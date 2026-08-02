@@ -618,7 +618,7 @@ export class Session {
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "the walk at idle — a reload reboots it, nothing mid-flight may be lost",
         got: `standing in ${leaf || "(nowhere)"}`,
-        remedy: { tool: "se_pull", args: {}, note: "pull to idle first (choice: \"idle\"), then se_reload" },
+        remedy: { tool: "se_pull", args: {}, note: "reach idle first — answer the offered doors with idle, or ask the person to aim the mirror — then se_reload" },
         source: "engine/session.ts reload",
       });
     }
@@ -811,116 +811,97 @@ export class Session {
     this.decisions.setExtraSink(undefined);
   }
 
-  /** ESCAPE (owner ruling 2026-07-27): always to idle — "we cannot work our
-   *  way through this machine". The sub-machine is LEFT STANDING (nothing
-   *  fills); the escape is a recorded failure with its reason, and a later
-   *  continue re-enters from the beginning, fast-forwarding on stored
-   *  evidence. Boot is the one exception — it must complete. */
+  /** ESCAPE (owner ruling 2026-08-02): ONE hatch, and it lands at the
+   *  FRONT DESK — where the person is. Every kind of stepping out is this
+   *  same move, told apart only by its reason: the person said stop, the
+   *  road is blocked, earlier work no longer stands. (pause and the
+   *  agent-side back retired with this ruling; the mirror's back button
+   *  remains the person's invalidating hand.) The walk that was left is
+   *  LEFT STANDING; a later walk re-enters it, fast-forwarding on stored
+   *  evidence. Boot is the one exception — it must complete.
+   *
+   *  THE HATCH IS NEVER GATED: no slider weighing, no read demand. Going
+   *  to the desk IS going to ask the person — the andon cord — and a cord
+   *  that can refuse to be pulled is no cord. What the desk demands
+   *  arrives on the next pull, as `read`. */
   escape(reason: string, channel: Channel = "agent"): Record<string, unknown> {
-    return this.exitToIdle(reason, channel, "escaped");
-  }
-
-  /** PAUSE (owner ruling 2026-07-29): escape's move, recorded as ordinary
-   *  work. An expedition is a day's bucket and is MEANT to stay open, so
-   *  stepping out to pick it up later is normal. Filing that as an escape
-   *  writes a false failure — and the retro mines escapes for the real ones. */
-  pause(reason: string, channel: Channel = "agent"): Record<string, unknown> {
-    return this.exitToIdle(reason, channel, "paused");
-  }
-
-  private exitToIdle(reason: string, channel: Channel, kind: "escaped" | "paused"): Record<string, unknown> {
-    const supplied = this.readProofs(channel);
-    const verb = kind === "escaped" ? "escape" : "pause";
     if (reason.trim() === "") {
       throw new Rejection({
         clause: CLAUSES.REQUIRED_ARGS,
-        expected:
-          kind === "escaped"
-            ? "a reason — an escape is a recorded failure, never a silent exit"
-            : "a reason — say what you are stepping out of, so the walk reads back",
+        expected: "a reason — an escape is recorded with its why, never a silent exit",
         got: "an empty reason",
-        remedy: {
-          tool: "se_pull",
-          args: kind === "escaped" ? { escape: "<why the walk cannot continue>" } : { pause: "<what you are stepping out of>" },
-        },
-        source: `engine/session.ts ${verb}`,
+        remedy: { tool: "se_pull", args: { escape: "<why you are stepping out>" } },
+        source: "engine/session.ts escape",
       });
     }
+    if (this.instance.status === "closed") {
+      throw new Rejection({
+        clause: CLAUSES.NOT_LEGAL_IN_STATE,
+        expected: "an open machine",
+        got: "an escape after end",
+        remedy: { tool: "se_pull", args: {}, note: "the machine is done; a new session starts at the beginning" },
+        source: "engine/session.ts escape",
+      });
+    }
+    const stood = this.active();
     if (!this.inSub()) {
-      // THE HATCH ALWAYS WORKS (owner ruling 2026-07-28): a main-machine
-      // walk escapes to idle too; only boot's green-proving must complete.
-      const stood = this.active();
-      if (stood.includes("idle")) {
+      if (stood.includes("front_desk")) {
         throw new Rejection({
           clause: CLAUSES.NOT_LEGAL_IN_STATE,
-          expected: "a walk away from idle",
-          got: `standing at idle — idle IS the ${verb} target`,
-          remedy: { tool: "se_pull", args: {}, note: `nothing to ${verb}; pull on normally` },
-          source: `engine/session.ts ${verb}`,
+          expected: "a walk away from the desk",
+          got: "standing at the front desk — the desk IS the escape target",
+          remedy: { tool: "se_pull", args: {}, note: "nothing to escape; talk to the person and pull on" },
+          source: "engine/session.ts escape",
         });
       }
       if (!this.instance.history.some((h) => h.state === "boot" && h.outcome === "filled")) {
         throw new Rejection({
           clause: CLAUSES.NOT_LEGAL_IN_STATE,
           expected: "a booted walk",
-          got: `a ${verb} before boot completed [${stood.join(", ")}]`,
+          got: `an escape before boot completed [${stood.join(", ")}]`,
           remedy: { tool: "se_pull", args: {}, note: "boot cannot be skipped — it must complete; if it is broken, tell the user" },
-          source: `engine/session.ts ${verb}`,
+          source: "engine/session.ts escape",
         });
       }
       const nowMain = new Date().toISOString();
-      this.gatePriority(this.machine, ["idle"], channel);
-      const idleState = this.state(this.machine, "idle");
-      const missingMain = this.entryRequirements(this.machine, idleState).filter((p) => !this.readProven(channel, p, supplied));
-      if (missingMain.length > 0) this.refuseReads("entry", "idle", missingMain, channel);
-      this.assertHandover(channel, supplied);
       const stoodIn = stood[0] ?? "(no state)";
-      this.instance.history.push({ state: stoodIn, outcome: kind, at: nowMain });
-      if (kind === "escaped") this.instance.escapes.push({ state: stoodIn, exhausted_guard: reason.slice(0, 300), at: nowMain });
-      this.instance.active = ["idle"];
-      this.instance.current = "idle";
+      this.instance.history.push({ state: stoodIn, outcome: "escaped", at: nowMain });
+      this.instance.escapes.push({ state: stoodIn, exhausted_guard: reason.slice(0, 300), at: nowMain });
+      this.instance.active = ["front_desk"];
+      this.instance.current = "front_desk";
+      this._target = "";
       this.unbind();
       this.notifyChange();
       return {
         ...this.tickInfo(),
-        [kind]: { from: stoodIn, reason },
-        note:
-          kind === "escaped"
-            ? "escaped to idle — the walk was left standing. Tell the user PLAINLY what blocked it, then wait for their ruling."
-            : "paused to idle — the walk was left standing, and a later continue re-enters it. Nothing failed.",
+        escaped: { from: stoodIn, reason },
+        note: "escaped to the front desk — the walk was left standing. Tell the person PLAINLY why, then wait for their word.",
       };
     }
     if (this.top()!.decl.id === "boot") {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "a sub-machine other than boot",
-        got: `a ${verb} from boot`,
+        got: "an escape from boot",
         remedy: { tool: "se_pull", args: {}, note: "boot cannot be skipped — it must complete; if it is broken, tell the user" },
-        source: `engine/session.ts ${verb}`,
+        source: "engine/session.ts escape",
       });
     }
     const now = new Date().toISOString();
-    this.gatePriority(this.machine, ["idle"], channel);
-    const idle = this.state(this.machine, "idle");
-    const missing = this.entryRequirements(this.machine, idle).filter((p) => !this.readProven(channel, p, supplied));
-    if (missing.length > 0) this.refuseReads("entry", "idle", missing, channel);
-    this.assertHandover(channel, supplied);
     const stoodIn = this.active()[0];
     const parent = this.subs[0].parentState;
-    this.instance.history.push({ state: stoodIn, outcome: kind, at: now });
-    if (kind === "escaped") this.instance.escapes.push({ state: parent, exhausted_guard: reason.slice(0, 300), at: now });
-    this.instance.active = [...activeStates(this.instance).filter((s) => s !== parent), "idle"];
-    this.instance.current = "idle";
+    this.instance.history.push({ state: stoodIn, outcome: "escaped", at: now });
+    this.instance.escapes.push({ state: parent, exhausted_guard: reason.slice(0, 300), at: now });
+    this.instance.active = [...activeStates(this.instance).filter((s) => s !== parent), "front_desk"];
+    this.instance.current = "front_desk";
     this.subs = [];
+    this._target = "";
     this.unbind();
     this.notifyChange();
     return {
       ...this.tickInfo(),
-      [kind]: { from: stoodIn, reason },
-      note:
-        kind === "escaped"
-          ? "escaped to idle — the machine was left standing. Tell the user PLAINLY what blocked the walk, then wait for their ruling."
-          : "paused to idle — the machine was left standing, and a later continue re-enters it. Nothing failed.",
+      escaped: { from: stoodIn, reason },
+      note: "escaped to the front desk — the machine was left standing, and a later walk re-enters it. Tell the person PLAINLY why, then wait for their word.",
     };
   }
 
@@ -1497,19 +1478,19 @@ export class Session {
    *  - `do`     the happy path, already walked, up to the next branch.
    *  - `wait`   out of work, or the next step is the person's.
    *
-   *  THE PAYLOAD IS EVERY DECISION THE AGENT STILL OWNS, and nothing else:
-   *  `form` (what it wrote), `choice` (where it heads), `back` (earlier
-   *  work no longer stands), `pause`/`escape` (stepping out, with why).
-   *  Everything that used to ride the tick — the hop, the proof, the
-   *  position, the route — is the machine's now.
+   *  THE PAYLOAD IS WHAT THE AGENT STILL OWNS, and it is TWO fields
+   *  (owner ruling 2026-08-02). `form` — the filled form the LAST pull
+   *  handed over: evidence for the step being left, or the answer to a
+   *  choice the machine offered ({choice: "<to>"}). A choice exists ONLY
+   *  where one was offered. `escape` — stepping out, with the why: one
+   *  hatch for every kind, landing at the front desk. Everything else —
+   *  the hop, the proof, the position, the route, invalidating earlier
+   *  work — is the machine's or the person's.
    *
-   *  A genuinely ILLEGAL call still throws (v2's Rejected kind): an
-   *  unreachable choice, a form nothing asked for. Those are contract
+   *  A genuinely ILLEGAL call still throws (v2's Rejected kind): a choice
+   *  outside the offer, a form nothing asked for. Those are contract
    *  violations, not a machine with nowhere to go. */
-  async pull(
-    payload: { form?: Record<string, string>; choice?: string | string[]; back?: string; pause?: string; escape?: string } = {},
-    channel: Channel = "agent",
-  ): Promise<Record<string, unknown>> {
+  async pull(payload: { form?: Record<string, unknown>; escape?: string } = {}, channel: Channel = "agent"): Promise<Record<string, unknown>> {
     const head = (): Record<string, unknown> => ({
       where: this.active(),
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
@@ -1519,68 +1500,69 @@ export class Session {
     });
 
     // STEPPING OUT stays the agent's decision — the machine cannot know
-    // the work should stop. The exit itself is the old machinery.
-    if (payload.pause !== undefined || payload.escape !== undefined) {
-      const kind = payload.pause !== undefined ? "paused" : "escaped";
-      const out = kind === "paused" ? this.pause(String(payload.pause), channel) : this.escape(String(payload.escape), channel);
+    // the work should stop. ONE hatch (owner ruling 2026-08-02), landing
+    // at the front desk; the reason is the whole story.
+    if (payload.escape !== undefined) {
+      const out = this.escape(String(payload.escape), channel);
       return {
         pull: "wait",
         ...head(),
-        stepped_out: out[kind],
+        stepped_out: out.escaped,
         waiting_for: "the person",
-        do: "say plainly why you stepped out and STOP — a message resumes you, and a later pull re-enters what was left standing",
+        do: "say plainly why you stepped out and STOP — the desk routes on the person's word",
       };
     }
 
-    // A JUMP BACK is a recorded decision: earlier work no longer stands.
-    // Deliberately NO walk afterwards — jumping back means the work there
-    // is to be REDONE, and sweeping forward again would walk past it.
-    if (payload.back !== undefined) {
-      this.jumpBack(String(payload.back), channel);
-      return {
-        pull: "do",
-        ...head(),
-        walked: [],
-        arrived: false,
-        here: this.pullHere(),
-        do: "redo what no longer stands, then pull again",
-      };
-    }
-
-    // THE PAYLOAD IS THE SUBMIT THAT HAS NO VERB — evidence for the LAST
-    // thing the machine asked, riding the next pull.
+    // THE PAYLOAD IS THE SUBMIT THAT HAS NO VERB — the filled form the
+    // LAST pull handed over. WHICH form is never the agent's call:
+    // evidence is expected while a step on the way demands it; a CHOICE
+    // only where the machine offered one (the road split, no target).
+    // Evidence wins when both could read — deterministic, and documented
+    // on the tool.
     let saved: Record<string, unknown> | undefined;
+    let fanOut: string[] = [];
     if (payload.form !== undefined) {
       const owed = this.pullFormsOwed();
-      if (owed.length === 0) {
+      if (owed.length > 0) {
+        saved = this.formSave(owed[0], payload.form as Record<string, string>);
+      } else if (this._target === "" && payload.form.choice !== undefined) {
+        // A LIST is legal on purpose: the seam for "send three agents, one
+        // per lane" must not be designed shut (owner, 2026-08-01). Only
+        // the first is walked, because one agent is walking — and every
+        // pick must come from the OFFER, because a choice exists only
+        // where the machine asked for one (owner, 2026-08-02).
+        const offered = this.pullOptions().map((o) => String(o.to));
+        const picks = (Array.isArray(payload.form.choice) ? payload.form.choice : [payload.form.choice]).map(String).filter((x) => x !== "");
+        if (picks.length === 0) {
+          throw new Rejection({
+            clause: CLAUSES.REQUIRED_ARGS,
+            expected: "a door from the offer, or a list of them",
+            got: "an empty choice",
+            remedy: { tool: "se_pull", args: {}, note: "pull with no payload to see the offer again" },
+            source: "engine/session.ts pull",
+          });
+        }
+        const stray = picks.find((p) => !offered.includes(p));
+        if (stray !== undefined) {
+          throw new Rejection({
+            clause: CLAUSES.NOT_LEGAL_IN_STATE,
+            expected: `one of the offered doors: ${offered.join(", ")}`,
+            got: stray,
+            remedy: { tool: "se_pull", args: {}, note: "a choice exists only where the machine offered one — pull with no payload and answer from its options" },
+            source: "engine/session.ts pull",
+          });
+        }
+        this.setTarget(picks[0]);
+        fanOut = picks.slice(1);
+      } else {
         throw new Rejection({
           clause: CLAUSES.NOT_LEGAL_IN_STATE,
           expected: "a step that asked for a form",
-          got: "a filled form, but nothing on the way wants one",
+          got: this._target === "" ? "a filled form, but nothing asked for one" : "a filled form, but nothing on the way wants one",
           remedy: { tool: "se_pull", args: {}, note: "pull with no payload — the machine says what it wants before you fill anything" },
           source: "engine/session.ts pull",
         });
       }
-      saved = this.formSave(owed[0], payload.form);
-    }
-
-    // A CHOICE AIMS THE WALK. A LIST is legal on purpose: the seam for
-    // "send three agents, one per lane" must not be designed shut (owner,
-    // 2026-08-01). Only the first is walked, because one agent is walking.
-    let fanOut: string[] = [];
-    if (payload.choice !== undefined) {
-      const picks = (Array.isArray(payload.choice) ? payload.choice : [payload.choice]).map(String).filter((x) => x !== "");
-      if (picks.length === 0) {
-        throw new Rejection({
-          clause: CLAUSES.REQUIRED_ARGS,
-          expected: "a state id to choose, or a list of them",
-          got: "an empty choice",
-          remedy: { tool: "se_pull", args: {}, note: "pull with no payload to see the options again" },
-          source: "engine/session.ts pull",
-        });
-      }
-      this.setTarget(picks[0]); // an unreachable pick refuses — that is illegal, not blocked
-      fanOut = picks.slice(1);
     }
 
     const extra = (): Record<string, unknown> => ({
@@ -1593,7 +1575,7 @@ export class Session {
     if (this._target === "") {
       const options = this.pullOptions();
       if (options.length > 0) {
-        return { pull: "choose", ...head(), options, do: "pick one and return it on the next pull as choice: \"<to>\" — a LIST is legal where the work fans out", ...extra() };
+        return { pull: "choose", ...head(), options, do: "pick one and return it on the next pull as form: {\"choice\": \"<to>\"} — a LIST is legal where the work fans out", ...extra() };
       }
       return { pull: "wait", ...head(), waiting_for: "the person", do: "say plainly that nothing is owed and STOP — the slider alone cannot wake you, so ask them to message you", ...extra() };
     }

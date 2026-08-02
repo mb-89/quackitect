@@ -100,7 +100,10 @@ test("idle opens the whole lane; pulling to end closes it; after the close the p
   const w = await call(server, "se_file_write", { path: "x.md", content: "hi", base_hash: null });
   assert.equal(w.isError, false);
   handOver(root); // the way out writes the next session's briefing
-  const exit = await call(server, "se_pull", { choice: "end" });
+  // At idle the machine OFFERS the doors; end is answered as a form.
+  const offer = await call(server, "se_pull");
+  assert.equal(offer.body.pull, "choose", JSON.stringify(offer.body));
+  const exit = await call(server, "se_pull", { form: { choice: "end" } });
   assert.equal(exit.isError, false, JSON.stringify(exit.body));
   const after = await call(server, "se_file_read", { path: "x.md" });
   assert.equal(after.isError, true);

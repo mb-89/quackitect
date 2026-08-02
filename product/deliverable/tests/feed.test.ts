@@ -59,7 +59,7 @@ test("the toll: armed after boot, one grace warning, then the refusal — any op
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session, { now: () => t });
-  await pullBoot(server);
+  await pullBoot(server, session);
   // A cheap, non-moving lane call carries the toll — the walk stands at
   // idle with no target, so a bare pull would only offer doors; a windowed
   // read is the neutral carrier here.
@@ -289,7 +289,7 @@ test("the update rides any tool call, is stripped before the handler, and never 
   const session = new Session(root);
   const server = buildServer(root, session);
   // Boot the walk so a work tool is legal, then ride an update on it.
-  await pullBoot(server);
+  await pullBoot(server, session);
   const r = await call(server, "se_file_list", { dir: ".", update: { op: "fork", brief: "looking around" } });
   assert.equal(r.isError, false, JSON.stringify(r.body));
   assert.equal(session.decisions.graph(session.currentVisit()).nodes.length, 1);

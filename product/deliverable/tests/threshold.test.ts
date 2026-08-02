@@ -42,7 +42,7 @@ test("the slider takes effect live: raise the autonomy and the agent's next pull
   const session = await sessionAtIdle(r);
   const server = buildServer(r, session);
   session.setAutonomy(0.2);
-  const held = await call(server, "se_pull", { choice: "expeditions" });
+  const held = await call(server, "se_pull", { form: { choice: "expeditions" } });
   assert.equal(held.body.pull, "wait");
   assert.match(String(held.body.at), /expeditions/, "the wait names the step that waits");
   session.setAutonomy(0.4); // the slider's POST lands here
@@ -56,17 +56,20 @@ test("the gate weighs the TARGET: a 0.4 state waits at 0.2, the archives wait at
   const session = await sessionAtIdle(r);
   const server = buildServer(r, session);
   session.setAutonomy(0.2);
-  // expeditions weighs 0.4 — above the agent's reach.
-  const held = await call(server, "se_pull", { choice: "expeditions" });
+  // expeditions weighs 0.4 — above the agent's reach. It IS one of idle's
+  // offered doors, so answering it is legal; walking it is not.
+  const held = await call(server, "se_pull", { form: { choice: "expeditions" } });
   assert.equal(held.body.pull, "wait");
   // The archives sit ABOVE the whole slider (1.5, human-only browsing).
   session.setAutonomy(1);
-  const arch = await call(server, "se_pull", { choice: "expedition_archive" });
+  session.setTarget(""); // drop the held aim so the doors are offered again
+  const arch = await call(server, "se_pull", { form: { choice: "expedition_archive" } });
   assert.equal(arch.body.pull, "wait", "1.5 outweighs even the top rung");
   session.setAutonomy(0.2);
+  session.setTarget("");
   // The front desk weighs 0.2 — exactly at the autonomy, the agent may.
   // Its method doc is owed first; the pull says read, the loop drains it.
-  const aim = await call(server, "se_pull", { choice: "front_desk" });
+  const aim = await call(server, "se_pull", { form: { choice: "front_desk" } });
   if (aim.body.pull === "read") readEverything(session);
   const desk = await call(server, "se_pull");
   assert.equal(desk.body.pull, "do", JSON.stringify(desk.body));
@@ -81,21 +84,16 @@ test("the gate weighs the TARGET: a 0.4 state waits at 0.2, the archives wait at
   assert.deepEqual(session.active(), ["expeditions/start"]);
 });
 
-test("jump back is entering too: the agent's back-jump is weighed, and STAYS a refusal", async () => {
-  // The pull turns a blocked WALK into an instruction. A back-jump is not
-  // a walk — it is the agent's own recorded decision, and one it may not
-  // take above the slider: that refusal is the contract, kept typed.
+test("the hatch is never gated: an escape at autonomy 0 still reaches the desk", async () => {
+  // The threshold guards what the agent ENTERS on its own judgment. The
+  // escape is the andon cord — going to the desk IS going to ask the
+  // person — and a cord that can refuse to be pulled is no cord.
   const r = root();
   const session = await sessionAtIdle(r);
-  session.setAutonomy(1);
-  readEverything(session);
-  session.setTarget("front_desk");
-  await session.pull();
-  checkDocs(session); // the human's hand proves by checkbox
-  await session.tickAdvance(); // desk back to idle, human hand
-  assert.deepEqual(session.active(), ["idle"]);
   session.setAutonomy(0);
-  await assert.rejects(() => session.pull({ back: "front_desk" }), (e) => (e as { clause?: string }).clause === "SE-C-113");
+  const out = (await session.pull({ escape: "the road is blocked, and the person must rule" })) as Record<string, unknown>;
+  assert.equal(out.pull, "wait");
+  assert.deepEqual(session.active(), ["front_desk"], "the desk weighs 0.2 and the hatch lands there anyway");
 });
 
 test("priority and autonomy ride every packet — the agent can weigh its next states", () => {

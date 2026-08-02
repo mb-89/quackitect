@@ -327,8 +327,10 @@ function briefFor(rec: CallRecord): string {
   switch (rec.tool) {
     case "se_tick": // old logs only — the tick retired 2026-08-02
       return a.back !== undefined ? `back → ${a.back}` : a.state !== undefined ? `peek ${a.state}` : a.wait === true ? "hold (wait)" : a.to !== undefined ? `tick → ${a.to}` : a.advance === true ? "tick advance" : "tick (look)";
-    case "se_pull":
-      return a.back !== undefined ? `pull · back → ${a.back}` : a.pause !== undefined ? "pull · pause" : a.escape !== undefined ? "pull · escape" : a.choice !== undefined ? `pull · choice ${Array.isArray(a.choice) ? (a.choice as unknown[]).join(", ") : a.choice}` : a.form !== undefined ? "pull · form" : "pull";
+    case "se_pull": {
+      const f = a.form as { choice?: unknown } | undefined;
+      return a.escape !== undefined ? "pull · escape" : f?.choice !== undefined ? `pull · choice ${Array.isArray(f.choice) ? (f.choice as unknown[]).join(", ") : String(f.choice)}` : f !== undefined ? "pull · form" : "pull";
+    }
     case "mirror_tick":
       return a.back !== undefined ? `back → ${a.back}` : a.to !== undefined ? `tick → ${a.to}` : "tick advance";
     case "mirror_check": return `check ${a.path}`;

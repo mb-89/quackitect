@@ -254,11 +254,13 @@ export async function sessionAtIdle(root: string): Promise<Session> {
   throw new Error(`the pull did not reach idle: ${JSON.stringify(s.active())}`);
 }
 
-/** Boot an EXISTING server by pulling, exactly as a real agent does:
- *  aim at idle, read what the machine serves, pull again. */
-export async function pullBoot(server: Server): Promise<void> {
-  const aim = await call(server, "se_pull", { choice: "idle" });
-  if (aim.isError) throw new Error(`aim failed: ${JSON.stringify(aim.body)}`);
+/** Boot an EXISTING server by pulling, exactly as a real agent does: do
+ *  what each answer says. WITH a session, the person's hand aims at idle
+ *  first (the agent cannot free-aim — a choice exists only where one was
+ *  offered); WITHOUT one, the walk follows the session's default target
+ *  and rests at the front desk. */
+export async function pullBoot(server: Server, session?: Session): Promise<void> {
+  if (session !== undefined) session.setTarget("idle");
   for (let i = 0; i < 12; i++) {
     const r = await call(server, "se_pull");
     if (r.isError) throw new Error(`boot pull failed: ${JSON.stringify(r.body)}`);
@@ -270,35 +272,32 @@ export async function pullBoot(server: Server): Promise<void> {
       }
       continue;
     }
-    if ((r.body.where as string[]).includes("idle")) return;
+    const where = r.body.where as string[];
+    if (where.includes("idle") || where.includes("front_desk")) return;
   }
-  throw new Error("the pull did not reach idle");
+  throw new Error("the pull did not reach a resting place");
 }
 
-/** A fresh server pulled through the whole boot walk into idle. */
+/** A fresh server pulled through the whole boot walk into IDLE — the
+ *  person's aim, so the doors stand open for whatever the test drives. */
 export async function bootedServer(root: string): Promise<Server> {
-  const server = buildServer(root);
-  await pullBoot(server);
+  const session = new Session(root);
+  const server = buildServer(root, session);
+  await pullBoot(server, session);
   return server;
 }
 
-/** Pull the walk to a named state: choose it, drain any reading owed on
- *  the way, and expect the machine to walk. Throws on any other answer,
- *  so a test that expects a refusal drives the pull itself. */
-export async function pullTo(server: Server, state: string): Promise<void> {
-  let r = await call(server, "se_pull", { choice: state });
+/** Aim the person's hand at a state and pull the walk there, draining any
+ *  reading owed on the way. Throws on any other answer, so a test that
+ *  expects a refusal drives the pull itself. */
+export async function pullTo(session: Session, state: string): Promise<void> {
+  session.setTarget(state);
   for (let i = 0; i < 6; i++) {
-    if (r.isError) throw new Error(`pull refused: ${JSON.stringify(r.body)}`);
-    if (r.body.pull === "read") {
-      for (let j = 0; j < 40; j++) {
-        const doc = await call(server, "se_reading");
-        if (doc.body.done === true) break;
-      }
-      r = await call(server, "se_pull");
-      continue;
-    }
-    if (r.body.pull === "do" && r.body.arrived === true) return;
-    throw new Error(`the pull did not walk: ${JSON.stringify(r.body)}`);
+    readEverything(session);
+    const r = (await session.pull()) as { pull?: string; arrived?: boolean };
+    if (r.pull === "read") continue;
+    if (r.pull === "do" && r.arrived === true) return;
+    throw new Error(`the pull did not walk: ${JSON.stringify(r)}`);
   }
   throw new Error("the reading never drained");
 }

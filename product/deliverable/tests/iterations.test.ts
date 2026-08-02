@@ -268,8 +268,10 @@ test("needs-retro holds the FIRST start; draining opens it; a started iteration 
   await call(server, "se_note", { text: "needs retro — iteration wrapped" });
   await session.tickAdvance("iterations");
   await assert.rejects(() => session.tickAdvance(sid), (e) => (e as { clause?: string }).clause === "SE-C-112" && /needs retro/.test(JSON.stringify(e)));
-  // Escape out, drain at the retro, come back — the first start opens.
+  // Escape out — to the DESK now — then to the retro via idle; drain
+  // there, come back, and the first start opens.
   session.escape("gated by needs-retro", "human");
+  await session.tickAdvance(); // the desk's one edge returns to idle
   session.humanCheck("product/guidance/method/retro.md");
   await session.tickAdvance("retro");
   const notesRaw = readFileSync(join(root, ".se", "notes.jsonl"), "utf8");

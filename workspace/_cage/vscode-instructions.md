@@ -7,8 +7,10 @@ the whole rule.
 
 Pull. Call `se_pull` with no payload. The machine answers with an
 instruction — `read`, `fill`, `choose`, `do`, or `wait` — and its answer
-says what to do about it. Do that, then pull again. Stop only at `wait`,
-or on a typed refusal you cannot remedy.
+says what to do about it. Do that, then pull again. Everything you hand
+back rides `form` (a choice is a form too, and only exists when offered);
+stepping out is `escape`, and it lands at the front desk. Stop only at
+`wait`, or on a typed refusal you cannot remedy.
 
 Do this at the START OF EVERY SESSION, unasked. Whatever the first message
 says, even if it says nothing about the machine, your first tool call is

@@ -332,3 +332,44 @@
 {"ts":"2026-08-02T11:21:40.737Z","op":"update","visit":"expeditions/e30@0","node":"d133","brief":"Battery eight past three minutes under load"}
 {"ts":"2026-08-02T11:22:00.884Z","op":"update","visit":"expeditions/e30@0","node":"d134","brief":"Exit zero — reading the tallies"}
 {"ts":"2026-08-02T11:22:21.049Z","op":"update","visit":"expeditions/e30@0","node":"d135","brief":"The report carries the real tallies and the fifth defect"}
+{"ts":"2026-08-02T11:22:35.440Z","op":"done","visit":"expeditions/e30@0","node":"d48","brief":"672 green at exit 0 and the report stands amended"}
+{"ts":"2026-08-02T11:35:19.503Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d136","brief":"One escape to the front desk replaces back and pause"},{"id":"d137","brief":"Choice becomes the answer to an offered form"},{"id":"d138","brief":"Guidance and schemas follow the two-field payload"},{"id":"d139","brief":"Tests follow and the battery goes green"}]}
+{"ts":"2026-08-02T11:36:13.098Z","op":"update","visit":"expeditions/e30@0","node":"d140","brief":"The pull takes two fields and validates choices against the offer"}
+{"ts":"2026-08-02T11:36:51.365Z","op":"update","visit":"expeditions/e30@0","node":"d141","brief":"The tool schema shrinks to form and escape"}
+{"ts":"2026-08-02T11:37:17.527Z","op":"update","visit":"expeditions/e30@0","node":"d142","brief":"The feed line and the type vocabulary follow"}
+{"ts":"2026-08-02T11:37:56.932Z","op":"update","visit":"expeditions/e30@0","node":"d143","brief":"walking.md carries the two-field payload"}
+{"ts":"2026-08-02T11:38:18.670Z","op":"done","visit":"expeditions/e30@0","node":"d138","brief":"Every contract surface speaks the two-field payload"}
+{"ts":"2026-08-02T11:38:27.049Z","op":"update","visit":"expeditions/e30@0","node":"d144","brief":"Mapping the test surface of the payload change"}
+{"ts":"2026-08-02T11:40:25.926Z","op":"update","visit":"expeditions/e30@0","node":"d145","brief":"Helpers aim with the person's hand instead of a free choice"}
+{"ts":"2026-08-02T11:40:55.140Z","op":"update","visit":"expeditions/e30@0","node":"d146","brief":"The simple call sites answer with forms or bare pulls"}
+{"ts":"2026-08-02T11:41:16.743Z","op":"update","visit":"expeditions/e30@0","node":"d147","brief":"reads.test aims by the mirror and answers offered doors"}
+{"ts":"2026-08-02T11:41:42.594Z","op":"update","visit":"expeditions/e30@0","node":"d148","brief":"threshold answers doors as forms and pins the ungated hatch"}
+{"ts":"2026-08-02T11:42:10.745Z","op":"done","visit":"expeditions/e30@0","node":"d137","brief":"The choice rides the form, validated against the offer"}
+{"ts":"2026-08-02T11:42:47.092Z","op":"update","visit":"expeditions/e30@0","node":"d149","brief":"worktree pins the one hatch and its desk landing"}
+{"ts":"2026-08-02T11:43:22.191Z","op":"done","visit":"expeditions/e30@0","node":"d136","brief":"The one hatch lands at the desk, pinned across the tests"}
+{"ts":"2026-08-02T11:43:45.126Z","op":"update","visit":"expeditions/e30@0","node":"d150","brief":"The last pullBoot call sites hand their session over"}
+{"ts":"2026-08-02T11:43:53.571Z","op":"update","visit":"expeditions/e30@0","node":"d151","brief":"File-scoped run one: the three pull files"}
+{"ts":"2026-08-02T11:44:13.401Z","op":"update","visit":"expeditions/e30@0","node":"d152","brief":"The suite-cost charter is on the inbox"}
+{"ts":"2026-08-02T11:44:59.817Z","op":"update","visit":"expeditions/e30@0","node":"d153","brief":"The report records the two-field payload and its tradeoff"}
+{"ts":"2026-08-02T11:45:20.553Z","op":"update","visit":"expeditions/e30@0","node":"d154","brief":"Run two mid-flight"}
+{"ts":"2026-08-02T11:45:30.101Z","op":"update","visit":"expeditions/e30@0","node":"d155","brief":"Run three covers the reading and routing files"}
+{"ts":"2026-08-02T11:46:06.040Z","op":"update","visit":"expeditions/e30@0","node":"d156","brief":"Run three still walking its boots"}
+{"ts":"2026-08-02T11:46:33.747Z","op":"update","visit":"expeditions/e30@0","node":"d157","brief":"Run three near the finish"}
+{"ts":"2026-08-02T11:47:40.403Z","op":"update","visit":"expeditions/e30@0","node":"d158","brief":"retro boots to idle by aim and reads drops its last free choice"}
+{"ts":"2026-08-02T11:48:16.875Z","op":"update","visit":"expeditions/e30@0","node":"d159","brief":"Re-running the two fixed files"}
+{"ts":"2026-08-02T11:48:37.750Z","op":"update","visit":"expeditions/e30@0","node":"d160","brief":"Waiting on the re-run"}
+{"ts":"2026-08-02T11:48:53.042Z","op":"update","visit":"expeditions/e30@0","node":"d161","brief":"The one full battery at the end"}
+{"ts":"2026-08-02T11:49:14.737Z","op":"update","visit":"expeditions/e30@0","node":"d162","brief":"Battery started, occupying myself with the audit note meanwhile"}
+{"ts":"2026-08-02T11:49:31.348Z","op":"update","visit":"expeditions/e30@0","node":"d163","brief":"The audit's follow-up note is on the inbox"}
+{"ts":"2026-08-02T11:50:05.766Z","op":"update","visit":"expeditions/e30@0","node":"d164","brief":"Final battery at the one-minute mark"}
+{"ts":"2026-08-02T11:50:25.209Z","op":"update","visit":"expeditions/e30@0","node":"d165","brief":"Final battery past ninety seconds"}
+{"ts":"2026-08-02T11:50:44.305Z","op":"update","visit":"expeditions/e30@0","node":"d166","brief":"Final battery nearing two minutes"}
+{"ts":"2026-08-02T11:51:04.095Z","op":"update","visit":"expeditions/e30@0","node":"d167","brief":"One case left: needs-retro"}
+{"ts":"2026-08-02T11:51:25.532Z","op":"update","visit":"expeditions/e30@0","node":"d168","brief":"The escaped walk hops the desk before the retro"}
+{"ts":"2026-08-02T11:51:46.846Z","op":"update","visit":"expeditions/e30@0","node":"d169","brief":"The confirming battery after the last fix"}
+{"ts":"2026-08-02T11:52:10.921Z","op":"update","visit":"expeditions/e30@0","node":"d170","brief":"Confirming battery underway"}
+{"ts":"2026-08-02T11:52:32.656Z","op":"update","visit":"expeditions/e30@0","node":"d171","brief":"Confirming battery at forty seconds"}
+{"ts":"2026-08-02T11:52:56.889Z","op":"update","visit":"expeditions/e30@0","node":"d172","brief":"Confirming battery past the minute"}
+{"ts":"2026-08-02T11:53:21.130Z","op":"update","visit":"expeditions/e30@0","node":"d173","brief":"Confirming battery in its last leg"}
+{"ts":"2026-08-02T11:53:43.597Z","op":"update","visit":"expeditions/e30@0","node":"d174","brief":"Exit zero, reading the tallies"}
+{"ts":"2026-08-02T11:53:51.810Z","op":"done","visit":"expeditions/e30@0","node":"d139","brief":"672 green at exit 0 on the reworked payload"}

@@ -74,8 +74,6 @@ tool list; se_pull is the agent's one verb. What each side owns now:
   gone), and the read proof end to end: read_hashes no longer exists,
   se_reading and se_file_read credit what they serve, and the reads
   refusal's remedy speaks the reading loop.
-- The AGENT keeps five decisions, all payload fields on se_pull: choice,
-  form, back, pause, escape. The pull grew back/pause/escape for this.
 - The DESK's door vocabulary rides se_survey as a live doors list derived
   from idle's edges, replacing the retired peek.
 - The BANNER now survives a sweep — it used to be eaten mid-walk, against
@@ -85,8 +83,26 @@ tool list; se_pull is the agent's one verb. What each side owns now:
   machine state card now speak pull. v3-plan.md's M1b entry records what
   shipped against what was planned.
 
+THE PAYLOAD SHRANK TO TWO FIELDS the same day, on the owner's second
+ruling. The first cut left the agent five decisions; the owner struck
+three of them.
+
+- `form` is the ONLY answer channel. A choice is a form too: the machine
+  offers its doors where the road splits, the agent answers form
+  {choice: "<to>"}, and only a door from the offer is legal. The
+  free-aimed choice is gone — you never choose unasked. Long-range
+  aiming is the person's, through the mirror's target, and the pull
+  follows it.
+- `escape` is the ONE hatch. back and pause are deleted: every kind of
+  stepping out — the person said stop, the road is blocked, earlier work
+  no longer stands — is an escape, told apart by its reason alone. It
+  lands at the FRONT DESK, where the person routes, and it is never
+  gated: no slider weighing, no read demand — the andon cord. Redoing
+  earlier work is escape-and-say-so; the person invalidates from the
+  mirror's back button, and the walk re-earns the evidence.
+
 The full audit — what moved, what stayed, with reasons — is
-note-c812ee64df45.
+note-c812ee64df45, and the payload cut is recorded on top of it.
 
 THE SHUTDOWN ROW. A new toggles parameter type, for buttons that do not
 exclude each other. The machine holds the two flags and serves them. Block
@@ -207,6 +223,16 @@ graph-is-evidence check without it ever looking.
 HAND VERIFICATION. Nobody has driven the pull lane by hand from an agent, and
 nobody has watched a real machine refuse to sleep or shut down at idle. Both
 are covered by tests and neither has been observed.
+
+THE SUITE'S WALL CLOCK STANDS UNFIXED, and the owner called it out: the
+pull cases each pay a real boot walk. The charter for the fix — a booted
+template copied per case — is note-2b63b3266a46, deferred on the owner's
+word.
+
+THE PAUSE'S RETRO SIGNAL IS GONE BY DESIGN. Escapes were mined for real
+blockages, and pause existed so routine stepping-out would not drown that
+signal. One hatch means the retro now reads REASONS instead of a flag —
+noted here so the next retro knows to.
 
 PARKED DELIBERATELY, not dropped. Machine-picture layout waits, and lifts v2's
 ranker when it returns. The specification column waits until a consumer exists.

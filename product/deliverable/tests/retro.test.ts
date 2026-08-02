@@ -20,7 +20,7 @@ test("draining splits: done and obsolete anywhere, carried and backlog only in t
   const session = new Session(root);
   session.setAutonomy(1); // the retro weighs 1.0 - lift the slider clear
   const server = buildServer(root, session);
-  await pullBoot(server);
+  await pullBoot(server, session);
   const minted = await call(server, "se_note", { text: "a stray to drain" });
   const ref = String(minted.body.captured);
   // AN INBOX YOU MAY ONLY ADD TO IS NOT AN INBOX (owner ruling 2026-08-01).
@@ -38,7 +38,7 @@ test("draining splits: done and obsolete anywhere, carried and backlog only in t
   const ref2 = String(second.body.captured);
   // Enter the retro — one plain state; the way in owes the METHOD read,
   // which the pull serves through the reading loop.
-  await pullTo(server, "retro");
+  await pullTo(session, "retro");
   // Here, and ONLY here, the judgment dispositions work.
   const parked = await call(server, "se_note_drain", { ref: ref2, disposition: "backlog", where: "ready when someone cares" });
   assert.equal(parked.isError, false, JSON.stringify(parked.body));
@@ -54,10 +54,10 @@ test("the backlog home (v1 port): backlog demands its ready-when, parks the note
   const session = new Session(root);
   session.setAutonomy(1); // the retro weighs 1.0 - lift the slider clear
   const server = buildServer(root, session);
-  await pullBoot(server);
+  await pullBoot(server, session);
   const minted = await call(server, "se_note", { text: "future scope" });
   const ref = String(minted.body.captured);
-  await pullTo(server, "retro");
+  await pullTo(session, "retro");
   // A made-up disposition refuses; backlog without its ready-when refuses.
   const bad = await call(server, "se_note_drain", { ref, disposition: "later" });
   assert.equal(bad.isError, true);
@@ -80,14 +80,14 @@ test("since last_retro: the log query scopes to the period after the newest drai
   const session = new Session(root);
   session.setAutonomy(1); // the retro weighs 1.0 - lift the slider clear
   const server = buildServer(root, session);
-  await pullBoot(server);
+  await pullBoot(server, session);
   // No drain yet: last_retro means no floor — everything counts.
   const log = new CallLog(seDir(root));
   const before = log.query({ filter: { since: "last_retro" } }).total;
   assert.ok(before > 0, "boot calls are on the log");
   // Run a drain (the retro marker) …
   const minted = await call(server, "se_note", { text: "marker" });
-  await pullTo(server, "retro");
+  await pullTo(session, "retro");
   await call(server, "se_note_drain", { ref: String(minted.body.captured), disposition: "done", where: "test" });
   // … then act once more: the scoped query sees only the tail.
   await call(server, "se_file_read", { path: "product/guidance/contract.md", offset: 1, limit: 1 });
@@ -100,12 +100,12 @@ test("the desk drains the mechanical verdicts and is refused the judgment ones",
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session);
-  await pullBoot(server);
+  await pullBoot(server, session);
   const stale = String((await call(server, "se_note", { text: "a later note supersedes this one" })).body.captured);
   const judged = String((await call(server, "se_note", { text: "what this means is the retro's call" })).body.captured);
   // The desk weighs 0.2 — the default slider clears it; the way in owes
   // the method, and the pull's reading loop serves it.
-  await pullTo(server, "front_desk");
+  await pullTo(session, "front_desk");
   // MECHANICAL — superseded, already built, ruled on since. Anyone may check it.
   const dropped = await call(server, "se_note_drain", { ref: stale, disposition: "obsolete", where: "superseded" });
   assert.equal(dropped.isError, false, JSON.stringify(dropped.body));
@@ -129,7 +129,7 @@ test("the survey lists a note by title — cut at a word, never mid-word, and ne
   }
   const session = new Session(root);
   const server = buildServer(root, session);
-  await pullBoot(server);
+  await pullBoot(server, session);
   // Every real note opens with a heading and carries its content below it.
   // The old defect took the first line and then 120 characters of it, so the
   // survey showed a title cut mid-word and none of the substance. A listing

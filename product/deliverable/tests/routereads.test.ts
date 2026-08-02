@@ -41,8 +41,8 @@ test("one multi-read of the listed set carries the whole walk to the target", as
   assert.equal(got.isError, false, JSON.stringify(got.body));
 
   // ONE pull walks the whole way on those credits: no read instruction,
-  // straight to `do`, arrived.
-  const walked = await call(server, "se_pull", { choice: "front_desk" });
+  // straight to `do`, arrived at the default target.
+  const walked = await call(server, "se_pull");
   assert.equal(walked.body.pull, "do", JSON.stringify(walked.body));
   assert.equal(walked.body.arrived, true, "the way was walked on the reading the packet named");
   assert.deepEqual(session.active(), ["front_desk"]);
@@ -54,7 +54,7 @@ test("the list goes away once the target is reached", async () => {
   const server = buildServer(root, session);
   const reads = (session.tickInfo() as { route_reads: string[] }).route_reads;
   await call(server, "se_file_read", { paths: reads });
-  const walked = await call(server, "se_pull", { choice: "front_desk" });
+  const walked = await call(server, "se_pull");
   assert.equal(walked.body.arrived, true, JSON.stringify(walked.body));
   const after = session.tickInfo() as { target: string; route_reads?: string[] };
   assert.equal(after.target, "", "arriving clears the target");

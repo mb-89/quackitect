@@ -17,7 +17,9 @@ One call, one optional payload. It answers with an INSTRUCTION, and the
   handed it over, so you never look one up. Fill it and return it on the
   next pull as `form`.
 - `choose` — the road splits. The options ride along with their statement,
-  weight and whether they are open. Return `choice` on the next pull.
+  weight and whether they are open. Answer on the next pull as
+  `form: {"choice": "<to>"}` — the choice is itself a form, and it exists
+  only because the machine handed it to you.
 - `do` — the happy path was WALKED for you, every hop to the next
   branching point in one call. `here` is where you landed, with its
   guidance and what it will ask. Do the work, then pull again.
@@ -33,7 +35,7 @@ BLOCKING IS AN INSTRUCTION, NOT AN ERROR. This is the point, and it is
 v2's law (§6). A threshold, an unmet condition and an undrawn route are
 the machine knowing what should happen next — the pull says it instead of
 throwing it. What stays a refusal is what is genuinely ILLEGAL: a choice
-no edge reaches, a form nothing asked for. A refusal is typed — clause,
+outside the offer, a form nothing asked for. A refusal is typed — clause,
 expected, got, and an executable remedy. Follow the remedy; recover in
 one turn. When a result carries a banner, show it to the user VERBATIM.
 
@@ -45,24 +47,30 @@ pull is safe by construction.
 
 ## What the agent still decides
 
-The payload is the whole list, and it is short on purpose.
+The payload is the whole list, and it is TWO fields (owner ruling
+2026-08-02).
 
-- `choice` — where to head: an offered option, or any drawn state. This
-  is the blue line: you set the target, the engine pulls you there. A
-  LIST is legal where the work fans out; one agent walks the first and
-  the rest come back as `not_walked`.
-- `form` — what you wrote into the form the machine handed you.
-- `back` — earlier work no longer stands. The walk reopens that state
-  and STOPS ON IT for the redo; downstream evidence is invalidated.
-- `pause` / `escape` — stepping out to idle, with the reason. Pause is
-  ordinary work; escape is a recorded failure.
+- `form` — the filled form the machine handed you. For evidence, the
+  sections. For an OFFERED choice, `{"choice": "<to>"}` — a LIST is
+  legal where the work fans out; one agent walks the first and the rest
+  come back as `not_walked`. You never choose unasked: a choice is a
+  form, and the machine builds every form.
+- `escape` — stepping out, with the reason. ONE hatch for every kind:
+  the person said stop, the road is blocked, earlier work no longer
+  stands. It lands at the FRONT DESK, where the person routes, and the
+  reason is the whole record.
+
+REDOING EARLIER WORK is not a payload field. Escape to the desk and say
+what no longer stands; the person invalidates from the mirror (the back
+button), and the walk re-earns the evidence on its way through.
 
 Everything else the tick used to ask of you — `advance`, `from`,
-`read_hashes`, `route`, `sweep`, `state` peeks, `wait` holds — is the
-engine's now. There is no position to assert (the pull recomputes from
-wherever the walk stands, so the human's hand can never race you), no
-proof to carry (reading credits itself), and no route to draw (the
-mirror draws it; the pull walks it).
+`read_hashes`, `route`, `sweep`, `state` peeks, `wait` holds, the
+free-aimed target — is the engine's or the person's now. There is no
+position to assert (the pull recomputes from wherever the walk stands,
+so the human's hand can never race you), no proof to carry (reading
+credits itself), and no route to draw (the mirror draws it; the pull
+walks it).
 
 ## The person's hand
 

@@ -16,7 +16,8 @@ async function booted(): Promise<{ server: ReturnType<typeof buildServer>; sessi
   const session = new Session(root);
   const server = buildServer(root, session);
   await call(server, "se_file_read", { path: ".se/reading.md" });
-  const walked = await call(server, "se_pull", { choice: "front_desk" });
+  // The session's default target IS the desk — a bare pull walks there.
+  const walked = await call(server, "se_pull");
   assert.equal(walked.body.pull, "do", JSON.stringify(walked.body));
   assert.deepEqual(session.active(), ["front_desk"], JSON.stringify(walked.body));
   return { server, session };

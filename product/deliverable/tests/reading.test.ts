@@ -58,8 +58,9 @@ test("one read of the reading carries the whole walk, with nothing handed in", a
     assert.ok(content.includes(`## ${p}`), `${p} is headed by its own path, so a reader can tell the parts apart`);
   }
 
-  // THE POINT: nothing handed in. The engine credited what it served.
-  const walked = await call(server, "se_pull", { choice: "front_desk" });
+  // THE POINT: nothing handed in. The engine credited what it served,
+  // and a bare pull walks the default target (the desk).
+  const walked = await call(server, "se_pull");
   assert.equal(walked.body.pull, "do", JSON.stringify(walked.body));
   assert.equal(walked.body.arrived, true, "every read gate on the way was already satisfied");
 });
@@ -107,7 +108,7 @@ test("the reading PULLS: one document a call, until it answers done", async () =
   for (const p of READ_DOCS) assert.ok(seen.includes(p), `${p} was handed over by the loop`);
 
   // THE POINT, as above: the engine credited what it served.
-  const walked = await call(server, "se_pull", { choice: "front_desk" });
+  const walked = await call(server, "se_pull");
   assert.equal(walked.body.pull, "do", JSON.stringify(walked.body));
   assert.equal(walked.body.arrived, true);
 });
@@ -126,7 +127,7 @@ test("a multi-read is remembered too, so nothing ever has to be carried", async 
   assert.equal(got.isError, false, JSON.stringify(got.body));
   // The buffer filled itself from the set, as it always did for a single
   // path. Only the multi shape was ever forgotten.
-  const walked = await call(server, "se_pull", { choice: "front_desk" });
+  const walked = await call(server, "se_pull");
   assert.equal(walked.body.pull, "do", JSON.stringify(walked.body));
   assert.equal(walked.body.arrived, true, "a set read in one call proves as much as one read at a time");
 });

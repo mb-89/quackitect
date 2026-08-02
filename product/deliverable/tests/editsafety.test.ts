@@ -19,7 +19,7 @@ import { compileMachine } from "../engine/machines/compile.ts";
 import { parseStateNote } from "../engine/notes.ts";
 import { Session, mainMachinePath } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, checkDocs, freshRoot, pullBoot, readEverything } from "./helpers.ts";
+import { call, checkDocs, freshRoot, pullBoot } from "./helpers.ts";
 
 interface RawEdge { id: string; styleAttributes?: Record<string, unknown>; fromNode: string; fromSide?: string; toNode: string; toSide?: string }
 interface RawCanvas { nodes: { type: string; file?: string }[]; edges: RawEdge[] }
@@ -28,7 +28,7 @@ test("the drawing is data: a state note edited on disk binds the next call, no r
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session);
-  await pullBoot(server);
+  await pullBoot(server, session);
   const notePath = join(root, "product", "deliverable", "machines", "states", "idle.md");
   const before = readFileSync(notePath, "utf8");
   assert.match(before, /^priority: 0\.01$/m, "idle costs nothing to enter");
@@ -45,7 +45,7 @@ test("a drawing that will not compile leaves the last good one standing", async 
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session);
-  await pullBoot(server);
+  await pullBoot(server, session);
   writeFileSync(mainMachinePath(root), "{ this is not a canvas");
   const survived = await call(server, "se_pull", {});
   assert.equal(survived.isError, false, "a broken drawing never stops the walk");
@@ -56,7 +56,7 @@ test("an edit that deletes the state the walk stands in waits until it has moved
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session);
-  await pullBoot(server);
+  await pullBoot(server, session);
   // Drop idle out of the drawing while the walk is standing in it.
   const canvasPath = mainMachinePath(root);
   const raw = JSON.parse(readFileSync(canvasPath, "utf8")) as RawCanvas;
@@ -166,7 +166,7 @@ test("plain fan-in is an OR; only a drawn join is the AND", () => {
   assert.ok(activeStates(ai).includes("m"), "all inbound fired — the join opens");
 });
 
-test("the hatch always works: a booted main-machine walk escapes to idle", async () => {
+test("the hatch always works: a booted walk escapes to the DESK, ungated, from anywhere", async () => {
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session);
@@ -177,18 +177,19 @@ test("the hatch always works: a booted main-machine walk escapes to idle", async
   await session.tickAdvance();
   await session.tickAdvance();
   assert.deepEqual(session.active(), ["idle"]);
-  // At idle the hatch has nowhere to go.
-  const atIdle = await call(server, "se_pull", { escape: "nothing is broken" });
-  assert.equal(atIdle.isError, true);
-  assert.equal(atIdle.body.clause, "SE-C-110");
-  // A legacy strand (empty token set) escapes home. The AGENT is escaping,
-  // and idle's entry demands the agent's own reading — earn it first.
-  readEverything(session);
+  // A legacy strand (empty token set) escapes home — to the desk, with no
+  // gate on the way: no slider weighing, no read demand. The reading the
+  // desk wants arrives on the NEXT pull, as an instruction.
   session.instance.active = [];
   const out = await call(server, "se_pull", { escape: "stranded by an old engine" });
   assert.equal(out.isError, false, JSON.stringify(out.body));
-  assert.deepEqual(session.active(), ["idle"]);
+  assert.equal(out.body.pull, "wait");
+  assert.deepEqual(session.active(), ["front_desk"]);
   assert.equal(session.instance.escapes.length, 1);
+  // At the desk itself there is nowhere further out.
+  const atDesk = await call(server, "se_pull", { escape: "nothing is broken" });
+  assert.equal(atDesk.isError, true);
+  assert.equal(atDesk.body.clause, "SE-C-110");
 });
 
 test("escape before boot completes still refuses", async () => {
@@ -356,7 +357,7 @@ test("a broken sub-canvas refuses typed at entry; fixing it heals on the next ti
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session);
-  await pullBoot(server);
+  await pullBoot(server, session);
   session.setAutonomy(1);
   // Aim while the drawing is sound — then it breaks under the walk.
   session.setTarget("ideation");

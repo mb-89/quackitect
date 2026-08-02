@@ -73,7 +73,6 @@ test("THE HANDOVER: a left-behind .se/HANDOVER.md joins the reading, and is cons
   mkdirSync(join(root, ".se"), { recursive: true });
   writeFileSync(join(root, ".se", "HANDOVER.md"), "# Handover\n\nOpen threads for the next session.\n", "utf8");
   const server = buildServer(root);
-  await call(server, "se_pull", { choice: "idle" });
   const owed = await call(server, "se_pull");
   assert.equal(owed.body.pull, "read", "the way in demands reading");
   // Drain the reading, collecting what the loop actually serves.
@@ -95,8 +94,9 @@ test("THE HANDOVER: the way out writes the next one — end waits without one fr
   const root = freshRoot();
   const server = await bootedServer(root);
   // Nothing was written for whoever comes next, so the door does not open —
-  // and the pull SAYS so, refusal riding the answer with the remedy.
-  const refused = await call(server, "se_pull", { choice: "end" });
+  // and the pull SAYS so, refusal riding the answer with the remedy. end is
+  // one of idle's offered doors, so the choice form answers it.
+  const refused = await call(server, "se_pull", { form: { choice: "end" } });
   assert.equal(refused.isError, false, "a blocked walk is an instruction, not an error");
   const ref = refused.body.refusal as { expected?: string; got?: string } | undefined;
   assert.ok(ref !== undefined, JSON.stringify(refused.body));
@@ -115,7 +115,7 @@ test("an edited doc drops the agent's credit: the pull asks for the reading agai
   const server = await bootedServer(root);
   // The boot reading stands credited; the owner edits a pulled doc.
   appendFileSync(join(root, "product", "guidance", "contract.md"), "\nEdited mid-session.\n");
-  const again = await call(server, "se_pull", { choice: "expeditions" });
+  const again = await call(server, "se_pull", { form: { choice: "expeditions" } });
   assert.equal(again.body.pull, "read", "a stale credit is no credit — the doc is owed again");
   for (let j = 0; j < 40; j++) {
     const doc = await call(server, "se_reading");
@@ -130,7 +130,7 @@ test("se_file_read credits too: reading the docs by hand carries the walk withou
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session);
-  await call(server, "se_pull", { choice: "idle" });
+  session.setTarget("idle"); // the person's aim
   assert.equal((await call(server, "se_pull")).body.pull, "read");
   // Earn the credits through plain lane reads of the engine's OWN list —
   // a windowed read still carries the whole file's CAS hash, so one line
@@ -156,16 +156,18 @@ test("re-entering boot clears the buffer, so a second walk earns its reading aga
   const session = new Session(root);
   const server = buildServer(root, session);
 
-  // First entry: one read of the reading file carries the whole boot walk.
+  // First entry: one read of the reading file carries the whole boot walk
+  // to the session's default target, the desk.
   await call(server, "se_file_read", { path: ".se/reading.md" });
-  const first = await call(server, "se_pull", { choice: "front_desk" });
+  const first = await call(server, "se_pull");
   assert.equal(first.body.pull, "do", JSON.stringify(first.body));
   assert.deepEqual(session.active(), ["front_desk"]);
 
-  // Back to the beginning: the walk starts over, and so does the reading.
-  const back = await call(server, "se_pull", { back: "start" });
-  assert.equal(back.isError, false, JSON.stringify(back.body));
-  const owed = await call(server, "se_pull", { choice: "idle" });
+  // Back to the beginning — the PERSON's move, from the mirror: the walk
+  // starts over, and so does the reading.
+  session.jumpBack("start");
+  session.setTarget("idle");
+  const owed = await call(server, "se_pull");
   assert.equal(owed.body.pull, "read", "a second pass through boot proves its reading again");
 });
 
@@ -222,7 +224,8 @@ test("THE HANDOVER RULE: the human walks boot on checkboxes, raises the slider �
   // The slider rises; the agent pulls — but its head holds none of it, so
   // the machine demands the same reading before it walks anywhere.
   session.setAutonomy(0.6);
-  const owed = await call(server, "se_pull", { choice: "idle" });
+  session.setTarget("idle"); // the person's aim
+  const owed = await call(server, "se_pull");
   assert.equal(owed.body.pull, "read", "their checkmark is not the agent's reading");
   const served: string[] = [];
   for (let j = 0; j < 40; j++) {

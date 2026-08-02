@@ -7,8 +7,11 @@ the whole rule.
 
 Pull. `se_pull` with no payload asks the machine what to do, and its answer
 is an instruction: `read`, `fill`, `choose`, `do`, or `wait`. Do what it
-says, then pull again. Keep pulling until the answer is `wait`. How walking
-works: product/guidance/walking.md — it is pulled into every state's packet.
+says, then pull again. Keep pulling until the answer is `wait`. Everything
+you hand back rides `form` — evidence sections, or `{"choice": "<to>"}`
+where the machine offered doors; you never choose unasked. Stepping out is
+`escape`, one hatch, landing at the front desk. How walking works:
+product/guidance/walking.md — it is pulled into every state's packet.
 
 Do this AT THE START OF EVERY SESSION, unasked. Whatever the user's first
 message says — even if it says nothing about the machine — your first tool

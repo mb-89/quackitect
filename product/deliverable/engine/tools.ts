@@ -46,40 +46,24 @@ export function sessionTools(session: Session): ToolDef[] {
       name: "se_pull",
       title: "se.pull",
       description:
-        "THE PULL — your one verb. Say pull, do what comes back, pull again. The machine owns every decision; you decide nothing about the walk. You never name a target, never carry read hashes, never ask which state you are in, and never ask which tools are legal. BLOCKING IS AN INSTRUCTION, NOT AN ERROR — a pull does not refuse a walk that cannot move yet, it tells you what to do about it. FIVE ANSWERS, and `pull` names which one you got. `read` — documents are owed: call se_reading until it answers done, then pull. `fill` — the next step wants evidence: the machine BUILT the form and handed it to you, so fill it and return it ON THE NEXT PULL as form: {\"<section>\": \"<text>\"}. THERE IS NO SUBMIT VERB; pulling without it hands back the same form. `choose` — the road splits: the options ride along, and you return choice: \"<to>\" on the next pull (a LIST is legal where the work fans out to several agents). `do` — the happy path was WALKED for you, every hop to the next branching point in one call: `here` is where you landed, with its guidance. `wait` — the machine is out of work, or the next step weighs more than the session autonomy: say plainly which step waits and STOP, because the slider alone cannot wake you and the person must message you after moving it. A genuinely illegal call still refuses typed — an unreachable choice, a form nothing asked for.",
+        "THE PULL — your one verb. Say pull, do what comes back, pull again. The machine owns every decision; you decide nothing about the walk unless it ASKS you to. You never name a target, never carry read hashes, never ask which state you are in, and never ask which tools are legal. BLOCKING IS AN INSTRUCTION, NOT AN ERROR — a pull does not refuse a walk that cannot move yet, it tells you what to do about it. FIVE ANSWERS, and `pull` names which one you got. `read` — documents are owed: call se_reading until it answers done, then pull. `fill` — the next step wants evidence: the machine BUILT the form and handed it to you, so fill it and return it ON THE NEXT PULL as form: {\"<section>\": \"<text>\"}. THERE IS NO SUBMIT VERB; pulling without it hands back the same form. `choose` — the road splits: the machine offers its doors, and you answer ON THE NEXT PULL as form: {\"choice\": \"<to>\"} (a LIST is legal where the work fans out to several agents — the first is walked, the rest come back as not_walked). A choice exists ONLY where one was offered. `do` — the happy path was WALKED for you, every hop to the next branching point in one call: `here` is where you landed, with its guidance. `wait` — the machine is out of work, or the next step weighs more than the session autonomy: say plainly which step waits and STOP, because the slider alone cannot wake you and the person must message you after moving it. A genuinely illegal call still refuses typed — a choice outside the offer, a form nothing asked for.",
       inputSchema: {
         type: "object",
         properties: {
           form: {
             type: "object",
-            description: "the filled form the LAST pull handed you, section name to text. This is the submit that has no verb of its own.",
-          },
-          choice: {
-            type: ["string", "array"],
-            items: { type: "string" },
-            description: "the option you picked, from the last pull's `options` — or any drawn state you decide to head for. A LIST is legal where the work fans out: one agent walks the first, the rest come back as not_walked for you to hand out.",
-          },
-          back: {
-            type: "string",
-            description: "jump BACK to an earlier filled state, because its work no longer stands — everything downstream is superseded and its evidence invalidated. The walk stops ON the reopened state for the redo; it does not sweep past it.",
-          },
-          pause: {
-            type: "string",
-            description: "step OUT to idle with this reason, as ordinary work — the walk is left standing and a later pull re-enters it. An expedition is a day's bucket and is MEANT to stay open, so leaving one is not a failure. Boot cannot be paused.",
+            description: "the filled form the LAST pull handed you. Evidence: {\"<section>\": \"<text>\", ...}. An offered choice: {\"choice\": \"<to>\"} — or a list, where the work fans out. Which one is never your call: evidence while a step demands it, a choice only where one was offered; evidence wins when both could read.",
           },
           escape: {
             type: "string",
-            description: "step OUT to idle with this reason, recorded as a FAILURE — the stuck walk is left standing and a later pull re-enters it. Stepping out of healthy work is pause, not this. Boot cannot be escaped.",
+            description: "step OUT with this reason — the ONE hatch for every kind of stepping out: the person said stop, the road is blocked, earlier work no longer stands (say so — the person invalidates from the mirror, and the walk re-earns it). Lands at the FRONT DESK, where the person routes; recorded with its reason. Boot cannot be escaped.",
           },
         },
       },
       handler: async (args) =>
         session.pull(
           {
-            ...(typeof args.form === "object" && args.form !== null ? { form: args.form as Record<string, string> } : {}),
-            ...(args.choice !== undefined ? { choice: args.choice as string | string[] } : {}),
-            ...(args.back !== undefined ? { back: String(args.back) } : {}),
-            ...(args.pause !== undefined ? { pause: String(args.pause) } : {}),
+            ...(typeof args.form === "object" && args.form !== null ? { form: args.form as Record<string, unknown> } : {}),
             ...(args.escape !== undefined ? { escape: String(args.escape) } : {}),
           },
           "agent",
