@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-The system's install-check, selftest, and launch.
+The install. Run it ONCE.
 
 .DESCRIPTION
 Preflight (node/git/ripgrep hard deps), cage install, engine selftests, then
@@ -160,7 +160,7 @@ You do not run RUNME.ps1 again. It is the installer, not the way in.
 - product/deliverable - the engine, the machines, the VS Code extension.
 - product/guidance - the rules the agent is bound by.
 - product/spec - where your own records get written.
-- workspace/ - where the agent runs, fenced in.
+- product/ - the folder you open. Everything being built lives here.
 - product/brand.json - the product name. Change it, and every surface follows.
 - product/palette.css - every colour. Edit it. No code change, no restart.
 
@@ -326,6 +326,17 @@ Write-Host "  node $nodeVersion  OK"
 if (-not (Ensure-Tool "git" "Git.Git" "git")) { exit 1 }
 Write-Host "  $((git --version))  OK"
 
+# RUNME IS THE INSTALL, AND YOU RUN IT ONCE (owner ruling 2026-08-02). It puts
+# the extension in place and opens the editor. After that the extension owns
+# everything: the server, the attach configs, the engine's npm install. Opening
+# VS Code on product\ is enough from then on.
+#
+# THE ONE THING THAT BRINGS YOU BACK HERE is a change to the extension itself,
+# because VS Code loads the COPY under ~/.vscode/extensions rather than the
+# source. A junction would fix that, and cannot: brand.ts RENDERS this tree's
+# $PRODUCT$ placeholders into the copy, so the copy is what carries a name.
+# Moving that rendering to activation time is what would retire this step.
+#
 # VS CODE IS THE HOST (owner, 2026-07-30). Ensure VS Code, put the extension
 # in place, open the workspace - the extension owns the rest: the server,
 # the attach configs, the engine's npm install. A session already running is
@@ -393,8 +404,8 @@ if (-not $classic) {
   }
   Write-Host "  extension in place - $rendered" -ForegroundColor Green
   Write-Host "  $extDest" -ForegroundColor DarkGray
-  Write-Host "$P - opening VS Code on workspace\ - the extension takes it from here" -ForegroundColor Cyan
-  code (Join-Path $root "workspace")
+  Write-Host "$P - opening VS Code on product\ - the extension takes it from here. You should not need to run this again" -ForegroundColor Cyan
+  code (Join-Path $root "product")
   exit 0
 }
 
@@ -461,18 +472,18 @@ try {
 # remote tools (desktop security rule), so they ship as templates in
 # workspace\_cage and are placed locally here - declaratively, every run.
 Write-Host "$P - installing cage config" -ForegroundColor Cyan
-$ws = Join-Path $root "workspace"
+$ws = Join-Path $root "product"
 New-Item -ItemType Directory -Force -Path (Join-Path $ws ".claude") | Out-Null
 Copy-Item (Join-Path $ws "_cage\mcp.json") (Join-Path $ws ".mcp.json") -Force
 Copy-Item (Join-Path $ws "_cage\claude-settings.json") (Join-Path $ws ".claude\settings.json") -Force
-Write-Host "  workspace\.mcp.json + workspace\.claude\settings.json in place"
+Write-Host "  product\.mcp.json + product\.claude\settings.json in place"
 # COPILOT'S CAGE IS SHAPED DIFFERENTLY. Its MCP config is a file like
 # Claude's, so it is placed here the same way. Its tool DENIAL is not a
 # file at all - Copilot takes that on the command line, so that half rides
 # the launch and lives in _cage\copilot-cage.json as data you can correct.
 New-Item -ItemType Directory -Force -Path (Join-Path $ws ".copilot") | Out-Null
 Copy-Item (Join-Path $ws "_cage\copilot-mcp-config.json") (Join-Path $ws ".copilot\mcp-config.json") -Force
-Write-Host "  workspace\.copilot\mcp-config.json in place"
+Write-Host "  product\.copilot\mcp-config.json in place"
 
 # The FAST gate only (sub-second): canvases compile, hard deps answer, the
 # log location is writable. The FULL test suite is not run here - it runs
@@ -520,7 +531,7 @@ if ($manual) {
 }
 $env:SE_ARGS = ($forwarded -join "`n")
 $argNote = if ($forwarded.Count -gt 0) { " (args: $($forwarded -join ' '))" } else { "" }
-Write-Host "$P - launching caged agent in workspace/$argNote" -ForegroundColor Cyan
+Write-Host "$P - launching caged agent in product/$argNote" -ForegroundColor Cyan
 Write-Host "$P - the Mirror (your hand on the walk): the server opens http://localhost:7333 as soon as it is up" -ForegroundColor Cyan
 
 # The server opens the Mirror itself as soon as it listens (se_panel
@@ -540,7 +551,7 @@ $kickoff = (Get-Content (Join-Path $ws "_cage\kickoff.txt") -Raw).Trim()
 # kills the agent - which happened for real on 2026-07-28. When no terminal
 # binding is installed the host runs the agent on this terminal instead, so a
 # terminal that will not start still never costs you your agent.
-Push-Location (Join-Path $root "workspace")
+Push-Location (Join-Path $root "product")
 try {
   if ($agentHost -eq "copilot") {
     # COPILOT DOES TAKE AN OPENING PROMPT - `copilot -i "<text>"` starts an

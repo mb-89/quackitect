@@ -58,8 +58,8 @@ BOOT STABILITY FOR THIS HOST:
   Absence answers `exists: false` rather than refusing. The handover is the
   case this exists for. Boot should produce no errors at all.
 
-Your native tools (Read, Write, Edit, Bash, Glob, Grep, web) are blocked in
-this workspace — tool by tool, by an explicit list. Which file holds that
+Your native tools (Read, Write, Edit, Bash, Glob, Grep, web) are blocked here —
+tool by tool, by an explicit list. Which file holds that
 list depends on the host: Claude Code reads `.claude/settings.json`, and
 GitHub Copilot CLI takes the same list on its command line from
 `_cage/copilot-cage.json` (Copilot's `--excluded-tools`; its `--deny-tool`
@@ -71,6 +71,7 @@ rule: the `se` lane replaces every native tool, as good or better:
 | Read | `se_file_read` (offset/limit for large files; returns the CAS hash) |
 | Write | `se_file_write` (base_hash: null creates; hash from read overwrites) |
 | Edit | `se_file_patch` (ops:[…] — many edits, many files, ONE atomic call) |
+| a rename running through the tree | `se_file_replace` (one regex over a glob; every place it landed comes back with its line before and after) |
 | Glob | `se_file_glob` |
 | Grep | `se_file_search` (state your intent — it is logged) |
 | ls | `se_file_list` |
@@ -80,8 +81,9 @@ rule: the `se` lane replaces every native tool, as good or better:
 | WebSearch | ALLOWED natively (owner ruling 2026-07-28) — web search runs on the provider's backend and cannot be self-hosted keylessly. Every query reaches the feed MECHANICALLY, through a PostToolUse hook, so there is no logging duty to remember. `se_web_search` stays for key-configured setups. |
 | your own history | `se_log_query` |
 
-Paths are root-relative to the project root (the folder holding `product/`
-and `workspace/`). Every call you make is logged raw to `.se/calls.jsonl`.
+Paths are root-relative to the PROJECT ROOT, which is the parent of the folder
+you have open. You open `product/`; a path you pass starts `product/`. Every
+call you make is logged raw to `.se/calls.jsonl`.
 
 When a call is refused you get a typed rejection: clause, expected, got, and
 an executable remedy — the exact call to make instead. Follow the remedy;

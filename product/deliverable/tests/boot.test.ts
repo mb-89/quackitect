@@ -32,7 +32,7 @@ test("the boot sub-machine compiles with its own mechanical start/end", () => {
   assert.equal(m.states.find((s) => s.id === "end")!.kind, "end");
   const rc = m.states.find((s) => s.id === "read_contract")!;
   assert.deepEqual(rc.exit, {
-    read: ["workspace/AGENTS.md", "product/guidance/contract.md", "product/guidance/voice.md", "product/guidance/walking.md"],
+    read: ["product/AGENTS.md", "product/guidance/contract.md", "product/guidance/voice.md", "product/guidance/walking.md"],
     // The handover is DECLARED here, not known by the engine: read on the
     // way out, and destroyed by the same move.
     read_consume: [".se/HANDOVER.md"],

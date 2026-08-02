@@ -218,7 +218,7 @@ test("THE HANDOVER RULE: the human walks boot on checkboxes, raises the slider â
   assert.deepEqual(session.active(), ["boot/prepare_idle"]);
   // The packet tells the agent what the session has checked.
   const info = session.tickInfo() as { human_checked: string[] };
-  assert.ok(info.human_checked.includes("workspace/AGENTS.md"));
+  assert.ok(info.human_checked.includes("product/AGENTS.md"));
   // The slider rises; the agent pulls â€” but its head holds none of it, so
   // the machine demands the same reading before it walks anywhere.
   session.setAutonomy(0.6);
@@ -231,7 +231,7 @@ test("THE HANDOVER RULE: the human walks boot on checkboxes, raises the slider â
     if (doc === null) break;
     served.push(doc.path);
   }
-  assert.ok(served.includes("workspace/AGENTS.md"), `the same list is owed: ${served.join(", ")}`);
+  assert.ok(served.includes("product/AGENTS.md"), `the same list is owed: ${served.join(", ")}`);
   // Proving the last document already moves the walk, so what matters here
   // is that the reading gate is discharged â€” not which door comes next.
   const landed = await call(server, "se_pull");

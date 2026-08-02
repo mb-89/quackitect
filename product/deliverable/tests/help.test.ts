@@ -148,7 +148,7 @@ test("each host gets a cage, and Copilot's flags live in data", () => {
   assert.match(src, /claude-settings\.json/, "Claude's deny list is installed");
   assert.match(src, /copilot-mcp-config\.json/, "Copilot's MCP config is installed");
   assert.match(src, /copilot-cage\.json[^\r\n]*|ConvertFrom-Json/, "and its deny flags are read from data, not hard-coded");
-  const cage = JSON.parse(readFileSync(join(repoRoot, "workspace", "_cage", "copilot-cage.json"), "utf8")) as { _readme: string[]; deny_args: string[] };
+  const cage = JSON.parse(readFileSync(join(repoRoot, "product", "_cage", "copilot-cage.json"), "utf8")) as { _readme: string[]; deny_args: string[] };
   assert.ok(cage.deny_args.length > 0, "the cage denies something");
   assert.ok(cage._readme.join(" ").includes("VERIFIED AGAINST A LIVE CLI"), "and it records that the flags were proven against a live CLI");
 });

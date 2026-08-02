@@ -739,7 +739,7 @@ function jsonTable(v) {
   if (typeof v === "number") return '<span class="vnum">' + v + "</span>";
   if (typeof v === "boolean") return '<span class="vbool">' + v + "</span>";
   if (typeof v === "string") {
-    const looksLikePath = (v.startsWith("workspace/") || v.startsWith("product/")) && !v.includes(" ") && v.lastIndexOf(".") > v.lastIndexOf("/");
+    const looksLikePath = v.startsWith("product/") && !v.includes(" ") && v.lastIndexOf(".") > v.lastIndexOf("/");
     if (looksLikePath) {
       return '<a class="doclink" data-path="' + v + '">' + v + "</a>";
     }

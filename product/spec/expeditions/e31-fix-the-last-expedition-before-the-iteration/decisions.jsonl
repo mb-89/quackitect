@@ -31,3 +31,16 @@
 {"ts":"2026-08-02T14:31:20.589Z","op":"update","visit":"expeditions/e31@1","node":"d53","brief":"reading the git lane tests for their idiom"}
 {"ts":"2026-08-02T14:31:52.678Z","op":"update","visit":"expeditions/e31@1","node":"d54","brief":"the trail is excused from the dirty gate"}
 {"ts":"2026-08-02T14:32:01.947Z","op":"update","visit":"expeditions/e31@1","node":"d55","brief":"running the git lane suite"}
+{"ts":"2026-08-02T14:33:06.798Z","op":"done","visit":"expeditions/e31@1","node":"d37","brief":"sync no longer refuses itself"}
+{"ts":"2026-08-02T14:33:41.973Z","op":"done","visit":"expeditions/e31@1","node":"d22","brief":"the NUL work is complete at every door"}
+{"ts":"2026-08-02T14:34:18.218Z","op":"update","visit":"expeditions/e31@1","node":"d56","brief":"moving the workspace files into product"}
+{"ts":"2026-08-02T14:35:35.161Z","op":"update","visit":"expeditions/e31@1","node":"d57","brief":"the opened folder is product now, everywhere"}
+{"ts":"2026-08-02T14:36:08.257Z","op":"update","visit":"expeditions/e31@1","node":"d58","brief":"mapping RUNME before cutting it down"}
+{"ts":"2026-08-02T14:37:27.531Z","op":"update","visit":"expeditions/e31@1","node":"d59","brief":"RUNME opens product and says it is install-once"}
+{"ts":"2026-08-02T14:38:11.219Z","op":"done","visit":"expeditions/e31@1","node":"d25","brief":"the restart rule is written where a person reads it"}
+{"ts":"2026-08-02T14:38:24.394Z","op":"done","visit":"expeditions/e31@1","node":"d24","brief":"RUNME is the install, run once"}
+{"ts":"2026-08-02T14:38:37.848Z","op":"update","visit":"expeditions/e31@1","node":"d60","brief":"testing the move against the read list"}
+{"ts":"2026-08-02T14:39:47.762Z","op":"update","visit":"expeditions/e31@1","node":"d61","brief":"a test the incoming patch obsoleted, brought up to date"}
+{"ts":"2026-08-02T14:39:57.695Z","op":"update","visit":"expeditions/e31@1","node":"d62","brief":"re-running the patch guards"}
+{"ts":"2026-08-02T14:41:17.524Z","op":"update","visit":"expeditions/e31@1","node":"d63","brief":"the test needed the reader it uses"}
+{"ts":"2026-08-02T14:41:45.140Z","op":"update","visit":"expeditions/e31@1","node":"d64","brief":"patch guards again"}

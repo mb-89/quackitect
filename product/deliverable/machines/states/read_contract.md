@@ -5,7 +5,7 @@ priority: 0.01
 tags: boot
 legal_tools: se_file_read, se_note
 exit_read:
-  - workspace/AGENTS.md
+  - product/AGENTS.md
   - product/guidance/contract.md
   - product/guidance/voice.md
   - product/guidance/walking.md

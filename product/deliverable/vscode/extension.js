@@ -96,12 +96,17 @@ function trace(what) {
   } catch { /* a trace that throws would be worse than no trace */ }
 }
 
+// THE OPENED FOLDER IS product/ (owner ruling 2026-08-02). It is the folder
+// holding the work, so it is the one a person opens. The project root is its
+// parent, and it is recognised by the engine it carries rather than by a
+// sibling folder that no longer exists.
 function projectRoot() {
+  const isRoot = (p) => existsSync(path.join(p, "product", "deliverable", "engine", "bin", "se-mcp.ts"));
   for (const f of vscode.workspace.workspaceFolders ?? []) {
     const p = f.uri.fsPath;
-    if (existsSync(path.join(p, "product")) && existsSync(path.join(p, "workspace"))) return p;
+    if (isRoot(p)) return p;
     const up = path.dirname(p);
-    if (existsSync(path.join(up, "product")) && existsSync(path.join(up, "workspace"))) return up;
+    if (isRoot(up)) return up;
   }
   return null;
 }
@@ -161,15 +166,17 @@ function evictPort(port) {
 }
 
 function placeConfigs(root) {
-  const ws = path.join(root, "workspace");
-  const cage = path.join(ws, "_cage");
+  // The host looks for its dot-config at the top of the OPENED folder, so
+  // that is where these land. Nothing else about them moved.
+  const opened = path.join(root, "product");
+  const cage = path.join(opened, "_cage");
   const place = (src, destDir, destName) => {
     mkdirSync(destDir, { recursive: true });
     copyFileSync(path.join(cage, src), path.join(destDir, destName));
   };
-  place("mcp-http.json", ws, ".mcp.json"); // a claude run in the terminal attaches
-  place("mcp-http.json", path.join(ws, ".copilot"), "mcp-config.json"); // a copilot run attaches
-  place("vscode-mcp.json", path.join(ws, ".vscode"), "mcp.json"); // agent mode attaches
+  place("mcp-http.json", opened, ".mcp.json"); // a claude run in the terminal attaches
+  place("mcp-http.json", path.join(opened, ".copilot"), "mcp-config.json"); // a copilot run attaches
+  place("vscode-mcp.json", path.join(opened, ".vscode"), "mcp.json"); // agent mode attaches
   // AGENT MODE READS ITS ORDERS FROM .github. Without this the VS Code agent
   // gets no first action, no tool activation and no serial-read rule — which
   // is exactly how a fresh machine looks like it is broken.
@@ -248,7 +255,7 @@ function startServer(root, runner) {
 async function ensureServer() {
   const root = projectRoot();
   if (root === null) {
-    void vscode.window.showErrorMessage("$PRODUCT$: open the project's workspace folder (or the project root) first.");
+    void vscode.window.showErrorMessage("$PRODUCT$: open the project's product folder (or the project root) first.");
     return false;
   }
   placeConfigs(root);
@@ -1566,7 +1573,7 @@ function sessionHeader(now) {
 }
 
 function agentLaunch(root) {
-  const cageDir = path.join(root, "workspace", "_cage");
+  const cageDir = path.join(root, "product", "_cage");
   const kickoff = sessionHeader() + "\n\n" + readFileSync(path.join(cageDir, "kickoff.txt"), "utf8").trim();
   const has = (cmd) => spawnSync(cmd, ["--version"], { encoding: "utf8", shell: true }).status === 0;
   if (has("claude")) return { host: "claude", kickoff, command: "claude " + psq(kickoff) };
@@ -1638,7 +1645,7 @@ async function startAgent() {
         // split from the agent where the terminal API allows it.
         agentTerm = vscode.window.createTerminal({
           name: "$PRODUCT$ agent",
-          cwd: path.join(root, "workspace"),
+          cwd: path.join(root, "product"),
         });
         agentTerm.sendText(command.command, true);
         // Rebuilt, so the log lands to the agent's RIGHT whatever stood there before.

@@ -148,8 +148,8 @@ export function freshRoot(): string {
   created.push(root);
   for (const rel of BORROWED) borrow(root, rel);
   for (const rel of COPIED) cpSync(join(REPO_ROOT, rel), join(root, rel), { recursive: true });
-  mkdirSync(join(root, "workspace"), { recursive: true });
-  cpSync(join(REPO_ROOT, "workspace", "AGENTS.md"), join(root, "workspace", "AGENTS.md"));
+  mkdirSync(join(root, "product"), { recursive: true });
+  cpSync(join(REPO_ROOT, "product", "AGENTS.md"), join(root, "product", "AGENTS.md"));
   return root;
 }
 
@@ -190,7 +190,7 @@ export async function call(server: Server, name: string, args: Record<string, un
  *  Anything sitting directly in product/guidance/ is pulled ALWAYS, so a
  *  new document there joins this list or every walk in the suite stalls. */
 export const READ_DOCS = [
-  "workspace/AGENTS.md",
+  "product/AGENTS.md",
   "product/guidance/contract.md",
   "product/guidance/software.md",
   "product/guidance/ux.md",

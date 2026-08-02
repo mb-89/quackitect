@@ -16,12 +16,12 @@ regresses below convention. See `product/spec/v3-plan.md`.
 ## Layout
 
 ```
-RUNME.ps1              preflight, selftest, launch the caged agent
-workspace/             where the agent runs (cwd of the session)
+RUNME.ps1              the install. Run it once.
+product/               THE FOLDER YOU OPEN. Everything being built lives here.
   AGENTS.md            the one rule + the lane table
   .mcp.json            registers the se server
   .claude/settings.json  the cage: explicit deny list of native tools
-product/
+  _cage/               the originals those two are placed from
   guidance/            the method layer - contract, voice, authoring/, methods/
   deliverable/         the engine (TypeScript, Node >= 22.6, no build step)
     engine/            mcp transport, tool lane, call log, machine kernel
@@ -34,9 +34,28 @@ product/
 ## Run
 
 ```powershell
-.\RUNME.ps1           # preflight, deps, cage install, selftests, launch the caged agent
-.\RUNME.ps1 -Manual   # ...or open the MIRROR and walk the machines yourself, step by step
+.\RUNME.ps1           # once: installs the extension and opens the editor
 ```
+
+After that, open `product/` in VS Code. The extension starts the server, places
+the attach configs and installs the engine's dependencies by itself.
+
+## What a change needs before you see it
+
+This used to cost an evening, because nobody could say which restart applied to
+which edit. Here is the whole rule.
+
+| you changed | you need |
+| --- | --- |
+| `product/palette.css` | nothing. It is read on every render. |
+| a machine drawing, guidance, a rigor-matrix row | nothing. They are read live. |
+| `product/deliverable/engine/**.ts` | restart the se server. Node caches modules at import, so a correct file on disk means nothing to a process already running. |
+| `product/deliverable/vscode/extension.js` | re-run `RUNME.ps1`. |
+
+The last row is the trap. VS Code loads the extension **copy** under
+`~/.vscode/extensions`, so reloading the window re-reads that copy and not your
+edit. The copy exists because the product's name is rendered into it at install
+time; until that rendering moves to activation time, this row stands.
 
 ## Give it to someone else
 
