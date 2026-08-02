@@ -70,3 +70,6 @@
 {"ts":"2026-08-02T14:59:09.365Z","op":"update","visit":"expeditions/e31@1","node":"d74","brief":"a test holds the visit parsing"}
 {"ts":"2026-08-02T14:59:25.905Z","op":"update","visit":"expeditions/e31@1","node":"d75","brief":"visitState is defined and exported"}
 {"ts":"2026-08-02T14:59:33.233Z","op":"update","visit":"expeditions/e31@1","node":"d76","brief":"running the visit-state and dirty-gate cases"}
+{"ts":"2026-08-02T15:00:32.918Z","op":"done","visit":"expeditions/e31@0","node":"d4","brief":"the workspace is gone and RUNME installs once"}
+{"ts":"2026-08-02T15:00:53.144Z","op":"update","visit":"expeditions/e31@1","node":"d77","brief":"reading what a test root borrows"}
+{"ts":"2026-08-02T15:01:26.489Z","op":"defer","visit":"expeditions/e31@1","node":"d34","brief":"boot once per suite run and read fixture guidance","to":"retro","hops":1,"trail":["expeditions/e31","retro"]}
