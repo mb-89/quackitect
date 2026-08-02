@@ -1,0 +1,6 @@
+{"ts":"2026-08-02T14:07:09.316Z","op":"plan","visit":"expeditions/e31@0","parent":null,"nodes":[{"id":"d1","brief":"check what the bound worktree actually holds"},{"id":"d2","brief":"carry the engine fix onto the expedition branch"},{"id":"d3","brief":"land the lane-verbs patch"},{"id":"d4","brief":"kill the workspace folder and the RUNME copy dance"},{"id":"d5","brief":"sweep the note inbox"},{"id":"d6","brief":"fold the rulings into guidance and clear _incoming"}]}
+{"ts":"2026-08-02T14:07:35.552Z","op":"update","visit":"expeditions/e31@0","node":"d7","brief":"reading the worktree's branch and dirt"}
+{"ts":"2026-08-02T14:08:19.458Z","op":"update","visit":"expeditions/e31@0","node":"d8","brief":"does the worktree even carry the incoming patch"}
+{"ts":"2026-08-02T14:09:01.162Z","op":"done","visit":"expeditions/e31@0","node":"d1","brief":"worktree is at HEAD and clean; the inputs are not in it"}
+{"ts":"2026-08-02T14:10:45.786Z","op":"update","visit":"expeditions/e31@1","node":"d13","brief":"pulling trunk into the expedition branch"}
+{"ts":"2026-08-02T14:10:53.009Z","op":"update","visit":"expeditions/e31@1","node":"d14","brief":"the record's own decision trail wants committing first"}
