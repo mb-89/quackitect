@@ -66,3 +66,18 @@
 {"ts":"2026-08-02T18:22:41.355Z","op":"update","visit":"expeditions/e32@0","node":"d104","brief":"the cross-visit resolution staged with its regression"}
 {"ts":"2026-08-02T18:22:52.032Z","op":"update","visit":"expeditions/e32@0","node":"d105","brief":"scoped run over job 4's surface"}
 {"ts":"2026-08-02T18:23:20.604Z","op":"update","visit":"expeditions/e32@0","node":"d106","brief":"committing the five small fixes"}
+{"ts":"2026-08-02T18:23:31.754Z","op":"update","visit":"expeditions/e32@0","node":"d107","brief":"draining job 4's landed notes"}
+{"ts":"2026-08-02T18:23:48.314Z","op":"update","visit":"expeditions/e32@0","node":"d108","brief":"the fetch handler"}
+{"ts":"2026-08-02T18:23:56.180Z","op":"update","visit":"expeditions/e32@0","node":"d109","brief":"reading the fetch tool"}
+{"ts":"2026-08-02T18:24:07.040Z","op":"update","visit":"expeditions/e32@0","node":"d110","brief":"the fetch implementation"}
+{"ts":"2026-08-02T18:24:25.875Z","op":"update","visit":"expeditions/e32@0","node":"d111","brief":"the fetch caps"}
+{"ts":"2026-08-02T18:25:06.203Z","op":"done","visit":"expeditions/e32@0","node":"d39","brief":"job 4 complete — five fixes landed and one was already shipped"}
+{"ts":"2026-08-02T18:25:29.992Z","op":"update","visit":"expeditions/e32@0","node":"d112","brief":"job 5: the extension copy block in RUNME"}
+{"ts":"2026-08-02T18:26:20.725Z","op":"done","visit":"expeditions/e32@0","node":"d40","brief":"job 5 resolved — premise corrected and the rewires wait for the owner's screen"}
+{"ts":"2026-08-02T18:26:31.625Z","op":"done","visit":"expeditions/e32@0","node":"d38","brief":"job 3 landed; the booted template and the map stay parked by their own terms"}
+{"ts":"2026-08-02T18:27:44.812Z","op":"update","visit":"expeditions/e32@0","node":"d113","brief":"polling for the battery verdict the server records"}
+{"ts":"2026-08-02T18:28:02.526Z","op":"update","visit":"expeditions/e32@0","node":"d114","brief":"a timed wait while the battery finishes server-side"}
+{"ts":"2026-08-02T18:28:12.975Z","op":"update","visit":"expeditions/e32@0","node":"d115","brief":"blocking on the timer job"}
+{"ts":"2026-08-02T18:29:20.677Z","op":"update","visit":"expeditions/e32@0","node":"d116","brief":"second poll for the battery verdict"}
+{"ts":"2026-08-02T18:33:25.703Z","op":"done","visit":"expeditions/e32@0","node":"d41","brief":"verified by the earned battery at 724 green"}
+{"ts":"2026-08-02T19:09:14.202Z","op":"update","visit":"expeditions/e32@1","node":"d184","brief":"pulling trunk into the branch"}
