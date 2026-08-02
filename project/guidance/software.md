@@ -121,8 +121,8 @@ So the rules:
   CPU-bound, and wanted splitting instead.
 - A GUARD THAT MAKES A TOOL DO NOTHING IS INVISIBLE to a test that only
   reads that tool's output. The suite sets SE_SELFTEST_SKIP,
-  SE_KEEPAWAKE_DISABLE and SE_RELOAD_DRY, and any of them can turn a
-  spawned script into one line of nothing. A test that spawns a lane script
+  SE_KEEPAWAKE_DISABLE, SE_RELOAD_DRY and SE_SCRIPT_SKIP, and any of them
+  can turn a spawned script into one line of nothing. A test that spawns a lane script
   clears the guard it needs cleared, and ASSERTS THE WORK RAN — never just
   that the output looked sound. The tell is a case that passes alone and
   fails in the suite.

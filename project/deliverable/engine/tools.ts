@@ -14,6 +14,7 @@ import { batteryGate, laneSummary, laneVerdict, parseTap, scopedGate, streakNudg
 import { existsSync } from "node:fs";
 import { contentHash } from "./hash.ts";
 import { parseUpdate } from "./decisions.ts";
+import { bumpDrawingEpoch } from "./machines/compile.ts";
 import { Toll } from "./toll.ts";
 import { readFileSync } from "node:fs";
 import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileReplace, fileWrite, type PatchOp } from "./files.ts";
@@ -1071,6 +1072,11 @@ export function buildServer(root: string, session = new Session(root), tollOpts:
   let updateComplaint: RejectionPayload | undefined;
   let updateResult: Record<string, unknown> | undefined;
   server.addGuard((tool, args) => {
+    // EVERY EXTERNAL CALL IS A NEW DRAWING EPOCH — "the next call" is the
+    // read-it-live law's unit, and pull alone was not enough: a gate check
+    // on any other tool trusted a stamp from the previous call and went
+    // stale for up to a second (caught by the battery, 2026-08-02).
+    bumpDrawingEpoch();
     updateComplaint = undefined;
     updateResult = undefined;
     if (args.update === undefined) return;

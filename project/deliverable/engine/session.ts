@@ -21,7 +21,7 @@ import {
   type MachineInstance,
   type StateDecl,
 } from "./machine.ts";
-import { compileMachine, compileMachineCached, resolveRef } from "./machines/compile.ts";
+import { bumpDrawingEpoch, compileMachine, compileMachineCached, resolveRef } from "./machines/compile.ts";
 import { computeRoute, type RouteNode, type RouteResult } from "./route.ts";
 
 /** THE STATE A RECORDED VISIT NAMES. A visit is stored qualified and
@@ -1614,6 +1614,9 @@ export class Session {
    *  outside the offer, a form nothing asked for. Those are contract
    *  violations, not a machine with nowhere to go. */
   async pull(payload: { form?: Record<string, unknown>; escape?: string } = {}, channel: Channel = "agent"): Promise<Record<string, unknown>> {
+    // ONE DRAWING VALIDATION PER WALK STEP — the epoch makes "the next
+    // call" the unit of the read-it-live law (see machines/compile.ts).
+    bumpDrawingEpoch();
     const head = (): Record<string, unknown> => ({
       where: this.active(),
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
@@ -2275,6 +2278,18 @@ export class Session {
     const inFlight = this.scriptRuns.get(key);
     if (inFlight !== undefined) return inFlight;
     const run = (async () => {
+      // THE SUITE'S SPAWN-SKIP (SE_SCRIPT_SKIP). A condition script is a
+      // node spawn, a booted walk runs two, and the battery boots ~200
+      // walks — a third of its whole clock went here (measured 2026-08-02).
+      // The skip answers green WITHOUT spawning and SAYS SO in the
+      // evidence; the test files whose job is proving the scripts delete
+      // the guard at their top.
+      if (process.env.SE_SCRIPT_SKIP === "1") {
+        const result = { ok: true, output: scripts.map((rel) => `${rel} → skipped (SE_SCRIPT_SKIP)`).join("\n"), at: new Date().toISOString() };
+        this.evidence.set(key, { ...(this.evidence.get(key) ?? {}), script_result: result });
+        this.notifyChange();
+        return { state: `${machine.id}/${s.id}`, script_result: result };
+      }
       const outputs: string[] = [];
       let ok = true;
       for (const rel of scripts) {
@@ -2837,6 +2852,9 @@ export class Session {
 
   /** tick without arguments: information about where the machine is. */
   packet(): Record<string, unknown> {
+    // The packet is a public read of the drawing — "the next call" includes
+    // it, so it opens a fresh epoch too (see machines/compile.ts).
+    bumpDrawingEpoch();
     const { machine, ids } = this.leaves();
     const states = ids.map((id) => {
       const s = this.state(machine, id);
@@ -2934,6 +2952,7 @@ export class Session {
    *  and se_file_read fill the buffer); the human proves via checkboxes.
    *  Reached through the pull and the mirror — never a tool of its own. */
   async advance(to?: string, channel: Channel = "human"): Promise<Record<string, unknown>> {
+    bumpDrawingEpoch();
     const now = new Date().toISOString();
     const supplied = this.readProofs(channel);
     if (this.instance.status === "closed") {

@@ -1,3 +1,7 @@
+// THIS FILE PROVES THE SCRIPTS RUN, so the suite's spawn-skip is cleared
+// here — a guard that makes a tool do nothing is invisible to a test that
+// only reads its output (software.md).
+delete process.env.SE_SCRIPT_SKIP;
 // walk mechanics: reload gating, repair mode, conditions.
 //
 // The engine's own step is driven at SESSION level here — the person's

@@ -31,6 +31,10 @@ process.env.SE_SELFTEST_SKIP = "1";
 process.env.SE_KEEPAWAKE_DISABLE = "1";
 // se_reload runs its canary but never exits the test process.
 process.env.SE_RELOAD_DRY = "1";
+// Condition scripts are node spawns — two per booted walk, ~200 walks per
+// battery, a third of its clock (measured 2026-08-02). The suite skips the
+// spawn; the files that PROVE the scripts delete this guard at their top.
+process.env.SE_SCRIPT_SKIP = "1";
 
 // A TEST ROOT BORROWS WHAT IS READ-ONLY AND COPIES WHAT IS WRITTEN. The
 // old version copied four trees per case — 679 files, 721ms, times every

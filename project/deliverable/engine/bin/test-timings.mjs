@@ -10,13 +10,16 @@
 // The record lands in .se/, machine-local and gitignored, beside the call
 // log. It APPENDS, so the retro can see a test getting slower over weeks
 // rather than only what one run happened to cost.
-import { appendFileSync, mkdirSync } from "node:fs";
+import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 
 // selftest runs with cwd = project/deliverable, so the root is two up. A
 // reporter has no argv of its own to be told this.
 const ROOT = join(process.cwd(), "..", "..");
 const OUT = join(ROOT, ".se", "test-timings.jsonl");
+// THE LAST RUN, STANDING (owner, 2026-08-02): one findable summary, replaced
+// per run, so the retro reads the hotspots without aggregating the append log.
+const LAST = join(ROOT, ".se", "test-last-run.json");
 
 export default async function* timings(source) {
   const run = new Date().toISOString();
@@ -38,6 +41,27 @@ export default async function* timings(source) {
   try {
     mkdirSync(dirname(OUT), { recursive: true });
     appendFileSync(OUT, rows.map((r) => JSON.stringify(r)).join("\n") + "\n", "utf8");
+    const byFile = new Map();
+    for (const r of rows) {
+      const f = r.file;
+      const e = byFile.get(f) ?? { sum_ms: 0, max_case_ms: 0, cases: 0, failed: 0 };
+      e.sum_ms += r.ms;
+      e.max_case_ms = Math.max(e.max_case_ms, r.ms);
+      e.cases += 1;
+      if (!r.ok) e.failed += 1;
+      byFile.set(f, e);
+    }
+    const files = [...byFile.entries()].sort((a, b) => b[1].sum_ms - a[1].sum_ms).map(([file, e]) => ({ file, ...e }));
+    const summary = {
+      run,
+      tests: rows.length,
+      failed: rows.filter((r) => !r.ok).length,
+      summed_ms: files.reduce((a, f) => a + f.sum_ms, 0),
+      // A file far above its siblings OWES AN EXPLANATION (retro.md). The
+      // top of this list is where the explanations are owed.
+      files,
+    };
+    writeFileSync(LAST, JSON.stringify(summary, null, 1) + "\n", "utf8");
   } catch {
     // A suite must never fail because its bookkeeping could not be written.
   }

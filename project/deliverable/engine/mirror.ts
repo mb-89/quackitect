@@ -13,6 +13,7 @@ import { Rejection } from "./errors.ts";
 import { appendNote, pendingNotes, readNotes } from "./inbox.ts";
 import { loadCards } from "./cards.ts";
 import { handleHttp, type McpServer } from "./mcp.ts";
+import { bumpDrawingEpoch } from "./machines/compile.ts";
 import { feedRows, renderMirror, type MirrorState } from "./render.ts";
 import { loadPanel, renderPanel } from "./params.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
@@ -93,6 +94,8 @@ export function startMirror(o: MirrorOptions): Server {
   };
 
   const server = createServer((req, res) => {
+    // Every request is a new drawing epoch — see machines/compile.ts.
+    bumpDrawingEpoch();
     const url = new URL(req.url ?? "/", `http://localhost:${o.port}`);
     try {
       if (url.pathname === "/mcp" && o.mcp !== undefined) {
