@@ -188,6 +188,55 @@ function contextFlags(opts: SearchOpts): string[] {
   return c > 0 ? ["--context", String(c)] : [];
 }
 
+function runRg(base: string, args: string[]): string {
+  const r = spawnSync(rgPath(), args, { cwd: base, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
+  if (r.status !== 0 && r.status !== 1) throw new Error(`ripgrep failed: ${r.stderr}`);
+  return r.stdout ?? "";
+}
+
+function parseJsonEvents(stdout: string, show: (abs: string) => string, unreadable: string[]): Match[] {
+  const out: Match[] = [];
+  for (const line of stdout.split("\n")) {
+    if (line.trim() === "") continue;
+    let ev: {
+      type?: string;
+      data?: { path?: { text?: string }; line_number?: number; lines?: { text?: string }; binary_offset?: number | null };
+    };
+    try {
+      ev = JSON.parse(line);
+    } catch {
+      continue;
+    }
+    const p = ev.data?.path?.text;
+    if (ev.type === "end" && typeof ev.data?.binary_offset === "number" && p !== undefined) {
+      unreadable.push(show(p));
+      continue;
+    }
+    if ((ev.type !== "match" && ev.type !== "context") || p === undefined || ev.data?.line_number === undefined) continue;
+    const text = (ev.data.lines?.text ?? "").replace(/\r?\n$/, "").slice(0, LINE_CAP);
+    out.push({ path: show(p), line: ev.data.line_number, text, ...(ev.type === "context" ? { context: true as const } : {}) });
+  }
+  return out;
+}
+
+function parsePlainLines(stdout: string, show: (abs: string) => string, unreadable: string[]): Match[] {
+  const out: Match[] = [];
+  for (const line of stdout.split("\n")) {
+    if (line.trim() === "") continue;
+    // ripgrep announces a skipped file as "<path>: binary file matches (...)",
+    // which has no line number and so never parsed. Catch it before the drop.
+    const bin = line.match(/^(.+?): binary file matches/);
+    if (bin !== null) {
+      unreadable.push(show(bin[1]));
+      continue;
+    }
+    const m = line.match(/^(.{1,}?):(\d+):(.*)$/s);
+    if (m === null) continue;
+    out.push({ path: show(m[1]), line: Number(m[2]), text: m[3].slice(0, LINE_CAP) });
+  }
+  return out;
+}
+
 function rgSearch(root: string, query: string, opts: SearchOpts, unreadable: string[] = []): Match[] {
   const { scope, base, show } = rgScope(root, opts);
   const ctx = contextFlags(opts);
@@ -197,36 +246,13 @@ function rgSearch(root: string, query: string, opts: SearchOpts, unreadable: str
   // for a hit.
   if (ctx.length > 0) {
     const args = ["--json", ...ctx, "--max-count", String(perFileCap(opts.limit)), ...rgCommonArgs(opts), "--regexp", query, scope];
-    const r = spawnSync(rgPath(), args, { cwd: base, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
-    if (r.status !== 0 && r.status !== 1) throw new Error(`ripgrep failed: ${r.stderr}`);
-    const out: Match[] = [];
-    for (const line of (r.stdout ?? "").split("\n")) {
-      if (line.trim() === "") continue;
-      let ev: {
-        type?: string;
-        data?: { path?: { text?: string }; line_number?: number; lines?: { text?: string }; binary_offset?: number | null };
-      };
-      try {
-        ev = JSON.parse(line);
-      } catch {
-        continue;
-      }
-      const p = ev.data?.path?.text;
-      if (ev.type === "end" && typeof ev.data?.binary_offset === "number" && p !== undefined) {
-        unreadable.push(show(p));
-        continue;
-      }
-      if ((ev.type !== "match" && ev.type !== "context") || p === undefined || ev.data?.line_number === undefined) continue;
-      const text = (ev.data.lines?.text ?? "").replace(/\r?\n$/, "").slice(0, LINE_CAP);
-      out.push({ path: show(p), line: ev.data.line_number, text, ...(ev.type === "context" ? { context: true as const } : {}) });
-    }
-    return out;
+    return parseJsonEvents(runRg(base, args), show, unreadable);
   }
   // --with-filename: rg drops the filename for a single-file scope, which
   // starved the path:line:text parser — every match silently vanished.
   // --binary: without it ripgrep skips a binary file in a DIRECTORY search
   // and says nothing whatsoever — no line, no warning, no exit code. With it,
-  // the file is named on a "binary file matches" line, which the loop below
+  // the file is named on a "binary file matches" line, which parsePlainLines
   // turns into `unreadable`. --text was the alternative and was rejected: it
   // would search real binaries as text and spray them through the results.
   const args = [
@@ -252,23 +278,7 @@ function rgSearch(root: string, query: string, opts: SearchOpts, unreadable: str
   // A single named FILE survived it, because ripgrep never applies these
   // filters to a target it was handed explicitly — which is what made the
   // failure look like a parser bug rather than a scoping one.
-  const r = spawnSync(rgPath(), args, { cwd: base, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
-  if (r.status !== 0 && r.status !== 1) throw new Error(`ripgrep failed: ${r.stderr}`);
-  const out: Match[] = [];
-  for (const line of (r.stdout ?? "").split("\n")) {
-    if (line.trim() === "") continue;
-    // ripgrep announces a skipped file as "<path>: binary file matches (...)",
-    // which has no line number and so never parsed. Catch it before the drop.
-    const bin = line.match(/^(.+?): binary file matches/);
-    if (bin !== null) {
-      unreadable.push(show(bin[1]));
-      continue;
-    }
-    const m = line.match(/^(.{1,}?):(\d+):(.*)$/s);
-    if (m === null) continue;
-    out.push({ path: show(m[1]), line: Number(m[2]), text: m[3].slice(0, LINE_CAP) });
-  }
-  return out;
+  return parsePlainLines(runRg(base, args), show, unreadable);
 }
 
 /** The include glob as a git pathspec, ANDed with the path scope when both
