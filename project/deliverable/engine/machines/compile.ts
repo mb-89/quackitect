@@ -14,19 +14,19 @@
 //   - canvas frontmatter: entry (initial state), reentry (restart|resume)
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, isAbsolute, join, resolve } from "node:path";
-import { loadCanvas, type CanvasElement } from "../canvas.ts";
-import { contentHash } from "../hash.ts";
-import { loadStateNote, section } from "../notes.ts";
+import { type CanvasElement, loadCanvas } from "../canvas.ts";
 import { CONDITION_TYPES, conditionNoteAbs, conditionNotePath } from "../conditions.ts";
+import { contentHash } from "../hash.ts";
 import {
-  evalGuard,
-  validateMachine,
   type EdgeDecl,
   type EdgeRole,
   type EvidenceField,
+  evalGuard,
   type MachineDecl,
   type StateDecl,
+  validateMachine,
 } from "../machine.ts";
+import { loadStateNote, section } from "../notes.ts";
 
 const ROLES: ReadonlySet<string> = new Set(["normal", "alternative", "fallback", "recovery", "approval", "error"]);
 
@@ -40,6 +40,7 @@ export class MachineCompileError extends Error {
 // THE STANDARD REVIEW ROUNDS moved to machine.ts, where BOTH compilers can
 // reach one copy. Re-exported so existing importers keep working.
 import { STANDARD_ROUNDS } from "../machine.ts";
+
 export { STANDARD_ROUNDS };
 
 function evidenceForm(machineId: string, noteName: string, body: string): EvidenceField[] {
@@ -138,7 +139,11 @@ export function compileMachineCached(root: string, canvasPath: string): MachineD
 /** sources, when given, collects every file this compile read — the cache's
  *  watch list. Compiling without it is unchanged. */
 export function compileMachine(root: string, canvasPath: string, sources?: string[]): MachineDecl {
-  const machineId = canvasPath.replace(/\\/g, "/").split("/").pop()!.replace(/\.canvas$/, "");
+  const machineId = canvasPath
+    .replace(/\\/g, "/")
+    .split("/")
+    .pop()!
+    .replace(/\.canvas$/, "");
   sources?.push(canvasPath);
   const canvas = loadCanvas(canvasPath);
   const fm = canvas.metadata?.frontmatter ?? {};
@@ -167,13 +172,21 @@ export function compileMachine(root: string, canvasPath: string, sources?: strin
     if (ref.endsWith(".canvas")) {
       // A drawn machine nested as a state — its priority is declared in the
       // sub-canvas frontmatter (it has no note).
-      const subId = ref.replace(/\\/g, "/").split("/").pop()!.replace(/\.canvas$/, "");
+      const subId = ref
+        .replace(/\\/g, "/")
+        .split("/")
+        .pop()!
+        .replace(/\.canvas$/, "");
       const subPath = resolveRef(root, canvasPath, ref);
       sources?.push(subPath);
       const subFm = existsSync(subPath) ? (loadCanvas(subPath).metadata?.frontmatter ?? {}) : {};
       const subPriority = asPriority(subFm.priority);
       if (subPriority === undefined) {
-        throw new MachineCompileError(machineId, `canvas node ${el.id}`, `${subId}.canvas declares no priority in its frontmatter — every state has one (0.01 mechanical .. 0.8 killer; 1 ideation; above 1 human-only)`);
+        throw new MachineCompileError(
+          machineId,
+          `canvas node ${el.id}`,
+          `${subId}.canvas declares no priority in its frontmatter — every state has one (0.01 mechanical .. 0.8 killer; 1 ideation; above 1 human-only)`,
+        );
       }
       // A sub-canvas may carry conditions in its frontmatter (flat keys,
       // like a note) — e.g. start_iteration's needs-retro gate.
@@ -199,7 +212,11 @@ export function compileMachine(root: string, canvasPath: string, sources?: strin
       }
       decl = stateFromNote(machineId, ref, notePath, root);
     } else {
-      throw new MachineCompileError(machineId, `canvas node ${el.id}`, `file ${JSON.stringify(ref)} is neither a state note (.md) nor a machine (.canvas)`);
+      throw new MachineCompileError(
+        machineId,
+        `canvas node ${el.id}`,
+        `file ${JSON.stringify(ref)} is neither a state note (.md) nor a machine (.canvas)`,
+      );
     }
     if (states.has(decl.id)) {
       throw new MachineCompileError(machineId, `canvas node ${el.id}`, `duplicate state ${decl.id}`);
@@ -246,7 +263,12 @@ export function compileMachine(root: string, canvasPath: string, sources?: strin
         );
       }
     }
-    drawn.push({ from, decl: { to: to.id, role: role as EdgeRole, ...(guard !== "" ? { guard } : {}) }, declared: roleRaw !== null, id: edge.id });
+    drawn.push({
+      from,
+      decl: { to: to.id, role: role as EdgeRole, ...(guard !== "" ? { guard } : {}) },
+      declared: roleRaw !== null,
+      id: edge.id,
+    });
     // ONE ARROW, BOTH WAYS (owner ruling 2026-07-28). Drawing a forward edge
     // and a return edge as two separate arrows is what Obsidian makes
     // tedious; a DOUBLE-HEADED arrow is what a person naturally draws
@@ -257,7 +279,12 @@ export function compileMachine(root: string, canvasPath: string, sources?: strin
     // names it: forward is whichever end lies deeper from start, and the
     // other way round is the return. Nothing new decides anything.
     if ((edge as { fromEnd?: string }).fromEnd === "arrow" && ((edge as { toEnd?: string }).toEnd ?? "arrow") === "arrow") {
-      drawn.push({ from: to, decl: { to: from.id, role: "normal", ...(guard !== "" ? { guard } : {}) }, declared: false, id: `${edge.id}~return` });
+      drawn.push({
+        from: to,
+        decl: { to: from.id, role: "normal", ...(guard !== "" ? { guard } : {}) },
+        declared: false,
+        id: `${edge.id}~return`,
+      });
     }
   }
 
@@ -372,7 +399,10 @@ function asList(v: unknown): string[] | undefined {
   }
   const s = asString(v);
   if (s === undefined || s === "") return undefined;
-  return s.split(",").map((t) => t.trim()).filter((t) => t !== "");
+  return s
+    .split(",")
+    .map((t) => t.trim())
+    .filter((t) => t !== "");
 }
 
 function asPriority(v: unknown): number | undefined {
@@ -385,16 +415,30 @@ function asPriority(v: unknown): number | undefined {
 /** Conditions are FLAT frontmatter keys — exit_read, exit_script,
  *  entry_<type> — because nested dictionaries render as JSON blobs in
  *  Obsidian Properties (owner ruling: Obsidian-editable). */
-function conditionDict(machineId: string, ref: string, root: string, which: "entry" | "exit", fm: Record<string, unknown>): Record<string, string[]> | undefined {
+function conditionDict(
+  machineId: string,
+  ref: string,
+  root: string,
+  which: "entry" | "exit",
+  fm: Record<string, unknown>,
+): Record<string, string[]> | undefined {
   const out: Record<string, string[]> = {};
   for (const [k, v] of Object.entries(fm)) {
     if (!k.startsWith(`${which}_`)) continue;
     const key = k.slice(which.length + 1);
     if (!CONDITION_TYPES.has(key)) {
-      throw new MachineCompileError(machineId, ref, `unknown ${which} condition type ${JSON.stringify(key)} — engine types: ${[...CONDITION_TYPES].join(", ")}`);
+      throw new MachineCompileError(
+        machineId,
+        ref,
+        `unknown ${which} condition type ${JSON.stringify(key)} — engine types: ${[...CONDITION_TYPES].join(", ")}`,
+      );
     }
     if (!existsSync(conditionNoteAbs(root, key))) {
-      throw new MachineCompileError(machineId, ref, `condition type ${key} has no note at ${conditionNotePath(key)} — every type is defined by its note`);
+      throw new MachineCompileError(
+        machineId,
+        ref,
+        `condition type ${key} has no note at ${conditionNotePath(key)} — every type is defined by its note`,
+      );
     }
     out[key] = asList(v) ?? [];
   }

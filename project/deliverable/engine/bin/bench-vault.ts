@@ -115,7 +115,7 @@ for (const n of SIZES) {
     ["a tag test", 'file.hasTag("book") && weight > 90'],
     ["a list membership", 'depends_on.contains("n7")'],
     ["a date comparison", 'accessed > date("2026-08-01")'],
-    ["computed, no index possible", "weight % 97 == 0 && status.startsWith(\"o\")"],
+    ["computed, no index possible", 'weight % 97 == 0 && status.startsWith("o")'],
   ];
   for (const [label, expr] of cases) {
     const r = timed(7, () => v.filter(expr).length);
@@ -143,17 +143,23 @@ for (const n of SIZES) {
   // The saved index: only the FIRST start of a big vault pays the full read.
   const bar: number[] = [];
   const cold = new Vault(dir, dir);
-  const coldMs = (await cold.buildAsync((p) => {
-    if (p.phase === "read") bar.push(p.done);
-  })).buildMs;
+  const coldMs = (
+    await cold.buildAsync((p) => {
+      if (p.phase === "read") bar.push(p.done);
+    })
+  ).buildMs;
   cold.saveIndex();
   const warm = new Vault(dir, dir);
   const w = warm.warmStart();
   console.log(`  ${"build cold".padEnd(28)} ${ms(coldMs).padStart(10)}   ${bar.length} progress ticks`);
-  console.log(`  ${"start warm (saved index)".padEnd(28)} ${ms(warm.measured().buildMs).padStart(10)}   reused ${w.reused}, re-read ${w.reread}`);
+  console.log(
+    `  ${"start warm (saved index)".padEnd(28)} ${ms(warm.measured().buildMs).padStart(10)}   reused ${w.reused}, re-read ${w.reread}`,
+  );
   console.log(`  ${"warm rows match cold".padEnd(28)} ${String(warm.all().length === cold.all().length).padStart(10)}`);
   const sample = 'status == "blocked" && kind == "adr"';
-  console.log(`  ${"warm filter matches cold".padEnd(28)} ${String(warm.filter(sample).length === cold.filter(sample).length).padStart(10)}`);
+  console.log(
+    `  ${"warm filter matches cold".padEnd(28)} ${String(warm.filter(sample).length === cold.filter(sample).length).padStart(10)}`,
+  );
   cold.stop();
   warm.stop();
 

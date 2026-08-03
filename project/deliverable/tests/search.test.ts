@@ -49,7 +49,10 @@ test("the exclusion list still holds for directories below the search root", () 
     // Anchoring the globs must not disarm them. Deleting the exclusion list
     // would make the case above pass just as well, and this one fail.
     const r = search(tmp, "needle");
-    assert.deepEqual(r.matches.map((m) => m.path), ["kept.md"]);
+    assert.deepEqual(
+      r.matches.map((m) => m.path),
+      ["kept.md"],
+    );
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }

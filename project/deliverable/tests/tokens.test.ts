@@ -15,7 +15,7 @@
 // what a header should say when the walk stands in three places. It demands
 // that the question be ASKED before the wrong answer ships.
 import { strict as assert } from "node:assert";
-import { readFileSync, readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
 
@@ -61,11 +61,7 @@ describe("the token set", { concurrency: true }, () => {
       assert.equal(collapses.length, 3, `the active[0] debt changed: ${collapses.join(", ")}`);
       return;
     }
-    assert.deepEqual(
-      collapses,
-      [],
-      `a machine now forks, so every one of these shows one state out of several: ${collapses.join(", ")}`,
-    );
+    assert.deepEqual(collapses, [], `a machine now forks, so every one of these shows one state out of several: ${collapses.join(", ")}`);
   });
 
   // THE MULTI-AGENT HOOK, half built. machine.ts:94 declares claims as "which

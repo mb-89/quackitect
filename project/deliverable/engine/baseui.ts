@@ -17,9 +17,9 @@
 // THE FUNCTION HELP IS GENERATED FROM THE LIVE REGISTRY, so it can never
 // describe a function the evaluator would refuse.
 import { basename, dirname, join } from "node:path";
-import { GLOBALS, METHODS, typeOf, type TypeName } from "./expr.ts";
 import { baseSource, LAYOUTS } from "./bases.ts";
-import { listBases, loadBase, renderView, selectRows, unreadableRows, vaultDir, type BaseSpec, type BaseView, type Row } from "./tables.ts";
+import { GLOBALS, METHODS, type TypeName, typeOf } from "./expr.ts";
+import { type BaseSpec, type BaseView, listBases, loadBase, type Row, renderView, selectRows, unreadableRows, vaultDir } from "./tables.ts";
 import { vaultFor } from "./vault.ts";
 
 const esc = (s: string): string => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -121,37 +121,53 @@ export interface Help {
 const TOPICS: Record<string, () => Help> = {
   properties: () => ({
     title: "properties — the columns",
-    html: P("Ticking a property adds it as a column, and the tick is a WRITE: it lands in this view's <code>order</code> in the query.")
-      + P("The list is every key any note carries, with the type its values actually hold. The <code>file.</code> entries at the top are synthesised rather than written in frontmatter.")
-      + P("Drag a column heading to reorder. Drag its right edge to resize. Both are writes, so they survive a reload.")
-      + P("Editing a cell writes the note the row came from. The view stores nothing."),
+    html:
+      P("Ticking a property adds it as a column, and the tick is a WRITE: it lands in this view's <code>order</code> in the query.") +
+      P(
+        "The list is every key any note carries, with the type its values actually hold. The <code>file.</code> entries at the top are synthesised rather than written in frontmatter.",
+      ) +
+      P("Drag a column heading to reorder. Drag its right edge to resize. Both are writes, so they survive a reload.") +
+      P("Editing a cell writes the note the row came from. The view stores nothing."),
   }),
   sort: () => ({
     title: "sort and group by",
-    html: P("<b>Sort by</b> takes several levels. The first decides, and each later one settles the ties the ones above it left.")
-      + P("A column sorts by its own type. Numbers and dates order properly rather than as text, and empty cells go last.")
-      + P("<b>Group by</b> also takes several levels, and this is where we go past Obsidian, which allows one.")
-      + P("Each group level SUBDIVIDES the one above it. Group by extension and you get one section per extension. Add folder underneath and every extension is then split by folder.")
-      + P("Sorting applies inside the groups, so the two work together rather than against each other."),
+    html:
+      P("<b>Sort by</b> takes several levels. The first decides, and each later one settles the ties the ones above it left.") +
+      P("A column sorts by its own type. Numbers and dates order properly rather than as text, and empty cells go last.") +
+      P("<b>Group by</b> also takes several levels, and this is where we go past Obsidian, which allows one.") +
+      P(
+        "Each group level SUBDIVIDES the one above it. Group by extension and you get one section per extension. Add folder underneath and every extension is then split by folder.",
+      ) +
+      P("Sorting applies inside the groups, so the two work together rather than against each other."),
   }),
   expression: () => ({
     title: "the expression language",
-    html: P("Filters and formulas are the SAME language. A filter is an expression that has to come out true; a formula is an expression whose value becomes a column.")
-      + P("<b>Where a value comes from</b>")
-      + NAMESPACE_HELP
-      + P("<b>Operators</b>")
-      + OPERATOR_HELP
-      + P("<b>Functions</b>, every one the evaluator accepts:")
-      + functionHelp()
-      + P("Three functions take an expression rather than a value, and bind <code>value</code> per element: <code>filter</code>, <code>map</code> and <code>reduce</code>. So <code>[1,2,3,4].filter(value &gt; 2)</code> gives <code>[3, 4]</code>.")
-      + P("Anything the language does not know is REFUSED by name. A query that ignored a clause would return a table that looks complete and is wrong."),
+    html:
+      P(
+        "Filters and formulas are the SAME language. A filter is an expression that has to come out true; a formula is an expression whose value becomes a column.",
+      ) +
+      P("<b>Where a value comes from</b>") +
+      NAMESPACE_HELP +
+      P("<b>Operators</b>") +
+      OPERATOR_HELP +
+      P("<b>Functions</b>, every one the evaluator accepts:") +
+      functionHelp() +
+      P(
+        "Three functions take an expression rather than a value, and bind <code>value</code> per element: <code>filter</code>, <code>map</code> and <code>reduce</code>. So <code>[1,2,3,4].filter(value &gt; 2)</code> gives <code>[3, 4]</code>.",
+      ) +
+      P(
+        "Anything the language does not know is REFUSED by name. A query that ignored a clause would return a table that looks complete and is wrong.",
+      ),
   }),
   cell: () => ({
     title: "editing a cell",
-    html: P("Double-click or press Enter to edit. Enter commits, Escape discards. Nothing is written while you type.")
-      + P("The value that was there decides the type. A key that held a list reads your text as a list; a key that held a number refuses prose rather than turning into one.")
-      + P("A cell that will not take an editor is a nested value, and it says so when you hover it.")
-      + P("The write goes to the note the row came from, never to the view."),
+    html:
+      P("Double-click or press Enter to edit. Enter commits, Escape discards. Nothing is written while you type.") +
+      P(
+        "The value that was there decides the type. A key that held a list reads your text as a list; a key that held a number refuses prose rather than turning into one.",
+      ) +
+      P("A cell that will not take an editor is a nested value, and it says so when you hover it.") +
+      P("The write goes to the note the row came from, never to the view."),
   }),
 };
 
@@ -304,7 +320,10 @@ export function basesCard(root: string, head: string, selected?: string, rowsIn?
     })
     .join("");
 
-  const damage = damaged.length === 0 ? "" : `<div class="tbl-damage">${damaged.length} note${damaged.length === 1 ? "" : "s"} in the vault do not parse — ${esc(damaged[0])}</div>`;
+  const damage =
+    damaged.length === 0
+      ? ""
+      : `<div class="tbl-damage">${damaged.length} note${damaged.length === 1 ? "" : "s"} in the vault do not parse — ${esc(damaged[0])}</div>`;
   return `<div class="widget" id="w-table"><div class="widget-head"><span>database</span>${head}</div>
     <div class="widget-body bs-body">${damage}${blocks}</div></div>`;
 }

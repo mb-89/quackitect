@@ -22,11 +22,11 @@
 // every change size, because a size column strikes rows and a striking bug
 // would show up in one column and not another.
 import { strict as assert } from "node:assert";
-import { describe, test } from "node:test";
 import { readFileSync } from "node:fs";
+import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { CHANGE_COLUMNS, compileColumn, readRigorMatrix, type ChangeColumn } from "../engine/rigor-matrix.ts";
 import { STANDARD_ROUNDS } from "../engine/machine.ts";
+import { CHANGE_COLUMNS, type ChangeColumn, compileColumn, readRigorMatrix } from "../engine/rigor-matrix.ts";
 
 const REPO = fileURLToPath(new URL("../../..", import.meta.url));
 const ROUND_NAMES = STANDARD_ROUNDS.map((f) => f.name);

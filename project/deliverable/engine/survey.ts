@@ -6,10 +6,10 @@
 // so was reachable only by the agent, which made "what is open" a question
 // the owner had to route through someone else. One implementation, two
 // doors.
-import { backlogNotes, byPriority, headline, pendingNotes, priorityOf, titleOf, type Priority } from "./inbox.ts";
-import { expList, readRecord } from "./worktree.ts";
+import { backlogNotes, byPriority, headline, type Priority, pendingNotes, priorityOf, titleOf } from "./inbox.ts";
 import { itList, readItRecord } from "./iterations.ts";
 import { seDir } from "./paths.ts";
+import { expList, readRecord } from "./worktree.ts";
 
 export interface Survey {
   counts: { expeditions: number; iterations: number; notes: number; backlog: number };
@@ -47,8 +47,12 @@ const goalOf = (fm: Record<string, unknown> | undefined): string =>
   fm?.unreadable !== undefined ? `⚠ ${String(fm.unreadable)}` : headline(String(fm?.goal ?? ""), GOAL_CAP);
 
 export function survey(projectRoot: string, opts: SurveyOptions = {}): Survey {
-  const exps = expList(projectRoot).filter((e) => e.open).map((e) => ({ id: e.id, goal: goalOf(readRecord(projectRoot, e)) }));
-  const its = itList(projectRoot).filter((i) => i.open).map((i) => ({ id: i.id, goal: goalOf(readItRecord(projectRoot, i)) }));
+  const exps = expList(projectRoot)
+    .filter((e) => e.open)
+    .map((e) => ({ id: e.id, goal: goalOf(readRecord(projectRoot, e)) }));
+  const its = itList(projectRoot)
+    .filter((i) => i.open)
+    .map((i) => ({ id: i.id, goal: goalOf(readItRecord(projectRoot, i)) }));
   const withText = opts.detail === "full";
   const allNotes = pendingNotes(seDir(projectRoot))
     .sort(byPriority)
@@ -58,11 +62,22 @@ export function survey(projectRoot: string, opts: SurveyOptions = {}): Survey {
   const notes = windowed ? allNotes.slice(offset, offset + (opts.limit ?? allNotes.length)) : allNotes;
   const allBacklog = backlogNotes(seDir(projectRoot))
     .sort(byPriority)
-    .map((n) => ({ ref: n.ref, ready_when: n.drained?.where ?? "", title: titleOf(n), priority: priorityOf(n), ...(withText ? { text: n.text } : {}) }));
+    .map((n) => ({
+      ref: n.ref,
+      ready_when: n.drained?.where ?? "",
+      title: titleOf(n),
+      priority: priorityOf(n),
+      ...(withText ? { text: n.text } : {}),
+    }));
   const backlog = windowed ? allBacklog.slice(offset, offset + (opts.limit ?? allBacklog.length)) : allBacklog;
   return {
     counts: { expeditions: exps.length, iterations: its.length, notes: allNotes.length, backlog: allBacklog.length },
-    ...(windowed ? { notes_window: { offset, shown: notes.length, remaining: Math.max(0, allNotes.length - offset - notes.length) }, backlog_window: { offset, shown: backlog.length, remaining: Math.max(0, allBacklog.length - offset - backlog.length) } } : {}),
+    ...(windowed
+      ? {
+          notes_window: { offset, shown: notes.length, remaining: Math.max(0, allNotes.length - offset - notes.length) },
+          backlog_window: { offset, shown: backlog.length, remaining: Math.max(0, allBacklog.length - offset - backlog.length) },
+        }
+      : {}),
     expeditions: exps,
     iterations: its,
     notes,

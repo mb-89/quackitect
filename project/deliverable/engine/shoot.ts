@@ -16,8 +16,8 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
-import { contentHash } from "./hash.ts";
 import { IMAGE_BUDGET } from "./files.ts";
+import { contentHash } from "./hash.ts";
 import { seDir } from "./paths.ts";
 
 const SRC = "engine/shoot.ts";
@@ -93,7 +93,11 @@ export function shoot(root: string, html: string, opts: { width?: number; height
       clause: CLAUSES.OVERSIZE_READ,
       expected: `a shot under ${IMAGE_BUDGET} bytes — this one is ${bytes.length}`,
       got: `${width}x${height}`,
-      remedy: { tool: "se_shoot", args: { width: Math.round(width / 2), height: Math.round(height / 2) }, note: "shoot a smaller window, or one widget instead of the page" },
+      remedy: {
+        tool: "se_shoot",
+        args: { width: Math.round(width / 2), height: Math.round(height / 2) },
+        note: "shoot a smaller window, or one widget instead of the page",
+      },
       source: SRC,
     });
   }

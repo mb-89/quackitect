@@ -14,7 +14,11 @@ test("a handed-off scoped run logs its own verdict without being fetched", async
   const server = await bootedServer(root);
   // A fixture root carries no tests directory — plant one green case.
   mkdirSync(join(root, "project", "deliverable", "tests"), { recursive: true });
-  writeFileSync(join(root, "project", "deliverable", "tests", "tiny.test.ts"), 'import { test } from "node:test";\nimport { strict as assert } from "node:assert";\ntest("one", () => { assert.equal(1, 1); });\n', "utf8");
+  writeFileSync(
+    join(root, "project", "deliverable", "tests", "tiny.test.ts"),
+    'import { test } from "node:test";\nimport { strict as assert } from "node:assert";\ntest("one", () => { assert.equal(1, 1); });\n',
+    "utf8",
+  );
   process.env.SE_TEST_HANDOFF_MS = "1";
   try {
     const started = await call(server, "se_test", { files: ["tiny"], force: true });

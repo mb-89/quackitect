@@ -10,11 +10,11 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, test } from "node:test";
-import { basesCard, HELP_TOPICS, helpFor, propertyInventory } from "../engine/baseui.ts";
 import { setSource, toggleProperty } from "../engine/bases.ts";
+import { basesCard, HELP_TOPICS, helpFor, propertyInventory } from "../engine/baseui.ts";
 import { Rejection } from "../engine/errors.ts";
 import { GLOBALS } from "../engine/expr.ts";
-import { Vault, type Row } from "../engine/vault.ts";
+import { type Row, Vault } from "../engine/vault.ts";
 
 /** assert.throws cannot hand the error back, and these refusals say things worth reading. */
 function refusal(fn: () => unknown): Rejection {
@@ -41,7 +41,10 @@ function vault(body = BASE): { root: string; rows: Row[] } {
   const dir = join(root, "project");
   mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, "v.base"), body);
-  writeFileSync(join(dir, "one.md"), "---\nstatus: open\nprice: 10\nage: 4\naccessed: 2026-08-01\ntags:\n  - book\n---\n\n# one\n\nA [[link]].\n");
+  writeFileSync(
+    join(dir, "one.md"),
+    "---\nstatus: open\nprice: 10\nage: 4\naccessed: 2026-08-01\ntags:\n  - book\n---\n\n# one\n\nA [[link]].\n",
+  );
   writeFileSync(join(dir, "two.md"), "---\nstatus: closed\nprice: 3\nage: 3\n---\n\n# two\n");
   const v = new Vault(root);
   v.build();
@@ -108,7 +111,7 @@ describe("the query flips with the table", () => {
   test("the toggle sits at the end of the toolbar", () => {
     const html = card(vault());
     const bar = html.slice(html.indexOf('class="bs-bar"'), html.indexOf('class="bs-pop"'));
-    assert.ok(bar.lastIndexOf("bs-code-toggle") > bar.lastIndexOf("bs-tool\" data-pop=\"props\""), "the code icon is last");
+    assert.ok(bar.lastIndexOf("bs-code-toggle") > bar.lastIndexOf('bs-tool" data-pop="props"'), "the code icon is last");
   });
 
   test("the query is the file on disk, verbatim", () => {

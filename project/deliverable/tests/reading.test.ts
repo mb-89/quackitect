@@ -123,7 +123,11 @@ test("the END alone is not enough — a lazy reader that skips to it is refused"
   const { server } = pair();
   const first = await call(server, "se_pull");
   const doc = first.body.document as { path: string; content: string };
-  const tailOnly = doc.content.split(/\s+/).filter((w) => w !== "").slice(-8).join(" ");
+  const tailOnly = doc.content
+    .split(/\s+/)
+    .filter((w) => w !== "")
+    .slice(-8)
+    .join(" ");
   const again = await call(server, "se_pull", { form: { read: tailOnly } });
   assert.equal(again.body.pull, "read", "answering only the last probe proves only the last page");
   assert.equal((again.body.document as { path: string }).path, doc.path);

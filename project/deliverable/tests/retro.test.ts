@@ -33,7 +33,11 @@ test("draining splits: done and obsolete anywhere, carried and backlog only in t
   // The JUDGMENT half did not move. carried and backlog decide what the work
   // MEANS and when it returns, which still wants the whole picture.
   const second = await call(server, "se_note", { text: "a stray for the retro" });
-  const judged = await call(server, "se_note_drain", { ref: String(second.body.captured), disposition: "backlog", where: "ready when someone cares" });
+  const judged = await call(server, "se_note_drain", {
+    ref: String(second.body.captured),
+    disposition: "backlog",
+    where: "ready when someone cares",
+  });
   assert.equal(judged.isError, true, "backlog outside the retro is still refused");
   const ref2 = String(second.body.captured);
   // Enter the retro — one plain state; the way in owes the METHOD read,
@@ -134,7 +138,8 @@ test("the survey lists a note by title — cut at a word, never mid-word, and ne
   // The old defect took the first line and then 120 characters of it, so the
   // survey showed a title cut mid-word and none of the substance. A listing
   // is fine; cutting a word in half and dropping the body is not.
-  const heading = "A HEADING LINE LONG ENOUGH THAT ONE HUNDRED AND TWENTY CHARACTERS WOULD END IT SOMEWHERE IN THE MIDDLE OF A WORD RATHER THAN AT ITS END.";
+  const heading =
+    "A HEADING LINE LONG ENOUGH THAT ONE HUNDRED AND TWENTY CHARACTERS WOULD END IT SOMEWHERE IN THE MIDDLE OF A WORD RATHER THAN AT ITS END.";
   const substance = "The substance lives down here, which is the only reason anyone reads a note at all.";
   const ref = String((await call(server, "se_note", { text: heading + "\n\n" + substance })).body.captured);
   assert.ok(heading.length > 120, "the heading alone outruns the old slice");

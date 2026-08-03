@@ -91,7 +91,10 @@ export function decisionsAsGitGraph(nodes: readonly DecisionNode[], trunkName = 
     if (n.parent === null) roots.push(n);
     else {
       let kids = children.get(n.parent);
-      if (!kids) children.set(n.parent, (kids = []));
+      if (!kids) {
+        kids = [];
+        children.set(n.parent, kids);
+      }
       kids.push(n);
     }
   }

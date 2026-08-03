@@ -11,8 +11,8 @@
 import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { assertFloor, CHANGE_COLUMNS, compileColumn, readRigorMatrix, type ChangeColumn } from "../engine/rigor-matrix.ts";
 import { Rejection } from "../engine/errors.ts";
+import { assertFloor, CHANGE_COLUMNS, type ChangeColumn, compileColumn, readRigorMatrix } from "../engine/rigor-matrix.ts";
 
 const REPO = fileURLToPath(new URL("../../..", import.meta.url));
 
@@ -44,7 +44,10 @@ const FLOOR = ["gate-kickoff", "verification", "sweep-consistency", "gate-releas
 
 describe("what the floor is", () => {
   test("exactly four rows declare it, and they are the ones the method names", () => {
-    const flagged = matrix().rows.filter((r) => r.floor).map((r) => r.name).sort();
+    const flagged = matrix()
+      .rows.filter((r) => r.floor)
+      .map((r) => r.name)
+      .sort();
     assert.deepEqual(flagged, [...FLOOR].sort());
   });
 

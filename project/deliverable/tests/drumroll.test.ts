@@ -23,7 +23,7 @@ import { SCRIPT } from "../engine/render.ts";
 
 /** Cut out the `document.addEventListener("click", ...)` that owns the rungs. */
 function rungClickHandler(): string {
-  const marker = SCRIPT.indexOf('.rung[data-level]');
+  const marker = SCRIPT.indexOf(".rung[data-level]");
   assert.ok(marker > 0, "the rung click handler is gone from the client script");
   const start = SCRIPT.lastIndexOf('document.addEventListener("click"', marker);
   assert.ok(start > 0, "the rung handler is no longer inside a click listener");
@@ -96,14 +96,35 @@ function harness(): Press {
 
   // levelHelp / nrHelp / refreshLog belong to the rest of the page.
   const fn = new Function(
-    "document", "window", "fetch", "Date", "levelHelp", "nrHelp", "refreshLog",
+    "document",
+    "window",
+    "fetch",
+    "Date",
+    "levelHelp",
+    "nrHelp",
+    "refreshLog",
     `document.addEventListener("click", (ev) => {${body}});`,
   );
-  fn(doc, win, fetchStub, { now: () => clock }, () => {}, () => {}, () => {});
+  fn(
+    doc,
+    win,
+    fetchStub,
+    { now: () => clock },
+    () => {},
+    () => {},
+    () => {},
+  );
 
   return {
     posts,
-    button: { get classes() { return classes; }, get text() { return btn.textContent; } },
+    button: {
+      get classes() {
+        return classes;
+      },
+      get text() {
+        return btn.textContent;
+      },
+    },
     press: async (times: number, gapMs = 200) => {
       for (let k = 0; k < times; k++) {
         clock += gapMs;
@@ -165,7 +186,10 @@ describe("the emergency drumroll", () => {
     h.button.classes.delete("on");
     h.button.classes.add("locked");
     await h.press(5);
-    assert.ok(h.posts.some((p) => p.url === "/emergency"), "a locked rung swallowed the drumroll");
+    assert.ok(
+      h.posts.some((p) => p.url === "/emergency"),
+      "a locked rung swallowed the drumroll",
+    );
   });
 
   test("the count survives a press that lands while the rung is dark", async () => {
@@ -175,6 +199,9 @@ describe("the emergency drumroll", () => {
     const h = harness();
     h.button.classes.delete("on");
     await h.press(5);
-    assert.ok(h.posts.some((p) => p.url === "/emergency"), "presses stopped counting once the rung went dark");
+    assert.ok(
+      h.posts.some((p) => p.url === "/emergency"),
+      "presses stopped counting once the rung went dark",
+    );
   });
 });

@@ -17,7 +17,20 @@ import { Rejection } from "../engine/errors.ts";
 import { readKeys } from "../engine/frontmatter.ts";
 import { seDir } from "../engine/paths.ts";
 import { Session } from "../engine/session.ts";
-import { editCell, listBases, loadBase, matches, parseBase, readVault, renderView, selectRows, TABLE_SCRIPT, unreadableRows, type BaseView, type Row } from "../engine/tables.ts";
+import {
+  type BaseView,
+  editCell,
+  listBases,
+  loadBase,
+  matches,
+  parseBase,
+  type Row,
+  readVault,
+  renderView,
+  selectRows,
+  TABLE_SCRIPT,
+  unreadableRows,
+} from "../engine/tables.ts";
 import { freshRoot } from "./helpers.ts";
 
 const REPO_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
@@ -30,7 +43,15 @@ const ROWS: Row[] = [
   { kind: "something-else", state_kind: "work", patch: "full", file: { name: "four" } },
 ];
 
-const view = (over: Partial<BaseView>): BaseView => ({ type: "table", name: "t", order: [], sort: [], groupBy: [], columnSize: {}, ...over });
+const view = (over: Partial<BaseView>): BaseView => ({
+  type: "table",
+  name: "t",
+  order: [],
+  sort: [],
+  groupBy: [],
+  columnSize: {},
+  ...over,
+});
 const pivot = (over: Partial<BaseView>): BaseView => view({ type: "pivot", filters: 'kind == "matrix-row"', ...over });
 
 /** assert.throws cannot hand the error back, and these refusals say things worth reading. */
@@ -126,7 +147,10 @@ describe("the pivot", { concurrency: true }, () => {
   test("list names the rows and refuses without a value property", () => {
     const r = renderView(SPEC, pivot({ rows: "state_kind", columns: "patch", aggregate: "list", value: "file.name" }), ROWS);
     assert.match(r.html, /one/);
-    assert.match(refusal(() => renderView(SPEC, pivot({ rows: "state_kind", columns: "patch", aggregate: "list" }), ROWS)).expected, /value/);
+    assert.match(
+      refusal(() => renderView(SPEC, pivot({ rows: "state_kind", columns: "patch", aggregate: "list" }), ROWS)).expected,
+      /value/,
+    );
   });
 
   test("one dimension is a table, and an unknown aggregate refuses", () => {
@@ -230,7 +254,21 @@ describe("the vault", { concurrency: true }, () => {
   });
 });
 
-const NOTE = ["---", "kind: matrix-row", "patch: none", "count: 2", "depends_on:", "  - a", "  - b", "---", "", "# One", "", "body", ""].join("\n");
+const NOTE = [
+  "---",
+  "kind: matrix-row",
+  "patch: none",
+  "count: 2",
+  "depends_on:",
+  "  - a",
+  "  - b",
+  "---",
+  "",
+  "# One",
+  "",
+  "body",
+  "",
+].join("\n");
 
 /** A throwaway vault holding one note, so a write can be proven on disk. */
 function vault(): { root: string; abs: string; rel: string } {

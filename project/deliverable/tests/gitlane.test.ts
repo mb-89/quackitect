@@ -23,6 +23,7 @@ test("a recorded visit yields its state, however deep the container", () => {
   assert.equal(visitState("e30"), "e30", "an unqualified visit still works");
   assert.equal(visitState("iterations/i1/walk@7"), "walk", "and it reaches the innermost state at any depth");
 });
+
 import { bootedServer, call, freshRoot } from "./helpers.ts";
 
 // A narrated call writes the record's decision trail INTO the bound worktree,
@@ -156,14 +157,17 @@ test("se_git: one side of a conflict can be taken, and only mid-merge", async ()
     if (r.status !== 0 && a[0] !== "merge") throw new Error(`git ${a.join(" ")} failed: ${r.stderr}`);
   };
   writeFileSync(join(root, "c.md"), "base\n");
-  g("add", "-A"); g("commit", "-q", "-m", "base");
+  g("add", "-A");
+  g("commit", "-q", "-m", "base");
   const trunk = spawnSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], { cwd: root, encoding: "utf8", windowsHide: true }).stdout.trim();
   g("checkout", "-q", "-b", "other");
   writeFileSync(join(root, "c.md"), "theirs\n");
-  g("add", "-A"); g("commit", "-q", "-m", "theirs");
+  g("add", "-A");
+  g("commit", "-q", "-m", "theirs");
   g("checkout", "-q", trunk);
   writeFileSync(join(root, "c.md"), "ours\n");
-  g("add", "-A"); g("commit", "-q", "-m", "ours");
+  g("add", "-A");
+  g("commit", "-q", "-m", "ours");
 
   const server = await bootedServer(root);
   // A bare checkout switches branches or discards edits. Never legal.

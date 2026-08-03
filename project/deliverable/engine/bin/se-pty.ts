@@ -21,10 +21,11 @@
 // FAIL SAFE: if the pseudo-terminal binding will not load, the command is
 // run normally on the inherited terminal. A missing dependency must never
 // cost the owner their agent.
-import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+
 import { spawn } from "node:child_process";
-import { createRequire } from "node:module";
 import { readFileSync } from "node:fs";
+import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 
 const argv = process.argv.slice(2);
@@ -215,7 +216,20 @@ async function waitForAlive(timeoutMs: number, now: () => number): Promise<boole
 }
 
 async function main(): Promise<void> {
-  let nodePty: { spawn: (file: string, args: string[], opts: Record<string, unknown>) => { onData: (f: (d: string) => void) => { dispose: () => void }; onExit: (f: (e: { exitCode: number }) => void) => void; write: (d: string) => void; resize: (c: number, r: number) => void; kill: () => void; pid: number } };
+  let nodePty: {
+    spawn: (
+      file: string,
+      args: string[],
+      opts: Record<string, unknown>,
+    ) => {
+      onData: (f: (d: string) => void) => { dispose: () => void };
+      onExit: (f: (e: { exitCode: number }) => void) => void;
+      write: (d: string) => void;
+      resize: (c: number, r: number) => void;
+      kill: () => void;
+      pid: number;
+    };
+  };
   try {
     nodePty = (await import("@lydell/node-pty")) as never;
   } catch {

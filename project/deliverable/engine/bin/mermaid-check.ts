@@ -65,4 +65,6 @@ document.title = bad === 0 ? "OK ${blocks.length} diagram(s)" : "BROKEN " + bad 
 `,
   "utf8",
 );
-process.stdout.write(`${resolve(out)}\n${blocks.length} diagram(s)\nNOTE: this page needs the network — mermaid is fetched from a CDN, not vendored.\n`);
+process.stdout.write(
+  `${resolve(out)}\n${blocks.length} diagram(s)\nNOTE: this page needs the network — mermaid is fetched from a CDN, not vendored.\n`,
+);

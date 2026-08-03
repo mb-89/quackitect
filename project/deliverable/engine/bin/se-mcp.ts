@@ -29,7 +29,7 @@
 //
 // SESSION OVER: anybody reaching end shuts the whole session down — the
 // child exits deliberately (code 0) and the shim follows it down.
-import { spawn, spawnSync, type ChildProcess } from "node:child_process";
+import { type ChildProcess, spawn, spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { createInterface } from "node:readline";
@@ -37,7 +37,10 @@ import { fileURLToPath } from "node:url";
 
 const argv = [
   ...process.argv.slice(2),
-  ...(process.env.SE_ARGS ?? "").split("\n").map((s) => s.trim()).filter((s) => s !== ""),
+  ...(process.env.SE_ARGS ?? "")
+    .split("\n")
+    .map((s) => s.trim())
+    .filter((s) => s !== ""),
 ];
 function argValue(flag: string): string | undefined {
   const i = argv.indexOf(flag);
@@ -184,7 +187,11 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
         process.kill(parentPid, 0);
       } catch {
         process.stderr.write("se-mcp: the window that started this server is gone — exiting\n");
-        try { (await import("../run.ts")).jobStopAll(); } catch { /* the reap is best effort */ }
+        try {
+          (await import("../run.ts")).jobStopAll();
+        } catch {
+          /* the reap is best effort */
+        }
         process.exit(0);
       }
     }, 5_000);
@@ -206,13 +213,16 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   // every spawned child now lives.
   for (const sig of ["SIGTERM", "SIGINT"] as const) {
     process.on(sig, () => {
-      try { jobStopAll(); } catch { /* best effort */ }
+      try {
+        jobStopAll();
+      } catch {
+        /* best effort */
+      }
       process.exit(0);
     });
   }
 
-  const autonomyRaw =
-    argValue("--autonomy") ?? argValue("--threshold") ?? process.env.SE_AUTONOMY ?? process.env.SE_THRESHOLD;
+  const autonomyRaw = argValue("--autonomy") ?? argValue("--threshold") ?? process.env.SE_AUTONOMY ?? process.env.SE_THRESHOLD;
 
   const session = new Session(root); // fails fast on a misdrawn machine
   if (autonomyRaw !== undefined) session.setAutonomy(Number(autonomyRaw)); // refuses out-of-range
@@ -231,7 +241,11 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
       body: JSON.stringify({ reason: "the machine reached end" }),
     }).catch(() => {});
     setTimeout(() => {
-      try { jobStopAll(); } catch { /* best effort */ }
+      try {
+        jobStopAll();
+      } catch {
+        /* best effort */
+      }
       process.exit(0);
     }, 1500);
   };
@@ -371,7 +385,9 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   };
 
   if (!argv.includes("--headless") && (await liveServerForThisRoot())) {
-    process.stderr.write(`se-mcp shim: a server already walks this root — attaching to ${target}/mcp as a proxy, not raising a second engine\n`);
+    process.stderr.write(
+      `se-mcp shim: a server already walks this root — attaching to ${target}/mcp as a proxy, not raising a second engine\n`,
+    );
     const rl = createInterface({ input: process.stdin, terminal: false });
     rl.on("line", (line) => {
       if (line.trim() === "") return;
@@ -386,7 +402,10 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
           } catch {
             // unparseable — the server would have answered the parse error; gone, nobody can
           }
-          if (id !== null) process.stdout.write(`${JSON.stringify({ jsonrpc: "2.0", id, error: { code: -32000, message: `the attached se server went away: ${String(e)}` } })}\n`);
+          if (id !== null)
+            process.stdout.write(
+              `${JSON.stringify({ jsonrpc: "2.0", id, error: { code: -32000, message: `the attached se server went away: ${String(e)}` } })}\n`,
+            );
         }
       })();
     });

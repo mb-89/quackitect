@@ -94,8 +94,14 @@ test("empty container: nothing open → start runs straight to end", async () =>
   const root = freshRoot();
   gitSeed(root);
   const gen = generateContinueExpedition(root);
-  assert.deepEqual(gen.decl.states.map((s) => s.id), ["start", "end"]);
-  assert.deepEqual(gen.decl.states[0].edges.map((e) => e.to), ["end"]);
+  assert.deepEqual(
+    gen.decl.states.map((s) => s.id),
+    ["start", "end"],
+  );
+  assert.deepEqual(
+    gen.decl.states[0].edges.map((e) => e.to),
+    ["end"],
+  );
   const s = new Session(root);
   await bootHuman(s);
   await s.advance("expeditions");
@@ -114,9 +120,15 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
   const sidA = shortId(a.created);
   const sidB = shortId(b.created);
   const gen = generateContinueExpedition(root);
-  assert.deepEqual(gen.decl.states.map((x) => x.id), ["start", sidA, `${sidA}-leave`, sidB, `${sidB}-leave`, "end"]);
+  assert.deepEqual(
+    gen.decl.states.map((x) => x.id),
+    ["start", sidA, `${sidA}-leave`, sidB, `${sidB}-leave`, "end"],
+  );
   assert.equal(gen.decl.states.find((x) => x.id === sidA)?.statement, "First Thing", "the record's goal is the statement");
-  assert.deepEqual(gen.decl.states[0].edges.map((e) => e.to), [sidA, sidB]);
+  assert.deepEqual(
+    gen.decl.states[0].edges.map((e) => e.to),
+    [sidA, sidB],
+  );
   // The leave gate rides the AUTHORED note into every instance.
   assert.deepEqual(gen.decl.states.find((x) => x.id === `${sidB}-leave`)?.entry?.evidence_form, ["expedition-leave"]);
   // The drawing carries one group per expedition, labeled with its id.
@@ -136,8 +148,16 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
   assert.equal(s.laneRoot(".se/HANDOVER.md"), root, "the handover belongs to the root, whatever branch we stand on");
   assert.equal(s.laneRoot(), s.workRoot(), "no path named — the work root, as before");
   // The leave gate holds until the page passes; then close, end, return.
-  await assert.rejects(() => s.advance(`${sidB}-leave`), (e) => (e as { clause?: string }).clause === "SE-C-112");
-  s.formSave("expedition-leave", { "What was the goal": "second thing", "What was done": "it", "What settled it": "the container test", "What was not done": "nothing" });
+  await assert.rejects(
+    () => s.advance(`${sidB}-leave`),
+    (e) => (e as { clause?: string }).clause === "SE-C-112",
+  );
+  s.formSave("expedition-leave", {
+    "What was the goal": "second thing",
+    "What was done": "it",
+    "What settled it": "the container test",
+    "What was not done": "nothing",
+  });
   // A PERSON confirms the report; the close then needs no override. The guard
   // itself is tested in editsafety.test.ts — this one is about the archive.
   s.formDone("expedition-leave", "human");
@@ -154,7 +174,10 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
   await s.advance("expeditions");
   assert.deepEqual(s.viewRun("expeditions").done, []);
   const again = s.generatedView("expeditions")!;
-  assert.deepEqual(again.decl.states.map((x) => x.id), ["start", sidA, `${sidA}-leave`, "end"]);
+  assert.deepEqual(
+    again.decl.states.map((x) => x.id),
+    ["start", sidA, `${sidA}-leave`, "end"],
+  );
 });
 
 // THE OFFER AND THE CHECK READ ONE GRAPH. The pull built its doors from the
@@ -171,7 +194,12 @@ test("a closed record leaves no phantom door: what the pull offers, the walk can
   const sid = shortId(e.created);
   await s.advance("expeditions");
   await s.advance(sid);
-  s.formSave("expedition-leave", { "What was the goal": "one thing", "What was done": "it", "What settled it": "this test", "What was not done": "nothing" });
+  s.formSave("expedition-leave", {
+    "What was the goal": "one thing",
+    "What was done": "it",
+    "What settled it": "this test",
+    "What was not done": "nothing",
+  });
   s.formDone("expedition-leave", "human");
   await s.advance(`${sid}-leave`);
   s.expeditionClose(true);
@@ -182,7 +210,11 @@ test("a closed record leaves no phantom door: what the pull offers, the walk can
   assert.equal(r.pull, "choose", "the container's end is a door, not a dead end");
   const options = r.options as Record<string, unknown>[];
   assert.ok(options.length > 0, "an end inside a container can always be left");
-  assert.equal(options.some((o) => String(o.to).includes(sid)), false, "the archived record is gone from the offer");
+  assert.equal(
+    options.some((o) => String(o.to).includes(sid)),
+    false,
+    "the archived record is gone from the offer",
+  );
   // The proof of the law: taking an offered door is never refused.
   const pick = options.find((o) => o.open === true) ?? options[0];
   await s.pull({ form: { choice: String(pick.to) } });
@@ -201,19 +233,37 @@ test("the archive: start reaches every closed expedition, each runs to end, brow
   s.expeditionOpen(a.created);
   s.expeditionClose(true);
   const gen = generateExpeditionArchive(root);
-  assert.deepEqual(gen.decl.states.map((x) => x.id), ["start", sid, "end"]);
-  assert.deepEqual(gen.decl.states[0].edges.map((e) => e.to), [sid], "start reaches the archived expedition");
+  assert.deepEqual(
+    gen.decl.states.map((x) => x.id),
+    ["start", sid, "end"],
+  );
+  assert.deepEqual(
+    gen.decl.states[0].edges.map((e) => e.to),
+    [sid],
+    "start reaches the archived expedition",
+  );
   const st = gen.decl.states.find((x) => x.id === sid)!;
   assert.deepEqual(st.edges, [{ to: "end", role: "alternative" }], "the archived state runs to end");
   assert.equal(st.priority, 1.5, "archive browsing sits above the whole slider — human-only");
   assert.equal(st.statement, "Archived Thing", "the record's goal is the statement");
-  assert.ok(gen.canvas.edges!.some((e) => e.fromNode === "n-start" && e.toNode === `n-${sid}`), "the drawing carries start → expedition");
+  assert.ok(
+    gen.canvas.edges!.some((e) => e.fromNode === "n-start" && e.toNode === `n-${sid}`),
+    "the drawing carries start → expedition",
+  );
   const empty = generateExpeditionArchive(join(root, ".no-such"));
-  assert.deepEqual(empty.decl.states[0].edges.map((e) => e.to), ["end"], "nothing closed: start runs straight to end");
+  assert.deepEqual(
+    empty.decl.states[0].edges.map((e) => e.to),
+    ["end"],
+    "nothing closed: start runs straight to end",
+  );
   // CLOSED RECORDS LIVE IN GIT (owner ruling 2026-07-28): the close
   // retires the record dir from the tree; the branch keeps serving it.
   assert.ok(!existsSync(join(root, "project", "spec", "expeditions", a.created)), "no closed record on the tree");
-  assert.equal(generateExpeditionArchive(root).decl.states.find((x) => x.id === sid)?.statement, "Archived Thing", "the branch serves the archive");
+  assert.equal(
+    generateExpeditionArchive(root).decl.states.find((x) => x.id === sid)?.statement,
+    "Archived Thing",
+    "the branch serves the archive",
+  );
   // The close stamped the ruling on the branch — the list serves it.
   const listed = s.expeditionList() as { archive: { id: string; ruling?: string }[] };
   assert.equal(listed.archive.find((x) => x.id === a.created)?.ruling, "applied", "the close IS the ruling");

@@ -38,7 +38,11 @@ export function declaredRoots(root: string, source = "engine/paths.ts"): Record<
       clause: CLAUSES.UNDECLARED_ROOT,
       expected: 'a readable .se/roots.json, e.g. {"desktop": "C:\\\\Users\\\\you\\\\Desktop"}',
       got: `.se/roots.json does not parse: ${(e as Error).message}`,
-      remedy: { tool: "se_pull", args: {}, note: "ask the OWNER to fix the file — a declaration that cannot be read must never pass for none declared" },
+      remedy: {
+        tool: "se_pull",
+        args: {},
+        note: "ask the OWNER to fix the file — a declaration that cannot be read must never pass for none declared",
+      },
       source,
     });
   }
@@ -91,7 +95,11 @@ export function resolveInRoot(root: string, p: string, source: string): string {
       clause: CLAUSES.PATH_ESCAPE,
       expected: "a path inside the project root — a declared root is READ-ONLY",
       got: p,
-      remedy: { tool: "se_file_read", args: { path: p }, note: "copy what you need into the product; foreign folders are never written from here" },
+      remedy: {
+        tool: "se_file_read",
+        args: { path: p },
+        note: "copy what you need into the product; foreign folders are never written from here",
+      },
       source,
     });
   }

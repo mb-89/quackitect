@@ -54,7 +54,19 @@ export default async function* timings(source) {
     };
     rows.push(row);
     // A dying test streams its WHY the moment it dies.
-    beat(row.ok ? { file: row.file, ms: row.ms, t: Date.now() - t0 } : { file: row.file, ms: row.ms, t: Date.now() - t0, fail: row.name, msg: String(d.details?.error?.message ?? d.details?.error ?? "").split("\n")[0].slice(0, 300) });
+    beat(
+      row.ok
+        ? { file: row.file, ms: row.ms, t: Date.now() - t0 }
+        : {
+            file: row.file,
+            ms: row.ms,
+            t: Date.now() - t0,
+            fail: row.name,
+            msg: String(d.details?.error?.message ?? d.details?.error ?? "")
+              .split("\n")[0]
+              .slice(0, 300),
+          },
+    );
   }
   try {
     mkdirSync(dirname(OUT), { recursive: true });

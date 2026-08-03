@@ -5,8 +5,8 @@
 import { strict as assert } from "node:assert";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 import { CallLog } from "../engine/calllog.ts";
 import { startMirror } from "../engine/mirror.ts";
 import { Session } from "../engine/session.ts";

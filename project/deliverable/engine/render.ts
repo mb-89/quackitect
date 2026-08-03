@@ -15,18 +15,18 @@
 // agent receives.
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { bindings, loadCards } from "./cards.ts";
-import { loadCanvas, subLabel, type CanvasData, type CanvasElement } from "./canvas.ts";
-import { CallLog, type CallRecord } from "./calllog.ts";
-import { type StrayNote } from "./inbox.ts";
-import { loadLevels } from "./scale.ts";
-import { loadPanel, renderPanel } from "./params.ts";
-import { mainMachinePath, Session } from "./session.ts";
-import { TABLE_SCRIPT, TABLE_STYLE } from "./tables.ts";
-import { basesCard } from "./baseui.ts";
 import { BASES_SCRIPT, BASES_STYLE, BASES_TABLE_STYLE } from "./basesclient.ts";
+import { basesCard } from "./baseui.ts";
+import type { CallLog, CallRecord } from "./calllog.ts";
+import { type CanvasData, type CanvasElement, loadCanvas, subLabel } from "./canvas.ts";
+import { bindings, loadCards } from "./cards.ts";
+import type { StrayNote } from "./inbox.ts";
+import type { MachineDecl } from "./machine.ts";
 import { compileMachineCached, resolveRef } from "./machines/compile.ts";
-import { type MachineDecl } from "./machine.ts";
+import { loadPanel, renderPanel } from "./params.ts";
+import { loadLevels } from "./scale.ts";
+import { mainMachinePath, type Session } from "./session.ts";
+import { TABLE_SCRIPT, TABLE_STYLE } from "./tables.ts";
 
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -44,10 +44,14 @@ function sidePoint(el: CanvasElement, side: string | undefined, other: CanvasEle
   const cx = el.x + el.width / 2;
   const cy = el.y + el.height / 2;
   switch (side) {
-    case "left": return [el.x, cy];
-    case "right": return [el.x + el.width, cy];
-    case "top": return [cx, el.y];
-    case "bottom": return [cx, el.y + el.height];
+    case "left":
+      return [el.x, cy];
+    case "right":
+      return [el.x + el.width, cy];
+    case "top":
+      return [cx, el.y];
+    case "bottom":
+      return [cx, el.y + el.height];
     default: {
       const ox = other.x + other.width / 2;
       return [ox < cx ? el.x : el.x + el.width, cy];
@@ -173,7 +177,14 @@ function splinePath(p: [number, number][]): string {
   return d;
 }
 
-function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<string>, subIds: Set<string>, meta: Record<string, StateMeta>, route?: RouteMarks): string {
+function machineSvg(
+  source: CanvasData,
+  activeIds: Set<string>,
+  doneIds: Set<string>,
+  subIds: Set<string>,
+  meta: Record<string, StateMeta>,
+  route?: RouteMarks,
+): string {
   const canvas = source;
   const nodes = canvas.nodes ?? [];
   const pad = 60;
@@ -207,7 +218,9 @@ function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<str
     // A double-headed arrow is one edge meaning both ways, so it draws that
     // way too — the marker already orients itself at a start.
     const bothWays = (edge as { fromEnd?: string }).fromEnd === "arrow";
-    parts.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="edge"${bothWays ? ' marker-start="url(#arrow)"' : ""} marker-end="url(#arrow)"/>`);
+    parts.push(
+      `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="edge"${bothWays ? ' marker-start="url(#arrow)"' : ""} marker-end="url(#arrow)"/>`,
+    );
     if (edge.label !== undefined && edge.label !== "") {
       parts.push(`<text x="${(x1 + x2) / 2}" y="${(y1 + y2) / 2 - 8}" class="guard">${esc(edge.label)}</text>`);
     }
@@ -215,8 +228,12 @@ function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<str
 
   for (const n of nodes) {
     if (n.type === "text") {
-      parts.push(`<g class="clickable" data-detail="comment"><rect x="${n.x}" y="${n.y}" width="${n.width}" height="${n.height}" class="comment"/>`);
-      parts.push(`<foreignObject x="${n.x + 10}" y="${n.y + 6}" width="${n.width - 20}" height="${n.height - 12}"><div xmlns="http://www.w3.org/1999/xhtml" class="comment-text">${esc(n.text ?? "")}</div></foreignObject></g>`);
+      parts.push(
+        `<g class="clickable" data-detail="comment"><rect x="${n.x}" y="${n.y}" width="${n.width}" height="${n.height}" class="comment"/>`,
+      );
+      parts.push(
+        `<foreignObject x="${n.x + 10}" y="${n.y + 6}" width="${n.width - 20}" height="${n.height - 12}"><div xmlns="http://www.w3.org/1999/xhtml" class="comment-text">${esc(n.text ?? "")}</div></foreignObject></g>`,
+      );
       continue;
     }
     const sid = stateIdOf(n);
@@ -229,7 +246,9 @@ function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<str
     parts.push(`<rect x="${n.x}" y="${n.y}" width="${n.width}" height="${n.height}" rx="${rx}" class="${cls}"/>`);
     if (isSub) {
       // Sub-machine states carry a DOUBLE border.
-      parts.push(`<rect x="${n.x + 8}" y="${n.y + 8}" width="${n.width - 16}" height="${n.height - 16}" rx="${Math.max(4, rx - 8)}" class="${cls} inner"/>`);
+      parts.push(
+        `<rect x="${n.x + 8}" y="${n.y + 8}" width="${n.width - 16}" height="${n.height - 16}" rx="${Math.max(4, rx - 8)}" class="${cls} inner"/>`,
+      );
     }
     const sub = subLabel(meta[sid]?.subtitle);
     parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + (sub !== undefined ? -6 : 6)}" class="label">${esc(sid)}</text>`);
@@ -241,10 +260,14 @@ function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<str
     if (mt !== undefined) {
       const cy = n.y + n.height / 2;
       if (mt.has_entry) {
-        parts.push(`<g class="clickable cond ${mt.entry_met ? "met" : "unmet"}" data-detail="cond:${esc(sid)}"><circle cx="${n.x}" cy="${cy}" r="18"/><text x="${n.x}" y="${cy + 7}" class="cond-label">${mt.entry_met ? "✓" : "!"}</text></g>`);
+        parts.push(
+          `<g class="clickable cond ${mt.entry_met ? "met" : "unmet"}" data-detail="cond:${esc(sid)}"><circle cx="${n.x}" cy="${cy}" r="18"/><text x="${n.x}" y="${cy + 7}" class="cond-label">${mt.entry_met ? "✓" : "!"}</text></g>`,
+        );
       }
       if (mt.has_exit) {
-        parts.push(`<g class="clickable cond ${mt.exit_met ? "met" : "unmet"}" data-detail="cond:${esc(sid)}"><circle cx="${n.x + n.width}" cy="${cy}" r="18"/><text x="${n.x + n.width}" y="${cy + 7}" class="cond-label">${mt.exit_met ? "✓" : "!"}</text></g>`);
+        parts.push(
+          `<g class="clickable cond ${mt.exit_met ? "met" : "unmet"}" data-detail="cond:${esc(sid)}"><circle cx="${n.x + n.width}" cy="${cy}" r="18"/><text x="${n.x + n.width}" y="${cy + 7}" class="cond-label">${mt.exit_met ? "✓" : "!"}</text></g>`,
+        );
       }
     }
   }
@@ -302,7 +325,9 @@ function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<str
     // YOU ARE HERE: the arrow a map puts under your car, turned to face the
     // way the line is going.
     const heading = (Math.atan2(stops[1].cy - stops[0].cy, stops[1].cx - stops[0].cx) * 180) / Math.PI + 90;
-    parts.push(`<path d="M 0 -12 L 10 9 L 0 4 L -10 9 Z" class="route-here" transform="translate(${stops[0].cx} ${stops[0].cy}) rotate(${heading.toFixed(1)})"/>`);
+    parts.push(
+      `<path d="M 0 -12 L 10 9 L 0 4 L -10 9 Z" class="route-here" transform="translate(${stops[0].cx} ${stops[0].cy}) rotate(${heading.toFixed(1)})"/>`,
+    );
   }
 
   return `<svg id="machine-svg" viewBox="${minX} ${minY} ${maxX - minX} ${maxY - minY}">
@@ -326,30 +351,58 @@ function briefFor(rec: CallRecord): string {
   const a = rec.args as Record<string, unknown>;
   switch (rec.tool) {
     case "se_tick": // old logs only
-      return a.back !== undefined ? `back → ${a.back}` : a.state !== undefined ? `peek ${a.state}` : a.wait === true ? "hold (wait)" : a.to !== undefined ? `tick → ${a.to}` : a.advance === true ? "tick advance" : "tick (look)";
+      return a.back !== undefined
+        ? `back → ${a.back}`
+        : a.state !== undefined
+          ? `peek ${a.state}`
+          : a.wait === true
+            ? "hold (wait)"
+            : a.to !== undefined
+              ? `tick → ${a.to}`
+              : a.advance === true
+                ? "tick advance"
+                : "tick (look)";
     case "se_pull": {
       const f = a.form as { choice?: unknown } | undefined;
-      return a.escape !== undefined ? "pull · escape" : f?.choice !== undefined ? `pull · choice ${Array.isArray(f.choice) ? (f.choice as unknown[]).join(", ") : String(f.choice)}` : f !== undefined ? "pull · form" : "pull";
+      return a.escape !== undefined
+        ? "pull · escape"
+        : f?.choice !== undefined
+          ? `pull · choice ${Array.isArray(f.choice) ? (f.choice as unknown[]).join(", ") : String(f.choice)}`
+          : f !== undefined
+            ? "pull · form"
+            : "pull";
     }
     case "mirror_tick":
       return a.back !== undefined ? `back → ${a.back}` : a.to !== undefined ? `tick → ${a.to}` : "tick advance";
-    case "mirror_check": return `check ${a.path}`;
-    case "mirror_autonomy": return `autonomy → ${a.value}`;
-    case "mirror_narration": return `updates → ${a.value}`;
-    case "mirror_script": return `run scripts · ${a.state}`;
+    case "mirror_check":
+      return `check ${a.path}`;
+    case "mirror_autonomy":
+      return `autonomy → ${a.value}`;
+    case "mirror_narration":
+      return `updates → ${a.value}`;
+    case "mirror_script":
+      return `run scripts · ${a.state}`;
     case "se_update": {
       const items = Array.isArray(a.items) ? ` (+${a.items.length})` : "";
       return `${a.op}${a.node !== undefined ? ` ${a.node}` : ""}${a.brief !== undefined ? `: ${a.brief}` : ""}${items}`;
     }
     case "se_note":
-    case "mirror_note": return String(a.text ?? "");
-    case "se_answer": return String(a.question ?? "");
-    case "mirror_tool": return `tool ${a.name}`;
-    case "mirror_escape": return `escape: ${a.reason}`;
-    case "mirror_form_save": return `form save ${a.name}`;
-    case "mirror_form_confirm": return `form confirm ${a.name} · ${a.field}`;
-    case "mirror_form_done": return `form done ${a.name}`;
-    case "mirror_form_folder": return "open evidence folder";
+    case "mirror_note":
+      return String(a.text ?? "");
+    case "se_answer":
+      return String(a.question ?? "");
+    case "mirror_tool":
+      return `tool ${a.name}`;
+    case "mirror_escape":
+      return `escape: ${a.reason}`;
+    case "mirror_form_save":
+      return `form save ${a.name}`;
+    case "mirror_form_confirm":
+      return `form confirm ${a.name} · ${a.field}`;
+    case "mirror_form_done":
+      return `form done ${a.name}`;
+    case "mirror_form_folder":
+      return "open evidence folder";
     case "se_file_read": {
       // A multi-read has no `path`, so naming only that one printed "read
       // undefined" and the reader could not tell one read from another.
@@ -360,22 +413,38 @@ function briefFor(rec: CallRecord): string {
       }
       return `read ${a.path}${a.offset !== undefined ? ` @${a.offset}` : ""}`;
     }
-    case "se_file_write": return `write ${a.path}`;
-    case "se_file_patch": return `patch ${Array.isArray(a.ops) ? a.ops.length : 0} op(s)`;
-    case "se_file_move": return `move ${a.from} → ${a.to}`;
-    case "se_file_delete": return `delete ${a.path}`;
-    case "se_file_list": return `list ${a.dir ?? "."}`;
-    case "se_file_glob": return `glob ${a.glob}`;
-    case "se_file_search": return `search /${a.query}/`;
-    case "se_run": return `run: ${String(a.command ?? "")}`;
-    case "se_web_fetch": return `fetch ${a.url}`;
-    case "se_web_search": return `web: ${a.query}`;
-    case "se_log_query": return a.ref !== undefined ? `log ref ${a.ref}` : "log query";
-    case "se_exp_new": return `new expedition (${a.kind})`;
-    case "se_exp_open": return `bind ${a.id}`;
-    case "se_exp_close": return "close expedition";
-    case "se_exp_list": return "expeditions";
-    default: return rec.tool;
+    case "se_file_write":
+      return `write ${a.path}`;
+    case "se_file_patch":
+      return `patch ${Array.isArray(a.ops) ? a.ops.length : 0} op(s)`;
+    case "se_file_move":
+      return `move ${a.from} → ${a.to}`;
+    case "se_file_delete":
+      return `delete ${a.path}`;
+    case "se_file_list":
+      return `list ${a.dir ?? "."}`;
+    case "se_file_glob":
+      return `glob ${a.glob}`;
+    case "se_file_search":
+      return `search /${a.query}/`;
+    case "se_run":
+      return `run: ${String(a.command ?? "")}`;
+    case "se_web_fetch":
+      return `fetch ${a.url}`;
+    case "se_web_search":
+      return `web: ${a.query}`;
+    case "se_log_query":
+      return a.ref !== undefined ? `log ref ${a.ref}` : "log query";
+    case "se_exp_new":
+      return `new expedition (${a.kind})`;
+    case "se_exp_open":
+      return `bind ${a.id}`;
+    case "se_exp_close":
+      return "close expedition";
+    case "se_exp_list":
+      return "expeditions";
+    default:
+      return rec.tool;
   }
 }
 
@@ -401,7 +470,11 @@ function oneLine(s: string): string {
   return flat.length > FEED_BRIEF_CHARS ? `${flat.slice(0, FEED_BRIEF_CHARS - 1)}…` : flat;
 }
 
-export function feedRows(log: CallLog, since: string, pending: StrayNote[] = []): { capped: boolean; rows: Array<Record<string, unknown>> } {
+export function feedRows(
+  log: CallLog,
+  since: string,
+  pending: StrayNote[] = [],
+): { capped: boolean; rows: Array<Record<string, unknown>> } {
   const q = log.query({ filter: { since }, limit: 501 });
   const records = q.records ?? [];
   const capped = records.length > 500;
@@ -411,7 +484,14 @@ export function feedRows(log: CallLog, since: string, pending: StrayNote[] = [])
     src: rec.tool.startsWith("mirror_") ? "human" : "agent",
     // Updates are NARRATION (bold), whatever their op — only se_note
     // strays are retro notes (italic). Two kinds, never conflated.
-    type: rec.tool === "se_update" ? "update" : rec.tool === "se_note" || rec.tool === "mirror_note" ? "note" : rec.tool === "se_answer" ? "aq" : "call",
+    type:
+      rec.tool === "se_update"
+        ? "update"
+        : rec.tool === "se_note" || rec.tool === "mirror_note"
+          ? "note"
+          : rec.tool === "se_answer"
+            ? "aq"
+            : "call",
     brief: oneLine(briefFor(rec)),
     ok: rec.ok,
     ...(rec.ok ? {} : { clause: (rec.response as { clause?: string } | undefined)?.clause }),
@@ -419,7 +499,15 @@ export function feedRows(log: CallLog, since: string, pending: StrayNote[] = [])
   }));
   const noteRows = pending
     .filter((n) => n.at < since)
-    .map((n) => ({ ref: n.ref, ts: n.at, src: n.by === "human" ? "human" : "agent", type: "note", brief: oneLine(n.text), ok: true, pending: true }));
+    .map((n) => ({
+      ref: n.ref,
+      ts: n.at,
+      src: n.by === "human" ? "human" : "agent",
+      type: "note",
+      brief: oneLine(n.text),
+      ok: true,
+      pending: true,
+    }));
   return { capped, rows: [...noteRows, ...rows] };
 }
 
@@ -2390,7 +2478,8 @@ void bootTerminal();
 setInterval(() => { void bootTerminal(); }, 2000);
 `;
 
-const MODAL = '<div id="modal"><div class="modal-box"><div class="widget-head"><span id="modal-title"></span><button class="expand" id="modal-close">✕</button></div><div class="modal-body" id="modal-body"></div></div></div><div id="toast"></div>';
+const MODAL =
+  '<div id="modal"><div class="modal-box"><div class="widget-head"><span id="modal-title"></span><button class="expand" id="modal-close">✕</button></div><div class="modal-body" id="modal-body"></div></div></div><div id="toast"></div>';
 
 function widgetHead(title: string, widgetId: string, url: string): string {
   return `<div class="widget-head"><span>${esc(title)}</span><button class="expand" data-widget="${widgetId}" data-url="${esc(url)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></div>`;
@@ -2434,7 +2523,14 @@ const NATIVE = `
   body.solo aside, body.solo main { background: transparent; }
 `;
 
-export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "log" | "terminal" | "table", view?: string, card?: string, embed?: boolean, tableView?: string): string {
+export function renderMirror(
+  m: MirrorState,
+  widget?: "machine" | "details" | "log" | "terminal" | "table",
+  view?: string,
+  card?: string,
+  embed?: boolean,
+  tableView?: string,
+): string {
   const skin = embed === true ? NATIVE : "";
   const bodyClass = embed === true ? ` class="embed${widget === undefined ? "" : " solo"}"` : "";
   const info = m.session.describe() as { active: string[]; status: string };
@@ -2491,7 +2587,9 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
       ...(r.found && localOf(r.target) !== undefined ? { target: localOf(r.target) } : {}),
       ...(shutAt !== undefined && r.stops_at !== undefined ? { blocked: { at: shutAt, why: r.stops_at.why } } : {}),
     };
-  } catch { /* no route, no marks - the drawing stands either way */ }
+  } catch {
+    /* no route, no marks - the drawing stands either way */
+  }
   const svg = machineSvg(canvas, leafActive, done, subIds, meta, marks);
 
   // Breadcrumbs describe the VIEW: main [›subs] [ › sub [›its subs] ].
@@ -2503,7 +2601,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // The crumbs walk the PARENT CHAIN — a nested machine shows under its
   // real parent, never directly under main (owner ruling 2026-07-28).
   const chain = m.session.viewChain(decl.id);
-  let crumbs = chain
+  const crumbs = chain
     .map((id, i) => {
       const label = i === chain.length - 1 ? `<b class="here">${esc(id)}</b>` : `<a href="/?view=${encodeURIComponent(id)}">${esc(id)}</a>`;
       const arrow =
@@ -2540,9 +2638,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
       ...(s.tags?.includes("archive-record")
         ? { archive_record: archived.find((e) => e.id === s.id || e.id.startsWith(`${s.id}-`)) ?? null }
         : {}),
-      ...(s.exit?.script !== undefined || s.entry?.script !== undefined
-        ? { script: m.session.scriptStatus(decl, s) }
-        : {}),
+      ...(s.exit?.script !== undefined || s.entry?.script !== undefined ? { script: m.session.scriptStatus(decl, s) } : {}),
       pulled: m.session.pulled(decl, s),
       next: s.edges.map((e) => {
         const t = decl.states.find((st) => st.id === e.to);
@@ -2616,7 +2712,10 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // The way home when the view holds still elsewhere: the header names
   // the walk's position; clicking it jumps the view there.
   const curLeaf = info.active[0] ?? "";
-  const curBtn = curLeaf === "" ? "" : `<button class="ghost" id="cur-state" data-machine="${esc(walkMachine.id)}" title="the walk stands here — click: jump the view to it">☉ ${esc(curLeaf)}</button>`;
+  const curBtn =
+    curLeaf === ""
+      ? ""
+      : `<button class="ghost" id="cur-state" data-machine="${esc(walkMachine.id)}" title="the walk stands here — click: jump the view to it">☉ ${esc(curLeaf)}</button>`;
   const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span class="head-controls" style="display:flex;align-items:center;gap:10px">${curBtn}<span class="head-sliders" style="display:flex;align-items:center;gap:10px">${slider}${nrBar}</span>${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:var(--se-fail)">machine closed</div>' : ""}
@@ -2625,7 +2724,10 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   </div>`;
   // The unified feed sits ABOVE details (owner ruling 2026-07-26) — rows
   // load and refresh client-side off /api/log; only present with a log.
-  const logWidget = m.log === undefined ? "" : `<div class="widget" id="w-log">${widgetHead("log", "w-log", "/widget/log")}
+  const logWidget =
+    m.log === undefined
+      ? ""
+      : `<div class="widget" id="w-log">${widgetHead("log", "w-log", "/widget/log")}
     <div class="panel log-panel" id="log-rows" data-morph-ignore><div class="meta">loading…</div></div>
   </div>`;
   // THE AGENT'S TERMINAL. The whole widget is morph-ignored: a morph that
@@ -2640,7 +2742,9 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // both simply never reveal it — one rule instead of a flag for each case.
   // On its OWN page the pane stays visible, so a direct visit can say why it
   // is empty rather than showing a blank tab.
-  const termWidget = (standalone: boolean) => `<div class="widget${standalone ? "" : " no-host"}" id="w-terminal" data-morph-ignore>${widgetHead("terminal", "w-terminal", "/widget/terminal")}
+  const termWidget = (
+    standalone: boolean,
+  ) => `<div class="widget${standalone ? "" : " no-host"}" id="w-terminal" data-morph-ignore>${widgetHead("terminal", "w-terminal", "/widget/terminal")}
     <div class="panel term-panel" id="term-body"><div class="meta" style="padding:10px 12px">no agent connected — the card keeps its slot, so no number ever shifts</div></div>
   </div>`;
   // THE CHAT CARD KEEPS ITS SLOT (owner 2026-07-29), superseding the older
@@ -2656,7 +2760,11 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // computing it eagerly would have put a 60% tax on the machine page, the
   // log page and the details page, none of which ever show a table.
   const tblWidget = (): string =>
-    basesCard(m.root, `<button class="expand" data-widget="w-table" data-url="/widget/table" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button>`, tableView);
+    basesCard(
+      m.root,
+      `<button class="expand" data-widget="w-table" data-url="/widget/table" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button>`,
+      tableView,
+    );
   // Read per render, so editing palette.css needs no restart.
   const pal = palette(m.root);
 
@@ -2720,16 +2828,24 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   const nothingYet = (title: string): string =>
     `<div class="widget"><div class="widget-head"><span>${esc(title)}</span></div><div class="widget-body"><div class="meta" style="padding:10px 12px">not built yet — the slot is held so the numbers never shift</div></div></div>`;
   const cardsHtml = cardList
-    .map((c, i) => `<div class="card${c.id === now ? " main" : ""}" id="card-${esc(c.id)}"${c.widget ? ` data-widget="${esc(c.widget)}"` : ""} style="${cellAt(i)}"><span class="cardnum" title="promote this card — the same as pressing ${c.n}">${c.n}</span>${filled(c) ? byWidget[c.widget as string] : nothingYet(c.title)}</div>`)
+    .map(
+      (c, i) =>
+        `<div class="card${c.id === now ? " main" : ""}" id="card-${esc(c.id)}"${c.widget ? ` data-widget="${esc(c.widget)}"` : ""} style="${cellAt(i)}"><span class="cardnum" title="promote this card — the same as pressing ${c.n}">${c.n}</span>${filled(c) ? byWidget[c.widget as string] : nothingYet(c.title)}</div>`,
+    )
     .join("\n  ");
   // THE LEGEND RENDERS FROM THE REGISTRY. Declare a key there and it shows up
   // here by itself; a hand-kept list drifts, and a stale legend is worse than
   // none. It sits in the promoted card's vacated slot, so its position also
   // says which card is up front.
   const legendRows = bindings(cardList)
-    .map((b) => `<div class="legend-row"><span class="legend-key">${esc(b.keys)}</span><span class="legend-what">${esc(b.label)}</span></div>`)
+    .map(
+      (b) => `<div class="legend-row"><span class="legend-key">${esc(b.keys)}</span><span class="legend-what">${esc(b.label)}</span></div>`,
+    )
     .join("");
-  const nowAt = Math.max(0, cardList.findIndex((c) => c.id === now));
+  const nowAt = Math.max(
+    0,
+    cardList.findIndex((c) => c.id === now),
+  );
   const legendHtml = `<div class="card" id="card-legend" style="${cellAt(nowAt)}"><div class="widget" id="w-legend"><div class="widget-head"><span>keys</span></div><div class="widget-body">${legendRows}</div></div></div>`;
   const cardData = `<script type="application/json" id="se-cards">${JSON.stringify({ list: cardList.map((c) => ({ n: c.n, id: c.id, title: c.title })), now })}</script>`;
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${pal}${STYLE}${TABLE_STYLE}${BASES_STYLE}${BASES_TABLE_STYLE}${skin}</style>${ELEMENTS}</head>

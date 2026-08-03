@@ -14,12 +14,13 @@
 // The ENGINE observes the result.
 //
 //   node engine/bin/selftest.ts --root <project root>
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
-import { availableParallelism } from "node:os";
+
 import { spawn, spawnSync } from "node:child_process";
-import { killTree } from "../run.ts";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { availableParallelism } from "node:os";
+import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { killTree } from "../run.ts";
 
 function argValue(flag: string): string | undefined {
   const i = process.argv.indexOf(flag);
@@ -76,7 +77,11 @@ const CAP_MS = 300_000;
 const lastRunPath = join(root, ".se", "test-last-run.json");
 const prior = (() => {
   try {
-    const rec = JSON.parse(readFileSync(lastRunPath, "utf8")) as { wall_ms?: number; tests?: number; files?: { file: string; sum_ms: number; cases: number }[] };
+    const rec = JSON.parse(readFileSync(lastRunPath, "utf8")) as {
+      wall_ms?: number;
+      tests?: number;
+      files?: { file: string; sum_ms: number; cases: number }[];
+    };
     return {
       wall_ms: typeof rec.wall_ms === "number" ? rec.wall_ms : undefined,
       tests: typeof rec.tests === "number" ? rec.tests : undefined,
@@ -93,7 +98,11 @@ const progressPath = join(root, ".se", "test-progress.jsonl");
 const expectedFiles = files.map((f) => `project/deliverable/${f.replace(/\\/g, "/")}`);
 try {
   mkdirSync(join(root, ".se"), { recursive: true });
-  writeFileSync(progressPath, `${JSON.stringify({ start: new Date(startedAt).toISOString(), files_total: expectedFiles.length, cores: availableParallelism(), ...(prior.tests !== undefined ? { tests_last_run: prior.tests } : {}) })}\n`, "utf8");
+  writeFileSync(
+    progressPath,
+    `${JSON.stringify({ start: new Date(startedAt).toISOString(), files_total: expectedFiles.length, cores: availableParallelism(), ...(prior.tests !== undefined ? { tests_last_run: prior.tests } : {}) })}\n`,
+    "utf8",
+  );
 } catch {
   // bookkeeping never blocks the run
 }
@@ -105,19 +114,29 @@ function snapshotWorkers(): string {
   try {
     const r =
       process.platform === "win32"
-        ? spawnSync("powershell", ["-NoProfile", "-Command", "Get-CimInstance Win32_Process -Filter \"Name='node.exe'\" | ForEach-Object { \"$($_.ProcessId) ppid=$($_.ParentProcessId) $($_.CommandLine)\" }"], { encoding: "utf8", windowsHide: true, timeout: 10_000 })
+        ? spawnSync(
+            "powershell",
+            [
+              "-NoProfile",
+              "-Command",
+              'Get-CimInstance Win32_Process -Filter "Name=\'node.exe\'" | ForEach-Object { "$($_.ProcessId) ppid=$($_.ParentProcessId) $($_.CommandLine)" }',
+            ],
+            { encoding: "utf8", windowsHide: true, timeout: 10_000 },
+          )
         : spawnSync("ps", ["-eo", "pid,args"], { encoding: "utf8", timeout: 10_000 });
-    return (r.stdout ?? "")
-      .split("\n")
-      .filter((l) => l.includes("tests\\") || l.includes("tests/"))
-      // Head AND tail: a worker's argv can carry node's whole serialized
-      // option set, and the script path — the name that matters — sits at
-      // the very end. Two truncations lost it twice.
-      .map((l) => {
-        const t = l.trim();
-        return `  ${t.length <= 340 ? t : `${t.slice(0, 100)} … ${t.slice(-220)}`}`;
-      })
-      .join("\n");
+    return (
+      (r.stdout ?? "")
+        .split("\n")
+        .filter((l) => l.includes("tests\\") || l.includes("tests/"))
+        // Head AND tail: a worker's argv can carry node's whole serialized
+        // option set, and the script path — the name that matters — sits at
+        // the very end. Two truncations lost it twice.
+        .map((l) => {
+          const t = l.trim();
+          return `  ${t.length <= 340 ? t : `${t.slice(0, 100)} … ${t.slice(-220)}`}`;
+        })
+        .join("\n")
+    );
   } catch {
     return "";
   }
@@ -131,16 +150,32 @@ const r = await new Promise<{ status: number | null; killed: boolean; out: strin
   });
   let acc = "";
   let killed = false;
-  const timer = setTimeout(() => { killed = true; stuckWorkers = snapshotWorkers(); killTree(child.pid); }, CAP_MS);
+  const timer = setTimeout(() => {
+    killed = true;
+    stuckWorkers = snapshotWorkers();
+    killTree(child.pid);
+  }, CAP_MS);
   child.stdout?.setEncoding("utf8");
   child.stderr?.setEncoding("utf8");
-  child.stdout?.on("data", (c: string) => { acc += c; });
-  child.stderr?.on("data", (c: string) => { acc += c; });
-  child.on("error", (e) => { clearTimeout(timer); resolveRun({ status: null, killed, out: acc + String(e) }); });
-  child.on("close", (code) => { clearTimeout(timer); resolveRun({ status: code, killed, out: acc }); });
+  child.stdout?.on("data", (c: string) => {
+    acc += c;
+  });
+  child.stderr?.on("data", (c: string) => {
+    acc += c;
+  });
+  child.on("error", (e) => {
+    clearTimeout(timer);
+    resolveRun({ status: null, killed, out: acc + String(e) });
+  });
+  child.on("close", (code) => {
+    clearTimeout(timer);
+    resolveRun({ status: code, killed, out: acc });
+  });
 });
 if (r.killed) {
-  process.stdout.write(`selftest: KILLED at its ${CAP_MS / 1000}s cap — the run is TRUNCATED, the tallies below are not a verdict${prior.wall_ms !== undefined ? ` (the last completed battery took ${Math.round(prior.wall_ms / 1000)}s)` : ""}\n`);
+  process.stdout.write(
+    `selftest: KILLED at its ${CAP_MS / 1000}s cap — the run is TRUNCATED, the tallies below are not a verdict${prior.wall_ms !== undefined ? ` (the last completed battery took ${Math.round(prior.wall_ms / 1000)}s)` : ""}\n`,
+  );
   // The beat stream outlives the kill. Completeness is judged against the
   // LAST run's per-file case counts — measured, never inferred from runner
   // internals. A file with no baseline is named unknown, never assumed done.
@@ -160,7 +195,8 @@ if (r.killed) {
       agg.cases += 1;
       agg.ms += Number(rec.ms ?? 0);
       seen.set(rec.file, agg);
-      if (typeof rec.fail === "string") fails.push(`  ${rec.fail} (${rec.file})${typeof rec.msg === "string" && rec.msg !== "" ? ` — ${rec.msg}` : ""}`);
+      if (typeof rec.fail === "string")
+        fails.push(`  ${rec.fail} (${rec.file})${typeof rec.msg === "string" && rec.msg !== "" ? ` — ${rec.msg}` : ""}`);
     }
     const complete: string[] = [];
     const partial: string[] = [];
@@ -180,7 +216,10 @@ if (r.killed) {
       const got = seen.get(f);
       return base !== undefined && got !== undefined && got.ms > 2 * base.sum_ms && got.ms - base.sum_ms > 1000;
     });
-    if (over.length > 0) process.stdout.write(`over their last-run baseline:\n${over.map((f) => `  ${f} ${((seen.get(f)?.ms ?? 0) / 1000).toFixed(1)}s (last run ${((prior.files.get(f)?.sum_ms ?? 0) / 1000).toFixed(1)}s)`).join("\n")}\n`);
+    if (over.length > 0)
+      process.stdout.write(
+        `over their last-run baseline:\n${over.map((f) => `  ${f} ${((seen.get(f)?.ms ?? 0) / 1000).toFixed(1)}s (last run ${((prior.files.get(f)?.sum_ms ?? 0) / 1000).toFixed(1)}s)`).join("\n")}\n`,
+      );
     if (fails.length > 0) process.stdout.write(`failures before the kill:\n${fails.join("\n")}\n`);
   } catch {
     // no beat stream — the reporter never started

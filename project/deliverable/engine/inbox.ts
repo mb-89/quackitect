@@ -3,9 +3,10 @@
 // machinery exists yet, so every note on file is pending. The mirror's
 // feed surfaces pending notes from EARLIER sessions too — the inbox must
 // never fall out of sight just because the session rolled over.
+
+import { randomBytes } from "node:crypto";
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { randomBytes } from "node:crypto";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { stripBom } from "./jsonio.ts";
 
@@ -68,7 +69,13 @@ export function byPriority(a: StrayNote, b: StrayNote): number {
   return RANK[priorityOf(a)] - RANK[priorityOf(b)];
 }
 
-export function appendNote(seDirPath: string, text: string, by = "agent", title?: string, priority?: Priority): { captured: string; inbox: number } {
+export function appendNote(
+  seDirPath: string,
+  text: string,
+  by = "agent",
+  title?: string,
+  priority?: Priority,
+): { captured: string; inbox: number } {
   const p = notesPath(seDirPath);
   const note: StrayNote = {
     ref: `note-${randomBytes(6).toString("hex")}`,
@@ -103,13 +110,23 @@ const JUDGMENT: ReadonlySet<string> = new Set(["carried", "backlog"]);
  *  anything out — and the desk's own method opens by weighing an inbox it
  *  was not allowed to correct. The ceremony is worth keeping where a
  *  judgment is actually made, and nowhere else. */
-export function drainNote(seDirPath: string, ref: string, disposition: string, where: string | undefined, judgmentAllowed: boolean): { drained: string; disposition: string; inbox: number } {
+export function drainNote(
+  seDirPath: string,
+  ref: string,
+  disposition: string,
+  where: string | undefined,
+  judgmentAllowed: boolean,
+): { drained: string; disposition: string; inbox: number } {
   if (!DISPOSITIONS.includes(disposition)) {
     throw new Rejection({
       clause: CLAUSES.REQUIRED_ARGS,
       expected: `disposition: ${DISPOSITIONS.join(" | ")}`,
       got: JSON.stringify(disposition),
-      remedy: { tool: "se_note_drain", args: { ref, disposition: "done" }, note: "backlog parks the note for a later migration — where: 'ready when …' is then required" },
+      remedy: {
+        tool: "se_note_drain",
+        args: { ref, disposition: "done" },
+        note: "backlog parks the note for a later migration — where: 'ready when …' is then required",
+      },
       source: "engine/inbox.ts drain",
     });
   }
@@ -131,7 +148,11 @@ export function drainNote(seDirPath: string, ref: string, disposition: string, w
       clause: CLAUSES.REQUIRED_ARGS,
       expected: "where: 'ready when …' — the parked note's re-entry condition",
       got: "no where",
-      remedy: { tool: "se_note_drain", args: { ref, disposition: "backlog", where: "ready when <condition>" }, note: "a parked note without a re-entry condition is never re-entered" },
+      remedy: {
+        tool: "se_note_drain",
+        args: { ref, disposition: "backlog", where: "ready when <condition>" },
+        note: "a parked note without a re-entry condition is never re-entered",
+      },
       source: "engine/inbox.ts drain",
     });
   }
@@ -142,7 +163,11 @@ export function drainNote(seDirPath: string, ref: string, disposition: string, w
       clause: CLAUSES.NOTE_UNKNOWN,
       expected: "an existing note ref",
       got: ref,
-      remedy: { tool: "se_note_drain", args: { ref: "<a ref from the pending list>", disposition: "done | obsolete | carried | backlog" }, note: "the mirror's feed (filter: note) and .se/notes.jsonl carry the refs" },
+      remedy: {
+        tool: "se_note_drain",
+        args: { ref: "<a ref from the pending list>", disposition: "done | obsolete | carried | backlog" },
+        note: "the mirror's feed (filter: note) and .se/notes.jsonl carry the refs",
+      },
       source: "engine/inbox.ts drain",
     });
   }
@@ -164,9 +189,7 @@ export function readNotes(seDirPath: string): StrayNote[] {
     if (line.trim() === "") continue;
     try {
       out.push(JSON.parse(line) as StrayNote);
-    } catch {
-      continue;
-    }
+    } catch {}
   }
   return out;
 }

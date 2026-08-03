@@ -33,7 +33,10 @@ test("the decision graph: plan, fork, resolve — everything started gets resolv
   assert.equal(g.nodes.find((n) => n.id === "d3")?.parent, "d1");
   assert.equal(g.nodes.find((n) => n.id === "d4")?.parent, "d3");
   // done over an open child is refused — resolve children first.
-  assert.throws(() => d.apply("s@0", parseUpdate({ op: "done", node: "d3" })), (e) => clause(e) === "SE-C-122");
+  assert.throws(
+    () => d.apply("s@0", parseUpdate({ op: "done", node: "d3" })),
+    (e) => clause(e) === "SE-C-122",
+  );
   d.apply("s@0", parseUpdate({ op: "done", node: "d4", brief: "installed" }));
   d.apply("s@0", parseUpdate({ op: "done", node: "d3" }));
   // Closing the fork lands the hand back on the nearest open ancestor.
@@ -45,9 +48,18 @@ test("the decision graph: plan, fork, resolve — everything started gets resolv
   assert.equal(g.nodes.find((n) => n.id === "d6")?.status, "obsolete");
   assert.match(String(g.nodes.find((n) => n.id === "d6")?.resolution), /swept with d5/);
   // A dead ref never fakes progress; garbage never parses.
-  assert.throws(() => d.apply("s@0", parseUpdate({ op: "done", node: "d99" })), (e) => clause(e) === "SE-C-121");
-  assert.throws(() => parseUpdate({ op: "sprint" }), (e) => clause(e) === "SE-C-120");
-  assert.throws(() => parseUpdate("not json"), (e) => clause(e) === "SE-C-120");
+  assert.throws(
+    () => d.apply("s@0", parseUpdate({ op: "done", node: "d99" })),
+    (e) => clause(e) === "SE-C-121",
+  );
+  assert.throws(
+    () => parseUpdate({ op: "sprint" }),
+    (e) => clause(e) === "SE-C-120",
+  );
+  assert.throws(
+    () => parseUpdate("not json"),
+    (e) => clause(e) === "SE-C-120",
+  );
   // The string form (a harness without the declared property) parses too.
   const op = parseUpdate(JSON.stringify({ op: "update", brief: "still here" }));
   assert.equal(op.op, "update");
@@ -78,7 +90,12 @@ test("the toll: armed after boot, one grace warning, then the refusal — any op
   assert.equal(r.body.clause, "SE-C-040");
   assert.equal((r.body.remedy as { args: { update?: unknown } }).args.update !== undefined, true);
   // Paying on the same call proceeds — and the op lands in graph AND log.
-  r = await call(server, "se_file_read", { path: "project/guidance/contract.md", offset: 1, limit: 1, update: { op: "plan", items: ["wire the pane", "test it"] } });
+  r = await call(server, "se_file_read", {
+    path: "project/guidance/contract.md",
+    offset: 1,
+    limit: 1,
+    update: { op: "plan", items: ["wire the pane", "test it"] },
+  });
   assert.equal(r.isError, false);
   const g = session.decisions.graph(session.currentVisit());
   assert.equal(g.nodes.length, 2);
@@ -101,15 +118,27 @@ test("se_note is legal in EVERY state — a stray is captured where it strikes",
 });
 
 test("the render lint: the update lane refuses what renders weird", () => {
-  assert.throws(() => parseUpdate({ op: "update", brief: "line one\nline two" }), (e) => (e as { clause?: string }).clause === "SE-C-120");
-  assert.throws(() => parseUpdate({ op: "update", brief: "x".repeat(91) }), (e) => (e as { clause?: string }).clause === "SE-C-120");
+  assert.throws(
+    () => parseUpdate({ op: "update", brief: "line one\nline two" }),
+    (e) => (e as { clause?: string }).clause === "SE-C-120",
+  );
+  assert.throws(
+    () => parseUpdate({ op: "update", brief: "x".repeat(91) }),
+    (e) => (e as { clause?: string }).clause === "SE-C-120",
+  );
   // A RESOLUTION'S chain still refuses — which part resolved the node is
   // not the engine's to guess.
-  assert.throws(() => parseUpdate({ op: "done", node: "d1", brief: "one, two, three" }), (e) => (e as { clause?: string }).clause === "SE-C-120");
+  assert.throws(
+    () => parseUpdate({ op: "done", node: "d1", brief: "one, two, three" }),
+    (e) => (e as { clause?: string }).clause === "SE-C-120",
+  );
   const ok = parseUpdate({ op: "update", brief: "short and clean — two parts, fine" });
   assert.equal(ok.op, "update");
   // defer demands node AND to.
-  assert.throws(() => parseUpdate({ op: "defer", node: "d1" }), (e) => (e as { clause?: string }).clause === "SE-C-120");
+  assert.throws(
+    () => parseUpdate({ op: "defer", node: "d1" }),
+    (e) => (e as { clause?: string }).clause === "SE-C-120",
+  );
   const d = parseUpdate({ op: "defer", node: "d1", to: "idle" });
   assert.equal(d.to, "idle");
 });
@@ -149,11 +178,22 @@ test("the render lint still quotes what it refuses", () => {
   }
 
   // WHICH item, when an item trips a lint the split cannot cure.
-  assert.match(got(() => parseUpdate({ op: "plan", items: ["fine", "fine too", "a\nb"] })), /item 3/, "the failing item is numbered");
+  assert.match(
+    got(() => parseUpdate({ op: "plan", items: ["fine", "fine too", "a\nb"] })),
+    /item 3/,
+    "the failing item is numbered",
+  );
 
   // The other two lints quote the text too.
-  assert.match(got(() => parseUpdate({ op: "update", brief: "a\nb" })), /\\n/, "the line break is shown, escaped");
-  assert.match(got(() => parseUpdate({ op: "update", brief: "y".repeat(91) })), /91 chars/);
+  assert.match(
+    got(() => parseUpdate({ op: "update", brief: "a\nb" })),
+    /\\n/,
+    "the line break is shown, escaped",
+  );
+  assert.match(
+    got(() => parseUpdate({ op: "update", brief: "y".repeat(91) })),
+    /91 chars/,
+  );
 });
 
 // THE LEAVE GATE COUNTS THE RECORD; the live graph replays one session's
@@ -164,7 +204,12 @@ test("a resolution reaches a node an earlier session's visit left open", () => {
   const dir = seDir(root);
   mkdirSync(dir, { recursive: true });
   const rec = join(dir, "record-decisions.jsonl");
-  writeFileSync(rec, JSON.stringify({ op: "plan", visit: "expeditions/e9@1", nodes: [{ id: "d173", brief: "rename product to project everywhere" }] }) + "\n", "utf8");
+  writeFileSync(
+    rec,
+    JSON.stringify({ op: "plan", visit: "expeditions/e9@1", nodes: [{ id: "d173", brief: "rename product to project everywhere" }] }) +
+      "\n",
+    "utf8",
+  );
   const d = new Decisions(dir);
   d.setExtraSink(rec);
   d.apply("expeditions/e9@0", { op: "done", node: "d173", brief: "the rename is finished" });
@@ -179,11 +224,22 @@ test("replay: parked defers and open points survive an engine life", () => {
   const root = freshRoot();
   const dir = seDir(root);
   mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, "decisions.jsonl"), [
-    JSON.stringify({ op: "plan", visit: "e1@0", nodes: [{ id: "d1", brief: "a" }, { id: "d2", brief: "b" }] }),
-    JSON.stringify({ op: "done", visit: "e1@0", node: "d1" }),
-    JSON.stringify({ op: "defer", visit: "e1@0", node: "d2", brief: "b", to: "idle" }),
-  ].join("\n") + "\n", "utf8");
+  writeFileSync(
+    join(dir, "decisions.jsonl"),
+    [
+      JSON.stringify({
+        op: "plan",
+        visit: "e1@0",
+        nodes: [
+          { id: "d1", brief: "a" },
+          { id: "d2", brief: "b" },
+        ],
+      }),
+      JSON.stringify({ op: "done", visit: "e1@0", node: "d1" }),
+      JSON.stringify({ op: "defer", visit: "e1@0", node: "d2", brief: "b", to: "idle" }),
+    ].join("\n") + "\n",
+    "utf8",
+  );
   // The file's replayed truth BEFORE arrival: nothing open, one parked.
   const before = replayFile(join(dir, "decisions.jsonl"));
   assert.equal(before.open.length, 0, "d1 done, d2 deferred — no open point");
@@ -220,14 +276,26 @@ test("defer parks a point for a later state — it arrives there as an open to-d
 });
 
 test("replayVisitsText: a record's history renders per visit with statuses", () => {
-  const text = [
-    JSON.stringify({ op: "plan", visit: "e9@0", parent: null, nodes: [{ id: "d1", brief: "build" }, { id: "d2", brief: "verify" }] }),
-    JSON.stringify({ op: "done", visit: "e9@0", node: "d1" }),
-    JSON.stringify({ op: "update", visit: "e9-leave@0", node: "d3", brief: "closing" }),
-    JSON.stringify({ op: "defer", visit: "e9@0", node: "d2", brief: "verify", to: "idle" }),
-  ].join("\n") + "\n";
+  const text =
+    [
+      JSON.stringify({
+        op: "plan",
+        visit: "e9@0",
+        parent: null,
+        nodes: [
+          { id: "d1", brief: "build" },
+          { id: "d2", brief: "verify" },
+        ],
+      }),
+      JSON.stringify({ op: "done", visit: "e9@0", node: "d1" }),
+      JSON.stringify({ op: "update", visit: "e9-leave@0", node: "d3", brief: "closing" }),
+      JSON.stringify({ op: "defer", visit: "e9@0", node: "d2", brief: "verify", to: "idle" }),
+    ].join("\n") + "\n";
   const visits = replayVisitsText(text);
-  assert.deepEqual(visits.map((v) => v.visit), ["e9@0", "e9-leave@0"]);
+  assert.deepEqual(
+    visits.map((v) => v.visit),
+    ["e9@0", "e9-leave@0"],
+  );
   const e9 = visits[0].nodes;
   assert.equal(e9.find((n) => n.id === "d1")!.status, "done");
   assert.equal(e9.find((n) => n.id === "d2")!.status, "deferred");
@@ -258,18 +326,43 @@ test("the unified feed derives src, type and brief — and the mirror carries th
   const log = new CallLog(seDir(root));
   log.append({ tool: "se_file_read", args: { path: "project/x.md" }, ok: true, outcome: "result", duration_ms: 1 });
   log.append({ tool: "mirror_check", args: { path: "project/guidance/voice.md" }, ok: true, outcome: "result", duration_ms: 1 });
-  log.append({ tool: "se_update", args: { via: "se_pull", visit: "idle@0", op: "plan", nodes: [{ id: "d1", brief: "x" }] }, ok: true, outcome: "result", duration_ms: 0 });
-  log.append({ tool: "se_update", args: { via: "se_pull", visit: "idle@0", op: "update", brief: "working" }, ok: true, outcome: "result", duration_ms: 0 });
+  log.append({
+    tool: "se_update",
+    args: { via: "se_pull", visit: "idle@0", op: "plan", nodes: [{ id: "d1", brief: "x" }] },
+    ok: true,
+    outcome: "result",
+    duration_ms: 0,
+  });
+  log.append({
+    tool: "se_update",
+    args: { via: "se_pull", visit: "idle@0", op: "update", brief: "working" },
+    ok: true,
+    outcome: "result",
+    duration_ms: 0,
+  });
   log.append({ tool: "se_note", args: { text: "stray" }, ok: true, outcome: "result", duration_ms: 0 });
-  log.append({ tool: "se_run", args: { command: "boom" }, ok: false, outcome: "rejected", duration_ms: 1, response: { clause: "SE-C-046" } });
+  log.append({
+    tool: "se_run",
+    args: { command: "boom" },
+    ok: false,
+    outcome: "rejected",
+    duration_ms: 1,
+    response: { clause: "SE-C-046" },
+  });
   const { rows, capped } = feedRows(log, "1970-01-01T00:00:00.000Z");
   assert.equal(capped, false);
   assert.equal(rows.length, 6);
-  assert.deepEqual(rows.map((r) => r.src), ["agent", "human", "agent", "agent", "agent", "agent"]);
+  assert.deepEqual(
+    rows.map((r) => r.src),
+    ["agent", "human", "agent", "agent", "agent", "agent"],
+  );
   // Updates are NARRATION, whatever their op — bold in the pane (owner
   // ruling 2026-07-27, superseding the op-note-as-note reading). Only
   // se_note strays are retro notes (italic). Two kinds, never conflated.
-  assert.deepEqual(rows.map((r) => r.type), ["call", "call", "update", "update", "note", "call"]);
+  assert.deepEqual(
+    rows.map((r) => r.type),
+    ["call", "call", "update", "update", "note", "call"],
+  );
   assert.match(String(rows[0].brief), /read project\/x\.md/);
   assert.match(String(rows[1].brief), /check/);
   assert.match(String(rows[3].brief), /update: working/);
@@ -278,9 +371,13 @@ test("the unified feed derives src, type and brief — and the mirror carries th
   // PENDING STRAYS SURVIVE SESSIONS: an earlier session's note rides on top
   // of the feed; one minted within the session window is not doubled (it
   // already rides as its se_note call).
-  writeFileSync(join(seDir(root), "notes.jsonl"),
-    JSON.stringify({ ref: "note-old", text: "from an earlier session", at: "2000-01-02T03:04:05.000Z" }) + "\n" +
-    JSON.stringify({ ref: "note-new", text: "this session", at: "2999-01-01T00:00:00.000Z" }) + "\n");
+  writeFileSync(
+    join(seDir(root), "notes.jsonl"),
+    JSON.stringify({ ref: "note-old", text: "from an earlier session", at: "2000-01-02T03:04:05.000Z" }) +
+      "\n" +
+      JSON.stringify({ ref: "note-new", text: "this session", at: "2999-01-01T00:00:00.000Z" }) +
+      "\n",
+  );
   const withPending = feedRows(log, "2020-01-01T00:00:00.000Z", readNotes(seDir(root)));
   assert.equal(withPending.rows[0].ref, "note-old");
   assert.equal(withPending.rows[0].type, "note");
@@ -353,5 +450,8 @@ test("a repeated resolution is a no-op; a conflicting one still refuses", () => 
   assert.equal(after.length, 1, "no second node, no second resolution");
   assert.equal(after[0].status, "done");
   // A DIFFERENT disposition is a real disagreement, and still refuses.
-  assert.throws(() => s.decisions.apply("idle@0", { op: "obsolete", node: item.id, brief: "actually dropped" }), (e: unknown) => (e as { clause?: string }).clause === "SE-C-121");
+  assert.throws(
+    () => s.decisions.apply("idle@0", { op: "obsolete", node: item.id, brief: "actually dropped" }),
+    (e: unknown) => (e as { clause?: string }).clause === "SE-C-121",
+  );
 });

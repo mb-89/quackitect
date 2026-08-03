@@ -10,7 +10,7 @@
 import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
 import { Rejection } from "../engine/errors.ts";
-import { Duration, evalExpr, Link, parseDuration, passes, registerGlobal, toText, typeOf, type Ctx } from "../engine/expr.ts";
+import { type Ctx, type Duration, evalExpr, Link, parseDuration, passes, registerGlobal, toText, typeOf } from "../engine/expr.ts";
 
 const row = (over: Record<string, unknown> = {}): Ctx["row"] => ({
   status: "open",
@@ -188,10 +188,10 @@ describe("lists, links and files", () => {
   test("file.hasLink finds a wikilink", () => assert.equal(ev('file.hasLink("Author")'), true));
   test("file.hasProperty", () => assert.equal(ev('file.hasProperty("folder")'), true));
   test("a link equals the file it resolves to", () => {
-    assert.equal(ev("link(\"Textbook\") == file"), true);
+    assert.equal(ev('link("Textbook") == file'), true);
   });
   test("a link that resolves nowhere is not equal", () => {
-    assert.equal(ev("link(\"Elsewhere\") == file"), false);
+    assert.equal(ev('link("Elsewhere") == file'), false);
   });
 });
 

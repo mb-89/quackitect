@@ -45,7 +45,7 @@ const CLOSES: Record<string, DecisionNode["status"]> = {
 };
 
 const SHAPE_NOTE =
-  "ops: plan {items: [\"...\"]} starts the checklist (node = optional parent) · " +
+  'ops: plan {items: ["..."]} starts the checklist (node = optional parent) · ' +
   "fork {brief, items?} opens an unplanned branch where you are · " +
   "done|obsolete|revert {node, brief?} resolves a node (brief = resolution) · " +
   "update {brief, node?} says what you are doing · " +
@@ -55,7 +55,10 @@ const SHAPE_NOTE =
  *  life left standing — parked defers that never arrived, and points
  *  still open. Sequential; a re-minted node id shadows its ancestor (the
  *  per-part history stays in the file for the retro). */
-export function replayFile(path: string): { parked: { state: string; brief: string; hops?: number; trail?: string[] }[]; open: { id: string; visit: string; brief: string }[] } {
+export function replayFile(path: string): {
+  parked: { state: string; brief: string; hops?: number; trail?: string[] }[];
+  open: { id: string; visit: string; brief: string }[];
+} {
   if (!existsSync(path)) return { parked: [], open: [] };
   const nodes = new Map<string, { visit: string; brief: string; open: boolean }>();
   const parked: { state: string; brief: string; hops?: number; trail?: string[] }[] = [];
@@ -71,14 +74,20 @@ export function replayFile(path: string): { parked: { state: string; brief: stri
     if (op === "plan" || op === "fork") {
       const list = Array.isArray(rec.nodes) ? (rec.nodes as { id: string; brief: string }[]) : [];
       for (const n of list) nodes.set(n.id, { visit: String(rec.visit ?? ""), brief: n.brief, open: true });
-      if (op === "fork" && rec.node !== undefined) nodes.set(String(rec.node), { visit: String(rec.visit ?? ""), brief: String(rec.brief ?? ""), open: true });
+      if (op === "fork" && rec.node !== undefined)
+        nodes.set(String(rec.node), { visit: String(rec.visit ?? ""), brief: String(rec.brief ?? ""), open: true });
     } else if (op === "done" || op === "obsolete" || op === "revert") {
       const n = nodes.get(String(rec.node ?? ""));
       if (n) n.open = false;
     } else if (op === "defer") {
       const n = nodes.get(String(rec.node ?? ""));
       if (n) n.open = false;
-      parked.push({ state: String(rec.to ?? ""), brief: String(rec.brief ?? ""), hops: Number(rec.hops ?? 1), trail: Array.isArray(rec.trail) ? rec.trail.map(String) : undefined });
+      parked.push({
+        state: String(rec.to ?? ""),
+        brief: String(rec.brief ?? ""),
+        hops: Number(rec.hops ?? 1),
+        trail: Array.isArray(rec.trail) ? rec.trail.map(String) : undefined,
+      });
     } else if (op === "defer_arrived") {
       const brief = String(rec.brief ?? "");
       const state = String(rec.visit ?? "").split("@")[0];
@@ -201,13 +210,15 @@ export function parseUpdate(v: unknown): DecisionOp {
   if (typeof v !== "object" || v === null || Array.isArray(v)) throw malformed(typeof v);
   const u = v as Record<string, unknown>;
   const op = String(u.op ?? "");
-  if (!(op in CLOSES) && op !== "plan" && op !== "fork" && op !== "update" && op !== "defer") throw malformed(`op: ${JSON.stringify(u.op)}`);
+  if (!(op in CLOSES) && op !== "plan" && op !== "fork" && op !== "update" && op !== "defer")
+    throw malformed(`op: ${JSON.stringify(u.op)}`);
   const items = u.items === undefined ? undefined : Array.isArray(u.items) ? u.items.map(String).filter((s) => s.trim() !== "") : null;
   if (items === null) throw malformed("items is not an array of strings");
   const brief = u.brief === undefined ? undefined : String(u.brief);
   const node = u.node === undefined ? undefined : String(u.node);
   const to = u.to === undefined ? undefined : String(u.to);
-  if (op === "defer" && (node === undefined || to === undefined || to.trim() === "")) throw malformed("defer needs node and to (the state that can do it)");
+  if (op === "defer" && (node === undefined || to === undefined || to.trim() === ""))
+    throw malformed("defer needs node and to (the state that can do it)");
   if (op === "plan" && (items === undefined || items.length === 0)) throw malformed("plan without items");
   if (op === "fork" && (brief === undefined || brief.trim() === "")) throw malformed("fork without brief");
   if (op in CLOSES && node === undefined) throw malformed(`${op} without node`);
@@ -250,14 +261,25 @@ export function parseUpdate(v: unknown): DecisionOp {
     if (text.length > 90) throw malformed(`${what} is ${text.length} chars — the feed renders 90; tighten it. Got ${JSON.stringify(text)}`);
     const parts = chainOf(text);
     if (parts !== null) {
-      throw malformed(`${what} chains ${parts.length} separator-joined parts — an unrendered list. Got ${JSON.stringify(text)} — as a plan that is items: [${parts.map((p) => JSON.stringify(p)).join(", ")}]`);
+      throw malformed(
+        `${what} chains ${parts.length} separator-joined parts — an unrendered list. Got ${JSON.stringify(text)} — as a plan that is items: [${parts.map((p) => JSON.stringify(p)).join(", ")}]`,
+      );
     }
   };
   if (briefOut !== undefined) lintLine(briefOut, "brief");
   // WHICH item, not just "an item". A five-item plan refused on "item" left
   // the caller re-reading all five to find the one that tripped.
-  (itemsOut ?? []).forEach((it, i) => lintLine(it, `item ${i + 1}`));
-  return { op: opOut, ...(briefOut !== undefined ? { brief: briefOut } : {}), ...(itemsOut !== undefined ? { items: itemsOut } : {}), ...(node !== undefined ? { node } : {}), ...(to !== undefined ? { to } : {}), ...(corrected !== undefined ? { corrected } : {}) };
+  (itemsOut ?? []).forEach((it, i) => {
+    lintLine(it, `item ${i + 1}`);
+  });
+  return {
+    op: opOut,
+    ...(briefOut !== undefined ? { brief: briefOut } : {}),
+    ...(itemsOut !== undefined ? { items: itemsOut } : {}),
+    ...(node !== undefined ? { node } : {}),
+    ...(to !== undefined ? { to } : {}),
+    ...(corrected !== undefined ? { corrected } : {}),
+  };
 }
 
 export class Decisions {
@@ -293,7 +315,15 @@ export class Decisions {
   }
 
   private add(visit: string, parent: string | null, brief: string, origin?: DecisionNode["origin"]): DecisionNode {
-    const node: DecisionNode = { id: `d${++this.seq}`, visit, parent, brief, status: "open", at: new Date().toISOString(), ...(origin !== undefined ? { origin } : {}) };
+    const node: DecisionNode = {
+      id: `d${++this.seq}`,
+      visit,
+      parent,
+      brief,
+      status: "open",
+      at: new Date().toISOString(),
+      ...(origin !== undefined ? { origin } : {}),
+    };
     this.nodes.set(node.id, node);
     return node;
   }
@@ -302,7 +332,10 @@ export class Decisions {
   private openBriefs(): string {
     const open = [...this.nodes.values()].filter((n) => n.status === "open");
     if (open.length === 0) return "(none open — plan or fork first)";
-    const shown = open.slice(-8).map((n) => `${n.id}: ${n.brief}`).join(" · ");
+    const shown = open
+      .slice(-8)
+      .map((n) => `${n.id}: ${n.brief}`)
+      .join(" · ");
     return open.length > 8 ? `${shown} · …and ${open.length - 8} more` : shown;
   }
 
@@ -387,7 +420,12 @@ export class Decisions {
         break;
       }
       case "fork": {
-        const parent = u.node !== undefined ? this.openNode(u.node).id : (this.activeId !== undefined && this.nodes.get(this.activeId)?.status === "open" ? this.activeId : null);
+        const parent =
+          u.node !== undefined
+            ? this.openNode(u.node).id
+            : this.activeId !== undefined && this.nodes.get(this.activeId)?.status === "open"
+              ? this.activeId
+              : null;
         // Idempotent for the same reason a plan is — a retried call must not
         // open the same branch twice; it re-enters the one already standing.
         const standingFork = [...this.nodes.values()].find(
@@ -400,7 +438,14 @@ export class Decisions {
         const fork = this.add(visit, parent, u.brief!, "fork");
         const added = (u.items ?? []).map((b) => this.add(visit, fork.id, b, "planned"));
         this.activeId = fork.id;
-        this.record({ op: "fork", visit, parent, node: fork.id, brief: fork.brief, nodes: added.map((n) => ({ id: n.id, brief: n.brief })) });
+        this.record({
+          op: "fork",
+          visit,
+          parent,
+          node: fork.id,
+          brief: fork.brief,
+          nodes: added.map((n) => ({ id: n.id, brief: n.brief })),
+        });
         break;
       }
       case "done":
@@ -424,7 +469,9 @@ export class Decisions {
           let visits: { visit: string; nodes: ReplayNode[] }[] = [];
           try {
             visits = replayVisitsText(readFileSync(this.extraPath, "utf8"));
-          } catch { /* no record yet — the ordinary refusal below says so */ }
+          } catch {
+            /* no record yet — the ordinary refusal below says so */
+          }
           const known = visits.find((v) => v.nodes.some((x) => x.id === u.node));
           if (known !== undefined) {
             const past = known.nodes.find((x) => x.id === u.node)!;
@@ -442,7 +489,11 @@ export class Decisions {
               clause: CLAUSES.DECISION_UNRESOLVED,
               expected: `every child of ${n.id} resolved before it closes — still open: ${open.map((c) => `${c.id}: ${c.brief}`).join(" · ")}`,
               got: `done on ${n.id} over ${open.length} open child(ren)`,
-              remedy: { tool: "(the same call)", args: { update: { op: "done", node: open[0].id, brief: "<how it resolved>" } }, note: "resolve each child (done, or obsolete/revert if it did not survive), then close the parent" },
+              remedy: {
+                tool: "(the same call)",
+                args: { update: { op: "done", node: open[0].id, brief: "<how it resolved>" } },
+                note: "resolve each child (done, or obsolete/revert if it did not survive), then close the parent",
+              },
               source: "engine/decisions.ts resolve",
             });
           }
@@ -463,7 +514,11 @@ export class Decisions {
             clause: CLAUSES.DECISION_UNRESOLVED,
             expected: `a DECISION — this point was deferred 3 times already (${trail.join(" → ")}); do it, obsolete it with the reason, or seed it as real work`,
             got: `defer number ${hops}`,
-            remedy: { tool: "(the same call)", args: { update: { op: "done", node: n.id, brief: "<how it resolved>" } }, note: "chronic deferral is usually a seed in disguise — se_seed_iteration gives it a goal and a vision" },
+            remedy: {
+              tool: "(the same call)",
+              args: { update: { op: "done", node: n.id, brief: "<how it resolved>" } },
+              note: "chronic deferral is usually a seed in disguise — se_seed_iteration gives it a goal and a vision",
+            },
             source: "engine/decisions.ts defer",
           });
         }
@@ -499,7 +554,11 @@ export class Decisions {
             clause: CLAUSES.DECISION_NODE,
             expected: `update {node, brief} - which item is this about? ${this.openBriefs()}`,
             got: "an update naming no node, with a checklist standing open",
-            remedy: { tool: "(the same call)", args: { update: { op: "update", node: "<an open node id>", brief: "..." } }, note: "or resolve one instead - done | obsolete | revert. A fork opens a new branch where you are" },
+            remedy: {
+              tool: "(the same call)",
+              args: { update: { op: "update", node: "<an open node id>", brief: "..." } },
+              note: "or resolve one instead - done | obsolete | revert. A fork opens a new branch where you are",
+            },
             source: "engine/decisions.ts update",
           });
         }
@@ -525,9 +584,10 @@ export class Decisions {
     // A NUDGE, never a refusal. Narration that outruns the checklist is bad
     // rhythm, not a broken call, and refusing the work over its commentary
     // is the mistake the update field already learned once.
-    const nudge = this.sinceResolve >= Decisions.NUDGE_AFTER && open > 0
-      ? `${this.sinceResolve} updates since anything closed, with ${open} still open — the checklist is a PROGRESS view. Close what is genuinely done on the NEXT call, not at the end.`
-      : undefined;
+    const nudge =
+      this.sinceResolve >= Decisions.NUDGE_AFTER && open > 0
+        ? `${this.sinceResolve} updates since anything closed, with ${open} still open — the checklist is a PROGRESS view. Close what is genuinely done on the NEXT call, not at the end.`
+        : undefined;
     return { update: u.op, active: this.activeId ?? null, open, open_nodes: openNodes, ...(nudge !== undefined ? { nudge } : {}) };
   }
 
@@ -544,7 +604,10 @@ export class Decisions {
   /** A state's decision history across its visits, plus points still
    *  parked for it — the details pane's to-do sections. READ-ONLY:
    *  looking never materializes a parked defer. */
-  stateTodos(stateId: string): { visits: { visit: string; nodes: DecisionNode[] }[]; parked: { brief: string; hops?: number; trail?: string[] }[] } {
+  stateTodos(stateId: string): {
+    visits: { visit: string; nodes: DecisionNode[] }[];
+    parked: { brief: string; hops?: number; trail?: string[] }[];
+  } {
     const byVisit = new Map<string, DecisionNode[]>();
     for (const n of this.nodes.values()) {
       if (n.visit !== stateId && !n.visit.startsWith(`${stateId}@`)) continue;
@@ -554,14 +617,22 @@ export class Decisions {
     }
     return {
       visits: [...byVisit.entries()].map(([visit, nodes]) => ({ visit, nodes })),
-      parked: this.parked.filter((p) => p.state === stateId).map((p) => ({ brief: p.brief, ...(p.hops !== undefined ? { hops: p.hops } : {}), ...(p.trail !== undefined ? { trail: p.trail } : {}) })),
+      parked: this.parked
+        .filter((p) => p.state === stateId)
+        .map((p) => ({
+          brief: p.brief,
+          ...(p.hops !== undefined ? { hops: p.hops } : {}),
+          ...(p.trail !== undefined ? { trail: p.trail } : {}),
+        })),
     };
   }
 
   /** Open nodes whose visit belongs to one of the given state ids — the
    *  evidence check: no point may stand open when the work claims done. */
   openFor(stateIds: string[]): DecisionNode[] {
-    return [...this.nodes.values()].filter((n) => n.status === "open" && stateIds.some((p) => n.visit === p || n.visit.startsWith(`${p}@`)));
+    return [...this.nodes.values()].filter(
+      (n) => n.status === "open" && stateIds.some((p) => n.visit === p || n.visit.startsWith(`${p}@`)),
+    );
   }
 
   /** Every visit that recorded decisions, in first-seen order. */

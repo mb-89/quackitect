@@ -34,14 +34,18 @@ export function formTemplatePath(name: string): string {
  *  "- name | description | required|optional" under "## Fields". */
 export function parseFormTemplate(name: string, raw: string): FormTemplate {
   const note = parseStateNote(raw);
-  const instance = typeof note.frontmatter.instance === "string" && note.frontmatter.instance !== "" ? note.frontmatter.instance : `${name}.md`;
+  const instance =
+    typeof note.frontmatter.instance === "string" && note.frontmatter.instance !== "" ? note.frontmatter.instance : `${name}.md`;
   const text = section(note.body, "Fields");
   const fields = text
     .split("\n")
     .filter((l) => l.trim() !== "")
     .map((line) => {
       const m = line.trim().match(/^- (.+?) \| (.+?) \| (required|optional)$/);
-      if (!m) throw new Error(`form template ${name}: malformed field line ${JSON.stringify(line.trim())} (want "- name | description | required|optional")`);
+      if (!m)
+        throw new Error(
+          `form template ${name}: malformed field line ${JSON.stringify(line.trim())} (want "- name | description | required|optional")`,
+        );
       return { name: m[1], description: m[2], required: m[3] === "required" };
     });
   if (fields.length === 0) throw new Error(`form template ${name}: no field lines under "## Fields"`);
@@ -115,7 +119,17 @@ export function lintForm(t: FormTemplate, instanceRaw: string | undefined, evide
 
 /** A fresh instance from the template — sections empty, ready to fill. */
 export function scaffoldInstance(t: FormTemplate, title: string): string {
-  return ["---", `form: ${t.form}`, "status: draft", "files:", "---", "", `# ${title}`, "", ...t.fields.flatMap((f) => [`## ${f.name}`, "", ""])].join("\n");
+  return [
+    "---",
+    `form: ${t.form}`,
+    "status: draft",
+    "files:",
+    "---",
+    "",
+    `# ${title}`,
+    "",
+    ...t.fields.flatMap((f) => [`## ${f.name}`, "", ""]),
+  ].join("\n");
 }
 
 /** Replace one section's body. A missing section is appended. */

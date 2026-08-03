@@ -15,7 +15,7 @@ import { join } from "node:path";
 import { describe, test } from "node:test";
 import { parse } from "yaml";
 import { setGroupBy, setSort } from "../engine/bases.ts";
-import { parseBase, renderView, selectRows, type Row } from "../engine/tables.ts";
+import { parseBase, type Row, renderView, selectRows } from "../engine/tables.ts";
 
 const rows: Row[] = [
   { name: "alpha", ext: "go", area: "engine", size: 3, file: { name: "alpha", path: "a.md" } },
@@ -44,8 +44,11 @@ function names(html: string): string[] {
 
 /** The group headers, as `property value` at their nesting depth. */
 function groups(html: string): { depth: number; label: string; count: string }[] {
-  return [...html.matchAll(/<tr class="tbl-group" data-depth="(\d+)">[\s\S]*?<span class="grp-prop">([^<]*)<\/span> <span class="grp-val">([^<]*)<\/span> <span class="grp-count">(\d+)<\/span>/g)]
-    .map((m) => ({ depth: Number(m[1]), label: `${m[2]} ${m[3]}`, count: m[4] }));
+  return [
+    ...html.matchAll(
+      /<tr class="tbl-group" data-depth="(\d+)">[\s\S]*?<span class="grp-prop">([^<]*)<\/span> <span class="grp-val">([^<]*)<\/span> <span class="grp-count">(\d+)<\/span>/g,
+    ),
+  ].map((m) => ({ depth: Number(m[1]), label: `${m[2]} ${m[3]}`, count: m[4] }));
 }
 
 describe("sorting in levels", () => {
@@ -67,12 +70,18 @@ describe("sorting in levels", () => {
   });
 
   test("a third level settles what the first two left tied", () => {
-    const v = view("    sort:\n      - property: ext\n        direction: ASC\n      - property: area\n        direction: ASC\n      - property: size\n        direction: ASC\n");
+    const v = view(
+      "    sort:\n      - property: ext\n        direction: ASC\n      - property: area\n        direction: ASC\n      - property: size\n        direction: ASC\n",
+    );
     assert.deepEqual(names(renderView(spec, v, rows).html).slice(0, 3), ["bravo", "alpha", "charlie"]);
   });
 
   test("numbers order as numbers rather than as text", () => {
-    const many: Row[] = [{ name: "n9", size: 9 }, { name: "n10", size: 10 }, { name: "n2", size: 2 }];
+    const many: Row[] = [
+      { name: "n9", size: 9 },
+      { name: "n10", size: 10 },
+      { name: "n2", size: 2 },
+    ];
     const html = renderView(spec, view("    sort:\n      - property: size\n        direction: ASC\n"), many).html;
     assert.deepEqual(names(html), ["n2", "n9", "n10"]);
   });
@@ -92,8 +101,14 @@ describe("grouping in levels", () => {
   test("one level puts a header over each group", () => {
     const html = renderView(spec, view("    groupBy:\n      property: ext\n      direction: ASC\n"), rows).html;
     const g = groups(html);
-    assert.deepEqual(g.map((x) => x.label), ["ext go", "ext ts", "ext —"]);
-    assert.deepEqual(g.map((x) => x.count), ["3", "2", "1"]);
+    assert.deepEqual(
+      g.map((x) => x.label),
+      ["ext go", "ext ts", "ext —"],
+    );
+    assert.deepEqual(
+      g.map((x) => x.count),
+      ["3", "2", "1"],
+    );
     assert.equal(new Set(g.map((x) => x.depth)).size, 1, "one level is all at depth zero");
   });
 
@@ -104,22 +119,19 @@ describe("grouping in levels", () => {
 
   test("a missing value gets its own group rather than losing the row", () => {
     const html = renderView(spec, view("    groupBy:\n      property: ext\n"), rows).html;
-    assert.ok(groups(html).some((g) => g.label === "ext —"), "foxtrot has no ext and is still shown");
+    assert.ok(
+      groups(html).some((g) => g.label === "ext —"),
+      "foxtrot has no ext and is still shown",
+    );
   });
 
   test("a second level SUBDIVIDES the first", () => {
     const v = view("    groupBy:\n      - property: ext\n        direction: ASC\n      - property: area\n        direction: ASC\n");
     const g = groups(renderView(spec, v, rows).html);
-    assert.deepEqual(g.map((x) => `${x.depth}:${x.label}`), [
-      "0:ext go",
-      "1:area engine",
-      "1:area web",
-      "0:ext ts",
-      "1:area engine",
-      "1:area web",
-      "0:ext —",
-      "1:area web",
-    ]);
+    assert.deepEqual(
+      g.map((x) => `${x.depth}:${x.label}`),
+      ["0:ext go", "1:area engine", "1:area web", "0:ext ts", "1:area engine", "1:area web", "0:ext —", "1:area web"],
+    );
   });
 
   test("the counts at each level add up to the level above", () => {
@@ -132,7 +144,10 @@ describe("grouping in levels", () => {
 
   test("a group level reverses on DESC, and the empty group still trails", () => {
     const v = view("    groupBy:\n      property: ext\n      direction: DESC\n");
-    assert.deepEqual(groups(renderView(spec, v, rows).html).map((x) => x.label), ["ext ts", "ext go", "ext —"]);
+    assert.deepEqual(
+      groups(renderView(spec, v, rows).html).map((x) => x.label),
+      ["ext ts", "ext go", "ext —"],
+    );
   });
 
   test("sorting applies inside the groups", () => {
@@ -141,7 +156,10 @@ describe("grouping in levels", () => {
   });
 
   test("a bare property name is a group level too", () => {
-    assert.deepEqual(groups(renderView(spec, view("    groupBy: ext\n"), rows).html).map((x) => x.label), ["ext go", "ext ts", "ext —"]);
+    assert.deepEqual(
+      groups(renderView(spec, view("    groupBy: ext\n"), rows).html).map((x) => x.label),
+      ["ext go", "ext ts", "ext —"],
+    );
   });
 
   test("no groupBy means no group rows at all", () => {
@@ -166,13 +184,22 @@ describe("what the controls write", () => {
 
   test("several group levels write a list", () => {
     const b = base();
-    setGroupBy(b.root, "v.base", "V", [{ property: "ext", direction: "ASC" }, { property: "area", direction: "DESC" }]);
-    assert.deepEqual(first(b.read()).groupBy, [{ property: "ext", direction: "ASC" }, { property: "area", direction: "DESC" }]);
+    setGroupBy(b.root, "v.base", "V", [
+      { property: "ext", direction: "ASC" },
+      { property: "area", direction: "DESC" },
+    ]);
+    assert.deepEqual(first(b.read()).groupBy, [
+      { property: "ext", direction: "ASC" },
+      { property: "area", direction: "DESC" },
+    ]);
   });
 
   test("a blank level is dropped rather than written", () => {
     const b = base();
-    setGroupBy(b.root, "v.base", "V", [{ property: "ext", direction: "ASC" }, { property: "", direction: "ASC" }]);
+    setGroupBy(b.root, "v.base", "V", [
+      { property: "ext", direction: "ASC" },
+      { property: "", direction: "ASC" },
+    ]);
     assert.deepEqual(first(b.read()).groupBy, { property: "ext", direction: "ASC" });
   });
 
@@ -185,7 +212,10 @@ describe("what the controls write", () => {
 
   test("what setGroupBy wrote is what the renderer reads back", () => {
     const b = base();
-    setGroupBy(b.root, "v.base", "V", [{ property: "ext", direction: "ASC" }, { property: "area", direction: "ASC" }]);
+    setGroupBy(b.root, "v.base", "V", [
+      { property: "ext", direction: "ASC" },
+      { property: "area", direction: "ASC" },
+    ]);
     const spec2 = parseBase(readFileSync(join(b.root, "project", "v.base"), "utf8"));
     assert.equal(spec2.views[0].groupBy.length, 2);
     assert.equal(groups(renderView(spec2, spec2.views[0], rows).html).length, 8);
@@ -193,9 +223,15 @@ describe("what the controls write", () => {
 
   test("what setSort wrote is what the renderer reads back", () => {
     const b = base();
-    setSort(b.root, "v.base", "V", [{ property: "area", direction: "ASC" }, { property: "size", direction: "DESC" }]);
+    setSort(b.root, "v.base", "V", [
+      { property: "area", direction: "ASC" },
+      { property: "size", direction: "DESC" },
+    ]);
     const spec2 = parseBase(readFileSync(join(b.root, "project", "v.base"), "utf8"));
     assert.equal(spec2.views[0].sort.length, 2);
-    assert.deepEqual(selectRows(spec2, spec2.views[0], rows).map((r) => r.name), ["delta", "alpha", "bravo", "foxtrot", "echo", "charlie"]);
+    assert.deepEqual(
+      selectRows(spec2, spec2.views[0], rows).map((r) => r.name),
+      ["delta", "alpha", "bravo", "foxtrot", "echo", "charlie"],
+    );
   });
 });

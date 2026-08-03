@@ -2,9 +2,10 @@
 // time). Every dispatch through the single MCP path lands here: tool, args,
 // verdict, duration. se_run responses are logged IN FULL under their ref so
 // a run is citable evidence. Machine-local (.se/), never committed.
+
+import { randomBytes } from "node:crypto";
 import { appendFileSync, existsSync, mkdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { randomBytes } from "node:crypto";
 import { stripBom } from "./jsonio.ts";
 
 export interface CallRecord {
@@ -62,9 +63,7 @@ export class CallLog {
       try {
         const rec = JSON.parse(line) as CallRecord;
         if (rec.ref === ref) return rec;
-      } catch {
-        continue;
-      }
+      } catch {}
     }
     return undefined;
   }
@@ -76,9 +75,7 @@ export class CallLog {
       if (line.trim() === "") continue;
       try {
         out.push(JSON.parse(line) as CallRecord);
-      } catch {
-        continue;
-      }
+      } catch {}
     }
     return out;
   }

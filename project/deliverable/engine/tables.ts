@@ -17,7 +17,7 @@
 // their own depends_on IS the dependency matrix, with no second data model
 // and no export. Obsidian cannot open a pivot view, which is fine — dropping
 // Obsidian is why this file exists.
-import { readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { parse } from "yaml";
 import { CLAUSES, Rejection } from "./errors.ts";
@@ -220,7 +220,11 @@ export function matches(filter: unknown, row: Row): boolean {
       clause: CLAUSES.REQUIRED_ARGS,
       expected: "a filter node the renderer knows: and, or, not, or an expression string",
       got: `keys ${Object.keys(o).join(", ")}`,
-      remedy: { tool: "se_file_read", args: { path: "project/deliverable/tests/fixtures/rigor-matrix.base" }, note: "the implemented subset is documented at the head of engine/tables.ts" },
+      remedy: {
+        tool: "se_file_read",
+        args: { path: "project/deliverable/tests/fixtures/rigor-matrix.base" },
+        note: "the implemented subset is documented at the head of engine/tables.ts",
+      },
       source: SRC,
     });
   }
@@ -292,7 +296,11 @@ export function renderView(spec: BaseSpec, view: BaseView, rows: Row[]): TableRe
       clause: CLAUSES.REQUIRED_ARGS,
       expected: "a view type the renderer knows: table or pivot",
       got: `${view.type} (view "${view.name}")`,
-      remedy: { tool: "se_file_read", args: { path: "project/deliverable/engine/tables.ts" }, note: "cards are not built yet; a declared view we cannot draw refuses rather than drawing something else" },
+      remedy: {
+        tool: "se_file_read",
+        args: { path: "project/deliverable/engine/tables.ts" },
+        note: "cards are not built yet; a declared view we cannot draw refuses rather than drawing something else",
+      },
       source: SRC,
     });
   }
@@ -409,7 +417,11 @@ export function renderPivot(spec: BaseSpec, view: BaseView, rows: Row[]): TableR
       clause: CLAUSES.REQUIRED_ARGS,
       expected: "a pivot view names both `rows` and `columns`",
       got: `rows: ${rowProp ?? "(absent)"}, columns: ${colProp ?? "(absent)"} (view "${view.name}")`,
-      remedy: { tool: "se_file_read", args: { path: "project/deliverable/engine/tables.ts" }, note: "a pivot with one dimension is a table; declare it as `type: table`" },
+      remedy: {
+        tool: "se_file_read",
+        args: { path: "project/deliverable/engine/tables.ts" },
+        note: "a pivot with one dimension is a table; declare it as `type: table`",
+      },
       source: SRC,
     });
   }
@@ -419,7 +431,11 @@ export function renderPivot(spec: BaseSpec, view: BaseView, rows: Row[]): TableR
       clause: CLAUSES.REQUIRED_ARGS,
       expected: `an aggregate this renderer knows: ${AGGREGATES.join(", ")}`,
       got: `${agg} (view "${view.name}")`,
-      remedy: { tool: "se_file_read", args: { path: "project/deliverable/engine/tables.ts" }, note: "widen the set deliberately rather than letting a cell fill with something nobody asked for" },
+      remedy: {
+        tool: "se_file_read",
+        args: { path: "project/deliverable/engine/tables.ts" },
+        note: "widen the set deliberately rather than letting a cell fill with something nobody asked for",
+      },
       source: SRC,
     });
   }
@@ -428,7 +444,11 @@ export function renderPivot(spec: BaseSpec, view: BaseView, rows: Row[]): TableR
       clause: CLAUSES.REQUIRED_ARGS,
       expected: "`aggregate: list` names the property it lists, in `value`",
       got: `no value (view "${view.name}")`,
-      remedy: { tool: "se_file_read", args: { path: "project/deliverable/engine/tables.ts" }, note: "use `aggregate: count` when the cell only needs how many" },
+      remedy: {
+        tool: "se_file_read",
+        args: { path: "project/deliverable/engine/tables.ts" },
+        note: "use `aggregate: count` when the cell only needs how many",
+      },
       source: SRC,
     });
   }
@@ -500,7 +520,10 @@ export function renderPivot(spec: BaseSpec, view: BaseView, rows: Row[]): TableR
     kept.length === 0
       ? `<tr><td class="tbl-empty" colspan="${ck.length + 2}">no rows match this view's filter</td></tr>`
       : rk
-          .map((r) => `<tr><th class="pv-row">${esc(r)}</th>${ck.map((c) => cell(r, c)).join("")}<td class="pv-tot pv-num">${rowTotal(r)}</td></tr>`)
+          .map(
+            (r) =>
+              `<tr><th class="pv-row">${esc(r)}</th>${ck.map((c) => cell(r, c)).join("")}<td class="pv-tot pv-num">${rowTotal(r)}</td></tr>`,
+          )
           .join("") +
         `<tr class="pv-totals"><th class="pv-tot">Σ</th>${ck.map((c) => `<td class="pv-tot pv-num">${colTotal(c)}</td>`).join("")}<td class="pv-tot pv-num">${rk.reduce((n, r) => n + rowTotal(r), 0)}</td></tr>`;
 
@@ -586,7 +609,11 @@ function notePath(root: string, rel: string): string {
       clause: CLAUSES.REQUIRED_ARGS,
       expected: "a markdown note inside the vault",
       got: rel,
-      remedy: { tool: "se_file_read", args: { path: "project/deliverable/engine/tables.ts" }, note: "a cell may only write the note its own row came from" },
+      remedy: {
+        tool: "se_file_read",
+        args: { path: "project/deliverable/engine/tables.ts" },
+        note: "a cell may only write the note its own row came from",
+      },
       source: SRC,
     });
   }

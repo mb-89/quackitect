@@ -2,7 +2,7 @@
 // recorded raw in the call log under the returned ref, so a run is citable
 // evidence, never a claim. This lane is the future breakout seam: when the
 // state machine lands, run legality becomes a per-state decision.
-import { spawn, type ChildProcess } from "node:child_process";
+import { type ChildProcess, spawn } from "node:child_process";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { capMiddle } from "./jsonio.ts";
 import { resolveInRoot } from "./paths.ts";
@@ -36,18 +36,31 @@ export function killTree(pid: number | undefined): void {
   if (process.platform === "win32") {
     // Detached and unref'd, so a reap fired on the way OUT of the process
     // still completes after we are gone.
-    try { spawn("taskkill", ["/PID", String(pid), "/T", "/F"], { windowsHide: true, stdio: "ignore", detached: true }).unref(); } catch { /* already gone */ }
+    try {
+      spawn("taskkill", ["/PID", String(pid), "/T", "/F"], { windowsHide: true, stdio: "ignore", detached: true }).unref();
+    } catch {
+      /* already gone */
+    }
     return;
   }
   // POSIX: the shell is spawned detached, so it leads its own process group
   // and the negative pid reaches every descendant.
-  try { process.kill(-pid, "SIGKILL"); } catch { try { process.kill(pid, "SIGKILL"); } catch { /* already gone */ } }
+  try {
+    process.kill(-pid, "SIGKILL");
+  } catch {
+    try {
+      process.kill(pid, "SIGKILL");
+    } catch {
+      /* already gone */
+    }
+  }
 }
 
 function spawnShell(root: string, command: string, cwd?: string): ChildProcess {
-  const shell = process.platform === "win32"
-    ? { file: "powershell.exe", args: ["-NoProfile", "-NonInteractive", "-Command", command] }
-    : { file: "/bin/bash", args: ["-c", command] };
+  const shell =
+    process.platform === "win32"
+      ? { file: "powershell.exe", args: ["-NoProfile", "-NonInteractive", "-Command", command] }
+      : { file: "/bin/bash", args: ["-c", command] };
   return spawn(shell.file, shell.args, {
     // cwd is root-relative — resolved against the ROOT, never the server's
     // own working directory (a relative cwd once made spawn fail silently).
@@ -154,7 +167,9 @@ export function runBackground(root: string, command: string, opts: { cwd?: strin
 export function startJob(command: string, spawnFn: () => ChildProcess): JobView {
   const id = `job-${Date.now().toString(36)}-${++jobSeq}`;
   let settle = (): void => {};
-  const done = new Promise<void>((res) => { settle = res; });
+  const done = new Promise<void>((res) => {
+    settle = res;
+  });
   const j: Job = { id, command, started: Date.now(), exit: null, running: true, out: "", err: "", done, settle };
   jobs.set(id, j);
   let child: ChildProcess;
@@ -170,10 +185,24 @@ export function startJob(command: string, spawnFn: () => ChildProcess): JobView 
   j.child = child;
   child.stdout?.setEncoding("utf8");
   child.stderr?.setEncoding("utf8");
-  child.stdout?.on("data", (c) => { j.out += c; });
-  child.stderr?.on("data", (c) => { j.err += c; });
-  child.on("error", (e) => { j.err += String(e); j.running = false; j.ended = Date.now(); j.settle(); });
-  child.on("close", (code) => { j.exit = code; j.running = false; j.ended = Date.now(); j.settle(); });
+  child.stdout?.on("data", (c) => {
+    j.out += c;
+  });
+  child.stderr?.on("data", (c) => {
+    j.err += c;
+  });
+  child.on("error", (e) => {
+    j.err += String(e);
+    j.running = false;
+    j.ended = Date.now();
+    j.settle();
+  });
+  child.on("close", (code) => {
+    j.exit = code;
+    j.running = false;
+    j.ended = Date.now();
+    j.settle();
+  });
   return view(j);
 }
 
@@ -217,12 +246,21 @@ export interface HandedOff extends JobView {
  *  This is what a client timeout used to do badly. The client would give up
  *  on the CALL while the command carried on unwatched, so the work was lost
  *  to the caller but still burning the machine. */
-export async function runOrHandoff(root: string, command: string, opts: { cwd?: string; handoff_ms?: number } = {}): Promise<RunResult | HandedOff> {
+export async function runOrHandoff(
+  root: string,
+  command: string,
+  opts: { cwd?: string; handoff_ms?: number } = {},
+): Promise<RunResult | HandedOff> {
   const handoff = Math.max(1_000, opts.handoff_ms ?? DEFAULT_HANDOFF_MS);
   const start = runBackground(root, command, { cwd: opts.cwd });
   const j = jobs.get(start.job)!;
   let timer: NodeJS.Timeout | undefined;
-  await Promise.race([j.done, new Promise<void>((res) => { timer = setTimeout(res, handoff); })]);
+  await Promise.race([
+    j.done,
+    new Promise<void>((res) => {
+      timer = setTimeout(res, handoff);
+    }),
+  ]);
   if (timer !== undefined) clearTimeout(timer);
   const v = view(j);
   if (!v.running) {
@@ -251,7 +289,7 @@ export async function run(root: string, command: string, opts: { timeout_ms?: nu
   const started = Date.now();
   // cwd is root-relative; spawnShell resolves it against the ROOT.
   const r = await new Promise<{ status: number | null; stdout: string; stderr: string; error?: Error }>((resolve) => {
-    let child;
+    let child: ReturnType<typeof spawnShell> | undefined;
     try {
       child = spawnShell(root, command, opts.cwd);
     } catch (e) {
@@ -261,12 +299,22 @@ export async function run(root: string, command: string, opts: { timeout_ms?: nu
     let out = "";
     let err = "";
     let timedOut = false;
-    const timer = setTimeout(() => { timedOut = true; killTree(child.pid); }, timeout);
+    const timer = setTimeout(() => {
+      timedOut = true;
+      killTree(child.pid);
+    }, timeout);
     child.stdout?.setEncoding("utf8");
     child.stderr?.setEncoding("utf8");
-    child.stdout?.on("data", (c) => { out += c; });
-    child.stderr?.on("data", (c) => { err += c; });
-    child.on("error", (e) => { clearTimeout(timer); resolve({ status: null, stdout: out, stderr: err, error: e }); });
+    child.stdout?.on("data", (c) => {
+      out += c;
+    });
+    child.stderr?.on("data", (c) => {
+      err += c;
+    });
+    child.on("error", (e) => {
+      clearTimeout(timer);
+      resolve({ status: null, stdout: out, stderr: err, error: e });
+    });
     child.on("close", (code) => {
       clearTimeout(timer);
       const e = timedOut ? Object.assign(new Error("timed out"), { code: "ETIMEDOUT" }) : undefined;
@@ -279,7 +327,11 @@ export async function run(root: string, command: string, opts: { timeout_ms?: nu
       clause: CLAUSES.RUN_TIMEOUT,
       expected: `completion within ${timeout}ms`,
       got: `still running (killed)`,
-      remedy: { tool: "se_run", args: { command, background: true }, note: "a long command belongs in the background — start it, then ask the job how it is doing" },
+      remedy: {
+        tool: "se_run",
+        args: { command, background: true },
+        note: "a long command belongs in the background — start it, then ask the job how it is doing",
+      },
       source: "engine/run.ts",
     });
   }

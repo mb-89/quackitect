@@ -93,7 +93,9 @@ function trace(what) {
       traceFile = path.join(root, ".se", "vscode-debug.log");
     }
     appendFileSync(traceFile, new Date().toISOString().slice(11, 23) + " " + what + "\n");
-  } catch { /* a trace that throws would be worse than no trace */ }
+  } catch {
+    /* a trace that throws would be worse than no trace */
+  }
 }
 
 // THE OPENED FOLDER IS project/ (owner ruling 2026-08-02). It is the folder
@@ -319,7 +321,9 @@ async function ensureServer() {
         output.appendLine("se: mirror port " + PORT + " was occupied by another project; stopped pid(s) " + killed.join(", "));
         await new Promise((r) => setTimeout(r, 250));
       } else {
-        void vscode.window.showErrorMessage("$PRODUCT$: port " + PORT + " already serves another project (" + probe.root + ") and could not be reclaimed automatically.");
+        void vscode.window.showErrorMessage(
+          "$PRODUCT$: port " + PORT + " already serves another project (" + probe.root + ") and could not be reclaimed automatically.",
+        );
         return false;
       }
     } else {
@@ -580,7 +584,8 @@ function framePage(url) {
 const ICON = {
   help: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2"/><path d="M6.2 6.1a1.85 1.85 0 1 1 2.1 2.2v1.1" /><circle cx="8.3" cy="11.4" r=".75" fill="currentColor" stroke="none"/></svg>',
   play: '<svg viewBox="0 0 16 16"><path d="M4.2 2.6 13 8l-8.8 5.4z" fill="currentColor" stroke="none"/></svg>',
-  machine: '<svg viewBox="0 0 16 16"><circle cx="3.4" cy="8" r="1.9"/><circle cx="12.6" cy="4.2" r="1.9"/><circle cx="12.6" cy="11.8" r="1.9"/><path d="M5.2 7.3 10.8 4.9M5.2 8.7l5.6 2.4"/></svg>',
+  machine:
+    '<svg viewBox="0 0 16 16"><circle cx="3.4" cy="8" r="1.9"/><circle cx="12.6" cy="4.2" r="1.9"/><circle cx="12.6" cy="11.8" r="1.9"/><path d="M5.2 7.3 10.8 4.9M5.2 8.7l5.6 2.4"/></svg>',
   graph: '<svg viewBox="0 0 16 16"><path d="M2.2 2.4v11.2h11.6"/><path d="M4.4 11.2 7 7.1l2.4 2.3 3.6-5"/></svg>',
   book: '<svg viewBox="0 0 16 16"><path d="M2.4 3.1h3.9c.9 0 1.6.4 1.7.9.1-.5.8-.9 1.7-.9h3.9v9.3H9.7c-.9 0-1.6.4-1.7.9-.1-.5-.8-.9-1.7-.9H2.4z"/><path d="M8 4v9.3"/></svg>',
   log: '<svg viewBox="0 0 16 16"><path d="M2.6 4.2h10.8M2.6 8h10.8M2.6 11.8h6.8"/></svg>',
@@ -597,7 +602,8 @@ function cardIcon(card) {
 }
 
 // ── THE HELP ─────────────────────────────────────────────────────────────
-const systemHelp = () => `<p><b>Shell build ${escapeHtml(BUILD)}</b> — if this is older than the fix you are testing, the window was not reloaded.</p>
+const systemHelp =
+  () => `<p><b>Shell build ${escapeHtml(BUILD)}</b> — if this is older than the fix you are testing, the window was not reloaded.</p>
 <p>$PRODUCT$ walks a state machine with you. The machine says which step is in hand, what to read, and what to produce.</p>
 <p>The engine runs on this computer only. Nothing leaves it.</p>
 <p>The sidebar has three groups. Features is what you can do. Controls steers the walk. Details is this — whatever you click explains itself here.</p>
@@ -612,7 +618,8 @@ function cardHelp(card) {
 <p>The slot is held so the card numbers never shift under your hand.</p>`;
   }
   const what = {
-    machine: "The machine being walked. Each box is a state; the blue line is where the walk is aimed. Click a state to read it here. The crumbs along its top navigate between machines.",
+    machine:
+      "The machine being walked. Each box is a state; the blue line is where the walk is aimed. Click a state to read it here. The crumbs along its top navigate between machines.",
     log: "Every act in this session, newest first. Click a line to see what it changed. It opens beside the agent's terminal.",
     details: "This group. Whatever you click elsewhere explains itself here.",
   };
@@ -671,7 +678,10 @@ function setBusy(on, label) {
 
 function onWebviewMessage(m) {
   if (!m) return;
-  if (m.se === "trace") { trace("page: " + String(m.text ?? "")); return; }
+  if (m.se === "trace") {
+    trace("page: " + String(m.text ?? ""));
+    return;
+  }
   trace("webview: " + String(m.se));
   if (m.se === "open") openInEditor(m.path);
   else if (m.se === "busy") setBusy(m.on === true, String(m.label ?? ""));
@@ -822,12 +832,10 @@ async function expandDetails() {
     return;
   }
   const shot = lastDetails;
-  const panel = vscode.window.createWebviewPanel(
-    "$PRODUCT_ID$.snapshot",
-    "Details · " + shot.title,
-    vscode.ViewColumn.Active,
-    { enableScripts: true, retainContextWhenHidden: true },
-  );
+  const panel = vscode.window.createWebviewPanel("$PRODUCT_ID$.snapshot", "Details · " + shot.title, vscode.ViewColumn.Active, {
+    enableScripts: true,
+    retainContextWhenHidden: true,
+  });
   // frozen=1 is the engine's own word for it: no event stream, no refresh.
   const surface = new Surface(() => framePage(SERVER + "/widget/" + card.widget + "?embed=1&frozen=1"));
   snapshots.add(surface);
@@ -865,7 +873,10 @@ const SCALE_HELP = {
     title: "the autonomy scale",
     lead: "<p>The agent enters a step only when that step weighs no more than this. At 0 nothing moves without you.</p>",
   },
-  shutdown: { title: "the shutdown row", lead: "<p>Two buttons, either or both. Block auto-sleep holds the machine awake. Shutdown at idle shuts the machine down once the walk is parked and nothing has happened for five minutes.</p>" },
+  shutdown: {
+    title: "the shutdown row",
+    lead: "<p>Two buttons, either or both. Block auto-sleep holds the machine awake. Shutdown at idle shuts the machine down once the walk is parked and nothing has happened for five minutes.</p>",
+  },
   narration: {
     title: "the update cadence",
     lead: "<p>How often the agent owes a line about what it is doing. Whichever falls due first counts, minutes or calls. A volunteered update always pays, and always resets both.</p>",
@@ -913,7 +924,9 @@ class Strip {
     // and made every row a guess.
     const rows = this.tools()
       .map(
-        (t) => `<button class="tool" data-cmd="${escapeHtml(t.cmd)}" title="${escapeHtml(t.key === "" ? t.label : t.label + " — " + t.key)}">
+        (
+          t,
+        ) => `<button class="tool" data-cmd="${escapeHtml(t.cmd)}" title="${escapeHtml(t.key === "" ? t.label : t.label + " — " + t.key)}">
       ${t.icon}<span class="label">${escapeHtml(t.label)}</span><span class="key">${escapeHtml(t.key)}</span></button>`,
       )
       .join("");
@@ -1212,15 +1225,31 @@ class Controls {
     });
     view.webview.onDidReceiveMessage(async (m) => {
       if (!m) return;
-      if (m.se === "log-filter") { logFilter = String(m.text ?? ""); redrawLog(); return; }
-      if (m.se === "note") { await post("/note", { text: m.text, priority: m.priority }); await pollLog(); return; }
-      if (m.se === "field-help") { await showFieldHelp(m.which); return; }
-      if (m.se === "scale-help") { await showScaleHelp(m.which, m.level); return; }
+      if (m.se === "log-filter") {
+        logFilter = String(m.text ?? "");
+        redrawLog();
+        return;
+      }
+      if (m.se === "note") {
+        await post("/note", { text: m.text, priority: m.priority });
+        await pollLog();
+        return;
+      }
+      if (m.se === "field-help") {
+        await showFieldHelp(m.which);
+        return;
+      }
+      if (m.se === "scale-help") {
+        await showScaleHelp(m.which, m.level);
+        return;
+      }
       if (m.se === "autonomy") await post("/autonomy", { value: m.value });
       // THE DRUMROLL ARMED. Climb to the top rung first: the engine refuses
       // emergency below it, and the presses may have started anywhere.
-      else if (m.se === "emergency") { await post("/autonomy", { value: 1 }); await post("/emergency", { on: true }); }
-      else if (m.se === "power") await post("/power", { key: m.key, on: m.on });
+      else if (m.se === "emergency") {
+        await post("/autonomy", { value: 1 });
+        await post("/emergency", { on: true });
+      } else if (m.se === "power") await post("/power", { key: m.key, on: m.on });
       // THE CADENCE IS A PAIR. POST /narration reads {minutes, calls}, so the
       // old single value left both halves NaN.
       else if (m.se === "narration") await post("/narration", { minutes: m.minutes, calls: m.calls });
@@ -1259,6 +1288,7 @@ class Controls {
 // exactly what the link provider is handed, which the ordinal never was.
 const REF_RE = /\[🔗\]/g;
 const LINK = "[🔗]";
+// biome-ignore lint/suspicious/noControlCharactersInRegex: strips real ANSI escapes from terminal output
 const PLAIN = (s) => s.replace(/\[[0-9;]*m/g, "").trimEnd();
 const logRefs = new Map();
 const DIM = (s) => "[2m" + s + "[0m";
@@ -1350,7 +1380,7 @@ function makeLogTerminal(parent) {
       open: () => {
         // The first paint draws everything; every poll after it only appends.
         logSeen.clear();
-              void api("/api/log").then((b) => {
+        void api("/api/log").then((b) => {
           if (b !== null && Array.isArray(b.rows)) logRows = b.rows;
           redrawLog();
         });
@@ -1359,7 +1389,9 @@ function makeLogTerminal(parent) {
         logEmitter = null;
         logTerm = null;
       },
-      handleInput: () => { /* the feed is read-only — the note box is in Controls */ },
+      handleInput: () => {
+        /* the feed is read-only — the note box is in Controls */
+      },
     },
   };
   // Split beside the agent when WE started it. When somebody else did — a
@@ -1597,7 +1629,6 @@ async function sendEnterOnly() {
   trace(sent > 0 ? sent + " Enter(s) went — if the kickoff still sits unsent, press it yourself" : "Enter never went — press it yourself");
 }
 
-
 /**
  * NAME THE SESSION IN ITS FIRST LINE.
  *
@@ -1647,7 +1678,9 @@ function agentLaunch(root) {
  */
 async function startAgent() {
   if (agentStarting) {
-    void vscode.window.showInformationMessage("$PRODUCT$: agent is already starting — check '$PRODUCT$ agent' and '$PRODUCT$ log' terminals.");
+    void vscode.window.showInformationMessage(
+      "$PRODUCT$: agent is already starting — check '$PRODUCT$ agent' and '$PRODUCT$ log' terminals.",
+    );
     return;
   }
   agentStarting = true;
@@ -1704,7 +1737,10 @@ async function startAgent() {
       },
     );
     if (ok) {
-      void vscode.window.setStatusBarMessage("$PRODUCT$: agent started — Claude runs the kickoff itself; Copilot runs in Chat; logs are in '$PRODUCT$ log'.", 5000);
+      void vscode.window.setStatusBarMessage(
+        "$PRODUCT$: agent started — Claude runs the kickoff itself; Copilot runs in Chat; logs are in '$PRODUCT$ log'.",
+        5000,
+      );
     }
   } finally {
     agentStarting = false;
@@ -1752,7 +1788,9 @@ function withHelp(cmd, run) {
 function activate(context) {
   try {
     BUILD = new Date(statSync(__filename).mtime).toISOString().slice(0, 16).replace("T", " ");
-  } catch { /* an unknown build is still better than a wrong one */ }
+  } catch {
+    /* an unknown build is still better than a wrong one */
+  }
   trace("ACTIVATE build=" + BUILD);
   output = vscode.window.createOutputChannel("$PRODUCT$ Engine");
   strip = new Strip();
@@ -1773,7 +1811,8 @@ function activate(context) {
         let m = REF_RE.exec(ctx.line);
         while (m !== null) {
           const ref = logRefs.get(PLAIN(ctx.line));
-          if (ref !== undefined && ref !== "") out.push({ startIndex: m.index, length: m[0].length, tooltip: "show this act in Details", ref });
+          if (ref !== undefined && ref !== "")
+            out.push({ startIndex: m.index, length: m[0].length, tooltip: "show this act in Details", ref });
           m = REF_RE.exec(ctx.line);
         }
         trace("links asked line=" + JSON.stringify(ctx.line.slice(0, 50)) + " gave=" + out.length + " known=" + logRefs.size);
@@ -1810,7 +1849,11 @@ function activate(context) {
       for (const s of snapshots) s.theme();
       for (const w of windows.values()) w.theme();
     }),
-    { dispose: () => { if (poller !== null) clearInterval(poller); } },
+    {
+      dispose: () => {
+        if (poller !== null) clearInterval(poller);
+      },
+    },
   );
   for (let n = 1; n <= SLOTS; n++) {
     context.subscriptions.push(

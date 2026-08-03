@@ -15,7 +15,9 @@ import { readVault } from "../engine/tables.ts";
 const REPO_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 const WHERE = "a-note.md";
 
-const NOTE = ["---", "id: one", "depends_on:", "  - a", "  - b", "count: 3", "open: true", "---", "", "# A note", "", "body text", ""].join("\n");
+const NOTE = ["---", "id: one", "depends_on:", "  - a", "  - b", "count: 3", "open: true", "---", "", "# A note", "", "body text", ""].join(
+  "\n",
+);
 
 function refusal(fn: () => unknown): Rejection {
   try {
@@ -83,7 +85,10 @@ describe("writing a key", { concurrency: true }, () => {
     const long = "x".repeat(400);
     const out = setKeys(NOTE, { statement: long }, WHERE);
     assert.equal(readKeys(out, WHERE).statement, long);
-    assert.ok(out.split("\n").some((l) => l.includes(long)), "the value stays on one line");
+    assert.ok(
+      out.split("\n").some((l) => l.includes(long)),
+      "the value stays on one line",
+    );
   });
 
   test("a note's own line ending is not changed under it", () => {

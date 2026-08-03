@@ -13,7 +13,9 @@ const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 test("the card order in the product's table is the numbering", () => {
   const cards = loadCards(ROOT);
   assert.ok(cards.length >= 2, "the product declares cards");
-  cards.forEach((c, i) => assert.equal(c.n, i + 1, "row order numbers the card"));
+  cards.forEach((c, i) => {
+    assert.equal(c.n, i + 1, "row order numbers the card");
+  });
   assert.equal(cards[0].title, "chat", "chat is card one");
   assert.equal(cards[0].widget, "terminal", "and it shows the terminal");
 });
@@ -29,7 +31,11 @@ test("a card that is not built keeps its number", () => {
   }
   // The numbers must be a gapless run — a dropped placeholder would show up
   // here as a hole, which is exactly the renumbering we forbid.
-  assert.deepEqual(cards.map((c) => c.n), cards.map((_, i) => i + 1), "no card is skipped");
+  assert.deepEqual(
+    cards.map((c) => c.n),
+    cards.map((_, i) => i + 1),
+    "no card is skipped",
+  );
 });
 
 // A missing config must not break another product that never wrote one.

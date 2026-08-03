@@ -1,8 +1,22 @@
 // Test scaffolding: a fresh temp project root carrying the REAL boot
 // machine (copied from this repo), so buildServer() compiles the same
 // drawing the shipped server does.
-import { chmodSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
+
 import { spawnSync } from "node:child_process";
+import {
+  chmodSync,
+  cpSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  renameSync,
+  rmSync,
+  statSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join, sep } from "node:path";
@@ -67,7 +81,12 @@ const BORROWED = [join("project", "deliverable", "engine")];
 // A test root should look like a real product, or the checks it runs are
 // checking something else. brand.json and palette.css are what a product IS
 // configured by, and preflight now demands both.
-const COPIED = [join("project", "deliverable", "machines"), "project/guidance".replace("/", sep), join("project", "brand", "brand.json"), join("project", "brand", "palette.css")];
+const COPIED = [
+  join("project", "deliverable", "machines"),
+  "project/guidance".replace("/", sep),
+  join("project", "brand", "brand.json"),
+  join("project", "brand", "palette.css"),
+];
 // A linked engine resolves its imports from where it REALLY lives, which
 // is the template — so the yaml package has to sit above it THERE. Copied
 // into the template once, instead of into every case.
@@ -198,10 +217,7 @@ export async function call(server: Server, name: string, args: Record<string, un
  *
  *  AGENTS.md, then the contract, the walk and the voice LEFT THIS LIST when
  *  they were promoted. */
-export const READ_DOCS = [
-  "project/guidance/software.md",
-  "project/guidance/ux.md",
-] as const;
+export const READ_DOCS = ["project/guidance/software.md", "project/guidance/ux.md"] as const;
 
 /** The human's side of the read proof: check every boot doc in the mirror.
  *  (The agent's side has no helper on purpose — its proofs are earned by

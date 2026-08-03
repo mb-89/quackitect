@@ -3,13 +3,12 @@
 // its tail comes back. Checkboxes stay the person's — one check per doc
 // VERSION. An edited doc unchecks itself and drops the agent's credit alike.
 import { strict as assert } from "node:assert";
-import { appendFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { renderMirror } from "../engine/render.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { readFileSync } from "node:fs";
 import { bootedServer, call, checkDocs, freshRoot, READ_DOCS, readOne } from "./helpers.ts";
 
 // THREE HOMES, NOT ONE (owner ruling 2026-07-29). voice.md is about HOW YOU
@@ -53,16 +52,22 @@ test("the guidance splits three ways, and every home reaches the reader", () => 
 test("a check pins the VERSION: editing the doc unchecks it and the gate asks again", async () => {
   const root = freshRoot();
   const s = new Session(root);
-  await s.advance(); await s.advance();
+  await s.advance();
+  await s.advance();
   checkDocs(s);
-  await s.advance(); await s.advance(); await s.advance();
+  await s.advance();
+  await s.advance();
+  await s.advance();
   assert.deepEqual(s.active(), ["idle"]);
   const idle = s.machine.states.find((x) => x.id === "expeditions")!;
   assert.equal(s.entryReadyHuman(s.machine, idle), true, "all pulled docs checked — entry ready");
   // The owner edits software.md mid-session: the pinned hash no longer matches.
   appendFileSync(join(root, "project", "guidance", "software.md"), "\nEdited mid-session.\n");
   assert.equal(s.entryReadyHuman(s.machine, idle), false, "the edited doc unchecked itself");
-  await assert.rejects(() => s.advance("expeditions"), (e) => (e as { clause?: string }).clause === "SE-C-112");
+  await assert.rejects(
+    () => s.advance("expeditions"),
+    (e) => (e as { clause?: string }).clause === "SE-C-112",
+  );
   // One fresh check of the NEW version and the walk flows again.
   s.humanCheck("project/guidance/software.md");
   await s.advance("expeditions");
@@ -185,7 +190,8 @@ test("the reading buffer is per session: a second session earns it afresh", asyn
 test("the mirror renders per-doc checkboxes and never locks reading itself", async () => {
   const root = freshRoot();
   const s = new Session(root);
-  await s.advance(); await s.advance(); // at boot/read_contract
+  await s.advance();
+  await s.advance(); // at boot/read_contract
   const html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });
   assert.ok(html.includes("docheck"), "checkboxes are served");
   assert.ok(!html.includes('class="primary confirm"'), "the old one-click confirm is gone");
@@ -208,7 +214,8 @@ test("the pill turns green from the machine: the agent's reading records its pro
   const server = buildServer(root, session);
   // Stand INSIDE boot so read_contract is peekable — the mirror peeks the
   // machine on screen, and that is boot while the walk is in it.
-  await session.advance(); await session.advance();
+  await session.advance();
+  await session.advance();
   const beforeState = session.stateInfo("read_contract") as { exit: { read_consume: { met: boolean } } };
   assert.equal(beforeState.exit.read_consume.met, false, "the handover is owed and unread");
   for (let j = 0; j < 40; j++) {
@@ -230,7 +237,8 @@ test("THE HANDOVER RULE: the human walks boot on checkboxes, raises the slider �
   session.setAutonomy(0); // manual start
   const server = buildServer(root, session);
   // The human drives: checks the boot docs, walks through read_contract.
-  await session.advance(); await session.advance();
+  await session.advance();
+  await session.advance();
   checkDocs(session);
   await session.advance();
   assert.deepEqual(session.active(), ["boot/prepare_idle"]);

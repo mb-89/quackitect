@@ -36,71 +36,69 @@ async function toolResult(res: Response): Promise<Record<string, unknown>> {
 
 // Concurrent: every case listens on its own ephemeral port and root.
 describe("mcp over http", { concurrency: true }, () => {
+  test("initialize and tools/list answer plain POSTs", async () => {
+    const { mirror, port } = await listening();
+    try {
+      const init = await rpc(port, { jsonrpc: "2.0", id: 1, method: "initialize", params: {} });
+      assert.equal(init.status, 200);
+      const initBody = (await init.json()) as { result: { protocolVersion: string } };
+      assert.ok(initBody.result.protocolVersion, "initialize answers with a protocol version");
+      const list = await rpc(port, { jsonrpc: "2.0", id: 2, method: "tools/list" });
+      const tools = ((await list.json()) as { result: { tools: { name: string }[] } }).result.tools.map((t) => t.name);
+      assert.ok(tools.includes("se_pull"), `the lane's tools ride the transport: ${tools.join(", ")}`);
+    } finally {
+      mirror.close();
+    }
+  });
 
-test("initialize and tools/list answer plain POSTs", async () => {
-  const { mirror, port } = await listening();
-  try {
-    const init = await rpc(port, { jsonrpc: "2.0", id: 1, method: "initialize", params: {} });
-    assert.equal(init.status, 200);
-    const initBody = (await init.json()) as { result: { protocolVersion: string } };
-    assert.ok(initBody.result.protocolVersion, "initialize answers with a protocol version");
-    const list = await rpc(port, { jsonrpc: "2.0", id: 2, method: "tools/list" });
-    const tools = ((await list.json()) as { result: { tools: { name: string }[] } }).result.tools.map((t) => t.name);
-    assert.ok(tools.includes("se_pull"), `the lane's tools ride the transport: ${tools.join(", ")}`);
-  } finally {
-    mirror.close();
-  }
-});
+  test("a tools/call over HTTP asks the SAME walk the process holds", async () => {
+    const { session, mirror, port } = await listening();
+    try {
+      const r = await rpc(port, {
+        jsonrpc: "2.0",
+        id: 3,
+        method: "tools/call",
+        params: { name: "se_pull", arguments: {} },
+      });
+      const packet = await toolResult(r);
+      assert.equal(packet.pull, "read", JSON.stringify(packet));
+      assert.deepEqual(packet.where, ["start"]);
+      assert.deepEqual(session.active(), ["start"], "one walk, not a private engine — the same session answered");
+    } finally {
+      mirror.close();
+    }
+  });
 
-test("a tools/call over HTTP asks the SAME walk the process holds", async () => {
-  const { session, mirror, port } = await listening();
-  try {
-    const r = await rpc(port, {
-      jsonrpc: "2.0",
-      id: 3,
-      method: "tools/call",
-      params: { name: "se_pull", arguments: {} },
-    });
-    const packet = await toolResult(r);
-    assert.equal(packet.pull, "read", JSON.stringify(packet));
-    assert.deepEqual(packet.where, ["start"]);
-    assert.deepEqual(session.active(), ["start"], "one walk, not a private engine — the same session answered");
-  } finally {
-    mirror.close();
-  }
-});
+  test("a notification is accepted with 202 and no body", async () => {
+    const { mirror, port } = await listening();
+    try {
+      const r = await rpc(port, { jsonrpc: "2.0", method: "notifications/initialized" });
+      assert.equal(r.status, 202);
+      assert.equal(await r.text(), "");
+    } finally {
+      mirror.close();
+    }
+  });
 
-test("a notification is accepted with 202 and no body", async () => {
-  const { mirror, port } = await listening();
-  try {
-    const r = await rpc(port, { jsonrpc: "2.0", method: "notifications/initialized" });
-    assert.equal(r.status, 202);
-    assert.equal(await r.text(), "");
-  } finally {
-    mirror.close();
-  }
-});
+  test("rubbish answers 400 with a JSON-RPC parse error", async () => {
+    const { mirror, port } = await listening();
+    try {
+      const r = await rpc(port, "this is not json");
+      assert.equal(r.status, 400);
+      const body = (await r.json()) as { error: { code: number } };
+      assert.equal(body.error.code, -32700);
+    } finally {
+      mirror.close();
+    }
+  });
 
-test("rubbish answers 400 with a JSON-RPC parse error", async () => {
-  const { mirror, port } = await listening();
-  try {
-    const r = await rpc(port, "this is not json");
-    assert.equal(r.status, 400);
-    const body = (await r.json()) as { error: { code: number } };
-    assert.equal(body.error.code, -32700);
-  } finally {
-    mirror.close();
-  }
-});
-
-test("GET is 405 — the optional push stream is not served; POST carries everything", async () => {
-  const { mirror, port } = await listening();
-  try {
-    const r = await fetch(`http://localhost:${port}/mcp`);
-    assert.equal(r.status, 405);
-  } finally {
-    mirror.close();
-  }
-});
-
+  test("GET is 405 — the optional push stream is not served; POST carries everything", async () => {
+    const { mirror, port } = await listening();
+    try {
+      const r = await fetch(`http://localhost:${port}/mcp`);
+      assert.equal(r.status, 405);
+    } finally {
+      mirror.close();
+    }
+  });
 });

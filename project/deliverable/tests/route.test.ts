@@ -19,7 +19,11 @@ test("the search finds the FEWEST hops, and says so when there is no way", () =>
   const g = graph({ a: ["b", "c"], b: ["d"], c: ["d"], d: ["e"], e: [], island: [] });
   const r = computeRoute("a", "e", g);
   assert.equal(r.found, true);
-  assert.deepEqual(r.steps.map((s) => s.to), ["b", "d", "e"], "three hops, not four - the first way found is the shortest");
+  assert.deepEqual(
+    r.steps.map((s) => s.to),
+    ["b", "d", "e"],
+    "three hops, not four - the first way found is the shortest",
+  );
   assert.deepEqual(computeRoute("a", "a", g).steps, [], "standing on the target is a route of no hops");
   const none = computeRoute("a", "island", g);
   assert.equal(none.found, false);
@@ -46,14 +50,10 @@ test("the blue line: from a cold start to the front desk, every hop named", () =
   // Two of these moves are drawn NOWHERE and are the reason the route needs
   // its own model: entering boot lands on the submachine's start, and
   // reaching its end pops back out to the parent's next state.
-  assert.deepEqual(r.steps.map((h) => h.to), [
-    "boot/start",
-    "boot/read_contract",
-    "boot/prepare_idle",
-    "boot/end",
-    "idle",
-    "front_desk",
-  ]);
+  assert.deepEqual(
+    r.steps.map((h) => h.to),
+    ["boot/start", "boot/read_contract", "boot/prepare_idle", "boot/end", "idle", "front_desk"],
+  );
   assert.deepEqual(r.steps[0].tick, { from: "start", to: "boot" }, "each hop carries the exact tick that performs it");
   assert.deepEqual(r.steps[4].tick, { from: "boot/end", advance: true }, "popping out of a submachine is an advance");
   assert.equal(r.steps[5].priority, 0.2, "and every hop carries the weight of ENTERING it");
@@ -153,7 +153,11 @@ test("the drawing carries the route: a spline OVER the nodes, its stops, an arro
   // Count the ELEMENTS, not every mention — the stylesheet names the class too.
   assert.equal(html.split('class="route-stop"').length - 1, 2);
   assert.equal(html.split("route-here").length - 1, 2, "an arrow says where you are");
-  assert.match(html, /class="route-here" transform="translate\(-?[\d.]+ -?[\d.]+\) rotate\(-?[\d.]+\)"/, "and it faces the way the line goes");
+  assert.match(
+    html,
+    /class="route-here" transform="translate\(-?[\d.]+ -?[\d.]+\) rotate\(-?[\d.]+\)"/,
+    "and it faces the way the line goes",
+  );
 
   // Blue, because the voice keeps green, red and yellow for verdicts.
   assert.match(html, /\.route-line \{ fill: none; stroke: var\(--se-walk\)/);

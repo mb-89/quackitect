@@ -7,22 +7,31 @@
 // compiled graph made idle an AND-join and completing boot dropped the only
 // token into nowhere.
 import { strict as assert } from "node:assert";
-import { readFileSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { spawnSync } from "node:child_process";
-import { mkdirSync } from "node:fs";
-import { activeStates, completeState, type EdgeDecl, type MachineDecl, type MachineInstance, type StateDecl } from "../engine/machine.ts";
-import { expClose, expNew, readRecord } from "../engine/worktree.ts";
 import { generateContinueExpedition } from "../engine/expmachine.ts";
+import { activeStates, completeState, type EdgeDecl, type MachineDecl, type MachineInstance, type StateDecl } from "../engine/machine.ts";
 import { compileMachine } from "../engine/machines/compile.ts";
 import { parseStateNote } from "../engine/notes.ts";
-import { Session, mainMachinePath } from "../engine/session.ts";
+import { mainMachinePath, Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
+import { expClose, expNew, readRecord } from "../engine/worktree.ts";
 import { call, checkDocs, freshRoot, pullBoot } from "./helpers.ts";
 
-interface RawEdge { id: string; styleAttributes?: Record<string, unknown>; fromNode: string; fromSide?: string; toNode: string; toSide?: string }
-interface RawCanvas { nodes: { type: string; file?: string }[]; edges: RawEdge[] }
+interface RawEdge {
+  id: string;
+  styleAttributes?: Record<string, unknown>;
+  fromNode: string;
+  fromSide?: string;
+  toNode: string;
+  toSide?: string;
+}
+interface RawCanvas {
+  nodes: { type: string; file?: string }[];
+  edges: RawEdge[];
+}
 
 test("the drawing is data: a state note edited on disk binds the next call, no reload", async () => {
   const root = freshRoot();
@@ -76,7 +85,14 @@ function redrawLikeObsidian(root: string): string {
   for (const e of canvas.edges) {
     if (e.id === "e-ideation-idle" || e.id === "e-front_desk-idle") e.styleAttributes = {};
   }
-  canvas.edges.push({ id: "dup-ideation-idle", styleAttributes: {}, fromNode: "n-ideation", fromSide: "left", toNode: "n-idle", toSide: "right" });
+  canvas.edges.push({
+    id: "dup-ideation-idle",
+    styleAttributes: {},
+    fromNode: "n-ideation",
+    fromSide: "left",
+    toNode: "n-idle",
+    toSide: "right",
+  });
   writeFileSync(p, JSON.stringify(canvas));
   return p;
 }
@@ -138,20 +154,40 @@ test("a drawn JOIN synchronizes: a starving join refuses the tick, the walk stan
 });
 
 test("plain fan-in is an OR; only a drawn join is the AND", () => {
-  const st = (id: string, kind: StateDecl["kind"], edges: EdgeDecl[]): StateDecl => ({ id, kind, statement: "", guidance: "g", evidence_form: [], priority: 0.01, edges });
+  const st = (id: string, kind: StateDecl["kind"], edges: EdgeDecl[]): StateDecl => ({
+    id,
+    kind,
+    statement: "",
+    guidance: "g",
+    evidence_form: [],
+    priority: 0.01,
+    edges,
+  });
   const mk = (mergeKind: StateDecl["kind"]): MachineDecl => ({
     id: "t",
     reentry: "restart",
     initial: "s",
     states: [
-      st("s", "start", [{ to: "a", role: "normal" }, { to: "b", role: "normal" }]),
+      st("s", "start", [
+        { to: "a", role: "normal" },
+        { to: "b", role: "normal" },
+      ]),
       st("a", "work", [{ to: "m", role: "normal" }]),
       st("b", "work", [{ to: "m", role: "normal" }]),
       st("m", mergeKind, [{ to: "end", role: "normal" }]),
       st("end", "end", []),
     ],
   });
-  const fresh = (): MachineInstance => ({ machine: "t", iteration: "x", current: "a", active: ["a", "b"], counters: {}, history: [], escapes: [], status: "open" });
+  const fresh = (): MachineInstance => ({
+    machine: "t",
+    iteration: "x",
+    current: "a",
+    active: ["a", "b"],
+    counters: {},
+    history: [],
+    escapes: [],
+    status: "open",
+  });
   const or = mk("work");
   const oi = fresh();
   completeState(or, oi, "a", "filled", "t0");
@@ -220,7 +256,10 @@ test("the close is atomic: a conflicting merge aborts and refuses typed, the roo
   g("commit", "-q", "-m", "trunk edit");
   writeFileSync(join(e.path, "clash.md"), "branch side\n");
   mkdirSync(join(e.path, "project", "spec", "expeditions", e.id), { recursive: true });
-  writeFileSync(join(e.path, "project", "spec", "expeditions", e.id, "report.md"), "---\nform: expedition-leave\nstatus: done\nby: human\n---\n\nprobe report\n");
+  writeFileSync(
+    join(e.path, "project", "spec", "expeditions", e.id, "report.md"),
+    "---\nform: expedition-leave\nstatus: done\nby: human\n---\n\nprobe report\n",
+  );
   assert.throws(
     () => expClose(root, e, true),
     (err) => (err as { clause?: string }).clause === "SE-C-112" && /clash\.md/.test(String((err as { got?: string }).got)),
@@ -252,18 +291,25 @@ test("closing on an unconfirmed report is refused, and the override is recorded"
   g("commit", "-q", "-m", "base");
   const report = (e: { path: string; id: string }, by: string): void => {
     mkdirSync(join(e.path, "project", "spec", "expeditions", e.id), { recursive: true });
-    writeFileSync(join(e.path, "project", "spec", "expeditions", e.id, "report.md"), `---\nform: expedition-leave\nstatus: done\nby: ${by}\n---\n\nprobe report\n`);
+    writeFileSync(
+      join(e.path, "project", "spec", "expeditions", e.id, "report.md"),
+      `---\nform: expedition-leave\nstatus: done\nby: ${by}\n---\n\nprobe report\n`,
+    );
   };
 
   // The agent finished its own report. No person ever confirmed it.
   const a = expNew(root, "fix", "unconfirmed probe");
   report(a, "agent");
-  assert.throws(() => expClose(root, a, true), (err: unknown) => {
-    const r = err as { clause?: string; got?: string };
-    assert.equal(typeof r.clause, "string", "a typed refusal, not a bare crash");
-    assert.match(String(r.got), /finished by the agent/);
-    return true;
-  }, "an agent-finished report cannot close silently");
+  assert.throws(
+    () => expClose(root, a, true),
+    (err: unknown) => {
+      const r = err as { clause?: string; got?: string };
+      assert.equal(typeof r.clause, "string", "a typed refusal, not a bare crash");
+      assert.match(String(r.got), /finished by the agent/);
+      return true;
+    },
+    "an agent-finished report cannot close silently",
+  );
 
   // The same close goes through WITH the override, and the record says so.
   // THE OVERRIDE IS FREE PROSE, so it carries colons and quotes. Unquoted,
@@ -274,7 +320,11 @@ test("closing on an unconfirmed report is refused, and the override is recorded"
   const out = expClose(root, a, true, authority);
   assert.equal(out.merged, true, "the override lets the legitimate close through");
   assert.match(String(out.override), /run the whole expedition without me/);
-  const rec = spawnSync("git", ["show", `${a.branch}:project/spec/expeditions/${a.id}/record.md`], { cwd: root, encoding: "utf8", windowsHide: true }).stdout;
+  const rec = spawnSync("git", ["show", `${a.branch}:project/spec/expeditions/${a.id}/record.md`], {
+    cwd: root,
+    encoding: "utf8",
+    windowsHide: true,
+  }).stdout;
   const fm = parseStateNote(rec).frontmatter;
   assert.equal(fm.report_override, authority, "the record PARSES, and gives the authority back verbatim");
   assert.equal(fm.status, "closed", "and the fields after it survived too");
@@ -302,7 +352,14 @@ test("a record that will not parse is marked, and the container still stands", (
   const bad = expNew(root, "fix", "the broken one");
   const rec = join(bad.path, "project", "spec", "expeditions", bad.id, "record.md");
   // Exactly the shape that broke it: free prose carrying a colon and a space.
-  writeFileSync(rec, readFileSync(rec, "utf8").replace(/^status: open$/m, "status: open\nnote_from_a_person: the owner, in chat, 2026-07-29: run it without me"), "utf8");
+  writeFileSync(
+    rec,
+    readFileSync(rec, "utf8").replace(
+      /^status: open$/m,
+      "status: open\nnote_from_a_person: the owner, in chat, 2026-07-29: run it without me",
+    ),
+    "utf8",
+  );
   const fm = readRecord(root, bad);
   assert.equal(typeof fm?.unreadable, "string", "it comes back MARKED, not thrown and not empty");
   assert.match(String(fm?.unreadable), /does not parse/);
@@ -334,7 +391,10 @@ test("the close COMMITS the trunk's strays rather than refusing, and says which"
   g("commit", "-q", "-m", "ignore machine-local paths");
   const e = expNew(root, "fix", "dirty trunk probe");
   mkdirSync(join(e.path, "project", "spec", "expeditions", e.id), { recursive: true });
-  writeFileSync(join(e.path, "project", "spec", "expeditions", e.id, "report.md"), "---\nform: expedition-leave\nstatus: done\nby: human\n---\n\nprobe report\n");
+  writeFileSync(
+    join(e.path, "project", "spec", "expeditions", e.id, "report.md"),
+    "---\nform: expedition-leave\nstatus: done\nby: human\n---\n\nprobe report\n",
+  );
   // A TRACKED file, modified and left uncommitted on trunk.
   writeFileSync(join(root, "README.md"), "# tracked\n");
   g("add", "-A");
@@ -346,7 +406,11 @@ test("the close COMMITS the trunk's strays rather than refusing, and says which"
   // Trunk stands CLEAN afterwards. That is not tidiness: a worktree branches
   // from the last commit, so a dirty trunk is exactly when the tree the lane
   // serves and the tree the read-proof hashes drift apart.
-  const left = spawnSync("git", ["status", "--porcelain", "--untracked-files=no"], { cwd: root, encoding: "utf8", windowsHide: true }).stdout;
+  const left = spawnSync("git", ["status", "--porcelain", "--untracked-files=no"], {
+    cwd: root,
+    encoding: "utf8",
+    windowsHide: true,
+  }).stdout;
   assert.equal(left.trim(), "", "nothing tracked is left uncommitted");
   // The work landed in HISTORY, where it is findable - not in a stash.
   const log = spawnSync("git", ["log", "--oneline", "-6"], { cwd: root, encoding: "utf8", windowsHide: true }).stdout;
@@ -377,7 +441,10 @@ test("a broken sub-canvas refuses typed at entry; fixing it heals on the next ti
   // exact canvas error, with the offending element named. (The human's
   // read gate stands before it, so the boxes are checked first.)
   checkDocs(session);
-  await assert.rejects(() => session.advance("ideation"), (e) => (e as { clause?: string }).clause === "SE-C-124");
+  await assert.rejects(
+    () => session.advance("ideation"),
+    (e) => (e as { clause?: string }).clause === "SE-C-124",
+  );
   // Fix the drawing; the next pull draws the way again and walks in.
   writeFileSync(p, original);
   const healed = await call(server, "se_pull", {});

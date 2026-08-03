@@ -12,10 +12,10 @@ import { spawnSync } from "node:child_process";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { freshRoot, readEverything } from "../../tests/helpers.ts";
 import { compileMachineCached } from "../machines/compile.ts";
 import { mainMachinePath, Session } from "../session.ts";
 import { expList } from "../worktree.ts";
-import { freshRoot, readEverything } from "../../tests/helpers.ts";
 
 const ms = (): number => Number(process.hrtime.bigint() / 1000000n);
 

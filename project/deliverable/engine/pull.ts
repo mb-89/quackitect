@@ -10,12 +10,12 @@
 // A PROMOTED source (PROMPT_SOURCES) is never pulled: the prompt layer
 // carries it on every turn, and it must not also ride the wire.
 // Pulling is VISIBILITY — it never gates; only conditions gate.
-import { existsSync, readdirSync, readFileSync, watch, type FSWatcher } from "node:fs";
+import { existsSync, type FSWatcher, readdirSync, readFileSync, watch } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
 import { contentHash } from "./hash.ts";
+import type { MachineDecl, StateDecl } from "./machine.ts";
 import { parseStateNote } from "./notes.ts";
 import { PROMPT_SOURCES } from "./promptlayer.ts";
-import { type MachineDecl, type StateDecl } from "./machine.ts";
 
 export interface GuidanceDoc {
   /** Root-relative path, forward slashes. */
@@ -39,7 +39,10 @@ export function guidanceDir(root: string): string {
 function list(v: unknown): string[] {
   if (Array.isArray(v)) return v.map((x) => String(x).trim()).filter((x) => x !== "");
   return typeof v === "string" && v !== ""
-    ? v.split(",").map((s) => s.trim()).filter((s) => s !== "")
+    ? v
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s !== "")
     : [];
 }
 

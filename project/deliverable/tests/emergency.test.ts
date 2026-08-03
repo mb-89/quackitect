@@ -134,7 +134,10 @@ describe("the surface", () => {
   test("the top rung draws as E, red, only when armed", async () => {
     const { renderPanel, parsePanel } = await import("../engine/params.ts");
     const spec = parsePanel("## Parameters\n\n- autonomy | rungs | scale | help\n");
-    const rungs = [{ value: 0.01, abbr: "M", name: "mechanical" }, { value: 1, abbr: "I", name: "ideation" }];
+    const rungs = [
+      { value: 0.01, abbr: "M", name: "mechanical" },
+      { value: 1, abbr: "I", name: "ideation" },
+    ];
 
     const off = renderPanel(spec, { rungs, autonomy: 1, ints: {} });
     assert.match(off, />I</, "the top rung is itself");
@@ -149,7 +152,10 @@ describe("the surface", () => {
   test("only the top rung ever becomes E", async () => {
     const { renderPanel, parsePanel } = await import("../engine/params.ts");
     const spec = parsePanel("## Parameters\n\n- autonomy | rungs | scale | help\n");
-    const rungs = [{ value: 0.01, abbr: "M", name: "mechanical" }, { value: 1, abbr: "I", name: "ideation" }];
+    const rungs = [
+      { value: 0.01, abbr: "M", name: "mechanical" },
+      { value: 1, abbr: "I", name: "ideation" },
+    ];
     const on = renderPanel(spec, { rungs, autonomy: 1, emergency: true, ints: {} });
     assert.equal((on.match(/>E</g) ?? []).length, 1);
     assert.match(on, />M</, "the lower rung keeps its own letter");

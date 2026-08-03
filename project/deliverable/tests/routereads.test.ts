@@ -7,9 +7,9 @@
 // person sees what the way demands — and one multi-read of that list
 // still credits the lot, so a single lane read can carry a whole walk.
 import { strict as assert } from "node:assert";
-import { test } from "node:test";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { call, freshRoot, READ_DOCS } from "./helpers.ts";

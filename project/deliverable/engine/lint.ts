@@ -22,7 +22,13 @@ interface Cfg {
   pyramid_paragraphs: number;
 }
 
-const DEFAULTS: Cfg = { long_sentence_words: 28, wall_paragraph_lines: 8, comma_chain_items: 3, dash_chain_items: 3, pyramid_paragraphs: 5 };
+const DEFAULTS: Cfg = {
+  long_sentence_words: 28,
+  wall_paragraph_lines: 8,
+  comma_chain_items: 3,
+  dash_chain_items: 3,
+  pyramid_paragraphs: 5,
+};
 
 export const LINT_CONFIG = "project/deliverable/machines/lint/voice-lint.md";
 
@@ -54,7 +60,12 @@ export function lintProse(root: string, text: string): LintFinding[] {
   let run = 0;
   const flushWall = (): void => {
     if (run >= cfg.wall_paragraph_lines) {
-      findings.push({ rule: "wall", line: runStart + 1, excerpt: lines[runStart].slice(0, 60), hint: `${run} unbroken lines — split into paragraphs, add small headings` });
+      findings.push({
+        rule: "wall",
+        line: runStart + 1,
+        excerpt: lines[runStart].slice(0, 60),
+        hint: `${run} unbroken lines — split into paragraphs, add small headings`,
+      });
     }
     run = 0;
     runStart = -1;
@@ -76,7 +87,12 @@ export function lintProse(root: string, text: string): LintFinding[] {
     for (const s of l.split(/(?<=[.!?])\s+/)) {
       const words = s.trim().split(/\s+/).filter(Boolean).length;
       if (words > cfg.long_sentence_words) {
-        findings.push({ rule: "long-sentence", line: i + 1, excerpt: s.slice(0, 60), hint: `${words} words — one thought per sentence, split it` });
+        findings.push({
+          rule: "long-sentence",
+          line: i + 1,
+          excerpt: s.slice(0, 60),
+          hint: `${words} words — one thought per sentence, split it`,
+        });
       }
       // A SET OF LITERALS IS NOT AN UNRENDERED LIST. Naming the shapes a
       // canvas accepts (`pill`, `diamond`) or quoting example statements is
@@ -84,17 +100,28 @@ export function lintProse(root: string, text: string): LintFinding[] {
       // that is ENTIRELY a code span or a quoted string does not count.
       // Bare words still do: "alpha, beta, gamma, delta and epsilon" is the
       // list this rule exists to catch.
-      const isLiteral = (part: string): boolean => /^`[^`]*`$/.test(part.trim()) || /^"[^"]*"$/.test(part.trim()) || /^'[^']*'$/.test(part.trim());
+      const isLiteral = (part: string): boolean =>
+        /^`[^`]*`$/.test(part.trim()) || /^"[^"]*"$/.test(part.trim()) || /^'[^']*'$/.test(part.trim());
       const items = s.split(/[,;]/).filter((part) => part.trim() !== "" && !isLiteral(part));
       if (items.length > cfg.comma_chain_items) {
-        findings.push({ rule: "comma-chain", line: i + 1, excerpt: s.slice(0, 60), hint: "chained items are an unrendered list — render a list" });
+        findings.push({
+          rule: "comma-chain",
+          line: i + 1,
+          excerpt: s.slice(0, 60),
+          hint: "chained items are an unrendered list — render a list",
+        });
       }
       // DASH CHAINS, not dashes. A single dash sets off an aside and is
       // house style; a sentence hinged on several is a run-on wearing
       // punctuation. Flagging every dash would be noise, and an advisory
       // nobody heeds gets deleted rather than obeyed.
       if (s.split(/\s[—–-]\s/).length > cfg.dash_chain_items) {
-        findings.push({ rule: "dash-chain", line: i + 1, excerpt: s.slice(0, 60), hint: "clauses hinged on several dashes — write separate sentences" });
+        findings.push({
+          rule: "dash-chain",
+          line: i + 1,
+          excerpt: s.slice(0, 60),
+          hint: "clauses hinged on several dashes — write separate sentences",
+        });
       }
     }
   });
@@ -102,7 +129,12 @@ export function lintProse(root: string, text: string): LintFinding[] {
   const paragraphs = body.split(/\r?\n\s*\r?\n/).filter((p) => p.trim() !== "");
   const hasHeadings = lines.some((l) => /^#{1,6}\s/.test(l));
   if (paragraphs.length >= cfg.pyramid_paragraphs && !hasHeadings) {
-    findings.push({ rule: "pyramid", line: 1, excerpt: paragraphs[0].slice(0, 60), hint: `${paragraphs.length} paragraphs without structure — TLDR on top, headings, detail last (methods/progressive-disclosure.md)` });
+    findings.push({
+      rule: "pyramid",
+      line: 1,
+      excerpt: paragraphs[0].slice(0, 60),
+      hint: `${paragraphs.length} paragraphs without structure — TLDR on top, headings, detail last (methods/progressive-disclosure.md)`,
+    });
   }
   return findings;
 }

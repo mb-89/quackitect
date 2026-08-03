@@ -3,9 +3,10 @@
 // to it, and the CLOSE IS THE RULING (owner 2026-07-27): apply merges the
 // changes to trunk, dismiss archives the branch unmerged. The worktree IS
 // the record; the archive is git history (exp/* branches).
+
+import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { spawnSync } from "node:child_process";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { parseStateNote } from "./notes.ts";
 
@@ -32,7 +33,13 @@ function git(root: string, args: string[], what: string): string {
 }
 
 export function slug(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "work";
+  return (
+    s
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 40) || "work"
+  );
 }
 
 export interface Expedition {
@@ -166,10 +173,11 @@ export function expNew(root: string, kind: string, goal: string): Expedition {
       source: SRC,
     });
   }
-  const n = expList(root).reduce((max, e) => {
-    const m = e.id.match(/^e(\d+)-/);
-    return m ? Math.max(max, Number(m[1])) : max;
-  }, 0) + 1;
+  const n =
+    expList(root).reduce((max, e) => {
+      const m = e.id.match(/^e(\d+)-/);
+      return m ? Math.max(max, Number(m[1])) : max;
+    }, 0) + 1;
   const id = `e${n}-${kind}-${slug(goal)}`;
   const path = join(worktreesDir(root), id);
   mkdirSync(worktreesDir(root), { recursive: true });
@@ -215,7 +223,9 @@ export function expNew(root: string, kind: string, goal: string): Expedition {
 export function expFind(root: string, id: string): Expedition {
   const e = expList(root).find((x) => x.id === id);
   if (e === undefined || !e.open) {
-    const open = expList(root).filter((x) => x.open).map((x) => x.id);
+    const open = expList(root)
+      .filter((x) => x.open)
+      .map((x) => x.id);
     throw new Rejection({
       clause: CLAUSES.PATH_ESCAPE,
       expected: `an OPEN expedition: ${open.join(", ") || "(none — start one first)"}`,
@@ -230,7 +240,12 @@ export function expFind(root: string, id: string): Expedition {
 /** Close IS the ruling: apply (merge=true) merges the changes to trunk;
  *  dismiss (merge=false) archives the branch unmerged. Leftovers are
  *  committed either way; the worktree is removed. */
-export function expClose(root: string, e: Expedition, merge: boolean, override?: string): { id: string; merged: boolean; trunk_committed?: string[]; override?: string } {
+export function expClose(
+  root: string,
+  e: Expedition,
+  merge: boolean,
+  override?: string,
+): { id: string; merged: boolean; trunk_committed?: string[]; override?: string } {
   // A DIRTY TRUNK IS SETTLED FIRST (found live 2026-07-28, closing e18).
   // git merge refuses to overwrite uncommitted local changes, so the merge
   // below failed — and the abort that follows it failed too, because no merge
@@ -271,7 +286,11 @@ export function expClose(root: string, e: Expedition, merge: boolean, override?:
         clause: CLAUSES.CONDITION_UNMET,
         expected: `a report before closing: ${repRel} — what was built or found, for the retro to adjudicate`,
         got: "no report.md in the expedition record",
-        remedy: { tool: "se_file_write", args: { path: repRel, content: "<goal · what shipped or was found · open threads>", base_hash: null }, note: "write the report, then close again" },
+        remedy: {
+          tool: "se_file_write",
+          args: { path: repRel, content: "<goal · what shipped or was found · open threads>", base_hash: null },
+          note: "write the report, then close again",
+        },
         source: SRC,
       });
     }
@@ -294,7 +313,11 @@ export function expClose(root: string, e: Expedition, merge: boolean, override?:
         clause: CLAUSES.CONDITION_UNMET,
         expected: "a report a person confirmed, or a recorded override naming who lifted the guard",
         got: `the report was finished by the ${finishedBy ?? "agent"}`,
-        remedy: { tool: "se_exp_close", args: { merge, override: "<who authorised the unattended close, and where they said it>" }, note: "confirm the report in the mirror, or close with the override — it is stamped on the record and shows in the archive" },
+        remedy: {
+          tool: "se_exp_close",
+          args: { merge, override: "<who authorised the unattended close, and where they said it>" },
+          note: "confirm the report in the mirror, or close with the override — it is stamped on the record and shows in the archive",
+        },
         source: SRC,
       });
     }
@@ -305,7 +328,14 @@ export function expClose(root: string, e: Expedition, merge: boolean, override?:
     // real on e22 and took the record down with it.
     const stamped = (override ?? "").trim();
     const raw = readFileSync(recAbs, "utf8");
-    writeFileSync(recAbs, raw.replace(/^status: open$/m, `status: closed\nclosed: ${new Date().toISOString()}\nruling: ${merge ? "applied" : "dismissed"}${stamped === "" ? "" : `\nreport_override: ${yamlScalar(stamped)}`}`), "utf8");
+    writeFileSync(
+      recAbs,
+      raw.replace(
+        /^status: open$/m,
+        `status: closed\nclosed: ${new Date().toISOString()}\nruling: ${merge ? "applied" : "dismissed"}${stamped === "" ? "" : `\nreport_override: ${yamlScalar(stamped)}`}`,
+      ),
+      "utf8",
+    );
   }
   // Leftover changes are committed — a walk's work never silently vanishes.
   const dirty = git(e.path, ["status", "--porcelain"], "status").trim() !== "";
@@ -318,15 +348,27 @@ export function expClose(root: string, e: Expedition, merge: boolean, override?:
     // mid-merge with markers inside main.canvas — the server died and the
     // relaunch refused on the red canvas. The close now aborts the failed
     // merge and refuses TYPED; the root tree is never left broken.
-    const m = spawnSync("git", ["merge", "--no-ff", e.branch, "-m", `merge expedition ${e.id}`], { cwd: root, encoding: "utf8", windowsHide: true });
+    const m = spawnSync("git", ["merge", "--no-ff", e.branch, "-m", `merge expedition ${e.id}`], {
+      cwd: root,
+      encoding: "utf8",
+      windowsHide: true,
+    });
     if (m.status !== 0) {
-      const conflicts = (spawnSync("git", ["diff", "--name-only", "--diff-filter=U"], { cwd: root, encoding: "utf8", windowsHide: true }).stdout ?? "").trim().replace(/\n/g, ", ");
+      const conflicts = (
+        spawnSync("git", ["diff", "--name-only", "--diff-filter=U"], { cwd: root, encoding: "utf8", windowsHide: true }).stdout ?? ""
+      )
+        .trim()
+        .replace(/\n/g, ", ");
       const aborted = spawnSync("git", ["merge", "--abort"], { cwd: root, windowsHide: true }).status === 0;
       throw new Rejection({
         clause: CLAUSES.CONDITION_UNMET,
         expected: `the trunk merge of ${e.branch} to succeed`,
         got: `conflicts in: ${conflicts || "(unknown)"}${aborted ? " — the merge was aborted, the root tree stands clean" : " — and the abort failed too; run git merge --abort by hand"}`,
-        remedy: { tool: "se_run", args: { command: "git merge <trunk-branch> --no-edit" }, note: "absorb trunk INTO the branch first: merge it in the worktree, resolve the named files there, commit, then close again" },
+        remedy: {
+          tool: "se_run",
+          args: { command: "git merge <trunk-branch> --no-edit" },
+          note: "absorb trunk INTO the branch first: merge it in the worktree, resolve the named files there, commit, then close again",
+        },
         source: SRC,
       });
     }
@@ -342,5 +384,10 @@ export function expClose(root: string, e: Expedition, merge: boolean, override?:
   git(root, ["worktree", "remove", "--force", e.path], "worktree remove");
   // NEVER SILENT. Committing someone's uncommitted work on their behalf is a
   // kindness only if they are told it happened, and which files it took.
-  return { id: e.id, merged: merge, ...(trunkCommitted.length > 0 ? { trunk_committed: trunkCommitted } : {}), ...((override ?? "").trim() === "" ? {} : { override: (override ?? "").trim() }) };
+  return {
+    id: e.id,
+    merged: merge,
+    ...(trunkCommitted.length > 0 ? { trunk_committed: trunkCommitted } : {}),
+    ...((override ?? "").trim() === "" ? {} : { override: (override ?? "").trim() }),
+  };
 }

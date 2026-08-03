@@ -5,14 +5,15 @@
 // The state declares WHAT runs; the engine only knows HOW to run scripts.
 //
 //   node engine/bin/preflight.ts --root <project root>
+
+import { spawnSync } from "node:child_process";
 import { accessSync, constants, existsSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
-import { spawnSync } from "node:child_process";
+import type { MachineDecl } from "../machine.ts";
 import { compileMachine } from "../machines/compile.ts";
-import { rgPath } from "../search.ts";
 import { resolveInRoot, seDir } from "../paths.ts";
 import { assembleProtocol, protocolTargets, textFor } from "../promptlayer.ts";
-import { type MachineDecl } from "../machine.ts";
+import { rgPath } from "../search.ts";
 
 function argValue(flag: string): string | undefined {
   const i = process.argv.indexOf(flag);
@@ -58,7 +59,9 @@ const scanForNul = (dir: string): void => {
     }
     if (!e.name.endsWith(".ts") && !e.name.endsWith(".js")) continue;
     if (readFileSync(p).includes(0)) {
-      failures.push(`${p} carries a raw NUL byte — every lane search over this file answers nothing. Write the separator as the escape \\0.`);
+      failures.push(
+        `${p} carries a raw NUL byte — every lane search over this file answers nothing. Write the separator as the escape \\0.`,
+      );
     }
   }
 };
@@ -76,7 +79,10 @@ try {
     if (!existsSync(t.path)) {
       // AGENTS.md is the door every host reads. The other two are per-host
       // conveniences, and a host that is not installed leaves none behind.
-      if (t.path.endsWith("AGENTS.md")) failures.push(`${t.path} is MISSING — the prompt layer was never placed, so nothing carries the contract. Run engine/bin/place-prompt-layer.ts.`);
+      if (t.path.endsWith("AGENTS.md"))
+        failures.push(
+          `${t.path} is MISSING — the prompt layer was never placed, so nothing carries the contract. Run engine/bin/place-prompt-layer.ts.`,
+        );
       continue;
     }
     if (readFileSync(t.path, "utf8") !== textFor(t, projection)) {
@@ -123,6 +129,11 @@ try {
   failures.push(String((e as Error).message));
 }
 if (spawnSync("git", ["--version"], { stdio: "ignore" }).status !== 0) failures.push("git does not answer — it is a hard dependency");
+// THE PRE-COMMIT HOOK RIDES THE REPO, but core.hooksPath is per-clone — so
+// every preflight re-points it. Idempotent, ~50ms, and no clone can forget.
+if (existsSync(join(root, "project", "deliverable", "hooks", "pre-commit"))) {
+  spawnSync("git", ["config", "core.hooksPath", "project/deliverable/hooks"], { cwd: root, stdio: "ignore" });
+}
 // THE SHELL IS NOT COVERED BY THE SUITE. Nothing imports extension.js, so a
 // syntax error in it ships GREEN and VS Code then loads no extension at all,
 // silently. That happened on 2026-07-30: a backtick inside a comment ended
@@ -136,7 +147,10 @@ const shell = join(root, "project", "deliverable", "vscode", "extension.js");
 if (existsSync(shell)) {
   const parsed = spawnSync(process.execPath, ["--check", shell], { encoding: "utf8" });
   if (parsed.status !== 0) {
-    const line = String(parsed.stderr ?? "").split("\n").map((l) => l.trim()).find((l) => l.includes("Error"));
+    const line = String(parsed.stderr ?? "")
+      .split("\n")
+      .map((l) => l.trim())
+      .find((l) => l.includes("Error"));
     failures.push(`the VS Code shell does not parse: ${line ?? "run node --check on it"}`);
   } else {
     const source = readFileSync(shell, "utf8");

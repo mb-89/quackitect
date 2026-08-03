@@ -84,13 +84,17 @@ export class Toll {
     }
     throw new Rejection({
       clause: CLAUSES.TOLL_DUE,
-      expected: budget.calls > 0
-        ? `an update within ${this.minutes(budget.ms)} min or ${budget.calls} calls of the last`
-        : `an update within ${this.minutes(budget.ms)} min of the last`,
+      expected:
+        budget.calls > 0
+          ? `an update within ${this.minutes(budget.ms)} min or ${budget.calls} calls of the last`
+          : `an update within ${this.minutes(budget.ms)} min of the last`,
       got: `${since}, warning ignored`,
       remedy: {
         tool,
-        args: { ...args, update: { op: "update", node: "<the open node you are on — or omit>", brief: "<one line: what you are doing right now>" } },
+        args: {
+          ...args,
+          update: { op: "update", node: "<the open node you are on — or omit>", brief: "<one line: what you are doing right now>" },
+        },
         note: "pay by resending THIS call with the update field — any op pays: plan {items}, fork {brief}, done|obsolete|revert {node, brief}, note {brief}. A volunteered update is never stopped.",
       },
       source: "engine/toll.ts check",

@@ -12,17 +12,20 @@
 //
 // A hook must never break the turn, so every failure is swallowed and the
 // exit is always clean.
+
+import { randomBytes } from "node:crypto";
 import { appendFileSync, mkdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { randomBytes } from "node:crypto";
 
 // bin -> engine -> deliverable -> product -> the project root.
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..");
 
 let raw = "";
 process.stdin.setEncoding("utf8");
-process.stdin.on("data", (c: string) => { raw += c; });
+process.stdin.on("data", (c: string) => {
+  raw += c;
+});
 process.stdin.on("end", () => {
   try {
     const payload = JSON.parse(raw || "{}") as { tool_name?: string; tool_input?: { query?: unknown } };
@@ -45,6 +48,8 @@ process.stdin.on("end", () => {
         "utf8",
       );
     }
-  } catch { /* a hook must never break the turn */ }
+  } catch {
+    /* a hook must never break the turn */
+  }
   process.exit(0);
 });

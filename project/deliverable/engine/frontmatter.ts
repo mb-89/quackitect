@@ -113,7 +113,7 @@ export function setKeys(raw: string, patch: Record<string, unknown>, where: stri
   // silently lost it reads as a different KIND of file to every reader here.
   const printed = Object.keys(data).length === 0 ? "" : stringify(data, PRINT).replace(/\n+$/, "");
   const head = printed === "" ? "" : printed.split("\n").join(split.eol) + split.eol;
-  const body = split.fenced ? split.body : (split.body === "" ? "" : split.eol + split.body);
+  const body = split.fenced ? split.body : split.body === "" ? "" : split.eol + split.body;
   return `---${split.eol}${head}---${body}`;
 }
 
@@ -139,7 +139,12 @@ export function coerce(previous: unknown, text: string): unknown {
   if (Array.isArray(previous)) {
     // The owner's own note grammar already accepts a comma-separated string
     // wherever a list is expected, so a comma is what a person will type.
-    return t === "" ? [] : t.split(",").map((s) => s.trim()).filter((s) => s !== "");
+    return t === ""
+      ? []
+      : t
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s) => s !== "");
   }
   if (t === "") return undefined;
   if (typeof previous === "boolean") {
@@ -149,7 +154,11 @@ export function coerce(previous: unknown, text: string): unknown {
       clause: CLAUSES.REQUIRED_ARGS,
       expected: `a yes or no — one of ${[...TRUE, ...FALSE].join(", ")}`,
       got: text,
-      remedy: { tool: "se_file_read", args: { path: "project/deliverable/engine/frontmatter.ts" }, note: "the key held a boolean, so the editor may only write one" },
+      remedy: {
+        tool: "se_file_read",
+        args: { path: "project/deliverable/engine/frontmatter.ts" },
+        note: "the key held a boolean, so the editor may only write one",
+      },
       source: SRC,
     });
   }
@@ -160,7 +169,11 @@ export function coerce(previous: unknown, text: string): unknown {
         clause: CLAUSES.REQUIRED_ARGS,
         expected: "a number",
         got: text,
-        remedy: { tool: "se_file_read", args: { path: "project/deliverable/engine/frontmatter.ts" }, note: "the key held a number, so the editor may only write one" },
+        remedy: {
+          tool: "se_file_read",
+          args: { path: "project/deliverable/engine/frontmatter.ts" },
+          note: "the key held a number, so the editor may only write one",
+        },
         source: SRC,
       });
     }
@@ -171,7 +184,11 @@ export function coerce(previous: unknown, text: string): unknown {
       clause: CLAUSES.REQUIRED_ARGS,
       expected: "a key a line editor can write: a string, a number, a yes/no, or a list",
       got: `a nested block (${Object.keys(previous as object).join(", ")})`,
-      remedy: { tool: "se_file_read", args: { path: "project/deliverable/engine/frontmatter.ts" }, note: "a nested value needs its own editor; refusing beats flattening somebody's data" },
+      remedy: {
+        tool: "se_file_read",
+        args: { path: "project/deliverable/engine/frontmatter.ts" },
+        note: "a nested value needs its own editor; refusing beats flattening somebody's data",
+      },
       source: SRC,
     });
   }

@@ -9,11 +9,11 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { nodeSize, type CanvasData, type CanvasEdge, type CanvasElement } from "./canvas.ts";
-import { validateMachine, type MachineDecl, type StateDecl } from "./machine.ts";
+import { type CanvasData, type CanvasEdge, type CanvasElement, nodeSize } from "./canvas.ts";
+import { type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
 import { stateFromNote } from "./machines/compile.ts";
 import { parseStateNote } from "./notes.ts";
-import { expList, frontmatterOf, readRecord, recordRel, type Expedition } from "./worktree.ts";
+import { type Expedition, expList, frontmatterOf, readRecord, recordRel } from "./worktree.ts";
 
 export interface GeneratedMachine {
   decl: MachineDecl;
@@ -73,8 +73,26 @@ export function generateContinueExpedition(root: string): GeneratedMachine {
   const GUTTER = 140; // between the work box and its leave box
   const PAD = 60; // group border to box
   const centerY = open.length === 0 ? 80 : ((open.length - 1) * ROW_STEP) / 2 + 50;
-  nodes.push({ id: "n-start", type: "file", file: "start.md", x: -1400, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
-  const endNode: GenNode = { id: "n-end", type: "file", file: "end.md", x: 0, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } };
+  nodes.push({
+    id: "n-start",
+    type: "file",
+    file: "start.md",
+    x: -1400,
+    y: centerY,
+    width: 160,
+    height: 160,
+    styleAttributes: { shape: "pill" },
+  });
+  const endNode: GenNode = {
+    id: "n-end",
+    type: "file",
+    file: "end.md",
+    x: 0,
+    y: centerY,
+    width: 160,
+    height: 160,
+    styleAttributes: { shape: "pill" },
+  };
   nodes.push(endNode);
   let rightmost = -740;
 
@@ -101,7 +119,15 @@ export function generateContinueExpedition(root: string): GeneratedMachine {
     const right = leaveX + leaveBox.width;
     if (right > rightmost) rightmost = right;
     const rowH = Math.max(workBox.height, leaveBox.height);
-    nodes.push({ id: `g-${sid}`, type: "group", x: workX - PAD, y: y - PAD, width: right + PAD - (workX - PAD), height: rowH + PAD * 2, label: e.id });
+    nodes.push({
+      id: `g-${sid}`,
+      type: "group",
+      x: workX - PAD,
+      y: y - PAD,
+      width: right + PAD - (workX - PAD),
+      height: rowH + PAD * 2,
+      label: e.id,
+    });
     nodes.push({ id: `n-${workId}`, type: "file", file: `${workId}.md`, x: workX, y, ...workBox });
     nodes.push({ id: `n-${leaveId}`, type: "file", file: `${leaveId}.md`, x: leaveX, y, ...leaveBox });
     edges.push({ id: `e-start-${workId}`, fromNode: "n-start", toNode: `n-${workId}` });
@@ -222,8 +248,26 @@ function buildRecordColumn(machineId: string, entries: ArchiveEntry[], kindWord:
   const nodes: GenNode[] = [];
   const edges: CanvasEdge[] = [];
   const centerY = entries.length === 0 ? 80 : ((entries.length - 1) * 420) / 2 + 80;
-  nodes.push({ id: "n-start", type: "file", file: "start.md", x: -1400, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
-  nodes.push({ id: "n-end", type: "file", file: "end.md", x: -240, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
+  nodes.push({
+    id: "n-start",
+    type: "file",
+    file: "start.md",
+    x: -1400,
+    y: centerY,
+    width: 160,
+    height: 160,
+    styleAttributes: { shape: "pill" },
+  });
+  nodes.push({
+    id: "n-end",
+    type: "file",
+    file: "end.md",
+    x: -240,
+    y: centerY,
+    width: 160,
+    height: 160,
+    styleAttributes: { shape: "pill" },
+  });
   entries.forEach((e, i) => {
     expByState[e.sid] = e.full;
     const st = recordState(e, kindWord);
@@ -243,7 +287,11 @@ function buildRecordColumn(machineId: string, entries: ArchiveEntry[], kindWord:
   states.push(mechanical("end", "end"));
   const decl: MachineDecl = { id: machineId, reentry: "restart", initial: "start", states };
   validateMachine(decl);
-  return { decl, canvas: { nodes: nodes as CanvasElement[], edges, metadata: { frontmatter: { reentry: "restart", priority: 0.2 } } }, expByState };
+  return {
+    decl,
+    canvas: { nodes: nodes as CanvasElement[], edges, metadata: { frontmatter: { reentry: "restart", priority: 0.2 } } },
+    expByState,
+  };
 }
 
 function buildDecades(machineId: string, entries: ArchiveEntry[], kindWord: string): GeneratedMachine {
@@ -258,8 +306,26 @@ function buildDecades(machineId: string, entries: ArchiveEntry[], kindWord: stri
   // a new decade lands at the bottom.
   const decCount = Math.ceil(entries.length / 10);
   const centerY = ((decCount - 1) * 420) / 2 + 80;
-  nodes.push({ id: "n-start", type: "file", file: "start.md", x: -1400, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
-  nodes.push({ id: "n-end", type: "file", file: "end.md", x: -240, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
+  nodes.push({
+    id: "n-start",
+    type: "file",
+    file: "start.md",
+    x: -1400,
+    y: centerY,
+    width: 160,
+    height: 160,
+    styleAttributes: { shape: "pill" },
+  });
+  nodes.push({
+    id: "n-end",
+    type: "file",
+    file: "end.md",
+    x: -240,
+    y: centerY,
+    width: 160,
+    height: 160,
+    styleAttributes: { shape: "pill" },
+  });
   for (let d = 0; d < decCount; d++) {
     const slice = entries.slice(d * 10, d * 10 + 10);
     const decId = `${slice[0].sid}-${slice[slice.length - 1].sid}`;
@@ -283,7 +349,12 @@ function buildDecades(machineId: string, entries: ArchiveEntry[], kindWord: stri
   states.push(mechanical("end", "end"));
   const decl: MachineDecl = { id: machineId, reentry: "restart", initial: "start", states };
   validateMachine(decl);
-  return { decl, canvas: { nodes: nodes as CanvasElement[], edges, metadata: { frontmatter: { reentry: "restart", priority: 0.2 } } }, expByState: {}, subGen };
+  return {
+    decl,
+    canvas: { nodes: nodes as CanvasElement[], edges, metadata: { frontmatter: { reentry: "restart", priority: 0.2 } } },
+    expByState: {},
+    subGen,
+  };
 }
 
 /** ONE archive shape for both record kinds (owner ruling 2026-07-27, both

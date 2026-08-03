@@ -12,8 +12,8 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, wri
 import { dirname, extname, join, relative, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
-import { isExcluded, isRootRef, resolveDeclaredRoot, resolveForRead, resolveInRoot } from "./paths.ts";
 import { parseStateNote } from "./notes.ts";
+import { isExcluded, isRootRef, resolveDeclaredRoot, resolveForRead, resolveInRoot } from "./paths.ts";
 
 /** Whole-file read budget (chars). Beyond this, offset/limit is required. */
 export const READ_BUDGET = 50_000;
@@ -39,7 +39,12 @@ const SRC = "engine/files.ts";
 function mustExist(root: string, path: string, source: string, allowDeclared = false): string {
   const abs = allowDeclared ? resolveForRead(root, path, source) : resolveInRoot(root, path, source);
   if (!existsSync(abs)) {
-    const dir = isRootRef(path) ? path.split(/[\\/]+/).slice(0, -1).join("/") : dirname(relative(root, abs));
+    const dir = isRootRef(path)
+      ? path
+          .split(/[\\/]+/)
+          .slice(0, -1)
+          .join("/")
+      : dirname(relative(root, abs));
     throw new Rejection({
       clause: CLAUSES.PATH_ESCAPE,
       expected: "an existing file",
@@ -81,7 +86,11 @@ function gitShow(root: string, ref: string, path: string): Buffer {
       clause: CLAUSES.PATH_ESCAPE,
       expected: "an existing <ref>:<path> in this repository",
       got: `${spec} — ${(r.stderr ?? Buffer.alloc(0)).toString("utf8").trim().split("\n")[0]}`,
-      remedy: { tool: "se_file_glob", args: { glob: "**/*", ref }, note: "glob the ref's tree first — the layout differs between versions ('main' reaches v1, 'v2' reaches v2)" },
+      remedy: {
+        tool: "se_file_glob",
+        args: { glob: "**/*", ref },
+        note: "glob the ref's tree first — the layout differs between versions ('main' reaches v1, 'v2' reaches v2)",
+      },
       source: SRC,
     });
   }
@@ -121,7 +130,11 @@ function imageRead(path: string, bytes: Buffer, mimeType: string, ref?: string):
   return res;
 }
 
-export function fileRead(root: string, path: string, opts: { offset?: number; limit?: number; ref?: string; optional?: boolean; maxChars?: number } = {}): ReadResult {
+export function fileRead(
+  root: string,
+  path: string,
+  opts: { offset?: number; limit?: number; ref?: string; optional?: boolean; maxChars?: number } = {},
+): ReadResult {
   // AN OPTIONAL READ FORGIVES ABSENCE AND NOTHING ELSE. Some documents are
   // allowed not to exist — the handover is why this exists, and a boot that
   // refuses over a file nobody promised is a boot that looks broken. The path
@@ -450,7 +463,10 @@ export function fileReplace(
   if (total === 0 || (opts.expect_count !== undefined && total !== opts.expect_count)) {
     throw new Rejection({
       clause: CLAUSES.PATCH_AMBIGUOUS,
-      expected: opts.expect_count !== undefined ? `the pattern to match exactly ${opts.expect_count} time(s) under ${glob}` : `the pattern to match somewhere under ${glob}`,
+      expected:
+        opts.expect_count !== undefined
+          ? `the pattern to match exactly ${opts.expect_count} time(s) under ${glob}`
+          : `the pattern to match somewhere under ${glob}`,
       got: `${total} match(es) across ${scanned} file(s) — nothing was written`,
       remedy: { tool: "se_file_search", args: { query: pattern, intent: "see what the pattern really hits before replacing" } },
       source: SRC,
@@ -495,9 +511,14 @@ function opKind(op: PatchOp, i: number, n: number): OpKind {
   if (marks.length === 1) return marks[0];
   throw new Rejection({
     clause: CLAUSES.REQUIRED_ARGS,
-    expected: "ONE verb per op: old_string+new_string | pattern+replacement | append+new_string | prepend+new_string | at+new_string+base_hash",
+    expected:
+      "ONE verb per op: old_string+new_string | pattern+replacement | append+new_string | prepend+new_string | at+new_string+base_hash",
     got: marks.length === 0 ? `op ${i + 1}/${n} names no verb` : `op ${i + 1}/${n} mixes ${marks.join(" and ")} — nothing was written`,
-    remedy: { tool: "se_file_patch", args: { ops: [{ path: "<path>", old_string: "<exact text>", new_string: "<replacement>" }] }, note: "split it into one op per verb" },
+    remedy: {
+      tool: "se_file_patch",
+      args: { ops: [{ path: "<path>", old_string: "<exact text>", new_string: "<replacement>" }] },
+      note: "split it into one op per verb",
+    },
     source: SRC,
   });
 }
@@ -550,7 +571,10 @@ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
       regex: [["replacement", "the substitution text ($1 backrefs work)"]],
       append: [["new_string", "the text to append"]],
       prepend: [["new_string", "the text to prepend"]],
-      range: [["new_string", "the replacement lines"], ["base_hash", "the hash from se_file_read — a line number only means something against the version you read"]],
+      range: [
+        ["new_string", "the replacement lines"],
+        ["base_hash", "the hash from se_file_read — a line number only means something against the version you read"],
+      ],
     };
     for (const [field, why] of needs[kind]) {
       if (op[field] === undefined) {
@@ -592,9 +616,16 @@ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
       if (count === 0 || (op.expect_count !== undefined && count !== op.expect_count)) {
         throw new Rejection({
           clause: CLAUSES.PATCH_AMBIGUOUS,
-          expected: op.expect_count !== undefined ? `pattern to match exactly ${op.expect_count} time(s) in ${op.path}` : `pattern to match in ${op.path}`,
+          expected:
+            op.expect_count !== undefined
+              ? `pattern to match exactly ${op.expect_count} time(s) in ${op.path}`
+              : `pattern to match in ${op.path}`,
           got: `${count} matches (op ${i + 1}/${ops.length}) — nothing was written`,
-          remedy: { tool: "se_file_search", args: { query: op.pattern, path: op.path }, note: "see what the pattern really hits, then patch again" },
+          remedy: {
+            tool: "se_file_search",
+            args: { query: op.pattern, path: op.path },
+            note: "see what the pattern really hits, then patch again",
+          },
           source: SRC,
         });
       }
@@ -614,7 +645,8 @@ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
         if (seam !== "") corrected.push(`op ${i + 1}: a newline was added between the prepended text and the file's first line`);
         next = piece + seam + current;
       }
-      if (eol === "\r\n" && (op.new_string as string) !== piece) corrected.push(`op ${i + 1}: the text was converted to CRLF — this file's convention`);
+      if (eol === "\r\n" && (op.new_string as string) !== piece)
+        corrected.push(`op ${i + 1}: the text was converted to CRLF — this file's convention`);
       replacements = 1;
     } else if (kind === "range") {
       // Lines are counted the way the READER numbers them — split on \n,
@@ -628,7 +660,11 @@ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
           clause: CLAUSES.PATCH_AMBIGUOUS,
           expected: `1 <= from_line <= to_line <= ${lines.length} for ${op.path}`,
           got: `from_line ${from}, to_line ${to} (op ${i + 1}/${ops.length}) — nothing was written`,
-          remedy: { tool: "se_file_read", args: { path: op.path, offset: Math.max(1, Number(from) || 1), limit: 40 }, note: "re-read the range you mean; line numbers ride every read" },
+          remedy: {
+            tool: "se_file_read",
+            args: { path: op.path, offset: Math.max(1, Number(from) || 1), limit: 40 },
+            note: "re-read the range you mean; line numbers ride every read",
+          },
           source: SRC,
         });
       }
@@ -660,7 +696,9 @@ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
           oldStr = reOld;
           newStr = toEol(newStr, eol);
           count = reCount;
-          corrected.push(`op ${i + 1}: old_string matched after line-ending normalisation — this file is ${eol === "\r\n" ? "CRLF" : "LF"}; the patch was applied in the file's own endings`);
+          corrected.push(
+            `op ${i + 1}: old_string matched after line-ending normalisation — this file is ${eol === "\r\n" ? "CRLF" : "LF"}; the patch was applied in the file's own endings`,
+          );
         }
       }
       if (count === 0 || (count > 1 && op.replace_all !== true)) {
@@ -678,12 +716,16 @@ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
         }
         throw new Rejection({
           clause: CLAUSES.PATCH_AMBIGUOUS,
-          expected: count === 0 ? `old_string to occur in ${op.path}` : `old_string to occur exactly once in ${op.path} (or pass replace_all: true)`,
+          expected:
+            count === 0
+              ? `old_string to occur in ${op.path}`
+              : `old_string to occur exactly once in ${op.path} (or pass replace_all: true)`,
           got: `${count} occurrences (op ${i + 1}/${ops.length}) — nothing was written${why}`,
           remedy: {
             tool: "se_file_read",
             args: { path: op.path },
-            note: count === 0 ? "re-read and copy the exact text, whitespace included" : "widen old_string until unique, or set replace_all",
+            note:
+              count === 0 ? "re-read and copy the exact text, whitespace included" : "widen old_string until unique, or set replace_all",
           },
           source: SRC,
         });
@@ -769,7 +811,11 @@ export function globToRegExp(glob: string): RegExp {
   return new RegExp(`^${re}$`);
 }
 
-export function fileGlob(root: string, glob: string, opts: { limit?: number; ref?: string } = {}): { glob: string; ref?: string; files: string[]; truncated: boolean } {
+export function fileGlob(
+  root: string,
+  glob: string,
+  opts: { limit?: number; ref?: string } = {},
+): { glob: string; ref?: string; files: string[]; truncated: boolean } {
   const limit = opts.limit ?? 500;
   // A declared root is globbed as "@name/pattern", and every hit carries the
   // prefix back — what the glob returns, the reader accepts unchanged.
@@ -777,7 +823,13 @@ export function fileGlob(root: string, glob: string, opts: { limit?: number; ref
   const rootName = rootRef ? glob.slice(1).split(/[\\/]+/)[0] : "";
   const base = rootRef ? resolveDeclaredRoot(root, `@${rootName}`, SRC) : root;
   const prefix = rootRef ? `@${rootName}/` : "";
-  const pattern = rootRef ? glob.slice(1).split(/[\\/]+/).slice(1).join("/") || "**" : glob;
+  const pattern = rootRef
+    ? glob
+        .slice(1)
+        .split(/[\\/]+/)
+        .slice(1)
+        .join("/") || "**"
+    : glob;
   const rx = globToRegExp(pattern.replace(/\\/g, "/"));
   if (rootRef && opts.ref !== undefined) {
     throw new Rejection({
@@ -799,7 +851,11 @@ export function fileGlob(root: string, glob: string, opts: { limit?: number; ref
         source: SRC,
       });
     }
-    const files = r.stdout.split("\n").map((l) => l.trim()).filter((l) => l !== "" && rx.test(l)).sort();
+    const files = r.stdout
+      .split("\n")
+      .map((l) => l.trim())
+      .filter((l) => l !== "" && rx.test(l))
+      .sort();
     return { glob, ref: opts.ref, files: files.slice(0, limit), truncated: files.length > limit };
   }
   const out: string[] = [];

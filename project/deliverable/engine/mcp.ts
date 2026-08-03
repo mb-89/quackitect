@@ -157,7 +157,14 @@ export class McpServer {
                 isError: true,
               });
             }
-            this.observe({ tool: name, args, ok: false, duration_ms: Date.now() - started, outcome: "errored", response: String((e as Error).message) });
+            this.observe({
+              tool: name,
+              args,
+              ok: false,
+              duration_ms: Date.now() - started,
+              outcome: "errored",
+              response: String((e as Error).message),
+            });
             return this.ok(id, {
               content: [{ type: "text", text: JSON.stringify({ kind: "errored", message: String((e as Error).message) }) }],
               isError: true,
@@ -204,9 +211,7 @@ export function runStdio(server: McpServer, onGone?: () => void): void {
     try {
       msg = JSON.parse(trimmed) as JsonRpcRequest;
     } catch {
-      process.stdout.write(
-        JSON.stringify({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "parse error" } }) + "\n",
-      );
+      process.stdout.write(JSON.stringify({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "parse error" } }) + "\n");
       return;
     }
     void server.handle(msg).then((res) => {

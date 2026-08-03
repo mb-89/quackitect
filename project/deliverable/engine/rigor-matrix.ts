@@ -10,8 +10,16 @@ import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
+import {
+  type EdgeDecl,
+  type EvidenceField,
+  type EvidenceType,
+  type MachineDecl,
+  STANDARD_ROUNDS,
+  type StateDecl,
+  validateMachine,
+} from "./machine.ts";
 import { parseStateNote, section } from "./notes.ts";
-import { STANDARD_ROUNDS, validateMachine, type EdgeDecl, type EvidenceField, type EvidenceType, type MachineDecl, type StateDecl } from "./machine.ts";
 
 const SRC = "engine/rigor-matrix.ts";
 
@@ -95,7 +103,9 @@ function parseEvidence(fm: Record<string, unknown>, file: string, body: string):
     // says `type: tabel` would otherwise be checked as free text forever,
     // which is the quiet-divergence failure this repository refuses everywhere.
     if (f.type !== undefined && !EVIDENCE_TYPES.includes(String(f.type) as EvidenceType)) {
-      throw new Error(`matrix row ${file} field ${f.name}: unknown evidence type "${String(f.type)}" — one of ${EVIDENCE_TYPES.join(", ")}`);
+      throw new Error(
+        `matrix row ${file} field ${f.name}: unknown evidence type "${String(f.type)}" — one of ${EVIDENCE_TYPES.join(", ")}`,
+      );
     }
     return {
       name: f.name,
@@ -117,7 +127,9 @@ export function matrixDir(root: string): string {
 export function rigorMatrixContentHash(root: string): string {
   const dir = matrixDir(root);
   const h = createHash("sha256");
-  for (const file of readdirSync(join(dir, "rows")).filter((f) => f.endsWith(".md")).sort()) {
+  for (const file of readdirSync(join(dir, "rows"))
+    .filter((f) => f.endsWith(".md"))
+    .sort()) {
     h.update(`rows/${file}\n`);
     h.update(readFileSync(join(dir, "rows", file)));
   }
@@ -146,7 +158,9 @@ function readRigorMatrixFresh(root: string): RigorMatrix {
   const rows: RigorMatrixRow[] = [];
   const byName = new Map<string, RigorMatrixRow>();
   const fmByName = new Map<string, Record<string, unknown>>();
-  for (const file of readdirSync(join(dir, "rows")).filter((f) => f.endsWith(".md")).sort()) {
+  for (const file of readdirSync(join(dir, "rows"))
+    .filter((f) => f.endsWith(".md"))
+    .sort()) {
     const note = parseStateNote(readFileSync(join(dir, "rows", file), "utf8"));
     const fm = note.frontmatter;
     const name = typeof fm.name === "string" ? fm.name : "";
@@ -245,9 +259,16 @@ export function assertFloor(matrix: RigorMatrix, column: ChangeColumn): void {
   if (struck.length === 0) return;
   throw new Rejection({
     clause: CLAUSES.REQUIRED_ARGS,
-    expected: `every floor step to apply at ${column} — the floor is ${matrix.rows.filter((r) => r.floor).map((r) => r.name).join(", ")}`,
+    expected: `every floor step to apply at ${column} — the floor is ${matrix.rows
+      .filter((r) => r.floor)
+      .map((r) => r.name)
+      .join(", ")}`,
     got: `${struck.map((r) => r.name).join(", ")} struck at ${column}`,
-    remedy: { tool: "se_file_glob", args: { glob: `project/deliverable/machines/rigor_matrix/rows/*${struck[0].name}.md` }, note: "give the cell a value, or drop `floor: true` if it is genuinely no longer a floor" },
+    remedy: {
+      tool: "se_file_glob",
+      args: { glob: `project/deliverable/machines/rigor_matrix/rows/*${struck[0].name}.md` },
+      note: "give the cell a value, or drop `floor: true` if it is genuinely no longer a floor",
+    },
     source: SRC,
   });
 }
@@ -255,9 +276,7 @@ export function assertFloor(matrix: RigorMatrix, column: ChangeColumn): void {
 export function compileColumn(matrix: RigorMatrix, column: ChangeColumn): MachineDecl {
   assertFloor(matrix, column);
   const byName = new Map(matrix.rows.map((r) => [r.name, r]));
-  const applied = new Set(
-    matrix.rows.filter((r) => matrix.cells.get(r.name)?.get(column)?.applies !== "none").map((r) => r.name),
-  );
+  const applied = new Set(matrix.rows.filter((r) => matrix.cells.get(r.name)?.get(column)?.applies !== "none").map((r) => r.name));
   const memo = new Map<string, string[]>();
   const resolve = (name: string, visiting: Set<string>): string[] => {
     if (applied.has(name)) return [name];
@@ -280,12 +299,18 @@ export function compileColumn(matrix: RigorMatrix, column: ChangeColumn): Machin
     if (deps.length === 0) roots.push(row.name);
     for (const d of deps) {
       let list = edgesFrom.get(d);
-      if (!list) edgesFrom.set(d, (list = []));
+      if (!list) {
+        list = [];
+        edgesFrom.set(d, list);
+      }
       if (row.edge_role === "fallback") {
         list.push({ to: row.name, role: "fallback", ...(row.guard ? { guard: row.guard } : {}) });
         // The recovery edge closes the loop back to the dependency.
         let back = edgesFrom.get(row.name);
-        if (!back) edgesFrom.set(row.name, (back = []));
+        if (!back) {
+          back = [];
+          edgesFrom.set(row.name, back);
+        }
         back.push({ to: d, role: "recovery" });
       } else {
         list.push({ to: row.name, role: byName.get(d)!.state_kind === "gate" ? "approval" : "normal" });

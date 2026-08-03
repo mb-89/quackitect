@@ -10,9 +10,9 @@ import { bootedServer, call, freshRoot as fresh } from "./helpers.ts";
 test("initialize and tools/list serve the full lane", async () => {
   const server = buildServer(fresh());
   const init = await server.handle({ jsonrpc: "2.0", id: 1, method: "initialize", params: {} });
-  assert.equal((init?.result as { serverInfo: { name: string } }).serverInfo.name, "se-mcp");
+  assert.equal((init!.result as { serverInfo: { name: string } }).serverInfo.name, "se-mcp");
   const list = await server.handle({ jsonrpc: "2.0", id: 2, method: "tools/list" });
-  const names = (list?.result as { tools: { name: string }[] }).tools.map((t) => t.name);
+  const names = (list!.result as { tools: { name: string }[] }).tools.map((t) => t.name);
   for (const expected of [
     "se_pull",
     "se_file_read",
@@ -42,7 +42,7 @@ test("initialize and tools/list serve the full lane", async () => {
 test("the server declares listChanged, so a reload can add a tool", async () => {
   const server = buildServer(fresh());
   const init = await server.handle({ jsonrpc: "2.0", id: 1, method: "initialize", params: {} });
-  const caps = (init?.result as { capabilities: { tools?: { listChanged?: boolean } } }).capabilities;
+  const caps = (init!.result as { capabilities: { tools?: { listChanged?: boolean } } }).capabilities;
   assert.equal(caps.tools?.listChanged, true, "without this a client may ignore the notification");
 });
 
@@ -100,10 +100,19 @@ test("a full read-edit-verify round trip over the wire, and every call logged", 
   // Every call is on the log — the boot pulls and readings, then exactly
   // the three lane calls of this round trip at the tail. The boot's own
   // call count is the machine's business, so only the tail is pinned.
-  const records = readFileSync(logPath, "utf8").trim().split("\n").map((l) => JSON.parse(l) as { tool: string; ok: boolean });
-  assert.deepEqual(records.slice(-3).map((r) => r.tool), ["se_file_read", "se_file_patch", "se_file_read"]);
+  const records = readFileSync(logPath, "utf8")
+    .trim()
+    .split("\n")
+    .map((l) => JSON.parse(l) as { tool: string; ok: boolean });
+  assert.deepEqual(
+    records.slice(-3).map((r) => r.tool),
+    ["se_file_read", "se_file_patch", "se_file_read"],
+  );
   assert.ok(records.length > 3, "the boot walk is on the log too");
-  assert.ok(records.slice(-3).every((r) => r.ok), "the round trip's calls all passed");
+  assert.ok(
+    records.slice(-3).every((r) => r.ok),
+    "the round trip's calls all passed",
+  );
 });
 
 test("se_run captures output and the log keeps it in full; se_log_query fetches by ref", async () => {
@@ -134,10 +143,7 @@ test("rejections are results (isError: true), not protocol errors — and carry 
 test("an image rides to the model as a real block, and never into the log", async () => {
   const root = fresh();
   const server = await bootedServer(root);
-  const png = Buffer.from(
-    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
-    "base64",
-  );
+  const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
   writeFileSync(join(root, "sketch.png"), png);
   const res = await server.handle({
     jsonrpc: "2.0",
@@ -145,7 +151,7 @@ test("an image rides to the model as a real block, and never into the log", asyn
     method: "tools/call",
     params: { name: "se_file_read", arguments: { path: "sketch.png" } },
   });
-  const content = (res?.result as { content: { type: string; text?: string; data?: string; mimeType?: string }[] }).content;
+  const content = (res!.result as { content: { type: string; text?: string; data?: string; mimeType?: string }[] }).content;
   assert.equal(content.length, 2, "the JSON result, then the picture itself");
   assert.equal(content[1].type, "image");
   assert.equal(content[1].mimeType, "image/png");

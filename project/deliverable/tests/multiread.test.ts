@@ -47,7 +47,11 @@ test("one bad path refuses for itself, and the good ones still arrive", async ()
 
 test("a set read takes per-file windows, and refuses a greedy call", async () => {
   const server = await bootedServer(freshRoot());
-  await call(server, "se_file_write", { path: "long.md", content: Array.from({ length: 40 }, (_, i) => `line ${i + 1}`).join("\n"), base_hash: null });
+  await call(server, "se_file_write", {
+    path: "long.md",
+    content: Array.from({ length: 40 }, (_, i) => `line ${i + 1}`).join("\n"),
+    base_hash: null,
+  });
   const r = await call(server, "se_file_read", { paths: [{ path: "long.md", offset: 5, limit: 2 }] });
   const m = r.body as unknown as Multi;
   assert.match(String(m.files[0].content), /line 5/);

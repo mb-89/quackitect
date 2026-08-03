@@ -12,7 +12,16 @@ const BODY_CAP = 2_000_000;
 
 /** Content this lane can honestly turn into text. Anything else is refused
  *  by NAME rather than decoded into mojibake and truncated to look fine. */
-const READABLE = ["text/", "application/json", "application/xml", "application/xhtml", "+json", "+xml", "application/javascript", "application/ecmascript"];
+const READABLE = [
+  "text/",
+  "application/json",
+  "application/xml",
+  "application/xhtml",
+  "+json",
+  "+xml",
+  "application/javascript",
+  "application/ecmascript",
+];
 
 export interface FetchResult {
   url: string;
@@ -36,7 +45,11 @@ export async function webFetch(url: string, opts: { offset?: number } = {}): Pro
       source: "engine/web.ts",
     });
   }
-  const res = await fetch(u, { redirect: "follow", headers: { "user-agent": "se-web-fetch", accept: "text/html,text/plain,application/json;q=0.9,*/*;q=0.5" }, signal: AbortSignal.timeout(30_000) });
+  const res = await fetch(u, {
+    redirect: "follow",
+    headers: { "user-agent": "se-web-fetch", accept: "text/html,text/plain,application/json;q=0.9,*/*;q=0.5" },
+    signal: AbortSignal.timeout(30_000),
+  });
   const type = res.headers.get("content-type") ?? "";
 
   // A PDF IS NOT TEXT, AND PRETENDING OTHERWISE IS WHERE THIS BROKE. res.text()
@@ -50,7 +63,11 @@ export async function webFetch(url: string, opts: { offset?: number } = {}): Pro
       clause: CLAUSES.OVERSIZE_READ,
       expected: "a text response this lane can read: html, plain text, json or xml",
       got: `${type} — a binary document, which would decode into mojibake rather than fail honestly`,
-      remedy: { tool: "se_run", args: { command: `# download it and convert it locally, then read the result` }, note: "the lane has no document converter, so a binary is refused rather than mangled" },
+      remedy: {
+        tool: "se_run",
+        args: { command: `# download it and convert it locally, then read the result` },
+        note: "the lane has no document converter, so a binary is refused rather than mangled",
+      },
       source: "engine/web.ts",
     });
   }
@@ -135,7 +152,11 @@ export async function webSearch(query: string, count = 8): Promise<{ query: stri
       clause: CLAUSES.NOT_CONFIGURED,
       expected: "SE_BRAVE_API_KEY in the server's environment (free tier: https://brave.com/search/api/)",
       got: "no search provider configured",
-      remedy: { tool: "se_web_fetch", args: { url: "<a specific url>" }, note: "fetch works without a key — or ask the owner to configure search" },
+      remedy: {
+        tool: "se_web_fetch",
+        args: { url: "<a specific url>" },
+        note: "fetch works without a key — or ask the owner to configure search",
+      },
       source: "engine/web.ts",
     });
   }

@@ -70,7 +70,12 @@ export interface PanelValues {
 }
 
 /** A toggle's key is its label, mechanically. The spec stays readable prose. */
-export const toggleKey = (label: string): string => label.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+export const toggleKey = (label: string): string =>
+  label
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 
 const esc = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -204,7 +209,11 @@ export function renderPanel(params: Param[], v: PanelValues): string {
           clause: CLAUSES.REQUIRED_ARGS,
           expected: "a parameter type the renderer knows: rungs, int, action, text, choice, toggles",
           got: `${p.type} (parameter "${p.name}")`,
-          remedy: { tool: "se_file_read", args: { path: "project/deliverable/machines/panels/controls.md" }, note: "the Types section lists what a panel may declare" },
+          remedy: {
+            tool: "se_file_read",
+            args: { path: "project/deliverable/machines/panels/controls.md" },
+            note: "the Types section lists what a panel may declare",
+          },
           source: SRC,
         });
     }

@@ -15,6 +15,7 @@ import {
   addView,
   createBase,
   duplicateView,
+  type FilterRow,
   fromExpression,
   hideAll,
   OPERATORS,
@@ -29,7 +30,6 @@ import {
   setViewFilters,
   toExpression,
   toggleProperty,
-  type FilterRow,
 } from "../engine/bases.ts";
 import { Rejection } from "../engine/errors.ts";
 import { parseBase } from "../engine/tables.ts";

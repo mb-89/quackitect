@@ -63,7 +63,12 @@ export function computeRoute(
     const next: string[] = [];
     for (const q of frontier) {
       if (++visited > maxVisited) {
-        return { target, found: false, steps: [], note: `gave up after ${maxVisited} states — the graph is larger than a route should search` };
+        return {
+          target,
+          found: false,
+          steps: [],
+          note: `gave up after ${maxVisited} states — the graph is larger than a route should search`,
+        };
       }
       const node = expand(q);
       if (node === undefined) continue;

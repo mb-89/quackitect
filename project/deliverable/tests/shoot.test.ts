@@ -37,7 +37,12 @@ describe("se_shoot", { concurrency: true }, () => {
     // A page of noise at a large viewport: the point is that the refusal
     // states the size and offers a smaller window, rather than resizing
     // behind the caller's back.
-    const noisy = `<style>body{margin:0}</style>` + Array.from({ length: 400 }, (_, i) => `<div style="height:40px;background:rgb(${i % 255},${(i * 7) % 255},${(i * 13) % 255})"></div>`).join("");
+    const noisy =
+      `<style>body{margin:0}</style>` +
+      Array.from(
+        { length: 400 },
+        (_, i) => `<div style="height:40px;background:rgb(${i % 255},${(i * 7) % 255},${(i * 13) % 255})"></div>`,
+      ).join("");
     try {
       const r = shoot(root, noisy, { width: 3000, height: 6000, name: "big" });
       // Some hosts compress this well enough to pass, and that is a legitimate

@@ -58,18 +58,7 @@ export class Link {
 
 export type Value = unknown;
 
-export type TypeName =
-  | "null"
-  | "boolean"
-  | "number"
-  | "string"
-  | "date"
-  | "duration"
-  | "list"
-  | "link"
-  | "file"
-  | "regexp"
-  | "object";
+export type TypeName = "null" | "boolean" | "number" | "string" | "date" | "duration" | "list" | "link" | "file" | "regexp" | "object";
 
 /** A row's `file` member is the one object we treat as its own type. */
 function isFile(v: unknown): boolean {
@@ -110,7 +99,10 @@ export function isEmpty(v: unknown): boolean {
 }
 
 function linkTargetsFile(l: Link, f: Record<string, unknown>): boolean {
-  const t = l.target.replace(/^\[\[|\]\]$/g, "").split("|")[0].trim();
+  const t = l.target
+    .replace(/^\[\[|\]\]$/g, "")
+    .split("|")[0]
+    .trim();
   const path = String(f.path ?? "");
   const name = String(f.name ?? "");
   return t === path || t === name || t === path.replace(/\.md$/, "");
@@ -164,7 +156,11 @@ function order(a: unknown, b: unknown, op: string): number {
     clause: CLAUSES.REQUIRED_ARGS,
     expected: `${op} over two numbers, two dates or two strings`,
     got: `${ta} ${op} ${tb}`,
-    remedy: { tool: "se_file_read", args: { path: "project/spec/bases-syntax.md" }, note: "section 7 says ordering works on numbers and dates" },
+    remedy: {
+      tool: "se_file_read",
+      args: { path: "project/spec/bases-syntax.md" },
+      note: "section 7 says ordering works on numbers and dates",
+    },
     source: SRC,
   });
 }
@@ -174,17 +170,33 @@ function durationMs(d: Duration): number {
 }
 
 const UNITS: Record<string, [number, number]> = {
-  y: [12, 0], year: [12, 0], years: [12, 0],
-  M: [1, 0], month: [1, 0], months: [1, 0],
-  w: [0, 604800000], week: [0, 604800000], weeks: [0, 604800000],
-  d: [0, 86400000], day: [0, 86400000], days: [0, 86400000],
-  h: [0, 3600000], hour: [0, 3600000], hours: [0, 3600000],
-  m: [0, 60000], minute: [0, 60000], minutes: [0, 60000],
-  s: [0, 1000], second: [0, 1000], seconds: [0, 1000],
+  y: [12, 0],
+  year: [12, 0],
+  years: [12, 0],
+  M: [1, 0],
+  month: [1, 0],
+  months: [1, 0],
+  w: [0, 604800000],
+  week: [0, 604800000],
+  weeks: [0, 604800000],
+  d: [0, 86400000],
+  day: [0, 86400000],
+  days: [0, 86400000],
+  h: [0, 3600000],
+  hour: [0, 3600000],
+  hours: [0, 3600000],
+  m: [0, 60000],
+  minute: [0, 60000],
+  minutes: [0, 60000],
+  s: [0, 1000],
+  second: [0, 1000],
+  seconds: [0, 1000],
 };
 
 export function parseDuration(text: string): Duration {
-  const parts = String(text).trim().match(/-?\d+(?:\.\d+)?\s*[A-Za-z]+/g);
+  const parts = String(text)
+    .trim()
+    .match(/-?\d+(?:\.\d+)?\s*[A-Za-z]+/g);
   if (parts === null) {
     throw new Rejection({
       clause: CLAUSES.REQUIRED_ARGS,
@@ -296,7 +308,33 @@ type Tok =
   | { k: "op"; v: string }
   | { k: "end" };
 
-const OPS = ["===", "!==", "==", "!=", ">=", "<=", "&&", "||", ">", "<", "+", "-", "*", "/", "%", "!", "(", ")", "[", "]", "{", "}", ",", ".", ":"];
+const OPS = [
+  "===",
+  "!==",
+  "==",
+  "!=",
+  ">=",
+  "<=",
+  "&&",
+  "||",
+  ">",
+  "<",
+  "+",
+  "-",
+  "*",
+  "/",
+  "%",
+  "!",
+  "(",
+  ")",
+  "[",
+  "]",
+  "{",
+  "}",
+  ",",
+  ".",
+  ":",
+];
 
 function lex(src: string): Tok[] {
   const out: Tok[] = [];
@@ -732,16 +770,24 @@ global("link", (_r, a) => new Link(a[0] instanceof Link ? (a[0] as Link).target 
 global("max", (_r, a) => Math.max(...a.map(toNumber)));
 global("min", (_r, a) => Math.min(...a.map(toNumber)));
 global("now", () => new Date(), { volatile: true });
-global("today", () => {
-  const d = new Date();
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-}, { volatile: true });
+global(
+  "today",
+  () => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  },
+  { volatile: true },
+);
 global("random", () => Math.random(), { volatile: true });
 global("escapeHTML", (_r, a) => toText(a[0]).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"));
 global("html", (_r, a) => ({ html: toText(a[0]) }));
 global("icon", (_r, a) => ({ icon: toText(a[0]) }));
 global("image", (_r, a) => ({ image: toText(a[0]) }));
-global("file", (_r, a, ctx) => (isFile(a[0]) ? a[0] : { name: toText(a[0]).split("/").pop() ?? "", path: toText(a[0]), folder: "", ext: "md", ...(ctx.row.file as object ?? {}) }));
+global("file", (_r, a, ctx) =>
+  isFile(a[0])
+    ? a[0]
+    : { name: toText(a[0]).split("/").pop() ?? "", path: toText(a[0]), folder: "", ext: "md", ...((ctx.row.file as object) ?? {}) },
+);
 
 // --- any ------------------------------------------------------------------
 
@@ -797,28 +843,50 @@ export function formatDate(d: Date, fmt: string): string {
   const p = (n: number, w = 2): string => String(n).padStart(w, "0");
   return fmt.replace(MOMENT, (t) => {
     switch (t) {
-      case "YYYY": return p(d.getFullYear(), 4);
-      case "YY": return p(d.getFullYear() % 100);
-      case "MMMM": return MONTHS[d.getMonth()];
-      case "MMM": return MONTHS[d.getMonth()].slice(0, 3);
-      case "MM": return p(d.getMonth() + 1);
-      case "M": return String(d.getMonth() + 1);
-      case "DD": return p(d.getDate());
-      case "D": return String(d.getDate());
-      case "dddd": return DAYS[d.getDay()];
-      case "ddd": return DAYS[d.getDay()].slice(0, 3);
-      case "HH": return p(d.getHours());
-      case "H": return String(d.getHours());
-      case "hh": return p(d.getHours() % 12 === 0 ? 12 : d.getHours() % 12);
-      case "h": return String(d.getHours() % 12 === 0 ? 12 : d.getHours() % 12);
-      case "mm": return p(d.getMinutes());
-      case "m": return String(d.getMinutes());
-      case "ss": return p(d.getSeconds());
-      case "s": return String(d.getSeconds());
-      case "SSS": return p(d.getMilliseconds(), 3);
-      case "A": return d.getHours() < 12 ? "AM" : "PM";
-      case "a": return d.getHours() < 12 ? "am" : "pm";
-      default: return t;
+      case "YYYY":
+        return p(d.getFullYear(), 4);
+      case "YY":
+        return p(d.getFullYear() % 100);
+      case "MMMM":
+        return MONTHS[d.getMonth()];
+      case "MMM":
+        return MONTHS[d.getMonth()].slice(0, 3);
+      case "MM":
+        return p(d.getMonth() + 1);
+      case "M":
+        return String(d.getMonth() + 1);
+      case "DD":
+        return p(d.getDate());
+      case "D":
+        return String(d.getDate());
+      case "dddd":
+        return DAYS[d.getDay()];
+      case "ddd":
+        return DAYS[d.getDay()].slice(0, 3);
+      case "HH":
+        return p(d.getHours());
+      case "H":
+        return String(d.getHours());
+      case "hh":
+        return p(d.getHours() % 12 === 0 ? 12 : d.getHours() % 12);
+      case "h":
+        return String(d.getHours() % 12 === 0 ? 12 : d.getHours() % 12);
+      case "mm":
+        return p(d.getMinutes());
+      case "m":
+        return String(d.getMinutes());
+      case "ss":
+        return p(d.getSeconds());
+      case "s":
+        return String(d.getSeconds());
+      case "SSS":
+        return p(d.getMilliseconds(), 3);
+      case "A":
+        return d.getHours() < 12 ? "AM" : "PM";
+      case "a":
+        return d.getHours() < 12 ? "am" : "pm";
+      default:
+        return t;
     }
   });
 }
@@ -834,7 +902,14 @@ method(["date"], "relative", (r) => {
   const ms = Date.now() - (r as Date).getTime();
   const past = ms >= 0;
   const abs = Math.abs(ms);
-  const steps: [number, string][] = [[86400000 * 365, "year"], [86400000 * 30, "month"], [86400000, "day"], [3600000, "hour"], [60000, "minute"], [1000, "second"]];
+  const steps: [number, string][] = [
+    [86400000 * 365, "year"],
+    [86400000 * 30, "month"],
+    [86400000, "day"],
+    [3600000, "hour"],
+    [60000, "minute"],
+    [1000, "second"],
+  ];
   for (const [span, name] of steps) {
     const n = Math.floor(abs / span);
     if (n >= 1) return past ? `${n} ${name}${n === 1 ? "" : "s"} ago` : `in ${n} ${name}${n === 1 ? "" : "s"}`;
@@ -849,7 +924,11 @@ const asList = (r: unknown): unknown[] => (Array.isArray(r) ? r : [r]);
 method(["list"], "contains", (r, a) => asList(r).some((e) => equals(e, a[0])));
 method(["list"], "containsAll", (r, a) => a.every((x) => asList(r).some((e) => equals(e, x))));
 method(["list"], "containsAny", (r, a) => a.some((x) => asList(r).some((e) => equals(e, x))));
-method(["list"], "join", (r, a) => asList(r).map(toText).join(a.length > 0 ? toText(a[0]) : ", "));
+method(["list"], "join", (r, a) =>
+  asList(r)
+    .map(toText)
+    .join(a.length > 0 ? toText(a[0]) : ", "),
+);
 method(["list"], "reverse", (r) => [...asList(r)].reverse());
 method(["list"], "unique", (r) => {
   const out: unknown[] = [];
@@ -862,28 +941,45 @@ method(["list"], "sort", (r) => [...asList(r)].sort((x, y) => order(x, y, "<")))
 method(["list"], "sum", (r) => asList(r).reduce<number>((n, e) => n + toNumber(e), 0));
 
 // The three call-by-name entries. They take the TREE, not the value.
-method(["list"], "filter", (r, _a, ctx, raw) => {
-  const body = raw[0];
-  return asList(r).filter((e, i) => isTruthy(evaluate(body, bind(ctx, { value: e, index: i }))));
-}, { lazy: true });
+method(
+  ["list"],
+  "filter",
+  (r, _a, ctx, raw) => {
+    const body = raw[0];
+    return asList(r).filter((e, i) => isTruthy(evaluate(body, bind(ctx, { value: e, index: i }))));
+  },
+  { lazy: true },
+);
 
-method(["list"], "map", (r, _a, ctx, raw) => {
-  const body = raw[0];
-  return asList(r).map((e, i) => evaluate(body, bind(ctx, { value: e, index: i })));
-}, { lazy: true });
+method(
+  ["list"],
+  "map",
+  (r, _a, ctx, raw) => {
+    const body = raw[0];
+    return asList(r).map((e, i) => evaluate(body, bind(ctx, { value: e, index: i })));
+  },
+  { lazy: true },
+);
 
-method(["list"], "reduce", (r, _a, ctx, raw) => {
-  const body = raw[0];
-  let acc: unknown = raw.length > 1 ? evaluate(raw[1], ctx) : null;
-  asList(r).forEach((e, i) => {
-    acc = evaluate(body, bind(ctx, { value: e, index: i, acc }));
-  });
-  return acc;
-}, { lazy: true });
+method(
+  ["list"],
+  "reduce",
+  (r, _a, ctx, raw) => {
+    const body = raw[0];
+    let acc: unknown = raw.length > 1 ? evaluate(raw[1], ctx) : null;
+    asList(r).forEach((e, i) => {
+      acc = evaluate(body, bind(ctx, { value: e, index: i, acc }));
+    });
+    return acc;
+  },
+  { lazy: true },
+);
 
 // --- link and file --------------------------------------------------------
 
-method(["link"], "asFile", (r, _a, ctx) => (linkTargetsFile(r as Link, ctx.row.file as Record<string, unknown> ?? {}) ? ctx.row.file : null));
+method(["link"], "asFile", (r, _a, ctx) =>
+  linkTargetsFile(r as Link, (ctx.row.file as Record<string, unknown>) ?? {}) ? ctx.row.file : null,
+);
 method(["link"], "linksTo", (r, a) => equals(r, a[0]));
 
 method(["file"], "hasTag", (r, a) => {
@@ -898,7 +994,11 @@ method(["file"], "hasProperty", (r, a) => {
   const v = (r as Record<string, unknown>)[toText(a[0])];
   return v !== undefined && v !== null;
 });
-method(["file"], "asLink", (r) => new Link(String((r as Record<string, unknown>).path ?? ""), String((r as Record<string, unknown>).name ?? "")));
+method(
+  ["file"],
+  "asLink",
+  (r) => new Link(String((r as Record<string, unknown>).path ?? ""), String((r as Record<string, unknown>).name ?? "")),
+);
 
 // --- object and regexp ----------------------------------------------------
 
@@ -926,14 +1026,22 @@ function builtinField(recv: unknown, name: string): { hit: boolean; v?: unknown 
   if (t === "date") {
     const d = recv as Date;
     switch (name) {
-      case "year": return { hit: true, v: d.getFullYear() };
-      case "month": return { hit: true, v: d.getMonth() + 1 };
-      case "day": return { hit: true, v: d.getDate() };
-      case "hour": return { hit: true, v: d.getHours() };
-      case "minute": return { hit: true, v: d.getMinutes() };
-      case "second": return { hit: true, v: d.getSeconds() };
-      case "millisecond": return { hit: true, v: d.getMilliseconds() };
-      default: break;
+      case "year":
+        return { hit: true, v: d.getFullYear() };
+      case "month":
+        return { hit: true, v: d.getMonth() + 1 };
+      case "day":
+        return { hit: true, v: d.getDate() };
+      case "hour":
+        return { hit: true, v: d.getHours() };
+      case "minute":
+        return { hit: true, v: d.getMinutes() };
+      case "second":
+        return { hit: true, v: d.getSeconds() };
+      case "millisecond":
+        return { hit: true, v: d.getMilliseconds() };
+      default:
+        break;
     }
   }
   return { hit: false };
@@ -1033,18 +1141,30 @@ function binary(node: Node & { k: "binary" }, ctx: Ctx): unknown {
   const a = evaluate(node.a, ctx);
   const b = evaluate(node.b, ctx);
   switch (node.op) {
-    case "==": return equals(a, b);
-    case "!=": return !equals(a, b);
-    case ">": return order(a, b, ">") > 0;
-    case "<": return order(a, b, "<") < 0;
-    case ">=": return order(a, b, ">=") >= 0;
-    case "<=": return order(a, b, "<=") <= 0;
-    case "+": return add(a, b);
-    case "-": return subtract(a, b);
-    case "*": return multiply(a, b);
-    case "/": return toNumber(a) / toNumber(b);
-    case "%": return toNumber(a) % toNumber(b);
-    default: return null;
+    case "==":
+      return equals(a, b);
+    case "!=":
+      return !equals(a, b);
+    case ">":
+      return order(a, b, ">") > 0;
+    case "<":
+      return order(a, b, "<") < 0;
+    case ">=":
+      return order(a, b, ">=") >= 0;
+    case "<=":
+      return order(a, b, "<=") <= 0;
+    case "+":
+      return add(a, b);
+    case "-":
+      return subtract(a, b);
+    case "*":
+      return multiply(a, b);
+    case "/":
+      return toNumber(a) / toNumber(b);
+    case "%":
+      return toNumber(a) % toNumber(b);
+    default:
+      return null;
   }
 }
 
@@ -1052,7 +1172,8 @@ function add(a: unknown, b: unknown): unknown {
   const ta = typeOf(a);
   const tb = typeOf(b);
   if (ta === "date") return shift(a as Date, tb === "duration" ? (b as Duration) : parseDuration(toText(b)), 1);
-  if (ta === "duration" && tb === "duration") return new Duration((a as Duration).months + (b as Duration).months, (a as Duration).ms + (b as Duration).ms);
+  if (ta === "duration" && tb === "duration")
+    return new Duration((a as Duration).months + (b as Duration).months, (a as Duration).ms + (b as Duration).ms);
   if (ta === "list" && tb === "list") return [...(a as unknown[]), ...(b as unknown[])];
   if (ta === "string" || tb === "string") return toText(a) + toText(b);
   return toNumber(a) + toNumber(b);
@@ -1064,7 +1185,8 @@ function subtract(a: unknown, b: unknown): unknown {
   // The reference is explicit: a date minus a date is milliseconds.
   if (ta === "date" && tb === "date") return (a as Date).getTime() - (b as Date).getTime();
   if (ta === "date") return shift(a as Date, tb === "duration" ? (b as Duration) : parseDuration(toText(b)), -1);
-  if (ta === "duration" && tb === "duration") return new Duration((a as Duration).months - (b as Duration).months, (a as Duration).ms - (b as Duration).ms);
+  if (ta === "duration" && tb === "duration")
+    return new Duration((a as Duration).months - (b as Duration).months, (a as Duration).ms - (b as Duration).ms);
   return toNumber(a) - toNumber(b);
 }
 
@@ -1091,7 +1213,11 @@ function call(node: Node & { k: "call" }, ctx: Ctx): unknown {
         clause: CLAUSES.REQUIRED_ARGS,
         expected: `a global function: ${[...GLOBALS.keys()].sort().join(", ")}`,
         got: `${node.name}()`,
-        remedy: { tool: "se_file_read", args: { path: "project/spec/bases-syntax.md" }, note: "section 9 lists every function; register our own with registerGlobal" },
+        remedy: {
+          tool: "se_file_read",
+          args: { path: "project/spec/bases-syntax.md" },
+          note: "section 9 lists every function; register our own with registerGlobal",
+        },
         source: SRC,
       });
     }
@@ -1109,7 +1235,11 @@ function call(node: Node & { k: "call" }, ctx: Ctx): unknown {
       clause: CLAUSES.REQUIRED_ARGS,
       expected: known.length > 0 ? `a ${t} function: ${known.join(", ")}` : `a function on a ${t}`,
       got: `${t}.${node.name}()`,
-      remedy: { tool: "se_file_read", args: { path: "project/spec/bases-syntax.md" }, note: "section 9 lists every function; register our own with registerMethod" },
+      remedy: {
+        tool: "se_file_read",
+        args: { path: "project/spec/bases-syntax.md" },
+        note: "section 9 lists every function; register our own with registerMethod",
+      },
       source: SRC,
     });
   }
@@ -1124,7 +1254,11 @@ function guardVolatile(fn: Fn, name: string, ctx: Ctx): void {
     clause: CLAUSES.REQUIRED_ARGS,
     expected: "an expression whose value does not move between renders",
     got: `${name}() in a render that must regenerate byte-identically`,
-    remedy: { tool: "se_file_read", args: { path: "project/spec/bases-syntax.md" }, note: "pass deterministic: false where a moving value is wanted" },
+    remedy: {
+      tool: "se_file_read",
+      args: { path: "project/spec/bases-syntax.md" },
+      note: "pass deterministic: false where a moving value is wanted",
+    },
     source: SRC,
   });
 }
@@ -1146,7 +1280,7 @@ export function compare(a: unknown, b: unknown): number {
   if (ta === "number" && tb === "number") return (a as number) - (b as number);
   if (ta === "date" && tb === "date") return (a as Date).getTime() - (b as Date).getTime();
   if (ta === "duration" && tb === "duration") return durationMs(a as Duration) - durationMs(b as Duration);
-  if (ta === "boolean" && tb === "boolean") return (a === b ? 0 : a === true ? 1 : -1);
+  if (ta === "boolean" && tb === "boolean") return a === b ? 0 : a === true ? 1 : -1;
   return toText(a).localeCompare(toText(b), undefined, { numeric: true });
 }
 

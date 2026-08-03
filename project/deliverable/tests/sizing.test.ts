@@ -18,7 +18,16 @@ import { renderMirror } from "../engine/render.ts";
 import { Session } from "../engine/session.ts";
 import { freshRoot } from "./helpers.ts";
 
-interface Node { id: string; type?: string; x: number; y: number; width: number; height: number; file?: string; styleAttributes?: { shape?: string } }
+interface Node {
+  id: string;
+  type?: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  file?: string;
+  styleAttributes?: { shape?: string };
+}
 
 function mainCanvas(): { nodes: Node[] } {
   return JSON.parse(readFileSync(new URL("../machines/main.canvas", import.meta.url), "utf8")) as { nodes: Node[] };

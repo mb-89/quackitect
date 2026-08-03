@@ -5,7 +5,15 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { confirmPrefill, lintForm, parseFormTemplate, scaffoldInstance, stripComments, withFieldContent, withStatus } from "../engine/forms.ts";
+import {
+  confirmPrefill,
+  lintForm,
+  parseFormTemplate,
+  scaffoldInstance,
+  stripComments,
+  withFieldContent,
+  withStatus,
+} from "../engine/forms.ts";
 
 const TPL = `---
 form: t1
@@ -25,7 +33,10 @@ test("a template parses: fields, requiredness, the instance name — garbage ref
   const t = parseFormTemplate("t1", TPL);
   assert.equal(t.instance, "report.md");
   assert.equal(t.statement, "T1 — the page");
-  assert.deepEqual(t.fields.map((f) => f.name), ["Goal", "Done", "Files"]);
+  assert.deepEqual(
+    t.fields.map((f) => f.name),
+    ["Goal", "Done", "Files"],
+  );
   assert.equal(t.fields[2].required, false);
   assert.throws(() => parseFormTemplate("t2", "---\nform: t2\n---\n\n# X\n\n## Fields\n\n- broken line\n"));
   assert.throws(() => parseFormTemplate("t3", "---\nform: t3\n---\n\n# X\n"));

@@ -6,10 +6,21 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { Rejection } from "../engine/errors.ts";
-import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileReplace, fileWrite, globToRegExp, IMAGE_BUDGET, READ_BUDGET } from "../engine/files.ts";
+import {
+  fileDelete,
+  fileGlob,
+  fileList,
+  filePatch,
+  fileRead,
+  fileReplace,
+  fileWrite,
+  globToRegExp,
+  IMAGE_BUDGET,
+  READ_BUDGET,
+} from "../engine/files.ts";
 import { contentHash } from "../engine/hash.ts";
-import { search } from "../engine/search.ts";
 import { run } from "../engine/run.ts";
+import { search } from "../engine/search.ts";
 
 function fresh(): string {
   return mkdtempSync(join(tmpdir(), "se-v3-"));
@@ -50,7 +61,10 @@ test("a file too binary to search is REPORTED, never silently empty", () => {
   // The same shape as the real defect: readable source with one NUL in it.
   writeFileSync(join(root, "withnul.ts"), "const marker = 2;\nconst k = `aNULb`;\n".replace("NUL", String.fromCharCode(0)));
   const r = search(root, "marker");
-  assert.ok(r.matches.some((m) => m.path === "plain.ts"), "the readable file still matches");
+  assert.ok(
+    r.matches.some((m) => m.path === "plain.ts"),
+    "the readable file still matches",
+  );
   // Either ripgrep read it, or it said it could not. Silence is the bug.
   const found = r.matches.some((m) => m.path === "withnul.ts");
   const announced = (r.unreadable ?? []).includes("withnul.ts");
@@ -95,7 +109,10 @@ test("the patch door closes the same way, and names it on the result", () => {
   const root = fresh();
   fileWrite(root, "engine/y.ts", 'const sep = "HERE";\n', null);
   const r = filePatch(root, [{ path: "engine/y.ts", old_string: "HERE", new_string: String.fromCharCode(0) }]);
-  assert.ok((r.corrected ?? []).some((c) => c.includes("engine/y.ts")), "the correction rides the result");
+  assert.ok(
+    (r.corrected ?? []).some((c) => c.includes("engine/y.ts")),
+    "the correction rides the result",
+  );
   assert.equal(readFileSync(join(root, "engine", "y.ts"), "utf8").includes(String.fromCharCode(0)), false);
   rmSync(root, { recursive: true, force: true });
 });
@@ -124,14 +141,20 @@ test("a wide replace sweeps every file the glob reaches, and names every place",
 test("a pattern that matches nothing REFUSES — a sweep that hit nothing is not a success", () => {
   const root = fresh();
   fileWrite(root, "a/one.ts", "const q = 1;\n", null);
-  assert.throws(() => fileReplace(root, "**/*.ts", "nowhere", "x"), (e: unknown) => e instanceof Rejection);
+  assert.throws(
+    () => fileReplace(root, "**/*.ts", "nowhere", "x"),
+    (e: unknown) => e instanceof Rejection,
+  );
   rmSync(root, { recursive: true, force: true });
 });
 
 test("expect_count guards a sweep whose size you already know, and writes nothing when it is wrong", () => {
   const root = fresh();
   fileWrite(root, "a/one.ts", 'const p = "old";\nconst r = "old";\n', null);
-  assert.throws(() => fileReplace(root, "**/*.ts", "old", "new", { expect_count: 1 }), (e: unknown) => e instanceof Rejection);
+  assert.throws(
+    () => fileReplace(root, "**/*.ts", "old", "new", { expect_count: 1 }),
+    (e: unknown) => e instanceof Rejection,
+  );
   assert.ok(readFileSync(join(root, "a", "one.ts"), "utf8").includes('"old"'), "a refused sweep leaves the tree untouched");
   rmSync(root, { recursive: true, force: true });
 });
@@ -145,7 +168,10 @@ test("the move sweep repairs a NUL file instead of skipping it in silence", asyn
   fileWrite(root, "engine/keep.ts", "const a = 1;\n", null);
   writeFileSync(join(root, "engine", "ref.ts"), `const p = "project/guidance/old.md";\nconst sep = "${String.fromCharCode(0)}";\n`);
   const r = fileMove(root, "project/guidance/old.md", "project/guidance/new.md");
-  assert.ok((r.corrected ?? []).some((c) => c.includes("ref.ts")), "the repair is named");
+  assert.ok(
+    (r.corrected ?? []).some((c) => c.includes("ref.ts")),
+    "the repair is named",
+  );
   const after = readFileSync(join(root, "engine", "ref.ts"), "utf8");
   assert.ok(after.includes("project/guidance/new.md"), "and the reference is rewritten, which the skip prevented");
   rmSync(root, { recursive: true, force: true });
@@ -166,7 +192,9 @@ test("the move sweep repairs a NUL file instead of skipping it in silence", asyn
 test("se_run does not block the event loop", async () => {
   const root = fresh();
   let ticks = 0;
-  const beat = setInterval(() => { ticks++; }, 20);
+  const beat = setInterval(() => {
+    ticks++;
+  }, 20);
   const sleep = process.platform === "win32" ? "Start-Sleep -Milliseconds 400" : "sleep 0.4";
   const r = await run(root, sleep);
   clearInterval(beat);
@@ -182,7 +210,7 @@ test("read returns hash and numbered lines", () => {
   writeFileSync(join(root, "a.md"), "one\ntwo\nthree\n");
   const r = fileRead(root, "a.md");
   assert.equal(r.total_lines, 4);
-  assert.match(r.content, /    1\tone/);
+  assert.match(r.content, / {4}1\tone/);
   assert.equal(r.hash.length, 12);
 });
 
@@ -334,8 +362,14 @@ test("ref READS reach committed states too: git show + ls-tree through the lane"
   assert.deepEqual(g.files, ["doc.md"]);
   assert.equal(g.ref, "main");
   // A missing path names the spec; an unknown ref names the ref.
-  assert.throws(() => fileRead(root, "nope.md", { ref: "main" }), (e) => (e as Rejection).clause === "SE-C-102");
-  assert.throws(() => fileGlob(root, "**", { ref: "nope" }), (e) => (e as Rejection).clause === "SE-C-102");
+  assert.throws(
+    () => fileRead(root, "nope.md", { ref: "main" }),
+    (e) => (e as Rejection).clause === "SE-C-102",
+  );
+  assert.throws(
+    () => fileGlob(root, "**", { ref: "nope" }),
+    (e) => (e as Rejection).clause === "SE-C-102",
+  );
 });
 
 test("move fixes every reference form: root-relative, vault-relative, wiki link", async () => {
@@ -343,7 +377,12 @@ test("move fixes every reference form: root-relative, vault-relative, wiki link"
   const root = fresh();
   fileWrite(root, "project/guidance/old.md", "# Doc", null);
   fileWrite(root, "project/notes/uses.md", "See project/guidance/old.md and [[guidance/old|the doc]].", null);
-  fileWrite(root, "project/m/x.canvas", '{"nodes":[{"id":"a","type":"file","file":"guidance/old.md","x":0,"y":0,"width":1,"height":1}]}', null);
+  fileWrite(
+    root,
+    "project/m/x.canvas",
+    '{"nodes":[{"id":"a","type":"file","file":"guidance/old.md","x":0,"y":0,"width":1,"height":1}]}',
+    null,
+  );
   const r = fileMove(root, "project/guidance/old.md", "project/guidance/new/doc.md");
   assert.equal(r.rewritten.length, 2);
   assert.ok(readFileSync(join(root, "project/notes/uses.md"), "utf8").includes("project/guidance/new/doc.md"));
@@ -351,7 +390,10 @@ test("move fixes every reference form: root-relative, vault-relative, wiki link"
   assert.ok(readFileSync(join(root, "project/m/x.canvas"), "utf8").includes("guidance/new/doc.md"));
   // no silent overwrite
   fileWrite(root, "project/guidance/other.md", "x", null);
-  assert.throws(() => fileMove(root, "project/guidance/other.md", "project/guidance/new/doc.md"), (e) => (e as Rejection).clause === "SE-C-104");
+  assert.throws(
+    () => fileMove(root, "project/guidance/other.md", "project/guidance/new/doc.md"),
+    (e) => (e as Rejection).clause === "SE-C-104",
+  );
 });
 
 // The mover was a markdown tool wearing a general file tool's name. Moving
@@ -415,10 +457,7 @@ test("move leaves markdown reference forms out of source, and spares longer name
 // every file as utf8, so the owner had to describe a drawing the agent was
 // holding the path to. Nothing ever ruled the reader text-only; it was only
 // ever written that way (owner, 2026-07-29).
-const PNG_1X1 = Buffer.from(
-  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
-  "base64",
-);
+const PNG_1X1 = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
 
 test("an image reads back as the PICTURE, not as lines", () => {
   const root = fresh();
@@ -448,7 +487,10 @@ test("an image carries a hash, so it can satisfy a read condition like any doc",
 test("an oversize image is refused, never silently downscaled", () => {
   const root = fresh();
   writeFileSync(join(root, "huge.png"), Buffer.alloc(IMAGE_BUDGET + 1));
-  assert.throws(() => fileRead(root, "huge.png"), (e) => (e as Rejection).clause === "SE-C-103");
+  assert.throws(
+    () => fileRead(root, "huge.png"),
+    (e) => (e as Rejection).clause === "SE-C-103",
+  );
   rmSync(root, { recursive: true, force: true });
 });
 
@@ -487,10 +529,16 @@ test("a declared root serves reads; an undeclared one refuses with the vocabular
     (e) => (e as Rejection).clause === "SE-C-127" && (e as Rejection).expected.includes("desk"),
   );
   // No climbing out of a declared root.
-  assert.throws(() => fileRead(root, "@desk/../beyond.md"), (e) => (e as Rejection).clause === "SE-C-102");
+  assert.throws(
+    () => fileRead(root, "@desk/../beyond.md"),
+    (e) => (e as Rejection).clause === "SE-C-102",
+  );
   // A declared root is a READ surface. Writing to one is refused, and never
   // silently creates a literal "@desk" folder inside the project.
-  assert.throws(() => fileWrite(root, "@desk/new.md", "x", null), (e) => (e as Rejection).clause === "SE-C-102");
+  assert.throws(
+    () => fileWrite(root, "@desk/new.md", "x", null),
+    (e) => (e as Rejection).clause === "SE-C-102",
+  );
   assert.equal(existsSync(join(root, "@desk")), false);
 
   rmSync(root, { recursive: true, force: true });

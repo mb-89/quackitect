@@ -11,16 +11,9 @@
 // the next refused call's remedy re-boots the agent in one turn.
 import { existsSync, mkdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { contentHash } from "./hash.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
-import {
-  activeStates,
-  completeState,
-  reopenStates,
-  type MachineDecl,
-  type MachineInstance,
-  type StateDecl,
-} from "./machine.ts";
+import { contentHash } from "./hash.ts";
+import { activeStates, completeState, type MachineDecl, type MachineInstance, reopenStates, type StateDecl } from "./machine.ts";
 import { bumpDrawingEpoch, compileMachine, compileMachineCached, resolveRef } from "./machines/compile.ts";
 import { computeRoute, type RouteNode, type RouteResult } from "./route.ts";
 
@@ -36,22 +29,43 @@ import { computeRoute, type RouteNode, type RouteResult } from "./route.ts";
 export function visitState(visit: string): string {
   return visit.split("@")[0].split("/").pop() ?? "";
 }
-import { conditionNotePath } from "./conditions.ts";
-import { drainNote, pendingNotes } from "./inbox.ts";
-import { confirmPrefill, formTemplatePath, lintForm, parseFormTemplate, scaffoldInstance, withFieldContent, withStatus, type FormLint, type FormTemplate } from "./forms.ts";
-import { pulledFor, scanGuidance, type GuidanceDoc, type PulledDoc } from "./pull.ts";
-import { expClose, expFind, expList, expNew, readRecord, type Expedition } from "./worktree.ts";
-import { generateContinueExpedition, generateExpeditionArchive, shortId, type GeneratedMachine } from "./expmachine.ts";
-import { type CanvasData } from "./canvas.ts";
+
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { resolveInRoot, seDir } from "./paths.ts";
+import type { CanvasData } from "./canvas.ts";
+import { conditionNotePath } from "./conditions.ts";
 import { Decisions, replayFile } from "./decisions.ts";
-import { generateIterationArchive, generateIterations, itFind, itPinRel, itRecordRel, itSeed, markStarted, pinIteration, readItRecord } from "./iterations.ts";
-import { anyJobRunning } from "./run.ts";
-import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
+import { type GeneratedMachine, generateContinueExpedition, generateExpeditionArchive, shortId } from "./expmachine.ts";
+import {
+  confirmPrefill,
+  type FormLint,
+  type FormTemplate,
+  formTemplatePath,
+  lintForm,
+  parseFormTemplate,
+  scaffoldInstance,
+  withFieldContent,
+  withStatus,
+} from "./forms.ts";
+import { drainNote, pendingNotes } from "./inbox.ts";
+import {
+  generateIterationArchive,
+  generateIterations,
+  itFind,
+  itPinRel,
+  itRecordRel,
+  itSeed,
+  markStarted,
+  pinIteration,
+  readItRecord,
+} from "./iterations.ts";
 import { parseStateNote, section } from "./notes.ts";
+import { resolveInRoot, seDir } from "./paths.ts";
+import { type GuidanceDoc, type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
+import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
+import { anyJobRunning } from "./run.ts";
 import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
+import { type Expedition, expClose, expFind, expList, expNew, readRecord } from "./worktree.ts";
 
 /** THE PULL is the machinery — one verb, legal in EVERY state: the agent
  *  says pull and the machine says what to do. se_note is legal everywhere
@@ -154,16 +168,27 @@ export class Session {
     // to forget, so a crash or a power cut cannot leave the last session's
     // sliders standing either.
     try {
-      const s = JSON.parse(readFileSync(join(seDir(root), "settings.json"), "utf8")) as { autonomy?: number; block_sleep?: boolean; shutdown_at_idle?: boolean; narration_minutes?: number; narration_calls?: number; session?: string };
+      const s = JSON.parse(readFileSync(join(seDir(root), "settings.json"), "utf8")) as {
+        autonomy?: number;
+        block_sleep?: boolean;
+        shutdown_at_idle?: boolean;
+        narration_minutes?: number;
+        narration_calls?: number;
+        session?: string;
+      };
       const mine = process.env.SE_SESSION;
       if (mine !== undefined && mine !== "" && s.session === mine) {
         if (typeof s.autonomy === "number" && s.autonomy >= 0 && s.autonomy <= 1) this._autonomy = s.autonomy;
         if (typeof s.block_sleep === "boolean") this._blockSleep = s.block_sleep;
-    if (typeof s.shutdown_at_idle === "boolean") this._shutdownAtIdle = s.shutdown_at_idle;
-        if (typeof s.narration_minutes === "number" && Number.isInteger(s.narration_minutes) && s.narration_minutes >= 0) this._narrationMinutes = s.narration_minutes;
-        if (typeof s.narration_calls === "number" && Number.isInteger(s.narration_calls) && s.narration_calls >= 0) this._narrationCalls = s.narration_calls;
+        if (typeof s.shutdown_at_idle === "boolean") this._shutdownAtIdle = s.shutdown_at_idle;
+        if (typeof s.narration_minutes === "number" && Number.isInteger(s.narration_minutes) && s.narration_minutes >= 0)
+          this._narrationMinutes = s.narration_minutes;
+        if (typeof s.narration_calls === "number" && Number.isInteger(s.narration_calls) && s.narration_calls >= 0)
+          this._narrationCalls = s.narration_calls;
       }
-    } catch { /* no store yet — the defaults stand */ }
+    } catch {
+      /* no store yet — the defaults stand */
+    }
     this.syncKeepAwake();
     this.armIdleTimer();
   }
@@ -171,8 +196,21 @@ export class Session {
   private persistSettings(): void {
     try {
       mkdirSync(seDir(this.root), { recursive: true });
-      writeFileSync(join(seDir(this.root), "settings.json"), JSON.stringify({ session: process.env.SE_SESSION ?? null, autonomy: this._autonomy, block_sleep: this._blockSleep, shutdown_at_idle: this._shutdownAtIdle, narration_minutes: this._narrationMinutes, narration_calls: this._narrationCalls }) + "\n", "utf8");
-    } catch { /* a failed save never blocks the slider */ }
+      writeFileSync(
+        join(seDir(this.root), "settings.json"),
+        JSON.stringify({
+          session: process.env.SE_SESSION ?? null,
+          autonomy: this._autonomy,
+          block_sleep: this._blockSleep,
+          shutdown_at_idle: this._shutdownAtIdle,
+          narration_minutes: this._narrationMinutes,
+          narration_calls: this._narrationCalls,
+        }) + "\n",
+        "utf8",
+      );
+    } catch {
+      /* a failed save never blocks the slider */
+    }
   }
 
   /** Boot is done — the toll arms on this; the reading room pays none. */
@@ -238,7 +276,11 @@ export class Session {
         clause: CLAUSES.REQUIRED_ARGS,
         expected: "a power toggle: block-auto-sleep or shutdown-at-idle",
         got: key,
-        remedy: { tool: "se_file_read", args: { path: "project/deliverable/machines/panels/controls.md" }, note: "the shutdown row names both" },
+        remedy: {
+          tool: "se_file_read",
+          args: { path: "project/deliverable/machines/panels/controls.md" },
+          note: "the shutdown row names both",
+        },
         source: "engine/session.ts power",
       });
     }
@@ -291,12 +333,15 @@ export class Session {
     // warning does not immediately arm another one behind them.
     this._shutdownAtIdle = false;
     this.armIdleTimer();
-    spawn("shutdown.exe", ["/s", "/t", "60", "/c", "se: idle for five minutes"], { stdio: "ignore", windowsHide: true, detached: true }).unref();
+    spawn("shutdown.exe", ["/s", "/t", "60", "/c", "se: idle for five minutes"], {
+      stdio: "ignore",
+      windowsHide: true,
+      detached: true,
+    }).unref();
   }
 
   /** The mirror's URL when one is listening — the panel se_panel opens. */
   mirrorUrl?: string;
-
 
   /** THE UPDATE CADENCE (owner design 2026-07-31, redrawn 2026-08-01): how
    *  often narration is OWED. TWO NUMBERS, not a level — an update every n
@@ -397,7 +442,11 @@ export class Session {
         clause: CLAUSES.CONDITION_UNMET,
         expected: `the milestone review report — no gate passes without one (${rel})`,
         got: "no review report in the record",
-        remedy: { tool: "se_file_write", args: { path: rel, content: scaffold, base_hash: null }, note: "fill every section — this report is what a person reads most; a prefilled comment counts as empty until real text replaces it" },
+        remedy: {
+          tool: "se_file_write",
+          args: { path: rel, content: scaffold, base_hash: null },
+          note: "fill every section — this report is what a person reads most; a prefilled comment counts as empty until real text replaces it",
+        },
         source: "engine/session.ts gate",
       });
     }
@@ -416,19 +465,27 @@ export class Session {
     }
     const note = parseStateNote(raw);
     const problems: string[] = [];
-    const filledText = (name: string): string => section(note.body, name).replace(/<!--[\s\S]*?-->/g, "").trim();
+    const filledText = (name: string): string =>
+      section(note.body, name)
+        .replace(/<!--[\s\S]*?-->/g, "")
+        .trim();
     for (const f of s.evidence_form) {
       if (f.required && filledText(f.name) === "") problems.push(`${f.name} is empty`);
     }
     if (note.frontmatter.status !== "done") problems.push("status is not done");
     const verdict = typeof note.frontmatter.verdict === "string" ? note.frontmatter.verdict.trim().toUpperCase() : "";
-    if (!verdict.startsWith("PASS")) problems.push(`the verdict is "${String(note.frontmatter.verdict ?? "")}" — PASS passes, anything else holds the gate`);
+    if (!verdict.startsWith("PASS"))
+      problems.push(`the verdict is "${String(note.frontmatter.verdict ?? "")}" — PASS passes, anything else holds the gate`);
     if (problems.length > 0) {
       throw new Rejection({
         clause: CLAUSES.CONDITION_UNMET,
         expected: `a complete, PASSED milestone review at ${rel}`,
         got: problems.join(" · "),
-        remedy: { tool: "se_file_read", args: { path: rel }, note: "fill what is empty, set status: done and the verdict, then tick again" },
+        remedy: {
+          tool: "se_file_read",
+          args: { path: rel },
+          note: "fill what is empty, set status: done and the verdict, then tick again",
+        },
         source: "engine/session.ts gate",
       });
     }
@@ -451,7 +508,8 @@ export class Session {
     if (t === "") {
       throw new Rejection({
         clause: CLAUSES.REQUIRED_ARGS,
-        expected: "a surface to ping: a card id (its slugged title from project/views/cards.md), the widget a card shows, a drawn state id, or an element id",
+        expected:
+          "a surface to ping: a card id (its slugged title from project/views/cards.md), the widget a card shows, a drawn state id, or an element id",
         got: "an empty target",
         remedy: { tool: "se_panel", args: { ping: "log" }, note: "name what the reader should look at" },
         source: "engine/session.ts ping",
@@ -467,7 +525,8 @@ export class Session {
     // while work is happening; once it is not, powering off is the point.
     const want = (this._blockSleep || this._shutdownAtIdle) && process.platform === "win32" && process.env.SE_KEEPAWAKE_DISABLE !== "1";
     if (want && this.keepAwake === undefined) {
-      const src = "Add-Type -TypeDefinition 'using System.Runtime.InteropServices; public class KA { [DllImport(\"kernel32.dll\")] public static extern uint SetThreadExecutionState(uint f); }'; while ($true) { [KA]::SetThreadExecutionState(2147483651) | Out-Null; Start-Sleep -Seconds 30 }";
+      const src =
+        "Add-Type -TypeDefinition 'using System.Runtime.InteropServices; public class KA { [DllImport(\"kernel32.dll\")] public static extern uint SetThreadExecutionState(uint f); }'; while ($true) { [KA]::SetThreadExecutionState(2147483651) | Out-Null; Start-Sleep -Seconds 30 }";
       this.keepAwake = spawn("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", src], { stdio: "ignore", windowsHide: true });
       // The keepawake must never hold its OWNER open: an un-unref'd child
       // handle kept a test worker's event loop alive forever, wedged the
@@ -602,7 +661,11 @@ export class Session {
           clause: CLAUSES.ABOVE_THRESHOLD,
           expected: `a state within the session autonomy ${this._autonomy}`,
           got: `${id} weighs ${t.priority} — this step is the human's`,
-          remedy: { tool: "se_pull", args: {}, note: "STOP and tell the human PLAINLY: this step waits for their hand (they advance it in the mirror, or raise the slider), and the slider alone cannot wake you — they must SEND YOU A MESSAGE (e.g. 'continue') after changing it. Then end your turn. A later pull re-weighs the step." },
+          remedy: {
+            tool: "se_pull",
+            args: {},
+            note: "STOP and tell the human PLAINLY: this step waits for their hand (they advance it in the mirror, or raise the slider), and the slider alone cannot wake you — they must SEND YOU A MESSAGE (e.g. 'continue') after changing it. Then end your turn. A later pull re-weighs the step.",
+          },
           source: "engine/session.ts threshold",
         });
       }
@@ -627,7 +690,11 @@ export class Session {
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "the walk at idle — a reload reboots it, nothing mid-flight may be lost",
         got: `standing in ${leaf || "(nowhere)"}`,
-        remedy: { tool: "se_pull", args: {}, note: "reach idle first — answer the offered doors with idle, or ask the person to aim the mirror — then se_reload" },
+        remedy: {
+          tool: "se_pull",
+          args: {},
+          note: "reach idle first — answer the offered doors with idle, or ask the person to aim the mirror — then se_reload",
+        },
         source: "engine/session.ts reload",
       });
     }
@@ -640,13 +707,20 @@ export class Session {
         clause: CLAUSES.CONDITION_UNMET,
         expected: "sources whose module graph LOADS — the canary never kills a running engine for a broken tree",
         got: (r.stderr || "no canary output").trim().slice(0, 300),
-        remedy: { tool: "se_file_read", args: { path: "project/deliverable/engine/tools.ts" }, note: "fix the named error, then se_reload again" },
+        remedy: {
+          tool: "se_file_read",
+          args: { path: "project/deliverable/engine/tools.ts" },
+          note: "fix the named error, then se_reload again",
+        },
         source: "engine/session.ts reload",
       });
     }
     if (process.env.SE_RELOAD_DRY === "1") return { reload: "dry", note: "canary green — no exit (SE_RELOAD_DRY)" };
     setTimeout(() => process.exit(42), 400);
-    return { reload: "armed", note: "the engine restarts in under a second on the NEW sources — the walk reboots at start; tick when the lane answers" };
+    return {
+      reload: "armed",
+      note: "the engine restarts in under a second on the NEW sources — the walk reboots at start; tick when the lane answers",
+    };
   }
 
   /** Where the LANE works: the bound expedition's worktree, else the root. */
@@ -710,7 +784,9 @@ export class Session {
         got: "no change_size in the record's frontmatter",
         remedy: {
           tool: "se_file_patch",
-          args: { ops: [{ path: itRecordRel(it.id), old_string: "status:", new_string: `change_size: <${CHANGE_COLUMNS.join(" | ")}>\nstatus:` }] },
+          args: {
+            ops: [{ path: itRecordRel(it.id), old_string: "status:", new_string: `change_size: <${CHANGE_COLUMNS.join(" | ")}>\nstatus:` }],
+          },
           note: "prefill it from the goal with its reasoning — the person's bless is the tick itself",
         },
         source: "engine/session.ts kickoff",
@@ -803,8 +879,16 @@ export class Session {
       throw new Rejection({
         clause: CLAUSES.DECISION_UNRESOLVED,
         expected: "no open decision point on this record — the graph is evidence",
-        got: open.slice(0, 8).map((n) => `${n.id}: ${n.brief}`).join(" · ") + (open.length > 8 ? ` · …and ${open.length - 8} more` : ""),
-        remedy: { tool: "se_pull", args: { update: { op: "done", node: open[0].id, brief: "<how it resolved>" } }, note: "resolve every point (done | obsolete | revert | defer), then close" },
+        got:
+          open
+            .slice(0, 8)
+            .map((n) => `${n.id}: ${n.brief}`)
+            .join(" · ") + (open.length > 8 ? ` · …and ${open.length - 8} more` : ""),
+        remedy: {
+          tool: "se_pull",
+          args: { update: { op: "done", node: open[0].id, brief: "<how it resolved>" } },
+          note: "resolve every point (done | obsolete | revert | defer), then close",
+        },
         source: "engine/session.ts close",
       });
     }
@@ -842,8 +926,12 @@ export class Session {
     return {
       ...result,
       note: merge ? "applied — merged to trunk, archived" : "dismissed — archived unmerged",
-      ...(moved === undefined ? {} : { moved_to: moved, moved_note: "the record's states are archived, so the walk stands at the container's end" }),
-      ...(result.override === undefined ? {} : { override_note: "the report was NOT confirmed by a person — this close is recorded as an override on the record" }),
+      ...(moved === undefined
+        ? {}
+        : { moved_to: moved, moved_note: "the record's states are archived, so the walk stands at the container's end" }),
+      ...(result.override === undefined
+        ? {}
+        : { override_note: "the report was NOT confirmed by a person — this close is recorded as an override on the record" }),
     };
   }
 
@@ -962,7 +1050,14 @@ export class Session {
    *  the walk stands instead of stranding. Found live 2026-07-28: plain
    *  return edges compiled as normal made idle an AND-join, and completing
    *  boot dropped the only token into nowhere. */
-  private completeGuarded(m: MachineDecl, inst: MachineInstance, stateId: string, outcome: "filled" | "failed", now: string, only?: string): void {
+  private completeGuarded(
+    m: MachineDecl,
+    inst: MachineInstance,
+    stateId: string,
+    outcome: "filled" | "failed",
+    now: string,
+    only?: string,
+  ): void {
     const snap = {
       active: inst.active === undefined ? undefined : [...inst.active],
       fired: inst.fired === undefined ? undefined : [...inst.fired],
@@ -980,7 +1075,11 @@ export class Session {
       clause: CLAUSES.DEAD_END,
       expected: `completing ${stateId} activates a successor`,
       got: `nothing activates — ${starving.join(", ") || "a join"} still waits for other inbound edges (the drawing makes it an AND-join)`,
-      remedy: { tool: "se_pull", args: {}, note: "every plain edge into the named state must fire before it activates. If those edges are returns, redraw them (a reverse-of-forward edge compiles as a return) — or walk the other branches first. The walk has not moved." },
+      remedy: {
+        tool: "se_pull",
+        args: {},
+        note: "every plain edge into the named state must fire before it activates. If those edges are returns, redraw them (a reverse-of-forward edge compiles as a return) — or walk the other branches first. The walk has not moved.",
+      },
       source: "engine/session.ts wedge-guard",
     });
   }
@@ -1177,7 +1276,11 @@ export class Session {
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "a state the drawing can reach from here",
         got: `${wanted} — ${r.note ?? "no path"}`,
-        remedy: { tool: "se_pull", args: {}, note: "aim only at drawn states — pull with no payload and the machine offers the doors it can reach" },
+        remedy: {
+          tool: "se_pull",
+          args: {},
+          note: "aim only at drawn states — pull with no payload and the machine offers the doors it can reach",
+        },
         source: "engine/session.ts target",
       });
     }
@@ -1236,7 +1339,9 @@ export class Session {
     // in main found nothing, so every such door read as not-a-submachine
     // by accident rather than by test.
     const cut = target.lastIndexOf("/");
-    const decl = this.declForPrefix(cut < 0 ? "" : target.slice(0, cut))?.states.find((s) => s.id === (cut < 0 ? target : target.slice(cut + 1)));
+    const decl = this.declForPrefix(cut < 0 ? "" : target.slice(0, cut))?.states.find(
+      (s) => s.id === (cut < 0 ? target : target.slice(cut + 1)),
+    );
     const aim = decl?.submachine !== undefined ? Session.qual(target, this.declForPrefix(target)?.initial ?? "start") : target;
     const r = computeRoute(from, aim, (q) => this.expandNode(q));
     const judgments: { at: string; needs: string; why: string }[] = [];
@@ -1432,7 +1537,9 @@ export class Session {
           as: 'form: {"read": "<the answers, in one string, in order>"}',
           why: "they are spread through the document on purpose — all of it has to be in hand",
         },
-        ...(unreadable.length > 0 ? { unreadable, warning: "demanded, but not readable from here. The gate that wants them will say so." } : {}),
+        ...(unreadable.length > 0
+          ? { unreadable, warning: "demanded, but not readable from here. The gate that wants them will say so." }
+          : {}),
       };
     }
     return null;
@@ -1494,7 +1601,13 @@ export class Session {
       }
       walked.push(step.to);
     }
-    return { ...this.packet(), swept: walked, arrived: false, ...carry(), note: "64 hops without arriving — the sweep stops rather than looping" };
+    return {
+      ...this.packet(),
+      swept: walked,
+      arrived: false,
+      ...carry(),
+      note: "64 hops without arriving — the sweep stops rather than looping",
+    };
   }
 
   // ── THE PULL (owner design 2026-08-01) — the agent's ONE verb ───────
@@ -1592,7 +1705,13 @@ export class Session {
         ...(s.statement !== "" ? { statement: s.statement } : {}),
         guidance: s.guidance,
         legal_tools: s.kind === "start" || s.kind === "end" || s.kind === "join" ? [...MACHINERY] : (s.legal_tools ?? []),
-        ...(s.evidence_form.length > 0 ? { asks: s.evidence_form.filter((f) => f.type !== "derived").map((f) => ({ name: f.name, ...(f.type !== undefined ? { type: f.type } : {}), required: f.required !== false })) } : {}),
+        ...(s.evidence_form.length > 0
+          ? {
+              asks: s.evidence_form
+                .filter((f) => f.type !== "derived")
+                .map((f) => ({ name: f.name, ...(f.type !== undefined ? { type: f.type } : {}), required: f.required !== false })),
+            }
+          : {}),
       };
     });
   }
@@ -1618,7 +1737,10 @@ export class Session {
    *  A genuinely ILLEGAL call still throws (v2's Rejected kind): a choice
    *  outside the offer, a form nothing asked for. Those are contract
    *  violations, not a machine with nowhere to go. */
-  async pull(payload: { form?: Record<string, unknown>; escape?: string } = {}, channel: Channel = "agent"): Promise<Record<string, unknown>> {
+  async pull(
+    payload: { form?: Record<string, unknown>; escape?: string } = {},
+    channel: Channel = "agent",
+  ): Promise<Record<string, unknown>> {
     // ONE DRAWING VALIDATION PER WALK STEP — the epoch makes "the next
     // call" the unit of the read-it-live law (see machines/compile.ts).
     bumpDrawingEpoch();
@@ -1680,7 +1802,9 @@ export class Session {
         // pick must come from the OFFER, because a choice exists only
         // where the machine asked for one (owner, 2026-08-02).
         const offered = this.pullOptions().map((o) => String(o.to));
-        const picks = (Array.isArray(payload.form.choice) ? payload.form.choice : [payload.form.choice]).map(String).filter((x) => x !== "");
+        const picks = (Array.isArray(payload.form.choice) ? payload.form.choice : [payload.form.choice])
+          .map(String)
+          .filter((x) => x !== "");
         if (picks.length === 0) {
           throw new Rejection({
             clause: CLAUSES.REQUIRED_ARGS,
@@ -1696,7 +1820,11 @@ export class Session {
             clause: CLAUSES.NOT_LEGAL_IN_STATE,
             expected: `one of the offered doors: ${offered.join(", ")}`,
             got: stray,
-            remedy: { tool: "se_pull", args: {}, note: "a choice exists only where the machine offered one — pull with no payload and answer from its options" },
+            remedy: {
+              tool: "se_pull",
+              args: {},
+              note: "a choice exists only where the machine offered one — pull with no payload and answer from its options",
+            },
             source: "engine/session.ts pull",
           });
         }
@@ -1715,7 +1843,9 @@ export class Session {
 
     const extra = (): Record<string, unknown> => ({
       ...(saved !== undefined ? { form_saved: saved } : {}),
-      ...(fanOut.length > 0 ? { not_walked: fanOut, note: "one agent is walking, so only the first choice was taken — the others are yours to hand out" } : {}),
+      ...(fanOut.length > 0
+        ? { not_walked: fanOut, note: "one agent is walking, so only the first choice was taken — the others are yours to hand out" }
+        : {}),
     });
 
     // 1. NO TARGET means the machine is not trying to get anywhere. The
@@ -1723,9 +1853,21 @@ export class Session {
     if (this._target === "") {
       const options = this.pullOptions();
       if (options.length > 0) {
-        return { pull: "choose", ...head(), options, do: "pick one and return it on the next pull as form: {\"choice\": \"<to>\"} — a LIST is legal where the work fans out", ...extra() };
+        return {
+          pull: "choose",
+          ...head(),
+          options,
+          do: 'pick one and return it on the next pull as form: {"choice": "<to>"} — a LIST is legal where the work fans out',
+          ...extra(),
+        };
       }
-      return { pull: "wait", ...head(), waiting_for: "the person", do: "say plainly that nothing is owed and STOP — the slider alone cannot wake you, so ask them to message you", ...extra() };
+      return {
+        pull: "wait",
+        ...head(),
+        waiting_for: "the person",
+        do: "say plainly that nothing is owed and STOP — the slider alone cannot wake you, so ask them to message you",
+        ...extra(),
+      };
     }
 
     let r: ReturnType<Session["route"]>;
@@ -1733,11 +1875,24 @@ export class Session {
       r = this.route(this._target);
     } catch (e) {
       if (!(e instanceof Rejection)) throw e;
-      return { pull: "wait", ...head(), waiting_for: "the person", why: "the way there cannot be drawn from here", refusal: e.toJSON(), ...extra() };
+      return {
+        pull: "wait",
+        ...head(),
+        waiting_for: "the person",
+        why: "the way there cannot be drawn from here",
+        refusal: e.toJSON(),
+        ...extra(),
+      };
     }
 
     if (r.steps.length === 0) {
-      return { pull: "wait", ...head(), waiting_for: "the person", why: r.found ? "the target is where the walk already stands" : (r.note ?? "no way there"), ...extra() };
+      return {
+        pull: "wait",
+        ...head(),
+        waiting_for: "the person",
+        why: r.found ? "the target is where the walk already stands" : (r.note ?? "no way there"),
+        ...extra(),
+      };
     }
 
     const first = r.steps[0];
@@ -1767,7 +1922,7 @@ export class Session {
         ...head(),
         ...served,
         ...(readProof === "wrong" ? { note: "that did not answer every probe — here is the document again" } : {}),
-        do: "read the WHOLE document, then pull again answering every probe in `prove` as form: {\"read\": \"<the answers, in one string>\"}",
+        do: 'read the WHOLE document, then pull again answering every probe in `prove` as form: {"read": "<the answers, in one string>"}',
         ...extra(),
       };
     }
@@ -1780,7 +1935,7 @@ export class Session {
         ...head(),
         for: first.to,
         forms: unmet.map((n) => this.formGet(n)),
-        do: "fill every required section, then return it on the next pull as form: {\"<section>\": \"<text>\"} — there is no submit verb, and pulling without it hands back this same form",
+        do: 'fill every required section, then return it on the next pull as form: {"<section>": "<text>"} — there is no submit verb, and pulling without it hands back this same form',
         ...extra(),
       };
     }
@@ -1819,7 +1974,7 @@ export class Session {
           walked: swept.swept ?? [],
           ...servedNow,
           ...(swept.banners !== undefined ? { banners: swept.banners } : {}),
-          do: "read the document, then pull again returning its proof as form: {\"read\": \"<the last words>\"}",
+          do: 'read the document, then pull again returning its proof as form: {"read": "<the last words>"}',
           ...extra(),
         };
       }
@@ -1832,7 +1987,7 @@ export class Session {
           for: swept.stopped_at,
           forms: formsNow.map((n) => this.formGet(n)),
           ...(swept.banners !== undefined ? { banners: swept.banners } : {}),
-          do: "fill every required section, then return it on the next pull as form: {\"<section>\": \"<text>\"} — there is no submit verb, and pulling without it hands back this same form",
+          do: 'fill every required section, then return it on the next pull as form: {"<section>": "<text>"} — there is no submit verb, and pulling without it hands back this same form',
           ...extra(),
         };
       }
@@ -1845,7 +2000,10 @@ export class Session {
       here: this.pullHere(),
       ...(swept.banners !== undefined ? { banners: swept.banners } : {}),
       ...(swept.refusal !== undefined ? { stopped_at: swept.stopped_at, refusal: swept.refusal } : {}),
-      do: swept.refusal !== undefined ? "the stopped step says what it wants — do that, then pull again" : "do what the guidance asks, then pull again",
+      do:
+        swept.refusal !== undefined
+          ? "the stopped step says what it wants — do that, then pull again"
+          : "do what the guidance asks, then pull again",
       ...extra(),
     };
   }
@@ -2015,7 +2173,11 @@ export class Session {
       clause: CLAUSES.NOT_LEGAL_IN_STATE,
       expected: `a tool legal in state [${active}]: ${legalList}`,
       got: tool,
-      remedy: { tool: "se_pull", args: {}, note: "pull first — the machine says what to do next, and the lane opens as the walk reaches the states that allow it" },
+      remedy: {
+        tool: "se_pull",
+        args: {},
+        note: "pull first — the machine says what to do next, and the lane opens as the walk reaches the states that allow it",
+      },
       source: "engine/session.ts gate",
     });
   }
@@ -2079,7 +2241,13 @@ export class Session {
     return parseFormTemplate(name, readFileSync(tplAbs, "utf8"));
   }
 
-  private formHome(name: string): { template: FormTemplate; instanceAbs: string; instanceRel: string; evidenceAbs: string; evidenceRel: string } {
+  private formHome(name: string): {
+    template: FormTemplate;
+    instanceAbs: string;
+    instanceRel: string;
+    evidenceAbs: string;
+    evidenceRel: string;
+  } {
     if (this.bound === undefined) {
       throw new Rejection({
         clause: CLAUSES.CONDITION_UNMET,
@@ -2110,7 +2278,9 @@ export class Session {
     // so the check survives engine reloads. Attached, never copied.
     const open = this.openRecordPoints();
     if (open.length > 0) {
-      lint.problems.push(`the decision graph holds ${open.length} open point(s) — resolve each (done | obsolete | revert | defer) before the evidence stands`);
+      lint.problems.push(
+        `the decision graph holds ${open.length} open point(s) — resolve each (done | obsolete | revert | defer) before the evidence stands`,
+      );
       lint.met = false;
     }
     return lint;
@@ -2207,7 +2377,11 @@ export class Session {
         clause: CLAUSES.CONDITION_UNMET,
         expected: `an instance at ${h.instanceRel}`,
         got: "no instance yet",
-        remedy: { tool: "se_file_write", args: { path: h.instanceRel, content: "<the filled page>", base_hash: null }, note: "write the page (or save it from the mirror), then set it done" },
+        remedy: {
+          tool: "se_file_write",
+          args: { path: h.instanceRel, content: "<the filled page>", base_hash: null },
+          note: "write the page (or save it from the mirror), then set it done",
+        },
         source: "engine/session.ts forms",
       });
     }
@@ -2244,16 +2418,31 @@ export class Session {
         const keep: string[] = [];
         for (const l of lines) {
           const m = /^##progress\s+(\d+)\s+(\d+)\s*(.*)$/.exec(l);
-          if (m === null) { keep.push(l); continue; }
+          if (m === null) {
+            keep.push(l);
+            continue;
+          }
           this.setProgress(Number(m[1]), Number(m[2]), (m[3] ?? "").trim());
         }
         return keep.length === 0 ? "" : `${keep.join("\n")}\n`;
       };
-      child.stdout.on("data", (d: Buffer) => { out += eat(String(d)); });
-      child.stderr.on("data", (d: Buffer) => { out += d; });
+      child.stdout.on("data", (d: Buffer) => {
+        out += eat(String(d));
+      });
+      child.stderr.on("data", (d: Buffer) => {
+        out += d;
+      });
       const timer = setTimeout(() => child.kill(), 120_000);
-      child.on("error", (e) => { clearTimeout(timer); this.clearProgress(); resolve({ status: null, out: String(e) }); });
-      child.on("close", (code) => { clearTimeout(timer); this.clearProgress(); resolve({ status: code, out: out + pending }); });
+      child.on("error", (e) => {
+        clearTimeout(timer);
+        this.clearProgress();
+        resolve({ status: null, out: String(e) });
+      });
+      child.on("close", (code) => {
+        clearTimeout(timer);
+        this.clearProgress();
+        resolve({ status: code, out: out + pending });
+      });
     });
   }
 
@@ -2290,7 +2479,11 @@ export class Session {
       // evidence; the test files whose job is proving the scripts delete
       // the guard at their top.
       if (process.env.SE_SCRIPT_SKIP === "1") {
-        const result = { ok: true, output: scripts.map((rel) => `${rel} → skipped (SE_SCRIPT_SKIP)`).join("\n"), at: new Date().toISOString() };
+        const result = {
+          ok: true,
+          output: scripts.map((rel) => `${rel} → skipped (SE_SCRIPT_SKIP)`).join("\n"),
+          at: new Date().toISOString(),
+        };
         this.evidence.set(key, { ...(this.evidence.get(key) ?? {}), script_result: result });
         this.notifyChange();
         return { state: `${machine.id}/${s.id}`, script_result: result };
@@ -2358,7 +2551,11 @@ export class Session {
   }
 
   /** Per-key status — the mirror's bubbles and the agent's packet share it. */
-  conditionStatus(m: MachineDecl, s: StateDecl, which: "enter" | "leave"): Record<string, { args: string[]; met: boolean; note: string }> | undefined {
+  conditionStatus(
+    m: MachineDecl,
+    s: StateDecl,
+    which: "enter" | "leave",
+  ): Record<string, { args: string[]; met: boolean; note: string }> | undefined {
     const dict = which === "leave" ? s.exit : s.entry;
     if (dict === undefined) return undefined;
     const out: Record<string, { args: string[]; met: boolean; note: string }> = {};
@@ -2612,7 +2809,9 @@ export class Session {
   /** One neighbor state's entry requirements, minus docs already present in
    *  the current read buffer at their latest hash. */
   private unreadEntryRequirements(m: MachineDecl, t: StateDecl): string[] {
-    return this.entryRequirements(m, t).filter((p) => !this.bufferedCurrent(p)).sort();
+    return this.entryRequirements(m, t)
+      .filter((p) => !this.bufferedCurrent(p))
+      .sort();
   }
 
   /** The docs worth pre-reading from HERE: every immediate neighbor state's
@@ -2631,11 +2830,20 @@ export class Session {
     throw new Rejection({
       clause: CLAUSES.CONDITION_UNMET,
       expected: `${which === "exit" ? "leaving" : "entering"} ${stateId} demands proven reading of: ${missing.join(", ")}`,
-      got: channel === "agent" ? `not read at its current version: ${missing.join(", ")}` : `not checked in the mirror: ${missing.join(", ")}`,
+      got:
+        channel === "agent" ? `not read at its current version: ${missing.join(", ")}` : `not checked in the mirror: ${missing.join(", ")}`,
       remedy:
         channel === "agent"
-          ? { tool: "se_pull", args: {}, note: "pull — it serves each document and names the last words to hand back, one document at a time. Reading through se_file_read credits too." }
-          : { tool: "se_pull", args: {}, note: "check each listed document in the mirror — one check per version; an edited doc asks again" },
+          ? {
+              tool: "se_pull",
+              args: {},
+              note: "pull — it serves each document and names the last words to hand back, one document at a time. Reading through se_file_read credits too.",
+            }
+          : {
+              tool: "se_pull",
+              args: {},
+              note: "check each listed document in the mirror — one check per version; an edited doc asks again",
+            },
       source: "engine/session.ts reads",
     });
   }
@@ -2677,7 +2885,11 @@ export class Session {
       clause: CLAUSES.CONDITION_UNMET,
       expected: `your reading to match the human's checked list: ${owed.join(", ")}`,
       got: `no current hash supplied for: ${owed.join(", ")}`,
-      remedy: { tool: "se_file_read", args: { path: owed[0] }, note: "the human checked these as read while driving — your head must hold them too. Read each through the lane, then repeat the tick with their hashes in read_hashes." },
+      remedy: {
+        tool: "se_file_read",
+        args: { path: owed[0] },
+        note: "the human checked these as read while driving — your head must hold them too. Read each through the lane, then repeat the tick with their hashes in read_hashes.",
+      },
       source: "engine/session.ts reads",
     });
   }
@@ -2714,14 +2926,25 @@ export class Session {
         return this.iterationSeed(
           String(args.goal ?? ""),
           String(args.vision ?? ""),
-          Array.isArray(args.inputs) ? args.inputs.map(String) : String(args.inputs ?? "").split(",").map((s) => s.trim()).filter((s) => s !== ""),
+          Array.isArray(args.inputs)
+            ? args.inputs.map(String)
+            : String(args.inputs ?? "")
+                .split(",")
+                .map((s) => s.trim())
+                .filter((s) => s !== ""),
         );
       case "se_exp_close":
         return this.expeditionClose(args.merge !== false && args.merge !== "false");
       case "se_note_drain":
         // THE CHANNEL RULE: this is the mirror, so it is the person's own
         // hand. Every disposition stands, wherever the walk happens to be.
-        return drainNote(seDir(this.root), String(args.ref ?? ""), String(args.disposition ?? ""), args.where === undefined ? undefined : String(args.where), true);
+        return drainNote(
+          seDir(this.root),
+          String(args.ref ?? ""),
+          String(args.disposition ?? ""),
+          args.where === undefined ? undefined : String(args.where),
+          true,
+        );
       case "se_reload":
         return this.requestReload();
       default:
@@ -2796,7 +3019,11 @@ export class Session {
         clause: CLAUSES.CONDITION_UNMET,
         expected: `${which} condition 'no_pending_note' of ${stateId} — no pending note carrying: ${args.join(", ")} (see ${note})`,
         got: blockers.map((b) => `${b.ref}: ${b.text.slice(0, 80)}`).join(" · ") || "unmet",
-        remedy: { tool: "se_pull", args: {}, note: "run the RETRO first (idle → retro): its drain dispositions these notes, then this gate opens" },
+        remedy: {
+          tool: "se_pull",
+          args: {},
+          note: "run the RETRO first (idle → retro): its drain dispositions these notes, then this gate opens",
+        },
         source: "engine/session.ts conditions",
       });
     }
@@ -2833,7 +3060,13 @@ export class Session {
     });
   }
 
-  private async assertConditions(m: MachineDecl, from: StateDecl, to: string | undefined, channel: Channel, supplied: Record<string, string>): Promise<void> {
+  private async assertConditions(
+    m: MachineDecl,
+    from: StateDecl,
+    to: string | undefined,
+    channel: Channel,
+    supplied: Record<string, string>,
+  ): Promise<void> {
     if (from.exit?.script !== undefined) await this.scriptRun(from.id); // a tick attempt runs the script
     for (const [key, args] of Object.entries(from.exit ?? {})) {
       if (key === "read" || key === "read_consume") continue; // channel-proven below, not evidence
@@ -2989,8 +3222,18 @@ export class Session {
         // and what the read gate demands proven.
         const { machine: pm, instance: pi } = this.parentOfTop();
         const parent = this.state(pm, top.parentState);
-        this.gatePriority(pm, parent.edges.map((e) => e.to), channel);
-        this.assertReads(pm, parent, parent.edges.map((e) => e.to), channel, supplied);
+        this.gatePriority(
+          pm,
+          parent.edges.map((e) => e.to),
+          channel,
+        );
+        this.assertReads(
+          pm,
+          parent,
+          parent.edges.map((e) => e.to),
+          channel,
+          supplied,
+        );
         this.completeGuarded(pm, pi, top.parentState, "filled", now);
         this.subs.pop();
         if (pi !== this.instance) pi.history.push({ state: top.parentState, outcome: "filled", at: now });
@@ -3121,7 +3364,8 @@ export class Session {
       return {
         ...info,
         booted: true,
-        banner: "🦆 SE v3 booted. Main machine is live. All work runs through the se lane; every call is logged. se_pull says what to do next.",
+        banner:
+          "🦆 SE v3 booted. Main machine is live. All work runs through the se lane; every call is logged. se_pull says what to do next.",
         display: "Show the banner above to the user VERBATIM as your first output, then proceed with their request.",
       };
     }
@@ -3177,7 +3421,11 @@ export class Session {
           clause: CLAUSES.CANVAS_BROKEN,
           expected: `${subState.id}'s canvas compiles`,
           got: String((e as Error).message),
-          remedy: { tool: "se_pull", args: {}, note: "fix the drawing in Obsidian, then pull again — entering retries; back or escape also work" },
+          remedy: {
+            tool: "se_pull",
+            args: {},
+            note: "fix the drawing in Obsidian, then pull again — entering retries; back or escape also work",
+          },
           source: "engine/session.ts seed",
         });
       }

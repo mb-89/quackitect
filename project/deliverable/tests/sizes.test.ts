@@ -35,7 +35,11 @@ describe("the sizes are not the same walk", () => {
   test("product and major share a state set and share no guidance", () => {
     const major = compiled.get("major")!;
     const product = compiled.get("product")!;
-    assert.deepEqual(major.states.map((s) => s.id), product.states.map((s) => s.id), "the same steps");
+    assert.deepEqual(
+      major.states.map((s) => s.id),
+      product.states.map((s) => s.id),
+      "the same steps",
+    );
     const differing = major.states.filter((s, i) => s.guidance !== product.states[i].guidance);
     assert.equal(differing.length, major.states.length, "and every one of them instructs differently");
   });
@@ -70,12 +74,31 @@ describe("the front is heavier at product, and that is the whole difference", ()
   test("product outranks major only on front steps", () => {
     const rank: Record<string, number> = { none: 0, inherit: 1, tailored: 2, full: 3 };
     const outranks = mx.rows
-      .filter((r) => (rank[mx.cells.get(r.name)?.get("product")?.applies ?? ""] ?? 0) > (rank[mx.cells.get(r.name)?.get("major")?.applies ?? ""] ?? 0))
+      .filter(
+        (r) =>
+          (rank[mx.cells.get(r.name)?.get("product")?.applies ?? ""] ?? 0) > (rank[mx.cells.get(r.name)?.get("major")?.applies ?? ""] ?? 0),
+      )
       .map((r) => r.name);
     assert.ok(outranks.length > 0, "product outranks major somewhere, or the size means nothing");
-    const FRONT_PREFIXES = ["draft-", "define-", "map-", "write-", "frame-", "scope-", "pressure-", "log-risks", "generalize-", "draw-", "gate-motivation", "gate-inputs"];
+    const FRONT_PREFIXES = [
+      "draft-",
+      "define-",
+      "map-",
+      "write-",
+      "frame-",
+      "scope-",
+      "pressure-",
+      "log-risks",
+      "generalize-",
+      "draw-",
+      "gate-motivation",
+      "gate-inputs",
+    ];
     for (const name of outranks) {
-      assert.ok(FRONT_PREFIXES.some((p) => name.startsWith(p)), `${name} outranks major but is not a front step`);
+      assert.ok(
+        FRONT_PREFIXES.some((p) => name.startsWith(p)),
+        `${name} outranks major but is not a front step`,
+      );
     }
   });
 });

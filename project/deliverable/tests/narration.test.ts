@@ -6,8 +6,8 @@
 // hold, counted in calls as well as minutes, and the top notch owes nothing.
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
-import { buildServer } from "../engine/tools.ts";
 import { Session } from "../engine/session.ts";
+import { buildServer } from "../engine/tools.ts";
 import { call, freshRoot } from "./helpers.ts";
 
 /** Boot on one read, so the toll is armed and the walk stands at the desk. */
@@ -25,7 +25,11 @@ async function booted(): Promise<{ server: ReturnType<typeof buildServer>; sessi
 
 test("the cadence rides every pull, so both hands see the same setting", async () => {
   const { server, session } = await booted();
-  assert.deepEqual((await call(server, "se_pull", {})).body.narration, { minutes: 5, calls: 20 }, "the default until somebody types over it");
+  assert.deepEqual(
+    (await call(server, "se_pull", {})).body.narration,
+    { minutes: 5, calls: 20 },
+    "the default until somebody types over it",
+  );
   session.setNarration(2, 8);
   assert.deepEqual((await call(server, "se_pull", {})).body.narration, { minutes: 2, calls: 8 });
 });
@@ -48,7 +52,10 @@ test("at the tightest notch the calls themselves fall due, warning first", async
   let refusal: Record<string, unknown> | undefined;
   for (let i = 0; i < 12 && refusal === undefined; i++) {
     const r = await read();
-    if (r.isError) { refusal = r.body; break; }
+    if (r.isError) {
+      refusal = r.body;
+      break;
+    }
     if (typeof r.body.toll_warning === "string") warning = r.body.toll_warning;
   }
   assert.ok(warning !== undefined, "the grace warning comes before any refusal");

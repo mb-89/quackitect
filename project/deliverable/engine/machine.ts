@@ -156,7 +156,12 @@ export interface MachineInstance {
   // review; erasing it would make a reopen indistinguishable from work that was
   // never done, which is exactly the history a reader needs most.
   // "paused" writes no more (one escape since 2026-08-02) — old records keep it
-  history: { state: string; outcome: "filled" | "failed" | "escaped" | "paused" | "abandoned" | "superseded" | "reopened"; evidence?: string; at: string }[];
+  history: {
+    state: string;
+    outcome: "filled" | "failed" | "escaped" | "paused" | "abandoned" | "superseded" | "reopened";
+    evidence?: string;
+    at: string;
+  }[];
   /** Escape records which guard was exhausted. */
   escapes: { state: string; exhausted_guard: string; at: string }[];
   status: "open" | "closed" | "abandoned";
@@ -198,11 +203,16 @@ export function evalGuard(guard: string | undefined, counters: Record<string, nu
   const v = counters[m[1]] ?? 0;
   const n = Number(m[3]);
   switch (m[2]) {
-    case "<": return v < n;
-    case "<=": return v <= n;
-    case ">": return v > n;
-    case ">=": return v >= n;
-    default: return v === n;
+    case "<":
+      return v < n;
+    case "<=":
+      return v <= n;
+    case ">":
+      return v > n;
+    case ">=":
+      return v >= n;
+    default:
+      return v === n;
   }
 }
 
@@ -270,9 +280,7 @@ export function reopenStates(
   // So: for every edge crossing INTO the cone from a source outside it, put
   // the fuel back if that source is still filled. Not if it is superseded —
   // then it is being re-walked and will fire on its own.
-  const stillDone = new Set(
-    inst.history.filter((h) => h.outcome === "filled" && !cone.has(h.state)).map((h) => h.state),
-  );
+  const stillDone = new Set(inst.history.filter((h) => h.outcome === "filled" && !cone.has(h.state)).map((h) => h.state));
   for (const src of m.states) {
     if (cone.has(src.id) || !stillDone.has(src.id)) continue;
     for (const e of src.edges) {
@@ -381,12 +389,7 @@ export function completeState(
  * authored (normal/alternative/approval) > fallback/recovery > escape.
  * Returns the escape record when every guard is exhausted.
  */
-export function advance(
-  m: MachineDecl,
-  inst: MachineInstance,
-  outcome: StepOutcome,
-  now: string,
-): { moved: boolean; escaped?: string } {
+export function advance(m: MachineDecl, inst: MachineInstance, outcome: StepOutcome, now: string): { moved: boolean; escaped?: string } {
   const state = m.states.find((s) => s.id === inst.current);
   if (!state) throw new Error(`instance at undeclared state ${inst.current}`);
   // recovery fires on FILLED: a successful repair returns into the verifying
@@ -412,7 +415,11 @@ export function advance(
   }
   // Escape to parent (implicit). Single flat machine at bootstrap: escape
   // closes nothing — it records the exhausted guard and asks the human.
-  const guards = state.edges.filter((e) => e.guard).map((e) => e.guard!).join("; ") || "(no guarded edges)";
+  const guards =
+    state.edges
+      .filter((e) => e.guard)
+      .map((e) => e.guard!)
+      .join("; ") || "(no guarded edges)";
   inst.escapes.push({ state: state.id, exhausted_guard: guards, at: now });
   return { moved: false, escaped: guards };
 }

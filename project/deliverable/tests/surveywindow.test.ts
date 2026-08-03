@@ -41,7 +41,10 @@ test("se_survey windows its notes, and the counts stay whole", async () => {
 
   const next = (await call(server, "se_survey", { limit: 2, offset: 2 })).body as unknown as Survey;
   assert.deepEqual(next.notes_window, { offset: 2, shown: 2, remaining: 1 });
-  assert.ok(next.notes.every((n) => !first.notes.some((f) => f.ref === n.ref)), "the second page is different notes");
+  assert.ok(
+    next.notes.every((n) => !first.notes.some((f) => f.ref === n.ref)),
+    "the second page is different notes",
+  );
 
   const past = (await call(server, "se_survey", { limit: 2, offset: 99 })).body as unknown as Survey;
   assert.equal(past.notes.length, 0);
@@ -68,8 +71,16 @@ test("a note carries its own title and priority, and the listing sorts by it", a
   await call(server, "se_note", { title: "a should", text: "body", priority: "should" });
 
   const listed = (await call(server, "se_survey", {})).body as unknown as Survey;
-  assert.deepEqual(listed.notes.map((n) => n.priority), ["must", "should", "could"], "highest first");
-  assert.deepEqual(listed.notes.map((n) => n.title), ["a must", "a should", "a could"], "the author's title, not a derived one");
+  assert.deepEqual(
+    listed.notes.map((n) => n.priority),
+    ["must", "should", "could"],
+    "highest first",
+  );
+  assert.deepEqual(
+    listed.notes.map((n) => n.title),
+    ["a must", "a should", "a could"],
+    "the author's title, not a derived one",
+  );
 });
 
 test("a title alone is a legal note, and an empty call still refuses", async () => {

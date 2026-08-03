@@ -182,5 +182,11 @@ export function fileMove(root: string, from: string, to: string): MoveResult {
   walk(root);
   rewritten.sort((a, b) => a.path.localeCompare(b.path));
   unrewritten.sort((a, b) => a.path.localeCompare(b.path) || a.line - b.line);
-  return { moved: { from: fromRel, to: toRel }, rewritten, unrewritten, unrewritten_total: unrewrittenTotal, ...(corrected.length > 0 ? { corrected } : {}) };
+  return {
+    moved: { from: fromRel, to: toRel },
+    rewritten,
+    unrewritten,
+    unrewritten_total: unrewrittenTotal,
+    ...(corrected.length > 0 ? { corrected } : {}),
+  };
 }

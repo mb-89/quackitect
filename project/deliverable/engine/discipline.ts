@@ -165,7 +165,12 @@ export function laneVerdict(seDir: string, command: string, noToolReason?: strin
   if (noToolReason !== undefined && noToolReason.trim() !== "") {
     // The valve. The run happens, the reason is EVIDENCE — filed for the
     // retro, not counted against the grace. Abuse is visible in the same file.
-    state.reasons.push({ ts: new Date().toISOString(), category: rule.category, reason: noToolReason.trim(), command: command.slice(0, 200) });
+    state.reasons.push({
+      ts: new Date().toISOString(),
+      category: rule.category,
+      reason: noToolReason.trim(),
+      command: command.slice(0, 200),
+    });
     saveState(seDir, state);
     return {
       rule: rule.id,
@@ -291,7 +296,9 @@ export function testGate(seDir: string, root: string, force: boolean, scope = "b
     remedy: {
       tool: "se_test",
       args: { force: true },
-      note: last.ok ? "that green still stands — force repeats it anyway (flake hunt is the one honest reason)" : "that red still stands: the same tree fails the same way — change something, then run",
+      note: last.ok
+        ? "that green still stands — force repeats it anyway (flake hunt is the one honest reason)"
+        : "that red still stands: the same tree fails the same way — change something, then run",
     },
     source: SRC,
   });

@@ -42,7 +42,11 @@ export function gitLane(cwd: string, rawArgs: unknown[]): Record<string, unknown
       clause: CLAUSES.GIT_PUSH,
       expected: "no push on the agent lane — pushing is the owner's act",
       got: `git ${args.join(" ")}`,
-      remedy: { tool: "se_git", args: { args: ["log", "--oneline", "-10"] }, note: "commit locally and list what is ahead; the owner pushes when they choose" },
+      remedy: {
+        tool: "se_git",
+        args: { args: ["log", "--oneline", "-10"] },
+        note: "commit locally and list what is ahead; the owner pushes when they choose",
+      },
       source: "engine/gitlane.ts",
     });
   }
@@ -51,7 +55,11 @@ export function gitLane(cwd: string, rawArgs: unknown[]): Record<string, unknown
       clause: CLAUSES.GIT_REWRITE,
       expected: "no rebase — superseded content lives in history",
       got: `git ${args.join(" ")}`,
-      remedy: { tool: "se_git", args: { args: ["status"] }, note: "history rewrites are refused outright; a diverged branch reconciles by merge" },
+      remedy: {
+        tool: "se_git",
+        args: { args: ["status"] },
+        note: "history rewrites are refused outright; a diverged branch reconciles by merge",
+      },
       source: "engine/gitlane.ts",
     });
   }
@@ -60,7 +68,11 @@ export function gitLane(cwd: string, rawArgs: unknown[]): Record<string, unknown
       clause: CLAUSES.GIT_NOT_ALLOWLISTED,
       expected: `an allowlisted git subcommand (${[...ALLOWED].join(", ")})`,
       got: args[0] ?? "(none)",
-      remedy: { tool: "se_git", args: { args: ["status"] }, note: "destructive git stays engine-internal; note the gap if a lane is missing" },
+      remedy: {
+        tool: "se_git",
+        args: { args: ["status"] },
+        note: "destructive git stays engine-internal; note the gap if a lane is missing",
+      },
       source: "engine/gitlane.ts",
     });
   }
@@ -70,7 +82,11 @@ export function gitLane(cwd: string, rawArgs: unknown[]): Record<string, unknown
       clause: CLAUSES.GIT_NOT_ALLOWLISTED,
       expected: "restore with --staged (unstage only)",
       got: `git ${args.join(" ")}`,
-      remedy: { tool: "se_git", args: { args: ["restore", "--staged", "<path>"] }, note: "worktree restores discard human edits; only unstaging is lane-legal" },
+      remedy: {
+        tool: "se_git",
+        args: { args: ["restore", "--staged", "<path>"] },
+        note: "worktree restores discard human edits; only unstaging is lane-legal",
+      },
       source: "engine/gitlane.ts",
     });
   }
@@ -82,7 +98,11 @@ export function gitLane(cwd: string, rawArgs: unknown[]): Record<string, unknown
         clause: CLAUSES.GIT_NOT_ALLOWLISTED,
         expected: "checkout --ours <path> or checkout --theirs <path> — the only lane-legal checkout",
         got: `git ${args.join(" ")}`,
-        remedy: { tool: "se_git", args: { args: ["checkout", "--theirs", "<path>"] }, note: "a bare checkout switches branches or discards edits; only taking one side of a CONFLICTED file is legal" },
+        remedy: {
+          tool: "se_git",
+          args: { args: ["checkout", "--theirs", "<path>"] },
+          note: "a bare checkout switches branches or discards edits; only taking one side of a CONFLICTED file is legal",
+        },
         source: "engine/gitlane.ts",
       });
     }
@@ -93,7 +113,11 @@ export function gitLane(cwd: string, rawArgs: unknown[]): Record<string, unknown
         clause: CLAUSES.GIT_NOT_ALLOWLISTED,
         expected: "a merge in progress — taking a side only means something mid-conflict",
         got: "no MERGE_HEAD",
-        remedy: { tool: "se_git", args: { args: ["status"] }, note: "outside a merge this discards working-tree edits, which the lane never does" },
+        remedy: {
+          tool: "se_git",
+          args: { args: ["status"] },
+          note: "outside a merge this discards working-tree edits, which the lane never does",
+        },
         source: "engine/gitlane.ts",
       });
     }
@@ -139,16 +163,18 @@ function twoTrees(root: string, worktree: string, verb: string): { branch: strin
 const ENGINE_TRAIL = /project\/spec\/(?:expeditions|iterations)\/[^/]+\/decisions\.jsonl$/;
 
 export function dirtyLines(porcelain: string): string[] {
-  return porcelain
-    .split("\n")
-    .filter((l) => l !== "")
-    // UNTRACKED FILES DO NOT BLOCK A RECONCILE. A merge cannot silently
-    // bury one — git itself aborts when an incoming file would overwrite
-    // it, and that abort already refuses typed. Counting them deadlocked
-    // once: the ignore rule for four generated files sat on the very
-    // branch the gate was refusing to land (found live 2026-08-02, e31).
-    .filter((l) => !l.startsWith("??"))
-    .filter((l) => !ENGINE_TRAIL.test(l.slice(2).trim().replace(/\\/g, "/").replace(/^"|"$/g, "")));
+  return (
+    porcelain
+      .split("\n")
+      .filter((l) => l !== "")
+      // UNTRACKED FILES DO NOT BLOCK A RECONCILE. A merge cannot silently
+      // bury one — git itself aborts when an incoming file would overwrite
+      // it, and that abort already refuses typed. Counting them deadlocked
+      // once: the ignore rule for four generated files sat on the very
+      // branch the gate was refusing to land (found live 2026-08-02, e31).
+      .filter((l) => !l.startsWith("??"))
+      .filter((l) => !ENGINE_TRAIL.test(l.slice(2).trim().replace(/\\/g, "/").replace(/^"|"$/g, "")))
+  );
 }
 
 function refuseDirty(where: string, tree: string, what: string): void {
@@ -158,7 +184,11 @@ function refuseDirty(where: string, tree: string, what: string): void {
     clause: CLAUSES.GIT_NOT_ALLOWLISTED,
     expected: `a clean ${tree} to ${what}`,
     got: `${dirty.length} uncommitted change(s) on ${tree}: ${dirty.slice(0, 5).join(", ")}`,
-    remedy: { tool: "se_git", args: { args: ["status", "--porcelain"] }, note: "commit what is there first; reconciling must never bury somebody's uncommitted work" },
+    remedy: {
+      tool: "se_git",
+      args: { args: ["status", "--porcelain"] },
+      note: "commit what is there first; reconciling must never bury somebody's uncommitted work",
+    },
     source: "engine/gitlane.ts",
   });
 }
@@ -166,7 +196,9 @@ function refuseDirty(where: string, tree: string, what: string): void {
 function crossed(where: string, before: string): string[] {
   const after = git(where, "rev-parse", "HEAD").stdout;
   if (before === after) return [];
-  return git(where, "log", "--oneline", `${before}..${after}`).stdout.split("\n").filter((l) => l !== "");
+  return git(where, "log", "--oneline", `${before}..${after}`)
+    .stdout.split("\n")
+    .filter((l) => l !== "");
 }
 
 /** LAND the bound expedition's commits on trunk, and LEAVE IT OPEN. */
@@ -184,13 +216,24 @@ export function gitLand(root: string, worktree: string): Record<string, unknown>
         clause: CLAUSES.GIT_NOT_ALLOWLISTED,
         expected: `${branch} to land on ${trunk} cleanly`,
         got: (m.stdout || m.stderr).split("\n").slice(0, 6).join(" · "),
-        remedy: { tool: "se_git_sync", args: {}, note: "the merge was ABORTED and nothing changed — sync trunk into the expedition, settle it there, then land again" },
+        remedy: {
+          tool: "se_git_sync",
+          args: {},
+          note: "the merge was ABORTED and nothing changed — sync trunk into the expedition, settle it there, then land again",
+        },
         source: "engine/gitlane.ts",
       });
     }
   }
   const commits = crossed(root, before);
-  return { landed: commits.length, how: commits.length === 0 ? "already there" : how, from: branch, onto: trunk, commits, still_open: true };
+  return {
+    landed: commits.length,
+    how: commits.length === 0 ? "already there" : how,
+    from: branch,
+    onto: trunk,
+    commits,
+    still_open: true,
+  };
 }
 
 /** SYNC trunk INTO the bound expedition, so the worktree is never stale. */
@@ -205,7 +248,11 @@ export function gitSync(root: string, worktree: string): Record<string, unknown>
       clause: CLAUSES.GIT_NOT_ALLOWLISTED,
       expected: `${trunk} to merge into ${branch} cleanly`,
       got: (m.stdout || m.stderr).split("\n").slice(0, 6).join(" · "),
-      remedy: { tool: "se_git", args: { args: ["status"] }, note: "the merge was ABORTED and nothing changed — settle the overlap by hand, then sync again" },
+      remedy: {
+        tool: "se_git",
+        args: { args: ["status"] },
+        note: "the merge was ABORTED and nothing changed — settle the overlap by hand, then sync again",
+      },
       source: "engine/gitlane.ts",
     });
   }

@@ -104,11 +104,7 @@ export interface SearchOpts {
   count_only?: boolean;
 }
 
-export function search(
-  root: string,
-  query: string,
-  opts: SearchOpts = {},
-): SearchResult {
+export function search(root: string, query: string, opts: SearchOpts = {}): SearchResult {
   const limit = normalizeLimit(opts.limit);
   if (opts.count_only === true) {
     const counts = opts.ref === undefined ? rgCount(root, query, opts) : gitGrepCount(root, query, opts.ref, opts);
@@ -206,8 +202,15 @@ function rgSearch(root: string, query: string, opts: SearchOpts, unreadable: str
     const out: Match[] = [];
     for (const line of (r.stdout ?? "").split("\n")) {
       if (line.trim() === "") continue;
-      let ev: { type?: string; data?: { path?: { text?: string }; line_number?: number; lines?: { text?: string }; binary_offset?: number | null } };
-      try { ev = JSON.parse(line); } catch { continue; }
+      let ev: {
+        type?: string;
+        data?: { path?: { text?: string }; line_number?: number; lines?: { text?: string }; binary_offset?: number | null };
+      };
+      try {
+        ev = JSON.parse(line);
+      } catch {
+        continue;
+      }
       const p = ev.data?.path?.text;
       if (ev.type === "end" && typeof ev.data?.binary_offset === "number" && p !== undefined) {
         unreadable.push(show(p));
@@ -226,7 +229,20 @@ function rgSearch(root: string, query: string, opts: SearchOpts, unreadable: str
   // the file is named on a "binary file matches" line, which the loop below
   // turns into `unreadable`. --text was the alternative and was rejected: it
   // would search real binaries as text and spray them through the results.
-  const args = ["--line-number", "--no-heading", "--with-filename", "--binary", "--max-count", String(perFileCap(opts.limit)), "--max-columns", String(LINE_CAP), ...rgCommonArgs(opts), "--regexp", query, scope];
+  const args = [
+    "--line-number",
+    "--no-heading",
+    "--with-filename",
+    "--binary",
+    "--max-count",
+    String(perFileCap(opts.limit)),
+    "--max-columns",
+    String(LINE_CAP),
+    ...rgCommonArgs(opts),
+    "--regexp",
+    query,
+    scope,
+  ];
   // THE EXCLUSION GLOBS ARE RELATIVE TO THE WORKING DIRECTORY, never to the
   // search target. Without a cwd of its own, ripgrep resolved them against
   // the SERVER's cwd — and a bound expedition worktree lives under
@@ -282,7 +298,9 @@ function gitGrepCount(root: string, query: string, ref: string, opts: SearchOpts
 
 /** Search a committed state: git grep at a ref. Path scope is a pathspec. */
 function gitGrepSearch(root: string, query: string, ref: string, opts: SearchOpts): Match[] {
-  const ctx = contextFlags(opts).map((f) => f.replace("--before-context", "-B").replace("--after-context", "-A").replace("--context", "-C"));
+  const ctx = contextFlags(opts).map((f) =>
+    f.replace("--before-context", "-B").replace("--after-context", "-A").replace("--context", "-C"),
+  );
   const args = ["grep", "-n", "-I", "-E", "--max-count", String(perFileCap(opts.limit)), ...ctx];
   if (opts.ignore_case === true) args.push("-i");
   args.push(query, ref, ...gitPathspec(opts));

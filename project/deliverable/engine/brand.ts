@@ -51,15 +51,21 @@ export function loadBrand(root: string): Brand {
 /** An id has to survive being a folder name, an npm name and a VS Code
  *  command id, so it is reduced to what all three accept. */
 export function slug(s: string): string {
-  const out = s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  const out = s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
   return out === "" ? FALLBACK.id : out;
 }
 
 export function fill(text: string, b: Brand): string {
   return text
-    .split("$PRODUCT_ABBR$").join(b.abbr ?? "")
-    .split("$PRODUCT_ID$").join(b.id)
-    .split("$PRODUCT$").join(b.name);
+    .split("$PRODUCT_ABBR$")
+    .join(b.abbr ?? "")
+    .split("$PRODUCT_ID$")
+    .join(b.id)
+    .split("$PRODUCT$")
+    .join(b.name);
 }
 
 /** The activity-bar icon, drawn from the abbreviation.

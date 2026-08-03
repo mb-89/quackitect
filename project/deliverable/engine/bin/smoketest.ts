@@ -116,7 +116,9 @@ which runs at validation, never at boot.
   // OVER BUDGET IS A FINDING, not a failure. Boot still passes; the line
   // is there so the drift shows the day it starts, not months later.
   if (elapsed > BUDGET_MS) {
-    process.stdout.write(`smoke took ${(elapsed / 1000).toFixed(1)}s — over the ${(BUDGET_MS / 1000).toFixed(0)}s budget; something here has grown\n`);
+    process.stdout.write(
+      `smoke took ${(elapsed / 1000).toFixed(1)}s — over the ${(BUDGET_MS / 1000).toFixed(0)}s budget; something here has grown\n`,
+    );
   }
   process.exitCode = failures.length === 0 ? 0 : 1;
 }

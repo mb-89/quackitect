@@ -2,6 +2,7 @@
 // here — a guard that makes a tool do nothing is invisible to a test that
 // only reads its output (software.md).
 delete process.env.SE_SCRIPT_SKIP;
+
 // THE SESSION CLEANS UP AFTER ITSELF (owner, 2026-07-30): when the machine
 // reaches end, the server posts /pty/end and the terminal host ends its
 // agent — politely first (/exit after the output settles), then by force.
@@ -22,7 +23,15 @@ test("POST /pty/end ends the agent: settle, /exit, then the insist kill", async 
     // NO SHELL METACHARACTERS in the inline script: the host runs the
     // command through cmd /c on Windows, and an arrow function's => {}
     // becomes a redirect that drops a junk file named {} in the cwd.
-    [PTY, "--pty-port", String(port), "--", process.execPath, "-e", "process.stdin.resume(); console.log('agent up'); setInterval(function tick() { return; }, 1000)"],
+    [
+      PTY,
+      "--pty-port",
+      String(port),
+      "--",
+      process.execPath,
+      "-e",
+      "process.stdin.resume(); console.log('agent up'); setInterval(function tick() { return; }, 1000)",
+    ],
     {
       env: { ...process.env, SE_PTY_END_QUIET_MS: "200", SE_PTY_END_INSIST_MS: "500", SE_PTY_END_CAP_MS: "3000" },
       stdio: ["ignore", "ignore", "pipe"],

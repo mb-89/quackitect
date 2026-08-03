@@ -21,7 +21,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { isAbsolute, join, resolve } from "node:path";
 import { parse, stringify } from "yaml";
 import { CLAUSES, Rejection } from "./errors.ts";
-import { parseExpr, type Node } from "./expr.ts";
+import { type Node, parseExpr } from "./expr.ts";
 import { vaultDir } from "./tables.ts";
 
 const SRC = "engine/bases.ts";
@@ -71,7 +71,11 @@ export function editBase(root: string, rel: string, fn: (doc: Doc) => void): str
       clause: CLAUSES.REQUIRED_ARGS,
       expected: "a base whose top level is a mapping",
       got: rel,
-      remedy: { tool: "se_file_read", args: { path: rel }, note: "section 1 of project/spec/bases-syntax.md gives the five top-level keys" },
+      remedy: {
+        tool: "se_file_read",
+        args: { path: rel },
+        note: "section 1 of project/spec/bases-syntax.md gives the five top-level keys",
+      },
       source: SRC,
     });
   }
@@ -164,7 +168,11 @@ export interface SortClause {
 
 export function setSort(root: string, rel: string, view: string, sort: SortClause[]): string {
   return editBase(root, rel, (doc) => {
-    set(findView(doc, view), "sort", sort.map((s) => ({ property: s.property, direction: s.direction })));
+    set(
+      findView(doc, view),
+      "sort",
+      sort.map((s) => ({ property: s.property, direction: s.direction })),
+    );
   });
 }
 
@@ -229,7 +237,13 @@ export const OPERATORS: Operator[] = [
   { id: "is", label: "is", types: [], takesValue: true, build: (p, v) => `${p} == ${quote(v)}` },
   { id: "isNot", label: "is not", types: [], takesValue: true, build: (p, v) => `${p} != ${quote(v)}` },
   { id: "contains", label: "contains", types: ["string", "list"], takesValue: true, build: (p, v) => `${p}.contains(${quote(v)})` },
-  { id: "notContains", label: "does not contain", types: ["string", "list"], takesValue: true, build: (p, v) => `!${p}.contains(${quote(v)})` },
+  {
+    id: "notContains",
+    label: "does not contain",
+    types: ["string", "list"],
+    takesValue: true,
+    build: (p, v) => `!${p}.contains(${quote(v)})`,
+  },
   { id: "startsWith", label: "starts with", types: ["string"], takesValue: true, build: (p, v) => `${p}.startsWith(${quote(v)})` },
   { id: "endsWith", label: "ends with", types: ["string"], takesValue: true, build: (p, v) => `${p}.endsWith(${quote(v)})` },
   { id: "isEmpty", label: "is empty", types: [], takesValue: false, build: (p) => `${p}.isEmpty()` },
@@ -254,7 +268,11 @@ export function toExpression(row: FilterRow): string {
       clause: CLAUSES.REQUIRED_ARGS,
       expected: `a filter operator: ${OPERATORS.map((o) => o.id).join(", ")}`,
       got: row.operator,
-      remedy: { tool: "se_file_read", args: { path: "project/deliverable/engine/bases.ts" }, note: "OPERATORS is the whole vocabulary the builder offers" },
+      remedy: {
+        tool: "se_file_read",
+        args: { path: "project/deliverable/engine/bases.ts" },
+        note: "OPERATORS is the whole vocabulary the builder offers",
+      },
       source: SRC,
     });
   }
@@ -401,7 +419,11 @@ function assertLayout(type: string): void {
     clause: CLAUSES.REQUIRED_ARGS,
     expected: `a layout: ${LAYOUTS.join(", ")}`,
     got: type,
-    remedy: { tool: "se_file_read", args: { path: "project/deliverable/engine/bases.ts" }, note: "LAYOUTS is the registry a new renderer joins" },
+    remedy: {
+      tool: "se_file_read",
+      args: { path: "project/deliverable/engine/bases.ts" },
+      note: "LAYOUTS is the registry a new renderer joins",
+    },
     source: SRC,
   });
 }
@@ -412,7 +434,11 @@ function assertFreeName(doc: Doc, name: string): void {
       clause: CLAUSES.REQUIRED_ARGS,
       expected: "a view name",
       got: "an empty name",
-      remedy: { tool: "se_file_read", args: { path: "project/spec/bases-syntax.md" }, note: "a view is addressed by name, so it needs one" },
+      remedy: {
+        tool: "se_file_read",
+        args: { path: "project/spec/bases-syntax.md" },
+        note: "a view is addressed by name, so it needs one",
+      },
       source: SRC,
     });
   }
@@ -421,7 +447,11 @@ function assertFreeName(doc: Doc, name: string): void {
       clause: CLAUSES.REQUIRED_ARGS,
       expected: "a view name this base does not already use",
       got: name,
-      remedy: { tool: "se_file_read", args: { path: "project/spec/bases-syntax.md" }, note: "an embed addresses a view by name, so two of a name is ambiguous" },
+      remedy: {
+        tool: "se_file_read",
+        args: { path: "project/spec/bases-syntax.md" },
+        note: "an embed addresses a view by name, so two of a name is ambiguous",
+      },
       source: SRC,
     });
   }
@@ -562,7 +592,19 @@ export interface BaseOp {
   to?: string;
 }
 
-const NEEDS_VIEW = new Set(["toggleProperty", "setOrder", "hideAll", "setSort", "setGroupBy", "setColumnSize", "setViewFilters", "renameView", "setLayout", "removeView", "duplicateView"]);
+const NEEDS_VIEW = new Set([
+  "toggleProperty",
+  "setOrder",
+  "hideAll",
+  "setSort",
+  "setGroupBy",
+  "setColumnSize",
+  "setViewFilters",
+  "renameView",
+  "setLayout",
+  "removeView",
+  "duplicateView",
+]);
 
 export function applyBaseOp(root: string, o: BaseOp): string {
   if (NEEDS_VIEW.has(o.op) && (o.view === undefined || o.view === "")) {
@@ -570,34 +612,58 @@ export function applyBaseOp(root: string, o: BaseOp): string {
       clause: CLAUSES.REQUIRED_ARGS,
       expected: `a view name, which ${o.op} acts on`,
       got: "no view",
-      remedy: { tool: "se_file_read", args: { path: "project/deliverable/engine/bases.ts" }, note: "the surface sends the view it is showing" },
+      remedy: {
+        tool: "se_file_read",
+        args: { path: "project/deliverable/engine/bases.ts" },
+        note: "the surface sends the view it is showing",
+      },
       source: SRC,
     });
   }
   const v = String(o.view ?? "");
   switch (o.op) {
-    case "toggleProperty": return toggleProperty(root, o.file, v, String(o.property), o.on === true);
-    case "setOrder": return setOrder(root, o.file, v, o.order ?? []);
-    case "hideAll": return hideAll(root, o.file, v);
-    case "setDisplayName": return setDisplayName(root, o.file, String(o.property), o.name ?? null);
-    case "setSort": return setSort(root, o.file, v, o.sort ?? []);
-    case "setGroupBy": return setGroupBy(root, o.file, v, o.levels ?? []);
-    case "setColumnSize": return setColumnSize(root, o.file, v, String(o.property), Number(o.px ?? 160));
-    case "setViewFilters": return setViewFilters(root, o.file, v, o.posted !== undefined ? compileTree(o.posted) : (o.filters ?? null));
-    case "setGlobalFilters": return setGlobalFilters(root, o.file, o.posted !== undefined ? compileTree(o.posted) : (o.filters ?? null));
-    case "addView": return addView(root, o.file, String(o.name ?? ""), o.type ?? "table");
-    case "renameView": return renameView(root, o.file, v, String(o.to ?? ""));
-    case "setLayout": return setLayout(root, o.file, v, o.type ?? "table");
-    case "removeView": return removeView(root, o.file, v);
-    case "duplicateView": return duplicateView(root, o.file, v, String(o.to ?? ""));
-    case "setSource": return setSource(root, o.file, String(o.text ?? ""));
-    case "createBase": return createBase(root, o.file, String(o.name ?? "Table"));
+    case "toggleProperty":
+      return toggleProperty(root, o.file, v, String(o.property), o.on === true);
+    case "setOrder":
+      return setOrder(root, o.file, v, o.order ?? []);
+    case "hideAll":
+      return hideAll(root, o.file, v);
+    case "setDisplayName":
+      return setDisplayName(root, o.file, String(o.property), o.name ?? null);
+    case "setSort":
+      return setSort(root, o.file, v, o.sort ?? []);
+    case "setGroupBy":
+      return setGroupBy(root, o.file, v, o.levels ?? []);
+    case "setColumnSize":
+      return setColumnSize(root, o.file, v, String(o.property), Number(o.px ?? 160));
+    case "setViewFilters":
+      return setViewFilters(root, o.file, v, o.posted !== undefined ? compileTree(o.posted) : (o.filters ?? null));
+    case "setGlobalFilters":
+      return setGlobalFilters(root, o.file, o.posted !== undefined ? compileTree(o.posted) : (o.filters ?? null));
+    case "addView":
+      return addView(root, o.file, String(o.name ?? ""), o.type ?? "table");
+    case "renameView":
+      return renameView(root, o.file, v, String(o.to ?? ""));
+    case "setLayout":
+      return setLayout(root, o.file, v, o.type ?? "table");
+    case "removeView":
+      return removeView(root, o.file, v);
+    case "duplicateView":
+      return duplicateView(root, o.file, v, String(o.to ?? ""));
+    case "setSource":
+      return setSource(root, o.file, String(o.text ?? ""));
+    case "createBase":
+      return createBase(root, o.file, String(o.name ?? "Table"));
     default:
       throw new Rejection({
         clause: CLAUSES.REQUIRED_ARGS,
         expected: `a control operation: ${[...NEEDS_VIEW, "setDisplayName", "setGlobalFilters", "addView", "createBase"].sort().join(", ")}`,
         got: o.op,
-        remedy: { tool: "se_file_read", args: { path: "project/deliverable/engine/bases.ts" }, note: "applyBaseOp is the whole vocabulary the surface may post" },
+        remedy: {
+          tool: "se_file_read",
+          args: { path: "project/deliverable/engine/bases.ts" },
+          note: "applyBaseOp is the whole vocabulary the surface may post",
+        },
         source: SRC,
       });
   }

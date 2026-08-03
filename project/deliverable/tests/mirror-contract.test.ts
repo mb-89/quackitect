@@ -35,8 +35,14 @@ test("EVERY update changes the render: a bare update lands as a checked point (o
   s.decisions.apply("idle@0", { op: "update", brief: "found it" });
   const g = s.decisions.graph("idle@0");
   assert.equal(g.nodes.length, 2, "each update is a visible point");
-  assert.ok(g.nodes.every((n) => n.status === "done"), "checked on arrival");
-  assert.deepEqual(g.nodes.map((n) => n.brief), ["hunting the bug", "found it"]);
+  assert.ok(
+    g.nodes.every((n) => n.status === "done"),
+    "checked on arrival",
+  );
+  assert.deepEqual(
+    g.nodes.map((n) => n.brief),
+    ["hunting the bug", "found it"],
+  );
   // An update aimed at an open plan item nests under it.
   s.decisions.apply("idle@0", { op: "plan", items: ["one item"] });
   const item = s.decisions.graph("idle@0").nodes.find((n) => n.status === "open")!;
@@ -63,7 +69,10 @@ test("/api/decisions serves the panel's whole contract over HTTP", async () => {
     };
     assert.equal(g.visit, "idle@0");
     assert.ok(g.nodes.length >= 2, "the checklist rides the wire");
-    assert.ok(g.nodes.some((n) => n.brief === "narrating"), "the update rides the wire as a checked point");
+    assert.ok(
+      g.nodes.some((n) => n.brief === "narrating"),
+      "the update rides the wire as a checked point",
+    );
     assert.ok(Array.isArray(g.visits));
   } finally {
     server.close();
@@ -73,7 +82,13 @@ test("/api/decisions serves the panel's whole contract over HTTP", async () => {
 test("feed rows carry the click keys the panel needs", () => {
   const root = freshRoot();
   const log = new CallLog(seDir(root));
-  log.append({ tool: "se_update", args: { via: "se_pull", visit: "idle@0", op: "update", brief: "x" }, ok: true, outcome: "result", duration_ms: 0 });
+  log.append({
+    tool: "se_update",
+    args: { via: "se_pull", visit: "idle@0", op: "update", brief: "x" },
+    ok: true,
+    outcome: "result",
+    duration_ms: 0,
+  });
   const { rows } = feedRows(log, "1970-01-01T00:00:00.000Z");
   assert.equal(rows[0].type, "update", "narration types as update (bold), never note");
   assert.equal(rows[0].visit, "idle@0", "the click opens this visit's tree");
@@ -159,7 +174,7 @@ test("promoting a card changes a class, never the DOM", () => {
   const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
   assert.ok(html.includes('el.classList.toggle("main"'), "the promoted card is marked by class");
   const from = html.indexOf("function applyCards");
-  const to = html.indexOf("addEventListener(\"keydown\"");
+  const to = html.indexOf('addEventListener("keydown"');
   assert.ok(from !== -1 && to > from, "the card logic is present");
   const cardJs = html.slice(from, to);
   assert.ok(!cardJs.includes("appendChild"), "no card is ever re-parented");
@@ -188,7 +203,10 @@ test("the number keys yield to a text field and pin their choice in the URL", ()
   assert.ok(html.includes("t.isContentEditable"), "nor typing in anything else editable");
   assert.ok(html.includes('q.set("card", id)'), "the promoted card is pinned in the URL");
   // Same key again is the way back: the loop is chat, look at something, chat.
-  assert.ok(html.includes("if (id === CARD_NOW) { if (CARD_PREV !== null) promoteCard(CARD_PREV); return; }"), "the same key returns to the previous card");
+  assert.ok(
+    html.includes("if (id === CARD_NOW) { if (CARD_PREV !== null) promoteCard(CARD_PREV); return; }"),
+    "the same key returns to the previous card",
+  );
   // THE NUMBER IS A CONTROL, NOT A LABEL (owner 2026-07-29). A badge that
   // names a shortcut but does nothing when clicked is a label pretending.
   assert.ok(html.includes('ev.target.closest(".cardnum")'), "the badge is wired to the click");
@@ -221,7 +239,10 @@ test("a morph leaves untouched everything the change did not touch", () => {
   // survives, as the manual retry on a stalled loading bar.
   const reloads = html.match(/location\.reload\(\)/g) ?? [];
   assert.equal(reloads.length, 1, "the page reloads itself in one place only");
-  assert.ok(html.includes("if (stalled !== null) { hideLoading(); location.reload(); return; }"), "and that place is the reader asking for it");
+  assert.ok(
+    html.includes("if (stalled !== null) { hideLoading(); location.reload(); return; }"),
+    "and that place is the reader asking for it",
+  );
 });
 
 // THE SAME RULE, ON THE PATH THE MORPH DOES NOT OWN (owner, 2026-07-29, seen
@@ -232,7 +253,10 @@ test("a morph leaves untouched everything the change did not touch", () => {
 test("the details pane is not rewritten when its content did not change", () => {
   const root = freshRoot();
   const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
-  assert.ok(html.includes("if (DETAIL_TITLE === title && DETAIL_HTML === html) return;"), "an unchanged details render touches no DOM at all");
+  assert.ok(
+    html.includes("if (DETAIL_TITLE === title && DETAIL_HTML === html) return;"),
+    "an unchanged details render touches no DOM at all",
+  );
   assert.ok(html.includes("const top = sameSubject ? el.scrollTop : 0;"), "and a changed one still keeps the reader's place");
   assert.ok(html.includes("el.scrollTop = top;"), "the kept position is actually restored");
   // The feed polls constantly, so it repaints far more often than anything
@@ -334,7 +358,10 @@ test("a machine switch carries the reader's open detail with it", () => {
   // while the behaviour it guarded was untouched. It now names the place and
   // the mechanism that carries every place.
   assert.ok(html.includes('["detail", () => CURRENT_DETAIL]'), "the open detail is a registered place");
-  assert.ok(html.includes("if (v && !u.searchParams.has(p[0])) u.searchParams.set(p[0], v);"), "and a view jump carries every registered place");
+  assert.ok(
+    html.includes("if (v && !u.searchParams.has(p[0])) u.searchParams.set(p[0], v);"),
+    "and a view jump carries every registered place",
+  );
   assert.ok(html.includes('new URLSearchParams(location.search).get("detail")'), "the page it lands on restores it");
 });
 
@@ -400,12 +427,21 @@ test("an update answers with the open nodes, so an id is never guessed", () => {
   const planned = s.decisions.apply("idle@0", { op: "plan", items: ["first", "second"] }) as Record<string, unknown>;
   const map = planned.open_nodes as { id: string; brief: string }[];
   assert.equal(map.length, 2, "the plan answers with what it opened");
-  assert.deepEqual(map.map((n) => n.brief), ["first", "second"]);
-  assert.ok(map.every((n) => /^d\d+$/.test(n.id)), "each carries the id a resolution needs");
+  assert.deepEqual(
+    map.map((n) => n.brief),
+    ["first", "second"],
+  );
+  assert.ok(
+    map.every((n) => /^d\d+$/.test(n.id)),
+    "each carries the id a resolution needs",
+  );
   // Closing one takes it off the map, so the map is never stale.
   const after = s.decisions.apply("idle@0", { op: "done", node: map[0].id, brief: "landed" }) as Record<string, unknown>;
   const left = after.open_nodes as { id: string; brief: string }[];
-  assert.deepEqual(left.map((n) => n.brief), ["second"]);
+  assert.deepEqual(
+    left.map((n) => n.brief),
+    ["second"],
+  );
   assert.equal(after.open, 1, "and the count still agrees with the map");
 });
 
@@ -420,13 +456,16 @@ test("an update names its item while a checklist stands, and is free when none d
   assert.equal(bare.update, "update");
   const planned = s.decisions.apply("idle@0", { op: "plan", items: ["the item"] }) as Record<string, unknown>;
   const only = (planned.open_nodes as { id: string }[])[0].id;
-  assert.throws(() => s.decisions.apply("idle@0", { op: "update", brief: "floating free" }), (err: unknown) => {
-    const r = err as { clause?: string; expected?: string };
-    assert.equal(r.clause, "SE-C-121");
-    assert.match(String(r.expected), /which item is this about/);
-    assert.match(String(r.expected), /the item/, "and the refusal names what is open");
-    return true;
-  });
+  assert.throws(
+    () => s.decisions.apply("idle@0", { op: "update", brief: "floating free" }),
+    (err: unknown) => {
+      const r = err as { clause?: string; expected?: string };
+      assert.equal(r.clause, "SE-C-121");
+      assert.match(String(r.expected), /which item is this about/);
+      assert.match(String(r.expected), /the item/, "and the refusal names what is open");
+      return true;
+    },
+  );
   // Named, it lands under the item it narrates.
   s.decisions.apply("idle@0", { op: "update", node: only, brief: "on it" });
   const nested = s.decisions.graph("idle@0").nodes.find((n) => n.brief === "on it")!;
@@ -442,9 +481,12 @@ test("the checklist nudges when narration outruns it, and never refuses", () => 
   // Each update NAMES its item - narration that moves nothing on the
   // checklist is refused outright. The nudge is about the item never
   // CLOSING, which is a different failure and still worth saying.
-  const items = (s.decisions.apply("idle@0", { op: "update", node: "d1", brief: "starting" }) as Record<string, unknown>).open_nodes as { id: string }[];
+  const items = (s.decisions.apply("idle@0", { op: "update", node: "d1", brief: "starting" }) as Record<string, unknown>).open_nodes as {
+    id: string;
+  }[];
   let last: Record<string, unknown> = {};
-  for (let i = 0; i < 5; i++) last = s.decisions.apply("idle@0", { op: "update", node: items[0].id, brief: "working " + i }) as Record<string, unknown>;
+  for (let i = 0; i < 5; i++)
+    last = s.decisions.apply("idle@0", { op: "update", node: items[0].id, brief: "working " + i }) as Record<string, unknown>;
   assert.ok(typeof last.nudge === "string", "five updates with nothing closed earns the nudge");
   assert.match(String(last.nudge), /PROGRESS view/);
   assert.equal(last.update, "update", "and the update itself still lands - a nudge is never a refusal");
@@ -494,7 +536,7 @@ test("a popped-out card opens on what it was showing, and then holds still", () 
     /if \(!FROZEN && window\.parent === window\) \{\nconst es = new EventSource/,
     "only a top-level, unfrozen window opens the event stream",
   );
-  assert.match(html, /async function refresh\(detail\) \{\n  if \(FROZEN\) return;/, "and never redraws itself");
+  assert.match(html, /async function refresh\(detail\) \{\n {2}if \(FROZEN\) return;/, "and never redraws itself");
   // It says so, quietly — a snapshot that looks live is a trap.
   assert.match(html, /frozen-bar/, "the frozen window carries its own marker");
 });

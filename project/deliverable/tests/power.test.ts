@@ -15,7 +15,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, test } from "node:test";
 import { Rejection } from "../engine/errors.ts";
-import { loadPanel, parsePanel, renderPanel, toggleKey, type PanelValues } from "../engine/params.ts";
+import { loadPanel, type PanelValues, parsePanel, renderPanel, toggleKey } from "../engine/params.ts";
 import { Session } from "../engine/session.ts";
 import { freshRoot } from "./helpers.ts";
 

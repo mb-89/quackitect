@@ -15,10 +15,10 @@
 // So there are two things to hold: the routing rule, and the wiring that
 // feeds it. The wiring is the half that broke.
 import { strict as assert } from "node:assert";
-import { describe, test } from "node:test";
-import { mkdtempSync, writeFileSync, mkdirSync } from "node:fs";
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { describe, test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { freshRoot } from "./helpers.ts";
 

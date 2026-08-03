@@ -2,6 +2,7 @@
 // here — a guard that makes a tool do nothing is invisible to a test that
 // only reads its output (software.md).
 delete process.env.SE_SCRIPT_SKIP;
+
 // e14 — the pre-iteration bundle: arbitrary-depth nesting (the walk is a
 // stack), archive decades as real sub-machines, the open-map "…and N
 // more", state to-do lists, and the se_test tool.
@@ -12,7 +13,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { Decisions, parseUpdate } from "../engine/decisions.ts";
-import { buildArchive, type ArchiveEntry } from "../engine/expmachine.ts";
+import { type ArchiveEntry, buildArchive } from "../engine/expmachine.ts";
 import { compileMachine } from "../engine/machines/compile.ts";
 import { renderMirror } from "../engine/render.ts";
 import { mainMachinePath, Session } from "../engine/session.ts";
@@ -27,7 +28,10 @@ test("buildArchive: ten or fewer stay flat, more grows decade sub-machines", () 
   assert.equal(flat.decl.states.length, 11, "start + 9 records + end");
   assert.equal(flat.subGen, undefined);
   const dec = buildArchive("expedition_archive", entries(13), "expedition");
-  assert.deepEqual(dec.decl.states.map((s) => s.id), ["start", "e1-e10", "e11-e13", "end"]);
+  assert.deepEqual(
+    dec.decl.states.map((s) => s.id),
+    ["start", "e1-e10", "e11-e13", "end"],
+  );
   assert.equal(dec.decl.states[1].submachine, "generated", "a decade is a sub-machine state");
   assert.equal(dec.decl.states[1].priority, 1.5, "archive browsing stays human-only");
   const inner = dec.subGen!["e1-e10"]();
@@ -66,7 +70,10 @@ test("stateTodos: origins ride the nodes and parked defers show without material
   d.apply("b@0", parseUpdate({ op: "update", node: "d3", brief: "arrived" }));
   const after = d.stateTodos("b");
   assert.equal(after.parked.length, 0);
-  assert.ok(after.visits.some((v) => v.nodes.some((n) => n.origin === "deferred")), "the arrived point knows it was deferred");
+  assert.ok(
+    after.visits.some((v) => v.nodes.some((n) => n.origin === "deferred")),
+    "the arrived point knows it was deferred",
+  );
 });
 
 function gitSeed(root: string): void {
@@ -131,8 +138,14 @@ test("the front desk and ideation stand as idle doors with their drawn shapes", 
   const root = freshRoot();
   const m = compileMachine(root, mainMachinePath(root));
   const idle = m.states.find((s) => s.id === "idle")!;
-  assert.ok(idle.edges.some((e) => e.to === "front_desk"), "idle reaches the front desk");
-  assert.ok(idle.edges.some((e) => e.to === "ideation"), "idle reaches ideation");
+  assert.ok(
+    idle.edges.some((e) => e.to === "front_desk"),
+    "idle reaches the front desk",
+  );
+  assert.ok(
+    idle.edges.some((e) => e.to === "ideation"),
+    "idle reaches ideation",
+  );
   const fd = m.states.find((s) => s.id === "front_desk")!;
   assert.equal(fd.priority, 0.2);
   assert.equal(fd.submachine, undefined, "the one-state rule: the desk is a plain state");
@@ -147,7 +160,10 @@ test("the front desk and ideation stand as idle doors with their drawn shapes", 
   const idle2 = m.states.find((s) => s.id === "idle")!;
   assert.equal(idle2.statement, "", "filler statements are struck - empty beats an echo");
   const ideaM = compileMachine(root, join(root, "project", "deliverable", "machines", "ideation.canvas"));
-  assert.deepEqual(ideaM.states.map((s) => s.id), ["start", "frame", "diverge", "converge", "route", "end"]);
+  assert.deepEqual(
+    ideaM.states.map((s) => s.id),
+    ["start", "frame", "diverge", "converge", "route", "end"],
+  );
 });
 
 // SETTINGS BELONG TO A SESSION (owner rulings 2026-07-28). A RELOAD is the
@@ -167,7 +183,8 @@ test("settings survive a RELOAD: the same session restores the store", () => {
     assert.equal(b.autonomy, 0.85);
     assert.equal(b.power.block_sleep, true);
   } finally {
-    if (was === undefined) delete process.env.SE_SESSION; else process.env.SE_SESSION = was;
+    if (was === undefined) delete process.env.SE_SESSION;
+    else process.env.SE_SESSION = was;
   }
 });
 
@@ -191,7 +208,8 @@ test("settings do NOT survive the session: a fresh start takes the defaults", ()
     assert.equal(c.autonomy, 0.4);
     assert.equal(c.power.block_sleep, false);
   } finally {
-    if (was === undefined) delete process.env.SE_SESSION; else process.env.SE_SESSION = was;
+    if (was === undefined) delete process.env.SE_SESSION;
+    else process.env.SE_SESSION = was;
   }
 });
 
@@ -200,15 +218,24 @@ test("the voice lint: walls, sentences, chains and the pyramid - thresholds are 
   const { writeFileSync } = await import("node:fs");
   const root = freshRoot();
   const wall = Array.from({ length: 9 }, (_, i) => `plain prose line number ${i} of the wall`).join("\n");
-  assert.ok(lintProse(root, wall).some((f) => f.rule === "wall"), "nine unbroken lines are a wall");
+  assert.ok(
+    lintProse(root, wall).some((f) => f.rule === "wall"),
+    "nine unbroken lines are a wall",
+  );
   assert.ok(lintProse(root, `${"word ".repeat(30)}end.`).some((f) => f.rule === "long-sentence"));
   assert.ok(lintProse(root, "we need alpha, beta, gamma, delta and epsilon.").some((f) => f.rule === "comma-chain"));
   // DASH CHAINS, not dashes. One dash sets off an aside and is house style
   // here; flagging every one would be an advisory nobody heeds.
   assert.ok(lintProse(root, "we need alpha — then beta — then gamma — then delta.").some((f) => f.rule === "dash-chain"));
-  assert.ok(!lintProse(root, "we need alpha — the obvious one — before anything else.").some((f) => f.rule === "dash-chain"), "a single aside is not a chain");
+  assert.ok(
+    !lintProse(root, "we need alpha — the obvious one — before anything else.").some((f) => f.rule === "dash-chain"),
+    "a single aside is not a chain",
+  );
   const five = Array.from({ length: 5 }, (_, i) => `paragraph ${i}.`).join("\n\n");
-  assert.ok(lintProse(root, five).some((f) => f.rule === "pyramid"), "five headingless paragraphs want the pyramid");
+  assert.ok(
+    lintProse(root, five).some((f) => f.rule === "pyramid"),
+    "five headingless paragraphs want the pyramid",
+  );
   assert.equal(lintProse(root, "# Heading\n\nshort and clean.").length, 0, "clean prose passes");
   // DATA, not code: raise the threshold in the config - the wall passes.
   writeFileSync(join(root, "project", "deliverable", "machines", "lint", "voice-lint.md"), "---\nwall_paragraph_lines: 99\n---\n", "utf8");
@@ -228,7 +255,11 @@ test("the voice lint sweeps a whole tree and reports what it left out", async ()
   writeFileSync(join(dir, "notprose.txt"), "never read by a prose lint\n", "utf8");
   // A STATE NOTE keeps its prose in the FRONTMATTER, where lintProse never
   // looked - and `guidance` is read by an agent on every single visit.
-  writeFileSync(join(dir, "astate.md"), "---\nstate: probe\nguidance: we need alpha, beta, gamma, delta and epsilon.\n---\n\nclean body.\n", "utf8");
+  writeFileSync(
+    join(dir, "astate.md"),
+    "---\nstate: probe\nguidance: we need alpha, beta, gamma, delta and epsilon.\n---\n\nclean body.\n",
+    "utf8",
+  );
   const swept = await call(server, "se_lint", { glob: "project/guidance/sweeptest/*" });
   assert.equal(swept.isError, false, JSON.stringify(swept.body));
   assert.equal(swept.body.swept, 3, "every markdown file was read");
@@ -236,7 +267,10 @@ test("the voice lint sweeps a whole tree and reports what it left out", async ()
   assert.equal(swept.body.clean, 1, "the clean file is counted");
   const files = swept.body.files as { path: string; count: number; findings: { where: string }[] }[];
   assert.equal(files.length, 2, "only files WITH findings come back");
-  assert.ok(files.some((f) => /dirty\.md$/.test(f.path)), "the one with a bad body");
+  assert.ok(
+    files.some((f) => /dirty\.md$/.test(f.path)),
+    "the one with a bad body",
+  );
   const stateNote = files.find((f) => /astate\.md$/.test(f.path))!;
   assert.ok(stateNote !== undefined, "and the one whose only bad prose is in its frontmatter");
   assert.equal(stateNote.findings[0].where, "guidance", "each finding says WHICH prose it is in");

@@ -38,7 +38,11 @@ test("a one-way arrow stays one-way", () => {
   const e = edgesOf(freshRoot());
   // start, boot and end are drawn with a single arrowhead and must not gain
   // a return just because the pair notation exists.
-  assert.deepEqual((e.get("end") ?? []).map((x) => x.to), [], "end goes nowhere");
+  assert.deepEqual(
+    (e.get("end") ?? []).map((x) => x.to),
+    [],
+    "end goes nowhere",
+  );
   const idleOut = (e.get("idle") ?? []).map((x) => x.to);
   assert.ok(idleOut.includes("end"), "idle still reaches end");
   assert.ok(!(e.get("boot") ?? []).some((x) => x.to === "start"), "boot never returns to start");

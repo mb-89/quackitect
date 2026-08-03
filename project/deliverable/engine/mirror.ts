@@ -2,27 +2,28 @@
 // alone, se-mcp embeds it beside the MCP lane on the SAME Session.
 // HTTP is the person, MCP is the agent, and the threshold gates only the
 // agent — so every route here moves the walk by the person's hand.
-import { createServer, type Server } from "node:http";
+
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
+import { createServer, type Server } from "node:http";
 import { createRequire } from "node:module";
 import { marked } from "marked";
-import { CallLog } from "./calllog.ts";
+import { applyBaseOp, type BaseOp } from "./bases.ts";
+import { helpFor } from "./baseui.ts";
+import type { CallLog } from "./calllog.ts";
+import { loadCards } from "./cards.ts";
 import { replayVisitsText } from "./decisions.ts";
 import { Rejection } from "./errors.ts";
 import { appendNote, pendingNotes, readNotes } from "./inbox.ts";
-import { loadCards } from "./cards.ts";
-import { handleHttp, type McpServer } from "./mcp.ts";
 import { bumpDrawingEpoch } from "./machines/compile.ts";
-import { feedRows, renderMirror, type MirrorState } from "./render.ts";
+import { handleHttp, type McpServer } from "./mcp.ts";
 import { loadPanel, renderPanel } from "./params.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
+import { feedRows, type MirrorState, renderMirror } from "./render.ts";
 import { loadLevels } from "./scale.ts";
-import { Session } from "./session.ts";
+import type { Session } from "./session.ts";
 import { survey } from "./survey.ts";
 import { editCell } from "./tables.ts";
-import { applyBaseOp, type BaseOp } from "./bases.ts";
-import { helpFor } from "./baseui.ts";
 
 export interface MirrorOptions {
   session: Session;
@@ -60,7 +61,12 @@ export function startMirror(o: MirrorOptions): Server {
 
   /** Collect a JSON body, run the handler (results may be async — script
    *  runs take seconds and must not block the server), log it, redirect. */
-  const post = (req: import("node:http").IncomingMessage, res: import("node:http").ServerResponse, tool: string, handle: (body: Record<string, unknown>) => { args: Record<string, unknown>; result: unknown }): void => {
+  const post = (
+    req: import("node:http").IncomingMessage,
+    res: import("node:http").ServerResponse,
+    tool: string,
+    handle: (body: Record<string, unknown>) => { args: Record<string, unknown>; result: unknown },
+  ): void => {
     const chunks: Buffer[] = [];
     req.on("data", (c) => chunks.push(c));
     req.on("end", () => {
@@ -234,7 +240,9 @@ export function startMirror(o: MirrorOptions): Server {
         if (url.searchParams.get("page") === "1") {
           // A standalone page — ctrl/shift-click targets (new tab, new window).
           res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-          res.end(`<!doctype html><html><head><meta charset="utf-8"><title>${p}</title><style>body{font-family:ui-monospace,Consolas,monospace;background:#14171a;color:#d8dde2;padding:24px;max-width:900px;margin:0 auto}a{color:#e8b339}</style></head><body>${html}</body></html>`);
+          res.end(
+            `<!doctype html><html><head><meta charset="utf-8"><title>${p}</title><style>body{font-family:ui-monospace,Consolas,monospace;background:#14171a;color:#d8dde2;padding:24px;max-width:900px;margin:0 auto}a{color:#e8b339}</style></head><body>${html}</body></html>`,
+          );
           return;
         }
         res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
@@ -249,7 +257,7 @@ export function startMirror(o: MirrorOptions): Server {
         // root. The engine can serve a tree it was not installed into, and a
         // test root has no node_modules at all. This is the same idiom the
         // search lane uses to find ripgrep.
-        let bundle;
+        let bundle: string | undefined;
         try {
           bundle = createRequire(import.meta.url).resolve("@vscode-elements/elements/dist/bundled.js");
         } catch {
@@ -314,11 +322,25 @@ export function startMirror(o: MirrorOptions): Server {
           res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
           try {
             const result = state.session.humanTool(name, toolArgs);
-            o.log.append({ tool: "mirror_tool", args: { name, tool_args: toolArgs }, ok: true, outcome: "result", duration_ms: Date.now() - started, response: result });
+            o.log.append({
+              tool: "mirror_tool",
+              args: { name, tool_args: toolArgs },
+              ok: true,
+              outcome: "result",
+              duration_ms: Date.now() - started,
+              response: result,
+            });
             res.end(JSON.stringify(result));
           } catch (e) {
             const payload = e instanceof Rejection ? e.toJSON() : { error: String(e) };
-            o.log.append({ tool: "mirror_tool", args: { name, tool_args: toolArgs }, ok: false, outcome: "rejected", duration_ms: Date.now() - started, response: payload });
+            o.log.append({
+              tool: "mirror_tool",
+              args: { name, tool_args: toolArgs },
+              ok: false,
+              outcome: "rejected",
+              duration_ms: Date.now() - started,
+              response: payload,
+            });
             res.end(JSON.stringify(payload));
           }
         });
@@ -379,11 +401,25 @@ export function startMirror(o: MirrorOptions): Server {
             const body = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}") as Record<string, unknown>;
             args = { path: String(body.path ?? ""), key: String(body.key ?? ""), text: String(body.text ?? "") };
             const written = editCell(o.root, { path: String(body.path ?? ""), key: String(body.key ?? ""), text: String(body.text ?? "") });
-            o.log.append({ tool: "mirror_cell_edit", args, ok: true, outcome: "result", duration_ms: Date.now() - started, response: written });
+            o.log.append({
+              tool: "mirror_cell_edit",
+              args,
+              ok: true,
+              outcome: "result",
+              duration_ms: Date.now() - started,
+              response: written,
+            });
             answer({ ok: true, ...written });
           } catch (e) {
             const why = e instanceof Rejection ? `${e.expected} — got ${e.got}` : String((e as Error).message ?? e);
-            o.log.append({ tool: "mirror_cell_edit", args, ok: false, outcome: "rejected", duration_ms: Date.now() - started, response: e instanceof Rejection ? e.toJSON() : { error: why } });
+            o.log.append({
+              tool: "mirror_cell_edit",
+              args,
+              ok: false,
+              outcome: "rejected",
+              duration_ms: Date.now() - started,
+              response: e instanceof Rejection ? e.toJSON() : { error: why },
+            });
             answer({ ok: false, error: why });
           }
         });
@@ -413,11 +449,25 @@ export function startMirror(o: MirrorOptions): Server {
             const body = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}") as unknown as BaseOp;
             args = { op: body.op, file: body.file, view: body.view };
             applyBaseOp(o.root, body);
-            o.log.append({ tool: "mirror_base_edit", args, ok: true, outcome: "result", duration_ms: Date.now() - started, response: { written: body.file } });
+            o.log.append({
+              tool: "mirror_base_edit",
+              args,
+              ok: true,
+              outcome: "result",
+              duration_ms: Date.now() - started,
+              response: { written: body.file },
+            });
             answer({ ok: true });
           } catch (e) {
             const why = e instanceof Rejection ? `${e.expected} — got ${e.got}` : String((e as Error).message ?? e);
-            o.log.append({ tool: "mirror_base_edit", args, ok: false, outcome: "rejected", duration_ms: Date.now() - started, response: e instanceof Rejection ? e.toJSON() : { error: why } });
+            o.log.append({
+              tool: "mirror_base_edit",
+              args,
+              ok: false,
+              outcome: "rejected",
+              duration_ms: Date.now() - started,
+              response: e instanceof Rejection ? e.toJSON() : { error: why },
+            });
             answer({ ok: false, error: why });
           }
         });
@@ -433,7 +483,13 @@ export function startMirror(o: MirrorOptions): Server {
         // The autonomy scale is authored in machines/scale.md, so a host that
         // kept its own copy of the notches would drift the moment it is edited.
         res.writeHead(200, { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" });
-        res.end(JSON.stringify({ autonomy: loadLevels(state.root), power: state.session.power, narration: { minutes: state.session.narrationMinutes, calls: state.session.narrationCalls } }));
+        res.end(
+          JSON.stringify({
+            autonomy: loadLevels(state.root),
+            power: state.session.power,
+            narration: { minutes: state.session.narrationMinutes, calls: state.session.narrationCalls },
+          }),
+        );
         return;
       }
       if (url.pathname === "/api/cards") {
@@ -463,12 +519,17 @@ export function startMirror(o: MirrorOptions): Server {
           connection: "keep-alive",
         });
         let open = true;
-        req.on("close", () => { open = false; });
+        req.on("close", () => {
+          open = false;
+        });
         void (async () => {
           let last = "";
           while (open) {
             const now = JSON.stringify(aliveState());
-            if (now !== last) { last = now; res.write(`data: ${now}\n\n`); }
+            if (now !== last) {
+              last = now;
+              res.write(`data: ${now}\n\n`);
+            }
             await state.session.waitForChange(2000);
           }
           res.end();
@@ -513,9 +574,22 @@ export function startMirror(o: MirrorOptions): Server {
         res.end(bar);
         return;
       }
-      if (url.pathname === "/widget/machine" || url.pathname === "/widget/details" || url.pathname === "/widget/log" || url.pathname === "/widget/terminal" || url.pathname === "/widget/table") {
+      if (
+        url.pathname === "/widget/machine" ||
+        url.pathname === "/widget/details" ||
+        url.pathname === "/widget/log" ||
+        url.pathname === "/widget/terminal" ||
+        url.pathname === "/widget/table"
+      ) {
         // RENDER FIRST, THEN WRITE THE HEAD. See the note at the catch below.
-        const widget = renderMirror(state, url.pathname.slice("/widget/".length) as "machine" | "details" | "log" | "terminal" | "table", url.searchParams.get("view") ?? undefined, undefined, url.searchParams.get("embed") === "1", url.searchParams.get("tv") ?? undefined);
+        const widget = renderMirror(
+          state,
+          url.pathname.slice("/widget/".length) as "machine" | "details" | "log" | "terminal" | "table",
+          url.searchParams.get("view") ?? undefined,
+          undefined,
+          url.searchParams.get("embed") === "1",
+          url.searchParams.get("tv") ?? undefined,
+        );
         res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
         res.end(widget);
         return;
@@ -531,7 +605,13 @@ export function startMirror(o: MirrorOptions): Server {
       // GET / — tick without arguments: information about where we are.
       // ?view=<machine> browses a machine without moving the walk.
       state.lastPacket = state.session.packet();
-      const page = renderMirror(state, undefined, url.searchParams.get("view") ?? undefined, url.searchParams.get("card") ?? undefined, url.searchParams.get("embed") === "1");
+      const page = renderMirror(
+        state,
+        undefined,
+        url.searchParams.get("view") ?? undefined,
+        url.searchParams.get("card") ?? undefined,
+        url.searchParams.get("embed") === "1",
+      );
       res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
       res.end(page);
     } catch (e) {

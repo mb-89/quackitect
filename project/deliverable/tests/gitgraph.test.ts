@@ -3,8 +3,8 @@
 // the story of that point rather than a detour that returned.
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
-import { MARK, decisionsAsGitGraph, decisionsAsMarkdown } from "../engine/gitgraph.ts";
 import type { DecisionNode } from "../engine/decisions.ts";
+import { decisionsAsGitGraph, decisionsAsMarkdown, MARK } from "../engine/gitgraph.ts";
 
 const node = (over: Partial<DecisionNode> & { id: string; at: string }): DecisionNode => ({
   visit: "v1",
@@ -20,10 +20,7 @@ const node = (over: Partial<DecisionNode> & { id: string; at: string }): Decisio
  *  asserted the string was present. This asserts the SHAPE instead. */
 test("every branch name is one token, so checkout can never split it", () => {
   const g = decisionsAsGitGraph(
-    [
-      node({ id: "d1", at: "2026-07-31T10:00:00Z" }),
-      node({ id: "d2", at: "2026-07-31T10:01:00Z", parent: "d1", brief: "worked on it" }),
-    ],
+    [node({ id: "d1", at: "2026-07-31T10:00:00Z" }), node({ id: "d2", at: "2026-07-31T10:01:00Z", parent: "d1", brief: "worked on it" })],
     "a trunk name with spaces",
   );
   for (const line of g.split("\n")) {
@@ -85,7 +82,11 @@ test("a quote in a brief cannot break the diagram", () => {
 
 test("a long brief is cut at a word, so the column stays narrow", () => {
   const g = decisionsAsGitGraph([
-    node({ id: "d1", at: "2026-07-31T10:00:00Z", brief: "a brief long enough that it would push the checklist column far wider than anyone wants to read across" }),
+    node({
+      id: "d1",
+      at: "2026-07-31T10:00:00Z",
+      brief: "a brief long enough that it would push the checklist column far wider than anyone wants to read across",
+    }),
   ]);
   const line = g.split("\n").find((l) => l.includes("a brief long enough")) ?? "";
   assert.match(line, /…"/, "it says it was cut");

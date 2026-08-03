@@ -111,8 +111,14 @@ test("priority and autonomy ride every packet — the agent can weigh its next s
 
 test("the autonomy refuses garbage: out-of-range values are typed rejections", () => {
   const session = new Session(freshRoot());
-  assert.throws(() => session.setAutonomy(1.5), (e) => (e as { clause?: string }).clause === "SE-C-046");
-  assert.throws(() => session.setAutonomy(Number("nope")), (e) => (e as { clause?: string }).clause === "SE-C-046");
+  assert.throws(
+    () => session.setAutonomy(1.5),
+    (e) => (e as { clause?: string }).clause === "SE-C-046",
+  );
+  assert.throws(
+    () => session.setAutonomy(Number("nope")),
+    (e) => (e as { clause?: string }).clause === "SE-C-046",
+  );
   assert.equal(session.autonomy, 0.4, "a refused set leaves the autonomy untouched");
 });
 
@@ -121,9 +127,12 @@ test("reaching end fires onClosed once and the closing packet says session over"
   const session = new Session(r);
   let fired = 0;
   session.onClosed = () => fired++;
-  await session.advance(); await session.advance();
+  await session.advance();
+  await session.advance();
   checkDocs(session);
-  await session.advance(); await session.advance(); await session.advance();
+  await session.advance();
+  await session.advance();
+  await session.advance();
   handOver(r); // the way out writes the next session's briefing
   const over = (await session.advance("end")) as { session_over?: boolean; banner?: string };
   assert.equal(over.session_over, true);
@@ -155,10 +164,15 @@ test("the mirror over HTTP: slider served, POST /autonomy moves the gate, /api/a
     const page = await (await fetch(base + "/")).text();
     assert.ok(page.includes('id="thr"'), "the slider is served");
     assert.ok(page.includes("SESSION OVER"), "the over overlay ships in the script");
-    const set = await fetch(base + "/autonomy", { method: "POST", redirect: "manual", headers: { "content-type": "application/json" }, body: JSON.stringify({ value: 0.75 }) });
+    const set = await fetch(base + "/autonomy", {
+      method: "POST",
+      redirect: "manual",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ value: 0.75 }),
+    });
     assert.equal(set.status, 303);
     assert.equal(session.autonomy, 0.75, "the slider's POST moves the session autonomy");
-    const alive = await (await fetch(base + "/api/alive")).json() as { status: string; autonomy: number; active: string[] };
+    const alive = (await (await fetch(base + "/api/alive")).json()) as { status: string; autonomy: number; active: string[] };
     assert.equal(alive.status, "open");
     assert.equal(alive.autonomy, 0.75);
     assert.deepEqual(alive.active, ["start"]);
@@ -169,15 +183,31 @@ test("the mirror over HTTP: slider served, POST /autonomy moves the gate, /api/a
     // cannot move the walk. It does not 404, because the mirror's router
     // falls through to the page for any unknown POST rather than refusing;
     // that is a router gap, filed as its own note, not this test's subject.
-    await fetch(base + "/tick", { method: "POST", redirect: "manual", headers: { "content-type": "application/json" }, body: JSON.stringify({ advance: true }) });
+    await fetch(base + "/tick", {
+      method: "POST",
+      redirect: "manual",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ advance: true }),
+    });
     assert.deepEqual(session.active(), ["start"], "the retired route moved nothing");
     // PARITY: the human's note lands hand-stamped in the feed; a tool
     // click faces the SAME state gate the agent does, answered as JSON.
-    const noted = await fetch(base + "/note", { method: "POST", redirect: "manual", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: "a human stray" }) });
+    const noted = await fetch(base + "/note", {
+      method: "POST",
+      redirect: "manual",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ text: "a human stray" }),
+    });
     assert.equal(noted.status, 303);
-    const feed = await (await fetch(base + "/api/log")).json() as { rows: { type: string; src: string; brief: string }[] };
+    const feed = (await (await fetch(base + "/api/log")).json()) as { rows: { type: string; src: string; brief: string }[] };
     assert.ok(feed.rows.some((x) => x.type === "note" && x.src === "human" && x.brief.includes("a human stray")));
-    const tool = await (await fetch(base + "/tool", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: "se_seed_expedition", args: {} }) })).json() as { clause?: string };
+    const tool = (await (
+      await fetch(base + "/tool", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ name: "se_seed_expedition", args: {} }),
+      })
+    ).json()) as { clause?: string };
     assert.equal(tool.clause, "SE-C-110", "the parity lane obeys the state gate");
   } finally {
     server.close();

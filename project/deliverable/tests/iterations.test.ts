@@ -8,14 +8,20 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { generateIterations, generateSeeded, itPinRel, itSeed, itSeededRel, pinIteration } from "../engine/iterations.ts";
-import { validateMachine, type MachineDecl } from "../engine/machine.ts";
+import { type MachineDecl, validateMachine } from "../engine/machine.ts";
 import { readRigorMatrix } from "../engine/rigor-matrix.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { call, checkDocs, freshRoot } from "./helpers.ts";
 
 function gitInit(root: string): void {
-  for (const a of [["init"], ["config", "user.email", "se@test.local"], ["config", "user.name", "se test"], ["add", "-A"], ["commit", "-q", "-m", "seed"]]) {
+  for (const a of [
+    ["init"],
+    ["config", "user.email", "se@test.local"],
+    ["config", "user.name", "se test"],
+    ["add", "-A"],
+    ["commit", "-q", "-m", "seed"],
+  ]) {
     const r = spawnSync("git", a, { cwd: root, encoding: "utf8", windowsHide: true });
     if (r.status !== 0) throw new Error(`git ${a.join(" ")} failed: ${r.stderr}`);
   }
@@ -50,12 +56,31 @@ test("the graph is evidence: an open decision point blocks the leave form", () =
   // A filled, done form — but the graph still holds an open point.
   const rel = join(root, ".worktrees", minted.created, "project", "spec", "expeditions", minted.created, "report.md");
   const filled = [
-    "---", "form: expedition-leave", "status: done", "by: agent", "files:", "---", "",
-    "# t", "",
-    "## What was the goal", "", "x", "",
-    "## What was done", "", "x", "",
-    "## What settled it", "", "x", "",
-    "## What was not done", "", "nothing", "",
+    "---",
+    "form: expedition-leave",
+    "status: done",
+    "by: agent",
+    "files:",
+    "---",
+    "",
+    "# t",
+    "",
+    "## What was the goal",
+    "",
+    "x",
+    "",
+    "## What was done",
+    "",
+    "x",
+    "",
+    "## What settled it",
+    "",
+    "x",
+    "",
+    "## What was not done",
+    "",
+    "nothing",
+    "",
   ].join("\n");
   writeFileSync(rel, filled, "utf8");
   s.decisions.apply(`${sid}@0`, { op: "plan", items: ["one open point"] });
@@ -87,7 +112,10 @@ test("the pin: the bless compiles the change size live; escalation only grows it
   pinIteration(root, it, "minor");
   const pin2 = JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as { machine: MachineDecl };
   for (const id of patchIds) {
-    assert.ok(pin2.machine.states.some((s) => s.id === id), `${id} was filled at patch and must survive the escalation`);
+    assert.ok(
+      pin2.machine.states.some((s) => s.id === id),
+      `${id} was filled at patch and must survive the escalation`,
+    );
   }
   // DE-ESCALATION (and a same-size re-pin) refused — drift never reaches a running walk.
   assert.throws(() => pinIteration(root, it, "patch"), /ESCALATION/);
@@ -157,7 +185,10 @@ test("an explicit none in the drawing passes the run state without ceremony", ()
   // Empty WITH the reason: a trivial pass-through carrying it.
   writeFileSync(abs, '---\nsteps: []\nnone: "no unknowns worth a spike"\n---\n', "utf8");
   const g = generateSeeded(root, it, "run-spikes", "spikes");
-  assert.deepEqual(g.decl.states.map((s) => s.id), ["start", "end"]);
+  assert.deepEqual(
+    g.decl.states.map((s) => s.id),
+    ["start", "end"],
+  );
   assert.match(g.decl.states[0].guidance, /no unknowns worth a spike/);
 });
 
@@ -193,9 +224,12 @@ test("the bless pins the machine and the container expands to the pinned walk", 
   const root = freshRoot();
   gitInit(root);
   const session = new Session(root);
-  await session.advance(); await session.advance();
+  await session.advance();
+  await session.advance();
   checkDocs(session);
-  await session.advance(); await session.advance(); await session.advance();
+  await session.advance();
+  await session.advance();
+  await session.advance();
   session.setAutonomy(1);
   const seeded = session.iterationSeed("walk the pinned machine", "the bless compiles and pins");
   const id = String(seeded.seeded);
@@ -203,7 +237,10 @@ test("the bless pins the machine and the container expands to the pinned walk", 
   await session.advance("iterations");
   await session.advance(sid);
   // No change_size in the record: the bless refuses, mechanically.
-  await assert.rejects(() => session.advance(), (e) => /change_size/.test(JSON.stringify(e)));
+  await assert.rejects(
+    () => session.advance(),
+    (e) => /change_size/.test(JSON.stringify(e)),
+  );
   // The prefill lands in the record; the advance is the bless.
   const rec = join(root, ".worktrees", id, "project", "spec", "iterations", id, "record.md");
   writeFileSync(rec, readFileSync(rec, "utf8").replace(/^status: /m, "change_size: patch\nstatus: "), "utf8");
@@ -220,7 +257,10 @@ test("the bless pins the machine and the container expands to the pinned walk", 
   const pin2 = JSON.parse(readFileSync(join(root, ".worktrees", id, itPinRel(id)), "utf8")) as { machine: MachineDecl };
   const gate = pin2.machine.states.find((s) => s.id === "gate-kickoff")!;
   await session.advance("gate-kickoff");
-  await assert.rejects(() => session.advance(gate.edges[0].to), (e) => /review report/.test(String((e as { expected?: string }).expected)));
+  await assert.rejects(
+    () => session.advance(gate.edges[0].to),
+    (e) => /review report/.test(String((e as { expected?: string }).expected)),
+  );
   const review = join(root, ".worktrees", id, "project", "spec", "iterations", id, "reviews", "gate-kickoff.md");
   mkdirSync(dirname(review), { recursive: true });
   const sections = [
@@ -229,7 +269,11 @@ test("the bless pins the machine and the container expands to the pinned walk", 
     "## validate\n\nthe milestone fits the frame\n",
     "## red_team\n\nthe opposing case was argued\n",
   ].join("\n");
-  writeFileSync(review, `---\nform: milestone-review\ngate: gate-kickoff\nstatus: done\nby: test\nverdict: PASS\n---\n\n# gate-kickoff — milestone review\n\n${sections}`, "utf8");
+  writeFileSync(
+    review,
+    `---\nform: milestone-review\ngate: gate-kickoff\nstatus: done\nby: test\nverdict: PASS\n---\n\n# gate-kickoff — milestone review\n\n${sections}`,
+    "utf8",
+  );
   await session.advance(gate.edges[0].to);
   // THE BLESS IS SEPARATE AND DURABLE: the passing step stamped the
   // sidecar with the report's version and whose hand it was.
@@ -251,7 +295,10 @@ test("the kickoff serves the rigor matrix's live evidence form", () => {
 test("the seed refuses a missing vision — the seed is a small form", () => {
   const root = freshRoot();
   gitInit(root);
-  assert.throws(() => itSeed(root, "goal only", "  "), (e) => (e as { clause?: string }).clause === "SE-C-046");
+  assert.throws(
+    () => itSeed(root, "goal only", "  "),
+    (e) => (e as { clause?: string }).clause === "SE-C-046",
+  );
 });
 
 test("needs-retro holds the FIRST start; draining opens it; a started iteration never blocks", async () => {
@@ -259,15 +306,21 @@ test("needs-retro holds the FIRST start; draining opens it; a started iteration 
   gitInit(root);
   const session = new Session(root);
   const server = buildServer(root, session);
-  await session.advance(); await session.advance();
+  await session.advance();
+  await session.advance();
   checkDocs(session);
-  await session.advance(); await session.advance(); await session.advance();
+  await session.advance();
+  await session.advance();
+  await session.advance();
   session.setAutonomy(1); // the kickoff weighs 0.6 — lift the slider clear
   const seeded = session.iterationSeed("prove the gate", "the first start waits on the retro");
   const sid = String(seeded.seeded).match(/^(i\d+)-/)![1];
   await call(server, "se_note", { text: "needs retro — iteration wrapped" });
   await session.advance("iterations");
-  await assert.rejects(() => session.advance(sid), (e) => (e as { clause?: string }).clause === "SE-C-112" && /needs retro/.test(JSON.stringify(e)));
+  await assert.rejects(
+    () => session.advance(sid),
+    (e) => (e as { clause?: string }).clause === "SE-C-112" && /needs retro/.test(JSON.stringify(e)),
+  );
   // Escape out — to the DESK now — then to the retro via idle; drain
   // there, come back, and the first start opens.
   session.escape("gated by needs-retro", "human");
@@ -275,14 +328,22 @@ test("needs-retro holds the FIRST start; draining opens it; a started iteration 
   session.humanCheck("project/guidance/method/retro.md");
   await session.advance("retro");
   const notesRaw = readFileSync(join(root, ".se", "notes.jsonl"), "utf8");
-  const ref = JSON.parse(notesRaw.trim().split("\n").filter((l) => l.includes("needs retro"))[0]).ref as string;
+  const ref = JSON.parse(
+    notesRaw
+      .trim()
+      .split("\n")
+      .filter((l) => l.includes("needs retro"))[0],
+  ).ref as string;
   await call(server, "se_note_drain", { ref, disposition: "done", where: "retro ran" });
   await session.advance(); // the retro's one edge returns to idle
   await session.advance("iterations");
   await session.advance(sid);
   // Entering bound the worktree and stamped `started:` — from now on a
   // fresh needs-retro note gates only NEW iterations, never this one.
-  const rec = readFileSync(join(root, ".worktrees", String(seeded.seeded), "project", "spec", "iterations", String(seeded.seeded), "record.md"), "utf8");
+  const rec = readFileSync(
+    join(root, ".worktrees", String(seeded.seeded), "project", "spec", "iterations", String(seeded.seeded), "record.md"),
+    "utf8",
+  );
   assert.match(rec, /^started: /m);
   assert.match(rec, /^status: open$/m);
 });

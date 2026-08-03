@@ -3,9 +3,9 @@
 // itself since 1.121, so this writes text and nothing else.
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import type { DecisionNode } from "../decisions.ts";
 import { replayVisitsText } from "../decisions.ts";
 import { decisionsAsMarkdown } from "../gitgraph.ts";
-import type { DecisionNode } from "../decisions.ts";
 
 const [, , source, outDir] = process.argv;
 if (source === undefined || outDir === undefined) {

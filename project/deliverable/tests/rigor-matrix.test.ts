@@ -3,12 +3,12 @@
 // compiling a change-size column yields a valid iteration machine with
 // struck states contracted out of the dependency graph.
 import { strict as assert } from "node:assert";
-import { test } from "node:test";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { readRigorMatrix, compileColumn, ALL_COLUMNS, CHANGE_COLUMNS } from "../engine/rigor-matrix.ts";
+import { test } from "node:test";
 import { validateMachine } from "../engine/machine.ts";
+import { ALL_COLUMNS, CHANGE_COLUMNS, compileColumn, readRigorMatrix } from "../engine/rigor-matrix.ts";
 
 const ROOT = join(import.meta.dirname, "..", "..", "..");
 
@@ -73,7 +73,11 @@ test("compileColumn patch: struck states vanish and dependencies contract", () =
   assert.ok(ids.has("gate-release"));
   // Contraction: write-requirements' struck upstream collapses to the
   // applied frame-delta and log-risks.
-  const incoming = (to: string) => decl.states.filter((s) => s.edges.some((e) => e.to === to)).map((s) => s.id).sort();
+  const incoming = (to: string) =>
+    decl.states
+      .filter((s) => s.edges.some((e) => e.to === to))
+      .map((s) => s.id)
+      .sort();
   assert.deepEqual(incoming("write-requirements"), ["frame-delta", "log-risks"]);
   // author-tests contracts through the whole struck M4-M6 stretch.
   assert.deepEqual(incoming("author-tests"), ["probe-assumptions", "write-requirements"]);
@@ -112,7 +116,16 @@ test("compileColumn minor: the tailoring strikes exactly the M4-M5 exploration",
   const decl = compileColumn(m, "minor");
   validateMachine(decl);
   const ids = new Set(decl.states.map((s) => s.id));
-  for (const struck of ["pressure-test", "derive-criteria", "partition-functions", "enumerate-space", "evaluate-set", "gate-candidates", "converge-pugh", "reverse-sensitivity"]) {
+  for (const struck of [
+    "pressure-test",
+    "derive-criteria",
+    "partition-functions",
+    "enumerate-space",
+    "evaluate-set",
+    "gate-candidates",
+    "converge-pugh",
+    "reverse-sensitivity",
+  ]) {
     assert.ok(!ids.has(struck), `minor should strike ${struck}`);
   }
   // 41 applied rows + start (run-spikes rides rank-unknowns into minor).
@@ -121,8 +134,7 @@ test("compileColumn minor: the tailoring strikes exactly the M4-M5 exploration",
 
 test("the columns are monotone: what a smaller column walks, every larger column walks", () => {
   const m = readRigorMatrix(ROOT);
-  const applied = (col: string) =>
-    new Set(m.rows.filter((r) => m.cells.get(r.name)?.get(col)?.applies !== "none").map((r) => r.name));
+  const applied = (col: string) => new Set(m.rows.filter((r) => m.cells.get(r.name)?.get(col)?.applies !== "none").map((r) => r.name));
   const patch = applied("patch");
   const minor = applied("minor");
   const major = applied("major");
@@ -155,7 +167,7 @@ test("a body evidence section is refused — the frontmatter block is the single
     mkdirSync(join(dir, "project", "deliverable", "machines", "rigor_matrix", "cells"), { recursive: true });
     writeFileSync(
       join(dir, "project", "deliverable", "machines", "rigor_matrix", "rows", "M0_10_echo.md"),
-      '---\nkind: matrix-row\nname: echo\nstate_kind: work\nfilled_by: agent\ndepends_on: []\nevidence:\n  - name: proof\n---\n\n## Guidance\nNothing.\n\n## Evidence form\n\n- proof | twice | required\n',
+      "---\nkind: matrix-row\nname: echo\nstate_kind: work\nfilled_by: agent\ndepends_on: []\nevidence:\n  - name: proof\n---\n\n## Guidance\nNothing.\n\n## Evidence form\n\n- proof | twice | required\n",
     );
     assert.throws(() => readRigorMatrix(dir), /single truth/);
   } finally {
@@ -170,7 +182,7 @@ test("a non-terminal row without evidence refuses — leaving a state demands ev
     mkdirSync(join(dir, "project", "deliverable", "machines", "rigor_matrix", "cells"), { recursive: true });
     writeFileSync(
       join(dir, "project", "deliverable", "machines", "rigor_matrix", "rows", "M0_10_bare.md"),
-      '---\nkind: matrix-row\nname: bare\nstate_kind: work\nfilled_by: agent\ndepends_on: []\n---\n\n## Guidance\nNothing.\n',
+      "---\nkind: matrix-row\nname: bare\nstate_kind: work\nfilled_by: agent\ndepends_on: []\n---\n\n## Guidance\nNothing.\n",
     );
     assert.throws(() => readRigorMatrix(dir), /carries no evidence/);
   } finally {

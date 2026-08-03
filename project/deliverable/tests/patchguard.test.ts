@@ -1,11 +1,11 @@
 // se_file_patch strict op fields — a mistyped find/replace refuses BY
 // NAME instead of reading as "0 occurrences" (the e10 lesson).
 import { strict as assert } from "node:assert";
+import { readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
 import { bootedServer, call, freshRoot, pullBoot } from "./helpers.ts";
 
 test("se_file_patch refuses unknown op fields by name, mapping the common aliases", async () => {

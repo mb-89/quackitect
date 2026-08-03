@@ -5,15 +5,16 @@
 // plan and rigor, the owner blesses). The kickoff's outcome seeds the
 // rest; that lane is the next build. The needs-retro gate holds the FIRST
 // start of a never-walked iteration — never the seeding.
+
+import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { spawnSync } from "node:child_process";
-import { nodeSize, type CanvasData, type CanvasEdge, type CanvasElement } from "./canvas.ts";
+import { type CanvasData, type CanvasEdge, type CanvasElement, nodeSize } from "./canvas.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
-import { validateMachine, type EvidenceField, type MachineDecl, type StateDecl } from "./machine.ts";
-import { CHANGE_COLUMNS, compileColumn, rigorMatrixContentHash, readRigorMatrix, type ChangeColumn } from "./rigor-matrix.ts";
-import { parseStateNote } from "./notes.ts";
 import { buildArchive, type GeneratedMachine } from "./expmachine.ts";
+import { type EvidenceField, type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
+import { parseStateNote } from "./notes.ts";
+import { CHANGE_COLUMNS, type ChangeColumn, compileColumn, readRigorMatrix, rigorMatrixContentHash } from "./rigor-matrix.ts";
 import { bustBranchList, listBranches, slug, worktreesDir } from "./worktree.ts";
 
 const SRC = "engine/iterations.ts";
@@ -78,14 +79,19 @@ export function itSeed(root: string, goal: string, vision: string, inputs: strin
       clause: CLAUSES.REQUIRED_ARGS,
       expected: "a goal AND a rough vision — the seed is a small form, not a slogan",
       got: goal.trim() === "" ? "an empty goal" : "an empty vision",
-      remedy: { tool: "se_seed_iteration", args: { goal: "<what>", vision: "<roughly how / what done looks like>" }, note: "inputs: [] may carry an expedition id or note refs" },
+      remedy: {
+        tool: "se_seed_iteration",
+        args: { goal: "<what>", vision: "<roughly how / what done looks like>" },
+        note: "inputs: [] may carry an expedition id or note refs",
+      },
       source: SRC,
     });
   }
-  const n = itList(root).reduce((max, it) => {
-    const m = it.id.match(/^i(\d+)-/);
-    return m ? Math.max(max, Number(m[1])) : max;
-  }, 0) + 1;
+  const n =
+    itList(root).reduce((max, it) => {
+      const m = it.id.match(/^i(\d+)-/);
+      return m ? Math.max(max, Number(m[1])) : max;
+    }, 0) + 1;
   const id = `i${n}-${slug(goal)}`;
   const path = join(worktreesDir(root), id);
   mkdirSync(worktreesDir(root), { recursive: true });
@@ -135,12 +141,18 @@ export function itSeed(root: string, goal: string, vision: string, inputs: strin
 export function itFind(root: string, id: string): Iteration {
   const it = itList(root).find((x) => x.id === id);
   if (it === undefined || !it.open) {
-    const open = itList(root).filter((x) => x.open).map((x) => x.id);
+    const open = itList(root)
+      .filter((x) => x.open)
+      .map((x) => x.id);
     throw new Rejection({
       clause: CLAUSES.PATH_ESCAPE,
       expected: `an OPEN iteration: ${open.join(", ") || "(none — seed one first)"}`,
       got: id,
-      remedy: { tool: "se_seed_iteration", args: { goal: "<what>", vision: "<roughly how>" }, note: "the iterations container lists the seeded ones" },
+      remedy: {
+        tool: "se_seed_iteration",
+        args: { goal: "<what>", vision: "<roughly how>" },
+        note: "the iterations container lists the seeded ones",
+      },
       source: SRC,
     });
   }
@@ -183,13 +195,18 @@ function chunkList(v: unknown): string[] {
 
 export function generateSeeded(root: string, it: Iteration, machineId: string, kind: string): GeneratedMachine {
   const abs = join(it.path, itSeededRel(it.id, kind));
-  const scaffold = '---\nsteps:\n  - id: <step>\n    statement: "<what this step builds or settles>"\n    depends_on: []\n    realization: software\n---\n';
+  const scaffold =
+    '---\nsteps:\n  - id: <step>\n    statement: "<what this step builds or settles>"\n    depends_on: []\n    realization: software\n---\n';
   if (!existsSync(abs)) {
     throw new Rejection({
       clause: CLAUSES.CONDITION_UNMET,
       expected: `a seeded drawing — the authoring state writes ${itSeededRel(it.id, kind)} (frontmatter steps: id, statement, depends_on, realization — or none: "<why nothing runs>")`,
       got: `no ${kind}.md in the iteration record — a run without visible steps is a defect`,
-      remedy: { tool: "se_file_write", args: { path: itSeededRel(it.id, kind), content: scaffold, base_hash: null }, note: "seed the drawing at the authoring state, then pull again" },
+      remedy: {
+        tool: "se_file_write",
+        args: { path: itSeededRel(it.id, kind), content: scaffold, base_hash: null },
+        note: "seed the drawing at the authoring state, then pull again",
+      },
       source: SRC,
     });
   }
@@ -208,7 +225,11 @@ export function generateSeeded(root: string, it: Iteration, machineId: string, k
         clause: CLAUSES.CONDITION_UNMET,
         expected: `step ${i + 1} declares an id`,
         got: "a step without an id",
-        remedy: { tool: "se_file_read", args: { path: itSeededRel(it.id, kind) }, note: "every step carries id, statement, depends_on, realization" },
+        remedy: {
+          tool: "se_file_read",
+          args: { path: itSeededRel(it.id, kind) },
+          note: "every step carries id, statement, depends_on, realization",
+        },
         source: SRC,
       });
     }
@@ -228,8 +249,24 @@ export function generateSeeded(root: string, it: Iteration, machineId: string, k
         reentry: "resume",
         initial: "start",
         states: [
-          { id: "start", kind: "start", statement: "", guidance: `Nothing was seeded, explicitly: ${fm.none}`, evidence_form: [], priority: 0.01, edges: [{ to: "end", role: "normal" }] },
-          { id: "end", kind: "end", statement: "", guidance: "The explicit none is recorded — pull once more to return to the walk.", evidence_form: [], priority: 0.01, edges: [] },
+          {
+            id: "start",
+            kind: "start",
+            statement: "",
+            guidance: `Nothing was seeded, explicitly: ${fm.none}`,
+            evidence_form: [],
+            priority: 0.01,
+            edges: [{ to: "end", role: "normal" }],
+          },
+          {
+            id: "end",
+            kind: "end",
+            statement: "",
+            guidance: "The explicit none is recorded — pull once more to return to the walk.",
+            evidence_form: [],
+            priority: 0.01,
+            edges: [],
+          },
         ],
       };
       validateMachine(decl);
@@ -239,7 +276,11 @@ export function generateSeeded(root: string, it: Iteration, machineId: string, k
       clause: CLAUSES.CONDITION_UNMET,
       expected: 'at least one step in the drawing, or an explicit none: "<why nothing runs>"',
       got: `${kind}.md carries an empty steps list with no reason`,
-      remedy: { tool: "se_file_patch", args: { ops: [{ path: itSeededRel(it.id, kind), old_string: "steps:", new_string: "steps:\n  - id: <step>" }] }, note: "a run without visible steps is a defect — absence must say why" },
+      remedy: {
+        tool: "se_file_patch",
+        args: { ops: [{ path: itSeededRel(it.id, kind), old_string: "steps:", new_string: "steps:\n  - id: <step>" }] },
+        note: "a run without visible steps is a defect — absence must say why",
+      },
       source: SRC,
     });
   }
@@ -262,7 +303,11 @@ export function generateSeeded(root: string, it: Iteration, machineId: string, k
           clause: CLAUSES.CONDITION_UNMET,
           expected: `chunk ${c.id} depends on a declared chunk`,
           got: d,
-          remedy: { tool: "se_file_read", args: { path: itSeededRel(it.id, kind) }, note: "dependencies name chunk ids from the same drawing" },
+          remedy: {
+            tool: "se_file_read",
+            args: { path: itSeededRel(it.id, kind) },
+            note: "dependencies name chunk ids from the same drawing",
+          },
           source: SRC,
         });
       }
@@ -467,8 +512,26 @@ export function generateIterations(root: string): GeneratedMachine {
   const nodes: GenNode[] = [];
   const edges: CanvasEdge[] = [];
   const centerY = open.length === 0 ? 80 : ((open.length - 1) * 420) / 2 + 80;
-  nodes.push({ id: "n-start", type: "file", file: "start.md", x: -1400, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
-  nodes.push({ id: "n-end", type: "file", file: "end.md", x: 260, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
+  nodes.push({
+    id: "n-start",
+    type: "file",
+    file: "start.md",
+    x: -1400,
+    y: centerY,
+    width: 160,
+    height: 160,
+    styleAttributes: { shape: "pill" },
+  });
+  nodes.push({
+    id: "n-end",
+    type: "file",
+    file: "end.md",
+    x: 260,
+    y: centerY,
+    width: 160,
+    height: 160,
+    styleAttributes: { shape: "pill" },
+  });
   open.forEach((it, i) => {
     const sid = itShortId(it.id);
     const fm = readItRecord(root, it);
@@ -505,7 +568,8 @@ export function generateIterations(root: string): GeneratedMachine {
         id: walkId,
         kind: "work",
         statement: `the pinned ${String(pinned!.change_size)} walk (${m.states.length} states)`,
-        guidance: "The pinned machine — compiled from the rigor matrix at the kickoff bless, pinned to the record. Click in; the walk continues inside. Rigor matrix edits reach the NEXT kickoff, never this walk.",
+        guidance:
+          "The pinned machine — compiled from the rigor matrix at the kickoff bless, pinned to the record. Click in; the walk continues inside. Rigor matrix edits reach the NEXT kickoff, never this walk.",
         evidence_form: [],
         priority: 0.2,
         submachine: "generated",

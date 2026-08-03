@@ -14,11 +14,11 @@
 // A ROW IS NOT A COPY OF A FILE. It is the note's frontmatter plus a `file`
 // member carrying the fields Bases synthesises. The expression language reads
 // exactly this shape, so nothing translates between the index and a filter.
-import { mkdirSync, readdirSync, readFileSync, statSync, unlinkSync, watch, writeFileSync, type FSWatcher } from "node:fs";
+import { type FSWatcher, mkdirSync, readdirSync, readFileSync, statSync, unlinkSync, watch, writeFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { availableParallelism } from "node:os";
 import { basename, dirname, join, relative, sep } from "node:path";
-import { DATEISH, evaluate, isTruthy, parseExpr, toDate, type Ctx } from "./expr.ts";
+import { type Ctx, DATEISH, evaluate, isTruthy, parseExpr, toDate } from "./expr.ts";
 import { parseStateNote } from "./notes.ts";
 
 export type Row = Record<string, unknown>;
@@ -47,7 +47,7 @@ export interface VaultStats {
 }
 
 function walk(dir: string, out: string[]): void {
-  let entries;
+  let entries: import("node:fs").Dirent[];
   try {
     entries = readdirSync(dir, { withFileTypes: true });
   } catch {
@@ -87,7 +87,10 @@ export class Vault {
   build(): VaultStats {
     const started = performance.now();
     const files = this.files();
-    return this.seat(files.map((abs) => this.readOne(abs)), started);
+    return this.seat(
+      files.map((abs) => this.readOne(abs)),
+      started,
+    );
   }
 
   /**
@@ -364,7 +367,7 @@ export class Vault {
     files.forEach((abs, i) => {
       const rel = relative(this.dir, abs).split(sep).join("/");
       const hit = cached.get(rel);
-      let st;
+      let st: import("node:fs").Stats;
       try {
         st = statSync(abs);
       } catch {

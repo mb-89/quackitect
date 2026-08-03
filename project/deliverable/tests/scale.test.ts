@@ -9,12 +9,12 @@
 //
 // Two invariants hold the promise up. Both are pinned here.
 import { strict as assert } from "node:assert";
-import { readFileSync, readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { loadLevels } from "../engine/scale.ts";
 import { parseStateNote } from "../engine/notes.ts";
 import { renderMirror } from "../engine/render.ts";
+import { loadLevels } from "../engine/scale.ts";
 import { Session } from "../engine/session.ts";
 import { freshRoot } from "./helpers.ts";
 

@@ -29,7 +29,10 @@ test("append is a patch op: no anchor, no full rewrite, seam handled and NAMED",
   writeFileSync(join(root, "h.md"), "# Handover\nbody"); // no trailing newline — the common fumble
   const r = filePatch(root, [{ path: "h.md", append: true, new_string: "## Addendum\nmore" }]);
   assert.equal(readFileSync(join(root, "h.md"), "utf8"), "# Handover\nbody\n## Addendum\nmore");
-  assert.ok((r.corrected ?? []).some((c) => c.includes("newline")), "the mechanical seam fix is announced, not silent");
+  assert.ok(
+    (r.corrected ?? []).some((c) => c.includes("newline")),
+    "the mechanical seam fix is announced, not silent",
+  );
   rmSync(root, { recursive: true, force: true });
 });
 
@@ -112,8 +115,15 @@ test("a CRLF/LF mismatch is auto-corrected and ANNOUNCED, not refused", () => {
   const root = fresh();
   writeFileSync(join(root, "w.ts"), "const a = 1;\r\nconst b = 2;\r\n");
   const r = filePatch(root, [{ path: "w.ts", old_string: "const a = 1;\nconst b = 2;", new_string: "const a = 1;\nconst b = 3;" }]);
-  assert.equal(readFileSync(join(root, "w.ts"), "utf8"), "const a = 1;\r\nconst b = 3;\r\n", "applied in the FILE's endings — CRLF stays CRLF");
-  assert.ok((r.corrected ?? []).some((c) => c.includes("CRLF")), "the correction is named on the result");
+  assert.equal(
+    readFileSync(join(root, "w.ts"), "utf8"),
+    "const a = 1;\r\nconst b = 3;\r\n",
+    "applied in the FILE's endings — CRLF stays CRLF",
+  );
+  assert.ok(
+    (r.corrected ?? []).some((c) => c.includes("CRLF")),
+    "the correction is named on the result",
+  );
   rmSync(root, { recursive: true, force: true });
 });
 
@@ -127,7 +137,10 @@ test("a mixed-endings file takes a range op at the reader's own line numbers", (
   assert.equal(read.total_lines, 4, "the reader counts by newline alone");
   const r = filePatch(root, [{ path: "m.ts", at: { from_line: 3, to_line: 3 }, new_string: "THREE", base_hash: read.hash }]);
   assert.equal(readFileSync(join(root, "m.ts"), "utf8"), "one\ntwo\nTHREE\r\n", "the replaced line keeps its own ending");
-  assert.ok((r.corrected ?? []).some((c) => c.includes("mixes CRLF and LF")), "the mix is announced");
+  assert.ok(
+    (r.corrected ?? []).some((c) => c.includes("mixes CRLF and LF")),
+    "the mix is announced",
+  );
   rmSync(root, { recursive: true, force: true });
 });
 
@@ -138,7 +151,10 @@ test("a BOM file matches BOM-free, keeps its mark, and says so", () => {
   writeFileSync(join(root, "b.ts"), "﻿alpha\nbeta\n");
   const r = filePatch(root, [{ path: "b.ts", old_string: "alpha", new_string: "ALPHA" }]);
   assert.equal(readFileSync(join(root, "b.ts"), "utf8"), "﻿ALPHA\nbeta\n", "the mark survives at the front");
-  assert.ok((r.corrected ?? []).some((c) => c.includes("byte-order mark")), "the mark is announced");
+  assert.ok(
+    (r.corrected ?? []).some((c) => c.includes("byte-order mark")),
+    "the mark is announced",
+  );
   rmSync(root, { recursive: true, force: true });
 });
 
@@ -201,7 +217,10 @@ test("include filters by filename inside the search call", () => {
   writeFileSync(join(root, "a.ts"), "marker\n");
   writeFileSync(join(root, "a.md"), "marker\n");
   const r = search(root, "marker", { include: "**/*.ts" });
-  assert.deepEqual(r.matches.map((m) => m.path), ["a.ts"]);
+  assert.deepEqual(
+    r.matches.map((m) => m.path),
+    ["a.ts"],
+  );
   rmSync(root, { recursive: true, force: true });
 });
 
@@ -211,7 +230,10 @@ test("count_only answers 'how many, where' without a single match line", () => {
   writeFileSync(join(root, "b.ts"), "x\n");
   const r = search(root, "x", { count_only: true });
   assert.equal(r.total, 4);
-  assert.deepEqual(r.counts, [{ path: "a.ts", count: 3 }, { path: "b.ts", count: 1 }]);
+  assert.deepEqual(r.counts, [
+    { path: "a.ts", count: 3 },
+    { path: "b.ts", count: 1 },
+  ]);
   assert.equal(r.matches.length, 0);
   rmSync(root, { recursive: true, force: true });
 });
@@ -365,7 +387,9 @@ function productRoot(): string {
     writeFileSync(join(root, "project", "deliverable", "engine", `${m}.ts`), `// ${m}\n`);
     writeFileSync(join(root, "project", "deliverable", "tests", `${m}.test.ts`), `// ${m} test\n`);
   }
-  const g = (...a: string[]): void => { spawnSync("git", a, { cwd: root }); };
+  const g = (...a: string[]): void => {
+    spawnSync("git", a, { cwd: root });
+  };
   g("add", "-A");
   g("commit", "-qm", "project");
   return root;
@@ -424,7 +448,10 @@ test("piecemeal past the threshold flips: scoped refuses toward the battery, the
   for (let i = 0; i < threshold - 1; i++) {
     testRecord(se, root, true, `scope-${i}`, [`project/deliverable/tests/f${i}.test.ts`]);
   }
-  assert.doesNotThrow(() => scopedGate(se, root, ["project/deliverable/tests/f0.test.ts"], false), "already-seen files do not advance the odometer");
+  assert.doesNotThrow(
+    () => scopedGate(se, root, ["project/deliverable/tests/f0.test.ts"], false),
+    "already-seen files do not advance the odometer",
+  );
   try {
     scopedGate(se, root, ["project/deliverable/tests/fresh.test.ts"], false);
     assert.fail("expected the flip");
@@ -446,7 +473,10 @@ test("the unchanged gate is PER SCOPE — pull's green does not fence files' run
   const root = productRoot();
   const se = join(root, ".se");
   testRecord(se, root, true, "pull-scope", ["project/deliverable/tests/pull.test.ts"]);
-  assert.throws(() => testGate(se, root, false, "pull-scope"), (e: unknown) => e instanceof Rejection && e.clause === "SE-C-130");
+  assert.throws(
+    () => testGate(se, root, false, "pull-scope"),
+    (e: unknown) => e instanceof Rejection && e.clause === "SE-C-130",
+  );
   assert.doesNotThrow(() => testGate(se, root, false, "files-scope"), "a scope never run is never fenced");
   rmSync(root, { recursive: true, force: true });
 });
@@ -490,14 +520,14 @@ test("parseTap keeps the counts and only the failures' detail", () => {
   assert.ok(r.failures[0].detail.includes("expected 1, got 2"));
 });
 
+import { streakNudge } from "../engine/discipline.ts";
 // ── waiting, and the streak ────────────────────────────────────────────────
 // Found live 2026-08-02: an agent burned ~15 minutes of one hour in
 // 100-second Start-Sleep calls, hand-polling a background job the lane gave
 // it no way to wait on. The wait verb is the lane's answer; the rule makes
 // the sleep a named lane job; the streak carries the 95% law back on every
 // green result.
-import { runBackground, jobWait } from "../engine/run.ts";
-import { streakNudge } from "../engine/discipline.ts";
+import { jobWait, runBackground } from "../engine/run.ts";
 
 test("the sleep classifies as a lane job pointing at the wait verb", () => {
   assert.equal(classifyCommand("Start-Sleep -Seconds 100; Write-Output ok")?.category, "waiting");

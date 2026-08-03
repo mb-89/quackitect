@@ -77,7 +77,10 @@ describe("parameter panels", { concurrency: true }, () => {
   test("the shipped control bar is read from its spec, not from code", () => {
     const params = loadPanel(REPO_ROOT, "controls");
     assert.ok(params.length >= 4, "the panel declares its parameters");
-    assert.deepEqual(params.map((p) => p.type), ["rungs", "int", "int", "action", "text", "toggles"]);
+    assert.deepEqual(
+      params.map((p) => p.type),
+      ["rungs", "int", "int", "action", "text", "toggles"],
+    );
     const html = renderPanel(params, VALUES);
     assert.match(html, /class="rung on" data-level="0"/, "the lowest lit rung releases to blocked");
     assert.match(html, /id="narration-minutes"[^>]*value="5"/);
@@ -118,7 +121,10 @@ describe("parameter panels", { concurrency: true }, () => {
   // renderer either generalises or is revealed as the first one in disguise.
   test("the note entry is a panel too, and its separator is declared not baked", () => {
     const params = loadPanel(REPO_ROOT, "note-entry");
-    assert.deepEqual(params.map((p) => p.type), ["text", "choice", "action"]);
+    assert.deepEqual(
+      params.map((p) => p.type),
+      ["text", "choice", "action"],
+    );
     const html = renderPanel(params, VALUES);
     // The sketch splits title from body on a forward slash and refuses a value
     // without one. That rule lives in the spec, so changing it is an edit.

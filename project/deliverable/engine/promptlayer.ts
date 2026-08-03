@@ -52,7 +52,12 @@ export function assembleProtocol(root: string): Projection {
     stamps.push(`${rel} ${contentHash(src)}`);
     parts.push(stripAuthoring(src).trim());
   }
-  const head = ["<!-- GENERATED at agent start. Do not edit — the next start overwrites it.", ...stamps.map((s) => `     from ${s}`), "-->", ""].join("\n");
+  const head = [
+    "<!-- GENERATED at agent start. Do not edit — the next start overwrites it.",
+    ...stamps.map((s) => `     from ${s}`),
+    "-->",
+    "",
+  ].join("\n");
   const body = `${head}\n${parts.join("\n\n")}\n`;
   return { body, hash: contentHash(body) };
 }
@@ -67,7 +72,14 @@ export function protocolTargets(opened: string): { path: string; frontmatter?: s
       path: join(opened, ".github", "instructions", "protocol.instructions.md"),
       // applyTo '**' is what makes an instructions file apply to everything
       // rather than to one file type.
-      frontmatter: ["---", "name: protocol", "description: Generated from project/guidance/. Edit those files, never this one.", "applyTo: '**'", "---", ""].join("\n"),
+      frontmatter: [
+        "---",
+        "name: protocol",
+        "description: Generated from project/guidance/. Edit those files, never this one.",
+        "applyTo: '**'",
+        "---",
+        "",
+      ].join("\n"),
     },
   ];
 }
