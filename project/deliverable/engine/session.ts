@@ -469,6 +469,11 @@ export class Session {
     if (want && this.keepAwake === undefined) {
       const src = "Add-Type -TypeDefinition 'using System.Runtime.InteropServices; public class KA { [DllImport(\"kernel32.dll\")] public static extern uint SetThreadExecutionState(uint f); }'; while ($true) { [KA]::SetThreadExecutionState(2147483651) | Out-Null; Start-Sleep -Seconds 30 }";
       this.keepAwake = spawn("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", src], { stdio: "ignore", windowsHide: true });
+      // The keepawake must never hold its OWNER open: an un-unref'd child
+      // handle kept a test worker's event loop alive forever, wedged the
+      // whole battery at its cap four times in one day, and took three
+      // instrumented kills to name.
+      this.keepAwake.unref();
     } else if (!want && this.keepAwake !== undefined) {
       this.keepAwake.kill();
       this.keepAwake = undefined;

@@ -19,25 +19,27 @@ import { describe, test } from "node:test";
 import { mkdtempSync, writeFileSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { mainMachinePath, Session } from "../engine/session.ts";
-
-const REPO_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
+import { Session } from "../engine/session.ts";
+import { freshRoot } from "./helpers.ts";
 
 describe("declared roots", { concurrency: true }, () => {
   // THE ROUTING RULE. An "@" address is session state exactly like .se/, so it
   // is answered by the PROJECT root however deep in a worktree the walk is.
+  // A FIXTURE ROOT, NEVER THE REAL ONE: a Session on the real root reads the
+  // owner's live settings, and block_sleep=true made every worker here spawn
+  // an immortal keepawake — the battery's four-kill wedge of 2026-08-03.
   test("an @ address routes to the project root, whatever else is bound", () => {
-    const s = new Session(REPO_ROOT);
-    assert.equal(s.laneRoot("@ai"), REPO_ROOT, "a bare root name");
-    assert.equal(s.laneRoot("@ai/sya_kb/digest"), REPO_ROOT, "a path inside one");
-    assert.equal(s.laneRoot("@ai/**/*.md"), REPO_ROOT, "A GLOB — the case that broke");
+    const root = freshRoot();
+    const s = new Session(root);
+    assert.equal(s.laneRoot("@ai"), root, "a bare root name");
+    assert.equal(s.laneRoot("@ai/sya_kb/digest"), root, "a path inside one");
+    assert.equal(s.laneRoot("@ai/**/*.md"), root, "A GLOB — the case that broke");
   });
 
   // ...and the other side of it, so a fix here never quietly redirects
   // ordinary work out of the worktree it belongs in.
   test("everything else still answers from the work root", () => {
-    const s = new Session(REPO_ROOT);
+    const s = new Session(freshRoot());
     assert.equal(s.laneRoot(), s.workRoot(), "no address at all");
     assert.equal(s.laneRoot("project/guidance/ux.md"), s.workRoot(), "an ordinary path");
     assert.equal(s.laneRoot("project/**/*.md"), s.workRoot(), "an ordinary glob");
