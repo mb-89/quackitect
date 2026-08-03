@@ -409,7 +409,9 @@ function emptyLast(keys: string[]): string[] {
 
 const AGGREGATES = ["count", "list"];
 
-export function renderPivot(spec: BaseSpec, view: BaseView, rows: Row[]): TableResult {
+/** A pivot view must name both dimensions, a known aggregate, and — for
+ *  `list` — the property it lists. Refuses typed, never renders a guess. */
+function guardPivotView(view: BaseView): { rowProp: string; colProp: string; agg: string } {
   const rowProp = view.rows;
   const colProp = view.columns;
   if (rowProp === undefined || colProp === undefined) {
@@ -452,14 +454,20 @@ export function renderPivot(spec: BaseSpec, view: BaseView, rows: Row[]): TableR
       source: SRC,
     });
   }
+  return { rowProp, colProp, agg };
+}
 
-  const kept = selectRows(spec, view, rows);
+/** NESTED MAPS, NOT A JOINED KEY. The first draft of this joined the two
+ *  dimensions with a separator byte, which is how a raw NUL got written into
+ *  this file — the exact fault worktree.ts carries a warning about, where
+ *  ripgrep calls the whole source binary and every search over it comes back
+ *  confidently empty. A nested map needs no separator, so it cannot happen. */
+function fillPivotCells(
+  kept: Row[],
+  rowProp: string,
+  colProp: string,
+): { cells: Map<string, Map<string, Row[]>>; colKeys: Set<string>; filled: number } {
   const colKeys = new Set<string>();
-  // NESTED MAPS, NOT A JOINED KEY. The first draft of this joined the two
-  // dimensions with a separator byte, which is how a raw NUL got written into
-  // this file — the exact fault worktree.ts carries a warning about, where
-  // ripgrep calls the whole source binary and every search over it comes back
-  // confidently empty. A nested map needs no separator, so it cannot happen.
   const cells = new Map<string, Map<string, Row[]>>();
   let filled = 0;
   for (const r of kept) {
@@ -481,6 +489,13 @@ export function renderPivot(spec: BaseSpec, view: BaseView, rows: Row[]): TableR
       }
     }
   }
+  return { cells, colKeys, filled };
+}
+
+export function renderPivot(spec: BaseSpec, view: BaseView, rows: Row[]): TableResult {
+  const { rowProp, colProp, agg } = guardPivotView(view);
+  const kept = selectRows(spec, view, rows);
+  const { cells, colKeys, filled } = fillPivotCells(kept, rowProp, colProp);
   // THE VIEW DECLARES THE ROW ORDER, NOT THE RENDERER. `cells` is filled in
   // the order selectRows handed the rows over, so its key order already IS the
   // view's `sort` (and, with none declared, the vault's own path order).
