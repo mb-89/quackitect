@@ -7,11 +7,14 @@
 //   tag: <t>     the doc's tags intersect the state's tags
 //   read         the state's own read arguments (entry/exit conditions)
 // A doc pulled by several rules appears once, with every source listed.
+// A PROMOTED source (PROMPT_SOURCES) is never pulled: the prompt layer
+// carries it on every turn, and it must not also ride the wire.
 // Pulling is VISIBILITY — it never gates; only conditions gate.
 import { existsSync, readdirSync, readFileSync, watch, type FSWatcher } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
 import { contentHash } from "./hash.ts";
 import { parseStateNote } from "./notes.ts";
+import { PROMPT_SOURCES } from "./promptlayer.ts";
 import { type MachineDecl, type StateDecl } from "./machine.ts";
 
 export interface GuidanceDoc {
@@ -146,6 +149,7 @@ export function pulledFor(root: string, docs: GuidanceDoc[], m: MachineDecl, s: 
   };
   const rootDir = guidanceDir(root);
   for (const d of docs) {
+    if (PROMPT_SOURCES.includes(d.path)) continue;
     const isRoot = dirname(join(root, d.path)) === rootDir;
     if (isRoot) add(d.path, d.hash, "root");
     else if (d.applies === "always") add(d.path, d.hash, "applies: always");

@@ -191,18 +191,16 @@ export async function call(server: Server, name: string, args: Record<string, un
 }
 
 /** The root guidance the pull demands at entry. Anything sitting DIRECTLY in
- *  project/guidance/ is pulled ALWAYS, so a new document there joins this
- *  list or every walk in the suite stalls. That is also why a promoted file
- *  moves to a subfolder rather than staying at the root.
+ *  project/guidance/ is pulled ALWAYS — except a source promoted to the
+ *  prompt layer (PROMPT_SOURCES in engine/promptlayer.ts), which the pull
+ *  skips because it is present on every turn. A new root document joins this
+ *  list or every walk in the suite stalls.
  *
- *  AGENTS.md LEFT THIS LIST when it was promoted to the prompt layer: it is
- *  generated now, present on every turn, and boot no longer reads it. */
+ *  AGENTS.md, then the contract, the walk and the voice LEFT THIS LIST when
+ *  they were promoted. */
 export const READ_DOCS = [
-  "project/guidance/contract.md",
   "project/guidance/software.md",
   "project/guidance/ux.md",
-  "project/guidance/voice.md",
-  "project/guidance/walking.md",
 ] as const;
 
 /** The human's side of the read proof: check every boot doc in the mirror.
