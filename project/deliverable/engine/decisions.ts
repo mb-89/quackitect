@@ -55,13 +55,54 @@ const SHAPE_NOTE =
  *  life left standing — parked defers that never arrived, and points
  *  still open. Sequential; a re-minted node id shadows its ancestor (the
  *  per-part history stays in the file for the retro). */
+type ReplayLiveNode = { visit: string; brief: string; open: boolean };
+type ReplayParked = { state: string; brief: string; hops?: number; trail?: string[] };
+
+function replayFileOp(nodes: Map<string, ReplayLiveNode>, parked: ReplayParked[], rec: Record<string, unknown>): void {
+  const op = String(rec.op ?? "");
+  if (op === "plan" || op === "fork") {
+    const list = Array.isArray(rec.nodes) ? (rec.nodes as { id: string; brief: string }[]) : [];
+    for (const n of list) nodes.set(n.id, { visit: String(rec.visit ?? ""), brief: n.brief, open: true });
+    if (op === "fork" && rec.node !== undefined)
+      nodes.set(String(rec.node), { visit: String(rec.visit ?? ""), brief: String(rec.brief ?? ""), open: true });
+    return;
+  }
+  if (op === "done" || op === "obsolete" || op === "revert") {
+    const n = nodes.get(String(rec.node ?? ""));
+    if (n) n.open = false;
+    return;
+  }
+  replayDeferOps(nodes, parked, op, rec);
+}
+
+function replayDeferOps(nodes: Map<string, ReplayLiveNode>, parked: ReplayParked[], op: string, rec: Record<string, unknown>): void {
+  if (op === "defer") {
+    const n = nodes.get(String(rec.node ?? ""));
+    if (n) n.open = false;
+    parked.push({
+      state: String(rec.to ?? ""),
+      brief: String(rec.brief ?? ""),
+      hops: Number(rec.hops ?? 1),
+      trail: Array.isArray(rec.trail) ? rec.trail.map(String) : undefined,
+    });
+    return;
+  }
+  if (op === "defer_arrived") {
+    const brief = String(rec.brief ?? "");
+    const state = String(rec.visit ?? "").split("@")[0];
+    const i = parked.findIndex((p) => p.state === state && p.brief === brief);
+    if (i >= 0) parked.splice(i, 1);
+    if (rec.node !== undefined) nodes.set(String(rec.node), { visit: String(rec.visit ?? ""), brief, open: true });
+  }
+}
+
 export function replayFile(path: string): {
-  parked: { state: string; brief: string; hops?: number; trail?: string[] }[];
+  parked: ReplayParked[];
   open: { id: string; visit: string; brief: string }[];
 } {
   if (!existsSync(path)) return { parked: [], open: [] };
-  const nodes = new Map<string, { visit: string; brief: string; open: boolean }>();
-  const parked: { state: string; brief: string; hops?: number; trail?: string[] }[] = [];
+  const nodes = new Map<string, ReplayLiveNode>();
+  const parked: ReplayParked[] = [];
   for (const line of readFileSync(path, "utf8").split("\n")) {
     if (line.trim() === "") continue;
     let rec: Record<string, unknown>;
@@ -70,31 +111,7 @@ export function replayFile(path: string): {
     } catch {
       continue;
     }
-    const op = String(rec.op ?? "");
-    if (op === "plan" || op === "fork") {
-      const list = Array.isArray(rec.nodes) ? (rec.nodes as { id: string; brief: string }[]) : [];
-      for (const n of list) nodes.set(n.id, { visit: String(rec.visit ?? ""), brief: n.brief, open: true });
-      if (op === "fork" && rec.node !== undefined)
-        nodes.set(String(rec.node), { visit: String(rec.visit ?? ""), brief: String(rec.brief ?? ""), open: true });
-    } else if (op === "done" || op === "obsolete" || op === "revert") {
-      const n = nodes.get(String(rec.node ?? ""));
-      if (n) n.open = false;
-    } else if (op === "defer") {
-      const n = nodes.get(String(rec.node ?? ""));
-      if (n) n.open = false;
-      parked.push({
-        state: String(rec.to ?? ""),
-        brief: String(rec.brief ?? ""),
-        hops: Number(rec.hops ?? 1),
-        trail: Array.isArray(rec.trail) ? rec.trail.map(String) : undefined,
-      });
-    } else if (op === "defer_arrived") {
-      const brief = String(rec.brief ?? "");
-      const state = String(rec.visit ?? "").split("@")[0];
-      const i = parked.findIndex((p) => p.state === state && p.brief === brief);
-      if (i >= 0) parked.splice(i, 1);
-      if (rec.node !== undefined) nodes.set(String(rec.node), { visit: String(rec.visit ?? ""), brief, open: true });
-    }
+    replayFileOp(nodes, parked, rec);
   }
   return { parked, open: [...nodes.entries()].filter(([, n]) => n.open).map(([id, n]) => ({ id, visit: n.visit, brief: n.brief })) };
 }
@@ -111,27 +128,88 @@ export interface ReplayNode {
   resolution?: string;
 }
 
+interface ReplayCtx {
+  byVisit: Map<string, Map<string, ReplayNode>>;
+  home: Map<string, string>;
+  updateSeq: number;
+}
+
+function replayTouch(ctx: ReplayCtx, visit: string): Map<string, ReplayNode> {
+  let m = ctx.byVisit.get(visit);
+  if (!m) {
+    m = new Map();
+    ctx.byVisit.set(visit, m);
+  }
+  return m;
+}
+
+function replaySetStatus(ctx: ReplayCtx, id: string, status: string, closedAt?: string, resolution?: string): void {
+  const v = ctx.home.get(id);
+  if (v === undefined) return;
+  const n = ctx.byVisit.get(v)?.get(id);
+  if (!n) return;
+  n.status = status;
+  if (closedAt !== undefined) n.closed_at = closedAt;
+  if (resolution !== undefined && resolution !== "") n.resolution = resolution;
+}
+
+function replayPlanFork(ctx: ReplayCtx, rec: Record<string, unknown>, op: string, visit: string, ts: string | undefined): void {
+  const parent = rec.parent === undefined || rec.parent === null ? null : String(rec.parent);
+  if (op === "fork" && rec.node !== undefined) {
+    replayTouch(ctx, visit).set(String(rec.node), { id: String(rec.node), parent, brief: String(rec.brief ?? ""), status: "open", at: ts });
+    ctx.home.set(String(rec.node), visit);
+  }
+  const under = op === "fork" && rec.node !== undefined ? String(rec.node) : parent;
+  for (const n of Array.isArray(rec.nodes) ? (rec.nodes as { id: string; brief: string }[]) : []) {
+    replayTouch(ctx, visit).set(n.id, { id: n.id, parent: under, brief: n.brief, status: "open", at: ts });
+    ctx.home.set(n.id, visit);
+  }
+}
+
+// AN UPDATE REPORTS ON A NODE. It never closes one, and it never
+// replaces one. Overwriting the target here marked every touched item
+// done and dropped its parent, so a replayed visit showed finished
+// work that was still open and a flat list where nesting stood.
+//
+// AN UPDATE LANDS AS A CHECKED POINT UNDER ITS NODE (walking.md). It
+// is a child, with an id of its own. Writing it AT the target's id
+// overwrote the target, which marked open work done and flattened the
+// nesting; dropping it instead lost the trail. Neither is the point.
+// A target this log never opened belongs to another engine life — the
+// id counter restarts on a reload, so d74 in one visit is not d74 in
+// the next. Hang the update on the trunk rather than invent a point
+// that was never planned.
+function replayUpdate(ctx: ReplayCtx, rec: Record<string, unknown>, visit: string, ts: string | undefined): void {
+  const id = String(rec.node ?? "");
+  if (id === "") return;
+  const owner = ctx.home.get(id) ?? visit;
+  const parent = ctx.byVisit.get(owner)?.get(id) === undefined ? null : id;
+  const childId = `${id}.${++ctx.updateSeq}`;
+  replayTouch(ctx, owner).set(childId, { id: childId, parent, brief: String(rec.brief ?? ""), status: "done", at: ts, closed_at: ts });
+  ctx.home.set(childId, owner);
+}
+
+function replayOne(ctx: ReplayCtx, rec: Record<string, unknown>): void {
+  const op = String(rec.op ?? "");
+  const visit = String(rec.visit ?? "");
+  const ts = rec.ts === undefined ? undefined : String(rec.ts);
+  if (op === "plan" || op === "fork") {
+    replayPlanFork(ctx, rec, op, visit, ts);
+  } else if (op === "done" || op === "obsolete" || op === "revert") {
+    replaySetStatus(ctx, String(rec.node ?? ""), op === "revert" ? "reverted" : op, ts, String(rec.brief ?? ""));
+  } else if (op === "update") {
+    replayUpdate(ctx, rec, visit, ts);
+  } else if (op === "defer") {
+    replaySetStatus(ctx, String(rec.node ?? ""), "deferred", ts, `deferred to ${String(rec.to ?? "?")}`);
+  } else if (op === "defer_arrived") {
+    const id = String(rec.node ?? "");
+    replayTouch(ctx, visit).set(id, { id, parent: null, brief: String(rec.brief ?? ""), status: "open", at: ts });
+    ctx.home.set(id, visit);
+  }
+}
+
 export function replayVisitsText(text: string): { visit: string; nodes: ReplayNode[] }[] {
-  const byVisit = new Map<string, Map<string, ReplayNode>>();
-  const home = new Map<string, string>();
-  let updateSeq = 0;
-  const touch = (visit: string): Map<string, ReplayNode> => {
-    let m = byVisit.get(visit);
-    if (!m) {
-      m = new Map();
-      byVisit.set(visit, m);
-    }
-    return m;
-  };
-  const setStatus = (id: string, status: string, closedAt?: string, resolution?: string): void => {
-    const v = home.get(id);
-    if (v === undefined) return;
-    const n = byVisit.get(v)?.get(id);
-    if (!n) return;
-    n.status = status;
-    if (closedAt !== undefined) n.closed_at = closedAt;
-    if (resolution !== undefined && resolution !== "") n.resolution = resolution;
-  };
+  const ctx: ReplayCtx = { byVisit: new Map(), home: new Map(), updateSeq: 0 };
   for (const line of text.split("\n")) {
     if (line.trim() === "") continue;
     let rec: Record<string, unknown>;
@@ -140,51 +218,9 @@ export function replayVisitsText(text: string): { visit: string; nodes: ReplayNo
     } catch {
       continue;
     }
-    const op = String(rec.op ?? "");
-    const visit = String(rec.visit ?? "");
-    const ts = rec.ts === undefined ? undefined : String(rec.ts);
-    if (op === "plan" || op === "fork") {
-      const parent = rec.parent === undefined || rec.parent === null ? null : String(rec.parent);
-      if (op === "fork" && rec.node !== undefined) {
-        touch(visit).set(String(rec.node), { id: String(rec.node), parent, brief: String(rec.brief ?? ""), status: "open", at: ts });
-        home.set(String(rec.node), visit);
-      }
-      const under = op === "fork" && rec.node !== undefined ? String(rec.node) : parent;
-      for (const n of Array.isArray(rec.nodes) ? (rec.nodes as { id: string; brief: string }[]) : []) {
-        touch(visit).set(n.id, { id: n.id, parent: under, brief: n.brief, status: "open", at: ts });
-        home.set(n.id, visit);
-      }
-    } else if (op === "done" || op === "obsolete" || op === "revert") {
-      setStatus(String(rec.node ?? ""), op === "revert" ? "reverted" : op, ts, String(rec.brief ?? ""));
-    } else if (op === "update") {
-      // AN UPDATE REPORTS ON A NODE. It never closes one, and it never
-      // replaces one. Overwriting the target here marked every touched item
-      // done and dropped its parent, so a replayed visit showed finished
-      // work that was still open and a flat list where nesting stood.
-      const id = String(rec.node ?? "");
-      if (id === "") continue;
-      // AN UPDATE LANDS AS A CHECKED POINT UNDER ITS NODE (walking.md). It
-      // is a child, with an id of its own. Writing it AT the target's id
-      // overwrote the target, which marked open work done and flattened the
-      // nesting; dropping it instead lost the trail. Neither is the point.
-      // A target this log never opened belongs to another engine life — the
-      // id counter restarts on a reload, so d74 in one visit is not d74 in
-      // the next. Hang the update on the trunk rather than invent a point
-      // that was never planned.
-      const owner = home.get(id) ?? visit;
-      const parent = byVisit.get(owner)?.get(id) === undefined ? null : id;
-      const childId = `${id}.${++updateSeq}`;
-      touch(owner).set(childId, { id: childId, parent, brief: String(rec.brief ?? ""), status: "done", at: ts, closed_at: ts });
-      home.set(childId, owner);
-    } else if (op === "defer") {
-      setStatus(String(rec.node ?? ""), "deferred", ts, `deferred to ${String(rec.to ?? "?")}`);
-    } else if (op === "defer_arrived") {
-      const id = String(rec.node ?? "");
-      touch(visit).set(id, { id, parent: null, brief: String(rec.brief ?? ""), status: "open", at: ts });
-      home.set(id, visit);
-    }
+    replayOne(ctx, rec);
   }
-  return [...byVisit.entries()].map(([visit, m]) => ({ visit, nodes: [...m.values()] }));
+  return [...ctx.byVisit.entries()].map(([visit, m]) => ({ visit, nodes: [...m.values()] }));
 }
 
 function malformed(got: string): Rejection {
@@ -200,6 +236,26 @@ function malformed(got: string): Rejection {
 /** Harnesses without the update property in their loaded schema serialize
  *  it as a JSON string — accept both forms (v2 field lesson, toll.ts). */
 export function parseUpdate(v: unknown): DecisionOp {
+  const u = updateShapeOf(v);
+  const { op, items, brief, node, to } = updateFieldsOf(u);
+  const { opOut, briefOut, itemsOut, corrected } = correctChains(op, brief, items);
+  if (briefOut !== undefined) lintUpdateLine(briefOut, "brief");
+  // WHICH item, not just "an item". A five-item plan refused on "item" left
+  // the caller re-reading all five to find the one that tripped.
+  (itemsOut ?? []).forEach((it, i) => {
+    lintUpdateLine(it, `item ${i + 1}`);
+  });
+  return {
+    op: opOut,
+    ...(briefOut !== undefined ? { brief: briefOut } : {}),
+    ...(itemsOut !== undefined ? { items: itemsOut } : {}),
+    ...(node !== undefined ? { node } : {}),
+    ...(to !== undefined ? { to } : {}),
+    ...(corrected !== undefined ? { corrected } : {}),
+  };
+}
+
+function updateShapeOf(v: unknown): Record<string, unknown> {
   if (typeof v === "string") {
     try {
       v = JSON.parse(v);
@@ -208,7 +264,16 @@ export function parseUpdate(v: unknown): DecisionOp {
     }
   }
   if (typeof v !== "object" || v === null || Array.isArray(v)) throw malformed(typeof v);
-  const u = v as Record<string, unknown>;
+  return v as Record<string, unknown>;
+}
+
+function updateFieldsOf(u: Record<string, unknown>): {
+  op: string;
+  items: string[] | undefined;
+  brief: string | undefined;
+  node: string | undefined;
+  to: string | undefined;
+} {
   const op = String(u.op ?? "");
   if (!(op in CLOSES) && op !== "plan" && op !== "fork" && op !== "update" && op !== "defer")
     throw malformed(`op: ${JSON.stringify(u.op)}`);
@@ -223,22 +288,28 @@ export function parseUpdate(v: unknown): DecisionOp {
   if (op === "fork" && (brief === undefined || brief.trim() === "")) throw malformed("fork without brief");
   if (op in CLOSES && node === undefined) throw malformed(`${op} without node`);
   if (op === "update" && (brief === undefined || brief.trim() === "")) throw malformed("update without brief");
-  // THE RENDER LINT (owner ruling 2026-07-27): the lane refuses what would
-  // render weird — mechanically, at the boundary.
-  //
-  // THE CHAIN IS CORRECTED, NOT REFUSED (owner ruling 2026-08-02: correct
-  // the mechanical, announce it, refuse only the ambiguous). This was the
-  // lane's most-hit refusal — 174 of one window's 505 failures — and the
-  // refusal already computed the split it then threw away. Narration that
-  // chains is APPLIED as the plan it wanted to be; a chained item becomes
-  // the items it listed. A RESOLUTION's brief still refuses: which part
-  // resolved the node is not the engine's to guess.
-  const chainOf = (text: string): string[] | null => {
-    const raw = text.split(/[,;]/);
-    if (raw.length < 3) return null;
-    const parts = raw.map((p) => p.trim()).filter((p) => p !== "");
-    return parts.length >= 2 ? parts : null;
-  };
+  return { op, items, brief, node, to };
+}
+
+function chainOf(text: string): string[] | null {
+  const raw = text.split(/[,;]/);
+  if (raw.length < 3) return null;
+  const parts = raw.map((p) => p.trim()).filter((p) => p !== "");
+  return parts.length >= 2 ? parts : null;
+}
+
+// THE CHAIN IS CORRECTED, NOT REFUSED (owner ruling 2026-08-02: correct
+// the mechanical, announce it, refuse only the ambiguous). This was the
+// lane's most-hit refusal — 174 of one window's 505 failures — and the
+// refusal already computed the split it then threw away. Narration that
+// chains is APPLIED as the plan it wanted to be; a chained item becomes
+// the items it listed. A RESOLUTION's brief still refuses: which part
+// resolved the node is not the engine's to guess.
+function correctChains(
+  op: string,
+  brief: string | undefined,
+  items: string[] | undefined,
+): { opOut: DecisionOp["op"]; briefOut: string | undefined; itemsOut: string[] | undefined; corrected: string | undefined } {
   let opOut = op as DecisionOp["op"];
   let briefOut = brief;
   let itemsOut = items;
@@ -256,30 +327,20 @@ export function parseUpdate(v: unknown): DecisionOp {
     itemsOut = itemsOut.flatMap((it) => chainOf(it) ?? [it]);
     corrected = corrected ?? "a chained item was split into the items it listed";
   }
-  const lintLine = (text: string, what: string): void => {
-    if (/[\r\n]/.test(text)) throw malformed(`${what} carries line breaks — one line only. Got ${JSON.stringify(text)}`);
-    if (text.length > 90) throw malformed(`${what} is ${text.length} chars — the feed renders 90; tighten it. Got ${JSON.stringify(text)}`);
-    const parts = chainOf(text);
-    if (parts !== null) {
-      throw malformed(
-        `${what} chains ${parts.length} separator-joined parts — an unrendered list. Got ${JSON.stringify(text)} — as a plan that is items: [${parts.map((p) => JSON.stringify(p)).join(", ")}]`,
-      );
-    }
-  };
-  if (briefOut !== undefined) lintLine(briefOut, "brief");
-  // WHICH item, not just "an item". A five-item plan refused on "item" left
-  // the caller re-reading all five to find the one that tripped.
-  (itemsOut ?? []).forEach((it, i) => {
-    lintLine(it, `item ${i + 1}`);
-  });
-  return {
-    op: opOut,
-    ...(briefOut !== undefined ? { brief: briefOut } : {}),
-    ...(itemsOut !== undefined ? { items: itemsOut } : {}),
-    ...(node !== undefined ? { node } : {}),
-    ...(to !== undefined ? { to } : {}),
-    ...(corrected !== undefined ? { corrected } : {}),
-  };
+  return { opOut, briefOut, itemsOut, corrected };
+}
+
+// THE RENDER LINT (owner ruling 2026-07-27): the lane refuses what would
+// render weird — mechanically, at the boundary.
+function lintUpdateLine(text: string, what: string): void {
+  if (/[\r\n]/.test(text)) throw malformed(`${what} carries line breaks — one line only. Got ${JSON.stringify(text)}`);
+  if (text.length > 90) throw malformed(`${what} is ${text.length} chars — the feed renders 90; tighten it. Got ${JSON.stringify(text)}`);
+  const parts = chainOf(text);
+  if (parts !== null) {
+    throw malformed(
+      `${what} chains ${parts.length} separator-joined parts — an unrendered list. Got ${JSON.stringify(text)} — as a plan that is items: [${parts.map((p) => JSON.stringify(p)).join(", ")}]`,
+    );
+  }
 }
 
 export class Decisions {
