@@ -126,57 +126,65 @@ export function fileMove(root: string, from: string, to: string): MoveResult {
   const corrected: string[] = [];
   let unrewrittenTotal = 0;
 
+  const applyPairs = (content: string, ps: typeof pairs): { after: string; count: number } => {
+    let after = content;
+    let count = 0;
+    for (const p of ps) {
+      const parts = after.split(p.old);
+      count += parts.length - 1;
+      after = parts.join(p.new);
+    }
+    return { after, count };
+  };
+
+  const sweepFile = (abs: string, rel: string, name: string): void => {
+    const prose = endsWithAny(name, PROSE_FORMATS);
+    const source = endsWithAny(name, SOURCE_FORMATS);
+    let content: string;
+    try {
+      content = readFileSync(abs, "utf8");
+    } catch {
+      return;
+    }
+    // A raw NUL used to end the sweep for this file in silence: its
+    // references stayed dangling and the report never said so.
+    if (content.includes(NUL)) {
+      const fixed = guardRawNul(rel, content, false);
+      if (fixed.corrected === undefined) return;
+      writeFileSync(abs, fixed.content, "utf8");
+      corrected.push(fixed.corrected);
+      content = fixed.content;
+    }
+
+    if (prose || source) {
+      const r = applyPairs(content, prose ? pairs : sourcePairs);
+      if (r.count > 0 && r.after !== content) {
+        writeFileSync(abs, r.after, "utf8");
+        rewritten.push({ path: rel, replacements: r.count });
+        content = r.after;
+      }
+    }
+
+    // Every file is swept, whitelisted or not. What the pass could not
+    // reach is the whole point of the report.
+    const hits = residualHits(content, fromRel, toRel);
+    unrewrittenTotal += hits.length;
+    for (const h of hits) {
+      if (unrewritten.length < RESIDUAL_REPORT_LIMIT) unrewritten.push({ path: rel, line: h.line, text: h.text });
+    }
+  };
+
   const walk = (dir: string): void => {
     for (const e of readdirSync(dir, { withFileTypes: true })) {
       const abs = join(dir, e.name);
       // isExcluded splits on the OS separator; the report wants forward slashes.
       const relOs = relative(root, abs);
       if (isExcluded(relOs)) continue;
-      const rel = relOs.split(sep).join("/");
       if (e.isDirectory()) {
         walk(abs);
         continue;
       }
-      const prose = endsWithAny(e.name, PROSE_FORMATS);
-      const source = endsWithAny(e.name, SOURCE_FORMATS);
-      let content: string;
-      try {
-        content = readFileSync(abs, "utf8");
-      } catch {
-        continue;
-      }
-      // A raw NUL used to end the sweep for this file in silence: its
-      // references stayed dangling and the report never said so.
-      if (content.includes(NUL)) {
-        const fixed = guardRawNul(rel, content, false);
-        if (fixed.corrected === undefined) continue;
-        writeFileSync(abs, fixed.content, "utf8");
-        corrected.push(fixed.corrected);
-        content = fixed.content;
-      }
-
-      if (prose || source) {
-        let after = content;
-        let count = 0;
-        for (const p of prose ? pairs : sourcePairs) {
-          const parts = after.split(p.old);
-          count += parts.length - 1;
-          after = parts.join(p.new);
-        }
-        if (count > 0 && after !== content) {
-          writeFileSync(abs, after, "utf8");
-          rewritten.push({ path: rel, replacements: count });
-          content = after;
-        }
-      }
-
-      // Every file is swept, whitelisted or not. What the pass could not
-      // reach is the whole point of the report.
-      const hits = residualHits(content, fromRel, toRel);
-      unrewrittenTotal += hits.length;
-      for (const h of hits) {
-        if (unrewritten.length < RESIDUAL_REPORT_LIMIT) unrewritten.push({ path: rel, line: h.line, text: h.text });
-      }
+      sweepFile(abs, relOs.split(sep).join("/"), e.name);
     }
   };
   walk(root);
