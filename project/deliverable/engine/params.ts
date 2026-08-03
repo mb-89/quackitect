@@ -86,37 +86,36 @@ const esc = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;"
  * above it with it. BLOCKED IS NOT A BUTTON — it is what no rung pressed
  * means, so it is reached by releasing the lowest one.
  */
+function renderRung(l: PanelValues["rungs"][number], below: number, v: PanelValues): string {
+  const on = v.autonomy >= l.value;
+  const reachable = on || v.autonomy >= below;
+  const target = on ? below : l.value;
+  // Ideation is the one rung that delegates the CREATION of work, so it
+  // is the one rung drawn as a hazard rather than as a setting.
+  const top = l.value >= 1;
+  const danger = top ? " danger" : "";
+  // THE HIDDEN RUNG. Past the top one is emergency, and it is not a
+  // separate button: the top rung BECOMES it. Nothing names it while it
+  // is off, which is the point — it is for repair, not for reaching for.
+  const armed = top && v.emergency === true;
+  const cls = `rung${on ? " on" : ""}${reachable ? "" : " locked"}${danger}${armed ? " emergency" : ""}`;
+  const why = armed
+    ? "emergency — every tool is legal in every state; lower the autonomy to end it"
+    : on
+      ? "click: release this rung and every rung above it"
+      : reachable
+        ? `click: ${l.name}`
+        : "unlock the rung below first";
+  // data-level is where the CLICK LANDS; data-rung is the rung's OWN
+  // value. They differ on a release, and the help has to follow the rung
+  // that was pressed. Sending the landing position explained "blocked" to
+  // a reader who had just clicked the mechanical rung.
+  return `<button type="button" class="${cls}" data-level="${target}" data-rung="${l.value}" title="${esc(armed ? "emergency" : l.name)} — ${esc(why)}">${esc(armed ? "E" : l.abbr)}</button>`;
+}
+
 function renderRungs(_p: Param, v: PanelValues): string {
   const climbable = v.rungs.filter((l) => l.value > 0);
-  const buttons = climbable
-    .map((l, i) => {
-      const on = v.autonomy >= l.value;
-      const below = i === 0 ? 0 : climbable[i - 1].value;
-      const reachable = on || v.autonomy >= below;
-      const target = on ? below : l.value;
-      // Ideation is the one rung that delegates the CREATION of work, so it
-      // is the one rung drawn as a hazard rather than as a setting.
-      const top = l.value >= 1;
-      const danger = top ? " danger" : "";
-      // THE HIDDEN RUNG. Past the top one is emergency, and it is not a
-      // separate button: the top rung BECOMES it. Nothing names it while it
-      // is off, which is the point — it is for repair, not for reaching for.
-      const armed = top && v.emergency === true;
-      const cls = `rung${on ? " on" : ""}${reachable ? "" : " locked"}${danger}${armed ? " emergency" : ""}`;
-      const why = armed
-        ? "emergency — every tool is legal in every state; lower the autonomy to end it"
-        : on
-          ? "click: release this rung and every rung above it"
-          : reachable
-            ? `click: ${l.name}`
-            : "unlock the rung below first";
-      // data-level is where the CLICK LANDS; data-rung is the rung's OWN
-      // value. They differ on a release, and the help has to follow the rung
-      // that was pressed. Sending the landing position explained "blocked" to
-      // a reader who had just clicked the mechanical rung.
-      return `<button type="button" class="${cls}" data-level="${target}" data-rung="${l.value}" title="${esc(armed ? "emergency" : l.name)} — ${esc(why)}">${esc(armed ? "E" : l.abbr)}</button>`;
-    })
-    .join("");
+  const buttons = climbable.map((l, i) => renderRung(l, i === 0 ? 0 : climbable[i - 1].value, v)).join("");
   return `<span class="rungs">${buttons}</span><input id="thr" type="hidden" value="${v.autonomy}">`;
 }
 
