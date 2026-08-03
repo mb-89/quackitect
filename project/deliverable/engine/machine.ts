@@ -235,18 +235,9 @@ export type StepOutcome = "filled" | "failed";
  * a reader can see what was claimed the first time and that it was reopened.
  * Erasing them would make a reopen indistinguishable from work never done.
  */
-export function reopenStates(
-  m: MachineDecl,
-  inst: MachineInstance,
-  stateIds: string[],
-  reason: string,
-  now: string,
-): { reopened: string[]; cone: string[]; superseded: number } {
-  for (const id of stateIds) {
-    if (!m.states.some((s) => s.id === id)) throw new Error(`reopenStates: undeclared state ${id}`);
-  }
-  // The downstream cone: everything reachable from the named states. Anything
-  // downstream was derived from what is being reopened, so it cannot stand.
+/** The downstream cone: everything reachable from the named states. Anything
+ *  downstream was derived from what is being reopened, so it cannot stand. */
+function downstreamCone(m: MachineDecl, stateIds: string[]): Set<string> {
   const cone = new Set<string>(stateIds);
   let grew = true;
   while (grew) {
@@ -261,25 +252,26 @@ export function reopenStates(
       }
     }
   }
+  return cone;
+}
 
-  // Un-fire every edge leaving the cone, so joins re-arm instead of firing on
-  // fuel left over from the walk being replaced.
-  inst.fired = (inst.fired ?? []).filter((key) => !cone.has(key.split("->")[0]));
-
-  // RE-ARM THE JOINS FROM OUTSIDE. A state in the cone may be an AND-join fed
-  // by states that are NOT being reopened and remain done. Their edges fired
-  // once and were CONSUMED when the join first activated, so after a reopen
-  // that fuel is gone and nothing will ever produce it again — the walk
-  // reaches the join and stops dead, with no error and no legal move.
-  //
-  // Found the first time reopen was used in anger: gate_inputs is a three-way
-  // join (draw_context, map_stakeholders, generalize_use_cases). Reopening
-  // write_stories re-walked one of the three; the other two stayed correctly
-  // done, and the gate became unreachable.
-  //
-  // So: for every edge crossing INTO the cone from a source outside it, put
-  // the fuel back if that source is still filled. Not if it is superseded —
-  // then it is being re-walked and will fire on its own.
+// RE-ARM THE JOINS FROM OUTSIDE. A state in the cone may be an AND-join fed
+// by states that are NOT being reopened and remain done. Their edges fired
+// once and were CONSUMED when the join first activated, so after a reopen
+// that fuel is gone and nothing will ever produce it again — the walk
+// reaches the join and stops dead, with no error and no legal move.
+//
+// Found the first time reopen was used in anger: gate_inputs is a three-way
+// join (draw_context, map_stakeholders, generalize_use_cases). Reopening
+// write_stories re-walked one of the three; the other two stayed correctly
+// done, and the gate became unreachable.
+//
+// So: for every edge crossing INTO the cone from a source outside it, put
+// the fuel back if that source is still filled. Not if it is superseded —
+// then it is being re-walked and will fire on its own.
+function rearmJoinsInto(m: MachineDecl, inst: MachineInstance, cone: Set<string>, stateIds: string[]): void {
+  inst.fired ??= [];
+  const fired = inst.fired;
   const stillDone = new Set(inst.history.filter((h) => h.outcome === "filled" && !cone.has(h.state)).map((h) => h.state));
   for (const src of m.states) {
     if (cone.has(src.id) || !stillDone.has(src.id)) continue;
@@ -293,9 +285,27 @@ export function reopenStates(
       // never moves. Observed on the second live reopen.
       if (stateIds.includes(e.to)) continue;
       const key = `${src.id}->${e.to}`;
-      if (!inst.fired.includes(key)) inst.fired.push(key);
+      if (!fired.includes(key)) fired.push(key);
     }
   }
+}
+
+export function reopenStates(
+  m: MachineDecl,
+  inst: MachineInstance,
+  stateIds: string[],
+  reason: string,
+  now: string,
+): { reopened: string[]; cone: string[]; superseded: number } {
+  for (const id of stateIds) {
+    if (!m.states.some((s) => s.id === id)) throw new Error(`reopenStates: undeclared state ${id}`);
+  }
+  const cone = downstreamCone(m, stateIds);
+
+  // Un-fire every edge leaving the cone, so joins re-arm instead of firing on
+  // fuel left over from the walk being replaced.
+  inst.fired = (inst.fired ?? []).filter((key) => !cone.has(key.split("->")[0]));
+  rearmJoinsInto(m, inst, cone, stateIds);
 
   // Supersede prior fills in the cone — kept, not erased.
   let superseded = 0;
@@ -317,6 +327,60 @@ export function reopenStates(
 /** The token set with adoption: an instance without active[] reads as [current]. */
 export function activeStates(inst: MachineInstance): string[] {
   return inst.active ?? [inst.current];
+}
+
+/** Fire the completing state's matching outbound edges: AND-join fuel for
+ *  normal/approval, direct activation for the OR paths. */
+function fireOutbound(
+  m: MachineDecl,
+  inst: MachineInstance,
+  state: StateDecl,
+  roles: EdgeRole[],
+  only: string | undefined,
+  active: string[],
+  activated: string[],
+): void {
+  for (const e of state.edges) {
+    if (only !== undefined && e.to !== only) continue;
+    if (!roles.includes(e.role)) continue;
+    if (!evalGuard(e.guard, inst.counters)) continue;
+    if (e.role === "normal" || e.role === "approval") {
+      // AND-join fuel: the key waits until every required inbound fired.
+      const key = `${state.id}->${e.to}`;
+      if (!inst.fired!.includes(key)) inst.fired!.push(key);
+    } else if (!active.includes(e.to) && !activated.includes(e.to)) {
+      // OR paths (alternative, recovery, fallback, error): activate directly.
+      activated.push(e.to);
+      const target = m.states.find((s) => s.id === e.to)!;
+      if (target.kind === "terminal" || target.kind === "end") inst.status = "closed";
+    }
+  }
+}
+
+/** Activate every successor whose required inbound edges have all fired,
+ *  consuming the fuel. */
+function activatePowered(m: MachineDecl, inst: MachineInstance, active: string[], activated: string[]): void {
+  // Fuel into an ACTIVE state is absorbed — one token per state, a second
+  // trigger during activity never re-runs it later.
+  inst.fired = inst.fired!.filter((k) => !active.includes(k.split("->")[1]));
+  for (const s of m.states) {
+    if (active.includes(s.id) || activated.includes(s.id)) continue;
+    // Inbound counted: normal and approval edges (alternatives activate
+    // directly above). FAN-IN IS OR (owner ruling 2026-07-28): any fired
+    // inbound activates a plain state — what a person naturally draws.
+    // Only an explicit JOIN state (state_kind join) synchronizes: it waits
+    // for EVERY inbound edge — the drawn AND of the formalisms (UML join
+    // bar, BPMN parallel gateway, Petri transition).
+    const inbound = m.states.flatMap((src) =>
+      src.edges.filter((e) => e.to === s.id && (e.role === "normal" || e.role === "approval")).map(() => `${src.id}->${s.id}`),
+    );
+    if (inbound.length === 0) continue;
+    const fired = inbound.filter((k) => inst.fired?.includes(k));
+    if (s.kind === "join" ? fired.length < inbound.length : fired.length === 0) continue;
+    inst.fired = inst.fired?.filter((k) => !inbound.includes(k)); // consume
+    activated.push(s.id);
+    if (s.kind === "terminal" || s.kind === "end") inst.status = "closed";
+  }
 }
 
 /**
@@ -342,46 +406,32 @@ export function completeState(
   const roles: EdgeRole[] = outcome === "filled" ? ["normal", "alternative", "approval", "recovery"] : ["fallback", "error"];
   inst.fired ??= [];
   const activated: string[] = [];
-  for (const e of state.edges) {
-    if (only !== undefined && e.to !== only) continue;
-    if (!roles.includes(e.role)) continue;
-    if (!evalGuard(e.guard, inst.counters)) continue;
-    if (e.role === "normal" || e.role === "approval") {
-      // AND-join fuel: the key waits until every required inbound fired.
-      const key = `${stateId}->${e.to}`;
-      if (!inst.fired.includes(key)) inst.fired.push(key);
-    } else if (!active.includes(e.to) && !activated.includes(e.to)) {
-      // OR paths (alternative, recovery, fallback, error): activate directly.
-      activated.push(e.to);
-      const target = m.states.find((s) => s.id === e.to)!;
-      if (target.kind === "terminal" || target.kind === "end") inst.status = "closed";
-    }
-  }
-  // Fuel into an ACTIVE state is absorbed — one token per state, a second
-  // trigger during activity never re-runs it later.
-  inst.fired = inst.fired.filter((k) => !active.includes(k.split("->")[1]));
-  for (const s of m.states) {
-    if (active.includes(s.id) || activated.includes(s.id)) continue;
-    // Inbound counted: normal and approval edges (alternatives activate
-    // directly above). FAN-IN IS OR (owner ruling 2026-07-28): any fired
-    // inbound activates a plain state — what a person naturally draws.
-    // Only an explicit JOIN state (state_kind join) synchronizes: it waits
-    // for EVERY inbound edge — the drawn AND of the formalisms (UML join
-    // bar, BPMN parallel gateway, Petri transition).
-    const inbound = m.states.flatMap((src) =>
-      src.edges.filter((e) => e.to === s.id && (e.role === "normal" || e.role === "approval")).map(() => `${src.id}->${s.id}`),
-    );
-    if (inbound.length === 0) continue;
-    const fired = inbound.filter((k) => inst.fired?.includes(k));
-    if (s.kind === "join" ? fired.length < inbound.length : fired.length === 0) continue;
-    inst.fired = inst.fired?.filter((k) => !inbound.includes(k)); // consume
-    activated.push(s.id);
-    if (s.kind === "terminal" || s.kind === "end") inst.status = "closed";
-  }
+  fireOutbound(m, inst, state, roles, only, active, activated);
+  activatePowered(m, inst, active, activated);
   inst.active = [...active, ...activated];
   inst.current = inst.active[0] ?? stateId;
   void now;
   return { activated };
+}
+
+/** One authored-or-fallback hop, token-synced; true when it moved. */
+function tryMove(m: MachineDecl, inst: MachineInstance, state: StateDecl, roles: EdgeRole[]): boolean {
+  for (const e of state.edges) {
+    if (!roles.includes(e.role)) continue;
+    if (!evalGuard(e.guard, inst.counters)) continue;
+    inst.current = e.to;
+    // Token sync: an instance running the token model swaps the moving
+    // token too — current and active[] never drift apart.
+    if (inst.active) {
+      inst.active = inst.active.filter((s) => s !== state.id);
+      if (!inst.active.includes(e.to)) inst.active.push(e.to);
+      if (inst.claims) delete inst.claims[state.id];
+    }
+    const next = m.states.find((s) => s.id === e.to)!;
+    if (next.kind === "terminal" || next.kind === "end") inst.status = "closed";
+    return true;
+  }
+  return false;
 }
 
 /**
@@ -396,23 +446,7 @@ export function advance(m: MachineDecl, inst: MachineInstance, outcome: StepOutc
   // state. Failure opens fallbacks and error paths.
   const authored: EdgeRole[] = outcome === "filled" ? ["normal", "alternative", "approval"] : [];
   const fallback: EdgeRole[] = outcome === "filled" ? ["recovery"] : ["fallback", "error"];
-  for (const roles of [authored, fallback]) {
-    for (const e of state.edges) {
-      if (!roles.includes(e.role)) continue;
-      if (!evalGuard(e.guard, inst.counters)) continue;
-      inst.current = e.to;
-      // Token sync: an instance running the token model swaps the moving
-      // token too — current and active[] never drift apart.
-      if (inst.active) {
-        inst.active = inst.active.filter((s) => s !== state.id);
-        if (!inst.active.includes(e.to)) inst.active.push(e.to);
-        if (inst.claims) delete inst.claims[state.id];
-      }
-      const next = m.states.find((s) => s.id === e.to)!;
-      if (next.kind === "terminal" || next.kind === "end") inst.status = "closed";
-      return { moved: true };
-    }
-  }
+  if (tryMove(m, inst, state, authored) || tryMove(m, inst, state, fallback)) return { moved: true };
   // Escape to parent (implicit). Single flat machine at bootstrap: escape
   // closes nothing — it records the exhausted guard and asks the human.
   const guards =
