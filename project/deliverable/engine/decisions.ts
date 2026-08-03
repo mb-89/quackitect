@@ -406,171 +406,23 @@ export class Decisions {
   apply(visit: string, u: DecisionOp): Record<string, unknown> {
     this.materialize(visit);
     switch (u.op) {
-      case "plan": {
-        const parent = u.node === undefined ? null : this.openNode(u.node).id;
-        // IDEMPOTENT. The update rides BEFORE the call's verdict (tools.ts),
-        // and every refusal's remedy says to repeat the call — so a
-        // refused-then-retried plan arrives again. An item already standing
-        // open under this parent in this visit IS that item, not a second one.
-        const standing = (b: string) =>
-          [...this.nodes.values()].some((n) => n.visit === visit && n.parent === parent && n.brief === b && n.status === "open");
-        const added = (u.items ?? []).filter((b) => !standing(b)).map((b) => this.add(visit, parent, b, "planned"));
-        if (this.activeId === undefined) this.activeId = added[0]?.id;
-        this.record({ op: "plan", visit, parent, nodes: added.map((n) => ({ id: n.id, brief: n.brief })) });
+      case "plan":
+        this.applyPlan(visit, u);
         break;
-      }
-      case "fork": {
-        const parent =
-          u.node !== undefined
-            ? this.openNode(u.node).id
-            : this.activeId !== undefined && this.nodes.get(this.activeId)?.status === "open"
-              ? this.activeId
-              : null;
-        // Idempotent for the same reason a plan is — a retried call must not
-        // open the same branch twice; it re-enters the one already standing.
-        const standingFork = [...this.nodes.values()].find(
-          (n) => n.visit === visit && n.parent === parent && n.brief === u.brief && n.status === "open" && n.origin === "fork",
-        );
-        if (standingFork !== undefined) {
-          this.activeId = standingFork.id;
-          break;
-        }
-        const fork = this.add(visit, parent, u.brief!, "fork");
-        const added = (u.items ?? []).map((b) => this.add(visit, fork.id, b, "planned"));
-        this.activeId = fork.id;
-        this.record({
-          op: "fork",
-          visit,
-          parent,
-          node: fork.id,
-          brief: fork.brief,
-          nodes: added.map((n) => ({ id: n.id, brief: n.brief })),
-        });
+      case "fork":
+        this.applyFork(visit, u);
         break;
-      }
       case "done":
       case "obsolete":
-      case "revert": {
-        // IDEMPOTENT, for the reason plan and fork already are: the update
-        // rides BEFORE the call's verdict, and every refusal's remedy says to
-        // repeat the call. So a call refused for some UNRELATED reason comes
-        // back with its resolution already applied, and the retry used to be
-        // refused for a second, more confusing reason. Re-resolving a node the
-        // SAME way is the state we were asked for; only a CONFLICTING
-        // re-resolution is a real disagreement worth refusing.
-        const already = this.nodes.get(u.node!);
-        if (already !== undefined && already.status === CLOSES[u.op]) break;
-        // A NODE FROM AN EARLIER SESSION'S VISIT. The live graph replays
-        // only this session's trail, but the RECORD keeps every visit — and
-        // the leave gate counts the record. A resolution must reach what the
-        // gate counts, or a record whose walk spanned sessions can never
-        // close (found live 2026-08-02, closing e31).
-        if (already === undefined && this.extraPath !== undefined) {
-          let visits: { visit: string; nodes: ReplayNode[] }[] = [];
-          try {
-            visits = replayVisitsText(readFileSync(this.extraPath, "utf8"));
-          } catch {
-            /* no record yet — the ordinary refusal below says so */
-          }
-          const known = visits.find((v) => v.nodes.some((x) => x.id === u.node));
-          if (known !== undefined) {
-            const past = known.nodes.find((x) => x.id === u.node)!;
-            if (past.status !== "open") break; // settled already — a repeat is a no-op across sessions too
-            this.record({ op: u.op, visit: known.visit, node: u.node, ...(u.brief !== undefined ? { brief: u.brief } : {}) });
-            this.sinceResolve = 0;
-            break;
-          }
-        }
-        const n = this.openNode(u.node!);
-        if (u.op === "done") {
-          const open = this.openChildren(n.id);
-          if (open.length > 0) {
-            throw new Rejection({
-              clause: CLAUSES.DECISION_UNRESOLVED,
-              expected: `every child of ${n.id} resolved before it closes — still open: ${open.map((c) => `${c.id}: ${c.brief}`).join(" · ")}`,
-              got: `done on ${n.id} over ${open.length} open child(ren)`,
-              remedy: {
-                tool: "(the same call)",
-                args: { update: { op: "done", node: open[0].id, brief: "<how it resolved>" } },
-                note: "resolve each child (done, or obsolete/revert if it did not survive), then close the parent",
-              },
-              source: "engine/decisions.ts resolve",
-            });
-          }
-        }
-        this.close(n, CLOSES[u.op], u.brief);
-        if (this.activeId !== undefined && this.nodes.get(this.activeId)?.status !== "open") this.activeId = this.openAncestor(n);
-        this.record({ op: u.op, visit: n.visit, node: n.id, ...(u.brief !== undefined ? { brief: u.brief } : {}) });
+      case "revert":
+        this.applyResolve(u);
         break;
-      }
-      case "defer": {
-        const n = this.openNode(u.node!);
-        // THE CAP (owner ruling 2026-07-27): three defers, then the wall —
-        // the fourth forces a decision. Every out stays legal and honest.
-        const hops = (n.hops ?? 0) + 1;
-        const trail = [...(n.trail ?? [n.visit.split("@")[0]]), u.to!];
-        if (hops > 3) {
-          throw new Rejection({
-            clause: CLAUSES.DECISION_UNRESOLVED,
-            expected: `a DECISION — this point was deferred 3 times already (${trail.join(" → ")}); do it, obsolete it with the reason, or seed it as real work`,
-            got: `defer number ${hops}`,
-            remedy: {
-              tool: "(the same call)",
-              args: { update: { op: "done", node: n.id, brief: "<how it resolved>" } },
-              note: "chronic deferral is usually a seed in disguise — se_seed_iteration gives it a goal and a vision",
-            },
-            source: "engine/decisions.ts defer",
-          });
-        }
-        if (this.openChildren(n.id).length > 0) {
-          throw new Rejection({
-            clause: CLAUSES.DECISION_UNRESOLVED,
-            expected: "no open children under a deferred point — resolve or defer each first",
-            got: `${n.id} still has open children`,
-            remedy: { tool: "(the same call)", args: { update: { op: "defer", node: "<child id>", to: u.to } }, note: SHAPE_NOTE },
-            source: "engine/decisions.ts defer",
-          });
-        }
-        this.close(n, "deferred", `deferred to ${u.to}`);
-        this.parked.push({ state: u.to!, brief: n.brief, hops, trail });
-        if (this.activeId === n.id) this.activeId = this.openAncestor(n);
-        this.record({ op: "defer", visit: n.visit, node: n.id, brief: n.brief, to: u.to, hops, trail });
+      case "defer":
+        this.applyDefer(u);
         break;
-      }
-      case "update": {
-        // AN UPDATE THAT MOVES NOTHING ON THE CHECKLIST IS NARRATION WEARING
-        // progress's clothes (owner, 2026-07-29, watching a board of thirteen
-        // yellow items collect a pile of checked leaves underneath).
-        //
-        // So when a checklist STANDS, an update says which item it is about.
-        // With none open there is nothing to attach to and a bare update is
-        // exactly right. This is only affordable because the open node map
-        // now rides home on every call - naming one costs a glance.
-        // SCOPED TO THIS VISIT. Another state's open checklist is not this
-        // state's business, and a walk that had moved on would be refused
-        // over items it can no longer reach.
-        if (u.node === undefined && [...this.nodes.values()].some((n) => n.visit === visit && n.status === "open")) {
-          throw new Rejection({
-            clause: CLAUSES.DECISION_NODE,
-            expected: `update {node, brief} - which item is this about? ${this.openBriefs()}`,
-            got: "an update naming no node, with a checklist standing open",
-            remedy: {
-              tool: "(the same call)",
-              args: { update: { op: "update", node: "<an open node id>", brief: "..." } },
-              note: "or resolve one instead - done | obsolete | revert. A fork opens a new branch where you are",
-            },
-            source: "engine/decisions.ts update",
-          });
-        }
-        if (u.node !== undefined) this.activeId = this.openNode(u.node).id;
-        // EVERY update changes the RENDER (owner ruling 2026-07-27): the
-        // brief lands as a checked point under the active node — the log
-        // line and the tree always tell the same story, mechanically.
-        const point = this.add(visit, this.activeId ?? null, u.brief ?? "");
-        this.close(point, "done", undefined);
-        this.record({ op: "update", visit, node: point.id, brief: u.brief });
+      case "update":
+        this.applyUpdate(visit, u);
         break;
-      }
     }
     if (u.op === "update") this.sinceResolve++;
     else if (u.op === "done" || u.op === "obsolete" || u.op === "revert" || u.op === "defer") this.sinceResolve = 0;
@@ -589,6 +441,172 @@ export class Decisions {
         ? `${this.sinceResolve} updates since anything closed, with ${open} still open — the checklist is a PROGRESS view. Close what is genuinely done on the NEXT call, not at the end.`
         : undefined;
     return { update: u.op, active: this.activeId ?? null, open, open_nodes: openNodes, ...(nudge !== undefined ? { nudge } : {}) };
+  }
+
+  private applyPlan(visit: string, u: DecisionOp): void {
+    const parent = u.node === undefined ? null : this.openNode(u.node).id;
+    // IDEMPOTENT. The update rides BEFORE the call's verdict (tools.ts),
+    // and every refusal's remedy says to repeat the call — so a
+    // refused-then-retried plan arrives again. An item already standing
+    // open under this parent in this visit IS that item, not a second one.
+    const standing = (b: string) =>
+      [...this.nodes.values()].some((n) => n.visit === visit && n.parent === parent && n.brief === b && n.status === "open");
+    const added = (u.items ?? []).filter((b) => !standing(b)).map((b) => this.add(visit, parent, b, "planned"));
+    if (this.activeId === undefined) this.activeId = added[0]?.id;
+    this.record({ op: "plan", visit, parent, nodes: added.map((n) => ({ id: n.id, brief: n.brief })) });
+  }
+
+  private applyFork(visit: string, u: DecisionOp): void {
+    const parent =
+      u.node !== undefined
+        ? this.openNode(u.node).id
+        : this.activeId !== undefined && this.nodes.get(this.activeId)?.status === "open"
+          ? this.activeId
+          : null;
+    // Idempotent for the same reason a plan is — a retried call must not
+    // open the same branch twice; it re-enters the one already standing.
+    const standingFork = [...this.nodes.values()].find(
+      (n) => n.visit === visit && n.parent === parent && n.brief === u.brief && n.status === "open" && n.origin === "fork",
+    );
+    if (standingFork !== undefined) {
+      this.activeId = standingFork.id;
+      return;
+    }
+    const fork = this.add(visit, parent, u.brief!, "fork");
+    const added = (u.items ?? []).map((b) => this.add(visit, fork.id, b, "planned"));
+    this.activeId = fork.id;
+    this.record({
+      op: "fork",
+      visit,
+      parent,
+      node: fork.id,
+      brief: fork.brief,
+      nodes: added.map((n) => ({ id: n.id, brief: n.brief })),
+    });
+  }
+
+  private applyResolve(u: DecisionOp): void {
+    // IDEMPOTENT, for the reason plan and fork already are: the update
+    // rides BEFORE the call's verdict, and every refusal's remedy says to
+    // repeat the call. So a call refused for some UNRELATED reason comes
+    // back with its resolution already applied, and the retry used to be
+    // refused for a second, more confusing reason. Re-resolving a node the
+    // SAME way is the state we were asked for; only a CONFLICTING
+    // re-resolution is a real disagreement worth refusing.
+    const op = u.op as "done" | "obsolete" | "revert";
+    const already = this.nodes.get(u.node!);
+    if (already !== undefined && already.status === CLOSES[op]) return;
+    // A NODE FROM AN EARLIER SESSION'S VISIT. The live graph replays
+    // only this session's trail, but the RECORD keeps every visit — and
+    // the leave gate counts the record. A resolution must reach what the
+    // gate counts, or a record whose walk spanned sessions can never
+    // close (found live 2026-08-02, closing e31).
+    if (already === undefined && this.extraPath !== undefined && this.resolveInRecord(op, u)) return;
+    const n = this.openNode(u.node!);
+    if (op === "done") {
+      const open = this.openChildren(n.id);
+      if (open.length > 0) {
+        throw new Rejection({
+          clause: CLAUSES.DECISION_UNRESOLVED,
+          expected: `every child of ${n.id} resolved before it closes — still open: ${open.map((c) => `${c.id}: ${c.brief}`).join(" · ")}`,
+          got: `done on ${n.id} over ${open.length} open child(ren)`,
+          remedy: {
+            tool: "(the same call)",
+            args: { update: { op: "done", node: open[0].id, brief: "<how it resolved>" } },
+            note: "resolve each child (done, or obsolete/revert if it did not survive), then close the parent",
+          },
+          source: "engine/decisions.ts resolve",
+        });
+      }
+    }
+    this.close(n, CLOSES[op], u.brief);
+    if (this.activeId !== undefined && this.nodes.get(this.activeId)?.status !== "open") this.activeId = this.openAncestor(n);
+    this.record({ op, visit: n.visit, node: n.id, ...(u.brief !== undefined ? { brief: u.brief } : {}) });
+  }
+
+  /** True when the node lives only in the durable record — resolved there. */
+  private resolveInRecord(op: "done" | "obsolete" | "revert", u: DecisionOp): boolean {
+    let visits: { visit: string; nodes: ReplayNode[] }[] = [];
+    try {
+      visits = replayVisitsText(readFileSync(this.extraPath!, "utf8"));
+    } catch {
+      /* no record yet — the ordinary refusal below says so */
+    }
+    const known = visits.find((v) => v.nodes.some((x) => x.id === u.node));
+    if (known === undefined) return false;
+    const past = known.nodes.find((x) => x.id === u.node)!;
+    if (past.status !== "open") return true; // settled already — a repeat is a no-op across sessions too
+    this.record({ op, visit: known.visit, node: u.node, ...(u.brief !== undefined ? { brief: u.brief } : {}) });
+    this.sinceResolve = 0;
+    return true;
+  }
+
+  private applyDefer(u: DecisionOp): void {
+    const n = this.openNode(u.node!);
+    // THE CAP (owner ruling 2026-07-27): three defers, then the wall —
+    // the fourth forces a decision. Every out stays legal and honest.
+    const hops = (n.hops ?? 0) + 1;
+    const trail = [...(n.trail ?? [n.visit.split("@")[0]]), u.to!];
+    if (hops > 3) {
+      throw new Rejection({
+        clause: CLAUSES.DECISION_UNRESOLVED,
+        expected: `a DECISION — this point was deferred 3 times already (${trail.join(" → ")}); do it, obsolete it with the reason, or seed it as real work`,
+        got: `defer number ${hops}`,
+        remedy: {
+          tool: "(the same call)",
+          args: { update: { op: "done", node: n.id, brief: "<how it resolved>" } },
+          note: "chronic deferral is usually a seed in disguise — se_seed_iteration gives it a goal and a vision",
+        },
+        source: "engine/decisions.ts defer",
+      });
+    }
+    if (this.openChildren(n.id).length > 0) {
+      throw new Rejection({
+        clause: CLAUSES.DECISION_UNRESOLVED,
+        expected: "no open children under a deferred point — resolve or defer each first",
+        got: `${n.id} still has open children`,
+        remedy: { tool: "(the same call)", args: { update: { op: "defer", node: "<child id>", to: u.to } }, note: SHAPE_NOTE },
+        source: "engine/decisions.ts defer",
+      });
+    }
+    this.close(n, "deferred", `deferred to ${u.to}`);
+    this.parked.push({ state: u.to!, brief: n.brief, hops, trail });
+    if (this.activeId === n.id) this.activeId = this.openAncestor(n);
+    this.record({ op: "defer", visit: n.visit, node: n.id, brief: n.brief, to: u.to, hops, trail });
+  }
+
+  private applyUpdate(visit: string, u: DecisionOp): void {
+    // AN UPDATE THAT MOVES NOTHING ON THE CHECKLIST IS NARRATION WEARING
+    // progress's clothes (owner, 2026-07-29, watching a board of thirteen
+    // yellow items collect a pile of checked leaves underneath).
+    //
+    // So when a checklist STANDS, an update says which item it is about.
+    // With none open there is nothing to attach to and a bare update is
+    // exactly right. This is only affordable because the open node map
+    // now rides home on every call - naming one costs a glance.
+    // SCOPED TO THIS VISIT. Another state's open checklist is not this
+    // state's business, and a walk that had moved on would be refused
+    // over items it can no longer reach.
+    if (u.node === undefined && [...this.nodes.values()].some((n) => n.visit === visit && n.status === "open")) {
+      throw new Rejection({
+        clause: CLAUSES.DECISION_NODE,
+        expected: `update {node, brief} - which item is this about? ${this.openBriefs()}`,
+        got: "an update naming no node, with a checklist standing open",
+        remedy: {
+          tool: "(the same call)",
+          args: { update: { op: "update", node: "<an open node id>", brief: "..." } },
+          note: "or resolve one instead - done | obsolete | revert. A fork opens a new branch where you are",
+        },
+        source: "engine/decisions.ts update",
+      });
+    }
+    if (u.node !== undefined) this.activeId = this.openNode(u.node).id;
+    // EVERY update changes the RENDER (owner ruling 2026-07-27): the
+    // brief lands as a checked point under the active node — the log
+    // line and the tree always tell the same story, mechanically.
+    const point = this.add(visit, this.activeId ?? null, u.brief ?? "");
+    this.close(point, "done", undefined);
+    this.record({ op: "update", visit, node: point.id, brief: u.brief });
   }
 
   /** One state visit's tree, insertion-ordered — the mirror renders this.
