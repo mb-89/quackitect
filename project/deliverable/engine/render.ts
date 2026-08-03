@@ -373,108 +373,78 @@ export interface MirrorState {
   log?: CallLog;
 }
 
+function briefTick(a: Record<string, unknown>): string {
+  if (a.back !== undefined) return `back → ${a.back}`;
+  if (a.state !== undefined) return `peek ${a.state}`;
+  if (a.wait === true) return "hold (wait)";
+  if (a.to !== undefined) return `tick → ${a.to}`;
+  return a.advance === true ? "tick advance" : "tick (look)";
+}
+
+function briefPull(a: Record<string, unknown>): string {
+  const f = a.form as { choice?: unknown } | undefined;
+  if (a.escape !== undefined) return "pull · escape";
+  if (f?.choice !== undefined) return `pull · choice ${Array.isArray(f.choice) ? (f.choice as unknown[]).join(", ") : String(f.choice)}`;
+  return f !== undefined ? "pull · form" : "pull";
+}
+
+function briefRead(a: Record<string, unknown>): string {
+  // A multi-read has no `path`, so naming only that one printed "read
+  // undefined" and the reader could not tell one read from another.
+  if (Array.isArray(a.paths)) {
+    const names = a.paths.map((p) => (typeof p === "string" ? p : String((p as { path?: unknown }).path ?? "?")));
+    const head = names.slice(0, 3).join(", ");
+    return `read ${names.length} · ${head}${names.length > 3 ? `, +${names.length - 3} more` : ""}`;
+  }
+  return `read ${a.path}${a.offset !== undefined ? ` @${a.offset}` : ""}`;
+}
+
+/** One formatter per tool — a new tool is a table entry, never a branch. */
+const BRIEFS: Record<string, (a: Record<string, unknown>) => string> = {
+  se_tick: briefTick, // old logs only
+  se_pull: briefPull,
+  mirror_tick: (a) => (a.back !== undefined ? `back → ${a.back}` : a.to !== undefined ? `tick → ${a.to}` : "tick advance"),
+  mirror_check: (a) => `check ${a.path}`,
+  mirror_autonomy: (a) => `autonomy → ${a.value}`,
+  mirror_narration: (a) => `updates → ${a.value}`,
+  mirror_script: (a) => `run scripts · ${a.state}`,
+  se_update: (a) => {
+    const items = Array.isArray(a.items) ? ` (+${a.items.length})` : "";
+    return `${a.op}${a.node !== undefined ? ` ${a.node}` : ""}${a.brief !== undefined ? `: ${a.brief}` : ""}${items}`;
+  },
+  se_note: (a) => String(a.text ?? ""),
+  mirror_note: (a) => String(a.text ?? ""),
+  se_answer: (a) => String(a.question ?? ""),
+  mirror_tool: (a) => `tool ${a.name}`,
+  mirror_escape: (a) => `escape: ${a.reason}`,
+  mirror_form_save: (a) => `form save ${a.name}`,
+  mirror_form_confirm: (a) => `form confirm ${a.name} · ${a.field}`,
+  mirror_form_done: (a) => `form done ${a.name}`,
+  mirror_form_folder: () => "open evidence folder",
+  se_file_read: briefRead,
+  se_file_write: (a) => `write ${a.path}`,
+  se_file_patch: (a) => `patch ${Array.isArray(a.ops) ? a.ops.length : 0} op(s)`,
+  se_file_move: (a) => `move ${a.from} → ${a.to}`,
+  se_file_delete: (a) => `delete ${a.path}`,
+  se_file_list: (a) => `list ${a.dir ?? "."}`,
+  se_file_glob: (a) => `glob ${a.glob}`,
+  se_file_search: (a) => `search /${a.query}/`,
+  se_run: (a) => `run: ${String(a.command ?? "")}`,
+  se_web_fetch: (a) => `fetch ${a.url}`,
+  se_web_search: (a) => `web: ${a.query}`,
+  se_log_query: (a) => (a.ref !== undefined ? `log ref ${a.ref}` : "log query"),
+  se_exp_new: (a) => `new expedition (${a.kind})`,
+  se_exp_open: (a) => `bind ${a.id}`,
+  se_exp_close: () => "close expedition",
+  se_exp_list: () => "expeditions",
+};
+
 /** One feed line's brief — the unified feed's middle column (owner ruling,
  *  v2 i9 notes: time | src | brief | result; the full record is one click
  *  away, so the brief only has to say WHAT, never everything). */
 function briefFor(rec: CallRecord): string {
-  const a = rec.args as Record<string, unknown>;
-  switch (rec.tool) {
-    case "se_tick": // old logs only
-      return a.back !== undefined
-        ? `back → ${a.back}`
-        : a.state !== undefined
-          ? `peek ${a.state}`
-          : a.wait === true
-            ? "hold (wait)"
-            : a.to !== undefined
-              ? `tick → ${a.to}`
-              : a.advance === true
-                ? "tick advance"
-                : "tick (look)";
-    case "se_pull": {
-      const f = a.form as { choice?: unknown } | undefined;
-      return a.escape !== undefined
-        ? "pull · escape"
-        : f?.choice !== undefined
-          ? `pull · choice ${Array.isArray(f.choice) ? (f.choice as unknown[]).join(", ") : String(f.choice)}`
-          : f !== undefined
-            ? "pull · form"
-            : "pull";
-    }
-    case "mirror_tick":
-      return a.back !== undefined ? `back → ${a.back}` : a.to !== undefined ? `tick → ${a.to}` : "tick advance";
-    case "mirror_check":
-      return `check ${a.path}`;
-    case "mirror_autonomy":
-      return `autonomy → ${a.value}`;
-    case "mirror_narration":
-      return `updates → ${a.value}`;
-    case "mirror_script":
-      return `run scripts · ${a.state}`;
-    case "se_update": {
-      const items = Array.isArray(a.items) ? ` (+${a.items.length})` : "";
-      return `${a.op}${a.node !== undefined ? ` ${a.node}` : ""}${a.brief !== undefined ? `: ${a.brief}` : ""}${items}`;
-    }
-    case "se_note":
-    case "mirror_note":
-      return String(a.text ?? "");
-    case "se_answer":
-      return String(a.question ?? "");
-    case "mirror_tool":
-      return `tool ${a.name}`;
-    case "mirror_escape":
-      return `escape: ${a.reason}`;
-    case "mirror_form_save":
-      return `form save ${a.name}`;
-    case "mirror_form_confirm":
-      return `form confirm ${a.name} · ${a.field}`;
-    case "mirror_form_done":
-      return `form done ${a.name}`;
-    case "mirror_form_folder":
-      return "open evidence folder";
-    case "se_file_read": {
-      // A multi-read has no `path`, so naming only that one printed "read
-      // undefined" and the reader could not tell one read from another.
-      if (Array.isArray(a.paths)) {
-        const names = a.paths.map((p) => (typeof p === "string" ? p : String((p as { path?: unknown }).path ?? "?")));
-        const head = names.slice(0, 3).join(", ");
-        return `read ${names.length} · ${head}${names.length > 3 ? `, +${names.length - 3} more` : ""}`;
-      }
-      return `read ${a.path}${a.offset !== undefined ? ` @${a.offset}` : ""}`;
-    }
-    case "se_file_write":
-      return `write ${a.path}`;
-    case "se_file_patch":
-      return `patch ${Array.isArray(a.ops) ? a.ops.length : 0} op(s)`;
-    case "se_file_move":
-      return `move ${a.from} → ${a.to}`;
-    case "se_file_delete":
-      return `delete ${a.path}`;
-    case "se_file_list":
-      return `list ${a.dir ?? "."}`;
-    case "se_file_glob":
-      return `glob ${a.glob}`;
-    case "se_file_search":
-      return `search /${a.query}/`;
-    case "se_run":
-      return `run: ${String(a.command ?? "")}`;
-    case "se_web_fetch":
-      return `fetch ${a.url}`;
-    case "se_web_search":
-      return `web: ${a.query}`;
-    case "se_log_query":
-      return a.ref !== undefined ? `log ref ${a.ref}` : "log query";
-    case "se_exp_new":
-      return `new expedition (${a.kind})`;
-    case "se_exp_open":
-      return `bind ${a.id}`;
-    case "se_exp_close":
-      return "close expedition";
-    case "se_exp_list":
-      return "expeditions";
-    default:
-      return rec.tool;
-  }
+  const f = BRIEFS[rec.tool];
+  return f !== undefined ? f(rec.args as Record<string, unknown>) : rec.tool;
 }
 
 /** The unified feed: this session's acts, capped at the newest 500 rows —
@@ -2552,103 +2522,8 @@ const NATIVE = `
   body.solo aside, body.solo main { background: transparent; }
 `;
 
-export function renderMirror(
-  m: MirrorState,
-  widget?: "machine" | "details" | "log" | "terminal" | "table",
-  view?: string,
-  card?: string,
-  embed?: boolean,
-  tableView?: string,
-): string {
-  const skin = embed === true ? NATIVE : "";
-  const bodyClass = embed === true ? ` class="embed${widget === undefined ? "" : " solo"}"` : "";
-  const info = m.session.describe() as { active: string[]; status: string };
-  // The scale is READ from machines/scale.md — the Obsidian-editable
-  // truth; an owner edit shows on the next reload.
-  const levels = loadLevels(m.root);
-  const walkMachine = m.session.currentMachine();
-  const { decl, canvas } = viewedMachine(m, view ?? walkMachine.id);
-  const viewingWalk = decl.id === walkMachine.id;
-
-  // Highlights follow the WALK; the view may be elsewhere.
-  const leafActive = viewingWalk ? new Set(info.active.map((a) => a.split("/").pop()!)) : new Set<string>();
-  if (!viewingWalk && decl.id === m.session.machine.id) {
-    // Viewing main while the walk is inside a sub: the sub state is the live one.
-    leafActive.add(m.session.breadcrumb()[1]);
-  }
-  const history = m.session.instance.history ?? [];
-  // RE-ENTRY RESETS (owner ruling 2026-07-27): the drawing shows the LIVE
-  // run only — a machine entered again starts gray; past passes live in
-  // the record, not on the drawing.
-  const run = m.session.viewRun(decl.id);
-  const done = new Set(run.done.map((s) => s.split("/").pop()!));
-  // An end state is never "filled" — it turns green when its machine completed.
-  if (run.completed) for (const s of decl.states) if (s.kind === "end") done.add(s.id);
-  const subIds = new Set(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id));
-  const meta: Record<string, StateMeta> = {};
-  for (const s of decl.states) {
-    meta[s.id] = {
-      has_exit: s.exit !== undefined,
-      exit_met: m.session.conditionMet(decl, s, "leave"),
-      has_entry: s.entry !== undefined,
-      entry_met: m.session.conditionMet(decl, s, "enter"),
-      // The STATEMENT is the subtitle (owner ruling 2026-07-28): authored
-      // meaning renders small under the name; empty renders nothing.
-      ...(s.statement !== "" && s.statement !== s.id ? { subtitle: s.statement } : {}),
-    };
-  }
-  // THE ROUTE, PROJECTED ONTO THIS DRAWING. A broken or unreachable target
-  // must never take the picture down with it, so the marks simply go
-  // missing and the machine still renders.
-  let marks: RouteMarks | undefined;
-  try {
-    const r = m.session.route(m.session.target);
-    const mainId = m.session.machine.id;
-    const { waypoints, path: hops } = routeOverlay(r.steps, decl.id, mainId);
-    const localOf = (q: string): string | undefined => {
-      if (decl.id === mainId) return q.split("/")[0];
-      return q.startsWith(`${decl.id}/`) ? q.slice(decl.id.length + 1).split("/")[0] : undefined;
-    };
-    const shutAt = r.stops_at === undefined ? undefined : localOf(r.stops_at.at);
-    marks = {
-      waypoints,
-      path: hops,
-      ...(r.found && localOf(r.target) !== undefined ? { target: localOf(r.target) } : {}),
-      ...(shutAt !== undefined && r.stops_at !== undefined ? { blocked: { at: shutAt, why: r.stops_at.why } } : {}),
-    };
-  } catch {
-    /* no route, no marks - the drawing stands either way */
-  }
-  const svg = machineSvg(canvas, leafActive, done, subIds, meta, marks);
-
-  // Breadcrumbs describe the VIEW: main [›subs] [ › sub [›its subs] ].
-  const mainSubs = m.session.machine.states.filter((s) => s.submachine !== undefined).map((s) => s.id);
-  const crumbArrow = (subs: string[]): string =>
-    subs.length === 0
-      ? ""
-      : `<span class="crumb-arrow">›<span class="crumb-menu">${subs.map((s) => `<a href="/?view=${encodeURIComponent(s)}">${esc(s)}</a>`).join("")}</span></span>`;
-  // The crumbs walk the PARENT CHAIN — a nested machine shows under its
-  // real parent, never directly under main (owner ruling 2026-07-28).
-  const chain = m.session.viewChain(decl.id);
-  const crumbs = chain
-    .map((id, i) => {
-      const label = i === chain.length - 1 ? `<b class="here">${esc(id)}</b>` : `<a href="/?view=${encodeURIComponent(id)}">${esc(id)}</a>`;
-      const arrow =
-        i === 0
-          ? crumbArrow(mainSubs)
-          : i === chain.length - 1
-            ? crumbArrow(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id))
-            : '<span style="color:var(--se-muted);padding:0 3px">›</span>';
-      return label + arrow;
-    })
-    .join("");
-
-  // ONE LIST FOR THE WHOLE RENDER. expeditionList() spawns git per record
-  // and does not vary per state; calling it inside the loop made the archive
-  // cost a spawn for every record TIMES every record, blocking the server.
-  const archived = decl.states.some((s) => s.tags?.includes("archive-record"))
-    ? (m.session.expeditionList() as { archive: { id: string }[] }).archive
-    : [];
+/** The per-state detail objects the page's data island carries. */
+function stateDetails(m: MirrorState, decl: MachineDecl, done: Set<string>, archived: { id: string }[]): Record<string, unknown> {
   const states: Record<string, unknown> = {};
   for (const s of decl.states) {
     states[s.id] = {
@@ -2669,25 +2544,144 @@ export function renderMirror(
         : {}),
       ...(s.exit?.script !== undefined || s.entry?.script !== undefined ? { script: m.session.scriptStatus(decl, s) } : {}),
       pulled: m.session.pulled(decl, s),
-      next: s.edges.map((e) => {
-        const t = decl.states.find((st) => st.id === e.to);
-        const ready = t === undefined ? true : m.session.entryReadyHuman(decl, t);
-        return {
-          to: e.to,
-          role: e.role,
-          ...(e.guard !== undefined ? { guard: e.guard } : {}),
-          ...(t !== undefined ? { kind: t.kind, statement: t.statement, priority: t.priority } : {}),
-          // The human's ▶ lock: explicit entry conditions AND the pull —
-          // every doc entering demands, checked at its current version. A
-          // locked edge carries WHAT is missing (the tooltip names it).
-          // ASKED ONCE. This ran entryReadyHuman twice per edge, and each
-          // call walks the target's whole reading list.
-          enter_met: ready,
-          ...(t !== undefined && !ready ? { missing: m.session.entryMissingHuman(decl, t) } : {}),
-        };
-      }),
+      next: s.edges.map((e) => stateEdgeDetail(m, decl, e)),
     };
   }
+  return states;
+}
+
+function stateEdgeDetail(m: MirrorState, decl: MachineDecl, e: MachineDecl["states"][number]["edges"][number]): Record<string, unknown> {
+  const t = decl.states.find((st) => st.id === e.to);
+  const ready = t === undefined ? true : m.session.entryReadyHuman(decl, t);
+  return {
+    to: e.to,
+    role: e.role,
+    ...(e.guard !== undefined ? { guard: e.guard } : {}),
+    ...(t !== undefined ? { kind: t.kind, statement: t.statement, priority: t.priority } : {}),
+    // The human's ▶ lock: explicit entry conditions AND the pull —
+    // every doc entering demands, checked at its current version. A
+    // locked edge carries WHAT is missing (the tooltip names it).
+    // ASKED ONCE. This ran entryReadyHuman twice per edge, and each
+    // call walks the target's whole reading list.
+    enter_met: ready,
+    ...(t !== undefined && !ready ? { missing: m.session.entryMissingHuman(decl, t) } : {}),
+  };
+}
+
+/** Highlights follow the WALK; the view may be elsewhere. */
+function drawingSets(
+  m: MirrorState,
+  decl: MachineDecl,
+  info: { active: string[] },
+  viewingWalk: boolean,
+): { leafActive: Set<string>; done: Set<string>; subIds: Set<string>; meta: Record<string, StateMeta> } {
+  const leafActive = viewingWalk ? new Set(info.active.map((a) => a.split("/").pop()!)) : new Set<string>();
+  if (!viewingWalk && decl.id === m.session.machine.id) {
+    // Viewing main while the walk is inside a sub: the sub state is the live one.
+    leafActive.add(m.session.breadcrumb()[1]);
+  }
+  // RE-ENTRY RESETS (owner ruling 2026-07-27): the drawing shows the LIVE
+  // run only — a machine entered again starts gray; past passes live in
+  // the record, not on the drawing.
+  const run = m.session.viewRun(decl.id);
+  const done = new Set(run.done.map((s) => s.split("/").pop()!));
+  // An end state is never "filled" — it turns green when its machine completed.
+  if (run.completed) for (const s of decl.states) if (s.kind === "end") done.add(s.id);
+  const subIds = new Set(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id));
+  const meta: Record<string, StateMeta> = {};
+  for (const s of decl.states) {
+    meta[s.id] = {
+      has_exit: s.exit !== undefined,
+      exit_met: m.session.conditionMet(decl, s, "leave"),
+      has_entry: s.entry !== undefined,
+      entry_met: m.session.conditionMet(decl, s, "enter"),
+      // The STATEMENT is the subtitle (owner ruling 2026-07-28): authored
+      // meaning renders small under the name; empty renders nothing.
+      ...(s.statement !== "" && s.statement !== s.id ? { subtitle: s.statement } : {}),
+    };
+  }
+  return { leafActive, done, subIds, meta };
+}
+
+// THE ROUTE, PROJECTED ONTO THIS DRAWING. A broken or unreachable target
+// must never take the picture down with it, so the marks simply go
+// missing and the machine still renders.
+function routeMarksFor(m: MirrorState, decl: MachineDecl): RouteMarks | undefined {
+  try {
+    const r = m.session.route(m.session.target);
+    const mainId = m.session.machine.id;
+    const { waypoints, path: hops } = routeOverlay(r.steps, decl.id, mainId);
+    const localOf = (q: string): string | undefined => {
+      if (decl.id === mainId) return q.split("/")[0];
+      return q.startsWith(`${decl.id}/`) ? q.slice(decl.id.length + 1).split("/")[0] : undefined;
+    };
+    const shutAt = r.stops_at === undefined ? undefined : localOf(r.stops_at.at);
+    return {
+      waypoints,
+      path: hops,
+      ...(r.found && localOf(r.target) !== undefined ? { target: localOf(r.target) } : {}),
+      ...(shutAt !== undefined && r.stops_at !== undefined ? { blocked: { at: shutAt, why: r.stops_at.why } } : {}),
+    };
+  } catch {
+    /* no route, no marks - the drawing stands either way */
+    return undefined;
+  }
+}
+
+// Breadcrumbs describe the VIEW: main [›subs] [ › sub [›its subs] ].
+// The crumbs walk the PARENT CHAIN — a nested machine shows under its
+// real parent, never directly under main (owner ruling 2026-07-28).
+function crumbsFor(m: MirrorState, decl: MachineDecl): string {
+  const mainSubs = m.session.machine.states.filter((s) => s.submachine !== undefined).map((s) => s.id);
+  const crumbArrow = (subs: string[]): string =>
+    subs.length === 0
+      ? ""
+      : `<span class="crumb-arrow">›<span class="crumb-menu">${subs.map((s) => `<a href="/?view=${encodeURIComponent(s)}">${esc(s)}</a>`).join("")}</span></span>`;
+  const chain = m.session.viewChain(decl.id);
+  return chain
+    .map((id, i) => {
+      const label = i === chain.length - 1 ? `<b class="here">${esc(id)}</b>` : `<a href="/?view=${encodeURIComponent(id)}">${esc(id)}</a>`;
+      const arrow =
+        i === 0
+          ? crumbArrow(mainSubs)
+          : i === chain.length - 1
+            ? crumbArrow(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id))
+            : '<span style="color:var(--se-muted);padding:0 3px">›</span>';
+      return label + arrow;
+    })
+    .join("");
+}
+
+export function renderMirror(
+  m: MirrorState,
+  widget?: "machine" | "details" | "log" | "terminal" | "table",
+  view?: string,
+  card?: string,
+  embed?: boolean,
+  tableView?: string,
+): string {
+  const skin = embed === true ? NATIVE : "";
+  const bodyClass = embed === true ? ` class="embed${widget === undefined ? "" : " solo"}"` : "";
+  const info = m.session.describe() as { active: string[]; status: string };
+  // The scale is READ from machines/scale.md — the Obsidian-editable
+  // truth; an owner edit shows on the next reload.
+  const levels = loadLevels(m.root);
+  const walkMachine = m.session.currentMachine();
+  const { decl, canvas } = viewedMachine(m, view ?? walkMachine.id);
+  const viewingWalk = decl.id === walkMachine.id;
+  const history = m.session.instance.history ?? [];
+  const { leafActive, done, subIds, meta } = drawingSets(m, decl, info, viewingWalk);
+  const marks = routeMarksFor(m, decl);
+  const svg = machineSvg(canvas, leafActive, done, subIds, meta, marks);
+  const crumbs = crumbsFor(m, decl);
+
+  // ONE LIST FOR THE WHOLE RENDER. expeditionList() spawns git per record
+  // and does not vary per state; calling it inside the loop made the archive
+  // cost a spawn for every record TIMES every record, blocking the server.
+  const archived = decl.states.some((s) => s.tags?.includes("archive-record"))
+    ? (m.session.expeditionList() as { archive: { id: string }[] }).archive
+    : [];
+  const states = stateDetails(m, decl, done, archived);
   const comment = (canvas.nodes ?? []).find((n) => n.type === "text")?.text ?? "";
   const data = `<script type="application/json" id="se-data">${JSON.stringify({
     describe: m.session.describe(),
@@ -2821,22 +2815,38 @@ export function renderMirror(
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · details</title><style>${pal}${STYLE}${skin}</style>${ELEMENTS}</head>
 <body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${detailsWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
-  // THE CARD MATRIX (owner design 2026-07-29). The card list and its ORDER are
-  // the product's, in project/views/cards.md — v3 exists to work on other products,
-  // and another product wants other cards.
-  // EMBEDDED, the console card leaves (owner ruling 2026-07-30): the host's
-  // integrated terminal is where the agent lives, and a second picture of it
-  // beside the editor is an echo. The grid closes over the gap.
+  return cardMatrixPage(
+    m,
+    card,
+    embed,
+    { bodyClass, skin, pal, data },
+    { terminal: terminalWidget, machine: machineWidget, log: logWidget, details: detailsWidget, table: tblWidget },
+  );
+}
+
+// THE CARD MATRIX (owner design 2026-07-29). The card list and its ORDER are
+// the product's, in project/views/cards.md — v3 exists to work on other products,
+// and another product wants other cards.
+// EMBEDDED, the console card leaves (owner ruling 2026-07-30): the host's
+// integrated terminal is where the agent lives, and a second picture of it
+// beside the editor is an echo. The grid closes over the gap.
+function cardMatrixPage(
+  m: MirrorState,
+  card: string | undefined,
+  embed: boolean | undefined,
+  frame: { bodyClass: string; skin: string; pal: string; data: string },
+  widgets: { terminal: string; machine: string; log: string; details: string; table: () => string },
+): string {
   const allCards = loadCards(m.root);
   const cardList = embed === true ? allCards.filter((c) => c.widget !== "terminal") : allCards;
   const byWidget: Record<string, string> = {
-    terminal: terminalWidget,
-    machine: machineWidget,
-    log: logWidget,
-    details: detailsWidget,
+    terminal: widgets.terminal,
+    machine: widgets.machine,
+    log: widgets.log,
+    details: widgets.details,
     // Only when a card actually asks for it. A product that declares no table
     // card never pays for one.
-    ...(cardList.some((c) => c.widget === "table") ? { table: tblWidget() } : {}),
+    ...(cardList.some((c) => c.widget === "table") ? { table: widgets.table() } : {}),
   };
   const filled = (c: { widget?: string }): boolean => c.widget !== undefined && (byWidget[c.widget] ?? "") !== "";
   // THE DEFAULT MAIN CARD IS THE FIRST AVAILABLE ONE — one rule instead of a
@@ -2877,13 +2887,13 @@ export function renderMirror(
   );
   const legendHtml = `<div class="card" id="card-legend" style="${cellAt(nowAt)}"><div class="widget" id="w-legend"><div class="widget-head"><span>keys</span></div><div class="widget-body">${legendRows}</div></div></div>`;
   const cardData = `<script type="application/json" id="se-cards">${JSON.stringify({ list: cardList.map((c) => ({ n: c.n, id: c.id, title: c.title })), now })}</script>`;
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${pal}${STYLE}${TABLE_STYLE}${BASES_STYLE}${BASES_TABLE_STYLE}${skin}</style>${ELEMENTS}</head>
-<body${bodyClass}>
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${frame.pal}${STYLE}${TABLE_STYLE}${BASES_STYLE}${BASES_TABLE_STYLE}${frame.skin}</style>${ELEMENTS}</head>
+<body${frame.bodyClass}>
 <div class="cards" data-keep-style style="grid-template-rows:repeat(${rows},1fr)">
   ${cardsHtml}
   ${legendHtml}
   <div class="divider" id="div-cards"></div>
 </div>
-${MODAL}${data}${cardData}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script><script>${BASES_SCRIPT}</script>
+${MODAL}${frame.data}${cardData}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script><script>${BASES_SCRIPT}</script>
 </body></html>`;
 }
