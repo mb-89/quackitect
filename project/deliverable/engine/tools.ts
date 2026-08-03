@@ -1461,6 +1461,7 @@ export function buildServer(
   // UNPAID, so the rule keeps its teeth — it just bites the narration now,
   // instead of the work.
   let updateComplaint: RejectionPayload | undefined;
+  let updateRejection: Rejection | undefined;
   let updateResult: Record<string, unknown> | undefined;
   server.addGuard((tool, args) => {
     // EVERY EXTERNAL CALL IS A NEW DRAWING EPOCH — "the next call" is the
@@ -1469,6 +1470,7 @@ export function buildServer(
     // stale for up to a second (caught by the battery, 2026-08-02).
     bumpDrawingEpoch();
     updateComplaint = undefined;
+    updateRejection = undefined;
     updateResult = undefined;
     if (args.update === undefined) return;
     const raw = args.update;
@@ -1482,6 +1484,7 @@ export function buildServer(
       toll.paid();
     } catch (e) {
       if (!(e instanceof Rejection)) throw e;
+      updateRejection = e;
       updateComplaint = e.toJSON();
       log.append({
         tool: "se_update",
@@ -1495,7 +1498,17 @@ export function buildServer(
   });
 
   // THE TOLL — armed after boot; one grace warning, then the refusal.
-  server.addGuard((tool, args) => toll.check(session.isBooted(), tool, args));
+  // THE PAYMENT'S OWN REFUSAL OUTRANKS THE TOLL (note-c883db8c6e12): a call
+  // that carried an update which failed to apply must hear what was wrong
+  // with the payment — the bare toll clause sent five identical resends
+  // into the same wall, live, on 2026-08-03.
+  server.addGuard((tool, args) => {
+    try {
+      toll.check(session.isBooted(), tool, args);
+    } catch (tollErr) {
+      throw updateRejection ?? tollErr;
+    }
+  });
 
   // The grace warning rides the NEXT successful result (never a refusal).
   server.addDecorator((_tool, result) => {

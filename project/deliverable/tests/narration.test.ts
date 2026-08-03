@@ -91,3 +91,28 @@ test("the control refuses a value outside its notches", async () => {
   session.setNarration(0, 20);
   session.setNarration(5, 0);
 });
+
+// THE PAYMENT'S OWN REFUSAL OUTRANKS THE TOLL (note-c883db8c6e12, live
+// 2026-08-03): five straight resends each CARRIED an update naming a dead
+// node, and each got the bare toll clause back — the actual error was
+// invisible. The caller must hear what was wrong with the payment.
+test("a failing update is named by the refusal, never masked by the toll", async () => {
+  const { server, session } = await booted();
+  session.setNarration(1, 5);
+  const read = () => call(server, "se_file_read", { path: "project/guidance/contract.md", offset: 1, limit: 1 });
+  let warned = false;
+  for (let i = 0; i < 12 && !warned; i++) {
+    const r = await read();
+    if (typeof r.body.toll_warning === "string") warned = true;
+  }
+  assert.ok(warned, "the grace warning is burnt — the next unpaid call refuses");
+  const r = await call(server, "se_file_read", {
+    path: "project/guidance/contract.md",
+    offset: 1,
+    limit: 1,
+    update: { op: "done", node: "d9999", brief: "no such node" },
+  });
+  assert.equal(r.isError, true, "a failed payment still refuses — the toll stays unpaid");
+  assert.notEqual(String(r.body.clause), "SE-C-040", "the refusal is the update's own, not the toll mask");
+  assert.match(JSON.stringify(r.body), /d9999/, "the refusal names the node that failed to apply");
+});
