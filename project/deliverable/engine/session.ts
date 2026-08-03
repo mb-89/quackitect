@@ -1296,6 +1296,65 @@ export class Session {
    *  it can prove. A form wants a person's confirmation, by design. */
   private static readonly PERSON_CONDITIONS: ReadonlySet<string> = new Set(["evidence_form"]);
 
+  /** A SUBMACHINE IS NAMED BY ITS CONTAINER, but the search graph never holds
+   *  that name: expandNode replaces the container with its inner states. So
+   *  aiming at "expeditions" found no path to a state the reader had just
+   *  walked into, which made the target useless for half the drawing (found
+   *  live 2026-07-29, the moment the mirror got a key for setting it).
+   *  Aim at its start. The render maps that back to the container node, so
+   *  the destination dot still lands exactly where the reader pointed.
+   *  The target's OWN machine answers this, never the main one. A door
+   *  inside a container is named "expeditions/e31", and looking that up
+   *  in main found nothing, so every such door read as not-a-submachine
+   *  by accident rather than by test. */
+  private routeAim(target: string): string {
+    const cut = target.lastIndexOf("/");
+    const decl = this.declForPrefix(cut < 0 ? "" : target.slice(0, cut))?.states.find(
+      (s) => s.id === (cut < 0 ? target : target.slice(cut + 1)),
+    );
+    return decl?.submachine !== undefined ? Session.qual(target, this.declForPrefix(target)?.initial ?? "start") : target;
+  }
+
+  /** The slider is weighed HOP BY HOP. A route that walks past a state
+   *  the agent may not enter is a hole straight through contract rule 3. */
+  private routeJudgments(steps: RouteResult["steps"]): { at: string; needs: string; why: string }[] {
+    const judgments: { at: string; needs: string; why: string }[] = [];
+    for (const s of steps) {
+      if (s.priority > this._autonomy) {
+        judgments.push({
+          at: s.to,
+          needs: "the slider, or the person's own hand",
+          why: `entering ${s.to} weighs ${s.priority}, above the session autonomy ${this._autonomy}`,
+        });
+      }
+      for (const key of Object.keys(s.demands)) {
+        if (!Session.PERSON_CONDITIONS.has(key)) continue;
+        judgments.push({ at: s.to, needs: key, why: `${s.to} asks for ${key}: ${(s.demands[key] ?? []).join(", ")}` });
+      }
+    }
+    return judgments;
+  }
+
+  /** EVERY DOCUMENT THE WHOLE WAY DEMANDS, gathered once. This is what
+   *  makes a sweep one call rather than one per hop: read this list, hash
+   *  it, and hand the lot over. A route is also PULLED guidance, which the
+   *  entry conditions never name, so both are collected. */
+  private routeReadList(steps: RouteResult["steps"]): string[] {
+    const reads = new Set<string>();
+    for (const s of steps) {
+      for (const p of s.demands.read ?? []) reads.add(p);
+      const cut = s.to.lastIndexOf("/");
+      const decl = this.declForPrefix(cut < 0 ? "" : s.to.slice(0, cut));
+      const st = decl?.states.find((x) => x.id === (cut < 0 ? s.to : s.to.slice(cut + 1)));
+      if (decl === undefined || st === undefined) continue;
+      for (const d of this.pulled(decl, st)) reads.add(d.path);
+      // A consumed document is read like any other. Only one that is really
+      // there joins the list — the handover usually is not.
+      for (const p of this.consumeDemand(st)) reads.add(p);
+    }
+    return [...reads].sort();
+  }
+
   /** THE BLUE LINE. Where the walk stands, where it is headed, and every
    *  hop between — with what each will ask for. It MOVES NOTHING.
    *
@@ -1327,61 +1386,14 @@ export class Session {
     if (this.routeMemo !== undefined && this.routeMemo.key === memoKey && this.routeMemo.machine === machineNow) {
       return this.routeMemo.value;
     }
-    // A SUBMACHINE IS NAMED BY ITS CONTAINER, but the search graph never holds
-    // that name: expandNode replaces the container with its inner states. So
-    // aiming at "expeditions" found no path to a state the reader had just
-    // walked into, which made the target useless for half the drawing (found
-    // live 2026-07-29, the moment the mirror got a key for setting it).
-    // Aim at its start. The render maps that back to the container node, so
-    // the destination dot still lands exactly where the reader pointed.
-    // The target's OWN machine answers this, never the main one. A door
-    // inside a container is named "expeditions/e31", and looking that up
-    // in main found nothing, so every such door read as not-a-submachine
-    // by accident rather than by test.
-    const cut = target.lastIndexOf("/");
-    const decl = this.declForPrefix(cut < 0 ? "" : target.slice(0, cut))?.states.find(
-      (s) => s.id === (cut < 0 ? target : target.slice(cut + 1)),
-    );
-    const aim = decl?.submachine !== undefined ? Session.qual(target, this.declForPrefix(target)?.initial ?? "start") : target;
-    const r = computeRoute(from, aim, (q) => this.expandNode(q));
-    const judgments: { at: string; needs: string; why: string }[] = [];
-    for (const s of r.steps) {
-      // The slider is weighed HOP BY HOP. A route that walks past a state
-      // the agent may not enter is a hole straight through contract rule 3.
-      if (s.priority > this._autonomy) {
-        judgments.push({
-          at: s.to,
-          needs: "the slider, or the person's own hand",
-          why: `entering ${s.to} weighs ${s.priority}, above the session autonomy ${this._autonomy}`,
-        });
-      }
-      for (const key of Object.keys(s.demands)) {
-        if (!Session.PERSON_CONDITIONS.has(key)) continue;
-        judgments.push({ at: s.to, needs: key, why: `${s.to} asks for ${key}: ${(s.demands[key] ?? []).join(", ")}` });
-      }
-    }
-    // EVERY DOCUMENT THE WHOLE WAY DEMANDS, gathered once. This is what
-    // makes a sweep one call rather than one per hop: read this list, hash
-    // it, and hand the lot over. A route is also PULLED guidance, which the
-    // entry conditions never name, so both are collected.
-    const reads = new Set<string>();
-    for (const s of r.steps) {
-      for (const p of s.demands.read ?? []) reads.add(p);
-      const cut = s.to.lastIndexOf("/");
-      const decl = this.declForPrefix(cut < 0 ? "" : s.to.slice(0, cut));
-      const st = decl?.states.find((x) => x.id === (cut < 0 ? s.to : s.to.slice(cut + 1)));
-      if (decl === undefined || st === undefined) continue;
-      for (const d of this.pulled(decl, st)) reads.add(d.path);
-      // A consumed document is read like any other. Only one that is really
-      // there joins the list — the handover usually is not.
-      for (const p of this.consumeDemand(st)) reads.add(p);
-    }
+    const r = computeRoute(from, this.routeAim(target), (q) => this.expandNode(q));
+    const judgments = this.routeJudgments(r.steps);
     const value = {
       ...r,
       from,
       autonomy: this._autonomy,
       judgments,
-      reads: [...reads].sort(),
+      reads: this.routeReadList(r.steps),
       ...(judgments.length > 0 ? { stops_at: { at: judgments[0].at, why: judgments[0].why } } : {}),
     };
     this.routeMemo = { key: memoKey, machine: machineNow, value };
@@ -1638,58 +1650,62 @@ export class Session {
     }
   }
 
+  /** One way out, said as an offer: weight, openness and what blocks it. */
+  private doorOption(decl: MachineDecl, t: StateDecl, to: string, role: string): Record<string, unknown> {
+    const open = this.conditionMet(decl, t, "enter");
+    const overWeight = t.priority > this._autonomy;
+    return {
+      to,
+      role,
+      ...(t.statement !== "" ? { statement: t.statement } : {}),
+      priority: t.priority,
+      open: open && !overWeight,
+      ...(overWeight ? { needs: `the person — ${t.priority} is above the session autonomy ${this._autonomy}` } : {}),
+      ...(open ? {} : { blocked_by: Object.keys(this.conditionStatus(decl, t, "enter") ?? {}) }),
+    };
+  }
+
+  /** THE OFFER AND THE CHECK READ ONE GRAPH. A sub holds the drawing the
+   *  walk entered with; the router re-derives it live. Archiving a record
+   *  takes its states out of the live one, so an offer built from the held
+   *  copy names doors the router then refuses, and the walk is stranded
+   *  with no legal move left (found live 2026-08-02, closing e31). */
+  private optionsAt(machine: MachineDecl, id: string): Record<string, unknown>[] {
+    const out: Record<string, unknown>[] = [];
+    const node = this.expandNode(this.qualHere(id));
+    if (node === undefined) return out;
+    const walkable = new Set<string>();
+    const pops: string[] = [];
+    for (const n of node.nexts) {
+      const tick = n.tick as { to?: unknown; advance?: unknown };
+      if (typeof tick.to === "string") walkable.add(tick.to);
+      else if (tick.advance === true) pops.push(n.to);
+    }
+    for (const e of this.state(machine, id).edges) {
+      if (!walkable.has(e.to)) continue;
+      const t = machine.states.find((x) => x.id === e.to);
+      if (t === undefined) continue;
+      out.push(this.doorOption(machine, t, this.qualHere(e.to), e.role));
+    }
+    // STANDING ON A SUB'S END, the way on is OUT of it, and the router
+    // walks exactly that. Left out of the offer it reads as no work left,
+    // when the container has merely finished.
+    for (const q of pops) {
+      const cut = q.lastIndexOf("/");
+      const decl = this.declForPrefix(cut < 0 ? "" : q.slice(0, cut));
+      const t = decl?.states.find((s) => s.id === (cut < 0 ? q : q.slice(cut + 1)));
+      if (decl === undefined || t === undefined) continue;
+      out.push(this.doorOption(decl, t, q, "return"));
+    }
+    return out;
+  }
+
   /** The ways out of where the walk stands — the machine's own offer at a
    *  branching point. Weight and openness ride along, so choosing costs
    *  no second call. */
   private pullOptions(): Record<string, unknown>[] {
     const { machine, ids } = this.leaves();
-    const out: Record<string, unknown>[] = [];
-    const door = (decl: MachineDecl, t: StateDecl, to: string, role: string): Record<string, unknown> => {
-      const open = this.conditionMet(decl, t, "enter");
-      const overWeight = t.priority > this._autonomy;
-      return {
-        to,
-        role,
-        ...(t.statement !== "" ? { statement: t.statement } : {}),
-        priority: t.priority,
-        open: open && !overWeight,
-        ...(overWeight ? { needs: `the person — ${t.priority} is above the session autonomy ${this._autonomy}` } : {}),
-        ...(open ? {} : { blocked_by: Object.keys(this.conditionStatus(decl, t, "enter") ?? {}) }),
-      };
-    };
-    for (const id of ids) {
-      // THE OFFER AND THE CHECK READ ONE GRAPH. A sub holds the drawing the
-      // walk entered with; the router re-derives it live. Archiving a record
-      // takes its states out of the live one, so an offer built from the held
-      // copy names doors the router then refuses, and the walk is stranded
-      // with no legal move left (found live 2026-08-02, closing e31).
-      const node = this.expandNode(this.qualHere(id));
-      if (node === undefined) continue;
-      const walkable = new Set<string>();
-      const pops: string[] = [];
-      for (const n of node.nexts) {
-        const tick = n.tick as { to?: unknown; advance?: unknown };
-        if (typeof tick.to === "string") walkable.add(tick.to);
-        else if (tick.advance === true) pops.push(n.to);
-      }
-      for (const e of this.state(machine, id).edges) {
-        if (!walkable.has(e.to)) continue;
-        const t = machine.states.find((x) => x.id === e.to);
-        if (t === undefined) continue;
-        out.push(door(machine, t, this.qualHere(e.to), e.role));
-      }
-      // STANDING ON A SUB'S END, the way on is OUT of it, and the router
-      // walks exactly that. Left out of the offer it reads as no work left,
-      // when the container has merely finished.
-      for (const q of pops) {
-        const cut = q.lastIndexOf("/");
-        const decl = this.declForPrefix(cut < 0 ? "" : q.slice(0, cut));
-        const t = decl?.states.find((s) => s.id === (cut < 0 ? q : q.slice(cut + 1)));
-        if (decl === undefined || t === undefined) continue;
-        out.push(door(decl, t, q, "return"));
-      }
-    }
-    return out;
+    return ids.flatMap((id) => this.optionsAt(machine, id));
   }
 
   /** The step the walk stands on, said small: id, statement, guidance,
@@ -3189,6 +3205,98 @@ export class Session {
     };
   }
 
+  /** Standing on the sub's end: this tick returns to the parent —
+   *  whatever the parent's edges enter is what the threshold weighs
+   *  and what the read gate demands proven. */
+  private advanceOutOfSub(channel: Channel, supplied: Record<string, string>, now: string): Record<string, unknown> {
+    const top = this.top()!;
+    const { machine: pm, instance: pi } = this.parentOfTop();
+    const parent = this.state(pm, top.parentState);
+    this.gatePriority(
+      pm,
+      parent.edges.map((e) => e.to),
+      channel,
+    );
+    this.assertReads(
+      pm,
+      parent,
+      parent.edges.map((e) => e.to),
+      channel,
+      supplied,
+    );
+    this.completeGuarded(pm, pi, top.parentState, "filled", now);
+    this.subs.pop();
+    if (pi !== this.instance) pi.history.push({ state: top.parentState, outcome: "filled", at: now });
+    const prefix = this.subs.map((s) => s.decl.id).join("/");
+    this.instance.history.push({ state: prefix === "" ? top.parentState : `${prefix}/${top.parentState}`, outcome: "filled", at: now });
+    if (!this.inSub()) this.unbind(); // leaving the outermost sub leaves the context (worktree stays)
+    this.seedSubs();
+    return this.landing();
+  }
+
+  /** One step inside the sub the walk stands in. */
+  private async advanceInSub(
+    to: string | undefined,
+    channel: Channel,
+    supplied: Record<string, string>,
+    now: string,
+  ): Promise<Record<string, unknown>> {
+    const top = this.top()!;
+    const cur = activeStates(top.instance)[0];
+    this.assertEdge(top.decl, cur, to);
+    const subTarget = to ?? this.state(top.decl, cur).edges[0]?.to;
+    if (subTarget !== undefined) this.gatePriority(top.decl, [subTarget], channel);
+    await this.assertConditions(top.decl, this.state(top.decl, cur), to, channel, supplied);
+    if (top.decl.id === "iterations" && (this.state(top.decl, cur).tags?.includes("iteration-kickoff") ?? false)) {
+      this.pinKickoff(top.gen?.expByState[cur]);
+    }
+    // NO GATE PASSES WITHOUT A REVIEW REPORT (owner ruling 2026-07-30):
+    // inside a pinned walk, leaving a gate demands its milestone review
+    // report — complete and PASSED. The report is the durable bless: a
+    // re-walk finds it standing and passes quickly.
+    if (this.bound !== undefined && top.decl.id.endsWith("-walk") && this.state(top.decl, cur).kind === "gate") {
+      this.assertGateReport(cur, this.state(top.decl, cur), channel);
+    }
+    this.completeGuarded(top.decl, top.instance, cur, "filled", now, to);
+    // Leaving the state is what destroys what it consumed.
+    this.consumeDocs(this.state(top.decl, cur));
+    top.instance.history.push({ state: cur, outcome: "filled", at: now });
+    const prefix = this.subs.map((s) => s.decl.id).join("/");
+    this.instance.history.push({ state: `${prefix}/${cur}`, outcome: "filled", at: now });
+    this.seedSubs(); // a sub state may itself host a sub-machine — nesting is arbitrary
+    this.autoBind();
+    this.notifyChange();
+    return this.packet();
+  }
+
+  /** One step on the main machine. */
+  private async advanceMain(
+    to: string | undefined,
+    channel: Channel,
+    supplied: Record<string, string>,
+    now: string,
+  ): Promise<Record<string, unknown>> {
+    const cur = activeStates(this.instance)[0];
+    this.assertEdge(this.machine, cur, to);
+    const target = to ?? this.state(this.machine, cur).edges[0]?.to;
+    // BOOT IS THE READING ROOM, so RE-ENTERING it earns its tokens again: a
+    // walk sent back to start proves its reading afresh. The FIRST entry
+    // keeps the buffer. The only reads it can hold were made moments ago at
+    // start, which is exactly where the packet hands over the reading and
+    // asks for them — wiping those made the one-document reading pointless.
+    if (this.machine.id === "main" && cur === this.machine.initial && target === "boot") {
+      if (this.bootEntered) this.clearReadBuffer();
+      this.bootEntered = true;
+    }
+    if (target !== undefined) this.gatePriority(this.machine, [target], channel);
+    await this.assertConditions(this.machine, this.state(this.machine, cur), to, channel, supplied);
+    this.completeGuarded(this.machine, this.instance, cur, "filled", now, to);
+    this.consumeDocs(this.state(this.machine, cur));
+    this.instance.history.push({ state: cur, outcome: "filled", at: now });
+    this.seedSubs();
+    return this.landing();
+  }
+
   /** THE ENGINE'S OWN STEP — complete the current state and move on.
    *  `to` picks the outgoing edge (needed only when there are several);
    *  `channel` is whose hand this is — the threshold gates only the agent's.
@@ -3220,80 +3328,9 @@ export class Session {
     // ONE VISIBLE STEP PER TICK (owner ruling 2026-07-26): you are only
     // ever in one state, and a tick moves exactly one position — including
     // the mechanical start/end positions of a sub-machine.
-    if (this.inSub()) {
-      const top = this.top()!;
-      if (top.instance.status !== "open") {
-        // Standing on the sub's end: this tick returns to the parent —
-        // whatever the parent's edges enter is what the threshold weighs
-        // and what the read gate demands proven.
-        const { machine: pm, instance: pi } = this.parentOfTop();
-        const parent = this.state(pm, top.parentState);
-        this.gatePriority(
-          pm,
-          parent.edges.map((e) => e.to),
-          channel,
-        );
-        this.assertReads(
-          pm,
-          parent,
-          parent.edges.map((e) => e.to),
-          channel,
-          supplied,
-        );
-        this.completeGuarded(pm, pi, top.parentState, "filled", now);
-        this.subs.pop();
-        if (pi !== this.instance) pi.history.push({ state: top.parentState, outcome: "filled", at: now });
-        const prefix = this.subs.map((s) => s.decl.id).join("/");
-        this.instance.history.push({ state: prefix === "" ? top.parentState : `${prefix}/${top.parentState}`, outcome: "filled", at: now });
-        if (!this.inSub()) this.unbind(); // leaving the outermost sub leaves the context (worktree stays)
-        this.seedSubs();
-        return this.landing();
-      }
-      const cur = activeStates(top.instance)[0];
-      this.assertEdge(top.decl, cur, to);
-      const subTarget = to ?? this.state(top.decl, cur).edges[0]?.to;
-      if (subTarget !== undefined) this.gatePriority(top.decl, [subTarget], channel);
-      await this.assertConditions(top.decl, this.state(top.decl, cur), to, channel, supplied);
-      if (top.decl.id === "iterations" && (this.state(top.decl, cur).tags?.includes("iteration-kickoff") ?? false)) {
-        this.pinKickoff(top.gen?.expByState[cur]);
-      }
-      // NO GATE PASSES WITHOUT A REVIEW REPORT (owner ruling 2026-07-30):
-      // inside a pinned walk, leaving a gate demands its milestone review
-      // report — complete and PASSED. The report is the durable bless: a
-      // re-walk finds it standing and passes quickly.
-      if (this.bound !== undefined && top.decl.id.endsWith("-walk") && this.state(top.decl, cur).kind === "gate") {
-        this.assertGateReport(cur, this.state(top.decl, cur), channel);
-      }
-      this.completeGuarded(top.decl, top.instance, cur, "filled", now, to);
-      // Leaving the state is what destroys what it consumed.
-      this.consumeDocs(this.state(top.decl, cur));
-      top.instance.history.push({ state: cur, outcome: "filled", at: now });
-      const prefix = this.subs.map((s) => s.decl.id).join("/");
-      this.instance.history.push({ state: `${prefix}/${cur}`, outcome: "filled", at: now });
-      this.seedSubs(); // a sub state may itself host a sub-machine — nesting is arbitrary
-      this.autoBind();
-      this.notifyChange();
-      return this.packet();
-    }
-    const cur = activeStates(this.instance)[0];
-    this.assertEdge(this.machine, cur, to);
-    const target = to ?? this.state(this.machine, cur).edges[0]?.to;
-    // BOOT IS THE READING ROOM, so RE-ENTERING it earns its tokens again: a
-    // walk sent back to start proves its reading afresh. The FIRST entry
-    // keeps the buffer. The only reads it can hold were made moments ago at
-    // start, which is exactly where the packet hands over the reading and
-    // asks for them — wiping those made the one-document reading pointless.
-    if (this.machine.id === "main" && cur === this.machine.initial && target === "boot") {
-      if (this.bootEntered) this.clearReadBuffer();
-      this.bootEntered = true;
-    }
-    if (target !== undefined) this.gatePriority(this.machine, [target], channel);
-    await this.assertConditions(this.machine, this.state(this.machine, cur), to, channel, supplied);
-    this.completeGuarded(this.machine, this.instance, cur, "filled", now, to);
-    this.consumeDocs(this.state(this.machine, cur));
-    this.instance.history.push({ state: cur, outcome: "filled", at: now });
-    this.seedSubs();
-    return this.landing();
+    if (!this.inSub()) return this.advanceMain(to, channel, supplied, now);
+    if (this.top()!.instance.status !== "open") return this.advanceOutOfSub(channel, supplied, now);
+    return this.advanceInSub(to, channel, supplied, now);
   }
 
   /** The agent's "click on a state": full information about any state of
