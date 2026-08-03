@@ -304,6 +304,79 @@ export interface ReadingHook {
   credit(offset: number, lines: number): string[];
 }
 
+/** THE READING is written the moment it is asked for, then served like
+ *  any other file — same numbered lines, same hash, same offset/limit.
+ *  What it showed is credited on the way out, so the documents inside
+ *  it never have to be asked for again. Undefined when the ask is not
+ *  the reading: the plain read handles it. */
+function serveReading(
+  rootOf: (rel?: string) => string,
+  reading: ReadingHook | undefined,
+  args: Record<string, unknown>,
+): Record<string, unknown> | undefined {
+  if (reading === undefined || args.ref !== undefined || args.paths !== undefined) return undefined;
+  if (String(args.path ?? "").replace(/\\/g, "/") !== reading.path) return undefined;
+  reading.build();
+  const res = fileRead(rootOf(reading.path), reading.path, {
+    ...(args.offset !== undefined ? { offset: Number(args.offset) } : {}),
+    ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
+    maxChars: READING_BUDGET,
+  }) as unknown as Record<string, unknown>;
+  const range = res.range as { offset: number; limit: number } | undefined;
+  const offset = range?.offset ?? 1;
+  const lines = range?.limit ?? Number(res.total_lines ?? 0);
+  return { ...res, credited: reading.credit(offset, lines) };
+}
+
+function readManyGuarded(
+  rootOf: (rel?: string) => string,
+  paths: unknown,
+  ref: string | undefined,
+  optional: boolean,
+): Record<string, unknown> {
+  if (!Array.isArray(paths)) {
+    throw new Rejection({
+      clause: CLAUSES.REQUIRED_ARGS,
+      expected: "paths as an array of paths, or of {path, offset?, limit?}",
+      got: typeof paths,
+      remedy: { tool: "se_file_read", args: { paths: ["<path>"] }, note: "one path uses `path`; a set uses `paths`" },
+      source: "engine/tools.ts se_file_read",
+    });
+  }
+  return readMany(rootOf, paths, ref, optional);
+}
+
+/** The job side of se_run: list, stop, wait or status. Undefined when the
+ *  call names no job — the command side handles it. */
+function jobArm(args: Record<string, unknown>): unknown {
+  if (args.jobs === true) return { jobs: jobList() };
+  if (args.job === undefined) return undefined;
+  if (args.stop === true) return jobStop(String(args.job));
+  // THE WAIT RIDES THE JOB'S OWN DONE-PROMISE — it returns the moment
+  // the command exits, where a sleep always serves its full sentence.
+  if (args.wait_ms !== undefined) return jobWait(String(args.job), Number(args.wait_ms));
+  return jobStatus(String(args.job));
+}
+
+/** A TRUNCATING PIPE CUTS BEFORE THE ENGINE SEES. What Select-Object
+ *  -First dropped exists NOWHERE — not here, not in the log. The note
+ *  rides at the moment of risk; a marker after the fact costs nothing
+ *  and once turned "(425.501917ms)" read from a shaped slice into a
+ *  confidently wrong 425 SECONDS. */
+function annotateRun(res: unknown, command: string, laneWarning: unknown): unknown {
+  const shaped = /select-object\s+-(first|last|skip)|(^|[;|&(\s])(head|tail)\s+-|\bcut\s+-c|\bmeasure-object\b/i.test(command);
+  const extra = {
+    ...(laneWarning !== undefined ? { lane_warning: laneWarning } : {}),
+    ...(shaped
+      ? {
+          output_shaped:
+            "a truncating pipe shaped this output BEFORE capture — what it dropped exists nowhere. Trust ends and totals only from unshaped output (se_test is structured; se_log_query serves full se_run output by ref).",
+        }
+      : {}),
+  };
+  return Object.keys(extra).length === 0 ? res : { ...(res as unknown as Record<string, unknown>), ...extra };
+}
+
 export function coreTools(
   rootOf: (rel?: string) => string,
   projectRoot: string,
@@ -341,39 +414,9 @@ export function coreTools(
       handler: (args) => {
         const ref = args.ref !== undefined ? String(args.ref) : undefined;
         const optional = args.optional === true;
-        // THE READING is written the moment it is asked for, then served like
-        // any other file — same numbered lines, same hash, same offset/limit.
-        // What it showed is credited on the way out, so the documents inside
-        // it never have to be asked for again.
-        if (
-          reading !== undefined &&
-          ref === undefined &&
-          args.paths === undefined &&
-          String(args.path ?? "").replace(/\\/g, "/") === reading.path
-        ) {
-          reading.build();
-          const res = fileRead(rootOf(reading.path), reading.path, {
-            ...(args.offset !== undefined ? { offset: Number(args.offset) } : {}),
-            ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
-            maxChars: READING_BUDGET,
-          }) as unknown as Record<string, unknown>;
-          const range = res.range as { offset: number; limit: number } | undefined;
-          const offset = range?.offset ?? 1;
-          const lines = range?.limit ?? Number(res.total_lines ?? 0);
-          return { ...res, credited: reading.credit(offset, lines) };
-        }
-        if (args.paths !== undefined) {
-          if (!Array.isArray(args.paths)) {
-            throw new Rejection({
-              clause: CLAUSES.REQUIRED_ARGS,
-              expected: "paths as an array of paths, or of {path, offset?, limit?}",
-              got: typeof args.paths,
-              remedy: { tool: "se_file_read", args: { paths: ["<path>"] }, note: "one path uses `path`; a set uses `paths`" },
-              source: "engine/tools.ts se_file_read",
-            });
-          }
-          return readMany(rootOf, args.paths, ref, optional);
-        }
+        const served = serveReading(rootOf, reading, args);
+        if (served !== undefined) return served;
+        if (args.paths !== undefined) return readManyGuarded(rootOf, args.paths, ref, optional);
         if (args.path === undefined) {
           throw new Rejection({
             clause: CLAUSES.REQUIRED_ARGS,
@@ -693,14 +736,8 @@ export function coreTools(
         },
       },
       handler: async (args) => {
-        if (args.jobs === true) return { jobs: jobList() };
-        if (args.job !== undefined) {
-          if (args.stop === true) return jobStop(String(args.job));
-          // THE WAIT RIDES THE JOB'S OWN DONE-PROMISE — it returns the moment
-          // the command exits, where a sleep always serves its full sentence.
-          if (args.wait_ms !== undefined) return jobWait(String(args.job), Number(args.wait_ms));
-          return jobStatus(String(args.job));
-        }
+        const job = jobArm(args);
+        if (job !== undefined) return job;
         if (args.command === undefined) {
           throw new Rejection({
             clause: CLAUSES.REQUIRED_ARGS,
@@ -726,24 +763,7 @@ export function coreTools(
                 ...cwd,
                 ...(args.handoff_ms !== undefined ? { handoff_ms: Number(args.handoff_ms) } : {}),
               });
-        // A TRUNCATING PIPE CUTS BEFORE THE ENGINE SEES. What Select-Object
-        // -First dropped exists NOWHERE — not here, not in the log. The note
-        // rides at the moment of risk; a marker after the fact costs nothing
-        // and once turned "(425.501917ms)" read from a shaped slice into a
-        // confidently wrong 425 SECONDS.
-        const shaped = /select-object\s+-(first|last|skip)|(^|[;|&(\s])(head|tail)\s+-|\bcut\s+-c|\bmeasure-object\b/i.test(
-          String(args.command),
-        );
-        const extra = {
-          ...(laneWarning !== undefined ? { lane_warning: laneWarning } : {}),
-          ...(shaped
-            ? {
-                output_shaped:
-                  "a truncating pipe shaped this output BEFORE capture — what it dropped exists nowhere. Trust ends and totals only from unshaped output (se_test is structured; se_log_query serves full se_run output by ref).",
-              }
-            : {}),
-        };
-        return Object.keys(extra).length === 0 ? res : { ...(res as unknown as Record<string, unknown>), ...extra };
+        return annotateRun(res, String(args.command), laneWarning);
       },
     },
     {
@@ -775,35 +795,7 @@ export function coreTools(
         const root = rootOf();
         const se = seDir(projectRoot);
         const force = args.force === true;
-        // THE VERDICT OUTLIVES THE CALL (found 2026-08-02: the battery outran
-        // the MCP client's timeout and the counts were lost). Past the
-        // handoff budget the caller gets a handle; the run carries on, the
-        // verdict is recorded, and {job} serves it.
-        if (args.job !== undefined) {
-          const id = String(args.job);
-          const t = testVerdicts.get(id);
-          if (t === undefined) {
-            throw new Rejection({
-              clause: CLAUSES.JOB_UNKNOWN,
-              expected: "a test run started in this session",
-              got: `${id} (unknown)`,
-              remedy: { tool: "se_run", args: { jobs: true }, note: "list the session's jobs" },
-              source: "engine/tools.ts se_test",
-            });
-          }
-          if (args.wait_ms !== undefined) {
-            await Promise.race([t.done, new Promise((r) => setTimeout(r, Math.max(0, Math.min(Number(args.wait_ms), HOST_SAFE_WAIT_MS))))]);
-          }
-          if (t.verdict !== undefined) return t.verdict;
-          const progress = t.pace !== "" ? batteryProgress(se, t.started) : undefined;
-          return {
-            job: id,
-            running: true,
-            elapsed_ms: Date.now() - t.started,
-            ...(progress !== undefined ? { progress } : {}),
-            note: `still running — ask again with {job}. Each wait blocks at most ${HOST_SAFE_WAIT_MS / 1000}s; poll until running is false.${t.pace}`,
-          };
-        }
+        if (args.job !== undefined) return testJobArm(args, se);
         // A TEST RUN NEVER OUTLIVES ITS SESSION (found 2026-08-02: two
         // orphaned workers held a folder lock for four hours). Children run
         // in the job registry — whole-tree killed on timeout, reaped at
@@ -835,31 +827,11 @@ export function coreTools(
           }
           return { status: v.exit, out };
         };
-        // 'pull', 'pull.test.ts', 'tests/pull.test.ts', full path — one file.
         const runScoped = async (): Promise<Record<string, unknown>> => {
-          const named = (Array.isArray(args.files) ? (args.files as unknown[]).map(String) : []).map((f) => {
-            const base = f.split("/").pop() as string;
-            const file = base.endsWith(".test.ts") ? base : `${base}.test.ts`;
-            return `project/deliverable/tests/${file}`;
-          });
-          const files = named.length > 0 ? [...new Set(named)].sort() : suiteFiles(root);
-          const missing = files.filter((f) => !existsSync(resolveInRoot(root, f, "engine/tools.ts se_test")));
-          if (missing.length > 0) {
-            throw new Rejection({
-              clause: CLAUSES.REQUIRED_ARGS,
-              expected: "test files that exist under project/deliverable/tests/",
-              got: `unknown: ${missing.join(", ")}`,
-              remedy: {
-                tool: "se_file_glob",
-                args: { glob: "project/deliverable/tests/*.test.ts" },
-                note: "list the suite, then name your scope",
-              },
-              source: "engine/tools.ts se_test",
-            });
-          }
+          const { files, named } = scopedFiles(root, args.files);
           const scope = `${files.join(",")}${args.name_pattern !== undefined ? `#${String(args.name_pattern)}` : ""}`;
           testGate(se, root, force, scope);
-          if (named.length > 0) scopedGate(se, root, files, force);
+          if (named) scopedGate(se, root, files, force);
           const argv = [
             "--test",
             "--test-reporter=tap",
@@ -1358,6 +1330,63 @@ const EDIT_TOOLS = new Set(["se_file_write", "se_file_patch", "se_file_replace",
 
 const testVerdicts = new Map<string, { done: Promise<void>; verdict?: Record<string, unknown>; started: number; pace: string }>();
 let testSeq = 0;
+
+/** THE VERDICT OUTLIVES THE CALL (found 2026-08-02: the battery outran
+ *  the MCP client's timeout and the counts were lost). Past the
+ *  handoff budget the caller gets a handle; the run carries on, the
+ *  verdict is recorded, and {job} serves it. */
+async function testJobArm(args: Record<string, unknown>, se: string): Promise<Record<string, unknown>> {
+  const id = String(args.job);
+  const t = testVerdicts.get(id);
+  if (t === undefined) {
+    throw new Rejection({
+      clause: CLAUSES.JOB_UNKNOWN,
+      expected: "a test run started in this session",
+      got: `${id} (unknown)`,
+      remedy: { tool: "se_run", args: { jobs: true }, note: "list the session's jobs" },
+      source: "engine/tools.ts se_test",
+    });
+  }
+  if (args.wait_ms !== undefined) {
+    await Promise.race([t.done, new Promise((r) => setTimeout(r, Math.max(0, Math.min(Number(args.wait_ms), HOST_SAFE_WAIT_MS))))]);
+  }
+  if (t.verdict !== undefined) return t.verdict;
+  const progress = t.pace !== "" ? batteryProgress(se, t.started) : undefined;
+  return {
+    job: id,
+    running: true,
+    elapsed_ms: Date.now() - t.started,
+    ...(progress !== undefined ? { progress } : {}),
+    note: `still running — ask again with {job}. Each wait blocks at most ${HOST_SAFE_WAIT_MS / 1000}s; poll until running is false.${t.pace}`,
+  };
+}
+
+/** 'pull', 'pull.test.ts', 'tests/pull.test.ts', full path — one file.
+ *  No names at all means the whole suite. Unknown names refuse with the
+ *  glob that lists it. */
+function scopedFiles(root: string, filesArg: unknown): { files: string[]; named: boolean } {
+  const named = (Array.isArray(filesArg) ? (filesArg as unknown[]).map(String) : []).map((f) => {
+    const base = f.split("/").pop() as string;
+    const file = base.endsWith(".test.ts") ? base : `${base}.test.ts`;
+    return `project/deliverable/tests/${file}`;
+  });
+  const files = named.length > 0 ? [...new Set(named)].sort() : suiteFiles(root);
+  const missing = files.filter((f) => !existsSync(resolveInRoot(root, f, "engine/tools.ts se_test")));
+  if (missing.length > 0) {
+    throw new Rejection({
+      clause: CLAUSES.REQUIRED_ARGS,
+      expected: "test files that exist under project/deliverable/tests/",
+      got: `unknown: ${missing.join(", ")}`,
+      remedy: {
+        tool: "se_file_glob",
+        args: { glob: "project/deliverable/tests/*.test.ts" },
+        note: "list the suite, then name your scope",
+      },
+      source: "engine/tools.ts se_test",
+    });
+  }
+  return { files, named: named.length > 0 };
+}
 
 export function buildServer(
   root: string,
