@@ -1314,6 +1314,48 @@ function refuseProseWall(tool: string, field: string, text: string): void {
 
 // se_test's handed-off runs: the verdict outlives the CALL — recorded here,
 // served by se_test {job}, whatever the client's timeout did.
+// THE ON-CHANGE TYPECHECK (owner ruling 2026-08-03): a lane edit touching a
+// .ts file kicks an incremental compile in the background, and while the
+// tree is red every result carries typecheck_error. The EDIT itself is
+// never refused — a two-file fix passes through a red middle; the
+// pre-commit hook is where red blocks. Nothing here may throw.
+const TYPECHECK: { running: boolean; dirty: boolean; report: string } = { running: false, dirty: false, report: "" };
+function kickTypecheck(root: string): void {
+  if (TYPECHECK.running) {
+    TYPECHECK.dirty = true;
+    return;
+  }
+  TYPECHECK.running = true;
+  try {
+    const child = spawn("npx", ["tsc", "-p", ".", "--pretty", "false"], {
+      cwd: join(root, "project", "deliverable"),
+      shell: true,
+      windowsHide: true,
+      stdio: ["ignore", "pipe", "ignore"],
+    });
+    let out = "";
+    child.stdout?.setEncoding("utf8");
+    child.stdout?.on("data", (c: string) => {
+      out += c;
+    });
+    child.on("error", () => {
+      TYPECHECK.running = false;
+    });
+    child.on("close", (code) => {
+      TYPECHECK.report = code === 0 ? "" : out.trim().split("\n").slice(0, 8).join("\n");
+      TYPECHECK.running = false;
+      if (TYPECHECK.dirty) {
+        TYPECHECK.dirty = false;
+        kickTypecheck(root);
+      }
+    });
+    child.unref();
+  } catch {
+    TYPECHECK.running = false;
+  }
+}
+const EDIT_TOOLS = new Set(["se_file_write", "se_file_patch", "se_file_replace", "se_file_move"]);
+
 const testVerdicts = new Map<string, { done: Promise<void>; verdict?: Record<string, unknown>; started: number; pace: string }>();
 let testSeq = 0;
 
@@ -1433,6 +1475,12 @@ export function buildServer(
     return { ...(result as Record<string, unknown>), toll_warning: w };
   });
 
+  // THE ON-CHANGE TYPECHECK'S REPORT rides every result while the tree is red.
+  server.addDecorator((_tool, result) => {
+    if (TYPECHECK.report === "" || typeof result !== "object" || result === null || Array.isArray(result)) return result;
+    return { ...(result as Record<string, unknown>), typecheck_error: TYPECHECK.report };
+  });
+
   // AND SO DOES THE ACCEPTED ONE (note-792c32b5425e item 5; the hole it
   // left was found live on 2026-07-29). The update's answer went only to
   // the LOG. So the node ids needed to resolve anything were invisible
@@ -1517,6 +1565,7 @@ export function buildServer(
       duration_ms: rec.duration_ms,
       response: rec.tool === "se_run" ? rec.response : capJson(rec.response),
     });
+    if (rec.ok && EDIT_TOOLS.has(rec.tool) && JSON.stringify(rec.args ?? {}).includes(".ts")) kickTypecheck(root);
   });
 
   return server;
