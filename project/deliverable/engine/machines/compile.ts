@@ -350,13 +350,9 @@ interface DrawnEdge {
   id: string;
 }
 
-/** THE MACHINES-ARE-DRAWN LAW (owner ruling 2026-07-28): the engine accepts
- *  what a person naturally draws in Obsidian — no invisible metadata.
- *  - The same pair drawn twice collapses to one edge; an authored role wins.
- *  - An undeclared edge running OPPOSITE a forward edge is a RETURN and
- *    compiles as alternative. Forward is the edge whose target lies deeper
- *    from start; equal depth is ambiguous and refuses with the edge named. */
-function normalizeDrawnEdges(machineId: string, drawn: DrawnEdge[], initial: string): DrawnEdge[] {
+/** The same pair drawn twice collapses to one edge; an authored role wins.
+ *  Conflicting authored roles refuse with every edge named. */
+function collapseDuplicatePairs(machineId: string, drawn: DrawnEdge[]): DrawnEdge[] {
   const byPair = new Map<string, DrawnEdge[]>();
   for (const d of drawn) {
     const key = `${d.from.id}->${d.decl.to}`;
@@ -381,6 +377,11 @@ function normalizeDrawnEdges(machineId: string, drawn: DrawnEdge[], initial: str
     }
     kept.push(authored[0] ?? group[0]);
   }
+  return kept;
+}
+
+/** Breadth-first depth of every state reachable from start. */
+function edgeDepths(kept: DrawnEdge[], initial: string): Map<string, number> {
   const depth = new Map<string, number>([[initial, 0]]);
   let frontier = [initial];
   while (frontier.length > 0) {
@@ -394,6 +395,12 @@ function normalizeDrawnEdges(machineId: string, drawn: DrawnEdge[], initial: str
     }
     frontier = next;
   }
+  return depth;
+}
+
+/** An undeclared edge running OPPOSITE a forward edge is a RETURN and
+ *  compiles as alternative. Equal depth is ambiguous and refuses. */
+function markReturnEdges(machineId: string, kept: DrawnEdge[], depth: Map<string, number>): void {
   const forward = (from: string, to: string) =>
     kept.some((d) => d.from.id === from && d.decl.to === to && (d.decl.role === "normal" || d.decl.role === "approval"));
   for (const d of kept) {
@@ -412,6 +419,17 @@ function normalizeDrawnEdges(machineId: string, drawn: DrawnEdge[], initial: str
       `${d.from.id} and ${d.decl.to} point at each other and neither lies closer to start — give the return edge a role`,
     );
   }
+}
+
+/** THE MACHINES-ARE-DRAWN LAW (owner ruling 2026-07-28): the engine accepts
+ *  what a person naturally draws in Obsidian — no invisible metadata.
+ *  - The same pair drawn twice collapses to one edge; an authored role wins.
+ *  - An undeclared edge running OPPOSITE a forward edge is a RETURN and
+ *    compiles as alternative. Forward is the edge whose target lies deeper
+ *    from start; equal depth is ambiguous and refuses with the edge named. */
+function normalizeDrawnEdges(machineId: string, drawn: DrawnEdge[], initial: string): DrawnEdge[] {
+  const kept = collapseDuplicatePairs(machineId, drawn);
+  markReturnEdges(machineId, kept, edgeDepths(kept, initial));
   return kept;
 }
 
