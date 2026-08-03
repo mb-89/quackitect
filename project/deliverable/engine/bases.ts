@@ -309,59 +309,60 @@ export function fromExpression(src: string): FilterRow | null {
 }
 
 function matchRow(node: Node): FilterRow | null {
-  if (node.k === "unary" && node.op === "!") {
-    const inner = node.x;
-    if (inner.k === "call" && inner.recv !== null) {
-      const p = refText(inner.recv);
-      if (p !== null && inner.name === "isEmpty" && inner.args.length === 0) return { property: p, operator: "isNotEmpty" };
-      if (p !== null && inner.name === "contains" && inner.args.length === 1) {
-        const v = literal(inner.args[0]);
-        if (v !== null) return { property: p, operator: "notContains", value: v };
-      }
-    }
-    return null;
-  }
-
-  if (node.k === "call" && node.recv !== null) {
-    const p = refText(node.recv);
-    if (p === null) return null;
-    if (p === "file" && node.name === "hasTag" && node.args.length === 1) {
-      const v = literal(node.args[0]);
-      if (v !== null) return { property: "file", operator: "hasTag", value: v };
-    }
-    if (p === "file" && node.name === "hasLink" && node.args.length === 1) {
-      const v = literal(node.args[0]);
-      if (v !== null) return { property: "file", operator: "linksTo", value: v };
-    }
-    if (node.name === "isEmpty" && node.args.length === 0) return { property: p, operator: "isEmpty" };
-    const named: Record<string, string> = { contains: "contains", startsWith: "startsWith", endsWith: "endsWith" };
-    const id = named[node.name];
-    if (id !== undefined && node.args.length === 1) {
-      const v = literal(node.args[0]);
-      if (v !== null) return { property: p, operator: id, value: v };
-    }
-    return null;
-  }
-
-  if (node.k === "binary") {
-    const p = refText(node.a);
-    if (p === null) return null;
-    const ops: Record<string, string> = { "==": "is", "!=": "isNot", ">": "gt", "<": "lt", ">=": "gte", "<=": "lte" };
-    const id = ops[node.op];
-    if (id === undefined) return null;
-    // `x > date("...")` is the date form of the same comparison.
-    if (node.b.k === "call" && node.b.recv === null && node.b.name === "date" && node.b.args.length === 1) {
-      const v = literal(node.b.args[0]);
-      if (v === null) return null;
-      if (node.op === ">") return { property: p, operator: "after", value: v };
-      if (node.op === "<") return { property: p, operator: "before", value: v };
-      return null;
-    }
-    const v = literal(node.b);
-    return v === null ? null : { property: p, operator: id, value: v };
-  }
-
+  if (node.k === "unary" && node.op === "!") return matchNegatedRow(node.x);
+  if (node.k === "call" && node.recv !== null) return matchCallRow(node);
+  if (node.k === "binary") return matchBinaryRow(node);
   return null;
+}
+
+function matchNegatedRow(inner: Node): FilterRow | null {
+  if (inner.k !== "call" || inner.recv === null) return null;
+  const p = refText(inner.recv);
+  if (p !== null && inner.name === "isEmpty" && inner.args.length === 0) return { property: p, operator: "isNotEmpty" };
+  if (p !== null && inner.name === "contains" && inner.args.length === 1) {
+    const v = literal(inner.args[0]);
+    if (v !== null) return { property: p, operator: "notContains", value: v };
+  }
+  return null;
+}
+
+function matchCallRow(node: Node & { k: "call" }): FilterRow | null {
+  const p = refText(node.recv!);
+  if (p === null) return null;
+  if (p === "file" && node.name === "hasTag" && node.args.length === 1) {
+    const v = literal(node.args[0]);
+    if (v !== null) return { property: "file", operator: "hasTag", value: v };
+  }
+  if (p === "file" && node.name === "hasLink" && node.args.length === 1) {
+    const v = literal(node.args[0]);
+    if (v !== null) return { property: "file", operator: "linksTo", value: v };
+  }
+  if (node.name === "isEmpty" && node.args.length === 0) return { property: p, operator: "isEmpty" };
+  const named: Record<string, string> = { contains: "contains", startsWith: "startsWith", endsWith: "endsWith" };
+  const id = named[node.name];
+  if (id !== undefined && node.args.length === 1) {
+    const v = literal(node.args[0]);
+    if (v !== null) return { property: p, operator: id, value: v };
+  }
+  return null;
+}
+
+function matchBinaryRow(node: Node & { k: "binary" }): FilterRow | null {
+  const p = refText(node.a);
+  if (p === null) return null;
+  const ops: Record<string, string> = { "==": "is", "!=": "isNot", ">": "gt", "<": "lt", ">=": "gte", "<=": "lte" };
+  const id = ops[node.op];
+  if (id === undefined) return null;
+  // `x > date("...")` is the date form of the same comparison.
+  if (node.b.k === "call" && node.b.recv === null && node.b.name === "date" && node.b.args.length === 1) {
+    const v = literal(node.b.args[0]);
+    if (v === null) return null;
+    if (node.op === ">") return { property: p, operator: "after", value: v };
+    if (node.op === "<") return { property: p, operator: "before", value: v };
+    return null;
+  }
+  const v = literal(node.b);
+  return v === null ? null : { property: p, operator: id, value: v };
 }
 
 /**
