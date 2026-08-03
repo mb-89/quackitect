@@ -33,10 +33,23 @@ import { shoot } from "./shoot.ts";
 import { spawn } from "node:child_process";
 import { openPanel } from "./panel.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
-import { jobList, jobStatus, jobStop, jobWait, run, runBackground, runOrHandoff, startJob } from "./run.ts";
+import { HOST_SAFE_WAIT_MS, jobList, jobStatus, jobStop, jobWait, run, runBackground, runOrHandoff, startJob } from "./run.ts";
 import { search } from "./search.ts";
 import { Session } from "./session.ts";
 import { webFetch, webSearch } from "./web.ts";
+import { join } from "node:path";
+
+/** The last battery's measured wall, phrased for a caller sizing a wait.
+ *  An expectation is measured or absent — never guessed. */
+function batteryPace(se: string): string {
+  try {
+    const rec = JSON.parse(readFileSync(join(se, "test-last-run.json"), "utf8")) as { wall_ms?: number };
+    if (typeof rec.wall_ms === "number") return ` The last battery took ${Math.round(rec.wall_ms / 1000)}s wall — expect the verdict on that scale.`;
+    return " The last battery on record has no wall clock; the next completed run records one.";
+  } catch {
+    return " No earlier battery is on record to size the wait.";
+  }
+}
 
 /** THE TICK — the machinery's one tool, legal in every state. */
 export function sessionTools(session: Session): ToolDef[] {
@@ -518,7 +531,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
           no_tool_reason: { type: "string", description: "why the lane cannot do this job — runs a lane-covered command ONCE and files the reason for the retro; a frequent reason is the lane's next verb" },
           background: { type: "boolean", description: "start it detached and return a job handle IMMEDIATELY — for work you know is long" },
           job: { type: "string", description: "ask an existing job how it is doing: its output so far, whether it still runs" },
-          wait_ms: { type: "number", description: "with job: BLOCK up to this long on the job's completion — returns the moment it exits. The replacement for every Start-Sleep. Capped at 120000." },
+          wait_ms: { type: "number", description: `with job: BLOCK up to this long on the job's completion — returns the moment it exits. The replacement for every Start-Sleep. Capped at ${HOST_SAFE_WAIT_MS} — the host kills a longer block before it answers; poll until running is false.` },
           stop: { type: "boolean", description: "with job: kill it and every process it spawned" },
           jobs: { type: "boolean", description: "list every job this session started, newest first" },
           handoff_ms: { type: "number", description: "how long to wait inline before handing off to the background (default 20000)" },
@@ -580,7 +593,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
           name_pattern: { type: "string", description: "--test-name-pattern: run only tests whose name matches" },
           force: { type: "boolean", description: "override both gates: unchanged tree, and battery/scope economics — for flake hunts" },
           job: { type: "string", description: "fetch a handed-off run's verdict by its handle — the counts are recorded even when the original call timed out" },
-          wait_ms: { type: "number", description: "with job: block up to this long (capped at 120000) for the verdict" },
+          wait_ms: { type: "number", description: `with job: block up to this long for the verdict. Capped at ${HOST_SAFE_WAIT_MS} — the host kills a longer block before it answers; poll until running is false.` },
         },
       },
       handler: async (args) => {
@@ -604,9 +617,9 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
             });
           }
           if (args.wait_ms !== undefined) {
-            await Promise.race([t.done, new Promise((r) => setTimeout(r, Math.max(0, Math.min(Number(args.wait_ms), 120_000))))]);
+            await Promise.race([t.done, new Promise((r) => setTimeout(r, Math.max(0, Math.min(Number(args.wait_ms), HOST_SAFE_WAIT_MS))))]);
           }
-          return t.verdict ?? { job: id, running: true, note: "still running — ask again with {job}, or add wait_ms to block on it" };
+          return t.verdict ?? { job: id, running: true, elapsed_ms: Date.now() - t.started, note: `still running — ask again with {job}. Each wait blocks at most ${HOST_SAFE_WAIT_MS / 1000}s; poll until running is false.${t.pace}` };
         }
         // A TEST RUN NEVER OUTLIVES ITS SESSION (found 2026-08-02: two
         // orphaned workers held a folder lock for four hours). Children run
@@ -625,7 +638,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
           let v = jobStatus(started.job);
           let waited = 0;
           while (v.running && waited < timeout) {
-            const step = Math.min(60_000, timeout - waited);
+            const step = Math.min(HOST_SAFE_WAIT_MS, timeout - waited);
             v = await jobWait(started.job, step);
             waited += step;
           }
@@ -690,7 +703,11 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
         return { ok, results };
         })();
         const id = `test-${Date.now().toString(36)}-${++testSeq}`;
-        const entry: { done: Promise<void>; verdict?: Record<string, unknown> } = { done: undefined as unknown as Promise<void> };
+        // THE LAST RUN SIZES THE EXPECTATION (owner ruling 2026-08-03): a
+        // battery caller is told how long the previous one took — measured,
+        // never guessed — or told plainly that no record exists.
+        const pace = args.files === undefined && args.name_pattern === undefined ? batteryPace(se) : "";
+        const entry: { done: Promise<void>; verdict?: Record<string, unknown>; started: number; pace: string } = { done: undefined as unknown as Promise<void>, started: Date.now(), pace };
         entry.done = work.then(
           (v) => { entry.verdict = { job: id, running: false, ...v }; },
           (e) => { entry.verdict = { job: id, running: false, refused: e instanceof Rejection ? e.toJSON() : String(e) }; },
@@ -703,7 +720,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
         ]);
         if (timer !== undefined) clearTimeout(timer);
         if (winner === "handoff") {
-          return { handed_off: true, job: id, note: `still running — it moved to the background rather than hold you. The verdict is recorded regardless; fetch it with se_test {job: "${id}"} (add wait_ms to block up to two minutes).` };
+          return { handed_off: true, job: id, note: `still running — it moved to the background rather than hold you. The verdict is recorded regardless; fetch it with se_test {job: "${id}"}. Each fetch waits at most ${HOST_SAFE_WAIT_MS / 1000}s (the host kills a longer block); poll until running is false.${pace}` };
         }
         if ("e" in (winner as object)) throw (winner as { e: unknown }).e;
         return (winner as { v: Record<string, unknown> }).v;

@@ -114,6 +114,12 @@ function knownJob(id: string): Job {
   });
 }
 
+/** The longest a single lane answer may block. MEASURED (2026-08-03): a 45s
+ *  handoff answer reached the caller; two 120s job-waits completed here and
+ *  never arrived — the MCP host kills the call first. A wait that outlives
+ *  the host's window answers nobody, so callers poll in slices of this. */
+export const HOST_SAFE_WAIT_MS = 45_000;
+
 /** WAIT ON A JOB, bounded. The honest replacement for Start-Sleep polling:
  *  the job's own done-promise is the wake path, so the wait returns the
  *  MOMENT the command exits — or at the bound, with the job still running.
@@ -121,7 +127,7 @@ function knownJob(id: string): Job {
  *  Start-Sleep calls, hand-rolling exactly this. */
 export async function jobWait(id: string, waitMs: number): Promise<JobView> {
   const j = knownJob(id);
-  const bound = Math.max(0, Math.min(waitMs, 120_000));
+  const bound = Math.max(0, Math.min(waitMs, HOST_SAFE_WAIT_MS));
   await Promise.race([j.done, new Promise((r) => setTimeout(r, bound))]);
   return view(j);
 }

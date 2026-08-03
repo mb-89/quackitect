@@ -14,7 +14,7 @@
 // The ENGINE observes the result.
 //
 //   node engine/bin/selftest.ts --root <project root>
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { spawn } from "node:child_process";
 import { killTree } from "../run.ts";
@@ -72,6 +72,16 @@ const CAP_MS = 300_000;
 // The cap kills the WHOLE TREE — spawnSync killed only the runner and left
 // its per-file workers orphaned (two held a folder lock for four hours,
 // 2026-08-02).
+const lastRunPath = join(root, ".se", "test-last-run.json");
+const priorWallMs = (() => {
+  try {
+    const rec = JSON.parse(readFileSync(lastRunPath, "utf8")) as { wall_ms?: number };
+    return typeof rec.wall_ms === "number" ? rec.wall_ms : undefined;
+  } catch {
+    return undefined;
+  }
+})();
+const startedAt = Date.now();
 const r = await new Promise<{ status: number | null; killed: boolean; out: string }>((resolveRun) => {
   const child = spawn(process.execPath, ["--test", ...REPORTERS, ...files], {
     cwd: dir,
@@ -90,7 +100,19 @@ const r = await new Promise<{ status: number | null; killed: boolean; out: strin
   child.on("close", (code) => { clearTimeout(timer); resolveRun({ status: code, killed, out: acc }); });
 });
 if (r.killed) {
-  process.stdout.write(`selftest: KILLED at its ${CAP_MS / 1000}s cap — the run is TRUNCATED, the tallies below are not a verdict\n`);
+  process.stdout.write(`selftest: KILLED at its ${CAP_MS / 1000}s cap — the run is TRUNCATED, the tallies below are not a verdict${priorWallMs !== undefined ? ` (the last completed battery took ${Math.round(priorWallMs / 1000)}s)` : ""}\n`);
+}
+// The reporter's record gains the wall clock — only a record THIS run wrote.
+// A killed run leaves the old record standing, and yesterday's record must
+// not wear today's wall.
+try {
+  const rec = JSON.parse(readFileSync(lastRunPath, "utf8")) as Record<string, unknown> & { run?: string };
+  if (typeof rec.run === "string" && Date.parse(rec.run) >= startedAt) {
+    rec.wall_ms = Date.now() - startedAt;
+    writeFileSync(lastRunPath, `${JSON.stringify(rec, null, 1)}\n`, "utf8");
+  }
+} catch {
+  // no fresh record — the reporter never finished; nothing to stamp
 }
 const out = r.out;
 // The condition's evidence is the verdict, not the firehose: failures by
