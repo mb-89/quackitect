@@ -177,30 +177,11 @@ function splinePath(p: [number, number][]): string {
   return d;
 }
 
-function machineSvg(
-  source: CanvasData,
-  activeIds: Set<string>,
-  doneIds: Set<string>,
-  subIds: Set<string>,
-  meta: Record<string, StateMeta>,
-  route?: RouteMarks,
-): string {
-  const canvas = source;
-  const nodes = canvas.nodes ?? [];
-  const pad = 60;
-  const minX = Math.min(...nodes.map((n) => n.x)) - pad;
-  const minY = Math.min(...nodes.map((n) => n.y)) - pad;
-  const maxX = Math.max(...nodes.map((n) => n.x + n.width)) + pad;
-  const maxY = Math.max(...nodes.map((n) => n.y + n.height)) + pad;
-  const byId = new Map(nodes.map((n) => [n.id, n]));
-  const nodeOfState = new Map<string, (typeof nodes)[number]>();
-  for (const n of nodes) {
-    const s = stateIdOf(n);
-    if (s !== undefined) nodeOfState.set(s, n);
-  }
-  const parts: string[] = [];
+type CNode = NonNullable<CanvasData["nodes"]>[number];
 
-  // Groups first — presentation only, drawn behind everything.
+// Groups first — presentation only, drawn behind everything.
+function svgGroups(nodes: CNode[]): string[] {
+  const parts: string[] = [];
   for (const n of nodes) {
     if (n.type !== "group") continue;
     parts.push(`<rect x="${n.x}" y="${n.y}" width="${n.width}" height="${n.height}" rx="18" class="group"/>`);
@@ -208,7 +189,11 @@ function machineSvg(
       parts.push(`<text x="${n.x + 20}" y="${n.y + 38}" class="group-label">${esc(n.label)}</text>`);
     }
   }
+  return parts;
+}
 
+function svgEdges(canvas: CanvasData, byId: Map<string, CNode>): string[] {
+  const parts: string[] = [];
   for (const edge of canvas.edges ?? []) {
     const a = byId.get(edge.fromNode);
     const b = byId.get(edge.toNode);
@@ -225,60 +210,76 @@ function machineSvg(
       parts.push(`<text x="${(x1 + x2) / 2}" y="${(y1 + y2) / 2 - 8}" class="guard">${esc(edge.label)}</text>`);
     }
   }
+  return parts;
+}
 
-  for (const n of nodes) {
-    if (n.type === "text") {
-      parts.push(
-        `<g class="clickable" data-detail="comment"><rect x="${n.x}" y="${n.y}" width="${n.width}" height="${n.height}" class="comment"/>`,
-      );
-      parts.push(
-        `<foreignObject x="${n.x + 10}" y="${n.y + 6}" width="${n.width - 20}" height="${n.height - 12}"><div xmlns="http://www.w3.org/1999/xhtml" class="comment-text">${esc(n.text ?? "")}</div></foreignObject></g>`,
-      );
-      continue;
-    }
-    const sid = stateIdOf(n);
-    if (sid === undefined) continue;
-    const isSub = subIds.has(sid);
-    const pill = (n as { styleAttributes?: { shape?: string } }).styleAttributes?.shape === "pill";
-    const cls = activeIds.has(sid) ? "state active" : doneIds.has(sid) ? "state done" : "state";
-    const rx = pill ? Math.min(n.width, n.height) / 2 : 14;
-    parts.push(`<g class="clickable" data-detail="state:${esc(sid)}"${isSub ? ` data-sub="${esc(sid)}"` : ""}>`);
-    parts.push(`<rect x="${n.x}" y="${n.y}" width="${n.width}" height="${n.height}" rx="${rx}" class="${cls}"/>`);
-    if (isSub) {
-      // Sub-machine states carry a DOUBLE border.
-      parts.push(
-        `<rect x="${n.x + 8}" y="${n.y + 8}" width="${n.width - 16}" height="${n.height - 16}" rx="${Math.max(4, rx - 8)}" class="${cls} inner"/>`,
-      );
-    }
-    const sub = subLabel(meta[sid]?.subtitle);
-    parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + (sub !== undefined ? -6 : 6)}" class="label">${esc(sid)}</text>`);
-    if (sub !== undefined) parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + 24}" class="sublabel">${esc(sub)}</text>`);
-    parts.push("</g>");
-    // Condition buttons ride the node's edges: enter on the LEFT (where the
-    // arrow comes in), leave on the RIGHT (in front of the arrow out).
-    const mt = meta[sid];
-    if (mt !== undefined) {
-      const cy = n.y + n.height / 2;
-      if (mt.has_entry) {
-        parts.push(
-          `<g class="clickable cond ${mt.entry_met ? "met" : "unmet"}" data-detail="cond:${esc(sid)}"><circle cx="${n.x}" cy="${cy}" r="18"/><text x="${n.x}" y="${cy + 7}" class="cond-label">${mt.entry_met ? "✓" : "!"}</text></g>`,
-        );
-      }
-      if (mt.has_exit) {
-        parts.push(
-          `<g class="clickable cond ${mt.exit_met ? "met" : "unmet"}" data-detail="cond:${esc(sid)}"><circle cx="${n.x + n.width}" cy="${cy}" r="18"/><text x="${n.x + n.width}" y="${cy + 7}" class="cond-label">${mt.exit_met ? "✓" : "!"}</text></g>`,
-        );
-      }
-    }
+function svgStateNode(
+  n: CNode,
+  activeIds: Set<string>,
+  doneIds: Set<string>,
+  subIds: Set<string>,
+  meta: Record<string, StateMeta>,
+): string[] {
+  const parts: string[] = [];
+  if (n.type === "text") {
+    parts.push(
+      `<g class="clickable" data-detail="comment"><rect x="${n.x}" y="${n.y}" width="${n.width}" height="${n.height}" class="comment"/>`,
+    );
+    parts.push(
+      `<foreignObject x="${n.x + 10}" y="${n.y + 6}" width="${n.width - 20}" height="${n.height - 12}"><div xmlns="http://www.w3.org/1999/xhtml" class="comment-text">${esc(n.text ?? "")}</div></foreignObject></g>`,
+    );
+    return parts;
   }
+  const sid = stateIdOf(n);
+  if (sid === undefined) return parts;
+  const isSub = subIds.has(sid);
+  const pill = (n as { styleAttributes?: { shape?: string } }).styleAttributes?.shape === "pill";
+  const cls = activeIds.has(sid) ? "state active" : doneIds.has(sid) ? "state done" : "state";
+  const rx = pill ? Math.min(n.width, n.height) / 2 : 14;
+  parts.push(`<g class="clickable" data-detail="state:${esc(sid)}"${isSub ? ` data-sub="${esc(sid)}"` : ""}>`);
+  parts.push(`<rect x="${n.x}" y="${n.y}" width="${n.width}" height="${n.height}" rx="${rx}" class="${cls}"/>`);
+  if (isSub) {
+    // Sub-machine states carry a DOUBLE border.
+    parts.push(
+      `<rect x="${n.x + 8}" y="${n.y + 8}" width="${n.width - 16}" height="${n.height - 16}" rx="${Math.max(4, rx - 8)}" class="${cls} inner"/>`,
+    );
+  }
+  const sub = subLabel(meta[sid]?.subtitle);
+  parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + (sub !== undefined ? -6 : 6)}" class="label">${esc(sid)}</text>`);
+  if (sub !== undefined) parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + 24}" class="sublabel">${esc(sub)}</text>`);
+  parts.push("</g>");
+  parts.push(...svgCondButtons(n, sid, meta[sid]));
+  return parts;
+}
 
-  // THE ROUTE IS DRAWN OVER THE NODES (owner ruling 2026-07-29), reversing
-  // the along-the-edges ruling of the same day. Riding the edges read as the
-  // graph highlighting itself; a navigation system lays its line ON the map.
-  // It is pushed LAST so it covers the boxes, exactly as a route does.
-  //
-  // ARRIVED MEANS CLEAR: with fewer than two stops there is no way left to
-  // show, so neither line nor arrow is drawn.
+// Condition buttons ride the node's edges: enter on the LEFT (where the
+// arrow comes in), leave on the RIGHT (in front of the arrow out).
+function svgCondButtons(n: CNode, sid: string, mt: StateMeta | undefined): string[] {
+  if (mt === undefined) return [];
+  const parts: string[] = [];
+  const cy = n.y + n.height / 2;
+  if (mt.has_entry) {
+    parts.push(
+      `<g class="clickable cond ${mt.entry_met ? "met" : "unmet"}" data-detail="cond:${esc(sid)}"><circle cx="${n.x}" cy="${cy}" r="18"/><text x="${n.x}" y="${cy + 7}" class="cond-label">${mt.entry_met ? "✓" : "!"}</text></g>`,
+    );
+  }
+  if (mt.has_exit) {
+    parts.push(
+      `<g class="clickable cond ${mt.exit_met ? "met" : "unmet"}" data-detail="cond:${esc(sid)}"><circle cx="${n.x + n.width}" cy="${cy}" r="18"/><text x="${n.x + n.width}" y="${cy + 7}" class="cond-label">${mt.exit_met ? "✓" : "!"}</text></g>`,
+    );
+  }
+  return parts;
+}
+
+// THE ROUTE IS DRAWN OVER THE NODES (owner ruling 2026-07-29), reversing
+// the along-the-edges ruling of the same day. Riding the edges read as the
+// graph highlighting itself; a navigation system lays its line ON the map.
+// It is pushed LAST so it covers the boxes, exactly as a route does.
+//
+// ARRIVED MEANS CLEAR: with fewer than two stops there is no way left to
+// show, so neither line nor arrow is drawn.
+function svgRoute(route: RouteMarks | undefined, nodeOfState: Map<string, CNode>): string[] {
+  const parts: string[] = [];
   const stops: { id: string; cx: number; cy: number }[] = [];
   for (const id of route?.path ?? []) {
     const n = nodeOfState.get(id);
@@ -286,50 +287,78 @@ function machineSvg(
     // between its top edge and its title, so the line never crosses the words.
     if (n !== undefined) stops.push({ id, cx: n.x + n.width / 2, cy: n.y + n.height / 4 });
   }
-  if (stops.length >= 2) {
-    // A ROAD CLOSURE (owner ruling 2026-07-29). The route already knows the hop
-    // the walk cannot pass — usually a state sitting above the autonomy slider.
-    // Drawn as one unbroken line the map says the whole way is open, which is
-    // the one moment it lies. So the line runs normally up to the closure and
-    // FADES past it: the way exists, it is shut.
-    const xy = (s: { cx: number; cy: number }): [number, number] => [s.cx, s.cy];
-    const shut = route?.blocked === undefined ? -1 : stops.findIndex((s) => s.id === route.blocked?.at);
-    const open = shut > 0 ? stops.slice(0, shut) : stops;
-    const past = shut > 0 ? stops.slice(shut - 1) : [];
-    // fill="none" is an ATTRIBUTE, not just a class rule. An SVG path with no
-    // fill declared paints SOLID BLACK, so the one time the stylesheet is not
-    // there the route becomes a black blob swallowing the drawing. That is not
-    // hypothetical: it is exactly what a reader saw, because the mirror morphs
-    // the body and never re-sent the <style>. The attribute survives that.
-    if (open.length >= 2) parts.push(`<path d="${splinePath(open.map(xy))}" fill="none" class="route-line"/>`);
-    if (past.length >= 2) parts.push(`<path d="${splinePath(past.map(xy))}" fill="none" class="route-line shut"/>`);
-    // A waypoint and the destination are the SAME filled dot. The owner's
-    // sketch drew the destination as a ring; that was the pen, not the intent.
-    for (const [i, s] of stops.entries()) {
-      if (route?.target === s.id || route?.waypoints.has(s.id) === true) {
-        parts.push(`<circle cx="${s.cx}" cy="${s.cy}" r="8" class="route-stop${shut > 0 && i >= shut ? " shut" : ""}"/>`);
-      }
+  if (stops.length < 2) return parts;
+  // A ROAD CLOSURE (owner ruling 2026-07-29). The route already knows the hop
+  // the walk cannot pass — usually a state sitting above the autonomy slider.
+  // Drawn as one unbroken line the map says the whole way is open, which is
+  // the one moment it lies. So the line runs normally up to the closure and
+  // FADES past it: the way exists, it is shut.
+  const xy = (s: { cx: number; cy: number }): [number, number] => [s.cx, s.cy];
+  const shut = route?.blocked === undefined ? -1 : stops.findIndex((s) => s.id === route.blocked?.at);
+  const open = shut > 0 ? stops.slice(0, shut) : stops;
+  const past = shut > 0 ? stops.slice(shut - 1) : [];
+  // fill="none" is an ATTRIBUTE, not just a class rule. An SVG path with no
+  // fill declared paints SOLID BLACK, so the one time the stylesheet is not
+  // there the route becomes a black blob swallowing the drawing. That is not
+  // hypothetical: it is exactly what a reader saw, because the mirror morphs
+  // the body and never re-sent the <style>. The attribute survives that.
+  if (open.length >= 2) parts.push(`<path d="${splinePath(open.map(xy))}" fill="none" class="route-line"/>`);
+  if (past.length >= 2) parts.push(`<path d="${splinePath(past.map(xy))}" fill="none" class="route-line shut"/>`);
+  // A waypoint and the destination are the SAME filled dot. The owner's
+  // sketch drew the destination as a ring; that was the pen, not the intent.
+  for (const [i, s] of stops.entries()) {
+    if (route?.target === s.id || route?.waypoints.has(s.id) === true) {
+      parts.push(`<circle cx="${s.cx}" cy="${s.cy}" r="8" class="route-stop${shut > 0 && i >= shut ? " shut" : ""}"/>`);
     }
-    // THE CLOSURE MARK, on the hop that shuts, carrying the reason. An
-    // exclamation in a ring rather than a bar across the line: a bar reads as
-    // part of the road, and it stays upright whichever way the road runs.
-    if (shut > 0) {
-      const b = stops[shut];
-      parts.push(
-        `<g class="clickable" data-detail="state:${esc(b.id)}"><title>${esc(route?.blocked?.why ?? "")}</title>` +
-          `<g class="route-shut" transform="translate(${b.cx} ${b.cy})">` +
-          `<circle r="12" class="shut-ring"/><path d="M 0 -6.5 L 0 2.5" class="shut-bang"/><circle cy="7" r="1.7" class="shut-dot"/>` +
-          `</g></g>`,
-      );
-    }
-    // YOU ARE HERE: the arrow a map puts under your car, turned to face the
-    // way the line is going.
-    const heading = (Math.atan2(stops[1].cy - stops[0].cy, stops[1].cx - stops[0].cx) * 180) / Math.PI + 90;
+  }
+  // THE CLOSURE MARK, on the hop that shuts, carrying the reason. An
+  // exclamation in a ring rather than a bar across the line: a bar reads as
+  // part of the road, and it stays upright whichever way the road runs.
+  if (shut > 0) {
+    const b = stops[shut];
     parts.push(
-      `<path d="M 0 -12 L 10 9 L 0 4 L -10 9 Z" class="route-here" transform="translate(${stops[0].cx} ${stops[0].cy}) rotate(${heading.toFixed(1)})"/>`,
+      `<g class="clickable" data-detail="state:${esc(b.id)}"><title>${esc(route?.blocked?.why ?? "")}</title>` +
+        `<g class="route-shut" transform="translate(${b.cx} ${b.cy})">` +
+        `<circle r="12" class="shut-ring"/><path d="M 0 -6.5 L 0 2.5" class="shut-bang"/><circle cy="7" r="1.7" class="shut-dot"/>` +
+        `</g></g>`,
     );
   }
+  // YOU ARE HERE: the arrow a map puts under your car, turned to face the
+  // way the line is going.
+  const heading = (Math.atan2(stops[1].cy - stops[0].cy, stops[1].cx - stops[0].cx) * 180) / Math.PI + 90;
+  parts.push(
+    `<path d="M 0 -12 L 10 9 L 0 4 L -10 9 Z" class="route-here" transform="translate(${stops[0].cx} ${stops[0].cy}) rotate(${heading.toFixed(1)})"/>`,
+  );
+  return parts;
+}
 
+function machineSvg(
+  source: CanvasData,
+  activeIds: Set<string>,
+  doneIds: Set<string>,
+  subIds: Set<string>,
+  meta: Record<string, StateMeta>,
+  route?: RouteMarks,
+): string {
+  const canvas = source;
+  const nodes = canvas.nodes ?? [];
+  const pad = 60;
+  const minX = Math.min(...nodes.map((n) => n.x)) - pad;
+  const minY = Math.min(...nodes.map((n) => n.y)) - pad;
+  const maxX = Math.max(...nodes.map((n) => n.x + n.width)) + pad;
+  const maxY = Math.max(...nodes.map((n) => n.y + n.height)) + pad;
+  const byId = new Map(nodes.map((n) => [n.id, n]));
+  const nodeOfState = new Map<string, CNode>();
+  for (const n of nodes) {
+    const s = stateIdOf(n);
+    if (s !== undefined) nodeOfState.set(s, n);
+  }
+  const parts: string[] = [
+    ...svgGroups(nodes),
+    ...svgEdges(canvas, byId),
+    ...nodes.flatMap((n) => svgStateNode(n, activeIds, doneIds, subIds, meta)),
+    ...svgRoute(route, nodeOfState),
+  ];
   return `<svg id="machine-svg" viewBox="${minX} ${minY} ${maxX - minX} ${maxY - minY}">
   <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowhead"/></marker></defs>
   ${parts.join("\n  ")}</svg>`;
