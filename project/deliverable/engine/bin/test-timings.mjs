@@ -21,22 +21,49 @@ const OUT = join(ROOT, ".se", "test-timings.jsonl");
 // per run, so the retro reads the hotspots without aggregating the append log.
 const LAST = join(ROOT, ".se", "test-last-run.json");
 
+// THE BEAT FILE: one line per finished file and per dying test, appended AS
+// IT HAPPENS. The end-of-run record cannot serve a killed run; this stream
+// survives any kill, so a poll reads N of M and a kill names the hang list.
+const PROGRESS = join(ROOT, ".se", "test-progress.jsonl");
+
 export default async function* timings(source) {
   const run = new Date().toISOString();
   const rows = [];
+  const perFile = new Map();
+  const beat = (obj) => {
+    try {
+      appendFileSync(PROGRESS, JSON.stringify(obj) + "\n", "utf8");
+    } catch {
+      // bookkeeping never fails the suite
+    }
+  };
   for await (const event of source) {
     if (event.type !== "test:pass" && event.type !== "test:fail") continue;
     const d = event.data;
     // A SUITE reports the sum of its children, so counting it too would
-    // double the total. Only leaves are the real cost.
-    if (d.details?.type === "suite") continue;
-    rows.push({
+    // double the total. Only leaves are the real cost. The FILE itself
+    // closes as a nesting-0 suite — that close is the progress beat.
+    if (d.details?.type === "suite") {
+      if (d.nesting === 0 && d.file !== undefined) {
+        const file = relative(ROOT, d.file).split("\\").join("/");
+        beat({ file, ...(perFile.get(file) ?? { cases: 0, failed: 0 }), ms: Math.round(Number(d.details?.duration_ms ?? 0)), ok: event.type === "test:pass" });
+      }
+      continue;
+    }
+    const row = {
       run,
       file: d.file === undefined ? "" : relative(ROOT, d.file).split("\\").join("/"),
       name: String(d.name ?? ""),
       ms: Math.round(Number(d.details?.duration_ms ?? 0)),
       ok: event.type === "test:pass",
-    });
+    };
+    rows.push(row);
+    const agg = perFile.get(row.file) ?? { cases: 0, failed: 0 };
+    agg.cases += 1;
+    if (!row.ok) agg.failed += 1;
+    perFile.set(row.file, agg);
+    // A dying test streams its WHY the moment it dies.
+    if (!row.ok) beat({ fail: row.name, file: row.file, msg: String(d.details?.error?.message ?? d.details?.error ?? "").split("\n")[0].slice(0, 300) });
   }
   try {
     mkdirSync(dirname(OUT), { recursive: true });

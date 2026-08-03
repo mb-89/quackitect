@@ -51,6 +51,31 @@ function batteryPace(se: string): string {
   }
 }
 
+/** Live progress of a running battery, read from the reporter's beat file.
+ *  Absent when the stream is missing or belongs to an older run. */
+function batteryProgress(se: string, since: number): Record<string, unknown> | undefined {
+  try {
+    const lines = readFileSync(join(se, "test-progress.jsonl"), "utf8").split("\n").filter((l) => l.trim() !== "");
+    const head = JSON.parse(lines[0]) as { start?: string; files_total?: number };
+    if (typeof head.start !== "string" || Date.parse(head.start) < since) return undefined;
+    let done = 0;
+    const failures: string[] = [];
+    for (const line of lines.slice(1)) {
+      let rec: { file?: string; fail?: string; msg?: string };
+      try {
+        rec = JSON.parse(line);
+      } catch {
+        continue;
+      }
+      if (typeof rec.fail === "string") failures.push(`${rec.fail}${typeof rec.msg === "string" && rec.msg !== "" ? `: ${rec.msg}` : ""}`);
+      else if (typeof rec.file === "string") done += 1;
+    }
+    return { files_done: done, files_total: head.files_total, ...(failures.length > 0 ? { failures_so_far: failures } : {}) };
+  } catch {
+    return undefined;
+  }
+}
+
 /** THE TICK — the machinery's one tool, legal in every state. */
 export function sessionTools(session: Session): ToolDef[] {
   return [
@@ -619,7 +644,9 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
           if (args.wait_ms !== undefined) {
             await Promise.race([t.done, new Promise((r) => setTimeout(r, Math.max(0, Math.min(Number(args.wait_ms), HOST_SAFE_WAIT_MS))))]);
           }
-          return t.verdict ?? { job: id, running: true, elapsed_ms: Date.now() - t.started, note: `still running — ask again with {job}. Each wait blocks at most ${HOST_SAFE_WAIT_MS / 1000}s; poll until running is false.${t.pace}` };
+          if (t.verdict !== undefined) return t.verdict;
+          const progress = t.pace !== "" ? batteryProgress(se, t.started) : undefined;
+          return { job: id, running: true, elapsed_ms: Date.now() - t.started, ...(progress !== undefined ? { progress } : {}), note: `still running — ask again with {job}. Each wait blocks at most ${HOST_SAFE_WAIT_MS / 1000}s; poll until running is false.${t.pace}` };
         }
         // A TEST RUN NEVER OUTLIVES ITS SESSION (found 2026-08-02: two
         // orphaned workers held a folder lock for four hours). Children run

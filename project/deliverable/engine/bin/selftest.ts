@@ -14,7 +14,7 @@
 // The ENGINE observes the result.
 //
 //   node engine/bin/selftest.ts --root <project root>
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { spawn } from "node:child_process";
 import { killTree } from "../run.ts";
@@ -73,15 +73,25 @@ const CAP_MS = 300_000;
 // its per-file workers orphaned (two held a folder lock for four hours,
 // 2026-08-02).
 const lastRunPath = join(root, ".se", "test-last-run.json");
-const priorWallMs = (() => {
+const prior = (() => {
   try {
-    const rec = JSON.parse(readFileSync(lastRunPath, "utf8")) as { wall_ms?: number };
-    return typeof rec.wall_ms === "number" ? rec.wall_ms : undefined;
+    const rec = JSON.parse(readFileSync(lastRunPath, "utf8")) as { wall_ms?: number; files?: { file: string; sum_ms: number }[] };
+    return { wall_ms: typeof rec.wall_ms === "number" ? rec.wall_ms : undefined, files: new Map((rec.files ?? []).map((f) => [f.file, f.sum_ms])) };
   } catch {
-    return undefined;
+    return { wall_ms: undefined, files: new Map<string, number>() };
   }
 })();
 const startedAt = Date.now();
+// The reporter appends a beat per finished file; the header is the parent's,
+// so a poll can answer N of M and a kill can name what never finished.
+const progressPath = join(root, ".se", "test-progress.jsonl");
+const expectedFiles = files.map((f) => `project/deliverable/${f.replace(/\\/g, "/")}`);
+try {
+  mkdirSync(join(root, ".se"), { recursive: true });
+  writeFileSync(progressPath, `${JSON.stringify({ start: new Date(startedAt).toISOString(), files_total: expectedFiles.length })}\n`, "utf8");
+} catch {
+  // bookkeeping never blocks the run
+}
 const r = await new Promise<{ status: number | null; killed: boolean; out: string }>((resolveRun) => {
   const child = spawn(process.execPath, ["--test", ...REPORTERS, ...files], {
     cwd: dir,
@@ -100,7 +110,34 @@ const r = await new Promise<{ status: number | null; killed: boolean; out: strin
   child.on("close", (code) => { clearTimeout(timer); resolveRun({ status: code, killed, out: acc }); });
 });
 if (r.killed) {
-  process.stdout.write(`selftest: KILLED at its ${CAP_MS / 1000}s cap — the run is TRUNCATED, the tallies below are not a verdict${priorWallMs !== undefined ? ` (the last completed battery took ${Math.round(priorWallMs / 1000)}s)` : ""}\n`);
+  process.stdout.write(`selftest: KILLED at its ${CAP_MS / 1000}s cap — the run is TRUNCATED, the tallies below are not a verdict${prior.wall_ms !== undefined ? ` (the last completed battery took ${Math.round(prior.wall_ms / 1000)}s)` : ""}\n`);
+  // The beat stream outlives the kill: what never finished IS the diagnosis,
+  // and a finished file far over its own last-run cost gets named too.
+  try {
+    const finished = new Map<string, number>();
+    const fails: string[] = [];
+    for (const line of readFileSync(progressPath, "utf8").split("\n").slice(1)) {
+      if (line.trim() === "") continue;
+      let rec: { file?: string; ms?: number; fail?: string; msg?: string };
+      try {
+        rec = JSON.parse(line);
+      } catch {
+        continue;
+      }
+      if (typeof rec.fail === "string") fails.push(`  ${rec.fail}${typeof rec.msg === "string" && rec.msg !== "" ? ` — ${rec.msg}` : ""}`);
+      else if (typeof rec.file === "string") finished.set(rec.file, Number(rec.ms ?? 0));
+    }
+    const unfinished = expectedFiles.filter((f) => !finished.has(f));
+    process.stdout.write(`finished ${finished.size} of ${expectedFiles.length} files. UNFINISHED — the hang list:\n${unfinished.map((f) => `  ${f}`).join("\n")}\n`);
+    const over = [...finished].filter(([f, ms]) => {
+      const base = prior.files.get(f);
+      return base !== undefined && ms > 2 * base && ms - base > 1000;
+    });
+    if (over.length > 0) process.stdout.write(`over their last-run baseline:\n${over.map(([f, ms]) => `  ${f} ${(ms / 1000).toFixed(1)}s (last run ${((prior.files.get(f) ?? 0) / 1000).toFixed(1)}s)`).join("\n")}\n`);
+    if (fails.length > 0) process.stdout.write(`failures before the kill:\n${fails.join("\n")}\n`);
+  } catch {
+    // no beat stream — the reporter never started
+  }
 }
 // The reporter's record gains the wall clock — only a record THIS run wrote.
 // A killed run leaves the old record standing, and yesterday's record must
@@ -122,13 +159,20 @@ const out = r.out;
 // moved to spec — so it quietly matched NOTHING and every run fell back to
 // the last 1500 characters. A summary that stops summarising without saying
 // so is worse than no summary, because the caller cannot tell.
+// A dying test's WHY survives into the verdict: the spec reporter's closing
+// "failing tests" section carries name, message and stack, and the old
+// filter dropped everything but the ✖ name line.
+const failingAt = out.search(/^✖ failing tests:/m);
+const failingSection = failingAt >= 0 ? out.slice(failingAt) : "";
 const summary = out
   .split("\n")
   .map((l) => l.trimEnd())
   .filter((l) => {
     const t = l.trimStart();
-    return l.startsWith("not ok") || t.startsWith("✖") || /^[#ℹ] (tests|suites|pass|fail) /.test(t);
+    if (l.startsWith("not ok")) return true;
+    if (t.startsWith("✖")) return failingSection === "";
+    return /^[#ℹ] (tests|suites|pass|fail) /.test(t);
   })
   .join("\n");
-process.stdout.write(`${summary || out.slice(-1500)}\n`);
+process.stdout.write(`${[summary, failingSection].filter((s) => s !== "").join("\n") || out.slice(-1500)}\n`);
 process.exit(r.status ?? 1);
