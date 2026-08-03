@@ -17,7 +17,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { availableParallelism } from "node:os";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { killTree } from "../run.ts";
 import { pathToFileURL } from "node:url";
 
@@ -97,6 +97,25 @@ try {
 } catch {
   // bookkeeping never blocks the run
 }
+// The cap's last act before the kill: photograph the still-living workers.
+// What refuses to exit IS the diagnosis, and the kill destroys the evidence —
+// the 60-file stall of 2026-08-03 died unnamed exactly this way.
+let stuckWorkers = "";
+function snapshotWorkers(): string {
+  try {
+    const r =
+      process.platform === "win32"
+        ? spawnSync("powershell", ["-NoProfile", "-Command", "Get-CimInstance Win32_Process -Filter \"Name='node.exe'\" | ForEach-Object { \"$($_.ProcessId) $($_.CommandLine)\" }"], { encoding: "utf8", windowsHide: true, timeout: 10_000 })
+        : spawnSync("ps", ["-eo", "pid,args"], { encoding: "utf8", timeout: 10_000 });
+    return (r.stdout ?? "")
+      .split("\n")
+      .filter((l) => l.includes("tests\\") || l.includes("tests/"))
+      .map((l) => `  ${l.trim().slice(0, 600)}`)
+      .join("\n");
+  } catch {
+    return "";
+  }
+}
 const r = await new Promise<{ status: number | null; killed: boolean; out: string }>((resolveRun) => {
   const child = spawn(process.execPath, ["--test", ...REPORTERS, ...files], {
     cwd: dir,
@@ -106,7 +125,7 @@ const r = await new Promise<{ status: number | null; killed: boolean; out: strin
   });
   let acc = "";
   let killed = false;
-  const timer = setTimeout(() => { killed = true; killTree(child.pid); }, CAP_MS);
+  const timer = setTimeout(() => { killed = true; stuckWorkers = snapshotWorkers(); killTree(child.pid); }, CAP_MS);
   child.stdout?.setEncoding("utf8");
   child.stderr?.setEncoding("utf8");
   child.stdout?.on("data", (c: string) => { acc += c; });
@@ -160,6 +179,7 @@ if (r.killed) {
   } catch {
     // no beat stream — the reporter never started
   }
+  if (stuckWorkers !== "") process.stdout.write(`workers alive at the kill — what refused to exit:\n${stuckWorkers}\n`);
 }
 // The reporter's record gains the wall clock — only a record THIS run wrote.
 // A killed run leaves the old record standing, and yesterday's record must
