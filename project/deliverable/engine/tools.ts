@@ -835,59 +835,58 @@ export function coreTools(
           }
           return { status: v.exit, out };
         };
-        const work = (async (): Promise<Record<string, unknown>> => {
-          const wantsScope = args.files !== undefined || args.name_pattern !== undefined;
-          if (wantsScope) {
-            // 'pull', 'pull.test.ts', 'tests/pull.test.ts', full path — one file.
-            const named = (Array.isArray(args.files) ? (args.files as unknown[]).map(String) : []).map((f) => {
-              const base = f.split("/").pop() as string;
-              const file = base.endsWith(".test.ts") ? base : `${base}.test.ts`;
-              return `project/deliverable/tests/${file}`;
+        // 'pull', 'pull.test.ts', 'tests/pull.test.ts', full path — one file.
+        const runScoped = async (): Promise<Record<string, unknown>> => {
+          const named = (Array.isArray(args.files) ? (args.files as unknown[]).map(String) : []).map((f) => {
+            const base = f.split("/").pop() as string;
+            const file = base.endsWith(".test.ts") ? base : `${base}.test.ts`;
+            return `project/deliverable/tests/${file}`;
+          });
+          const files = named.length > 0 ? [...new Set(named)].sort() : suiteFiles(root);
+          const missing = files.filter((f) => !existsSync(resolveInRoot(root, f, "engine/tools.ts se_test")));
+          if (missing.length > 0) {
+            throw new Rejection({
+              clause: CLAUSES.REQUIRED_ARGS,
+              expected: "test files that exist under project/deliverable/tests/",
+              got: `unknown: ${missing.join(", ")}`,
+              remedy: {
+                tool: "se_file_glob",
+                args: { glob: "project/deliverable/tests/*.test.ts" },
+                note: "list the suite, then name your scope",
+              },
+              source: "engine/tools.ts se_test",
             });
-            const files = named.length > 0 ? [...new Set(named)].sort() : suiteFiles(root);
-            const missing = files.filter((f) => !existsSync(resolveInRoot(root, f, "engine/tools.ts se_test")));
-            if (missing.length > 0) {
-              throw new Rejection({
-                clause: CLAUSES.REQUIRED_ARGS,
-                expected: "test files that exist under project/deliverable/tests/",
-                got: `unknown: ${missing.join(", ")}`,
-                remedy: {
-                  tool: "se_file_glob",
-                  args: { glob: "project/deliverable/tests/*.test.ts" },
-                  note: "list the suite, then name your scope",
-                },
-                source: "engine/tools.ts se_test",
-              });
-            }
-            const scope = `${files.join(",")}${args.name_pattern !== undefined ? `#${String(args.name_pattern)}` : ""}`;
-            testGate(se, root, force, scope);
-            if (named.length > 0) scopedGate(se, root, files, force);
-            const argv = [
-              "--test",
-              "--test-reporter=tap",
-              ...(args.name_pattern !== undefined ? [`--test-name-pattern=${String(args.name_pattern)}`] : []),
-              ...files.map((f) => resolveInRoot(root, f, "engine/tools.ts se_test")),
-            ];
-            const r = await spawnNode(argv, Number(process.env.SE_TEST_SCOPED_TIMEOUT_MS ?? 150_000));
-            const tap = parseTap(r.out);
-            const ok = r.status === 0 && tap.fail === 0;
-            const streak = testRecord(se, root, ok, scope, files);
-            const nudge = streakNudge(streak);
-            // Counts plus failures — the slice every temp-file grep was after.
-            // A long green streak carries the owner's law back with the result:
-            // in ~95% of cases the change broke nothing; test to answer a
-            // question, not to reassure.
-            return {
-              ok,
-              scope: { files, ...(args.name_pattern !== undefined ? { name_pattern: String(args.name_pattern) } : {}) },
-              tests: { total: tap.total, pass: tap.pass, fail: tap.fail },
-              ...(tap.failures.length > 0 ? { failures: tap.failures } : {}),
-              ...(nudge !== undefined ? { green_streak: streak, nudge } : {}),
-              ...(r.status !== 0 && tap.total === 0 ? { output: capMiddle(r.out.trim(), 4000) } : {}),
-            };
           }
-          // The battery: EARNED, not habitual. The gate computes the scoped
-          // remedy from the diff since the last green battery.
+          const scope = `${files.join(",")}${args.name_pattern !== undefined ? `#${String(args.name_pattern)}` : ""}`;
+          testGate(se, root, force, scope);
+          if (named.length > 0) scopedGate(se, root, files, force);
+          const argv = [
+            "--test",
+            "--test-reporter=tap",
+            ...(args.name_pattern !== undefined ? [`--test-name-pattern=${String(args.name_pattern)}`] : []),
+            ...files.map((f) => resolveInRoot(root, f, "engine/tools.ts se_test")),
+          ];
+          const r = await spawnNode(argv, Number(process.env.SE_TEST_SCOPED_TIMEOUT_MS ?? 150_000));
+          const tap = parseTap(r.out);
+          const ok = r.status === 0 && tap.fail === 0;
+          const streak = testRecord(se, root, ok, scope, files);
+          const nudge = streakNudge(streak);
+          // Counts plus failures — the slice every temp-file grep was after.
+          // A long green streak carries the owner's law back with the result:
+          // in ~95% of cases the change broke nothing; test to answer a
+          // question, not to reassure.
+          return {
+            ok,
+            scope: { files, ...(args.name_pattern !== undefined ? { name_pattern: String(args.name_pattern) } : {}) },
+            tests: { total: tap.total, pass: tap.pass, fail: tap.fail },
+            ...(tap.failures.length > 0 ? { failures: tap.failures } : {}),
+            ...(nudge !== undefined ? { green_streak: streak, nudge } : {}),
+            ...(r.status !== 0 && tap.total === 0 ? { output: capMiddle(r.out.trim(), 4000) } : {}),
+          };
+        };
+        // The battery: EARNED, not habitual. The gate computes the scoped
+        // remedy from the diff since the last green battery.
+        const runBattery = async (): Promise<Record<string, unknown>> => {
           batteryGate(se, root, force);
           testGate(se, root, force);
           const scripts = ["project/deliverable/engine/bin/preflight.ts", "project/deliverable/engine/bin/selftest.ts"];
@@ -904,7 +903,8 @@ export function coreTools(
           // tree can be answered from the record instead of another 90 seconds.
           testRecord(se, root, ok);
           return { ok, results };
-        })();
+        };
+        const work = args.files !== undefined || args.name_pattern !== undefined ? runScoped() : runBattery();
         const id = `test-${Date.now().toString(36)}-${++testSeq}`;
         // THE LAST RUN SIZES THE EXPECTATION (owner ruling 2026-08-03): a
         // battery caller is told how long the previous one took — measured,
