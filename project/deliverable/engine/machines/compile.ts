@@ -138,6 +138,147 @@ export function compileMachineCached(root: string, canvasPath: string): MachineD
 
 /** sources, when given, collects every file this compile read — the cache's
  *  watch list. Compiling without it is unchanged. */
+/** One drawn FILE node becomes a state: a nested .canvas machine, or a .md
+ *  note. Anything else refuses with the node named. */
+function stateFromElement(machineId: string, root: string, canvasPath: string, el: CanvasElement, sources?: string[]): StateDecl {
+  if (el.type !== "file") {
+    throw new MachineCompileError(machineId, `canvas node ${el.id}`, `states are file nodes onto notes (got type ${el.type})`);
+  }
+  const ref = el.file ?? "";
+  if (ref.endsWith(".canvas")) {
+    // A drawn machine nested as a state — its priority is declared in the
+    // sub-canvas frontmatter (it has no note).
+    const subId = ref
+      .replace(/\\/g, "/")
+      .split("/")
+      .pop()!
+      .replace(/\.canvas$/, "");
+    const subPath = resolveRef(root, canvasPath, ref);
+    sources?.push(subPath);
+    const subFm = existsSync(subPath) ? (loadCanvas(subPath).metadata?.frontmatter ?? {}) : {};
+    const subPriority = asPriority(subFm.priority);
+    if (subPriority === undefined) {
+      throw new MachineCompileError(
+        machineId,
+        `canvas node ${el.id}`,
+        `${subId}.canvas declares no priority in its frontmatter — every state has one (0.01 mechanical .. 0.8 killer; 1 ideation; above 1 human-only)`,
+      );
+    }
+    // A sub-canvas may carry conditions in its frontmatter (flat keys,
+    // like a note) — e.g. start_iteration's needs-retro gate.
+    const subEntry = conditionDict(machineId, ref, root, "entry", subFm);
+    const subExit = conditionDict(machineId, ref, root, "exit", subFm);
+    return {
+      id: subId,
+      kind: "work",
+      statement: typeof subFm.statement === "string" ? subFm.statement : "",
+      guidance: `A sub-machine: entering this state enters ${subId} at its start; this state completes when ${subId} reaches its end.`,
+      evidence_form: [],
+      submachine: ref,
+      priority: subPriority,
+      ...(subEntry !== undefined ? { entry: subEntry } : {}),
+      ...(subExit !== undefined ? { exit: subExit } : {}),
+      edges: [],
+    };
+  }
+  if (ref.endsWith(".md")) {
+    const notePath = resolveRef(root, canvasPath, ref);
+    sources?.push(notePath);
+    if (!existsSync(notePath)) {
+      throw new MachineCompileError(machineId, `canvas node ${el.id}`, `dangling reference: ${ref} not found`);
+    }
+    return stateFromNote(machineId, ref, notePath, root);
+  }
+  throw new MachineCompileError(
+    machineId,
+    `canvas node ${el.id}`,
+    `file ${JSON.stringify(ref)} is neither a state note (.md) nor a machine (.canvas)`,
+  );
+}
+
+// Group membership is geometric: a state whose center sits inside the
+// group rectangle carries its label (presentation only).
+function assignGroups(elements: CanvasElement[], byElement: Map<string, StateDecl>, groups: CanvasElement[]): void {
+  for (const el of elements) {
+    const s = byElement.get(el.id);
+    if (s === undefined) continue;
+    const cx = el.x + el.width / 2;
+    const cy = el.y + el.height / 2;
+    for (const g of groups) {
+      if (cx >= g.x && cx <= g.x + g.width && cy >= g.y && cy <= g.y + g.height && typeof g.label === "string" && g.label !== "") {
+        s.group = g.label;
+      }
+    }
+  }
+}
+
+type LoadedCanvas = ReturnType<typeof loadCanvas>;
+type CanvasEdge = NonNullable<LoadedCanvas["edges"]>[number];
+
+function edgeRoleOf(machineId: string, edge: CanvasEdge): { role: EdgeRole; declared: boolean } {
+  const roleRaw = edge.styleAttributes?.role ?? null;
+  const role = roleRaw === null ? "normal" : roleRaw;
+  if (typeof role !== "string" || !ROLES.has(role)) {
+    throw new MachineCompileError(machineId, `canvas edge ${edge.id}`, `unknown role ${JSON.stringify(roleRaw)}`);
+  }
+  return { role: role as EdgeRole, declared: roleRaw !== null };
+}
+
+function edgeGuardOf(machineId: string, edge: CanvasEdge): string {
+  const guard = (edge.label ?? "").trim();
+  if (guard !== "") {
+    try {
+      evalGuard(guard, {});
+    } catch {
+      throw new MachineCompileError(
+        machineId,
+        `canvas edge ${edge.id}`,
+        `label must be a guard (<counter> <op> <int>), got ${JSON.stringify(guard)}`,
+      );
+    }
+  }
+  return guard;
+}
+
+function drawnEdgesOf(machineId: string, canvas: LoadedCanvas, byElement: Map<string, StateDecl>): DrawnEdge[] {
+  const drawn: DrawnEdge[] = [];
+  for (const edge of canvas.edges ?? []) {
+    const from = byElement.get(edge.fromNode);
+    const to = byElement.get(edge.toNode);
+    if (from === undefined || to === undefined) {
+      throw new MachineCompileError(machineId, `canvas edge ${edge.id}`, "both ends must be drawn states");
+    }
+    const { role, declared } = edgeRoleOf(machineId, edge);
+    const guard = edgeGuardOf(machineId, edge);
+    drawn.push({
+      from,
+      decl: { to: to.id, role, ...(guard !== "" ? { guard } : {}) },
+      declared,
+      id: edge.id,
+    });
+    // ONE ARROW, BOTH WAYS (owner ruling 2026-07-28). Drawing a forward edge
+    // and a return edge as two separate arrows is what Obsidian makes
+    // tedious; a DOUBLE-HEADED arrow is what a person naturally draws
+    // instead, and Obsidian offers it in its own editor. So it means exactly
+    // that pair.
+    //
+    // The return half is left UNDECLARED on purpose, so the depth rule below
+    // names it: forward is whichever end lies deeper from start, and the
+    // other way round is the return. Nothing new decides anything.
+    if ((edge as { fromEnd?: string }).fromEnd === "arrow" && ((edge as { toEnd?: string }).toEnd ?? "arrow") === "arrow") {
+      drawn.push({
+        from: to,
+        decl: { to: from.id, role: "normal", ...(guard !== "" ? { guard } : {}) },
+        declared: false,
+        id: `${edge.id}~return`,
+      });
+    }
+  }
+  return drawn;
+}
+
+/** sources, when given, collects every file this compile read — the cache's
+ *  watch list. Compiling without it is unchanged. */
 export function compileMachine(root: string, canvasPath: string, sources?: string[]): MachineDecl {
   const machineId = canvasPath
     .replace(/\\/g, "/")
@@ -164,60 +305,7 @@ export function compileMachine(root: string, canvasPath: string, sources?: strin
       continue;
     }
     if (el.type === "text") continue; // comments
-    if (el.type !== "file") {
-      throw new MachineCompileError(machineId, `canvas node ${el.id}`, `states are file nodes onto notes (got type ${el.type})`);
-    }
-    const ref = el.file ?? "";
-    let decl: StateDecl;
-    if (ref.endsWith(".canvas")) {
-      // A drawn machine nested as a state — its priority is declared in the
-      // sub-canvas frontmatter (it has no note).
-      const subId = ref
-        .replace(/\\/g, "/")
-        .split("/")
-        .pop()!
-        .replace(/\.canvas$/, "");
-      const subPath = resolveRef(root, canvasPath, ref);
-      sources?.push(subPath);
-      const subFm = existsSync(subPath) ? (loadCanvas(subPath).metadata?.frontmatter ?? {}) : {};
-      const subPriority = asPriority(subFm.priority);
-      if (subPriority === undefined) {
-        throw new MachineCompileError(
-          machineId,
-          `canvas node ${el.id}`,
-          `${subId}.canvas declares no priority in its frontmatter — every state has one (0.01 mechanical .. 0.8 killer; 1 ideation; above 1 human-only)`,
-        );
-      }
-      // A sub-canvas may carry conditions in its frontmatter (flat keys,
-      // like a note) — e.g. start_iteration's needs-retro gate.
-      const subEntry = conditionDict(machineId, ref, root, "entry", subFm);
-      const subExit = conditionDict(machineId, ref, root, "exit", subFm);
-      decl = {
-        id: subId,
-        kind: "work",
-        statement: typeof subFm.statement === "string" ? subFm.statement : "",
-        guidance: `A sub-machine: entering this state enters ${subId} at its start; this state completes when ${subId} reaches its end.`,
-        evidence_form: [],
-        submachine: ref,
-        priority: subPriority,
-        ...(subEntry !== undefined ? { entry: subEntry } : {}),
-        ...(subExit !== undefined ? { exit: subExit } : {}),
-        edges: [],
-      };
-    } else if (ref.endsWith(".md")) {
-      const notePath = resolveRef(root, canvasPath, ref);
-      sources?.push(notePath);
-      if (!existsSync(notePath)) {
-        throw new MachineCompileError(machineId, `canvas node ${el.id}`, `dangling reference: ${ref} not found`);
-      }
-      decl = stateFromNote(machineId, ref, notePath, root);
-    } else {
-      throw new MachineCompileError(
-        machineId,
-        `canvas node ${el.id}`,
-        `file ${JSON.stringify(ref)} is neither a state note (.md) nor a machine (.canvas)`,
-      );
-    }
+    const decl = stateFromElement(machineId, root, canvasPath, el, sources);
     if (states.has(decl.id)) {
       throw new MachineCompileError(machineId, `canvas node ${el.id}`, `duplicate state ${decl.id}`);
     }
@@ -225,68 +313,8 @@ export function compileMachine(root: string, canvasPath: string, sources?: strin
     byElement.set(el.id, decl);
   }
 
-  // Group membership is geometric: a state whose center sits inside the
-  // group rectangle carries its label (presentation only).
-  for (const el of elements) {
-    const s = byElement.get(el.id);
-    if (s === undefined) continue;
-    const cx = el.x + el.width / 2;
-    const cy = el.y + el.height / 2;
-    for (const g of groups) {
-      if (cx >= g.x && cx <= g.x + g.width && cy >= g.y && cy <= g.y + g.height && typeof g.label === "string" && g.label !== "") {
-        s.group = g.label;
-      }
-    }
-  }
-
-  const drawn: DrawnEdge[] = [];
-  for (const edge of canvas.edges ?? []) {
-    const from = byElement.get(edge.fromNode);
-    const to = byElement.get(edge.toNode);
-    if (from === undefined || to === undefined) {
-      throw new MachineCompileError(machineId, `canvas edge ${edge.id}`, "both ends must be drawn states");
-    }
-    const roleRaw = edge.styleAttributes?.role ?? null;
-    const role = roleRaw === null ? "normal" : roleRaw;
-    if (typeof role !== "string" || !ROLES.has(role)) {
-      throw new MachineCompileError(machineId, `canvas edge ${edge.id}`, `unknown role ${JSON.stringify(roleRaw)}`);
-    }
-    const guard = (edge.label ?? "").trim();
-    if (guard !== "") {
-      try {
-        evalGuard(guard, {});
-      } catch {
-        throw new MachineCompileError(
-          machineId,
-          `canvas edge ${edge.id}`,
-          `label must be a guard (<counter> <op> <int>), got ${JSON.stringify(guard)}`,
-        );
-      }
-    }
-    drawn.push({
-      from,
-      decl: { to: to.id, role: role as EdgeRole, ...(guard !== "" ? { guard } : {}) },
-      declared: roleRaw !== null,
-      id: edge.id,
-    });
-    // ONE ARROW, BOTH WAYS (owner ruling 2026-07-28). Drawing a forward edge
-    // and a return edge as two separate arrows is what Obsidian makes
-    // tedious; a DOUBLE-HEADED arrow is what a person naturally draws
-    // instead, and Obsidian offers it in its own editor. So it means exactly
-    // that pair.
-    //
-    // The return half is left UNDECLARED on purpose, so the depth rule below
-    // names it: forward is whichever end lies deeper from start, and the
-    // other way round is the return. Nothing new decides anything.
-    if ((edge as { fromEnd?: string }).fromEnd === "arrow" && ((edge as { toEnd?: string }).toEnd ?? "arrow") === "arrow") {
-      drawn.push({
-        from: to,
-        decl: { to: from.id, role: "normal", ...(guard !== "" ? { guard } : {}) },
-        declared: false,
-        id: `${edge.id}~return`,
-      });
-    }
-  }
+  assignGroups(elements, byElement, groups);
+  const drawn = drawnEdgesOf(machineId, canvas, byElement);
 
   // start and end are MECHANICAL: every machine has exactly one of each.
   // The machinery enters at start (no frontmatter entry needed) and the
