@@ -262,7 +262,7 @@ export function generateSeeded(root: string, it: Iteration, machineId: string, k
           clause: CLAUSES.CONDITION_UNMET,
           expected: `chunk ${c.id} depends on a declared chunk`,
           got: d,
-          remedy: { tool: "se_file_read", args: { path: itChunksRel(it.id) }, note: "dependencies name chunk ids from the same drawing" },
+          remedy: { tool: "se_file_read", args: { path: itSeededRel(it.id, kind) }, note: "dependencies name chunk ids from the same drawing" },
           source: SRC,
         });
       }

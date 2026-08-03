@@ -39,7 +39,8 @@ export class MachineCompileError extends Error {
 
 // THE STANDARD REVIEW ROUNDS moved to machine.ts, where BOTH compilers can
 // reach one copy. Re-exported so existing importers keep working.
-export { STANDARD_ROUNDS } from "../machine.ts";
+import { STANDARD_ROUNDS } from "../machine.ts";
+export { STANDARD_ROUNDS };
 
 function evidenceForm(machineId: string, noteName: string, body: string): EvidenceField[] {
   const text = section(body, "Evidence form");
