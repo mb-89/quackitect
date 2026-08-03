@@ -80,9 +80,11 @@ test("the route collects every judgment and every document up front", () => {
   // EVERY doc the whole way demands, gathered once - this is what lets a
   // sweep be one call. Exit conditions count: most of the boot lane's
   // reads are demanded on the way OUT of a state, not into it.
-  // AGENTS.md was an exit-condition read until it was promoted. What the
-  // route still collects is the root guidance every packet pulls.
-  assert.ok(clear.reads.includes("project/guidance/contract.md"), "a pulled guidance read is collected");
+  // AGENTS.md was an exit-condition read until it was promoted, and the
+  // contract followed it into the prompt layer. What the route still
+  // collects is the UNPROMOTED root guidance every packet pulls.
+  assert.ok(clear.reads.includes("project/guidance/software.md"), "a pulled guidance read is collected");
+  assert.ok(!clear.reads.includes("project/guidance/contract.md"), "a promoted source never rides the route");
   assert.ok(clear.reads.includes("project/guidance/method/front-desk.md"), "and guidance the target PULLS, which no condition names");
   // Lowered, every hop needing a person is listed - not just the first, so
   // they can all be answered in one sitting.
