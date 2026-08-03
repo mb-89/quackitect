@@ -744,13 +744,29 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
         // battery's failure rate from the log.
         let detached = false;
         entry.done = work.then(
+          // The handler runs long after the call, OUTSIDE buildServer's
+          // scope — it builds its own CallLog, and it may NEVER throw: a
+          // rejection here rode a pending fetch through the transport and
+          // killed the engine (2026-08-03).
           (v) => {
             entry.verdict = { job: id, running: false, ...v };
-            if (detached) log.append({ tool: "se_test_verdict", args: { job: id, battery: pace !== "" }, ok: v.ok === true, outcome: "result", duration_ms: Date.now() - entry.started, response: { ok: v.ok, ...(v.tests !== undefined ? { tests: v.tests } : {}), ...(v.results !== undefined ? { results: v.results } : {}) } });
+            if (detached) {
+              try {
+                new CallLog(seDir(projectRoot)).append({ tool: "se_test_verdict", args: { job: id, battery: pace !== "" }, ok: v.ok === true, outcome: "result", duration_ms: Date.now() - entry.started, response: { ok: v.ok, ...(v.tests !== undefined ? { tests: v.tests } : {}), ...(v.results !== undefined ? { results: v.results } : {}) } });
+              } catch {
+                // bookkeeping never kills the engine
+              }
+            }
           },
           (e) => {
             entry.verdict = { job: id, running: false, refused: e instanceof Rejection ? e.toJSON() : String(e) };
-            if (detached) log.append({ tool: "se_test_verdict", args: { job: id, battery: pace !== "" }, ok: false, outcome: "rejected", duration_ms: Date.now() - entry.started, response: entry.verdict });
+            if (detached) {
+              try {
+                new CallLog(seDir(projectRoot)).append({ tool: "se_test_verdict", args: { job: id, battery: pace !== "" }, ok: false, outcome: "rejected", duration_ms: Date.now() - entry.started, response: entry.verdict });
+              } catch {
+                // bookkeeping never kills the engine
+              }
+            }
           },
         );
         testVerdicts.set(id, entry);
