@@ -635,6 +635,40 @@ class Parser {
     }
   }
 
+  private listLiteral(): Node {
+    const items: Node[] = [];
+    if (this.eat("]")) return { k: "list", items };
+    for (;;) {
+      items.push(this.or());
+      if (this.eat(",")) continue;
+      this.expect("]");
+      return { k: "list", items };
+    }
+  }
+
+  private objectLiteral(): Node {
+    const entries: [string, Node][] = [];
+    if (this.eat("}")) return { k: "object", entries };
+    for (;;) {
+      const key = this.peek();
+      if (key.k !== "str" && key.k !== "id") {
+        throw new Rejection({
+          clause: CLAUSES.REQUIRED_ARGS,
+          expected: "an object key",
+          got: JSON.stringify(this.src),
+          remedy: { tool: "se_file_read", args: { path: "project/spec/bases-syntax.md" }, note: "section 8 covers objects" },
+          source: SRC,
+        });
+      }
+      this.pos++;
+      this.expect(":");
+      entries.push([String(key.v), this.or()]);
+      if (this.eat(",")) continue;
+      this.expect("}");
+      return { k: "object", entries };
+    }
+  }
+
   private primary(): Node {
     const t = this.peek();
     if (t.k === "num") {
@@ -662,38 +696,8 @@ class Parser {
       this.expect(")");
       return n;
     }
-    if (this.eat("[")) {
-      const items: Node[] = [];
-      if (this.eat("]")) return { k: "list", items };
-      for (;;) {
-        items.push(this.or());
-        if (this.eat(",")) continue;
-        this.expect("]");
-        return { k: "list", items };
-      }
-    }
-    if (this.eat("{")) {
-      const entries: [string, Node][] = [];
-      if (this.eat("}")) return { k: "object", entries };
-      for (;;) {
-        const key = this.peek();
-        if (key.k !== "str" && key.k !== "id") {
-          throw new Rejection({
-            clause: CLAUSES.REQUIRED_ARGS,
-            expected: "an object key",
-            got: JSON.stringify(this.src),
-            remedy: { tool: "se_file_read", args: { path: "project/spec/bases-syntax.md" }, note: "section 8 covers objects" },
-            source: SRC,
-          });
-        }
-        this.pos++;
-        this.expect(":");
-        entries.push([String(key.v), this.or()]);
-        if (this.eat(",")) continue;
-        this.expect("}");
-        return { k: "object", entries };
-      }
-    }
+    if (this.eat("[")) return this.listLiteral();
+    if (this.eat("{")) return this.objectLiteral();
     throw new Rejection({
       clause: CLAUSES.REQUIRED_ARGS,
       expected: "a value, a property or a function call",
