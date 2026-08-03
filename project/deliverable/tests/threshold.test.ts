@@ -16,7 +16,7 @@ import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { call, checkDocs, freshRoot, handOver, readEverything, sessionAtIdle } from "./helpers.ts";
 
-const root = (): string => freshRoot(mkdtempSync(join(tmpdir(), "se-thr-")));
+const root = (): string => freshRoot();
 
 test("autonomy 0 is manual mode: the agent's pull waits, the human walks freely", async () => {
   const r = root();

@@ -12,7 +12,7 @@ function graph(edges: Record<string, string[]>, priority: Record<string, number>
   return (q: string): RouteNode | undefined =>
     edges[q] === undefined
       ? undefined
-      : { priority: priority[q] ?? 0.01, demands: {}, nexts: edges[q].map((to) => ({ to, tick: { from: q, to } })) };
+      : { priority: priority[q] ?? 0.01, demands: {}, exit_demands: {}, nexts: edges[q].map((to) => ({ to, tick: { from: q, to } })) };
 }
 
 test("the search finds the FEWEST hops, and says so when there is no way", () => {

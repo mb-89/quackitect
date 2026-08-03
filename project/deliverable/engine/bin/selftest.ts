@@ -105,12 +105,18 @@ function snapshotWorkers(): string {
   try {
     const r =
       process.platform === "win32"
-        ? spawnSync("powershell", ["-NoProfile", "-Command", "Get-CimInstance Win32_Process -Filter \"Name='node.exe'\" | ForEach-Object { \"$($_.ProcessId) $($_.CommandLine)\" }"], { encoding: "utf8", windowsHide: true, timeout: 10_000 })
+        ? spawnSync("powershell", ["-NoProfile", "-Command", "Get-CimInstance Win32_Process -Filter \"Name='node.exe'\" | ForEach-Object { \"$($_.ProcessId) ppid=$($_.ParentProcessId) $($_.CommandLine)\" }"], { encoding: "utf8", windowsHide: true, timeout: 10_000 })
         : spawnSync("ps", ["-eo", "pid,args"], { encoding: "utf8", timeout: 10_000 });
     return (r.stdout ?? "")
       .split("\n")
       .filter((l) => l.includes("tests\\") || l.includes("tests/"))
-      .map((l) => `  ${l.trim().slice(0, 600)}`)
+      // Head AND tail: a worker's argv can carry node's whole serialized
+      // option set, and the script path — the name that matters — sits at
+      // the very end. Two truncations lost it twice.
+      .map((l) => {
+        const t = l.trim();
+        return `  ${t.length <= 340 ? t : `${t.slice(0, 100)} … ${t.slice(-220)}`}`;
+      })
       .join("\n");
   } catch {
     return "";

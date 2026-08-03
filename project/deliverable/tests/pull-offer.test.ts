@@ -22,7 +22,7 @@ import { describe, test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { freshRoot, readEverything, sessionAtIdle } from "./helpers.ts";
 
-const root = (): string => freshRoot(mkdtempSync(join(tmpdir(), "se-pullo-")));
+const root = (): string => freshRoot();
 
 describe("the batch", { concurrency: true }, () => {
   test("`do` walks the whole happy path in ONE call, not one hop per call", async () => {

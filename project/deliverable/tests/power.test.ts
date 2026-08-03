@@ -85,7 +85,7 @@ function freshRootWithProduct(): string {
 }
 
 describe("the power flags on the session", () => {
-  const root = (): string => freshRoot(mkdtempSync(join(tmpdir(), "se-power-")));
+  const root = (): string => freshRoot();
 
   test("both start off, so a fresh session touches power at all", () => {
     const s = new Session(root());
@@ -124,7 +124,7 @@ describe("the power flags on the session", () => {
 });
 
 describe("the idle clock", () => {
-  const root = (): string => freshRoot(mkdtempSync(join(tmpdir(), "se-idle-")));
+  const root = (): string => freshRoot();
 
   test("a session that just acted is not idle", () => {
     assert.equal(new Session(root()).idleFor(60_000), false);

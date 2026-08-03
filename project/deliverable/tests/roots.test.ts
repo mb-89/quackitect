@@ -28,16 +28,16 @@ describe("declared roots", { concurrency: true }, () => {
   // THE ROUTING RULE. An "@" address is session state exactly like .se/, so it
   // is answered by the PROJECT root however deep in a worktree the walk is.
   test("an @ address routes to the project root, whatever else is bound", () => {
-    const s = new Session(REPO_ROOT, mainMachinePath(REPO_ROOT));
-    assert.equal(s.laneRoot("@ai"), s.root, "a bare root name");
-    assert.equal(s.laneRoot("@ai/sya_kb/digest"), s.root, "a path inside one");
-    assert.equal(s.laneRoot("@ai/**/*.md"), s.root, "A GLOB — the case that broke");
+    const s = new Session(REPO_ROOT);
+    assert.equal(s.laneRoot("@ai"), REPO_ROOT, "a bare root name");
+    assert.equal(s.laneRoot("@ai/sya_kb/digest"), REPO_ROOT, "a path inside one");
+    assert.equal(s.laneRoot("@ai/**/*.md"), REPO_ROOT, "A GLOB — the case that broke");
   });
 
   // ...and the other side of it, so a fix here never quietly redirects
   // ordinary work out of the worktree it belongs in.
   test("everything else still answers from the work root", () => {
-    const s = new Session(REPO_ROOT, mainMachinePath(REPO_ROOT));
+    const s = new Session(REPO_ROOT);
     assert.equal(s.laneRoot(), s.workRoot(), "no address at all");
     assert.equal(s.laneRoot("project/guidance/ux.md"), s.workRoot(), "an ordinary path");
     assert.equal(s.laneRoot("project/**/*.md"), s.workRoot(), "an ordinary glob");

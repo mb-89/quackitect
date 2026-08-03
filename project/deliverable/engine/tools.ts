@@ -28,7 +28,7 @@ import { capJson, capMiddle } from "./jsonio.ts";
 import { McpServer, type ToolDef } from "./mcp.ts";
 import { gitLand, gitLane, gitSync } from "./gitlane.ts";
 import { fileMove } from "./move.ts";
-import { renderMirror } from "./render.ts";
+import { renderMirror, type MirrorState } from "./render.ts";
 import { shoot } from "./shoot.ts";
 import { spawn } from "node:child_process";
 import { openPanel } from "./panel.ts";
@@ -234,7 +234,7 @@ function readMany(rootOf: (rel?: string) => string, entries: unknown[], ref: str
         ...(spec.limit !== undefined ? { limit: Number(spec.limit) } : {}),
         ...(ref !== undefined ? { ref } : {}),
         ...(spec.optional === true || optional ? { optional: true } : {}),
-      }) as Record<string, unknown>;
+      }) as unknown as Record<string, unknown>;
     } catch (err) {
       const r = err as { clause?: string; expected?: string; got?: string; remedy?: unknown; message?: string };
       return { path, refused: { clause: r.clause, expected: r.expected ?? r.message, got: r.got, remedy: r.remedy } };
@@ -255,7 +255,7 @@ export interface ReadingHook {
   credit(offset: number, lines: number): string[];
 }
 
-export function coreTools(rootOf: (rel?: string) => string, projectRoot: string, judgmentDrainAllowed: () => boolean = () => true, reading?: ReadingHook, doors: () => Record<string, unknown>[] = () => []): ToolDef[] {
+export function coreTools(rootOf: (rel?: string) => string, projectRoot: string, judgmentDrainAllowed: () => boolean = () => true, reading?: ReadingHook, doors: () => Record<string, unknown>[] = () => [], mirror?: () => MirrorState): ToolDef[] {
   return [
     {
       name: "se_file_read",
@@ -533,9 +533,18 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
       },
       handler: (args) => {
         const w = args.widget === undefined ? undefined : (String(args.widget) as "machine" | "details" | "log" | "terminal" | "table");
+        if (mirror === undefined) {
+          throw new Rejection({
+            clause: CLAUSES.CONDITION_UNMET,
+            expected: "a server built with a mirror surface",
+            got: "no mirror on this build",
+            remedy: { tool: "se_pull", args: {}, note: "the full engine serves the mirror; this build cannot shoot it" },
+            source: "engine/tools.ts se_shoot",
+          });
+        }
         // The same renderer the owner's mirror uses, so the picture is the
         // surface itself rather than a second drawing of it.
-        const html = renderMirror({ root: rootOf(), session }, w, args.view === undefined ? undefined : String(args.view));
+        const html = renderMirror(mirror(), w, args.view === undefined ? undefined : String(args.view));
         // .se IS SESSION STATE, so a shot belongs to the PROJECT root however
         // deep in a worktree the walk stands — exactly as the handover, the
         // notes and the call log do. Passing rootOf() with no address would
@@ -1074,7 +1083,7 @@ function refuseProseWall(tool: string, field: string, text: string): void {
 
 // se_test's handed-off runs: the verdict outlives the CALL — recorded here,
 // served by se_test {job}, whatever the client's timeout did.
-const testVerdicts = new Map<string, { done: Promise<void>; verdict?: Record<string, unknown> }>();
+const testVerdicts = new Map<string, { done: Promise<void>; verdict?: Record<string, unknown>; started: number; pace: string }>();
 let testSeq = 0;
 
 export function buildServer(root: string, session = new Session(root), tollOpts: { windowMs?: number; now?: () => number } = {}): McpServer {
@@ -1092,6 +1101,7 @@ export function buildServer(root: string, session = new Session(root), tollOpts:
         credit: (offset, lines) => session.creditReading(offset, lines),
       },
       () => session.doors(),
+      () => ({ session, root, lastPacket: undefined, mode: "manual" }),
     ),
   ];
   // THE UPDATE FIELD — every lane tool accepts it: a decision-graph op

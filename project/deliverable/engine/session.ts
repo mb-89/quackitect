@@ -261,7 +261,7 @@ export class Session {
   idleFor(ms: number): boolean {
     if (Date.now() - this.lastActivity < ms) return false;
     if (anyJobRunning()) return false;
-    const active = this.describe().active;
+    const active = this.describe().active as string[];
     return active.length > 0 && active.every((a) => Session.RESTING.has(a.split("/").pop()!));
   }
 
@@ -1536,7 +1536,7 @@ export class Session {
         priority: t.priority,
         open: open && !overWeight,
         ...(overWeight ? { needs: `the person — ${t.priority} is above the session autonomy ${this._autonomy}` } : {}),
-        ...(open ? {} : { blocked_by: Object.keys(this.conditionStatus(decl, t, "enter")) }),
+        ...(open ? {} : { blocked_by: Object.keys(this.conditionStatus(decl, t, "enter") ?? {}) }),
       };
     };
     for (const id of ids) {

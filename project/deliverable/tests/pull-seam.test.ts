@@ -25,7 +25,7 @@ import { Rejection } from "../engine/errors.ts";
 import { Session } from "../engine/session.ts";
 import { freshRoot, sessionAtIdle } from "./helpers.ts";
 
-const root = (): string => freshRoot(mkdtempSync(join(tmpdir(), "se-pulls-")));
+const root = (): string => freshRoot();
 
 async function refusal(fn: () => Promise<unknown>): Promise<Rejection> {
   try {

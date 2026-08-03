@@ -20,7 +20,7 @@ import { describe, test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { freshRoot, readEverything, sessionAtIdle } from "./helpers.ts";
 
-const root = (): string => freshRoot(mkdtempSync(join(tmpdir(), "se-pull-")));
+const root = (): string => freshRoot();
 
 describe("the pull instructs where a refusal would have thrown", { concurrency: true }, () => {
   test("unread guidance comes back as `read`, not as a rejection", async () => {

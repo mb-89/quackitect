@@ -17,7 +17,7 @@ import { Rejection } from "../engine/errors.ts";
 import { Session } from "../engine/session.ts";
 import { freshRoot } from "./helpers.ts";
 
-const root = (): string => freshRoot(mkdtempSync(join(tmpdir(), "se-emg-")));
+const root = (): string => freshRoot();
 
 function refusal(fn: () => unknown): Rejection {
   try {

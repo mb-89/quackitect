@@ -369,7 +369,7 @@ export function compileTree(t: PostedTree | null | undefined): FilterTree | null
     return inner === null ? null : { not: inner };
   }
   const key = "and" in t ? "and" : "or";
-  const kids = ((key === "and" ? t.and : (t as { or: PostedTree[] }).or) ?? []).map(compileTree).filter((k): k is FilterTree => k !== null);
+  const kids = (("and" in t ? t.and : t.or) ?? []).map(compileTree).filter((k): k is FilterTree => k !== null);
   if (kids.length === 0) return null;
   return key === "and" ? { and: kids } : { or: kids };
 }

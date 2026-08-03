@@ -67,7 +67,7 @@ describe("striking a floor step is refused, at every size", () => {
     for (const column of CHANGE_COLUMNS) {
       test(`${step} struck at ${column}`, () => {
         const mx = matrix();
-        mx.cells.get(step)!.set(column as ChangeColumn, { applies: "none", note: "" });
+        mx.cells.get(step)!.set(column as ChangeColumn, { ...mx.cells.get(step)!.get(column as ChangeColumn)!, applies: "none" });
         const r = refusal(() => compileColumn(mx, column));
         assert.match(r.got, new RegExp(step));
         assert.match(r.got, new RegExp(column));
@@ -77,14 +77,14 @@ describe("striking a floor step is refused, at every size", () => {
 
   test("the refusal names the whole floor, so the reader sees what else is protected", () => {
     const mx = matrix();
-    mx.cells.get("gate-release")!.set("minor", { applies: "none", note: "" });
+    mx.cells.get("gate-release")!.set("minor", { ...mx.cells.get("gate-release")!.get("minor")!, applies: "none" });
     const r = refusal(() => compileColumn(mx, "minor"));
     for (const step of FLOOR) assert.match(r.expected, new RegExp(step));
   });
 
   test("the remedy points at the row, and offers the honest way out", () => {
     const mx = matrix();
-    mx.cells.get("verification")!.set("patch", { applies: "none", note: "" });
+    mx.cells.get("verification")!.set("patch", { ...mx.cells.get("verification")!.get("patch")!, applies: "none" });
     const r = refusal(() => compileColumn(mx, "patch"));
     assert.match(String(r.remedy?.args?.glob ?? ""), /rows\/\*verification\.md/);
     assert.match(String(r.remedy?.note ?? ""), /drop `floor: true`/);
@@ -92,8 +92,8 @@ describe("striking a floor step is refused, at every size", () => {
 
   test("two struck at once are both named, not just the first", () => {
     const mx = matrix();
-    mx.cells.get("verification")!.set("major", { applies: "none", note: "" });
-    mx.cells.get("gate-release")!.set("major", { applies: "none", note: "" });
+    mx.cells.get("verification")!.set("major", { ...mx.cells.get("verification")!.get("major")!, applies: "none" });
+    mx.cells.get("gate-release")!.set("major", { ...mx.cells.get("gate-release")!.get("major")!, applies: "none" });
     const r = refusal(() => compileColumn(mx, "major"));
     assert.match(r.got, /verification/);
     assert.match(r.got, /gate-release/);
@@ -106,7 +106,7 @@ describe("what the floor does NOT do", () => {
   test("a step without the flag still strikes freely", () => {
     const mx = matrix();
     const ordinary = mx.rows.find((r) => !r.floor && mx.cells.get(r.name)?.get("major")?.applies !== "none")!;
-    mx.cells.get(ordinary.name)!.set("major", { applies: "none", note: "" });
+    mx.cells.get(ordinary.name)!.set("major", { ...mx.cells.get(ordinary.name)!.get("major")!, applies: "none" });
     const ids = new Set(compileColumn(mx, "major").states.map((s) => s.id));
     assert.ok(!ids.has(ordinary.name), `${ordinary.name} struck without complaint`);
   });
@@ -117,7 +117,7 @@ describe("what the floor does NOT do", () => {
     const mx = matrix();
     const row = mx.rows.find((r) => r.name === "gate-release")!;
     (row as { floor: boolean }).floor = false;
-    mx.cells.get("gate-release")!.set("minor", { applies: "none", note: "" });
+    mx.cells.get("gate-release")!.set("minor", { ...mx.cells.get("gate-release")!.get("minor")!, applies: "none" });
     const ids = new Set(compileColumn(mx, "minor").states.map((s) => s.id));
     assert.ok(!ids.has("gate-release"));
   });

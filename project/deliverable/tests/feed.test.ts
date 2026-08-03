@@ -331,8 +331,9 @@ test("the update rides any tool call, is stripped before the handler, and never 
   // rides home on the result, carrying the shape in its remedy as before.
   const bad = await call(server, "se_file_list", { dir: ".", update: { op: "sprint" } });
   assert.equal(bad.isError, false, "the call it rode on still went through");
-  assert.equal(bad.body.update_refused.clause, "SE-C-120", "and the update was refused, visibly");
-  assert.ok(String(bad.body.update_refused.note).includes("THE CALL WENT THROUGH"), "the reader is told which half failed");
+  const refusedUpdate = bad.body.update_refused as { clause: string; note?: string };
+  assert.equal(refusedUpdate.clause, "SE-C-120", "and the update was refused, visibly");
+  assert.ok(String(refusedUpdate.note).includes("THE CALL WENT THROUGH"), "the reader is told which half failed");
   assert.equal(session.decisions.graph(session.currentVisit()).nodes.length, 1, "a refused update changed no graph");
 });
 
