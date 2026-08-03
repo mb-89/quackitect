@@ -153,57 +153,49 @@ export function readRigorMatrix(root: string): RigorMatrix {
   return matrix;
 }
 
-function readRigorMatrixFresh(root: string): RigorMatrix {
-  const dir = matrixDir(root);
-  const rows: RigorMatrixRow[] = [];
-  const byName = new Map<string, RigorMatrixRow>();
-  const fmByName = new Map<string, Record<string, unknown>>();
-  for (const file of readdirSync(join(dir, "rows"))
-    .filter((f) => f.endsWith(".md"))
-    .sort()) {
-    const note = parseStateNote(readFileSync(join(dir, "rows", file), "utf8"));
-    const fm = note.frontmatter;
-    const name = typeof fm.name === "string" ? fm.name : "";
-    if (!name) throw new Error(`matrix row ${file} declares no name`);
-    if (byName.has(name)) throw new Error(`matrix row name ${name} is declared twice (${byName.get(name)?.file} and ${file})`);
-    const row: RigorMatrixRow = {
-      name,
-      file,
-      milestone: file.split("_")[0] ?? "",
-      statement: typeof fm.statement === "string" ? fm.statement : "",
-      state_kind: fm.state_kind === "gate" ? "gate" : fm.state_kind === "terminal" ? "terminal" : "work",
-      filled_by: fm.filled_by === "engine" ? "engine" : "agent",
-      command: typeof fm.command === "string" ? fm.command : undefined,
-      depends_on: asList(fm.depends_on),
-      seeds: typeof fm.seeds === "string" ? fm.seeds : undefined,
-      runs: typeof fm.runs === "string" ? fm.runs : undefined,
-      floor: fm.floor === true,
-      edge_role: typeof fm.edge_role === "string" ? fm.edge_role : undefined,
-      guard: typeof fm.guard === "string" ? fm.guard : undefined,
-      guidance: section(note.body, "Guidance"),
-      evidence_form: parseEvidence(fm, file, note.body),
-      legal_tools: fm.legal_tools === undefined ? undefined : asList(fm.legal_tools),
-    };
-    if (row.state_kind !== "terminal" && row.evidence_form.length === 0) {
-      throw new Error(`matrix row ${row.name} carries no evidence — leaving a state demands evidence; only a terminal is exempt`);
-    }
-    rows.push(row);
-    byName.set(name, row);
-    fmByName.set(name, fm);
+function parseMatrixRow(
+  dir: string,
+  file: string,
+  byName: Map<string, RigorMatrixRow>,
+): { row: RigorMatrixRow; fm: Record<string, unknown> } {
+  const note = parseStateNote(readFileSync(join(dir, "rows", file), "utf8"));
+  const fm = note.frontmatter;
+  const name = typeof fm.name === "string" ? fm.name : "";
+  if (!name) throw new Error(`matrix row ${file} declares no name`);
+  if (byName.has(name)) throw new Error(`matrix row name ${name} is declared twice (${byName.get(name)?.file} and ${file})`);
+  const row: RigorMatrixRow = {
+    name,
+    file,
+    milestone: file.split("_")[0] ?? "",
+    statement: typeof fm.statement === "string" ? fm.statement : "",
+    state_kind: fm.state_kind === "gate" ? "gate" : fm.state_kind === "terminal" ? "terminal" : "work",
+    filled_by: fm.filled_by === "engine" ? "engine" : "agent",
+    command: typeof fm.command === "string" ? fm.command : undefined,
+    depends_on: asList(fm.depends_on),
+    seeds: typeof fm.seeds === "string" ? fm.seeds : undefined,
+    runs: typeof fm.runs === "string" ? fm.runs : undefined,
+    floor: fm.floor === true,
+    edge_role: typeof fm.edge_role === "string" ? fm.edge_role : undefined,
+    guard: typeof fm.guard === "string" ? fm.guard : undefined,
+    guidance: section(note.body, "Guidance"),
+    evidence_form: parseEvidence(fm, file, note.body),
+    legal_tools: fm.legal_tools === undefined ? undefined : asList(fm.legal_tools),
+  };
+  if (row.state_kind !== "terminal" && row.evidence_form.length === 0) {
+    throw new Error(`matrix row ${row.name} carries no evidence — leaving a state demands evidence; only a terminal is exempt`);
   }
-  for (const row of rows) {
-    for (const d of row.depends_on) {
-      if (!byName.has(d)) throw new Error(`matrix row ${row.name} depends on undeclared row ${d}`);
-    }
-  }
-  // A CELL IS FRONTMATTER ON ITS ROW. It used to be a file of its own, and
-  // three of that file's four keys echoed its own name — kind, row and
-  // column all restated what the filename already said. Only `applies`
-  // carried anything, so the file was mostly noise (software.md).
-  //
-  // The column value is the cell; `<column>_note` is its prose. Both are
-  // scalars, because a Bases table edits a cell inline and cannot edit a
-  // nested map.
+  return { row, fm };
+}
+
+// A CELL IS FRONTMATTER ON ITS ROW. It used to be a file of its own, and
+// three of that file's four keys echoed its own name — kind, row and
+// column all restated what the filename already said. Only `applies`
+// carried anything, so the file was mostly noise (software.md).
+//
+// The column value is the cell; `<column>_note` is its prose. Both are
+// scalars, because a Bases table edits a cell inline and cannot edit a
+// nested map.
+function cellsOf(rows: RigorMatrixRow[], fmByName: Map<string, Record<string, unknown>>): Map<string, Map<string, RigorMatrixCell>> {
   const cells = new Map<string, Map<string, RigorMatrixCell>>();
   for (const row of rows) {
     const fm = fmByName.get(row.name)!;
@@ -226,7 +218,28 @@ function readRigorMatrixFresh(root: string): RigorMatrix {
     }
     cells.set(row.name, per);
   }
-  return { rows, cells };
+  return cells;
+}
+
+function readRigorMatrixFresh(root: string): RigorMatrix {
+  const dir = matrixDir(root);
+  const rows: RigorMatrixRow[] = [];
+  const byName = new Map<string, RigorMatrixRow>();
+  const fmByName = new Map<string, Record<string, unknown>>();
+  for (const file of readdirSync(join(dir, "rows"))
+    .filter((f) => f.endsWith(".md"))
+    .sort()) {
+    const { row, fm } = parseMatrixRow(dir, file, byName);
+    rows.push(row);
+    byName.set(row.name, row);
+    fmByName.set(row.name, fm);
+  }
+  for (const row of rows) {
+    for (const d of row.depends_on) {
+      if (!byName.has(d)) throw new Error(`matrix row ${row.name} depends on undeclared row ${d}`);
+    }
+  }
+  return { rows, cells: cellsOf(rows, fmByName) };
 }
 
 /** Priority anchors per state kind (the autonomy scale's bands). */
@@ -273,10 +286,13 @@ export function assertFloor(matrix: RigorMatrix, column: ChangeColumn): void {
   });
 }
 
-export function compileColumn(matrix: RigorMatrix, column: ChangeColumn): MachineDecl {
-  assertFloor(matrix, column);
-  const byName = new Map(matrix.rows.map((r) => [r.name, r]));
-  const applied = new Set(matrix.rows.filter((r) => matrix.cells.get(r.name)?.get(column)?.applies !== "none").map((r) => r.name));
+/** The surviving rows' contracted dependency edges: struck rows vanish and
+ *  dependencies pass transitively through them, so the walk stays connected. */
+function columnEdges(
+  matrix: RigorMatrix,
+  applied: Set<string>,
+  byName: Map<string, RigorMatrixRow>,
+): { edgesFrom: Map<string, EdgeDecl[]>; roots: string[] } {
   const memo = new Map<string, string[]>();
   const resolve = (name: string, visiting: Set<string>): string[] => {
     if (applied.has(name)) return [name];
@@ -289,8 +305,14 @@ export function compileColumn(matrix: RigorMatrix, column: ChangeColumn): Machin
     memo.set(name, out);
     return out;
   };
-
-  const states: StateDecl[] = [];
+  const listOf = (m: Map<string, EdgeDecl[]>, key: string): EdgeDecl[] => {
+    let list = m.get(key);
+    if (!list) {
+      list = [];
+      m.set(key, list);
+    }
+    return list;
+  };
   const edgesFrom = new Map<string, EdgeDecl[]>();
   const roots: string[] = [];
   for (const row of matrix.rows) {
@@ -298,25 +320,24 @@ export function compileColumn(matrix: RigorMatrix, column: ChangeColumn): Machin
     const deps = [...new Set(row.depends_on.flatMap((d) => resolve(d, new Set([row.name]))))].filter((d) => d !== row.name);
     if (deps.length === 0) roots.push(row.name);
     for (const d of deps) {
-      let list = edgesFrom.get(d);
-      if (!list) {
-        list = [];
-        edgesFrom.set(d, list);
-      }
       if (row.edge_role === "fallback") {
-        list.push({ to: row.name, role: "fallback", ...(row.guard ? { guard: row.guard } : {}) });
+        listOf(edgesFrom, d).push({ to: row.name, role: "fallback", ...(row.guard ? { guard: row.guard } : {}) });
         // The recovery edge closes the loop back to the dependency.
-        let back = edgesFrom.get(row.name);
-        if (!back) {
-          back = [];
-          edgesFrom.set(row.name, back);
-        }
-        back.push({ to: d, role: "recovery" });
+        listOf(edgesFrom, row.name).push({ to: d, role: "recovery" });
       } else {
-        list.push({ to: row.name, role: byName.get(d)?.state_kind === "gate" ? "approval" : "normal" });
+        listOf(edgesFrom, d).push({ to: row.name, role: byName.get(d)?.state_kind === "gate" ? "approval" : "normal" });
       }
     }
   }
+  return { edgesFrom, roots };
+}
+
+export function compileColumn(matrix: RigorMatrix, column: ChangeColumn): MachineDecl {
+  assertFloor(matrix, column);
+  const byName = new Map(matrix.rows.map((r) => [r.name, r]));
+  const applied = new Set(matrix.rows.filter((r) => matrix.cells.get(r.name)?.get(column)?.applies !== "none").map((r) => r.name));
+  const { edgesFrom, roots } = columnEdges(matrix, applied, byName);
+  const states: StateDecl[] = [];
 
   const start: StateDecl = {
     id: "start",
