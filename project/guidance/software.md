@@ -57,6 +57,33 @@ out of one day of measuring what the lane actually cost its callers.
   engine could carry is a defect with a deadline. The reading loop, the
   update ruling and the auto-corrections are all this law being applied.
 
+## The toolchain is mechanical
+
+What a machine can check, a machine checks. What a machine can fix, the
+ENGINE fixes — and says so. The concrete tools and their flags are the
+project's own rulings, in `method/engineering.md`.
+
+- RUNNING IS NOT CHECKING. The runtime strips TypeScript's types without
+  reading them. Only the typechecker reads them. A tree that runs clean can
+  still be full of type lies.
+- THREE GATES, ONE ORDER: the typechecker, then the linter-formatter, then
+  the scoped tests. The commit hook runs the first two and BLOCKS — a red
+  gate is fixed now, never committed around.
+- THE LANE FIXES WHAT A MACHINE CAN FIX. A write to a covered file comes
+  back formatted and safe-fixed. The result names what changed, and the
+  returned hash is the FIXED content. Never re-apply what the result says
+  was fixed; never hand-format.
+- WHAT THE FIX CANNOT REACH RIDES THE RESULT as findings, at the same bar
+  the commit hook holds. Fix them when they appear — they are the exact
+  list the hook would refuse.
+- AFTER A REFLOW, YOUR EXCERPTS ARE STALE. The fixer may move lines the
+  moment you write them. Re-read before the next patch instead of patching
+  from memory — a stale old_string is the most common self-inflicted
+  refusal.
+- COMPLEXITY HAS A CEILING, enforced as an error. The fix is splitting
+  along the function's own phases into named functions. Never suppress the
+  rule, never inline-disable it.
+
 ## Dated guidance
 
 This applies to every citation, and to your own instincts.

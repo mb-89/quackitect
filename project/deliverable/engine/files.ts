@@ -12,6 +12,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, wri
 import { dirname, extname, join, relative, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
+import { lintFix } from "./lintfix.ts";
 import { parseStateNote } from "./notes.ts";
 import { isExcluded, isRootRef, resolveDeclaredRoot, resolveForRead, resolveInRoot } from "./paths.ts";
 
@@ -293,6 +294,10 @@ export interface WriteResult {
   bytes: number;
   created: boolean;
   corrected?: string;
+  /** The linter's safe fixes ran after the write; hash is the fixed content. */
+  lint_fixed?: string;
+  /** Linter findings the safe fixes could not reach (engine/lintfix.ts). */
+  lint_findings?: string;
 }
 
 export function fileWrite(root: string, path: string, content: string, baseHash: string | null): WriteResult {
@@ -332,12 +337,18 @@ export function fileWrite(root: string, path: string, content: string, baseHash:
   const nul = guardRawNul(path, content);
   mkdirSync(dirname(abs), { recursive: true });
   writeFileSync(abs, nul.content, "utf8");
+  const lint = lintFix(root, [path]);
+  const final = lint !== undefined && lint.fixed.length > 0 ? readFileSync(abs, "utf8") : nul.content;
   return {
     path,
-    hash: contentHash(nul.content),
-    bytes: Buffer.byteLength(nul.content, "utf8"),
+    hash: contentHash(final),
+    bytes: Buffer.byteLength(final, "utf8"),
     created: !exists,
     ...(nul.corrected !== undefined ? { corrected: nul.corrected } : {}),
+    ...(lint !== undefined && lint.fixed.length > 0
+      ? { lint_fixed: "the linter's safe fixes ran after the write — the returned hash is the fixed content" }
+      : {}),
+    ...(lint?.findings !== undefined ? { lint_findings: lint.findings } : {}),
   };
 }
 
@@ -371,6 +382,8 @@ export interface PatchResult {
   /** Mechanical fixes the engine applied FOR the agent, each named. An
    *  auto-correction that is not announced teaches nothing. */
   corrected?: string[];
+  /** Linter findings the safe fixes could not reach (engine/lintfix.ts). */
+  lint_findings?: string;
 }
 
 export interface ReplaceResult {
@@ -382,10 +395,36 @@ export interface ReplaceResult {
   files_scanned: number;
   truncated: boolean;
   corrected?: string[];
+  /** Linter findings the safe fixes could not reach (engine/lintfix.ts). */
+  lint_findings?: string;
 }
 
 /** How many places travel back before the report starts counting only. */
 const PLACES_LIMIT = 200;
+
+function compileReplacePattern(glob: string, pattern: string, replacement: string, flags: string): RegExp {
+  const bad = [...flags].filter((f) => !"ims".includes(f));
+  if (bad.length > 0) {
+    throw new Rejection({
+      clause: CLAUSES.REQUIRED_ARGS,
+      expected: "flags from: i (ignore case), m (multiline anchors), s (dot matches newline) — g is always on",
+      got: `flag(s) ${bad.join(", ")}`,
+      remedy: { tool: "se_file_replace", args: { glob, pattern, replacement, flags: "im" } },
+      source: SRC,
+    });
+  }
+  try {
+    return new RegExp(pattern, `g${flags}`);
+  } catch (e) {
+    throw new Rejection({
+      clause: CLAUSES.REQUIRED_ARGS,
+      expected: "a pattern that compiles as a JS regex",
+      got: String((e as Error).message),
+      remedy: { tool: "se_file_replace", args: { glob, pattern: "<fixed pattern>", replacement } },
+      source: SRC,
+    });
+  }
+}
 
 /** SEARCH AND REPLACE ACROSS FILES. The per-file regex op is a scalpel; this
  *  is the sweep.
@@ -405,29 +444,7 @@ export function fileReplace(
   replacement: string,
   opts: { flags?: string; expect_count?: number } = {},
 ): ReplaceResult {
-  const flags = opts.flags ?? "";
-  const bad = [...flags].filter((f) => !"ims".includes(f));
-  if (bad.length > 0) {
-    throw new Rejection({
-      clause: CLAUSES.REQUIRED_ARGS,
-      expected: "flags from: i (ignore case), m (multiline anchors), s (dot matches newline) — g is always on",
-      got: `flag(s) ${bad.join(", ")}`,
-      remedy: { tool: "se_file_replace", args: { glob, pattern, replacement, flags: "im" } },
-      source: SRC,
-    });
-  }
-  let rx: RegExp;
-  try {
-    rx = new RegExp(pattern, `g${flags}`);
-  } catch (e) {
-    throw new Rejection({
-      clause: CLAUSES.REQUIRED_ARGS,
-      expected: "a pattern that compiles as a JS regex",
-      got: String((e as Error).message),
-      remedy: { tool: "se_file_replace", args: { glob, pattern: "<fixed pattern>", replacement } },
-      source: SRC,
-    });
-  }
+  const rx = compileReplacePattern(glob, pattern, replacement, opts.flags ?? "");
   const found = fileGlob(root, glob, { limit: 10000 });
   const staged: { path: string; abs: string; next: string; replacements: number }[] = [];
   const places: ReplaceResult["places"] = [];
@@ -482,6 +499,7 @@ export function fileReplace(
     writeFileSync(s.abs, s.next, "utf8");
     return { path: s.path, hash: contentHash(s.next), replacements: s.replacements };
   });
+  const findings = lintAfterWrite(root, changed, corrected);
   return {
     changed,
     places,
@@ -489,7 +507,26 @@ export function fileReplace(
     files_scanned: scanned,
     truncated: total > places.length,
     ...(corrected.length > 0 ? { corrected } : {}),
+    ...(findings !== undefined ? { lint_findings: findings } : {}),
   };
+}
+
+/** Run the fixer over just-written files, refresh their hashes in place and
+ *  announce what changed. Returns the findings the fixes could not reach. */
+function lintAfterWrite(root: string, rows: { path: string; hash: string }[], corrected: string[]): string | undefined {
+  const lint = lintFix(
+    root,
+    rows.map((r) => r.path),
+  );
+  if (lint === undefined) return undefined;
+  if (lint.fixed.length > 0) {
+    for (const r of rows) {
+      if (!lint.fixed.includes(r.path)) continue;
+      r.hash = contentHash(readFileSync(resolveInRoot(root, r.path, SRC), "utf8"));
+    }
+    corrected.push(`the linter's safe fixes ran on ${lint.fixed.join(", ")} — the returned hashes are the fixed content`);
+  }
+  return lint.findings;
 }
 
 // One patch call, several verbs. Which verb an op is, read from its fields —
@@ -756,7 +793,12 @@ function writeStaged(
     writeFileSync(abs, f.next, "utf8");
     return { path: f.path, hash: contentHash(f.next), replacements: f.replacements };
   });
-  return { applied, ...(corrected.length > 0 ? { corrected } : {}) };
+  const findings = lintAfterWrite(root, applied, corrected);
+  return {
+    applied,
+    ...(corrected.length > 0 ? { corrected } : {}),
+    ...(findings !== undefined ? { lint_findings: findings } : {}),
+  };
 }
 
 /** Every guard is checked before anything is written — a failure leaves the tree untouched. */

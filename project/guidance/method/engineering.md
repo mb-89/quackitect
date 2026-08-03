@@ -5,6 +5,36 @@ statement: General software rules the project builds by - referenced, never pull
 
 # Engineering rules
 
+## The TypeScript toolchain (owner ruling 2026-08-03)
+
+The universal law is software.md's "The toolchain is mechanical". These are
+the concrete tools, chosen for speed and for installing with plain
+`npm install` — no extra install step, ever.
+
+- THE CHECKER is `tsc -p . --noEmit` from `project/deliverable` (the
+  `--pretty false` form is grep-friendly). Incremental cache under
+  `node_modules/.cache/se.tsbuildinfo`; a warm run is ~3s.
+- THE LINTER-FORMATTER is Biome, one binary for both. Config:
+  `project/deliverable/biome.json`. House choices there:
+    - lineWidth 140.
+    - noNonNullAssertion OFF — `x!` is house idiom.
+    - noExcessiveCognitiveComplexity at 25, level ERROR.
+- THE COMMIT HOOK (`project/deliverable/hooks/pre-commit`, wired by
+  preflight via `core.hooksPath` every boot) runs the checker and
+  `biome check --error-on-warnings` and BLOCKS. Boot runs no typecheck.
+- THE LANE'S FIXER (`engine/lintfix.ts`) runs Biome's SAFE fixes after
+  every lane write to a covered file and announces what changed. Its
+  coverage is read live from biome.json — never mirrored.
+- `--write --unsafe` IS BANNED. The unsafe tier rewrote ~70 non-null
+  assertions into optional chains and broke the strict build (2026-08-03).
+  Safe fixes only, everywhere, including by hand.
+- THE SHELL BUNDLES: `vscode/src/extension.ts` → esbuild →
+  `vscode/extension.js` (generated — edit the source, then
+  `npm run build`). The manifest and install seam stay unchanged.
+- THE VERIFY LOOP for any refactor: checker → `biome check --write` →
+  scoped `se_test` → commit. The battery only where the test economics
+  flip (software.md).
+
 ## Commit what is on disk (owner ruling 2026-07-29)
 
 A dirty tree left behind is not caution. It is unfinished work.
