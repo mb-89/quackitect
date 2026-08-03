@@ -1766,80 +1766,9 @@ export class Session {
       };
     }
 
-    // THE PAYLOAD IS THE SUBMIT THAT HAS NO VERB — the filled form the
-    // LAST pull handed over. WHICH form is never the agent's call:
-    // evidence is expected while a step on the way demands it; a CHOICE
-    // only where the machine offered one (the road split, no target).
-    // Evidence wins when both could read — deterministic, and documented
-    // on the tool.
-    // THE READING PROOF. The last pull served a document and named its tail;
-    // this is the agent handing that tail back. A form carrying `read` is only
-    // ever this, so it never competes with evidence or a choice. A wrong
-    // answer credits nothing and the same document is served again.
-    let readProof: "ok" | "wrong" | null = null;
-    if (payload.form?.read !== undefined && this.pendingRead !== null) {
-      const pending = this.pendingRead;
-      const given = this.normWords(String(payload.form.read));
-      if (pending.expect.every((e) => given.includes(this.normWords(e)))) {
-        this.readBuffer.set(pending.path, pending.hash);
-        this.pendingRead = null;
-        readProof = "ok";
-      } else {
-        readProof = "wrong";
-      }
-    }
-
-    let saved: Record<string, unknown> | undefined;
-    let fanOut: string[] = [];
-    if (payload.form !== undefined && readProof === null) {
-      const owed = this.pullFormsOwed();
-      if (owed.length > 0) {
-        saved = this.formSave(owed[0], payload.form as Record<string, string>);
-      } else if (this._target === "" && payload.form.choice !== undefined) {
-        // A LIST is legal on purpose: the seam for "send three agents, one
-        // per lane" must not be designed shut (owner, 2026-08-01). Only
-        // the first is walked, because one agent is walking — and every
-        // pick must come from the OFFER, because a choice exists only
-        // where the machine asked for one (owner, 2026-08-02).
-        const offered = this.pullOptions().map((o) => String(o.to));
-        const picks = (Array.isArray(payload.form.choice) ? payload.form.choice : [payload.form.choice])
-          .map(String)
-          .filter((x) => x !== "");
-        if (picks.length === 0) {
-          throw new Rejection({
-            clause: CLAUSES.REQUIRED_ARGS,
-            expected: "a door from the offer, or a list of them",
-            got: "an empty choice",
-            remedy: { tool: "se_pull", args: {}, note: "pull with no payload to see the offer again" },
-            source: "engine/session.ts pull",
-          });
-        }
-        const stray = picks.find((p) => !offered.includes(p));
-        if (stray !== undefined) {
-          throw new Rejection({
-            clause: CLAUSES.NOT_LEGAL_IN_STATE,
-            expected: `one of the offered doors: ${offered.join(", ")}`,
-            got: stray,
-            remedy: {
-              tool: "se_pull",
-              args: {},
-              note: "a choice exists only where the machine offered one — pull with no payload and answer from its options",
-            },
-            source: "engine/session.ts pull",
-          });
-        }
-        this.setTarget(picks[0]);
-        fanOut = picks.slice(1);
-      } else {
-        throw new Rejection({
-          clause: CLAUSES.NOT_LEGAL_IN_STATE,
-          expected: "a step that asked for a form",
-          got: this._target === "" ? "a filled form, but nothing asked for one" : "a filled form, but nothing on the way wants one",
-          remedy: { tool: "se_pull", args: {}, note: "pull with no payload — the machine says what it wants before you fill anything" },
-          source: "engine/session.ts pull",
-        });
-      }
-    }
+    const readProof = this.takeReadProof(payload.form);
+    const { saved, fanOut } =
+      payload.form !== undefined && readProof === null ? this.pullSaveOrChoose(payload.form) : { saved: undefined, fanOut: [] };
 
     const extra = (): Record<string, unknown> => ({
       ...(saved !== undefined ? { form_saved: saved } : {}),
@@ -1944,10 +1873,91 @@ export class Session {
     //    branching point, because start-to-front-desk has no branch in it
     //    and should never cost a round trip per hop.
     const swept = await this.sweep(this._target, channel);
-    // A WALL FURTHER ALONG THE WAY IS THE SAME LAW. The route is weighed
-    // hop by hop, so a heavy step three hops out only refuses once the
-    // sweep reaches it — and it must arrive as the same instruction the
-    // first hop would have given, not as a rejection wearing a walk.
+    return this.pullAfterSweep(swept, head, extra);
+  }
+
+  /** THE READING PROOF. The last pull served a document and named its tail;
+   *  this is the agent handing that tail back. A form carrying `read` is only
+   *  ever this, so it never competes with evidence or a choice. A wrong
+   *  answer credits nothing and the same document is served again. */
+  private takeReadProof(form: Record<string, unknown> | undefined): "ok" | "wrong" | null {
+    if (form?.read === undefined || this.pendingRead === null) return null;
+    const pending = this.pendingRead;
+    const given = this.normWords(String(form.read));
+    if (pending.expect.every((e) => given.includes(this.normWords(e)))) {
+      this.readBuffer.set(pending.path, pending.hash);
+      this.pendingRead = null;
+      return "ok";
+    }
+    return "wrong";
+  }
+
+  /** THE PAYLOAD IS THE SUBMIT THAT HAS NO VERB — the filled form the
+   *  LAST pull handed over. WHICH form is never the agent's call:
+   *  evidence is expected while a step on the way demands it; a CHOICE
+   *  only where the machine offered one (the road split, no target).
+   *  Evidence wins when both could read — deterministic, and documented
+   *  on the tool. */
+  private pullSaveOrChoose(form: Record<string, unknown>): { saved?: Record<string, unknown>; fanOut: string[] } {
+    const owed = this.pullFormsOwed();
+    if (owed.length > 0) {
+      return { saved: this.formSave(owed[0], form as Record<string, string>), fanOut: [] };
+    }
+    if (this._target === "" && form.choice !== undefined) {
+      return { fanOut: this.pullPickChoice(form.choice) };
+    }
+    throw new Rejection({
+      clause: CLAUSES.NOT_LEGAL_IN_STATE,
+      expected: "a step that asked for a form",
+      got: this._target === "" ? "a filled form, but nothing asked for one" : "a filled form, but nothing on the way wants one",
+      remedy: { tool: "se_pull", args: {}, note: "pull with no payload — the machine says what it wants before you fill anything" },
+      source: "engine/session.ts pull",
+    });
+  }
+
+  /** A LIST is legal on purpose: the seam for "send three agents, one
+   *  per lane" must not be designed shut (owner, 2026-08-01). Only
+   *  the first is walked, because one agent is walking — and every
+   *  pick must come from the OFFER, because a choice exists only
+   *  where the machine asked for one (owner, 2026-08-02). */
+  private pullPickChoice(choice: unknown): string[] {
+    const offered = this.pullOptions().map((o) => String(o.to));
+    const picks = (Array.isArray(choice) ? choice : [choice]).map(String).filter((x) => x !== "");
+    if (picks.length === 0) {
+      throw new Rejection({
+        clause: CLAUSES.REQUIRED_ARGS,
+        expected: "a door from the offer, or a list of them",
+        got: "an empty choice",
+        remedy: { tool: "se_pull", args: {}, note: "pull with no payload to see the offer again" },
+        source: "engine/session.ts pull",
+      });
+    }
+    const stray = picks.find((p) => !offered.includes(p));
+    if (stray !== undefined) {
+      throw new Rejection({
+        clause: CLAUSES.NOT_LEGAL_IN_STATE,
+        expected: `one of the offered doors: ${offered.join(", ")}`,
+        got: stray,
+        remedy: {
+          tool: "se_pull",
+          args: {},
+          note: "a choice exists only where the machine offered one — pull with no payload and answer from its options",
+        },
+        source: "engine/session.ts pull",
+      });
+    }
+    this.setTarget(picks[0]);
+    return picks.slice(1);
+  }
+
+  /** What the sweep's outcome means to the caller: a wall further along the
+   *  way is the same law as at the first hop, and an unmet condition arrives
+   *  as read or fill — never as a rejection wearing a walk. */
+  private pullAfterSweep(
+    swept: Record<string, unknown>,
+    head: () => Record<string, unknown>,
+    extra: () => Record<string, unknown>,
+  ): Record<string, unknown> {
     const ref = swept.refusal as { clause?: string; got?: string } | undefined;
     if (ref?.clause === CLAUSES.ABOVE_THRESHOLD) {
       return {
@@ -1961,10 +1971,6 @@ export class Session {
         ...extra(),
       };
     }
-    // AN UNMET CONDITION FURTHER ALONG resolves the way it would have at
-    // the first hop: the position moved, so the same pre-checks are asked
-    // again from where the walk now stands — the answer is read or fill,
-    // never a refusal wearing a walk.
     if (ref?.clause === CLAUSES.CONDITION_UNMET) {
       const servedNow = this.serveReading();
       if (servedNow !== null) {
