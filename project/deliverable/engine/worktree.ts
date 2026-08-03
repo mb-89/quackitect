@@ -237,6 +237,143 @@ export function expFind(root: string, id: string): Expedition {
   return e;
 }
 
+/** A DIRTY TRUNK IS SETTLED FIRST (found live 2026-07-28, closing e18).
+ *  git merge refuses to overwrite uncommitted local changes, so the merge
+ *  below failed — and the abort that follows it failed too, because no merge
+ *  had started. The record was already stamped closed by then, leaving an
+ *  expedition marked shut, unmerged, with its worktree still standing.
+ *
+ *  The close COMMITS the root's strays rather than refusing (owner ruling
+ *  2026-07-28). It already does exactly this on the other side of the merge,
+ *  on the principle that a walk's work never silently vanishes; the root
+ *  deserves the same. Not a stash: a stash pop can conflict AFTER the merge
+ *  has started, which strands uncommitted work halfway through a close.
+ *
+ *  TRACKED changes only, via commit -a. Untracked files are left alone, so
+ *  .worktrees and every scratch file stay out of it. An untracked file the
+ *  incoming branch also creates still fails the merge below, which aborts
+ *  cleanly and says so.
+ *
+ *  Keeping trunk clean is also what keeps the READ-PROOF honest: a worktree
+ *  branches from the last commit, so a dirty trunk is exactly when the tree
+ *  the lane serves and the tree the proof hashes drift apart. */
+function settleTrunk(root: string, expeditionId: string): string[] {
+  const strays = git(root, ["status", "--porcelain", "--untracked-files=no"], "status")
+    .split("\n")
+    .map((l) => l.slice(3).trim())
+    .filter((f) => f !== "");
+  if (strays.length > 0) {
+    git(root, ["commit", "-a", "-m", `trunk: strays committed by the close of ${expeditionId}`], "commit trunk");
+  }
+  return strays;
+}
+
+/** The close ruling stamps the record: applied (merged) or dismissed
+ *  (unmerged). Guards ride here: the report must exist, and an agent-finished
+ *  report needs a recorded override. */
+function stampRecordClosed(e: Expedition, merge: boolean, override?: string): void {
+  const recAbs = join(e.path, recordRel(e.id));
+  if (!existsSync(recAbs)) return;
+  // The expedition ends with a REPORT (owner ruling 2026-07-27); the
+  // close ruling stamps it: applied (merged) or dismissed (unmerged).
+  const repRel = `project/spec/expeditions/${e.id}/report.md`;
+  if (!existsSync(join(e.path, repRel))) {
+    throw new Rejection({
+      clause: CLAUSES.CONDITION_UNMET,
+      expected: `a report before closing: ${repRel} — what was built or found, for the retro to adjudicate`,
+      got: "no report.md in the expedition record",
+      remedy: {
+        tool: "se_file_write",
+        args: { path: repRel, content: "<goal · what shipped or was found · open threads>", base_hash: null },
+        note: "write the report, then close again",
+      },
+      source: SRC,
+    });
+  }
+  // THE PREFILL GUARD WAS LIFTED BY A SENTENCE IN CHAT, TWICE (e20 and e21,
+  // note-c93953578cde and note-afd649b506a0). The report stamps whose hand
+  // finished it, human or agent, and NOTHING had ever read that stamp. A
+  // report the agent wrote and finished itself passed exactly like one a
+  // person walked through field by field.
+  //
+  // Both lifts were legitimate — the owner asked for an unattended run. The
+  // defect was that the record could not SHOW it, so the only evidence was a
+  // line the agent chose to write. That punished honesty: an agent that said
+  // nothing left a cleaner-looking archive than one that owned up.
+  //
+  // The override is a lane act now, and it is stamped on the record. An
+  // override is LOUDER than compliance, never quieter.
+  const finishedBy = /^by: *(\w+)/m.exec(readFileSync(join(e.path, repRel), "utf8"))?.[1];
+  if (finishedBy !== "human" && (override ?? "").trim() === "") {
+    throw new Rejection({
+      clause: CLAUSES.CONDITION_UNMET,
+      expected: "a report a person confirmed, or a recorded override naming who lifted the guard",
+      got: `the report was finished by the ${finishedBy ?? "agent"}`,
+      remedy: {
+        tool: "se_exp_close",
+        args: { merge, override: "<who authorised the unattended close, and where they said it>" },
+        note: "confirm the report in the mirror, or close with the override — it is stamped on the record and shows in the archive",
+      },
+      source: SRC,
+    });
+  }
+  // QUOTED, because the writer controls the field and NOT its content.
+  // An override is free prose from a person, so it carries colons, quotes
+  // and line breaks. Unquoted, "in chat, 2026-07-29: after reading" is a
+  // nested mapping and the WHOLE record stops parsing. That happened for
+  // real on e22 and took the record down with it.
+  const stamped = (override ?? "").trim();
+  const raw = readFileSync(recAbs, "utf8");
+  writeFileSync(
+    recAbs,
+    raw.replace(
+      /^status: open$/m,
+      `status: closed\nclosed: ${new Date().toISOString()}\nruling: ${merge ? "applied" : "dismissed"}${stamped === "" ? "" : `\nreport_override: ${yamlScalar(stamped)}`}`,
+    ),
+    "utf8",
+  );
+}
+
+/** Merge the branch to trunk and retire the record dir in the same breath. */
+function mergeToTrunk(root: string, e: Expedition): void {
+  // ATOMIC (hit live 2026-07-28): a conflicting merge left the root
+  // mid-merge with markers inside main.canvas — the server died and the
+  // relaunch refused on the red canvas. The close now aborts the failed
+  // merge and refuses TYPED; the root tree is never left broken.
+  const m = spawnSync("git", ["merge", "--no-ff", e.branch, "-m", `merge expedition ${e.id}`], {
+    cwd: root,
+    encoding: "utf8",
+    windowsHide: true,
+  });
+  if (m.status !== 0) {
+    const conflicts = (
+      spawnSync("git", ["diff", "--name-only", "--diff-filter=U"], { cwd: root, encoding: "utf8", windowsHide: true }).stdout ?? ""
+    )
+      .trim()
+      .replace(/\n/g, ", ");
+    const aborted = spawnSync("git", ["merge", "--abort"], { cwd: root, windowsHide: true }).status === 0;
+    throw new Rejection({
+      clause: CLAUSES.CONDITION_UNMET,
+      expected: `the trunk merge of ${e.branch} to succeed`,
+      got: `conflicts in: ${conflicts || "(unknown)"}${aborted ? " — the merge was aborted, the root tree stands clean" : " — and the abort failed too; run git merge --abort by hand"}`,
+      remedy: {
+        tool: "se_run",
+        args: { command: "git merge <trunk-branch> --no-edit" },
+        note: "absorb trunk INTO the branch first: merge it in the worktree, resolve the named files there, commit, then close again",
+      },
+      source: SRC,
+    });
+  }
+  // CLOSED RECORDS LIVE IN GIT (owner ruling 2026-07-28): history is
+  // git's; the tree carries only live work. The record rode the merge —
+  // retire its dir in the same breath; the branch keeps serving it.
+  const dirRel = `project/spec/expeditions/${e.id}`;
+  git(root, ["rm", "-r", "-q", "--ignore-unmatch", dirRel], "rm record");
+  if (spawnSync("git", ["diff", "--cached", "--quiet", "--", dirRel], { cwd: root }).status === 1) {
+    git(root, ["commit", "-q", "-m", `expedition ${e.id}: record retires to its branch`, "--", dirRel], "commit");
+  }
+}
+
 /** Close IS the ruling: apply (merge=true) merges the changes to trunk;
  *  dismiss (merge=false) archives the branch unmerged. Leftovers are
  *  committed either way; the worktree is removed. */
@@ -246,141 +383,15 @@ export function expClose(
   merge: boolean,
   override?: string,
 ): { id: string; merged: boolean; trunk_committed?: string[]; override?: string } {
-  // A DIRTY TRUNK IS SETTLED FIRST (found live 2026-07-28, closing e18).
-  // git merge refuses to overwrite uncommitted local changes, so the merge
-  // below failed — and the abort that follows it failed too, because no merge
-  // had started. The record was already stamped closed by then, leaving an
-  // expedition marked shut, unmerged, with its worktree still standing.
-  //
-  // The close COMMITS the root's strays rather than refusing (owner ruling
-  // 2026-07-28). It already does exactly this on the other side of the merge,
-  // on the principle that a walk's work never silently vanishes; the root
-  // deserves the same. Not a stash: a stash pop can conflict AFTER the merge
-  // has started, which strands uncommitted work halfway through a close.
-  //
-  // TRACKED changes only, via commit -a. Untracked files are left alone, so
-  // .worktrees and every scratch file stay out of it. An untracked file the
-  // incoming branch also creates still fails the merge below, which aborts
-  // cleanly and says so.
-  //
-  // Keeping trunk clean is also what keeps the READ-PROOF honest: a worktree
-  // branches from the last commit, so a dirty trunk is exactly when the tree
-  // the lane serves and the tree the proof hashes drift apart.
-  let trunkCommitted: string[] = [];
-  if (merge) {
-    trunkCommitted = git(root, ["status", "--porcelain", "--untracked-files=no"], "status")
-      .split("\n")
-      .map((l) => l.slice(3).trim())
-      .filter((f) => f !== "");
-    if (trunkCommitted.length > 0) {
-      git(root, ["commit", "-a", "-m", `trunk: strays committed by the close of ${e.id}`], "commit trunk");
-    }
-  }
-  const recAbs = join(e.path, recordRel(e.id));
-  if (existsSync(recAbs)) {
-    // The expedition ends with a REPORT (owner ruling 2026-07-27); the
-    // close ruling stamps it: applied (merged) or dismissed (unmerged).
-    const repRel = `project/spec/expeditions/${e.id}/report.md`;
-    if (!existsSync(join(e.path, repRel))) {
-      throw new Rejection({
-        clause: CLAUSES.CONDITION_UNMET,
-        expected: `a report before closing: ${repRel} — what was built or found, for the retro to adjudicate`,
-        got: "no report.md in the expedition record",
-        remedy: {
-          tool: "se_file_write",
-          args: { path: repRel, content: "<goal · what shipped or was found · open threads>", base_hash: null },
-          note: "write the report, then close again",
-        },
-        source: SRC,
-      });
-    }
-    // THE PREFILL GUARD WAS LIFTED BY A SENTENCE IN CHAT, TWICE (e20 and e21,
-    // note-c93953578cde and note-afd649b506a0). The report stamps whose hand
-    // finished it, human or agent, and NOTHING had ever read that stamp. A
-    // report the agent wrote and finished itself passed exactly like one a
-    // person walked through field by field.
-    //
-    // Both lifts were legitimate — the owner asked for an unattended run. The
-    // defect was that the record could not SHOW it, so the only evidence was a
-    // line the agent chose to write. That punished honesty: an agent that said
-    // nothing left a cleaner-looking archive than one that owned up.
-    //
-    // The override is a lane act now, and it is stamped on the record. An
-    // override is LOUDER than compliance, never quieter.
-    const finishedBy = /^by: *(\w+)/m.exec(readFileSync(join(e.path, repRel), "utf8"))?.[1];
-    if (finishedBy !== "human" && (override ?? "").trim() === "") {
-      throw new Rejection({
-        clause: CLAUSES.CONDITION_UNMET,
-        expected: "a report a person confirmed, or a recorded override naming who lifted the guard",
-        got: `the report was finished by the ${finishedBy ?? "agent"}`,
-        remedy: {
-          tool: "se_exp_close",
-          args: { merge, override: "<who authorised the unattended close, and where they said it>" },
-          note: "confirm the report in the mirror, or close with the override — it is stamped on the record and shows in the archive",
-        },
-        source: SRC,
-      });
-    }
-    // QUOTED, because the writer controls the field and NOT its content.
-    // An override is free prose from a person, so it carries colons, quotes
-    // and line breaks. Unquoted, "in chat, 2026-07-29: after reading" is a
-    // nested mapping and the WHOLE record stops parsing. That happened for
-    // real on e22 and took the record down with it.
-    const stamped = (override ?? "").trim();
-    const raw = readFileSync(recAbs, "utf8");
-    writeFileSync(
-      recAbs,
-      raw.replace(
-        /^status: open$/m,
-        `status: closed\nclosed: ${new Date().toISOString()}\nruling: ${merge ? "applied" : "dismissed"}${stamped === "" ? "" : `\nreport_override: ${yamlScalar(stamped)}`}`,
-      ),
-      "utf8",
-    );
-  }
+  const trunkCommitted = merge ? settleTrunk(root, e.id) : [];
+  stampRecordClosed(e, merge, override);
   // Leftover changes are committed — a walk's work never silently vanishes.
   const dirty = git(e.path, ["status", "--porcelain"], "status").trim() !== "";
   if (dirty) {
     git(e.path, ["add", "-A"], "add");
     git(e.path, ["commit", "-m", `expedition ${e.id}: close`], "commit");
   }
-  if (merge) {
-    // ATOMIC (hit live 2026-07-28): a conflicting merge left the root
-    // mid-merge with markers inside main.canvas — the server died and the
-    // relaunch refused on the red canvas. The close now aborts the failed
-    // merge and refuses TYPED; the root tree is never left broken.
-    const m = spawnSync("git", ["merge", "--no-ff", e.branch, "-m", `merge expedition ${e.id}`], {
-      cwd: root,
-      encoding: "utf8",
-      windowsHide: true,
-    });
-    if (m.status !== 0) {
-      const conflicts = (
-        spawnSync("git", ["diff", "--name-only", "--diff-filter=U"], { cwd: root, encoding: "utf8", windowsHide: true }).stdout ?? ""
-      )
-        .trim()
-        .replace(/\n/g, ", ");
-      const aborted = spawnSync("git", ["merge", "--abort"], { cwd: root, windowsHide: true }).status === 0;
-      throw new Rejection({
-        clause: CLAUSES.CONDITION_UNMET,
-        expected: `the trunk merge of ${e.branch} to succeed`,
-        got: `conflicts in: ${conflicts || "(unknown)"}${aborted ? " — the merge was aborted, the root tree stands clean" : " — and the abort failed too; run git merge --abort by hand"}`,
-        remedy: {
-          tool: "se_run",
-          args: { command: "git merge <trunk-branch> --no-edit" },
-          note: "absorb trunk INTO the branch first: merge it in the worktree, resolve the named files there, commit, then close again",
-        },
-        source: SRC,
-      });
-    }
-    // CLOSED RECORDS LIVE IN GIT (owner ruling 2026-07-28): history is
-    // git's; the tree carries only live work. The record rode the merge —
-    // retire its dir in the same breath; the branch keeps serving it.
-    const dirRel = `project/spec/expeditions/${e.id}`;
-    git(root, ["rm", "-r", "-q", "--ignore-unmatch", dirRel], "rm record");
-    if (spawnSync("git", ["diff", "--cached", "--quiet", "--", dirRel], { cwd: root }).status === 1) {
-      git(root, ["commit", "-q", "-m", `expedition ${e.id}: record retires to its branch`, "--", dirRel], "commit");
-    }
-  }
+  if (merge) mergeToTrunk(root, e);
   git(root, ["worktree", "remove", "--force", e.path], "worktree remove");
   // NEVER SILENT. Committing someone's uncommitted work on their behalf is a
   // kindness only if they are told it happened, and which files it took.
