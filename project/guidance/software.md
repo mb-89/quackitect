@@ -146,6 +146,12 @@ file and grepped for a single failure.
 - TEST TO ANSWER A QUESTION, NOT TO REASSURE YOURSELF. In most cases the
   change broke nothing, and a green run you already expected bought you
   nothing but the wall clock.
+- THE BATTERY IS FIRE AND FORGET (owner ruling 2026-08-03). Call it only
+  when the scoped runs make you expect green, then DO OTHER WORK while it
+  runs — never sit polling it. Its verdict logs itself when the run ends
+  (an se_test_verdict record), and the retro reads the failure rate from
+  the log. The one exception: do not start work that touches the same
+  files the running battery is proving.
 
 ## Where things live
 

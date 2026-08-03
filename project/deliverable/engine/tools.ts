@@ -56,9 +56,10 @@ function batteryPace(se: string): string {
 function batteryProgress(se: string, since: number): Record<string, unknown> | undefined {
   try {
     const lines = readFileSync(join(se, "test-progress.jsonl"), "utf8").split("\n").filter((l) => l.trim() !== "");
-    const head = JSON.parse(lines[0]) as { start?: string; files_total?: number };
+    const head = JSON.parse(lines[0]) as { start?: string; files_total?: number; tests_last_run?: number };
     if (typeof head.start !== "string" || Date.parse(head.start) < since) return undefined;
-    let done = 0;
+    let cases = 0;
+    const files = new Set<string>();
     const failures: string[] = [];
     for (const line of lines.slice(1)) {
       let rec: { file?: string; fail?: string; msg?: string };
@@ -67,10 +68,12 @@ function batteryProgress(se: string, since: number): Record<string, unknown> | u
       } catch {
         continue;
       }
+      if (typeof rec.file !== "string") continue;
+      cases += 1;
+      files.add(rec.file);
       if (typeof rec.fail === "string") failures.push(`${rec.fail}${typeof rec.msg === "string" && rec.msg !== "" ? `: ${rec.msg}` : ""}`);
-      else if (typeof rec.file === "string") done += 1;
     }
-    return { files_done: done, files_total: head.files_total, ...(failures.length > 0 ? { failures_so_far: failures } : {}) };
+    return { cases_done: cases, ...(typeof head.tests_last_run === "number" ? { cases_last_run: head.tests_last_run } : {}), files_touched: files.size, files_total: head.files_total, ...(failures.length > 0 ? { failures_so_far: failures } : {}) };
   } catch {
     return undefined;
   }
@@ -735,9 +738,20 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
         // never guessed — or told plainly that no record exists.
         const pace = args.files === undefined && args.name_pattern === undefined ? batteryPace(se) : "";
         const entry: { done: Promise<void>; verdict?: Record<string, unknown>; started: number; pace: string } = { done: undefined as unknown as Promise<void>, started: Date.now(), pace };
+        // FIRE AND FORGET (owner ruling 2026-08-03): the verdict writes
+        // itself into the call log at completion, fetched or not. A caller
+        // works elsewhere while the run lives, and the retro reads the
+        // battery's failure rate from the log.
+        let detached = false;
         entry.done = work.then(
-          (v) => { entry.verdict = { job: id, running: false, ...v }; },
-          (e) => { entry.verdict = { job: id, running: false, refused: e instanceof Rejection ? e.toJSON() : String(e) }; },
+          (v) => {
+            entry.verdict = { job: id, running: false, ...v };
+            if (detached) log.append({ tool: "se_test_verdict", args: { job: id, battery: pace !== "" }, ok: v.ok === true, outcome: "result", duration_ms: Date.now() - entry.started, response: { ok: v.ok, ...(v.tests !== undefined ? { tests: v.tests } : {}), ...(v.results !== undefined ? { results: v.results } : {}) } });
+          },
+          (e) => {
+            entry.verdict = { job: id, running: false, refused: e instanceof Rejection ? e.toJSON() : String(e) };
+            if (detached) log.append({ tool: "se_test_verdict", args: { job: id, battery: pace !== "" }, ok: false, outcome: "rejected", duration_ms: Date.now() - entry.started, response: entry.verdict });
+          },
         );
         testVerdicts.set(id, entry);
         let timer: NodeJS.Timeout | undefined;
@@ -747,7 +761,8 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
         ]);
         if (timer !== undefined) clearTimeout(timer);
         if (winner === "handoff") {
-          return { handed_off: true, job: id, note: `still running — it moved to the background rather than hold you. The verdict is recorded regardless; fetch it with se_test {job: "${id}"}. Each fetch waits at most ${HOST_SAFE_WAIT_MS / 1000}s (the host kills a longer block); poll until running is false.${pace}` };
+          detached = true;
+          return { handed_off: true, job: id, note: `still running — it moved to the background rather than hold you. The verdict LOGS ITSELF when the run ends (an se_test_verdict record in the call log); do other work meanwhile, or fetch with se_test {job: "${id}"} — each fetch waits at most ${HOST_SAFE_WAIT_MS / 1000}s.${pace}` };
         }
         if ("e" in (winner as object)) throw (winner as { e: unknown }).e;
         return (winner as { v: Record<string, unknown> }).v;

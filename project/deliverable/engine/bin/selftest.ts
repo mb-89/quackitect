@@ -16,6 +16,7 @@
 //   node engine/bin/selftest.ts --root <project root>
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { availableParallelism } from "node:os";
 import { spawn } from "node:child_process";
 import { killTree } from "../run.ts";
 import { pathToFileURL } from "node:url";
@@ -75,10 +76,14 @@ const CAP_MS = 300_000;
 const lastRunPath = join(root, ".se", "test-last-run.json");
 const prior = (() => {
   try {
-    const rec = JSON.parse(readFileSync(lastRunPath, "utf8")) as { wall_ms?: number; files?: { file: string; sum_ms: number }[] };
-    return { wall_ms: typeof rec.wall_ms === "number" ? rec.wall_ms : undefined, files: new Map((rec.files ?? []).map((f) => [f.file, f.sum_ms])) };
+    const rec = JSON.parse(readFileSync(lastRunPath, "utf8")) as { wall_ms?: number; tests?: number; files?: { file: string; sum_ms: number; cases: number }[] };
+    return {
+      wall_ms: typeof rec.wall_ms === "number" ? rec.wall_ms : undefined,
+      tests: typeof rec.tests === "number" ? rec.tests : undefined,
+      files: new Map((rec.files ?? []).map((f) => [f.file, { sum_ms: f.sum_ms, cases: f.cases }])),
+    };
   } catch {
-    return { wall_ms: undefined, files: new Map<string, number>() };
+    return { wall_ms: undefined, tests: undefined, files: new Map<string, { sum_ms: number; cases: number }>() };
   }
 })();
 const startedAt = Date.now();
@@ -88,7 +93,7 @@ const progressPath = join(root, ".se", "test-progress.jsonl");
 const expectedFiles = files.map((f) => `project/deliverable/${f.replace(/\\/g, "/")}`);
 try {
   mkdirSync(join(root, ".se"), { recursive: true });
-  writeFileSync(progressPath, `${JSON.stringify({ start: new Date(startedAt).toISOString(), files_total: expectedFiles.length })}\n`, "utf8");
+  writeFileSync(progressPath, `${JSON.stringify({ start: new Date(startedAt).toISOString(), files_total: expectedFiles.length, cores: availableParallelism(), ...(prior.tests !== undefined ? { tests_last_run: prior.tests } : {}) })}\n`, "utf8");
 } catch {
   // bookkeeping never blocks the run
 }
@@ -111,10 +116,11 @@ const r = await new Promise<{ status: number | null; killed: boolean; out: strin
 });
 if (r.killed) {
   process.stdout.write(`selftest: KILLED at its ${CAP_MS / 1000}s cap — the run is TRUNCATED, the tallies below are not a verdict${prior.wall_ms !== undefined ? ` (the last completed battery took ${Math.round(prior.wall_ms / 1000)}s)` : ""}\n`);
-  // The beat stream outlives the kill: what never finished IS the diagnosis,
-  // and a finished file far over its own last-run cost gets named too.
+  // The beat stream outlives the kill. Completeness is judged against the
+  // LAST run's per-file case counts — measured, never inferred from runner
+  // internals. A file with no baseline is named unknown, never assumed done.
   try {
-    const finished = new Map<string, number>();
+    const seen = new Map<string, { cases: number; ms: number }>();
     const fails: string[] = [];
     for (const line of readFileSync(progressPath, "utf8").split("\n").slice(1)) {
       if (line.trim() === "") continue;
@@ -124,16 +130,32 @@ if (r.killed) {
       } catch {
         continue;
       }
-      if (typeof rec.fail === "string") fails.push(`  ${rec.fail}${typeof rec.msg === "string" && rec.msg !== "" ? ` — ${rec.msg}` : ""}`);
-      else if (typeof rec.file === "string") finished.set(rec.file, Number(rec.ms ?? 0));
+      if (typeof rec.file !== "string") continue;
+      const agg = seen.get(rec.file) ?? { cases: 0, ms: 0 };
+      agg.cases += 1;
+      agg.ms += Number(rec.ms ?? 0);
+      seen.set(rec.file, agg);
+      if (typeof rec.fail === "string") fails.push(`  ${rec.fail} (${rec.file})${typeof rec.msg === "string" && rec.msg !== "" ? ` — ${rec.msg}` : ""}`);
     }
-    const unfinished = expectedFiles.filter((f) => !finished.has(f));
-    process.stdout.write(`finished ${finished.size} of ${expectedFiles.length} files. UNFINISHED — the hang list:\n${unfinished.map((f) => `  ${f}`).join("\n")}\n`);
-    const over = [...finished].filter(([f, ms]) => {
+    const complete: string[] = [];
+    const partial: string[] = [];
+    const untouched: string[] = [];
+    for (const f of expectedFiles) {
       const base = prior.files.get(f);
-      return base !== undefined && ms > 2 * base && ms - base > 1000;
+      const got = seen.get(f);
+      if (got === undefined) untouched.push(f);
+      else if (base !== undefined && got.cases >= base.cases) complete.push(f);
+      else partial.push(`  ${f} (${got.cases}${base !== undefined ? ` of ${base.cases}` : ""} cases, ${(got.ms / 1000).toFixed(1)}s)`);
+    }
+    process.stdout.write(`complete ${complete.length} of ${expectedFiles.length} files, by last-run case counts.\n`);
+    if (partial.length > 0) process.stdout.write(`MID-FLIGHT at the kill:\n${partial.join("\n")}\n`);
+    if (untouched.length > 0) process.stdout.write(`never started:\n${untouched.map((f) => `  ${f}`).join("\n")}\n`);
+    const over = complete.filter((f) => {
+      const base = prior.files.get(f);
+      const got = seen.get(f);
+      return base !== undefined && got !== undefined && got.ms > 2 * base.sum_ms && got.ms - base.sum_ms > 1000;
     });
-    if (over.length > 0) process.stdout.write(`over their last-run baseline:\n${over.map(([f, ms]) => `  ${f} ${(ms / 1000).toFixed(1)}s (last run ${((prior.files.get(f) ?? 0) / 1000).toFixed(1)}s)`).join("\n")}\n`);
+    if (over.length > 0) process.stdout.write(`over their last-run baseline:\n${over.map((f) => `  ${f} ${((seen.get(f)?.ms ?? 0) / 1000).toFixed(1)}s (last run ${((prior.files.get(f)?.sum_ms ?? 0) / 1000).toFixed(1)}s)`).join("\n")}\n`);
     if (fails.length > 0) process.stdout.write(`failures before the kill:\n${fails.join("\n")}\n`);
   } catch {
     // no beat stream — the reporter never started
