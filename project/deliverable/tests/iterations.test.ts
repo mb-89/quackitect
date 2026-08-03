@@ -40,10 +40,10 @@ test("a seed stands in the container at once — kickoff only, gate armed", () =
   const kick = gen.decl.states.find((s) => s.id === "i1")!;
   assert.equal(kick.statement, "first visible iteration");
   assert.deepEqual(kick.entry, { no_pending_note: ["needs retro"] });
-  assert.equal(gen.expByState["i1"], it.id);
+  assert.equal(gen.expByState.i1, it.id);
   // Not a git repo → an empty container that runs start to end.
   const empty = generateIterations(freshRoot());
-  assert.deepEqual(empty.decl.states.find((s) => s.id === "start")!.edges, [{ to: "end", role: "normal" }]);
+  assert.deepEqual(empty.decl.states.find((s) => s.id === "start")?.edges, [{ to: "end", role: "normal" }]);
 });
 
 test("the graph is evidence: an open decision point blocks the leave form", () => {
@@ -52,7 +52,7 @@ test("the graph is evidence: an open decision point blocks the leave form", () =
   const s = new Session(root);
   const minted = s.expeditionNew("spike", "graph evidence") as { created: string };
   s.expeditionOpen(minted.created);
-  const sid = minted.created.match(/^(e\d+)-/)![1];
+  const sid = minted.created.match(/^(e\d+)-/)?.[1];
   // A filled, done form — but the graph still holds an open point.
   const rel = join(root, ".worktrees", minted.created, "project", "spec", "expeditions", minted.created, "report.md");
   const filled = [
@@ -203,9 +203,9 @@ test("escalation reopens exactly the grown steps", () => {
   const rank: Record<string, number> = { none: 0, tailored: 1, inherit: 2, full: 2 };
   const expected = m.rows
     .filter((r) => {
-      const p = m.cells.get(r.name)!.get("patch")!.applies;
-      const mi = m.cells.get(r.name)!.get("minor")!.applies;
-      return p !== "none" && mi !== "none" && (rank[mi] ?? 0) > (rank[p] ?? 0);
+      const p = m.cells.get(r.name)?.get("patch")?.applies;
+      const mi = m.cells.get(r.name)?.get("minor")?.applies;
+      return p !== "none" && mi !== "none" && (rank[mi ?? ""] ?? 0) > (rank[p ?? ""] ?? 0);
     })
     .map((r) => r.name)
     .sort();
@@ -233,7 +233,7 @@ test("the bless pins the machine and the container expands to the pinned walk", 
   session.setAutonomy(1);
   const seeded = session.iterationSeed("walk the pinned machine", "the bless compiles and pins");
   const id = String(seeded.seeded);
-  const sid = id.match(/^(i\d+)-/)![1];
+  const sid = id.match(/^(i\d+)-/)?.[1];
   await session.advance("iterations");
   await session.advance(sid);
   // No change_size in the record: the bless refuses, mechanically.
@@ -314,7 +314,7 @@ test("needs-retro holds the FIRST start; draining opens it; a started iteration 
   await session.advance();
   session.setAutonomy(1); // the kickoff weighs 0.6 — lift the slider clear
   const seeded = session.iterationSeed("prove the gate", "the first start waits on the retro");
-  const sid = String(seeded.seeded).match(/^(i\d+)-/)![1];
+  const sid = String(seeded.seeded).match(/^(i\d+)-/)?.[1];
   await call(server, "se_note", { text: "needs retro — iteration wrapped" });
   await session.advance("iterations");
   await assert.rejects(

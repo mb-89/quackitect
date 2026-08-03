@@ -9,9 +9,6 @@
 // It times the stages a boot walk is made of, separately, so the answer is
 // never "boot is slow" but "this stage is, by this much".
 import { spawnSync } from "node:child_process";
-import { mkdtempSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 import { freshRoot, readEverything } from "../../tests/helpers.ts";
 import { compileMachineCached } from "../machines/compile.ts";
 import { mainMachinePath, Session } from "../session.ts";

@@ -12,7 +12,6 @@ import { join } from "node:path";
 import { type CanvasData, type CanvasEdge, type CanvasElement, nodeSize } from "./canvas.ts";
 import { type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
 import { stateFromNote } from "./machines/compile.ts";
-import { parseStateNote } from "./notes.ts";
 import { type Expedition, expList, frontmatterOf, readRecord, recordRel } from "./worktree.ts";
 
 export interface GeneratedMachine {
@@ -184,7 +183,7 @@ function closedRecords(root: string, closed: Expedition[]): Map<string, Record<s
     }
   }
   if (missing.length === 0) return out;
-  const input = missing.map((e) => `${e.branch}:${recordRel(e.id)}`).join("\n") + "\n";
+  const input = `${missing.map((e) => `${e.branch}:${recordRel(e.id)}`).join("\n")}\n`;
   const r = spawnSync("git", ["cat-file", "--batch"], { cwd: root, input, maxBuffer: 64 * 1024 * 1024 });
   if (r.status !== 0) {
     for (const e of missing) {

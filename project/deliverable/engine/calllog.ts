@@ -39,7 +39,7 @@ export class CallLog {
       ...entry,
     };
     mkdirSync(dirname(this.path), { recursive: true });
-    appendFileSync(this.path, JSON.stringify(rec) + "\n", "utf8");
+    appendFileSync(this.path, `${JSON.stringify(rec)}\n`, "utf8");
     return rec;
   }
 

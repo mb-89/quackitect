@@ -90,7 +90,7 @@ test("a long brief is cut at a word, so the column stays narrow", () => {
   ]);
   const line = g.split("\n").find((l) => l.includes("a brief long enough")) ?? "";
   assert.match(line, /…"/, "it says it was cut");
-  assert.ok(line.length < 80, "and the line stays short: " + line.length);
+  assert.ok(line.length < 80, `and the line stays short: ${line.length}`);
 });
 
 test("an empty graph renders rather than throwing", () => {

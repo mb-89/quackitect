@@ -141,7 +141,7 @@ test("the survey lists a note by title — cut at a word, never mid-word, and ne
   const heading =
     "A HEADING LINE LONG ENOUGH THAT ONE HUNDRED AND TWENTY CHARACTERS WOULD END IT SOMEWHERE IN THE MIDDLE OF A WORD RATHER THAN AT ITS END.";
   const substance = "The substance lives down here, which is the only reason anyone reads a note at all.";
-  const ref = String((await call(server, "se_note", { text: heading + "\n\n" + substance })).body.captured);
+  const ref = String((await call(server, "se_note", { text: `${heading}\n\n${substance}` })).body.captured);
   assert.ok(heading.length > 120, "the heading alone outruns the old slice");
   const answered = await call(server, "se_survey", {});
   assert.equal(answered.isError, false, JSON.stringify(answered.body));

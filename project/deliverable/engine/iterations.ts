@@ -161,7 +161,7 @@ export function itFind(root: string, id: string): Iteration {
 
 /** First entry stamps `started:` — from then on the needs-retro gate no
  *  longer holds this iteration (re-entering running work is never blocked). */
-export function markStarted(root: string, it: Iteration): void {
+export function markStarted(_root: string, it: Iteration): void {
   const recAbs = join(it.path, itRecordRel(it.id));
   if (!existsSync(recAbs)) return;
   const raw = readFileSync(recAbs, "utf8");
@@ -193,7 +193,7 @@ function chunkList(v: unknown): string[] {
   return [];
 }
 
-export function generateSeeded(root: string, it: Iteration, machineId: string, kind: string): GeneratedMachine {
+export function generateSeeded(_root: string, it: Iteration, machineId: string, kind: string): GeneratedMachine {
   const abs = join(it.path, itSeededRel(it.id, kind));
   const scaffold =
     '---\nsteps:\n  - id: <step>\n    statement: "<what this step builds or settles>"\n    depends_on: []\n    realization: software\n---\n';
@@ -406,9 +406,11 @@ export function pinIteration(root: string, it: Iteration, changeSize: string): R
   // re-earned. Guidance-only wording never reopens.
   const reopened = Object.keys(prev?.demands ?? {})
     .filter((id) => {
-      const o = prev!.demands![id];
+      const o = prev?.demands?.[id];
       const n = demands[id];
-      return n !== undefined && ((APPLIES_RANK[n.applies] ?? 0) > (APPLIES_RANK[o.applies] ?? 0) || n.evidence !== o.evidence);
+      return (
+        n !== undefined && (o === undefined || (APPLIES_RANK[n.applies] ?? 0) > (APPLIES_RANK[o.applies] ?? 0) || n.evidence !== o.evidence)
+      );
     })
     .sort();
   const pin = {
@@ -555,7 +557,7 @@ export function generateIterations(root: string): GeneratedMachine {
       guidance:
         "KICKOFF — one brief carries plan and rigor; the owner blesses, and past it the iteration is set. THE CHANGE SIZE IS NOT YOURS TO PICK. You PROPOSE one with your reasoning; the person decides, and their bless is the decision. Seeding never asked for a size and never needed to — every iteration reaches this state the same way, and the size is chosen here or nowhere. The bless SEEDS the rest: the engine compiles the blessed change_size from the live rigor matrix and pins the machine into the record. Goal, vision and inputs live in the record.",
       evidence_form: kickoff()?.evidence_form ?? [],
-      ...(kickoff()?.legal_tools !== undefined ? { legal_tools: kickoff()!.legal_tools } : {}),
+      ...(kickoff()?.legal_tools !== undefined ? { legal_tools: kickoff()?.legal_tools } : {}),
       priority: 0.6,
       ...(started ? {} : { entry: { no_pending_note: ["needs retro"] } }),
       tags: ["iteration-kickoff"],
@@ -567,7 +569,7 @@ export function generateIterations(root: string): GeneratedMachine {
       states.push({
         id: walkId,
         kind: "work",
-        statement: `the pinned ${String(pinned!.change_size)} walk (${m.states.length} states)`,
+        statement: `the pinned ${String(pinned?.change_size)} walk (${m.states.length} states)`,
         guidance:
           "The pinned machine — compiled from the rigor matrix at the kickoff bless, pinned to the record. Click in; the walk continues inside. Rigor matrix edits reach the NEXT kickoff, never this walk.",
         evidence_form: [],

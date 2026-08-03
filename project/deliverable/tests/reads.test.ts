@@ -25,8 +25,8 @@ test("the guidance splits three ways, and every home reaches the reader", () => 
   const idle = s.machine.states.find((x) => x.id === "idle")!;
   const pulled = s.pulled(s.machine, idle).map((p) => p.path);
   for (const home of ["project/guidance/software.md", "project/guidance/ux.md"]) {
-    assert.ok(pulled.includes(home), home + " is not pulled — a guidance nobody pulls is a guidance nobody reads");
-    assert.ok(READ_DOCS.includes(home as (typeof READ_DOCS)[number]), home + " is pulled but the suite never proves reading it");
+    assert.ok(pulled.includes(home), `${home} is not pulled — a guidance nobody pulls is a guidance nobody reads`);
+    assert.ok(READ_DOCS.includes(home as (typeof READ_DOCS)[number]), `${home} is pulled but the suite never proves reading it`);
   }
   assert.ok(!pulled.includes("project/guidance/voice.md"), "a promoted source must not also ride the wire");
   const read = (p: string): string => readFileSync(join(root, ...p.split("/")), "utf8");
@@ -41,7 +41,7 @@ test("the guidance splits three ways, and every home reaches the reader", () => 
   assert.match(ux, /NEVER BLOCK THE PROCESS THAT DRAWS THE INTERFACE/, "including the half that actually bites");
   assert.match(ux, /ONE SURFACE NEVER RESETS ANOTHER/, "and the place rules");
   for (const moved of [/Do not repeat \(DRY\)/, /Comments & provenance/, /### Visual design/, /### Figures/]) {
-    assert.ok(!moved.test(voice), "voice.md kept " + String(moved) + " — it belongs to a sibling now");
+    assert.ok(!moved.test(voice), `voice.md kept ${String(moved)} — it belongs to a sibling now`);
   }
   // What voice.md is FOR stays in it.
   assert.match(voice, /### Sentences/);

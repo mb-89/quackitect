@@ -20,7 +20,7 @@ function rootWithShell(script: string): string {
   mkdirSync(dir, { recursive: true });
   // The script lives inside a template literal, exactly as the real shell
   // builds its webviews — so the OUTER file parses whatever is in here.
-  writeFileSync(join(dir, "extension.js"), "const html = `<script>" + script + "</script>`;\n", "utf8");
+  writeFileSync(join(dir, "extension.js"), `const html = \`<script>${script}</script>\`;\n`, "utf8");
   return root;
 }
 
@@ -81,6 +81,7 @@ describe("preflight", { concurrency: true }, () => {
   // is what lets the body be judged at all; without it every real webview
   // would report a false failure.
   test("host interpolation is blanked rather than parsed", () => {
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: the test feeds a literal host-interpolation marker on purpose
     const out = preflightOutput(rootWithShell("const a = ${JSON.stringify(x)}; const b = a;"));
     assert.ok(!out.includes("webview script"), "an interpolated script is not a syntax error");
   });

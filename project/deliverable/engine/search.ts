@@ -145,7 +145,7 @@ export function search(root: string, query: string, opts: SearchOpts = {}): Sear
 function rgScope(root: string, opts: { path?: string }): { scope: string; base: string; show: (abs: string) => string } {
   const scope = opts.path === undefined ? resolve(root) : resolveForRead(root, opts.path, "engine/search.ts");
   const rootRef = opts.path !== undefined && isRootRef(opts.path);
-  const rootName = rootRef ? opts.path!.slice(1).split(/[\\/]+/)[0] : "";
+  const rootName = rootRef ? opts.path?.slice(1).split(/[\\/]+/)[0] : "";
   const base = rootRef ? resolveDeclaredRoot(root, `@${rootName}`, "engine/search.ts") : resolve(root);
   const prefix = rootRef ? `@${rootName}/` : "";
   const show = (abs: string): string => {

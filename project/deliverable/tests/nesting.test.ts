@@ -124,7 +124,7 @@ test("nesting: the walk descends into an archive decade and climbs back out", as
   // The nested machines stay viewable from idle — decl and drawing.
   const dec = s.viewFor("e11-e12");
   assert.ok(dec !== undefined);
-  assert.equal(dec!.decl.states.length, 4, "start + two records + end");
+  assert.equal(dec?.decl.states.length, 4, "start + two records + end");
   assert.ok(s.viewFor("expedition_archive") !== undefined);
   // Breadcrumbs walk the PARENT CHAIN — a decade stands under its archive.
   assert.deepEqual(s.viewChain("e11-e12"), ["main", "expedition_archive", "e11-e12"]);
@@ -293,7 +293,7 @@ test("se_answer records an aq entry and the feed types it aq", async () => {
   const rows = feedRows(new CallLog(seDir(root)), "2000-01-01").rows as { type: string; brief: string }[];
   const aq = rows.find((r) => r.type === "aq");
   assert.ok(aq !== undefined, "the aq row rides the feed");
-  assert.equal(aq!.brief, "Where does the ruling live?", "the feed line is the question");
+  assert.equal(aq?.brief, "Where does the ruling live?", "the feed line is the question");
 });
 
 test("se_test: one call runs both scripts with structured verdicts", async () => {

@@ -9,9 +9,6 @@
 // TO FORGET. It arms only from the top rung. It dies with that rung. It never
 // survives a restart. And nothing in the resting packet says it exists.
 import { strict as assert } from "node:assert";
-import { mkdtempSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 import { describe, test } from "node:test";
 import { Rejection } from "../engine/errors.ts";
 import { Session } from "../engine/session.ts";

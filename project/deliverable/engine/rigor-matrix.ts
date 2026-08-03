@@ -313,7 +313,7 @@ export function compileColumn(matrix: RigorMatrix, column: ChangeColumn): Machin
         }
         back.push({ to: d, role: "recovery" });
       } else {
-        list.push({ to: row.name, role: byName.get(d)!.state_kind === "gate" ? "approval" : "normal" });
+        list.push({ to: row.name, role: byName.get(d)?.state_kind === "gate" ? "approval" : "normal" });
       }
     }
   }

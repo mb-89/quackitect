@@ -372,9 +372,9 @@ export function completeState(
       src.edges.filter((e) => e.to === s.id && (e.role === "normal" || e.role === "approval")).map(() => `${src.id}->${s.id}`),
     );
     if (inbound.length === 0) continue;
-    const fired = inbound.filter((k) => inst.fired!.includes(k));
+    const fired = inbound.filter((k) => inst.fired?.includes(k));
     if (s.kind === "join" ? fired.length < inbound.length : fired.length === 0) continue;
-    inst.fired = inst.fired!.filter((k) => !inbound.includes(k)); // consume
+    inst.fired = inst.fired?.filter((k) => !inbound.includes(k)); // consume
     activated.push(s.id);
     if (s.kind === "terminal" || s.kind === "end") inst.status = "closed";
   }

@@ -584,7 +584,7 @@ test("roots.json survives a BOM, and a broken one refuses LOUDLY", () => {
   const cfg = join(root, ".se", "roots.json");
 
   // Notepad and PowerShell both write this byte order mark. It must not bite.
-  writeFileSync(cfg, "﻿" + JSON.stringify({ desk: outside }), "utf8");
+  writeFileSync(cfg, `﻿${JSON.stringify({ desk: outside })}`, "utf8");
   assert.ok(fileRead(root, "@desk/x.md").content.includes("reachable"));
 
   // Broken JSON is a refusal naming the file, NOT a quiet "none declared".

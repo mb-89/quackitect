@@ -22,7 +22,7 @@ const compiled = new Map(CHANGE_COLUMNS.map((c) => [c, compileColumn(mx, c)]));
 
 /** Every state's instructions, as one comparable value. */
 const instructions = (column: string): string =>
-  JSON.stringify(compiled.get(column as (typeof CHANGE_COLUMNS)[number])!.states.map((s) => [s.id, s.guidance]));
+  JSON.stringify(compiled.get(column as (typeof CHANGE_COLUMNS)[number])?.states.map((s) => [s.id, s.guidance]));
 
 describe("the sizes are not the same walk", () => {
   test("each size strikes a different number of steps", () => {

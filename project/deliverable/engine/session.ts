@@ -61,7 +61,7 @@ import {
 } from "./iterations.ts";
 import { parseStateNote, section } from "./notes.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
-import { type GuidanceDoc, type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
+import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { anyJobRunning } from "./run.ts";
 import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
@@ -198,14 +198,14 @@ export class Session {
       mkdirSync(seDir(this.root), { recursive: true });
       writeFileSync(
         join(seDir(this.root), "settings.json"),
-        JSON.stringify({
+        `${JSON.stringify({
           session: process.env.SE_SESSION ?? null,
           autonomy: this._autonomy,
           block_sleep: this._blockSleep,
           shutdown_at_idle: this._shutdownAtIdle,
           narration_minutes: this._narrationMinutes,
           narration_calls: this._narrationCalls,
-        }) + "\n",
+        })}\n`,
         "utf8",
       );
     } catch {
@@ -410,7 +410,7 @@ export class Session {
    *  whose hand it was; an EDITED report drops its bless (one bless per
    *  version), and a standing bless lets a re-walk pass without re-asking. */
   private gateReportRel(gateId: string): string {
-    return `project/spec/iterations/${this.bound!.id}/reviews/${gateId}.md`;
+    return `project/spec/iterations/${this.bound?.id}/reviews/${gateId}.md`;
   }
 
   private assertGateReport(gateId: string, s: StateDecl, channel: Channel): void {
@@ -492,7 +492,7 @@ export class Session {
     // THE BLESS: this passing tick is the act, and it lands durably — the
     // report's version pinned, the hand recorded. Below 0.6 the slider made
     // that hand human; at or above, the delegation is stamped honestly.
-    writeFileSync(blessAbs, JSON.stringify({ hash: reportHash, by: channel, at: new Date().toISOString() }) + "\n", "utf8");
+    writeFileSync(blessAbs, `${JSON.stringify({ hash: reportHash, by: channel, at: new Date().toISOString() })}\n`, "utf8");
   }
 
   /** THE PING (owner, 2026-07-30): the agent points at a mirror surface and
@@ -958,7 +958,7 @@ export class Session {
    *  to the desk IS going to ask the person — the andon cord — and a cord
    *  that can refuse to be pulled is no cord. What the desk demands
    *  arrives on the next pull, as `read`. */
-  escape(reason: string, channel: Channel = "agent"): Record<string, unknown> {
+  escape(reason: string, _channel: Channel = "agent"): Record<string, unknown> {
     if (reason.trim() === "") {
       throw new Rejection({
         clause: CLAUSES.REQUIRED_ARGS,
@@ -1012,7 +1012,7 @@ export class Session {
         note: "escaped to the front desk — the walk was left standing. Tell the person PLAINLY why, then wait for their word.",
       };
     }
-    if (this.top()!.decl.id === "boot") {
+    if (this.top()?.decl.id === "boot") {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "a sub-machine other than boot",
@@ -2353,7 +2353,7 @@ export class Session {
 
   formSave(name: string, fields: Record<string, string>): Record<string, unknown> {
     const h = this.formHome(name);
-    let raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : scaffoldInstance(h.template, `${this.bound!.id} — ${name}`);
+    let raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : scaffoldInstance(h.template, `${this.bound?.id} — ${name}`);
     for (const [f, content] of Object.entries(fields)) raw = withFieldContent(raw, f, String(content));
     mkdirSync(dirname(h.instanceAbs), { recursive: true });
     writeFileSync(h.instanceAbs, raw, "utf8");
@@ -2725,7 +2725,7 @@ export class Session {
   private pullGateExempt(m: MachineDecl, t: StateDecl): boolean {
     if (t.kind === "start" || t.kind === "end") return true;
     if (m.id === "boot") return true;
-    if (t.submachine !== undefined && t.submachine.includes("boot")) return true;
+    if (t.submachine?.includes("boot")) return true;
     return false;
   }
 
@@ -2760,7 +2760,7 @@ export class Session {
    *  what kept being skipped. Written BEFORE this session started is a
    *  leftover, not a handover, so the clock decides — not the file's
    *  existence. */
-  private assertHandoverWritten(channel: Channel): void {
+  private assertHandoverWritten(_channel: Channel): void {
     const p = this.handoverPath();
     const writtenMs = existsSync(p) ? statSync(p).mtimeMs : -1;
     if (writtenMs >= Date.parse(this.startedTs)) return;

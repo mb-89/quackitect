@@ -74,7 +74,7 @@ test("an update pays, whatever the cadence, and the count starts over", async ()
       limit: 1,
       update: { op: "update", brief: "still reading" },
     });
-    assert.equal(r.isError, false, "a volunteered update is never stopped: " + JSON.stringify(r.body));
+    assert.equal(r.isError, false, `a volunteered update is never stopped: ${JSON.stringify(r.body)}`);
   }
 });
 

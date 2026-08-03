@@ -36,9 +36,9 @@ describe("the token set", { concurrency: true }, () => {
       const text = readFileSync(MACHINES + f, "utf8");
       if (/\bjoin\b/.test(text)) joins.push(f);
     }
-    const notes = readdirSync(MACHINES + "states/").filter((f) => f.endsWith(".md"));
+    const notes = readdirSync(`${MACHINES}states/`).filter((f) => f.endsWith(".md"));
     for (const n of notes) {
-      if (/state_kind:\s*join/.test(readFileSync(MACHINES + "states/" + n, "utf8"))) joins.push("states/" + n);
+      if (/state_kind:\s*join/.test(readFileSync(`${MACHINES}states/${n}`, "utf8"))) joins.push(`states/${n}`);
     }
     assert.deepEqual(joins, [], "a join appeared — read the next test, it is now load-bearing");
   });

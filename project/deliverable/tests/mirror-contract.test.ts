@@ -291,7 +291,7 @@ test("every place the reader can pin is registered, so navigation carries it", (
   assert.ok(pinned.includes("view"), "the sweep found the pin sites at all");
   for (const p of pinned) {
     if (p === "view") continue;
-    assert.ok(registered.has(p), p + " is pinned into the URL but is not a registered place");
+    assert.ok(registered.has(p), `${p} is pinned into the URL but is not a registered place`);
   }
 
   // Both consumers go through the registry. A fourth hand-written list is
@@ -486,7 +486,7 @@ test("the checklist nudges when narration outruns it, and never refuses", () => 
   }[];
   let last: Record<string, unknown> = {};
   for (let i = 0; i < 5; i++)
-    last = s.decisions.apply("idle@0", { op: "update", node: items[0].id, brief: "working " + i }) as Record<string, unknown>;
+    last = s.decisions.apply("idle@0", { op: "update", node: items[0].id, brief: `working ${i}` }) as Record<string, unknown>;
   assert.ok(typeof last.nudge === "string", "five updates with nothing closed earns the nudge");
   assert.match(String(last.nudge), /PROGRESS view/);
   assert.equal(last.update, "update", "and the update itself still lands - a nudge is never a refusal");

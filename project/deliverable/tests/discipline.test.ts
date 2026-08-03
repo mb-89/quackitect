@@ -284,7 +284,7 @@ test("no_tool_reason runs a blocked category once and files the reason as eviden
   const cmd = "Select-String -Pattern 'x' a.ts";
   laneVerdict(se, cmd); // grace spent
   const w = laneVerdict(se, cmd, "needs -Context 40, beyond the lane's cap");
-  assert.ok(w !== undefined && w.note.includes("logged"), "the valve run still carries the lane's answer");
+  assert.ok(w?.note.includes("logged"), "the valve run still carries the lane's answer");
   const state = JSON.parse(readFileSync(join(se, "discipline.json"), "utf8")) as { reasons: { category: string; reason: string }[] };
   assert.equal(state.reasons.length, 1);
   assert.ok(state.reasons[0].reason.includes("-Context 40"));
@@ -573,7 +573,7 @@ test("the streak counts consecutive greens per scope and a red resets it", () =>
 import { capMiddle } from "../engine/jsonio.ts";
 
 test("capMiddle keeps both ends — the tail's unit survives any cap", () => {
-  const out = "x".repeat(9000) + " tests 425 pass 424 fail 1 duration (425.501917ms)";
+  const out = `${"x".repeat(9000)} tests 425 pass 424 fail 1 duration (425.501917ms)`;
   const capped = capMiddle(out, 1000);
   assert.ok(capped.length < 1300, "capped near the budget");
   assert.ok(capped.includes("(425.501917ms)"), "the END survives — the unit cannot be eaten");

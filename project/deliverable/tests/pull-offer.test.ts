@@ -15,9 +15,6 @@
 // Split from pull.test.ts by theme; each case here costs a boot walk. See
 // guidance/software.md.
 import { strict as assert } from "node:assert";
-import { mkdtempSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 import { describe, test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { freshRoot, readEverything, sessionAtIdle } from "./helpers.ts";

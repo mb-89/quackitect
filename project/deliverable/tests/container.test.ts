@@ -132,7 +132,7 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
   // The leave gate rides the AUTHORED note into every instance.
   assert.deepEqual(gen.decl.states.find((x) => x.id === `${sidB}-leave`)?.entry?.evidence_form, ["expedition-leave"]);
   // The drawing carries one group per expedition, labeled with its id.
-  assert.ok(gen.canvas.nodes!.some((n) => n.type === "group" && n.label === b.created));
+  assert.ok(gen.canvas.nodes?.some((n) => n.type === "group" && n.label === b.created));
 
   // Walk: enter the container, choose B — the click IS the pick, the
   // worktree binds on entry.
@@ -247,7 +247,7 @@ test("the archive: start reaches every closed expedition, each runs to end, brow
   assert.equal(st.priority, 1.5, "archive browsing sits above the whole slider — human-only");
   assert.equal(st.statement, "Archived Thing", "the record's goal is the statement");
   assert.ok(
-    gen.canvas.edges!.some((e) => e.fromNode === "n-start" && e.toNode === `n-${sid}`),
+    gen.canvas.edges?.some((e) => e.fromNode === "n-start" && e.toNode === `n-${sid}`),
     "the drawing carries start → expedition",
   );
   const empty = generateExpeditionArchive(join(root, ".no-such"));

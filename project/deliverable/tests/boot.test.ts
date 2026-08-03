@@ -19,17 +19,17 @@ describe("boot", { concurrency: true }, () => {
     const m = compileMachine(REPO_ROOT, mainMachinePath(REPO_ROOT));
     assert.equal(m.id, "main");
     assert.equal(m.initial, "start", "entry is the mechanical start state, not frontmatter");
-    assert.equal(m.states.find((s) => s.id === "start")!.kind, "start");
-    assert.equal(m.states.find((s) => s.id === "end")!.kind, "end");
+    assert.equal(m.states.find((s) => s.id === "start")?.kind, "start");
+    assert.equal(m.states.find((s) => s.id === "end")?.kind, "end");
     const boot = m.states.find((s) => s.id === "boot")!;
     assert.ok(boot.submachine?.endsWith("boot.canvas"), "boot is a sub-machine state");
-    assert.deepEqual(m.states.find((s) => s.id === "idle")!.legal_tools, ["all"]);
+    assert.deepEqual(m.states.find((s) => s.id === "idle")?.legal_tools, ["all"]);
   });
 
   test("the boot sub-machine compiles with its own mechanical start/end", () => {
     const m = compileMachine(REPO_ROOT, mainMachinePath(REPO_ROOT).replace("main.canvas", "boot.canvas"));
     assert.equal(m.initial, "start");
-    assert.equal(m.states.find((s) => s.id === "end")!.kind, "end");
+    assert.equal(m.states.find((s) => s.id === "end")?.kind, "end");
     const rc = m.states.find((s) => s.id === "read_contract")!;
     // BOOT READS ONE THING NOW. The contract, the walk, the lane and the voice
     // were PROMOTED to the prompt layer, where they are present every turn and
@@ -203,15 +203,15 @@ describe("boot", { concurrency: true }, () => {
     // An absent dictionary is the shape of a boot that owes nothing — which is
     // the whole point of the promotion.
     assert.deepEqual(Object.keys(state.exit ?? {}), ["read_consume"], "boot's only remaining exit demand is the handover");
-    assert.deepEqual(state.exit!.read_consume.args, [], "and with none left behind it asks for nothing");
+    assert.deepEqual(state.exit?.read_consume.args, [], "and with none left behind it asks for nothing");
     assert.ok(state.pulled !== undefined && state.pulled.length >= 2, "the pulled guidance rides the packet");
     // The hash IS the proof — packets must never print it.
     assert.ok(
-      state.pulled!.every((p) => !("hash" in p)),
+      state.pulled?.every((p) => !("hash" in p)),
       "packets never hand out the hashes",
     );
     assert.ok(
-      state.pulled!.some((p) => (p.sources as string[]).includes("root")),
+      state.pulled?.some((p) => (p.sources as string[]).includes("root")),
       "root guidance pulled always",
     );
     assert.ok(Array.isArray(state.lookahead_read), "packet carries preread hint field");

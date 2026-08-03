@@ -22,7 +22,7 @@ if (blocks.length === 0) {
   process.exit(1);
 }
 
-const out = outPath ?? source.replace(/\.md$/, "") + ".check.html";
+const out = outPath ?? `${source.replace(/\.md$/, "")}.check.html`;
 const esc = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 // The title carries the verdict so a screenshot never needs the console, and

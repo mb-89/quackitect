@@ -317,7 +317,7 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
    *  connection, so it is the only side that can say so — the child that
    *  knew about the change has already exited by now. */
   const notifyToolListChanged = (): void => {
-    process.stdout.write(JSON.stringify({ jsonrpc: "2.0", method: "notifications/tools/list_changed" }) + "\n");
+    process.stdout.write(`${JSON.stringify({ jsonrpc: "2.0", method: "notifications/tools/list_changed" })}\n`);
   };
 
   const ensureChild = (): ChildProcess => {
@@ -357,7 +357,7 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
         } catch {
           return; // non-JSON child noise never reaches the harness
         }
-        process.stdout.write(line + "\n");
+        process.stdout.write(`${line}\n`);
       });
       child = c;
     }
@@ -424,7 +424,7 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
         } catch {
           // the child answers parse errors itself
         }
-        c.stdin!.write(line + "\n");
+        c.stdin?.write(`${line}\n`);
       });
       rl.on("close", () => {
         // Drain: answers already owed still flow home before the lights go out.

@@ -106,10 +106,10 @@ test("a plain reverse edge compiles as a return, and a duplicate collapses", () 
   assert.equal(toIdle.length, 1, "the duplicate collapsed to one edge");
   assert.equal(toIdle[0].role, "alternative", "the plain return infers alternative");
   const desk = m.states.find((s) => s.id === "front_desk")!;
-  assert.equal(desk.edges.find((e) => e.to === "idle")!.role, "alternative");
+  assert.equal(desk.edges.find((e) => e.to === "idle")?.role, "alternative");
   // The authored returns stay what they are.
   const exp = m.states.find((s) => s.id === "expeditions")!;
-  assert.equal(exp.edges.find((e) => e.to === "idle")!.role, "alternative");
+  assert.equal(exp.edges.find((e) => e.to === "idle")?.role, "alternative");
 });
 
 test("the owner's redraw no longer strands the walk: boot completes into idle", async () => {
@@ -265,7 +265,7 @@ test("the close is atomic: a conflicting merge aborts and refuses typed, the roo
     (err) => (err as { clause?: string }).clause === "SE-C-112" && /clash\.md/.test(String((err as { got?: string }).got)),
   );
   const st = spawnSync("git", ["status"], { cwd: root, encoding: "utf8", windowsHide: true }).stdout;
-  assert.ok(!/Unmerged|MERGING|both added/.test(st), "the root tree stands clean after the refusal: " + st);
+  assert.ok(!/Unmerged|MERGING|both added/.test(st), `the root tree stands clean after the refusal: ${st}`);
 });
 
 // A DIRTY TRUNK IS SETTLED, NOT REFUSED (owner ruling 2026-07-28). git will

@@ -86,7 +86,7 @@ const esc = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;"
  * above it with it. BLOCKED IS NOT A BUTTON — it is what no rung pressed
  * means, so it is reached by releasing the lowest one.
  */
-function renderRungs(p: Param, v: PanelValues): string {
+function renderRungs(_p: Param, v: PanelValues): string {
   const climbable = v.rungs.filter((l) => l.value > 0);
   const buttons = climbable
     .map((l, i) => {

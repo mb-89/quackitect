@@ -5,8 +5,6 @@
 // the suite uses the machine it runs on. See guidance/software.md.
 import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
-import { Session } from "../engine/session.ts";
-import { buildServer } from "../engine/tools.ts";
 import { call, freshRoot, pullBoot, pullTo } from "./helpers.ts";
 
 // Concurrent: every case builds its own root and touches no global.

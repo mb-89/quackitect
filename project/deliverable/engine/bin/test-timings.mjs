@@ -34,7 +34,7 @@ export default async function* timings(source) {
   const rows = [];
   const beat = (obj) => {
     try {
-      appendFileSync(PROGRESS, JSON.stringify(obj) + "\n", "utf8");
+      appendFileSync(PROGRESS, `${JSON.stringify(obj)}\n`, "utf8");
     } catch {
       // bookkeeping never fails the suite
     }
@@ -70,7 +70,7 @@ export default async function* timings(source) {
   }
   try {
     mkdirSync(dirname(OUT), { recursive: true });
-    appendFileSync(OUT, rows.map((r) => JSON.stringify(r)).join("\n") + "\n", "utf8");
+    appendFileSync(OUT, `${rows.map((r) => JSON.stringify(r)).join("\n")}\n`, "utf8");
     const byFile = new Map();
     for (const r of rows) {
       const f = r.file;
@@ -91,7 +91,7 @@ export default async function* timings(source) {
       // top of this list is where the explanations are owed.
       files,
     };
-    writeFileSync(LAST, JSON.stringify(summary, null, 1) + "\n", "utf8");
+    writeFileSync(LAST, `${JSON.stringify(summary, null, 1)}\n`, "utf8");
   } catch {
     // A suite must never fail because its bookkeeping could not be written.
   }

@@ -86,7 +86,7 @@ export function appendNote(
     by,
   };
   mkdirSync(dirname(p), { recursive: true });
-  appendFileSync(p, JSON.stringify(note) + "\n", "utf8");
+  appendFileSync(p, `${JSON.stringify(note)}\n`, "utf8");
   return { captured: note.ref, inbox: pendingNotes(seDirPath).length };
 }
 
@@ -172,7 +172,7 @@ export function drainNote(
     });
   }
   hit.drained = { at: new Date().toISOString(), disposition, ...(where !== undefined && where !== "" ? { where } : {}) };
-  writeFileSync(notesPath(seDirPath), all.map((n) => JSON.stringify(n)).join("\n") + "\n", "utf8");
+  writeFileSync(notesPath(seDirPath), `${all.map((n) => JSON.stringify(n)).join("\n")}\n`, "utf8");
   return { drained: ref, disposition, inbox: all.filter((n) => n.drained === undefined).length };
 }
 

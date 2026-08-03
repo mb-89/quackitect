@@ -17,9 +17,6 @@
 // nothing asked for are v2 §6's Rejected kind — illegal, never retried,
 // corrected call returned.
 import { strict as assert } from "node:assert";
-import { mkdtempSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 import { describe, test } from "node:test";
 import { Rejection } from "../engine/errors.ts";
 import { Session } from "../engine/session.ts";

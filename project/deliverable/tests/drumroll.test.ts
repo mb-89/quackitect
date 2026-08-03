@@ -90,7 +90,7 @@ function harness(): Press {
   };
 
   const fetchStub = (url: string, opts: { body?: string }) => {
-    posts.push({ url, body: opts && opts.body ? JSON.parse(opts.body) : null });
+    posts.push({ url, body: opts?.body ? JSON.parse(opts.body) : null });
     return Promise.resolve({ ok: true });
   };
 

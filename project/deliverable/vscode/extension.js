@@ -28,11 +28,11 @@ const { appendFileSync, copyFileSync, existsSync, mkdirSync, readFileSync, statS
 const path = require("node:path");
 
 const PORT = 7333;
-const SERVER = "http://localhost:" + PORT;
+const SERVER = `http://localhost:${PORT}`;
 // Card numbers are muscle memory (project/views/cards.md), so a slot is reserved
 // per number rather than per shown card. Eight covers the list with room.
 const SLOTS = 8;
-const VIEW_TYPE = (slot) => "$PRODUCT_ID$.card" + slot;
+const VIEW_TYPE = (slot) => `$PRODUCT_ID$.card${slot}`;
 const POLL_MS = 1000;
 // WHICH BUILD IS ACTUALLY RUNNING. A shell that was never reloaded behaves
 // exactly like one that was reloaded and still fails, and telling those two
@@ -73,7 +73,7 @@ const windows = new Map();
 // The session's name survives engine reloads (exit 42): the settings store
 // keeps its sliders across a reload and falls back to defaults on a fresh
 // start. The same contract the stdio shim keeps.
-const sessionToken = process.pid + "-" + Date.now().toString(36);
+const sessionToken = `${process.pid}-${Date.now().toString(36)}`;
 
 /**
  * THE TRACE. A line per act, appended to .se/vscode-debug.log.
@@ -92,7 +92,7 @@ function trace(what) {
       mkdirSync(path.join(root, ".se"), { recursive: true });
       traceFile = path.join(root, ".se", "vscode-debug.log");
     }
-    appendFileSync(traceFile, new Date().toISOString().slice(11, 23) + " " + what + "\n");
+    appendFileSync(traceFile, `${new Date().toISOString().slice(11, 23)} ${what}\n`);
   } catch {
     /* a trace that throws would be worse than no trace */
   }
@@ -198,7 +198,7 @@ function placePromptLayer(root, opened) {
     shell: process.platform === "win32",
     windowsHide: true,
   });
-  if (r.status !== 0) trace("prompt layer not placed: " + String(r.stderr || r.stdout).trim());
+  if (r.status !== 0) trace(`prompt layer not placed: ${String(r.stderr || r.stdout).trim()}`);
 }
 
 // VOICE IS ONE FILE, AND EVERY PROMPT LAYER IS A PROJECTION OF IT (owner
@@ -218,7 +218,7 @@ function placePromptLayer(root, opened) {
 function placeVoiceProjections(root, opened) {
   const write = (dir, name, head, body) => {
     mkdirSync(dir, { recursive: true });
-    writeFileSync(path.join(dir, name), head.join("\n") + "\n\n" + body, "utf8");
+    writeFileSync(path.join(dir, name), `${head.join("\n")}\n\n${body}`, "utf8");
   };
   const GENERATED = "description: Generated from project/guidance/voice.md. Edit that file, never this one.";
   try {
@@ -230,7 +230,7 @@ function placeVoiceProjections(root, opened) {
   } catch (e) {
     // A projection is a convenience. A missing or unreadable voice.md must
     // never stop the cage itself from being placed.
-    trace("voice projections not placed: " + String(e && e.message));
+    trace(`voice projections not placed: ${String(e?.message)}`);
   }
 }
 
@@ -297,7 +297,7 @@ function startServer(root, runner) {
         if (!disposed) startServer(root, runner);
       }, 100);
     } else {
-      output.appendLine("se: engine exited (" + code + ")");
+      output.appendLine(`se: engine exited (${code})`);
     }
   });
 }
@@ -318,11 +318,11 @@ async function ensureServer() {
     if (probe.root !== null && path.resolve(probe.root) !== path.resolve(root)) {
       const killed = evictPort(PORT);
       if (killed.length > 0) {
-        output.appendLine("se: mirror port " + PORT + " was occupied by another project; stopped pid(s) " + killed.join(", "));
+        output.appendLine(`se: mirror port ${PORT} was occupied by another project; stopped pid(s) ${killed.join(", ")}`);
         await new Promise((r) => setTimeout(r, 250));
       } else {
         void vscode.window.showErrorMessage(
-          "$PRODUCT$: port " + PORT + " already serves another project (" + probe.root + ") and could not be reclaimed automatically.",
+          `$PRODUCT$: port ${PORT} already serves another project (${probe.root}) and could not be reclaimed automatically.`,
         );
         return false;
       }
@@ -345,7 +345,7 @@ async function ensureServer() {
   // so whatever is still here is not ours.
   const squatters = evictPort(PORT);
   if (squatters.length > 0) {
-    output.appendLine("se: mirror port " + PORT + " was held by pid(s) " + squatters.join(", ") + " — stopped them");
+    output.appendLine(`se: mirror port ${PORT} was held by pid(s) ${squatters.join(", ")} — stopped them`);
     await new Promise((r) => setTimeout(r, 250));
   }
   startServer(root, runner);
@@ -367,7 +367,7 @@ async function ensureServer() {
 let bar = "";
 async function fetchBar() {
   try {
-    const r = await fetch(SERVER + "/widget/controls");
+    const r = await fetch(`${SERVER}/widget/controls`);
     return r.ok === true ? await r.text() : "";
   } catch {
     return "";
@@ -410,8 +410,8 @@ async function pollWalk() {
   if (levels === null) levels = await api("/api/levels");
   const p = await api("/api/packet");
   if (p === null) return;
-  const moved = JSON.stringify(p.active ?? null) + "|" + String(p.status) !== lastWalk;
-  lastWalk = JSON.stringify(p.active ?? null) + "|" + String(p.status);
+  const moved = `${JSON.stringify(p.active ?? null)}|${String(p.status)}` !== lastWalk;
+  lastWalk = `${JSON.stringify(p.active ?? null)}|${String(p.status)}`;
   packet = p;
   bar = await fetchBar();
   if (controls !== null) controls.send();
@@ -679,10 +679,10 @@ function setBusy(on, label) {
 function onWebviewMessage(m) {
   if (!m) return;
   if (m.se === "trace") {
-    trace("page: " + String(m.text ?? ""));
+    trace(`page: ${String(m.text ?? "")}`);
     return;
   }
-  trace("webview: " + String(m.se));
+  trace(`webview: ${String(m.se)}`);
   if (m.se === "open") openInEditor(m.path);
   else if (m.se === "busy") setBusy(m.on === true, String(m.label ?? ""));
   // CLICKING ANYTHING EXPLAINS IT IN DETAILS (ux rule). Split across windows,
@@ -746,7 +746,7 @@ class Surface {
  */
 class CardView extends Surface {
   constructor(widget) {
-    super(() => framePage(SERVER + "/widget/" + widget + "?embed=1"));
+    super(() => framePage(`${SERVER}/widget/${widget}?embed=1`));
   }
   resolveWebviewView(view) {
     view.onDidDispose(() => {
@@ -763,7 +763,7 @@ class CardWindow extends Surface {
       const card = cardBySlot(slot);
       if (card === undefined) return messagePage("Connecting to the engine…");
       if (!card.widget) return messagePage("Not built yet. The slot is held so the numbers never shift.");
-      return framePage(SERVER + "/widget/" + card.widget + "?embed=1");
+      return framePage(`${SERVER}/widget/${card.widget}?embed=1`);
     });
     this.slot = slot;
     this.panel = panel;
@@ -793,7 +793,7 @@ function openWindow(slot, preserveFocus, column) {
   const card = cardBySlot(slot);
   const panel = vscode.window.createWebviewPanel(
     VIEW_TYPE(slot),
-    card === undefined ? "Card " + slot : titleOf(card),
+    card === undefined ? `Card ${slot}` : titleOf(card),
     { viewColumn: column ?? vscode.ViewColumn.Active, preserveFocus: preserveFocus === true },
     { enableScripts: true, retainContextWhenHidden: true },
   );
@@ -832,12 +832,12 @@ async function expandDetails() {
     return;
   }
   const shot = lastDetails;
-  const panel = vscode.window.createWebviewPanel("$PRODUCT_ID$.snapshot", "Details · " + shot.title, vscode.ViewColumn.Active, {
+  const panel = vscode.window.createWebviewPanel("$PRODUCT_ID$.snapshot", `Details · ${shot.title}`, vscode.ViewColumn.Active, {
     enableScripts: true,
     retainContextWhenHidden: true,
   });
   // frozen=1 is the engine's own word for it: no event stream, no refresh.
-  const surface = new Surface(() => framePage(SERVER + "/widget/" + card.widget + "?embed=1&frozen=1"));
+  const surface = new Surface(() => framePage(`${SERVER}/widget/${card.widget}?embed=1&frozen=1`));
   snapshots.add(surface);
   panel.onDidDispose(() => snapshots.delete(surface));
   surface.attach(panel.webview, () => surface.help(shot.title, shot.html));
@@ -893,7 +893,7 @@ async function showScaleHelp(which, level) {
     })
     .join("");
   const h = SCALE_HELP[which] ?? SCALE_HELP.autonomy;
-  await showHelp(h.title, h.lead + '<table class="kv">' + rows + "</table>", false);
+  await showHelp(h.title, `${h.lead}<table class="kv">${rows}</table>`, false);
 }
 
 // ── THE SIDEBAR GROUPS ───────────────────────────────────────────────────
@@ -914,7 +914,7 @@ class Strip {
     ];
     for (const c of cards) {
       if (!inStrip(c)) continue;
-      list.push({ cmd: "$PRODUCT_ID$.openCard" + c.n, icon: cardIcon(c), label: titleOf(c), key: "ctrl+alt+" + c.n });
+      list.push({ cmd: `$PRODUCT_ID$.openCard${c.n}`, icon: cardIcon(c), label: titleOf(c), key: `ctrl+alt+${c.n}` });
     }
     return list;
   }
@@ -926,7 +926,7 @@ class Strip {
       .map(
         (
           t,
-        ) => `<button class="tool" data-cmd="${escapeHtml(t.cmd)}" title="${escapeHtml(t.key === "" ? t.label : t.label + " — " + t.key)}">
+        ) => `<button class="tool" data-cmd="${escapeHtml(t.cmd)}" title="${escapeHtml(t.key === "" ? t.label : `${t.label} — ${t.key}`)}">
       ${t.icon}<span class="label">${escapeHtml(t.label)}</span><span class="key">${escapeHtml(t.key)}</span></button>`,
       )
       .join("");
@@ -1291,12 +1291,12 @@ const LINK = "[🔗]";
 // biome-ignore lint/suspicious/noControlCharactersInRegex: strips real ANSI escapes from terminal output
 const PLAIN = (s) => s.replace(/\[[0-9;]*m/g, "").trimEnd();
 const logRefs = new Map();
-const DIM = (s) => "[2m" + s + "[0m";
+const DIM = (s) => `[2m${s}[0m`;
 // THE TERMINAL'S OWN PALETTE. These are the theme's ansi slots, so the log
 // follows whatever the reader picked, exactly like the rest of the shell.
 // Green and red are spent on pass and fail, so a kind never takes one.
 const KIND_COLOUR = { call: "34", update: "35", note: "33", aq: "36" };
-const paint = (code, s) => (code === undefined ? s : "[" + code + "m" + s + "[0m");
+const paint = (code, s) => (code === undefined ? s : `[${code}m${s}[0m`);
 
 function logRow(r) {
   const ts = String(r.ts ?? "");
@@ -1306,9 +1306,9 @@ function logRow(r) {
   // THE BRIEF OFTEN OPENS WITH ITS OWN KIND, and the column beside it has
   // just said that. One word, once.
   let brief = String(r.brief ?? "");
-  if (brief.toLowerCase().startsWith(kind.toLowerCase() + " ")) brief = brief.slice(kind.length + 1);
+  if (brief.toLowerCase().startsWith(`${kind.toLowerCase()} `)) brief = brief.slice(kind.length + 1);
   const ok = r.ok === false ? "[31m✗[0m" : "[32m✓[0m";
-  const clause = r.ok === false && r.clause ? " " + String(r.clause) : "";
+  const clause = r.ok === false && r.clause ? ` ${String(r.clause)}` : "";
   // PADDED TO A FIXED WIDTH so the columns line up and the eye can run down
   // them. The colour codes are zero-width, so they never shift the alignment.
   const kindCol = paint(KIND_COLOUR[kind], kind.padEnd(6).slice(0, 6));
@@ -1343,7 +1343,7 @@ function appendLog() {
     logRefs.set(PLAIN(row), ref);
     out.push(row);
   }
-  if (out.length > 0) logEmitter.fire(out.join("\r\n") + "\r\n");
+  if (out.length > 0) logEmitter.fire(`${out.join("\r\n")}\r\n`);
 }
 
 /** A FILTER CHANGE is the one case that must draw the whole feed again. */
@@ -1360,7 +1360,7 @@ function redrawLog() {
     logRefs.set(PLAIN(row), ref);
     out.push(row);
   }
-  logEmitter.fire("[2J[3J[H" + (out.length === 0 ? DIM("no acts match") : out.join("\r\n")) + "\r\n");
+  logEmitter.fire(`[2J[3J[H${out.length === 0 ? DIM("no acts match") : out.join("\r\n")}\r\n`);
 }
 
 async function pollLog() {
@@ -1401,7 +1401,7 @@ function makeLogTerminal(parent) {
   const anchor = parent ?? vscode.window.activeTerminal ?? vscode.window.terminals.find((t) => t !== logTerm) ?? null;
   logAnchored = anchor !== null && anchor !== undefined;
   if (logAnchored) opts.location = { parentTerminal: anchor };
-  trace("log terminal: anchor=" + (logAnchored ? anchor.name : "none"));
+  trace(`log terminal: anchor=${logAnchored ? anchor.name : "none"}`);
   logTerm = vscode.window.createTerminal(opts);
   return logTerm;
 }
@@ -1428,7 +1428,7 @@ async function showLog(rebuild) {
 
 /** A reference clicked in the log terminal explains itself in Details. */
 async function showLogRef(ref) {
-  trace("showLogRef " + ref + " detailsView=" + (detailsView === null ? "null" : "ready"));
+  trace(`showLogRef ${ref} detailsView=${detailsView === null ? "null" : "ready"}`);
   await vscode.commands.executeCommand("$PRODUCT_ID$.details.focus");
   if (detailsView !== null) detailsView.post({ se: "logref", ref });
 }
@@ -1436,7 +1436,7 @@ async function showLogRef(ref) {
 // The same choice RUNME makes: Claude wins when both are installed. The
 // kickoff text is read from the one file both launchers share.
 function psq(text) {
-  return "'" + String(text).replace(/'/g, "''") + "'";
+  return `'${String(text).replace(/'/g, "''")}'`;
 }
 
 function parseExcludedToolsFromCage(cage) {
@@ -1545,7 +1545,7 @@ async function openClaudeInSideBar(kickoff) {
     trace("no Claude Code command is registered — the extension is absent or inactive");
     return false;
   } catch (err) {
-    trace("opening claude failed: " + String(err));
+    trace(`opening claude failed: ${String(err)}`);
     return false;
   }
 }
@@ -1568,7 +1568,7 @@ async function sendKickoffToClaude(kickoff) {
     try {
       await vscode.commands.executeCommand(CLAUDE_FOCUS_COMMAND);
     } catch (err) {
-      trace("focus attempt failed (the view may still be mounting): " + String(err));
+      trace(`focus attempt failed (the view may still be mounting): ${String(err)}`);
     }
   };
   await focus();
@@ -1606,13 +1606,13 @@ async function sendPasteAndEnter() {
   let sent = 0;
   for (let i = 0; i < 10; i++) {
     if (!vscode.window.state.focused) {
-      trace("focus left mid-send after " + sent + " Enter(s) — the rest are withheld");
+      trace(`focus left mid-send after ${sent} Enter(s) — the rest are withheld`);
       return;
     }
     if (keys.enter() > 0) sent++;
     await new Promise((r) => setTimeout(r, 150));
   }
-  trace(sent > 0 ? sent + " Enter(s) went — if the kickoff still sits unsent, press it yourself" : "Enter never went — press it yourself");
+  trace(sent > 0 ? `${sent} Enter(s) went — if the kickoff still sits unsent, press it yourself` : "Enter never went — press it yourself");
 }
 
 /** The editor door's half: the prompt is already in the box, so only send. */
@@ -1626,7 +1626,7 @@ async function sendEnterOnly() {
     if (vscode.window.state.focused && keys.enter() > 0) sent++;
     await new Promise((r) => setTimeout(r, 150));
   }
-  trace(sent > 0 ? sent + " Enter(s) went — if the kickoff still sits unsent, press it yourself" : "Enter never went — press it yourself");
+  trace(sent > 0 ? `${sent} Enter(s) went — if the kickoff still sits unsent, press it yourself` : "Enter never went — press it yourself");
 }
 
 /**
@@ -1653,9 +1653,9 @@ function sessionHeader(now) {
 
 function agentLaunch(root) {
   const cageDir = path.join(root, "project", "_cage");
-  const kickoff = sessionHeader() + "\n\n" + readFileSync(path.join(cageDir, "kickoff.txt"), "utf8").trim();
+  const kickoff = `${sessionHeader()}\n\n${readFileSync(path.join(cageDir, "kickoff.txt"), "utf8").trim()}`;
   const has = (cmd) => spawnSync(cmd, ["--version"], { encoding: "utf8", shell: true }).status === 0;
-  if (has("claude")) return { host: "claude", kickoff, command: "claude " + psq(kickoff) };
+  if (has("claude")) return { host: "claude", kickoff, command: `claude ${psq(kickoff)}` };
   if (has("copilot")) {
     const cage = JSON.parse(readFileSync(path.join(cageDir, "copilot-cage.json"), "utf8"));
     const args = [].concat(cage.mcp_args, cage.exclude_args, cage.allow_args, cage.deny_args, cage.extra_args);
@@ -1663,7 +1663,7 @@ function agentLaunch(root) {
       host: "copilot",
       kickoff,
       cage,
-      command: "copilot " + args.map((a) => psq(a)).join(" ") + " -i " + psq(kickoff),
+      command: `copilot ${args.map((a) => psq(a)).join(" ")} -i ${psq(kickoff)}`,
     };
   }
   return null;
@@ -1752,7 +1752,7 @@ async function openCard(n) {
   await ensureCards();
   const card = cardBySlot(n);
   if (!shown(card)) {
-    void vscode.window.showInformationMessage("$PRODUCT$: project/views/cards.md declares no card " + n + ".");
+    void vscode.window.showInformationMessage(`$PRODUCT$: project/views/cards.md declares no card ${n}.`);
     return;
   }
   await showHelp(titleOf(card), cardHelp(card), false);
@@ -1791,7 +1791,7 @@ function activate(context) {
   } catch {
     /* an unknown build is still better than a wrong one */
   }
-  trace("ACTIVATE build=" + BUILD);
+  trace(`ACTIVATE build=${BUILD}`);
   output = vscode.window.createOutputChannel("$PRODUCT$ Engine");
   strip = new Strip();
   controls = new Controls();
@@ -1815,11 +1815,11 @@ function activate(context) {
             out.push({ startIndex: m.index, length: m[0].length, tooltip: "show this act in Details", ref });
           m = REF_RE.exec(ctx.line);
         }
-        trace("links asked line=" + JSON.stringify(ctx.line.slice(0, 50)) + " gave=" + out.length + " known=" + logRefs.size);
+        trace(`links asked line=${JSON.stringify(ctx.line.slice(0, 50))} gave=${out.length} known=${logRefs.size}`);
         return out;
       },
       handleTerminalLink: (link) => {
-        trace("link clicked ref=" + String(link.ref));
+        trace(`link clicked ref=${String(link.ref)}`);
         void showLogRef(link.ref);
       },
     }),
@@ -1828,7 +1828,7 @@ function activate(context) {
     // happens whenever the agent was started outside this window.
     vscode.window.onDidOpenTerminal((t) => {
       if (logTerm === null || t === logTerm || logAnchored) return;
-      trace("log re-splitting beside " + t.name);
+      trace(`log re-splitting beside ${t.name}`);
       void showLog(true);
     }),
     vscode.window.onDidCloseTerminal((t) => {
@@ -1857,7 +1857,7 @@ function activate(context) {
   );
   for (let n = 1; n <= SLOTS; n++) {
     context.subscriptions.push(
-      vscode.commands.registerCommand("$PRODUCT_ID$.openCard" + n, () => void openCard(n)),
+      vscode.commands.registerCommand(`$PRODUCT_ID$.openCard${n}`, () => void openCard(n)),
       // WITHOUT THIS THE LAYOUT IS A LIE. VS Code drops every webview editor
       // on a window reload unless its type can be deserialized — so the
       // windows a person arranged would come back empty, and the promise

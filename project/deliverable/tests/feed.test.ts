@@ -226,7 +226,7 @@ test("replay: parked defers and open points survive an engine life", () => {
   mkdirSync(dir, { recursive: true });
   writeFileSync(
     join(dir, "decisions.jsonl"),
-    [
+    `${[
       JSON.stringify({
         op: "plan",
         visit: "e1@0",
@@ -237,7 +237,7 @@ test("replay: parked defers and open points survive an engine life", () => {
       }),
       JSON.stringify({ op: "done", visit: "e1@0", node: "d1" }),
       JSON.stringify({ op: "defer", visit: "e1@0", node: "d2", brief: "b", to: "idle" }),
-    ].join("\n") + "\n",
+    ].join("\n")}\n`,
     "utf8",
   );
   // The file's replayed truth BEFORE arrival: nothing open, one parked.
@@ -264,7 +264,7 @@ test("defer parks a point for a later state — it arrives there as an open to-d
   s.decisions.apply("e1@0", { op: "plan", items: ["doable here", "needs idle"] });
   const park = s.decisions.graph("e1@0").nodes.find((n) => n.brief === "needs idle")!;
   s.decisions.apply("e1@0", { op: "defer", node: park.id, to: "idle" });
-  assert.equal(s.decisions.graph("e1@0").nodes.find((n) => n.id === park.id)!.status, "deferred");
+  assert.equal(s.decisions.graph("e1@0").nodes.find((n) => n.id === park.id)?.status, "deferred");
   // Deferred is not open — the evidence check passes over it.
   assert.equal(s.decisions.openFor(["e1"]).length, 1, "only the doable point stays open");
   // First touch of the target state materializes it — once.
@@ -276,29 +276,28 @@ test("defer parks a point for a later state — it arrives there as an open to-d
 });
 
 test("replayVisitsText: a record's history renders per visit with statuses", () => {
-  const text =
-    [
-      JSON.stringify({
-        op: "plan",
-        visit: "e9@0",
-        parent: null,
-        nodes: [
-          { id: "d1", brief: "build" },
-          { id: "d2", brief: "verify" },
-        ],
-      }),
-      JSON.stringify({ op: "done", visit: "e9@0", node: "d1" }),
-      JSON.stringify({ op: "update", visit: "e9-leave@0", node: "d3", brief: "closing" }),
-      JSON.stringify({ op: "defer", visit: "e9@0", node: "d2", brief: "verify", to: "idle" }),
-    ].join("\n") + "\n";
+  const text = `${[
+    JSON.stringify({
+      op: "plan",
+      visit: "e9@0",
+      parent: null,
+      nodes: [
+        { id: "d1", brief: "build" },
+        { id: "d2", brief: "verify" },
+      ],
+    }),
+    JSON.stringify({ op: "done", visit: "e9@0", node: "d1" }),
+    JSON.stringify({ op: "update", visit: "e9-leave@0", node: "d3", brief: "closing" }),
+    JSON.stringify({ op: "defer", visit: "e9@0", node: "d2", brief: "verify", to: "idle" }),
+  ].join("\n")}\n`;
   const visits = replayVisitsText(text);
   assert.deepEqual(
     visits.map((v) => v.visit),
     ["e9@0", "e9-leave@0"],
   );
   const e9 = visits[0].nodes;
-  assert.equal(e9.find((n) => n.id === "d1")!.status, "done");
-  assert.equal(e9.find((n) => n.id === "d2")!.status, "deferred");
+  assert.equal(e9.find((n) => n.id === "d1")?.status, "done");
+  assert.equal(e9.find((n) => n.id === "d2")?.status, "deferred");
   assert.equal(visits[1].nodes[0].status, "done");
 });
 

@@ -28,9 +28,7 @@ import {
 import { CLAUSES, Rejection, type RejectionPayload } from "./errors.ts";
 import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileReplace, fileWrite, type PatchOp } from "./files.ts";
 import { gitLand, gitLane, gitSync } from "./gitlane.ts";
-import { contentHash } from "./hash.ts";
-import { appendNote, backlogNotes, drainNote, type Priority, pendingNotes, readNotes } from "./inbox.ts";
-import { itList, readItRecord } from "./iterations.ts";
+import { appendNote, drainNote, type Priority, readNotes } from "./inbox.ts";
 import { capJson, capMiddle } from "./jsonio.ts";
 import { LINT_CONFIG, lintProse } from "./lint.ts";
 import { bumpDrawingEpoch } from "./machines/compile.ts";
@@ -40,14 +38,13 @@ import { parseStateNote } from "./notes.ts";
 import { openPanel } from "./panel.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { type MirrorState, renderMirror } from "./render.ts";
-import { HOST_SAFE_WAIT_MS, jobList, jobStatus, jobStop, jobWait, run, runBackground, runOrHandoff, startJob } from "./run.ts";
+import { HOST_SAFE_WAIT_MS, jobList, jobStatus, jobStop, jobWait, runBackground, runOrHandoff, startJob } from "./run.ts";
 import { search } from "./search.ts";
 import { Session } from "./session.ts";
 import { shoot } from "./shoot.ts";
 import { survey } from "./survey.ts";
 import { Toll } from "./toll.ts";
 import { webFetch, webSearch } from "./web.ts";
-import { expList, readRecord } from "./worktree.ts";
 
 /** The last battery's measured wall, phrased for a caller sizing a wait.
  *  An expectation is measured or absent — never guessed. */

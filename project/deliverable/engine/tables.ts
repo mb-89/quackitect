@@ -231,7 +231,7 @@ export function matches(filter: unknown, row: Row): boolean {
   return passes(String(filter).trim(), { row });
 }
 
-export function selectRows(spec: BaseSpec, view: BaseView, rows: Row[]): Row[] {
+export function selectRows(_spec: BaseSpec, view: BaseView, rows: Row[]): Row[] {
   const kept = rows.filter((r) => matches(view.filters, r));
   // Applied back to front, so the first clause is the one that decides ties.
   for (const s of [...view.sort].reverse()) {
@@ -310,7 +310,7 @@ export function renderView(spec: BaseSpec, view: BaseView, rows: Row[]): TableRe
     .map((c, i) => {
       // The LAST column takes whatever is left, so the table always fills its
       // pane. Giving it a width too would leave a dead strip on the right.
-      const w = i === cols.length - 1 ? "" : ` style="width:${Math.max(40, Math.round((view.columnSize ?? {})[c] ?? 160))}px"`;
+      const w = i === cols.length - 1 ? "" : ` style="width:${Math.max(40, Math.round(view.columnSize?.[c] ?? 160))}px"`;
       return `<th data-col="${esc(c)}" draggable="true"${w}><span class="th-label">${esc(heading(spec, c))}</span><span class="th-grip" title="drag to resize"></span></th>`;
     })
     .join("");

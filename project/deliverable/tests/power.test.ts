@@ -10,9 +10,6 @@
 // shutdown waiting for the agent to notice would never fire, because an agent
 // that has stopped is exactly what idle means.
 import { strict as assert } from "node:assert";
-import { mkdtempSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 import { describe, test } from "node:test";
 import { Rejection } from "../engine/errors.ts";
 import { loadPanel, type PanelValues, parsePanel, renderPanel, toggleKey } from "../engine/params.ts";

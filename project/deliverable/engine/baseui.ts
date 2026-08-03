@@ -16,7 +16,7 @@
 //
 // THE FUNCTION HELP IS GENERATED FROM THE LIVE REGISTRY, so it can never
 // describe a function the evaluator would refuse.
-import { basename, dirname, join } from "node:path";
+import { join } from "node:path";
 import { baseSource, LAYOUTS } from "./bases.ts";
 import { GLOBALS, METHODS, type TypeName, typeOf } from "./expr.ts";
 import { type BaseSpec, type BaseView, listBases, loadBase, type Row, renderView, selectRows, unreadableRows, vaultDir } from "./tables.ts";

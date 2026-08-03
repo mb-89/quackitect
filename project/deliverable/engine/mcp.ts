@@ -211,11 +211,11 @@ export function runStdio(server: McpServer, onGone?: () => void): void {
     try {
       msg = JSON.parse(trimmed) as JsonRpcRequest;
     } catch {
-      process.stdout.write(JSON.stringify({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "parse error" } }) + "\n");
+      process.stdout.write(`${JSON.stringify({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "parse error" } })}\n`);
       return;
     }
     void server.handle(msg).then((res) => {
-      if (res) process.stdout.write(JSON.stringify(res) + "\n");
+      if (res) process.stdout.write(`${JSON.stringify(res)}\n`);
     });
   });
 }

@@ -5,5 +5,5 @@
 # Wired automatically: preflight sets core.hooksPath to this directory.
 cd "$(git rev-parse --show-toplevel)/project/deliverable" || exit 1
 npx tsc -p . --pretty false || { echo "pre-commit: type error - commit blocked (npx tsc -p . to see it)"; exit 1; }
-npx biome check . >/dev/null 2>&1 || { echo "pre-commit: biome - commit blocked (npx biome check . to see it; --write fixes format)"; exit 1; }
+npx biome check --error-on-warnings . >/dev/null 2>&1 || { echo "pre-commit: biome - commit blocked (npx biome check . to see it; --write fixes format)"; exit 1; }
 exit 0

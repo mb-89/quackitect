@@ -252,7 +252,7 @@ export function parseUpdate(v: unknown): DecisionOp {
       corrected = `narration landed as a plan — a chain is a list, and its parts are the items: [${parts.map((p) => JSON.stringify(p)).join(", ")}]`;
     }
   }
-  if (itemsOut !== undefined && itemsOut.some((it) => chainOf(it) !== null)) {
+  if (itemsOut?.some((it) => chainOf(it) !== null)) {
     itemsOut = itemsOut.flatMap((it) => chainOf(it) ?? [it]);
     corrected = corrected ?? "a chained item was split into the items it listed";
   }
@@ -305,7 +305,7 @@ export class Decisions {
   }
 
   private record(line: Record<string, unknown>): void {
-    const row = JSON.stringify({ ts: new Date().toISOString(), ...line }) + "\n";
+    const row = `${JSON.stringify({ ts: new Date().toISOString(), ...line })}\n`;
     mkdirSync(dirname(this.path), { recursive: true });
     appendFileSync(this.path, row, "utf8");
     if (this.extraPath !== undefined) {

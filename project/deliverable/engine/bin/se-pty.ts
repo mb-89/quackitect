@@ -337,7 +337,7 @@ async function main(): Promise<void> {
       if (sent) return;
       sent = true;
       armed.dispose();
-      setTimeout(() => term.write(send + "\r"), 1500);
+      setTimeout(() => term.write(`${send}\r`), 1500);
     });
   }
   startServer();

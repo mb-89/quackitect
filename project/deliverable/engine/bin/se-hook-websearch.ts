@@ -35,7 +35,7 @@ process.stdin.on("end", () => {
       mkdirSync(dir, { recursive: true });
       appendFileSync(
         join(dir, "calls.jsonl"),
-        JSON.stringify({
+        `${JSON.stringify({
           ref: `call-${randomBytes(6).toString("hex")}`,
           ts: new Date().toISOString(),
           tool: "WebSearch",
@@ -44,7 +44,7 @@ process.stdin.on("end", () => {
           outcome: "result",
           duration_ms: 0,
           se_version: "3.0.0-bootstrap",
-        }) + "\n",
+        })}\n`,
         "utf8",
       );
     }
