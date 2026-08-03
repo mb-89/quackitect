@@ -336,6 +336,60 @@ const OPS = [
   ":",
 ];
 
+function lexNumber(src: string, i: number): { tok: Tok; next: number } | undefined {
+  const c = src[i];
+  if (!(/[0-9]/.test(c) || (c === "." && /[0-9]/.test(src[i + 1] ?? "")))) return undefined;
+  const m = src.slice(i).match(/^\d*\.?\d+(?:[eE][+-]?\d+)?/);
+  if (m === null) return undefined;
+  return { tok: { k: "num", v: Number(m[0]) }, next: i + m[0].length };
+}
+
+function lexString(src: string, i: number): { tok: Tok; next: number } {
+  const quote = src[i];
+  let j = i + 1;
+  let text = "";
+  while (j < src.length && src[j] !== quote) {
+    if (src[j] === "\\") {
+      const esc = src[j + 1];
+      text += esc === "n" ? "\n" : esc === "t" ? "\t" : esc;
+      j += 2;
+      continue;
+    }
+    text += src[j];
+    j++;
+  }
+  if (j >= src.length) {
+    throw new Rejection({
+      clause: CLAUSES.REQUIRED_ARGS,
+      expected: `a closing ${quote}`,
+      got: src,
+      remedy: { tool: "se_file_read", args: { path: "project/spec/bases-syntax.md" }, note: "strings take single or double quotes" },
+      source: SRC,
+    });
+  }
+  return { tok: { k: "str", v: text }, next: j + 1 };
+}
+
+function lexRegex(src: string, i: number): { tok: Tok; next: number } | undefined {
+  let j = i + 1;
+  let body = "";
+  let cls = false;
+  while (j < src.length && (cls || src[j] !== "/")) {
+    if (src[j] === "\\") {
+      body += src[j] + (src[j + 1] ?? "");
+      j += 2;
+      continue;
+    }
+    if (src[j] === "[") cls = true;
+    if (src[j] === "]") cls = false;
+    body += src[j];
+    j++;
+  }
+  if (j >= src.length) return undefined;
+  const flags = (src.slice(j + 1).match(/^[gimsuy]*/) ?? [""])[0];
+  return { tok: { k: "regex", v: new RegExp(body, flags) }, next: j + 1 + flags.length };
+}
+
 function lex(src: string): Tok[] {
   const out: Tok[] = [];
   let i = 0;
@@ -351,59 +405,23 @@ function lex(src: string): Tok[] {
       i++;
       continue;
     }
-    if (/[0-9]/.test(c) || (c === "." && /[0-9]/.test(src[i + 1] ?? ""))) {
-      const m = src.slice(i).match(/^\d*\.?\d+(?:[eE][+-]?\d+)?/);
-      if (m !== null) {
-        out.push({ k: "num", v: Number(m[0]) });
-        i += m[0].length;
-        continue;
-      }
+    const num = lexNumber(src, i);
+    if (num !== undefined) {
+      out.push(num.tok);
+      i = num.next;
+      continue;
     }
     if (c === '"' || c === "'") {
-      let j = i + 1;
-      let text = "";
-      while (j < src.length && src[j] !== c) {
-        if (src[j] === "\\") {
-          const esc = src[j + 1];
-          text += esc === "n" ? "\n" : esc === "t" ? "\t" : esc;
-          j += 2;
-          continue;
-        }
-        text += src[j];
-        j++;
-      }
-      if (j >= src.length) {
-        throw new Rejection({
-          clause: CLAUSES.REQUIRED_ARGS,
-          expected: `a closing ${c}`,
-          got: src,
-          remedy: { tool: "se_file_read", args: { path: "project/spec/bases-syntax.md" }, note: "strings take single or double quotes" },
-          source: SRC,
-        });
-      }
-      out.push({ k: "str", v: text });
-      i = j + 1;
+      const s = lexString(src, i);
+      out.push(s.tok);
+      i = s.next;
       continue;
     }
     if (c === "/" && prevAllowsRegex()) {
-      let j = i + 1;
-      let body = "";
-      let cls = false;
-      while (j < src.length && (cls || src[j] !== "/")) {
-        if (src[j] === "\\") {
-          body += src[j] + (src[j + 1] ?? "");
-          j += 2;
-          continue;
-        }
-        if (src[j] === "[") cls = true;
-        if (src[j] === "]") cls = false;
-        body += src[j];
-        j++;
-      }
-      if (j < src.length) {
-        const flags = (src.slice(j + 1).match(/^[gimsuy]*/) ?? [""])[0];
-        out.push({ k: "regex", v: new RegExp(body, flags) });
-        i = j + 1 + flags.length;
+      const r = lexRegex(src, i);
+      if (r !== undefined) {
+        out.push(r.tok);
+        i = r.next;
         continue;
       }
     }
