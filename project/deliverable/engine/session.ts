@@ -2500,6 +2500,16 @@ export class Session {
           source: "engine/session.ts stateform",
         });
       }
+      const feeders = this.gateFeedersUnsigned(fm, this.stateFormState(name, fm));
+      if (feeders.length > 0) {
+        throw new Rejection({
+          clause: CLAUSES.CONDITION_UNMET,
+          expected: `a gate requires ALL its inputs — every feeder form signed before ${name} may stamp`,
+          got: `unsigned feeders: ${feeders.join(", ")}`,
+          remedy: { tool: "se_pull", args: {}, note: "walk the named states and submit their forms; the gate stamps after" },
+          source: "engine/session.ts stateform",
+        });
+      }
       writeFileSync(sh.instanceAbs, withBy(withSignedOff(readFileSync(sh.instanceAbs, "utf8"), new Date().toISOString()), by), "utf8");
       this.notifyChange();
       return this.stateFormGet(name, fm);
@@ -2810,6 +2820,22 @@ export class Session {
     }
   }
 
+  /** A GATE requires ALL its inputs: every feeder state carrying an
+   *  evidence form must be SIGNED before the gate may stamp or pass. */
+  private gateFeedersUnsigned(fm: MachineDecl, gate: StateDecl): string[] {
+    if (gate.kind !== "gate") return [];
+    return fm.states
+      .filter((p) => p.evidence_form.length > 0 && p.edges.some((e) => e.to === gate.id))
+      .filter((p) => {
+        try {
+          return (this.stateFormGet(p.id, fm) as { signed?: boolean }).signed !== true;
+        } catch {
+          return true;
+        }
+      })
+      .map((p) => p.id);
+  }
+
   private assertStateFormMet(stateId: string): void {
     const lint = this.stateFormGet(stateId) as {
       met?: boolean;
@@ -2836,6 +2862,20 @@ export class Session {
         remedy: { tool: "se_pull", args: {}, note: 'return {"submit": true} on the fill, or press submit in the form' },
         source: "engine/session.ts stateform",
       });
+    }
+    if (lint.gate === true) {
+      const m = this.currentMachine();
+      const gs = m.states.find((x) => x.id === stateId);
+      const feeders = gs === undefined ? [] : this.gateFeedersUnsigned(m, gs);
+      if (feeders.length > 0) {
+        throw new Rejection({
+          clause: CLAUSES.CONDITION_UNMET,
+          expected: `a gate requires ALL its inputs — every feeder form signed before ${stateId} passes`,
+          got: `unsigned feeders: ${feeders.join(", ")}`,
+          remedy: { tool: "se_pull", args: {}, note: "walk the named states and submit their forms; the gate passes after" },
+          source: "engine/session.ts stateform",
+        });
+      }
     }
     if (lint.gate === true && !(lint.bless ?? "").startsWith("blessed")) {
       throw new Rejection({

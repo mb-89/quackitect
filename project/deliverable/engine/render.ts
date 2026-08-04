@@ -203,6 +203,8 @@ interface RouteMarks {
   here?: boolean;
   /** The hop the walk cannot pass, and why. Drawn as a road closure. */
   blocked?: { at: string; why: string };
+  /** Uncovered AND-inputs per gate on the way — the busbar's taps. */
+  busbars?: { gate: string; feeders: string[] }[];
 }
 
 /** A Catmull-Rom spline through every stop, emitted as cubic Beziers — the
@@ -349,8 +351,11 @@ function svgRoute(route: RouteMarks | undefined, nodeOfState: Map<string, CNode>
   for (const [i, s] of stops.entries()) {
     if (route?.target === s.id || route?.waypoints.has(s.id) === true) {
       parts.push(`<circle cx="${s.cx}" cy="${s.cy}" r="8" class="route-stop${shut > 0 && i >= shut ? " shut" : ""}"/>`);
+      // A pass-through waypoint is an in-and-out: the down and up arrows.
+      if (route?.waypoints.has(s.id) === true) parts.push(`<text x="${s.cx}" y="${s.cy + 3.5}" class="route-wp-io">↓↑</text>`);
     }
   }
+  parts.push(...svgBusbars(route, nodeOfState));
   // THE CLOSURE MARK, on the hop that shuts, carrying the reason. An
   // exclamation in a ring rather than a bar across the line: a bar reads as
   // part of the road, and it stays upright whichever way the road runs.
@@ -371,6 +376,31 @@ function svgRoute(route: RouteMarks | undefined, nodeOfState: Map<string, CNode>
     parts.push(
       `<path d="M 0 -12 L 10 9 L 0 4 L -10 9 Z" class="route-here" transform="translate(${stops[0].cx} ${stops[0].cy}) rotate(${heading.toFixed(1)})"/>`,
     );
+  }
+  return parts;
+}
+
+// THE BUSBAR (owner design 2026-08-04): a gate collects ALL its inputs.
+// Uncovered feeders tap a collection bar wearing the AND icon; one line
+// drops from the bar into the gate.
+function svgBusbars(route: RouteMarks | undefined, nodeOfState: Map<string, CNode>): string[] {
+  const parts: string[] = [];
+  for (const b of route?.busbars ?? []) {
+    const g = nodeOfState.get(b.gate);
+    if (g === undefined) continue;
+    const taps = b.feeders.map((f) => nodeOfState.get(f)).filter((n): n is CNode => n !== undefined);
+    if (taps.length === 0) continue;
+    const barY = g.y - 26;
+    const xs = [g.x + g.width / 2, ...taps.map((n) => n.x + n.width / 2)];
+    const x1 = Math.min(...xs) - 20;
+    const x2 = Math.max(...xs) + 20;
+    parts.push(`<line x1="${x1}" y1="${barY}" x2="${x2}" y2="${barY}" class="route-bus"/>`);
+    for (const n of taps) {
+      const cx = n.x + n.width / 2;
+      parts.push(`<line x1="${cx}" y1="${n.y + n.height / 4}" x2="${cx}" y2="${barY}" class="route-bus tap"/>`);
+    }
+    parts.push(`<line x1="${g.x + g.width / 2}" y1="${barY}" x2="${g.x + g.width / 2}" y2="${g.y + g.height / 4}" class="route-bus"/>`);
+    parts.push(`<text x="${x1 + 10}" y="${barY - 6}" class="route-bus-icon">&amp;</text>`);
   }
   return parts;
 }
@@ -750,6 +780,10 @@ const STYLE = `
   .route-shut .shut-bang { stroke-width: 3; stroke-linecap: round; }
   .route-shut .shut-dot { fill: var(--se-warn); stroke: none; }
   .route-stop { fill: var(--se-walk); stroke: var(--se-walk-ring); stroke-width: 2; }
+  .route-bus { stroke: var(--se-walk); stroke-width: 5; stroke-linecap: round; }
+  .route-bus.tap { stroke-width: 3.5; }
+  .route-bus-icon { fill: var(--se-walk); font: 700 14px system-ui, sans-serif; }
+  .route-wp-io { fill: var(--se-walk-ring); font: 700 9px system-ui, sans-serif; text-anchor: middle; }
   .route-stop.shut { opacity: .28; }
   .route-here { fill: var(--se-walk); stroke: var(--se-walk-ring); stroke-width: 2; }
   .guard { fill: var(--se-accent); font-size: 20px; text-anchor: middle; }
@@ -2972,9 +3006,22 @@ function routeMarksFor(m: MirrorState, decl: MachineDecl): RouteMarks | undefine
     };
     const shutAt = r.stops_at === undefined ? undefined : localOf(r.stops_at.at);
     const rest = prefix === "" ? r.from : r.from.startsWith(`${prefix}/`) ? r.from.slice(prefix.length + 1) : undefined;
+    // A GATE COLLECTS ALL ITS INPUTS (owner ruling 2026-08-04): the route
+    // shows the gate's uncovered feeders as taps into a collection busbar.
+    const signed = new Set<string>(m.session.recordDone(decl));
+    const busbars: { gate: string; feeders: string[] }[] = [];
+    for (const id of hops) {
+      const st = decl.states.find((x) => x.id === id);
+      if (st?.kind !== "gate") continue;
+      const feeders = decl.states
+        .filter((p) => p.evidence_form.length > 0 && p.edges.some((e) => e.to === st.id) && !signed.has(p.id))
+        .map((p) => p.id);
+      if (feeders.length > 0) busbars.push({ gate: id, feeders });
+    }
     return {
       waypoints,
       path: hops,
+      ...(busbars.length > 0 ? { busbars } : {}),
       here: rest !== undefined && !rest.includes("/"),
       ...(r.found && localOf(r.target) !== undefined ? { target: localOf(r.target) } : {}),
       ...(shutAt !== undefined && r.stops_at !== undefined ? { blocked: { at: shutAt, why: r.stops_at.why } } : {}),
