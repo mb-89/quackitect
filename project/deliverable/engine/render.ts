@@ -261,9 +261,9 @@ function svgCondButtons(n: CNode, sid: string, mt: StateMeta | undefined): strin
   const parts: string[] = [];
   const cx = n.x + n.width / 2;
   const pillAt = (cy: number, met: boolean): string =>
-    `<g class="clickable cond ${met ? "met" : "unmet"}" data-detail="state:${esc(sid)}"><circle cx="${cx}" cy="${cy}" r="9"/><text x="${cx}" y="${cy + 3.5}" class="cond-label" style="font-size:10px">${met ? "✓" : "!"}</text></g>`;
-  if (mt.has_entry) parts.push(pillAt(n.y - 16, mt.entry_met));
-  if (mt.has_exit) parts.push(pillAt(n.y + n.height + 16, mt.exit_met));
+    `<g class="clickable cond ${met ? "met" : "unmet"}" data-detail="state:${esc(sid)}"><circle cx="${cx}" cy="${cy}" r="12"/><text x="${cx}" y="${cy + 4}" class="cond-label" style="font-size:11px">${met ? "✓" : "!"}</text></g>`;
+  if (mt.has_entry) parts.push(pillAt(n.y - 28, mt.entry_met));
+  if (mt.has_exit) parts.push(pillAt(n.y + n.height + 28, mt.exit_met));
   return parts;
 }
 
@@ -1503,7 +1503,7 @@ function renderStateForm(f) {
   };
   // A real heading; every header item its own line, at the body text size.
   let h = '<div style="font-size:17px;font-weight:700;padding:2px 0 6px">Evidence form <span style="font-weight:400;color:var(--se-muted)">/ ' + escText(name) + "</span></div>";
-  h += Object.keys(f.header || {}).map(function (k) { return '<div class="comment-text">' + escText(k) + ": " + escText(String(f.header[k] || "____")) + "</div>"; }).join("");
+  h += '<table class="kv" style="font-size:12.5px">' + Object.keys(f.header || {}).map(function (k) { return "<tr><td>" + escText(k) + "</td><td>" + escText(String(f.header[k] || "____")) + "</td></tr>"; }).join("") + "</table>";
   h += sfBox("Description", '<div class="comment-text">' + escText(f.description || "") + "</div>", false);
   if (f.motivation) h += sfBox("Motivation", '<div class="comment-text">' + escText(f.motivation) + "</div>", false);
   h += sfBox("Current situation", sfOne(f, fld("current_situation")), false);
@@ -1551,7 +1551,9 @@ async function showForm(name, into, machine) {
   machine = machine || viewedMachine();
   const r = await fetch("/api/form?name=" + encodeURIComponent(name) + "&machine=" + encodeURIComponent(machine));
   const f = await r.json();
-  if (f.state_form) { presentForm(name, into, f.title || ("form · " + name), renderStateForm(f), machine); return; }
+  // The body carries the one "Evidence form" heading — the pane title
+  // stays the bare state name so nothing repeats.
+  if (f.state_form) { presentForm(name, into, name, renderStateForm(f), machine); return; }
   if (f.kind === "rejected" || f.error) {
     // Plain words at the human — never raw rejection JSON.
     presentForm(name, into, "form · " + name,

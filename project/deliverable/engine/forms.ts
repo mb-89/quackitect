@@ -85,7 +85,7 @@ export function lintForm(t: FormTemplate, instanceRaw: string | undefined, evide
     return {
       met: false,
       status: "missing",
-      problems: [`not started yet — the first save creates ${t.instance}`],
+      problems: [],
       fields: t.fields.map((f) => ({ ...f, content: "", prefills: [], filled: false })),
       files: [],
     };
