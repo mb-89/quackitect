@@ -698,7 +698,11 @@ const STYLE = `
      it has BEEN keeps the ordinary state colour: two shades of one blue asked
      the reader to compare hues, and the eye does not read that difference
      reliably. There is no .state.done rule, on purpose. */
-  .state.active { fill: var(--se-walk-bg); stroke: var(--se-walk); stroke-width: 3.5; }
+  /* THE CURRENT STATES BLINK YELLOW (owner ruling 2026-08-04, v1's pulse
+     reborn) — half the emergency pace, so alarm still outranks attention. */
+  .state.active { fill: color-mix(in srgb, var(--se-warn, #d7a72a) 16%, var(--se-bg)); stroke: var(--se-warn, #d7a72a); stroke-width: 3.5; animation: se-current 2.2s ease-in-out infinite; }
+  @keyframes se-current { 0%, 100% { stroke-opacity: 1; } 50% { stroke-opacity: 0.35; } }
+  @media (prefers-reduced-motion: reduce) { .state.active { animation: none; } }
   .state.inner { fill: none; }
   .clickable { cursor: pointer; }
   .clickable:hover .state, .clickable:hover .comment { stroke: var(--se-fg); }
@@ -2893,6 +2897,9 @@ function drawingSets(
   // the record, not on the drawing.
   const run = m.session.viewRun(decl.id);
   const done = new Set(run.done.map((s) => s.split("/").pop()!));
+  // The record outlives the engine life: a signed (and, for gates,
+  // blessed) stored claim paints its state green across restarts.
+  for (const id of m.session.recordDone(decl)) done.add(id);
   // An end state is never "filled" — it turns green when its machine completed.
   if (run.completed) for (const s of decl.states) if (s.kind === "end") done.add(s.id);
   const subIds = new Set(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id));

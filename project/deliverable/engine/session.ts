@@ -2608,7 +2608,12 @@ export class Session {
     // for both hands: the page's problems list and the gate's refusal.
     // The named-form lint judges a status line; state forms have none —
     // a synthetic one keeps the SECTION checks and mutes the dead field.
-    const lint = lintForm(model.template, raw === undefined ? raw : raw.replace(/^---\n/, "---\nstatus: done\n"), "");
+    // A LEGACY instance may still carry its own; never inject a second.
+    const lint = lintForm(
+      model.template,
+      raw === undefined || /^status: /m.test(raw) ? raw : raw.replace(/^---\n/, "---\nstatus: done\n"),
+      "",
+    );
     const fills: Record<string, string> = {};
     if (raw !== undefined) {
       const body = parseStateNote(raw).body;
@@ -2631,6 +2636,38 @@ export class Session {
       problems: [...lint.problems, ...tp],
       met: lint.met && tp.length === 0,
     };
+  }
+
+  /** GREEN FROM THE RECORD (owner ruling 2026-08-04): a record-backed
+   *  state is done when its stored claim STANDS — signed, and blessed
+   *  where it is a gate. Session runs die with the engine life; the
+   *  record does not. States without records stay uncoloured. */
+  recordDone(decl: MachineDecl): string[] {
+    if (decl.id === this.machine.id) return [];
+    let it: Iteration | undefined;
+    try {
+      it = itList(this.root).find((x) => x.open && itShortId(x.id) === decl.id);
+    } catch {
+      return []; // no git, no records — nothing to colour
+    }
+    if (it === undefined) return [];
+    const done: string[] = [];
+    for (const s of decl.states) {
+      if (s.evidence_form.length === 0) continue;
+      const abs = join(it.path, `project/spec/iterations/${it.id}/evidence/${s.id}.md`);
+      if (!existsSync(abs)) continue;
+      try {
+        const fm = parseStateNote(readFileSync(abs, "utf8")).frontmatter;
+        if (typeof fm.signed_off !== "string") continue;
+        if (s.kind === "gate" && !(typeof fm.bless === "string" && fm.bless.startsWith("blessed"))) continue;
+        done.push(s.id);
+      } catch {
+        // an unreadable claim colours nothing
+      }
+    }
+    // The mechanical start was necessarily walked on the way to any claim.
+    if (done.length > 0) done.push("start");
+    return done;
   }
 
   /** The walk STANDS in the state — the one moment its questions are in
@@ -2729,6 +2766,8 @@ export class Session {
     // (the page's boxes, the agent's fill) send it through this one door.
     const { inputs_checked, ...rest } = fields;
     for (const [f, content] of Object.entries(rest)) raw = withFieldContent(raw, f, String(content));
+    // The dead fields migrate out as legacy instances are touched.
+    raw = raw.replace(/^status: .*\n?/m, "").replace(/^opened: .*\n?/m, "");
     // A changed claim is neither the submitted nor the blessed claim.
     if (Object.keys(fields).length > 0) raw = stripSignedOff(withBless(raw, undefined));
     if (inputs_checked !== undefined) {
