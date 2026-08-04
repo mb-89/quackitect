@@ -178,3 +178,23 @@ export function withStatus(instanceRaw: string, status: string, by: string): str
   else out = out.replace(/^status: .*$/m, (m) => `${m}\nby: ${by}`);
   return out;
 }
+
+/** The claim's names: whoever writes joins `authors:`, once. */
+export function withAuthor(instanceRaw: string, author: string): string {
+  if (author === "") return instanceRaw;
+  const m = instanceRaw.match(/^authors:(.*)$/m);
+  if (m === null) return instanceRaw.replace(/^status: .*$/m, (s) => `${s}\nauthors: ${author}`);
+  const list = m[1]
+    .split(",")
+    .map((x) => x.trim())
+    .filter((x) => x !== "");
+  if (list.includes(author)) return instanceRaw;
+  list.push(author);
+  return instanceRaw.replace(/^authors:.*$/m, `authors: ${list.join(", ")}`);
+}
+
+/** The sign-off stamp — the claim's date, shown in the headline. */
+export function withSignedOff(instanceRaw: string, when: string): string {
+  if (/^signed_off: /m.test(instanceRaw)) return instanceRaw.replace(/^signed_off: .*$/m, `signed_off: ${when}`);
+  return instanceRaw.replace(/^status: .*$/m, (s) => `${s}\nsigned_off: ${when}`);
+}

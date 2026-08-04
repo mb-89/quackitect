@@ -1474,9 +1474,56 @@ function presentForm(name, into, title, html) {
   if (into === "details") { CURRENT_DETAIL = "form:" + name; showDetails(title, html); return; }
   openModal(title, html);
 }
+// THE STATE FORM'S SHEET (owner rulings 2026-08-04): boxes from the A3
+// shape, fields with their template chips, the existing save/confirm/done
+// buttons, plus the portable copy's export and ingest.
+function sfOne(f, fl) {
+  const name = f.form;
+  const tpl = (f.field_templates || {})[fl.name] || "free-form";
+  let s = '<div style="border:1px solid var(--se-line,#888);border-radius:4px;padding:7px 10px;margin:7px 0">';
+  s += '<span style="float:right;font-size:11.5px;color:var(--se-accent)">template: ' + escText(tpl) + "</span>";
+  s += "<b>" + escText(fl.name) + "</b>" + (fl.required ? ' <span style="color:var(--se-fail);font-size:11px">required</span>' : ' <span class="meta">optional</span>');
+  s += '<div class="meta">' + escText(fl.description || "") + "</div>";
+  (fl.prefills || []).forEach(function (p, i) {
+    s += '<div class="prefill"><div class="comment-text">prefill — unconfirmed:</div><div>' + escText(p) + '</div><button class="primary confirmpre" data-form="' + name + '" data-field="' + escText(fl.name) + '" data-index="' + i + '">confirm</button></div>';
+  });
+  s += '<textarea class="formfield" data-field="' + escText(fl.name) + '">' + escText(fl.content || "") + "</textarea></div>";
+  return s;
+}
+function renderStateForm(f) {
+  const name = f.form;
+  const fld = function (n) {
+    const hit = (f.fields || []).filter(function (q) { return q.name === n; })[0];
+    return hit || { name: n, description: "", required: false, content: "", prefills: [] };
+  };
+  let h = '<div class="meta">' + Object.keys(f.header || {}).map(function (k) { return escText(k) + ": " + escText(String(f.header[k] || "____")); }).join(" · ") + "</div>";
+  h += '<div style="padding:4px 0"><b>Description</b><div class="comment-text">' + escText(f.description || "") + "</div></div>";
+  if (f.motivation) h += '<div style="padding:4px 0"><b>Motivation</b><div class="comment-text">' + escText(f.motivation) + "</div></div>";
+  h += '<div style="padding:4px 0"><b>Current situation</b>' + sfOne(f, fld("current_situation")) + "</div>";
+  h += '<div style="padding:4px 0"><b>Inputs</b>' + (f.inputs || []).map(function (i) {
+    const label = i.path ? '<a class="doclink" data-path="' + escText(i.path) + '">' + escText(i.label) + "</a>" : "<b>" + escText(i.label) + "</b>";
+    return '<div style="font-size:12.5px">☐ ' + label + (i.entry ? ' <span style="color:var(--se-fail);font-size:11px">before entry</span>' : "") + ' <span class="meta">' + escText(i.description || "") + "</span></div>";
+  }).join("") + "</div>";
+  h += '<div style="padding:4px 0"><b>Evidence</b>' + (f.fields || []).filter(function (x) { return x.name !== "current_situation" && x.name !== "follow_up"; }).map(function (x) { return sfOne(f, x); }).join("") + "</div>";
+  h += '<div style="padding:4px 0"><b>Follow-up' + (f.follow_up_label ? " / " + escText(f.follow_up_label) : "") + "</b>" + sfOne(f, fld("follow_up")) + "</div>";
+  if (f.problems && f.problems.length) h += '<div style="color:var(--se-accent);padding:6px 0">' + f.problems.map(escText).join("<br>") + "</div>";
+  if (f.met) h += '<div style="color:var(--se-ok);padding:6px 0">✓ complete — the claim stands; the gate judges it</div>';
+  h += '<div style="padding:10px 0"><button class="primary saveform" data-form="' + name + '">save</button> <button class="primary doneform" data-form="' + name + '" title="sets status done">done</button> ';
+  h += '<a class="ghost" href="/form/export?name=' + encodeURIComponent(name) + '">export portable copy</a> ';
+  h += '<label class="ghost" style="cursor:pointer">ingest returned copy<input type="file" accept=".html,text/html" style="display:none" onchange="seIngest(this, '' + name + '')"></label></div>';
+  return h;
+}
+async function seIngest(inp, name) {
+  const file = inp.files && inp.files[0];
+  if (!file) return;
+  const html = await file.text();
+  await formPost("/form/ingest", { name: name, html: html });
+  showFormAgain(name);
+}
 async function showForm(name, into) {
   const r = await fetch("/api/form?name=" + encodeURIComponent(name));
   const f = await r.json();
+  if (f.state_form) { presentForm(name, into, f.title || ("form · " + name), renderStateForm(f)); return; }
   if (f.kind === "rejected" || f.error) {
     // Plain words at the human — never raw rejection JSON.
     presentForm(name, into, "form · " + name,

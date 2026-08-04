@@ -150,7 +150,7 @@ export function startMirror(o: MirrorOptions): Server {
       "mirror_form_save",
       (body) => ({
         args: { name: body.name, fields: Object.keys((body.fields as object | undefined) ?? {}) },
-        result: state.session.formSave(String(body.name ?? ""), (body.fields ?? {}) as Record<string, string>),
+        result: state.session.formSave(String(body.name ?? ""), (body.fields ?? {}) as Record<string, string>, "human"),
       }),
     ],
     // THE PREFILL LAW: one confirmation per prefill — this is that click.
@@ -274,6 +274,22 @@ export function startMirror(o: MirrorOptions): Server {
           };
         },
         (e) => ({ ok: false, error: whyOf(e) }),
+      ),
+    // THE RETURNED PORTABLE COPY lands as fills, marked imported — a
+    // claim like every fill, judged at the gate.
+    "/form/ingest": (req, res) =>
+      jsonPost(
+        req,
+        res,
+        "mirror_form_ingest",
+        (body) => ({
+          args: { name: body.name },
+          run: () => {
+            const r = state.session.stateFormIngest(String(body.name ?? ""), String(body.html ?? ""));
+            return { log: { ingested: r.ingested, author: r.author }, answer: r };
+          },
+        }),
+        (e) => (e instanceof Rejection ? e.toJSON() : { error: String(e) }),
       ),
     // THE PERSON'S PULL (owner design 2026-08-04): the same five
     // instructions the agent gets, on the human channel — no slider gate,
@@ -468,6 +484,23 @@ export function startMirror(o: MirrorOptions): Server {
     // the details pane; there is no help button anywhere on it.
     "/base/help": (url, _req, res) => {
       json(res, helpFor(url.searchParams.get("topic") ?? ""));
+    },
+    // THE PORTABLE COPY — one self-contained HTML, downloaded to travel.
+    "/form/export": (url, _req, res) => {
+      const name = url.searchParams.get("name") ?? "";
+      let body: string;
+      try {
+        body = state.session.stateFormExport(name);
+      } catch (e) {
+        res.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
+        res.end(e instanceof Rejection ? `${e.expected} — got ${e.got}` : String(e));
+        return;
+      }
+      res.writeHead(200, {
+        "content-type": "text/html; charset=utf-8",
+        "content-disposition": `attachment; filename="form-${name}.html"`,
+      });
+      res.end(body);
     },
     "/api/packet": (_url, _req, res) => {
       res.writeHead(200, { "content-type": "application/json; charset=utf-8" });

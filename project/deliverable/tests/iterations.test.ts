@@ -250,19 +250,57 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
   await session.advance(sid);
   // Entering the node descends into the iteration's OWN machine — M0.
   assert.deepEqual(session.breadcrumb(), ["main", "iterations", sid]);
+  // The METHOD guards the door (owner 2026-08-04) — the person proves by
+  // checkbox, and only then does the retro open.
+  session.humanCheck("project/guidance/method/retro.md");
   await session.advance(); // start → onboard-retro
-  await session.advance(); // onboard-retro → gate-kickoff
-  // No change_size in the record: the bless refuses, mechanically.
+  // THE EXIT IS THE HARD GATE (owner 2026-08-04): the retro's stored form
+  // must stand complete before the walk moves.
+  await assert.rejects(
+    () => session.advance(),
+    (e) => /evidence form complete/.test(JSON.stringify(e)),
+  );
+  // Multi-pass fills land in the record on the branch; completeness signs.
+  session.formSave("onboard-retro", { current_situation: "fresh root, empty inbox", field_feedback: "nothing yet" }, "human");
+  session.formSave(
+    "onboard-retro",
+    {
+      notes_drained: "0 before, 0 after",
+      call_log_mined: "0 calls — fresh root",
+      process_stale: "checked — nothing stale",
+      follow_up: "none",
+    },
+    "human",
+  );
+  const retroForm = readFileSync(join(root, ".worktrees", id, "project", "spec", "iterations", id, "evidence", "onboard-retro.md"), "utf8");
+  assert.match(retroForm, /^status: done$/m, "completeness signs the claim");
+  assert.match(retroForm, /^authors: human$/m);
+  await session.advance(); // onboard-retro → gate-kickoff — the exit is open now
+  // No change_size anywhere: the bless refuses, mechanically.
   await assert.rejects(
     () => session.advance(),
     (e) => /change_size/.test(JSON.stringify(e)),
   );
-  // The prefill lands in the record; the advance is the bless — the pin
-  // fires and the machine GROWS IN PLACE during that very call. Several
-  // ways forward stand in the grown machine, so the UNNAMED advance
-  // refuses typed — and the growth has already happened when it does.
+  // The kickoff's OWN form carries the size — fill it whole, rounds included.
+  const kickFields: Record<string, string> = {
+    current_situation: "M0 walked, inbox empty",
+    retro_drained: "nothing pended",
+    goal: "walk the pinned machine",
+    pulled_in: "nothing — test walk",
+    left_out: "everything else",
+    change_size: "patch — the smallest walk proves the seam",
+    verify_round: "inputs checked",
+    validate_round: "fits the frame",
+    redteam_round: "argued — no kill criterion met",
+    verdict: "PASS",
+    follow_up: "none",
+  };
+  session.formSave("gate-kickoff", kickFields, "human");
+  // The advance is the bless — the pin fires from the form and the machine
+  // GROWS IN PLACE during that very call. Several ways forward stand in
+  // the grown machine, so the UNNAMED advance refuses typed — and the
+  // growth has already happened when it does.
   const rec = join(root, ".worktrees", id, "project", "spec", "iterations", id, "record.md");
-  writeFileSync(rec, readFileSync(rec, "utf8").replace(/^status: /m, "change_size: patch\nstatus: "), "utf8");
   await assert.rejects(
     () => session.advance(),
     (e) => /named way forward/.test(JSON.stringify(e)),
@@ -327,6 +365,7 @@ test("no gate holds the first start — entering binds, stamps started, and M0 s
   await session.advance("iterations");
   await session.advance(sid);
   assert.deepEqual(session.breadcrumb(), ["main", "iterations", sid]);
+  session.humanCheck("project/guidance/method/retro.md");
   // The target CLEARS on the descent — when it did not, the pull answered
   // wait forever with the walk wedged at the sub's start.
   session.setTarget(`iterations/${sid}`);

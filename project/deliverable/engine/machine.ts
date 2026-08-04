@@ -36,6 +36,9 @@ export interface EvidenceField {
   type?: EvidenceType;
   /** One or two lines telling whoever fills it what belongs in it. */
   guidance?: string;
+  /** The field's template (machines/forms/templates/<name>.md). Absent
+   *  means free-form; every referenced template is a read input. */
+  template?: string;
 }
 
 /**
@@ -116,6 +119,12 @@ export interface StateDecl {
   exit?: Record<string, string[]>;
   /** Tags join states to guidance (the pull system's tag rule). */
   tags?: string[];
+  /** WHY the state exists — one authored line, shown on its evidence form. */
+  motivation?: string;
+  /** Declared do-inputs beyond the reading ("Do the survey | …"). */
+  inputs?: { label: string; description: string }[];
+  /** The concrete slash-name of the form's Follow-up box. */
+  follow_up_label?: string;
   /** HUMAN INVOLVEMENT (owner ruling 2026-07-26): the weight of the
    *  decision to ENTER this state, 0.01 (mechanical) .. 1 (killer). The
    *  agent may enter only when priority <= the session threshold; the

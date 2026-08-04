@@ -64,6 +64,12 @@ export interface RigorMatrixRow {
   same_as?: string;
   /** Entry conditions inherited from the referenced state note. */
   entry?: Record<string, string[]>;
+  /** WHY the step exists — one authored line for its evidence form. */
+  motivation?: string;
+  /** Declared do-inputs beyond the reading. */
+  inputs?: { label: string; description: string }[];
+  /** The concrete slash-name of the form's Follow-up box. */
+  follow_up_label?: string;
 }
 
 export interface RigorMatrixCell {
@@ -83,6 +89,18 @@ function asList(v: unknown): string[] {
   if (Array.isArray(v)) return v.map(String);
   if (typeof v === "string" && v.trim() !== "") return v.split(",").map((s) => s.trim());
   return [];
+}
+
+/** "label | description" lines — a state's do-inputs beyond the reading. */
+function parseDoInputs(v: unknown): { label: string; description: string }[] | undefined {
+  if (!Array.isArray(v)) return undefined;
+  const out = v.map(String).map((line) => {
+    const cut = line.indexOf("|");
+    return cut < 0
+      ? { label: line.trim(), description: "" }
+      : { label: line.slice(0, cut).trim(), description: line.slice(cut + 1).trim() };
+  });
+  return out.length > 0 ? out : undefined;
 }
 
 // Evidence lives in FRONTMATTER (owner ruling 2026-07-30): a nested YAML
@@ -117,6 +135,7 @@ function parseEvidence(fm: Record<string, unknown>, file: string, body: string):
       required: f.required !== false,
       ...(f.type !== undefined ? { type: String(f.type) as EvidenceType } : {}),
       ...(typeof f.guidance === "string" && f.guidance.trim() !== "" ? { guidance: f.guidance } : {}),
+      ...(typeof f.template === "string" && f.template.trim() !== "" ? { template: f.template } : {}),
     };
   });
 }
@@ -184,6 +203,9 @@ function parseMatrixRow(
     guidance: section(note.body, "Guidance"),
     evidence_form: parseEvidence(fm, file, note.body),
     legal_tools: fm.legal_tools === undefined ? undefined : asList(fm.legal_tools),
+    motivation: typeof fm.motivation === "string" ? fm.motivation : undefined,
+    inputs: parseDoInputs(fm.inputs),
+    follow_up_label: typeof fm.follow_up_label === "string" ? fm.follow_up_label : undefined,
   };
   if (row.state_kind !== "terminal" && row.evidence_form.length === 0) {
     throw new Error(`matrix row ${row.name} carries no evidence — leaving a state demands evidence; only a terminal is exempt`);
@@ -205,6 +227,10 @@ function mergeSameAs(dir: string, row: RigorMatrixRow, fm: Record<string, unknow
   if (nfm.legal_tools !== undefined) row.legal_tools = asList(nfm.legal_tools);
   if (typeof nfm.guidance === "string" && nfm.guidance !== "") row.guidance = [nfm.guidance, row.guidance].filter(Boolean).join("\n\n");
   if (nfm.entry_read !== undefined) row.entry = { read: asList(nfm.entry_read) };
+  if (typeof nfm.motivation === "string" && nfm.motivation !== "") row.motivation = nfm.motivation;
+  if (typeof nfm.follow_up_label === "string" && nfm.follow_up_label !== "") row.follow_up_label = nfm.follow_up_label;
+  const di = parseDoInputs(nfm.inputs);
+  if (di !== undefined) row.inputs = di;
 }
 
 // A CELL IS FRONTMATTER ON ITS ROW. It used to be a file of its own, and
@@ -294,6 +320,9 @@ function rowState(row: RigorMatrixRow): Omit<StateDecl, "guidance" | "edges"> {
     // back, or SE-C-112 answers with SE-C-110 and the walk cannot recover.
     ...(row.legal_tools !== undefined ? { legal_tools: row.legal_tools } : {}),
     ...(row.entry !== undefined ? { entry: row.entry } : {}),
+    ...(row.motivation !== undefined ? { motivation: row.motivation } : {}),
+    ...(row.inputs !== undefined ? { inputs: row.inputs } : {}),
+    ...(row.follow_up_label !== undefined ? { follow_up_label: row.follow_up_label } : {}),
     // The walk's pin hook finds the kickoff by this tag, wherever it compiles.
     ...(row.name === "gate-kickoff" ? { tags: ["iteration-kickoff"] } : {}),
   };

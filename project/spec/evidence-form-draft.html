@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>evidence form — draft</title>
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { font: 14px/1.5 system-ui, sans-serif; color: #111; background: #e8e8e8; padding: 24px; }
+  .sheet { max-width: 1240px; margin: 0 auto; background: #fff; border: 2px solid #111; }
+  header { display: flex; justify-content: space-between; align-items: baseline; gap: 2em; border-bottom: 2px solid #111; padding: 10px 16px; }
+  h1 { font-size: 19px; }
+  h1 .slash { color: #888; font-weight: normal; }
+  .dates { font-size: 12.5px; color: #333; display: flex; gap: 1.6em; }
+  .dates b { color: #111; }
+  .grid { display: grid; grid-template-columns: 1fr 1.25fr; }
+  .col-l { border-right: 2px solid #111; }
+  .box { border-bottom: 1.5px solid #111; padding: 10px 14px 12px; }
+  .col-l .box:last-child, .col-r .box:last-child { border-bottom: none; }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: #111; margin-bottom: 6px; }
+  h2 .no { display: inline-block; width: 1.5em; }
+  h2 .concrete { color: #888; text-transform: none; letter-spacing: 0; }
+  p, li { font-size: 13.5px; }
+  .inputs { list-style: none; padding-left: 0; }
+  .inputs li { margin: 6px 0; }
+  .inputs li::before { content: "☐ "; }
+  .inputs .t { font-weight: 600; }
+  .inputs .d { color: #555; font-size: 12.5px; display: block; margin-left: 1.5em; }
+  .field { border: 1px solid #999; border-radius: 4px; padding: 7px 10px; margin: 7px 0; }
+  .field .name { font-weight: 600; font-size: 13.5px; }
+  .field .req { color: #b3261e; font-size: 11.5px; margin-left: .5em; }
+  .field .opt { color: #888; font-size: 11.5px; margin-left: .5em; }
+  .field .tpl { float: right; font-size: 11.5px; color: #35507a; }
+  .field .desc { color: #555; font-size: 12.5px; margin: 2px 0 6px; }
+  .fill { min-height: 40px; border: 1px dashed #bbb; border-radius: 3px; background: #fcfcfc; padding: 6px 8px; color: #aaa; font-size: 12.5px; }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <header>
+    <h1>Evidence form <span class="slash">/ retro</span></h1>
+    <div class="dates">
+      <span>status <b>open</b></span>
+      <span>opened <b>2026-08-04</b></span>
+      <span>signed off <b>____</b></span>
+      <span>by <b>____</b></span>
+    </div>
+  </header>
+  <div class="grid">
+    <div class="col-l">
+      <div class="box">
+        <h2><span class="no">1</span>Description</h2>
+        <p>A retro looks back over the interval since the last one. The field gets asked first. Then every pending note is judged and drained. The call log is mined for what kept refusing. The waste in the record is named. What the interval taught leaves as rules and as steps.</p>
+      </div>
+      <div class="box">
+        <h2><span class="no">2</span>Motivation</h2>
+        <p>Lessons expire. A stray nobody judges rots into noise, and a mistake nobody names repeats. The retro turns what happened into rules while it is still cheap, and it empties the inbox so the next decision starts on a clean slate.</p>
+      </div>
+      <div class="box">
+        <h2><span class="no">3</span>Current situation <span class="tpl" style="float:right;font-size:11.5px;color:#35507a;font-weight:normal;letter-spacing:0;text-transform:none">template: free-form</span></h2>
+        <div class="fill" style="min-height:64px">What stands right now, in a few lines — the inbox count, the open work, the interval's bounds. Filled from the survey before the sweep begins.</div>
+      </div>
+      <div class="box">
+        <h2><span class="no">4</span>Inputs</h2>
+        <ul class="inputs">
+          <li><span class="t">Read retro</span> <span style="font-size:11px;color:#b3261e;border:1px solid #b3261e;border-radius:3px;padding:0 4px">before entry</span><span class="d">The retro method — the sweep, step by step. Read before the state is entered; everything below gates the exit.</span></li>
+          <li><span class="t">Read software</span><span class="d">How work is written and recorded — notes rule on it.</span></li>
+          <li><span class="t">Read ux</span><span class="d">How surfaces are built — notes rule on it.</span></li>
+          <li><span class="t">Read template-free-form</span><span class="d">The default evidence template — how to write understandable prose.</span></li>
+          <li><span class="t">Do the survey</span><span class="d">Everything open in one call: inbox count, open work.</span></li>
+          <li><span class="t">Establish the interval</span><span class="d">Last retro to now — the span this retro judges.</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-r">
+      <div class="box">
+        <h2><span class="no">5</span>Evidence</h2>
+        <div class="field"><span class="tpl">template: free-form</span><span class="name">field_feedback</span><span class="req">required</span>
+          <div class="desc">What came back from the field, or an explicit "nothing yet".</div>
+          <div class="fill">…</div></div>
+        <div class="field"><span class="tpl">template: free-form</span><span class="name">notes_drained</span><span class="req">required</span>
+          <div class="desc">Inbox count before and after, each note with its disposition.</div>
+          <div class="fill">…</div></div>
+        <div class="field"><span class="tpl">template: free-form</span><span class="name">call_log_mined</span><span class="req">required</span>
+          <div class="desc">Counts and rejection clauses since the last retro, with the leads drawn.</div>
+          <div class="fill">…</div></div>
+        <div class="field"><span class="tpl">template: free-form</span><span class="name">waste_leads</span><span class="opt">optional</span>
+          <div class="desc">Rework or waste found in the record.</div>
+          <div class="fill">…</div></div>
+        <div class="field"><span class="tpl">template: free-form</span><span class="name">process_stale</span><span class="req">required</span>
+          <div class="desc">The standing state-of-the-art check on the process itself.</div>
+          <div class="fill">…</div></div>
+      </div>
+      <div class="box">
+        <h2><span class="no">6</span>Follow-up <span class="concrete">/ steps minted</span> <span class="tpl" style="float:right;font-size:11.5px;color:#35507a;font-weight:normal;letter-spacing:0;text-transform:none">template: free-form</span></h2>
+        <p style="color:#555;font-size:12.5px">The steps this retro produces — each becomes work, or a note parked with its ready-when.</p>
+        <div class="fill" style="min-height:56px">1. …</div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

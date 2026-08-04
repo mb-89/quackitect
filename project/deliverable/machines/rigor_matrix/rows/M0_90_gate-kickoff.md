@@ -4,6 +4,7 @@ name: gate-kickoff
 statement: "GATE kickoff: one handover carries the plan and the rigor column; the owner blesses - past it the iteration is set."
 state_kind: gate
 filled_by: agent
+motivation: The size decision has one home. The kickoff proposes, the person rules, and the machine grows from the blessed column - nothing downstream re-litigates it.
 depends_on:
   - onboard-retro
 floor: true
