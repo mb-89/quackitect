@@ -252,22 +252,18 @@ function svgStateNode(
   return parts;
 }
 
-// Condition buttons ride the node's edges: enter on the LEFT (where the
-// arrow comes in), leave on the RIGHT (in front of the arrow out).
+// Condition pills ride the ARROWS of the top-to-bottom flow: the entry
+// pill sits over the incoming tip above the box, the exit pill on the
+// outgoing line below it, clear of every arrowhead. They MARK the guards;
+// what they open is the state's own detail — the form, where one exists.
 function svgCondButtons(n: CNode, sid: string, mt: StateMeta | undefined): string[] {
   if (mt === undefined) return [];
   const parts: string[] = [];
-  const cy = n.y + n.height / 2;
-  if (mt.has_entry) {
-    parts.push(
-      `<g class="clickable cond ${mt.entry_met ? "met" : "unmet"}" data-detail="cond:${esc(sid)}"><circle cx="${n.x}" cy="${cy}" r="18"/><text x="${n.x}" y="${cy + 7}" class="cond-label">${mt.entry_met ? "✓" : "!"}</text></g>`,
-    );
-  }
-  if (mt.has_exit) {
-    parts.push(
-      `<g class="clickable cond ${mt.exit_met ? "met" : "unmet"}" data-detail="cond:${esc(sid)}"><circle cx="${n.x + n.width}" cy="${cy}" r="18"/><text x="${n.x + n.width}" y="${cy + 7}" class="cond-label">${mt.exit_met ? "✓" : "!"}</text></g>`,
-    );
-  }
+  const cx = n.x + n.width / 2;
+  const pillAt = (cy: number, met: boolean): string =>
+    `<g class="clickable cond ${met ? "met" : "unmet"}" data-detail="state:${esc(sid)}"><circle cx="${cx}" cy="${cy}" r="9"/><text x="${cx}" y="${cy + 3.5}" class="cond-label" style="font-size:10px">${met ? "✓" : "!"}</text></g>`;
+  if (mt.has_entry) parts.push(pillAt(n.y - 16, mt.entry_met));
+  if (mt.has_exit) parts.push(pillAt(n.y + n.height + 16, mt.exit_met));
   return parts;
 }
 
@@ -1472,8 +1468,10 @@ function condDetail(id) {
 // folder one click away, done runs the same lint the agent's tick runs.
 // A form renders into the MODAL by default; "details" pins it to the
 // details surface instead — which is what a detached form window is.
-function presentForm(name, into, title, html) {
-  if (into === "details") { CURRENT_DETAIL = "form:" + name; showDetails(title, html); return; }
+function presentForm(name, into, title, html, machine) {
+  // The machine rides INSIDE the detail key, so a popped-out window
+  // re-resolves the same form wherever its own view happens to stand.
+  if (into === "details") { CURRENT_DETAIL = "form:" + name + (machine ? "@" + machine : ""); showDetails(title, html); return; }
   openModal(title, html);
 }
 // THE STATE FORM'S SHEET (owner rulings 2026-08-04): boxes from the A3
@@ -1498,54 +1496,68 @@ function sfBox(title, inner, open) {
 }
 function renderStateForm(f) {
   const name = f.form;
+  const mach = f.machine || viewedMachine();
   const fld = function (n) {
     const hit = (f.fields || []).filter(function (q) { return q.name === n; })[0];
     return hit || { name: n, description: "", required: false, content: "", prefills: [] };
   };
-  let h = '<div class="meta">' + Object.keys(f.header || {}).map(function (k) { return escText(k) + ": " + escText(String(f.header[k] || "____")); }).join(" · ") + "</div>";
+  // A real heading; every header item its own line, at the body text size.
+  let h = '<div style="font-size:17px;font-weight:700;padding:2px 0 6px">Evidence form <span style="font-weight:400;color:var(--se-muted)">/ ' + escText(name) + "</span></div>";
+  h += Object.keys(f.header || {}).map(function (k) { return '<div class="comment-text">' + escText(k) + ": " + escText(String(f.header[k] || "____")) + "</div>"; }).join("");
   h += sfBox("Description", '<div class="comment-text">' + escText(f.description || "") + "</div>", false);
   if (f.motivation) h += sfBox("Motivation", '<div class="comment-text">' + escText(f.motivation) + "</div>", false);
-  h += sfBox("Current situation", sfOne(f, fld("current_situation")), true);
+  h += sfBox("Current situation", sfOne(f, fld("current_situation")), false);
   h += sfBox("Inputs", (f.inputs || []).map(function (i) {
+    const on = (f.checked || []).indexOf(i.label) >= 0;
     const label = i.path ? '<a class="doclink" data-path="' + escText(i.path) + '">' + escText(i.label) + "</a>" : "<b>" + escText(i.label) + "</b>";
-    return '<div style="font-size:12.5px">☐ ' + label + (i.entry ? ' <span style="color:var(--se-fail);font-size:11px">before entry</span>' : "") + ' <span class="meta">' + escText(i.description || "") + "</span></div>";
+    return '<div style="font-size:12.5px"><input type="checkbox" class="sfcheck" data-form="' + name + '" data-machine="' + escText(mach) + '" data-label="' + escText(i.label) + '"' + (on ? " checked" : "") + "> " + label + (i.entry ? ' <span style="color:var(--se-fail);font-size:11px">before entry</span>' : "") + ' <span class="meta">' + escText(i.description || "") + "</span></div>";
   }).join(""), false);
-  h += sfBox("Evidence", (f.fields || []).filter(function (x) { return x.name !== "current_situation" && x.name !== "follow_up"; }).map(function (x) { return sfOne(f, x); }).join(""), true);
-  h += sfBox("Follow-up" + (f.follow_up_label ? " / " + escText(f.follow_up_label) : ""), sfOne(f, fld("follow_up")), true);
+  h += sfBox("Evidence", (f.fields || []).filter(function (x) { return x.name !== "current_situation" && x.name !== "follow_up"; }).map(function (x) { return sfOne(f, x); }).join(""), false);
+  h += sfBox("Follow-up" + (f.follow_up_label ? " / " + escText(f.follow_up_label) : ""), sfOne(f, fld("follow_up")), false);
   if (f.problems && f.problems.length) h += '<div style="color:var(--se-accent);padding:6px 0">' + f.problems.map(escText).join("<br>") + "</div>";
   if (f.met) h += '<div style="color:var(--se-ok);padding:6px 0">✓ complete — the claim stands; the gate judges it</div>';
-  h += '<div style="padding:10px 0"><button class="primary saveform" data-form="' + name + '">save</button> <button class="primary doneform" data-form="' + name + '" title="sets status done">done</button> ';
-  h += '<a class="ghost" href="/form/export?name=' + encodeURIComponent(name) + '&machine=' + encodeURIComponent(viewedMachine()) + '">export portable copy</a> ';
-  h += '<label class="ghost" style="cursor:pointer">ingest returned copy<input type="file" accept=".html,text/html" style="display:none" class="ingestform" data-form="' + name + '"></label></div>';
+  h += '<div style="padding:10px 0"><button class="primary sfexport" data-form="' + name + '" data-machine="' + escText(mach) + '">export</button> ';
+  h += '<button class="primary sfimport" data-form="' + name + '">import</button><input type="file" accept=".html,text/html" style="display:none" class="ingestform" data-form="' + name + '" data-machine="' + escText(mach) + '"> ';
+  h += '<button class="primary saveform" data-form="' + name + '" data-machine="' + escText(mach) + '">save</button> ';
+  h += '<button class="primary doneform" data-form="' + name + '" data-machine="' + escText(mach) + '" title="marks the claim complete — the gate judges it">submit</button></div>';
   return h;
 }
 async function seIngest(inp, name) {
   const file = inp.files && inp.files[0];
   if (!file) return;
   const html = await file.text();
-  await formPost("/form/ingest", { name: name, html: html, machine: viewedMachine() });
-  showFormAgain(name);
+  await formPost("/form/ingest", { name: name, html: html, machine: inp.dataset.machine || viewedMachine() });
+  showFormAgain(name, inp.dataset.machine);
 }
 // Delegated, like every other control — an inline handler needs quote
 // nesting the fixer is free to normalise, and one stripped escape killed
 // the whole page script at parse.
 document.addEventListener("change", function (ev) {
   const inp = ev.target.closest ? ev.target.closest(".ingestform") : null;
-  if (inp) void seIngest(inp, inp.getAttribute("data-form"));
+  if (inp) { void seIngest(inp, inp.getAttribute("data-form")); return; }
+  // A checked input saves QUIETLY — no re-render, so the reader's folds
+  // and scroll hold still and the box already shows its new state.
+  const cb = ev.target.closest ? ev.target.closest(".sfcheck") : null;
+  if (cb) {
+    const labels = [];
+    document.querySelectorAll('.sfcheck[data-form="' + cb.dataset.form + '"]').forEach(function (x) { if (x.checked) labels.push(x.dataset.label); });
+    void formPost("/form/save", { name: cb.dataset.form, fields: { inputs_checked: labels.join("\\n") }, machine: cb.dataset.machine || viewedMachine() });
+  }
 });
 // The machine on display resolves a form name — without it, two records'
 // same-named states would collide and the walk's machine would shadow the view.
 function viewedMachine() { return (D.viewed && D.viewed.id) || ""; }
-async function showForm(name, into) {
-  const r = await fetch("/api/form?name=" + encodeURIComponent(name) + "&machine=" + encodeURIComponent(viewedMachine()));
+async function showForm(name, into, machine) {
+  machine = machine || viewedMachine();
+  const r = await fetch("/api/form?name=" + encodeURIComponent(name) + "&machine=" + encodeURIComponent(machine));
   const f = await r.json();
-  if (f.state_form) { presentForm(name, into, f.title || ("form · " + name), renderStateForm(f)); return; }
+  if (f.state_form) { presentForm(name, into, f.title || ("form · " + name), renderStateForm(f), machine); return; }
   if (f.kind === "rejected" || f.error) {
     // Plain words at the human — never raw rejection JSON.
     presentForm(name, into, "form · " + name,
       '<div class="comment-detail">' + escText(f.expected || f.error || "") + "</div>" +
       '<div class="meta">' + escText(f.got || "") + "</div>" +
-      (f.remedy && f.remedy.note ? '<div class="comment-text">' + escText(f.remedy.note) + "</div>" : ""));
+      (f.remedy && f.remedy.note ? '<div class="comment-text">' + escText(f.remedy.note) + "</div>" : ""), machine);
     return;
   }
   const ro = f.preview === true;
@@ -1569,12 +1581,12 @@ async function showForm(name, into) {
     if (f.problems && f.problems.length) html += '<div style="color:var(--se-accent);padding:6px 0">' + f.problems.map(escText).join("<br>") + "</div>";
     html += '<div style="padding:10px 0"><button class="primary saveform" data-form="' + name + '">save</button> <button class="primary doneform" data-form="' + name + '" title="sets status done and runs the lint">done</button></div>';
   }
-  presentForm(name, into, "form · " + name, html);
+  presentForm(name, into, "form · " + name, html, machine);
 }
 // A save or confirm re-renders the form WHERE IT STANDS — the modal, or
 // the details surface a detached window is pinned to.
-function showFormAgain(name) {
-  void showForm(name, CURRENT_DETAIL === "form:" + name ? "details" : undefined);
+function showFormAgain(name, machine) {
+  void showForm(name, CURRENT_DETAIL && CURRENT_DETAIL.indexOf("form:" + name) === 0 ? "details" : undefined, machine);
 }
 async function formPost(path, body) {
   await fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
@@ -1583,22 +1595,37 @@ document.addEventListener("click", async (ev) => {
   const of = ev.target.closest ? ev.target.closest(".openform") : null;
   if (of) { void showForm(of.dataset.form); return; }
   const cp = ev.target.closest ? ev.target.closest(".confirmpre") : null;
-  if (cp) { await formPost("/form/confirm", { name: cp.dataset.form, field: cp.dataset.field, index: Number(cp.dataset.index), machine: viewedMachine() }); showFormAgain(cp.dataset.form); return; }
+  if (cp) { await formPost("/form/confirm", { name: cp.dataset.form, field: cp.dataset.field, index: Number(cp.dataset.index), machine: cp.dataset.machine || viewedMachine() }); showFormAgain(cp.dataset.form, cp.dataset.machine); return; }
+  const ex = ev.target.closest ? ev.target.closest(".sfexport") : null;
+  if (ex) {
+    // A download navigation — the browser's own save dialog names the place.
+    const a = document.createElement("a");
+    a.href = "/form/export?name=" + encodeURIComponent(ex.dataset.form) + "&machine=" + encodeURIComponent(ex.dataset.machine || viewedMachine());
+    a.download = "";
+    a.click();
+    return;
+  }
+  const im = ev.target.closest ? ev.target.closest(".sfimport") : null;
+  if (im) {
+    const inp = document.querySelector('.ingestform[data-form="' + im.dataset.form + '"]');
+    if (inp) inp.click();
+    return;
+  }
   const sv = ev.target.closest ? ev.target.closest(".saveform") : null;
   if (sv) {
     const fields = {};
     document.querySelectorAll(".formfield").forEach((t) => { fields[t.dataset.field] = t.value; });
-    await formPost("/form/save", { name: sv.dataset.form, fields, machine: viewedMachine() });
-    showFormAgain(sv.dataset.form);
+    await formPost("/form/save", { name: sv.dataset.form, fields, machine: sv.dataset.machine || viewedMachine() });
+    showFormAgain(sv.dataset.form, sv.dataset.machine);
     return;
   }
   const dn2 = ev.target.closest ? ev.target.closest(".doneform") : null;
   if (dn2) {
     const fields = {};
     document.querySelectorAll(".formfield").forEach((t) => { fields[t.dataset.field] = t.value; });
-    await formPost("/form/save", { name: dn2.dataset.form, fields, machine: viewedMachine() });
-    await formPost("/form/done", { name: dn2.dataset.form, machine: viewedMachine() });
-    showFormAgain(dn2.dataset.form);
+    await formPost("/form/save", { name: dn2.dataset.form, fields, machine: dn2.dataset.machine || viewedMachine() });
+    await formPost("/form/done", { name: dn2.dataset.form, machine: dn2.dataset.machine || viewedMachine() });
+    showFormAgain(dn2.dataset.form, dn2.dataset.machine);
     return;
   }
   const ofo = ev.target.closest ? ev.target.closest(".openfolder") : null;
@@ -1616,7 +1643,7 @@ async function openDoc(path, returnKey) {
 function detailFor(key) {
   if (key.startsWith("log:")) { void openLogDetail(key.slice(4)); return ["log entry", '<div class="meta">loading…</div>']; }
   if (key.startsWith("doc:")) { void openDoc(key.slice(4), "comment"); return [key.slice(4), '<div class="meta">loading…</div>']; }
-  if (key.startsWith("form:")) { void showForm(key.slice(5), "details"); return ["form · " + key.slice(5), '<div class="meta">loading…</div>']; }
+  if (key.startsWith("form:")) { const fm = key.slice(5).split("@"); void showForm(fm[0], "details", fm[1]); return ["form · " + fm[0], '<div class="meta">loading…</div>']; }
   if (key.startsWith("cond:")) return condDetail(key.slice(5));
   if (key === "comment") {
     const txt = (D.comment || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");
@@ -1885,10 +1912,11 @@ if (cardsEl !== null) {
     });
   }
 }
-if (CURRENT && D.states[CURRENT] && WALK_HERE) { CURRENT_DETAIL = "state:" + CURRENT; const wdp = detailFor("state:" + CURRENT); showDetails(wdp[0], wdp[1]); }
-// A bookmark or an F5 still deep-links to the pane that was open.
+// A deep link names the subject — a popped-out or bookmarked pane must
+// show what it was opened on, so the walk's default never runs over it.
 const DETAIL_PARAM = new URLSearchParams(location.search).get("detail");
 if (DETAIL_PARAM) { CURRENT_DETAIL = DETAIL_PARAM; const dp = detailFor(DETAIL_PARAM); showDetails(dp[0], dp[1]); }
+else if (CURRENT && D.states[CURRENT] && WALK_HERE) { CURRENT_DETAIL = "state:" + CURRENT; const wdp = detailFor("state:" + CURRENT); showDetails(wdp[0], wdp[1]); }
 // A frozen window says so. Not a warning — a quiet line, so a reader with
 // one live pane and four snapshots can tell which is which at a glance.
 if (FROZEN) {
@@ -2425,7 +2453,7 @@ function applyAlive(a) {
       const first = resp && resp.pull === "fill" && resp.forms && resp.forms[0];
       if (!first || !first.form) return;
       if (window.parent !== window) window.parent.postMessage({ se: "open-form", name: first.form }, "*");
-      else window.open("/widget/details?detail=" + encodeURIComponent("form:" + first.form), "_blank", "popup,width=760,height=900");
+      else if (!EMBED) window.open("/widget/details?detail=" + encodeURIComponent("form:" + first.form), "_blank", "popup,width=760,height=900");
     }).catch(() => {});
   }
   if (JSON.stringify(a.active || []) !== ACTIVE_AT_RENDER) { refresh(); return; }

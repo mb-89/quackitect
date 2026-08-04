@@ -85,7 +85,7 @@ export function lintForm(t: FormTemplate, instanceRaw: string | undefined, evide
     return {
       met: false,
       status: "missing",
-      problems: [`no instance yet — create ${t.instance} from the ${t.form} template`],
+      problems: [`not started yet — the first save creates ${t.instance}`],
       fields: t.fields.map((f) => ({ ...f, content: "", prefills: [], filled: false })),
       files: [],
     };
@@ -197,4 +197,11 @@ export function withAuthor(instanceRaw: string, author: string): string {
 export function withSignedOff(instanceRaw: string, when: string): string {
   if (/^signed_off: /m.test(instanceRaw)) return instanceRaw.replace(/^signed_off: .*$/m, `signed_off: ${when}`);
   return instanceRaw.replace(/^status: .*$/m, (s) => `${s}\nsigned_off: ${when}`);
+}
+
+/** The ticked inputs — one line like authors, replaced whole on each save. */
+export function withChecked(instanceRaw: string, labels: string[]): string {
+  const line = `checked: ${labels.join(", ")}`;
+  if (/^checked:/m.test(instanceRaw)) return instanceRaw.replace(/^checked:.*$/m, line);
+  return instanceRaw.replace(/^status: .*$/m, (s) => `${s}\n${line}`);
 }

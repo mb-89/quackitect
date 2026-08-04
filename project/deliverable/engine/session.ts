@@ -46,6 +46,7 @@ import {
   scaffoldInstance,
   stripComments,
   withAuthor,
+  withChecked,
   withFieldContent,
   withSignedOff,
   withStatus,
@@ -2586,7 +2587,26 @@ export class Session {
     const h = this.stateFormHome(name, m);
     const raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : undefined;
     const model = stateFormModel(this.root, scanGuidance(this.root), m, s, this.stateFormHeader(name, raw, m));
-    return { state_form: true, ...model, instance: h.instanceRel, exists: raw !== undefined, ...lintForm(model.template, raw, "") };
+    return {
+      state_form: true,
+      ...model,
+      machine: m.id,
+      checked: this.stateFormChecked(raw),
+      instance: h.instanceRel,
+      exists: raw !== undefined,
+      ...lintForm(model.template, raw, ""),
+    };
+  }
+
+  private stateFormChecked(raw: string | undefined): string[] {
+    if (raw === undefined) return [];
+    const v = parseStateNote(raw).frontmatter.checked;
+    return typeof v === "string"
+      ? v
+          .split(",")
+          .map((x) => x.trim())
+          .filter((x) => x !== "")
+      : [];
   }
 
   private stateFormScaffold(name: string, t: FormTemplate): string {
@@ -2619,7 +2639,19 @@ export class Session {
     const t = stateFormFields(this.stateFormState(name, m));
     const h = this.stateFormHome(name, m);
     let raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : this.stateFormScaffold(name, t);
-    for (const [f, content] of Object.entries(fields)) raw = withFieldContent(raw, f, String(content));
+    // inputs_checked is the checkbox column, not a section — both hands
+    // (the page's boxes, the agent's fill) send it through this one door.
+    const { inputs_checked, ...rest } = fields;
+    for (const [f, content] of Object.entries(rest)) raw = withFieldContent(raw, f, String(content));
+    if (inputs_checked !== undefined) {
+      raw = withChecked(
+        raw,
+        String(inputs_checked)
+          .split("\n")
+          .map((x) => x.trim())
+          .filter((x) => x !== ""),
+      );
+    }
     raw = this.autoSign(withAuthor(raw, by), t, by);
     mkdirSync(dirname(h.instanceAbs), { recursive: true });
     writeFileSync(h.instanceAbs, raw, "utf8");
@@ -2683,7 +2715,7 @@ export class Session {
         docs.push({ path: i.path, content: "(unreadable at export time)" });
       }
     }
-    return buildPortableForm(model, fills, docs);
+    return buildPortableForm(model, fills, docs, this.stateFormChecked(raw));
   }
 
   /** The returned copy's island lands as fills, marked imported — a
@@ -2701,7 +2733,8 @@ export class Session {
       });
     }
     const author = island.author === "" ? "imported" : `${island.author} (imported)`;
-    return { ingested: name, author, ...this.stateFormSave(name, island.fields, author, m) };
+    const fields = { ...island.fields, inputs_checked: island.checked.join("\n") };
+    return { ingested: name, author, ...this.stateFormSave(name, fields, author, m) };
   }
 
   /** One script, ASYNC — spawnSync would freeze the whole server (and the

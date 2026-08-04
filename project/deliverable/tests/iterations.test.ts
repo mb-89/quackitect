@@ -72,8 +72,16 @@ test("any state's form is fetchable by its machine — the walk elsewhere", () =
   const inst = join(it.path, "project", "spec", "iterations", it.id, "evidence", "onboard-retro.md");
   assert.ok(existsSync(inst), "the instance lives in the record's worktree");
   assert.match(readFileSync(inst, "utf8"), /seen from the desk/);
-  // The portable export travels the same road.
-  assert.match(s.stateFormExport("onboard-retro", "i1"), /Evidence form/);
+  // The checks are inputs' state: stored in the instance, alive in the
+  // fetch, travelling in the portable copy's island.
+  s.formSave("onboard-retro", { inputs_checked: "Do the survey\nRead retro" }, "human", "i1");
+  const withChecks = s.formGet("onboard-retro", "i1") as { checked?: string[] };
+  assert.deepEqual(withChecks.checked, ["Do the survey", "Read retro"], "ticked inputs round-trip");
+  assert.match(readFileSync(inst, "utf8"), /^checked: Do the survey, Read retro$/m);
+  // The portable export travels the same road, checks included.
+  const page = s.stateFormExport("onboard-retro", "i1");
+  assert.match(page, /Evidence form/);
+  assert.match(page, /"checked": \[/);
 });
 
 test("the graph is evidence: an open decision point blocks the leave form", () => {

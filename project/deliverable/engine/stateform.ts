@@ -139,6 +139,8 @@ export interface IslandData {
   form: string;
   author: string;
   fields: Record<string, string>;
+  /** Input labels ticked on the sheet — they travel with the fills. */
+  checked: string[];
 }
 
 /** The returned file's island — the ONLY thing the ingest reads. */
@@ -149,7 +151,8 @@ export function parseIsland(html: string): IslandData | undefined {
     const d = JSON.parse(m[1]) as Partial<IslandData>;
     if (typeof d.form !== "string" || d.fields === null || typeof d.fields !== "object") return undefined;
     const fields = Object.fromEntries(Object.entries(d.fields ?? {}).map(([k, v]) => [k, String(v)]));
-    return { form: d.form, author: typeof d.author === "string" ? d.author : "", fields };
+    const checked = Array.isArray(d.checked) ? d.checked.map(String) : [];
+    return { form: d.form, author: typeof d.author === "string" ? d.author : "", fields, checked };
   } catch {
     return undefined;
   }
@@ -178,7 +181,6 @@ const SHEET_CSS = `
   p, li { font-size: 13.5px; }
   .inputs { list-style: none; padding-left: 0; }
   .inputs li { margin: 6px 0; }
-  .inputs li::before { content: "☐ "; }
   .inputs .t { font-weight: 600; } .inputs a.t { color: #35507a; }
   .inputs .entry { font-size: 11px; color: #b3261e; border: 1px solid #b3261e; border-radius: 3px; padding: 0 4px; margin-left: .4em; }
   .inputs .d { color: #555; font-size: 12.5px; display: block; margin-left: 1.5em; }
@@ -201,9 +203,15 @@ const SHEET_JS = `
   function seCollect() {
     var fields = {};
     document.querySelectorAll("textarea[data-field]").forEach(function (t) { fields[t.getAttribute("data-field")] = t.value; });
+    var checked = [];
+    document.querySelectorAll("input[data-input]").forEach(function (c) {
+      if (c.checked) { checked.push(c.getAttribute("data-input")); c.setAttribute("checked", ""); }
+      else { c.removeAttribute("checked"); }
+    });
     var island = document.getElementById("se-form");
     var d = JSON.parse(island.textContent);
     d.fields = fields;
+    d.checked = checked;
     d.author = (document.getElementById("se-author") || { value: "" }).value;
     island.textContent = JSON.stringify(d, null, 1);
     document.querySelectorAll("textarea[data-field]").forEach(function (t) { t.textContent = t.value; });
@@ -225,14 +233,15 @@ const SHEET_JS = `
   });
 `;
 
-function renderInput(i: FormInput, docIndex: Map<string, number>): string {
+function renderInput(i: FormInput, docIndex: Map<string, number>, checked: Set<string>): string {
   const entry = i.entry ? '<span class="entry">before entry</span>' : "";
   const idx = i.path !== undefined ? docIndex.get(i.path) : undefined;
   const label =
     idx !== undefined
       ? `<a class="t" data-doc="doc-${idx}" href="#doc-${idx}">${esc(i.label)}</a>`
       : `<span class="t">${esc(i.label)}</span>`;
-  return `<li>${label}${entry}<span class="d">${esc(i.description)}</span></li>`;
+  const box = `<input type="checkbox" data-input="${esc(i.label)}"${checked.has(i.label) ? " checked" : ""}> `;
+  return `<li>${box}${label}${entry}<span class="d">${esc(i.description)}</span></li>`;
 }
 
 function renderField(name: string, description: string, required: boolean, template: string, content: string): string {
@@ -254,20 +263,26 @@ function renderHeader(model: StateFormModel): string {
 
 /** The whole portable sheet: fills bound to the ONE island, the reading
  *  and every template baked in behind their links, save as download. */
-export function buildPortableForm(model: StateFormModel, fills: Record<string, string>, docs: EmbeddedDoc[]): string {
+export function buildPortableForm(
+  model: StateFormModel,
+  fills: Record<string, string>,
+  docs: EmbeddedDoc[],
+  checked: string[] = [],
+): string {
   const docIndex = new Map(docs.map((d, i) => [d.path, i]));
+  const done = new Set(checked);
   const follow = model.follow_up_label === "" ? "" : `<span class="concrete">/ ${esc(model.follow_up_label)}</span> `;
   const evid = model.template.fields
     .filter((f) => f.name !== "current_situation" && f.name !== "follow_up")
     .map((f) => renderField(f.name, f.description, f.required, model.field_templates[f.name] ?? "free-form", fills[f.name] ?? ""))
     .join("");
-  const island: IslandData = { form: model.form, author: "", fields: fills };
+  const island: IslandData = { form: model.form, author: "", fields: fills, checked };
   const left =
     `<div class="box"><h2>1&nbsp;&nbsp;Description</h2><p>${esc(model.description)}</p></div>` +
     `<div class="box"><h2>2&nbsp;&nbsp;Motivation</h2><p>${esc(model.motivation)}</p></div>` +
     `<div class="box"><h2>3&nbsp;&nbsp;Current situation <span class="tpl">template: ${esc(model.field_templates.current_situation ?? "free-form")}</span></h2>` +
     `<textarea data-field="current_situation">${esc(fills.current_situation ?? "")}</textarea></div>` +
-    `<div class="box"><h2>4&nbsp;&nbsp;Inputs</h2><ul class="inputs">${model.inputs.map((i) => renderInput(i, docIndex)).join("")}</ul></div>`;
+    `<div class="box"><h2>4&nbsp;&nbsp;Inputs</h2><ul class="inputs">${model.inputs.map((i) => renderInput(i, docIndex, done)).join("")}</ul></div>`;
   const right =
     `<div class="box"><h2>5&nbsp;&nbsp;Evidence</h2>${evid}</div>` +
     `<div class="box"><h2>6&nbsp;&nbsp;Follow-up ${follow}<span class="tpl">template: ${esc(model.field_templates.follow_up ?? "free-form")}</span></h2>` +
