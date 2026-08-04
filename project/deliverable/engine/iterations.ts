@@ -720,7 +720,7 @@ function pinnedCanvas(m: MachineDecl): CanvasData {
       edges.push(sidedEdge(els, `n-${s.id}`, `n-${e.to}`, `e-${s.id}-${e.to}`));
     }
   }
-  return { nodes: nodes as CanvasElement[], edges, metadata: { frontmatter: { reentry: "resume", priority: 0.2 } } };
+  return { nodes: nodes as CanvasElement[], edges, routed: true, metadata: { frontmatter: { reentry: "resume", priority: 0.2 } } };
 }
 
 /** THE ITERATION ARCHIVE, generated like the expedition archive — the

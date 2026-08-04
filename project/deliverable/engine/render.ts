@@ -40,11 +40,31 @@ function stateIdOf(el: CanvasElement): string | undefined {
   return undefined;
 }
 
-/** ARROWS RUN CENTRE TO CENTRE and clip at the borders (owner ruling
- *  2026-08-04): the tip always lands ON the target's edge, pointing at
- *  its heart. The declared sides lost their vote in OUR drawing — side
- *  anchors let geometry bury a tip inside a box; Obsidian still reads
- *  them from the canvas for its own render. */
+/** THE AUTHORED LAW: an edge anchors at the side midpoints the drawing
+ *  declares — the owner drew those sides, and the drawing wins. Only
+ *  canvases that OPT IN (routed: true) take the centre-line law below. */
+function sidePoint(el: CanvasElement, side: string | undefined, other: CanvasElement): [number, number] {
+  const cx = el.x + el.width / 2;
+  const cy = el.y + el.height / 2;
+  switch (side) {
+    case "left":
+      return [el.x, cy];
+    case "right":
+      return [el.x + el.width, cy];
+    case "top":
+      return [cx, el.y];
+    case "bottom":
+      return [cx, el.y + el.height];
+    default: {
+      const ox = other.x + other.width / 2;
+      return [ox < cx ? el.x : el.x + el.width, cy];
+    }
+  }
+}
+
+/** THE ROUTED LAW (owner ruling 2026-08-04, opt-in): arrows run centre
+ *  to centre and clip at the borders — the tip always lands ON the
+ *  target's edge, pointing at its heart. */
 function borderPoint(el: CanvasElement, toward: [number, number]): [number, number] {
   const cx = el.x + el.width / 2;
   const cy = el.y + el.height / 2;
@@ -219,17 +239,18 @@ function svgGroups(nodes: CNode[]): string[] {
 function svgEdges(canvas: CanvasData, byId: Map<string, CNode>): string[] {
   const parts: string[] = [];
   const nodes = canvas.nodes ?? [];
+  const routed = canvas.routed === true;
   for (const edge of canvas.edges ?? []) {
     const a = byId.get(edge.fromNode);
     const b = byId.get(edge.toNode);
     if (a === undefined || b === undefined) continue;
-    const pts = edgeWaypoints(a, b, nodes);
-    const [x1, y1] = borderPoint(a, pts[0] ?? centerOf(b));
-    const [x2, y2] = borderPoint(b, pts[pts.length - 1] ?? centerOf(a));
     // A double-headed arrow is one edge meaning both ways, so it draws that
     // way too — the marker already orients itself at a start.
     const bothWays = (edge as { fromEnd?: string }).fromEnd === "arrow";
     const ends = `class="edge"${bothWays ? ' marker-start="url(#arrow)"' : ""} marker-end="url(#arrow)"`;
+    const pts = routed ? edgeWaypoints(a, b, nodes) : [];
+    const [x1, y1] = routed ? borderPoint(a, pts[0] ?? centerOf(b)) : sidePoint(a, (edge as { fromSide?: string }).fromSide, b);
+    const [x2, y2] = routed ? borderPoint(b, pts[pts.length - 1] ?? centerOf(a)) : sidePoint(b, (edge as { toSide?: string }).toSide, a);
     if (pts.length === 0) {
       parts.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" ${ends}/>`);
     } else {
@@ -694,10 +715,11 @@ const STYLE = `
   svg { width: 100%; height: 100%; cursor: grab; }
   svg.panning { cursor: grabbing; }
   .state { fill: var(--se-raised); stroke: var(--se-border-strong); stroke-width: 2; }
-  /* ONLY WHERE THE WALK STANDS IS COLOURED (owner ruling 2026-07-31). Where
-     it has BEEN keeps the ordinary state colour: two shades of one blue asked
-     the reader to compare hues, and the eye does not read that difference
-     reliably. There is no .state.done rule, on purpose. */
+  /* DONE IS GREEN where a RECORD stands behind it (owner ruling 2026-08-04,
+     reversing the no-done-colour rule of 2026-07-31): a signed — and, for a
+     gate, blessed — stored claim paints its state. States without records
+     never enter the done set, so they stay uncoloured as before. */
+  .state.done { fill: color-mix(in srgb, var(--se-ok) 16%, var(--se-bg)); stroke: var(--se-ok); }
   /* THE CURRENT STATES BLINK YELLOW (owner ruling 2026-08-04, v1's pulse
      reborn) — half the emergency pace, so alarm still outranks attention. */
   .state.active { fill: color-mix(in srgb, var(--se-warn, #d7a72a) 16%, var(--se-bg)); stroke: var(--se-warn, #d7a72a); stroke-width: 3.5; animation: se-current 2.2s ease-in-out infinite; }
@@ -2886,7 +2908,7 @@ function drawingSets(
   decl: MachineDecl,
   info: { active: string[] },
   viewingWalk: boolean,
-): { leafActive: Set<string>; done: Set<string>; subIds: Set<string>; meta: Record<string, StateMeta> } {
+): { leafActive: Set<string>; done: Set<string>; paint: Set<string>; subIds: Set<string>; meta: Record<string, StateMeta> } {
   const leafActive = viewingWalk ? new Set(info.active.map((a) => a.split("/").pop()!)) : new Set<string>();
   if (!viewingWalk && decl.id === m.session.machine.id) {
     // Viewing main while the walk is inside a sub: the sub state is the live one.
@@ -2897,11 +2919,12 @@ function drawingSets(
   // the record, not on the drawing.
   const run = m.session.viewRun(decl.id);
   const done = new Set(run.done.map((s) => s.split("/").pop()!));
-  // The record outlives the engine life: a signed (and, for gates,
-  // blessed) stored claim paints its state green across restarts.
-  for (const id of m.session.recordDone(decl)) done.add(id);
   // An end state is never "filled" — it turns green when its machine completed.
   if (run.completed) for (const s of decl.states) if (s.kind === "end") done.add(s.id);
+  // ONLY record-backed states PAINT (owner ruling 2026-08-04): the green
+  // set is the record's standing claims, which outlive the engine life.
+  // Session-walked states elsewhere stay uncoloured, as ruled 2026-07-31.
+  const paint = new Set(m.session.recordDone(decl));
   const subIds = new Set(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id));
   const meta: Record<string, StateMeta> = {};
   for (const s of decl.states) {
@@ -2915,7 +2938,7 @@ function drawingSets(
       ...(s.statement !== "" && s.statement !== s.id ? { subtitle: s.statement } : {}),
     };
   }
-  return { leafActive, done, subIds, meta };
+  return { leafActive, done, paint, subIds, meta };
 }
 
 // THE ROUTE, PROJECTED ONTO THIS DRAWING. A broken or unreachable target
@@ -2985,9 +3008,9 @@ export function renderMirror(
   const { decl, canvas } = viewedMachine(m, view ?? walkMachine.id);
   const viewingWalk = decl.id === walkMachine.id;
   const history = m.session.instance.history ?? [];
-  const { leafActive, done, subIds, meta } = drawingSets(m, decl, info, viewingWalk);
+  const { leafActive, done, paint, subIds, meta } = drawingSets(m, decl, info, viewingWalk);
   const marks = routeMarksFor(m, decl);
-  const svg = machineSvg(canvas, leafActive, done, subIds, meta, marks);
+  const svg = machineSvg(canvas, leafActive, paint, subIds, meta, marks);
   const crumbs = crumbsFor(m, decl);
 
   // ONE LIST FOR THE WHOLE RENDER. expeditionList() spawns git per record
