@@ -64,6 +64,8 @@ export function startMirror(o: MirrorOptions): Server {
     emergency: state.session.emergency,
     power: state.session.power,
     active: state.session.active(),
+    // The walk's aim — a re-aim redraws the route on every open page.
+    target: state.session.target,
     busy: state.session.busy(),
     ...(state.session.progress() === undefined ? {} : { progress: state.session.progress() }),
     // A monotone change signal for the feed — the log file only grows.

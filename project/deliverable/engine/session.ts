@@ -1976,7 +1976,13 @@ export class Session {
   private pullSaveOrChoose(form: Record<string, unknown>): { saved?: Record<string, unknown>; fanOut: string[] } {
     const owed = this.pullFormsOwed();
     if (owed.length > 0) {
-      return { saved: this.formSave(owed[0], form as Record<string, string>), fanOut: [] };
+      // submit and bless are ACTS, not sections: the save lands the fills
+      // first, then each act runs with its own checks and stamps.
+      const { submit, bless, ...fills } = form;
+      let saved = this.formSave(owed[0], fills as Record<string, string>);
+      if (submit === true || submit === "true" || submit === "yes") saved = this.formDone(owed[0], "agent");
+      if (bless !== undefined) saved = this.formBless(owed[0], bless === true || bless === "true" || bless === "yes", "agent");
+      return { saved, fanOut: [] };
     }
     if (this._target === "" && form.choice !== undefined) {
       return { fanOut: this.pullPickChoice(form.choice) };
@@ -2794,8 +2800,11 @@ export class Session {
     const s = machine.states.find((x) => x.id === ids[0]);
     if (s === undefined || s.evidence_form.length === 0) return undefined;
     try {
-      // Owed until SUBMITTED — the stamp, not mere completeness, closes it.
-      return (this.stateFormGet(s.id) as { signed?: boolean }).signed === true ? undefined : s.id;
+      // Owed until SUBMITTED and still COMPLETE — a live input growing back
+      // (a new inbox item) re-opens a signed form instead of leaving it
+      // unpullable while the next state's entry refuses.
+      const f = this.stateFormGet(s.id) as { signed?: boolean; met?: boolean };
+      return f.signed === true && f.met === true ? undefined : s.id;
     } catch {
       return undefined;
     }

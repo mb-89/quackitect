@@ -199,6 +199,8 @@ interface RouteMarks {
   path: string[];
   /** The destination, if it is in this drawing. */
   target?: string;
+  /** The walk STANDS in this drawing — the one view that draws the here-arrow. */
+  here?: boolean;
   /** The hop the walk cannot pass, and why. Drawn as a road closure. */
   blocked?: { at: string; why: string };
 }
@@ -362,11 +364,14 @@ function svgRoute(route: RouteMarks | undefined, nodeOfState: Map<string, CNode>
     );
   }
   // YOU ARE HERE: the arrow a map puts under your car, turned to face the
-  // way the line is going.
-  const heading = (Math.atan2(stops[1].cy - stops[0].cy, stops[1].cx - stops[0].cx) * 180) / Math.PI + 90;
-  parts.push(
-    `<path d="M 0 -12 L 10 9 L 0 4 L -10 9 Z" class="route-here" transform="translate(${stops[0].cx} ${stops[0].cy}) rotate(${heading.toFixed(1)})"/>`,
-  );
+  // way the line is going. There is only ever ONE — the view the walk
+  // stands in draws it; every other drawing shows the line alone.
+  if (route?.here === true) {
+    const heading = (Math.atan2(stops[1].cy - stops[0].cy, stops[1].cx - stops[0].cx) * 180) / Math.PI + 90;
+    parts.push(
+      `<path d="M 0 -12 L 10 9 L 0 4 L -10 9 Z" class="route-here" transform="translate(${stops[0].cx} ${stops[0].cy}) rotate(${heading.toFixed(1)})"/>`,
+    );
+  }
   return parts;
 }
 
@@ -1245,6 +1250,7 @@ function rebind() {
   WALK_HERE = D.viewingWalk;
   // Without this the next poll compares against the OLD position forever.
   ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
+  TARGET_AT_RENDER = D.target || "";
   restoreViewBox();
   if (CURRENT_DETAIL) { const dp = detailFor(CURRENT_DETAIL); showDetails(dp[0], dp[1]); }
 }
@@ -2583,6 +2589,7 @@ function pingSurface(target) {
 }
 let pollBusy = null;
 let ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
+let TARGET_AT_RENDER = D.target || "";
 let sawError = false;
 let deathTimer = null;
 // The newest person-pull already landed; null until the first alive adopts
@@ -2638,6 +2645,8 @@ function applyAlive(a) {
     }).catch(() => {});
   }
   if (JSON.stringify(a.active || []) !== ACTIVE_AT_RENDER) { refresh(); return; }
+  // A re-aimed walk redraws the route under the reader.
+  if ((a.target || "") !== TARGET_AT_RENDER) { refresh(); return; }
   // A script run finishing elsewhere (agent tick, other window) lands its
   // result — refresh, keeping the open pane.
   // THE BAR FOLLOWS THE ENGINE, not just this page's clicks. A script the
@@ -2954,9 +2963,11 @@ function routeMarksFor(m: MirrorState, decl: MachineDecl): RouteMarks | undefine
       return q.startsWith(`${prefix}/`) ? q.slice(prefix.length + 1).split("/")[0] : undefined;
     };
     const shutAt = r.stops_at === undefined ? undefined : localOf(r.stops_at.at);
+    const rest = prefix === "" ? r.from : r.from.startsWith(`${prefix}/`) ? r.from.slice(prefix.length + 1) : undefined;
     return {
       waypoints,
       path: hops,
+      here: rest !== undefined && !rest.includes("/"),
       ...(r.found && localOf(r.target) !== undefined ? { target: localOf(r.target) } : {}),
       ...(shutAt !== undefined && r.stops_at !== undefined ? { blocked: { at: shutAt, why: r.stops_at.why } } : {}),
     };
@@ -3023,6 +3034,7 @@ export function renderMirror(
   const comment = (canvas.nodes ?? []).find((n) => n.type === "text")?.text ?? "";
   const data = `<script type="application/json" id="se-data">${JSON.stringify({
     build: ENGINE_LIFE,
+    target: m.session.target,
     describe: m.session.describe(),
     packet: m.session.packet(),
     lastPacket: m.lastPacket ?? null,
