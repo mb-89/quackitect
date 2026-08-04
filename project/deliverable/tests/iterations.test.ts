@@ -72,6 +72,13 @@ test("any state's form is fetchable by its machine — the walk elsewhere", () =
   const inst = join(it.path, "project", "spec", "iterations", it.id, "evidence", "onboard-retro.md");
   assert.ok(existsSync(inst), "the instance lives in the record's worktree");
   assert.match(readFileSync(inst, "utf8"), /seen from the desk/);
+  // A browse-save is never stamped and a browse-submit refuses — questions
+  // are answered in order, in the state (owner ruling 2026-08-04).
+  assert.ok(!/^signed_off:/m.test(readFileSync(inst, "utf8")), "a save never stamps; submit does, and only in the state");
+  assert.throws(
+    () => s.formDone("onboard-retro", "human", "i1"),
+    (e) => /standing in/.test(JSON.stringify(e)),
+  );
   // The checks are inputs' state: stored in the instance, alive in the
   // fetch, travelling in the portable copy's island.
   s.formSave("onboard-retro", { inputs_checked: "Do the survey\nRead retro" }, "human", "i1");
@@ -299,8 +306,14 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
     },
     "human",
   );
+  // Complete but unsubmitted still blocks — SUBMIT is the stamping act.
+  await assert.rejects(
+    () => session.advance(),
+    (e) => /SUBMITTED/.test(JSON.stringify(e)),
+  );
+  session.formDone("onboard-retro", "human");
   const retroForm = readFileSync(join(root, ".worktrees", id, "project", "spec", "iterations", id, "evidence", "onboard-retro.md"), "utf8");
-  assert.match(retroForm, /^status: done$/m, "completeness signs the claim");
+  assert.match(retroForm, /^signed_off: /m, "the submit stamps the claim");
   assert.match(retroForm, /^authors: human$/m);
   await session.advance(); // onboard-retro → gate-kickoff — the exit is open now
   // No change_size anywhere: the bless refuses, mechanically.
@@ -333,8 +346,9 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
     follow_up: "none",
   };
   session.formSave("gate-kickoff", kickFields, "human");
-  // THE THUMBS: the gate's form is met but unblessed — an agent below the
-  // gate's weight is refused the bless; the human's thumb opens it.
+  session.formDone("gate-kickoff", "human");
+  // THE THUMBS: the gate's claim is stamped but unblessed — an agent below
+  // the gate's weight is refused the bless; the human's thumb opens it.
   assert.match(JSON.stringify(session.formGet("gate-kickoff")), /"gate":true/);
   session.setAutonomy(0.2);
   assert.throws(

@@ -179,11 +179,18 @@ export function withStatus(instanceRaw: string, status: string, by: string): str
   return out;
 }
 
+/** Insert a frontmatter line after `status:` where one exists (named
+ *  forms), else after `form:` (state forms carry no status). */
+const afterAnchor = (instanceRaw: string, line: string): string =>
+  /^status: .*$/m.test(instanceRaw)
+    ? instanceRaw.replace(/^status: .*$/m, (s) => `${s}\n${line}`)
+    : instanceRaw.replace(/^form: .*$/m, (s) => `${s}\n${line}`);
+
 /** The claim's names: whoever writes joins `authors:`, once. */
 export function withAuthor(instanceRaw: string, author: string): string {
   if (author === "") return instanceRaw;
   const m = instanceRaw.match(/^authors:(.*)$/m);
-  if (m === null) return instanceRaw.replace(/^status: .*$/m, (s) => `${s}\nauthors: ${author}`);
+  if (m === null) return afterAnchor(instanceRaw, `authors: ${author}`);
   const list = m[1]
     .split(",")
     .map((x) => x.trim())
@@ -196,14 +203,25 @@ export function withAuthor(instanceRaw: string, author: string): string {
 /** The sign-off stamp — the claim's date, shown in the headline. */
 export function withSignedOff(instanceRaw: string, when: string): string {
   if (/^signed_off: /m.test(instanceRaw)) return instanceRaw.replace(/^signed_off: .*$/m, `signed_off: ${when}`);
-  return instanceRaw.replace(/^status: .*$/m, (s) => `${s}\nsigned_off: ${when}`);
+  return afterAnchor(instanceRaw, `signed_off: ${when}`);
 }
 
 /** The ticked inputs — one line like authors, replaced whole on each save. */
 export function withChecked(instanceRaw: string, labels: string[]): string {
   const line = `checked: ${labels.join(", ")}`;
   if (/^checked:/m.test(instanceRaw)) return instanceRaw.replace(/^checked:.*$/m, line);
-  return instanceRaw.replace(/^status: .*$/m, (s) => `${s}\n${line}`);
+  return afterAnchor(instanceRaw, line);
+}
+
+/** Who pressed submit — one line beside the sign-off. */
+export function withBy(instanceRaw: string, by: string): string {
+  if (/^by: /m.test(instanceRaw)) return instanceRaw.replace(/^by: .*$/m, `by: ${by}`);
+  return instanceRaw.replace(/^form: .*$/m, (s) => `${s}\nby: ${by}`);
+}
+
+/** A changed claim is no longer the submitted claim — the stamp comes off. */
+export function stripSignedOff(instanceRaw: string): string {
+  return instanceRaw.replace(/^signed_off: .*\n?/m, "").replace(/^by: .*\n?/m, "");
 }
 
 /** The gate's bless line — set, replaced, or removed whole. A save removes
@@ -211,5 +229,5 @@ export function withChecked(instanceRaw: string, labels: string[]): string {
 export function withBless(instanceRaw: string, line: string | undefined): string {
   const cleared = instanceRaw.replace(/^bless:.*\n?/m, "");
   if (line === undefined) return cleared;
-  return cleared.replace(/^status: .*$/m, (s) => `${s}\nbless: ${line}`);
+  return afterAnchor(cleared, `bless: ${line}`);
 }

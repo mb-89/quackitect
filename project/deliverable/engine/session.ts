@@ -45,8 +45,10 @@ import {
   parseFormTemplate,
   scaffoldInstance,
   stripComments,
+  stripSignedOff,
   withAuthor,
   withBless,
+  withBy,
   withChecked,
   withFieldContent,
   withSignedOff,
@@ -1843,7 +1845,7 @@ export class Session {
         ...head(),
         for: standingForm,
         forms: [this.formGet(standingForm)],
-        do: 'work the state, then return fills on the next pull as form: {"<section>": "<text>"} — multi-pass is fine; completeness signs the claim and the exit opens',
+        do: 'work the state, then return fills on the next pull as form: {"<section>": "<text>"} — multi-pass is fine; finish with {"submit": true}: the submit checks the fields and stamps the claim',
         ...extra(),
       };
     }
@@ -2478,18 +2480,22 @@ export class Session {
   formDone(name: string, by: Channel, machineId?: string): Record<string, unknown> {
     const fm = this.formMachine(machineId);
     if (this.isStateForm(name, fm)) {
-      // A submit only STAMPS a claim that stands — an unmet form comes
-      // back with its problems instead, shown where the filler is.
+      this.assertStateFormActive(name, fm, "submit");
+      // SUBMIT is the checking act: an unmet form THROWS, so the log line
+      // wears the ✗ and carries the why — the details stay the definition.
       const sh = this.stateFormHome(name, fm);
-      const before = this.stateFormGet(name, fm) as { met?: boolean };
-      if (existsSync(sh.instanceAbs) && before.met === true) {
-        writeFileSync(
-          sh.instanceAbs,
-          withSignedOff(withStatus(readFileSync(sh.instanceAbs, "utf8"), "done", by), new Date().toISOString()),
-          "utf8",
-        );
-        this.notifyChange();
+      const before = this.stateFormGet(name, fm) as { met?: boolean; problems?: string[] };
+      if (!existsSync(sh.instanceAbs) || before.met !== true) {
+        throw new Rejection({
+          clause: CLAUSES.CONDITION_UNMET,
+          expected: `every check green on ${name} — submit stamps only a standing claim`,
+          got: (before.problems ?? []).join(" · ") || "nothing saved yet",
+          remedy: { tool: "se_pull", args: {}, note: "fix the named fields, save, submit again" },
+          source: "engine/session.ts stateform",
+        });
       }
+      writeFileSync(sh.instanceAbs, withBy(withSignedOff(readFileSync(sh.instanceAbs, "utf8"), new Date().toISOString()), by), "utf8");
+      this.notifyChange();
       return this.stateFormGet(name, fm);
     }
     const h = this.formHome(name);
@@ -2587,8 +2593,6 @@ export class Session {
       state: `${m.id}/${name}`,
       ...(s !== undefined ? { level: levelName(loadLevels(this.root), s.priority) } : {}),
       ...(this.bound !== undefined ? { record: this.bound.id } : {}),
-      status: typeof fm.status === "string" ? fm.status : "open",
-      opened: typeof fm.opened === "string" ? fm.opened.slice(0, 10) : "",
       "signed off": typeof fm.signed_off === "string" ? fm.signed_off.slice(0, 10) : "",
       by: typeof fm.by === "string" ? fm.by : "",
     };
@@ -2602,7 +2606,9 @@ export class Session {
     // The section lint plus the TEMPLATE checks — generic engine code,
     // configured per field in the templates' own markdown. One verdict
     // for both hands: the page's problems list and the gate's refusal.
-    const lint = lintForm(model.template, raw, "");
+    // The named-form lint judges a status line; state forms have none —
+    // a synthetic one keeps the SECTION checks and mutes the dead field.
+    const lint = lintForm(model.template, raw === undefined ? raw : raw.replace(/^---\n/, "---\nstatus: done\n"), "");
     const fills: Record<string, string> = {};
     if (raw !== undefined) {
       const body = parseStateNote(raw).body;
@@ -2615,7 +2621,9 @@ export class Session {
       ...model,
       machine: m.id,
       checked: this.stateFormChecked(raw),
+      active: this.stateFormActive(name, m),
       gate: s.kind === "gate",
+      signed: typeof fmData.signed_off === "string",
       bless: typeof fmData.bless === "string" ? fmData.bless : "",
       instance: h.instanceRel,
       exists: raw !== undefined,
@@ -2625,12 +2633,33 @@ export class Session {
     };
   }
 
+  /** The walk STANDS in the state — the one moment its questions are in
+   *  order. Saves are welcome from anywhere; submit and bless are not:
+   *  the steps before a step are where its answers become visible, and
+   *  no lint can see what a skipped step would have shown. */
+  private stateFormActive(name: string, m: MachineDecl): boolean {
+    const { machine, ids } = this.leaves();
+    return machine.id === m.id && ids.includes(name);
+  }
+
+  private assertStateFormActive(name: string, m: MachineDecl, verb: string): void {
+    if (this.stateFormActive(name, m)) return;
+    throw new Rejection({
+      clause: CLAUSES.NOT_LEGAL_IN_STATE,
+      expected: `the walk standing in ${name} — questions are answered in ORDER, and a ${verb} out of order skips the steps that feed it`,
+      got: "the walk stands elsewhere",
+      remedy: { tool: "se_pull", args: {}, note: "save keeps working from anywhere; the state's own moment is when it submits" },
+      source: "engine/session.ts stateform",
+    });
+  }
+
   /** THE BLESS (owner design 2026-08-04, v1's thumbs reborn): a gate's
    *  submitted form needs a hand ABOVE it — the human always, or an agent
    *  whose autonomy stands strictly above the gate's own weight. */
   formBless(name: string, ok: boolean, by: string, machineId?: string): Record<string, unknown> {
     const m = this.formMachine(machineId);
     const s = this.stateFormState(name, m);
+    this.assertStateFormActive(name, m, "bless");
     if (s.kind !== "gate") {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
@@ -2650,10 +2679,18 @@ export class Session {
       });
     }
     const h = this.stateFormHome(name, m);
-    if (existsSync(h.instanceAbs)) {
-      writeFileSync(h.instanceAbs, withBless(readFileSync(h.instanceAbs, "utf8"), `${ok ? "blessed" : "dismissed"} by ${by}`), "utf8");
-      this.notifyChange();
+    const braw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : undefined;
+    if (braw === undefined || typeof parseStateNote(braw).frontmatter.signed_off !== "string") {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `the ${name} form submitted — the thumbs judge a STAMPED claim`,
+        got: "not submitted yet",
+        remedy: { tool: "se_pull", args: {}, note: 'fill, then {"submit": true} — the bless follows the stamp' },
+        source: "engine/session.ts bless",
+      });
     }
+    writeFileSync(h.instanceAbs, withBless(braw, `${ok ? "blessed" : "dismissed"} by ${by}`), "utf8");
+    this.notifyChange();
     return this.stateFormGet(name, m);
   }
 
@@ -2672,8 +2709,6 @@ export class Session {
     return [
       "---",
       `form: ${name}`,
-      "status: draft",
-      `opened: ${new Date().toISOString()}`,
       "authors:",
       "files:",
       "---",
@@ -2684,16 +2719,8 @@ export class Session {
     ].join("\n");
   }
 
-  /** COMPLETENESS SIGNS THE CLAIM: every required section standing flips
-   *  the status and stamps the sign-off — still a claim; the gate judges. */
-  private autoSign(raw: string, t: FormTemplate, by: string): string {
-    const note = parseStateNote(raw);
-    const complete = t.fields.every((f) => !f.required || stripComments(section(note.body, f.name)).trim() !== "");
-    if (!complete || note.frontmatter.status === "done") return raw;
-    return withSignedOff(withStatus(raw, "done", by), new Date().toISOString());
-  }
-
-  /** One or many fields into the stored instance — multi-pass by law. */
+  /** One or many fields into the stored instance — multi-pass by law.
+   *  A save never stamps: SUBMIT is the one checking, stamping act. */
   stateFormSave(name: string, fields: Record<string, string>, by: string, m: MachineDecl = this.currentMachine()): Record<string, unknown> {
     const t = stateFormFields(this.stateFormState(name, m));
     const h = this.stateFormHome(name, m);
@@ -2702,8 +2729,8 @@ export class Session {
     // (the page's boxes, the agent's fill) send it through this one door.
     const { inputs_checked, ...rest } = fields;
     for (const [f, content] of Object.entries(rest)) raw = withFieldContent(raw, f, String(content));
-    // A changed claim is no longer the blessed claim.
-    if (Object.keys(fields).length > 0) raw = withBless(raw, undefined);
+    // A changed claim is neither the submitted nor the blessed claim.
+    if (Object.keys(fields).length > 0) raw = stripSignedOff(withBless(raw, undefined));
     if (inputs_checked !== undefined) {
       raw = withChecked(
         raw,
@@ -2713,7 +2740,7 @@ export class Session {
           .filter((x) => x !== ""),
       );
     }
-    raw = this.autoSign(withAuthor(raw, by), t, by);
+    raw = withAuthor(raw, by);
     mkdirSync(dirname(h.instanceAbs), { recursive: true });
     writeFileSync(h.instanceAbs, raw, "utf8");
     this.notifyChange();
@@ -2728,20 +2755,37 @@ export class Session {
     const s = machine.states.find((x) => x.id === ids[0]);
     if (s === undefined || s.evidence_form.length === 0) return undefined;
     try {
-      return (this.stateFormGet(s.id) as { met?: boolean }).met === true ? undefined : s.id;
+      // Owed until SUBMITTED — the stamp, not mere completeness, closes it.
+      return (this.stateFormGet(s.id) as { signed?: boolean }).signed === true ? undefined : s.id;
     } catch {
       return undefined;
     }
   }
 
   private assertStateFormMet(stateId: string): void {
-    const lint = this.stateFormGet(stateId) as { met?: boolean; problems?: string[]; instance?: string; gate?: boolean; bless?: string };
+    const lint = this.stateFormGet(stateId) as {
+      met?: boolean;
+      signed?: boolean;
+      problems?: string[];
+      instance?: string;
+      gate?: boolean;
+      bless?: string;
+    };
     if (lint.met !== true) {
       throw new Rejection({
         clause: CLAUSES.CONDITION_UNMET,
         expected: `the ${stateId} evidence form complete (${String(lint.instance)})`,
         got: (lint.problems ?? []).join(" · ") || "unfilled",
-        remedy: { tool: "se_pull", args: {}, note: "the pull serves the form; its payload fills it, and completeness signs the claim" },
+        remedy: { tool: "se_pull", args: {}, note: 'the pull serves the form; fill it, then finish with {"submit": true}' },
+        source: "engine/session.ts stateform",
+      });
+    }
+    if (lint.signed !== true) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `the ${stateId} form SUBMITTED — the submit checks the fields and stamps the claim`,
+        got: "complete but not submitted",
+        remedy: { tool: "se_pull", args: {}, note: 'return {"submit": true} on the fill, or press submit in the form' },
         source: "engine/session.ts stateform",
       });
     }
@@ -3413,11 +3457,12 @@ export class Session {
     // THE STORED FORM IS THE DURABLE COPY (owner rulings 2026-08-04): a
     // state with evidence fields lands every fill in its instance too.
     if (s.evidence_form.length > 0 && this.isStateForm(s.id)) {
-      // The bless is not a section — it rides the fill as its own key and
-      // lands AFTER the save, which resets any stale bless first.
-      const { bless, ...fills } = data;
+      // submit and bless are not sections — they ride the fill as their
+      // own keys and land AFTER the save, which strips stale stamps first.
+      const { bless, submit, ...fills } = data;
       const strings = Object.fromEntries(Object.entries(fills).map(([k, v]) => [k, typeof v === "string" ? v : JSON.stringify(v)]));
       this.stateFormSave(s.id, strings, "agent");
+      if (submit === true || submit === "true" || submit === "yes") this.formDone(s.id, "agent");
       if (bless !== undefined) this.formBless(s.id, bless === true || bless === "true" || bless === "yes", "agent");
     }
     this.notifyChange();

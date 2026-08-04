@@ -1561,8 +1561,8 @@ function renderStateForm(f) {
   }).join(""), false);
   h += sfBox("Evidence", (f.fields || []).filter(function (x) { return x.name !== "current_situation" && x.name !== "follow_up"; }).map(function (x) { return sfOne(f, x); }).join(""), false);
   h += sfBox("Follow-up" + (f.follow_up_label ? " / " + escText(f.follow_up_label) : ""), sfOne(f, fld("follow_up")), false);
-  if (f.problems && f.problems.length) h += '<div style="color:var(--se-accent);padding:6px 0">' + f.problems.map(escText).join("<br>") + "</div>";
-  if (f.met) h += '<div style="color:var(--se-ok);padding:6px 0">✓ complete — the claim stands; the gate judges it</div>';
+  // No verdicts here — the details are the DEFINITION; a submit's pass or
+  // fail lands in the log, where its line carries the why.
   if (f.gate) {
     if ((f.bless || "").indexOf("blessed") === 0) h += '<div style="color:var(--se-ok);padding:4px 0">👍 ' + escText(f.bless) + "</div>";
     else if ((f.bless || "").indexOf("dismissed") === 0) h += '<div style="color:var(--se-fail);padding:4px 0">👎 ' + escText(f.bless) + "</div>";
@@ -1571,9 +1571,12 @@ function renderStateForm(f) {
   h += '<div style="padding:10px 0"><button class="primary sfexport" data-form="' + name + '" data-machine="' + escText(mach) + '">export</button> ';
   h += '<button class="primary sfimport" data-form="' + name + '">import</button><input type="file" accept=".html,text/html" style="display:none" class="ingestform" data-form="' + name + '" data-machine="' + escText(mach) + '"> ';
   h += '<button class="primary saveform" data-form="' + name + '" data-machine="' + escText(mach) + '">save</button> ';
-  h += '<button class="primary doneform" data-form="' + name + '" data-machine="' + escText(mach) + '" title="marks the claim complete — the gate judges it">submit</button>';
+  // Questions are answered in ORDER: submit and the thumbs wake only
+  // while the walk stands in the state. Save works from anywhere.
+  const inactive = f.active ? "" : ' disabled title="available only while the state is active — save still works"';
+  h += '<button class="primary doneform" data-form="' + name + '" data-machine="' + escText(mach) + '"' + (inactive || ' title="marks the claim complete — the gate judges it"') + ">submit</button>";
   if (f.gate) {
-    const off = f.met ? "" : ' disabled title="available after submit"';
+    const off = inactive || (f.signed ? "" : ' disabled title="available after submit"');
     h += ' <button class="primary blessform" data-form="' + name + '" data-machine="' + escText(mach) + '"' + (off || ' title="the gate opens — the human, or a hand above its rung"') + ">👍 bless</button>";
     h += ' <button class="primary dismissform" data-form="' + name + '" data-machine="' + escText(mach) + '"' + (off || ' title="send it back — the reasons go in the form"') + ">👎 dismiss</button>";
   }
