@@ -1,0 +1,156 @@
+{
+  "name": "$PRODUCT_ID$",
+  "displayName": "$PRODUCT$",
+  "description": "The se machine in VS Code — every card its own editor window, the records as real files.",
+  "version": "0.1.0",
+  "publisher": "$PRODUCT_ID$",
+  "private": true,
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "main": "./extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "dependencies": {
+    "koffi": "^3.1.4"
+  },
+  "extensionKind": [
+    "workspace"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "$PRODUCT_ID$",
+          "title": "$PRODUCT$",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "$PRODUCT_ID$": [
+        {
+          "id": "$PRODUCT_ID$.tools",
+          "name": "Features",
+          "type": "webview"
+        },
+        {
+          "id": "$PRODUCT_ID$.controls",
+          "name": "Controls",
+          "type": "webview"
+        },
+        {
+          "id": "$PRODUCT_ID$.details",
+          "name": "Details",
+          "type": "webview"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "$PRODUCT_ID$.startAgent",
+        "title": "$PRODUCT$: Start the Agent",
+        "icon": "$(play)"
+      },
+      {
+        "command": "$PRODUCT_ID$.howToAttach",
+        "title": "$PRODUCT$: How to Attach Your Agent",
+        "icon": "$(question)"
+      },
+      {
+        "command": "$PRODUCT_ID$.help",
+        "title": "$PRODUCT$: What This Is",
+        "icon": "$(question)"
+      },
+      {
+        "command": "$PRODUCT_ID$.expandDetails",
+        "title": "$PRODUCT$: Expand the Details",
+        "icon": "$(screen-full)"
+      },
+      {
+        "command": "$PRODUCT_ID$.openCard1",
+        "title": "$PRODUCT$: Open Card 1"
+      },
+      {
+        "command": "$PRODUCT_ID$.openCard2",
+        "title": "$PRODUCT$: Open Card 2"
+      },
+      {
+        "command": "$PRODUCT_ID$.openCard3",
+        "title": "$PRODUCT$: Open Card 3"
+      },
+      {
+        "command": "$PRODUCT_ID$.openCard4",
+        "title": "$PRODUCT$: Open Card 4"
+      },
+      {
+        "command": "$PRODUCT_ID$.openCard5",
+        "title": "$PRODUCT$: Open Card 5"
+      },
+      {
+        "command": "$PRODUCT_ID$.openCard6",
+        "title": "$PRODUCT$: Open Card 6"
+      },
+      {
+        "command": "$PRODUCT_ID$.openCard7",
+        "title": "$PRODUCT$: Open Card 7"
+      },
+      {
+        "command": "$PRODUCT_ID$.openCard8",
+        "title": "$PRODUCT$: Open Card 8"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "$PRODUCT_ID$.expandDetails",
+          "when": "view == $PRODUCT_ID$.details",
+          "group": "navigation@1"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "$PRODUCT_ID$.help",
+        "key": "ctrl+alt+/"
+      },
+      {
+        "command": "$PRODUCT_ID$.startAgent",
+        "key": "ctrl+alt+enter"
+      },
+      {
+        "command": "$PRODUCT_ID$.openCard1",
+        "key": "ctrl+alt+1"
+      },
+      {
+        "command": "$PRODUCT_ID$.openCard2",
+        "key": "ctrl+alt+2"
+      },
+      {
+        "command": "$PRODUCT_ID$.openCard3",
+        "key": "ctrl+alt+3"
+      },
+      {
+        "command": "$PRODUCT_ID$.openCard4",
+        "key": "ctrl+alt+4"
+      },
+      {
+        "command": "$PRODUCT_ID$.openCard5",
+        "key": "ctrl+alt+5"
+      },
+      {
+        "command": "$PRODUCT_ID$.openCard6",
+        "key": "ctrl+alt+6"
+      },
+      {
+        "command": "$PRODUCT_ID$.openCard7",
+        "key": "ctrl+alt+7"
+      },
+      {
+        "command": "$PRODUCT_ID$.openCard8",
+        "key": "ctrl+alt+8"
+      }
+    ]
+  }
+}

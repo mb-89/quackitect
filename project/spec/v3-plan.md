@@ -1,0 +1,98 @@
+# v3 plan — owner-corrected, 2026-07-26
+
+Supersedes the first draft where they differ. Owner rulings incorporated:
+
+1. **Not a linear-only machine.** Sub-machine seeding is in scope early.
+   Worktree machinery can wait; the machine kernel keeps its full v2
+   semantics (token sets, joins, seeded sub-machines, reopen cones) —
+   `engine/machine.ts` is harvested verbatim and already carries them.
+2. **The Mirror comes immediately after the machine.** Any machine
+   visibility gap is a defect. One renderer, two projections: the packet the
+   agent gets and the HTML the owner reads are the same bytes rendered twice.
+3. **The canvas compiler is required, not optional** — Obsidian canvas is
+   the owner's authoring surface for machines. Harvest v2's
+   `machines/compile.ts` (geometric group membership, edge roles on style
+   attributes, review-round injection) once the JSON machine round-trips.
+4. **The cage is an explicit blacklist** (owner ruling): today's native
+   tools are denied by name in `workspace/.claude/settings.json`. A future
+   tool is NOT auto-blocked; blocking it is a deliberate edit. Subagents
+   stay available and inherit the denies.
+5. **Guidance over ledger** (owner ruling): output quality beats
+   traceability. The audit ledger stays minimal until the output is good;
+   every addition must name the failure it is load-bearing for. v2's
+   diagnosis stands: enforcement landed B0–B6, guidance was scheduled i13
+   and never shipped — v3 does not repeat that order.
+
+## Order of work
+
+- **M1a — cage + lane + log.** DONE with this scaffold. Explicit-deny cage;
+  11-tool drop-in lane at the i12 standard (offset/limit reads, atomic batch
+  patch, CAS everywhere, unknown-arg refusal, honest truncation); raw call
+  log; selftests; RUNME.
+- **M1b — machine wired to dispatch.** Planned as `se_next` / `se_submit` /
+  `se_abandon`; SHIPPED 2026-08-02 as `se_pull` (owner ruling: submit is
+  not a verb — a pull carrying the filled form IS the submit; abandon is
+  the pull's `escape`). One generic dispatch guard stands as planned: the
+  active state's legal list decides, the rejection names the state, the
+  legal moves, and the exact next call. Sub-machine seeding included.
+  The interim `se_tick` (agent names its own hop and carries read hashes)
+  served from M1a until the pull landed, and retired with it.
+- **M2 — the Mirror.** HTML projection of: current machine (drawn), active
+  state(s), the packet as served (byte-equal, same renderer), guidance as
+  inlined, last N log lines. Regenerated on every state change; no server
+  needed to read it. Exit: the owner confirms what he reads IS what the
+  agent got.
+- **M2b — canvas compiler.** Obsidian canvas → machine JSON. Exit: a drawn
+  machine executes; the Mirror renders it.
+- **M3 — guidance library.** Markdown files bound to states; served in the
+  packet; owner edits land on the next `se_next`. This is v2's missing
+  pillar, now ahead of everything ledger-shaped.
+- **M4 — gates, evidence, minimal ledger.** Human blessing, offers with
+  absence-as-dismissal (harvest v2 `gate.ts` minus worktrees), evidence
+  pinning, grants with channel. No hash chain, no suspect ripple until a
+  named failure demands them.
+- **Later, on demand:** worktrees, board/phone, retro tooling, v2 mint
+  import, toll (the update-toll harvests cleanly when wanted).
+
+## Standing laws
+
+- Typed rejections everywhere; the weak-model one-turn-recovery test is the
+  bar for every refusal.
+- Honest truncation — nothing is ever silently cut.
+- Every dispatch is logged raw; se_run output in full.
+- Prose rules do not change agent behavior; refusals do (P5, proven twice).
+- Each mechanism must name the failure it is load-bearing for; anything that
+  cannot is deferred.
+
+## Visibility before M4 (owner ruling 2026-07-26, expedition e2)
+
+The mirror grew the UNIFIED LOG: every hand's act — agent calls, human
+mirror acts, updates, notes — one line each in the sidebar above details;
+click → the full record (request then response); an update line → the
+DECISION GRAPH of its state visit. Updates are graph ops riding any call's
+`update` field (plan / fork / done / obsolete / revert / note); everything
+started gets resolved — silently abandoning is refused into visibility.
+The TOLL enforces narration: five silent minutes, one grace warning, then
+the refusal with the resend inline. `se_note` captures strays anywhere.
+Design source: v2's i9-board-rounds notes (never built there).
+
+ETA was DROPPED deliberately: hand-typed clock times proved
+uncalibratable in v2 (median claimed-vs-actual ratio 0.01, a wrong wall
+clock). If it returns, it returns as ETA-ON-STEPS: machine states declare
+expected durations, the engine stamps actuals, planned-vs-actual becomes
+the calibration table. Never an agent-authored clock time again.
+
+## Forward: asynchronous lane tasks (owner question 2026-07-26)
+
+MCP's CALL is synchronous; the SERVER is not. Nothing stops the lane from
+growing a background arm: `se_run {background: true}` spawns and returns a
+ref immediately; a status tool (or the tick packet) reports progress; the
+full output lands in the call log under the ref, as ever. The elegant part
+is the wake path that exists: task completion is a CHANGE — it fires
+notifyChange, which wakes a held `wait`. So an agent could start a long
+build and hold a short wait on its completion. What stays impossible: the
+server initiating a message mid-turn, or waking a STOPPED agent — a Stop
+hook that held the turn open was tried (2026-07-26) and REMOVED: it froze
+the chat while waiting, and a second agent could not get a word in. A
+stopped agent resumes only when the user messages it. Build the async arm
+when a real long-running task demands it, not before.

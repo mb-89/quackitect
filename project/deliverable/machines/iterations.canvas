@@ -1,0 +1,32 @@
+{
+	"metadata":{
+		"version":"1.0-1.0",
+		"frontmatter":{"reentry":"restart","priority":0.4}
+	},
+	"nodes":[
+		{"id":"n-comment","type":"text","text":"GENERATED AT ENTRY — this machine's states are the OPEN iterations, each carrying its OWN machine: M0 at seed (onboard-retro, then gate-kickoff), and the full pinned column once the kickoff's bless compiles it from the live rigor matrix. The walk shows FLAT — milestones are group boxes, never sub-machines; only seeded chunk machines dive. Seeding is a function (se_seed_iteration: goal + vision + inputs) — a seeded iteration stands here at once. With nothing open, start runs to end. This drawing is the stub that carries the frontmatter.","x":-1100,"y":-340,"width":900,"height":180},
+		{
+			"id":"n-start",
+			"type":"file",
+			"file":"deliverable/machines/states/start.md",
+			"x":-1400,
+			"y":80,
+			"width":160,
+			"height":160,
+			"styleAttributes":{"shape":"pill"}
+		},
+		{
+			"id":"n-end",
+			"type":"file",
+			"file":"deliverable/machines/states/end.md",
+			"x":1180,
+			"y":80,
+			"width":160,
+			"height":160,
+			"styleAttributes":{"shape":"pill"}
+		}
+	],
+	"edges":[
+		{"id":"e-start-end","fromNode":"n-start","toNode":"n-end","fromSide":"right","toSide":"left"}
+	]
+}

@@ -1,0 +1,9 @@
+#!/bin/sh
+# The cheap gate, blocking from day one (owner ruling 2026-08-03): a commit
+# carrying a type error or a lint/format error does not land. The battery is
+# NOT here — it guards landing, not every commit.
+# Wired automatically: preflight sets core.hooksPath to this directory.
+cd "$(git rev-parse --show-toplevel)/project/deliverable" || exit 1
+npx tsc -p . --pretty false || { echo "pre-commit: type error - commit blocked (npx tsc -p . to see it)"; exit 1; }
+npx biome check --error-on-warnings . >/dev/null 2>&1 || { echo "pre-commit: biome - commit blocked (npx biome check . to see it; --write fixes format)"; exit 1; }
+exit 0

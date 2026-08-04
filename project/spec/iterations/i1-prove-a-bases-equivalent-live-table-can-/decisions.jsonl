@@ -1,0 +1,2 @@
+{"ts":"2026-08-04T08:12:06.524Z","op":"fork","visit":"iterations/i1/start@0","parent":null,"node":"d2","brief":"the target never clears when its node descends into a sub","nodes":[]}
+{"ts":"2026-08-04T08:18:13.511Z","op":"fork","visit":"iterations/i1/start@0","parent":null,"node":"d2","brief":"i1's worktree predates the current tree — merging v3 in","nodes":[]}

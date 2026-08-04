@@ -1,0 +1,13 @@
+Session start. Pull the machine as far as it allows.
+
+Boot stability rules:
+- Your first call is se_pull with no payload. It answers with an instruction: read, fill, choose, do, or wait. Answers ride form (a choice is a form, only ever offered); stepping out is escape, to the front desk.
+- After the first pull, make the se file/search lane callable before any read.
+- On GitHub Copilot CLI that means calling activate_file_navigation_and_search_tools.
+- On every other host, load the se tools the normal way. No activation tool is not an error.
+- Keep boot calls serial. Do not run parallel read/search batches.
+- When the pull answers read, the document rides in the answer and prove names its last words. Read it, then pull again with form: {"read": "<those words>"}.
+- Keep any direct reads small with offset/limit.
+- If a state allows no tools, do not read/search there. Pull only.
+
+Then report in one short message: where you stand, and why you stopped (the pull's wait says which). If you are waiting on a step that is mine, stop and make it clear that the slider alone cannot wake you: after I change it or move the machine in the mirror, I have to send you a message (continue is enough), and you pick up from wherever the machine stands.

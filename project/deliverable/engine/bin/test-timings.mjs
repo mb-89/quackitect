@@ -1,0 +1,99 @@
+// EVERY TEST IS TIMED, ALWAYS (owner ruling 2026-07-31). A suite's cost is
+// not a thing to go looking for when it hurts; it is recorded on every run,
+// and the retro reads the record.
+//
+// This is a node test reporter. It takes the runner's structured events —
+// not parsed console text — so the durations are the runner's own numbers.
+// It writes the record and prints nothing: selftest pairs it with the
+// ordinary reporter, which keeps the human output unchanged.
+//
+// The record lands in .se/, machine-local and gitignored, beside the call
+// log. It APPENDS, so the retro can see a test getting slower over weeks
+// rather than only what one run happened to cost.
+import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
+import { dirname, join, relative } from "node:path";
+
+// selftest runs with cwd = project/deliverable, so the root is two up. A
+// reporter has no argv of its own to be told this.
+const ROOT = join(process.cwd(), "..", "..");
+const OUT = join(ROOT, ".se", "test-timings.jsonl");
+// THE LAST RUN, STANDING (owner, 2026-08-02): one findable summary, replaced
+// per run, so the retro reads the hotspots without aggregating the append log.
+const LAST = join(ROOT, ".se", "test-last-run.json");
+
+// THE BEAT FILE: one line per finished CASE, appended AS IT HAPPENS. The
+// end-of-run record cannot serve a killed run; this stream survives any
+// kill, so a poll reads live counts and a kill names what was mid-flight.
+// Per-case, not per-suite: suite events fire once per top-level group, so
+// counting them ran past the file total on the first real run.
+const PROGRESS = join(ROOT, ".se", "test-progress.jsonl");
+
+export default async function* timings(source) {
+  const run = new Date().toISOString();
+  const t0 = Date.now();
+  const rows = [];
+  const beat = (obj) => {
+    try {
+      appendFileSync(PROGRESS, `${JSON.stringify(obj)}\n`, "utf8");
+    } catch {
+      // bookkeeping never fails the suite
+    }
+  };
+  for await (const event of source) {
+    if (event.type !== "test:pass" && event.type !== "test:fail") continue;
+    const d = event.data;
+    // A SUITE reports the sum of its children, so counting it too would
+    // double the total. Only leaves are the real cost.
+    if (d.details?.type === "suite") continue;
+    const row = {
+      run,
+      file: d.file === undefined ? "" : relative(ROOT, d.file).split("\\").join("/"),
+      name: String(d.name ?? ""),
+      ms: Math.round(Number(d.details?.duration_ms ?? 0)),
+      ok: event.type === "test:pass",
+    };
+    rows.push(row);
+    // A dying test streams its WHY the moment it dies.
+    beat(
+      row.ok
+        ? { file: row.file, ms: row.ms, t: Date.now() - t0 }
+        : {
+            file: row.file,
+            ms: row.ms,
+            t: Date.now() - t0,
+            fail: row.name,
+            msg: String(d.details?.error?.message ?? d.details?.error ?? "")
+              .split("\n")[0]
+              .slice(0, 300),
+          },
+    );
+  }
+  try {
+    mkdirSync(dirname(OUT), { recursive: true });
+    appendFileSync(OUT, `${rows.map((r) => JSON.stringify(r)).join("\n")}\n`, "utf8");
+    const byFile = new Map();
+    for (const r of rows) {
+      const f = r.file;
+      const e = byFile.get(f) ?? { sum_ms: 0, max_case_ms: 0, cases: 0, failed: 0 };
+      e.sum_ms += r.ms;
+      e.max_case_ms = Math.max(e.max_case_ms, r.ms);
+      e.cases += 1;
+      if (!r.ok) e.failed += 1;
+      byFile.set(f, e);
+    }
+    const files = [...byFile.entries()].sort((a, b) => b[1].sum_ms - a[1].sum_ms).map(([file, e]) => ({ file, ...e }));
+    const summary = {
+      run,
+      tests: rows.length,
+      failed: rows.filter((r) => !r.ok).length,
+      summed_ms: files.reduce((a, f) => a + f.sum_ms, 0),
+      // A file far above its siblings OWES AN EXPLANATION (retro.md). The
+      // top of this list is where the explanations are owed.
+      files,
+    };
+    writeFileSync(LAST, `${JSON.stringify(summary, null, 1)}\n`, "utf8");
+  } catch {
+    // A suite must never fail because its bookkeeping could not be written.
+  }
+  yield "";
+}

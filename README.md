@@ -11,17 +11,17 @@ action it may take is decided by the state machine.
 
 v3 inverts v2's build order: **channel and visibility first, guidance early,
 ledger late.** v2's post-mortem in one line: enforcement without guidance
-regresses below convention. See `product/spec/v3-plan.md`.
+regresses below convention. See `project/spec/v3-plan.md`.
 
 ## Layout
 
 ```
-RUNME.ps1              preflight, selftest, launch the caged agent
-workspace/             where the agent runs (cwd of the session)
+RUNME.ps1              the install. Run it once.
+project/               THE FOLDER YOU OPEN. Everything being built lives here.
   AGENTS.md            the one rule + the lane table
   .mcp.json            registers the se server
   .claude/settings.json  the cage: explicit deny list of native tools
-product/
+  _cage/               the originals those two are placed from
   guidance/            the method layer - contract, voice, authoring/, methods/
   deliverable/         the engine (TypeScript, Node >= 22.6, no build step)
     engine/            mcp transport, tool lane, call log, machine kernel
@@ -34,9 +34,28 @@ product/
 ## Run
 
 ```powershell
-.\RUNME.ps1           # preflight, deps, cage install, selftests, launch the caged agent
-.\RUNME.ps1 -Manual   # ...or open the MIRROR and walk the machines yourself, tick by tick
+.\RUNME.ps1           # once: installs the extension and opens the editor
 ```
+
+After that, open `project/` in VS Code. The extension starts the server, places
+the attach configs and installs the engine's dependencies by itself.
+
+## What a change needs before you see it
+
+This used to cost an evening, because nobody could say which restart applied to
+which edit. Here is the whole rule.
+
+| you changed | you need |
+| --- | --- |
+| `project/brand/palette.css` | nothing. It is read on every render. |
+| a machine drawing, guidance, a rigor-matrix row | nothing. They are read live. |
+| `project/deliverable/engine/**.ts` | restart the se server. Node caches modules at import, so a correct file on disk means nothing to a process already running. |
+| `project/deliverable/vscode/src/extension.ts` | re-run `RUNME.ps1`. |
+
+The last row is the trap. VS Code loads the extension **copy** under
+`~/.vscode/extensions`, so reloading the window re-reads that copy and not your
+edit. The copy exists because the product's name is rendered into it at install
+time; until that rendering moves to activation time, this row stands.
 
 ## Give it to someone else
 
@@ -59,7 +78,7 @@ It starts as a fresh git repository with one commit on `main`.
 Four things stay home:
 
 - the git history
-- this project's own records in `product/spec`
+- this project's own records in `project/spec`
 - the session state in `.se/`
 - everything the ignore file already excludes
 
@@ -70,15 +89,15 @@ cd C:\path\to\empty
 .\RUNME.ps1
 ```
 
-**The tick** is the universal walk operation and `se_tick` the machinery's
-ONE tool, legal in every state: without arguments it reports where the
-machine is; with arguments it advances (`to:` picks the edge, `confirm:`
-confirms the state's `read` list was read). The agent, the Mirror's
-buttons, and `POST /tick` all drive the same core.
+**The pull** is the walk operation and `se_pull` the machinery's ONE
+verb, legal in every state: the agent says pull and the machine answers
+with an instruction — `read`, `fill`, `choose`, `do`, or `wait` — walking
+the happy path itself and offering options only where the road splits.
+The Mirror's buttons drive the same core by the person's hand.
 
 ## The cage (how it blocks)
 
-`workspace/.claude/settings.json` **denies the current native tools by
+`project/.claude/settings.json` **denies the current native tools by
 name** — Bash, BashOutput, KillShell, Read, Write, Edit, NotebookEdit,
 Glob, Grep, WebSearch, WebFetch, Skill (an explicit blacklist by owner
 ruling: a tool added in the future is NOT blocked automatically; blocking it
@@ -87,7 +106,7 @@ model's context entirely. `mcp__se__*` is allowlisted. Subagents (Task)
 stay available and inherit the same denies — they are caged too.
 
 The settings file and `.mcp.json` are GENERATED: edit the templates in
-`workspace/_cage/`; the RUNME copies them into place on every run (the
+`project/_cage/`; the extension places them when the window opens (the
 generated copies are gitignored).
 
 **Hard dependencies (owner ruling 2026-07-26): ripgrep and git.** The RUNME
@@ -121,10 +140,10 @@ raw to `.se/calls.jsonl`.
 
 Machines are DRAWN — Advanced Canvas files, compiled at load, refused with
 the offending element named on any misparse. Engine-owned machines live in
-`product/deliverable/machines/`; owner-authored process machines will live
-in `product/spec/` later. **Authoring rules: `product/guidance/authoring/machines.md`** —
+`project/deliverable/machines/`; owner-authored process machines will live
+in `project/spec/` later. **Authoring rules: `project/guidance/authoring/machines.md`** —
 notably: file refs are VAULT-relative (the Obsidian vault root is
-`product/`), agent-facing fields (`state`, `state_kind`, `legal_tools`,
+`project/`), agent-facing fields (`state`, `state_kind`, `legal_tools`,
 `guidance`) live in the state note's FRONTMATTER while the body is prose
 for humans, and start/terminal states are drawn as pills.
 
@@ -133,14 +152,13 @@ sharing the same two notes; the machinery walks out of start and the
 machine is done when end activates. **The MAIN machine** (`main.canvas`)
 runs every session: `start → boot → idle → end`, where **boot is a
 sub-machine** (`boot.canvas`: `start → read_contract → prepare_idle → end`)
-and future work states branch from idle. `se_tick` walks it one state per call; the
-SessionStart hook makes the agent tick immediately and show the landing
-banner verbatim; THE STATE GATE makes the walk inevitable anyway — any
-pre-idle lane call is refused with `se_tick` as the remedy (SE-C-110).
-States carry `legal_tools` (enforced at dispatch), SCXML-style
-`enter_when`/`leave_when` conditions (SE-C-112 when unmet — `read_guidance`
-demands a logged confirmation of the state's `read` list), and the tick is
-never gated.
+and future work states branch from idle. `se_pull` walks it — the whole
+happy path per call; the SessionStart hook makes the agent pull
+immediately and show the landing banner verbatim; THE STATE GATE makes
+the walk inevitable anyway — any pre-idle lane call is refused with
+`se_pull` as the remedy (SE-C-110). States carry `legal_tools` (enforced
+at dispatch) and SCXML-style enter/leave conditions (SE-C-112 when
+unmet), and the pull is never gated.
 
 ## Status
 

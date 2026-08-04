@@ -1,0 +1,42 @@
+properties:
+  name:
+    displayName: Step
+  depends_on:
+    displayName: Waits for
+  state_kind:
+    displayName: Kind
+  patch:
+    displayName: Patch
+  minor:
+    displayName: Minor
+  major:
+    displayName: Major
+views:
+  - type: pivot
+    name: What each step waits for
+    filters:
+      and:
+        - kind == "matrix-row"
+    rows: name
+    columns: depends_on
+    aggregate: count
+    groupBy:
+      property: file.name
+      direction: ASC
+  - type: table
+    name: Kind against the patch column
+    filters:
+      and:
+        - kind == "matrix-row"
+    rows: state_kind
+    columns: patch
+    aggregate: count
+  - type: list
+    name: Which steps, by kind and minor
+    filters:
+      and:
+        - kind == "matrix-row"
+    rows: state_kind
+    columns: minor
+    aggregate: list
+    value: file.name
