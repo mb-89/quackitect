@@ -40,23 +40,21 @@ function stateIdOf(el: CanvasElement): string | undefined {
   return undefined;
 }
 
-function sidePoint(el: CanvasElement, side: string | undefined, other: CanvasElement): [number, number] {
+/** ARROWS RUN CENTRE TO CENTRE and clip at the borders (owner ruling
+ *  2026-08-04): the tip always lands ON the target's edge, pointing at
+ *  its heart. The declared sides lost their vote in OUR drawing — side
+ *  anchors let geometry bury a tip inside a box; Obsidian still reads
+ *  them from the canvas for its own render. */
+function borderPoint(el: CanvasElement, other: CanvasElement): [number, number] {
   const cx = el.x + el.width / 2;
   const cy = el.y + el.height / 2;
-  switch (side) {
-    case "left":
-      return [el.x, cy];
-    case "right":
-      return [el.x + el.width, cy];
-    case "top":
-      return [cx, el.y];
-    case "bottom":
-      return [cx, el.y + el.height];
-    default: {
-      const ox = other.x + other.width / 2;
-      return [ox < cx ? el.x : el.x + el.width, cy];
-    }
-  }
+  const dx = other.x + other.width / 2 - cx;
+  const dy = other.y + other.height / 2 - cy;
+  if (dx === 0 && dy === 0) return [cx, cy];
+  const sx = dx === 0 ? Number.POSITIVE_INFINITY : el.width / 2 / Math.abs(dx);
+  const sy = dy === 0 ? Number.POSITIVE_INFINITY : el.height / 2 / Math.abs(dy);
+  const s = Math.min(sx, sy);
+  return [cx + dx * s, cy + dy * s];
 }
 
 /** THE FEED ROLES — one colour per role, none shared. The aq kind wore the
@@ -198,8 +196,8 @@ function svgEdges(canvas: CanvasData, byId: Map<string, CNode>): string[] {
     const a = byId.get(edge.fromNode);
     const b = byId.get(edge.toNode);
     if (a === undefined || b === undefined) continue;
-    const [x1, y1] = sidePoint(a, (edge as { fromSide?: string }).fromSide, b);
-    const [x2, y2] = sidePoint(b, (edge as { toSide?: string }).toSide, a);
+    const [x1, y1] = borderPoint(a, b);
+    const [x2, y2] = borderPoint(b, a);
     // A double-headed arrow is one edge meaning both ways, so it draws that
     // way too — the marker already orients itself at a start.
     const bothWays = (edge as { fromEnd?: string }).fromEnd === "arrow";
