@@ -150,7 +150,12 @@ export function startMirror(o: MirrorOptions): Server {
       "mirror_form_save",
       (body) => ({
         args: { name: body.name, fields: Object.keys((body.fields as object | undefined) ?? {}) },
-        result: state.session.formSave(String(body.name ?? ""), (body.fields ?? {}) as Record<string, string>, "human"),
+        result: state.session.formSave(
+          String(body.name ?? ""),
+          (body.fields ?? {}) as Record<string, string>,
+          "human",
+          String(body.machine ?? ""),
+        ),
       }),
     ],
     // THE PREFILL LAW: one confirmation per prefill — this is that click.
@@ -158,12 +163,20 @@ export function startMirror(o: MirrorOptions): Server {
       "mirror_form_confirm",
       (body) => ({
         args: { name: body.name, field: body.field, index: body.index },
-        result: state.session.formConfirm(String(body.name ?? ""), String(body.field ?? ""), Number(body.index ?? 0)),
+        result: state.session.formConfirm(
+          String(body.name ?? ""),
+          String(body.field ?? ""),
+          Number(body.index ?? 0),
+          String(body.machine ?? ""),
+        ),
       }),
     ],
     "/form/done": [
       "mirror_form_done",
-      (body) => ({ args: { name: body.name }, result: state.session.formDone(String(body.name ?? ""), "human") }),
+      (body) => ({
+        args: { name: body.name },
+        result: state.session.formDone(String(body.name ?? ""), "human", String(body.machine ?? "")),
+      }),
     ],
     // THE PRIORITY RIDES THE NOTE (owner, 2026-08-01). The note row draws
     // a MoSCoW choice, and a capture that dropped it made every stray a
@@ -285,7 +298,7 @@ export function startMirror(o: MirrorOptions): Server {
         (body) => ({
           args: { name: body.name },
           run: () => {
-            const r = state.session.stateFormIngest(String(body.name ?? ""), String(body.html ?? ""));
+            const r = state.session.stateFormIngest(String(body.name ?? ""), String(body.html ?? ""), String(body.machine ?? ""));
             return { log: { ingested: r.ingested, author: r.author }, answer: r };
           },
         }),
@@ -475,7 +488,7 @@ export function startMirror(o: MirrorOptions): Server {
       const name = url.searchParams.get("name") ?? "";
       res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
       try {
-        res.end(JSON.stringify(state.session.formGet(name)));
+        res.end(JSON.stringify(state.session.formGet(name, url.searchParams.get("machine") ?? "")));
       } catch (e) {
         res.end(JSON.stringify(e instanceof Rejection ? e.toJSON() : { error: String(e) }));
       }
@@ -490,7 +503,7 @@ export function startMirror(o: MirrorOptions): Server {
       const name = url.searchParams.get("name") ?? "";
       let body: string;
       try {
-        body = state.session.stateFormExport(name);
+        body = state.session.stateFormExport(name, url.searchParams.get("machine") ?? "");
       } catch (e) {
         res.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
         res.end(e instanceof Rejection ? `${e.expected} — got ${e.got}` : String(e));

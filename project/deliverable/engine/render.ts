@@ -1461,7 +1461,9 @@ function condDetail(id) {
   let html = "";
   if (s.exit) html += '<div class="meta" style="padding:4px 0">exit</div>' + condRows(id, s.exit, standing);
   if (s.entry) html += '<div class="meta" style="padding:4px 0">entry</div>' + condRows(id, s.entry, standing);
-  html += '<div class="comment-detail">' + (s.guidance || "").replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
+  // A form-bearing state's prose lives in its form — repeating the guidance
+  // here would fork the one truth the details already render.
+  if (!s.has_form) html += '<div class="comment-detail">' + (s.guidance || "").replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
   return ["conditions · " + id, html];
 }
 // THE FORM SURFACE — an evidence form rendered to fill: required fields
@@ -1513,7 +1515,7 @@ function renderStateForm(f) {
   if (f.problems && f.problems.length) h += '<div style="color:var(--se-accent);padding:6px 0">' + f.problems.map(escText).join("<br>") + "</div>";
   if (f.met) h += '<div style="color:var(--se-ok);padding:6px 0">✓ complete — the claim stands; the gate judges it</div>';
   h += '<div style="padding:10px 0"><button class="primary saveform" data-form="' + name + '">save</button> <button class="primary doneform" data-form="' + name + '" title="sets status done">done</button> ';
-  h += '<a class="ghost" href="/form/export?name=' + encodeURIComponent(name) + '">export portable copy</a> ';
+  h += '<a class="ghost" href="/form/export?name=' + encodeURIComponent(name) + '&machine=' + encodeURIComponent(viewedMachine()) + '">export portable copy</a> ';
   h += '<label class="ghost" style="cursor:pointer">ingest returned copy<input type="file" accept=".html,text/html" style="display:none" class="ingestform" data-form="' + name + '"></label></div>';
   return h;
 }
@@ -1521,7 +1523,7 @@ async function seIngest(inp, name) {
   const file = inp.files && inp.files[0];
   if (!file) return;
   const html = await file.text();
-  await formPost("/form/ingest", { name: name, html: html });
+  await formPost("/form/ingest", { name: name, html: html, machine: viewedMachine() });
   showFormAgain(name);
 }
 // Delegated, like every other control — an inline handler needs quote
@@ -1531,8 +1533,11 @@ document.addEventListener("change", function (ev) {
   const inp = ev.target.closest ? ev.target.closest(".ingestform") : null;
   if (inp) void seIngest(inp, inp.getAttribute("data-form"));
 });
+// The machine on display resolves a form name — without it, two records'
+// same-named states would collide and the walk's machine would shadow the view.
+function viewedMachine() { return (D.viewed && D.viewed.id) || ""; }
 async function showForm(name, into) {
-  const r = await fetch("/api/form?name=" + encodeURIComponent(name));
+  const r = await fetch("/api/form?name=" + encodeURIComponent(name) + "&machine=" + encodeURIComponent(viewedMachine()));
   const f = await r.json();
   if (f.state_form) { presentForm(name, into, f.title || ("form · " + name), renderStateForm(f)); return; }
   if (f.kind === "rejected" || f.error) {
@@ -1578,12 +1583,12 @@ document.addEventListener("click", async (ev) => {
   const of = ev.target.closest ? ev.target.closest(".openform") : null;
   if (of) { void showForm(of.dataset.form); return; }
   const cp = ev.target.closest ? ev.target.closest(".confirmpre") : null;
-  if (cp) { await formPost("/form/confirm", { name: cp.dataset.form, field: cp.dataset.field, index: Number(cp.dataset.index) }); showFormAgain(cp.dataset.form); return; }
+  if (cp) { await formPost("/form/confirm", { name: cp.dataset.form, field: cp.dataset.field, index: Number(cp.dataset.index), machine: viewedMachine() }); showFormAgain(cp.dataset.form); return; }
   const sv = ev.target.closest ? ev.target.closest(".saveform") : null;
   if (sv) {
     const fields = {};
     document.querySelectorAll(".formfield").forEach((t) => { fields[t.dataset.field] = t.value; });
-    await formPost("/form/save", { name: sv.dataset.form, fields });
+    await formPost("/form/save", { name: sv.dataset.form, fields, machine: viewedMachine() });
     showFormAgain(sv.dataset.form);
     return;
   }
@@ -1591,8 +1596,8 @@ document.addEventListener("click", async (ev) => {
   if (dn2) {
     const fields = {};
     document.querySelectorAll(".formfield").forEach((t) => { fields[t.dataset.field] = t.value; });
-    await formPost("/form/save", { name: dn2.dataset.form, fields });
-    await formPost("/form/done", { name: dn2.dataset.form });
+    await formPost("/form/save", { name: dn2.dataset.form, fields, machine: viewedMachine() });
+    await formPost("/form/done", { name: dn2.dataset.form, machine: viewedMachine() });
     showFormAgain(dn2.dataset.form);
     return;
   }

@@ -57,6 +57,25 @@ test("a seed stands in the container at once — its machine is M0", () => {
   assert.deepEqual(empty.decl.states.find((s) => s.id === "start")?.edges, [{ to: "end", role: "normal" }]);
 });
 
+test("any state's form is fetchable by its machine — the walk elsewhere", () => {
+  const root = freshRoot();
+  gitInit(root);
+  const it = itSeed(root, "browse the form", "the reader fetches it from the desk");
+  const s = new Session(root);
+  // The walk stands at main; the view names the iteration's machine.
+  const f = s.formGet("onboard-retro", "i1") as { state_form?: boolean; header?: Record<string, string> };
+  assert.equal(f.state_form, true, "the viewed machine resolves the state");
+  assert.equal(f.header?.state, "i1/onboard-retro");
+  assert.ok(f.header?.level !== undefined && f.header.level !== "", "the priority wears its rung name");
+  // A save from the browse lands in the RECORD's evidence, on its branch.
+  s.formSave("onboard-retro", { current_situation: "seen from the desk" }, "human", "i1");
+  const inst = join(it.path, "project", "spec", "iterations", it.id, "evidence", "onboard-retro.md");
+  assert.ok(existsSync(inst), "the instance lives in the record's worktree");
+  assert.match(readFileSync(inst, "utf8"), /seen from the desk/);
+  // The portable export travels the same road.
+  assert.match(s.stateFormExport("onboard-retro", "i1"), /Evidence form/);
+});
+
 test("the graph is evidence: an open decision point blocks the leave form", () => {
   const root = freshRoot();
   gitInit(root);

@@ -56,9 +56,11 @@ import {
   generateIterations,
   type Iteration,
   itFind,
+  itList,
   itPinRel,
   itRecordRel,
   itSeed,
+  itShortId,
   markStarted,
   pinIteration,
   readItRecord,
@@ -2400,8 +2402,9 @@ export class Session {
     }
   }
 
-  formGet(name: string): Record<string, unknown> {
-    if (this.isStateForm(name)) return this.stateFormGet(name);
+  formGet(name: string, machineId?: string): Record<string, unknown> {
+    const fm = this.formMachine(machineId);
+    if (this.isStateForm(name, fm)) return this.stateFormGet(name, fm);
     if (this.bound === undefined) {
       // No expedition bound — the TEMPLATE is still viewable (owner ruling:
       // any form may be inspected at any time); filling needs a bound record.
@@ -2432,8 +2435,9 @@ export class Session {
     };
   }
 
-  formSave(name: string, fields: Record<string, string>, by = "agent"): Record<string, unknown> {
-    if (this.isStateForm(name)) return this.stateFormSave(name, fields, by);
+  formSave(name: string, fields: Record<string, string>, by = "agent", machineId?: string): Record<string, unknown> {
+    const fm = this.formMachine(machineId);
+    if (this.isStateForm(name, fm)) return this.stateFormSave(name, fields, by, fm);
     const h = this.formHome(name);
     let raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : scaffoldInstance(h.template, `${this.bound?.id} — ${name}`);
     for (const [f, content] of Object.entries(fields)) raw = withFieldContent(raw, f, String(content));
@@ -2443,14 +2447,15 @@ export class Session {
     return this.formGet(name);
   }
 
-  formConfirm(name: string, field: string, index: number): Record<string, unknown> {
-    if (this.isStateForm(name)) {
-      const sh = this.stateFormHome(name);
+  formConfirm(name: string, field: string, index: number, machineId?: string): Record<string, unknown> {
+    const fm = this.formMachine(machineId);
+    if (this.isStateForm(name, fm)) {
+      const sh = this.stateFormHome(name, fm);
       if (existsSync(sh.instanceAbs)) {
         writeFileSync(sh.instanceAbs, confirmPrefill(readFileSync(sh.instanceAbs, "utf8"), field, index), "utf8");
         this.notifyChange();
       }
-      return this.stateFormGet(name);
+      return this.stateFormGet(name, fm);
     }
     const h = this.formHome(name);
     if (existsSync(h.instanceAbs)) {
@@ -2460,9 +2465,10 @@ export class Session {
     return this.formGet(name);
   }
 
-  formDone(name: string, by: Channel): Record<string, unknown> {
-    if (this.isStateForm(name)) {
-      const sh = this.stateFormHome(name);
+  formDone(name: string, by: Channel, machineId?: string): Record<string, unknown> {
+    const fm = this.formMachine(machineId);
+    if (this.isStateForm(name, fm)) {
+      const sh = this.stateFormHome(name, fm);
       if (existsSync(sh.instanceAbs)) {
         writeFileSync(
           sh.instanceAbs,
@@ -2471,7 +2477,7 @@ export class Session {
         );
         this.notifyChange();
       }
-      return this.stateFormGet(name);
+      return this.stateFormGet(name, fm);
     }
     const h = this.formHome(name);
     if (!existsSync(h.instanceAbs)) {
@@ -2502,16 +2508,30 @@ export class Session {
 
   // ── State forms (owner rulings 2026-08-04): form = f(state), stored ──
 
-  /** The dispatch between the two form kinds: a state of the machine on
-   *  display with evidence fields, unshadowed by a named template. */
-  private isStateForm(name: string): boolean {
-    if (existsSync(join(this.root, formTemplatePath(name)))) return false;
-    return this.currentMachine().states.some((s) => s.id === name && s.evidence_form.length > 0);
+  /** ANY state's form is always fetchable (owner ruling 2026-08-04) —
+   *  for export to a colleague wherever the walk stands. The machine on
+   *  display resolves the name; the walk's machine is the default. */
+  private formMachine(machineId?: string): MachineDecl {
+    if (machineId === undefined || machineId === "" || machineId === this.currentMachine().id) return this.currentMachine();
+    return this.viewFor(machineId)?.decl ?? this.currentMachine();
   }
 
-  /** Where the instance lives: the bound record's evidence folder ON ITS
-   *  BRANCH, or the session store when nothing is bound. */
-  private stateFormHome(name: string): { instanceAbs: string; instanceRel: string } {
+  /** The dispatch between the two form kinds: a state of the machine on
+   *  display with evidence fields, unshadowed by a named template. */
+  private isStateForm(name: string, m: MachineDecl = this.currentMachine()): boolean {
+    if (existsSync(join(this.root, formTemplatePath(name)))) return false;
+    return m.states.some((s) => s.id === name && s.evidence_form.length > 0);
+  }
+
+  /** Where the instance lives: the record whose machine carries the state
+   *  (its evidence folder ON ITS BRANCH), the bound record as fallback,
+   *  or the session store when neither exists. */
+  private stateFormHome(name: string, m: MachineDecl = this.currentMachine()): { instanceAbs: string; instanceRel: string } {
+    const it = itList(this.root).find((x) => x.open && itShortId(x.id) === m.id);
+    if (it !== undefined) {
+      const rel = `project/spec/iterations/${it.id}/evidence/${name}.md`;
+      return { instanceAbs: join(it.path, rel), instanceRel: rel };
+    }
     if (this.bound !== undefined) {
       const kind = this.bound.branch.startsWith("it/") ? "iterations" : "expeditions";
       const rel = `project/spec/${kind}/${this.bound.id}/evidence/${name}.md`;
@@ -2521,12 +2541,12 @@ export class Session {
     return { instanceAbs: join(this.root, rel), instanceRel: rel };
   }
 
-  private stateFormState(name: string): StateDecl {
-    const s = this.currentMachine().states.find((x) => x.id === name);
+  private stateFormState(name: string, m: MachineDecl = this.currentMachine()): StateDecl {
+    const s = m.states.find((x) => x.id === name);
     if (s === undefined) {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
-        expected: `a state of ${this.currentMachine().id} with an evidence form`,
+        expected: `a state of ${m.id} with an evidence form`,
         got: name,
         remedy: { tool: "se_pull", args: {}, note: "the walk's own states carry the forms" },
         source: "engine/session.ts stateform",
@@ -2544,14 +2564,14 @@ export class Session {
     }
   }
 
-  private stateFormHeader(name: string, raw: string | undefined): Record<string, string> {
+  private stateFormHeader(name: string, raw: string | undefined, m: MachineDecl = this.currentMachine()): Record<string, string> {
     const fm = raw === undefined ? ({} as Record<string, unknown>) : parseStateNote(raw).frontmatter;
     // The priority wears its RUNG NAME (owner ruling 2026-08-04) — the
     // numerical scale stays internal.
-    const s = this.currentMachine().states.find((st) => st.id === name);
+    const s = m.states.find((st) => st.id === name);
     return {
       project: this.brandName(),
-      state: `${this.currentMachine().id}/${name}`,
+      state: `${m.id}/${name}`,
       ...(s !== undefined ? { level: levelName(loadLevels(this.root), s.priority) } : {}),
       ...(this.bound !== undefined ? { record: this.bound.id } : {}),
       status: typeof fm.status === "string" ? fm.status : "open",
@@ -2561,11 +2581,11 @@ export class Session {
     };
   }
 
-  stateFormGet(name: string): Record<string, unknown> {
-    const s = this.stateFormState(name);
-    const h = this.stateFormHome(name);
+  stateFormGet(name: string, m: MachineDecl = this.currentMachine()): Record<string, unknown> {
+    const s = this.stateFormState(name, m);
+    const h = this.stateFormHome(name, m);
     const raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : undefined;
-    const model = stateFormModel(this.root, scanGuidance(this.root), this.currentMachine(), s, this.stateFormHeader(name, raw));
+    const model = stateFormModel(this.root, scanGuidance(this.root), m, s, this.stateFormHeader(name, raw, m));
     return { state_form: true, ...model, instance: h.instanceRel, exists: raw !== undefined, ...lintForm(model.template, raw, "") };
   }
 
@@ -2595,16 +2615,16 @@ export class Session {
   }
 
   /** One or many fields into the stored instance — multi-pass by law. */
-  stateFormSave(name: string, fields: Record<string, string>, by: string): Record<string, unknown> {
-    const t = stateFormFields(this.stateFormState(name));
-    const h = this.stateFormHome(name);
+  stateFormSave(name: string, fields: Record<string, string>, by: string, m: MachineDecl = this.currentMachine()): Record<string, unknown> {
+    const t = stateFormFields(this.stateFormState(name, m));
+    const h = this.stateFormHome(name, m);
     let raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : this.stateFormScaffold(name, t);
     for (const [f, content] of Object.entries(fields)) raw = withFieldContent(raw, f, String(content));
     raw = this.autoSign(withAuthor(raw, by), t, by);
     mkdirSync(dirname(h.instanceAbs), { recursive: true });
     writeFileSync(h.instanceAbs, raw, "utf8");
     this.notifyChange();
-    return this.stateFormGet(name);
+    return this.stateFormGet(name, m);
   }
 
   /** The state form the walk itself owes: standing in an iteration's
@@ -2643,11 +2663,12 @@ export class Session {
 
   /** ONE self-contained HTML: the sheet, the fills, the reading and the
    *  templates baked in — the island is what travels back. */
-  stateFormExport(name: string): string {
-    const s = this.stateFormState(name);
-    const h = this.stateFormHome(name);
+  stateFormExport(name: string, machineId?: string): string {
+    const m = this.formMachine(machineId);
+    const s = this.stateFormState(name, m);
+    const h = this.stateFormHome(name, m);
     const raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : undefined;
-    const model = stateFormModel(this.root, scanGuidance(this.root), this.currentMachine(), s, this.stateFormHeader(name, raw));
+    const model = stateFormModel(this.root, scanGuidance(this.root), m, s, this.stateFormHeader(name, raw, m));
     const fills: Record<string, string> = {};
     if (raw !== undefined) {
       const body = parseStateNote(raw).body;
@@ -2667,7 +2688,8 @@ export class Session {
 
   /** The returned copy's island lands as fills, marked imported — a
    *  claim like every other, judged at the gate. */
-  stateFormIngest(name: string, html: string): Record<string, unknown> {
+  stateFormIngest(name: string, html: string, machineId?: string): Record<string, unknown> {
+    const m = this.formMachine(machineId);
     const island = parseIsland(html);
     if (island === undefined || island.form !== name) {
       throw new Rejection({
@@ -2679,7 +2701,7 @@ export class Session {
       });
     }
     const author = island.author === "" ? "imported" : `${island.author} (imported)`;
-    return { ingested: name, author, ...this.stateFormSave(name, island.fields, author) };
+    return { ingested: name, author, ...this.stateFormSave(name, island.fields, author, m) };
   }
 
   /** One script, ASYNC — spawnSync would freeze the whole server (and the
