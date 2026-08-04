@@ -68,6 +68,7 @@ import { resolveInRoot, seDir } from "./paths.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { anyJobRunning } from "./run.ts";
+import { levelName, loadLevels } from "./scale.ts";
 import { buildPortableForm, type EmbeddedDoc, parseIsland, stateFormFields, stateFormModel } from "./stateform.ts";
 import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
 import { type Expedition, expClose, expFind, expList, expNew, readRecord } from "./worktree.ts";
@@ -2545,9 +2546,13 @@ export class Session {
 
   private stateFormHeader(name: string, raw: string | undefined): Record<string, string> {
     const fm = raw === undefined ? ({} as Record<string, unknown>) : parseStateNote(raw).frontmatter;
+    // The priority wears its RUNG NAME (owner ruling 2026-08-04) — the
+    // numerical scale stays internal.
+    const s = this.currentMachine().states.find((st) => st.id === name);
     return {
       project: this.brandName(),
       state: `${this.currentMachine().id}/${name}`,
+      ...(s !== undefined ? { level: levelName(loadLevels(this.root), s.priority) } : {}),
       ...(this.bound !== undefined ? { record: this.bound.id } : {}),
       status: typeof fm.status === "string" ? fm.status : "open",
       opened: typeof fm.opened === "string" ? fm.opened.slice(0, 10) : "",

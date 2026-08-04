@@ -1490,6 +1490,10 @@ function sfOne(f, fl) {
   s += '<textarea class="formfield" data-field="' + escText(fl.name) + '">' + escText(fl.content || "") + "</textarea></div>";
   return s;
 }
+// A collapsible box — the same truth, folded for a narrow pane.
+function sfBox(title, inner, open) {
+  return '<details' + (open ? " open" : "") + ' style="margin:6px 0"><summary style="cursor:pointer;font-weight:600">' + title + "</summary>" + inner + "</details>";
+}
 function renderStateForm(f) {
   const name = f.form;
   const fld = function (n) {
@@ -1497,15 +1501,15 @@ function renderStateForm(f) {
     return hit || { name: n, description: "", required: false, content: "", prefills: [] };
   };
   let h = '<div class="meta">' + Object.keys(f.header || {}).map(function (k) { return escText(k) + ": " + escText(String(f.header[k] || "____")); }).join(" · ") + "</div>";
-  h += '<div style="padding:4px 0"><b>Description</b><div class="comment-text">' + escText(f.description || "") + "</div></div>";
-  if (f.motivation) h += '<div style="padding:4px 0"><b>Motivation</b><div class="comment-text">' + escText(f.motivation) + "</div></div>";
-  h += '<div style="padding:4px 0"><b>Current situation</b>' + sfOne(f, fld("current_situation")) + "</div>";
-  h += '<div style="padding:4px 0"><b>Inputs</b>' + (f.inputs || []).map(function (i) {
+  h += sfBox("Description", '<div class="comment-text">' + escText(f.description || "") + "</div>", false);
+  if (f.motivation) h += sfBox("Motivation", '<div class="comment-text">' + escText(f.motivation) + "</div>", false);
+  h += sfBox("Current situation", sfOne(f, fld("current_situation")), true);
+  h += sfBox("Inputs", (f.inputs || []).map(function (i) {
     const label = i.path ? '<a class="doclink" data-path="' + escText(i.path) + '">' + escText(i.label) + "</a>" : "<b>" + escText(i.label) + "</b>";
     return '<div style="font-size:12.5px">☐ ' + label + (i.entry ? ' <span style="color:var(--se-fail);font-size:11px">before entry</span>' : "") + ' <span class="meta">' + escText(i.description || "") + "</span></div>";
-  }).join("") + "</div>";
-  h += '<div style="padding:4px 0"><b>Evidence</b>' + (f.fields || []).filter(function (x) { return x.name !== "current_situation" && x.name !== "follow_up"; }).map(function (x) { return sfOne(f, x); }).join("") + "</div>";
-  h += '<div style="padding:4px 0"><b>Follow-up' + (f.follow_up_label ? " / " + escText(f.follow_up_label) : "") + "</b>" + sfOne(f, fld("follow_up")) + "</div>";
+  }).join(""), false);
+  h += sfBox("Evidence", (f.fields || []).filter(function (x) { return x.name !== "current_situation" && x.name !== "follow_up"; }).map(function (x) { return sfOne(f, x); }).join(""), true);
+  h += sfBox("Follow-up" + (f.follow_up_label ? " / " + escText(f.follow_up_label) : ""), sfOne(f, fld("follow_up")), true);
   if (f.problems && f.problems.length) h += '<div style="color:var(--se-accent);padding:6px 0">' + f.problems.map(escText).join("<br>") + "</div>";
   if (f.met) h += '<div style="color:var(--se-ok);padding:6px 0">✓ complete — the claim stands; the gate judges it</div>';
   h += '<div style="padding:10px 0"><button class="primary saveform" data-form="' + name + '">save</button> <button class="primary doneform" data-form="' + name + '" title="sets status done">done</button> ';
@@ -1613,7 +1617,14 @@ function detailFor(key) {
     const txt = (D.comment || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");
     return ["machine: " + D.viewed.id, '<div class="comment-detail">' + txt + "</div>" + jsonTable(D.viewed)];
   }
-  if (key.startsWith("state:")) { const id = key.slice(6); return ["state: " + id, stateDetail(id)]; }
+  if (key.startsWith("state:")) {
+    const id = key.slice(6);
+    // ONE TRUTH, TWO RENDERS (owner ruling 2026-08-04): a state with an
+    // evidence form shows THE FORM as its details — the old detail view
+    // stays only for form-less states.
+    if ((D.states[id] || {}).has_form) { void showForm(id, "details"); return ["Evidence form / " + id, '<div class="meta">loading…</div>']; }
+    return ["state: " + id, stateDetail(id)];
+  }
   return [key, jsonTable({})];
 }
 document.addEventListener("click", async (ev) => {
@@ -1869,7 +1880,7 @@ if (cardsEl !== null) {
     });
   }
 }
-if (CURRENT && D.states[CURRENT] && WALK_HERE) { CURRENT_DETAIL = "state:" + CURRENT; showDetails("state: " + CURRENT, stateDetail(CURRENT)); }
+if (CURRENT && D.states[CURRENT] && WALK_HERE) { CURRENT_DETAIL = "state:" + CURRENT; const wdp = detailFor("state:" + CURRENT); showDetails(wdp[0], wdp[1]); }
 // A bookmark or an F5 still deep-links to the pane that was open.
 const DETAIL_PARAM = new URLSearchParams(location.search).get("detail");
 if (DETAIL_PARAM) { CURRENT_DETAIL = DETAIL_PARAM; const dp = detailFor(DETAIL_PARAM); showDetails(dp[0], dp[1]); }
@@ -2639,6 +2650,8 @@ function stateDetails(m: MirrorState, decl: MachineDecl, done: Set<string>, arch
       statement: s.statement,
       guidance: s.guidance,
       priority: s.priority,
+      // A state with evidence fields IS its form — the details render it.
+      has_form: s.evidence_form.length > 0,
       legal_tools: s.legal_tools ?? [],
       ...(s.submachine !== undefined ? { submachine: s.submachine } : {}),
       ...(s.entry !== undefined ? { entry: m.session.conditionStatus(decl, s, "enter") } : {}),

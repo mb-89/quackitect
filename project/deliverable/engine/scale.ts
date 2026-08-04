@@ -17,6 +17,13 @@ export function scalePath(root: string): string {
   return join(root, "project", "deliverable", "machines", "scale.md");
 }
 
+/** The rung a priority calibrates against: the least level that admits it.
+ *  Blocked (0) is a control position, never a name for work. */
+export function levelName(levels: AutonomyLevel[], priority: number): string {
+  const rungs = levels.filter((l) => l.value > 0).sort((a, b) => a.value - b.value);
+  return (rungs.find((l) => l.value >= priority) ?? rungs[rungs.length - 1]).name;
+}
+
 export function loadLevels(root: string): AutonomyLevel[] {
   const note = parseStateNote(readFileSync(scalePath(root), "utf8"));
   const rows = section(note.body, "Levels")
