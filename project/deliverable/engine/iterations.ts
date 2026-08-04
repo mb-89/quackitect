@@ -485,31 +485,13 @@ export function generateIterations(root: string): GeneratedMachine {
   const states: StateDecl[] = [start];
   const expByState: Record<string, string> = {};
   const subGen: Record<string, () => GeneratedMachine> = {};
-  type GenNode = CanvasElement & { styleAttributes?: Record<string, unknown> };
   const nodes: GenNode[] = [];
-  const edges: CanvasEdge[] = [];
-  const centerY = open.length === 0 ? 80 : ((open.length - 1) * 420) / 2 + 80;
-  nodes.push({
-    id: "n-start",
-    type: "file",
-    file: "start.md",
-    x: -1400,
-    y: centerY,
-    width: 160,
-    height: 160,
-    styleAttributes: { shape: "pill" },
-  });
-  nodes.push({
-    id: "n-end",
-    type: "file",
-    file: "end.md",
-    x: 260,
-    y: centerY,
-    width: 160,
-    height: 160,
-    styleAttributes: { shape: "pill" },
-  });
-  open.forEach((it, i) => {
+  const edges: GenEdge[] = [];
+  // TOP TO BOTTOM, like every machine reads (owner ruling 2026-08-04): the
+  // start pill, the open iterations stacked, the end pill.
+  nodes.push(pill("n-start", "start.md", 0));
+  let nextY = 300;
+  for (const it of open) {
     const sid = itShortId(it.id);
     const fm = readItRecord(root, it);
     const goal = typeof fm?.goal === "string" ? fm.goal : it.id;
@@ -527,14 +509,19 @@ export function generateIterations(root: string): GeneratedMachine {
     });
     subGen[sid] = () => generateIterationWalk(root, it, sid);
     start.edges.push({ to: sid, role: "normal" });
-    const y = i * 420;
-    nodes.push({ id: `n-${sid}`, type: "file", file: `${sid}.md`, x: -1100, y, ...nodeSize(sid, goal) });
-    edges.push({ id: `e-start-${sid}`, fromNode: "n-start", toNode: `n-${sid}` });
-    edges.push({ id: `e-${sid}-end`, fromNode: `n-${sid}`, toNode: "n-end" });
-  });
+    const size = nodeSize(sid, goal);
+    nodes.push({ id: `n-${sid}`, type: "file", file: `${sid}.md`, x: -size.width / 2, y: nextY, ...size });
+    nextY += size.height + 160;
+  }
+  nodes.push(pill("n-end", "end.md", nextY));
+  const els = new Map<string, CanvasElement>(nodes.map((n) => [n.id, n]));
+  for (const it of open) {
+    const sid = itShortId(it.id);
+    edges.push(sidedEdge(els, "n-start", `n-${sid}`), sidedEdge(els, `n-${sid}`, "n-end"));
+  }
   if (open.length === 0) {
     start.edges.push({ to: "end", role: "normal" });
-    edges.push({ id: "e-start-end", fromNode: "n-start", toNode: "n-end" });
+    edges.push(sidedEdge(els, "n-start", "n-end"));
   }
   states.push({
     id: "end",
@@ -553,6 +540,33 @@ export function generateIterations(root: string): GeneratedMachine {
     metadata: { frontmatter: { reentry: "restart", priority: 0.4 } },
   };
   return { decl, canvas, expByState, ...(Object.keys(subGen).length > 0 ? { subGen } : {}) };
+}
+
+type GenNode = CanvasElement & { styleAttributes?: Record<string, unknown> };
+type GenEdge = CanvasEdge & { fromSide?: string; toSide?: string };
+
+/** The round start and end every machine shares, centred on the axis. */
+function pill(id: string, file: string, y: number): GenNode {
+  return { id, type: "file", file, x: -80, y, width: 160, height: 160, styleAttributes: { shape: "pill" } };
+}
+
+/** Which sides an arrow uses, from the boxes' relative positions — the
+ *  drawing reads top to bottom, so flow leaves a bottom and enters a top.
+ *  Declared on the edge, exactly as a person picks sides in Obsidian. */
+function sidedEdge(els: Map<string, CanvasElement>, fromId: string, toId: string, id?: string): GenEdge {
+  const a = els.get(fromId)!;
+  const b = els.get(toId)!;
+  const dy = b.y + b.height / 2 - (a.y + a.height / 2);
+  const dx = b.x + b.width / 2 - (a.x + a.width / 2);
+  const vertical = Math.abs(dy) >= Math.abs(dx);
+  const sides = vertical
+    ? dy >= 0
+      ? { fromSide: "bottom", toSide: "top" }
+      : { fromSide: "top", toSide: "bottom" }
+    : dx >= 0
+      ? { fromSide: "right", toSide: "left" }
+      : { fromSide: "left", toSide: "right" };
+  return { id: id ?? `e-${fromId}-${toId}`, fromNode: fromId, toNode: toId, ...sides };
 }
 
 /** The iteration's machine, read at CALL time: the pinned column when the
@@ -576,30 +590,137 @@ function generateIterationWalk(root: string, it: Iteration, sid: string): Genera
   };
 }
 
-/** A drawn view of a pinned machine: milestone columns, states stacked in
- *  reading order — generated, like every container view. */
-function pinnedCanvas(m: MachineDecl): CanvasData {
-  const cols: string[] = [];
-  for (const s of m.states) {
-    const g = s.kind === "start" ? "" : (s.group ?? "?");
-    if (!cols.includes(g)) cols.push(g);
-  }
-  const nodes: CanvasElement[] = [];
-  const edges: CanvasEdge[] = [];
-  const rows: Record<string, number> = {};
-  for (const s of m.states) {
-    const g = s.kind === "start" ? "" : (s.group ?? "?");
-    const col = cols.indexOf(g);
-    const row = rows[g] ?? 0;
-    rows[g] = row + 1;
-    nodes.push({ id: `n-${s.id}`, type: "file", file: `${s.id}.md`, x: col * 560, y: row * 260, ...nodeSize(s.id, s.statement) });
-  }
+/** In-group dependency layers: a state sits one row below its deepest
+ *  in-group predecessor; independent states share the row. */
+function groupLayers(m: MachineDecl, groupOf: (s: StateDecl) => string): Map<string, number> {
+  const byId = new Map(m.states.map((s) => [s.id, s]));
+  const preds = new Map<string, string[]>();
   for (const s of m.states) {
     for (const e of s.edges) {
-      edges.push({ id: `e-${s.id}-${e.to}`, fromNode: `n-${s.id}`, toNode: `n-${e.to}` });
+      const list = preds.get(e.to) ?? [];
+      list.push(s.id);
+      preds.set(e.to, list);
     }
   }
-  return { nodes, edges, metadata: { frontmatter: { reentry: "resume", priority: 0.2 } } };
+  const memo = new Map<string, number>();
+  const layerOf = (id: string, visiting: Set<string>): number => {
+    const hit = memo.get(id);
+    if (hit !== undefined) return hit;
+    if (visiting.has(id)) return 0;
+    visiting.add(id);
+    const s = byId.get(id);
+    let layer = 0;
+    for (const p of preds.get(id) ?? []) {
+      const ps = byId.get(p);
+      if (s !== undefined && ps !== undefined && groupOf(ps) === groupOf(s)) layer = Math.max(layer, layerOf(p, visiting) + 1);
+    }
+    visiting.delete(id);
+    memo.set(id, layer);
+    return layer;
+  };
+  for (const s of m.states) layerOf(s.id, new Set());
+  return memo;
+}
+
+const LAYOUT = { gapX: 60, gapY: 90, pad: 44, labelH: 34, groupGap: 150 } as const;
+
+interface LayoutCtx {
+  nodes: GenNode[];
+  els: Map<string, CanvasElement>;
+}
+
+/** One horizontal row of states, centred on the axis; answers its height. */
+function placeRow(ctx: LayoutCtx, row: StateDecl[], atY: number): number {
+  const sized = row.map((s) => ({
+    el:
+      s.kind === "start" || s.kind === "end" || s.kind === "terminal"
+        ? pill(`n-${s.id}`, `${s.id}.md`, atY)
+        : ({ id: `n-${s.id}`, type: "file", file: `${s.id}.md`, x: 0, y: atY, ...nodeSize(s.id, s.statement) } as GenNode),
+  }));
+  const total = sized.reduce((w, x) => w + x.el.width, 0) + LAYOUT.gapX * (sized.length - 1);
+  let x = -total / 2;
+  let tallest = 0;
+  for (const item of sized) {
+    item.el.x = x;
+    x += item.el.width + LAYOUT.gapX;
+    tallest = Math.max(tallest, item.el.height);
+    ctx.nodes.push(item.el);
+    ctx.els.set(item.el.id, item.el);
+  }
+  return tallest;
+}
+
+/** One milestone's box: its states in dependency rows, wrapped and
+ *  labelled; answers the y below the box. */
+function placeGroup(ctx: LayoutCtx, g: string, members: StateDecl[], layers: Map<string, number>, boxTop: number): number {
+  let rowY = boxTop + LAYOUT.labelH + LAYOUT.pad;
+  let minX = Number.POSITIVE_INFINITY;
+  let maxX = Number.NEGATIVE_INFINITY;
+  const depth = Math.max(...members.map((s) => layers.get(s.id) ?? 0));
+  for (let r = 0; r <= depth; r++) {
+    const row = members.filter((s) => (layers.get(s.id) ?? 0) === r);
+    if (row.length === 0) continue;
+    const tallest = placeRow(ctx, row, rowY);
+    for (const s of row) {
+      const el = ctx.els.get(`n-${s.id}`)!;
+      minX = Math.min(minX, el.x);
+      maxX = Math.max(maxX, el.x + el.width);
+    }
+    rowY += tallest + LAYOUT.gapY;
+  }
+  const boxBottom = rowY - LAYOUT.gapY + LAYOUT.pad;
+  ctx.nodes.push({
+    id: `g-${g}`,
+    type: "group",
+    label: g,
+    x: minX - LAYOUT.pad,
+    y: boxTop,
+    width: maxX - minX + LAYOUT.pad * 2,
+    height: boxBottom - boxTop,
+  });
+  return boxBottom + LAYOUT.groupGap;
+}
+
+/** A drawn view of a generated machine, top to bottom like the walk
+ *  reads: the shared start and end pills, each milestone a labelled group
+ *  box, states inside layered by dependency — independent ones side by
+ *  side — and every edge declaring its sides. */
+function pinnedCanvas(m: MachineDecl): CanvasData {
+  const groupOf = (s: StateDecl): string => (s.kind === "start" || s.kind === "end" || s.kind === "terminal" ? "" : (s.group ?? "?"));
+  const layers = groupLayers(m, groupOf);
+  const order: string[] = [];
+  for (const s of m.states) {
+    const g = groupOf(s);
+    if (g !== "" && !order.includes(g)) order.push(g);
+  }
+  const ctx: LayoutCtx = { nodes: [], els: new Map() };
+  let y = 0;
+  for (const s of m.states) {
+    if (s.kind !== "start") continue;
+    y += placeRow(ctx, [s], y) + LAYOUT.groupGap;
+  }
+  for (const g of order) {
+    y = placeGroup(
+      ctx,
+      g,
+      m.states.filter((s) => groupOf(s) === g),
+      layers,
+      y,
+    );
+  }
+  for (const s of m.states) {
+    if (s.kind !== "end" && s.kind !== "terminal") continue;
+    y += placeRow(ctx, [s], y) + LAYOUT.groupGap;
+  }
+  const { nodes, els } = ctx;
+  const edges: GenEdge[] = [];
+  for (const s of m.states) {
+    for (const e of s.edges) {
+      if (!els.has(`n-${s.id}`) || !els.has(`n-${e.to}`)) continue;
+      edges.push(sidedEdge(els, `n-${s.id}`, `n-${e.to}`, `e-${s.id}-${e.to}`));
+    }
+  }
+  return { nodes: nodes as CanvasElement[], edges, metadata: { frontmatter: { reentry: "resume", priority: 0.2 } } };
 }
 
 /** THE ITERATION ARCHIVE, generated like the expedition archive — the

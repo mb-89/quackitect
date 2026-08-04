@@ -60,6 +60,10 @@ export interface RigorMatrixRow {
   evidence_form: EvidenceField[];
   /** Narrows what the compiled state may call. Absent means every lane tool. */
   legal_tools?: string[];
+  /** Set when the row IS another machine's state, by reference. */
+  same_as?: string;
+  /** Entry conditions inherited from the referenced state note. */
+  entry?: Record<string, string[]>;
 }
 
 export interface RigorMatrixCell {
@@ -184,7 +188,23 @@ function parseMatrixRow(
   if (row.state_kind !== "terminal" && row.evidence_form.length === 0) {
     throw new Error(`matrix row ${row.name} carries no evidence — leaving a state demands evidence; only a terminal is exempt`);
   }
+  mergeSameAs(dir, row, fm);
   return { row, fm };
+}
+
+/** A MIRROR IS A REFERENCE, NEVER A COPY (owner law 2026-08-04). A row
+ *  carrying `same_as: <state>` IS that state, standing in the walk: how it
+ *  WORKS — its tools, its guidance, its entry reading — comes from the ONE
+ *  note in machines/states/, read here so an edit there reaches both. The
+ *  row keeps only its seam: statement, evidence, dependencies, cells. */
+function mergeSameAs(dir: string, row: RigorMatrixRow, fm: Record<string, unknown>): void {
+  if (typeof fm.same_as !== "string" || fm.same_as === "") return;
+  const note = parseStateNote(readFileSync(join(dir, "..", "states", `${fm.same_as}.md`), "utf8"));
+  const nfm = note.frontmatter;
+  row.same_as = fm.same_as;
+  if (nfm.legal_tools !== undefined) row.legal_tools = asList(nfm.legal_tools);
+  if (typeof nfm.guidance === "string" && nfm.guidance !== "") row.guidance = [nfm.guidance, row.guidance].filter(Boolean).join("\n\n");
+  if (nfm.entry_read !== undefined) row.entry = { read: asList(nfm.entry_read) };
 }
 
 // A CELL IS FRONTMATTER ON ITS ROW. It used to be a file of its own, and
@@ -273,6 +293,7 @@ function rowState(row: RigorMatrixRow): Omit<StateDecl, "guidance" | "edges"> {
     // A state must declare enough to execute the remedy its own refusal hands
     // back, or SE-C-112 answers with SE-C-110 and the walk cannot recover.
     ...(row.legal_tools !== undefined ? { legal_tools: row.legal_tools } : {}),
+    ...(row.entry !== undefined ? { entry: row.entry } : {}),
     // The walk's pin hook finds the kickoff by this tag, wherever it compiles.
     ...(row.name === "gate-kickoff" ? { tags: ["iteration-kickoff"] } : {}),
   };
