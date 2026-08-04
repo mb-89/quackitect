@@ -333,6 +333,15 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
     follow_up: "none",
   };
   session.formSave("gate-kickoff", kickFields, "human");
+  // THE THUMBS: the gate's form is met but unblessed — an agent below the
+  // gate's weight is refused the bless; the human's thumb opens it.
+  assert.match(JSON.stringify(session.formGet("gate-kickoff")), /"gate":true/);
+  session.setAutonomy(0.2);
+  assert.throws(
+    () => session.formBless("gate-kickoff", true, "agent"),
+    (e) => /above/.test(JSON.stringify(e)),
+  );
+  session.formBless("gate-kickoff", true, "human");
   // The advance is the bless — the pin fires from the form and the machine
   // GROWS IN PLACE during that very call. Several ways forward stand in
   // the grown machine, so the UNNAMED advance refuses typed — and the

@@ -174,7 +174,9 @@ test("promoting a card changes a class, never the DOM", () => {
   const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
   assert.ok(html.includes('el.classList.toggle("main"'), "the promoted card is marked by class");
   const from = html.indexOf("function applyCards");
-  const to = html.indexOf('addEventListener("keydown"');
+  // The FIRST keydown after applyCards bounds the slice — the form editors
+  // own an earlier keydown of their own.
+  const to = html.indexOf('addEventListener("keydown"', from);
   assert.ok(from !== -1 && to > from, "the card logic is present");
   const cardJs = html.slice(from, to);
   assert.ok(!cardJs.includes("appendChild"), "no card is ever re-parented");

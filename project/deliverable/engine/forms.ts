@@ -205,3 +205,11 @@ export function withChecked(instanceRaw: string, labels: string[]): string {
   if (/^checked:/m.test(instanceRaw)) return instanceRaw.replace(/^checked:.*$/m, line);
   return instanceRaw.replace(/^status: .*$/m, (s) => `${s}\n${line}`);
 }
+
+/** The gate's bless line — set, replaced, or removed whole. A save removes
+ *  it: a changed claim is no longer the claim that was blessed. */
+export function withBless(instanceRaw: string, line: string | undefined): string {
+  const cleared = instanceRaw.replace(/^bless:.*\n?/m, "");
+  if (line === undefined) return cleared;
+  return cleared.replace(/^status: .*$/m, (s) => `${s}\nbless: ${line}`);
+}

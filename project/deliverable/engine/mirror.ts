@@ -181,6 +181,14 @@ export function startMirror(o: MirrorOptions): Server {
         result: state.session.formDone(String(body.name ?? ""), "human", String(body.machine ?? "")),
       }),
     ],
+    // THE THUMBS (v1 reborn): the human's bless or dismiss on a gate's form.
+    "/form/bless": [
+      "mirror_form_bless",
+      (body) => ({
+        args: { name: body.name, ok: body.ok },
+        result: state.session.formBless(String(body.name ?? ""), body.ok === true, "human", String(body.machine ?? "")),
+      }),
+    ],
     // THE PRIORITY RIDES THE NOTE (owner, 2026-08-01). The note row draws
     // a MoSCoW choice, and a capture that dropped it made every stray a
     // "could" whatever the reader picked.

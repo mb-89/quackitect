@@ -618,6 +618,15 @@ const STYLE = `
   .widget { display: flex; flex-direction: column; border: 1px solid var(--se-border); border-radius: 10px; background: var(--se-bg-side); min-height: 0; }
   .widget-head { display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; border-bottom: 1px solid var(--se-border); color: var(--se-muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
   .widget-body { flex: 1; min-height: 0; overflow: auto; }
+  /* THE FORM EDITORS read as quiet tables: bordered row groups, borderless
+     inputs on the theme's own surface — never a white browser box. */
+  .sfrows { border: 1px solid var(--se-border); border-radius: 4px; margin: 4px 0; }
+  .sfrow { display: flex; gap: 6px; align-items: center; padding: 2px 6px; border-bottom: 1px solid var(--se-border); }
+  .sfrow:last-child { border-bottom: 0; }
+  .sfrow input { flex: 1; background: transparent; color: var(--se-fg); border: 0; outline: none; font: inherit; font-size: 12.5px; padding: 4px 2px; min-width: 0; }
+  .sfrow input:focus { background: var(--se-hover); border-radius: 3px; }
+  .sfrow select { flex: 0 0 auto; background: var(--se-bg); color: var(--se-fg); border: 1px solid var(--se-border); border-radius: 3px; font: inherit; font-size: 12.5px; padding: 3px 4px; }
+  .sfrow .sfitem { flex: 0 0 44%; font-size: 12.5px; color: var(--se-muted); }
   .expand { background: none; border: 1px solid var(--se-border-strong); color: var(--se-muted); border-radius: 6px; cursor: pointer; font: inherit; padding: 2px 8px; }
   .expand:hover { color: var(--se-accent); border-color: var(--se-accent); }
   /* THE CARD MATRIX (owner design 2026-07-29). One BIG card beside a two-wide
@@ -1470,7 +1479,9 @@ function sfOne(f, fl) {
   let s = '<div style="border:1px solid var(--se-line,#888);border-radius:4px;padding:7px 10px;margin:7px 0">';
   s += '<span style="float:right;font-size:11.5px;color:var(--se-accent)">template: ' + escText(tpl) + "</span>";
   s += "<b>" + escText(fl.name) + "</b>" + (fl.required ? ' <span style="color:var(--se-fail);font-size:11px">required</span>' : ' <span class="meta">optional</span>');
-  s += '<div class="meta">' + escText(fl.description || "") + "</div>";
+  // Free text carries its ask as the PLACEHOLDER; the structured editors
+  // keep the description above, because their rows replace the empty box.
+  if ((tm.editor || "text") !== "text") s += '<div class="meta">' + escText(fl.description || "") + "</div>";
   (fl.prefills || []).forEach(function (p, i) {
     s += '<div class="prefill"><div class="comment-text">prefill — unconfirmed:</div><div>' + escText(p) + '</div><button class="primary confirmpre" data-form="' + name + '" data-machine="' + escText(f.machine || "") + '" data-field="' + escText(fl.name) + '" data-index="' + i + '">confirm</button></div>';
   });
@@ -1486,15 +1497,16 @@ function sfDash(c) {
 }
 function sfEditor(fl, tm, args) {
   const name = escText(fl.name);
+  const ph = escText(tm.placeholder || "");
   if (tm.editor === "list") {
-    return '<div class="sfrows">' + sfDash(fl.content).concat([""]).map(function (v) { return '<div class="sfrow" style="display:flex;gap:6px;margin:4px 0"><input class="sfli" data-field="' + name + '" value="' + escText(v) + '" style="flex:1"></div>'; }).join("") + "</div>";
+    return '<div class="sfrows">' + sfDash(fl.content).concat([""]).map(function (v) { return '<div class="sfrow"><input class="sfli" data-field="' + name + '" placeholder="' + ph + '" value="' + escText(v) + '"></div>'; }).join("") + "</div>";
   }
   if (tm.editor === "per-item" && (args.items || []).length > 0) {
     return '<div class="sfrows">' + args.items.map(function (it) {
       const pref = "- " + it + ":";
       const hit = (fl.content || "").split("\\n").map(function (l) { return l.trim(); }).filter(function (l) { return l.indexOf(pref) === 0; })[0];
       const ans = hit ? hit.slice(pref.length).trim() : "";
-      return '<div class="sfrow" style="display:flex;gap:6px;margin:4px 0;align-items:center"><span class="meta" style="flex:0 0 45%">' + escText(it) + '</span><input class="sfpi" data-field="' + name + '" data-item="' + escText(it) + '" value="' + escText(ans) + '" style="flex:1"></div>';
+      return '<div class="sfrow"><span class="sfitem">' + escText(it) + '</span><input class="sfpi" data-field="' + name + '" data-item="' + escText(it) + '" placeholder="' + ph + '" value="' + escText(ans) + '"></div>';
     }).join("") + "</div>";
   }
   if (tm.editor === "choice-rationale") {
@@ -1502,13 +1514,13 @@ function sfEditor(fl, tm, args) {
     const sep = first.indexOf(" — ");
     const chosen = sep < 0 ? first : first.slice(0, sep).trim();
     const rat = sep < 0 ? "" : first.slice(sep + 3).trim();
-    return '<div class="sfrow" style="display:flex;gap:6px;margin:4px 0"><select class="sfsel" data-field="' + name + '"><option value=""></option>' + (args.options || []).map(function (o) { return "<option" + (o === chosen ? " selected" : "") + ">" + escText(o) + "</option>"; }).join("") + '</select><input class="sfrat" data-field="' + name + '" placeholder="rationale" value="' + escText(rat) + '" style="flex:1"></div>';
+    return '<div class="sfrows"><div class="sfrow"><select class="sfsel" data-field="' + name + '"><option value=""></option>' + (args.options || []).map(function (o) { return "<option" + (o === chosen ? " selected" : "") + ">" + escText(o) + "</option>"; }).join("") + '</select><input class="sfrat" data-field="' + name + '" placeholder="rationale — why this option" value="' + escText(rat) + '"></div></div>';
   }
   if (tm.editor === "findings") {
     const pairs = sfDash(fl.content).filter(function (l) { return l.indexOf(" => ") >= 0; }).map(function (l) { const i = l.indexOf(" => "); return { f: l.slice(0, i), a: l.slice(i + 4) }; });
-    return '<div class="sfrows">' + pairs.concat([{ f: "", a: "" }]).map(function (p) { return '<div class="sfrow" style="display:flex;gap:6px;margin:4px 0;align-items:center"><input class="sfff" data-field="' + name + '" placeholder="finding" value="' + escText(p.f) + '" style="flex:1"><span class="meta">=&gt;</span><input class="sffa" data-field="' + name + '" placeholder="answer" value="' + escText(p.a) + '" style="flex:1"></div>'; }).join("") + "</div>";
+    return '<div class="sfrows">' + pairs.concat([{ f: "", a: "" }]).map(function (p) { return '<div class="sfrow"><input class="sfff" data-field="' + name + '" placeholder="finding" value="' + escText(p.f) + '"><span class="meta">=&gt;</span><input class="sffa" data-field="' + name + '" placeholder="answer — fix, rebuttal, or accepted risk" value="' + escText(p.a) + '"></div>'; }).join("") + "</div>";
   }
-  return '<textarea class="formfield" data-field="' + name + '">' + escText(fl.content || "") + "</textarea>";
+  return '<textarea class="formfield" data-field="' + name + '" placeholder="' + escText(fl.description || "") + '">' + escText(fl.content || "") + "</textarea>";
 }
 // A collapsible box — the same truth, folded for a narrow pane.
 function sfBox(title, inner, open) {
@@ -1536,10 +1548,20 @@ function renderStateForm(f) {
   h += sfBox("Follow-up" + (f.follow_up_label ? " / " + escText(f.follow_up_label) : ""), sfOne(f, fld("follow_up")), false);
   if (f.problems && f.problems.length) h += '<div style="color:var(--se-accent);padding:6px 0">' + f.problems.map(escText).join("<br>") + "</div>";
   if (f.met) h += '<div style="color:var(--se-ok);padding:6px 0">✓ complete — the claim stands; the gate judges it</div>';
+  if (f.gate) {
+    if ((f.bless || "").indexOf("blessed") === 0) h += '<div style="color:var(--se-ok);padding:4px 0">👍 ' + escText(f.bless) + "</div>";
+    else if ((f.bless || "").indexOf("dismissed") === 0) h += '<div style="color:var(--se-fail);padding:4px 0">👎 ' + escText(f.bless) + "</div>";
+    else if (f.met) h += '<div class="meta" style="padding:4px 0">submitted — awaiting the bless</div>';
+  }
   h += '<div style="padding:10px 0"><button class="primary sfexport" data-form="' + name + '" data-machine="' + escText(mach) + '">export</button> ';
   h += '<button class="primary sfimport" data-form="' + name + '">import</button><input type="file" accept=".html,text/html" style="display:none" class="ingestform" data-form="' + name + '" data-machine="' + escText(mach) + '"> ';
   h += '<button class="primary saveform" data-form="' + name + '" data-machine="' + escText(mach) + '">save</button> ';
-  h += '<button class="primary doneform" data-form="' + name + '" data-machine="' + escText(mach) + '" title="marks the claim complete — the gate judges it">submit</button></div>';
+  h += '<button class="primary doneform" data-form="' + name + '" data-machine="' + escText(mach) + '" title="marks the claim complete — the gate judges it">submit</button>';
+  if (f.gate) {
+    h += ' <button class="primary blessform" data-form="' + name + '" data-machine="' + escText(mach) + '" title="the gate opens — the human, or a hand above its rung">👍 bless</button>';
+    h += ' <button class="primary dismissform" data-form="' + name + '" data-machine="' + escText(mach) + '" title="send it back — the reasons go in the form">👎 dismiss</button>';
+  }
+  h += "</div>";
   return h;
 }
 async function seIngest(inp, name) {
@@ -1575,6 +1597,20 @@ document.addEventListener("change", function (ev) {
       row.parentElement.appendChild(clone);
     }
   }
+});
+// ENTER ADDS THE NEXT ROW, right below the one being edited.
+document.addEventListener("keydown", (ev) => {
+  if (ev.key !== "Enter") return;
+  const t = ev.target.closest ? ev.target.closest(".sfli, .sfff, .sffa") : null;
+  if (!t) return;
+  ev.preventDefault();
+  const row = t.closest(".sfrow");
+  if (!row) return;
+  const clone = row.cloneNode(true);
+  clone.querySelectorAll("input").forEach(function (i) { i.value = ""; });
+  row.after(clone);
+  const first = clone.querySelector("input");
+  if (first) first.focus();
 });
 // The machine on display resolves a form name — without it, two records'
 // same-named states would collide and the walk's machine would shadow the view.
@@ -1666,6 +1702,12 @@ document.addEventListener("click", async (ev) => {
   if (im) {
     const inp = document.querySelector('.ingestform[data-form="' + im.dataset.form + '"]');
     if (inp) inp.click();
+    return;
+  }
+  const bl = ev.target.closest ? ev.target.closest(".blessform, .dismissform") : null;
+  if (bl) {
+    await formPost("/form/bless", { name: bl.dataset.form, ok: bl.classList.contains("blessform"), machine: bl.dataset.machine || viewedMachine() });
+    showFormAgain(bl.dataset.form, bl.dataset.machine);
     return;
   }
   const sv = ev.target.closest ? ev.target.closest(".saveform") : null;

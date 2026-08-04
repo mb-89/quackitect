@@ -21,7 +21,7 @@ legal_tools:
   - se_answer
 evidence:
   - name: retro_drained
-    description: "every inbox note with its disposition - one line per note"
+    description: "what happened to each pending note - built, dropped as obsolete, carried in, or parked with its ready-when"
     template: per-item
     items:
       - "$inbox"

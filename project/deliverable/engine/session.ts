@@ -46,6 +46,7 @@ import {
   scaffoldInstance,
   stripComments,
   withAuthor,
+  withBless,
   withChecked,
   withFieldContent,
   withSignedOff,
@@ -2600,17 +2601,52 @@ export class Session {
       for (const f of model.template.fields) fills[f.name] = stripComments(section(body, f.name)).trim();
     }
     const tp = templateProblems(model, fills);
+    const fmData = raw === undefined ? ({} as Record<string, unknown>) : parseStateNote(raw).frontmatter;
     return {
       state_form: true,
       ...model,
       machine: m.id,
       checked: this.stateFormChecked(raw),
+      gate: s.kind === "gate",
+      bless: typeof fmData.bless === "string" ? fmData.bless : "",
       instance: h.instanceRel,
       exists: raw !== undefined,
       ...lint,
       problems: [...lint.problems, ...tp],
       met: lint.met && tp.length === 0,
     };
+  }
+
+  /** THE BLESS (owner design 2026-08-04, v1's thumbs reborn): a gate's
+   *  submitted form needs a hand ABOVE it — the human always, or an agent
+   *  whose autonomy stands strictly above the gate's own weight. */
+  formBless(name: string, ok: boolean, by: string, machineId?: string): Record<string, unknown> {
+    const m = this.formMachine(machineId);
+    const s = this.stateFormState(name, m);
+    if (s.kind !== "gate") {
+      throw new Rejection({
+        clause: CLAUSES.NOT_LEGAL_IN_STATE,
+        expected: "a GATE state — only gates carry a bless",
+        got: `${name} (${s.kind})`,
+        remedy: { tool: "se_pull", args: {}, note: "work states complete by their form alone" },
+        source: "engine/session.ts bless",
+      });
+    }
+    if (by !== "human" && this._autonomy <= s.priority) {
+      throw new Rejection({
+        clause: CLAUSES.ABOVE_THRESHOLD,
+        expected: `a hand above this gate's weight — autonomy > ${s.priority}, or the human's thumb in the form`,
+        got: `agent at autonomy ${this._autonomy}`,
+        remedy: { tool: "se_pull", args: {}, note: "present the gate to the person and stop — their bless resumes the walk" },
+        source: "engine/session.ts bless",
+      });
+    }
+    const h = this.stateFormHome(name, m);
+    if (existsSync(h.instanceAbs)) {
+      writeFileSync(h.instanceAbs, withBless(readFileSync(h.instanceAbs, "utf8"), `${ok ? "blessed" : "dismissed"} by ${by}`), "utf8");
+      this.notifyChange();
+    }
+    return this.stateFormGet(name, m);
   }
 
   private stateFormChecked(raw: string | undefined): string[] {
@@ -2658,6 +2694,8 @@ export class Session {
     // (the page's boxes, the agent's fill) send it through this one door.
     const { inputs_checked, ...rest } = fields;
     for (const [f, content] of Object.entries(rest)) raw = withFieldContent(raw, f, String(content));
+    // A changed claim is no longer the blessed claim.
+    if (Object.keys(fields).length > 0) raw = withBless(raw, undefined);
     if (inputs_checked !== undefined) {
       raw = withChecked(
         raw,
@@ -2689,15 +2727,29 @@ export class Session {
   }
 
   private assertStateFormMet(stateId: string): void {
-    const lint = this.stateFormGet(stateId) as { met?: boolean; problems?: string[]; instance?: string };
-    if (lint.met === true) return;
-    throw new Rejection({
-      clause: CLAUSES.CONDITION_UNMET,
-      expected: `the ${stateId} evidence form complete (${String(lint.instance)})`,
-      got: (lint.problems ?? []).join(" · ") || "unfilled",
-      remedy: { tool: "se_pull", args: {}, note: "the pull serves the form; its payload fills it, and completeness signs the claim" },
-      source: "engine/session.ts stateform",
-    });
+    const lint = this.stateFormGet(stateId) as { met?: boolean; problems?: string[]; instance?: string; gate?: boolean; bless?: string };
+    if (lint.met !== true) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `the ${stateId} evidence form complete (${String(lint.instance)})`,
+        got: (lint.problems ?? []).join(" · ") || "unfilled",
+        remedy: { tool: "se_pull", args: {}, note: "the pull serves the form; its payload fills it, and completeness signs the claim" },
+        source: "engine/session.ts stateform",
+      });
+    }
+    if (lint.gate === true && !(lint.bless ?? "").startsWith("blessed")) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `the ${stateId} gate blessed — the 👍 in the form, by the human or a hand above the gate's rung`,
+        got: (lint.bless ?? "") === "" ? "submitted, awaiting the bless" : String(lint.bless),
+        remedy: {
+          tool: "se_pull",
+          args: {},
+          note: 'present the gate and stop; a fill of {"bless": true} blesses only from above its weight',
+        },
+        source: "engine/session.ts bless",
+      });
+    }
   }
 
   /** The blessed size may live in the kickoff's own stored form. */
@@ -3353,8 +3405,12 @@ export class Session {
     // THE STORED FORM IS THE DURABLE COPY (owner rulings 2026-08-04): a
     // state with evidence fields lands every fill in its instance too.
     if (s.evidence_form.length > 0 && this.isStateForm(s.id)) {
-      const strings = Object.fromEntries(Object.entries(data).map(([k, v]) => [k, typeof v === "string" ? v : JSON.stringify(v)]));
+      // The bless is not a section — it rides the fill as its own key and
+      // lands AFTER the save, which resets any stale bless first.
+      const { bless, ...fills } = data;
+      const strings = Object.fromEntries(Object.entries(fills).map(([k, v]) => [k, typeof v === "string" ? v : JSON.stringify(v)]));
       this.stateFormSave(s.id, strings, "agent");
+      if (bless !== undefined) this.formBless(s.id, bless === true || bless === "true" || bless === "yes", "agent");
     }
     this.notifyChange();
     return { state: `${machine.id}/${s.id}`, evidence: record };

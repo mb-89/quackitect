@@ -73,6 +73,8 @@ export interface TemplateMeta {
   editor: string;
   line_pattern: string;
   line_help: string;
+  /** What the editor's empty box says — the hint AT the point of typing. */
+  placeholder: string;
 }
 
 /** The field's arguments to its template — declared in the form's own
@@ -90,9 +92,10 @@ export function templateMeta(root: string, name: string): TemplateMeta {
       editor: typeof fm.editor === "string" ? fm.editor : "text",
       line_pattern: typeof fm.line_pattern === "string" ? fm.line_pattern : "",
       line_help: typeof fm.line_help === "string" ? fm.line_help : "",
+      placeholder: typeof fm.placeholder === "string" ? fm.placeholder : "",
     };
   } catch {
-    return { editor: "text", line_pattern: "", line_help: "" };
+    return { editor: "text", line_pattern: "", line_help: "", placeholder: "" };
   }
 }
 
@@ -381,6 +384,20 @@ const SHEET_JS = `
     clone.querySelectorAll("input").forEach(function (i) { i.value = ""; i.removeAttribute("value"); });
     row.parentElement.appendChild(clone);
   });
+  // Enter adds the next row right below the one being edited.
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key !== "Enter") return;
+    var t = ev.target;
+    if (!t.matches || !t.matches("input[data-list], input[data-findf], input[data-finda]")) return;
+    ev.preventDefault();
+    var row = t.parentElement;
+    if (!row) return;
+    var clone = row.cloneNode(true);
+    clone.querySelectorAll("input").forEach(function (i) { i.value = ""; i.removeAttribute("value"); });
+    row.after(clone);
+    var first = clone.querySelector("input");
+    if (first) first.focus();
+  });
 `;
 
 function renderInput(i: FormInput, docIndex: Map<string, number>, checked: Set<string>): string {
@@ -405,7 +422,7 @@ function renderField(
 ): string {
   const flag = required ? '<span class="req">required</span>' : '<span class="opt">optional</span>';
   const head = `<div class="field"><span class="tpl">template: ${esc(template)}</span><span class="name">${esc(name)}</span>${flag}<div class="desc">${esc(description)}</div>`;
-  return `${head}${fieldEditor(name, content, meta?.editor ?? "text", args)}</div>`;
+  return `${head}${fieldEditor(name, content, meta, args)}</div>`;
 }
 
 const dashLines = (content: string): string[] =>
@@ -417,9 +434,13 @@ const dashLines = (content: string): string[] =>
 
 /** The editor IS the template's shape — rows for lists, labelled rows for
  *  known items, a dropdown with its rationale, pairs for findings. */
-function fieldEditor(name: string, content: string, editor: string, args: FieldArgs): string {
+function fieldEditor(name: string, content: string, meta: TemplateMeta | undefined, args: FieldArgs): string {
+  const editor = meta?.editor ?? "text";
+  const ph = esc(meta?.placeholder ?? "");
   if (editor === "list") {
-    const rows = [...dashLines(content), ""].map((v) => `<div class="row"><input data-list="${esc(name)}" value="${esc(v)}"></div>`);
+    const rows = [...dashLines(content), ""].map(
+      (v) => `<div class="row"><input data-list="${esc(name)}" placeholder="${ph}" value="${esc(v)}"></div>`,
+    );
     return `<div class="rows">${rows.join("")}</div>`;
   }
   if (editor === "per-item" && args.items.length > 0) {
@@ -429,7 +450,7 @@ function fieldEditor(name: string, content: string, editor: string, args: FieldA
         .map((l) => l.trim())
         .find((l) => l.startsWith(`- ${it}:`));
       const answer = hit === undefined ? "" : hit.slice(`- ${it}:`.length).trim();
-      return `<div class="row"><span class="pi">${esc(it)}</span><input data-peritem="${esc(name)}" data-item="${esc(it)}" value="${esc(answer)}"></div>`;
+      return `<div class="row"><span class="pi">${esc(it)}</span><input data-peritem="${esc(name)}" data-item="${esc(it)}" placeholder="${ph}" value="${esc(answer)}"></div>`;
     });
     return `<div class="rows">${rows.join("")}</div>`;
   }
