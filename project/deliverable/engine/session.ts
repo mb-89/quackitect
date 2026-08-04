@@ -1258,11 +1258,10 @@ export class Session {
     if (this._target === "") return;
     const here = this.active()[0];
     if (here === undefined) return;
-    // A submachine is aimed at by its container name; route() lands on its
-    // start, so arrival compares against the same normalised id.
-    const decl = this.machine.states.find((s) => s.id === this._target);
-    const aim = decl?.submachine !== undefined ? `${this._target}/start` : this._target;
-    if (here === aim) this._target = "";
+    // routeAim is the ONE normalisation: a target naming a node that
+    // descends means that machine's start. A private main-only copy here
+    // missed "iterations/i1" and wedged the walk at the sub's start.
+    if (here === this.routeAim(this._target)) this._target = "";
   }
 
   /** What the route search can see, beyond file content. Bumped wherever the
@@ -2127,11 +2126,16 @@ export class Session {
     for (const sub of this.subs) {
       if (sub.gen?.subGen?.[id] !== undefined) return [...this.viewChain(sub.decl.id), id];
     }
-    for (const cid of ["expedition_archive", "iteration_archive"]) {
+    for (const cid of Session.NESTING_CONTAINERS) {
       if (this.genFor(cid)?.subGen?.[id] !== undefined) return [this.machine.id, cid, id];
     }
     return [this.machine.id, id];
   }
+
+  /** Every container whose generated machine nests further generated ones.
+   *  The list once held only the archives, so BROWSING into an iteration
+   *  (the reader's click, walk elsewhere) fell back to the main drawing. */
+  private static readonly NESTING_CONTAINERS = ["iterations", "expeditions", "expedition_archive", "iteration_archive"] as const;
 
   /** Resolve ANY machine id to a viewable drawing: the walked stack
    *  first, then the top-level containers, then their nested generated
@@ -2146,7 +2150,7 @@ export class Session {
         return { decl: g.decl, canvas: g.canvas };
       }
     }
-    for (const cid of ["expedition_archive", "iteration_archive"]) {
+    for (const cid of Session.NESTING_CONTAINERS) {
       const nested = this.genFor(cid)?.subGen?.[id];
       if (nested !== undefined) {
         const g = nested();

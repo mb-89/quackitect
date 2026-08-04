@@ -327,6 +327,13 @@ test("no gate holds the first start — entering binds, stamps started, and M0 s
   await session.advance("iterations");
   await session.advance(sid);
   assert.deepEqual(session.breadcrumb(), ["main", "iterations", sid]);
+  // The target CLEARS on the descent — when it did not, the pull answered
+  // wait forever with the walk wedged at the sub's start.
+  session.setTarget(`iterations/${sid}`);
+  assert.equal(session.target, "", "arrival at a descending node clears the target");
+  // And a BROWSE resolves the iteration's machine with the walk elsewhere —
+  // the reader's click, which used to fall back to the main drawing.
+  assert.ok(new Session(root).viewFor(sid!) !== undefined, "browsing resolves the iteration's machine without a walk");
   await session.advance(); // start → onboard-retro: the retro stands FIRST
   const active = (session.describe() as { submachine?: { active: string[] } }).submachine?.active;
   assert.deepEqual(active, ["onboard-retro"]);
