@@ -168,10 +168,10 @@ export interface StateMeta {
  *  anchor all the same, which is what the owner called an invisible waypoint. */
 export function routeOverlay(
   steps: { from: string; to: string }[],
-  viewId: string,
-  mainId: string,
+  /** The view's QUALIFIED chain below main ("" is main). A nested machine
+   *  is "iterations/i1", never its bare leaf id — hops speak full chains. */
+  prefix: string,
 ): { waypoints: Set<string>; path: string[] } {
-  const prefix = viewId === mainId ? "" : viewId;
   const local = (q: string): string | undefined => {
     if (prefix === "") return q.split("/")[0];
     if (!q.startsWith(`${prefix}/`)) return undefined;
@@ -2947,11 +2947,11 @@ function drawingSets(
 function routeMarksFor(m: MirrorState, decl: MachineDecl): RouteMarks | undefined {
   try {
     const r = m.session.route(m.session.target);
-    const mainId = m.session.machine.id;
-    const { waypoints, path: hops } = routeOverlay(r.steps, decl.id, mainId);
+    const prefix = decl.id === m.session.machine.id ? "" : m.session.viewChain(decl.id).slice(1).join("/");
+    const { waypoints, path: hops } = routeOverlay(r.steps, prefix);
     const localOf = (q: string): string | undefined => {
-      if (decl.id === mainId) return q.split("/")[0];
-      return q.startsWith(`${decl.id}/`) ? q.slice(decl.id.length + 1).split("/")[0] : undefined;
+      if (prefix === "") return q.split("/")[0];
+      return q.startsWith(`${prefix}/`) ? q.slice(prefix.length + 1).split("/")[0] : undefined;
     };
     const shutAt = r.stops_at === undefined ? undefined : localOf(r.stops_at.at);
     return {
