@@ -627,6 +627,11 @@ const STYLE = `
   .sfrow input:focus { background: var(--se-hover); border-radius: 3px; }
   .sfrow select { flex: 0 0 auto; background: var(--se-bg); color: var(--se-fg); border: 1px solid var(--se-border); border-radius: 3px; font: inherit; font-size: 12.5px; padding: 3px 4px; }
   .sfrow .sfitem { flex: 0 0 44%; font-size: 12.5px; color: var(--se-muted); }
+  .sfrow .sfrowadd, .sfrow .sfrowdel { flex: 0 0 auto; background: none; border: 1px solid var(--se-border); color: var(--se-muted); border-radius: 3px; cursor: pointer; font-size: 11px; line-height: 16px; padding: 0 5px; }
+  .sfrow .sfrowadd:hover, .sfrow .sfrowdel:hover { color: var(--se-accent); border-color: var(--se-accent); }
+  /* The thumbs wear their meaning: green opens, red refuses. */
+  button.primary.blessform { background: var(--se-ok); border-color: var(--se-ok); }
+  button.primary.dismissform { background: var(--se-fail); border-color: var(--se-fail); }
   .expand { background: none; border: 1px solid var(--se-border-strong); color: var(--se-muted); border-radius: 6px; cursor: pointer; font: inherit; padding: 2px 8px; }
   .expand:hover { color: var(--se-accent); border-color: var(--se-accent); }
   /* THE CARD MATRIX (owner design 2026-07-29). One BIG card beside a two-wide
@@ -1499,7 +1504,7 @@ function sfEditor(fl, tm, args) {
   const name = escText(fl.name);
   const ph = escText(tm.placeholder || "");
   if (tm.editor === "list") {
-    return '<div class="sfrows">' + sfDash(fl.content).concat([""]).map(function (v) { return '<div class="sfrow"><input class="sfli" data-field="' + name + '" placeholder="' + ph + '" value="' + escText(v) + '"></div>'; }).join("") + "</div>";
+    return '<div class="sfrows">' + sfDash(fl.content).concat([""]).map(function (v) { return '<div class="sfrow"><input class="sfli" data-field="' + name + '" placeholder="' + ph + '" value="' + escText(v) + '">' + sfRowBtns() + "</div>"; }).join("") + "</div>";
   }
   if (tm.editor === "per-item" && (args.items || []).length > 0) {
     return '<div class="sfrows">' + args.items.map(function (it) {
@@ -1518,9 +1523,12 @@ function sfEditor(fl, tm, args) {
   }
   if (tm.editor === "findings") {
     const pairs = sfDash(fl.content).filter(function (l) { return l.indexOf(" => ") >= 0; }).map(function (l) { const i = l.indexOf(" => "); return { f: l.slice(0, i), a: l.slice(i + 4) }; });
-    return '<div class="sfrows">' + pairs.concat([{ f: "", a: "" }]).map(function (p) { return '<div class="sfrow"><input class="sfff" data-field="' + name + '" placeholder="finding" value="' + escText(p.f) + '"><span class="meta">=&gt;</span><input class="sffa" data-field="' + name + '" placeholder="answer — fix, rebuttal, or accepted risk" value="' + escText(p.a) + '"></div>'; }).join("") + "</div>";
+    return '<div class="sfrows">' + pairs.concat([{ f: "", a: "" }]).map(function (p) { return '<div class="sfrow"><input class="sfff" data-field="' + name + '" placeholder="finding" value="' + escText(p.f) + '"><span class="meta">=&gt;</span><input class="sffa" data-field="' + name + '" placeholder="answer — fix, rebuttal, or accepted risk" value="' + escText(p.a) + '">' + sfRowBtns() + "</div>"; }).join("") + "</div>";
   }
   return '<textarea class="formfield" data-field="' + name + '" placeholder="' + escText(fl.description || "") + '">' + escText(fl.content || "") + "</textarea>";
+}
+function sfRowBtns() {
+  return '<button type="button" class="sfrowadd" title="add a row below">+</button><button type="button" class="sfrowdel" title="remove this row">−</button>';
 }
 // A collapsible box — the same truth, folded for a narrow pane.
 function sfBox(title, inner, open) {
@@ -1584,18 +1592,6 @@ document.addEventListener("change", function (ev) {
     const labels = [];
     document.querySelectorAll('.sfcheck[data-form="' + cb.dataset.form + '"]').forEach(function (x) { if (x.checked) labels.push(x.dataset.label); });
     void formPost("/form/save", { name: cb.dataset.form, fields: { inputs_checked: labels.join("\\n") }, machine: cb.dataset.machine || viewedMachine() });
-    return;
-  }
-  // A list or findings table grows as its last row fills — quietly, in
-  // place, without a re-render that would steal the reader's spot.
-  const gr = ev.target.closest ? ev.target.closest(".sfli, .sfff, .sffa") : null;
-  if (gr && gr.value.trim() !== "") {
-    const row = gr.closest(".sfrow");
-    if (row && !row.nextElementSibling) {
-      const clone = row.cloneNode(true);
-      clone.querySelectorAll("input").forEach(function (i) { i.value = ""; });
-      row.parentElement.appendChild(clone);
-    }
   }
 });
 // ENTER ADDS THE NEXT ROW, right below the one being edited.
@@ -1708,6 +1704,23 @@ document.addEventListener("click", async (ev) => {
   if (bl) {
     await formPost("/form/bless", { name: bl.dataset.form, ok: bl.classList.contains("blessform"), machine: bl.dataset.machine || viewedMachine() });
     showFormAgain(bl.dataset.form, bl.dataset.machine);
+    return;
+  }
+  const ra = ev.target.closest ? ev.target.closest(".sfrowadd") : null;
+  if (ra) {
+    const row = ra.closest(".sfrow");
+    const clone = row.cloneNode(true);
+    clone.querySelectorAll("input").forEach(function (i) { i.value = ""; });
+    row.after(clone);
+    const first = clone.querySelector("input");
+    if (first) first.focus();
+    return;
+  }
+  const rd = ev.target.closest ? ev.target.closest(".sfrowdel") : null;
+  if (rd) {
+    const row = rd.closest(".sfrow");
+    // The last row stays — an empty list still needs its one editor.
+    if (row && row.parentElement && row.parentElement.querySelectorAll(".sfrow").length > 1) row.remove();
     return;
   }
   const sv = ev.target.closest ? ev.target.closest(".saveform") : null;

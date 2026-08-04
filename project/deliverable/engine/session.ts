@@ -180,6 +180,7 @@ export class Session {
     try {
       const s = JSON.parse(readFileSync(join(seDir(root), "settings.json"), "utf8")) as {
         autonomy?: number;
+        emergency?: boolean;
         block_sleep?: boolean;
         shutdown_at_idle?: boolean;
         narration_minutes?: number;
@@ -189,6 +190,8 @@ export class Session {
       const mine = process.env.SE_SESSION;
       if (mine !== undefined && mine !== "" && s.session === mine) {
         if (typeof s.autonomy === "number" && s.autonomy >= 0 && s.autonomy <= 1) this._autonomy = s.autonomy;
+        // Emergency rides its rung: restored only beside a top-rung autonomy.
+        if (s.emergency === true && this._autonomy >= 1) this._emergency = true;
         if (typeof s.block_sleep === "boolean") this._blockSleep = s.block_sleep;
         if (typeof s.shutdown_at_idle === "boolean") this._shutdownAtIdle = s.shutdown_at_idle;
         if (typeof s.narration_minutes === "number" && Number.isInteger(s.narration_minutes) && s.narration_minutes >= 0)
@@ -211,6 +214,7 @@ export class Session {
         `${JSON.stringify({
           session: process.env.SE_SESSION ?? null,
           autonomy: this._autonomy,
+          emergency: this._emergency,
           block_sleep: this._blockSleep,
           shutdown_at_idle: this._shutdownAtIdle,
           narration_minutes: this._narrationMinutes,
@@ -614,8 +618,11 @@ export class Session {
    * IT IS NOT ADVERTISED. It rides the packet only when it is ON, so nothing
    * about the resting state hints that it exists.
    *
-   * IT DOES NOT PERSIST. A new engine life starts without it. An emergency
-   * that survives a restart unannounced is a gate quietly missing.
+   * IT PERSISTS WITH ITS RUNG (owner ruling 2026-08-04, reversing the
+   * earlier no-persist law): engine reloads are routine mid-session, and
+   * each one silently revoked the very delegation the fixes were granted
+   * under. It restores only beside a persisted TOP-RUNG autonomy, and
+   * lowering the dial still revokes it — in this life and the next.
    */
   private _emergency = false;
 
@@ -635,6 +642,7 @@ export class Session {
     }
     const was = this._emergency;
     this._emergency = on;
+    this.persistSettings();
     this.notifyChange();
     return { emergency: on, was };
   }
