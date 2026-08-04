@@ -13,7 +13,7 @@ import { helpFor } from "./baseui.ts";
 import type { CallLog } from "./calllog.ts";
 import { loadCards } from "./cards.ts";
 import { replayVisitsText } from "./decisions.ts";
-import { Rejection } from "./errors.ts";
+import { CLAUSES, Rejection } from "./errors.ts";
 import { appendNote, pendingNotes, readNotes } from "./inbox.ts";
 import { bumpDrawingEpoch } from "./machines/compile.ts";
 import { handleHttp, type McpServer } from "./mcp.ts";
@@ -38,6 +38,14 @@ export interface MirrorOptions {
 export function startMirror(o: MirrorOptions): Server {
   const state: MirrorState = { session: o.session, root: o.root, lastPacket: undefined, mode: o.mode, log: o.log };
 
+  // THE READER'S SELECTION, mirrored server-side: the machine page reports
+  // which state's details are open, so a control in ANOTHER surface (the
+  // sidebar's SET TARGET) can act on it. View state, like a pane size.
+  let selected = "";
+  // The newest person-pull: the seq bumps, the ref names the log record —
+  // every surface lands the answer in its details from this.
+  let lastPull: { seq: number; ref: string } | undefined;
+
   /** What the page watches: position, the two sliders, and a growth signal
    *  for the feed. One shape, served both as a poll and as a pushed event. */
   const aliveState = (): Record<string, unknown> => ({
@@ -57,6 +65,7 @@ export function startMirror(o: MirrorOptions): Server {
     acts: existsSync(o.log.path) ? statSync(o.log.path).size : 0,
     // The agent's pointing finger — the page pulses the target on a new seq.
     ...(state.session.ping === undefined ? {} : { ping: state.session.ping }),
+    ...(lastPull === undefined ? {} : { last_pull: lastPull }),
   });
 
   /** Collect a JSON body, run the handler (results may be async — script
@@ -173,6 +182,23 @@ export function startMirror(o: MirrorOptions): Server {
       }),
     ],
     "/target": ["mirror_target", (body) => ({ args: { to: body.to }, result: state.session.setTarget(String(body.to ?? "")) })],
+    // SET TARGET, the bar's button (owner design 2026-08-04): aims at the
+    // SELECTED state — the one whose details the machine page reported.
+    "/target/selected": [
+      "mirror_target",
+      () => {
+        if (selected === "") {
+          throw new Rejection({
+            clause: CLAUSES.REQUIRED_ARGS,
+            expected: "a selected state — click one in the machine view first; its details showing is what selected means",
+            got: "no selection",
+            remedy: { tool: "se_pull", args: {}, note: "or aim directly: POST /target {to}" },
+            source: "engine/mirror.ts",
+          });
+        }
+        return { args: { to: selected }, result: state.session.setTarget(selected) };
+      },
+    ],
     "/escape": [
       "mirror_escape",
       (body) => ({ args: { reason: body.reason }, result: state.session.escape(String(body.reason ?? ""), "human") }),
@@ -196,8 +222,9 @@ export function startMirror(o: MirrorOptions): Server {
     req: Req,
     res: Res,
     tool: string,
-    apply: (body: Body) => { args: Body; run: () => { log: unknown; answer: unknown } },
+    apply: (body: Body) => { args: Body; run: () => { log: unknown; answer: unknown } | Promise<{ log: unknown; answer: unknown }> },
     onError: (e: unknown) => unknown,
+    onLogged?: (rec: { ref: string }) => void,
   ): void => {
     const chunks: Buffer[] = [];
     req.on("data", (c: Buffer) => chunks.push(c));
@@ -211,21 +238,64 @@ export function startMirror(o: MirrorOptions): Server {
         body = {};
       }
       res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
-      try {
-        const a = apply(body);
-        args = a.args;
-        const r = a.run();
-        o.log.append({ tool, args, ok: true, outcome: "result", duration_ms: Date.now() - started, response: r.log });
-        res.end(JSON.stringify(r.answer));
-      } catch (e) {
-        const payload = e instanceof Rejection ? e.toJSON() : { error: whyOf(e) };
-        o.log.append({ tool, args, ok: false, outcome: "rejected", duration_ms: Date.now() - started, response: payload });
-        res.end(JSON.stringify(onError(e)));
-      }
+      void (async () => {
+        try {
+          const a = apply(body);
+          args = a.args;
+          const r = await a.run();
+          const rec = o.log.append({ tool, args, ok: true, outcome: "result", duration_ms: Date.now() - started, response: r.log });
+          if (onLogged !== undefined) onLogged(rec);
+          res.end(JSON.stringify(r.answer));
+        } catch (e) {
+          const payload = e instanceof Rejection ? e.toJSON() : { error: whyOf(e) };
+          o.log.append({ tool, args, ok: false, outcome: "rejected", duration_ms: Date.now() - started, response: payload });
+          res.end(JSON.stringify(onError(e)));
+        }
+      })();
     });
   };
 
   const jsonPosts: Record<string, (req: Req, res: Res) => void> = {
+    // THE READER'S SELECTION — view state. Logged like every call, but the
+    // feed skips it (feedRows), so reading the machine stays quiet.
+    "/selected": (req, res) =>
+      jsonPost(
+        req,
+        res,
+        "mirror_select",
+        (body) => {
+          const s = String(body.state ?? "");
+          return {
+            args: { state: s },
+            run: () => {
+              selected = s;
+              return { log: { selected: s }, answer: { ok: true } };
+            },
+          };
+        },
+        (e) => ({ ok: false, error: whyOf(e) }),
+      ),
+    // THE PERSON'S PULL (owner design 2026-08-04): the same five
+    // instructions the agent gets, on the human channel — no slider gate,
+    // no reading loop; checkboxes are the person's proof. The answer is
+    // logged, and last_pull points every surface at it.
+    "/pull": (req, res) =>
+      jsonPost(
+        req,
+        res,
+        "mirror_pull",
+        (body) => ({
+          args: { payload: body },
+          run: async () => {
+            const result = await state.session.pull(body as { form?: Record<string, unknown>; escape?: string }, "human");
+            return { log: result, answer: result };
+          },
+        }),
+        (e) => (e instanceof Rejection ? e.toJSON() : { error: String(e) }),
+        (rec) => {
+          lastPull = { seq: (lastPull?.seq ?? 0) + 1, ref: rec.ref };
+        },
+      ),
     // THE PARITY LAW: a state's tools, the human's hand — same gate.
     // Answers JSON (no redirect): the modal shows the result in place.
     "/tool": (req, res) =>

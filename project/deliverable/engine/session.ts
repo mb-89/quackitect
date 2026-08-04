@@ -1865,7 +1865,7 @@ export class Session {
     //    documents to prepare for a step it was never allowed to take, and
     //    only then told it to stop. Nothing is owed for a step that is not
     //    the agent's.
-    if (first.priority > this._autonomy) {
+    if (channel === "agent" && first.priority > this._autonomy) {
       return {
         pull: "wait",
         ...head(),
@@ -1877,8 +1877,10 @@ export class Session {
       };
     }
 
-    // 3. THE READING, served here rather than sent somewhere else.
-    const served = this.serveReading();
+    // 3. THE READING, served here rather than sent somewhere else. It is
+    //    the AGENT's proof; the person proves by checkbox, so their pull
+    //    never eats a document.
+    const served = channel === "agent" ? this.serveReading() : null;
     if (served !== null) {
       return {
         pull: "read",

@@ -153,3 +153,27 @@ core package is pure JavaScript. A wrong capability claim steers a whole
 design before anyone checks it.
 
 Cite where the capability is documented when a decision rests on it.
+
+## Adding a control to the bar (owner ruling 2026-08-04)
+
+The bar's one truth is `project/deliverable/machines/panels/controls.md`.
+The renderer is `engine/params.ts`. Every surface fetches the rendered bar
+from the engine (`/widget/controls`) — the VS Code sidebar included.
+
+- ONE ROW PER CONTROL. The row starts with its label; the controls follow.
+  The Types section in controls.md lists what a row may declare.
+- NEVER write bar markup in a surface. A surface that drew its own copy
+  drifted silently, and it cost the owner corrections. The spec is the
+  only place a control is born.
+- A BUTTON POSTS A ROUTE. Give it `data-post` (the `action` and `actions`
+  types do); the sidebar forwards any such press with no extension edit.
+- THE LABEL EXPLAINS ITSELF ON CLICK. The renderer puts the row's help
+  into `data-help` on the label; the surfaces' one generic hook shows it
+  in the details. No per-row help wiring, ever.
+- WHAT SHOWS UP IN VS CODE: engine-served surfaces (the bar, the machine
+  page, the widgets) change live with the engine. The EXTENSION does not
+  — VS Code runs the COPY under `~/.vscode/extensions`. After an
+  extension edit: `npm run build` in project/deliverable, robocopy
+  `vscode/` over the copy (RUNME's own step), reload the VS Code window.
+- Adding a control therefore means: a row in controls.md, at most a new
+  type in params.ts — and NO extension edit in the normal case.

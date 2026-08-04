@@ -463,6 +463,7 @@ function framePage(url) {
     if (d.se === "open") { vsapi.postMessage(d); return; }
     if (d.se === "trace") { vsapi.postMessage(d); return; } // the page reporting what it just did
     if (d.se === "details") { vsapi.postMessage(d); return; } // a click in THIS card, bound for the details group
+    if (d.se === "open-form") { vsapi.postMessage(d); return; } // a form wants its own panel
     if (d.se === "theme-changed") { sendTheme(); return; }
     if (d.se === "up") { show(); return; }
     if (d.se === "wake") { if (loaded && frame.contentWindow) frame.contentWindow.postMessage(d, "*"); return; }
@@ -601,6 +602,29 @@ function onWebviewMessage(m) {
   if (m.se === "open") openInEditor(m.path);
   else if (m.se === "busy") setBusy(m.on === true, String(m.label ?? ""));
   else if (m.se === "details") void showHelp(m.title, m.html, false);
+  else if (m.se === "open-form") openFormPanel(String(m.name ?? ""));
+}
+async function handleBarHelp(m) {
+  if (m.se === "field-help") {
+    await showFieldHelp(m.which);
+    return true;
+  }
+  if (m.se === "scale-help") {
+    await showScaleHelp(m.which, m.level);
+    return true;
+  }
+  if (m.se === "row-help") {
+    const safe = String(m.text ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;");
+    await showHelp(String(m.label ?? "row"), `<p>${safe}</p>`, false);
+    return true;
+  }
+  return false;
+}
+function openFormPanel(name) {
+  if (name === "") return;
+  const panel = vscode.window.createWebviewPanel("seForm", `form \xB7 ${name}`, vscode.ViewColumn.Beside, { enableScripts: true });
+  const src = `${SERVER}/widget/details?embed=1&detail=${encodeURIComponent(`form:${name}`)}`;
+  panel.webview.html = `<!doctype html><html><body style="margin:0;padding:0;height:100vh"><iframe src="${src}" style="border:0;width:100%;height:100%"></iframe></body></html>`;
 }
 var Surface = class {
   constructor(page) {
@@ -1002,7 +1026,11 @@ var Controls = class {
       return;
     }
     if (t.closest(".thr-help") !== null) { vsapi.postMessage({ se: "scale-help", which: "autonomy" }); return; }
-    if (t.closest(".nr-help") !== null) vsapi.postMessage({ se: "scale-help", which: "narration" });
+    if (t.closest(".nr-help") !== null) { vsapi.postMessage({ se: "scale-help", which: "narration" }); return; }
+    // GENERIC ROW HELP: every labelled row explains itself on click. The
+    // help text rides the label, so a new row needs no branch here.
+    const rowLbl = t.closest(".param-label[data-help]");
+    if (rowLbl !== null) vsapi.postMessage({ se: "row-help", label: rowLbl.textContent, text: rowLbl.dataset.help });
   });
 
   // THE LOG'S TWO LINE EDITS ARE PANEL PARAMETERS NOW, so they arrive inside
@@ -1072,14 +1100,7 @@ var Controls = class {
         await pollLog();
         return;
       }
-      if (m.se === "field-help") {
-        await showFieldHelp(m.which);
-        return;
-      }
-      if (m.se === "scale-help") {
-        await showScaleHelp(m.which, m.level);
-        return;
-      }
+      if (await handleBarHelp(m)) return;
       if (m.se === "autonomy") await post("/autonomy", { value: m.value });
       else if (m.se === "emergency") {
         await post("/autonomy", { value: 1 });

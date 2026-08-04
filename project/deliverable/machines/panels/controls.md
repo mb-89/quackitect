@@ -26,6 +26,9 @@ a person edits it in the real world, and Obsidian reads it.
 - `toggles` — independent on/off buttons, any combination on at once. Fields:
   one per button, each the button's label. Not a `choice`: a choice is one of
   a set, and these do not exclude each other.
+- `actions` — a bank of one-shot buttons: caption then route, repeated.
+  Each press posts its route and nothing else. Not an `action`: an action
+  joins the row above, and a bank IS its own row, label first.
 
 A type this renderer does not know is a REFUSAL, not a guess. That is the
 whole point: the drawing decides, and an unlisted widget cannot appear by
@@ -47,6 +50,7 @@ screen twice, which is the same two-drawings fault the sliders had.
 ## Parameters
 
 - autonomy | rungs | scale | what the agent may decide alone — each rung is a kind of work, and every rung below it comes with it
+- walk | actions | SET TARGET | /target/selected | PULL | /pull | drive the walk by hand — SET TARGET aims at the state whose details are open; PULL advances one instruction, and the answer lands in the details
 - updates | int | narration_minutes | min | 0 | 1440 | an update every n minutes at least — 0 stops this clock
 - | int | narration_calls | calls | 0 | 1440 | an update every n calls at least — 0 stops this clock
 - NOW | action | /narration-now | force an update at the next possibility

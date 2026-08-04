@@ -79,13 +79,17 @@ describe("parameter panels", { concurrency: true }, () => {
     assert.ok(params.length >= 4, "the panel declares its parameters");
     assert.deepEqual(
       params.map((p) => p.type),
-      ["rungs", "int", "int", "action", "text", "toggles"],
+      ["rungs", "actions", "int", "int", "action", "text", "toggles"],
     );
     const html = renderPanel(params, VALUES);
     assert.match(html, /class="rung on" data-level="0"/, "the lowest lit rung releases to blocked");
     assert.match(html, /id="narration-minutes"[^>]*value="5"/);
     assert.match(html, /id="narration-calls"[^>]*value="20"/);
     assert.match(html, /class="rung param-action" data-post="\/narration-now"/);
+    // The walk row (owner design 2026-08-04): one row, label first, two
+    // one-shot buttons — aim at the selected state, and the person's pull.
+    assert.match(html, /class="rung param-action" data-post="\/target\/selected"/);
+    assert.match(html, /class="rung param-action" data-post="\/pull"/);
     assert.doesNotMatch(html, /type="range"/, "a spec cannot produce a slider");
     // The shutdown row: two buttons that do not exclude each other, which is
     // why it is `toggles` and not `choice`.

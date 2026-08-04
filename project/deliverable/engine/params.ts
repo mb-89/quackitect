@@ -129,6 +129,18 @@ function renderAction(p: Param): string {
   return `<button type="button" class="rung param-action" data-post="${esc(p.fields[0] ?? "")}" title="${esc(p.help)}">${esc(p.name)}</button>`;
 }
 
+/** A BANK OF ONE-SHOT BUTTONS — caption and route, in pairs. Toggles'
+ *  shape, but stateless: each press posts its route and nothing else. */
+function renderActions(p: Param): string {
+  const buttons: string[] = [];
+  for (let i = 0; i + 1 < p.fields.length; i += 2) {
+    buttons.push(
+      `<button type="button" class="rung param-action" data-post="${esc(p.fields[i + 1])}" title="${esc(p.fields[i])} — ${esc(p.help)}">${esc(p.fields[i])}</button>`,
+    );
+  }
+  return `<span class="actions">${buttons.join("")}</span>`;
+}
+
 /**
  * A LINE OF TEXT, with an optional SEPARATOR the value must contain.
  * The separator is not decoration: a note carries a title and a body, and the
@@ -184,8 +196,11 @@ function renderChoice(p: Param, v: PanelValues): string {
 function rowLabel(p: Param): string {
   if (p.name === "") return "";
   const help = p.type === "rungs" ? " thr-help" : p.type === "int" ? " nr-help" : "";
-  const title = help === "" ? "" : ' title="click: the scale, explained in details"';
-  return `<span class="param-label${help}"${title}>${esc(p.name)}</span>`;
+  // EVERY label explains itself on click: the help rides the element, so a
+  // surface needs ONE generic hook rather than a class per row.
+  const data = p.help === "" ? "" : ` data-help="${esc(p.help)}"`;
+  const title = ' title="click: what this row does, explained in details"';
+  return `<span class="param-label${help}"${data}${title}>${esc(p.name)}</span>`;
 }
 
 export function renderPanel(params: Param[], v: PanelValues): string {
@@ -197,6 +212,8 @@ export function renderPanel(params: Param[], v: PanelValues): string {
         return renderInt(p, v);
       case "action":
         return renderAction(p);
+      case "actions":
+        return renderActions(p);
       case "text":
         return renderText(p, v);
       case "choice":
@@ -206,7 +223,7 @@ export function renderPanel(params: Param[], v: PanelValues): string {
       default:
         throw new Rejection({
           clause: CLAUSES.REQUIRED_ARGS,
-          expected: "a parameter type the renderer knows: rungs, int, action, text, choice, toggles",
+          expected: "a parameter type the renderer knows: rungs, int, action, actions, text, choice, toggles",
           got: `${p.type} (parameter "${p.name}")`,
           remedy: {
             tool: "se_file_read",

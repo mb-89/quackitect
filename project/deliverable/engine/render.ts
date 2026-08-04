@@ -475,7 +475,8 @@ export function feedRows(
   pending: StrayNote[] = [],
 ): { capped: boolean; rows: Array<Record<string, unknown>> } {
   const q = log.query({ filter: { since }, limit: 501 });
-  const records = q.records ?? [];
+  // The reader's selection is view state — logged, never shown as a feed row.
+  const records = (q.records ?? []).filter((r) => r.tool !== "mirror_select");
   const capped = records.length > 500;
   const rows = records.slice(-500).map((rec) => ({
     ref: rec.ref,
@@ -1340,7 +1341,13 @@ window.addEventListener("message", (ev) => {
   // has no room to explain itself, so what an icon means arrives HERE, in
   // the details pane, the one place the reader already looks for meaning.
   // The host saw the walk move. Embedded, this replaces the event stream.
-  if (d.se === "wake") { refresh(); return; }
+  if (d.se === "wake") {
+    // No event stream in a frame — the wake stands in for it, so the same
+    // alive-driven work (the pull landing above all) runs here too.
+    void fetch("/api/alive").then((r) => r.json()).then((a) => applyAlive(a)).catch(() => {});
+    refresh();
+    return;
+  }
   if (d.se === "help") { hostTrace("page got help"); showDetails(d.title, d.html); hostAck(); return; }
   // A LOG LINE CLICKED IN THE HOST'S TERMINAL. The record is rendered HERE,
   // by the same code the mirror uses, so a host never grows a second
@@ -1461,12 +1468,18 @@ function condDetail(id) {
 // as textareas, each unconfirmed prefill with its OWN confirm button (the
 // prefill law: one confirmation per prefill, never in bulk), the evidence
 // folder one click away, done runs the same lint the agent's tick runs.
-async function showForm(name) {
+// A form renders into the MODAL by default; "details" pins it to the
+// details surface instead — which is what a detached form window is.
+function presentForm(name, into, title, html) {
+  if (into === "details") { CURRENT_DETAIL = "form:" + name; showDetails(title, html); return; }
+  openModal(title, html);
+}
+async function showForm(name, into) {
   const r = await fetch("/api/form?name=" + encodeURIComponent(name));
   const f = await r.json();
   if (f.kind === "rejected" || f.error) {
     // Plain words at the human — never raw rejection JSON.
-    openModal("form · " + name,
+    presentForm(name, into, "form · " + name,
       '<div class="comment-detail">' + escText(f.expected || f.error || "") + "</div>" +
       '<div class="meta">' + escText(f.got || "") + "</div>" +
       (f.remedy && f.remedy.note ? '<div class="comment-text">' + escText(f.remedy.note) + "</div>" : ""));
@@ -1493,7 +1506,12 @@ async function showForm(name) {
     if (f.problems && f.problems.length) html += '<div style="color:var(--se-accent);padding:6px 0">' + f.problems.map(escText).join("<br>") + "</div>";
     html += '<div style="padding:10px 0"><button class="primary saveform" data-form="' + name + '">save</button> <button class="primary doneform" data-form="' + name + '" title="sets status done and runs the lint">done</button></div>';
   }
-  openModal("form · " + name, html);
+  presentForm(name, into, "form · " + name, html);
+}
+// A save or confirm re-renders the form WHERE IT STANDS — the modal, or
+// the details surface a detached window is pinned to.
+function showFormAgain(name) {
+  void showForm(name, CURRENT_DETAIL === "form:" + name ? "details" : undefined);
 }
 async function formPost(path, body) {
   await fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
@@ -1502,13 +1520,13 @@ document.addEventListener("click", async (ev) => {
   const of = ev.target.closest ? ev.target.closest(".openform") : null;
   if (of) { void showForm(of.dataset.form); return; }
   const cp = ev.target.closest ? ev.target.closest(".confirmpre") : null;
-  if (cp) { await formPost("/form/confirm", { name: cp.dataset.form, field: cp.dataset.field, index: Number(cp.dataset.index) }); void showForm(cp.dataset.form); return; }
+  if (cp) { await formPost("/form/confirm", { name: cp.dataset.form, field: cp.dataset.field, index: Number(cp.dataset.index) }); showFormAgain(cp.dataset.form); return; }
   const sv = ev.target.closest ? ev.target.closest(".saveform") : null;
   if (sv) {
     const fields = {};
     document.querySelectorAll(".formfield").forEach((t) => { fields[t.dataset.field] = t.value; });
     await formPost("/form/save", { name: sv.dataset.form, fields });
-    void showForm(sv.dataset.form);
+    showFormAgain(sv.dataset.form);
     return;
   }
   const dn2 = ev.target.closest ? ev.target.closest(".doneform") : null;
@@ -1517,7 +1535,7 @@ document.addEventListener("click", async (ev) => {
     document.querySelectorAll(".formfield").forEach((t) => { fields[t.dataset.field] = t.value; });
     await formPost("/form/save", { name: dn2.dataset.form, fields });
     await formPost("/form/done", { name: dn2.dataset.form });
-    void showForm(dn2.dataset.form);
+    showFormAgain(dn2.dataset.form);
     return;
   }
   const ofo = ev.target.closest ? ev.target.closest(".openfolder") : null;
@@ -1527,10 +1545,15 @@ document.addEventListener("click", async (ev) => {
 async function openDoc(path, returnKey) {
   const r = await fetch("/doc?path=" + encodeURIComponent(path));
   const d = await r.json();
-  showDetails(path, '<div style="padding:2px 0 10px"><button class="ghost back" data-return="' + returnKey + '">‹ back</button></div><div class="docview">' + d.html + "</div>");
+  // The subject is recorded, so a detached details window shows THIS
+  // document rather than whatever was clicked before it.
+  CURRENT_DETAIL = "doc:" + path;
+  showDetails(path, '<div style="padding:2px 0 10px"><button class="ghost back" data-return="' + (returnKey || "comment") + '">‹ back</button></div><div class="docview">' + d.html + "</div>");
 }
 function detailFor(key) {
   if (key.startsWith("log:")) { void openLogDetail(key.slice(4)); return ["log entry", '<div class="meta">loading…</div>']; }
+  if (key.startsWith("doc:")) { void openDoc(key.slice(4), "comment"); return [key.slice(4), '<div class="meta">loading…</div>']; }
+  if (key.startsWith("form:")) { void showForm(key.slice(5), "details"); return ["form · " + key.slice(5), '<div class="meta">loading…</div>']; }
   if (key.startsWith("cond:")) return condDetail(key.slice(5));
   if (key === "comment") {
     const txt = (D.comment || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");
@@ -1555,7 +1578,13 @@ document.addEventListener("click", (ev) => {
   document.querySelectorAll(".crumb-arrow.open").forEach((a) => { if (a !== arrow) a.classList.remove("open"); });
   if (arrow) { arrow.classList.toggle("open"); return; }
   const g = ev.target.closest ? ev.target.closest(".clickable") : null;
-  if (g && g.dataset.detail) { CURRENT_DETAIL = g.dataset.detail; const [t, h] = detailFor(g.dataset.detail); showDetails(t, h); }
+  if (g && g.dataset.detail) {
+    CURRENT_DETAIL = g.dataset.detail;
+    // The engine mirrors the selection, so a control in ANOTHER surface
+    // (the sidebar's SET TARGET) can act on the state whose details show.
+    if (g.dataset.detail.startsWith("state:")) void fetch("/selected", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: g.dataset.detail.slice(6) }) });
+    const [t, h] = detailFor(g.dataset.detail); showDetails(t, h);
+  }
 });
 // Double-click a sub-machine state: enter it as a VIEWER (walk unmoved).
 document.addEventListener("dblclick", (ev) => {
@@ -2279,32 +2308,12 @@ let pollBusy = null;
 let ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
 let sawError = false;
 let deathTimer = null;
-// A frozen window never opens the stream — that is the whole of freezing.
-//
-// AND NEITHER DOES AN EMBEDDED CARD. A browser allows only a handful of
-// connections to one host, and a permanent event stream per card ate one
-// each. Past that limit EVERY other request to the engine queues instead of
-// going out — so a click did nothing at all, and then four minutes later the
-// whole backlog arrived at once. The host polls the engine over its own
-// runtime, where no such limit applies, and wakes the cards through the
-// channel they already have.
-if (!FROZEN && window.parent === window) {
-const es = new EventSource("/events");
-es.addEventListener("open", () => {
-  if (deathTimer !== null) { clearTimeout(deathTimer); deathTimer = null; }
-  linkLost(false);
-  if (sawError) { sawError = false; refresh(); }
-});
-es.addEventListener("error", () => {
-  sawError = true;
-  linkLost(true);
-  // Long enough that an ordered reload reconnects inside it, short enough
-  // that a reader who quit is not left guessing.
-  if (deathTimer === null) deathTimer = setTimeout(() => sessionOver("the server stopped answering — the session it served is gone"), 10000);
-});
-es.addEventListener("message", (ev) => {
-  let a;
-  try { a = JSON.parse(ev.data); } catch (e) { return; }
+// The newest person-pull already landed; null until the first alive adopts
+// the standing value, so a page load never replays an old pull.
+let lastPullSeq = null;
+// ONE alive-driven pass, shared by the event stream and the host's wake —
+// an embedded page has no stream, and this is everything it would miss.
+function applyAlive(a) {
   if (a.status === "closed") { sessionOver("the machine reached end — the walk is complete"); return; }
   if (a.gone) { sessionOver("the console quit — the server has stopped, the walk was left standing"); return; }
   // Emergency is drawn from the engine, so a second surface cannot disagree
@@ -2333,6 +2342,22 @@ es.addEventListener("message", (ev) => {
   // mid-sentence — the ping outlives the DOM that carried it.
   else if (litTarget !== null && !document.querySelector(".se-ping, .se-ping-svg")) applyPing();
   if (logPanel && a.acts !== lastActs) { lastActs = a.acts; refreshLog(); }
+  // THE PERSON PULLED (owner design 2026-08-04): the answer lands in the
+  // details, and a form the walk owes gets a panel of its own — the inline
+  // details pane is ephemeral on purpose.
+  if (lastPullSeq === null) lastPullSeq = a.last_pull ? a.last_pull.seq : 0;
+  else if (a.last_pull && a.last_pull.seq !== lastPullSeq) {
+    lastPullSeq = a.last_pull.seq;
+    CURRENT_DETAIL = "log:" + a.last_pull.ref;
+    void openLogDetail(a.last_pull.ref);
+    void fetch("/api/log?ref=" + encodeURIComponent(a.last_pull.ref)).then((r) => r.json()).then((rec) => {
+      const resp = rec && rec.response;
+      const first = resp && resp.pull === "fill" && resp.forms && resp.forms[0];
+      if (!first || !first.form) return;
+      if (window.parent !== window) window.parent.postMessage({ se: "open-form", name: first.form }, "*");
+      else window.open("/widget/details?detail=" + encodeURIComponent("form:" + first.form), "_blank", "popup,width=760,height=900");
+    }).catch(() => {});
+  }
   if (JSON.stringify(a.active || []) !== ACTIVE_AT_RENDER) { refresh(); return; }
   // A script run finishing elsewhere (agent tick, other window) lands its
   // result — refresh, keeping the open pane.
@@ -2344,6 +2369,34 @@ es.addEventListener("message", (ev) => {
   else if (a.busy === false && pollBusy === true) hideLoading();
   if (pollBusy === true && a.busy === false) { refresh(); return; }
   pollBusy = a.busy;
+}
+// A frozen window never opens the stream — that is the whole of freezing.
+//
+// AND NEITHER DOES AN EMBEDDED CARD. A browser allows only a handful of
+// connections to one host, and a permanent event stream per card ate one
+// each. Past that limit EVERY other request to the engine queues instead of
+// going out — so a click did nothing at all, and then four minutes later the
+// whole backlog arrived at once. The host polls the engine over its own
+// runtime, where no such limit applies, and wakes the cards through the
+// channel they already have.
+if (!FROZEN && window.parent === window) {
+const es = new EventSource("/events");
+es.addEventListener("open", () => {
+  if (deathTimer !== null) { clearTimeout(deathTimer); deathTimer = null; }
+  linkLost(false);
+  if (sawError) { sawError = false; refresh(); }
+});
+es.addEventListener("error", () => {
+  sawError = true;
+  linkLost(true);
+  // Long enough that an ordered reload reconnects inside it, short enough
+  // that a reader who quit is not left guessing.
+  if (deathTimer === null) deathTimer = setTimeout(() => sessionOver("the server stopped answering — the session it served is gone"), 10000);
+});
+es.addEventListener("message", (ev) => {
+  let a;
+  try { a = JSON.parse(ev.data); } catch (e) { return; }
+  applyAlive(a);
 });
 }
 
