@@ -1412,7 +1412,7 @@ window.addEventListener("message", (ev) => {
     refresh();
     return;
   }
-  if (d.se === "help") { hostTrace("page got help"); showDetails(d.title, d.html); hostAck(); return; }
+  if (d.se === "help") { hostTrace("page got help"); LAST_RELAY = { title: d.title, html: d.html }; CURRENT_DETAIL = "relay"; showDetails(d.title, d.html); hostAck(); return; }
   // A LOG LINE CLICKED IN THE HOST'S TERMINAL. The record is rendered HERE,
   // by the same code the mirror uses, so a host never grows a second
   // renderer for what this page already knows how to draw.
@@ -1554,6 +1554,7 @@ function sfOne(f, fl) {
   let s = '<div style="border:1px solid var(--se-line,#888);border-radius:4px;padding:7px 10px;margin:7px 0">';
   s += '<span style="float:right;font-size:11.5px;color:var(--se-accent)">template: ' + escText(tpl) + "</span>";
   s += "<b>" + escText(fl.name) + "</b>" + (fl.required ? ' <span style="color:var(--se-fail);font-size:11px">required</span>' : ' <span class="meta">optional</span>');
+  if (fl.guidance) s += '<div class="meta" style="font-style:italic">' + escText(fl.guidance) + "</div>";
   // Free text carries its ask as the PLACEHOLDER; the structured editors
   // keep the description above, because their rows replace the empty box.
   if ((tm.editor || "text") !== "text") s += '<div class="meta">' + escText(fl.description || "") + "</div>";
@@ -1826,6 +1827,7 @@ async function openDoc(path, returnKey) {
   showDetails(path, '<div style="padding:2px 0 10px"><button class="ghost back" data-return="' + (returnKey || "comment") + '">‹ back</button></div><div class="docview">' + d.html + "</div>");
 }
 function detailFor(key) {
+  if (key === "relay" && LAST_RELAY) return [LAST_RELAY.title, LAST_RELAY.html];
   if (key.startsWith("log:")) { void openLogDetail(key.slice(4)); return ["log entry", '<div class="meta">loading…</div>']; }
   if (key.startsWith("doc:")) { void openDoc(key.slice(4), "comment"); return [key.slice(4), '<div class="meta">loading…</div>']; }
   if (key.startsWith("form:")) { const fm = key.slice(5).split("@"); void showForm(fm[0], "details", fm[1]); return ["", '<div class="meta">loading…</div>']; }
@@ -1855,6 +1857,9 @@ document.addEventListener("click", async (ev) => {
   }
 });
 let CURRENT_DETAIL = null;
+// The last RELAYED card (help from another surface) — kept so a refresh
+// re-shows it instead of clobbering the reader's place.
+let LAST_RELAY = null;
 document.addEventListener("click", (ev) => {
   const arrow = ev.target.closest ? ev.target.closest(".crumb-arrow") : null;
   document.querySelectorAll(".crumb-arrow.open").forEach((a) => { if (a !== arrow) a.classList.remove("open"); });
@@ -2189,6 +2194,9 @@ if (logPanel) {
   }
 }
 async function openLogDetail(ref) {
+  // A solo card does not render log details — it relays the ref, and the
+  // details surface owns the render and keeps its place through refreshes.
+  if (!document.getElementById("details") && window.parent !== window) { window.parent.postMessage({ se: "logref", ref: ref }, "*"); return; }
   CURRENT_DETAIL = "log:" + ref;
   hostTrace("openLogDetail asking for " + ref);
   const r = await fetch("/api/log?ref=" + encodeURIComponent(ref));

@@ -176,7 +176,12 @@ const FOLLOW_UP = {
 export function stateFormFields(s: StateDecl): FormTemplate {
   const fields = [
     SITUATION,
-    ...s.evidence_form.map((f) => ({ name: f.name, description: f.description, required: f.required })),
+    ...s.evidence_form.map((f) => ({
+      name: f.name,
+      description: f.description,
+      required: f.required,
+      ...(f.guidance !== undefined ? { guidance: f.guidance } : {}),
+    })),
     FOLLOW_UP,
   ];
   return { form: s.id, instance: `${s.id}.md`, statement: s.statement, fields };
@@ -298,6 +303,7 @@ const SHEET_CSS = `
   .field .opt { color: #888; font-size: 11.5px; margin-left: .5em; }
   .field .tpl { float: right; font-size: 11.5px; color: #35507a; }
   .field .desc { color: #555; font-size: 12.5px; margin: 2px 0 6px; }
+  .field .guide { color: #555; font-size: 12.5px; font-style: italic; margin: 2px 0 6px; }
   textarea[data-field] { width: 100%; min-height: 64px; border: 1px dashed #bbb; border-radius: 3px; background: #fcfcfc; padding: 6px 8px; font: 12.5px/1.5 system-ui, sans-serif; }
   .docs { max-width: 1240px; margin: 14px auto; }
   .docs details { background: #fff; border: 1px solid #c9c9c9; margin: 6px 0; padding: 6px 10px; }
@@ -426,9 +432,11 @@ function renderField(
   content: string,
   meta?: TemplateMeta,
   args: FieldArgs = NO_ARGS,
+  guidance = "",
 ): string {
   const flag = required ? '<span class="req">required</span>' : '<span class="opt">optional</span>';
-  const head = `<div class="field"><span class="tpl">template: ${esc(template)}</span><span class="name">${esc(name)}</span>${flag}<div class="desc">${esc(description)}</div>`;
+  const guide = guidance === "" ? "" : `<div class="guide">${esc(guidance)}</div>`;
+  const head = `<div class="field"><span class="tpl">template: ${esc(template)}</span><span class="name">${esc(name)}</span>${flag}<div class="desc">${esc(description)}</div>${guide}`;
   return `${head}${fieldEditor(name, content, meta, args)}</div>`;
 }
 
@@ -514,7 +522,16 @@ export function buildPortableForm(
     .filter((f) => f.name !== "current_situation" && f.name !== "follow_up")
     .map((f) => {
       const tpl = model.field_templates[f.name] ?? "free-form";
-      return renderField(f.name, f.description, f.required, tpl, fills[f.name] ?? "", model.template_meta[tpl], model.field_args[f.name]);
+      return renderField(
+        f.name,
+        f.description,
+        f.required,
+        tpl,
+        fills[f.name] ?? "",
+        model.template_meta[tpl],
+        model.field_args[f.name],
+        f.guidance ?? "",
+      );
     })
     .join("");
   const island: IslandData = { form: model.form, author: "", fields: fills, checked };

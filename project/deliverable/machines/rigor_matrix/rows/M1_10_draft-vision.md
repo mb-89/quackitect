@@ -19,13 +19,31 @@ legal_tools:
   - se_web_fetch
 evidence:
   - name: big_idea
-    description: "one breath, standalone-readable, lineage named"
+    description: "one breath, standalone-readable"
+    guidance: |
+      One or two sentences a stranger understands with no context. Say what
+      the product does and why anyone would want it. No history, no method
+      words. Read it alone: if it is not interesting by itself, stop here.
   - name: to_be_world
     description: "who does what in the to-be world, alive"
+    guidance: |
+      Describe a working day AFTER the product exists. Name people by role.
+      Present tense, a scene, not a feature list. The reader should be able
+      to picture the screen and the hands on it.
   - name: goal_system
     description: "goals, conflicts named openly, priority order ruled"
+    guidance: |
+      List the goals the product serves, most important first. Where two
+      goals pull against each other, say so openly and rule which one wins.
+      A goal list without a named conflict is usually hiding one.
+      The method: [[meth-goal-system]].
   - name: moore_pitch
     description: "all five slots filled"
+    guidance: |
+      Fill the five slots in this exact shape: FOR (target customer) WHO
+      (need), THE (product name) IS A (category) THAT (key benefit).
+      UNLIKE (main alternative), OUR PRODUCT (key differentiator).
+      One phrase per slot, no slot skipped. The method: [[meth-moore-pitch]].
 major: tailored
 minor: inherit
 patch: none
@@ -63,6 +81,6 @@ specification_note: |
 
 ## Guidance
 
-Vision FIRST - it is the stop-or-continue filter; if the vision alone is not interesting, nothing downstream matters. The big idea in one breath, lineage named. The to-be world alive, not abstract. The goal system with conflicts named openly ([[meth-goal-system]]). Close with the pitch ([[meth-moore-pitch]]). The vision is axiomatic: nothing derives it; the gate adjudicates whether it is worth having.
+Vision FIRST - it is the stop-or-continue filter; if the vision alone is not interesting, nothing downstream matters. The big idea in one breath. The to-be world alive, not abstract. The goal system with conflicts named openly ([[meth-goal-system]]). Close with the pitch ([[meth-moore-pitch]]). The vision is axiomatic: nothing derives it; the gate adjudicates whether it is worth having.
 
 INHERIT where possible: if this iteration reuses an existing design and does not deviate from the resident vision, satisfy this state with a pointer plus the delta - do not re-derive the axiom.

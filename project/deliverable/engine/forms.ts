@@ -16,6 +16,8 @@ export interface FormField {
   name: string;
   description: string;
   required: boolean;
+  /** The how-to for whoever fills it — shown in every render of the field. */
+  guidance?: string;
 }
 
 export interface FormTemplate {
