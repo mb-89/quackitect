@@ -72,7 +72,7 @@ import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { anyJobRunning } from "./run.ts";
 import { levelName, loadLevels } from "./scale.ts";
-import { buildPortableForm, type EmbeddedDoc, parseIsland, stateFormFields, stateFormModel } from "./stateform.ts";
+import { buildPortableForm, type EmbeddedDoc, parseIsland, stateFormFields, stateFormModel, templateProblems } from "./stateform.ts";
 import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
 import { type Expedition, expClose, expFind, expList, expNew, readRecord } from "./worktree.ts";
 
@@ -426,7 +426,7 @@ export class Session {
     const rel = this.gateReportRel(gateId);
     const abs = join(this.bound!.path, rel);
     // THE ROUNDS ARE NOT WRITTEN TWICE. compileMachine appends STANDARD_ROUNDS
-    // (verify_round, validate_round, redteam_round, verdict) to every gate's
+    // (round_0_verify, round_1_validate, round_2_red_team, verdict) to every gate's
     // evidence_form — machines/compile.ts, the `kind === "gate"` clause — so
     // the scaffold below already emits them once, with the fuller v1-derived
     // wording. A second REVIEW_TAIL stood here and emitted verify/validate/
@@ -2469,8 +2469,11 @@ export class Session {
   formDone(name: string, by: Channel, machineId?: string): Record<string, unknown> {
     const fm = this.formMachine(machineId);
     if (this.isStateForm(name, fm)) {
+      // A submit only STAMPS a claim that stands — an unmet form comes
+      // back with its problems instead, shown where the filler is.
       const sh = this.stateFormHome(name, fm);
-      if (existsSync(sh.instanceAbs)) {
+      const before = this.stateFormGet(name, fm) as { met?: boolean };
+      if (existsSync(sh.instanceAbs) && before.met === true) {
         writeFileSync(
           sh.instanceAbs,
           withSignedOff(withStatus(readFileSync(sh.instanceAbs, "utf8"), "done", by), new Date().toISOString()),
@@ -2587,6 +2590,16 @@ export class Session {
     const h = this.stateFormHome(name, m);
     const raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : undefined;
     const model = stateFormModel(this.root, scanGuidance(this.root), m, s, this.stateFormHeader(name, raw, m));
+    // The section lint plus the TEMPLATE checks — generic engine code,
+    // configured per field in the templates' own markdown. One verdict
+    // for both hands: the page's problems list and the gate's refusal.
+    const lint = lintForm(model.template, raw, "");
+    const fills: Record<string, string> = {};
+    if (raw !== undefined) {
+      const body = parseStateNote(raw).body;
+      for (const f of model.template.fields) fills[f.name] = stripComments(section(body, f.name)).trim();
+    }
+    const tp = templateProblems(model, fills);
     return {
       state_form: true,
       ...model,
@@ -2594,7 +2607,9 @@ export class Session {
       checked: this.stateFormChecked(raw),
       instance: h.instanceRel,
       exists: raw !== undefined,
-      ...lintForm(model.template, raw, ""),
+      ...lint,
+      problems: [...lint.problems, ...tp],
+      met: lint.met && tp.length === 0,
     };
   }
 

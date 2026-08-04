@@ -7,9 +7,9 @@ statement: "The gate template: how every gate is reviewed and blessed - the stan
 Every gate state links this note. The gate's own evidence form carries its milestone-specific acceptance items; this template carries the standard review that evaluates them. The rounds themselves are [[meth-review-rounds]].
 
 ## The standard fields
-- verify_round | built it right: each input state's evidence read against its claim - a bless is not proof | required
-- validate_round | built the right thing: against the frame and vision, not just the plan; list what is missing, wrong, or out of scope | required
-- redteam_round | the opposing case, rubric-cited; an override blesses past an unmet criterion and is logged WITH its dissent, never as a clean pass | required
+- round_0_verify | built it right: one line per check that ran, each with its verdict - a bless is not proof | required
+- round_1_validate | built the right thing: against the frame and vision, not just the plan; list what is missing, wrong, or out of scope | required
+- round_2_red_team | the opposing case: one finding per line, each answered; the kill-criterion named and looked for | required
 - state_of_the_art | what was scanned for this milestone's artifact, what adopted, what rejected - or a recorded skip with reason ([[meth-state-of-the-art]]) | required
 - verdict | pass, pass with noted overrides, or reopen with named states and reasons | required
 

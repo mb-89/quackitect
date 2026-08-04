@@ -308,18 +308,28 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
     () => session.advance(),
     (e) => /change_size/.test(JSON.stringify(e)),
   );
-  // The kickoff's OWN form carries the size — fill it whole, rounds included.
+  // A FAIL verdict is mechanical: the form never counts as met while it
+  // stands, and the problems name it.
+  session.formSave("gate-kickoff", { verdict: "fail\nnot yet" }, "human");
+  const failing = session.formGet("gate-kickoff") as { met?: boolean; problems?: string[] };
+  assert.equal(failing.met, false);
+  assert.ok(
+    (failing.problems ?? []).some((p) => /does not stand/.test(p)),
+    "the fail is named in the problems",
+  );
+  // The kickoff's OWN form carries the size — fill it whole, rounds
+  // included, each field in its template's shape.
   const kickFields: Record<string, string> = {
     current_situation: "M0 walked, inbox empty",
-    retro_drained: "nothing pended",
+    retro_drained: "- none: nothing pended",
     goal: "walk the pinned machine",
-    pulled_in: "nothing — test walk",
-    left_out: "everything else",
-    change_size: "patch — the smallest walk proves the seam",
-    verify_round: "inputs checked",
-    validate_round: "fits the frame",
-    redteam_round: "argued — no kill criterion met",
-    verdict: "PASS",
+    pulled_in: "- none",
+    left_out: "- everything else",
+    change_size: "patch\nthe smallest walk proves the seam",
+    round_0_verify: "- inputs checked",
+    round_1_validate: "- fits the frame",
+    round_2_red_team: "- none => the attack found nothing",
+    verdict: "pass\nthe claims held",
     follow_up: "none",
   };
   session.formSave("gate-kickoff", kickFields, "human");

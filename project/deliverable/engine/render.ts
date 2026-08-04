@@ -248,22 +248,6 @@ function svgStateNode(
   parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + (sub !== undefined ? -6 : 6)}" class="label">${esc(sid)}</text>`);
   if (sub !== undefined) parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + 24}" class="sublabel">${esc(sub)}</text>`);
   parts.push("</g>");
-  parts.push(...svgCondButtons(n, sid, meta[sid]));
-  return parts;
-}
-
-// Condition pills ride the ARROWS of the top-to-bottom flow: the entry
-// pill sits over the incoming tip above the box, the exit pill on the
-// outgoing line below it, clear of every arrowhead. They MARK the guards;
-// what they open is the state's own detail — the form, where one exists.
-function svgCondButtons(n: CNode, sid: string, mt: StateMeta | undefined): string[] {
-  if (mt === undefined) return [];
-  const parts: string[] = [];
-  const cx = n.x + n.width / 2;
-  const pillAt = (cy: number, met: boolean): string =>
-    `<g class="clickable cond ${met ? "met" : "unmet"}" data-detail="state:${esc(sid)}"><circle cx="${cx}" cy="${cy}" r="12"/><text x="${cx}" y="${cy + 4}" class="cond-label" style="font-size:11px">${met ? "✓" : "!"}</text></g>`;
-  if (mt.has_entry) parts.push(pillAt(n.y - 28, mt.entry_met));
-  if (mt.has_exit) parts.push(pillAt(n.y + n.height + 28, mt.exit_met));
   return parts;
 }
 
@@ -1471,7 +1455,8 @@ function condDetail(id) {
 function presentForm(name, into, title, html, machine) {
   // The machine rides INSIDE the detail key, so a popped-out window
   // re-resolves the same form wherever its own view happens to stand.
-  if (into === "details") { CURRENT_DETAIL = "form:" + name + (machine ? "@" + machine : ""); showDetails(title, html); return; }
+  // The pane title stays EMPTY — the sheet body carries the one heading.
+  if (into === "details") { CURRENT_DETAIL = "form:" + name + (machine ? "@" + machine : ""); showDetails("", html); return; }
   openModal(title, html);
 }
 // THE STATE FORM'S SHEET (owner rulings 2026-08-04): boxes from the A3
@@ -1480,13 +1465,23 @@ function presentForm(name, into, title, html, machine) {
 function sfOne(f, fl) {
   const name = f.form;
   const tpl = (f.field_templates || {})[fl.name] || "free-form";
+  const tm = (f.template_meta || {})[tpl] || {};
   let s = '<div style="border:1px solid var(--se-line,#888);border-radius:4px;padding:7px 10px;margin:7px 0">';
   s += '<span style="float:right;font-size:11.5px;color:var(--se-accent)">template: ' + escText(tpl) + "</span>";
   s += "<b>" + escText(fl.name) + "</b>" + (fl.required ? ' <span style="color:var(--se-fail);font-size:11px">required</span>' : ' <span class="meta">optional</span>');
   s += '<div class="meta">' + escText(fl.description || "") + "</div>";
   (fl.prefills || []).forEach(function (p, i) {
-    s += '<div class="prefill"><div class="comment-text">prefill — unconfirmed:</div><div>' + escText(p) + '</div><button class="primary confirmpre" data-form="' + name + '" data-field="' + escText(fl.name) + '" data-index="' + i + '">confirm</button></div>';
+    s += '<div class="prefill"><div class="comment-text">prefill — unconfirmed:</div><div>' + escText(p) + '</div><button class="primary confirmpre" data-form="' + name + '" data-machine="' + escText(f.machine || "") + '" data-field="' + escText(fl.name) + '" data-index="' + i + '">confirm</button></div>';
   });
+  // A choice template edits as its dropdown plus the reasoning — stored
+  // as one section: the option on the first line, the prose below.
+  if (tm.editor === "choice") {
+    const lines = (fl.content || "").split("\\n");
+    const first = (lines[0] || "").trim();
+    s += '<div><select class="formchoice" data-field="' + escText(fl.name) + '"><option value=""></option>' + (tm.options || []).map(function (o) { return "<option" + (o === first ? " selected" : "") + ">" + escText(o) + "</option>"; }).join("") + "</select></div>";
+    s += '<textarea class="formfield" data-field="' + escText(fl.name) + '">' + escText(lines.slice(1).join("\\n")) + "</textarea></div>";
+    return s;
+  }
   s += '<textarea class="formfield" data-field="' + escText(fl.name) + '">' + escText(fl.content || "") + "</textarea></div>";
   return s;
 }
@@ -1593,6 +1588,14 @@ function showFormAgain(name, machine) {
 async function formPost(path, body) {
   await fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
 }
+// One collector for save and submit: the textareas, then every choice
+// select folded onto its field — the option first, the reasoning below.
+function sfCollect() {
+  const fields = {};
+  document.querySelectorAll(".formfield").forEach(function (t) { fields[t.dataset.field] = t.value; });
+  document.querySelectorAll(".formchoice").forEach(function (s) { fields[s.dataset.field] = (s.value + "\\n" + (fields[s.dataset.field] || "")).trim(); });
+  return fields;
+}
 document.addEventListener("click", async (ev) => {
   const of = ev.target.closest ? ev.target.closest(".openform") : null;
   if (of) { void showForm(of.dataset.form); return; }
@@ -1615,17 +1618,13 @@ document.addEventListener("click", async (ev) => {
   }
   const sv = ev.target.closest ? ev.target.closest(".saveform") : null;
   if (sv) {
-    const fields = {};
-    document.querySelectorAll(".formfield").forEach((t) => { fields[t.dataset.field] = t.value; });
-    await formPost("/form/save", { name: sv.dataset.form, fields, machine: sv.dataset.machine || viewedMachine() });
+    await formPost("/form/save", { name: sv.dataset.form, fields: sfCollect(), machine: sv.dataset.machine || viewedMachine() });
     showFormAgain(sv.dataset.form, sv.dataset.machine);
     return;
   }
   const dn2 = ev.target.closest ? ev.target.closest(".doneform") : null;
   if (dn2) {
-    const fields = {};
-    document.querySelectorAll(".formfield").forEach((t) => { fields[t.dataset.field] = t.value; });
-    await formPost("/form/save", { name: dn2.dataset.form, fields, machine: dn2.dataset.machine || viewedMachine() });
+    await formPost("/form/save", { name: dn2.dataset.form, fields: sfCollect(), machine: dn2.dataset.machine || viewedMachine() });
     await formPost("/form/done", { name: dn2.dataset.form, machine: dn2.dataset.machine || viewedMachine() });
     showFormAgain(dn2.dataset.form, dn2.dataset.machine);
     return;
@@ -1645,7 +1644,7 @@ async function openDoc(path, returnKey) {
 function detailFor(key) {
   if (key.startsWith("log:")) { void openLogDetail(key.slice(4)); return ["log entry", '<div class="meta">loading…</div>']; }
   if (key.startsWith("doc:")) { void openDoc(key.slice(4), "comment"); return [key.slice(4), '<div class="meta">loading…</div>']; }
-  if (key.startsWith("form:")) { const fm = key.slice(5).split("@"); void showForm(fm[0], "details", fm[1]); return ["form · " + fm[0], '<div class="meta">loading…</div>']; }
+  if (key.startsWith("form:")) { const fm = key.slice(5).split("@"); void showForm(fm[0], "details", fm[1]); return ["", '<div class="meta">loading…</div>']; }
   if (key.startsWith("cond:")) return condDetail(key.slice(5));
   if (key === "comment") {
     const txt = (D.comment || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");
@@ -1656,7 +1655,7 @@ function detailFor(key) {
     // ONE TRUTH, TWO RENDERS (owner ruling 2026-08-04): a state with an
     // evidence form shows THE FORM as its details — the old detail view
     // stays only for form-less states.
-    if ((D.states[id] || {}).has_form) { void showForm(id, "details"); return ["Evidence form / " + id, '<div class="meta">loading…</div>']; }
+    if ((D.states[id] || {}).has_form) { void showForm(id, "details"); return ["", '<div class="meta">loading…</div>']; }
     return ["state: " + id, stateDetail(id)];
   }
   return [key, jsonTable({})];
@@ -1681,7 +1680,7 @@ document.addEventListener("click", (ev) => {
     CURRENT_DETAIL = g.dataset.detail;
     // The engine mirrors the selection, so a control in ANOTHER surface
     // (the sidebar's SET TARGET) can act on the state whose details show.
-    if (g.dataset.detail.startsWith("state:")) void fetch("/selected", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: g.dataset.detail.slice(6) }) });
+    if (g.dataset.detail.startsWith("state:")) void fetch("/selected", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: g.dataset.detail.slice(6), machine: viewedMachine() }) });
     const [t, h] = detailFor(g.dataset.detail); showDetails(t, h);
   }
 });

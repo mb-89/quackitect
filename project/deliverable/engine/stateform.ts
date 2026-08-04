@@ -50,6 +50,8 @@ export interface StateFormModel {
   follow_up_label: string;
   inputs: FormInput[];
   boxes: A3Box[];
+  /** Per template name: its editor and its mechanical checks. */
+  template_meta: Record<string, TemplateMeta>;
   /** The lint template over the fill sections, in sheet order. */
   template: FormTemplate;
   /** Field name -> its template name (free-form unless declared). */
@@ -58,6 +60,64 @@ export interface StateFormModel {
 
 export function fieldTemplateRel(name: string): string {
   return `project/deliverable/machines/forms/templates/${name}.md`;
+}
+
+/** A template's MECHANICS, from its frontmatter — the generic checks are
+ *  engine code; which of them a field gets is markdown configuration. */
+export interface TemplateMeta {
+  editor: string;
+  options: string[];
+  /** choice only: the options that let the form stand met. Empty = all. */
+  passing: string[];
+  line_pattern: string;
+  line_help: string;
+}
+
+const list = (v: unknown): string[] =>
+  typeof v === "string"
+    ? v
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s !== "")
+    : [];
+
+export function templateMeta(root: string, name: string): TemplateMeta {
+  try {
+    const fm = parseStateNote(readFileSync(join(root, fieldTemplateRel(name)), "utf8")).frontmatter;
+    return {
+      editor: typeof fm.editor === "string" ? fm.editor : "text",
+      options: list(fm.options),
+      passing: list(fm.passing),
+      line_pattern: typeof fm.line_pattern === "string" ? fm.line_pattern : "",
+      line_help: typeof fm.line_help === "string" ? fm.line_help : "",
+    };
+  } catch {
+    return { editor: "text", options: [], passing: [], line_pattern: "", line_help: "" };
+  }
+}
+
+/** The template checks over the fills — same verdicts for both hands and
+ *  both renders. Emptiness stays the required-check's job. */
+export function templateProblems(model: StateFormModel, fills: Record<string, string>): string[] {
+  const out: string[] = [];
+  for (const f of model.template.fields) {
+    const meta = model.template_meta[model.field_templates[f.name] ?? "free-form"];
+    if (meta === undefined) continue;
+    const content = (fills[f.name] ?? "").trim();
+    if (content === "") continue;
+    if (meta.editor === "choice") {
+      const first = (content.split("\n")[0] ?? "").trim();
+      if (!meta.options.includes(first)) out.push(`${f.name}: the first line must be one of — ${meta.options.join(" | ")}`);
+      else if (meta.passing.length > 0 && !meta.passing.includes(first))
+        out.push(`${f.name}: ${first} — the claim does not stand, and the gate stays shut while it does`);
+      continue;
+    }
+    if (meta.line_pattern === "") continue;
+    const re = new RegExp(meta.line_pattern);
+    const bad = content.split("\n").find((l) => l.trim() !== "" && !re.test(l.trim()));
+    if (bad !== undefined) out.push(`${f.name}: ${meta.line_help !== "" ? meta.line_help : `every line matches ${meta.line_pattern}`}`);
+  }
+  return out;
 }
 
 function templateStatement(root: string, name: string): string {
@@ -76,7 +136,7 @@ function readLabel(path: string): string {
 
 const SITUATION = {
   name: "current_situation",
-  description: "What stands right now, in a few lines — opened from the survey.",
+  description: "What stands right now, in a few lines.",
   required: true,
 };
 const FOLLOW_UP = {
@@ -113,8 +173,10 @@ export function stateFormModel(
   }));
   const fieldTemplates: Record<string, string> = { current_situation: "free-form", follow_up: "free-form" };
   for (const f of s.evidence_form) fieldTemplates[f.name] = f.template ?? "free-form";
+  const templateMetas: Record<string, TemplateMeta> = {};
   for (const t of [...new Set(Object.values(fieldTemplates))]) {
     inputs.push({ label: `Read template-${t}`, description: templateStatement(root, t), path: fieldTemplateRel(t), entry: false });
+    templateMetas[t] = templateMeta(root, t);
   }
   for (const d of s.inputs ?? []) inputs.push({ label: d.label, description: d.description, entry: false });
   return {
@@ -126,6 +188,7 @@ export function stateFormModel(
     follow_up_label: s.follow_up_label ?? "",
     inputs,
     boxes: readA3(root),
+    template_meta: templateMetas,
     template: stateFormFields(s),
     field_templates: fieldTemplates,
   };
@@ -203,6 +266,14 @@ const SHEET_JS = `
   function seCollect() {
     var fields = {};
     document.querySelectorAll("textarea[data-field]").forEach(function (t) { fields[t.getAttribute("data-field")] = t.value; });
+    document.querySelectorAll("select[data-choice]").forEach(function (s) {
+      var n = s.getAttribute("data-choice");
+      fields[n] = (s.value + "\\n" + (fields[n] || "")).trim();
+      for (var i = 0; i < s.options.length; i++) {
+        if (s.options[i].selected) s.options[i].setAttribute("selected", "");
+        else s.options[i].removeAttribute("selected");
+      }
+    });
     var checked = [];
     document.querySelectorAll("input[data-input]").forEach(function (c) {
       if (c.checked) { checked.push(c.getAttribute("data-input")); c.setAttribute("checked", ""); }
@@ -244,13 +315,20 @@ function renderInput(i: FormInput, docIndex: Map<string, number>, checked: Set<s
   return `<li>${box}${label}${entry}<span class="d">${esc(i.description)}</span></li>`;
 }
 
-function renderField(name: string, description: string, required: boolean, template: string, content: string): string {
+function renderField(name: string, description: string, required: boolean, template: string, content: string, meta?: TemplateMeta): string {
   const flag = required ? '<span class="req">required</span>' : '<span class="opt">optional</span>';
-  return (
-    `<div class="field"><span class="tpl">template: ${esc(template)}</span><span class="name">${esc(name)}</span>${flag}` +
-    `<div class="desc">${esc(description)}</div>` +
-    `<textarea data-field="${esc(name)}">${esc(content)}</textarea></div>`
-  );
+  const head = `<div class="field"><span class="tpl">template: ${esc(template)}</span><span class="name">${esc(name)}</span>${flag}<div class="desc">${esc(description)}</div>`;
+  if (meta?.editor === "choice") {
+    const lines = content.split("\n");
+    const first = (lines[0] ?? "").trim();
+    const rest = lines.slice(1).join("\n");
+    const opts = [
+      '<option value=""></option>',
+      ...meta.options.map((o) => `<option${o === first ? " selected" : ""}>${esc(o)}</option>`),
+    ].join("");
+    return `${head}<div><select data-choice="${esc(name)}">${opts}</select></div><textarea data-field="${esc(name)}">${esc(rest)}</textarea></div>`;
+  }
+  return `${head}<textarea data-field="${esc(name)}">${esc(content)}</textarea></div>`;
 }
 
 function renderHeader(model: StateFormModel): string {
@@ -274,7 +352,10 @@ export function buildPortableForm(
   const follow = model.follow_up_label === "" ? "" : `<span class="concrete">/ ${esc(model.follow_up_label)}</span> `;
   const evid = model.template.fields
     .filter((f) => f.name !== "current_situation" && f.name !== "follow_up")
-    .map((f) => renderField(f.name, f.description, f.required, model.field_templates[f.name] ?? "free-form", fills[f.name] ?? ""))
+    .map((f) => {
+      const tpl = model.field_templates[f.name] ?? "free-form";
+      return renderField(f.name, f.description, f.required, tpl, fills[f.name] ?? "", model.template_meta[tpl]);
+    })
     .join("");
   const island: IslandData = { form: model.form, author: "", fields: fills, checked };
   const left =

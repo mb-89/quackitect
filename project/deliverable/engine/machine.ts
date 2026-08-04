@@ -57,27 +57,32 @@ export interface EvidenceField {
  */
 export const STANDARD_ROUNDS: EvidenceField[] = [
   {
-    name: "verify_round",
+    name: "round_0_verify",
     description:
-      "BUILT IT RIGHT: every input state since the last gate, its evidence read against its claim. Open what the evidence points at rather than trusting its description of itself — a bless is not proof.",
+      "ROUND 0 — VERIFY: built it right. One line per check that ran — each input state's evidence read against its claim, the types, the lint, the scoped tests or the battery — each with its verdict. Open what the evidence points at; a bless is not proof.",
     required: true,
+    template: "list",
   },
   {
-    name: "validate_round",
+    name: "round_1_validate",
     description:
-      "BUILT THE RIGHT THING: against the frame and the goal, not merely this step's own plan. List what is missing, wrong or out of scope.",
+      "ROUND 1 — VALIDATE: built the right thing. One line per question asked of the RESULT against the goal and the frame: what was exercised, what it showed, what is missing, wrong or out of scope.",
     required: true,
+    template: "list",
   },
   {
-    name: "redteam_round",
+    name: "round_2_red_team",
     description:
-      "ARGUE THE OPPOSING CASE BEFORE ENDORSING. Cite a rubric, never vibes. Name the KILL-CRITERION: what would have to be true for this to be the wrong call, then look for it. An override is logged WITH its dissent, never as a clean pass.",
+      "ROUND 2 — RED TEAM: attack the result before endorsing it. Argue the opposing case; name the KILL-CRITERION — what would have to be true for this to be the wrong call — then look for it. One finding per line, each with its answer.",
     required: true,
+    template: "findings",
   },
   {
     name: "verdict",
-    description: "PASS, PASS WITH NOTED OVERRIDES, or REOPEN with the named states and reasons. No silent pass.",
+    description:
+      "The gate's ruling on the first line — pass, pass with overrides, or fail — the reasoning below. An override is logged WITH its dissent, never as a clean pass.",
     required: true,
+    template: "verdict",
   },
 ];
 

@@ -1,10 +1,10 @@
 ---
 kind: matrix-row
 name: gate-kickoff
-statement: "GATE kickoff: one handover carries the plan and the rigor column; the owner blesses - past it the iteration is set."
+statement: "GATE kickoff: the gate of milestone M0 - sets the change size and the rigor of the machine below."
 state_kind: gate
 filled_by: agent
-motivation: The size decision has one home. The kickoff proposes, the person rules, and the machine grows from the blessed column - nothing downstream re-litigates it.
+motivation: Work is priced before it is done. Too little rigor ships an untested change; too much drowns a small one in ceremony. The kickoff sizes the bet once, while it is cheap, and the machine below grows to match - nothing downstream re-litigates it.
 depends_on:
   - onboard-retro
 floor: true
@@ -21,15 +21,19 @@ legal_tools:
   - se_answer
 evidence:
   - name: retro_drained
-    description: "every inbox note has a recorded disposition"
+    description: "every inbox note with its disposition - one line per note"
+    template: per-item
   - name: goal
     description: "the confirmed one-line iteration goal"
   - name: pulled_in
     description: "what this iteration absorbs, each item with its origin"
+    template: list
   - name: left_out
     description: "what explicitly stays out, and where it went"
+    template: list
   - name: change_size
-    description: "patch, minor, major or product, with reasoning; strikes named"
+    description: "the proposed column and its reasoning; strikes named"
+    template: change-size
 major: full
 minor: full
 patch: tailored

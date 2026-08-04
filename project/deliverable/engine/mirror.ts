@@ -42,6 +42,9 @@ export function startMirror(o: MirrorOptions): Server {
   // which state's details are open, so a control in ANOTHER surface (the
   // sidebar's SET TARGET) can act on it. View state, like a pane size.
   let selected = "";
+  // The machine the selection was made IN — a bare state id resolves to
+  // the wrong drawing the moment the reader browses a sub-machine.
+  let selectedMachine = "";
   // The newest person-pull: the seq bumps, the ref names the log record —
   // every surface lands the answer in its details from this.
   let lastPull: { seq: number; ref: string } | undefined;
@@ -209,7 +212,13 @@ export function startMirror(o: MirrorOptions): Server {
             source: "engine/mirror.ts",
           });
         }
-        return { args: { to: selected }, result: state.session.setTarget(selected) };
+        // The selection is machine-scoped: a state picked inside a
+        // sub-machine aims THERE — "end" in i1 is iterations/i1/end,
+        // never the main machine's end. Setting over a locked target
+        // simply re-aims; the route recomputes as machines regenerate.
+        const chain = selectedMachine === "" ? [] : state.session.viewChain(selectedMachine).slice(1);
+        const to = chain.length === 0 ? selected : `${chain.join("/")}/${selected}`;
+        return { args: { to }, result: state.session.setTarget(to) };
       },
     ],
     "/escape": [
@@ -278,11 +287,13 @@ export function startMirror(o: MirrorOptions): Server {
         "mirror_select",
         (body) => {
           const s = String(body.state ?? "");
+          const m = String(body.machine ?? "");
           return {
-            args: { state: s },
+            args: { state: s, machine: m },
             run: () => {
               selected = s;
-              return { log: { selected: s }, answer: { ok: true } };
+              selectedMachine = m;
+              return { log: { selected: s, machine: m }, answer: { ok: true } };
             },
           };
         },
