@@ -345,6 +345,31 @@ test("the seed refuses a missing vision — the seed is a small form", () => {
   );
 });
 
+test("the agent's pull SERVES the reading a sub state demands — no wedge", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  const session = new Session(root);
+  await session.advance();
+  await session.advance();
+  checkDocs(session);
+  await session.advance();
+  await session.advance();
+  await session.advance();
+  session.setAutonomy(1);
+  const seeded = session.iterationSeed("serve the reading", "the pull carries the method in");
+  const sid = String(seeded.seeded).match(/^(i\d+)-/)?.[1];
+  await session.advance("iterations");
+  await session.advance(sid);
+  // Aim inside and pull as the AGENT: the answer must SERVE (read) or
+  // proceed (fill) — never repeat the entry refusal (note-a8d711a4f6f1).
+  session.setTarget(`iterations/${sid}/onboard-retro`);
+  const r = (await session.pull({}, "agent")) as { pull: string; document?: { path: string }; refusal?: unknown };
+  assert.ok(
+    r.pull === "read" || r.pull === "fill",
+    `the pull serves or proceeds, never wedges — got ${r.pull}: ${JSON.stringify(r.refusal ?? "")}`,
+  );
+});
+
 test("no gate holds the first start — entering binds, stamps started, and M0 stands", async () => {
   const root = freshRoot();
   gitInit(root);

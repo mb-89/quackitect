@@ -1510,7 +1510,7 @@ function renderStateForm(f) {
   if (f.met) h += '<div style="color:var(--se-ok);padding:6px 0">✓ complete — the claim stands; the gate judges it</div>';
   h += '<div style="padding:10px 0"><button class="primary saveform" data-form="' + name + '">save</button> <button class="primary doneform" data-form="' + name + '" title="sets status done">done</button> ';
   h += '<a class="ghost" href="/form/export?name=' + encodeURIComponent(name) + '">export portable copy</a> ';
-  h += '<label class="ghost" style="cursor:pointer">ingest returned copy<input type="file" accept=".html,text/html" style="display:none" onchange="seIngest(this, '' + name + '')"></label></div>';
+  h += '<label class="ghost" style="cursor:pointer">ingest returned copy<input type="file" accept=".html,text/html" style="display:none" class="ingestform" data-form="' + name + '"></label></div>';
   return h;
 }
 async function seIngest(inp, name) {
@@ -1520,6 +1520,13 @@ async function seIngest(inp, name) {
   await formPost("/form/ingest", { name: name, html: html });
   showFormAgain(name);
 }
+// Delegated, like every other control — an inline handler needs quote
+// nesting the fixer is free to normalise, and one stripped escape killed
+// the whole page script at parse.
+document.addEventListener("change", function (ev) {
+  const inp = ev.target.closest ? ev.target.closest(".ingestform") : null;
+  if (inp) void seIngest(inp, inp.getAttribute("data-form"));
+});
 async function showForm(name, into) {
   const r = await fetch("/api/form?name=" + encodeURIComponent(name));
   const f = await r.json();
