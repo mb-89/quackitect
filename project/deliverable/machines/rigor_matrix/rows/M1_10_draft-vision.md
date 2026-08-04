@@ -81,6 +81,6 @@ specification_note: |
 
 ## Guidance
 
-Vision FIRST - it is the stop-or-continue filter; if the vision alone is not interesting, nothing downstream matters. The big idea in one breath. The to-be world alive, not abstract. The goal system with conflicts named openly ([[meth-goal-system]]). Close with the pitch ([[meth-moore-pitch]]). The vision is axiomatic: nothing derives it; the gate adjudicates whether it is worth having.
+Vision FIRST - it is the stop-or-continue filter; if the vision alone is not interesting, nothing downstream matters. The method, start to pitch: [[meth-motivation]]. The big idea in one breath. The to-be world alive, not abstract. The goal system with conflicts named openly ([[meth-goal-system]]). Close with the pitch ([[meth-moore-pitch]]). The vision is axiomatic: nothing derives it; the gate adjudicates whether it is worth having.
 
 INHERIT where possible: if this iteration reuses an existing design and does not deviate from the resident vision, satisfy this state with a pointer plus the delta - do not re-derive the axiom.
