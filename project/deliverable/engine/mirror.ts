@@ -19,7 +19,7 @@ import { bumpDrawingEpoch } from "./machines/compile.ts";
 import { handleHttp, type McpServer } from "./mcp.ts";
 import { loadPanel, renderPanel } from "./params.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
-import { feedRows, type MirrorState, renderMirror } from "./render.ts";
+import { ENGINE_LIFE, feedRows, type MirrorState, renderMirror } from "./render.ts";
 import { loadLevels } from "./scale.ts";
 import type { Session } from "./session.ts";
 import { survey } from "./survey.ts";
@@ -55,6 +55,8 @@ export function startMirror(o: MirrorOptions): Server {
     // Which project this server walks — an attaching shim or host refuses
     // to join a stranger's walk on a matching port.
     root: o.root,
+    // The engine life — a page holding an older stamp reloads itself.
+    build: ENGINE_LIFE,
     status: state.session.instance.status,
     // The server is going away with the walk unfinished — a quit, not an end.
     gone: state.session.serverGone,

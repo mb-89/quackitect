@@ -4,7 +4,7 @@ statement: A list editor — one item per row; a new row appears as the last one
 editor: list
 line_pattern: "^- .+"
 line_help: one item per line, each line a dash
-placeholder: "one item — Enter adds the next"
+placeholder: "one item"
 ---
 
 # list

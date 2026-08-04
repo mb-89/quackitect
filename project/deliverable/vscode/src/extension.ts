@@ -529,6 +529,7 @@ function framePage(url) {
     if (d.se === "trace") { vsapi.postMessage(d); return; } // the page reporting what it just did
     if (d.se === "details") { vsapi.postMessage(d); return; } // a click in THIS card, bound for the details group
     if (d.se === "open-form") { vsapi.postMessage(d); return; } // a form wants its own panel
+    if (d.se === "download") { vsapi.postMessage(d); return; } // a webview cannot download; the host's browser can
     if (d.se === "theme-changed") { sendTheme(); return; }
     if (d.se === "up") { show(); return; }
     if (d.se === "wake") { if (loaded && frame.contentWindow) frame.contentWindow.postMessage(d, "*"); return; }
@@ -696,6 +697,8 @@ function onWebviewMessage(m) {
   // A FORM GETS A PANEL OF ITS OWN (owner design 2026-08-04): pinned to
   // the form, beside the editor — the inline details pane is ephemeral.
   else if (m.se === "open-form") openFormPanel(String(m.name ?? ""));
+  // The system browser downloads what the webview sandbox refuses to.
+  else if (m.se === "download") void vscode.env.openExternal(vscode.Uri.parse(String(m.url ?? "")));
 }
 
 /** The bar's help clicks, one place: a handled message answers true. */

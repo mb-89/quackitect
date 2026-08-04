@@ -251,6 +251,12 @@ function svgStateNode(
   return parts;
 }
 
+/** ONE ENGINE LIFE, ONE PAGE SCRIPT. Hosts keep webviews alive across
+ *  engine reloads, so a shell can outlive the script it was served — and
+ *  keep clicking with dead code. The stamp travels in the island and in
+ *  every alive answer; a mismatch reloads the page. */
+export const ENGINE_LIFE = Date.now().toString(36);
+
 // THE ROUTE IS DRAWN OVER THE NODES (owner ruling 2026-07-29), reversing
 // the along-the-edges ruling of the same day. Riding the edges read as the
 // graph highlighting itself; a navigation system lays its line ON the map.
@@ -632,6 +638,7 @@ const STYLE = `
   /* The thumbs wear their meaning: green opens, red refuses. */
   button.primary.blessform { background: var(--se-ok); border-color: var(--se-ok); }
   button.primary.dismissform { background: var(--se-fail); border-color: var(--se-fail); }
+  button.primary:disabled { opacity: .45; cursor: default; }
   .expand { background: none; border: 1px solid var(--se-border-strong); color: var(--se-muted); border-radius: 6px; cursor: pointer; font: inherit; padding: 2px 8px; }
   .expand:hover { color: var(--se-accent); border-color: var(--se-accent); }
   /* THE CARD MATRIX (owner design 2026-07-29). One BIG card beside a two-wide
@@ -1566,8 +1573,9 @@ function renderStateForm(f) {
   h += '<button class="primary saveform" data-form="' + name + '" data-machine="' + escText(mach) + '">save</button> ';
   h += '<button class="primary doneform" data-form="' + name + '" data-machine="' + escText(mach) + '" title="marks the claim complete — the gate judges it">submit</button>';
   if (f.gate) {
-    h += ' <button class="primary blessform" data-form="' + name + '" data-machine="' + escText(mach) + '" title="the gate opens — the human, or a hand above its rung">👍 bless</button>';
-    h += ' <button class="primary dismissform" data-form="' + name + '" data-machine="' + escText(mach) + '" title="send it back — the reasons go in the form">👎 dismiss</button>';
+    const off = f.met ? "" : ' disabled title="available after submit"';
+    h += ' <button class="primary blessform" data-form="' + name + '" data-machine="' + escText(mach) + '"' + (off || ' title="the gate opens — the human, or a hand above its rung"') + ">👍 bless</button>";
+    h += ' <button class="primary dismissform" data-form="' + name + '" data-machine="' + escText(mach) + '"' + (off || ' title="send it back — the reasons go in the form"') + ">👎 dismiss</button>";
   }
   h += "</div>";
   return h;
@@ -1687,9 +1695,12 @@ document.addEventListener("click", async (ev) => {
   if (cp) { await formPost("/form/confirm", { name: cp.dataset.form, field: cp.dataset.field, index: Number(cp.dataset.index), machine: cp.dataset.machine || viewedMachine() }); showFormAgain(cp.dataset.form, cp.dataset.machine); return; }
   const ex = ev.target.closest ? ev.target.closest(".sfexport") : null;
   if (ex) {
-    // A download navigation — the browser's own save dialog names the place.
+    const exUrl = location.origin + "/form/export?name=" + encodeURIComponent(ex.dataset.form) + "&machine=" + encodeURIComponent(ex.dataset.machine || viewedMachine());
+    // Inside the editor a webview cannot download; the HOST opens the
+    // system browser, whose save dialog names the place.
+    if (window.parent !== window) { window.parent.postMessage({ se: "download", url: exUrl }, "*"); return; }
     const a = document.createElement("a");
-    a.href = "/form/export?name=" + encodeURIComponent(ex.dataset.form) + "&machine=" + encodeURIComponent(ex.dataset.machine || viewedMachine());
+    a.href = exUrl;
     a.download = "";
     a.click();
     return;
@@ -2520,6 +2531,8 @@ let lastPullSeq = null;
 // ONE alive-driven pass, shared by the event stream and the host's wake —
 // an embedded page has no stream, and this is everything it would miss.
 function applyAlive(a) {
+  // A stale shell heals itself: new engine life, new page — now.
+  if (a.build && D.build && a.build !== D.build) { location.reload(); return; }
   if (a.status === "closed") { sessionOver("the machine reached end — the walk is complete"); return; }
   if (a.gone) { sessionOver("the console quit — the server has stopped, the walk was left standing"); return; }
   // Emergency is drawn from the engine, so a second surface cannot disagree
@@ -2945,6 +2958,7 @@ export function renderMirror(
   const states = stateDetails(m, decl, done, archived);
   const comment = (canvas.nodes ?? []).find((n) => n.type === "text")?.text ?? "";
   const data = `<script type="application/json" id="se-data">${JSON.stringify({
+    build: ENGINE_LIFE,
     describe: m.session.describe(),
     packet: m.session.packet(),
     lastPacket: m.lastPacket ?? null,

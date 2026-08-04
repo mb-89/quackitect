@@ -237,13 +237,16 @@ test("a morph leaves untouched everything the change did not touch", () => {
   assert.ok(html.includes('from.hasAttribute("data-keep-style")'), "a size the reader dragged is never snapped back");
   assert.ok(html.includes("from !== document.activeElement"), "a control under the reader's hand stays theirs");
   assert.match(html, /<div class="cards" data-keep-style/, "the card split is a dragged size, so it is kept");
-  // A full reload throws away every one of the above at once. Exactly one
-  // survives, as the manual retry on a stalled loading bar.
+  // A full reload throws away every one of the above at once. Exactly two
+  // survive: the reader's manual retry on a stalled loading bar, and the
+  // stale-shell heal when the ENGINE's life stamp changed — by then the
+  // page's script is dead code and there is no place left to keep.
   const reloads = html.match(/location\.reload\(\)/g) ?? [];
-  assert.equal(reloads.length, 1, "the page reloads itself in one place only");
+  assert.equal(reloads.length, 2, "the page reloads itself in exactly two sanctioned places");
+  assert.ok(html.includes("if (stalled !== null) { hideLoading(); location.reload(); return; }"), "one is the reader asking for it");
   assert.ok(
-    html.includes("if (stalled !== null) { hideLoading(); location.reload(); return; }"),
-    "and that place is the reader asking for it",
+    html.includes("if (a.build && D.build && a.build !== D.build) { location.reload(); return; }"),
+    "the other is a new engine life serving a new script",
   );
 });
 

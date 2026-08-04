@@ -310,6 +310,7 @@ const SHEET_CSS = `
   .rows .pi { font-size: 12.5px; color: #333; flex: 0 0 42%; }
   .rows select { padding: .3em .4em; font: 12.5px system-ui, sans-serif; }
   .rows .sep { color: #888; font-size: 12px; }
+  .rows .rowadd, .rows .rowdel { flex: 0 0 auto; background: #fff; border: 1px solid #999; border-radius: 3px; cursor: pointer; font-size: 11px; line-height: 16px; padding: 0 5px; color: #555; }
 `;
 
 const SHEET_JS = `
@@ -374,15 +375,21 @@ const SHEET_JS = `
     var d = document.getElementById(a.getAttribute("data-doc"));
     if (d) { d.open = true; d.scrollIntoView({ behavior: "smooth" }); }
   });
-  // A list grows as its last row fills; per-item rows are fixed by design.
-  document.addEventListener("change", function (ev) {
-    var t = ev.target;
-    if (!t.matches || !t.matches("input[data-list], input[data-findf], input[data-finda]")) return;
-    var row = t.parentElement;
-    if (!row || row.nextElementSibling || t.value.trim() === "") return;
-    var clone = row.cloneNode(true);
-    clone.querySelectorAll("input").forEach(function (i) { i.value = ""; i.removeAttribute("value"); });
-    row.parentElement.appendChild(clone);
+  // Plus adds a row below; minus removes — the last row stays.
+  document.addEventListener("click", function (ev) {
+    var b = ev.target.closest ? ev.target.closest(".rowadd, .rowdel") : null;
+    if (!b) return;
+    var row = b.parentElement;
+    if (!row) return;
+    if (b.className.indexOf("rowadd") >= 0) {
+      var clone = row.cloneNode(true);
+      clone.querySelectorAll("input").forEach(function (i) { i.value = ""; i.removeAttribute("value"); });
+      row.after(clone);
+      var first = clone.querySelector("input");
+      if (first) first.focus();
+      return;
+    }
+    if (row.parentElement.querySelectorAll(".row").length > 1) row.remove();
   });
   // Enter adds the next row right below the one being edited.
   document.addEventListener("keydown", function (ev) {
@@ -425,6 +432,9 @@ function renderField(
   return `${head}${fieldEditor(name, content, meta, args)}</div>`;
 }
 
+const ROW_BTNS =
+  '<button type="button" class="rowadd" title="add a row below">+</button><button type="button" class="rowdel" title="remove this row">−</button>';
+
 const dashLines = (content: string): string[] =>
   content
     .split("\n")
@@ -439,7 +449,7 @@ function fieldEditor(name: string, content: string, meta: TemplateMeta | undefin
   const ph = esc(meta?.placeholder ?? "");
   if (editor === "list") {
     const rows = [...dashLines(content), ""].map(
-      (v) => `<div class="row"><input data-list="${esc(name)}" placeholder="${ph}" value="${esc(v)}"></div>`,
+      (v) => `<div class="row"><input data-list="${esc(name)}" placeholder="${ph}" value="${esc(v)}">${ROW_BTNS}</div>`,
     );
     return `<div class="rows">${rows.join("")}</div>`;
   }
@@ -474,7 +484,7 @@ function fieldEditor(name: string, content: string, meta: TemplateMeta | undefin
       });
     const rows = [...pairs, { f: "", a: "" }].map(
       (p) =>
-        `<div class="row"><input data-findf="${esc(name)}" placeholder="finding" value="${esc(p.f)}"><span class="sep">=&gt;</span><input data-finda="${esc(name)}" placeholder="answer" value="${esc(p.a)}"></div>`,
+        `<div class="row"><input data-findf="${esc(name)}" placeholder="finding" value="${esc(p.f)}"><span class="sep">=&gt;</span><input data-finda="${esc(name)}" placeholder="answer" value="${esc(p.a)}">${ROW_BTNS}</div>`,
     );
     return `<div class="rows">${rows.join("")}</div>`;
   }
