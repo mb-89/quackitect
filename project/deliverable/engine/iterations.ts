@@ -1,10 +1,10 @@
 // Iterations — planned work, SEEDED AS A FUNCTION (owner design
-// 2026-07-27): a seed mints the record and its worktree, and the
-// iteration stands VISIBLE in the iterations container from that moment —
-// a machine holding only its KICKOFF (v2's opening gate: one brief carries
-// plan and rigor, the owner blesses). The kickoff's outcome seeds the
-// rest; that lane is the next build. The needs-retro gate holds the FIRST
-// start of a never-walked iteration — never the seeding.
+// 2026-07-27; reshaped 2026-08-04): a seed mints the record and its
+// worktree, and the iteration stands VISIBLE in the iterations container
+// from that moment — standing in M0: the retro onboards, the kickoff
+// sizes. The kickoff's bless pins the blessed column and the machine
+// grows IN PLACE. The walk is FLAT: milestones are groups on the states,
+// never sub-machines; only seeded chunk machines dive.
 
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -12,9 +12,9 @@ import { dirname, join } from "node:path";
 import { type CanvasData, type CanvasEdge, type CanvasElement, nodeSize } from "./canvas.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { buildArchive, type GeneratedMachine } from "./expmachine.ts";
-import { type EvidenceField, type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
+import { type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
 import { parseStateNote } from "./notes.ts";
-import { CHANGE_COLUMNS, type ChangeColumn, compileColumn, readRigorMatrix, rigorMatrixContentHash } from "./rigor-matrix.ts";
+import { CHANGE_COLUMNS, type ChangeColumn, compileColumn, compileM0, readRigorMatrix, rigorMatrixContentHash } from "./rigor-matrix.ts";
 import { bustBranchList, listBranches, slug, worktreesDir } from "./worktree.ts";
 
 const SRC = "engine/iterations.ts";
@@ -460,9 +460,11 @@ export function itShortId(itId: string): string {
   return m ? m[1] : itId;
 }
 
-/** THE ITERATIONS CONTAINER, generated: every open iteration stands as
- *  its KICKOFF state. Never-started ones carry the needs-retro gate on
- *  entry. Nothing open: start runs to end. */
+/** THE ITERATIONS CONTAINER, generated: every open iteration is ONE node
+ *  whose machine is the iteration's own walk — M0 alone until the
+ *  kickoff's bless pins a column, the full pinned machine after. The walk
+ *  shows FLAT: milestones are groups on the states, never sub-machines
+ *  (owner ruling 2026-08-04). Nothing open: start runs to end. */
 export function generateIterations(root: string): GeneratedMachine {
   let open: Iteration[] = [];
   try {
@@ -474,7 +476,8 @@ export function generateIterations(root: string): GeneratedMachine {
     id: "start",
     kind: "start",
     statement: "",
-    guidance: "The seeded container: every open iteration stands as its KICKOFF. Entering one binds its worktree and stamps it started.",
+    guidance:
+      "The seeded container: every open iteration stands as its own machine. Entering one binds its worktree and stamps it started.",
     evidence_form: [],
     priority: 0.01,
     edges: [],
@@ -482,34 +485,6 @@ export function generateIterations(root: string): GeneratedMachine {
   const states: StateDecl[] = [start];
   const expByState: Record<string, string> = {};
   const subGen: Record<string, () => GeneratedMachine> = {};
-  // The kickoff's evidence form is the rigor matrix's OWN gate-kickoff row,
-  // read live (seed-from-source). An unreadable rigor matrix never takes the
-  // container down — the kickoff then serves without a form.
-  // THE MATRIX IS READ ONLY IF SOMETHING ACTUALLY STANDS HERE, and it used to
-  // be read on every render regardless. The container wants exactly ONE row
-  // out of fifty rows and two hundred and fifty cells - gate-kickoff, for its
-  // form and its tools - and it wants that only while an iteration is open.
-  // With nothing open this never runs, and the whole read disappears.
-  //
-  // ITS TOOLS COME FROM THAT SAME ROW. The container's kickoff is the matrix's
-  // gate-kickoff standing one machine higher, so it may call exactly what the
-  // row declares. Taking the form and leaving the tools behind is what left a
-  // seeded iteration unable to read the record it is about to fill in.
-  let kickoffRow: { evidence_form: EvidenceField[]; legal_tools?: string[] } | undefined;
-  let kickoffLooked = false;
-  const kickoff = (): { evidence_form: EvidenceField[]; legal_tools?: string[] } | undefined => {
-    if (!kickoffLooked) {
-      kickoffLooked = true;
-      // An unreadable matrix never takes the container down; the kickoff then
-      // serves without a form.
-      try {
-        kickoffRow = readRigorMatrix(root).rows.find((r) => r.name === "gate-kickoff");
-      } catch {
-        kickoffRow = undefined;
-      }
-    }
-    return kickoffRow;
-  };
   type GenNode = CanvasElement & { styleAttributes?: Record<string, unknown> };
   const nodes: GenNode[] = [];
   const edges: CanvasEdge[] = [];
@@ -538,67 +513,24 @@ export function generateIterations(root: string): GeneratedMachine {
     const sid = itShortId(it.id);
     const fm = readItRecord(root, it);
     const goal = typeof fm?.goal === "string" ? fm.goal : it.id;
-    const started = typeof fm?.started === "string";
     expByState[sid] = it.id;
-    // A PINNED iteration expands: the kickoff leads into the pinned machine
-    // (a generated sub the reader clicks into), not straight to end.
-    let pinned: { change_size?: string; machine?: MachineDecl } | undefined;
-    try {
-      pinned = JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as { change_size?: string; machine?: MachineDecl };
-    } catch {
-      pinned = undefined;
-    }
-    const walkId = `${sid}-walk`;
-    const hasWalk = pinned?.machine !== undefined;
     states.push({
       id: sid,
       kind: "work",
       statement: goal,
       guidance:
-        "KICKOFF — one brief carries plan and rigor; the owner blesses, and past it the iteration is set. THE CHANGE SIZE IS NOT YOURS TO PICK. You PROPOSE one with your reasoning; the person decides, and their bless is the decision. Seeding never asked for a size and never needed to — every iteration reaches this state the same way, and the size is chosen here or nowhere. The bless SEEDS the rest: the engine compiles the blessed change_size from the live rigor matrix and pins the machine into the record. Goal, vision and inputs live in the record.",
-      evidence_form: kickoff()?.evidence_form ?? [],
-      ...(kickoff()?.legal_tools !== undefined ? { legal_tools: kickoff()?.legal_tools } : {}),
-      priority: 0.6,
-      ...(started ? {} : { entry: { no_pending_note: ["needs retro"] } }),
-      tags: ["iteration-kickoff"],
-      edges: [hasWalk ? { to: walkId, role: "normal" as const } : { to: "end", role: "alternative" as const }],
+        "The iteration's own machine — enter it and the walk stands in M0: the retro onboards, the kickoff proposes a size, and the bless pins the full column. Goal, vision and inputs live in the record.",
+      evidence_form: [],
+      priority: 0.2,
+      submachine: "generated",
+      edges: [{ to: "end", role: "normal" }],
     });
-    if (hasWalk) {
-      const m = pinned!.machine!;
-      expByState[walkId] = it.id;
-      states.push({
-        id: walkId,
-        kind: "work",
-        statement: `the pinned ${String(pinned?.change_size)} walk (${m.states.length} states)`,
-        guidance:
-          "The pinned machine — compiled from the rigor matrix at the kickoff bless, pinned to the record. Click in; the walk continues inside. Rigor matrix edits reach the NEXT kickoff, never this walk.",
-        evidence_form: [],
-        priority: 0.2,
-        submachine: "generated",
-        edges: [{ to: "end", role: "alternative" }],
-      });
-      subGen[walkId] = () => ({
-        decl: { ...m, id: walkId },
-        canvas: pinnedCanvas(m),
-        expByState: {},
-        // The walk's own seed points: a state that RUNS a seeded machine
-        // descends into it here — or refuses typed when nothing was seeded.
-        subGen: Object.fromEntries(
-          m.states.filter((s) => s.submachine !== undefined).map((s) => [s.id, () => generateSeeded(root, it, s.id, s.submachine!)]),
-        ),
-      });
-    }
+    subGen[sid] = () => generateIterationWalk(root, it, sid);
     start.edges.push({ to: sid, role: "normal" });
     const y = i * 420;
     nodes.push({ id: `n-${sid}`, type: "file", file: `${sid}.md`, x: -1100, y, ...nodeSize(sid, goal) });
     edges.push({ id: `e-start-${sid}`, fromNode: "n-start", toNode: `n-${sid}` });
-    if (hasWalk) {
-      nodes.push({ id: `n-${walkId}`, type: "file", file: `${walkId}.md`, x: -560, y, ...nodeSize(walkId) });
-      edges.push({ id: `e-${sid}-${walkId}`, fromNode: `n-${sid}`, toNode: `n-${walkId}` });
-      edges.push({ id: `e-${walkId}-end`, fromNode: `n-${walkId}`, toNode: "n-end" });
-    } else {
-      edges.push({ id: `e-${sid}-end`, fromNode: `n-${sid}`, toNode: "n-end" });
-    }
+    edges.push({ id: `e-${sid}-end`, fromNode: `n-${sid}`, toNode: "n-end" });
   });
   if (open.length === 0) {
     start.edges.push({ to: "end", role: "normal" });
@@ -608,7 +540,7 @@ export function generateIterations(root: string): GeneratedMachine {
     id: "end",
     kind: "end",
     statement: "",
-    guidance: "Left the iterations container — running work parks where it stands; a seeded one waits for its first start.",
+    guidance: "Left the iterations container — running work parks where it stands; a seeded one waits in M0.",
     evidence_form: [],
     priority: 0.01,
     edges: [],
@@ -621,6 +553,27 @@ export function generateIterations(root: string): GeneratedMachine {
     metadata: { frontmatter: { reentry: "restart", priority: 0.4 } },
   };
   return { decl, canvas, expByState, ...(Object.keys(subGen).length > 0 ? { subGen } : {}) };
+}
+
+/** The iteration's machine, read at CALL time: the pinned column when the
+ *  pin stands, the M0 seed machine otherwise — the same machine id either
+ *  way, so evidence keys and history survive the pin swap. */
+function generateIterationWalk(root: string, it: Iteration, sid: string): GeneratedMachine {
+  let pinned: { machine?: MachineDecl } | undefined;
+  try {
+    pinned = JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as { machine?: MachineDecl };
+  } catch {
+    pinned = undefined;
+  }
+  const m: MachineDecl = pinned?.machine !== undefined ? { ...pinned.machine, id: sid } : compileM0(readRigorMatrix(root), sid);
+  return {
+    decl: m,
+    canvas: pinnedCanvas(m),
+    expByState: {},
+    subGen: Object.fromEntries(
+      m.states.filter((s) => s.submachine !== undefined).map((s) => [s.id, () => generateSeeded(root, it, s.id, s.submachine!)]),
+    ),
+  };
 }
 
 /** A drawn view of a pinned machine: milestone columns, states stacked in

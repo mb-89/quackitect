@@ -4,10 +4,9 @@ The state refuses while a PENDING note carries one of the condition's
 marker phrases. The arguments are the markers; matching is
 case-insensitive substring over pending (undrained) notes.
 
-The one live use: start_iteration carries
-`entry_no_pending_note: needs retro` — whenever an iteration finishes, or
-the owner asks for a retro, a note saying "needs retro" is minted. While
-it pends, iterations cannot start. The RETRO's drain dispositions it
-(idle → retro → drain), and the gate opens.
+No state carries it today. The former use — a pending "needs retro" note
+gating an iteration's first start — was dropped (owner 2026-08-04):
+every iteration opens with its own onboard-retro inside M0, and that
+retro drains the pending notes, the "needs retro" markers included.
 
-How to satisfy it: run the retro. Draining is legal only there.
+How to satisfy it, wherever it is used next: drain the named notes.

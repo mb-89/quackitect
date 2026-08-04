@@ -1,7 +1,8 @@
-// Seeding is a FUNCTION (owner design 2026-07-27): a seed mints the
-// record and its worktree, and the iteration stands VISIBLE in the
-// iterations container as its KICKOFF from that moment. The needs-retro
-// gate holds only the FIRST start of a never-walked iteration.
+// Seeding is a FUNCTION (owner design 2026-07-27; reshaped 2026-08-04):
+// a seed mints the record and its worktree, and the iteration stands
+// VISIBLE in the iterations container from that moment — as its OWN
+// machine, standing in M0. The kickoff's bless pins the column and the
+// machine grows in place; no gate holds the first start.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -27,20 +28,30 @@ function gitInit(root: string): void {
   }
 }
 
-test("a seed stands in the container at once — kickoff only, gate armed", () => {
+test("a seed stands in the container at once — its machine is M0", () => {
   const root = freshRoot();
   gitInit(root);
-  const it = itSeed(root, "first visible iteration", "the container shows it as a kickoff", ["e13"]);
+  const it = itSeed(root, "first visible iteration", "the container shows it standing in M0", ["e13"]);
   assert.match(it.id, /^i1-/);
   const rec = readFileSync(join(it.path, "project", "spec", "iterations", it.id, "record.md"), "utf8");
   assert.match(rec, /^status: seeded$/m);
   assert.match(rec, /^vision: /m);
   assert.match(rec, /- "e13"/);
   const gen = generateIterations(root);
-  const kick = gen.decl.states.find((s) => s.id === "i1")!;
-  assert.equal(kick.statement, "first visible iteration");
-  assert.deepEqual(kick.entry, { no_pending_note: ["needs retro"] });
+  const node = gen.decl.states.find((s) => s.id === "i1")!;
+  assert.equal(node.statement, "first visible iteration");
+  assert.equal(node.entry, undefined, "no gate holds the first start — the retro rides inside M0");
+  assert.equal(node.submachine, "generated");
   assert.equal(gen.expByState.i1, it.id);
+  const walk = gen.subGen!.i1();
+  assert.deepEqual(
+    walk.decl.states.map((s) => s.id),
+    ["start", "onboard-retro", "gate-kickoff", "end"],
+    "the seed machine is M0 alone",
+  );
+  const kick = walk.decl.states.find((s) => s.id === "gate-kickoff")!;
+  assert.equal(kick.group, "M0", "milestones are groups on the states");
+  assert.deepEqual(kick.tags, ["iteration-kickoff"]);
   // Not a git repo → an empty container that runs start to end.
   const empty = generateIterations(freshRoot());
   assert.deepEqual(empty.decl.states.find((s) => s.id === "start")?.edges, [{ to: "end", role: "normal" }]);
@@ -216,11 +227,12 @@ test("escalation reopens exactly the grown steps", () => {
   assert.deepEqual(pin.reopened ?? [], expected, "the reopen list rides the pin itself");
 });
 
-test("the bless pins the machine and the container expands to the pinned walk", async () => {
-  // The WALK here is the human's hand (session-level, hash-free) — the
-  // agent's read proofs are the reading buffer now, covered in
-  // reads.test.ts, so this test drives the mechanics it is actually
-  // about: the bless, the pin, and the gate report.
+test("the bless pins the machine and it grows in place — no wrapper, fills carried", async () => {
+  // The WALK here is the human's hand (session-level, hash-free). The
+  // gate-report law (no gate passes without a PASSED milestone review)
+  // now binds the gates AFTER the kickoff; the kickoff's own bless IS
+  // the pin, and this test drives exactly that seam: M0 at seed, the
+  // refusal without a change_size, the pin, and the in-place growth.
   const root = freshRoot();
   gitInit(root);
   const session = new Session(root);
@@ -236,60 +248,54 @@ test("the bless pins the machine and the container expands to the pinned walk", 
   const sid = id.match(/^(i\d+)-/)?.[1];
   await session.advance("iterations");
   await session.advance(sid);
+  // Entering the node descends into the iteration's OWN machine — M0.
+  assert.deepEqual(session.breadcrumb(), ["main", "iterations", sid]);
+  await session.advance(); // start → onboard-retro
+  await session.advance(); // onboard-retro → gate-kickoff
   // No change_size in the record: the bless refuses, mechanically.
   await assert.rejects(
     () => session.advance(),
     (e) => /change_size/.test(JSON.stringify(e)),
   );
-  // The prefill lands in the record; the advance is the bless.
+  // The prefill lands in the record; the advance is the bless — the pin
+  // fires and the machine GROWS IN PLACE during that very call. Several
+  // ways forward stand in the grown machine, so the UNNAMED advance
+  // refuses typed — and the growth has already happened when it does.
   const rec = join(root, ".worktrees", id, "project", "spec", "iterations", id, "record.md");
   writeFileSync(rec, readFileSync(rec, "utf8").replace(/^status: /m, "change_size: patch\nstatus: "), "utf8");
-  await session.advance();
-  assert.ok(existsSync(join(root, ".worktrees", id, itPinRel(id))), "the pin exists");
-  // Re-entering the container serves the walk: kickoff → the pinned machine.
-  await session.advance();
-  await session.advance("iterations");
-  await session.advance(sid);
-  await session.advance();
-  assert.deepEqual(session.breadcrumb(), ["main", "iterations", `${sid}-walk`], "the walk descended into the pinned machine");
-  // NO GATE PASSES WITHOUT A REVIEW REPORT (owner ruling): walk to the
-  // first gate and try to leave — held until the report stands, then quick.
-  const pin2 = JSON.parse(readFileSync(join(root, ".worktrees", id, itPinRel(id)), "utf8")) as { machine: MachineDecl };
-  const gate = pin2.machine.states.find((s) => s.id === "gate-kickoff")!;
-  await session.advance("gate-kickoff");
   await assert.rejects(
-    () => session.advance(gate.edges[0].to),
-    (e) => /review report/.test(String((e as { expected?: string }).expected)),
+    () => session.advance(),
+    (e) => /named way forward/.test(JSON.stringify(e)),
   );
-  const review = join(root, ".worktrees", id, "project", "spec", "iterations", id, "reviews", "gate-kickoff.md");
-  mkdirSync(dirname(review), { recursive: true });
-  const sections = [
-    ...gate.evidence_form.map((f) => `## ${f.name}\n\nfilled for the test\n`),
-    "## verify\n\neach input checked against its referent\n",
-    "## validate\n\nthe milestone fits the frame\n",
-    "## red_team\n\nthe opposing case was argued\n",
-  ].join("\n");
-  writeFileSync(
-    review,
-    `---\nform: milestone-review\ngate: gate-kickoff\nstatus: done\nby: test\nverdict: PASS\n---\n\n# gate-kickoff — milestone review\n\n${sections}`,
-    "utf8",
-  );
-  await session.advance(gate.edges[0].to);
-  // THE BLESS IS SEPARATE AND DURABLE: the passing step stamped the
-  // sidecar with the report's version and whose hand it was.
-  const bless = JSON.parse(readFileSync(review.replace(/\.md$/, ".bless.json"), "utf8")) as { hash: string; by: string };
-  assert.equal(bless.by, "human");
-  assert.match(bless.hash, /^[0-9a-f]+$/);
+  assert.ok(existsSync(join(root, ".worktrees", id, itPinRel(id))), "the pin exists");
+  assert.deepEqual(session.breadcrumb(), ["main", "iterations", sid], "the walk stands in the SAME machine");
+  const grown = session.currentMachine();
+  assert.equal(grown.id, sid, "the machine id is stable across the pin");
+  const pin = JSON.parse(readFileSync(join(root, ".worktrees", id, itPinRel(id)), "utf8")) as { machine: MachineDecl };
+  assert.equal(grown.states.length, pin.machine.states.length, "the machine is the pinned column now");
+  // Leaving the blessed kickoff by a NAMED edge completes it — and the
+  // M0 fills carried across the swap.
+  await session.advance(grown.states.find((s) => s.id === "gate-kickoff")!.edges[0].to);
+  const hist = (session.describe() as { history: { state: string; outcome: string }[] }).history.map((h) => h.state);
+  assert.ok(hist.includes(`iterations/${sid}/onboard-retro`), "the retro's fill survived the swap");
+  assert.ok(hist.includes(`iterations/${sid}/gate-kickoff`), "the kickoff's fill survived the swap");
+  // Entering stamped `started:` — the bind is the container's.
+  assert.match(readFileSync(rec, "utf8"), /^started: /m);
 });
 
-test("the kickoff serves the rigor matrix's live evidence form", () => {
+test("the kickoff serves the rigor matrix's live evidence form, rounds included", () => {
   const root = freshRoot();
   gitInit(root);
   itSeed(root, "the form rides", "the kickoff carries the gate fields");
-  const gen = generateIterations(root);
-  const kick = gen.decl.states.find((s) => s.id === "i1")!;
+  const kick = generateIterations(root)
+    .subGen!.i1()
+    .decl.states.find((s) => s.id === "gate-kickoff")!;
   assert.ok(kick.evidence_form.some((f) => f.name === "change_size" && f.required));
   assert.ok(kick.evidence_form.some((f) => f.name === "retro_drained" && f.required !== false));
+  assert.ok(
+    kick.evidence_form.some((f) => f.name === "verdict"),
+    "the compiler adds the four rounds to every gate",
+  );
 });
 
 test("the seed refuses a missing vision — the seed is a small form", () => {
@@ -301,7 +307,7 @@ test("the seed refuses a missing vision — the seed is a small form", () => {
   );
 });
 
-test("needs-retro holds the FIRST start; draining opens it; a started iteration never blocks", async () => {
+test("no gate holds the first start — entering binds, stamps started, and M0 stands", async () => {
   const root = freshRoot();
   gitInit(root);
   const session = new Session(root);
@@ -312,34 +318,19 @@ test("needs-retro holds the FIRST start; draining opens it; a started iteration 
   await session.advance();
   await session.advance();
   await session.advance();
-  session.setAutonomy(1); // the kickoff weighs 0.6 — lift the slider clear
-  const seeded = session.iterationSeed("prove the gate", "the first start waits on the retro");
+  session.setAutonomy(1); // the kickoff gate weighs 0.6 — lift the slider clear
+  const seeded = session.iterationSeed("first start unblocked", "the retro rides inside M0");
   const sid = String(seeded.seeded).match(/^(i\d+)-/)?.[1];
+  // A pending "needs retro" note no longer gates the start (owner
+  // 2026-08-04): the iteration's own onboard-retro is the anchor.
   await call(server, "se_note", { text: "needs retro — iteration wrapped" });
   await session.advance("iterations");
-  await assert.rejects(
-    () => session.advance(sid),
-    (e) => (e as { clause?: string }).clause === "SE-C-112" && /needs retro/.test(JSON.stringify(e)),
-  );
-  // Escape out — to the DESK now — then to the retro via idle; drain
-  // there, come back, and the first start opens.
-  session.escape("gated by needs-retro", "human");
-  await session.advance(); // the desk's one edge returns to idle
-  session.humanCheck("project/guidance/method/retro.md");
-  await session.advance("retro");
-  const notesRaw = readFileSync(join(root, ".se", "notes.jsonl"), "utf8");
-  const ref = JSON.parse(
-    notesRaw
-      .trim()
-      .split("\n")
-      .filter((l) => l.includes("needs retro"))[0],
-  ).ref as string;
-  await call(server, "se_note_drain", { ref, disposition: "done", where: "retro ran" });
-  await session.advance(); // the retro's one edge returns to idle
-  await session.advance("iterations");
   await session.advance(sid);
-  // Entering bound the worktree and stamped `started:` — from now on a
-  // fresh needs-retro note gates only NEW iterations, never this one.
+  assert.deepEqual(session.breadcrumb(), ["main", "iterations", sid]);
+  await session.advance(); // start → onboard-retro: the retro stands FIRST
+  const active = (session.describe() as { submachine?: { active: string[] } }).submachine?.active;
+  assert.deepEqual(active, ["onboard-retro"]);
+  // Entering bound the worktree and stamped `started:`.
   const rec = readFileSync(
     join(root, ".worktrees", String(seeded.seeded), "project", "spec", "iterations", String(seeded.seeded), "record.md"),
     "utf8",

@@ -803,6 +803,24 @@ export class Session {
     this.rewalk(pin, `escalated to ${size}`);
   }
 
+  /** The pin GROWS the machine under the walk's feet: regenerate the
+   *  iteration's machine (pinned now), carry history, counters and the
+   *  active kickoff, and swap the frame in place. The machine id and the
+   *  state ids are stable, so the evidence store keeps answering. */
+  private repinSwap(): void {
+    const top = this.top();
+    const parent = this.subs[this.subs.length - 2];
+    if (top === undefined || parent === undefined) return;
+    const regen = parent.gen?.subGen?.[top.parentState]?.();
+    if (regen === undefined || regen.decl.states.length <= top.decl.states.length) return;
+    const inst = newInstance(regen.decl);
+    inst.history = top.instance.history;
+    inst.counters = top.instance.counters;
+    inst.current = top.instance.current;
+    inst.active = [...activeStates(top.instance)];
+    this.subs[this.subs.length - 1] = { decl: regen.decl, instance: inst, parentState: top.parentState, gen: regen };
+  }
+
   /**
    * THE RE-WALK. One mechanism, several triggers.
    *
@@ -2055,19 +2073,27 @@ export class Session {
     return this.top()?.decl ?? this.machine;
   }
 
-  /** Entering a GENERATED container's expedition states binds that
-   *  expedition's worktree — the click IS the pick (owner design
-   *  2026-07-27). The parent-return and escape paths unbind as ever. */
+  /** Entering a GENERATED container's record states binds that record's
+   *  worktree — the click IS the pick (owner design 2026-07-27). The walk
+   *  may already stand INSIDE the record's own machine when this runs (an
+   *  iteration node descends at once), so every frame is checked and the
+   *  deepest frame naming a record wins. The parent-return and escape
+   *  paths unbind as ever. */
   private autoBind(): void {
-    const top = this.top();
-    const gen = top?.gen;
-    if (top === undefined || gen === undefined) return;
-    const leaf = activeStates(top.instance)[0];
-    const boundId = leaf === undefined ? undefined : gen.expByState[leaf];
-    if (boundId === undefined || this.bound?.id === boundId) return;
-    // Only the WORK containers bind — archives browse read-only.
-    if (top.decl.id === "iterations") this.iterationOpen(boundId);
-    else if (top.decl.id === "expeditions") this.expeditionOpen(boundId);
+    for (let i = this.subs.length - 1; i >= 0; i--) {
+      const frame = this.subs[i];
+      const gen = frame.gen;
+      if (gen === undefined) continue;
+      const pos = i === this.subs.length - 1 ? activeStates(frame.instance)[0] : this.subs[i + 1].parentState;
+      const boundId = pos === undefined ? undefined : gen.expByState[pos];
+      if (boundId === undefined) continue;
+      if (this.bound?.id !== boundId) {
+        // Only the WORK containers bind — archives browse read-only.
+        if (frame.decl.id === "iterations") this.iterationOpen(boundId);
+        else if (frame.decl.id === "expeditions") this.expeditionOpen(boundId);
+      }
+      return;
+    }
   }
 
   /** The mirror's view of a GENERATED machine: the walk's own instance
@@ -3241,20 +3267,27 @@ export class Session {
     supplied: Record<string, string>,
     now: string,
   ): Promise<Record<string, unknown>> {
+    const entered = this.top()!;
+    const cur = activeStates(entered.instance)[0];
+    // THE KICKOFF PINS, AND THE MACHINE GROWS IN PLACE (owner ruling
+    // 2026-08-04): leaving a blessed kickoff compiles the column and swaps
+    // the M0 seed machine for the pinned walk BEFORE the step is weighed —
+    // same machine id, same state ids, so evidence and history carry.
+    if (this.state(entered.decl, cur).tags?.includes("iteration-kickoff") ?? false) {
+      this.pinKickoff(this.subs[this.subs.length - 2]?.gen?.expByState[entered.parentState]);
+      this.repinSwap();
+    }
     const top = this.top()!;
-    const cur = activeStates(top.instance)[0];
     this.assertEdge(top.decl, cur, to);
     const subTarget = to ?? this.state(top.decl, cur).edges[0]?.to;
     if (subTarget !== undefined) this.gatePriority(top.decl, [subTarget], channel);
     await this.assertConditions(top.decl, this.state(top.decl, cur), to, channel, supplied);
-    if (top.decl.id === "iterations" && (this.state(top.decl, cur).tags?.includes("iteration-kickoff") ?? false)) {
-      this.pinKickoff(top.gen?.expByState[cur]);
-    }
     // NO GATE PASSES WITHOUT A REVIEW REPORT (owner ruling 2026-07-30):
-    // inside a pinned walk, leaving a gate demands its milestone review
-    // report — complete and PASSED. The report is the durable bless: a
-    // re-walk finds it standing and passes quickly.
-    if (this.bound !== undefined && top.decl.id.endsWith("-walk") && this.state(top.decl, cur).kind === "gate") {
+    // inside an iteration's own walk, leaving a gate demands its milestone
+    // review report — complete and PASSED. The kickoff is the one gate
+    // without one: its bless IS the pin.
+    const inIteration = this.subs[this.subs.length - 2]?.decl.id === "iterations";
+    if (this.bound !== undefined && inIteration && this.state(top.decl, cur).kind === "gate" && cur !== "gate-kickoff") {
       this.assertGateReport(cur, this.state(top.decl, cur), channel);
     }
     this.completeGuarded(top.decl, top.instance, cur, "filled", now, to);

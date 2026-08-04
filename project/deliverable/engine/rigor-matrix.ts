@@ -250,6 +250,34 @@ function priorityOf(row: RigorMatrixRow): number {
   return 0.2;
 }
 
+/** What a row compiles to, minus what differs per compilation: guidance
+ *  source, sub-machine descent and edges. Both compilers spread this, so
+ *  the gate rounds and the kickoff tag cannot drift apart. */
+function rowState(row: RigorMatrixRow): Omit<StateDecl, "guidance" | "edges"> {
+  return {
+    id: row.name,
+    kind: row.state_kind,
+    group: row.milestone,
+    statement: row.statement,
+    filled_by: row.filled_by,
+    ...(row.command ? { command: row.command } : {}),
+    // EVERY GATE CARRIES THE FOUR ROUNDS, and the compiler adds them so that
+    // no row author can forget one. v2 recorded what happens otherwise: the
+    // rounds were doctrine since meth-gate-review was written, no evidence
+    // form ever collected them, and consequently NOT ONE was filled in any
+    // gate of any iteration.
+    evidence_form: row.state_kind === "gate" ? [...row.evidence_form, ...STANDARD_ROUNDS] : row.evidence_form,
+    priority: priorityOf(row),
+    // Absent stays minimal — the always-legal three and nothing else. The
+    // kickoff sets each state's rights, so a row opens only what it declares.
+    // A state must declare enough to execute the remedy its own refusal hands
+    // back, or SE-C-112 answers with SE-C-110 and the walk cannot recover.
+    ...(row.legal_tools !== undefined ? { legal_tools: row.legal_tools } : {}),
+    // The walk's pin hook finds the kickoff by this tag, wherever it compiles.
+    ...(row.name === "gate-kickoff" ? { tags: ["iteration-kickoff"] } : {}),
+  };
+}
+
 /** Compile one change-size column into an iteration machine. Struck rows
  *  vanish; each surviving row's dependencies contract transitively through
  *  the struck ones, so the walk stays connected without them. */
@@ -353,31 +381,56 @@ export function compileColumn(matrix: RigorMatrix, column: ChangeColumn): Machin
     if (!applied.has(row.name)) continue;
     const cell = matrix.cells.get(row.name)!.get(column)!;
     states.push({
-      id: row.name,
-      kind: row.state_kind,
-      group: row.milestone,
-      statement: row.statement,
-      filled_by: row.filled_by,
-      ...(row.command ? { command: row.command } : {}),
+      ...rowState(row),
       guidance: [cell.body, row.guidance].filter(Boolean).join("\n\n"),
-      // EVERY GATE CARRIES THE FOUR ROUNDS, and the compiler adds them so that
-      // no row author can forget one. v2 recorded what happens otherwise: the
-      // rounds were doctrine since meth-gate-review was written, no evidence
-      // form ever collected them, and consequently NOT ONE was filled in any
-      // gate of any iteration. The canvas compiler already did this; THIS one
-      // did not, so the ten gates a real iteration walks carried none of them.
-      evidence_form: row.state_kind === "gate" ? [...row.evidence_form, ...STANDARD_ROUNDS] : row.evidence_form,
       ...(row.runs ? { submachine: row.runs } : {}),
-      priority: priorityOf(row),
-      // Absent stays minimal — the always-legal three and nothing else. The
-      // kickoff sets each state's rights, so a row opens only what it declares.
-      // A state must declare enough to execute the remedy its own refusal hands
-      // back, or SE-C-112 answers with SE-C-110 and the walk cannot recover.
-      ...(row.legal_tools !== undefined ? { legal_tools: row.legal_tools } : {}),
       edges: edgesFrom.get(row.name) ?? [],
     });
   }
   const decl: MachineDecl = { id: `iteration-${column}`, reentry: "resume", initial: "start", states };
+  validateMachine(decl);
+  return decl;
+}
+
+/** THE SEED MACHINE (owner ruling 2026-08-04): every iteration stands in
+ *  M0 from the moment it is seeded — the retro onboards, then the kickoff
+ *  sizes. No column exists yet, so only the M0 rows compile, on their own
+ *  guidance. The kickoff's bless pins the full column and the machine
+ *  grows IN PLACE: the machine id and the state ids are stable, so filled
+ *  M0 states and their evidence carry over. */
+export function compileM0(matrix: RigorMatrix, id: string): MachineDecl {
+  const rows = matrix.rows.filter((r) => r.milestone === "M0");
+  const inSet = (name: string) => rows.some((r) => r.name === name);
+  const roleFrom = (row: RigorMatrixRow) => (row.state_kind === "gate" ? ("approval" as const) : ("normal" as const));
+  const states: StateDecl[] = [
+    {
+      id: "start",
+      kind: "start",
+      statement: "",
+      guidance: "The seeded iteration: M0 first. The retro onboards, the kickoff proposes a size, and the bless pins the rest.",
+      evidence_form: [],
+      priority: 0.01,
+      edges: rows.filter((r) => r.depends_on.every((d) => !inSet(d))).map((r) => ({ to: r.name, role: "normal" as const })),
+    },
+  ];
+  for (const row of rows) {
+    const dependents = rows.filter((o) => o.depends_on.includes(row.name));
+    states.push({
+      ...rowState(row),
+      guidance: row.guidance,
+      edges: dependents.length > 0 ? dependents.map((o) => ({ to: o.name, role: roleFrom(row) })) : [{ to: "end", role: roleFrom(row) }],
+    });
+  }
+  states.push({
+    id: "end",
+    kind: "end",
+    statement: "",
+    guidance: "The kickoff is blessed and the column pinned — the walk continues in the grown machine.",
+    evidence_form: [],
+    priority: 0.01,
+    edges: [],
+  });
+  const decl: MachineDecl = { id, reentry: "resume", initial: "start", states };
   validateMachine(decl);
   return decl;
 }

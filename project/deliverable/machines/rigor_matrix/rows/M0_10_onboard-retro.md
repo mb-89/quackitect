@@ -30,7 +30,7 @@ evidence:
     description: "the standing state-of-the-art check on the process itself"
 major: full
 minor: full
-patch: none
+patch: tailored
 product: full
 specification: tailored
 major_note: |
@@ -41,9 +41,10 @@ minor_note: |
   retro: field feedback first, inbox drained, call history mined. The
   cadence exists exactly for work of this size.
 patch_note: |
-  Does not apply. The retro belongs to the session cadence, not to a patch.
-  A patch rides an open expedition; the retro that covers it is the day's,
-  not its own. STRIKE PROPOSAL - owner adjudicates.
+  Applies, tailored (owner adjudication 2026-08-04: the strike proposal
+  is rejected). A patch is an iteration, and every iteration opens with
+  the retro - for a patch it is what decides what rides in: field
+  feedback first, then the inbox sweep.
 product_note: |
   STANDING STATE: the retro cadence itself. At rest the product shows a
   near-empty notes inbox, a drained backlog with ready-when conditions,

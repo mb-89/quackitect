@@ -196,7 +196,7 @@ export function expeditionTools(session: Session): ToolDef[] {
       name: "se_seed_iteration",
       title: "se.seed.iteration",
       description:
-        "Seed an iteration: goal + rough vision, plus input refs (an expedition id, retro note refs). Mints its record and worktree (branch it/<id>); it stands in the iterations container as its KICKOFF — the kickoff's outcome seeds the rest. A pending 'needs retro' note gates only the FIRST start of a never-walked iteration, never the seeding.",
+        "Seed an iteration: goal + rough vision, plus input refs (an expedition id, retro note refs). Mints its record and worktree (branch it/<id>); it stands in the iterations container in M0 — the retro onboards, the kickoff proposes a size, and the bless pins the rest. No size is asked at the seed.",
       inputSchema: {
         type: "object",
         properties: {

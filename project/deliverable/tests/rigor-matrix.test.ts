@@ -64,7 +64,8 @@ test("compileColumn patch: struck states vanish and dependencies contract", () =
   // Struck at patch: no vision, no architecture walk.
   assert.ok(!ids.has("gate-motivation"));
   assert.ok(!ids.has("enumerate-space"));
-  assert.ok(!ids.has("onboard-retro"));
+  // Every iteration opens with the retro — patch included (owner 2026-08-04).
+  assert.ok(ids.has("onboard-retro"));
   // The floor holds. Every size is checked below; this is the patch case,
   // which is the one that strikes the most.
   assert.ok(ids.has("gate-kickoff"));
@@ -81,8 +82,8 @@ test("compileColumn patch: struck states vanish and dependencies contract", () =
   assert.deepEqual(incoming("write-requirements"), ["frame-delta", "log-risks"]);
   // author-tests contracts through the whole struck M4-M6 stretch.
   assert.deepEqual(incoming("author-tests"), ["probe-assumptions", "write-requirements"]);
-  // 17 applied rows + start.
-  assert.equal(decl.states.length, 18);
+  // 18 applied rows + start.
+  assert.equal(decl.states.length, 19);
 });
 
 test("compileColumn: the verification loop compiles as fallback and recovery", () => {
