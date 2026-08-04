@@ -45,16 +45,42 @@ function stateIdOf(el: CanvasElement): string | undefined {
  *  its heart. The declared sides lost their vote in OUR drawing — side
  *  anchors let geometry bury a tip inside a box; Obsidian still reads
  *  them from the canvas for its own render. */
-function borderPoint(el: CanvasElement, other: CanvasElement): [number, number] {
+function borderPoint(el: CanvasElement, toward: [number, number]): [number, number] {
   const cx = el.x + el.width / 2;
   const cy = el.y + el.height / 2;
-  const dx = other.x + other.width / 2 - cx;
-  const dy = other.y + other.height / 2 - cy;
+  const dx = toward[0] - cx;
+  const dy = toward[1] - cy;
   if (dx === 0 && dy === 0) return [cx, cy];
   const sx = dx === 0 ? Number.POSITIVE_INFINITY : el.width / 2 / Math.abs(dx);
   const sy = dy === 0 ? Number.POSITIVE_INFINITY : el.height / 2 / Math.abs(dy);
   const s = Math.min(sx, sy);
   return [cx + dx * s, cy + dy * s];
+}
+
+const centerOf = (el: CanvasElement): [number, number] => [el.x + el.width / 2, el.y + el.height / 2];
+
+/** A LONG EDGE ROUTES AROUND THE BAND (owner rule 2026-08-04): when other
+ *  nodes stand vertically between the two, the line detours through up to
+ *  two OUTSIDE waypoints — beside the source, then straight down beside
+ *  the target — at 100px past the widest in-between node on the chosen
+ *  side. A waypoint that would land inside its own endpoint is skipped. */
+function edgeWaypoints(a: CanvasElement, b: CanvasElement, nodes: CanvasElement[]): [number, number][] {
+  const [acx, acy] = centerOf(a);
+  const [bcx, bcy] = centerOf(b);
+  const lo = Math.min(acy, bcy);
+  const hi = Math.max(acy, bcy);
+  const between = nodes.filter((n) => {
+    if (n === a || n === b || n.type === "group") return false;
+    const cy = n.y + n.height / 2;
+    return cy > lo && cy < hi;
+  });
+  if (between.length === 0) return [];
+  const right = acx >= bcx;
+  const x = right ? Math.max(...between.map((n) => n.x + n.width)) + 100 : Math.min(...between.map((n) => n.x)) - 100;
+  const pts: [number, number][] = [];
+  if (x < a.x || x > a.x + a.width) pts.push([x, acy]);
+  if (x < b.x || x > b.x + b.width) pts.push([x, bcy]);
+  return pts;
 }
 
 /** THE FEED ROLES — one colour per role, none shared. The aq kind wore the
@@ -192,20 +218,27 @@ function svgGroups(nodes: CNode[]): string[] {
 
 function svgEdges(canvas: CanvasData, byId: Map<string, CNode>): string[] {
   const parts: string[] = [];
+  const nodes = canvas.nodes ?? [];
   for (const edge of canvas.edges ?? []) {
     const a = byId.get(edge.fromNode);
     const b = byId.get(edge.toNode);
     if (a === undefined || b === undefined) continue;
-    const [x1, y1] = borderPoint(a, b);
-    const [x2, y2] = borderPoint(b, a);
+    const pts = edgeWaypoints(a, b, nodes);
+    const [x1, y1] = borderPoint(a, pts[0] ?? centerOf(b));
+    const [x2, y2] = borderPoint(b, pts[pts.length - 1] ?? centerOf(a));
     // A double-headed arrow is one edge meaning both ways, so it draws that
     // way too — the marker already orients itself at a start.
     const bothWays = (edge as { fromEnd?: string }).fromEnd === "arrow";
-    parts.push(
-      `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="edge"${bothWays ? ' marker-start="url(#arrow)"' : ""} marker-end="url(#arrow)"/>`,
-    );
+    const ends = `class="edge"${bothWays ? ' marker-start="url(#arrow)"' : ""} marker-end="url(#arrow)"`;
+    if (pts.length === 0) {
+      parts.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" ${ends}/>`);
+    } else {
+      const mid = pts.map((p) => `L ${p[0]} ${p[1]}`).join(" ");
+      parts.push(`<path d="M ${x1} ${y1} ${mid} L ${x2} ${y2}" fill="none" ${ends}/>`);
+    }
     if (edge.label !== undefined && edge.label !== "") {
-      parts.push(`<text x="${(x1 + x2) / 2}" y="${(y1 + y2) / 2 - 8}" class="guard">${esc(edge.label)}</text>`);
+      const [lx, ly] = pts[0] ?? [(x1 + x2) / 2, (y1 + y2) / 2];
+      parts.push(`<text x="${lx}" y="${ly - 8}" class="guard">${esc(edge.label)}</text>`);
     }
   }
   return parts;
