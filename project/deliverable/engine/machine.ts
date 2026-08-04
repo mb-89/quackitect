@@ -36,6 +36,8 @@ export interface EvidenceField {
   type?: EvidenceType;
   /** One or two lines telling whoever fills it what belongs in it. */
   guidance?: string;
+  /** The table template's column names. */
+  columns?: string[];
   /** The field's template (machines/forms/templates/<name>.md). Absent
    *  means free-form; every referenced template is a read input. */
   template?: string;

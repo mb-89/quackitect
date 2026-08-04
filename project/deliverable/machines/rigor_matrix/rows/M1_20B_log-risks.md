@@ -17,7 +17,15 @@ legal_tools:
   - se_answer
 evidence:
   - name: raid_opened
-    description: "the top entries, each with kind, owner and trigger"
+    description: "the register's table: every entry typed, owned, numbered, triggered"
+    template: table
+    columns: [kind, entry, impact, likelihood, owner, revisit]
+    guidance: |
+      One markdown-table row per entry. kind is R, A, I or D. impact and
+      likelihood are 1 to 5 — their product orders the register and draws
+      the computed risk picture, so no cell may stay empty. owner is a
+      role, never a name. revisit is the trigger that reopens the entry.
+      The method: [[meth-raid]].
 major: full
 minor: tailored
 patch: tailored

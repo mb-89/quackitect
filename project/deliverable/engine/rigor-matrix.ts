@@ -113,34 +113,35 @@ function parseEvidence(fm: Record<string, unknown>, file: string, body: string):
   const raw = fm.evidence;
   if (raw === undefined) return [];
   if (!Array.isArray(raw)) throw new Error(`matrix row ${file} evidence block is not a list`);
-  return raw.map((entry, i) => {
-    if (entry === null || typeof entry !== "object" || Array.isArray(entry)) {
-      throw new Error(`matrix row ${file} evidence entry ${i + 1} is not a mapping`);
-    }
-    const f = entry as Record<string, unknown>;
-    if (typeof f.name !== "string" || f.name.trim() === "") {
-      throw new Error(`matrix row ${file} evidence entry ${i + 1} declares no name`);
-    }
-    // An UNKNOWN type refuses rather than falling back to prose. A row that
-    // says `type: tabel` would otherwise be checked as free text forever,
-    // which is the quiet-divergence failure this repository refuses everywhere.
-    if (f.type !== undefined && !EVIDENCE_TYPES.includes(String(f.type) as EvidenceType)) {
-      throw new Error(
-        `matrix row ${file} field ${f.name}: unknown evidence type "${String(f.type)}" — one of ${EVIDENCE_TYPES.join(", ")}`,
-      );
-    }
-    return {
-      name: f.name,
-      description: typeof f.description === "string" ? f.description : "",
-      required: f.required !== false,
-      ...(f.type !== undefined ? { type: String(f.type) as EvidenceType } : {}),
-      ...(typeof f.guidance === "string" && f.guidance.trim() !== "" ? { guidance: f.guidance } : {}),
-      ...(typeof f.template === "string" && f.template.trim() !== "" ? { template: f.template } : {}),
-      ...(Array.isArray(f.options) ? { options: f.options.map(String) } : {}),
-      ...(Array.isArray(f.items) ? { items: f.items.map(String) } : {}),
-      ...(Array.isArray(f.passing) ? { passing: f.passing.map(String) } : {}),
-    };
-  });
+  return raw.map((entry, i) => evidenceField(file, entry, i));
+}
+
+function evidenceField(file: string, entry: unknown, i: number): EvidenceField {
+  if (entry === null || typeof entry !== "object" || Array.isArray(entry)) {
+    throw new Error(`matrix row ${file} evidence entry ${i + 1} is not a mapping`);
+  }
+  const f = entry as Record<string, unknown>;
+  if (typeof f.name !== "string" || f.name.trim() === "") {
+    throw new Error(`matrix row ${file} evidence entry ${i + 1} declares no name`);
+  }
+  // An UNKNOWN type refuses rather than falling back to prose. A row that
+  // says `type: tabel` would otherwise be checked as free text forever,
+  // which is the quiet-divergence failure this repository refuses everywhere.
+  if (f.type !== undefined && !EVIDENCE_TYPES.includes(String(f.type) as EvidenceType)) {
+    throw new Error(`matrix row ${file} field ${f.name}: unknown evidence type "${String(f.type)}" — one of ${EVIDENCE_TYPES.join(", ")}`);
+  }
+  return {
+    name: f.name,
+    description: typeof f.description === "string" ? f.description : "",
+    required: f.required !== false,
+    ...(f.type !== undefined ? { type: String(f.type) as EvidenceType } : {}),
+    ...(typeof f.guidance === "string" && f.guidance.trim() !== "" ? { guidance: f.guidance } : {}),
+    ...(typeof f.template === "string" && f.template.trim() !== "" ? { template: f.template } : {}),
+    ...(Array.isArray(f.options) ? { options: f.options.map(String) } : {}),
+    ...(Array.isArray(f.items) ? { items: f.items.map(String) } : {}),
+    ...(Array.isArray(f.passing) ? { passing: f.passing.map(String) } : {}),
+    ...(Array.isArray(f.columns) ? { columns: f.columns.map(String) } : {}),
+  };
 }
 
 export function matrixDir(root: string): string {

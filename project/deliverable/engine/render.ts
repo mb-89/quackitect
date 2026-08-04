@@ -203,8 +203,6 @@ interface RouteMarks {
   here?: boolean;
   /** The hop the walk cannot pass, and why. Drawn as a road closure. */
   blocked?: { at: string; why: string };
-  /** Uncovered AND-inputs per gate on the way — the busbar's taps. */
-  busbars?: { gate: string; feeders: string[] }[];
 }
 
 /** A Catmull-Rom spline through every stop, emitted as cubic Beziers — the
@@ -240,7 +238,7 @@ function svgGroups(nodes: CNode[]): string[] {
   return parts;
 }
 
-function svgEdges(canvas: CanvasData, byId: Map<string, CNode>): string[] {
+function svgEdges(canvas: CanvasData, byId: Map<string, CNode>, skip: Set<string>): string[] {
   const parts: string[] = [];
   const nodes = canvas.nodes ?? [];
   const routed = canvas.routed === true;
@@ -248,6 +246,7 @@ function svgEdges(canvas: CanvasData, byId: Map<string, CNode>): string[] {
     const a = byId.get(edge.fromNode);
     const b = byId.get(edge.toNode);
     if (a === undefined || b === undefined) continue;
+    if (skip.has(`${stateIdOf(a)}->${stateIdOf(b)}`)) continue;
     // A double-headed arrow is one edge meaning both ways, so it draws that
     // way too — the marker already orients itself at a start.
     const bothWays = (edge as { fromEnd?: string }).fromEnd === "arrow";
@@ -355,7 +354,7 @@ function svgRoute(route: RouteMarks | undefined, nodeOfState: Map<string, CNode>
       if (route?.waypoints.has(s.id) === true) parts.push(`<text x="${s.cx}" y="${s.cy + 3.5}" class="route-wp-io">↓↑</text>`);
     }
   }
-  parts.push(...svgBusbars(route, nodeOfState));
+
   // THE CLOSURE MARK, on the hop that shuts, carrying the reason. An
   // exclamation in a ring rather than a bar across the line: a bar reads as
   // part of the road, and it stays upright whichever way the road runs.
@@ -380,27 +379,31 @@ function svgRoute(route: RouteMarks | undefined, nodeOfState: Map<string, CNode>
   return parts;
 }
 
-// THE BUSBAR (owner design 2026-08-04): a gate collects ALL its inputs.
-// Uncovered feeders tap a collection bar wearing the AND icon; one line
-// drops from the bar into the gate.
-function svgBusbars(route: RouteMarks | undefined, nodeOfState: Map<string, CNode>): string[] {
+// THE BUSBAR IS STRUCTURE, NOT ROUTE (owner ruling 2026-08-04): a gate
+// collects ALL its inputs, so every multi-feeder gate draws its feeders as
+// taps into a collection bar wearing the AND icon — one line drops from
+// the bar into the gate, and the individual feeder arrows disappear.
+function svgBusbars(busbars: { gate: string; feeders: string[] }[], nodeOfState: Map<string, CNode>): string[] {
   const parts: string[] = [];
-  for (const b of route?.busbars ?? []) {
+  for (const b of busbars) {
     const g = nodeOfState.get(b.gate);
     if (g === undefined) continue;
     const taps = b.feeders.map((f) => nodeOfState.get(f)).filter((n): n is CNode => n !== undefined);
     if (taps.length === 0) continue;
-    const barY = g.y - 26;
+    const barY = g.y - 40;
     const xs = [g.x + g.width / 2, ...taps.map((n) => n.x + n.width / 2)];
-    const x1 = Math.min(...xs) - 20;
-    const x2 = Math.max(...xs) + 20;
-    parts.push(`<line x1="${x1}" y1="${barY}" x2="${x2}" y2="${barY}" class="route-bus"/>`);
+    const x1 = Math.min(...xs) - 24;
+    const x2 = Math.max(...xs) + 24;
+    parts.push(`<line x1="${x1}" y1="${barY}" x2="${x2}" y2="${barY}" class="edge busbar"/>`);
     for (const n of taps) {
       const cx = n.x + n.width / 2;
-      parts.push(`<line x1="${cx}" y1="${n.y + n.height / 4}" x2="${cx}" y2="${barY}" class="route-bus tap"/>`);
+      const fromY = n.y + n.height / 2 < barY ? n.y + n.height : n.y;
+      parts.push(`<line x1="${cx}" y1="${fromY}" x2="${cx}" y2="${barY}" class="edge busbar tap"/>`);
     }
-    parts.push(`<line x1="${g.x + g.width / 2}" y1="${barY}" x2="${g.x + g.width / 2}" y2="${g.y + g.height / 4}" class="route-bus"/>`);
-    parts.push(`<text x="${x1 + 10}" y="${barY - 6}" class="route-bus-icon">&amp;</text>`);
+    parts.push(
+      `<line x1="${g.x + g.width / 2}" y1="${barY}" x2="${g.x + g.width / 2}" y2="${g.y}" class="edge busbar" marker-end="url(#arrow)"/>`,
+    );
+    parts.push(`<text x="${x1 + 8}" y="${barY - 8}" class="busbar-icon">&amp;</text>`);
   }
   return parts;
 }
@@ -411,6 +414,7 @@ function machineSvg(
   doneIds: Set<string>,
   subIds: Set<string>,
   meta: Record<string, StateMeta>,
+  busbars: { gate: string; feeders: string[] }[],
   route?: RouteMarks,
 ): string {
   const canvas = source;
@@ -426,9 +430,11 @@ function machineSvg(
     const s = stateIdOf(n);
     if (s !== undefined) nodeOfState.set(s, n);
   }
+  const skip = new Set(busbars.flatMap((b) => b.feeders.map((f) => `${f}->${b.gate}`)));
   const parts: string[] = [
     ...svgGroups(nodes),
-    ...svgEdges(canvas, byId),
+    ...svgEdges(canvas, byId, skip),
+    ...svgBusbars(busbars, nodeOfState),
     ...nodes.flatMap((n) => svgStateNode(n, activeIds, doneIds, subIds, meta)),
     ...svgRoute(route, nodeOfState),
   ];
@@ -780,9 +786,9 @@ const STYLE = `
   .route-shut .shut-bang { stroke-width: 3; stroke-linecap: round; }
   .route-shut .shut-dot { fill: var(--se-warn); stroke: none; }
   .route-stop { fill: var(--se-walk); stroke: var(--se-walk-ring); stroke-width: 2; }
-  .route-bus { stroke: var(--se-walk); stroke-width: 5; stroke-linecap: round; }
-  .route-bus.tap { stroke-width: 3.5; }
-  .route-bus-icon { fill: var(--se-walk); font: 700 14px system-ui, sans-serif; }
+  .busbar { stroke-width: 3.5; stroke-linecap: round; fill: none; }
+  .busbar.tap { stroke-width: 2.5; }
+  .busbar-icon { fill: var(--se-dim); font: 700 16px system-ui, sans-serif; }
   .route-wp-io { fill: var(--se-walk-ring); font: 700 9px system-ui, sans-serif; text-anchor: middle; }
   .route-stop.shut { opacity: .28; }
   .route-here { fill: var(--se-walk); stroke: var(--se-walk-ring); stroke-width: 2; }
@@ -3006,22 +3012,9 @@ function routeMarksFor(m: MirrorState, decl: MachineDecl): RouteMarks | undefine
     };
     const shutAt = r.stops_at === undefined ? undefined : localOf(r.stops_at.at);
     const rest = prefix === "" ? r.from : r.from.startsWith(`${prefix}/`) ? r.from.slice(prefix.length + 1) : undefined;
-    // A GATE COLLECTS ALL ITS INPUTS (owner ruling 2026-08-04): the route
-    // shows the gate's uncovered feeders as taps into a collection busbar.
-    const signed = new Set<string>(m.session.recordDone(decl));
-    const busbars: { gate: string; feeders: string[] }[] = [];
-    for (const id of hops) {
-      const st = decl.states.find((x) => x.id === id);
-      if (st?.kind !== "gate") continue;
-      const feeders = decl.states
-        .filter((p) => p.evidence_form.length > 0 && p.edges.some((e) => e.to === st.id) && !signed.has(p.id))
-        .map((p) => p.id);
-      if (feeders.length > 0) busbars.push({ gate: id, feeders });
-    }
     return {
       waypoints,
       path: hops,
-      ...(busbars.length > 0 ? { busbars } : {}),
       here: rest !== undefined && !rest.includes("/"),
       ...(r.found && localOf(r.target) !== undefined ? { target: localOf(r.target) } : {}),
       ...(shutAt !== undefined && r.stops_at !== undefined ? { blocked: { at: shutAt, why: r.stops_at.why } } : {}),
@@ -3076,7 +3069,12 @@ export function renderMirror(
   const history = m.session.instance.history ?? [];
   const { leafActive, done, paint, subIds, meta } = drawingSets(m, decl, info, viewingWalk);
   const marks = routeMarksFor(m, decl);
-  const svg = machineSvg(canvas, leafActive, paint, subIds, meta, marks);
+  // A GATE COLLECTS ALL ITS INPUTS: every multi-feeder gate draws as a busbar.
+  const busbars = decl.states
+    .filter((s) => s.kind === "gate")
+    .map((g) => ({ gate: g.id, feeders: decl.states.filter((p) => p.edges.some((e) => e.to === g.id)).map((p) => p.id) }))
+    .filter((b) => b.feeders.length >= 2);
+  const svg = machineSvg(canvas, leafActive, paint, subIds, meta, busbars, marks);
   const crumbs = crumbsFor(m, decl);
 
   // ONE LIST FOR THE WHOLE RENDER. expeditionList() spawns git per record

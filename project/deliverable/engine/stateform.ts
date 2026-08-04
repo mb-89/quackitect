@@ -83,6 +83,7 @@ export interface FieldArgs {
   options: string[];
   items: string[];
   passing: string[];
+  columns: string[];
 }
 
 export function templateMeta(root: string, name: string): TemplateMeta {
@@ -101,7 +102,7 @@ export function templateMeta(root: string, name: string): TemplateMeta {
 
 const escapeRe = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, (c) => `\\${c}`);
 
-const NO_ARGS: FieldArgs = { options: [], items: [], passing: [] };
+const NO_ARGS: FieldArgs = { options: [], items: [], passing: [], columns: [] };
 
 /** The choice half of a `<option> — <rationale>` line. */
 export function choiceOf(content: string): string {
@@ -137,6 +138,19 @@ function fieldProblems(name: string, meta: TemplateMeta, args: FieldArgs, conten
   if (meta.editor === "per-item" && args.items.length > 0) {
     const missing = args.items.filter((i) => !new RegExp(`^- ${escapeRe(i)}: .+`, "m").test(content));
     if (missing.length > 0) out.push(`${name}: unanswered — ${missing.join(" · ")}`);
+  }
+  if (meta.editor === "table" && args.columns.length > 0) {
+    const rows = content
+      .split("\n")
+      .map((l) => l.trim())
+      .filter((l) => l.startsWith("|") && l.endsWith("|"));
+    const isRule = (l: string): boolean => /^\|(\s*:?-+:?\s*\|)+$/.test(l);
+    const data = rows.slice(1).filter((l) => !isRule(l));
+    const want = args.columns.length;
+    if (rows.length === 0 || data.length === 0)
+      out.push(`${name}: a markdown table with columns — ${args.columns.join(" | ")} — and at least one data row`);
+    else if (data.some((l) => l.split("|").length - 2 !== want))
+      out.push(`${name}: every row carries ${want} cells — ${args.columns.join(" | ")}`);
   }
   if (meta.line_pattern !== "") {
     const re = new RegExp(meta.line_pattern);
@@ -215,6 +229,7 @@ export function stateFormModel(
       options: f.options ?? [],
       items: (f.items ?? []).flatMap((i) => (i === "$inbox" ? inboxItems(root) : [i])),
       passing: f.passing ?? [],
+      columns: f.columns ?? [],
     };
   }
   for (const d of s.inputs ?? []) inputs.push({ label: d.label, description: d.description, entry: false });
