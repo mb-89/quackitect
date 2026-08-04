@@ -1,17 +1,18 @@
 ---
 id: template-per-item
-statement: Answer a known list — every source item gets its line and its answer.
-editor: text
+statement: Answer a known list — the form names the items; every one gets its answer.
+editor: per-item
 line_pattern: "^- .+: .+"
-line_help: "every line is `- <item>: <answer>` — nothing in the source list stays unanswered"
+line_help: "every line is `- <item>: <answer>`, and every named item appears"
 ---
 
 # per-item
 
-The source list is known before the work starts — the inbox notes, a
-checklist, a set of requirements. This field answers it item by item.
+The FORM supplies the items — its `items:` argument. A fixed list, or
+`$inbox` for the live pending notes. The template stays generic; the
+arguments make it concrete.
 
-One line per source item: `- <item>: <answer>`.
+The editor shows one row per item; the answer goes beside each. Stored
+as `- <item>: <answer>` per line.
 
-- Every source item appears. A missing line is a missing answer.
-- An item with nothing to do still gets its line: `- <item>: nothing to do`.
+An item with nothing to do still gets its answer: `nothing to do`.

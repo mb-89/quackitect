@@ -23,6 +23,8 @@ evidence:
   - name: retro_drained
     description: "every inbox note with its disposition - one line per note"
     template: per-item
+    items:
+      - "$inbox"
   - name: goal
     description: "the confirmed one-line iteration goal"
   - name: pulled_in
@@ -32,8 +34,13 @@ evidence:
     description: "what explicitly stays out, and where it went"
     template: list
   - name: change_size
-    description: "the proposed column and its reasoning; strikes named"
-    template: change-size
+    description: "the proposed column and its rationale; strikes named"
+    template: choice-with-rationale
+    options:
+      - patch
+      - minor
+      - major
+      - product
 major: full
 minor: full
 patch: tailored

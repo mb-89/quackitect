@@ -9,8 +9,10 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { FormTemplate } from "./forms.ts";
+import { pendingNotes } from "./inbox.ts";
 import type { MachineDecl, StateDecl } from "./machine.ts";
 import { parseStateNote, section } from "./notes.ts";
+import { seDir } from "./paths.ts";
 import { type GuidanceDoc, pulledFor } from "./pull.ts";
 
 export interface A3Box {
@@ -52,6 +54,8 @@ export interface StateFormModel {
   boxes: A3Box[];
   /** Per template name: its editor and its mechanical checks. */
   template_meta: Record<string, TemplateMeta>;
+  /** Per field name: the arguments the form hands its template. */
+  field_args: Record<string, FieldArgs>;
   /** The lint template over the fill sections, in sheet order. */
   template: FormTemplate;
   /** Field name -> its template name (free-form unless declared). */
@@ -62,38 +66,45 @@ export function fieldTemplateRel(name: string): string {
   return `project/deliverable/machines/forms/templates/${name}.md`;
 }
 
-/** A template's MECHANICS, from its frontmatter — the generic checks are
- *  engine code; which of them a field gets is markdown configuration. */
+/** A template's MECHANICS, from its frontmatter. Templates stay GENERIC
+ *  (owner ruling 2026-08-04): the editor shape and the line grammar live
+ *  here; the concrete options and items are the FIELD's arguments. */
 export interface TemplateMeta {
   editor: string;
-  options: string[];
-  /** choice only: the options that let the form stand met. Empty = all. */
-  passing: string[];
   line_pattern: string;
   line_help: string;
 }
 
-const list = (v: unknown): string[] =>
-  typeof v === "string"
-    ? v
-        .split(",")
-        .map((s) => s.trim())
-        .filter((s) => s !== "")
-    : [];
+/** The field's arguments to its template — declared in the form's own
+ *  markdown, resolved live where a source is named ($inbox). */
+export interface FieldArgs {
+  options: string[];
+  items: string[];
+  passing: string[];
+}
 
 export function templateMeta(root: string, name: string): TemplateMeta {
   try {
     const fm = parseStateNote(readFileSync(join(root, fieldTemplateRel(name)), "utf8")).frontmatter;
     return {
       editor: typeof fm.editor === "string" ? fm.editor : "text",
-      options: list(fm.options),
-      passing: list(fm.passing),
       line_pattern: typeof fm.line_pattern === "string" ? fm.line_pattern : "",
       line_help: typeof fm.line_help === "string" ? fm.line_help : "",
     };
   } catch {
-    return { editor: "text", options: [], passing: [], line_pattern: "", line_help: "" };
+    return { editor: "text", line_pattern: "", line_help: "" };
   }
+}
+
+const escapeRe = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, (c) => `\\${c}`);
+
+const NO_ARGS: FieldArgs = { options: [], items: [], passing: [] };
+
+/** The choice half of a `<option> — <rationale>` line. */
+export function choiceOf(content: string): string {
+  const first = (content.split("\n")[0] ?? "").trim();
+  const i = first.indexOf(" — ");
+  return i < 0 ? first : first.slice(0, i).trim();
 }
 
 /** The template checks over the fills — same verdicts for both hands and
@@ -105,17 +116,29 @@ export function templateProblems(model: StateFormModel, fills: Record<string, st
     if (meta === undefined) continue;
     const content = (fills[f.name] ?? "").trim();
     if (content === "") continue;
-    if (meta.editor === "choice") {
-      const first = (content.split("\n")[0] ?? "").trim();
-      if (!meta.options.includes(first)) out.push(`${f.name}: the first line must be one of — ${meta.options.join(" | ")}`);
-      else if (meta.passing.length > 0 && !meta.passing.includes(first))
-        out.push(`${f.name}: ${first} — the claim does not stand, and the gate stays shut while it does`);
-      continue;
-    }
-    if (meta.line_pattern === "") continue;
+    out.push(...fieldProblems(f.name, meta, model.field_args[f.name] ?? NO_ARGS, content));
+  }
+  return out;
+}
+
+function fieldProblems(name: string, meta: TemplateMeta, args: FieldArgs, content: string): string[] {
+  if (meta.editor === "choice-rationale") {
+    const choice = choiceOf(content);
+    if (args.options.length > 0 && !args.options.includes(choice))
+      return [`${name}: the choice must be one of — ${args.options.join(" | ")}`];
+    if (args.passing.length > 0 && !args.passing.includes(choice))
+      return [`${name}: ${choice} — the claim does not stand, and the gate stays shut while it does`];
+    return [];
+  }
+  const out: string[] = [];
+  if (meta.editor === "per-item" && args.items.length > 0) {
+    const missing = args.items.filter((i) => !new RegExp(`^- ${escapeRe(i)}: .+`, "m").test(content));
+    if (missing.length > 0) out.push(`${name}: unanswered — ${missing.join(" · ")}`);
+  }
+  if (meta.line_pattern !== "") {
     const re = new RegExp(meta.line_pattern);
     const bad = content.split("\n").find((l) => l.trim() !== "" && !re.test(l.trim()));
-    if (bad !== undefined) out.push(`${f.name}: ${meta.line_help !== "" ? meta.line_help : `every line matches ${meta.line_pattern}`}`);
+    if (bad !== undefined) out.push(`${name}: ${meta.line_help !== "" ? meta.line_help : `every line matches ${meta.line_pattern}`}`);
   }
   return out;
 }
@@ -178,6 +201,14 @@ export function stateFormModel(
     inputs.push({ label: `Read template-${t}`, description: templateStatement(root, t), path: fieldTemplateRel(t), entry: false });
     templateMetas[t] = templateMeta(root, t);
   }
+  const fieldArgs: Record<string, FieldArgs> = {};
+  for (const f of s.evidence_form) {
+    fieldArgs[f.name] = {
+      options: f.options ?? [],
+      items: (f.items ?? []).flatMap((i) => (i === "$inbox" ? inboxItems(root) : [i])),
+      passing: f.passing ?? [],
+    };
+  }
   for (const d of s.inputs ?? []) inputs.push({ label: d.label, description: d.description, entry: false });
   return {
     form: s.id,
@@ -189,9 +220,20 @@ export function stateFormModel(
     inputs,
     boxes: readA3(root),
     template_meta: templateMetas,
+    field_args: fieldArgs,
     template: stateFormFields(s),
     field_templates: fieldTemplates,
   };
+}
+
+/** $inbox, resolved live: one item per pending note — the ref, then the
+ *  note's own title so the filler knows what they are answering. */
+function inboxItems(root: string): string[] {
+  try {
+    return pendingNotes(seDir(root)).map((n) => `${n.ref} — ${(n.title ?? n.text.split("\n")[0]).slice(0, 48)}`);
+  } catch {
+    return [];
+  }
 }
 
 // ── The portable copy ──────────────────────────────────────────────────
@@ -260,15 +302,42 @@ const SHEET_CSS = `
   .bar { max-width: 1240px; margin: 12px auto; display: flex; gap: 1em; align-items: center; }
   .bar button { padding: .5em 1.4em; border: 1px solid #111; background: #fff; cursor: pointer; font-weight: 600; }
   .bar input { padding: .4em .6em; border: 1px solid #999; }
+  .rows .row { display: flex; gap: 6px; margin: 4px 0; align-items: center; }
+  .rows input { flex: 1; padding: .35em .5em; border: 1px dashed #bbb; border-radius: 3px; background: #fcfcfc; font: 12.5px system-ui, sans-serif; }
+  .rows .pi { font-size: 12.5px; color: #333; flex: 0 0 42%; }
+  .rows select { padding: .3em .4em; font: 12.5px system-ui, sans-serif; }
+  .rows .sep { color: #888; font-size: 12px; }
 `;
 
 const SHEET_JS = `
   function seCollect() {
     var fields = {};
     document.querySelectorAll("textarea[data-field]").forEach(function (t) { fields[t.getAttribute("data-field")] = t.value; });
-    document.querySelectorAll("select[data-choice]").forEach(function (s) {
-      var n = s.getAttribute("data-choice");
-      fields[n] = (s.value + "\\n" + (fields[n] || "")).trim();
+    var acc = {};
+    function push(n, line) { (acc[n] = acc[n] || []).push(line); }
+    document.querySelectorAll("input[data-list]").forEach(function (t) {
+      if (t.value.trim() !== "") push(t.getAttribute("data-list"), "- " + t.value.trim());
+      t.setAttribute("value", t.value);
+    });
+    document.querySelectorAll("input[data-peritem]").forEach(function (t) {
+      if (t.value.trim() !== "") push(t.getAttribute("data-peritem"), "- " + t.getAttribute("data-item") + ": " + t.value.trim());
+      t.setAttribute("value", t.value);
+    });
+    document.querySelectorAll("input[data-findf]").forEach(function (t) {
+      var row = t.parentElement;
+      var a = row ? row.querySelector("input[data-finda]") : null;
+      var av = a ? a.value.trim() : "";
+      if (t.value.trim() !== "" || av !== "") push(t.getAttribute("data-findf"), "- " + t.value.trim() + " => " + av);
+      t.setAttribute("value", t.value);
+      if (a) a.setAttribute("value", a.value);
+    });
+    Object.keys(acc).forEach(function (n) { fields[n] = acc[n].join("\\n"); });
+    document.querySelectorAll("select[data-choicesel]").forEach(function (s) {
+      var n = s.getAttribute("data-choicesel");
+      var r = document.querySelector('input[data-rationale="' + n + '"]');
+      var rv = r ? r.value.trim() : "";
+      if (r) r.setAttribute("value", r.value);
+      fields[n] = (s.value + (rv !== "" ? " — " + rv : "")).trim();
       for (var i = 0; i < s.options.length; i++) {
         if (s.options[i].selected) s.options[i].setAttribute("selected", "");
         else s.options[i].removeAttribute("selected");
@@ -302,6 +371,16 @@ const SHEET_JS = `
     var d = document.getElementById(a.getAttribute("data-doc"));
     if (d) { d.open = true; d.scrollIntoView({ behavior: "smooth" }); }
   });
+  // A list grows as its last row fills; per-item rows are fixed by design.
+  document.addEventListener("change", function (ev) {
+    var t = ev.target;
+    if (!t.matches || !t.matches("input[data-list], input[data-findf], input[data-finda]")) return;
+    var row = t.parentElement;
+    if (!row || row.nextElementSibling || t.value.trim() === "") return;
+    var clone = row.cloneNode(true);
+    clone.querySelectorAll("input").forEach(function (i) { i.value = ""; i.removeAttribute("value"); });
+    row.parentElement.appendChild(clone);
+  });
 `;
 
 function renderInput(i: FormInput, docIndex: Map<string, number>, checked: Set<string>): string {
@@ -315,20 +394,70 @@ function renderInput(i: FormInput, docIndex: Map<string, number>, checked: Set<s
   return `<li>${box}${label}${entry}<span class="d">${esc(i.description)}</span></li>`;
 }
 
-function renderField(name: string, description: string, required: boolean, template: string, content: string, meta?: TemplateMeta): string {
+function renderField(
+  name: string,
+  description: string,
+  required: boolean,
+  template: string,
+  content: string,
+  meta?: TemplateMeta,
+  args: FieldArgs = NO_ARGS,
+): string {
   const flag = required ? '<span class="req">required</span>' : '<span class="opt">optional</span>';
   const head = `<div class="field"><span class="tpl">template: ${esc(template)}</span><span class="name">${esc(name)}</span>${flag}<div class="desc">${esc(description)}</div>`;
-  if (meta?.editor === "choice") {
-    const lines = content.split("\n");
-    const first = (lines[0] ?? "").trim();
-    const rest = lines.slice(1).join("\n");
+  return `${head}${fieldEditor(name, content, meta?.editor ?? "text", args)}</div>`;
+}
+
+const dashLines = (content: string): string[] =>
+  content
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l.startsWith("- "))
+    .map((l) => l.slice(2));
+
+/** The editor IS the template's shape — rows for lists, labelled rows for
+ *  known items, a dropdown with its rationale, pairs for findings. */
+function fieldEditor(name: string, content: string, editor: string, args: FieldArgs): string {
+  if (editor === "list") {
+    const rows = [...dashLines(content), ""].map((v) => `<div class="row"><input data-list="${esc(name)}" value="${esc(v)}"></div>`);
+    return `<div class="rows">${rows.join("")}</div>`;
+  }
+  if (editor === "per-item" && args.items.length > 0) {
+    const rows = args.items.map((it) => {
+      const hit = content
+        .split("\n")
+        .map((l) => l.trim())
+        .find((l) => l.startsWith(`- ${it}:`));
+      const answer = hit === undefined ? "" : hit.slice(`- ${it}:`.length).trim();
+      return `<div class="row"><span class="pi">${esc(it)}</span><input data-peritem="${esc(name)}" data-item="${esc(it)}" value="${esc(answer)}"></div>`;
+    });
+    return `<div class="rows">${rows.join("")}</div>`;
+  }
+  if (editor === "choice-rationale") {
+    const first = (content.split("\n")[0] ?? "").trim();
+    const sep = first.indexOf(" — ");
+    const chosen = sep < 0 ? first : first.slice(0, sep).trim();
+    const rationale = sep < 0 ? "" : first.slice(sep + 3).trim();
     const opts = [
       '<option value=""></option>',
-      ...meta.options.map((o) => `<option${o === first ? " selected" : ""}>${esc(o)}</option>`),
+      ...args.options.map((o) => `<option${o === chosen ? " selected" : ""}>${esc(o)}</option>`),
     ].join("");
-    return `${head}<div><select data-choice="${esc(name)}">${opts}</select></div><textarea data-field="${esc(name)}">${esc(rest)}</textarea></div>`;
+    return `<div class="rows"><div class="row"><select data-choicesel="${esc(name)}">${opts}</select><input data-rationale="${esc(name)}" placeholder="rationale" value="${esc(rationale)}"></div></div>`;
   }
-  return `${head}<textarea data-field="${esc(name)}">${esc(content)}</textarea></div>`;
+  if (editor === "findings") {
+    const pairs = dashLines(content)
+      .filter((l) => l.includes(" => "))
+      .map((l) => {
+        const i = l.indexOf(" => ");
+        return { f: l.slice(0, i), a: l.slice(i + 4) };
+      });
+    const rows = [...pairs, { f: "", a: "" }].map(
+      (p) =>
+        `<div class="row"><input data-findf="${esc(name)}" placeholder="finding" value="${esc(p.f)}"><span class="sep">=&gt;</span><input data-finda="${esc(name)}" placeholder="answer" value="${esc(p.a)}"></div>`,
+    );
+    return `<div class="rows">${rows.join("")}</div>`;
+  }
+  return `<textarea data-field="${esc(name)}">${esc(content)}</textarea>`;
 }
 
 function renderHeader(model: StateFormModel): string {
@@ -354,7 +483,7 @@ export function buildPortableForm(
     .filter((f) => f.name !== "current_situation" && f.name !== "follow_up")
     .map((f) => {
       const tpl = model.field_templates[f.name] ?? "free-form";
-      return renderField(f.name, f.description, f.required, tpl, fills[f.name] ?? "", model.template_meta[tpl]);
+      return renderField(f.name, f.description, f.required, tpl, fills[f.name] ?? "", model.template_meta[tpl], model.field_args[f.name]);
     })
     .join("");
   const island: IslandData = { form: model.form, author: "", fields: fills, checked };

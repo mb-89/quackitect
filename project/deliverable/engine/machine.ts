@@ -39,6 +39,12 @@ export interface EvidenceField {
   /** The field's template (machines/forms/templates/<name>.md). Absent
    *  means free-form; every referenced template is a read input. */
   template?: string;
+  /** THE TEMPLATE'S ARGUMENTS — templates stay generic, the field makes
+   *  them concrete. options/passing feed choice-rationale; items feeds
+   *  per-item (the literal "$inbox" resolves to the live pending notes). */
+  options?: string[];
+  items?: string[];
+  passing?: string[];
 }
 
 /**
@@ -59,30 +65,32 @@ export const STANDARD_ROUNDS: EvidenceField[] = [
   {
     name: "round_0_verify",
     description:
-      "ROUND 0 — VERIFY: built it right. One line per check that ran — each input state's evidence read against its claim, the types, the lint, the scoped tests or the battery — each with its verdict. Open what the evidence points at; a bless is not proof.",
+      "ROUND 0 — VERIFY: built it right. Each named check with its verdict. Open what the evidence points at; a bless is not proof.",
     required: true,
-    template: "list",
+    template: "per-item",
+    items: ["evidence vs claims", "types", "lint", "tests"],
   },
   {
     name: "round_1_validate",
-    description:
-      "ROUND 1 — VALIDATE: built the right thing. One line per question asked of the RESULT against the goal and the frame: what was exercised, what it showed, what is missing, wrong or out of scope.",
+    description: "ROUND 1 — VALIDATE: built the right thing. The RESULT against the goal and the frame — each named question answered.",
     required: true,
-    template: "list",
+    template: "per-item",
+    items: ["exercised against the goal", "missing", "wrong", "out of scope"],
   },
   {
     name: "round_2_red_team",
     description:
-      "ROUND 2 — RED TEAM: attack the result before endorsing it. Argue the opposing case; name the KILL-CRITERION — what would have to be true for this to be the wrong call — then look for it. One finding per line, each with its answer.",
+      "ROUND 2 — RED TEAM: attack the result before endorsing it. Argue the opposing case; name the KILL-CRITERION — what would have to be true for this to be the wrong call — then look for it.",
     required: true,
     template: "findings",
   },
   {
     name: "verdict",
-    description:
-      "The gate's ruling on the first line — pass, pass with overrides, or fail — the reasoning below. An override is logged WITH its dissent, never as a clean pass.",
+    description: "The gate's ruling with its rationale. An override is logged WITH its dissent, never as a clean pass.",
     required: true,
-    template: "verdict",
+    template: "choice-with-rationale",
+    options: ["pass", "pass with overrides", "fail"],
+    passing: ["pass", "pass with overrides"],
   },
 ];
 

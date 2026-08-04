@@ -1466,6 +1466,7 @@ function sfOne(f, fl) {
   const name = f.form;
   const tpl = (f.field_templates || {})[fl.name] || "free-form";
   const tm = (f.template_meta || {})[tpl] || {};
+  const args = (f.field_args || {})[fl.name] || { options: [], items: [], passing: [] };
   let s = '<div style="border:1px solid var(--se-line,#888);border-radius:4px;padding:7px 10px;margin:7px 0">';
   s += '<span style="float:right;font-size:11.5px;color:var(--se-accent)">template: ' + escText(tpl) + "</span>";
   s += "<b>" + escText(fl.name) + "</b>" + (fl.required ? ' <span style="color:var(--se-fail);font-size:11px">required</span>' : ' <span class="meta">optional</span>');
@@ -1473,17 +1474,41 @@ function sfOne(f, fl) {
   (fl.prefills || []).forEach(function (p, i) {
     s += '<div class="prefill"><div class="comment-text">prefill — unconfirmed:</div><div>' + escText(p) + '</div><button class="primary confirmpre" data-form="' + name + '" data-machine="' + escText(f.machine || "") + '" data-field="' + escText(fl.name) + '" data-index="' + i + '">confirm</button></div>';
   });
-  // A choice template edits as its dropdown plus the reasoning — stored
-  // as one section: the option on the first line, the prose below.
-  if (tm.editor === "choice") {
-    const lines = (fl.content || "").split("\\n");
-    const first = (lines[0] || "").trim();
-    s += '<div><select class="formchoice" data-field="' + escText(fl.name) + '"><option value=""></option>' + (tm.options || []).map(function (o) { return "<option" + (o === first ? " selected" : "") + ">" + escText(o) + "</option>"; }).join("") + "</select></div>";
-    s += '<textarea class="formfield" data-field="' + escText(fl.name) + '">' + escText(lines.slice(1).join("\\n")) + "</textarea></div>";
-    return s;
-  }
-  s += '<textarea class="formfield" data-field="' + escText(fl.name) + '">' + escText(fl.content || "") + "</textarea></div>";
+  s += sfEditor(fl, tm, args) + "</div>";
   return s;
+}
+// THE EDITOR IS THE TEMPLATE'S SHAPE (owner ruling 2026-08-04): a list
+// edits as rows, known items as labelled rows, a choice as its dropdown
+// with the rationale beside it, findings as answered pairs. Free text
+// stays a textarea. Stored forms stay markdown lines either way.
+function sfDash(c) {
+  return (c || "").split("\\n").map(function (l) { return l.trim(); }).filter(function (l) { return l.indexOf("- ") === 0; }).map(function (l) { return l.slice(2); });
+}
+function sfEditor(fl, tm, args) {
+  const name = escText(fl.name);
+  if (tm.editor === "list") {
+    return '<div class="sfrows">' + sfDash(fl.content).concat([""]).map(function (v) { return '<div class="sfrow" style="display:flex;gap:6px;margin:4px 0"><input class="sfli" data-field="' + name + '" value="' + escText(v) + '" style="flex:1"></div>'; }).join("") + "</div>";
+  }
+  if (tm.editor === "per-item" && (args.items || []).length > 0) {
+    return '<div class="sfrows">' + args.items.map(function (it) {
+      const pref = "- " + it + ":";
+      const hit = (fl.content || "").split("\\n").map(function (l) { return l.trim(); }).filter(function (l) { return l.indexOf(pref) === 0; })[0];
+      const ans = hit ? hit.slice(pref.length).trim() : "";
+      return '<div class="sfrow" style="display:flex;gap:6px;margin:4px 0;align-items:center"><span class="meta" style="flex:0 0 45%">' + escText(it) + '</span><input class="sfpi" data-field="' + name + '" data-item="' + escText(it) + '" value="' + escText(ans) + '" style="flex:1"></div>';
+    }).join("") + "</div>";
+  }
+  if (tm.editor === "choice-rationale") {
+    const first = ((fl.content || "").split("\\n")[0] || "").trim();
+    const sep = first.indexOf(" — ");
+    const chosen = sep < 0 ? first : first.slice(0, sep).trim();
+    const rat = sep < 0 ? "" : first.slice(sep + 3).trim();
+    return '<div class="sfrow" style="display:flex;gap:6px;margin:4px 0"><select class="sfsel" data-field="' + name + '"><option value=""></option>' + (args.options || []).map(function (o) { return "<option" + (o === chosen ? " selected" : "") + ">" + escText(o) + "</option>"; }).join("") + '</select><input class="sfrat" data-field="' + name + '" placeholder="rationale" value="' + escText(rat) + '" style="flex:1"></div>';
+  }
+  if (tm.editor === "findings") {
+    const pairs = sfDash(fl.content).filter(function (l) { return l.indexOf(" => ") >= 0; }).map(function (l) { const i = l.indexOf(" => "); return { f: l.slice(0, i), a: l.slice(i + 4) }; });
+    return '<div class="sfrows">' + pairs.concat([{ f: "", a: "" }]).map(function (p) { return '<div class="sfrow" style="display:flex;gap:6px;margin:4px 0;align-items:center"><input class="sfff" data-field="' + name + '" placeholder="finding" value="' + escText(p.f) + '" style="flex:1"><span class="meta">=&gt;</span><input class="sffa" data-field="' + name + '" placeholder="answer" value="' + escText(p.a) + '" style="flex:1"></div>'; }).join("") + "</div>";
+  }
+  return '<textarea class="formfield" data-field="' + name + '">' + escText(fl.content || "") + "</textarea>";
 }
 // A collapsible box — the same truth, folded for a narrow pane.
 function sfBox(title, inner, open) {
@@ -1537,6 +1562,18 @@ document.addEventListener("change", function (ev) {
     const labels = [];
     document.querySelectorAll('.sfcheck[data-form="' + cb.dataset.form + '"]').forEach(function (x) { if (x.checked) labels.push(x.dataset.label); });
     void formPost("/form/save", { name: cb.dataset.form, fields: { inputs_checked: labels.join("\\n") }, machine: cb.dataset.machine || viewedMachine() });
+    return;
+  }
+  // A list or findings table grows as its last row fills — quietly, in
+  // place, without a re-render that would steal the reader's spot.
+  const gr = ev.target.closest ? ev.target.closest(".sfli, .sfff, .sffa") : null;
+  if (gr && gr.value.trim() !== "") {
+    const row = gr.closest(".sfrow");
+    if (row && !row.nextElementSibling) {
+      const clone = row.cloneNode(true);
+      clone.querySelectorAll("input").forEach(function (i) { i.value = ""; });
+      row.parentElement.appendChild(clone);
+    }
   }
 });
 // The machine on display resolves a form name — without it, two records'
@@ -1588,12 +1625,27 @@ function showFormAgain(name, machine) {
 async function formPost(path, body) {
   await fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
 }
-// One collector for save and submit: the textareas, then every choice
-// select folded onto its field — the option first, the reasoning below.
+// One collector for save and submit: every editor serialises back to its
+// field's markdown lines — the same shapes the lint checks.
 function sfCollect() {
   const fields = {};
   document.querySelectorAll(".formfield").forEach(function (t) { fields[t.dataset.field] = t.value; });
-  document.querySelectorAll(".formchoice").forEach(function (s) { fields[s.dataset.field] = (s.value + "\\n" + (fields[s.dataset.field] || "")).trim(); });
+  const acc = {};
+  const push = function (n, line) { (acc[n] = acc[n] || []).push(line); };
+  document.querySelectorAll(".sfli").forEach(function (t) { if (t.value.trim() !== "") push(t.dataset.field, "- " + t.value.trim()); });
+  document.querySelectorAll(".sfpi").forEach(function (t) { if (t.value.trim() !== "") push(t.dataset.field, "- " + t.dataset.item + ": " + t.value.trim()); });
+  document.querySelectorAll(".sfff").forEach(function (t) {
+    const row = t.parentElement;
+    const a = row ? row.querySelector(".sffa") : null;
+    const av = a ? a.value.trim() : "";
+    if (t.value.trim() !== "" || av !== "") push(t.dataset.field, "- " + t.value.trim() + " => " + av);
+  });
+  Object.keys(acc).forEach(function (n) { fields[n] = acc[n].join("\\n"); });
+  document.querySelectorAll(".sfsel").forEach(function (s) {
+    const r = document.querySelector('.sfrat[data-field="' + s.dataset.field + '"]');
+    const rv = r ? r.value.trim() : "";
+    fields[s.dataset.field] = (s.value + (rv !== "" ? " — " + rv : "")).trim();
+  });
   return fields;
 }
 document.addEventListener("click", async (ev) => {

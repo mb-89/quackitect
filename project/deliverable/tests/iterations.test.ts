@@ -292,8 +292,8 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
   session.formSave(
     "onboard-retro",
     {
-      notes_drained: "0 before, 0 after",
-      call_log_mined: "0 calls — fresh root",
+      notes_drained: "- none: inbox empty",
+      call_log_mined: "- 0 calls, fresh root",
       process_stale: "checked — nothing stale",
       follow_up: "none",
     },
@@ -310,7 +310,7 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
   );
   // A FAIL verdict is mechanical: the form never counts as met while it
   // stands, and the problems name it.
-  session.formSave("gate-kickoff", { verdict: "fail\nnot yet" }, "human");
+  session.formSave("gate-kickoff", { verdict: "fail — not yet" }, "human");
   const failing = session.formGet("gate-kickoff") as { met?: boolean; problems?: string[] };
   assert.equal(failing.met, false);
   assert.ok(
@@ -325,11 +325,11 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
     goal: "walk the pinned machine",
     pulled_in: "- none",
     left_out: "- everything else",
-    change_size: "patch\nthe smallest walk proves the seam",
-    round_0_verify: "- inputs checked",
-    round_1_validate: "- fits the frame",
+    change_size: "patch — the smallest walk proves the seam",
+    round_0_verify: "- evidence vs claims: read\n- types: green\n- lint: green\n- tests: green",
+    round_1_validate: "- exercised against the goal: walked\n- missing: none\n- wrong: none\n- out of scope: none",
     round_2_red_team: "- none => the attack found nothing",
-    verdict: "pass\nthe claims held",
+    verdict: "pass — the claims held",
     follow_up: "none",
   };
   session.formSave("gate-kickoff", kickFields, "human");

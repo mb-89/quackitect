@@ -136,6 +136,9 @@ function parseEvidence(fm: Record<string, unknown>, file: string, body: string):
       ...(f.type !== undefined ? { type: String(f.type) as EvidenceType } : {}),
       ...(typeof f.guidance === "string" && f.guidance.trim() !== "" ? { guidance: f.guidance } : {}),
       ...(typeof f.template === "string" && f.template.trim() !== "" ? { template: f.template } : {}),
+      ...(Array.isArray(f.options) ? { options: f.options.map(String) } : {}),
+      ...(Array.isArray(f.items) ? { items: f.items.map(String) } : {}),
+      ...(Array.isArray(f.passing) ? { passing: f.passing.map(String) } : {}),
     };
   });
 }
