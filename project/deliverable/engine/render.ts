@@ -933,6 +933,10 @@ const STYLE = `
   .modal-box { width: min(760px, 92vw); max-height: 86vh; display: flex; flex-direction: column; background: var(--se-bg-side); border: 1px solid var(--se-border-strong); border-radius: 12px; }
   .modal-body { padding: 12px 16px; overflow: auto; font-size: 13px; }
   a.toollink { color: var(--se-link); text-decoration: underline; cursor: pointer; margin-right: 10px; }
+  .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 200; overflow: hidden; }
+  .confetti i { position: absolute; width: 8px; height: 8px; border-radius: 2px; animation: se-confetti 1.5s cubic-bezier(.2,.6,.4,1) forwards; }
+  @keyframes se-confetti { from { transform: translate(0,0) rotate(0deg); opacity: 1; } to { transform: translate(var(--dx), 70vh) rotate(540deg); opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .confetti { display: none; } }
   #toast { position: fixed; left: 14px; bottom: 14px; background: var(--se-raised); border: 1px solid var(--se-border-strong); border-radius: 8px; padding: 8px 14px; color: var(--se-fg); font-size: 12.5px; z-index: 90; display: none; }
   #link-lost { position: fixed; left: 0; right: 0; top: 0; z-index: 99; background: var(--se-lost-bg); color: var(--se-accent); text-align: center; padding: 7px; font-size: 13px; letter-spacing: .04em; }
   #over { position: fixed; inset: 0; background: rgba(20,23,26,.94); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
@@ -1722,7 +1726,7 @@ async function seIngest(inp, name) {
   if (!file) return;
   const html = await file.text();
   await formPost("/form/ingest", { name: name, html: html, machine: inp.dataset.machine || viewedMachine() });
-  showFormAgain(name, inp.dataset.machine);
+  showFormAgain(name, inp.dataset.machine, inp);
 }
 // Delegated, like every other control — an inline handler needs quote
 // nesting the fixer is free to normalise, and one stripped escape killed
@@ -1794,10 +1798,35 @@ async function showForm(name, into, machine) {
   }
   presentForm(name, into, "form · " + name, html, machine);
 }
-// A save or confirm re-renders the form WHERE IT STANDS — the modal, or
-// the details surface a detached window is pinned to.
-function showFormAgain(name, machine) {
-  void showForm(name, CURRENT_DETAIL && CURRENT_DETAIL.indexOf("form:" + name) === 0 ? "details" : undefined, machine);
+// WHERE IT WAS IS WHERE IT RE-RENDERS. Guessing the surface from
+// CURRENT_DETAIL opened a modal COPY on top of a form already on screen, and
+// left the surface the reader was actually looking at showing the state
+// BEFORE the click — so a bless that had landed looked like it had not.
+// A detached form panel carries neither #modal nor #details of its own; it
+// takes the details route and the host relays it into the panel.
+function showFormAgain(name, machine, el) {
+  const inModal = el && el.closest ? el.closest("#modal") : null;
+  void showForm(name, inModal ? undefined : "details", machine);
+}
+// THE BLESS IS THE ONE MOMENT WORTH MARKING. A gate passing is the person's
+// act and the whole point of the walk stopping there; a silent re-render made
+// it read as nothing having happened.
+function confetti() {
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const box = document.createElement("div");
+  box.className = "confetti";
+  const roles = ["--se-ok", "--se-accent", "--se-link", "--se-warn"];
+  for (let i = 0; i < 70; i++) {
+    const p = document.createElement("i");
+    p.style.left = 8 + Math.random() * 84 + "vw";
+    p.style.top = 6 + Math.random() * 28 + "vh";
+    p.style.background = cssPalette(roles[i % roles.length]);
+    p.style.setProperty("--dx", Math.random() * 220 - 110 + "px");
+    p.style.animationDelay = Math.random() * 0.28 + "s";
+    box.appendChild(p);
+  }
+  document.body.appendChild(box);
+  setTimeout(function () { box.remove(); }, 2000);
 }
 async function formPost(path, body) {
   await fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
@@ -1829,7 +1858,7 @@ document.addEventListener("click", async (ev) => {
   const of = ev.target.closest ? ev.target.closest(".openform") : null;
   if (of) { void showForm(of.dataset.form); return; }
   const cp = ev.target.closest ? ev.target.closest(".confirmpre") : null;
-  if (cp) { await formPost("/form/confirm", { name: cp.dataset.form, field: cp.dataset.field, index: Number(cp.dataset.index), machine: cp.dataset.machine || viewedMachine() }); showFormAgain(cp.dataset.form, cp.dataset.machine); return; }
+  if (cp) { await formPost("/form/confirm", { name: cp.dataset.form, field: cp.dataset.field, index: Number(cp.dataset.index), machine: cp.dataset.machine || viewedMachine() }); showFormAgain(cp.dataset.form, cp.dataset.machine, cp); return; }
   const ex = ev.target.closest ? ev.target.closest(".sfexport") : null;
   if (ex) {
     const exUrl = location.origin + "/form/export?name=" + encodeURIComponent(ex.dataset.form) + "&machine=" + encodeURIComponent(ex.dataset.machine || viewedMachine());
@@ -1850,8 +1879,10 @@ document.addEventListener("click", async (ev) => {
   }
   const bl = ev.target.closest ? ev.target.closest(".blessform, .dismissform") : null;
   if (bl) {
-    await formPost("/form/bless", { name: bl.dataset.form, ok: bl.classList.contains("blessform"), machine: bl.dataset.machine || viewedMachine() });
-    showFormAgain(bl.dataset.form, bl.dataset.machine);
+    const blessed = bl.classList.contains("blessform");
+    await formPost("/form/bless", { name: bl.dataset.form, ok: blessed, machine: bl.dataset.machine || viewedMachine() });
+    if (blessed) confetti();
+    showFormAgain(bl.dataset.form, bl.dataset.machine, bl);
     return;
   }
   const ra = ev.target.closest ? ev.target.closest(".sfrowadd") : null;
@@ -1874,14 +1905,14 @@ document.addEventListener("click", async (ev) => {
   const sv = ev.target.closest ? ev.target.closest(".saveform") : null;
   if (sv) {
     await formPost("/form/save", { name: sv.dataset.form, fields: sfCollect(), machine: sv.dataset.machine || viewedMachine() });
-    showFormAgain(sv.dataset.form, sv.dataset.machine);
+    showFormAgain(sv.dataset.form, sv.dataset.machine, sv);
     return;
   }
   const dn2 = ev.target.closest ? ev.target.closest(".doneform") : null;
   if (dn2) {
     await formPost("/form/save", { name: dn2.dataset.form, fields: sfCollect(), machine: dn2.dataset.machine || viewedMachine() });
     await formPost("/form/done", { name: dn2.dataset.form, machine: dn2.dataset.machine || viewedMachine() });
-    showFormAgain(dn2.dataset.form, dn2.dataset.machine);
+    showFormAgain(dn2.dataset.form, dn2.dataset.machine, dn2);
     return;
   }
   const ofo = ev.target.closest ? ev.target.closest(".openfolder") : null;
