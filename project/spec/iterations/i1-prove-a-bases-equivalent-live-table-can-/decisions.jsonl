@@ -1,2 +1,11 @@
 {"ts":"2026-08-04T08:12:06.524Z","op":"fork","visit":"iterations/i1/start@0","parent":null,"node":"d2","brief":"the target never clears when its node descends into a sub","nodes":[]}
 {"ts":"2026-08-04T08:18:13.511Z","op":"fork","visit":"iterations/i1/start@0","parent":null,"node":"d2","brief":"i1's worktree predates the current tree — merging v3 in","nodes":[]}
+{"ts":"2026-08-04T08:26:29.742Z","op":"plan","visit":"iterations/i1/onboard-retro@0","parent":null,"nodes":[{"id":"d6","brief":"vertical layout with milestone group boxes and pill ends"},{"id":"d7","brief":"edges carry their sides explicitly"},{"id":"d8","brief":"onboard-retro references the retro state note (same_as)"},{"id":"d9","brief":"test"},{"id":"d10","brief":"commit"},{"id":"d11","brief":"reload"},{"id":"d12","brief":"re-walk to the retro"}]}
+{"ts":"2026-08-04T08:28:05.535Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d13","brief":"the vertical layout with groups and pills lands"}
+{"ts":"2026-08-04T08:28:30.319Z","op":"done","visit":"iterations/i1/onboard-retro@0","node":"d8","brief":"same_as pulls the state note in at read time"}
+{"ts":"2026-08-04T16:15:49.090Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d14","brief":"the retro opens with the survey"}
+{"ts":"2026-08-04T16:16:10.536Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d15","brief":"draining the four pending notes"}
+{"ts":"2026-08-04T16:17:26.120Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d16","brief":"marking the retro boundary"}
+{"ts":"2026-08-04T16:18:49.431Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d17","brief":"the retro form fills in one pass"}
+{"ts":"2026-08-04T16:19:52.623Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d18","brief":"the kickoff brief fills whole"}
+{"ts":"2026-08-04T16:20:11.173Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d19","brief":"the bless lands and the pin should fire"}
