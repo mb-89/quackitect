@@ -1,6 +1,7 @@
 ---
 form: draft-vision
-suspect: "rests on onboard-retro, gate-kickoff, frame-delta, which fell"
+by: agent
+signed_off: 2026-08-05T18:32:08.102Z
 authors: agent
 files:
 ---
@@ -40,3 +41,7 @@ FOR engineering teams driving work with AI agents WHO need good architecture and
 - the why-now evidence becomes reference notes under spec/references/ (ruled; build queued)
 - the README reworks from v1's front door once vision and actual stand
 - queued engine work: guidance links as real inputs, the anything-else field on every form, the red-team steelman ask, freeze-at-pass for stamped forms
+
+## choice
+
+?

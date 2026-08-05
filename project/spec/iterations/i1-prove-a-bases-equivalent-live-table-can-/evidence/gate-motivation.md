@@ -72,3 +72,7 @@ pass — the frame is interesting on its own terms: an open middle, an evidenced
 - the owner's bless makes the vision axiomatic; a rejection names what to redo
 - past the gate, M2 begins: the context draws, and the deep prior-art state follows with its wired guidance
 - the queued engine bundle (form-lane designs, reference lint, row sync, walk-all fans) lands at the next unbound stand
+
+## choice
+
+iterations/i1/log-risks

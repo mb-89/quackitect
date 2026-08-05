@@ -1,6 +1,7 @@
 ---
 form: frame-delta
-suspect: "no longer passes its form — value_props: no references — one artifact id per line, or one line saying none"
+by: agent
+signed_off: 2026-08-05T18:32:48.458Z
 authors: agent
 files:
 ---
@@ -29,27 +30,11 @@ The gap is open, the method for filling it exists (@[[ref-sya-program]]), and ag
 
 ## value_props
 
-VALUE PROP — the team architect
-
-- audience: an architect or team lead driving AI agents in a multi-person product
-- need: trust and trace work nobody watched | outcome: every claim lands in a refusable record with who approved what
-  pass: any decision from years back answers its "why" in one click from the record
-- need: good architecture before fast output | outcome: the machine refuses to skip input and architecture
-  pass: no output state is reachable while an architecture gate behind it stands unsigned
-- alternative: spec-to-code tools plus review discipline
-- difference: the discipline is mechanical, not aspirational — the engine refuses instead of reminding
-- validation_signal: a team ships with the walk and zombie questions in reviews measurably drop
-
-VALUE PROP — the solo engineer
-
-- audience: one engineer running agents on their own product, often unattended
-- need: leave the agent alone without losing the reins | outcome: the dial prices autonomy and gates stop what matters
-  pass: an unattended walk stops AT gates and nowhere else, evidence forms filled
-- need: rigor without the toil | outcome: the agent carries the method, the person judges
-  pass: the person's time goes to redlines and thumbs, not to writing process artifacts
-- alternative: a coding harness and willpower
-- difference: the process is drawn, walked and enforced by a deterministic engine
-- validation_signal: this product — built by its own walk, the record its own proof
+- vp-systematic-engineering
+- vp-the-ledger
+- vp-autonomy-range
+- vp-rigor-without-toil
+- vp-vendoring
 
 ## business_case
 

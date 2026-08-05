@@ -1784,6 +1784,13 @@ export class Session {
    *  branching point. Weight and openness ride along, so choosing costs
    *  no second call. */
   private pullOptions(): Record<string, unknown>[] {
+    const stuck = this.gateStuck();
+    if (stuck !== undefined) {
+      return stuck.feeders.flatMap((f) => {
+        const t = stuck.machine.states.find((x) => x.id === f);
+        return t === undefined ? [] : [this.doorOption(stuck.machine, t, this.qualHere(f), "normal")];
+      });
+    }
     const { machine, ids } = this.leaves();
     if (this._target === "" && !this.inSub() && ids.length === 1 && ids[0] === "front_desk") {
       return this.optionsAt(this.machine, "idle");
@@ -2073,6 +2080,16 @@ export class Session {
         remedy: { tool: "se_pull", args: {}, note: "pull with no payload to see the offer again" },
         source: "engine/session.ts pull",
       });
+    }
+    // TAKING A FAN'S OTHER LEG IS A MOVE, not an aim: there is no edge back
+    // to it, so no route could ever be drawn.
+    const stuck = this.gateStuck();
+    if (stuck !== undefined) {
+      const leg = stuck.feeders.find((f) => this.qualHere(f) === picks[0]);
+      if (leg !== undefined) {
+        this.walkBackTo(leg);
+        return [];
+      }
     }
     const stray = picks.find((p) => !offered.includes(p));
     if (stray !== undefined) {
@@ -3034,11 +3051,44 @@ export class Session {
       // at the submit left the bless with no carrier — the pull stopped asking,
       // and a bless only rides a pull that is asking. The mirror's thumbs still
       // worked, so the gap was invisible to a person and total for an agent.
+      // A GATE MISSING AN INPUT OWES NOTHING. Its form cannot be finished, and
+      // owing it swallows every choice that would fetch the missing leg.
+      if (f.gate === true && this.gateFeedersUnsigned(machine, s).length > 0) return undefined;
       const blessed = f.gate !== true || (f.bless ?? "") !== "";
       return f.signed === true && f.met === true && blessed ? undefined : s.id;
     } catch {
       return undefined;
     }
+  }
+
+  /** THE FAN'S OTHER LEGS.
+   *
+   *  A fan hands out one leg and reports the rest as not_walked, for the day
+   *  several agents walk them at once. ONE agent then reaches the join with
+   *  the other legs unwalked, and is stuck for good: the gate owes a form it
+   *  cannot finish, and a choice is only read when nothing is owed, so every
+   *  attempt to aim elsewhere is swallowed as a fill.
+   *
+   *  So at a stuck gate the unsigned feeders ARE the offer, and taking one
+   *  puts the walk back on that leg. One agent walks a fan leg by leg; the
+   *  list form still serves several agents unchanged. */
+  private gateStuck(): { machine: MachineDecl; feeders: string[] } | undefined {
+    const { machine, ids } = this.leaves();
+    const gate = machine.states.find((s) => s.id === ids[0]);
+    if (gate === undefined || gate.kind !== "gate") return undefined;
+    const feeders = this.gateFeedersUnsigned(machine, gate);
+    return feeders.length === 0 ? undefined : { machine, feeders };
+  }
+
+  /** Put the walk back on a leg it never took. No history is superseded:
+   *  nothing downstream was earned, because the join was never passed. */
+  private walkBackTo(id: string): void {
+    const top = this.top();
+    if (top === undefined) return;
+    top.instance.active = [id];
+    top.instance.current = id;
+    top.instance.status = "open";
+    this.notifyChange();
   }
 
   /** A GATE requires ALL its inputs: every feeder state carrying an
