@@ -118,3 +118,7 @@
 {"ts":"2026-08-05T17:56:54.372Z","op":"update","visit":"iterations/i1/start@0","node":"d4","brief":"the battery — recordDone now runs the form checks on every paint"}
 {"ts":"2026-08-05T17:58:12.754Z","op":"done","visit":"iterations/i1/start@0","node":"d2","brief":"green now means the claim passes its form now, not that it passed once"}
 {"ts":"2026-08-05T17:58:26.272Z","op":"plan","visit":"iterations/i1/start@0","parent":null,"nodes":[{"id":"d5","brief":"commit the self-healing green in the worktree"},{"id":"d6","brief":"reload and pull so the stale claims mark themselves"}]}
+{"ts":"2026-08-05T17:58:38.972Z","op":"done","visit":"iterations/i1/start@0","node":"d5","brief":"committed on the iteration branch"}
+{"ts":"2026-08-05T17:59:26.482Z","op":"fork","visit":"iterations/i1/start@0","parent":null,"node":"d2","brief":"the stale pass sat behind the drift's early return","nodes":[]}
+{"ts":"2026-08-05T17:59:47.069Z","op":"done","visit":"iterations/i1/start@0","node":"d2","brief":"the stale pass runs first and unconditionally"}
+{"ts":"2026-08-05T18:03:59.031Z","op":"plan","visit":"iterations/i1/start@0","parent":null,"nodes":[{"id":"d1","brief":"land the engine commits on trunk"},{"id":"d2","brief":"restart the engine on the landed sources"},{"id":"d3","brief":"walk to gate-motivation for the re-bless"}]}

@@ -2856,6 +2856,11 @@ export class Session {
     if (run === undefined) return;
     const it = this.declIteration(run.decl);
     if (it === undefined) return;
+    // THE STALE PASS RUNS FIRST, and unconditionally. A claim can stop passing
+    // its form for reasons the pin knows nothing about — a referenced artifact
+    // deleted, a template tightened — and the drift's early return would hide
+    // every one of them.
+    this.markStaleClaims(run.decl, it);
     const moved = iterationDrift(this.root, it);
     if (moved.length === 0) return;
     // ONLY A STANDING CLAIM CAN BE REOPENED, and standing is the RECORD's
@@ -2865,7 +2870,6 @@ export class Session {
     const done = new Set(this.recordDone(run.decl));
     const owed = moved.filter((id) => done.has(id));
     if (owed.length > 0) this.rewalk({ reopened: owed }, "the rigor matrix moved under the pin");
-    this.markStaleClaims(run.decl, it);
     // CONSUME IT EITHER WAY. The walk has now seen this move, whether or not
     // anything was standing to reopen. Leaving the pin stale would re-fire it
     // on the next pull, and the re-earned step would reopen forever.
