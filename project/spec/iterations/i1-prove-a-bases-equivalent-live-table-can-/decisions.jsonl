@@ -129,3 +129,6 @@
 {"ts":"2026-08-05T18:07:58.663Z","op":"done","visit":"iterations/i1/start@0","node":"d5","brief":"the reason is quoted, and the three broken notes are repaired"}
 {"ts":"2026-08-05T18:09:37.965Z","op":"update","visit":"iterations/i1/start@0","node":"d6","brief":"the battery again after the quoting fix"}
 {"ts":"2026-08-05T18:10:57.530Z","op":"update","visit":"iterations/i1/start@0","node":"d7","brief":"775 green — landing the ripple"}
+{"ts":"2026-08-05T18:11:24.433Z","op":"done","visit":"iterations/start@0","node":"d1","brief":"landed, and the reload puts it under the walk"}
+{"ts":"2026-08-05T18:12:30.935Z","op":"fork","visit":"iterations/i1/start@0","parent":null,"node":"d2","brief":"the ripple forgot the claims that had already fallen","nodes":[]}
+{"ts":"2026-08-05T18:12:53.476Z","op":"update","visit":"iterations/i1/start@0","node":"d3","brief":"landing so the running engine can prove it on the real record"}
