@@ -6,7 +6,7 @@ applyTo: '**'
 
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
      from project/guidance/contract.md 767b97401755
-     from project/guidance/walking.md 01ff08ccface
+     from project/guidance/walking.md dad62d8fd3d1
      from project/guidance/method/lane.md f0c61141aa63
      from project/guidance/voice.md 67bed88ab015
 -->
@@ -116,6 +116,15 @@ names which of five you got.
   that door. A LIST is legal where work fans out; one is walked, the rest
   come back as `not_walked`. You never choose unasked, and you do not choose
   just because options were offered.
+
+  A CHOICE AIMS THE WALK. Taking an offered door SETS the target to it, and
+  that is how the agent moves toward anything at all. There is no separate
+  verb and none is missing. "You never name a target" means you never invent
+  one — it has never meant you cannot move.
+
+  A `wait` IS NOT PROOF THERE IS NO DOOR. It reports that the route to the
+  STANDING target could not be drawn, which says nothing about the doors from
+  here. Ask with a choice; the refusal names what is actually offered.
 - `do` — the happy path was walked for you, every hop to the next branching
   point. `here` is where you landed. Do the work, pull again.
 - `wait` — out of work, or the next step outweighs the slider. Name the
