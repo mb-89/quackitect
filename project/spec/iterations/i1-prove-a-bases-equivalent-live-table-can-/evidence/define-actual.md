@@ -1,7 +1,6 @@
 ---
 form: define-actual
-by: agent
-signed_off: 2026-08-04T19:17:38.146Z
+suspect: "rests on onboard-retro, gate-kickoff, frame-delta, which fell"
 authors: agent
 files:
 ---

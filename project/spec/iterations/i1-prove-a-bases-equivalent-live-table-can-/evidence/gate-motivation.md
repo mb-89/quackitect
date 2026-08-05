@@ -1,8 +1,6 @@
 ---
 form: gate-motivation
-bless: blessed by human
-by: agent
-signed_off: 2026-08-04T20:32:37.664Z
+suspect: "rests on onboard-retro, gate-kickoff, frame-delta, which fell"
 authors: agent
 files:
 ---

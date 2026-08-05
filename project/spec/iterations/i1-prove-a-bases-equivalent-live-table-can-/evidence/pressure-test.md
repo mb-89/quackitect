@@ -1,7 +1,6 @@
 ---
 form: pressure-test
-by: agent
-signed_off: 2026-08-04T20:02:37.025Z
+suspect: "rests on onboard-retro, gate-kickoff, frame-delta, which fell"
 authors: agent
 files:
 ---

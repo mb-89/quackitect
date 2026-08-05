@@ -1,7 +1,6 @@
 ---
 form: draft-vision
-by: agent
-signed_off: 2026-08-04T19:05:19.784Z
+suspect: "rests on onboard-retro, gate-kickoff, frame-delta, which fell"
 authors: agent
 files:
 ---

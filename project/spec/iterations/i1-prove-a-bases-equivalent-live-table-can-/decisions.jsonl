@@ -132,3 +132,4 @@
 {"ts":"2026-08-05T18:11:24.433Z","op":"done","visit":"iterations/start@0","node":"d1","brief":"landed, and the reload puts it under the walk"}
 {"ts":"2026-08-05T18:12:30.935Z","op":"fork","visit":"iterations/i1/start@0","parent":null,"node":"d2","brief":"the ripple forgot the claims that had already fallen","nodes":[]}
 {"ts":"2026-08-05T18:12:53.476Z","op":"update","visit":"iterations/i1/start@0","node":"d3","brief":"landing so the running engine can prove it on the real record"}
+{"ts":"2026-08-05T18:14:04.503Z","op":"done","visit":"iterations/i1/start@0","node":"d2","brief":"gate-motivation now says it rests on claims that fell"}
