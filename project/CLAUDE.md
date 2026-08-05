@@ -1,6 +1,6 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
      from project/guidance/contract.md 767b97401755
-     from project/guidance/walking.md 01ff08ccface
+     from project/guidance/walking.md dad62d8fd3d1
      from project/guidance/method/lane.md f0c61141aa63
      from project/guidance/voice.md 67bed88ab015
 -->
