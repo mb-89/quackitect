@@ -1,8 +1,6 @@
 ---
 form: gate-kickoff
-bless: blessed by agent
-by: agent
-signed_off: 2026-08-04T20:28:39.941Z
+suspect: "no longer passes its form — retro_drained: unanswered — $inbox"
 checked: Read software, Read ux, Read template-free-form, Read template-per-item, Read template-list, Read template-choice-with-rationale, Read template-findings
 authors: human, agent
 files:

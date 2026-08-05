@@ -2741,17 +2741,7 @@ export class Session {
   private markSuspect(decl: MachineDecl, states: string[], why: string): void {
     const it = this.declIteration(decl);
     if (it === undefined) return;
-    for (const id of states) {
-      const abs = this.evidenceAbs(it, id);
-      if (!existsSync(abs)) continue;
-      try {
-        const raw = readFileSync(abs, "utf8");
-        if (!/^signed_off: /m.test(raw) && !/^bless:/m.test(raw)) continue;
-        writeFileSync(abs, withSuspect(raw, why), "utf8");
-      } catch {
-        // an unreadable claim has no stamp to mark
-      }
-    }
+    for (const id of states) this.suspect(it, id, why);
   }
 
   /** A CLAIM THAT NO LONGER PASSES ITS OWN FORM SAYS SO.
@@ -2761,19 +2751,48 @@ export class Session {
    *  for what changed — which is the whole thing the suspect mark exists to
    *  prevent. */
   private markStaleClaims(decl: MachineDecl, it: Iteration): void {
+    const failed: string[] = [];
     for (const s of decl.states) {
-      if (s.evidence_form.length === 0) continue;
-      const abs = this.evidenceAbs(it, s.id);
-      if (!existsSync(abs)) continue;
-      try {
-        const note = parseStateNote(readFileSync(abs, "utf8"));
-        if (typeof note.frontmatter.signed_off !== "string") continue;
-        const problems = claimProblems(this.root, s, note.body);
-        if (problems.length === 0) continue;
-        writeFileSync(abs, withSuspect(readFileSync(abs, "utf8"), `no longer passes its form — ${problems[0]}`), "utf8");
-      } catch {
-        // an unreadable claim is the lint's problem, not the walk's
-      }
+      const note = this.standingClaim(it, s);
+      if (note === undefined) continue;
+      const problems = claimProblems(this.root, s, note);
+      if (problems.length > 0 && this.suspect(it, s.id, `no longer passes its form — ${problems[0]}`)) failed.push(s.id);
+    }
+    if (failed.length === 0) return;
+    // AND IT RIPS DOWN. A gate whose feeder just fell cannot stand on it, and
+    // neither can anything past the gate. The claim downstream may be word for
+    // word fine and still be resting on ground that moved.
+    for (const id of downstreamCone(decl, failed)) {
+      if (failed.includes(id)) continue;
+      this.suspect(it, id, `rests on ${failed.join(", ")}, which fell`);
+    }
+  }
+
+  /** A state's claim when one STANDS — signed, and not already marked. */
+  private standingClaim(it: Iteration, s: StateDecl): string | undefined {
+    if (s.evidence_form.length === 0) return undefined;
+    const abs = this.evidenceAbs(it, s.id);
+    if (!existsSync(abs)) return undefined;
+    try {
+      const note = parseStateNote(readFileSync(abs, "utf8"));
+      if (typeof note.frontmatter.signed_off !== "string") return undefined;
+      return note.body;
+    } catch {
+      return undefined; // an unreadable claim is the lint's problem, not the walk's
+    }
+  }
+
+  /** Mark one claim, if there is one to mark. */
+  private suspect(it: Iteration, state: string, why: string): boolean {
+    const abs = this.evidenceAbs(it, state);
+    if (!existsSync(abs)) return false;
+    try {
+      const raw = readFileSync(abs, "utf8");
+      if (!/^signed_off: /m.test(raw) && !/^bless:/m.test(raw)) return false;
+      writeFileSync(abs, withSuspect(raw, why), "utf8");
+      return true;
+    } catch {
+      return false;
     }
   }
 

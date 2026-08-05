@@ -122,3 +122,10 @@
 {"ts":"2026-08-05T17:59:26.482Z","op":"fork","visit":"iterations/i1/start@0","parent":null,"node":"d2","brief":"the stale pass sat behind the drift's early return","nodes":[]}
 {"ts":"2026-08-05T17:59:47.069Z","op":"done","visit":"iterations/i1/start@0","node":"d2","brief":"the stale pass runs first and unconditionally"}
 {"ts":"2026-08-05T18:03:59.031Z","op":"plan","visit":"iterations/i1/start@0","parent":null,"nodes":[{"id":"d1","brief":"land the engine commits on trunk"},{"id":"d2","brief":"restart the engine on the landed sources"},{"id":"d3","brief":"walk to gate-motivation for the re-bless"}]}
+{"ts":"2026-08-05T18:04:19.568Z","op":"done","visit":"iterations/i1/start@0","node":"d1","brief":"9 commits fast-forwarded onto v3"}
+{"ts":"2026-08-05T18:05:42.994Z","op":"update","visit":"iterations/i1/start@0","node":"d3","brief":"suspicion rips down — a gate cannot stand on a feeder that fell"}
+{"ts":"2026-08-05T18:06:02.735Z","op":"update","visit":"iterations/i1/start@0","node":"d4","brief":"the battery before landing the ripple"}
+{"ts":"2026-08-05T18:07:34.138Z","op":"fork","visit":"iterations/i1/start@0","parent":"d1","node":"d5","brief":"the suspect reason broke the note's YAML","nodes":[]}
+{"ts":"2026-08-05T18:07:58.663Z","op":"done","visit":"iterations/i1/start@0","node":"d5","brief":"the reason is quoted, and the three broken notes are repaired"}
+{"ts":"2026-08-05T18:09:37.965Z","op":"update","visit":"iterations/i1/start@0","node":"d6","brief":"the battery again after the quoting fix"}
+{"ts":"2026-08-05T18:10:57.530Z","op":"update","visit":"iterations/i1/start@0","node":"d7","brief":"775 green — landing the ripple"}

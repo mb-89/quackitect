@@ -1,7 +1,6 @@
 ---
 form: frame-delta
-by: agent
-signed_off: 2026-08-04T19:21:34.701Z
+suspect: "no longer passes its form — value_props: no references — one artifact id per line, or one line saying none"
 authors: agent
 files:
 ---

@@ -1,7 +1,6 @@
 ---
 form: onboard-retro
-by: agent
-signed_off: 2026-08-04T20:26:52.867Z
+suspect: "no longer passes its form — notes_drained: unanswered — $inbox"
 checked: Read software, Read ux, Read retro, Read template-free-form, Read template-per-item, Read template-list, Do the survey, Establish the interval
 authors: agent
 files:

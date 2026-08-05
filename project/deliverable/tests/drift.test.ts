@@ -181,7 +181,7 @@ test("a suspect claim keeps its content, loses its stamps, and stops being green
   const after = readFileSync(ev, "utf8");
   assert.doesNotMatch(after, /^signed_off:/m, "the stamp goes");
   assert.doesNotMatch(after, /^bless:/m, "and so does the bless");
-  assert.match(after, /^suspect: the matrix moved$/m, "replaced by the mark, carrying why");
+  assert.match(after, /^suspect: "the matrix moved"$/m, "replaced by the mark, carrying why — quoted, because a reason is full of colons");
   assert.match(after, /^keep_me: yes$/m, "an unrelated key is untouched");
   assert.match(after, /the claim, in full/, "and the claim itself stays — it is re-approved, not re-written");
   assert.ok(!new Session(root).recordDone(decl).includes(gate.id), "and it is not green any more");

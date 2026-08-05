@@ -226,7 +226,10 @@ export function withSignedOff(instanceRaw: string, when: string): string {
  *  it makes re-earning cost as much as starting over. */
 export function withSuspect(instanceRaw: string, why: string): string {
   const cleared = stripSuspect(stripSignedOff(instanceRaw)).replace(/^bless:.*\n?/m, "");
-  return afterAnchor(cleared, `suspect: ${why}`);
+  // QUOTED, ALWAYS. The reason carries the checker's own message, which is
+  // full of colons and dashes — unquoted it reads as a nested mapping and the
+  // whole note stops parsing.
+  return afterAnchor(cleared, `suspect: ${JSON.stringify(why)}`);
 }
 
 export function stripSuspect(instanceRaw: string): string {
