@@ -192,7 +192,11 @@ export function claimProblems(root: string, s: StateDecl, body: string, corpus?:
     const args: FieldArgs = {
       of: f.of ?? "",
       options: f.options ?? [],
-      items: f.items ?? [],
+      // A LIVE-RESOLVING ARGUMENT CANNOT BE RE-CHECKED. `$inbox` expands to the
+      // notes pending RIGHT NOW; a retro answered the notes pending when it was
+      // walked, and that list is gone. Re-checking against today's inbox marks
+      // every retro suspect the moment any note arrives, forever.
+      items: (f.items ?? []).filter((i) => !i.startsWith("$")),
       passing: f.passing ?? [],
       columns: f.columns ?? [],
     };

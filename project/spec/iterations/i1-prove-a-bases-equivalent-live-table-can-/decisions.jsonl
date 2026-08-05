@@ -133,3 +133,9 @@
 {"ts":"2026-08-05T18:12:30.935Z","op":"fork","visit":"iterations/i1/start@0","parent":null,"node":"d2","brief":"the ripple forgot the claims that had already fallen","nodes":[]}
 {"ts":"2026-08-05T18:12:53.476Z","op":"update","visit":"iterations/i1/start@0","node":"d3","brief":"landing so the running engine can prove it on the real record"}
 {"ts":"2026-08-05T18:14:04.503Z","op":"done","visit":"iterations/i1/start@0","node":"d2","brief":"gate-motivation now says it rests on claims that fell"}
+{"ts":"2026-08-05T18:16:20.806Z","op":"plan","visit":"iterations/i1/start@0","parent":null,"nodes":[{"id":"d1","brief":"walk M1 to gate-motivation, re-earning each suspect claim"}]}
+{"ts":"2026-08-05T18:16:40.972Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d2","brief":"the retro's drain is the first thing owed"}
+{"ts":"2026-08-05T18:17:08.230Z","op":"fork","visit":"iterations/i1/onboard-retro@0","parent":"d1","node":"d3","brief":"the re-check marked every retro suspect on its own live argument","nodes":[]}
+{"ts":"2026-08-05T18:17:56.418Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d4","brief":"the guidance now says a choice aims the walk"}
+{"ts":"2026-08-05T18:18:15.002Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d5","brief":"restoring the two claims my own check wrongly knocked down"}
+{"ts":"2026-08-05T18:18:40.671Z","op":"done","visit":"iterations/i1/onboard-retro@0","node":"d3","brief":"a live-resolving argument is no longer re-checked against a stored claim"}
