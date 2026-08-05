@@ -139,3 +139,13 @@
 {"ts":"2026-08-05T18:17:56.418Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d4","brief":"the guidance now says a choice aims the walk"}
 {"ts":"2026-08-05T18:18:15.002Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d5","brief":"restoring the two claims my own check wrongly knocked down"}
 {"ts":"2026-08-05T18:18:40.671Z","op":"done","visit":"iterations/i1/onboard-retro@0","node":"d3","brief":"a live-resolving argument is no longer re-checked against a stored claim"}
+{"ts":"2026-08-05T18:18:59.112Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d6","brief":"landed — reloading to see what stands after the false positive is gone"}
+{"ts":"2026-08-05T18:24:01.911Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d2","brief":"onboard-retro stands — on to the kickoff gate"}
+{"ts":"2026-08-05T18:24:42.476Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d3","brief":"attempting the agent bless on gate-kickoff, as asked"}
+{"ts":"2026-08-05T18:25:17.206Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d4","brief":"draining the inbox — the kickoff refuses while it pends"}
+{"ts":"2026-08-05T18:26:08.044Z","op":"defer","visit":"front_desk@0","node":"d1","brief":"walk M1 to gate-motivation, blessing gate-kickoff on the way","to":"write-stories","hops":1,"trail":["front_desk","write-stories"]}
+{"ts":"2026-08-05T18:26:20.853Z","op":"plan","visit":"iterations/i1/gate-kickoff@0","parent":null,"nodes":[{"id":"d5","brief":"submit and bless gate-kickoff, then walk to gate-motivation"}]}
+{"ts":"2026-08-05T18:26:28.300Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d6","brief":"the agent bless on gate-kickoff — the test you asked for"}
+{"ts":"2026-08-05T18:27:15.583Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d7","brief":"a gate stays owed until blessed, so the bless has a carrier"}
+{"ts":"2026-08-05T18:27:51.736Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d8","brief":"the battery — the owed rule sits on every walk"}
+{"ts":"2026-08-05T18:29:32.396Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d9","brief":"775 green — landing the owed-until-blessed rule"}

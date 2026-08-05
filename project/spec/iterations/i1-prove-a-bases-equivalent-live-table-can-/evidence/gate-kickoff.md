@@ -1,9 +1,7 @@
 ---
 form: gate-kickoff
-status: done
-signed_off: 2026-08-04T16:19:52.666Z
 by: agent
-opened: 2026-08-04T14:28:49.218Z
+signed_off: 2026-08-05T18:26:20.986Z
 authors: human, agent
 files:
 ---
@@ -16,10 +14,14 @@ M0's retro closed with the inbox judged — three notes parked in the form pendi
 
 ## retro_drained
 
-- note-cb05c419a62e — The hot-swap junction cannot work while package.: parked for the VS Code shell work (in the retro form; the drain follows the seam fix)
-- note-f06de8f02a3b — The test-template freeze has a hole: new files p: parked for the engine-fix bundle
-- note-833a0707f1c6 — Form inputs and guidance links (owner, 2026-08-0: half built; the open halves parked with the forms pass
-- note-6176aac68897 — Seam bug, found live in i1's onboard-retro (2026: the fix lands unbound right after this walk
+- note-a0c85ded3278: done — the M2 trace-graph research is parked as a to-do on write-stories, which is the first state that consumes it
+- note-ef3f41d02983: obsolete — the twelve-prop proposal was struck to six and then to five
+- note-2b4aa8a09eb0: obsolete — the six-prop proposal was superseded by the five the owner settled on
+- note-5503456afc89: done — the five value props stand as nodes under project/spec/trace/value-prop/
+- note-0ed069030139: done — the filter pills and the radial graph are built in engine/trace.ts and engine/traceui.ts
+- note-d35e75426f30: done — the render landed; what it taught is recorded in guidance/ux.md under reuse the surface
+- note-cafbaf9c591b: done — the value-prop item type and the frame-delta rework are built and checked
+- note-dc19338c2f63: done — a live-resolving argument is no longer re-checked against a stored claim
 
 ## goal
 
@@ -51,10 +53,11 @@ product — the first iteration of a product authors the vision packet, the stak
 
 ## round_1_validate
 
-- exercised against the goal: M0 walked end to end through the real machinery, which is what the seed promised
-- missing: the judgment-drain seam fix — parked and noted
-- wrong: nothing found
-- out of scope: the shell and render rounds, named under left_out
+- exercised against the goal: M0 walked end to end, and M1 re-walked after the matrix moved under it
+- missing: none for this gate
+- wrong: none
+- out of scope: the M2 trace chain, parked on write-stories
+- prior art: v1's suspect-bless, mined this session — a changed input MARKS a check rather than reopening it, and one re-attestation clears it. That is what this walk now implements.
 
 ## round_2_red_team
 

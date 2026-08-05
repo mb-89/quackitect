@@ -3029,8 +3029,13 @@ export class Session {
       // Owed until SUBMITTED and still COMPLETE — a live input growing back
       // (a new inbox item) re-opens a signed form instead of leaving it
       // unpullable while the next state's entry refuses.
-      const f = this.stateFormGet(s.id) as { signed?: boolean; met?: boolean };
-      return f.signed === true && f.met === true ? undefined : s.id;
+      const f = this.stateFormGet(s.id) as { signed?: boolean; met?: boolean; gate?: boolean; bless?: string };
+      // A GATE IS NOT DONE UNTIL IT IS BLESSED. Dropping it from the owed list
+      // at the submit left the bless with no carrier — the pull stopped asking,
+      // and a bless only rides a pull that is asking. The mirror's thumbs still
+      // worked, so the gap was invisible to a person and total for an agent.
+      const blessed = f.gate !== true || (f.bless ?? "") !== "";
+      return f.signed === true && f.met === true && blessed ? undefined : s.id;
     } catch {
       return undefined;
     }
