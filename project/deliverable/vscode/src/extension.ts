@@ -413,8 +413,9 @@ async function pollWalk() {
   if (levels === null) levels = await api("/api/levels");
   const p = await api("/api/packet");
   if (p === null) return;
-  const moved = `${JSON.stringify(p.active ?? null)}|${String(p.status)}` !== lastWalk;
-  lastWalk = `${JSON.stringify(p.active ?? null)}|${String(p.status)}`;
+  const walkNow = `${JSON.stringify(p.active ?? null)}|${String(p.status)}|${String(p.target ?? "")}`;
+  const moved = walkNow !== lastWalk;
+  lastWalk = walkNow;
   packet = p;
   bar = await fetchBar();
   if (controls !== null) controls.send();
@@ -528,7 +529,9 @@ function framePage(url) {
     if (d.se === "open") { vsapi.postMessage(d); return; }
     if (d.se === "trace") { vsapi.postMessage(d); return; } // the page reporting what it just did
     if (d.se === "details") { vsapi.postMessage(d); return; } // a click in THIS card, bound for the details group
+    if (d.se === "logref" && ev.source === frame.contentWindow) { vsapi.postMessage(d); return; } // a log row clicked HERE, bound for the details surface
     if (d.se === "open-form") { vsapi.postMessage(d); return; } // a form wants its own panel
+    if (d.se === "download") { vsapi.postMessage(d); return; } // a webview cannot download; the host's browser can
     if (d.se === "theme-changed") { sendTheme(); return; }
     if (d.se === "up") { show(); return; }
     if (d.se === "wake") { if (loaded && frame.contentWindow) frame.contentWindow.postMessage(d, "*"); return; }
@@ -693,9 +696,12 @@ function onWebviewMessage(m) {
   // the card that was clicked and the group that explains it are two separate
   // documents, so the subject is relayed rather than shown in place.
   else if (m.se === "details") void showHelp(m.title, m.html, false);
+  else if (m.se === "logref") void showLogRef(String(m.ref ?? ""));
   // A FORM GETS A PANEL OF ITS OWN (owner design 2026-08-04): pinned to
   // the form, beside the editor — the inline details pane is ephemeral.
   else if (m.se === "open-form") openFormPanel(String(m.name ?? ""));
+  // The system browser downloads what the webview sandbox refuses to.
+  else if (m.se === "download") void vscode.env.openExternal(vscode.Uri.parse(String(m.url ?? "")));
 }
 
 /** The bar's help clicks, one place: a handled message answers true. */

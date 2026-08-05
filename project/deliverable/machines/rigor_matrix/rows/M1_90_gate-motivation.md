@@ -58,3 +58,26 @@ specification_note: |
 ## Guidance
 
 THE one place where the frame's worth is argued - this gate may fail on a trivial motivation. Past it, the vision is accepted as axiom and never re-litigated downstream. Review per [[meth-gate-review]]: specifics below first, the standard rounds evaluate them.
+
+## The value props are reviewed as ARTIFACTS
+
+frame-delta hands this gate a list of REFERENCES. Follow every one to its
+node in `project/spec/trace/value-prop/` and review the artifact itself, not
+the list.
+
+Per prop, in this order:
+
+- The reference RESOLVES. An id pointing at no file fails the gate outright.
+- The statement is in the audience's own words, and names a need rather than
+  a feature.
+- `audience` names a stakeholder that exists.
+- `outcome` says what becomes true for that audience. It is what validation
+  will measure, so a vague one is a defect now rather than at M8.
+- Every success criterion carries a Metric and a Target. A criterion nothing
+  will ever check is not a criterion.
+
+Across the set:
+
+- No two props claim the same id.
+- No prop duplicates another in substance under a different name.
+- A delta authoring ZERO props is legal, and says so in one line.

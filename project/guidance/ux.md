@@ -63,6 +63,47 @@ bug somewhere else.
 - Author every figure in a text-based form: inline SVG with real text, Mermaid, or ASCII. A machine must be able to read it.
 - Give each figure one line saying what to see in it.
 
+## Fix the whole wire
+
+A surface behavior is never one change. It spans the engine's state, the payload that carries it, every host's wake channel, and the DOM that draws it. Fixing one leg and shipping is the failure this project repeats most.
+
+Four times in one day (2026-08-04) a change landed with one leg missing:
+
+- Colours: the data was right. The CSS rule never existed.
+- The route line: the route was right. The projection matched the wrong prefix.
+- The submit: the instruction advertised it. The pull never routed it.
+- The set-target redraw: engine and page were fixed. The extension's relay was not.
+
+So before shipping a surface behavior, NAME EVERY LEG:
+
+- The engine state that holds the new fact.
+- The payload that carries it outward.
+- Each host's wake channel. The browser event stream and the extension relay are SEPARATE builds.
+- The DOM update that draws it.
+
+Then verify the new datum travels each leg. The extension does not recompile with the engine. It is the leg people forget.
+
+TWO GREEN HALVES ARE NOT A GREEN WIRE. The guard is a SEAM test per wire. Assert that the payload carries the field. Assert that the surface acts on it.
+
+## Reuse the surface, never rebuild it
+
+Before drawing anything, find what already draws it. A second surface for a job one surface already does is the most expensive mistake on this page, because both halves keep working and only their disagreement is visible.
+
+Three came out of one afternoon on the trace graph (2026-08-05):
+
+- A second details panel was built beside the real one. The page already routes every click through `clickable` and `data-detail`.
+- The nodes were styled from scratch and came out black on black. The machine view's `state` and `label` classes already carry the host's palette.
+- A per-control help popover was invented. Help is a detail and belongs in the details panel, which this document already said.
+
+So, before writing a line of a new surface:
+
+- Name the element that does this job today, and read how it does it.
+- Take its CLASSES, not its colours. A class inherits the host's theme; a colour you pick does not.
+- Take its EVENT PATH. If a click already reaches the details panel, join that path rather than opening a second one.
+- Only what genuinely has no precedent is new code. On the trace graph that was three things: the rings, the edges and the filter pills.
+
+A NEW SURFACE IS A CLAIM THAT NOTHING FITS. Make the claim out loud, in one line, or do not make it.
+
 ## When a rule here keeps breaking
 
 A prose rule broken more than once wants a LINT or a TEST, not another

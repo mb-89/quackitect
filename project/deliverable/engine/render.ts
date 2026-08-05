@@ -27,6 +27,7 @@ import { loadPanel, renderPanel } from "./params.ts";
 import { loadLevels } from "./scale.ts";
 import { mainMachinePath, type Session } from "./session.ts";
 import { TABLE_SCRIPT, TABLE_STYLE } from "./tables.ts";
+import { TRACE_SCRIPT, TRACE_STYLE, traceCard } from "./traceui.ts";
 
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -40,6 +41,9 @@ function stateIdOf(el: CanvasElement): string | undefined {
   return undefined;
 }
 
+/** THE AUTHORED LAW: an edge anchors at the side midpoints the drawing
+ *  declares — the owner drew those sides, and the drawing wins. Only
+ *  canvases that OPT IN (routed: true) take the centre-line law below. */
 function sidePoint(el: CanvasElement, side: string | undefined, other: CanvasElement): [number, number] {
   const cx = el.x + el.width / 2;
   const cy = el.y + el.height / 2;
@@ -57,6 +61,47 @@ function sidePoint(el: CanvasElement, side: string | undefined, other: CanvasEle
       return [ox < cx ? el.x : el.x + el.width, cy];
     }
   }
+}
+
+/** THE ROUTED LAW (owner ruling 2026-08-04, opt-in): arrows run centre
+ *  to centre and clip at the borders — the tip always lands ON the
+ *  target's edge, pointing at its heart. */
+function borderPoint(el: CanvasElement, toward: [number, number]): [number, number] {
+  const cx = el.x + el.width / 2;
+  const cy = el.y + el.height / 2;
+  const dx = toward[0] - cx;
+  const dy = toward[1] - cy;
+  if (dx === 0 && dy === 0) return [cx, cy];
+  const sx = dx === 0 ? Number.POSITIVE_INFINITY : el.width / 2 / Math.abs(dx);
+  const sy = dy === 0 ? Number.POSITIVE_INFINITY : el.height / 2 / Math.abs(dy);
+  const s = Math.min(sx, sy);
+  return [cx + dx * s, cy + dy * s];
+}
+
+const centerOf = (el: CanvasElement): [number, number] => [el.x + el.width / 2, el.y + el.height / 2];
+
+/** A LONG EDGE ROUTES AROUND THE BAND (owner rule 2026-08-04): when other
+ *  nodes stand vertically between the two, the line detours through up to
+ *  two OUTSIDE waypoints — beside the source, then straight down beside
+ *  the target — at 100px past the widest in-between node on the chosen
+ *  side. A waypoint that would land inside its own endpoint is skipped. */
+function edgeWaypoints(a: CanvasElement, b: CanvasElement, nodes: CanvasElement[]): [number, number][] {
+  const [acx, acy] = centerOf(a);
+  const [bcx, bcy] = centerOf(b);
+  const lo = Math.min(acy, bcy);
+  const hi = Math.max(acy, bcy);
+  const between = nodes.filter((n) => {
+    if (n === a || n === b || n.type === "group") return false;
+    const cy = n.y + n.height / 2;
+    return cy > lo && cy < hi;
+  });
+  if (between.length === 0) return [];
+  const right = acx >= bcx;
+  const x = right ? Math.max(...between.map((n) => n.x + n.width)) + 100 : Math.min(...between.map((n) => n.x)) - 100;
+  const pts: [number, number][] = [];
+  if (x < a.x || x > a.x + a.width) pts.push([x, acy]);
+  if (x < b.x || x > b.x + b.width) pts.push([x, bcy]);
+  return pts;
 }
 
 /** THE FEED ROLES — one colour per role, none shared. The aq kind wore the
@@ -88,6 +133,8 @@ export function reservedColours(root: string): string[] {
 }
 
 export interface StateMeta {
+  /** Passed against a demand that has since moved — no longer green. */
+  suspect?: boolean;
   has_exit: boolean;
   exit_met: boolean;
   has_entry: boolean;
@@ -124,10 +171,10 @@ export interface StateMeta {
  *  anchor all the same, which is what the owner called an invisible waypoint. */
 export function routeOverlay(
   steps: { from: string; to: string }[],
-  viewId: string,
-  mainId: string,
+  /** The view's QUALIFIED chain below main ("" is main). A nested machine
+   *  is "iterations/i1", never its bare leaf id — hops speak full chains. */
+  prefix: string,
 ): { waypoints: Set<string>; path: string[] } {
-  const prefix = viewId === mainId ? "" : viewId;
   const local = (q: string): string | undefined => {
     if (prefix === "") return q.split("/")[0];
     if (!q.startsWith(`${prefix}/`)) return undefined;
@@ -155,6 +202,8 @@ interface RouteMarks {
   path: string[];
   /** The destination, if it is in this drawing. */
   target?: string;
+  /** The walk STANDS in this drawing — the one view that draws the here-arrow. */
+  here?: boolean;
   /** The hop the walk cannot pass, and why. Drawn as a road closure. */
   blocked?: { at: string; why: string };
 }
@@ -192,25 +241,48 @@ function svgGroups(nodes: CNode[]): string[] {
   return parts;
 }
 
-function svgEdges(canvas: CanvasData, byId: Map<string, CNode>): string[] {
+function svgEdges(canvas: CanvasData, byId: Map<string, CNode>, skip: Set<string>): string[] {
   const parts: string[] = [];
+  const nodes = canvas.nodes ?? [];
+  const routed = canvas.routed === true;
   for (const edge of canvas.edges ?? []) {
     const a = byId.get(edge.fromNode);
     const b = byId.get(edge.toNode);
     if (a === undefined || b === undefined) continue;
-    const [x1, y1] = sidePoint(a, (edge as { fromSide?: string }).fromSide, b);
-    const [x2, y2] = sidePoint(b, (edge as { toSide?: string }).toSide, a);
+    if (skip.has(`${stateIdOf(a)}->${stateIdOf(b)}`)) continue;
     // A double-headed arrow is one edge meaning both ways, so it draws that
     // way too — the marker already orients itself at a start.
     const bothWays = (edge as { fromEnd?: string }).fromEnd === "arrow";
-    parts.push(
-      `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="edge"${bothWays ? ' marker-start="url(#arrow)"' : ""} marker-end="url(#arrow)"/>`,
-    );
+    const ends = `class="edge"${bothWays ? ' marker-start="url(#arrow)"' : ""} marker-end="url(#arrow)"`;
+    const pts = routed ? edgeWaypoints(a, b, nodes) : [];
+    const [x1, y1] = routed ? borderPoint(a, pts[0] ?? centerOf(b)) : sidePoint(a, (edge as { fromSide?: string }).fromSide, b);
+    const [x2, y2] = routed ? borderPoint(b, pts[pts.length - 1] ?? centerOf(a)) : sidePoint(b, (edge as { toSide?: string }).toSide, a);
+    if (pts.length === 0) {
+      parts.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" ${ends}/>`);
+    } else {
+      const mid = pts.map((p) => `L ${p[0]} ${p[1]}`).join(" ");
+      parts.push(`<path d="M ${x1} ${y1} ${mid} L ${x2} ${y2}" fill="none" ${ends}/>`);
+    }
     if (edge.label !== undefined && edge.label !== "") {
-      parts.push(`<text x="${(x1 + x2) / 2}" y="${(y1 + y2) / 2 - 8}" class="guard">${esc(edge.label)}</text>`);
+      const [lx, ly] = pts[0] ?? [(x1 + x2) / 2, (y1 + y2) / 2];
+      parts.push(`<text x="${lx}" y="${ly - 8}" class="guard">${esc(edge.label)}</text>`);
     }
   }
   return parts;
+}
+
+/** SUSPECT BEATS DONE. The claim was filed and it still stands on disk. What
+ *  it answered has moved, so the state is not green — it is a lapsed pass,
+ *  and the drawing has to say so before anybody trusts the colour.
+ *
+ *  ONE WORD FOR ONE IDEA. The trace graph marks a node standing on moved
+ *  ground with the same word and the same style. A reader who learns the mark
+ *  once reads it everywhere. */
+function stateClass(sid: string, activeIds: Set<string>, doneIds: Set<string>, meta: Record<string, StateMeta>): string {
+  if (activeIds.has(sid)) return "state active";
+  if (meta[sid]?.suspect === true) return "state suspect";
+  if (doneIds.has(sid)) return "state done";
+  return "state";
 }
 
 function svgStateNode(
@@ -234,7 +306,7 @@ function svgStateNode(
   if (sid === undefined) return parts;
   const isSub = subIds.has(sid);
   const pill = (n as { styleAttributes?: { shape?: string } }).styleAttributes?.shape === "pill";
-  const cls = activeIds.has(sid) ? "state active" : doneIds.has(sid) ? "state done" : "state";
+  const cls = stateClass(sid, activeIds, doneIds, meta);
   const rx = pill ? Math.min(n.width, n.height) / 2 : 14;
   parts.push(`<g class="clickable" data-detail="state:${esc(sid)}"${isSub ? ` data-sub="${esc(sid)}"` : ""}>`);
   parts.push(`<rect x="${n.x}" y="${n.y}" width="${n.width}" height="${n.height}" rx="${rx}" class="${cls}"/>`);
@@ -248,28 +320,14 @@ function svgStateNode(
   parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + (sub !== undefined ? -6 : 6)}" class="label">${esc(sid)}</text>`);
   if (sub !== undefined) parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + 24}" class="sublabel">${esc(sub)}</text>`);
   parts.push("</g>");
-  parts.push(...svgCondButtons(n, sid, meta[sid]));
   return parts;
 }
 
-// Condition buttons ride the node's edges: enter on the LEFT (where the
-// arrow comes in), leave on the RIGHT (in front of the arrow out).
-function svgCondButtons(n: CNode, sid: string, mt: StateMeta | undefined): string[] {
-  if (mt === undefined) return [];
-  const parts: string[] = [];
-  const cy = n.y + n.height / 2;
-  if (mt.has_entry) {
-    parts.push(
-      `<g class="clickable cond ${mt.entry_met ? "met" : "unmet"}" data-detail="cond:${esc(sid)}"><circle cx="${n.x}" cy="${cy}" r="18"/><text x="${n.x}" y="${cy + 7}" class="cond-label">${mt.entry_met ? "✓" : "!"}</text></g>`,
-    );
-  }
-  if (mt.has_exit) {
-    parts.push(
-      `<g class="clickable cond ${mt.exit_met ? "met" : "unmet"}" data-detail="cond:${esc(sid)}"><circle cx="${n.x + n.width}" cy="${cy}" r="18"/><text x="${n.x + n.width}" y="${cy + 7}" class="cond-label">${mt.exit_met ? "✓" : "!"}</text></g>`,
-    );
-  }
-  return parts;
-}
+/** ONE ENGINE LIFE, ONE PAGE SCRIPT. Hosts keep webviews alive across
+ *  engine reloads, so a shell can outlive the script it was served — and
+ *  keep clicking with dead code. The stamp travels in the island and in
+ *  every alive answer; a mismatch reloads the page. */
+export const ENGINE_LIFE = Date.now().toString(36);
 
 // THE ROUTE IS DRAWN OVER THE NODES (owner ruling 2026-07-29), reversing
 // the along-the-edges ruling of the same day. Riding the edges read as the
@@ -309,8 +367,11 @@ function svgRoute(route: RouteMarks | undefined, nodeOfState: Map<string, CNode>
   for (const [i, s] of stops.entries()) {
     if (route?.target === s.id || route?.waypoints.has(s.id) === true) {
       parts.push(`<circle cx="${s.cx}" cy="${s.cy}" r="8" class="route-stop${shut > 0 && i >= shut ? " shut" : ""}"/>`);
+      // A pass-through waypoint is an in-and-out: the down and up arrows.
+      if (route?.waypoints.has(s.id) === true) parts.push(`<text x="${s.cx}" y="${s.cy + 3.5}" class="route-wp-io">↓↑</text>`);
     }
   }
+
   // THE CLOSURE MARK, on the hop that shuts, carrying the reason. An
   // exclamation in a ring rather than a bar across the line: a bar reads as
   // part of the road, and it stays upright whichever way the road runs.
@@ -324,11 +385,43 @@ function svgRoute(route: RouteMarks | undefined, nodeOfState: Map<string, CNode>
     );
   }
   // YOU ARE HERE: the arrow a map puts under your car, turned to face the
-  // way the line is going.
-  const heading = (Math.atan2(stops[1].cy - stops[0].cy, stops[1].cx - stops[0].cx) * 180) / Math.PI + 90;
-  parts.push(
-    `<path d="M 0 -12 L 10 9 L 0 4 L -10 9 Z" class="route-here" transform="translate(${stops[0].cx} ${stops[0].cy}) rotate(${heading.toFixed(1)})"/>`,
-  );
+  // way the line is going. There is only ever ONE — the view the walk
+  // stands in draws it; every other drawing shows the line alone.
+  if (route?.here === true) {
+    const heading = (Math.atan2(stops[1].cy - stops[0].cy, stops[1].cx - stops[0].cx) * 180) / Math.PI + 90;
+    parts.push(
+      `<path d="M 0 -12 L 10 9 L 0 4 L -10 9 Z" class="route-here" transform="translate(${stops[0].cx} ${stops[0].cy}) rotate(${heading.toFixed(1)})"/>`,
+    );
+  }
+  return parts;
+}
+
+// THE BUSBAR IS STRUCTURE, NOT ROUTE (owner ruling 2026-08-04): a gate
+// collects ALL its inputs, so every multi-feeder gate draws its feeders as
+// taps into a collection bar wearing the AND icon — one line drops from
+// the bar into the gate, and the individual feeder arrows disappear.
+function svgBusbars(busbars: { gate: string; feeders: string[] }[], nodeOfState: Map<string, CNode>): string[] {
+  const parts: string[] = [];
+  for (const b of busbars) {
+    const g = nodeOfState.get(b.gate);
+    if (g === undefined) continue;
+    const taps = b.feeders.map((f) => nodeOfState.get(f)).filter((n): n is CNode => n !== undefined);
+    if (taps.length === 0) continue;
+    const barY = g.y - 40;
+    const xs = [g.x + g.width / 2, ...taps.map((n) => n.x + n.width / 2)];
+    const x1 = Math.min(...xs) - 24;
+    const x2 = Math.max(...xs) + 24;
+    parts.push(`<line x1="${x1}" y1="${barY}" x2="${x2}" y2="${barY}" class="edge busbar"/>`);
+    for (const n of taps) {
+      const cx = n.x + n.width / 2;
+      const fromY = n.y + n.height / 2 < barY ? n.y + n.height : n.y;
+      parts.push(`<line x1="${cx}" y1="${fromY}" x2="${cx}" y2="${barY}" class="edge busbar tap"/>`);
+    }
+    parts.push(
+      `<line x1="${g.x + g.width / 2}" y1="${barY}" x2="${g.x + g.width / 2}" y2="${g.y}" class="edge busbar" marker-end="url(#arrow)"/>`,
+    );
+    parts.push(`<text x="${x1 + 8}" y="${barY - 8}" class="busbar-icon">&amp;</text>`);
+  }
   return parts;
 }
 
@@ -338,6 +431,7 @@ function machineSvg(
   doneIds: Set<string>,
   subIds: Set<string>,
   meta: Record<string, StateMeta>,
+  busbars: { gate: string; feeders: string[] }[],
   route?: RouteMarks,
 ): string {
   const canvas = source;
@@ -353,9 +447,11 @@ function machineSvg(
     const s = stateIdOf(n);
     if (s !== undefined) nodeOfState.set(s, n);
   }
+  const skip = new Set(busbars.flatMap((b) => b.feeders.map((f) => `${f}->${b.gate}`)));
   const parts: string[] = [
     ...svgGroups(nodes),
-    ...svgEdges(canvas, byId),
+    ...svgEdges(canvas, byId, skip),
+    ...svgBusbars(busbars, nodeOfState),
     ...nodes.flatMap((n) => svgStateNode(n, activeIds, doneIds, subIds, meta)),
     ...svgRoute(route, nodeOfState),
   ];
@@ -638,6 +734,21 @@ const STYLE = `
   .widget { display: flex; flex-direction: column; border: 1px solid var(--se-border); border-radius: 10px; background: var(--se-bg-side); min-height: 0; }
   .widget-head { display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; border-bottom: 1px solid var(--se-border); color: var(--se-muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
   .widget-body { flex: 1; min-height: 0; overflow: auto; }
+  /* THE FORM EDITORS read as quiet tables: bordered row groups, borderless
+     inputs on the theme's own surface — never a white browser box. */
+  .sfrows { border: 1px solid var(--se-border); border-radius: 4px; margin: 4px 0; }
+  .sfrow { display: flex; gap: 6px; align-items: center; padding: 2px 6px; border-bottom: 1px solid var(--se-border); }
+  .sfrow:last-child { border-bottom: 0; }
+  .sfrow input { flex: 1; background: transparent; color: var(--se-fg); border: 0; outline: none; font: inherit; font-size: 12.5px; padding: 4px 2px; min-width: 0; }
+  .sfrow input:focus { background: var(--se-hover); border-radius: 3px; }
+  .sfrow select { flex: 0 0 auto; background: var(--se-bg); color: var(--se-fg); border: 1px solid var(--se-border); border-radius: 3px; font: inherit; font-size: 12.5px; padding: 3px 4px; }
+  .sfrow .sfitem { flex: 0 0 44%; font-size: 12.5px; color: var(--se-muted); }
+  .sfrow .sfrowadd, .sfrow .sfrowdel { flex: 0 0 auto; background: none; border: 1px solid var(--se-border); color: var(--se-muted); border-radius: 3px; cursor: pointer; font-size: 11px; line-height: 16px; padding: 0 5px; }
+  .sfrow .sfrowadd:hover, .sfrow .sfrowdel:hover { color: var(--se-accent); border-color: var(--se-accent); }
+  /* The thumbs wear their meaning: green opens, red refuses. */
+  button.primary.blessform { background: var(--se-ok); border-color: var(--se-ok); }
+  button.primary.dismissform { background: var(--se-fail); border-color: var(--se-fail); }
+  button.primary:disabled { opacity: .45; cursor: default; }
   .expand { background: none; border: 1px solid var(--se-border-strong); color: var(--se-muted); border-radius: 6px; cursor: pointer; font: inherit; padding: 2px 8px; }
   .expand:hover { color: var(--se-accent); border-color: var(--se-accent); }
   /* THE CARD MATRIX (owner design 2026-07-29). One BIG card beside a two-wide
@@ -662,11 +773,22 @@ const STYLE = `
   svg { width: 100%; height: 100%; cursor: grab; }
   svg.panning { cursor: grabbing; }
   .state { fill: var(--se-raised); stroke: var(--se-border-strong); stroke-width: 2; }
-  /* ONLY WHERE THE WALK STANDS IS COLOURED (owner ruling 2026-07-31). Where
-     it has BEEN keeps the ordinary state colour: two shades of one blue asked
-     the reader to compare hues, and the eye does not read that difference
-     reliably. There is no .state.done rule, on purpose. */
-  .state.active { fill: var(--se-walk-bg); stroke: var(--se-walk); stroke-width: 3.5; }
+  /* DONE IS GREEN where a RECORD stands behind it (owner ruling 2026-08-04,
+     reversing the no-done-colour rule of 2026-07-31): a signed — and, for a
+     gate, blessed — stored claim paints its state. States without records
+     never enter the done set, so they stay uncoloured as before. */
+  .state.done { fill: color-mix(in srgb, var(--se-ok) 16%, var(--se-bg)); stroke: var(--se-ok); }
+  /* THE CURRENT STATES BLINK YELLOW (owner ruling 2026-08-04, v1's pulse
+     reborn) — half the emergency pace, so alarm still outranks attention. */
+  .state.active { fill: color-mix(in srgb, var(--se-warn, #d7a72a) 16%, var(--se-bg)); stroke: var(--se-warn, #d7a72a); stroke-width: 3.5; animation: se-current 2.2s ease-in-out infinite; }
+  @keyframes se-current { 0%, 100% { stroke-opacity: 1; } 50% { stroke-opacity: 0.35; } }
+  @media (prefers-reduced-motion: reduce) { .state.active { animation: none; } }
+  /* SUSPECT HAS NO RULE OF ITS OWN, and that is the ruling (owner,
+     2026-08-05). No verdict looks like no verdict. Whether a step was never
+     walked or was passed against a question that has since changed does not
+     matter to the reader — either way there is nothing to trust yet, so the
+     colour simply goes and the plain state card is what remains. The class
+     stays because the details panel and the tooltip still say WHY. */
   .state.inner { fill: none; }
   .clickable { cursor: pointer; }
   .clickable:hover .state, .clickable:hover .comment { stroke: var(--se-fg); }
@@ -687,11 +809,15 @@ const STYLE = `
   .route-shut .shut-bang { stroke-width: 3; stroke-linecap: round; }
   .route-shut .shut-dot { fill: var(--se-warn); stroke: none; }
   .route-stop { fill: var(--se-walk); stroke: var(--se-walk-ring); stroke-width: 2; }
+  .busbar { stroke-width: 3.5; stroke-linecap: round; fill: none; }
+  .busbar.tap { stroke-width: 2.5; }
+  .busbar-icon { fill: var(--se-dim); font: 700 16px system-ui, sans-serif; }
+  .route-wp-io { fill: var(--se-walk-ring); font: 700 9px system-ui, sans-serif; text-anchor: middle; }
   .route-stop.shut { opacity: .28; }
   .route-here { fill: var(--se-walk); stroke: var(--se-walk-ring); stroke-width: 2; }
   .guard { fill: var(--se-accent); font-size: 20px; text-anchor: middle; }
   .comment { fill: var(--se-bg-side); stroke: var(--se-border); }
-  .group { fill: var(--se-bg-side); stroke: var(--se-border); stroke-dasharray: 10 6; stroke-width: 2; }
+  .group { fill: var(--se-bg-side); stroke: var(--se-border); stroke-width: 2; }
   .group-label { fill: var(--se-dim); font-size: 24px; font-family: inherit; letter-spacing: .06em; }
   .comment-text { color: var(--se-muted); font-size: 13px; line-height: 1.35; }
   .comment-detail { font-size: 15px; line-height: 1.55; color: var(--se-fg); padding: 2px 0 10px; }
@@ -1187,6 +1313,7 @@ function rebind() {
   WALK_HERE = D.viewingWalk;
   // Without this the next poll compares against the OLD position forever.
   ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
+  TARGET_AT_RENDER = D.target || "";
   restoreViewBox();
   if (CURRENT_DETAIL) { const dp = detailFor(CURRENT_DETAIL); showDetails(dp[0], dp[1]); }
 }
@@ -1348,7 +1475,7 @@ window.addEventListener("message", (ev) => {
     refresh();
     return;
   }
-  if (d.se === "help") { hostTrace("page got help"); showDetails(d.title, d.html); hostAck(); return; }
+  if (d.se === "help") { hostTrace("page got help"); LAST_RELAY = { title: d.title, html: d.html }; CURRENT_DETAIL = "relay"; showDetails(d.title, d.html); hostAck(); return; }
   // A LOG LINE CLICKED IN THE HOST'S TERMINAL. The record is rendered HERE,
   // by the same code the mirror uses, so a host never grows a second
   // renderer for what this page already knows how to draw.
@@ -1461,7 +1588,9 @@ function condDetail(id) {
   let html = "";
   if (s.exit) html += '<div class="meta" style="padding:4px 0">exit</div>' + condRows(id, s.exit, standing);
   if (s.entry) html += '<div class="meta" style="padding:4px 0">entry</div>' + condRows(id, s.entry, standing);
-  html += '<div class="comment-detail">' + (s.guidance || "").replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
+  // A form-bearing state's prose lives in its form — repeating the guidance
+  // here would fork the one truth the details already render.
+  if (!s.has_form) html += '<div class="comment-detail">' + (s.guidance || "").replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
   return ["conditions · " + id, html];
 }
 // THE FORM SURFACE — an evidence form rendered to fill: required fields
@@ -1470,19 +1599,169 @@ function condDetail(id) {
 // folder one click away, done runs the same lint the agent's tick runs.
 // A form renders into the MODAL by default; "details" pins it to the
 // details surface instead — which is what a detached form window is.
-function presentForm(name, into, title, html) {
-  if (into === "details") { CURRENT_DETAIL = "form:" + name; showDetails(title, html); return; }
+function presentForm(name, into, title, html, machine) {
+  // The machine rides INSIDE the detail key, so a popped-out window
+  // re-resolves the same form wherever its own view happens to stand.
+  // The pane title stays EMPTY — the sheet body carries the one heading.
+  if (into === "details") { CURRENT_DETAIL = "form:" + name + (machine ? "@" + machine : ""); showDetails("", html); return; }
   openModal(title, html);
 }
-async function showForm(name, into) {
-  const r = await fetch("/api/form?name=" + encodeURIComponent(name));
+// THE STATE FORM'S SHEET (owner rulings 2026-08-04): boxes from the A3
+// shape, fields with their template chips, the existing save/confirm/done
+// buttons, plus the portable copy's export and ingest.
+function sfOne(f, fl) {
+  const name = f.form;
+  const tpl = (f.field_templates || {})[fl.name] || "free-form";
+  const tm = (f.template_meta || {})[tpl] || {};
+  const args = (f.field_args || {})[fl.name] || { options: [], items: [], passing: [] };
+  let s = '<div style="border:1px solid var(--se-line,#888);border-radius:4px;padding:7px 10px;margin:7px 0">';
+  s += '<span style="float:right;font-size:11.5px;color:var(--se-accent)">template: ' + escText(tpl) + "</span>";
+  s += "<b>" + escText(fl.name) + "</b>" + (fl.required ? ' <span style="color:var(--se-fail);font-size:11px">required</span>' : ' <span class="meta">optional</span>');
+  if (fl.guidance) s += '<div class="meta" style="font-style:italic">' + escText(fl.guidance) + "</div>";
+  // Free text carries its ask as the PLACEHOLDER; the structured editors
+  // keep the description above, because their rows replace the empty box.
+  if ((tm.editor || "text") !== "text") s += '<div class="meta">' + escText(fl.description || "") + "</div>";
+  (fl.prefills || []).forEach(function (p, i) {
+    s += '<div class="prefill"><div class="comment-text">prefill — unconfirmed:</div><div>' + escText(p) + '</div><button class="primary confirmpre" data-form="' + name + '" data-machine="' + escText(f.machine || "") + '" data-field="' + escText(fl.name) + '" data-index="' + i + '">confirm</button></div>';
+  });
+  s += sfEditor(fl, tm, args) + "</div>";
+  return s;
+}
+// THE EDITOR IS THE TEMPLATE'S SHAPE (owner ruling 2026-08-04): a list
+// edits as rows, known items as labelled rows, a choice as its dropdown
+// with the rationale beside it, findings as answered pairs. Free text
+// stays a textarea. Stored forms stay markdown lines either way.
+function sfDash(c) {
+  return (c || "").split("\\n").map(function (l) { return l.trim(); }).filter(function (l) { return l.indexOf("- ") === 0; }).map(function (l) { return l.slice(2); });
+}
+function sfEditor(fl, tm, args) {
+  const name = escText(fl.name);
+  const ph = escText(tm.placeholder || "");
+  if (tm.editor === "list") {
+    return '<div class="sfrows">' + sfDash(fl.content).concat([""]).map(function (v) { return '<div class="sfrow"><input class="sfli" data-field="' + name + '" placeholder="' + ph + '" value="' + escText(v) + '">' + sfRowBtns() + "</div>"; }).join("") + "</div>";
+  }
+  if (tm.editor === "per-item" && (args.items || []).length > 0) {
+    return '<div class="sfrows">' + args.items.map(function (it) {
+      const pref = "- " + it + ":";
+      const hit = (fl.content || "").split("\\n").map(function (l) { return l.trim(); }).filter(function (l) { return l.indexOf(pref) === 0; })[0];
+      const ans = hit ? hit.slice(pref.length).trim() : "";
+      return '<div class="sfrow"><span class="sfitem">' + escText(it) + '</span><input class="sfpi" data-field="' + name + '" data-item="' + escText(it) + '" placeholder="' + ph + '" value="' + escText(ans) + '"></div>';
+    }).join("") + "</div>";
+  }
+  if (tm.editor === "choice-rationale") {
+    const first = ((fl.content || "").split("\\n")[0] || "").trim();
+    const sep = first.indexOf(" — ");
+    const chosen = sep < 0 ? first : first.slice(0, sep).trim();
+    const rat = sep < 0 ? "" : first.slice(sep + 3).trim();
+    return '<div class="sfrows"><div class="sfrow"><select class="sfsel" data-field="' + name + '"><option value=""></option>' + (args.options || []).map(function (o) { return "<option" + (o === chosen ? " selected" : "") + ">" + escText(o) + "</option>"; }).join("") + '</select><input class="sfrat" data-field="' + name + '" placeholder="rationale — why this option" value="' + escText(rat) + '"></div></div>';
+  }
+  if (tm.editor === "findings") {
+    const pairs = sfDash(fl.content).filter(function (l) { return l.indexOf(" => ") >= 0; }).map(function (l) { const i = l.indexOf(" => "); return { f: l.slice(0, i), a: l.slice(i + 4) }; });
+    return '<div class="sfrows">' + pairs.concat([{ f: "", a: "" }]).map(function (p) { return '<div class="sfrow"><input class="sfff" data-field="' + name + '" placeholder="finding" value="' + escText(p.f) + '"><span class="meta">=&gt;</span><input class="sffa" data-field="' + name + '" placeholder="answer — fix, rebuttal, or accepted risk" value="' + escText(p.a) + '">' + sfRowBtns() + "</div>"; }).join("") + "</div>";
+  }
+  return '<textarea class="formfield" data-field="' + name + '" placeholder="' + escText(fl.description || "") + '">' + escText(fl.content || "") + "</textarea>";
+}
+function sfRowBtns() {
+  return '<button type="button" class="sfrowadd" title="add a row below">+</button><button type="button" class="sfrowdel" title="remove this row">−</button>';
+}
+// A collapsible box — the same truth, folded for a narrow pane.
+function sfBox(title, inner, open) {
+  return '<details' + (open ? " open" : "") + ' style="margin:6px 0"><summary style="cursor:pointer;font-weight:600">' + title + "</summary>" + inner + "</details>";
+}
+function renderStateForm(f) {
+  const name = f.form;
+  const mach = f.machine || viewedMachine();
+  const fld = function (n) {
+    const hit = (f.fields || []).filter(function (q) { return q.name === n; })[0];
+    return hit || { name: n, description: "", required: false, content: "", prefills: [] };
+  };
+  // A real heading; every header item its own line, at the body text size.
+  let h = '<div style="font-size:17px;font-weight:700;padding:2px 0 6px">Evidence form <span style="font-weight:400;color:var(--se-muted)">/ ' + escText(name) + "</span></div>";
+  h += '<table class="kv" style="font-size:12.5px">' + Object.keys(f.header || {}).map(function (k) { return "<tr><td>" + escText(k) + "</td><td>" + escText(String(f.header[k] || "____")) + "</td></tr>"; }).join("") + "</table>";
+  h += sfBox("Description", '<div class="comment-text">' + escText(f.description || "") + "</div>", false);
+  if (f.motivation) h += sfBox("Motivation", '<div class="comment-text">' + escText(f.motivation) + "</div>", false);
+  h += sfBox("Current situation", sfOne(f, fld("current_situation")), false);
+  h += sfBox("Inputs", (f.inputs || []).map(function (i) {
+    const on = (f.checked || []).indexOf(i.label) >= 0;
+    const label = i.path ? '<a class="doclink" data-path="' + escText(i.path) + '">' + escText(i.label) + "</a>" : "<b>" + escText(i.label) + "</b>";
+    return '<div style="font-size:12.5px"><input type="checkbox" class="sfcheck" data-form="' + name + '" data-machine="' + escText(mach) + '" data-label="' + escText(i.label) + '"' + (on ? " checked" : "") + "> " + label + (i.entry ? ' <span style="color:var(--se-fail);font-size:11px">before entry</span>' : "") + ' <span class="meta">' + escText(i.description || "") + "</span></div>";
+  }).join(""), false);
+  h += sfBox("Evidence", (f.fields || []).filter(function (x) { return x.name !== "current_situation" && x.name !== "follow_up"; }).map(function (x) { return sfOne(f, x); }).join(""), false);
+  h += sfBox("Follow-up" + (f.follow_up_label ? " / " + escText(f.follow_up_label) : ""), sfOne(f, fld("follow_up")), false);
+  // No verdicts here — the details are the DEFINITION; a submit's pass or
+  // fail lands in the log, where its line carries the why.
+  if (f.gate) {
+    if ((f.bless || "").indexOf("blessed") === 0) h += '<div style="color:var(--se-ok);padding:4px 0">👍 ' + escText(f.bless) + "</div>";
+    else if ((f.bless || "").indexOf("dismissed") === 0) h += '<div style="color:var(--se-fail);padding:4px 0">👎 ' + escText(f.bless) + "</div>";
+    else if (f.met) h += '<div class="meta" style="padding:4px 0">submitted — awaiting the bless</div>';
+  }
+  h += '<div style="padding:10px 0"><button class="primary sfexport" data-form="' + name + '" data-machine="' + escText(mach) + '">export</button> ';
+  h += '<button class="primary sfimport" data-form="' + name + '">import</button><input type="file" accept=".html,text/html" style="display:none" class="ingestform" data-form="' + name + '" data-machine="' + escText(mach) + '"> ';
+  h += '<button class="primary saveform" data-form="' + name + '" data-machine="' + escText(mach) + '">save</button> ';
+  // Questions are answered in ORDER: submit and the thumbs wake only
+  // while the walk stands in the state. Save works from anywhere.
+  const inactive = f.active ? "" : ' disabled title="available only while the state is active — save still works"';
+  h += '<button class="primary doneform" data-form="' + name + '" data-machine="' + escText(mach) + '"' + (inactive || ' title="marks the claim complete — the gate judges it"') + ">submit</button>";
+  if (f.gate) {
+    const off = inactive || (f.signed ? "" : ' disabled title="available after submit"');
+    h += ' <button class="primary blessform" data-form="' + name + '" data-machine="' + escText(mach) + '"' + (off || ' title="the gate opens — the human, or a hand above its rung"') + ">👍 bless</button>";
+    h += ' <button class="primary dismissform" data-form="' + name + '" data-machine="' + escText(mach) + '"' + (off || ' title="send it back — the reasons go in the form"') + ">👎 dismiss</button>";
+  }
+  h += "</div>";
+  return h;
+}
+async function seIngest(inp, name) {
+  const file = inp.files && inp.files[0];
+  if (!file) return;
+  const html = await file.text();
+  await formPost("/form/ingest", { name: name, html: html, machine: inp.dataset.machine || viewedMachine() });
+  showFormAgain(name, inp.dataset.machine);
+}
+// Delegated, like every other control — an inline handler needs quote
+// nesting the fixer is free to normalise, and one stripped escape killed
+// the whole page script at parse.
+document.addEventListener("change", function (ev) {
+  const inp = ev.target.closest ? ev.target.closest(".ingestform") : null;
+  if (inp) { void seIngest(inp, inp.getAttribute("data-form")); return; }
+  // A checked input saves QUIETLY — no re-render, so the reader's folds
+  // and scroll hold still and the box already shows its new state.
+  const cb = ev.target.closest ? ev.target.closest(".sfcheck") : null;
+  if (cb) {
+    const labels = [];
+    document.querySelectorAll('.sfcheck[data-form="' + cb.dataset.form + '"]').forEach(function (x) { if (x.checked) labels.push(x.dataset.label); });
+    void formPost("/form/save", { name: cb.dataset.form, fields: { inputs_checked: labels.join("\\n") }, machine: cb.dataset.machine || viewedMachine() });
+  }
+});
+// ENTER ADDS THE NEXT ROW, right below the one being edited.
+document.addEventListener("keydown", (ev) => {
+  if (ev.key !== "Enter") return;
+  const t = ev.target.closest ? ev.target.closest(".sfli, .sfff, .sffa") : null;
+  if (!t) return;
+  ev.preventDefault();
+  const row = t.closest(".sfrow");
+  if (!row) return;
+  const clone = row.cloneNode(true);
+  clone.querySelectorAll("input").forEach(function (i) { i.value = ""; });
+  row.after(clone);
+  const first = clone.querySelector("input");
+  if (first) first.focus();
+});
+// The machine on display resolves a form name — without it, two records'
+// same-named states would collide and the walk's machine would shadow the view.
+function viewedMachine() { return (D.viewed && D.viewed.id) || ""; }
+async function showForm(name, into, machine) {
+  machine = machine || viewedMachine();
+  const r = await fetch("/api/form?name=" + encodeURIComponent(name) + "&machine=" + encodeURIComponent(machine));
   const f = await r.json();
+  // The body carries the one "Evidence form" heading — the pane title
+  // stays the bare state name so nothing repeats.
+  if (f.state_form) { presentForm(name, into, name, renderStateForm(f), machine); return; }
   if (f.kind === "rejected" || f.error) {
     // Plain words at the human — never raw rejection JSON.
     presentForm(name, into, "form · " + name,
       '<div class="comment-detail">' + escText(f.expected || f.error || "") + "</div>" +
       '<div class="meta">' + escText(f.got || "") + "</div>" +
-      (f.remedy && f.remedy.note ? '<div class="comment-text">' + escText(f.remedy.note) + "</div>" : ""));
+      (f.remedy && f.remedy.note ? '<div class="comment-text">' + escText(f.remedy.note) + "</div>" : ""), machine);
     return;
   }
   const ro = f.preview === true;
@@ -1506,36 +1785,96 @@ async function showForm(name, into) {
     if (f.problems && f.problems.length) html += '<div style="color:var(--se-accent);padding:6px 0">' + f.problems.map(escText).join("<br>") + "</div>";
     html += '<div style="padding:10px 0"><button class="primary saveform" data-form="' + name + '">save</button> <button class="primary doneform" data-form="' + name + '" title="sets status done and runs the lint">done</button></div>';
   }
-  presentForm(name, into, "form · " + name, html);
+  presentForm(name, into, "form · " + name, html, machine);
 }
 // A save or confirm re-renders the form WHERE IT STANDS — the modal, or
 // the details surface a detached window is pinned to.
-function showFormAgain(name) {
-  void showForm(name, CURRENT_DETAIL === "form:" + name ? "details" : undefined);
+function showFormAgain(name, machine) {
+  void showForm(name, CURRENT_DETAIL && CURRENT_DETAIL.indexOf("form:" + name) === 0 ? "details" : undefined, machine);
 }
 async function formPost(path, body) {
   await fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+}
+// One collector for save and submit: every editor serialises back to its
+// field's markdown lines — the same shapes the lint checks.
+function sfCollect() {
+  const fields = {};
+  document.querySelectorAll(".formfield").forEach(function (t) { fields[t.dataset.field] = t.value; });
+  const acc = {};
+  const push = function (n, line) { (acc[n] = acc[n] || []).push(line); };
+  document.querySelectorAll(".sfli").forEach(function (t) { if (t.value.trim() !== "") push(t.dataset.field, "- " + t.value.trim()); });
+  document.querySelectorAll(".sfpi").forEach(function (t) { if (t.value.trim() !== "") push(t.dataset.field, "- " + t.dataset.item + ": " + t.value.trim()); });
+  document.querySelectorAll(".sfff").forEach(function (t) {
+    const row = t.parentElement;
+    const a = row ? row.querySelector(".sffa") : null;
+    const av = a ? a.value.trim() : "";
+    if (t.value.trim() !== "" || av !== "") push(t.dataset.field, "- " + t.value.trim() + " => " + av);
+  });
+  Object.keys(acc).forEach(function (n) { fields[n] = acc[n].join("\\n"); });
+  document.querySelectorAll(".sfsel").forEach(function (s) {
+    const r = document.querySelector('.sfrat[data-field="' + s.dataset.field + '"]');
+    const rv = r ? r.value.trim() : "";
+    fields[s.dataset.field] = (s.value + (rv !== "" ? " — " + rv : "")).trim();
+  });
+  return fields;
 }
 document.addEventListener("click", async (ev) => {
   const of = ev.target.closest ? ev.target.closest(".openform") : null;
   if (of) { void showForm(of.dataset.form); return; }
   const cp = ev.target.closest ? ev.target.closest(".confirmpre") : null;
-  if (cp) { await formPost("/form/confirm", { name: cp.dataset.form, field: cp.dataset.field, index: Number(cp.dataset.index) }); showFormAgain(cp.dataset.form); return; }
+  if (cp) { await formPost("/form/confirm", { name: cp.dataset.form, field: cp.dataset.field, index: Number(cp.dataset.index), machine: cp.dataset.machine || viewedMachine() }); showFormAgain(cp.dataset.form, cp.dataset.machine); return; }
+  const ex = ev.target.closest ? ev.target.closest(".sfexport") : null;
+  if (ex) {
+    const exUrl = location.origin + "/form/export?name=" + encodeURIComponent(ex.dataset.form) + "&machine=" + encodeURIComponent(ex.dataset.machine || viewedMachine());
+    // Inside the editor a webview cannot download; the HOST opens the
+    // system browser, whose save dialog names the place.
+    if (window.parent !== window) { window.parent.postMessage({ se: "download", url: exUrl }, "*"); return; }
+    const a = document.createElement("a");
+    a.href = exUrl;
+    a.download = "";
+    a.click();
+    return;
+  }
+  const im = ev.target.closest ? ev.target.closest(".sfimport") : null;
+  if (im) {
+    const inp = document.querySelector('.ingestform[data-form="' + im.dataset.form + '"]');
+    if (inp) inp.click();
+    return;
+  }
+  const bl = ev.target.closest ? ev.target.closest(".blessform, .dismissform") : null;
+  if (bl) {
+    await formPost("/form/bless", { name: bl.dataset.form, ok: bl.classList.contains("blessform"), machine: bl.dataset.machine || viewedMachine() });
+    showFormAgain(bl.dataset.form, bl.dataset.machine);
+    return;
+  }
+  const ra = ev.target.closest ? ev.target.closest(".sfrowadd") : null;
+  if (ra) {
+    const row = ra.closest(".sfrow");
+    const clone = row.cloneNode(true);
+    clone.querySelectorAll("input").forEach(function (i) { i.value = ""; });
+    row.after(clone);
+    const first = clone.querySelector("input");
+    if (first) first.focus();
+    return;
+  }
+  const rd = ev.target.closest ? ev.target.closest(".sfrowdel") : null;
+  if (rd) {
+    const row = rd.closest(".sfrow");
+    // The last row stays — an empty list still needs its one editor.
+    if (row && row.parentElement && row.parentElement.querySelectorAll(".sfrow").length > 1) row.remove();
+    return;
+  }
   const sv = ev.target.closest ? ev.target.closest(".saveform") : null;
   if (sv) {
-    const fields = {};
-    document.querySelectorAll(".formfield").forEach((t) => { fields[t.dataset.field] = t.value; });
-    await formPost("/form/save", { name: sv.dataset.form, fields });
-    showFormAgain(sv.dataset.form);
+    await formPost("/form/save", { name: sv.dataset.form, fields: sfCollect(), machine: sv.dataset.machine || viewedMachine() });
+    showFormAgain(sv.dataset.form, sv.dataset.machine);
     return;
   }
   const dn2 = ev.target.closest ? ev.target.closest(".doneform") : null;
   if (dn2) {
-    const fields = {};
-    document.querySelectorAll(".formfield").forEach((t) => { fields[t.dataset.field] = t.value; });
-    await formPost("/form/save", { name: dn2.dataset.form, fields });
-    await formPost("/form/done", { name: dn2.dataset.form });
-    showFormAgain(dn2.dataset.form);
+    await formPost("/form/save", { name: dn2.dataset.form, fields: sfCollect(), machine: dn2.dataset.machine || viewedMachine() });
+    await formPost("/form/done", { name: dn2.dataset.form, machine: dn2.dataset.machine || viewedMachine() });
+    showFormAgain(dn2.dataset.form, dn2.dataset.machine);
     return;
   }
   const ofo = ev.target.closest ? ev.target.closest(".openfolder") : null;
@@ -1550,16 +1889,37 @@ async function openDoc(path, returnKey) {
   CURRENT_DETAIL = "doc:" + path;
   showDetails(path, '<div style="padding:2px 0 10px"><button class="ghost back" data-return="' + (returnKey || "comment") + '">‹ back</button></div><div class="docview">' + d.html + "</div>");
 }
+// The trace graph's nodes and its filters answer a click the same way every
+// other element does: through detailFor and showDetails. The card carries its
+// own subjects as JSON because it is rendered lazily, so they are not in D.
+function traceDetail(id) {
+  const tag = document.getElementById("se-trace");
+  let map = {};
+  try { map = JSON.parse(tag.textContent); } catch (e) { /* an unrendered card has no subjects */ }
+  const d = map[id];
+  if (!d) return [id, '<div class="meta">nothing recorded for this node</div>'];
+  const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  return [id, '<div class="docview"><div class="meta">' + esc(d.type) + '</div><p style="white-space:pre-wrap">' + esc(d.statement) + '</p><div class="meta">' + esc(d.path) + "</div></div>"];
+}
 function detailFor(key) {
+  if (key === "relay" && LAST_RELAY) return [LAST_RELAY.title, LAST_RELAY.html];
   if (key.startsWith("log:")) { void openLogDetail(key.slice(4)); return ["log entry", '<div class="meta">loading…</div>']; }
   if (key.startsWith("doc:")) { void openDoc(key.slice(4), "comment"); return [key.slice(4), '<div class="meta">loading…</div>']; }
-  if (key.startsWith("form:")) { void showForm(key.slice(5), "details"); return ["form · " + key.slice(5), '<div class="meta">loading…</div>']; }
+  if (key.startsWith("form:")) { const fm = key.slice(5).split("@"); void showForm(fm[0], "details", fm[1]); return ["", '<div class="meta">loading…</div>']; }
   if (key.startsWith("cond:")) return condDetail(key.slice(5));
+  if (key.startsWith("trace:")) return traceDetail(key.slice(6));
   if (key === "comment") {
     const txt = (D.comment || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");
     return ["machine: " + D.viewed.id, '<div class="comment-detail">' + txt + "</div>" + jsonTable(D.viewed)];
   }
-  if (key.startsWith("state:")) { const id = key.slice(6); return ["state: " + id, stateDetail(id)]; }
+  if (key.startsWith("state:")) {
+    const id = key.slice(6);
+    // ONE TRUTH, TWO RENDERS (owner ruling 2026-08-04): a state with an
+    // evidence form shows THE FORM as its details — the old detail view
+    // stays only for form-less states.
+    if ((D.states[id] || {}).has_form) { void showForm(id, "details"); return ["", '<div class="meta">loading…</div>']; }
+    return ["state: " + id, stateDetail(id)];
+  }
   return [key, jsonTable({})];
 }
 document.addEventListener("click", async (ev) => {
@@ -1573,6 +1933,9 @@ document.addEventListener("click", async (ev) => {
   }
 });
 let CURRENT_DETAIL = null;
+// The last RELAYED card (help from another surface) — kept so a refresh
+// re-shows it instead of clobbering the reader's place.
+let LAST_RELAY = null;
 document.addEventListener("click", (ev) => {
   const arrow = ev.target.closest ? ev.target.closest(".crumb-arrow") : null;
   document.querySelectorAll(".crumb-arrow.open").forEach((a) => { if (a !== arrow) a.classList.remove("open"); });
@@ -1582,7 +1945,7 @@ document.addEventListener("click", (ev) => {
     CURRENT_DETAIL = g.dataset.detail;
     // The engine mirrors the selection, so a control in ANOTHER surface
     // (the sidebar's SET TARGET) can act on the state whose details show.
-    if (g.dataset.detail.startsWith("state:")) void fetch("/selected", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: g.dataset.detail.slice(6) }) });
+    if (g.dataset.detail.startsWith("state:")) void fetch("/selected", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: g.dataset.detail.slice(6), machine: viewedMachine() }) });
     const [t, h] = detailFor(g.dataset.detail); showDetails(t, h);
   }
 });
@@ -1815,10 +2178,11 @@ if (cardsEl !== null) {
     });
   }
 }
-if (CURRENT && D.states[CURRENT] && WALK_HERE) { CURRENT_DETAIL = "state:" + CURRENT; showDetails("state: " + CURRENT, stateDetail(CURRENT)); }
-// A bookmark or an F5 still deep-links to the pane that was open.
+// A deep link names the subject — a popped-out or bookmarked pane must
+// show what it was opened on, so the walk's default never runs over it.
 const DETAIL_PARAM = new URLSearchParams(location.search).get("detail");
 if (DETAIL_PARAM) { CURRENT_DETAIL = DETAIL_PARAM; const dp = detailFor(DETAIL_PARAM); showDetails(dp[0], dp[1]); }
+else if (CURRENT && D.states[CURRENT] && WALK_HERE) { CURRENT_DETAIL = "state:" + CURRENT; const wdp = detailFor("state:" + CURRENT); showDetails(wdp[0], wdp[1]); }
 // A frozen window says so. Not a warning — a quiet line, so a reader with
 // one live pane and four snapshots can tell which is which at a glance.
 if (FROZEN) {
@@ -1906,6 +2270,9 @@ if (logPanel) {
   }
 }
 async function openLogDetail(ref) {
+  // A solo card does not render log details — it relays the ref, and the
+  // details surface owns the render and keeps its place through refreshes.
+  if (!document.getElementById("details") && window.parent !== window) { window.parent.postMessage({ se: "logref", ref: ref }, "*"); return; }
   CURRENT_DETAIL = "log:" + ref;
   hostTrace("openLogDetail asking for " + ref);
   const r = await fetch("/api/log?ref=" + encodeURIComponent(ref));
@@ -2306,6 +2673,7 @@ function pingSurface(target) {
 }
 let pollBusy = null;
 let ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
+let TARGET_AT_RENDER = D.target || "";
 let sawError = false;
 let deathTimer = null;
 // The newest person-pull already landed; null until the first alive adopts
@@ -2314,6 +2682,8 @@ let lastPullSeq = null;
 // ONE alive-driven pass, shared by the event stream and the host's wake —
 // an embedded page has no stream, and this is everything it would miss.
 function applyAlive(a) {
+  // A stale shell heals itself: new engine life, new page — now.
+  if (a.build && D.build && a.build !== D.build) { location.reload(); return; }
   if (a.status === "closed") { sessionOver("the machine reached end — the walk is complete"); return; }
   if (a.gone) { sessionOver("the console quit — the server has stopped, the walk was left standing"); return; }
   // Emergency is drawn from the engine, so a second surface cannot disagree
@@ -2355,10 +2725,12 @@ function applyAlive(a) {
       const first = resp && resp.pull === "fill" && resp.forms && resp.forms[0];
       if (!first || !first.form) return;
       if (window.parent !== window) window.parent.postMessage({ se: "open-form", name: first.form }, "*");
-      else window.open("/widget/details?detail=" + encodeURIComponent("form:" + first.form), "_blank", "popup,width=760,height=900");
+      else if (!EMBED) window.open("/widget/details?detail=" + encodeURIComponent("form:" + first.form), "_blank", "popup,width=760,height=900");
     }).catch(() => {});
   }
   if (JSON.stringify(a.active || []) !== ACTIVE_AT_RENDER) { refresh(); return; }
+  // A re-aimed walk redraws the route under the reader.
+  if ((a.target || "") !== TARGET_AT_RENDER) { refresh(); return; }
   // A script run finishing elsewhere (agent tick, other window) lands its
   // result — refresh, keeping the open pane.
   // THE BAR FOLLOWS THE ENGINE, not just this page's clicks. A script the
@@ -2585,6 +2957,8 @@ function stateDetails(m: MirrorState, decl: MachineDecl, done: Set<string>, arch
       statement: s.statement,
       guidance: s.guidance,
       priority: s.priority,
+      // A state with evidence fields IS its form — the details render it.
+      has_form: s.evidence_form.length > 0,
       legal_tools: s.legal_tools ?? [],
       ...(s.submachine !== undefined ? { submachine: s.submachine } : {}),
       ...(s.entry !== undefined ? { entry: m.session.conditionStatus(decl, s, "enter") } : {}),
@@ -2627,7 +3001,7 @@ function drawingSets(
   decl: MachineDecl,
   info: { active: string[] },
   viewingWalk: boolean,
-): { leafActive: Set<string>; done: Set<string>; subIds: Set<string>; meta: Record<string, StateMeta> } {
+): { leafActive: Set<string>; done: Set<string>; paint: Set<string>; subIds: Set<string>; meta: Record<string, StateMeta> } {
   const leafActive = viewingWalk ? new Set(info.active.map((a) => a.split("/").pop()!)) : new Set<string>();
   if (!viewingWalk && decl.id === m.session.machine.id) {
     // Viewing main while the walk is inside a sub: the sub state is the live one.
@@ -2640,10 +3014,21 @@ function drawingSets(
   const done = new Set(run.done.map((s) => s.split("/").pop()!));
   // An end state is never "filled" — it turns green when its machine completed.
   if (run.completed) for (const s of decl.states) if (s.kind === "end") done.add(s.id);
+  // ONLY record-backed states PAINT (owner ruling 2026-08-04): the green
+  // set is the record's standing claims, which outlive the engine life.
+  // Session-walked states elsewhere stay uncoloured, as ruled 2026-07-31.
+  const paint = new Set(m.session.recordDone(decl));
+  // DRIFT IS COMPUTED ON THE WAY TO THE SCREEN (owner ruling 2026-08-05):
+  // green must mean still green NOW, so the demand diff is recomputed on
+  // every look rather than only when a pin is rewritten. It costs one hash
+  // of the matrix (~3ms) against a render measured in hundreds. A view
+  // never writes — the reopen is the walk's, in Session.driftReopen.
+  const suspect = new Set(m.session.suspectStates(decl));
   const subIds = new Set(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id));
   const meta: Record<string, StateMeta> = {};
   for (const s of decl.states) {
     meta[s.id] = {
+      suspect: suspect.has(s.id),
       has_exit: s.exit !== undefined,
       exit_met: m.session.conditionMet(decl, s, "leave"),
       has_entry: s.entry !== undefined,
@@ -2653,7 +3038,7 @@ function drawingSets(
       ...(s.statement !== "" && s.statement !== s.id ? { subtitle: s.statement } : {}),
     };
   }
-  return { leafActive, done, subIds, meta };
+  return { leafActive, done, paint, subIds, meta };
 }
 
 // THE ROUTE, PROJECTED ONTO THIS DRAWING. A broken or unreachable target
@@ -2662,16 +3047,18 @@ function drawingSets(
 function routeMarksFor(m: MirrorState, decl: MachineDecl): RouteMarks | undefined {
   try {
     const r = m.session.route(m.session.target);
-    const mainId = m.session.machine.id;
-    const { waypoints, path: hops } = routeOverlay(r.steps, decl.id, mainId);
+    const prefix = decl.id === m.session.machine.id ? "" : m.session.viewChain(decl.id).slice(1).join("/");
+    const { waypoints, path: hops } = routeOverlay(r.steps, prefix);
     const localOf = (q: string): string | undefined => {
-      if (decl.id === mainId) return q.split("/")[0];
-      return q.startsWith(`${decl.id}/`) ? q.slice(decl.id.length + 1).split("/")[0] : undefined;
+      if (prefix === "") return q.split("/")[0];
+      return q.startsWith(`${prefix}/`) ? q.slice(prefix.length + 1).split("/")[0] : undefined;
     };
     const shutAt = r.stops_at === undefined ? undefined : localOf(r.stops_at.at);
+    const rest = prefix === "" ? r.from : r.from.startsWith(`${prefix}/`) ? r.from.slice(prefix.length + 1) : undefined;
     return {
       waypoints,
       path: hops,
+      here: rest !== undefined && !rest.includes("/"),
       ...(r.found && localOf(r.target) !== undefined ? { target: localOf(r.target) } : {}),
       ...(shutAt !== undefined && r.stops_at !== undefined ? { blocked: { at: shutAt, why: r.stops_at.why } } : {}),
     };
@@ -2707,11 +3094,14 @@ function crumbsFor(m: MirrorState, decl: MachineDecl): string {
 
 export function renderMirror(
   m: MirrorState,
-  widget?: "machine" | "details" | "log" | "terminal" | "table",
+  widget?: "machine" | "details" | "log" | "terminal" | "table" | "trace",
   view?: string,
   card?: string,
   embed?: boolean,
   tableView?: string,
+  traceProps?: string,
+  traceTypes?: string,
+  traceFind?: string,
 ): string {
   const skin = embed === true ? NATIVE : "";
   const bodyClass = embed === true ? ` class="embed${widget === undefined ? "" : " solo"}"` : "";
@@ -2723,9 +3113,14 @@ export function renderMirror(
   const { decl, canvas } = viewedMachine(m, view ?? walkMachine.id);
   const viewingWalk = decl.id === walkMachine.id;
   const history = m.session.instance.history ?? [];
-  const { leafActive, done, subIds, meta } = drawingSets(m, decl, info, viewingWalk);
+  const { leafActive, done, paint, subIds, meta } = drawingSets(m, decl, info, viewingWalk);
   const marks = routeMarksFor(m, decl);
-  const svg = machineSvg(canvas, leafActive, done, subIds, meta, marks);
+  // A GATE COLLECTS ALL ITS INPUTS: every multi-feeder gate draws as a busbar.
+  const busbars = decl.states
+    .filter((s) => s.kind === "gate")
+    .map((g) => ({ gate: g.id, feeders: decl.states.filter((p) => p.edges.some((e) => e.to === g.id)).map((p) => p.id) }))
+    .filter((b) => b.feeders.length >= 2);
+  const svg = machineSvg(canvas, leafActive, paint, subIds, meta, busbars, marks);
   const crumbs = crumbsFor(m, decl);
 
   // ONE LIST FOR THE WHOLE RENDER. expeditionList() spawns git per record
@@ -2737,6 +3132,8 @@ export function renderMirror(
   const states = stateDetails(m, decl, done, archived);
   const comment = (canvas.nodes ?? []).find((n) => n.type === "text")?.text ?? "";
   const data = `<script type="application/json" id="se-data">${JSON.stringify({
+    build: ENGINE_LIFE,
+    target: m.session.target,
     describe: m.session.describe(),
     packet: m.session.packet(),
     lastPacket: m.lastPacket ?? null,
@@ -2841,8 +3238,25 @@ export function renderMirror(
       `<button class="expand" data-widget="w-table" data-url="/widget/table" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button>`,
       tableView,
     );
+  // THE TRACE GRAPH — a function for the same reason the table is: it reads
+  // every trace node off disk, and no other card wants them. Its three
+  // filters arrive as query values, because each one REDRAWS the layout.
+  const csv = (s: string | undefined): string[] => (s ?? "").split(",").filter((x) => x !== "");
+  const traceWidget = (): string =>
+    traceCard(
+      m.root,
+      csv(traceProps),
+      csv(traceTypes),
+      traceFind ?? "",
+      `<button class="expand" data-widget="w-trace" data-url="/widget/trace" title="expand · ctrl-click: new tab · shift-click: new window">⌘</button>`,
+    );
   // Read per render, so editing palette.css needs no restart.
   const pal = palette(m.root);
+
+  if (widget === "trace") {
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · trace</title><style>${pal}${STYLE}${TRACE_STYLE} #w-trace{flex:1;border-bottom:0;min-height:0} body.solo #sidebar{display:flex;flex-direction:column;height:100vh}${skin}</style>${ELEMENTS}</head>
+<body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${traceWidget()}</aside></div>${MODAL}${data}<script>${SCRIPT}</script><script>${TRACE_SCRIPT}</script></body></html>`;
+  }
 
   if (widget === "table") {
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · table</title><style>${pal}${STYLE}${TABLE_STYLE}${BASES_STYLE}${BASES_TABLE_STYLE} #w-table{flex:1;border-bottom:0;min-height:0} body.solo #sidebar{display:flex;flex-direction:column;height:100vh} .tbl-body{flex:1;min-height:0}${skin}</style>${ELEMENTS}</head>
@@ -2873,7 +3287,7 @@ export function renderMirror(
     card,
     embed,
     { bodyClass, skin, pal, data },
-    { terminal: terminalWidget, machine: machineWidget, log: logWidget, details: detailsWidget, table: tblWidget },
+    { terminal: terminalWidget, machine: machineWidget, log: logWidget, details: detailsWidget, table: tblWidget, trace: traceWidget },
   );
 }
 
@@ -2888,7 +3302,7 @@ function cardMatrixPage(
   card: string | undefined,
   embed: boolean | undefined,
   frame: { bodyClass: string; skin: string; pal: string; data: string },
-  widgets: { terminal: string; machine: string; log: string; details: string; table: () => string },
+  widgets: { terminal: string; machine: string; log: string; details: string; table: () => string; trace: () => string },
 ): string {
   const allCards = loadCards(m.root);
   const cardList = embed === true ? allCards.filter((c) => c.widget !== "terminal") : allCards;
@@ -2900,6 +3314,7 @@ function cardMatrixPage(
     // Only when a card actually asks for it. A product that declares no table
     // card never pays for one.
     ...(cardList.some((c) => c.widget === "table") ? { table: widgets.table() } : {}),
+    ...(cardList.some((c) => c.widget === "trace") ? { trace: widgets.trace() } : {}),
   };
   const filled = (c: { widget?: string }): boolean => c.widget !== undefined && (byWidget[c.widget] ?? "") !== "";
   // THE DEFAULT MAIN CARD IS THE FIRST AVAILABLE ONE — one rule instead of a
@@ -2940,13 +3355,13 @@ function cardMatrixPage(
   );
   const legendHtml = `<div class="card" id="card-legend" style="${cellAt(nowAt)}"><div class="widget" id="w-legend"><div class="widget-head"><span>keys</span></div><div class="widget-body">${legendRows}</div></div></div>`;
   const cardData = `<script type="application/json" id="se-cards">${JSON.stringify({ list: cardList.map((c) => ({ n: c.n, id: c.id, title: c.title })), now })}</script>`;
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${frame.pal}${STYLE}${TABLE_STYLE}${BASES_STYLE}${BASES_TABLE_STYLE}${frame.skin}</style>${ELEMENTS}</head>
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${frame.pal}${STYLE}${TABLE_STYLE}${BASES_STYLE}${BASES_TABLE_STYLE}${TRACE_STYLE}${frame.skin}</style>${ELEMENTS}</head>
 <body${frame.bodyClass}>
 <div class="cards" data-keep-style style="grid-template-rows:repeat(${rows},1fr)">
   ${cardsHtml}
   ${legendHtml}
   <div class="divider" id="div-cards"></div>
 </div>
-${MODAL}${frame.data}${cardData}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script><script>${BASES_SCRIPT}</script>
+${MODAL}${frame.data}${cardData}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script><script>${BASES_SCRIPT}</script><script>${TRACE_SCRIPT}</script>
 </body></html>`;
 }

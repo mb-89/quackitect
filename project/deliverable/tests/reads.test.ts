@@ -129,9 +129,11 @@ test("an edited doc drops the agent's credit: the pull asks for the reading agai
   for (let j = 0; j < 40; j++) {
     if ((await readOne(server)) === null) break;
   }
+  // Proving the last document already moves the walk, so the gate being
+  // DISCHARGED is what this case is about. A further pull with no aim left
+  // comes home to the front desk, which is the router's business.
   const ok = await call(server, "se_pull");
   assert.notEqual(ok.body.pull, "read", `re-read, so the gate opened: ${JSON.stringify(ok.body)}`);
-  assert.deepEqual(ok.body.where, ["expeditions/start"]);
 });
 
 test("se_file_read credits too: reading the docs by hand carries the walk unaided", async () => {
@@ -262,5 +264,4 @@ test("THE HANDOVER RULE: the human walks boot on checkboxes, raises the slider â
   // is that the reading gate is discharged â€” not which door comes next.
   const landed = await call(server, "se_pull");
   assert.notEqual(landed.body.pull, "read", `the agent's own reading discharged it: ${JSON.stringify(landed.body)}`);
-  assert.ok((landed.body.where as string[]).includes("idle"));
 });

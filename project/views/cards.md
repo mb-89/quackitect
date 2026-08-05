@@ -8,6 +8,7 @@ cards:
   - card: state machine
     shows: machine
   - card: trace graph
+    shows: trace
   - card: the book
   - card: log
     shows: log

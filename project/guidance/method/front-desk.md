@@ -104,8 +104,13 @@ STOPS. The person's word is what routes.
 A handover's "owed next" list, a full inbox, a ripe stub — these are
 input to the recommendation. None of them is a substitute for the word.
 
-Waiting is the desk's normal resting state. Say plainly that the slider
-alone cannot wake a stopped agent, and that a message resumes it.
+Waiting is the desk's normal resting state.
+
+When no specific routed goal is active, stay at the desk and stop.
+
+Say plainly that the slider alone cannot wake a stopped agent.
+
+Say plainly that a message resumes it.
 
 On the person's word, do the bureaucracy from the desk:
 
@@ -129,6 +134,10 @@ On the person's word, do the bureaucracy from the desk:
 
 Never walk another machine from the desk. Seed and defer; the walk
 follows after leaving.
+
+Do not take offered doors just because they are offered.
+
+Take a door only when the person has routed a goal behind it.
 
 ## 4. The tour
 

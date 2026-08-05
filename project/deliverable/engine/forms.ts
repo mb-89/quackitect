@@ -16,6 +16,8 @@ export interface FormField {
   name: string;
   description: string;
   required: boolean;
+  /** The how-to for whoever fills it — shown in every render of the field. */
+  guidance?: string;
 }
 
 export interface FormTemplate {
@@ -85,7 +87,7 @@ export function lintForm(t: FormTemplate, instanceRaw: string | undefined, evide
     return {
       met: false,
       status: "missing",
-      problems: [`no instance yet — create ${t.instance} from the ${t.form} template`],
+      problems: [],
       fields: t.fields.map((f) => ({ ...f, content: "", prefills: [], filled: false })),
       files: [],
     };
@@ -177,4 +179,82 @@ export function withStatus(instanceRaw: string, status: string, by: string): str
   if (/^by: /m.test(out)) out = out.replace(/^by: .*$/m, `by: ${by}`);
   else out = out.replace(/^status: .*$/m, (m) => `${m}\nby: ${by}`);
   return out;
+}
+
+/** Insert a frontmatter line after `status:` where one exists (named
+ *  forms), else after `form:` (state forms carry no status). */
+const afterAnchor = (instanceRaw: string, line: string): string => {
+  if (/^status: .*$/m.test(instanceRaw)) return instanceRaw.replace(/^status: .*$/m, (s) => `${s}\n${line}`);
+  if (/^form: .*$/m.test(instanceRaw)) return instanceRaw.replace(/^form: .*$/m, (s) => `${s}\n${line}`);
+  // NEITHER ANCHOR: the stamp used to VANISH, silently, which is the worst of
+  // the three outcomes — the caller believes it stamped and the file says
+  // otherwise. The head of the frontmatter is a fine second choice.
+  if (/^---\r?\n/.test(instanceRaw)) return instanceRaw.replace(/^---\r?\n/, (s) => `${s}${line}\n`);
+  return `---\n${line}\n---\n\n${instanceRaw}`;
+};
+
+/** The claim's names: whoever writes joins `authors:`, once. */
+export function withAuthor(instanceRaw: string, author: string): string {
+  if (author === "") return instanceRaw;
+  const m = instanceRaw.match(/^authors:(.*)$/m);
+  if (m === null) return afterAnchor(instanceRaw, `authors: ${author}`);
+  const list = m[1]
+    .split(",")
+    .map((x) => x.trim())
+    .filter((x) => x !== "");
+  if (list.includes(author)) return instanceRaw;
+  list.push(author);
+  return instanceRaw.replace(/^authors:.*$/m, `authors: ${list.join(", ")}`);
+}
+
+/** The sign-off stamp — the claim's date, shown in the headline. */
+export function withSignedOff(instanceRaw: string, when: string): string {
+  // Signing off IS the re-attestation, so it clears any suspect mark.
+  const raw = stripSuspect(instanceRaw);
+  if (/^signed_off: /m.test(raw)) return raw.replace(/^signed_off: .*$/m, `signed_off: ${when}`);
+  return afterAnchor(raw, `signed_off: ${when}`);
+}
+
+/** SUSPECT — v1's design, and the one this project already settled on: when an
+ *  input changes under a finished claim, the claim is MARKED, not undone.
+ *
+ *  Suspect means re-look, then re-approve. The content stays, the authorship
+ *  stays, and the reason it fell is written down so the next reader knows what
+ *  moved without going hunting.
+ *
+ *  Tearing the claim back to nothing reads as the tool undoing your work, and
+ *  it makes re-earning cost as much as starting over. */
+export function withSuspect(instanceRaw: string, why: string): string {
+  const cleared = stripSuspect(stripSignedOff(instanceRaw)).replace(/^bless:.*\n?/m, "");
+  return afterAnchor(cleared, `suspect: ${why}`);
+}
+
+export function stripSuspect(instanceRaw: string): string {
+  return instanceRaw.replace(/^suspect:.*\n?/m, "");
+}
+
+/** The ticked inputs — one line like authors, replaced whole on each save. */
+export function withChecked(instanceRaw: string, labels: string[]): string {
+  const line = `checked: ${labels.join(", ")}`;
+  if (/^checked:/m.test(instanceRaw)) return instanceRaw.replace(/^checked:.*$/m, line);
+  return afterAnchor(instanceRaw, line);
+}
+
+/** Who pressed submit — one line beside the sign-off. */
+export function withBy(instanceRaw: string, by: string): string {
+  if (/^by: /m.test(instanceRaw)) return instanceRaw.replace(/^by: .*$/m, `by: ${by}`);
+  return instanceRaw.replace(/^form: .*$/m, (s) => `${s}\nby: ${by}`);
+}
+
+/** A changed claim is no longer the submitted claim — the stamp comes off. */
+export function stripSignedOff(instanceRaw: string): string {
+  return instanceRaw.replace(/^signed_off: .*\n?/m, "").replace(/^by: .*\n?/m, "");
+}
+
+/** The gate's bless line — set, replaced, or removed whole. A save removes
+ *  it: a changed claim is no longer the claim that was blessed. */
+export function withBless(instanceRaw: string, line: string | undefined): string {
+  const cleared = instanceRaw.replace(/^bless:.*\n?/m, "");
+  if (line === undefined) return cleared;
+  return afterAnchor(cleared, `bless: ${line}`);
 }

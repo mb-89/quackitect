@@ -13,7 +13,15 @@ import { existsSync, mkdirSync, readFileSync, statSync, unlinkSync, writeFileSyn
 import { dirname, join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
-import { activeStates, completeState, type MachineDecl, type MachineInstance, reopenStates, type StateDecl } from "./machine.ts";
+import {
+  activeStates,
+  completeState,
+  downstreamCone,
+  type MachineDecl,
+  type MachineInstance,
+  reopenStates,
+  type StateDecl,
+} from "./machine.ts";
 import { bumpDrawingEpoch, compileMachine, compileMachineCached, resolveRef } from "./machines/compile.ts";
 import { computeRoute, type RouteNode, type RouteResult } from "./route.ts";
 
@@ -44,26 +52,41 @@ import {
   lintForm,
   parseFormTemplate,
   scaffoldInstance,
+  stripComments,
+  stripSignedOff,
+  withAuthor,
+  withBless,
+  withBy,
+  withChecked,
   withFieldContent,
+  withSignedOff,
   withStatus,
+  withSuspect,
 } from "./forms.ts";
 import { drainNote, pendingNotes } from "./inbox.ts";
 import {
   generateIterationArchive,
   generateIterations,
+  type Iteration,
+  iterationDrift,
   itFind,
+  itList,
   itPinRel,
   itRecordRel,
   itSeed,
+  itShortId,
   markStarted,
   pinIteration,
   readItRecord,
+  repinColumn,
 } from "./iterations.ts";
 import { parseStateNote, section } from "./notes.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { anyJobRunning } from "./run.ts";
+import { levelName, loadLevels } from "./scale.ts";
+import { buildPortableForm, type EmbeddedDoc, parseIsland, stateFormFields, stateFormModel, templateProblems } from "./stateform.ts";
 import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
 import { type Expedition, expClose, expFind, expList, expNew, readRecord } from "./worktree.ts";
 
@@ -170,6 +193,7 @@ export class Session {
     try {
       const s = JSON.parse(readFileSync(join(seDir(root), "settings.json"), "utf8")) as {
         autonomy?: number;
+        emergency?: boolean;
         block_sleep?: boolean;
         shutdown_at_idle?: boolean;
         narration_minutes?: number;
@@ -179,6 +203,8 @@ export class Session {
       const mine = process.env.SE_SESSION;
       if (mine !== undefined && mine !== "" && s.session === mine) {
         if (typeof s.autonomy === "number" && s.autonomy >= 0 && s.autonomy <= 1) this._autonomy = s.autonomy;
+        // Emergency rides its rung: restored only beside a top-rung autonomy.
+        if (s.emergency === true && this._autonomy >= 1) this._emergency = true;
         if (typeof s.block_sleep === "boolean") this._blockSleep = s.block_sleep;
         if (typeof s.shutdown_at_idle === "boolean") this._shutdownAtIdle = s.shutdown_at_idle;
         if (typeof s.narration_minutes === "number" && Number.isInteger(s.narration_minutes) && s.narration_minutes >= 0)
@@ -201,6 +227,7 @@ export class Session {
         `${JSON.stringify({
           session: process.env.SE_SESSION ?? null,
           autonomy: this._autonomy,
+          emergency: this._emergency,
           block_sleep: this._blockSleep,
           shutdown_at_idle: this._shutdownAtIdle,
           narration_minutes: this._narrationMinutes,
@@ -417,7 +444,7 @@ export class Session {
     const rel = this.gateReportRel(gateId);
     const abs = join(this.bound!.path, rel);
     // THE ROUNDS ARE NOT WRITTEN TWICE. compileMachine appends STANDARD_ROUNDS
-    // (verify_round, validate_round, redteam_round, verdict) to every gate's
+    // (round_0_verify, round_1_validate, round_2_red_team, verdict) to every gate's
     // evidence_form — machines/compile.ts, the `kind === "gate"` clause — so
     // the scaffold below already emits them once, with the fuller v1-derived
     // wording. A second REVIEW_TAIL stood here and emitted verify/validate/
@@ -604,8 +631,11 @@ export class Session {
    * IT IS NOT ADVERTISED. It rides the packet only when it is ON, so nothing
    * about the resting state hints that it exists.
    *
-   * IT DOES NOT PERSIST. A new engine life starts without it. An emergency
-   * that survives a restart unannounced is a gate quietly missing.
+   * IT PERSISTS WITH ITS RUNG (owner ruling 2026-08-04, reversing the
+   * earlier no-persist law): engine reloads are routine mid-session, and
+   * each one silently revoked the very delegation the fixes were granted
+   * under. It restores only beside a persisted TOP-RUNG autonomy, and
+   * lowering the dial still revokes it — in this life and the next.
    */
   private _emergency = false;
 
@@ -625,6 +655,7 @@ export class Session {
     }
     const was = this._emergency;
     this._emergency = on;
+    this.persistSettings();
     this.notifyChange();
     return { emergency: on, was };
   }
@@ -682,10 +713,15 @@ export class Session {
    *  on request — never on their own — and only at idle. The canary
    *  refuses to kill a running engine for a tree that does not load; then
    *  the child exits 42 and the shim respawns it on the new sources. The
-   *  walk reboots — by design; boot re-proves the new engine green. */
+   *  walk reboots — by design; boot re-proves the new engine green.
+   *
+   *  EMERGENCY RELOADS FROM ANY STAND (owner ruling 2026-08-04). Emergency
+   *  is repair, and repair is exactly when the walk cannot afford to go
+   *  home first: reaching idle costs an escape, and the escape costs the
+   *  target. */
   requestReload(): Record<string, unknown> {
     const leaf = this.active()[0] ?? "";
-    if (leaf !== "idle") {
+    if (leaf !== "idle" && !this._emergency) {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "the walk at idle — a reload reboots it, nothing mid-flight may be lost",
@@ -774,7 +810,7 @@ export class Session {
     if (fullId === undefined) return;
     const it = itFind(this.root, fullId);
     const rec = readItRecord(this.root, it);
-    const size = typeof rec?.change_size === "string" ? rec.change_size : undefined;
+    const size = typeof rec?.change_size === "string" ? rec.change_size : this.kickoffSizeFromForm(it);
     const pinAbs = join(it.path, itPinRel(it.id));
     if (size === undefined) {
       if (existsSync(pinAbs)) return; // blessed in an earlier pass — walk on
@@ -803,21 +839,29 @@ export class Session {
     this.rewalk(pin, `escalated to ${size}`);
   }
 
-  /** The pin GROWS the machine under the walk's feet: regenerate the
+  /** The pin RESHAPES the machine under the walk's feet: regenerate the
    *  iteration's machine (pinned now), carry history, counters and the
    *  active kickoff, and swap the frame in place. The machine id and the
-   *  state ids are stable, so the evidence store keeps answering. */
+   *  state ids are stable, so the evidence store keeps answering.
+   *
+   *  The compare is the compiled decl's CONTENT, because a widened field —
+   *  a new item, a new column, new guidance — leaves the state COUNT
+   *  untouched. A regeneration that drops a state the walk stands in is
+   *  left alone: the swapped frame would point at nothing. */
   private repinSwap(): void {
     const top = this.top();
     const parent = this.subs[this.subs.length - 2];
     if (top === undefined || parent === undefined) return;
     const regen = parent.gen?.subGen?.[top.parentState]?.();
-    if (regen === undefined || regen.decl.states.length <= top.decl.states.length) return;
+    if (regen === undefined || JSON.stringify(regen.decl) === JSON.stringify(top.decl)) return;
+    const active = [...activeStates(top.instance)];
+    const survives = (id: string): boolean => regen.decl.states.some((s) => s.id === id);
+    if (!survives(top.instance.current) || !active.every(survives)) return;
     const inst = newInstance(regen.decl);
     inst.history = top.instance.history;
     inst.counters = top.instance.counters;
     inst.current = top.instance.current;
-    inst.active = [...activeStates(top.instance)];
+    inst.active = active;
     this.subs[this.subs.length - 1] = { decl: regen.decl, instance: inst, parentState: top.parentState, gen: regen };
   }
 
@@ -850,6 +894,7 @@ export class Session {
     const known = owed.filter((id) => run.decl.states.some((s) => s.id === id));
     if (known.length === 0) return undefined;
     const { reopened, cone } = reopenStates(run.decl, run.instance, known, reason, new Date().toISOString());
+    this.markSuspect(run.decl, cone, `${reason} — ${known.join(", ")}`);
     this.notifyChange();
     return { reopened, cone };
   }
@@ -1170,9 +1215,14 @@ export class Session {
   }
 
   /** Standing in the retro — the one place holding the whole picture, so
-   *  the one place that may park a note or carry it (engine/inbox.ts). */
+   *  the one place that may park a note or carry it (engine/inbox.ts).
+   *
+   *  A MIRROR IS THE STATE IT MIRRORS. An iteration's onboard-retro carries
+   *  same_as: retro, and its own guidance calls it the one legal drain
+   *  place, so matching the id alone refused it the only job it has. */
   inRetro(): boolean {
-    return this.active().some((id) => id === "retro" || id.endsWith("/retro"));
+    const { machine, ids } = this.leaves();
+    return ids.some((id) => id === "retro" || machine.states.find((s) => s.id === id)?.same_as === "retro");
   }
 
   /** The machine standing behind a qualified prefix ("" is main). A prefix
@@ -1658,13 +1708,18 @@ export class Session {
   /** The form names the very NEXT hop demands. The machine looks this up
    *  so the agent never goes hunting for which form applies. */
   private pullFormsOwed(): string[] {
-    if (this._target === "") return [];
-    try {
-      const r = this.route(this._target);
-      return r.steps.length === 0 ? [] : (r.steps[0].demands.evidence_form ?? []);
-    } catch {
-      return [];
+    const owed: string[] = [];
+    const standing = this.standingStateFormOwed();
+    if (standing !== undefined) owed.push(standing);
+    if (this._target !== "") {
+      try {
+        const r = this.route(this._target);
+        if (r.steps.length > 0) owed.push(...(r.steps[0].demands.evidence_form ?? []));
+      } catch {
+        // an undrawable way owes nothing extra
+      }
     }
+    return owed;
   }
 
   /** One way out, said as an offer: weight, openness and what blocks it. */
@@ -1722,6 +1777,9 @@ export class Session {
    *  no second call. */
   private pullOptions(): Record<string, unknown>[] {
     const { machine, ids } = this.leaves();
+    if (this._target === "" && !this.inSub() && ids.length === 1 && ids[0] === "front_desk") {
+      return this.optionsAt(this.machine, "idle");
+    }
     return ids.flatMap((id) => this.optionsAt(machine, id));
   }
 
@@ -1777,10 +1835,18 @@ export class Session {
     // ONE DRAWING VALIDATION PER WALK STEP — the epoch makes "the next
     // call" the unit of the read-it-live law (see machines/compile.ts).
     bumpDrawingEpoch();
+    this.driftReopen();
+    // THE AIM IS READ AFTER THE PAYLOAD LANDS. A CHOICE IS THE ACT OF
+    // AIMING, so reading the aim first threw it away: standing at idle,
+    // the walk fell back to the front desk and went THERE while the
+    // chosen door sat recorded and unwalked. Proven live 2026-08-05 —
+    // choice "expeditions" at autonomy 0.2 answered `do` for front_desk.
+    const targetNow = (): string =>
+      this._target === "" && this.active()[0] !== undefined && this.active()[0] !== "front_desk" ? "front_desk" : this._target;
     const head = (): Record<string, unknown> => ({
       where: this.active(),
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
-      target: this._target,
+      target: targetNow(),
       autonomy: this._autonomy,
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
     });
@@ -1810,31 +1876,44 @@ export class Session {
         : {}),
     });
 
-    // 1. NO TARGET means the machine is not trying to get anywhere. The
-    //    doors are the offer; with none open, the work is the person's.
-    if (this._target === "") {
+    const pullTarget = targetNow();
+
+    // THE STANDING FORM COMES FIRST (owner rulings 2026-08-04): inside an
+    // iteration's state with evidence fields, the stored form IS the work.
+    // The pull serves it until it is met; the payload fills it.
+    const standingForm = this.standingStateFormOwed();
+    if (standingForm !== undefined) {
+      return {
+        pull: "fill",
+        ...head(),
+        for: standingForm,
+        forms: [this.formGet(standingForm)],
+        do: 'work the state, then return fills on the next pull as form: {"<section>": "<text>"} - multi-pass is fine; finish with {"submit": true}: the submit checks the fields and stamps the claim',
+        ...extra(),
+      };
+    }
+
+    // 1. NO TARGET at the front desk means nothing is owed here. The
+    //    doors ride along as options, but the machine does not pick one. Anywhere
+    //    else, no-target work comes home to the desk first.
+    if (pullTarget === "") {
       const options = this.pullOptions();
-      if (options.length > 0) {
-        return {
-          pull: "choose",
-          ...head(),
-          options,
-          do: 'pick one and return it on the next pull as form: {"choice": "<to>"} — a LIST is legal where the work fans out',
-          ...extra(),
-        };
-      }
       return {
         pull: "wait",
         ...head(),
+        ...(options.length > 0 ? { options } : {}),
         waiting_for: "the person",
-        do: "say plainly that nothing is owed and STOP — the slider alone cannot wake you, so ask them to message you",
+        do:
+          options.length > 0
+            ? "say plainly that nothing is owed here and STOP - options are available, but do not take one unless a goal is set or the person routes it"
+            : "say plainly that nothing is owed and STOP - the slider alone cannot wake you, so ask them to message you",
         ...extra(),
       };
     }
 
     let r: ReturnType<Session["route"]>;
     try {
-      r = this.route(this._target);
+      r = this.route(pullTarget);
     } catch (e) {
       if (!(e instanceof Rejection)) throw e;
       return {
@@ -1857,13 +1936,34 @@ export class Session {
       };
     }
 
-    const first = r.steps[0];
+    // 2. THE GATES ON THE FIRST STEP: the slider, the reading, the form.
+    const gated = this.pullStepGate(r.steps[0], readProof, channel, head, extra);
+    if (gated !== undefined) return gated;
 
-    // 2. THE SLIDER, WEIGHED BEFORE THE READING. Order matters here and it
-    //    was wrong once: reading first sent the agent through several
-    //    documents to prepare for a step it was never allowed to take, and
-    //    only then told it to stop. Nothing is owed for a step that is not
-    //    the agent's.
+    // 3. THE HAPPY PATH, WALKED. Not one hop — every hop to the next
+    //    branching point, because start-to-front-desk has no branch in it
+    //    and should never cost a round trip per hop.
+    const swept = await this.sweep(pullTarget, channel);
+    return this.pullAfterSweep(swept, head, extra);
+  }
+
+  /** THE THREE GATES ON THE NEXT STEP, in the order they must run, or
+   *  undefined when the step is the agent's to take.
+   *
+   *  THE SLIDER IS WEIGHED BEFORE THE READING, and the order was wrong
+   *  once: reading first sent the agent through several documents to
+   *  prepare for a step it was never allowed to take, and only then told
+   *  it to stop. Nothing is owed for a step that is not the agent's.
+   *
+   *  The reading is the AGENT's proof. The person proves by checkbox, so
+   *  their pull never eats a document. */
+  private pullStepGate(
+    first: ReturnType<Session["route"]>["steps"][number],
+    readProof: "ok" | "wrong" | null,
+    channel: Channel,
+    head: () => Record<string, unknown>,
+    extra: () => Record<string, unknown>,
+  ): Record<string, unknown> | undefined {
     if (channel === "agent" && first.priority > this._autonomy) {
       return {
         pull: "wait",
@@ -1876,9 +1976,6 @@ export class Session {
       };
     }
 
-    // 3. THE READING, served here rather than sent somewhere else. It is
-    //    the AGENT's proof; the person proves by checkbox, so their pull
-    //    never eats a document.
     const served = channel === "agent" ? this.serveReading() : null;
     if (served !== null) {
       return {
@@ -1891,7 +1988,7 @@ export class Session {
       };
     }
 
-    // 4. THE FORM, BUILT AND HANDED OVER. The agent never looks one up.
+    // THE FORM IS BUILT AND HANDED OVER. The agent never looks one up.
     const unmet = (first.demands.evidence_form ?? []).filter((n) => !this.formsMet([n]));
     if (unmet.length > 0) {
       return {
@@ -1904,11 +2001,7 @@ export class Session {
       };
     }
 
-    // 5. THE HAPPY PATH, WALKED. Not one hop — every hop to the next
-    //    branching point, because start-to-front-desk has no branch in it
-    //    and should never cost a round trip per hop.
-    const swept = await this.sweep(this._target, channel);
-    return this.pullAfterSweep(swept, head, extra);
+    return undefined;
   }
 
   /** THE READING PROOF. The last pull served a document and named its tail;
@@ -1936,7 +2029,13 @@ export class Session {
   private pullSaveOrChoose(form: Record<string, unknown>): { saved?: Record<string, unknown>; fanOut: string[] } {
     const owed = this.pullFormsOwed();
     if (owed.length > 0) {
-      return { saved: this.formSave(owed[0], form as Record<string, string>), fanOut: [] };
+      // submit and bless are ACTS, not sections: the save lands the fills
+      // first, then each act runs with its own checks and stamps.
+      const { submit, bless, ...fills } = form;
+      let saved = this.formSave(owed[0], fills as Record<string, string>);
+      if (submit === true || submit === "true" || submit === "yes") saved = this.formDone(owed[0], "agent");
+      if (bless !== undefined) saved = this.formBless(owed[0], bless === true || bless === "true" || bless === "yes", "agent");
+      return { saved, fanOut: [] };
     }
     if (this._target === "" && form.choice !== undefined) {
       return { fanOut: this.pullPickChoice(form.choice) };
@@ -2374,7 +2473,9 @@ export class Session {
     }
   }
 
-  formGet(name: string): Record<string, unknown> {
+  formGet(name: string, machineId?: string): Record<string, unknown> {
+    const fm = this.formMachine(machineId);
+    if (this.isStateForm(name, fm)) return this.stateFormGet(name, fm);
     if (this.bound === undefined) {
       // No expedition bound — the TEMPLATE is still viewable (owner ruling:
       // any form may be inspected at any time); filling needs a bound record.
@@ -2405,7 +2506,9 @@ export class Session {
     };
   }
 
-  formSave(name: string, fields: Record<string, string>): Record<string, unknown> {
+  formSave(name: string, fields: Record<string, string>, by = "agent", machineId?: string): Record<string, unknown> {
+    const fm = this.formMachine(machineId);
+    if (this.isStateForm(name, fm)) return this.stateFormSave(name, fields, by, fm);
     const h = this.formHome(name);
     let raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : scaffoldInstance(h.template, `${this.bound?.id} — ${name}`);
     for (const [f, content] of Object.entries(fields)) raw = withFieldContent(raw, f, String(content));
@@ -2415,7 +2518,16 @@ export class Session {
     return this.formGet(name);
   }
 
-  formConfirm(name: string, field: string, index: number): Record<string, unknown> {
+  formConfirm(name: string, field: string, index: number, machineId?: string): Record<string, unknown> {
+    const fm = this.formMachine(machineId);
+    if (this.isStateForm(name, fm)) {
+      const sh = this.stateFormHome(name, fm);
+      if (existsSync(sh.instanceAbs)) {
+        writeFileSync(sh.instanceAbs, confirmPrefill(readFileSync(sh.instanceAbs, "utf8"), field, index), "utf8");
+        this.notifyChange();
+      }
+      return this.stateFormGet(name, fm);
+    }
     const h = this.formHome(name);
     if (existsSync(h.instanceAbs)) {
       writeFileSync(h.instanceAbs, confirmPrefill(readFileSync(h.instanceAbs, "utf8"), field, index), "utf8");
@@ -2424,7 +2536,37 @@ export class Session {
     return this.formGet(name);
   }
 
-  formDone(name: string, by: Channel): Record<string, unknown> {
+  formDone(name: string, by: Channel, machineId?: string): Record<string, unknown> {
+    const fm = this.formMachine(machineId);
+    if (this.isStateForm(name, fm)) {
+      this.assertStateFormActive(name, fm, "submit");
+      // SUBMIT is the checking act: an unmet form THROWS, so the log line
+      // wears the ✗ and carries the why — the details stay the definition.
+      const sh = this.stateFormHome(name, fm);
+      const before = this.stateFormGet(name, fm) as { met?: boolean; problems?: string[] };
+      if (!existsSync(sh.instanceAbs) || before.met !== true) {
+        throw new Rejection({
+          clause: CLAUSES.CONDITION_UNMET,
+          expected: `every check green on ${name} — submit stamps only a standing claim`,
+          got: (before.problems ?? []).join(" · ") || "nothing saved yet",
+          remedy: { tool: "se_pull", args: {}, note: "fix the named fields, save, submit again" },
+          source: "engine/session.ts stateform",
+        });
+      }
+      const feeders = this.gateFeedersUnsigned(fm, this.stateFormState(name, fm));
+      if (feeders.length > 0) {
+        throw new Rejection({
+          clause: CLAUSES.CONDITION_UNMET,
+          expected: `a gate requires ALL its inputs — every feeder form signed before ${name} may stamp`,
+          got: `unsigned feeders: ${feeders.join(", ")}`,
+          remedy: { tool: "se_pull", args: {}, note: "walk the named states and submit their forms; the gate stamps after" },
+          source: "engine/session.ts stateform",
+        });
+      }
+      writeFileSync(sh.instanceAbs, withBy(withSignedOff(readFileSync(sh.instanceAbs, "utf8"), new Date().toISOString()), by), "utf8");
+      this.notifyChange();
+      return this.stateFormGet(name, fm);
+    }
     const h = this.formHome(name);
     if (!existsSync(h.instanceAbs)) {
       throw new Rejection({
@@ -2450,6 +2592,509 @@ export class Session {
     const cmd = process.platform === "win32" ? "explorer" : process.platform === "darwin" ? "open" : "xdg-open";
     spawn(cmd, [h.evidenceAbs], { detached: true, stdio: "ignore" }).unref();
     return { opened: h.evidenceRel };
+  }
+
+  // ── State forms (owner rulings 2026-08-04): form = f(state), stored ──
+
+  /** ANY state's form is always fetchable (owner ruling 2026-08-04) —
+   *  for export to a colleague wherever the walk stands. The machine on
+   *  display resolves the name; the walk's machine is the default. */
+  private formMachine(machineId?: string): MachineDecl {
+    if (machineId === undefined || machineId === "" || machineId === this.currentMachine().id) return this.currentMachine();
+    return this.viewFor(machineId)?.decl ?? this.currentMachine();
+  }
+
+  /** The dispatch between the two form kinds: a state of the machine on
+   *  display with evidence fields, unshadowed by a named template. */
+  private isStateForm(name: string, m: MachineDecl = this.currentMachine()): boolean {
+    if (existsSync(join(this.root, formTemplatePath(name)))) return false;
+    return m.states.some((s) => s.id === name && s.evidence_form.length > 0);
+  }
+
+  /** Where the instance lives: the record whose machine carries the state
+   *  (its evidence folder ON ITS BRANCH), the bound record as fallback,
+   *  or the session store when neither exists. */
+  private stateFormHome(name: string, m: MachineDecl = this.currentMachine()): { instanceAbs: string; instanceRel: string } {
+    const it = itList(this.root).find((x) => x.open && itShortId(x.id) === m.id);
+    if (it !== undefined) {
+      const rel = `project/spec/iterations/${it.id}/evidence/${name}.md`;
+      return { instanceAbs: join(it.path, rel), instanceRel: rel };
+    }
+    if (this.bound !== undefined) {
+      const kind = this.bound.branch.startsWith("it/") ? "iterations" : "expeditions";
+      const rel = `project/spec/${kind}/${this.bound.id}/evidence/${name}.md`;
+      return { instanceAbs: join(this.workRoot(), rel), instanceRel: rel };
+    }
+    const rel = `.se/forms/${name}.md`;
+    return { instanceAbs: join(this.root, rel), instanceRel: rel };
+  }
+
+  private stateFormState(name: string, m: MachineDecl = this.currentMachine()): StateDecl {
+    const s = m.states.find((x) => x.id === name);
+    if (s === undefined) {
+      throw new Rejection({
+        clause: CLAUSES.NOT_LEGAL_IN_STATE,
+        expected: `a state of ${m.id} with an evidence form`,
+        got: name,
+        remedy: { tool: "se_pull", args: {}, note: "the walk's own states carry the forms" },
+        source: "engine/session.ts stateform",
+      });
+    }
+    return s;
+  }
+
+  private brandName(): string {
+    try {
+      const b = JSON.parse(readFileSync(join(this.root, "project", "brand", "brand.json"), "utf8")) as { name?: string };
+      return typeof b.name === "string" ? b.name : "se";
+    } catch {
+      return "se";
+    }
+  }
+
+  private stateFormHeader(name: string, raw: string | undefined, m: MachineDecl = this.currentMachine()): Record<string, string> {
+    const fm = raw === undefined ? ({} as Record<string, unknown>) : parseStateNote(raw).frontmatter;
+    // The priority wears its RUNG NAME (owner ruling 2026-08-04) — the
+    // numerical scale stays internal.
+    const s = m.states.find((st) => st.id === name);
+    return {
+      project: this.brandName(),
+      state: `${m.id}/${name}`,
+      ...(s !== undefined ? { level: levelName(loadLevels(this.root), s.priority) } : {}),
+      ...(this.bound !== undefined ? { record: this.bound.id } : {}),
+      "signed off": typeof fm.signed_off === "string" ? fm.signed_off.slice(0, 10) : "",
+      by: typeof fm.by === "string" ? fm.by : "",
+    };
+  }
+
+  stateFormGet(name: string, m: MachineDecl = this.currentMachine()): Record<string, unknown> {
+    const s = this.stateFormState(name, m);
+    const h = this.stateFormHome(name, m);
+    const raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : undefined;
+    const model = stateFormModel(this.root, scanGuidance(this.root), m, s, this.stateFormHeader(name, raw, m), raw);
+    // The section lint plus the TEMPLATE checks — generic engine code,
+    // configured per field in the templates' own markdown. One verdict
+    // for both hands: the page's problems list and the gate's refusal.
+    // The named-form lint judges a status line; state forms have none —
+    // a synthetic one keeps the SECTION checks and mutes the dead field.
+    // A LEGACY instance may still carry its own; never inject a second.
+    const lint = lintForm(
+      model.template,
+      raw === undefined || /^status: /m.test(raw) ? raw : raw.replace(/^---\n/, "---\nstatus: done\n"),
+      "",
+    );
+    const fills: Record<string, string> = {};
+    if (raw !== undefined) {
+      const body = parseStateNote(raw).body;
+      for (const f of model.template.fields) fills[f.name] = stripComments(section(body, f.name)).trim();
+    }
+    const tp = templateProblems(model, fills, this.root);
+    const fmData = raw === undefined ? ({} as Record<string, unknown>) : parseStateNote(raw).frontmatter;
+    return {
+      state_form: true,
+      ...model,
+      machine: m.id,
+      checked: this.stateFormChecked(raw),
+      active: this.stateFormActive(name, m),
+      gate: s.kind === "gate",
+      signed: typeof fmData.signed_off === "string",
+      bless: typeof fmData.bless === "string" ? fmData.bless : "",
+      instance: h.instanceRel,
+      exists: raw !== undefined,
+      ...lint,
+      problems: [...lint.problems, ...tp],
+      met: lint.met && tp.length === 0,
+    };
+  }
+
+  /** GREEN FROM THE RECORD (owner ruling 2026-08-04): a record-backed
+   *  state is done when its stored claim STANDS — signed, and blessed
+   *  where it is a gate. Session runs die with the engine life; the
+   *  record does not. States without records stay uncoloured. */
+  /** Where a state's stored claim lives, in the record's own worktree. */
+  private evidenceAbs(it: Iteration, state: string): string {
+    return join(it.path, `project/spec/iterations/${it.id}/evidence/${state}.md`);
+  }
+
+  /** THE CLAIM GOES SUSPECT (v1's suspect-bless, kept).
+   *
+   *  signed_off and bless are not evidence. They assert that the evidence
+   *  STANDS — and once an input under it moved, it does not. So they come off
+   *  and a `suspect:` line goes on, carrying WHAT moved.
+   *
+   *  IT IS NOT A TEARDOWN. The claim keeps its content and its authors. The
+   *  next reader re-looks and re-approves; they do not re-write. v1 recorded
+   *  the reason plainly: a silent auto-reopen reads as the tool undoing your
+   *  work.
+   *
+   *  Leaving the stamps is what kept a reopened gate painted green — the paint
+   *  reads the FILE, which outlives the engine, not the instance, which does
+   *  not. */
+  private markSuspect(decl: MachineDecl, states: string[], why: string): void {
+    const it = this.declIteration(decl);
+    if (it === undefined) return;
+    for (const id of states) {
+      const abs = this.evidenceAbs(it, id);
+      if (!existsSync(abs)) continue;
+      try {
+        const raw = readFileSync(abs, "utf8");
+        if (!/^signed_off: /m.test(raw) && !/^bless:/m.test(raw)) continue;
+        writeFileSync(abs, withSuspect(raw, why), "utf8");
+      } catch {
+        // an unreadable claim has no stamp to mark
+      }
+    }
+  }
+
+  recordDone(decl: MachineDecl): string[] {
+    const it = this.declIteration(decl);
+    if (it === undefined) return [];
+    const done: string[] = [];
+    for (const s of decl.states) {
+      if (s.evidence_form.length === 0) continue;
+      const abs = this.evidenceAbs(it, s.id);
+      if (!existsSync(abs)) continue;
+      try {
+        const fm = parseStateNote(readFileSync(abs, "utf8")).frontmatter;
+        // SUSPECT IS NOT DONE. An input moved under this claim, so it is
+        // waiting on somebody to re-look and re-approve.
+        if (typeof fm.suspect === "string") continue;
+        if (typeof fm.signed_off !== "string") continue;
+        if (s.kind === "gate" && !(typeof fm.bless === "string" && fm.bless.startsWith("blessed"))) continue;
+        done.push(s.id);
+      } catch {
+        // an unreadable claim colours nothing
+      }
+    }
+    // The mechanical start was necessarily walked on the way to any claim.
+    if (done.length > 0) done.push("start");
+    return done;
+  }
+
+  /** THE ITERATION THIS MACHINE IS, if it is one and it is still open. */
+  private declIteration(decl: MachineDecl): Iteration | undefined {
+    if (decl.id === this.machine.id) return undefined;
+    try {
+      return itList(this.root).find((x) => x.open && itShortId(x.id) === decl.id);
+    } catch {
+      return undefined; // no git, no records — nothing to check
+    }
+  }
+
+  /** THE DRIFT (owner ruling 2026-08-05): which states were passed against a
+   *  demand that has since moved, plus everything downstream of them.
+   *
+   *  GREEN MUST MEAN STILL GREEN NOW. The demand diff used to run only when a
+   *  pin was rewritten, and a pin is only rewritten on an escalation. So
+   *  editing a matrix row under a standing iteration changed what its steps
+   *  ask for and left every one of them green against a question that no
+   *  longer existed.
+   *
+   *  IT WRITES NOTHING. Somebody opening the machine to look must never
+   *  change the record, so the view calls this and paints. The walk calls
+   *  driftReopen, which is the only writer.
+   *
+   *  ONE WORD FOR ONE IDEA. A trace node standing on moved ground is suspect
+   *  too, by the same mechanism and wearing the same mark — see
+   *  trace.ts traceSuspects. */
+  suspectStates(decl: MachineDecl): string[] {
+    const it = this.declIteration(decl);
+    if (it === undefined) return [];
+    const moved = iterationDrift(this.root, it).filter((id) => decl.states.some((s) => s.id === id));
+    if (moved.length === 0) return [];
+    // ONLY A PASS CAN LAPSE (owner, 2026-08-05). The cone runs to the end of
+    // the machine, and most of it was never walked. Emptying those cards
+    // marks steps that had nothing to lose and drowns the ones that did —
+    // seen live, as the whole tail of the machine going blank at once.
+    const green = new Set(this.recordDone(decl));
+    const cone = downstreamCone(decl, moved);
+    return [...green].filter((id) => cone.has(id));
+  }
+
+  /** THE WRITER'S HALF: the walk arrives, so the drift stops being a mark on
+   *  a picture and becomes an actual reopen. Reusing rewalk means the drift
+   *  and the escalation reopen by exactly one mechanism.
+   *
+   *  Nothing to reopen is the normal case and costs one hash. */
+  private driftReopen(): void {
+    const run = this.top();
+    if (run === undefined) return;
+    const it = this.declIteration(run.decl);
+    if (it === undefined) return;
+    const moved = iterationDrift(this.root, it);
+    if (moved.length === 0) return;
+    // ONLY A STANDING CLAIM CAN BE REOPENED, and standing is the RECORD's
+    // word, not this session's. Reading the instance's own history instead
+    // meant a drift could only ever reopen steps filled since the last engine
+    // start — so after a restart, nothing reopened at all.
+    const done = new Set(this.recordDone(run.decl));
+    const owed = moved.filter((id) => done.has(id));
+    if (owed.length > 0) this.rewalk({ reopened: owed }, "the rigor matrix moved under the pin");
+    // CONSUME IT EITHER WAY. The walk has now seen this move, whether or not
+    // anything was standing to reopen. Leaving the pin stale would re-fire it
+    // on the next pull, and the re-earned step would reopen forever.
+    repinColumn(this.root, it);
+    // The frame under the walk's feet is the OLD machine until it is swapped,
+    // so the reopened step would still serve the form it was reopened for.
+    this.repinSwap();
+  }
+
+  /** The walk STANDS in the state — the one moment its questions are in
+   *  order. Saves are welcome from anywhere; submit and bless are not:
+   *  the steps before a step are where its answers become visible, and
+   *  no lint can see what a skipped step would have shown. */
+  private stateFormActive(name: string, m: MachineDecl): boolean {
+    const { machine, ids } = this.leaves();
+    return machine.id === m.id && ids.includes(name);
+  }
+
+  private assertStateFormActive(name: string, m: MachineDecl, verb: string): void {
+    if (this.stateFormActive(name, m)) return;
+    throw new Rejection({
+      clause: CLAUSES.NOT_LEGAL_IN_STATE,
+      expected: `the walk standing in ${name} — questions are answered in ORDER, and a ${verb} out of order skips the steps that feed it`,
+      got: "the walk stands elsewhere",
+      remedy: { tool: "se_pull", args: {}, note: "save keeps working from anywhere; the state's own moment is when it submits" },
+      source: "engine/session.ts stateform",
+    });
+  }
+
+  /** THE BLESS (owner design 2026-08-04, v1's thumbs reborn): a gate's
+   *  submitted form needs a hand ABOVE it — the human always, or an agent
+   *  whose autonomy stands strictly above the gate's own weight. */
+  formBless(name: string, ok: boolean, by: string, machineId?: string): Record<string, unknown> {
+    const m = this.formMachine(machineId);
+    const s = this.stateFormState(name, m);
+    this.assertStateFormActive(name, m, "bless");
+    if (s.kind !== "gate") {
+      throw new Rejection({
+        clause: CLAUSES.NOT_LEGAL_IN_STATE,
+        expected: "a GATE state — only gates carry a bless",
+        got: `${name} (${s.kind})`,
+        remedy: { tool: "se_pull", args: {}, note: "work states complete by their form alone" },
+        source: "engine/session.ts bless",
+      });
+    }
+    if (by !== "human" && this._autonomy <= s.priority) {
+      throw new Rejection({
+        clause: CLAUSES.ABOVE_THRESHOLD,
+        expected: `a hand above this gate's weight — autonomy > ${s.priority}, or the human's thumb in the form`,
+        got: `agent at autonomy ${this._autonomy}`,
+        remedy: { tool: "se_pull", args: {}, note: "present the gate to the person and stop — their bless resumes the walk" },
+        source: "engine/session.ts bless",
+      });
+    }
+    const h = this.stateFormHome(name, m);
+    const braw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : undefined;
+    if (braw === undefined || typeof parseStateNote(braw).frontmatter.signed_off !== "string") {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `the ${name} form submitted — the thumbs judge a STAMPED claim`,
+        got: "not submitted yet",
+        remedy: { tool: "se_pull", args: {}, note: 'fill, then {"submit": true} — the bless follows the stamp' },
+        source: "engine/session.ts bless",
+      });
+    }
+    writeFileSync(h.instanceAbs, withBless(braw, `${ok ? "blessed" : "dismissed"} by ${by}`), "utf8");
+    this.notifyChange();
+    return this.stateFormGet(name, m);
+  }
+
+  private stateFormChecked(raw: string | undefined): string[] {
+    if (raw === undefined) return [];
+    const v = parseStateNote(raw).frontmatter.checked;
+    return typeof v === "string"
+      ? v
+          .split(",")
+          .map((x) => x.trim())
+          .filter((x) => x !== "")
+      : [];
+  }
+
+  private stateFormScaffold(name: string, t: FormTemplate): string {
+    return [
+      "---",
+      `form: ${name}`,
+      "authors:",
+      "files:",
+      "---",
+      "",
+      `# Evidence form / ${name}`,
+      "",
+      ...t.fields.flatMap((f) => [`## ${f.name}`, "", ""]),
+    ].join("\n");
+  }
+
+  /** One or many fields into the stored instance — multi-pass by law.
+   *  A save never stamps: SUBMIT is the one checking, stamping act. */
+  stateFormSave(name: string, fields: Record<string, string>, by: string, m: MachineDecl = this.currentMachine()): Record<string, unknown> {
+    const t = stateFormFields(this.stateFormState(name, m));
+    const h = this.stateFormHome(name, m);
+    let raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : this.stateFormScaffold(name, t);
+    // inputs_checked is the checkbox column, not a section — both hands
+    // (the page's boxes, the agent's fill) send it through this one door.
+    const { inputs_checked, ...rest } = fields;
+    for (const [f, content] of Object.entries(rest)) raw = withFieldContent(raw, f, String(content));
+    // The dead fields migrate out as legacy instances are touched.
+    raw = raw.replace(/^status: .*\n?/m, "").replace(/^opened: .*\n?/m, "");
+    // A changed claim is neither the submitted nor the blessed claim.
+    if (Object.keys(fields).length > 0) raw = stripSignedOff(withBless(raw, undefined));
+    if (inputs_checked !== undefined) {
+      raw = withChecked(
+        raw,
+        String(inputs_checked)
+          .split("\n")
+          .map((x) => x.trim())
+          .filter((x) => x !== ""),
+      );
+    }
+    raw = withAuthor(raw, by);
+    mkdirSync(dirname(h.instanceAbs), { recursive: true });
+    writeFileSync(h.instanceAbs, raw, "utf8");
+    this.notifyChange();
+    return this.stateFormGet(name, m);
+  }
+
+  /** The state form the walk itself owes: standing in an iteration's
+   *  state with evidence fields, the stored form IS the work. */
+  private standingStateFormOwed(): string | undefined {
+    if (this.subs[this.subs.length - 2]?.decl.id !== "iterations") return undefined;
+    const { machine, ids } = this.leaves();
+    const s = machine.states.find((x) => x.id === ids[0]);
+    if (s === undefined || s.evidence_form.length === 0) return undefined;
+    try {
+      // Owed until SUBMITTED and still COMPLETE — a live input growing back
+      // (a new inbox item) re-opens a signed form instead of leaving it
+      // unpullable while the next state's entry refuses.
+      const f = this.stateFormGet(s.id) as { signed?: boolean; met?: boolean };
+      return f.signed === true && f.met === true ? undefined : s.id;
+    } catch {
+      return undefined;
+    }
+  }
+
+  /** A GATE requires ALL its inputs: every feeder state carrying an
+   *  evidence form must be SIGNED before the gate may stamp or pass. */
+  private gateFeedersUnsigned(fm: MachineDecl, gate: StateDecl): string[] {
+    if (gate.kind !== "gate") return [];
+    return fm.states
+      .filter((p) => p.evidence_form.length > 0 && p.edges.some((e) => e.to === gate.id))
+      .filter((p) => {
+        try {
+          return (this.stateFormGet(p.id, fm) as { signed?: boolean }).signed !== true;
+        } catch {
+          return true;
+        }
+      })
+      .map((p) => p.id);
+  }
+
+  private assertStateFormMet(stateId: string): void {
+    const lint = this.stateFormGet(stateId) as {
+      met?: boolean;
+      signed?: boolean;
+      problems?: string[];
+      instance?: string;
+      gate?: boolean;
+      bless?: string;
+    };
+    if (lint.met !== true) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `the ${stateId} evidence form complete (${String(lint.instance)})`,
+        got: (lint.problems ?? []).join(" · ") || "unfilled",
+        remedy: { tool: "se_pull", args: {}, note: 'the pull serves the form; fill it, then finish with {"submit": true}' },
+        source: "engine/session.ts stateform",
+      });
+    }
+    if (lint.signed !== true) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `the ${stateId} form SUBMITTED — the submit checks the fields and stamps the claim`,
+        got: "complete but not submitted",
+        remedy: { tool: "se_pull", args: {}, note: 'return {"submit": true} on the fill, or press submit in the form' },
+        source: "engine/session.ts stateform",
+      });
+    }
+    if (lint.gate === true) {
+      const m = this.currentMachine();
+      const gs = m.states.find((x) => x.id === stateId);
+      const feeders = gs === undefined ? [] : this.gateFeedersUnsigned(m, gs);
+      if (feeders.length > 0) {
+        throw new Rejection({
+          clause: CLAUSES.CONDITION_UNMET,
+          expected: `a gate requires ALL its inputs — every feeder form signed before ${stateId} passes`,
+          got: `unsigned feeders: ${feeders.join(", ")}`,
+          remedy: { tool: "se_pull", args: {}, note: "walk the named states and submit their forms; the gate passes after" },
+          source: "engine/session.ts stateform",
+        });
+      }
+    }
+    if (lint.gate === true && !(lint.bless ?? "").startsWith("blessed")) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `the ${stateId} gate blessed — the 👍 in the form, by the human or a hand above the gate's rung`,
+        got: (lint.bless ?? "") === "" ? "submitted, awaiting the bless" : String(lint.bless),
+        remedy: {
+          tool: "se_pull",
+          args: {},
+          note: 'present the gate and stop; a fill of {"bless": true} blesses only from above its weight',
+        },
+        source: "engine/session.ts bless",
+      });
+    }
+  }
+
+  /** The blessed size may live in the kickoff's own stored form. */
+  private kickoffSizeFromForm(it: Iteration): string | undefined {
+    const abs = join(it.path, `project/spec/iterations/${it.id}/evidence/gate-kickoff.md`);
+    if (!existsSync(abs)) return undefined;
+    const txt = stripComments(section(parseStateNote(readFileSync(abs, "utf8")).body, "change_size")).toLowerCase();
+    return (CHANGE_COLUMNS as readonly string[]).find((c) => txt.includes(c));
+  }
+
+  /** ONE self-contained HTML: the sheet, the fills, the reading and the
+   *  templates baked in — the island is what travels back. */
+  stateFormExport(name: string, machineId?: string): string {
+    const m = this.formMachine(machineId);
+    const s = this.stateFormState(name, m);
+    const h = this.stateFormHome(name, m);
+    const raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : undefined;
+    const model = stateFormModel(this.root, scanGuidance(this.root), m, s, this.stateFormHeader(name, raw, m), raw);
+    const fills: Record<string, string> = {};
+    if (raw !== undefined) {
+      const body = parseStateNote(raw).body;
+      for (const f of model.template.fields) fills[f.name] = stripComments(section(body, f.name)).trim();
+    }
+    const docs: EmbeddedDoc[] = [];
+    for (const i of model.inputs) {
+      if (i.path === undefined) continue;
+      try {
+        docs.push({ path: i.path, content: readFileSync(join(this.root, i.path), "utf8") });
+      } catch {
+        docs.push({ path: i.path, content: "(unreadable at export time)" });
+      }
+    }
+    return buildPortableForm(model, fills, docs, this.stateFormChecked(raw));
+  }
+
+  /** The returned copy's island lands as fills, marked imported — a
+   *  claim like every other, judged at the gate. */
+  stateFormIngest(name: string, html: string, machineId?: string): Record<string, unknown> {
+    const m = this.formMachine(machineId);
+    const island = parseIsland(html);
+    if (island === undefined || island.form !== name) {
+      throw new Rejection({
+        clause: CLAUSES.REQUIRED_ARGS,
+        expected: `a returned portable form carrying the se-form island for ${name}`,
+        got: island === undefined ? "no island in the file" : `an island for ${island.form}`,
+        remedy: { tool: "se_pull", args: {}, note: "export first, have it filled and saved, ingest that file" },
+        source: "engine/session.ts stateform",
+      });
+    }
+    const author = island.author === "" ? "imported" : `${island.author} (imported)`;
+    const fields = { ...island.fields, inputs_checked: island.checked.join("\n") };
+    return { ingested: name, author, ...this.stateFormSave(name, fields, author, m) };
   }
 
   /** One script, ASYNC — spawnSync would freeze the whole server (and the
@@ -3050,6 +3695,17 @@ export class Session {
     const key = this.evidenceKey(machine, s.id);
     const record = { ...(this.evidence.get(key) ?? {}), ...data, at: new Date().toISOString() };
     this.evidence.set(key, record);
+    // THE STORED FORM IS THE DURABLE COPY (owner rulings 2026-08-04): a
+    // state with evidence fields lands every fill in its instance too.
+    if (s.evidence_form.length > 0 && this.isStateForm(s.id)) {
+      // submit and bless are not sections — they ride the fill as their
+      // own keys and land AFTER the save, which strips stale stamps first.
+      const { bless, submit, ...fills } = data;
+      const strings = Object.fromEntries(Object.entries(fills).map(([k, v]) => [k, typeof v === "string" ? v : JSON.stringify(v)]));
+      this.stateFormSave(s.id, strings, "agent");
+      if (submit === true || submit === "true" || submit === "yes") this.formDone(s.id, "agent");
+      if (bless !== undefined) this.formBless(s.id, bless === true || bless === "true" || bless === "yes", "agent");
+    }
     this.notifyChange();
     return { state: `${machine.id}/${s.id}`, evidence: record };
   }
@@ -3296,6 +3952,10 @@ export class Session {
     if (this.bound !== undefined && inIteration && this.state(top.decl, cur).kind === "gate" && cur !== "gate-kickoff") {
       this.assertGateReport(cur, this.state(top.decl, cur), channel);
     }
+    // THE EXIT IS THE HARD GATE (owner ruling 2026-08-04): a state with
+    // evidence fields leaves only on a COMPLETE stored form — the claim
+    // stands in the record before the walk moves.
+    if (inIteration && this.state(top.decl, cur).evidence_form.length > 0) this.assertStateFormMet(cur);
     this.completeGuarded(top.decl, top.instance, cur, "filled", now, to);
     // Leaving the state is what destroys what it consumed.
     this.consumeDocs(this.state(top.decl, cur));

@@ -12,7 +12,7 @@ import { dirname, join } from "node:path";
 import { type CanvasData, type CanvasEdge, type CanvasElement, nodeSize } from "./canvas.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { buildArchive, type GeneratedMachine } from "./expmachine.ts";
-import { type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
+import { type EvidenceField, type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
 import { parseStateNote } from "./notes.ts";
 import { CHANGE_COLUMNS, type ChangeColumn, compileColumn, compileM0, readRigorMatrix, rigorMatrixContentHash } from "./rigor-matrix.ts";
 import { bustBranchList, listBranches, slug, worktreesDir } from "./worktree.ts";
@@ -391,40 +391,23 @@ export function pinIteration(root: string, it: Iteration, changeSize: string): R
   }
   const rigorMatrix = readRigorMatrix(root);
   const machine = compileColumn(rigorMatrix, changeSize as ChangeColumn);
-  // THE DEMANDS LEDGER: what each applied step asks at this pin — the
-  // ordinal applies plus the evidence spec. The next escalation compares
-  // against it.
-  const demands: Record<string, StepDemand> = {};
-  for (const row of rigorMatrix.rows) {
-    const cell = rigorMatrix.cells.get(row.name)!.get(changeSize as ChangeColumn)!;
-    if (cell.applies === "none") continue;
-    demands[row.name] = { applies: cell.applies, evidence: JSON.stringify(row.evidence_form) };
-  }
-  // REOPEN (owner verdict 2026-07-30): a filled step survives the
-  // escalation only while its demand stands. applies stepped up, or the
-  // evidence spec changed — the step reopens and its evidence is
-  // re-earned. Guidance-only wording never reopens.
-  const reopened = Object.keys(prev?.demands ?? {})
-    .filter((id) => {
-      const o = prev?.demands?.[id];
-      const n = demands[id];
-      return (
-        n !== undefined && (o === undefined || (APPLIES_RANK[n.applies] ?? 0) > (APPLIES_RANK[o.applies] ?? 0) || n.evidence !== o.evidence)
-      );
-    })
-    .sort();
+  const demands = demandsFor(rigorMatrix, changeSize as ChangeColumn);
+  const reopened = movedDemands(prev?.demands ?? {}, demands);
   const pin = {
     change_size: changeSize,
     rigor_matrix_hash: rigorMatrixContentHash(root),
     pinned_at: new Date().toISOString(),
     ...(reopened.length > 0 ? { reopened } : {}),
     demands,
-    machine,
   };
   mkdirSync(dirname(pinAbs), { recursive: true });
   writeFileSync(pinAbs, JSON.stringify(pin, null, 2), "utf8");
   git(it.path, ["add", "-A"], "add");
-  git(it.path, ["commit", "-q", "-m", `iteration ${it.id}: pin ${changeSize}`], "commit");
+  // BOOKKEEPING, NOT AUTHORED WORK: this commit lands a generated file. It
+  // skips the hook because a fresh worktree carries no node_modules, so the
+  // hook's typechecker dies and the pin refuses before the walk has had any
+  // chance to install one.
+  git(it.path, ["commit", "-q", "--no-verify", "-m", `iteration ${it.id}: pin ${changeSize}`], "commit");
   return {
     pinned: changeSize,
     rigor_matrix_hash: pin.rigor_matrix_hash,
@@ -433,9 +416,136 @@ export function pinIteration(root: string, it: Iteration, changeSize: string): R
   };
 }
 
-interface StepDemand {
+export interface StepDemand {
   applies: string;
   evidence: string;
+}
+
+/** THE DEMANDS LEDGER: what each applied step ASKS FOR at this column — the
+ *  ordinal applies, plus the evidence spec. The pin stores it, and every
+ *  later look recomputes it and compares. */
+export function demandsFor(rigorMatrix: ReturnType<typeof readRigorMatrix>, changeSize: ChangeColumn): Record<string, StepDemand> {
+  const demands: Record<string, StepDemand> = {};
+  for (const row of rigorMatrix.rows) {
+    const cell = rigorMatrix.cells.get(row.name)!.get(changeSize)!;
+    if (cell.applies === "none") continue;
+    demands[row.name] = { applies: cell.applies, evidence: demandOf(row.evidence_form) };
+  }
+  return demands;
+}
+
+/** WHAT A STEP ASKS FOR, with the prose stripped out.
+ *
+ *  A field's description and guidance TELL whoever fills it what belongs
+ *  there. They do not change what belongs there. So rewording them must not
+ *  reopen a step that already answered the question.
+ *
+ *  "Guidance-only wording never reopens" was the rule from the start and was
+ *  never implemented: the whole field list was serialised, prose included.
+ *  Linking a method card into one row's vision field reopened three
+ *  milestones of passed work, which is how this was found.
+ *
+ *  Everything else IS the demand: the field's name, whether it is required,
+ *  the shape of the answer, and the template and arguments that bound it. */
+export function demandOf(fields: EvidenceField[]): string {
+  return JSON.stringify(
+    fields.map((f) => [
+      f.name,
+      f.required,
+      f.type ?? "",
+      f.columns ?? [],
+      f.template ?? "",
+      f.of ?? "",
+      f.options ?? [],
+      f.items ?? [],
+      f.passing ?? [],
+    ]),
+  );
+}
+
+/** A PIN TAKEN BEFORE demandOf EXISTED stored the whole field list. Compare
+ *  it through the same stripper, or changing the digest would reopen every
+ *  step in every standing iteration exactly once — a migration nobody asked
+ *  for, wearing the clothes of a real finding. */
+function structural(evidence: string): string {
+  try {
+    const parsed: unknown = JSON.parse(evidence);
+    if (Array.isArray(parsed) && parsed.every((f) => typeof f === "object" && f !== null && "name" in f)) {
+      return demandOf(parsed as EvidenceField[]);
+    }
+  } catch {
+    // not JSON at all — compare the raw strings
+  }
+  return evidence;
+}
+
+/** REOPEN (owner verdict 2026-07-30): a filled step survives only while its
+ *  demand stands. applies stepped UP, or the evidence spec changed — the step
+ *  reopens and its evidence is re-earned. Guidance-only wording never reopens,
+ *  and a WEAKENED demand never does either: what was filed already covers it.
+ *
+ *  Only steps the previous ledger knew are compared. A step that did not exist
+ *  then is not in the pinned machine, so there is nothing there to reopen. */
+export function movedDemands(prev: Record<string, StepDemand>, now: Record<string, StepDemand>): string[] {
+  return Object.keys(prev)
+    .filter((id) => {
+      const o = prev[id];
+      const n = now[id];
+      if (n === undefined) return false;
+      if (o === undefined || (APPLIES_RANK[n.applies] ?? 0) > (APPLIES_RANK[o.applies] ?? 0)) return true;
+      return structural(n.evidence) !== structural(o.evidence);
+    })
+    .sort();
+}
+
+/** THE PIN CATCHES UP WITH THE DEFINITION: the whole column is recompiled at
+ *  the SAME size, and the ledger and the hash are re-taken with it.
+ *
+ *  THE MACHINE GOES TOO, and that is the point. A step reopens because what it
+ *  ASKS FOR changed. Re-taking only the ledger would reopen the step and then
+ *  hand back the OLD form — the walk re-earns evidence against the question we
+ *  just decided no longer stands. Seen live: frame-delta's field became a
+ *  reference list, the step reopened, and the form still offered free prose.
+ *
+ *  WITHOUT THE RE-TAKE IT NEVER TERMINATES. The step reopens, the agent
+ *  re-earns it, the next pull finds the pin still stale and reopens it again.
+ *
+ *  IT IS NOT AN ESCALATION. The change size is untouched, so pinIteration's
+ *  refusal to de-escalate has nothing to say here. */
+export function repinColumn(root: string, it: Iteration): void {
+  const pinAbs = join(it.path, itPinRel(it.id));
+  if (!existsSync(pinAbs)) return;
+  const pin = parsePin(readFileSync(pinAbs, "utf8")) as ParsedPin & Record<string, unknown>;
+  if (pin.change_size === undefined) return;
+  pin.demands = demandsFor(readRigorMatrix(root), pin.change_size as ChangeColumn);
+  pin.rigor_matrix_hash = rigorMatrixContentHash(root);
+  delete pin.machine; // derived from change_size now — a stored copy only goes stale
+  writeFileSync(pinAbs, JSON.stringify(pin, null, 2), "utf8");
+}
+
+/** THE LIVE DRIFT: which of this iteration's steps were passed against a
+ *  demand that has since moved.
+ *
+ *  IT WRITES NOTHING, on purpose. A person opening the machine to look must
+ *  never change the record, so this is computed on the way to the screen and
+ *  thrown away. The walk entering the iteration is what turns it into a
+ *  reopen — one computation, two callers, one writer.
+ *
+ *  WHY NOT AT THE PIN. A pin is only rewritten on an escalation, so a matrix
+ *  edit under a standing iteration moved nothing and every passed step stayed
+ *  green against a question that no longer existed. Green has to mean still
+ *  green NOW.
+ *
+ *  THE CHEAP PATH IS THE COMMON ONE. The hash answers "did anything move at
+ *  all" for about 3ms against a ~900ms render; only a moved hash pays for the
+ *  read and the diff. */
+export function iterationDrift(root: string, it: Iteration): string[] {
+  const pinAbs = join(it.path, itPinRel(it.id));
+  if (!existsSync(pinAbs)) return [];
+  const pin = parsePin(readFileSync(pinAbs, "utf8"));
+  if (pin.change_size === undefined || pin.demands === undefined) return [];
+  if (pin.rigor_matrix_hash === rigorMatrixContentHash(root)) return [];
+  return movedDemands(pin.demands, demandsFor(readRigorMatrix(root), pin.change_size as ChangeColumn));
 }
 
 /** tailored is always tailored DOWN (owner ruling 2026-07-30); inherit
@@ -444,6 +554,7 @@ const APPLIES_RANK: Record<string, number> = { none: 0, tailored: 1, inherit: 2,
 
 interface ParsedPin {
   change_size?: string;
+  rigor_matrix_hash?: string;
   demands?: Record<string, StepDemand>;
 }
 
@@ -485,31 +596,13 @@ export function generateIterations(root: string): GeneratedMachine {
   const states: StateDecl[] = [start];
   const expByState: Record<string, string> = {};
   const subGen: Record<string, () => GeneratedMachine> = {};
-  type GenNode = CanvasElement & { styleAttributes?: Record<string, unknown> };
   const nodes: GenNode[] = [];
-  const edges: CanvasEdge[] = [];
-  const centerY = open.length === 0 ? 80 : ((open.length - 1) * 420) / 2 + 80;
-  nodes.push({
-    id: "n-start",
-    type: "file",
-    file: "start.md",
-    x: -1400,
-    y: centerY,
-    width: 160,
-    height: 160,
-    styleAttributes: { shape: "pill" },
-  });
-  nodes.push({
-    id: "n-end",
-    type: "file",
-    file: "end.md",
-    x: 260,
-    y: centerY,
-    width: 160,
-    height: 160,
-    styleAttributes: { shape: "pill" },
-  });
-  open.forEach((it, i) => {
+  const edges: GenEdge[] = [];
+  // TOP TO BOTTOM, like every machine reads (owner ruling 2026-08-04): the
+  // start pill, the open iterations stacked, the end pill.
+  nodes.push(pill("n-start", "start.md", 0));
+  let nextY = 300;
+  for (const it of open) {
     const sid = itShortId(it.id);
     const fm = readItRecord(root, it);
     const goal = typeof fm?.goal === "string" ? fm.goal : it.id;
@@ -527,14 +620,19 @@ export function generateIterations(root: string): GeneratedMachine {
     });
     subGen[sid] = () => generateIterationWalk(root, it, sid);
     start.edges.push({ to: sid, role: "normal" });
-    const y = i * 420;
-    nodes.push({ id: `n-${sid}`, type: "file", file: `${sid}.md`, x: -1100, y, ...nodeSize(sid, goal) });
-    edges.push({ id: `e-start-${sid}`, fromNode: "n-start", toNode: `n-${sid}` });
-    edges.push({ id: `e-${sid}-end`, fromNode: `n-${sid}`, toNode: "n-end" });
-  });
+    const size = nodeSize(sid, goal);
+    nodes.push({ id: `n-${sid}`, type: "file", file: `${sid}.md`, x: -size.width / 2, y: nextY, ...size });
+    nextY += size.height + 160;
+  }
+  nodes.push(pill("n-end", "end.md", nextY));
+  const els = new Map<string, CanvasElement>(nodes.map((n) => [n.id, n]));
+  for (const it of open) {
+    const sid = itShortId(it.id);
+    edges.push(sidedEdge(els, "n-start", `n-${sid}`), sidedEdge(els, `n-${sid}`, "n-end"));
+  }
   if (open.length === 0) {
     start.edges.push({ to: "end", role: "normal" });
-    edges.push({ id: "e-start-end", fromNode: "n-start", toNode: "n-end" });
+    edges.push(sidedEdge(els, "n-start", "n-end"));
   }
   states.push({
     id: "end",
@@ -555,17 +653,60 @@ export function generateIterations(root: string): GeneratedMachine {
   return { decl, canvas, expByState, ...(Object.keys(subGen).length > 0 ? { subGen } : {}) };
 }
 
-/** The iteration's machine, read at CALL time: the pinned column when the
- *  pin stands, the M0 seed machine otherwise — the same machine id either
- *  way, so evidence keys and history survive the pin swap. */
+type GenNode = CanvasElement & { styleAttributes?: Record<string, unknown> };
+type GenEdge = CanvasEdge & { fromSide?: string; toSide?: string };
+
+/** The round start and end every machine shares, centred on the axis. */
+function pill(id: string, file: string, y: number): GenNode {
+  return { id, type: "file", file, x: -80, y, width: 160, height: 160, styleAttributes: { shape: "pill" } };
+}
+
+/** Which sides an arrow uses, from the boxes' relative positions — the
+ *  drawing reads top to bottom, so flow leaves a bottom and enters a top.
+ *  Declared on the edge, exactly as a person picks sides in Obsidian. */
+function sidedEdge(els: Map<string, CanvasElement>, fromId: string, toId: string, id?: string): GenEdge {
+  const a = els.get(fromId)!;
+  const b = els.get(toId)!;
+  const dy = b.y + b.height / 2 - (a.y + a.height / 2);
+  const dx = b.x + b.width / 2 - (a.x + a.width / 2);
+  const vertical = Math.abs(dy) >= Math.abs(dx);
+  const sides = vertical
+    ? dy >= 0
+      ? { fromSide: "bottom", toSide: "top" }
+      : { fromSide: "top", toSide: "bottom" }
+    : dx >= 0
+      ? { fromSide: "right", toSide: "left" }
+      : { fromSide: "left", toSide: "right" };
+  return { id: id ?? `e-${fromId}-${toId}`, fromNode: fromId, toNode: toId, ...sides };
+}
+
+/** The iteration's machine, COMPILED LIVE at call time from the pinned
+ *  COLUMN. The pin records WHICH column this iteration walks; the shape of
+ *  that column and every form in it are derived from the matrix, so a row
+ *  edited a moment ago shows on the next render — from anywhere, with nobody
+ *  standing in the machine.
+ *
+ *  THE MACHINE IS NOT STORED (owner ruling 2026-08-05). A frozen copy made
+ *  the walk hand back the OLD question after the drift had already reopened
+ *  the step for asking a new one, and a reader looking at the state saw a
+ *  form the matrix had stopped asking for.
+ *
+ *  WHAT THE ITERATION WAS JUDGED AGAINST is the pin's DEMANDS LEDGER, which
+ *  is a different record and the one the drift check reads. Freezing the
+ *  machine never served that job; the ledger always did.
+ *
+ *  The machine id is the iteration's short id either way, so evidence keys
+ *  and history survive. */
 function generateIterationWalk(root: string, it: Iteration, sid: string): GeneratedMachine {
-  let pinned: { machine?: MachineDecl } | undefined;
+  let size: string | undefined;
   try {
-    pinned = JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as { machine?: MachineDecl };
+    size = (JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as { change_size?: string }).change_size;
   } catch {
-    pinned = undefined;
+    size = undefined;
   }
-  const m: MachineDecl = pinned?.machine !== undefined ? { ...pinned.machine, id: sid } : compileM0(readRigorMatrix(root), sid);
+  const matrix = readRigorMatrix(root);
+  const walked = size !== undefined && (CHANGE_COLUMNS as readonly string[]).includes(size);
+  const m: MachineDecl = walked ? { ...compileColumn(matrix, size as ChangeColumn), id: sid } : compileM0(matrix, sid);
   return {
     decl: m,
     canvas: pinnedCanvas(m),
@@ -576,30 +717,137 @@ function generateIterationWalk(root: string, it: Iteration, sid: string): Genera
   };
 }
 
-/** A drawn view of a pinned machine: milestone columns, states stacked in
- *  reading order — generated, like every container view. */
-function pinnedCanvas(m: MachineDecl): CanvasData {
-  const cols: string[] = [];
-  for (const s of m.states) {
-    const g = s.kind === "start" ? "" : (s.group ?? "?");
-    if (!cols.includes(g)) cols.push(g);
-  }
-  const nodes: CanvasElement[] = [];
-  const edges: CanvasEdge[] = [];
-  const rows: Record<string, number> = {};
-  for (const s of m.states) {
-    const g = s.kind === "start" ? "" : (s.group ?? "?");
-    const col = cols.indexOf(g);
-    const row = rows[g] ?? 0;
-    rows[g] = row + 1;
-    nodes.push({ id: `n-${s.id}`, type: "file", file: `${s.id}.md`, x: col * 560, y: row * 260, ...nodeSize(s.id, s.statement) });
-  }
+/** In-group dependency layers: a state sits one row below its deepest
+ *  in-group predecessor; independent states share the row. */
+function groupLayers(m: MachineDecl, groupOf: (s: StateDecl) => string): Map<string, number> {
+  const byId = new Map(m.states.map((s) => [s.id, s]));
+  const preds = new Map<string, string[]>();
   for (const s of m.states) {
     for (const e of s.edges) {
-      edges.push({ id: `e-${s.id}-${e.to}`, fromNode: `n-${s.id}`, toNode: `n-${e.to}` });
+      const list = preds.get(e.to) ?? [];
+      list.push(s.id);
+      preds.set(e.to, list);
     }
   }
-  return { nodes, edges, metadata: { frontmatter: { reentry: "resume", priority: 0.2 } } };
+  const memo = new Map<string, number>();
+  const layerOf = (id: string, visiting: Set<string>): number => {
+    const hit = memo.get(id);
+    if (hit !== undefined) return hit;
+    if (visiting.has(id)) return 0;
+    visiting.add(id);
+    const s = byId.get(id);
+    let layer = 0;
+    for (const p of preds.get(id) ?? []) {
+      const ps = byId.get(p);
+      if (s !== undefined && ps !== undefined && groupOf(ps) === groupOf(s)) layer = Math.max(layer, layerOf(p, visiting) + 1);
+    }
+    visiting.delete(id);
+    memo.set(id, layer);
+    return layer;
+  };
+  for (const s of m.states) layerOf(s.id, new Set());
+  return memo;
+}
+
+const LAYOUT = { gapX: 60, gapY: 90, pad: 44, labelH: 34, groupGap: 150 } as const;
+
+interface LayoutCtx {
+  nodes: GenNode[];
+  els: Map<string, CanvasElement>;
+}
+
+/** One horizontal row of states, centred on the axis; answers its height. */
+function placeRow(ctx: LayoutCtx, row: StateDecl[], atY: number): number {
+  const sized = row.map((s) => ({
+    el:
+      s.kind === "start" || s.kind === "end" || s.kind === "terminal"
+        ? pill(`n-${s.id}`, `${s.id}.md`, atY)
+        : ({ id: `n-${s.id}`, type: "file", file: `${s.id}.md`, x: 0, y: atY, ...nodeSize(s.id, s.statement) } as GenNode),
+  }));
+  const total = sized.reduce((w, x) => w + x.el.width, 0) + LAYOUT.gapX * (sized.length - 1);
+  let x = -total / 2;
+  let tallest = 0;
+  for (const item of sized) {
+    item.el.x = x;
+    x += item.el.width + LAYOUT.gapX;
+    tallest = Math.max(tallest, item.el.height);
+    ctx.nodes.push(item.el);
+    ctx.els.set(item.el.id, item.el);
+  }
+  return tallest;
+}
+
+/** One milestone's box: its states in dependency rows, wrapped and
+ *  labelled; answers the y below the box. */
+function placeGroup(ctx: LayoutCtx, g: string, members: StateDecl[], layers: Map<string, number>, boxTop: number): number {
+  let rowY = boxTop + LAYOUT.labelH + LAYOUT.pad;
+  let minX = Number.POSITIVE_INFINITY;
+  let maxX = Number.NEGATIVE_INFINITY;
+  const depth = Math.max(...members.map((s) => layers.get(s.id) ?? 0));
+  for (let r = 0; r <= depth; r++) {
+    const row = members.filter((s) => (layers.get(s.id) ?? 0) === r);
+    if (row.length === 0) continue;
+    const tallest = placeRow(ctx, row, rowY);
+    for (const s of row) {
+      const el = ctx.els.get(`n-${s.id}`)!;
+      minX = Math.min(minX, el.x);
+      maxX = Math.max(maxX, el.x + el.width);
+    }
+    rowY += tallest + LAYOUT.gapY;
+  }
+  const boxBottom = rowY - LAYOUT.gapY + LAYOUT.pad;
+  ctx.nodes.push({
+    id: `g-${g}`,
+    type: "group",
+    label: g,
+    x: minX - LAYOUT.pad,
+    y: boxTop,
+    width: maxX - minX + LAYOUT.pad * 2,
+    height: boxBottom - boxTop,
+  });
+  return boxBottom + LAYOUT.groupGap;
+}
+
+/** A drawn view of a generated machine, top to bottom like the walk
+ *  reads: the shared start and end pills, each milestone a labelled group
+ *  box, states inside layered by dependency — independent ones side by
+ *  side — and every edge declaring its sides. */
+function pinnedCanvas(m: MachineDecl): CanvasData {
+  const groupOf = (s: StateDecl): string => (s.kind === "start" || s.kind === "end" || s.kind === "terminal" ? "" : (s.group ?? "?"));
+  const layers = groupLayers(m, groupOf);
+  const order: string[] = [];
+  for (const s of m.states) {
+    const g = groupOf(s);
+    if (g !== "" && !order.includes(g)) order.push(g);
+  }
+  const ctx: LayoutCtx = { nodes: [], els: new Map() };
+  let y = 0;
+  for (const s of m.states) {
+    if (s.kind !== "start") continue;
+    y += placeRow(ctx, [s], y) + LAYOUT.groupGap;
+  }
+  for (const g of order) {
+    y = placeGroup(
+      ctx,
+      g,
+      m.states.filter((s) => groupOf(s) === g),
+      layers,
+      y,
+    );
+  }
+  for (const s of m.states) {
+    if (s.kind !== "end" && s.kind !== "terminal") continue;
+    y += placeRow(ctx, [s], y) + LAYOUT.groupGap;
+  }
+  const { nodes, els } = ctx;
+  const edges: GenEdge[] = [];
+  for (const s of m.states) {
+    for (const e of s.edges) {
+      if (!els.has(`n-${s.id}`) || !els.has(`n-${e.to}`)) continue;
+      edges.push(sidedEdge(els, `n-${s.id}`, `n-${e.to}`, `e-${s.id}-${e.to}`));
+    }
+  }
+  return { nodes: nodes as CanvasElement[], edges, routed: true, metadata: { frontmatter: { reentry: "resume", priority: 0.2 } } };
 }
 
 /** THE ITERATION ARCHIVE, generated like the expedition archive — the

@@ -1082,13 +1082,13 @@ export function coreTools(
           // lintProse strips frontmatter before it starts.
           const lintFile = (p: string): { path: string; count: number; findings: unknown[] } => {
             const raw = readFileSync(resolveInRoot(root, p, "engine/tools.ts se_lint"), "utf8");
-            const findings: unknown[] = lintProse(root, raw).map((f) => ({ ...f, where: "body" }));
+            const findings: unknown[] = lintProse(root, raw, p).map((f) => ({ ...f, where: "body" }));
             try {
               const fm = parseStateNote(raw).frontmatter;
               for (const key of ["guidance", "statement"]) {
                 const v = fm[key];
                 if (typeof v !== "string" || v.trim() === "") continue;
-                for (const f of lintProse(root, v)) findings.push({ ...f, where: key });
+                for (const f of lintProse(root, v, p)) findings.push({ ...f, where: key });
               }
             } catch {
               /* a note that will not parse is the canvas lint's problem, not the prose lint's */
@@ -1119,7 +1119,7 @@ export function coreTools(
             });
           }
           const abs = resolveInRoot(root, p, "engine/tools.ts se_lint");
-          const findings = lintProse(root, readFileSync(abs, "utf8"));
+          const findings = lintProse(root, readFileSync(abs, "utf8"), p);
           return { path: p, findings, count: findings.length, config: LINT_CONFIG };
         }
         if (typeof args.text === "string") {
@@ -1479,7 +1479,10 @@ export function buildServer(
       const { corrected, ...op } = parseUpdate(raw);
       const visit = session.currentVisit();
       const result = session.decisions.apply(visit, op);
-      updateResult = { ...(result as unknown as Record<string, unknown>), ...(corrected !== undefined ? { corrected } : {}) };
+      // BOTH HALVES CAN CORRECT AT ONCE — the parser (a chained brief) and
+      // the apply (a closed node). Spreading would drop one silently.
+      const notes = [(result as Record<string, unknown>).corrected, corrected].filter((c): c is string => typeof c === "string");
+      updateResult = { ...(result as unknown as Record<string, unknown>), ...(notes.length > 0 ? { corrected: notes.join(" · ") } : {}) };
       log.append({ tool: "se_update", args: { via: tool, visit, ...op }, ok: true, outcome: "result", duration_ms: 0, response: result });
       toll.paid();
     } catch (e) {

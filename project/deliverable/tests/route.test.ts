@@ -136,7 +136,7 @@ test("the drawing carries the route: a spline OVER the nodes, its stops, an arro
   const s = new Session(root);
   // The projection gives the ORDERED stops. Hops running around inside one
   // state make it a WAYPOINT, which is what a submachine entered and left is.
-  const { waypoints, path } = routeOverlay(s.route("front_desk").steps, "main", s.machine.id);
+  const { waypoints, path } = routeOverlay(s.route("front_desk").steps, "");
   assert.deepEqual(path, ["start", "boot", "idle", "front_desk"]);
   assert.deepEqual([...waypoints], ["boot"], "boot is passed through, so it is a waypoint");
   const html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });

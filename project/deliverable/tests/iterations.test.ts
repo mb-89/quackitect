@@ -10,7 +10,7 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { generateIterations, generateSeeded, itPinRel, itSeed, itSeededRel, pinIteration } from "../engine/iterations.ts";
 import { type MachineDecl, validateMachine } from "../engine/machine.ts";
-import { readRigorMatrix } from "../engine/rigor-matrix.ts";
+import { type ChangeColumn, compileColumn, readRigorMatrix } from "../engine/rigor-matrix.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { call, checkDocs, freshRoot } from "./helpers.ts";
@@ -55,6 +55,40 @@ test("a seed stands in the container at once — its machine is M0", () => {
   // Not a git repo → an empty container that runs start to end.
   const empty = generateIterations(freshRoot());
   assert.deepEqual(empty.decl.states.find((s) => s.id === "start")?.edges, [{ to: "end", role: "normal" }]);
+});
+
+test("any state's form is fetchable by its machine — the walk elsewhere", () => {
+  const root = freshRoot();
+  gitInit(root);
+  const it = itSeed(root, "browse the form", "the reader fetches it from the desk");
+  const s = new Session(root);
+  // The walk stands at main; the view names the iteration's machine.
+  const f = s.formGet("onboard-retro", "i1") as { state_form?: boolean; header?: Record<string, string> };
+  assert.equal(f.state_form, true, "the viewed machine resolves the state");
+  assert.equal(f.header?.state, "i1/onboard-retro");
+  assert.ok(f.header?.level !== undefined && f.header.level !== "", "the priority wears its rung name");
+  // A save from the browse lands in the RECORD's evidence, on its branch.
+  s.formSave("onboard-retro", { current_situation: "seen from the desk" }, "human", "i1");
+  const inst = join(it.path, "project", "spec", "iterations", it.id, "evidence", "onboard-retro.md");
+  assert.ok(existsSync(inst), "the instance lives in the record's worktree");
+  assert.match(readFileSync(inst, "utf8"), /seen from the desk/);
+  // A browse-save is never stamped and a browse-submit refuses — questions
+  // are answered in order, in the state (owner ruling 2026-08-04).
+  assert.ok(!/^signed_off:/m.test(readFileSync(inst, "utf8")), "a save never stamps; submit does, and only in the state");
+  assert.throws(
+    () => s.formDone("onboard-retro", "human", "i1"),
+    (e) => /standing in/.test(JSON.stringify(e)),
+  );
+  // The checks are inputs' state: stored in the instance, alive in the
+  // fetch, travelling in the portable copy's island.
+  s.formSave("onboard-retro", { inputs_checked: "Do the survey\nRead retro" }, "human", "i1");
+  const withChecks = s.formGet("onboard-retro", "i1") as { checked?: string[] };
+  assert.deepEqual(withChecks.checked, ["Do the survey", "Read retro"], "ticked inputs round-trip");
+  assert.match(readFileSync(inst, "utf8"), /^checked: Do the survey, Read retro$/m);
+  // The portable export travels the same road, checks included.
+  const page = s.stateFormExport("onboard-retro", "i1");
+  assert.match(page, /Evidence form/);
+  assert.match(page, /"checked": \[/);
 });
 
 test("the graph is evidence: an open decision point blocks the leave form", () => {
@@ -111,22 +145,23 @@ test("the pin: the bless compiles the change size live; escalation only grows it
   const res = pinIteration(root, it, "patch") as { pinned: string; rigor_matrix_hash: string };
   assert.equal(res.pinned, "patch");
   assert.match(res.rigor_matrix_hash, /^[0-9a-f]{12}$/);
-  const pin = JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as {
-    change_size: string;
-    rigor_matrix_hash: string;
-    machine: MachineDecl;
-  };
+  const readPin = (): { change_size: string; rigor_matrix_hash: string; machine?: unknown } =>
+    JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as { change_size: string; rigor_matrix_hash: string };
+  const pin = readPin();
   assert.equal(pin.change_size, "patch");
-  validateMachine(pin.machine);
+  // THE MACHINE IS NOT STORED. The pin records which COLUMN is walked; the
+  // machine derives from it, so a matrix edit reaches the walk and the screen
+  // without anybody re-pinning. A frozen copy could only go stale.
+  assert.equal(pin.machine, undefined);
+  const column = (size: ChangeColumn): MachineDecl => compileColumn(readRigorMatrix(root), size);
+  validateMachine(column("patch"));
   // ESCALATION re-pins larger — monotonicity: every patch state survives.
-  const patchIds = pin.machine.states.map((s) => s.id);
+  const patchIds = column("patch").states.map((s) => s.id);
   pinIteration(root, it, "minor");
-  const pin2 = JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as { machine: MachineDecl };
+  assert.equal(readPin().change_size, "minor");
+  const minorIds = column("minor").states.map((s) => s.id);
   for (const id of patchIds) {
-    assert.ok(
-      pin2.machine.states.some((s) => s.id === id),
-      `${id} was filled at patch and must survive the escalation`,
-    );
+    assert.ok(minorIds.includes(id), `${id} was filled at patch and must survive the escalation`);
   }
   // DE-ESCALATION (and a same-size re-pin) refused — drift never reaches a running walk.
   assert.throws(() => pinIteration(root, it, "patch"), /ESCALATION/);
@@ -134,9 +169,8 @@ test("the pin: the bless compiles the change size live; escalation only grows it
   // product SITS ABOVE major: the first iteration of a product authors the
   // vision, the stakeholders and the actual state every later one inherits.
   pinIteration(root, it, "product");
-  const pin3 = JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as { change_size: string; machine: MachineDecl };
-  assert.equal(pin3.change_size, "product");
-  validateMachine(pin3.machine);
+  assert.equal(readPin().change_size, "product");
+  validateMachine(column("product"));
   // specification is read and validated as a column, never pinned as a walk.
   assert.throws(() => pinIteration(root, it, "specification"), /patch \| minor \| major \| product/);
 });
@@ -250,19 +284,84 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
   await session.advance(sid);
   // Entering the node descends into the iteration's OWN machine — M0.
   assert.deepEqual(session.breadcrumb(), ["main", "iterations", sid]);
+  // The METHOD guards the door (owner 2026-08-04) — the person proves by
+  // checkbox, and only then does the retro open.
+  session.humanCheck("project/guidance/method/retro.md");
   await session.advance(); // start → onboard-retro
-  await session.advance(); // onboard-retro → gate-kickoff
-  // No change_size in the record: the bless refuses, mechanically.
+  // THE EXIT IS THE HARD GATE (owner 2026-08-04): the retro's stored form
+  // must stand complete before the walk moves.
+  await assert.rejects(
+    () => session.advance(),
+    (e) => /evidence form complete/.test(JSON.stringify(e)),
+  );
+  // Multi-pass fills land in the record on the branch; completeness signs.
+  session.formSave("onboard-retro", { current_situation: "fresh root, empty inbox", field_feedback: "nothing yet" }, "human");
+  session.formSave(
+    "onboard-retro",
+    {
+      notes_drained: "- none: inbox empty",
+      call_log_mined: "- 0 calls, fresh root",
+      process_stale: "checked — nothing stale",
+      follow_up: "none",
+    },
+    "human",
+  );
+  // Complete but unsubmitted still blocks — SUBMIT is the stamping act.
+  await assert.rejects(
+    () => session.advance(),
+    (e) => /SUBMITTED/.test(JSON.stringify(e)),
+  );
+  session.formDone("onboard-retro", "human");
+  const retroForm = readFileSync(join(root, ".worktrees", id, "project", "spec", "iterations", id, "evidence", "onboard-retro.md"), "utf8");
+  assert.match(retroForm, /^signed_off: /m, "the submit stamps the claim");
+  assert.match(retroForm, /^authors: human$/m);
+  await session.advance(); // onboard-retro → gate-kickoff — the exit is open now
+  // No change_size anywhere: the bless refuses, mechanically.
   await assert.rejects(
     () => session.advance(),
     (e) => /change_size/.test(JSON.stringify(e)),
   );
-  // The prefill lands in the record; the advance is the bless — the pin
-  // fires and the machine GROWS IN PLACE during that very call. Several
-  // ways forward stand in the grown machine, so the UNNAMED advance
-  // refuses typed — and the growth has already happened when it does.
+  // A FAIL verdict is mechanical: the form never counts as met while it
+  // stands, and the problems name it.
+  session.formSave("gate-kickoff", { verdict: "fail — not yet" }, "human");
+  const failing = session.formGet("gate-kickoff") as { met?: boolean; problems?: string[] };
+  assert.equal(failing.met, false);
+  assert.ok(
+    (failing.problems ?? []).some((p) => /does not stand/.test(p)),
+    "the fail is named in the problems",
+  );
+  // The kickoff's OWN form carries the size — fill it whole, rounds
+  // included, each field in its template's shape.
+  const kickFields: Record<string, string> = {
+    current_situation: "M0 walked, inbox empty",
+    retro_drained: "- none: nothing pended",
+    goal: "walk the pinned machine",
+    pulled_in: "- none",
+    left_out: "- everything else",
+    change_size: "patch — the smallest walk proves the seam",
+    round_0_verify: "- evidence vs claims: read\n- types: green\n- lint: green\n- tests: green",
+    round_1_validate:
+      "- exercised against the goal: walked\n- missing: none\n- wrong: none\n- out of scope: none\n- prior art: none in this seam",
+    round_2_red_team: "- none => the attack found nothing",
+    verdict: "pass — the claims held",
+    follow_up: "none",
+  };
+  session.formSave("gate-kickoff", kickFields, "human");
+  session.formDone("gate-kickoff", "human");
+  // THE THUMBS: the gate's claim is stamped but unblessed — an agent below
+  // the gate's weight is refused the bless; the human's thumb opens it.
+  assert.match(JSON.stringify(session.formGet("gate-kickoff")), /"gate":true/);
+  session.setAutonomy(0.2);
+  assert.throws(
+    () => session.formBless("gate-kickoff", true, "agent"),
+    (e) => /above/.test(JSON.stringify(e)),
+  );
+  session.formBless("gate-kickoff", true, "human");
+  // The advance is the bless — the pin fires from the form and the machine
+  // GROWS IN PLACE during that very call. Several ways forward stand in
+  // the grown machine, so the UNNAMED advance refuses typed — and the
+  // growth has already happened when it does.
   const rec = join(root, ".worktrees", id, "project", "spec", "iterations", id, "record.md");
-  writeFileSync(rec, readFileSync(rec, "utf8").replace(/^status: /m, "change_size: patch\nstatus: "), "utf8");
   await assert.rejects(
     () => session.advance(),
     (e) => /named way forward/.test(JSON.stringify(e)),
@@ -271,8 +370,12 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
   assert.deepEqual(session.breadcrumb(), ["main", "iterations", sid], "the walk stands in the SAME machine");
   const grown = session.currentMachine();
   assert.equal(grown.id, sid, "the machine id is stable across the pin");
-  const pin = JSON.parse(readFileSync(join(root, ".worktrees", id, itPinRel(id)), "utf8")) as { machine: MachineDecl };
-  assert.equal(grown.states.length, pin.machine.states.length, "the machine is the pinned column now");
+  const pin = JSON.parse(readFileSync(join(root, ".worktrees", id, itPinRel(id)), "utf8")) as { change_size: ChangeColumn };
+  assert.equal(
+    grown.states.length,
+    compileColumn(readRigorMatrix(root), pin.change_size).states.length,
+    "the machine is the pinned column, compiled live from it",
+  );
   // Leaving the blessed kickoff by a NAMED edge completes it — and the
   // M0 fills carried across the swap.
   await session.advance(grown.states.find((s) => s.id === "gate-kickoff")!.edges[0].to);
@@ -307,6 +410,31 @@ test("the seed refuses a missing vision — the seed is a small form", () => {
   );
 });
 
+test("the agent's pull SERVES the reading a sub state demands — no wedge", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  const session = new Session(root);
+  await session.advance();
+  await session.advance();
+  checkDocs(session);
+  await session.advance();
+  await session.advance();
+  await session.advance();
+  session.setAutonomy(1);
+  const seeded = session.iterationSeed("serve the reading", "the pull carries the method in");
+  const sid = String(seeded.seeded).match(/^(i\d+)-/)?.[1];
+  await session.advance("iterations");
+  await session.advance(sid);
+  // Aim inside and pull as the AGENT: the answer must SERVE (read) or
+  // proceed (fill) — never repeat the entry refusal (note-a8d711a4f6f1).
+  session.setTarget(`iterations/${sid}/onboard-retro`);
+  const r = (await session.pull({}, "agent")) as { pull: string; document?: { path: string }; refusal?: unknown };
+  assert.ok(
+    r.pull === "read" || r.pull === "fill",
+    `the pull serves or proceeds, never wedges — got ${r.pull}: ${JSON.stringify(r.refusal ?? "")}`,
+  );
+});
+
 test("no gate holds the first start — entering binds, stamps started, and M0 stands", async () => {
   const root = freshRoot();
   gitInit(root);
@@ -327,6 +455,7 @@ test("no gate holds the first start — entering binds, stamps started, and M0 s
   await session.advance("iterations");
   await session.advance(sid);
   assert.deepEqual(session.breadcrumb(), ["main", "iterations", sid]);
+  session.humanCheck("project/guidance/method/retro.md");
   // The target CLEARS on the descent — when it did not, the pull answered
   // wait forever with the walk wedged at the sub's start.
   session.setTarget(`iterations/${sid}`);

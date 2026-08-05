@@ -463,9 +463,12 @@ export class Decisions {
    *  High enough that ordinary narration passes untouched. */
   private sinceResolve = 0;
   private static readonly NUDGE_AFTER = 5;
+  /** What attachTo corrected on THIS call — read once by apply(). */
+  private lastCorrection: string | undefined;
 
   apply(visit: string, u: DecisionOp): Record<string, unknown> {
     this.materialize(visit);
+    this.lastCorrection = undefined;
     switch (u.op) {
       case "plan":
         this.applyPlan(visit, u);
@@ -501,7 +504,14 @@ export class Decisions {
       this.sinceResolve >= Decisions.NUDGE_AFTER && open > 0
         ? `${this.sinceResolve} updates since anything closed, with ${open} still open — the checklist is a PROGRESS view. Close what is genuinely done on the NEXT call, not at the end.`
         : undefined;
-    return { update: u.op, active: this.activeId ?? null, open, open_nodes: openNodes, ...(nudge !== undefined ? { nudge } : {}) };
+    return {
+      update: u.op,
+      active: this.activeId ?? null,
+      open,
+      open_nodes: openNodes,
+      ...(nudge !== undefined ? { nudge } : {}),
+      ...(this.lastCorrection !== undefined ? { corrected: this.lastCorrection } : {}),
+    };
   }
 
   private applyPlan(visit: string, u: DecisionOp): void {
@@ -661,13 +671,33 @@ export class Decisions {
         source: "engine/decisions.ts update",
       });
     }
-    if (u.node !== undefined) this.activeId = this.openNode(u.node).id;
+    if (u.node !== undefined) this.activeId = this.attachTo(u.node);
     // EVERY update changes the RENDER (owner ruling 2026-07-27): the
     // brief lands as a checked point under the active node — the log
     // line and the tree always tell the same story, mechanically.
     const point = this.add(visit, this.activeId ?? null, u.brief ?? "");
     this.close(point, "done", undefined);
     this.record({ op: "update", visit, node: point.id, brief: u.brief });
+  }
+
+  /** THE NODE AN UPDATE ATTACHES TO. A node that is CLOSED or unknown is
+   *  not an AMBIGUOUS one (software.md: correct what is mechanical,
+   *  announce it, refuse only the ambiguous). Narrating on the item just
+   *  resolved is the commonest slip there is — the largest single refusal
+   *  class in the 2026-08-02 to 08-05 window, 43 of 128 failures.
+   *
+   *  So it lands on the closed item's still-open ancestor, or bare when
+   *  nothing above it is open, and the result says which happened. Only
+   *  `update` is corrected. A RESOLUTION naming a closed node still
+   *  refuses, because re-resolving is a real disagreement. */
+  private attachTo(id: string): string | undefined {
+    const named = this.nodes.get(id);
+    if (named?.status === "open") return named.id;
+    const parent = named === undefined ? undefined : this.openAncestor(named);
+    const landed = parent === undefined ? "bare" : `on its open parent ${parent}`;
+    this.lastCorrection =
+      named === undefined ? `no node ${id} — the update landed bare` : `${id} is already ${named.status} — the update landed ${landed}`;
+    return parent;
   }
 
   /** One state visit's tree, insertion-ordered — the mirror renders this.

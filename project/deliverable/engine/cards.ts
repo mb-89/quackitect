@@ -62,7 +62,7 @@ function declared(frontmatter: Record<string, unknown>): [string, string][] {
 }
 
 export function cardsPath(root: string): string {
-  return join(root, "project", "cards.md");
+  return join(root, "project", "views", "cards.md");
 }
 
 export function loadCards(root: string): Card[] {

@@ -4,27 +4,22 @@ name: onboard-retro
 statement: "Onboarding opens with the retro: the field-feedback question first, then the notes inbox drains."
 state_kind: work
 filled_by: agent
+same_as: retro
 depends_on: []
-legal_tools:
-  - se_file_read
-  - se_file_write
-  - se_file_patch
-  - se_file_search
-  - se_file_glob
-  - se_file_list
-  - se_log_query
-  - se_answer
-  - se_survey
-  - se_note_drain
 evidence:
   - name: field_feedback
     description: "what came back from the field, or an explicit \"nothing yet\""
   - name: notes_drained
-    description: "inbox count before and after, with each note's disposition"
+    description: "what happened to each pending note - built, dropped as obsolete, carried into this iteration, or parked with its ready-when"
+    template: per-item
+    items:
+      - "$inbox"
   - name: call_log_mined
-    description: "counts and rejection clauses since the last retro, with the leads drawn"
+    description: "counts and rejection clauses since the last retro, one lead per line"
+    template: list
   - name: waste_leads
     description: "rework or waste found in the record"
+    template: list
     required: false
   - name: process_stale
     description: "the standing state-of-the-art check on the process itself"
@@ -59,4 +54,4 @@ specification_note: |
 
 ## Guidance
 
-The retro method is the truth here - project/guidance/method/retro.md; do not restate it. This row adds only the seam: onboarding OPENS with the retro, the field-feedback question first, and the kickoff gate refuses while the inbox pends.
+The seam this row adds: onboarding OPENS with the retro - the field-feedback question first - and the kickoff refuses while the inbox pends. Everything else about the retro is the referenced state's truth (same_as: retro), never restated here.

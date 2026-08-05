@@ -36,6 +36,22 @@ export interface EvidenceField {
   type?: EvidenceType;
   /** One or two lines telling whoever fills it what belongs in it. */
   guidance?: string;
+  /** The table template's column names. */
+  columns?: string[];
+  /** The field's template (machines/forms/templates/<name>.md). Absent
+   *  means free-form; every referenced template is a read input. */
+  template?: string;
+  /** WHICH ITEM TYPE the references must be, for a field that points at
+   *  standing artifacts. The value names an item template
+   *  (machines/items/<of>.md), and every referenced node must declare that
+   *  same type. Absent means any typed node resolves. */
+  of?: string;
+  /** THE TEMPLATE'S ARGUMENTS — templates stay generic, the field makes
+   *  them concrete. options/passing feed choice-rationale; items feeds
+   *  per-item (the literal "$inbox" resolves to the live pending notes). */
+  options?: string[];
+  items?: string[];
+  passing?: string[];
 }
 
 /**
@@ -54,27 +70,35 @@ export interface EvidenceField {
  */
 export const STANDARD_ROUNDS: EvidenceField[] = [
   {
-    name: "verify_round",
+    name: "round_0_verify",
     description:
-      "BUILT IT RIGHT: every input state since the last gate, its evidence read against its claim. Open what the evidence points at rather than trusting its description of itself — a bless is not proof.",
+      "ROUND 0 — VERIFY: built it right. Each named check with its verdict. Open what the evidence points at; a bless is not proof.",
     required: true,
+    template: "per-item",
+    items: ["evidence vs claims", "types", "lint", "tests"],
   },
   {
-    name: "validate_round",
+    name: "round_1_validate",
     description:
-      "BUILT THE RIGHT THING: against the frame and the goal, not merely this step's own plan. List what is missing, wrong or out of scope.",
+      "ROUND 1 — VALIDATE: built the right thing. The RESULT against the goal and the frame — each named question answered. Prior art asks who else solved THIS, and what they shed.",
     required: true,
+    template: "per-item",
+    items: ["exercised against the goal", "missing", "wrong", "out of scope", "prior art"],
   },
   {
-    name: "redteam_round",
+    name: "round_2_red_team",
     description:
-      "ARGUE THE OPPOSING CASE BEFORE ENDORSING. Cite a rubric, never vibes. Name the KILL-CRITERION: what would have to be true for this to be the wrong call, then look for it. An override is logged WITH its dissent, never as a clean pass.",
+      "ROUND 2 — RED TEAM: attack the result before endorsing it. STEELMAN FIRST: argue the OPPOSING case at its strongest, the way its best advocate would. Only then attack. Name the KILL-CRITERION — what would have to be true for this to be the wrong call — and look for it.",
     required: true,
+    template: "findings",
   },
   {
     name: "verdict",
-    description: "PASS, PASS WITH NOTED OVERRIDES, or REOPEN with the named states and reasons. No silent pass.",
+    description: "The gate's ruling with its rationale. An override is logged WITH its dissent, never as a clean pass.",
     required: true,
+    template: "choice-with-rationale",
+    options: ["pass", "pass with overrides", "fail"],
+    passing: ["pass", "pass with overrides"],
   },
 ];
 
@@ -116,6 +140,12 @@ export interface StateDecl {
   exit?: Record<string, string[]>;
   /** Tags join states to guidance (the pull system's tag rule). */
   tags?: string[];
+  /** WHY the state exists — one authored line, shown on its evidence form. */
+  motivation?: string;
+  /** Declared do-inputs beyond the reading ("Do the survey | …"). */
+  inputs?: { label: string; description: string }[];
+  /** The concrete slash-name of the form's Follow-up box. */
+  follow_up_label?: string;
   /** HUMAN INVOLVEMENT (owner ruling 2026-07-26): the weight of the
    *  decision to ENTER this state, 0.01 (mechanical) .. 1 (killer). The
    *  agent may enter only when priority <= the session threshold; the
@@ -127,6 +157,10 @@ export interface StateDecl {
   legal_tools?: string[];
   /** Legal ONLY while the state's exit script stands red (repair mode). */
   repair_tools?: string[];
+  /** Set when the state IS another machine's state, by reference — a mirror
+   *  is a reference, never a copy (owner law 2026-08-04). Anything asking
+   *  WHICH state this is must follow it, not the id. */
+  same_as?: string;
   edges: EdgeDecl[];
 }
 
@@ -237,7 +271,7 @@ export type StepOutcome = "filled" | "failed";
  */
 /** The downstream cone: everything reachable from the named states. Anything
  *  downstream was derived from what is being reopened, so it cannot stand. */
-function downstreamCone(m: MachineDecl, stateIds: string[]): Set<string> {
+export function downstreamCone(m: MachineDecl, stateIds: string[]): Set<string> {
   const cone = new Set<string>(stateIds);
   let grew = true;
   while (grew) {

@@ -60,6 +60,16 @@ export interface RigorMatrixRow {
   evidence_form: EvidenceField[];
   /** Narrows what the compiled state may call. Absent means every lane tool. */
   legal_tools?: string[];
+  /** Set when the row IS another machine's state, by reference. */
+  same_as?: string;
+  /** Entry conditions inherited from the referenced state note. */
+  entry?: Record<string, string[]>;
+  /** WHY the step exists — one authored line for its evidence form. */
+  motivation?: string;
+  /** Declared do-inputs beyond the reading. */
+  inputs?: { label: string; description: string }[];
+  /** The concrete slash-name of the form's Follow-up box. */
+  follow_up_label?: string;
 }
 
 export interface RigorMatrixCell {
@@ -81,6 +91,18 @@ function asList(v: unknown): string[] {
   return [];
 }
 
+/** "label | description" lines — a state's do-inputs beyond the reading. */
+function parseDoInputs(v: unknown): { label: string; description: string }[] | undefined {
+  if (!Array.isArray(v)) return undefined;
+  const out = v.map(String).map((line) => {
+    const cut = line.indexOf("|");
+    return cut < 0
+      ? { label: line.trim(), description: "" }
+      : { label: line.slice(0, cut).trim(), description: line.slice(cut + 1).trim() };
+  });
+  return out.length > 0 ? out : undefined;
+}
+
 // Evidence lives in FRONTMATTER (owner ruling 2026-07-30): a nested YAML
 // list the form machinery consumes directly. A body "## Evidence form"
 // section is refused — one truth, no echo.
@@ -91,30 +113,36 @@ function parseEvidence(fm: Record<string, unknown>, file: string, body: string):
   const raw = fm.evidence;
   if (raw === undefined) return [];
   if (!Array.isArray(raw)) throw new Error(`matrix row ${file} evidence block is not a list`);
-  return raw.map((entry, i) => {
-    if (entry === null || typeof entry !== "object" || Array.isArray(entry)) {
-      throw new Error(`matrix row ${file} evidence entry ${i + 1} is not a mapping`);
-    }
-    const f = entry as Record<string, unknown>;
-    if (typeof f.name !== "string" || f.name.trim() === "") {
-      throw new Error(`matrix row ${file} evidence entry ${i + 1} declares no name`);
-    }
-    // An UNKNOWN type refuses rather than falling back to prose. A row that
-    // says `type: tabel` would otherwise be checked as free text forever,
-    // which is the quiet-divergence failure this repository refuses everywhere.
-    if (f.type !== undefined && !EVIDENCE_TYPES.includes(String(f.type) as EvidenceType)) {
-      throw new Error(
-        `matrix row ${file} field ${f.name}: unknown evidence type "${String(f.type)}" — one of ${EVIDENCE_TYPES.join(", ")}`,
-      );
-    }
-    return {
-      name: f.name,
-      description: typeof f.description === "string" ? f.description : "",
-      required: f.required !== false,
-      ...(f.type !== undefined ? { type: String(f.type) as EvidenceType } : {}),
-      ...(typeof f.guidance === "string" && f.guidance.trim() !== "" ? { guidance: f.guidance } : {}),
-    };
-  });
+  return raw.map((entry, i) => evidenceField(file, entry, i));
+}
+
+function evidenceField(file: string, entry: unknown, i: number): EvidenceField {
+  if (entry === null || typeof entry !== "object" || Array.isArray(entry)) {
+    throw new Error(`matrix row ${file} evidence entry ${i + 1} is not a mapping`);
+  }
+  const f = entry as Record<string, unknown>;
+  if (typeof f.name !== "string" || f.name.trim() === "") {
+    throw new Error(`matrix row ${file} evidence entry ${i + 1} declares no name`);
+  }
+  // An UNKNOWN type refuses rather than falling back to prose. A row that
+  // says `type: tabel` would otherwise be checked as free text forever,
+  // which is the quiet-divergence failure this repository refuses everywhere.
+  if (f.type !== undefined && !EVIDENCE_TYPES.includes(String(f.type) as EvidenceType)) {
+    throw new Error(`matrix row ${file} field ${f.name}: unknown evidence type "${String(f.type)}" — one of ${EVIDENCE_TYPES.join(", ")}`);
+  }
+  return {
+    name: f.name,
+    description: typeof f.description === "string" ? f.description : "",
+    required: f.required !== false,
+    ...(f.type !== undefined ? { type: String(f.type) as EvidenceType } : {}),
+    ...(typeof f.guidance === "string" && f.guidance.trim() !== "" ? { guidance: f.guidance } : {}),
+    ...(typeof f.template === "string" && f.template.trim() !== "" ? { template: f.template } : {}),
+    ...(typeof f.of === "string" && f.of.trim() !== "" ? { of: f.of.trim() } : {}),
+    ...(Array.isArray(f.options) ? { options: f.options.map(String) } : {}),
+    ...(Array.isArray(f.items) ? { items: f.items.map(String) } : {}),
+    ...(Array.isArray(f.passing) ? { passing: f.passing.map(String) } : {}),
+    ...(Array.isArray(f.columns) ? { columns: f.columns.map(String) } : {}),
+  };
 }
 
 export function matrixDir(root: string): string {
@@ -180,11 +208,34 @@ function parseMatrixRow(
     guidance: section(note.body, "Guidance"),
     evidence_form: parseEvidence(fm, file, note.body),
     legal_tools: fm.legal_tools === undefined ? undefined : asList(fm.legal_tools),
+    motivation: typeof fm.motivation === "string" ? fm.motivation : undefined,
+    inputs: parseDoInputs(fm.inputs),
+    follow_up_label: typeof fm.follow_up_label === "string" ? fm.follow_up_label : undefined,
   };
   if (row.state_kind !== "terminal" && row.evidence_form.length === 0) {
     throw new Error(`matrix row ${row.name} carries no evidence — leaving a state demands evidence; only a terminal is exempt`);
   }
+  mergeSameAs(dir, row, fm);
   return { row, fm };
+}
+
+/** A MIRROR IS A REFERENCE, NEVER A COPY (owner law 2026-08-04). A row
+ *  carrying `same_as: <state>` IS that state, standing in the walk: how it
+ *  WORKS — its tools, its guidance, its entry reading — comes from the ONE
+ *  note in machines/states/, read here so an edit there reaches both. The
+ *  row keeps only its seam: statement, evidence, dependencies, cells. */
+function mergeSameAs(dir: string, row: RigorMatrixRow, fm: Record<string, unknown>): void {
+  if (typeof fm.same_as !== "string" || fm.same_as === "") return;
+  const note = parseStateNote(readFileSync(join(dir, "..", "states", `${fm.same_as}.md`), "utf8"));
+  const nfm = note.frontmatter;
+  row.same_as = fm.same_as;
+  if (nfm.legal_tools !== undefined) row.legal_tools = asList(nfm.legal_tools);
+  if (typeof nfm.guidance === "string" && nfm.guidance !== "") row.guidance = [nfm.guidance, row.guidance].filter(Boolean).join("\n\n");
+  if (nfm.entry_read !== undefined) row.entry = { read: asList(nfm.entry_read) };
+  if (typeof nfm.motivation === "string" && nfm.motivation !== "") row.motivation = nfm.motivation;
+  if (typeof nfm.follow_up_label === "string" && nfm.follow_up_label !== "") row.follow_up_label = nfm.follow_up_label;
+  const di = parseDoInputs(nfm.inputs);
+  if (di !== undefined) row.inputs = di;
 }
 
 // A CELL IS FRONTMATTER ON ITS ROW. It used to be a file of its own, and
@@ -273,6 +324,11 @@ function rowState(row: RigorMatrixRow): Omit<StateDecl, "guidance" | "edges"> {
     // A state must declare enough to execute the remedy its own refusal hands
     // back, or SE-C-112 answers with SE-C-110 and the walk cannot recover.
     ...(row.legal_tools !== undefined ? { legal_tools: row.legal_tools } : {}),
+    ...(row.same_as !== undefined ? { same_as: row.same_as } : {}),
+    ...(row.entry !== undefined ? { entry: row.entry } : {}),
+    ...(row.motivation !== undefined ? { motivation: row.motivation } : {}),
+    ...(row.inputs !== undefined ? { inputs: row.inputs } : {}),
+    ...(row.follow_up_label !== undefined ? { follow_up_label: row.follow_up_label } : {}),
     // The walk's pin hook finds the kickoff by this tag, wherever it compiles.
     ...(row.name === "gate-kickoff" ? { tags: ["iteration-kickoff"] } : {}),
   };

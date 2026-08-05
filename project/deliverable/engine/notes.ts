@@ -29,7 +29,10 @@ export function parseStateNote(raw: string): StateNote {
     const end = lines.findIndex((l, i) => i > 0 && l.trim() === "---");
     if (end > 0) {
       const block = lines.slice(1, end).join("\n");
-      const parsed = parseYaml(block) as unknown;
+      // A person edits these files in the real world, and two engine
+      // generations may stamp the same key. The LAST value wins — a pane
+      // that dies on a YAML nit is a broken pane, not a strict one.
+      const parsed = parseYaml(block, { uniqueKeys: false }) as unknown;
       if (parsed !== null && typeof parsed === "object" && !Array.isArray(parsed)) {
         frontmatter = parsed as Record<string, unknown>;
       }

@@ -118,12 +118,15 @@ describe("it cannot outlive what granted it", () => {
 
   // An emergency that survives a restart is a gate quietly missing, and
   // nobody would know to look for it.
-  test("a new engine life starts without it", () => {
+  test("emergency survives the reload it was granted through — and a lowered dial revokes it for good", () => {
     const r = root();
     const a = new Session(r);
     a.setAutonomy(1);
     a.setEmergency(true);
-    assert.equal(new Session(r).emergency, false);
+    assert.equal(new Session(r).emergency, true, "a reload mid-session keeps the granted delegation");
+    a.setAutonomy(0.6);
+    assert.equal(new Session(r).emergency, false, "lowering the dial revokes it now");
+    assert.equal(new Session(r).emergency, false, "and in the next life too");
   });
 });
 

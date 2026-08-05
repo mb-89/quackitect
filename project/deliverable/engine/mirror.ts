@@ -19,7 +19,7 @@ import { bumpDrawingEpoch } from "./machines/compile.ts";
 import { handleHttp, type McpServer } from "./mcp.ts";
 import { loadPanel, renderPanel } from "./params.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
-import { feedRows, type MirrorState, renderMirror } from "./render.ts";
+import { ENGINE_LIFE, feedRows, type MirrorState, renderMirror } from "./render.ts";
 import { loadLevels } from "./scale.ts";
 import type { Session } from "./session.ts";
 import { survey } from "./survey.ts";
@@ -42,6 +42,9 @@ export function startMirror(o: MirrorOptions): Server {
   // which state's details are open, so a control in ANOTHER surface (the
   // sidebar's SET TARGET) can act on it. View state, like a pane size.
   let selected = "";
+  // The machine the selection was made IN — a bare state id resolves to
+  // the wrong drawing the moment the reader browses a sub-machine.
+  let selectedMachine = "";
   // The newest person-pull: the seq bumps, the ref names the log record —
   // every surface lands the answer in its details from this.
   let lastPull: { seq: number; ref: string } | undefined;
@@ -52,6 +55,8 @@ export function startMirror(o: MirrorOptions): Server {
     // Which project this server walks — an attaching shim or host refuses
     // to join a stranger's walk on a matching port.
     root: o.root,
+    // The engine life — a page holding an older stamp reloads itself.
+    build: ENGINE_LIFE,
     status: state.session.instance.status,
     // The server is going away with the walk unfinished — a quit, not an end.
     gone: state.session.serverGone,
@@ -59,6 +64,8 @@ export function startMirror(o: MirrorOptions): Server {
     emergency: state.session.emergency,
     power: state.session.power,
     active: state.session.active(),
+    // The walk's aim — a re-aim redraws the route on every open page.
+    target: state.session.target,
     busy: state.session.busy(),
     ...(state.session.progress() === undefined ? {} : { progress: state.session.progress() }),
     // A monotone change signal for the feed — the log file only grows.
@@ -150,7 +157,12 @@ export function startMirror(o: MirrorOptions): Server {
       "mirror_form_save",
       (body) => ({
         args: { name: body.name, fields: Object.keys((body.fields as object | undefined) ?? {}) },
-        result: state.session.formSave(String(body.name ?? ""), (body.fields ?? {}) as Record<string, string>),
+        result: state.session.formSave(
+          String(body.name ?? ""),
+          (body.fields ?? {}) as Record<string, string>,
+          "human",
+          String(body.machine ?? ""),
+        ),
       }),
     ],
     // THE PREFILL LAW: one confirmation per prefill — this is that click.
@@ -158,12 +170,28 @@ export function startMirror(o: MirrorOptions): Server {
       "mirror_form_confirm",
       (body) => ({
         args: { name: body.name, field: body.field, index: body.index },
-        result: state.session.formConfirm(String(body.name ?? ""), String(body.field ?? ""), Number(body.index ?? 0)),
+        result: state.session.formConfirm(
+          String(body.name ?? ""),
+          String(body.field ?? ""),
+          Number(body.index ?? 0),
+          String(body.machine ?? ""),
+        ),
       }),
     ],
     "/form/done": [
       "mirror_form_done",
-      (body) => ({ args: { name: body.name }, result: state.session.formDone(String(body.name ?? ""), "human") }),
+      (body) => ({
+        args: { name: body.name },
+        result: state.session.formDone(String(body.name ?? ""), "human", String(body.machine ?? "")),
+      }),
+    ],
+    // THE THUMBS (v1 reborn): the human's bless or dismiss on a gate's form.
+    "/form/bless": [
+      "mirror_form_bless",
+      (body) => ({
+        args: { name: body.name, ok: body.ok },
+        result: state.session.formBless(String(body.name ?? ""), body.ok === true, "human", String(body.machine ?? "")),
+      }),
     ],
     // THE PRIORITY RIDES THE NOTE (owner, 2026-08-01). The note row draws
     // a MoSCoW choice, and a capture that dropped it made every stray a
@@ -196,7 +224,13 @@ export function startMirror(o: MirrorOptions): Server {
             source: "engine/mirror.ts",
           });
         }
-        return { args: { to: selected }, result: state.session.setTarget(selected) };
+        // The selection is machine-scoped: a state picked inside a
+        // sub-machine aims THERE — "end" in i1 is iterations/i1/end,
+        // never the main machine's end. Setting over a locked target
+        // simply re-aims; the route recomputes as machines regenerate.
+        const chain = selectedMachine === "" ? [] : state.session.viewChain(selectedMachine).slice(1);
+        const to = chain.length === 0 ? selected : `${chain.join("/")}/${selected}`;
+        return { args: { to }, result: state.session.setTarget(to) };
       },
     ],
     "/escape": [
@@ -265,15 +299,33 @@ export function startMirror(o: MirrorOptions): Server {
         "mirror_select",
         (body) => {
           const s = String(body.state ?? "");
+          const m = String(body.machine ?? "");
           return {
-            args: { state: s },
+            args: { state: s, machine: m },
             run: () => {
               selected = s;
-              return { log: { selected: s }, answer: { ok: true } };
+              selectedMachine = m;
+              return { log: { selected: s, machine: m }, answer: { ok: true } };
             },
           };
         },
         (e) => ({ ok: false, error: whyOf(e) }),
+      ),
+    // THE RETURNED PORTABLE COPY lands as fills, marked imported — a
+    // claim like every fill, judged at the gate.
+    "/form/ingest": (req, res) =>
+      jsonPost(
+        req,
+        res,
+        "mirror_form_ingest",
+        (body) => ({
+          args: { name: body.name },
+          run: () => {
+            const r = state.session.stateFormIngest(String(body.name ?? ""), String(body.html ?? ""), String(body.machine ?? ""));
+            return { log: { ingested: r.ingested, author: r.author }, answer: r };
+          },
+        }),
+        (e) => (e instanceof Rejection ? e.toJSON() : { error: String(e) }),
       ),
     // THE PERSON'S PULL (owner design 2026-08-04): the same five
     // instructions the agent gets, on the human channel — no slider gate,
@@ -459,7 +511,7 @@ export function startMirror(o: MirrorOptions): Server {
       const name = url.searchParams.get("name") ?? "";
       res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
       try {
-        res.end(JSON.stringify(state.session.formGet(name)));
+        res.end(JSON.stringify(state.session.formGet(name, url.searchParams.get("machine") ?? "")));
       } catch (e) {
         res.end(JSON.stringify(e instanceof Rejection ? e.toJSON() : { error: String(e) }));
       }
@@ -468,6 +520,23 @@ export function startMirror(o: MirrorOptions): Server {
     // the details pane; there is no help button anywhere on it.
     "/base/help": (url, _req, res) => {
       json(res, helpFor(url.searchParams.get("topic") ?? ""));
+    },
+    // THE PORTABLE COPY — one self-contained HTML, downloaded to travel.
+    "/form/export": (url, _req, res) => {
+      const name = url.searchParams.get("name") ?? "";
+      let body: string;
+      try {
+        body = state.session.stateFormExport(name, url.searchParams.get("machine") ?? "");
+      } catch (e) {
+        res.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
+        res.end(e instanceof Rejection ? `${e.expected} — got ${e.got}` : String(e));
+        return;
+      }
+      res.writeHead(200, {
+        "content-type": "text/html; charset=utf-8",
+        "content-disposition": `attachment; filename="form-${name}.html"`,
+      });
+      res.end(body);
     },
     "/api/packet": (_url, _req, res) => {
       res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
@@ -564,17 +633,20 @@ export function startMirror(o: MirrorOptions): Server {
     },
   };
 
-  const WIDGETS = new Set(["machine", "details", "log", "terminal", "table"]);
+  const WIDGETS = new Set(["machine", "details", "log", "terminal", "table", "trace"]);
 
   // RENDER FIRST, THEN WRITE THE HEAD. See the note at the dispatcher's catch.
   const serveWidget = (widget: string, url: URL, res: Res): void => {
     const html = renderMirror(
       state,
-      widget as "machine" | "details" | "log" | "terminal" | "table",
+      widget as "machine" | "details" | "log" | "terminal" | "table" | "trace",
       url.searchParams.get("view") ?? undefined,
       undefined,
       url.searchParams.get("embed") === "1",
       url.searchParams.get("tv") ?? undefined,
+      url.searchParams.get("tp") ?? undefined,
+      url.searchParams.get("tt") ?? undefined,
+      url.searchParams.get("tq") ?? undefined,
     );
     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
     res.end(html);
@@ -590,6 +662,10 @@ export function startMirror(o: MirrorOptions): Server {
       url.searchParams.get("view") ?? undefined,
       url.searchParams.get("card") ?? undefined,
       url.searchParams.get("embed") === "1",
+      undefined,
+      url.searchParams.get("tp") ?? undefined,
+      url.searchParams.get("tt") ?? undefined,
+      url.searchParams.get("tq") ?? undefined,
     );
     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
     res.end(page);

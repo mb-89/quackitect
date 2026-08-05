@@ -116,16 +116,19 @@ describe("boot", { concurrency: true }, () => {
     const w = await call(server, "se_file_write", { path: "x.md", content: "hi", base_hash: null });
     assert.equal(w.isError, false);
     handOver(root); // the way out writes the next session's briefing
-    // At idle the machine OFFERS the doors; end is answered as a form.
-    const offer = await call(server, "se_pull");
-    assert.equal(offer.body.pull, "choose", JSON.stringify(offer.body));
+    // With no target, idle comes home to the desk first. The desk then waits
+    // with the live doors as options, and end is answered as a form.
+    const first = await call(server, "se_pull");
+    const offer = first.body.pull === "do" ? await call(server, "se_pull") : first;
+    assert.equal(offer.body.pull, "wait", JSON.stringify(offer.body));
     const exit = await call(server, "se_pull", { form: { choice: "end" } });
     assert.equal(exit.isError, false, JSON.stringify(exit.body));
+    const rest0 = await call(server, "se_pull");
+    const rest = rest0.body.pull === "do" ? await call(server, "se_pull") : rest0;
+    assert.equal(rest.body.pull, "wait", JSON.stringify(rest.body));
     const after = await call(server, "se_file_read", { path: "x.md" });
     assert.equal(after.isError, true);
     assert.equal(after.body.clause, "SE-C-110");
-    const rest = await call(server, "se_pull");
-    assert.equal(rest.body.pull, "wait", "a closed machine has nothing to hand out");
   });
 
   test("the gate is logged like everything else — a refused pre-boot call lands in the log", async () => {

@@ -16,19 +16,38 @@ import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { bootedServer, call, checkDocs, freshRoot } from "./helpers.ts";
+import { call, checkDocs, freshRoot, pullBoot, sessionAtIdle } from "./helpers.ts";
 
 // Concurrent: every case builds its own root and touches no global.
 describe("walk mechanics", { concurrency: true }, () => {
-  test("se_reload: refused off-idle, dry-runs its canary at idle", async () => {
+  test("se_reload: refused off-idle, dry-runs its canary at idle, free under emergency", async () => {
     const server = buildServer(freshRoot());
     const early = await call(server, "se_reload", {});
     assert.equal(early.isError, true);
     assert.equal(early.body.clause, "SE-C-110", "not legal before idle");
-    const booted = await bootedServer(freshRoot());
-    const r = await call(booted, "se_reload", {});
+
+    const idleRoot = freshRoot();
+    const idle = await sessionAtIdle(idleRoot);
+    assert.deepEqual(idle.active(), ["idle"]);
+    const r = await call(buildServer(idleRoot, idle), "se_reload", {});
     assert.equal(r.isError, false, JSON.stringify(r.body));
     assert.equal(r.body.reload, "dry");
+
+    // The boot walks THROUGH idle and rests at the front desk, so the
+    // resting place is off-idle and the gate still holds there. Emergency
+    // is the one key: repair cannot afford to walk home first.
+    const deskRoot = freshRoot();
+    const desk = new Session(deskRoot);
+    const deskServer = buildServer(deskRoot, desk);
+    await pullBoot(deskServer, desk);
+    assert.equal(desk.active()[0], "front_desk");
+    const refused = await call(deskServer, "se_reload", {});
+    assert.equal(refused.body.clause, "SE-C-110", "the desk is not idle");
+    desk.setAutonomy(1);
+    desk.setEmergency(true);
+    const armed = await call(deskServer, "se_reload", {});
+    assert.equal(armed.isError, false, JSON.stringify(armed.body));
+    assert.equal(armed.body.reload, "dry");
   });
 
   test("repair mode: a RED exit script arms the state's repair tools", async () => {

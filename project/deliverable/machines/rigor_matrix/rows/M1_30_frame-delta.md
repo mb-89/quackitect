@@ -21,7 +21,9 @@ evidence:
   - name: why_now
     description: "what matured to make the gap closable"
   - name: value_props
-    description: "the one-pagers, each with its needs and their pass lines"
+    template: refs
+    of: value-prop
+    description: "the value props this delta authors — one REFERENCE per line, and none is legal until its artifact exists"
   - name: business_case
     description: "what the effort buys, in whose currency - skip with a recorded reason where no acquirer exists"
     required: false
@@ -56,14 +58,20 @@ product_note: |
   is a standing defect the orphan check should surface.
 specification_note: |
   DOCUMENT FORM: the motivation chapter's gap and why-now as marked
-  prose; each VALUE PROP as its own DIN-A4 one-pager section (audience,
-  need, outcome, alternative, difference, validation_signal), needs as
-  need|outcome lines with pass lines attached. Needs are nodes; the
-  trace tables derive from them.
+  prose; each VALUE PROP transcluded from its own node, one DIN-A4
+  one-pager each. The props are nodes; the trace tables derive from them.
 ---
 
 ## Guidance
 
-The gap as a CLAIM: what every existing alternative sheds - only honest after the scan ([[meth-state-of-the-art]]). Then why the gap is closable now. The value props are created here: DIN-A4 one-pagers per audience (audience, need, outcome, alternative, difference, validation_signal); needs live as need|outcome lines inside them, and the SUCCESS CRITERIA live as pass lines on those needs - a criterion nothing will ever check is not a criterion. The day-to-day trace anchors at these props.
+The gap as a CLAIM: what every existing alternative sheds - only honest after the scan ([[meth-state-of-the-art]]). Then why the gap is closable now.
+
+THE VALUE PROPS ARE AUTHORED HERE, AS ARTIFACTS. Each one is a NODE in project/spec/trace/value-prop/, shaped by [[value-prop]] - statement, audience, outcome, priority, and its success criteria. They are STANDING artifacts: they outlive this iteration, land on trunk when the record closes, and a later record may change them.
+
+SO THIS FIELD CARRIES REFERENCES, NEVER PROSE. One id per line. The artifact is the truth; the form points at it. gate-motivation follows each reference and reviews the artifact itself, so a reference that resolves to nothing fails the gate.
+
+A delta may author ZERO new value props. An empty list is a claim too - one line saying none.
+
+The day-to-day trace anchors at these props: the vision is their parent, and stories, use cases and requirements hang below them.
 
 INHERIT where the frame is unchanged: reuse the resident value-props and gap, and carry only the delta's new needs and their pass lines.

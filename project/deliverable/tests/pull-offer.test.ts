@@ -47,22 +47,26 @@ describe("the batch", { concurrency: true }, () => {
 });
 
 describe("the offer", { concurrency: true }, () => {
-  test("with no target the doors are OFFERED, because that is where the machine stops deciding", async () => {
+  test("with no target away from the desk, the walk comes home first; at the desk it waits with options", async () => {
     const s = await sessionAtIdle(root());
     s.setTarget("");
+    const routed = await readEverything(s);
+    assert.equal(routed.pull, "do");
+    assert.deepEqual(s.active(), ["front_desk"]);
     const r = (await s.pull()) as Record<string, unknown>;
-    assert.equal(r.pull, "choose");
+    assert.equal(r.pull, "wait");
     const options = r.options as Record<string, unknown>[];
-    assert.ok(options.length > 1, "idle is a switchboard — it has several doors");
+    assert.ok(options.length > 1, "the desk should still surface the live doors");
     const desk = options.find((o) => o.to === "front_desk");
     assert.ok(desk !== undefined, "the front desk is one of them");
-    assert.equal(typeof desk.priority, "number", "the weight rides along, so choosing costs no second call");
+    assert.equal(typeof desk.priority, "number", "the weight rides along with the waiting options");
   });
 
   test("an option above the slider is offered as NOT open, and says who it needs", async () => {
     const s = await sessionAtIdle(root());
     s.setAutonomy(0.4);
     s.setTarget("");
+    await readEverything(s);
     const r = (await s.pull()) as Record<string, unknown>;
     const heavy = (r.options as Record<string, unknown>[]).find((o) => o.to === "overhaul");
     assert.ok(heavy !== undefined);
