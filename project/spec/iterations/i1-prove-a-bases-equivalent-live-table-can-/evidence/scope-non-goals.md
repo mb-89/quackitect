@@ -1,6 +1,7 @@
 ---
 form: scope-non-goals
-suspect: "rests on onboard-retro, gate-kickoff, frame-delta, which fell"
+by: agent
+signed_off: 2026-08-05T18:33:08.864Z
 authors: agent
 files:
 ---

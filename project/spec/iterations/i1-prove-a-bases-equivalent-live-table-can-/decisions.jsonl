@@ -149,3 +149,16 @@
 {"ts":"2026-08-05T18:27:15.583Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d7","brief":"a gate stays owed until blessed, so the bless has a carrier"}
 {"ts":"2026-08-05T18:27:51.736Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d8","brief":"the battery — the owed rule sits on every walk"}
 {"ts":"2026-08-05T18:29:32.396Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d9","brief":"775 green — landing the owed-until-blessed rule"}
+{"ts":"2026-08-05T18:30:20.619Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d10","brief":"landed — reloading so the bless is reachable"}
+{"ts":"2026-08-05T18:31:30.043Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d1","brief":"back at the kickoff gate with the bless now reachable"}
+{"ts":"2026-08-05T18:31:46.401Z","op":"plan","visit":"iterations/i1/gate-kickoff@0","parent":null,"nodes":[{"id":"d2","brief":"walk M1 to gate-motivation, re-earning frame-delta"}]}
+{"ts":"2026-08-05T18:31:52.140Z","op":"plan","visit":"iterations/i1/gate-kickoff@0","parent":null,"nodes":[{"id":"d3","brief":"walk M1 to gate-motivation and re-earn frame-delta"}]}
+{"ts":"2026-08-05T18:31:57.417Z","op":"obsolete","visit":"iterations/i1/gate-kickoff@0","node":"d2","brief":"duplicate of d3"}
+{"ts":"2026-08-05T18:32:08.016Z","op":"update","visit":"iterations/i1/draft-vision@0","node":"d4","brief":"re-attesting draft-vision — the content stands, the checks pass"}
+{"ts":"2026-08-05T18:32:41.171Z","op":"update","visit":"iterations/i1/define-actual@0","node":"d5","brief":"at frame-delta — the one claim that genuinely fell"}
+{"ts":"2026-08-05T18:32:48.338Z","op":"update","visit":"iterations/i1/frame-delta@0","node":"d6","brief":"the five references replace the prose that never was a reference list"}
+{"ts":"2026-08-05T18:33:25.970Z","op":"update","visit":"iterations/i1/scope-non-goals@0","node":"d7","brief":"arriving at gate-motivation — the bless is the owner's"}
+{"ts":"2026-08-05T18:33:32.371Z","op":"done","visit":"iterations/i1/gate-kickoff@0","node":"d3","brief":"M1 re-walked; the gate's claim is stamped and waiting on the owner"}
+{"ts":"2026-08-05T18:38:02.658Z","op":"plan","visit":"iterations/i1/gate-motivation@0","parent":null,"nodes":[{"id":"d8","brief":"one agent walks a fan leg by leg, and the join offers the legs it still needs"}]}
+{"ts":"2026-08-05T18:39:10.768Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d9","brief":"the battery — the offer and the owed rule sit on every walk"}
+{"ts":"2026-08-05T18:40:36.815Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d10","brief":"775 green — landing the fan fix"}
