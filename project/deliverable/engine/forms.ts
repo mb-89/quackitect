@@ -183,10 +183,15 @@ export function withStatus(instanceRaw: string, status: string, by: string): str
 
 /** Insert a frontmatter line after `status:` where one exists (named
  *  forms), else after `form:` (state forms carry no status). */
-const afterAnchor = (instanceRaw: string, line: string): string =>
-  /^status: .*$/m.test(instanceRaw)
-    ? instanceRaw.replace(/^status: .*$/m, (s) => `${s}\n${line}`)
-    : instanceRaw.replace(/^form: .*$/m, (s) => `${s}\n${line}`);
+const afterAnchor = (instanceRaw: string, line: string): string => {
+  if (/^status: .*$/m.test(instanceRaw)) return instanceRaw.replace(/^status: .*$/m, (s) => `${s}\n${line}`);
+  if (/^form: .*$/m.test(instanceRaw)) return instanceRaw.replace(/^form: .*$/m, (s) => `${s}\n${line}`);
+  // NEITHER ANCHOR: the stamp used to VANISH, silently, which is the worst of
+  // the three outcomes — the caller believes it stamped and the file says
+  // otherwise. The head of the frontmatter is a fine second choice.
+  if (/^---\r?\n/.test(instanceRaw)) return instanceRaw.replace(/^---\r?\n/, (s) => `${s}${line}\n`);
+  return `---\n${line}\n---\n\n${instanceRaw}`;
+};
 
 /** The claim's names: whoever writes joins `authors:`, once. */
 export function withAuthor(instanceRaw: string, author: string): string {
@@ -204,8 +209,28 @@ export function withAuthor(instanceRaw: string, author: string): string {
 
 /** The sign-off stamp — the claim's date, shown in the headline. */
 export function withSignedOff(instanceRaw: string, when: string): string {
-  if (/^signed_off: /m.test(instanceRaw)) return instanceRaw.replace(/^signed_off: .*$/m, `signed_off: ${when}`);
-  return afterAnchor(instanceRaw, `signed_off: ${when}`);
+  // Signing off IS the re-attestation, so it clears any suspect mark.
+  const raw = stripSuspect(instanceRaw);
+  if (/^signed_off: /m.test(raw)) return raw.replace(/^signed_off: .*$/m, `signed_off: ${when}`);
+  return afterAnchor(raw, `signed_off: ${when}`);
+}
+
+/** SUSPECT — v1's design, and the one this project already settled on: when an
+ *  input changes under a finished claim, the claim is MARKED, not undone.
+ *
+ *  Suspect means re-look, then re-approve. The content stays, the authorship
+ *  stays, and the reason it fell is written down so the next reader knows what
+ *  moved without going hunting.
+ *
+ *  Tearing the claim back to nothing reads as the tool undoing your work, and
+ *  it makes re-earning cost as much as starting over. */
+export function withSuspect(instanceRaw: string, why: string): string {
+  const cleared = stripSuspect(stripSignedOff(instanceRaw)).replace(/^bless:.*\n?/m, "");
+  return afterAnchor(cleared, `suspect: ${why}`);
+}
+
+export function stripSuspect(instanceRaw: string): string {
+  return instanceRaw.replace(/^suspect:.*\n?/m, "");
 }
 
 /** The ticked inputs — one line like authors, replaced whole on each save. */

@@ -10,6 +10,7 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
+import { withSuspect } from "../engine/forms.ts";
 import {
   demandsFor,
   generateIterations,
@@ -23,7 +24,6 @@ import {
   repinColumn,
 } from "../engine/iterations.ts";
 import { downstreamCone, type MachineDecl } from "../engine/machine.ts";
-import { stripFrontmatterKeys } from "../engine/notes.ts";
 import { type ChangeColumn, compileColumn, readRigorMatrix } from "../engine/rigor-matrix.ts";
 import { Session } from "../engine/session.ts";
 import { freshRoot } from "./helpers.ts";
@@ -168,7 +168,7 @@ test("a step that was never green is not painted suspect", () => {
 // A REOPENED STEP LOSES ITS STAMPS. They assert the claim STANDS, and after a
 // reopen it does not. The paint reads the file, so leaving them there kept a
 // reopened gate green — seen live on gate-motivation.
-test("a reopen strips signed_off and bless, and keeps the claim", () => {
+test("a suspect claim keeps its content, loses its stamps, and stops being green", () => {
   const { root, it } = pinned();
   const decl = { ...compileColumn(readRigorMatrix(root), SIZE), id: itShortId(it.id) };
   const gate = decl.states.find((s) => s.kind === "gate" && s.evidence_form.length > 0);
@@ -177,12 +177,13 @@ test("a reopen strips signed_off and bless, and keeps the claim", () => {
   mkdirSync(dirname(ev), { recursive: true });
   writeFileSync(ev, `---\nsigned_off: the agent\nbless: blessed by the owner\nkeep_me: yes\n---\n\nthe claim, in full\n`, "utf8");
   assert.ok(new Session(root).recordDone(decl).includes(gate.id), "green before the reopen");
-  writeFileSync(ev, stripFrontmatterKeys(readFileSync(ev, "utf8"), ["signed_off", "bless"]), "utf8");
+  writeFileSync(ev, withSuspect(readFileSync(ev, "utf8"), "the matrix moved"), "utf8");
   const after = readFileSync(ev, "utf8");
   assert.doesNotMatch(after, /^signed_off:/m, "the stamp goes");
   assert.doesNotMatch(after, /^bless:/m, "and so does the bless");
+  assert.match(after, /^suspect: the matrix moved$/m, "replaced by the mark, carrying why");
   assert.match(after, /^keep_me: yes$/m, "an unrelated key is untouched");
-  assert.match(after, /the claim, in full/, "and the claim itself stays — it is what the next walker judges");
+  assert.match(after, /the claim, in full/, "and the claim itself stays — it is re-approved, not re-written");
   assert.ok(!new Session(root).recordDone(decl).includes(gate.id), "and it is not green any more");
 });
 

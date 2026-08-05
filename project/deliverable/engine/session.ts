@@ -61,6 +61,7 @@ import {
   withFieldContent,
   withSignedOff,
   withStatus,
+  withSuspect,
 } from "./forms.ts";
 import { drainNote, pendingNotes } from "./inbox.ts";
 import {
@@ -79,7 +80,7 @@ import {
   readItRecord,
   repinColumn,
 } from "./iterations.ts";
-import { parseStateNote, section, stripFrontmatterKeys } from "./notes.ts";
+import { parseStateNote, section } from "./notes.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
@@ -893,7 +894,7 @@ export class Session {
     const known = owed.filter((id) => run.decl.states.some((s) => s.id === id));
     if (known.length === 0) return undefined;
     const { reopened, cone } = reopenStates(run.decl, run.instance, known, reason, new Date().toISOString());
-    this.unsign(run.decl, cone);
+    this.markSuspect(run.decl, cone, `${reason} — ${known.join(", ")}`);
     this.notifyChange();
     return { reopened, cone };
   }
@@ -2715,19 +2716,21 @@ export class Session {
     return join(it.path, `project/spec/iterations/${it.id}/evidence/${state}.md`);
   }
 
-  /** A REOPENED STEP LOSES ITS STAMPS (owner ruling 2026-08-05).
+  /** THE CLAIM GOES SUSPECT (v1's suspect-bless, kept).
    *
-   *  signed_off and bless are not evidence. They are the assertions that the
-   *  evidence STANDS — and after a reopen it does not, by definition.
+   *  signed_off and bless are not evidence. They assert that the evidence
+   *  STANDS — and once an input under it moved, it does not. So they come off
+   *  and a `suspect:` line goes on, carrying WHAT moved.
    *
-   *  THE CLAIM ITSELF STAYS. The next walker reads what was said last time and
-   *  judges whether it still answers the question. Deleting it would throw away
-   *  the only thing that makes re-earning cheaper than starting over.
+   *  IT IS NOT A TEARDOWN. The claim keeps its content and its authors. The
+   *  next reader re-looks and re-approves; they do not re-write. v1 recorded
+   *  the reason plainly: a silent auto-reopen reads as the tool undoing your
+   *  work.
    *
-   *  Leaving the stamps is what kept a reopened gate painted green: the paint
+   *  Leaving the stamps is what kept a reopened gate painted green — the paint
    *  reads the FILE, which outlives the engine, not the instance, which does
    *  not. */
-  private unsign(decl: MachineDecl, states: string[]): void {
+  private markSuspect(decl: MachineDecl, states: string[], why: string): void {
     const it = this.declIteration(decl);
     if (it === undefined) return;
     for (const id of states) {
@@ -2735,10 +2738,10 @@ export class Session {
       if (!existsSync(abs)) continue;
       try {
         const raw = readFileSync(abs, "utf8");
-        const next = stripFrontmatterKeys(raw, ["signed_off", "bless"]);
-        if (next !== raw) writeFileSync(abs, next, "utf8");
+        if (!/^signed_off: /m.test(raw) && !/^bless:/m.test(raw)) continue;
+        writeFileSync(abs, withSuspect(raw, why), "utf8");
       } catch {
-        // an unreadable claim has no stamp to strip
+        // an unreadable claim has no stamp to mark
       }
     }
   }
@@ -2753,6 +2756,9 @@ export class Session {
       if (!existsSync(abs)) continue;
       try {
         const fm = parseStateNote(readFileSync(abs, "utf8")).frontmatter;
+        // SUSPECT IS NOT DONE. An input moved under this claim, so it is
+        // waiting on somebody to re-look and re-approve.
+        if (typeof fm.suspect === "string") continue;
         if (typeof fm.signed_off !== "string") continue;
         if (s.kind === "gate" && !(typeof fm.bless === "string" && fm.bless.startsWith("blessed"))) continue;
         done.push(s.id);
@@ -2817,9 +2823,11 @@ export class Session {
     if (it === undefined) return;
     const moved = iterationDrift(this.root, it);
     if (moved.length === 0) return;
-    // Only what this instance still counts as done can be reopened — without
-    // this the drift fires on every pull, and the walk never leaves the step.
-    const done = new Set(run.instance.history.filter((h) => h.outcome === "filled").map((h) => h.state));
+    // ONLY A STANDING CLAIM CAN BE REOPENED, and standing is the RECORD's
+    // word, not this session's. Reading the instance's own history instead
+    // meant a drift could only ever reopen steps filled since the last engine
+    // start — so after a restart, nothing reopened at all.
+    const done = new Set(this.recordDone(run.decl));
     const owed = moved.filter((id) => done.has(id));
     if (owed.length > 0) this.rewalk({ reopened: owed }, "the rigor matrix moved under the pin");
     // CONSUME IT EITHER WAY. The walk has now seen this move, whether or not
