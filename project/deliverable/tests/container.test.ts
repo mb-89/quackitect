@@ -62,7 +62,7 @@ test("a declared root survives a bound worktree", async () => {
 // languages. The offer named "e31" while the route graph only ever holds
 // "expeditions/e31", so the choice validator accepted exactly the string the
 // router then refused as unreachable, and no answer could move the walk.
-test("a container's offered door is answerable — the agent's own path in", async () => {
+test("a container state is reachable by explicit target - the agent's own path in", async () => {
   const root = freshRoot();
   gitSeed(root);
   const s = new Session(root);
@@ -71,22 +71,13 @@ test("a container's offered door is answerable — the agent's own path in", asy
   const sid = shortId(e.created);
   s.setAutonomy(1);
   await s.advance("expeditions");
-  s.setTarget("");
-  const offer = (await s.pull()) as { pull: string; options: { to: string }[] };
-  assert.equal(offer.pull, "choose");
-  const doors = offer.options.map((o) => o.to);
-  const door = doors.find((to) => to === `expeditions/${sid}`);
-  assert.ok(door !== undefined, `the offer names ${JSON.stringify(doors)} — a door has to be said the way the router reads it`);
-  // EVERY door, not only the seeded one. An offer holding a single
-  // unanswerable option is the whole defect, whatever the option is.
-  for (const to of doors) assert.doesNotThrow(() => s.setTarget(to), `offered ${to}, then refused it`);
-  s.setTarget("");
-  await s.pull({ form: { choice: door } });
+  const door = `expeditions/${sid}`;
+  assert.doesNotThrow(() => s.setTarget(door));
   for (let i = 0; i < 3 && s.active()[0] !== `expeditions/${sid}`; i++) {
     await readEverything(s);
     await s.pull();
   }
-  assert.deepEqual(s.active(), [`expeditions/${sid}`], "answering the offer walks in");
+  assert.deepEqual(s.active(), [`expeditions/${sid}`], "the explicit target walks in");
   assert.ok(s.workRoot().includes(e.created), "and binds the worktree, exactly as the click does");
 });
 
@@ -206,18 +197,18 @@ test("a closed record leaves no phantom door: what the pull offers, the walk can
 
   s.setAutonomy(1);
   s.setTarget("");
+  const routed = await readEverything(s);
+  assert.equal(routed.pull, "do", "with no target, a finished container comes home to the desk first");
+  assert.deepEqual(s.active(), ["front_desk"]);
   const r = (await s.pull()) as Record<string, unknown>;
-  assert.equal(r.pull, "choose", "the container's end is a door, not a dead end");
+  assert.equal(r.pull, "wait");
   const options = r.options as Record<string, unknown>[];
-  assert.ok(options.length > 0, "an end inside a container can always be left");
+  assert.ok(options.length > 0, "the desk surfaces the live doors after the return");
   assert.equal(
     options.some((o) => String(o.to).includes(sid)),
     false,
     "the archived record is gone from the offer",
   );
-  // The proof of the law: taking an offered door is never refused.
-  const pick = options.find((o) => o.open === true) ?? options[0];
-  await s.pull({ form: { choice: String(pick.to) } });
 });
 
 test("the archive: start reaches every closed expedition, each runs to end, browsing is human-only", async () => {
@@ -278,3 +269,5 @@ test("forms are viewable unbound: formGet returns the template preview", () => {
   assert.equal(f.met, false);
   assert.ok(f.fields.length >= 4, "the template's fields ride the preview");
 });
+
+

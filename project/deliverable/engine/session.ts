@@ -1747,6 +1747,9 @@ export class Session {
    *  no second call. */
   private pullOptions(): Record<string, unknown>[] {
     const { machine, ids } = this.leaves();
+    if (this._target === "" && !this.inSub() && ids.length === 1 && ids[0] === "front_desk") {
+      return this.optionsAt(this.machine, "idle");
+    }
     return ids.flatMap((id) => this.optionsAt(machine, id));
   }
 
@@ -1802,10 +1805,13 @@ export class Session {
     // ONE DRAWING VALIDATION PER WALK STEP — the epoch makes "the next
     // call" the unit of the read-it-live law (see machines/compile.ts).
     bumpDrawingEpoch();
+    const pullTarget = this._target === "" && this.active()[0] !== undefined && this.active()[0] !== "front_desk"
+      ? "front_desk"
+      : this._target;
     const head = (): Record<string, unknown> => ({
       where: this.active(),
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
-      target: this._target,
+      target: pullTarget,
       autonomy: this._autonomy,
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
     });
@@ -1845,36 +1851,32 @@ export class Session {
         ...head(),
         for: standingForm,
         forms: [this.formGet(standingForm)],
-        do: 'work the state, then return fills on the next pull as form: {"<section>": "<text>"} — multi-pass is fine; finish with {"submit": true}: the submit checks the fields and stamps the claim',
+        do: 'work the state, then return fills on the next pull as form: {"<section>": "<text>"} - multi-pass is fine; finish with {"submit": true}: the submit checks the fields and stamps the claim',
         ...extra(),
       };
     }
 
-    // 1. NO TARGET means the machine is not trying to get anywhere. The
-    //    doors are the offer; with none open, the work is the person's.
-    if (this._target === "") {
+    // 1. NO TARGET at the front desk means nothing is owed here. The
+    //    doors ride along as options, but the machine does not pick one. Anywhere
+    //    else, no-target work comes home to the desk first.
+    if (pullTarget === "") {
       const options = this.pullOptions();
-      if (options.length > 0) {
-        return {
-          pull: "choose",
-          ...head(),
-          options,
-          do: 'pick one and return it on the next pull as form: {"choice": "<to>"} — a LIST is legal where the work fans out',
-          ...extra(),
-        };
-      }
       return {
         pull: "wait",
         ...head(),
+        ...(options.length > 0 ? { options } : {}),
         waiting_for: "the person",
-        do: "say plainly that nothing is owed and STOP — the slider alone cannot wake you, so ask them to message you",
+        do:
+          options.length > 0
+            ? "say plainly that nothing is owed here and STOP - options are available, but do not take one unless a goal is set or the person routes it"
+            : "say plainly that nothing is owed and STOP - the slider alone cannot wake you, so ask them to message you",
         ...extra(),
       };
     }
 
     let r: ReturnType<Session["route"]>;
     try {
-      r = this.route(this._target);
+      r = this.route(pullTarget);
     } catch (e) {
       if (!(e instanceof Rejection)) throw e;
       return {
@@ -1947,7 +1949,7 @@ export class Session {
     // 5. THE HAPPY PATH, WALKED. Not one hop — every hop to the next
     //    branching point, because start-to-front-desk has no branch in it
     //    and should never cost a round trip per hop.
-    const swept = await this.sweep(this._target, channel);
+    const swept = await this.sweep(pullTarget, channel);
     return this.pullAfterSweep(swept, head, extra);
   }
 
@@ -4047,3 +4049,5 @@ export class Session {
     };
   }
 }
+
+

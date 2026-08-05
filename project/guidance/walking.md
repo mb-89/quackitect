@@ -4,9 +4,16 @@
      assembles this file verbatim into the prompt layer. No LLM stands in that
      path. Edit the rule here. -->
 
-One verb drives the walk: `se_pull`. Pull, do what comes back, pull again. The
-machine owns every decision about the walk — the route, the hop, the proof,
-the position.
+One verb drives the walk: `se_pull`.
+
+Pull, do what comes back, pull again.
+
+Without a routed goal, staying in the current state is valid progress.
+
+A no-goal pull should report there is nothing to do here and show options.
+
+The machine owns every decision about the walk — the route, the hop, the
+proof, the position.
 
 ## The pull
 
@@ -20,13 +27,15 @@ names which of five you got.
   as `form` on the next pull. THERE IS NO SUBMIT: the pull carrying the form
   is the submit.
 - `choose` — the road splits; the options ride along with weight and
-  openness. Answer `form: {"choice": "<to>"}`. A LIST is legal where work fans
-  out; one is walked, the rest come back as `not_walked`. You never choose
-  unasked.
+  openness. Answer `form: {"choice": "<to>"}` only when a routed goal needs
+  that door. A LIST is legal where work fans out; one is walked, the rest
+  come back as `not_walked`. You never choose unasked, and you do not choose
+  just because options were offered.
 - `do` — the happy path was walked for you, every hop to the next branching
   point. `here` is where you landed. Do the work, pull again.
 - `wait` — out of work, or the next step outweighs the slider. Name the
-  waiting step plainly, then STOP (contract rule 3).
+  waiting step plainly, then STOP (contract rule 3). If the work is done,
+  stop pulling.
 
 BLOCKING IS AN INSTRUCTION, NOT AN ERROR. A threshold, an unmet condition, an
 undrawn route: the pull says so instead of throwing. What stays a refusal is
