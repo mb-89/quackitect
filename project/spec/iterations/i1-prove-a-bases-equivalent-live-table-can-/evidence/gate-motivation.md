@@ -1,6 +1,7 @@
 ---
 form: gate-motivation
-suspect: "rests on onboard-retro, gate-kickoff, frame-delta, which fell"
+by: agent
+signed_off: 2026-08-05T18:43:47.126Z
 authors: agent
 files:
 ---
@@ -42,10 +43,10 @@ The register stands typed and signed: eight entries in the six-column table — 
 
 ## round_0_verify
 
-- evidence vs claims: every packet field read back from its signed form; every external citation resolves to a reference note under spec/references
-- types: green — tsc clean at 0d6fe43
-- lint: green — biome clean at the commit hook through today's seven commits
-- tests: green — 57 of 57 scoped at 0d6fe43, and the full battery 733 of 733 earlier today
+- evidence vs claims: every packet field read back from its signed form; the five value props resolve as references and each answers the value-prop template
+- types: green — tsc clean at the landing commit
+- lint: green — biome clean through today's commits
+- tests: green — 775 of 775, preflight green, at 641c0c3
 
 ## round_1_validate
 

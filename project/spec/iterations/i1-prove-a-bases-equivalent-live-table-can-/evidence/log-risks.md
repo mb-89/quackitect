@@ -1,6 +1,7 @@
 ---
 form: log-risks
-suspect: "rests on onboard-retro, gate-kickoff, frame-delta, which fell"
+by: agent
+signed_off: 2026-08-05T18:42:46.645Z
 authors: agent
 files:
 ---

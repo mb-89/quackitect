@@ -10,7 +10,7 @@
 // State is in-memory: a server restart mid-session drops back to start, and
 // the next refused call's remedy re-boots the agent in one turn.
 import { existsSync, mkdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, relative, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
 import {
@@ -96,6 +96,7 @@ import {
   templateProblems,
 } from "./stateform.ts";
 import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
+import { loadTrace } from "./trace.ts";
 import { type Expedition, expClose, expFind, expList, expNew, readRecord } from "./worktree.ts";
 
 /** THE PULL is the machinery — one verb, legal in EVERY state: the agent
@@ -2692,6 +2693,20 @@ export class Session {
     };
   }
 
+  /** Every trace node's id against the path that holds it, root-relative —
+   *  what a surface needs to turn a reference into something clickable. */
+  private refPaths(): Record<string, string> {
+    const out: Record<string, string> = {};
+    try {
+      for (const n of loadTrace(this.root)) {
+        if (n.file !== undefined) out[n.id] = relative(this.root, n.file).split(sep).join("/");
+      }
+    } catch {
+      // no corpus, no links — the ids still read
+    }
+    return out;
+  }
+
   stateFormGet(name: string, m: MachineDecl = this.currentMachine()): Record<string, unknown> {
     const s = this.stateFormState(name, m);
     const h = this.stateFormHome(name, m);
@@ -2718,6 +2733,10 @@ export class Session {
     return {
       state_form: true,
       ...model,
+      // A REFERENCE IS AN ADDRESS, so the surface can open it. Without the
+      // path the reader sees an id and has to go hunting for the file it
+      // names, which is the whole reason references were hard to review.
+      ref_paths: this.refPaths(),
       machine: m.id,
       checked: this.stateFormChecked(raw),
       active: this.stateFormActive(name, m),
