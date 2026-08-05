@@ -169,3 +169,9 @@
 {"ts":"2026-08-05T18:43:32.117Z","op":"done","visit":"iterations/i1/draft-vision@0","node":"d3","brief":"pressure-test filled and signed — the fan fix fetched the leg"}
 {"ts":"2026-08-05T18:43:46.929Z","op":"done","visit":"iterations/i1/draft-vision@0","node":"d4","brief":"the gate is stamped and waiting on the owner's bless"}
 {"ts":"2026-08-05T18:43:55.593Z","op":"plan","visit":"iterations/i1/gate-motivation@0","parent":null,"nodes":[{"id":"d6","brief":"commit the walked record"}]}
+{"ts":"2026-08-05T18:44:01.774Z","op":"done","visit":"iterations/i1/gate-motivation@0","node":"d6","brief":"the record is committed on the iteration branch"}
+{"ts":"2026-08-05T18:53:17.216Z","op":"plan","visit":"iterations/i1/gate-motivation@0","parent":null,"nodes":[{"id":"d7","brief":"a reference in a form is a link that opens the artifact in the editor"}]}
+{"ts":"2026-08-05T18:55:40.311Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d8","brief":"the form carries what each reference resolves to"}
+{"ts":"2026-08-05T18:56:10.107Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d9","brief":"the row draws the link and the click reaches the host"}
+{"ts":"2026-08-05T18:56:27.416Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d10","brief":"the battery — the form model gained a field on every surface"}
+{"ts":"2026-08-05T18:57:47.249Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d11","brief":"775 green — landing the reference links"}

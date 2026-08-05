@@ -1624,7 +1624,7 @@ function sfOne(f, fl) {
   (fl.prefills || []).forEach(function (p, i) {
     s += '<div class="prefill"><div class="comment-text">prefill — unconfirmed:</div><div>' + escText(p) + '</div><button class="primary confirmpre" data-form="' + name + '" data-machine="' + escText(f.machine || "") + '" data-field="' + escText(fl.name) + '" data-index="' + i + '">confirm</button></div>';
   });
-  s += sfEditor(fl, tm, args) + "</div>";
+  s += sfEditor(fl, tm, args, f.ref_paths || {}) + "</div>";
   return s;
 }
 // THE EDITOR IS THE TEMPLATE'S SHAPE (owner ruling 2026-08-04): a list
@@ -1634,11 +1634,18 @@ function sfOne(f, fl) {
 function sfDash(c) {
   return (c || "").split("\\n").map(function (l) { return l.trim(); }).filter(function (l) { return l.indexOf("- ") === 0; }).map(function (l) { return l.slice(2); });
 }
-function sfEditor(fl, tm, args) {
+function sfEditor(fl, tm, args, paths) {
   const name = escText(fl.name);
   const ph = escText(tm.placeholder || "");
   if (tm.editor === "list") {
-    return '<div class="sfrows">' + sfDash(fl.content).concat([""]).map(function (v) { return '<div class="sfrow"><input class="sfli" data-field="' + name + '" placeholder="' + ph + '" value="' + escText(v) + '">' + sfRowBtns() + "</div>"; }).join("") + "</div>";
+    // A REFERENCE IS AN ADDRESS, so it opens. Reading a reference list meant
+    // reading ids and then going to find the files they name by hand, which
+    // is exactly the work the reference was supposed to save.
+    const link = function (v) {
+      const p = tm.resolves === "artifact" && paths ? paths[v.replace(/^\\[\\[|\\]\\]$/g, "")] : null;
+      return p ? '<a class="doclink openref" data-path="' + escText(p) + '" title="open ' + escText(p) + '">open</a>' : "";
+    };
+    return '<div class="sfrows">' + sfDash(fl.content).concat([""]).map(function (v) { return '<div class="sfrow"><input class="sfli" data-field="' + name + '" placeholder="' + ph + '" value="' + escText(v) + '">' + link(v) + sfRowBtns() + "</div>"; }).join("") + "</div>";
   }
   if (tm.editor === "per-item" && (args.items || []).length > 0) {
     return '<div class="sfrows">' + args.items.map(function (it) {
@@ -1879,6 +1886,14 @@ document.addEventListener("click", async (ev) => {
   }
   const ofo = ev.target.closest ? ev.target.closest(".openfolder") : null;
   if (ofo) { await formPost("/form/folder", { name: ofo.dataset.form }); return; }
+  // THE ARTIFACT OPENS WHERE IT IS EDITED. Inside the editor the host owns
+  // the file; standing alone, the details pane renders it instead.
+  const orf = ev.target.closest ? ev.target.closest(".openref") : null;
+  if (orf) {
+    if (window.parent !== window) window.parent.postMessage({ se: "open", path: orf.dataset.path }, "*");
+    else await openDoc(orf.dataset.path, "comment");
+    return;
+  }
 });
 
 async function openDoc(path, returnKey) {
