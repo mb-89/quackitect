@@ -1,5 +1,6 @@
 ---
 form: gate-motivation
+bless: blessed by human
 by: agent
 signed_off: 2026-08-05T18:43:47.126Z
 authors: agent

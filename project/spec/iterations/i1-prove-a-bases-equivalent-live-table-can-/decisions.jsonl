@@ -175,3 +175,16 @@
 {"ts":"2026-08-05T18:56:10.107Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d9","brief":"the row draws the link and the click reaches the host"}
 {"ts":"2026-08-05T18:56:27.416Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d10","brief":"the battery — the form model gained a field on every surface"}
 {"ts":"2026-08-05T18:57:47.249Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d11","brief":"775 green — landing the reference links"}
+{"ts":"2026-08-05T18:58:04.069Z","op":"done","visit":"iterations/i1/gate-motivation@0","node":"d7","brief":"a reference is clickable and opens its file in the editor"}
+{"ts":"2026-08-05T19:04:14.394Z","op":"update","visit":"iterations/i1/start@0","node":"d6","brief":"bringing the link fix into the worktree before walking"}
+{"ts":"2026-08-05T19:06:32.656Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d7","brief":"the slider moved — walking on to the gate"}
+{"ts":"2026-08-05T19:07:19.407Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d8","brief":"at the gate — checking whether the claim still stands"}
+{"ts":"2026-08-05T19:07:25.349Z","op":"done","visit":"front_desk@0","node":"d2","brief":"the gate stands stamped and unblessed"}
+{"ts":"2026-08-05T19:07:31.003Z","op":"plan","visit":"iterations/i1/gate-motivation@0","parent":null,"nodes":[{"id":"d9","brief":"commit the walk's trail"}]}
+{"ts":"2026-08-05T19:07:35.989Z","op":"done","visit":"iterations/i1/gate-motivation@0","node":"d9","brief":"the trail is committed"}
+{"ts":"2026-08-05T19:11:04.188Z","op":"plan","visit":"iterations/i1/gate-motivation@0","parent":null,"nodes":[{"id":"d10","brief":"find why the bless does not stick"}]}
+{"ts":"2026-08-05T19:13:50.432Z","op":"done","visit":"iterations/i1/gate-motivation@0","node":"d10","brief":"the copy came from guessing the surface; it re-renders in place now"}
+{"ts":"2026-08-05T19:13:57.422Z","op":"plan","visit":"iterations/i1/gate-motivation@0","parent":null,"nodes":[{"id":"d11","brief":"confetti on the bless, and the form re-renders where it stands"}]}
+{"ts":"2026-08-05T19:14:11.484Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d12","brief":"the battery — the page script must still parse"}
+{"ts":"2026-08-05T19:15:50.314Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d13","brief":"the battery again after dropping the hardcoded colour"}
+{"ts":"2026-08-05T19:17:11.012Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d14","brief":"775 green — committing"}
