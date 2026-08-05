@@ -9,3 +9,107 @@
 {"ts":"2026-08-04T16:18:49.431Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d17","brief":"the retro form fills in one pass"}
 {"ts":"2026-08-04T16:19:52.623Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d18","brief":"the kickoff brief fills whole"}
 {"ts":"2026-08-04T16:20:11.173Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d19","brief":"the bless lands and the pin should fire"}
+{"ts":"2026-08-04T16:21:16.318Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d20","brief":"the worktree gets its toolchain for the pin commit"}
+{"ts":"2026-08-04T16:21:53.616Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d21","brief":"the pin landed; naming the grown states"}
+{"ts":"2026-08-04T16:22:34.114Z","op":"done","visit":"start@0","node":"d4","brief":"shipped and reloaded by the owner's own restart"}
+{"ts":"2026-08-04T16:22:59.333Z","op":"done","visit":"start@0","node":"d5","brief":"the product column stands pinned; the gate waits on the thumb"}
+{"ts":"2026-08-04T17:10:34.888Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d7","brief":"the retro form takes the two new notes and resubmits"}
+{"ts":"2026-08-04T17:11:41.267Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d8","brief":"the form takes the three new rows and sheds its stamp"}
+{"ts":"2026-08-04T17:14:52.598Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d9","brief":"the stamp lands by hand where the pull's submit cannot"}
+{"ts":"2026-08-04T17:15:44.451Z","op":"done","visit":"front_desk@0","node":"d3","brief":"the walk stands at the gate with both forms current and stamped"}
+{"ts":"2026-08-04T17:23:12.950Z","op":"plan","visit":"iterations/i1/onboard-retro@0","parent":null,"nodes":[{"id":"d1","brief":"the retro form covers the newest note"},{"id":"d2","brief":"the target change redraws the viewed machine"},{"id":"d3","brief":"one here-marker, in the walk's own view only"},{"id":"d4","brief":"tests then commit then the owner restarts and blesses"}]}
+{"ts":"2026-08-04T17:23:22.649Z","op":"done","visit":"iterations/i1/onboard-retro@0","node":"d1","brief":"the row is in and the stamp stands"}
+{"ts":"2026-08-04T17:28:42.347Z","op":"done","visit":"iterations/i1/onboard-retro@0","node":"d2","brief":"committed and battery-proven; shows after the engine restart"}
+{"ts":"2026-08-04T17:28:46.840Z","op":"done","visit":"iterations/i1/onboard-retro@0","node":"d3","brief":"committed and battery-proven; shows after the engine restart"}
+{"ts":"2026-08-04T17:45:24.373Z","op":"plan","visit":"iterations/i1/draft-vision@0","parent":null,"nodes":[{"id":"d1","brief":"the fan design settles: derived symbols"},{"id":"d2","brief":"AND default"},{"id":"d3","brief":"v2 busbars"}]}
+{"ts":"2026-08-04T17:45:36.216Z","op":"done","visit":"iterations/i1/draft-vision@0","node":"d1","brief":"the settled design stands as note-bb6d1cb6b75d"}
+{"ts":"2026-08-04T17:45:40.494Z","op":"obsolete","visit":"iterations/i1/draft-vision@0","node":"d2","brief":"a splinter of the same note, not its own work item"}
+{"ts":"2026-08-04T17:45:46.887Z","op":"obsolete","visit":"iterations/i1/draft-vision@0","node":"d3","brief":"a splinter of the same note, not its own work item"}
+{"ts":"2026-08-04T17:47:31.069Z","op":"update","visit":"iterations/i1/draft-vision@0","node":"d4","brief":"the venn passages are extracted windowed from the v1 transcripts"}
+{"ts":"2026-08-04T17:49:44.601Z","op":"update","visit":"iterations/i1/draft-vision@0","node":"d5","brief":"the cowork question is answered: extraction needed, local archive lacks it"}
+{"ts":"2026-08-04T18:16:19.169Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d13","brief":"the retro form takes four new rows through the fixed submit"}
+{"ts":"2026-08-04T18:16:36.096Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d14","brief":"the gate rows go in by hand so the bless survives"}
+{"ts":"2026-08-04T18:17:18.430Z","op":"done","visit":"start@0","node":"d1","brief":"the corpus is in the head; the venn found authored in the sebot vault"}
+{"ts":"2026-08-04T18:17:30.980Z","op":"done","visit":"start@0","node":"d9","brief":"arrived; both new form laws exercised live on the way"}
+{"ts":"2026-08-04T18:20:05.321Z","op":"update","visit":"iterations/i1/draft-vision@0","node":"d15","brief":"the InfoQ piece is read before the answer is recorded"}
+{"ts":"2026-08-04T18:38:29.675Z","op":"done","visit":"front_desk@0","node":"d3","brief":"standing at draft-vision; the link ruling is filed"}
+{"ts":"2026-08-04T18:45:00.715Z","op":"plan","visit":"iterations/i1/draft-vision@0","parent":null,"nodes":[{"id":"d9","brief":"the v1 reference system is looked up"},{"id":"d10","brief":"the reference-note ruling and lint are filed"},{"id":"d11","brief":"the four vision fills land in the form as a draft"}]}
+{"ts":"2026-08-04T18:45:58.656Z","op":"done","visit":"iterations/i1/draft-vision@0","node":"d9","brief":"v1's reference law found verbatim and carried over"}
+{"ts":"2026-08-04T18:46:14.901Z","op":"update","visit":"iterations/i1/draft-vision@0","node":"d12","brief":"the four fills land as a draft, unsigned for the redline"}
+{"ts":"2026-08-04T18:46:25.557Z","op":"done","visit":"iterations/i1/draft-vision@0","node":"d10","brief":"both rulings filed as notes for the build queue"}
+{"ts":"2026-08-04T18:46:37.193Z","op":"done","visit":"iterations/i1/draft-vision@0","node":"d11","brief":"the draft stands unsigned in the form for the redline"}
+{"ts":"2026-08-04T18:51:24.671Z","op":"plan","visit":"iterations/i1/draft-vision@0","parent":null,"nodes":[{"id":"d13","brief":"the three fields recenter on input"},{"id":"d14","brief":"architecture"},{"id":"d15","brief":"then the free agent"}]}
+{"ts":"2026-08-04T18:51:31.790Z","op":"done","visit":"iterations/i1/draft-vision@0","node":"d13","brief":"the recentered draft is saved in the form"}
+{"ts":"2026-08-04T18:51:36.900Z","op":"obsolete","visit":"iterations/i1/draft-vision@0","node":"d14","brief":"a splinter of the same brief, not its own item"}
+{"ts":"2026-08-04T18:51:41.600Z","op":"obsolete","visit":"iterations/i1/draft-vision@0","node":"d15","brief":"a splinter of the same brief, not its own item"}
+{"ts":"2026-08-04T18:56:43.561Z","op":"update","visit":"iterations/i1/draft-vision@0","node":"d16","brief":"the fields generalize past software to technology"}
+{"ts":"2026-08-04T19:05:19.734Z","op":"plan","visit":"iterations/i1/draft-vision@0","parent":null,"nodes":[{"id":"d17","brief":"draft-vision fills and submits on the approved texts"},{"id":"d18","brief":"the steelman and prior-art notes are filed"},{"id":"d19","brief":"the walk enters define-actual and drafts its fills"}]}
+{"ts":"2026-08-04T19:05:30.657Z","op":"done","visit":"iterations/i1/draft-vision@0","node":"d17","brief":"submitted and stamped; the packet stands"}
+{"ts":"2026-08-04T19:05:37.731Z","op":"done","visit":"iterations/i1/draft-vision@0","node":"d18","brief":"both notes stand in the inbox"}
+{"ts":"2026-08-04T19:06:18.848Z","op":"update","visit":"iterations/i1/define-actual@0","node":"d20","brief":"the as-is drafts in three blocks, witnesses named"}
+{"ts":"2026-08-04T19:06:50.028Z","op":"plan","visit":"iterations/i1/define-actual@0","parent":null,"nodes":[{"id":"d21","brief":"the v1 reference notes are harvested"},{"id":"d22","brief":"the references folder lands with the evidence set"},{"id":"d23","brief":"the as-is witnesses cite the notes"},{"id":"d24","brief":"the lint stays queued for the engine bundle"}]}
+{"ts":"2026-08-04T19:07:12.265Z","op":"done","visit":"iterations/i1/define-actual@0","node":"d21","brief":"six v1 notes harvested for carrying over"}
+{"ts":"2026-08-04T19:09:08.509Z","op":"done","visit":"iterations/i1/define-actual@0","node":"d22","brief":"thirteen notes stand under spec/references"}
+{"ts":"2026-08-04T19:09:23.558Z","op":"done","visit":"iterations/i1/define-actual@0","node":"d23","brief":"every big claim now cites a reference note"}
+{"ts":"2026-08-04T19:09:29.087Z","op":"done","visit":"iterations/i1/define-actual@0","node":"d24","brief":"the lint rides the ruled note; it needs the unbound tree"}
+{"ts":"2026-08-04T19:13:44.495Z","op":"update","visit":"iterations/i1/define-actual@0","node":"d25","brief":"Boehm joins the references as the cost-curve witness"}
+{"ts":"2026-08-04T19:14:18.204Z","op":"update","visit":"iterations/i1/define-actual@0","node":"d26","brief":"the pin's as-is field gets the world-not-us guidance"}
+{"ts":"2026-08-04T19:14:32.930Z","op":"plan","visit":"iterations/i1/define-actual@0","parent":"d19","nodes":[{"id":"d27","brief":"the as-is reworks: world only"},{"id":"d28","brief":"Boehm cited"},{"id":"d29","brief":"no dates"}]}
+{"ts":"2026-08-04T19:14:46.400Z","op":"done","visit":"iterations/i1/define-actual@0","node":"d27","brief":"the reworked as-is is saved for the redline"}
+{"ts":"2026-08-04T19:14:51.909Z","op":"obsolete","visit":"iterations/i1/define-actual@0","node":"d28","brief":"a splinter of the same brief"}
+{"ts":"2026-08-04T19:14:57.490Z","op":"obsolete","visit":"iterations/i1/define-actual@0","node":"d29","brief":"a splinter of the same brief"}
+{"ts":"2026-08-04T19:17:38.106Z","op":"done","visit":"iterations/i1/draft-vision@0","node":"d19","brief":"define-actual submits on the approved world-only as-is"}
+{"ts":"2026-08-04T19:18:31.749Z","op":"plan","visit":"iterations/i1/frame-delta@0","parent":null,"nodes":[{"id":"d30","brief":"frame-delta drafts and saves for the redline"},{"id":"d31","brief":"the walk covers log-risks on the fan's other branch"}]}
+{"ts":"2026-08-04T19:21:10.560Z","op":"update","visit":"iterations/i1/frame-delta@0","node":"d32","brief":"the founding note sheds the predecessor's name"}
+{"ts":"2026-08-04T19:21:21.602Z","op":"update","visit":"iterations/i1/frame-delta@0","node":"d33","brief":"the signed as-is re-cites the renamed note, stamp kept"}
+{"ts":"2026-08-04T19:21:34.661Z","op":"update","visit":"iterations/i1/frame-delta@0","node":"d34","brief":"the redlined frame-delta submits"}
+{"ts":"2026-08-04T19:21:50.407Z","op":"done","visit":"iterations/i1/frame-delta@0","node":"d30","brief":"frame-delta signed; the predecessor's name scrubbed everywhere"}
+{"ts":"2026-08-04T19:22:06.029Z","op":"update","visit":"iterations/i1/scope-non-goals@0","node":"d35","brief":"scope and non-goals draft straight from the signed delta"}
+{"ts":"2026-08-04T19:25:50.677Z","op":"update","visit":"iterations/i1/scope-non-goals@0","node":"d36","brief":"the scope fields get the corpus guidance they were written from"}
+{"ts":"2026-08-04T19:25:58.946Z","op":"update","visit":"iterations/i1/scope-non-goals@0","node":"d37","brief":"scope and non-goals carry their sources in the pin"}
+{"ts":"2026-08-04T19:29:00.857Z","op":"plan","visit":"iterations/i1/gate-motivation@0","parent":null,"nodes":[{"id":"d38","brief":"a gate's submit refuses while any feeder form is unsigned"},{"id":"d39","brief":"the route draws the AND cover into a busbar with its icons"},{"id":"d40","brief":"tests then commit then the owner reconnects"},{"id":"d41","brief":"the walk returns to the gate"}]}
+{"ts":"2026-08-04T19:35:32.953Z","op":"plan","visit":"iterations/i1/onboard-retro@0","parent":null,"nodes":[{"id":"d2","brief":"the retro form re-signs over seventeen rows"},{"id":"d3","brief":"the gate-kickoff rows go in by hand keeping the bless"},{"id":"d4","brief":"log-risks fills the register and signs"},{"id":"d5","brief":"the report lands at the gate"}]}
+{"ts":"2026-08-04T19:35:44.759Z","op":"done","visit":"iterations/i1/onboard-retro@0","node":"d2","brief":"seventeen rows signed through the working lane"}
+{"ts":"2026-08-04T19:35:52.423Z","op":"done","visit":"iterations/i1/onboard-retro@0","node":"d3","brief":"the blessed form carries all seventeen, stamp intact"}
+{"ts":"2026-08-04T19:36:12.807Z","op":"update","visit":"iterations/i1/draft-vision@0","node":"d6","brief":"the fan's right branch is taken this pass"}
+{"ts":"2026-08-04T19:36:39.051Z","op":"update","visit":"iterations/i1/log-risks@0","node":"d7","brief":"the register fills with owners and revisit triggers"}
+{"ts":"2026-08-04T19:36:48.586Z","op":"done","visit":"iterations/i1/onboard-retro@0","node":"d4","brief":"the register stands signed with eight owned entries"}
+{"ts":"2026-08-04T19:42:18.247Z","op":"plan","visit":"iterations/i1/gate-motivation@0","parent":null,"nodes":[{"id":"d8","brief":"the busbar draws structurally over every multi-feeder gate"},{"id":"d9","brief":"the table template exists with typed columns"},{"id":"d10","brief":"the raid method describes impact and likelihood"},{"id":"d11","brief":"log-risks refills as the table and the walk lands back at the gate"}]}
+{"ts":"2026-08-04T19:51:24.188Z","op":"update","visit":"iterations/i1/log-risks@0","node":"d1","brief":"the typed register signed; the walk enters the gate"}
+{"ts":"2026-08-04T19:55:59.264Z","op":"plan","visit":"iterations/i1/gate-motivation@0","parent":null,"nodes":[{"id":"d2","brief":"the big table-editor note stands"},{"id":"d3","brief":"the pressure-test form is designed and wired into the pin"},{"id":"d4","brief":"the design lands with the owner before any fill"}]}
+{"ts":"2026-08-04T19:56:08.660Z","op":"done","visit":"iterations/i1/gate-motivation@0","node":"d2","brief":"the law is filed as a must note"}
+{"ts":"2026-08-04T19:56:49.860Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d5","brief":"three typed fields replace the two untyped ones in the pin"}
+{"ts":"2026-08-04T19:59:40.132Z","op":"done","visit":"iterations/i1/gate-motivation@0","node":"d3","brief":"the three-field design is approved and pinned"}
+{"ts":"2026-08-04T20:01:06.066Z","op":"update","visit":"iterations/i1/onboard-retro@1","node":"d7","brief":"the retro re-signs over eighteen; the fill pass runs"}
+{"ts":"2026-08-04T20:01:19.909Z","op":"update","visit":"iterations/i1/onboard-retro@1","node":"d8","brief":"the blessed kickoff carries the eighteenth row by hand"}
+{"ts":"2026-08-04T20:02:36.980Z","op":"update","visit":"iterations/i1/pressure-test@0","node":"d9","brief":"the pressure test fills its three typed fields and submits"}
+{"ts":"2026-08-04T20:03:20.041Z","op":"update","visit":"iterations/i1/gate-motivation@1","node":"d10","brief":"the gate's nine asks fill; the red team steelmans three attacks"}
+{"ts":"2026-08-04T20:03:33.252Z","op":"update","visit":"iterations/i1/gate-motivation@1","node":"d11","brief":"the residual line takes its pair shape and the gate resubmits"}
+{"ts":"2026-08-04T20:03:46.011Z","op":"done","visit":"iterations/i1/gate-motivation@0","node":"d4","brief":"the gate is signed; only the thumb remains"}
+{"ts":"2026-08-04T20:11:14.256Z","op":"plan","visit":"iterations/i1/gate-motivation@1","parent":null,"nodes":[{"id":"d12","brief":"the round-level prior-art ruling is noted"},{"id":"d13","brief":"the red team absorbs the owner's stronger answers and resubmits"},{"id":"d14","brief":"the honest assessment is recorded and printed"}]}
+{"ts":"2026-08-04T20:11:29.920Z","op":"update","visit":"iterations/i1/gate-motivation@1","node":"d15","brief":"the two rounds absorb the affordability and information arguments"}
+{"ts":"2026-08-04T20:11:58.129Z","op":"update","visit":"iterations/i1/gate-motivation@1","node":"d16","brief":"the file takes the stronger rounds and sheds its stamp"}
+{"ts":"2026-08-04T20:12:20.462Z","op":"update","visit":"iterations/i1/gate-motivation@1","node":"d17","brief":"the stamp sheds and both sections strengthen"}
+{"ts":"2026-08-04T20:12:30.034Z","op":"done","visit":"iterations/i1/gate-motivation@1","node":"d13","brief":"the strengthened gate resubmits through the lane"}
+{"ts":"2026-08-04T20:12:49.878Z","op":"done","visit":"iterations/i1/gate-motivation@1","node":"d14","brief":"the assessment is recorded as an aq"}
+{"ts":"2026-08-04T20:12:56.151Z","op":"done","visit":"iterations/i1/gate-motivation@1","node":"d12","brief":"the ruling stands as a should note for the rounds build"}
+{"ts":"2026-08-04T20:15:51.317Z","op":"plan","visit":"iterations/i1/gate-motivation@1","parent":null,"nodes":[{"id":"d18","brief":"the approval-layer category joins the references"},{"id":"d19","brief":"the gate's validate round gains the prior-art item in the pin"},{"id":"d20","brief":"the gate re-reviews with the check that ran"}]}
+{"ts":"2026-08-04T20:16:01.428Z","op":"done","visit":"iterations/i1/gate-motivation@1","node":"d18","brief":"the category note stands with its links"}
+{"ts":"2026-08-04T20:16:26.705Z","op":"done","visit":"iterations/i1/gate-motivation@1","node":"d19","brief":"every pin gate's validate round now demands prior art"}
+{"ts":"2026-08-04T20:17:20.200Z","op":"update","visit":"iterations/i1/gate-motivation@1","node":"d21","brief":"the gate refills its widened round and resubmits"}
+{"ts":"2026-08-04T20:20:29.491Z","op":"update","visit":"iterations/i1/gate-motivation@1","node":"d22","brief":"checking the widened round reached the compiled gate section"}
+{"ts":"2026-08-04T20:22:09.814Z","op":"update","visit":"iterations/i1/gate-motivation@1","node":"d23","brief":"the pin is right on disk; reloading the engine's stale copy"}
+{"ts":"2026-08-04T20:24:03.823Z","op":"update","visit":"iterations/i1/gate-motivation@1","node":"d24","brief":"stale-frame cause found: repinSwap ignores same-state-count pin edits"}
+{"ts":"2026-08-04T20:24:08.141Z","op":"update","visit":"iterations/i1/gate-motivation@1","node":"d25","brief":"stale-frame cause found: repinSwap ignores same-state-count pin edits"}
+{"ts":"2026-08-04T20:26:52.814Z","op":"update","visit":"iterations/i1/onboard-retro@2","node":"d27","brief":"the retro form re-signed with the three new notes answered"}
+{"ts":"2026-08-04T20:27:36.126Z","op":"update","visit":"iterations/i1/gate-kickoff@2","node":"d28","brief":"the kickoff answers the three new notes; the human bless is the cost"}
+{"ts":"2026-08-04T20:28:11.634Z","op":"update","visit":"iterations/i1/gate-kickoff@2","node":"d29","brief":"re-blessing the kickoff whose substance the human already chose"}
+{"ts":"2026-08-04T20:28:39.896Z","op":"update","visit":"iterations/i1/gate-kickoff@2","node":"d30","brief":"the kickoff re-stamps with the two fresh notes answered"}
+{"ts":"2026-08-04T20:28:50.387Z","op":"update","visit":"iterations/i1/gate-motivation@2","node":"d31","brief":"at the gate; the widened round should now serve its fill"}
+{"ts":"2026-08-04T20:29:17.094Z","op":"update","visit":"iterations/i1/gate-motivation@2","node":"d32","brief":"the gate refills the widened round with the ran check and resubmits"}
+{"ts":"2026-08-04T20:29:56.504Z","op":"done","visit":"iterations/i1/gate-motivation@1","node":"d20","brief":"the gate re-reviewed with the ran check and stands signed for the bless"}
+{"ts":"2026-08-04T20:31:53.519Z","op":"update","visit":"iterations/i1/gate-motivation@2","node":"d33","brief":"the gate absorbs the counter-probe and resubmits for the bless"}
+{"ts":"2026-08-04T20:32:09.992Z","op":"update","visit":"iterations/i1/gate-motivation@2","node":"d34","brief":"the stamp lifts so the counter-probe amendment can be served"}
+{"ts":"2026-08-04T20:32:37.608Z","op":"update","visit":"iterations/i1/gate-motivation@2","node":"d35","brief":"the gate absorbs the counter-probe and resubmits for the bless"}
+{"ts":"2026-08-04T20:36:11.366Z","op":"update","visit":"iterations/i1/gate-motivation@2","node":"d36","brief":"the day closes with the handover written"}
+{"ts":"2026-08-05T17:53:36.204Z","op":"update","visit":"iterations/i1/start@0","node":"d1","brief":"bringing trunk into the worktree so the references can resolve"}

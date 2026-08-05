@@ -3,7 +3,7 @@ id: i1-prove-a-bases-equivalent-live-table-can-
 status: open
 started: 2026-08-04T08:11:36.635Z
 opened: 2026-08-04T00:00:00.000Z
-goal: "Prove a Bases-equivalent live table can carry the machinery's tables — the rigor matrix demoted to one renderer of it."
+goal: "Design quackitect — the product's first iteration, authoring the vision and the design input in full, traced end to end."
 vision: "The product's FIRST iteration, walked in full. M0's onboard-retro drains the parked design input. The kickoff proposes its size with reasoning — the first iteration of a product is product-sized: it authors the vision packet, the stakeholders and the actual state, and every later iteration inherits those by pointer. The live table lands as the proof piece: machinery tables served live and editable."
 inputs:
   - "note-40b6f9328b0b"
@@ -23,8 +23,18 @@ kickoff judges every line.
 
 ## Goal
 
-Prove a Bases-equivalent live table can carry the machinery's tables —
-the rigor matrix demoted to one renderer of it.
+Design quackitect. This is the product's first iteration, and the first
+iteration of any product is the one that authors its design input in
+full: the vision, the stakeholders, the actual state, the needs and the
+requirements — traced end to end.
+
+THE ID IS A SLUG OF THE OLD GOAL, and it stays. i1 was seeded by hand
+under a working title while the machine was still being bootstrapped;
+the branch and the worktree carry that title. Renaming them is worktree
+surgery on an open record, and the id is a handle, not a claim.
+
+The Bases live table is not this iteration's goal. It was a proof piece
+that moved to expedition e29.
 
 ## Rough vision
 
