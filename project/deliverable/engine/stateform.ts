@@ -170,6 +170,37 @@ function typeProblems(name: string, of: string, refs: string[], byId: Map<string
   return out;
 }
 
+/** DOES A STANDING CLAIM STILL PASS ITS OWN FORM?
+ *
+ *  The checks run when a form is saved and when it is submitted. Nothing ever
+ *  re-ran them over evidence already on disk. So a claim signed under an older
+ *  form kept its stamp and its green while answering a question the form had
+ *  since stopped asking — and because it looked green, nobody was asked to
+ *  answer the new one.
+ *
+ *  Same checks, run against what is stored. Empty fields stay the
+ *  required-check's business, here as everywhere. */
+export function claimProblems(root: string, s: StateDecl, body: string, corpus?: TraceNode[]): string[] {
+  const nodes = corpus ?? loadTrace(root);
+  const metas = new Map<string, TemplateMeta>();
+  const out: string[] = [];
+  for (const f of s.evidence_form) {
+    const content = section(body, f.name).trim();
+    if (content === "") continue;
+    const name = f.template ?? "free-form";
+    if (!metas.has(name)) metas.set(name, templateMeta(root, name));
+    const args: FieldArgs = {
+      of: f.of ?? "",
+      options: f.options ?? [],
+      items: f.items ?? [],
+      passing: f.passing ?? [],
+      columns: f.columns ?? [],
+    };
+    out.push(...fieldProblems(f.name, metas.get(name) as TemplateMeta, args, content, nodes, root));
+  }
+  return out;
+}
+
 /** A REFERENCE THAT RESOLVES TO NOTHING IS A DEFECT, not a warning. The form
  *  points at standing artifacts, so an id naming no file means the reviewing
  *  gate would follow it and find nothing there. The corpus is absent where it

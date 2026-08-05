@@ -113,3 +113,8 @@
 {"ts":"2026-08-04T20:32:37.608Z","op":"update","visit":"iterations/i1/gate-motivation@2","node":"d35","brief":"the gate absorbs the counter-probe and resubmits for the bless"}
 {"ts":"2026-08-04T20:36:11.366Z","op":"update","visit":"iterations/i1/gate-motivation@2","node":"d36","brief":"the day closes with the handover written"}
 {"ts":"2026-08-05T17:53:36.204Z","op":"update","visit":"iterations/i1/start@0","node":"d1","brief":"bringing trunk into the worktree so the references can resolve"}
+{"ts":"2026-08-05T17:56:00.712Z","op":"plan","visit":"iterations/i1/start@0","parent":null,"nodes":[{"id":"d2","brief":"a standing claim is re-checked against its live form, so green means it passes now"}]}
+{"ts":"2026-08-05T17:56:35.827Z","op":"update","visit":"iterations/i1/start@0","node":"d3","brief":"a stale claim writes down why it fell, not just that it did"}
+{"ts":"2026-08-05T17:56:54.372Z","op":"update","visit":"iterations/i1/start@0","node":"d4","brief":"the battery — recordDone now runs the form checks on every paint"}
+{"ts":"2026-08-05T17:58:12.754Z","op":"done","visit":"iterations/i1/start@0","node":"d2","brief":"green now means the claim passes its form now, not that it passed once"}
+{"ts":"2026-08-05T17:58:26.272Z","op":"plan","visit":"iterations/i1/start@0","parent":null,"nodes":[{"id":"d5","brief":"commit the self-healing green in the worktree"},{"id":"d6","brief":"reload and pull so the stale claims mark themselves"}]}

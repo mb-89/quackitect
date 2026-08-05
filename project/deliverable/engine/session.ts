@@ -86,7 +86,15 @@ import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { anyJobRunning } from "./run.ts";
 import { levelName, loadLevels } from "./scale.ts";
-import { buildPortableForm, type EmbeddedDoc, parseIsland, stateFormFields, stateFormModel, templateProblems } from "./stateform.ts";
+import {
+  buildPortableForm,
+  claimProblems,
+  type EmbeddedDoc,
+  parseIsland,
+  stateFormFields,
+  stateFormModel,
+  templateProblems,
+} from "./stateform.ts";
 import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
 import { type Expedition, expClose, expFind, expList, expNew, readRecord } from "./worktree.ts";
 
@@ -2746,6 +2754,29 @@ export class Session {
     }
   }
 
+  /** A CLAIM THAT NO LONGER PASSES ITS OWN FORM SAYS SO.
+   *
+   *  recordDone already refuses it green. This writes the reason onto the file
+   *  as well, because grey with no explanation sends the next reader hunting
+   *  for what changed — which is the whole thing the suspect mark exists to
+   *  prevent. */
+  private markStaleClaims(decl: MachineDecl, it: Iteration): void {
+    for (const s of decl.states) {
+      if (s.evidence_form.length === 0) continue;
+      const abs = this.evidenceAbs(it, s.id);
+      if (!existsSync(abs)) continue;
+      try {
+        const note = parseStateNote(readFileSync(abs, "utf8"));
+        if (typeof note.frontmatter.signed_off !== "string") continue;
+        const problems = claimProblems(this.root, s, note.body);
+        if (problems.length === 0) continue;
+        writeFileSync(abs, withSuspect(readFileSync(abs, "utf8"), `no longer passes its form — ${problems[0]}`), "utf8");
+      } catch {
+        // an unreadable claim is the lint's problem, not the walk's
+      }
+    }
+  }
+
   recordDone(decl: MachineDecl): string[] {
     const it = this.declIteration(decl);
     if (it === undefined) return [];
@@ -2755,11 +2786,15 @@ export class Session {
       const abs = this.evidenceAbs(it, s.id);
       if (!existsSync(abs)) continue;
       try {
-        const fm = parseStateNote(readFileSync(abs, "utf8")).frontmatter;
+        const note = parseStateNote(readFileSync(abs, "utf8"));
+        const fm = note.frontmatter;
         // SUSPECT IS NOT DONE. An input moved under this claim, so it is
         // waiting on somebody to re-look and re-approve.
         if (typeof fm.suspect === "string") continue;
         if (typeof fm.signed_off !== "string") continue;
+        // AND IT MUST STILL PASS ITS OWN FORM. A stamp says it passed once;
+        // green says it passes NOW.
+        if (claimProblems(this.root, s, note.body).length > 0) continue;
         if (s.kind === "gate" && !(typeof fm.bless === "string" && fm.bless.startsWith("blessed"))) continue;
         done.push(s.id);
       } catch {
@@ -2830,6 +2865,7 @@ export class Session {
     const done = new Set(this.recordDone(run.decl));
     const owed = moved.filter((id) => done.has(id));
     if (owed.length > 0) this.rewalk({ reopened: owed }, "the rigor matrix moved under the pin");
+    this.markStaleClaims(run.decl, it);
     // CONSUME IT EITHER WAY. The walk has now seen this move, whether or not
     // anything was standing to reopen. Leaving the pin stale would re-fire it
     // on the next pull, and the re-earned step would reopen forever.
