@@ -53,6 +53,26 @@ test("the open map says …and N more past eight open points", () => {
   );
 });
 
+// CORRECT WHAT IS MECHANICAL, ANNOUNCE IT, REFUSE ONLY THE AMBIGUOUS. An
+// update on the item just resolved was the biggest refusal class in the log.
+test("an update on a CLOSED node is corrected and announced, never refused", () => {
+  const d = new Decisions(mkdtempSync(join(tmpdir(), "se-dec-")));
+  d.apply("s@0", parseUpdate({ op: "plan", items: ["parent"] }));
+  d.apply("s@0", parseUpdate({ op: "plan", node: "d1", items: ["child"] }));
+  d.apply("s@0", parseUpdate({ op: "done", node: "d2", brief: "the child landed" }));
+  // The child is closed; its parent is not, so the update goes to the parent.
+  const onChild = d.apply("s@0", parseUpdate({ op: "update", node: "d2", brief: "still tidying it" }));
+  assert.equal(onChild.active, "d1", "it landed on the open parent");
+  assert.match(String(onChild.corrected), /d2 is already done/);
+  d.apply("s@0", parseUpdate({ op: "done", node: "d1", brief: "the parent landed" }));
+  // Nothing above it is open now, so the same update lands bare.
+  const bare = d.apply("s@0", parseUpdate({ op: "update", node: "d1", brief: "one last word" }));
+  assert.equal(bare.active, null, "with nothing open it lands bare");
+  assert.match(String(bare.corrected), /landed bare/);
+  // A RESOLUTION is a different matter — re-resolving is a real disagreement.
+  assert.throws(() => d.apply("s@0", parseUpdate({ op: "done", node: "d99", brief: "no such thing" })));
+});
+
 test("stateTodos: origins ride the nodes and parked defers show without materializing", () => {
   const d = new Decisions(mkdtempSync(join(tmpdir(), "se-dec-")));
   d.apply("a@0", parseUpdate({ op: "plan", items: ["one", "two"] }));
@@ -237,6 +257,18 @@ test("the voice lint: walls, sentences, chains and the pyramid - thresholds are 
     "five headingless paragraphs want the pyramid",
   );
   assert.equal(lintProse(root, "# Heading\n\nshort and clean.").length, 0, "clean prose passes");
+  // REFERENCES ARE NOTES: the link belongs in a reference note, and every
+  // other page cites that note instead of carrying the link itself.
+  const linked = "see https://example.org/paper for the method.";
+  assert.ok(
+    lintProse(root, linked, "project/guidance/some.md").some((f) => f.rule === "external-link"),
+    "a link outside the reference home is a finding",
+  );
+  assert.ok(
+    !lintProse(root, linked, "project/spec/references/ref-paper.md").some((f) => f.rule === "external-link"),
+    "the same link inside a reference note is where it belongs",
+  );
+  assert.ok(!lintProse(root, linked).some((f) => f.rule === "external-link"), "text with no home is not judged");
   // DATA, not code: raise the threshold in the config - the wall passes.
   writeFileSync(join(root, "project", "deliverable", "machines", "lint", "voice-lint.md"), "---\nwall_paragraph_lines: 99\n---\n", "utf8");
   assert.ok(!lintProse(root, wall).some((f) => f.rule === "wall"), "the edited threshold applies without a rebuild");

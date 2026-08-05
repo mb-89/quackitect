@@ -20,6 +20,23 @@ export interface StateNote {
   body: string;
 }
 
+/** DROP FRONTMATTER KEYS, keeping everything else byte for byte.
+ *
+ *  A reopened step loses the stamps that assert its claim STANDS, and keeps
+ *  the claim. The next walker reads what was said last time and judges it.
+ *
+ *  Single-line values only, which is what every stamp is. A key whose value
+ *  runs over several lines would leave its continuation behind. */
+export function stripFrontmatterKeys(raw: string, keys: string[]): string {
+  const lines = raw.split(/\r?\n/);
+  if (lines[0]?.trim() !== "---") return raw;
+  const end = lines.findIndex((l, i) => i > 0 && l.trim() === "---");
+  if (end < 0) return raw;
+  const drop = keys.map((k) => new RegExp(`^${k}\\s*:`));
+  const head = lines.slice(1, end).filter((l) => !drop.some((re) => re.test(l)));
+  return [lines[0], ...head, ...lines.slice(end)].join("\n");
+}
+
 export function parseStateNote(raw: string): StateNote {
   const text = stripBom(raw);
   const lines = text.split(/\r?\n/);

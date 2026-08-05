@@ -41,6 +41,11 @@ export interface EvidenceField {
   /** The field's template (machines/forms/templates/<name>.md). Absent
    *  means free-form; every referenced template is a read input. */
   template?: string;
+  /** WHICH ITEM TYPE the references must be, for a field that points at
+   *  standing artifacts. The value names an item template
+   *  (machines/items/<of>.md), and every referenced node must declare that
+   *  same type. Absent means any typed node resolves. */
+  of?: string;
   /** THE TEMPLATE'S ARGUMENTS — templates stay generic, the field makes
    *  them concrete. options/passing feed choice-rationale; items feeds
    *  per-item (the literal "$inbox" resolves to the live pending notes). */
@@ -74,15 +79,16 @@ export const STANDARD_ROUNDS: EvidenceField[] = [
   },
   {
     name: "round_1_validate",
-    description: "ROUND 1 — VALIDATE: built the right thing. The RESULT against the goal and the frame — each named question answered.",
+    description:
+      "ROUND 1 — VALIDATE: built the right thing. The RESULT against the goal and the frame — each named question answered. Prior art asks who else solved THIS, and what they shed.",
     required: true,
     template: "per-item",
-    items: ["exercised against the goal", "missing", "wrong", "out of scope"],
+    items: ["exercised against the goal", "missing", "wrong", "out of scope", "prior art"],
   },
   {
     name: "round_2_red_team",
     description:
-      "ROUND 2 — RED TEAM: attack the result before endorsing it. Argue the opposing case; name the KILL-CRITERION — what would have to be true for this to be the wrong call — then look for it.",
+      "ROUND 2 — RED TEAM: attack the result before endorsing it. STEELMAN FIRST: argue the OPPOSING case at its strongest, the way its best advocate would. Only then attack. Name the KILL-CRITERION — what would have to be true for this to be the wrong call — and look for it.",
     required: true,
     template: "findings",
   },
@@ -151,6 +157,10 @@ export interface StateDecl {
   legal_tools?: string[];
   /** Legal ONLY while the state's exit script stands red (repair mode). */
   repair_tools?: string[];
+  /** Set when the state IS another machine's state, by reference — a mirror
+   *  is a reference, never a copy (owner law 2026-08-04). Anything asking
+   *  WHICH state this is must follow it, not the id. */
+  same_as?: string;
   edges: EdgeDecl[];
 }
 
@@ -261,7 +271,7 @@ export type StepOutcome = "filled" | "failed";
  */
 /** The downstream cone: everything reachable from the named states. Anything
  *  downstream was derived from what is being reopened, so it cannot stand. */
-function downstreamCone(m: MachineDecl, stateIds: string[]): Set<string> {
+export function downstreamCone(m: MachineDecl, stateIds: string[]): Set<string> {
   const cone = new Set<string>(stateIds);
   let grew = true;
   while (grew) {

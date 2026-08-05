@@ -18,7 +18,7 @@ import { parseStateNote } from "../engine/notes.ts";
 import { mainMachinePath, Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { expClose, expNew, readRecord } from "../engine/worktree.ts";
-import { call, checkDocs, freshRoot, pullBoot } from "./helpers.ts";
+import { call, checkDocs, freshRoot, pullBoot, sessionAtIdle } from "./helpers.ts";
 
 interface RawEdge {
   id: string;
@@ -35,9 +35,10 @@ interface RawCanvas {
 
 test("the drawing is data: a state note edited on disk binds the next call, no reload", async () => {
   const root = freshRoot();
-  const session = new Session(root);
-  const server = buildServer(root, session);
-  await pullBoot(server, session);
+  // STANDING IN IDLE IS THE PREMISE of these cases, so the helper that
+  // guarantees it is the one to use: pullBoot rests at idle OR at the
+  // front desk, whichever the walk reaches first.
+  const session = await sessionAtIdle(root);
   const notePath = join(root, "project", "deliverable", "machines", "states", "idle.md");
   const before = readFileSync(notePath, "utf8");
   assert.match(before, /^priority: 0\.01$/m, "idle costs nothing to enter");
@@ -52,9 +53,11 @@ test("the drawing is data: a state note edited on disk binds the next call, no r
 
 test("a drawing that will not compile leaves the last good one standing", async () => {
   const root = freshRoot();
-  const session = new Session(root);
+  // STANDING IN IDLE IS THE PREMISE of these cases, so the helper that
+  // guarantees it is the one to use: pullBoot rests at idle OR at the
+  // front desk, whichever the walk reaches first.
+  const session = await sessionAtIdle(root);
   const server = buildServer(root, session);
-  await pullBoot(server, session);
   writeFileSync(mainMachinePath(root), "{ this is not a canvas");
   const survived = await call(server, "se_pull", {});
   assert.equal(survived.isError, false, "a broken drawing never stops the walk");
@@ -63,9 +66,11 @@ test("a drawing that will not compile leaves the last good one standing", async 
 
 test("an edit that deletes the state the walk stands in waits until it has moved on", async () => {
   const root = freshRoot();
-  const session = new Session(root);
+  // STANDING IN IDLE IS THE PREMISE of these cases, so the helper that
+  // guarantees it is the one to use: pullBoot rests at idle OR at the
+  // front desk, whichever the walk reaches first.
+  const session = await sessionAtIdle(root);
   const server = buildServer(root, session);
-  await pullBoot(server, session);
   // Drop idle out of the drawing while the walk is standing in it.
   const canvasPath = mainMachinePath(root);
   const raw = JSON.parse(readFileSync(canvasPath, "utf8")) as RawCanvas;
@@ -419,9 +424,11 @@ test("the close COMMITS the trunk's strays rather than refusing, and says which"
 
 test("a broken sub-canvas refuses typed at entry; fixing it heals on the next tick", async () => {
   const root = freshRoot();
-  const session = new Session(root);
+  // STANDING IN IDLE IS THE PREMISE of these cases, so the helper that
+  // guarantees it is the one to use: pullBoot rests at idle OR at the
+  // front desk, whichever the walk reaches first.
+  const session = await sessionAtIdle(root);
   const server = buildServer(root, session);
-  await pullBoot(server, session);
   session.setAutonomy(1);
   // Aim while the drawing is sound — then it breaks under the walk.
   session.setTarget("ideation");

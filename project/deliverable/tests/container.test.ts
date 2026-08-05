@@ -269,5 +269,3 @@ test("forms are viewable unbound: formGet returns the template preview", () => {
   assert.equal(f.met, false);
   assert.ok(f.fields.length >= 4, "the template's fields ride the preview");
 });
-
-

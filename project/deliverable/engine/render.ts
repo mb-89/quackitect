@@ -27,6 +27,7 @@ import { loadPanel, renderPanel } from "./params.ts";
 import { loadLevels } from "./scale.ts";
 import { mainMachinePath, type Session } from "./session.ts";
 import { TABLE_SCRIPT, TABLE_STYLE } from "./tables.ts";
+import { TRACE_SCRIPT, TRACE_STYLE, traceCard } from "./traceui.ts";
 
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -132,6 +133,8 @@ export function reservedColours(root: string): string[] {
 }
 
 export interface StateMeta {
+  /** Passed against a demand that has since moved — no longer green. */
+  suspect?: boolean;
   has_exit: boolean;
   exit_met: boolean;
   has_entry: boolean;
@@ -268,6 +271,20 @@ function svgEdges(canvas: CanvasData, byId: Map<string, CNode>, skip: Set<string
   return parts;
 }
 
+/** SUSPECT BEATS DONE. The claim was filed and it still stands on disk. What
+ *  it answered has moved, so the state is not green — it is a lapsed pass,
+ *  and the drawing has to say so before anybody trusts the colour.
+ *
+ *  ONE WORD FOR ONE IDEA. The trace graph marks a node standing on moved
+ *  ground with the same word and the same style. A reader who learns the mark
+ *  once reads it everywhere. */
+function stateClass(sid: string, activeIds: Set<string>, doneIds: Set<string>, meta: Record<string, StateMeta>): string {
+  if (activeIds.has(sid)) return "state active";
+  if (meta[sid]?.suspect === true) return "state suspect";
+  if (doneIds.has(sid)) return "state done";
+  return "state";
+}
+
 function svgStateNode(
   n: CNode,
   activeIds: Set<string>,
@@ -289,7 +306,7 @@ function svgStateNode(
   if (sid === undefined) return parts;
   const isSub = subIds.has(sid);
   const pill = (n as { styleAttributes?: { shape?: string } }).styleAttributes?.shape === "pill";
-  const cls = activeIds.has(sid) ? "state active" : doneIds.has(sid) ? "state done" : "state";
+  const cls = stateClass(sid, activeIds, doneIds, meta);
   const rx = pill ? Math.min(n.width, n.height) / 2 : 14;
   parts.push(`<g class="clickable" data-detail="state:${esc(sid)}"${isSub ? ` data-sub="${esc(sid)}"` : ""}>`);
   parts.push(`<rect x="${n.x}" y="${n.y}" width="${n.width}" height="${n.height}" rx="${rx}" class="${cls}"/>`);
@@ -766,6 +783,12 @@ const STYLE = `
   .state.active { fill: color-mix(in srgb, var(--se-warn, #d7a72a) 16%, var(--se-bg)); stroke: var(--se-warn, #d7a72a); stroke-width: 3.5; animation: se-current 2.2s ease-in-out infinite; }
   @keyframes se-current { 0%, 100% { stroke-opacity: 1; } 50% { stroke-opacity: 0.35; } }
   @media (prefers-reduced-motion: reduce) { .state.active { animation: none; } }
+  /* SUSPECT HAS NO RULE OF ITS OWN, and that is the ruling (owner,
+     2026-08-05). No verdict looks like no verdict. Whether a step was never
+     walked or was passed against a question that has since changed does not
+     matter to the reader — either way there is nothing to trust yet, so the
+     colour simply goes and the plain state card is what remains. The class
+     stays because the details panel and the tooltip still say WHY. */
   .state.inner { fill: none; }
   .clickable { cursor: pointer; }
   .clickable:hover .state, .clickable:hover .comment { stroke: var(--se-fg); }
@@ -794,7 +817,7 @@ const STYLE = `
   .route-here { fill: var(--se-walk); stroke: var(--se-walk-ring); stroke-width: 2; }
   .guard { fill: var(--se-accent); font-size: 20px; text-anchor: middle; }
   .comment { fill: var(--se-bg-side); stroke: var(--se-border); }
-  .group { fill: var(--se-bg-side); stroke: var(--se-border); stroke-dasharray: 10 6; stroke-width: 2; }
+  .group { fill: var(--se-bg-side); stroke: var(--se-border); stroke-width: 2; }
   .group-label { fill: var(--se-dim); font-size: 24px; font-family: inherit; letter-spacing: .06em; }
   .comment-text { color: var(--se-muted); font-size: 13px; line-height: 1.35; }
   .comment-detail { font-size: 15px; line-height: 1.55; color: var(--se-fg); padding: 2px 0 10px; }
@@ -1866,12 +1889,25 @@ async function openDoc(path, returnKey) {
   CURRENT_DETAIL = "doc:" + path;
   showDetails(path, '<div style="padding:2px 0 10px"><button class="ghost back" data-return="' + (returnKey || "comment") + '">‹ back</button></div><div class="docview">' + d.html + "</div>");
 }
+// The trace graph's nodes and its filters answer a click the same way every
+// other element does: through detailFor and showDetails. The card carries its
+// own subjects as JSON because it is rendered lazily, so they are not in D.
+function traceDetail(id) {
+  const tag = document.getElementById("se-trace");
+  let map = {};
+  try { map = JSON.parse(tag.textContent); } catch (e) { /* an unrendered card has no subjects */ }
+  const d = map[id];
+  if (!d) return [id, '<div class="meta">nothing recorded for this node</div>'];
+  const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  return [id, '<div class="docview"><div class="meta">' + esc(d.type) + '</div><p style="white-space:pre-wrap">' + esc(d.statement) + '</p><div class="meta">' + esc(d.path) + "</div></div>"];
+}
 function detailFor(key) {
   if (key === "relay" && LAST_RELAY) return [LAST_RELAY.title, LAST_RELAY.html];
   if (key.startsWith("log:")) { void openLogDetail(key.slice(4)); return ["log entry", '<div class="meta">loading…</div>']; }
   if (key.startsWith("doc:")) { void openDoc(key.slice(4), "comment"); return [key.slice(4), '<div class="meta">loading…</div>']; }
   if (key.startsWith("form:")) { const fm = key.slice(5).split("@"); void showForm(fm[0], "details", fm[1]); return ["", '<div class="meta">loading…</div>']; }
   if (key.startsWith("cond:")) return condDetail(key.slice(5));
+  if (key.startsWith("trace:")) return traceDetail(key.slice(6));
   if (key === "comment") {
     const txt = (D.comment || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");
     return ["machine: " + D.viewed.id, '<div class="comment-detail">' + txt + "</div>" + jsonTable(D.viewed)];
@@ -2982,10 +3018,17 @@ function drawingSets(
   // set is the record's standing claims, which outlive the engine life.
   // Session-walked states elsewhere stay uncoloured, as ruled 2026-07-31.
   const paint = new Set(m.session.recordDone(decl));
+  // DRIFT IS COMPUTED ON THE WAY TO THE SCREEN (owner ruling 2026-08-05):
+  // green must mean still green NOW, so the demand diff is recomputed on
+  // every look rather than only when a pin is rewritten. It costs one hash
+  // of the matrix (~3ms) against a render measured in hundreds. A view
+  // never writes — the reopen is the walk's, in Session.driftReopen.
+  const suspect = new Set(m.session.suspectStates(decl));
   const subIds = new Set(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id));
   const meta: Record<string, StateMeta> = {};
   for (const s of decl.states) {
     meta[s.id] = {
+      suspect: suspect.has(s.id),
       has_exit: s.exit !== undefined,
       exit_met: m.session.conditionMet(decl, s, "leave"),
       has_entry: s.entry !== undefined,
@@ -3051,11 +3094,14 @@ function crumbsFor(m: MirrorState, decl: MachineDecl): string {
 
 export function renderMirror(
   m: MirrorState,
-  widget?: "machine" | "details" | "log" | "terminal" | "table",
+  widget?: "machine" | "details" | "log" | "terminal" | "table" | "trace",
   view?: string,
   card?: string,
   embed?: boolean,
   tableView?: string,
+  traceProps?: string,
+  traceTypes?: string,
+  traceFind?: string,
 ): string {
   const skin = embed === true ? NATIVE : "";
   const bodyClass = embed === true ? ` class="embed${widget === undefined ? "" : " solo"}"` : "";
@@ -3192,8 +3238,25 @@ export function renderMirror(
       `<button class="expand" data-widget="w-table" data-url="/widget/table" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button>`,
       tableView,
     );
+  // THE TRACE GRAPH — a function for the same reason the table is: it reads
+  // every trace node off disk, and no other card wants them. Its three
+  // filters arrive as query values, because each one REDRAWS the layout.
+  const csv = (s: string | undefined): string[] => (s ?? "").split(",").filter((x) => x !== "");
+  const traceWidget = (): string =>
+    traceCard(
+      m.root,
+      csv(traceProps),
+      csv(traceTypes),
+      traceFind ?? "",
+      `<button class="expand" data-widget="w-trace" data-url="/widget/trace" title="expand · ctrl-click: new tab · shift-click: new window">⌘</button>`,
+    );
   // Read per render, so editing palette.css needs no restart.
   const pal = palette(m.root);
+
+  if (widget === "trace") {
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · trace</title><style>${pal}${STYLE}${TRACE_STYLE} #w-trace{flex:1;border-bottom:0;min-height:0} body.solo #sidebar{display:flex;flex-direction:column;height:100vh}${skin}</style>${ELEMENTS}</head>
+<body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${traceWidget()}</aside></div>${MODAL}${data}<script>${SCRIPT}</script><script>${TRACE_SCRIPT}</script></body></html>`;
+  }
 
   if (widget === "table") {
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · table</title><style>${pal}${STYLE}${TABLE_STYLE}${BASES_STYLE}${BASES_TABLE_STYLE} #w-table{flex:1;border-bottom:0;min-height:0} body.solo #sidebar{display:flex;flex-direction:column;height:100vh} .tbl-body{flex:1;min-height:0}${skin}</style>${ELEMENTS}</head>
@@ -3224,7 +3287,7 @@ export function renderMirror(
     card,
     embed,
     { bodyClass, skin, pal, data },
-    { terminal: terminalWidget, machine: machineWidget, log: logWidget, details: detailsWidget, table: tblWidget },
+    { terminal: terminalWidget, machine: machineWidget, log: logWidget, details: detailsWidget, table: tblWidget, trace: traceWidget },
   );
 }
 
@@ -3239,7 +3302,7 @@ function cardMatrixPage(
   card: string | undefined,
   embed: boolean | undefined,
   frame: { bodyClass: string; skin: string; pal: string; data: string },
-  widgets: { terminal: string; machine: string; log: string; details: string; table: () => string },
+  widgets: { terminal: string; machine: string; log: string; details: string; table: () => string; trace: () => string },
 ): string {
   const allCards = loadCards(m.root);
   const cardList = embed === true ? allCards.filter((c) => c.widget !== "terminal") : allCards;
@@ -3251,6 +3314,7 @@ function cardMatrixPage(
     // Only when a card actually asks for it. A product that declares no table
     // card never pays for one.
     ...(cardList.some((c) => c.widget === "table") ? { table: widgets.table() } : {}),
+    ...(cardList.some((c) => c.widget === "trace") ? { trace: widgets.trace() } : {}),
   };
   const filled = (c: { widget?: string }): boolean => c.widget !== undefined && (byWidget[c.widget] ?? "") !== "";
   // THE DEFAULT MAIN CARD IS THE FIRST AVAILABLE ONE — one rule instead of a
@@ -3291,13 +3355,13 @@ function cardMatrixPage(
   );
   const legendHtml = `<div class="card" id="card-legend" style="${cellAt(nowAt)}"><div class="widget" id="w-legend"><div class="widget-head"><span>keys</span></div><div class="widget-body">${legendRows}</div></div></div>`;
   const cardData = `<script type="application/json" id="se-cards">${JSON.stringify({ list: cardList.map((c) => ({ n: c.n, id: c.id, title: c.title })), now })}</script>`;
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${frame.pal}${STYLE}${TABLE_STYLE}${BASES_STYLE}${BASES_TABLE_STYLE}${frame.skin}</style>${ELEMENTS}</head>
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${frame.pal}${STYLE}${TABLE_STYLE}${BASES_STYLE}${BASES_TABLE_STYLE}${TRACE_STYLE}${frame.skin}</style>${ELEMENTS}</head>
 <body${frame.bodyClass}>
 <div class="cards" data-keep-style style="grid-template-rows:repeat(${rows},1fr)">
   ${cardsHtml}
   ${legendHtml}
   <div class="divider" id="div-cards"></div>
 </div>
-${MODAL}${frame.data}${cardData}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script><script>${BASES_SCRIPT}</script>
+${MODAL}${frame.data}${cardData}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script><script>${BASES_SCRIPT}</script><script>${TRACE_SCRIPT}</script>
 </body></html>`;
 }

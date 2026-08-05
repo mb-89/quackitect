@@ -6,7 +6,7 @@
 // copy is one HTML with ONE JSON island — the island is the only thing
 // the save rewrites and the only thing the ingest reads (the v1 book's
 // comment law, reapplied).
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { FormTemplate } from "./forms.ts";
 import { pendingNotes } from "./inbox.ts";
@@ -14,6 +14,7 @@ import type { MachineDecl, StateDecl } from "./machine.ts";
 import { parseStateNote, section } from "./notes.ts";
 import { seDir } from "./paths.ts";
 import { type GuidanceDoc, pulledFor } from "./pull.ts";
+import { conformance, duplicateIds, itemTemplateRel, loadTrace, refsIn, type TraceNode } from "./trace.ts";
 
 export interface A3Box {
   heading: string;
@@ -75,12 +76,18 @@ export interface TemplateMeta {
   line_help: string;
   /** What the editor's empty box says — the hint AT the point of typing. */
   placeholder: string;
+  /** Set where the lines are REFERENCES to standing artifacts rather than
+   *  free text. The editor shape is shared with an ordinary list, so the
+   *  template declares the meaning and the check reads the declaration. */
+  resolves?: string;
 }
 
 /** The field's arguments to its template — declared in the form's own
  *  markdown, resolved live where a source is named ($inbox). */
 export interface FieldArgs {
   options: string[];
+  /** Which item type a reference field accepts. Empty means any typed node. */
+  of: string;
   items: string[];
   passing: string[];
   columns: string[];
@@ -94,6 +101,7 @@ export function templateMeta(root: string, name: string): TemplateMeta {
       line_pattern: typeof fm.line_pattern === "string" ? fm.line_pattern : "",
       line_help: typeof fm.line_help === "string" ? fm.line_help : "",
       placeholder: typeof fm.placeholder === "string" ? fm.placeholder : "",
+      ...(typeof fm.resolves === "string" ? { resolves: fm.resolves } : {}),
     };
   } catch {
     return { editor: "text", line_pattern: "", line_help: "", placeholder: "" };
@@ -102,7 +110,7 @@ export function templateMeta(root: string, name: string): TemplateMeta {
 
 const escapeRe = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, (c) => `\\${c}`);
 
-const NO_ARGS: FieldArgs = { options: [], items: [], passing: [], columns: [] };
+const NO_ARGS: FieldArgs = { of: "", options: [], items: [], passing: [], columns: [] };
 
 /** The choice half of a `<option> — <rationale>` line. */
 export function choiceOf(content: string): string {
@@ -113,19 +121,73 @@ export function choiceOf(content: string): string {
 
 /** The template checks over the fills — same verdicts for both hands and
  *  both renders. Emptiness stays the required-check's job. */
-export function templateProblems(model: StateFormModel, fills: Record<string, string>): string[] {
+export function templateProblems(model: StateFormModel, fills: Record<string, string>, root?: string): string[] {
   const out: string[] = [];
+  // The corpus is read ONCE per check, not once per field.
+  const corpus = root === undefined ? undefined : loadTrace(root);
+  // AN ID THAT RESOLVES TWO WAYS RESOLVES NEITHER. This fires wherever a form
+  // is checked, which is where an imported fill lands — the collision an
+  // author cannot see coming, because the file it collides with is not open.
+  for (const d of corpus === undefined ? [] : duplicateIds(corpus)) {
+    out.push(`the trace corpus declares ${d.id} ${d.count} times — an id is an address, and two files cannot share one`);
+  }
   for (const f of model.template.fields) {
     const meta = model.template_meta[model.field_templates[f.name] ?? "free-form"];
     if (meta === undefined) continue;
     const content = (fills[f.name] ?? "").trim();
     if (content === "") continue;
-    out.push(...fieldProblems(f.name, meta, model.field_args[f.name] ?? NO_ARGS, content));
+    out.push(...fieldProblems(f.name, meta, model.field_args[f.name] ?? NO_ARGS, content, corpus, root));
   }
   return out;
 }
 
-function fieldProblems(name: string, meta: TemplateMeta, args: FieldArgs, content: string): string[] {
+/** THE REFERENCES MUST BE OF THE TYPE THE FIELD ASKED FOR. `of: value-prop`
+ *  names an item template, and every referenced node must declare that same
+ *  type. Without it a field asking for value props accepts a stakeholder, and
+ *  the gate that follows the reference reviews the wrong kind of thing.
+ *
+ *  A type naming no item template is the ROW author's mistake, and it is
+ *  reported here because here is where it first becomes visible. */
+function typeProblems(name: string, of: string, refs: string[], byId: Map<string, TraceNode>, root?: string): string[] {
+  const out: string[] = [];
+  if (of !== "" && root !== undefined && !existsSync(join(root, itemTemplateRel(of)))) {
+    out.push(`${name}: asks for ${of}, and no item template exists at ${itemTemplateRel(of)}`);
+  }
+  const wrong = of === "" ? [] : refs.filter((r) => byId.has(r) && byId.get(r)?.type !== of);
+  if (wrong.length > 0) {
+    out.push(`${name}: every reference is a ${of} — ${wrong.map((r) => `${r} is ${byId.get(r)?.type ?? "untyped"}`).join(" · ")}`);
+  }
+  // AND THE ARTIFACT MUST ANSWER ITS OWN TEMPLATE. Resolving and being the
+  // right type still leaves the third way a reference lies: the file exists,
+  // carries the right type, and is a skeleton. The gate would follow it and
+  // review a hole.
+  if (root !== undefined) {
+    for (const r of refs) {
+      const n = byId.get(r);
+      if (n !== undefined) out.push(...conformance(root, n).map((p) => `${name}: ${p}`));
+    }
+  }
+  return out;
+}
+
+/** A REFERENCE THAT RESOLVES TO NOTHING IS A DEFECT, not a warning. The form
+ *  points at standing artifacts, so an id naming no file means the reviewing
+ *  gate would follow it and find nothing there. The corpus is absent where it
+ *  is not loaded, and then the check stays quiet rather than guessing. */
+function refProblems(name: string, meta: TemplateMeta, args: FieldArgs, content: string, corpus?: TraceNode[], root?: string): string[] {
+  if (meta.resolves !== "artifact" || corpus === undefined) return [];
+  const refs = refsIn(content);
+  if (refs.length === 0) {
+    return /^\s*-\s*none\b/im.test(content) ? [] : [`${name}: no references — one artifact id per line, or one line saying none`];
+  }
+  const byId = new Map(corpus.map((n) => [n.id, n]));
+  const dangling = refs.filter((r) => !byId.has(r));
+  const out = dangling.length > 0 ? [`${name}: no artifact for — ${dangling.join(" · ")}`] : [];
+  out.push(...typeProblems(name, args.of, refs, byId, root));
+  return out;
+}
+
+function fieldProblems(name: string, meta: TemplateMeta, args: FieldArgs, content: string, corpus?: TraceNode[], root?: string): string[] {
   if (meta.editor === "choice-rationale") {
     const choice = choiceOf(content);
     if (args.options.length > 0 && !args.options.includes(choice))
@@ -134,7 +196,7 @@ function fieldProblems(name: string, meta: TemplateMeta, args: FieldArgs, conten
       return [`${name}: ${choice} — the claim does not stand, and the gate stays shut while it does`];
     return [];
   }
-  const out: string[] = [];
+  const out: string[] = [...refProblems(name, meta, args, content, corpus, root)];
   if (meta.editor === "per-item" && args.items.length > 0) {
     const missing = args.items.filter((i) => !new RegExp(`^- ${escapeRe(i)}: .+`, "m").test(content));
     if (missing.length > 0) out.push(`${name}: unanswered — ${missing.join(" · ")}`);
@@ -184,6 +246,14 @@ const FOLLOW_UP = {
   description: "What this work produces as next steps — work, or notes parked with their ready-when.",
   required: true,
 };
+// THE LAST BOX IS ALWAYS OPEN (owner ruling 2026-08-04): whoever fills a
+// form is asked whether anything is left unsaid. A form must never be the
+// reason something went unrecorded.
+const ANYTHING_ELSE = {
+  name: "anything_else",
+  description: "Anything else? Free text, optional. Say what the boxes above had no room for.",
+  required: false,
+};
 
 /** The lint template a state's form derives: situation, the evidence
  *  fields, follow-up — the fill sections in sheet order. */
@@ -197,6 +267,7 @@ export function stateFormFields(s: StateDecl): FormTemplate {
       ...(f.guidance !== undefined ? { guidance: f.guidance } : {}),
     })),
     FOLLOW_UP,
+    ANYTHING_ELSE,
   ];
   return { form: s.id, instance: `${s.id}.md`, statement: s.statement, fields };
 }
@@ -208,6 +279,7 @@ export function stateFormModel(
   m: MachineDecl,
   s: StateDecl,
   header: Record<string, string>,
+  instanceRaw?: string,
 ): StateFormModel {
   const entryReads = new Set(s.entry?.read ?? []);
   const inputs: FormInput[] = pulledFor(root, docs, m, s).map((d) => ({
@@ -226,8 +298,9 @@ export function stateFormModel(
   const fieldArgs: Record<string, FieldArgs> = {};
   for (const f of s.evidence_form) {
     fieldArgs[f.name] = {
+      of: f.of ?? "",
       options: f.options ?? [],
-      items: (f.items ?? []).flatMap((i) => (i === "$inbox" ? inboxItems(root) : [i])),
+      items: (f.items ?? []).flatMap((i) => (i === "$inbox" ? inboxItems(root, instanceRaw) : [i])),
       passing: f.passing ?? [],
       columns: f.columns ?? [],
     };
@@ -250,13 +323,23 @@ export function stateFormModel(
 }
 
 /** $inbox, resolved live: one item per pending note — the ref, then the
- *  note's own title so the filler knows what they are answering. */
-function inboxItems(root: string): string[] {
+ *  note's own title so the filler knows what they are answering.
+ *
+ *  A SIGNED FORM FREEZES ITS LIST (owner ruling 2026-08-04). The inbox
+ *  grows all day, and every new note re-opened a stamped form — which
+ *  stripped the bless on the way back through the save. So a signed
+ *  instance keeps only the notes it ALREADY names: its own answers are
+ *  the snapshot, and nothing new has to be stored to hold one. Editing
+ *  the form strips the stamp, and the live list returns with it. */
+function inboxItems(root: string, instanceRaw?: string): string[] {
+  let live: string[];
   try {
-    return pendingNotes(seDir(root)).map((n) => `${n.ref} — ${(n.title ?? n.text.split("\n")[0]).slice(0, 48)}`);
+    live = pendingNotes(seDir(root)).map((n) => `${n.ref} — ${(n.title ?? n.text.split("\n")[0]).slice(0, 48)}`);
   } catch {
     return [];
   }
+  if (instanceRaw === undefined || !/^signed_off: /m.test(instanceRaw)) return live;
+  return live.filter((i) => instanceRaw.includes(i.split(" — ")[0]));
 }
 
 // ── The portable copy ──────────────────────────────────────────────────

@@ -137,6 +137,7 @@ function evidenceField(file: string, entry: unknown, i: number): EvidenceField {
     ...(f.type !== undefined ? { type: String(f.type) as EvidenceType } : {}),
     ...(typeof f.guidance === "string" && f.guidance.trim() !== "" ? { guidance: f.guidance } : {}),
     ...(typeof f.template === "string" && f.template.trim() !== "" ? { template: f.template } : {}),
+    ...(typeof f.of === "string" && f.of.trim() !== "" ? { of: f.of.trim() } : {}),
     ...(Array.isArray(f.options) ? { options: f.options.map(String) } : {}),
     ...(Array.isArray(f.items) ? { items: f.items.map(String) } : {}),
     ...(Array.isArray(f.passing) ? { passing: f.passing.map(String) } : {}),
@@ -323,6 +324,7 @@ function rowState(row: RigorMatrixRow): Omit<StateDecl, "guidance" | "edges"> {
     // A state must declare enough to execute the remedy its own refusal hands
     // back, or SE-C-112 answers with SE-C-110 and the walk cannot recover.
     ...(row.legal_tools !== undefined ? { legal_tools: row.legal_tools } : {}),
+    ...(row.same_as !== undefined ? { same_as: row.same_as } : {}),
     ...(row.entry !== undefined ? { entry: row.entry } : {}),
     ...(row.motivation !== undefined ? { motivation: row.motivation } : {}),
     ...(row.inputs !== undefined ? { inputs: row.inputs } : {}),

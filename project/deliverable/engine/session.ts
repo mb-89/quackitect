@@ -13,7 +13,15 @@ import { existsSync, mkdirSync, readFileSync, statSync, unlinkSync, writeFileSyn
 import { dirname, join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
-import { activeStates, completeState, type MachineDecl, type MachineInstance, reopenStates, type StateDecl } from "./machine.ts";
+import {
+  activeStates,
+  completeState,
+  downstreamCone,
+  type MachineDecl,
+  type MachineInstance,
+  reopenStates,
+  type StateDecl,
+} from "./machine.ts";
 import { bumpDrawingEpoch, compileMachine, compileMachineCached, resolveRef } from "./machines/compile.ts";
 import { computeRoute, type RouteNode, type RouteResult } from "./route.ts";
 
@@ -59,6 +67,7 @@ import {
   generateIterationArchive,
   generateIterations,
   type Iteration,
+  iterationDrift,
   itFind,
   itList,
   itPinRel,
@@ -68,8 +77,9 @@ import {
   markStarted,
   pinIteration,
   readItRecord,
+  repinColumn,
 } from "./iterations.ts";
-import { parseStateNote, section } from "./notes.ts";
+import { parseStateNote, section, stripFrontmatterKeys } from "./notes.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
@@ -702,10 +712,15 @@ export class Session {
    *  on request — never on their own — and only at idle. The canary
    *  refuses to kill a running engine for a tree that does not load; then
    *  the child exits 42 and the shim respawns it on the new sources. The
-   *  walk reboots — by design; boot re-proves the new engine green. */
+   *  walk reboots — by design; boot re-proves the new engine green.
+   *
+   *  EMERGENCY RELOADS FROM ANY STAND (owner ruling 2026-08-04). Emergency
+   *  is repair, and repair is exactly when the walk cannot afford to go
+   *  home first: reaching idle costs an escape, and the escape costs the
+   *  target. */
   requestReload(): Record<string, unknown> {
     const leaf = this.active()[0] ?? "";
-    if (leaf !== "idle") {
+    if (leaf !== "idle" && !this._emergency) {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "the walk at idle — a reload reboots it, nothing mid-flight may be lost",
@@ -823,21 +838,29 @@ export class Session {
     this.rewalk(pin, `escalated to ${size}`);
   }
 
-  /** The pin GROWS the machine under the walk's feet: regenerate the
+  /** The pin RESHAPES the machine under the walk's feet: regenerate the
    *  iteration's machine (pinned now), carry history, counters and the
    *  active kickoff, and swap the frame in place. The machine id and the
-   *  state ids are stable, so the evidence store keeps answering. */
+   *  state ids are stable, so the evidence store keeps answering.
+   *
+   *  The compare is the compiled decl's CONTENT, because a widened field —
+   *  a new item, a new column, new guidance — leaves the state COUNT
+   *  untouched. A regeneration that drops a state the walk stands in is
+   *  left alone: the swapped frame would point at nothing. */
   private repinSwap(): void {
     const top = this.top();
     const parent = this.subs[this.subs.length - 2];
     if (top === undefined || parent === undefined) return;
     const regen = parent.gen?.subGen?.[top.parentState]?.();
-    if (regen === undefined || regen.decl.states.length <= top.decl.states.length) return;
+    if (regen === undefined || JSON.stringify(regen.decl) === JSON.stringify(top.decl)) return;
+    const active = [...activeStates(top.instance)];
+    const survives = (id: string): boolean => regen.decl.states.some((s) => s.id === id);
+    if (!survives(top.instance.current) || !active.every(survives)) return;
     const inst = newInstance(regen.decl);
     inst.history = top.instance.history;
     inst.counters = top.instance.counters;
     inst.current = top.instance.current;
-    inst.active = [...activeStates(top.instance)];
+    inst.active = active;
     this.subs[this.subs.length - 1] = { decl: regen.decl, instance: inst, parentState: top.parentState, gen: regen };
   }
 
@@ -870,6 +893,7 @@ export class Session {
     const known = owed.filter((id) => run.decl.states.some((s) => s.id === id));
     if (known.length === 0) return undefined;
     const { reopened, cone } = reopenStates(run.decl, run.instance, known, reason, new Date().toISOString());
+    this.unsign(run.decl, cone);
     this.notifyChange();
     return { reopened, cone };
   }
@@ -1190,9 +1214,14 @@ export class Session {
   }
 
   /** Standing in the retro — the one place holding the whole picture, so
-   *  the one place that may park a note or carry it (engine/inbox.ts). */
+   *  the one place that may park a note or carry it (engine/inbox.ts).
+   *
+   *  A MIRROR IS THE STATE IT MIRRORS. An iteration's onboard-retro carries
+   *  same_as: retro, and its own guidance calls it the one legal drain
+   *  place, so matching the id alone refused it the only job it has. */
   inRetro(): boolean {
-    return this.active().some((id) => id === "retro" || id.endsWith("/retro"));
+    const { machine, ids } = this.leaves();
+    return ids.some((id) => id === "retro" || machine.states.find((s) => s.id === id)?.same_as === "retro");
   }
 
   /** The machine standing behind a qualified prefix ("" is main). A prefix
@@ -1805,13 +1834,18 @@ export class Session {
     // ONE DRAWING VALIDATION PER WALK STEP — the epoch makes "the next
     // call" the unit of the read-it-live law (see machines/compile.ts).
     bumpDrawingEpoch();
-    const pullTarget = this._target === "" && this.active()[0] !== undefined && this.active()[0] !== "front_desk"
-      ? "front_desk"
-      : this._target;
+    this.driftReopen();
+    // THE AIM IS READ AFTER THE PAYLOAD LANDS. A CHOICE IS THE ACT OF
+    // AIMING, so reading the aim first threw it away: standing at idle,
+    // the walk fell back to the front desk and went THERE while the
+    // chosen door sat recorded and unwalked. Proven live 2026-08-05 —
+    // choice "expeditions" at autonomy 0.2 answered `do` for front_desk.
+    const targetNow = (): string =>
+      this._target === "" && this.active()[0] !== undefined && this.active()[0] !== "front_desk" ? "front_desk" : this._target;
     const head = (): Record<string, unknown> => ({
       where: this.active(),
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
-      target: pullTarget,
+      target: targetNow(),
       autonomy: this._autonomy,
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
     });
@@ -1840,6 +1874,8 @@ export class Session {
         ? { not_walked: fanOut, note: "one agent is walking, so only the first choice was taken — the others are yours to hand out" }
         : {}),
     });
+
+    const pullTarget = targetNow();
 
     // THE STANDING FORM COMES FIRST (owner rulings 2026-08-04): inside an
     // iteration's state with evidence fields, the stored form IS the work.
@@ -1899,13 +1935,34 @@ export class Session {
       };
     }
 
-    const first = r.steps[0];
+    // 2. THE GATES ON THE FIRST STEP: the slider, the reading, the form.
+    const gated = this.pullStepGate(r.steps[0], readProof, channel, head, extra);
+    if (gated !== undefined) return gated;
 
-    // 2. THE SLIDER, WEIGHED BEFORE THE READING. Order matters here and it
-    //    was wrong once: reading first sent the agent through several
-    //    documents to prepare for a step it was never allowed to take, and
-    //    only then told it to stop. Nothing is owed for a step that is not
-    //    the agent's.
+    // 3. THE HAPPY PATH, WALKED. Not one hop — every hop to the next
+    //    branching point, because start-to-front-desk has no branch in it
+    //    and should never cost a round trip per hop.
+    const swept = await this.sweep(pullTarget, channel);
+    return this.pullAfterSweep(swept, head, extra);
+  }
+
+  /** THE THREE GATES ON THE NEXT STEP, in the order they must run, or
+   *  undefined when the step is the agent's to take.
+   *
+   *  THE SLIDER IS WEIGHED BEFORE THE READING, and the order was wrong
+   *  once: reading first sent the agent through several documents to
+   *  prepare for a step it was never allowed to take, and only then told
+   *  it to stop. Nothing is owed for a step that is not the agent's.
+   *
+   *  The reading is the AGENT's proof. The person proves by checkbox, so
+   *  their pull never eats a document. */
+  private pullStepGate(
+    first: ReturnType<Session["route"]>["steps"][number],
+    readProof: "ok" | "wrong" | null,
+    channel: Channel,
+    head: () => Record<string, unknown>,
+    extra: () => Record<string, unknown>,
+  ): Record<string, unknown> | undefined {
     if (channel === "agent" && first.priority > this._autonomy) {
       return {
         pull: "wait",
@@ -1918,9 +1975,6 @@ export class Session {
       };
     }
 
-    // 3. THE READING, served here rather than sent somewhere else. It is
-    //    the AGENT's proof; the person proves by checkbox, so their pull
-    //    never eats a document.
     const served = channel === "agent" ? this.serveReading() : null;
     if (served !== null) {
       return {
@@ -1933,7 +1987,7 @@ export class Session {
       };
     }
 
-    // 4. THE FORM, BUILT AND HANDED OVER. The agent never looks one up.
+    // THE FORM IS BUILT AND HANDED OVER. The agent never looks one up.
     const unmet = (first.demands.evidence_form ?? []).filter((n) => !this.formsMet([n]));
     if (unmet.length > 0) {
       return {
@@ -1946,11 +2000,7 @@ export class Session {
       };
     }
 
-    // 5. THE HAPPY PATH, WALKED. Not one hop — every hop to the next
-    //    branching point, because start-to-front-desk has no branch in it
-    //    and should never cost a round trip per hop.
-    const swept = await this.sweep(pullTarget, channel);
-    return this.pullAfterSweep(swept, head, extra);
+    return undefined;
   }
 
   /** THE READING PROOF. The last pull served a document and named its tail;
@@ -2620,7 +2670,7 @@ export class Session {
     const s = this.stateFormState(name, m);
     const h = this.stateFormHome(name, m);
     const raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : undefined;
-    const model = stateFormModel(this.root, scanGuidance(this.root), m, s, this.stateFormHeader(name, raw, m));
+    const model = stateFormModel(this.root, scanGuidance(this.root), m, s, this.stateFormHeader(name, raw, m), raw);
     // The section lint plus the TEMPLATE checks — generic engine code,
     // configured per field in the templates' own markdown. One verdict
     // for both hands: the page's problems list and the gate's refusal.
@@ -2637,7 +2687,7 @@ export class Session {
       const body = parseStateNote(raw).body;
       for (const f of model.template.fields) fills[f.name] = stripComments(section(body, f.name)).trim();
     }
-    const tp = templateProblems(model, fills);
+    const tp = templateProblems(model, fills, this.root);
     const fmData = raw === undefined ? ({} as Record<string, unknown>) : parseStateNote(raw).frontmatter;
     return {
       state_form: true,
@@ -2660,19 +2710,46 @@ export class Session {
    *  state is done when its stored claim STANDS — signed, and blessed
    *  where it is a gate. Session runs die with the engine life; the
    *  record does not. States without records stay uncoloured. */
-  recordDone(decl: MachineDecl): string[] {
-    if (decl.id === this.machine.id) return [];
-    let it: Iteration | undefined;
-    try {
-      it = itList(this.root).find((x) => x.open && itShortId(x.id) === decl.id);
-    } catch {
-      return []; // no git, no records — nothing to colour
+  /** Where a state's stored claim lives, in the record's own worktree. */
+  private evidenceAbs(it: Iteration, state: string): string {
+    return join(it.path, `project/spec/iterations/${it.id}/evidence/${state}.md`);
+  }
+
+  /** A REOPENED STEP LOSES ITS STAMPS (owner ruling 2026-08-05).
+   *
+   *  signed_off and bless are not evidence. They are the assertions that the
+   *  evidence STANDS — and after a reopen it does not, by definition.
+   *
+   *  THE CLAIM ITSELF STAYS. The next walker reads what was said last time and
+   *  judges whether it still answers the question. Deleting it would throw away
+   *  the only thing that makes re-earning cheaper than starting over.
+   *
+   *  Leaving the stamps is what kept a reopened gate painted green: the paint
+   *  reads the FILE, which outlives the engine, not the instance, which does
+   *  not. */
+  private unsign(decl: MachineDecl, states: string[]): void {
+    const it = this.declIteration(decl);
+    if (it === undefined) return;
+    for (const id of states) {
+      const abs = this.evidenceAbs(it, id);
+      if (!existsSync(abs)) continue;
+      try {
+        const raw = readFileSync(abs, "utf8");
+        const next = stripFrontmatterKeys(raw, ["signed_off", "bless"]);
+        if (next !== raw) writeFileSync(abs, next, "utf8");
+      } catch {
+        // an unreadable claim has no stamp to strip
+      }
     }
+  }
+
+  recordDone(decl: MachineDecl): string[] {
+    const it = this.declIteration(decl);
     if (it === undefined) return [];
     const done: string[] = [];
     for (const s of decl.states) {
       if (s.evidence_form.length === 0) continue;
-      const abs = join(it.path, `project/spec/iterations/${it.id}/evidence/${s.id}.md`);
+      const abs = this.evidenceAbs(it, s.id);
       if (!existsSync(abs)) continue;
       try {
         const fm = parseStateNote(readFileSync(abs, "utf8")).frontmatter;
@@ -2686,6 +2763,72 @@ export class Session {
     // The mechanical start was necessarily walked on the way to any claim.
     if (done.length > 0) done.push("start");
     return done;
+  }
+
+  /** THE ITERATION THIS MACHINE IS, if it is one and it is still open. */
+  private declIteration(decl: MachineDecl): Iteration | undefined {
+    if (decl.id === this.machine.id) return undefined;
+    try {
+      return itList(this.root).find((x) => x.open && itShortId(x.id) === decl.id);
+    } catch {
+      return undefined; // no git, no records — nothing to check
+    }
+  }
+
+  /** THE DRIFT (owner ruling 2026-08-05): which states were passed against a
+   *  demand that has since moved, plus everything downstream of them.
+   *
+   *  GREEN MUST MEAN STILL GREEN NOW. The demand diff used to run only when a
+   *  pin was rewritten, and a pin is only rewritten on an escalation. So
+   *  editing a matrix row under a standing iteration changed what its steps
+   *  ask for and left every one of them green against a question that no
+   *  longer existed.
+   *
+   *  IT WRITES NOTHING. Somebody opening the machine to look must never
+   *  change the record, so the view calls this and paints. The walk calls
+   *  driftReopen, which is the only writer.
+   *
+   *  ONE WORD FOR ONE IDEA. A trace node standing on moved ground is suspect
+   *  too, by the same mechanism and wearing the same mark — see
+   *  trace.ts traceSuspects. */
+  suspectStates(decl: MachineDecl): string[] {
+    const it = this.declIteration(decl);
+    if (it === undefined) return [];
+    const moved = iterationDrift(this.root, it).filter((id) => decl.states.some((s) => s.id === id));
+    if (moved.length === 0) return [];
+    // ONLY A PASS CAN LAPSE (owner, 2026-08-05). The cone runs to the end of
+    // the machine, and most of it was never walked. Emptying those cards
+    // marks steps that had nothing to lose and drowns the ones that did —
+    // seen live, as the whole tail of the machine going blank at once.
+    const green = new Set(this.recordDone(decl));
+    const cone = downstreamCone(decl, moved);
+    return [...green].filter((id) => cone.has(id));
+  }
+
+  /** THE WRITER'S HALF: the walk arrives, so the drift stops being a mark on
+   *  a picture and becomes an actual reopen. Reusing rewalk means the drift
+   *  and the escalation reopen by exactly one mechanism.
+   *
+   *  Nothing to reopen is the normal case and costs one hash. */
+  private driftReopen(): void {
+    const run = this.top();
+    if (run === undefined) return;
+    const it = this.declIteration(run.decl);
+    if (it === undefined) return;
+    const moved = iterationDrift(this.root, it);
+    if (moved.length === 0) return;
+    // Only what this instance still counts as done can be reopened — without
+    // this the drift fires on every pull, and the walk never leaves the step.
+    const done = new Set(run.instance.history.filter((h) => h.outcome === "filled").map((h) => h.state));
+    const owed = moved.filter((id) => done.has(id));
+    if (owed.length > 0) this.rewalk({ reopened: owed }, "the rigor matrix moved under the pin");
+    // CONSUME IT EITHER WAY. The walk has now seen this move, whether or not
+    // anything was standing to reopen. Leaving the pin stale would re-fire it
+    // on the next pull, and the re-earned step would reopen forever.
+    repinColumn(this.root, it);
+    // The frame under the walk's feet is the OLD machine until it is swapped,
+    // so the reopened step would still serve the form it was reopened for.
+    this.repinSwap();
   }
 
   /** The walk STANDS in the state — the one moment its questions are in
@@ -2909,7 +3052,7 @@ export class Session {
     const s = this.stateFormState(name, m);
     const h = this.stateFormHome(name, m);
     const raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : undefined;
-    const model = stateFormModel(this.root, scanGuidance(this.root), m, s, this.stateFormHeader(name, raw, m));
+    const model = stateFormModel(this.root, scanGuidance(this.root), m, s, this.stateFormHeader(name, raw, m), raw);
     const fills: Record<string, string> = {};
     if (raw !== undefined) {
       const body = parseStateNote(raw).body;
@@ -4049,5 +4192,3 @@ export class Session {
     };
   }
 }
-
-

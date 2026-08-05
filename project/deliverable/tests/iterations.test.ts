@@ -10,7 +10,7 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { generateIterations, generateSeeded, itPinRel, itSeed, itSeededRel, pinIteration } from "../engine/iterations.ts";
 import { type MachineDecl, validateMachine } from "../engine/machine.ts";
-import { readRigorMatrix } from "../engine/rigor-matrix.ts";
+import { type ChangeColumn, compileColumn, readRigorMatrix } from "../engine/rigor-matrix.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { call, checkDocs, freshRoot } from "./helpers.ts";
@@ -145,22 +145,23 @@ test("the pin: the bless compiles the change size live; escalation only grows it
   const res = pinIteration(root, it, "patch") as { pinned: string; rigor_matrix_hash: string };
   assert.equal(res.pinned, "patch");
   assert.match(res.rigor_matrix_hash, /^[0-9a-f]{12}$/);
-  const pin = JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as {
-    change_size: string;
-    rigor_matrix_hash: string;
-    machine: MachineDecl;
-  };
+  const readPin = (): { change_size: string; rigor_matrix_hash: string; machine?: unknown } =>
+    JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as { change_size: string; rigor_matrix_hash: string };
+  const pin = readPin();
   assert.equal(pin.change_size, "patch");
-  validateMachine(pin.machine);
+  // THE MACHINE IS NOT STORED. The pin records which COLUMN is walked; the
+  // machine derives from it, so a matrix edit reaches the walk and the screen
+  // without anybody re-pinning. A frozen copy could only go stale.
+  assert.equal(pin.machine, undefined);
+  const column = (size: ChangeColumn): MachineDecl => compileColumn(readRigorMatrix(root), size);
+  validateMachine(column("patch"));
   // ESCALATION re-pins larger — monotonicity: every patch state survives.
-  const patchIds = pin.machine.states.map((s) => s.id);
+  const patchIds = column("patch").states.map((s) => s.id);
   pinIteration(root, it, "minor");
-  const pin2 = JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as { machine: MachineDecl };
+  assert.equal(readPin().change_size, "minor");
+  const minorIds = column("minor").states.map((s) => s.id);
   for (const id of patchIds) {
-    assert.ok(
-      pin2.machine.states.some((s) => s.id === id),
-      `${id} was filled at patch and must survive the escalation`,
-    );
+    assert.ok(minorIds.includes(id), `${id} was filled at patch and must survive the escalation`);
   }
   // DE-ESCALATION (and a same-size re-pin) refused — drift never reaches a running walk.
   assert.throws(() => pinIteration(root, it, "patch"), /ESCALATION/);
@@ -168,9 +169,8 @@ test("the pin: the bless compiles the change size live; escalation only grows it
   // product SITS ABOVE major: the first iteration of a product authors the
   // vision, the stakeholders and the actual state every later one inherits.
   pinIteration(root, it, "product");
-  const pin3 = JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as { change_size: string; machine: MachineDecl };
-  assert.equal(pin3.change_size, "product");
-  validateMachine(pin3.machine);
+  assert.equal(readPin().change_size, "product");
+  validateMachine(column("product"));
   // specification is read and validated as a column, never pinned as a walk.
   assert.throws(() => pinIteration(root, it, "specification"), /patch \| minor \| major \| product/);
 });
@@ -340,7 +340,8 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
     left_out: "- everything else",
     change_size: "patch — the smallest walk proves the seam",
     round_0_verify: "- evidence vs claims: read\n- types: green\n- lint: green\n- tests: green",
-    round_1_validate: "- exercised against the goal: walked\n- missing: none\n- wrong: none\n- out of scope: none",
+    round_1_validate:
+      "- exercised against the goal: walked\n- missing: none\n- wrong: none\n- out of scope: none\n- prior art: none in this seam",
     round_2_red_team: "- none => the attack found nothing",
     verdict: "pass — the claims held",
     follow_up: "none",
@@ -369,8 +370,12 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
   assert.deepEqual(session.breadcrumb(), ["main", "iterations", sid], "the walk stands in the SAME machine");
   const grown = session.currentMachine();
   assert.equal(grown.id, sid, "the machine id is stable across the pin");
-  const pin = JSON.parse(readFileSync(join(root, ".worktrees", id, itPinRel(id)), "utf8")) as { machine: MachineDecl };
-  assert.equal(grown.states.length, pin.machine.states.length, "the machine is the pinned column now");
+  const pin = JSON.parse(readFileSync(join(root, ".worktrees", id, itPinRel(id)), "utf8")) as { change_size: ChangeColumn };
+  assert.equal(
+    grown.states.length,
+    compileColumn(readRigorMatrix(root), pin.change_size).states.length,
+    "the machine is the pinned column, compiled live from it",
+  );
   // Leaving the blessed kickoff by a NAMED edge completes it — and the
   // M0 fills carried across the swap.
   await session.advance(grown.states.find((s) => s.id === "gate-kickoff")!.edges[0].to);

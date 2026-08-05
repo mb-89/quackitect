@@ -633,17 +633,20 @@ export function startMirror(o: MirrorOptions): Server {
     },
   };
 
-  const WIDGETS = new Set(["machine", "details", "log", "terminal", "table"]);
+  const WIDGETS = new Set(["machine", "details", "log", "terminal", "table", "trace"]);
 
   // RENDER FIRST, THEN WRITE THE HEAD. See the note at the dispatcher's catch.
   const serveWidget = (widget: string, url: URL, res: Res): void => {
     const html = renderMirror(
       state,
-      widget as "machine" | "details" | "log" | "terminal" | "table",
+      widget as "machine" | "details" | "log" | "terminal" | "table" | "trace",
       url.searchParams.get("view") ?? undefined,
       undefined,
       url.searchParams.get("embed") === "1",
       url.searchParams.get("tv") ?? undefined,
+      url.searchParams.get("tp") ?? undefined,
+      url.searchParams.get("tt") ?? undefined,
+      url.searchParams.get("tq") ?? undefined,
     );
     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
     res.end(html);
@@ -659,6 +662,10 @@ export function startMirror(o: MirrorOptions): Server {
       url.searchParams.get("view") ?? undefined,
       url.searchParams.get("card") ?? undefined,
       url.searchParams.get("embed") === "1",
+      undefined,
+      url.searchParams.get("tp") ?? undefined,
+      url.searchParams.get("tt") ?? undefined,
+      url.searchParams.get("tq") ?? undefined,
     );
     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
     res.end(page);

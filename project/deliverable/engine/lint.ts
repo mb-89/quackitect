@@ -32,6 +32,22 @@ const DEFAULTS: Cfg = {
 
 export const LINT_CONFIG = "project/deliverable/machines/lint/voice-lint.md";
 
+/** REFERENCES ARE NOTES (owner ruling 2026-08-04). An external source is ONE
+ *  note under this folder, and a claim anywhere else cites that note. Links
+ *  spread through the prose are links nobody can keep from rotting. */
+export const REFERENCE_HOME = "spec/references/";
+
+function linkFinding(line: string, i: number): LintFinding | undefined {
+  const link = line.match(/https?:\/\/[^\s)>\]"']+/);
+  if (link === null) return undefined;
+  return {
+    rule: "external-link",
+    line: i + 1,
+    excerpt: link[0].slice(0, 60),
+    hint: `an external link belongs in ${REFERENCE_HOME} — write a reference note and cite it`,
+  };
+}
+
 function loadCfg(root: string): Cfg {
   try {
     const fm = parseStateNote(readFileSync(join(root, ...LINT_CONFIG.split("/")), "utf8")).frontmatter;
@@ -49,10 +65,15 @@ function loadCfg(root: string): Cfg {
 }
 
 /** Lint prose text. Frontmatter and code fences are skipped; headings,
- *  list items, quotes and table rows count as structure, never as walls. */
-export function lintProse(root: string, text: string): LintFinding[] {
+ *  list items, quotes and table rows count as structure, never as walls.
+ *
+ *  Pass `rel` where the text HAS a home: the external-link rule needs to
+ *  know whether it is reading a reference note. Text with no path is text
+ *  with no home, and the rule stays quiet. */
+export function lintProse(root: string, text: string, rel?: string): LintFinding[] {
   const cfg = loadCfg(root);
   const findings: LintFinding[] = [];
+  const linksAllowed = rel === undefined || rel.replace(/\\/g, "/").includes(REFERENCE_HOME);
   const body = text.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, "");
   const lines = body.split(/\r?\n/);
   let inCode = false;
@@ -77,6 +98,10 @@ export function lintProse(root: string, text: string): LintFinding[] {
       return;
     }
     if (inCode) return;
+    if (!linksAllowed) {
+      const link = linkFinding(l, i);
+      if (link !== undefined) findings.push(link);
+    }
     const isStructure = l.trim() === "" || /^#{1,6}\s/.test(l) || /^\s*[-*>|]/.test(l) || /^\s*\d+\.\s/.test(l);
     if (isStructure) {
       flushWall();

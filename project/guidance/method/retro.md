@@ -26,8 +26,12 @@ The trigger is a NOTE carrying "needs retro":
 ## The steps
 
 1. MARK THE BOUNDARY, before anything else. Run se_log_query with
-   filter {since: "last_retro"} and keep the newest timestamp it
-   returns. Write it down; every later query uses THAT timestamp.
+   filter {since: "last_retro"} and take the timestamp of its OLDEST
+   record. That is where the window opens, just after the previous
+   retro's drain. Write it down; every later query uses THAT timestamp.
+
+   The result pages NEWEST first, so the oldest record sits at the last
+   offset. The first call's `total` says which offset that is.
 
    Why first: "last_retro" means the newest drain call, and step 3
    drains. Once you have drained, the phrase points at your own retro
