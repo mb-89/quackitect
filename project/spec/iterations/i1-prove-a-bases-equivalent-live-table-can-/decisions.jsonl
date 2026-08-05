@@ -162,3 +162,10 @@
 {"ts":"2026-08-05T18:38:02.658Z","op":"plan","visit":"iterations/i1/gate-motivation@0","parent":null,"nodes":[{"id":"d8","brief":"one agent walks a fan leg by leg, and the join offers the legs it still needs"}]}
 {"ts":"2026-08-05T18:39:10.768Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d9","brief":"the battery — the offer and the owed rule sit on every walk"}
 {"ts":"2026-08-05T18:40:36.815Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d10","brief":"775 green — landing the fan fix"}
+{"ts":"2026-08-05T18:42:15.648Z","op":"update","visit":"iterations/i1/start@0","node":"d1","brief":"walking forward to take the leg I missed"}
+{"ts":"2026-08-05T18:42:39.468Z","op":"plan","visit":"iterations/i1/draft-vision@0","parent":null,"nodes":[{"id":"d2","brief":"take the log-risks leg"},{"id":"d3","brief":"then pressure-test"},{"id":"d4","brief":"then the gate"}]}
+{"ts":"2026-08-05T18:42:46.527Z","op":"done","visit":"iterations/i1/draft-vision@0","node":"d2","brief":"log-risks re-attested"}
+{"ts":"2026-08-05T18:43:09.116Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d5","brief":"asking the gate for the leg it is missing"}
+{"ts":"2026-08-05T18:43:32.117Z","op":"done","visit":"iterations/i1/draft-vision@0","node":"d3","brief":"pressure-test filled and signed — the fan fix fetched the leg"}
+{"ts":"2026-08-05T18:43:46.929Z","op":"done","visit":"iterations/i1/draft-vision@0","node":"d4","brief":"the gate is stamped and waiting on the owner's bless"}
+{"ts":"2026-08-05T18:43:55.593Z","op":"plan","visit":"iterations/i1/gate-motivation@0","parent":null,"nodes":[{"id":"d6","brief":"commit the walked record"}]}
