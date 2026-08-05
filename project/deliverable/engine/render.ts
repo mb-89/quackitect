@@ -841,6 +841,10 @@ const STYLE = `
   .cond-label { font-size: 20px; text-anchor: middle; fill: var(--se-fg); pointer-events: none; }
   .doclist a { display: block; padding: 4px 0; }
   a.doclink { color: var(--se-link); cursor: pointer; text-decoration: underline; }
+  /* A REFERENCE OPENS ITS FILE, never the details pane — so it is NOT a
+     doclink, whose handler would render it here and take the pane the
+     reader is reviewing from. */
+  a.reflink { color: var(--se-link); cursor: pointer; text-decoration: underline; font-size: 11.5px; padding: 0 4px; }
   .docview { font-size: 13.5px; line-height: 1.55; }
   .docview h1, .docview h2, .docview h3 { color: var(--se-accent); }
   .docview code { background: var(--se-raised); padding: 1px 5px; border-radius: 4px; }
@@ -1643,7 +1647,7 @@ function sfEditor(fl, tm, args, paths) {
     // is exactly the work the reference was supposed to save.
     const link = function (v) {
       const p = tm.resolves === "artifact" && paths ? paths[v.replace(/^\\[\\[|\\]\\]$/g, "")] : null;
-      return p ? '<a class="doclink openref" data-path="' + escText(p) + '" title="open ' + escText(p) + '">open</a>' : "";
+      return p ? '<a class="reflink" data-path="' + escText(p) + '" title="open ' + escText(p) + ' in the editor">open</a>' : "";
     };
     return '<div class="sfrows">' + sfDash(fl.content).concat([""]).map(function (v) { return '<div class="sfrow"><input class="sfli" data-field="' + name + '" placeholder="' + ph + '" value="' + escText(v) + '">' + link(v) + sfRowBtns() + "</div>"; }).join("") + "</div>";
   }
@@ -1886,12 +1890,13 @@ document.addEventListener("click", async (ev) => {
   }
   const ofo = ev.target.closest ? ev.target.closest(".openfolder") : null;
   if (ofo) { await formPost("/form/folder", { name: ofo.dataset.form }); return; }
-  // THE ARTIFACT OPENS WHERE IT IS EDITED. Inside the editor the host owns
-  // the file; standing alone, the details pane renders it instead.
-  const orf = ev.target.closest ? ev.target.closest(".openref") : null;
+  // THE ARTIFACT OPENS IN THE EDITOR, AND ONLY THERE (owner, 2026-08-05).
+  // Rendering it in details as well cost the reader the pane they were
+  // reviewing from — two surfaces answering one click, and the one they
+  // still needed was the one that got replaced.
+  const orf = ev.target.closest ? ev.target.closest(".reflink") : null;
   if (orf) {
     if (window.parent !== window) window.parent.postMessage({ se: "open", path: orf.dataset.path }, "*");
-    else await openDoc(orf.dataset.path, "comment");
     return;
   }
 });
