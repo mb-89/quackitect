@@ -18,11 +18,11 @@ evidence:
   - name: verifiable
     description: "every requirement carries its named verify_method"
   - name: traced
-    description: "every requirement traces to a story or prop - the matrix shows no empty rows"
+    description: "every requirement refines a use case, and the chain reaches a story - no empty matrix rows, no orphan register rows"
   - name: functions_cover
     description: "every requirement requires at least one function; every use-case step covered"
   - name: set_holds
-    description: "complete, consistent, affordable, bounded; no TBD"
+    description: "the six set answers stand: complete, consistent, affordable, bounded, comprehensible - and the TBD sweep counted zero"
   - name: breaks_if_removed
     description: "filled on every requirement"
   - name: assumptions_probed
