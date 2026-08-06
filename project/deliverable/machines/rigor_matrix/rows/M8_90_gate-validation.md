@@ -3,6 +3,7 @@ kind: matrix-row
 name: gate-validation
 statement: "GATE validation: meets the need - and this bless IS the sign-off."
 state_kind: gate
+busbar: true
 filled_by: agent
 depends_on:
   - fill-story-evidence

@@ -3,6 +3,7 @@ kind: matrix-row
 name: gate-kickoff
 statement: "GATE kickoff: the gate of milestone M0 - sets the change size and the rigor of the machine below."
 state_kind: gate
+busbar: true
 filled_by: agent
 motivation: Work is priced before it is done. Too little rigor ships an untested change; too much drowns a small one in ceremony. The kickoff sizes the bet once, while it is cheap, and the machine below grows to match - nothing downstream re-litigates it.
 depends_on:

@@ -49,6 +49,8 @@ export interface RigorMatrixRow {
   filled_by: "agent" | "engine";
   command?: string;
   depends_on: string[];
+  /** Whether this row's inputs meet at an AND bar. Absent means they do not. */
+  busbar: boolean;
   /** Set when the state SEEDS (authors) an iteration-local sub-machine. */
   seeds?: string;
   /** Set when the state RUNS a seeded sub-machine — the walk descends here. */
@@ -201,6 +203,8 @@ function parseMatrixRow(
     filled_by: fm.filled_by === "engine" ? "engine" : "agent",
     command: typeof fm.command === "string" ? fm.command : undefined,
     depends_on: asList(fm.depends_on),
+    // THE BAR IS AUTHORED. A row without one lets its inputs meet as an OR.
+    busbar: fm.busbar === true,
     seeds: typeof fm.seeds === "string" ? fm.seeds : undefined,
     runs: typeof fm.runs === "string" ? fm.runs : undefined,
     floor: fm.floor === true,
@@ -445,6 +449,7 @@ export function compileColumn(matrix: RigorMatrix, column: ChangeColumn): Machin
       ...rowState(row),
       guidance: [cell.body, row.guidance].filter(Boolean).join("\n\n"),
       ...(row.runs ? { submachine: row.runs } : {}),
+      busbar: row.busbar,
       edges: edgesFrom.get(row.name) ?? [],
     });
   }
@@ -479,6 +484,7 @@ export function compileM0(matrix: RigorMatrix, id: string): MachineDecl {
     states.push({
       ...rowState(row),
       guidance: row.guidance,
+      busbar: row.busbar,
       edges: dependents.length > 0 ? dependents.map((o) => ({ to: o.name, role: roleFrom(row) })) : [{ to: "end", role: roleFrom(row) }],
     });
   }

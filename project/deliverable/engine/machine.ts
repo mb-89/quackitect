@@ -125,6 +125,22 @@ export interface StateDecl {
    *  the machinery enters (auto-advanced), end closes the machine (terminal).
    *  Nothing machine-specific belongs in them. */
   kind: "work" | "gate" | "terminal" | "start" | "end" | "join";
+  /** THE BUSBAR (owner ruling 2026-08-06): this state's inputs meet at an
+   *  AND bar. The bar is passed only when EVERY state feeding it is done,
+   *  and the state cannot submit before then.
+   *
+   *  THE BAR IS AUTHORED, NOT INFERRED. It is an element of the state
+   *  machine, drawn by whoever writes the row. The engine never decides
+   *  where one belongs.
+   *
+   *  ITS ABSENCE IS THE OR, and that is the default. A state with several
+   *  inputs and no bar above it moves on the first input that arrives. No
+   *  vocabulary says this — the missing bar already does.
+   *
+   *  NOT A GATE THING. A gate is one state that happens to carry a bar.
+   *  Work states carry them too. The engine used to key the whole rule off
+   *  kind === "gate", which gave every work state an accidental OR. */
+  busbar?: boolean;
   /** Diagram grouping, e.g. "boot" — presentation metadata, no run-time meaning. */
   group?: string;
   /** AUTHORED meaning, or empty (owner ruling 2026-07-28): a statement

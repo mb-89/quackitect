@@ -1786,7 +1786,7 @@ export class Session {
    *  branching point. Weight and openness ride along, so choosing costs
    *  no second call. */
   private pullOptions(): Record<string, unknown>[] {
-    const stuck = this.gateStuck();
+    const stuck = this.joinStuck();
     if (stuck !== undefined) {
       return stuck.feeders.flatMap((f) => {
         const t = stuck.machine.states.find((x) => x.id === f);
@@ -2085,7 +2085,7 @@ export class Session {
     }
     // TAKING A FAN'S OTHER LEG IS A MOVE, not an aim: there is no edge back
     // to it, so no route could ever be drawn.
-    const stuck = this.gateStuck();
+    const stuck = this.joinStuck();
     if (stuck !== undefined) {
       const leg = stuck.feeders.find((f) => this.qualHere(f) === picks[0]);
       if (leg !== undefined) {
@@ -2580,13 +2580,13 @@ export class Session {
           source: "engine/session.ts stateform",
         });
       }
-      const feeders = this.gateFeedersUnsigned(fm, this.stateFormState(name, fm));
+      const feeders = this.feedersUnsigned(fm, this.stateFormState(name, fm));
       if (feeders.length > 0) {
         throw new Rejection({
           clause: CLAUSES.CONDITION_UNMET,
-          expected: `a gate requires ALL its inputs — every feeder form signed before ${name} may stamp`,
+          expected: `a state requires ALL its inputs — every feeder form signed before ${name} may stamp`,
           got: `unsigned feeders: ${feeders.join(", ")}`,
-          remedy: { tool: "se_pull", args: {}, note: "walk the named states and submit their forms; the gate stamps after" },
+          remedy: { tool: "se_pull", args: {}, note: "walk the named states and submit their forms; this one stamps after" },
           source: "engine/session.ts stateform",
         });
       }
@@ -3105,9 +3105,9 @@ export class Session {
       // at the submit left the bless with no carrier — the pull stopped asking,
       // and a bless only rides a pull that is asking. The mirror's thumbs still
       // worked, so the gap was invisible to a person and total for an agent.
-      // A GATE MISSING AN INPUT OWES NOTHING. Its form cannot be finished, and
+      // A STATE MISSING AN INPUT OWES NOTHING. Its form cannot be finished, and
       // owing it swallows every choice that would fetch the missing leg.
-      if (f.gate === true && this.gateFeedersUnsigned(machine, s).length > 0) return undefined;
+      if (this.feedersUnsigned(machine, s).length > 0) return undefined;
       const blessed = f.gate !== true || (f.bless ?? "") !== "";
       return f.signed === true && f.met === true && blessed ? undefined : s.id;
     } catch {
@@ -3123,14 +3123,17 @@ export class Session {
    *  cannot finish, and a choice is only read when nothing is owed, so every
    *  attempt to aim elsewhere is swallowed as a fill.
    *
-   *  So at a stuck gate the unsigned feeders ARE the offer, and taking one
-   *  puts the walk back on that leg. One agent walks a fan leg by leg; the
-   *  list form still serves several agents unchanged. */
-  private gateStuck(): { machine: MachineDecl; feeders: string[] } | undefined {
+   *  So where the walk stands stuck the unsigned feeders ARE the offer, and
+   *  taking one puts the walk back on that leg. One agent walks a fan leg by
+   *  leg; the list form still serves several agents unchanged. */
+  private joinStuck(): { machine: MachineDecl; feeders: string[] } | undefined {
     const { machine, ids } = this.leaves();
-    const gate = machine.states.find((s) => s.id === ids[0]);
-    if (gate === undefined || gate.kind !== "gate") return undefined;
-    const feeders = this.gateFeedersUnsigned(machine, gate);
+    const here = machine.states.find((s) => s.id === ids[0]);
+    // A STATE THAT OWES NO FORM CANNOT BE STUCK OWING ONE. start and end
+    // collect edges like anything else, but they never wait on them, so
+    // offering their feeders as an escape stops a sweep that was fine.
+    if (here === undefined || here.evidence_form.length === 0) return undefined;
+    const feeders = this.feedersUnsigned(machine, here);
     return feeders.length === 0 ? undefined : { machine, feeders };
   }
 
@@ -3145,20 +3148,44 @@ export class Session {
     this.notifyChange();
   }
 
-  /** A GATE requires ALL its inputs: every feeder state carrying an
-   *  evidence form must be SIGNED before the gate may stamp or pass. */
-  private gateFeedersUnsigned(fm: MachineDecl, gate: StateDecl): string[] {
-    if (gate.kind !== "gate") return [];
-    return fm.states
-      .filter((p) => p.evidence_form.length > 0 && p.edges.some((e) => e.to === gate.id))
-      .filter((p) => {
-        try {
-          return (this.stateFormGet(p.id, fm) as { signed?: boolean }).signed !== true;
-        } catch {
-          return true;
-        }
-      })
-      .map((p) => p.id);
+  /** EVERY STATE REQUIRES ALL ITS INPUTS (owner ruling, 2026-08-06). Each
+   *  feeder carrying an evidence form must be SIGNED before this state may
+   *  stamp or pass. No state is an exception, and a gate was never special —
+   *  it was only the one place the rule happened to be written down.
+   *
+   *  THE LINE THAT USED TO STAND HERE was `if (gate.kind !== "gate") return
+   *  []`, and it was the whole defect. Several incoming edges met as an OR:
+   *  one signed feeder let the state through and the panel went green over a
+   *  hole. The owner caught it on generalize-use-cases, standing green with
+   *  an unsigned write-stories directly above it.
+   *
+   *  FALLBACK AND RECOVERY EDGES ARE NOT INPUTS. A fallback hangs off its
+   *  dependency as the guard-failure path, and the recovery edge points back
+   *  the way it came. Neither is something the state waits for. */
+  private feedersUnsigned(fm: MachineDecl, state: StateDecl): string[] {
+    const REQUIRED = new Set(["normal", "approval"]);
+    const feeders = fm.states.filter(
+      (p) => p.evidence_form.length > 0 && p.edges.some((e) => e.to === state.id && REQUIRED.has(e.role ?? "normal")),
+    );
+    if (feeders.length === 0) return [];
+    const unsigned = feeders.filter((p) => {
+      try {
+        return (this.stateFormGet(p.id, fm) as { signed?: boolean }).signed !== true;
+      } catch {
+        return true;
+      }
+    });
+    // THE BAR IS THE AND: every input signed, or the state does not stamp.
+    if (state.busbar === true) return unsigned.map((p) => p.id);
+    // NO BAR IS THE OR, and the OR still demands ONE. A state waits until an
+    // input actually arrives; it just does not care which.
+    //
+    // WITH A SINGLE INPUT THE TWO RULES MEET. One of one is all of one, so a
+    // lone predecessor binds without any bar being drawn. That is the case
+    // that was wide open: generalize-use-cases has exactly one input, so no
+    // bar could have saved it and no OR excused it — nothing was checking a
+    // work state's inputs at all.
+    return unsigned.length === feeders.length ? unsigned.map((p) => p.id) : [];
   }
 
   private assertStateFormMet(stateId: string): void {
@@ -3188,16 +3215,16 @@ export class Session {
         source: "engine/session.ts stateform",
       });
     }
-    if (lint.gate === true) {
+    {
       const m = this.currentMachine();
       const gs = m.states.find((x) => x.id === stateId);
-      const feeders = gs === undefined ? [] : this.gateFeedersUnsigned(m, gs);
+      const feeders = gs === undefined ? [] : this.feedersUnsigned(m, gs);
       if (feeders.length > 0) {
         throw new Rejection({
           clause: CLAUSES.CONDITION_UNMET,
-          expected: `a gate requires ALL its inputs — every feeder form signed before ${stateId} passes`,
+          expected: `a state requires ALL its inputs — every feeder form signed before ${stateId} passes`,
           got: `unsigned feeders: ${feeders.join(", ")}`,
-          remedy: { tool: "se_pull", args: {}, note: "walk the named states and submit their forms; the gate passes after" },
+          remedy: { tool: "se_pull", args: {}, note: "walk the named states and submit their forms; this one passes after" },
           source: "engine/session.ts stateform",
         });
       }

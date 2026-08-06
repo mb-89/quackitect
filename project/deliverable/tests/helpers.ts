@@ -218,7 +218,16 @@ export async function call(server: Server, name: string, args: Record<string, un
  *  SOFTWARE AND UX LEFT IT on 2026-08-06, when they moved out of the guidance
  *  root behind applies_to. They bind the states that build something, and the
  *  way to the desk passes through none of them. */
-export const READ_DOCS = ["project/guidance/method/boot.md", "project/guidance/method/front-desk.md"] as const;
+// REFUSALS RIDES EVERY PACKET, because it sits at the guidance ROOT and root
+// docs pull everywhere. That is the point of it: a clause stated only when it
+// fires is feedback, and the owner asked for feed-forward (ruling
+// 2026-08-06). So the human's proof owes it wherever the walk stands, and a
+// fixture that skips it fails at the first hop into idle.
+export const READ_DOCS = [
+  "project/guidance/method/boot.md",
+  "project/guidance/method/front-desk.md",
+  "project/guidance/refusals.md",
+] as const;
 
 /** The craft guidance, and the states it binds. Pulled THERE, nowhere else. */
 export const CRAFT_DOCS = ["project/guidance/craft/software.md", "project/guidance/craft/ux.md"] as const;

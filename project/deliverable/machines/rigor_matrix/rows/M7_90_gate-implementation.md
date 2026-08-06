@@ -3,6 +3,7 @@ kind: matrix-row
 name: gate-implementation
 statement: "GATE implementation: built inside the baseline, verified green across all iterations."
 state_kind: gate
+busbar: true
 filled_by: agent
 depends_on:
   - verification

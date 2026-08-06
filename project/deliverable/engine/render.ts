@@ -396,14 +396,14 @@ function svgRoute(route: RouteMarks | undefined, nodeOfState: Map<string, CNode>
   return parts;
 }
 
-// THE BUSBAR IS STRUCTURE, NOT ROUTE (owner ruling 2026-08-04): a gate
-// collects ALL its inputs, so every multi-feeder gate draws its feeders as
+// THE BUSBAR IS STRUCTURE, NOT ROUTE (owner ruling 2026-08-04): a state
+// collects ALL its inputs, so every multi-feeder state draws its feeders as
 // taps into a collection bar wearing the AND icon — one line drops from
-// the bar into the gate, and the individual feeder arrows disappear.
-function svgBusbars(busbars: { gate: string; feeders: string[] }[], nodeOfState: Map<string, CNode>): string[] {
+// the bar into the state, and the individual feeder arrows disappear.
+function svgBusbars(busbars: { into: string; feeders: string[] }[], nodeOfState: Map<string, CNode>): string[] {
   const parts: string[] = [];
   for (const b of busbars) {
-    const g = nodeOfState.get(b.gate);
+    const g = nodeOfState.get(b.into);
     if (g === undefined) continue;
     const taps = b.feeders.map((f) => nodeOfState.get(f)).filter((n): n is CNode => n !== undefined);
     if (taps.length === 0) continue;
@@ -431,7 +431,7 @@ function machineSvg(
   doneIds: Set<string>,
   subIds: Set<string>,
   meta: Record<string, StateMeta>,
-  busbars: { gate: string; feeders: string[] }[],
+  busbars: { into: string; feeders: string[] }[],
   route?: RouteMarks,
 ): string {
   const canvas = source;
@@ -447,7 +447,7 @@ function machineSvg(
     const s = stateIdOf(n);
     if (s !== undefined) nodeOfState.set(s, n);
   }
-  const skip = new Set(busbars.flatMap((b) => b.feeders.map((f) => `${f}->${b.gate}`)));
+  const skip = new Set(busbars.flatMap((b) => b.feeders.map((f) => `${f}->${b.into}`)));
   const parts: string[] = [
     ...svgGroups(nodes),
     ...svgEdges(canvas, byId, skip),
@@ -3205,10 +3205,28 @@ export function renderMirror(
   const history = m.session.instance.history ?? [];
   const { leafActive, done, paint, subIds, meta } = drawingSets(m, decl, info, viewingWalk);
   const marks = routeMarksFor(m, decl);
-  // A GATE COLLECTS ALL ITS INPUTS: every multi-feeder gate draws as a busbar.
+  // EVERY STATE COLLECTS ALL ITS INPUTS (owner ruling 2026-08-06), so every
+  // multi-feeder state draws as a busbar — not only the gates.
+  //
+  // The drawing used to filter kind === "gate" here, and the enforcement in
+  // session.ts skipped anything that was not a gate. The two agreed with each
+  // other and both were wrong: generalize-use-cases took its feeders as an
+  // OR, on screen and in the check alike. THE BAR AND THE REFUSAL MUST USE
+  // THE SAME RULE, or a person reads a promise the engine does not keep.
+  //
+  // FALLBACK AND RECOVERY EDGES ARE NOT INPUTS. A fallback is the
+  // guard-failure path and its recovery edge points back the way it came, so
+  // neither taps the bar.
+  const INPUT_ROLES = new Set(["normal", "approval"]);
   const busbars = decl.states
-    .filter((s) => s.kind === "gate")
-    .map((g) => ({ gate: g.id, feeders: decl.states.filter((p) => p.edges.some((e) => e.to === g.id)).map((p) => p.id) }))
+    // THE BAR IS AUTHORED, so only a row that declares one draws one. A state
+    // with two inputs and no declared bar is an OR, and drawing a bar over it
+    // would promise an AND the engine does not enforce.
+    .filter((g) => g.busbar === true)
+    .map((g) => ({
+      into: g.id,
+      feeders: decl.states.filter((p) => p.edges.some((e) => e.to === g.id && INPUT_ROLES.has(e.role ?? "normal"))).map((p) => p.id),
+    }))
     .filter((b) => b.feeders.length >= 2);
   const svg = machineSvg(canvas, leafActive, paint, subIds, meta, busbars, marks);
   const crumbs = crumbsFor(m, decl);

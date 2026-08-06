@@ -3,6 +3,7 @@ kind: matrix-row
 name: gate-candidates
 statement: "GATE candidates: the front is blessed, never a winner."
 state_kind: gate
+busbar: true
 filled_by: agent
 depends_on:
   - evaluate-set

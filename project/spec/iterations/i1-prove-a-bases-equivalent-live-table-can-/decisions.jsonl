@@ -543,3 +543,50 @@
 {"ts":"2026-08-06T17:35:23.728Z","op":"update","visit":"iterations/i1/map-stakeholders@0","node":"d26","brief":"map-stakeholders signed; gate-inputs is next"}
 {"ts":"2026-08-06T17:35:59.480Z","op":"update","visit":"iterations/i1/map-stakeholders@0","node":"d27","brief":"the handover tracks eleven re-earned states"}
 {"ts":"2026-08-06T17:36:34.309Z","op":"update","visit":"iterations/i1/generalize-use-cases@0","node":"d28","brief":"generalize-use-cases had lost its stamp too"}
+{"ts":"2026-08-06T17:37:22.316Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d29","brief":"the M2 fan is whole so the gate can serve"}
+{"ts":"2026-08-06T17:37:56.122Z","op":"done","visit":"iterations/i1/start@0","node":"d4","brief":"three gates blessed and the user picture stands"}
+{"ts":"2026-08-06T17:38:58.947Z","op":"plan","visit":"iterations/i1/gate-inputs@0","parent":null,"nodes":[{"id":"d30","brief":"file the dependency-check defect"},{"id":"d31","brief":"re-earn write-stories honestly"},{"id":"d32","brief":"re-check what stood above it"}]}
+{"ts":"2026-08-06T17:39:22.082Z","op":"done","visit":"iterations/i1/gate-inputs@0","node":"d30","brief":"the defect is the unmet dependency, not the signature"}
+{"ts":"2026-08-06T17:44:37.295Z","op":"plan","visit":"iterations/i1/gate-inputs@0","parent":null,"nodes":[{"id":"d33","brief":"widen the all-inputs check from gates to every state"},{"id":"d34","brief":"reword the three refusals"},{"id":"d35","brief":"add the requirement to the register"},{"id":"d36","brief":"test"},{"id":"d37","brief":"re-earn write-stories"}]}
+{"ts":"2026-08-06T17:45:30.806Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d38","brief":"the kind check is gone; fallback and recovery edges excluded"}
+{"ts":"2026-08-06T17:45:53.215Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d39","brief":"the kind check is gone; fallback and recovery edges excluded"}
+{"ts":"2026-08-06T17:46:16.669Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d40","brief":"the kind check is gone; fallback and recovery edges excluded"}
+{"ts":"2026-08-06T17:46:26.647Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d41","brief":"renaming the predicate away from its gate-only name"}
+{"ts":"2026-08-06T17:46:31.254Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d42","brief":"renaming the predicate away from its gate-only name"}
+{"ts":"2026-08-06T17:46:44.679Z","op":"done","visit":"iterations/i1/gate-inputs@0","node":"d33","brief":"every state now requires all its signed inputs"}
+{"ts":"2026-08-06T17:46:58.342Z","op":"done","visit":"iterations/i1/gate-inputs@0","node":"d34","brief":"refusals and names now say state, not gate"}
+{"ts":"2026-08-06T17:48:01.226Z","op":"plan","visit":"iterations/i1/gate-inputs@0","parent":null,"nodes":[{"id":"d43","brief":"bar and check now share one rule"},{"id":"d44","brief":"typecheck and test"},{"id":"d45","brief":"requirement for the AND rule"}]}
+{"ts":"2026-08-06T17:48:14.644Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d46","brief":"typechecking the rename and the two widened predicates"}
+{"ts":"2026-08-06T17:48:21.938Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d47","brief":"no local tsc, so the tests carry the check"}
+{"ts":"2026-08-06T17:49:13.294Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d48","brief":"locating the register to check for an existing all-inputs requirement"}
+{"ts":"2026-08-06T17:49:17.849Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d49","brief":"locating the register to check for an existing all-inputs requirement"}
+{"ts":"2026-08-06T17:49:22.313Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d50","brief":"checking the nearest existing requirement before minting a new one"}
+{"ts":"2026-08-06T17:49:46.640Z","op":"done","visit":"iterations/i1/gate-inputs@0","node":"d45","brief":"req-state-needs-all-its-inputs written with its facets"}
+{"ts":"2026-08-06T17:49:49.692Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d51","brief":"fetching the battery verdict"}
+{"ts":"2026-08-06T17:50:06.040Z","op":"fork","visit":"iterations/i1/gate-inputs@0","parent":"d44","node":"d52","brief":"battery red on 20 reading-proof failures, unrelated to the AND fix","nodes":[]}
+{"ts":"2026-08-06T17:50:28.497Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d53","brief":"tracing where the idle reading demand is built"}
+{"ts":"2026-08-06T17:50:39.721Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d54","brief":"reading the page's frontmatter — a missing applies_to would demand it everywhere"}
+{"ts":"2026-08-06T17:51:02.292Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d55","brief":"root docs ride every packet by design; the fixtures never credit the new one"}
+{"ts":"2026-08-06T17:51:25.840Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d56","brief":"READ_DOCS now owes refusals.md, as a guidance-root page must"}
+{"ts":"2026-08-06T17:51:42.278Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d57","brief":"adding a declared join mode so an OR can be said at all"}
+{"ts":"2026-08-06T17:51:56.895Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d58","brief":"reading compileColumn's state push"}
+{"ts":"2026-08-06T17:52:36.586Z","op":"done","visit":"iterations/i1/gate-inputs@0","node":"d43","brief":"AND is default and drawn; OR is declarable and draws no bar"}
+{"ts":"2026-08-06T17:53:00.351Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d59","brief":"field renamed off the collision; re-running the battery"}
+{"ts":"2026-08-06T17:53:03.996Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d60","brief":"battery re-run over the AND fix and the reading-proof repair"}
+{"ts":"2026-08-06T17:54:47.921Z","op":"fork","visit":"iterations/i1/gate-inputs@0","parent":"d44","node":"d61","brief":"rebuild the bar as authored: absence is the OR, presence is the AND","nodes":[]}
+{"ts":"2026-08-06T17:55:36.741Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d62","brief":"engine now reads an authored busbar; default is the implicit OR"}
+{"ts":"2026-08-06T17:55:53.253Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d63","brief":"authoring the bar on every gate so no drawing is lost"}
+{"ts":"2026-08-06T17:56:29.085Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d64","brief":"OR still demands one input; generalize-use-cases gets its bar over both feeders"}
+{"ts":"2026-08-06T17:56:46.612Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d65","brief":"evaluate-set takes its bar: no scoring without both runs and criteria"}
+{"ts":"2026-08-06T17:58:15.238Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d66","brief":"listing every multi-input row and whether it carries a bar"}
+{"ts":"2026-08-06T17:58:34.493Z","op":"done","visit":"iterations/i1/gate-inputs@0","node":"d61","brief":"bar authored on all 7 multi-input rows; single input binds without one"}
+{"ts":"2026-08-06T17:58:37.169Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d67","brief":"battery over the authored-busbar model"}
+{"ts":"2026-08-06T17:59:27.007Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d68","brief":"fetching the verdict"}
+{"ts":"2026-08-06T18:00:45.457Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d69","brief":"joinStuck no longer fires on formless states"}
+{"ts":"2026-08-06T18:00:59.525Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d70","brief":"battery after the joinStuck guard"}
+{"ts":"2026-08-06T18:01:48.403Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d71","brief":"fetching the verdict"}
+{"ts":"2026-08-06T18:02:45.664Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d72","brief":"generalize-use-cases back to one input: write-stories, no bar needed"}
+{"ts":"2026-08-06T18:03:32.869Z","op":"done","visit":"iterations/i1/gate-inputs@0","node":"d52","brief":"the read-proof stop moved to boot/end; refusals.md rides every packet by design"}
+{"ts":"2026-08-06T18:03:57.761Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d73","brief":"checking where the walk stands before re-earning write-stories"}
+{"ts":"2026-08-06T18:04:11.154Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d74","brief":"walking back to write-stories"}
+{"ts":"2026-08-06T18:04:27.514Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d75","brief":"trying to put the new enforcement into the running engine"}

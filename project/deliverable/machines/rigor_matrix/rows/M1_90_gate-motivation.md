@@ -3,6 +3,7 @@ kind: matrix-row
 name: gate-motivation
 statement: "GATE motivation: the one interestingness discussion - past this gate the vision is axiomatic."
 state_kind: gate
+busbar: true
 filled_by: agent
 depends_on:
   - scope-non-goals

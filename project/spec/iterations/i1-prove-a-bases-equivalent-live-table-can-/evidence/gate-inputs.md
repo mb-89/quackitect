@@ -1,5 +1,8 @@
 ---
 form: gate-inputs
+bless: blessed by agent
+by: agent
+signed_off: 2026-08-06T17:37:27.564Z
 authors: agent
 files:
 ---

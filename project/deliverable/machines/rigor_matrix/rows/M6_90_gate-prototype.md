@@ -3,6 +3,7 @@ kind: matrix-row
 name: gate-prototype
 statement: "GATE prototype: the riskiest assumptions are validated by evidence."
 state_kind: gate
+busbar: true
 filled_by: agent
 depends_on:
   - fold-back

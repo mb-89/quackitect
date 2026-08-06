@@ -4,6 +4,7 @@ name: evaluate-set
 statement: "Evaluate the candidate set: multi-objective scores, the Pareto front, eliminations recorded."
 state_kind: work
 filled_by: agent
+busbar: true
 depends_on:
   - run-candidates
   - derive-criteria

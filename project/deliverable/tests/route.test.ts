@@ -104,11 +104,13 @@ test("the sweep walks the whole way in one call, and every guard still fires", a
   assert.equal(short.arrived, false, "the read proof is not waived by sweeping");
   assert.equal((short.refusal as { clause: string }).clause, "SE-C-112");
   assert.ok((short.swept as string[]).length > 0, "and the hops it DID make stand");
-  // It reaches idle now: read_contract owes nothing since the promotion, and
-  // prepare_idle owes nothing since software and ux left the root. The gate
-  // that stops the sweep is the desk's own method card. The stop has moved on
-  // twice; that it STOPS, and stands where it got to, is what this guards.
-  assert.deepEqual(s.active(), ["idle"], "the walk stands where it got to, never rolled back");
+  // The stop has now moved THREE times, and where it lands is not the point.
+  // refusals.md joined the guidance ROOT, and a root doc rides every packet,
+  // so the first hop that demands reading is the one out of boot. Before that
+  // it was the desk's method card; before that, software and ux at the root.
+  // What this guards is that the sweep STOPS on an unmet read proof and
+  // stands where it got to, never rolling back.
+  assert.deepEqual(s.active(), ["boot/end"], "the walk stands where it got to, never rolled back");
   // WITH the reading earned through the loop, the same call arrives.
   await readEverything(s);
   const done = await s.sweep("front_desk", "agent");

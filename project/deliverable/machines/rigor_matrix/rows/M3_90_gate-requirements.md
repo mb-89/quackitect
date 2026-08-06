@@ -3,6 +3,7 @@ kind: matrix-row
 name: gate-requirements
 statement: "GATE requirements: the end of design input - the binding register blessed."
 state_kind: gate
+busbar: true
 filled_by: agent
 depends_on:
   - derive-functions
