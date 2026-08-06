@@ -5,6 +5,29 @@ id_prefix: req-
 folder: project/spec/trace/requirement
 applies_rigor: [systematic]
 applies_type: [default]
+checks:
+  - field: statement
+    ears: true
+    hint: "one of the five shapes with shall — or ears: exempt — <reason citing a decision>"
+  - field: statement
+    ban_words: [should, would, could, may, might, appropriate, adequate, sufficient, quickly, easy, user-friendly, robust, flexible, seamless, efficient, optimal, reasonable, gracefully]
+    hint: a weasel word checks nothing
+  - field: statement
+    ban_phrases: ["as possible", "where possible", "as required", "as appropriate", "if necessary", "including but not limited to", "and so on", "etc."]
+    hint: an escape or open-ended clause makes verification impossible
+  - field: kind
+    one_of: [functional, quality, constraint, interface]
+  - field: verify_method
+    one_of: [test, analysis, inspection, demonstration]
+  - field: weight
+    one_of: [key, important, unimportant]
+  - field: statement
+    ban_markers: [TBD, TBC, TBR, "???"]
+    hint: no TBD survives the milestone
+  - field: kind
+    equals: quality
+    require_section: Scenario
+    hint: a quality carries its six-part scenario, and the response measure is the pass line
 ---
 
 # requirement — one binding, verifiable demand on the system
@@ -80,11 +103,12 @@ source_refs:
 weight: unimportant
 ---
 
-<!-- QUALITY KIND ONLY — the six-part scenario per the quality-scenarios
-method: source, then stimulus, then artifact, then environment, then
-response, then the response MEASURE with its tolerance. The measure is the
-pass line: no measure, no requirement. Strike this comment for other
-kinds. -->
+<!-- QUALITY KIND ONLY — add a `## Scenario` section carrying the six-part
+scenario per the quality-scenarios method: source, then stimulus, then
+artifact, then environment, then response, then the response MEASURE with
+its tolerance. The measure is the pass line: no measure, no requirement.
+The conformance check demands the section on every quality-kind row. Strike
+this comment for other kinds. -->
 
 <!-- A genuinely non-EARS statement records its exemption in frontmatter as
 `ears: exempt — <reason citing a recorded decision>`. A bare exemption is a

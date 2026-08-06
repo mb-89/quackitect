@@ -110,6 +110,67 @@ export interface ItemTemplate {
   sections: string[];
   /** Where nodes of this type live, root-relative. Empty if unstated. */
   folder: string;
+  /** MECHANICAL CHECKS THE TEMPLATE DECLARES (owner order 2026-08-06): the
+   *  rules ride the template's own frontmatter, generic engine code applies
+   *  them, and they fire for EVERY hand — the agent's submit and a person's
+   *  panel edit run the same conformance. */
+  checks: TemplateCheck[];
+}
+
+/** One declared check. Exactly one of its rule keys is set.
+ *  - ears: the five EARS shapes with shall; `ears: exempt — <reason>` on the
+ *    node waives the shape, and a reasonless exemption is itself a finding.
+ *  - ban_words: single weasel words, matched on word boundaries, lowercased.
+ *  - ban_phrases: escape and open-ended clauses, substring, lowercased.
+ *  - one_of: a closed vocabulary for the field's value.
+ *  - ban_markers: literal placeholder markers over the WHOLE file.
+ *  - equals + require_section: when the field holds this value, the body
+ *    must carry the named `## <section>`. */
+export interface TemplateCheck {
+  field: string;
+  ears?: boolean;
+  ban_words?: string[];
+  ban_phrases?: string[];
+  one_of?: string[];
+  ban_markers?: string[];
+  equals?: string;
+  require_section?: string;
+  hint?: string;
+}
+
+const EARS_PREFIXES = ["the ", "when ", "while ", "if ", "where "];
+
+/** v1's earsShapeOK, ported from engine-go/trust.go at ref main: lowercase,
+ *  ' shall ' present, one of the five openers, and the if-shape carries
+ *  ' then '. Syntactic — necessary, never sufficient. */
+export function earsShapeOK(stmt: string): boolean {
+  const s = stmt.trim().toLowerCase();
+  if (!s.includes(" shall ")) return false;
+  const p = EARS_PREFIXES.find((x) => s.startsWith(x));
+  if (p === undefined) return false;
+  if (p === "if " && !s.includes(" then ")) return false;
+  return true;
+}
+
+function checkList(v: unknown): TemplateCheck[] {
+  if (!Array.isArray(v)) return [];
+  const out: TemplateCheck[] = [];
+  for (const c of v) {
+    if (typeof c !== "object" || c === null) continue;
+    const r = c as Record<string, unknown>;
+    out.push({
+      field: typeof r.field === "string" ? r.field : "",
+      ...(r.ears === true ? { ears: true } : {}),
+      ...(Array.isArray(r.ban_words) ? { ban_words: r.ban_words.map(String) } : {}),
+      ...(Array.isArray(r.ban_phrases) ? { ban_phrases: r.ban_phrases.map(String) } : {}),
+      ...(Array.isArray(r.one_of) ? { one_of: r.one_of.map(String) } : {}),
+      ...(Array.isArray(r.ban_markers) ? { ban_markers: r.ban_markers.map(String) } : {}),
+      ...(typeof r.equals === "string" ? { equals: r.equals } : {}),
+      ...(typeof r.require_section === "string" ? { require_section: r.require_section } : {}),
+      ...(typeof r.hint === "string" ? { hint: r.hint } : {}),
+    });
+  }
+  return out;
 }
 
 export function itemTemplate(root: string, type: string): ItemTemplate | undefined {
@@ -128,7 +189,61 @@ export function itemTemplate(root: string, type: string): ItemTemplate | undefin
     defaults: Object.fromEntries(pairs.filter((m) => !(m[2] ?? "").includes("TODO")).map((m) => [m[1] ?? "", (m[2] ?? "").trim()])),
     sections: Array.isArray(note.frontmatter.sections) ? note.frontmatter.sections.map(String) : [],
     folder: typeof note.frontmatter.folder === "string" ? note.frontmatter.folder : "",
+    checks: checkList(note.frontmatter.checks),
   };
+}
+
+/** The EARS rule with its exemption door: `ears: exempt — <reason>` waives
+ *  the shape, and a reasonless exemption is itself the finding. */
+function checkEars(id: string, c: TemplateCheck, value: string, fm: Record<string, unknown>, suffix: string): string[] {
+  const ex = String(fm.ears ?? "").trim();
+  if (ex.startsWith("exempt")) {
+    const reason = ex.replace(/^exempt[\s\-–—:]*/, "").trim();
+    return reason === "" ? [`${id}: ears exemption without a reason — cite the decision that grants it`] : [];
+  }
+  return earsShapeOK(value) ? [] : [`${id}: ${c.field} is not in an EARS shape${suffix}`];
+}
+
+/** The two ban lists over the field's own value: words on boundaries,
+ *  phrases as substrings, both lowercased. */
+function checkBans(id: string, c: TemplateCheck, value: string, suffix: string): string[] {
+  const out: string[] = [];
+  if (c.ban_words !== undefined) {
+    const words = new Set(value.toLowerCase().split(/[^a-z-]+/));
+    const hits = c.ban_words.filter((w) => words.has(w.toLowerCase()));
+    if (hits.length > 0) out.push(`${id}: ${c.field} carries ${hits.join(" · ")}${suffix}`);
+  }
+  if (c.ban_phrases !== undefined) {
+    const s = value.toLowerCase();
+    const hits = c.ban_phrases.filter((p) => s.includes(p.toLowerCase()));
+    if (hits.length > 0) out.push(`${id}: ${c.field} carries "${hits.join('" · "')}"${suffix}`);
+  }
+  return out;
+}
+
+/** Apply one declared check to a node. The value arrives resolved (own or
+ *  default); an empty or TODO value is the unanswered check's finding, not
+ *  this one's, so those pass through silently here. */
+function applyCheck(id: string, c: TemplateCheck, value: string, fm: Record<string, unknown>, body: string, whole: string): string[] {
+  const out: string[] = [];
+  const suffix = c.hint === undefined ? "" : ` — ${c.hint}`;
+  const answered = value.trim() !== "" && !value.includes("TODO");
+  if (c.ears === true && answered) out.push(...checkEars(id, c, value, fm, suffix));
+  if (answered) out.push(...checkBans(id, c, value, suffix));
+  if (c.one_of !== undefined && answered && !c.one_of.includes(value.trim())) {
+    out.push(`${id}: ${c.field} is "${value.trim()}" — one of ${c.one_of.join(" | ")}`);
+  }
+  if (c.ban_markers !== undefined) {
+    const hits = c.ban_markers.filter((m) => (/^[A-Z]+$/.test(m) ? new RegExp(`\\b${m}\\b`).test(whole) : whole.includes(m)));
+    if (hits.length > 0) out.push(`${id}: carries ${hits.join(" · ")}${suffix}`);
+  }
+  if (c.equals !== undefined && c.require_section !== undefined && value.trim() === c.equals) {
+    const headings = new Set(body.split("\n").map((l) => l.trim()));
+    if (!headings.has(`## ${c.require_section}`)) {
+      out.push(`${id}: ${c.field} ${c.equals} demands — ## ${c.require_section}${suffix}`);
+    }
+  }
+  return out;
 }
 
 /** DOES THIS NODE KEEP ITS TYPE'S PROMISES.
@@ -173,6 +288,12 @@ export function conformance(root: string, node: TraceNode): string[] {
   const headings = new Set(note.body.split("\n").map((l) => l.trim()));
   const absent = tpl.sections.filter((h) => !headings.has(`## ${h}`));
   if (absent.length > 0) out.push(`${node.id}: missing section — ${absent.map((h) => `## ${h}`).join(" · ")}`);
+  // The declared checks run last, on resolved values — same rules for every
+  // hand that submits, the agent's form and the person's panel edit alike.
+  const whole = readFileSync(node.file, "utf8");
+  for (const c of tpl.checks) {
+    out.push(...applyCheck(node.id, c, fieldValue(tpl, note.frontmatter, c.field), note.frontmatter, note.body, whole));
+  }
   return out;
 }
 

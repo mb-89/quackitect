@@ -345,3 +345,11 @@
 {"ts":"2026-08-06T14:49:27.813Z","op":"update","visit":"iterations/i1/start@0","node":"d38","brief":"syncing trunk into the bound i1 worktree"}
 {"ts":"2026-08-06T14:49:59.541Z","op":"update","visit":"iterations/i1/start@0","node":"d39","brief":"worktree committed at 6aea9fd and the sync runs"}
 {"ts":"2026-08-06T14:52:01.258Z","op":"update","visit":"iterations/i1/start@0","node":"d40","brief":"weaving the two story-card rewrites into one"}
+{"ts":"2026-08-06T14:53:52.924Z","op":"plan","visit":"iterations/i1/start@0","parent":null,"nodes":[{"id":"d41","brief":"learn the conformance and pin machinery"},{"id":"d42","brief":"harvest the v1 lint assets"},{"id":"d43","brief":"build the requirement checks so both hands trip them"},{"id":"d44","brief":"test the checks from minted fixtures"},{"id":"d45","brief":"report the build with its judgment calls"}]}
+{"ts":"2026-08-06T14:54:01.369Z","op":"done","visit":"front_desk@0","node":"d9","brief":"the sync landed at b3e6df8 with all six conflicts settled"}
+{"ts":"2026-08-06T14:54:42.527Z","op":"update","visit":"iterations/i1/start@0","node":"d46","brief":"pulling v1's EARS shape check from trust.go at ref main"}
+{"ts":"2026-08-06T14:56:23.011Z","op":"update","visit":"iterations/i1/start@0","node":"d47","brief":"the declared-checks engine lands in trace.ts conformance"}
+{"ts":"2026-08-06T14:57:18.324Z","op":"update","visit":"iterations/i1/start@0","node":"d48","brief":"the template declares its eight checks in frontmatter"}
+{"ts":"2026-08-06T14:58:03.533Z","op":"done","visit":"iterations/i1/start@0","node":"d42","brief":"v1's weasel list and shape check ride the template and the engine now"}
+{"ts":"2026-08-06T14:58:21.321Z","op":"done","visit":"iterations/i1/start@0","node":"d44","brief":"eleven minted-fixture cases green on the first run"}
+{"ts":"2026-08-06T14:58:55.728Z","op":"done","visit":"iterations/i1/start@0","node":"d41","brief":"signed forms freeze and unsigned read live so the new shape serves i1"}
