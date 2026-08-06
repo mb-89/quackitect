@@ -541,3 +541,5 @@
 {"ts":"2026-08-06T17:34:07.521Z","op":"update","visit":"iterations/i1/draw-context@0","node":"d24","brief":"draw-context signed; ten states re-earned"}
 {"ts":"2026-08-06T17:35:14.160Z","op":"update","visit":"iterations/i1/map-stakeholders@0","node":"d25","brief":"map-stakeholders was still unsigned; submitting it"}
 {"ts":"2026-08-06T17:35:23.728Z","op":"update","visit":"iterations/i1/map-stakeholders@0","node":"d26","brief":"map-stakeholders signed; gate-inputs is next"}
+{"ts":"2026-08-06T17:35:59.480Z","op":"update","visit":"iterations/i1/map-stakeholders@0","node":"d27","brief":"the handover tracks eleven re-earned states"}
+{"ts":"2026-08-06T17:36:34.309Z","op":"update","visit":"iterations/i1/generalize-use-cases@0","node":"d28","brief":"generalize-use-cases had lost its stamp too"}
