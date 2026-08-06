@@ -1,7 +1,5 @@
 ---
 form: map-stakeholders
-by: agent
-signed_off: 2026-08-06T09:33:43.688Z
 authors: agent
 files:
 ---

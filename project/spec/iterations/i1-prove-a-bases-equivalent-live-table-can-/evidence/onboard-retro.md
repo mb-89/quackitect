@@ -1,10 +1,6 @@
 ---
 form: onboard-retro
-status: done
-signed_off: 2026-08-04T16:18:49.470Z
-by: agent
 checked: Read software, Read ux, Read retro, Read template-free-form, Read template-per-item, Read template-list, Do the survey, Establish the interval
-opened: 2026-08-04T16:18:49.469Z
 authors: agent
 files:
 ---

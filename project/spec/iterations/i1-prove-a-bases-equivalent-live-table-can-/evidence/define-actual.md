@@ -1,7 +1,5 @@
 ---
 form: define-actual
-by: agent
-signed_off: 2026-08-05T18:32:26.417Z
 authors: agent
 files:
 ---

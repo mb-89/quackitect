@@ -1,7 +1,5 @@
 ---
 form: draw-context
-by: agent
-signed_off: 2026-08-06T08:03:46.443Z
 authors: agent
 files:
 ---

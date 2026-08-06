@@ -1,6 +1,5 @@
 ---
 form: generalize-use-cases
-signed_off: 2026-08-06
 authors: agent
 files:
 ---
