@@ -1,5 +1,7 @@
 ---
 form: gate-kickoff
+by: agent
+signed_off: 2026-08-06T16:51:46.834Z
 authors: human, agent
 files:
 ---
