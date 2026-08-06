@@ -5,7 +5,8 @@ import { strict as assert } from "node:assert";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, test } from "node:test";
-import { type StateFormModel, templateProblems } from "../engine/stateform.ts";
+import { fileURLToPath } from "node:url";
+import { expandHint, fieldHint, type StateFormModel, templateMeta, templateProblems } from "../engine/stateform.ts";
 import { freshRoot } from "./helpers.ts";
 
 /** A form asking for one reference field, with the type it demands. */
@@ -84,6 +85,90 @@ describe("typed references", { concurrency: true }, () => {
   test("an empty list is a claim, and it has to be written", () => {
     assert.match(check(corpus(), "value-prop", "the props are obvious")[0] ?? "", /no references/);
     assert.deepEqual(check(corpus(), "value-prop", "- none"), []);
+  });
+
+  // FOUR HONEST WAYS TO NAME A FILE, and the machine takes all of them
+  // (owner, 2026-08-06). A person has the file in front of them; refusing
+  // three shapes teaches nothing and reads as broken.
+  test("a path from the project root resolves", () => {
+    assert.deepEqual(check(corpus(), "value-prop", "- project/spec/trace/value-prop/vp-a.md"), []);
+  });
+
+  test("the same path with backslashes resolves — that is what Windows copies", () => {
+    assert.deepEqual(check(corpus(), "value-prop", "- project\\spec\\trace\\value-prop\\vp-a.md"), []);
+  });
+
+  test("a bare file name resolves", () => {
+    assert.deepEqual(check(corpus(), "value-prop", "- vp-a.md"), []);
+  });
+
+  test("a wiki link resolves, display half and all", () => {
+    assert.deepEqual(check(corpus(), "value-prop", "- [[vp-a]]"), []);
+    assert.deepEqual(check(corpus(), "value-prop", "- [[vp-a|the first one]]"), []);
+  });
+
+  test("generosity about SHAPE is not generosity about existence", () => {
+    assert.match(check(corpus(), "value-prop", "- project/spec/trace/value-prop/vp-nowhere.md")[0] ?? "", /no artifact for/);
+    assert.match(check(corpus(), "value-prop", "- project/spec/trace/stakeholder/stk-a.md").join(" "), /every reference is a value-prop/);
+  });
+
+  test("a wrong folder above a real file name still resolves — the name is the id", () => {
+    assert.deepEqual(check(corpus(), "value-prop", "- somewhere/else/vp-a.md"), []);
+  });
+
+  // THE TEMPLATE IS WRITTEN ONCE AND REUSED, so it cannot name a type. It
+  // writes {type} and {prefix}, and the field's own `of:` fills them in.
+  // Copying the text instead is how a neighbours field came to prompt for
+  // a value prop.
+  test("the placeholder is expanded from the FIELD's type, never copied", () => {
+    const root = corpus();
+    const dir = join(root, "project", "deliverable", "machines", "items");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "neighbour.md"), "---\nid_prefix: nbr-\nfolder: project/spec/trace/neighbour\n---\n", "utf8");
+    const meta = {
+      editor: "list",
+      line_pattern: "",
+      line_help: "",
+      placeholder: "{folder}/{prefix}something.md",
+      description: "one {type} REFERENCE per line",
+    };
+    const h = fieldHint(root, meta, "neighbour");
+    assert.equal(h.placeholder, "project/spec/trace/neighbour/nbr-something.md", "the placeholder TEACHES the path shape by being one");
+    assert.equal(h.description, "one neighbour REFERENCE per line");
+    assert.equal(h.of_template, "project/deliverable/machines/items/neighbour.md", "the reader is one click from the rules");
+  });
+
+  test("a field with no declared type still reads, and links nowhere", () => {
+    const h = fieldHint(
+      corpus(),
+      { editor: "list", line_pattern: "", line_help: "", placeholder: "{folder}/{prefix}something.md", description: "" },
+      "",
+    );
+    assert.equal(h.placeholder, "project/spec/trace/something.md", "still a path, and it still starts project/");
+    assert.equal(h.of_template, "", "there is no template to point at");
+  });
+
+  test("a type with no item template gets no link rather than a broken one", () => {
+    assert.equal(
+      fieldHint(corpus(), { editor: "list", line_pattern: "", line_help: "", placeholder: "", description: "" }, "not-a-type").of_template,
+      "",
+    );
+  });
+
+  test("expansion leaves text with no tokens alone, and an empty string empty", () => {
+    assert.equal(expandHint(corpus(), "plain words", "value-prop"), "plain words");
+    assert.equal(expandHint(corpus(), "", "value-prop"), "");
+  });
+
+  // THE SHIPPED TEMPLATE, not a fixture: the real refs.md must stay generic.
+  test("the shipped refs template names no concrete type", () => {
+    const meta = templateMeta(fileURLToPath(new URL("../../..", import.meta.url)), "refs");
+    assert.match(meta.placeholder, /^\{folder\}\//, "the placeholder is a token, and it opens with the folder so it starts project/");
+    assert.doesNotMatch(
+      meta.placeholder + meta.description + meta.line_help,
+      /value-prop|neighbour/,
+      "no concrete type leaks into the reusable text",
+    );
   });
 
   test("the type reads whether it is written as a link or bare", () => {

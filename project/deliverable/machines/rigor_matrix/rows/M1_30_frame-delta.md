@@ -23,7 +23,7 @@ evidence:
   - name: value_props
     template: refs
     of: value-prop
-    description: "the value props this delta authors — one REFERENCE per line, and none is legal until its artifact exists"
+    description: "the value props this delta authors"
   - name: business_case
     description: "what the effort buys, in whose currency - skip with a recorded reason where no acquirer exists"
     required: false

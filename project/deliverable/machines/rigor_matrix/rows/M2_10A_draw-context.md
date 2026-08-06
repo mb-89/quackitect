@@ -17,7 +17,11 @@ legal_tools:
   - se_answer
 evidence:
   - name: boundary
-    description: "inside, outside, every neighbour and interface named"
+    description: "what is inside and what is outside, in prose — the neighbours themselves are the list below"
+  - name: neighbours
+    template: refs
+    of: neighbour
+    description: "every neighbour that touches the box — one node each, whichever way the arrow points"
   - name: intended_use
     description: "one honest paragraph"
   - name: excluded_use
@@ -58,4 +62,10 @@ specification_note: |
 
 ## Guidance
 
-Per [[meth-context-boundary]]. The excluded list is the scope-creep guard - system-level and binding, sharper than M1's vision-level non-goals. Neighbours are NODES: later artifacts reference them, the structure models among them.
+Per [[meth-context-boundary]]. The excluded list is the scope-creep guard - system-level and binding, sharper than M1's vision-level non-goals.
+
+THE DIAGRAM IS A BLACK BOX AND ITS NEIGHBOURS. The system sits in the middle as one box; every neighbour stands around it with its connection. Nothing else belongs in a context view.
+
+SO THE NEIGHBOURS ARE NODES, shaped by [[neighbour]] - statement, direction, and the interface that actually crosses the boundary. This field carries REFERENCES, never prose. The figure DERIVES from the nodes; the interface list is never hand-authored twice. Later artifacts reference the same nodes, and the structure models among them.
+
+The boundary field says what is inside and what is outside. It never repeats the neighbour list.
