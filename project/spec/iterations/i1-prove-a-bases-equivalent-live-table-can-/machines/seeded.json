@@ -1,11 +1,11 @@
 {
   "change_size": "product",
-  "rigor_matrix_hash": "e1e14dd0dd1b",
+  "rigor_matrix_hash": "cef1f43c4858",
   "pinned_at": "2026-08-04T16:20:30.684Z",
   "demands": {
     "onboard-retro": {
       "applies": "full",
-      "evidence": "[[\"field_feedback\",true,\"\",[],\"\",\"\",[],[],[]],[\"notes_drained\",true,\"\",[],\"per-item\",\"\",[],[\"$inbox\"],[]],[\"call_log_mined\",true,\"\",[],\"list\",\"\",[],[],[]],[\"waste_leads\",false,\"\",[],\"list\",\"\",[],[],[]],[\"process_stale\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"field_feedback\",true,\"\",[],\"\",\"\",[],[],[]],[\"notes_drained\",true,\"\",[],\"per-item\",\"\",[],[\"$inbox\"],[]],[\"call_log_mined\",true,\"\",[],\"list\",\"\",[],[],[]],[\"waste_leads\",false,\"\",[],\"list\",\"\",[],[],[]],[\"promotions\",true,\"\",[],\"list\",\"\",[],[],[]],[\"process_stale\",true,\"\",[],\"\",\"\",[],[],[]]]"
     },
     "gate-kickoff": {
       "applies": "full",

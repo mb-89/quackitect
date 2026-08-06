@@ -1,7 +1,5 @@
 ---
 form: scope-non-goals
-by: agent
-signed_off: 2026-08-05T18:33:08.864Z
 authors: agent
 files:
 ---

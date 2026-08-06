@@ -1,7 +1,5 @@
 ---
 form: frame-delta
-by: agent
-signed_off: 2026-08-05T18:32:48.458Z
 authors: agent
 files:
 ---

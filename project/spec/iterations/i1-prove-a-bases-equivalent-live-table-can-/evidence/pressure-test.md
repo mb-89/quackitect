@@ -1,7 +1,5 @@
 ---
 form: pressure-test
-by: agent
-signed_off: 2026-08-05T18:43:32.237Z
 authors: agent
 files:
 ---
