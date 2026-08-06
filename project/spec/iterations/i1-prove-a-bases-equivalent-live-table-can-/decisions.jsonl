@@ -527,3 +527,8 @@
 {"ts":"2026-08-06T17:16:41.933Z","op":"update","visit":"iterations/i1/define-actual@0","node":"d14","brief":"the stagger must pay for itself on its own ring"}
 {"ts":"2026-08-06T17:17:12.463Z","op":"done","visit":"iterations/i1/define-actual@0","node":"d9","brief":"the stagger now pays for itself per ring, with no threshold"}
 {"ts":"2026-08-06T17:17:19.280Z","op":"done","visit":"iterations/i1/define-actual@0","node":"d10","brief":"25 trace tests green at size 3237"}
+{"ts":"2026-08-06T17:18:32.933Z","op":"update","visit":"iterations/i1/define-actual@0","node":"d15","brief":"clearing the doubled phrase before the walk resumes"}
+{"ts":"2026-08-06T17:21:12.708Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d16","brief":"blessing gate-motivation on the owner's grant"}
+{"ts":"2026-08-06T17:23:55.237Z","op":"update","visit":"iterations/i1/log-risks@0","node":"d17","brief":"log-risks was the unwalked branch; submitting it"}
+{"ts":"2026-08-06T17:24:36.409Z","op":"update","visit":"iterations/i1/log-risks@0","node":"d18","brief":"writing the handover before the context runs out"}
+{"ts":"2026-08-06T17:25:05.102Z","op":"done","visit":"iterations/i1/start@0","node":"d3","brief":"seven states re-earned and the handover names the rest"}
