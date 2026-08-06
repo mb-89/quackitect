@@ -1,7 +1,7 @@
 // FORMAT THE VAULT'S FRONTMATTER, in place.
 //
 // The formatter existed with no way to RUN it. Every note was authored by
-// hand and drifted from what formatNote would print, until 254 of 423 notes
+// hand and drifted from what formatNote would print, until most of the vault
 // disagreed with it. frontmatter.test.ts fails loudly at that point, and it
 // is right to: the first real edit to any of them would land in a diff
 // nobody could read.

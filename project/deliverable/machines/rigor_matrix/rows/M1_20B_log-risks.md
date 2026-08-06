@@ -15,23 +15,16 @@ legal_tools:
   - se_file_list
   - se_log_query
   - se_answer
+entry_read:
+  - project/deliverable/machines/methods/meth-raid.md
 evidence:
   - name: raid_opened
-    description: "the register's table: every entry typed, owned, numbered, triggered"
-    template: table
-    columns:
-      - kind
-      - entry
-      - impact
-      - likelihood
-      - owner
-      - revisit
+    template: refs
+    of: raid
+    description: every entry opened here, as a raid node reference, one per line
     guidance: |
-      One markdown-table row per entry. kind is R, A, I or D. impact and
-      likelihood are 1 to 5 — their product orders the register and draws
-      the computed risk picture, so no cell may stay empty. owner is a
-      role, never a name. revisit is the trigger that reopens the entry.
-      The method: [[meth-raid]].
+      Write each entry as a node shaped by [[raid]], then name it here.
+      The node carries kind, owner, trigger, impact and statement.
 major: full
 minor: tailored
 patch: tailored
@@ -56,10 +49,14 @@ product_note: |
   register is append-and-resolve, not append-only.
 specification_note: |
   DOCUMENT FORM: the RAID register as a QUERY-DRIVEN TABLE - entries are
-  nodes, the table derives (v1's raid-matrix figure). Never hand-tabled:
-  the register is edited as entries, the render assembles.
+  nodes, the table derives. Never hand-tabled: the register is edited as
+  entries, the render assembles.
 ---
 
 ## Guidance
 
-Open the register ([[meth-raid]]). The goal system's named conflicts are the first entries; add the top risks the vision and delta expose. Owners and revisit triggers on each.
+Open the register ([[meth-raid]]), which the entry read demands before this state opens. The goal system's named conflicts are the first entries; add the top risks the vision and delta expose. Owners and revisit triggers on each.
+
+EACH ENTRY IS A NODE, not a table row. A node has an id, so a later state can point at it, probe it and change its status. A table row inside this form has none of that: it is per-iteration and frozen once the form signs.
+
+RISKS OPEN HERE. Assumptions have two states of their own at M3 — identify-assumptions sweeps for them, probe-assumptions checks every standing one. An assumption noticed HERE is still recorded here rather than held back; waiting for the right state is how an entry is lost.

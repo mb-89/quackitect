@@ -724,3 +724,14 @@
 {"ts":"2026-08-06T19:28:49.039Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d55","brief":"fetching the verdict"}
 {"ts":"2026-08-06T19:30:08.413Z","op":"plan","visit":"iterations/i1/gate-kickoff@0","parent":null,"nodes":[{"id":"d56","brief":"see what stands uncommitted in the worktree"},{"id":"d57","brief":"sync trunk in"},{"id":"d58","brief":"verify the merged tree green"},{"id":"d59","brief":"walk to identify-assumptions"}]}
 {"ts":"2026-08-06T19:30:23.500Z","op":"done","visit":"iterations/i1/gate-kickoff@0","node":"d56","brief":"the worktree holds the tests and the card sweep; trunk holds the row split"}
+{"ts":"2026-08-06T19:30:29.205Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d60","brief":"committing before the sync"}
+{"ts":"2026-08-06T19:30:43.230Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d61","brief":"pulling trunk into the worktree"}
+{"ts":"2026-08-06T19:31:01.622Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d62","brief":"reloading to land the root's uncommitted raid work"}
+{"ts":"2026-08-06T19:38:05.897Z","op":"update","visit":"iterations/i1/start@0","node":"d22","brief":"syncing trunk into the bound worktree"}
+{"ts":"2026-08-06T19:38:17.019Z","op":"update","visit":"iterations/i1/start@0","node":"d23","brief":"reading trunk's versions of the three conflicts"}
+{"ts":"2026-08-06T19:38:34.996Z","op":"update","visit":"iterations/i1/start@0","node":"d24","brief":"getting the worktree hashes to overwrite"}
+{"ts":"2026-08-06T19:38:50.454Z","op":"update","visit":"iterations/i1/start@0","node":"d25","brief":"format-vault matches trunk"}
+{"ts":"2026-08-06T19:38:57.200Z","op":"update","visit":"iterations/i1/start@0","node":"d26","brief":"the unsplit row goes, as trunk already decided"}
+{"ts":"2026-08-06T19:39:02.300Z","op":"update","visit":"iterations/i1/start@0","node":"d27","brief":"getting the log-risks hash"}
+{"ts":"2026-08-06T19:39:18.703Z","op":"update","visit":"iterations/i1/start@0","node":"d28","brief":"log-risks aligned, history out of its guidance"}
+{"ts":"2026-08-06T19:39:24.372Z","op":"update","visit":"iterations/i1/start@0","node":"d29","brief":"committing the alignment before the sync"}
