@@ -1,5 +1,5 @@
 ---
-id: vp-holds-its-qualities
+id: vp-qualities
 type: "[[value-prop]]"
 statement: As an engineer driving agents I need the product to hold its qualities under stress, not only on the happy path.
 audience: stk-engineer-driving-agents

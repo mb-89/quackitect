@@ -4,7 +4,7 @@ type: "[[story]]"
 statement: When a new engine version lands, I want to take it without touching my overlay, so I can keep upstream improvements and my private method both.
 actor: stk-vehicle-owner
 refines:
-  - vp-holds-its-qualities
+  - vp-qualities
 killer: false
 ---
 

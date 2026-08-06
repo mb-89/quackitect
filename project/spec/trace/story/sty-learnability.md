@@ -4,7 +4,7 @@ type: "[[story]]"
 statement: When I meet this project with no context, I want the front door to speak my language, so I can say what the product is before my first session ends.
 actor: stk-newcomer
 refines:
-  - vp-holds-its-qualities
+  - vp-qualities
 killer: false
 ---
 

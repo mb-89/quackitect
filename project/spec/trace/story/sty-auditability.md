@@ -4,7 +4,7 @@ type: "[[story]]"
 statement: When a night of agent work lands that I did not watch, I want to reconstruct who did what from the record alone, so I can answer for output carrying my name.
 actor: stk-engineer-driving-agents
 refines:
-  - vp-holds-its-qualities
+  - vp-qualities
 killer: false
 ---
 

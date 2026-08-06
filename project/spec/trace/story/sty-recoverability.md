@@ -4,7 +4,7 @@ type: "[[story]]"
 statement: When my walk breaks mid-flight, I want the break itself to carry my way back, so I can finish without a person's rescue.
 actor: stk-agent
 refines:
-  - vp-holds-its-qualities
+  - vp-qualities
 killer: true
 ---
 

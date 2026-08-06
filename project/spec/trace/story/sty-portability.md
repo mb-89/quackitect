@@ -4,7 +4,7 @@ type: "[[story]]"
 statement: When my machine or harness changes, I want the walk to continue where it stood, so I can work from whatever is at hand.
 actor: stk-engineer-driving-agents
 refines:
-  - vp-holds-its-qualities
+  - vp-qualities
 killer: false
 ---
 

@@ -461,6 +461,15 @@ const CARD_W = 260;
 const CARD_H = 60;
 const MAX_CHARS = 14;
 
+/** THE STAGGER, ported from v1's report renderer (report_assets.go: a
+ *  3-level modulo offset per row). A crowded ring splits into up to three
+ *  SUB-ORBITS: neighbours in angle alternate outward, so the ring holds
+ *  three times the cards per arc while same-orbit neighbours keep the full
+ *  LABEL_W minimum — the spacing floor survives the collapse (owner,
+ *  2026-08-06). The radial step clears the card height with margin. */
+const STAGGER = 3;
+const STAGGER_STEP = CARD_H + 16;
+
 /** THE INNERMOST RING CLEARS THE VISION, derived rather than eyeballed. Two
  *  equal cards whose centres are r apart overlap unless |dx| >= CARD_W or
  *  |dy| >= CARD_H, and the worst angle is the diagonal, where both shrink by
@@ -563,23 +572,51 @@ function keepFor(all: TraceNode[], q: string): Set<string> {
 }
 
 /** Ring k must hold the WORST wedge's count at that level, because the radius
- *  is GLOBAL and a ring is one circle for everybody. */
+ *  is GLOBAL and a ring is one circle for everybody.
+ *
+ *  EACH RING CARRIES ITS OWN LOAD (owner, 2026-08-06). The shared gap made
+ *  the crowded outer ring blow every inner ring up with it, and the drawing
+ *  wasted its middle. Now a ring grows only as far as ITS worst wedge needs
+ *  at full stagger, and the floor chain keeps it clear of the previous
+ *  ring's outermost sub-orbit. Inner rings collapse; the spacing does not. */
 function ringRadii(perWedge: Map<string, string[][]>, count: number, wedge: number): number[] {
-  // What each ring needs on its own: the arc its worst wedge demands.
-  const need: number[] = [];
+  const radii: number[] = [];
+  let floor = FIRST_RING;
   for (let k = 0; k < count; k++) {
     let worst = 0;
     for (const lanes of perWedge.values()) worst = Math.max(worst, lanes[k].length);
-    need.push(wedge === 0 ? 0 : (worst * LABEL_W) / wedge);
+    const need = wedge === 0 ? 0 : (worst * LABEL_W) / (STAGGER * wedge);
+    radii.push(Math.max(floor, need));
+    floor = (radii[k] ?? 0) + (STAGGER - 1) * STAGGER_STEP + RING_GAP;
   }
-  // ONE GAP FOR EVERY LEVEL (owner, 2026-08-06). The distance from the vision
-  // out to the first ring governs every later pair too. It used to be two
-  // different numbers — 403 to the first ring, then 190 between the rest — so
-  // the outer levels crowded while the middle looked airy, and the drawing
-  // implied a hierarchy that is not in the data.
-  let gap = FIRST_RING;
-  for (let k = 0; k < count; k++) gap = Math.max(gap, (need[k] ?? 0) / (k + 1));
-  return Array.from({ length: count }, (_, k) => gap * (k + 1));
+  return radii;
+}
+
+/** THE RELAX PASS (owner order 2026-08-06: collapse, but never until cards
+ *  touch). The stagger is angle-blind and the cards are axis-aligned, so at
+ *  some angles the radial step and the arc offset cancel on one axis. Any
+ *  pair still overlapping pushes its outer card further OUTWARD along its
+ *  own angle — the parent line keeps its direction — until the axis-aligned
+ *  clearance holds by check rather than by formula. */
+function relax(placed: Placed[]): void {
+  for (let pass = 0; pass < 60; pass++) {
+    let moved = false;
+    for (let i = 0; i < placed.length; i++) {
+      for (let j = i + 1; j < placed.length; j++) {
+        const a = placed[i];
+        const b = placed[j];
+        if (a === undefined || b === undefined) continue;
+        if (Math.abs(a.x - b.x) >= CARD_W || Math.abs(a.y - b.y) >= CARD_H) continue;
+        const out = Math.hypot(a.x, a.y) >= Math.hypot(b.x, b.y) ? a : b;
+        const ang = Math.atan2(out.y, out.x);
+        const r = Math.hypot(out.x, out.y) + 24;
+        out.x = Math.cos(ang) * r;
+        out.y = Math.sin(ang) * r;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
 }
 
 /** The radial arrangement. The ring radius is GLOBAL across every wedge, so
@@ -645,9 +682,15 @@ export function layoutTrace(all: TraceNode[], selected?: string[], filter?: { ty
         target.set(id, ps.length === 0 ? centre : ps.reduce((a, b) => a + b, 0) / ps.length);
       }
       const ordered = [...lane].sort((a, b) => (target.get(a) ?? 0) - (target.get(b) ?? 0));
+      // HOW MANY SUB-ORBITS THIS LANE NEEDS. A sparse lane stays on one
+      // orbit — staggering it would be noise. A dense one splits across up
+      // to three, and neighbours IN ANGLE alternate outward, so same-orbit
+      // neighbours always sit the full LABEL_W apart.
+      const arc = 2 * half * (rings[k] ?? 1);
+      const orbits = Math.max(1, Math.min(STAGGER, Math.ceil((lane.length * LABEL_W) / Math.max(arc, 1))));
       const angles = spread(
         ordered.map((id) => target.get(id) ?? centre),
-        LABEL_W / (rings[k] ?? 1),
+        LABEL_W / (orbits * (rings[k] ?? 1)),
         centre,
         half,
       );
@@ -656,10 +699,13 @@ export function layoutTrace(all: TraceNode[], selected?: string[], filter?: { ty
         place.set(at(prop, id), a);
         const n = inScope.find((x) => x.id === id);
         if (n === undefined) return;
-        placed.push({ ...n, key: at(prop, id), level: k, root: prop, x: Math.cos(a) * rings[k], y: Math.sin(a) * rings[k] });
+        const r = (rings[k] ?? 0) + (i % orbits) * STAGGER_STEP;
+        placed.push({ ...n, key: at(prop, id), level: k, root: prop, x: Math.cos(a) * r, y: Math.sin(a) * r });
       });
     }
   });
+
+  relax(placed);
 
   const keys = new Set(placed.map((p) => p.key));
   const edges: { from: string; to: string }[] = [];
@@ -671,7 +717,10 @@ export function layoutTrace(all: TraceNode[], selected?: string[], filter?: { ty
     for (const p of n.refines) if (keys.has(at(n.root, p))) edges.push({ from: at(n.root, p), to: n.key });
     if (n.type === levels[0]) edges.push({ from: "vision", to: n.key });
   }
-  return { nodes: placed, edges, rings, size: (rings[rings.length - 1] ?? RING_GAP) + LABEL_W };
+  // The relax pass may push past the outermost ring, so the size follows the
+  // cards rather than the circles.
+  const reach = placed.reduce((m, p) => Math.max(m, Math.hypot(p.x, p.y)), rings[rings.length - 1] ?? RING_GAP);
+  return { nodes: placed, edges, rings, size: reach + LABEL_W };
 }
 
 function esc(s: string): string {
