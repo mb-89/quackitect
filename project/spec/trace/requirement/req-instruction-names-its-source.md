@@ -10,5 +10,13 @@ refines:
 source_refs:
   - uc-change-the-method-mid-walk step 1
   - uc-change-the-method-mid-walk step 2
+  - uc-change-the-method-mid-walk ext 5a
+  - ".se/req-mine-sebots.md: capture, decisions, change"
 priority: should
 ---
+
+## Detail
+
+What travels with the instruction:
+
+- Where a walk-governing rule records a settled decision as its source, the engine shall serve that decision's reference with the guidance.

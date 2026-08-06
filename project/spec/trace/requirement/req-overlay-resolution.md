@@ -13,12 +13,19 @@ source_refs:
   - uc-vendor-and-overlay ext 3a
   - uc-vendor-and-overlay step 5
   - uc-vendor-and-overlay step 3
-  - uc-vendor-and-overlay step 5
   - ".se/req-mine-v2.md: machine execution (compile-at-load, draft is truth; changes reach every iteration at its next load)"
+  - ".se/req-mine-v1.md: lifecycle and distribution (data-shaped rules load from configuration files, never code constants)"
+  - uc-vendor-and-overlay ext 6a
 priority: should
 ---
 
 ## Detail
+
+The layering, whole:
+
+- Where a builder declares an overlay folder in the host repository, the engine shall load guidance, method cards and rigor rows from that folder with zero changes to files under the engine's folder.
+- The engine shall serve zero method artifacts that an overlay file cannot replace.
+- The engine and the builder overlay shall resolve method artifacts through one shared identity scheme, where a card's identity alone decides which engine card it replaces.
 
 The resolution rule, in every place it binds:
 

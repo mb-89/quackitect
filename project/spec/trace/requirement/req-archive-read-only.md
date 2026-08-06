@@ -12,5 +12,12 @@ source_refs:
   - uc-browse-the-archive ext 4a
   - uc-close-a-record step 6
   - ".se/req-mine-v1.md: the ledger and truth — archive read natively"
+  - uc-browse-the-archive step 1
 priority: must
 ---
+
+## Detail
+
+What browsing may never touch:
+
+- While the archive is browsed, the engine shall write zero changes to any live record, any machine state, and the walk.
