@@ -118,7 +118,15 @@ test("the desk drains the mechanical verdicts and is refused the judgment ones",
   const parked = await call(server, "se_note_drain", { ref: judged, disposition: "backlog", where: "ready when later" });
   assert.equal(parked.isError, true);
   assert.equal(parked.body.clause, "SE-C-110");
-  assert.match(String((parked.body.remedy as { args: { to: unknown } }).args.to), /retro/, "the remedy names the state that may");
+  // The remedy is an EXECUTABLE call, not a description of one. It used to
+  // read `args: {to: "retro"}`, and se_pull has never taken a target — the
+  // walk is aimed by an offered door. remedies.test.ts now refuses that class
+  // mechanically; this asserts the door the refusal actually points at.
+  assert.match(
+    String((parked.body.remedy as { args: { form: { choice: unknown } } }).args.form.choice),
+    /retro/,
+    "the remedy names the door to the state that may",
+  );
   const carried = await call(server, "se_note_drain", { ref: judged, disposition: "carried", where: "this round" });
   assert.equal(carried.isError, true);
   assert.equal(carried.body.clause, "SE-C-110");

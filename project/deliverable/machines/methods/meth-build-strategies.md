@@ -17,4 +17,4 @@ Guidance for M7 plan-build. A chunk plan without a strategy is a pile: the strat
 - Record the strategy WITH the plan so the reviewer can judge the order, not only the pieces.
 
 ## Sources
-SyA Architecting (walking skeleton) and Testing Tactics (integration strategies), owner-mapped digest @ai/sya_kb; owner ruling 2026-07-30 (run first, improve later).
+SyA Architecting (walking skeleton) and Testing Tactics (integration strategies), owner-mapped digest @ai/sya_kb.

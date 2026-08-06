@@ -13,7 +13,7 @@ it. Log it in the RAID register at log-risks, like any other risk.
 
 ## Why it is not a table of its own
 
-Owner ruling, 2026-08-06, on the evidence of both earlier versions.
+
 
 v1 modelled a tension as a connection node of kind `conflicts-with` and had a
 table ready to render them. It minted zero across 27 iterations.

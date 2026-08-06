@@ -8,7 +8,7 @@ applyTo: '**'
      from project/guidance/contract.md 29fa22448c22
      from project/guidance/walking.md 59404c4f2f05
      from project/guidance/method/lane.md f0c61141aa63
-     from project/guidance/voice.md 55eccb668cbb
+     from project/guidance/voice.md a6cfbb949b4f
 -->
 
 # contract — the binding rules of the session
@@ -426,6 +426,23 @@ Write plainly. These are rules, not suggestions. They bind every output:
 
 ### Evidence (applies to every claim, and hardest to judgments)
 - NO CLAIM WITHOUT EVIDENCE. Not "I believe", not "it is known", not a plausible sentence in the right shape. The source, or nothing.
+- THE EVIDENCE IS A REFERENCE SOMEBODY CAN FOLLOW. A path, an id, a ref, a
+  URL, a clause number. "As documented" and "per the spec" are not evidence;
+  they are the shape of evidence with the evidence removed.
+- PROVE TO THE ORIGINAL SOURCE, NEVER A SECOND-HAND ONE. Cite the standard,
+  not the article about it. Cite the code, not the comment describing it.
+  Cite the ruling, not the summary of it. A chain of citations decays at every
+  hop, and the reader who follows it lands somewhere nobody checked.
+- WHERE THE ORIGINAL IS OUT OF REACH, say so in the citation. "Reported by X,
+  primary not seen" is honest and useful. A second-hand citation dressed as a
+  primary one is not.
+- AN ASSERTION ABOUT THE SYSTEM IS CHECKABLE, so check it rather than citing
+  it. A remedy naming a tool argument, a link to a file, a claim that a state
+  exists — the repo answers in milliseconds. Where the check is cheap, run it.
+  Where it is not, the belief is an ASSUMPTION and it goes in the register
+  with its probe. Where it cannot be checked at all, it is a risk with a
+  trigger. A register that fills with what a test could have settled becomes
+  a list nobody reads.
 - A COMPARATIVE CLAIM NEEDS EVIDENCE ON BOTH SIDES. "They do X better than us" needs what they do AND what we do.
 - A vendor's feature list is evidence a feature is CLAIMED. Never that it is good. Never that it beats ours.
 - WHERE OUR SIDE DOES NOT EXIST YET, the comparison is not weak. It is impossible, and writing it is fabrication.

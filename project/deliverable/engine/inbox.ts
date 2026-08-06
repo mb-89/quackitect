@@ -137,8 +137,8 @@ export function drainNote(
       got: `${disposition} outside the retro`,
       remedy: {
         tool: "se_pull",
-        args: { to: "retro" },
-        note: "carried and backlog decide what the work MEANS and when it returns, which wants the whole picture. done and obsolete are checks anyone can run, so they drain wherever the tool is legal",
+        args: { form: { choice: "retro" } },
+        note: "the retro is a door from idle, and it is where carried and backlog are legal — they decide what the work MEANS and when it returns, which wants the whole picture. done and obsolete are checks anyone can run, so they drain wherever the tool is legal",
       },
       source: "engine/inbox.ts drain",
     });

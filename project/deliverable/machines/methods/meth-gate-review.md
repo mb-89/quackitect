@@ -6,9 +6,7 @@ statement: "The gate template: how every gate is reviewed and blessed - the stan
 ## Situation
 Every gate state links this note. The gate's own evidence form carries its milestone-specific acceptance items; this template carries the standard review that evaluates them. The rounds themselves are [[meth-review-rounds]].
 
-THE EVIDENCE FORM IS THE REVIEW (owner ruling 2026-08-06). There is no second review artifact. The form holds the acceptance items, the rounds and the verdict, and the bless on it is the gate's ruling.
-
-The engine demanded a separate milestone-review file until that ruling. None was ever written, for any gate, in any iteration. It asked for the same sections under a second path, which is the DRY law broken inside the gate itself.
+THE EVIDENCE FORM IS THE REVIEW. There is no second review artifact. The form holds the acceptance items, the rounds and the verdict, and the bless on it is the gate's ruling.
 
 ## The standard fields
 - round_0_verify | built it right: one line per check that ran, each with its verdict - a bless is not proof | required
@@ -20,7 +18,7 @@ The engine demanded a separate milestone-review file until that ruling. None was
 
 ## PRIOR ART IS A LIVE SCAN, NEVER A CITATION
 
-Owner ruling, 2026-08-06, after a gate cited a book and called it prior art.
+
 
 SEARCH. Actually search, on the web, at the gate, for what this milestone's
 artifact is being compared against. `se_web_search` and `se_web_fetch` are the
