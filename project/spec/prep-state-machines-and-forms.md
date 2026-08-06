@@ -5,6 +5,11 @@ statement: Preparation for the owner session on the state machine pictures and t
 
 # The state machines and the rigors — what to decide
 
+> STALE IN PART (marked 2026-08-06). The gate-report guard this analysis leans
+> on was struck by owner ruling — see machines/methods/meth-gate-review.md.
+> The "70 of 122 fields read by nothing" conclusion rested on that guard and
+> needs re-deriving against assertStateFormMet before anyone acts on it.
+
 Nine decisions are waiting. Four are cheap and mechanical. Five are yours alone.
 
 The picture problem is half solved and the two halves live in different versions. Version 3 draws real arrows with guard labels. Version 2 computed a top-to-bottom rank but never sorted by it. Neither ever shipped both.

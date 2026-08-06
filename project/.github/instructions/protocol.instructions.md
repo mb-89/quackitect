@@ -5,10 +5,10 @@ applyTo: '**'
 ---
 
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from project/guidance/contract.md 767b97401755
-     from project/guidance/walking.md dad62d8fd3d1
+     from project/guidance/contract.md 29fa22448c22
+     from project/guidance/walking.md 59404c4f2f05
      from project/guidance/method/lane.md f0c61141aa63
-     from project/guidance/voice.md 0b76731c3edb
+     from project/guidance/voice.md 55eccb668cbb
 -->
 
 # contract — the binding rules of the session
@@ -35,8 +35,14 @@ The slider alone cannot wake you. The dial can move mid-session.
 
 ## 4. Strays are notes
 
-An idea, a bug, a better way: `se_note`, and keep walking. You do not leave
-the state in your hand to chase one.
+A stray is:
+
+- an idea
+- a bug
+- a better way
+
+Capture it with `se_note` and keep walking. You do not leave the state in
+your hand to chase one.
 
 ## 5. Confirm before you compose
 
@@ -67,9 +73,17 @@ you begin; once begun, carry on.
 
 ## 7. The repo is the memory
 
-No private assistant memory: nothing here reads or checks it. Durable
-knowledge goes where the machine reads it — guidance, machines, condition
-notes, the spec. What the NEXT session must know goes to `.se/HANDOVER.md`.
+The assistant memory is a scratchpad, never an archive (owner ruling
+2026-08-06). Write to it freely. Every retro DRAINS it: whatever holds
+project rules, project state or working guidance moves into the repo and
+leaves the memory. Durable knowledge goes where the machine reads it:
+
+- guidance
+- machines
+- condition notes
+- the spec
+
+What the NEXT session must know goes to `.se/HANDOVER.md`.
 
 ## 8. Never open a record unasked
 
@@ -134,8 +148,9 @@ names which of five you got.
 BLOCKING IS AN INSTRUCTION, NOT AN ERROR. A threshold, an unmet condition, an
 undrawn route: the pull says so instead of throwing. What stays a refusal is
 what is genuinely ILLEGAL — a choice outside the offer, a form nothing asked
-for. A refusal is typed: clause, expected, got, executable remedy. Follow the
-remedy; recover in one turn. A result carrying a `banner` is shown VERBATIM.
+for. A refusal is typed and carries an executable remedy. Every clause's
+rule stands ahead of time in guidance/refusals.md. Follow the remedy;
+recover in one turn. A result carrying a `banner` is shown VERBATIM.
 
 A PULL MAY MOVE THE WALK. There is no passive position query: "where am I" is
 the pull's `where`. It only advances through states whose conditions pass and
@@ -306,7 +321,13 @@ This document is about WORDS. Two siblings carry what used to live here:
 
 Audience: engineers in general. Not software developers. Assume average competence. Assume English is a second language.
 
-Write plainly. These are rules, not suggestions. They bind every output: chat, docs, spec, report, and code comments.
+Write plainly. These are rules, not suggestions. They bind every output:
+
+- chat
+- docs
+- spec
+- report
+- code comments
 
 ### Sentences
 - One thought per sentence. End it. Start a new sentence for the next thought.

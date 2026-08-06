@@ -12,7 +12,13 @@ This document is about WORDS. Two siblings carry what used to live here:
 
 Audience: engineers in general. Not software developers. Assume average competence. Assume English is a second language.
 
-Write plainly. These are rules, not suggestions. They bind every output: chat, docs, spec, report, and code comments.
+Write plainly. These are rules, not suggestions. They bind every output:
+
+- chat
+- docs
+- spec
+- report
+- code comments
 
 ### Sentences
 - One thought per sentence. End it. Start a new sentence for the next thought.

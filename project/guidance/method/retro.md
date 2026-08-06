@@ -79,11 +79,13 @@ The trigger is a NOTE carrying "needs retro":
    in .se/notes.jsonl): keep it (condition still unmet), pull it
    (re-drain as carried, into this round's scope), or drop it (re-drain
    as obsolete, reason recorded). Re-draining IS the migration mechanism.
-5. Sweep the assistant's persistent memory (owner rule 2026-07-27). Read
-   every memory entry: whatever holds project rules, project state, or
-   working guidance moves INTO the repo (guidance, machines, prompts) and
-   leaves the memory. Memory keeps only personal data and harness
-   mechanics the repo cannot hold.
+5. Drain the assistant's persistent memory (owner rule 2026-08-06,
+   supersedes the 2026-07-27 rule). The agent may write memory freely
+   between retros; the retro is where it drains. Read every memory entry:
+   whatever holds project rules, project state, or working guidance moves
+   INTO the repo (guidance, machines, prompts) and leaves the memory.
+   Memory keeps only personal data and harness mechanics the repo cannot
+   hold. The agent runs this sweep itself.
 6. Hunt wasted effort. Rework, reversals, avoidable refactors,
    reinventing instead of reusing. Each one is a lead.
 7. Mine the record, using the timestamp step 1 stored — never the whole

@@ -61,14 +61,14 @@ dicet: TODO — decider | influencer | customer | expert | team
 disposition: TODO — ++ | + | 0 | - | --
 #
 # How much the outcome matters to them, 0 to 1.
-interest: 0.5
+interest: TODO — 0 to 1
 #
 # How much they can change the outcome, 0 to 1.
-influence: 0.5
+influence: TODO — 0 to 1
 #
 # The project's own weighting of their concerns, 0 to 1. It is the project's
 # judgement, not theirs, and the two may honestly differ.
-weight: 0.5
+weight: TODO — 0 to 1
 ---
 
 ## Concerns
