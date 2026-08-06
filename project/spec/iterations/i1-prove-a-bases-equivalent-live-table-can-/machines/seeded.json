@@ -1,6 +1,6 @@
 {
   "change_size": "product",
-  "rigor_matrix_hash": "db48b108a7e5",
+  "rigor_matrix_hash": "581a9c9fc099",
   "pinned_at": "2026-08-04T16:20:30.684Z",
   "demands": {
     "onboard-retro": {
@@ -49,15 +49,15 @@
     },
     "write-stories": {
       "applies": "full",
-      "evidence": "[[\"stories\",true,\"\",[],\"refs\",\"story\",[],[],[]],[\"coverage\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"stories\",true,\"\",[],\"refs\",\"story\",[],[],[]]]"
     },
     "generalize-use-cases": {
       "applies": "full",
-      "evidence": "[[\"use_cases\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"use_cases\",true,\"\",[],\"refs\",\"use-case\",[],[],[]]]"
     },
     "gate-inputs": {
       "applies": "full",
-      "evidence": "[[\"props_realized\",true,\"\",[],\"\",\"\",[],[],[]],[\"stories_generalized\",true,\"\",[],\"\",\"\",[],[],[]],[\"roles_covered\",true,\"\",[],\"\",\"\",[],[],[]],[\"excluded_stated\",true,\"\",[],\"\",\"\",[],[],[]],[\"examples_formulated\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"picture_judged\",true,\"\",[],\"\",\"\",[],[],[]],[\"unspecified_capability\",true,\"\",[],\"\",\"\",[],[],[]],[\"passes_concrete\",true,\"\",[],\"\",\"\",[],[],[]]]"
     },
     "write-requirements": {
       "applies": "full",

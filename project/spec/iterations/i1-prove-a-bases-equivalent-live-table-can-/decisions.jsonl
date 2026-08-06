@@ -216,3 +216,130 @@
 {"ts":"2026-08-06T10:48:17.155Z","op":"done","visit":"iterations/i1/write-stories@0","node":"d7","brief":"twelve decks written into the iteration's worktree"}
 {"ts":"2026-08-06T10:49:27.511Z","op":"update","visit":"iterations/i1/generalize-use-cases@0","node":"d11","brief":"eighteen stories in the field, coverage rewritten around them"}
 {"ts":"2026-08-06T10:49:44.180Z","op":"update","visit":"iterations/i1/generalize-use-cases@0","node":"d12","brief":"standing on write-stories to read the coverage check's verdict"}
+{"ts":"2026-08-06T10:59:27.646Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d12","brief":"hopping i1 toward write-stories"}
+{"ts":"2026-08-06T10:59:47.365Z","op":"update","visit":"iterations/i1/frame-delta@0","node":"d13","brief":"three hops from write-stories"}
+{"ts":"2026-08-06T10:59:55.004Z","op":"done","visit":"start@0","node":"d5","brief":"the eighteen are preserved in the record's inputs folder"}
+{"ts":"2026-08-06T11:00:29.315Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d14","brief":"the method card now says a story is a journey, with the failing examples"}
+{"ts":"2026-08-06T11:01:20.168Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d15","brief":"the ramp-up: empty machine to the front desk"}
+{"ts":"2026-08-06T11:01:56.373Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d16","brief":"the four you named are written; seven more follow"}
+{"ts":"2026-08-06T11:02:54.648Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d17","brief":"eight journeys written, three left"}
+{"ts":"2026-08-06T11:03:39.897Z","op":"done","visit":"start@0","node":"d7","brief":"eleven journeys stand in the story folder"}
+{"ts":"2026-08-06T11:03:45.299Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d18","brief":"removing the capability statements from the story folder"}
+{"ts":"2026-08-06T11:04:05.574Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d19","brief":"six of eighteen removed"}
+{"ts":"2026-08-06T11:04:23.288Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d20","brief":"eleven of eighteen removed"}
+{"ts":"2026-08-06T11:05:03.285Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d21","brief":"four of the old set left"}
+{"ts":"2026-08-06T11:05:25.051Z","op":"done","visit":"start@0","node":"d6","brief":"all eighteen capability statements are out of the story folder"}
+{"ts":"2026-08-06T11:06:10.454Z","op":"done","visit":"start@0","node":"d8","brief":"the evidence carries the eleven, the coverage and the design question"}
+{"ts":"2026-08-06T11:06:15.137Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d22","brief":"submitting so the coverage check rules on the new set"}
+{"ts":"2026-08-06T11:06:26.147Z","op":"done","visit":"start@0","node":"d4","brief":"coverage check green on the eleven journeys"}
+{"ts":"2026-08-06T11:11:52.873Z","op":"plan","visit":"iterations/i1/write-stories@0","parent":null,"nodes":[{"id":"d23","brief":"coverage field struck from write-stories"},{"id":"d24","brief":"v1 and v2 mined for the use-case shape"},{"id":"d25","brief":"the use-case template and guidance written"},{"id":"d26","brief":"the row reshaped to references"},{"id":"d27","brief":"the use cases authored"}]}
+{"ts":"2026-08-06T11:11:57.882Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d28","brief":"mining v1 at ref main for the use-case shape"}
+{"ts":"2026-08-06T11:12:03.195Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d29","brief":"reading v1's use-case item template"}
+{"ts":"2026-08-06T11:12:23.136Z","op":"done","visit":"iterations/i1/write-stories@0","node":"d24","brief":"v1's template is the prior art and its instances never used it"}
+{"ts":"2026-08-06T11:12:39.822Z","op":"done","visit":"iterations/i1/write-stories@0","node":"d23","brief":"the coverage field is struck; the mechanical check stays"}
+{"ts":"2026-08-06T11:12:48.819Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d30","brief":"locating the coverage field's exact text"}
+{"ts":"2026-08-06T11:13:26.355Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d31","brief":"reading the story template for the house shape"}
+{"ts":"2026-08-06T11:13:51.746Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d32","brief":"the use-case item template, into the worktree first"}
+{"ts":"2026-08-06T11:14:15.197Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d33","brief":"the guidance written; the same two files owed on trunk"}
+{"ts":"2026-08-06T11:15:02.062Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d34","brief":"two missing stories found while reverse-engineering the use cases"}
+{"ts":"2026-08-06T11:15:36.227Z","op":"done","visit":"iterations/i1/write-stories@0","node":"d25","brief":"template and guidance stand in the worktree; trunk copies still owed"}
+{"ts":"2026-08-06T11:16:08.801Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d35","brief":"four of fifteen use cases written"}
+{"ts":"2026-08-06T11:16:42.061Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d36","brief":"seven of fifteen use cases written"}
+{"ts":"2026-08-06T11:17:16.375Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d37","brief":"ten of fifteen use cases written"}
+{"ts":"2026-08-06T11:17:51.229Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d38","brief":"thirteen of fifteen use cases written"}
+{"ts":"2026-08-06T11:18:18.636Z","op":"done","visit":"iterations/i1/write-stories@0","node":"d27","brief":"fifteen use cases stand over thirteen stories"}
+{"ts":"2026-08-06T11:18:53.791Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d39","brief":"filling the use-case form; the row change still waits on trunk"}
+{"ts":"2026-08-06T11:19:13.764Z","op":"fork","visit":"iterations/i1/write-stories@0","parent":"d26","node":"d40","brief":"my fill overwrote the wrong form; restoring both evidence files","nodes":[]}
+{"ts":"2026-08-06T11:19:44.895Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d41","brief":"write-stories restored; the use-case evidence next"}
+{"ts":"2026-08-06T11:20:05.332Z","op":"done","visit":"iterations/i1/write-stories@0","node":"d40","brief":"both evidence files hold their own content again"}
+{"ts":"2026-08-06T11:20:17.894Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d42","brief":"escaping to write the method changes where they compile"}
+{"ts":"2026-08-06T11:30:35.438Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d4","brief":"hopping i1 back to the two states"}
+{"ts":"2026-08-06T11:30:53.742Z","op":"update","visit":"iterations/i1/frame-delta@0","node":"d5","brief":"three hops out"}
+{"ts":"2026-08-06T11:31:17.198Z","op":"done","visit":"front_desk@0","node":"d2","brief":"write-stories submitted with the coverage check live"}
+{"ts":"2026-08-06T11:31:28.080Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d6","brief":"on to the use-case form"}
+{"ts":"2026-08-06T11:31:51.286Z","op":"done","visit":"front_desk@0","node":"d3","brief":"the use-case evidence is written and met; the stamp itself is broken"}
+{"ts":"2026-08-06T11:36:59.752Z","op":"plan","visit":"iterations/i1/write-stories@0","parent":null,"nodes":[{"id":"d7","brief":"the submit stamp repaired"},{"id":"d8","brief":"both states stamped"},{"id":"d9","brief":"gate-inputs filled and presented"}]}
+{"ts":"2026-08-06T11:41:14.754Z","op":"plan","visit":"iterations/i1/start@0","parent":null,"nodes":[{"id":"d2","brief":"write-stories stamped"},{"id":"d3","brief":"generalize-use-cases stamped"},{"id":"d4","brief":"gate-inputs filled"}]}
+{"ts":"2026-08-06T11:41:35.174Z","op":"update","visit":"iterations/i1/draft-vision@0","node":"d5","brief":"five hops to write-stories"}
+{"ts":"2026-08-06T11:41:51.849Z","op":"update","visit":"iterations/i1/scope-non-goals@0","node":"d6","brief":"two hops out"}
+{"ts":"2026-08-06T11:42:13.191Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d7","brief":"submitting write-stories on the fixed stamp"}
+{"ts":"2026-08-06T11:42:29.899Z","op":"done","visit":"iterations/i1/start@0","node":"d2","brief":"write-stories is signed off and green"}
+{"ts":"2026-08-06T11:42:40.750Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d8","brief":"crediting the use-case entry read"}
+{"ts":"2026-08-06T11:42:46.466Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d9","brief":"entering generalize-use-cases with the read credited"}
+{"ts":"2026-08-06T11:43:12.367Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d10","brief":"the entry read refuses both remedies; the state cannot be entered"}
+{"ts":"2026-08-06T11:45:52.105Z","op":"plan","visit":"iterations/i1/write-stories@0","parent":null,"nodes":[{"id":"d11","brief":"the read credit diagnosed"},{"id":"d12","brief":"the credit fixed"},{"id":"d13","brief":"frontmatter checks normalized"},{"id":"d14","brief":"gate-inputs reached"}]}
+{"ts":"2026-08-06T11:59:16.036Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d5","brief":"hopping toward generalize-use-cases"}
+{"ts":"2026-08-06T11:59:40.127Z","op":"update","visit":"iterations/i1/frame-delta@0","node":"d6","brief":"three hops from the test"}
+{"ts":"2026-08-06T12:00:14.206Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d7","brief":"asking for the state that could not be entered"}
+{"ts":"2026-08-06T12:00:25.350Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d8","brief":"plain pull to draw the owed document"}
+{"ts":"2026-08-06T12:00:50.838Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d9","brief":"reading the gathered reading, which is what credits"}
+{"ts":"2026-08-06T12:01:22.109Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d10","brief":"comparing my entry_read against a working one"}
+{"ts":"2026-08-06T12:01:37.965Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d11","brief":"the row names a bare name where a path is owed"}
+{"ts":"2026-08-06T12:07:09.333Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d9","brief":"hopping to write-stories"}
+{"ts":"2026-08-06T12:07:27.258Z","op":"update","visit":"iterations/i1/define-actual@0","node":"d10","brief":"four hops out"}
+{"ts":"2026-08-06T12:07:43.509Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d11","brief":"one hop out"}
+{"ts":"2026-08-06T12:08:03.194Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d12","brief":"the moment of truth on the fixed row"}
+{"ts":"2026-08-06T12:08:19.919Z","op":"done","visit":"start@0","node":"d2","brief":"the entry read serves; the state can be entered"}
+{"ts":"2026-08-06T12:08:25.087Z","op":"update","visit":"iterations/i1/generalize-use-cases@0","node":"d13","brief":"stamping the use cases"}
+{"ts":"2026-08-06T12:08:37.479Z","op":"update","visit":"iterations/i1/generalize-use-cases@0","node":"d14","brief":"asking for the gate"}
+{"ts":"2026-08-06T12:10:11.071Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d15","brief":"the gate is filled; the rounds are argued against the artifacts"}
+{"ts":"2026-08-06T12:10:21.808Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d16","brief":"submitting the gate to see what it still wants"}
+{"ts":"2026-08-06T12:11:12.631Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d17","brief":"the rounds refilled in the shapes the templates demand"}
+{"ts":"2026-08-06T12:11:18.549Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d18","brief":"submitting the gate"}
+{"ts":"2026-08-06T12:11:33.688Z","op":"done","visit":"start@0","node":"d3","brief":"gate-inputs is stamped and waiting for the bless"}
+{"ts":"2026-08-06T12:20:06.807Z","op":"plan","visit":"iterations/i1/gate-inputs@0","parent":null,"nodes":[{"id":"d19","brief":"the three questions answered"},{"id":"d20","brief":"the mechanical fields struck from the gate"},{"id":"d21","brief":"prior art gets a real scan"},{"id":"d22","brief":"unknown-unknowns idea researched"},{"id":"d23","brief":"the gate refilled honestly"}]}
+{"ts":"2026-08-06T12:20:49.332Z","op":"done","visit":"iterations/i1/gate-inputs@0","node":"d22","brief":"two of the three layers are mechanical and buildable"}
+{"ts":"2026-08-06T12:21:03.001Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d24","brief":"the renderer is on file as an open point"}
+{"ts":"2026-08-06T12:21:34.847Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d25","brief":"the gate's shape invites the failure it should refuse"}
+{"ts":"2026-08-06T12:26:35.882Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d5","brief":"hopping in to write the four missing passes"}
+{"ts":"2026-08-06T12:27:05.889Z","op":"update","visit":"iterations/i1/frame-delta@0","node":"d6","brief":"two hops from write-stories"}
+{"ts":"2026-08-06T12:27:43.309Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d7","brief":"the scoped-test journey"}
+{"ts":"2026-08-06T12:28:30.550Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d8","brief":"the scan's sources become reference nodes"}
+{"ts":"2026-08-06T12:29:00.218Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d9","brief":"three of four journeys written"}
+{"ts":"2026-08-06T12:29:51.782Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d10","brief":"eighteen stories in the field"}
+{"ts":"2026-08-06T12:30:16.315Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d11","brief":"eighteen stories, and the gate's four holes closed"}
+{"ts":"2026-08-06T12:30:22.975Z","op":"done","visit":"front_desk@0","node":"d2","brief":"four missing passes now have journeys"}
+{"ts":"2026-08-06T12:30:34.082Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d12","brief":"retrying the pull after a dropped socket"}
+{"ts":"2026-08-06T12:30:47.237Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d13","brief":"checking whether the stamp survived a raw patch"}
+{"ts":"2026-08-06T12:30:55.825Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d14","brief":"the stamp comes off so the changed claim must be re-earned"}
+{"ts":"2026-08-06T12:31:04.065Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d15","brief":"re-earning the stamp on the eighteen"}
+{"ts":"2026-08-06T12:31:15.319Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d16","brief":"eighteen stories signed; four use cases owed"}
+{"ts":"2026-08-06T12:31:34.951Z","op":"update","visit":"iterations/i1/generalize-use-cases@0","node":"d17","brief":"four use cases over the four new journeys"}
+{"ts":"2026-08-06T12:32:12.354Z","op":"update","visit":"iterations/i1/generalize-use-cases@0","node":"d18","brief":"four use cases written; the field owes them"}
+{"ts":"2026-08-06T12:32:23.684Z","op":"update","visit":"iterations/i1/generalize-use-cases@0","node":"d19","brief":"nineteen use cases; the stamp comes off to be re-earned"}
+{"ts":"2026-08-06T12:32:31.334Z","op":"update","visit":"iterations/i1/generalize-use-cases@0","node":"d20","brief":"reading the exact frontmatter"}
+{"ts":"2026-08-06T12:32:46.526Z","op":"update","visit":"iterations/i1/generalize-use-cases@0","node":"d21","brief":"nineteen use cases over eighteen stories"}
+{"ts":"2026-08-06T12:32:51.918Z","op":"done","visit":"front_desk@0","node":"d3","brief":"re-earning the use-case stamp on nineteen"}
+{"ts":"2026-08-06T12:33:04.398Z","op":"update","visit":"iterations/i1/generalize-use-cases@0","node":"d22","brief":"the gate on its new shape"}
+{"ts":"2026-08-06T12:34:29.327Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d23","brief":"the gate fails itself on three uncovered capabilities"}
+{"ts":"2026-08-06T12:34:37.145Z","op":"done","visit":"front_desk@0","node":"d4","brief":"the gate stands filled with a fail it earned"}
+{"ts":"2026-08-06T12:34:54.870Z","op":"plan","visit":"iterations/i1/gate-inputs@0","parent":null,"nodes":[{"id":"d24","brief":"three stories for the uncovered doors"},{"id":"d25","brief":"three use cases over them"},{"id":"d26","brief":"the gate passes on its own rule"}]}
+{"ts":"2026-08-06T12:42:43.094Z","op":"plan","visit":"iterations/i1/gate-inputs@0","parent":null,"nodes":[{"id":"d27","brief":"the fabricated comparisons stripped"},{"id":"d28","brief":"the evidence rule reinforced"},{"id":"d29","brief":"the vehicle-owner node corrected"},{"id":"d30","brief":"prior art worked into the red team"},{"id":"d31","brief":"the gate passed on its own rule"}]}
+{"ts":"2026-08-06T12:46:24.685Z","op":"done","visit":"iterations/i1/gate-inputs@0","node":"d28","brief":"the evidence rule is on file for the retro"}
+{"ts":"2026-08-06T12:46:33.860Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d32","brief":"out of the failed gate to close its three holes"}
+{"ts":"2026-08-06T12:47:10.446Z","op":"update","visit":"iterations/i1/onboard-retro@1","node":"d34","brief":"five hops to write-stories"}
+{"ts":"2026-08-06T12:47:37.592Z","op":"update","visit":"iterations/i1/frame-delta@1","node":"d35","brief":"two hops out"}
+{"ts":"2026-08-06T12:48:13.873Z","op":"update","visit":"iterations/i1/write-stories@1","node":"d36","brief":"ideation, overhaul and asking-and-recording get journeys"}
+{"ts":"2026-08-06T12:48:41.669Z","op":"done","visit":"iterations/i1/gate-inputs@0","node":"d24","brief":"three journeys written for the uncovered doors"}
+{"ts":"2026-08-06T12:48:55.582Z","op":"update","visit":"iterations/i1/write-stories@1","node":"d37","brief":"twenty-one stories; the stamp comes off to be re-earned"}
+{"ts":"2026-08-06T12:49:01.390Z","op":"update","visit":"iterations/i1/write-stories@1","node":"d38","brief":"re-earning the stamp on twenty-one"}
+{"ts":"2026-08-06T12:49:17.039Z","op":"update","visit":"iterations/i1/write-stories@1","node":"d39","brief":"on to the three use cases"}
+{"ts":"2026-08-06T12:49:31.810Z","op":"update","visit":"iterations/i1/generalize-use-cases@1","node":"d40","brief":"three use cases over the new journeys"}
+{"ts":"2026-08-06T12:49:58.005Z","op":"done","visit":"iterations/i1/gate-inputs@0","node":"d25","brief":"three use cases written"}
+{"ts":"2026-08-06T12:50:10.067Z","op":"update","visit":"iterations/i1/generalize-use-cases@1","node":"d41","brief":"twenty-two use cases over twenty-one stories"}
+{"ts":"2026-08-06T12:50:16.086Z","op":"update","visit":"iterations/i1/generalize-use-cases@1","node":"d42","brief":"signing the use cases"}
+{"ts":"2026-08-06T12:50:42.835Z","op":"done","visit":"iterations/i1/gate-inputs@0","node":"d27","brief":"both fabricated comparatives withdrawn on the record"}
+{"ts":"2026-08-06T12:50:56.096Z","op":"update","visit":"iterations/i1/generalize-use-cases@1","node":"d43","brief":"correcting the vehicle owner to what they actually are"}
+{"ts":"2026-08-06T12:51:10.362Z","op":"done","visit":"iterations/i1/gate-inputs@0","node":"d29","brief":"vehicle owners are real customers, weighted accordingly"}
+{"ts":"2026-08-06T12:55:54.664Z","op":"update","visit":"iterations/i1/generalize-use-cases@1","node":"d44","brief":"to the gate with the positioning right"}
+{"ts":"2026-08-06T12:56:56.313Z","op":"update","visit":"iterations/i1/gate-inputs@1","node":"d45","brief":"the gate filled with the positioning right and the steelman answered"}
+{"ts":"2026-08-06T12:57:05.077Z","op":"done","visit":"iterations/i1/gate-inputs@0","node":"d31","brief":"submitting the gate for the bless"}
+{"ts":"2026-08-06T12:57:27.266Z","op":"update","visit":"iterations/i1/gate-inputs@1","node":"d46","brief":"the red team in the shape the template demands"}
+{"ts":"2026-08-06T12:57:36.358Z","op":"done","visit":"iterations/i1/gate-inputs@0","node":"d26","brief":"stamping the gate for the bless"}
+{"ts":"2026-08-06T13:08:44.496Z","op":"plan","visit":"iterations/i1/gate-inputs@1","parent":null,"nodes":[{"id":"d47","brief":"the orthogonality argument into the gate"},{"id":"d48","brief":"re-stamped for the bless"}]}
+{"ts":"2026-08-06T13:08:59.694Z","op":"update","visit":"iterations/i1/gate-inputs@1","node":"d49","brief":"orthogonality in both rounds; the stamp comes off to be re-earned"}
+{"ts":"2026-08-06T13:09:06.213Z","op":"done","visit":"iterations/i1/gate-inputs@1","node":"d47","brief":"re-stamping the gate with the orthogonality argument in it"}
+{"ts":"2026-08-06T13:09:26.093Z","op":"update","visit":"iterations/i1/gate-inputs@1","node":"d50","brief":"the red team in one line per finding again"}
+{"ts":"2026-08-06T13:09:34.008Z","op":"done","visit":"iterations/i1/gate-inputs@1","node":"d48","brief":"the gate stamped and ready for the bless"}
+{"ts":"2026-08-06T13:12:23.071Z","op":"plan","visit":"iterations/i1/gate-inputs@1","parent":null,"nodes":[{"id":"d51","brief":"the retro window marked"},{"id":"d52","brief":"notes today closed are drained"},{"id":"d53","brief":"the evidence rule carried into voice.md"},{"id":"d54","brief":"the retro recorded with what waits on the owner"}]}
+{"ts":"2026-08-06T14:49:27.813Z","op":"update","visit":"iterations/i1/start@0","node":"d38","brief":"syncing trunk into the bound i1 worktree"}

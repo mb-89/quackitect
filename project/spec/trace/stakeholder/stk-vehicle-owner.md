@@ -2,9 +2,10 @@
 id: stk-vehicle-owner
 type: "[[stakeholder]]"
 statement: A builder who runs the method on their own product, and needs their own guidance to stay their own.
-interest: 0.7
-influence: 0.4
-weight: 0.6
+role_class: customer
+interest: 0.9
+influence: 0.8
+weight: 0.85
 ---
 
 ## Concerns
@@ -20,8 +21,20 @@ weight: 0.6
 
 ## Notes (not load-bearing)
 
-Distinct from the engineer driving agents, and deliberately weighted lower:
-this role arrives after the product works for its primary audience. Its
-influence is low because it does not yet exist as a real person — it is the
-role the vendoring proposition is built for, and it will gain weight when
-someone actually occupies it.
+CORRECTED BY THE OWNER, 2026-08-06. This node previously said the role does not
+yet exist as a real person, and weighted it at 0.4 influence on that basis.
+Both were wrong. These are the product's CUSTOMERS in the DICET sense: they
+provide requirements, they do not hold the budget and do not decide the
+product's direction. They run the system today with their own guidance layered
+on it, and they specifically do not want that guidance going back into the open
+source.
+
+SO THE PRIVACY OF THE OVERLAY IS A REQUIREMENT, not a preference. It is the
+reason this role vendors rather than contributes, and it is the constraint the
+whole resolution chain exists to honour. It is listed as a concern above
+because that is what it is - a stated need from a real audience - rather than
+an inference the agent drew.
+
+WHY IT WAS WRONG. The agent asserted the role was hypothetical instead of
+asking. That is the same defect as writing an unevidenced comparison, in a
+different place: a judgment stated where a question was owed (note-2374e629249f).

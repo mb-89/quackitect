@@ -1,7 +1,8 @@
 ---
 form: write-stories
+signed_off: 2026-08-06T12:49:02.109Z
 by: agent
-signed_off: 2026-08-06T09:57:41.781Z
+signed_off_was: 2026-08-06T12:31:04.626Z
 authors: agent
 files:
 ---
@@ -10,103 +11,92 @@ files:
 
 ## current_situation
 
-The five value props stand signed and their two audiences have nodes. Nothing downstream of them existed: no story, no use case, no requirement.
+THE FIRST SET WAS THE WRONG SHAPE, all eighteen of it, and the owner ruled it so on 2026-08-06. They quoted two back: "When a new engine version arrives, I want my own method to survive untouched" and "When I point the agent at building, I want the machine to refuse until the input is earned." Neither is a story. Nothing happens in them.
 
-This state authored the first layer. Six decks, reverse-engineered from what the system already does rather than imagined — v1's IFU arc at ref main, v2's ledger, and this walk's own record.
+A STORY IS A JOURNEY. A person walks through the product from one end to the other. They arrive somewhere, they click something, something answers, they arrive somewhere else. That order is why it draws as slides, and a capability statement has no order at all.
 
-The method card and the item template were rewritten first, because the shape was under-specified: it said statement and evidence but never said the deck was markdown slides, and never said why a story exists at all.
+The test is mechanical: if any two sentences could swap without loss, it is not a story.
+
+THE EIGHTEEN ARE NOT LOST. They describe what the system can DO, which is the use-case question. They are preserved as `inputs/use-case-seeds.md` and generalize-use-cases mines them.
+
+THE METHOD CARD WAS AT FAULT and is fixed. It said "a named actor doing one real pass", which is nearly right and not enough — it never said the pass had an ORDER, and it never said what the shape rules out. Both failing examples now sit in the card as counter-examples.
+
+TWO MORE STORIES ARRIVED FROM THE NEXT STATE. Reverse-engineering the use cases found two goals no journey told, and the rule is that the story comes first. They are in the list below: sty-capture-a-stray and sty-the-agent-proves-it-read.
+
+AND FOUR MORE ARRIVED FROM THE GATE. Its first run found four capabilities with no story and no use case, LISTED them, and recommended pass anyway. The owner ruled that a fail on 2026-08-06: naming a gap does not close it. So they are closed rather than disclosed.
+
+- sty-ask-the-tests-a-question. One question to the tests, one answer, seconds.
+- sty-improve-the-machine-mid-walk. The method is wrong mid-walk; fix it and keep going.
+- sty-look-at-a-closed-record. Reading a finished record as it stood.
+- sty-close-the-day. Every finding ruled before the record closes.
+
+AND THREE MORE FROM THE GATE'S SECOND RUN. Walking the live tool list and the live doors by hand found three capabilities a person can reach this minute with no journey describing them.
+
+- sty-diverge-on-purpose. The ideation door: come out with a choice rather than a default.
+- sty-let-the-system-catch-up. The overhaul door: the method catches up with itself in one pass.
+- sty-ask-and-record-the-answer. Researching a question the repo cannot settle, and putting both the search and the answer on the record.
+
+The third one I created while filling the gate — I performed exactly that pass doing the prior-art scan, and no journey covered it.
+
+Twenty-one. Six killers, and the seven added after the first pass are not among them: each is a real pass, none is load-bearing for a proposition on its own. Missing is not the same as critical.
 
 ## stories
 
-- sty-gate-holds-the-walk
-- sty-reading-cannot-be-skipped
-- sty-worktree-holds-the-iteration
-- sty-scoped-test-answers-one-question
-- sty-method-arrives-at-the-state
-- sty-desk-routes-the-work
-- sty-refusal-names-the-remedy
-- sty-change-size-picks-the-rigor
-- sty-template-mints-the-node
-- sty-unattended-run-stops-at-the-gate
-- sty-manual-walk-no-agent
-- sty-slider-moves-mid-session
-- sty-why-answered-years-later
-- sty-stray-becomes-a-note
-- sty-narration-shows-the-work
-- sty-trace-graph-answers-what-serves-what
-- sty-vendor-overlays-without-forking
-- sty-engine-update-keeps-the-overlay
-
-## coverage
-
-EIGHTEEN STORIES OVER FIVE PROPOSITIONS. Every proposition is realized, and every story refines one. The engine checks both directions now, so neither claim rests on this prose.
-
-vp-systematic-engineering — the machine enforces the order.
-
-- sty-gate-holds-the-walk. The gate refuses until the input is earned.
-- sty-reading-cannot-be-skipped. The proof of a read is the document's last words.
-- sty-worktree-holds-the-iteration. Unfinished work never sits on the tree you demo from.
-- sty-scoped-test-answers-one-question. A run answers a question; the battery is earned.
-
-vp-rigor-without-toil — the method is carried, not memorised.
-
-- sty-method-arrives-at-the-state. The method is handed over before the step opens.
-- sty-desk-routes-the-work. The desk reads the live system and recommends one vehicle.
-- sty-refusal-names-the-remedy. A refusal carries the call to make instead.
-- sty-change-size-picks-the-rigor. The ceremony matches the size, decided once by a person.
-- sty-template-mints-the-node. The shape of an artifact is one click from the field asking for it.
-
-vp-autonomy-range — every setting works, including none.
-
-- sty-unattended-run-stops-at-the-gate. The slider at the top, stopping only where it must.
-- sty-manual-walk-no-agent. The slider at zero, with no AI in the loop at all.
-- sty-slider-moves-mid-session. The setting changes mid-walk without restarting anything.
-
-vp-the-ledger — recorded, attributed, refusable.
-
-- sty-why-answered-years-later. A decision answers its own why from the record.
-- sty-stray-becomes-a-note. A finding survives without the detour that would have cost it.
-- sty-narration-shows-the-work. Progress is readable without interrupting the work.
-- sty-trace-graph-answers-what-serves-what. "Why does this exist" is answered by looking.
-
-vp-vendoring — run it as it is, or overlay it.
-
-- sty-vendor-overlays-without-forking. A builder overlays their method without forking.
-- sty-engine-update-keeps-the-overlay. The first upstream update is a replace, not a merge.
-
-THE KILLERS, and why the product dies without each.
-
-- sty-gate-holds-the-walk. If the walk can be talked past a gate, the enforcement is advice, and advice is what every existing tool already gives. The product IS the refusal.
-- sty-method-arrives-at-the-state. If the method only sits behind a link, the agent improvises and the rigor is theatre. This is the difference between a machine that carries the method and one that mentions it.
-- sty-unattended-run-stops-at-the-gate. If the walk stops at everything or at nothing, the autonomy range collapses to a single setting and the proposition is gone.
-- sty-reading-cannot-be-skipped. If a read cannot be told from a polite yes, every downstream step rests on a claim nobody checked. The reading loop is what makes "the agent has the method" a fact rather than a hope.
-
-THE REST ARE NOT KILLERS. They are how the product is pleasant rather than how it is possible. Two deserve their reason recorded.
-
-- sty-manual-walk-no-agent proves the method outlives the AI. It matters, and the product still works for its primary audience without it.
-- sty-vendor-overlays-without-forking serves a role that does not yet exist as a real person, which its own node records at influence 0.4.
-
-WHERE THESE CAME FROM. Reverse-engineered from what the system already does, not invented: v1's IFU decks at ref main gave the arc and the split slide; v2's ledger gave the roles; the rest is this walk's own record — the gate that held, the entry read that fired, the slider that stopped a pull, the refusal that named its own remedy.
-
-WHAT THE SET DOES NOT CLAIM. Coverage is not completeness. Every proposition has a story, and that does not mean every pass a person can make is told. The twelve added here trace the machinery a user actually touches: the desk, the note, the refusal, the reading loop, the narration, the worktree, the change size, the graph, the slider, the update, the scoped run, the template. A missing story will surface the way a missing value prop does — something gets built that no story covers.
-
-EVERY EVIDENCE SIDE IS EMPTY, which is correct at M2. They fill at M8, and that is what makes each deck its own validation container rather than a design-time leftover.
+- sty-ramp-up
+- sty-take-the-tour
+- sty-next-iteration
+- sty-start-a-new-product
+- sty-review-a-gate
+- sty-land-the-work
+- sty-close-the-day
+- sty-hand-over-and-walk-away
+- sty-walk-it-by-hand
+- sty-improve-the-machine-mid-walk
+- sty-ask-the-tests-a-question
+- sty-come-back-after-a-week
+- sty-clear-the-inbox-with-a-retro
+- sty-capture-a-stray
+- sty-answer-why-a-year-later
+- sty-look-at-a-closed-record
+- sty-the-agent-proves-it-read
+- sty-vendor-it-into-my-product
+- sty-diverge-on-purpose
+- sty-let-the-system-catch-up
+- sty-ask-and-record-the-answer
 
 ## follow_up
 
-- The evidence sides are empty by design and fill at M8. A story whose right half is still blank after validation is a defect from that point on, not before.
-- Use cases generalise these stories at M2's next step, and requirements derive from the use cases' steps. A step no story walks is a step nobody asked for.
-- The set is not exhaustive. Add a story when something gets built that none covers, rather than sweeping for completeness now.
-- sty-vendor-overlays-without-forking describes a chain that is designed and not built. It is a story about the to-be world, which is legal at M2 and becomes a lie if it is still unbuilt when the product claims vendoring works.
+- THE COVERAGE FIELD IS STRUCK. It restated what the engine already computes, and the owner ruled it out on 2026-08-06. The mechanical check stays; the prose describing it goes. The row change is written and waits on the trunk.
+- WHAT WAS NOT COMPUTED MOVED HERE. Which stories are killers and why is judgment, and it lives under `anything_else` below rather than in a field that duplicated the check.
+- NOTHING RENDERS THE DECKS. Not this repo, not VS Code, not any marketplace extension that knows the `|||` split. A small renderer belongs in the panel: split on `---`, split each slide on `|||`, draw two columns.
+- THE RENDERER MUST NOT GO IN THE HTML MIRROR, which the owner ruled out the same day. It goes in the panel, once.
+- THE PRODUCT-SELECTION ANSWER WANTS A RULING. The story proposes folder-is-product; nothing is built on it yet.
+- The evidence sides are empty by design and fill at M8. A blank right half after validation is a defect from that point on, not before.
+- The set is not exhaustive and coverage is not completeness. Add a story when something gets built that none of these covers.
 
 ## anything_else
 
-THE ENTRY READ FIRED AGAIN, and again served the worktree's copy — the method card as it stood before today, not the rewrite. I wrote these decks from the current card, which I authored an hour ago and still hold.
+THE RAMP-UP IS FIRST, AND EVERY OTHER STORY BEGINS WHERE IT ENDS. An empty machine, nothing installed, and the person has to reach the first screen. Installing, booting and every click on the way live in that one story rather than being scattered through the others.
 
-THE SAME GAP THEN BLOCKED THE SUBMIT, which is the useful part. The reference check reads the trace corpus from THIS RECORD's worktree, which is the owner's ruling and correct. It reads the ITEM TEMPLATE from the same place, and the template is METHOD — authored on trunk, absent here. So the form refused with "no item template exists" while the template plainly existed.
+THE KILLERS, six of them, and why the product dies without each. This is judgment, which is why it survives the struck coverage field.
 
-SO THE STOPGAP WAS APPLIED BY HAND: story.md copied into this worktree, which is exactly what the missing mechanism would have done (note-cc562f5f1fab). It also names the seam more precisely than the note did. Two roots are needed, not one: the CORPUS follows the record, the METHOD follows trunk. templateProblems passes a single root for both.
+- sty-ramp-up. A system nobody can install is a system nobody has. Every other claim is downstream of somebody reaching the front desk.
+- sty-start-a-new-product. If the second product is harder than the first, this is a project and not a product.
+- sty-review-a-gate. If a gate cannot be read, argued and rejected against the artifacts themselves, the bless is a rubber stamp and the enforcement is theatre.
+- sty-hand-over-and-walk-away. The unattended walk is the proposition. If it stops at everything or at nothing, the autonomy range collapses to one setting.
+- sty-walk-it-by-hand. The zero end of the same range. If the method only works with an agent, the method is the agent.
+- sty-the-agent-proves-it-read. If a read cannot be told from a polite yes, every step downstream rests on a claim nobody checked.
 
-ONE DEFECT FOUND AND FIXED ON THE WAY. The trace graph read the project root while the walk writes to the record's worktree, so every story authored here would have been invisible on the graph — the third instance of that reader split today, after the form check and the green light. engine/render.ts now reads where the walk works, and the source guard in refs.test.ts covers it.
+A STORY DID DESIGN WORK, which is the point of writing one. sty-start-a-new-product could not be told without answering a question nobody had answered: is a product chosen at boot, or at the front desk?
 
-TWO STORIES OMIT `killer` ENTIRELY rather than writing false. The item template carries `killer: false` as a real default, so the node takes it. That is the defaults mechanism the owner ruled this morning, exercised for the first time.
+THE ANSWER THE STORY SETTLES: a product IS a folder, chosen at boot by which folder is opened. There is no picker and there should not be one, because everything a product owns — spec, machines, notes, log — lives in that tree. A picker would have to switch trees, which is what opening a folder already does. Starting a new product from the desk means scaffolding a folder and opening it in its own window.
+
+THAT IS A PROPOSAL, not a ruling. It is recorded here because the story cannot stand without it, and it wants the owner's word before anything is built on it.
+
+WHAT THE SECOND ATTEMPT CHANGED. The first set answered "what can the system do". Every entry named a property and then described it. Read as slides, the slides could be shuffled without loss, which is the tell.
+
+The second set answers "what happens to a person using it". Each one has a first slide where they arrive with nothing and a last slide where they have something. The middle is in the only order it could be in.
+
+## choice
+
+iterations/i1/generalize-use-cases
