@@ -1,5 +1,7 @@
 ---
 form: draft-vision
+by: agent
+signed_off: 2026-08-06T17:11:55.606Z
 authors: agent
 files:
 ---

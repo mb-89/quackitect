@@ -514,3 +514,16 @@
 {"ts":"2026-08-06T17:07:43.252Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d17","brief":"charging for gaps rather than items, with a debug line"}
 {"ts":"2026-08-06T17:09:19.799Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d18","brief":"restoring the down-facing origin and rewriting the wedge law test"}
 {"ts":"2026-08-06T17:09:35.687Z","op":"done","visit":"iterations/i1/gate-kickoff@0","node":"d14","brief":"25 trace tests green on the new section law"}
+{"ts":"2026-08-06T17:09:51.274Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d19","brief":"reloading to reconcile the split trees and serve the new layout"}
+{"ts":"2026-08-06T17:11:04.669Z","op":"plan","visit":"iterations/i1/start@0","parent":null,"nodes":[{"id":"d2","brief":"find the bless verb at gate-kickoff"},{"id":"d3","brief":"walk and re-earn the M1 and M2 states"},{"id":"d4","brief":"bless the three gates down to gate-requirements"}]}
+{"ts":"2026-08-06T17:11:19.270Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d5","brief":"onboard-retro still signed; on to the kickoff gate"}
+{"ts":"2026-08-06T17:11:25.792Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d6","brief":"trying bless as a form key at the kickoff gate"}
+{"ts":"2026-08-06T17:11:43.876Z","op":"done","visit":"iterations/i1/start@0","node":"d2","brief":"the bless verb is form bless true, and the kickoff is blessed"}
+{"ts":"2026-08-06T17:11:54.692Z","op":"update","visit":"iterations/i1/draft-vision@0","node":"d7","brief":"re-earning draft-vision"}
+{"ts":"2026-08-06T17:12:19.721Z","op":"update","visit":"iterations/i1/draft-vision@0","node":"d8","brief":"draft-vision signed; on to define-actual"}
+{"ts":"2026-08-06T17:13:14.895Z","op":"plan","visit":"iterations/i1/define-actual@0","parent":null,"nodes":[{"id":"d9","brief":"cap the stagger band by its own radius"},{"id":"d10","brief":"measure and test the layout"},{"id":"d11","brief":"resume the bless walk"}]}
+{"ts":"2026-08-06T17:14:01.582Z","op":"update","visit":"iterations/i1/define-actual@0","node":"d12","brief":"a ring under four times the default never staggers"}
+{"ts":"2026-08-06T17:14:55.090Z","op":"update","visit":"iterations/i1/define-actual@0","node":"d13","brief":"a section's load is its worst ring, counted in gaps"}
+{"ts":"2026-08-06T17:16:41.933Z","op":"update","visit":"iterations/i1/define-actual@0","node":"d14","brief":"the stagger must pay for itself on its own ring"}
+{"ts":"2026-08-06T17:17:12.463Z","op":"done","visit":"iterations/i1/define-actual@0","node":"d9","brief":"the stagger now pays for itself per ring, with no threshold"}
+{"ts":"2026-08-06T17:17:19.280Z","op":"done","visit":"iterations/i1/define-actual@0","node":"d10","brief":"25 trace tests green at size 3237"}

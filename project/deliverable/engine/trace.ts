@@ -485,7 +485,11 @@ const MIN_DIST = Math.round((FIRST_RING * 2) / 3);
  *  IT IS COMPUTED, NEVER STORED. The loads come from whatever is in scope at
  *  this layout, so a filter or a selection re-cuts every section. */
 function sections(shown: string[], perWedge: Map<string, string[][]>): Map<string, { centre: number; span: number }> {
-  const load = (p: string): number => Math.max(1, ...(perWedge.get(p) ?? []).map((l) => l.length));
+  // A SECTION'S LOAD IS ITS WORST RING, counted in GAPS. Counting only the
+  // outer ring starved the inner ones: a section whose stories outnumbered
+  // its share of the turn had nowhere to put them once the small rings
+  // stopped staggering.
+  const load = (p: string): number => Math.max(1, ...(perWedge.get(p) ?? []).map((l) => Math.max(0, l.length - 1)));
   const total = shown.reduce((a, p) => a + load(p), 0);
   const out = new Map<string, { centre: number; span: number }>();
   // The FIRST section is centred straight down, so a single prop still hangs
@@ -533,9 +537,24 @@ function bandHalf(orbits: number): number {
 const RING_GAP = MIN_DIST;
 
 /** How many sub-orbits a lane needs for the arc it has. A sparse lane stays
- *  on one orbit — staggering it would be noise and a thicker band. */
-function orbitsFor(count: number, arc: number): number {
-  return Math.max(1, Math.min(STAGGER, Math.ceil((count * MIN_DIST) / Math.max(arc, 1))));
+ *  on one orbit — staggering it would be noise and a thicker band.
+ *
+ *  AND A STAGGER MUST PAY FOR ITSELF (owner, 2026-08-06). The test is NOT
+ *  the absolute radius — that only counts the rings nested inside, and says
+ *  nothing about this ring's own room. It is whether the BAND the stagger
+ *  adds costs less than the ARC it saves, on this ring alone. On a sparse
+ *  inner ring the arc is already ample, so a band buys nothing and the ring
+ *  stays a single circle; on a crowded outer one the band is small beside
+ *  what it saves. Nothing is thresholded; the cheaper answer wins. */
+function bestOrbits(gaps: number, span: number, floor: number): { r: number; orbits: number } {
+  let best = { r: Number.POSITIVE_INFINITY, orbits: 1 };
+  for (let o = 1; o <= STAGGER; o++) {
+    const half = bandHalf(o);
+    const r = Math.max(floor + half, span <= 0 ? 0 : (gaps * MIN_DIST) / (o * span * 0.86));
+    // What this ring actually costs the drawing is its OUTER edge.
+    if (r + half < best.r + bandHalf(best.orbits)) best = { r, orbits: o };
+  }
+  return best;
 }
 
 export function shortLabel(id: string): string {
@@ -641,29 +660,24 @@ function keepFor(all: TraceNode[], q: string): Set<string> {
  *  wasted its middle. Now a ring grows only as far as ITS worst wedge needs
  *  at full stagger, and the floor chain keeps it clear of the previous
  *  ring's outermost sub-orbit. Inner rings collapse; the spacing does not. */
-function ringRadii(wedges: { lanes: string[][]; span: number }[], count: number): number[] {
-  const radii: number[] = [];
+function ringRadii(wedges: { lanes: string[][]; span: number }[], count: number): { r: number; orbits: number }[] {
+  const rings: { r: number; orbits: number }[] = [];
   let floor = FIRST_RING;
   for (let k = 0; k < count; k++) {
-    let worst = 0;
-    let need = 0;
+    // The ring answers to its HUNGRIEST section: each is sized against its
+    // own arc, and n items need n-1 gaps, never n.
+    let pick = { r: floor, orbits: 1 };
     for (const w of wedges) {
       const n = w.lanes[k]?.length ?? 0;
-      worst = Math.max(worst, n);
-      // Each section is sized against ITS OWN arc, so a crowded section no
-      // longer sets the ring for the sparse ones.
-      // n items need n-1 GAPS, not n — charging for the extra one made a
-      // narrow section demand a huge radius to hold a single node.
-      if (n > 1 && w.span > 0) need = Math.max(need, ((n - 1) * MIN_DIST) / (STAGGER * w.span * 0.86));
+      if (n < 2 || w.span <= 0) continue;
+      const got = bestOrbits(n - 1, w.span, floor);
+      if (got.r > pick.r) pick = got;
     }
-    // The band reaches INWARD too, so the ring itself has to clear the
-    // previous ring's outer edge by its own inner half.
-    const half = bandHalf(orbitsFor(worst, Math.max(floor, need)));
-    const r = Math.max(floor + half, need);
-    radii.push(r);
-    floor = r + half + RING_GAP;
+    rings.push(pick);
+    // The band straddles the ring, so the next floor clears its outer half.
+    floor = pick.r + bandHalf(pick.orbits) + RING_GAP;
   }
-  return radii;
+  return rings;
 }
 
 /** THE RELAX PASS (owner order 2026-08-06: collapse, but never until cards
@@ -731,10 +745,11 @@ export function layoutTrace(all: TraceNode[], selected?: string[], filter?: { ty
   // The sections are cut AFTER the lanes are known, because each one's share
   // of the turn is its own load.
   const cut = sections(shown, perWedge);
-  const rings = ringRadii(
+  const ringPlan = ringRadii(
     shown.map((p) => ({ lanes: perWedge.get(p) ?? [], span: cut.get(p)?.span ?? 0 })),
     levels.length,
   );
+  const rings = ringPlan.map((x) => x.r);
 
   const placed: Placed[] = [];
   const place = new Map<string, number>();
@@ -766,8 +781,8 @@ export function layoutTrace(all: TraceNode[], selected?: string[], filter?: { ty
       // orbit — staggering it would be noise. A dense one splits across up
       // to three, and neighbours IN ANGLE alternate outward, so same-orbit
       // neighbours always sit the full LABEL_W apart.
-      const arc = 2 * half * (rings[k] ?? 1);
-      const orbits = orbitsFor(lane.length, arc);
+      // The orbit count is the ring's own, chosen where the radius was.
+      const orbits = ringPlan[k]?.orbits ?? 1;
       const angles = spread(
         ordered.map((id) => target.get(id) ?? centre),
         MIN_DIST / orbits / (rings[k] ?? 1),
