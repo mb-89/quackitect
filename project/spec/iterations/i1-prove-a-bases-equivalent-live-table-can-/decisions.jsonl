@@ -539,3 +539,5 @@
 {"ts":"2026-08-06T17:33:15.543Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d22","brief":"the handover records the two blessed gates"}
 {"ts":"2026-08-06T17:33:52.904Z","op":"update","visit":"iterations/i1/draw-context@0","node":"d23","brief":"M2 begins: draw-context"}
 {"ts":"2026-08-06T17:34:07.521Z","op":"update","visit":"iterations/i1/draw-context@0","node":"d24","brief":"draw-context signed; ten states re-earned"}
+{"ts":"2026-08-06T17:35:14.160Z","op":"update","visit":"iterations/i1/map-stakeholders@0","node":"d25","brief":"map-stakeholders was still unsigned; submitting it"}
+{"ts":"2026-08-06T17:35:23.728Z","op":"update","visit":"iterations/i1/map-stakeholders@0","node":"d26","brief":"map-stakeholders signed; gate-inputs is next"}
