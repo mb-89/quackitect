@@ -756,20 +756,66 @@ interface LayoutCtx {
   els: Map<string, CanvasElement>;
 }
 
-/** One horizontal row of states, centred on the axis; answers its height. */
-function placeRow(ctx: LayoutCtx, row: StateDecl[], atY: number): number {
+/** A STATE SITS UNDER ITS INPUTS (owner ruling 2026-08-06).
+ *
+ *  Every row used to be centred on the axis, whatever fed it. A row of three
+ *  above a row of one put the lone dependant under the MIDDLE of the three —
+ *  whoever that happened to be — and drew its real parent's arrow straight
+ *  past it. A reader cannot tell that picture from a join, which is the exact
+ *  confusion the busbar exists to remove.
+ *
+ *  It bit generalize-use-cases in M2: one input, write-stories, and it drew
+ *  under map-stakeholders with write-stories' arrow running through.
+ *
+ *  So each node WANTS the mean centre of its already-placed inputs, and one
+ *  input means it lands squarely under that input. Wants collide, so the row
+ *  is laid out in want order with the gap enforced, then shifted so its own
+ *  centre lands where the wants averaged. A row whose inputs are not placed
+ *  yet — the start pill, the first row of a group — keeps the old centring. */
+function placeRow(ctx: LayoutCtx, row: StateDecl[], atY: number, inputsOf?: Map<string, string[]>): number {
   const sized = row.map((s) => ({
+    s,
     el:
       s.kind === "start" || s.kind === "end" || s.kind === "terminal"
         ? pill(`n-${s.id}`, `${s.id}.md`, atY)
         : ({ id: `n-${s.id}`, type: "file", file: `${s.id}.md`, x: 0, y: atY, ...nodeSize(s.id, s.statement) } as GenNode),
   }));
+  const centreOf = (id: string): number | undefined => {
+    const el = ctx.els.get(`n-${id}`);
+    return el === undefined ? undefined : el.x + el.width / 2;
+  };
+  const want = new Map<string, number>();
+  for (const item of sized) {
+    const cs = (inputsOf?.get(item.s.id) ?? []).map(centreOf).filter((c): c is number => c !== undefined);
+    if (cs.length > 0) want.set(item.s.id, cs.reduce((a, b) => a + b, 0) / cs.length);
+  }
   const total = sized.reduce((w, x) => w + x.el.width, 0) + LAYOUT.gapX * (sized.length - 1);
-  let x = -total / 2;
+  if (want.size > 0) {
+    const byWant = [...sized].sort((a, b) => (want.get(a.s.id) ?? 0) - (want.get(b.s.id) ?? 0));
+    let cursor = Number.NEGATIVE_INFINITY;
+    for (const item of byWant) {
+      const w = want.get(item.s.id);
+      const ideal = w === undefined ? cursor : w - item.el.width / 2;
+      item.el.x = cursor === Number.NEGATIVE_INFINITY ? ideal : Math.max(cursor, ideal);
+      cursor = item.el.x + item.el.width + LAYOUT.gapX;
+    }
+    // Enforcing the gap pushes everything rightward, so put the row back on
+    // the centre its wants asked for. With one node this shift is zero and
+    // the node stays exactly under its input.
+    const left = Math.min(...byWant.map((i) => i.el.x));
+    const right = Math.max(...byWant.map((i) => i.el.x + i.el.width));
+    const wants = [...want.values()];
+    const drift = wants.reduce((a, b) => a + b, 0) / wants.length - (left + right) / 2;
+    for (const item of byWant) item.el.x += drift;
+  } else {
+    let x = -total / 2;
+    for (const item of sized) {
+      item.el.x = x;
+      x += item.el.width + LAYOUT.gapX;
+    }
+  }
   let tallest = 0;
   for (const item of sized) {
-    item.el.x = x;
-    x += item.el.width + LAYOUT.gapX;
     tallest = Math.max(tallest, item.el.height);
     ctx.nodes.push(item.el);
     ctx.els.set(item.el.id, item.el);
@@ -777,9 +823,30 @@ function placeRow(ctx: LayoutCtx, row: StateDecl[], atY: number): number {
   return tallest;
 }
 
+/** Who feeds whom, by the same rule the busbar and the submit check use:
+ *  a normal or approval edge is an input; fallback and recovery are not. */
+function inputsOf(m: MachineDecl): Map<string, string[]> {
+  const INPUT_ROLES = new Set(["normal", "approval"]);
+  const map = new Map<string, string[]>();
+  for (const s of m.states) {
+    for (const e of s.edges) {
+      if (!INPUT_ROLES.has(e.role ?? "normal")) continue;
+      map.set(e.to, [...(map.get(e.to) ?? []), s.id]);
+    }
+  }
+  return map;
+}
+
 /** One milestone's box: its states in dependency rows, wrapped and
  *  labelled; answers the y below the box. */
-function placeGroup(ctx: LayoutCtx, g: string, members: StateDecl[], layers: Map<string, number>, boxTop: number): number {
+function placeGroup(
+  ctx: LayoutCtx,
+  g: string,
+  members: StateDecl[],
+  layers: Map<string, number>,
+  boxTop: number,
+  feeders?: Map<string, string[]>,
+): number {
   let rowY = boxTop + LAYOUT.labelH + LAYOUT.pad;
   let minX = Number.POSITIVE_INFINITY;
   let maxX = Number.NEGATIVE_INFINITY;
@@ -787,7 +854,7 @@ function placeGroup(ctx: LayoutCtx, g: string, members: StateDecl[], layers: Map
   for (let r = 0; r <= depth; r++) {
     const row = members.filter((s) => (layers.get(s.id) ?? 0) === r);
     if (row.length === 0) continue;
-    const tallest = placeRow(ctx, row, rowY);
+    const tallest = placeRow(ctx, row, rowY, feeders);
     for (const s of row) {
       const el = ctx.els.get(`n-${s.id}`)!;
       minX = Math.min(minX, el.x);
@@ -821,6 +888,7 @@ function pinnedCanvas(m: MachineDecl): CanvasData {
     if (g !== "" && !order.includes(g)) order.push(g);
   }
   const ctx: LayoutCtx = { nodes: [], els: new Map() };
+  const feeders = inputsOf(m);
   let y = 0;
   for (const s of m.states) {
     if (s.kind !== "start") continue;
@@ -833,6 +901,7 @@ function pinnedCanvas(m: MachineDecl): CanvasData {
       m.states.filter((s) => groupOf(s) === g),
       layers,
       y,
+      feeders,
     );
   }
   for (const s of m.states) {

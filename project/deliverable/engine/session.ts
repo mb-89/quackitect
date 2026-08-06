@@ -3105,9 +3105,15 @@ export class Session {
       // at the submit left the bless with no carrier — the pull stopped asking,
       // and a bless only rides a pull that is asking. The mirror's thumbs still
       // worked, so the gap was invisible to a person and total for an agent.
-      // A STATE MISSING AN INPUT OWES NOTHING. Its form cannot be finished, and
+      // A GATE MISSING AN INPUT OWES NOTHING. Its form cannot be finished, and
       // owing it swallows every choice that would fetch the missing leg.
-      if (this.feedersUnsigned(machine, s).length > 0) return undefined;
+      //
+      // THIS STAYS GATE-ONLY, and widening it was a deadlock. A work state
+      // whose feeder is unsigned would owe no form, so it could never be
+      // filled, so its feeder could never become signed either. The rule that
+      // every input must be met belongs at the SUBMIT, where formDone checks
+      // it. Owing a form and being allowed to stamp it are different questions.
+      if (f.gate === true && this.feedersUnsigned(machine, s).length > 0) return undefined;
       const blessed = f.gate !== true || (f.bless ?? "") !== "";
       return f.signed === true && f.met === true && blessed ? undefined : s.id;
     } catch {

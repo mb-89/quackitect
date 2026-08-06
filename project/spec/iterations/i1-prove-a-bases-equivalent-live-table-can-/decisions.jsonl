@@ -590,3 +590,52 @@
 {"ts":"2026-08-06T18:03:57.761Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d73","brief":"checking where the walk stands before re-earning write-stories"}
 {"ts":"2026-08-06T18:04:11.154Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d74","brief":"walking back to write-stories"}
 {"ts":"2026-08-06T18:04:27.514Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d75","brief":"trying to put the new enforcement into the running engine"}
+{"ts":"2026-08-06T18:05:34.393Z","op":"update","visit":"iterations/i1/start@0","node":"d12","brief":"aiming at write-stories"}
+{"ts":"2026-08-06T18:05:41.464Z","op":"update","visit":"iterations/i1/start@0","node":"d13","brief":"walking the chain from onboard-retro"}
+{"ts":"2026-08-06T18:05:48.878Z","op":"update","visit":"iterations/i1/start@0","node":"d14","brief":"retro method credited; walking on toward write-stories"}
+{"ts":"2026-08-06T18:05:56.691Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d15","brief":"advancing past onboard-retro"}
+{"ts":"2026-08-06T18:06:06.899Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d16","brief":"aiming the walk at write-stories"}
+{"ts":"2026-08-06T18:07:54.746Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d17","brief":"hop 1 of the chain to write-stories"}
+{"ts":"2026-08-06T18:08:01.601Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d18","brief":"hop 2"}
+{"ts":"2026-08-06T18:08:08.830Z","op":"update","visit":"iterations/i1/draft-vision@0","node":"d19","brief":"hop 3"}
+{"ts":"2026-08-06T18:08:15.368Z","op":"update","visit":"iterations/i1/define-actual@0","node":"d20","brief":"hop 4"}
+{"ts":"2026-08-06T18:08:22.783Z","op":"update","visit":"iterations/i1/frame-delta@0","node":"d21","brief":"hop 5"}
+{"ts":"2026-08-06T18:08:59.619Z","op":"update","visit":"iterations/i1/start@0","node":"d9","brief":"hop 1"}
+{"ts":"2026-08-06T18:09:06.996Z","op":"update","visit":"iterations/i1/start@0","node":"d10","brief":"retro credited"}
+{"ts":"2026-08-06T18:09:12.680Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d11","brief":"hop 2"}
+{"ts":"2026-08-06T18:09:19.187Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d12","brief":"hop 3"}
+{"ts":"2026-08-06T18:09:27.068Z","op":"update","visit":"iterations/i1/draft-vision@0","node":"d13","brief":"hop 4"}
+{"ts":"2026-08-06T18:09:52.136Z","op":"update","visit":"iterations/i1/define-actual@0","node":"d14","brief":"engine died again at hop 5; reconnecting"}
+{"ts":"2026-08-06T18:10:01.143Z","op":"update","visit":"iterations/i1/define-actual@0","node":"d15","brief":"hop 5, retry"}
+{"ts":"2026-08-06T18:10:08.733Z","op":"update","visit":"iterations/i1/frame-delta@0","node":"d16","brief":"hop 6"}
+{"ts":"2026-08-06T18:10:16.908Z","op":"update","visit":"iterations/i1/scope-non-goals@0","node":"d17","brief":"hop 7 toward the M2 fan"}
+{"ts":"2026-08-06T18:10:31.107Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d18","brief":"reconnecting after the socket dropped"}
+{"ts":"2026-08-06T18:10:38.054Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d19","brief":"taking the write-stories leg, retry"}
+{"ts":"2026-08-06T18:10:55.911Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d20","brief":"story method credited"}
+{"ts":"2026-08-06T18:11:03.925Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d21","brief":"stakeholder method credited"}
+{"ts":"2026-08-06T18:13:03.736Z","op":"update","visit":"iterations/i1/start@0","node":"d8","brief":"hop 1"}
+{"ts":"2026-08-06T18:13:10.056Z","op":"update","visit":"iterations/i1/start@0","node":"d9","brief":"retro credited"}
+{"ts":"2026-08-06T18:13:15.233Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d10","brief":"hop 2"}
+{"ts":"2026-08-06T18:13:21.294Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d11","brief":"hop 3"}
+{"ts":"2026-08-06T18:13:28.763Z","op":"update","visit":"iterations/i1/draft-vision@0","node":"d12","brief":"hop 4"}
+{"ts":"2026-08-06T18:13:36.079Z","op":"update","visit":"iterations/i1/define-actual@0","node":"d13","brief":"hop 5"}
+{"ts":"2026-08-06T18:13:43.752Z","op":"update","visit":"iterations/i1/frame-delta@0","node":"d14","brief":"hop 6"}
+{"ts":"2026-08-06T18:13:51.185Z","op":"update","visit":"iterations/i1/scope-non-goals@0","node":"d15","brief":"hop 7"}
+{"ts":"2026-08-06T18:14:19.553Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d16","brief":"hop 8, the write-stories leg"}
+{"ts":"2026-08-06T18:14:29.672Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d17","brief":"story method credited"}
+{"ts":"2026-08-06T18:14:36.126Z","op":"done","visit":"start@0","node":"d2","brief":"arrived at write-stories"}
+{"ts":"2026-08-06T18:14:53.505Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d18","brief":"un-deadlocking the owing; the input rule lives at the submit"}
+{"ts":"2026-08-06T18:14:56.554Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d19","brief":"asking write-stories for its form"}
+{"ts":"2026-08-06T18:15:06.052Z","op":"done","visit":"start@0","node":"d3","brief":"write-stories submitted and stamped"}
+{"ts":"2026-08-06T18:16:12.186Z","op":"plan","visit":"iterations/i1/write-stories@0","parent":null,"nodes":[{"id":"d20","brief":"place generalize-use-cases under write-stories"},{"id":"d21","brief":"make it a rule for generated machines"},{"id":"d22","brief":"re-verify what stands above write-stories"}]}
+{"ts":"2026-08-06T18:16:19.458Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d23","brief":"locating the machine auto-layout"}
+{"ts":"2026-08-06T18:16:23.846Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d24","brief":"tracing the canvas back to its producer"}
+{"ts":"2026-08-06T18:16:29.459Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d25","brief":"following viewFor to the generated canvas"}
+{"ts":"2026-08-06T18:16:36.295Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d26","brief":"narrowing to the canvas builder"}
+{"ts":"2026-08-06T18:16:40.136Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d27","brief":"reading the iteration canvas layout"}
+{"ts":"2026-08-06T18:16:47.850Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d28","brief":"reading the per-layer placement"}
+{"ts":"2026-08-06T18:17:15.285Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d29","brief":"reading the rest of pinnedCanvas to thread the parent map"}
+{"ts":"2026-08-06T18:17:45.423Z","op":"done","visit":"iterations/i1/write-stories@0","node":"d20","brief":"a state now draws under its inputs, not on the axis"}
+{"ts":"2026-08-06T18:17:51.649Z","op":"done","visit":"iterations/i1/write-stories@0","node":"d21","brief":"the rule is in the generator, so it binds every generated machine"}
+{"ts":"2026-08-06T18:18:40.674Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d30","brief":"fetching the verdict"}
+{"ts":"2026-08-06T18:19:19.713Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d31","brief":"putting the layout and the input check into the running engine"}
