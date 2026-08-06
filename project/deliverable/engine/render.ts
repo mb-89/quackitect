@@ -3112,6 +3112,38 @@ function drawingSets(
   // every look rather than only when a pin is rewritten. It costs one hash
   // of the matrix (~3ms) against a render measured in hundreds. A view
   // never writes — the reopen is the walk's, in Session.driftReopen.
+  // GREEN PROPAGATES DOWNWARD (owner ruling 2026-08-06). A state resting on
+  // an input that is not green is NOT GREEN, however complete its own form
+  // is — its claim was earned over something that no longer stands.
+  //
+  // The panel used to paint each state from its own fields alone. Adding one
+  // required field to gate-kickoff un-signed it and left every state below it
+  // green, so the picture said the work held when it did not.
+  //
+  // A FIXPOINT, not one pass: un-greening a state un-greens its own
+  // dependants, and that runs all the way down.
+  const INPUT_ROLES = new Set(["normal", "approval"]);
+  const inputsOf = new Map<string, string[]>();
+  for (const s of decl.states) {
+    if (s.evidence_form.length === 0) continue;
+    for (const e of s.edges) {
+      if (!INPUT_ROLES.has(e.role ?? "normal")) continue;
+      inputsOf.set(e.to, [...(inputsOf.get(e.to) ?? []), s.id]);
+    }
+  }
+  const prune = (set: Set<string>): void => {
+    for (let moved = true; moved; ) {
+      moved = false;
+      for (const id of [...set]) {
+        if ((inputsOf.get(id) ?? []).every((p) => set.has(p))) continue;
+        set.delete(id);
+        moved = true;
+      }
+    }
+  };
+  prune(paint);
+  prune(done);
+
   const suspect = new Set(m.session.suspectStates(decl));
   const subIds = new Set(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id));
   const meta: Record<string, StateMeta> = {};

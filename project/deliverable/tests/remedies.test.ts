@@ -6,9 +6,10 @@
 // in a .ts file — it rots exactly like guidance rots, and the reader finds out
 // at the worst moment, holding a refusal whose fix does not work.
 //
-// One shipped that way: `se_pull {to: "retro"}`. `to` has never been a pull
-// argument. The walk is aimed by taking an offered door, never by naming a
-// target, so that argument could not exist by design.
+// Two shipped that way: `se_pull {to: "retro"}`, and a remedy naming a tool
+// called se_state that has never existed. The walk is aimed by taking an
+// offered door, never by naming a target, so the first could not exist by
+// design and the second could not exist at all.
 //
 // THIS IS THE CHEAP CHECK, so it is a check rather than a register entry. The
 // remedy names a tool and its arguments; the tool declares its arguments in
@@ -21,6 +22,11 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const ENGINE = join(here, "..", "engine");
+
+// THE TOLL RIDES EVERY TOOL. `update` is injected by the narration layer
+// rather than declared per tool, so a per-tool schema read alone would call
+// it unknown everywhere.
+const UNIVERSAL = ["update"];
 
 /** The text of an object literal starting at the `{` at `open`. */
 function balanced(src: string, open: number): string {
@@ -67,11 +73,6 @@ function engineSources(): { file: string; src: string }[] {
   return out;
 }
 
-// THE TOLL RIDES EVERY TOOL. `update` is injected by the narration layer
-// rather than declared per tool, so a per-tool schema read alone would call
-// it unknown everywhere.
-const UNIVERSAL = ["update"];
-
 /** Every tool the surface declares, with the arguments it accepts. */
 function toolArgs(): Map<string, Set<string>> {
   const src = readFileSync(join(ENGINE, "tools.ts"), "utf8");
@@ -83,9 +84,9 @@ function toolArgs(): Map<string, Set<string>> {
     if (props !== -1) {
       const open = src.indexOf("{", props);
       // Stop if the next tool declaration starts before this properties block —
-      // that tool takes no arguments at all.
+      // that tool takes no arguments of its own.
       const nextName = src.slice(m.index + 1).search(/name:\s*"se_[a-z_]+"/);
-      const nextAt = nextName === -1 ? Infinity : m.index + 1 + nextName;
+      const nextAt = nextName === -1 ? Number.POSITIVE_INFINITY : m.index + 1 + nextName;
       if (open !== -1 && open < nextAt) tools.set(m[1], new Set([...topKeys(balanced(src, open)), ...UNIVERSAL]));
       else tools.set(m[1], new Set(UNIVERSAL));
     }
@@ -93,14 +94,6 @@ function toolArgs(): Map<string, Set<string>> {
   }
   return tools;
 }
-
-test("the tool surface is readable and non-trivial", () => {
-  const tools = toolArgs();
-  assert.ok(tools.size > 10, `expected the real tool surface — parsed ${tools.size} tools`);
-  assert.ok(tools.get("se_pull")?.has("form"), "se_pull takes form");
-  assert.ok(tools.get("se_pull")?.has("escape"), "se_pull takes escape");
-  assert.ok(!tools.get("se_pull")?.has("to"), "se_pull has never taken a target — the walk is aimed by an offered door");
-});
 
 /** One remedy literal, reduced to the claim it makes. */
 interface Claim {
@@ -125,6 +118,14 @@ function claims(): Claim[] {
   }
   return out;
 }
+
+test("the tool surface is readable and non-trivial", () => {
+  const tools = toolArgs();
+  assert.ok(tools.size > 10, `expected the real tool surface — parsed ${tools.size} tools`);
+  assert.ok(tools.get("se_pull")?.has("form"), "se_pull takes form");
+  assert.ok(tools.get("se_pull")?.has("escape"), "se_pull takes escape");
+  assert.ok(!tools.get("se_pull")?.has("to"), "se_pull has never taken a target — the walk is aimed by an offered door");
+});
 
 test("every remedy names arguments its tool actually accepts", () => {
   const tools = toolArgs();

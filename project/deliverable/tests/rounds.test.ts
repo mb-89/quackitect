@@ -37,7 +37,10 @@ function gatesOf(column: ChangeColumn) {
 
 describe("the standard review rounds", () => {
   test("the four rounds are the ones the doctrine names", () => {
-    assert.deepEqual(ROUND_NAMES, ["round_0_verify", "round_1_validate", "round_2_red_team", "verdict"]);
+    // raid_additions sits between the last round and the verdict: a review is
+    // when a risk or assumption is most visible and least likely to be
+    // recorded.
+    assert.deepEqual(ROUND_NAMES, ["round_0_verify", "round_1_validate", "round_2_red_team", "raid_additions", "verdict"]);
     for (const f of STANDARD_ROUNDS) {
       assert.equal(f.required, true, `${f.name} must be required — an optional round is a round that never happens`);
       assert.ok(f.description.trim().length > 40, `${f.name} needs a description that tells the filler what to do`);

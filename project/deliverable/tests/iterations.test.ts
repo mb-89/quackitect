@@ -346,6 +346,7 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
     round_1_validate:
       "- exercised against the goal: walked\n- missing: none\n- wrong: none\n- out of scope: none\n- prior art: none in this seam",
     round_2_red_team: "- none => the attack found nothing",
+    raid_additions: "- none",
     verdict: "pass — the claims held",
     follow_up: "none",
   };
@@ -381,6 +382,10 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
   );
   // Leaving the blessed kickoff by a NAMED edge completes it — and the
   // M0 fills carried across the swap.
+  //
+  // log-risks demands meth-raid first: the register is NODES, and a state
+  // entered without that card writes the table it used to write.
+  session.humanCheck("project/deliverable/machines/methods/meth-raid.md");
   await session.advance(grown.states.find((s) => s.id === "gate-kickoff")!.edges[0].to);
   const hist = (session.describe() as { history: { state: string; outcome: string }[] }).history.map((h) => h.state);
   assert.ok(hist.includes(`iterations/${sid}/onboard-retro`), "the retro's fill survived the swap");

@@ -1,36 +1,77 @@
 ---
 kind: method
-statement: "The RAID log: risks, assumptions, issues, dependencies - each named, owned, and revisited at gates."
+statement: "The RAID register: risks, assumptions, issues and dependencies, each a node, each owned, each carrying the trigger that brings it back."
 ---
 
 ## Situation
-Opened at M1 (top risks; goal conflicts feed it), grown everywhere: design-relevant assumptions live HERE, never inline in prose; M5's sensitivity tripwires land here as watch-items with their fallback; M8's validation gaps land here.
 
-## Procedure
-- One entry per item: kind (R/A/I/D), statement, owner, trigger or revisit point, fallback where one exists.
-- Assumptions that a requirement builds on get field-probed at M3 (one probe settles what a datasheet claims).
-- Every gate's verify round re-reads the entries whose trigger touches the milestone.
+The register opens at M1 log-risks and is added to for the life of the
+product. Assumptions get two states of their own at M3: identify, then probe.
 
-## The fields, and why
+## THE REGISTER IS NODES, AND THE TABLE IS A VIEW
 
-The register is a TABLE so the machine can compute from it, not only
-people read it.
+Every entry is a node shaped by [[raid]], living in
+`project/spec/trace/raid/`, landing on trunk exactly as a requirement does.
 
-- kind — R risk, A assumption, I issue, D dependency. One letter; the
-  filter every view starts from.
-- entry — the statement, one line, plain words.
-- impact — 1 to 5. What it costs if it lands. Half of the priority
-  arithmetic.
-- likelihood — 1 to 5. How probable it is. The other half.
-- owner — the ROLE that works it (the owner, the driving agent, the
-  machine). An unowned entry is dead weight.
-- revisit — the trigger that reopens it. Append-and-resolve lives here:
-  a triggered entry gets revisited, never just re-read.
+That is what makes an entry addressable, durable across iterations, and
+linkable. A table row inside one iteration's evidence form is none of those:
+nothing can point at it, and an assumption recorded in one iteration cannot be
+probed by a later one.
 
-Impact times likelihood orders the register and draws the risk picture
-— the matrix and the graph generate from the rows. An entry without
-both numbers cannot be placed and drops out of every computed view,
-which is why the table check demands every cell.
+A FORM FIELD CARRIES REFERENCES. log-risks lists the raid ids it opened. The
+register a person reads is a VIEW over the folder, filtered by kind — so one
+source serves the project chapter and the design-input chapter without either
+restating the other.
+
+## Writing one
+
+- ONE ENTRY, ONE CONCERN. Two things that would be mitigated differently are
+  two entries.
+- THE STATEMENT IS WHAT IS AT STAKE, in one sentence. Not how worried you are.
+- THE OWNER IS A ROLE. One person holds several roles and the role outlives
+  the person. This is also the privacy law.
+- THE TRIGGER IS THE LIVE PART. Name the event that brings this back for a
+  look. An entry with no trigger is filed, not watched, and the register
+  becomes a graveyard the first time nobody re-reads it.
+- IMPACT IS A SENTENCE, NOT A SCORE. A probability nobody measured reads
+  exactly like one somebody did.
+
+## Telling the four kinds apart
+
+| kind | what it is | the tell |
+| --- | --- | --- |
+| risk | might happen, would hurt | it has not happened |
+| assumption | treated as true without being established | you are already relying on it |
+| issue | has happened, hurts now | present tense |
+| dependency | outside your control, needed | somebody else owns it |
+
+A FALSIFIED ASSUMPTION BECOMES AN ISSUE. It has already happened, so it is not
+a risk. Change the kind, keep the id, say so in the body.
+
+A TENSION BETWEEN STAKEHOLDER ROLES IS A RISK and belongs here, not in a table
+of its own ([[meth-stakeholder-analysis]]).
+
+A CREDIBLE DECISION FLIP IS A RISK with its fallback recorded
+([[meth-pugh-convergence]]).
+
+## Where entries come from
+
+- M1 log-risks opens the register from the vision and the actual.
+- M3 identify-assumptions adds the assumptions the requirements lean on.
+- M5 reverse-sensitivity adds a tripwire per credible flip.
+- M7 and M8 add what the build and the validation turned up.
+- EVERY GATE ASKS what its review turned up, so nothing waits for the state
+  that owns the register.
+- Any state may add one the moment it is noticed. Waiting for the right state
+  is how an entry is lost.
+
+## What the gates read
+
+A gate does not count the register. It asks whether what stands there is
+believable, and whether anything obvious is missing. The counting is the
+engine's.
 
 ## Sources
-Standard PM practice; SyA digest.
+
+- RAID as project practice: risks, assumptions, issues and dependencies as one
+  log, each entry with one owner and one trigger.
