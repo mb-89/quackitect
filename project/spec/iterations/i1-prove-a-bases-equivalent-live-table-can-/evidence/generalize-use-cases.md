@@ -1,7 +1,6 @@
 ---
 form: generalize-use-cases
-by: agent
-signed_off: 2026-08-06T12:50:16.762Z
+suspect: "no longer passes its form — use_cases: each story is covered — nothing here refines sty-auditability · sty-learnability · sty-maintainability · sty-portability · sty-recoverability"
 authors: agent
 files:
 ---

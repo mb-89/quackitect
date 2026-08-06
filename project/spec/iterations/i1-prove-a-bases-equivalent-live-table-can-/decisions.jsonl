@@ -359,3 +359,126 @@
 {"ts":"2026-08-06T15:11:02.100Z","op":"plan","visit":"iterations/i1/write-requirements@0","parent":null,"nodes":[{"id":"d51","brief":"work MoSCoW and the detail ruling into template and card and row"},{"id":"d52","brief":"align the tests and rerun them"},{"id":"d53","brief":"compose the qualities-chain proposal for convergence"}]}
 {"ts":"2026-08-06T15:11:31.696Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d51","brief":"MoSCoW and the detail ruling stand in template and card and row"}
 {"ts":"2026-08-06T15:11:47.446Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d52","brief":"23 green after the MoSCoW alignment"}
+{"ts":"2026-08-06T15:12:35.179Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d53","brief":"the qualities-chain proposal stands recorded for convergence"}
+{"ts":"2026-08-06T15:18:05.359Z","op":"plan","visit":"iterations/i1/write-requirements@0","parent":null,"nodes":[{"id":"d54","brief":"mine v1 for demand content"},{"id":"d55","brief":"mine v2 for demand content"},{"id":"d56","brief":"mine the sebot family for demand content"},{"id":"d57","brief":"draft batch one of the use-case rows"},{"id":"d58","brief":"draft batch two of the use-case rows"},{"id":"d59","brief":"draft batch three of the use-case rows"},{"id":"d60","brief":"draft batch four of the use-case rows"},{"id":"d61","brief":"draft batch five of the use-case rows"},{"id":"d62","brief":"draft batch six of the use-case rows"},{"id":"d63","brief":"draft batch seven of the use-case rows"},{"id":"d64","brief":"draft batch eight of the use-case rows"},{"id":"d65","brief":"draft the qualities chain"},{"id":"d66","brief":"critique the whole draft set"},{"id":"d67","brief":"mint the nodes and pass the checks"},{"id":"d68","brief":"fill the register and the set criteria"}]}
+{"ts":"2026-08-06T15:19:47.792Z","op":"done","visit":"iterations/i1/start@0","node":"d45","brief":"the report went out and the owner converged on all of it"}
+{"ts":"2026-08-06T15:19:53.919Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d69","brief":"globbing v2 req nodes"}
+{"ts":"2026-08-06T15:19:54.290Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d70","brief":"listing sebot_creator root"}
+{"ts":"2026-08-06T15:19:54.459Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d71","brief":"globbing v1 requirement nodes"}
+{"ts":"2026-08-06T15:19:54.999Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d72","brief":"listing sebot_projects root"}
+{"ts":"2026-08-06T15:19:55.455Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d73","brief":"searching v1 requirement declarations"}
+{"ts":"2026-08-06T15:19:55.668Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d74","brief":"listing sebot_v0 root"}
+{"ts":"2026-08-06T15:19:56.032Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d75","brief":"listing sebot_v1 root"}
+{"ts":"2026-08-06T15:20:04.858Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d76","brief":"reading sebot top-level docs"}
+{"ts":"2026-08-06T15:20:05.582Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d77","brief":"listing sebot_v0 spec dir"}
+{"ts":"2026-08-06T15:20:05.762Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d78","brief":"reading v2 req nodes 1-20"}
+{"ts":"2026-08-06T15:20:06.836Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d79","brief":"listing sebot_v1 spec dir"}
+{"ts":"2026-08-06T15:20:07.000Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d80","brief":"listing sebot_v1 sys dir"}
+{"ts":"2026-08-06T15:20:08.431Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d81","brief":"harvesting v1 requirement statements"}
+{"ts":"2026-08-06T15:20:09.647Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d82","brief":"harvesting v1 decision statements"}
+{"ts":"2026-08-06T15:20:10.466Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d83","brief":"reading v1 self-checklist rules"}
+{"ts":"2026-08-06T15:20:12.486Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d84","brief":"reading v2 req nodes 21-38"}
+{"ts":"2026-08-06T15:20:15.999Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d85","brief":"reading charter and motivation"}
+{"ts":"2026-08-06T15:20:17.512Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d86","brief":"listing v1 design atoms"}
+{"ts":"2026-08-06T15:20:18.164Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d87","brief":"listing todo_engage run"}
+{"ts":"2026-08-06T15:20:18.325Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d88","brief":"listing benchmark folder"}
+{"ts":"2026-08-06T15:20:19.022Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d89","brief":"reading v2 req nodes 39-55"}
+{"ts":"2026-08-06T15:20:24.720Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d90","brief":"reading sebot v1 charter"}
+{"ts":"2026-08-06T15:20:27.890Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d91","brief":"reading design doc 700-1150"}
+{"ts":"2026-08-06T15:20:30.071Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d92","brief":"reading motivation and status docs"}
+{"ts":"2026-08-06T15:20:32.317Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d93","brief":"reading design doc 1150-1600"}
+{"ts":"2026-08-06T15:20:38.083Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d94","brief":"reading backlog first half"}
+{"ts":"2026-08-06T15:20:38.971Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d95","brief":"reading design doc 2300-2754"}
+{"ts":"2026-08-06T15:20:43.818Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d96","brief":"reading backlog second half"}
+{"ts":"2026-08-06T15:20:48.023Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d97","brief":"chunked statement harvest 12-16"}
+{"ts":"2026-08-06T15:20:50.181Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d98","brief":"chunked statement harvest 17-19"}
+{"ts":"2026-08-06T15:20:51.216Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d99","brief":"reading key atoms and run log"}
+{"ts":"2026-08-06T15:20:51.540Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d100","brief":"chunked statement harvest 21-23"}
+{"ts":"2026-08-06T15:20:52.912Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d101","brief":"chunked statement harvest 24-26"}
+{"ts":"2026-08-06T15:20:54.209Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d102","brief":"chunked statement harvest 27"}
+{"ts":"2026-08-06T15:21:01.281Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d103","brief":"reading session digest and benchmark note"}
+{"ts":"2026-08-06T15:21:01.968Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d104","brief":"listing v0 llmcfg prompts"}
+{"ts":"2026-08-06T15:21:02.136Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d105","brief":"listing keel project"}
+{"ts":"2026-08-06T15:21:14.727Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d106","brief":"reading v0 quality bar guidance"}
+{"ts":"2026-08-06T15:23:05.659Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d107","brief":"writing v2 demand digest"}
+{"ts":"2026-08-06T15:23:09.181Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d108","brief":"writing sebot req-mine digest"}
+{"ts":"2026-08-06T15:23:21.306Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d55","brief":"98 v2 demands digested to .se/req-mine-v2.md"}
+{"ts":"2026-08-06T15:23:26.999Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d56","brief":"sebot family mined; digest at .se/req-mine-sebots.md"}
+{"ts":"2026-08-06T15:23:28.031Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d109","brief":"writing the v1 demand digest"}
+{"ts":"2026-08-06T15:24:07.074Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d110","brief":"reading method and node shape"}
+{"ts":"2026-08-06T15:24:07.224Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d111","brief":"reading method and node shape"}
+{"ts":"2026-08-06T15:24:07.564Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d112","brief":"reading method and node shape"}
+{"ts":"2026-08-06T15:24:08.465Z","op":"plan","visit":"iterations/i1/write-requirements@0","parent":"d64","nodes":[{"id":"d113","brief":"reading method"},{"id":"d114","brief":"shape"},{"id":"d115","brief":"use case"}]}
+{"ts":"2026-08-06T15:24:09.068Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d116","brief":"reading method and node shape"}
+{"ts":"2026-08-06T15:24:10.134Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d117","brief":"reading method and requirement shape"}
+{"ts":"2026-08-06T15:24:10.791Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d118","brief":"reading the three use cases"}
+{"ts":"2026-08-06T15:24:11.067Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d119","brief":"reading the three use cases"}
+{"ts":"2026-08-06T15:24:11.370Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d120","brief":"reading the three use cases"}
+{"ts":"2026-08-06T15:24:12.222Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d121","brief":"reading requirement authoring methods"}
+{"ts":"2026-08-06T15:24:13.024Z","op":"plan","visit":"iterations/i1/write-requirements@0","parent":"d63","nodes":[{"id":"d122","brief":"reading method"},{"id":"d123","brief":"shape"},{"id":"d124","brief":"use cases"}]}
+{"ts":"2026-08-06T15:24:13.294Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d125","brief":"reading method and node shape"}
+{"ts":"2026-08-06T15:24:13.357Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d126","brief":"reading the three use cases"}
+{"ts":"2026-08-06T15:24:13.599Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d127","brief":"reading node shape templates"}
+{"ts":"2026-08-06T15:24:14.039Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d128","brief":"listing stakeholder corpus files"}
+{"ts":"2026-08-06T15:24:14.429Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d113","brief":"method card read in full"}
+{"ts":"2026-08-06T15:24:17.385Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d129","brief":"reading the three use cases"}
+{"ts":"2026-08-06T15:24:17.515Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d122","brief":"method and shape read"}
+{"ts":"2026-08-06T15:24:17.878Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d130","brief":"reading mined demand digests"}
+{"ts":"2026-08-06T15:24:18.156Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d131","brief":"reading stakeholder corpus for actors"}
+{"ts":"2026-08-06T15:24:18.888Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d132","brief":"reading v1 mined digest"}
+{"ts":"2026-08-06T15:24:18.896Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d114","brief":"node shape read in full"}
+{"ts":"2026-08-06T15:24:19.130Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d133","brief":"reading v2 mined digest"}
+{"ts":"2026-08-06T15:24:21.167Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d134","brief":"reading the mined demand digests"}
+{"ts":"2026-08-06T15:24:21.327Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d135","brief":"reading the three use cases"}
+{"ts":"2026-08-06T15:24:22.927Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d123","brief":"shape read, digests next"}
+{"ts":"2026-08-06T15:24:23.331Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d136","brief":"reading v1 mine digest"}
+{"ts":"2026-08-06T15:24:25.201Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d137","brief":"reading the mined demand digests"}
+{"ts":"2026-08-06T15:24:27.333Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d124","brief":"use cases read in full"}
+{"ts":"2026-08-06T15:24:29.193Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d138","brief":"reading v2 mine digest"}
+{"ts":"2026-08-06T15:24:29.644Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d115","brief":"use case read in full"}
+{"ts":"2026-08-06T15:24:30.275Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d139","brief":"reading v1 mined digest"}
+{"ts":"2026-08-06T15:24:32.517Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d140","brief":"reading sebots mine digest"}
+{"ts":"2026-08-06T15:24:32.623Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d141","brief":"reading sebots digest"}
+{"ts":"2026-08-06T15:24:32.799Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d142","brief":"reading v1 mined digest alone"}
+{"ts":"2026-08-06T15:24:33.853Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d143","brief":"reading the sebots digest"}
+{"ts":"2026-08-06T15:24:34.237Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d144","brief":"reading sebots digest"}
+{"ts":"2026-08-06T15:24:35.053Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d145","brief":"reading v2 mined digest"}
+{"ts":"2026-08-06T15:24:35.802Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d146","brief":"reading v2 mined digest"}
+{"ts":"2026-08-06T15:24:37.862Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d147","brief":"reading v2 mined digest"}
+{"ts":"2026-08-06T15:24:38.795Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d148","brief":"reading sebots mined digest"}
+{"ts":"2026-08-06T15:24:38.856Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d149","brief":"reading sebots mined digest"}
+{"ts":"2026-08-06T15:24:44.123Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d150","brief":"reading sebots mined digest"}
+{"ts":"2026-08-06T15:27:59.111Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d64","brief":"batch eight drafted to b8.json"}
+{"ts":"2026-08-06T15:29:21.842Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d151","brief":"writing batch five draft rows"}
+{"ts":"2026-08-06T15:29:37.069Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d152","brief":"writing 29 drafted rows to b6.json"}
+{"ts":"2026-08-06T15:29:37.854Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d61","brief":"batch five drafted: 31 rows in b5.json"}
+{"ts":"2026-08-06T15:29:44.397Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d62","brief":"batch six drafted to b6.json"}
+{"ts":"2026-08-06T15:30:09.200Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d58","brief":"batch two drafted: 27 rows to b2.json"}
+{"ts":"2026-08-06T15:30:12.636Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d153","brief":"writing batch three draft rows"}
+{"ts":"2026-08-06T15:30:14.172Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d57","brief":"batch one drafted, 31 rows written"}
+{"ts":"2026-08-06T15:30:25.340Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d59","brief":"batch three drafted, 27 rows"}
+{"ts":"2026-08-06T15:30:51.995Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d60","brief":"batch four drafted: 29 rows to b4.json"}
+{"ts":"2026-08-06T15:30:58.659Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d154","brief":"writing 34 draft rows to b7.json"}
+{"ts":"2026-08-06T15:32:07.612Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d155","brief":"writing qualities chain draft file"}
+{"ts":"2026-08-06T15:32:35.328Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d156","brief":"reading all requirement draft batches"}
+{"ts":"2026-08-06T15:32:45.666Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d157","brief":"reading batch b1 drafts"}
+{"ts":"2026-08-06T15:32:49.302Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d158","brief":"reading batch b2 drafts"}
+{"ts":"2026-08-06T15:32:55.182Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d159","brief":"reading batch b3 drafts"}
+{"ts":"2026-08-06T15:32:58.766Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d160","brief":"reading batch b4 drafts"}
+{"ts":"2026-08-06T15:33:01.642Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d161","brief":"reading batch b5 drafts"}
+{"ts":"2026-08-06T15:33:05.508Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d162","brief":"reading batch b6 drafts"}
+{"ts":"2026-08-06T15:33:09.190Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d163","brief":"reading batch b7 drafts"}
+{"ts":"2026-08-06T15:33:25.826Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d164","brief":"reading batch b8 drafts"}
+{"ts":"2026-08-06T15:33:30.795Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d165","brief":"reading qualities chain drafts"}
+{"ts":"2026-08-06T15:33:35.364Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d166","brief":"reading requirement authoring method"}
+{"ts":"2026-08-06T15:38:25.619Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d167","brief":"grounding the 1-second bound"}
+{"ts":"2026-08-06T15:39:56.300Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d168","brief":"writing the cross-set critique"}
+{"ts":"2026-08-06T15:41:01.417Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d169","brief":"reading the critic's 39 fixes before the mint"}
+{"ts":"2026-08-06T15:42:18.372Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d66","brief":"the critic's 39 fixes stand encoded as operations"}
+{"ts":"2026-08-06T15:42:58.384Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d170","brief":"the mint script runs once over all drafts"}
+{"ts":"2026-08-06T15:43:43.532Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d171","brief":"hand-finishing the two rows the script printed"}
+{"ts":"2026-08-06T15:44:58.778Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d67","brief":"218 rows and 11 chain nodes stand minted and validated"}
+{"ts":"2026-08-06T15:45:20.665Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d172","brief":"the submit named eight unresolved refines and the check runs"}
+{"ts":"2026-08-06T15:46:59.678Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d173","brief":"resubmitting after quoting the colon entries in 104 rows"}
+{"ts":"2026-08-06T15:47:49.616Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d174","brief":"resubmitting with the chain nodes stamped"}
+{"ts":"2026-08-06T15:48:10.459Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d68","brief":"the form stamped with all checks green"}

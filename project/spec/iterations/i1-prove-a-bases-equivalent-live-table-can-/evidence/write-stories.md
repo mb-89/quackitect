@@ -1,7 +1,6 @@
 ---
 form: write-stories
-signed_off: 2026-08-06T12:49:02.109Z
-by: agent
+suspect: "no longer passes its form — stories: each value-prop is covered — nothing here refines vp-holds-its-qualities"
 signed_off_was: 2026-08-06T12:31:04.626Z
 authors: agent
 files:

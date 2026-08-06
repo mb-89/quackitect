@@ -1,0 +1,14 @@
+---
+id: req-archive-lists-every-closed-record
+type: "[[requirement]]"
+statement: "The archive shall list every closed record with its identifier and statement, and zero live records."
+kind: functional
+verify_method: test
+breaks_if_removed: "A question about a finished decision has no door; closed records are findable only by digging through files."
+refines:
+  - uc-browse-the-archive
+source_refs:
+  - uc-browse-the-archive step 1
+  - uc-browse-the-archive step 2
+priority: should
+---

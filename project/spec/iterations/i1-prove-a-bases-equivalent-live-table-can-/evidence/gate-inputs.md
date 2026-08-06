@@ -1,8 +1,6 @@
 ---
 form: gate-inputs
-bless: blessed by human
-by: agent
-signed_off: 2026-08-06T13:09:35.012Z
+suspect: "rests on write-stories, generalize-use-cases, which fell"
 authors: agent
 files:
 ---
