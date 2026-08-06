@@ -639,3 +639,88 @@
 {"ts":"2026-08-06T18:17:51.649Z","op":"done","visit":"iterations/i1/write-stories@0","node":"d21","brief":"the rule is in the generator, so it binds every generated machine"}
 {"ts":"2026-08-06T18:18:40.674Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d30","brief":"fetching the verdict"}
 {"ts":"2026-08-06T18:19:19.713Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d31","brief":"putting the layout and the input check into the running engine"}
+{"ts":"2026-08-06T18:24:29.461Z","op":"update","visit":"iterations/i1/start@0","node":"d15","brief":"hop 1"}
+{"ts":"2026-08-06T18:24:34.366Z","op":"update","visit":"iterations/i1/start@0","node":"d16","brief":"retro credited"}
+{"ts":"2026-08-06T18:24:39.681Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d17","brief":"hop 2"}
+{"ts":"2026-08-06T18:24:54.552Z","op":"fork","visit":"iterations/i1/gate-kickoff@0","parent":"d2","node":"d18","brief":"the two reds get fixed before the walk continues","nodes":[]}
+{"ts":"2026-08-06T18:25:08.095Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d19","brief":"finding the fixture that leaves promotions empty"}
+{"ts":"2026-08-06T18:25:20.225Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d20","brief":"the fixture now fills promotions"}
+{"ts":"2026-08-06T18:25:35.255Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d21","brief":"reading the formatter's module paths"}
+{"ts":"2026-08-06T18:25:54.006Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d22","brief":"format-vault written, with the round trip checked per file"}
+{"ts":"2026-08-06T18:26:00.833Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d23","brief":"dry-running the formatter"}
+{"ts":"2026-08-06T18:26:08.326Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d24","brief":"formatting the vault for real"}
+{"ts":"2026-08-06T18:26:13.530Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d25","brief":"battery over both red fixes"}
+{"ts":"2026-08-06T18:27:03.312Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d26","brief":"fetching the verdict"}
+{"ts":"2026-08-06T18:27:32.985Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d27","brief":"re-projecting the prompt layer after the reformat"}
+{"ts":"2026-08-06T18:27:39.676Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d28","brief":"confirming preflight green after the re-projection"}
+{"ts":"2026-08-06T18:28:28.847Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d29","brief":"fetching the verdict"}
+{"ts":"2026-08-06T18:28:59.765Z","op":"done","visit":"iterations/i1/gate-kickoff@0","node":"d18","brief":"both reds green, and the vault has a formatter entry point now"}
+{"ts":"2026-08-06T18:29:07.317Z","op":"update","visit":"iterations/i1/draft-vision@0","node":"d30","brief":"hop 4"}
+{"ts":"2026-08-06T18:29:14.416Z","op":"update","visit":"iterations/i1/define-actual@0","node":"d31","brief":"hop 5"}
+{"ts":"2026-08-06T18:29:26.875Z","op":"update","visit":"iterations/i1/frame-delta@0","node":"d32","brief":"hop 6"}
+{"ts":"2026-08-06T18:29:33.939Z","op":"update","visit":"iterations/i1/scope-non-goals@0","node":"d33","brief":"hop 7"}
+{"ts":"2026-08-06T18:29:41.781Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d34","brief":"hop 8, through the M2 fan"}
+{"ts":"2026-08-06T18:29:50.454Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d35","brief":"story method credited"}
+{"ts":"2026-08-06T18:29:58.066Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d36","brief":"at write-stories, already signed"}
+{"ts":"2026-08-06T18:30:04.999Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d37","brief":"hop 9"}
+{"ts":"2026-08-06T18:30:12.632Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d38","brief":"use-case method credited"}
+{"ts":"2026-08-06T18:30:19.702Z","op":"update","visit":"iterations/i1/generalize-use-cases@0","node":"d39","brief":"hop 10, at the M2 gate"}
+{"ts":"2026-08-06T18:30:29.574Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d40","brief":"hop 11, the last one"}
+{"ts":"2026-08-06T18:30:39.645Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d41","brief":"requirement method credited"}
+{"ts":"2026-08-06T18:30:47.435Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d42","brief":"submitting write-requirements"}
+{"ts":"2026-08-06T18:30:57.061Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d43","brief":"two quality rows owe their scenario"}
+{"ts":"2026-08-06T18:31:16.423Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d44","brief":"both quality rows now carry their scenario and pass line"}
+{"ts":"2026-08-06T18:31:19.923Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d45","brief":"submitting write-requirements again"}
+{"ts":"2026-08-06T18:32:06.509Z","op":"done","visit":"start@0","node":"d2","brief":"write-requirements signed, register carries all 146 rows"}
+{"ts":"2026-08-06T18:35:50.194Z","op":"plan","visit":"iterations/i1/write-requirements@0","parent":null,"nodes":[{"id":"d46","brief":"the trace check runs over the folders, both ways"},{"id":"d47","brief":"correct the note that blamed the register"}]}
+{"ts":"2026-08-06T18:35:53.938Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d48","brief":"running the two trace directions"}
+{"ts":"2026-08-06T18:36:09.001Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d49","brief":"a vacuous pass can no longer look like a green"}
+{"ts":"2026-08-06T18:36:13.484Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d46","brief":"both directions checked over the folders, non-vacuously"}
+{"ts":"2026-08-06T18:36:24.315Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d47","brief":"the note now says what the owner ruled"}
+{"ts":"2026-08-06T19:13:03.371Z","op":"update","visit":"iterations/i1/start@0","node":"d15","brief":"hop 1"}
+{"ts":"2026-08-06T19:13:11.326Z","op":"update","visit":"iterations/i1/start@0","node":"d16","brief":"retro credited"}
+{"ts":"2026-08-06T19:13:16.672Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d17","brief":"hop 2, the first gate to take the new field"}
+{"ts":"2026-08-06T19:13:23.612Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d18","brief":"gate-kickoff takes the new field"}
+{"ts":"2026-08-06T19:13:33.212Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d19","brief":"submitting gate-kickoff"}
+{"ts":"2026-08-06T19:14:06.632Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d20","brief":"dispositioning the six pending notes"}
+{"ts":"2026-08-06T19:14:14.802Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d21","brief":"submitting gate-kickoff again"}
+{"ts":"2026-08-06T19:14:42.508Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d22","brief":"draining the inbox the gate is refusing over"}
+{"ts":"2026-08-06T19:14:51.461Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d23","brief":"draining the input-check note"}
+{"ts":"2026-08-06T19:14:56.493Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d24","brief":"draining the register-omission note"}
+{"ts":"2026-08-06T19:15:01.858Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d25","brief":"draining the trace-coverage note"}
+{"ts":"2026-08-06T19:15:09.892Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d26","brief":"parking the batch re-bless dig"}
+{"ts":"2026-08-06T19:15:21.734Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d27","brief":"following the refusal's remedy to the retro"}
+{"ts":"2026-08-06T19:15:42.274Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d28","brief":"sweeping the history out of the older cards"}
+{"ts":"2026-08-06T19:15:53.432Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d29","brief":"the dated attributions come out of the cards"}
+{"ts":"2026-08-06T19:16:00.291Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d30","brief":"reading the two history sections"}
+{"ts":"2026-08-06T19:16:16.739Z","op":"done","visit":"start@0","node":"d3","brief":"the cards describe the method now"}
+{"ts":"2026-08-06T19:16:24.725Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d31","brief":"the card sweep closes its note"}
+{"ts":"2026-08-06T19:16:32.733Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d32","brief":"digging v1 for the batch re-bless"}
+{"ts":"2026-08-06T19:16:40.583Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d33","brief":"reading v1's grant"}
+{"ts":"2026-08-06T19:16:49.060Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d34","brief":"the dig closes its note"}
+{"ts":"2026-08-06T19:17:04.303Z","op":"done","visit":"start@0","node":"d4","brief":"the grant design is on the record"}
+{"ts":"2026-08-06T19:19:02.849Z","op":"plan","visit":"iterations/i1/gate-kickoff@0","parent":null,"nodes":[{"id":"d35","brief":"fix the unexecutable drain remedy"},{"id":"d36","brief":"check every remedy names a real argument"}]}
+{"ts":"2026-08-06T19:19:19.436Z","op":"done","visit":"iterations/i1/gate-kickoff@0","node":"d35","brief":"the remedy names a call that exists"}
+{"ts":"2026-08-06T19:19:53.616Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d37","brief":"locating the schema the test will check against"}
+{"ts":"2026-08-06T19:20:04.415Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d38","brief":"finding the shapes map"}
+{"ts":"2026-08-06T19:20:11.800Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d39","brief":"tracing shape.known to its definition"}
+{"ts":"2026-08-06T19:20:32.157Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d40","brief":"one precise search for the shapes map"}
+{"ts":"2026-08-06T19:22:58.013Z","op":"plan","visit":"iterations/i1/gate-kickoff@0","parent":"d36","nodes":[{"id":"d41","brief":"answered: check first"},{"id":"d42","brief":"assume second"},{"id":"d43","brief":"gate last"}]}
+{"ts":"2026-08-06T19:23:11.233Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d44","brief":"reading the tool declaration shape the test must parse"}
+{"ts":"2026-08-06T19:23:52.070Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d45","brief":"the remedy test is written"}
+{"ts":"2026-08-06T19:24:08.206Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d46","brief":"the scan is its own function now"}
+{"ts":"2026-08-06T19:24:12.407Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d47","brief":"running the remedy check"}
+{"ts":"2026-08-06T19:24:23.850Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d48","brief":"checking the second broken remedy"}
+{"ts":"2026-08-06T19:24:39.651Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d49","brief":"se_state replaced by the pull; the toll arg taught to the parser"}
+{"ts":"2026-08-06T19:24:48.666Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d50","brief":"re-running the remedy check"}
+{"ts":"2026-08-06T19:25:58.190Z","op":"done","visit":"iterations/i1/gate-kickoff@0","node":"d41","brief":"the check-first half is now guidance"}
+{"ts":"2026-08-06T19:26:12.896Z","op":"done","visit":"iterations/i1/gate-kickoff@0","node":"d42","brief":"the assume-second half is now guidance"}
+{"ts":"2026-08-06T19:26:18.571Z","op":"done","visit":"iterations/i1/gate-kickoff@0","node":"d43","brief":"the gate-last half already shipped as raid_additions"}
+{"ts":"2026-08-06T19:26:22.485Z","op":"done","visit":"iterations/i1/gate-kickoff@0","node":"d36","brief":"remedies are checked mechanically, and two broken ones are fixed"}
+{"ts":"2026-08-06T19:27:11.268Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d51","brief":"fetching the verdict"}
+{"ts":"2026-08-06T19:27:50.003Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d52","brief":"the retro test asserts the old remedy shape"}
+{"ts":"2026-08-06T19:27:57.015Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d53","brief":"the retro test asserts the executable remedy"}
+{"ts":"2026-08-06T19:28:00.043Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d54","brief":"battery after the remedy fix"}
+{"ts":"2026-08-06T19:28:49.039Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d55","brief":"fetching the verdict"}
+{"ts":"2026-08-06T19:30:08.413Z","op":"plan","visit":"iterations/i1/gate-kickoff@0","parent":null,"nodes":[{"id":"d56","brief":"see what stands uncommitted in the worktree"},{"id":"d57","brief":"sync trunk in"},{"id":"d58","brief":"verify the merged tree green"},{"id":"d59","brief":"walk to identify-assumptions"}]}
+{"ts":"2026-08-06T19:30:23.500Z","op":"done","visit":"iterations/i1/gate-kickoff@0","node":"d56","brief":"the worktree holds the tests and the card sweep; trunk holds the row split"}

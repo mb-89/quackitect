@@ -1,10 +1,10 @@
 ---
 id: req-tour-speaks-plainly
 type: "[[requirement]]"
-statement: "The tour shall use a method term only where the term's definition is one interaction away."
+statement: The tour shall use a method term only where the term's definition is one interaction away.
 kind: constraint
 verify_method: inspection
-breaks_if_removed: "The first door speaks jargon; the newcomer needs a translator before the tour helps."
+breaks_if_removed: The first door speaks jargon; the newcomer needs a translator before the tour helps.
 refines:
   - uc-learn-the-machinery
 source_refs:

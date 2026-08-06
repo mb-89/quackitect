@@ -1,10 +1,10 @@
 ---
 id: req-every-call-logged
 type: "[[requirement]]"
-statement: "The engine shall append exactly one log line per dispatched call, carrying the call's outcome."
+statement: The engine shall append exactly one log line per dispatched call, carrying the call's outcome.
 kind: quality
 verify_method: test
-breaks_if_removed: "The audit has holes, and the person answers for acts the record never saw."
+breaks_if_removed: The audit has holes, and the person answers for acts the record never saw.
 refines:
   - uc-stay-auditable
   - uc-take-a-step

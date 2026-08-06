@@ -17,9 +17,9 @@ legal_tools:
   - se_answer
 evidence:
   - name: sensitivity
-    description: "robust, or weight-sensitive with the flip conditions"
+    description: robust, or weight-sensitive with the flip conditions
   - name: tripwires
-    description: "the credible flips as RAID watch-items, or none"
+    description: the credible flips as RAID watch-items, or none
 major: full
 minor: none
 patch: none

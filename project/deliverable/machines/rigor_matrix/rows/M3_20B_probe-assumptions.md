@@ -19,7 +19,7 @@ legal_tools:
   - se_web_fetch
 evidence:
   - name: probes
-    description: "each assumption, its probe, its result"
+    description: each assumption, its probe, its result
 major: full
 minor: tailored
 patch: tailored

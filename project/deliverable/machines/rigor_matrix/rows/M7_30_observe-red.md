@@ -18,7 +18,7 @@ legal_tools:
   - se_run
 evidence:
   - name: red_observed
-    description: "every new check with its observed failure"
+    description: every new check with its observed failure
 major: full
 minor: full
 patch: full

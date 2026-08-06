@@ -1,10 +1,10 @@
 ---
 id: req-kickoff-refuses-pending-notes
 type: "[[requirement]]"
-statement: "While the notes inbox holds pending notes, the engine shall refuse the iteration kickoff and name the pending count."
+statement: While the notes inbox holds pending notes, the engine shall refuse the iteration kickoff and name the pending count.
 kind: functional
 verify_method: test
-breaks_if_removed: "The kickoff starts over an undrained inbox; a noted ruling gets built around."
+breaks_if_removed: The kickoff starts over an undrained inbox; a noted ruling gets built around.
 refines:
   - uc-open-an-iteration
 source_refs:

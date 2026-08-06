@@ -17,9 +17,9 @@ legal_tools:
   - se_answer
 evidence:
   - name: prfaq
-    description: "the press release and the hostile FAQ"
+    description: the press release and the hostile FAQ
   - name: findings_folded
-    description: "what the test changed upstream, or none-with-reason"
+    description: what the test changed upstream, or none-with-reason
 major: tailored
 minor: none
 patch: none

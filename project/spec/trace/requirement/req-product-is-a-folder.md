@@ -1,10 +1,10 @@
 ---
 id: req-product-is-a-folder
 type: "[[requirement]]"
-statement: "The engine shall keep every artifact a product owns inside that product's own root folder, with zero product-owned files outside it."
+statement: The engine shall keep every artifact a product owns inside that product's own root folder, with zero product-owned files outside it.
 kind: functional
 verify_method: test
-breaks_if_removed: "A second product bleeds into the first, and deleting the folder stops being the whole uninstall."
+breaks_if_removed: A second product bleeds into the first, and deleting the folder stops being the whole uninstall.
 refines:
   - uc-begin-a-product
 source_refs:

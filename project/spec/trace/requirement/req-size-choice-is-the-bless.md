@@ -1,10 +1,10 @@
 ---
 id: req-size-choice-is-the-bless
 type: "[[requirement]]"
-statement: "When the person answers the change-size decision, the engine shall record that answer as the bless and compile the column the person named."
+statement: When the person answers the change-size decision, the engine shall record that answer as the bless and compile the column the person named.
 kind: functional
 verify_method: test
-breaks_if_removed: "A chosen size needs a second confirmation, or the proposal overrides the person."
+breaks_if_removed: A chosen size needs a second confirmation, or the proposal overrides the person.
 refines:
   - uc-open-an-iteration
 source_refs:

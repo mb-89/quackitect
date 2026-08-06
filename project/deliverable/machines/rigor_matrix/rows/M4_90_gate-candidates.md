@@ -16,15 +16,15 @@ legal_tools:
   - se_answer
 evidence:
   - name: viable_set
-    description: "at least two viable candidates survive, or the no-real-alternatives case is argued and recorded"
+    description: at least two viable candidates survive, or the no-real-alternatives case is argued and recorded
   - name: complete_allocation
-    description: "every candidate allocates ALL functions; interfaces and rationale recorded"
+    description: every candidate allocates ALL functions; interfaces and rationale recorded
   - name: criteria_traced
-    description: "weights derived from requirements and tensions"
+    description: weights derived from requirements and tensions
   - name: front_recorded
-    description: "the Pareto front with every elimination reasoned"
+    description: the Pareto front with every elimination reasoned
   - name: feasibility_checked
-    description: "rough checks per survivor"
+    description: rough checks per survivor
 major: full
 minor: none
 patch: none

@@ -6,8 +6,10 @@ folder: project/spec/trace/value-prop
 sections:
   - Success criteria
   - Unlike
-applies_rigor: [systematic]
-applies_type: [default]
+applies_rigor:
+  - systematic
+applies_type:
+  - default
 ---
 
 # value-prop — one proposition the product makes to one audience

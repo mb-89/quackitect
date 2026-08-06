@@ -19,17 +19,17 @@ legal_tools:
   - se_test
 evidence:
   - name: meets_need
-    description: "every need's pass lines demonstrated, all iterations"
+    description: every need's pass lines demonstrated, all iterations
   - name: killers_demonstrated
-    description: "each killer use case exercised end to end"
+    description: each killer use case exercised end to end
   - name: acceptance_converted
-    description: "executable slices now permanent acceptance scenarios, or reasons"
+    description: executable slices now permanent acceptance scenarios, or reasons
   - name: consistency_swept
-    description: "the surfaces agree with the behavior"
+    description: the surfaces agree with the behavior
   - name: gaps_logged
-    description: "validation gaps in RAID"
+    description: validation gaps in RAID
   - name: market_tier
-    description: "(market) the real-world checks green - required only when the iteration is declared to market"
+    description: (market) the real-world checks green - required only when the iteration is declared to market
     required: false
 major: full
 minor: tailored

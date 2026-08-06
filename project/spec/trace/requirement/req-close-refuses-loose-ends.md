@@ -1,10 +1,10 @@
 ---
 id: req-close-refuses-loose-ends
 type: "[[requirement]]"
-statement: "If a record holds unlanded work or an unruled finding, then the engine shall refuse the close and name what stands."
+statement: If a record holds unlanded work or an unruled finding, then the engine shall refuse the close and name what stands.
 kind: functional
 verify_method: test
-breaks_if_removed: "A record closes over work nobody landed and findings nobody ruled, and the archive lies."
+breaks_if_removed: A record closes over work nobody landed and findings nobody ruled, and the archive lies.
 refines:
   - uc-close-a-record
 source_refs:

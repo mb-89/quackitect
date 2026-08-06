@@ -1,10 +1,10 @@
 ---
 id: req-autonomy-gates-every-hop
 type: "[[requirement]]"
-statement: "When a pull is served, the engine shall weigh the next hop against the autonomy setting and shall stop before any hop that outweighs it, naming the waiting step."
+statement: When a pull is served, the engine shall weigh the next hop against the autonomy setting and shall stop before any hop that outweighs it, naming the waiting step.
 kind: functional
 verify_method: test
-breaks_if_removed: "The agent walks past the person's dial and the one control they hold means nothing."
+breaks_if_removed: The agent walks past the person's dial and the one control they hold means nothing.
 refines:
   - uc-set-the-autonomy
 source_refs:

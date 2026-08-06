@@ -14,7 +14,7 @@ learned the hard way.
 
 ## ONE CONCERN PER NODE — AND THE DETAIL RIDES IN TABLES
 
-Owner ruling, 2026-08-06, overruling textbook singularity: requirements
+requirements
 written by and for agents need DETAIL, and a thousand atomic rows for the
 smallest thing is the failure, not the discipline. A node carries ONE
 CONCERN; its `## Detail` section may carry tables, lists and limit sets,
@@ -107,8 +107,7 @@ unproducible; what projection starts to mislead.
 Unfillable means deletion candidate — never a keeper with a TODO.
 
 Editing this line later is patch-class: it rewords the why, not the demand.
-(In-house rule, v2 owner ruling 2026-07-21 — no external standard names it;
-its nearest kin is 29148's "necessary".)
+(An in-house rule; its nearest kin in the standards is 29148's "necessary".)
 
 ## PRIORITY — MOSCOW, THE HOUSE SCALE
 
@@ -148,15 +147,12 @@ The rule: every number, unit and domain fact traces to a named source
 before the row is accepted. A value with no source is a guess wearing a
 tolerance's clothes.
 
-## WHAT THE LAST PRODUCTS GOT WRONG
+## EVERY RULE HERE IS BACKED BY A CHECK
 
-v1 declared ~13 fields per row and its schema enforced one; the unchecked
-fields silently went unfilled. v2 wrote "mandatory" in guidance and its own
-agent-drafted node shipped without breaks_if_removed, kind, or must_wish.
-The lesson both times: a rule that lives in prose and not in a check will
-not be followed. This card's rules are backed by the register's refs
-coverage, the per-item criteria form, and the gate's evidence fields — the
-ones that are not yet mechanical say so where they stand.
+A rule that lives in prose and not in a check will not be followed. These
+rules are backed by the register's refs coverage, the per-item criteria form
+and the gate's evidence fields. The ones that are not yet mechanical say so
+where they stand.
 
 ## Sources
 

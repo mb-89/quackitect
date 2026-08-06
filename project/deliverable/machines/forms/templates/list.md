@@ -2,9 +2,9 @@
 id: template-list
 statement: A list editor — one item per row; a new row appears as the last one fills.
 editor: list
-line_pattern: "^- .+"
+line_pattern: ^- .+
 line_help: one item per line, each line a dash
-placeholder: "one item"
+placeholder: one item
 ---
 
 # list

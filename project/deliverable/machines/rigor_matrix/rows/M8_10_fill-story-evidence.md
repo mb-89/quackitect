@@ -18,9 +18,9 @@ legal_tools:
   - se_answer
 evidence:
   - name: slides_filled
-    description: "the stories walked, evidence refs in place or findings named"
+    description: the stories walked, evidence refs in place or findings named
   - name: demos_seeded
-    description: "one demonstration per killer use case"
+    description: one demonstration per killer use case
 major: full
 minor: tailored
 patch: tailored

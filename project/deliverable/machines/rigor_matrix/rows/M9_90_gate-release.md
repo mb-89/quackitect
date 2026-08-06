@@ -18,15 +18,15 @@ legal_tools:
   - se_git
 evidence:
   - name: docs_match
-    description: "docs complete and matching the actual surface"
+    description: docs complete and matching the actual surface
   - name: packaged
-    description: "versioned, configuration baselined, entry script in place"
+    description: versioned, configuration baselined, entry script in place
   - name: dependencies_ruled
-    description: "the ship review done, sticky rulings honored"
+    description: the ship review done, sticky rulings honored
   - name: handover_accepted
-    description: "the bless is the acceptance"
+    description: the bless is the acceptance
   - name: market_block
-    description: "(market) real-world validation green - blocks the ship only for to-market iterations"
+    description: (market) real-world validation green - blocks the ship only for to-market iterations
     required: false
 major: full
 minor: full

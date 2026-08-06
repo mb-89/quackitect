@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "EARS - author every requirement statement in one of five shapes, with shall."
+statement: EARS - author every requirement statement in one of five shapes, with shall.
 source: ref-iso-29148
 ---
 

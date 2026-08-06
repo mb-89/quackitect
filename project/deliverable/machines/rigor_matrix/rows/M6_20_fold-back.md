@@ -17,9 +17,9 @@ legal_tools:
   - se_answer
 evidence:
   - name: folded
-    description: "what each spike's evidence changed upstream"
+    description: what each spike's evidence changed upstream
   - name: promotions
-    description: "spike output marked for entry into the build, or none"
+    description: spike output marked for entry into the build, or none
 major: full
 minor: tailored
 patch: none

@@ -1,10 +1,10 @@
 ---
 id: req-overhaul-takes-only-unowned-drift
 type: "[[requirement]]"
-statement: "If a finding belongs to an open record or changes behaviour, then the overhaul shall exclude it and name where it belongs."
+statement: If a finding belongs to an open record or changes behaviour, then the overhaul shall exclude it and name where it belongs.
 kind: functional
 verify_method: test
-breaks_if_removed: "The overhaul becomes a second lane for real work, escaping every gate that work owes."
+breaks_if_removed: The overhaul becomes a second lane for real work, escaping every gate that work owes.
 refines:
   - uc-let-the-system-catch-up
 source_refs:

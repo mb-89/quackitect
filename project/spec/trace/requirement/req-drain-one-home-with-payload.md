@@ -1,10 +1,10 @@
 ---
 id: req-drain-one-home-with-payload
 type: "[[requirement]]"
-statement: "When a note is drained, the engine shall accept the drain only with exactly one home, that home's payload, and that home's legal context, per the Detail table."
+statement: When a note is drained, the engine shall accept the drain only with exactly one home, that home's payload, and that home's legal context, per the Detail table.
 kind: functional
 verify_method: test
-breaks_if_removed: "Notes drain homeless or payloadless and the next retro re-reads and re-litigates every one."
+breaks_if_removed: Notes drain homeless or payloadless and the next retro re-reads and re-litigates every one.
 refines:
   - uc-drain-the-inbox
   - uc-capture-a-stray

@@ -1,10 +1,10 @@
 ---
 id: req-call-answers-in-one-second
 type: "[[requirement]]"
-statement: "When a driver's call is admitted, the engine shall answer within 1 second or return a background handle whose completion the driver observes, for every admitted call."
+statement: When a driver's call is admitted, the engine shall answer within 1 second or return a background handle whose completion the driver observes, for every admitted call.
 kind: quality
 verify_method: test
-breaks_if_removed: "The loop's rhythm dies, and drivers batch calls to dodge the lag."
+breaks_if_removed: The loop's rhythm dies, and drivers batch calls to dodge the lag.
 refines:
   - uc-take-a-step
   - uc-resume-after-an-absence

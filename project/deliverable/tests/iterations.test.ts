@@ -299,6 +299,11 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
     {
       notes_drained: "- none: inbox empty",
       call_log_mined: "- 0 calls, fresh root",
+      // PROMOTIONS IS REQUIRED, and this fixture stopped filling it the day
+      // the retro's standing question became a field. The form then never
+      // completed, so the walk could not leave onboard-retro and the test
+      // read as a machine defect rather than a stale fixture.
+      promotions: "- none: a fresh root has no instance changes to promote",
       process_stale: "checked — nothing stale",
       follow_up: "none",
     },

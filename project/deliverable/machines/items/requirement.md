@@ -3,26 +3,69 @@ template: item-requirement
 artifact: node
 id_prefix: req-
 folder: project/spec/trace/requirement
-applies_rigor: [systematic]
-applies_type: [default]
+applies_rigor:
+  - systematic
+applies_type:
+  - default
 checks:
   - field: statement
     ears: true
     hint: "one of the five shapes with shall — or ears: exempt — <reason citing a decision>"
   - field: statement
-    ban_words: [should, would, could, may, might, appropriate, adequate, sufficient, quickly, easy, user-friendly, robust, flexible, seamless, efficient, optimal, reasonable, gracefully]
+    ban_words:
+      - should
+      - would
+      - could
+      - may
+      - might
+      - appropriate
+      - adequate
+      - sufficient
+      - quickly
+      - easy
+      - user-friendly
+      - robust
+      - flexible
+      - seamless
+      - efficient
+      - optimal
+      - reasonable
+      - gracefully
     hint: a weasel word checks nothing
   - field: statement
-    ban_phrases: ["as possible", "where possible", "as required", "as appropriate", "if necessary", "including but not limited to", "and so on", "etc."]
+    ban_phrases:
+      - as possible
+      - where possible
+      - as required
+      - as appropriate
+      - if necessary
+      - including but not limited to
+      - and so on
+      - etc.
     hint: an escape or open-ended clause makes verification impossible
   - field: kind
-    one_of: [functional, quality, constraint, interface]
+    one_of:
+      - functional
+      - quality
+      - constraint
+      - interface
   - field: verify_method
-    one_of: [test, analysis, inspection, demonstration]
+    one_of:
+      - test
+      - analysis
+      - inspection
+      - demonstration
   - field: priority
-    one_of: [must, should, could]
+    one_of:
+      - must
+      - should
+      - could
   - field: statement
-    ban_markers: [TBD, TBC, TBR, "???"]
+    ban_markers:
+      - TBD
+      - TBC
+      - TBR
+      - ???
     hint: no TBD survives the milestone
   - field: kind
     equals: quality

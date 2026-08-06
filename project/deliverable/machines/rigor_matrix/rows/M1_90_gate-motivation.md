@@ -20,13 +20,13 @@ evidence:
   - name: vision_scope_stated
     description: "the packet is complete: idea, to-be world, goals, pitch, scope, non-goals"
   - name: problem_agreed
-    description: "the delta is real and the goal is worth having - argue it here"
+    description: the delta is real and the goal is worth having - argue it here
   - name: prior_art_positioned
-    description: "the idea positioned against what exists and what failed"
+    description: the idea positioned against what exists and what failed
   - name: success_measurable
-    description: "every need carries its pass lines"
+    description: every need carries its pass lines
   - name: risks_logged
-    description: "the register is open with owners and triggers"
+    description: the register is open with owners and triggers
 major: full
 minor: tailored
 patch: none

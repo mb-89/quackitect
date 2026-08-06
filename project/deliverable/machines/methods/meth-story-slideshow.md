@@ -43,7 +43,7 @@ reviewer to spot it.
 
 ## A story is a journey
 
-Owner ruling, 2026-08-06, after a whole set was written the wrong way.
+
 
 A story follows a PERSON THROUGH THE PRODUCT, start to finish. They arrive
 somewhere. They click something. Something answers. They arrive somewhere

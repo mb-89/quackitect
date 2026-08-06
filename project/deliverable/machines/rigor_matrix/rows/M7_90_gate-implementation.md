@@ -17,19 +17,19 @@ legal_tools:
   - se_test
 evidence:
   - name: build_planned
-    description: "the seeded chunk machine exists and was walked"
+    description: the seeded chunk machine exists and was walked
   - name: models_adhered
-    description: "the build fills the allocated elements - no unsanctioned element"
+    description: the build fills the allocated elements - no unsanctioned element
   - name: red_observed
-    description: "every new check failed before the build"
+    description: every new check failed before the build
   - name: designs_realized
-    description: "every requirement has a realized design"
+    description: every requirement has a realized design
   - name: verification_green
-    description: "the battery passes, all iterations"
+    description: the battery passes, all iterations
   - name: quality_ok
-    description: "internal quality reviewed"
+    description: internal quality reviewed
   - name: risks_acceptable
-    description: "implementation risks judged and folded into the RAID register"
+    description: implementation risks judged and folded into the RAID register
 major: full
 minor: full
 patch: tailored

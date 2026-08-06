@@ -1,10 +1,10 @@
 ---
 id: req-record-arrives-prefilled
 type: "[[requirement]]"
-statement: "When the person chooses a vehicle, the desk shall seed the record with every field carrying a proposed value drawn from the person's words, so that the person confirms rather than composes."
+statement: When the person chooses a vehicle, the desk shall seed the record with every field carrying a proposed value drawn from the person's words, so that the person confirms rather than composes.
 kind: functional
 verify_method: inspection
-breaks_if_removed: "The person composes the record field by field and confirm-not-compose becomes a lie."
+breaks_if_removed: The person composes the record field by field and confirm-not-compose becomes a lie.
 refines:
   - uc-get-work-routed
 source_refs:

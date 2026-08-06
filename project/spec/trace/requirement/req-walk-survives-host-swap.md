@@ -1,10 +1,10 @@
 ---
 id: req-walk-survives-host-swap
 type: "[[requirement]]"
-statement: "When the project is reopened under a different supported host, the engine shall serve the walk from the same recorded position with zero host-specific repair steps."
+statement: When the project is reopened under a different supported host, the engine shall serve the walk from the same recorded position with zero host-specific repair steps.
 kind: quality
 verify_method: demonstration
-breaks_if_removed: "Work is welded to one harness, and a host change strands mid-flight iterations."
+breaks_if_removed: Work is welded to one harness, and a host change strands mid-flight iterations.
 refines:
   - uc-stay-portable
 source_refs:

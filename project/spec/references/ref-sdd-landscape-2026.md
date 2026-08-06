@@ -1,7 +1,7 @@
 ---
 id: ref-sdd-landscape-2026
 kind: reference
-statement: "Spec-driven development tooling as it stands in 2026 — the market this product sits closest to, scanned live at gate-inputs."
+statement: Spec-driven development tooling as it stands in 2026 — the market this product sits closest to, scanned live at gate-inputs.
 scanned: 2026-08-06
 scanned_at: i1/gate-inputs
 ---

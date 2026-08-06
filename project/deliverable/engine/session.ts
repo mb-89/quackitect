@@ -4332,7 +4332,11 @@ export class Session {
       clause: CLAUSES.NOT_LEGAL_IN_STATE,
       expected: `one of ${stateId}'s next states: ${s.edges.map((e) => e.to).join(", ") || "(none)"}`,
       got: to,
-      remedy: { tool: "se_state", args: {}, note: "the drawn edges are the legal next states" },
+      remedy: {
+        tool: "se_pull",
+        args: {},
+        note: "the drawn edges are the legal next states — pull with no payload and take one of the doors it offers",
+      },
       source: "engine/session.ts tick",
     });
   }

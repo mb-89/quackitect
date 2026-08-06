@@ -1,10 +1,10 @@
 ---
 id: req-drained-note-leaves-count
 type: "[[requirement]]"
-statement: "When a drain is accepted, the engine shall remove the note from the pending count and shall retain the note with its disposition."
+statement: When a drain is accepted, the engine shall remove the note from the pending count and shall retain the note with its disposition.
 kind: functional
 verify_method: test
-breaks_if_removed: "The inbox cannot reach zero honestly, or a drained judgment vanishes and is re-litigated."
+breaks_if_removed: The inbox cannot reach zero honestly, or a drained judgment vanishes and is re-litigated.
 refines:
   - uc-drain-the-inbox
 source_refs:

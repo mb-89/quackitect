@@ -1,10 +1,10 @@
 ---
 id: req-engine-folder-is-sealed
 type: "[[requirement]]"
-statement: "Where the engine is vendored in a host repository, the engine shall resolve every resource it serves from inside its own folder and shall write zero files into it."
+statement: Where the engine is vendored in a host repository, the engine shall resolve every resource it serves from inside its own folder and shall write zero files into it.
 kind: functional
 verify_method: test
-breaks_if_removed: "The vendored folder stops being replaceable whole, and an engine update starts destroying builder edits."
+breaks_if_removed: The vendored folder stops being replaceable whole, and an engine update starts destroying builder edits.
 refines:
   - uc-vendor-and-overlay
 source_refs:

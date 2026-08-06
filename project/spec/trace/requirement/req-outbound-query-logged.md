@@ -1,10 +1,10 @@
 ---
 id: req-outbound-query-logged
 type: "[[requirement]]"
-statement: "When research runs outside the repo, the engine shall log every outbound query alongside a reference to what came back."
+statement: When research runs outside the repo, the engine shall log every outbound query alongside a reference to what came back.
 kind: functional
 verify_method: test
-breaks_if_removed: "The search that shaped an answer is unrecoverable; the answer cannot be audited."
+breaks_if_removed: The search that shaped an answer is unrecoverable; the answer cannot be audited.
 refines:
   - uc-research-and-record-an-answer
 source_refs:

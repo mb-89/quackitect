@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "DSM - represent one domain's elements as a square, directed dependency matrix (row affects column); the base representation every structure-analysis operation reads."
+statement: DSM - represent one domain's elements as a square, directed dependency matrix (row affects column); the base representation every structure-analysis operation reads.
 source: ref-structural-complexity-management
 ---
 

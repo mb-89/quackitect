@@ -19,11 +19,11 @@ legal_tools:
   - se_answer
 evidence:
   - name: scores
-    description: "candidates x criteria and metrics"
+    description: candidates x criteria and metrics
   - name: front
-    description: "the surviving set"
+    description: the surviving set
   - name: eliminations
-    description: "each dominated candidate with its reason"
+    description: each dominated candidate with its reason
 major: full
 minor: none
 patch: none

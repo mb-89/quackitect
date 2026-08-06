@@ -3,15 +3,15 @@ id: i1-prove-a-bases-equivalent-live-table-can-
 status: open
 started: 2026-08-04T08:11:36.635Z
 opened: 2026-08-04T00:00:00.000Z
-goal: "Design quackitect — the product's first iteration, authoring the vision and the design input in full, traced end to end."
+goal: Design quackitect — the product's first iteration, authoring the vision and the design input in full, traced end to end.
 vision: "The product's FIRST iteration, walked in full. M0's onboard-retro drains the parked design input. The kickoff proposes its size with reasoning — the first iteration of a product is product-sized: it authors the vision packet, the stakeholders and the actual state, and every later iteration inherits those by pointer. The live table lands as the proof piece: machinery tables served live and editable."
 inputs:
-  - "note-40b6f9328b0b"
-  - "note-b20c4ff82555"
-  - "note-84f06cf44e0a"
-  - "note-1a48dc0ac764"
-  - "note-9a0d4ccb25d5"
-  - "note-f73b7de73ea6"
+  - note-40b6f9328b0b
+  - note-b20c4ff82555
+  - note-84f06cf44e0a
+  - note-1a48dc0ac764
+  - note-9a0d4ccb25d5
+  - note-f73b7de73ea6
   - "the survey's backlog: every note parked ready-at-the-iterations-kickoff"
 ---
 

@@ -4,10 +4,10 @@ name: refs
 statement: a list of REFERENCES to standing artifacts — one id per line, and every one must resolve
 editor: list
 resolves: artifact
-line_pattern: "^- \\[?\\[?[A-Za-z0-9_./\\\\-]+\\]?\\]?$|^- none\\b"
-line_help: "one {type} per line — its path, its file name, its id, or a wiki link; all four resolve"
-placeholder: "path from the project root, e.g. {folder}/{prefix}something.md"
-description: "one {type} REFERENCE per line — every one must resolve to a standing node of that type, and `none` is a legal answer"
+line_pattern: ^- \[?\[?[A-Za-z0-9_./\\-]+\]?\]?$|^- none\b
+line_help: one {type} per line — its path, its file name, its id, or a wiki link; all four resolve
+placeholder: path from the project root, e.g. {folder}/{prefix}something.md
+description: one {type} REFERENCE per line — every one must resolve to a standing node of that type, and `none` is a legal answer
 ---
 
 # refs

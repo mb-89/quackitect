@@ -17,9 +17,9 @@ legal_tools:
   - se_answer
 evidence:
   - name: function_structure
-    description: "overall function and sub-functions, solution-neutral"
+    description: overall function and sub-functions, solution-neutral
   - name: coverage
-    description: "every requirement mapped, every use-case step covered - the matrix filters show no holes"
+    description: every requirement mapped, every use-case step covered - the matrix filters show no holes
 major: full
 minor: tailored
 patch: none

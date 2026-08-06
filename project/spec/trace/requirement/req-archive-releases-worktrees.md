@@ -1,10 +1,10 @@
 ---
 id: req-archive-releases-worktrees
 type: "[[requirement]]"
-statement: "When a record archives, the engine shall remove every worktree bound to it, leaving zero worktrees referencing the record."
+statement: When a record archives, the engine shall remove every worktree bound to it, leaving zero worktrees referencing the record.
 kind: functional
 verify_method: test
-breaks_if_removed: "Stale worktrees survive the archive, and nobody can prove nothing unfinished survived the close."
+breaks_if_removed: Stale worktrees survive the archive, and nobody can prove nothing unfinished survived the close.
 refines:
   - uc-close-a-record
 source_refs:

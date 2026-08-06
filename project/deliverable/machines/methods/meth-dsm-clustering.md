@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "DSM clustering - search cluster (module) assignments over a DSM that maximize intra-cluster and minimize inter-cluster dependency, exposing candidate architecture modules."
+statement: DSM clustering - search cluster (module) assignments over a DSM that maximize intra-cluster and minimize inter-cluster dependency, exposing candidate architecture modules.
 source: ref-structural-complexity-management
 ---
 

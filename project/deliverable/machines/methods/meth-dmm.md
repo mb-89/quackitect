@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "DMM (Domain Mapping Matrix) - a rectangular matrix mapping elements of two DIFFERENT domains (e.g. requirements x design regions), without computing new information from it."
+statement: DMM (Domain Mapping Matrix) - a rectangular matrix mapping elements of two DIFFERENT domains (e.g. requirements x design regions), without computing new information from it.
 source: ref-structural-complexity-management
 ---
 

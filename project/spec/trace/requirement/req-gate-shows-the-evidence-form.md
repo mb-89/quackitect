@@ -1,10 +1,10 @@
 ---
 id: req-gate-shows-the-evidence-form
 type: "[[requirement]]"
-statement: "When a gate is offered for adjudication, the engine shall present the gate's evidence form itself, never a summary of it."
+statement: When a gate is offered for adjudication, the engine shall present the gate's evidence form itself, never a summary of it.
 kind: functional
 verify_method: demonstration
-breaks_if_removed: "The person adjudicates a paraphrase, and an assertion-shaped round passes for evidence."
+breaks_if_removed: The person adjudicates a paraphrase, and an assertion-shaped round passes for evidence.
 refines:
   - uc-adjudicate-a-gate
   - uc-land-work-on-trunk

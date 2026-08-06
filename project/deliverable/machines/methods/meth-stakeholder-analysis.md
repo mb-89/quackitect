@@ -98,7 +98,7 @@ This is what the step actually proves, and what the M2 gate reads.
 
 ## Tensions are RAID entries
 
-Owner ruling, 2026-08-06. Where two roles pull against each other, that is a
+Where two roles pull against each other, that is a
 RISK. It goes in the RAID register with an owner and a trigger, like any
 other risk. It is not a table of its own.
 

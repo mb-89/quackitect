@@ -1,10 +1,10 @@
 ---
 id: req-newcomer-orients-unaided
 type: "[[requirement]]"
-statement: "When a first-time reader opens the entry documents unaided, the entry documents shall bring at least 2 of 3 such readers to state what the product is within one session."
+statement: When a first-time reader opens the entry documents unaided, the entry documents shall bring at least 2 of 3 such readers to state what the product is within one session.
 kind: quality
 verify_method: demonstration
-breaks_if_removed: "Nobody measures orientation, and the entry documents rot unnoticed until the next cold read fails."
+breaks_if_removed: Nobody measures orientation, and the entry documents rot unnoticed until the next cold read fails.
 refines:
   - uc-stay-learnable
 source_refs:

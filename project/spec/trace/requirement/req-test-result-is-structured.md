@@ -1,10 +1,10 @@
 ---
 id: req-test-result-is-structured
 type: "[[requirement]]"
-statement: "The engine shall report every test run as totals with each failure carrying its failing assertion."
+statement: The engine shall report every test run as totals with each failure carrying its failing assertion.
 kind: functional
 verify_method: test
-breaks_if_removed: "The verdict rides raw output through a truncating pipe, and the end that carries it is exactly what gets cut."
+breaks_if_removed: The verdict rides raw output through a truncating pipe, and the end that carries it is exactly what gets cut.
 refines:
   - uc-answer-a-question-with-tests
 source_refs:

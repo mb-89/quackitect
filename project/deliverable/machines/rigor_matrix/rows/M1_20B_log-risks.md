@@ -19,7 +19,13 @@ evidence:
   - name: raid_opened
     description: "the register's table: every entry typed, owned, numbered, triggered"
     template: table
-    columns: [kind, entry, impact, likelihood, owner, revisit]
+    columns:
+      - kind
+      - entry
+      - impact
+      - likelihood
+      - owner
+      - revisit
     guidance: |
       One markdown-table row per entry. kind is R, A, I or D. impact and
       likelihood are 1 to 5 — their product orders the register and draws

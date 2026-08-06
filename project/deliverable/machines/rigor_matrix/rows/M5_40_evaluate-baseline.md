@@ -17,9 +17,9 @@ legal_tools:
   - se_answer
 evidence:
   - name: walk
-    description: "each quality scenario with its verdict and carrying decision"
+    description: each quality scenario with its verdict and carrying decision
   - name: fitness_candidates
-    description: "the measurable scenarios that could automate at M7"
+    description: the measurable scenarios that could automate at M7
 major: full
 minor: tailored
 patch: none

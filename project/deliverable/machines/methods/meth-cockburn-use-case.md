@@ -66,16 +66,11 @@ written without one is a guess about how the product behaves.
 - M3 derives requirements from the steps and extensions. A step no requirement
   covers is a hole, visible in the coverage matrix rather than in a review.
 
-## WHAT THE LAST PRODUCT GOT WRONG
+## WHY THE CHECKS ARE MECHANICAL
 
-v1 declared this shape in its own item template — actors, trigger, success
-scenario, alternatives — and then wrote use cases that were a single statement
-line with no scenario at all. Checked at ref main, 2026-08-06.
-
-The lesson is not that v1 was careless. It is that a shape declared in a
-template and never checked mechanically will not be filled. This is why the
-coverage check exists here, and why the steps live in sections the conformance
-check can see.
+A shape declared in a template and never checked will not be filled. That is
+why the coverage check runs both ways here, and why the steps live in sections
+the conformance check can see rather than in prose it cannot.
 
 ## Sources
 

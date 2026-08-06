@@ -5,8 +5,10 @@ id_prefix: stk-
 folder: project/spec/trace/stakeholder
 sections:
   - Concerns
-applies_rigor: [systematic]
-applies_type: [default]
+applies_rigor:
+  - systematic
+applies_type:
+  - default
 ---
 
 # stakeholder — one role the product serves or answers to

@@ -17,9 +17,9 @@ legal_tools:
   - se_answer
 evidence:
   - name: scope
-    description: "what this effort takes on"
+    description: what this effort takes on
   - name: non_goals
-    description: "what it deliberately leaves, one line each"
+    description: what it deliberately leaves, one line each
 major: full
 minor: tailored
 patch: none

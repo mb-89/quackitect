@@ -1,9 +1,8 @@
 ---
 form: generalize-use-cases
-by: agent
-signed_off: 2026-08-06T17:36:37.412Z
+suspect: "rests on log-risks, which fell"
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / generalize-use-cases

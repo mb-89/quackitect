@@ -17,7 +17,7 @@ legal_tools:
   - se_answer
 evidence:
   - name: adrs
-    description: "the decision records, each traced"
+    description: the decision records, each traced
 major: full
 minor: tailored
 patch: none

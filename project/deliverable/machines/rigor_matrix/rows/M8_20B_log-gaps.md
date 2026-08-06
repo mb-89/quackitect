@@ -17,7 +17,7 @@ legal_tools:
   - se_answer
 evidence:
   - name: gaps
-    description: "the entries added, or none-found stated"
+    description: the entries added, or none-found stated
 major: full
 minor: full
 patch: tailored

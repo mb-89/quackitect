@@ -1,9 +1,9 @@
 ---
 form: write-requirements
-suspect: "rests on gate-inputs, which stands unblessed since the quality nodes joined its picture"
+suspect: "rests on log-risks, which fell"
 signed_off_was: 2026-08-06
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / write-requirements

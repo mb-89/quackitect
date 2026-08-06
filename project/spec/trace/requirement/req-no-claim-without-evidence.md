@@ -1,10 +1,10 @@
 ---
 id: req-no-claim-without-evidence
 type: "[[requirement]]"
-statement: "The recorded answer shall carry no claim that its kept sources do not support."
+statement: The recorded answer shall carry no claim that its kept sources do not support.
 kind: functional
 verify_method: inspection
-breaks_if_removed: "Fabricated claims enter the record and route real work."
+breaks_if_removed: Fabricated claims enter the record and route real work.
 refines:
   - uc-research-and-record-an-answer
 source_refs:

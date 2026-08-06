@@ -1,10 +1,10 @@
 ---
 id: req-fresh-machine-runs
 type: "[[requirement]]"
-statement: "When a person sets up the product on a fresh machine, the engine shall reach a verified working state through the published entry point with zero steps outside it."
+statement: When a person sets up the product on a fresh machine, the engine shall reach a verified working state through the published entry point with zero steps outside it.
 kind: quality
 verify_method: demonstration
-breaks_if_removed: "A colleague cannot run a clone, and the vehicle-owner audience is cut off."
+breaks_if_removed: A colleague cannot run a clone, and the vehicle-owner audience is cut off.
 refines:
   - uc-stay-portable
 source_refs:

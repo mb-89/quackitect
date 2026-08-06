@@ -19,7 +19,7 @@ legal_tools:
   - se_web_fetch
 evidence:
   - name: as_is
-    description: "where we stand, good and bad, witnesses named"
+    description: where we stand, good and bad, witnesses named
 major: tailored
 minor: inherit
 patch: none

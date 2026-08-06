@@ -21,9 +21,9 @@ evidence:
   - name: roles
     template: refs
     of: stakeholder
-    description: "every role as a node reference, one per line — the node carries the placement, this field never restates it"
+    description: every role as a node reference, one per line — the node carries the placement, this field never restates it
   - name: coverage
-    description: "every value prop's audience resolves to a role here, and every always-on class is present or ruled out with its reason"
+    description: every value prop's audience resolves to a role here, and every always-on class is present or ruled out with its reason
 major: tailored
 minor: inherit
 patch: none

@@ -57,7 +57,7 @@ evidence:
     template: refs
     of: requirement
     covers: use-case
-    description: "every requirement as a node reference, one per line — the node carries the demand, this field never restates it"
+    description: every requirement as a node reference, one per line — the node carries the demand, this field never restates it
   - name: set_criteria
     template: per-item
     items:
@@ -67,7 +67,7 @@ evidence:
       - bounded
       - comprehensible
       - no_tbd
-    description: "the set-level questions, each answered with the argument that makes it true — a bare yes is not an answer"
+    description: the set-level questions, each answered with the argument that makes it true — a bare yes is not an answer
 ---
 
 ## Guidance

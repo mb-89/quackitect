@@ -4,7 +4,7 @@ statement: Answer a known list — the form names the items; every one gets its 
 editor: per-item
 line_pattern: "^- .+: .+"
 line_help: "every line is `- <item>: <answer>`, and every named item appears"
-placeholder: "what happened to it, in a few words"
+placeholder: what happened to it, in a few words
 ---
 
 # per-item

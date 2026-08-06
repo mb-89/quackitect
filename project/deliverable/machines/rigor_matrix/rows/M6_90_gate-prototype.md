@@ -16,11 +16,11 @@ legal_tools:
   - se_answer
 evidence:
   - name: assumptions_validated
-    description: "the ranked riskiest assumptions hold or the design changed"
+    description: the ranked riskiest assumptions hold or the design changed
   - name: buildable
-    description: "the design is buildable as evidenced"
+    description: the design is buildable as evidenced
   - name: results_recorded
-    description: "every spike's evidence pinned; promotions marked"
+    description: every spike's evidence pinned; promotions marked
 major: full
 minor: tailored
 patch: none

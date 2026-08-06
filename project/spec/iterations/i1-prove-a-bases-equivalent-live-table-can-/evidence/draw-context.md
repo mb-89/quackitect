@@ -1,9 +1,8 @@
 ---
 form: draw-context
-by: agent
-signed_off: 2026-08-06T17:33:55.360Z
+suspect: "rests on log-risks, which fell"
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / draw-context

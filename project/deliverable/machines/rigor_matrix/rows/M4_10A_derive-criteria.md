@@ -17,7 +17,7 @@ legal_tools:
   - se_answer
 evidence:
   - name: criteria
-    description: "the vital-few high-weight requirements, each with weight and scoring definition"
+    description: the vital-few high-weight requirements, each with weight and scoring definition
 major: full
 minor: none
 patch: none

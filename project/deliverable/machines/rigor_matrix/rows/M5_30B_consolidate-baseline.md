@@ -17,11 +17,11 @@ legal_tools:
   - se_answer
 evidence:
   - name: baseline
-    description: "the consolidated matrix set with element black-box descriptions"
+    description: the consolidated matrix set with element black-box descriptions
   - name: allocation_exact
-    description: "every function allocated exactly once"
+    description: every function allocated exactly once
   - name: interfaces_both_ends
-    description: "the element DSM is symmetric where it must be"
+    description: the element DSM is symmetric where it must be
 major: full
 minor: tailored
 patch: none

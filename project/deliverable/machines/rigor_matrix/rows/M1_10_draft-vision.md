@@ -19,26 +19,26 @@ legal_tools:
   - se_web_fetch
 evidence:
   - name: big_idea
-    description: "one breath, standalone-readable"
+    description: one breath, standalone-readable
     guidance: |
       One or two sentences a stranger understands with no context. Say what
       the product does and why anyone would want it. No history, no method
       words. Read it alone: if it is not interesting by itself, stop here.
   - name: to_be_world
-    description: "who does what in the to-be world, alive"
+    description: who does what in the to-be world, alive
     guidance: |
       Describe a working day AFTER the product exists. Name people by role.
       Present tense, a scene, not a feature list. The reader should be able
       to picture the screen and the hands on it.
   - name: goal_system
-    description: "goals, conflicts named openly, priority order ruled"
+    description: goals, conflicts named openly, priority order ruled
     guidance: |
       List the goals the product serves, most important first. Where two
       goals pull against each other, say so openly and rule which one wins.
       A goal list without a named conflict is usually hiding one.
       The method: [[meth-goal-system]].
   - name: moore_pitch
-    description: "all five slots filled"
+    description: all five slots filled
     guidance: |
       Fill the five slots in this exact shape: FOR (target customer) WHO
       (need), THE (product name) IS A (category) THAT (key benefit).

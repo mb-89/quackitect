@@ -1,9 +1,8 @@
 ---
 form: log-risks
-by: agent
-signed_off: 2026-08-06T17:23:56.781Z
+suspect: "no longer passes its form — raid_opened: no references — one artifact id per line, or one line saying none"
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / log-risks

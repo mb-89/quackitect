@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "DSM banding - on a partitioned DSM, group mutually-independent elements at the same topological level into the same band, exposing within-layer parallelism."
+statement: DSM banding - on a partitioned DSM, group mutually-independent elements at the same topological level into the same band, exposing within-layer parallelism.
 source: ref-structural-complexity-management
 ---
 

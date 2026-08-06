@@ -1,6 +1,6 @@
 {
   "change_size": "product",
-  "rigor_matrix_hash": "cef1f43c4858",
+  "rigor_matrix_hash": "b5bb59c2cf25",
   "pinned_at": "2026-08-04T16:20:30.684Z",
   "demands": {
     "onboard-retro": {
@@ -21,7 +21,7 @@
     },
     "log-risks": {
       "applies": "full",
-      "evidence": "[[\"raid_opened\",true,\"\",[\"kind\",\"entry\",\"impact\",\"likelihood\",\"owner\",\"revisit\"],\"table\",\"\",[],[],[]]]"
+      "evidence": "[[\"raid_opened\",true,\"\",[],\"refs\",\"raid\",[],[],[]]]"
     },
     "frame-delta": {
       "applies": "full",
@@ -67,9 +67,13 @@
       "applies": "full",
       "evidence": "[[\"function_structure\",true,\"\",[],\"\",\"\",[],[],[]],[\"coverage\",true,\"\",[],\"\",\"\",[],[],[]]]"
     },
+    "identify-assumptions": {
+      "applies": "full",
+      "evidence": "[[\"assumptions\",true,\"\",[],\"refs\",\"raid\",[],[],[]],[\"sweep\",true,\"\",[],\"per-item\",\"\",[],[\"environment\",\"toolchain\",\"host\",\"platform\",\"neighbours\",\"people\"],[]]]"
+    },
     "probe-assumptions": {
       "applies": "full",
-      "evidence": "[[\"probes\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"probes\",true,\"\",[],\"per-item\",\"raid\",[],[],[]],[\"fallout\",true,\"\",[],\"refs\",\"\",[],[],[]]]"
     },
     "gate-requirements": {
       "applies": "full",

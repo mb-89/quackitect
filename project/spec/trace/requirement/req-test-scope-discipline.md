@@ -1,10 +1,10 @@
 ---
 id: req-test-scope-discipline
 type: "[[requirement]]"
-statement: "When a test run names a scope, the engine shall run exactly that scope and shall answer from the recorded verdict where the scope has not changed."
+statement: When a test run names a scope, the engine shall run exactly that scope and shall answer from the recorded verdict where the scope has not changed.
 kind: functional
 verify_method: test
-breaks_if_removed: "Tests run to reassure rather than to answer, and the battery's cost buys nothing."
+breaks_if_removed: Tests run to reassure rather than to answer, and the battery's cost buys nothing.
 refines:
   - uc-land-work-on-trunk
   - uc-let-the-system-catch-up
