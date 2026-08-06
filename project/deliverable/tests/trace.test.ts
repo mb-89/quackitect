@@ -114,18 +114,35 @@ describe("the radial trace graph", { concurrency: true }, () => {
     assert.equal(radius(stories[0]), Math.round(l.rings[1]), "and it is the declared ring");
   });
 
-  test("a NARROWER wedge pushes its ring outward, because arc is radius times angle", () => {
-    const many = (n: number): TraceNode[] => {
+  test("EVERY SECTION TAKES THE ANGLE ITS OWN LOAD NEEDS, so the ring answers to the whole circle", () => {
+    // This replaces the old equal-wedge law ("a narrower wedge pushes its
+    // ring outward"). Sections are no longer equal, so a narrow one is narrow
+    // BECAUSE it holds less — and the ring is sized by what the whole circle
+    // carries rather than by its worst wedge repeated.
+    const many = (n: number, per: number): TraceNode[] => {
       const out: TraceNode[] = [];
       for (let i = 0; i < n; i++) {
         out.push(prop(`vp-${i}`));
-        for (let j = 0; j < 6; j++) out.push(child(`s-${i}-${j}`, "story", `vp-${i}`));
+        for (let j = 0; j < per; j++) out.push(child(`s-${i}-${j}`, "story", `vp-${i}`));
       }
       return out;
     };
-    const few = layoutTrace(many(2)).rings[1];
-    const lots = layoutTrace(many(8)).rings[1];
-    assert.ok(lots > few, `eight wedges must ring wider than two — got ${lots} against ${few}`);
+    const few = layoutTrace(many(2, 20)).rings[1];
+    const lots = layoutTrace(many(8, 20)).rings[1];
+    assert.ok(lots > few, `eight sections carry more than two, so they ring wider — got ${lots} against ${few}`);
+
+    // And the share is the load: one section holding twice as much takes
+    // about twice the turn.
+    const lopsided = [prop("vp-big"), prop("vp-small")];
+    for (let j = 0; j < 20; j++) lopsided.push(child(`b-${j}`, "story", "vp-big"));
+    for (let j = 0; j < 10; j++) lopsided.push(child(`s-${j}`, "story", "vp-small"));
+    const l = layoutTrace(lopsided);
+    const spanOf = (root: string): number => {
+      const angles = l.nodes.filter((n) => n.root === root && n.type === "story").map((n) => Math.atan2(n.y, n.x));
+      return Math.max(...angles) - Math.min(...angles);
+    };
+    const ratio = spanOf("vp-big") / spanOf("vp-small");
+    assert.ok(ratio > 1.5, `the heavier section takes the wider turn — ratio ${ratio.toFixed(2)}`);
   });
 
   test("the barycentre sweep puts a child near its parent, so lines do not cross", () => {

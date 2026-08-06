@@ -472,6 +472,34 @@ const FIRST_RING = CARD_W * 1.55;
  *  this distance a 260×60 card clears its neighbour at every angle. */
 const MIN_DIST = Math.round((FIRST_RING * 2) / 3);
 
+/** EVERY SECTION TAKES THE ANGLE IT NEEDS (owner, 2026-08-06). Equal wedges
+ *  are the circle's real waste: one value prop carrying sixty rows and
+ *  another carrying thirteen each got a sixth of the turn, so the crowded
+ *  one set the radius for everybody while the sparse one drew empty arc.
+ *
+ *  Each section's share is its own LOAD over the total — so the outer ring
+ *  is sized by what the whole circle holds, not by six times its worst
+ *  wedge. Closing one gap lets its neighbour round up against it, and the
+ *  whole drawing collapses inward.
+ *
+ *  IT IS COMPUTED, NEVER STORED. The loads come from whatever is in scope at
+ *  this layout, so a filter or a selection re-cuts every section. */
+function sections(shown: string[], perWedge: Map<string, string[][]>): Map<string, { centre: number; span: number }> {
+  const load = (p: string): number => Math.max(1, ...(perWedge.get(p) ?? []).map((l) => l.length));
+  const total = shown.reduce((a, p) => a + load(p), 0);
+  const out = new Map<string, { centre: number; span: number }>();
+  // The FIRST section is centred straight down, so a single prop still hangs
+  // below the vision however wide its section turns out to be.
+  const first = total === 0 ? 0 : (Math.PI * 2 * load(shown[0] ?? "")) / total;
+  let at = Math.PI / 2 - first / 2;
+  for (const p of shown) {
+    const span = total === 0 ? 0 : (Math.PI * 2 * load(p)) / total;
+    out.set(p, { centre: at + span / 2, span });
+    at += span;
+  }
+  return out;
+}
+
 /** THE STAGGER, ported from v1's report renderer (report_assets.go: a
  *  3-level modulo offset per row). A crowded ring splits into up to three
  *  SUB-ORBITS, and neighbours in angle alternate outward.
@@ -485,9 +513,6 @@ const MIN_DIST = Math.round((FIRST_RING * 2) / 3);
  *  three items apart — still owe the full distance in arc. */
 const STAGGER = 3;
 const STAGGER_STEP = MIN_DIST;
-/** What one item costs in arc at full stagger: a third of the floor. */
-const STAGGER_ARC = MIN_DIST / STAGGER;
-
 /** THE BAND STRADDLES ITS RING (owner sketch, 2026-08-06): one card pushed
  *  OUT and one pulled IN, rather than every sub-orbit growing outward. The
  *  ring keeps its own radius as the band's middle, so the band costs half as
@@ -616,17 +641,24 @@ function keepFor(all: TraceNode[], q: string): Set<string> {
  *  wasted its middle. Now a ring grows only as far as ITS worst wedge needs
  *  at full stagger, and the floor chain keeps it clear of the previous
  *  ring's outermost sub-orbit. Inner rings collapse; the spacing does not. */
-function ringRadii(perWedge: Map<string, string[][]>, count: number, wedge: number): number[] {
+function ringRadii(wedges: { lanes: string[][]; span: number }[], count: number): number[] {
   const radii: number[] = [];
   let floor = FIRST_RING;
   for (let k = 0; k < count; k++) {
     let worst = 0;
-    for (const lanes of perWedge.values()) worst = Math.max(worst, lanes[k].length);
-    const need = wedge === 0 ? 0 : (worst * STAGGER_ARC) / wedge;
+    let need = 0;
+    for (const w of wedges) {
+      const n = w.lanes[k]?.length ?? 0;
+      worst = Math.max(worst, n);
+      // Each section is sized against ITS OWN arc, so a crowded section no
+      // longer sets the ring for the sparse ones.
+      // n items need n-1 GAPS, not n — charging for the extra one made a
+      // narrow section demand a huge radius to hold a single node.
+      if (n > 1 && w.span > 0) need = Math.max(need, ((n - 1) * MIN_DIST) / (STAGGER * w.span * 0.86));
+    }
     // The band reaches INWARD too, so the ring itself has to clear the
     // previous ring's outer edge by its own inner half.
-    const guess = Math.max(floor, need);
-    const half = bandHalf(orbitsFor(worst, guess * wedge));
+    const half = bandHalf(orbitsFor(worst, Math.max(floor, need)));
     const r = Math.max(floor + half, need);
     radii.push(r);
     floor = r + half + RING_GAP;
@@ -682,7 +714,6 @@ export function layoutTrace(all: TraceNode[], selected?: string[], filter?: { ty
   // yet draws a circle around nothing and pushes everything else inward. It
   // comes back by itself the moment the level has a node.
   const levels = asked.filter((t) => inScope.some((n) => n.type === t));
-  const wedge = shown.length === 0 ? 0 : (Math.PI * 2) / shown.length;
 
   const parentsOf = new Map(inScope.map((n) => [n.id, n.refines]));
   const perWedge = new Map<string, string[][]>();
@@ -697,17 +728,23 @@ export function layoutTrace(all: TraceNode[], selected?: string[], filter?: { ty
     for (const r of rootsShown(n.id)) perWedge.get(r)?.[lv].push(n.id);
   }
 
-  const rings = ringRadii(perWedge, levels.length, wedge);
+  // The sections are cut AFTER the lanes are known, because each one's share
+  // of the turn is its own load.
+  const cut = sections(shown, perWedge);
+  const rings = ringRadii(
+    shown.map((p) => ({ lanes: perWedge.get(p) ?? [], span: cut.get(p)?.span ?? 0 })),
+    levels.length,
+  );
 
   const placed: Placed[] = [];
   const place = new Map<string, number>();
   const at = (prop: string, id: string): string => `${prop}\0${id}`;
-  shown.forEach((prop, w) => {
+  shown.forEach((prop) => {
     const lanes = perWedge.get(prop) ?? [];
-    // Wedge zero points straight DOWN, so a single prop hangs below the
-    // vision rather than sitting at an arbitrary angle.
-    const centre = Math.PI / 2 + w * wedge;
-    const half = (wedge * 0.86) / 2;
+    // The first section starts pointing straight DOWN, so a single prop hangs
+    // below the vision rather than sitting at an arbitrary angle.
+    const centre = cut.get(prop)?.centre ?? Math.PI / 2;
+    const half = ((cut.get(prop)?.span ?? 0) * 0.86) / 2;
     for (let k = 0; k < levels.length; k++) {
       const lane = lanes[k] ?? [];
       if (lane.length === 0) continue;

@@ -506,3 +506,11 @@
 {"ts":"2026-08-06T16:50:57.273Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d9","brief":"filling the retro's owed fields"}
 {"ts":"2026-08-06T16:51:35.450Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d10","brief":"onboard-retro re-earned; moving to the kickoff gate"}
 {"ts":"2026-08-06T16:52:02.107Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d11","brief":"kickoff re-earned; testing whether the walk carries on"}
+{"ts":"2026-08-06T16:52:47.291Z","op":"done","visit":"start@0","node":"d3","brief":"the rework stands at gate-kickoff, which waits for a bless"}
+{"ts":"2026-08-06T17:02:01.342Z","op":"plan","visit":"iterations/i1/gate-kickoff@0","parent":null,"nodes":[{"id":"d12","brief":"make the clearance direction-aware"},{"id":"d13","brief":"size the rings from the summed local need"},{"id":"d14","brief":"verify the floor and measure"},{"id":"d15","brief":"walk down and bless to gate-requirements"}]}
+{"ts":"2026-08-06T17:03:10.888Z","op":"done","visit":"iterations/i1/gate-kickoff@0","node":"d12","brief":"clearance is now the card rectangle, not a disc"}
+{"ts":"2026-08-06T17:04:27.012Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d16","brief":"each section takes the angle its own load needs"}
+{"ts":"2026-08-06T17:04:58.312Z","op":"done","visit":"iterations/i1/gate-kickoff@0","node":"d13","brief":"sections cut by load and wired into the layout"}
+{"ts":"2026-08-06T17:07:43.252Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d17","brief":"charging for gaps rather than items, with a debug line"}
+{"ts":"2026-08-06T17:09:19.799Z","op":"update","visit":"iterations/i1/gate-kickoff@0","node":"d18","brief":"restoring the down-facing origin and rewriting the wedge law test"}
+{"ts":"2026-08-06T17:09:35.687Z","op":"done","visit":"iterations/i1/gate-kickoff@0","node":"d14","brief":"25 trace tests green on the new section law"}
