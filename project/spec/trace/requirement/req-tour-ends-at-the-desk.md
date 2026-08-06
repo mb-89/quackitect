@@ -1,10 +1,10 @@
 ---
 id: req-tour-ends-at-the-desk
 type: "[[requirement]]"
-statement: "When the last stop completes, the tour shall return to the front desk and show the offer list."
+statement: When the last stop completes, the tour shall return to the front desk and show the offer list.
 kind: functional
 verify_method: demonstration
-breaks_if_removed: "The tour dead-ends; what was learned never connects to what to ask for."
+breaks_if_removed: The tour dead-ends; what was learned never connects to what to ask for.
 refines:
   - uc-learn-the-machinery
 source_refs:

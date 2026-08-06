@@ -1,10 +1,10 @@
 ---
 id: req-tour-reads-what-stands
 type: "[[requirement]]"
-statement: "When a tour runs, the engine shall derive every stop from the live machinery and read zero stored tour scripts."
+statement: When a tour runs, the engine shall derive every stop from the live machinery and read zero stored tour scripts.
 kind: functional
 verify_method: demonstration
-breaks_if_removed: "The tour rots the day it is written; a shipped part stays invisible until someone rewrites a script."
+breaks_if_removed: The tour rots the day it is written; a shipped part stays invisible until someone rewrites a script.
 refines:
   - uc-learn-the-machinery
 source_refs:

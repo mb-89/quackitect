@@ -1,10 +1,10 @@
 ---
 id: req-coverage-checked-both-ways
 type: "[[requirement]]"
-statement: "While a field declares coverage over another type, the engine shall hold the state unmet until both directions hold with zero orphans on either side."
+statement: While a field declares coverage over another type, the engine shall hold the state unmet until both directions hold with zero orphans on either side.
 kind: functional
 verify_method: test
-breaks_if_removed: "A use case no requirement covers ships as covered; the trace lies where it matters most."
+breaks_if_removed: A use case no requirement covers ships as covered; the trace lies where it matters most.
 refines:
   - uc-take-a-step
 source_refs:

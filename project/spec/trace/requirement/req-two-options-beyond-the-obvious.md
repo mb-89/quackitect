@@ -1,10 +1,10 @@
 ---
 id: req-two-options-beyond-the-obvious
 type: "[[requirement]]"
-statement: "While the standing options number fewer than two, or every standing option restates the recorded incumbent, the engine shall keep the choosing step closed."
+statement: While the standing options number fewer than two, or every standing option restates the recorded incumbent, the engine shall keep the choosing step closed.
 kind: functional
 verify_method: test
-breaks_if_removed: "The obvious answer passes with a token rival, and the choice was never checked against a real alternative."
+breaks_if_removed: The obvious answer passes with a token rival, and the choice was never checked against a real alternative.
 refines:
   - uc-diverge-before-deciding
 source_refs:

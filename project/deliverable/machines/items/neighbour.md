@@ -5,8 +5,10 @@ id_prefix: nbr-
 folder: project/spec/trace/neighbour
 sections:
   - Interface
-applies_rigor: [systematic]
-applies_type: [default]
+applies_rigor:
+  - systematic
+applies_type:
+  - default
 ---
 
 # neighbour — one thing outside the boundary, and what crosses it

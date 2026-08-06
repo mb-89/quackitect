@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "Absolute 0-5 anchors for evaluation scoring; a spawned research agent scores against prior art, never the builder."
+statement: Absolute 0-5 anchors for evaluation scoring; a spawned research agent scores against prior art, never the builder.
 ---
 
 ## Anchors (absolute, 0-5)

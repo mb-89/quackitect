@@ -19,7 +19,7 @@ legal_tools:
   - se_lint
 evidence:
   - name: swept
-    description: "the changes and the surfaces updated for each"
+    description: the changes and the surfaces updated for each
 major: full
 minor: full
 patch: full

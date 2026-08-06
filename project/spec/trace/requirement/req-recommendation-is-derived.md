@@ -1,10 +1,10 @@
 ---
 id: req-recommendation-is-derived
 type: "[[requirement]]"
-statement: "When the desk recommends a vehicle, the desk shall derive the recommendation from the state standing at that moment and shall carry every part the Detail table names."
+statement: When the desk recommends a vehicle, the desk shall derive the recommendation from the state standing at that moment and shall carry every part the Detail table names.
 kind: functional
 verify_method: inspection
-breaks_if_removed: "The desk answers from memory and recommends against a system that has moved."
+breaks_if_removed: The desk answers from memory and recommends against a system that has moved.
 refines:
   - uc-get-work-routed
 source_refs:

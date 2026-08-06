@@ -4,7 +4,7 @@ type: "[[stakeholder]]"
 statement: Someone meeting this project with no context, who has to get oriented before any of it makes sense.
 role_class: newcomer
 dicet: customer
-disposition: "+"
+disposition: +
 interest: 0.5
 influence: 0.2
 weight: 0.6

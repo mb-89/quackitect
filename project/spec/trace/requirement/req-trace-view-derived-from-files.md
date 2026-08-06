@@ -1,10 +1,10 @@
 ---
 id: req-trace-view-derived-from-files
 type: "[[requirement]]"
-statement: "The engine shall derive every trace view from the node files alone, with zero truth stored only in the view."
+statement: The engine shall derive every trace view from the node files alone, with zero truth stored only in the view.
 kind: functional
 verify_method: analysis
-breaks_if_removed: "The screen shows a chain the files cannot back, and the view drifts from truth."
+breaks_if_removed: The screen shows a chain the files cannot back, and the view drifts from truth.
 refines:
   - uc-trace-a-decision-to-its-origin
 source_refs:

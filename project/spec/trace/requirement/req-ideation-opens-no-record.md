@@ -1,10 +1,10 @@
 ---
 id: req-ideation-opens-no-record
 type: "[[requirement]]"
-statement: "While ideation stands open, the engine shall open zero records and commit zero files."
+statement: While ideation stands open, the engine shall open zero records and commit zero files.
 kind: functional
 verify_method: test
-breaks_if_removed: "Ideation grows records and commits, divergence stops being cheap, and nobody diverges before deciding."
+breaks_if_removed: Ideation grows records and commits, divergence stops being cheap, and nobody diverges before deciding.
 refines:
   - uc-diverge-before-deciding
 source_refs:

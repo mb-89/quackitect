@@ -17,15 +17,15 @@ legal_tools:
   - se_answer
 evidence:
   - name: boundary
-    description: "what is inside and what is outside, in prose — the neighbours themselves are the list below"
+    description: what is inside and what is outside, in prose — the neighbours themselves are the list below
   - name: neighbours
     template: refs
     of: neighbour
-    description: "every neighbour that touches the box — one node each, whichever way the arrow points"
+    description: every neighbour that touches the box — one node each, whichever way the arrow points
   - name: intended_use
-    description: "one honest paragraph"
+    description: one honest paragraph
   - name: excluded_use
-    description: "the does-NOT-do list"
+    description: the does-NOT-do list
 major: full
 minor: inherit
 patch: none

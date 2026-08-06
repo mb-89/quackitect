@@ -19,9 +19,9 @@ legal_tools:
   - se_git
 evidence:
   - name: package
-    description: "the versioned artifact with its contents listed"
+    description: the versioned artifact with its contents listed
   - name: entry_script
-    description: "the one-script entry, or the recorded skip"
+    description: the one-script entry, or the recorded skip
 major: full
 minor: full
 patch: tailored

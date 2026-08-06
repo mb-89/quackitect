@@ -22,7 +22,7 @@ evidence:
     template: refs
     of: use-case
     covers: story
-    description: "every use case as a node reference, one per line — the scenario lives in the node, this field never restates it"
+    description: every use case as a node reference, one per line — the scenario lives in the node, this field never restates it
 major: full
 minor: tailored
 patch: none

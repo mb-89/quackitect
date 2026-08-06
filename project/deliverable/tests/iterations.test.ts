@@ -299,6 +299,11 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
     {
       notes_drained: "- none: inbox empty",
       call_log_mined: "- 0 calls, fresh root",
+      // PROMOTIONS IS REQUIRED, and this fixture stopped filling it the day
+      // the retro's standing question became a field. The form then never
+      // completed, so the walk could not leave onboard-retro and the test
+      // read as a machine defect rather than a stale fixture.
+      promotions: "- none: a fresh root has no instance changes to promote",
       process_stale: "checked — nothing stale",
       follow_up: "none",
     },
@@ -341,6 +346,7 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
     round_1_validate:
       "- exercised against the goal: walked\n- missing: none\n- wrong: none\n- out of scope: none\n- prior art: none in this seam",
     round_2_red_team: "- none => the attack found nothing",
+    raid_additions: "- none",
     verdict: "pass — the claims held",
     follow_up: "none",
   };
@@ -376,6 +382,11 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
   );
   // Leaving the blessed kickoff by a NAMED edge completes it — and the
   // M0 fills carried across the swap.
+  //
+  // log-risks demands meth-raid first: the register became NODES on
+  // 2026-08-06 and a state entered without that card writes the table it
+  // used to write.
+  session.humanCheck("project/deliverable/machines/methods/meth-raid.md");
   await session.advance(grown.states.find((s) => s.id === "gate-kickoff")!.edges[0].to);
   const hist = (session.describe() as { history: { state: string; outcome: string }[] }).history.map((h) => h.state);
   assert.ok(hist.includes(`iterations/${sid}/onboard-retro`), "the retro's fill survived the swap");

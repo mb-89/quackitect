@@ -6,8 +6,10 @@ folder: project/spec/trace/use-case
 sections:
   - Main scenario
   - Extensions
-applies_rigor: [systematic]
-applies_type: [default]
+applies_rigor:
+  - systematic
+applies_type:
+  - default
 ---
 
 # use case — one actor, one goal, every pass

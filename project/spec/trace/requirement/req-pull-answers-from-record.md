@@ -1,10 +1,10 @@
 ---
 id: req-pull-answers-from-record
 type: "[[requirement]]"
-statement: "When a driver asks what to do, the engine shall answer from the walk's recorded position with one instruction carrying everything the step needs."
+statement: When a driver asks what to do, the engine shall answer from the walk's recorded position with one instruction carrying everything the step needs.
 kind: functional
 verify_method: test
-breaks_if_removed: "The driver has to reconstruct where it stands and what it may use, which is the whole job the lane exists to remove."
+breaks_if_removed: The driver has to reconstruct where it stands and what it may use, which is the whole job the lane exists to remove.
 refines:
   - uc-take-a-step
 source_refs:

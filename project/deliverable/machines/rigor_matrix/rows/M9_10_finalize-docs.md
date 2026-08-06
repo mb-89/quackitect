@@ -18,7 +18,7 @@ legal_tools:
   - se_lint
 evidence:
   - name: docs
-    description: "the emitted set and the match against the surface"
+    description: the emitted set and the match against the surface
 major: full
 minor: full
 patch: none

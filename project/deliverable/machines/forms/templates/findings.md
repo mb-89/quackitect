@@ -2,8 +2,8 @@
 id: template-findings
 statement: Findings with answers — nothing stands unanswered.
 editor: findings
-line_pattern: "^- .+ => .+"
-line_help: "every line is `- <finding> => <answer>`"
+line_pattern: ^- .+ => .+
+line_help: every line is `- <finding> => <answer>`
 ---
 
 # findings

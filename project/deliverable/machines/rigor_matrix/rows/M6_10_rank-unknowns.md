@@ -20,9 +20,9 @@ legal_tools:
   - se_web_fetch
 evidence:
   - name: ranking
-    description: "the unknowns ranked, with what-if-wrong"
+    description: the unknowns ranked, with what-if-wrong
   - name: seeded
-    description: "the spike list with timeboxes"
+    description: the spike list with timeboxes
 major: full
 minor: tailored
 patch: none

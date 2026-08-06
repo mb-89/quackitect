@@ -1,10 +1,10 @@
 ---
 id: req-roles-never-usernames
 type: "[[requirement]]"
-statement: "The engine shall record every acting party as a role from the fixed vocabulary, with zero usernames or hostnames in stored records."
+statement: The engine shall record every acting party as a role from the fixed vocabulary, with zero usernames or hostnames in stored records.
 kind: constraint
 verify_method: inspection
-breaks_if_removed: "Personal data lands in durable records, breaking the privacy law over the whole corpus."
+breaks_if_removed: Personal data lands in durable records, breaking the privacy law over the whole corpus.
 refines:
   - uc-trace-a-decision-to-its-origin
   - uc-browse-the-archive

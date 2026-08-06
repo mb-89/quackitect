@@ -18,11 +18,11 @@ legal_tools:
   - se_answer
 evidence:
   - name: picture_judged
-    description: "the judgment the counts cannot make — are these the right journeys, and is any one of them wrong?"
+    description: the judgment the counts cannot make — are these the right journeys, and is any one of them wrong?
   - name: unspecified_capability
-    description: "every lane tool and every offered door, against the use cases — an uncovered capability that is in scope FAILS this gate"
+    description: every lane tool and every offered door, against the use cases — an uncovered capability that is in scope FAILS this gate
   - name: passes_concrete
-    description: "is every pass written concretely enough to script at M6 — the formulated stage of the example system, which at M2 IS the story slides"
+    description: is every pass written concretely enough to script at M6 — the formulated stage of the example system, which at M2 IS the story slides
 major: full
 minor: tailored
 patch: none

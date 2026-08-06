@@ -1,10 +1,10 @@
 ---
 id: req-state-opens-only-when-earned
 type: "[[requirement]]"
-statement: "The engine shall open a state only when every document it owes is credited and every entry condition holds, naming whatever is missing."
+statement: The engine shall open a state only when every document it owes is credited and every entry condition holds, naming whatever is missing.
 kind: functional
 verify_method: test
-breaks_if_removed: "Work begins on guidance nobody read and inputs nobody produced, which is the failure the whole walk exists to prevent."
+breaks_if_removed: Work begins on guidance nobody read and inputs nobody produced, which is the failure the whole walk exists to prevent.
 refines:
   - uc-be-handed-the-method
   - uc-take-a-step

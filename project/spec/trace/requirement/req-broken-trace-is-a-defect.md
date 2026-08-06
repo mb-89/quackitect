@@ -1,10 +1,10 @@
 ---
 id: req-broken-trace-is-a-defect
 type: "[[requirement]]"
-statement: "The engine shall count every broken trace link as a defect and shall fail the gate reviewing it."
+statement: The engine shall count every broken trace link as a defect and shall fail the gate reviewing it.
 kind: functional
 verify_method: test
-breaks_if_removed: "The trace renders whole while pointing at nothing, which is worse than rendering a hole."
+breaks_if_removed: The trace renders whole while pointing at nothing, which is worse than rendering a hole.
 refines:
   - uc-trace-a-decision-to-its-origin
 source_refs:

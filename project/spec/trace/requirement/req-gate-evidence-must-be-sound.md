@@ -1,10 +1,10 @@
 ---
 id: req-gate-evidence-must-be-sound
 type: "[[requirement]]"
-statement: "If a gate's evidence holds an unfilled field, an unfilled round, or a citation resolving to no artifact, then the engine shall refuse to offer the gate for adjudication."
+statement: If a gate's evidence holds an unfilled field, an unfilled round, or a citation resolving to no artifact, then the engine shall refuse to offer the gate for adjudication.
 kind: functional
 verify_method: test
-breaks_if_removed: "A person is asked to bless a form with holes in it, and their signature covers nothing."
+breaks_if_removed: A person is asked to bless a form with holes in it, and their signature covers nothing.
 refines:
   - uc-adjudicate-a-gate
   - uc-land-work-on-trunk

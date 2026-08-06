@@ -15,17 +15,16 @@ legal_tools:
   - se_file_list
   - se_log_query
   - se_answer
+entry_read:
+  - project/deliverable/machines/methods/meth-raid.md
 evidence:
   - name: raid_opened
-    description: "the register's table: every entry typed, owned, numbered, triggered"
-    template: table
-    columns: [kind, entry, impact, likelihood, owner, revisit]
+    template: refs
+    of: raid
+    description: every entry opened here, as a raid node reference, one per line
     guidance: |
-      One markdown-table row per entry. kind is R, A, I or D. impact and
-      likelihood are 1 to 5 — their product orders the register and draws
-      the computed risk picture, so no cell may stay empty. owner is a
-      role, never a name. revisit is the trigger that reopens the entry.
-      The method: [[meth-raid]].
+      Write each entry as a node shaped by [[raid]], then name it here.
+      The node carries kind, owner, trigger, impact and statement.
 major: full
 minor: tailored
 patch: tailored
@@ -56,4 +55,8 @@ specification_note: |
 
 ## Guidance
 
-Open the register ([[meth-raid]]). The goal system's named conflicts are the first entries; add the top risks the vision and delta expose. Owners and revisit triggers on each.
+Open the register ([[meth-raid]]), which the entry read demands before this state opens. The goal system's named conflicts are the first entries; add the top risks the vision and delta expose. Owners and revisit triggers on each.
+
+EACH ENTRY IS A NODE, not a table row (owner ruling 2026-08-06). A table row is per-iteration, has no id, and freezes at sign-off — so an entry recorded here could never be pointed at, and an assumption recorded here could never be probed by a later iteration. Both ancestors already knew this: v1 shipped a raid item template with a per-kind query view, v2 shipped one file per entry. This field carries references; the register a person reads is a view over the folder.
+
+RISKS OPEN HERE. Assumptions have two states of their own at M3 — identify-assumptions sweeps for them, probe-assumptions checks every standing one. An assumption noticed HERE is still recorded here rather than held back; waiting for the right state is how an entry is lost.

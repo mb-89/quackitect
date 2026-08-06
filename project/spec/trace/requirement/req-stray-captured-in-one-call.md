@@ -1,10 +1,10 @@
 ---
 id: req-stray-captured-in-one-call
 type: "[[requirement]]"
-statement: "The engine shall capture a stray finding in one call carrying the finder's own words, from any state, with zero prerequisite steps."
+statement: The engine shall capture a stray finding in one call carrying the finder's own words, from any state, with zero prerequisite steps.
 kind: functional
 verify_method: test
-breaks_if_removed: "Capture costs a detour, so findings are chased mid-walk or dropped."
+breaks_if_removed: Capture costs a detour, so findings are chased mid-walk or dropped.
 refines:
   - uc-capture-a-stray
 source_refs:

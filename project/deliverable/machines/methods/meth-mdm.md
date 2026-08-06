@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "MDM (Multiple-Domain Matrix) - a block matrix of several domains' DSMs (diagonal) and DMMs (off-diagonal) where at least one subset is COMPUTED (derived) from others already present, not independently elicited."
+statement: MDM (Multiple-Domain Matrix) - a block matrix of several domains' DSMs (diagonal) and DMMs (off-diagonal) where at least one subset is COMPUTED (derived) from others already present, not independently elicited.
 source: ref-structural-complexity-management
 ---
 

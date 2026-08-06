@@ -1,10 +1,10 @@
 ---
 id: req-newcomer-one-command
 type: "[[requirement]]"
-statement: "When a newcomer runs the setup script on a fresh computer, the install path shall deliver the desk's greeting with exactly 1 command run by the person and 0 files edited by hand."
+statement: When a newcomer runs the setup script on a fresh computer, the install path shall deliver the desk's greeting with exactly 1 command run by the person and 0 files edited by hand.
 kind: quality
 verify_method: demonstration
-breaks_if_removed: "Install quality decays one manual step per release and nobody counts."
+breaks_if_removed: Install quality decays one manual step per release and nobody counts.
 refines:
   - uc-install-quackitect
 source_refs:

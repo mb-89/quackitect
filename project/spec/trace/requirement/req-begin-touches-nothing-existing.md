@@ -1,10 +1,10 @@
 ---
 id: req-begin-touches-nothing-existing
 type: "[[requirement]]"
-statement: "While a new product is begun, the engine shall change zero files of any existing product."
+statement: While a new product is begun, the engine shall change zero files of any existing product.
 kind: functional
 verify_method: test
-breaks_if_removed: "Beginning a second product damages the first, which is unrecoverable and unforgivable."
+breaks_if_removed: Beginning a second product damages the first, which is unrecoverable and unforgivable.
 refines:
   - uc-begin-a-product
 source_refs:

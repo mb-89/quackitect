@@ -17,15 +17,15 @@ legal_tools:
   - se_answer
 evidence:
   - name: gap_claim
-    description: "what each alternative sheds, positioned against the scanned field"
+    description: what each alternative sheds, positioned against the scanned field
   - name: why_now
-    description: "what matured to make the gap closable"
+    description: what matured to make the gap closable
   - name: value_props
     template: refs
     of: value-prop
-    description: "the value props this delta authors"
+    description: the value props this delta authors
   - name: business_case
-    description: "what the effort buys, in whose currency - skip with a recorded reason where no acquirer exists"
+    description: what the effort buys, in whose currency - skip with a recorded reason where no acquirer exists
     required: false
 major: full
 minor: tailored

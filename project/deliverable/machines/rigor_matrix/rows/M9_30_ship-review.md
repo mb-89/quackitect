@@ -19,9 +19,9 @@ legal_tools:
   - se_git
 evidence:
   - name: review
-    description: "the dependency list with rulings; new asks answered"
+    description: the dependency list with rulings; new asks answered
   - name: upstream
-    description: "proposals deposited, or none owed"
+    description: proposals deposited, or none owed
 major: full
 minor: tailored
 patch: none

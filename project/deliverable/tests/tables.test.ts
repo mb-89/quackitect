@@ -166,11 +166,11 @@ describe("the vault", { concurrency: true }, () => {
     assert.deepEqual(unreadableRows(rows), [], "no note in the vault has broken frontmatter");
   });
 
-  test("the fifty rigor rows come back through the owner's own base file", () => {
+  test("every rigor row comes back through the owner's own base file", () => {
     const spec = loadBase(RIGOR);
     const matrix = spec.views.find((v) => v.name === "The matrix");
     assert.ok(matrix !== undefined, "the shipped base declares The matrix");
-    assert.equal(renderView(spec, matrix, readVault(REPO_ROOT)).rows, 50);
+    assert.equal(renderView(spec, matrix, readVault(REPO_ROOT)).rows, 51);
   });
 
   // The pivot and the flat view read ONE set of notes. Each rigor row carries
@@ -199,7 +199,7 @@ describe("the vault", { concurrency: true }, () => {
     const waits = spec.views[0];
     const r = renderView(spec, waits, rows);
     const labels = [...r.html.matchAll(/pv-row">([^<]+)</g)].map((m) => m[1]);
-    assert.equal(labels.length, 50, "every rigor step is a row");
+    assert.equal(labels.length, 51, "every rigor step is a row");
     const shared = r.columns.filter((c) => labels.includes(c));
     assert.ok(shared.length >= 45, `the axes name the same things — only ${shared.length} of ${r.columns.length} columns are also rows`);
   });

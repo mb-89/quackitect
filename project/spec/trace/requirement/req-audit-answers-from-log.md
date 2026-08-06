@@ -1,10 +1,10 @@
 ---
 id: req-audit-answers-from-log
 type: "[[requirement]]"
-statement: "The engine shall answer the retro's declared counts from the recorded log alone."
+statement: The engine shall answer the retro's declared counts from the recorded log alone.
 kind: quality
 verify_method: test
-breaks_if_removed: "The retro guesses its counts and drifts from what actually ran."
+breaks_if_removed: The retro guesses its counts and drifts from what actually ran.
 refines:
   - uc-stay-auditable
 source_refs:

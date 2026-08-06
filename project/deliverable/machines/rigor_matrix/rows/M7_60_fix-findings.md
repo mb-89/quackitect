@@ -7,7 +7,7 @@ filled_by: agent
 depends_on:
   - verification
 edge_role: fallback
-guard: "verification_attempts < 3"
+guard: verification_attempts < 3
 legal_tools:
   - se_file_read
   - se_file_write
@@ -22,7 +22,7 @@ legal_tools:
   - se_git
 evidence:
   - name: findings_fixed
-    description: "every finding and its fix, one pass"
+    description: every finding and its fix, one pass
 major: full
 minor: full
 patch: full

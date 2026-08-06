@@ -1,10 +1,10 @@
 ---
 id: req-one-script-installs
 type: "[[requirement]]"
-statement: "When the one setup script at the product root runs, the script shall perform the whole install per the Detail table with zero further commands from the person."
+statement: When the one setup script at the product root runs, the script shall perform the whole install per the Detail table with zero further commands from the person.
 kind: functional
 verify_method: demonstration
-breaks_if_removed: "Install becomes a manual multi-step ritual and the newcomer never reaches the desk."
+breaks_if_removed: Install becomes a manual multi-step ritual and the newcomer never reaches the desk.
 refines:
   - uc-install-quackitect
 source_refs:

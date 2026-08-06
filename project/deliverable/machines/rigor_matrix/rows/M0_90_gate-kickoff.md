@@ -22,20 +22,20 @@ legal_tools:
   - se_answer
 evidence:
   - name: retro_drained
-    description: "what happened to each pending note - built, dropped as obsolete, carried in, or parked with its ready-when"
+    description: what happened to each pending note - built, dropped as obsolete, carried in, or parked with its ready-when
     template: per-item
     items:
-      - "$inbox"
+      - $inbox
   - name: goal
-    description: "the confirmed one-line iteration goal"
+    description: the confirmed one-line iteration goal
   - name: pulled_in
-    description: "what this iteration absorbs, each item with its origin"
+    description: what this iteration absorbs, each item with its origin
     template: list
   - name: left_out
-    description: "what explicitly stays out, and where it went"
+    description: what explicitly stays out, and where it went
     template: list
   - name: change_size
-    description: "the proposed column and its rationale; strikes named"
+    description: the proposed column and its rationale; strikes named
     template: choice-with-rationale
     options:
       - patch

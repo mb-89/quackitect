@@ -20,7 +20,7 @@ evidence:
   - name: build_machine
     description: "the seeded chunk drawing: chunks, dependencies, realization kinds"
   - name: promotions_placed
-    description: "promoted spike output positioned, or none"
+    description: promoted spike output positioned, or none
 major: full
 minor: full
 patch: none

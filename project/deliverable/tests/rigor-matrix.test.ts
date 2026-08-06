@@ -12,9 +12,47 @@ import { ALL_COLUMNS, CHANGE_COLUMNS, compileColumn, readRigorMatrix } from "../
 
 const ROOT = join(import.meta.dirname, "..", "..", "..");
 
+// EVERY JOIN DECIDES ABOUT ITS BAR (owner ruling 2026-08-06).
+//
+// A state with two or more inputs meets them as an AND only when a busbar is
+// authored above it. Without one they are an OR, and any single arriving
+// input releases the state. Both readings are legal and the bar is what says
+// which.
+//
+// What is NOT legal is a multi-input row where nobody decided. A reader
+// cannot tell the two apart, and the day this went unchecked the panel
+// reported green over work nobody had done.
+test("every multi-input row has decided about its busbar", () => {
+  const m = readRigorMatrix(ROOT);
+  const undecided = m.rows.filter((r) => r.depends_on.length >= 2 && !r.busbar).map((r) => r.name);
+  assert.deepEqual(undecided, [], "a row with several inputs declares busbar: true, or is re-cut to one input");
+});
+
+// THE BAR AND THE CHECK READ ONE FACT. The authored declaration rides the
+// compiled state, so the drawing and the submit cannot disagree. They
+// disagreed once: both keyed off kind === "gate", which made them agree with
+// each other and be wrong together.
+test("compileColumn: the authored busbar rides the compiled state", () => {
+  const decl = compileColumn(readRigorMatrix(ROOT), "major");
+  assert.equal(decl.states.find((s) => s.id === "gate-inputs")?.busbar, true, "a gate collects all its inputs, and now says so out loud");
+  assert.equal(decl.states.find((s) => s.id === "generalize-use-cases")?.busbar, false, "one input needs no bar");
+});
+
+// A SINGLE INPUT STILL BINDS, and that was the case standing wide open. No
+// bar could have saved generalize-use-cases and no OR excused it, because
+// nothing checked a work state's inputs at all.
+test("generalize-use-cases takes exactly one input, and it is write-stories", () => {
+  const decl = compileColumn(readRigorMatrix(ROOT), "major");
+  const feeders = decl.states.filter((s) => s.edges.some((e) => e.to === "generalize-use-cases" && e.role === "normal")).map((s) => s.id);
+  assert.deepEqual(feeders, ["write-stories"]);
+});
+
 test("readMatrix: the real matrix is complete", () => {
   const m = readRigorMatrix(ROOT);
-  assert.equal(m.rows.length, 50);
+  // 51 since identify-assumptions split off probe-assumptions (owner ruling
+  // 2026-08-06): probing assumed somebody had written assumptions, and
+  // nothing forced anybody to.
+  assert.equal(m.rows.length, 51);
   for (const row of m.rows) {
     for (const col of ALL_COLUMNS) {
       const cell = m.cells.get(row.name)?.get(col);
@@ -45,8 +83,8 @@ test("compileColumn major: every row seeds; the machine validates", () => {
   const m = readRigorMatrix(ROOT);
   const decl = compileColumn(m, "major");
   validateMachine(decl);
-  // 50 rows + the mechanical start.
-  assert.equal(decl.states.length, 51);
+  // 51 rows + the mechanical start.
+  assert.equal(decl.states.length, 52);
   // Only a state that RUNS a seeded machine descends; authoring states do not.
   assert.ok(decl.states.some((s) => s.id === "build-steps" && s.submachine === "build-chunks"));
   assert.ok(decl.states.some((s) => s.id === "run-spikes" && s.submachine === "spikes"));
@@ -82,8 +120,10 @@ test("compileColumn patch: struck states vanish and dependencies contract", () =
   assert.deepEqual(incoming("write-requirements"), ["frame-delta", "log-risks"]);
   // author-tests contracts through the whole struck M4-M6 stretch.
   assert.deepEqual(incoming("author-tests"), ["probe-assumptions", "write-requirements"]);
-  // 18 applied rows + start.
-  assert.equal(decl.states.length, 19);
+  // 19 applied rows + start. identify-assumptions applies at patch too: when a
+  // patch exists BECAUSE something stopped holding, that is an assumption
+  // turning into an issue, and it is the one case patch-size must record.
+  assert.equal(decl.states.length, 20);
 });
 
 test("compileColumn: the verification loop compiles as fallback and recovery", () => {
@@ -129,8 +169,8 @@ test("compileColumn minor: the tailoring strikes exactly the M4-M5 exploration",
   ]) {
     assert.ok(!ids.has(struck), `minor should strike ${struck}`);
   }
-  // 41 applied rows + start (run-spikes rides rank-unknowns into minor).
-  assert.equal(decl.states.length, 42);
+  // 42 applied rows + start (run-spikes rides rank-unknowns into minor).
+  assert.equal(decl.states.length, 43);
 });
 
 test("the columns are monotone: what a smaller column walks, every larger column walks", () => {

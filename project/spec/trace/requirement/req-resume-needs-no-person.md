@@ -1,10 +1,10 @@
 ---
 id: req-resume-needs-no-person
 type: "[[requirement]]"
-statement: "When a person returns to the product after an absence, the panel shall show them where everything stands with zero questions to another person."
+statement: When a person returns to the product after an absence, the panel shall show them where everything stands with zero questions to another person.
 kind: quality
 verify_method: demonstration
-breaks_if_removed: "Coming back costs a conversation with whoever was here last, and unattended work stops being safe to leave."
+breaks_if_removed: Coming back costs a conversation with whoever was here last, and unattended work stops being safe to leave.
 refines:
   - uc-resume-after-an-absence
 source_refs:

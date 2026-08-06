@@ -102,6 +102,20 @@ export const STANDARD_ROUNDS: EvidenceField[] = [
     required: true,
     template: "findings",
   },
+  // ASKED AT EVERY GATE, SO NOTHING IS DROPPED (owner ruling 2026-08-06).
+  // A review is where somebody has just looked hard at the work, which is the
+  // moment a risk or an assumption is most visible and least likely to be
+  // written down. Waiting for the state that owns the register is how an
+  // entry is lost. NONE IS A LEGAL ANSWER and most gates will give it; the
+  // cost of asking is one line, and the cost of not asking is an assumption
+  // nobody records until it breaks.
+  {
+    name: "raid_additions",
+    description:
+      "Anything this review adds to the RAID register, as raid node references — a risk, an assumption, an issue, a dependency. Look especially for ASSUMPTIONS: something this milestone is treating as true without having established it. `none` is a legal answer.",
+    required: true,
+    template: "refs",
+  },
   {
     name: "verdict",
     description: "The gate's ruling with its rationale. An override is logged WITH its dissent, never as a clean pass.",

@@ -5,8 +5,10 @@ id_prefix: sty-
 folder: project/spec/trace/story
 sections:
   - Deck
-applies_rigor: [systematic]
-applies_type: [default]
+applies_rigor:
+  - systematic
+applies_type:
+  - default
 ---
 
 # story — one concrete pass through the product, told as a deck

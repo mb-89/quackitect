@@ -1,10 +1,10 @@
 ---
 id: req-gate-needs-a-persons-verdict
 type: "[[requirement]]"
-statement: "When the walk reaches a gate, the engine shall hold the walk until a person's verdict is recorded."
+statement: When the walk reaches a gate, the engine shall hold the walk until a person's verdict is recorded.
 kind: functional
 verify_method: test
-breaks_if_removed: "An agent blesses its own work and the gate stops meaning anything."
+breaks_if_removed: An agent blesses its own work and the gate stops meaning anything.
 refines:
   - uc-adjudicate-a-gate
   - uc-land-work-on-trunk

@@ -1,10 +1,10 @@
 ---
 id: req-acts-carry-role-and-channel
 type: "[[requirement]]"
-statement: "The engine shall stamp every recorded act with the acting role and the arrival channel, and with zero personal identifiers."
+statement: The engine shall stamp every recorded act with the acting role and the arrival channel, and with zero personal identifiers.
 kind: quality
 verify_method: test
-breaks_if_removed: "Nobody can say who authorized what, and the authorization strength of every grant is unknowable."
+breaks_if_removed: Nobody can say who authorized what, and the authorization strength of every grant is unknowable.
 refines:
   - uc-stay-auditable
   - uc-adjudicate-a-gate

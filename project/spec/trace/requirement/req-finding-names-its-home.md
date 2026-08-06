@@ -1,10 +1,10 @@
 ---
 id: req-finding-names-its-home
 type: "[[requirement]]"
-statement: "When the sweep reports a finding, the finding shall name the file that carries the drift."
+statement: When the sweep reports a finding, the finding shall name the file that carries the drift.
 kind: functional
 verify_method: inspection
-breaks_if_removed: "Fixes land beside the drift instead of on it; workarounds pile up where the source stays wrong."
+breaks_if_removed: Fixes land beside the drift instead of on it; workarounds pile up where the source stays wrong.
 refines:
   - uc-let-the-system-catch-up
 source_refs:

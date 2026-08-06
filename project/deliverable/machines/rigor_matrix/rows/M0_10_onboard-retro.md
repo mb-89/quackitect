@@ -8,24 +8,24 @@ same_as: retro
 depends_on: []
 evidence:
   - name: field_feedback
-    description: "what came back from the field, or an explicit \"nothing yet\""
+    description: what came back from the field, or an explicit "nothing yet"
   - name: notes_drained
-    description: "what happened to each pending note - built, dropped as obsolete, carried into this iteration, or parked with its ready-when"
+    description: what happened to each pending note - built, dropped as obsolete, carried into this iteration, or parked with its ready-when
     template: per-item
     items:
-      - "$inbox"
+      - $inbox
   - name: call_log_mined
-    description: "counts and rejection clauses since the last retro, one lead per line"
+    description: counts and rejection clauses since the last retro, one lead per line
     template: list
   - name: waste_leads
-    description: "rework or waste found in the record"
+    description: rework or waste found in the record
     template: list
     required: false
   - name: promotions
-    description: "local changes worth promoting to the template they came from, one per line, or none-found stated"
+    description: local changes worth promoting to the template they came from, one per line, or none-found stated
     template: list
   - name: process_stale
-    description: "the standing state-of-the-art check on the process itself"
+    description: the standing state-of-the-art check on the process itself
 major: full
 minor: full
 patch: tailored

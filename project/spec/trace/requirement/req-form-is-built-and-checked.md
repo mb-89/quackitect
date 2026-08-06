@@ -1,10 +1,10 @@
 ---
 id: req-form-is-built-and-checked
 type: "[[requirement]]"
-statement: "When a state owes evidence, the engine shall build the form itself and shall stamp the returned claim only where every field's shape passes."
+statement: When a state owes evidence, the engine shall build the form itself and shall stamp the returned claim only where every field's shape passes.
 kind: functional
 verify_method: test
-breaks_if_removed: "Forms drift per author and a claim stamps itself, so the evidence stops meaning one thing."
+breaks_if_removed: Forms drift per author and a claim stamps itself, so the evidence stops meaning one thing.
 refines:
   - uc-take-a-step
 source_refs:

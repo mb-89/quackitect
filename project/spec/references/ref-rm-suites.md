@@ -4,7 +4,11 @@ title: Requirements-management suites as prior art
 kind: web
 url: https://www.jamasoftware.com/blog/ai-requirements-management/
 accessed: 2026-08-04
-tags: [prior-art, requirements, governance, input-quality]
+tags:
+  - prior-art
+  - requirements
+  - governance
+  - input-quality
 ---
 
 The classical requirements-management class: Jama Connect, Siemens Polarion, IBM DOORS Next, Codebeamer.

@@ -17,15 +17,15 @@ legal_tools:
   - se_answer
 evidence:
   - name: choice_traced
-    description: "the winner traced to the weighted criteria; both Pugh runs recorded where status-quo was used"
+    description: the winner traced to the weighted criteria; both Pugh runs recorded where status-quo was used
   - name: sensitivity_ruled
-    description: "the verdict with tripwires in RAID"
+    description: the verdict with tripwires in RAID
   - name: matrix_review
     description: "the baseline matrices reviewed: decomposition, clustering, allocation, interfaces"
   - name: evaluation_recorded
-    description: "every quality scenario addressed or flagged"
+    description: every quality scenario addressed or flagged
   - name: adrs_traced
-    description: "every deciding ADR addresses its requirement"
+    description: every deciding ADR addresses its requirement
 major: full
 minor: tailored
 patch: none

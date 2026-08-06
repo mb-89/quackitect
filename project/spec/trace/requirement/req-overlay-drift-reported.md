@@ -1,10 +1,10 @@
 ---
 id: req-overlay-drift-reported
 type: "[[requirement]]"
-statement: "When the loaded engine no longer matches what the overlay or the vendored folder expects, the engine shall report every diverged identity and path instead of serving a default."
+statement: When the loaded engine no longer matches what the overlay or the vendored folder expects, the engine shall report every diverged identity and path instead of serving a default.
 kind: functional
 verify_method: test
-breaks_if_removed: "An engine update silently swaps a builder's method back to the shipped one, and nobody sees it happen."
+breaks_if_removed: An engine update silently swaps a builder's method back to the shipped one, and nobody sees it happen.
 refines:
   - uc-vendor-and-overlay
 source_refs:

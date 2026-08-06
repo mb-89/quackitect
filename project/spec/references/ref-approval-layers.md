@@ -4,7 +4,10 @@ url: https://velt.dev/blog/why-ai-agents-need-approval-layer
 kind: informative
 version: "2026"
 accessed: 2026-08-04
-tags: [prior-art, approval, governance]
+tags:
+  - prior-art
+  - approval
+  - governance
 ---
 A 2026 product category: approval infrastructure routing high-stakes AGENT ACTIONS through human review — gate types, RACI mappings, escalation SLAs, audit-trail schemas, driven by the EU AI Act, ISO 42001 and the NIST AI RMF demanding demonstrable human oversight. Representative besides the primary link: the agentic-workflow gate framework (digitalapplied.com), approval-workflow guides (waxell.ai), architecture guides (stackai.com).
 

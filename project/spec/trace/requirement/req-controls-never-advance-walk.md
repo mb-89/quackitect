@@ -1,10 +1,10 @@
 ---
 id: req-controls-never-advance-walk
 type: "[[requirement]]"
-statement: "The engine shall advance the walk only on a driver's pull, with zero advances caused by a control movement."
+statement: The engine shall advance the walk only on a driver's pull, with zero advances caused by a control movement.
 kind: functional
 verify_method: test
-breaks_if_removed: "Raising the dial wakes an absent agent, and the person's hand can race the walk."
+breaks_if_removed: Raising the dial wakes an absent agent, and the person's hand can race the walk.
 refines:
   - uc-set-the-autonomy
 source_refs:

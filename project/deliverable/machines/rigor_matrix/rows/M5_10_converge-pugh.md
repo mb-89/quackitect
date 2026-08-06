@@ -17,9 +17,9 @@ legal_tools:
   - se_answer
 evidence:
   - name: matrix_runs
-    description: "the recorded runs with datum choices"
+    description: the recorded runs with datum choices
   - name: winner
-    description: "the selected candidate and the why beyond the arithmetic"
+    description: the selected candidate and the why beyond the arithmetic
 major: full
 minor: none
 patch: none

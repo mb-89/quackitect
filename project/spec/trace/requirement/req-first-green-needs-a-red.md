@@ -1,10 +1,10 @@
 ---
 id: req-first-green-needs-a-red
 type: "[[requirement]]"
-statement: "If a test reaches its first green with no recorded red and no recorded exemption, then the engine shall withhold the verdict and flag the test."
+statement: If a test reaches its first green with no recorded red and no recorded exemption, then the engine shall withhold the verdict and flag the test.
 kind: functional
 verify_method: test
-breaks_if_removed: "A test that never failed proves nothing, and a fabricated pass enters the record as an answer."
+breaks_if_removed: A test that never failed proves nothing, and a fabricated pass enters the record as an answer.
 refines:
   - uc-answer-a-question-with-tests
 source_refs:

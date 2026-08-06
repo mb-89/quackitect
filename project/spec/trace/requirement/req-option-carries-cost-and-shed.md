@@ -1,10 +1,10 @@
 ---
 id: req-option-carries-cost-and-shed
 type: "[[requirement]]"
-statement: "While any standing option lacks its cost entry or its shed entry, the engine shall keep the choosing step closed."
+statement: While any standing option lacks its cost entry or its shed entry, the engine shall keep the choosing step closed.
 kind: functional
 verify_method: test
-breaks_if_removed: "Options carry no price, so the choice is made against alternatives that were never real."
+breaks_if_removed: Options carry no price, so the choice is made against alternatives that were never real.
 refines:
   - uc-diverge-before-deciding
 source_refs:

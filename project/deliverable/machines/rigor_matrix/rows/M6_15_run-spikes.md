@@ -1,7 +1,7 @@
 ---
 kind: matrix-row
 name: run-spikes
-statement: "The placeholder the seeded spike machine fills - one timeboxed spike per chosen unknown, parallel."
+statement: The placeholder the seeded spike machine fills - one timeboxed spike per chosen unknown, parallel.
 state_kind: work
 filled_by: agent
 depends_on:

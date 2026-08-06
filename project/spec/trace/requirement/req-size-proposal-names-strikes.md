@@ -1,10 +1,10 @@
 ---
 id: req-size-proposal-names-strikes
 type: "[[requirement]]"
-statement: "When a change size is proposed for an iteration, the product shall present the proposal with its reasoning and the cells each smaller column strikes."
+statement: When a change size is proposed for an iteration, the product shall present the proposal with its reasoning and the cells each smaller column strikes.
 kind: functional
 verify_method: test
-breaks_if_removed: "The person blesses a size blind; struck cells surface only after the walk."
+breaks_if_removed: The person blesses a size blind; struck cells surface only after the walk.
 refines:
   - uc-open-an-iteration
 source_refs:

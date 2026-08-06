@@ -1,10 +1,10 @@
 ---
 id: req-land-demands-fresh-green
 type: "[[requirement]]"
-statement: "When the walk reaches the land gate, the engine shall run the full battery to its end and refuse the advance while any test fails."
+statement: When the walk reaches the land gate, the engine shall run the full battery to its end and refuse the advance while any test fails.
 kind: functional
 verify_method: test
-breaks_if_removed: "Red work reaches trunk behind a stale green verdict."
+breaks_if_removed: Red work reaches trunk behind a stale green verdict.
 refines:
   - uc-land-work-on-trunk
   - uc-let-the-system-catch-up

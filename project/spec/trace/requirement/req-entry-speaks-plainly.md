@@ -1,10 +1,10 @@
 ---
 id: req-entry-speaks-plainly
 type: "[[requirement]]"
-statement: "The entry documents shall carry zero bare method terms, with every method term present linked to its definition."
+statement: The entry documents shall carry zero bare method terms, with every method term present linked to its definition.
 kind: quality
 verify_method: inspection
-breaks_if_removed: "Newcomers bounce off the front door, and the i17 red-team and i19 cold-read rework repeats."
+breaks_if_removed: Newcomers bounce off the front door, and the i17 red-team and i19 cold-read rework repeats.
 refines:
   - uc-stay-learnable
 source_refs:

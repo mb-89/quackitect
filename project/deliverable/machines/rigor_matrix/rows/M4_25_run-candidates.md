@@ -1,7 +1,7 @@
 ---
 kind: matrix-row
 name: run-candidates
-statement: "The placeholder the seeded candidate machine fills - one parallel compose state per shortlisted combination."
+statement: The placeholder the seeded candidate machine fills - one parallel compose state per shortlisted combination.
 state_kind: work
 filled_by: agent
 depends_on:

@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "DSM tearing - on an already-partitioned DSM, propose the minimal set of feedback (backward) edges to break so the remaining structure reads as a clean layering; the residual cycles are the tears."
+statement: DSM tearing - on an already-partitioned DSM, propose the minimal set of feedback (backward) edges to break so the remaining structure reads as a clean layering; the residual cycles are the tears.
 source: ref-structural-complexity-management
 ---
 

@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "DSM partitioning (triangularization/sequencing) - reorder a DSM's rows and columns to push dependencies to one side of the diagonal, exposing a dependency layering or sequence."
+statement: DSM partitioning (triangularization/sequencing) - reorder a DSM's rows and columns to push dependencies to one side of the diagonal, exposing a dependency layering or sequence.
 source: ref-structural-complexity-management
 ---
 

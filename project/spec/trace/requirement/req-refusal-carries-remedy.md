@@ -1,10 +1,10 @@
 ---
 id: req-refusal-carries-remedy
 type: "[[requirement]]"
-statement: "When the engine refuses a call, it shall answer with a typed refusal whose remedy, executed unchanged, is accepted on the next call."
+statement: When the engine refuses a call, it shall answer with a typed refusal whose remedy, executed unchanged, is accepted on the next call.
 kind: interface
 verify_method: test
-breaks_if_removed: "A refusal becomes a dead end instead of a redirection, and the walk stalls on every wrong turn."
+breaks_if_removed: A refusal becomes a dead end instead of a redirection, and the walk stalls on every wrong turn.
 refines:
   - uc-take-a-step
   - uc-stay-recoverable
@@ -18,7 +18,7 @@ source_refs:
   - stk-agent
   - uc-take-a-step step 3
   - ".se/req-mine-v1.md: the lane — mediated I/O"
-  - "- \\\".se/req-mine-v2.md: the edit model and the file lane"
+  - '- \".se/req-mine-v2.md: the edit model and the file lane'
 priority: must
 ---
 

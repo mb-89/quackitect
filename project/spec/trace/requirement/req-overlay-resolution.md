@@ -1,10 +1,10 @@
 ---
 id: req-overlay-resolution
 type: "[[requirement]]"
-statement: "When a builder overlay carries a card for an identity the engine also ships, the engine shall serve the overlay's card at every point that identity is resolved."
+statement: When a builder overlay carries a card for an identity the engine also ships, the engine shall serve the overlay's card at every point that identity is resolved.
 kind: functional
 verify_method: test
-breaks_if_removed: "A builder's own method silently loses to the engine's, and layering becomes forking."
+breaks_if_removed: A builder's own method silently loses to the engine's, and layering becomes forking.
 refines:
   - uc-vendor-and-overlay
 source_refs:

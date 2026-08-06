@@ -10,7 +10,7 @@ depends_on:
 floor: true
 evidence:
   - name: battery
-    description: "the run reference and its verdict"
+    description: the run reference and its verdict
 major: full
 minor: full
 patch: full

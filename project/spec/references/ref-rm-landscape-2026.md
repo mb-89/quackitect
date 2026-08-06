@@ -1,7 +1,7 @@
 ---
 id: ref-rm-landscape-2026
 kind: reference
-statement: "Requirements-management tooling as it stands in 2026 — the mature market this product borrows its trace shape from, scanned live at gate-inputs."
+statement: Requirements-management tooling as it stands in 2026 — the mature market this product borrows its trace shape from, scanned live at gate-inputs.
 scanned: 2026-08-06
 scanned_at: i1/gate-inputs
 ---

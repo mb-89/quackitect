@@ -1,10 +1,10 @@
 ---
 id: req-answer-recorded-with-question
 type: "[[requirement]]"
-statement: "When a person's direct question is answered, the engine shall record the question and its answer as two separate fields in one log entry."
+statement: When a person's direct question is answered, the engine shall record the question and its answer as two separate fields in one log entry.
 kind: functional
 verify_method: test
-breaks_if_removed: "The answer lives only in chat and a lost turn erases it."
+breaks_if_removed: The answer lives only in chat and a lost turn erases it.
 refines:
   - uc-research-and-record-an-answer
 source_refs:

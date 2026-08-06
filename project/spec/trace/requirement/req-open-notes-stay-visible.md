@@ -1,10 +1,10 @@
 ---
 id: req-open-notes-stay-visible
 type: "[[requirement]]"
-statement: "The engine shall show every undrained note in the inbox count and the feed until a recorded disposition removes it."
+statement: The engine shall show every undrained note in the inbox count and the feed until a recorded disposition removes it.
 kind: functional
 verify_method: test
-breaks_if_removed: "Captured findings vanish from sight, and the inbox becomes a write-only hole."
+breaks_if_removed: Captured findings vanish from sight, and the inbox becomes a write-only hole.
 refines:
   - uc-capture-a-stray
 source_refs:

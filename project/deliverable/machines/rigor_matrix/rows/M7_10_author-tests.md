@@ -18,7 +18,7 @@ legal_tools:
   - se_run
 evidence:
   - name: checks
-    description: "every in-scope requirement with its authored check"
+    description: every in-scope requirement with its authored check
 major: full
 minor: full
 patch: tailored

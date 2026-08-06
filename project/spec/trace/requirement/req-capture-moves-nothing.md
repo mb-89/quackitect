@@ -1,10 +1,10 @@
 ---
 id: req-capture-moves-nothing
 type: "[[requirement]]"
-statement: "When a stray is captured, the engine shall leave the walk unchanged, with zero state transitions and zero plan changes caused by the capture."
+statement: When a stray is captured, the engine shall leave the walk unchanged, with zero state transitions and zero plan changes caused by the capture.
 kind: functional
 verify_method: test
-breaks_if_removed: "Capturing a finding abandons the state in hand — the exact failure the note lane exists to prevent."
+breaks_if_removed: Capturing a finding abandons the state in hand — the exact failure the note lane exists to prevent.
 refines:
   - uc-capture-a-stray
   - uc-change-the-method-mid-walk

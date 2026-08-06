@@ -1,10 +1,10 @@
 ---
 id: req-reload-restarts-clean
 type: "[[requirement]]"
-statement: "When a reload is requested, the engine shall restart from the sources as they stand on disk and shall recompute the walk's position from recorded evidence."
+statement: When a reload is requested, the engine shall restart from the sources as they stand on disk and shall recompute the walk's position from recorded evidence.
 kind: functional
 verify_method: test
-breaks_if_removed: "A reload serves half-old content from a half-remembered position, which is worse than not reloading."
+breaks_if_removed: A reload serves half-old content from a half-remembered position, which is worse than not reloading.
 refines:
   - uc-change-the-method-mid-walk
 source_refs:

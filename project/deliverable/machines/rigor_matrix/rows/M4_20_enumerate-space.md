@@ -22,7 +22,7 @@ evidence:
   - name: chart
     description: "the morphological chart: rows, options, pruned cells with reasons"
   - name: shortlist
-    description: "the seeded combinations, one line each"
+    description: the seeded combinations, one line each
 major: full
 minor: none
 patch: none

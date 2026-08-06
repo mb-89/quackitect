@@ -1,10 +1,10 @@
 ---
 id: req-tour-admits-absence
 type: "[[requirement]]"
-statement: "If zero instances of a stop's kind exist, then the stop shall state the absence and show no invented example."
+statement: If zero instances of a stop's kind exist, then the stop shall state the absence and show no invented example.
 kind: functional
 verify_method: test
-breaks_if_removed: "The tour invents records that do not exist; the newcomer's first lesson is a fabrication."
+breaks_if_removed: The tour invents records that do not exist; the newcomer's first lesson is a fabrication.
 refines:
   - uc-learn-the-machinery
 source_refs:
