@@ -129,11 +129,15 @@ describe("typed references", { concurrency: true }, () => {
       editor: "list",
       line_pattern: "",
       line_help: "",
-      placeholder: "{folder}/{prefix}something.md",
+      placeholder: "path from the project root, e.g. {folder}/{prefix}something.md",
       description: "one {type} REFERENCE per line",
     };
     const h = fieldHint(root, meta, "neighbour");
-    assert.equal(h.placeholder, "project/spec/trace/neighbour/nbr-something.md", "the placeholder TEACHES the path shape by being one");
+    assert.equal(
+      h.placeholder,
+      "path from the project root, e.g. project/spec/trace/neighbour/nbr-something.md",
+      "it SAYS where the path is measured from, and shows one",
+    );
     assert.equal(h.description, "one neighbour REFERENCE per line");
     assert.equal(h.of_template, "project/deliverable/machines/items/neighbour.md", "the reader is one click from the rules");
   });
@@ -141,10 +145,10 @@ describe("typed references", { concurrency: true }, () => {
   test("a field with no declared type still reads, and links nowhere", () => {
     const h = fieldHint(
       corpus(),
-      { editor: "list", line_pattern: "", line_help: "", placeholder: "{folder}/{prefix}something.md", description: "" },
+      { editor: "list", line_pattern: "", line_help: "", placeholder: "e.g. {folder}/{prefix}something.md", description: "" },
       "",
     );
-    assert.equal(h.placeholder, "project/spec/trace/something.md", "still a path, and it still starts project/");
+    assert.equal(h.placeholder, "e.g. project/spec/trace/something.md", "still a path, and it still starts project/");
     assert.equal(h.of_template, "", "there is no template to point at");
   });
 
@@ -163,7 +167,8 @@ describe("typed references", { concurrency: true }, () => {
   // THE SHIPPED TEMPLATE, not a fixture: the real refs.md must stay generic.
   test("the shipped refs template names no concrete type", () => {
     const meta = templateMeta(fileURLToPath(new URL("../../..", import.meta.url)), "refs");
-    assert.match(meta.placeholder, /^\{folder\}\//, "the placeholder is a token, and it opens with the folder so it starts project/");
+    assert.match(meta.placeholder, /\{folder\}\//, "the placeholder is a token, not one field's example");
+    assert.match(meta.placeholder, /project root/, "and it SAYS where the path is measured from");
     assert.doesNotMatch(
       meta.placeholder + meta.description + meta.line_help,
       /value-prop|neighbour/,
