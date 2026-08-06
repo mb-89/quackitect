@@ -2,7 +2,7 @@
 // it accepts, and the check refuses anything else. General: any field, any
 // item type. Concurrent: every case builds its own root.
 import { strict as assert } from "node:assert";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -162,6 +162,16 @@ describe("typed references", { concurrency: true }, () => {
   test("expansion leaves text with no tokens alone, and an empty string empty", () => {
     assert.equal(expandHint(corpus(), "plain words", "value-prop"), "plain words");
     assert.equal(expandHint(corpus(), "", "value-prop"), "");
+  });
+
+  // THE SEAM, both legs (ux.md). Two green halves are not a green wire: the
+  // payload must CARRY the hint, and the surface must DRAW it. This exact
+  // wire shipped half-done and the owner saw a raw {token} on screen.
+  test("the mirror's own source reads field_hints and draws the template link", () => {
+    const src = readFileSync(fileURLToPath(new URL("../engine/render.ts", import.meta.url)), "utf8");
+    assert.match(src, /field_hints/, "the surface reads the resolved hints");
+    assert.match(src, /hint\.placeholder/, "the empty row shows the RESOLVED placeholder, never the raw token");
+    assert.match(src, /hint\.of_template/, "and the item template is reachable from the field");
   });
 
   // THE SHIPPED TEMPLATE, not a fixture: the real refs.md must stay generic.
