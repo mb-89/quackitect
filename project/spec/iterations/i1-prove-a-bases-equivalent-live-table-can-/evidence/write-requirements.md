@@ -1,7 +1,6 @@
 ---
 form: write-requirements
-by: agent
-signed_off: 2026-08-06T15:47:53.175Z
+signed_off: 2026-08-06
 authors: agent
 files:
 ---

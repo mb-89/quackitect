@@ -1,7 +1,6 @@
 ---
 form: write-stories
-suspect: "no longer passes its form — stories: each value-prop is covered — nothing here refines vp-holds-its-qualities"
-signed_off_was: 2026-08-06T12:31:04.626Z
+signed_off: 2026-08-06
 authors: agent
 files:
 ---
@@ -41,6 +40,11 @@ Twenty-one. Six killers, and the seven added after the first pass are not among 
 
 ## stories
 
+- sty-auditability
+- sty-learnability
+- sty-maintainability
+- sty-portability
+- sty-recoverability
 - sty-ramp-up
 - sty-take-the-tour
 - sty-next-iteration

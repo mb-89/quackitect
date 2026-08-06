@@ -1,6 +1,6 @@
 ---
 form: generalize-use-cases
-suspect: "no longer passes its form — use_cases: each story is covered — nothing here refines sty-auditability · sty-learnability · sty-maintainability · sty-portability · sty-recoverability"
+signed_off: 2026-08-06
 authors: agent
 files:
 ---
@@ -21,6 +21,11 @@ SO THREE THINGS WERE BUILT BEFORE ANY USE CASE WAS WRITTEN. The use-case item te
 
 ## use_cases
 
+- uc-stay-auditable
+- uc-stay-learnable
+- uc-stay-maintainable
+- uc-stay-portable
+- uc-stay-recoverable
 - uc-install-quackitect
 - uc-learn-the-machinery
 - uc-get-work-routed

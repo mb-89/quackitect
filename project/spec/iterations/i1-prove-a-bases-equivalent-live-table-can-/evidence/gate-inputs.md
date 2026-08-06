@@ -1,6 +1,5 @@
 ---
 form: gate-inputs
-suspect: "rests on write-stories, generalize-use-cases, which fell"
 authors: agent
 files:
 ---
