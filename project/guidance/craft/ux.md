@@ -1,6 +1,14 @@
 ---
 id: ux
 statement: How to build an interface. The owner owns visual design; these are the rules a build must not break.
+applies_to:
+  - work
+  - overhaul
+  - build-steps
+  - verification
+  - fix-findings
+  - gate-implementation
+  - finalize-docs
 ---
 
 # ux — how you build an interface

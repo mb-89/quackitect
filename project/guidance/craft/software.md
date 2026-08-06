@@ -1,6 +1,18 @@
 ---
 id: software
-statement: How to write code and record work. The universal rules; the project's own rulings live in method/engineering.md.
+statement: How to write code and record work. The universal rules; the project's own rulings live in project/guidance/method/engineering.md.
+applies_to:
+  - work
+  - overhaul
+  - run-spikes
+  - author-tests
+  - plan-build
+  - observe-red
+  - build-steps
+  - verification
+  - fix-findings
+  - gate-implementation
+  - package
 ---
 
 # software — how you write it

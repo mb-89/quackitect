@@ -21,7 +21,7 @@ evidence:
   - name: stories_generalized
     description: "every story inside a use case"
   - name: roles_covered
-    description: "no stakeholder role left out; tensions named"
+    description: "no stakeholder role left out; every value prop's audience resolves to a role that exists"
   - name: excluded_stated
     description: "the binding excluded-use list exists"
   - name: examples_formulated

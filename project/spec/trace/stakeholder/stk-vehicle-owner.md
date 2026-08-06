@@ -2,6 +2,9 @@
 id: stk-vehicle-owner
 type: "[[stakeholder]]"
 statement: A builder who runs the method on their own product, and needs their own guidance to stay their own.
+role_class: acquirer
+dicet: customer
+disposition: "+"
 interest: 0.7
 influence: 0.4
 weight: 0.6

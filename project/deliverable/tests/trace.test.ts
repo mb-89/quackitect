@@ -79,7 +79,44 @@ describe("the radial trace graph", { concurrency: true }, () => {
   });
 
   test("adding a LEVEL is one more ring and nothing else", () => {
-    assert.equal(layoutTrace([prop("vp-a")]).rings.length, TRACE_LEVELS.length);
+    // One node per level, so every level is live and every ring is earned.
+    const all: TraceNode[] = [prop("vp-a")];
+    let parent = "vp-a";
+    for (const t of TRACE_LEVELS.slice(1)) {
+      all.push(child(`n-${t}`, t, parent));
+      parent = `n-${t}`;
+    }
+    assert.equal(layoutTrace(all).rings.length, TRACE_LEVELS.length);
+  });
+
+  // AN EMPTY RING IS NOISE (owner, 2026-08-06). A level nothing has reached
+  // draws a circle around nothing and pushes the rest inward.
+  test("a level with nothing on it draws NO ring, and gets one the moment it does", () => {
+    assert.equal(layoutTrace([prop("vp-a")]).rings.length, 1, "props alone, one ring");
+    const withStory = [prop("vp-a"), child("s-1", "story", "vp-a")];
+    assert.equal(layoutTrace(withStory).rings.length, 2, "a story earns the second");
+    assert.equal(
+      layoutTrace(withStory).nodes.some((n) => n.type === "use-case"),
+      false,
+      "and the empty levels beyond it are simply absent",
+    );
+  });
+
+  // THE SPAN IS WHAT THE ITEMS NEED (owner, 2026-08-06). Spreading them across
+  // the whole wedge flung two stories to opposite sides the moment a filter
+  // left one prop standing — the drawing changed shape without the data
+  // changing.
+  test("a filter RE-SPREADS the children rather than leaving them where they were", () => {
+    const all = [prop("vp-a"), prop("vp-b"), child("s-1", "story", "vp-a"), child("s-2", "story", "vp-a")];
+    const spread = (sel: string[]): number => {
+      const l = layoutTrace(all, sel);
+      const a = l.nodes.find((n) => n.id === "s-1");
+      const b = l.nodes.find((n) => n.id === "s-2");
+      assert.ok(a !== undefined && b !== undefined);
+      return Math.abs(Math.atan2(a.y, a.x) - Math.atan2(b.y, b.x));
+    };
+    const alone = spread(["vp-a"]);
+    assert.ok(alone < Math.PI / 2, `one prop selected must keep its stories together — got ${alone} radians apart`);
   });
 
   test("the innermost ring CLEARS the vision, whatever angle a wedge points", () => {
@@ -112,7 +149,7 @@ describe("the radial trace graph", { concurrency: true }, () => {
 
   test("a TYPE filter removes rings rather than greying them", () => {
     const all = [prop("vp-a"), child("s-1", "story", "vp-a"), child("u-1", "use-case", "s-1")];
-    assert.equal(layoutTrace(all).rings.length, TRACE_LEVELS.length, "unfiltered, every level has its ring");
+    assert.equal(layoutTrace(all).rings.length, 3, "unfiltered, every level THAT HAS A NODE has its ring");
     const only = layoutTrace(all, [], { types: ["value-prop", "use-case"] });
     assert.equal(only.rings.length, 2, "two types, two rings");
     assert.equal(

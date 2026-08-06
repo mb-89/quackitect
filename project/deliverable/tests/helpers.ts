@@ -208,15 +208,20 @@ export async function call(server: Server, name: string, args: Record<string, un
   return { isError: r.isError, body: JSON.parse(r.content[0].text) as Record<string, unknown> };
 }
 
-/** The root guidance the pull demands at entry. Anything sitting DIRECTLY in
- *  project/guidance/ is pulled ALWAYS — except a source promoted to the
- *  prompt layer (PROMPT_SOURCES in engine/promptlayer.ts), which the pull
- *  skips because it is present on every turn. A new root document joins this
- *  list or every walk in the suite stalls.
+/** The guidance the pull demands on the way to the desk — the boot reading.
+ *  A doc joins this list by being pulled at those states, or every walk in
+ *  the suite stalls waiting for a proof the suite never gives.
  *
  *  AGENTS.md, then the contract, the walk and the voice LEFT THIS LIST when
- *  they were promoted. */
-export const READ_DOCS = ["project/guidance/software.md", "project/guidance/ux.md"] as const;
+ *  they were promoted to the prompt layer.
+ *
+ *  SOFTWARE AND UX LEFT IT on 2026-08-06, when they moved out of the guidance
+ *  root behind applies_to. They bind the states that build something, and the
+ *  way to the desk passes through none of them. */
+export const READ_DOCS = ["project/guidance/method/boot.md", "project/guidance/method/front-desk.md"] as const;
+
+/** The craft guidance, and the states it binds. Pulled THERE, nowhere else. */
+export const CRAFT_DOCS = ["project/guidance/craft/software.md", "project/guidance/craft/ux.md"] as const;
 
 /** The human's side of the read proof: check every boot doc in the mirror.
  *  (The agent's side has no helper on purpose — its proofs are earned by

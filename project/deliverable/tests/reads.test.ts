@@ -6,33 +6,44 @@ import { strict as assert } from "node:assert";
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
+import { pulledFor, scanGuidance } from "../engine/pull.ts";
 import { renderMirror } from "../engine/render.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { bootedServer, call, checkDocs, freshRoot, READ_DOCS, readOne } from "./helpers.ts";
+import { bootedServer, CRAFT_DOCS, call, checkDocs, freshRoot, readOne } from "./helpers.ts";
 
 // THREE HOMES, NOT ONE (owner ruling 2026-07-29). voice.md is about HOW YOU
 // TALK. It had accumulated rules about writing SOFTWARE and building
 // INTERFACES, and a reader looking for one had to sift the other two.
 //
 // The split is only half the ruling. A guidance nobody pulls is a guidance
-// nobody reads: software and ux sit directly in project/guidance/ where the
-// pull serves them always. voice is PROMOTED: the prompt layer carries it on
-// every turn, so the pull skips it.
+// nobody reads: software and ux name the states they bind with applies_to,
+// so the pull serves them THERE and nowhere else. voice is PROMOTED: the
+// prompt layer carries it on every turn, so the pull skips it.
+//
+// THEY LEFT THE GUIDANCE ROOT (owner ruling 2026-08-06). A root doc is pulled
+// into every packet, and neither of these binds a design-input step. The step
+// that maps stakeholders was reading how to write code.
 test("the guidance splits three ways, and every home reaches the reader", () => {
   const root = freshRoot();
   const s = new Session(root);
-  const idle = s.machine.states.find((x) => x.id === "idle")!;
-  const pulled = s.pulled(s.machine, idle).map((p) => p.path);
-  for (const home of ["project/guidance/software.md", "project/guidance/ux.md"]) {
-    assert.ok(pulled.includes(home), `${home} is not pulled — a guidance nobody pulls is a guidance nobody reads`);
-    assert.ok(READ_DOCS.includes(home as (typeof READ_DOCS)[number]), `${home} is pulled but the suite never proves reading it`);
+  // THE SELECTOR IS TESTED DIRECTLY, against a state NAMED rather than found.
+  // Which states the drawn machine happens to carry is not this test's
+  // subject, and a fixture missing one would fail it for the wrong reason.
+  const docs = scanGuidance(root);
+  const at = (id: string): string[] =>
+    pulledFor(root, docs, s.machine, { id, kind: "work", tags: [] } as unknown as Parameters<typeof pulledFor>[3]).map((p) => p.path);
+  const idle = at("idle");
+  const work = at("build-steps");
+  for (const home of CRAFT_DOCS) {
+    assert.ok(!idle.includes(home), `${home} still rides every packet — it names its own states now`);
+    assert.ok(work.includes(home), `${home} is not pulled where it binds — a guidance nobody pulls is a guidance nobody reads`);
   }
-  assert.ok(!pulled.includes("project/guidance/voice.md"), "a promoted source must not also ride the wire");
+  assert.ok(!idle.includes("project/guidance/voice.md"), "a promoted source must not also ride the wire");
   const read = (p: string): string => readFileSync(join(root, ...p.split("/")), "utf8");
   const voice = read("project/guidance/voice.md");
-  const software = read("project/guidance/software.md");
-  const ux = read("project/guidance/ux.md");
+  const software = read(CRAFT_DOCS[0]);
+  const ux = read(CRAFT_DOCS[1]);
   // Each rule sits in exactly one home. Two copies is how they drift apart.
   assert.match(software, /Do not repeat \(DRY\)/, "DRY is a software rule");
   assert.match(software, /Comments and provenance/, "so is how you comment");
@@ -59,19 +70,25 @@ test("a check pins the VERSION: editing the doc unchecks it and the gate asks ag
   await s.advance();
   await s.advance();
   assert.deepEqual(s.active(), ["idle"]);
-  const idle = s.machine.states.find((x) => x.id === "expeditions")!;
-  assert.equal(s.entryReadyHuman(s.machine, idle), true, "all pulled docs checked — entry ready");
-  // The owner edits software.md mid-session: the pinned hash no longer matches.
-  appendFileSync(join(root, "project", "guidance", "software.md"), "\nEdited mid-session.\n");
-  assert.equal(s.entryReadyHuman(s.machine, idle), false, "the edited doc unchecked itself");
+  // THE DOOR IS ONE THAT PULLS SOMETHING. Since software and ux left the
+  // guidance root, a door that pulls nothing has nothing that can go stale,
+  // so the doc under test is READ OFF the door rather than named here.
+  const door = s.machine.states.find((x) => x.id === "front_desk")!;
+  const doc = s.pulled(s.machine, door).map((p) => p.path)[0];
+  assert.ok(doc !== undefined, "the door pulls guidance, or there is nothing to pin");
+  s.humanCheck(doc);
+  assert.equal(s.entryReadyHuman(s.machine, door), true, "all pulled docs checked — entry ready");
+  // The owner edits it mid-session: the pinned hash no longer matches.
+  appendFileSync(join(root, ...doc.split("/")), "\nEdited mid-session.\n");
+  assert.equal(s.entryReadyHuman(s.machine, door), false, "the edited doc unchecked itself");
   await assert.rejects(
-    () => s.advance("expeditions"),
+    () => s.advance("front_desk"),
     (e) => (e as { clause?: string }).clause === "SE-C-112",
   );
   // One fresh check of the NEW version and the walk flows again.
-  s.humanCheck("project/guidance/software.md");
-  await s.advance("expeditions");
-  assert.deepEqual(s.active(), ["expeditions/start"]);
+  s.humanCheck(doc);
+  await s.advance("front_desk");
+  assert.deepEqual(s.active(), ["front_desk"]);
 });
 
 test("THE HANDOVER: a left-behind .se/HANDOVER.md joins the reading, and is consumed by the walk", async () => {
@@ -121,9 +138,17 @@ test("THE HANDOVER: the way out writes the next one — end waits without one fr
 
 test("an edited doc drops the agent's credit: the pull asks for the reading again", async () => {
   const root = freshRoot();
+  // A DOC THAT APPLIES EVERYWHERE, written for this case. The law under test
+  // is that a DEMANDED doc going stale is demanded again, and since software
+  // and ux left the guidance root nothing else is demanded at every door.
+  writeFileSync(
+    join(root, "project", "guidance", "method", "always.md"),
+    "---\nid: always\napplies: always\nstatement: A document every state pulls.\n---\n\nThe body every door demands.\n",
+    "utf8",
+  );
   const server = await bootedServer(root);
   // The boot reading stands credited; the owner edits a pulled doc.
-  appendFileSync(join(root, "project", "guidance", "software.md"), "\nEdited mid-session.\n");
+  appendFileSync(join(root, "project", "guidance", "method", "always.md"), "\nEdited mid-session.\n");
   const again = await call(server, "se_pull", { form: { choice: "expeditions" } });
   assert.equal(again.body.pull, "read", "a stale credit is no credit — the doc is owed again");
   for (let j = 0; j < 40; j++) {
@@ -199,7 +224,9 @@ test("the mirror renders per-doc checkboxes and never locks reading itself", asy
   assert.ok(!html.includes('class="primary confirm"'), "the old one-click confirm is gone");
   // The mirror's SE_DATA carries checked per pulled doc — the human ledger.
   assert.match(html, /"checked":\s*false/);
-  s.humanCheck("project/guidance/software.md");
+  const here = (s.packet() as { states: { pulled?: { path: string }[] }[] }).states[0]?.pulled?.[0]?.path;
+  assert.ok(here !== undefined, "the state pulls a doc to check");
+  s.humanCheck(here);
   const after = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });
   assert.match(after, /"checked":\s*true/);
 });
@@ -246,7 +273,7 @@ test("THE HANDOVER RULE: the human walks boot on checkboxes, raises the slider �
   assert.deepEqual(session.active(), ["boot/prepare_idle"]);
   // The packet tells the agent what the session has checked.
   const info = session.packet() as { human_checked: string[] };
-  assert.ok(info.human_checked.includes("project/guidance/software.md"));
+  assert.ok(info.human_checked.includes("project/guidance/method/boot.md"));
   // The slider rises; the agent pulls — but its head holds none of it, so
   // the machine demands the same reading before it walks anywhere.
   session.setAutonomy(0.6);
@@ -259,7 +286,7 @@ test("THE HANDOVER RULE: the human walks boot on checkboxes, raises the slider �
     if (doc === null) break;
     served.push(doc.path);
   }
-  assert.ok(served.includes("project/guidance/software.md"), `the same list is owed: ${served.join(", ")}`);
+  assert.ok(served.includes("project/guidance/craft/software.md"), `the same list is owed: ${served.join(", ")}`);
   // Proving the last document already moves the walk, so what matters here
   // is that the reading gate is discharged — not which door comes next.
   const landed = await call(server, "se_pull");

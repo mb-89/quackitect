@@ -647,6 +647,7 @@ export function startMirror(o: MirrorOptions): Server {
       url.searchParams.get("tp") ?? undefined,
       url.searchParams.get("tt") ?? undefined,
       url.searchParams.get("tq") ?? undefined,
+      url.searchParams.get("tc") ?? undefined,
     );
     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
     res.end(html);
@@ -666,6 +667,7 @@ export function startMirror(o: MirrorOptions): Server {
       url.searchParams.get("tp") ?? undefined,
       url.searchParams.get("tt") ?? undefined,
       url.searchParams.get("tq") ?? undefined,
+      url.searchParams.get("tc") ?? undefined,
     );
     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
     res.end(page);

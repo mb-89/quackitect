@@ -38,6 +38,10 @@ export interface EvidenceField {
   guidance?: string;
   /** The table template's column names. */
   columns?: string[];
+  /** COVERAGE IS MUTUAL. Naming an item type here makes two things checkable
+   *  at once: every reference in this field refines one of that type, and
+   *  every standing node of that type is refined by one of them. */
+  covers?: string;
   /** The field's template (machines/forms/templates/<name>.md). Absent
    *  means free-form; every referenced template is a read input. */
   template?: string;

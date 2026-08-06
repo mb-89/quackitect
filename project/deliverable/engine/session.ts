@@ -434,104 +434,6 @@ export class Session {
     return { minutes, calls, was: { minutes: wasMinutes, calls: wasCalls } };
   }
 
-  /** THE MILESTONE REVIEW REPORT (owner rulings 2026-07-30): the one thing
-   *  a person reads most, so it is the gate's MECHANICAL demand. The
-   *  scaffold generates from the gate's OWN evidence fields (the rigor matrix,
-   *  live) plus v1's field-tested review tail: verify, validate, red_team,
-   *  verdict. Prefilled comments never count as content (the prefill law).
-   *
-   *  REPORT AND BLESS ARE SEPARATE THINGS. The report is the artifact; the
-   *  BLESS is the act of passing the gate on it — the tick, weighed by the
-   *  autonomy slider as ever (below the gate's 0.6 the hand is human). The
-   *  bless lands DURABLY as a sidecar pinning the report's version and
-   *  whose hand it was; an EDITED report drops its bless (one bless per
-   *  version), and a standing bless lets a re-walk pass without re-asking. */
-  private gateReportRel(gateId: string): string {
-    return `project/spec/iterations/${this.bound?.id}/reviews/${gateId}.md`;
-  }
-
-  private assertGateReport(gateId: string, s: StateDecl, channel: Channel): void {
-    const rel = this.gateReportRel(gateId);
-    const abs = join(this.bound!.path, rel);
-    // THE ROUNDS ARE NOT WRITTEN TWICE. compileMachine appends STANDARD_ROUNDS
-    // (round_0_verify, round_1_validate, round_2_red_team, verdict) to every gate's
-    // evidence_form — machines/compile.ts, the `kind === "gate"` clause — so
-    // the scaffold below already emits them once, with the fuller v1-derived
-    // wording. A second REVIEW_TAIL stood here and emitted verify/validate/
-    // red_team AGAIN: seven round sections, three of them the same round under
-    // a shorter name, every one of them required non-empty. Nobody ever hit it
-    // because no gate report has ever been written.
-    if (!existsSync(abs)) {
-      const scaffold = [
-        "---",
-        "form: milestone-review",
-        `gate: ${gateId}`,
-        "status: draft",
-        "by: ",
-        "verdict: ",
-        "---",
-        "",
-        `# ${gateId} — milestone review`,
-        "",
-        ...s.evidence_form.flatMap((f) => [`## ${f.name}`, "", `<!-- ${f.description}${f.required ? "" : " (optional)"} -->`, ""]),
-      ].join("\n");
-      throw new Rejection({
-        clause: CLAUSES.CONDITION_UNMET,
-        expected: `the milestone review report — no gate passes without one (${rel})`,
-        got: "no review report in the record",
-        remedy: {
-          tool: "se_file_write",
-          args: { path: rel, content: scaffold, base_hash: null },
-          note: "fill every section — this report is what a person reads most; a prefilled comment counts as empty until real text replaces it",
-        },
-        source: "engine/session.ts gate",
-      });
-    }
-    const raw = readFileSync(abs, "utf8");
-    // A STANDING BLESS passes at once: the sidecar pins the report's exact
-    // version — the quick re-walk the owner asked for.
-    const blessAbs = abs.replace(/\.md$/, ".bless.json");
-    const reportHash = contentHash(Buffer.from(raw, "utf8"));
-    if (existsSync(blessAbs)) {
-      try {
-        const b = JSON.parse(readFileSync(blessAbs, "utf8")) as { hash?: string };
-        if (b.hash === reportHash) return;
-      } catch {
-        // an unreadable bless is no bless — fall through and re-earn it
-      }
-    }
-    const note = parseStateNote(raw);
-    const problems: string[] = [];
-    const filledText = (name: string): string =>
-      section(note.body, name)
-        .replace(/<!--[\s\S]*?-->/g, "")
-        .trim();
-    for (const f of s.evidence_form) {
-      if (f.required && filledText(f.name) === "") problems.push(`${f.name} is empty`);
-    }
-    if (note.frontmatter.status !== "done") problems.push("status is not done");
-    const verdict = typeof note.frontmatter.verdict === "string" ? note.frontmatter.verdict.trim().toUpperCase() : "";
-    if (!verdict.startsWith("PASS"))
-      problems.push(`the verdict is "${String(note.frontmatter.verdict ?? "")}" — PASS passes, anything else holds the gate`);
-    if (problems.length > 0) {
-      throw new Rejection({
-        clause: CLAUSES.CONDITION_UNMET,
-        expected: `a complete, PASSED milestone review at ${rel}`,
-        got: problems.join(" · "),
-        remedy: {
-          tool: "se_file_read",
-          args: { path: rel },
-          note: "fill what is empty, set status: done and the verdict, then tick again",
-        },
-        source: "engine/session.ts gate",
-      });
-    }
-    // THE BLESS: this passing tick is the act, and it lands durably — the
-    // report's version pinned, the hand recorded. Below 0.6 the slider made
-    // that hand human; at or above, the delegation is stamped honestly.
-    writeFileSync(blessAbs, `${JSON.stringify({ hash: reportHash, by: channel, at: new Date().toISOString() })}\n`, "utf8");
-  }
-
   /** THE PING (owner, 2026-07-30): the agent points at a mirror surface and
    *  it pulses YELLOW in every open window — the tour's pointing finger,
    *  and "look HERE" for refusals and diffs. Targets: a card id (machine,
@@ -813,6 +715,26 @@ export class Session {
   /** Where the LANE works: the bound expedition's worktree, else the root. */
   workRoot(): string {
     return this.bound?.path ?? this.root;
+  }
+
+  /** THE CORPORA A READER MAY CHOOSE BETWEEN (owner ruling 2026-08-06).
+   *
+   *  Trunk is what has landed. An OPEN record's worktree is a full checkout,
+   *  so it carries trunk's nodes AND everything that record has authored.
+   *
+   *  A whole-corpus view belongs to no single record, so the person picks
+   *  which one they mean instead of the engine guessing — which it did three
+   *  times before this existed, differently each time. */
+  corpora(): { id: string; label: string; path: string }[] {
+    const out = [{ id: "trunk", label: "trunk", path: this.root }];
+    try {
+      for (const it of itList(this.root).filter((x) => x.open)) {
+        out.push({ id: it.id, label: it.id.split("-")[0] ?? it.id, path: it.path });
+      }
+    } catch {
+      // no iterations yet, so trunk is the whole story
+    }
+    return out;
   }
 
   /** Where the lane resolves ONE path (owner ruling 2026-07-28).
@@ -2737,10 +2659,37 @@ export class Session {
 
   /** Every trace node's id against the path that holds it, root-relative —
    *  what a surface needs to turn a reference into something clickable. */
-  private refPaths(): Record<string, string> {
+  /** WHERE THE TRACE CORPUS IS READ FROM. ONE answer, for every reader.
+   *
+   *  It used to be two. The form check read the project root while the walk
+   *  WROTE to the bound record's worktree, so a node the lane had just
+   *  authored resolved to nothing — and the green light read the root as
+   *  well, so a form could pass its own submit while the state stayed grey.
+   *  Two readers, one path, two answers, and nothing caught it.
+   *
+   *  The value is the root of the RECORD BEING CHECKED, because a standing
+   *  artifact lands on trunk when its record closes and lives in that
+   *  record's worktree until then (owner ruling 2026-08-06).
+   *
+   *  IT IS THE RECORD'S ROOT, NEVER THE SESSION'S BINDING. The green light
+   *  runs for an iteration whether or not the walk is standing in it — the
+   *  mirror renders from the desk — so reading the corpus from wherever the
+   *  session happens to be bound made the same claim green from inside the
+   *  record and grey from outside it. */
+  private traceRoot(it?: Iteration): string {
+    return it?.path ?? this.workRoot();
+  }
+
+  private refPaths(it?: Iteration): Record<string, string> {
     const out: Record<string, string> = {};
+    const root = this.traceRoot(it);
     try {
-      for (const n of loadTrace(this.root)) {
+      // THE PATH IS WRITTEN FROM THE PROJECT ROOT, because the HOST opens it
+      // from there. A node living in a record's worktree comes out under
+      // .worktrees/, which opens. The record-relative path LOOKED right and
+      // pointed into the wrong tree, so every link on an open record's form
+      // reported a file that is not there.
+      for (const n of loadTrace(root)) {
         if (n.file !== undefined) out[n.id] = relative(this.root, n.file).split(sep).join("/");
       }
     } catch {
@@ -2770,7 +2719,12 @@ export class Session {
       const body = parseStateNote(raw).body;
       for (const f of model.template.fields) fills[f.name] = stripComments(section(body, f.name)).trim();
     }
-    const tp = templateProblems(model, fills, this.root);
+    // THE FORM'S OWN RECORD, not the session's binding. The mirror renders an
+    // iteration's form from the desk with nothing bound, so resolving against
+    // the binding made a node the record owns invisible on screen while the
+    // same form passed its submit from inside the walk.
+    const forIt = this.declIteration(m);
+    const tp = templateProblems(model, fills, this.traceRoot(forIt));
     const fmData = raw === undefined ? ({} as Record<string, unknown>) : parseStateNote(raw).frontmatter;
     return {
       state_form: true,
@@ -2778,7 +2732,7 @@ export class Session {
       // A REFERENCE IS AN ADDRESS, so the surface can open it. Without the
       // path the reader sees an id and has to go hunting for the file it
       // names, which is the whole reason references were hard to review.
-      ref_paths: this.refPaths(),
+      ref_paths: this.refPaths(forIt),
       machine: m.id,
       checked: this.stateFormChecked(raw),
       active: this.stateFormActive(name, m),
@@ -2851,7 +2805,7 @@ export class Session {
         continue;
       }
       if (typeof fm.signed_off !== "string") continue;
-      const problems = claimProblems(this.root, s, body);
+      const problems = claimProblems(this.traceRoot(it), s, body);
       if (problems.length > 0 && this.suspect(it, s.id, `no longer passes its form — ${problems[0]}`)) failed.push(s.id);
     }
     if (failed.length === 0) return;
@@ -2895,7 +2849,7 @@ export class Session {
         if (typeof fm.signed_off !== "string") continue;
         // AND IT MUST STILL PASS ITS OWN FORM. A stamp says it passed once;
         // green says it passes NOW.
-        if (claimProblems(this.root, s, note.body).length > 0) continue;
+        if (claimProblems(this.traceRoot(it), s, note.body).length > 0) continue;
         if (s.kind === "gate" && !(typeof fm.bless === "string" && fm.bless.startsWith("blessed"))) continue;
         done.push(s.id);
       } catch {
@@ -4123,14 +4077,7 @@ export class Session {
     const subTarget = to ?? this.state(top.decl, cur).edges[0]?.to;
     if (subTarget !== undefined) this.gatePriority(top.decl, [subTarget], channel);
     await this.assertConditions(top.decl, this.state(top.decl, cur), to, channel, supplied);
-    // NO GATE PASSES WITHOUT A REVIEW REPORT (owner ruling 2026-07-30):
-    // inside an iteration's own walk, leaving a gate demands its milestone
-    // review report — complete and PASSED. The kickoff is the one gate
-    // without one: its bless IS the pin.
     const inIteration = this.subs[this.subs.length - 2]?.decl.id === "iterations";
-    if (this.bound !== undefined && inIteration && this.state(top.decl, cur).kind === "gate" && cur !== "gate-kickoff") {
-      this.assertGateReport(cur, this.state(top.decl, cur), channel);
-    }
     // THE EXIT IS THE HARD GATE (owner ruling 2026-08-04): a state with
     // evidence fields leaves only on a COMPLETE stored form — the claim
     // stands in the record before the walk moves.

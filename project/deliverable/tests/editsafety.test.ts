@@ -456,5 +456,5 @@ test("a broken sub-canvas refuses typed at entry; fixing it heals on the next ti
   writeFileSync(p, original);
   const healed = await call(server, "se_pull", {});
   assert.equal(healed.isError, false, JSON.stringify(healed.body));
-  assert.deepEqual(session.active(), ["ideation/start"], "the healed entry is the pull's one step");
+  assert.deepEqual(session.active(), ["ideation"], "the healed entry is the pull's one step");
 });

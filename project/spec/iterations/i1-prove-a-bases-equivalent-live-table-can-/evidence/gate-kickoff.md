@@ -20,7 +20,7 @@ M0's retro closed with the inbox judged — three notes parked in the form pendi
 - note-2b4aa8a09eb0: obsolete — the six-prop proposal was superseded by the five the owner settled on
 - note-5503456afc89: done — the five value props stand as nodes under project/spec/trace/value-prop/
 - note-0ed069030139: done — the filter pills and the radial graph are built in engine/trace.ts and engine/traceui.ts
-- note-d35e75426f30: done — the render landed; what it taught is recorded in guidance/ux.md under reuse the surface
+- note-d35e75426f30: done — the render landed; what it taught is recorded in guidance/craft/ux.md under reuse the surface
 - note-cafbaf9c591b: done — the value-prop item type and the frame-delta rework are built and checked
 - note-dc19338c2f63: done — a live-resolving argument is no longer re-checked against a stored claim
 

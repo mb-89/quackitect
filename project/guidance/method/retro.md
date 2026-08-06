@@ -109,10 +109,12 @@ The trigger is a NOTE carrying "needs retro":
    ms, pass — and the LAST run stands summarized in .se/test-last-run.json,
    files ranked by summed cost. Read the summary first; the append log is
    for comparing across runs.
+
    A TEST FAR ABOVE ITS SIBLINGS OWES AN EXPLANATION. Sometimes there is a
    good one: it drives a real server, or it walks a whole machine end to
-   end. Sometimes there is not, and then it is a lead like any other. The
-   usual culprits, in the order they are worth trying:
+   end. Sometimes there is not, and then it is a lead like any other.
+
+   The usual culprits, in the order they are worth trying:
    - A fresh template copied per case, where the cases never mutate it.
    - A real dependency where a stub would prove the same thing.
    - Sequential cases inside ONE file, which is the only unit that reaches

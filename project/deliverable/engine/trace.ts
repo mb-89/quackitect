@@ -100,6 +100,9 @@ export interface ItemTemplate {
   type: string;
   id_prefix: string;
   fields: string[];
+  /** Field -> the value the mint writes for it. A TODO is not a default: it
+   *  is the mint asking, and no template may answer on the author's behalf. */
+  defaults: Record<string, string>;
   sections: string[];
   /** Where nodes of this type live, root-relative. Empty if unstated. */
   folder: string;
@@ -113,10 +116,12 @@ export function itemTemplate(root: string, type: string): ItemTemplate | undefin
     return undefined;
   }
   const fence = /```skeleton\r?\n([\s\S]*?)```/.exec(note.body);
+  const pairs = fence === null ? [] : [...(fence[1] ?? "").matchAll(/^([a-z_]+):[ \t]*(.*)$/gm)];
   return {
     type,
     id_prefix: typeof note.frontmatter.id_prefix === "string" ? note.frontmatter.id_prefix : "",
-    fields: fence === null ? [] : [...(fence[1] ?? "").matchAll(/^([a-z_]+):/gm)].map((m) => m[1] ?? ""),
+    fields: pairs.map((m) => m[1] ?? ""),
+    defaults: Object.fromEntries(pairs.filter((m) => !(m[2] ?? "").includes("TODO")).map((m) => [m[1] ?? "", (m[2] ?? "").trim()])),
     sections: Array.isArray(note.frontmatter.sections) ? note.frontmatter.sections.map(String) : [],
     folder: typeof note.frontmatter.folder === "string" ? note.frontmatter.folder : "",
   };
@@ -129,7 +134,22 @@ export function itemTemplate(root: string, type: string): ItemTemplate | undefin
  *  reviews a hole.
  *
  *  A TODO LEFT IN PLACE COUNTS AS UNANSWERED. The mint writes TODOs on
- *  purpose, so treating them as filled would let a skeleton pass as work. */
+ *  purpose, so treating them as filled would let a skeleton pass as work.
+ *
+ *  A FIELD THE NODE OMITS TAKES THE TEMPLATE'S DEFAULT (owner ruling
+ *  2026-08-06). Widening a template must not make the whole standing corpus
+ *  non-conforming overnight: the default is what the template asserts is true
+ *  until a node says otherwise, and migration only visits the nodes where it
+ *  is wrong. A field with no honest default carries a TODO instead, and that
+ *  field is introduced together with its migration. */
+/** What a node ANSWERS for a field: its own value, or the template's default
+ *  where it carries none. One function, so every reader resolves it alike. */
+export function fieldValue(tpl: ItemTemplate, fm: Record<string, unknown>, key: string): string {
+  const v = fm[key];
+  if (v === undefined) return tpl.defaults[key] ?? "";
+  return Array.isArray(v) ? v.join(" ") : String(v);
+}
+
 export function conformance(root: string, node: TraceNode): string[] {
   const tpl = itemTemplate(root, node.type);
   if (tpl === undefined || node.file === undefined) return [];
@@ -142,8 +162,7 @@ export function conformance(root: string, node: TraceNode): string[] {
   const out: string[] = [];
   if (tpl.id_prefix !== "" && !node.id.startsWith(tpl.id_prefix)) out.push(`${node.id}: a ${tpl.type} id starts with ${tpl.id_prefix}`);
   const missing = tpl.fields.filter((k) => {
-    const v = note.frontmatter[k];
-    const s = Array.isArray(v) ? v.join(" ") : v === undefined ? "" : String(v);
+    const s = fieldValue(tpl, note.frontmatter, k);
     return s.trim() === "" || s.includes("TODO");
   });
   if (missing.length > 0) out.push(`${node.id}: unanswered — ${missing.join(" · ")}`);
@@ -374,14 +393,21 @@ function keepFor(all: TraceNode[], q: string): Set<string> {
 /** Ring k must hold the WORST wedge's count at that level, because the radius
  *  is GLOBAL and a ring is one circle for everybody. */
 function ringRadii(perWedge: Map<string, string[][]>, count: number, wedge: number): number[] {
-  const rings: number[] = [];
+  // What each ring needs on its own: the arc its worst wedge demands.
+  const need: number[] = [];
   for (let k = 0; k < count; k++) {
     let worst = 0;
     for (const lanes of perWedge.values()) worst = Math.max(worst, lanes[k].length);
-    const byArc = wedge === 0 ? 0 : (worst * LABEL_W) / wedge;
-    rings.push(Math.max((rings[k - 1] ?? 0) + RING_GAP, byArc, FIRST_RING + k * RING_GAP));
+    need.push(wedge === 0 ? 0 : (worst * LABEL_W) / wedge);
   }
-  return rings;
+  // ONE GAP FOR EVERY LEVEL (owner, 2026-08-06). The distance from the vision
+  // out to the first ring governs every later pair too. It used to be two
+  // different numbers — 403 to the first ring, then 190 between the rest — so
+  // the outer levels crowded while the middle looked airy, and the drawing
+  // implied a hierarchy that is not in the data.
+  let gap = FIRST_RING;
+  for (let k = 0; k < count; k++) gap = Math.max(gap, (need[k] ?? 0) / (k + 1));
+  return Array.from({ length: count }, (_, k) => gap * (k + 1));
 }
 
 /** The radial arrangement. The ring radius is GLOBAL across every wedge, so
@@ -393,12 +419,16 @@ export function layoutTrace(all: TraceNode[], selected?: string[], filter?: { ty
   // come from the value props, so hiding a middle level closes the gap rather
   // than leaving a hole where it stood.
   const wanted = filter?.types ?? [];
-  const levels = wanted.length > 0 ? TRACE_LEVELS.filter((t) => wanted.includes(t)) : TRACE_LEVELS;
+  const asked = wanted.length > 0 ? TRACE_LEVELS.filter((t) => wanted.includes(t)) : TRACE_LEVELS;
   const props = all.filter((n) => n.type === TRACE_LEVELS[0]);
   const shown = selected === undefined || selected.length === 0 ? props.map((p) => p.id) : selected;
   const root = rootsOf(all);
   const kept = keepFor(all, filter?.find ?? "");
-  const inScope = all.filter((n) => shown.includes(root.get(n.id) ?? "") && kept.has(n.id) && levels.includes(n.type));
+  const inScope = all.filter((n) => shown.includes(root.get(n.id) ?? "") && kept.has(n.id) && asked.includes(n.type));
+  // AN EMPTY RING IS NOISE (owner, 2026-08-06). A level nothing has reached
+  // yet draws a circle around nothing and pushes everything else inward. It
+  // comes back by itself the moment the level has a node.
+  const levels = asked.filter((t) => inScope.some((n) => n.type === t));
   const wedge = shown.length === 0 ? 0 : (Math.PI * 2) / shown.length;
 
   const parentsOf = new Map(inScope.map((n) => [n.id, n.refines]));
@@ -427,7 +457,15 @@ export function layoutTrace(all: TraceNode[], selected?: string[], filter?: { ty
     for (let k = 0; k < levels.length; k++) {
       const ordered = k === 0 ? lanes[k] : orderByBarycentre(lanes[k], place, parentsOf);
       ordered.forEach((id, i) => {
-        const span = wedge * 0.86; // a margin, so neighbouring wedges never touch
+        // THE SPAN IS WHAT THE ITEMS NEED, not the whole wedge (owner,
+        // 2026-08-06). Spreading n items across the full wedge flung two
+        // stories to opposite sides of the circle the moment a filter left
+        // one prop standing — the drawing changed shape without the data
+        // changing. Each item claims LABEL_W of arc, and the row is centred
+        // under its parent; the wedge is only the cap, so neighbouring
+        // wedges still never touch.
+        const need = ((ordered.length - 1) * LABEL_W) / (rings[k] ?? 1);
+        const span = Math.min(wedge * 0.86, need);
         const a = ordered.length === 1 ? centre : centre - span / 2 + (span * i) / (ordered.length - 1);
         place.set(id, a);
         const n = inScope.find((x) => x.id === id);
