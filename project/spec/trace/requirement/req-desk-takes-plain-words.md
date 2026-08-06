@@ -10,5 +10,12 @@ refines:
 source_refs:
   - uc-get-work-routed step 1
   - stk-engineer-driving-agents
+  - uc-get-work-routed ext 1a
 priority: must
 ---
+
+## Detail
+
+What the desk does with what it hears:
+
+- When one message carries more than one piece of work, the desk shall sort the pieces and shall recommend a vehicle for each piece on its own.

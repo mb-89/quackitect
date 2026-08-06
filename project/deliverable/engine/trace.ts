@@ -446,7 +446,6 @@ function spread(targets: number[], want: number, centre: number, half: number): 
 /** The arc one item claims on its ring — the card plus breathing room, so two
  *  neighbours on the same ring never touch. */
 const LABEL_W = 310;
-const RING_GAP = 190;
 
 /** EVERY NODE IS A CARD, uniformly sized (owner, 2026-08-05). A dot with a
  *  label beside it is a pixel-wide click target; the card is the whole thing,
@@ -461,20 +460,58 @@ const CARD_W = 260;
 const CARD_H = 60;
 const MAX_CHARS = 14;
 
-/** THE STAGGER, ported from v1's report renderer (report_assets.go: a
- *  3-level modulo offset per row). A crowded ring splits into up to three
- *  SUB-ORBITS: neighbours in angle alternate outward, so the ring holds
- *  three times the cards per arc while same-orbit neighbours keep the full
- *  LABEL_W minimum — the spacing floor survives the collapse (owner,
- *  2026-08-06). The radial step clears the card height with margin. */
-const STAGGER = 3;
-const STAGGER_STEP = CARD_H + 16;
-
 /** THE INNERMOST RING CLEARS THE VISION, derived rather than eyeballed. Two
  *  equal cards whose centres are r apart overlap unless |dx| >= CARD_W or
  *  |dy| >= CARD_H, and the worst angle is the diagonal, where both shrink by
  *  root two. So r must beat CARD_W times root two; the rest is margin. */
 const FIRST_RING = CARD_W * 1.55;
+
+/** THE CENTER-DISTANCE FLOOR (owner, 2026-08-06): no two node centers sit
+ *  closer than two thirds of the inner ring — a fixed value, and radii GROW
+ *  where it would be undercut. It also subsumes the card-overlap rule: at
+ *  this distance a 260×60 card clears its neighbour at every angle. */
+const MIN_DIST = Math.round((FIRST_RING * 2) / 3);
+
+/** THE STAGGER, ported from v1's report renderer (report_assets.go: a
+ *  3-level modulo offset per row). A crowded ring splits into up to three
+ *  SUB-ORBITS, and neighbours in angle alternate outward.
+ *
+ *  THE STEP IS THE FLOOR ITSELF, and a smaller one buys nothing — the first
+ *  attempt stepped one card height (76) against a 269 floor, so 258 of the
+ *  269 still had to come from the ARC. That is the arc the stagger exists to
+ *  save, and the rings GREW instead of collapsing. Stepping a full MIN_DIST
+ *  outward makes the radial separation carry the floor by itself: neighbours
+ *  in angle are clear whatever their angle, and only SAME-ORBIT neighbours —
+ *  three items apart — still owe the full distance in arc. */
+const STAGGER = 3;
+const STAGGER_STEP = MIN_DIST;
+/** What one item costs in arc at full stagger: a third of the floor. */
+const STAGGER_ARC = MIN_DIST / STAGGER;
+
+/** THE BAND STRADDLES ITS RING (owner sketch, 2026-08-06): one card pushed
+ *  OUT and one pulled IN, rather than every sub-orbit growing outward. The
+ *  ring keeps its own radius as the band's middle, so the band costs half as
+ *  much clearance on each side and the next ring starts nearer. */
+function orbitOffset(i: number, orbits: number): number {
+  return ((i % orbits) - (orbits - 1) / 2) * STAGGER_STEP;
+}
+
+/** How far a band of this many orbits reaches on EITHER side of its ring. */
+function bandHalf(orbits: number): number {
+  return ((orbits - 1) / 2) * STAGGER_STEP;
+}
+
+/** THE RING GAP IS THE FLOOR. A parent and its child are a pair like any
+ *  other, so rings closer than MIN_DIST let the relax pass shove children
+ *  off their own ring — which broke the global-radius invariant the level
+ *  circles depend on. Tying the two makes the drawing self-consistent. */
+const RING_GAP = MIN_DIST;
+
+/** How many sub-orbits a lane needs for the arc it has. A sparse lane stays
+ *  on one orbit — staggering it would be noise and a thicker band. */
+function orbitsFor(count: number, arc: number): number {
+  return Math.max(1, Math.min(STAGGER, Math.ceil((count * MIN_DIST) / Math.max(arc, 1))));
+}
 
 export function shortLabel(id: string): string {
   const label = id.replace(/^vp-/, "");
@@ -585,9 +622,14 @@ function ringRadii(perWedge: Map<string, string[][]>, count: number, wedge: numb
   for (let k = 0; k < count; k++) {
     let worst = 0;
     for (const lanes of perWedge.values()) worst = Math.max(worst, lanes[k].length);
-    const need = wedge === 0 ? 0 : (worst * LABEL_W) / (STAGGER * wedge);
-    radii.push(Math.max(floor, need));
-    floor = (radii[k] ?? 0) + (STAGGER - 1) * STAGGER_STEP + RING_GAP;
+    const need = wedge === 0 ? 0 : (worst * STAGGER_ARC) / wedge;
+    // The band reaches INWARD too, so the ring itself has to clear the
+    // previous ring's outer edge by its own inner half.
+    const guess = Math.max(floor, need);
+    const half = bandHalf(orbitsFor(worst, guess * wedge));
+    const r = Math.max(floor + half, need);
+    radii.push(r);
+    floor = r + half + RING_GAP;
   }
   return radii;
 }
@@ -606,10 +648,11 @@ function relax(placed: Placed[]): void {
         const a = placed[i];
         const b = placed[j];
         if (a === undefined || b === undefined) continue;
-        if (Math.abs(a.x - b.x) >= CARD_W || Math.abs(a.y - b.y) >= CARD_H) continue;
+        const d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (d >= MIN_DIST) continue;
         const out = Math.hypot(a.x, a.y) >= Math.hypot(b.x, b.y) ? a : b;
         const ang = Math.atan2(out.y, out.x);
-        const r = Math.hypot(out.x, out.y) + 24;
+        const r = Math.hypot(out.x, out.y) + (MIN_DIST - d);
         out.x = Math.cos(ang) * r;
         out.y = Math.sin(ang) * r;
         moved = true;
@@ -687,10 +730,10 @@ export function layoutTrace(all: TraceNode[], selected?: string[], filter?: { ty
       // to three, and neighbours IN ANGLE alternate outward, so same-orbit
       // neighbours always sit the full LABEL_W apart.
       const arc = 2 * half * (rings[k] ?? 1);
-      const orbits = Math.max(1, Math.min(STAGGER, Math.ceil((lane.length * LABEL_W) / Math.max(arc, 1))));
+      const orbits = orbitsFor(lane.length, arc);
       const angles = spread(
         ordered.map((id) => target.get(id) ?? centre),
-        LABEL_W / (orbits * (rings[k] ?? 1)),
+        MIN_DIST / orbits / (rings[k] ?? 1),
         centre,
         half,
       );
@@ -699,7 +742,7 @@ export function layoutTrace(all: TraceNode[], selected?: string[], filter?: { ty
         place.set(at(prop, id), a);
         const n = inScope.find((x) => x.id === id);
         if (n === undefined) return;
-        const r = (rings[k] ?? 0) + (i % orbits) * STAGGER_STEP;
+        const r = (rings[k] ?? 0) + orbitOffset(i, orbits);
         placed.push({ ...n, key: at(prop, id), level: k, root: prop, x: Math.cos(a) * r, y: Math.sin(a) * r });
       });
     }

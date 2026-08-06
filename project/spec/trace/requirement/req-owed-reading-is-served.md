@@ -10,5 +10,13 @@ refines:
 source_refs:
   - uc-be-handed-the-method step 1
   - uc-be-handed-the-method step 5
+  - uc-be-handed-the-method step 2
+  - uc-be-handed-the-method ext 2a
 priority: must
 ---
+
+## Detail
+
+How the serving runs:
+
+- When a document is owed, the engine shall serve one document per reply, with the engine's aggregate reading file counting as one served reply.

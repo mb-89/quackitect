@@ -26,6 +26,18 @@ The split rule that remains: detail that VERIFIES DIFFERENTLY is a sibling
 row. One node, one verify_method, one pass/fail — a table whose rows would
 fail independently under different methods is several requirements.
 
+THE FAN-OUT HEURISTIC (owner, 2026-08-06). A use case refined by MORE THAN
+FIVE rows is a clustering candidate. Look for facet families: rows sharing
+one kind, one verify_method and one concern, differing only in which facet
+they pin. Fold such a family into ONE row — the statement names the family's
+demand, the Detail table carries each facet as a binding line.
+
+THE CHECK ALWAYS RUNS; the fold is judgment. Count the fan-out on every
+register pass. Every use case past five gets LOOKED AT, and where the family
+will not read as one concern it STAYS split — record that look, never skip
+it. Five is a smell threshold, not a rule. The win is a trace graph a person
+can follow.
+
 (ISO 29148 "singular" is deliberately relaxed here; the trace and verify
 unit is the NODE, not the sentence.)
 

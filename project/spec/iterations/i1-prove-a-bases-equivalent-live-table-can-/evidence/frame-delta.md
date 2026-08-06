@@ -35,6 +35,7 @@ The gap is open, the method for filling it exists (@[[ref-sya-program]]), and ag
 - vp-autonomy-range
 - vp-rigor-without-toil
 - vp-vendoring
+- vp-qualities
 
 ## business_case
 

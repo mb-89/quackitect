@@ -11,16 +11,13 @@ source_refs:
   - uc-vendor-and-overlay step 1
   - uc-vendor-and-overlay ext 1a
   - uc-vendor-and-overlay step 6
+  - uc-vendor-and-overlay ext 1a
+  - ".se/req-mine-v1.md: refusals and honesty (every refusal names the cause and the one recovery command)"
 priority: should
 ---
 
 ## Detail
 
-## Detail
+What the fence covers:
 
-Run-time artifacts land in the host's own folders, never under the engine's:
-
-- call logs
-- walk and record state
-- evidence files
-- builder overlay content
+- If a lane write targets a path under the engine's vendored folder, then the engine shall refuse the call with a remedy naming the overlay folder.
