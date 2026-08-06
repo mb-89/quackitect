@@ -1483,13 +1483,28 @@ export class Session {
       if (p !== "" && !p.startsWith("@") && !want.includes(p)) want.push(p);
     };
     for (const p of this.routeReads()) add(p);
-    if (want.length === 0) {
-      const { machine, ids } = this.leaves();
-      for (const id of ids) {
-        const s = this.state(machine, id);
-        for (const d of this.pulled(machine, s)) add(d.path);
-        for (const p of this.lookaheadRequirements(machine, s)) add(p);
-      }
+    // ALWAYS LOOK AHEAD — never only when the route gave nothing.
+    //
+    // THE ROUTE STOPS AT THE STEP IT CANNOT ENTER, so that step is not among
+    // its steps and its entry documents were never gathered. When the reason it
+    // could not be entered IS an unread document, that document is the only one
+    // that matters, and it was the one thing missing from the reading.
+    //
+    // The old guard made it worse by testing the UNFILTERED list. A route that
+    // contributed only documents already in the head counted as not empty, the
+    // lookahead was skipped, and the filter below then left the reading EMPTY
+    // while the walk stood blocked on a document nobody was shown. The pull
+    // answered with a refusal whose own remedy could not be executed: pulling
+    // served nothing, and reading the file by hand credits only the gathered
+    // reading, never an arbitrary path. Found live 2026-08-06.
+    //
+    // Gathering more candidates is free: the filter drops everything the head
+    // already holds, so nothing is ever read twice.
+    const { machine, ids } = this.leaves();
+    for (const id of ids) {
+      const s = this.state(machine, id);
+      for (const d of this.pulled(machine, s)) add(d.path);
+      for (const p of this.lookaheadRequirements(machine, s)) add(p);
     }
     // THE HANDOVER RULE JOINS THE LOOP. When the slider rises mid-walk,
     // the agent's advances must prove the reading the human checked — even
@@ -1519,7 +1534,29 @@ export class Session {
         body = readFileSync(resolveInRoot(this.laneRoot(rel), rel, "engine/session.ts reading")).toString("utf8");
         hash = contentHash(body);
       } catch {
-        continue; // unreadable here: it stays owed, and says so where it is asked for
+        // NAME IT IN THE READING rather than skipping in silence.
+        //
+        // An owed document that cannot be read used to leave the reading
+        // EMPTY: the header said "1 document(s) the way ahead demands", the
+        // body said nothing, and the refusal repeated a name with no way on
+        // Earth to satisfy it. The comment here claimed it "says so where it
+        // is asked for". It did not.
+        //
+        // It cost a state its entry on 2026-08-06, and the cause was a row
+        // naming a bare id where a PATH is owed — a five-second fix that took
+        // an hour to see, because nothing anywhere said which document or why.
+        //
+        // No part is pushed, so it stays owed and the walk still blocks. It
+        // blocks legibly now.
+        out.push(
+          "## " + rel,
+          "",
+          "NOT READABLE. The walk demands this document and cannot serve it, so the walk stays blocked.",
+          "",
+          "Whatever names it names it WRONGLY. entry_read and the pulled guidance take a PATH from the project root, never a bare id.",
+          "",
+        );
+        continue;
       }
       out.push(`<!-- ${rel} · ${hash} -->`, "", `## ${rel}`, "");
       const from = out.length + 1;
@@ -2737,7 +2774,9 @@ export class Session {
       checked: this.stateFormChecked(raw),
       active: this.stateFormActive(name, m),
       gate: s.kind === "gate",
-      signed: typeof fmData.signed_off === "string",
+      // A present-but-EMPTY signed_off is unsigned. Reading the key's mere
+      // presence as a stamp is the same defect as withSignedOff's, mirrored.
+      signed: typeof fmData.signed_off === "string" && fmData.signed_off.trim() !== "",
       bless: typeof fmData.bless === "string" ? fmData.bless : "",
       instance: h.instanceRel,
       exists: raw !== undefined,

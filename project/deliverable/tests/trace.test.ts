@@ -12,6 +12,75 @@ function child(id: string, type: string, parent: string): TraceNode {
   return { id, type, statement: "", refines: [parent] };
 }
 
+/** The angle of a placement, which is what "straight outward" is a claim
+ *  about. Radius is the ring; only the angle is the layout's decision. */
+function angleOf(n: { x: number; y: number }): number {
+  return Math.atan2(n.y, n.x);
+}
+
+describe("outward means outward", { concurrency: true }, () => {
+  test("a lone child sits on its parent's own angle, so the edge points away from the centre", () => {
+    const l = layoutTrace([prop("vp-a"), child("sty-1", "story", "vp-a"), child("uc-1", "use-case", "sty-1")]);
+    const a = l.nodes.find((n) => n.id === "vp-a");
+    const b = l.nodes.find((n) => n.id === "sty-1");
+    const c = l.nodes.find((n) => n.id === "uc-1");
+    assert.ok(a && b && c, "all three are placed");
+    // Not "roughly": with nothing to collide with there is no reason to move.
+    assert.ok(Math.abs(angleOf(a) - angleOf(b)) < 1e-9, "the story is directly outside its prop");
+    assert.ok(Math.abs(angleOf(b) - angleOf(c)) < 1e-9, "the use case is directly outside its story");
+  });
+
+  test("siblings move only far enough to clear each other, and stay centred on the parent", () => {
+    const kids = ["sty-1", "sty-2", "sty-3"].map((id) => child(id, "story", "vp-a"));
+    const l = layoutTrace([prop("vp-a"), ...kids]);
+    const parent = l.nodes.find((n) => n.id === "vp-a");
+    assert.ok(parent, "the prop is placed");
+    const angles = kids.map((k) => angleOf(l.nodes.find((n) => n.id === k.id) as { x: number; y: number })).sort((p, q) => p - q);
+    const spread = (angles[2] ?? 0) - (angles[0] ?? 0);
+    assert.ok(spread > 0, "three siblings do not sit on top of each other");
+    // The row's midpoint is the parent's ray: the fan is symmetric about it.
+    const mid = ((angles[0] ?? 0) + (angles[2] ?? 0)) / 2;
+    assert.ok(Math.abs(mid - angleOf(parent)) < 1e-6, "the row is centred on the parent, not on the wedge");
+  });
+});
+
+describe("a node under two value props is drawn under both", { concurrency: true }, () => {
+  const shared = (): TraceNode[] => [
+    prop("vp-a"),
+    prop("vp-b"),
+    child("sty-a", "story", "vp-a"),
+    child("sty-b", "story", "vp-b"),
+    { id: "uc-both", type: "use-case", statement: "", refines: ["sty-a", "sty-b"] },
+  ];
+
+  test("it is placed once per prop, and the data still holds one node", () => {
+    const l = layoutTrace(shared());
+    const both = l.nodes.filter((n) => n.id === "uc-both");
+    assert.equal(both.length, 2, "one card under each prop");
+    assert.deepEqual(both.map((n) => n.root).sort(), ["vp-a", "vp-b"], "one placement per wedge it reaches");
+    assert.equal(new Set(both.map((n) => n.key)).size, 2, "the two placements are distinguishable");
+  });
+
+  test("no edge crosses from one prop's wedge into another's", () => {
+    const l = layoutTrace(shared());
+    const at = new Map(l.nodes.map((n) => [n.key, n]));
+    for (const e of l.edges) {
+      if (e.from === "vision") continue;
+      const a = at.get(e.from);
+      const b = at.get(e.to);
+      assert.ok(a && b, `both ends of ${e.from}->${e.to} are placed`);
+      assert.equal(a.root, b.root, "an edge stays inside the wedge it was drawn for");
+    }
+  });
+
+  test("selecting one prop leaves that prop's copy and drops the other", () => {
+    const l = layoutTrace(shared(), ["vp-a"]);
+    const both = l.nodes.filter((n) => n.id === "uc-both");
+    assert.equal(both.length, 1, "only the selected wedge's copy stands");
+    assert.equal(both[0]?.root, "vp-a");
+  });
+});
+
 describe("the radial trace graph", { concurrency: true }, () => {
   test("one value prop hangs straight DOWN from the vision", () => {
     const l = layoutTrace([prop("vp-a")]);

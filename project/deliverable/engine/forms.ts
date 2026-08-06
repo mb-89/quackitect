@@ -175,17 +175,25 @@ export function confirmPrefill(instanceRaw: string, field: string, index: number
 
 /** Flip the frontmatter status; stamp whose hand finished. */
 export function withStatus(instanceRaw: string, status: string, by: string): string {
-  let out = instanceRaw.replace(/^status: .*$/m, `status: ${status}`);
-  if (/^by: /m.test(out)) out = out.replace(/^by: .*$/m, `by: ${by}`);
-  else out = out.replace(/^status: .*$/m, (m) => `${m}\nby: ${by}`);
+  // NO SPACE IS DEMANDED AFTER THE COLON, anywhere in this file (owner
+  // ruling, 2026-08-06). `key:` and `key: value` are one line to a reader and
+  // must be one line to the engine. A regex that wants the space matches
+  // nothing on an empty key, and a replace that matches nothing returns the
+  // string UNCHANGED — so the caller writes the file, sees no error, and the
+  // change is simply absent. Nothing fails, which is why it took four
+  // attempts to see it.
+  let out = instanceRaw.replace(/^status:.*$/m, `status: ${status}`);
+  if (/^by:/m.test(out)) out = out.replace(/^by:.*$/m, `by: ${by}`);
+  else out = out.replace(/^status:.*$/m, (m) => `${m}\nby: ${by}`);
   return out;
 }
 
 /** Insert a frontmatter line after `status:` where one exists (named
  *  forms), else after `form:` (state forms carry no status). */
 const afterAnchor = (instanceRaw: string, line: string): string => {
-  if (/^status: .*$/m.test(instanceRaw)) return instanceRaw.replace(/^status: .*$/m, (s) => `${s}\n${line}`);
-  if (/^form: .*$/m.test(instanceRaw)) return instanceRaw.replace(/^form: .*$/m, (s) => `${s}\n${line}`);
+  // Whitespace-blind, like every other key here — see withStatus.
+  if (/^status:/m.test(instanceRaw)) return instanceRaw.replace(/^status:.*$/m, (s) => `${s}\n${line}`);
+  if (/^form:/m.test(instanceRaw)) return instanceRaw.replace(/^form:.*$/m, (s) => `${s}\n${line}`);
   // NEITHER ANCHOR: the stamp used to VANISH, silently, which is the worst of
   // the three outcomes — the caller believes it stamped and the file says
   // otherwise. The head of the frontmatter is a fine second choice.
@@ -211,7 +219,13 @@ export function withAuthor(instanceRaw: string, author: string): string {
 export function withSignedOff(instanceRaw: string, when: string): string {
   // Signing off IS the re-attestation, so it clears any suspect mark.
   const raw = stripSuspect(instanceRaw);
-  if (/^signed_off: /m.test(raw)) return raw.replace(/^signed_off: .*$/m, `signed_off: ${when}`);
+  // THE KEY MAY BE PRESENT AND EMPTY, and it usually is: a hand-written or
+  // template-minted form carries `signed_off:` with nothing after it. Matching
+  // on "signed_off: " — colon SPACE — missed exactly that case, so neither
+  // branch fired the replace and the anchor appended a SECOND key. The parser
+  // then read the first one, which was the empty one, and the stamp vanished
+  // while the file plainly contained it (found live 2026-08-06).
+  if (/^signed_off:/m.test(raw)) return raw.replace(/^signed_off:.*$/m, `signed_off: ${when}`);
   return afterAnchor(raw, `signed_off: ${when}`);
 }
 
@@ -245,13 +259,14 @@ export function withChecked(instanceRaw: string, labels: string[]): string {
 
 /** Who pressed submit — one line beside the sign-off. */
 export function withBy(instanceRaw: string, by: string): string {
-  if (/^by: /m.test(instanceRaw)) return instanceRaw.replace(/^by: .*$/m, `by: ${by}`);
-  return instanceRaw.replace(/^form: .*$/m, (s) => `${s}\nby: ${by}`);
+  // Present-but-empty counts as present — see withSignedOff.
+  if (/^by:/m.test(instanceRaw)) return instanceRaw.replace(/^by:.*$/m, `by: ${by}`);
+  return instanceRaw.replace(/^form:.*$/m, (s) => `${s}\nby: ${by}`);
 }
 
 /** A changed claim is no longer the submitted claim — the stamp comes off. */
 export function stripSignedOff(instanceRaw: string): string {
-  return instanceRaw.replace(/^signed_off: .*\n?/m, "").replace(/^by: .*\n?/m, "");
+  return instanceRaw.replace(/^signed_off:.*\n?/m, "").replace(/^by:.*\n?/m, "");
 }
 
 /** The gate's bless line — set, replaced, or removed whole. A save removes

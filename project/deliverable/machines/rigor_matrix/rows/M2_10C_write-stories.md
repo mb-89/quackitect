@@ -23,8 +23,6 @@ evidence:
     of: story
     covers: value-prop
     description: "every story as a node reference, one per line — the deck lives in the node, this field never restates it"
-  - name: coverage
-    description: "every value prop realized by at least one story, and every killer named with why the product dies without it"
 major: full
 minor: tailored
 patch: none
@@ -70,6 +68,8 @@ SO THE STORIES ARE NODES, shaped by [[stakeholder]]'s sibling [[story]]. This fi
 
 SEVERAL STORIES MAY SERVE ONE VALUE PROP, and most do. `refines` names the prop, and that is the edge the trace graph draws.
 
-COVERAGE IS CHECKED, not claimed. The field declares `covers: value-prop`, so the engine refuses this state while any story refines no proposition, and while any proposition is refined by no story. Neither is a judgment call, so neither waits for a reviewer to notice it.
+COVERAGE IS CHECKED, NEVER WRITTEN DOWN. The field declares `covers: value-prop`, so the engine refuses this state while any story refines no proposition, and while any proposition is refined by no story.
+
+THERE IS NO COVERAGE FIELD, deliberately (owner ruling 2026-08-06). A form field asking whoever fills it to restate a computed result gets a paragraph that agrees with the engine until the day it does not. What is NOT computed - which stories are killers, and why the product dies without each - is judgment, and it goes under `anything_else`.
 
 THE SET IS NEVER COMPLETE, and does not have to be. Coverage is not the same as completeness: every proposition having a story does not mean every pass is told. A missing story surfaces later the same way a missing value prop does - something gets built that no story covers. Add it then, rather than stalling here for exhaustiveness.

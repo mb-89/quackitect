@@ -84,11 +84,17 @@ export const STANDARD_ROUNDS: EvidenceField[] = [
   {
     name: "round_1_validate",
     description:
-      "ROUND 1 — VALIDATE: built the right thing. The RESULT against the goal and the frame — each named question answered. Prior art asks who else solved THIS, and what they shed.",
+      "ROUND 1 — VALIDATE: built the right thing. The RESULT against the goal and the frame — each named question answered. PRIOR ART IS A COMPARISON, NOT A CITATION (owner, 2026-08-06): name systems people ACTUALLY USE, say what each does better, and say what ours sheds. Naming the book a shape came from proves only that it was borrowed. If the comparison was not made, say so — an unmade comparison is a finding, never a blank.",
     required: true,
     template: "per-item",
     items: ["exercised against the goal", "missing", "wrong", "out of scope", "prior art"],
   },
+  // A ROUND THAT ONLY EVER PASSES IS DECORATION. Round 1's `missing` and
+  // round 2's kill-criterion are the two places a gate can actually die, and
+  // both are worthless when filled with findings nobody would act on. A
+  // finding padded in to make the list look longer is worse than a short
+  // list: it teaches the reader to skim (owner, 2026-08-06, striking
+  // "fourteen stories is an arbitrary number" from a live gate).
   {
     name: "round_2_red_team",
     description:

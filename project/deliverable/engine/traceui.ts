@@ -115,6 +115,14 @@ export const TRACE_STYLE = `
 .pill:hover { border-color:var(--se-accent); }
 .pill.on { border-color:var(--se-accent); color:var(--se-accent); }
 .pill-n { color:var(--se-muted); }
+/* THE NEIGHBOURHOOD, LIT (owner, 2026-08-06). Nothing changes colour — the
+   rest DIMS. The drawing keeps its own palette, so the eye still reads type
+   and level from it while the question "what does this touch" is answered. */
+svg.trace.lit .trace-node { opacity:0.22; }
+svg.trace.lit .trace-edge { opacity:0.1; }
+svg.trace.lit .trace-node.on, svg.trace.lit .trace-node.near { opacity:1; }
+svg.trace.lit .trace-edge.on { opacity:1; stroke:var(--se-accent); }
+svg.trace.lit .trace-node.on rect { stroke:var(--se-accent); stroke-width:3; }
 .trace-find { appearance:none; -webkit-appearance:none; padding:3px 7px; font:inherit; font-size:11px; min-width:190px;
   background:var(--se-raised); color:var(--se-fg); border:1px solid var(--se-border-strong); border-radius:3px; }
 .trace-find:focus { border-color:var(--se-accent); outline:none; }
@@ -222,6 +230,35 @@ export const TRACE_SCRIPT = `
       if(typing){ var f = w.querySelector('.trace-find'); if(f){ f.focus(); f.setSelectionRange(f.value.length, f.value.length); } }
     }).catch(function(){});
   }
+  // A CLICK LIGHTS THE NEIGHBOURHOOD: the node itself, every node one edge
+  // away, and the edges between. Keyed by NODE rather than by card, so a node
+  // drawn under two value props lights in both places at once — which is how
+  // the duplication reads as one thing instead of two.
+  function lightUp(id){
+    var s = svgEl(); if(!s) return;
+    s.querySelectorAll('.on, .near').forEach(function(el){ el.classList.remove('on'); el.classList.remove('near'); });
+    if(!id){ s.classList.remove('lit'); s.dataset.lit = ''; return; }
+    var near = {}; near[id] = true;
+    s.querySelectorAll('.trace-edge').forEach(function(l){
+      if(l.dataset.a === id) near[l.dataset.b] = true;
+      if(l.dataset.b === id) near[l.dataset.a] = true;
+    });
+    s.classList.add('lit'); s.dataset.lit = id;
+    s.querySelectorAll('.trace-node').forEach(function(g){
+      var n = g.dataset.node;
+      if(n === id) g.classList.add('on'); else if(near[n] === true) g.classList.add('near');
+    });
+    s.querySelectorAll('.trace-edge').forEach(function(l){
+      if(l.dataset.a === id || l.dataset.b === id) l.classList.add('on');
+    });
+  }
+  document.addEventListener('click', function(e){
+    var s = svgEl(); if(!s || !e.target.closest) return;
+    var g = e.target.closest('#w-trace .trace-node');
+    // The same node twice puts the drawing back; a click on empty canvas too.
+    if(g){ lightUp(g.dataset.node === s.dataset.lit ? '' : g.dataset.node); return; }
+    if(e.target.closest('#w-trace svg.trace') && s.dataset.lit) lightUp('');
+  });
   var pending = null;
   document.addEventListener('click', function(e){
     var p = e.target.closest ? e.target.closest('#w-trace .pill') : null;

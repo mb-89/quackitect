@@ -5,8 +5,9 @@
 // NO LAYOUT LIBRARY. The arrangement is deterministic geometry — an angle per
 // wedge and a radius per ring — so there is nothing to solve at run time and
 // nothing to load. What a library WOULD have given us is crossing
-// minimisation, and that is one named heuristic (orderByBarycentre) rather
-// than a dependency the always-on mirror would carry forever.
+// minimisation, and that is one named rule — a child sits on its parent's own
+// angle and moves only to clear a neighbour — rather than a dependency the
+// always-on mirror would carry forever.
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseStateNote } from "./notes.ts";
@@ -35,6 +36,9 @@ export interface Placed extends TraceNode {
   level: number;
   /** The wedge this node belongs to — the value prop at its root. */
   root: string;
+  /** UNIQUE PER PLACEMENT, not per node. A node under two value props is
+   *  drawn twice, so `id` no longer identifies a card on the canvas. */
+  key: string;
   x: number;
   y: number;
 }
@@ -236,15 +240,12 @@ export function visionText(root: string): string {
  *  the piece a layout library would have supplied. Each level is ordered by
  *  the mean position of a node's parents in the level inside it, so an edge
  *  travels as straight outward as it can. A node with no parent keeps its
- *  place, which is what stops the sweep shuffling roots around. */
-function orderByBarycentre(level: string[], place: Map<string, number>, parentsOf: Map<string, string[]>): string[] {
-  const key = new Map<string, number>();
-  level.forEach((id, i) => {
-    const ps = (parentsOf.get(id) ?? []).map((p) => place.get(p)).filter((n): n is number => n !== undefined);
-    key.set(id, ps.length === 0 ? i : ps.reduce((a, b) => a + b, 0) / ps.length);
-  });
-  return [...level].sort((a, b) => (key.get(a) ?? 0) - (key.get(b) ?? 0));
-}
+ *  place, which is what stops the sweep shuffling roots around.
+ *
+ *  SUPERSEDED 2026-08-06, and the code is gone. Ordering alone still left a
+ *  child anywhere along its row. It now TAKES its parent's angle and `spread`
+ *  moves it only far enough to clear a neighbour, which does everything the
+ *  ordering was for and fixes what it could not. */
 
 /** Which wedge a node belongs to: the value prop it ultimately refines. */
 export function rootsOf(nodes: TraceNode[]): Map<string, string> {
@@ -265,6 +266,56 @@ export function rootsOf(nodes: TraceNode[]): Map<string, string> {
   };
   for (const n of nodes) root.set(n.id, walk(n.id, new Set()));
   return root;
+}
+
+/** EVERY wedge a node belongs to. A node whose ancestry reaches two value
+ *  props is DRAWN IN BOTH (owner, 2026-08-06) — one node in the data, two
+ *  places in the picture.
+ *
+ *  The alternative was one placement plus an edge crossing the whole circle to
+ *  reach its other parent, and those lines are what made the drawing
+ *  unreadable. Sharing WITHIN one prop is fine and stays: those lines are
+ *  short and local.
+ */
+export function rootsAllOf(nodes: TraceNode[]): Map<string, string[]> {
+  const byId = new Map(nodes.map((n) => [n.id, n]));
+  const cache = new Map<string, string[]>();
+  const walk = (id: string, seen: Set<string>): string[] => {
+    const got = cache.get(id);
+    if (got !== undefined) return got;
+    if (seen.has(id)) return [];
+    seen.add(id);
+    const n = byId.get(id);
+    if (n === undefined) return [];
+    if (n.type === TRACE_LEVELS[0]) return [id];
+    const out = new Set<string>();
+    for (const p of n.refines) for (const r of walk(p, seen)) out.add(r);
+    const list = [...out];
+    cache.set(id, list);
+    return list;
+  };
+  for (const n of nodes) cache.set(n.id, walk(n.id, new Set()));
+  return cache;
+}
+
+/** Push apart only as much as needed. Each item starts on the angle its parent
+ *  already has, the sweep moves it the minimum that clears its neighbour, and
+ *  the block is re-centred on where the items wanted to be. */
+function spread(targets: number[], want: number, centre: number, half: number): number[] {
+  const n = targets.length;
+  if (n === 0) return [];
+  if (n === 1) return [Math.min(centre + half, Math.max(centre - half, targets[0] ?? centre))];
+  // A wedge too narrow for the wanted separation gets an even one instead.
+  const gap = Math.min(want, (half * 2) / (n - 1));
+  const out = targets.slice();
+  for (let i = 1; i < n; i++) out[i] = Math.max(out[i] ?? 0, (out[i - 1] ?? 0) + gap);
+  const mean = (xs: number[]): number => xs.reduce((a, b) => a + b, 0) / xs.length;
+  const drift = mean(out) - mean(targets);
+  for (let i = 0; i < n; i++) out[i] = (out[i] ?? 0) - drift;
+  const over = Math.max(0, (out[n - 1] ?? 0) - (centre + half));
+  const under = Math.max(0, centre - half - (out[0] ?? 0));
+  for (let i = 0; i < n; i++) out[i] = (out[i] ?? 0) + under - over;
+  return out;
 }
 
 /** LABELS NEVER ROTATE (owner, 2026-08-05). A radial arrangement tempts you
@@ -422,9 +473,10 @@ export function layoutTrace(all: TraceNode[], selected?: string[], filter?: { ty
   const asked = wanted.length > 0 ? TRACE_LEVELS.filter((t) => wanted.includes(t)) : TRACE_LEVELS;
   const props = all.filter((n) => n.type === TRACE_LEVELS[0]);
   const shown = selected === undefined || selected.length === 0 ? props.map((p) => p.id) : selected;
-  const root = rootsOf(all);
+  const roots = rootsAllOf(all);
   const kept = keepFor(all, filter?.find ?? "");
-  const inScope = all.filter((n) => shown.includes(root.get(n.id) ?? "") && kept.has(n.id) && asked.includes(n.type));
+  const rootsShown = (id: string): string[] => (roots.get(id) ?? []).filter((r) => shown.includes(r));
+  const inScope = all.filter((n) => rootsShown(n.id).length > 0 && kept.has(n.id) && asked.includes(n.type));
   // AN EMPTY RING IS NOISE (owner, 2026-08-06). A level nothing has reached
   // yet draws a circle around nothing and pushes everything else inward. It
   // comes back by itself the moment the level has a node.
@@ -439,47 +491,64 @@ export function layoutTrace(all: TraceNode[], selected?: string[], filter?: { ty
       levels.map(() => []),
     );
   for (const n of inScope) {
-    const r = root.get(n.id) ?? "";
     const lv = levels.indexOf(n.type);
     if (lv < 0) continue;
-    perWedge.get(r)?.[lv].push(n.id);
+    for (const r of rootsShown(n.id)) perWedge.get(r)?.[lv].push(n.id);
   }
 
   const rings = ringRadii(perWedge, levels.length, wedge);
 
   const placed: Placed[] = [];
   const place = new Map<string, number>();
+  const at = (prop: string, id: string): string => `${prop}\0${id}`;
   shown.forEach((prop, w) => {
     const lanes = perWedge.get(prop) ?? [];
     // Wedge zero points straight DOWN, so a single prop hangs below the
     // vision rather than sitting at an arbitrary angle.
     const centre = Math.PI / 2 + w * wedge;
+    const half = (wedge * 0.86) / 2;
     for (let k = 0; k < levels.length; k++) {
-      const ordered = k === 0 ? lanes[k] : orderByBarycentre(lanes[k], place, parentsOf);
+      const lane = lanes[k] ?? [];
+      if (lane.length === 0) continue;
+      // OUTWARD MEANS OUTWARD (owner, 2026-08-06). A child WANTS its parent's
+      // own angle, so the line between them runs straight away from the
+      // centre rather than sideways. Only a collision moves it, and only far
+      // enough to clear its neighbour.
+      //
+      // It used to spread every item evenly across the row's own span, which
+      // put a lone child beside its parent instead of outside it, and turned
+      // a wedge of four into a fan.
+      const target = new Map<string, number>();
+      for (const id of lane) {
+        const ps = (parentsOf.get(id) ?? []).map((p) => place.get(at(prop, p))).filter((a): a is number => a !== undefined);
+        target.set(id, ps.length === 0 ? centre : ps.reduce((a, b) => a + b, 0) / ps.length);
+      }
+      const ordered = [...lane].sort((a, b) => (target.get(a) ?? 0) - (target.get(b) ?? 0));
+      const angles = spread(
+        ordered.map((id) => target.get(id) ?? centre),
+        LABEL_W / (rings[k] ?? 1),
+        centre,
+        half,
+      );
       ordered.forEach((id, i) => {
-        // THE SPAN IS WHAT THE ITEMS NEED, not the whole wedge (owner,
-        // 2026-08-06). Spreading n items across the full wedge flung two
-        // stories to opposite sides of the circle the moment a filter left
-        // one prop standing — the drawing changed shape without the data
-        // changing. Each item claims LABEL_W of arc, and the row is centred
-        // under its parent; the wedge is only the cap, so neighbouring
-        // wedges still never touch.
-        const need = ((ordered.length - 1) * LABEL_W) / (rings[k] ?? 1);
-        const span = Math.min(wedge * 0.86, need);
-        const a = ordered.length === 1 ? centre : centre - span / 2 + (span * i) / (ordered.length - 1);
-        place.set(id, a);
+        const a = angles[i] ?? centre;
+        place.set(at(prop, id), a);
         const n = inScope.find((x) => x.id === id);
         if (n === undefined) return;
-        placed.push({ ...n, level: k, root: prop, x: Math.cos(a) * rings[k], y: Math.sin(a) * rings[k] });
+        placed.push({ ...n, key: at(prop, id), level: k, root: prop, x: Math.cos(a) * rings[k], y: Math.sin(a) * rings[k] });
       });
     }
   });
 
-  const ids = new Set(placed.map((p) => p.id));
+  const keys = new Set(placed.map((p) => p.key));
   const edges: { from: string; to: string }[] = [];
   for (const n of placed) {
-    for (const p of n.refines) if (ids.has(p)) edges.push({ from: p, to: n.id });
-    if (n.type === levels[0]) edges.push({ from: "vision", to: n.id });
+    // WITHIN THE WEDGE ONLY. A parent under a different value prop is not
+    // linked from here: this node is drawn under that prop as well, and the
+    // link is drawn there, short and local. That is what removes the lines
+    // that used to cross the whole circle.
+    for (const p of n.refines) if (keys.has(at(n.root, p))) edges.push({ from: at(n.root, p), to: n.key });
+    if (n.type === levels[0]) edges.push({ from: "vision", to: n.key });
   }
   return { nodes: placed, edges, rings, size: (rings[rings.length - 1] ?? RING_GAP) + LABEL_W };
 }
@@ -494,7 +563,9 @@ export function traceSvg(l: TraceLayout): string {
   const s = l.size;
   const parts = [`<svg class="trace" viewBox="${-s} ${-s} ${s * 2} ${s * 2}" role="img" aria-label="trace graph">`];
   for (const r of l.rings) parts.push(`<circle cx="0" cy="0" r="${r.toFixed(0)}" class="trace-ring"/>`);
-  const at = new Map(l.nodes.map((n) => [n.id, n]));
+  // KEYED BY PLACEMENT, not by node: a node under two value props has two
+  // cards, and `id` no longer picks one out.
+  const at = new Map(l.nodes.map((n) => [n.key, n]));
   for (const e of l.edges) {
     const b = at.get(e.to);
     if (b === undefined) continue;
@@ -505,7 +576,7 @@ export function traceSvg(l: TraceLayout): string {
     const a = implicit ? { x: 0, y: 0 } : at.get(e.from);
     if (a === undefined) continue;
     parts.push(
-      `<line x1="${a.x.toFixed(0)}" y1="${a.y.toFixed(0)}" x2="${b.x.toFixed(0)}" y2="${b.y.toFixed(0)}" class="trace-edge${implicit ? " implicit" : ""}"/>`,
+      `<line x1="${a.x.toFixed(0)}" y1="${a.y.toFixed(0)}" x2="${b.x.toFixed(0)}" y2="${b.y.toFixed(0)}" class="trace-edge${implicit ? " implicit" : ""}" data-a="${esc(implicit ? "vision" : (at.get(e.from)?.id ?? ""))}" data-b="${esc(b.id)}"/>`,
     );
   }
   // THE CARD IS THE MACHINE VIEW'S STATE NODE, class for class. Its colours
@@ -521,9 +592,21 @@ export function traceSvg(l: TraceLayout): string {
     `<title>${esc(tip)}</title></g>`;
   // The vision is an ORDINARY node. `active` means the walk is standing there,
   // and nothing stands in a trace graph.
-  parts.push(card(0, 0, "vision", "vision", "state", "", "the product vision"));
+  parts.push(card(0, 0, "vision", "vision", "state", ' data-node="vision"', "the product vision"));
   for (const n of l.nodes) {
-    parts.push(card(n.x, n.y, shortLabel(n.id), n.id, "state", ` data-type="${esc(n.type)}" data-root="${esc(n.root)}"`, n.statement));
+    // data-node is the NODE, shared by both cards of a duplicated node, so a
+    // click lights every place it appears rather than only the one hit.
+    parts.push(
+      card(
+        n.x,
+        n.y,
+        shortLabel(n.id),
+        n.id,
+        "state",
+        ` data-type="${esc(n.type)}" data-root="${esc(n.root)}" data-node="${esc(n.id)}"`,
+        n.statement,
+      ),
+    );
   }
   parts.push("</svg>");
   return parts.join("");

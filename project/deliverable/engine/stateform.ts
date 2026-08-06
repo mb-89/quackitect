@@ -467,7 +467,9 @@ function inboxItems(root: string, instanceRaw?: string): string[] {
   } catch {
     return [];
   }
-  if (instanceRaw === undefined || !/^signed_off: /m.test(instanceRaw)) return live;
+  // AN EMPTY KEY IS NOT A SIGN-OFF. `signed_off:` with nothing after it is an
+  // unsigned form, so the test wants a VALUE rather than the key's presence.
+  if (instanceRaw === undefined || !/^signed_off: *\S/m.test(instanceRaw)) return live;
   return live.filter((i) => instanceRaw.includes(i.split(" — ")[0]));
 }
 

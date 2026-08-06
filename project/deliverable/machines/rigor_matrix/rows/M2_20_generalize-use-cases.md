@@ -15,9 +15,14 @@ legal_tools:
   - se_file_list
   - se_log_query
   - se_answer
+entry_read:
+  - project/deliverable/machines/methods/meth-cockburn-use-case.md
 evidence:
   - name: use_cases
-    description: "the generalized set, every story covered"
+    template: refs
+    of: use-case
+    covers: story
+    description: "every use case as a node reference, one per line — the scenario lives in the node, this field never restates it"
 major: full
 minor: tailored
 patch: none
@@ -47,4 +52,20 @@ specification_note: |
 
 ## Guidance
 
-Per [[meth-cockburn-use-case]]. Every story maps into a scenario path; extensions from numbered steps; no UI mechanics. M3 derives the requirements from these steps and extensions.
+Per [[meth-cockburn-use-case]], which the entry read demands before this state opens. The Cockburn shape is not common knowledge, and the last product declared it without ever filling it.
+
+WHAT A USE CASE IS, against the story beside it. A story is ONE pass: this person, this Tuesday, these clicks. A use case is EVERY pass: the same goal, told once, with the branches that can happen along the way. The story is the example; the use case is the general form.
+
+SO EVERY USE CASE HAS AT LEAST ONE STORY UNDER IT, and it is the story that proves the general form is real. A use case with no story is a capability nobody has walked.
+
+AND EVERY STORY SITS INSIDE A USE CASE. A story that generalizes to nothing is either a use case nobody wrote down, or a pass the product does not actually support.
+
+SO THIS FIELD CARRIES REFERENCES, NEVER PROSE. One id per line, shaped by [[use-case]]. The scenario lives in the node; the form points at it and never restates it.
+
+COVERAGE IS CHECKED, not claimed. The field declares `covers: story`, so the engine refuses this state while any use case refines no story, and while any story is refined by no use case. Neither is a judgment call.
+
+REVERSE-ENGINEERING FINDS MISSING STORIES, and that is a result rather than a failure. Walking the system turns up goals nobody told a story about. Write the story, then the use case over it. The story comes first because the example is what makes the general form checkable.
+
+NO UI MECHANICS. A use case survives a rewrite of every screen it describes. Name what the actor achieves, never which button they press.
+
+M3 derives the requirements from these steps and extensions. A step no requirement covers is a hole, and it shows up in the coverage matrix rather than in a review.
