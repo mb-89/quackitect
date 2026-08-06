@@ -189,3 +189,30 @@
 {"ts":"2026-08-05T19:15:50.314Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d13","brief":"the battery again after dropping the hardcoded colour"}
 {"ts":"2026-08-05T19:17:11.012Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d14","brief":"775 green — committing"}
 {"ts":"2026-08-05T19:17:35.475Z","op":"done","visit":"iterations/i1/gate-motivation@0","node":"d11","brief":"the bless re-renders in place and throws confetti"}
+{"ts":"2026-08-06T07:46:57.074Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d7","brief":"aiming the walk at draw-context from onboard-retro"}
+{"ts":"2026-08-06T07:47:03.462Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d8","brief":"hopping i1 forward one state at a time toward draw-context"}
+{"ts":"2026-08-06T07:47:27.925Z","op":"update","visit":"iterations/i1/define-actual@0","node":"d9","brief":"hopped past kickoff, vision and as-is — all already blessed"}
+{"ts":"2026-08-06T07:47:49.096Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d10","brief":"past gate-motivation — the last hop before draw-context"}
+{"ts":"2026-08-06T07:50:52.132Z","op":"fork","visit":"iterations/i1/gate-motivation@0","parent":"d4","node":"d11","brief":"why gate-motivation blocks while gate-kickoff did not — diagnose before claiming anything","nodes":[]}
+{"ts":"2026-08-06T07:52:23.186Z","op":"done","visit":"iterations/i1/gate-motivation@0","node":"d11","brief":"diagnosed: the guard demands a second copy of the review, and exempts kickoff by name"}
+{"ts":"2026-08-06T07:55:03.874Z","op":"plan","visit":"iterations/i1/gate-motivation@0","parent":null,"nodes":[{"id":"d12","brief":"find what the report demanded that the evidence form lacks"},{"id":"d13","brief":"carry the gap onto the evidence form"},{"id":"d14","brief":"strike the separate report requirement"},{"id":"d15","brief":"prove it with a scoped run"},{"id":"d16","brief":"walk on to draw-context and fill it"}]}
+{"ts":"2026-08-06T07:56:00.543Z","op":"done","visit":"iterations/i1/gate-motivation@0","node":"d12","brief":"nothing missing — every report demand has a stronger counterpart on the evidence form"}
+{"ts":"2026-08-06T07:56:06.137Z","op":"obsolete","visit":"iterations/i1/gate-motivation@0","node":"d13","brief":"nothing to carry — the evidence form already holds everything the report asked for"}
+{"ts":"2026-08-06T08:06:21.652Z","op":"plan","visit":"iterations/i1/draw-context@0","parent":null,"nodes":[{"id":"d2","brief":"read what map-stakeholders asks for today"},{"id":"d3","brief":"read what v1 did at the same step"},{"id":"d4","brief":"check the overlap with the standing stakeholder nodes"},{"id":"d5","brief":"weigh the tensions table on its own record"}]}
+{"ts":"2026-08-06T08:09:50.005Z","op":"plan","visit":"iterations/i1/draw-context@0","parent":null,"nodes":[{"id":"d6","brief":"add the promotion question to the retro method"},{"id":"d7","brief":"make it an answerable field on the retro row"},{"id":"d8","brief":"note the vendoring promotion question for later"},{"id":"d9","brief":"report the map-stakeholders research"}]}
+{"ts":"2026-08-06T08:10:44.242Z","op":"done","visit":"iterations/i1/draw-context@0","node":"d9","brief":"research recorded: v1 checked coverage and never minted one tension"}
+{"ts":"2026-08-06T08:11:07.053Z","op":"done","visit":"iterations/i1/draw-context@0","node":"d2","brief":"the step asks for roles and tensions, and nothing else"}
+{"ts":"2026-08-06T09:04:26.325Z","op":"update","visit":"iterations/i1/define-actual@1","node":"d36","brief":"four hops down, four to go"}
+{"ts":"2026-08-06T09:05:36.713Z","op":"done","visit":"overhaul@0","node":"d34","brief":"standing at map-stakeholders with the new row live"}
+{"ts":"2026-08-06T09:07:23.423Z","op":"fork","visit":"iterations/i1/map-stakeholders@0","parent":null,"node":"d37","brief":"the trace corpus read the project root while the walk wrote to the worktree","nodes":[]}
+{"ts":"2026-08-06T09:08:05.513Z","op":"update","visit":"iterations/i1/map-stakeholders@0","node":"d38","brief":"the fix must land in the main tree, and a bound walk cannot write there"}
+{"ts":"2026-08-06T09:33:43.472Z","op":"done","visit":"iterations/start@0","node":"d1","brief":"standing at map-stakeholders again"}
+{"ts":"2026-08-06T09:34:05.300Z","op":"done","visit":"iterations/start@0","node":"d2","brief":"signed_off restored, no suspect line"}
+{"ts":"2026-08-06T09:55:19.499Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d13","brief":"six decks, one per prop plus a second on autonomy"}
+{"ts":"2026-08-06T09:57:41.490Z","op":"done","visit":"front_desk@1","node":"d9","brief":"six decks written, each under the prop it realizes"}
+{"ts":"2026-08-06T10:44:23.736Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d6","brief":"at write-stories; reading the form to see the six that stand"}
+{"ts":"2026-08-06T10:46:32.667Z","op":"plan","visit":"iterations/i1/write-stories@0","parent":null,"nodes":[{"id":"d7","brief":"twelve decks written"},{"id":"d8","brief":"the form refilled and submitted"},{"id":"d9","brief":"the coverage check green"}]}
+{"ts":"2026-08-06T10:47:09.972Z","op":"update","visit":"iterations/i1/write-stories@0","node":"d10","brief":"six decks down, six to go"}
+{"ts":"2026-08-06T10:48:17.155Z","op":"done","visit":"iterations/i1/write-stories@0","node":"d7","brief":"twelve decks written into the iteration's worktree"}
+{"ts":"2026-08-06T10:49:27.511Z","op":"update","visit":"iterations/i1/generalize-use-cases@0","node":"d11","brief":"eighteen stories in the field, coverage rewritten around them"}
+{"ts":"2026-08-06T10:49:44.180Z","op":"update","visit":"iterations/i1/generalize-use-cases@0","node":"d12","brief":"standing on write-stories to read the coverage check's verdict"}

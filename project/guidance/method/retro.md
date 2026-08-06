@@ -132,9 +132,38 @@ The trigger is a NOTE carrying "needs retro":
    highest-leverage notes. Each one specific and checkable — a concrete
    change, never "improve X".
 
-Standing question, every retro: has the process itself gone stale against
-the state of the art? That is the process dimension of the
-state-of-the-art method (project/deliverable/machines/methods/meth-state-of-the-art.md).
+## The standing questions
+
+Two questions run EVERY retro, whatever the period held.
+
+### Did anything local earn promotion?
+
+The work happens in an INSTANCE. The next project starts from a TEMPLATE. A
+good change made in an instance and never promoted dies with that instance.
+
+So walk what changed in the period, and ask of each change: does this belong
+upstream?
+
+- The iteration's own state machine, against the rigor matrix it compiled
+  from. This is the common case. A state whose guidance, legal tools or
+  evidence fields improved during the walk improved them for one walk only.
+- The evidence forms, against their form templates.
+- The item templates, against the nodes actually written from them.
+- Anything else built from a template. The rule is the template, not the
+  kind of artifact.
+
+Promote it, or record why it stays local. Silence is the default answer, and
+the default loses the improvement.
+
+THE PROMOTION LIST GROWS. Vendored and imported code gets the same question
+later: does a change that proved good here belong further up the dependency
+chain? Not built yet, and it joins this list when it is.
+
+### Has the process gone stale?
+
+Has the way of working fallen behind current practice? Name what you
+compared it against. That is the process dimension of the state-of-the-art
+method (project/deliverable/machines/methods/meth-state-of-the-art.md).
 
 ## The mechanical half
 

@@ -216,7 +216,7 @@ export async function call(server: Server, name: string, args: Record<string, un
  *
  *  AGENTS.md, then the contract, the walk and the voice LEFT THIS LIST when
  *  they were promoted. */
-export const READ_DOCS = ["project/guidance/software.md", "project/guidance/ux.md"] as const;
+export const READ_DOCS = ["project/guidance/craft/software.md", "project/guidance/craft/ux.md"] as const;
 
 /** The human's side of the read proof: check every boot doc in the mirror.
  *  (The agent's side has no helper on purpose — its proofs are earned by

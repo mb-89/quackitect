@@ -21,6 +21,9 @@ evidence:
     description: "rework or waste found in the record"
     template: list
     required: false
+  - name: promotions
+    description: "local changes worth promoting to the template they came from, one per line, or none-found stated"
+    template: list
   - name: process_stale
     description: "the standing state-of-the-art check on the process itself"
 major: full

@@ -2695,11 +2695,16 @@ export class Session {
 
   /** Every trace node's id against the path that holds it, root-relative —
    *  what a surface needs to turn a reference into something clickable. */
+  /** THE CORPUS IS READ WHERE THE WALK WRITES. A standing artifact authored
+   *  inside a bound record lives in that record's worktree until it lands, so
+   *  reading the trace from the project root made a node the lane had just
+   *  written resolve to nothing. Everything else on this path already used
+   *  the work root; the trace was the one that did not. */
   private refPaths(): Record<string, string> {
     const out: Record<string, string> = {};
     try {
-      for (const n of loadTrace(this.root)) {
-        if (n.file !== undefined) out[n.id] = relative(this.root, n.file).split(sep).join("/");
+      for (const n of loadTrace(this.workRoot())) {
+        if (n.file !== undefined) out[n.id] = relative(this.workRoot(), n.file).split(sep).join("/");
       }
     } catch {
       // no corpus, no links — the ids still read
@@ -2728,7 +2733,7 @@ export class Session {
       const body = parseStateNote(raw).body;
       for (const f of model.template.fields) fills[f.name] = stripComments(section(body, f.name)).trim();
     }
-    const tp = templateProblems(model, fills, this.root);
+    const tp = templateProblems(model, fills, this.workRoot());
     const fmData = raw === undefined ? ({} as Record<string, unknown>) : parseStateNote(raw).frontmatter;
     return {
       state_form: true,

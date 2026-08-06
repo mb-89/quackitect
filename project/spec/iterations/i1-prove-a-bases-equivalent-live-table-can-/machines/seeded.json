@@ -1,6 +1,6 @@
 {
   "change_size": "product",
-  "rigor_matrix_hash": "ab88ef7cfee1",
+  "rigor_matrix_hash": "db48b108a7e5",
   "pinned_at": "2026-08-04T16:20:30.684Z",
   "demands": {
     "onboard-retro": {
@@ -45,11 +45,11 @@
     },
     "map-stakeholders": {
       "applies": "full",
-      "evidence": "[[\"roles\",true,\"\",[],\"\",\"\",[],[],[]],[\"tensions\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"roles\",true,\"\",[],\"refs\",\"stakeholder\",[],[],[]],[\"coverage\",true,\"\",[],\"\",\"\",[],[],[]]]"
     },
     "write-stories": {
       "applies": "full",
-      "evidence": "[[\"stories\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"stories\",true,\"\",[],\"refs\",\"story\",[],[],[]],[\"coverage\",true,\"\",[],\"\",\"\",[],[],[]]]"
     },
     "generalize-use-cases": {
       "applies": "full",

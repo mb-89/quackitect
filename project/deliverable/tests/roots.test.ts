@@ -41,7 +41,7 @@ describe("declared roots", { concurrency: true }, () => {
   test("everything else still answers from the work root", () => {
     const s = new Session(freshRoot());
     assert.equal(s.laneRoot(), s.workRoot(), "no address at all");
-    assert.equal(s.laneRoot("project/guidance/ux.md"), s.workRoot(), "an ordinary path");
+    assert.equal(s.laneRoot("project/guidance/craft/ux.md"), s.workRoot(), "an ordinary path");
     assert.equal(s.laneRoot("project/**/*.md"), s.workRoot(), "an ordinary glob");
   });
 
