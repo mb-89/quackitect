@@ -536,3 +536,6 @@
 {"ts":"2026-08-06T17:27:37.647Z","op":"update","visit":"iterations/i1/pressure-test@0","node":"d20","brief":"pressure-test is the last M1 feeder"}
 {"ts":"2026-08-06T17:28:21.001Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d21","brief":"blessing gate-motivation on the owner's standing grant"}
 {"ts":"2026-08-06T17:32:54.475Z","op":"done","visit":"iterations/i1/define-actual@0","node":"d11","brief":"M1 closed: nine states re-earned and two gates blessed"}
+{"ts":"2026-08-06T17:33:15.543Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d22","brief":"the handover records the two blessed gates"}
+{"ts":"2026-08-06T17:33:52.904Z","op":"update","visit":"iterations/i1/draw-context@0","node":"d23","brief":"M2 begins: draw-context"}
+{"ts":"2026-08-06T17:34:07.521Z","op":"update","visit":"iterations/i1/draw-context@0","node":"d24","brief":"draw-context signed; ten states re-earned"}
