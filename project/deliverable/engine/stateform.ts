@@ -723,22 +723,30 @@ export function buildPortableForm(
   const docIndex = new Map(docs.map((d, i) => [d.path, i]));
   const done = new Set(checked);
   const follow = model.follow_up_label === "" ? "" : `<span class="concrete">/ ${esc(model.follow_up_label)}</span> `;
+  // ANYTHING ELSE IS FOLLOW-UP, NOT EVIDENCE (owner, 2026-08-06). It asks
+  // what is left over, which is the same question box 6 asks.
+  const TAIL = ["current_situation", "follow_up", "anything_else"];
+  const one = (f: FormTemplate["fields"][number]): string => {
+    const tpl = model.field_templates[f.name] ?? "free-form";
+    return renderField(
+      f.name,
+      f.description,
+      f.required,
+      tpl,
+      fills[f.name] ?? "",
+      model.template_meta[tpl],
+      model.field_args[f.name],
+      f.guidance ?? "",
+      model.field_hints[f.name],
+    );
+  };
   const evid = model.template.fields
-    .filter((f) => f.name !== "current_situation" && f.name !== "follow_up")
-    .map((f) => {
-      const tpl = model.field_templates[f.name] ?? "free-form";
-      return renderField(
-        f.name,
-        f.description,
-        f.required,
-        tpl,
-        fills[f.name] ?? "",
-        model.template_meta[tpl],
-        model.field_args[f.name],
-        f.guidance ?? "",
-        model.field_hints[f.name],
-      );
-    })
+    .filter((f) => !TAIL.includes(f.name))
+    .map(one)
+    .join("");
+  const spill = model.template.fields
+    .filter((f) => f.name === "anything_else")
+    .map(one)
     .join("");
   const island: IslandData = { form: model.form, author: "", fields: fills, checked };
   const left =
@@ -750,7 +758,7 @@ export function buildPortableForm(
   const right =
     `<div class="box"><h2>5&nbsp;&nbsp;Evidence</h2>${evid}</div>` +
     `<div class="box"><h2>6&nbsp;&nbsp;Follow-up ${follow}<span class="tpl">template: ${esc(model.field_templates.follow_up ?? "free-form")}</span></h2>` +
-    `<textarea data-field="follow_up">${esc(fills.follow_up ?? "")}</textarea></div>`;
+    `<textarea data-field="follow_up">${esc(fills.follow_up ?? "")}</textarea>${spill}</div>`;
   const embedded = docs
     .map((d, i) => `<details id="doc-${i}"><summary>${esc(d.path)}</summary><pre>${esc(d.content)}</pre></details>`)
     .join("");
