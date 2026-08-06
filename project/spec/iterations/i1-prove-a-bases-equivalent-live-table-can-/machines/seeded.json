@@ -1,6 +1,6 @@
 {
   "change_size": "product",
-  "rigor_matrix_hash": "581a9c9fc099",
+  "rigor_matrix_hash": "e1e14dd0dd1b",
   "pinned_at": "2026-08-04T16:20:30.684Z",
   "demands": {
     "onboard-retro": {
@@ -61,7 +61,7 @@
     },
     "write-requirements": {
       "applies": "full",
-      "evidence": "[[\"register\",true,\"\",[],\"\",\"\",[],[],[]],[\"set_criteria\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"register\",true,\"\",[],\"refs\",\"requirement\",[],[],[]],[\"set_criteria\",true,\"\",[],\"per-item\",\"\",[],[\"complete\",\"consistent\",\"affordable\",\"bounded\",\"comprehensible\",\"no_tbd\"],[]]]"
     },
     "derive-functions": {
       "applies": "full",

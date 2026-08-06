@@ -12,17 +12,22 @@ card does not restate them. It says everything AROUND the statement: what
 makes one row good, and what the field, the corpus and two prior products
 learned the hard way.
 
-## ONE CLAIM PER ROW
+## ONE CONCERN PER NODE — AND THE DETAIL RIDES IN TABLES
 
-A requirement states exactly one thought. No `and`-joined behaviors. No
-combined conditions. No numbered sub-claims inside one node — v1 allowed
-`req-x.<n>` sub-statements and quietly lost the one-claim rule to them.
+Owner ruling, 2026-08-06, overruling textbook singularity: requirements
+written by and for agents need DETAIL, and a thousand atomic rows for the
+smallest thing is the failure, not the discipline. A node carries ONE
+CONCERN; its `## Detail` section may carry tables, lists and limit sets,
+and they BIND as part of the demand.
 
-The test: if two different tests could fail independently, it is two
-requirements. Split it.
+The statement stays the one EARS-shaped headline over that detail.
 
-Why it binds: a compound row cannot be traced, weighted, or verified as a
-unit. (ISO 29148 "singular"; INCOSE GTWR singularity rules.)
+The split rule that remains: detail that VERIFIES DIFFERENTLY is a sibling
+row. One node, one verify_method, one pass/fail — a table whose rows would
+fail independently under different methods is several requirements.
+
+(ISO 29148 "singular" is deliberately relaxed here; the trace and verify
+unit is the NODE, not the sentence.)
 
 ## EVERY VALUE CARRIES ITS UNIT AND TOLERANCE
 
@@ -37,9 +42,9 @@ Why it binds: verification is done by people without the author's domain
 knowledge. The number is the only thing they can check. (INCOSE R33; the
 corpus's field practice.)
 
-## THE STATEMENT IS THE SPEC — PROSE IS A DEFECT
+## THE STATEMENT LEADS — FREE PROSE IS A DEFECT
 
-The node carries no rationale paragraph, no test design, no design detail.
+Structured detail binds; loose paragraphs do not belong in a row.
 
 - A rationale is a LINK in `source_refs` — to the stakeholder, the norm
   clause, the decision. A changed rationale then never forces re-review of
@@ -93,11 +98,13 @@ Editing this line later is patch-class: it rewords the why, not the demand.
 (In-house rule, v2 owner ruling 2026-07-21 — no external standard names it;
 its nearest kin is 29148's "necessary".)
 
-## WEIGHT — THREE STEPS, ONE CONSUMER
+## PRIORITY — MOSCOW, THE HOUSE SCALE
 
-`key | important | unimportant`, defaulting to unimportant. Only the key
-rows become M4's criteria and owe a scoring definition there. Weight
-inflation defeats the consumer: if most rows are key, none is.
+`must | should | could`, defaulting to could — the same scale everything
+else here uses. The consumer is M4: the must rows GATE every candidate
+pass/fail, and the should and could rows become the scored criteria. A
+won't-have is a non-goal, never a register row. Priority inflation defeats
+the consumer: if most rows are must, no candidate can differ.
 
 ## TRACE — REFINES AND SOURCE_REFS ARE DIFFERENT EDGES
 

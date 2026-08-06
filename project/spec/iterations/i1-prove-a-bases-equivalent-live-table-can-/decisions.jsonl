@@ -353,3 +353,9 @@
 {"ts":"2026-08-06T14:58:03.533Z","op":"done","visit":"iterations/i1/start@0","node":"d42","brief":"v1's weasel list and shape check ride the template and the engine now"}
 {"ts":"2026-08-06T14:58:21.321Z","op":"done","visit":"iterations/i1/start@0","node":"d44","brief":"eleven minted-fixture cases green on the first run"}
 {"ts":"2026-08-06T14:58:55.728Z","op":"done","visit":"iterations/i1/start@0","node":"d41","brief":"signed forms freeze and unsigned read live so the new shape serves i1"}
+{"ts":"2026-08-06T14:59:41.641Z","op":"done","visit":"iterations/i1/start@0","node":"d43","brief":"checks committed at 9f98896 with both suites green"}
+{"ts":"2026-08-06T15:01:16.046Z","op":"update","visit":"iterations/i1/draft-vision@0","node":"d49","brief":"hopping the passed chain toward write-requirements"}
+{"ts":"2026-08-06T15:02:51.988Z","op":"update","visit":"iterations/i1/gate-inputs@0","node":"d50","brief":"the blessed gate passes and the M3 door opens"}
+{"ts":"2026-08-06T15:11:02.100Z","op":"plan","visit":"iterations/i1/write-requirements@0","parent":null,"nodes":[{"id":"d51","brief":"work MoSCoW and the detail ruling into template and card and row"},{"id":"d52","brief":"align the tests and rerun them"},{"id":"d53","brief":"compose the qualities-chain proposal for convergence"}]}
+{"ts":"2026-08-06T15:11:31.696Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d51","brief":"MoSCoW and the detail ruling stand in template and card and row"}
+{"ts":"2026-08-06T15:11:47.446Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d52","brief":"23 green after the MoSCoW alignment"}

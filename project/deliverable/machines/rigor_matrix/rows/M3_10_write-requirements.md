@@ -81,7 +81,7 @@ Every row fills its duties:
 - kind picked
 - verify_method named
 - breaks_if_removed filled
-- weight set (key | important | unimportant - only the key rows become M4's criteria)
+- priority set (MoSCoW - the must rows gate M4's candidates, the should and could rows become its scored criteria)
 
 Detail now. No TBD survives this milestone.
 

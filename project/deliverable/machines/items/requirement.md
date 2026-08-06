@@ -19,8 +19,8 @@ checks:
     one_of: [functional, quality, constraint, interface]
   - field: verify_method
     one_of: [test, analysis, inspection, demonstration]
-  - field: weight
-    one_of: [key, important, unimportant]
+  - field: priority
+    one_of: [must, should, could]
   - field: statement
     ban_markers: [TBD, TBC, TBR, "???"]
     hint: no TBD survives the milestone
@@ -37,9 +37,11 @@ the iteration that authored it, lands on trunk when that record closes, and a
 later record may change it — a rewording is a patch, a changed demand is a
 minor that returns the gate.
 
-THE STATEMENT IS THE SPEC. Everything the row demands lives in the statement
-line — the EARS shape and every value with its unit and tolerance. The node
-carries no prose beyond it. A rationale is a LINK in `source_refs`, never a
+THE STATEMENT LEADS, THE DETAIL BINDS. The statement is the one EARS-shaped
+headline. Structured detail — tables, lists, limit sets — goes in a
+`## Detail` section and binds as part of the demand: agent-grade
+requirements need that precision, and a table beats thirty sibling rows.
+Free prose stays a defect. A rationale is a LINK in `source_refs`, never a
 paragraph, so a changed rationale never forces re-review of the demand.
 
 IT DERIVES FROM USE CASES. `refines` names the uc- ids whose steps and
@@ -98,9 +100,10 @@ refines:
 source_refs:
   - TODO — the source beyond the use case, or none
 #
-# How much it matters: key | important | unimportant. Only the key rows
-# become M4 criteria and owe a scoring definition there.
-weight: unimportant
+# MoSCoW, the house scale: must | should | could. At M4 the must rows GATE
+# every candidate pass/fail; the should and could rows become the scored
+# criteria. A won't-have is a non-goal, never a register row.
+priority: could
 ---
 
 <!-- QUALITY KIND ONLY — add a `## Scenario` section carrying the six-part
@@ -109,6 +112,10 @@ artifact, then environment, then response, then the response MEASURE with
 its tolerance. The measure is the pass line: no measure, no requirement.
 The conformance check demands the section on every quality-kind row. Strike
 this comment for other kinds. -->
+
+<!-- OPTIONAL `## Detail` — the structured precision an agent builds from:
+tables, lists, limit sets. It BINDS as part of the demand. One concern per
+node still holds: detail that verifies differently is a sibling row. -->
 
 <!-- A genuinely non-EARS statement records its exemption in frontmatter as
 `ears: exempt — <reason citing a recorded decision>`. A bare exemption is a

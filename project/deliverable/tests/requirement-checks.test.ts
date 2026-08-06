@@ -49,7 +49,7 @@ const GOOD = {
   breaks_if_removed: "a gate would pass unreviewed and the bless would mean nothing",
   refines: "uc-take-a-step",
   source_refs: "none",
-  weight: "key",
+  priority: "must",
 };
 
 describe("the requirement template's declared checks", () => {
