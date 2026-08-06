@@ -532,3 +532,7 @@
 {"ts":"2026-08-06T17:23:55.237Z","op":"update","visit":"iterations/i1/log-risks@0","node":"d17","brief":"log-risks was the unwalked branch; submitting it"}
 {"ts":"2026-08-06T17:24:36.409Z","op":"update","visit":"iterations/i1/log-risks@0","node":"d18","brief":"writing the handover before the context runs out"}
 {"ts":"2026-08-06T17:25:05.102Z","op":"done","visit":"iterations/i1/start@0","node":"d3","brief":"seven states re-earned and the handover names the rest"}
+{"ts":"2026-08-06T17:25:46.883Z","op":"update","visit":"iterations/i1/log-risks@0","node":"d19","brief":"walking on to the pressure test"}
+{"ts":"2026-08-06T17:27:37.647Z","op":"update","visit":"iterations/i1/pressure-test@0","node":"d20","brief":"pressure-test is the last M1 feeder"}
+{"ts":"2026-08-06T17:28:21.001Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d21","brief":"blessing gate-motivation on the owner's standing grant"}
+{"ts":"2026-08-06T17:32:54.475Z","op":"done","visit":"iterations/i1/define-actual@0","node":"d11","brief":"M1 closed: nine states re-earned and two gates blessed"}

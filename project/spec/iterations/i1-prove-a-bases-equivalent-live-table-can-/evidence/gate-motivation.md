@@ -1,5 +1,8 @@
 ---
 form: gate-motivation
+bless: blessed by agent
+by: agent
+signed_off: 2026-08-06T17:28:08.352Z
 authors: agent
 files:
 ---
