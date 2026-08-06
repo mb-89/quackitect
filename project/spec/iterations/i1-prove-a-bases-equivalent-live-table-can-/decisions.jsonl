@@ -188,3 +188,4 @@
 {"ts":"2026-08-05T19:14:11.484Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d12","brief":"the battery — the page script must still parse"}
 {"ts":"2026-08-05T19:15:50.314Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d13","brief":"the battery again after dropping the hardcoded colour"}
 {"ts":"2026-08-05T19:17:11.012Z","op":"update","visit":"iterations/i1/gate-motivation@0","node":"d14","brief":"775 green — committing"}
+{"ts":"2026-08-05T19:17:35.475Z","op":"done","visit":"iterations/i1/gate-motivation@0","node":"d11","brief":"the bless re-renders in place and throws confetti"}

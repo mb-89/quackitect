@@ -1,6 +1,6 @@
 {
   "change_size": "product",
-  "rigor_matrix_hash": "a887f43c9e3c",
+  "rigor_matrix_hash": "ab88ef7cfee1",
   "pinned_at": "2026-08-04T16:20:30.684Z",
   "demands": {
     "onboard-retro": {
@@ -41,7 +41,7 @@
     },
     "draw-context": {
       "applies": "full",
-      "evidence": "[[\"boundary\",true,\"\",[],\"\",\"\",[],[],[]],[\"intended_use\",true,\"\",[],\"\",\"\",[],[],[]],[\"excluded_use\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"boundary\",true,\"\",[],\"\",\"\",[],[],[]],[\"neighbours\",true,\"\",[],\"refs\",\"neighbour\",[],[],[]],[\"intended_use\",true,\"\",[],\"\",\"\",[],[],[]],[\"excluded_use\",true,\"\",[],\"\",\"\",[],[],[]]]"
     },
     "map-stakeholders": {
       "applies": "full",
