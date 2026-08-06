@@ -101,6 +101,8 @@ export interface ItemTemplate {
   id_prefix: string;
   fields: string[];
   sections: string[];
+  /** Where nodes of this type live, root-relative. Empty if unstated. */
+  folder: string;
 }
 
 export function itemTemplate(root: string, type: string): ItemTemplate | undefined {
@@ -116,6 +118,7 @@ export function itemTemplate(root: string, type: string): ItemTemplate | undefin
     id_prefix: typeof note.frontmatter.id_prefix === "string" ? note.frontmatter.id_prefix : "",
     fields: fence === null ? [] : [...(fence[1] ?? "").matchAll(/^([a-z_]+):/gm)].map((m) => m[1] ?? ""),
     sections: Array.isArray(note.frontmatter.sections) ? note.frontmatter.sections.map(String) : [],
+    folder: typeof note.frontmatter.folder === "string" ? note.frontmatter.folder : "",
   };
 }
 
@@ -300,14 +303,50 @@ export function traceIds(root: string): Set<string> {
   return new Set(loadTrace(root).map((n) => n.id));
 }
 
+/** ONE WRITTEN REFERENCE, REDUCED TO THE ID IT MEANS.
+ *
+ *  THE MACHINE IS GENEROUS HERE ON PURPOSE (owner, 2026-08-06). A person
+ *  writing a reference has a file in front of them, and there are four honest
+ *  ways to name it. Refusing three of them teaches nothing — it just makes the
+ *  form feel broken.
+ *
+ *  All of these mean the same node:
+ *
+ *  - `nbr-obsidian` — the bare id
+ *  - `[[nbr-obsidian]]` — a wiki link, which is what Obsidian pastes
+ *  - `project/spec/trace/neighbour/nbr-obsidian.md` — the path from the root
+ *  - `project\spec\trace\neighbour\nbr-obsidian.md` — the same, Windows-shaped
+ *  - `nbr-obsidian.md` — just the file name
+ *
+ *  A path reduces to its LAST SEGMENT with `.md` dropped, because the file
+ *  name IS the id everywhere in the trace. So a unique file name resolves
+ *  whether or not the folders above it were typed correctly.
+ *
+ *  What stays strict is the ID ITSELF. It must look like an id, and it must
+ *  resolve to a standing node — those checks are the point of a reference. */
+export function refId(written: string): string {
+  const bare = written.trim().replace(/^\[\[/, "").replace(/\]\]$/, "").trim();
+  // A wiki link may carry a display half: [[id|what it says]].
+  const target = (bare.split("|")[0] ?? "").trim();
+  const last = target.replace(/\\/g, "/").split("/").filter(Boolean).pop() ?? "";
+  return last.replace(/\.md$/i, "").trim();
+}
+
+/** Does this reduce to something SHAPED like a trace id. */
+export function looksLikeId(id: string): boolean {
+  return /^[a-z][a-z0-9]*-[a-z0-9-]+$/i.test(id);
+}
+
 /** THE REFERENCES A FIELD CARRIES. frame-delta's evidence is a list of value
  *  props BY ID, never their prose — the artifact is the truth and the form
- *  points at it. A line may be a bare id or a wiki link; both resolve. */
+ *  points at it. Every shape refId accepts resolves; see it for the list. */
 export function refsIn(text: string): string[] {
   const out: string[] = [];
   for (const line of text.split(/\r?\n/)) {
-    const m = line.match(/^\s*-\s*\[?\[?([a-z][a-z0-9]*-[a-z0-9-]+)\]?\]?\s*$/i);
-    if (m !== null) out.push(m[1]);
+    const m = line.match(/^\s*-\s*(.+?)\s*$/);
+    if (m === null) continue;
+    const id = refId(m[1] ?? "");
+    if (looksLikeId(id)) out.push(id);
   }
   return out;
 }

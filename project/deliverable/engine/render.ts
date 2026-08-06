@@ -841,6 +841,10 @@ const STYLE = `
   .cond-label { font-size: 20px; text-anchor: middle; fill: var(--se-fg); pointer-events: none; }
   .doclist a { display: block; padding: 4px 0; }
   a.doclink { color: var(--se-link); cursor: pointer; text-decoration: underline; }
+  /* A REFERENCE OPENS ITS FILE, never the details pane — so it is NOT a
+     doclink, whose handler would render it here and take the pane the
+     reader is reviewing from. */
+  a.reflink { color: var(--se-link); cursor: pointer; text-decoration: underline; font-size: 11.5px; padding: 0 4px; }
   .docview { font-size: 13.5px; line-height: 1.55; }
   .docview h1, .docview h2, .docview h3 { color: var(--se-accent); }
   .docview code { background: var(--se-raised); padding: 1px 5px; border-radius: 4px; }
@@ -1618,17 +1622,37 @@ function sfOne(f, fl) {
   const tpl = (f.field_templates || {})[fl.name] || "free-form";
   const tm = (f.template_meta || {})[tpl] || {};
   const args = (f.field_args || {})[fl.name] || { options: [], items: [], passing: [] };
+  const hint = (f.field_hints || {})[fl.name] || {};
   let s = '<div style="border:1px solid var(--se-line,#888);border-radius:4px;padding:7px 10px;margin:7px 0">';
-  s += '<span style="float:right;font-size:11.5px;color:var(--se-accent)">template: ' + escText(tpl) + "</span>";
+  // THE TYPE IS A DOOR, NOT A WORD. A field that accepts one kind of node
+  // says which, and the rules for that kind are one click away — otherwise
+  // the filler has to guess what a legal line even looks like.
+  const ofChip = hint.of && hint.of_template
+    ? ' · of: <a class="reflink" data-path="' + escText(hint.of_template) + '" title="open the ' + escText(hint.of) + ' template in the editor">' + escText(hint.of) + "</a>"
+    : (hint.of ? " · of: " + escText(hint.of) : "");
+  s += '<span style="float:right;font-size:11.5px;color:var(--se-accent)">template: ' + escText(tpl) + ofChip + "</span>";
   s += "<b>" + escText(fl.name) + "</b>" + (fl.required ? ' <span style="color:var(--se-fail);font-size:11px">required</span>' : ' <span class="meta">optional</span>');
   if (fl.guidance) s += '<div class="meta" style="font-style:italic">' + escText(fl.guidance) + "</div>";
   // Free text carries its ask as the PLACEHOLDER; the structured editors
   // keep the description above, because their rows replace the empty box.
-  if ((tm.editor || "text") !== "text") s += '<div class="meta">' + escText(fl.description || "") + "</div>";
+  // The FIELD's ask comes first, then the TEMPLATE's mechanics — written
+  // once in the template and expanded for this field's type.
+  if ((tm.editor || "text") !== "text") {
+    s += '<div class="meta">' + escText(fl.description || "") + "</div>";
+    // THE RULES FOR WHAT GOES IN ARE ONE CLICK AWAY. A person told to list
+    // neighbours still has to know what a neighbour note must carry, and
+    // guessing that from an empty row is not a fair ask.
+    if (hint.description || hint.of_template) {
+      const tlink = hint.of_template
+        ? ' <a class="reflink" data-path="' + escText(hint.of_template) + '" title="open the ' + escText(hint.of) + ' template in the editor">what a ' + escText(hint.of) + " must carry</a>"
+        : "";
+      s += '<div class="meta">' + escText(hint.description || "") + tlink + "</div>";
+    }
+  }
   (fl.prefills || []).forEach(function (p, i) {
     s += '<div class="prefill"><div class="comment-text">prefill — unconfirmed:</div><div>' + escText(p) + '</div><button class="primary confirmpre" data-form="' + name + '" data-machine="' + escText(f.machine || "") + '" data-field="' + escText(fl.name) + '" data-index="' + i + '">confirm</button></div>';
   });
-  s += sfEditor(fl, tm, args, f.ref_paths || {}) + "</div>";
+  s += sfEditor(fl, tm, args, f.ref_paths || {}, hint) + "</div>";
   return s;
 }
 // THE EDITOR IS THE TEMPLATE'S SHAPE (owner ruling 2026-08-04): a list
@@ -1638,16 +1662,24 @@ function sfOne(f, fl) {
 function sfDash(c) {
   return (c || "").split("\\n").map(function (l) { return l.trim(); }).filter(function (l) { return l.indexOf("- ") === 0; }).map(function (l) { return l.slice(2); });
 }
-function sfEditor(fl, tm, args, paths) {
+function sfEditor(fl, tm, args, paths, hint) {
   const name = escText(fl.name);
-  const ph = escText(tm.placeholder || "");
+  const ph = escText((hint && hint.placeholder) || "");
   if (tm.editor === "list") {
     // A REFERENCE IS AN ADDRESS, so it opens. Reading a reference list meant
     // reading ids and then going to find the files they name by hand, which
     // is exactly the work the reference was supposed to save.
+    // The SAME reduction the engine does: a path, a file name, an id or a
+    // wiki link all name one node, so all four get their open link.
+    const refId = function (v) {
+      const bare = String(v || "").trim().replace(/^\\[\\[/, "").replace(/\\]\\]$/, "").trim();
+      const target = (bare.split("|")[0] || "").trim();
+      const last = target.replace(/\\\\/g, "/").split("/").filter(Boolean).pop() || "";
+      return last.replace(/\\.md$/i, "").trim();
+    };
     const link = function (v) {
-      const p = tm.resolves === "artifact" && paths ? paths[v.replace(/^\\[\\[|\\]\\]$/g, "")] : null;
-      return p ? '<a class="doclink openref" data-path="' + escText(p) + '" title="open ' + escText(p) + '">open</a>' : "";
+      const p = tm.resolves === "artifact" && paths ? paths[refId(v)] : null;
+      return p ? '<a class="reflink" data-path="' + escText(p) + '" title="open ' + escText(p) + ' in the editor">open</a>' : "";
     };
     return '<div class="sfrows">' + sfDash(fl.content).concat([""]).map(function (v) { return '<div class="sfrow"><input class="sfli" data-field="' + name + '" placeholder="' + ph + '" value="' + escText(v) + '">' + link(v) + sfRowBtns() + "</div>"; }).join("") + "</div>";
   }
@@ -1697,8 +1729,16 @@ function renderStateForm(f) {
     const label = i.path ? '<a class="doclink" data-path="' + escText(i.path) + '">' + escText(i.label) + "</a>" : "<b>" + escText(i.label) + "</b>";
     return '<div style="font-size:12.5px"><input type="checkbox" class="sfcheck" data-form="' + name + '" data-machine="' + escText(mach) + '" data-label="' + escText(i.label) + '"' + (on ? " checked" : "") + "> " + label + (i.entry ? ' <span style="color:var(--se-fail);font-size:11px">before entry</span>' : "") + ' <span class="meta">' + escText(i.description || "") + "</span></div>";
   }).join(""), false);
-  h += sfBox("Evidence", (f.fields || []).filter(function (x) { return x.name !== "current_situation" && x.name !== "follow_up"; }).map(function (x) { return sfOne(f, x); }).join(""), false);
-  h += sfBox("Follow-up" + (f.follow_up_label ? " / " + escText(f.follow_up_label) : ""), sfOne(f, fld("follow_up")), false);
+  const tail = ["current_situation", "follow_up", "anything_else"];
+  h += sfBox("Evidence", (f.fields || []).filter(function (x) { return tail.indexOf(x.name) < 0; }).map(function (x) { return sfOne(f, x); }).join(""), false);
+  // ANYTHING ELSE IS A FOLLOW-UP, not evidence (owner, 2026-08-05). It is
+  // what the boxes above had no room for, so it belongs beside what happens
+  // next — never among the claims the gate judges.
+  h += sfBox(
+    "Follow-up" + (f.follow_up_label ? " / " + escText(f.follow_up_label) : ""),
+    sfOne(f, fld("follow_up")) + ((f.fields || []).some(function (q) { return q.name === "anything_else"; }) ? sfOne(f, fld("anything_else")) : ""),
+    false,
+  );
   // No verdicts here — the details are the DEFINITION; a submit's pass or
   // fail lands in the log, where its line carries the why.
   if (f.gate) {
@@ -1917,12 +1957,13 @@ document.addEventListener("click", async (ev) => {
   }
   const ofo = ev.target.closest ? ev.target.closest(".openfolder") : null;
   if (ofo) { await formPost("/form/folder", { name: ofo.dataset.form }); return; }
-  // THE ARTIFACT OPENS WHERE IT IS EDITED. Inside the editor the host owns
-  // the file; standing alone, the details pane renders it instead.
-  const orf = ev.target.closest ? ev.target.closest(".openref") : null;
+  // THE ARTIFACT OPENS IN THE EDITOR, AND ONLY THERE (owner, 2026-08-05).
+  // Rendering it in details as well cost the reader the pane they were
+  // reviewing from — two surfaces answering one click, and the one they
+  // still needed was the one that got replaced.
+  const orf = ev.target.closest ? ev.target.closest(".reflink") : null;
   if (orf) {
     if (window.parent !== window) window.parent.postMessage({ se: "open", path: orf.dataset.path }, "*");
-    else await openDoc(orf.dataset.path, "comment");
     return;
   }
 });

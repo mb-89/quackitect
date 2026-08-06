@@ -14,7 +14,7 @@ import type { MachineDecl, StateDecl } from "./machine.ts";
 import { parseStateNote, section } from "./notes.ts";
 import { seDir } from "./paths.ts";
 import { type GuidanceDoc, pulledFor } from "./pull.ts";
-import { conformance, duplicateIds, itemTemplateRel, loadTrace, refsIn, type TraceNode } from "./trace.ts";
+import { conformance, duplicateIds, itemTemplate, itemTemplateRel, loadTrace, refsIn, type TraceNode } from "./trace.ts";
 
 export interface A3Box {
   heading: string;
@@ -57,6 +57,9 @@ export interface StateFormModel {
   template_meta: Record<string, TemplateMeta>;
   /** Per field name: the arguments the form hands its template. */
   field_args: Record<string, FieldArgs>;
+  /** Field name -> the resolved placeholder, mechanics line and item-template
+   *  link. Derived, never authored. */
+  field_hints: Record<string, FieldHint>;
   /** The lint template over the fill sections, in sheet order. */
   template: FormTemplate;
   /** Field name -> its template name (free-form unless declared). */
@@ -74,8 +77,12 @@ export interface TemplateMeta {
   editor: string;
   line_pattern: string;
   line_help: string;
-  /** What the editor's empty box says — the hint AT the point of typing. */
+  /** What the editor's empty box says — the hint AT the point of typing.
+   *  May carry {type} and {prefix}; see expandHint. */
   placeholder: string;
+  /** The template's OWN description of the mechanics, written once here so
+   *  no field repeats it. May carry {type} and {prefix} too. */
+  description: string;
   /** Set where the lines are REFERENCES to standing artifacts rather than
    *  free text. The editor shape is shared with an ordinary list, so the
    *  template declares the meaning and the check reads the declaration. */
@@ -101,11 +108,62 @@ export function templateMeta(root: string, name: string): TemplateMeta {
       line_pattern: typeof fm.line_pattern === "string" ? fm.line_pattern : "",
       line_help: typeof fm.line_help === "string" ? fm.line_help : "",
       placeholder: typeof fm.placeholder === "string" ? fm.placeholder : "",
+      description: typeof fm.description === "string" ? fm.description : "",
       ...(typeof fm.resolves === "string" ? { resolves: fm.resolves } : {}),
     };
   } catch {
-    return { editor: "text", line_pattern: "", line_help: "", placeholder: "" };
+    return { editor: "text", line_pattern: "", line_help: "", placeholder: "", description: "" };
   }
+}
+
+/** WHAT THE EDITOR DRAWS FOR ONE FIELD, resolved once and server-side.
+ *
+ *  A template is generic by law, so it cannot name the type its fields will
+ *  accept. It writes {type} and {prefix} instead, and this expands them from
+ *  the FIELD's own `of:`. The alternative was every field copying the text,
+ *  which is exactly how a neighbours field came to prompt for a value prop.
+ *
+ *  Both renders read the resolved strings, so the mirror and the portable
+ *  copy cannot drift apart. */
+export interface FieldHint {
+  /** The empty row's hint, with the type's real id prefix in it. */
+  placeholder: string;
+  /** The template's mechanics line, resolved. The field's own description
+   *  sits ABOVE this one; it never replaces it. */
+  description: string;
+  /** Root-relative path to the item template `of:` names, so the reader is
+   *  one click from the rules for what they must type. Empty without `of:`. */
+  of_template: string;
+  /** The type itself, for the link's label. */
+  of: string;
+}
+
+/** {type}, {prefix} and {folder} filled from the field's declared type.
+ *
+ *  {folder} is what makes the placeholder TEACH. Showing
+ *  `project/spec/trace/neighbour/nbr-something.md` says root-relative path
+ *  without a sentence about it — and the id inside it says an id is fine too.
+ *
+ *  IT ALWAYS STARTS `project/` (owner, 2026-08-06). That first segment is the
+ *  whole reason the placeholder works: it tells the reader where the path is
+ *  measured from. A folder is root-relative already, so it carries it; the
+ *  fallback for a type with no folder declared carries it too. */
+export function expandHint(root: string, text: string, of: string): string {
+  if (text === "") return "";
+  const tpl = of === "" ? undefined : itemTemplate(root, of);
+  return text
+    .replace(/\{type\}/g, of === "" ? "artifact" : of)
+    .replace(/\{prefix\}/g, tpl?.id_prefix ?? "")
+    .replace(/\{folder\}/g, tpl?.folder === undefined || tpl.folder === "" ? "project/spec/trace" : tpl.folder);
+}
+
+export function fieldHint(root: string, meta: TemplateMeta | undefined, of: string): FieldHint {
+  return {
+    placeholder: expandHint(root, meta?.placeholder ?? "", of),
+    description: expandHint(root, meta?.description ?? "", of),
+    of_template: of === "" || itemTemplate(root, of) === undefined ? "" : itemTemplateRel(of),
+    of,
+  };
 }
 
 const escapeRe = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, (c) => `\\${c}`);
@@ -340,6 +398,10 @@ export function stateFormModel(
       columns: f.columns ?? [],
     };
   }
+  const fieldHints: Record<string, FieldHint> = {};
+  for (const f of s.evidence_form) {
+    fieldHints[f.name] = fieldHint(root, templateMetas[f.template ?? "free-form"], f.of ?? "");
+  }
   for (const d of s.inputs ?? []) inputs.push({ label: d.label, description: d.description, entry: false });
   return {
     form: s.id,
@@ -352,6 +414,7 @@ export function stateFormModel(
     boxes: readA3(root),
     template_meta: templateMetas,
     field_args: fieldArgs,
+    field_hints: fieldHints,
     template: stateFormFields(s),
     field_templates: fieldTemplates,
   };
@@ -566,11 +629,20 @@ function renderField(
   meta?: TemplateMeta,
   args: FieldArgs = NO_ARGS,
   guidance = "",
+  hint?: FieldHint,
 ): string {
   const flag = required ? '<span class="req">required</span>' : '<span class="opt">optional</span>';
   const guide = guidance === "" ? "" : `<div class="guide">${esc(guidance)}</div>`;
-  const head = `<div class="field"><span class="tpl">template: ${esc(template)}</span><span class="name">${esc(name)}</span>${flag}<div class="desc">${esc(description)}</div>${guide}`;
-  return `${head}${fieldEditor(name, content, meta, args)}</div>`;
+  // The portable copy travels with no editor to open, so the item template is
+  // NAMED here rather than linked. The mirror draws the same chip clickable.
+  const of = hint?.of === undefined || hint.of === "" ? "" : ` · of: ${esc(hint.of)}`;
+  // The portable copy travels off the machine, so the template is NAMED by
+  // its path rather than linked — a reader can still go and open it.
+  const where =
+    hint?.of_template === undefined || hint.of_template === "" ? "" : ` What a ${esc(hint.of)} must carry: ${esc(hint.of_template)}`;
+  const mech = hint?.description === undefined || hint.description === "" ? "" : `<div class="desc">${esc(hint.description)}${where}</div>`;
+  const head = `<div class="field"><span class="tpl">template: ${esc(template)}${of}</span><span class="name">${esc(name)}</span>${flag}<div class="desc">${esc(description)}</div>${mech}${guide}`;
+  return `${head}${fieldEditor(name, content, meta, args, hint)}</div>`;
 }
 
 const ROW_BTNS =
@@ -585,9 +657,9 @@ const dashLines = (content: string): string[] =>
 
 /** The editor IS the template's shape — rows for lists, labelled rows for
  *  known items, a dropdown with its rationale, pairs for findings. */
-function fieldEditor(name: string, content: string, meta: TemplateMeta | undefined, args: FieldArgs): string {
+function fieldEditor(name: string, content: string, meta: TemplateMeta | undefined, args: FieldArgs, hint?: FieldHint): string {
   const editor = meta?.editor ?? "text";
-  const ph = esc(meta?.placeholder ?? "");
+  const ph = esc(hint?.placeholder ?? "");
   if (editor === "list") {
     const rows = [...dashLines(content), ""].map(
       (v) => `<div class="row"><input data-list="${esc(name)}" placeholder="${ph}" value="${esc(v)}">${ROW_BTNS}</div>`,
@@ -664,6 +736,7 @@ export function buildPortableForm(
         model.template_meta[tpl],
         model.field_args[f.name],
         f.guidance ?? "",
+        model.field_hints[f.name],
       );
     })
     .join("");
