@@ -1,6 +1,7 @@
 ---
 form: write-requirements
-signed_off: 2026-08-06
+suspect: "rests on gate-inputs, which stands unblessed since the quality nodes joined its picture"
+signed_off_was: 2026-08-06
 authors: agent
 files:
 ---
