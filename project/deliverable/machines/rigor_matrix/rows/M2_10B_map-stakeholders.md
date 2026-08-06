@@ -1,11 +1,13 @@
 ---
 kind: matrix-row
 name: map-stakeholders
-statement: Map the stakeholders by role, and surface their tensions.
+statement: "Map the stakeholders by role: who the value props serve, and who else the project answers to."
 state_kind: work
 filled_by: agent
 depends_on:
   - gate-motivation
+entry_read:
+  - project/deliverable/machines/methods/meth-stakeholder-analysis.md
 legal_tools:
   - se_file_read
   - se_file_write
@@ -17,33 +19,48 @@ legal_tools:
   - se_answer
 evidence:
   - name: roles
-    description: "every role, one line each"
-  - name: tensions
-    description: "the conflicting pairs with their reasoning, or none-found stated"
+    template: refs
+    of: stakeholder
+    description: "every role as a node reference, one per line — the node carries the placement, this field never restates it"
+  - name: coverage
+    description: "every value prop's audience resolves to a role here, and every always-on class is present or ruled out with its reason"
 major: tailored
 minor: inherit
 patch: none
 product: full
 specification: full
 major_note: |
-  Inherit the map; re-check the TENSIONS against the change - an
-  architectural move often shifts who pays and who gains. New roles and
-  new tensions recorded; the rest stands by pointer.
+  Inherit the map; re-check it against the change. An architectural move
+  often shifts who pays and who gains, and a role that newly loses gets
+  its disposition re-marked. New roles recorded; the rest stands by
+  pointer.
 minor_note: |
-  INHERIT; add only a role the delta newly serves, with its tensions
-  against the standing set. No new role is the normal outcome.
+  INHERIT; add only a role the delta newly serves. No new role is the
+  normal outcome, and saying so is a complete answer.
 patch_note: |
   Does not apply. No new roles enter through a patch. STRIKE PROPOSAL -
   owner adjudicates.
 product_note: |
-  STANDING ARTIFACT: the stakeholder map by role with its tensions. At
-  rest every requirement sources to a role that exists here.
+  STANDING ARTIFACT: the stakeholder set by role, each node carrying its
+  placement and its disposition. At rest every requirement sources to a
+  role that exists here.
 specification_note: |
-  DOCUMENT FORM: a derived TABLE - roles and tensions from stakeholder
-  nodes and their edges. The book's fundamentals or design-input chapter
-  holds it; requirements' source_refs point back here.
+  DOCUMENT FORM: a derived TABLE - roles, type, interest, influence and
+  disposition, read off the stakeholder nodes. The Stakeholder/View
+  matrix derives from the same nodes. The book's fundamentals or
+  design-input chapter holds them; requirements' source_refs point back.
 ---
 
 ## Guidance
 
-Per [[meth-stakeholder-analysis]]; the tensions per [[meth-stakeholder-tensions]]. Roles, never names. Stakeholders are nodes; the matrices surface them by edge filter; requirements will source to them at M3.
+Per [[meth-stakeholder-analysis]]. Roles, never names.
+
+START FROM THE VALUE PROPS. Each one names an `audience`, and that audience is a stakeholder. Sweep them first and ask who each proposition is for.
+
+THEN THE ROLES THE PROPS DO NOT REACH. The always-on classes every project serves come next. After them come the roles the project and the organisation carry. Who funds it. Who must approve it. Who inherits it when this effort ends. Who is affected without ever being asked. None of these fall out of the value props, and they are the ones a walk misses.
+
+SO THE ROLES ARE NODES, shaped by [[stakeholder]]. This field carries REFERENCES, never prose. The node holds the placement and the concerns; the form points at it and never restates it.
+
+COVERAGE IS WHAT THIS STEP PROVES, and it is what the M2 gate reads. Every value prop's audience resolves. Every always-on class is present or ruled out with its reason. At M3 every requirement sources to a role that exists here.
+
+TENSIONS ARE RAID ENTRIES (owner ruling 2026-08-06). Two roles pulling against each other is a risk with an owner and a trigger, logged in the register. It is not a field here.

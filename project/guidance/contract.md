@@ -28,8 +28,14 @@ The slider alone cannot wake you. The dial can move mid-session.
 
 ## 4. Strays are notes
 
-An idea, a bug, a better way: `se_note`, and keep walking. You do not leave
-the state in your hand to chase one.
+A stray is:
+
+- an idea
+- a bug
+- a better way
+
+Capture it with `se_note` and keep walking. You do not leave the state in
+your hand to chase one.
 
 ## 5. Confirm before you compose
 
@@ -60,9 +66,17 @@ you begin; once begun, carry on.
 
 ## 7. The repo is the memory
 
-No private assistant memory: nothing here reads or checks it. Durable
-knowledge goes where the machine reads it — guidance, machines, condition
-notes, the spec. What the NEXT session must know goes to `.se/HANDOVER.md`.
+The assistant memory is a scratchpad, never an archive (owner ruling
+2026-08-06). Write to it freely. Every retro DRAINS it: whatever holds
+project rules, project state or working guidance moves into the repo and
+leaves the memory. Durable knowledge goes where the machine reads it:
+
+- guidance
+- machines
+- condition notes
+- the spec
+
+What the NEXT session must know goes to `.se/HANDOVER.md`.
 
 ## 8. Never open a record unasked
 

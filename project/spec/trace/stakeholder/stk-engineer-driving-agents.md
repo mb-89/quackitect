@@ -2,6 +2,9 @@
 id: stk-engineer-driving-agents
 type: "[[stakeholder]]"
 statement: An engineer who drives AI agents to build a product, and is answerable for what they produce.
+role_class: user
+dicet: decider
+disposition: "++"
 interest: 1
 influence: 0.9
 weight: 1

@@ -262,11 +262,9 @@ test("escalation reopens exactly the grown steps", () => {
 });
 
 test("the bless pins the machine and it grows in place — no wrapper, fills carried", async () => {
-  // The WALK here is the human's hand (session-level, hash-free). The
-  // gate-report law (no gate passes without a PASSED milestone review)
-  // now binds the gates AFTER the kickoff; the kickoff's own bless IS
-  // the pin, and this test drives exactly that seam: M0 at seed, the
-  // refusal without a change_size, the pin, and the in-place growth.
+  // The WALK here is the human's hand (session-level, hash-free). This
+  // test drives the kickoff seam: M0 at seed, the refusal without a
+  // change_size, the pin, and the in-place growth.
   const root = freshRoot();
   gitInit(root);
   const session = new Session(root);

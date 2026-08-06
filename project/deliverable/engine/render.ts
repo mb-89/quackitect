@@ -841,9 +841,8 @@ const STYLE = `
   .cond-label { font-size: 20px; text-anchor: middle; fill: var(--se-fg); pointer-events: none; }
   .doclist a { display: block; padding: 4px 0; }
   a.doclink { color: var(--se-link); cursor: pointer; text-decoration: underline; }
-  /* A REFERENCE OPENS ITS FILE, never the details pane — so it is NOT a
-     doclink, whose handler would render it here and take the pane the
-     reader is reviewing from. */
+  /* Both open the file in the editor; they differ only in SIZE, because a
+     reference sits inline on a form row and a doclink stands on its own. */
   a.reflink { color: var(--se-link); cursor: pointer; text-decoration: underline; font-size: 11.5px; padding: 0 4px; }
   .docview { font-size: 13.5px; line-height: 1.55; }
   .docview h1, .docview h2, .docview h3 { color: var(--se-accent); }
@@ -1549,8 +1548,15 @@ document.addEventListener("click", async (ev) => {
     openModal(rpl.dataset.title || rpl.dataset.path, '<div class="docview">' + d.html + "</div>");
     return;
   }
+  // A FILE LINK OPENS THE FILE, in the editor the host already has (owner
+  // ruling 2026-08-06). The pane render is the FALLBACK, for the standalone
+  // browser where there is no editor to open into.
   const dl = ev.target.closest ? ev.target.closest(".doclink") : null;
-  if (dl) { openDoc(dl.dataset.path, dl.dataset.return || CURRENT_DETAIL || (CURRENT ? "state:" + CURRENT : "comment")); return; }
+  if (dl) {
+    if (embedOpen(dl.dataset.path)) return;
+    openDoc(dl.dataset.path, dl.dataset.return || CURRENT_DETAIL || (CURRENT ? "state:" + CURRENT : "comment"));
+    return;
+  }
   const back = ev.target.closest ? ev.target.closest(".back") : null;
   if (back) { const [t, h] = detailFor(back.dataset.return); showDetails(t, h); return; }
 });
@@ -1639,15 +1645,7 @@ function sfOne(f, fl) {
   // once in the template and expanded for this field's type.
   if ((tm.editor || "text") !== "text") {
     s += '<div class="meta">' + escText(fl.description || "") + "</div>";
-    // THE RULES FOR WHAT GOES IN ARE ONE CLICK AWAY. A person told to list
-    // neighbours still has to know what a neighbour note must carry, and
-    // guessing that from an empty row is not a fair ask.
-    if (hint.description || hint.of_template) {
-      const tlink = hint.of_template
-        ? ' <a class="reflink" data-path="' + escText(hint.of_template) + '" title="open the ' + escText(hint.of) + ' template in the editor">what a ' + escText(hint.of) + " must carry</a>"
-        : "";
-      s += '<div class="meta">' + escText(hint.description || "") + tlink + "</div>";
-    }
+    if (hint.description) s += '<div class="meta">' + escText(hint.description) + "</div>";
   }
   (fl.prefills || []).forEach(function (p, i) {
     s += '<div class="prefill"><div class="comment-text">prefill — unconfirmed:</div><div>' + escText(p) + '</div><button class="primary confirmpre" data-form="' + name + '" data-machine="' + escText(f.machine || "") + '" data-field="' + escText(fl.name) + '" data-index="' + i + '">confirm</button></div>';
@@ -1986,7 +1984,11 @@ function traceDetail(id) {
   const d = map[id];
   if (!d) return [id, '<div class="meta">nothing recorded for this node</div>'];
   const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;");
-  return [id, '<div class="docview"><div class="meta">' + esc(d.type) + '</div><p style="white-space:pre-wrap">' + esc(d.statement) + '</p><div class="meta">' + esc(d.path) + "</div></div>"];
+  // THE PATH IS AN ADDRESS, so it opens — through .doclink, the same path
+  // every other document link in the panel already takes. Printed as text it
+  // told the reader where the node lives and made them go and find it.
+  const where = d.path ? '<a class="doclink" data-path="' + esc(d.path) + '">' + esc(d.path) + "</a>" : "";
+  return [id, '<div class="docview"><div class="meta">' + esc(d.type) + '</div><p style="white-space:pre-wrap">' + esc(d.statement) + '</p><div class="meta">' + where + "</div></div>"];
 }
 function detailFor(key) {
   if (key === "relay" && LAST_RELAY) return [LAST_RELAY.title, LAST_RELAY.html];
@@ -3189,6 +3191,7 @@ export function renderMirror(
   traceProps?: string,
   traceTypes?: string,
   traceFind?: string,
+  traceCorpus?: string,
 ): string {
   const skin = embed === true ? NATIVE : "";
   const bodyClass = embed === true ? ` class="embed${widget === undefined ? "" : " solo"}"` : "";
@@ -3329,13 +3332,21 @@ export function renderMirror(
   // every trace node off disk, and no other card wants them. Its three
   // filters arrive as query values, because each one REDRAWS the layout.
   const csv = (s: string | undefined): string[] => (s ?? "").split(",").filter((x) => x !== "");
+  // THE READER PICKS THE CORPUS. Trunk is what landed; an open record carries
+  // trunk plus its own work. Defaulting to the LAST open record shows the work
+  // in flight, which is what somebody looking at an open iteration means.
+  const corpora = m.session.corpora();
+  const pick = corpora.find((c) => c.id === traceCorpus) ?? corpora[corpora.length - 1] ?? corpora[0];
   const traceWidget = (): string =>
     traceCard(
-      m.root,
+      pick?.path ?? m.root,
       csv(traceProps),
       csv(traceTypes),
       traceFind ?? "",
       `<button class="expand" data-widget="w-trace" data-url="/widget/trace" title="expand · ctrl-click: new tab · shift-click: new window">⌘</button>`,
+      m.root,
+      corpora.map((c) => ({ id: c.id, label: c.label })),
+      pick?.id ?? "trunk",
     );
   // Read per render, so editing palette.css needs no restart.
   const pal = palette(m.root);

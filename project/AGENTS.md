@@ -1,8 +1,8 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from project/guidance/contract.md 767b97401755
-     from project/guidance/walking.md dad62d8fd3d1
+     from project/guidance/contract.md 29fa22448c22
+     from project/guidance/walking.md 59404c4f2f05
      from project/guidance/method/lane.md f0c61141aa63
-     from project/guidance/voice.md 67bed88ab015
+     from project/guidance/voice.md 55eccb668cbb
 -->
 
 # contract — the binding rules of the session
@@ -29,8 +29,14 @@ The slider alone cannot wake you. The dial can move mid-session.
 
 ## 4. Strays are notes
 
-An idea, a bug, a better way: `se_note`, and keep walking. You do not leave
-the state in your hand to chase one.
+A stray is:
+
+- an idea
+- a bug
+- a better way
+
+Capture it with `se_note` and keep walking. You do not leave the state in
+your hand to chase one.
 
 ## 5. Confirm before you compose
 
@@ -61,9 +67,17 @@ you begin; once begun, carry on.
 
 ## 7. The repo is the memory
 
-No private assistant memory: nothing here reads or checks it. Durable
-knowledge goes where the machine reads it — guidance, machines, condition
-notes, the spec. What the NEXT session must know goes to `.se/HANDOVER.md`.
+The assistant memory is a scratchpad, never an archive (owner ruling
+2026-08-06). Write to it freely. Every retro DRAINS it: whatever holds
+project rules, project state or working guidance moves into the repo and
+leaves the memory. Durable knowledge goes where the machine reads it:
+
+- guidance
+- machines
+- condition notes
+- the spec
+
+What the NEXT session must know goes to `.se/HANDOVER.md`.
 
 ## 8. Never open a record unasked
 
@@ -128,8 +142,9 @@ names which of five you got.
 BLOCKING IS AN INSTRUCTION, NOT AN ERROR. A threshold, an unmet condition, an
 undrawn route: the pull says so instead of throwing. What stays a refusal is
 what is genuinely ILLEGAL — a choice outside the offer, a form nothing asked
-for. A refusal is typed: clause, expected, got, executable remedy. Follow the
-remedy; recover in one turn. A result carrying a `banner` is shown VERBATIM.
+for. A refusal is typed and carries an executable remedy. Every clause's
+rule stands ahead of time in guidance/refusals.md. Follow the remedy;
+recover in one turn. A result carrying a `banner` is shown VERBATIM.
 
 A PULL MAY MOVE THE WALK. There is no passive position query: "where am I" is
 the pull's `where`. It only advances through states whose conditions pass and
@@ -300,7 +315,13 @@ This document is about WORDS. Two siblings carry what used to live here:
 
 Audience: engineers in general. Not software developers. Assume average competence. Assume English is a second language.
 
-Write plainly. These are rules, not suggestions. They bind every output: chat, docs, spec, report, and code comments.
+Write plainly. These are rules, not suggestions. They bind every output:
+
+- chat
+- docs
+- spec
+- report
+- code comments
 
 ### Sentences
 - One thought per sentence. End it. Start a new sentence for the next thought.
@@ -396,6 +417,18 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - WRITE THE ANSWER ONCE. Compose it a single time, record it, then print THAT SAME TEXT in chat. Never write a second version for the reader.
 - Two versions cost tokens twice and leave the reader comparing them to see whether they agree. That is work you handed them for nothing.
 - Sources and links belong in the RECORDED copy too, not bolted onto the chat one.
+
+### Evidence (applies to every claim, and hardest to judgments)
+- NO CLAIM WITHOUT EVIDENCE. Not "I believe", not "it is known", not a plausible sentence in the right shape. The source, or nothing.
+- A COMPARATIVE CLAIM NEEDS EVIDENCE ON BOTH SIDES. "They do X better than us" needs what they do AND what we do.
+- A vendor's feature list is evidence a feature is CLAIMED. Never that it is good. Never that it beats ours.
+- WHERE OUR SIDE DOES NOT EXIST YET, the comparison is not weak. It is impossible, and writing it is fabrication.
+- NEVER FABRICATE A JUDGMENT. Gate rounds, red-team findings, verdicts, recommendations. These exist to be acted on, so a false one does not merely mislead — it routes real work.
+- A judgment cannot be vibe-coded into existence.
+- HAVING RESEARCHED IS NOT HAVING A RESULT. A real search makes the paragraph after it FEEL earned. That gap is where fabrication lives.
+- "Not compared, and here is why" is a complete answer. A blank reads as done and is worth less than a named gap.
+- ASK WHERE A QUESTION IS OWED. A judgment asserted about somebody's own domain cannot be caught by them, which is exactly when it does the most damage.
+- Owner ruling 2026-08-06, after a gate carried a fabricated comparison about a tool nobody here had run.
 
 ### The sycophancy guard (applies to every assessment)
 - Praise is a signal, not a nicety. Endorse only what survives the disconfirming question.

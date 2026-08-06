@@ -138,6 +138,7 @@ function evidenceField(file: string, entry: unknown, i: number): EvidenceField {
     ...(typeof f.guidance === "string" && f.guidance.trim() !== "" ? { guidance: f.guidance } : {}),
     ...(typeof f.template === "string" && f.template.trim() !== "" ? { template: f.template } : {}),
     ...(typeof f.of === "string" && f.of.trim() !== "" ? { of: f.of.trim() } : {}),
+    ...(typeof f.covers === "string" && f.covers.trim() !== "" ? { covers: f.covers.trim() } : {}),
     ...(Array.isArray(f.options) ? { options: f.options.map(String) } : {}),
     ...(Array.isArray(f.items) ? { items: f.items.map(String) } : {}),
     ...(Array.isArray(f.passing) ? { passing: f.passing.map(String) } : {}),
@@ -211,6 +212,10 @@ function parseMatrixRow(
     motivation: typeof fm.motivation === "string" ? fm.motivation : undefined,
     inputs: parseDoInputs(fm.inputs),
     follow_up_label: typeof fm.follow_up_label === "string" ? fm.follow_up_label : undefined,
+    // A ROW MAY DEMAND ITS OWN METHOD. A state note has always been able to;
+    // a row could only inherit one through same_as, so a step whose method is
+    // not common knowledge had no way to make it a condition of entry.
+    entry: fm.entry_read === undefined ? undefined : { read: asList(fm.entry_read) },
   };
   if (row.state_kind !== "terminal" && row.evidence_form.length === 0) {
     throw new Error(`matrix row ${row.name} carries no evidence — leaving a state demands evidence; only a terminal is exempt`);

@@ -22,79 +22,50 @@ below them. `frame-delta` authors them and passes REFERENCES as its
 evidence; `gate-motivation` follows each reference and reviews the artifact
 itself.
 
-Id prefix `vp-`.
+## The template
 
-## Fields
+A new value prop is seeded from this fence. Replace every comment with the
+real content.
 
-Every field carries its name, its semantics and its value range. A field
-that cannot be filled honestly is left out, never guessed.
-
-- `id` (`vp-<slug>`): unique across the whole trace corpus. Two files
-  claiming one id is a refusal, not a warning — see the duplicate check.
-- `type` (`"[[value-prop]]"`): a LINK to this template, which is what makes a
-  node typed. It puts the node on the first ring, and it is what a reference
-  field checks when it asks for value props. A bare `value-prop` reads the
-  same; the link is the form a reader can follow.
-- `statement` (one sentence, "As a ⟨role⟩ I need ⟨X⟩"): the proposition in
-  the audience's own words. Not a feature, and not a solution.
-- `audience` (a `stk-` id): the stakeholder this proposition serves. A
-  proposition with no audience is a wish.
-- `outcome` (one sentence): what becomes true for that audience. THIS IS
-  WHAT GETS VALIDATED — the success criteria measure it.
-- `priority` (must | should | could): MoSCoW. Most value props are must; the
-  field earns its keep when one is not.
-- `source_refs` (list of `ref-` ids, optional): the reference notes the
-  proposition rests on. External links live only in reference notes.
-- `refines` (list, optional): normally absent. A value prop's parent is the
-  vision, and that edge is implicit in the type.
-
-## Body
-
-Three sections, in this order.
-
-- `## Success criteria` — one bullet per criterion, each naming its Metric
-  and its Target. A criterion nothing will ever check is not a criterion.
-- `## Unlike` — the alternative, and what makes this different. Prose, and
-  not load-bearing.
-- `## Notes (not load-bearing)` — anything a reader would otherwise
-  re-derive.
-
-## Example
-
-```
+```skeleton
 ---
-id: vp-{{slug}}
-type: "[[value-prop]]"
-statement: As a {{role}}, I need {{the need}}.
-audience: stk-{{stakeholder}}
-outcome: {{what becomes true for them}}
+# The engine writes id and the type link. id is vp- plus a slug, unique
+# across the whole trace corpus; two files claiming one id is a refusal.
+#
+# refines is normally absent. A value prop's parent is the vision, and that
+# edge is implicit in the type.
+#
+# source_refs is optional: a list of ref- ids, the reference notes this
+# proposition rests on. External links live only in reference notes.
+#
+# The proposition in the audience's own words, one sentence, shaped
+# "As a <role> I need <X>". Not a feature, and not a solution.
+statement: TODO — as a <role> I need <X>
+#
+# The stk- id of the stakeholder this proposition serves. A proposition with
+# no audience is a wish.
+audience: stk-TODO
+#
+# What becomes true for that audience, one sentence. THIS IS WHAT GETS
+# VALIDATED — the success criteria measure it.
+outcome: TODO — what becomes true for that audience
+#
+# MoSCoW: must, should or could. Most value props are must; the field earns
+# its keep when one is not.
 priority: must
-source_refs:
-  - ref-{{slug}}
 ---
 
 ## Success criteria
 
-- {{the checkable claim}}.
-  Metric: {{what is measured}}. Target: {{the target}}.
+<!-- One bullet per criterion, each naming its Metric and its Target. A
+criterion nothing will ever check is not a criterion. -->
 
 ## Unlike
 
-{{the alternative}}. The difference is {{what sets this apart}}.
+<!-- The alternative, and what makes this different. Prose, and not
+load-bearing. -->
 
 ## Notes (not load-bearing)
 
-{{context a reader would otherwise re-derive}}
-```
-
-## Mint skeleton
-
-A new value prop is seeded from this fence verbatim. The engine owns `id`
-and `type`; everything else starts as a TODO the author must answer.
-
-```skeleton
-statement: TODO — as a ⟨role⟩ I need ⟨X⟩
-audience: stk-TODO
-outcome: TODO — what becomes true for that audience
-priority: must
+<!-- Optional. Anything a reader would otherwise re-derive. -->
 ```

@@ -12,6 +12,7 @@
 import { existsSync, mkdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
+import { dirtyLines, git, gitLand, gitSync } from "./gitlane.ts";
 import { contentHash } from "./hash.ts";
 import {
   activeStates,
@@ -433,104 +434,6 @@ export class Session {
     return { minutes, calls, was: { minutes: wasMinutes, calls: wasCalls } };
   }
 
-  /** THE MILESTONE REVIEW REPORT (owner rulings 2026-07-30): the one thing
-   *  a person reads most, so it is the gate's MECHANICAL demand. The
-   *  scaffold generates from the gate's OWN evidence fields (the rigor matrix,
-   *  live) plus v1's field-tested review tail: verify, validate, red_team,
-   *  verdict. Prefilled comments never count as content (the prefill law).
-   *
-   *  REPORT AND BLESS ARE SEPARATE THINGS. The report is the artifact; the
-   *  BLESS is the act of passing the gate on it — the tick, weighed by the
-   *  autonomy slider as ever (below the gate's 0.6 the hand is human). The
-   *  bless lands DURABLY as a sidecar pinning the report's version and
-   *  whose hand it was; an EDITED report drops its bless (one bless per
-   *  version), and a standing bless lets a re-walk pass without re-asking. */
-  private gateReportRel(gateId: string): string {
-    return `project/spec/iterations/${this.bound?.id}/reviews/${gateId}.md`;
-  }
-
-  private assertGateReport(gateId: string, s: StateDecl, channel: Channel): void {
-    const rel = this.gateReportRel(gateId);
-    const abs = join(this.bound!.path, rel);
-    // THE ROUNDS ARE NOT WRITTEN TWICE. compileMachine appends STANDARD_ROUNDS
-    // (round_0_verify, round_1_validate, round_2_red_team, verdict) to every gate's
-    // evidence_form — machines/compile.ts, the `kind === "gate"` clause — so
-    // the scaffold below already emits them once, with the fuller v1-derived
-    // wording. A second REVIEW_TAIL stood here and emitted verify/validate/
-    // red_team AGAIN: seven round sections, three of them the same round under
-    // a shorter name, every one of them required non-empty. Nobody ever hit it
-    // because no gate report has ever been written.
-    if (!existsSync(abs)) {
-      const scaffold = [
-        "---",
-        "form: milestone-review",
-        `gate: ${gateId}`,
-        "status: draft",
-        "by: ",
-        "verdict: ",
-        "---",
-        "",
-        `# ${gateId} — milestone review`,
-        "",
-        ...s.evidence_form.flatMap((f) => [`## ${f.name}`, "", `<!-- ${f.description}${f.required ? "" : " (optional)"} -->`, ""]),
-      ].join("\n");
-      throw new Rejection({
-        clause: CLAUSES.CONDITION_UNMET,
-        expected: `the milestone review report — no gate passes without one (${rel})`,
-        got: "no review report in the record",
-        remedy: {
-          tool: "se_file_write",
-          args: { path: rel, content: scaffold, base_hash: null },
-          note: "fill every section — this report is what a person reads most; a prefilled comment counts as empty until real text replaces it",
-        },
-        source: "engine/session.ts gate",
-      });
-    }
-    const raw = readFileSync(abs, "utf8");
-    // A STANDING BLESS passes at once: the sidecar pins the report's exact
-    // version — the quick re-walk the owner asked for.
-    const blessAbs = abs.replace(/\.md$/, ".bless.json");
-    const reportHash = contentHash(Buffer.from(raw, "utf8"));
-    if (existsSync(blessAbs)) {
-      try {
-        const b = JSON.parse(readFileSync(blessAbs, "utf8")) as { hash?: string };
-        if (b.hash === reportHash) return;
-      } catch {
-        // an unreadable bless is no bless — fall through and re-earn it
-      }
-    }
-    const note = parseStateNote(raw);
-    const problems: string[] = [];
-    const filledText = (name: string): string =>
-      section(note.body, name)
-        .replace(/<!--[\s\S]*?-->/g, "")
-        .trim();
-    for (const f of s.evidence_form) {
-      if (f.required && filledText(f.name) === "") problems.push(`${f.name} is empty`);
-    }
-    if (note.frontmatter.status !== "done") problems.push("status is not done");
-    const verdict = typeof note.frontmatter.verdict === "string" ? note.frontmatter.verdict.trim().toUpperCase() : "";
-    if (!verdict.startsWith("PASS"))
-      problems.push(`the verdict is "${String(note.frontmatter.verdict ?? "")}" — PASS passes, anything else holds the gate`);
-    if (problems.length > 0) {
-      throw new Rejection({
-        clause: CLAUSES.CONDITION_UNMET,
-        expected: `a complete, PASSED milestone review at ${rel}`,
-        got: problems.join(" · "),
-        remedy: {
-          tool: "se_file_read",
-          args: { path: rel },
-          note: "fill what is empty, set status: done and the verdict, then tick again",
-        },
-        source: "engine/session.ts gate",
-      });
-    }
-    // THE BLESS: this passing tick is the act, and it lands durably — the
-    // report's version pinned, the hand recorded. Below 0.6 the slider made
-    // that hand human; at or above, the delegation is stamped honestly.
-    writeFileSync(blessAbs, `${JSON.stringify({ hash: reportHash, by: channel, at: new Date().toISOString() })}\n`, "utf8");
-  }
-
   /** THE PING (owner, 2026-07-30): the agent points at a mirror surface and
    *  it pulses YELLOW in every open window — the tour's pointing finger,
    *  and "look HERE" for refusals and diffs. Targets: a card id (machine,
@@ -760,17 +663,78 @@ export class Session {
         source: "engine/session.ts reload",
       });
     }
-    if (process.env.SE_RELOAD_DRY === "1") return { reload: "dry", note: "canary green — no exit (SE_RELOAD_DRY)" };
+    const reconciled = this.reconcileTrees();
+    if (process.env.SE_RELOAD_DRY === "1") return { reload: "dry", note: "canary green — no exit (SE_RELOAD_DRY)", ...reconciled };
     setTimeout(() => process.exit(42), 400);
     return {
       reload: "armed",
       note: "the engine restarts in under a second on the NEW sources — the walk reboots at start; tick when the lane answers",
+      ...reconciled,
     };
+  }
+
+  /** RELOAD RECONCILES THE TWO TREES (owner ruling 2026-08-06).
+   *
+   *  A bound record has its own worktree, and the engine serves ONE tree.
+   *  Which one depends on whether a walk is bound at that instant, and the
+   *  walk moves. So an edit could land in the tree the person was not
+   *  looking at, and it read on screen as a broken feature rather than a
+   *  missing merge — four times in one morning.
+   *
+   *  The tell was always the same: NEW DATA drawn by OLD CODE. Markdown is
+   *  read live from whichever tree is served, so a template's raw {token}
+   *  would appear beside a description that had already updated.
+   *
+   *  Reload is the right seam because it is already the verb for "make what
+   *  I wrote take effect". It commits what is on disk, lands the branch on
+   *  trunk, and syncs trunk back — so whichever tree the engine comes up
+   *  on, it carries the change. Nothing here can lose work: a commit is
+   *  made before anything moves, and a conflicting merge aborts and says so.
+   *
+   *  Unbound, there is one tree and nothing to do. */
+  private reconcileTrees(): Record<string, unknown> {
+    const wt = this.bound?.path;
+    if (wt === undefined || wt === this.root) return {};
+    try {
+      for (const tree of [wt, this.root]) {
+        if (dirtyLines(git(tree, "status", "--porcelain").stdout).length === 0) continue;
+        git(tree, "add", "-A");
+        git(tree, "commit", "-m", "the machine commits what stood on disk at a reload");
+      }
+      const landed = gitLand(this.root, wt);
+      const synced = gitSync(this.root, wt);
+      return { trees: { landed: landed.commits ?? [], synced: synced.commits ?? [] } };
+    } catch (e) {
+      // A RECONCILE THAT FAILS NEVER BLOCKS THE RELOAD. The reload is still
+      // correct for the tree it comes up on; the person is told what stayed
+      // behind so they can see why a surface looks unchanged.
+      return { trees: { failed: e instanceof Error ? e.message : String(e) } };
+    }
   }
 
   /** Where the LANE works: the bound expedition's worktree, else the root. */
   workRoot(): string {
     return this.bound?.path ?? this.root;
+  }
+
+  /** THE CORPORA A READER MAY CHOOSE BETWEEN (owner ruling 2026-08-06).
+   *
+   *  Trunk is what has landed. An OPEN record's worktree is a full checkout,
+   *  so it carries trunk's nodes AND everything that record has authored.
+   *
+   *  A whole-corpus view belongs to no single record, so the person picks
+   *  which one they mean instead of the engine guessing — which it did three
+   *  times before this existed, differently each time. */
+  corpora(): { id: string; label: string; path: string }[] {
+    const out = [{ id: "trunk", label: "trunk", path: this.root }];
+    try {
+      for (const it of itList(this.root).filter((x) => x.open)) {
+        out.push({ id: it.id, label: it.id.split("-")[0] ?? it.id, path: it.path });
+      }
+    } catch {
+      // no iterations yet, so trunk is the whole story
+    }
+    return out;
   }
 
   /** Where the lane resolves ONE path (owner ruling 2026-07-28).
@@ -1519,13 +1483,28 @@ export class Session {
       if (p !== "" && !p.startsWith("@") && !want.includes(p)) want.push(p);
     };
     for (const p of this.routeReads()) add(p);
-    if (want.length === 0) {
-      const { machine, ids } = this.leaves();
-      for (const id of ids) {
-        const s = this.state(machine, id);
-        for (const d of this.pulled(machine, s)) add(d.path);
-        for (const p of this.lookaheadRequirements(machine, s)) add(p);
-      }
+    // ALWAYS LOOK AHEAD — never only when the route gave nothing.
+    //
+    // THE ROUTE STOPS AT THE STEP IT CANNOT ENTER, so that step is not among
+    // its steps and its entry documents were never gathered. When the reason it
+    // could not be entered IS an unread document, that document is the only one
+    // that matters, and it was the one thing missing from the reading.
+    //
+    // The old guard made it worse by testing the UNFILTERED list. A route that
+    // contributed only documents already in the head counted as not empty, the
+    // lookahead was skipped, and the filter below then left the reading EMPTY
+    // while the walk stood blocked on a document nobody was shown. The pull
+    // answered with a refusal whose own remedy could not be executed: pulling
+    // served nothing, and reading the file by hand credits only the gathered
+    // reading, never an arbitrary path. Found live 2026-08-06.
+    //
+    // Gathering more candidates is free: the filter drops everything the head
+    // already holds, so nothing is ever read twice.
+    const { machine, ids } = this.leaves();
+    for (const id of ids) {
+      const s = this.state(machine, id);
+      for (const d of this.pulled(machine, s)) add(d.path);
+      for (const p of this.lookaheadRequirements(machine, s)) add(p);
     }
     // THE HANDOVER RULE JOINS THE LOOP. When the slider rises mid-walk,
     // the agent's advances must prove the reading the human checked — even
@@ -1555,7 +1534,29 @@ export class Session {
         body = readFileSync(resolveInRoot(this.laneRoot(rel), rel, "engine/session.ts reading")).toString("utf8");
         hash = contentHash(body);
       } catch {
-        continue; // unreadable here: it stays owed, and says so where it is asked for
+        // NAME IT IN THE READING rather than skipping in silence.
+        //
+        // An owed document that cannot be read used to leave the reading
+        // EMPTY: the header said "1 document(s) the way ahead demands", the
+        // body said nothing, and the refusal repeated a name with no way on
+        // Earth to satisfy it. The comment here claimed it "says so where it
+        // is asked for". It did not.
+        //
+        // It cost a state its entry on 2026-08-06, and the cause was a row
+        // naming a bare id where a PATH is owed — a five-second fix that took
+        // an hour to see, because nothing anywhere said which document or why.
+        //
+        // No part is pushed, so it stays owed and the walk still blocks. It
+        // blocks legibly now.
+        out.push(
+          "## " + rel,
+          "",
+          "NOT READABLE. The walk demands this document and cannot serve it, so the walk stays blocked.",
+          "",
+          "Whatever names it names it WRONGLY. entry_read and the pulled guidance take a PATH from the project root, never a bare id.",
+          "",
+        );
+        continue;
       }
       out.push(`<!-- ${rel} · ${hash} -->`, "", `## ${rel}`, "");
       const from = out.length + 1;
@@ -2695,16 +2696,38 @@ export class Session {
 
   /** Every trace node's id against the path that holds it, root-relative —
    *  what a surface needs to turn a reference into something clickable. */
-  /** THE CORPUS IS READ WHERE THE WALK WRITES. A standing artifact authored
-   *  inside a bound record lives in that record's worktree until it lands, so
-   *  reading the trace from the project root made a node the lane had just
-   *  written resolve to nothing. Everything else on this path already used
-   *  the work root; the trace was the one that did not. */
-  private refPaths(): Record<string, string> {
+  /** WHERE THE TRACE CORPUS IS READ FROM. ONE answer, for every reader.
+   *
+   *  It used to be two. The form check read the project root while the walk
+   *  WROTE to the bound record's worktree, so a node the lane had just
+   *  authored resolved to nothing — and the green light read the root as
+   *  well, so a form could pass its own submit while the state stayed grey.
+   *  Two readers, one path, two answers, and nothing caught it.
+   *
+   *  The value is the root of the RECORD BEING CHECKED, because a standing
+   *  artifact lands on trunk when its record closes and lives in that
+   *  record's worktree until then (owner ruling 2026-08-06).
+   *
+   *  IT IS THE RECORD'S ROOT, NEVER THE SESSION'S BINDING. The green light
+   *  runs for an iteration whether or not the walk is standing in it — the
+   *  mirror renders from the desk — so reading the corpus from wherever the
+   *  session happens to be bound made the same claim green from inside the
+   *  record and grey from outside it. */
+  private traceRoot(it?: Iteration): string {
+    return it?.path ?? this.workRoot();
+  }
+
+  private refPaths(it?: Iteration): Record<string, string> {
     const out: Record<string, string> = {};
+    const root = this.traceRoot(it);
     try {
-      for (const n of loadTrace(this.workRoot())) {
-        if (n.file !== undefined) out[n.id] = relative(this.workRoot(), n.file).split(sep).join("/");
+      // THE PATH IS WRITTEN FROM THE PROJECT ROOT, because the HOST opens it
+      // from there. A node living in a record's worktree comes out under
+      // .worktrees/, which opens. The record-relative path LOOKED right and
+      // pointed into the wrong tree, so every link on an open record's form
+      // reported a file that is not there.
+      for (const n of loadTrace(root)) {
+        if (n.file !== undefined) out[n.id] = relative(this.root, n.file).split(sep).join("/");
       }
     } catch {
       // no corpus, no links — the ids still read
@@ -2733,7 +2756,12 @@ export class Session {
       const body = parseStateNote(raw).body;
       for (const f of model.template.fields) fills[f.name] = stripComments(section(body, f.name)).trim();
     }
-    const tp = templateProblems(model, fills, this.workRoot());
+    // THE FORM'S OWN RECORD, not the session's binding. The mirror renders an
+    // iteration's form from the desk with nothing bound, so resolving against
+    // the binding made a node the record owns invisible on screen while the
+    // same form passed its submit from inside the walk.
+    const forIt = this.declIteration(m);
+    const tp = templateProblems(model, fills, this.traceRoot(forIt));
     const fmData = raw === undefined ? ({} as Record<string, unknown>) : parseStateNote(raw).frontmatter;
     return {
       state_form: true,
@@ -2741,12 +2769,14 @@ export class Session {
       // A REFERENCE IS AN ADDRESS, so the surface can open it. Without the
       // path the reader sees an id and has to go hunting for the file it
       // names, which is the whole reason references were hard to review.
-      ref_paths: this.refPaths(),
+      ref_paths: this.refPaths(forIt),
       machine: m.id,
       checked: this.stateFormChecked(raw),
       active: this.stateFormActive(name, m),
       gate: s.kind === "gate",
-      signed: typeof fmData.signed_off === "string",
+      // A present-but-EMPTY signed_off is unsigned. Reading the key's mere
+      // presence as a stamp is the same defect as withSignedOff's, mirrored.
+      signed: typeof fmData.signed_off === "string" && fmData.signed_off.trim() !== "",
       bless: typeof fmData.bless === "string" ? fmData.bless : "",
       instance: h.instanceRel,
       exists: raw !== undefined,
@@ -2814,7 +2844,7 @@ export class Session {
         continue;
       }
       if (typeof fm.signed_off !== "string") continue;
-      const problems = claimProblems(this.root, s, body);
+      const problems = claimProblems(this.traceRoot(it), s, body);
       if (problems.length > 0 && this.suspect(it, s.id, `no longer passes its form — ${problems[0]}`)) failed.push(s.id);
     }
     if (failed.length === 0) return;
@@ -2858,7 +2888,7 @@ export class Session {
         if (typeof fm.signed_off !== "string") continue;
         // AND IT MUST STILL PASS ITS OWN FORM. A stamp says it passed once;
         // green says it passes NOW.
-        if (claimProblems(this.root, s, note.body).length > 0) continue;
+        if (claimProblems(this.traceRoot(it), s, note.body).length > 0) continue;
         if (s.kind === "gate" && !(typeof fm.bless === "string" && fm.bless.startsWith("blessed"))) continue;
         done.push(s.id);
       } catch {
@@ -4086,14 +4116,7 @@ export class Session {
     const subTarget = to ?? this.state(top.decl, cur).edges[0]?.to;
     if (subTarget !== undefined) this.gatePriority(top.decl, [subTarget], channel);
     await this.assertConditions(top.decl, this.state(top.decl, cur), to, channel, supplied);
-    // NO GATE PASSES WITHOUT A REVIEW REPORT (owner ruling 2026-07-30):
-    // inside an iteration's own walk, leaving a gate demands its milestone
-    // review report — complete and PASSED. The kickoff is the one gate
-    // without one: its bless IS the pin.
     const inIteration = this.subs[this.subs.length - 2]?.decl.id === "iterations";
-    if (this.bound !== undefined && inIteration && this.state(top.decl, cur).kind === "gate" && cur !== "gate-kickoff") {
-      this.assertGateReport(cur, this.state(top.decl, cur), channel);
-    }
     // THE EXIT IS THE HARD GATE (owner ruling 2026-08-04): a state with
     // evidence fields leaves only on a COMPLETE stored form — the claim
     // stands in the record before the walk moves.

@@ -38,6 +38,10 @@ test("the slider takes effect live: raise the autonomy and the agent's next pull
   const r = root();
   const session = await sessionAtIdle(r);
   const server = buildServer(r, session);
+  // Earn every read first: since software and ux left the guidance root the
+  // reading is served per WAY, so an unearned one answers read before the
+  // threshold gets a word in. The THRESHOLD is this test's subject.
+  await readEverything(session);
   session.setAutonomy(0.2);
   const held = await call(server, "se_pull", { form: { choice: "expeditions" } });
   assert.equal(held.body.pull, "wait");
@@ -52,6 +56,7 @@ test("the gate weighs the TARGET: a 0.4 state waits at 0.2, the archives wait at
   const r = root();
   const session = await sessionAtIdle(r);
   const server = buildServer(r, session);
+  await readEverything(session);
   session.setAutonomy(0.2);
   // expeditions weighs 0.4 — above the agent's reach. It IS one of idle's
   // offered doors, so answering it is legal; walking it is not.

@@ -343,3 +343,5 @@
 {"ts":"2026-08-06T13:09:34.008Z","op":"done","visit":"iterations/i1/gate-inputs@1","node":"d48","brief":"the gate stamped and ready for the bless"}
 {"ts":"2026-08-06T13:12:23.071Z","op":"plan","visit":"iterations/i1/gate-inputs@1","parent":null,"nodes":[{"id":"d51","brief":"the retro window marked"},{"id":"d52","brief":"notes today closed are drained"},{"id":"d53","brief":"the evidence rule carried into voice.md"},{"id":"d54","brief":"the retro recorded with what waits on the owner"}]}
 {"ts":"2026-08-06T14:49:27.813Z","op":"update","visit":"iterations/i1/start@0","node":"d38","brief":"syncing trunk into the bound i1 worktree"}
+{"ts":"2026-08-06T14:49:59.541Z","op":"update","visit":"iterations/i1/start@0","node":"d39","brief":"worktree committed at 6aea9fd and the sync runs"}
+{"ts":"2026-08-06T14:52:01.258Z","op":"update","visit":"iterations/i1/start@0","node":"d40","brief":"weaving the two story-card rewrites into one"}

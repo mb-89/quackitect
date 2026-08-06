@@ -81,10 +81,11 @@ test("the route collects every judgment and every document up front", () => {
   // sweep be one call. Exit conditions count: most of the boot lane's
   // reads are demanded on the way OUT of a state, not into it.
   // AGENTS.md was an exit-condition read until it was promoted, and the
-  // contract followed it into the prompt layer. What the route still
-  // collects is the UNPROMOTED root guidance every packet pulls.
-  assert.ok(clear.reads.includes("project/guidance/craft/software.md"), "a pulled guidance read is collected");
+  // contract followed it into the prompt layer. Software and ux then left
+  // the guidance root for applies_to, so no doc rides EVERY packet any more
+  // and what the route collects is what the way itself pulls.
   assert.ok(!clear.reads.includes("project/guidance/contract.md"), "a promoted source never rides the route");
+  assert.ok(!clear.reads.includes("project/guidance/craft/software.md"), "and craft guidance rides only the states it names");
   assert.ok(clear.reads.includes("project/guidance/method/front-desk.md"), "and guidance the target PULLS, which no condition names");
   // Lowered, every hop needing a person is listed - not just the first, so
   // they can all be answered in one sitting.
@@ -103,11 +104,11 @@ test("the sweep walks the whole way in one call, and every guard still fires", a
   assert.equal(short.arrived, false, "the read proof is not waived by sweeping");
   assert.equal((short.refusal as { clause: string }).clause, "SE-C-112");
   assert.ok((short.swept as string[]).length > 0, "and the hops it DID make stand");
-  // It reaches boot/end now: read_contract owes nothing since the promotion,
-  // so the gate that stops the sweep is the root guidance prepare_idle pulls.
-  // The stop moved one state on; that it STOPS, and stands where it got to,
-  // is what this guards.
-  assert.deepEqual(s.active(), ["boot/end"], "the walk stands where it got to, never rolled back");
+  // It reaches idle now: read_contract owes nothing since the promotion, and
+  // prepare_idle owes nothing since software and ux left the root. The gate
+  // that stops the sweep is the desk's own method card. The stop has moved on
+  // twice; that it STOPS, and stands where it got to, is what this guards.
+  assert.deepEqual(s.active(), ["idle"], "the walk stands where it got to, never rolled back");
   // WITH the reading earned through the loop, the same call arrives.
   await readEverything(s);
   const done = await s.sweep("front_desk", "agent");

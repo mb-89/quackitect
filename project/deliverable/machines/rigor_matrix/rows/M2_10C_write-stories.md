@@ -1,11 +1,13 @@
 ---
 kind: matrix-row
 name: write-stories
-statement: Write the user stories as slideshows - concrete examples realizing the value props; evidence sides stay empty until validation.
+statement: Write the user stories as decks - one actor, one concrete pass, a claim on every slide and the proof beside it.
 state_kind: work
 filled_by: agent
 depends_on:
   - gate-motivation
+entry_read:
+  - project/deliverable/machines/methods/meth-story-slideshow.md
 legal_tools:
   - se_file_read
   - se_file_write
@@ -17,7 +19,10 @@ legal_tools:
   - se_answer
 evidence:
   - name: stories
-    description: "the slideshows, each realizing a named prop, killers marked"
+    template: refs
+    of: story
+    covers: value-prop
+    description: "every story as a node reference, one per line — the deck lives in the node, this field never restates it"
 major: full
 minor: tailored
 patch: none
@@ -38,17 +43,33 @@ patch_note: |
   affected story's evidence side is refreshed at the sweep (M8), not
   here. STRIKE PROPOSAL - owner adjudicates.
 product_note: |
-  STANDING ARTIFACT: the story slideshows, evidence sides FILLED - at
-  rest the stories are the product's living validation record, not a
-  design-time leftover. Every value prop realized by at least one story;
-  killers marked; every slide's evidence current.
+  STANDING ARTIFACT: the story decks, evidence sides FILLED - at rest the
+  stories are the product's living validation record, not a design-time
+  leftover. Every value prop realized by at least one story; killers
+  marked; every slide's evidence current.
 specification_note: |
-  DOCUMENT FORM: story SLIDESHOWS - v1's deck manifests, one deck per
-  story, slides with scenario side and evidence side. The book renders
-  them as decks; killer stories marked in their frontmatter so the
-  validation chapter can pull exactly those.
+  DOCUMENT FORM: story DECKS - one deck per story, slides split into a
+  statement half and an evidence half. The book renders them as decks;
+  killer stories marked in their frontmatter so the validation chapter
+  can pull exactly those.
 ---
 
 ## Guidance
 
-Per [[meth-story-slideshow]]. Every value prop is realized by at least one story; killer stories marked. The slides' formulated scenarios are the examples' birth ([[meth-examples-checkable]]) - roles for now, nodes later.
+Per [[meth-story-slideshow]], which the entry read demands before this state opens. The deck shape and the arc are not common knowledge.
+
+WHY STORIES EXIST. A value prop is a promise, and a promise is easy to agree with and impossible to check. A story shows one named actor getting it, once, end to end. It is the first artifact in the trace that could be wrong in a way anybody would notice.
+
+THE STORY IS THE DECK. Its body is markdown slides, the shape Obsidian uses. One slide per separator, and each slide split into a STATEMENT half and an EVIDENCE half. The left half is one claim; the right half is what shows it happened.
+
+THE EVIDENCE SIDE IS EMPTY UNTIL M8. That is by design. It is what makes a story its own validation container: the artifact that says what should happen ends up carrying the proof it did.
+
+SO THE STORIES ARE NODES, shaped by [[stakeholder]]'s sibling [[story]]. This field carries REFERENCES, never prose. The deck lives in the node; the form points at it and never restates it.
+
+SEVERAL STORIES MAY SERVE ONE VALUE PROP, and most do. `refines` names the prop, and that is the edge the trace graph draws.
+
+COVERAGE IS CHECKED, NEVER WRITTEN DOWN. The field declares `covers: value-prop`, so the engine refuses this state while any story refines no proposition, and while any proposition is refined by no story.
+
+THERE IS NO COVERAGE FIELD, deliberately (owner ruling 2026-08-06). A form field asking whoever fills it to restate a computed result gets a paragraph that agrees with the engine until the day it does not. What is NOT computed - which stories are killers, and why the product dies without each - is judgment, and it goes under `anything_else`.
+
+THE SET IS NEVER COMPLETE, and does not have to be. Coverage is not the same as completeness: every proposition having a story does not mean every pass is told. A missing story surfaces later the same way a missing value prop does - something gets built that no story covers. Add it then, rather than stalling here for exhaustiveness.

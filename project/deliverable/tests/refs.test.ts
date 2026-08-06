@@ -2,11 +2,12 @@
 // it accepts, and the check refuses anything else. General: any field, any
 // item type. Concurrent: every case builds its own root.
 import { strict as assert } from "node:assert";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { expandHint, fieldHint, type StateFormModel, templateMeta, templateProblems } from "../engine/stateform.ts";
+import { itemTemplate } from "../engine/trace.ts";
 import { freshRoot } from "./helpers.ts";
 
 /** A form asking for one reference field, with the type it demands. */
@@ -35,7 +36,12 @@ function corpus(): string {
     "audience: stk-a\noutcome: something becomes true\npriority: must\n",
     "\n## Success criteria\n\n- a checkable claim.\n\n## Unlike\n\nthe alternative.\n",
   );
-  write("stakeholder", "stk-a", "interest: the work lands\ninfluence: high\nweight: high\n", "");
+  write(
+    "stakeholder",
+    "stk-a",
+    'role_class: user\ndicet: customer\ndisposition: "++"\ninterest: the work lands\ninfluence: high\nweight: high\n',
+    "\n## Concerns\n\n- the work lands.\n",
+  );
   return root;
 }
 
@@ -73,6 +79,59 @@ describe("typed references", { concurrency: true }, () => {
     const out = check(root, "value-prop", "- vp-todo");
     assert.match(out.join(" "), /unanswered/, "a TODO left in place is not an answer");
     assert.match(out.join(" "), /audience/, "and it names the keys the template's own mint skeleton writes");
+  });
+
+  // A FIELD THE NODE OMITS TAKES THE TEMPLATE'S DEFAULT (owner ruling
+  // 2026-08-06). Widening a template must not make the standing corpus
+  // non-conforming overnight; migration visits only where the default is
+  // wrong. A field with no honest default carries a TODO and is introduced
+  // together with its migration.
+  test("a field the node omits takes the template's default, and a TODO is no default", () => {
+    const root = corpus();
+    const dir = join(root, "project", "spec", "trace", "value-prop");
+    // priority carries a real value in the mint skeleton; audience carries a TODO.
+    writeFileSync(
+      join(dir, "vp-b.md"),
+      `---\nid: vp-b\ntype: "[[value-prop]]"\nstatement: as a role I need X\naudience: stk-a\noutcome: something becomes true\n---\n\n## Success criteria\n\n- a checkable claim.\n\n## Unlike\n\nthe alternative.\n`,
+      "utf8",
+    );
+    assert.deepEqual(check(root, "value-prop", "- vp-b"), [], "the omitted priority took the skeleton's default");
+    const tpl = itemTemplate(root, "value-prop");
+    assert.equal(tpl?.defaults.priority, "must", "a real value in the skeleton IS the default");
+    assert.equal(tpl?.defaults.audience, undefined, "a TODO is the mint asking, never an answer");
+  });
+
+  // ONE CORPUS ROOT, FOR EVERY READER (owner, 2026-08-06). The form check and
+  // the green light both resolve references, and they used to read the trace
+  // from different trees: a form passed its own submit while the state it
+  // belongs to stayed grey, and nothing said so. A second answer is the
+  // defect, whichever answer is right.
+  test("every trace read goes through the one accessor, so the readers cannot drift", () => {
+    // THE SURFACE IS A READER TOO. The trace graph read the project root while
+    // the walk wrote to a worktree, which hid every node the record authored.
+    // It now reads the CHOSEN corpus — trunk, or an open record — so the rule
+    // is that its root comes from the pick, never straight from the session.
+    const ui = readFileSync(fileURLToPath(new URL("../engine/render.ts", import.meta.url)), "utf8");
+    for (const call of [...ui.matchAll(/traceCard\([^,]*/g)]) {
+      assert.match(call[0], /pick\?\.path/, `the trace graph reads the chosen corpus, not a root of its own: ${call[0]}`);
+    }
+    const src = readFileSync(fileURLToPath(new URL("../engine/session.ts", import.meta.url)), "utf8");
+    assert.match(src, /private traceRoot\(it\?: Iteration\): string/, "one accessor owns which root the corpus is read from");
+    // AND IT TAKES THE RECORD. The green light runs for an iteration from the
+    // desk, with nothing bound, so a corpus root read off the session's
+    // binding made the same claim green inside the record and grey outside.
+    for (const call of [...src.matchAll(/claimProblems\([^,]*/g)]) {
+      assert.match(call[0], /this\.traceRoot\(it\)/, `a claim check must resolve against ITS OWN record: ${call[0]}`);
+    }
+    for (const reader of [/claimProblems\(/g, /templateProblems\(/g, /loadTrace\(/g]) {
+      for (const call of src.match(reader) === null ? [] : [...src.matchAll(new RegExp(`${reader.source}[^)]*`, "g"))]) {
+        assert.doesNotMatch(
+          call[0],
+          /this\.root/,
+          `a trace read still names the project root directly: ${call[0]} — it must go through traceRoot()`,
+        );
+      }
+    }
   });
 
   test("a node whose id breaks its type's prefix is refused", () => {
@@ -129,11 +188,15 @@ describe("typed references", { concurrency: true }, () => {
       editor: "list",
       line_pattern: "",
       line_help: "",
-      placeholder: "{folder}/{prefix}something.md",
+      placeholder: "path from the project root, e.g. {folder}/{prefix}something.md",
       description: "one {type} REFERENCE per line",
     };
     const h = fieldHint(root, meta, "neighbour");
-    assert.equal(h.placeholder, "project/spec/trace/neighbour/nbr-something.md", "the placeholder TEACHES the path shape by being one");
+    assert.equal(
+      h.placeholder,
+      "path from the project root, e.g. project/spec/trace/neighbour/nbr-something.md",
+      "it SAYS where the path is measured from, and shows one",
+    );
     assert.equal(h.description, "one neighbour REFERENCE per line");
     assert.equal(h.of_template, "project/deliverable/machines/items/neighbour.md", "the reader is one click from the rules");
   });
@@ -141,10 +204,10 @@ describe("typed references", { concurrency: true }, () => {
   test("a field with no declared type still reads, and links nowhere", () => {
     const h = fieldHint(
       corpus(),
-      { editor: "list", line_pattern: "", line_help: "", placeholder: "{folder}/{prefix}something.md", description: "" },
+      { editor: "list", line_pattern: "", line_help: "", placeholder: "e.g. {folder}/{prefix}something.md", description: "" },
       "",
     );
-    assert.equal(h.placeholder, "project/spec/trace/something.md", "still a path, and it still starts project/");
+    assert.equal(h.placeholder, "e.g. project/spec/trace/something.md", "still a path, and it still starts project/");
     assert.equal(h.of_template, "", "there is no template to point at");
   });
 
@@ -160,10 +223,21 @@ describe("typed references", { concurrency: true }, () => {
     assert.equal(expandHint(corpus(), "", "value-prop"), "");
   });
 
+  // THE SEAM, both legs (ux.md). Two green halves are not a green wire: the
+  // payload must CARRY the hint, and the surface must DRAW it. This exact
+  // wire shipped half-done and the owner saw a raw {token} on screen.
+  test("the mirror's own source reads field_hints and draws the template link", () => {
+    const src = readFileSync(fileURLToPath(new URL("../engine/render.ts", import.meta.url)), "utf8");
+    assert.match(src, /field_hints/, "the surface reads the resolved hints");
+    assert.match(src, /hint\.placeholder/, "the empty row shows the RESOLVED placeholder, never the raw token");
+    assert.match(src, /hint\.of_template/, "and the item template is reachable from the field");
+  });
+
   // THE SHIPPED TEMPLATE, not a fixture: the real refs.md must stay generic.
   test("the shipped refs template names no concrete type", () => {
     const meta = templateMeta(fileURLToPath(new URL("../../..", import.meta.url)), "refs");
-    assert.match(meta.placeholder, /^\{folder\}\//, "the placeholder is a token, and it opens with the folder so it starts project/");
+    assert.match(meta.placeholder, /\{folder\}\//, "the placeholder is a token, not one field's example");
+    assert.match(meta.placeholder, /project root/, "and it SAYS where the path is measured from");
     assert.doesNotMatch(
       meta.placeholder + meta.description + meta.line_help,
       /value-prop|neighbour/,

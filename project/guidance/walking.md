@@ -49,8 +49,9 @@ names which of five you got.
 BLOCKING IS AN INSTRUCTION, NOT AN ERROR. A threshold, an unmet condition, an
 undrawn route: the pull says so instead of throwing. What stays a refusal is
 what is genuinely ILLEGAL — a choice outside the offer, a form nothing asked
-for. A refusal is typed: clause, expected, got, executable remedy. Follow the
-remedy; recover in one turn. A result carrying a `banner` is shown VERBATIM.
+for. A refusal is typed and carries an executable remedy. Every clause's
+rule stands ahead of time in guidance/refusals.md. Follow the remedy;
+recover in one turn. A result carrying a `banner` is shown VERBATIM.
 
 A PULL MAY MOVE THE WALK. There is no passive position query: "where am I" is
 the pull's `where`. It only advances through states whose conditions pass and

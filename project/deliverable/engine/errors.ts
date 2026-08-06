@@ -9,6 +9,16 @@ export interface RejectionPayload {
   /** Executable: the exact call to make instead. */
   remedy: { tool: string; args: Record<string, unknown>; note?: string };
   source: string;
+  /** FEED-FORWARD (owner ruling 2026-08-06): where the rule is stated ahead
+   *  of the refusal. Computed from the clause, never passed by a caller.
+   *  refusals.test.ts enforces that the section exists. */
+  guidance: string;
+}
+
+/** The feed-forward pointer for a clause: its section in the refusals page.
+ *  One page, one section per clause — the pairing refusals.test.ts enforces. */
+export function clauseGuidance(clause: string): string {
+  return `project/guidance/refusals.md § ${clause}`;
 }
 
 export class Rejection extends Error {
@@ -17,14 +27,16 @@ export class Rejection extends Error {
   readonly got: string;
   readonly remedy: RejectionPayload["remedy"];
   readonly source: string;
+  readonly guidance: string;
 
-  constructor(p: Omit<RejectionPayload, "kind">) {
+  constructor(p: Omit<RejectionPayload, "kind" | "guidance">) {
     super(`${p.clause}: expected ${p.expected}, got ${p.got}`);
     this.clause = p.clause;
     this.expected = p.expected;
     this.got = p.got;
     this.remedy = p.remedy;
     this.source = p.source;
+    this.guidance = clauseGuidance(p.clause);
   }
 
   toJSON(): RejectionPayload {
@@ -35,6 +47,7 @@ export class Rejection extends Error {
       got: this.got,
       remedy: this.remedy,
       source: this.source,
+      guidance: this.guidance,
     };
   }
 }

@@ -95,6 +95,9 @@ export interface FieldArgs {
   options: string[];
   /** Which item type a reference field accepts. Empty means any typed node. */
   of: string;
+  /** Which item type this field must COVER: every reference refines one, and
+   *  every standing one is refined by a reference. Empty means no such duty. */
+  covers: string;
   items: string[];
   passing: string[];
   columns: string[];
@@ -168,7 +171,7 @@ export function fieldHint(root: string, meta: TemplateMeta | undefined, of: stri
 
 const escapeRe = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, (c) => `\\${c}`);
 
-const NO_ARGS: FieldArgs = { of: "", options: [], items: [], passing: [], columns: [] };
+const NO_ARGS: FieldArgs = { of: "", covers: "", options: [], items: [], passing: [], columns: [] };
 
 /** The choice half of a `<option> — <rationale>` line. */
 export function choiceOf(content: string): string {
@@ -249,6 +252,7 @@ export function claimProblems(root: string, s: StateDecl, body: string, corpus?:
     if (!metas.has(name)) metas.set(name, templateMeta(root, name));
     const args: FieldArgs = {
       of: f.of ?? "",
+      covers: f.covers ?? "",
       options: f.options ?? [],
       // A LIVE-RESOLVING ARGUMENT CANNOT BE RE-CHECKED. `$inbox` expands to the
       // notes pending RIGHT NOW; a retro answered the notes pending when it was
@@ -277,6 +281,32 @@ function refProblems(name: string, meta: TemplateMeta, args: FieldArgs, content:
   const dangling = refs.filter((r) => !byId.has(r));
   const out = dangling.length > 0 ? [`${name}: no artifact for — ${dangling.join(" · ")}`] : [];
   out.push(...typeProblems(name, args.of, refs, byId, root));
+  out.push(...coverProblems(name, args.covers, refs, byId, corpus));
+  return out;
+}
+
+/** COVERAGE IS MUTUAL (owner ruling 2026-08-06). `covers: value-prop` on a
+ *  reference field means two things at once, and both are mechanical.
+ *
+ *  Every referenced node must refine one of the covered type. A story serving
+ *  no proposition is work nobody asked for.
+ *
+ *  And every standing node of that type must be refined by one of them. A
+ *  proposition no story serves is a promise nothing shows.
+ *
+ *  Neither is a judgment call, so neither waits for a reviewer to notice it. */
+function coverProblems(name: string, covers: string, refs: string[], byId: Map<string, TraceNode>, corpus: TraceNode[]): string[] {
+  if (covers === "" || covers === undefined) return [];
+  const out: string[] = [];
+  const orphan = refs.filter((r) => {
+    const n = byId.get(r);
+    return n !== undefined && !n.refines.some((p) => byId.get(p)?.type === covers);
+  });
+  if (orphan.length > 0) out.push(`${name}: each one refines a ${covers} — ${orphan.join(" · ")} refines none`);
+  const served = new Set<string>();
+  for (const r of refs) for (const p of byId.get(r)?.refines ?? []) served.add(p);
+  const bare = corpus.filter((n) => n.type === covers && !served.has(n.id)).map((n) => n.id);
+  if (bare.length > 0) out.push(`${name}: each ${covers} is covered — nothing here refines ${bare.join(" · ")}`);
   return out;
 }
 
@@ -392,6 +422,7 @@ export function stateFormModel(
   for (const f of s.evidence_form) {
     fieldArgs[f.name] = {
       of: f.of ?? "",
+      covers: f.covers ?? "",
       options: f.options ?? [],
       items: (f.items ?? []).flatMap((i) => (i === "$inbox" ? inboxItems(root, instanceRaw) : [i])),
       passing: f.passing ?? [],
@@ -436,7 +467,9 @@ function inboxItems(root: string, instanceRaw?: string): string[] {
   } catch {
     return [];
   }
-  if (instanceRaw === undefined || !/^signed_off: /m.test(instanceRaw)) return live;
+  // AN EMPTY KEY IS NOT A SIGN-OFF. `signed_off:` with nothing after it is an
+  // unsigned form, so the test wants a VALUE rather than the key's presence.
+  if (instanceRaw === undefined || !/^signed_off: *\S/m.test(instanceRaw)) return live;
   return live.filter((i) => instanceRaw.includes(i.split(" — ")[0]));
 }
 
@@ -634,13 +667,11 @@ function renderField(
   const flag = required ? '<span class="req">required</span>' : '<span class="opt">optional</span>';
   const guide = guidance === "" ? "" : `<div class="guide">${esc(guidance)}</div>`;
   // The portable copy travels with no editor to open, so the item template is
-  // NAMED here rather than linked. The mirror draws the same chip clickable.
-  const of = hint?.of === undefined || hint.of === "" ? "" : ` · of: ${esc(hint.of)}`;
-  // The portable copy travels off the machine, so the template is NAMED by
-  // its path rather than linked — a reader can still go and open it.
-  const where =
-    hint?.of_template === undefined || hint.of_template === "" ? "" : ` What a ${esc(hint.of)} must carry: ${esc(hint.of_template)}`;
-  const mech = hint?.description === undefined || hint.description === "" ? "" : `<div class="desc">${esc(hint.description)}${where}</div>`;
+  // NAMED here rather than linked, and its path rides the chip's tooltip. The
+  // mirror draws the same chip clickable.
+  const at = hint?.of_template === undefined || hint.of_template === "" ? "" : ` title="${esc(hint.of_template)}"`;
+  const of = hint?.of === undefined || hint.of === "" ? "" : ` · of: <span${at}>${esc(hint.of)}</span>`;
+  const mech = hint?.description === undefined || hint.description === "" ? "" : `<div class="desc">${esc(hint.description)}</div>`;
   const head = `<div class="field"><span class="tpl">template: ${esc(template)}${of}</span><span class="name">${esc(name)}</span>${flag}<div class="desc">${esc(description)}</div>${mech}${guide}`;
   return `${head}${fieldEditor(name, content, meta, args, hint)}</div>`;
 }
@@ -723,22 +754,30 @@ export function buildPortableForm(
   const docIndex = new Map(docs.map((d, i) => [d.path, i]));
   const done = new Set(checked);
   const follow = model.follow_up_label === "" ? "" : `<span class="concrete">/ ${esc(model.follow_up_label)}</span> `;
+  // ANYTHING ELSE IS FOLLOW-UP, NOT EVIDENCE (owner, 2026-08-06). It asks
+  // what is left over, which is the same question box 6 asks.
+  const TAIL = ["current_situation", "follow_up", "anything_else"];
+  const one = (f: FormTemplate["fields"][number]): string => {
+    const tpl = model.field_templates[f.name] ?? "free-form";
+    return renderField(
+      f.name,
+      f.description,
+      f.required,
+      tpl,
+      fills[f.name] ?? "",
+      model.template_meta[tpl],
+      model.field_args[f.name],
+      f.guidance ?? "",
+      model.field_hints[f.name],
+    );
+  };
   const evid = model.template.fields
-    .filter((f) => f.name !== "current_situation" && f.name !== "follow_up")
-    .map((f) => {
-      const tpl = model.field_templates[f.name] ?? "free-form";
-      return renderField(
-        f.name,
-        f.description,
-        f.required,
-        tpl,
-        fills[f.name] ?? "",
-        model.template_meta[tpl],
-        model.field_args[f.name],
-        f.guidance ?? "",
-        model.field_hints[f.name],
-      );
-    })
+    .filter((f) => !TAIL.includes(f.name))
+    .map(one)
+    .join("");
+  const spill = model.template.fields
+    .filter((f) => f.name === "anything_else")
+    .map(one)
     .join("");
   const island: IslandData = { form: model.form, author: "", fields: fills, checked };
   const left =
@@ -750,7 +789,7 @@ export function buildPortableForm(
   const right =
     `<div class="box"><h2>5&nbsp;&nbsp;Evidence</h2>${evid}</div>` +
     `<div class="box"><h2>6&nbsp;&nbsp;Follow-up ${follow}<span class="tpl">template: ${esc(model.field_templates.follow_up ?? "free-form")}</span></h2>` +
-    `<textarea data-field="follow_up">${esc(fills.follow_up ?? "")}</textarea></div>`;
+    `<textarea data-field="follow_up">${esc(fills.follow_up ?? "")}</textarea>${spill}</div>`;
   const embedded = docs
     .map((d, i) => `<details id="doc-${i}"><summary>${esc(d.path)}</summary><pre>${esc(d.content)}</pre></details>`)
     .join("");

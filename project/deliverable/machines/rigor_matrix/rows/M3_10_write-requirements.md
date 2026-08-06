@@ -41,6 +41,8 @@ specification_note: |
   table.
 depends_on:
   - gate-inputs
+entry_read:
+  - project/deliverable/machines/methods/meth-requirement-authoring.md
 legal_tools:
   - se_file_read
   - se_file_write
@@ -52,14 +54,47 @@ legal_tools:
   - se_answer
 evidence:
   - name: register
-    description: "the requirement set: EARS, kinds, verify_method and breaks_if_removed on every row"
+    template: refs
+    of: requirement
+    covers: use-case
+    description: "every requirement as a node reference, one per line — the node carries the demand, this field never restates it"
   - name: set_criteria
-    description: complete, consistent, affordable, bounded - argued
+    template: per-item
+    items:
+      - complete
+      - consistent
+      - affordable
+      - bounded
+      - comprehensible
+      - no_tbd
+    description: "the set-level questions, each answered with the argument that makes it true — a bare yes is not an answer"
 ---
 
 ## Guidance
 
-Derive from the use-case steps and extensions. EARS shapes ([[meth-ears]]); kinds functional / quality / constraint / interface - qualities carry six-part scenarios ([[meth-quality-scenarios]]), constraints link their binding norm. Naming the verify_method (test / analysis / inspection / demonstration) IS the verifiability check - unnameable means rewrite or drop. breaks_if_removed mandatory on every requirement. Every requirement carries a WEIGHT, defaulting to unimportant - the high weights become M4's criteria and only they owe a scoring definition. source_refs to stakeholders, stories, norms. Detail now - no TBD survives this milestone; requirements are design input, never build-time afterthoughts. Position the concrete set against the standard checklists for this deliverable kind ([[meth-state-of-the-art]]). Expect iteration with the functions ([[meth-twin-peaks]]).
+How to write one row is [[meth-requirement-authoring]], which the entry read demands before this state opens. The statement shapes are [[meth-ears]]; quality scenarios are [[meth-quality-scenarios]]. The rows are NODES shaped by [[requirement]] - the register field carries references, never prose.
+
+Derive from the use-case steps and extensions. `refines` names the use cases; a cross-cutting quality names every use case whose pass it protects. `source_refs` carries the rest: stakeholders, norm clauses, decisions. COVERAGE IS CHECKED, NEVER WRITTEN DOWN. The field declares `covers: use-case`. The engine refuses this state while any requirement refines no use case. It refuses too while any use case is covered by no requirement.
+
+Every row fills its duties:
+
+- kind picked
+- verify_method named
+- breaks_if_removed filled
+- weight set (key | important | unimportant - only the key rows become M4's criteria)
+
+Detail now. No TBD survives this milestone.
+
+THE SET QUESTIONS, one argument each:
+
+- complete - every use-case step and extension has a covering row; name what has none.
+- consistent - no two rows conflict, and every term means one thing everywhere.
+- affordable - the set is buildable and verifiable together, within the project's means.
+- bounded - every row sits inside scope and answers to a source; nothing gold-plated.
+- comprehensible - a reader from any involved discipline can say what the system must do, from the set alone.
+- no_tbd - the sweep for TBD | TBC | TBR | ??? found zero, and you ran it.
+
+Position the concrete set against the standard checklists for this deliverable kind ([[meth-state-of-the-art]]). Expect iteration with the functions ([[meth-twin-peaks]]).
 
 ## Trial — this row only
 

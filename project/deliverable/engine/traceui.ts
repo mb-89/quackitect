@@ -4,6 +4,7 @@
 // for class. A click reaches the details panel through `clickable` and
 // `data-detail`, the same path every other element takes. Only the rings, the
 // edges and the pills are new here, because nothing else draws those.
+import { relative, sep } from "node:path";
 import { layoutTrace, loadTrace, rootsOf, TRACE_LEVELS, traceSvg, visionText } from "./trace.ts";
 
 function esc(s: string): string {
@@ -34,9 +35,24 @@ const FILTER_HELP = [
   "FIND — free text over every node's id, its statement, and EVERY FRONTMATTER FIELD. So `must` finds what a priority says, and `priority:must` narrows to that field. Matching is case-insensitive substring.",
   "",
   "A find match keeps its whole line of descent: the node, and every ancestor up to the vision. So a value prop stays when a requirement under it matches.",
+  "",
+  "CORPUS — which tree the nodes are read from. Trunk is what has landed. An OPEN record carries trunk plus everything it has authored, so pick the record to see work in flight. This is a choice rather than a guess, because a whole-corpus view belongs to no single record.",
 ].join("\n");
 
-export function traceCard(root: string, selected: string[], types: string[], find: string, expand: string): string {
+export function traceCard(
+  root: string,
+  selected: string[],
+  types: string[],
+  find: string,
+  expand: string,
+  // THE PATH A READER CLICKS is resolved by the HOST against the project
+  // root, so it is written from there — a node in a record's worktree comes
+  // out under .worktrees/, which opens, rather than a trunk path that does
+  // not exist.
+  projectRoot: string = root,
+  corpora: { id: string; label: string }[] = [],
+  corpus = "",
+): string {
   const all = loadTrace(root);
   const props = all.filter((n) => n.type === TRACE_LEVELS[0]);
   const rootOf = rootsOf(all);
@@ -52,7 +68,13 @@ export function traceCard(root: string, selected: string[], types: string[], fin
     vision: { statement: visionText(root), type: "vision", path: "the motivation gate's report" },
     filter: { statement: FILTER_HELP, type: "filter", path: "value prop · type · find" },
   };
-  for (const n of all) subjects[n.id] = { statement: n.statement, type: n.type, path: `project/spec/trace/${n.id}.md` };
+  // THE NODE'S OWN FILE, never a path built from its id. The built one
+  // dropped the type folder, so every link on the graph pointed at a file
+  // that has never existed.
+  for (const n of all) {
+    const file = n.file === undefined ? "" : relative(projectRoot, n.file).split(sep).join("/");
+    subjects[n.id] = { statement: n.statement, type: n.type, path: file };
+  }
   const data = `<script type="application/json" id="se-trace">${JSON.stringify(subjects).replace(/</g, "\\u003c")}</script>`;
   const body =
     props.length === 0
@@ -60,7 +82,16 @@ export function traceCard(root: string, selected: string[], types: string[], fin
       : '<div class="trace-filters clickable" data-detail="trace:filter">' +
         `${pillColumn("value prop", "prop", propValues, selected)}${pillColumn("type", "type", typeValues, types)}` +
         '<div class="pill-col"><div class="pill-head">find</div>' +
-        `<input class="trace-find" type="search" placeholder="id, statement, frontmatter…" value="${esc(find)}"></div></div>` +
+        `<input class="trace-find" type="search" placeholder="id, statement, frontmatter…" value="${esc(find)}"></div>` +
+        // THE PICKER IS ITS OWN COLUMN, headed like every other one. Sitting
+        // unlabelled under the search box, nothing said what it chose.
+        (corpora.length < 2
+          ? ""
+          : '<div class="pill-col"><div class="pill-head">source</div>' +
+            `<select class="trace-corpus">${corpora
+              .map((c) => `<option value="${esc(c.id)}"${c.id === corpus ? " selected" : ""}>${esc(c.label)}</option>`)
+              .join("")}</select></div>`) +
+        "</div>" +
         `<div class="trace-canvas">${traceSvg(layoutTrace(all, selected, { types, find }))}</div>${data}`;
   return `<div class="widget" id="w-trace"><div class="widget-head"><span>trace graph</span>${expand}</div><div class="widget-body">${body}</div></div>`;
 }
@@ -74,18 +105,46 @@ export const TRACE_STYLE = `
 .pill-head { font-size:11px; color:var(--se-muted); }
 /* A column past ten values scrolls, v1's own rule. */
 .pill-chips { display:flex; flex-direction:column; gap:3px; max-height:150px; overflow:auto; }
-.pill { display:flex; justify-content:space-between; gap:8px; padding:2px 7px; border:1px solid var(--se-line);
-  border-radius:9px; background:transparent; color:var(--se-fg); font:inherit; font-size:11px; cursor:pointer; text-align:left; }
+/* A CONTROL MUST LOOK LIKE ONE (owner, 2026-08-06). These all drew on
+   --se-line, which is the hairline the panels are divided by — far too faint
+   to read as an edge. A pill that looks like text is not a button, and a
+   borderless box is not a field. --se-border-strong is the host's own
+   interactive edge, so nothing here picks a colour of its own. */
+.pill { display:flex; justify-content:space-between; gap:8px; padding:3px 8px; border:1px solid var(--se-border-strong);
+  border-radius:9px; background:var(--se-raised); color:var(--se-fg); font:inherit; font-size:11px; cursor:pointer; text-align:left; }
+.pill:hover { border-color:var(--se-accent); }
 .pill.on { border-color:var(--se-accent); color:var(--se-accent); }
 .pill-n { color:var(--se-muted); }
-/* A bare search input renders borderless in some themes, so the border is stated. */
+/* THE NEIGHBOURHOOD, LIT (owner, 2026-08-06). Nothing changes colour — the
+   rest DIMS. The drawing keeps its own palette, so the eye still reads type
+   and level from it while the question "what does this touch" is answered. */
+svg.trace.lit .trace-node { opacity:0.22; }
+svg.trace.lit .trace-edge { opacity:0.1; }
+svg.trace.lit .trace-node.on, svg.trace.lit .trace-node.near { opacity:1; }
+svg.trace.lit .trace-edge.on { opacity:1; stroke:var(--se-accent); }
+svg.trace.lit .trace-node.on rect { stroke:var(--se-accent); stroke-width:3; }
 .trace-find { appearance:none; -webkit-appearance:none; padding:3px 7px; font:inherit; font-size:11px; min-width:190px;
-  background:transparent; color:var(--se-fg); border:1px solid var(--se-line); border-radius:3px; }
+  background:var(--se-raised); color:var(--se-fg); border:1px solid var(--se-border-strong); border-radius:3px; }
 .trace-find:focus { border-color:var(--se-accent); outline:none; }
+/* THE SOURCE PICKER. A native select paints itself from the OS unless both it
+   AND its options are told the host's colours — white-on-black otherwise. The
+   caret is drawn here because appearance:none takes the platform's away, and
+   without it nothing says the box drops down. */
+.trace-corpus { appearance:none; -webkit-appearance:none; padding:3px 22px 3px 7px; font:inherit; font-size:11px;
+  min-width:190px; background:var(--se-raised); color:var(--se-fg); border:1px solid var(--se-border-strong);
+  border-radius:3px; cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,var(--se-muted) 50%),linear-gradient(135deg,var(--se-muted) 50%,transparent 50%);
+  background-position:calc(100% - 13px) 50%, calc(100% - 8px) 50%; background-size:5px 5px, 5px 5px; background-repeat:no-repeat; }
+.trace-corpus:hover { border-color:var(--se-accent); }
+.trace-corpus:focus { border-color:var(--se-accent); outline:none; }
+.trace-corpus option { background:var(--se-bg-side); color:var(--se-fg); }
 .trace-canvas { flex:1; min-width:0; min-height:0; display:flex; align-items:center; justify-content:center; overflow:hidden; }
 svg.trace { width:100%; height:100%; cursor:grab; touch-action:none; }
 svg.trace.grabbing { cursor:grabbing; }
-.trace-ring { fill:none; stroke:var(--se-line); }
+/* THE LEVEL SEPARATORS ARE DASHED (owner, 2026-08-06). They are not edges
+   between nodes — they divide the rings — so the no-dashed-edges rule of
+   2026-08-05 does not reach them. Solid on --se-line they were invisible. */
+.trace-ring { fill:none; stroke:var(--se-border-strong); stroke-dasharray:7 9; }
 .trace-edge { stroke:var(--se-muted); stroke-width:1.4; }
 /* NO DASHED BORDERS ANYWHERE (owner, 2026-08-05). The vision's edges are
    implicit — no node declares them — and they are still DRAWN, which is what
@@ -106,6 +165,7 @@ export const TRACE_SCRIPT = `
   function svgEl(){ return document.querySelector('#w-trace svg.trace'); }
   function on(dim){ return Array.from(document.querySelectorAll('#w-trace .pill[data-dim="'+dim+'"].on')).map(function(b){return b.dataset.value}); }
   function query(){ var f = document.querySelector('#w-trace .trace-find'); return f && f.value ? f.value : ''; }
+  function corpus(){ var c = document.querySelector('#w-trace .trace-corpus'); return c && c.value ? c.value : ''; }
   function centreOf(g){ var b = g.getBBox(); return { x: b.x + b.width/2, y: b.y + b.height/2 }; }
   function anchor(){
     var s = svgEl(); if(!s) return null;
@@ -159,7 +219,8 @@ export const TRACE_SCRIPT = `
     var typing = document.activeElement && document.activeElement.classList.contains('trace-find');
     var url = '/widget/trace?embed=1&tp=' + encodeURIComponent(on('prop').join(','))
       + '&tt=' + encodeURIComponent(on('type').join(','))
-      + '&tq=' + encodeURIComponent(query());
+      + '&tq=' + encodeURIComponent(query())
+      + '&tc=' + encodeURIComponent(corpus());
     fetch(url).then(function(r){return r.text()}).then(function(html){
       var doc = new DOMParser().parseFromString(html,'text/html');
       var fresh = doc.getElementById('w-trace');
@@ -169,6 +230,35 @@ export const TRACE_SCRIPT = `
       if(typing){ var f = w.querySelector('.trace-find'); if(f){ f.focus(); f.setSelectionRange(f.value.length, f.value.length); } }
     }).catch(function(){});
   }
+  // A CLICK LIGHTS THE NEIGHBOURHOOD: the node itself, every node one edge
+  // away, and the edges between. Keyed by NODE rather than by card, so a node
+  // drawn under two value props lights in both places at once — which is how
+  // the duplication reads as one thing instead of two.
+  function lightUp(id){
+    var s = svgEl(); if(!s) return;
+    s.querySelectorAll('.on, .near').forEach(function(el){ el.classList.remove('on'); el.classList.remove('near'); });
+    if(!id){ s.classList.remove('lit'); s.dataset.lit = ''; return; }
+    var near = {}; near[id] = true;
+    s.querySelectorAll('.trace-edge').forEach(function(l){
+      if(l.dataset.a === id) near[l.dataset.b] = true;
+      if(l.dataset.b === id) near[l.dataset.a] = true;
+    });
+    s.classList.add('lit'); s.dataset.lit = id;
+    s.querySelectorAll('.trace-node').forEach(function(g){
+      var n = g.dataset.node;
+      if(n === id) g.classList.add('on'); else if(near[n] === true) g.classList.add('near');
+    });
+    s.querySelectorAll('.trace-edge').forEach(function(l){
+      if(l.dataset.a === id || l.dataset.b === id) l.classList.add('on');
+    });
+  }
+  document.addEventListener('click', function(e){
+    var s = svgEl(); if(!s || !e.target.closest) return;
+    var g = e.target.closest('#w-trace .trace-node');
+    // The same node twice puts the drawing back; a click on empty canvas too.
+    if(g){ lightUp(g.dataset.node === s.dataset.lit ? '' : g.dataset.node); return; }
+    if(e.target.closest('#w-trace svg.trace') && s.dataset.lit) lightUp('');
+  });
   var pending = null;
   document.addEventListener('click', function(e){
     var p = e.target.closest ? e.target.closest('#w-trace .pill') : null;
@@ -176,6 +266,9 @@ export const TRACE_SCRIPT = `
   });
   document.addEventListener('input', function(e){
     if(e.target.classList && e.target.classList.contains('trace-find')){ clearTimeout(pending); pending = setTimeout(relayout, 200); }
+  });
+  document.addEventListener('change', function(e){
+    if(e.target.classList && e.target.classList.contains('trace-corpus')) relayout();
   });
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wirePanZoom); else wirePanZoom();
 })();

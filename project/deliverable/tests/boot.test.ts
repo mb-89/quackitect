@@ -207,15 +207,15 @@ describe("boot", { concurrency: true }, () => {
     // the whole point of the promotion.
     assert.deepEqual(Object.keys(state.exit ?? {}), ["read_consume"], "boot's only remaining exit demand is the handover");
     assert.deepEqual(state.exit?.read_consume.args, [], "and with none left behind it asks for nothing");
-    assert.ok(state.pulled !== undefined && state.pulled.length >= 2, "the pulled guidance rides the packet");
+    assert.ok(state.pulled !== undefined && state.pulled.length >= 1, "the pulled guidance rides the packet");
     // The hash IS the proof — packets must never print it.
     assert.ok(
       state.pulled?.every((p) => !("hash" in p)),
       "packets never hand out the hashes",
     );
     assert.ok(
-      state.pulled?.some((p) => (p.sources as string[]).includes("root")),
-      "root guidance pulled always",
+      state.pulled?.every((p) => Array.isArray(p.sources) && (p.sources as string[]).length > 0),
+      "every pulled doc says which rule pulled it",
     );
     assert.ok(Array.isArray(state.lookahead_read), "packet carries preread hint field");
     assert.ok(

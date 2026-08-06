@@ -16,16 +16,12 @@ legal_tools:
   - se_log_query
   - se_answer
 evidence:
-  - name: props_realized
-    description: "every value prop realized by at least one story"
-  - name: stories_generalized
-    description: "every story inside a use case"
-  - name: roles_covered
-    description: "no stakeholder role left out; tensions named"
-  - name: excluded_stated
-    description: "the binding excluded-use list exists"
-  - name: examples_formulated
-    description: "scenario paths and slides identified as the formulated examples"
+  - name: picture_judged
+    description: "the judgment the counts cannot make — are these the right journeys, and is any one of them wrong?"
+  - name: unspecified_capability
+    description: "every lane tool and every offered door, against the use cases — an uncovered capability that is in scope FAILS this gate"
+  - name: passes_concrete
+    description: "is every pass written concretely enough to script at M6 — the formulated stage of the example system, which at M2 IS the story slides"
 major: full
 minor: tailored
 patch: none
@@ -57,3 +53,15 @@ specification_note: |
 ## Guidance
 
 The user-level picture stops here for judgment before any system-level writing starts - requirements written on unblessed stories propagate garbage. Review per [[meth-gate-review]].
+
+THE COUNTS ARE NOT EVIDENCE HERE (owner ruling 2026-08-06). Every proposition realized by a story, and every story inside a use case, are COMPUTED - `covers: value-prop` at write-stories and `covers: story` at generalize-use-cases. This gate used to ask for all three in prose, and got a paragraph that agreed with the engine until the day it did not. They are struck. If a coverage rule is red, the feeder state never signed and this gate cannot stamp; there is nothing left for a person to attest.
+
+SO THIS GATE ASKS ONLY WHAT A PERSON CAN SEE AND THE ENGINE CANNOT.
+
+A HOLE FOUND BY JUDGMENT AND LISTED IS A FAIL, NOT A DISCLOSURE. This is the rule the gate exists for, and it was broken the first time it ran: four capabilities with no use case were found by hand, written down, and the gate recommended pass anyway. Naming a gap does not close it. Either the capability is genuinely out of scope - and then it belongs in the non-goals, argued - or it is in scope and the gate FAILS until it has a use case.
+
+WHERE THE UNSPECIFIED LIST COMES FROM. Not from imagination. The lane's tool list and the machine's offered doors are enumerations the spec did not write, so they can be compared against the use cases mechanically. Until that check is built (note-9c5253b4da67) it is walked by hand HERE, against the live tool list and the live doors, and the walk is written down so the next reviewer can repeat it.
+
+PRIOR ART MEANS A COMPARISON, not a citation. Naming Cockburn proves a shape was borrowed. It says nothing about whether this user picture survives against systems people actually use.
+
+EXAMPLES ARE FORMULATED HERE, NEVER EXECUTABLE. The example system has three stages: formulated at M2 and M3, scripted at M6, demonstrated at M8. At this gate the story slides ARE the formulated examples and nothing is runnable yet, which is correct rather than a shortfall. The field asks whether the passes are concrete enough to script later.
