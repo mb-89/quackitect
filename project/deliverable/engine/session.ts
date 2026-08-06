@@ -12,6 +12,7 @@
 import { existsSync, mkdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
+import { dirtyLines, git, gitLand, gitSync } from "./gitlane.ts";
 import { contentHash } from "./hash.ts";
 import {
   activeStates,
@@ -760,12 +761,53 @@ export class Session {
         source: "engine/session.ts reload",
       });
     }
-    if (process.env.SE_RELOAD_DRY === "1") return { reload: "dry", note: "canary green — no exit (SE_RELOAD_DRY)" };
+    const reconciled = this.reconcileTrees();
+    if (process.env.SE_RELOAD_DRY === "1") return { reload: "dry", note: "canary green — no exit (SE_RELOAD_DRY)", ...reconciled };
     setTimeout(() => process.exit(42), 400);
     return {
       reload: "armed",
       note: "the engine restarts in under a second on the NEW sources — the walk reboots at start; tick when the lane answers",
+      ...reconciled,
     };
+  }
+
+  /** RELOAD RECONCILES THE TWO TREES (owner ruling 2026-08-06).
+   *
+   *  A bound record has its own worktree, and the engine serves ONE tree.
+   *  Which one depends on whether a walk is bound at that instant, and the
+   *  walk moves. So an edit could land in the tree the person was not
+   *  looking at, and it read on screen as a broken feature rather than a
+   *  missing merge — four times in one morning.
+   *
+   *  The tell was always the same: NEW DATA drawn by OLD CODE. Markdown is
+   *  read live from whichever tree is served, so a template's raw {token}
+   *  would appear beside a description that had already updated.
+   *
+   *  Reload is the right seam because it is already the verb for "make what
+   *  I wrote take effect". It commits what is on disk, lands the branch on
+   *  trunk, and syncs trunk back — so whichever tree the engine comes up
+   *  on, it carries the change. Nothing here can lose work: a commit is
+   *  made before anything moves, and a conflicting merge aborts and says so.
+   *
+   *  Unbound, there is one tree and nothing to do. */
+  private reconcileTrees(): Record<string, unknown> {
+    const wt = this.bound?.path;
+    if (wt === undefined || wt === this.root) return {};
+    try {
+      for (const tree of [wt, this.root]) {
+        if (dirtyLines(git(tree, "status", "--porcelain").stdout).length === 0) continue;
+        git(tree, "add", "-A");
+        git(tree, "commit", "-m", "the machine commits what stood on disk at a reload");
+      }
+      const landed = gitLand(this.root, wt);
+      const synced = gitSync(this.root, wt);
+      return { trees: { landed: landed.commits ?? [], synced: synced.commits ?? [] } };
+    } catch (e) {
+      // A RECONCILE THAT FAILS NEVER BLOCKS THE RELOAD. The reload is still
+      // correct for the tree it comes up on; the person is told what stayed
+      // behind so they can see why a surface looks unchanged.
+      return { trees: { failed: e instanceof Error ? e.message : String(e) } };
+    }
   }
 
   /** Where the LANE works: the bound expedition's worktree, else the root. */
