@@ -36,7 +36,7 @@ import { McpServer, type ToolDef } from "./mcp.ts";
 import { fileMove } from "./move.ts";
 import { parseStateNote } from "./notes.ts";
 import { openPanel } from "./panel.ts";
-import { resolveInRoot, seDir } from "./paths.ts";
+import { fansOut, resolveInRoot, seDir } from "./paths.ts";
 import { type MirrorState, renderMirror } from "./render.ts";
 import { HOST_SAFE_WAIT_MS, jobList, jobStatus, jobStop, jobWait, runBackground, runOrHandoff, startJob } from "./run.ts";
 import { search } from "./search.ts";
@@ -1506,6 +1506,40 @@ export function buildServer(
   // The work lands. The complaint rides back on the result. And the toll goes
   // UNPAID, so the rule keeps its teeth — it just bites the narration now,
   // instead of the work.
+  // METHOD CANNOT BE CHANGED FROM INSIDE A RECORD (owner ruling 2026-08-07).
+  //
+  // While a record is bound, laneRoot sends a METHOD write into that record's
+  // worktree, and the fan-out pushes it from there to trunk. So editing
+  // guidance or the engine while bound publishes the RECORD's copy over the
+  // shared one. It happened twice in one afternoon, and the first time it ate
+  // two lane verbs out of trunk's tool list.
+  //
+  // GUARDED AT DISPATCH, before the handler runs, so the whole call refuses
+  // and nothing is half-written. A guard at the write sites would refuse
+  // partway through a multi-file patch.
+  const WRITE_TOOLS = new Set(["se_file_write", "se_file_patch", "se_file_replace", "se_file_delete", "se_file_move"]);
+  server.addGuard((tool, args) => {
+    if (!WRITE_TOOLS.has(tool) || session.workRoot() === root) return;
+    const paths: string[] = [];
+    for (const k of ["path", "glob", "from", "to"]) if (typeof args[k] === "string") paths.push(args[k] as string);
+    if (Array.isArray(args.ops)) {
+      for (const op of args.ops as Record<string, unknown>[]) if (typeof op.path === "string") paths.push(op.path);
+    }
+    const offending = paths.filter((p) => fansOut(p));
+    if (offending.length === 0) return;
+    throw new Rejection({
+      clause: CLAUSES.METHOD_WRITE_BOUND,
+      expected: "a method write from trunk — step out of the record first",
+      got: `${offending.join(", ")} — written while a record's worktree is bound`,
+      remedy: {
+        tool: "se_pull",
+        args: { escape: "method cannot be changed from inside a record" },
+        note: "escape to the front desk, make the edit there, then aim back. The walk is left standing, so nothing is lost. A record's OWN evidence is never refused here.",
+      },
+      source: "engine/tools.ts method guard",
+    });
+  });
+
   let updateComplaint: RejectionPayload | undefined;
   let updateRejection: Rejection | undefined;
   let updateResult: Record<string, unknown> | undefined;

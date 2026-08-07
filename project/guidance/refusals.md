@@ -159,6 +159,21 @@ hand. Nothing genuinely finished? Say what is actually blocking the item with
 `defer`, or close it `obsolete`. A checklist standing open for hours is the
 thing this stops.
 
+### SE-C-134 — a method write while a record is bound
+Method cannot be changed from inside a record. Guidance, machines, matrix
+rows, templates, the engine and the tests are SHARED, so a write to one while
+a record is bound lands in that record's worktree and fans out from there,
+pushing the record's copy over trunk.
+
+That is not theoretical. It happened twice on 2026-08-07, and the first time
+it overwrote trunk's tool list and deleted two lane verbs.
+
+The remedy is one call. Step out with `se_pull {escape: "<why>"}`, make the
+edit unbound, then aim back. The walk is left standing where it was.
+
+A RECORD'S OWN CONTENT IS NEVER REFUSED here. Evidence and decisions under
+the record's own folder are exactly what a bound walk is for.
+
 ## Notes and prose
 
 ### SE-C-073 — the note ref is unknown
