@@ -252,3 +252,36 @@ test("a collection bar's prerequisites include every input, not just the nearest
     for (const d of declared) assert.ok(feeders.includes(d), `${d} feeds ${bar.id} and must be a prerequisite`);
   }
 });
+
+// THE ANSWER COMES BACK INSIDE A SECOND (req-call-answers-in-one-second).
+//
+// The requirement stood and nothing enforced it. So when green stopped reading
+// a stamp and started re-checking every claim against the whole trace corpus,
+// the cost landed on the render path — and the render runs on every change.
+// The engine stopped answering three times in one afternoon before anybody
+// measured it, and each time the diagnosis started from scratch.
+//
+// A CORPUS OF TWO HUNDRED, ON PURPOSE. Against the handful of nodes a fresh
+// root carries, the cheap version and the expensive one both round to nothing.
+// A guard that cannot tell them apart guards nothing, so this one buys a
+// corpus big enough for the difference to show.
+//
+// The bound is deliberately loose. It is not measuring how fast this is; it is
+// there to go red if somebody puts a per-state corpus load back.
+test("green is computed inside a second against a corpus of two hundred nodes", () => {
+  const { root, it } = pinned();
+  const decl = { ...compileColumn(readRigorMatrix(root), SIZE), id: itShortId(it.id) };
+  const reqDir = join(it.path, "project", "spec", "trace", "requirement");
+  mkdirSync(reqDir, { recursive: true });
+  for (let i = 0; i < 200; i++) {
+    writeFileSync(join(reqDir, `req-filler-${i}.md`), `---\nid: req-filler-${i}\ntype: "[[requirement]]"\n---\n\nfiller\n`, "utf8");
+  }
+  const session = new Session(root);
+  const started = Date.now();
+  session.recordDone(decl);
+  const took = Date.now() - started;
+  assert.ok(
+    took < 1000,
+    `recordDone took ${took} ms over 200 nodes. The requirement is one second per CALL, and one call paints more than once — so this budget is already generous.`,
+  );
+});
