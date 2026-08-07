@@ -84,7 +84,7 @@ import {
   repinColumn,
 } from "./iterations.ts";
 import { parseStateNote, section } from "./notes.ts";
-import { fansOut, pathKind, recordOwnerOf, resolveInRoot, seDir } from "./paths.ts";
+import { fansOut, methodFilesIn, pathKind, recordOwnerOf, resolveInRoot, seDir } from "./paths.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { anyJobRunning } from "./run.ts";
@@ -106,8 +106,16 @@ import { type Expedition, expClose, expFind, expList, expNew, readRecord } from 
  *  says pull and the machine says what to do. se_note is legal everywhere
  *  too: a stray is captured where it strikes, never chased (contract rule
  *  4). se_note_drain joins them by the same logic: an inbox you may only add
- *  to is not an inbox. */
-const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_pull", "se_note", "se_panel", "se_note_drain"]);
+ *  to is not an inbox.
+ *
+ *  se_aim joins them because AIMING IS NOT WORK (owner ruling 2026-08-07).
+ *  The engine is born aimed at front_desk by a field initializer, and the
+ *  mirror has had a setter since 2026-08-04 — so the capability existed and
+ *  simply was not reachable from the lane. An agent that cannot aim can only
+ *  take the next offered door, which means it wanders one hop at a time and
+ *  no route is ever drawn. That is not a walk; it is guessing with extra
+ *  steps. */
+const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_pull", "se_note", "se_panel", "se_note_drain", "se_aim"]);
 /** RESTRICTED tools: "all" does NOT grant these — a state must name them.
  *  Nothing is restricted today.
  *
@@ -670,7 +678,7 @@ export class Session {
         source: "engine/session.ts reload",
       });
     }
-    const reconciled = this.reconcileTrees();
+    const reconciled = { ...this.reconcileTrees(), method: this.backfillMethod() };
     if (process.env.SE_RELOAD_DRY === "1") return { reload: "dry", note: "canary green — no exit (SE_RELOAD_DRY)", ...reconciled };
     setTimeout(() => process.exit(42), 400);
     return {
@@ -717,6 +725,46 @@ export class Session {
       // behind so they can see why a surface looks unchanged.
       return { trees: { failed: e instanceof Error ? e.message : String(e) } };
     }
+  }
+
+  /** THE BACKFILL: every METHOD file, trunk to every open worktree, at reload.
+   *
+   *  The write-time fan-out only catches files that are written. This catches
+   *  the rest, so a tree cannot sit half-updated — which is how a worktree
+   *  came to hold a new session.ts against an old paths.ts and stopped
+   *  compiling.
+   *
+   *  TRUNK IS THE SOURCE AND NEVER THE DESTINATION. A stale worktree must not
+   *  be able to push its old copy back. That direction is not a detail: an
+   *  edit made while a record was bound once fanned a stale tools.ts over
+   *  trunk and ate two lane verbs.
+   *
+   *  UNCHANGED FILES ARE NOT REWRITTEN, so this costs a read per file and
+   *  nothing else on a tree that is already level. */
+  private backfillMethod(): { trees: number; files: number } {
+    const trees = this.methodTrees().filter((t) => t !== this.root);
+    if (trees.length === 0) return { trees: 0, files: 0 };
+    let files = 0;
+    for (const rel of methodFilesIn(this.root)) {
+      let bytes: string;
+      try {
+        bytes = readFileSync(join(this.root, rel), "utf8");
+      } catch {
+        continue;
+      }
+      for (const tree of trees) {
+        const dst = join(tree, rel);
+        try {
+          if (existsSync(dst) && readFileSync(dst, "utf8") === bytes) continue;
+          mkdirSync(dirname(dst), { recursive: true });
+          writeFileSync(dst, bytes, "utf8");
+          files++;
+        } catch {
+          // one unreachable tree must never stop the others
+        }
+      }
+    }
+    return { trees: trees.length, files };
   }
 
   /** Where the LANE works: the bound expedition's worktree, else the root. */

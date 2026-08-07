@@ -206,6 +206,18 @@ export function sessionTools(session: Session): ToolDef[] {
           {},
         ),
     },
+    {
+      name: "se_aim",
+      title: "se.aim",
+      description:
+        "AIM THE WALK at a state, then pull and be carried there. The machine draws the route and walks every hop whose conditions already pass, stopping only where something is genuinely owed — so a state that is already green is walked THROUGH, never landed on. Name any state in the machine you stand in, or a fully qualified one like iterations/i1/write-requirements. THIS IS HOW YOU MOVE: taking an offered door aims one hop, which draws a route one segment long and lands you on every state in between. Aim far instead. Aiming is not walking and changes nothing — the pull still refuses whatever the conditions and the slider refuse.",
+      inputSchema: {
+        type: "object",
+        properties: { to: { type: "string", description: "the state to aim at — the route is drawn to it and the pull follows it" } },
+        required: ["to"],
+      },
+      handler: (args) => session.setTarget(String(args.to)),
+    },
   ];
 }
 

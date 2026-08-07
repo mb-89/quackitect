@@ -10,7 +10,7 @@
 // to hand-edit a dotfile they cannot be expected to understand. Roots are
 // READ surfaces, never write targets, machine-local on purpose (an absolute
 // path means nothing on anyone else's machine).
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 
@@ -199,3 +199,31 @@ export function pathKind(rel: string): PathKind {
  *  write lane and the tests agree on the question rather than each deciding
  *  it. */
 export const fansOut = (rel: string): boolean => pathKind(rel) === "method";
+
+/** EVERY METHOD FILE IN A TREE, root-relative.
+ *
+ *  THE FAN-OUT ALONE WAS NOT ENOUGH. It copies a method file when that file
+ *  is WRITTEN, so every edit made before the mirror went live stayed in the
+ *  tree it was written in. That gap shipped and then bit within the day: a
+ *  worktree ended up holding a NEW session.ts against an OLD paths.ts and
+ *  could not compile.
+ *
+ *  A PARTIAL SYNC IS WORSE THAN NONE. An unsynced tree is merely old and
+ *  self-consistent. A half-synced one is broken, and it breaks at whatever
+ *  moment somebody happens to run a check inside it.
+ *
+ *  So the reload backfills the whole set, and this is the set. */
+export function methodFilesIn(root: string): string[] {
+  const out: string[] = [];
+  for (const rel of METHOD_FILES) if (existsSync(join(root, rel))) out.push(rel);
+  for (const pre of METHOD_PREFIXES) {
+    const abs = join(root, pre);
+    if (!existsSync(abs)) continue;
+    for (const e of readdirSync(abs, { recursive: true, withFileTypes: true })) {
+      if (!e.isFile()) continue;
+      const dir = (e as { parentPath?: string; path?: string }).parentPath ?? (e as { path?: string }).path ?? abs;
+      out.push(relative(root, join(dir, e.name)).replace(/\\/g, "/"));
+    }
+  }
+  return out;
+}
