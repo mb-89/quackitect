@@ -1620,13 +1620,26 @@ export class Session {
     // misses the memo, and the truth stays read live. `generation` covers what
     // no file content can: a record seeded or a worktree bound changes what a
     // generated container expands to.
-    const memoKey = [from, target, this._autonomy, this.subs.map((s) => s.decl.id).join("/"), this.generation].join("::");
+    // THE OBJECTIVE IS PART OF THE KEY, and it is computed BEFORE the memo is
+    // consulted. The route used to be pure graph search over the drawing, so
+    // the drawing's identity was a complete key. It now depends on which
+    // claims stand, and those change under a walk that is filling forms.
+    //
+    // Caught live 2026-08-07: a claim was signed, the objective should have
+    // moved on, and the memo kept handing back the route to the state the
+    // walk was already standing in — so the walk had nowhere to go. A stale
+    // derived value, which is the exact fault this whole day removed
+    // elsewhere.
+    //
+    // nextObjective reads the evidence files, which is cheap. What stays
+    // memoized is expandNode, which WRITES generated containers.
+    const aim = this.routeAim(target);
+    const objective = this.nextObjective(aim);
+    const memoKey = [from, target, objective, this._autonomy, this.subs.map((s) => s.decl.id).join("/"), this.generation].join("::");
     const machineNow = this.machine;
     if (this.routeMemo !== undefined && this.routeMemo.key === memoKey && this.routeMemo.machine === machineNow) {
       return this.routeMemo.value;
     }
-    const aim = this.routeAim(target);
-    const objective = this.nextObjective(aim);
     const r = computeRoute(from, objective, (q) => this.expandNode(q));
     const judgments = this.routeJudgments(r.steps);
     const value = {

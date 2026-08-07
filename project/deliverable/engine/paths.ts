@@ -165,7 +165,16 @@ export type PathKind = "session" | "method" | "record" | "content";
  *  changes how the MACHINE behaves, which is why they cannot belong to one
  *  tree. Kept as a list rather than a clever rule: the set is small, it is
  *  read by people, and a wrong guess here is the bug this exists to kill. */
-export const METHOD_PREFIXES = ["project/guidance/", "project/deliverable/machines/", "project/deliverable/engine/"] as const;
+// THE TESTS ARE METHOD TOO. They are the engine's own proof, they belong to no
+// record, and leaving them out produced exactly the fault this list exists to
+// prevent: a worktree took the new engine and kept its old tests, so the suite
+// failed on laws that had already been changed (found live 2026-08-07).
+export const METHOD_PREFIXES = [
+  "project/guidance/",
+  "project/deliverable/machines/",
+  "project/deliverable/engine/",
+  "project/deliverable/tests/",
+] as const;
 
 /** The prompt layer is METHOD that does not live under a method folder. It is
  *  PROJECTED into each tree by place-prompt-layer, so every tree needs it and
