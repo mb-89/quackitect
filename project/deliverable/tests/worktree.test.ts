@@ -140,4 +140,72 @@ describe("worktree", { concurrency: true }, () => {
     assert.equal(atDesk.isError, true);
     assert.equal(atDesk.body.clause, "SE-C-110");
   });
+
+  // THE METHOD REACHES EVERY TREE; A RECORD REACHES ONLY ITS OWN (owner
+  // ruling 2026-08-07). The failure this pins, in the owner's words: you
+  // apply a change, you want the state machine to behave differently, and it
+  // does not — because the change went to a tree you are not standing in.
+  // Before this, only a RELOAD reconciled the trees, and a reload reboots the
+  // walk. The cure cost more than the disease, so divergence just piled up.
+  test("a method write fans out to every tree; a record write stays in its own", async () => {
+    const { Session } = await import("../engine/session.ts");
+    const { spawnSync } = await import("node:child_process");
+    const { existsSync, readFileSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const root = freshRoot();
+    const g = (...a: string[]) => {
+      const r = spawnSync("git", a, { cwd: root, encoding: "utf8" });
+      assert.equal(r.status, 0, `git ${a.join(" ")}: ${r.stderr}`);
+    };
+    g("init", "-q", "-b", "v3");
+    g("add", "-A");
+    g("-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "seed");
+    g("config", "user.name", "t");
+    g("config", "user.email", "t@t");
+
+    const s = new Session(root);
+    const minted = s.expeditionNew("fix", "Fan the method out") as { created: string };
+    s.expeditionOpen(minted.created);
+    const wt = s.workRoot();
+    assert.ok(wt.includes(".worktrees"), "bound to the worktree");
+
+    const { fileDelete, filePatch, fileReplace, fileWrite } = await import("../engine/files.ts");
+    const rule = "project/guidance/fanout-probe.md";
+    // COMPARED TREE TO TREE, never against a literal. The linter's safe fixes
+    // run on the way in, so the only thing worth asserting is that both trees
+    // ended up with the very same bytes.
+    const agree = (): string => {
+      const mine = readFileSync(join(wt, rule), "utf8");
+      assert.equal(readFileSync(join(root, rule), "utf8"), mine, "trunk carries exactly what the bound tree got, with no reload");
+      return mine;
+    };
+
+    fileWrite(s.laneRoot(rule), rule, "---\nid: fanout-probe\nstatement: A probe.\n---\n\none\n", null);
+    assert.match(agree(), /one/);
+
+    // The append verb — a second write site in the lane.
+    filePatch(s.laneRoot(rule), [{ path: rule, append: true, new_string: "two\n" }]);
+    assert.match(agree(), /two/);
+
+    // The regex verb — a third, and the one whose RESULT caps its file list,
+    // which is why the hook sits at the write and not on the way out.
+    fileReplace(s.laneRoot(rule), rule, "two", "three");
+    const after = agree();
+    assert.match(after, /three/);
+    assert.doesNotMatch(after, /two/);
+
+    // A RECORD PATH IS NOT SHARED. One copy, in the record's own tree, so
+    // there is never a second copy to disagree with it.
+    const rec = `project/spec/expeditions/${minted.created}/scratch.md`;
+    fileWrite(s.laneRoot(rec), rec, "mine alone\n", null);
+    assert.ok(existsSync(join(wt, rec)), "the record's own tree has it");
+    assert.equal(existsSync(join(root, rec)), false, "and trunk does not");
+
+    // A DELETE FANS OUT TOO. Half the drift was a file that lived on in one
+    // tree after being removed from the other.
+    const { contentHash } = await import("../engine/hash.ts");
+    fileDelete(s.laneRoot(rule), rule, contentHash(after));
+    assert.equal(existsSync(join(wt, rule)), false, "gone where it was deleted");
+    assert.equal(existsSync(join(root, rule)), false, "and gone from trunk too");
+  });
 });

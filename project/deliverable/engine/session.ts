@@ -45,6 +45,7 @@ import type { CanvasData } from "./canvas.ts";
 import { conditionNotePath } from "./conditions.ts";
 import { Decisions, replayFile } from "./decisions.ts";
 import { type GeneratedMachine, generateContinueExpedition, generateExpeditionArchive, shortId } from "./expmachine.ts";
+import { setMethodMirror } from "./files.ts";
 import {
   confirmPrefill,
   type FormLint,
@@ -82,7 +83,7 @@ import {
   repinColumn,
 } from "./iterations.ts";
 import { parseStateNote, section } from "./notes.ts";
-import { pathKind, recordOwnerOf, resolveInRoot, seDir } from "./paths.ts";
+import { fansOut, pathKind, recordOwnerOf, resolveInRoot, seDir } from "./paths.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { anyJobRunning } from "./run.ts";
@@ -184,6 +185,11 @@ export class Session {
 
   constructor(root: string) {
     this.root = root;
+    // THE WRITE LANE LEARNS ABOUT TREES HERE, and only here. files.ts must not
+    // know what a worktree is, so the session hands it the mirror instead.
+    setMethodMirror(root, (rel, from) => {
+      this.fanOutMethod(rel, from);
+    });
     // Fail fast at server start: a misdrawn machine must not silently serve
     // an ungated lane.
     this._machine = compileMachine(root, mainMachinePath(root));
@@ -782,6 +788,65 @@ export class Session {
       // with it — the working root is always a legal answer.
       return undefined;
     }
+  }
+
+  /** EVERY TREE THE METHOD LIVES IN: trunk, plus each OPEN record's worktree.
+   *
+   *  A closed record's tree is gone, and its branch is history. Only what is
+   *  open can be walked, so only what is open needs the method. */
+  methodTrees(): string[] {
+    const trees = new Set<string>([this.root]);
+    try {
+      for (const it of itList(this.root)) if (it.open) trees.add(it.path);
+    } catch {
+      // no iterations yet — trunk is the whole story
+    }
+    try {
+      for (const e of expList(this.root)) if (e.open) trees.add(e.path);
+    } catch {
+      // likewise for expeditions
+    }
+    return [...trees];
+  }
+
+  /** A METHOD WRITE LANDS IN EVERY TREE, IN ONE ACT (owner ruling 2026-08-07).
+   *
+   *  THE FAILURE THIS ENDS, in the owner's words: you apply a change, you want
+   *  the state machine to behave differently, and it does not — because the
+   *  change went to a tree you are not standing in. Before this, the only
+   *  thing that reconciled the trees was reconcileTrees at RELOAD, which
+   *  reboots the walk and re-reads the whole of boot. So the cure cost more
+   *  than the disease and the divergence just accumulated.
+   *
+   *  A DELETE FANS OUT TOO. Half the drift was a file that existed in one tree
+   *  and not the other, which is what a one-way copy leaves behind.
+   *
+   *  RECORD CONTENT IS NOT COPIED, ever. An open record's evidence has exactly
+   *  one home, and laneRoot sends every read there. One copy cannot disagree
+   *  with itself. */
+  fanOutMethod(rel: string, from: string): string[] {
+    if (!fansOut(rel)) return [];
+    const src = join(from, rel);
+    const gone = !existsSync(src);
+    const bytes = gone ? "" : readFileSync(src, "utf8");
+    const reached: string[] = [];
+    for (const tree of this.methodTrees()) {
+      if (tree === from) continue;
+      const dst = join(tree, rel);
+      try {
+        if (gone) {
+          if (existsSync(dst)) unlinkSync(dst);
+        } else {
+          mkdirSync(dirname(dst), { recursive: true });
+          writeFileSync(dst, bytes, "utf8");
+        }
+        reached.push(tree);
+      } catch {
+        // One unreachable tree must not stop the others — partial is strictly
+        // better than none, and reconcileTrees still backstops at reload.
+      }
+    }
+    return reached;
   }
 
   expeditionNew(kind: string, goal: string): Record<string, unknown> {
