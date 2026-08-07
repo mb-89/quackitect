@@ -1633,13 +1633,24 @@ export class Session {
     //
     // nextObjective reads the evidence files, which is cheap. What stays
     // memoized is expandNode, which WRITES generated containers.
-    const aim = this.routeAim(target);
-    const objective = this.nextObjective(aim);
-    const memoKey = [from, target, objective, this._autonomy, this.subs.map((s) => s.decl.id).join("/"), this.generation].join("::");
+    const memoKey = [from, target, this._autonomy, this.subs.map((s) => s.decl.id).join("/"), this.generation].join("::");
     const machineNow = this.machine;
     if (this.routeMemo !== undefined && this.routeMemo.key === memoKey && this.routeMemo.machine === machineNow) {
       return this.routeMemo.value;
     }
+    // THE OBJECTIVE IS COMPUTED ON A MEMO MISS, never before the check.
+    //
+    // It reads the evidence, and evidence reading is not free. Computing it
+    // ahead of the memo put a full green recomputation on EVERY packet, and
+    // route() is built into every packet — se_aim measured 2936 ms and the
+    // next pull never came back.
+    //
+    // The staleness that ordering was meant to fix is handled at the other
+    // end instead: a form write clears this memo, because a form write is the
+    // only thing that can change which claims stand. Invalidate on the event,
+    // do not recompute on every read.
+    const aim = this.routeAim(target);
+    const objective = this.nextObjective(aim);
     const r = computeRoute(from, objective, (q) => this.expandNode(q));
     const judgments = this.routeJudgments(r.steps);
     const value = {
@@ -2751,7 +2762,15 @@ export class Session {
     };
   }
 
+  /** A FORM WRITE IS THE ONLY THING THAT CHANGES WHICH CLAIMS STAND, so it is
+   *  the one event the route memo has to hear about. Clearing it here keeps
+   *  the objective honest without making every read recompute green. */
+  private forgetRoute(): void {
+    this.routeMemo = undefined;
+  }
+
   formSave(name: string, fields: Record<string, string>, by = "agent", machineId?: string): Record<string, unknown> {
+    this.forgetRoute();
     const fm = this.formMachine(machineId);
     if (this.isStateForm(name, fm)) return this.stateFormSave(name, fields, by, fm);
     const h = this.formHome(name);
@@ -2782,6 +2801,7 @@ export class Session {
   }
 
   formDone(name: string, by: Channel, machineId?: string): Record<string, unknown> {
+    this.forgetRoute();
     const fm = this.formMachine(machineId);
     if (this.isStateForm(name, fm)) {
       this.assertStateFormActive(name, fm, "submit");
@@ -3023,6 +3043,17 @@ export class Session {
    *
    *  A stamp says it passed once. Green says it passes now. */
   private standingClaims(decl: MachineDecl, it: Iteration, claimful: Set<string>): Set<string> {
+    // THE CORPUS IS LOADED ONCE, NOT ONCE PER STATE. claimProblems takes it as
+    // an argument for exactly this reason and recordDone was not passing it,
+    // so every claimful state re-read the whole trace — about fifteen full
+    // corpus loads per paint.
+    //
+    // That was survivable while recordDone only ran when something painted. It
+    // stopped being survivable the moment the ROUTE started calling it, which
+    // put it on every packet: se_aim measured 2936 ms and the next pull never
+    // returned. The engine is single-threaded, so a synchronous scan that long
+    // does not slow the server down — it stops it answering.
+    const corpus = loadTrace(this.traceRoot(it));
     const standing = new Set<string>();
     for (const s of decl.states) {
       if (!claimful.has(s.id)) continue;
@@ -3032,7 +3063,7 @@ export class Session {
         const note = parseStateNote(readFileSync(abs, "utf8"));
         const fm = note.frontmatter;
         if (typeof fm.signed_off !== "string") continue;
-        if (claimProblems(this.traceRoot(it), s, note.body).length > 0) continue;
+        if (claimProblems(this.traceRoot(it), s, note.body, corpus).length > 0) continue;
         if (s.kind === "gate" && !(typeof fm.bless === "string" && fm.bless.startsWith("blessed"))) continue;
         standing.add(s.id);
       } catch {
@@ -3184,6 +3215,7 @@ export class Session {
    *  submitted form needs a hand ABOVE it — the human always, or an agent
    *  whose autonomy stands strictly above the gate's own weight. */
   formBless(name: string, ok: boolean, by: string, machineId?: string): Record<string, unknown> {
+    this.forgetRoute();
     const m = this.formMachine(machineId);
     const s = this.stateFormState(name, m);
     this.assertStateFormActive(name, m, "bless");

@@ -79,6 +79,31 @@ design-input chapter at once.
 A FALSIFIED ASSUMPTION BECOMES AN ISSUE, not a risk — it has already
 happened. Change the kind, keep the id, and say so in the body.
 
+## THE TITLE STATES THE CLAIM, NOT THE TOPIC (owner ruling 2026-08-07)
+
+An entry's id and statement say the THING HELD TRUE, phrased so it could be
+falsified. Not the subject area, not the test status, not the name of a gap.
+
+The test is one question: could somebody disagree with the title? If not, it
+is a topic and it needs rewriting.
+
+| written as | reads as | what it should say |
+| --- | --- | --- |
+| `raid-experimental-type-stripping` | a topic | the flag keeps behaving as it does today |
+| `raid-posix-untested` | a test status | the lane works the same on POSIX |
+| `raid-adjudication-provenance-gap` | a thing | no vendor ships adjudication provenance |
+| `raid-corpus-stays-small` | A CLAIM — correct | — |
+
+All four were written on one day. Only the last one can be argued with, which
+is exactly what makes it the only one a reader can act on.
+
+WHY IT MATTERS MORE FOR AN ASSUMPTION THAN FOR THE OTHER KINDS. An assumption
+is a claim you are RELYING ON without having established it. If the title does
+not state the claim, the register lists subjects nobody can check, and the
+probe has nothing to aim at. A risk can survive a vague name because its body
+carries the worry; an assumption cannot, because the title IS the thing under
+test.
+
 ## Fields
 
 - `id` — `raid-<slug>`.

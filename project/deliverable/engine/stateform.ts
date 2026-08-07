@@ -241,8 +241,21 @@ function typeProblems(name: string, of: string, refs: string[], byId: Map<string
  *
  *  Same checks, run against what is stored. Empty fields stay the
  *  required-check's business, here as everywhere. */
-export function claimProblems(root: string, s: StateDecl, body: string, corpus?: TraceNode[]): string[] {
-  const nodes = corpus ?? loadTrace(root);
+/** THE CORPUS IS THE CALLER'S TO LOAD, and it is not optional (owner ruling
+ *  2026-08-07). It used to default to `corpus ?? loadTrace(root)`, which made
+ *  an expensive call look free at the call site — and recordDone duly called
+ *  it once per state, reloading roughly 250 files about fifteen times per
+ *  paint. That was enough to hang the engine once the route started calling
+ *  recordDone on every packet.
+ *
+ *  THE DEEPER REASON IS CONSISTENCY, not speed. Read the input, process it,
+ *  produce the output. A corpus re-read between two states means those two
+ *  states were judged against different worlds, and nothing would report the
+ *  difference. One load per call is the only way the answer is coherent.
+ *
+ *  Required, so the cost is always visible where it is paid. */
+export function claimProblems(root: string, s: StateDecl, body: string, corpus: TraceNode[]): string[] {
+  const nodes = corpus;
   const metas = new Map<string, TemplateMeta>();
   const out: string[] = [];
   for (const f of s.evidence_form) {
