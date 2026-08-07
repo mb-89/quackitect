@@ -229,3 +229,26 @@ test("the drift rips down — everything downstream of a moved step goes with it
   assert.deepEqual([...cone].sort(), ["a", "b", "c"], "the moved step re-earns its own claim too");
   assert.ok(!cone.has("unrelated"), "a step off the path is untouched");
 });
+
+// THE FAN-IN IS AN AND (owner design 2026-08-04, note-bb6d1cb6b75d): in most
+// machines every branch must be covered. The route used to be breadth-first
+// shortest path, which finds ONE way to a gate and never mentions the other
+// branch — so the walk marched at a gate that then refused, naming a feeder
+// nobody had been sent to. claimFeeders is what makes the route cover both.
+test("a collection bar's prerequisites include every input, not just the nearest one", () => {
+  const { root, it } = pinned();
+  const decl = { ...compileColumn(readRigorMatrix(root), SIZE), id: itShortId(it.id) };
+  const claimful = new Set(decl.states.filter((s) => s.evidence_form.length > 0).map((s) => s.id));
+  const bars = decl.states.filter((s) => s.busbar === true);
+  assert.ok(bars.length > 0, "the column declares at least one collection bar");
+  for (const bar of bars) {
+    const feeders = claimFeeders(decl, bar.id, claimful);
+    // EVERY declared claim-bearing input is a prerequisite. A shortest path
+    // would have named exactly one of them, whatever the bar collects.
+    const declared = decl.states
+      .filter((p) => p.edges.some((e) => e.to === bar.id && (e.role ?? "normal") !== "fallback"))
+      .map((p) => p.id)
+      .filter((id) => claimful.has(id));
+    for (const d of declared) assert.ok(feeders.includes(d), `${d} feeds ${bar.id} and must be a prerequisite`);
+  }
+});

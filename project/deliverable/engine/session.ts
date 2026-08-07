@@ -1502,6 +1502,58 @@ export class Session {
     return decl?.submachine !== undefined ? Session.qual(target, this.declForPrefix(target)?.initial ?? "start") : target;
   }
 
+  /** THE ROUTE COMPUTES WHAT IS NEEDED, NOT WHAT IS NEAREST (owner design
+   *  2026-08-04 in note-bb6d1cb6b75d, built 2026-08-07).
+   *
+   *  route.ts says the frame is `make` — name a target, compute what is
+   *  needed, run it. It was breadth-first shortest path instead, which is a
+   *  different question with a different answer. Two things followed:
+   *
+   *  - IT WAS BLIND TO GREEN. A state already standing was routed through
+   *    exactly like one that still owed work.
+   *  - IT WAS BLIND TO THE AND. From one state it found ONE way to a gate.
+   *    But a gate collects EVERY input, so a branch the path never mentioned
+   *    is still owed — and the walk marched to a gate that then refused,
+   *    naming a feeder nobody had been sent to.
+   *
+   *  DEFAULT IS AND, which is the settled ruling: in most machines every
+   *  branch must be covered. So the objective is the first prerequisite that
+   *  does NOT yet stand, and the target itself only once they all do.
+   *
+   *  Transparent states are looked through by claimFeeders, so a waypoint
+   *  carrying no claim never becomes an objective.
+   *
+   *  IT RE-ASKS ON EVERY PULL. Finishing one objective simply makes the next
+   *  one the answer, so no plan is stored and none can go stale. */
+  private nextObjective(aim: string): string {
+    const cut = aim.lastIndexOf("/");
+    const prefix = cut < 0 ? "" : aim.slice(0, cut);
+    const local = cut < 0 ? aim : aim.slice(cut + 1);
+    const decl = this.declForPrefix(prefix);
+    if (decl === undefined || !decl.states.some((s) => s.id === local)) return aim;
+    const claimful = new Set(decl.states.filter((s) => s.evidence_form.length > 0).map((s) => s.id));
+    const done = new Set(this.recordDone(decl));
+    const unmet: string[] = [];
+    const seen = new Set<string>([local]);
+    const stack = [local];
+    while (stack.length > 0) {
+      const at = stack.pop() as string;
+      for (const f of claimFeeders(decl, at, claimful)) {
+        if (seen.has(f)) continue;
+        seen.add(f);
+        stack.push(f);
+        if (!done.has(f)) unmet.push(f);
+      }
+    }
+    if (unmet.length === 0) return aim;
+    // THE ONE WITH NOTHING UNMET BEHIND IT. Anything else would send the walk
+    // at a state whose own inputs are still owed, which is the very mistake
+    // this replaces.
+    const owed = new Set(unmet);
+    const first = unmet.find((u) => claimFeeders(decl, u, claimful).every((f) => !owed.has(f)));
+    return Session.qual(prefix, first ?? unmet[0]);
+  }
+
   /** The slider is weighed HOP BY HOP. A route that walks past a state
    *  the agent may not enter is a hole straight through contract rule 3. */
   private routeJudgments(steps: RouteResult["steps"]): { at: string; needs: string; why: string }[] {
@@ -1573,11 +1625,17 @@ export class Session {
     if (this.routeMemo !== undefined && this.routeMemo.key === memoKey && this.routeMemo.machine === machineNow) {
       return this.routeMemo.value;
     }
-    const r = computeRoute(from, this.routeAim(target), (q) => this.expandNode(q));
+    const aim = this.routeAim(target);
+    const objective = this.nextObjective(aim);
+    const r = computeRoute(from, objective, (q) => this.expandNode(q));
     const judgments = this.routeJudgments(r.steps);
     const value = {
       ...r,
       from,
+      // THE LINE GOES TO THE OBJECTIVE, which is the work actually owed next.
+      // `aimed_at` keeps the far target visible, so a reader can see both
+      // where they are headed and what stands in the way of it.
+      ...(objective === aim ? {} : { aimed_at: aim }),
       autonomy: this._autonomy,
       judgments,
       reads: this.routeReadList(r.steps),
