@@ -8,7 +8,6 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { withSignedOff } from "../engine/forms.ts";
 import { itFind, itPinRel, pinIteration } from "../engine/iterations.ts";
 import { Session } from "../engine/session.ts";
 import { checkDocs, freshRoot } from "./helpers.ts";
@@ -26,7 +25,7 @@ function gitInit(root: string): void {
   }
 }
 
-test("a matrix that moves under a standing claim reopens it and strips its stamps", async () => {
+test("a matrix that moves under a standing claim reopens it WITHOUT touching its stamps", async () => {
   const root = freshRoot();
   gitInit(root);
   const session = new Session(root);
@@ -68,19 +67,27 @@ test("a matrix that moves under a standing claim reopens it and strips its stamp
   // ONE PULL. Nothing else.
   await session.pull();
 
+  // THE REOPEN WRITES NOTHING ONTO THE CLAIM (owner ruling 2026-08-07). It
+  // used to strip the signature and stamp a reason in its place, which stored
+  // a derived value and destroyed a person's act in one move.
   const after = readFileSync(ev, "utf8");
-  assert.doesNotMatch(after, /^signed_off:/m, "the stamp is gone");
-  assert.match(after, /^suspect: /m, "and a suspect mark replaces it — re-look, then re-approve");
-  assert.match(after, new RegExp(`suspect:.*${step.id}`), "which names what moved, so nobody has to go hunting");
+  assert.match(after, /^signed_off: /m, "the signature SURVIVES — a check may refuse to paint, never to erase");
+  assert.doesNotMatch(after, /^suspect:/m, "and no mark is written onto the claim");
   assert.match(after, /^authors: human$/m, "an unrelated key is untouched");
-  assert.match(after, /what was claimed the first time/, "and the claim stays — it is re-approved, not re-written");
-  assert.ok(!session.recordDone(decl).includes(step.id), "so the drawing stops painting it green");
+  assert.match(after, /what was claimed the first time/, "and the claim stays");
+
+  // WHAT A REOPEN CHANGES IS THE WALK, not the record. The step is active
+  // again, so the drawing blinks it as the live state — and active beats done
+  // when the colour is chosen. Nothing had to be written onto the claim to
+  // say so, which is the whole point.
+  assert.ok(
+    session.active().some((a) => a.split("/").pop() === step.id),
+    `the walk is back at the step: ${JSON.stringify(session.active())}`,
+  );
 
   // AND IT SETTLES. The pin caught up in the same pull, so a second one finds
   // nothing to do — without that the step would reopen forever.
-  writeFileSync(ev, withSignedOff(after, "re-attested"), "utf8");
-  assert.doesNotMatch(readFileSync(ev, "utf8"), /^suspect:/m, "re-attesting clears the mark in the same act");
   await session.pull();
-  assert.match(readFileSync(ev, "utf8"), /^signed_off: re-attested$/m, "and it is not marked again");
-  assert.ok(session.recordDone(decl).includes(step.id), "green again, by one act rather than a re-fill");
+  assert.match(readFileSync(ev, "utf8"), /^signed_off: /m, "still signed after a second pull");
+  assert.deepEqual(session.suspectStates(decl), [], "and the drift has settled");
 });

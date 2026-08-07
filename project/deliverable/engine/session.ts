@@ -16,6 +16,7 @@ import { dirtyLines, git, gitLand, gitSync } from "./gitlane.ts";
 import { contentHash } from "./hash.ts";
 import {
   activeStates,
+  claimFeeders,
   completeState,
   downstreamCone,
   type MachineDecl,
@@ -64,7 +65,6 @@ import {
   withFieldContent,
   withSignedOff,
   withStatus,
-  withSuspect,
 } from "./forms.ts";
 import { drainNote, pendingNotes } from "./inbox.ts";
 import {
@@ -963,7 +963,10 @@ export class Session {
     const known = owed.filter((id) => run.decl.states.some((s) => s.id === id));
     if (known.length === 0) return undefined;
     const { reopened, cone } = reopenStates(run.decl, run.instance, known, reason, new Date().toISOString());
-    this.markSuspect(run.decl, cone, `${reason} — ${known.join(", ")}`);
+    // NOTHING IS WRITTEN ONTO THE CLAIMS. The reopen used to strip their
+    // signatures and stamp a reason in their place; it does not any more
+    // (owner ruling 2026-08-06, built 2026-08-07). The reason belongs in the
+    // log, which already has it — this call is logged like every other.
     this.notifyChange();
     return { reopened, cone };
   }
@@ -2891,106 +2894,76 @@ export class Session {
     return join(it.path, `project/spec/iterations/${it.id}/evidence/${state}.md`);
   }
 
-  /** THE CLAIM GOES SUSPECT (v1's suspect-bless, kept).
+  /** WHAT STANDS ON ITS OWN MERIT — computed from the file, every time.
    *
-   *  signed_off and bless are not evidence. They assert that the evidence
-   *  STANDS — and once an input under it moved, it does not. So they come off
-   *  and a `suspect:` line goes on, carrying WHAT moved.
+   *  Three things, and nothing is remembered between looks:
    *
-   *  IT IS NOT A TEARDOWN. The claim keeps its content and its authors. The
-   *  next reader re-looks and re-approves; they do not re-write. v1 recorded
-   *  the reason plainly: a silent auto-reopen reads as the tool undoing your
-   *  work.
+   *  - a signature is present,
+   *  - the claim still passes its own form NOW, not merely once,
+   *  - and where it is a gate, the bless stands.
    *
-   *  Leaving the stamps is what kept a reopened gate painted green — the paint
-   *  reads the FILE, which outlives the engine, not the instance, which does
-   *  not. */
-  private markSuspect(decl: MachineDecl, states: string[], why: string): void {
-    const it = this.declIteration(decl);
-    if (it === undefined) return;
-    for (const id of states) this.suspect(it, id, why);
-  }
-
-  /** A CLAIM THAT NO LONGER PASSES ITS OWN FORM SAYS SO.
-   *
-   *  recordDone already refuses it green. This writes the reason onto the file
-   *  as well, because grey with no explanation sends the next reader hunting
-   *  for what changed — which is the whole thing the suspect mark exists to
-   *  prevent. */
-  private markStaleClaims(decl: MachineDecl, it: Iteration): void {
-    const failed: string[] = [];
+   *  A stamp says it passed once. Green says it passes now. */
+  private standingClaims(decl: MachineDecl, it: Iteration, claimful: Set<string>): Set<string> {
+    const standing = new Set<string>();
     for (const s of decl.states) {
-      if (s.evidence_form.length === 0) continue;
-      const abs = this.evidenceAbs(it, s.id);
-      if (!existsSync(abs)) continue;
-      let fm: Record<string, unknown>;
-      let body: string;
-      try {
-        const note = parseStateNote(readFileSync(abs, "utf8"));
-        fm = note.frontmatter;
-        body = note.body;
-      } catch {
-        continue; // an unreadable claim is the lint's problem, not the walk's
-      }
-      // ALREADY FALLEN STILL COUNTS. The ripple has to keep holding after the
-      // pass that first knocked the upstream claim down — otherwise a gate
-      // whose feeder fell yesterday reads as standing today.
-      if (typeof fm.suspect === "string") {
-        failed.push(s.id);
-        continue;
-      }
-      if (typeof fm.signed_off !== "string") continue;
-      const problems = claimProblems(this.traceRoot(it), s, body);
-      if (problems.length > 0 && this.suspect(it, s.id, `no longer passes its form — ${problems[0]}`)) failed.push(s.id);
-    }
-    if (failed.length === 0) return;
-    // AND IT RIPS DOWN. A gate whose feeder just fell cannot stand on it, and
-    // neither can anything past the gate. The claim downstream may be word for
-    // word fine and still be resting on ground that moved.
-    for (const id of downstreamCone(decl, failed)) {
-      if (failed.includes(id)) continue;
-      this.suspect(it, id, `rests on ${failed.join(", ")}, which fell`);
-    }
-  }
-
-  /** Mark one claim, if there is one to mark. */
-  private suspect(it: Iteration, state: string, why: string): boolean {
-    const abs = this.evidenceAbs(it, state);
-    if (!existsSync(abs)) return false;
-    try {
-      const raw = readFileSync(abs, "utf8");
-      if (!/^signed_off: /m.test(raw) && !/^bless:/m.test(raw)) return false;
-      writeFileSync(abs, withSuspect(raw, why), "utf8");
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  recordDone(decl: MachineDecl): string[] {
-    const it = this.declIteration(decl);
-    if (it === undefined) return [];
-    const done: string[] = [];
-    for (const s of decl.states) {
-      if (s.evidence_form.length === 0) continue;
+      if (!claimful.has(s.id)) continue;
       const abs = this.evidenceAbs(it, s.id);
       if (!existsSync(abs)) continue;
       try {
         const note = parseStateNote(readFileSync(abs, "utf8"));
         const fm = note.frontmatter;
-        // SUSPECT IS NOT DONE. An input moved under this claim, so it is
-        // waiting on somebody to re-look and re-approve.
-        if (typeof fm.suspect === "string") continue;
         if (typeof fm.signed_off !== "string") continue;
-        // AND IT MUST STILL PASS ITS OWN FORM. A stamp says it passed once;
-        // green says it passes NOW.
         if (claimProblems(this.traceRoot(it), s, note.body).length > 0) continue;
         if (s.kind === "gate" && !(typeof fm.bless === "string" && fm.bless.startsWith("blessed"))) continue;
-        done.push(s.id);
+        standing.add(s.id);
       } catch {
         // an unreadable claim colours nothing
       }
     }
+    return standing;
+  }
+
+  /** GREEN IS CALCULATED, NEVER STORED (owner ruling 2026-08-07, v1's design).
+   *
+   *  THE FAILURE THIS ENDS. A `suspect:` line used to be WRITTEN into a claim
+   *  when an input moved, and writing it STRIPPED the signature, the author
+   *  and the bless. Two things went wrong with that, and both were seen live:
+   *
+   *  - A derived value on disk goes stale. It was written by a pass that runs
+   *    at some moments and not others, so between them the file and the truth
+   *    disagreed. States painted green that had fallen, and one that had not
+   *    fallen painted grey.
+   *  - It destroyed the one fact that genuinely had to be stored. A signature
+   *    is a person's act. A computed check may refuse to paint it green; it
+   *    may never erase it. One claim lost its signature to a merge and no
+   *    longer says who signed it or when.
+   *
+   *  v1 SETTLED THIS AND WE DRIFTED OFF IT. adr-verdict-cache, at ref main:
+   *  verdicts live keyed by input hash outside the spec, because "a cache is
+   *  never truth and the repo must stay cache-free". adr-evidence-hash: the
+   *  gate folds its evidence hash into its own, so editing blessed evidence
+   *  flips it suspect — a COMPARISON made at look time, never a written mark.
+   *
+   *  So there is nothing to go stale here. Every look recomputes. */
+  recordDone(decl: MachineDecl): string[] {
+    const it = this.declIteration(decl);
+    if (it === undefined) return [];
+    const claimful = new Set(decl.states.filter((s) => s.evidence_form.length > 0).map((s) => s.id));
+    const green = this.standingClaims(decl, it, claimful);
+    // GREEN STOPS AT THE FIRST INPUT THAT IS NOT GREEN. This is the ripple,
+    // and it is a graph walk rather than a mark on a file. A claim may be word
+    // for word fine and still rest on ground that moved.
+    //
+    // Run to a FIXED POINT: knocking one out can knock out what stood on it.
+    for (let changed = true; changed; ) {
+      changed = false;
+      for (const id of [...green]) {
+        if (claimFeeders(decl, id, claimful).every((f) => green.has(f))) continue;
+        green.delete(id);
+        changed = true;
+      }
+    }
+    const done = [...green];
     // The mechanical start was necessarily walked on the way to any claim.
     if (done.length > 0) done.push("start");
     return done;
@@ -3046,11 +3019,10 @@ export class Session {
     if (run === undefined) return;
     const it = this.declIteration(run.decl);
     if (it === undefined) return;
-    // THE STALE PASS RUNS FIRST, and unconditionally. A claim can stop passing
-    // its form for reasons the pin knows nothing about — a referenced artifact
-    // deleted, a template tightened — and the drift's early return would hide
-    // every one of them.
-    this.markStaleClaims(run.decl, it);
+    // NO STALE PASS ANY MORE. It used to walk every claim and WRITE a suspect
+    // mark onto the ones that had stopped passing. recordDone re-runs those
+    // same form checks on every look, so the mark bought nothing and cost a
+    // signature each time it fired.
     const moved = iterationDrift(this.root, it);
     if (moved.length === 0) return;
     // ONLY A STANDING CLAIM CAN BE REOPENED, and standing is the RECORD's

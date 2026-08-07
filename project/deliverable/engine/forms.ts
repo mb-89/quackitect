@@ -229,23 +229,20 @@ export function withSignedOff(instanceRaw: string, when: string): string {
   return afterAnchor(raw, `signed_off: ${when}`);
 }
 
-/** SUSPECT — v1's design, and the one this project already settled on: when an
- *  input changes under a finished claim, the claim is MARKED, not undone.
+/** NOTHING WRITES A SUSPECT MARK ANY MORE (owner ruling 2026-08-06, built
+ *  2026-08-07). There was a `withSuspect` here that stamped a reason onto a
+ *  claim, and it STRIPPED the signature, the author and the bless to do it.
  *
- *  Suspect means re-look, then re-approve. The content stays, the authorship
- *  stays, and the reason it fell is written down so the next reader knows what
- *  moved without going hunting.
+ *  Two faults in one function. It stored a derived value, which then went
+ *  stale between the passes that wrote it. And it destroyed a person's act to
+ *  record a machine's opinion — a checker may refuse to paint a claim green,
+ *  but it may never erase what somebody signed.
  *
- *  Tearing the claim back to nothing reads as the tool undoing your work, and
- *  it makes re-earning cost as much as starting over. */
-export function withSuspect(instanceRaw: string, why: string): string {
-  const cleared = stripSuspect(stripSignedOff(instanceRaw)).replace(/^bless:.*\n?/m, "");
-  // QUOTED, ALWAYS. The reason carries the checker's own message, which is
-  // full of colons and dashes — unquoted it reads as a nested mapping and the
-  // whole note stops parsing.
-  return afterAnchor(cleared, `suspect: ${JSON.stringify(why)}`);
-}
-
+ *  Green is computed now, on every look, in Session.recordDone. The reason a
+ *  claim fell is in the log, which had it all along.
+ *
+ *  THE STRIPPER STAYS, for the claims the old code already marked: reading one
+ *  still has to ignore a leftover line. */
 export function stripSuspect(instanceRaw: string): string {
   return instanceRaw.replace(/^suspect:.*\n?/m, "");
 }

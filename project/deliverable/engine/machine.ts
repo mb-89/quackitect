@@ -309,6 +309,43 @@ export type StepOutcome = "filled" | "failed";
  * a reader can see what was claimed the first time and that it was reopened.
  * Erasing them would make a reopen indistinguishable from work never done.
  */
+/** THE INPUT ROLES. A fallback is the guard-failure path and a recovery edge
+ *  points back the way it came, so neither is an input. The drawing uses the
+ *  same rule for its busbars, and the two must never disagree — a person
+ *  reading a bar is reading a promise the engine has to keep. */
+const INPUT_ROLES = new Set(["normal", "approval"]);
+
+/** THE CLAIM-BEARING FEEDERS of a state, looking THROUGH states that carry no
+ *  claim of their own (owner ruling 2026-08-07).
+ *
+ *  This is the ripple, computed instead of written. Green stops at the first
+ *  input that is not green, and a mark on a file is not needed to say so.
+ *
+ *  TRANSPARENT STATES ARE LOOKED THROUGH, never gated on. `start` and plain
+ *  waypoints carry no evidence form, so they can never be green — gating on
+ *  them would grey the entire machine. The question is the first input that
+ *  COULD be green and is not. */
+export function claimFeeders(m: MachineDecl, id: string, claimful: Set<string>): string[] {
+  const out = new Set<string>();
+  const walked = new Set<string>([id]);
+  const queue = [id];
+  while (queue.length > 0) {
+    const target = queue.pop() as string;
+    for (const p of m.states) {
+      if (!p.edges.some((e) => e.to === target && INPUT_ROLES.has(e.role ?? "normal"))) continue;
+      if (claimful.has(p.id)) {
+        out.add(p.id);
+        continue;
+      }
+      // A cycle through transparent states must not spin. Seen once is enough.
+      if (walked.has(p.id)) continue;
+      walked.add(p.id);
+      queue.push(p.id);
+    }
+  }
+  return [...out];
+}
+
 /** The downstream cone: everything reachable from the named states. Anything
  *  downstream was derived from what is being reopened, so it cannot stand. */
 export function downstreamCone(m: MachineDecl, stateIds: string[]): Set<string> {
