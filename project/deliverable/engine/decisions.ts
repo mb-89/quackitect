@@ -466,8 +466,43 @@ export class Decisions {
   /** What attachTo corrected on THIS call — read once by apply(). */
   private lastCorrection: string | undefined;
 
+  /** THE NUDGE GREW TEETH (owner ruling 2026-08-07).
+   *
+   *  It stayed advice for good reason, recorded below: refusing work over its
+   *  commentary is a mistake this field already made once. Advice lost anyway.
+   *  In one 15-hour window the nudge fired five times and was ignored five
+   *  times, once at nineteen updates with nothing closed.
+   *
+   *  So it takes the TOLL'S OWN SHAPE, which the owner already trusts: one
+   *  warning, then the next offending call refuses. The counter clears on any
+   *  resolve, so a walk with a moving checklist never sees this.
+   *
+   *  WHAT KEEPS IT FROM BEING THE OLD MISTAKE: a resolving op is never
+   *  refused. The remedy is always reachable in one call, and the open node
+   *  map rides the refusal, so the id needed to obey it is already in hand. */
+  private refuseIfStalled(u: DecisionOp): void {
+    if (u.op === "done" || u.op === "obsolete" || u.op === "revert" || u.op === "defer") return;
+    if (this.sinceResolve < Decisions.NUDGE_AFTER) return;
+    const openNodes = [...this.nodes.values()].filter((n) => n.status === "open").map((n) => ({ id: n.id, brief: n.brief }));
+    if (openNodes.length === 0) return;
+    throw new Rejection({
+      clause: CLAUSES.NARRATION_STALLED,
+      expected: "a resolving op — done, obsolete, revert or defer — because the checklist has not moved",
+      got: `${this.sinceResolve} updates since anything closed, with ${openNodes.length} still open`,
+      remedy: {
+        tool: "(the same call)",
+        args: { update: { op: "done", node: openNodes[0].id, brief: "<what landed>" } },
+        note: `open now: ${openNodes.map((n) => `${n.id} (${n.brief})`).join(" · ")}. Nothing finished? defer {node, to} parks it, obsolete {node, brief} drops it. One of these, then carry on.`,
+      },
+      source: "engine/decisions.ts stall",
+    });
+  }
+
   apply(visit: string, u: DecisionOp): Record<string, unknown> {
     this.materialize(visit);
+    // BEFORE anything mutates. Every refusal's remedy says to repeat the call,
+    // so the repeat must find the graph exactly as this call found it.
+    this.refuseIfStalled(u);
     this.lastCorrection = undefined;
     switch (u.op) {
       case "plan":

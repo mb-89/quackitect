@@ -82,7 +82,7 @@ import {
   repinColumn,
 } from "./iterations.ts";
 import { parseStateNote, section } from "./notes.ts";
-import { resolveInRoot, seDir } from "./paths.ts";
+import { pathKind, recordOwnerOf, resolveInRoot, seDir } from "./paths.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { anyJobRunning } from "./run.ts";
@@ -747,11 +747,41 @@ export class Session {
    *  Everything else follows the walk into its worktree, as it always did. */
   laneRoot(rel?: string): string {
     if (rel === undefined) return this.workRoot();
+    // RESOLVED BY WHAT THE PATH IS, never by where the walk stands (owner
+    // ruling 2026-08-07). paths.ts holds the classification and the reasons.
+    //
     // A DECLARED ROOT is session state exactly like .se/ — its declaration
     // lives in the project root's .se/roots.json, so a bound worktree must
     // never make the owner's roots read as undeclared (found live 2026-07-30).
-    if (rel.startsWith("@")) return this.root;
-    return rel.replace(/\\/g, "/").split("/")[0] === ".se" ? this.root : this.workRoot();
+    const kind = pathKind(rel);
+    if (kind === "session") return this.root;
+    // A RECORD'S OWN CONTENT IS READ FROM THE RECORD'S TREE, bound or not.
+    // The mirror painted i1's states out of trunk while i1's worktree held
+    // the fall that knocked them down, and both halves were working — they
+    // were simply looking at different files.
+    if (kind === "record") return this.recordRoot(rel) ?? this.workRoot();
+    return this.workRoot();
+  }
+
+  /** WHERE ONE RECORD'S OWN CONTENT LIVES.
+   *
+   *  An OPEN record owns its worktree, so that is the only copy that counts.
+   *  A CLOSED one has landed and its tree is gone, so undefined here falls
+   *  back to the working root and finds the landed archive. */
+  private recordRoot(rel: string): string | undefined {
+    const owner = recordOwnerOf(rel);
+    if (owner === undefined) return undefined;
+    try {
+      const found =
+        owner.container === "iterations"
+          ? itList(this.root).find((x) => x.id === owner.id)
+          : expList(this.root).find((x) => x.id === owner.id);
+      return found?.open === true ? found.path : undefined;
+    } catch {
+      // A record list that cannot be read must not take path resolution down
+      // with it — the working root is always a legal answer.
+      return undefined;
+    }
   }
 
   expeditionNew(kind: string, goal: string): Record<string, unknown> {

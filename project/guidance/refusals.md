@@ -141,6 +141,24 @@ Updates name an OPEN node. Check the node map that rides every result.
 ### SE-C-122 — done over open children
 Everything started gets resolved. Resolve or re-home the children first.
 
+### SE-C-133 — the checklist stopped moving
+Narration that never closes anything records intent, not progress. After five
+updates with nothing resolved you get one warning, riding the result as a
+`nudge`. Ignore it and the next update refuses.
+
+The way out is always open. A resolving op is never refused, because it is the
+remedy:
+
+- `done` — the item landed.
+- `obsolete` — it stopped mattering.
+- `revert` — it was undone.
+- `defer` — it belongs to a later state.
+
+The open node map rides every refusal, so the id you need is already in your
+hand. Nothing genuinely finished? Say what is actually blocking the item with
+`defer`, or close it `obsolete`. A checklist standing open for hours is the
+thing this stops.
+
 ## Notes and prose
 
 ### SE-C-073 — the note ref is unknown

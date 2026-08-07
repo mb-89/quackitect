@@ -480,22 +480,31 @@ test("an update names its item while a checklist stands, and is free when none d
   assert.equal(elsewhere.update, "update", "an open list in another visit never blocks this one");
 });
 
-test("the checklist nudges when narration outruns it, and never refuses", () => {
+test("the checklist warns once when narration outruns it, then refuses", () => {
   const s = new Session(freshRoot());
   s.decisions.apply("idle@0", { op: "plan", items: ["first", "second"] });
   // Each update NAMES its item - narration that moves nothing on the
-  // checklist is refused outright. The nudge is about the item never
-  // CLOSING, which is a different failure and still worth saying.
+  // checklist is refused outright. This is about the item never CLOSING,
+  // which is a different failure.
   const items = (s.decisions.apply("idle@0", { op: "update", node: "d1", brief: "starting" }) as Record<string, unknown>).open_nodes as {
     id: string;
   }[];
   let last: Record<string, unknown> = {};
-  for (let i = 0; i < 5; i++)
+  for (let i = 0; i < 4; i++)
     last = s.decisions.apply("idle@0", { op: "update", node: items[0].id, brief: `working ${i}` }) as Record<string, unknown>;
-  assert.ok(typeof last.nudge === "string", "five updates with nothing closed earns the nudge");
+  assert.ok(typeof last.nudge === "string", "five updates with nothing closed earns the warning");
   assert.match(String(last.nudge), /PROGRESS view/);
-  assert.equal(last.update, "update", "and the update itself still lands - a nudge is never a refusal");
-  // Closing something resets it: the rhythm is what is being asked for.
+  assert.equal(last.update, "update", "the warned call itself still lands - the warning is free");
+  // IGNORE THE WARNING AND THE NEXT ONE REFUSES (owner ruling 2026-08-07).
+  // It took the toll's shape because advice lost: in one 15-hour window the
+  // nudge fired five times and was ignored five times.
+  assert.throws(
+    () => s.decisions.apply("idle@0", { op: "update", node: items[0].id, brief: "ignoring the warning" }),
+    (e: Error & { clause?: string }) => e.clause === "SE-C-133",
+    "the update after the warning is refused",
+  );
+  // THE REMEDY IS NEVER REFUSED, or the refusal would be a trap with no way
+  // out. Closing something is always legal, and it clears the count.
   const open = s.decisions.graph("idle@0").nodes.filter((n) => n.status === "open");
   const closed = s.decisions.apply("idle@0", { op: "done", node: open[0].id, brief: "landed" }) as Record<string, unknown>;
   assert.equal(closed.nudge, undefined, "closing something clears it");

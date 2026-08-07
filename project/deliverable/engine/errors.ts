@@ -84,5 +84,6 @@ export const CLAUSES = {
   RUN_LANE_JOB: "SE-C-129", // se_run asked to do a lane tool's job — the lane covers it; the ladder blocks after one warned run
   TEST_UNCHANGED: "SE-C-130", // se_test over an unchanged tree — the last verdict still stands
   TEST_SCOPE: "SE-C-131", // the wrong test scope: a battery when scoped runs answer the diff, or piecemeal past where the battery is cheaper
+  NARRATION_STALLED: "SE-C-133", // updates keep coming while the checklist never moves — warned once, then refused
   RAW_NUL: "SE-C-132", // a raw NUL byte in text — it makes the whole file unsearchable; in code it is corrected to the escape, elsewhere the intent is not knowable
 } as const;
