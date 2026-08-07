@@ -91,49 +91,36 @@ test("a check pins the VERSION: editing the doc unchecks it and the gate asks ag
   assert.deepEqual(s.active(), ["front_desk"]);
 });
 
-test("THE HANDOVER: a left-behind .se/HANDOVER.md joins the reading, and is consumed by the walk", async () => {
+// THE WRITTEN HANDOVER IS GONE (owner ruling 2026-08-07). It was demanded at
+// the `end` state, and sessions do not end there — they get killed, so the
+// gate almost never fired. The owner put it plainly: they kill the session, so
+// there was never a handover. Boot DERIVES the briefing from the call log now
+// and rides it on the banner, which costs no document and no proof.
+test("a left-behind handover file is neither read nor destroyed — it is simply ignored", async () => {
   const root = freshRoot();
   mkdirSync(join(root, ".se"), { recursive: true });
-  writeFileSync(join(root, ".se", "HANDOVER.md"), "# Handover\n\nOpen threads for the next session.\n", "utf8");
+  writeFileSync(join(root, ".se", "HANDOVER.md"), "# Handover\n\nfrom the old world.\n", "utf8");
   const server = buildServer(root);
-  const owed = await call(server, "se_pull");
-  assert.equal(owed.body.pull, "read", "the way in demands reading");
-  // Drain the reading, collecting what the loop actually serves.
+  await call(server, "se_pull");
   const served: string[] = [];
-  let last: Record<string, unknown> | undefined;
   for (let j = 0; j < 40; j++) {
     const doc = await readOne(server);
     if (doc === null) break;
     served.push(doc.path);
-    last = doc.after;
   }
-  assert.ok(served.includes(".se/HANDOVER.md"), `the handover rode the reading: ${served.join(", ")}`);
-  // Proving the LAST document is the call that walked. Pulling again would
-  // find the target cleared and offer doors instead.
-  assert.equal(last?.pull, "do", JSON.stringify(last));
-  // CONSUMED, NOT KEPT (owner ruling 2026-07-31): being read is what
-  // destroys it. A handover that survives gets believed a second time.
-  assert.equal(existsSync(join(root, ".se", "HANDOVER.md")), false, "the handover did not survive the reading room");
+  assert.ok(!served.includes(".se/HANDOVER.md"), `the handover is not part of the reading any more: ${served.join(", ")}`);
+  // NOT DESTROYED EITHER. Deleting a file the engine no longer claims to
+  // manage would be the engine reaching outside its own rules.
+  assert.equal(existsSync(join(root, ".se", "HANDOVER.md")), true, "left alone, not consumed");
 });
 
-test("THE HANDOVER: the way out writes the next one — end waits without one from this session", async () => {
-  const root = freshRoot();
-  const server = await bootedServer(root);
-  // Nothing was written for whoever comes next, so the door does not open —
-  // and the pull SAYS so, refusal riding the answer with the remedy. end is
-  // one of idle's offered doors, so the choice form answers it.
-  const refused = await call(server, "se_pull", { form: { choice: "end" } });
-  assert.equal(refused.isError, false, "a blocked walk is an instruction, not an error");
-  const ref = refused.body.refusal as { expected?: string; got?: string } | undefined;
-  assert.ok(ref !== undefined, JSON.stringify(refused.body));
-  assert.match(String(ref.expected), /handover written THIS session/);
-  assert.match(String(ref.got), /no \.se\/HANDOVER\.md/);
-  // Write one and the way out opens.
-  mkdirSync(join(root, ".se"), { recursive: true });
-  writeFileSync(join(root, ".se", "HANDOVER.md"), "# Handover\n\nWhat the next session cannot read from the repo.\n", "utf8");
-  const ok = await call(server, "se_pull");
-  assert.equal(ok.isError, false, JSON.stringify(ok.body));
-  assert.deepEqual(ok.body.where, ["end"]);
+test("end opens with no handover written, because nobody writes one now", async () => {
+  const server = await bootedServer(freshRoot());
+  // end is one of idle's offered doors, so the choice form answers it.
+  const out = await call(server, "se_pull", { form: { choice: "end" } });
+  assert.equal(out.isError, false, JSON.stringify(out.body));
+  assert.equal(out.body.refusal, undefined, "the way out is no longer gated on a file");
+  assert.deepEqual(out.body.where, ["end"]);
 });
 
 test("an edited doc drops the agent's credit: the pull asks for the reading again", async () => {
@@ -233,26 +220,28 @@ test("the mirror renders per-doc checkboxes and never locks reading itself", asy
 
 test("the pill turns green from the machine: the agent's reading records its proof — checkboxes stay human-only", async () => {
   const root = freshRoot();
-  // A HANDOVER IS WHAT read_contract STILL OWES. The contract, the walk, the
-  // lane and the voice went to the prompt layer, so without one left behind
-  // this gate has nothing to be unmet about — and a pill that is green before
-  // anything happened reports nothing.
-  mkdirSync(join(root, ".se"), { recursive: true });
-  writeFileSync(join(root, ".se", "HANDOVER.md"), "# Handover\n\nsomething the next session must read.\n", "utf8");
+  // WHAT read_contract OWES IS ITS TAG-PULLED GUIDANCE. The contract, the
+  // walk, the lane and the voice went to the prompt layer, and the handover
+  // was retired outright (owner ruling 2026-08-07) — what remains is the boot
+  // method reading, demanded by tag rather than named on the state.
   const session = new Session(root);
   const server = buildServer(root, session);
   // Stand INSIDE boot so read_contract is peekable — the mirror peeks the
   // machine on screen, and that is boot while the walk is in it.
   await session.advance();
   await session.advance();
-  const beforeState = session.stateInfo("read_contract") as { exit: { read_consume: { met: boolean } } };
-  assert.equal(beforeState.exit.read_consume.met, false, "the handover is owed and unread");
+  // PREFIXED, because active() names states by their full path. Asserting the
+  // bare id here passed for free and proved nothing — caught 2026-08-07.
+  assert.ok(session.active().includes("boot/read_contract"), `standing where the reading is owed: ${JSON.stringify(session.active())}`);
   for (let j = 0; j < 40; j++) {
     if ((await readOne(server)) === null) break;
   }
   // Proving the last document walks the machine OUT of read_contract, so the
   // green is read from the gate having let it through.
-  assert.ok(!session.active().includes("read_contract"), `the agent's reading is the pill's green: ${JSON.stringify(session.active())}`);
+  assert.ok(
+    !session.active().includes("boot/read_contract"),
+    `the agent's reading is the pill's green: ${JSON.stringify(session.active())}`,
+  );
   // The human ledger is untouched: nothing checked, boxes stay empty.
   assert.deepEqual((session.packet() as { human_checked: string[] }).human_checked, []);
   // The version-pinning half moved out rather than away: "an edited doc drops

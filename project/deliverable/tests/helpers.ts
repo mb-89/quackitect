@@ -3,19 +3,7 @@
 // drawing the shipped server does.
 
 import { spawnSync } from "node:child_process";
-import {
-  chmodSync,
-  cpSync,
-  existsSync,
-  mkdirSync,
-  mkdtempSync,
-  readdirSync,
-  renameSync,
-  rmSync,
-  statSync,
-  symlinkSync,
-  writeFileSync,
-} from "node:fs";
+import { chmodSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, renameSync, rmSync, statSync, symlinkSync } from "node:fs";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join, sep } from "node:path";
@@ -262,13 +250,6 @@ export function gitInit(root: string): void {
     gitTemplate = t;
   }
   cpSync(join(gitTemplate, ".git"), join(root, ".git"), { recursive: true });
-}
-
-/** Leaving through main's end demands a handover written THIS session
- *  (owner ruling 2026-07-31). Any test that walks out writes one first. */
-export function handOver(root: string): void {
-  mkdirSync(join(root, ".se"), { recursive: true });
-  writeFileSync(join(root, ".se", "HANDOVER.md"), "# Handover\n\nNothing outstanding.\n", "utf8");
 }
 
 /** The engine's own proof, mirrored: engine/session.ts readingProbes. */

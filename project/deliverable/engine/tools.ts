@@ -172,6 +172,40 @@ export function sessionTools(session: Session): ToolDef[] {
       inputSchema: { type: "object", properties: {} },
       handler: () => session.requestReload(),
     },
+    // TWO SCRIPTS THAT WERE ONLY EVER REACHABLE THROUGH THE SHELL (owner
+    // ruling 2026-08-07). Measured over one 15-hour window: 8 of 23 se_run
+    // calls were these two, four runs each, every one carrying a
+    // no_tool_reason that said the same thing — the lane has no verb for it.
+    //
+    // One of those eight died MODULE_NOT_FOUND because the shell's working
+    // directory was trunk while the script it wanted lived in a worktree.
+    // These resolve the tree the way every other lane call does, so that
+    // failure stops being possible rather than stopping by luck.
+    {
+      name: "se_prompt_place",
+      title: "se.prompt.place",
+      description:
+        "Re-project the PROMPT LAYER — AGENTS.md, CLAUDE.md and the Copilot instructions — from project/guidance/ into the tree the lane is working in. Preflight names this script as its own remedy when what was placed has gone stale, so this is the verb behind that remedy. It resolves the tree itself, so the projection cannot land in the one you are not standing in.",
+      inputSchema: { type: "object", properties: {} },
+      handler: async () =>
+        runOrHandoff(session.workRoot(), "node --experimental-strip-types project/deliverable/engine/bin/place-prompt-layer.ts", {}),
+    },
+    {
+      name: "se_format",
+      title: "se.format",
+      description:
+        "Run the frontmatter formatter over the vault. This is a parse-and-print, which is exactly what se_file_replace cannot be — that verb is a regex. Pass check: true to report what WOULD change without writing anything. It resolves the tree itself.",
+      inputSchema: {
+        type: "object",
+        properties: { check: { type: "boolean", description: "report what would change and write nothing" } },
+      },
+      handler: async (args) =>
+        runOrHandoff(
+          session.workRoot(),
+          `node --experimental-strip-types project/deliverable/engine/bin/format-vault.ts${args.check === true ? " --check" : ""}`,
+          {},
+        ),
+    },
   ];
 }
 

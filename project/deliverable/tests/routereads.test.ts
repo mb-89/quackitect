@@ -27,14 +27,19 @@ test("the first packet names every document the way to the target demands", () =
 
 test("one multi-read of the listed set carries the whole walk to the target", async () => {
   const root = freshRoot();
-  // A handover is only sometimes there. When it is, it is read like the rest.
+  // A LEFT-BEHIND HANDOVER IS NOT PART OF THE WAY any more (owner ruling
+  // 2026-08-07). It used to join the list whenever it existed; the whole
+  // mechanism was retired, and the last session is derived from the call log
+  // onto the boot banner instead. Written here to prove it is ignored rather
+  // than merely absent.
   mkdirSync(join(root, ".se"), { recursive: true });
-  writeFileSync(join(root, ".se", "HANDOVER.md"), "# Handover\n\nNothing outstanding.\n", "utf8");
+  writeFileSync(join(root, ".se", "HANDOVER.md"), "# Handover\n\nfrom the old world.\n", "utf8");
   const session = new Session(root);
   const server = buildServer(root, session);
 
   const reads = (session.packet() as { route_reads: string[] }).route_reads;
-  assert.ok(reads.includes(".se/HANDOVER.md"), "a handover that exists joins the list");
+  assert.ok(!reads.includes(".se/HANDOVER.md"), `a handover on disk is not demanded: ${reads.join(", ")}`);
+  assert.ok(reads.length > 0, "but the way still names the guidance it needs");
 
   // ONE read for the whole way — each served file credits itself.
   const got = await call(server, "se_file_read", { paths: reads });

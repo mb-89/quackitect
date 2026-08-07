@@ -4,9 +4,7 @@ state_kind: work
 priority: 0.01
 tags: boot
 legal_tools: se_file_read, se_note
-exit_read_consume:
-  - .se/HANDOVER.md
-guidance: BOOT IS SHORT NOW. The contract, the walk, the lane and the voice are in your PROMPT LAYER already - present every turn, and preflight refuses to boot if what was placed is not the projection of project/guidance/. So nothing is re-read here that you are already holding. WHAT REMAINS IS THE HANDOVER, and it is the one thing that cannot be in the prompt because it CHANGES every session. A left-behind .se/HANDOVER.md joins the read list and the engine DESTROYS it the moment you leave this state, so read it as a briefing that is about to vanish. READ IT WITH optional true when reading it directly - most sessions leave none, and a boot that refuses over a file nobody promised looks broken to the person watching. Anything in it that must outlive this session gets carried out BEFORE you pull onward - as a note (se_note is legal here for exactly this), a parked to-do, or an edit to guidance where the fact really belongs. Treat every claim in it as dated. Check it before you build on it, and never carry a stale one forward.
+guidance: BOOT IS SHORT NOW. The contract, the walk, the lane and the voice are in your PROMPT LAYER already - present every turn, and preflight refuses to boot if what was placed is not the projection of project/guidance/. So nothing is re-read here that you are already holding. NOTHING IS OWED HERE AT ALL NOW. There is no handover to read any more. The briefing on the last session is DERIVED from the call log and rides the boot banner, so it arrives without a document, without a reading proof and without an extra hop. Just pull onward. If something in that briefing matters beyond this session, put it where it belongs while you are thinking of it - a note (se_note is legal here for exactly this), a parked to-do, or an edit to guidance. Treat every claim in it as dated, because it describes what HAPPENED rather than what is true now.
 ---
 
 # Read the contract
@@ -25,21 +23,32 @@ Missing refuses. Both were proven with a planted canary rather than assumed —
 the alternative is a check that never fires, which this project has shipped
 before.
 
-## The handover, which cannot be promoted
+## The handover, which nobody writes any more
 
-`.se/HANDOVER.md` stays a read because it CHANGES every session, and the
-prompt layer is for constants only.
+There used to be a `.se/HANDOVER.md`, read here and destroyed on the way out.
+It is gone (owner ruling 2026-08-07).
 
-AND IT DOES NOT SURVIVE THE ROOM. Leaving this state destroys it (owner
-ruling 2026-07-31). A handover that persists gets believed a second time, and
-a claim nobody re-measured is worse than no claim at all — that cost two
-sessions before the rule changed.
+WHY IT WENT. The duty to write one was enforced at the `end` state. Sessions
+do not end there. They get killed — the host closes, the person walks away,
+the context runs out. So the gate almost never fired, and the owner confirmed
+the plain version of it: they kill the session, so there was never a handover.
 
-So it is a BRIEFING, never a store. Carry anything durable out while you are
-still here:
+A duty that only discharges on the tidy path is not a duty. It is a wish.
 
-- A fact belonging to the project goes into guidance or a record.
-- A job somebody must still do becomes a note or a parked to-do.
-- A caution worth keeping gets CHECKED first, then written where it belongs.
+WHAT REPLACED IT. The call log already records every call with its verdict, so
+the last session can be DESCRIBED rather than remembered. Boot reads the tail
+of the log and puts the summary on the banner: when it ran, how long, where it
+stopped, which refusals fired and how often, what was captured.
 
-What you leave in it is gone.
+THREE THINGS THAT BUYS:
+
+- Nobody can forget to write it.
+- It cannot go stale, because it is computed at the moment it is read.
+- It costs no reading proof and no extra document, so boot did not get longer.
+
+Only the TAIL is parsed, never the whole log. That was the owner's condition.
+
+What it does NOT do is carry intent. The log knows what happened, not what it
+meant or what comes next. That still belongs in a note, a parked to-do, or
+guidance — written when the thought occurs, not saved for an exit that may
+never come.

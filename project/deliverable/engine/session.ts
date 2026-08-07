@@ -9,7 +9,7 @@
 //
 // State is in-memory: a server restart mid-session drops back to start, and
 // the next refused call's remedy re-boots the agent in one turn.
-import { existsSync, mkdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { dirtyLines, git, gitLand, gitSync } from "./gitlane.ts";
@@ -41,6 +41,7 @@ export function visitState(visit: string): string {
 
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { CallLog } from "./calllog.ts";
 import type { CanvasData } from "./canvas.ts";
 import { conditionNotePath } from "./conditions.ts";
 import { Decisions, replayFile } from "./decisions.ts";
@@ -3744,37 +3745,22 @@ export class Session {
     return join(this.laneRoot(rel), rel);
   }
 
-  private handoverPath(): string {
-    return join(seDir(this.root), "HANDOVER.md");
-  }
-
   /** Leaving the state destroys what it consumed. A briefing that cannot
    *  survive its own reading cannot go stale and cannot be believed twice. */
   private consumeDocs(s: StateDecl): void {
     for (const rel of this.consumeDemand(s)) unlinkSync(this.consumeAbs(rel));
   }
 
-  /** The other half of the same law: the way OUT writes the next one.
-   *  Demanded mechanically, because the duty was prose before and prose is
-   *  what kept being skipped. Written BEFORE this session started is a
-   *  leftover, not a handover, so the clock decides — not the file's
-   *  existence. */
-  private assertHandoverWritten(_channel: Channel): void {
-    const p = this.handoverPath();
-    const writtenMs = existsSync(p) ? statSync(p).mtimeMs : -1;
-    if (writtenMs >= Date.parse(this.startedTs)) return;
-    throw new Rejection({
-      clause: CLAUSES.CONDITION_UNMET,
-      expected: "a handover written THIS session — ending the session writes .se/HANDOVER.md for the next one",
-      got: writtenMs < 0 ? "no .se/HANDOVER.md" : "a .se/HANDOVER.md left over from before this session started",
-      remedy: {
-        tool: "se_file_write",
-        args: { path: ".se/HANDOVER.md", base_hash: null, content: "# Handover — <date>\n\n<what the next session must know>\n" },
-        note: "write what the NEXT session cannot get from the repo or the records. It is read once and destroyed at their boot, so nothing here can go stale — but nothing here survives either. Anything durable belongs in guidance, a note or a record.",
-      },
-      source: "engine/session.ts handover",
-    });
-  }
+  /** THE WRITTEN HANDOVER IS GONE (owner ruling 2026-08-07).
+   *
+   *  It used to be demanded here, on the way out through `end`. The owner
+   *  settled it in one sentence: they kill the session, so the gate never
+   *  fired and there was never a handover. A duty that only discharges on the
+   *  tidy path is not a duty, it is a wish.
+   *
+   *  The log already records what happened, so boot DERIVES the briefing
+   *  instead of asking anyone to write it. See lastSessionBriefing below and
+   *  CallLog.lastSession. Nothing to forget, nothing to go stale. */
 
   /** ONE READING LIST (owner ruling 2026-07-31). A document a state NAMES
    *  and a document a tag BINDS to it are not two kinds of thing: both are
@@ -4086,7 +4072,6 @@ export class Session {
     this.assertReads(m, from, targetId === undefined ? [] : [targetId], channel, supplied);
     // Leaving through the main machine's end is where the next handover is
     // owed. Sub-machines have their own end and owe nothing.
-    if (m.id === this.machine.id && targetId === "end") this.assertHandoverWritten(channel);
     if (targetId === undefined) return;
     const target = m.states.find((s) => s.id === targetId);
     if (target === undefined) return;
@@ -4373,6 +4358,31 @@ export class Session {
   /** The tick's result — plus the booted banner the first time idle lands.
    *  Reaching end fires onClosed once: the session is OVER — the server
    *  entry shuts the whole session down (owner ruling 2026-07-26). */
+  /** THE HANDOVER, DERIVED FROM THE LOG (owner ruling 2026-08-07).
+   *
+   *  Rides the boot banner, which the harness rule already shows VERBATIM. So
+   *  it costs no extra document, no reading proof and no extra hop — the
+   *  owner's condition was that boot must not get slower, and this adds one
+   *  tail scan of a file the engine writes anyway.
+   *
+   *  A BRIEFING THAT CANNOT BE BUILT MUST NEVER BLOCK BOOT. A first-ever
+   *  session has nothing behind it, and that is normal rather than an error. */
+  private lastSessionBriefing(): string | undefined {
+    try {
+      const last = new CallLog(seDir(this.root)).lastSession();
+      if (last === undefined) return undefined;
+      const when = `${last.from.slice(0, 10)} ${last.from.slice(11, 16)}–${last.to.slice(11, 16)}`;
+      const lines = [`Last session (${when}): ${last.calls} calls.`];
+      if (last.ended_at !== undefined) lines.push(`It stopped at ${last.ended_at}.`);
+      const refused = Object.entries(last.refusals ?? {});
+      if (refused.length > 0) lines.push(`Refused: ${refused.map(([c, n]) => `${c} ×${n}`).join(", ")}.`);
+      if (last.notes !== undefined) lines.push(`Notes captured: ${last.notes.length}. Answers recorded: ${(last.answers ?? []).length}.`);
+      return lines.join("\n");
+    } catch {
+      return undefined;
+    }
+  }
+
   private landing(): Record<string, unknown> {
     this.notifyChange(); // every landing is a change a holding hand should see
     if (this.instance.status === "closed" && !this.closedFired) {
@@ -4396,11 +4406,13 @@ export class Session {
     const info = this.packet();
     if (!this.bannerShown && !this.inSub() && activeStates(this.instance).includes("idle")) {
       this.bannerShown = true;
+      const brief = this.lastSessionBriefing();
       return {
         ...info,
         booted: true,
         banner:
-          "🦆 SE v3 booted. Main machine is live. All work runs through the se lane; every call is logged. se_pull says what to do next.",
+          "🦆 SE v3 booted. Main machine is live. All work runs through the se lane; every call is logged. se_pull says what to do next." +
+          (brief === undefined ? "" : `\n\n${brief}`),
         display: "Show the banner above to the user VERBATIM as your first output, then proceed with their request.",
       };
     }

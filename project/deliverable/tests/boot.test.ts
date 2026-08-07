@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 import { compileMachine } from "../engine/machines/compile.ts";
 import { mainMachinePath, Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { bootedServer, call, checkDocs, freshRoot, handOver, proofFor, pullBoot } from "./helpers.ts";
+import { bootedServer, call, checkDocs, freshRoot, proofFor, pullBoot } from "./helpers.ts";
 
 const REPO_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 
@@ -37,10 +37,12 @@ describe("boot", { concurrency: true }, () => {
     // placed is not the projection of project/guidance/, so the promotion is
     // guarded mechanically rather than by trust.
     //
-    // The handover cannot be promoted: it CHANGES every session, and the prompt
-    // layer is for constants. It is DECLARED here, not known by the engine:
-    // read on the way out, and destroyed by the same move.
-    assert.deepEqual(rc.exit, { read_consume: [".se/HANDOVER.md"] });
+    // AND NOW IT READS NOTHING ON THE WAY OUT (owner ruling 2026-08-07). The
+    // handover used to be consumed here. It is gone: boot DERIVES the last
+    // session from the call log and puts it on the banner, so there is no
+    // document to read, no proof to earn and no file anyone must remember to
+    // write. An absent exit is the shape of a boot that owes nothing.
+    assert.equal(rc.exit, undefined);
   });
 
   test("at start the lane beyond reading is refused with se_pull as the remedy", async () => {
@@ -115,7 +117,6 @@ describe("boot", { concurrency: true }, () => {
     const server = await bootedServer(root);
     const w = await call(server, "se_file_write", { path: "x.md", content: "hi", base_hash: null });
     assert.equal(w.isError, false);
-    handOver(root); // the way out writes the next session's briefing
     // With no target, idle comes home to the desk first. The desk then waits
     // with the live doors as options, and end is answered as a form.
     const first = await call(server, "se_pull");
@@ -177,7 +178,6 @@ describe("boot", { concurrency: true }, () => {
     assert.deepEqual(s.active(), ["expeditions/end"]);
     await s.advance(); // pop: filled, back at idle
     assert.deepEqual(s.active(), ["idle"]);
-    handOver(root);
     await s.advance("end");
     assert.equal((s.describe() as { status: string }).status, "closed");
   });
@@ -200,13 +200,12 @@ describe("boot", { concurrency: true }, () => {
         }[];
       }
     ).states[0];
-    // WITH NO HANDOVER LEFT BEHIND, boot owes NOTHING on the way out. The
-    // contract, the walk, the lane and the voice were promoted to the prompt
-    // layer, and the handover is dropped from the demand when it is not there.
-    // An absent dictionary is the shape of a boot that owes nothing — which is
-    // the whole point of the promotion.
-    assert.deepEqual(Object.keys(state.exit ?? {}), ["read_consume"], "boot's only remaining exit demand is the handover");
-    assert.deepEqual(state.exit?.read_consume.args, [], "and with none left behind it asks for nothing");
+    // BOOT OWES NOTHING ON THE WAY OUT. The contract, the walk, the lane and
+    // the voice went to the prompt layer, and the handover was retired
+    // outright (owner ruling 2026-08-07) — the last session is derived from
+    // the call log now and rides the banner. An absent dictionary is the shape
+    // of a boot that owes nothing, which is the whole point.
+    assert.deepEqual(Object.keys(state.exit ?? {}), [], "nothing is demanded on the way out any more");
     assert.ok(state.pulled !== undefined && state.pulled.length >= 1, "the pulled guidance rides the packet");
     // The hash IS the proof — packets must never print it.
     assert.ok(
