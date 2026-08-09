@@ -12,7 +12,7 @@
 //   - text nodes are comments — a drawing may annotate itself
 //   - escape and ask-human edges are never drawn — the executor owns them
 //   - canvas frontmatter: entry (initial state), reentry (restart|resume)
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import { type CanvasElement, loadCanvas } from "../canvas.ts";
 import { CONDITION_TYPES, conditionNoteAbs, conditionNotePath } from "../conditions.ts";
@@ -26,7 +26,7 @@ import {
   type StateDecl,
   validateMachine,
 } from "../machine.ts";
-import { loadStateNote } from "../notes.ts";
+import { loadStateNote, readNode } from "../notes.ts";
 import { parseEvidence } from "../rigor-matrix.ts";
 
 const ROLES: ReadonlySet<string> = new Set(["normal", "alternative", "fallback", "recovery", "approval", "error"]);
@@ -107,11 +107,11 @@ const TRUST_MS = 1000;
 function stampOf(paths: readonly string[]): string {
   return paths
     .map((p) => {
-      try {
-        return `${p}@${contentHash(readFileSync(p))}`;
-      } catch {
-        return `${p}@gone`;
-      }
+      // THROUGH THE DOOR, which already holds this text for every other
+      // reader of the same drawing. The hash is a cache key, so it only has
+      // to be STABLE — it is now over the string rather than the bytes.
+      const text = readNode(p);
+      return text === "" ? `${p}@gone` : `${p}@${contentHash(text)}`;
     })
     .join("|");
 }

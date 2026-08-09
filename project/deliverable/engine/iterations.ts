@@ -13,7 +13,7 @@ import { type CanvasData, type CanvasEdge, type CanvasElement, nodeSize } from "
 import { CLAUSES, Rejection } from "./errors.ts";
 import { buildArchive, type GeneratedMachine } from "./expmachine.ts";
 import { type EvidenceField, type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
-import { noteOf, parseStateNote } from "./notes.ts";
+import { noteOf, parseStateNote, readNode } from "./notes.ts";
 import { CHANGE_COLUMNS, type ChangeColumn, compileColumn, compileM0, readRigorMatrix, rigorMatrixContentHash } from "./rigor-matrix.ts";
 import { bustBranchList, listBranches, slug, worktreesDir } from "./worktree.ts";
 
@@ -698,7 +698,9 @@ function sidedEdge(els: Map<string, CanvasElement>, fromId: string, toId: string
 function generateIterationWalk(root: string, it: Iteration, sid: string): GeneratedMachine {
   let size: string | undefined;
   try {
-    size = (JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as { change_size?: string }).change_size;
+    // THROUGH THE DOOR. 93 reads and 77 ms to enter one record — the single
+    // most expensive read site in the profile, for one small pin file.
+    size = (JSON.parse(readNode(join(it.path, itPinRel(it.id)))) as { change_size?: string }).change_size;
   } catch {
     size = undefined;
   }

@@ -15,7 +15,7 @@ import type { FormTemplate } from "./forms.ts";
 import { pendingNotes } from "./inbox.ts";
 import type { EvidenceField, MachineDecl, StateDecl } from "./machine.ts";
 import { bare, type MorphBox, type MorphCell, type MorphLine, type MorphRow, orderLines, storedOrder } from "./morphbox.ts";
-import { parseStateNote, section } from "./notes.ts";
+import { noteOf, parseStateNote, section } from "./notes.ts";
 import { type ParetoView, pareto, readScores } from "./pareto.ts";
 import { seDir } from "./paths.ts";
 import { type GuidanceDoc, pulledFor } from "./pull.ts";
@@ -183,7 +183,9 @@ export interface FieldArgs {
 
 export function templateMeta(root: string, name: string): TemplateMeta {
   try {
-    const fm = parseStateNote(readFileSync(join(root, fieldTemplateRel(name)), "utf8")).frontmatter;
+    // THROUGH THE DOOR: read once, parsed once, shared with every other reader
+    // of the same template. This was 125 reads and 58 ms to enter one record.
+    const fm = (noteOf(join(root, fieldTemplateRel(name))) ?? parseStateNote("")).frontmatter;
     return {
       editor: typeof fm.editor === "string" ? fm.editor : "text",
       line_pattern: typeof fm.line_pattern === "string" ? fm.line_pattern : "",

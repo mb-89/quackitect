@@ -55,9 +55,11 @@ function wrap(obj, name, label, withSite) {
   };
 }
 
-for (const n of ["writeFileSync", "readdirSync", "appendFileSync", "mkdirSync", "renameSync", "readFileSync"]) {
+for (const n of ["writeFileSync", "appendFileSync", "mkdirSync", "renameSync"]) {
   wrap(fs, n, `fs.${n}`, false);
 }
+wrap(fs, "readdirSync", "fs.readdirSync", true);
+wrap(fs, "readFileSync", "fs.readFileSync", true);
 // THE STATS ARE THE QUESTION NOW: 48,652 of them to walk a 40-node graph.
 wrap(fs, "statSync", "fs.statSync", true);
 wrap(fs, "existsSync", "fs.existsSync", true);
