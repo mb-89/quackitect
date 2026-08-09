@@ -727,10 +727,42 @@ export function startMirror(o: MirrorOptions): Server {
     return false;
   };
 
+  // THE PERSON'S SURFACES GET THE SAME CLOCK AS THE LANE (owner, 2026-08-09:
+  // "every time something takes long, I have to tell you"). Every request is
+  // timed at this one door, and a slow one lands in the SAME log the retro
+  // already mines — tool mirror_slow, with the path and the wait. Fast
+  // requests stay out: the alive poll runs constantly, and a log of
+  // heartbeats would bury what this exists to surface. Half the one-second
+  // budget is the tripwire, so the trend shows before the rule breaks.
+  // The env override is the test seam.
+  const SLOW_MS = Number(process.env.SE_MIRROR_SLOW_MS ?? 500);
   const server = createServer((req, res) => {
     // Every request is a new drawing epoch — see machines/compile.ts.
     bumpDrawingEpoch();
     const url = new URL(req.url ?? "/", `http://localhost:${o.port}`);
+    const started = Date.now();
+    const finish = res.end.bind(res) as (...a: unknown[]) => Res;
+    let clocked = false;
+    (res as { end: unknown }).end = (...a: unknown[]): Res => {
+      if (!clocked) {
+        clocked = true;
+        const ms = Date.now() - started;
+        if (ms >= SLOW_MS) {
+          try {
+            o.log.append({
+              tool: "mirror_slow",
+              args: { path: url.pathname, method: req.method ?? "", ms },
+              ok: true,
+              outcome: "result",
+              duration_ms: ms,
+            });
+          } catch {
+            /* measuring must never break serving */
+          }
+        }
+      }
+      return finish(...a);
+    };
     try {
       if (url.pathname === "/mcp" && o.mcp !== undefined) {
         // THE AGENT'S LANE ON THE SHARED PORT. Every other route here is the

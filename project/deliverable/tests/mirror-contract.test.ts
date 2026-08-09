@@ -634,3 +634,33 @@ test("/target/selected with no selection answers its rejection in place", async 
     server.close();
   }
 });
+
+// EVERY SURFACE GETS THE SAME CLOCK (owner, 2026-08-09: "every time
+// something takes long, I have to tell you"). The dispatcher times every
+// request and a slow one lands in the call log as mirror_slow — the same
+// log the retro mines, so nobody has to keep slowness in the back of their
+// mind. The env seam drops the tripwire to zero so any request trips it.
+test("a slow mirror request lands in the call log with its path and wait", async () => {
+  const { startMirror } = await import("../engine/mirror.ts");
+  const root = freshRoot();
+  const session = new Session(root);
+  const log = new CallLog(seDir(root));
+  process.env.SE_MIRROR_SLOW_MS = "0";
+  try {
+    const server = startMirror({ session, root, port: 0, log, mode: "agent" });
+    await new Promise((r) => server.on("listening", r));
+    const port = (server.address() as { port: number }).port;
+    try {
+      await (await fetch(`http://localhost:${port}/api/packet`)).json();
+    } finally {
+      server.close();
+    }
+  } finally {
+    delete process.env.SE_MIRROR_SLOW_MS;
+  }
+  const slow = log.query({ filter: { tool: "mirror_slow" } });
+  assert.ok(slow.total >= 1, "the request tripped the clock");
+  const rec = (slow.records ?? [])[slow.records ? slow.records.length - 1 : 0] as unknown as { args: { path?: string; ms?: number } };
+  assert.equal(rec.args.path, "/api/packet", "the path is named");
+  assert.ok(typeof rec.args.ms === "number", "and the wait is a number");
+});

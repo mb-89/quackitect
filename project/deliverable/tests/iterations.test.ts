@@ -534,3 +534,64 @@ test("a choice while a form is owed refuses and names the reopen", async () => {
   assert.equal(out.clause, "SE-C-110", "the swallowed choice refuses with its clause");
   assert.equal(out.remedy?.tool, "se_reopen", "and the remedy names the way back");
 });
+
+// A CLAIMFUL STATE COMPLETES ON ITS CLAIM (owner rule 2026-08-09). The walk
+// once passed build_chart unsigned and reached the candidates gate — a
+// sub-machine skipped whole. The route-side fix stopped the observed case;
+// this guard closes the class at the one gate every completion passes.
+test("completing a claimful state without its claim refuses, and the walk stands", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  const session = new Session(root);
+  for (let i = 0; i < 2; i++) await session.advance();
+  checkDocs(session);
+  for (let i = 0; i < 3; i++) await session.advance();
+  session.setAutonomy(1);
+  const seeded = session.iterationSeed("guard the skip", "a claimless completion refuses");
+  const sid = String(seeded.seeded).match(/^(i\d+)-/)?.[1];
+  await session.advance("iterations");
+  await session.advance(sid);
+  // Walk to the first owed FILL, so a claimful state is the active one.
+  session.setTarget(`iterations/${sid}/onboard-retro`);
+  const answers = (body: string): string => {
+    const w = body.split(/\s+/).filter((x) => x !== "");
+    if (w.length < 16) return w.join(" ");
+    return [0.3, 0.6, 0.92]
+      .map((at) => {
+        const i = Math.min(Math.floor(w.length * at), w.length - 8);
+        return w.slice(i + 4, i + 8).join(" ");
+      })
+      .join(" · ");
+  };
+  let r = (await session.pull({}, "agent")) as { pull: string; document?: { content?: string } };
+  for (let hops = 0; (r.pull === "read" || r.pull === "do") && hops < 40; hops++) {
+    const payload = r.pull === "read" ? { form: { read: answers(r.document?.content ?? "") } } : {};
+    r = (await session.pull(payload, "agent")) as { pull: string; document?: { content?: string } };
+  }
+  assert.equal(r.pull, "fill", `the walk stands at an owed form — got ${r.pull}`);
+  const s = session as unknown as {
+    subs: { decl: { states: { id: string; evidence_form: unknown[] }[] }; instance: { active?: string[]; current?: string } }[];
+    completeGuarded(m: unknown, i: unknown, id: string, o: string, now: string): void;
+  };
+  const sub = s.subs[s.subs.length - 1];
+  const active =
+    (sub.instance.active ?? []).length > 0
+      ? (sub.instance.active as string[])
+      : sub.instance.current !== undefined
+        ? [sub.instance.current]
+        : [];
+  const claimful = active.find((id) => (sub.decl.states.find((x) => x.id === id)?.evidence_form.length ?? 0) > 0);
+  assert.ok(claimful !== undefined, `an active claimful state exists — active: ${JSON.stringify(active)}`);
+  assert.throws(
+    () => s.completeGuarded(sub.decl, sub.instance, claimful, "filled", new Date().toISOString()),
+    (e: unknown) => (e as { clause?: string }).clause === "SE-C-112",
+    "the claimless completion refuses with the condition clause",
+  );
+  const after =
+    (sub.instance.active ?? []).length > 0
+      ? (sub.instance.active as string[])
+      : sub.instance.current !== undefined
+        ? [sub.instance.current]
+        : [];
+  assert.ok(after.includes(claimful), "and the walk has not moved");
+});

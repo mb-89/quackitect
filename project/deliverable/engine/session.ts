@@ -1260,6 +1260,25 @@ export class Session {
     now: string,
     only?: string,
   ): void {
+    // A CLAIMFUL STATE COMPLETES ON ITS CLAIM (owner rule 2026-08-09: the
+    // walk once passed build_chart unsigned and reached the gate — a
+    // sub-machine skipped whole. subObjective closed that route; this
+    // closes the CLASS, at the one gate every completion passes). A
+    // "filled" completion of a state that declares evidence, while its
+    // claim is not green, is work that was never done. The unchosen leg of
+    // a choice is never completed, so a choice machine cannot wedge here.
+    // Claimful completions only — mechanical hops stay free of the corpus
+    // load this check costs.
+    const decl = this.state(m, stateId);
+    if (outcome === "filled" && decl.evidence_form.length > 0 && !new Set(this.recordDone(m)).has(stateId)) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `${stateId}'s claim to stand before it completes — it declares ${decl.evidence_form.length} evidence field(s)`,
+        got: 'a "filled" completion with the claim neither signed nor standing — the walk has not moved',
+        remedy: { tool: "se_pull", args: {}, note: "pull — the machine serves the owed form; submit it and the completion follows" },
+        source: "engine/session.ts claim-guard",
+      });
+    }
     const snap = {
       active: inst.active === undefined ? undefined : [...inst.active],
       fired: inst.fired === undefined ? undefined : [...inst.fired],
