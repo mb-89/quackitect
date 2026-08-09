@@ -10,10 +10,12 @@ names one control, says what TYPE it is, and the type decides which widget
 gets drawn. Nobody places pixels, and nothing here can invent a slider —
 the renderer only knows the types listed under Types.
 
-This is the same shape the repo already uses twice: machines/scale.md holds
-the autonomy rungs as a list, machines/lint/voice-lint.md holds the lint
-thresholds. Markdown rather than JSON because the WHY lives beside the WHAT,
-a person edits it in the real world, and Obsidian reads it.
+This is the same shape the repo already uses twice. `machines/scale.md` holds
+the autonomy rungs as a list, and `machines/lint/voice-lint.md` holds the lint
+thresholds.
+
+Markdown rather than JSON, because the WHY lives beside the WHAT. A person
+edits it in the real world, and Obsidian reads it.
 
 ## Types
 

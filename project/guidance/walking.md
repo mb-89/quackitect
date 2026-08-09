@@ -24,8 +24,45 @@ names which of five you got.
   it, pull again with `form: {"read": "<those words>"}`. Keep going until no
   `read` comes back — then you hold everything, by construction.
 - `fill` — the machine BUILT the form and handed it over. Fill it, return it
-  as `form` on the next pull. THERE IS NO SUBMIT: the pull carrying the form
-  is the submit.
+  as `form` on the next pull. There is no submit VERB; the pull is the only
+  call. There IS a submit FLAG, and it rides in the form.
+
+  THREE KEYS ARE ACTS, NOT SECTIONS. Everything else in the form is a field
+  and gets saved.
+
+  - `submit: true` — stamp it. Runs every check, then signs.
+  - `bless: true` or `bless: false` — the gate's thumb, up or down.
+  - a bare fill with neither — SAVED and NOT stamped, on purpose. Fill half a
+    form now and the rest later.
+
+  SO A FORM YOU MEAN TO FINISH CARRIES `submit: true`. Without it the fields
+  land, nothing signs, and the same form comes back looking untouched — which
+  reads exactly like a refusal and is not one. This cost four round trips on
+  2026-08-09 before anybody read the engine.
+
+  A GATE IS THE SAME MECHANISM. It takes `submit` and `bless` like any other
+  form, and at high autonomy the agent uses both (owner ruling 2026-08-09).
+  Blessing your own gate is normal here when the person has said so. Below the
+  slider it is theirs, exactly like every other step.
+
+  BOTH IN ONE PULL IS LEGAL: `form: {"verdict": "pass — why", "submit": true,
+  "bless": true}` fills, stamps and blesses in a single call.
+
+  A `recheck` BLOCK MEANS THE CLAIM ALREADY STOOD (owner ruling 2026-08-07).
+  Somebody signed it, then something upstream moved and sent it back. The body
+  is still on the file and the signature is still on the file.
+
+  SO DO NOT ANSWER IT AGAIN. Read what is written, ask only whether the named
+  change moved it, and submit if it still holds. Rewrite ONLY the fields the
+  change actually touched.
+
+  THE SUBMIT IS THE REBLESS. It re-runs every check against the corpus as it
+  now stands and stamps a newer signature, and the newer signature clears the
+  mark by itself. Nothing is skipped and nothing can be waved through: a claim
+  the change really did break refuses, and names what broke.
+
+  RE-DERIVING A STANDING CLAIM IS WASTE, and it is the waste this block exists
+  to stop. A reopened form used to arrive looking exactly like a fresh one.
 - `choose` — the road splits; the options ride along with weight and
   openness. Answer `form: {"choice": "<to>"}` only when a routed goal needs
   that door. A LIST is legal where work fans out; one is walked, the rest

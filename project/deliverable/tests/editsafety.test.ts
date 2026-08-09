@@ -158,17 +158,23 @@ test("a drawn JOIN synchronizes: a starving join refuses the tick, the walk stan
   assert.deepEqual(session.active(), ["boot/end"], "the wedge guard leaves the walk standing");
 });
 
-test("plain fan-in is an OR; only a drawn join is the AND", () => {
-  const st = (id: string, kind: StateDecl["kind"], edges: EdgeDecl[]): StateDecl => ({
+// THE BUSBAR IS THE AND, and it is the ONLY one (owner ruling 2026-08-08).
+// This used to read `state_kind: join`, which the kernel checked while the
+// rigor matrix checked `busbar` — one idea in two words, enforced in two
+// places, with nothing making them agree. The kind survives as drawing
+// vocabulary and the compiler turns it into a bar.
+test("plain fan-in is an OR; only a busbar is the AND", () => {
+  const st = (id: string, kind: StateDecl["kind"], edges: EdgeDecl[], bar = false): StateDecl => ({
     id,
     kind,
     statement: "",
     guidance: "g",
     evidence_form: [],
     priority: 0.01,
+    ...(bar ? { busbar: true } : {}),
     edges,
   });
-  const mk = (mergeKind: StateDecl["kind"]): MachineDecl => ({
+  const mk = (bar: boolean): MachineDecl => ({
     id: "t",
     reentry: "restart",
     initial: "s",
@@ -179,7 +185,7 @@ test("plain fan-in is an OR; only a drawn join is the AND", () => {
       ]),
       st("a", "work", [{ to: "m", role: "normal" }]),
       st("b", "work", [{ to: "m", role: "normal" }]),
-      st("m", mergeKind, [{ to: "end", role: "normal" }]),
+      st("m", "work", [{ to: "end", role: "normal" }], bar),
       st("end", "end", []),
     ],
   });
@@ -193,18 +199,18 @@ test("plain fan-in is an OR; only a drawn join is the AND", () => {
     escapes: [],
     status: "open",
   });
-  const or = mk("work");
+  const or = mk(false);
   const oi = fresh();
   completeState(or, oi, "a", "filled", "t0");
   assert.ok(activeStates(oi).includes("m"), "any fired inbound activates a plain state");
   completeState(or, oi, "b", "filled", "t1");
   assert.deepEqual(activeStates(oi).sort(), ["m"], "the second arrival is absorbed, never re-queued");
-  const andM = mk("join");
+  const andM = mk(true);
   const ai = fresh();
   completeState(andM, ai, "a", "filled", "t0");
-  assert.ok(!activeStates(ai).includes("m"), "the join waits for the second branch");
+  assert.ok(!activeStates(ai).includes("m"), "the bar waits for the second branch");
   completeState(andM, ai, "b", "filled", "t1");
-  assert.ok(activeStates(ai).includes("m"), "all inbound fired — the join opens");
+  assert.ok(activeStates(ai).includes("m"), "all inbound fired — the bar opens");
 });
 
 test("the hatch always works: a booted walk escapes to the DESK, ungated, from anywhere", async () => {

@@ -21,7 +21,7 @@ project/               THE FOLDER YOU OPEN. Everything being built lives here.
   AGENTS.md            the one rule + the lane table
   .mcp.json            registers the se server
   .claude/settings.json  the cage: explicit deny list of native tools
-  _cage/               the originals those two are placed from
+  deliverable/cage/    the originals those two are placed from
   guidance/            the method layer - contract, voice, authoring/, methods/
   deliverable/         the engine (TypeScript, Node >= 22.6, no build step)
     engine/            mcp transport, tool lane, call log, machine kernel
@@ -47,7 +47,7 @@ which edit. Here is the whole rule.
 
 | you changed | you need |
 | --- | --- |
-| `project/brand/palette.css` | nothing. It is read on every render. |
+| `project/deliverable/deliverable/brand/palette.css` | nothing. It is read on every render. |
 | a machine drawing, guidance, a rigor-matrix row | nothing. They are read live. |
 | `project/deliverable/engine/**.ts` | restart the se server. Node caches modules at import, so a correct file on disk means nothing to a process already running. |
 | `project/deliverable/vscode/src/extension.ts` | re-run `RUNME.ps1`. |
@@ -106,7 +106,7 @@ model's context entirely. `mcp__se__*` is allowlisted. Subagents (Task)
 stay available and inherit the same denies — they are caged too.
 
 The settings file and `.mcp.json` are GENERATED: edit the templates in
-`project/_cage/`; the extension places them when the window opens (the
+`project/deliverable/cage/`; the extension places them when the window opens (the
 generated copies are gitignored).
 
 **Hard dependencies (owner ruling 2026-07-26): ripgrep and git.** The RUNME

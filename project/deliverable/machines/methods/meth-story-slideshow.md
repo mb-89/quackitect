@@ -27,10 +27,13 @@ It does four jobs, and each is worth the writing on its own.
 - IT IS WHERE THE EXAMPLES ARE BORN. Use cases generalise stories, and
   requirements derive from the use cases' steps. A step no story ever walked
   is a step nobody asked for.
-- IT IS A DESIGN INSTRUMENT. Writing one forces the screens to exist. A story
-  that cannot be told without inventing a control has found a hole in the
-  design, and that is the point of writing it. A capability statement can
-  never do this, because it describes what is already decided.
+- IT IS A DESIGN INSTRUMENT. Writing one forces the screens to exist.
+
+A story that cannot be told without inventing a control has found a hole in
+the design. Finding that hole is the point of writing it.
+
+A capability statement can never do this. It only describes what is already
+decided.
 
 SEVERAL STORIES MAY SERVE ONE VALUE PROP, and most do. One prop, one story is
 usually a sign the prop was written narrowly rather than that the product is
@@ -45,9 +48,14 @@ reviewer to spot it.
 
 
 
-A story follows a PERSON THROUGH THE PRODUCT, start to finish. They arrive
-somewhere. They click something. Something answers. They arrive somewhere
-else. It has an ORDER, and that order is why it draws as slides.
+A story follows a PERSON THROUGH THE PRODUCT, start to finish.
+
+- They arrive somewhere.
+- They click something.
+- Something answers.
+- They arrive somewhere else.
+
+It has an ORDER, and that order is why it draws as slides.
 
 WHAT IT IS NOT: a capability statement. "When a new engine version arrives, I
 want my own method to survive untouched." "When I point the agent at
@@ -71,7 +79,7 @@ The body is markdown slides, the shape Obsidian uses. One slide per `---`.
 Every slide is split by `|||` into two halves: the STATEMENT on the left, the
 EVIDENCE on the right.
 
-- The left half is ONE CLAIM about what happens. Not a bullet list. A slide
+- The left half is ONE CLAIM about what happens, never a bullet list. A slide
   that needs bullets is two slides.
 - The right half is what shows it happened: a run record, a demo, a
   measurement, a rendering. It is EMPTY until M8, and empty is correct before
@@ -87,10 +95,10 @@ A fixed shape, so a reader knows where they are. v1 settled it as
 req-ifu-user-stories and the prior art holds it up.
 
 1. THE PROBLEM. What the actor cannot do today.
-2. THE STARTING STATE. Where they stand before they begin. Concrete: what is
-   open, what exists, what does not.
-3. THE STEPS. What they do and what the product does back. Six at most; past
-   that it is two stories.
+2. THE STARTING STATE — where they stand before they begin. Name what is
+   already open, and what does not exist yet.
+3. THE STEPS — what they do, and what the product does back. Six at most,
+   because past that it is two stories.
 4. THE RESULT. How it was solved, answering the problem slide in its own
    words.
 
@@ -103,8 +111,11 @@ before, the result is the after, the steps are the bridge.
   can <outcome>." It leads with the situation, which is what a concrete pass
   actually starts from, and it does not pretend the role explains the want.
 - ONE ACTOR, ONE GOAL. A second goal is a second story.
-- NAME THINGS. A real command, a real file, a real number. A story written in
-  the abstract cannot be validated, and validation is half its job.
+- NAME THINGS. A story written in the abstract cannot be validated, and
+  validation is half its job.
+  - A real command.
+  - A real file.
+  - A real number.
 - MARK THE KILLERS. A killer story is one the product dies without, and M8
   demonstrates exactly those end to end.
 - `refines` NAMES THE VALUE PROP, and that is the edge the trace graph draws.

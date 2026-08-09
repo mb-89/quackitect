@@ -24,9 +24,13 @@ desk, after the tour ends.
 ## Pointing
 
 The agent HAS a finger: `se_panel {ping: "<surface>"}` lights the named
-surface yellow in every open mirror window. Targets: a card id (its title
-from `project/views/cards.md`, slugged), the widget a card shows, a drawn state
-id, or an element id.
+surface yellow in every open mirror window. Targets:
+
+- a card id, which is its title from
+  `project/deliverable/deliverable/views/cards.md`, slugged
+- the widget a card shows
+- a drawn state id
+- an element id
 
 - Ping WITH words, never instead of them - a pulse without a sentence is
   a mystery. Say what pulses and why it matters, then ping it.
@@ -55,9 +59,12 @@ guide.
    stands. The feed is everything that happened, one line per act -
    click a line for its detail. The slider is the human's grip: it sets
    how far the agent may walk alone.
-2. THE MAIN MACHINE. Idle is the switchboard. The front desk advises.
-   The retro turns what happened into rules. The containers hold the
-   work: expeditions (a day's bucket) and iterations (planned work).
+2. THE MAIN MACHINE.
+   - Idle is the switchboard.
+   - The front desk advises.
+   - The retro turns what happened into rules.
+   - The containers hold the work: expeditions (a day's bucket) and
+     iterations (planned work).
 3. A RECORD. Open one expedition: its goal, its decision trail, its
    report. Every claim links to evidence; nothing is prose alone.
 4. THE RIGOR MATRIX. The whole process as data: 50 rows of steps, five

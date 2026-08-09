@@ -1,7 +1,7 @@
 ---
 id: method-autonomous-run
 tags: autonomous-run
-statement: The unattended loop — clear what stands, tidy it, invent more, tidy again, stop honestly.
+statement: "The unattended loop. It clears what stands and tidies up. Then it invents more work and stops honestly."
 ---
 
 # the autonomous run — the method

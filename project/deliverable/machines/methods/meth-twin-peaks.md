@@ -4,7 +4,14 @@ statement: "Twin Peaks: requirements and design are refined concurrently - each 
 ---
 
 ## Situation
-Guidance for M3-M5: deriving functions surfaces missing requirements; structuring candidates surfaces structure-dependent qualities (SyA notes the same feedback: functions and qualities that depend on chosen elements appear only after the first partitioning iteration).
+
+Guidance for M3 through M5.
+
+Deriving functions surfaces missing requirements. Structuring candidates
+surfaces structure-dependent qualities.
+
+SyA notes the same feedback. Functions and qualities that depend on chosen
+elements appear only after the first partitioning iteration.
 
 ## Procedure
 - Work in short alternations, never a waterfall pass per peak.

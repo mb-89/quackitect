@@ -212,7 +212,7 @@ export function withAuthor(instanceRaw: string, author: string): string {
     .filter((x) => x !== "");
   if (list.includes(author)) return instanceRaw;
   list.push(author);
-  return instanceRaw.replace(/^authors:.*$/m, `authors: ${list.join(", ")}`);
+  return instanceRaw.replace(/^authors:.*$/m, () => `authors: ${list.join(", ")}`);
 }
 
 /** The sign-off stamp — the claim's date, shown in the headline. */
@@ -250,15 +250,133 @@ export function stripSuspect(instanceRaw: string): string {
 /** The ticked inputs — one line like authors, replaced whole on each save. */
 export function withChecked(instanceRaw: string, labels: string[]): string {
   const line = `checked: ${labels.join(", ")}`;
-  if (/^checked:/m.test(instanceRaw)) return instanceRaw.replace(/^checked:.*$/m, line);
+  if (/^checked:/m.test(instanceRaw)) return instanceRaw.replace(/^checked:.*$/m, () => line);
   return afterAnchor(instanceRaw, line);
 }
 
 /** Who pressed submit — one line beside the sign-off. */
 export function withBy(instanceRaw: string, by: string): string {
   // Present-but-empty counts as present — see withSignedOff.
-  if (/^by:/m.test(instanceRaw)) return instanceRaw.replace(/^by:.*$/m, `by: ${by}`);
+  if (/^by:/m.test(instanceRaw)) return instanceRaw.replace(/^by:.*$/m, () => `by: ${by}`);
   return instanceRaw.replace(/^form:.*$/m, (s) => `${s}\nby: ${by}`);
+}
+
+/** Frontmatter holds ONE LINE PER KEY, so a reason folds onto one.
+ *
+ *  CUT AT A WORD, never mid-word. A truncation that lands inside a word is
+ *  not a length limit, it is a silent edit of somebody's sentence. */
+const oneLine = (s: string): string => {
+  const flat = s.replace(/\s+/g, " ").trim();
+  if (flat.length <= 200) return flat;
+  const cut = flat.slice(0, 200);
+  const space = cut.lastIndexOf(" ");
+  return `${(space > 120 ? cut.slice(0, space) : cut).trimEnd()}…`;
+};
+
+/** EVERY WRITTEN VALUE IS QUOTED, unconditionally (found the hard way twice
+ *  on 2026-08-07).
+ *
+ *  A bare scalar containing ": " is a YAML syntax error. The parse then
+ *  throws, the node leaves the corpus, and the symptom lands somewhere else
+ *  entirely — first a raid entry reported as a missing artifact two states
+ *  away, then a gate whose own frontmatter stopped reading.
+ *
+ *  QUOTE ALWAYS RATHER THAN SNIFFING for dangerous characters. A sniff is a
+ *  list somebody has to keep complete, and colon-space was already missed
+ *  once by exactly that reasoning. */
+const yamlValue = (s: string): string => `"${oneLine(s).replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+
+/** THE REOPEN MARK — A COMPARISON, NEVER AN ERASURE.
+ *
+ *  A reopen used to strip the signature and stamp a reason in its place. That
+ *  destroyed the one fact that genuinely had to be stored: who signed, and
+ *  when (owner ruling 2026-08-06). So the signature STAYS and a date lands
+ *  beside it.
+ *
+ *  Green then asks one question — is the reopen newer than the signature? —
+ *  and re-submitting stamps a newer signature, which clears the mark with
+ *  nothing having to erase anything. This is v1's adr-evidence-hash shape: a
+ *  comparison made at look time, never a written verdict.
+ *
+ *  WHY THE FILE AND NOT THE HISTORY. The machine instance lives in memory and
+ *  is rebuilt from the repo each boot, so a reopen recorded only in its
+ *  history dies at the next restart. The repo is the memory. */
+export function withReopened(instanceRaw: string, when: string, why: string): string {
+  const line = `reopened: ${yamlValue(`${when} — ${why}`)}`;
+  // The reason is somebody's prose, and prose is DATA. A string replacement
+  // would read a dollar in it as an instruction — see files.ts applyExactOp.
+  if (/^reopened:/m.test(instanceRaw)) return instanceRaw.replace(/^reopened:.*$/m, () => line);
+  return afterAnchor(instanceRaw, line);
+}
+
+/** THE AMEND MARK — the claim stands, the text moved.
+ *
+ *  An amend is the small fix that must NOT reopen: a renamed reference, a
+ *  moved path, a typo. The signature is untouched on purpose, because nothing
+ *  it attested to has changed. Reopening for these would invalidate a whole
+ *  tree to fix a spelling.
+ *
+ *  ONE LINE, REPLACED. The latest amend is what a reader of the file needs;
+ *  every earlier one is in git, which is where file history already lives. */
+export function withAmended(instanceRaw: string, when: string, by: string, why: string): string {
+  const line = `amended: ${yamlValue(`${when} by ${by} — ${why}`)}`;
+  if (/^amended:/m.test(instanceRaw)) return instanceRaw.replace(/^amended:.*$/m, () => line);
+  return afterAnchor(instanceRaw, line);
+}
+
+/** Does a reopen stand against this claim? ISO timestamps compare as strings,
+ *  so the answer is a string comparison and nothing is remembered. */
+export function reopenedAfterSigning(fm: Record<string, unknown>): boolean {
+  // The parser hands back the value already unquoted, so nothing here has to
+  // undo what yamlValue did.
+  const signed = typeof fm.signed_off === "string" ? fm.signed_off.trim() : "";
+  const mark = typeof fm.reopened === "string" ? fm.reopened.trim() : "";
+  if (mark === "") return false;
+  const at = mark.split(" — ")[0].trim();
+  // An unsigned claim cannot be re-opened past its signature; it is simply
+  // unsigned, and the ordinary owed check already has it.
+  return signed !== "" && at > signed;
+}
+
+/** A KEY OWNS ITS BLOCK: the key line, plus every indented line under it.
+ *
+ *  That is what a YAML block list is, and replacing only the key line leaves
+ *  the old items dangling beneath a scalar. The result is not YAML at all.
+ *
+ *  IT COST FIVE CANDIDATE NOTES THEIR PICKS on 2026-08-09. The chart wrote
+ *  `picks` as a scalar over a block list, every note stopped parsing, and the
+ *  five drawn lines vanished off the chart with no error anywhere. */
+function keyBlock(key: string): RegExp {
+  const esc = key.replace(/[.*+?^{}()|[\]\\]/g, (c) => "\\" + c);
+  return new RegExp("^" + esc + ":.*(?:\\n[ \\t]+\\S.*)*", "m");
+}
+
+/** SET ONE FRONTMATTER KEY on any node, creating it if absent.
+ *
+ *  This is the write half of a bound field: the form's answer for a node
+ *  lands here, on the node's own file, where the register keeps its truth.
+ *  An empty value CLEARS the key rather than writing a blank line, so a
+ *  cleared answer and a never-answered one read the same to every check. */
+export function withFrontmatter(raw: string, key: string, value: string): string {
+  const has = keyBlock(key);
+  if (value.trim() === "") return raw.replace(new RegExp(has.source + "\\n?", "m"), "");
+  const line = key + ": " + yamlValue(value);
+  // A FUNCTION REPLACEMENT, NEVER A STRING. A value carrying a dollar sign
+  // is data, and String.replace reads a dollar in the replacement as an
+  // instruction — dollar-backtick alone splices the whole preceding text in.
+  return has.test(raw) ? raw.replace(has, () => line) : afterAnchor(raw, line);
+}
+
+/** SET ONE FRONTMATTER KEY TO A BLOCK LIST.
+ *
+ *  A list field written as a comma-joined string reads back as ONE value, so
+ *  every consumer that asked for items gets a sentence. The shape has to
+ *  match what the item card declares, and for a list that is a block. */
+export function withFrontmatterList(raw: string, key: string, values: string[]): string {
+  if (values.length === 0) return withFrontmatter(raw, key, "");
+  const block = key + ":\n" + values.map((v) => "  - " + yamlValue(v)).join("\n");
+  const has = keyBlock(key);
+  return has.test(raw) ? raw.replace(has, () => block) : afterAnchor(raw, block);
 }
 
 /** A changed claim is no longer the submitted claim — the stamp comes off. */

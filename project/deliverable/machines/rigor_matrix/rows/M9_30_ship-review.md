@@ -52,4 +52,9 @@ specification_note: |
 
 ## Guidance
 
-Per [[meth-dependency-ship-review]]: display everything, ask only where no sticky ruling exists or the state changed; diverged deps ship flagged; upstream offers deposited, never pushed.
+Per [[meth-dependency-ship-review]]:
+
+- Display everything.
+- Ask only where no sticky ruling exists, or the state changed.
+- Diverged deps ship flagged.
+- Upstream offers are deposited, never pushed.

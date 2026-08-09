@@ -54,8 +54,10 @@ A product with hardware or a service life adds more.
 
 ### 3. The project and the organisation
 
-Who funds it. Who must approve it. Who inherits it when this effort ends. Who
-is affected without ever being asked.
+- Who funds it.
+- Who must approve it.
+- Who inherits it when this effort ends.
+- Who is affected without ever being asked.
 
 These never fall out of the value props, and they are the ones a walk misses.
 
@@ -117,4 +119,4 @@ See [[meth-stakeholder-tensions]], which now says only this.
 - Software Architecture in Practice (Bass, Clements, Kazman) — the
   Stakeholder/View matrix.
 - The always-on class register, harvested from v1 at ref main
-  (product/quackitect/project_types/classes/).
+  (`product/quackitect/project_types/classes/`).

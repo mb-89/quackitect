@@ -813,6 +813,21 @@ global("file", (_r, a, ctx) =>
 
 // --- any ------------------------------------------------------------------
 
+// AN ABSENT FIELD DOES NOT CONTAIN ANYTHING — it is not an error to ask.
+//
+// WHY THIS EXISTS (owner report 2026-08-08). "Give me every note linked to X"
+// is the query the whole register is for, and it is one expression:
+// refines.contains("uc-take-a-step"). It THREW, on the first note that has no
+// refines — which over a vault of 480 notes holding method cards, states and
+// templates is immediately. So the one query that matters could not be run at
+// all, and nothing said why.
+//
+// FALSE IS THE RIGHT ANSWER, not a refusal. A note with no links is not linked
+// to X, and a filter that cannot survive a heterogeneous vault is not a filter.
+for (const name of ["contains", "containsAll", "containsAny", "startsWith", "endsWith"]) {
+  method(["null"], name, () => false);
+}
+
 method(ALL, "isTruthy", (r) => isTruthy(r));
 method(ALL, "isType", (r, a) => typeOf(r) === toText(a[0]));
 method(ALL, "toString", (r) => toText(r));
@@ -1250,7 +1265,11 @@ function call(node: Node & { k: "call" }, ctx: Ctx): unknown {
 
   const recv = evaluate(node.recv, ctx);
   const t = typeOf(recv);
-  const fn = METHODS.get(t)?.get(node.name) ?? METHODS.get("null")?.get(node.name);
+  // NULL'S TABLE IS NOT A CATCH-ALL. It used to be consulted for every type,
+  // so anything registered there leaked to all of them — and once `contains`
+  // lived there, `3.contains(x)` would have quietly answered false instead of
+  // naming the type error. A null method answers for null.
+  const fn = METHODS.get(t)?.get(node.name) ?? (recv === null || recv === undefined ? METHODS.get("null")?.get(node.name) : undefined);
   if (fn === undefined) {
     const known = [...(METHODS.get(t)?.keys() ?? [])].sort();
     throw new Rejection({

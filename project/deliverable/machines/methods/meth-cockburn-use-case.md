@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "Cockburn-shape use cases: one actor one goal, 3-9 numbered steps, extensions branching from step numbers - each generalizes at least one story, and requirements derive from the steps."
+statement: "A use case has one actor and one goal. Its main path runs 3 to 9 steps, with extensions beside it."
 ---
 
 ## Situation
@@ -13,9 +13,9 @@ use case is every pass.
 This is the whole distinction, and getting it backwards produces two piles of
 the same artifact.
 
-A STORY is this person, this Tuesday, these clicks, in the order they happened.
-It is an example. Its job is to be concrete enough that somebody would notice
-if it were wrong.
+A STORY is one person on one Tuesday, clicking in the order it happened. It is
+an example. Its job is to be concrete enough that somebody would notice if it
+were wrong.
 
 A USE CASE is the same goal told once, with the branches that can happen along
 the way. It has no Tuesday in it. Its job is to be complete enough that the
@@ -74,5 +74,6 @@ the conformance check can see rather than in prose it cannot.
 
 ## Sources
 
-Cockburn, Writing Effective Use Cases; SyA RE deck (ref-sya-re); v1's own
-`method/templates/items/usecase.md` at ref main.
+- Cockburn, Writing Effective Use Cases.
+- The SyA RE deck (ref-sya-re).
+- v1's own `method/templates/items/usecase.md`, at ref main.

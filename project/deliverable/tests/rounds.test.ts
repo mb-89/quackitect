@@ -67,11 +67,28 @@ describe("the standard review rounds", () => {
         }
       });
 
-      test("a gate keeps its own acceptance items as well as the rounds", () => {
+      test("a gate that declares acceptance items keeps them alongside the rounds", () => {
+        // THE GUARD IS AGAINST LOSS, never against emptiness. Adding the
+        // rounds once overwrote a gate's own fields instead of joining them,
+        // and this is what caught it.
+        //
+        // AN EMPTY GATE IS LEGAL NOW (owner ruling 2026-08-07). A gate whose
+        // fields all reduced to mechanical checks SHOULD carry none, because
+        // re-asking a check that can only pass is what teaches a reader to
+        // skim. gate-requirements is the first to get there.
+        //
+        // So the property is read from the ROW, which is the authored truth,
+        // and compared against what the compiled state carries.
+        const rows = readRigorMatrix(REPO).rows;
+        let checked = 0;
         for (const g of gatesOf(column)) {
+          const authored = rows.find((r) => r.name === g.id)?.evidence_form ?? [];
+          if (authored.length === 0) continue;
+          checked++;
           const own = g.evidence_form.filter((f) => !ROUND_NAMES.includes(f.name));
-          assert.ok(own.length > 0, `${column}/${g.id} has only rounds — its own acceptance items were lost`);
+          assert.equal(own.length, authored.length, `${column}/${g.id} lost its own acceptance items when the rounds were added`);
         }
+        assert.ok(checked > 0, `${column} has no gate with authored items — this guard would be checking nothing`);
       });
 
       test("no work row is given the rounds", () => {

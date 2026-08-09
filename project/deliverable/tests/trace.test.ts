@@ -313,3 +313,221 @@ describe("the radial trace graph", { concurrency: true }, () => {
     assert.equal((svg.match(/trace-edge implicit/g) ?? []).length, 2, "and both reach the drawing, marked as implicit");
   });
 });
+
+describe("the band is a ceiling and the split is one level", { concurrency: true }, () => {
+  // One value prop, one story, one use case, then a crowded requirement lane
+  // and a crowded function lane. Crowded is the whole point: a sparse lane
+  // never staggers, so it could not show the bug.
+  const crowded = (): TraceNode[] => {
+    const reqs = Array.from({ length: 40 }, (_, i) => child(`req-${i}`, "requirement", "uc-1"));
+    const fns = Array.from({ length: 40 }, (_, i) => child(`fn-${i}`, "function", `req-${i}`));
+    return [prop("vp-a"), child("sty-1", "story", "vp-a"), child("uc-1", "use-case", "sty-1"), ...reqs, ...fns];
+  };
+
+  /** How far a level's cards actually stray from the ring they belong to. */
+  function spreadOfRing(l: ReturnType<typeof layoutTrace>, type: string): number {
+    const rs = l.nodes.filter((n) => n.type === type).map((n) => Math.hypot(n.x, n.y));
+    return Math.max(...rs) - Math.min(...rs);
+  }
+
+  test("a crowded lane stays inside one stagger step of its ring, never five", () => {
+    const l = layoutTrace(crowded());
+    // Three sub-orbits, so the band is one step in and one step out. Whatever
+    // the step is worth, the whole lane fits inside two of them.
+    const step = spreadOfRing(l, "requirement") / 2;
+    assert.ok(step > 0, "a crowded lane does stagger");
+    const ring = (l.rings[TRACE_LEVELS.indexOf("requirement")] ?? 0) as number;
+    // The band may not be a meaningful slice of the ring it sits on. Five
+    // layers out was what the owner saw; two is the design.
+    assert.ok(spreadOfRing(l, "requirement") <= ring, "the requirement band is smaller than its own radius");
+    assert.ok(spreadOfRing(l, "function") <= ring, "the function band is too");
+  });
+
+  test("functions sit left of centre, requirements stay centred on their parents", () => {
+    const l = layoutTrace(crowded());
+    const mid = (type: string): number => {
+      const as = l.nodes.filter((n) => n.type === type).map(angleOf);
+      return (Math.min(...as) + Math.max(...as)) / 2;
+    };
+    // Angles grow clockwise on screen, so "left of centre" is the SMALLER
+    // angle. The requirements keep the section's own middle; the functions
+    // give up its right half.
+    const uc = angleOf(l.nodes.find((n) => n.id === "uc-1") as { x: number; y: number });
+    assert.ok(Math.abs(mid("requirement") - uc) < 0.05, "the requirements are still centred on their use case");
+    assert.ok(mid("function") < uc - 0.05, "the functions have moved off centre, to the left");
+  });
+
+  test("the split costs radius, not crowding", () => {
+    const l = layoutTrace(crowded());
+    const rq = (l.rings[TRACE_LEVELS.indexOf("requirement")] ?? 0) as number;
+    const fn = (l.rings[TRACE_LEVELS.indexOf("function")] ?? 0) as number;
+    // Same count, half the arc, so the function ring has to sit further out
+    // than the ring gap alone would put it.
+    assert.ok(fn > rq, "the function ring is outside the requirement ring");
+  });
+});
+
+describe("any node can be the centre", { concurrency: true }, () => {
+  const chain = (): TraceNode[] => [
+    prop("vp-a"),
+    child("sty-1", "story", "vp-a"),
+    child("uc-1", "use-case", "sty-1"),
+    child("uc-2", "use-case", "sty-1"),
+    child("req-1", "requirement", "uc-1"),
+    child("req-2", "requirement", "uc-1"),
+    child("req-3", "requirement", "uc-2"),
+    child("fn-1", "function", "req-1"),
+    child("fn-2", "function", "req-3"),
+  ];
+
+  test("an origin draws its own descendants and nothing else", () => {
+    const l = layoutTrace(chain(), undefined, { origin: "uc-1" });
+    const ids = new Set(l.nodes.map((n) => n.id));
+    assert.deepEqual([...ids].sort(), ["fn-1", "req-1", "req-2"], "only what hangs under uc-1");
+    assert.equal(ids.has("vp-a"), false, "its ancestors are gone");
+    assert.equal(ids.has("req-3"), false, "a sibling's subtree is gone");
+  });
+
+  test("the origin's own children become the first ring, whatever their type", () => {
+    const l = layoutTrace(chain(), undefined, { origin: "uc-1" });
+    // req-1 and req-2 refine uc-1 directly, so they take the innermost ring.
+    for (const id of ["req-1", "req-2"]) {
+      assert.equal(l.nodes.find((n) => n.id === id)?.level, 0, `${id} is on the first ring`);
+    }
+    assert.equal(l.nodes.find((n) => n.id === "fn-1")?.level, 1, "its function is one ring further out");
+  });
+
+  test("the type order survives — a function still sits outside its requirement", () => {
+    const l = layoutTrace(chain(), undefined, { origin: "uc-1" });
+    const r = (id: string): number => {
+      const n = l.nodes.find((x) => x.id === id);
+      return n === undefined ? 0 : Math.hypot(n.x, n.y);
+    };
+    assert.ok(r("fn-1") > r("req-1"), "outward still means outward from the new centre");
+  });
+
+  test("a name that does not exist shows the whole picture, never a blank", () => {
+    const whole = layoutTrace(chain()).nodes.length;
+    assert.equal(layoutTrace(chain(), undefined, { origin: "nope-1" }).nodes.length, whole);
+    assert.equal(layoutTrace(chain(), undefined, { origin: "" }).nodes.length, whole);
+  });
+});
+
+describe("the subsegments are declared, not hardcoded", { concurrency: true }, () => {
+  // TWO PROPS, NOT ONE. A lone value prop takes the whole circle, and a full
+  // turn has no left and no right — the angles wrap past pi and every
+  // comparison becomes meaningless. Two wedges is the smallest honest case.
+  const spread = (types: string[], n: number): TraceNode[] => {
+    const nodes: TraceNode[] = [prop("vp-a"), prop("vp-b"), child("req-1", "requirement", "vp-a"), child("req-2", "requirement", "vp-b")];
+    for (const t of types) for (let i = 0; i < n; i++) nodes.push(child(`${t}-${i}`, t, "req-1"));
+    return nodes;
+  };
+
+  /** Every angle of a type, measured from its own wedge's centre and
+   *  unwrapped, so a wedge straddling pi still reads left to right. */
+  const offsets = (l: ReturnType<typeof layoutTrace>, t: string): number[] => {
+    const at = l.nodes.find((n) => n.type === "value-prop" && n.root === "vp-a");
+    const c = at === undefined ? 0 : angleOf(at);
+    return l.nodes.filter((n) => n.type === t).map((n) => Math.atan2(Math.sin(angleOf(n) - c), Math.cos(angleOf(n) - c)));
+  };
+  const mid = (l: ReturnType<typeof layoutTrace>, t: string): number => {
+    const o = offsets(l, t);
+    return (Math.min(...o) + Math.max(...o)) / 2;
+  };
+
+  test("three slices divide the section three ways, in the order they are declared", () => {
+    const l = layoutTrace(spread(["design-element", "test-def", "ops-note"], 6), undefined, undefined, {
+      of: [
+        { id: "a", label: "a", levels: ["design-element"] },
+        { id: "b", label: "b", levels: ["test-def"] },
+        { id: "c", label: "c", levels: ["ops-note"] },
+      ],
+    });
+    assert.ok(mid(l, "design-element") < mid(l, "test-def"), "the first slice is left of the second");
+    assert.ok(mid(l, "test-def") < mid(l, "ops-note"), "the second is left of the third");
+  });
+
+  test("a crowded slice spills inside its own arc and never past the separator", () => {
+    const l = layoutTrace(spread(["design-element", "test-def"], 12), undefined, undefined, {
+      of: [
+        { id: "a", label: "a", levels: ["design-element"] },
+        { id: "b", label: "b", levels: ["test-def"] },
+      ],
+    });
+    assert.ok(Math.max(...offsets(l, "design-element")) < Math.min(...offsets(l, "test-def")), "the two slices do not overlap in angle");
+  });
+});
+
+describe("the pieces you click reach the lines you see", { concurrency: true }, () => {
+  const corpus = (): TraceNode[] => {
+    const out: TraceNode[] = [prop("vp-a"), prop("vp-b")];
+    for (const p of ["a", "b"]) {
+      out.push(child(`req-${p}`, "requirement", `vp-${p}`));
+      for (let i = 0; i < 8; i++) out.push(child(`fn-${p}-${i}`, "function", `req-${p}`));
+    }
+    return out;
+  };
+
+  test("a section's sectors and its separator sit on the SAME angle", () => {
+    const l = layoutTrace(corpus());
+    // The section spoke is one section's outer edge and the next one's inner.
+    // Every sector edge must fall on a spoke or on a slice cut — a sector
+    // stopping short of the line a reader can see is the bug this pins.
+    const lines = l.spokes.map((s) => s.at);
+    const near = (a: number): boolean => lines.some((x) => Math.abs(Math.atan2(Math.sin(a - x), Math.cos(a - x))) < 1e-6);
+    const outer = l.sectors.filter((s) => s.slice === "design" || s.slice === "");
+    assert.ok(outer.length > 0, "there are sectors to check");
+    for (const s of l.sectors) {
+      assert.ok(near(s.from) || near(s.to), `sector ${s.root}/${s.label} touches a drawn separator`);
+    }
+  });
+
+  test("the sectors tile a section with no gap between them", () => {
+    const l = layoutTrace(corpus());
+    const ring0 = l.sectors.filter((s) => s.root === "vp-a" && s.ring === l.rings.length - 1).sort((a, b) => a.from - b.from);
+    for (let i = 1; i < ring0.length; i++) {
+      assert.ok(Math.abs((ring0[i]?.from ?? 0) - (ring0[i - 1]?.to ?? 0)) < 1e-9, "one piece ends exactly where the next begins");
+    }
+  });
+
+  test("every card sits inside a sector of its own section", () => {
+    const l = layoutTrace(corpus());
+    const inside = (a: number, s: { from: number; to: number }): boolean => {
+      const d = Math.atan2(Math.sin(a - s.from), Math.cos(a - s.from));
+      return d >= -1e-9 && d <= s.to - s.from + 1e-9;
+    };
+    for (const n of l.nodes) {
+      const a = Math.atan2(n.y, n.x);
+      const r = Math.hypot(n.x, n.y);
+      const home = l.sectors.filter((s) => s.root === n.root && r >= s.r0 - 1e-6 && r <= s.r1 + 1e-6);
+      assert.ok(
+        home.some((s) => inside(a, s)),
+        `${n.id} falls inside one of its own section's pieces`,
+      );
+    }
+  });
+});
+
+// THE THREE GESTURES (owner ruling 2026-08-07). Client script, so a test can
+// only hold the WIRING honest — that each gesture exists and does its own job.
+// It has been rewired three times in one day; this is what stops a fourth
+// silently dropping one.
+test("the wheel zooms, the drag pans, the double-click centres", async () => {
+  const { TRACE_SCRIPT } = await import("../engine/traceui.ts");
+  // It must PARSE, or the whole card dies silently.
+  new Function(TRACE_SCRIPT);
+
+  const wheel = TRACE_SCRIPT.slice(TRACE_SCRIPT.indexOf("addEventListener('wheel'"));
+  assert.ok(wheel.includes("vb.width *= scale"), "the wheel changes the zoom");
+  assert.ok(!/^[\s\S]{0,400}vb\.x \+=/.test(wheel), "and does not also pan, which is what fought the drag");
+
+  assert.ok(TRACE_SCRIPT.includes("addEventListener('mousedown'"), "a drag starts a pan");
+  assert.ok(TRACE_SCRIPT.includes("pan.vx - (ev.clientX - pan.x)"), "and the pan follows the pointer");
+
+  const dbl = TRACE_SCRIPT.slice(TRACE_SCRIPT.indexOf("addEventListener('dblclick'"));
+  assert.ok(dbl.length > 0, "double-click is wired");
+  // A CARD IS TESTED FIRST. It sits on top of its piece, so testing the piece
+  // first meant a card could never be picked — the bug this pins.
+  assert.ok(dbl.indexOf("'.trace-node'") < dbl.indexOf("'.trace-sector'"), "a card is tested before the piece under it");
+  assert.ok(dbl.includes("centreOn("), "a card is centred rather than filled to the screen");
+});

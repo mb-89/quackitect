@@ -2,7 +2,7 @@
 //
 // The list is PER PRODUCT, not per engine (owner ruling 2026-07-29). v3 is
 // meant to work on other products, and another product wants other cards. So
-// the truth is project/views/cards.md, edited in Obsidian.
+// the truth is project/deliverable/views/cards.md, edited in Obsidian.
 //
 // NESTED FRONTMATTER, by the owner's call. Obsidian's own Properties panel
 // collapses nested YAML into a blob, but the Nested Properties community
@@ -62,7 +62,7 @@ function declared(frontmatter: Record<string, unknown>): [string, string][] {
 }
 
 export function cardsPath(root: string): string {
-  return join(root, "project", "views", "cards.md");
+  return join(root, "project", "deliverable", "views", "cards.md");
 }
 
 export function loadCards(root: string): Card[] {

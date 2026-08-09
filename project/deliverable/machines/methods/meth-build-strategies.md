@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "Build strategies: name the order the chunks are built in and why - spine first, breakthrough early, make it run then make it right; risk drives the sequence."
+statement: "Name the order the chunks are built in. The order is a strategy, and it is chosen rather than fallen into."
 ---
 
 ## Situation

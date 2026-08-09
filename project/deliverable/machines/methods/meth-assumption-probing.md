@@ -29,8 +29,8 @@ actually exits with, what the platform actually does.
   the check.
 - AN ARGUMENT IS NOT A PROBE. Reasoning that it must hold is how the
   assumption got made.
-- THE CHEAPEST REAL CHECK WINS. A probe is minutes, not a spike. If it needs a
-  spike, that is M6's work and the entry says so.
+- THE CHEAPEST REAL CHECK WINS. A probe is minutes, not a spike.
+  - If it needs a spike, that is M6's work and the entry says so.
 
 ## THE FOUR OUTCOMES
 

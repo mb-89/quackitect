@@ -66,6 +66,17 @@ Per [[meth-context-boundary]]. The excluded list is the scope-creep guard - syst
 
 THE DIAGRAM IS A BLACK BOX AND ITS NEIGHBOURS. The system sits in the middle as one box; every neighbour stands around it with its connection. Nothing else belongs in a context view.
 
-SO THE NEIGHBOURS ARE NODES, shaped by [[neighbour]] - statement, direction, and the interface that actually crosses the boundary. This field carries REFERENCES, never prose. The figure DERIVES from the nodes; the interface list is never hand-authored twice. Later artifacts reference the same nodes, and the structure models among them.
+SO THE NEIGHBOURS ARE NODES, shaped by [[neighbour]]. Each one carries:
+
+- a statement
+- a direction
+- the interface that actually crosses the boundary
+
+This field carries REFERENCES, never prose.
+
+The figure DERIVES from the nodes. The interface list is never hand-authored
+twice.
+
+Later artifacts reference the same nodes, and the structure models among them.
 
 The boundary field says what is inside and what is outside. It never repeats the neighbour list.

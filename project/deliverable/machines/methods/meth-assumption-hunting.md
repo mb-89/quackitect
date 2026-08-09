@@ -16,11 +16,12 @@ not control, that condition is an ASSUMPTION and it gets written down.
 
 Two halves matter equally.
 
-- NOT ESTABLISHED. You have not checked it. Believing it firmly is not
+- NOT ESTABLISHED means you have not checked it. Believing it firmly is not
   checking it.
-- NOT CONTROLLED. If you own it, it is a decision. If somebody else owns it
-  and you need it, it is a dependency. If nobody owns it and it might change
-  under you, it is an assumption.
+- NOT CONTROLLED separates three things.
+  - If you own it, it is a decision.
+  - If somebody else owns it and you need it, it is a dependency.
+  - If nobody owns it and it might change under you, it is an assumption.
 
 ## THE SWEEP — WHERE TO LOOK
 

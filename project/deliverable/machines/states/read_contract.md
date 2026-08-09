@@ -4,7 +4,28 @@ state_kind: work
 priority: 0.01
 tags: boot
 legal_tools: se_file_read, se_note
-guidance: BOOT IS SHORT NOW. The contract, the walk, the lane and the voice are in your PROMPT LAYER already - present every turn, and preflight refuses to boot if what was placed is not the projection of project/guidance/. So nothing is re-read here that you are already holding. NOTHING IS OWED HERE AT ALL NOW. There is no handover to read any more. The briefing on the last session is DERIVED from the call log and rides the boot banner, so it arrives without a document, without a reading proof and without an extra hop. Just pull onward. If something in that briefing matters beyond this session, put it where it belongs while you are thinking of it - a note (se_note is legal here for exactly this), a parked to-do, or an edit to guidance. Treat every claim in it as dated, because it describes what HAPPENED rather than what is true now.
+guidance: |
+  BOOT IS SHORT NOW. Four documents are already in your PROMPT LAYER, present
+  every turn. They are the contract, the walk, the lane and the voice.
+
+  Preflight refuses to boot if what was placed is not the projection of
+  project/guidance/. So nothing is re-read here that you already hold.
+
+  NOTHING IS OWED HERE AT ALL. There is no handover to read any more.
+
+  The briefing on the last session is DERIVED from the call log. It rides the
+  boot banner, so it needs no document, no reading proof and no extra hop.
+  Just pull onward.
+
+  Does something in that briefing matter beyond this session? Put it where it
+  belongs while you are thinking of it.
+
+  - A note. se_note is legal here for exactly this.
+  - A parked to-do.
+  - An edit to guidance.
+
+  Treat every claim in it as dated. It describes what HAPPENED, not what is
+  true now.
 ---
 
 # Read the contract

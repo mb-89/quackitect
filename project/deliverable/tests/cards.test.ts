@@ -1,7 +1,7 @@
 // THE CARD LIST IS THE PRODUCT'S, AND ITS ORDER IS THE NUMBERING.
 //
 // The numbers are muscle memory. Two things must therefore hold forever: the
-// order in project/views/cards.md is the order on screen, and a card that is not
+// order in project/deliverable/views/cards.md is the order on screen, and a card that is not
 // built yet still occupies its number rather than letting the rest shift up.
 import { strict as assert } from "node:assert";
 import { test } from "node:test";

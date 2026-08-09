@@ -10,7 +10,7 @@ evidence:
   - name: field_feedback
     description: what came back from the field, or an explicit "nothing yet"
   - name: notes_drained
-    description: what happened to each pending note - built, dropped as obsolete, carried into this iteration, or parked with its ready-when
+    description: what happened to each pending note, in one word and a reason
     template: per-item
     items:
       - $inbox

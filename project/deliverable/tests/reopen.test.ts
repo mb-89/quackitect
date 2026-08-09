@@ -8,7 +8,9 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
+import { reopenedAfterSigning } from "../engine/forms.ts";
 import { itFind, itPinRel, pinIteration } from "../engine/iterations.ts";
+import { parseStateNote } from "../engine/notes.ts";
 import { Session } from "../engine/session.ts";
 import { checkDocs, freshRoot } from "./helpers.ts";
 
@@ -90,4 +92,48 @@ test("a matrix that moves under a standing claim reopens it WITHOUT touching its
   await session.pull();
   assert.match(readFileSync(ev, "utf8"), /^signed_off: /m, "still signed after a second pull");
   assert.deepEqual(session.suspectStates(decl), [], "and the drift has settled");
+});
+
+// A RECHECK IS NOT A REWRITE (owner ruling 2026-08-07). A reopened claim used
+// to arrive looking exactly like a fresh one, so the agent answered it from
+// scratch and re-derived evidence that had already been earned.
+//
+// The engine always knew which it was — reopened_after has been computed for
+// days. What it never did was SAY so, and an agent cannot act on a boolean
+// nobody explains.
+test("a reopened claim's packet says it is a RECHECK, and a fresh one says nothing", () => {
+  const root = freshRoot();
+  const session = new Session(root);
+
+  // The two cases side by side, straight through the same reader.
+  const packet = (raw: string): Record<string, unknown> => {
+    const fm = parseStateNote(raw).frontmatter;
+    return { reopened_after: reopenedAfterSigning(fm), reopened: fm.reopened, signed_off: fm.signed_off };
+  };
+
+  const fresh = packet("---\nsigned_off: 2026-08-07T10:00:00.000Z\n---\n\nthe claim\n");
+  assert.equal(fresh.reopened_after, false, "a signed claim nobody reopened is not a recheck");
+
+  const reopened = packet(
+    '---\nsigned_off: 2026-08-07T10:00:00.000Z\nreopened: "2026-08-07T11:00:00.000Z — the ground moved"\n---\n\nthe claim\n',
+  );
+  assert.equal(reopened.reopened_after, true, "a reopen stamped AFTER the signature is a recheck");
+
+  // ORDER IS THE WHOLE TEST. A reopen older than the signature was already
+  // answered by that signature, so it is not owed again.
+  const resigned = packet(
+    '---\nsigned_off: 2026-08-07T12:00:00.000Z\nreopened: "2026-08-07T11:00:00.000Z — the ground moved"\n---\n\nthe claim\n',
+  );
+  assert.equal(resigned.reopened_after, false, "re-signing clears the mark by itself — that IS the rebless");
+
+  // AND THE INSTRUCTION SHIPS. The packet must carry words the agent can act
+  // on, not just the boolean it has always had.
+  assert.ok(session !== undefined);
+  const src = readFileSync(join(import.meta.dirname, "..", "engine", "session.ts"), "utf8");
+  const at = src.indexOf("recheck: reopenedAfterSigning(");
+  assert.ok(at > 0, "the packet carries a recheck block");
+  const block = src.slice(at, at + 700);
+  assert.match(block, /THIS CLAIM STOOD BEFORE/, "it says the claim already stood");
+  assert.match(block, /Rewrite ONLY the fields/, "it says not to rewrite what the change did not touch");
+  assert.match(block, /re-runs every check/, "and it says the checks are not skipped");
 });

@@ -4,13 +4,32 @@ statement: "ATAM-lite: walk the quality scenarios against the baseline analytica
 ---
 
 ## Situation
-M5's evaluate-baseline, on the consolidated winner. Evaluation is a distinct act: qualities constrain the architecture, decisions address them, the evaluation evaluates - and the TEST later verifies the quality requirement. Never conflate the levels.
+
+M5's evaluate-baseline, on the consolidated winner.
+
+Evaluation is a distinct act, and the levels are never conflated.
+
+- Qualities constrain the architecture.
+- Decisions address them.
+- The evaluation evaluates.
+- The TEST, later, verifies the quality requirement.
 
 ## Procedure
-- Walk each quality scenario through the baseline matrices: which elements carry the stimulus, where the response forms, what limits the measure.
-- Record per scenario: addressed (by which decision), at risk (tradeoff named), or unaddressed (a finding for the gate).
-- Name candidate fitness functions: the measurable scenarios that could become automated checks at M7.
-- Findings that shake the choice reopen converge-pugh; findings that shake requirements ripple to M3.
+
+- Walk each quality scenario through the baseline matrices.
+  - Which elements carry the stimulus.
+  - Where the response forms.
+  - What limits the measure.
+- Record a verdict per scenario.
+  - addressed, naming the decision.
+  - at risk, naming the tradeoff.
+  - unaddressed, which is a finding for the gate.
+- Name candidate fitness functions. Those are the measurable scenarios that
+  could become automated checks at M7.
+- Findings that shake the choice reopen converge-pugh.
+- Findings that shake requirements ripple to M3.
 
 ## Sources
-SEI ATAM, scenario-walk core, lightened; v1 method sheet atam-lite.
+
+- SEI ATAM, with the scenario-walk core, lightened.
+- v1's method sheet atam-lite.

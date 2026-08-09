@@ -52,7 +52,11 @@ test("readMatrix: the real matrix is complete", () => {
   // 51 since identify-assumptions split off probe-assumptions (owner ruling
   // 2026-08-06): probing assumed somebody had written assumptions, and
   // nothing forced anybody to.
-  assert.equal(m.rows.length, 51);
+  // 52 since cut-criteria split off evaluate-set (owner ruling 2026-08-08):
+  // cutting an axis inside evaluate-set means cutting with the totals
+  // already visible, which is the poisoning the weights-first order exists
+  // to prevent, arriving one step later.
+  assert.equal(m.rows.length, 52);
   for (const row of m.rows) {
     for (const col of ALL_COLUMNS) {
       const cell = m.cells.get(row.name)?.get(col);
@@ -83,13 +87,32 @@ test("compileColumn major: every row seeds; the machine validates", () => {
   const m = readRigorMatrix(ROOT);
   const decl = compileColumn(m, "major");
   validateMachine(decl);
-  // 51 rows + the mechanical start.
-  assert.equal(decl.states.length, 52);
-  // Only a state that RUNS a seeded machine descends; authoring states do not.
+  // 52 rows + the mechanical start.
+  assert.equal(decl.states.length, 53);
+  // Only a state that RUNS a machine descends; authoring states do not.
   assert.ok(decl.states.some((s) => s.id === "build-steps" && s.submachine === "build-chunks"));
   assert.ok(decl.states.some((s) => s.id === "run-spikes" && s.submachine === "spikes"));
   assert.ok(decl.states.some((s) => s.id === "run-candidates" && s.submachine === "candidates"));
-  assert.ok(decl.states.every((s) => s.submachine === undefined || ["build-steps", "run-spikes", "run-candidates"].includes(s.id)));
+  // TWO KINDS OF SUBMACHINE, and enumerate-space is the first of the second
+  // kind. build-chunks, spikes and candidates are SEEDED — their shape varies
+  // per record, so the state above authors the drawing. `finders` is STATIC,
+  // like boot: the same five searches every time, so the drawing is method
+  // rather than content and lives in machines/enumerate-space.canvas.
+  //
+  // THE .canvas SUFFIX IS WHAT TELLS THEM APART (owner ruling 2026-08-08). A
+  // seeded name is looked for in the record; a file name is compiled from
+  // machines/. Without the suffix the walk refused with "a run without
+  // visible steps" and pointed at a file nobody was ever going to write.
+  //
+  // AND A DRAWN SUB-MACHINE TAKES ITS CANVAS'S NAME. Two names for one node
+  // is what a reader hits when they click a state and land somewhere called
+  // something else; the matrix refuses a row where they differ.
+  assert.ok(decl.states.some((s) => s.id === "enumerate-space" && s.submachine === "enumerate-space.canvas"));
+  assert.ok(
+    decl.states.every(
+      (s) => s.submachine === undefined || ["build-steps", "run-spikes", "run-candidates", "enumerate-space"].includes(s.id),
+    ),
+  );
   const shipped = decl.states.find((s) => s.id === "shipped");
   assert.equal(shipped?.kind, "terminal");
 });
@@ -187,7 +210,22 @@ test("evidence is frontmatter data: every non-terminal row carries fields", () =
   const m = readRigorMatrix(ROOT);
   for (const row of m.rows) {
     if (row.state_kind === "terminal") continue;
-    assert.ok(row.evidence_form.length > 0, `${row.name} carries no evidence fields`);
+    // A GATE MAY CARRY NONE (owner ruling 2026-08-07). The compiler gives it
+    // the four standard rounds, and those are evidence. A gate whose own
+    // fields all reduced to mechanical checks SHOULD end up empty — a field
+    // that can only ever say yes teaches the reader to skim, and then the
+    // fields that could have said no get skimmed with it.
+    //
+    // A SUB-MACHINE STATE MUST CARRY NONE (owner ruling 2026-08-08), for the
+    // opposite reason: its evidence lives one level down, in the sub-machine's
+    // own states. Four rows carried a field here that nothing could ever
+    // serve, because the walk descends past this state and completes it on
+    // the way out.
+    if (row.state_kind !== "gate" && row.runs === undefined) {
+      assert.ok(row.evidence_form.length > 0, `${row.name} carries no evidence fields`);
+    }
+    if (row.runs !== undefined)
+      assert.equal(row.evidence_form.length, 0, `${row.name} runs a sub-machine, so its own form is never served`);
     for (const f of row.evidence_form) {
       assert.ok(!f.description.includes("(killer)"), `${row.name}.${f.name} smuggles a killer mark in prose`);
       // THE KILLER FLAG IS GONE. It reached the author inside an HTML comment

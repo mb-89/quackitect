@@ -5,9 +5,15 @@ instance: report.md
 
 # Expedition leave — the page
 
-The expedition's one-pager, A3 spirit: goal, what happened, what settled
-it, what is left. It becomes the record's report.md — the page a retro
-adjudicates (apply as design input, or dismiss to the archive).
+The expedition's one-pager, in A3 spirit. It answers four things:
+
+- the goal
+- what happened
+- what settled it
+- what is left
+
+It becomes the record's report.md. That is the page a retro adjudicates,
+either applying it as design input or dismissing it to the archive.
 
 ## Fields
 

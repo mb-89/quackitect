@@ -24,5 +24,24 @@ in engine/lint.ts; only parameters belong here.
 - `dash_chain_items` — a sentence hinged on more than this many
   dash-separated parts is a run-on. One dash sets off an aside and is
   never flagged.
+- `sentence_run_items` — a prose paragraph of more than this many SHORT
+  sentences is a list nobody rendered.
+- `run_sentence_words` — what counts as short, for that rule. Ordinary
+  prose runs long and varied; a buried list runs short and parallel.
+- `item_sentences` — a list item carrying more than this many sentences
+  grew past one thought and wants splitting.
 - `pyramid_paragraphs` — a document with this many paragraphs and no
   headings wants the pyramid shape.
+
+## Why the last three exist
+
+The chain rules count separators INSIDE one sentence. So the way past them
+is a full stop, and the same buried list gets written as "Open it. Read it.
+Fill both cells."
+
+That evasion ran three times in one afternoon on 2026-08-07, each time after
+the author had been told. List items were not linted at all, so a bullet
+carrying three sentences met no rule either.
+
+A rule an author walks around by changing punctuation is an advisory. An
+advisory is not a rule.

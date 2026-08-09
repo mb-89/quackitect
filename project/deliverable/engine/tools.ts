@@ -34,7 +34,6 @@ import { LINT_CONFIG, lintProse } from "./lint.ts";
 import { bumpDrawingEpoch } from "./machines/compile.ts";
 import { McpServer, type ToolDef } from "./mcp.ts";
 import { fileMove } from "./move.ts";
-import { parseStateNote } from "./notes.ts";
 import { openPanel } from "./panel.ts";
 import { fansOut, resolveInRoot, seDir } from "./paths.ts";
 import { type MirrorState, renderMirror } from "./render.ts";
@@ -102,7 +101,7 @@ export function sessionTools(session: Session): ToolDef[] {
       name: "se_pull",
       title: "se.pull",
       description:
-        'THE PULL — your ONLY verb. Say pull, do what comes back, pull again. There is nothing else to learn. The machine owns every decision; you decide nothing about the walk unless it ASKS you to. You never name a target, never name a path, never ask which state you are in, and never ask which tools are legal. BLOCKING IS AN INSTRUCTION, NOT AN ERROR — a pull does not refuse a walk that cannot move yet, it tells you what to do about it. FIVE ANSWERS, and `pull` names which one you got. `read` — a document rides along in `document`, and `prove` names its LAST WORDS: read it, then pull again with form: {"read": "<those words>"}. One document per pull, and the next arrives when this one is proven. The tail is asked for because a host that truncates a big result drops the END, so quoting it is what shows the text arrived whole. `fill` — the next step wants evidence: the machine BUILT the form and handed it to you, so fill it and return it ON THE NEXT PULL as form: {"<section>": "<text>"}. THERE IS NO SUBMIT VERB; pulling without it hands back the same form. `choose` — the road splits: the machine offers its doors, and you answer ON THE NEXT PULL as form: {"choice": "<to>"} (a LIST is legal where the work fans out to several agents — the first is walked, the rest come back as not_walked). A choice exists ONLY where one was offered. `do` — the happy path was WALKED for you, every hop to the next branching point in one call: `here` is where you landed, with its guidance. `wait` — the machine is out of work, or the next step weighs more than the session autonomy: say plainly which step waits and STOP, because the slider alone cannot wake you and the person must message you after moving it. A genuinely illegal call still refuses typed — a choice outside the offer, a form nothing asked for.',
+        'THE PULL — your ONLY verb. Say pull, do what comes back, pull again. There is nothing else to learn. The machine owns every decision; you decide nothing about the walk unless it ASKS you to. You never name a target, never name a path, never ask which state you are in, and never ask which tools are legal. BLOCKING IS AN INSTRUCTION, NOT AN ERROR — a pull does not refuse a walk that cannot move yet, it tells you what to do about it. FIVE ANSWERS, and `pull` names which one you got. `read` — a document rides along in `document`, and `prove` names its LAST WORDS: read it, then pull again with form: {"read": "<those words>"}. One document per pull, and the next arrives when this one is proven. The tail is asked for because a host that truncates a big result drops the END, so quoting it is what shows the text arrived whole. `fill` — the next step wants evidence: the machine BUILT the form and handed it to you, so fill it and return it ON THE NEXT PULL as form: {"<section>": "<text>"}. There is no submit VERB — the pull is the only call — but there IS a submit FLAG, and it rides in the form. THREE KEYS ARE ACTS, not sections: `submit: true` stamps it (every check runs, then it signs), `bless: true`/`bless: false` is the thumb on a gate, and a fill carrying NEITHER is saved and deliberately left unstamped so you can finish it later. So a form you mean to finish carries `submit: true`; without it the fields land, nothing signs, and the same form comes back looking untouched. A GATE IS THE SAME MECHANISM and takes both flags — at high autonomy the agent blesses its own (owner ruling 2026-08-09); below the slider it belongs to the person. All three in one pull is legal. `choose` — the road splits: the machine offers its doors, and you answer ON THE NEXT PULL as form: {"choice": "<to>"} (a LIST is legal where the work fans out to several agents — the first is walked, the rest come back as not_walked). A choice exists ONLY where one was offered. `do` — the happy path was WALKED for you, every hop to the next branching point in one call: `here` is where you landed, with its guidance. `wait` — the machine is out of work, or the next step weighs more than the session autonomy: say plainly which step waits and STOP, because the slider alone cannot wake you and the person must message you after moving it. A genuinely illegal call still refuses typed — a choice outside the offer, a form nothing asked for.',
       inputSchema: {
         type: "object",
         properties: {
@@ -138,7 +137,7 @@ export function sessionTools(session: Session): ToolDef[] {
           ping: {
             type: "string",
             description:
-              "light this surface instead of opening the panel, and leave it lit until the next ping: a card id (its title from project/views/cards.md, slugged — e.g. state-machine, chat, log, details), the widget a card shows (machine, terminal), a drawn state id, or an element id",
+              "light this surface instead of opening the panel, and leave it lit until the next ping: a card id (its title from project/deliverable/views/cards.md, slugged — e.g. state-machine, chat, log, details), the widget a card shows (machine, terminal), a drawn state id, or an element id",
           },
           note: { type: "string", description: "optional one-liner recorded with the ping" },
         },
@@ -217,6 +216,52 @@ export function sessionTools(session: Session): ToolDef[] {
         required: ["to"],
       },
       handler: (args) => session.setTarget(String(args.to)),
+    },
+    {
+      name: "se_reopen",
+      title: "se.reopen",
+      description:
+        "SEND A STANDING CLAIM BACK to be re-earned. Use it when the work is wrong or its ground moved — the state goes grey, its form is owed again, and everything downstream falls with it because green ripples through the feeders. The SIGNATURE IS KEPT: a reopen records that the claim must be re-done, it never erases who signed it or when. Re-submitting stamps a newer signature, which clears the mark by itself. FOR A SMALL FIX THAT DOES NOT CHANGE THE CLAIM — a renamed reference, a moved path, a typo — use se_amend instead, which leaves the tree standing.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          state: { type: "string", description: "the state whose claim must be re-earned" },
+          reason: { type: "string", description: "why it stopped standing — one line, and the record keeps it" },
+          machine: { type: "string", description: "which machine the state belongs to — needed from outside it, e.g. i1" },
+        },
+        required: ["state", "reason"],
+      },
+      handler: (args) =>
+        session.reopenClaim(
+          String(args.state),
+          String(args.reason),
+          "agent",
+          args.machine === undefined ? undefined : String(args.machine),
+        ),
+    },
+    {
+      name: "se_amend",
+      title: "se.amend",
+      description:
+        "FIX A SUBMITTED FORM WITHOUT REOPENING IT. For the small correction that does not change what the claim says: a reference renamed under it, a path that moved, a typo. The signature stays, because nothing it attested to has changed — invalidating a whole tree to fix a spelling is the cost that leaves spellings wrong. The amend is RECORDED on the file, so a reader sees it happened, when, and why. THE CHECKS STILL RUN: an amend that breaks one is refused and the file is put back untouched, with se_reopen named as what to use instead. Judgement is yours — the engine only guarantees an amend cannot smuggle a reopen past the checks.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          state: { type: "string", description: "the state whose submitted form is being corrected" },
+          fills: { type: "object", description: "the fields to rewrite, whole, as {field: text} — only the named ones move" },
+          reason: { type: "string", description: "what was wrong — one line, and the file keeps it" },
+          machine: { type: "string", description: "which machine the state belongs to — needed from outside it, e.g. i1" },
+        },
+        required: ["state", "fills", "reason"],
+      },
+      handler: (args) =>
+        session.amendClaim(
+          String(args.state),
+          (args.fills ?? {}) as Record<string, string>,
+          String(args.reason),
+          "agent",
+          args.machine === undefined ? undefined : String(args.machine),
+        ),
     },
   ];
 }
@@ -1127,18 +1172,13 @@ export function coreTools(
           // matters most - and the lint had never seen a word of it, because
           // lintProse strips frontmatter before it starts.
           const lintFile = (p: string): { path: string; count: number; findings: unknown[] } => {
+            // ONE PASS, and every finding already carries the key it is in.
+            // This used to lint the file, then lint `guidance` and `statement`
+            // AGAIN as separate strings — two passes, duplicate findings, and
+            // only the two keys somebody remembered to list. lintProse reads
+            // every prose key now and tags each finding with its own.
             const raw = readFileSync(resolveInRoot(root, p, "engine/tools.ts se_lint"), "utf8");
-            const findings: unknown[] = lintProse(root, raw, p).map((f) => ({ ...f, where: "body" }));
-            try {
-              const fm = parseStateNote(raw).frontmatter;
-              for (const key of ["guidance", "statement"]) {
-                const v = fm[key];
-                if (typeof v !== "string" || v.trim() === "") continue;
-                for (const f of lintProse(root, v, p)) findings.push({ ...f, where: key });
-              }
-            } catch {
-              /* a note that will not parse is the canvas lint's problem, not the prose lint's */
-            }
+            const findings: unknown[] = lintProse(root, raw, p);
             return { path: p, count: findings.length, findings };
           };
           const files = md.map(lintFile).filter((f) => f.count > 0);
@@ -1518,6 +1558,21 @@ export function buildServer(
   // and nothing is half-written. A guard at the write sites would refuse
   // partway through a multi-file patch.
   const WRITE_TOOLS = new Set(["se_file_write", "se_file_patch", "se_file_replace", "se_file_delete", "se_file_move"]);
+  // ANY WRITE CLEARS THE ROUTE MEMO. Which claims stand depends on the
+  // evidence AND on the trace nodes that evidence references, so a node
+  // repaired through the file lane can change the objective without any form
+  // being touched.
+  //
+  // It wedged the walk on 2026-08-07: a broken node was fixed, the state went
+  // green, and the router kept handing back the route to the state the walk
+  // already stood in. Re-aiming could not shift it, because the key had not
+  // changed either.
+  //
+  // Clearing here costs one recomputation after a write, which is precisely
+  // when the answer may have moved.
+  server.addGuard((tool) => {
+    if (WRITE_TOOLS.has(tool)) session.forgetRoute();
+  });
   server.addGuard((tool, args) => {
     if (!WRITE_TOOLS.has(tool) || session.workRoot() === root) return;
     const paths: string[] = [];

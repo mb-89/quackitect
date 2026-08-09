@@ -4,6 +4,8 @@
 // the renderers. Pinned after the blank-panel regression (owner order
 // 2026-07-27): a narrated visit must NEVER render empty.
 import { strict as assert } from "node:assert";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { test } from "node:test";
 import { CallLog } from "../engine/calllog.ts";
 import { seDir } from "../engine/paths.ts";
@@ -553,4 +555,27 @@ test("a popped-out card opens on what it was showing, and then holds still", () 
   assert.match(html, /async function refresh\(detail\) \{\n {2}if \(FROZEN\) return;/, "and never redraws itself");
   // It says so, quietly — a snapshot that looks live is a trap.
   assert.match(html, /frozen-bar/, "the frozen window carries its own marker");
+});
+
+// THE MIRROR NEVER LEAVES THE MACHINE (req-mirror-stays-on-the-machine).
+//
+// It serves the whole record with no authentication anywhere, by design,
+// because the design assumed one machine. `listen(port)` with no host binds
+// EVERY interface, so that assumption was false for as long as the code
+// existed — and a comment three hundred lines up asserted the opposite.
+//
+// A COMMENT IS NOT A BIND. That is the whole lesson, and this is the check
+// that makes the sentence true.
+test("the mirror binds loopback only, so the record never leaves the machine", () => {
+  const src = readFileSync(join(import.meta.dirname, "..", "engine", "mirror.ts"), "utf8");
+
+  const listens = [...src.matchAll(/\.listen\(([^)]*)\)/g)].map((m) => m[1]);
+  assert.ok(listens.length > 0, "the mirror listens somewhere");
+  for (const args of listens) {
+    assert.match(args, /"127\.0\.0\.1"|"localhost"/, `listen(${args}) names a loopback host — a bare port binds every interface`);
+  }
+
+  // AND NOTHING RE-OPENS IT. A second listener added later without a host
+  // would undo this silently, which is why every call is checked, not one.
+  assert.equal(listens.filter((a) => !/127\.0\.0\.1|localhost/.test(a)).length, 0, "no listen call binds every interface");
 });

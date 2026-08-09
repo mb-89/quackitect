@@ -45,7 +45,7 @@ product_note: |
   placement and its disposition. At rest every requirement sources to a
   role that exists here.
 specification_note: |
-  DOCUMENT FORM: a derived TABLE - roles, type, interest, influence and
+  DOCUMENT FORM: a derived TABLE. It carries the role and the type, then the interest, the influence and
   disposition, read off the stakeholder nodes. The Stakeholder/View
   matrix derives from the same nodes. The book's fundamentals or
   design-input chapter holds them; requirements' source_refs point back.

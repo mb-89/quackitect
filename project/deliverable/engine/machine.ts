@@ -36,7 +36,14 @@ export interface EvidenceField {
   type?: EvidenceType;
   /** One or two lines telling whoever fills it what belongs in it. */
   guidance?: string;
-  /** The table template's column names. */
+  /** THE COLUMNS. For `table`, plain headings. For `node-table`, the
+   *  FRONTMATTER KEYS on the listed nodes — each becomes an editable cell,
+   *  read from the node and written back to it (owner ruling 2026-08-07).
+   *
+   *  WHY THE NODE AND NOT THE FORM. A probe result belongs to the assumption,
+   *  not to whichever iteration happened to run it. Written in both places it
+   *  is two copies of one fact, and one of them goes stale. The register's
+   *  own law already says this: the nodes are the truth, the table is a view. */
   columns?: string[];
   /** COVERAGE IS MUTUAL. Naming an item type here makes two things checkable
    *  at once: every reference in this field refines one of that type, and
@@ -56,6 +63,54 @@ export interface EvidenceField {
   options?: string[];
   items?: string[];
   passing?: string[];
+  /** WHICH CHOICES OWE A REASON (owner ruling 2026-08-08). Absent means ALL
+   *  of them, which is what a gate verdict wants. A finder's `applies` names
+   *  only the skip: saying yes needs no essay, saying no does. */
+  rationale_for?: string[];
+  /** WHAT TO TYPE IN EACH COLUMN, one line per column, in the column order.
+   *  A header of single words leaves the filler guessing, and a guess is
+   *  exactly what the cell-count check cannot catch. */
+  column_help?: string[];
+  /** WHICH COLUMNS ARE CONSTRAINED TO A KNOWN SET, as column name to the
+   *  sources its cells come from. A cell so named holds a member of that set
+   *  and nothing else, so the editor offers a CHOOSER rather than a text box.
+   *
+   *  SEVERAL SOURCES ARE ALLOWED, and a literal rides beside a live one: a
+   *  column offering `[$clusters, the environment, the user, nobody]` is
+   *  complete without being free.
+   *
+   *  WHY IT IS A CONSTRAINT AND NOT A CONVENTION. A pairwise judgment naming
+   *  something outside the pool compares an axis against a non-axis, and the
+   *  weight computed from it is arithmetic over a typo. */
+  picks?: Record<string, string[]>;
+  /** WHICH PICKED COLUMNS STILL TAKE SOMETHING ELSE (owner ruling
+   *  2026-08-08: "this should just show me all the clusters, and I can only
+   *  choose clusters").
+   *
+   *  A PICK IS CLOSED BY DEFAULT, because that is what a known set means. A
+   *  column named here is the exception: the offer is help, and typing past
+   *  it is legal. The comparison cards need it — their cells hold an id PLUS
+   *  a reason, and a closed chooser would forbid the reason. */
+  pick_free?: string[];
+  /** HOW MANY ROWS A PAGE SHOWS. A field over a live register is as long as
+   *  the register, and a table nobody can page through is a table nobody
+   *  fills. Absent means all rows at once, which is right for a short one. */
+  page_size?: number;
+  /** WHICH RELATION A COMPARISON CARD WALKS — `order` or `equivalence`. It
+   *  decides what may be inferred from an answer, and that decides how many
+   *  questions the card ever puts. */
+  relation?: string;
+  /** THE FRONTMATTER KEY a card's answers land in, on the node itself. */
+  writes?: string;
+  /** ANOTHER FIELD IN THIS STATE THAT THIS ONE IS DERIVED FROM.
+   *
+   *  A derived field asks for nothing. It reads the named field, computes,
+   *  and shows the answer — so the answer cannot disagree with what it was
+   *  computed from, which is what a second typed copy always eventually does
+   *  (owner report 2026-08-08, on a Pareto front typed beside its scores). */
+  reads?: string;
+  /** An optional second key, where the card also wants a sentence. */
+  reason?: string;
 }
 
 /**
@@ -72,6 +127,8 @@ export interface EvidenceField {
  * doctrine from the day they were written, no evidence form ever collected
  * them, and consequently NOT ONE was filled in any gate of any iteration.
  */
+// A CHOICE CARRIES ITS REASON. `rationale_for` names the options that owe
+// one; absent means all of them, which is what a verdict wants.
 export const STANDARD_ROUNDS: EvidenceField[] = [
   {
     name: "round_0_verify",
@@ -142,6 +199,11 @@ export interface StateDecl {
   /** THE BUSBAR (owner ruling 2026-08-06): this state's inputs meet at an
    *  AND bar. The bar is passed only when EVERY state feeding it is done,
    *  and the state cannot submit before then.
+   *
+   *  IT IS THE ONLY AND-MECHANISM (owner ruling 2026-08-08). The kernel's
+   *  activation rule, the submit check and the drawing all read THIS field.
+   *  `state_kind: join` is drawing vocabulary the compiler turns into a bar.
+   *  There is no second word and no second place it is enforced.
    *
    *  THE BAR IS AUTHORED, NOT INFERRED. It is an element of the state
    *  machine, drawn by whoever writes the row. The engine never decides
@@ -401,6 +463,71 @@ function rearmJoinsInto(m: MachineDecl, inst: MachineInstance, cone: Set<string>
   }
 }
 
+/** A BRANCHING POINT is a state with more than one way out (owner design
+ *  2026-08-07). The owner calls it a waypoint; this file already uses that
+ *  word for a claim-less transparent state, so the new idea takes the plainer
+ *  name and the two stay distinguishable.
+ *
+ *  It matters because a fan hands out ONE leg. Whoever walks it reaches the
+ *  end and the drawing offers nothing: the other legs are behind them, and
+ *  the join above wants them all. */
+export function branchingPoints(m: MachineDecl): string[] {
+  return m.states.filter((s) => s.edges.filter((e) => INPUT_ROLES.has(e.role ?? "normal")).length > 1).map((s) => s.id);
+}
+
+/** AND or OR, and the difference decides whether you may come back.
+ *
+ *  AND means every leg must be walked, so the walk MUST be able to return to
+ *  the branching point and take another. The tell is a busbar above: a join
+ *  that collects every input.
+ *
+ *  OR means one leg is the answer. At an OR the branching point is where a
+ *  DECISION was made, and returning would un-make it. So there is no jump
+ *  back, and the legs not taken are recorded as not_walked. */
+export function branchKind(m: MachineDecl, id: string): "and" | "or" {
+  const s = m.states.find((x) => x.id === id);
+  if (s === undefined) return "or";
+  const legs = s.edges.filter((e) => INPUT_ROLES.has(e.role ?? "normal")).map((e) => e.to);
+  if (legs.length < 2) return "or";
+  // Reachable from EVERY leg, and a busbar OVER SEVERAL INPUTS. That is the
+  // join that wants them all, and its existence is what makes the branch an
+  // AND.
+  //
+  // THE INPUT COUNT IS LOAD-BEARING (found 2026-08-08, putting the bar on the
+  // shared end note). Reachability alone says nothing: a machine's END is
+  // downstream of every leg BY CONSTRUCTION, so any bar on it would turn
+  // every branch in every machine into an AND — including idle's doors, where
+  // taking one is a decision and the others are never walked.
+  //
+  // A bar over ONE input synchronises nothing. It is a bar over TWO that says
+  // the legs below it are all required.
+  const inbound = (id: string): number =>
+    m.states.filter((p) => p.edges.some((e) => e.to === id && INPUT_ROLES.has(e.role ?? "normal"))).length;
+  const cones = legs.map((l) => downstreamCone(m, [l]));
+  return m.states.some((x) => x.busbar === true && inbound(x.id) >= 2 && cones.every((c) => c.has(x.id))) ? "and" : "or";
+}
+
+/** THE BRANCHING POINT TO RETURN TO, or none.
+ *
+ *  Answers one question: standing at `from`, wanting `to`, is there an AND
+ *  branching point behind me that reaches it? The nearest one wins, because a
+ *  return should undo as little of the walk as possible.
+ *
+ *  An OR branch is never offered. A walk does not get to re-decide by walking
+ *  backwards. */
+export function branchToReturnTo(m: MachineDecl, from: string, to: string): string | undefined {
+  // ALREADY THERE IS NOT A REASON TO GO BACK. The router only asks when the
+  // two differ, but a function that would answer "return to the fan" for
+  // "reach where you are standing" is wrong on its own terms.
+  if (from === to) return undefined;
+  const reaches = (a: string, b: string): boolean => downstreamCone(m, [a]).has(b);
+  const candidates = branchingPoints(m).filter((b) => b !== from && reaches(b, from) && reaches(b, to) && branchKind(m, b) === "and");
+  if (candidates.length === 0) return undefined;
+  // NEAREST MEANS FEWEST STATES BETWEEN IT AND HERE. A branch whose cone is
+  // smaller sits closer to the walk, so it undoes less.
+  return candidates.sort((a, b) => downstreamCone(m, [a]).size - downstreamCone(m, [b]).size)[0];
+}
+
 export function reopenStates(
   m: MachineDecl,
   inst: MachineInstance,
@@ -440,6 +567,17 @@ export function activeStates(inst: MachineInstance): string[] {
   return inst.active ?? [inst.current];
 }
 
+/** Every state whose LATEST history outcome is `filled` — the green set.
+ *
+ *  Latest-wins matters: a state filled, superseded and re-walked appears three
+ *  times. Only the last entry says whether it stands NOW. A reopen writes
+ *  `reopened` or `superseded`, which takes the state back out of this set. */
+export function settledStates(inst: MachineInstance): Set<string> {
+  const last: Record<string, string> = {};
+  for (const h of inst.history) last[h.state] = h.outcome;
+  return new Set(Object.keys(last).filter((s) => last[s] === "filled"));
+}
+
 /** Fire the completing state's matching outbound edges: AND-join fuel for
  *  normal/approval, direct activation for the OR paths. */
 function fireOutbound(
@@ -470,24 +608,81 @@ function fireOutbound(
 
 /** Activate every successor whose required inbound edges have all fired,
  *  consuming the fuel. */
-function activatePowered(m: MachineDecl, inst: MachineInstance, active: string[], activated: string[]): void {
+function activatePowered(
+  m: MachineDecl,
+  inst: MachineInstance,
+  active: string[],
+  activated: string[],
+  /** The states standing GREEN on their evidence, fetched only if a bar is
+   *  short an edge. It reads evidence files, so it is never paid up front. */
+  green?: () => Set<string>,
+): void {
   // Fuel into an ACTIVE state is absorbed — one token per state, a second
   // trigger during activity never re-runs it later.
   inst.fired = inst.fired!.filter((k) => !active.includes(k.split("->")[1]));
+  const settled = settledStates(inst);
+  // GREEN IS GREEN, WHOEVER WALKED IT (owner ruling 2026-08-09). A state whose
+  // evidence stands owes nothing. Nothing records this instance having walked
+  // over it, and nothing needs to.
+  //
+  // Two sources, and the second is the one that survives. History says THIS
+  // instance filled it, which a reload or a re-entry wipes. The evidence says
+  // it stands at all, which outlives every one of those.
+  let byEvidence: Set<string> | undefined;
+  const standsGreen = (id: string): boolean => {
+    if (settled.has(id)) return true;
+    byEvidence ??= green?.() ?? new Set<string>();
+    return byEvidence.has(id);
+  };
   for (const s of m.states) {
     if (active.includes(s.id) || activated.includes(s.id)) continue;
     // Inbound counted: normal and approval edges (alternatives activate
     // directly above). FAN-IN IS OR (owner ruling 2026-07-28): any fired
     // inbound activates a plain state — what a person naturally draws.
-    // Only an explicit JOIN state (state_kind join) synchronizes: it waits
-    // for EVERY inbound edge — the drawn AND of the formalisms (UML join
-    // bar, BPMN parallel gateway, Petri transition).
-    const inbound = m.states.flatMap((src) =>
-      src.edges.filter((e) => e.to === s.id && (e.role === "normal" || e.role === "approval")).map(() => `${src.id}->${s.id}`),
-    );
+    //
+    // THE BUSBAR IS THE ONLY SYNCHRONISER (owner ruling 2026-08-08). It waits
+    // for EVERY inbound edge — the drawn AND of the formalisms: the UML join
+    // bar, the BPMN parallel gateway, the Petri transition.
+    //
+    // IT USED TO READ kind === "join" HERE while the rigor matrix read
+    // `busbar`, so a drawn machine and a compiled one meant one thing in two
+    // words and enforced it in two places. A matrix row's bar was checked at
+    // SUBMIT and never at activation; a drawn join was checked at activation
+    // and had no submit rule. Same idea, two mechanisms, nothing making them
+    // agree.
+    //
+    // `state_kind: join` survives as DRAWING vocabulary: the compiler turns it
+    // into a busbar, and nothing at run time reads it.
+    //
+    // DEDUPED, because two edges from one source to one state are ONE
+    // inbound. Counted twice, a busbar could never reach its own total.
+    const inbound = [
+      ...new Set(
+        m.states.flatMap((src) =>
+          src.edges.filter((e) => e.to === s.id && (e.role === "normal" || e.role === "approval")).map(() => `${src.id}->${s.id}`),
+        ),
+      ),
+    ];
     if (inbound.length === 0) continue;
     const fired = inbound.filter((k) => inst.fired?.includes(k));
-    if (s.kind === "join" ? fired.length < inbound.length : fired.length === 0) continue;
+    // NOTHING ARRIVED, NOTHING ACTIVATES. A token has to reach the state on
+    // one of its inbound edges. This is also what stops the green rule below
+    // from re-activating a done join every time anything, anywhere, completes.
+    if (fired.length === 0) continue;
+    // A GREEN BRANCH SATISFIES ITS EDGE (owner ruling 2026-08-09). A busbar
+    // waits for every inbound edge. An edge whose source already stands filled
+    // has nothing left to deliver — the work is done, and its fuel was
+    // consumed the last time the join ran.
+    //
+    // WITHOUT THIS A THREE-WAY JOIN IS UNREACHABLE by a single token. Walking
+    // one branch fires one edge; reaching a sibling routes BACK through the
+    // fork, which re-walks the branch and clears the fuel. Measured in
+    // iteration one on 2026-08-09: all three branches walked, gate still shut,
+    // and stepping out to re-enter reset the count to zero.
+    //
+    // rearmJoinsInto solves the same problem for a reopen, by putting fuel
+    // back. This solves it for a plain walk, by not demanding it.
+    if (s.busbar === true && inbound.some((k) => !fired.includes(k) && !standsGreen(k.split("->")[0]))) continue;
     inst.fired = inst.fired?.filter((k) => !inbound.includes(k)); // consume
     activated.push(s.id);
     if (s.kind === "terminal" || s.kind === "end") inst.status = "closed";
@@ -507,6 +702,8 @@ export function completeState(
   now: string,
   /** Fire only the edge to this state. */
   only?: string,
+  /** The green set, lazily — a bar counts a green source as satisfied. */
+  green?: () => Set<string>,
 ): { activated: string[] } {
   const state = m.states.find((s) => s.id === stateId);
   if (!state) throw new Error(`completeState: undeclared state ${stateId}`);
@@ -518,7 +715,7 @@ export function completeState(
   inst.fired ??= [];
   const activated: string[] = [];
   fireOutbound(m, inst, state, roles, only, active, activated);
-  activatePowered(m, inst, active, activated);
+  activatePowered(m, inst, active, activated, green);
   inst.active = [...active, ...activated];
   inst.current = inst.active[0] ?? stateId;
   void now;

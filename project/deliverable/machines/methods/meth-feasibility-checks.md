@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "Early feasibility, economically reasonable: resource estimation, worst-case calculation or simulation, risk analysis, make/reuse/buy - per candidate, before deciding."
+statement: "Check feasibility early and roughly, per candidate. Prove what the decision needs and no more."
 ---
 
 ## Situation

@@ -34,7 +34,7 @@ product: full
 specification: full
 major_note: |
   Applies in full for the change: the gap claim for what the major
-  answers, the why-now, the value props it extends or creates, needs with
+  answers and the why-now. Then the value props it extends or creates, and the needs with
   pass lines. The resident frame inherits where the change does not touch
   it. This is where a major proves it deserves its cost.
 minor_note: |
@@ -64,11 +64,30 @@ specification_note: |
 
 ## Guidance
 
-The gap as a CLAIM: what every existing alternative sheds - only honest after the scan ([[meth-state-of-the-art]]). Then why the gap is closable now.
+The gap as a CLAIM: what every existing alternative sheds. That is only honest
+after the scan ([[meth-state-of-the-art]]).
 
-THE VALUE PROPS ARE AUTHORED HERE, AS ARTIFACTS. Each one is a NODE in project/spec/trace/value-prop/, shaped by [[value-prop]] - statement, audience, outcome, priority, and its success criteria. They are STANDING artifacts: they outlive this iteration, land on trunk when the record closes, and a later record may change them.
+Then say why the gap is closable now.
 
-SO THIS FIELD CARRIES REFERENCES, NEVER PROSE. One id per line. The artifact is the truth; the form points at it. gate-motivation follows each reference and reviews the artifact itself, so a reference that resolves to nothing fails the gate.
+THE VALUE PROPS ARE AUTHORED HERE, AS ARTIFACTS. Each one is a NODE under
+`project/spec/trace/value-prop/`, shaped by [[value-prop]].
+
+A value prop carries:
+
+- a statement
+- an audience
+- an outcome
+- a priority
+- its success criteria
+
+They are STANDING artifacts. They outlive this iteration, land on trunk when
+the record closes, and a later record may change them.
+
+SO THIS FIELD CARRIES REFERENCES, NEVER PROSE. One id per line.
+
+The artifact is the truth, and the form points at it. gate-motivation follows
+each reference and reviews the artifact itself, so a reference that resolves
+to nothing fails the gate.
 
 A delta may author ZERO new value props. An empty list is a claim too - one line saying none.
 

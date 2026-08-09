@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "Context and boundary: the system-in-focus, its neighbours, intended use - and the explicit excluded-from-intended-use list, the scope-creep guard."
+statement: "Draw what is inside the system and what is outside it. Everything crossing the line is named."
 ---
 
 ## Situation

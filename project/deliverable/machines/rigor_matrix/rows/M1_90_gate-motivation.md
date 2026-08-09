@@ -18,7 +18,7 @@ legal_tools:
   - se_answer
 evidence:
   - name: vision_scope_stated
-    description: "the packet is complete: idea, to-be world, goals, pitch, scope, non-goals"
+    description: the packet is complete, every part of it
   - name: problem_agreed
     description: the delta is real and the goal is worth having - argue it here
   - name: prior_art_positioned

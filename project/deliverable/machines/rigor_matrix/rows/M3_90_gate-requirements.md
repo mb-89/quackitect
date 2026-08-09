@@ -15,19 +15,7 @@ legal_tools:
   - se_file_list
   - se_log_query
   - se_answer
-evidence:
-  - name: verifiable
-    description: every requirement carries its named verify_method
-  - name: traced
-    description: every requirement refines a use case, and the chain reaches a story - no empty matrix rows, no orphan register rows
-  - name: functions_cover
-    description: every requirement requires at least one function; every use-case step covered
-  - name: set_holds
-    description: "the six set answers stand: complete, consistent, affordable, bounded, comprehensible - and the TBD sweep counted zero"
-  - name: breaks_if_removed
-    description: filled on every requirement
-  - name: assumptions_probed
-    description: the register's environment assumptions probed or scheduled with reason
+evidence: []
 major: full
 minor: full
 patch: none
@@ -38,7 +26,7 @@ major_note: |
   space. The set criteria are argued for the register as it now stands.
 minor_note: |
   APPLIES IN FULL, scoped to the delta. The new rows are verifiable,
-  traced, function-covered, probed; the SET criteria are re-argued for
+  traced and function-covered, and probed. The SET criteria are re-argued for
   the register as extended - a delta can break the whole set's
   consistency, so the set-level check never shrinks. End of design input,
   at this size too.
@@ -62,4 +50,17 @@ specification_note: |
 
 ## Guidance
 
-The design input ends here: the requirements and the solution-neutral function structure stand blessed. Everything after is solution space; the functions belong to the input - they name WHAT, never HOW. Review per [[meth-gate-review]].
+Design input ends here. The requirements and the function structure stand blessed. Everything after is solution space.
+
+THIS GATE CARRIES NO FIELDS OF ITS OWN, and that is deliberate (owner ruling 2026-08-07). Six stood here. Each was already settled elsewhere:
+
+- verifiable: the requirement template demands a `verify_method` from a fixed set.
+- traced: the register declares `covers: use-case`, checked both ways.
+- functions_cover: derive-functions declares `covers: requirement`, checked both ways.
+- set_holds: write-requirements asks all six set questions.
+- breaks_if_removed: the requirement template refuses an empty one.
+- assumptions_probed: probe-assumptions refuses a submit while any probe is missing.
+
+A GATE THAT RE-ASKS A MECHANICAL CHECK TEACHES PEOPLE TO SKIM. A field that can only say yes trains the reader to stop reading. The fields that could have said no get skimmed with the rest.
+
+What is left is the four standard rounds. Review per [[meth-gate-review]].

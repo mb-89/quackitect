@@ -817,7 +817,21 @@ function applyExactOp(w: OpWork): { next: string; replacements: number } {
       source: SRC,
     });
   }
-  const next = w.op.replace_all === true ? w.current.split(oldStr).join(newStr) : w.current.replace(oldStr, newStr);
+  // A FUNCTION REPLACEMENT, NEVER A STRING (found 2026-08-07, the hard way).
+  // String.replace reads dollar sequences in a STRING replacement as
+  // instructions:   const next = w.op.replace_all === true ? w.current.split(oldStr).join(newStr) : w.current.replace(oldStr, newStr); is the match, $1 a group, and dollar-backtick is
+  // everything BEFORE the match. new_string is DATA — code, prose, a regex
+  // someone is editing — and it must never be read as an instruction.
+  //
+  // What it did: two engine files were spliced full-length into themselves
+  // by patches whose new_string happened to contain a regex ending in
+  // dollar-backtick. Both doubled in size, both still "applied" cleanly, and
+  // the only signal was a parse error hundreds of lines away.
+  //
+  // split().join() was already safe; join takes its argument literally. Only
+  // the single-replacement path was exposed, which is why replace_all never
+  // showed it.
+  const next = w.op.replace_all === true ? w.current.split(oldStr).join(newStr) : w.current.replace(oldStr, () => newStr);
   return { next, replacements: w.op.replace_all === true ? count : 1 };
 }
 

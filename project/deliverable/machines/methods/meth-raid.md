@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "The RAID register: risks, assumptions, issues and dependencies, each a node, each owned, each carrying the trigger that brings it back."
+statement: "One register holds the risks and the assumptions. It holds the issues and the dependencies too."
 ---
 
 ## Situation

@@ -12,11 +12,69 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseStateNote } from "./notes.ts";
 
-/** THE LEVELS, in ring order from the centre outward.
+/** THE SHARED SPINE, in ring order from the centre outward. Every wedge holds
+ *  these whole, and nothing branches until the last of them.
  *
  *  Adding a level is ONE entry here and one more ring. Nothing else in this
  *  file knows how many there are, or what they are called. */
-export const TRACE_LEVELS = ["value-prop", "story", "use-case", "requirement"];
+const TRACE_SPINE = ["value-prop", "story", "use-case", "requirement"];
+
+/** ONE SUBSEGMENT — a slice of every wedge, past the point where the spine
+ *  ends. It carries its own ordered levels outward from there. */
+export interface Subsegment {
+  /** Stable name, used as a css class and in the schema. */
+  id: string;
+  /** What a reader sees on the arc when zoomed out. */
+  label: string;
+  /** Its own levels, in ring order. Ring 0 here is the first ring past the
+   *  spine, so two subsegments' first levels share a circle. */
+  levels: string[];
+}
+
+/** THE SUBSEGMENTS (owner design 2026-08-07).
+ *
+ *  A wedge runs whole while the spine lasts. At the spine's END it divides
+ *  into two, three or four slices, and each goes its own way outward.
+ *
+ *  THE DIVISION HAPPENS ONCE. A node on the LAST spine level may point into
+ *  several slices — that is the one place an item belongs to more than one.
+ *  Past it there is no cross-coupling: a node in one slice never points at a
+ *  node in another, and no edge is drawn between them.
+ *
+ *  WHY IT EXISTS: design and testing answer the same requirement and answer
+ *  it differently. Design goes one way, testing the other, and a reader can
+ *  tell which is which by where it sits rather than by reading it.
+ *
+ *  AN EMPTY SLICE STILL HOLDS ITS ARC. The test levels do not exist yet; the
+ *  space is reserved so they land without moving anything. */
+export interface Subsegments {
+  of: Subsegment[];
+}
+
+export const TRACE_SUBSEGMENTS: Subsegments = {
+  of: [
+    { id: "design", label: "design", levels: ["function"] },
+    { id: "test", label: "tests", levels: [] },
+  ],
+};
+
+/** THE RINGS, each one the types that share it. The spine gives one type per
+ *  ring; past it a ring holds one type per subsegment that reaches that far. */
+export function traceRings(sub: Subsegments = TRACE_SUBSEGMENTS): string[][] {
+  const depth = Math.max(0, ...sub.of.map((s) => s.levels.length));
+  const past = Array.from({ length: depth }, (_, i) => sub.of.map((s) => s.levels[i]).filter((t): t is string => typeof t === "string"));
+  return [...TRACE_SPINE.map((t) => [t]), ...past];
+}
+
+/** Which subsegment a type belongs to. A spine type belongs to none, and that
+ *  is what "it owns the whole wedge" means. */
+export function subsegmentOf(type: string, sub: Subsegments = TRACE_SUBSEGMENTS): string | undefined {
+  return sub.of.find((s) => s.levels.includes(type))?.id;
+}
+
+/** Every level in ring order, flattened. The type filter and the pills read
+ *  this; the layout works from the rings. */
+export const TRACE_LEVELS = traceRings().flat();
 
 export interface TraceNode {
   id: string;
@@ -43,11 +101,62 @@ export interface Placed extends TraceNode {
   y: number;
 }
 
+/** ONE LABELLED ARC — a whole section, or one slice of one (owner design
+ *  2026-08-07). What a reader sees when the drawing is too small for cards.
+ *
+ *  IT IS THE MAP AT ALTITUDE. Zoomed out, the cards are specks and the arcs
+ *  carry the meaning: this wedge is that value proposition, and past the
+ *  requirements it divides into design and tests. Zoomed in, the arcs fade
+ *  and the cards take over. */
+export interface TraceBand {
+  label: string;
+  /** The value prop this arc belongs to — a click target for a zoom-to. */
+  root: string;
+  kind: "segment" | "slice";
+  r: number;
+  from: number;
+  to: number;
+}
+
+/** ONE CLICKABLE PIECE OF THE PIE — a section at one ring, or one slice of
+ *  that (owner ruling 2026-08-07).
+ *
+ *  "THE LEDGER'S REQUIREMENTS" IS A PLACE. Naming a section was not enough:
+ *  a reader who wants one ring of one section needs somewhere to aim, and the
+ *  label arc was the only target there was. */
+export interface TraceSector {
+  /** The types on this ring — what the piece holds. */
+  label: string;
+  root: string;
+  ring: number;
+  /** Which slice, or empty on an undivided ring. */
+  slice: string;
+  r0: number;
+  r1: number;
+  from: number;
+  to: number;
+}
+
+/** ONE SEPARATOR — the cut between two pieces. A `section` spoke runs the
+ *  whole way out; a `slice` cut starts where the division opens. */
+export interface TraceSpoke {
+  kind: "section" | "slice";
+  at: number;
+  r0: number;
+  r1: number;
+}
+
 export interface TraceLayout {
   nodes: Placed[];
   edges: { from: string; to: string }[];
   /** Ring radii, innermost first — the level separators are drawn at these. */
   rings: number[];
+  /** The labelled arcs, outside the outermost ring. */
+  bands: TraceBand[];
+  /** The clickable pieces, tiling the circle. */
+  sectors: TraceSector[];
+  /** The cuts between them. */
+  spokes: TraceSpoke[];
   size: number;
 }
 
@@ -227,7 +336,16 @@ function checkBans(id: string, c: TemplateCheck, value: string, suffix: string):
 function applyCheck(id: string, c: TemplateCheck, value: string, fm: Record<string, unknown>, body: string, whole: string): string[] {
   const out: string[] = [];
   const suffix = c.hint === undefined ? "" : ` — ${c.hint}`;
-  const answered = value.trim() !== "" && !value.includes("TODO");
+  // A STILL-COMMENTED VALUE IS UNANSWERED, the same convention the form
+  // checker has always used. A minted field carries its prompt as a markdown
+  // comment, and reading that prompt as an ANSWER means every declared check
+  // fires against the instructions for filling it in.
+  //
+  // It surfaced the day a field was minted with a comment listing its own
+  // vocabulary: the one_of check duly refused the list of legal values for not
+  // being one of the legal values.
+  const t = value.trim();
+  const answered = t !== "" && !t.includes("TODO") && !(t.startsWith("<!--") && t.endsWith("-->"));
   if (c.ears === true && answered) out.push(...checkEars(id, c, value, fm, suffix));
   if (answered) out.push(...checkBans(id, c, value, suffix));
   if (c.one_of !== undefined && answered && !c.one_of.includes(value.trim())) {
@@ -319,7 +437,18 @@ export function loadTrace(root: string): TraceNode[] {
       id: typeof fm.id === "string" ? fm.id : (file.split(/[\\/]/).pop() ?? "").replace(/\.md$/, ""),
       type,
       statement: typeof fm.statement === "string" ? fm.statement : "",
-      refines: asList(fm.refines),
+      // THE UPWARD EDGE HAS ONE SLOT AND SEVERAL NAMES (owner ruling
+      // 2026-08-07, machines/trace-schema.md). A requirement writes
+      // `refines:` because it breaks its use case into finer grain. A
+      // function writes `satisfies:` because it does not refine a
+      // requirement at all — it is what the system does so the requirement
+      // holds. The relation differs, so the word does.
+      //
+      // The MODEL keeps one slot on purpose. Everything downstream — the
+      // wedge walk, the coverage checks, the drawing — asks the same
+      // question of every node: what does this serve? Splitting the slot
+      // would fork that question per type for no gain.
+      refines: [...asList(fm.refines), ...asList(fm.satisfies)],
       hay: pairs,
       file,
     });
@@ -368,6 +497,33 @@ export function visionText(root: string): string {
  *  moves it only far enough to clear a neighbour, which does everything the
  *  ordering was for and fixes what it could not. */
 
+/** RE-ORIGIN (owner design 2026-08-07). Any node can be made the centre. Its
+ *  own descendants become the drawing, and everything else falls away.
+ *
+ *  A LEVEL IS A DISTANCE, NOT A TYPE. From the vision the first ring is the
+ *  value props, because that is what the vision's children are. From a use
+ *  case the first ring is its requirements. The rings, the wedges, the bands,
+ *  the slices — all of it takes the level as given, so all of it survives
+ *  unchanged.
+ *
+ *  WHAT SURVIVES A RE-ORIGIN is the type order. A requirement still sits
+ *  inside a function, because that order is what the trace MEANS. What moves
+ *  is where the counting starts. */
+export function descendantsOf(nodes: TraceNode[], origin: string): TraceNode[] {
+  const kids = new Map<string, TraceNode[]>();
+  for (const n of nodes) for (const p of n.refines) kids.set(p, [...(kids.get(p) ?? []), n]);
+  const out = new Map<string, TraceNode>();
+  const walk = (id: string): void => {
+    for (const k of kids.get(id) ?? []) {
+      if (out.has(k.id)) continue;
+      out.set(k.id, k);
+      walk(k.id);
+    }
+  };
+  walk(origin);
+  return [...out.values()];
+}
+
 /** Which wedge a node belongs to: the value prop it ultimately refines. */
 export function rootsOf(nodes: TraceNode[]): Map<string, string> {
   const byId = new Map(nodes.map((n) => [n.id, n]));
@@ -398,7 +554,10 @@ export function rootsOf(nodes: TraceNode[]): Map<string, string> {
  *  unreadable. Sharing WITHIN one prop is fine and stays: those lines are
  *  short and local.
  */
-export function rootsAllOf(nodes: TraceNode[]): Map<string, string[]> {
+export function rootsAllOf(
+  nodes: TraceNode[],
+  isRoot: (n: TraceNode) => boolean = (n) => n.type === TRACE_LEVELS[0],
+): Map<string, string[]> {
   const byId = new Map(nodes.map((n) => [n.id, n]));
   const cache = new Map<string, string[]>();
   const walk = (id: string, seen: Set<string>): string[] => {
@@ -408,7 +567,7 @@ export function rootsAllOf(nodes: TraceNode[]): Map<string, string[]> {
     seen.add(id);
     const n = byId.get(id);
     if (n === undefined) return [];
-    if (n.type === TRACE_LEVELS[0]) return [id];
+    if (isRoot(n)) return [id];
     const out = new Set<string>();
     for (const p of n.refines) for (const r of walk(p, seen)) out.add(r);
     const list = [...out];
@@ -421,21 +580,39 @@ export function rootsAllOf(nodes: TraceNode[]): Map<string, string[]> {
 
 /** Push apart only as much as needed. Each item starts on the angle its parent
  *  already has, the sweep moves it the minimum that clears its neighbour, and
- *  the block is re-centred on where the items wanted to be. */
+ *  the block is re-centred on where the items wanted to be.
+ *
+ *  THE BAND IS A WALL (owner ruling 2026-08-07). Nothing may leave it, ever.
+ *
+ *  IT USED TO LEAK, and this is how: the sweep only ever pushes items APART,
+ *  never together. A function WANTS its requirement's angle, and requirements
+ *  own the whole section while functions own half of it. So a function under a
+ *  requirement on the far side of the section started outside the design slice
+ *  and nothing brought it back — it was drawn in the neighbouring section,
+ *  belonging visibly to nothing.
+ *
+ *  So the wants are clamped BEFORE the sweep, and the result is clamped after.
+ *  A card that cannot have its parent's exact angle gets the nearest angle it
+ *  is allowed, which is what "outward means outward" degrades to once a band
+ *  narrower than its parent's exists at all. */
 function spread(targets: number[], want: number, centre: number, half: number): number[] {
   const n = targets.length;
   if (n === 0) return [];
-  if (n === 1) return [Math.min(centre + half, Math.max(centre - half, targets[0] ?? centre))];
+  const lo = centre - half;
+  const hi = centre + half;
+  const pin = (a: number): number => Math.min(hi, Math.max(lo, a));
+  const wanted = targets.map(pin);
+  if (n === 1) return [pin(targets[0] ?? centre)];
   // A wedge too narrow for the wanted separation gets an even one instead.
   const gap = Math.min(want, (half * 2) / (n - 1));
-  const out = targets.slice();
+  const out = wanted.slice();
   for (let i = 1; i < n; i++) out[i] = Math.max(out[i] ?? 0, (out[i - 1] ?? 0) + gap);
   const mean = (xs: number[]): number => xs.reduce((a, b) => a + b, 0) / xs.length;
-  const drift = mean(out) - mean(targets);
+  const drift = mean(out) - mean(wanted);
   for (let i = 0; i < n; i++) out[i] = (out[i] ?? 0) - drift;
-  const over = Math.max(0, (out[n - 1] ?? 0) - (centre + half));
-  const under = Math.max(0, centre - half - (out[0] ?? 0));
-  for (let i = 0; i < n; i++) out[i] = (out[i] ?? 0) + under - over;
+  const over = Math.max(0, (out[n - 1] ?? 0) - hi);
+  const under = Math.max(0, lo - (out[0] ?? 0));
+  for (let i = 0; i < n; i++) out[i] = pin((out[i] ?? 0) + under - over);
   return out;
 }
 
@@ -443,10 +620,6 @@ function spread(targets: number[], want: number, centre: number, half: number): 
  *  to turn the text with the angle, and then half of it reads upside down.
  *  So a label keeps its own width, and that width is what the ring spacing
  *  has to clear. */
-/** The arc one item claims on its ring — the card plus breathing room, so two
- *  neighbours on the same ring never touch. */
-const LABEL_W = 310;
-
 /** EVERY NODE IS A CARD, uniformly sized (owner, 2026-08-05). A dot with a
  *  label beside it is a pixel-wide click target; the card is the whole thing,
  *  and it is the same size for every node so the rings read as rings. The
@@ -471,6 +644,17 @@ const FIRST_RING = CARD_W * 1.55;
  *  where it would be undercut. It also subsumes the card-overlap rule: at
  *  this distance a 260×60 card clears its neighbour at every angle. */
 const MIN_DIST = Math.round((FIRST_RING * 2) / 3);
+
+/** How much of a section's angle its cards may use. The rest is left EMPTY,
+ *  so two sections read apart without a line drawn between them. Half of the
+ *  slack falls on each side. */
+const SECTION_SLACK = 0.86;
+
+/** The hidden separator between one slice and the next. It is the
+ *  SAME width as the gap between two sections, because a reader who has
+ *  learnt that gap should not have to learn a second one. Like the section
+ *  boundaries, it is deliberately not drawn. */
+const SPLIT_GAP = 0.14;
 
 /** EVERY SECTION TAKES THE ANGLE IT NEEDS (owner, 2026-08-06). Equal wedges
  *  are the circle's real waste: one value prop carrying sixty rows and
@@ -530,11 +714,24 @@ function bandHalf(orbits: number): number {
   return ((orbits - 1) / 2) * STAGGER_STEP;
 }
 
-/** THE RING GAP IS THE FLOOR. A parent and its child are a pair like any
- *  other, so rings closer than MIN_DIST let the relax pass shove children
- *  off their own ring — which broke the global-radius invariant the level
- *  circles depend on. Tying the two makes the drawing self-consistent. */
-const RING_GAP = MIN_DIST;
+/** THE RING GAP IS THE VISION'S OWN GAP (owner ruling 2026-08-07).
+ *
+ *  The distance from the vision to the value props is FIRST_RING, and that is
+ *  the drawing's unit of separation. Every later ring gets at least the same,
+ *  measured EDGE TO EDGE: the outermost card of one ring to the innermost
+ *  card of the next.
+ *
+ *  IT USED TO BE MIN_DIST, which is two thirds of that. Enough while the
+ *  rings were sparse. Once the crowded ones started staggering, their bands
+ *  ate most of the gap and consecutive rings read as one smear. Adding the
+ *  functions made it plain: requirements and functions ran together with
+ *  nothing between them.
+ *
+ *  EDGE TO EDGE IS THE WHOLE POINT. A gap between ring CENTRES says nothing
+ *  once a band straddles the ring, which is exactly the case where the
+ *  drawing gets tight. The floor below already adds the band's outer half,
+ *  so this constant is the clear air between cards. */
+const RING_GAP = FIRST_RING;
 
 /** How many sub-orbits a lane needs for the arc it has. A sparse lane stays
  *  on one orbit — staggering it would be noise and a thicker band.
@@ -545,14 +742,29 @@ const RING_GAP = MIN_DIST;
  *  adds costs less than the ARC it saves, on this ring alone. On a sparse
  *  inner ring the arc is already ample, so a band buys nothing and the ring
  *  stays a single circle; on a crowded outer one the band is small beside
- *  what it saves. Nothing is thresholded; the cheaper answer wins. */
-function bestOrbits(gaps: number, span: number, floor: number): { r: number; orbits: number } {
-  let best = { r: Number.POSITIVE_INFINITY, orbits: 1 };
+ *  what it saves. Nothing is thresholded; the cheaper answer wins.
+ *
+ *  THE RADIUS AND THE STAGGER ARE ONE DECISION, taken for the whole ring
+ *  (owner ruling 2026-08-07). Every section shares a ring, so both numbers
+ *  must suit the HUNGRIEST of them.
+ *
+ *  IT USED TO PICK THEM APART: each section proposed a pair, and the ring took
+ *  the largest RADIUS with whatever stagger came attached. A section that
+ *  needed three orbits to fit could be handed a bigger radius and one orbit,
+ *  which is a third of the room it asked for. Its cards then spread past their
+ *  own arc into the next section. */
+function bestOrbits(lanes: { gaps: number; arc: number }[], floor: number): { r: number; orbits: number } {
+  let best = { r: floor, orbits: 1 };
+  let cost = Number.POSITIVE_INFINITY;
   for (let o = 1; o <= STAGGER; o++) {
     const half = bandHalf(o);
-    const r = Math.max(floor + half, span <= 0 ? 0 : (gaps * MIN_DIST) / (o * span * 0.86));
+    let r = floor + half;
+    for (const l of lanes) if (l.arc > 0) r = Math.max(r, (l.gaps * MIN_DIST) / (o * l.arc));
     // What this ring actually costs the drawing is its OUTER edge.
-    if (r + half < best.r + bandHalf(best.orbits)) best = { r, orbits: o };
+    if (r + half < cost) {
+      cost = r + half;
+      best = { r, orbits: o };
+    }
   }
   return best;
 }
@@ -614,8 +826,20 @@ export function refId(written: string): string {
 }
 
 /** Does this reduce to something SHAPED like a trace id. */
+/** DOTS ARE LEGAL INSIDE AN ID, and that is how the function tree carries its
+ *  shape (owner ruling 2026-08-07). `fn-a.b` sits under `fn-a`; a node's
+ *  parent is its id with the last segment removed.
+ *
+ *  WHAT IT COST TO MISS. The character class had no dot, so every dotted id
+ *  failed this test and was DROPPED by refsIn before anything looked at it.
+ *  Not refused, not reported — dropped. The coverage check then said no
+ *  function covered any requirement, which pointed at the tree rather than at
+ *  the extractor, and the tree was correct.
+ *
+ *  A FILTER THAT DISCARDS SILENTLY IS THE WORST SHAPE for this. It cannot be
+ *  distinguished from an author who wrote nothing. */
 export function looksLikeId(id: string): boolean {
-  return /^[a-z][a-z0-9]*-[a-z0-9-]+$/i.test(id);
+  return /^[a-z][a-z0-9]*-[a-z0-9.-]+$/i.test(id);
 }
 
 /** THE REFERENCES A FIELD CARRIES. frame-delta's evidence is a list of value
@@ -624,10 +848,47 @@ export function looksLikeId(id: string): boolean {
 export function refsIn(text: string): string[] {
   const out: string[] = [];
   for (const line of text.split(/\r?\n/)) {
-    const m = line.match(/^\s*-\s*(.+?)\s*$/);
+    // A LIST LINE IS DASH-LED OR NUMBERED (2026-08-09). The rank-cut template
+    // numbers its rows, because the numbers ARE the order, and reading only
+    // dash-led lines found nothing in one — so cut-criteria refused as empty
+    // while its own line check passed. Fifth time that pair has disagreed.
+    const m = line.match(/^\s*(?:[-*]|\d+[.)])\s*(.+?)\s*$/);
     if (m === null) continue;
-    const id = refId(m[1] ?? "");
+    // A ROW MAY CARRY A MARK AFTER ITS ID — [cutoff], [cut: why], [moved: why].
+    // The id is the first wiki link where there is one, so the mark travels
+    // beside the reference instead of destroying it.
+    const rest = m[1] ?? "";
+    const linked = /\[\[([^\]]+)\]\]/.exec(rest);
+    const id = refId(linked === null ? rest : (linked[1] ?? ""));
     if (looksLikeId(id)) out.push(id);
+  }
+  return out;
+}
+
+/** THE REFERENCES A TABLE ROW CARRIES — the compare-card's answer shape.
+ *
+ *  A card records one answered pair per row: the two items and the verdict.
+ *  refsIn above reads a LIST, one dash-led id per line, so it found nothing in
+ *  a row and the field refused as empty while its own line check passed. No
+ *  content could satisfy both, which is a field nobody can ever fill.
+ *
+ *  Only the first two cells are items. The third is the verdict, and a
+ *  verdict is not an artifact.
+ *
+ *  HOW MANY CELLS ARE ITEMS DEPENDS ON THE ROW (2026-08-09). A card answers
+ *  with two items and a verdict. A dsm answers with ONE element and the value
+ *  written onto it, so reading two cells there offered the cluster name as an
+ *  artifact and the type check refused it. The caller knows which shape it
+ *  has; it says so. */
+export function refsInRows(text: string, columns = 2): string[] {
+  const out: string[] = [];
+  for (const line of text.split(/\r?\n/)) {
+    if (!/^\s*\|/.test(line)) continue;
+    const cells = line.split("|").slice(1, -1);
+    for (const cell of cells.slice(0, columns)) {
+      const id = refId(cell.trim());
+      if (looksLikeId(id)) out.push(id);
+    }
   }
   return out;
 }
@@ -660,19 +921,19 @@ function keepFor(all: TraceNode[], q: string): Set<string> {
  *  wasted its middle. Now a ring grows only as far as ITS worst wedge needs
  *  at full stagger, and the floor chain keeps it clear of the previous
  *  ring's outermost sub-orbit. Inner rings collapse; the spacing does not. */
-function ringRadii(wedges: { lanes: string[][]; span: number }[], count: number): { r: number; orbits: number }[] {
+function ringRadii(wedges: { lanes: string[][]; arcs: number[] }[], count: number): { r: number; orbits: number }[] {
   const rings: { r: number; orbits: number }[] = [];
   let floor = FIRST_RING;
   for (let k = 0; k < count; k++) {
-    // The ring answers to its HUNGRIEST section: each is sized against its
-    // own arc, and n items need n-1 gaps, never n.
-    let pick = { r: floor, orbits: 1 };
-    for (const w of wedges) {
-      const n = w.lanes[k]?.length ?? 0;
-      if (n < 2 || w.span <= 0) continue;
-      const got = bestOrbits(n - 1, w.span, floor);
-      if (got.r > pick.r) pick = got;
-    }
+    // The ring answers to its HUNGRIEST section, and n items need n-1 gaps.
+    //
+    // THE ARC IS THE ONE THIS LEVEL MAY ACTUALLY USE (owner ruling
+    // 2026-08-07). Below the split that is half a section, so the ring has to
+    // grow to hold the same rows in half the angle. Sizing against the whole
+    // section instead left the cards overlapping, and the pass that prises
+    // them apart smeared the requirements over five layers.
+    const lanes = wedges.map((w) => ({ gaps: Math.max(0, (w.lanes[k]?.length ?? 0) - 1), arc: w.arcs[k] ?? 0 })).filter((l) => l.gaps > 0);
+    const pick = bestOrbits(lanes, floor);
     rings.push(pick);
     // The band straddles the ring, so the next floor clears its outer half.
     floor = pick.r + bandHalf(pick.orbits) + RING_GAP;
@@ -685,49 +946,125 @@ function ringRadii(wedges: { lanes: string[][]; span: number }[], count: number)
  *  some angles the radial step and the arc offset cancel on one axis. Any
  *  pair still overlapping pushes its outer card further OUTWARD along its
  *  own angle — the parent line keeps its direction — until the axis-aligned
- *  clearance holds by check rather than by formula. */
-function relax(placed: Placed[]): void {
+ *  clearance holds by check rather than by formula.
+ *
+ *  THE BAND IS A HARD CEILING (owner ruling 2026-08-07). A card sits on its
+ *  ring, one step out or one step in. Never further. The push stops at the
+ *  band's outer edge and the card stays where the stagger put it.
+ *
+ *  IT USED TO BE UNBOUNDED, and that is what the owner saw: the requirements
+ *  climbing five steps out of their ring, until the ring was no longer a ring
+ *  and the drawing read as one smear. The push is a last resort for a clash
+ *  the arc could not foresee. Where a whole lane does not fit, the answer is
+ *  a BIGGER RADIUS, chosen once in ringRadii, not sixty passes of shoving. */
+function pushApart(a: Placed | undefined, b: Placed | undefined, ceiling: number[]): boolean {
+  if (a === undefined || b === undefined) return false;
+  const d = Math.hypot(a.x - b.x, a.y - b.y);
+  if (d >= MIN_DIST) return false;
+  const out = Math.hypot(a.x, a.y) >= Math.hypot(b.x, b.y) ? a : b;
+  const was = Math.hypot(out.x, out.y);
+  const r = Math.min(ceiling[out.level] ?? Number.POSITIVE_INFINITY, was + (MIN_DIST - d));
+  if (r <= was) return false;
+  const ang = Math.atan2(out.y, out.x);
+  out.x = Math.cos(ang) * r;
+  out.y = Math.sin(ang) * r;
+  return true;
+}
+
+function relax(placed: Placed[], ceiling: number[]): void {
   for (let pass = 0; pass < 60; pass++) {
     let moved = false;
-    for (let i = 0; i < placed.length; i++) {
-      for (let j = i + 1; j < placed.length; j++) {
-        const a = placed[i];
-        const b = placed[j];
-        if (a === undefined || b === undefined) continue;
-        const d = Math.hypot(a.x - b.x, a.y - b.y);
-        if (d >= MIN_DIST) continue;
-        const out = Math.hypot(a.x, a.y) >= Math.hypot(b.x, b.y) ? a : b;
-        const ang = Math.atan2(out.y, out.x);
-        const r = Math.hypot(out.x, out.y) + (MIN_DIST - d);
-        out.x = Math.cos(ang) * r;
-        out.y = Math.sin(ang) * r;
-        moved = true;
-      }
-    }
+    for (let i = 0; i < placed.length; i++)
+      for (let j = i + 1; j < placed.length; j++) if (pushApart(placed[i], placed[j], ceiling)) moved = true;
     if (!moved) break;
   }
+}
+
+/** Where each item in a lane WANTS to sit: the mean angle of its placed
+ *  parents, or the wedge's centre when none of them is placed. */
+function wants(
+  lane: string[],
+  parents: Map<string, string[]>,
+  placedAt: (id: string) => number | undefined,
+  fallback: number,
+): Map<string, number> {
+  const out = new Map<string, number>();
+  for (const id of lane) {
+    const ps = (parents.get(id) ?? []).map(placedAt).filter((a): a is number => a !== undefined);
+    out.set(id, ps.length === 0 ? fallback : ps.reduce((a, b) => a + b, 0) / ps.length);
+  }
+  return out;
+}
+
+/** A ring's lane, split into its slices and keeping the incoming order. A
+ *  spine ring has no slices and yields one group, keyed -1. */
+function bySlice(ordered: string[], sliceOf: (id: string) => number): Map<number, string[]> {
+  const out = new Map<number, string[]>();
+  for (const id of ordered) {
+    const s = sliceOf(id);
+    out.set(s, [...(out.get(s) ?? []), id]);
+  }
+  return out;
+}
+
+/** WHERE THE DRAWING STARTS: the node set, the wedges and the ring order,
+ *  taken from the origin. No origin means the vision, which is not a node —
+ *  so the wedges are the value props and the rings are the whole type order.
+ *
+ *  AN UNKNOWN ORIGIN FALLS BACK TO THE VISION rather than drawing nothing. A
+ *  typed name that does not exist should show the whole picture, not a blank. */
+function originAt(
+  all: TraceNode[],
+  origin: string | undefined,
+  sub: Subsegments,
+): { nodes: TraceNode[]; props: string[]; rings: string[][] } {
+  const rings = traceRings(sub);
+  const seed = origin === undefined || origin === "" ? undefined : all.find((n) => n.id === origin);
+  if (seed === undefined) {
+    return { nodes: all, props: all.filter((n) => n.type === TRACE_LEVELS[0]).map((n) => n.id), rings };
+  }
+  const nodes = descendantsOf(all, seed.id);
+  const at = rings.findIndex((r) => r.includes(seed.type));
+  const past = at < 0 ? rings : rings.slice(at + 1);
+  // The wedges are the origin's OWN children — whatever type they turn out to
+  // be. A use case as origin gives one wedge per requirement.
+  const props = nodes.filter((n) => n.refines.includes(seed.id)).map((n) => n.id);
+  return { nodes, props, rings: past };
 }
 
 /** The radial arrangement. The ring radius is GLOBAL across every wedge, so
  *  the level separators stay true circles — which means the WORST wedge sets
  *  the ring for everyone. A narrower wedge pushes its ring outward, because
  *  the arc a wedge offers is its radius times its angle. */
-export function layoutTrace(all: TraceNode[], selected?: string[], filter?: { types?: string[]; find?: string }): TraceLayout {
+export function layoutTrace(
+  all: TraceNode[],
+  selected?: string[],
+  filter?: { types?: string[]; find?: string; origin?: string },
+  subs?: Subsegments,
+): TraceLayout {
   // A TYPE FILTER REMOVES RINGS, it does not grey them out. The wedges still
   // come from the value props, so hiding a middle level closes the gap rather
   // than leaving a hole where it stood.
   const wanted = filter?.types ?? [];
-  const asked = wanted.length > 0 ? TRACE_LEVELS.filter((t) => wanted.includes(t)) : TRACE_LEVELS;
-  const props = all.filter((n) => n.type === TRACE_LEVELS[0]);
-  const shown = selected === undefined || selected.length === 0 ? props.map((p) => p.id) : selected;
-  const roots = rootsAllOf(all);
-  const kept = keepFor(all, filter?.find ?? "");
+  const sub = subs ?? TRACE_SUBSEGMENTS;
+  // THE ORIGIN DECIDES WHERE THE COUNTING STARTS. With none, the centre is
+  // the vision and the first ring is the value props. With one, the centre is
+  // that node and the first ring is its own children — the type order past it
+  // is unchanged, because that order is what the trace MEANS.
+  const from = originAt(all, filter?.origin, sub);
+  const rung = wanted.length > 0 ? from.rings.map((r) => r.filter((t) => wanted.includes(t))) : from.rings;
+  const asked = rung;
+  const shown = selected === undefined || selected.length === 0 ? from.props : selected;
+  const roots = rootsAllOf(from.nodes, (n) => from.props.includes(n.id));
+  const all2 = from.nodes;
+  const kept = keepFor(all2, filter?.find ?? "");
   const rootsShown = (id: string): string[] => (roots.get(id) ?? []).filter((r) => shown.includes(r));
-  const inScope = all.filter((n) => rootsShown(n.id).length > 0 && kept.has(n.id) && asked.includes(n.type));
+  const onSome = (t: string): boolean => asked.some((r) => r.includes(t));
+  const inScope = all2.filter((n) => rootsShown(n.id).length > 0 && kept.has(n.id) && onSome(n.type));
   // AN EMPTY RING IS NOISE (owner, 2026-08-06). A level nothing has reached
   // yet draws a circle around nothing and pushes everything else inward. It
   // comes back by itself the moment the level has a node.
-  const levels = asked.filter((t) => inScope.some((n) => n.type === t));
+  const levels = asked.filter((r) => r.some((t) => inScope.some((n) => n.type === t)));
 
   const parentsOf = new Map(inScope.map((n) => [n.id, n.refines]));
   const perWedge = new Map<string, string[][]>();
@@ -736,8 +1073,9 @@ export function layoutTrace(all: TraceNode[], selected?: string[], filter?: { ty
       p,
       levels.map(() => []),
     );
+  const ringOf = (t: string): number => levels.findIndex((r) => r.includes(t));
   for (const n of inScope) {
-    const lv = levels.indexOf(n.type);
+    const lv = ringOf(n.type);
     if (lv < 0) continue;
     for (const r of rootsShown(n.id)) perWedge.get(r)?.[lv].push(n.id);
   }
@@ -745,21 +1083,60 @@ export function layoutTrace(all: TraceNode[], selected?: string[], filter?: { ty
   // The sections are cut AFTER the lanes are known, because each one's share
   // of the turn is its own load.
   const cut = sections(shown, perWedge);
+  // HOW MUCH ANGLE A RING MAY USE, and where its middle sits.
+  //
+  // A SPINE RING OWNS THE WHOLE SECTION. Past the spine the section divides
+  // into one slice per subsegment, parted by a hidden separator the width of
+  // the gap between two sections — a reader who has learnt that gap should not
+  // have to learn a second one.
+  //
+  // THE SLICES ARE EQUAL, whatever they hold. An empty one keeps its arc, so
+  // the test levels land later without moving anything already drawn.
+  const slices = Math.max(1, sub.of.length);
+  const wedgeArc = (prop: string): number => (cut.get(prop)?.span ?? 0) * SECTION_SLACK;
+  const gaps = (prop: string): number => (cut.get(prop)?.span ?? 0) * SPLIT_GAP * (slices - 1);
+  const sliceArc = (prop: string): number => Math.max(0, (wedgeArc(prop) - gaps(prop)) / slices);
+  /** Which slice a type sits in, counted from the section's left edge. */
+  const sliceOf = (t: string): number => sub.of.findIndex((s: Subsegment) => s.levels.includes(t));
+  /** The middle of a slice, in absolute angle. */
+  const sliceAt = (prop: string, i: number): number => {
+    const centre = cut.get(prop)?.centre ?? Math.PI / 2;
+    const step = sliceArc(prop) + (cut.get(prop)?.span ?? 0) * SPLIT_GAP;
+    return centre - wedgeArc(prop) / 2 + sliceArc(prop) / 2 + i * step;
+  };
+  const arcAt = (prop: string, k: number): number => ((levels[k] ?? []).some((t) => sliceOf(t) >= 0) ? sliceArc(prop) : wedgeArc(prop));
   const ringPlan = ringRadii(
-    shown.map((p) => ({ lanes: perWedge.get(p) ?? [], span: cut.get(p)?.span ?? 0 })),
+    shown.map((p) => ({ lanes: perWedge.get(p) ?? [], arcs: levels.map((_, k) => arcAt(p, k)) })),
     levels.length,
   );
   const rings = ringPlan.map((x) => x.r);
 
   const placed: Placed[] = [];
   const place = new Map<string, number>();
+  const byId = new Map(inScope.map((n) => [n.id, n]));
   const at = (prop: string, id: string): string => `${prop}\0${id}`;
   shown.forEach((prop) => {
     const lanes = perWedge.get(prop) ?? [];
     // The first section starts pointing straight DOWN, so a single prop hangs
     // below the vision rather than sitting at an arbitrary angle.
     const centre = cut.get(prop)?.centre ?? Math.PI / 2;
-    const half = ((cut.get(prop)?.span ?? 0) * 0.86) / 2;
+    const half = wedgeArc(prop) / 2;
+    // THE SECTION DIVIDES PAST THE SPINE (owner design 2026-08-07).
+    //
+    // Everything derived FROM the requirements — the functions, and later the
+    // architecture and the design elements — takes one slice. What verifies
+    // them takes another: test definitions and test results. Two answers to
+    // one requirement, going two ways.
+    //
+    // A SLICE IS HELD, not merely marked. A thin separator was the first
+    // attempt and it was worth nothing: at 7% of a wedge nobody could see it,
+    // so it signalled nothing to a reader and reserved nothing for the tests.
+    // A reservation that cannot be seen is not a reservation.
+    //
+    // WHAT IT COSTS is paid in RADIUS, not in crowding. A divided ring is
+    // sized against the slice it may use, so it simply sits further out — and
+    // arc is radius times angle, so the push pays for part of itself.
+    const sliceHalf = sliceArc(prop) / 2;
     for (let k = 0; k < levels.length; k++) {
       const lane = lanes[k] ?? [];
       if (lane.length === 0) continue;
@@ -771,11 +1148,7 @@ export function layoutTrace(all: TraceNode[], selected?: string[], filter?: { ty
       // It used to spread every item evenly across the row's own span, which
       // put a lone child beside its parent instead of outside it, and turned
       // a wedge of four into a fan.
-      const target = new Map<string, number>();
-      for (const id of lane) {
-        const ps = (parentsOf.get(id) ?? []).map((p) => place.get(at(prop, p))).filter((a): a is number => a !== undefined);
-        target.set(id, ps.length === 0 ? centre : ps.reduce((a, b) => a + b, 0) / ps.length);
-      }
+      const target = wants(lane, parentsOf, (id) => place.get(at(prop, id)), centre);
       const ordered = [...lane].sort((a, b) => (target.get(a) ?? 0) - (target.get(b) ?? 0));
       // HOW MANY SUB-ORBITS THIS LANE NEEDS. A sparse lane stays on one
       // orbit — staggering it would be noise. A dense one splits across up
@@ -783,24 +1156,47 @@ export function layoutTrace(all: TraceNode[], selected?: string[], filter?: { ty
       // neighbours always sit the full LABEL_W apart.
       // The orbit count is the ring's own, chosen where the radius was.
       const orbits = ringPlan[k]?.orbits ?? 1;
-      const angles = spread(
-        ordered.map((id) => target.get(id) ?? centre),
-        MIN_DIST / orbits / (rings[k] ?? 1),
-        centre,
-        half,
-      );
-      ordered.forEach((id, i) => {
-        const a = angles[i] ?? centre;
-        place.set(at(prop, id), a);
-        const n = inScope.find((x) => x.id === id);
-        if (n === undefined) return;
-        const r = (rings[k] ?? 0) + orbitOffset(i, orbits);
-        placed.push({ ...n, key: at(prop, id), level: k, root: prop, x: Math.cos(a) * r, y: Math.sin(a) * r });
-      });
+      // EACH SLICE IS SPREAD ON ITS OWN, inside its own arc. A ring past the
+      // spine holds design on one side and tests on the other, and neither
+      // may drift into the other's angle.
+      //
+      // THE BAND CLAMPS, IT DOES NOT RE-CENTRE. A node still WANTS its
+      // parent's own angle, and a lone value prop still wants to hang
+      // straight down from the vision. What the band changes is where a
+      // crowded lane may spill to: within its own slice, never past it.
+      //
+      // Re-centring instead moved a lone prop 88 units sideways and broke the
+      // straight-down rule, which is a promise about the FIRST thing a reader
+      // sees.
+      //
+      // A SPINE RING HAS ONE GROUP, keyed -1, and it takes the whole section.
+      const groups = bySlice(ordered, (id) => sliceOf(byId.get(id)?.type ?? ""));
+      for (const [s, group] of groups) {
+        const [bandAt, bandHalfArc] = s < 0 ? [centre, half] : [sliceAt(prop, s), sliceHalf];
+        const angles = spread(
+          group.map((id) => target.get(id) ?? bandAt),
+          MIN_DIST / orbits / (rings[k] ?? 1),
+          bandAt,
+          bandHalfArc,
+        );
+        group.forEach((id, i) => {
+          const a = angles[i] ?? centre;
+          place.set(at(prop, id), a);
+          const n = byId.get(id);
+          if (n === undefined) return;
+          const r = (rings[k] ?? 0) + orbitOffset(i, orbits);
+          placed.push({ ...n, key: at(prop, id), level: k, root: prop, x: Math.cos(a) * r, y: Math.sin(a) * r });
+        });
+      }
     }
   });
 
-  relax(placed);
+  // A card may leave its ring by one stagger step and no more — the band's
+  // outer edge is the ceiling, computed where the ring was.
+  relax(
+    placed,
+    ringPlan.map((p) => p.r + bandHalf(p.orbits)),
+  );
 
   const keys = new Set(placed.map((p) => p.key));
   const edges: { from: string; to: string }[] = [];
@@ -810,16 +1206,219 @@ export function layoutTrace(all: TraceNode[], selected?: string[], filter?: { ty
     // link is drawn there, short and local. That is what removes the lines
     // that used to cross the whole circle.
     for (const p of n.refines) if (keys.has(at(n.root, p))) edges.push({ from: at(n.root, p), to: n.key });
-    if (n.type === levels[0]) edges.push({ from: "vision", to: n.key });
+    if ((levels[0] ?? []).includes(n.type)) edges.push({ from: "vision", to: n.key });
   }
   // The relax pass may push past the outermost ring, so the size follows the
   // cards rather than the circles.
   const reach = placed.reduce((m, p) => Math.max(m, Math.hypot(p.x, p.y)), rings[rings.length - 1] ?? RING_GAP);
-  return { nodes: placed, edges, rings, size: reach + LABEL_W };
+  // THE BANDS — what a reader sees when the cards are too small to read
+  // (owner design 2026-08-07). One arc per section, and one per slice inside
+  // it. They ride OUTSIDE the outermost ring so they never collide with a
+  // card, and the client fades them against the cards as the zoom changes.
+  const divided = levels.some((r) => r.some((t) => sliceOf(t) >= 0));
+  const segR = reach + RING_GAP * 0.85;
+  const bands = shown.flatMap((prop): TraceBand[] => {
+    const c = cut.get(prop)?.centre ?? Math.PI / 2;
+    const half = wedgeArc(prop) / 2;
+    const w = sliceArc(prop) / 2;
+    const seg: TraceBand = { label: propLabel(prop), root: prop, kind: "segment", r: segR, from: c - half, to: c + half };
+    if (!divided) return [seg];
+    const cuts = sub.of.map(
+      (s, i): TraceBand => ({
+        label: s.label,
+        root: prop,
+        kind: "slice",
+        r: reach + RING_GAP * 0.35,
+        from: sliceAt(prop, i) - w,
+        to: sliceAt(prop, i) + w,
+      }),
+    );
+    return [seg, ...cuts];
+  });
+  // THE SECTORS — the clickable pie of the drawing (owner ruling 2026-08-07).
+  //
+  // ONE PER SECTION PER RING, so "the ledger's requirements" is a thing a
+  // pointer can hit. The label arcs alone were not enough: they named the
+  // whole section, and a reader who wants one ring of it had nowhere to aim.
+  //
+  // A SECTOR SPANS ITS RING'S BAND, from halfway in to the previous ring to
+  // halfway out to the next — so the sectors tile the circle with no gaps and
+  // no overlaps, and every point belongs to exactly one.
+  const edgesOf = (k: number): [number, number] => {
+    const r = rings[k] ?? 0;
+    const inner = k === 0 ? 0 : ((rings[k - 1] ?? 0) + r) / 2;
+    const outer = k === rings.length - 1 ? reach + RING_GAP * 0.15 : (r + (rings[k + 1] ?? r)) / 2;
+    return [inner, outer];
+  };
+  // THE SECTOR RUNS SEPARATOR TO SEPARATOR (owner ruling 2026-08-07). It takes
+  // the section's WHOLE angle, not the 86% the cards are allowed.
+  //
+  // THE 14% IS A MARGIN, NOT A GAP. Cards keep off it so a section does not
+  // read as crowded against its neighbour. The sector still owns it, because
+  // a reader aiming near a section's edge is aiming at THAT section, and
+  // nothing else is there to claim the click.
+  //
+  // IT ALSO FIXES CARDS LANDING OUTSIDE. A card is 260 wide, so one near the
+  // edge overhung a sector that stopped at 86% — and read as a node belonging
+  // to nothing. Sector edges and separator lines are now the SAME angles, so
+  // what a reader sees is what a click hits.
+  const edgeAt = (prop: string, i: number, n: number): number => {
+    const c = cut.get(prop)?.centre ?? Math.PI / 2;
+    const span = cut.get(prop)?.span ?? 0;
+    return c - span / 2 + (span * i) / n;
+  };
+  const sectors = shown.flatMap((prop): TraceSector[] =>
+    levels.flatMap((types, k): TraceSector[] => {
+      const [r0, r1] = edgesOf(k);
+      // A DIVIDED RING GETS ONE SECTOR PER SLICE, an undivided one a single
+      // sector across the whole section.
+      const parts = types.some((t) => sliceOf(t) >= 0) ? sub.of.length : 1;
+      return Array.from({ length: parts }, (_, i): TraceSector => {
+        const mine = parts === 1 ? types : types.filter((t) => sliceOf(t) === i);
+        return {
+          label: mine.length > 0 ? mine.join(" ") : (sub.of[i]?.label ?? ""),
+          root: prop,
+          ring: k,
+          slice: parts === 1 ? "" : (sub.of[i]?.id ?? ""),
+          r0,
+          r1,
+          from: edgeAt(prop, i, parts),
+          to: edgeAt(prop, i + 1, parts),
+        };
+      });
+    }),
+  );
+  // THE SEPARATORS ARE THE SECTOR EDGES, exactly. One spoke between two
+  // sections, running the whole way out. Inside a section, one cut per slice
+  // boundary, starting where the division opens.
+  const opensAt = levels.findIndex((types) => types.some((t) => sliceOf(t) >= 0));
+  const cutFrom = opensAt <= 0 ? 0 : edgesOf(opensAt)[0];
+  const spokes = shown.flatMap((prop): TraceSpoke[] => {
+    const out = segR + RING_GAP * 0.25;
+    const n = sub.of.length;
+    const line: TraceSpoke[] = [{ kind: "section", at: edgeAt(prop, n, n), r0: 0, r1: out }];
+    if (!divided || n < 2) return line;
+    const between = Array.from(
+      { length: n - 1 },
+      (_, i): TraceSpoke => ({ kind: "slice", at: edgeAt(prop, i + 1, n), r0: cutFrom, r1: out }),
+    );
+    return [...line, ...between];
+  });
+  // THE LABELS MUST FIT. A section band's text is the outermost thing drawn,
+  // and its glyphs rise off the arc by roughly the font size.
+  return { nodes: placed, edges, rings, bands, sectors, spokes, size: segR + FIRST_RING * 0.34 * 1.6 };
 }
 
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+/** A SECTION'S NAME, WRITTEN OUT (owner ruling 2026-08-07). The short label
+ *  truncates, and truncation is what turned "vendoring" into "ndorin" on the
+ *  arc. There is room for the whole thing, so the whole thing is drawn.
+ *
+ *  The type prefix goes and the dashes become spaces, because the arc is read
+ *  by a person rather than matched by a machine. */
+function propLabel(id: string): string {
+  return id.replace(/^[a-z]+-/, "").replace(/-/g, " ");
+}
+
+/** ONE PIECE OF THE PIE, as a closed path: out along one edge, round the
+ *  outer arc, back down the other edge, round the inner arc. */
+function sectorPath(r0: number, r1: number, from: number, to: number): string {
+  const sweep = Math.min(to - from, Math.PI * 2 - 0.02);
+  const big = sweep > Math.PI ? 1 : 0;
+  const p = (r: number, t: number): string => `${(Math.cos(t) * r).toFixed(1)} ${(Math.sin(t) * r).toFixed(1)}`;
+  const a = from;
+  const b = from + sweep;
+  if (r0 <= 0) return `M 0 0 L ${p(r1, a)} A ${r1.toFixed(1)} ${r1.toFixed(1)} 0 ${big} 1 ${p(r1, b)} Z`;
+  return (
+    `M ${p(r0, a)} L ${p(r1, a)} A ${r1.toFixed(1)} ${r1.toFixed(1)} 0 ${big} 1 ${p(r1, b)}` +
+    ` L ${p(r0, b)} A ${r0.toFixed(1)} ${r0.toFixed(1)} 0 ${big} 0 ${p(r0, a)} Z`
+  );
+}
+
+/** THE TEXT MUST FIT THE ARC IT RIDES (owner ruling 2026-08-07). A textPath
+ *  draws only what fits and silently drops the rest, which is how "vendoring"
+ *  arrived on screen as "ndorin".
+ *
+ *  So the size comes DOWN until the whole word fits. A glyph is about 0.58 of
+ *  its font size wide in this face, which is close enough — the answer only
+ *  has to be small enough, not exact. */
+function fitted(label: string, r: number, sweep: number, want: number): number {
+  const arc = Math.abs(r * sweep);
+  const need = Math.max(1, label.length) * 0.58;
+  return Math.min(want, arc / need);
+}
+
+/** ONE ARC, as a path. Drawn BACKWARDS when its middle falls in the lower
+ *  half, because text on a path follows the path's direction and would
+ *  otherwise hang upside down along the bottom of the circle.
+ *
+ *  A full turn cannot be one arc command — its start and end are the same
+ *  point and nothing is drawn — so a lone section stops a hair short. */
+function arcPath(r: number, from: number, to: number): string {
+  const sweep = Math.min(to - from, Math.PI * 2 - 0.02);
+  const mid = from + sweep / 2;
+  const flip = Math.sin(mid) > 0;
+  const [a, b, dir] = flip ? [from + sweep, from, 0] : [from, from + sweep, 1];
+  const p = (t: number): string => `${(Math.cos(t) * r).toFixed(1)} ${(Math.sin(t) * r).toFixed(1)}`;
+  return `M ${p(a)} A ${r.toFixed(1)} ${r.toFixed(1)} 0 ${sweep > Math.PI ? 1 : 0} ${dir} ${p(b)}`;
+}
+
+/** THE PIE — one clickable piece per section per ring, each carrying the name
+ *  of what it holds. The ground the drawing sits on: a click that misses every
+ *  card still lands on one of these. */
+function svgSectors(sectors: TraceSector[]): string {
+  if (sectors.length === 0) return "";
+  const out = ['<g class="trace-sectors">'];
+  for (const [i, s] of sectors.entries()) {
+    out.push(
+      `<path class="trace-sector" d="${sectorPath(s.r0, s.r1, s.from, s.to)}"` +
+        ` data-band="${esc(s.root)}" data-ring="${s.ring}" data-slice="${esc(s.slice)}"><title>${esc(`${propLabel(s.root)} · ${s.label}`)}</title></path>`,
+    );
+    const mid = (s.r0 + s.r1) / 2;
+    const size = fitted(s.label, mid, s.to - s.from, FIRST_RING * 0.16);
+    // Below this nobody could read it, and an unreadable label is noise on a
+    // drawing whose whole point at that zoom is the shape.
+    if (size < FIRST_RING * 0.05) continue;
+    out.push(
+      `<path id="ts-${i}" d="${arcPath(mid, s.from, s.to)}" fill="none"/>`,
+      `<text class="trace-ringlabel" font-size="${size.toFixed(0)}"><textPath href="#ts-${i}" startOffset="50%" text-anchor="middle">${esc(s.label)}</textPath></text>`,
+    );
+  }
+  out.push("</g>");
+  return out.join("");
+}
+
+/** THE CUTS IN THE CAKE, so a reader far out can see where one section ends
+ *  even when no label is legible. */
+function svgSpokes(spokes: TraceSpoke[]): string {
+  if (spokes.length === 0) return "";
+  const line = (s: TraceSpoke): string => {
+    const x1 = (Math.cos(s.at) * s.r0).toFixed(1);
+    const y1 = (Math.sin(s.at) * s.r0).toFixed(1);
+    const x2 = (Math.cos(s.at) * s.r1).toFixed(1);
+    const y2 = (Math.sin(s.at) * s.r1).toFixed(1);
+    return `<line class="trace-spoke ${s.kind}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+  };
+  return `<g class="trace-spokes">${spokes.map(line).join("")}</g>`;
+}
+
+/** THE NAMES ON THEIR ARCS — the section, and each slice inside it. */
+function svgBands(bands: TraceBand[]): string {
+  if (bands.length === 0) return "";
+  const defs = bands.map((b, i) => `<path id="tb-${i}" d="${arcPath(b.r, b.from, b.to)}" fill="none"/>`).join("");
+  const text = bands
+    .map((b, i) => {
+      const want = FIRST_RING * (b.kind === "segment" ? 0.34 : 0.2);
+      return (
+        `<text class="trace-band ${b.kind} clickable" data-band="${esc(b.root)}" font-size="${fitted(b.label, b.r, b.to - b.from, want).toFixed(0)}">` +
+        `<textPath href="#tb-${i}" startOffset="50%" text-anchor="middle">${esc(b.label)}</textPath></text>`
+      );
+    })
+    .join("");
+  return `<defs>${defs}</defs><g class="trace-bands">${text}</g>`;
 }
 
 /** The SVG. The centre is (0,0) in a viewBox that grows with the outermost
@@ -827,6 +1426,10 @@ function esc(s: string): string {
 export function traceSvg(l: TraceLayout): string {
   const s = l.size;
   const parts = [`<svg class="trace" viewBox="${-s} ${-s} ${s * 2} ${s * 2}" role="img" aria-label="trace graph">`];
+  // THE BANDS GO FIRST, so a card always draws over a label rather than under
+  // it. At the zoom where the labels matter there are no legible cards, and
+  // at the zoom where the cards matter the labels have faded out.
+  parts.push(svgSectors(l.sectors), svgSpokes(l.spokes), svgBands(l.bands));
   for (const r of l.rings) parts.push(`<circle cx="0" cy="0" r="${r.toFixed(0)}" class="trace-ring"/>`);
   // KEYED BY PLACEMENT, not by node: a node under two value props has two
   // cards, and `id` no longer picks one out.

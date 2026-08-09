@@ -49,12 +49,54 @@ checks:
       - quality
       - constraint
       - interface
+  - field: breaks_how_badly
+    one_of:
+      - fatal
+      - crippling
+      - corrosive
+      - abrasive
+      - cosmetic
+    hint: how badly it breaks, not how much you want it — the test is in meth-damage-scale
+  - field: characteristic
+    one_of:
+      - functional-suitability
+      - performance-efficiency
+      - compatibility
+      - interaction-capability
+      - reliability
+      - security
+      - maintainability
+      - flexibility
+      - safety
+    hint: the nine of ISO/IEC 25010:2023 — absent on a functional row, carried by a quality
+  - field: kind
+    equals: quality
+    require_section: Scenario
+    hint: a quality carries its six-part scenario, and the response measure is its pass line
+  - field: measure
+    ban_words:
+      - fast
+      - quick
+      - easy
+      - simple
+      - robust
+      - seamless
+      - efficient
+      - optimal
+    hint: a quality without a number is a mood
   - field: verify_method
     one_of:
       - test
       - analysis
       - inspection
       - demonstration
+  - field: breaks_if_removed
+    ban_markers:
+      - TBD
+      - TBC
+      - TBR
+      - "???"
+    hint: unfillable means deletion candidate, never a keeper with a TODO
   - field: priority
     one_of:
       - must
@@ -132,6 +174,16 @@ verify_method: TODO — test | analysis | inspection | demonstration
 # this row is a deletion candidate, never a keeper with a TODO.
 breaks_if_removed: TODO — what fails when this row is struck
 #
+# HOW BADLY it breaks, on the damage scale. One word, and it is a claim
+# about CONSEQUENCE, never about how much anybody wants it.
+#   fatal      — the product stops being the thing it claims to be
+#   crippling  — one named use case can no longer complete
+#   corrosive  — it still works, and people route around it every time
+#   abrasive   — noticed and complained about; nobody changes what they do
+#   cosmetic   — nobody would notice. This row is a deletion candidate.
+# The test for each is in machines/methods/meth-damage-scale.md.
+breaks_how_badly: TODO — fatal | crippling | corrosive | abrasive | cosmetic
+#
 # The uc- ids this derives from. A cross-cutting quality names every use
 # case whose pass it protects — the killer set at minimum.
 refines:
@@ -147,6 +199,20 @@ source_refs:
 # every candidate pass/fail; the should and could rows become the scored
 # criteria. A won't-have is a non-goal, never a register row.
 priority: could
+#
+# THE TWO M4 KEYS. Both are written at derive-criteria, through its editors,
+# and both are as editable here as anywhere. The criteria table is derived
+# from them, so there is no criteria list to keep in step.
+#
+# The pool member this shares an axis with, and why, on one line. Two rows
+# measuring the same thing are ONE criterion; scoring both counts that thing
+# twice. `none` where this is an axis of its own.
+weighs_with: <!-- a pool id, then why the two measure the same thing. Or none. -->
+#
+# The pairwise judgments the weight is computed from. One line per pair: a
+# pool id, then > where this row matters more, or = where they match. The
+# reciprocal is implied and checked. Silence is not equality.
+weighs_against: <!-- one line per pair — a pool id, then > or = -->
 ---
 
 <!-- QUALITY KIND ONLY — add a `## Scenario` section carrying the six-part

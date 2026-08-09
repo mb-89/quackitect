@@ -29,7 +29,7 @@ product: full
 specification: full
 major_note: |
   Applies in full: the winner's matrices become THE baseline - allocation
-  DMM, element DSM, interfaces, metrics. Every function allocated exactly
+  the DMM and the element DSM, then the interfaces and the metrics. Every function is allocated exactly
   once, interfaces declared at both ends. The old baseline is superseded,
   never left ambiguous.
 minor_note: |
@@ -57,4 +57,18 @@ specification_note: |
 
 ## Guidance
 
-Nothing is redrawn: the winner's allocation DMM, element DSM, interface set and metrics become THE baseline ([[meth-dmm]], [[meth-dsm]]). Mechanical properties hold: every function allocated exactly once (a column property), interfaces declared at both ends (a symmetry property) - review-class now, engine-computed later. Diagrams, where wanted, are derived views of these matrices.
+Nothing is redrawn. The winner's own artifacts become THE baseline
+([[meth-dmm]], [[meth-dsm]]):
+
+- the allocation DMM
+- the element DSM
+- the interface set
+- the metrics
+
+Mechanical properties hold. They are review-class now, and engine-computed
+later.
+
+- Every function is allocated exactly once. That is a column property.
+- Interfaces are declared at both ends. That is a symmetry property.
+
+Diagrams, where wanted, are derived views of these matrices.

@@ -26,7 +26,8 @@ import {
   type StateDecl,
   validateMachine,
 } from "../machine.ts";
-import { loadStateNote, section } from "../notes.ts";
+import { loadStateNote } from "../notes.ts";
+import { parseEvidence } from "../rigor-matrix.ts";
 
 const ROLES: ReadonlySet<string> = new Set(["normal", "alternative", "fallback", "recovery", "approval", "error"]);
 
@@ -43,23 +44,22 @@ import { STANDARD_ROUNDS } from "../machine.ts";
 
 export { STANDARD_ROUNDS };
 
-function evidenceForm(machineId: string, noteName: string, body: string): EvidenceField[] {
-  const text = section(body, "Evidence form");
-  if (text === "") return [];
-  return text
-    .split("\n")
-    .filter((l) => l.trim() !== "")
-    .map((line) => {
-      const m = line.trim().match(/^- (.+?) \| (.+?) \| (required|optional)$/);
-      if (!m) {
-        throw new MachineCompileError(
-          machineId,
-          noteName,
-          `malformed evidence-form line ${JSON.stringify(line.trim())} (want "- name | description | required|optional")`,
-        );
-      }
-      return { name: m[1], description: m[2], required: m[3] === "required" };
-    });
+// A DRAWN STATE'S EVIDENCE IS THE MATRIX'S EVIDENCE (owner ruling
+// 2026-08-08). The one parser lives in rigor-matrix.ts and both compilers
+// call it, so a state note declares `evidence:` in frontmatter with the same
+// templates, item types, columns, picks and guidance a row declares.
+//
+// WHAT THIS REPLACED: a second evidence language, one line per field, that
+// could say a name, a description, and required-or-optional. Nothing else.
+// It was never used by a single state note in the repository, and the first
+// drawn state that wanted a real form wrote frontmatter — the shape anybody
+// would reach for — which was read by nobody and compiled to an empty form.
+function evidenceForm(machineId: string, noteName: string, fm: Record<string, unknown>, body: string): EvidenceField[] {
+  try {
+    return parseEvidence(fm, noteName, body);
+  } catch (e) {
+    throw new MachineCompileError(machineId, noteName, e instanceof Error ? e.message : String(e));
+  }
 }
 
 /** File refs are VAULT-RELATIVE (the Obsidian vault root is project/ —
@@ -525,6 +525,16 @@ export function stateFromNote(machineId: string, ref: string, notePath: string, 
   const exit = conditionDict(machineId, ref, root, "exit", x);
   const tags = asList(x.tags);
   const submachine = asString(x.submachine);
+  // THE BAR IS AUTHORED IN A DRAWING TOO, exactly as it is in a matrix row.
+  // Without this a drawn fan could never fold: branchKind looks for a busbar
+  // above the legs before it calls the branch an AND, and a canvas had no way
+  // to say so. Found writing the finders fan (owner ruling 2026-08-08).
+  //
+  // A DRAWN `state_kind: join` IS A BUSBAR, and nothing else. It stays in the
+  // drawing vocabulary because a person drawing a machine reaches for the
+  // word, and it compiles to the one field the kernel, the submit check and
+  // the layout all read.
+  const busbar = x.busbar === true || kind === "join";
   return {
     id: stateId,
     kind,
@@ -534,7 +544,8 @@ export function stateFromNote(machineId: string, ref: string, notePath: string, 
     statement: asString(x.statement) ?? "",
     guidance,
     priority,
-    evidence_form: [...evidenceForm(machineId, ref, note.body), ...(kind === "gate" ? STANDARD_ROUNDS : [])],
+    evidence_form: [...evidenceForm(machineId, ref, x, note.body), ...(kind === "gate" ? STANDARD_ROUNDS : [])],
+    ...(busbar ? { busbar: true } : {}),
     ...(submachine !== undefined && submachine !== "" ? { submachine } : {}),
     ...(legalTools !== undefined ? { legal_tools: legalTools } : {}),
     ...(repairTools !== undefined ? { repair_tools: repairTools } : {}),

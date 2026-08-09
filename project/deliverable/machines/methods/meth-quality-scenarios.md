@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "Six-part quality scenarios: source, stimulus, artifact, environment, response, response MEASURE - a quality without a measure is a mood."
+statement: "A quality demand becomes measurable when it is written as a six-part scenario. The six parts are below."
 ---
 
 ## Situation
@@ -10,8 +10,14 @@ M3: qualities are requirements of kind quality, each carried by a scenario. The 
 - source (who/what initiates) | stimulus (the event) | artifact (what is hit) | environment (under which conditions) | response (what the system does) | response measure (the pass line, with tolerance).
 
 ## Procedure
-- The response measure is the requirement's pass line; no measure, no requirement.
-- A quality scenario is also a formulated example: at M5 it is walked analytically against the baseline; at M7 the measurable ones become fitness checks.
+- The response measure is the requirement's pass line. No measure, no
+  requirement.
+- A quality scenario is also a formulated example.
+  - At M5 it is walked analytically against the baseline.
+  - At M7 the measurable ones become fitness checks.
 
 ## Sources
-SEI/ATAM scenario form; ISO 25010 tree; SyA NFR deck.
+
+- The SEI ATAM scenario form.
+- The ISO 25010 tree.
+- The SyA NFR deck.

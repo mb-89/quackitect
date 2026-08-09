@@ -30,7 +30,7 @@ major_note: |
   matrices, verdicts recorded, fitness candidates named for M7.
 minor_note: |
   Walk ONLY the quality scenarios the delta touches through the standing
-  matrices; record addressed / at-risk / unaddressed for those. The full
+  matrices. Record each one as addressed, at risk or unaddressed. The full
   walk is not repeated.
 patch_note: |
   Does not apply. The quality-scenario walk holds as evaluated. STRIKE
@@ -47,4 +47,10 @@ specification_note: |
 
 ## Guidance
 
-Per [[meth-atam-lite]]: walk each quality scenario through the matrices; record addressed / at-risk / unaddressed; name candidate fitness functions. Evaluation, never verification.
+Per [[meth-atam-lite]]:
+
+- Walk each quality scenario through the matrices.
+- Record it as addressed, at risk, or unaddressed.
+- Name candidate fitness functions.
+
+Evaluation, never verification.

@@ -3,7 +3,17 @@ state: converge
 state_kind: work
 priority: 0.2
 legal_tools: all
-guidance: CONVERGE - cluster the harvest, then judge it. Group ideas that are the same idea in different clothes. Then run the pugh card (project/deliverable/machines/methods/pugh.md) - a quick matrix against the frame, a sensible datum, few criteria. Keep the strong. The weak DIE HERE with their reason recorded - obsolete each with a brief; a silently dropped idea is illegal. What survives goes to route.
+guidance: |
+  CONVERGE - cluster the harvest, then judge it.
+
+  - Group ideas that are the same idea in different clothes.
+  - Run the pugh card at project/deliverable/machines/methods/pugh.md. A quick
+    matrix against the frame, a sensible datum, few criteria.
+  - Keep the strong.
+  - The weak DIE HERE, each with its reason recorded. Obsolete every one with
+    a brief. A silently dropped idea is illegal.
+
+  What survives goes to route.
 ---
 
 # Converge

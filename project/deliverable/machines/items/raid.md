@@ -118,7 +118,69 @@ test.
 - `impact` — what it costs if it bites. A sentence, not a score.
 - `source_refs` — what it came from and what leans on it: requirement ids,
   decisions, use cases, field evidence.
+- `probe` — the probe RESULT, on assumptions. Say what was checked and what
+  came back, starting with the outcome word.
+  - holds
+  - false
+  - unprobed
+  - scheduled
+  - Absent means never probed.
 - `probed` — ISO date of the last probe, on assumptions. Absent means never.
+- `weighs_with` — the pool member this shares a decision axis with, and why.
+  Written at M4. See [[meth-derive-criteria]].
+- `weighs_against` — the pairwise importance judgments. Written at M4.
+
+## A COMMENT IS THE UNANSWERED STATE (owner ruling 2026-08-07)
+
+`probe` and `probed` are minted carrying a markdown comment. The comment says
+what belongs there. Replacing it with plain text is what answers the field.
+
+```
+probe: <!-- what the check found. Start with holds, false, unprobed or scheduled. -->
+probe: holds — ran the battery on macOS, all 859 green
+```
+
+A still-commented value counts as UNANSWERED and the submit refuses it by
+name. So the prompt lives where the answer will live, and nothing has to
+invent a placeholder somewhere else to explain the field.
+
+## A MINTED COMMENT CARRIES NO COLON-SPACE
+
+The comment sits where a YAML value goes, so it obeys YAML. A `: ` inside it
+reads as a second key and the whole note stops parsing.
+
+WHAT THAT LOOKS LIKE WHEN IT BITES, and it is why this has its own heading.
+The note does not fail a check. It fails to LOAD, so every test that asks for
+it reports the node missing. The symptom names the wrong thing entirely, and
+the real cause is one character in a prompt nobody was looking at.
+
+Costed 13 red tests on 2026-08-08, all of them reading `req-clean loads`.
+
+Use a dash where a colon wants to go. `one line per pair — a pool id, then >
+or =` says the same thing and parses.
+
+This is the same convention the evidence forms already use for prefilled
+text: a comment is a suggestion, and confirming it is what makes it a claim.
+
+## `probe` IS THE FORM'S FIELD (owner ruling 2026-08-07)
+
+The probe-assumptions step does not keep its own copy of this. Its `probes`
+field is a VIEW: one line per standing assumption, and the answer on each line
+IS this frontmatter key.
+
+So there are two ways to write the same thing and they cannot disagree.
+
+- Type the answer in the form. It lands on this node.
+- Edit this node and save. The form shows it at the next look.
+
+WHY IT IS HERE AND NOT THERE. A probe result belongs to the assumption, not
+to whichever iteration happened to run it. Kept in the form, an entry written
+in i1 and probed in i7 would have its result filed under i7 — findable only by
+somebody who already knew to look there.
+
+The state stands exactly while every standing assumption carries this field.
+Nothing else is counted, so a new assumption turns the state grey the moment
+it is written, which is what a standing artifact means.
 
 ## The Probe section, on every assumption
 
@@ -150,8 +212,15 @@ owner: {{role}}
 trigger: {{the event that brings it back}}
 status: open
 impact: {{what it costs if it bites}}
+probe: <!-- what the check found. Start with holds, false, unprobed or scheduled. -->
+probed: <!-- the date the check ran, as YYYY-MM-DD -->
 source_refs:
   - {{what leans on it}}
+#
+# THE TWO M4 KEYS, exactly as on a requirement. A register entry sits in the
+# criterion pool, so it is compared and compounded the same way.
+weighs_with: <!-- a pool id, then why the two measure the same thing. Or none. -->
+weighs_against: <!-- one line per pair — a pool id, then > or = -->
 ---
 
 ## Probe

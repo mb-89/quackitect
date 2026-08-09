@@ -71,8 +71,8 @@ const BORROWED = [join("project", "deliverable", "engine")];
 const COPIED = [
   join("project", "deliverable", "machines"),
   "project/guidance".replace("/", sep),
-  join("project", "brand", "brand.json"),
-  join("project", "brand", "palette.css"),
+  join("project", "deliverable", "brand", "brand.json"),
+  join("project", "deliverable", "brand", "palette.css"),
 ];
 // A linked engine resolves its imports from where it REALLY lives, which
 // is the template — so the yaml package has to sit above it THERE. Copied

@@ -177,11 +177,11 @@ if (existsSync(shell)) {
 // Silent is right at render time and wrong at boot. A product running under
 // the fallback name in fallback colours is a broken install, not a choice,
 // and preflight is where that gets said out loud.
-if (!existsSync(join(root, "project", "brand", "brand.json"))) {
-  failures.push("project/brand/brand.json is missing — the product would run unnamed, under the lane's own fallback");
+if (!existsSync(join(root, "project", "deliverable", "brand", "brand.json"))) {
+  failures.push("project/deliverable/brand/brand.json is missing — the product would run unnamed, under the lane's own fallback");
 }
-if (!existsSync(join(root, "project", "brand", "palette.css"))) {
-  failures.push("project/brand/palette.css is missing — every surface would render from the baked fallback palette");
+if (!existsSync(join(root, "project", "deliverable", "brand", "palette.css"))) {
+  failures.push("project/deliverable/brand/palette.css is missing — every surface would render from the baked fallback palette");
 }
 try {
   mkdirSync(seDir(root), { recursive: true });

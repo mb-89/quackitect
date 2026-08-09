@@ -38,7 +38,7 @@ product: full
 specification: tailored
 major_note: |
   Applies in full: every need's pass lines demonstrated, killers
-  exercised end to end, acceptance scenarios converted, sweep done, gaps
+  exercised end to end. Acceptance scenarios are converted and the sweep is done. Gaps
   logged. The bless is the sign-off.
 minor_note: |
   The killer holds scoped: the DELTA's pass lines demonstrated, its

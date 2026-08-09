@@ -20,7 +20,7 @@ THE EVIDENCE FORM IS THE REVIEW. There is no second review artifact. The form ho
 
 
 
-SEARCH. Actually search, on the web, at the gate, for what this milestone's
+SEARCH. Actually search the web, at the gate, for what this milestone's
 artifact is being compared against. `se_web_search` and `se_web_fetch` are the
 lane for it. Reaching for a name already in your head is not a scan - it
 returns what was known before the work started, which is exactly the
