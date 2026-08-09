@@ -5,6 +5,7 @@ statement: When an option is chosen, the engine shall record the reasoning again
 kind: functional
 verify_method: test
 breaks_if_removed: The choice stands bare, and whoever asks why the losers lost re-litigates the decision from scratch.
+breaks_how_badly: corrosive
 refines:
   - uc-diverge-before-deciding
 source_refs:

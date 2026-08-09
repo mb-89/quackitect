@@ -5,6 +5,7 @@ statement: If a record holds unlanded work or an unruled finding, then the engin
 kind: functional
 verify_method: test
 breaks_if_removed: A record closes over work nobody landed and findings nobody ruled, and the archive lies.
+breaks_how_badly: fatal
 refines:
   - uc-close-a-record
 source_refs:

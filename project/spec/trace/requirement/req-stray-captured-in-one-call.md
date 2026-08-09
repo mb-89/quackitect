@@ -5,6 +5,7 @@ statement: The engine shall capture a stray finding in one call carrying the fin
 kind: functional
 verify_method: test
 breaks_if_removed: Capture costs a detour, so findings are chased mid-walk or dropped.
+breaks_how_badly: corrosive
 refines:
   - uc-capture-a-stray
 source_refs:

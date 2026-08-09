@@ -5,6 +5,7 @@ statement: When a pull is served, the engine shall weigh the next hop against th
 kind: functional
 verify_method: test
 breaks_if_removed: The agent walks past the person's dial and the one control they hold means nothing.
+breaks_how_badly: fatal
 refines:
   - uc-set-the-autonomy
 source_refs:

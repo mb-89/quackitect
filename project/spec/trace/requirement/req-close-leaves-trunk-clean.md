@@ -5,6 +5,7 @@ statement: When a record closes, the engine shall commit the record's strays, le
 kind: functional
 verify_method: test
 breaks_if_removed: Every close leaves uncommitted strays behind, and the next record opens on a dirty trunk it did not make.
+breaks_how_badly: corrosive
 refines:
   - uc-close-a-record
 source_refs:

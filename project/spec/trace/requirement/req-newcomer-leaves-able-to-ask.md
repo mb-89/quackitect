@@ -6,6 +6,7 @@ kind: quality
 characteristic: interaction-capability
 verify_method: demonstration
 breaks_if_removed: The tour runs but teaches nothing measurable; nobody can say whether newcomers leave able to ask.
+breaks_how_badly: abrasive
 refines:
   - uc-quality-interaction-capability
 source_refs:

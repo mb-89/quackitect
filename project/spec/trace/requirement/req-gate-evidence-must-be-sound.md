@@ -5,6 +5,7 @@ statement: If a gate's evidence holds an unfilled field, an unfilled round, or a
 kind: functional
 verify_method: test
 breaks_if_removed: A person is asked to bless a form with holes in it, and their signature covers nothing.
+breaks_how_badly: fatal
 refines:
   - uc-adjudicate-a-gate
   - uc-land-work-on-trunk

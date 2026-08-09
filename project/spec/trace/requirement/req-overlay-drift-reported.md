@@ -5,6 +5,7 @@ statement: When the loaded engine no longer matches what the overlay or the vend
 kind: functional
 verify_method: test
 breaks_if_removed: An engine update silently swaps a builder's method back to the shipped one, and nobody sees it happen.
+breaks_how_badly: crippling
 refines:
   - uc-vendor-and-overlay
 source_refs:

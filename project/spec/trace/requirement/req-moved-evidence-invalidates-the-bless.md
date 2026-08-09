@@ -5,6 +5,7 @@ statement: When the evidence under a bless changes, the engine shall mark the de
 kind: functional
 verify_method: test
 breaks_if_removed: A bless outlives the thing it approved, and the record claims a review that never covered what now stands.
+breaks_how_badly: fatal
 refines:
   - uc-adjudicate-a-gate
 source_refs:

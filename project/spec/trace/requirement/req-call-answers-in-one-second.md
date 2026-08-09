@@ -6,6 +6,7 @@ kind: quality
 characteristic: performance-efficiency
 verify_method: test
 breaks_if_removed: The loop's rhythm dies, and drivers batch calls to dodge the lag.
+breaks_how_badly: corrosive
 refines:
   - uc-quality-performance-efficiency
 source_refs:

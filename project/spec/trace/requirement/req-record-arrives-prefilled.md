@@ -5,6 +5,7 @@ statement: When the person chooses a vehicle, the desk shall seed the record wit
 kind: functional
 verify_method: inspection
 breaks_if_removed: The person composes the record field by field and confirm-not-compose becomes a lie.
+breaks_how_badly: corrosive
 refines:
   - uc-get-work-routed
 source_refs:

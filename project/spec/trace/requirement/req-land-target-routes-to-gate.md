@@ -5,6 +5,7 @@ statement: When the person sets landing as the walk's target, the engine shall r
 kind: functional
 verify_method: test
 breaks_if_removed: Finished work has no routed road to trunk; landing becomes a git act outside the record.
+breaks_how_badly: crippling
 refines:
   - uc-land-work-on-trunk
 source_refs:

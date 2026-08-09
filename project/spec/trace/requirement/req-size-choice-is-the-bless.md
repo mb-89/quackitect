@@ -5,6 +5,7 @@ statement: When the person answers the change-size decision, the engine shall re
 kind: functional
 verify_method: test
 breaks_if_removed: A chosen size needs a second confirmation, or the proposal overrides the person.
+breaks_how_badly: crippling
 refines:
   - uc-open-an-iteration
 source_refs:

@@ -5,6 +5,7 @@ statement: When a state owes reading, the engine shall name and serve every owed
 kind: functional
 verify_method: test
 breaks_if_removed: The reader works out what it owes, and a skipped document is invisible until the work built on it fails.
+breaks_how_badly: crippling
 refines:
   - uc-be-handed-the-method
 source_refs:

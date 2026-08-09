@@ -5,6 +5,7 @@ statement: When a session first enters the desk, the desk shall greet the person
 kind: functional
 verify_method: demonstration
 breaks_if_removed: The newcomer faces a silent prompt with no notion of what can happen next.
+breaks_how_badly: corrosive
 refines:
   - uc-install-quackitect
 source_refs:

@@ -5,6 +5,7 @@ statement: When a test run names a scope, the engine shall run exactly that scop
 kind: functional
 verify_method: test
 breaks_if_removed: Tests run to reassure rather than to answer, and the battery's cost buys nothing.
+breaks_how_badly: corrosive
 refines:
   - uc-land-work-on-trunk
   - uc-let-the-system-catch-up

@@ -5,6 +5,7 @@ statement: While a vehicle runs the engine, the engine shall land zero writes in
 kind: quality
 verify_method: test
 breaks_if_removed: The private overlay leaks into the open engine, and the customer's reason to use the product dies.
+breaks_how_badly: fatal
 refines:
   - uc-quality-flexibility
 source_refs:

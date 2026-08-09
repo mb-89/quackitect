@@ -5,6 +5,7 @@ statement: If zero instances of a stop's kind exist, then the stop shall state t
 kind: functional
 verify_method: test
 breaks_if_removed: The tour invents records that do not exist; the newcomer's first lesson is a fabrication.
+breaks_how_badly: crippling
 refines:
   - uc-learn-the-machinery
 source_refs:

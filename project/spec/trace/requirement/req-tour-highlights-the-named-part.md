@@ -5,6 +5,7 @@ statement: While a tour stop names a part, the panel shall highlight that part.
 kind: interface
 verify_method: demonstration
 breaks_if_removed: The spoken name and the visible thing never connect; the newcomer cannot map words to parts.
+breaks_how_badly: corrosive
 refines:
   - uc-learn-the-machinery
 source_refs:

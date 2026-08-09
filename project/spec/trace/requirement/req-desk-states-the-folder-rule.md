@@ -5,6 +5,7 @@ statement: When asked to begin a product or asked for a product picker, the fron
 kind: functional
 verify_method: demonstration
 breaks_if_removed: The person hunts for a picker that does not exist and distrusts the folder model.
+breaks_how_badly: abrasive
 refines:
   - uc-begin-a-product
 source_refs:

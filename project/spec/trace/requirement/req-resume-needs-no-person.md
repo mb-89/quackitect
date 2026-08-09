@@ -6,6 +6,7 @@ kind: quality
 characteristic: interaction-capability
 verify_method: demonstration
 breaks_if_removed: Coming back costs a conversation with whoever was here last, and unattended work stops being safe to leave.
+breaks_how_badly: crippling
 refines:
   - uc-quality-interaction-capability
 source_refs:

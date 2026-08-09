@@ -5,6 +5,7 @@ statement: If an entered iteration declares a dependency on an iteration that ha
 kind: functional
 verify_method: test
 breaks_if_removed: An iteration builds on unshipped work and its baseline shifts under it.
+breaks_how_badly: crippling
 refines:
   - uc-open-an-iteration
 source_refs:

@@ -5,6 +5,7 @@ statement: The engine shall count every broken trace link as a defect and shall 
 kind: functional
 verify_method: test
 breaks_if_removed: The trace renders whole while pointing at nothing, which is worse than rendering a hole.
+breaks_how_badly: corrosive
 refines:
   - uc-trace-a-decision-to-its-origin
 source_refs:

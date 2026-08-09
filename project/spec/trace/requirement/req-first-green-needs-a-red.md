@@ -5,6 +5,7 @@ statement: If a test reaches its first green with no recorded red and no recorde
 kind: functional
 verify_method: test
 breaks_if_removed: A test that never failed proves nothing, and a fabricated pass enters the record as an answer.
+breaks_how_badly: crippling
 refines:
   - uc-answer-a-question-with-tests
 source_refs:

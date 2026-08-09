@@ -5,6 +5,7 @@ statement: While the notes inbox holds pending notes, the engine shall refuse th
 kind: functional
 verify_method: test
 breaks_if_removed: The kickoff starts over an undrained inbox; a noted ruling gets built around.
+breaks_how_badly: corrosive
 refines:
   - uc-open-an-iteration
 source_refs:

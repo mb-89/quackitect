@@ -5,6 +5,7 @@ statement: If reuse of another product's method is requested at begin, then the 
 kind: functional
 verify_method: test
 breaks_if_removed: Method files fork silently at scaffold time, with no declared dependency to reconcile later.
+breaks_how_badly: corrosive
 refines:
   - uc-begin-a-product
 source_refs:

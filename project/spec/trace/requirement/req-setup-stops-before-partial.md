@@ -5,6 +5,7 @@ statement: If a tool the setup needs is missing, then the script shall stop befo
 kind: functional
 verify_method: test
 breaks_if_removed: Setup dies part-way and leaves a half-installed machine with no named fix.
+breaks_how_badly: crippling
 refines:
   - uc-install-quackitect
 source_refs:

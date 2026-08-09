@@ -5,6 +5,7 @@ statement: When a drain is accepted, the engine shall remove the note from the p
 kind: functional
 verify_method: test
 breaks_if_removed: The inbox cannot reach zero honestly, or a drained judgment vanishes and is re-litigated.
+breaks_how_badly: corrosive
 refines:
   - uc-drain-the-inbox
 source_refs:

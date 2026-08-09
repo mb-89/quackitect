@@ -5,6 +5,7 @@ statement: When a person's direct question is answered, the engine shall record 
 kind: functional
 verify_method: test
 breaks_if_removed: The answer lives only in chat and a lost turn erases it.
+breaks_how_badly: crippling
 refines:
   - uc-research-and-record-an-answer
 source_refs:

@@ -5,6 +5,7 @@ statement: If the trunk and the record's tree have diverged on a compiled source
 kind: functional
 verify_method: test
 breaks_if_removed: A silent merge invents content neither tree holds, and the walk restarts on sources nobody wrote.
+breaks_how_badly: fatal
 refines:
   - uc-change-the-method-mid-walk
 source_refs:

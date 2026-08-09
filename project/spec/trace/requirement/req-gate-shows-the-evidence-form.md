@@ -5,6 +5,7 @@ statement: When a gate is offered for adjudication, the engine shall present the
 kind: functional
 verify_method: demonstration
 breaks_if_removed: The person adjudicates a paraphrase, and an assertion-shaped round passes for evidence.
+breaks_how_badly: crippling
 refines:
   - uc-adjudicate-a-gate
   - uc-land-work-on-trunk

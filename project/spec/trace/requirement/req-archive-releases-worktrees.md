@@ -5,6 +5,7 @@ statement: When a record archives, the engine shall remove every worktree bound 
 kind: functional
 verify_method: test
 breaks_if_removed: Stale worktrees survive the archive, and nobody can prove nothing unfinished survived the close.
+breaks_how_badly: corrosive
 refines:
   - uc-close-a-record
 source_refs:

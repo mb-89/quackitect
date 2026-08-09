@@ -5,6 +5,7 @@ statement: When a newly scaffolded product is opened for the first time, its fro
 kind: functional
 verify_method: test
 breaks_if_removed: A new product opens carrying another product's leftovers, and its record is polluted from birth.
+breaks_how_badly: crippling
 refines:
   - uc-begin-a-product
 source_refs:

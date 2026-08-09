@@ -5,6 +5,7 @@ statement: When a gate bless names a seeded output, the engine shall produce tha
 kind: functional
 verify_method: test
 breaks_if_removed: The seeded output becomes a step after the gate, forgotten when the walk moves on.
+breaks_how_badly: corrosive
 refines:
   - uc-adjudicate-a-gate
 source_refs:

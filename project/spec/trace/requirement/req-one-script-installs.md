@@ -5,6 +5,7 @@ statement: When the one setup script at the product root runs, the script shall 
 kind: functional
 verify_method: demonstration
 breaks_if_removed: Install becomes a manual multi-step ritual and the newcomer never reaches the desk.
+breaks_how_badly: crippling
 refines:
   - uc-install-quackitect
 source_refs:

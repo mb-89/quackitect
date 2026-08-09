@@ -5,6 +5,7 @@ statement: The archive shall list every closed record with its identifier and st
 kind: functional
 verify_method: test
 breaks_if_removed: A question about a finished decision has no door; closed records are findable only by digging through files.
+breaks_how_badly: corrosive
 refines:
   - uc-browse-the-archive
 source_refs:

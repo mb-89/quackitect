@@ -6,6 +6,7 @@ kind: quality
 characteristic: flexibility
 verify_method: demonstration
 breaks_if_removed: Install quality decays one manual step per release and nobody counts.
+breaks_how_badly: abrasive
 refines:
   - uc-quality-flexibility
 source_refs:

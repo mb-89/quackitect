@@ -1037,3 +1037,4 @@
 {"ts":"2026-08-09T10:37:41.815Z","op":"update","visit":"iterations/i1/write-requirements@1","node":"d22","brief":"merging trunk into the record so the committed grades arrive"}
 {"ts":"2026-08-09T10:37:54.735Z","op":"update","visit":"iterations/i1/write-requirements@1","node":"d23","brief":"reading the record's 297 uncommitted changes before committing any of them"}
 {"ts":"2026-08-09T10:43:35.583Z","op":"plan","visit":"iterations/i1/write-requirements@1","parent":null,"nodes":[{"id":"d24","brief":"commit the worktree's 297 changes on its own branch"},{"id":"d25","brief":"sync trunk into the record"},{"id":"d26","brief":"settle any conflicts"},{"id":"d27","brief":"submit write-requirements"},{"id":"d28","brief":"walk on to the candidates gate"}]}
+{"ts":"2026-08-09T10:51:56.379Z","op":"obsolete","visit":"front_desk@1","node":"d13","brief":"the grades came from trunk; none needed writing"}

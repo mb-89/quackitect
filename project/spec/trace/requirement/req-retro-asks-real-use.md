@@ -5,6 +5,7 @@ statement: When a retro opens, the engine shall ask what came back from real use
 kind: functional
 verify_method: demonstration
 breaks_if_removed: Feedback from real use evaporates and the retro judges notes without field evidence.
+breaks_how_badly: corrosive
 refines:
   - uc-drain-the-inbox
 source_refs:

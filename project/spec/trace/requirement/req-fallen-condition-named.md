@@ -5,6 +5,7 @@ statement: If a filled state's conditions no longer hold, then the panel shall s
 kind: functional
 verify_method: test
 breaks_if_removed: A state whose ground fell still shows met; the panel lies green.
+breaks_how_badly: crippling
 refines:
   - uc-resume-after-an-absence
 source_refs:

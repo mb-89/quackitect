@@ -5,6 +5,7 @@ statement: While the corpus is split across the trunk and an open record, the en
 kind: functional
 verify_method: test
 breaks_if_removed: An open record's half-made trace mixes with trunk truth; the reader cannot tell which world they read.
+breaks_how_badly: fatal
 refines:
   - uc-trace-a-decision-to-its-origin
 source_refs:

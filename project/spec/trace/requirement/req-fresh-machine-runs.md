@@ -5,6 +5,7 @@ statement: When a person sets up the product on a fresh machine, the engine shal
 kind: quality
 verify_method: demonstration
 breaks_if_removed: A colleague cannot run a clone, and the vehicle-owner audience is cut off.
+breaks_how_badly: crippling
 refines:
   - uc-quality-flexibility
 source_refs:

@@ -5,6 +5,7 @@ statement: If the engine's preferred port is taken, then the engine shall bind t
 kind: functional
 verify_method: test
 breaks_if_removed: A busy port kills the install on exactly the machines that already run other tools.
+breaks_how_badly: crippling
 refines:
   - uc-install-quackitect
 source_refs:

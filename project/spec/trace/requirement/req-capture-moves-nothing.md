@@ -5,6 +5,7 @@ statement: When a stray is captured, the engine shall leave the walk unchanged, 
 kind: functional
 verify_method: test
 breaks_if_removed: Capturing a finding abandons the state in hand — the exact failure the note lane exists to prevent.
+breaks_how_badly: crippling
 refines:
   - uc-capture-a-stray
   - uc-change-the-method-mid-walk

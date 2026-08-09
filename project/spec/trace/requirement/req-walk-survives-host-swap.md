@@ -5,6 +5,7 @@ statement: When the project is reopened under a different supported host, the en
 kind: quality
 verify_method: demonstration
 breaks_if_removed: Work is welded to one harness, and a host change strands mid-flight iterations.
+breaks_how_badly: crippling
 refines:
   - uc-quality-flexibility
 source_refs:

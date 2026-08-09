@@ -5,6 +5,7 @@ statement: While a record stands open, the engine shall accept landings without 
 kind: functional
 verify_method: test
 breaks_if_removed: Landings drag a close ritual behind them, so work is hoarded unlanded while records stay open.
+breaks_how_badly: corrosive
 refines:
   - uc-close-a-record
 source_refs:

@@ -5,6 +5,7 @@ statement: Where a comparative claim is recorded, the record shall carry evidenc
 kind: functional
 verify_method: inspection
 breaks_if_removed: A one-sided comparison reads as a finding and routes real work.
+breaks_how_badly: corrosive
 refines:
   - uc-research-and-record-an-answer
 source_refs:

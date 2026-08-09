@@ -5,6 +5,7 @@ statement: When the scaffold completes, the engine shall state that the new prod
 kind: functional
 verify_method: demonstration
 breaks_if_removed: The person waits in the old window for a hand-off that never comes.
+breaks_how_badly: abrasive
 refines:
   - uc-begin-a-product
 source_refs:

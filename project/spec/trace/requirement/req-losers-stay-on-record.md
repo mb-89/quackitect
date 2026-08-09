@@ -5,6 +5,7 @@ statement: The engine shall keep every unchosen option readable after the choice
 kind: functional
 verify_method: inspection
 breaks_if_removed: Dead options return as fresh ideas and are re-worked by whoever was not there when they lost.
+breaks_how_badly: corrosive
 refines:
   - uc-diverge-before-deciding
 source_refs:

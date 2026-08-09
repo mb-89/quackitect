@@ -5,6 +5,7 @@ statement: The recorded answer shall carry no claim that its kept sources do not
 kind: functional
 verify_method: inspection
 breaks_if_removed: Fabricated claims enter the record and route real work.
+breaks_how_badly: fatal
 refines:
   - uc-research-and-record-an-answer
 source_refs:

@@ -5,6 +5,7 @@ statement: When a note is drained, the engine shall accept the drain only with e
 kind: functional
 verify_method: test
 breaks_if_removed: Notes drain homeless or payloadless and the next retro re-reads and re-litigates every one.
+breaks_how_badly: corrosive
 refines:
   - uc-drain-the-inbox
   - uc-capture-a-stray

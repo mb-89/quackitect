@@ -5,6 +5,7 @@ statement: The engine shall advance the walk only on a driver's pull, with zero 
 kind: functional
 verify_method: test
 breaks_if_removed: Raising the dial wakes an absent agent, and the person's hand can race the walk.
+breaks_how_badly: crippling
 refines:
   - uc-set-the-autonomy
 source_refs:

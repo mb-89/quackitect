@@ -5,6 +5,7 @@ statement: Where the engine is vendored in a host repository, the engine shall r
 kind: functional
 verify_method: test
 breaks_if_removed: The vendored folder stops being replaceable whole, and an engine update starts destroying builder edits.
+breaks_how_badly: crippling
 refines:
   - uc-vendor-and-overlay
 source_refs:

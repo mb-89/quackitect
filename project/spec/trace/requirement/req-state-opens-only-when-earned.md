@@ -5,6 +5,7 @@ statement: The engine shall open a state only when every document it owes is cre
 kind: functional
 verify_method: test
 breaks_if_removed: Work begins on guidance nobody read and inputs nobody produced, which is the failure the whole walk exists to prevent.
+breaks_how_badly: fatal
 refines:
   - uc-be-handed-the-method
   - uc-take-a-step

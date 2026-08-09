@@ -5,6 +5,7 @@ statement: When the engine refuses a call, it shall answer with a typed refusal 
 kind: interface
 verify_method: test
 breaks_if_removed: A refusal becomes a dead end instead of a redirection, and the walk stalls on every wrong turn.
+breaks_how_badly: crippling
 refines:
   - uc-take-a-step
   - uc-quality-reliability

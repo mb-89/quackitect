@@ -5,6 +5,7 @@ statement: When work lands in a vehicle, the engine shall record the recommendat
 kind: functional
 verify_method: inspection
 breaks_if_removed: Nobody can later tell why this vehicle holds this work, and the choice is re-litigated.
+breaks_how_badly: abrasive
 refines:
   - uc-get-work-routed
 source_refs:

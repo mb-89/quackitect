@@ -5,6 +5,7 @@ statement: When an iteration opens, the engine shall place the walk's first stat
 kind: functional
 verify_method: test
 breaks_if_removed: Onboarding skips the retro; strays and lessons never reach disposition.
+breaks_how_badly: corrosive
 refines:
   - uc-open-an-iteration
 source_refs:

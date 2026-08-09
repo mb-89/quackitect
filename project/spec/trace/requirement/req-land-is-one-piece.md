@@ -5,6 +5,7 @@ statement: When the land gate is blessed, the engine shall merge the record's br
 kind: functional
 verify_method: test
 breaks_if_removed: A half-landed record leaves trunk in a state nobody chose and nobody can name.
+breaks_how_badly: crippling
 refines:
   - uc-land-work-on-trunk
 source_refs:

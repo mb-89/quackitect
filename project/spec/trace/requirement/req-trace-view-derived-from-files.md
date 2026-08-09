@@ -5,6 +5,7 @@ statement: The engine shall derive every trace view from the node files alone, w
 kind: functional
 verify_method: analysis
 breaks_if_removed: The screen shows a chain the files cannot back, and the view drifts from truth.
+breaks_how_badly: crippling
 refines:
   - uc-trace-a-decision-to-its-origin
 source_refs:

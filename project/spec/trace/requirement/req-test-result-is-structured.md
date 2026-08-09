@@ -5,6 +5,7 @@ statement: The engine shall report every test run as totals with each failure ca
 kind: functional
 verify_method: test
 breaks_if_removed: The verdict rides raw output through a truncating pipe, and the end that carries it is exactly what gets cut.
+breaks_how_badly: crippling
 refines:
   - uc-answer-a-question-with-tests
 source_refs:

@@ -5,6 +5,7 @@ statement: When the walk reaches the land gate, the engine shall run the full ba
 kind: functional
 verify_method: test
 breaks_if_removed: Red work reaches trunk behind a stale green verdict.
+breaks_how_badly: fatal
 refines:
   - uc-land-work-on-trunk
   - uc-let-the-system-catch-up

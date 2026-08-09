@@ -5,6 +5,7 @@ statement: When a first-time reader opens the entry documents unaided, the entry
 kind: quality
 verify_method: demonstration
 breaks_if_removed: Nobody measures orientation, and the entry documents rot unnoticed until the next cold read fails.
+breaks_how_badly: abrasive
 refines:
   - uc-quality-interaction-capability
 source_refs:

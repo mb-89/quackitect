@@ -5,6 +5,7 @@ statement: If the work is a single small fix while a record stands open, then th
 kind: functional
 verify_method: demonstration
 breaks_if_removed: Every small fix mints a record and record overhead swamps the work it holds.
+breaks_how_badly: corrosive
 refines:
   - uc-get-work-routed
 source_refs:

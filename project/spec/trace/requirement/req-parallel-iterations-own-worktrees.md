@@ -5,6 +5,7 @@ statement: Where two planned iterations have no unmet dependencies, the engine s
 kind: functional
 verify_method: demonstration
 breaks_if_removed: Two ready streams queue behind each other for no reason.
+breaks_how_badly: abrasive
 refines:
   - uc-open-an-iteration
 source_refs:

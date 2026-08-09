@@ -5,6 +5,7 @@ statement: When the person rules that no option qualifies, the engine shall reco
 kind: functional
 verify_method: test
 breaks_if_removed: A forced pick beats an honest none, and a bad option wins because the form demanded a winner.
+breaks_how_badly: corrosive
 refines:
   - uc-diverge-before-deciding
 source_refs:

@@ -5,6 +5,7 @@ statement: The engine shall show every undrained note in the inbox count and the
 kind: functional
 verify_method: test
 breaks_if_removed: Captured findings vanish from sight, and the inbox becomes a write-only hole.
+breaks_how_badly: crippling
 refines:
   - uc-capture-a-stray
 source_refs:
