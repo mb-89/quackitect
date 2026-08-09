@@ -1,6 +1,7 @@
 ---
 id: fn-run-a-governed-walk.hold-a-stray
 type: "[[function]]"
+cluster: the-holding-pen
 statement: take a stray thought out of the walk's way and give it back later with exactly one home
 satisfies:
   - req-stray-captured-in-one-call

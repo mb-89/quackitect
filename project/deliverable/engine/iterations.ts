@@ -323,29 +323,24 @@ export function generateSeeded(_root: string, it: Iteration, machineId: string, 
       tags: [`realization-${c.realization}`],
       edges: [
         ...chunks.filter((o) => o.depends_on.includes(c.id)).map((o) => ({ to: o.id, role: "normal" as const })),
-        ...(dependents.has(c.id) ? [] : [{ to: "all-built", role: "normal" as const }]),
+        ...(dependents.has(c.id) ? [] : [{ to: "end", role: "normal" as const }]),
       ],
     });
   }
-  // The JOIN: a build is done when EVERY leaf chunk is — plain fan-in
-  // would be an OR, and one finished chunk is not a finished build.
-  states.push({
-    id: "all-built",
-    kind: "join",
-    // THE BAR IS THE FIELD, NOT THE KIND (owner ruling 2026-08-08). The kind
-    // stays as drawing vocabulary; this is what the kernel reads.
-    busbar: true,
-    statement: "",
-    guidance: "Every chunk is built — the join releases the walk.",
-    evidence_form: [],
-    priority: 0.01,
-    edges: [{ to: "end", role: "normal" }],
-  });
+  // THE BAR SITS ON THE END, AND THERE IS NO JOIN PILL (owner ruling
+  // 2026-08-09). A build is done when EVERY leaf step is, so plain fan-in
+  // would be an OR — but the bar is a FIELD, not a state, so the end pill
+  // carries it directly.
+  //
+  // THE SEPARATE JOIN WAS CEREMONY. It held no evidence, asked nothing and
+  // did no work; it merged, which the bar already does. A pill a reader
+  // cannot act on is a pill that teaches them to click past pills.
   states.push({
     id: "end",
     kind: "end",
+    busbar: true,
     statement: "",
-    guidance: "The chunk machine is complete — pull once more to return to the walk.",
+    guidance: "Every step is done — the machine is complete here. Pull once more to return to the walk.",
     evidence_form: [],
     priority: 0.01,
     edges: [],

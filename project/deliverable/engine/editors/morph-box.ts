@@ -42,8 +42,19 @@ export const MORPH_BOX_EDITOR: EditorKind = {
     if (box.rows.length === 0) {
       return '<div class="sfempty" style="color:var(--se-muted);font-style:italic;padding:6px 0;">No clusters yet, so there is no chart to draw on. partition-functions names the rows, and the seven finders fill the cells.</div>';
     }
-    const cel = "padding:5px 8px;border-top:1px solid var(--se-border);vertical-align:top;font-size:12.5px;min-width:120px;";
-    const hed = "padding:5px 8px;text-align:left;font-weight:normal;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--se-muted);white-space:nowrap;vertical-align:top;";
+    // EVERY COLUMN WRAPS, AND THE ROW HEADER WRAPS TOO (owner, 2026-08-09).
+    // The header carried white-space:nowrap, so a cluster name held the whole
+    // chart open and pushed the cells off the side. A chart nobody can see
+    // across is a chart nobody draws on.
+    const cel = "padding:5px 8px;border-top:1px solid var(--se-border);vertical-align:top;font-size:12.5px;min-width:140px;max-width:240px;white-space:normal;overflow-wrap:anywhere;";
+    // A MIN-WIDTH IS WHAT MAKES IT WRAP (owner, 2026-08-09). Wrapping alone
+    // let the table squeeze the header to one character per line, because
+    // overflow-wrap:anywhere permits a break between any two letters. The
+    // floor gives the column a width to wrap INSIDE.
+    const hed = "padding:5px 8px;text-align:left;font-weight:normal;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--se-muted);vertical-align:top;white-space:normal;overflow-wrap:break-word;min-width:150px;max-width:200px;";
+    // THE CONTROLS WEAR THE THEME, never the browser's default (ux.md). A bare
+    // button renders white on a dark panel, which is what the owner saw.
+    const btn = "background:transparent;border:1px solid var(--se-border);border-radius:3px;color:var(--se-muted);font:inherit;font-size:11px;line-height:1.4;padding:0 6px;cursor:pointer;";
     const rowHtml = function (r) {
       const cells = r.cells.map(function (c) {
         const struck = c.pruned !== "" ? "text-decoration:line-through;color:var(--se-muted);" : "";
@@ -51,10 +62,18 @@ export const MORPH_BOX_EDITOR: EditorKind = {
         // THE SLOTS ARE FILLED BY THE CLIENT, never here. The count follows the
         // number of lines, which changes as a person draws, so rendering them
         // server-side would put two sources in charge of one thing.
+        // EVERY CELL IS AN OPTION, SO EVERY CELL LINKS TO ITS NOTE (owner,
+        // 2026-08-09). It opens in the EDITOR rather than the details pane,
+        // because the pane is already holding the matrix you are reading.
+        const p = paths ? paths[c.id] : null;
+        const idLink = p
+          ? '<a class="doclink" data-path="' + escText(p) + '" title="open ' + escText(p) + ' in the editor" style="color:var(--se-accent);font-size:10.5px;cursor:pointer;">' + escText(c.id) + "</a>"
+          : '<span style="font-size:10.5px;color:var(--se-muted);">' + escText(c.id) + "</span>";
         return '<td class="sfmbcell" style="' + cel + 'cursor:pointer;" data-opt="' + escText(c.id) + '" data-row="' + escText(r.id) + '" data-pruned="' + (c.pruned !== "" ? "1" : "") + '" title="' + escText(why) + '">' +
+          '<div class="sfmbid" style="padding-bottom:2px;">' + idLink + "</div>" +
           '<div class="sfmbtext" style="' + struck + '">' + escText(c.label) + "</div>" +
           '<div class="sfmbdots" style="display:flex;flex-wrap:wrap;gap:3px;padding-top:4px;min-height:9px;"></div>' +
-          '<button type="button" class="sfmbprune" title="prune this option out of the chart" style="display:none;">prune</button>' +
+          '<button type="button" class="sfmbprune" title="prune this option out of the chart" style="' + btn + 'display:none;margin-top:4px;">prune</button>' +
           "</td>";
       }).join("");
       const empty = r.cells.length === 0 ? '<td style="' + cel + 'color:var(--se-muted);font-style:italic;">nobody found an option for this cluster</td>' : "";
@@ -74,16 +93,28 @@ export const MORPH_BOX_EDITOR: EditorKind = {
       return '<div class="sfrow sfmbline" data-cand="' + escText(l.id) + '" data-picks="' + escText(l.picks.join(" ")) + '">' +
         '<span class="sfmbswatch" style="flex:0 0 auto;width:10px;height:10px;border-radius:2px;display:inline-block;"></span>' +
         open +
-        '<input class="sfmbname" style="' + bx + 'flex:0 0 160px;font-weight:600;" value="' + escText(l.name) + '" placeholder="name it">' +
-        '<input class="sfmbwhat" style="' + bx + 'flex:1 1 auto;" value="' + escText(l.statement) + '" placeholder="what this whole architecture is, in one line">' +
+        '<input class="sfmbname" style="' + bx + 'flex:0 0 160px;font-weight:600;font-size:12.5px;" value="' + escText(l.name) + '" placeholder="name it">' +
+        '<input class="sfmbwhat" style="' + bx + 'flex:1 1 auto;font-size:12.5px;" value="' + escText(l.statement) + '" placeholder="what this whole architecture is, in one line">' +
         '<span class="sfmbwarn" style="font-size:11px;color:var(--se-muted);"></span>' +
-        '<button type="button" class="sfmbdel" title="remove this candidate and its line">−</button>' +
+        '<button type="button" class="sfmbdel" title="remove this candidate and its line" style="' + btn + '">−</button>' +
         "</div>";
     };
     const rowCount = box.rows.filter(function (r) { return r.id !== ""; }).length;
-    const list = '<div class="sfmblines" data-field="' + escText(name) + '" data-rows="' + rowCount + '">' + box.lines.map(lineRow).join("") + "</div>";
+    // THE SAVED SNAPSHOT IS WHAT REVERT GOES BACK TO, never the previous step.
+    // Drawing a line is several clicks and deleting one is a single press, so
+    // a person needs somewhere to return to that is not one click back.
+    const U1 = String.fromCharCode(1);
+    const U2 = String.fromCharCode(2);
+    const pristine = box.lines.map(function (l) {
+      return [l.id, l.name, l.statement, l.picks.join(" ")].join(U1);
+    }).join(U2);
+    const list = '<div class="sfmblines" data-field="' + escText(name) + '" data-rows="' + rowCount + '" data-pristine="' + escText(pristine) + '">' + box.lines.map(lineRow).join("") + "</div>";
+    const bar = '<div class="sfmbbar" style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:11px;color:var(--se-muted);">' +
+      '<button type="button" class="sfmbsave sfact save" title="write these changes to the form">save</button>' +
+      '<button type="button" class="sfmbrevert sfact revert" title="throw the changes away and go back to the last save">revert</button>' +
+      '<span class="sfmbdirty"></span></div>';
     const how = '<div class="sfmbhow" style="color:var(--se-muted);font-size:11px;padding:6px 0;">Hold shift and click one cell per row to draw a candidate. Release shift to keep it, escape to abandon it. Drag a dot to move that waypoint within its row.</div>';
-    return grid + how + list;
+    return grid + how + bar + list;
   `,
   collect: `
   // ONE ROW PER LINE, in the order they are drawn — and that order is the
@@ -145,7 +176,27 @@ export const MORPH_BOX_EDITOR: EditorKind = {
   }
   let sfmbDraft = null;
   let sfmbDrag = null;
+  const sfmbU1 = String.fromCharCode(1);
+  const sfmbU2 = String.fromCharCode(2);
   function sfmbLines() { return [].slice.call(document.querySelectorAll(".sfmbline")); }
+  // ONE PLACE BUILDS A LINE ROW. Drawing one and reverting to one produce the
+  // same element, so the two cannot drift into different markup.
+  function sfmbRowEl(cand, nm, what, picks) {
+    const el = document.createElement("div");
+    el.className = "sfrow sfmbline";
+    el.dataset.cand = cand;
+    el.dataset.picks = picks;
+    const bx = "background:transparent;border:0;outline:none;font:inherit;color:var(--se-fg);padding:0;";
+    const btn = "background:transparent;border:1px solid var(--se-border);border-radius:3px;color:var(--se-muted);font:inherit;font-size:11px;line-height:1.4;padding:0 6px;cursor:pointer;";
+    const esc = function (s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); };
+    el.innerHTML = '<span class="sfmbswatch" style="flex:0 0 auto;width:10px;height:10px;border-radius:2px;display:inline-block;"></span>' +
+      '<span style="flex:0 0 auto;font-size:11px;color:var(--se-muted);" title="the note is written when the form is saved">' + esc(cand) + "</span>" +
+      '<input class="sfmbname" style="' + bx + 'flex:0 0 160px;font-weight:600;font-size:12.5px;" value="' + esc(nm) + '" placeholder="name it">' +
+      '<input class="sfmbwhat" style="' + bx + 'flex:1 1 auto;font-size:12.5px;" value="' + esc(what) + '" placeholder="what this whole architecture is, in one line">' +
+      '<span class="sfmbwarn" style="font-size:11px;color:var(--se-muted);"></span>' +
+      '<button type="button" class="sfmbdel" title="remove this candidate and its line" style="' + btn + '">−</button>';
+    return el;
+  }
   function sfmbPicks(row) { return (row.dataset.picks || "").split(" ").filter(Boolean); }
   // EVERY CELL HOLDS ONE SLOT PER LINE, plus one for whatever is being drawn.
   // The slot index IS the line's index, so a candidate's dot sits in the same
@@ -213,6 +264,21 @@ export const MORPH_BOX_EDITOR: EditorKind = {
       if (warn) warn.textContent = left > 0 ? "unfinished — " + left + " row" + (left === 1 ? "" : "s") + " to go" : "";
       row.dataset.complete = left > 0 ? "" : "1";
     });
+    // UNSAVED CHANGES SAY SO, measured against the SAVED snapshot. Somebody
+    // who drew a line and deleted it again has changed nothing, and should
+    // not be told otherwise.
+    const list = document.querySelector(".sfmblines");
+    const flag = document.querySelector(".sfmbdirty");
+    if (list && flag) {
+      const now = rows.map(function (row) {
+        const nm = row.querySelector(".sfmbname");
+        const wt = row.querySelector(".sfmbwhat");
+        return [row.dataset.cand, nm ? nm.value : "", wt ? wt.value : "", row.dataset.picks || ""].join(sfmbU1);
+      }).join(sfmbU2);
+      const dirty = now !== (list.dataset.pristine || "");
+      flag.textContent = dirty ? "unsaved changes" : "";
+      flag.style.color = dirty ? "var(--se-accent)" : "";
+    }
     document.querySelectorAll(".sfmbwrap").forEach(function (wrap) {
       const svg = wrap.querySelector(".sfmbsvg");
       const tbl = wrap.querySelector("table.sfmb");
@@ -312,17 +378,8 @@ export const MORPH_BOX_EDITOR: EditorKind = {
     sfmbDraft = null;
     const list = document.querySelector(".sfmblines");
     if (picks.length === 0 || !list) { sfmbDraw(); return; }
-    const el = document.createElement("div");
-    el.className = "sfrow sfmbline";
-    el.dataset.cand = "cand-" + (list.querySelectorAll(".sfmbline").length + 1) + "-" + picks[0].replace(/^opt-/, "");
-    el.dataset.picks = picks.join(" ");
-    const bx = "background:transparent;border:0;outline:none;font:inherit;color:var(--se-fg);padding:0;";
-    el.innerHTML = '<span class="sfmbswatch" style="flex:0 0 auto;width:10px;height:10px;border-radius:2px;display:inline-block;"></span>' +
-      '<span style="flex:0 0 auto;font-size:11px;color:var(--se-muted);" title="the note is written when the form is saved">' + el.dataset.cand + "</span>" +
-      '<input class="sfmbname" style="' + bx + 'flex:0 0 160px;font-weight:600;" placeholder="name it">' +
-      '<input class="sfmbwhat" style="' + bx + 'flex:1 1 auto;" placeholder="what this whole architecture is, in one line">' +
-      '<span class="sfmbwarn" style="font-size:11px;color:var(--se-muted);"></span>' +
-      '<button type="button" class="sfmbdel" title="remove this candidate and its line">−</button>';
+    const id = "cand-" + (list.querySelectorAll(".sfmbline").length + 1) + "-" + picks[0].replace(/^opt-/, "");
+    const el = sfmbRowEl(id, "", "", picks.join(" "));
     list.appendChild(el);
     const nm = el.querySelector(".sfmbname");
     if (nm) nm.focus();
@@ -330,6 +387,31 @@ export const MORPH_BOX_EDITOR: EditorKind = {
   });
   document.addEventListener("keydown", function (ev) {
     if (ev.key === "Escape" && sfmbDraft !== null) { sfmbDraft = null; sfmbDraw(); }
+  });
+  // SAVE IS THE FORM'S OWN SAVE, pressed from here. A second save that wrote
+  // by another path would be a second way for the form to land, and the two
+  // would drift.
+  document.addEventListener("click", function (ev) {
+    const s = ev.target.closest ? ev.target.closest(".sfmbsave") : null;
+    if (!s) return;
+    const real = document.querySelector(".saveform");
+    if (real) real.click();
+  });
+  // REVERT PUTS THE LINES BACK TO THE LAST SAVE. Drawing a line is several
+  // clicks and deleting one is a single press, so one step back is not what a
+  // person wants when they change their mind.
+  document.addEventListener("click", function (ev) {
+    const r = ev.target.closest ? ev.target.closest(".sfmbrevert") : null;
+    if (!r) return;
+    const list = document.querySelector(".sfmblines");
+    if (!list) return;
+    list.innerHTML = "";
+    (list.dataset.pristine || "").split(sfmbU2).filter(Boolean).forEach(function (line) {
+      const p = line.split(sfmbU1);
+      list.appendChild(sfmbRowEl(p[0] || "", p[1] || "", p[2] || "", p[3] || ""));
+    });
+    sfmbDraft = null;
+    sfmbDraw();
   });
   document.addEventListener("input", function (ev) {
     if (ev.target.closest && ev.target.closest(".sfmbname")) sfmbDraw();

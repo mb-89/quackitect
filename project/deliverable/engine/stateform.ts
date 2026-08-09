@@ -569,7 +569,19 @@ function refProblems(name: string, meta: TemplateMeta, args: FieldArgs, content:
   // A CARD ANSWERS IN ROWS, NOT IN A LIST. Reading it with the list rule
   // found nothing, so the field refused as empty while its own line check
   // passed — no content could satisfy both (owner report 2026-08-08).
-  const refs = meta.editor === "compare-card" ? refsInRows(content) : refsIn(content);
+  //
+  // NOW FIXED BY SHAPE RATHER THAN BY NAME (2026-08-09). Naming compare-card
+  // fixed the one card somebody had walked. `dsm` has the identical shape and
+  // was missed, so partition-functions could not be satisfied by ANY content:
+  // bullets passed the reference check and failed the row check, rows did the
+  // reverse. A template whose line grammar anchors on a leading pipe stores a
+  // TABLE, and every one of them reads rows.
+  const answersInRows = meta.editor === "compare-card" || /^\^\\\|/.test(meta.line_pattern);
+  // A FIELD THAT WRITES A KEY PUTS THAT KEY'S VALUE IN THE LATER CELLS. So a
+  // dsm row is one element and its cluster, where a card's row is two items
+  // and a verdict. `writes` is the tell, and a written value is not an
+  // artifact to resolve.
+  const refs = answersInRows ? refsInRows(content, args.writes === "" ? 2 : 1) : refsIn(content);
   if (refs.length === 0) {
     return /^\s*-\s*none\b/im.test(content) ? [] : [`${name}: no references — one artifact id per line, or one line saying none`];
   }
@@ -648,6 +660,83 @@ function nodeTableProblems(name: string, args: FieldArgs, content: string): stri
   return missing.length > 0 ? [`${name}: unanswered — ${missing.join(" · ")}`] : [];
 }
 
+/** Which cluster each option serves, read once for the whole chart. */
+function optionClusters(corpus: TraceNode[]): Map<string, string> {
+  const out = new Map<string, string>();
+  for (const n of corpus) {
+    if (n.type !== "option" || n.file === undefined) continue;
+    out.set(n.id, bare(nodeField(n.file, "cluster")));
+  }
+  return out;
+}
+
+/** A CHART NEEDS CANDIDATES DRAWN ACROSS IT, and two is the floor.
+ *
+ *  AND EVERY LINE VISITS EVERY CLUSTER (owner, 2026-08-09). A cluster is a
+ *  job the system has to do, so a line that skips one has not said how that
+ *  job gets done — the item card calls that not-yet-a-candidate, and the
+ *  editor already draws it dashed.
+ *
+ *  THE CHECK USED TO COUNT ROWS AND STOP. Five unfinished lines counted as
+ *  five candidates, the state went green, and the walk carried on past a
+ *  chart with no waypoints on it at all. */
+function chartProblems(name: string, content: string, corpus?: TraceNode[]): string[] {
+  const rows = content.split("\n").filter((l) => /^\s*\|/.test(l) && l.includes("[["));
+  if (rows.length < 2) {
+    return [
+      `${name}: ${rows.length} candidate${rows.length === 1 ? "" : "s"} drawn — a chart needs at least two, because one combination is not a choice`,
+    ];
+  }
+  if (corpus === undefined) return [];
+  const clusters = corpus.filter((n) => n.type === "cluster").map((n) => n.id);
+  if (clusters.length === 0) return [];
+  const serves = optionClusters(corpus);
+  const unfinished: string[] = [];
+  for (const line of rows) {
+    const cells = line
+      .trim()
+      .replace(/^\|/, "")
+      .replace(/\|$/, "")
+      .split("|")
+      .map((c) => c.trim());
+    const id = bare(cells[0] ?? "");
+    if (!id.startsWith("cand-")) continue;
+    const visited = new Set(
+      (cells[3] ?? "")
+        .split(/[·,]/)
+        .map((p) => serves.get(bare(p)))
+        .filter((c): c is string => c !== undefined && c !== ""),
+    );
+    const left = clusters.filter((c) => !visited.has(c));
+    if (left.length > 0) unfinished.push(`${id} misses ${left.join(", ")}`);
+  }
+  if (unfinished.length === 0) return [];
+  return [`${name}: a line that skips a cluster is not a candidate — one option per cluster · ${unfinished.join(" · ")}`];
+}
+
+/** THE TABLE'S OWN SHAPE — a header, a rule, and rows of the right width.
+ *
+ *  Lifted out of fieldProblems so that function stays under the complexity
+ *  bar; the logic is unchanged from where it stood. */
+function tableProblems(name: string, args: FieldArgs, content: string): string[] {
+  const rows = content
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l.startsWith("|") && l.endsWith("|"));
+  const isRule = (l: string): boolean => /^\|(\s*:?-+:?\s*\|)+$/.test(l);
+  const data = rows.slice(1).filter((l) => !isRule(l));
+  const want = args.columns.length;
+  // THE COLUMN HELP RIDES THE REFUSAL. A header of single words leaves the
+  // filler guessing, and the cell count cannot catch a guess — so the message
+  // says what each column wants rather than only naming it.
+  const spec = args.columns.map((c, i) => (args.column_help[i] ? `${c} (${args.column_help[i]})` : c)).join(" | ");
+  if (rows.length === 0 || data.length === 0) {
+    return [`${name}: a markdown table with columns — ${spec} — and at least one data row, or one line saying none`];
+  }
+  if (data.some((l) => l.split("|").length - 2 !== want)) return [`${name}: every row carries ${want} cells — ${spec}`];
+  return [];
+}
+
 export function fieldProblems(
   name: string,
   meta: TemplateMeta,
@@ -687,21 +776,33 @@ export function fieldProblems(
     const missing = args.items.filter((i) => !new RegExp(`^- ${escapeRe(i)}: .+`, "m").test(content));
     if (missing.length > 0) out.push(`${name}: unanswered — ${missing.join(" · ")}`);
   }
-  if (meta.editor === "table" && args.columns.length > 0) {
-    const rows = content
-      .split("\n")
-      .map((l) => l.trim())
-      .filter((l) => l.startsWith("|") && l.endsWith("|"));
-    const isRule = (l: string): boolean => /^\|(\s*:?-+:?\s*\|)+$/.test(l);
-    const data = rows.slice(1).filter((l) => !isRule(l));
-    const want = args.columns.length;
-    // THE COLUMN HELP RIDES THE REFUSAL. A header of single words leaves the
-    // filler guessing, and the cell count cannot catch a guess — so the
-    // message says what each column wants rather than only naming it.
-    const spec = args.columns.map((c, i) => (args.column_help[i] ? `${c} (${args.column_help[i]})` : c)).join(" | ");
-    if (rows.length === 0 || data.length === 0) out.push(`${name}: a markdown table with columns — ${spec} — and at least one data row`);
-    else if (data.some((l) => l.split("|").length - 2 !== want)) out.push(`${name}: every row carries ${want} cells — ${spec}`);
-  }
+  // AN EMPTY SET IS A CLAIM, AND IT IS WRITTEN (2026-08-09). The refs template
+  // already rules this — "one line saying none" is a legal answer — because a
+  // blank field and a field that honestly found nothing look identical
+  // afterwards. A shaped field had no such door, so a state with nothing to
+  // tabulate could only be passed by inventing a row.
+  //
+  // FOUND AT evaluate-set. i1 composes no candidates by construction — its
+  // candidates drawing says `none` — so the score table has no rows, and the
+  // only way past the check was a fabricated score. The whole method exists to
+  // stop exactly that.
+  //
+  // IT MUST OPEN THE SHAPE CHECK TOO. A `none` that satisfies the table and
+  // then fails the line grammar is the same unsatisfiable pair by another
+  // route, which this file has now hit five times.
+  // A CHART WITH NOTHING DRAWN ACROSS IT IS NOT A CHART (owner ruling
+  // 2026-08-09). The state's own guidance already says two is the floor,
+  // because one combination is not a choice — and this runs BEFORE the `none`
+  // door on purpose. An enumerated space nobody has combined is unfinished,
+  // never empty, so `none` may not buy its way past it.
+  //
+  // It reached gate-candidates with zero candidates drawn and the only
+  // complaint was "no references", which reads like a formatting slip rather
+  // than the missing work it was.
+  if (meta.editor === "morph-box") return chartProblems(name, content, corpus);
+  const saysNone = /^-?\s*none\b/i.test(content.trim());
+  if (saysNone) return out;
+  if (meta.editor === "table" && args.columns.length > 0) out.push(...tableProblems(name, args, content));
   if (meta.line_pattern !== "") {
     const re = new RegExp(meta.line_pattern);
     const bad = content.split("\n").find((l) => l.trim() !== "" && !re.test(l.trim()));

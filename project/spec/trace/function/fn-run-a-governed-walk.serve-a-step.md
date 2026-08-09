@@ -1,6 +1,7 @@
 ---
 id: fn-run-a-governed-walk.serve-a-step
 type: "[[function]]"
+cluster: the-walk
 statement: hand the driver one instruction carrying everything that step needs
 satisfies:
   - req-pull-answers-from-record

@@ -1,6 +1,7 @@
 ---
 id: fn-run-a-governed-walk.route-the-work
 type: "[[function]]"
+cluster: the-record-life
 statement: turn a sentence about wanted work into the right vehicle to hold it
 satisfies:
   - req-desk-takes-plain-words

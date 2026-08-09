@@ -1,6 +1,7 @@
 ---
 id: fn-run-a-governed-walk.keep-the-archive
 type: "[[function]]"
+cluster: the-record-life
 statement: keep every closed record readable exactly as it stood, and unchangeable
 satisfies:
   - req-archive-lists-every-closed-record

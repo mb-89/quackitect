@@ -58,10 +58,17 @@ export const NODE_TABLE_EDITOR: EditorKind = {
     // next render, and nothing would report the loss.
     const chooser = function (c, id, v, dim) {
       const offer = picks[c] || [];
+      // A DROPDOWN WEARS THE THEME, INCLUDING ITS LIST (owner, 2026-08-09). A
+      // transparent select looks right closed and opens an OS-default list:
+      // white on a dark panel, which is the one thing ux.md forbids.
+      //
+      // THE OPTIONS ARE PAINTED BY THE STYLESHEET, not here. Forty inline
+      // styles would say the same thing forty times, and the markup is what
+      // the script tests read.
       const hint = offer.length === 0 ? '<option value="" disabled>— no ' + escText(waitingFor(c)) + " yet —</option>" : '<option value=""></option>';
       const opts = offer.map(function (o) { return '<option value="' + escText(o) + '"' + (o === v ? " selected" : "") + ">" + escText(o) + "</option>"; }).join("");
       const stray = v !== "" && offer.indexOf(v) < 0 ? '<option value="' + escText(v) + '" selected>' + escText(v) + " — no longer offered</option>" : "";
-      return '<select class="sfnt sfpick" style="' + box + dim + 'cursor:pointer;" data-field="' + name + '" data-item="' + escText(id) + '" data-col="' + escText(c) + '">' + hint + opts + stray + "</select>";
+      return '<select class="sfnt sfpick" style="' + box + dim + 'cursor:pointer;background:var(--se-raised);border:1px solid var(--se-border);border-radius:3px;padding:1px 4px;" data-field="' + name + '" data-item="' + escText(id) + '" data-col="' + escText(c) + '">' + hint + opts + stray + "</select>";
     };
     const rowHtml = function (id) {
       const p = paths ? paths[id] : null;

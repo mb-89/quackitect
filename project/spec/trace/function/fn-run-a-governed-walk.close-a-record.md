@@ -1,6 +1,7 @@
 ---
 id: fn-run-a-governed-walk.close-a-record
 type: "[[function]]"
+cluster: the-record-life
 statement: end a record by ruling on everything it produced, leaving nothing loose
 satisfies:
   - req-close-refuses-loose-ends

@@ -1,6 +1,7 @@
 ---
 id: fn-run-a-governed-walk.hold-the-method
 type: "[[function]]"
+cluster: the-walk
 statement: compile the authored method into the machine the walk runs on, and keep the two in agreement
 satisfies:
   - req-reachable-capability-is-traced

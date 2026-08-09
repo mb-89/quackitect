@@ -78,20 +78,41 @@ can be fatal — genuinely load-bearing and genuinely not scheduled yet.
 
 ## WHAT M4 DOES WITH IT
 
-The criteria ordering starts from damage, worst first.
+IT IS THE SORT KEY AT cut-criteria, worst first (owner ruling 2026-08-09). Not
+a hint for something else to improve on — the order itself.
 
-That is a HINT ORDER, not the answer. The pairwise walk still settles the
-order, and it still lets a person overrule any pair. What changes is where it
-starts from.
+THE SORT IS THEREFORE MECHANICAL, and that is the property worth protecting.
+Nobody types the order, so nobody can aim it.
 
-Two things fall out, and the second is the one that was hurting:
+IT STAYS BLIND EVEN THOUGH IT RUNS LATE. The sort happens at cut-criteria,
+where the candidates already exist, and that would normally break the guard
+that weights are fixed before the options are known. It does not break here,
+because the KEY is authored at M3 on the requirement itself. A person who
+wanted a favourite axis to rise would have to re-grade what breaks without it,
+in the register, against the strike test, where anybody can check it.
 
-- FEWER QUESTIONS. The walk is cheapest when the hint is close to right,
-  because every item then lands where it was predicted and costs one question.
-- A SANE STARTING POINT. Ordered from nothing, a response-time requirement
-  came out above the foundations of the system (owner report 2026-08-08). No
-  amount of pairwise comparison discovers that it should not be there, because
-  the comparison never reads what breaks.
+THE SORT IS TWO STEPS, AND THIS IS THE FIRST (owner ruling 2026-08-09). The
+grade roughs the order out. Then somebody CHECKS it and pushes rows up or down
+where it came out wrong.
+
+THE AGENT MAKES THAT CHECK EXACTLY AS A PERSON DOES. Same arrows, same
+rationale, same refusal without one. A move is not a person-only act.
+
+WHERE THE JUDGMENT ACTUALLY LANDS. Five levels over a large pool leaves dozens
+of rows tied inside one band, and the machine has nothing to say about a tie.
+That is what the check is for, and it is cheap because a row only ever argues
+with its neighbours.
+
+WHY IT WAS SPECIFIED THIS WAY. Ordered from nothing, a response-time
+requirement came out above the foundations of the system (owner report
+2026-08-08). It was still there on 2026-08-09, ranked first of seventy-two
+while graded corrosive — third of five — because a stored order from an
+earlier pass overrode the computed one. Two lessons, and both are load-bearing.
+
+- A COMPARISON THAT NEVER READS WHAT BREAKS CANNOT DISCOVER THIS. So the
+  damage grade leads rather than advises.
+- A STORED ORDER MUST NOT SILENTLY BEAT THE COMPUTED ONE. Only a recorded move
+  overrides the sort.
 
 ## Sources
 

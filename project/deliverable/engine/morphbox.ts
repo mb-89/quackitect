@@ -49,12 +49,19 @@ export interface MorphBox {
   lines: MorphLine[];
 }
 
-/** A wiki link, a path or a bare id all name one node. */
+/** A wiki link, a path or a bare id all name one node.
+ *
+ *  THE YAML QUOTES COME OFF FIRST (owner, 2026-08-09). A block list writes
+ *  its items quoted, so a pick reads back as the seven characters "[[opt-a]]"
+ *  WITH the quotes. The bracket strip then matches nothing, the id keeps its
+ *  quotes, and it equals no cell on the chart — so every line drew with zero
+ *  waypoints and reported itself unfinished. */
 export function bare(v: string): string {
-  const t = v.trim().replace(/^\[\[/, "").replace(/\]\]$/, "").trim();
+  const unquoted = v.trim().replace(/^["']/, "").replace(/["']$/, "");
+  const t = unquoted.trim().replace(/^\[\[/, "").replace(/\]\]$/, "").trim();
   const target = (t.split("|")[0] ?? "").trim();
   const last = target.replace(/\\/g, "/").split("/").filter(Boolean).pop() ?? "";
-  return last.replace(/\.md$/i, "").trim();
+  return last.replace(/\.md$/i, "").replace(/["']$/, "").trim();
 }
 
 /** The candidate ids named in a stored table, in file order.

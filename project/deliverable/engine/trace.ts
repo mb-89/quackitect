@@ -848,9 +848,18 @@ export function looksLikeId(id: string): boolean {
 export function refsIn(text: string): string[] {
   const out: string[] = [];
   for (const line of text.split(/\r?\n/)) {
-    const m = line.match(/^\s*-\s*(.+?)\s*$/);
+    // A LIST LINE IS DASH-LED OR NUMBERED (2026-08-09). The rank-cut template
+    // numbers its rows, because the numbers ARE the order, and reading only
+    // dash-led lines found nothing in one — so cut-criteria refused as empty
+    // while its own line check passed. Fifth time that pair has disagreed.
+    const m = line.match(/^\s*(?:[-*]|\d+[.)])\s*(.+?)\s*$/);
     if (m === null) continue;
-    const id = refId(m[1] ?? "");
+    // A ROW MAY CARRY A MARK AFTER ITS ID — [cutoff], [cut: why], [moved: why].
+    // The id is the first wiki link where there is one, so the mark travels
+    // beside the reference instead of destroying it.
+    const rest = m[1] ?? "";
+    const linked = /\[\[([^\]]+)\]\]/.exec(rest);
+    const id = refId(linked === null ? rest : (linked[1] ?? ""));
     if (looksLikeId(id)) out.push(id);
   }
   return out;
@@ -864,13 +873,19 @@ export function refsIn(text: string): string[] {
  *  content could satisfy both, which is a field nobody can ever fill.
  *
  *  Only the first two cells are items. The third is the verdict, and a
- *  verdict is not an artifact. */
-export function refsInRows(text: string): string[] {
+ *  verdict is not an artifact.
+ *
+ *  HOW MANY CELLS ARE ITEMS DEPENDS ON THE ROW (2026-08-09). A card answers
+ *  with two items and a verdict. A dsm answers with ONE element and the value
+ *  written onto it, so reading two cells there offered the cluster name as an
+ *  artifact and the type check refused it. The caller knows which shape it
+ *  has; it says so. */
+export function refsInRows(text: string, columns = 2): string[] {
   const out: string[] = [];
   for (const line of text.split(/\r?\n/)) {
     if (!/^\s*\|/.test(line)) continue;
     const cells = line.split("|").slice(1, -1);
-    for (const cell of cells.slice(0, 2)) {
+    for (const cell of cells.slice(0, columns)) {
       const id = refId(cell.trim());
       if (looksLikeId(id)) out.push(id);
     }

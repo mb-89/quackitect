@@ -68,6 +68,7 @@ import {
   withChecked,
   withFieldContent,
   withFrontmatter,
+  withFrontmatterList,
   withReopened,
   withSignedOff,
   withStatus,
@@ -1408,25 +1409,39 @@ export class Session {
     const st = decl?.states.find((s) => s.id === id);
     if (decl === undefined || st === undefined) return undefined;
     const nexts: RouteNode["nexts"] = [];
+    // ONE RULE FOR LANDING, WHICHEVER MOVE BROUGHT YOU (owner, 2026-08-09).
+    // A state that carries a sub-machine is never a position: the position is
+    // that machine's own start. The normal edge knew this and the POP did
+    // not, so popping out of one container landed ON the next container and
+    // the route stepped straight over every state inside it. Five compose
+    // states sat outside the search and the walk reported no path to them.
+    const land = (pfx: string, t: StateDecl, tick: RouteNode["nexts"][number]["tick"]): void => {
+      const at = Session.qual(pfx, t.id);
+      if (t.submachine !== undefined) {
+        const inner = this.declForPrefix(at);
+        if (inner !== undefined) {
+          nexts.push({ to: Session.qual(at, inner.initial), tick });
+          return;
+        }
+      }
+      nexts.push({ to: at, tick });
+    };
     for (const e of st.edges) {
       const t = decl.states.find((s) => s.id === e.to);
       if (t === undefined) continue;
-      const landed = Session.qual(prefix, t.id);
-      if (t.submachine !== undefined) {
-        const inner = this.declForPrefix(landed);
-        if (inner !== undefined) {
-          nexts.push({ to: Session.qual(landed, inner.initial), tick: { from: q, to: e.to } });
-          continue;
-        }
-      }
-      nexts.push({ to: landed, tick: { from: q, to: e.to } });
+      land(prefix, t, { from: q, to: e.to });
     }
     if (st.kind === "end" && prefix !== "") {
       const pcut = prefix.lastIndexOf("/");
       const pprefix = pcut < 0 ? "" : prefix.slice(0, pcut);
       const pid = pcut < 0 ? prefix : prefix.slice(pcut + 1);
-      const pst = this.declForPrefix(pprefix)?.states.find((s) => s.id === pid);
-      for (const e of pst?.edges ?? []) nexts.push({ to: Session.qual(pprefix, e.to), tick: { from: q, advance: true } });
+      const pdecl = this.declForPrefix(pprefix);
+      const pst = pdecl?.states.find((s) => s.id === pid);
+      for (const e of pst?.edges ?? []) {
+        const t = pdecl?.states.find((s) => s.id === e.to);
+        if (t === undefined) continue;
+        land(pprefix, t, { from: q, advance: true });
+      }
     }
     return { priority: st.priority, demands: { ...(st.entry ?? {}) }, exit_demands: { ...(st.exit ?? {}) }, nexts };
   }
@@ -1563,13 +1578,54 @@ export class Session {
         if (!done.has(f)) unmet.push(f);
       }
     }
-    if (unmet.length === 0) return aim;
+    if (unmet.length === 0) {
+      // A SUB-MACHINE'S WORK IS NOT INVISIBLE (2026-08-09). claimFeeders looks
+      // THROUGH a state carrying no claim. That is right for a waypoint and
+      // wrong for a CONTAINER: everything drawn inside it disappears from the
+      // objective, so a walk aimed past `enumerate-space` ran seven finders
+      // and a chart in one hop without being asked for anything.
+      //
+      // Found when build_chart reached gate-candidates unsigned, with three
+      // empty evidence fields and no file on disk at all.
+      return this.subObjective(decl, prefix, local) ?? aim;
+    }
     // THE ONE WITH NOTHING UNMET BEHIND IT. Anything else would send the walk
     // at a state whose own inputs are still owed, which is the very mistake
     // this replaces.
     const owed = new Set(unmet);
     const first = unmet.find((u) => claimFeeders(decl, u, claimful).every((f) => !owed.has(f)));
     return Session.qual(prefix, first ?? unmet[0]);
+  }
+
+  /** THE FIRST OWED STATE INSIDE A SUB-MACHINE THAT LIES UPSTREAM OF THE AIM.
+   *
+   *  Walks the inbound edges of THIS machine — every state, not only the ones
+   *  carrying a claim — and for each container it meets, asks that machine
+   *  what it still owes. The first answer wins, in the sub-machine's own
+   *  declaration order, so a chart that waits on its finders is named after
+   *  them rather than before. */
+  private subObjective(decl: MachineDecl, prefix: string, local: string): string | undefined {
+    const upstream = new Set<string>();
+    const stack = [local];
+    while (stack.length > 0) {
+      const at = stack.pop() as string;
+      for (const src of decl.states) {
+        if (upstream.has(src.id) || !src.edges.some((e) => e.to === at)) continue;
+        upstream.add(src.id);
+        stack.push(src.id);
+      }
+    }
+    for (const id of upstream) {
+      const st = decl.states.find((s) => s.id === id);
+      if (st?.submachine === undefined) continue;
+      const subPrefix = Session.qual(prefix, id);
+      const sub = this.declForPrefix(subPrefix);
+      if (sub === undefined) continue;
+      const done = new Set(this.recordDone(sub));
+      const owed = sub.states.filter((s) => s.evidence_form.length > 0).find((s) => !done.has(s.id));
+      if (owed !== undefined) return Session.qual(subPrefix, owed.id);
+    }
+    return undefined;
   }
 
   /** PUT THE WALK BACK ON A BRANCHING POINT.
@@ -3472,11 +3528,26 @@ export class Session {
     return done;
   }
 
-  /** THE ITERATION THIS MACHINE IS, if it is one and it is still open. */
+  /** THE ITERATION THIS MACHINE BELONGS TO, if there is one and it is open.
+   *
+   *  IT USED TO ASK WHETHER THE DECL *IS* AN ITERATION (2026-08-09). That is
+   *  true of `i1` and false of every drawn sub-machine inside it, so for
+   *  `enumerate-space` it returned undefined, recordDone returned an empty
+   *  green set, and NOTHING INSIDE A SUB-MACHINE WAS EVER GREEN.
+   *
+   *  The walk then pinned its objective on the sub-machine's first state
+   *  forever. Seven finder forms stood signed and the join above them would
+   *  not open, because the router could not see that any of them was done. */
   private declIteration(decl: MachineDecl): Iteration | undefined {
     if (decl.id === this.machine.id) return undefined;
     try {
-      return itList(this.root).find((x) => x.open && itShortId(x.id) === decl.id);
+      const open = itList(this.root).filter((x) => x.open);
+      const own = open.find((x) => itShortId(x.id) === decl.id);
+      if (own !== undefined) return own;
+      // A SUB-MACHINE BELONGS TO WHATEVER RECORD IS BOUND. Its evidence lands
+      // in that record's folder, which is exactly where the green check looks.
+      const boundId = this.bound?.id;
+      return boundId === undefined ? undefined : open.find((x) => x.id === boundId);
     } catch {
       return undefined; // no git, no records — nothing to check
     }
@@ -3843,7 +3914,13 @@ export class Session {
         : ["---", `id: ${w.id}`, 'type: "[[candidate]]"', "name:", "statement:", "picks:", "---", "", "## Why this one", "", ""].join("\n");
       raw = withFrontmatter(raw, "name", w.name);
       raw = withFrontmatter(raw, "statement", w.statement);
-      raw = withFrontmatter(raw, "picks", w.picks.map((p) => `[[${p}]]`).join(", "));
+      // PICKS IS A LIST, SO IT IS WRITTEN AS ONE. The item card declares a
+      // block, and a comma-joined scalar reads back as a single pick.
+      raw = withFrontmatterList(
+        raw,
+        "picks",
+        w.picks.map((p) => `[[${p}]]`),
+      );
       mkdirSync(dirname(file), { recursive: true });
       writeFileSync(file, raw, "utf8");
       touched.push(w.id);
@@ -3896,9 +3973,20 @@ export class Session {
   }
 
   /** The state form the walk itself owes: standing in an iteration's
-   *  state with evidence fields, the stored form IS the work. */
+   *  state with evidence fields, the stored form IS the work.
+   *
+   *  MEMBERSHIP, NOT DEPTH (2026-08-09). This asked whether the SECOND-FROM-TOP
+   *  sub was `iterations`, which is true at exactly one level of nesting and
+   *  false one level deeper. A drawn sub-machine inside an iteration — the
+   *  finders under enumerate-space — therefore owed no form at all: the walk
+   *  stood on the state, the packet listed its asks, and the submit refused
+   *  with "nothing on the way wants one".
+   *
+   *  It only surfaced there because the route was ALSO empty, the chart above
+   *  being a starved join. Anywhere else the route's own demand covered for
+   *  the missing standing form, so the fault sat hidden behind it. */
   private standingStateFormOwed(): string | undefined {
-    if (this.subs[this.subs.length - 2]?.decl.id !== "iterations") return undefined;
+    if (!this.subs.some((s) => s.decl.id === "iterations")) return undefined;
     const { machine, ids } = this.leaves();
     const s = machine.states.find((x) => x.id === ids[0]);
     if (s === undefined || s.evidence_form.length === 0) return undefined;

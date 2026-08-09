@@ -7,9 +7,15 @@
 // ninety rows that is the same question asked ninety times, and the answers
 // were free to disagree with each other.
 //
-// THE ORDER IS ALREADY SETTLED when this opens. derive-criteria closed it
-// upstream, before any candidate existed, so the only decision left is WHERE
-// THE LINE FALLS. One mark says it.
+// THE ORDER IS COMPUTED, NOT STORED (owner ruling 2026-08-09). It arrives in
+// args.items already sorted worst-breakage first, and that sort is the answer
+// rather than a starting point.
+//
+// A STORED POSITION USED TO WIN, AND THAT WAS THE DEFECT. Once a numbered list
+// was saved, its numbers beat the computed order forever, so a corrected sort
+// could never reach the page. Measured in iteration one: a corrosive row sat
+// first of seventy-two, above every fatal one, because an earlier pass had
+// written it there.
 //
 // THREE MARKS, AND THEY MEAN DIFFERENT THINGS:
 //
@@ -49,14 +55,18 @@ export const RANK_CUT_EDITOR: EditorKind = {
         moved: (/\\[moved:\\s*([^\\]]*)\\]/.exec(rest) || [])[1] || "",
       };
     });
-    // A ROW THE FILE HAS NOT CAUGHT UP WITH KEEPS ITS REGISTER POSITION, so a
-    // criterion written since the last save appears where the order put it
-    // rather than vanishing.
-    const rows = ids.slice().sort(function (a, b) {
-      const pa = stored[a] ? stored[a].at : ids.indexOf(a) + 1;
-      const pb = stored[b] ? stored[b].at : ids.indexOf(b) + 1;
-      return pa - pb;
-    });
+    // THE COMPUTED ORDER IS THE BASE, and only a recorded MOVE overrides it.
+    // A move already carries its rationale, so honouring it is honouring a
+    // decision somebody signed; honouring a bare stored number is honouring an
+    // accident of when the file was last written.
+    const wasMoved = function (id) { return stored[id] && stored[id].moved !== ""; };
+    const rows = ids.filter(function (id) { return !wasMoved(id); });
+    ids.filter(wasMoved)
+      .sort(function (a, b) { return stored[a].at - stored[b].at; })
+      .forEach(function (id) {
+        const at = Math.max(0, Math.min(rows.length, stored[id].at - 1));
+        rows.splice(at, 0, id);
+      });
     const cel = "padding:5px 8px;border-top:1px solid var(--se-border);vertical-align:middle;font-size:12.5px;";
     const hed = "padding:5px 8px;text-align:left;font-weight:normal;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--se-muted);";
     const box = "width:100%;box-sizing:border-box;background:transparent;border:0;outline:none;font:inherit;font-size:12.5px;color:var(--se-fg);padding:0;";
@@ -98,8 +108,8 @@ export const RANK_CUT_EDITOR: EditorKind = {
     // CLICKING IS TOO CHEAP TO BE A COMMIT. An arrow is one press and it
     // reorders the ranking, so the changes are held until they are kept.
     const bar = '<div class="sfrcbar" style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:11px;color:var(--se-muted);">' +
-      '<button type="button" class="sfrcsave" style="' + btn + '" title="write these changes to the form">save</button>' +
-      '<button type="button" class="sfrcrevert" style="' + btn + '" title="throw the changes away and go back to the last save">revert</button>' +
+      '<button type="button" class="sfrcsave sfact save" title="write these changes to the form">save</button>' +
+      '<button type="button" class="sfrcrevert sfact revert" title="throw the changes away and go back to the last save">revert</button>' +
       '<span class="sfrcdirty"></span></div>';
     const count = '<div class="sfrccount" style="font-size:11px;color:var(--se-muted);padding:4px 0;"></div>';
     return bar + '<table class="sfnodetable sfrc" data-field="' + escText(name) + '" data-pristine="' + escText(pristine) + '" style="width:100%;border-collapse:collapse;">' + head + "<tbody>" + rows.map(rowHtml).join("") + "</tbody></table>" + count;

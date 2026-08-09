@@ -1,9 +1,9 @@
 ---
 form: gate-requirements
-amended: "2026-08-07T19:58:46.913Z by agent — the export finding stood open; the owner ruled it deferred scope with v1's book as the known solution, and an open finding invites re-litigation"
-bless: blessed by human
+bless: blessed by agent
 by: agent
-signed_off: 2026-08-07T19:50:47.970Z
+signed_off: 2026-08-09T10:55:01.754Z
+amended: "2026-08-07T19:58:46.913Z by agent — the export finding stood open; the owner ruled it deferred scope with v1's book as the known solution, and an open finding invites re-litigation"
 authors: agent
 files:
 ---
@@ -49,7 +49,7 @@ What reached this gate was walked today after two false starts. The fan handed o
 
 ## verdict
 
-pass
+pass — design input closes with the register and the function structure both standing, and the nine-characteristic sweep that found four unwritten demands is what closed the last gap.
 
 ## follow_up
 

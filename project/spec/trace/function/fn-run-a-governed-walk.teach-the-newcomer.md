@@ -1,6 +1,7 @@
 ---
 id: fn-run-a-governed-walk.teach-the-newcomer
 type: "[[function]]"
+cluster: the-account
 statement: explain the system from the live system, so a stranger can act without a second person
 satisfies:
   - req-tour-reads-what-stands

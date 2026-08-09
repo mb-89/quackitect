@@ -1,6 +1,7 @@
 ---
 id: fn-run-a-governed-walk.hold-the-work
 type: "[[function]]"
+cluster: the-record-life
 statement: hold work in progress so the walk can be left and picked up again
 satisfies:
   - req-entry-binds-worktree

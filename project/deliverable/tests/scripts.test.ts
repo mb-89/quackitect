@@ -324,13 +324,14 @@ test("the ranked list draws its arrows, its cutoff and its two reasons", () => {
   assert.ok(!/cut_proposed|cut_verdict|criterion_band/.test(html), "the four columns are gone");
 });
 
-// THE FILE IS THE ORDER. Reordering the lines by hand reorders the list, so
-// the stored positions must win over the register's.
-test("the stored order wins, and its marks come back", () => {
+// THE MARKS ARE THE FILE'S, THE ORDER IS NOT (owner ruling 2026-08-09). A
+// strike and a cutoff are decisions somebody made and they come back. A bare
+// row number is an accident of when the file was last written, and it does not.
+test("the stored marks come back, and the stored order does not", () => {
   const stored = ["1. [[req-c]]", "2. [[req-a]] [cutoff]", "3. [[req-b]] [cut: every candidate meets it identically]"].join("\n");
   const html = drawRankCut({ content: stored }, { items: ["req-a", "req-b", "req-c"] });
   const order = [...html.matchAll(/class="sfrcrow" data-id="([^"]+)"/g)].map((m) => m[1]);
-  assert.deepEqual(order, ["req-c", "req-a", "req-b"], "the file's order, not the register's");
+  assert.deepEqual(order, ["req-a", "req-b", "req-c"], "the computed order, not the file's");
   assert.match(html, /data-id="req-a" data-cutoff="1"/, "the cutoff comes back on its row");
   assert.match(html, /class="sfrccut"[^>]*value="every candidate meets it identically"/, "and so does the strike's reason");
 });
@@ -350,11 +351,33 @@ test("an empty ranking says why it is empty rather than drawing a blank table", 
 // A MOVE CANNOT BE UNDONE BY HAND (owner report 2026-08-08). The arrows go one
 // place at a time and nothing remembers where a row started, so the editor has
 // to carry the last saved state with it.
+test("the computed order wins over a stored one, and only a recorded move overrides it", () => {
+  // THE DEFECT THIS PINS, 2026-08-09. A stored number beat the computed sort
+  // forever, so a corrosive row sat first of seventy-two above every fatal
+  // one. The items arrive already sorted worst-breakage first; a bare stored
+  // position must not reorder them.
+  const stored = ["1. [[req-late]]", "2. [[req-early]]"].join("\n");
+  const html = drawRankCut({ content: stored }, { items: ["req-early", "req-late"] });
+  const order = [...html.matchAll(/data-id="([^"]+)"/g)].map((m) => m[1]);
+  assert.deepEqual(order, ["req-early", "req-late"], "the computed order stands, the stored numbers do not");
+
+  // A MOVE IS A DECISION SOMEBODY SIGNED, so it is honoured.
+  const moved = ["1. [[req-late]] [moved: it gates the killer use case]", "2. [[req-early]]"].join("\n");
+  const html2 = drawRankCut({ content: moved }, { items: ["req-early", "req-late"] });
+  const order2 = [...html2.matchAll(/data-id="([^"]+)"/g)].map((m) => m[1]);
+  assert.deepEqual(order2, ["req-late", "req-early"], "a recorded move overrides the sort");
+});
+
 test("the ranking carries its last saved state, so it can be reverted to", () => {
-  const stored = ["1. [[req-b]] [cutoff]", "2. [[req-a]] [cut: measured identically everywhere]"].join("\n");
+  const stored = [
+    "1. [[req-b]] [cutoff] [moved: it gates the killer use case]",
+    "2. [[req-a]] [cut: measured identically everywhere]",
+  ].join("\n");
   const html = drawRankCut({ content: stored }, { items: ["req-a", "req-b"] });
-  assert.match(html, /class="sfrcsave"/, "changes are kept on purpose");
-  assert.match(html, /class="sfrcrevert"/, "or thrown away");
+  // THE ACT CLASSES RIDE ALONG (owner, 2026-08-09). Save and revert wear the
+  // accent so they read as the two acts on offer, rather than as decoration.
+  assert.match(html, /class="sfrcsave sfact save"/, "changes are kept on purpose, and it looks like it");
+  assert.match(html, /class="sfrcrevert sfact revert"/, "or thrown away");
   const snap = /data-pristine="([^"]*)"/.exec(html);
   assert.ok(snap !== null, "the saved state rides on the table");
   const rows = (snap?.[1] ?? "").split("");

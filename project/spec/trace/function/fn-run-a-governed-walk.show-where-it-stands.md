@@ -1,6 +1,7 @@
 ---
 id: fn-run-a-governed-walk.show-where-it-stands
 type: "[[function]]"
+cluster: the-account
 statement: put the whole standing position in front of a person, without them asking anybody
 satisfies:
   - req-panel-shows-the-machine

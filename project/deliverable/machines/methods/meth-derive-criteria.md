@@ -128,14 +128,31 @@ score table has.
 Equal weight is a judgment about importance. Compounding is a judgment about
 what is being measured. A pair can be either, both, or neither.
 
-## COMPOUND FIRST, THEN RANK EVERYTHING THAT SURVIVES
+## THIS STATE PRODUCES THE POOL, NOT THE ORDER
 
-Compounding removes duplicates. The ranking then covers every axis left,
-however many there are.
+Owner ruling 2026-08-09, and it moves a job.
 
-THE WHOLE POOL GETS RANKED (owner ruling 2026-08-08). No cut to the vital few
-happens here. Cutting to eleven belongs to cut-criteria, and it wants a
-complete order to cut from.
+What settles here is WHICH rows are criteria and which of them compound into
+one axis. That is the pool.
+
+THE ORDER IS NOT SETTLED HERE. Whatever sequence the pool comes out in is an
+enumeration, not an importance claim, and reading it as one is exactly how a
+response-time requirement ended up above the foundations of the system.
+
+THE IMPORTANCE ORDER IS COMPUTED AT cut-criteria, mechanically, from
+`breaks_how_badly` — see [[meth-damage-scale]]. It runs there because the
+non-differentiating axes are gone by then, so the sort covers only rows that
+survive.
+
+THE BLIND GUARD SURVIVES THE MOVE. The sort key is authored at M3, on the
+requirement, before any candidate exists. Late sorting on an early key is not
+the same as late weighting.
+
+CUTTING TO THE VITAL FEW belongs to cut-criteria too, and it wants the
+computed order to cut from.
+
+ELEVEN IS THE REFERENCE, NOT THE RULE (owner ruling 2026-08-09). Above it is
+right where the extra rows earn it. Fifty is not a cut.
 
 WHAT IT COSTS IS A RANGE, NEVER ONE NUMBER. Ordering n items never costs
 n(n-1)/2, because transitivity settles most pairs for free.
@@ -277,13 +294,13 @@ with.
 
 ## THE BAND IS DRAWN ONCE, AT cut-criteria
 
-The ranking is blind. The busbar forces it to close before any candidate
-exists. The boundary is drawn later, with the candidates in hand.
+The boundary is drawn there, with the candidates in hand and the
+non-differentiators already struck.
 
-ONE DRAWING IS ENOUGH BECAUSE THE ORDER IS ALREADY LOCKED (owner ruling
-2026-08-08). A boundary takes a prefix of a fixed blind ranking. It cannot
-promote a favourite's axis past the rows above it, because nothing at
-cut-criteria touches the order.
+ONE DRAWING IS ENOUGH BECAUSE THE ORDER UNDER IT IS COMPUTED. A boundary takes
+a prefix of a mechanical sort. It cannot promote a favourite's axis past the
+rows above it, because nothing at cut-criteria types the order — only a
+recorded move can change it, and a move carries its reason.
 
 So the gameable surface is one number: how deep the cut goes. That is visible,
 and a gate reads it in a glance.

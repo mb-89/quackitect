@@ -50,6 +50,13 @@ describe("the box's shape", { concurrency: true }, () => {
     assert.equal(bare("project/spec/trace/option/opt-proxy.md"), "opt-proxy");
     assert.equal(bare("  opt-proxy  "), "opt-proxy");
     assert.equal(bare("[[opt-proxy|a proxy]]"), "opt-proxy");
+
+    // THE YAML QUOTES COME OFF, and this is the case that cost a whole chart
+    // on 2026-08-09. A block list writes its items quoted, so every pick read
+    // back with its quotes, matched no cell, and all five lines drew empty.
+    assert.equal(bare('"[[opt-proxy]]"'), "opt-proxy");
+    assert.equal(bare("'[[opt-proxy]]'"), "opt-proxy");
+    assert.equal(bare('"opt-proxy"'), "opt-proxy");
   });
 
   // THE FILE DECIDES THE ORDER, and the order decides the colours. A person

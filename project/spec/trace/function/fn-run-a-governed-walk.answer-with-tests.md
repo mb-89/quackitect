@@ -1,6 +1,7 @@
 ---
 id: fn-run-a-governed-walk.answer-with-tests
 type: "[[function]]"
+cluster: the-record-life
 statement: answer one question about a change by running the narrowest scope that settles it
 satisfies:
   - req-test-run-carries-its-question

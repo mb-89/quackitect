@@ -1,6 +1,7 @@
 ---
 id: fn-run-a-governed-walk.diverge-before-deciding
 type: "[[function]]"
+cluster: the-holding-pen
 statement: hold several real options open until one is chosen, and keep the losers readable afterwards
 satisfies:
   - req-ideation-opens-no-record

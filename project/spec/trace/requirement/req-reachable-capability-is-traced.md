@@ -6,6 +6,7 @@ kind: quality
 characteristic: functional-suitability
 verify_method: analysis
 breaks_if_removed: The register drifts behind the product, and the trace stops answering what the system actually does.
+breaks_how_badly: crippling
 measure: 0 live doors, lane verbs or panel actions with no use case, walked against the live offer at each design-input gate.
 refines:
   - uc-quality-functional-suitability

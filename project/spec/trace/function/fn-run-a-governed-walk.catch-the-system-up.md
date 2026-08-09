@@ -1,6 +1,7 @@
 ---
 id: fn-run-a-governed-walk.catch-the-system-up
 type: "[[function]]"
+cluster: the-walk
 statement: find where the system has fallen behind its own standard and bring it back, in one pass
 satisfies:
   - req-overhaul-opens-without-deliverable

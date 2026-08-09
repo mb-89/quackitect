@@ -772,6 +772,14 @@ const STYLE = `
   .widget-body { flex: 1; min-height: 0; overflow: auto; }
   /* THE FORM EDITORS read as quiet tables: bordered row groups, borderless
      inputs on the theme's own surface — never a white browser box. */
+  /* SAVE AND REVERT ARE THE TWO ACTS AN EDITOR OFFERS, so they look like acts
+     (owner, 2026-08-09). Drawn transparent on a dark panel they read as
+     decoration, and the owner could not find them. Save carries the accent
+     filled; revert carries the same accent as an outline, because undoing is
+     not the thing you are being invited to do. */
+  .sfact { font: inherit; font-size: 11px; line-height: 18px; padding: 1px 10px; border-radius: 3px; cursor: pointer; }
+  .sfact.save { background: var(--se-accent); border: 1px solid var(--se-accent); color: var(--se-bg); font-weight: 600; }
+  .sfact.revert { background: transparent; border: 1px solid var(--se-accent); color: var(--se-accent); }
   .sfrows { border: 1px solid var(--se-border); border-radius: 4px; margin: 4px 0; }
   .sfrow { display: flex; gap: 6px; align-items: center; padding: 2px 6px; border-bottom: 1px solid var(--se-border); }
   .sfrow:last-child { border-bottom: 0; }
@@ -782,6 +790,10 @@ const STYLE = `
   /* THE NODE TABLE draws its structure on the ELEMENTS (ux.md), because a
      stylesheet only aligns what it reaches. What is left here is cosmetic:
      nothing below decides where anything sits. */
+  /* A PICKER'S LIST IS DRAWN BY THE BROWSER, and left alone it comes back
+     white on a dark panel (owner, 2026-08-09). The face is styled where it is
+     built; the OPTIONS can only be reached from here. */
+  .sfpick option { background: var(--se-raised); color: var(--se-fg); }
   .sfnodetable { border: 1px solid var(--se-border); border-radius: 4px; margin: 4px 0; }
   .sfnodetable a.reflink:hover { text-decoration: underline; }
   .sfnodetable td:focus-within { background: var(--se-hover); }
@@ -2581,7 +2593,13 @@ if (FROZEN) {
 // italic, refusals red. Click a line: the full record (request first, then
 // response, one combined object) in details; an update line: the decision
 // graph of its state visit.
-function escText(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+// THE QUOTE IS THE ONE THAT MATTERS, because almost every use of this is an
+// ATTRIBUTE (owner, 2026-08-09). A value carrying a double quote closed the
+// attribute early and the rest became stray markup: a candidate whose name
+// read "Derived house" rendered value=""Derived house"", so the browser saw an
+// EMPTY value and drew the placeholder. The box looked unfilled and the note
+// was fine all along.
+function escText(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); }
 const logPanel = document.getElementById("log-rows");
 let LOG_ROWS = [];
 let lastActs = null;

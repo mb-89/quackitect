@@ -1,6 +1,7 @@
 ---
 id: fn-run-a-governed-walk.judge-a-claim
 type: "[[function]]"
+cluster: the-walk
 statement: build the form a step owes, check what comes back, and carry a person's verdict on it
 satisfies:
   - req-form-is-built-and-checked

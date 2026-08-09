@@ -6,6 +6,7 @@ kind: quality
 characteristic: compatibility
 verify_method: test
 breaks_if_removed: The tree stops being readable by anything but this engine, and the product becomes the only way to see its own record.
+breaks_how_badly: fatal
 measure: 0 binary files under the product root, counted by the suite on every run.
 refines:
   - uc-quality-compatibility

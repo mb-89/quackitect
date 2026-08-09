@@ -14,7 +14,7 @@ import { strict as assert } from "node:assert";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { withFrontmatter } from "../engine/forms.ts";
+import { withFrontmatter, withFrontmatterList } from "../engine/forms.ts";
 import { parseStateNote } from "../engine/notes.ts";
 import { assumptionItems, claimProblems, criterionAxisItems, nodeField, tableRow } from "../engine/stateform.ts";
 import { freshRoot } from "./helpers.ts";
@@ -149,6 +149,32 @@ test("a multi-line answer folds onto one frontmatter line", () => {
   // otherwise write a second line the parser reads as a different key.
   const out = withFrontmatter(`---\nid: raid-x\n---\n\nbody\n`, "probe", "holds\nand here is more\nand more");
   assert.equal(parseStateNote(out).frontmatter.probe, "holds and here is more and more");
+});
+
+test("a key owns its block list, so a scalar write does not leave the old items dangling", () => {
+  // THE DEFECT THIS PINS, 2026-08-09. The chart wrote picks as a scalar over
+  // a block list. The key line was replaced and the indented items stayed, so
+  // the file stopped being YAML. Five candidate notes lost their picks, and
+  // the five lines vanished off the chart with no error anywhere.
+  const raw = ["---", "id: cand-x", "picks:", '  - "[[opt-a]]"', '  - "[[opt-b]]"', "name: X", "---", "", "body", ""].join("\n");
+
+  const scalar = withFrontmatter(raw, "picks", "one");
+  assert.doesNotMatch(scalar, /^\s+- /m, "the old items went with the key");
+  assert.match(scalar, /^name: X$/m, "and the key after the block survived");
+
+  // A LIST FIELD IS WRITTEN AS A LIST. A comma-joined scalar reads back as
+  // one value, so every consumer asking for items gets a sentence.
+  const listed = withFrontmatterList(raw, "picks", ["[[opt-c]]", "[[opt-d]]", "[[opt-e]]"]);
+  assert.deepEqual(parseStateNote(listed).frontmatter.picks, ["[[opt-c]]", "[[opt-d]]", "[[opt-e]]"]);
+  assert.match(listed, /^name: X$/m);
+  assert.equal(listed.split("picks:").length - 1, 1, "replaced, never appended twice");
+
+  // AND IT CREATES THE KEY when the node has none yet.
+  const fresh = withFrontmatterList(`---\nid: cand-y\n---\n\nbody\n`, "picks", ["[[opt-a]]"]);
+  assert.deepEqual(parseStateNote(fresh).frontmatter.picks, ["[[opt-a]]"]);
+
+  // AN EMPTY LIST CLEARS IT, the same way an empty scalar does.
+  assert.doesNotMatch(withFrontmatterList(raw, "picks", []), /^picks:/m);
 });
 
 test("a table row yields its cells, and a header rule yields nothing", () => {

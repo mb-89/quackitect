@@ -338,6 +338,19 @@ export function reopenedAfterSigning(fm: Record<string, unknown>): boolean {
   return signed !== "" && at > signed;
 }
 
+/** A KEY OWNS ITS BLOCK: the key line, plus every indented line under it.
+ *
+ *  That is what a YAML block list is, and replacing only the key line leaves
+ *  the old items dangling beneath a scalar. The result is not YAML at all.
+ *
+ *  IT COST FIVE CANDIDATE NOTES THEIR PICKS on 2026-08-09. The chart wrote
+ *  `picks` as a scalar over a block list, every note stopped parsing, and the
+ *  five drawn lines vanished off the chart with no error anywhere. */
+function keyBlock(key: string): RegExp {
+  const esc = key.replace(/[.*+?^{}()|[\]\\]/g, (c) => "\\" + c);
+  return new RegExp("^" + esc + ":.*(?:\\n[ \\t]+\\S.*)*", "m");
+}
+
 /** SET ONE FRONTMATTER KEY on any node, creating it if absent.
  *
  *  This is the write half of a bound field: the form's answer for a node
@@ -345,14 +358,25 @@ export function reopenedAfterSigning(fm: Record<string, unknown>): boolean {
  *  An empty value CLEARS the key rather than writing a blank line, so a
  *  cleared answer and a never-answered one read the same to every check. */
 export function withFrontmatter(raw: string, key: string, value: string): string {
-  const esc = key.replace(/[.*+?^{}()|[\]\\]/g, (c) => "\\" + c);
-  const has = new RegExp("^" + esc + ":.*", "m");
-  if (value.trim() === "") return raw.replace(new RegExp("^" + esc + ":.*\\n?", "m"), "");
+  const has = keyBlock(key);
+  if (value.trim() === "") return raw.replace(new RegExp(has.source + "\\n?", "m"), "");
   const line = key + ": " + yamlValue(value);
   // A FUNCTION REPLACEMENT, NEVER A STRING. A value carrying a dollar sign
   // is data, and String.replace reads a dollar in the replacement as an
   // instruction — dollar-backtick alone splices the whole preceding text in.
   return has.test(raw) ? raw.replace(has, () => line) : afterAnchor(raw, line);
+}
+
+/** SET ONE FRONTMATTER KEY TO A BLOCK LIST.
+ *
+ *  A list field written as a comma-joined string reads back as ONE value, so
+ *  every consumer that asked for items gets a sentence. The shape has to
+ *  match what the item card declares, and for a list that is a block. */
+export function withFrontmatterList(raw: string, key: string, values: string[]): string {
+  if (values.length === 0) return withFrontmatter(raw, key, "");
+  const block = key + ":\n" + values.map((v) => "  - " + yamlValue(v)).join("\n");
+  const has = keyBlock(key);
+  return has.test(raw) ? raw.replace(has, () => block) : afterAnchor(raw, block);
 }
 
 /** A changed claim is no longer the submitted claim — the stamp comes off. */

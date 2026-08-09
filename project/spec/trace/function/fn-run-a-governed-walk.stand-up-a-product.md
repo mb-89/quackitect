@@ -1,6 +1,7 @@
 ---
 id: fn-run-a-governed-walk.stand-up-a-product
 type: "[[function]]"
+cluster: the-bootstrap
 statement: take a computer with nothing on it to a product standing at its own front desk
 satisfies:
   - req-one-script-installs

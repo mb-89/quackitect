@@ -214,8 +214,14 @@ test("the chunk machine: refused when unseeded, compiled with realization tags a
   assert.deepEqual(core.edges.map((e) => e.to).sort(), ["docs", "probe"], "independent chunks fan out");
   const docs = g.decl.states.find((s) => s.id === "docs")!;
   assert.deepEqual(docs.tags, ["realization-document"]);
-  assert.deepEqual(docs.edges, [{ to: "all-built", role: "normal" }]);
-  assert.equal(g.decl.states.find((s) => s.id === "all-built")?.kind, "join", "one finished chunk is not a finished build");
+  assert.deepEqual(docs.edges, [{ to: "end", role: "normal" }], "a leaf step runs straight into the end");
+  assert.equal(
+    g.decl.states.find((s) => s.id === "all-built"),
+    undefined,
+    "the join pill is gone — it merged and did nothing else",
+  );
+  const fin = g.decl.states.find((s) => s.id === "end")!;
+  assert.equal(fin.busbar, true, "one finished step is not a finished build, so the bar sits on the end");
 });
 
 test("an explicit none in the drawing passes the run state without ceremony", () => {

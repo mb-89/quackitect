@@ -1,6 +1,7 @@
 ---
 id: fn-run-a-governed-walk.keep-the-record
 type: "[[function]]"
+cluster: the-account
 statement: record every act and every claim so the reasoning can be reconstructed without asking anybody
 satisfies:
   - req-every-call-logged
