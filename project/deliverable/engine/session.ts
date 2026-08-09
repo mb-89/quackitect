@@ -2505,6 +2505,27 @@ export class Session {
       // submit and bless are ACTS, not sections: the save lands the fills
       // first, then each act runs with its own checks and stamps.
       const { submit, bless, ...fills } = form;
+      // A CHOICE WHILE A FORM IS OWED IS NOT A FILL (found live 2026-08-06:
+      // a backward choice arrived here, was SAVED as a field named "choice"
+      // on the owed form, and the walk stood still — accepted, swallowed,
+      // repeated). A payload that is ONLY a choice is a move, and it is
+      // refused with both sanctioned ends named: fill the owed form to go
+      // forward, or reopen the passed state to go back. A form genuinely
+      // declaring a field called "choice" is filled with its siblings, so
+      // the one-key test lets it through.
+      if (fills.choice !== undefined && Object.keys(fills).length === 1) {
+        throw new Rejection({
+          clause: CLAUSES.NOT_LEGAL_IN_STATE,
+          expected: `the owed form (${owed[0]}) — a choice is read only when nothing is owed`,
+          got: `a choice (${String(fills.choice)}) while ${owed[0]}'s form is owed — nothing was saved`,
+          remedy: {
+            tool: "se_reopen",
+            args: { state: "<the passed state>", reason: "<why its claim must be re-earned>" },
+            note: "to go BACK to a passed state, reopen it — its form is owed again and green re-earns downstream; to go FORWARD, fill the owed form and pull on",
+          },
+          source: "engine/session.ts pull",
+        });
+      }
       let saved = this.formSave(owed[0], fills as Record<string, string>);
       if (submit === true || submit === "true" || submit === "yes") saved = this.formDone(owed[0], "agent");
       if (bless !== undefined) saved = this.formBless(owed[0], bless === true || bless === "true" || bless === "yes", "agent");

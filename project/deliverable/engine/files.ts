@@ -832,6 +832,25 @@ function applyExactOp(w: OpWork): { next: string; replacements: number } {
   // the single-replacement path was exposed, which is why replace_all never
   // showed it.
   const next = w.op.replace_all === true ? w.current.split(oldStr).join(newStr) : w.current.replace(oldStr, () => newStr);
+  // THE ROUND-TRIP VERIFY (owner ask 2026-08-07: escaping kept eating
+  // writes, and every instance was silent). new_string is DATA and must
+  // land verbatim. If the applied buffer does not contain it, something
+  // between the tool boundary and the buffer transformed it — refuse
+  // rather than report a success that is not one. This catches the CLASS,
+  // including whatever eats the next one.
+  if (newStr !== "" && !next.includes(newStr)) {
+    throw new Rejection({
+      clause: CLAUSES.WRITE_TRANSFORMED,
+      expected: `new_string to land verbatim in ${w.op.path}`,
+      got: `the applied text does not contain the payload (op ${w.i + 1}/${w.n}) — nothing was written`,
+      remedy: {
+        tool: "se_file_read",
+        args: { path: w.op.path },
+        note: "the payload was transformed on the way in — the escape-eating class has a new member; report it with the payload that triggered this",
+      },
+      source: SRC,
+    });
+  }
   return { next, replacements: w.op.replace_all === true ? count : 1 };
 }
 

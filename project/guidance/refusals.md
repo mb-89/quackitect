@@ -196,6 +196,19 @@ hand. Nothing genuinely finished? Say what is actually blocking the item with
 `defer`, or close it `obsolete`. A checklist standing open for hours is the
 thing this stops.
 
+### SE-C-135 — the write did not land as asked
+
+A write verb's payload is DATA. It must land in the file verbatim.
+
+This refusal fires when the applied text does not contain the payload. That
+means something between the tool boundary and the buffer transformed it —
+the class that spliced two engine files into themselves in 2026-08-07 and
+reported success both times.
+
+Nothing was written. Read the file, then report the payload that triggered
+this: the escape-eating class has a new member, and the payload is the
+evidence.
+
 ### SE-C-134 — a method write while a record is bound
 Method cannot be changed from inside a record. These are SHARED:
 

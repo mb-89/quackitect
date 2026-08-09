@@ -489,3 +489,48 @@ test("no gate holds the first start — entering binds, stamps started, and M0 s
   assert.match(rec, /^started: /m);
   assert.match(rec, /^status: open$/m);
 });
+
+// A CHOICE WHILE A FORM IS OWED IS A MOVE, NOT A FILL (found live
+// 2026-08-06: a backward choice was saved as a FIELD named "choice" on the
+// owed form — accepted, swallowed, and the walk stood still). It now
+// refuses, and the remedy names the reopen as the sanctioned way back.
+test("a choice while a form is owed refuses and names the reopen", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  const session = new Session(root);
+  for (let i = 0; i < 2; i++) await session.advance();
+  checkDocs(session);
+  for (let i = 0; i < 3; i++) await session.advance();
+  session.setAutonomy(1);
+  const seeded = session.iterationSeed("refuse the swallowed choice", "a backward choice names its remedy");
+  const sid = String(seeded.seeded).match(/^(i\d+)-/)?.[1];
+  await session.advance("iterations");
+  await session.advance(sid);
+  session.setTarget(`iterations/${sid}/onboard-retro`);
+  // Serve the reading until the walk owes a FILL.
+  // The probes sit at fixed fractions of the served document; the answers
+  // are the four words after each anchor — computed here exactly as the
+  // engine computes them, which is what an honest reader would quote.
+  const answers = (body: string): string => {
+    const w = body.split(/\s+/).filter((x) => x !== "");
+    if (w.length < 16) return w.join(" ");
+    return [0.3, 0.6, 0.92]
+      .map((at) => {
+        const i = Math.min(Math.floor(w.length * at), w.length - 8);
+        return w.slice(i + 4, i + 8).join(" ");
+      })
+      .join(" · ");
+  };
+  let r = (await session.pull({}, "agent")) as { pull: string; document?: { content?: string } };
+  for (let hops = 0; (r.pull === "read" || r.pull === "do") && hops < 40; hops++) {
+    const payload = r.pull === "read" ? { form: { read: answers(r.document?.content ?? "") } } : {};
+    r = (await session.pull(payload, "agent")) as { pull: string; document?: { content?: string } };
+  }
+  assert.equal(r.pull, "fill", `the fixture reaches an owed form — stuck at ${r.pull} with keys ${JSON.stringify(Object.keys(r))}`);
+  const out = (await session.pull({ form: { choice: "front_desk" } }, "agent").catch((e: unknown) => e)) as {
+    clause?: string;
+    remedy?: { tool?: string };
+  };
+  assert.equal(out.clause, "SE-C-110", "the swallowed choice refuses with its clause");
+  assert.equal(out.remedy?.tool, "se_reopen", "and the remedy names the way back");
+});
