@@ -19,7 +19,17 @@ import { parseStateNote, section } from "./notes.ts";
 import { type ParetoView, pareto, readScores } from "./pareto.ts";
 import { seDir } from "./paths.ts";
 import { type GuidanceDoc, pulledFor } from "./pull.ts";
-import { conformance, duplicateIds, itemTemplate, itemTemplateRel, loadTrace, refsIn, refsInRows, type TraceNode } from "./trace.ts";
+import {
+  conformance,
+  duplicateIds,
+  itemTemplate,
+  itemTemplateRel,
+  loadTrace,
+  nodeLines,
+  refsIn,
+  refsInRows,
+  type TraceNode,
+} from "./trace.ts";
 import { edgeProblems, traceSchema } from "./traceschema.ts";
 
 export interface A3Box {
@@ -1256,7 +1266,7 @@ export function criterionAxisItems(traceRoot: string): string[] {
  *  what the graph needs, so anything else is fetched by whoever wants it. */
 export function nodeField(file: string, key: string): string {
   try {
-    const lines = readFileSync(file, "utf8").split("\n");
+    const lines = nodeLines(file);
     // FRONTMATTER ONLY. Past the closing fence a line that looks like a key
     // is prose, and reading prose as a value is how a field silently fills.
     const end = lines.indexOf("---", 1);
@@ -1280,7 +1290,7 @@ export function nodeField(file: string, key: string): string {
  *  convention. Reading the prompt as a value is how a field silently fills. */
 export function nodeList(file: string, key: string): string[] {
   try {
-    const lines = readFileSync(file, "utf8").split("\n");
+    const lines = nodeLines(file);
     const end = lines.indexOf("---", 1);
     const fm = lines.slice(0, end < 0 ? lines.length : end);
     const at = fm.findIndex((l) => l.startsWith(`${key}:`));

@@ -5,7 +5,7 @@
 // the record; the archive is git history (exp/* branches).
 
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { parseStateNote } from "./notes.ts";
@@ -111,13 +111,41 @@ export function readRecord(root: string, e: Expedition): Record<string, unknown>
  *  four git processes - 4.9 seconds of one profiled session sat inside
  *  spawnSync under exactly these two callers.
  *
- *  This is git's ref store, not a markdown truth, so the read-it-live law
- *  does not bind it. Staleness is still bounded: a second is far below what
- *  a person notices, and far above the burst of renders it collapses.
- *  Anything in the lane that moves a ref calls bustBranchList and the window
- *  never applies. */
-const BRANCH_TTL_MS = 1000;
-const branchList = new Map<string, { at: number; branches?: string[]; failure?: Rejection }>();
+ *  IT WAS A ONE-SECOND TTL AND THAT WAS THE WRONG SHAPE (measured
+ *  2026-08-09). A timer only helps when the burst is shorter than the timer.
+ *  Entering a record takes 3.7 s and the mirror polls every second, so the
+ *  window was GUARANTEED to lapse mid-operation and spawn again. A profile of
+ *  that entry found 301 ticks with 20.6 % in JavaScript: the walk was not
+ *  computing, it was BLOCKED, and a bare git spawn is 40.6 ms of blocking.
+ *
+ *  SO IT IS STAMPED, NOT TIMED. The answer changes when git's ref store
+ *  changes, and that is a stat rather than a clock. Same rule as the corpus
+ *  (software.md): key the answer to a hash of its input, and recompute when
+ *  the input moves rather than when a timer says so.
+ *
+ *  WHY STATTING THE SUBDIRECTORIES. Our globs are `it/*` and `exp/*`, so the
+ *  refs live one level down and the parent's mtime does not move when a child
+ *  is added. A directory's mtime DOES move when one of its own entries is
+ *  created or removed, which is exactly the change a NAME listing cares
+ *  about. A branch repointed to a new commit rewrites a file without renaming
+ *  it, and that cannot change this answer.
+ *
+ *  Anything in the lane that moves a ref still calls bustBranchList. */
+const branchList = new Map<string, { stamp: string; branches?: string[]; failure?: Rejection }>();
+
+function refStamp(root: string): string {
+  const g = join(root, ".git");
+  const parts: string[] = [];
+  for (const p of [join(g, "packed-refs"), join(g, "refs", "heads"), join(g, "refs", "heads", "it"), join(g, "refs", "heads", "exp")]) {
+    try {
+      const s = statSync(p);
+      parts.push(`${s.size}:${s.mtimeMs}`);
+    } catch {
+      parts.push("gone");
+    }
+  }
+  return parts.join("|");
+}
 
 export function bustBranchList(): void {
   branchList.clear();
@@ -125,9 +153,9 @@ export function bustBranchList(): void {
 
 export function listBranches(root: string, glob: string): string[] {
   const key = `${root} :: ${glob}`;
+  const stamp = refStamp(root);
   const hit = branchList.get(key);
-  const now = Date.now();
-  if (hit !== undefined && now - hit.at < BRANCH_TTL_MS) {
+  if (hit !== undefined && hit.stamp === stamp) {
     if (hit.branches !== undefined) return hit.branches;
     // A FAILURE IS CACHED TOO (profiled 2026-08-02): a root with no
     // repository failed this spawn dozens of times per walk — half a
@@ -140,10 +168,10 @@ export function listBranches(root: string, glob: string): string[] {
       .split("\n")
       .map((b) => b.trim())
       .filter((b) => b !== "");
-    branchList.set(key, { at: now, branches });
+    branchList.set(key, { stamp, branches });
     return branches;
   } catch (e) {
-    if (e instanceof Rejection) branchList.set(key, { at: now, failure: e });
+    if (e instanceof Rejection) branchList.set(key, { stamp, failure: e });
     throw e;
   }
 }

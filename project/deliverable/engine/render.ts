@@ -3532,8 +3532,12 @@ function drawingSets(
   // stood signed). A container and an end carry no claim of their own, and
   // the live run that used to colour them dies with the engine — so their
   // green is DERIVED via recordComplete, below.
+  // A CONTAINER'S GREEN IS THE SESSION'S, NOT THE RENDERER'S (owner ruling
+  // 2026-08-09). recordDone already answers for it, and it answers with the
+  // ripple applied — so a container whose own inputs are grey stays grey.
+  // Painting it here from its interior alone was the second rule, and it drew
+  // enumerate-space green above a grey derive-criteria.
   const rc = new Map<string, boolean>();
-  for (const id of openIds) if (subComplete(m, id, rc)) paint.add(id);
   if (decl.states.some((s) => s.kind === "end") && recordComplete(m, decl, rc, paint)) {
     for (const s of decl.states) if (s.kind === "end") paint.add(s.id);
   }

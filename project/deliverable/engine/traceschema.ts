@@ -5,10 +5,9 @@
 // WHY A FILE AND NOT A CONSTANT. The spine is method, not engine. A product
 // that vendors this and adds a level edits its own schema; nothing here
 // knows how many types there are or what they are called.
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { parseStateNote } from "./notes.ts";
-import { type Subsegments, TRACE_SUBSEGMENTS, type TraceNode } from "./trace.ts";
+import { noteOf, type Subsegments, TRACE_SUBSEGMENTS, type TraceNode } from "./trace.ts";
 
 export interface TraceEdge {
   /** The child's type — the end that carries the edge. */
@@ -28,7 +27,10 @@ export function traceSchema(root: string): TraceEdge[] {
   const abs = join(root, TRACE_SCHEMA_REL);
   if (!existsSync(abs)) return [];
   try {
-    const raw = parseStateNote(readFileSync(abs, "utf8")).frontmatter.edges;
+    // THROUGH THE ONE DOOR. The schema and the subsegments are the same file,
+    // and both were read and parsed on every call — 870 reads of one file to
+    // enter a record.
+    const raw = noteOf(abs)?.frontmatter.edges;
     if (!Array.isArray(raw)) return [];
     return raw
       .map((e) => e as Record<string, unknown>)
@@ -46,7 +48,7 @@ export function traceSubsegments(root: string): Subsegments {
   const abs = join(root, TRACE_SCHEMA_REL);
   if (!existsSync(abs)) return TRACE_SUBSEGMENTS;
   try {
-    const raw = parseStateNote(readFileSync(abs, "utf8")).frontmatter.subsegments;
+    const raw = noteOf(abs)?.frontmatter.subsegments;
     if (!Array.isArray(raw) || raw.length === 0) return TRACE_SUBSEGMENTS;
     const of = raw
       .map((s) => s as Record<string, unknown>)
@@ -78,12 +80,11 @@ export function edgeKeys(schema: TraceEdge[], type: string): string[] {
 const allKeys = (schema: TraceEdge[]): string[] => [...new Set(schema.map((e) => e.key))];
 
 function frontmatterOf(file: string | undefined): Record<string, unknown> {
-  if (file === undefined || !existsSync(file)) return {};
-  try {
-    return parseStateNote(readFileSync(file, "utf8")).frontmatter;
-  } catch {
-    return {};
-  }
+  // THROUGH THE ONE DOOR. The edge check asks this of every node's every
+  // reference, so it was 714 reads and 714 parses of files the corpus had
+  // already read — the largest single reader left after the corpus itself.
+  if (file === undefined) return {};
+  return noteOf(file)?.frontmatter ?? {};
 }
 
 /** ONE NODE'S EDGES, against the schema. Two ways an edge is wrong, and both

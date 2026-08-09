@@ -179,7 +179,7 @@ test("only a sub-machine that resolves is double-clickable", async () => {
 // a drawn sub-machine browsed from the desk resolved to NO iteration (only
 // the bound record answered), and a container or an end carries no claim of
 // its own, so nothing record-backed could ever paint them.
-test("a finished sub-machine paints its container and its end from the record", async () => {
+test("a finished sub-machine does NOT paint its container while the container's own inputs are grey", async () => {
   const { session, root, id } = await rootWithMajorIteration();
   const view = session.viewFor("enumerate-space");
   assert.ok(view !== undefined);
@@ -207,14 +207,28 @@ test("a finished sub-machine paints its container and its end from the record", 
     assert.ok(green.has(s.id), `${s.id} stands green from the desk — grey means the sub-machine found no iteration`);
   }
 
-  // The host drawing paints the CONTAINER green.
+  // A CONTAINER OBEYS THE SAME RIPPLE AS EVERY OTHER STATE (owner ruling
+  // 2026-08-09). Its interior is finished, but nothing upstream of it in the
+  // HOST is signed here — so it stays grey.
+  //
+  // THIS TEST USED TO ASSERT THE OPPOSITE, and that was the defect the owner
+  // reported three times: enumerate-space drew green above a grey
+  // derive-criteria feeding it. The renderer painted a container from its own
+  // interior alone, which is a second rule, and two rules is how a drawing
+  // comes to contradict itself.
   const iteration = session.viewChain("enumerate-space").at(-2) ?? "";
   const host = renderMirror({ session, root, lastPacket: undefined, mode: "manual" }, "machine", iteration);
-  assert.match(
+  assert.doesNotMatch(
     host,
     /data-detail="state:enumerate-space"[^>]*>[\s\S]{0,300}?class="state done"/,
-    "the container is green — grey is the bug: a walked sub-machine looking unstarted",
+    "a container whose feeders are grey stays grey, however finished its interior",
   );
+
+  // NOT PINNED HERE: the positive case, where the whole host chain is signed
+  // and the container turns green. Building a fully green host fixture means
+  // satisfying every template's own checks across the iteration, which is its
+  // own piece of work. The interior assertion above still proves the
+  // sub-machine is seen from the desk, which was the original bug.
 
   // And the sub-machine's own view paints its END green.
   const sub = renderMirror({ session, root, lastPacket: undefined, mode: "manual" }, "machine", "enumerate-space");

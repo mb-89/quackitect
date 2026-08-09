@@ -13,7 +13,7 @@ import { type CanvasData, type CanvasEdge, type CanvasElement, nodeSize } from "
 import { CLAUSES, Rejection } from "./errors.ts";
 import { buildArchive, type GeneratedMachine } from "./expmachine.ts";
 import { type EvidenceField, type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
-import { parseStateNote } from "./notes.ts";
+import { noteOf, parseStateNote } from "./notes.ts";
 import { CHANGE_COLUMNS, type ChangeColumn, compileColumn, compileM0, readRigorMatrix, rigorMatrixContentHash } from "./rigor-matrix.ts";
 import { bustBranchList, listBranches, slug, worktreesDir } from "./worktree.ts";
 
@@ -49,10 +49,10 @@ export function readItRecord(root: string, it: Iteration): Record<string, unknow
   if (it.open) {
     const abs = join(it.path, rel);
     if (!existsSync(abs)) return undefined;
-    return parseStateNote(readFileSync(abs, "utf8")).frontmatter;
+    return noteOf(abs)?.frontmatter;
   }
   const merged = join(root, rel);
-  if (existsSync(merged)) return parseStateNote(readFileSync(merged, "utf8")).frontmatter;
+  if (existsSync(merged)) return noteOf(merged)?.frontmatter;
   const r = spawnSync("git", ["show", `${it.branch}:${rel}`], { cwd: root, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
   if (r.status !== 0) return undefined;
   return parseStateNote(r.stdout).frontmatter;

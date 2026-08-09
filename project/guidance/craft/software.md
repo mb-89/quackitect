@@ -90,6 +90,118 @@ The rule:
 The precedent is the green light: calculated from the live files on every
 look, never written (owner ruling 2026-08-07, v1's adr-verdict-cache).
 
+## Derive on every look, but never re-derive what has not changed
+
+The sibling of the rule above, and it must be read WITH it. "Derive on
+every look" is about where truth lives. It is not an instruction to read
+the same unchanged files forty times in one call.
+
+Owner ruling 2026-08-09, after a single `se_pull` took 274,270 ms entering
+an iteration. The server answers NOTHING while that runs, because the
+lane's endpoint shares one event loop with the mirror, so the transport
+gave up and the extension had to be restarted.
+
+### The rule
+
+CACHE THE COMPUTATION. Never cache the truth.
+
+- Key the answer to a HASH OF ITS INPUT plus the build identity.
+- Recompute when either moves. Never on a timer, never on a guess.
+- Keep it OUT OF THE REPO. A cache is never truth, and the repo stays
+  cache-free.
+
+This is v1's adr-verdict-cache, and its wording is the test: verdicts
+keyed to full input hash plus build identity, in the data home, because
+"a cache is never truth and the repo must stay cache-free".
+
+### Why it does not break the rule above
+
+Nothing is stored that anyone reads as an answer. A stamp is not a value.
+An edit moves the input, the stamp stops matching, and the work runs
+again. There is still ONE source of truth and it is still the files.
+
+AN IN-MEMORY CACHE GETS BUILD IDENTITY FREE. v1 needed to key on the
+build because its cache was on disk and outlived the engine. A map that
+dies with the process cannot be reached by the code that replaced it.
+
+### The stamp is stat, never content
+
+Where the input is files, hashing their CONTENT means READING them, which
+is the cost being avoided. Size and modification time answer the same
+question for one syscall each.
+
+### What it was worth here
+
+Measured on 328 nodes: a cold corpus load is 312.9 ms, a stamped one is
+4.3 ms. Eleven walk hops over three machines went from 10,325 ms to
+142 ms.
+
+### Where to look for the next one
+
+The test is one question: does this recompute the same answer from
+unchanged input more than once in a call?
+
+- A whole-corpus load behind a function that looks like a getter.
+- A per-node file read inside a loop over every node.
+- A check re-run per state when the corpus it reads is the same corpus.
+
+A CALL SITE HIDES THE COST. `loadTrace(root)` reads like a variable and
+costs a third of a second. Name the cost in the comment where the cheap
+spelling hides it.
+
+### Input, process, output — and the cache is the consolation prize
+
+Owner ruling 2026-08-09, and it OUTRANKS the section above.
+
+COLLECT THE INPUT ONCE. PROCESS IT. OUTPUT IT. Where it matters, check ONCE at
+the end whether the input moved while you worked, and redo or refuse if it did.
+
+WHAT YOU DO NOT DO is ask an outside system the same question sixty-six times.
+
+### The measurement that set it
+
+Entering one record asked for the same 328-node corpus SIXTY-SIX TIMES. Each
+hop of the walk asked what was green; each green pass asked for the corpus;
+each container asked again for itself.
+
+Stamping made each ask cost 4 ms instead of 300 ms. The route still asked
+sixty-six times.
+
+SO THE CACHE FIXED THE PRICE AND NOT THE SHAPE, and that is the trap: cheap
+waste stops appearing in profiles, so nobody removes it. The 21,648 stats that
+replaced the reads were invisible until somebody counted CALLS rather than
+milliseconds.
+
+### Where the defect actually lives
+
+A FUNCTION THAT FETCHES ITS OWN INPUT IS FINE AT THE TOP AND WRONG IN A LOOP.
+The walk's objective finder loads the corpus because it needs the corpus, which
+reads perfectly well at the call site — and it is called once per hop.
+
+Pass the input DOWN. A parameter cannot be fetched twice, cannot go stale
+within the operation, and needs no invalidation. It is the version of a cache
+that cannot be wrong.
+
+### When a cache is still right
+
+Between INDEPENDENT operations, where there is no call chain to thread through.
+The mirror renders and the lane pulls; neither can hand the other its inputs,
+so the model holds them and both read it.
+
+Inside ONE operation, a cache is an admission that the shape is wrong.
+
+### The test
+
+COUNT THE ASKS, NOT THE MILLISECONDS. If one operation asks an outside system
+for the same thing more than once, the number of times is the defect, whatever
+each one costs.
+
+### And none of it makes a long scan acceptable inline
+
+Capping the work makes it cheaper. It does not make it correct to run on
+the request path. Anything that scans thousands of things belongs where
+`se_test` already goes: past a second, hand it off and report.
+
 ## Comments and provenance
 
 - Write comments the way people write them: only where a reader would be surprised.

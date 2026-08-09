@@ -109,7 +109,7 @@ import {
   templateProblems,
 } from "./stateform.ts";
 import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
-import { loadTrace } from "./trace.ts";
+import { corpusVersion, loadTrace, noteOf } from "./trace.ts";
 import { type Expedition, expClose, expFind, expList, expNew, readRecord } from "./worktree.ts";
 
 /** THE PULL is the machinery — one verb, legal in EVERY state: the agent
@@ -147,6 +147,17 @@ const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_pull", "se_note", "se_pan
  *  those outside the retro. done and obsolete are checks anyone can run. */
 const RESTRICTED: ReadonlySet<string> = new Set<string>();
 const MACHINERY: readonly string[] = ["se_pull", "se_file_read"];
+
+/** ONE OPERATION'S COLLECTED INPUT, handed down instead of re-fetched.
+ *
+ *  The corpus and its version are per trace root, because one walk can touch
+ *  trunk and a record. `done` is the green answer per machine, so a container
+ *  asked about twice in one route is computed once. */
+export interface GreenPass {
+  corpus?: Map<string, ReturnType<typeof loadTrace>>;
+  version?: Map<string, string>;
+  done: Map<string, string[]>;
+}
 
 export function mainMachinePath(root: string): string {
   return join(root, "project", "deliverable", "machines", "main.canvas");
@@ -1577,14 +1588,14 @@ export class Session {
    *
    *  IT RE-ASKS ON EVERY PULL. Finishing one objective simply makes the next
    *  one the answer, so no plan is stored and none can go stale. */
-  private nextObjective(aim: string): string {
+  private nextObjective(aim: string, pass: GreenPass = Session.newPass()): string {
     const cut = aim.lastIndexOf("/");
     const prefix = cut < 0 ? "" : aim.slice(0, cut);
     const local = cut < 0 ? aim : aim.slice(cut + 1);
     const decl = this.declForPrefix(prefix);
     if (decl === undefined || !decl.states.some((s) => s.id === local)) return aim;
     const claimful = new Set(decl.states.filter((s) => s.evidence_form.length > 0).map((s) => s.id));
-    const done = new Set(this.recordDone(decl));
+    const done = new Set(this.recordDone(decl, new Set(), pass));
     const unmet: string[] = [];
     const seen = new Set<string>([local]);
     const stack = [local];
@@ -1606,7 +1617,7 @@ export class Session {
       //
       // Found when build_chart reached gate-candidates unsigned, with three
       // empty evidence fields and no file on disk at all.
-      return this.subObjective(decl, prefix, local) ?? aim;
+      return this.subObjective(decl, prefix, local, pass) ?? aim;
     }
     // THE ONE WITH NOTHING UNMET BEHIND IT. Anything else would send the walk
     // at a state whose own inputs are still owed, which is the very mistake
@@ -1623,7 +1634,7 @@ export class Session {
    *  what it still owes. The first answer wins, in the sub-machine's own
    *  declaration order, so a chart that waits on its finders is named after
    *  them rather than before. */
-  private subObjective(decl: MachineDecl, prefix: string, local: string): string | undefined {
+  private subObjective(decl: MachineDecl, prefix: string, local: string, pass: GreenPass): string | undefined {
     const upstream = new Set<string>();
     const stack = [local];
     while (stack.length > 0) {
@@ -1640,7 +1651,7 @@ export class Session {
       const subPrefix = Session.qual(prefix, id);
       const sub = this.declForPrefix(subPrefix);
       if (sub === undefined) continue;
-      const done = new Set(this.recordDone(sub));
+      const done = new Set(this.recordDone(sub, new Set(), pass));
       const owed = sub.states.filter((s) => s.evidence_form.length > 0).find((s) => !done.has(s.id));
       if (owed !== undefined) return Session.qual(subPrefix, owed.id);
     }
@@ -1811,7 +1822,11 @@ export class Session {
     // Every lane write now clears it. The cost is one recomputation after a
     // write, which is exactly when the answer may have moved.
     const aim = this.routeAim(target);
-    const objective = this.nextObjective(aim);
+    // THE ROUTE IS ONE OPERATION, so it collects its input once. Everything
+    // below reads the corpus out of this pass rather than fetching its own
+    // (software.md, input-process-output).
+    const pass = Session.newPass();
+    const objective = this.nextObjective(aim, pass);
     let r = computeRoute(from, objective, (q) => this.expandNode(q));
     // NO WAY FORWARD IS NOT THE SAME AS NO WAY (owner design 2026-08-07).
     //
@@ -3544,7 +3559,12 @@ export class Session {
    *  - and where it is a gate, the bless stands.
    *
    *  A stamp says it passed once. Green says it passes now. */
-  private standingClaims(decl: MachineDecl, it: Iteration, claimful: Set<string>): Set<string> {
+  /** Claim verdicts, keyed to their inputs. Module-scoped on purpose: it is a
+   *  pure function of (corpus, body, form), so two sessions on one root reach
+   *  the same answer and there is nothing session-shaped about it. */
+  private static readonly VERDICTS = new Map<string, boolean>();
+
+  private standingClaims(decl: MachineDecl, it: Iteration, claimful: Set<string>, pass: GreenPass): Set<string> {
     // THE CORPUS IS LOADED ONCE, NOT ONCE PER STATE. claimProblems takes it as
     // an argument for exactly this reason and recordDone was not passing it,
     // so every claimful state re-read the whole trace — about fifteen full
@@ -3555,14 +3575,39 @@ export class Session {
     // put it on every packet: se_aim measured 2936 ms and the next pull never
     // returned. The engine is single-threaded, so a synchronous scan that long
     // does not slow the server down — it stops it answering.
-    const corpus = loadTrace(this.traceRoot(it));
+    const traceRoot = this.traceRoot(it);
+    // ONCE PER OPERATION, not once per machine. Both of these sweep the whole
+    // corpus; the pass carries them so the sweep happens on the first machine
+    // and nowhere after it.
+    pass.corpus ??= new Map();
+    let corpus = pass.corpus.get(traceRoot);
+    if (corpus === undefined) {
+      corpus = loadTrace(traceRoot);
+      pass.corpus.set(traceRoot, corpus);
+    }
+    // THE VERDICT IS KEYED TO ITS INPUTS — v1's adr-verdict-cache, reapplied
+    // (owner ruling 2026-08-09). Stamping the corpus took entering an
+    // iteration from 274 s to 66 s; the rest is THIS check, re-run for every
+    // claimful state, for every machine, at every hop of the walk.
+    //
+    // A CHECK WHOSE INPUTS HAVE NOT MOVED HAS NOT CHANGED ITS MIND. The inputs
+    // are the corpus, the claim's own body, and the form the state declares.
+    // All three are in the key, so an edit to any of them recomputes and
+    // nothing else does.
+    pass.version ??= new Map();
+    let version = pass.version.get(traceRoot);
+    if (version === undefined) {
+      version = corpusVersion(traceRoot);
+      pass.version.set(traceRoot, version);
+    }
     const standing = new Set<string>();
     for (const s of decl.states) {
       if (!claimful.has(s.id)) continue;
       const abs = this.evidenceAbs(it, s.id);
       if (!existsSync(abs)) continue;
       try {
-        const note = parseStateNote(readFileSync(abs, "utf8"));
+        const note = noteOf(abs);
+        if (note === undefined) continue;
         const fm = note.frontmatter;
         if (typeof fm.signed_off !== "string") continue;
         // A REOPEN IS THE FOURTH WAY A CLAIM STOPS STANDING. The other three
@@ -3570,7 +3615,16 @@ export class Session {
         // re-earned. The downstream ripple is free — the fixed point below
         // drops everything fed by a state that just left this set.
         if (reopenedAfterSigning(fm)) continue;
-        if (claimProblems(this.traceRoot(it), s, note.body, corpus).length > 0) continue;
+        const key = [traceRoot, s.id, version, contentHash(note.body), contentHash(JSON.stringify(s.evidence_form))].join("\0");
+        let failed = Session.VERDICTS.get(key);
+        if (failed === undefined) {
+          // this.traceRoot(it) IN FULL, not the local. A guard test greps for
+          // exactly this spelling, because a claim check resolving against
+          // the wrong record is the drift it exists to catch.
+          failed = claimProblems(this.traceRoot(it), s, note.body, corpus).length > 0;
+          Session.VERDICTS.set(key, failed);
+        }
+        if (failed) continue;
         if (s.kind === "gate" && !(typeof fm.bless === "string" && fm.bless.startsWith("blessed"))) continue;
         standing.add(s.id);
       } catch {
@@ -3602,11 +3656,75 @@ export class Session {
    *  flips it suspect — a COMPARISON made at look time, never a written mark.
    *
    *  So there is nothing to go stale here. Every look recomputes. */
-  recordDone(decl: MachineDecl): string[] {
+  /** IS THIS CONTAINER'S DRAWING FINISHED? Every claim inside it stands, and
+   *  every container inside it is finished too.
+   *
+   *  A CONTAINER IS A CLAIM LIKE ANY OTHER (owner ruling 2026-08-09). It used
+   *  to be painted by the RENDERER, from its own interior, with no regard for
+   *  its inputs — so enumerate-space drew green while derive-criteria feeding
+   *  it drew grey. Green that ignores the ripple is not green. It is a second
+   *  rule, and two rules is how the drawing came to contradict itself.
+   *
+   *  IT NESTS BY CONSTRUCTION, because it asks recordDone, which asks this
+   *  again for whatever containers that machine holds. */
+  private drawingDone(id: string, seen: Set<string>, pass: GreenPass): boolean {
+    if (seen.has(id)) return false; // a cycle proves nothing
+    seen.add(id);
+    // AN UNSEEDED DRAWING PROVES NOTHING, and asking for one THROWS: viewFor
+    // raises the typed refusal that tells an agent to seed it. That refusal is
+    // right where the walk asked to enter, and wrong here — this is only
+    // colouring a box, and a question about green must never take the walk
+    // down with it.
+    let sub: MachineDecl | undefined;
+    try {
+      sub = this.viewFor(id)?.decl;
+    } catch {
+      return false;
+    }
+    if (sub === undefined) return false;
+    const done = new Set(this.recordDone(sub, seen, pass));
+    let provable = false;
+    for (const s of sub.states) {
+      if (s.evidence_form.length === 0 && s.submachine === undefined) continue;
+      provable = true;
+      if (!done.has(s.id)) return false;
+    }
+    return provable;
+  }
+
+  /** COLLECT THE INPUT ONCE, PROCESS, OUTPUT (owner ruling 2026-08-09,
+   *  software.md). One operation — a route, a render, a pull — makes ONE of
+   *  these and hands it down. Every machine and every container it touches
+   *  reads the same corpus and the same version out of it.
+   *
+   *  WHAT IT REPLACES. Entering one record asked for the same 328-node corpus
+   *  SIXTY-SIX times, because each hop asked what was green and each green pass
+   *  fetched its own inputs. Stamping made each ask cost 4 ms instead of 300 —
+   *  and left the sixty-six.
+   *
+   *  IT IS A PARAMETER, NOT A CACHE, and that is the point. It lives on the
+   *  stack for one operation, so it cannot outlive its inputs, cannot go stale
+   *  and needs no invalidation. It is the version of a cache that cannot be
+   *  wrong — unlike the two I built today that could. */
+  static newPass(): GreenPass {
+    return { done: new Map() };
+  }
+
+  recordDone(decl: MachineDecl, seen: Set<string> = new Set(), pass: GreenPass = Session.newPass()): string[] {
+    const memo = pass.done.get(decl.id);
+    if (memo !== undefined) return memo;
     const it = this.declIteration(decl);
     if (it === undefined) return [];
+    // THE RIPPLE COVERS CONTAINERS TOO, so claimFeeders must not look THROUGH
+    // one. A container carries no evidence of its own and used to read as a
+    // waypoint, which is what let the objective skip a whole sub-machine.
     const claimful = new Set(decl.states.filter((s) => s.evidence_form.length > 0).map((s) => s.id));
-    const green = this.standingClaims(decl, it, claimful);
+    const green = this.standingClaims(decl, it, claimful, pass);
+    for (const s of decl.states) {
+      if (s.submachine === undefined) continue;
+      claimful.add(s.id);
+      if (this.drawingDone(s.id, seen, pass)) green.add(s.id);
+    }
     // GREEN STOPS AT THE FIRST INPUT THAT IS NOT GREEN. This is the ripple,
     // and it is a graph walk rather than a mark on a file. A claim may be word
     // for word fine and still rest on ground that moved.
@@ -3623,6 +3741,7 @@ export class Session {
     const done = [...green];
     // The mechanical start was necessarily walked on the way to any claim.
     if (done.length > 0) done.push("start");
+    pass.done.set(decl.id, done);
     return done;
   }
 

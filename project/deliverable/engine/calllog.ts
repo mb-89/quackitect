@@ -4,7 +4,7 @@
 // a run is citable evidence. Machine-local (.se/), never committed.
 
 import { randomBytes } from "node:crypto";
-import { appendFileSync, existsSync, mkdirSync, readFileSync, statSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { stripBom } from "./jsonio.ts";
 
@@ -47,8 +47,20 @@ export function slowMs(): number {
   return Number(process.env.SE_SLOW_MS ?? 1000);
 }
 
+/** THE LIVE FILE'S CEILING. Roughly ten thousand records at the size this
+ *  log actually runs to (owner ruling 2026-08-09: cap it at ten thousand).
+ *  It is measured in BYTES because a byte is one stat call and a line count
+ *  is a full read — and reading the log to decide whether the log is too big
+ *  to read is the joke this whole change exists to stop. */
+const ROTATE_BYTES = 12 * 1024 * 1024;
+
+/** How often the size is checked. A stat is cheap; a stat per append is
+ *  still a syscall on the hot path for nothing. */
+const STAT_EVERY = 50;
+
 export class CallLog {
   readonly path: string;
+  private sinceStat = STAT_EVERY;
 
   constructor(seDir: string) {
     this.path = join(seDir, "calls.jsonl");
@@ -63,7 +75,57 @@ export class CallLog {
     };
     mkdirSync(dirname(this.path), { recursive: true });
     appendFileSync(this.path, `${JSON.stringify(rec)}\n`, "utf8");
+    this.rotateIfFull();
     return rec;
+  }
+
+  /** ROTATE BY RENAME, NEVER BY REWRITE (owner ruling 2026-08-09).
+   *
+   *  Trimming a JSONL to its last N lines means reading and rewriting the
+   *  whole file. That is the same synchronous cost this is removing, paid on
+   *  every rotation instead of every query, and a process that dies mid-write
+   *  leaves the log torn — the one file that must survive a crash.
+   *
+   *  A rename is one filesystem operation and it is atomic on the same
+   *  volume. The live file starts empty; the old one keeps every byte.
+   *
+   *  NOTHING IS EVER DELETED HERE. The standing ruling is that the raw log is
+   *  kept forever-until-1GB, and the owner reaffirmed it: at a gigabyte we
+   *  TALK about the old records rather than a collector quietly eating them. */
+  private rotateIfFull(): void {
+    if (--this.sinceStat > 0) return;
+    this.sinceStat = STAT_EVERY;
+    try {
+      if (statSync(this.path).size < ROTATE_BYTES) return;
+      renameSync(this.path, join(dirname(this.path), `calls-${new Date().toISOString().replace(/[:.]/g, "-")}.jsonl`));
+    } catch {
+      // a rotation that cannot happen must never cost a record
+    }
+  }
+
+  /** The archives, OLDEST FIRST — the order the live file continues from, so
+   *  a caller reading history then the live file reads it in time order. */
+  private archives(): string[] {
+    try {
+      return readdirSync(dirname(this.path))
+        .filter((n) => /^calls-.*\.jsonl$/.test(n))
+        .sort()
+        .map((n) => join(dirname(this.path), n));
+    } catch {
+      return [];
+    }
+  }
+
+  /** Total bytes across the live file and every archive — the number the
+   *  gigabyte conversation is about. */
+  bytesKept(): number {
+    let total = 0;
+    for (const p of [...this.archives(), this.path]) {
+      try {
+        total += statSync(p).size;
+      } catch {}
+    }
+    return total;
   }
 
   /** ONE PARSE, NOT FOUR THOUSAND (owner, 2026-07-29: clicking a log line
@@ -78,8 +140,19 @@ export class CallLog {
    *  Newest first: a reader clicks what they just saw, and the feed shows the
    *  newest at the top. */
   find(ref: string): CallRecord | undefined {
-    if (!existsSync(this.path)) return undefined;
-    const lines = stripBom(readFileSync(this.path, "utf8")).split("\n");
+    // NEWEST FILE FIRST, then back through the archives. A ref lookup is rare
+    // and must never MISS — a record the reader can see in the feed but not
+    // open would be worse than a slow open.
+    for (const p of [this.path, ...this.archives().reverse()]) {
+      const hit = CallLog.findIn(p, ref);
+      if (hit !== undefined) return hit;
+    }
+    return undefined;
+  }
+
+  private static findIn(path: string, ref: string): CallRecord | undefined {
+    if (!existsSync(path)) return undefined;
+    const lines = stripBom(readFileSync(path, "utf8")).split("\n");
     for (let i = lines.length - 1; i >= 0; i--) {
       const line = lines[i];
       if (!line.includes(ref)) continue;
@@ -91,9 +164,36 @@ export class CallLog {
     return undefined;
   }
 
-  private lines(): string[] {
-    if (!existsSync(this.path)) return [];
-    return stripBom(readFileSync(this.path, "utf8")).split("\n");
+  /** THE LIVE FILE ONLY, unless the caller says how far back it needs.
+   *
+   *  This is the bounded default and it is the point of rotating. Nearly every
+   *  read wants recent records: the retro mines its own period, the banner
+   *  reads the previous sitting, the feed shows the newest page. Reaching into
+   *  the archives for those would put the whole history back on the event loop
+   *  and rotation would have bought nothing.
+   *
+   *  `since` is the one honest reason to go further. When the live file does
+   *  not reach back that far, archives are prepended until it does — so a
+   *  retro whose window crosses a rotation still sees its whole period.
+   *  Without that, the first retro after a rotation would silently mine half
+   *  its window and report a clean run that was not clean. */
+  private lines(since?: string): string[] {
+    const read = (p: string): string[] => (existsSync(p) ? stripBom(readFileSync(p, "utf8")).split("\n") : []);
+    const live = read(this.path);
+    if (since === undefined) return live;
+    const reaches = (ls: string[]): boolean => {
+      for (const l of ls) {
+        const m = /"ts":"([^"]+)"/.exec(l);
+        if (m !== null) return m[1] <= since;
+      }
+      return false;
+    };
+    let out = live;
+    for (const p of this.archives().reverse()) {
+      if (reaches(out)) break;
+      out = read(p).concat(out);
+    }
+    return out;
   }
 
   /** WHERE THE PREVIOUS RETRO ENDED, from drain lines alone. Only lines
@@ -104,6 +204,9 @@ export class CallLog {
   private lastRetroMark(): string | undefined {
     let judged: string | undefined;
     let any: string | undefined;
+    // No `since` to hand it: a drain older than the live file is a retro that
+    // ended before the rotation, and the window opening at the live file's
+    // start is the honest answer rather than a scan of every archive.
     for (const line of this.lines()) {
       if (!line.includes('"se_note_drain"')) continue;
       try {
@@ -148,7 +251,7 @@ export class CallLog {
       });
     }
     const out: CallRecord[] = [];
-    for (const line of this.lines()) {
+    for (const line of this.lines(f.since)) {
       if (line.trim() === "" || !rough.every((k) => k(line))) continue;
       try {
         const rec = JSON.parse(line) as CallRecord;
