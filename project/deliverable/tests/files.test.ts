@@ -47,6 +47,49 @@ test("no binary file lives under project/ — an unreadable figure is not an art
   assert.deepEqual(offenders, [], "author figures as inline SVG, Mermaid or ASCII; a binary is input, never evidence");
 });
 
+// THE DOOR ONLY HELPS WHAT WALKS THROUGH IT (owner question, 2026-08-09:
+// "what do you need to search for so that you know that you found every call?").
+//
+// The answer is this string, and the reason it needs a test is that four
+// separate caches were built before anyone counted. Together they cost 39,857
+// stats and left the three biggest readers untouched — because those readers
+// called readFileSync themselves and no cache stood in their way. A door that
+// can be walked around is a suggestion.
+//
+// A RATCHET, NOT A BAN. Ninety-nine of these are legitimate: JSON config, a
+// canvas, a git object, a file read once at boot. Banning them would be a lie
+// nobody could keep. What must never happen is the number going UP without
+// somebody deciding it should — so it may fall freely and cannot rise.
+//
+// bin/ IS EXEMPT. A one-shot script reads its input and exits; there is no
+// second ask for a door to save.
+test("no new file read bypasses the door — the count may fall, never rise", () => {
+  const CEILING = 99;
+  let found = 0;
+  const offenders: string[] = [];
+  const walk = (dir: URL, rel: string): void => {
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      if (e.isDirectory()) {
+        if (e.name !== "bin") walk(new URL(`${e.name}/`, dir), `${rel}${e.name}/`);
+        continue;
+      }
+      // notes.ts IS the door. Its own read is the one that is supposed to be there.
+      if (!e.name.endsWith(".ts") || e.name === "notes.ts") continue;
+      const n = (readFileSync(new URL(e.name, dir), "utf8").match(/readFileSync\(/g) ?? []).length;
+      if (n > 0) offenders.push(`${rel}${e.name} (${n})`);
+      found += n;
+    }
+  };
+  walk(new URL("../engine/", import.meta.url), "engine/");
+  assert.ok(
+    found <= CEILING,
+    `${found} direct file reads, up from ${CEILING}. Read notes through readNode/noteOf/nodeLines instead — ` +
+      `they share one read and one parse with every other reader. If the new read is genuinely one-shot, ` +
+      `lower nothing and raise CEILING with a reason.\n${offenders.join("\n")}`,
+  );
+  assert.ok(found >= CEILING - 20, `${found} reads against a ceiling of ${CEILING} — lower the ceiling, the ratchet has slack`);
+});
+
 // AN EMPTY RESULT AND AN UNREADABLE FILE MUST NEVER LOOK ALIKE (found live
 // 2026-07-29). engine/worktree.ts carried ONE raw NUL byte, used as a
 // cache-key separator. ripgrep called the whole file binary and said so on a

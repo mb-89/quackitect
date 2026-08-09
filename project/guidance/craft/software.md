@@ -196,6 +196,60 @@ COUNT THE ASKS, NOT THE MILLISECONDS. If one operation asks an outside system
 for the same thing more than once, the number of times is the defect, whatever
 each one costs.
 
+### The pass, for readers too deep to thread a parameter through
+
+Some readers sit twenty frames below the operation. Threading a parameter to
+all of them is a refactor nobody will finish, and half-done it is worse than
+not started.
+
+SO THE OPERATION DECLARES ITSELF INSTEAD. It opens a PASS. Inside one, the
+door verifies each file ONCE and answers every later access from what it holds.
+
+- `withPass(fn)` wraps a synchronous operation.
+- `passEpoch()` keys anything derived from MANY files on the pass that built it.
+- Outside a pass, every access asks. That is what a test gets, and it is right.
+
+WHAT IT IS WORTH, measured on one record entry:
+
+- The door's stats: 19,730 to 583.
+- The corpus sweep: 19,024 stats to 2,952.
+- The route: 2,488 ms to 1,271 ms.
+
+### A pass covers reading, never writing
+
+TWO ATTEMPTS TO MAKE THE PASS AUTOMATIC FAILED, both on the same day, both on
+the same law.
+
+The first held files for 2,000 ms of wall clock. Five tests refused it.
+
+The second held them for one turn of the event loop — indivisible, with no
+interval of trust at all, since nothing else can run inside a synchronous
+region. Seven tests refused it, one of them a product law:
+
+> a state note edited on disk binds the NEXT call, no reload
+
+SHRINKING THE WINDOW FROM SECONDS TO MICROSECONDS DID NOT CHANGE THE CLASS OF
+THE BUG. That is the finding. Both failed because a caller writes through
+something other than the lane and reads back inside the same window.
+
+SO THE RULE IS NARROW ON PURPOSE. An operation that only READS may be a pass.
+The route and the mirror's render qualify. Anything that writes while it walks
+does not.
+
+### A door only helps what walks through it
+
+Four caches were built before anyone counted. Together they cost 39,857 stats
+and left the three biggest readers untouched, because those readers called
+`readFileSync` themselves and no cache stood in their way.
+
+A DOOR THAT CAN BE WALKED AROUND IS A SUGGESTION. So the count of direct reads
+is held by a ratchet test: it may fall freely and cannot rise
+(`tests/files.test.ts`).
+
+A ban would be a lie. Ninety-nine of those reads are legitimate — JSON, a
+canvas, a git object, a one-shot script. What must never happen is the number
+growing without somebody deciding it should.
+
 ### And none of it makes a long scan acceptable inline
 
 Capping the work makes it cheaper. It does not make it correct to run on
