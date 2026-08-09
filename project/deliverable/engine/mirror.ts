@@ -17,6 +17,7 @@ import { CLAUSES, Rejection } from "./errors.ts";
 import { appendNote, pendingNotes, readNotes } from "./inbox.ts";
 import { bumpDrawingEpoch } from "./machines/compile.ts";
 import { handleHttp, type McpServer } from "./mcp.ts";
+import { beginPass, endPass } from "./notes.ts";
 import { loadPanel, renderPanel } from "./params.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { ENGINE_LIFE, feedRows, type MirrorState, renderMirror } from "./render.ts";
@@ -737,6 +738,11 @@ export function startMirror(o: MirrorOptions): Server {
   const server = createServer((req, res) => {
     // Every request is a new drawing epoch — see machines/compile.ts.
     bumpDrawingEpoch();
+    // AND ONE PASS OVER DISK (software.md, input-process-output). A render
+    // asks the same notes over and over; inside a pass the door stats each of
+    // them once. The boundary is already here — the drawing epoch draws it —
+    // and a request is exactly the operation the input belongs to.
+    beginPass();
     const url = new URL(req.url ?? "/", `http://localhost:${o.port}`);
     const started = Date.now();
     const finish = res.end.bind(res) as (...a: unknown[]) => Res;
@@ -807,6 +813,12 @@ export function startMirror(o: MirrorOptions): Server {
       }
       res.writeHead(500, { "content-type": "text/plain; charset=utf-8" });
       res.end(body);
+    } finally {
+      // THE PASS CLOSES WITH THE SYNCHRONOUS BODY, not with the response. A
+      // route that continues asynchronously does the rest of its reading
+      // outside the pass, stat per access, which is the correct answer and
+      // the slower one.
+      endPass();
     }
   });
 

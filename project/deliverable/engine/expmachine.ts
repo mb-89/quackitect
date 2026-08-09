@@ -7,11 +7,12 @@
 // machine, the others stay parked. Nothing open: start runs to end.
 // The drawn continue_expedition.canvas is a stub saying exactly this.
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+
 import { join } from "node:path";
 import { type CanvasData, type CanvasEdge, type CanvasElement, nodeSize } from "./canvas.ts";
 import { type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
 import { stateFromNote } from "./machines/compile.ts";
+import { readNode } from "./notes.ts";
 import { type Expedition, expList, frontmatterOf, readRecord, recordRel } from "./worktree.ts";
 
 export interface GeneratedMachine {
@@ -174,8 +175,15 @@ function closedRecords(root: string, closed: Expedition[]): Map<string, Record<s
   const missing: Expedition[] = [];
   for (const e of closed) {
     const merged = join(root, recordRel(e.id));
-    if (existsSync(merged)) {
-      out.set(e.id, frontmatterOf(readFileSync(merged, "utf8"), `${e.id} record`));
+    // ONE ASK, THROUGH THE DOOR. This was existsSync then readFileSync — two
+    // syscalls for one answer, 4,448 of the first to enter a record, and
+    // neither of them shared with any other reader of the same file.
+    //
+    // EMPTY READS AS ABSENT, which is exact here: a record file always carries
+    // frontmatter, so an empty one is a file that is not there.
+    const text = readNode(merged);
+    if (text !== "") {
+      out.set(e.id, frontmatterOf(text, `${e.id} record`));
     } else if (cache.has(e.id)) {
       out.set(e.id, cache.get(e.id));
     } else {

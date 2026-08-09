@@ -11,7 +11,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { contentHash } from "./hash.ts";
-import { nodeLines, noteOf, parseStateNote, readNode } from "./notes.ts";
+import { nodeLines, noteOf, parseStateNote, passEpoch, readNode } from "./notes.ts";
 
 /** THE SHARED SPINE, in ring order from the centre outward. Every wedge holds
  *  these whole, and nothing branches until the last of them.
@@ -467,7 +467,7 @@ export function conformance(root: string, node: TraceNode): string[] {
  *  every machine. The server answers nothing while that runs — the MCP
  *  endpoint shares the event loop — so the transport gave up and the
  *  extension had to be restarted. */
-const CORPUS = new Map<string, { stamp: string; nodes: TraceNode[] }>();
+const CORPUS = new Map<string, { stamp: string; nodes: TraceNode[]; epoch: number }>();
 
 /** ONE FILE, READ ONCE UNTIL IT MOVES — the same rule as the corpus, one
  *  level down.
@@ -517,17 +517,32 @@ function corpusStamp(files: string[]): string {
  *  per pass and key every verdict in that pass on it — asking per item would
  *  pay the walk per item. */
 export function corpusVersion(root: string): string {
+  // THE CORPUS THIS PASS ALREADY BUILT carries the stamp with it. Asking again
+  // would re-sweep 328 files to recompute a string that is sitting in the map.
+  const era = passEpoch();
+  const hit = CORPUS.get(root);
+  if (hit !== undefined && era !== 0 && hit.epoch === era) return hit.stamp;
   return corpusStamp(traceFiles(traceDir(root)));
 }
 
 export function loadTrace(root: string): TraceNode[] {
-  const files = traceFiles(traceDir(root));
-  const stamp = corpusStamp(files);
   const hit = CORPUS.get(root);
   // A COPY, NEVER THE STORED ARRAY. A caller that sorts what it was handed
   // would otherwise reorder every later caller's corpus, and the bug would
   // look like the sort rather than the sharing.
-  if (hit !== undefined && hit.stamp === stamp) return hit.nodes.slice();
+  //
+  // BUILT IN THIS PASS ALREADY. The sweep below is what the pass exists to
+  // remove: 328 stats to decide whether to rebuild, paid 58 times to enter one
+  // record, on a corpus whose every file the pass had already verified. A
+  // lane write bumps the epoch, so a corpus built before it is never reused.
+  const era = passEpoch();
+  if (hit !== undefined && era !== 0 && hit.epoch === era) return hit.nodes.slice();
+  const files = traceFiles(traceDir(root));
+  const stamp = corpusStamp(files);
+  if (hit !== undefined && hit.stamp === stamp) {
+    hit.epoch = era;
+    return hit.nodes.slice();
+  }
   const out: TraceNode[] = [];
   for (const file of files) {
     // THROUGH THE ONE DOOR, so the corpus and every later reader of the same
@@ -564,7 +579,7 @@ export function loadTrace(root: string): TraceNode[] {
       file,
     });
   }
-  CORPUS.set(root, { stamp, nodes: out });
+  CORPUS.set(root, { stamp, nodes: out, epoch: era });
   return out.slice();
 }
 

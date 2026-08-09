@@ -42,7 +42,10 @@ function wrap(obj, name, label, withSite) {
       t.ms += took;
       tally.set(label, t);
       if (withSite) {
-        const where = callsite();
+        // THE LABEL IS PART OF THE KEY. Without it stat and exists share a row
+        // and the table cannot say which call a site is making — which is the
+        // one thing it exists to say.
+        const where = `${label.replace("fs.", "").padEnd(11)} ${callsite()}`;
         const s = sites.get(where) ?? { calls: 0, ms: 0 };
         s.calls++;
         s.ms += took;
@@ -69,8 +72,8 @@ process.on("exit", () => {
   }
   process.stdout.write(`${"TOTAL".padEnd(28)} ${"".padStart(8)}       ${total.toFixed(0).padStart(8)} ms\n`);
 
-  process.stdout.write("\nWHO STATS, most calls first\n");
-  const top = [...sites.entries()].sort((x, y) => y[1].calls - x[1].calls).slice(0, 15);
+  process.stdout.write("\nWHO ASKS, most calls first\n");
+  const top = [...sites.entries()].sort((x, y) => y[1].calls - x[1].calls).slice(0, 18);
   for (const [where, s] of top) {
     process.stdout.write(`${String(s.calls).padStart(7)} calls ${s.ms.toFixed(0).padStart(7)} ms   ${where}\n`);
   }

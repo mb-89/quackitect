@@ -50,6 +50,9 @@ interface HeldFile {
   text: string;
   lines?: string[];
   note?: StateNote;
+  /** The pass that last verified this against disk. Equal to the current one
+   *  means the stat already happened in this operation. */
+  epoch: number;
 }
 
 const HELD = new Map<string, HeldFile>();
@@ -87,20 +90,103 @@ const HELD = new Map<string, HeldFile>();
  *  without waiting for anything. */
 export function forgetPath(path: string): void {
   HELD.delete(resolve(path));
+  // EVERY DERIVED ANSWER FALLS WITH IT. The corpus and its friends cannot say
+  // which files they read, so one write moves them all. Working out which ones
+  // actually touched this path is a dependency graph nobody asked for.
+  DERIVED += 1;
 }
 
-/** THE MODEL'S GENERATION — one number that changes when anything it holds
- *  does. Anything DERIVED from many files keys on this instead of stat-sweeping
- *  them all: the corpus stamp swept 328 files 66 times in one entry, 21,648
- *  stats to answer a question this answers in a lookup.
+/** ONE OPERATION'S WINDOW ONTO DISK.
  *
- *  IT IS DELIBERATELY COARSE. A change to one node invalidates every derived
- *  answer, not just the ones that read that node. Recomputing a few things that
- *  did not need it beats sweeping thousands of files to find out which did. */
-const generation = 0;
+ *  Inside a pass the door stats each file ONCE and answers every later access
+ *  from what it already holds. Outside a pass it stats per access, which is
+ *  what a test or a stray caller gets.
+ *
+ *  THIS IS NOT THE TRUST WINDOW THE SUITE REFUSED. That one was two seconds of
+ *  WALL CLOCK, and a note edited during it stayed unseen — the product law says
+ *  "a state note edited on disk binds the NEXT call, no reload" (editsafety),
+ *  and a clock does not know where one call ends. A pass does. It opens when a
+ *  lane call arrives and closes when its answer goes out, so the next call
+ *  re-stats everything by construction and the law holds exactly.
+ *
+ *  WHAT IT BUYS. Entering one record touched the corpus's 328 notes about sixty
+ *  times over: 19,730 stats for 328 answers. The sixty is the shape defect that
+ *  input-process-output names, and the pass is that rule made mechanical for
+ *  the readers too deep to thread a parameter through.
+ *
+ *  NESTING IS A DEPTH COUNT, not a second epoch. An inner beginPass inside an
+ *  outer one must not bump the generation — that would silently re-stat the
+ *  whole corpus halfway through the outer operation, which is the cost this
+ *  removes. */
+let EPOCH = 0;
+let DERIVED = 0;
+let DEPTH = 0;
 
-export function modelGeneration(): number {
-  return generation;
+// TWO COUNTERS, BECAUSE A WRITE INVALIDATES TWO DIFFERENT THINGS.
+//
+// EPOCH is the door's own: it says "this pass has already stat'd that file".
+// Writing one file says nothing about the other 327, so a write leaves it
+// alone and simply drops the written entry.
+//
+// DERIVED is for answers built FROM MANY files — the corpus, the expedition
+// list, the matrix hash. Those cannot say which file they depended on, so any
+// write moves them all. Measured: bumping ONE counter on write cost 5,031
+// stats where 583 was possible, because the route writes generated containers
+// while it walks and each write re-invalidated the whole corpus.
+
+export function beginPass(): void {
+  if (DEPTH === 0) {
+    EPOCH += 1;
+    DERIVED += 1;
+  }
+  DEPTH += 1;
+}
+
+export function endPass(): void {
+  if (DEPTH > 0) DEPTH -= 1;
+}
+
+/** The current pass, or 0 outside one. Anything DERIVED from many notes keys
+ *  on this: the pass already verified every file, so a derived answer built in
+ *  this pass is as fresh as the files it was built from. */
+export function passEpoch(): number {
+  return DEPTH > 0 ? DERIVED : 0;
+}
+
+/* THE PASS IS OPENED BY HAND, AND THAT IS THE SECOND TIME THIS WAS SETTLED.
+ *
+ * An AUTOMATIC pass was tried on 2026-08-09: the first door access in a turn
+ * of the event loop opens one, a microtask closes it. The reasoning was that a
+ * synchronous region is exactly one turn, so no interval of trust exists at
+ * all — only the indivisible region in which nothing else can run.
+ *
+ * SEVEN TESTS REFUSED IT, and one of them is a product law:
+ *
+ *   "a row edited now reaches the walk's machine with no pull at all"
+ *
+ * The others were the archive missing a closed expedition, a re-signed claim
+ * not standing again, and the item register dropping a held assumption. All
+ * the same fault: a caller writes through something other than the lane, then
+ * reads back inside the same turn, and gets what it wrote over.
+ *
+ * SO THE RULE IS: a pass covers an operation that only READS. Route and the
+ * mirror's render qualify and are wrapped. Anything that writes while it walks
+ * does not, and asking per access is what keeps it correct.
+ *
+ * The first attempt was a 2,000 ms window (same day, five tests). Shrinking
+ * the window from seconds to microseconds did not change the class of the bug
+ * — which is the finding worth keeping. */
+
+/** Run one operation as a pass. ALWAYS through this, never the raw pair — a
+ *  begin whose end is skipped by a throw would freeze the door on stale text
+ *  for the rest of the process. */
+export function withPass<T>(fn: () => T): T {
+  beginPass();
+  try {
+    return fn();
+  } finally {
+    endPass();
+  }
 }
 
 /** THE ONE DOOR ONTO A REPO FILE. Read it once, split it once, parse it once,
@@ -128,6 +214,10 @@ export function modelGeneration(): number {
 function held(path: string): HeldFile | undefined {
   const key = resolve(path);
   const hit = HELD.get(key);
+  // ALREADY VERIFIED THIS OPERATION. The stat happened on the first access and
+  // nothing since then could have moved the file without a lane write, which
+  // calls forgetPath.
+  if (hit !== undefined && DEPTH > 0 && hit.epoch === EPOCH) return hit;
   // NO TRUST WINDOW. It was tried on 2026-08-09 and the suite refused it in
   // four places, one of them a product law: "a state note edited on disk binds
   // the NEXT call, no reload" (editsafety). fs.watch is asynchronous, so
@@ -146,14 +236,17 @@ function held(path: string): HeldFile | undefined {
     HELD.delete(key);
     return undefined;
   }
-  if (hit !== undefined && hit.stamp === stamp) return hit;
+  if (hit !== undefined && hit.stamp === stamp) {
+    hit.epoch = EPOCH;
+    return hit;
+  }
   let text: string;
   try {
     text = readFileSync(key, "utf8");
   } catch {
     return undefined;
   }
-  const fresh: HeldFile = { stamp, text };
+  const fresh: HeldFile = { stamp, text, epoch: EPOCH };
   HELD.set(key, fresh);
   return fresh;
 }

@@ -91,7 +91,7 @@ import {
   readItRecord,
   repinColumn,
 } from "./iterations.ts";
-import { parseStateNote, section } from "./notes.ts";
+import { parseStateNote, section, withPass } from "./notes.ts";
 import { fansOut, methodFilesIn, pathKind, recordOwnerOf, resolveInRoot, seDir } from "./paths.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
@@ -1765,6 +1765,27 @@ export class Session {
    *  each one in turn is how a five-minute errand becomes an afternoon of
    *  being asked one question at a time. */
   route(target: string): RouteResult & {
+    from: string;
+    autonomy: number;
+    judgments: { at: string; needs: string; why: string }[];
+    reads: string[];
+    stops_at?: { at: string; why: string };
+    fan: { at: string; legs: string[] }[];
+  } {
+    // ONE PASS OVER DISK FOR THE WHOLE ROUTE (software.md, input-process-
+    // output). Between here and the return the door stats each note ONCE
+    // instead of once per access. Entering one record touched the same 328
+    // notes about sixty times over — 19,730 stats to answer 328 questions.
+    //
+    // SYNCHRONOUS ON PURPOSE. Nothing can interleave inside a pass, so no
+    // other operation is ever handed this one's held text, and the next lane
+    // call re-stats everything. An async wrapper would break exactly that:
+    // two overlapping calls would share a pass, and a file written by the
+    // first would go unseen by the second.
+    return withPass(() => this.routeNow(target));
+  }
+
+  private routeNow(target: string): RouteResult & {
     from: string;
     autonomy: number;
     judgments: { at: string; needs: string; why: string }[];

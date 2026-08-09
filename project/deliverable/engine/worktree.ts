@@ -8,7 +8,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
-import { parseStateNote } from "./notes.ts";
+import { parseStateNote, passEpoch } from "./notes.ts";
 
 /** Free prose as a YAML scalar. Backslashes first, then quotes — the other
  *  order doubles the escape it just added. */
@@ -133,7 +133,21 @@ export function readRecord(root: string, e: Expedition): Record<string, unknown>
  *  Anything in the lane that moves a ref still calls bustBranchList. */
 const branchList = new Map<string, { stamp: string; branches?: string[]; failure?: Rejection }>();
 
+/** The four ref paths, stat'd once per pass. Every branch list asks for this
+ *  and the walk asks for branch lists constantly — 1,580 stats to enter one
+ *  record, for four files that cannot move inside one synchronous operation. */
+const REF_STAMP = new Map<string, { epoch: number; value: string }>();
+
 function refStamp(root: string): string {
+  const era = passEpoch();
+  const seen = REF_STAMP.get(root);
+  if (seen !== undefined && era !== 0 && seen.epoch === era) return seen.value;
+  const value = refStampNow(root);
+  if (era !== 0) REF_STAMP.set(root, { epoch: era, value });
+  return value;
+}
+
+function refStampNow(root: string): string {
   const g = join(root, ".git");
   const parts: string[] = [];
   for (const p of [join(g, "packed-refs"), join(g, "refs", "heads"), join(g, "refs", "heads", "it"), join(g, "refs", "heads", "exp")]) {
@@ -149,6 +163,8 @@ function refStamp(root: string): string {
 
 export function bustBranchList(): void {
   branchList.clear();
+  REF_STAMP.clear();
+  EXP_LIST.clear();
 }
 
 export function listBranches(root: string, glob: string): string[] {
@@ -176,8 +192,19 @@ export function listBranches(root: string, glob: string): string[] {
   }
 }
 
+/** One existsSync per expedition, and the walk asks for the whole list over
+ *  and over: 5,824 of them to enter one record. Inside a pass the answer is
+ *  built once — a worktree cannot appear halfway through a synchronous
+ *  operation, and the lane's own seed and close both call bustBranchList. */
+const EXP_LIST = new Map<string, { epoch: number; value: Expedition[] }>();
+
 /** Open = the worktree exists. Closed (archive) = branch exp/* without one. */
 export function expList(root: string): Expedition[] {
+  const era = passEpoch();
+  const seen = EXP_LIST.get(root);
+  // A COPY. The sort below hands back a fresh array today; a caller that
+  // mutates the stored one would otherwise poison every later reader.
+  if (seen !== undefined && era !== 0 && seen.epoch === era) return seen.value.slice();
   const out: Expedition[] = [];
   const branches = listBranches(root, "exp/*");
   for (const branch of branches) {
@@ -187,7 +214,9 @@ export function expList(root: string): Expedition[] {
   }
   // NUMERIC order — git lists branches alphabetically (e1, e10, e11, …,
   // e2), which reads as missing entries to a human scanning for e10.
-  return out.sort((a, b) => Number(a.id.match(/^e(\d+)/)?.[1] ?? 0) - Number(b.id.match(/^e(\d+)/)?.[1] ?? 0));
+  out.sort((a, b) => Number(a.id.match(/^e(\d+)/)?.[1] ?? 0) - Number(b.id.match(/^e(\d+)/)?.[1] ?? 0));
+  if (era !== 0) EXP_LIST.set(root, { epoch: era, value: out.slice() });
+  return out;
 }
 
 export function expNew(root: string, kind: string, goal: string): Expedition {
