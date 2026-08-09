@@ -17,8 +17,11 @@ Lives in `project/spec/trace/story/`. It is a STANDING ARTIFACT: it outlives
 the iteration that authored it, lands on trunk when that record closes, and a
 later record may change it.
 
-A story is the concrete anchor of the trace. A value prop says what the
-product promises; a story shows one named actor getting it, once, end to end.
+A story is the concrete anchor of the trace.
+
+A value prop says what the product promises. A story shows one named actor
+getting it once, end to end.
+
 Several stories may serve one value prop, and use cases generalise them later.
 
 THE STORY IS THE DECK. Its body is markdown slides, the shape Obsidian uses:

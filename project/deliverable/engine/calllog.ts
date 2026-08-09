@@ -21,6 +21,19 @@ export interface CallRecord {
   se_version: string;
 }
 
+/** What the last sitting did, derived rather than written down. */
+export interface LastSession {
+  from: string;
+  to: string;
+  calls: number;
+  /** The last position the machine reported — where the person walked away. */
+  ended_at?: string;
+  /** Refusal clause to count, so a repeated one is visible at a glance. */
+  refusals?: Record<string, number>;
+  notes?: string[];
+  answers?: string[];
+}
+
 const SE_VERSION = "3.0.0-bootstrap";
 const GB = 1024 * 1024 * 1024;
 
@@ -140,6 +153,106 @@ export class CallLog {
     const end = Math.max(0, records.length - offset);
     const start = Math.max(0, end - limit);
     return { total: records.length, offset, older: start, records: records.slice(start, end) };
+  }
+
+  /** THE LAST SESSION, READ OFF THE LOG (owner ruling 2026-08-07).
+   *
+   *  THIS REPLACES THE WRITTEN HANDOVER. The old one had a gate at the `end`
+   *  state, so a session that simply stopped — the host closed, the person
+   *  walked away — never wrote one. The owner named that plainly: they kill
+   *  the session, so there was never a handover. A briefing nobody writes is
+   *  worth less than one nobody has to.
+   *
+   *  THE LOG ALREADY KNOWS. Every call lands here with its verdict, so the
+   *  last session can be described rather than remembered. It cannot go
+   *  stale, it cannot be forgotten, and it costs the reader nothing.
+   *
+   *  ONLY THE TAIL IS PARSED. Splitting a few megabytes of text is cheap;
+   *  JSON.parse of every record is not, and this runs during boot. The same
+   *  trade find() already makes one line at a time.
+   *
+   *  SESSIONS ARE TOLD APART BY A GAP. There is no session id in the record
+   *  and adding one would only describe sessions written after the change.
+   *  A quiet stretch is what actually separates two sittings. */
+  /** ONLY THE TAIL IS PARSED. Splitting a few megabytes of text is cheap;
+   *  JSON.parse of every record is not, and this runs during boot. The same
+   *  trade find() already makes one line at a time. */
+  private tailRecords(tailLines: number): CallRecord[] {
+    if (!existsSync(this.path)) return [];
+    const lines = stripBom(readFileSync(this.path, "utf8")).split("\n");
+    const out: CallRecord[] = [];
+    for (let i = lines.length - 1; i >= 0 && out.length < tailLines; i--) {
+      if (lines[i].trim() === "") continue;
+      try {
+        out.push(JSON.parse(lines[i]) as CallRecord);
+      } catch {
+        // a torn last line is normal on a killed process
+      }
+    }
+    return out.reverse();
+  }
+
+  /** THE SITTING BEFORE THIS ONE. Walk back over the current run, then over
+   *  the one before it — the second is what the reader wants, the first is
+   *  their own and they were there for it. */
+  private previousRun(tail: CallRecord[], gapMs: number): CallRecord[] {
+    if (tail.length === 0) return [];
+    const startOfRun = (endIdx: number): number => {
+      let i = endIdx;
+      while (i > 0 && Date.parse(tail[i].ts) - Date.parse(tail[i - 1].ts) < gapMs) i--;
+      return i;
+    };
+    const currentFrom = startOfRun(tail.length - 1);
+    if (currentFrom === 0) return []; // nothing older is in view
+    const prevTo = currentFrom - 1;
+    return tail.slice(startOfRun(prevTo), prevTo + 1);
+  }
+
+  /** WHAT WENT WRONG, AND WHERE IT STOPPED. Clause counts make a repeated
+   *  refusal visible at a glance — the same one firing twenty times is a
+   *  design problem, not twenty accidents. */
+  private static verdicts(run: CallRecord[]): { refusals: Record<string, number>; ended?: string } {
+    const refusals: Record<string, number> = {};
+    let ended: string | undefined;
+    for (const r of run) {
+      const res = r.response as Record<string, unknown> | null | undefined;
+      if (typeof res !== "object" || res === null) continue;
+      if (!r.ok && typeof res.clause === "string") refusals[res.clause] = (refusals[res.clause] ?? 0) + 1;
+      // A pull carries the position, so the last one is where the person
+      // walked away from.
+      if (Array.isArray(res.where) && res.where.length > 0) ended = res.where.join(", ");
+    }
+    return { refusals, ...(ended !== undefined ? { ended } : {}) };
+  }
+
+  /** WHAT WAS CAPTURED AND WHAT WAS ANSWERED. Both outlive the session in
+   *  their own stores; listing them here is a pointer, not a copy. */
+  private static captured(run: CallRecord[]): { notes: string[]; answers: string[] } {
+    const notes: string[] = [];
+    const answers: string[] = [];
+    for (const r of run) {
+      if (!r.ok) continue;
+      const a = r.args as { title?: unknown; question?: unknown };
+      if (r.tool === "se_note" && typeof a.title === "string") notes.push(a.title);
+      if (r.tool === "se_answer" && typeof a.question === "string") answers.push(a.question);
+    }
+    return { notes, answers };
+  }
+
+  lastSession(opts: { gapMinutes?: number; tailLines?: number } = {}): LastSession | undefined {
+    const run = this.previousRun(this.tailRecords(opts.tailLines ?? 4000), (opts.gapMinutes ?? 45) * 60_000);
+    if (run.length === 0) return undefined;
+    const { refusals, ended } = CallLog.verdicts(run);
+    const { notes, answers } = CallLog.captured(run);
+    return {
+      from: run[0].ts,
+      to: run[run.length - 1].ts,
+      calls: run.length,
+      ...(ended !== undefined ? { ended_at: ended } : {}),
+      ...(Object.keys(refusals).length > 0 ? { refusals } : {}),
+      ...(notes.length > 0 ? { notes } : {}),
+      ...(answers.length > 0 ? { answers } : {}),
+    };
   }
 
   /** ~1 GB: surface a cleanup decision, never auto-delete (owner ruling, v2). */

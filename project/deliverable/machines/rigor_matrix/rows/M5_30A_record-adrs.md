@@ -51,4 +51,18 @@ specification_note: |
 
 ## Guidance
 
-The why lives once, here. Every decision is its OWN FILE (kind: decision - id, one-line decision, status, the addresses edge to the requirement or risk that forced it; the body holds context, options and consequences). The RAID register view includes the decisions beside the risks and assumptions ([[meth-raid]]) - one surface to read, files apart underneath. The rejected options stay recorded as history.
+The why lives once, here.
+
+Every decision is its OWN FILE, with `kind: decision`. It carries:
+
+- an id
+- the decision in one line
+- a status
+- the `addresses` edge to the requirement or risk that forced it
+
+The body holds the context, the options and the consequences.
+
+The RAID register view includes the decisions beside the risks and assumptions
+([[meth-raid]]). One surface to read, files apart underneath.
+
+The rejected options stay recorded as history.

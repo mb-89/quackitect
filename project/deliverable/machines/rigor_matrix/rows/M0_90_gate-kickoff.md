@@ -22,7 +22,7 @@ legal_tools:
   - se_answer
 evidence:
   - name: retro_drained
-    description: what happened to each pending note - built, dropped as obsolete, carried in, or parked with its ready-when
+    description: what happened to each pending note, in one word and a reason
     template: per-item
     items:
       - $inbox
@@ -71,7 +71,7 @@ product_note: |
   driven effort. Every iteration kickoff diffs against it implicitly.
 specification_note: |
   DOCUMENT FORM: the kickoff brief as the iteration record's opening -
-  goal, pulled-in/left-out, column with reasoning. Renders in the archive
+  the goal, what was pulled in and left out, and the column with its reasoning. It renders in the archive
   per iteration, never in the book's reader chapters. Template: the
   evidence form of the row, one instance per iteration, prefills
   commented until confirmed.
@@ -79,4 +79,38 @@ specification_note: |
 
 ## Guidance
 
-Review per [[meth-gate-review]]. The kickoff handover is ONE brief carrying everything: the drained retro, the iteration goal, the scope as pulled-in/left-out, and the CHANGE SIZE (the `change_size` field: patch, minor, major or product) with its reasoning - strikes named when a cell reduces the walk. THE FIRST ITERATION OF A PRODUCT IS `product`: it authors the vision packet, the stakeholders and the actual state, and every later iteration inherits those by pointer. A later iteration sizes itself against that standing baseline. The agent bakes scope and a PROPOSED column into the brief - no separate confirmation rounds before the gate. THE COLUMN IS A PROPOSAL, NEVER A DECISION: the agent names one with its reasoning, the person chooses, and the bless IS that choice. Seeding never asked for a size, so nothing was decided before this state and nothing should be assumed here. One bless sets the iteration; a rejection names what to redo. The column choice is a prediction: the walk escalates visibly when the work outgrows it, never silently. The bless SEEDS the iteration: the engine compiles the blessed column into the iteration's state machine and pins it to the record - the seeded machine is part of this gate's output.
+Review per [[meth-gate-review]].
+
+The kickoff handover is ONE brief carrying everything:
+
+- the drained retro
+- the iteration goal
+- the scope, as pulled-in and left-out
+- the CHANGE SIZE, with its reasoning
+
+The change size is the `change_size` field. It is one of patch, minor, major
+or product. Strikes are named where a cell reduces the walk.
+
+THE FIRST ITERATION OF A PRODUCT IS `product`. It authors the vision packet,
+the stakeholders and the actual state.
+
+Every later iteration inherits those by pointer, and sizes itself against that
+standing baseline.
+
+The agent bakes scope and a PROPOSED column into the brief. There are no
+separate confirmation rounds before the gate.
+
+THE COLUMN IS A PROPOSAL, NEVER A DECISION. The agent names one with its
+reasoning, the person chooses, and the bless IS that choice.
+
+Seeding never asked for a size. Nothing was decided before this state, and
+nothing should be assumed here.
+
+One bless sets the iteration. A rejection names what to redo.
+
+The column choice is a prediction. The walk escalates visibly when the work
+outgrows it, never silently.
+
+THE BLESS SEEDS THE ITERATION. The engine compiles the blessed column into the
+iteration's state machine and pins it to the record, and that seeded machine
+is part of this gate's output.

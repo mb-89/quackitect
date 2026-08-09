@@ -1,10 +1,13 @@
 # Progressive disclosure — the whole picture first, detail on request
 
-**What.** Show the essential first; disclose depth only when the reader
-asks for it. A named, established method: Nielsen coined it for
-interaction design (nngroup.com/articles/progressive-disclosure, 2006).
-Its siblings for TEXT — BLUF and the inverted pyramid — have their own
-card: methods/bluf.md.
+**What.** Show the essential first. Disclose depth only when the reader
+asks for it.
+
+It is a named, established method. Nielsen coined it for interaction
+design in 2006 ([[ref-progressive-disclosure]]).
+
+Its siblings for TEXT are BLUF and the inverted pyramid. They have their
+own card, `methods/bluf.md`.
 
 **When.** Any document past a few paragraphs, any report, any surface
 where readers differ in how much they need. The voice's pyramid rule is

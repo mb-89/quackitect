@@ -1,77 +1,105 @@
-// THE TOKEN SET, AND THE DAY IT STOPS BEING THEORETICAL.
+// THE TOKEN SET, AND THE DAY IT STOPPED BEING THEORETICAL.
 //
 // The kernel has carried concurrent states since it was harvested:
-// machine.ts:89 declares the token set as "every concurrently active state",
-// and joins re-arm on a reopen (machine.ts:199-205). The packet's `active` is
-// a LIST, not a state.
+// machine.ts declares the token set as "every concurrently active state", and
+// joins re-arm on a reopen. The packet's `active` is a LIST, not a state.
 //
-// No shipped machine uses a join today, so nothing renders wrongly. But three
-// places in the renderer take `active[0]` and call it the position. The day
-// somebody draws a fork, those three will show one state out of several and
-// look completely normal doing it.
+// THIS FILE USED TO ASSERT THAT NOTHING FORKED. It was wrong, and it could
+// not see that it was wrong: it read the .canvas drawings and the state notes
+// only. The rigor matrix compiles a machine from ROWS, and M3's rows have
+// fanned since they landed — write-requirements feeds derive-functions and
+// identify-assumptions, and gate-requirements is the bar that collects them.
 //
-// That is the failure this file exists to make loud. It does NOT demand a
-// multi-token design — the owner owns visual design, and no sketch exists for
-// what a header should say when the walk stands in three places. It demands
-// that the question be ASKED before the wrong answer ships.
+// So the three renderer collapses were not latent debt. They were live, and
+// what saved them from being visibly wrong is that all three are cosmetic:
+// which node blinks, which button appears, which panel opens by default.
+//
+// The owner ruled on 2026-08-08 that finders fans into five. So the guard
+// flips: instead of asserting no fork exists, it asserts that nothing which
+// answers "is the walk standing here" reads only the first token.
 import { strict as assert } from "node:assert";
 import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { completeState, type MachineDecl, type MachineInstance } from "../engine/machine.ts";
+import { compileMachine } from "../engine/machines/compile.ts";
+import { freshRoot } from "./helpers.ts";
 
 const MACHINES = fileURLToPath(new URL("../machines/", import.meta.url));
+const ROWS = fileURLToPath(new URL("../machines/rigor_matrix/rows/", import.meta.url));
 const RENDER = fileURLToPath(new URL("../engine/render.ts", import.meta.url));
 
-/** Every authored machine drawing, by name. */
-function canvases(): string[] {
-  return readdirSync(MACHINES).filter((f) => f.endsWith(".canvas"));
+/** Every drawn state note, by name. */
+function stateNotes(): string[] {
+  return readdirSync(`${MACHINES}states/`).filter((f) => f.endsWith(".md"));
 }
 
 describe("the token set", { concurrency: true }, () => {
-  // The state of the world this file was written against. If this fails,
-  // somebody has drawn a fork, and the next test is the one that matters.
-  test("no shipped machine forks today, so the collapse is latent", () => {
-    const joins: string[] = [];
-    for (const f of canvases()) {
-      const text = readFileSync(MACHINES + f, "utf8");
-      if (/\bjoin\b/.test(text)) joins.push(f);
+  // THE FACT THE OLD VERSION OF THIS FILE COULD NOT SEE. A matrix row is a
+  // machine's state too, and two of them naming one input is a fan.
+  test("the rigor matrix already fans, and has since M3 landed", () => {
+    const feeders = new Map<string, string[]>();
+    for (const f of readdirSync(ROWS).filter((n) => n.endsWith(".md"))) {
+      const text = readFileSync(ROWS + f, "utf8");
+      const name = /^name:\s*(\S+)/m.exec(text)?.[1] ?? f;
+      const block = /^depends_on:\n((?:\s+-\s.*\n)+)/m.exec(text)?.[1] ?? "";
+      for (const line of block.split("\n")) {
+        const dep = /^\s+-\s+(\S+)/.exec(line)?.[1];
+        if (dep !== undefined) feeders.set(dep, [...(feeders.get(dep) ?? []), name]);
+      }
     }
-    const notes = readdirSync(`${MACHINES}states/`).filter((f) => f.endsWith(".md"));
-    for (const n of notes) {
-      if (/state_kind:\s*join/.test(readFileSync(`${MACHINES}states/${n}`, "utf8"))) joins.push(`states/${n}`);
-    }
-    assert.deepEqual(joins, [], "a join appeared — read the next test, it is now load-bearing");
+    const fans = [...feeders.entries()].filter(([, outs]) => outs.length > 1);
+    assert.ok(fans.length > 0, "no row feeds two — the premise of this whole file has changed");
+    assert.ok(
+      feeders.get("write-requirements")?.length === 2,
+      `write-requirements is the named example and must still fan: ${JSON.stringify(feeders.get("write-requirements"))}`,
+    );
   });
 
-  // THE GUARD. Two facts, checked together, so that fixing neither is caught.
-  // The moment a machine forks, a renderer still reading active[0] is a bug
-  // that shows a plausible wrong answer, which is the worst kind.
-  test("a fork and an active[0] collapse must never ship together", () => {
+  // A fan needs somewhere to fold. Two mechanisms exist and they are NOT the
+  // same one: state_kind join is what makes the kernel wait for every inbound
+  // edge (machine.ts activatePowered), and busbar is what lets the walk go
+  // back to the branching point for a leg it has not taken (machine.ts
+  // branchKind). A drawn fan wants both, and a drawing that has one without
+  // the other is half a join.
+  test("every drawn join also carries its bar", () => {
+    for (const n of stateNotes()) {
+      const text = readFileSync(`${MACHINES}states/${n}`, "utf8");
+      if (!/^state_kind:\s*join/m.test(text)) continue;
+      assert.match(text, /^busbar:\s*true/m, `states/${n} is a join with no busbar — the walk could never take the second leg`);
+    }
+  });
+
+  // THE GUARD, flipped. Machines fork, so the question is no longer whether
+  // one does. It is whether anything decides "is the walk here" from one
+  // token. standingAt() reads the whole list; nothing else may ask.
+  test("nothing answers standing-here from the first token alone", () => {
     const source = readFileSync(RENDER, "utf8");
-    const collapses: string[] = [];
+    const bad: string[] = [];
     for (const [i, line] of source.split("\n").entries()) {
-      if (line.includes("active[0]")) collapses.push(`render.ts:${i + 1}`);
+      if (/\bactive\[0\]/.test(line)) bad.push(`render.ts:${i + 1}`);
+      // The shape the fix replaced. It compares one state id against one
+      // remembered leaf, which is the collapse wearing different clothes.
+      if (/===\s*CURRENT\b/.test(line) || /CURRENT\s*===/.test(line)) bad.push(`render.ts:${i + 1}`);
     }
-
-    const forks = canvases().some((f) => /\bjoin\b/.test(readFileSync(MACHINES + f, "utf8")));
-
-    if (!forks) {
-      // Nothing renders wrongly. Record the debt precisely so the count cannot
-      // drift upward unnoticed while the case is still unreachable.
-      assert.equal(collapses.length, 3, `the active[0] debt changed: ${collapses.join(", ")}`);
-      return;
-    }
-    assert.deepEqual(collapses, [], `a machine now forks, so every one of these shows one state out of several: ${collapses.join(", ")}`);
+    assert.deepEqual(bad, [], `these show one state out of several: ${bad.join(", ")}`);
   });
 
-  // THE MULTI-AGENT HOOK, half built. machine.ts:94 declares claims as "which
+  // The membership test exists, and it is the one every caller uses.
+  test("standingAt reads the whole token list", () => {
+    const source = readFileSync(RENDER, "utf8");
+    assert.match(source, /function standingAt\(id\)\s*\{\s*return WALK_HERE && CURRENTS\.indexOf\(id\) >= 0;/);
+  });
+
+  // THE MULTI-AGENT HOOK, half built. machine.ts declares claims as "which
   // session holds which active state" — exactly the per-agent marking the
   // owner wants. It is DELETED in three places and WRITTEN in none, so the
   // bookkeeping is complete and only the claim-staking is missing.
   //
-  // The day a writer appears, the same three active[0] collapses become a
-  // second bug: several agents, one shown. This pins the asymmetry so the
-  // arrival is noticed rather than discovered later.
+  // The day a writer appears, the header's row of position buttons needs to
+  // say WHO stands where, not only where. This pins the arrival so it is
+  // noticed rather than discovered later.
   test("the per-agent claims field is cleaned up but never staked", () => {
     const kernel = readFileSync(fileURLToPath(new URL("../engine/machine.ts", import.meta.url)), "utf8");
     const lines = kernel.split("\n");
@@ -81,9 +109,170 @@ describe("the token set", { concurrency: true }, () => {
     assert.equal(writes, 0, "a writer appeared — decide how several agents are drawn before it ships");
   });
 
-  // The half that already works, pinned so a refactor cannot quietly undo it.
+  // The half that already worked, pinned so a refactor cannot quietly undo it.
   test("the drawing already fills every active box, not just the first", () => {
     const source = readFileSync(RENDER, "utf8");
     assert.match(source, /new Set\(\s*info\.active/, "the box fill builds a set from the whole list");
+  });
+
+  // THE FAN, WALKED. Five legs hand out five tokens, and the bar releases on
+  // the fifth submit rather than the first.
+  test("the enumerate-space drawing fans into seven and folds on the last one", () => {
+    const root = freshRoot();
+    const m = compileMachine(root, join(root, "project", "deliverable", "machines", "enumerate-space.canvas"));
+    const legs = [
+      "find_prior_art",
+      "find_contradiction",
+      "find_analogy",
+      "find_without",
+      "find_by_heuristic",
+      "find_by_transforming",
+      "find_by_probing",
+    ];
+
+    const start = m.states.find((s) => s.id === "start");
+    assert.deepEqual(start?.edges.map((e) => e.to).sort(), [...legs].sort(), "start fans into all seven — a chain would list one");
+
+    // THE BAR STANDS OVER THE WORK THAT JOINS THE LEGS, never over the pill
+    // that closes the machine (owner ruling 2026-08-08).
+    const bar = m.states.find((s) => s.id === "build_chart");
+    assert.equal(bar?.busbar, true, "the chart waits for every finder, and the walk may return for a leg it has not taken");
+    assert.equal(m.states.find((s) => s.id === "end")?.busbar, undefined, "the end joins nothing, so it carries no bar");
+    assert.ok(!m.states.some((s) => s.id === "all_found"), "no separate join state");
+
+    // Walk it. Every leg is active at once; the bar stays shut until the last.
+    const inst: MachineInstance = {
+      machine: m.id,
+      iteration: "t",
+      current: "start",
+      counters: {},
+      history: [],
+      active: ["start"],
+    } as unknown as MachineInstance;
+    completeState(m, inst, "start", "filled", "now");
+    assert.deepEqual((inst.active ?? []).slice().sort(), [...legs].sort(), "seven tokens, one per leg");
+
+    for (const leg of legs.slice(0, -1)) {
+      completeState(m, inst, leg, "filled", "now");
+      assert.ok(!(inst.active ?? []).includes("build_chart"), `the bar opened early, on ${leg}`);
+    }
+    completeState(m, inst, legs[legs.length - 1], "filled", "now");
+    assert.deepEqual(inst.active, ["build_chart"], "the last submit releases the bar");
+  });
+
+  // A GREEN BRANCH SATISFIES ITS EDGE (owner ruling 2026-08-09).
+  //
+  // Measured in iteration one that day. The motivation gate collects three
+  // branches. All three were walked and the bar stayed shut, because one
+  // token cannot hold three edges: reaching a sibling routes BACK through the
+  // fork, and that re-walk clears the fuel the last leg just laid down.
+  // Stepping out of the record and re-entering reset the count to zero.
+  //
+  // So a bar counts a source that already stands filled as satisfied. The
+  // work is done, and there is nothing left for it to deliver.
+  const threeWayBar = (): MachineDecl =>
+    ({
+      id: "t",
+      reentry: "resume",
+      initial: "fork",
+      states: [
+        {
+          id: "fork",
+          edges: [
+            { to: "a", role: "normal" },
+            { to: "b", role: "normal" },
+            { to: "c", role: "normal" },
+          ],
+        },
+        { id: "a", edges: [{ to: "bar", role: "normal" }] },
+        { id: "b", edges: [{ to: "bar", role: "normal" }] },
+        { id: "c", edges: [{ to: "bar", role: "normal" }] },
+        { id: "idle_elsewhere", edges: [] },
+        { id: "bar", busbar: true, edges: [] },
+      ],
+    }) as unknown as MachineDecl;
+
+  const instAt = (current: string, history: { state: string; outcome: string }[]): MachineInstance =>
+    ({
+      machine: "t",
+      iteration: "t",
+      current,
+      counters: {},
+      history: history.map((h) => ({ ...h, at: "then" })),
+      active: [current],
+      escapes: [],
+      status: "open",
+    }) as unknown as MachineInstance;
+
+  test("a bar opens when the branches it still waits on already stand filled", () => {
+    const m = threeWayBar();
+    // One token, on the last branch. The other two were walked on an earlier
+    // visit and their fuel was consumed long ago.
+    const inst = instAt("c", [
+      { state: "a", outcome: "filled" },
+      { state: "b", outcome: "filled" },
+    ]);
+    completeState(m, inst, "c", "filled", "now");
+    assert.deepEqual(inst.active, ["bar"], "the bar stayed shut on two green branches");
+  });
+
+  // GREEN IS THE LATEST WORD, not any word. A branch filled and then reopened
+  // is being re-walked and will fire on its own, so the bar waits for it.
+  test("a reopened branch stops being green and the bar waits again", () => {
+    const m = threeWayBar();
+    const inst = instAt("c", [
+      { state: "a", outcome: "filled" },
+      { state: "b", outcome: "filled" },
+      { state: "b", outcome: "reopened" },
+    ]);
+    completeState(m, inst, "c", "filled", "now");
+    assert.ok(!(inst.active ?? []).includes("bar"), "b is being re-walked, so the bar must not open without it");
+  });
+
+  // THE GUARD THAT KEEPS THE RULE FROM RUNNING AWAY. Green branches alone are
+  // not a trigger. A token has to arrive on some inbound edge, or every
+  // completion anywhere would re-open every bar whose work is finished.
+  test("a bar with no fuel never activates, however green its branches", () => {
+    const m = threeWayBar();
+    const inst = instAt("idle_elsewhere", [
+      { state: "a", outcome: "filled" },
+      { state: "b", outcome: "filled" },
+      { state: "c", outcome: "filled" },
+    ]);
+    completeState(m, inst, "idle_elsewhere", "filled", "now");
+    assert.ok(!(inst.active ?? []).includes("bar"), "the bar re-opened with nothing arriving at it");
+  });
+
+  // THE WIRING, which the three tests above cannot see.
+  //
+  // They feed `green` by HISTORY, and history is exactly what a reload or a
+  // re-entry wipes. What made the live walk work is the OTHER source: the
+  // wedge guard handing `recordDone` — the evidence-based green set — into
+  // completeState as a lazy thunk.
+  //
+  // Nothing else pins it. Drop that argument in a refactor and every test
+  // above still passes, while a real walk goes back to refusing SE-C-123 at
+  // the first three-way join. That is the whole defect, silently restored.
+  //
+  // LAZY ON PURPOSE. recordDone reads evidence files. Called up front it put a
+  // full green recomputation on every completion; the same mistake cost 2936ms
+  // on se_aim once and is written up at engine/session.ts:1717.
+  test("the wedge guard hands the evidence-based green set to completeState", () => {
+    const source = readFileSync(fileURLToPath(new URL("../engine/session.ts", import.meta.url)), "utf8");
+    assert.match(
+      source,
+      /completeState\(m,\s*inst,\s*stateId,\s*outcome,\s*now,\s*only,\s*\(\)\s*=>\s*new Set\(this\.recordDone\(m\)\)\)/,
+      "the guard must pass recordDone as a thunk — without it a bar only sees this instance's history",
+    );
+    const kernel = readFileSync(fileURLToPath(new URL("../engine/machine.ts", import.meta.url)), "utf8");
+    assert.match(kernel, /standsGreen\(k\.split\("->"\)\[0\]\)/, "the busbar test must ask standsGreen, not the history set alone");
+    assert.match(kernel, /byEvidence \?\?= green\?\.\(\)/, "the evidence set is fetched on demand, never up front");
+  });
+
+  // The header names every standing state, one button each.
+  test("the header draws a position button per standing state", () => {
+    const source = readFileSync(RENDER, "utf8");
+    assert.match(source, /const curBtn = info\.active\s*\n\s*\.map\(/, "curBtn maps over the whole list");
+    assert.match(source, /closest\("\.cur-state"\)/, "several buttons cannot share one id");
   });
 });

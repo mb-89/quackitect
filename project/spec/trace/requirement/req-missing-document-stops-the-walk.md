@@ -10,4 +10,6 @@ refines:
 source_refs:
   - uc-be-handed-the-method ext 6a
 priority: should
+weighs_against:
+  - req-instruction-names-its-source >
 ---

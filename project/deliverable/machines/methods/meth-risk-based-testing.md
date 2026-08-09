@@ -13,4 +13,7 @@ Guidance for M6 (ranking unknowns for spikes) and M7 (allocating test depth). Wh
 - Re-rank when evidence moves either factor - a probe result or a field report changes the list.
 
 ## Sources
-QAPA tailoring literature (risk exposure = P x C; owner-mapped digest, @ai/college/buecher). Bach, Heuristic Risk-Based Testing (1999).
+
+- QAPA tailoring literature, where risk exposure is probability times
+  consequence. From the owner-mapped digest at @ai/college/buecher.
+- Bach, Heuristic Risk-Based Testing (1999).

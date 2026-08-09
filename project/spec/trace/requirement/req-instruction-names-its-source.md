@@ -13,6 +13,8 @@ source_refs:
   - uc-change-the-method-mid-walk ext 5a
   - ".se/req-mine-sebots.md: capture, decisions, change"
 priority: should
+weighs_against:
+  - req-fallen-condition-named >
 ---
 
 ## Detail

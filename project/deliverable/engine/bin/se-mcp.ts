@@ -30,7 +30,7 @@
 // SESSION OVER: anybody reaching end shuts the whole session down — the
 // child exits deliberately (code 0) and the shim follows it down.
 import { type ChildProcess, spawn, spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
@@ -168,6 +168,52 @@ if (!existsSync(root)) {
 const mirrorPort = Number(argValue("--mirror-port") ?? process.env.SE_MIRROR_PORT ?? 7333);
 
 if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
+  // ── THE POSTMORTEM (owner ruling 2026-08-07, after three silent deaths).
+  //
+  //    The engine died three times in one afternoon and left NOTHING to read.
+  //    The call log writes on completion, so a call that never returns is
+  //    never logged; stderr goes to whatever launched us, which in the VS Code
+  //    host is an output channel nobody can grep. The last death showed four
+  //    lines and ended "engine exited (1)" with no trace at all.
+  //
+  //    THREE HANDLERS, BECAUSE THEY TRIANGULATE. Between them they tell three
+  //    endings apart, and each wants a different fix:
+  //
+  //    - a crash record, then an exit record  → it THREW; the trace names where
+  //    - an exit record with no crash record  → somebody called exit(1)
+  //    - neither, and the log just stops      → it was KILLED from outside,
+  //      or the loop wedged and never got to exit at all
+  //
+  //    IT STILL EXITS. Node already ends the process on an unhandled
+  //    rejection; catching one and carrying on would leave a server running in
+  //    a state nobody reasoned about, which is worse than dying. These record
+  //    and then do exactly what would have happened anyway.
+  //
+  //    SYNCHRONOUS WRITES ONLY. A dying process never flushes an async one.
+  //
+  //    IT DOES NOT CATCH EVERYTHING. A hard kill and an out-of-memory run no
+  //    handler, so silence here is not proof the engine did not crash — only
+  //    proof it did not crash in a way JavaScript could see.
+  const deathLog = join(root, ".se", "engine.log");
+  const record = (what: string): void => {
+    try {
+      mkdirSync(join(root, ".se"), { recursive: true });
+      appendFileSync(deathLog, `${new Date().toISOString()} pid=${process.pid} ${what}\n`, "utf8");
+    } catch {
+      // a postmortem that cannot be written must not become the cause of death
+    }
+  };
+  const fatal = (kind: string, e: unknown): void => {
+    const detail = e instanceof Error ? `${e.message}\n${e.stack ?? ""}` : String(e);
+    record(`${kind} ${detail.replace(/\n/g, "\n    ")}`);
+    process.stderr.write(`se-mcp: ${kind} — ${detail}\n`);
+    process.exit(1);
+  };
+  process.on("uncaughtException", (e) => fatal("UNCAUGHT", e));
+  process.on("unhandledRejection", (e) => fatal("UNHANDLED-REJECTION", e));
+  process.on("exit", (code) => record(`exit ${code}`));
+  record(`start root=${root}`);
+
   // ── THE CHILD — the engine proper. Dynamic imports keep the shim free
   //    of the engine's module graph: a broken engine breaks the child (the
   //    reload canary catches it first), never the standing connection. ────

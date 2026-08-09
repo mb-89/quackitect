@@ -11,4 +11,6 @@ source_refs:
   - uc-diverge-before-deciding ext 5a
   - ".se/req-mine-sebots.md: overrides recorded as overrides"
 priority: should
+weighs_against:
+  - req-problem-recorded-before-options >
 ---

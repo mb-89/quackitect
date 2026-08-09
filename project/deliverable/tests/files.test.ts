@@ -413,13 +413,13 @@ test("move rewrites source references and reports the ones it could not", async 
   // one has to come back as work the caller still owes.
   fileWrite(root, "deploy/stack.yml", "  config: brand.json", null);
 
-  const r = fileMove(root, "brand.json", "project/brand/brand.json");
+  const r = fileMove(root, "brand.json", "project/deliverable/brand/brand.json");
 
   const paths = r.rewritten.map((x) => x.path);
   assert.ok(paths.includes("engine/brand.ts"), ".ts is rewritten");
   assert.ok(paths.includes("RUNME.ps1"), ".ps1 is rewritten");
   assert.ok(paths.includes("notes/uses.md"), "prose still works");
-  assert.ok(readFileSync(join(root, "engine/brand.ts"), "utf8").includes('"project/brand/brand.json"'));
+  assert.ok(readFileSync(join(root, "engine/brand.ts"), "utf8").includes('"project/deliverable/brand/brand.json"'));
 
   // THE TRAP: the new path CONTAINS the old one, so a naive residual scan
   // would report every reference it had just fixed.
@@ -608,4 +608,31 @@ test("text reading is untouched: same lines, same hash, no attachment", () => {
   assert.equal(r.media_type, undefined);
   assert.ok(r.content.includes("# Title"));
   rmSync(root, { recursive: true, force: true });
+});
+
+// A DOLLAR IN new_string IS DATA, NEVER AN INSTRUCTION (found 2026-08-07).
+//
+// String.replace reads dollar sequences in a STRING replacement as commands:
+// $& is the match, $1 a group, and dollar-backtick is EVERYTHING BEFORE the
+// match. se_file_patch passed new_string straight in, so a patch carrying a
+// regex that ended in dollar-backtick spliced the whole preceding file into
+// itself. Two engine files doubled in length, both patches reported success,
+// and the only symptom was a parse error hundreds of lines away.
+//
+// replace_all never showed it: split().join() takes its argument literally.
+test("a dollar sequence in new_string is written literally, not expanded", () => {
+  const root = fresh();
+  const D = String.fromCharCode(36);
+  fileWrite(root, "engine/x.ts", "HEAD\nMARK\nTAIL\n", null);
+
+  // dollar-backtick: the sequence that spliced a whole file into itself.
+  filePatch(root, [{ path: "engine/x.ts", old_string: "MARK", new_string: `re("a"${D}\`)` }]);
+  const once = readFileSync(join(root, "engine", "x.ts"), "utf8");
+  assert.equal(once.includes("HEAD\nre"), true, "the replacement landed");
+  assert.equal(once.split("HEAD").length - 1, 1, "and the text BEFORE the match was not spliced in");
+
+  // $& and $1, the other two that silently rewrite what was asked for.
+  fileWrite(root, "engine/y.ts", "HEAD\nMARK\nTAIL\n", null);
+  filePatch(root, [{ path: "engine/y.ts", old_string: "MARK", new_string: `${D}& and ${D}1` }]);
+  assert.match(readFileSync(join(root, "engine", "y.ts"), "utf8"), /^\$& and \$1$/m, "both survive as typed");
 });

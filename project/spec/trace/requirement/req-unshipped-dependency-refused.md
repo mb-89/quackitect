@@ -11,4 +11,6 @@ source_refs:
   - uc-open-an-iteration step 1
   - ".se/req-mine-v2.md: Worktrees and parallel streams"
 priority: should
+weighs_against:
+  - req-walk-opens-at-retro >
 ---

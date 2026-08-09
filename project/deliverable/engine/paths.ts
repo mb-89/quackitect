@@ -10,7 +10,7 @@
 // to hand-edit a dotfile they cannot be expected to understand. Roots are
 // READ surfaces, never write targets, machine-local on purpose (an absolute
 // path means nothing on anyone else's machine).
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 
@@ -128,4 +128,111 @@ export function isExcluded(rootRelative: string): boolean {
 
 export function seDir(root: string): string {
   return join(root, ".se");
+}
+
+/** WHAT KIND OF THING A PATH IS (owner ruling 2026-08-07).
+ *
+ *  THE FAILURE THIS ENDS. The engine served ONE tree, chosen by whether a
+ *  walk happened to be bound at that instant. So the same path meant
+ *  different files at different moments, and two failures followed it
+ *  everywhere:
+ *
+ *  - A method change applied in one tree and the machine kept its old
+ *    behaviour in the other. The person edits a row, the state machine does
+ *    not change, and nothing says why.
+ *  - A record's state was read from whichever tree was in hand. The mirror
+ *    painted i1's states green out of trunk while i1's own worktree held the
+ *    fall that knocked them down.
+ *
+ *  THE RULE. A path is resolved by WHAT IT IS, never by where the walk
+ *  stands. Three kinds, and each has exactly one home:
+ *
+ *  - SESSION — `.se/` and the declared roots. Always the project root. The
+ *    handover, the notes and the call log belong to the person's machine,
+ *    not to a branch.
+ *  - METHOD — guidance, machines, matrix rows, templates, the engine and the
+ *    prompt layer. SHARED by every tree. A write fans out to all of them in
+ *    one act, so a change takes effect wherever the reader is standing.
+ *  - RECORD — one iteration's or expedition's own evidence and decisions.
+ *    Owned by that record, and read from ITS tree whether or not it is
+ *    bound. There is only ever one copy that counts, so nothing can drift.
+ *
+ *  CONTENT is everything else and behaves as it always did: it rides the
+ *  tree the walk is working in. */
+export type PathKind = "session" | "method" | "record" | "content";
+
+/** The method surfaces, as root-relative prefixes. A change to any of these
+ *  changes how the MACHINE behaves, which is why they cannot belong to one
+ *  tree. Kept as a list rather than a clever rule: the set is small, it is
+ *  read by people, and a wrong guess here is the bug this exists to kill. */
+// THE TESTS ARE METHOD TOO. They are the engine's own proof, they belong to no
+// record, and leaving them out produced exactly the fault this list exists to
+// prevent: a worktree took the new engine and kept its old tests, so the suite
+// failed on laws that had already been changed (found live 2026-08-07).
+export const METHOD_PREFIXES = [
+  "project/guidance/",
+  "project/deliverable/machines/",
+  "project/deliverable/engine/",
+  "project/deliverable/tests/",
+] as const;
+
+/** The prompt layer is METHOD that does not live under a method folder. It is
+ *  PROJECTED into each tree by place-prompt-layer, so every tree needs it and
+ *  no tree owns it. */
+export const METHOD_FILES = ["project/AGENTS.md", "project/CLAUDE.md", "project/.github/instructions/protocol.instructions.md"] as const;
+
+/** Normalise separators once, so every rule below reads one shape. */
+const slashed = (p: string): string => p.replace(/\\/g, "/").replace(/^\.\//, "");
+
+/** WHICH RECORD OWNS THIS PATH, if any.
+ *
+ *  Returns the container and the record id, so the caller can find that
+ *  record's tree. Undefined means no record owns it. */
+export function recordOwnerOf(rel: string): { container: "iterations" | "expeditions"; id: string } | undefined {
+  const m = /^project\/spec\/(iterations|expeditions)\/([^/]+)\//.exec(slashed(rel));
+  if (m === null) return undefined;
+  return { container: m[1] as "iterations" | "expeditions", id: m[2] };
+}
+
+export function pathKind(rel: string): PathKind {
+  if (isRootRef(rel)) return "session";
+  const p = slashed(rel);
+  if (p.split("/")[0] === ".se") return "session";
+  if (METHOD_FILES.includes(p as (typeof METHOD_FILES)[number])) return "method";
+  if (METHOD_PREFIXES.some((pre) => p.startsWith(pre))) return "method";
+  if (recordOwnerOf(p) !== undefined) return "record";
+  return "content";
+}
+
+/** A METHOD write must reach every tree. This says so in one place, so the
+ *  write lane and the tests agree on the question rather than each deciding
+ *  it. */
+export const fansOut = (rel: string): boolean => pathKind(rel) === "method";
+
+/** EVERY METHOD FILE IN A TREE, root-relative.
+ *
+ *  THE FAN-OUT ALONE WAS NOT ENOUGH. It copies a method file when that file
+ *  is WRITTEN, so every edit made before the mirror went live stayed in the
+ *  tree it was written in. That gap shipped and then bit within the day: a
+ *  worktree ended up holding a NEW session.ts against an OLD paths.ts and
+ *  could not compile.
+ *
+ *  A PARTIAL SYNC IS WORSE THAN NONE. An unsynced tree is merely old and
+ *  self-consistent. A half-synced one is broken, and it breaks at whatever
+ *  moment somebody happens to run a check inside it.
+ *
+ *  So the reload backfills the whole set, and this is the set. */
+export function methodFilesIn(root: string): string[] {
+  const out: string[] = [];
+  for (const rel of METHOD_FILES) if (existsSync(join(root, rel))) out.push(rel);
+  for (const pre of METHOD_PREFIXES) {
+    const abs = join(root, pre);
+    if (!existsSync(abs)) continue;
+    for (const e of readdirSync(abs, { recursive: true, withFileTypes: true })) {
+      if (!e.isFile()) continue;
+      const dir = (e as { parentPath?: string; path?: string }).parentPath ?? (e as { path?: string }).path ?? abs;
+      out.push(relative(root, join(dir, e.name)).replace(/\\/g, "/"));
+    }
+  }
+  return out;
 }

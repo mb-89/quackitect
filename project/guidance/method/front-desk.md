@@ -75,8 +75,9 @@ commit inside an expedition. It is never an expedition of its own.
 
 Recommend the smallest vehicle that honors the derisking gates:
 
-- An expedition already open — put the work THERE. Check this first. It
-  is the usual answer, because an open expedition is a day's bundle.
+- An expedition already open — put the work THERE.
+  - Check this first. It is the usual answer, because an open expedition is
+    a day's bundle.
 - Nothing open, work is small — open ONE expedition to hold today's
   work. It closes at the end of the day, not at the end of the fix.
 - Nothing open, work has a clear goal of its own — an expedition for
@@ -141,6 +142,7 @@ Take a door only when the person has routed a goal behind it.
 
 ## 4. The tour
 
-A newcomer asking for a tour gets one FROM THE LIVE STATE - read
-project/guidance/method/tour.md and follow its stops. The card holds the
-order; the machinery holds the content.
+A newcomer asking for a tour gets one FROM THE LIVE STATE. Read
+`project/guidance/method/tour.md` and follow its stops.
+
+The card holds the order. The machinery holds the content.

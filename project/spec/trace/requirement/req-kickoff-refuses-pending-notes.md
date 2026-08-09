@@ -11,4 +11,6 @@ source_refs:
   - uc-open-an-iteration ext 3a
   - ".se/req-mine-v2.md: Notes and the toll"
 priority: should
+weighs_against:
+  - req-drained-note-leaves-count >
 ---

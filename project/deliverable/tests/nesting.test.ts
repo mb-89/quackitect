@@ -151,7 +151,10 @@ test("nesting: the walk descends into an archive decade and climbs back out", as
   const html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual", log: undefined }, undefined, "e11-e12");
   assert.ok(html.includes('<b class="here">e11-e12</b>'), "the decade is the here-crumb");
   assert.ok(html.includes('href="/?view=expedition_archive"'), "its parent archive is a crumb link");
-  assert.ok(html.includes('id="cur-state"'), "the header names the walk's current state");
+  // ONE BUTTON PER STANDING STATE, so the hook is a class rather than an id
+  // (owner ruling 2026-08-08, when finders became a fan). Here the walk
+  // stands in one state, so there is exactly one button.
+  assert.ok(html.includes('class="ghost cur-state"'), "the header names the walk's current state");
 });
 
 test("the front desk and ideation stand as idle doors with their drawn shapes", () => {
@@ -244,6 +247,33 @@ test("the voice lint: walls, sentences, chains and the pyramid - thresholds are 
   );
   assert.ok(lintProse(root, `${"word ".repeat(30)}end.`).some((f) => f.rule === "long-sentence"));
   assert.ok(lintProse(root, "we need alpha, beta, gamma, delta and epsilon.").some((f) => f.rule === "comma-chain"));
+  // A SPAN IS ONE THING. The separator set includes the slash, so a path
+  // inside a code span split into an "item" per segment. Every card saying
+  // where its node lives fired the chain rule on a path it could not fix.
+  assert.equal(
+    lintProse(root, "Lives in `project/spec/trace/raid/`. Written at M4.").length,
+    0,
+    "a path inside a code span is one item, not five",
+  );
+  // A LIST MARKER IS NOT A SENTENCE. "1." ends in a full stop, so a numbered
+  // item measured one sentence more than it had.
+  assert.equal(
+    lintProse(root, "1. State the overall function. Abstract until it holds.").length,
+    0,
+    "a numbered marker does not count as a sentence",
+  );
+  // A numbered step IS a list item, so the item cap applies to it.
+  assert.ok(
+    lintProse(root, "1. Do this. Then do that. Then do the third thing.").some((f) => f.rule === "item-grew"),
+    "three sentences in a numbered item is item-grew",
+  );
+  // A PIPE ROW IS CELLS. A form field is `- name | help | required`, and the
+  // trailing `required` was counted as a sentence of the help text.
+  assert.equal(
+    lintProse(root, "- tldr | The chosen candidate. What it beat. | required").length,
+    0,
+    "the trailing cell of a field row is not a sentence of its help",
+  );
   // DASH CHAINS, not dashes. One dash sets off an aside and is house style
   // here; flagging every one would be an advisory nobody heeds.
   assert.ok(lintProse(root, "we need alpha — then beta — then gamma — then delta.").some((f) => f.rule === "dash-chain"));

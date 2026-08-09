@@ -46,7 +46,7 @@ patch_note: |
   full form's packaging and dependency lines fall away with their rows.
 product_note: |
   FLOOR, standing: every shipped version passed this gate - docs
-  matching, packaged, ruled, accepted. The release history IS the list of
+  matching and packaged, then ruled and accepted. The release history IS the list of
   these blesses.
 specification_note: |
   DOCUMENT FORM: the ship record - the release bless, hash-bound,

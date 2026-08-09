@@ -14,6 +14,8 @@ source_refs:
   - ".se/req-mine-v1.md: refusals and honesty (every refusal names the cause and the one recovery command)"
   - ".se/req-mine-v1.md: lifecycle and distribution (the binary embeds no data; every resource resolves from the live layer beside it)"
 priority: should
+weighs_against:
+  - req-overlay-resolution >
 ---
 
 ## Detail

@@ -1,6 +1,6 @@
 ---
 id: method-retro
-statement: The retro — look back, drain the inbox, walk the backlog, emit durable improvements.
+statement: "The retro. Look back and drain the inbox, then walk the backlog and emit durable improvements."
 ---
 
 # retro — the method
@@ -51,8 +51,8 @@ The trigger is a NOTE carrying "needs retro":
    this step owes.
 2. Field feedback. Ask the owner what came back from the
    field since the last look. Capture every answer as a note.
-3. Drain the notes inbox. Walk EVERY pending note once. Disposition each
-   with se_note_drain — route it to exactly ONE home.
+3. Drain the notes inbox, walking EVERY pending note once. Disposition each
+   with se_note_drain, routing it to exactly ONE home.
 
    CHECK BEFORE YOU JUDGE, and check CHEAPLY. Most of what pends is often
    ALREADY BUILT — on 2026-07-31 the twelve smallest notes were sampled
@@ -100,11 +100,47 @@ The trigger is a NOTE carrying "needs retro":
    A command that keeps failing or a refusal that keeps firing is a lead.
    The fix may be a tool, a refusal, or better guidance.
 
-   Walk the period's se_run commands too (v1 law): every shell command is
-   a candidate sign of a MISSING piece — a determinizer tool, a guidance
-   page, a prompt. Repeated or process-relevant commands especially. The
-   raw log is KEPT (owner ruling: forever-until-1GB; a garbage collector
+   THEN WALK THE se_run COMMANDS, AND KNOW WHAT THAT STEP IS FOR (owner
+   ruling 2026-08-07). It is not a survey. THE POINT IS TO DRIVE THE se_run
+   COUNT DOWN. Every shell command is a candidate sign of a MISSING lane
+   verb, and the retro is where that verb gets named.
+
+   COUNT IT AND COMPARE IT. `se_log_query {group_by: "tool"}` gives the
+   whole distribution in one call. Write the se_run number down and put it
+   beside the last retro's. A number that is not falling means this step
+   ran and changed nothing.
+
+   THE MEASUREMENT THAT SET THIS RULE: on 2026-08-07 se_run stood at 3249
+   calls out of 28612 — the SECOND most-used tool in the system, ahead of
+   se_file_search. A lane whose escape hatch is its second-busiest door is
+   missing verbs, and nobody had counted.
+
+   GROUP THE COMMANDS BY SHAPE, not by date. Four runs of one script is one
+   missing verb, not four incidents. Name the verb, and if it is cheap
+   enough, build it in the retro.
+
+   The raw log is KEPT (owner ruling: forever-until-1GB; a garbage collector
    may harvest it later).
+
+   THEN AUDIT THE TOOLS THEMSELVES (owner ruling 2026-08-07). The same
+   grouping answers a second question the retro owes: which lane verbs are
+   DEAD, and which are worth improving.
+
+   - OBSOLETE. A verb whose count is near zero because something replaced
+    it. Retire it — a superseded tool is not a rare tool, it is a wrong
+    turn left lying around. Say what replaced it.
+   - RARE BUT RIGHT. A verb with a low count because the job is rare.
+    se_shoot is used when somebody needs to LOOK at the mirror, and that is
+    seldom. Keep it, and do not confuse the two cases: the test is whether
+    something else now does the job, never the count alone.
+   - WORTH IMPROVING. A verb that IS used but keeps being followed by a
+    correction, a second call to finish the job, or a refusal. The clause
+    ranking above and the failure rates point straight at these.
+
+   PRUNING FOR COUNT IS THE WRONG MOVE. Tool schemas load on demand here, so
+   a long tail costs almost no context. What a dead verb costs is
+   maintenance and one more wrong turn available. Retire what is dead; the
+   leverage is in the missing verbs, not the surplus ones.
 
    THEN MINE THE TEST TIMINGS (owner ruling 2026-07-31). Every run
    records every test's duration to .se/test-timings.jsonl — file, name,
@@ -124,8 +160,8 @@ The trigger is a NOTE carrying "needs retro":
      SPLIT before anything clever is attempted inside it.
    COMPARE ACROSS RUNS, not within one. The record appends, so a test that
    has been getting slower for a fortnight is visible here and nowhere else.
-8. Tally the previous retro's improvements. Promote the wins. Dismiss the
-   duds WITH the reason recorded, so a dud is never re-proposed.
+8. Tally the previous retro's improvements, and promote the wins. Dismiss
+   the duds WITH the reason recorded, so a dud is never re-proposed.
 9. Check the contract. Walk the contract rule by rule against the
    period's recorded trail — the call log, the decision graph, the
    notes. A violation is a lead: propose how the rule gets teeth (a
@@ -167,7 +203,7 @@ chain? Not built yet, and it joins this list when it is.
 
 Has the way of working fallen behind current practice? Name what you
 compared it against. That is the process dimension of the state-of-the-art
-method (project/deliverable/machines/methods/meth-state-of-the-art.md).
+method (`machines/methods/meth-state-of-the-art.md`).
 
 ## The mechanical half
 

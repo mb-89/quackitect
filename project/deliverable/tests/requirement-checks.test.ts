@@ -47,6 +47,9 @@ const GOOD = {
   kind: "functional",
   verify_method: "test",
   breaks_if_removed: "a gate would pass unreviewed and the bless would mean nothing",
+  // A ROW SAYS HOW BADLY IT BREAKS, not just what breaks (owner ruling
+  // 2026-08-08). The scale and its per-level test are meth-damage-scale.
+  breaks_how_badly: "fatal",
   refines: "uc-take-a-step",
   source_refs: "none",
   priority: "must",
@@ -57,6 +60,19 @@ describe("the requirement template's declared checks", () => {
     const root = freshRoot();
     mint(root, "req-clean", GOOD);
     assert.deepEqual(findings(root, "req-clean"), []);
+  });
+
+  // A REQUIREMENT CANNOT BE WRITTEN UNGRADED (owner ruling 2026-08-08). The
+  // ordering reads the grade, and a row without one sorts as the middle — so
+  // leaving it blank would be the quiet way to land anywhere in the ranking.
+  test("a row with no damage grade is unanswered, and a wrong one is refused", () => {
+    const root = freshRoot();
+    const { breaks_how_badly, ...ungraded } = GOOD;
+    mint(root, "req-ungraded", ungraded);
+    assert.match(findings(root, "req-ungraded").join(" "), /unanswered — .*breaks_how_badly/);
+
+    mint(root, "req-misgraded", { ...GOOD, breaks_how_badly: "annoying" });
+    assert.match(findings(root, "req-misgraded").join(" "), /breaks_how_badly is "annoying" — one of fatal/);
   });
 
   test("a weasel word is named", () => {

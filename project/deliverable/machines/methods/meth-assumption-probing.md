@@ -15,7 +15,7 @@ assumption is probed, whenever it was recorded.
 
 That split is the whole reason this is its own state. With one state doing
 both jobs, the natural reading of "probe assumptions" is "probe the ones I
-just identified", and an assumption written early is never looked at again —
+just identified", and an assumption written in i1 is never looked at again —
 which is exactly when it is most likely to have gone stale, because the world
 moved and nobody checked.
 
@@ -29,8 +29,8 @@ actually exits with, what the platform actually does.
   the check.
 - AN ARGUMENT IS NOT A PROBE. Reasoning that it must hold is how the
   assumption got made.
-- THE CHEAPEST REAL CHECK WINS. A probe is minutes, not a spike. If it needs a
-  spike, that is M6's work and the entry says so.
+- THE CHEAPEST REAL CHECK WINS. A probe is minutes, not a spike.
+  - If it needs a spike, that is M6's work and the entry says so.
 
 ## THE FOUR OUTCOMES
 
@@ -57,7 +57,7 @@ not be pointed at, so nothing could be traced back from it.
 
 ## A PROBE RESULT DECAYS
 
-An assumption probed green once is not thereby green a year later. Stamp the
+An assumption probed green in i1 is not thereby green in i7. Stamp the
 `probed` date on every probe. Nothing enforces a re-probe interval today; the
 date is recorded from the first probe so that rule can land later without a
 migration.

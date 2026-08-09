@@ -10,4 +10,6 @@ refines:
 source_refs:
   - uc-research-and-record-an-answer ext 3a
 priority: should
+weighs_against:
+  - req-finding-lands-as-reference >
 ---

@@ -54,8 +54,9 @@ edit it; the prose lives where prose belongs.
 
 ## The tiers, and why they decide WHEN
 
-- Tier one needs no language processing. Sub-millisecond, so `write`. It
-  covers the dictionary lookup and every structural check we already have.
+- Tier one needs no language processing, so it runs at `write` in under a
+  millisecond. It covers the dictionary lookup and every structural check we
+  already have.
 - Tier two needs a part-of-speech tagger: active voice, tense, one part of
   speech per word. Real work per sentence, so `review`.
 

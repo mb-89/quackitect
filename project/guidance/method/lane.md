@@ -3,10 +3,19 @@
 <!-- AUTHORED TERSE. This register IS the source: the start-the-agent step
      assembles this file verbatim into the prompt layer. Edit the rule here. -->
 
-Your native tools (Read, Write, Edit, Bash, Glob, Grep, web) are blocked here,
-tool by tool, by an explicit list. Which file holds that list depends on the
-host: Claude Code reads `.claude/settings.json`; GitHub Copilot CLI takes the
-same list on its command line from `_cage/copilot-cage.json`.
+Your native tools are blocked here, tool by tool, by an explicit list:
+
+- Read
+- Write
+- Edit
+- Bash
+- Glob
+- Grep
+- web
+
+Which file holds that list depends on the host. Claude Code reads
+`.claude/settings.json`, and GitHub Copilot CLI takes the same list on its
+command line from `deliverable/cage/copilot-cage.json`.
 
 The effect is the one rule: the `se` lane replaces every native tool, as good
 or better.
@@ -33,13 +42,20 @@ Every call is logged raw to `.se/calls.jsonl`.
 
 TWO DOORS LEAD OUTSIDE THE ROOT, and neither is a path. A past version of this
 repo is read at a committed ref — `se_file_read`, `se_file_search` and
-`se_file_glob` all take `ref`. Another folder entirely belongs in
-`.se/roots.json` as a declared, read-only root, reachable as `@name/rest`; ask
-the owner before declaring one.
+`se_file_glob` all take `ref`.
 
-WHEN A CALL IS REFUSED you get a typed rejection: clause, expected, got, and
-an executable remedy — the exact call to make instead. Follow the remedy and
-recover in one turn. Never work around a refusal with another lane.
+Another folder entirely belongs in `.se/roots.json`, as a declared read-only
+root. It is reachable as `@name/rest`. Ask the owner before declaring one.
+
+WHEN A CALL IS REFUSED you get a typed rejection. It carries:
+
+- the clause
+- what was expected
+- what it got
+- an executable remedy, the exact call to make instead
+
+Follow the remedy and recover in one turn. Never work around a refusal with
+another lane.
 
 A TRUNCATING PIPE CUTS BEFORE THE ENGINE SEES. What `Select-Object -First`
 dropped exists nowhere — not on the result, not in the log. Ends carry

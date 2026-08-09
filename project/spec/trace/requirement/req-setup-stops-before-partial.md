@@ -10,4 +10,6 @@ refines:
 source_refs:
   - uc-install-quackitect ext 2a
 priority: should
+weighs_against:
+  - req-scaffold-from-template >
 ---

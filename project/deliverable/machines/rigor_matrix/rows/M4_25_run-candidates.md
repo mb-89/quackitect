@@ -17,9 +17,6 @@ legal_tools:
   - se_log_query
   - se_answer
   - se_run
-evidence:
-  - name: candidate_records
-    description: "each composed candidate: allocation, interfaces, metrics, rationale - one record per compose state"
 major: full
 minor: none
 patch: none
@@ -45,4 +42,22 @@ specification_note: |
 
 ## Guidance
 
-enumerate-space AUTHORS the candidate drawing (machines/candidates.md); entering this state RUNS it - one compose state per shortlisted combination, parallel, the unchanged baseline entering each as a fixed block. An unseeded drawing refuses mechanically. Judging stays at evaluate-set - composing and evaluating never share a state.
+build-chart AUTHORS the candidate drawing (machines/candidates.md), one compose state per line drawn on the chart. Entering this state RUNS it.
+
+- One compose state per candidate.
+- All of them in parallel.
+- The unchanged baseline enters each as a fixed block.
+
+An unseeded drawing refuses mechanically. Until build-chart has run there is nothing to enter, and the drawing cannot be double-clicked into.
+
+IT WRITES BACK INTO THE CANDIDATE NOTES, and mints nothing (owner ruling 2026-08-08). Each compose state fills three sections of the [[candidate]] note its line already created:
+
+- How it works - the whole architecture, and especially the seams between the chosen options.
+- What it costs - the rough feasibility checks, proportional and no more ([[meth-feasibility-checks]]).
+- What it leans on - what has to be true for it to work.
+
+THERE IS NO SECOND ARTIFACT. A composed record beside the candidate would be a second copy of one thing, and the two disagree the first time anybody edits one. The candidate item card says which state writes which section.
+
+NO SPIKES HERE. The rough checks are M4's; the deep ones are M6's, on the winner alone. Running them per candidate spends the budget before anything is chosen.
+
+JUDGING STAYS AT evaluate-set. Composing and evaluating never share a state, and cutting does not share one with either ([[meth-derive-criteria]]). An agent that knows the score while it writes the description writes a description that earns the score.

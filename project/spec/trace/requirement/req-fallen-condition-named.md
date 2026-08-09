@@ -11,4 +11,6 @@ source_refs:
   - uc-resume-after-an-absence ext 4a
   - ".se/req-mine-v1.md: The ledger and truth"
 priority: should
+weighs_against:
+  - req-first-green-needs-a-red >
 ---

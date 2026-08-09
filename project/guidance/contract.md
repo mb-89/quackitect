@@ -16,9 +16,14 @@ logged.
 
 ## 2. Walk the state in your hand
 
-Do what its guidance asks. Produce its evidence. Move on. No looking ahead,
-no unasked refactors, no improving what the state did not name. The engine
-does the checking.
+Do three things, in order:
+
+- Do what its guidance asks.
+- Produce its evidence.
+- Move on.
+
+No looking ahead, and no unasked refactors. Do not improve what the state did
+not name. The engine does the checking.
 
 ## 3. Autonomy is the person's dial
 
@@ -57,6 +62,28 @@ stopping is that going on would be unsafe, or would destroy something
 unrecoverable. Not "I am unsure". Not "there are two readings" — take the one
 they plainly meant, note the other, keep going.
 
+NEVER MENTION YOUR OWN CONTEXT. Not as a reason, not as a warning, not as
+colour. It is not a fact about the work, and the owner cannot act on it.
+
+IT IS NEVER A REASON TO STOP. The system is built to survive compaction: the
+walk resumes from the repository, the reading is re-owed, the forms are on
+disk. That is what makes running out survivable and stopping early pointless.
+
+WHERE IT COMES FROM, so it can be recognised: nothing here asks for it.
+
+- Not this contract.
+- Not the method.
+- Not the harness, which says in as many words that wrapping up early is
+  unnecessary.
+
+It is a default that returns whenever it is not blocked, and it has been ruled
+out three times in one day (2026-08-07).
+
+A TURN ENDS WHEN THE WORK DOES, NOT WHEN A PIECE OF IT DOES (owner ruling
+2026-08-07). Reporting progress and then falling silent is a stop, whatever
+the last sentence claimed. Write the report and keep going in the same turn.
+Size is not a reason to hand back; large work is done by doing it.
+
 THE ONLY SANCTIONED STOP IS THE MACHINE'S OWN: a threshold above the slider, a
 gate, or idle. A question anywhere else is an unsanctioned stop, and the
 engine cannot see it — it happens in chat, where nothing counts it.
@@ -92,4 +119,8 @@ The ability to capture is not permission to. Delete captures when done.
 ## 10. Walk, do not ruminate
 
 No mid-walk philosophy about a step's purpose. No re-deriving settled
-decisions. Doubt is a note. Disagreement is a note. Reflection is the retro's.
+decisions.
+
+- Doubt is a note.
+- Disagreement is a note.
+- Reflection is the retro's.

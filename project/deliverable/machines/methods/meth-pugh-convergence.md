@@ -15,4 +15,7 @@ M5's converge-pugh and reverse-sensitivity, operating on M4's Pareto front with 
 - Named hazard: decision theater (weights invented post-hoc to justify a predecided option). The sensitivity check is the mitigation; the recorded runs are the audit.
 
 ## Sources
-Pugh, controlled convergence; VDI 2225 via Pahl & Beitz; v1's M4 method text.
+
+- Pugh, controlled convergence.
+- VDI 2225, via Pahl and Beitz.
+- v1's M4 method text.

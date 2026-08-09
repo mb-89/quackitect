@@ -12,6 +12,8 @@ source_refs:
   - uc-trace-a-decision-to-its-origin guarantee
   - ".se/req-mine-v2.md: gates, offers and grants"
 priority: should
+weighs_against:
+  - req-rejection-carries-its-reason >
 ---
 
 ## Detail

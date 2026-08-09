@@ -11,4 +11,6 @@ source_refs:
   - uc-get-work-routed ext 3b
   - ".se/req-mine-sebots.md: capture, decisions, change (frictionless capture)"
 priority: should
+weighs_against:
+  - req-retro-asks-real-use >
 ---

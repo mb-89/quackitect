@@ -10,6 +10,8 @@ refines:
 source_refs:
   - uc-let-the-system-catch-up step 2
 priority: should
+weighs_against:
+  - req-overhaul-opens-without-deliverable >
 ---
 
 ## Detail

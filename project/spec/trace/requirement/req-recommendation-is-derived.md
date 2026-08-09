@@ -12,6 +12,8 @@ source_refs:
   - uc-get-work-routed step 4
   - uc-get-work-routed step 3
 priority: should
+weighs_against:
+  - req-engine-folder-is-sealed >
 ---
 
 ## Detail

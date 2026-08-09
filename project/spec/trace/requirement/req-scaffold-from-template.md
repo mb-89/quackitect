@@ -11,4 +11,6 @@ source_refs:
   - uc-begin-a-product step 3
   - ".se/req-mine-v1.md: the lane — mediated I/O"
 priority: should
+weighs_against:
+  - req-fresh-product-starts-empty >
 ---

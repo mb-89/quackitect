@@ -1,7 +1,7 @@
 ---
 form: write-requirements
-suspect: "rests on log-risks, which fell"
-signed_off_was: 2026-08-06
+by: agent
+signed_off: 2026-08-07T19:45:43.282Z
 authors: agent
 files: null
 ---
@@ -10,11 +10,27 @@ files: null
 
 ## current_situation
 
-gate-inputs stands blessed: 5 value props, 21 stories, 22 use cases. The owner ordered the register written, hundreds expected, mined from the ancestors.
+gate-inputs stands blessed. The owner ordered the register written, hundreds expected, mined from the ancestors.
 
-Three miners distilled 234 demands from v1 (ref main), v2 (ref v2 plus the design doc) and the sebot family. Eight drafters derived rows from every use-case step and extension; a ninth drafted the owner-approved qualities chain: vp-holds-its-qualities, 5 journey stories, 5 use cases whose extensions are the quality's failure modes. A cross-set critic returned 39 fixes: 17 merges, 3 conflicts, 4 vocabulary sweeps, 9 demotions, 4 precision repairs, 7 EARS rewrites. All applied at the mint.
+Three miners distilled 234 demands from v1 (ref main), v2 (ref v2 plus the design doc) and the sebot family. Eight drafters derived rows from every use-case step and extension. A cross-set critic returned 39 fixes: 17 merges, 3 conflicts, 4 vocabulary sweeps, 9 demotions, 4 precision repairs, 7 EARS rewrites. All applied at the mint.
 
-218 rows stand minted, must at 70 of 218 (32%). Every row passed the mint-side validation: EARS shape, weasel and escape bans, closed vocabularies, scenario on every quality, breaks_if_removed and refines on every row, zero TBD markers.
+150 ROWS STAND, must at 56 of 150 (37%). Every row passed the mint-side validation: EARS shape, weasel and escape bans, closed vocabularies, scenario on every quality, breaks_if_removed and refines on every row, zero TBD markers.
+
+THE QUALITIES WERE RESTRUCTURED (owner ruling 2026-08-07). They used to hang under five ad-hoc quality use cases somebody invented. They now hang under the nine characteristics of ISO/IEC 25010:2023, and a quality's only upward edge is its characteristic.
+
+WHAT A QUALITY PROTECTS IS READ FROM THE FUNCTION SIDE. Functions satisfy it, one quality may be satisfied by several, and a function serving several requirements is drawn several times. That edge already existed and is already checked both ways, so nothing new was built and nothing went unenforced.
+
+FOUR ROWS CAME FROM ASKING ALL NINE, and each is grounded in something already true in this repo rather than invented to fill a slot.
+
+req-mirror-stays-on-the-machine. SECURITY had no quality because nobody thought this product had one. It does: the mirror served the whole record on every network interface with no authentication, while a comment three hundred lines up asserted it never left localhost. The bind is fixed and a test now checks every listen call.
+
+req-no-agent-act-destroys-work. SAFETY is new in the 2023 revision and had no answer here. The demand is cross-cutting: across every operation an agent can reach, committed work stays recoverable. The refusals that serve it already existed; the property they serve did not.
+
+req-every-artifact-is-readable-text. COMPATIBILITY had no answer, and asking found a rule the suite has enforced for weeks without the register ever stating it.
+
+req-reachable-capability-is-traced. FUNCTIONAL SUITABILITY, and it has failed twice: the requirements gate found four reachable capabilities with no use case on its first run and three more on its second.
+
+ONE ROW WAS MISSING FROM THIS LIST AND IS BACK. req-state-needs-all-its-inputs stood in the corpus and never in the register field.
 
 ## register
 
@@ -60,6 +76,7 @@ Three miners distilled 234 demands from v1 (ref main), v2 (ref v2 plus the desig
 - req-engine-port-fallback
 - req-entry-binds-worktree
 - req-entry-speaks-plainly
+- req-every-artifact-is-readable-text
 - req-every-call-logged
 - req-extension-replaced-reported
 - req-fallen-condition-named
@@ -86,12 +103,14 @@ Three miners distilled 234 demands from v1 (ref main), v2 (ref v2 plus the desig
 - req-landing-needs-no-close
 - req-losers-stay-on-record
 - req-method-reuse-is-vendoring
+- req-mirror-stays-on-the-machine
 - req-missing-document-stops-the-walk
 - req-missing-provider-named
 - req-moved-evidence-invalidates-the-bless
 - req-newcomer-leaves-able-to-ask
 - req-newcomer-one-command
 - req-newcomer-orients-unaided
+- req-no-agent-act-destroys-work
 - req-no-claim-without-evidence
 - req-one-note-per-settled-point
 - req-one-script-installs
@@ -112,6 +131,7 @@ Three miners distilled 234 demands from v1 (ref main), v2 (ref v2 plus the desig
 - req-product-is-a-folder
 - req-pull-answers-from-record
 - req-purpose-recorded-at-begin
+- req-reachable-capability-is-traced
 - req-reading-proof
 - req-recommendation-is-derived
 - req-record-arrives-prefilled
@@ -138,6 +158,7 @@ Three miners distilled 234 demands from v1 (ref main), v2 (ref v2 plus the desig
 - req-size-escalation-readjudicated
 - req-size-proposal-names-strikes
 - req-small-fix-joins-open-record
+- req-state-needs-all-its-inputs
 - req-state-opens-only-when-earned
 - req-story-links-its-proving-run
 - req-stray-captured-in-one-call
@@ -166,12 +187,12 @@ Three miners distilled 234 demands from v1 (ref main), v2 (ref v2 plus the desig
 
 ## set_criteria
 
-- complete: every numbered step and lettered extension of all 27 use cases (22 blessed plus 5 quality) was walked by a dedicated drafter and carries at least one row, with the step pointer in source_refs; the engine's covers check proves node-level coverage both ways on this submit; 234 mined ancestor demands were folded in so the set demands more than the use cases spell out.
-- consistent: a cross-set critic compared all nine drafts pairwise by theme and found 3 conflicts - scoped-verdict reuse vs the fresh land battery, guidance-edit target vs the vendored write fence, one-document-per-reply vs the aggregate reading file - and all 3 are reworded so a single implementation satisfies the set; vocabulary is standardized (the engine, the panel, the pull, the driver) across every row.
-- affordable: the bulk of the set states what the shipped engine already does, so its cost is the checks that keep it true; the genuinely new rows (install, tour, panel depth, vendored overlays) sit inside i1's own charter, and no row demands hardware, services, or staffing the project does not have.
-- bounded: every row refines a use case and answers to a source (a step pointer, a stakeholder, a mined ancestor demand, or a recorded ruling); the critic's gold-plating pass found four fabricated precisions and all four are repaired; won't-haves were kept out of the register entirely - exclusions live in the non-goals and the excluded-use list.
-- comprehensible: every statement is one EARS sentence with a named acting subject; detail rides in tables under the statement, not in prose; a reader from any discipline finds their rows by kind and by the use case they refine; must sits at 70 of 218 so the binding core is readable on its own.
-- no_tbd: the mint swept every row's every field for TBD, TBC, TBR and ??? and counted zero; the sweep runs in .se/req-mint.mjs and its output is in the call log.
+- complete: every numbered step and lettered extension of all 31 use cases was walked by a dedicated drafter and carries at least one row, with the step pointer in source_refs; the engine's covers check proves node-level coverage both ways on this submit; 234 mined ancestor demands were folded in so the set demands more than the use cases spell out. The nine ISO/IEC 25010:2023 characteristics now ask the completeness question from the quality side too, and asking them in full added four rows nobody had thought to write.
+- consistent: a cross-set critic compared all nine drafts pairwise by theme and found 3 conflicts, all reworded so a single implementation satisfies the set; vocabulary is standardized (the engine, the panel, the pull, the driver) across every row. The quality restructure changed where rows hang, never what they demand, so no statement, measure or verify method moved.
+- affordable: the bulk of the set states what the shipped engine already does, so its cost is the checks that keep it true; the genuinely new rows sit inside i1's own charter, and no row demands hardware, services or staffing the project does not have. One of the four new rows is NOT satisfied today — req-mirror-stays-on-the-machine was a live defect — and the fix was one argument to a listen call.
+- bounded: every row refines a use case and answers to a source (a step pointer, a stakeholder, a mined ancestor demand, or a recorded ruling); the critic's gold-plating pass found four fabricated precisions and all four are repaired; won't-haves were kept out of the register entirely. The four rows added from the checklist were each grounded in existing code, an existing test, or a measured failure — none was written to fill a characteristic.
+- comprehensible: every statement is one EARS sentence with a named acting subject; detail rides in tables under the statement, not in prose; a reader from any discipline finds their rows by kind and by the use case they refine; must sits at 56 of 150 so the binding core is readable on its own. A quality is now found by its characteristic rather than by guessing which ad-hoc category somebody filed it under.
+- no_tbd: swept project/spec/trace for TBD, TBC, TBR and ??? at this gate and counted zero across the whole corpus rather than the requirement folder alone.
 
 ## follow_up
 

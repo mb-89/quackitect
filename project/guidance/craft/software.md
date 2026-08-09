@@ -1,6 +1,6 @@
 ---
 id: software
-statement: How to write code and record work. The universal rules; the project's own rulings live in project/guidance/method/engineering.md.
+statement: "How to write code and record work. These are the universal rules, and the project's own rulings live in `project/guidance/method/engineering.md`."
 applies_to:
   - work
   - overhaul
@@ -27,24 +27,40 @@ that one when you touch what it covers.
 
 ## Do not repeat (DRY)
 
-- Single source of truth. Each fact lives in one place. Everything else points to it.
-- Markdown is the truth. Anything whose truth lives in markdown keeps it Obsidian-compatible and human-editable IN THE REAL WORLD — a million-line file is not editable. Generated surfaces derive from the markdown, never the reverse. Log files are the one exception.
-- Machines are drawn. A state machine's truth is its Obsidian canvas, and a person edits it in Obsidian, in the real world (owner law, 2026-07-28). The engine accepts what a person naturally draws. A mechanism that depends on metadata Obsidian does not surface to its editor is a defect — rework the mechanism, never the person.
-- The truth is read LIVE (owner ruling, 2026-07-29). A running system holding a stale copy of a file it calls the single truth is enforcing a lie. Where re-reading is too expensive, cache it against the CONTENT of the files it was built from — never against size and modification time, which a same-length edit walks straight past.
-- Do not repeat prose, data, or code. Not across files. Not across panels. Not within one screen.
+- Single source of truth. Each fact lives in one place, and everything else points to it.
+- Markdown is the truth. Anything whose truth lives in markdown keeps it Obsidian-compatible and human-editable IN THE REAL WORLD.
+  - A million-line file is not editable.
+  - Generated surfaces derive from the markdown, never the reverse.
+  - Log files are the one exception.
+- Machines are drawn. A state machine's truth is its Obsidian canvas, and a person edits it in Obsidian, in the real world (owner law, 2026-07-28).
+  - The engine accepts what a person naturally draws.
+  - A mechanism that depends on metadata Obsidian does not surface to its editor is a defect. Rework the mechanism, never the person.
+- The truth is read LIVE (owner ruling, 2026-07-29). A running system holding a stale copy of a file it calls the single truth is enforcing a lie.
+  - Where re-reading is too expensive, cache it against the CONTENT of the files it was built from. Never against size and modification time, which a same-length edit walks straight past.
+- Do not repeat prose, data, or code.
+  - Not across files.
+  - Not across panels.
+  - Not within one screen.
 - If two places show the same thing, delete one. A detail view should not echo what its parent already shows.
-- A field that restates another field is NOISE. A statement that repeats the id, a title that repeats the name, a label that echoes the filename — strike it. Empty is better than an echo; a field is filled only when it ADDS something.
+- A field that restates another field is NOISE. A statement that repeats the id, a title that repeats the name, a label that echoes the filename — strike it.
+  - Empty is better than an echo. A field is filled only when it ADDS something.
 - Repeat only when strongly advised. Then say why.
 
 ## Comments and provenance
 
 - Write comments the way people write them: only where a reader would be surprised.
 - A comment states a constraint the artifact cannot show itself. Nothing else.
-- Never comment that a rule was followed, who ruled it, or when. No dates. No step numbers. No law citations at application sites.
+- Never comment that a rule was followed, who ruled it, or when.
+  - No dates.
+  - No step numbers.
+  - No law citations at application sites.
 - The why lives ONCE, in its designated home: an ADR, a `decided_via`, an evidence doc, a note, the ledger. Everywhere else, the artifact just IS the consequence.
 - A deliberate choice that must survive future edits gets a TEST or a LINT, not a comment. A comment is the weakest guard.
-- PREFER DELETING A COMMENT TO WRITING ONE (owner ruling 2026-08-02). Nobody maintains them. An unmaintained comment goes stale, and a stale comment does not merely age — it lies, and nothing in the build catches it. More of this project's staleness has come from comments than from any other source.
-- REFERENCE, NEVER COPY. Point at the one place the fact lives: a path, a condition note, a guidance file. A comment that restates what another file says has FORKED the truth, and only one fork ever gets updated.
+- PREFER DELETING A COMMENT TO WRITING ONE (owner ruling 2026-08-02). Nobody maintains them.
+  - An unmaintained comment goes stale. A stale comment does not merely age, it lies, and nothing in the build catches it.
+  - More of this project's staleness has come from comments than from any other source.
+- REFERENCE, NEVER COPY. Point at the one place the fact lives: a path, a condition note, a guidance file.
+  - A comment that restates what another file says has FORKED the truth, and only one fork ever gets updated.
 - The test of a comment is whether it can go stale. If the code changing would make it wrong, and nothing would fail, delete it or turn it into a check.
 
 ## Guards that teach
@@ -52,18 +68,20 @@ that one when you touch what it covers.
 A guard exists to move the work on, never to prove a rule. These four came
 out of one day of measuring what the lane actually cost its callers.
 
-- CORRECT WHAT IS MECHANICAL. ANNOUNCE WHAT YOU CORRECTED. REFUSE ONLY THE
-  AMBIGUOUS (owner ruling 2026-08-02). A refusal over a difference nobody
-  can see on screen spends a round and teaches nothing. A silent correction
-  teaches nothing either. Do it, and say what you did.
+- THE CORRECTION RULE (owner ruling 2026-08-02). Correct what is mechanical,
+  announce what you corrected, and refuse only the ambiguous.
+  - A refusal over a difference nobody can see on screen spends a round and
+    teaches nothing.
+  - A silent correction teaches nothing either.
+  - Do it, and say what you did.
 - ONE TABLE, THREE OUTPUTS. Where a rule is enforced, the warning it prints
   and the tool description that announces it all generate from ONE table.
   Feed-forward and feedback cannot drift apart if there is nothing to drift
   between.
-- SHIP AT WARN, BLOCK ON EVIDENCE. A new guard warns first. It only starts
-  refusing once the log shows its warn rate near zero AND the lane
-  demonstrably serves the job it is fencing off. A guard that blocks work
-  the lane cannot yet do is a trap.
+- SHIP AT WARN, BLOCK ON EVIDENCE. A new guard warns first.
+  - It only starts refusing once the log shows its warn rate near zero AND the
+    lane demonstrably serves the job it is fencing off.
+  - A guard that blocks work the lane cannot yet do is a trap.
 - THE AGENT THINKS ABOUT THE WORK. THE ENGINE THINKS ABOUT THE BOOKKEEPING.
   Every protocol element that spends the agent's attention on something the
   engine could carry is a defect with a deadline. The reading loop, the
@@ -104,7 +122,8 @@ This applies to every citation, and to your own instincts.
 - Rations human LABOUR: suspect it. That cost collapsed once a machine started doing the work.
 - Rations human JUDGEMENT or ATTENTION: it still holds. There is still one owner, and they still have to look at the diff.
 - Most guidance predates AI and was written for human teams. Split it along that seam instead of quoting or discarding it whole.
-- This binds the assistant's own instincts too. The training assumes writing the code is the expensive part. Where a recommendation rests on that assumption, say so rather than asserting it.
+- This binds the assistant's own instincts too. The training assumes writing the code is the expensive part.
+  - Where a recommendation rests on that assumption, say so rather than asserting it.
 
 ## Use the cores
 
@@ -174,8 +193,8 @@ THE BATTERY IS THE EXCEPTION, NOT THE HABIT (owner ruling 2026-08-02).
 Measured: about sixty full runs in one two-hour session, each piped to a temp
 file and grepped for a single failure.
 
-- SCOPED IS THE DEFAULT. Name the files the change touches. The result
-  carries the counts and only the failures' detail.
+- SCOPED IS THE DEFAULT. Name the files the change touches, and the result
+  carries the counts plus only the failures' detail.
 - THE BATTERY IS EARNED. It runs when a change maps to no test file, when
   the last one was red, when there is no memory of one, or on demand for a
   flake hunt.
@@ -210,10 +229,15 @@ level that shows twenty things has stopped helping them choose.
 
 ## Sizing and records
 
-- Size work by its CONTENT, never by an agent's time estimate. Those estimates overshoot wildly and have done so repeatedly — a day claimed, an hour spent. Do not parrot an inherited size claim either.
+- Size work by its CONTENT, never by an agent's time estimate. Those estimates overshoot wildly and have done so repeatedly, a day claimed against an hour spent.
+  - Do not parrot an inherited size claim either.
 - Never say how long something will take unless you have a measurement. "Roughly a day" from feel is not an estimate; it is a guess wearing one's clothes.
-- Size the vehicle before choosing it. An expedition and an iteration are each worth ROUGHLY A DAY of agent work. Anything smaller goes INSIDE one.
-- Never spam the archives with many small records. Bundle related small work into ONE expedition or iteration. An archive reader does not care about ten-per-day granularity.
+- Size the vehicle before choosing it. An expedition and an iteration are each worth ROUGHLY A DAY of agent work.
+  - Anything smaller goes INSIDE one.
+- Never spam the archives with many small records. Bundle related small work into ONE expedition or iteration.
+  - An archive reader does not care about ten-per-day granularity.
 - A single small fix never earns its own record. It is a commit inside an expedition that is already open, or inside one opened to hold the day's work.
-- AN EXPEDITION THAT BECOMES THE DAY'S BUCKET SAYS SO IN ITS GOAL. Bundling is right, and it quietly makes the goal a lie: an expedition opened to put the system into VS Code ended up holding a handover law, a rigor column, log paging and a palette file. Nobody looking for those would look there. Amend the goal when the bundle grows past it, or the archive keeps the work and loses the thread.
-- Commits stay fine-grained. Records do not. The two answer different questions.
+- AN EXPEDITION THAT BECOMES THE DAY'S BUCKET SAYS SO IN ITS GOAL. Bundling is right, and it quietly makes the goal a lie.
+  - An expedition opened to put the system into VS Code ended up holding a handover law, a rigor column, log paging and a palette file. Nobody looking for those would look there.
+  - Amend the goal when the bundle grows past it, or the archive keeps the work and loses the thread.
+- Commits stay fine-grained, and records do not. The two answer different questions.

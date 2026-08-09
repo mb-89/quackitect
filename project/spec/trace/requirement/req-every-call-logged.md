@@ -6,11 +6,11 @@ kind: quality
 verify_method: test
 breaks_if_removed: The audit has holes, and the person answers for acts the record never saw.
 refines:
-  - uc-stay-auditable
+  - uc-quality-maintainability
   - uc-take-a-step
 source_refs:
-  - uc-stay-auditable step 2
-  - uc-stay-auditable ext 2a
+  - uc-quality-maintainability step 2
+  - uc-quality-maintainability ext 2a
   - ".se/req-mine-v2.md: logging, observability and the retro (v2-067, v2-069)"
   - ".se/req-mine-v1.md: the lane — mediated I/O"
   - stk-engineer-driving-agents

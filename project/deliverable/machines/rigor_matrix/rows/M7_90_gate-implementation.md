@@ -37,7 +37,7 @@ product: full
 specification: tailored
 major_note: |
   Applies in full: built inside the NEW baseline, no unsanctioned
-  element, red observed, designs realized, battery green, quality and
+  element. A red was observed and the designs realized. The battery is green, and quality and
   risks judged.
 minor_note: |
   Applies in full: build planned and walked, models adhered, red observed,

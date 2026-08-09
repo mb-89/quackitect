@@ -6,6 +6,12 @@ folder: project/spec/trace/use-case
 sections:
   - Main scenario
   - Extensions
+checks:
+  - field: kind
+    one_of:
+      - interaction
+      - quality-area
+    hint: an interaction is told from the user's side; a quality-area is one of the nine ISO 25010 characteristics
 applies_rigor:
   - systematic
 applies_type:
@@ -17,6 +23,22 @@ applies_type:
 Lives in `project/spec/trace/use-case/`. It is a STANDING ARTIFACT: it outlives
 the iteration that authored it, lands on trunk when that record closes, and a
 later record may change it.
+
+## THE LEVEL CARRIES TWO KINDS (owner ruling 2026-08-07)
+
+`kind: interaction` is the original: one actor, one goal, every pass.
+
+`kind: quality-area` is one of the nine ISO/IEC 25010:2023 characteristics.
+It is not an interaction, and it is not told from anybody's side. It is the
+umbrella the non-functional requirements hang under.
+
+The two sit at one level because both are what requirements refine. The facet
+is there so a reader is never surprised, and so the register can be filtered
+to either set.
+
+A QUALITY-AREA'S SECTIONS READ DIFFERENTLY. Its Main scenario says what the
+characteristic means for this product. Its Extensions say where the product
+deliberately accepts less, and why.
 
 A STORY IS ONE PASS. A USE CASE IS EVERY PASS. The story says this person, this
 Tuesday, these clicks. The use case says the same goal told once, with the

@@ -11,4 +11,6 @@ source_refs:
   - uc-drain-the-inbox step 6
   - ".se/req-mine-v2.md: notes and the toll (v2-081)"
 priority: should
+weighs_against:
+  - req-parked-note-re-drains >
 ---

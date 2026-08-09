@@ -10,4 +10,6 @@ refines:
 source_refs:
   - uc-let-the-system-catch-up step 3
 priority: should
+weighs_against:
+  - req-sweep-covers-every-drift-class >
 ---

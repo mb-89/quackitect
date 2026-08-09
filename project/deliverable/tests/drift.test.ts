@@ -10,7 +10,6 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { withSuspect } from "../engine/forms.ts";
 import {
   demandsFor,
   generateIterations,
@@ -23,7 +22,7 @@ import {
   pinIteration,
   repinColumn,
 } from "../engine/iterations.ts";
-import { downstreamCone, type MachineDecl } from "../engine/machine.ts";
+import { claimFeeders, downstreamCone, type MachineDecl } from "../engine/machine.ts";
 import { type ChangeColumn, compileColumn, readRigorMatrix } from "../engine/rigor-matrix.ts";
 import { Session } from "../engine/session.ts";
 import { freshRoot } from "./helpers.ts";
@@ -165,26 +164,39 @@ test("a step that was never green is not painted suspect", () => {
   );
 });
 
-// A REOPENED STEP LOSES ITS STAMPS. They assert the claim STANDS, and after a
-// reopen it does not. The paint reads the file, so leaving them there kept a
-// reopened gate green — seen live on gate-motivation.
-test("a suspect claim keeps its content, loses its stamps, and stops being green", () => {
+// GREEN STOPS AT THE FIRST INPUT THAT IS NOT GREEN, and the claim that stops
+// being green KEEPS ITS SIGNATURE (owner ruling 2026-08-07, v1's design).
+//
+// The old code wrote a `suspect:` line onto the claim and stripped the stamps
+// to do it. That stored a derived value, which then went stale between the
+// passes that wrote it — and it destroyed a person's act to record a machine's
+// opinion. A checker may refuse to paint a claim green. It may never erase
+// what somebody signed.
+test("a claim keeps its signature when an input falls, and the colour is computed", () => {
   const { root, it } = pinned();
   const decl = { ...compileColumn(readRigorMatrix(root), SIZE), id: itShortId(it.id) };
   const gate = decl.states.find((s) => s.kind === "gate" && s.evidence_form.length > 0);
   assert.ok(gate !== undefined);
-  const ev = join(it.path, "project", "spec", "iterations", it.id, "evidence", `${gate.id}.md`);
-  mkdirSync(dirname(ev), { recursive: true });
-  writeFileSync(ev, `---\nsigned_off: the agent\nbless: blessed by the owner\nkeep_me: yes\n---\n\nthe claim, in full\n`, "utf8");
-  assert.ok(new Session(root).recordDone(decl).includes(gate.id), "green before the reopen");
-  writeFileSync(ev, withSuspect(readFileSync(ev, "utf8"), "the matrix moved"), "utf8");
-  const after = readFileSync(ev, "utf8");
-  assert.doesNotMatch(after, /^signed_off:/m, "the stamp goes");
-  assert.doesNotMatch(after, /^bless:/m, "and so does the bless");
-  assert.match(after, /^suspect: "the matrix moved"$/m, "replaced by the mark, carrying why — quoted, because a reason is full of colons");
-  assert.match(after, /^keep_me: yes$/m, "an unrelated key is untouched");
-  assert.match(after, /the claim, in full/, "and the claim itself stays — it is re-approved, not re-written");
-  assert.ok(!new Session(root).recordDone(decl).includes(gate.id), "and it is not green any more");
+  const claimful = new Set(decl.states.filter((s) => s.evidence_form.length > 0).map((s) => s.id));
+  const feeders = claimFeeders(decl, gate.id, claimful);
+  assert.ok(feeders.length > 0, "the gate has at least one claim-bearing input");
+
+  const evOf = (id: string): string => join(it.path, "project", "spec", "iterations", it.id, "evidence", `${id}.md`);
+  const sign = (id: string): void => {
+    mkdirSync(dirname(evOf(id)), { recursive: true });
+    writeFileSync(evOf(id), `---\nsigned_off: the agent\nbless: blessed by the owner\nkeep_me: yes\n---\n\nthe claim, in full\n`, "utf8");
+  };
+  for (const id of claimful) sign(id);
+  assert.ok(new Session(root).recordDone(decl).includes(gate.id), "green while every input stands");
+
+  // ONE INPUT LOSES ITS SIGNATURE. The gate's own file is never touched.
+  writeFileSync(evOf(feeders[0]), `---\nkeep_me: yes\n---\n\nthe claim, in full\n`, "utf8");
+  const after = readFileSync(evOf(gate.id), "utf8");
+  assert.match(after, /^signed_off: the agent$/m, "the gate's stamp is untouched");
+  assert.match(after, /^bless: blessed by the owner$/m, "and so is its bless");
+  assert.doesNotMatch(after, /^suspect:/m, "nothing was written onto it");
+  assert.match(after, /the claim, in full/, "and the claim itself stays");
+  assert.ok(!new Session(root).recordDone(decl).includes(gate.id), "but it is NOT green — it rests on ground that moved");
 });
 
 test("a weakened demand does not reopen — what was filed already covers it", () => {
@@ -216,4 +228,60 @@ test("the drift rips down — everything downstream of a moved step goes with it
   const cone = downstreamCone(decl, ["a"]);
   assert.deepEqual([...cone].sort(), ["a", "b", "c"], "the moved step re-earns its own claim too");
   assert.ok(!cone.has("unrelated"), "a step off the path is untouched");
+});
+
+// THE FAN-IN IS AN AND (owner design 2026-08-04, note-bb6d1cb6b75d): in most
+// machines every branch must be covered. The route used to be breadth-first
+// shortest path, which finds ONE way to a gate and never mentions the other
+// branch — so the walk marched at a gate that then refused, naming a feeder
+// nobody had been sent to. claimFeeders is what makes the route cover both.
+test("a collection bar's prerequisites include every input, not just the nearest one", () => {
+  const { root, it } = pinned();
+  const decl = { ...compileColumn(readRigorMatrix(root), SIZE), id: itShortId(it.id) };
+  const claimful = new Set(decl.states.filter((s) => s.evidence_form.length > 0).map((s) => s.id));
+  const bars = decl.states.filter((s) => s.busbar === true);
+  assert.ok(bars.length > 0, "the column declares at least one collection bar");
+  for (const bar of bars) {
+    const feeders = claimFeeders(decl, bar.id, claimful);
+    // EVERY declared claim-bearing input is a prerequisite. A shortest path
+    // would have named exactly one of them, whatever the bar collects.
+    const declared = decl.states
+      .filter((p) => p.edges.some((e) => e.to === bar.id && (e.role ?? "normal") !== "fallback"))
+      .map((p) => p.id)
+      .filter((id) => claimful.has(id));
+    for (const d of declared) assert.ok(feeders.includes(d), `${d} feeds ${bar.id} and must be a prerequisite`);
+  }
+});
+
+// THE ANSWER COMES BACK INSIDE A SECOND (req-call-answers-in-one-second).
+//
+// The requirement stood and nothing enforced it. So when green stopped reading
+// a stamp and started re-checking every claim against the whole trace corpus,
+// the cost landed on the render path — and the render runs on every change.
+// The engine stopped answering three times in one afternoon before anybody
+// measured it, and each time the diagnosis started from scratch.
+//
+// A CORPUS OF TWO HUNDRED, ON PURPOSE. Against the handful of nodes a fresh
+// root carries, the cheap version and the expensive one both round to nothing.
+// A guard that cannot tell them apart guards nothing, so this one buys a
+// corpus big enough for the difference to show.
+//
+// The bound is deliberately loose. It is not measuring how fast this is; it is
+// there to go red if somebody puts a per-state corpus load back.
+test("green is computed inside a second against a corpus of two hundred nodes", () => {
+  const { root, it } = pinned();
+  const decl = { ...compileColumn(readRigorMatrix(root), SIZE), id: itShortId(it.id) };
+  const reqDir = join(it.path, "project", "spec", "trace", "requirement");
+  mkdirSync(reqDir, { recursive: true });
+  for (let i = 0; i < 200; i++) {
+    writeFileSync(join(reqDir, `req-filler-${i}.md`), `---\nid: req-filler-${i}\ntype: "[[requirement]]"\n---\n\nfiller\n`, "utf8");
+  }
+  const session = new Session(root);
+  const started = Date.now();
+  session.recordDone(decl);
+  const took = Date.now() - started;
+  assert.ok(
+    took < 1000,
+    `recordDone took ${took} ms over 200 nodes. The requirement is one second per CALL, and one call paints more than once — so this budget is already generous.`,
+  );
 });

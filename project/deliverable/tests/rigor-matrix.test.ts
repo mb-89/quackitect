@@ -12,11 +12,51 @@ import { ALL_COLUMNS, CHANGE_COLUMNS, compileColumn, readRigorMatrix } from "../
 
 const ROOT = join(import.meta.dirname, "..", "..", "..");
 
+// EVERY JOIN DECIDES ABOUT ITS BAR (owner ruling 2026-08-06).
+//
+// A state with two or more inputs meets them as an AND only when a busbar is
+// authored above it. Without one they are an OR, and any single arriving
+// input releases the state. Both readings are legal and the bar is what says
+// which.
+//
+// What is NOT legal is a multi-input row where nobody decided. A reader
+// cannot tell the two apart, and the day this went unchecked the panel
+// reported green over work nobody had done.
+test("every multi-input row has decided about its busbar", () => {
+  const m = readRigorMatrix(ROOT);
+  const undecided = m.rows.filter((r) => r.depends_on.length >= 2 && !r.busbar).map((r) => r.name);
+  assert.deepEqual(undecided, [], "a row with several inputs declares busbar: true, or is re-cut to one input");
+});
+
+// THE BAR AND THE CHECK READ ONE FACT. The authored declaration rides the
+// compiled state, so the drawing and the submit cannot disagree. They
+// disagreed once: both keyed off kind === "gate", which made them agree with
+// each other and be wrong together.
+test("compileColumn: the authored busbar rides the compiled state", () => {
+  const decl = compileColumn(readRigorMatrix(ROOT), "major");
+  assert.equal(decl.states.find((s) => s.id === "gate-inputs")?.busbar, true, "a gate collects all its inputs, and now says so out loud");
+  assert.equal(decl.states.find((s) => s.id === "generalize-use-cases")?.busbar, false, "one input needs no bar");
+});
+
+// A SINGLE INPUT STILL BINDS, and that was the case standing wide open. No
+// bar could have saved generalize-use-cases and no OR excused it, because
+// nothing checked a work state's inputs at all.
+test("generalize-use-cases takes exactly one input, and it is write-stories", () => {
+  const decl = compileColumn(readRigorMatrix(ROOT), "major");
+  const feeders = decl.states.filter((s) => s.edges.some((e) => e.to === "generalize-use-cases" && e.role === "normal")).map((s) => s.id);
+  assert.deepEqual(feeders, ["write-stories"]);
+});
+
 test("readMatrix: the real matrix is complete", () => {
   const m = readRigorMatrix(ROOT);
-  // 51 since identify-assumptions split off probe-assumptions: probing
-  // assumed somebody had written assumptions, and nothing forced anybody to.
-  assert.equal(m.rows.length, 51);
+  // 51 since identify-assumptions split off probe-assumptions (owner ruling
+  // 2026-08-06): probing assumed somebody had written assumptions, and
+  // nothing forced anybody to.
+  // 52 since cut-criteria split off evaluate-set (owner ruling 2026-08-08):
+  // cutting an axis inside evaluate-set means cutting with the totals
+  // already visible, which is the poisoning the weights-first order exists
+  // to prevent, arriving one step later.
+  assert.equal(m.rows.length, 52);
   for (const row of m.rows) {
     for (const col of ALL_COLUMNS) {
       const cell = m.cells.get(row.name)?.get(col);
@@ -47,13 +87,32 @@ test("compileColumn major: every row seeds; the machine validates", () => {
   const m = readRigorMatrix(ROOT);
   const decl = compileColumn(m, "major");
   validateMachine(decl);
-  // 51 rows + the mechanical start.
-  assert.equal(decl.states.length, 52);
-  // Only a state that RUNS a seeded machine descends; authoring states do not.
+  // 52 rows + the mechanical start.
+  assert.equal(decl.states.length, 53);
+  // Only a state that RUNS a machine descends; authoring states do not.
   assert.ok(decl.states.some((s) => s.id === "build-steps" && s.submachine === "build-chunks"));
   assert.ok(decl.states.some((s) => s.id === "run-spikes" && s.submachine === "spikes"));
   assert.ok(decl.states.some((s) => s.id === "run-candidates" && s.submachine === "candidates"));
-  assert.ok(decl.states.every((s) => s.submachine === undefined || ["build-steps", "run-spikes", "run-candidates"].includes(s.id)));
+  // TWO KINDS OF SUBMACHINE, and enumerate-space is the first of the second
+  // kind. build-chunks, spikes and candidates are SEEDED — their shape varies
+  // per record, so the state above authors the drawing. `finders` is STATIC,
+  // like boot: the same five searches every time, so the drawing is method
+  // rather than content and lives in machines/enumerate-space.canvas.
+  //
+  // THE .canvas SUFFIX IS WHAT TELLS THEM APART (owner ruling 2026-08-08). A
+  // seeded name is looked for in the record; a file name is compiled from
+  // machines/. Without the suffix the walk refused with "a run without
+  // visible steps" and pointed at a file nobody was ever going to write.
+  //
+  // AND A DRAWN SUB-MACHINE TAKES ITS CANVAS'S NAME. Two names for one node
+  // is what a reader hits when they click a state and land somewhere called
+  // something else; the matrix refuses a row where they differ.
+  assert.ok(decl.states.some((s) => s.id === "enumerate-space" && s.submachine === "enumerate-space.canvas"));
+  assert.ok(
+    decl.states.every(
+      (s) => s.submachine === undefined || ["build-steps", "run-spikes", "run-candidates", "enumerate-space"].includes(s.id),
+    ),
+  );
   const shipped = decl.states.find((s) => s.id === "shipped");
   assert.equal(shipped?.kind, "terminal");
 });
@@ -84,8 +143,8 @@ test("compileColumn patch: struck states vanish and dependencies contract", () =
   assert.deepEqual(incoming("write-requirements"), ["frame-delta", "log-risks"]);
   // author-tests contracts through the whole struck M4-M6 stretch.
   assert.deepEqual(incoming("author-tests"), ["probe-assumptions", "write-requirements"]);
-  // 19 applied rows + start. identify-assumptions applies at patch too: when
-  // a patch exists BECAUSE something stopped holding, that is an assumption
+  // 19 applied rows + start. identify-assumptions applies at patch too: when a
+  // patch exists BECAUSE something stopped holding, that is an assumption
   // turning into an issue, and it is the one case patch-size must record.
   assert.equal(decl.states.length, 20);
 });
@@ -151,7 +210,22 @@ test("evidence is frontmatter data: every non-terminal row carries fields", () =
   const m = readRigorMatrix(ROOT);
   for (const row of m.rows) {
     if (row.state_kind === "terminal") continue;
-    assert.ok(row.evidence_form.length > 0, `${row.name} carries no evidence fields`);
+    // A GATE MAY CARRY NONE (owner ruling 2026-08-07). The compiler gives it
+    // the four standard rounds, and those are evidence. A gate whose own
+    // fields all reduced to mechanical checks SHOULD end up empty — a field
+    // that can only ever say yes teaches the reader to skim, and then the
+    // fields that could have said no get skimmed with it.
+    //
+    // A SUB-MACHINE STATE MUST CARRY NONE (owner ruling 2026-08-08), for the
+    // opposite reason: its evidence lives one level down, in the sub-machine's
+    // own states. Four rows carried a field here that nothing could ever
+    // serve, because the walk descends past this state and completes it on
+    // the way out.
+    if (row.state_kind !== "gate" && row.runs === undefined) {
+      assert.ok(row.evidence_form.length > 0, `${row.name} carries no evidence fields`);
+    }
+    if (row.runs !== undefined)
+      assert.equal(row.evidence_form.length, 0, `${row.name} runs a sub-machine, so its own form is never served`);
     for (const f of row.evidence_form) {
       assert.ok(!f.description.includes("(killer)"), `${row.name}.${f.name} smuggles a killer mark in prose`);
       // THE KILLER FLAG IS GONE. It reached the author inside an HTML comment

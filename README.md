@@ -47,7 +47,7 @@ which edit. Here is the whole rule.
 
 | you changed | you need |
 | --- | --- |
-| `project/brand/palette.css` | nothing. It is read on every render. |
+| `project/deliverable/deliverable/brand/palette.css` | nothing. It is read on every render. |
 | a machine drawing, guidance, a rigor-matrix row | nothing. They are read live. |
 | `project/deliverable/engine/**.ts` | restart the se server. Node caches modules at import, so a correct file on disk means nothing to a process already running. |
 | `project/deliverable/vscode/src/extension.ts` | re-run `RUNME.ps1`. |

@@ -66,6 +66,8 @@ export interface RigorMatrixRow {
   same_as?: string;
   /** Entry conditions inherited from the referenced state note. */
   entry?: Record<string, string[]>;
+  /** Exit conditions the row declares — today, `exit_script`. */
+  exit?: Record<string, string[]>;
   /** WHY the step exists — one authored line for its evidence form. */
   motivation?: string;
   /** Declared do-inputs beyond the reading. */
@@ -108,14 +110,145 @@ function parseDoInputs(v: unknown): { label: string; description: string }[] | u
 // Evidence lives in FRONTMATTER (owner ruling 2026-07-30): a nested YAML
 // list the form machinery consumes directly. A body "## Evidence form"
 // section is refused — one truth, no echo.
-function parseEvidence(fm: Record<string, unknown>, file: string, body: string): EvidenceField[] {
+//
+// EXPORTED, BECAUSE A DRAWN STATE SPEAKS THE SAME LANGUAGE (owner ruling
+// 2026-08-08). The canvas compiler had its own evidence shape — one line per
+// field, carrying a name, a description and required-or-optional, and nothing
+// else. No template, no item type, no guidance. So a hand-drawn state could
+// never ask for what a matrix row asks for every day, and the first drawn
+// state that wanted a real form found the key it wrote was read by nobody.
+//
+// After seeding there is no mechanical difference between a state the matrix
+// compiled and a state somebody drew. This is where that stops being two
+// things.
+export function parseEvidence(fm: Record<string, unknown>, file: string, body: string): EvidenceField[] {
   if (section(body, "Evidence form")) {
-    throw new Error(`matrix row ${file} carries a body evidence section — the frontmatter evidence block is the single truth`);
+    throw new Error(`${file} carries a body evidence section — the frontmatter evidence block is the single truth`);
   }
   const raw = fm.evidence;
   if (raw === undefined) return [];
-  if (!Array.isArray(raw)) throw new Error(`matrix row ${file} evidence block is not a list`);
+  if (!Array.isArray(raw)) throw new Error(`${file} evidence block is not a list`);
   return raw.map((entry, i) => evidenceField(file, entry, i));
+}
+
+/** `picks` maps a column to the sources its cells are constrained to. ONE
+ *  source or SEVERAL, and a literal is legal beside a live one — a column
+ *  offering `[$clusters, nobody]` is complete without being free.
+ *
+ *  Anything else refuses. A pick pointing at nothing offers nothing, and an
+ *  empty offer looks exactly like a text box (owner report 2026-08-08). */
+function picksOf(file: string, f: Record<string, unknown>): Record<string, string[]> {
+  const raw = f.picks;
+  if (raw === undefined) return {};
+  if (raw === null || typeof raw !== "object" || Array.isArray(raw)) {
+    throw new Error(`matrix row ${file} field ${String(f.name)}: \`picks\` maps a column name to one item source or a list of them`);
+  }
+  const out: Record<string, string[]> = {};
+  for (const [col, src] of Object.entries(raw as Record<string, unknown>)) {
+    const list = (Array.isArray(src) ? src : [src]).map((s) => (typeof s === "string" ? s.trim() : ""));
+    if (list.length === 0 || list.some((s) => s === "")) {
+      throw new Error(`matrix row ${file} field ${String(f.name)}: \`picks.${col}\` names no item source`);
+    }
+    out[col] = list;
+  }
+  return out;
+}
+
+/** THE SHAPES THAT REFUSE RATHER THAN DROP. A key the parser cannot read is
+ *  a key the field silently loses, and a field that loses `writes` renders a
+ *  card with nothing to ask — confident, and shaped exactly like success. */
+function refuseBadShapes(file: string, f: Record<string, unknown>): void {
+  // An UNKNOWN type refuses rather than falling back to prose. A row that
+  // says `type: tabel` would otherwise be checked as free text forever,
+  // which is the quiet-divergence failure this repository refuses everywhere.
+  if (f.type !== undefined && !EVIDENCE_TYPES.includes(String(f.type) as EvidenceType)) {
+    throw new Error(
+      `matrix row ${file} field ${String(f.name)}: unknown evidence type "${String(f.type)}" — one of ${EVIDENCE_TYPES.join(", ")}`,
+    );
+  }
+  // `of` NAMES ONE ITEM TYPE. A field whose rows mix two kinds omits it.
+  if (f.of !== undefined && typeof f.of !== "string") {
+    throw new Error(`matrix row ${file} field ${String(f.name)}: \`of\` names one item type — omit it where the rows mix kinds`);
+  }
+}
+
+/** THE THREE WAYS A ROW CAN BE WRONG ABOUT ITS OWN SHAPE. Each is a rule a
+ *  reader would otherwise have to know, and each cost a real defect. */
+function refuseBadRow(row: RigorMatrixRow): void {
+  // A DRAWN SUB-MACHINE IS A CANVAS, SO IT TAKES THE CANVAS'S NAME (owner
+  // ruling 2026-08-08). `boot` is the shape: the node's file is boot.canvas
+  // and the state's id is boot. One name.
+  //
+  // Two names for one node is what a reader hits when they click a state and
+  // land somewhere called something else, and no amount of breadcrumb work
+  // fixes it.
+  if (row.runs?.endsWith(".canvas")) {
+    const drawing = (row.runs.split("/").pop() ?? row.runs).replace(/\.canvas$/, "");
+    if (drawing !== row.name) {
+      throw new Error(
+        `matrix row ${row.name} runs ${row.runs} — a drawn sub-machine takes its canvas's name, so the row and the drawing must both be called ${drawing} or both ${row.name}`,
+      );
+    }
+  }
+  // A SUB-MACHINE STATE'S EVIDENCE LIVES INSIDE IT, so carrying any here is
+  // the defect. The walk DESCENDS into the sub-machine the moment this state
+  // becomes the leaf, and COMPLETES it when the sub-machine pops, so a field
+  // declared here can never be filled by anybody. Four rows carried one each
+  // before this refusal existed, and all four read as ordinary work.
+  if (row.runs !== undefined && row.evidence_form.length > 0) {
+    throw new Error(
+      `matrix row ${row.name} runs a sub-machine AND declares evidence — the walk descends past this state and completes it on the way out, so its form is never served; move the fields into the sub-machine's own states`,
+    );
+  }
+  // A GATE MAY DECLARE NOTHING, because the compiler gives it the four
+  // standard rounds and those are evidence. A gate whose own fields all
+  // reduced to mechanical checks SHOULD end up empty — re-asking a check
+  // that can only pass is what teaches a reader to skim (owner, 2026-08-07).
+  //
+  // A SUB-MACHINE STATE IS EXEMPT FOR THE OPPOSITE REASON: not that its
+  // evidence reduced to nothing, but that it lives one level down.
+  if (row.state_kind !== "terminal" && row.state_kind !== "gate" && row.runs === undefined && row.evidence_form.length === 0) {
+    throw new Error(
+      `matrix row ${row.name} carries no evidence — leaving a state demands evidence; only a terminal, a gate or a sub-machine state is exempt`,
+    );
+  }
+}
+
+/** Every optional key, each present only where the frontmatter carried it in
+ *  a shape the field can use. */
+function optionalKeys(file: string, f: Record<string, unknown>): Partial<EvidenceField> {
+  const str = (k: string): Partial<EvidenceField> =>
+    typeof f[k] === "string" && (f[k] as string).trim() !== "" ? { [k]: (f[k] as string).trim() } : {};
+  const list = (k: string): Partial<EvidenceField> => (Array.isArray(f[k]) ? { [k]: (f[k] as unknown[]).map(String) } : {});
+  return {
+    ...(f.type !== undefined ? { type: String(f.type) as EvidenceType } : {}),
+    ...(typeof f.guidance === "string" && f.guidance.trim() !== "" ? { guidance: f.guidance } : {}),
+    ...str("template"),
+    ...str("of"),
+    ...str("covers"),
+    ...str("relation"),
+    ...str("writes"),
+    ...str("reads"),
+    ...str("reason"),
+    ...(typeof f.page_size === "number" ? { page_size: f.page_size } : {}),
+    ...(f.picks !== undefined ? { picks: picksOf(file, f) } : {}),
+    ...list("options"),
+    ...list("items"),
+    ...list("passing"),
+    ...list("columns"),
+    // WHICH CHOICES OWE A REASON (owner ruling 2026-08-08). Absent means
+    // ALL of them, which is what a gate verdict wants. A finder's `applies`
+    // names only the skip: saying yes needs no essay, saying no does.
+    ...list("rationale_for"),
+    // WHAT TO TYPE IN EACH COLUMN, one line per column, same order. A table
+    // whose headers are single words leaves the filler guessing, and a guess
+    // is what the column check cannot catch.
+    ...list("column_help"),
+    // WHICH PICKED COLUMNS STILL TAKE SOMETHING ELSE. A pick is CLOSED by
+    // default — a known set means the cell holds a member of it. This names
+    // the exceptions, and the comparison cards are the reason it exists.
+    ...list("pick_free"),
+  };
 }
 
 function evidenceField(file: string, entry: unknown, i: number): EvidenceField {
@@ -126,25 +259,12 @@ function evidenceField(file: string, entry: unknown, i: number): EvidenceField {
   if (typeof f.name !== "string" || f.name.trim() === "") {
     throw new Error(`matrix row ${file} evidence entry ${i + 1} declares no name`);
   }
-  // An UNKNOWN type refuses rather than falling back to prose. A row that
-  // says `type: tabel` would otherwise be checked as free text forever,
-  // which is the quiet-divergence failure this repository refuses everywhere.
-  if (f.type !== undefined && !EVIDENCE_TYPES.includes(String(f.type) as EvidenceType)) {
-    throw new Error(`matrix row ${file} field ${f.name}: unknown evidence type "${String(f.type)}" — one of ${EVIDENCE_TYPES.join(", ")}`);
-  }
+  refuseBadShapes(file, f);
   return {
     name: f.name,
     description: typeof f.description === "string" ? f.description : "",
     required: f.required !== false,
-    ...(f.type !== undefined ? { type: String(f.type) as EvidenceType } : {}),
-    ...(typeof f.guidance === "string" && f.guidance.trim() !== "" ? { guidance: f.guidance } : {}),
-    ...(typeof f.template === "string" && f.template.trim() !== "" ? { template: f.template } : {}),
-    ...(typeof f.of === "string" && f.of.trim() !== "" ? { of: f.of.trim() } : {}),
-    ...(typeof f.covers === "string" && f.covers.trim() !== "" ? { covers: f.covers.trim() } : {}),
-    ...(Array.isArray(f.options) ? { options: f.options.map(String) } : {}),
-    ...(Array.isArray(f.items) ? { items: f.items.map(String) } : {}),
-    ...(Array.isArray(f.passing) ? { passing: f.passing.map(String) } : {}),
-    ...(Array.isArray(f.columns) ? { columns: f.columns.map(String) } : {}),
+    ...optionalKeys(file, f),
   };
 }
 
@@ -220,10 +340,15 @@ function parseMatrixRow(
     // a row could only inherit one through same_as, so a step whose method is
     // not common knowledge had no way to make it a condition of entry.
     entry: fm.entry_read === undefined ? undefined : { read: asList(fm.entry_read) },
+    // A ROW MAY DEMAND A MACHINE-OBSERVED CHECK ON THE WAY OUT, for the same
+    // reason it may demand its method on the way in. A form field can only
+    // check the shape of what was written; a script can check the world.
+    // derive-functions is the first: its flows field promised a both-ways
+    // closure that no form vocabulary could express (owner ruling
+    // 2026-08-08).
+    exit: fm.exit_script === undefined ? undefined : { script: asList(fm.exit_script) },
   };
-  if (row.state_kind !== "terminal" && row.evidence_form.length === 0) {
-    throw new Error(`matrix row ${row.name} carries no evidence — leaving a state demands evidence; only a terminal is exempt`);
-  }
+  refuseBadRow(row);
   mergeSameAs(dir, row, fm);
   return { row, fm };
 }
@@ -335,6 +460,7 @@ function rowState(row: RigorMatrixRow): Omit<StateDecl, "guidance" | "edges"> {
     ...(row.legal_tools !== undefined ? { legal_tools: row.legal_tools } : {}),
     ...(row.same_as !== undefined ? { same_as: row.same_as } : {}),
     ...(row.entry !== undefined ? { entry: row.entry } : {}),
+    ...(row.exit !== undefined ? { exit: row.exit } : {}),
     ...(row.motivation !== undefined ? { motivation: row.motivation } : {}),
     ...(row.inputs !== undefined ? { inputs: row.inputs } : {}),
     ...(row.follow_up_label !== undefined ? { follow_up_label: row.follow_up_label } : {}),

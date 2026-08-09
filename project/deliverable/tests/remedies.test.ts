@@ -86,7 +86,7 @@ function toolArgs(): Map<string, Set<string>> {
       // Stop if the next tool declaration starts before this properties block —
       // that tool takes no arguments of its own.
       const nextName = src.slice(m.index + 1).search(/name:\s*"se_[a-z_]+"/);
-      const nextAt = nextName === -1 ? Number.POSITIVE_INFINITY : m.index + 1 + nextName;
+      const nextAt = nextName === -1 ? Infinity : m.index + 1 + nextName;
       if (open !== -1 && open < nextAt) tools.set(m[1], new Set([...topKeys(balanced(src, open)), ...UNIVERSAL]));
       else tools.set(m[1], new Set(UNIVERSAL));
     }

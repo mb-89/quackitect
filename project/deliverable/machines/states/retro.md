@@ -10,7 +10,18 @@ inputs:
   - "Do the survey | Run se_survey. One call lists everything open: expeditions, iterations, pending notes, parked backlog."
   - "Establish the interval | Name the span this retro judges: from the last retro (se_log_query shows it) to now. Write it into the report."
 follow_up_label: steps minted
-guidance: THE RETRO, applied - follow project/guidance/method/retro.md step by step. Open with se_survey - one call lists everything open (expeditions, iterations, pending notes, parked backlog). se_note_drain dispositions every pending note including the "needs retro" triggers (this state is the ONE place draining is legal); improvements aim at durable homes. Seeding is legal HERE - the retro plans by seeding iterations (goal + vision) without leaving. Pull onward when the inbox stands at zero.
+guidance: |
+  THE RETRO, applied. Follow `project/guidance/method/retro.md` step by step.
+
+  - Open with se_survey. One call lists everything that stands open, down to
+    the parked backlog.
+  - Drain every pending note with se_note_drain, including the needs-retro
+    triggers. This state is the ONE place draining is legal.
+  - Aim improvements at durable homes.
+  - Seed iterations from here, with a goal and a vision. Seeding is legal HERE
+    and needs no leaving.
+
+  Pull onward when the inbox stands at zero.
 ---
 
 # Retro

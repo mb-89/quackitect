@@ -11,6 +11,8 @@ source_refs:
   - uc-diverge-before-deciding step 1
   - uc-diverge-before-deciding ext 6a
 priority: should
+weighs_against:
+  - req-panel-shows-the-machine >
 ---
 
 ## Detail

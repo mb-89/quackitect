@@ -1,7 +1,10 @@
 # How to write machine canvases
 
-(Lives in guidance/authoring/ — guidance is the method layer, spec is the
-project record, the engine is code.)
+Lives in `guidance/authoring/`. The three layers are:
+
+- guidance — the method layer
+- spec — the project record
+- the engine — code
 
 The authoring rules for drawn machines. Written after the first canvas
 shipped with paths Obsidian could not resolve (owner fix 2026-07-26) — so

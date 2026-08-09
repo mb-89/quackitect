@@ -161,8 +161,8 @@ You do not run RUNME.ps1 again. It is the installer, not the way in.
 - project/guidance - the rules the agent is bound by.
 - project/spec - where your own records get written.
 - project/ - the folder you open. Everything being built lives here.
-- project/brand/brand.json - the product name. Change it, and every surface follows.
-- project/brand/palette.css - every colour. Edit it. No code change, no restart.
+- project/deliverable/brand/brand.json - the product name. Change it, and every surface follows.
+- project/deliverable/brand/palette.css - every colour. Edit it. No code change, no restart.
 
 ## Attaching an agent
 

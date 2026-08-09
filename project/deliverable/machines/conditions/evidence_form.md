@@ -1,9 +1,11 @@
 # evidence_form — the condition
 
 The state demands a filled EVIDENCE FORM: an A3-style one-pager in the
-bound expedition's record. The condition's arguments name form TEMPLATES
-(project/deliverable/machines/forms/<name>.md). Each template declares its
-fields and its instance file.
+bound expedition's record.
+
+The condition's arguments name form TEMPLATES, under
+`project/deliverable/machines/forms/`. Each template declares its fields and
+its instance file.
 
 How to satisfy it:
 

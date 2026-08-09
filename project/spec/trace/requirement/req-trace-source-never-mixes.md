@@ -10,4 +10,6 @@ refines:
 source_refs:
   - uc-trace-a-decision-to-its-origin ext 1a
 priority: should
+weighs_against:
+  - req-broken-trace-is-a-defect >
 ---

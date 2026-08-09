@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "FRAME - Feasibility, References, Alternatives, Modeling, Elements/structure: the architecting tactic toolbox spanning M4 and M5, not a sequence."
+statement: "FRAME names five tactic groups for finding options. Each group is a different way to look."
 ---
 
 ## Situation

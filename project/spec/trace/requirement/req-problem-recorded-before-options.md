@@ -11,4 +11,6 @@ source_refs:
   - uc-diverge-before-deciding step 2
   - uc-diverge-before-deciding ext 1a
 priority: should
+weighs_against:
+  - req-ideation-opens-no-record >
 ---

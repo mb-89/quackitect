@@ -32,10 +32,10 @@ product_note: |
   STANDING ARTIFACT: the requirement register - EARS, four kinds,
   verify_method and breaks_if_removed on every row, sourced to
   stakeholders and stories. This is the spec's load-bearing table at
-  rest: complete, consistent, no TBD, no orphan rows.
+  rest is complete and consistent. No TBD survives, and no row is an orphan.
 specification_note: |
   DOCUMENT FORM: requirements as NODES, one file each - EARS statement,
-  kind, verify_method, breaks_if_removed, source_refs in frontmatter. The
+  the kind and the verify method in frontmatter, beside what breaks and its sources. The
   book's requirements table DERIVES via query (v1's .base pattern); the
   design-input chapter transcludes the register. Never a hand-maintained
   table.

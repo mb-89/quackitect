@@ -3,11 +3,13 @@ id: req-resume-needs-no-person
 type: "[[requirement]]"
 statement: When a person returns to the product after an absence, the panel shall show them where everything stands with zero questions to another person.
 kind: quality
+characteristic: interaction-capability
 verify_method: demonstration
 breaks_if_removed: Coming back costs a conversation with whoever was here last, and unattended work stops being safe to leave.
 refines:
-  - uc-resume-after-an-absence
+  - uc-quality-interaction-capability
 source_refs:
+  - uc-resume-after-an-absence
   - uc-resume-after-an-absence step 2
   - uc-resume-after-an-absence step 6
   - ".se/req-mine-sebots.md: The person's dial and the manual path"
@@ -15,6 +17,8 @@ source_refs:
   - uc-resume-after-an-absence step 4
   - uc-resume-after-an-absence step 5
 priority: should
+weighs_against:
+  - req-walk-survives-host-swap >
 ---
 
 ## Scenario

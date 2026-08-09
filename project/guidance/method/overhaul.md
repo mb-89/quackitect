@@ -11,8 +11,15 @@ drifted. Fire it at the end of an unattended run, when there is nothing
 left to build.
 
 THE NAME (owner ruling 2026-07-29). This was called pruning, and the name
-was smaller than the job. A mechanical engineer overhauls a machine: strip
-it, discard what is worn, replace what is bad, put it back together better.
+was smaller than the job.
+
+A mechanical engineer overhauls a machine:
+
+- strip it
+- discard what is worn
+- replace what is bad
+- put it back together better
+
 That is this, exactly.
 
 ## The three jobs
@@ -108,15 +115,15 @@ A candidate that fits no letter is KEPT. Record that it was looked at.
 
 ## The steps
 
-1. Inventory. List what is active. You cannot weed what you have not
-   listed.
-2. Run the machines. Every lint, every test, the whole suite. Collect
+1. Inventory. List what is active, because you cannot weed what you have
+   not listed.
+2. Run the machines. Every lint, every test and the whole suite, collecting
    what fails.
 3. Take the rules that changed since the last overhaul. Sweep the system
    against each one.
 4. Mark every candidate with its SORTED letter.
-5. Split the findings. The mechanisable ones become lints. The rest need
-   a ruling.
+5. Split the findings. The mechanisable ones become lints, and the rest
+   need a ruling.
 6. Bring the rulings to the owner. Deletion is theirs.
 7. Execute what was ruled. Record what was KEPT and why, so the next
    overhaul does not re-litigate it.
@@ -124,7 +131,7 @@ A candidate that fits no letter is KEPT. Record that it was looked at.
 ## What an overhaul never does
 
 - It never deletes on its own judgment. Removal is the owner's word.
-- It never treats age as a defect. Age is a reason to LOOK. It is never
-  a reason to remove.
+- It never treats age as a defect. Age is a reason to LOOK, never a reason
+  to remove.
 - It never works the delta. That is the retro's job, and doing it here
   duplicates the retro.

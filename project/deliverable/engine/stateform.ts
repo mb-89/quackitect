@@ -8,13 +8,19 @@
 // comment law, reapplied).
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { catalogItems, trizParameterItems } from "./catalogs.ts";
+import { type Judgment, type RelationKind, type WalkResult, walk } from "./compare.ts";
+import { clusterDsm, type Dsm, flowMatrix } from "./dsm.ts";
 import type { FormTemplate } from "./forms.ts";
 import { pendingNotes } from "./inbox.ts";
-import type { MachineDecl, StateDecl } from "./machine.ts";
+import type { EvidenceField, MachineDecl, StateDecl } from "./machine.ts";
+import { bare, type MorphBox, type MorphCell, type MorphLine, type MorphRow, orderLines, storedOrder } from "./morphbox.ts";
 import { parseStateNote, section } from "./notes.ts";
+import { type ParetoView, pareto, readScores } from "./pareto.ts";
 import { seDir } from "./paths.ts";
 import { type GuidanceDoc, pulledFor } from "./pull.ts";
-import { conformance, duplicateIds, itemTemplate, itemTemplateRel, loadTrace, refsIn, type TraceNode } from "./trace.ts";
+import { conformance, duplicateIds, itemTemplate, itemTemplateRel, loadTrace, refsIn, refsInRows, type TraceNode } from "./trace.ts";
+import { edgeProblems, traceSchema } from "./traceschema.ts";
 
 export interface A3Box {
   heading: string;
@@ -100,7 +106,69 @@ export interface FieldArgs {
   covers: string;
   items: string[];
   passing: string[];
+  /** For `node-table`, the FRONTMATTER KEYS that become the editable columns.
+   *  For `table`, the plain column headings. */
   columns: string[];
+  /** Which choices owe a reason. Empty means all of them. */
+  rationale_for: string[];
+  /** What to type in each column, in the column order. Empty means the
+   *  column names have to carry it alone, which they rarely can. */
+  column_help: string[];
+  /** Column name to the RESOLVED options its cells are constrained to. A
+   *  named column offers a list rather than a text box, because a judgment
+   *  naming something outside the source is arithmetic over a typo.
+   *
+   *  THE PICK SOURCE IS NOT THE ROW SOURCE, and that is the whole reason this
+   *  resolves separately. A compounding table lists the flagged SUSPECTS and
+   *  lets each of them merge with any pool member. */
+  picks: Record<string, string[]>;
+  /** WHICH PICKED COLUMNS ARE STILL OPEN. Everything else is a CLOSED
+   *  chooser, because that is what a known set means. */
+  pick_free: string[];
+  /** WHAT EACH PICKED COLUMN'S OFFER IS CALLED, unresolved.
+   *
+   *  AN EMPTY OFFER MUST SAY SO. `$clusters` before partition-functions has
+   *  run resolves to nothing, and a chooser with nothing in it looks exactly
+   *  like a text box — which is how a wired-up column got reported as free
+   *  text (owner, 2026-08-08). The editor names the source in that case. */
+  pick_sources: Record<string, string[]>;
+  /** Rows per page. 0 means all of them, which is right for a short field
+   *  and wrong for one over a live register. */
+  page_size: number;
+  /** A comparison card's relation — `order` or `equivalence`. Empty for
+   *  every other field. */
+  relation: string;
+  /** The frontmatter key a card's answers land in. */
+  writes: string;
+  /** The optional second key, where the card also wants a sentence. */
+  reason: string;
+  /** A comparison card's NEXT QUESTION, computed from the nodes on every
+   *  look. Null for every other field.
+   *
+   *  THE CARD STORES NO POSITION. Every answer is already in frontmatter, so
+   *  the walk is rebuilt from the register each time, and a person who stops
+   *  at pair nine of sixty resumes exactly there. */
+  walk: WalkResult | null;
+  /** A matrix field's DSM, computed from the nodes on every look. Null for
+   *  every other field.
+   *
+   *  THE PICTURE IS DERIVED, NEVER STORED. Edges come from the flows and
+   *  placements from the function notes, so there is no second copy of the
+   *  structure to drift from the one people edit. */
+  dsm: Dsm | null;
+  /** A morphological chart's rows, cells and lines, computed from the nodes
+   *  on every look. Null for every other field.
+   *
+   *  SAME LAW AS THE DSM, and for the same reason. The clusters are the rows,
+   *  the options are the cells, the candidates are the lines. A stored grid
+   *  would be a second copy of all three. */
+  box: MorphBox | null;
+  /** The Pareto front, its eliminations and its two corners, computed from
+   *  the field this one `reads`. Null for every other field.
+   *
+   *  SAME LAW AGAIN. Domination is arithmetic over the scores, so a typed
+   *  front is a second copy that can disagree with the table above it. */
+  pareto: ParetoView | null;
 }
 
 export function templateMeta(root: string, name: string): TemplateMeta {
@@ -171,13 +239,207 @@ export function fieldHint(root: string, meta: TemplateMeta | undefined, of: stri
 
 const escapeRe = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, (c) => `\\${c}`);
 
-const NO_ARGS: FieldArgs = { of: "", covers: "", options: [], items: [], passing: [], columns: [] };
+/** A field with nothing declared. Exported so a test can spread it rather
+ *  than restate fifteen keys it does not care about. */
+export const NO_ARGS: FieldArgs = {
+  of: "",
+  covers: "",
+  options: [],
+  items: [],
+  passing: [],
+  columns: [],
+  picks: {},
+  pick_free: [],
+  pick_sources: {},
+  page_size: 0,
+  relation: "",
+  writes: "",
+  reason: "",
+  rationale_for: [],
+  column_help: [],
+  walk: null,
+  dsm: null,
+  box: null,
+  pareto: null,
+};
+
+/** THE CHART, computed from the nodes. Rows are the clusters, cells are the
+ *  options serving them, lines are the candidates.
+ *
+ *  IT IS DERIVED, so there is no table to fill and no second copy to drift.
+ *  Every option already carries the cluster it serves; before 2026-08-08 the
+ *  state kept a flat table repeating that, and the owner asked why the chart
+ *  was not simply built.
+ *
+ *  THE READING LIVES HERE AND THE SHAPE LIVES IN morphbox.ts, which knows
+ *  nothing about this repository — that split is what keeps the editor
+ *  liftable into another product later. */
+export function fieldBox(f: EvidenceField, traceRoot: string, stored: string): MorphBox | null {
+  if (f.template !== "morph-box") return null;
+  try {
+    const nodes = loadTrace(traceRoot).filter((n) => n.file !== undefined);
+    const at = (n: (typeof nodes)[number], key: string): string => nodeField(n.file as string, key);
+    const rows: MorphRow[] = nodes
+      .filter((n) => n.type === "cluster")
+      .map((n) => ({ id: n.id, name: at(n, "name") === "" ? n.id : at(n, "name"), cells: [] as MorphCell[] }))
+      .sort((a, b) => a.id.localeCompare(b.id));
+    const byCluster = new Map(rows.map((r) => [r.id, r]));
+    // AN OPTION NAMING NO CLUSTER IS NOT DROPPED. It lands in an unplaced row
+    // so the chart shows it — a search whose result vanishes is worse than an
+    // untidy chart.
+    const unplaced: MorphRow = { id: "", name: "unplaced", cells: [] };
+    for (const n of nodes.filter((x) => x.type === "option").sort((a, b) => a.id.localeCompare(b.id))) {
+      const cell: MorphCell = {
+        id: n.id,
+        label: n.statement === "" ? n.id : n.statement,
+        found_by: at(n, "found_by"),
+        pruned: at(n, "pruned_because"),
+      };
+      (byCluster.get(bare(at(n, "cluster"))) ?? unplaced).cells.push(cell);
+    }
+    if (unplaced.cells.length > 0) rows.push(unplaced);
+    const cands: MorphLine[] = nodes
+      .filter((n) => n.type === "candidate")
+      .map((n) => ({
+        id: n.id,
+        name: at(n, "name") === "" ? n.id : at(n, "name"),
+        statement: n.statement,
+        picks: nodeList(n.file as string, "picks").map(bare),
+      }));
+    return { rows, lines: orderLines(cands, storedOrder(stored)) };
+  } catch {
+    return null;
+  }
+}
+
+/** THE MATRIX, computed from the nodes. Edges come from the flows: one
+ *  function's output is another's input.
+ *
+ *  PLACEMENTS ALREADY MADE BY HAND GO IN AS FIXED, so the search groups
+ *  around them rather than overruling them. */
+function fieldDsm(f: EvidenceField, traceRoot: string, items: string[]): Dsm | null {
+  if (f.template !== "dsm") return null;
+  try {
+    const byId = new Map<string, string>();
+    for (const n of loadTrace(traceRoot)) if (n.file !== undefined) byId.set(n.id, n.file);
+    const nodes = items
+      .filter((id) => byId.has(id))
+      .map((id) => ({
+        id,
+        inputs: nodeList(byId.get(id) as string, "inputs"),
+        outputs: nodeList(byId.get(id) as string, "outputs"),
+      }));
+    const fixed: Record<string, string> = {};
+    for (const n of nodes) {
+      const c = nodeField(byId.get(n.id) as string, f.writes ?? "cluster");
+      if (c !== "" && !c.startsWith("<!--")) fixed[n.id] = c;
+    }
+    const m = flowMatrix(nodes);
+    const d = clusterDsm(
+      nodes.map((n) => n.id),
+      m.edges,
+      fixed,
+    );
+    // THE CELL IS A SET, so the flows behind each mark ride along. Clicking a
+    // cell should show what the mark is made of, not just that it exists.
+    return { ...d, via: m.via };
+  } catch {
+    return null;
+  }
+}
+
+/** THE ANSWERS ARE ON THE NODES, so a card's next question is derived and
+ *  never stored. One frontmatter line per answered pair, shaped `<id>
+ *  <verdict>`, with anything after it a reason for a reader.
+ *
+ *  A VERDICT OUTSIDE THE FOUR IS SKIPPED rather than guessed at. A cell still
+ *  holding its minted comment is not an answer, and reading it as one is how
+ *  a field silently fills. */
+function cardWalk(f: EvidenceField, traceRoot: string, items: string[]): WalkResult | null {
+  if (f.template !== "compare-card" || f.writes === undefined) return null;
+  const kind: RelationKind = f.relation === "equivalence" ? "equivalence" : "order";
+  const files = new Map<string, string>();
+  try {
+    for (const n of loadTrace(traceRoot)) if (n.file !== undefined) files.set(n.id, n.file);
+  } catch {
+    return null;
+  }
+  const known = new Set(items);
+  const js: Judgment[] = [];
+  for (const id of items) {
+    const file = files.get(id);
+    if (file === undefined) continue;
+    for (const raw of nodeList(file, f.writes)) {
+      const parts = raw.split(/\s+/);
+      const other = parts[0];
+      const verdict = parts[1];
+      if (!known.has(other)) continue;
+      if (verdict === ">" || verdict === "<" || verdict === "=") js.push({ a: id, b: other, verdict });
+      // `!` says NOT THE SAME on an equivalence card. It settles the pair
+      // without joining the two, which is exactly what the order relation
+      // does with a strict verdict, so it rides in as one.
+      else if (verdict === "!") js.push({ a: id, b: other, verdict: ">" });
+    }
+  }
+  const pairs = kind === "equivalence" ? compoundingSuspectPairs(traceRoot).filter(([a, b]) => known.has(a) && known.has(b)) : undefined;
+  return walk(items, js, kind, pairs);
+}
+
+/** ONE SOURCE RESOLVER, so a `$name` means the same thing wherever it is
+ *  written. Items and picks both come through here; a literal passes
+ *  straight out, which is what makes a fixed list legal beside a live one. */
+function resolveSource(i: string, root: string, traceRoot: string, instanceRaw?: string): string[] {
+  if (i === "$inbox") return inboxItems(root, instanceRaw);
+  if (i === "$assumptions") return assumptionItems(traceRoot);
+  if (i === "$criterion_pool") return criterionPoolItems(traceRoot);
+  if (i === "$compounding_suspects") return compoundingSuspectItems(traceRoot);
+  if (i === "$criterion_axes") return criterionAxisItems(traceRoot);
+  if (i === "$functions") return functionItems(traceRoot);
+  if (i === "$clusters") return clusterItems(traceRoot);
+  if (i === "$flows") return flowItems(traceRoot);
+  if (i === "$options") return optionItems(traceRoot);
+  if (i === "$candidates") return candidateItems(traceRoot);
+  // THE CATALOGUES. A known set is never typed from memory and never hard
+  // coded — it is read from the method card that holds it, so editing the card
+  // edits the offer (owner ruling 2026-08-08). catalogs.ts says how.
+  if (i === "$heuristics") return catalogItems(root, "heuristics");
+  if (i === "$transform_operators") return catalogItems(root, "transform_operators");
+  if (i === "$triz_separations") return catalogItems(root, "triz_separations");
+  if (i === "$triz_parameters") return trizParameterItems(root);
+  // A `$name` NOBODY RESOLVES IS A TYPO, and the silent version of this bug is
+  // the worst kind: the field renders, the datalist is empty, and the form
+  // looks like it simply has no offer. `$` is reserved for live sources, so a
+  // literal can never legitimately start with one.
+  if (i.startsWith("$")) throw new Error(`no item source named ${i} — see resolveSource in stateform.ts for the ones there are`);
+  return [i];
+}
+
+/** The cells of one markdown table row, outer pipes dropped. A line that is
+ *  not a row — the header rule, a blank, prose — yields nothing, so callers
+ *  filter by whether the first cell names anything rather than by position. */
+export function tableRow(line: string): string[] {
+  const t = line.trim();
+  if (!t.startsWith("|")) return [];
+  const cells = t
+    .replace(/^\|/, "")
+    .replace(/\|$/, "")
+    .split(/(?<!\\)\|/)
+    .map((c) => c.trim());
+  return cells.every((c) => /^-{3,}$/.test(c)) ? [] : cells;
+}
 
 /** The choice half of a `<option> — <rationale>` line. */
 export function choiceOf(content: string): string {
   const first = (content.split("\n")[0] ?? "").trim();
   const i = first.indexOf(" — ");
   return i < 0 ? first : first.slice(0, i).trim();
+}
+
+/** The rationale half, or "" where the line carries none. */
+export function rationaleOf(content: string): string {
+  const first = (content.split("\n")[0] ?? "").trim();
+  const i = first.indexOf(" — ");
+  return i < 0 ? "" : first.slice(i + 3).trim();
 }
 
 /** The template checks over the fills — same verdicts for both hands and
@@ -241,8 +503,21 @@ function typeProblems(name: string, of: string, refs: string[], byId: Map<string
  *
  *  Same checks, run against what is stored. Empty fields stay the
  *  required-check's business, here as everywhere. */
-export function claimProblems(root: string, s: StateDecl, body: string, corpus?: TraceNode[]): string[] {
-  const nodes = corpus ?? loadTrace(root);
+/** THE CORPUS IS THE CALLER'S TO LOAD, and it is not optional (owner ruling
+ *  2026-08-07). It used to default to `corpus ?? loadTrace(root)`, which made
+ *  an expensive call look free at the call site — and recordDone duly called
+ *  it once per state, reloading roughly 250 files about fifteen times per
+ *  paint. That was enough to hang the engine once the route started calling
+ *  recordDone on every packet.
+ *
+ *  THE DEEPER REASON IS CONSISTENCY, not speed. Read the input, process it,
+ *  produce the output. A corpus re-read between two states means those two
+ *  states were judged against different worlds, and nothing would report the
+ *  difference. One load per call is the only way the answer is coherent.
+ *
+ *  Required, so the cost is always visible where it is paid. */
+export function claimProblems(root: string, s: StateDecl, body: string, corpus: TraceNode[]): string[] {
+  const nodes = corpus;
   const metas = new Map<string, TemplateMeta>();
   const out: string[] = [];
   for (const f of s.evidence_form) {
@@ -254,6 +529,8 @@ export function claimProblems(root: string, s: StateDecl, body: string, corpus?:
       of: f.of ?? "",
       covers: f.covers ?? "",
       options: f.options ?? [],
+      rationale_for: f.rationale_for ?? [],
+      column_help: f.column_help ?? [],
       // A LIVE-RESOLVING ARGUMENT CANNOT BE RE-CHECKED. `$inbox` expands to the
       // notes pending RIGHT NOW; a retro answered the notes pending when it was
       // walked, and that list is gone. Re-checking against today's inbox marks
@@ -261,6 +538,22 @@ export function claimProblems(root: string, s: StateDecl, body: string, corpus?:
       items: (f.items ?? []).filter((i) => !i.startsWith("$")),
       passing: f.passing ?? [],
       columns: f.columns ?? [],
+      // A LIVE SOURCE CANNOT BE RE-CHECKED, for the same reason the items
+      // above drop theirs: the offer today is not the offer that was signed.
+      picks: {},
+      pick_free: f.pick_free ?? [],
+      pick_sources: {},
+      page_size: f.page_size ?? 0,
+      relation: f.relation ?? "",
+      writes: f.writes ?? "",
+      reason: f.reason ?? "",
+      // THE CHECK NEVER RE-WALKS, RE-CLUSTERS OR REBUILDS THE CHART. All
+      // three are live, and deriving them here would mark a signed form the
+      // moment somebody adds an item.
+      walk: null,
+      dsm: null,
+      box: null,
+      pareto: null,
     };
     out.push(...fieldProblems(f.name, metas.get(name) as TemplateMeta, args, content, nodes, root));
   }
@@ -273,7 +566,10 @@ export function claimProblems(root: string, s: StateDecl, body: string, corpus?:
  *  is not loaded, and then the check stays quiet rather than guessing. */
 function refProblems(name: string, meta: TemplateMeta, args: FieldArgs, content: string, corpus?: TraceNode[], root?: string): string[] {
   if (meta.resolves !== "artifact" || corpus === undefined) return [];
-  const refs = refsIn(content);
+  // A CARD ANSWERS IN ROWS, NOT IN A LIST. Reading it with the list rule
+  // found nothing, so the field refused as empty while its own line check
+  // passed — no content could satisfy both (owner report 2026-08-08).
+  const refs = meta.editor === "compare-card" ? refsInRows(content) : refsIn(content);
   if (refs.length === 0) {
     return /^\s*-\s*none\b/im.test(content) ? [] : [`${name}: no references — one artifact id per line, or one line saying none`];
   }
@@ -282,6 +578,16 @@ function refProblems(name: string, meta: TemplateMeta, args: FieldArgs, content:
   const out = dangling.length > 0 ? [`${name}: no artifact for — ${dangling.join(" · ")}`] : [];
   out.push(...typeProblems(name, args.of, refs, byId, root));
   out.push(...coverProblems(name, args.covers, refs, byId, corpus));
+  // AND EVERY REFERENCED NODE'S OWN EDGES ARE LEGAL. Checking them here is
+  // what makes the schema bind: a field listing functions checks those
+  // functions, so an illegal edge cannot reach a submit unnoticed.
+  if (root !== undefined) {
+    const schema = traceSchema(root);
+    for (const r of refs) {
+      const n = byId.get(r);
+      if (n !== undefined) out.push(...edgeProblems(n, byId, root, schema).map((p) => `${name}: ${p}`));
+    }
+  }
   return out;
 }
 
@@ -310,16 +616,73 @@ function coverProblems(name: string, covers: string, refs: string[], byId: Map<s
   return out;
 }
 
-function fieldProblems(name: string, meta: TemplateMeta, args: FieldArgs, content: string, corpus?: TraceNode[], root?: string): string[] {
-  if (meta.editor === "choice-rationale") {
-    const choice = choiceOf(content);
-    if (args.options.length > 0 && !args.options.includes(choice))
-      return [`${name}: the choice must be one of — ${args.options.join(" | ")}`];
-    if (args.passing.length > 0 && !args.passing.includes(choice))
-      return [`${name}: ${choice} — the claim does not stand, and the gate stays shut while it does`];
-    return [];
+/** The first cell of a row, as a bare id — wiki brackets are how a reader
+ *  writes a node and how the view renders one, so both read the same. */
+const rowId = (cells: string[]): string => (cells[0] ?? "").replace(/^\[\[|\]\]$/g, "").trim();
+
+/** A CELL STILL CARRYING ITS COMMENT IS UNANSWERED (owner ruling 2026-08-07).
+ *
+ *  A node is minted with `probe: <!-- what the check found ... -->`. The
+ *  comment says what belongs there, sitting exactly where the answer will
+ *  sit, so nothing has to invent a placeholder elsewhere to explain the
+ *  field. Replacing it is what answers it.
+ *
+ *  Blank and still-commented are the same verdict on purpose. Both mean
+ *  nobody has said anything, and a check that told them apart would let a
+ *  minted prompt pass as a claim. */
+const unanswered = (v: string): boolean => v.trim() === "" || /^<!--[\s\S]*-->$/.test(v.trim());
+
+function nodeTableProblems(name: string, args: FieldArgs, content: string): string[] {
+  const rows = content.split("\n").map(tableRow);
+  const missing: string[] = [];
+  for (const id of args.items) {
+    const row = rows.find((c) => rowId(c) === id);
+    if (row === undefined) {
+      missing.push(`${id} (no row)`);
+      continue;
+    }
+    for (const [i, c] of args.columns.entries()) {
+      if (unanswered(row[i + 1] ?? "")) missing.push(`${id}.${c}`);
+    }
   }
+  return missing.length > 0 ? [`${name}: unanswered — ${missing.join(" · ")}`] : [];
+}
+
+export function fieldProblems(
+  name: string,
+  meta: TemplateMeta,
+  args: FieldArgs,
+  content: string,
+  corpus?: TraceNode[],
+  root?: string,
+): string[] {
+  if (meta.editor === "choice-rationale") return choiceProblems(name, args, content);
   const out: string[] = [...refProblems(name, meta, args, content, corpus, root)];
+  // EVERY CELL IS REQUIRED. The rows are the register itself, so an empty
+  // cell is a standing node nobody answered for — which is exactly the state
+  // this field exists to refuse. "No check exists yet" is a legal answer and
+  // has to be typed; blank is not an answer.
+  if (meta.editor === "node-table") return nodeTableProblems(name, args, content);
+  // A MOVE OWES A RATIONALE (owner ruling 2026-08-08). The order was settled
+  // BLIND, before any candidate existed, and that is what keeps it honest.
+  // Moving a row past another jumps that ordering, so it is the one edit that
+  // can be aimed at a favourite — and the one that has to say why.
+  //
+  // The editor writes a bare `[moved]` when the box is empty, so an unreasoned
+  // move reaches the file rather than disappearing when nobody types.
+  if (meta.editor === "rank-cut") {
+    const unreasoned = content
+      .split("\n")
+      .map((l) => /^\d+\.\s+\[\[([^\]]+)\]\](.*)$/.exec(l.trim()))
+      .filter((m): m is RegExpExecArray => m !== null && /\[moved\]/.test(m[2]))
+      .map((m) => m[1].trim());
+    if (unreasoned.length > 0) out.push(`${name}: moved with no reason — ${unreasoned.join(" · ")}`);
+    // THE CUTOFF IS THE STATE'S ONE DECISION, so a ranking without it has not
+    // been cut at all. Cutting NOTHING is legal and common, and it is said by
+    // putting the cutoff on the last row — not by leaving it unset.
+    if (!/\[cutoff\]/.test(content)) out.push(`${name}: no cutoff — mark the last row that is still a criterion`);
+    return out;
+  }
   if (meta.editor === "per-item" && args.items.length > 0) {
     const missing = args.items.filter((i) => !new RegExp(`^- ${escapeRe(i)}: .+`, "m").test(content));
     if (missing.length > 0) out.push(`${name}: unanswered — ${missing.join(" · ")}`);
@@ -332,10 +695,12 @@ function fieldProblems(name: string, meta: TemplateMeta, args: FieldArgs, conten
     const isRule = (l: string): boolean => /^\|(\s*:?-+:?\s*\|)+$/.test(l);
     const data = rows.slice(1).filter((l) => !isRule(l));
     const want = args.columns.length;
-    if (rows.length === 0 || data.length === 0)
-      out.push(`${name}: a markdown table with columns — ${args.columns.join(" | ")} — and at least one data row`);
-    else if (data.some((l) => l.split("|").length - 2 !== want))
-      out.push(`${name}: every row carries ${want} cells — ${args.columns.join(" | ")}`);
+    // THE COLUMN HELP RIDES THE REFUSAL. A header of single words leaves the
+    // filler guessing, and the cell count cannot catch a guess — so the
+    // message says what each column wants rather than only naming it.
+    const spec = args.columns.map((c, i) => (args.column_help[i] ? `${c} (${args.column_help[i]})` : c)).join(" | ");
+    if (rows.length === 0 || data.length === 0) out.push(`${name}: a markdown table with columns — ${spec} — and at least one data row`);
+    else if (data.some((l) => l.split("|").length - 2 !== want)) out.push(`${name}: every row carries ${want} cells — ${spec}`);
   }
   if (meta.line_pattern !== "") {
     const re = new RegExp(meta.line_pattern);
@@ -343,6 +708,30 @@ function fieldProblems(name: string, meta: TemplateMeta, args: FieldArgs, conten
     if (bad !== undefined) out.push(`${name}: ${meta.line_help !== "" ? meta.line_help : `every line matches ${meta.line_pattern}`}`);
   }
   return out;
+}
+
+/** A CHOICE, ITS REASON, AND WHETHER IT BLOCKS — three separate questions.
+ *
+ *  `rationale_for` names which options owe an explanation; absent means all
+ *  of them, which is what a gate verdict wants. `passing` names which ones
+ *  let the form stand.
+ *
+ *  THEY ARE NOT THE SAME QUESTION (owner ruling 2026-08-08). A finder that
+ *  cannot apply to a physical build PASSES and still owes its reason, so a
+ *  legitimate skip and an unexplained one are told apart. */
+function choiceProblems(name: string, args: FieldArgs, content: string): string[] {
+  const choice = choiceOf(content);
+  if (args.options.length > 0 && !args.options.includes(choice)) {
+    return [`${name}: the choice must be one of — ${args.options.join(" | ")}`];
+  }
+  const owes = args.rationale_for.length === 0 || args.rationale_for.includes(choice);
+  if (owes && rationaleOf(content) === "") {
+    return [`${name}: "${choice}" needs its reason on the same line — write it as \`${choice} — <why>\``];
+  }
+  if (args.passing.length > 0 && !args.passing.includes(choice)) {
+    return [`${name}: ${choice} — the claim does not stand, and the gate stays shut while it does`];
+  }
+  return [];
 }
 
 function templateStatement(root: string, name: string): string {
@@ -386,13 +775,68 @@ export function stateFormFields(s: StateDecl): FormTemplate {
     ...s.evidence_form.map((f) => ({
       name: f.name,
       description: f.description,
-      required: f.required,
+      // A DERIVED FIELD IS A READING, NOT A CLAIM (owner ruling 2026-08-08:
+      // "if it's derived, then it doesn't need to be in the notes"). It reads
+      // another field, computes, and shows the answer — so there is nothing
+      // for anybody to fill and nothing to demand.
+      //
+      // IT STORES NOTHING EITHER. Writing the answer down would be the second
+      // copy this whole design exists to avoid, and the stored one would drift
+      // from the scores the moment a single number changed.
+      required: f.reads === undefined && f.required,
       ...(f.guidance !== undefined ? { guidance: f.guidance } : {}),
     })),
     FOLLOW_UP,
     ANYTHING_ELSE,
   ];
   return { form: s.id, instance: `${s.id}.md`, statement: s.statement, fields };
+}
+
+/** ONE FIELD'S ARGUMENTS, every live source resolved against the record's own
+ *  trace. Extracted from stateFormModel because it grew past what one function
+ *  should hold, and because the pick resolution below is worth reading alone. */
+export function fieldArgsFor(f: EvidenceField, root: string, traceRoot: string, instanceRaw?: string): FieldArgs {
+  const resolved = (f.items ?? []).flatMap((i) => resolveSource(i, root, traceRoot, instanceRaw));
+  return {
+    of: f.of ?? "",
+    covers: f.covers ?? "",
+    options: f.options ?? [],
+    rationale_for: f.rationale_for ?? [],
+    column_help: f.column_help ?? [],
+    items: resolved,
+    passing: f.passing ?? [],
+    columns: f.columns ?? [],
+    // SEVERAL SOURCES CONCATENATE, in the order declared, without repeats. A
+    // live source beside a literal is the point: every cluster, then `nobody`.
+    picks: Object.fromEntries(
+      Object.entries(f.picks ?? {}).map(([col, srcs]) => [
+        col,
+        [...new Set(srcs.flatMap((src) => resolveSource(src, root, traceRoot, instanceRaw)))],
+      ]),
+    ),
+    pick_free: f.pick_free ?? [],
+    pick_sources: f.picks ?? {},
+    page_size: f.page_size ?? 0,
+    relation: f.relation ?? "",
+    writes: f.writes ?? "",
+    reason: f.reason ?? "",
+    walk: cardWalk(f, traceRoot, resolved),
+    dsm: fieldDsm(f, traceRoot, resolved),
+    // THE STORED TABLE SUPPLIES THE LINE ORDER AND NOTHING ELSE. Everything
+    // drawn comes from the nodes, so an edit made in a candidate's own note
+    // wins over whatever the field happens to hold.
+    box: fieldBox(f, traceRoot, section(instanceRaw ?? "", f.name)),
+    // A DERIVED FIELD READS ANOTHER ONE. The scores are the input; the front,
+    // the eliminations and both corners all fall out of them, so nothing here
+    // is typed and nothing can disagree with the table it came from.
+    pareto: f.template !== "pareto-plot" || f.reads === undefined ? null : viewOfScores(section(instanceRaw ?? "", f.reads)),
+  };
+}
+
+/** The whole drawing's input, from the score table alone. */
+function viewOfScores(scores: string): ParetoView {
+  const { candidates, axes } = readScores(scores);
+  return { axes, candidates, result: pareto(candidates, axes) };
 }
 
 /** form = f(state): the A3 model, every part from markdown or derived. */
@@ -403,6 +847,15 @@ export function stateFormModel(
   s: StateDecl,
   header: Record<string, string>,
   instanceRaw?: string,
+  /** Where the RECORD's trace lives — a record owns its nodes in its own
+   *  worktree, so a live item list has to be told, never guessed.
+   *
+   *  IT DEFAULTS TO `root`, NEVER TO "". An empty root sends every live
+   *  source at the process's working directory, which is a guess about who
+   *  launched the engine. The card that started this rendered "every pair
+   *  settled" over an empty list, which is the worst way to be wrong:
+   *  confident, and shaped exactly like success. */
+  traceRoot = root,
 ): StateFormModel {
   const entryReads = new Set(s.entry?.read ?? []);
   const inputs: FormInput[] = pulledFor(root, docs, m, s).map((d) => ({
@@ -419,16 +872,7 @@ export function stateFormModel(
     templateMetas[t] = templateMeta(root, t);
   }
   const fieldArgs: Record<string, FieldArgs> = {};
-  for (const f of s.evidence_form) {
-    fieldArgs[f.name] = {
-      of: f.of ?? "",
-      covers: f.covers ?? "",
-      options: f.options ?? [],
-      items: (f.items ?? []).flatMap((i) => (i === "$inbox" ? inboxItems(root, instanceRaw) : [i])),
-      passing: f.passing ?? [],
-      columns: f.columns ?? [],
-    };
-  }
+  for (const f of s.evidence_form) fieldArgs[f.name] = fieldArgsFor(f, root, traceRoot, instanceRaw);
   const fieldHints: Record<string, FieldHint> = {};
   for (const f of s.evidence_form) {
     fieldHints[f.name] = fieldHint(root, templateMetas[f.template ?? "free-form"], f.of ?? "");
@@ -460,6 +904,308 @@ export function stateFormModel(
  *  instance keeps only the notes it ALREADY names: its own answers are
  *  the snapshot, and nothing new has to be stored to hold one. Editing
  *  the form strips the stamp, and the live list returns with it. */
+/** $assumptions, resolved live: one item per STANDING assumption in the
+ *  register, whichever iteration wrote it.
+ *
+ *  IT DOES NOT FREEZE, and that is the difference from $inbox. A retro
+ *  answered the notes pending when it walked, and re-checking against
+ *  today's inbox would mark every retro suspect forever. This field is a
+ *  STANDING ARTIFACT instead: at rest, every assumption carries a probe or
+ *  a reason it has none. A new unprobed assumption SHOULD turn the state
+ *  grey, because the claim "they are all probed" stopped being true.
+ *
+ *  Closed entries drop out. There is nothing to probe about an assumption
+ *  nobody is relying on any more. */
+export function assumptionItems(traceRoot: string): string[] {
+  try {
+    return loadTrace(traceRoot)
+      .filter(
+        (n) =>
+          n.type === "raid" &&
+          n.file !== undefined &&
+          nodeField(n.file, "kind") === "assumption" &&
+          nodeField(n.file, "status") !== "closed",
+      )
+      .map((n) => n.id)
+      .sort();
+  } catch {
+    return [];
+  }
+}
+
+/** THE CRITERION POOL IS REQUIREMENTS, AND ONLY REQUIREMENTS.
+ *
+ *  A REGISTER ENTRY IS NOT A CRITERION (owner ruling 2026-08-08, and the
+ *  method card said so first). It POINTS at requirements through source_refs,
+ *  and a requirement several entries lean on is one that matters — that is a
+ *  hint for the ordering, never a row to weigh against a requirement.
+ *
+ *  WHAT IT LOOKED LIKE WHEN IT WAS WRONG. The card put up "no vendor ships
+ *  adjudication provenance" against "the record arrives prefilled" and asked
+ *  which mattered more. Those are not comparable quantities. One is a claim
+ *  about the market, the other a demand on the system, and no honest answer
+ *  exists. The entry was also CLOSED, which nothing checked. */
+function poolNodes(traceRoot: string) {
+  try {
+    return loadTrace(traceRoot).filter((n) => n.type === "requirement" && n.file !== undefined);
+  } catch {
+    return [];
+  }
+}
+
+/** HOW MANY OPEN REGISTER ENTRIES LEAN ON EACH REQUIREMENT. This is the
+ *  register's real contribution to the criteria: a requirement several risks
+ *  and assumptions point at is rarely unimportant, so it seeds the ordering.
+ *
+ *  CLOSED ENTRIES DO NOT COUNT. A concern somebody ruled away cannot make a
+ *  requirement matter more. */
+export function registerPull(traceRoot: string): Record<string, number> {
+  const out: Record<string, number> = {};
+  try {
+    for (const n of loadTrace(traceRoot)) {
+      if (n.type !== "raid" || n.file === undefined) continue;
+      if (nodeField(n.file, "status") === "closed") continue;
+      for (const ref of nodeList(n.file, "source_refs")) {
+        const id = ref.split(/\s+/)[0].replace(/^\[\[/, "").replace(/\]\]$/, "").trim();
+        if (id.startsWith("req-")) out[id] = (out[id] ?? 0) + 1;
+      }
+    }
+  } catch {
+    // no register, no pull — the ordering falls back to priority alone
+  }
+  return out;
+}
+
+/** $functions, resolved live: every function the structure declares.
+ *
+ *  IT DOES NOT FREEZE. The function DSM is a projection over these nodes, so
+ *  a function written after the partitioning was signed SHOULD turn that
+ *  state grey — the claim "every function has a quality class" stopped being
+ *  true the moment somebody added one. */
+export function functionItems(traceRoot: string): string[] {
+  return typedItems(traceRoot, "function");
+}
+
+/** $clusters: every function group the partitioning declared. It is the OFFER
+ *  a placement picks from — a function cannot belong to a cluster nobody has
+ *  named. */
+export function clusterItems(traceRoot: string): string[] {
+  return typedItems(traceRoot, "cluster");
+}
+
+/** $flows: every thing that moves between functions. An input and an output
+ *  are the same kind, because the input of one function is the output of
+ *  another. */
+export function flowItems(traceRoot: string): string[] {
+  return typedItems(traceRoot, "flow");
+}
+
+/** $options: every candidate any finder has minted so far. The chart is built
+ *  over these, and a row naming an option that no finder produced is a row
+ *  about something nobody searched for. */
+export function optionItems(traceRoot: string): string[] {
+  return typedItems(traceRoot, "option");
+}
+
+/** $candidates: every line drawn across the morphological chart. They are what
+ *  run-candidates composes and evaluate-set scores, so a score naming anything
+ *  else is a score against something nobody proposed. */
+export function candidateItems(traceRoot: string): string[] {
+  return typedItems(traceRoot, "candidate");
+}
+
+function typedItems(traceRoot: string, type: string): string[] {
+  try {
+    return loadTrace(traceRoot)
+      .filter((n) => n.type === type)
+      .map((n) => n.id)
+      .sort();
+  } catch {
+    return [];
+  }
+}
+
+/** $criterion_pool, resolved live. It is the OFFER a comparison picks from —
+ *  a pick outside it is not an axis — and never the set that ends up scored. */
+export function criterionPoolItems(traceRoot: string): string[] {
+  return poolNodes(traceRoot)
+    .map((n) => n.id)
+    .sort();
+}
+
+/** $compounding_suspects, resolved live: pool members the engine OFFERS as a
+ *  merge. Two rows sharing a characteristic, or refining one use case, are
+ *  the two ways duplication actually shows up.
+ *
+ *  IT IS AN OFFER AND NEVER A MERGE. Only `weighs_with` compounds anything,
+ *  and only an author writes that. */
+export function compoundingSuspectItems(traceRoot: string): string[] {
+  const flagged = new Set<string>();
+  for (const [a, b] of compoundingSuspectPairs(traceRoot)) {
+    flagged.add(a);
+    flagged.add(b);
+  }
+  return [...flagged].sort();
+}
+
+/** THE SUSPECTS ARE PAIRS, AND THAT IS THE WHOLE POINT. Flagging NODES and
+ *  then crossing them asks n(n-1)/2 questions — 10,440 over this register,
+ *  which is not a form, it is a punishment.
+ *
+ *  BOTH SIGNALS MUST FIRE, not either. Almost every requirement refines one
+ *  of a handful of use cases, and plenty share a quality characteristic, so
+ *  either signal alone flags nearly the whole register. Two rows that share a
+ *  characteristic AND derive from the same use case are a genuinely small
+ *  set, and a genuinely plausible duplicate. */
+export function compoundingSuspectPairs(traceRoot: string): [string, string][] {
+  const nodes = poolNodes(traceRoot).map((n) => ({
+    id: n.id,
+    characteristic: nodeField(n.file as string, "characteristic"),
+    refines: new Set(nodeList(n.file as string, "refines")),
+  }));
+  const out: [string, string][] = [];
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const a = nodes[i];
+      const b = nodes[j];
+      if (a.characteristic === "" || a.characteristic !== b.characteristic) continue;
+      let shares = false;
+      for (const uc of a.refines) if (b.refines.has(uc)) shares = true;
+      if (shares) out.push([a.id, b.id]);
+    }
+  }
+  return out;
+}
+
+/** $criterion_axes, resolved live: what survives compounding. ONE ENTRY PER
+ *  AXIS, never per row — a `weighs_with` group collapses to its lowest id, so
+ *  the axis carries one stable name whichever member you came in through.
+ *
+ *  A `must` ROW IS NOT AN AXIS. Every surviving candidate meets a demand by
+ *  definition, so it separates nothing, and scoring it would let a candidate
+ *  that fails the demand buy that failure back elsewhere. */
+export function criterionAxisItems(traceRoot: string): string[] {
+  const pool = poolNodes(traceRoot).filter((n) => nodeField(n.file as string, "priority") !== "must");
+  // THE HINT ORDER, and it is the difference between 149 questions and 873.
+  // Taken most-important-first, every item is PREDICTED to be the new bottom
+  // of the chain, so the walk's one probe is the question most likely to be
+  // confirmed. A wrong hint costs one question, never a wrong answer.
+  //
+  // DAMAGE LEADS IT (owner report 2026-08-08). Ordered from MoSCoW alone, a
+  // response-time requirement came out above the foundations of the system —
+  // and no amount of pairwise comparison discovers that, because the
+  // comparison never reads what breaks. Every requirement already carries that
+  // line; `breaks_how_badly` grades it, and the grade leads the sort.
+  //
+  // IT IS A HINT, NOT THE ANSWER. The walk still settles the order and a
+  // person still overrules any pair. This only decides where it starts.
+  //
+  // AN UNGRADED ROW SORTS IN THE MIDDLE. Not last, or every row written before
+  // the scale existed would sink beneath rows nobody has thought about; not
+  // first, or leaving it blank would be the way to the top.
+  //
+  // THE LEVELS ARE READ FROM THE CARD, never listed here. meth-damage-scale is
+  // their only home and the order in it IS the severity order — the catalogue
+  // guard refuses a copy in the engine, and it caught this one.
+  const damageLevels = catalogItems(traceRoot, "damage_levels");
+  const middle = Math.floor(damageLevels.length / 2);
+  const pull = registerPull(traceRoot);
+  const rank = (n: { id: string; file?: string }): number => {
+    const at = damageLevels.indexOf(nodeField(n.file as string, "breaks_how_badly"));
+    const damage = at < 0 ? middle : at;
+    const moscow = nodeField(n.file as string, "priority") === "should" ? 0 : 1;
+    return damage * 10000 + moscow * 1000 - (pull[n.id] ?? 0);
+  };
+  pool.sort((a, b) => rank(a) - rank(b) || a.id.localeCompare(b.id));
+  const ids = new Set(pool.map((n) => n.id));
+  const parent = new Map<string, string>();
+  for (const id of ids) parent.set(id, id);
+  const find = (a: string): string => {
+    let r = a;
+    while (parent.get(r) !== r) r = parent.get(r) as string;
+    return r;
+  };
+  for (const n of pool) {
+    for (const raw of nodeList(n.file as string, "weighs_with")) {
+      // THE CELL IS "<id> — why", and only the first token is structural.
+      // Splitting on the dash would cut req-lane-is-the-only-door in half.
+      const other = raw.split(/\s+/)[0].trim();
+      if (!ids.has(other)) continue;
+      const ra = find(n.id);
+      const rb = find(other);
+      if (ra === rb) continue;
+      if (ra < rb) parent.set(rb, ra);
+      else parent.set(ra, rb);
+    }
+  }
+  // THE ORDER IS THE HINT'S, NOT THE ALPHABET'S. Sorting here would throw
+  // away the very thing that makes the first pass affordable.
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const n of pool) {
+    const r = find(n.id);
+    if (seen.has(r)) continue;
+    seen.add(r);
+    out.push(r);
+  }
+  return out;
+}
+
+/** One frontmatter value off a node, read from disk. The loader keeps only
+ *  what the graph needs, so anything else is fetched by whoever wants it. */
+export function nodeField(file: string, key: string): string {
+  try {
+    const lines = readFileSync(file, "utf8").split("\n");
+    // FRONTMATTER ONLY. Past the closing fence a line that looks like a key
+    // is prose, and reading prose as a value is how a field silently fills.
+    const end = lines.indexOf("---", 1);
+    const hit = lines.slice(0, end < 0 ? lines.length : end).find((l) => l.startsWith(`${key}:`));
+    return hit === undefined ? "" : hit.slice(key.length + 1).trim();
+  } catch {
+    return "";
+  }
+}
+
+/** The same, for a key whose value is a LIST. `nodeField` reads one line and
+ *  slices after the colon, so a list comes back as the empty string — which
+ *  reads as "no value" when it means "wrong reader", and that is the worse
+ *  of the two failures.
+ *
+ *  THREE SHAPES COUNT, because all three appear on real nodes: a block list
+ *  of `  - item` lines, an inline `[a, b]`, and a bare scalar where exactly
+ *  one value was written.
+ *
+ *  A STILL-COMMENTED KEY HOLDS NOTHING, per the comment-is-unanswered
+ *  convention. Reading the prompt as a value is how a field silently fills. */
+export function nodeList(file: string, key: string): string[] {
+  try {
+    const lines = readFileSync(file, "utf8").split("\n");
+    const end = lines.indexOf("---", 1);
+    const fm = lines.slice(0, end < 0 ? lines.length : end);
+    const at = fm.findIndex((l) => l.startsWith(`${key}:`));
+    if (at < 0) return [];
+    const inline = fm[at].slice(key.length + 1).trim();
+    if (inline.startsWith("[")) {
+      return inline
+        .replace(/^\[|\]$/g, "")
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s !== "");
+    }
+    if (inline !== "" && !inline.startsWith("<!--")) return [inline];
+    const out: string[] = [];
+    for (const l of fm.slice(at + 1)) {
+      const m = /^\s+-\s+(.*)$/.exec(l);
+      if (m === null) break;
+      const v = m[1].trim();
+      if (v !== "" && !v.startsWith("<!--")) out.push(v);
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
+
 function inboxItems(root: string, instanceRaw?: string): string[] {
   let live: string[];
   try {
@@ -665,7 +1411,7 @@ function renderField(
   hint?: FieldHint,
 ): string {
   const flag = required ? '<span class="req">required</span>' : '<span class="opt">optional</span>';
-  const guide = guidance === "" ? "" : `<div class="guide">${esc(guidance)}</div>`;
+  const guide = guidance === "" ? "" : `<div class="guide">${guideHtml(guidance)}</div>`;
   // The portable copy travels with no editor to open, so the item template is
   // NAMED here rather than linked, and its path rides the chip's tooltip. The
   // mirror draws the same chip clickable.
@@ -674,6 +1420,56 @@ function renderField(
   const mech = hint?.description === undefined || hint.description === "" ? "" : `<div class="desc">${esc(hint.description)}</div>`;
   const head = `<div class="field"><span class="tpl">template: ${esc(template)}${of}</span><span class="name">${esc(name)}</span>${flag}<div class="desc">${esc(description)}</div>${mech}${guide}`;
   return `${head}${fieldEditor(name, content, meta, args, hint)}</div>`;
+}
+
+/** GUIDANCE IS PARAGRAPHS AND LISTS, and it has to RENDER as them (owner
+ *  report 2026-08-08: "there is a list in the scores text, so format it like a
+ *  list").
+ *
+ *  It used to be escaped into one div. A list authored as a list — which
+ *  voice.md requires — arrived as a run of text with dashes in it, so the one
+ *  place the rule is most visible was the one place it did not survive.
+ *
+ *  TWO SHAPES ONLY, deliberately: paragraphs and bullets. This is form help,
+ *  not a document, and a full markdown renderer here would invite headings and
+ *  tables into a box three lines tall. */
+export function guideHtml(text: string): string {
+  const out: string[] = [];
+  for (const block of text.split(/\n\s*\n/)) {
+    let bullets: string[] = [];
+    let para: string[] = [];
+    const flushList = (): void => {
+      if (bullets.length === 0) return;
+      out.push(`<ul>${bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>`);
+      bullets = [];
+    };
+    const flushPara = (): void => {
+      if (para.length === 0) return;
+      out.push(`<p>${esc(para.join(" "))}</p>`);
+      para = [];
+    };
+    for (const l of block.split("\n").map((x) => x.trim())) {
+      if (l === "") continue;
+      const item = /^[-*]\s+(.*)$/.exec(l);
+      if (item !== null) {
+        flushPara();
+        bullets.push(item[1]);
+        continue;
+      }
+      // A CONTINUATION LINE BELONGS TO ITS BULLET. An item wrapped over two
+      // lines is one item, and a new paragraph mid-list would split it.
+      if (bullets.length > 0) {
+        bullets[bullets.length - 1] += ` ${l}`;
+        continue;
+      }
+      // WRAPPED LINES ARE ONE PARAGRAPH. A blank line starts the next one,
+      // which is the only thing that ever does.
+      para.push(l);
+    }
+    flushPara();
+    flushList();
+  }
+  return out.join("");
 }
 
 const ROW_BTNS =

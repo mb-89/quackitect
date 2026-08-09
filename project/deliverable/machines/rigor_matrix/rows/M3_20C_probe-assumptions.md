@@ -23,15 +23,33 @@ legal_tools:
   - se_web_fetch
 evidence:
   - name: probes
-    template: per-item
+    template: node-table
     of: raid
-    description: "each standing assumption, its probe, and what came back — holds, false, unprobed with its reason, or scheduled"
+    items:
+      - $assumptions
+    columns:
+      - probe
+      - probed
+    description: every standing assumption, with what its probe checked and when
     guidance: |
-      One line per assumption in project/spec/trace/raid/ — every standing
-      one, not only the new ones. Say what you checked and what came back.
-  - name: fallout
-    template: refs
-    description: "every item resting on an assumption that turned out false, named — or none"
+      Fill one row per assumption.
+
+      - Open the assumption from its link.
+      - Read it.
+      - Run the check its Probe section names.
+      - Write the outcome word in `probe`.
+      - Say how you know, after the word.
+      - Write the date in `probed`, as YYYY-MM-DD.
+
+      The outcome word is one of four.
+
+      - holds: the check ran, and the assumption survived.
+      - false: the check ran, and it did not.
+      - unprobed: no cheap check exists yet. Say why.
+      - scheduled: it needs a spike. M6 carries it.
+
+      A cell still holding its comment counts as empty.
+      The submit refuses it by name.
 major: full
 minor: tailored
 patch: tailored
@@ -59,14 +77,42 @@ specification_note: |
 
 ## Guidance
 
-THIS STATE'S INPUT IS THE RAID FOLDER, not the state above it. Every standing assumption is probed, whenever it was recorded. That is why identifying and probing are two states: with one state doing both, "probe assumptions" naturally reads as "probe the ones I just wrote", and an assumption recorded in an early iteration is never looked at again — which is exactly when it has most likely gone stale.
+THIS STATE'S INPUT IS THE RAID FOLDER, not the state above it. Every standing
+assumption is probed, whenever it was recorded.
 
-ONE PROBE SETTLES WHAT A DATASHEET CLAIMS. Check the real channel: what the harness actually loads, what the command actually exits with, what the API actually returns, what the platform actually does. A document saying a thing works is the claim, not the check. Reasoning that it must hold is how the assumption got made in the first place.
+That is why identifying and probing are two states (owner ruling, 2026-08-06).
+With one state doing both, "probe assumptions" naturally reads as "probe the
+ones I just wrote". An assumption recorded in i1 is then never looked at
+again, which is exactly when it has most likely gone stale.
 
-THE CHEAPEST REAL CHECK WINS. A probe is minutes. If it needs a spike, that is M6's work and the entry says so.
+ONE PROBE SETTLES WHAT A DATASHEET CLAIMS. Check the real channel:
 
-FOUR OUTCOMES, and each writes back to the node: holds (status probed, date stamped), false (the kind becomes ISSUE — it has already happened), unprobed (status stays open WITH its reason), scheduled (M6 carries it). NAMING A GAP DOES NOT CLOSE IT: unprobed is legal, unexplained is not.
+- what the harness actually loads
+- what the command actually exits with
+- what the API actually returns
+- what the platform actually does
 
-WHEN ONE TURNS OUT FALSE, FOLLOW IT UPWARD. Everything whose source_refs named that entry now rests on something known false, and those items go in `fallout`. This is the payoff of the register being addressable — nothing could be traced back from a table row.
+A document saying a thing works is the claim, not the check. Reasoning that it
+must hold is how the assumption got made in the first place.
 
-The method is [[meth-assumption-probing]], which the entry read demands before this state opens. The register is [[meth-raid]].
+THE CHEAPEST REAL CHECK WINS. A probe is minutes. If it needs a spike, that is
+M6's work and the entry says so.
+
+FOUR OUTCOMES, and each writes back to the node:
+
+- holds — status probed, date stamped.
+- false — the kind becomes ISSUE, because it has already happened.
+- unprobed — status stays open WITH its reason.
+- scheduled — M6 carries it.
+
+NAMING A GAP DOES NOT CLOSE IT. Unprobed is legal, unexplained is not.
+
+WHEN ONE TURNS OUT FALSE, FOLLOW IT UPWARD. Everything whose source_refs named
+that entry now rests on something known false, and those items go in
+`fallout`.
+
+This is the payoff of the register being addressable. Nothing could be traced
+back from a table row.
+
+The method is [[meth-assumption-probing]], which the entry read demands before
+this state opens. The register is [[meth-raid]].

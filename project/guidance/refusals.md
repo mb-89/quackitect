@@ -14,6 +14,29 @@ The pairing rule: a new clause is not done until its section stands here.
 The mechanical enforcement of that rule is parked for the engine iterations;
 until it lands, authorship carries it.
 
+## ANYTHING THAT BLOCKS OWES A REMEDY, NOT ONLY A TYPED REFUSAL
+
+Owner ruling 2026-08-07, and it generalises the rule above.
+
+A typed refusal is one shape of block. There are others, and they owe the
+same thing. A `fill` that comes back unchanged is a refusal wearing an
+instruction's clothes: the submit did not stamp, and the agent is expected to
+work out why.
+
+THE MACHINE HOLDS THE VERDICT, SO THE MACHINE HANDS IT OVER. It is never the
+agent's job to ask why it was blocked, and a mechanism whose answer is "call
+another verb to find out" is the wrong fix. Say what is wrong, and say it
+clearly enough to act on.
+
+PUT IT WHERE A TRUNCATING HOST STILL SHOWS IT. A large result is moved to disk
+by some hosts, which hand back the HEAD of it. A remedy buried deep in a big
+payload is a remedy nobody receives. This cost five calls of guessing at a
+one-word mistake on 2026-08-07, and the fix was to move the block to the top
+rather than to add a verb for fetching it.
+
+THE TEST OF A REMEDY: could somebody act on it without asking a second
+question? If not, it is a diagnosis rather than a remedy.
+
 ## The git lane
 
 ### SE-C-002 — no history rewrite
@@ -118,6 +141,20 @@ Reserved. Never issued by this engine; old logs carry it.
 Completing this state would leave the machine open with nothing active — a
 starved join. Fix the drawing, not the walk.
 
+A GREEN BRANCH NO LONGER COUNTS AGAINST YOU (owner ruling 2026-08-09). A
+busbar waits only for the inbound edges whose source is not already filled.
+A branch that stands green has nothing left to deliver, so it is not walked
+again to satisfy the bar.
+
+What still fires this clause is a branch that is genuinely owed. Walk that
+one.
+
+WHY THE RULE CHANGED. A three-way join used to be unreachable by a single
+token. Walking one branch fired one edge; reaching a sibling routed BACK
+through the fork, and the re-walk cleared the fuel the last leg had just laid
+down. Measured in iteration one on 2026-08-09: all three branches walked, the
+gate still shut, and stepping out to re-enter reset the count to zero.
+
 ### SE-C-124 — the canvas fails to compile
 The walk stands where it is. Fix the drawing; the walk resumes.
 
@@ -140,6 +177,46 @@ Updates name an OPEN node. Check the node map that rides every result.
 
 ### SE-C-122 — done over open children
 Everything started gets resolved. Resolve or re-home the children first.
+
+### SE-C-133 — the checklist stopped moving
+Narration that never closes anything records intent, not progress. After five
+updates with nothing resolved you get one warning, riding the result as a
+`nudge`. Ignore it and the next update refuses.
+
+The way out is always open. A resolving op is never refused, because it is the
+remedy:
+
+- `done` — the item landed.
+- `obsolete` — it stopped mattering.
+- `revert` — it was undone.
+- `defer` — it belongs to a later state.
+
+The open node map rides every refusal, so the id you need is already in your
+hand. Nothing genuinely finished? Say what is actually blocking the item with
+`defer`, or close it `obsolete`. A checklist standing open for hours is the
+thing this stops.
+
+### SE-C-134 — a method write while a record is bound
+Method cannot be changed from inside a record. These are SHARED:
+
+- guidance
+- machines
+- matrix rows
+- templates
+- the engine
+- the tests
+
+A write to one while a record is bound lands in that record's worktree and
+fans out from there, pushing the record's copy over trunk.
+
+That is not theoretical. It happened twice on 2026-08-07, and the first time
+it overwrote trunk's tool list and deleted two lane verbs.
+
+The remedy is one call. Step out with `se_pull {escape: "<why>"}`, make the
+edit unbound, then aim back. The walk is left standing where it was.
+
+A RECORD'S OWN CONTENT IS NEVER REFUSED here. Evidence and decisions under
+the record's own folder are exactly what a bound walk is for.
 
 ## Notes and prose
 

@@ -98,6 +98,29 @@ describe("the base format", { concurrency: true }, () => {
     assert.equal(selectRows(SPEC, view({ filters: { or: ['patch == "none"', 'state_kind == "gate"'] } }), ROWS).length, 2);
   });
 
+  // "GIVE ME EVERY NOTE LINKED TO X" IS THE QUERY THE REGISTER IS FOR (owner,
+  // 2026-08-08). It is one expression, and it THREW: the first note without a
+  // refines field hit null.contains() and the whole filter died. Over a vault
+  // holding method cards, states and templates that is immediately, so the one
+  // query that matters could not be run at all.
+  test("a link query survives every note that has no links", () => {
+    const mixed: Row[] = [
+      { file: { name: "req-a" }, refines: ["uc-take-a-step", "uc-capture-a-stray"] },
+      { file: { name: "req-b" }, refines: ["uc-capture-a-stray"] },
+      { file: { name: "a-method-card" } },
+    ];
+    const linked = selectRows(SPEC, view({ filters: 'refines.contains("uc-take-a-step")' }), mixed);
+    assert.equal(linked.length, 1, "the card with no refines answers false, it does not take the query down");
+    assert.equal(selectRows(SPEC, view({ filters: 'refines.contains("uc-capture-a-stray")' }), mixed).length, 2);
+  });
+
+  // A NULL METHOD ANSWERS FOR NULL. Null's table used to be the fallback for
+  // EVERY type, so anything registered there leaked — and a typo on a number
+  // would have answered false instead of naming the type error.
+  test("contains on a number still refuses by type", () => {
+    assert.match(refusal(() => matches('count.contains("x")', { count: 3 })).got, /number\.contains/);
+  });
+
   test("a bare property means it carries something", () => {
     assert.equal(matches("depends_on", ROWS[0]), true);
     assert.equal(matches("depends_on", ROWS[2]), false);
@@ -170,7 +193,7 @@ describe("the vault", { concurrency: true }, () => {
     const spec = loadBase(RIGOR);
     const matrix = spec.views.find((v) => v.name === "The matrix");
     assert.ok(matrix !== undefined, "the shipped base declares The matrix");
-    assert.equal(renderView(spec, matrix, readVault(REPO_ROOT)).rows, 51);
+    assert.equal(renderView(spec, matrix, readVault(REPO_ROOT)).rows, 52);
   });
 
   // The pivot and the flat view read ONE set of notes. Each rigor row carries
@@ -199,7 +222,7 @@ describe("the vault", { concurrency: true }, () => {
     const waits = spec.views[0];
     const r = renderView(spec, waits, rows);
     const labels = [...r.html.matchAll(/pv-row">([^<]+)</g)].map((m) => m[1]);
-    assert.equal(labels.length, 51, "every rigor step is a row");
+    assert.equal(labels.length, 52, "every rigor step is a row");
     const shared = r.columns.filter((c) => labels.includes(c));
     assert.ok(shared.length >= 45, `the axes name the same things — only ${shared.length} of ${r.columns.length} columns are also rows`);
   });

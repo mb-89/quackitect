@@ -7,7 +7,7 @@ exit_script:
   - project/deliverable/engine/bin/preflight.ts
   - project/deliverable/engine/bin/smoketest.ts
 repair_tools: se_file_read, se_file_search, se_file_glob, se_file_list, se_file_patch, se_file_write, se_run
-guidance: BOOT METHOD rides in from guidance/method/boot.md by tag - follow it. Preflight and the SMOKE test run on exit, and both are quick. If this state allows no tools, pull to run them; do not read/search here. A failure is named in the refusal. While a check stands red, the repair tools are legal HERE - fix what the output names, then pull again.
+guidance: BOOT METHOD rides in from guidance/method/boot.md by tag - follow it. Preflight and the SMOKE test run on exit, and both are quick. If this state allows no tools, pull to run them. Do not read or search here. A failure is named in the refusal. While a check stands red, the repair tools are legal HERE - fix what the output names, then pull again.
 ---
 
 # Prepare idle

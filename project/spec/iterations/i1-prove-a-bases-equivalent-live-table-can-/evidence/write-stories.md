@@ -1,6 +1,8 @@
 ---
 form: write-stories
-suspect: "rests on log-risks, which fell"
+by: agent
+signed_off: 2026-08-07T19:42:48.034Z
+reopened: "2026-08-07T18:59:02.767Z — the qualities restructure was ruled on 2026-08-07 and never applied: five stretched quality stories stand where one explainer belongs"
 authors: agent
 files: null
 ---
@@ -19,32 +21,23 @@ THE EIGHTEEN ARE NOT LOST. They describe what the system can DO, which is the us
 
 THE METHOD CARD WAS AT FAULT and is fixed. It said "a named actor doing one real pass", which is nearly right and not enough — it never said the pass had an ORDER, and it never said what the shape rules out. Both failing examples now sit in the card as counter-examples.
 
-TWO MORE STORIES ARRIVED FROM THE NEXT STATE. Reverse-engineering the use cases found two goals no journey told, and the rule is that the story comes first. They are in the list below: sty-capture-a-stray and sty-the-agent-proves-it-read.
+TWO MORE STORIES ARRIVED FROM THE NEXT STATE. Reverse-engineering the use cases found two goals no journey told, and the rule is that the story comes first.
 
 AND FOUR MORE ARRIVED FROM THE GATE. Its first run found four capabilities with no story and no use case, LISTED them, and recommended pass anyway. The owner ruled that a fail on 2026-08-06: naming a gap does not close it. So they are closed rather than disclosed.
 
-- sty-ask-the-tests-a-question. One question to the tests, one answer, seconds.
-- sty-improve-the-machine-mid-walk. The method is wrong mid-walk; fix it and keep going.
-- sty-look-at-a-closed-record. Reading a finished record as it stood.
-- sty-close-the-day. Every finding ruled before the record closes.
+AND THREE MORE FROM THE GATE'S SECOND RUN. Walking the live tool list and the live doors by hand found three capabilities a person can reach this minute with no journey describing them. The last of the three was created while filling the gate: the prior-art scan was exactly that pass, and no journey covered it.
 
-AND THREE MORE FROM THE GATE'S SECOND RUN. Walking the live tool list and the live doors by hand found three capabilities a person can reach this minute with no journey describing them.
+THE FIVE QUALITY STORIES ARE STRUCK, and one explainer replaces them (owner ruling 2026-08-07). One each for auditability, learnability, maintainability, portability and recoverability. Every one named a property of the system and then described it — the same defect the first eighteen had, surviving inside the second set because nobody re-applied the test to them.
 
-- sty-diverge-on-purpose. The ideation door: come out with a choice rather than a default.
-- sty-let-the-system-catch-up. The overhaul door: the method catches up with itself in one pass.
-- sty-ask-and-record-the-answer. Researching a question the repo cannot settle, and putting both the search and the answer on the record.
+A QUALITY IS NOT A JOURNEY. There is no pass through the product called being maintainable. What IS a journey is a person meeting their first quality and needing somewhere to put it, and that is the explainer in the list below. It walks them to the nine characteristics of ISO/IEC 25010:2023 and shows the row landing under one of them.
 
-The third one I created while filling the gate — I performed exactly that pass doing the prior-art scan, and no journey covered it.
+WHY ONE AND NOT NONE. The qualities proposition is a value prop, and the coverage check refuses a proposition no story refines. It also deserves one: the qualities section is the part of the register a newcomer least expects, so the explainer earns its place.
 
-Twenty-one. Six killers, and the seven added after the first pass are not among them: each is a real pass, none is load-bearing for a proposition on its own. Missing is not the same as critical.
+Twenty-two stories. Six killers, unchanged — none of the struck five was one, and the explainer is not one either.
 
 ## stories
 
-- sty-auditability
-- sty-learnability
-- sty-maintainability
-- sty-portability
-- sty-recoverability
+- sty-what-a-quality-is
 - sty-ramp-up
 - sty-take-the-tour
 - sty-next-iteration

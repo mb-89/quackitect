@@ -7,13 +7,13 @@ verify_method: test
 breaks_if_removed: A refusal becomes a dead end instead of a redirection, and the walk stalls on every wrong turn.
 refines:
   - uc-take-a-step
-  - uc-stay-recoverable
+  - uc-quality-reliability
 source_refs:
   - uc-take-a-step ext 3a
   - ".se/req-mine-v2.md: errors and refusals"
   - ".se/req-mine-v1.md: refusals and honesty"
-  - uc-stay-recoverable step 2
-  - uc-stay-recoverable ext 2a
+  - uc-quality-reliability step 2
+  - uc-quality-reliability ext 2a
   - ".se/req-mine-v2.md: errors and refusals (v2-062, v2-064, v2-066)"
   - stk-agent
   - uc-take-a-step step 3

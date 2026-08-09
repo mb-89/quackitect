@@ -12,6 +12,8 @@ source_refs:
   - uc-adjudicate-a-gate ext 4a
   - uc-adjudicate-a-gate ext 5a
 priority: should
+weighs_against:
+  - req-reject-names-the-redo >
 ---
 
 ## Detail

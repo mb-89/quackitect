@@ -11,7 +11,7 @@ import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, checkDocs, freshRoot, handOver, readEverything, sessionAtIdle } from "./helpers.ts";
+import { call, checkDocs, freshRoot, readEverything, sessionAtIdle } from "./helpers.ts";
 
 const root = (): string => freshRoot();
 
@@ -135,7 +135,6 @@ test("reaching end fires onClosed once and the closing packet says session over"
   await session.advance();
   await session.advance();
   await session.advance();
-  handOver(r); // the way out writes the next session's briefing
   const over = (await session.advance("end")) as { session_over?: boolean; banner?: string };
   assert.equal(over.session_over, true);
   assert.match(String(over.banner), /session over/i);

@@ -11,6 +11,8 @@ source_refs:
   - uc-answer-a-question-with-tests step 4
   - ".se/req-mine-v1.md: tests and the battery"
 priority: should
+weighs_against:
+  - req-entry-binds-worktree >
 ---
 
 ## Detail

@@ -23,7 +23,9 @@ and they BIND as part of the demand.
 The statement stays the one EARS-shaped headline over that detail.
 
 The split rule that remains: detail that VERIFIES DIFFERENTLY is a sibling
-row. One node, one verify_method, one pass/fail — a table whose rows would
+row.
+
+One node carries one verify_method and one pass line. A table whose rows would
 fail independently under different methods is several requirements.
 
 THE FAN-OUT HEURISTIC (owner, 2026-08-06). A use case refined by MORE THAN

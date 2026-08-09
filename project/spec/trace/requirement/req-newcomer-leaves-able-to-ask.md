@@ -3,14 +3,18 @@ id: req-newcomer-leaves-able-to-ask
 type: "[[requirement]]"
 statement: When a newcomer completes their first tour, the engine shall leave at least 2 of 3 newcomers able to name the parts they will use and to pick a fitting desk offer unaided within the same session.
 kind: quality
+characteristic: interaction-capability
 verify_method: demonstration
 breaks_if_removed: The tour runs but teaches nothing measurable; nobody can say whether newcomers leave able to ask.
 refines:
-  - uc-learn-the-machinery
+  - uc-quality-interaction-capability
 source_refs:
+  - uc-learn-the-machinery
   - uc-learn-the-machinery guarantee
   - "meth-requirement-authoring: population measure rule"
 priority: should
+weighs_against:
+  - req-tour-reads-what-stands >
 ---
 
 ## Scenario

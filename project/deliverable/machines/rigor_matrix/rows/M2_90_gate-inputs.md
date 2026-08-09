@@ -30,7 +30,7 @@ product: full
 specification: tailored
 major_note: |
   Applies in full, scoped to the change and everything it invalidated:
-  props realized, stories generalized, roles covered, excluded-use list
+  props realized and stories generalized. Roles are covered, and the excluded-use list
   current. The gate's reason is strongest exactly here - system-level
   writing on a wrong user picture is what a major cannot afford.
 minor_note: |
@@ -59,9 +59,24 @@ THE COUNTS ARE NOT EVIDENCE HERE (owner ruling 2026-08-06). Every proposition re
 
 SO THIS GATE ASKS ONLY WHAT A PERSON CAN SEE AND THE ENGINE CANNOT.
 
-A HOLE FOUND BY JUDGMENT AND LISTED IS A FAIL, NOT A DISCLOSURE. This is the rule the gate exists for, and it was broken the first time it ran: four capabilities with no use case were found by hand, written down, and the gate recommended pass anyway. Naming a gap does not close it. Either the capability is genuinely out of scope - and then it belongs in the non-goals, argued - or it is in scope and the gate FAILS until it has a use case.
+A HOLE FOUND BY JUDGMENT AND LISTED IS A FAIL, NOT A DISCLOSURE.
 
-WHERE THE UNSPECIFIED LIST COMES FROM. Not from imagination. The lane's tool list and the machine's offered doors are enumerations the spec did not write, so they can be compared against the use cases mechanically. Until that check is built (note-9c5253b4da67) it is walked by hand HERE, against the live tool list and the live doors, and the walk is written down so the next reviewer can repeat it.
+This is the rule the gate exists for, and it was broken the first time it ran.
+Four capabilities with no use case were found by hand and written down, and
+the gate recommended pass anyway.
+
+Naming a gap does not close it. Either the capability is genuinely out of
+scope, and then it belongs in the non-goals, argued. Or it is in scope, and
+the gate FAILS until it has a use case.
+
+WHERE THE UNSPECIFIED LIST COMES FROM. Not from imagination.
+
+The lane's tool list and the machine's offered doors are enumerations the spec
+did not write. They can be compared against the use cases mechanically.
+
+Until that check is built (note-9c5253b4da67) it is walked by hand HERE,
+against the live tool list and the live doors. The walk is written down so the
+next reviewer can repeat it.
 
 PRIOR ART MEANS A COMPARISON, not a citation. Naming Cockburn proves a shape was borrowed. It says nothing about whether this user picture survives against systems people actually use.
 

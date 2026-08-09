@@ -1,0 +1,36 @@
+{
+	"metadata":{
+		"version":"1.0-1.0",
+		"frontmatter":{"reentry":"restart","priority":0.2}
+	},
+	"nodes":[
+		{"id":"n-start","type":"file","file":"deliverable/machines/states/start.md","styleAttributes":{"shape":"pill"},"x":0,"y":0,"width":160,"height":160},
+		{"id":"n-prior-art","type":"file","file":"deliverable/machines/states/find_prior_art.md","x":-1300,"y":300,"width":480,"height":260},
+		{"id":"n-contradiction","type":"file","file":"deliverable/machines/states/find_contradiction.md","x":-260,"y":300,"width":480,"height":260},
+		{"id":"n-analogy","type":"file","file":"deliverable/machines/states/find_analogy.md","x":260,"y":300,"width":480,"height":260},
+		{"id":"n-without","type":"file","file":"deliverable/machines/states/find_without.md","x":780,"y":300,"width":480,"height":260},
+		{"id":"n-heuristic","type":"file","file":"deliverable/machines/states/find_by_heuristic.md","x":1300,"y":300,"width":480,"height":260},
+		{"id":"n-transforming","type":"file","file":"deliverable/machines/states/find_by_transforming.md","x":1820,"y":300,"width":480,"height":260},
+		{"id":"n-probing","type":"file","file":"deliverable/machines/states/find_by_probing.md","x":2340,"y":300,"width":480,"height":260},
+		{"id":"n-build-chart","type":"file","file":"deliverable/machines/states/build_chart.md","x":-240,"y":700,"width":480,"height":260},
+		{"id":"n-end","type":"file","file":"deliverable/machines/states/end.md","styleAttributes":{"shape":"pill"},"x":0,"y":1060,"width":160,"height":160},
+		{"id":"n-comment","type":"text","text":"ENUMERATE SPACE — the sub-machine behind the M4 row of the same name. A sub-machine IS a canvas, so it carries the canvas's name and no other (owner ruling 2026-08-08). There is no second name anywhere in here.\n\nSEVEN FINDERS, THEN THE CHART. The finders search; the chart is where their options become one space AND where the candidates are drawn across it. pick_shortlist stood after it until 2026-08-08; the owner asked why, and there was no good answer - the space and the sample are one interaction. Each is a state with its own evidence form, exactly like a state the rigor matrix compiled.\n\nTHE SEVEN ARE A FAN, NOT A CHAIN. None of them depends on any other, so the order the machine hands them out is irrelevant — the same way it is irrelevant which of derive-functions and identify-assumptions comes first after write-requirements. One agent walks the seven one after another; several agents take one each.\n\nNONE OF THEM CAN SEE WHAT THE OTHERS FOUND, and that is the point. Prior art finds what is already known outside this project, written down or running. Contradiction finds what nobody built because it looked impossible. Analogy finds it solved in another field. Trimming finds the option of not doing it at all. Heuristics hold the old rules against every cluster. Transforming mutates what already exists. Probing builds the cheapest runnable version and finds out.\n\nSIX OF THE SEVEN PREDATE THE MACHINE. What changed is that their catalogues can now be run to COMPLETION rather than sampled — forty TRIZ principles against every cluster, twelve transformation operators against every subject, eight heuristics against every cluster. The old cards budgeted a human minute per operator, and that budget is the only thing about them that aged.\n\nPROBING IS THE ONE THAT IS NEW, and for a boring reason: a spike used to cost days, so it was never spent on whether something is an option at all.\n\nA FINDER MAY BE SKIPPED, WITH A NAMED REASON. Each carries an `applies` field. A physical build nobody can execute from the lane is an honest skip; a blank one is a search nobody did.\n\nIT WAS FIVE UNTIL 2026-08-08, then four, now seven. Prior art and benchmarking merged — a shipped product IS prior art. Heuristics, transforming and probing were added after an audit against FRAME, the SyA corpus, and the 2025-26 LLM-ideation literature.\n\nTHE BAR STANDS OVER build_chart, because that is the work that joins the legs. A chart built over a partial search still holds options the trimming finder would have struck. The end pill closes the machine and joins nothing, so it carries no bar.\n\nTHE COORDINATES BELOW ARE A COURTESY TO OBSIDIAN. The mirror lays this out with the same generator every compiled machine uses, top to bottom.","x":-1300,"y":-720,"width":2560,"height":520}
+	],
+	"edges":[
+		{"id":"e-start-prior-art","fromNode":"n-start","fromSide":"bottom","toNode":"n-prior-art","toSide":"top"},
+		{"id":"e-start-contradiction","fromNode":"n-start","fromSide":"bottom","toNode":"n-contradiction","toSide":"top"},
+		{"id":"e-start-analogy","fromNode":"n-start","fromSide":"bottom","toNode":"n-analogy","toSide":"top"},
+		{"id":"e-start-without","fromNode":"n-start","fromSide":"bottom","toNode":"n-without","toSide":"top"},
+		{"id":"e-start-heuristic","fromNode":"n-start","fromSide":"bottom","toNode":"n-heuristic","toSide":"top"},
+		{"id":"e-start-transforming","fromNode":"n-start","fromSide":"bottom","toNode":"n-transforming","toSide":"top"},
+		{"id":"e-start-probing","fromNode":"n-start","fromSide":"bottom","toNode":"n-probing","toSide":"top"},
+		{"id":"e-prior-art-chart","fromNode":"n-prior-art","fromSide":"bottom","toNode":"n-build-chart","toSide":"top"},
+		{"id":"e-contradiction-chart","fromNode":"n-contradiction","fromSide":"bottom","toNode":"n-build-chart","toSide":"top"},
+		{"id":"e-analogy-chart","fromNode":"n-analogy","fromSide":"bottom","toNode":"n-build-chart","toSide":"top"},
+		{"id":"e-without-chart","fromNode":"n-without","fromSide":"bottom","toNode":"n-build-chart","toSide":"top"},
+		{"id":"e-heuristic-chart","fromNode":"n-heuristic","fromSide":"bottom","toNode":"n-build-chart","toSide":"top"},
+		{"id":"e-transforming-chart","fromNode":"n-transforming","fromSide":"bottom","toNode":"n-build-chart","toSide":"top"},
+		{"id":"e-probing-chart","fromNode":"n-probing","fromSide":"bottom","toNode":"n-build-chart","toSide":"top"},
+			{"id":"e-chart-end","fromNode":"n-build-chart","fromSide":"bottom","toNode":"n-end","toSide":"top"}
+	]
+}

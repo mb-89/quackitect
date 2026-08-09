@@ -10,6 +10,8 @@ refines:
 source_refs:
   - uc-adjudicate-a-gate ext 6a
 priority: should
+weighs_against:
+  - req-close-leaves-trunk-clean >
 ---
 
 ## Detail

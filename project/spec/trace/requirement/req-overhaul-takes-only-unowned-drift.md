@@ -13,6 +13,8 @@ source_refs:
   - uc-let-the-system-catch-up step 4
   - ".se/req-mine-sebots.md: capture, decisions, change"
 priority: should
+weighs_against:
+  - req-option-carries-cost-and-shed >
 ---
 
 ## Detail

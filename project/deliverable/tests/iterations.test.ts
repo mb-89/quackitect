@@ -383,8 +383,9 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
   // Leaving the blessed kickoff by a NAMED edge completes it — and the
   // M0 fills carried across the swap.
   //
-  // log-risks demands meth-raid first: the register is NODES, and a state
-  // entered without that card writes the table it used to write.
+  // log-risks demands meth-raid first: the register became NODES on
+  // 2026-08-06 and a state entered without that card writes the table it
+  // used to write.
   session.humanCheck("project/deliverable/machines/methods/meth-raid.md");
   await session.advance(grown.states.find((s) => s.id === "gate-kickoff")!.edges[0].to);
   const hist = (session.describe() as { history: { state: string; outcome: string }[] }).history.map((h) => h.state);

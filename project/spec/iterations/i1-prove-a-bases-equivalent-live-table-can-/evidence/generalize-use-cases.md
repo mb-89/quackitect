@@ -1,6 +1,7 @@
 ---
 form: generalize-use-cases
-suspect: "rests on log-risks, which fell"
+by: agent
+signed_off: 2026-08-07T19:43:56.228Z
 authors: agent
 files: null
 ---
@@ -19,13 +20,29 @@ THE SHAPE CAME FROM v1, AND SO DID A WARNING. v1's item template at ref main dec
 
 SO THREE THINGS WERE BUILT BEFORE ANY USE CASE WAS WRITTEN. The use-case item template, the guidance card expanded from a summary into real guidance, and the row's field turned from free form into typed references with a coverage rule.
 
+THE QUALITY USE CASES ARE THE NINE CHARACTERISTICS NOW (owner ruling 2026-08-07). Five stood here before — auditable, learnable, maintainable, portable, recoverable — each an ad-hoc category somebody chose. They are struck, and the nine characteristics of ISO/IEC 25010:2023 stand in their place.
+
+WHY THE STANDARD RATHER THAN OUR OWN LIST. A local list cannot tell you what is missing. The nine were meant to be exhaustive over product quality, so a characteristic with nothing under it is a question somebody owes an answer to rather than a gap nobody sees.
+
+EACH ONE CARRIES ITS SUB-CHARACTERISTICS IN ITS OWN PROSE, so a person writing a quality never has to open the standard to place it.
+
+THEY ARE `kind: quality-area`, not interactions. A characteristic is not something somebody does, and the use-case template already carried that second kind for exactly this.
+
+ASKING ALL NINE FOUND A REAL DEFECT. Security had no quality because nobody thought this product had one. It does: the mirror served the whole record on every interface with no authentication, while a comment asserted it never left localhost. That is now req-mirror-stays-on-the-machine, and the bind is fixed.
+
+Thirty-one use cases over twenty-two stories.
+
 ## use_cases
 
-- uc-stay-auditable
-- uc-stay-learnable
-- uc-stay-maintainable
-- uc-stay-portable
-- uc-stay-recoverable
+- uc-quality-functional-suitability
+- uc-quality-performance-efficiency
+- uc-quality-compatibility
+- uc-quality-interaction-capability
+- uc-quality-reliability
+- uc-quality-security
+- uc-quality-maintainability
+- uc-quality-flexibility
+- uc-quality-safety
 - uc-install-quackitect
 - uc-learn-the-machinery
 - uc-get-work-routed

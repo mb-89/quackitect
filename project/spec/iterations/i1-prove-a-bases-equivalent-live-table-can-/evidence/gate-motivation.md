@@ -1,6 +1,8 @@
 ---
 form: gate-motivation
-suspect: "rests on log-risks, which fell"
+bless: blessed by agent
+by: agent
+signed_off: 2026-08-07T12:07:03.405Z
 authors: agent
 files: null
 ---
@@ -38,7 +40,11 @@ The value props carry pass lines a machine can check: any past decision answers 
 
 ## risks_logged
 
-The register stands typed and signed: eight entries in the six-column table — kind, impact, likelihood, owner, revisit — led by the supervision paradox and the thin evidence base. The pressure test's two unclean answers resolve INTO standing entries, not past them.
+The register stands as NODES, not a table (owner ruling 2026-08-06, built 2026-08-07). Eight entries live in project/spec/trace/raid/, each shaped by [[raid]] and each carrying kind, statement, owner, trigger, status, impact and source_refs.
+
+Five risks: the supervision paradox, the thin evidence base, the harness half-life, cheap rigor amplifying slop, and young machinery. One assumption with its Probe section: the adjudication-provenance gap the whole delta rests on. One issue: the manual fan coverage, now MITIGATED by the make-style route built the same day. One dependency: Obsidian as the drawing surface and the agent harness as the runtime.
+
+log-risks names all eight as references, so this gate follows each one and reviews the artifact rather than a summary.
 
 ## round_0_verify
 
@@ -75,4 +81,8 @@ pass — the frame is interesting on its own terms: an open middle, an evidenced
 
 ## choice
 
-iterations/i1/log-risks
+iterations/i1/draw-context
+
+## raid_additions
+
+- none

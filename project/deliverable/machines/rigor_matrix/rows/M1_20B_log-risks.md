@@ -24,7 +24,7 @@ evidence:
     description: every entry opened here, as a raid node reference, one per line
     guidance: |
       Write each entry as a node shaped by [[raid]], then name it here.
-      The node carries kind, owner, trigger, impact and statement.
+      The node carries its kind and its owner. It carries the trigger, the impact and the statement too.
 major: full
 minor: tailored
 patch: tailored
@@ -49,14 +49,34 @@ product_note: |
   register is append-and-resolve, not append-only.
 specification_note: |
   DOCUMENT FORM: the RAID register as a QUERY-DRIVEN TABLE - entries are
-  nodes, the table derives. Never hand-tabled: the register is edited as
-  entries, the render assembles.
+  nodes, the table derives (v1's raid-matrix figure). Never hand-tabled:
+  the register is edited as entries, the render assembles.
 ---
 
 ## Guidance
 
-Open the register ([[meth-raid]]), which the entry read demands before this state opens. The goal system's named conflicts are the first entries; add the top risks the vision and delta expose. Owners and revisit triggers on each.
+Open the register ([[meth-raid]]), which the entry read demands before this
+state opens.
 
-EACH ENTRY IS A NODE, not a table row. A node has an id, so a later state can point at it, probe it and change its status. A table row inside this form has none of that: it is per-iteration and frozen once the form signs.
+The goal system's named conflicts are the first entries. Add the top risks the
+vision and delta expose, with an owner and a revisit trigger on each.
 
-RISKS OPEN HERE. Assumptions have two states of their own at M3 — identify-assumptions sweeps for them, probe-assumptions checks every standing one. An assumption noticed HERE is still recorded here rather than held back; waiting for the right state is how an entry is lost.
+EACH ENTRY IS A NODE, not a table row (owner ruling 2026-08-06). A table row
+is per-iteration, carries no id, and freezes at sign-off.
+
+So an entry recorded here could never be pointed at. An assumption recorded
+here could never be probed by a later iteration.
+
+Both ancestors already knew this. v1 shipped a raid item template with a
+per-kind query view, and v2 shipped one file per entry.
+
+This field carries references. The register a person reads is a view over the
+folder.
+
+RISKS OPEN HERE. Assumptions have two states of their own at M3.
+
+- identify-assumptions sweeps for them.
+- probe-assumptions checks every standing one.
+
+An assumption noticed HERE is still recorded here rather than held back.
+Waiting for the right state is how an entry is lost.

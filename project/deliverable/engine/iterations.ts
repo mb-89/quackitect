@@ -332,6 +332,9 @@ export function generateSeeded(_root: string, it: Iteration, machineId: string, 
   states.push({
     id: "all-built",
     kind: "join",
+    // THE BAR IS THE FIELD, NOT THE KIND (owner ruling 2026-08-08). The kind
+    // stays as drawing vocabulary; this is what the kernel reads.
+    busbar: true,
     statement: "",
     guidance: "Every chunk is built — the join releases the walk.",
     evidence_form: [],
@@ -711,8 +714,21 @@ function generateIterationWalk(root: string, it: Iteration, sid: string): Genera
     decl: m,
     canvas: pinnedCanvas(m),
     expByState: {},
+    // TWO KINDS OF SUB-MACHINE, told apart by the name (owner ruling
+    // 2026-08-08). A SEEDED one is authored per iteration and lives in the
+    // record, so it is generated here: build-chunks, spikes, candidates.
+    // A STATIC one is method — the same five finders every time — and its
+    // drawing is a .canvas under machines/. Naming a file is what says so.
+    //
+    // A static name is left OUT of subGen on purpose. Session.seedSubs and
+    // Session.declForPrefix both fall back to compiling the ref when no
+    // generator answers, which is exactly the right path for a drawing.
+    // Registering it here instead sent the walk looking for a seeded file
+    // in the record and refused with "a run without visible steps".
     subGen: Object.fromEntries(
-      m.states.filter((s) => s.submachine !== undefined).map((s) => [s.id, () => generateSeeded(root, it, s.id, s.submachine!)]),
+      m.states
+        .filter((s) => s.submachine !== undefined && !s.submachine.endsWith(".canvas"))
+        .map((s) => [s.id, () => generateSeeded(root, it, s.id, s.submachine!)]),
     ),
   };
 }
@@ -863,29 +879,43 @@ function placeGroup(
     rowY += tallest + LAYOUT.gapY;
   }
   const boxBottom = rowY - LAYOUT.gapY + LAYOUT.pad;
-  ctx.nodes.push({
-    id: `g-${g}`,
-    type: "group",
-    label: g,
-    x: minX - LAYOUT.pad,
-    y: boxTop,
-    width: maxX - minX + LAYOUT.pad * 2,
-    height: boxBottom - boxTop,
-  });
+  // AN UNNAMED GROUP DRAWS NO BOX. A hand-drawn machine's states carry no
+  // milestone, and a box labelled with nothing is furniture.
+  if (g !== "") {
+    ctx.nodes.push({
+      id: `g-${g}`,
+      type: "group",
+      label: g,
+      x: minX - LAYOUT.pad,
+      y: boxTop,
+      width: maxX - minX + LAYOUT.pad * 2,
+      height: boxBottom - boxTop,
+    });
+  }
   return boxBottom + LAYOUT.groupGap;
 }
 
-/** A drawn view of a generated machine, top to bottom like the walk
- *  reads: the shared start and end pills, each milestone a labelled group
- *  box, states inside layered by dependency — independent ones side by
- *  side — and every edge declaring its sides. */
-function pinnedCanvas(m: MachineDecl): CanvasData {
-  const groupOf = (s: StateDecl): string => (s.kind === "start" || s.kind === "end" || s.kind === "terminal" ? "" : (s.group ?? "?"));
+/** A drawn view of ANY machine, top to bottom like the walk reads: the
+ *  shared start and end pills, each milestone a labelled group box, states
+ *  inside layered by dependency — independent ones side by side — and every
+ *  edge declaring its sides.
+ *
+ *  EXPORTED, AND NOT ONLY FOR GENERATED MACHINES (owner ruling 2026-08-08).
+ *  A hand-drawn sub-machine served its authored x and y, so it read left to
+ *  right while every compiled machine read top to bottom, and a fan's AND bar
+ *  did not look like a bar. Same layout, whatever built the states. */
+export function pinnedCanvas(m: MachineDecl): CanvasData {
+  // A HAND-DRAWN MACHINE HAS NO MILESTONES, and that is not a defect. Its
+  // states lay out in the same dependency rows, without a labelled box
+  // around them.
+  const isPill = (s: StateDecl): boolean => s.kind === "start" || s.kind === "end" || s.kind === "terminal";
+  const groupOf = (s: StateDecl): string => (isPill(s) ? "" : (s.group ?? ""));
   const layers = groupLayers(m, groupOf);
   const order: string[] = [];
   for (const s of m.states) {
+    if (isPill(s)) continue;
     const g = groupOf(s);
-    if (g !== "" && !order.includes(g)) order.push(g);
+    if (!order.includes(g)) order.push(g);
   }
   const ctx: LayoutCtx = { nodes: [], els: new Map() };
   const feeders = inputsOf(m);
@@ -898,7 +928,7 @@ function pinnedCanvas(m: MachineDecl): CanvasData {
     y = placeGroup(
       ctx,
       g,
-      m.states.filter((s) => groupOf(s) === g),
+      m.states.filter((s) => !isPill(s) && groupOf(s) === g),
       layers,
       y,
       feeders,

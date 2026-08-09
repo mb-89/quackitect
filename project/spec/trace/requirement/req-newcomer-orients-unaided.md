@@ -6,9 +6,9 @@ kind: quality
 verify_method: demonstration
 breaks_if_removed: Nobody measures orientation, and the entry documents rot unnoticed until the next cold read fails.
 refines:
-  - uc-stay-learnable
+  - uc-quality-interaction-capability
 source_refs:
-  - uc-stay-learnable step 5
+  - uc-quality-interaction-capability step 5
   - stk-newcomer
   - meth-requirement-authoring — population measure form
   - i19 cold read

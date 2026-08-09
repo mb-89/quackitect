@@ -29,10 +29,10 @@ patch: full
 product: full
 specification: tailored
 major_note: |
-  Applies as drawn: collect all, one pass, one confirm run, escape when
+  Applies as drawn. Collect them all, fix in one pass, confirm in one run. Escape when
   the guard exhausts.
 minor_note: |
-  Applies as drawn: collect all, fix in one pass, one confirm run, escape
+  Applies as drawn. Collect them all and fix in one pass, then one confirm run. Escape
   when the guard exhausts.
 patch_note: |
   Applies as drawn: collect everything, fix in one pass, one confirm run,

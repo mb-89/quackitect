@@ -6,13 +6,15 @@ kind: quality
 verify_method: test
 breaks_if_removed: Every engine update forces overlay rework, which is the fork cost the product exists to remove.
 refines:
-  - uc-stay-maintainable
+  - uc-quality-flexibility
 source_refs:
-  - uc-stay-maintainable step 3
-  - uc-stay-maintainable ext 2a
-  - uc-stay-maintainable ext 3a
+  - uc-quality-flexibility step 3
+  - uc-quality-flexibility ext 2a
+  - uc-quality-flexibility ext 3a
   - stk-vehicle-owner
 priority: should
+weighs_against:
+  - req-overlay-drift-reported >
 ---
 
 ## Scenario

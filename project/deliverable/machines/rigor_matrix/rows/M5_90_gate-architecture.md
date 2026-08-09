@@ -21,7 +21,7 @@ evidence:
   - name: sensitivity_ruled
     description: the verdict with tripwires in RAID
   - name: matrix_review
-    description: "the baseline matrices reviewed: decomposition, clustering, allocation, interfaces"
+    description: every baseline matrix reviewed, none skipped
   - name: evaluation_recorded
     description: every quality scenario addressed or flagged
   - name: adrs_traced
@@ -33,7 +33,7 @@ product: full
 specification: tailored
 major_note: |
   Applies in full - the gate a major exists to pass. The matrix review is
-  the killer: decomposition, clustering, allocation, interfaces, reviewed
+  the killer. The decomposition and the clustering are reviewed, and so are the allocation and the interfaces. Reviewed
   as data. M7 builds inside this baseline; a new element found mid-build
   returns HERE.
 minor_note: |
@@ -60,4 +60,13 @@ specification_note: |
 
 ## Guidance
 
-The killer here is the MATRIX review: the clustering, the allocation, the interfaces - reviewed as data, not as a picture. Diagrams are derived views; if standardized diagrams return, a visual review can be reinstated. M7 builds inside this baseline; a new element found mid-build returns HERE, never in silently. Review per [[meth-gate-review]].
+The killer here is the MATRIX review. The clustering, the allocation and the
+interfaces are reviewed as data. Never as a picture.
+
+Diagrams are derived views. If standardised diagrams return, a visual review
+can be reinstated.
+
+M7 builds inside this baseline. A new element found mid-build returns HERE,
+never in silently.
+
+Review per [[meth-gate-review]].

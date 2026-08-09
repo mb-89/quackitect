@@ -18,7 +18,7 @@ minor_note: |
 patch_note: |
   Terminal, at every size. The record closes; the day's retro covers it.
 product_note: |
-  The product's resting state: shipped, green, documented, its record
+  The product's resting state. It is shipped and green, documented, and its record
   closed and its retro fed. Everything in this column describes what must
   be true HERE.
 specification_note: |

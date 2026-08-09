@@ -10,4 +10,6 @@ refines:
 source_refs:
   - uc-let-the-system-catch-up step 1
 priority: should
+weighs_against:
+  - req-overhaul-takes-only-unowned-drift >
 ---

@@ -5,7 +5,7 @@ statement: a list of REFERENCES to standing artifacts — one id per line, and e
 editor: list
 resolves: artifact
 line_pattern: ^- \[?\[?[A-Za-z0-9_./\\-]+\]?\]?$|^- none\b
-line_help: one {type} per line — its path, its file name, its id, or a wiki link; all four resolve
+line_help: "one {type} per line, named any way that resolves"
 placeholder: path from the project root, e.g. {folder}/{prefix}something.md
 description: one {type} REFERENCE per line — every one must resolve to a standing node of that type, and `none` is a legal answer
 ---
@@ -19,8 +19,8 @@ file, its own template and its own life — it outlives the iteration that
 authored it and a later record may change it. A form that copied the prose
 would fork the truth, and only one fork would ever get updated.
 
-- One reference per line. EVERY REFERENCE MUST RESOLVE. A line pointing at no
-  file is a defect the gate refuses, not a warning it prints.
+- One reference per line, and EVERY REFERENCE MUST RESOLVE. A line pointing at
+  no file is a defect the gate refuses, not a warning it prints.
 - An empty list is a claim as well: one line saying `none`.
 
 ## Four ways to write one line, all accepted

@@ -11,6 +11,8 @@ source_refs:
   - uc-learn-the-machinery step 2
   - uc-learn-the-machinery ext 2a
 priority: should
+weighs_against:
+  - req-tour-shows-live-instances >
 ---
 
 ## Detail

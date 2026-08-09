@@ -18,8 +18,8 @@ idea for whole documents and interfaces.
 2. Put it FIRST — before context, before narrative, before caveats.
 3. Order the rest by falling importance, not by the order you did the
    work or thought the thoughts.
-4. Cut test: delete the last paragraph. Still complete? Then the order
-   is right. Repeat.
+4. Cut test: delete the last paragraph. If the text is still complete,
+   the order is right, so repeat.
 
 **Output.** A text whose first sentence could stand alone — and whose
 tail is detail, never the point.

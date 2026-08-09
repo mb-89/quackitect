@@ -32,7 +32,7 @@ const path = require("node:path");
 
 const PORT = 7333;
 const SERVER = `http://localhost:${PORT}`;
-// Card numbers are muscle memory (project/views/cards.md), so a slot is reserved
+// Card numbers are muscle memory (project/deliverable/views/cards.md), so a slot is reserved
 // per number rather than per shown card. Eight covers the list with room.
 const SLOTS = 8;
 const VIEW_TYPE = (slot) => `$PRODUCT_ID$.card${slot}`;
@@ -362,7 +362,7 @@ async function ensureServer() {
 }
 
 // ── THE CARDS ────────────────────────────────────────────────────────────
-// Read from the engine, never listed here: project/views/cards.md is the truth,
+// Read from the engine, never listed here: project/deliverable/views/cards.md is the truth,
 // so a card added there grows a row here without an extension edit.
 // THE BAR ARRIVES AS MARKUP, never as data to re-draw. params.ts already
 // drew it from the panel spec; deriving a second picture here is exactly how
@@ -1789,7 +1789,7 @@ async function openCard(n) {
   await ensureCards();
   const card = cardBySlot(n);
   if (!shown(card)) {
-    void vscode.window.showInformationMessage(`$PRODUCT$: project/views/cards.md declares no card ${n}.`);
+    void vscode.window.showInformationMessage(`$PRODUCT$: project/deliverable/views/cards.md declares no card ${n}.`);
     return;
   }
   await showHelp(titleOf(card), cardHelp(card), false);

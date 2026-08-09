@@ -6,7 +6,7 @@
 // This is a LINT, not a comment, because a comment is the weakest guard: the
 // next person to pick a colour finds out here rather than in review.
 //
-// The values are read from project/brand/palette.css, so this lints the FILE a
+// The values are read from project/deliverable/brand/palette.css, so this lints the FILE a
 // person edits rather than a copy of it in the source.
 import { strict as assert } from "node:assert";
 import { readFileSync } from "node:fs";
@@ -61,7 +61,7 @@ test("no six-digit hex is written into the renderer", () => {
       offenders.push(`${i + 1}: ${line.trim().slice(0, 100)}`);
     }
   }
-  assert.deepEqual(offenders, [], "colours belong in project/brand/palette.css");
+  assert.deepEqual(offenders, [], "colours belong in project/deliverable/brand/palette.css");
 });
 
 // A CONTROL THAT DOES NOTHING IS WORSE THAN NO CONTROL. VS Code sandboxes its

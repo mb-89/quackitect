@@ -17,6 +17,8 @@ source_refs:
   - ".se/req-mine-v1.md: lifecycle and distribution (data-shaped rules load from configuration files, never code constants)"
   - uc-vendor-and-overlay ext 6a
 priority: should
+weighs_against:
+  - req-overlay-survives-update >
 ---
 
 ## Detail

@@ -12,4 +12,6 @@ source_refs:
   - ".se/req-mine-v1.md: provenance and trust (mint prefill)"
   - ".se/req-mine-v1.md: the lane — mediated I/O (deterministic mint)"
 priority: should
+weighs_against:
+  - req-recommendation-is-derived >
 ---

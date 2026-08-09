@@ -12,4 +12,7 @@ source_refs:
   - "owner law 2026-07-12: entry documents carry no method jargon"
   - ".se/req-mine-v1.md: voice, entry, and readability"
 priority: should
+weighs_with: req-entry-speaks-plainly — both measure plain language on a stranger's first contact
+weighs_against:
+  - req-tour-admits-absence >
 ---

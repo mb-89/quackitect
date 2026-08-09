@@ -1,18 +1,56 @@
 ---
 kind: method
-statement: "Document scrutiny: docs are for communication, never for backup - judge the emitted set per stakeholder, against the seven quality attributes, with the why included."
+statement: "Documents are for communication. Scrutinise them for what a reader can actually use."
 ---
 
 ## Situation
-Guidance for M9 finalize-docs: the moment to scrutinize the emitted documentation as a DOCUMENT. The war story to avoid: complete docs nobody understood - they diverged from reality and the system was re-engineered.
+
+Guidance for M9 finalize-docs. It is the moment to scrutinise the emitted
+documentation as a DOCUMENT.
+
+The war story to avoid is complete docs nobody understood. They diverged from
+reality, and the system was re-engineered.
 
 ## Procedure
-- Judge against the seven documentation qualities: HELPFUL (effort with it < effort without), CORRECT (the uncompromised one - never allow a known error to stand), UP-TO-DATE (correctness decays), EASY TO FIND (a defined structure, arc42-like), EASY TO UNDERSTAND (language and notation per stakeholder), EASY TO CHANGE (the easier, the likelier it stays current), ADEQUATE (pragmatic for THIS system and THESE stakeholders).
-- Walk the STAKEHOLDERS, not the chapters: for each reader class (developer, tester, operator, maintainer, the next architect, the assessor) - do they find what THEY need? A view nobody's concern demands is noise; a concern no view serves is a gap.
-- Check the pair WHAT and WHY: every significant decision present WITH its rationale and its rejected options. A doc that only says what is a backup, not a communication.
-- Check the summaries exist and are honest: scope, overview, key decisions, key requirements - the reader stops when they have enough (progressive disclosure).
-- Ask the minimality question per view: is this view as small as its stakeholders allow? More views mean more inconsistency risk.
-- Scrutinize the prose itself: missing or bad prose, undefined terms (the glossary catches them), stale references, figures without a what-to-see line.
+
+- Judge against the seven documentation qualities.
+  - HELPFUL. Effort with it is less than effort without it.
+  - CORRECT. Never allow a known error to stand.
+  - UP-TO-DATE. Correctness decays.
+  - EASY TO FIND. A defined structure, arc42-like.
+  - EASY TO UNDERSTAND. Language and notation per stakeholder.
+  - EASY TO CHANGE. The easier it is, the likelier it stays current.
+  - ADEQUATE. Pragmatic for THIS system and THESE stakeholders.
+- Walk the STAKEHOLDERS, not the chapters. For each reader class, ask whether
+  they find what THEY need.
+  - The developer.
+  - The tester.
+  - The operator.
+  - The maintainer.
+  - The next architect.
+  - The assessor.
+- A view no concern demands is noise. A concern no view serves is a gap.
+- Check the pair WHAT and WHY. Every significant decision is present with its
+  rationale and its rejected options.
+  - A doc that only says what is a backup, not a communication.
+- Check the summaries exist and are honest.
+  - Scope.
+  - Overview.
+  - Key decisions.
+  - Key requirements.
+  - The reader stops when they have enough (progressive disclosure).
+- Ask the minimality question per view. Is this view as small as its
+  stakeholders allow?
+  - More views mean more inconsistency risk.
+- Scrutinise the prose itself.
+  - Missing or bad prose.
+  - Undefined terms, which the glossary catches.
+  - Stale references.
+  - Figures without a what-to-see line.
 
 ## Sources
-SyA Architectural Views & Documentation (Vollmar/Kramer 2022, owner-mapped digest @ai/sya_kb); ISO/IEC/IEEE 42010; arc42.
+
+- SyA Architectural Views and Documentation (Vollmar and Kramer 2022), from
+  the owner-mapped digest at @ai/sya_kb.
+- ISO/IEC/IEEE 42010.
+- arc42.

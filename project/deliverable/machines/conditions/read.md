@@ -13,11 +13,16 @@ joins the same list, is proven the same way, and is refused the same way.
 What differs is only PROVENANCE, and every document carries its own
 `sources` saying what put it there — authored on the state, bound by a tag,
 or consumed. Boot is the one exemption, and it is a bootstrap rule: guidance
-cannot be demanded before the contract explaining guidance has been read. A left-behind session handover
-(.se/HANDOVER.md) joins boot read_contract's exit list while it exists — and
-the engine DESTROYS it as that state is left, so it is read exactly once
-(owner ruling 2026-07-31). The matching demand sits at the other end: the
-main machine refuses to reach `end` without a handover written that session.
+cannot be demanded before the contract explaining guidance has been read.
+
+THERE IS NO SESSION HANDOVER TO READ ANY MORE (owner ruling 2026-08-07).
+`.se/HANDOVER.md` used to join boot's exit list and be destroyed as the state
+was left, with a matching demand refusing `end` until one was written. Both
+are gone. The duty only discharged on the tidy path, and sessions are killed
+rather than ended, so it almost never fired.
+
+The last session is DERIVED from the call log instead and rides the boot
+banner. Nothing to read, nothing to prove, nothing to remember to write.
 
 The proof is per hand:
 
@@ -38,11 +43,16 @@ pill green too. The checkbox stays the human's alone: a green pill with
 empty boxes means the agent read, the human did not. An edited doc drops
 both proofs and asks again.
 
-THE HANDOVER RULE: the human's checked docs are the SESSION's reading
+THE TAKEOVER RULE: the human's checked docs are the SESSION's reading
 list (`human_checked` in every packet). When the agent takes over — the
 slider rises mid-walk — its walk must earn that same reading through the
 lane, even past transitions the human already walked: their checkmark is
 not the agent's reading.
+
+IT WAS CALLED THE HANDOVER RULE until 2026-08-07, which collided with the
+session handover file that has since been retired. Two unrelated ideas under
+one name cost a diagnosis, so this one is named for what it describes: one
+hand taking over from the other mid-walk.
 
 Reading is what the machine is FOR — the credit proves the doc passed
 through the agent's hands at its current version, and the engine will

@@ -10,4 +10,6 @@ refines:
 source_refs:
   - uc-research-and-record-an-answer step 1
 priority: should
+weighs_against:
+  - req-outbound-query-logged >
 ---

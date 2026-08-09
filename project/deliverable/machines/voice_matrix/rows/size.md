@@ -31,21 +31,26 @@ Refused at the write, because the cost is countable and immediate.
 
 TWO NUMBERS, not one.
 
-- SOFT, 1,200 tokens. Reported at a sweep. Past this a document is asking to
+- SOFT, 1,200 tokens, reported at a sweep. Past this a document is asking to
   be split, and the author decides.
-- HARD, 2,000 tokens. Refused. Past this nobody reads it whole, and a
-  document nobody reads whole is a document whose second half is not binding
-  anything.
+- HARD, 2,000 tokens, refused. Past this nobody reads it whole, and a document
+  whose second half nobody reads is binding nothing.
 
 THE REMEDY IS A FOLDER CLUSTER, never section routing. `walking.md` becomes
 `guidance/walking/*.md`, one file per idea. Small files ARE section routing,
 and both mechanisms that carry documents keep working unchanged: the pull
 addresses a file, and the reading proof hashes a file.
 
-FOUR DOCUMENTS EXCEED THE HARD CAP TODAY: walking, voice, authoring/machines
-and software. None of them is split yet, so this cell reports rather than
-refuses until they are. Turning it on before then would refuse edits to the
-very files that need editing.
+FOUR DOCUMENTS EXCEED THE HARD CAP TODAY:
+
+- walking
+- voice
+- authoring/machines
+- software
+
+None of them is split yet, so this cell reports rather than refuses until they
+are. Turning it on before then would refuse edits to the very files that need
+editing.
 
 ## record
 

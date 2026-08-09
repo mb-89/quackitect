@@ -10,4 +10,6 @@ refines:
 source_refs:
   - uc-get-work-routed ext 3a
 priority: should
+weighs_against:
+  - req-routing-reasoning-recorded >
 ---

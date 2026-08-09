@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "The goal system: goals, their conflicts, their priorities - conflicts named openly, priority order ruled."
+statement: "Goals form a system, not a list. Their conflicts and their priorities are part of it."
 ---
 
 ## Situation

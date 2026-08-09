@@ -20,6 +20,7 @@ import { basesCard } from "./baseui.ts";
 import type { CallLog, CallRecord } from "./calllog.ts";
 import { type CanvasData, type CanvasElement, loadCanvas, subLabel } from "./canvas.ts";
 import { bindings, loadCards } from "./cards.ts";
+import { editorBehaviourBlocks, editorCollectBranches, editorRenderBranches } from "./editors/index.ts";
 import type { StrayNote } from "./inbox.ts";
 import type { MachineDecl } from "./machine.ts";
 import { compileMachineCached, resolveRef } from "./machines/compile.ts";
@@ -109,7 +110,7 @@ function edgeWaypoints(a: CanvasElement, b: CanvasElement, nodes: CanvasElement[
  *  three columns said the same thing twice.
  *
  *  The NAMES live here because the code asks for them. The VALUES live in
- *  project/brand/palette.css, because a colour is configuration. */
+ *  project/deliverable/brand/palette.css, because a colour is configuration. */
 export const FEED_ROLES = ["time", "src-agent", "src-human", "kind-call", "kind-update", "kind-note", "kind-aq"] as const;
 
 /** What the voice already spent: pass, failure, attention. */
@@ -290,6 +291,7 @@ function svgStateNode(
   activeIds: Set<string>,
   doneIds: Set<string>,
   subIds: Set<string>,
+  openIds: Set<string>,
   meta: Record<string, StateMeta>,
 ): string[] {
   const parts: string[] = [];
@@ -305,10 +307,21 @@ function svgStateNode(
   const sid = stateIdOf(n);
   if (sid === undefined) return parts;
   const isSub = subIds.has(sid);
+  // TWO DIFFERENT FACTS, and conflating them threw the reader back to main
+  // (owner report 2026-08-08). A state IS a sub-machine — that is the double
+  // border, and it is true whether or not the drawing exists yet. A state can
+  // be ENTERED only when its drawing resolves; a seeded one has none until the
+  // authoring state has run.
+  //
+  // Double-clicking an unseeded one now does NOTHING, which is the honest
+  // answer. It used to navigate to a view that could not be found, and the
+  // resolver quietly served the main machine instead.
+  const canEnter = openIds.has(sid);
   const pill = (n as { styleAttributes?: { shape?: string } }).styleAttributes?.shape === "pill";
   const cls = stateClass(sid, activeIds, doneIds, meta);
   const rx = pill ? Math.min(n.width, n.height) / 2 : 14;
-  parts.push(`<g class="clickable" data-detail="state:${esc(sid)}"${isSub ? ` data-sub="${esc(sid)}"` : ""}>`);
+  const why = isSub && !canEnter ? ' data-nosub="1"' : "";
+  parts.push(`<g class="clickable" data-detail="state:${esc(sid)}"${canEnter ? ` data-sub="${esc(sid)}"` : why}>`);
   parts.push(`<rect x="${n.x}" y="${n.y}" width="${n.width}" height="${n.height}" rx="${rx}" class="${cls}"/>`);
   if (isSub) {
     // Sub-machine states carry a DOUBLE border.
@@ -430,6 +443,7 @@ function machineSvg(
   activeIds: Set<string>,
   doneIds: Set<string>,
   subIds: Set<string>,
+  openIds: Set<string>,
   meta: Record<string, StateMeta>,
   busbars: { into: string; feeders: string[] }[],
   route?: RouteMarks,
@@ -452,7 +466,7 @@ function machineSvg(
     ...svgGroups(nodes),
     ...svgEdges(canvas, byId, skip),
     ...svgBusbars(busbars, nodeOfState),
-    ...nodes.flatMap((n) => svgStateNode(n, activeIds, doneIds, subIds, meta)),
+    ...nodes.flatMap((n) => svgStateNode(n, activeIds, doneIds, subIds, openIds, meta)),
     ...svgRoute(route, nodeOfState),
   ];
   return `<svg id="machine-svg" viewBox="${minX} ${minY} ${maxX - minX} ${maxY - minY}">
@@ -637,7 +651,7 @@ function viewedMachine(m: MirrorState, view: string | undefined): { decl: Machin
 const ELEMENTS = '<script type="module" src="/vendor/vscode-elements.js"></script>';
 
 // THE PALETTE IS CONFIGURATION, NEVER CODE (owner ruling 2026-07-30). Every
-// colour the product chooses lives in project/brand/palette.css, beside the other
+// colour the product chooses lives in project/deliverable/brand/palette.css, beside the other
 // product configuration, where a person edits it without touching code. It is
 // read on EVERY render, so an edit shows on the next page load and the engine
 // never restarts for a colour.
@@ -649,16 +663,38 @@ const ELEMENTS = '<script type="module" src="/vendor/vscode-elements.js"></scrip
 // edited the real one.
 //
 // Nothing renders from this in a working install: preflight refuses to go
-// green without project/brand/palette.css, so a tree reaching here is already
+// green without project/deliverable/brand/palette.css, so a tree reaching here is already
 // known-broken and only has to stay readable enough to say so.
 const PALETTE_FALLBACK = ":root{--se-bg:#14171a;--se-fg:#d8dde2}";
 
 export function palette(root: string): string {
   try {
-    return readFileSync(join(root, "project", "brand", "palette.css"), "utf8");
+    return readFileSync(join(root, "project", "deliverable", "brand", "palette.css"), "utf8");
   } catch {
     return PALETTE_FALLBACK;
   }
+}
+
+/** THE LOOK FILES — configuration, not code (owner ruling 2026-08-07). Read on
+ *  every render, so an edit shows on the next paint and nothing restarts.
+ *
+ *  WHY A CSS FILE AND NOT A CONFIG FORMAT: the values ARE css. The drawing
+ *  reads them back with getComputedStyle, so one file drives both what the
+ *  browser paints and what the client script computes. A json file would have
+ *  needed a second road into the page and a second name for every value.
+ *
+ *  A MISSING FILE IS NOT AN ERROR. Every value it sets has a default in the
+ *  stylesheet it overrides, so the drawing stands without it. */
+const LOOK_FILES = ["palette.css", "trace.css"];
+
+export function look(root: string): string {
+  return LOOK_FILES.map((f) => {
+    try {
+      return readFileSync(join(root, "project", "deliverable", "brand", f), "utf8");
+    } catch {
+      return f === "palette.css" ? PALETTE_FALLBACK : "";
+    }
+  }).join("\n");
 }
 
 const STYLE = `
@@ -743,6 +779,17 @@ const STYLE = `
   .sfrow input:focus { background: var(--se-hover); border-radius: 3px; }
   .sfrow select { flex: 0 0 auto; background: var(--se-bg); color: var(--se-fg); border: 1px solid var(--se-border); border-radius: 3px; font: inherit; font-size: 12.5px; padding: 3px 4px; }
   .sfrow .sfitem { flex: 0 0 44%; font-size: 12.5px; color: var(--se-muted); }
+  /* THE NODE TABLE draws its structure on the ELEMENTS (ux.md), because a
+     stylesheet only aligns what it reaches. What is left here is cosmetic:
+     nothing below decides where anything sits. */
+  .sfnodetable { border: 1px solid var(--se-border); border-radius: 4px; margin: 4px 0; }
+  .sfnodetable a.reflink:hover { text-decoration: underline; }
+  .sfnodetable td:focus-within { background: var(--se-hover); }
+  /* A CLOSED PICK IS A NATIVE SELECT, and a native select paints its own
+     dropdown from the OS. Without these two the list is a white sheet in a
+     dark panel — the theme reaches the control but not the popup. */
+  select.sfpick option { background: var(--se-bg); color: var(--se-fg); }
+  select.sfpick option:disabled { color: var(--se-muted); font-style: italic; }
   .sfrow .sfrowadd, .sfrow .sfrowdel { flex: 0 0 auto; background: none; border: 1px solid var(--se-border); color: var(--se-muted); border-radius: 3px; cursor: pointer; font-size: 11px; line-height: 16px; padding: 0 5px; }
   .sfrow .sfrowadd:hover, .sfrow .sfrowdel:hover { color: var(--se-accent); border-color: var(--se-accent); }
   /* The thumbs wear their meaning: green opens, red refuses. */
@@ -800,6 +847,20 @@ const STYLE = `
   /* THE BLUE LINE. Blue on purpose: the voice reserves green, red and
      yellow for verdicts, and a route is not a verdict. It is a way. */
   .route-line { fill: none; stroke: var(--se-walk); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+  /* PAST A BRANCHING POINT THE LINE MEANS TWO DIFFERENT THINGS (owner design
+     2026-08-07), and drawing them the same was a lie.
+
+     AND — every leg must be walked, so every leg is drawn SOLID. The route
+     does not choose between them; it owes all of them.
+
+     OR — one leg is the answer, so the legs behind the decision are DASHED.
+     A dashed line reads as a way that exists and was not taken, which is
+     exactly what it is. */
+  .route-line.leg-or { stroke-dasharray: 10 8; }
+  /* The branching point itself is marked, so a reader can see WHERE the way
+     divides rather than inferring it from the lines. */
+  .route-branch { fill: var(--se-bg); stroke: var(--se-walk); stroke-width: 3; }
+  .route-branch-mark { fill: var(--se-walk); font: 700 13px system-ui, sans-serif; text-anchor: middle; dominant-baseline: central; }
   /* Past a closure the way is FADED, never hidden: it exists, it is shut.
      The barrier itself is yellow, because yellow is attention and a shut
      road wants the reader's hand on the slider. */
@@ -1086,6 +1147,221 @@ document.addEventListener("click", (ev) => {
   const mc = ev.target.closest ? ev.target.closest("#modal-close") : null;
   if (mc) closeModal();
 });
+// THE MATRIX PAGES ITSELF, with no round trip. Every cell is already in the
+// DOM, so a page turn is a display toggle and nothing typed can be lost by it.
+function dsmApply(w) {
+  const size = Number(w.getAttribute("data-size")) || 10;
+  const n = Number(w.getAttribute("data-n")) || 0;
+  const last = Math.max(0, Math.ceil(n / size) - 1);
+  const g = Number(w.getAttribute("data-g")) || 0;
+  const glast = Math.max(0, Math.ceil(g / size) - 1);
+  const rp = Math.min(last, Math.max(0, Number(w.getAttribute("data-rp")) || 0));
+  const cp = Math.min(last, Math.max(0, Number(w.getAttribute("data-cp")) || 0));
+  const gp = Math.min(glast, Math.max(0, Number(w.getAttribute("data-gp")) || 0));
+  w.setAttribute("data-rp", String(rp));
+  w.setAttribute("data-cp", String(cp));
+  w.setAttribute("data-gp", String(gp));
+  // THE CLUSTER LIST PAGES TOO, at the same size, so the panel beside the
+  // matrix never runs taller than the matrix itself.
+  w.querySelectorAll(".dsmg").forEach((tr) => {
+    const k = Number(tr.getAttribute("data-g"));
+    tr.style.display = k >= gp * size && k < (gp + 1) * size ? "" : "none";
+  });
+  w.querySelectorAll(".dsmr").forEach((tr) => {
+    const r = Number(tr.getAttribute("data-r"));
+    tr.style.display = r >= rp * size && r < (rp + 1) * size ? "" : "none";
+  });
+  w.querySelectorAll(".dsmc").forEach((td) => {
+    const c = Number(td.getAttribute("data-c"));
+    td.style.display = c >= cp * size && c < (cp + 1) * size ? "" : "none";
+  });
+  w.querySelectorAll(".dsmat").forEach((s) => {
+    const kind = s.getAttribute("data-kind");
+    const p = kind === "r" ? rp : kind === "g" ? gp : cp;
+    const total = kind === "g" ? g : n;
+    s.textContent = String(total === 0 ? 0 : p * size + 1) + "-" + String(Math.min(total, (p + 1) * size)) + " of " + total;
+  });
+}
+// ROWS AND COLUMNS PAGE INDEPENDENTLY, because a square window hides exactly
+// the off-diagonal marks that say two distant elements are coupled.
+document.addEventListener("click", (ev) => {
+  const t = ev.target;
+  if (!t || !t.closest) return;
+  const pg = t.closest(".dsmpg");
+  if (pg) {
+    const w = pg.closest(".dsmwrap");
+    const kind = pg.getAttribute("data-kind");
+    const key = kind === "r" ? "data-rp" : kind === "g" ? "data-gp" : "data-cp";
+    w.setAttribute(key, String((Number(w.getAttribute(key)) || 0) + Number(pg.getAttribute("data-step"))));
+    dsmApply(w);
+    return;
+  }
+  // CLICKING A CLUSTER CENTRES IT ON BOTH AXES. On a register-sized matrix,
+  // finding a group by paging is the slow way to look at it.
+  const go = t.closest(".dsmgo");
+  if (go) {
+    const w = go.closest(".dsmwrap");
+    const size = Number(w.getAttribute("data-size")) || 10;
+    const page = String(Math.max(0, Math.floor(Number(go.getAttribute("data-at")) / size)));
+    w.setAttribute("data-rp", page);
+    w.setAttribute("data-cp", page);
+    dsmApply(w);
+  }
+});
+document.addEventListener("change", (ev) => {
+  const t = ev.target;
+  if (!t || !t.closest) return;
+  const s = t.closest(".dsmsize");
+  if (s) {
+    const w = s.closest(".dsmwrap");
+    w.setAttribute("data-size", s.value);
+    dsmApply(w);
+    return;
+  }
+  // MOVING A FUNCTION REPAINTS ITS CLUSTER COLUMN AT ONCE. Waiting for a
+  // save to see where a row went makes the matrix unusable for the one thing
+  // it is for, which is trying groupings out.
+  const p = t.closest(".dsmdsel");
+  if (p) {
+    const row = p.closest(".dsmr");
+    const cell = row ? row.querySelector(".dsmcl") : null;
+    if (cell) cell.textContent = p.value === "" ? "-" : p.value;
+    dsmBoxes(p.closest(".dsmwrap"));
+  }
+});
+/** THE BOXES ARE REDRAWN FROM THE LIVE PICKERS, never left as the server drew
+ *  them. Server-drawn borders are a picture of the assignment as it WAS, so
+ *  moving two functions into one cluster left the boxes where they were. */
+function dsmBoxes(w) {
+  const cls = [];
+  w.querySelectorAll(".dsmr").forEach((tr) => {
+    const sel = tr.querySelector(".dsmdsel");
+    cls[Number(tr.getAttribute("data-r"))] = sel ? sel.value : "";
+  });
+  const n = cls.length;
+  const grid = "1px solid var(--se-border)";
+  const edge = "2px solid var(--se-accent)";
+  w.querySelectorAll(".dsmr").forEach((tr) => {
+    const i = Number(tr.getAttribute("data-r"));
+    tr.querySelectorAll(".dsmc").forEach((td) => {
+      const j = Number(td.getAttribute("data-c"));
+      // BACK TO THE GRID FIRST. Clearing to empty would drop the cell's own
+      // ruling too, and the matrix would lose its lines wherever a box moved.
+      td.style.borderTop = grid;
+      td.style.borderBottom = grid;
+      td.style.borderLeft = grid;
+      td.style.borderRight = grid;
+      const c = cls[i] || "";
+      if (c === "" || c !== (cls[j] || "")) return;
+      if (i === 0 || (cls[i - 1] || "") !== c) td.style.borderTop = edge;
+      if (i === n - 1 || (cls[i + 1] || "") !== c) td.style.borderBottom = edge;
+      if (j === 0 || (cls[j - 1] || "") !== c) td.style.borderLeft = edge;
+      if (j === n - 1 || (cls[j + 1] || "") !== c) td.style.borderRight = edge;
+    });
+  });
+}
+/** SORT PERMUTES BOTH AXES. A DSM whose rows and columns disagree is not a
+ *  DSM — the diagonal stops being the diagonal and every box lands on the
+ *  wrong pair. Reordering rows alone corrupts the picture silently. */
+function dsmSort(w) {
+  const table = w.querySelector("table");
+  const rows = [...w.querySelectorAll(".dsmr")];
+  const keyOf = (r) => {
+    const sel = r.querySelector(".dsmdsel");
+    const v = sel ? sel.value : "";
+    return (v === "" ? "zzzz" : v) + "|" + String(r.getAttribute("data-r")).padStart(4, "0");
+  };
+  rows.sort((a, b) => (keyOf(a) < keyOf(b) ? -1 : 1));
+  const perm = rows.map((r) => Number(r.getAttribute("data-r")));
+  const move = (host) => {
+    const byOld = {};
+    host.querySelectorAll(".dsmc").forEach((c) => { byOld[c.getAttribute("data-c")] = c; });
+    perm.forEach((old, k) => {
+      const c = byOld[String(old)];
+      if (!c) return;
+      c.setAttribute("data-c", String(k));
+      host.appendChild(c);
+    });
+  };
+  const head = table.querySelector("tr");
+  if (head) move(head);
+  rows.forEach((r, i) => {
+    r.setAttribute("data-r", String(i));
+    move(r);
+    const num = r.querySelector(".dsmn");
+    if (num) num.textContent = String(i + 1);
+    table.appendChild(r);
+  });
+  dsmApply(w);
+  dsmBoxes(w);
+}
+/** THE NEXT FREE LABEL, zero-padded so the list keeps sorting as numbers. */
+function dsmNextLabel(w) {
+  let n = 0;
+  w.querySelectorAll(".dsmg").forEach((tr) => {
+    const v = String(tr.getAttribute("data-c") || "").replace("c", "");
+    if (Number(v) > n) n = Number(v);
+  });
+  return "c" + String(n + 1).padStart(2, "0");
+}
+document.addEventListener("click", (ev) => {
+  const t = ev.target;
+  if (!t || !t.closest) return;
+  const add = t.closest(".dsmadd");
+  if (add) {
+    const w = add.closest(".dsmwrap");
+    const c = dsmNextLabel(w);
+    const tb = add.closest("table");
+    const proto = w.querySelector(".dsmg");
+    if (proto) {
+      const row = proto.cloneNode(true);
+      row.setAttribute("data-c", c);
+      row.setAttribute("data-g", String(w.querySelectorAll(".dsmg").length));
+      row.querySelectorAll("[data-item]").forEach((el) => { el.setAttribute("data-item", c); if (el.tagName === "INPUT") el.value = ""; else el.selectedIndex = 0; });
+      const jump = row.querySelector(".dsmgo");
+      if (jump) jump.textContent = c;
+      const del = row.querySelector(".dsmdel");
+      if (del) del.setAttribute("data-c", c);
+      tb.appendChild(row);
+    }
+    // EVERY ROW PICKER GAINS THE OPTION, or the new cluster is one nobody
+    // could put anything into.
+    w.querySelectorAll(".dsmdsel").forEach((sel) => {
+      const o = document.createElement("option");
+      o.value = c;
+      o.textContent = c;
+      sel.appendChild(o);
+    });
+    w.setAttribute("data-g", String(w.querySelectorAll(".dsmg").length));
+    dsmApply(w);
+    dsmBoxes(w);
+    return;
+  }
+  // REMOVING A CLUSTER UNCLUSTERS ITS FUNCTIONS. They are not deleted and not
+  // moved somewhere arbitrary — they go back to unplaced, which is the honest
+  // state for a function whose group just stopped existing.
+  const del = t.closest(".dsmdel");
+  if (del) {
+    const w = del.closest(".dsmwrap");
+    const c = del.getAttribute("data-c");
+    w.querySelectorAll(".dsmdsel").forEach((sel) => {
+      if (sel.value === c) { sel.value = ""; const row = sel.closest(".dsmr"); const cell = row ? row.querySelector(".dsmcl") : null; if (cell) cell.textContent = "-"; }
+      sel.querySelectorAll("option").forEach((o) => { if (o.value === c) o.remove(); });
+    });
+    const row = del.closest(".dsmg");
+    if (row) row.remove();
+    w.querySelectorAll(".dsmg").forEach((r, i) => { r.setAttribute("data-g", String(i)); });
+    w.setAttribute("data-g", String(w.querySelectorAll(".dsmg").length));
+    dsmApply(w);
+    dsmBoxes(w);
+    return;
+  }
+  // SORT REORDERS BY THE CURRENT ASSIGNMENT, putting the blocks back on the
+  // diagonal after a hand move. It does not re-run the search — that would
+  // overwrite the decision the move just made.
+  const so = t.closest(".dsmsort");
+  if (so) dsmSort(so.closest(".dsmwrap"));
+});
 // THE PARITY LAW — a state's human-callable tools as links; the modal
 // takes the arguments and shows the result in place.
 const HUMAN_TOOLS = {
@@ -1144,10 +1420,19 @@ document.addEventListener("click", async (ev) => {
     return;
   }
 });
-let CURRENT = (D.describe.active && D.describe.active[0]) ? D.describe.active[0].split("/").pop() : null;
+// THE WALK STANDS IN SEVERAL STATES AT ONCE, and has since the first fan
+// shipped (owner ruling 2026-08-08). The active field is a LIST, so every
+// standing-here test reads the WHOLE list. standingAt() below is the one way
+// to ask, and reading the first entry would highlight one leg of a fan and
+// look completely normal doing it.
+let CURRENTS = (D.describe.active || []).map(function (a) { return a.split("/").pop(); });
+// The details panel opens on ONE state, because a panel shows one thing.
+// That is a default, never a claim that the other legs are not standing.
+let CURRENT = CURRENTS.length > 0 ? CURRENTS[0] : null;
+function standingAt(id) { return WALK_HERE && CURRENTS.indexOf(id) >= 0; }
 let WALK_HERE = D.viewingWalk;
 function nextTable(id, s) {
-  const here = WALK_HERE && id === CURRENT;
+  const here = standingAt(id);
   // THE NEW WAY (owner ruling 2026-07-30): the host's own elements, the same
   // ones the facts and the pull already use. A bordered table nested inside
   // another bordered table was the last of the old rendering left in here.
@@ -1269,7 +1554,7 @@ function stateDetail(id) {
   if (s.next && s.next.length > 0) {
     html += '<div class="meta" style="padding:8px 0 4px">next</div>' + nextTable(id, s);
   }
-  if (WALK_HERE && id === CURRENT && s.kind === "end" && (!s.next || s.next.length === 0) && D.describe.breadcrumb.length > 1) {
+  if (standingAt(id) && s.kind === "end" && (!s.next || s.next.length === 0) && D.describe.breadcrumb.length > 1) {
     const parent = D.describe.breadcrumb[0];
     html += '<div class="meta" style="padding:8px 0 4px">next</div>' +
       '<div class="nextitem open"><div class="nexthead"><span class="nextto">return to ' + escText(parent) + "</span></div></div>";
@@ -1316,7 +1601,8 @@ function morph(from, to) {
 function rebind() {
   const blob = document.getElementById("se-data");
   if (blob) D = JSON.parse(blob.textContent);
-  CURRENT = (D.describe.active && D.describe.active[0]) ? D.describe.active[0].split("/").pop() : null;
+  CURRENTS = (D.describe.active || []).map(function (a) { return a.split("/").pop(); });
+  CURRENT = CURRENTS.length > 0 ? CURRENTS[0] : null;
   WALK_HERE = D.viewingWalk;
   // Without this the next poll compares against the OLD position forever.
   ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
@@ -1598,7 +1884,7 @@ function condRows(id, dict, standing) {
 }
 function condDetail(id) {
   const s = D.states[id] ?? {};
-  const standing = WALK_HERE && id === CURRENT;
+  const standing = standingAt(id);
   let html = "";
   if (s.exit) html += '<div class="meta" style="padding:4px 0">exit</div>' + condRows(id, s.exit, standing);
   if (s.entry) html += '<div class="meta" style="padding:4px 0">entry</div>' + condRows(id, s.entry, standing);
@@ -1623,6 +1909,42 @@ function presentForm(name, into, title, html, machine) {
 // THE STATE FORM'S SHEET (owner rulings 2026-08-04): boxes from the A3
 // shape, fields with their template chips, the existing save/confirm/done
 // buttons, plus the portable copy's export and ingest.
+// A [[LINK]] IS A LINK, NOT A SPELLING. Escaped prose with double brackets
+// left in it teaches the reader a filename and makes them go find it, which
+// is exactly the work a pointer exists to save.
+//
+// UNRESOLVED STAYS PLAIN. A name with no path is written without brackets
+// rather than as a dead link, because a link that does nothing is worse than
+// a word: it invites a click and spends it.
+// NO REGEX HERE, and the first cut of this function is why. It was written
+// as a split on /([[[^]]+]])/ and ARRIVED at the page as /([[[^]]+]])/ —
+// every backslash eaten in transit, leaving a matcher that matches nothing.
+// The brackets rendered literally and no link ever appeared.
+//
+// The warning was already in this file, twenty lines down, from the last time
+// it happened. Two string searches cannot be eaten.
+function wikiText(text, paths) {
+  const s = String(text || "");
+  let out = "";
+  let i = 0;
+  while (i < s.length) {
+    const open = s.indexOf("[[", i);
+    const close = open < 0 ? -1 : s.indexOf("]]", open);
+    if (open < 0 || close < 0) {
+      out += escText(s.slice(i));
+      break;
+    }
+    out += escText(s.slice(i, open));
+    const id = s.slice(open + 2, close).trim();
+    const p = paths[id];
+    out += p
+      ? '<a class="reflink" style="color:var(--se-accent);cursor:pointer;font-style:normal;" data-path="' + escText(p) + '" title="open ' + escText(p) + ' in the editor">' + escText(id) + "</a>"
+      : escText(id);
+    i = close + 2;
+  }
+  return out;
+}
+
 function sfOne(f, fl) {
   const name = f.form;
   const tpl = (f.field_templates || {})[fl.name] || "free-form";
@@ -1638,19 +1960,19 @@ function sfOne(f, fl) {
     : (hint.of ? " · of: " + escText(hint.of) : "");
   s += '<span style="float:right;font-size:11.5px;color:var(--se-accent)">template: ' + escText(tpl) + ofChip + "</span>";
   s += "<b>" + escText(fl.name) + "</b>" + (fl.required ? ' <span style="color:var(--se-fail);font-size:11px">required</span>' : ' <span class="meta">optional</span>');
-  if (fl.guidance) s += '<div class="meta" style="font-style:italic">' + escText(fl.guidance) + "</div>";
+  if (fl.guidance) s += '<div class="meta" style="font-style:italic">' + wikiText(fl.guidance, f.ref_paths || {}) + "</div>";
   // Free text carries its ask as the PLACEHOLDER; the structured editors
   // keep the description above, because their rows replace the empty box.
   // The FIELD's ask comes first, then the TEMPLATE's mechanics — written
   // once in the template and expanded for this field's type.
   if ((tm.editor || "text") !== "text") {
-    s += '<div class="meta">' + escText(fl.description || "") + "</div>";
-    if (hint.description) s += '<div class="meta">' + escText(hint.description) + "</div>";
+    s += '<div class="meta">' + wikiText(fl.description || "", f.ref_paths || {}) + "</div>";
+    if (hint.description) s += '<div class="meta">' + wikiText(hint.description, f.ref_paths || {}) + "</div>";
   }
   (fl.prefills || []).forEach(function (p, i) {
     s += '<div class="prefill"><div class="comment-text">prefill — unconfirmed:</div><div>' + escText(p) + '</div><button class="primary confirmpre" data-form="' + name + '" data-machine="' + escText(f.machine || "") + '" data-field="' + escText(fl.name) + '" data-index="' + i + '">confirm</button></div>';
   });
-  s += sfEditor(fl, tm, args, f.ref_paths || {}, hint) + "</div>";
+  s += sfEditor(fl, tm, args, f.ref_paths || {}, hint, f.ref_facts || {}) + "</div>";
   return s;
 }
 // THE EDITOR IS THE TEMPLATE'S SHAPE (owner ruling 2026-08-04): a list
@@ -1660,46 +1982,12 @@ function sfOne(f, fl) {
 function sfDash(c) {
   return (c || "").split("\\n").map(function (l) { return l.trim(); }).filter(function (l) { return l.indexOf("- ") === 0; }).map(function (l) { return l.slice(2); });
 }
-function sfEditor(fl, tm, args, paths, hint) {
+function sfEditor(fl, tm, args, paths, hint, facts) {
   const name = escText(fl.name);
   const ph = escText((hint && hint.placeholder) || "");
-  if (tm.editor === "list") {
-    // A REFERENCE IS AN ADDRESS, so it opens. Reading a reference list meant
-    // reading ids and then going to find the files they name by hand, which
-    // is exactly the work the reference was supposed to save.
-    // The SAME reduction the engine does: a path, a file name, an id or a
-    // wiki link all name one node, so all four get their open link.
-    const refId = function (v) {
-      const bare = String(v || "").trim().replace(/^\\[\\[/, "").replace(/\\]\\]$/, "").trim();
-      const target = (bare.split("|")[0] || "").trim();
-      const last = target.replace(/\\\\/g, "/").split("/").filter(Boolean).pop() || "";
-      return last.replace(/\\.md$/i, "").trim();
-    };
-    const link = function (v) {
-      const p = tm.resolves === "artifact" && paths ? paths[refId(v)] : null;
-      return p ? '<a class="reflink" data-path="' + escText(p) + '" title="open ' + escText(p) + ' in the editor">open</a>' : "";
-    };
-    return '<div class="sfrows">' + sfDash(fl.content).concat([""]).map(function (v) { return '<div class="sfrow"><input class="sfli" data-field="' + name + '" placeholder="' + ph + '" value="' + escText(v) + '">' + link(v) + sfRowBtns() + "</div>"; }).join("") + "</div>";
-  }
-  if (tm.editor === "per-item" && (args.items || []).length > 0) {
-    return '<div class="sfrows">' + args.items.map(function (it) {
-      const pref = "- " + it + ":";
-      const hit = (fl.content || "").split("\\n").map(function (l) { return l.trim(); }).filter(function (l) { return l.indexOf(pref) === 0; })[0];
-      const ans = hit ? hit.slice(pref.length).trim() : "";
-      return '<div class="sfrow"><span class="sfitem">' + escText(it) + '</span><input class="sfpi" data-field="' + name + '" data-item="' + escText(it) + '" placeholder="' + ph + '" value="' + escText(ans) + '"></div>';
-    }).join("") + "</div>";
-  }
-  if (tm.editor === "choice-rationale") {
-    const first = ((fl.content || "").split("\\n")[0] || "").trim();
-    const sep = first.indexOf(" — ");
-    const chosen = sep < 0 ? first : first.slice(0, sep).trim();
-    const rat = sep < 0 ? "" : first.slice(sep + 3).trim();
-    return '<div class="sfrows"><div class="sfrow"><select class="sfsel" data-field="' + name + '"><option value=""></option>' + (args.options || []).map(function (o) { return "<option" + (o === chosen ? " selected" : "") + ">" + escText(o) + "</option>"; }).join("") + '</select><input class="sfrat" data-field="' + name + '" placeholder="rationale — why this option" value="' + escText(rat) + '"></div></div>';
-  }
-  if (tm.editor === "findings") {
-    const pairs = sfDash(fl.content).filter(function (l) { return l.indexOf(" => ") >= 0; }).map(function (l) { const i = l.indexOf(" => "); return { f: l.slice(0, i), a: l.slice(i + 4) }; });
-    return '<div class="sfrows">' + pairs.concat([{ f: "", a: "" }]).map(function (p) { return '<div class="sfrow"><input class="sfff" data-field="' + name + '" placeholder="finding" value="' + escText(p.f) + '"><span class="meta">=&gt;</span><input class="sffa" data-field="' + name + '" placeholder="answer — fix, rebuttal, or accepted risk" value="' + escText(p.a) + '">' + sfRowBtns() + "</div>"; }).join("") + "</div>";
-  }
+${editorRenderBranches()}
+  // FREE TEXT IS THE FALLBACK, and an editor that falls through on purpose
+  // lands here — per-item with no items, for one.
   return '<textarea class="formfield" data-field="' + name + '" placeholder="' + escText(fl.description || "") + '">' + escText(fl.content || "") + "</textarea>";
 }
 function sfRowBtns() {
@@ -1874,24 +2162,21 @@ async function formPost(path, body) {
 function sfCollect() {
   const fields = {};
   document.querySelectorAll(".formfield").forEach(function (t) { fields[t.dataset.field] = t.value; });
+  // TWO ACCUMULATORS THE EDITORS SHARE. push appends one markdown line to a
+  // field; acc is drained into fields at the end, so an editor that emits
+  // lines never has to know how many other editors did too.
+  // NO BACKTICKS ANYWHERE IN HERE. This whole block is one template literal.
   const acc = {};
   const push = function (n, line) { (acc[n] = acc[n] || []).push(line); };
-  document.querySelectorAll(".sfli").forEach(function (t) { if (t.value.trim() !== "") push(t.dataset.field, "- " + t.value.trim()); });
-  document.querySelectorAll(".sfpi").forEach(function (t) { if (t.value.trim() !== "") push(t.dataset.field, "- " + t.dataset.item + ": " + t.value.trim()); });
-  document.querySelectorAll(".sfff").forEach(function (t) {
-    const row = t.parentElement;
-    const a = row ? row.querySelector(".sffa") : null;
-    const av = a ? a.value.trim() : "";
-    if (t.value.trim() !== "" || av !== "") push(t.dataset.field, "- " + t.value.trim() + " => " + av);
-  });
+${editorCollectBranches()}
   Object.keys(acc).forEach(function (n) { fields[n] = acc[n].join("\\n"); });
-  document.querySelectorAll(".sfsel").forEach(function (s) {
-    const r = document.querySelector('.sfrat[data-field="' + s.dataset.field + '"]');
-    const rv = r ? r.value.trim() : "";
-    fields[s.dataset.field] = (s.value + (rv !== "" ? " — " + rv : "")).trim();
-  });
   return fields;
 }
+// THE EDITORS THAT NEED REAL INTERACTION WIRE THEMSELVES HERE, once, from
+// their own files. An editor whose markup lives in one place and whose
+// behaviour lives four hundred lines away is the defect engine/editors/ was
+// made to fix, and the morph box would have reintroduced it.
+${editorBehaviourBlocks()}
 document.addEventListener("click", async (ev) => {
   const of = ev.target.closest ? ev.target.closest(".openform") : null;
   if (of) { void showForm(of.dataset.form); return; }
@@ -1928,6 +2213,9 @@ document.addEventListener("click", async (ev) => {
     const row = ra.closest(".sfrow");
     const clone = row.cloneNode(true);
     clone.querySelectorAll("input").forEach(function (i) { i.value = ""; });
+    // A CLONED CHOOSER CARRIES THE SELECTION WITH IT. Cleared here, or the
+    // new row arrives pre-answered with whatever the row above said.
+    clone.querySelectorAll("select").forEach(function (s) { s.selectedIndex = 0; });
     row.after(clone);
     const first = clone.querySelector("input");
     if (first) first.focus();
@@ -2012,12 +2300,17 @@ function detailFor(key) {
   return [key, jsonTable({})];
 }
 document.addEventListener("click", async (ev) => {
-  const cs = ev.target.closest ? ev.target.closest("#cur-state") : null;
+  const cs = ev.target.closest ? ev.target.closest(".cur-state") : null;
   if (cs) {
     // The quick way home: jump the view to the walk's machine, whole
     // drawing visible (the saved pan is dropped so the state shows).
     sessionStorage.removeItem("se-vb-" + cs.dataset.machine);
-    navigateTo("/?view=" + encodeURIComponent(cs.dataset.machine), "loading " + cs.dataset.machine);
+    // The clicked button names WHICH state, so the details open on that one
+    // rather than on whichever leg the default would have picked.
+    navigateTo(
+      "/?view=" + encodeURIComponent(cs.dataset.machine) + "&detail=" + encodeURIComponent("state:" + cs.dataset.state),
+      "loading " + cs.dataset.machine,
+    );
     return;
   }
 });
@@ -3090,7 +3383,14 @@ function drawingSets(
   decl: MachineDecl,
   info: { active: string[] },
   viewingWalk: boolean,
-): { leafActive: Set<string>; done: Set<string>; paint: Set<string>; subIds: Set<string>; meta: Record<string, StateMeta> } {
+): {
+  leafActive: Set<string>;
+  done: Set<string>;
+  paint: Set<string>;
+  subIds: Set<string>;
+  openIds: Set<string>;
+  meta: Record<string, StateMeta>;
+} {
   const leafActive = viewingWalk ? new Set(info.active.map((a) => a.split("/").pop()!)) : new Set<string>();
   if (!viewingWalk && decl.id === m.session.machine.id) {
     // Viewing main while the walk is inside a sub: the sub state is the live one.
@@ -3112,40 +3412,12 @@ function drawingSets(
   // every look rather than only when a pin is rewritten. It costs one hash
   // of the matrix (~3ms) against a render measured in hundreds. A view
   // never writes — the reopen is the walk's, in Session.driftReopen.
-  // GREEN PROPAGATES DOWNWARD (owner ruling 2026-08-06). A state resting on
-  // an input that is not green is NOT GREEN, however complete its own form
-  // is — its claim was earned over something that no longer stands.
-  //
-  // The panel used to paint each state from its own fields alone. Adding one
-  // required field to gate-kickoff un-signed it and left every state below it
-  // green, so the picture said the work held when it did not.
-  //
-  // A FIXPOINT, not one pass: un-greening a state un-greens its own
-  // dependants, and that runs all the way down.
-  const INPUT_ROLES = new Set(["normal", "approval"]);
-  const inputsOf = new Map<string, string[]>();
-  for (const s of decl.states) {
-    if (s.evidence_form.length === 0) continue;
-    for (const e of s.edges) {
-      if (!INPUT_ROLES.has(e.role ?? "normal")) continue;
-      inputsOf.set(e.to, [...(inputsOf.get(e.to) ?? []), s.id]);
-    }
-  }
-  const prune = (set: Set<string>): void => {
-    for (let moved = true; moved; ) {
-      moved = false;
-      for (const id of [...set]) {
-        if ((inputsOf.get(id) ?? []).every((p) => set.has(p))) continue;
-        set.delete(id);
-        moved = true;
-      }
-    }
-  };
-  prune(paint);
-  prune(done);
-
   const suspect = new Set(m.session.suspectStates(decl));
   const subIds = new Set(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id));
+  // WHICH OF THEM CAN ACTUALLY BE OPENED. A seeded sub-machine has no drawing
+  // until its authoring state has run, and asking the resolver is the only way
+  // to know — the declaration alone says nothing about whether it exists.
+  const openIds = new Set([...subIds].filter((id) => m.session.viewFor(id) !== undefined));
   const meta: Record<string, StateMeta> = {};
   for (const s of decl.states) {
     meta[s.id] = {
@@ -3159,7 +3431,7 @@ function drawingSets(
       ...(s.statement !== "" && s.statement !== s.id ? { subtitle: s.statement } : {}),
     };
   }
-  return { leafActive, done, paint, subIds, meta };
+  return { leafActive, done, paint, subIds, openIds, meta };
 }
 
 // THE ROUTE, PROJECTED ONTO THIS DRAWING. A broken or unreachable target
@@ -3224,6 +3496,8 @@ export function renderMirror(
   traceTypes?: string,
   traceFind?: string,
   traceCorpus?: string,
+  /** WHICH NODE IS THE CENTRE. Empty means the vision. */
+  traceOrigin?: string,
 ): string {
   const skin = embed === true ? NATIVE : "";
   const bodyClass = embed === true ? ` class="embed${widget === undefined ? "" : " solo"}"` : "";
@@ -3235,7 +3509,7 @@ export function renderMirror(
   const { decl, canvas } = viewedMachine(m, view ?? walkMachine.id);
   const viewingWalk = decl.id === walkMachine.id;
   const history = m.session.instance.history ?? [];
-  const { leafActive, done, paint, subIds, meta } = drawingSets(m, decl, info, viewingWalk);
+  const { leafActive, done, paint, subIds, openIds, meta } = drawingSets(m, decl, info, viewingWalk);
   const marks = routeMarksFor(m, decl);
   // EVERY STATE COLLECTS ALL ITS INPUTS (owner ruling 2026-08-06), so every
   // multi-feeder state draws as a busbar — not only the gates.
@@ -3260,7 +3534,7 @@ export function renderMirror(
       feeders: decl.states.filter((p) => p.edges.some((e) => e.to === g.id && INPUT_ROLES.has(e.role ?? "normal"))).map((p) => p.id),
     }))
     .filter((b) => b.feeders.length >= 2);
-  const svg = machineSvg(canvas, leafActive, paint, subIds, meta, busbars, marks);
+  const svg = machineSvg(canvas, leafActive, paint, subIds, openIds, meta, busbars, marks);
   const crumbs = crumbsFor(m, decl);
 
   // ONE LIST FOR THE WHOLE RENDER. expeditionList() spawns git per record
@@ -3324,11 +3598,18 @@ export function renderMirror(
   const escapeBtn = `<button class="ghost" id="escape-btn"${canEscape ? "" : " disabled"} title="${canEscape ? "escape to idle — the machine is left standing, the reason is recorded" : "nothing to escape — the walk is not inside a sub-machine"}">⤴ escape</button>`;
   // The way home when the view holds still elsewhere: the header names
   // the walk's position; clicking it jumps the view there.
-  const curLeaf = info.active[0] ?? "";
-  const curBtn =
-    curLeaf === ""
-      ? ""
-      : `<button class="ghost" id="cur-state" data-machine="${esc(walkMachine.id)}" title="the walk stands here — click: jump the view to it">☉ ${esc(curLeaf)}</button>`;
+  //
+  // ONE BUTTON PER STANDING STATE (owner ruling 2026-08-08). A fan puts the
+  // walk in several states at once, and naming the first of them would read
+  // exactly like standing in one. Five buttons is what five legs looks like.
+  const curBtn = info.active
+    .map((qualified) => qualified.split("/").pop() ?? "")
+    .filter((leaf) => leaf !== "")
+    .map(
+      (leaf) =>
+        `<button class="ghost cur-state" data-machine="${esc(walkMachine.id)}" data-state="${esc(leaf)}" title="the walk stands here — click: jump the view to it">☉ ${esc(leaf)}</button>`,
+    )
+    .join("");
   const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span class="head-controls" style="display:flex;align-items:center;gap:10px">${curBtn}<span class="head-sliders" style="display:flex;align-items:center;gap:10px">${slider}${nrBar}</span>${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:var(--se-fail)">machine closed</div>' : ""}
@@ -3397,9 +3678,10 @@ export function renderMirror(
       m.root,
       corpora.map((c) => ({ id: c.id, label: c.label })),
       pick?.id ?? "trunk",
+      traceOrigin ?? "",
     );
-  // Read per render, so editing palette.css needs no restart.
-  const pal = palette(m.root);
+  // Read per render, so editing the look files needs no restart.
+  const pal = look(m.root);
 
   if (widget === "trace") {
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · trace</title><style>${pal}${STYLE}${TRACE_STYLE} #w-trace{flex:1;border-bottom:0;min-height:0} body.solo #sidebar{display:flex;flex-direction:column;height:100vh}${skin}</style>${ELEMENTS}</head>
@@ -3440,7 +3722,7 @@ export function renderMirror(
 }
 
 // THE CARD MATRIX (owner design 2026-07-29). The card list and its ORDER are
-// the product's, in project/views/cards.md — v3 exists to work on other products,
+// the product's, in project/deliverable/views/cards.md — v3 exists to work on other products,
 // and another product wants other cards.
 // EMBEDDED, the console card leaves (owner ruling 2026-07-30): the host's
 // integrated terminal is where the agent lives, and a second picture of it

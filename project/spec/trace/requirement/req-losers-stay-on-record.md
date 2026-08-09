@@ -11,4 +11,6 @@ source_refs:
   - uc-diverge-before-deciding step 6
   - ".se/req-mine-sebots.md: rejections need memory"
 priority: should
+weighs_against:
+  - req-choosing-none-is-legal >
 ---

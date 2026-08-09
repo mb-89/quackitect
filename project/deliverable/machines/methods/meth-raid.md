@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "The RAID register: risks, assumptions, issues and dependencies, each a node, each owned, each carrying the trigger that brings it back."
+statement: "One register holds the risks and the assumptions. It holds the issues and the dependencies too."
 ---
 
 ## Situation
@@ -60,8 +60,6 @@ A CREDIBLE DECISION FLIP IS A RISK with its fallback recorded
 - M3 identify-assumptions adds the assumptions the requirements lean on.
 - M5 reverse-sensitivity adds a tripwire per credible flip.
 - M7 and M8 add what the build and the validation turned up.
-- EVERY GATE ASKS what its review turned up, so nothing waits for the state
-  that owns the register.
 - Any state may add one the moment it is noticed. Waiting for the right state
   is how an entry is lost.
 

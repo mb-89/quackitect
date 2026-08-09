@@ -42,7 +42,7 @@ product_note: |
 specification_note: |
   DOCUMENT FORM: this row's output IS the document - the book, emitted
   deterministically: chapters from manifests, order from the toc, tables
-  from queries, figures derived, glossary from used terms, provenance
+  from queries and figures derived. The glossary comes from used terms, and provenance
   marks throughout, published copies byte-equal (drift law), nothing
   orphaned (orphan law). Harvest v1's book pipeline as the reference
   implementation.

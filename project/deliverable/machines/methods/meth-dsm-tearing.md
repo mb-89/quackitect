@@ -1,14 +1,36 @@
 ---
 kind: method
-statement: DSM tearing - on an already-partitioned DSM, propose the minimal set of feedback (backward) edges to break so the remaining structure reads as a clean layering; the residual cycles are the tears.
+statement: "Tearing breaks a cycle in a partitioned DSM. It proposes which feedback edge to assume, so the loop can be ordered."
 source: ref-structural-complexity-management
 ---
 
 ## Situation
-Reach for it after [DSM partitioning](meth-dsm-partitioning), when residual cycles remain and some of them need prioritizing for redesign, or explicit, recorded acceptance rather than a silent unresolved loop.
+
+Reach for it after [DSM partitioning](meth-dsm-partitioning), when residual
+cycles remain.
+
+Some of those cycles need prioritising for redesign. The others need explicit,
+recorded acceptance, rather than staying silent unresolved loops.
 
 ## Effect
-Ranks backward dependencies by reach-back distance - the iteration/rework length a cycle costs. Tearing the furthest-reaching edges first shortens rework loops the most. Tearing only prioritizes WHICH edges are structurally most disruptive to keep; whether removing or redesigning one is actually feasible stays a domain-expert judgment call, not an automatic edit.
+
+Ranks backward dependencies by reach-back distance. That distance is the
+rework length a cycle costs.
+
+Tearing the furthest-reaching edges first shortens rework loops the most.
+
+Tearing only prioritises WHICH edges are structurally most disruptive to keep.
+Whether removing or redesigning one is feasible stays a domain-expert judgment
+call, never an automatic edit.
 
 ## Procedure
-Tearing is derivative of partitioning: its candidate list depends entirely on which valid ordering was computed - the source gives a worked counter-example where the SAME 7-node, 2-backward-edge structure yields either 1 or 2 tear candidates depending purely on reordering. Fix one canonical partitioning first, or re-run tearing per candidate ordering and compare before committing to a tear list.
+
+Tearing is derivative of partitioning. Its candidate list depends entirely on
+which valid ordering was computed.
+
+The source gives a worked counter-example. The same 7-node structure with two
+backward edges yields either one or two tear candidates, purely from
+reordering.
+
+Fix one canonical partitioning first. Otherwise re-run tearing per candidate
+ordering, and compare before committing to a tear list.

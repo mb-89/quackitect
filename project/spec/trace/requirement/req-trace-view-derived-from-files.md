@@ -12,4 +12,6 @@ source_refs:
   - ".se/req-mine-v1.md: the ledger and truth"
   - ".se/req-mine-sebots.md: state — derived, append-only, on disk"
 priority: should
+weighs_against:
+  - req-upward-links-live-in-the-file >
 ---

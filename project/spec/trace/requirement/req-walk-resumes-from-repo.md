@@ -6,11 +6,11 @@ kind: quality
 verify_method: test
 breaks_if_removed: Every compaction or crash ends the iteration, and settled work gets re-litigated by the next session.
 refines:
-  - uc-stay-recoverable
+  - uc-quality-reliability
   - uc-resume-after-an-absence
   - uc-install-quackitect
 source_refs:
-  - uc-stay-recoverable step 5
+  - uc-quality-reliability step 5
   - stk-agent
   - ".se/req-mine-v1.md: the ledger and truth"
   - uc-resume-after-an-absence step 1

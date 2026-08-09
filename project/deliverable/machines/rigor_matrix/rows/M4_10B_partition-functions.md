@@ -16,8 +16,30 @@ legal_tools:
   - se_log_query
   - se_answer
 evidence:
-  - name: partitioning
-    description: "the clustered function DSM: relation meaning, coupling reasons, clusters"
+  - name: clusters
+    template: dsm
+    of: function
+    items:
+      - $functions
+    writes: cluster
+    picks:
+      cluster: $clusters
+    options:
+      - shared-data
+      - sequence
+      - timing
+      - shared-failure-mode
+      - same-actor
+      - same-policy
+      - same-external-interface
+      - same-lifecycle
+    page_size: 10
+    description: the matrix with a box round every cluster, and the clusters named beside it
+    guidance: |
+      The engine groups and orders the rows so the blocks show. Move a
+      function with the picker beside its row, then name each cluster.
+
+      The method is [[meth-function-dsm]].
 major: full
 minor: none
 patch: none
@@ -25,8 +47,8 @@ product: full
 specification: full
 major_note: |
   Applies in full for the change's cone: the DSM re-clusters where the
-  move lands; untouched clusters inherit. One relation meaning, coupling
-  reasons classified, qualities assigned - the shared partitioning every
+  move lands, and untouched clusters inherit. Every function placed, every
+  cluster named and its coupling classed - the shared partitioning every
   candidate builds on.
 minor_note: |
   Does not apply - AND THIS IS MINOR'S TRIPWIRE. The prediction behind
@@ -49,4 +71,17 @@ specification_note: |
 
 ## Guidance
 
-Per [[meth-function-dsm]]: one relation meaning per matrix, coupling reasons classified, clusters formed, qualities assigned (basic / additional / safety / support). This partitioning is SHARED across all candidates - the static cut into elements varies per candidate later. The matrix is a projection over the function notes' edges.
+TWO ACTS, AND THE ENGINE DOES EVERYTHING BETWEEN THEM.
+
+- PLACE each function in a cluster. The engine proposes; you confirm or move.
+- NAME each cluster and class its coupling. The engine cannot do this part.
+
+THERE IS NO MATCHING STEP HERE ANY MORE (owner ruling 2026-08-08). A [[flow]] is a node, picked at derive-functions, so two functions naming one flow are connected by construction. The matrix is built before you arrive.
+
+THE MATRIX IS DERIVED AND NEVER DRAWN. It projects over the function notes' flow edges, clusters by [[meth-dsm-clustering]], and there is no second copy to drift.
+
+THE RELATION MEANING IS FIXED, so nothing asks for it. [[meth-function-dsm]] offers five because Lindemann's method is general. Here every edge comes from a flow, so the meaning is `passes_data_to` and there is nothing to choose.
+
+A CLUSTER IS A GROUP OF FUNCTIONS, NEVER AN ELEMENT. That is the commonest way this step goes wrong. The two look alike on a page, and the cut into elements is per candidate, later.
+
+This partitioning is SHARED across all candidates.

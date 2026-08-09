@@ -74,3 +74,65 @@ test("se_log_query narrows by text, so finding a topic is not reading every reco
   assert.equal(none.records.length, 0);
   assert.equal(none.total, 0, "a filter that matches nothing reports nothing, not the whole log");
 });
+
+// THE HANDOVER, DERIVED RATHER THAN WRITTEN (owner ruling 2026-08-07). The
+// written one had its gate at the `end` state, so a session that was simply
+// killed never produced one — which the owner confirmed is how they always
+// worked. The log already knows what happened, so it gets asked instead.
+test("the last sitting is read off the log's tail, told apart by a quiet gap", async () => {
+  const { CallLog } = await import("../engine/calllog.ts");
+  const { mkdirSync, writeFileSync } = await import("node:fs");
+  const { join } = await import("node:path");
+  const se = join(freshRoot(), ".se");
+  mkdirSync(se, { recursive: true });
+  const rec = (ts: string, extra: Record<string, unknown> = {}): string =>
+    JSON.stringify({
+      ref: `call-${ts}`,
+      ts,
+      se_version: "t",
+      tool: "se_pull",
+      args: {},
+      ok: true,
+      outcome: "result",
+      duration_ms: 1,
+      ...extra,
+    });
+  writeFileSync(
+    join(se, "calls.jsonl"),
+    `${[
+      // The sitting to be described.
+      rec("2026-08-06T09:00:00.000Z"),
+      rec("2026-08-06T09:05:00.000Z", { tool: "se_note", args: { title: "a stray worth keeping" } }),
+      rec("2026-08-06T09:06:00.000Z", { ok: false, outcome: "rejected", response: { clause: "SE-C-110" } }),
+      rec("2026-08-06T09:07:00.000Z", { response: { where: ["front_desk"] } }),
+      // Hours of quiet, then the CURRENT sitting — the reader was there for
+      // this one and does not need it summarised back to them.
+      rec("2026-08-07T08:00:00.000Z"),
+    ].join("\n")}\n`,
+    "utf8",
+  );
+  const last = new CallLog(se).lastSession();
+  if (last === undefined) throw new Error("expected a previous sitting to describe");
+  assert.equal(last.calls, 4, "the earlier run, not the current one");
+  assert.equal(last.from, "2026-08-06T09:00:00.000Z");
+  assert.equal(last.to, "2026-08-06T09:07:00.000Z");
+  assert.equal(last.ended_at, "front_desk", "where the person walked away from");
+  assert.deepEqual(last.notes, ["a stray worth keeping"]);
+  assert.deepEqual(last.refusals, { "SE-C-110": 1 }, "a repeated clause has to be visible at a glance");
+});
+
+// A FIRST-EVER SESSION HAS NOTHING BEHIND IT, and that is not an error.
+test("with only one sitting in the log there is nothing to hand over", async () => {
+  const { CallLog } = await import("../engine/calllog.ts");
+  const { mkdirSync, writeFileSync } = await import("node:fs");
+  const { join } = await import("node:path");
+  const se = join(freshRoot(), ".se");
+  mkdirSync(se, { recursive: true });
+  writeFileSync(
+    join(se, "calls.jsonl"),
+    `${JSON.stringify({ ref: "call-1", ts: "2026-08-07T08:00:00.000Z", se_version: "t", tool: "se_pull", args: {}, ok: true, outcome: "result", duration_ms: 1 })}\n`,
+    "utf8",
+  );
+  assert.equal(new CallLog(se).lastSession(), undefined);
+  assert.equal(new CallLog(join(freshRoot(), ".se")).lastSession(), undefined, "and no log at all is also fine");
+});

@@ -557,7 +557,7 @@ export function startMirror(o: MirrorOptions): Server {
     },
     // THE HOST READS THE CARDS FROM HERE (owner design 2026-07-30). A host
     // that draws one button per card must not keep its own copy of the
-    // list — project/views/cards.md stays the single truth, and a card added
+    // list — project/deliverable/views/cards.md stays the single truth, and a card added
     // there appears in VS Code without touching the extension.
     "/api/cards": (_url, _req, res) => {
       res.writeHead(200, { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" });
@@ -598,8 +598,12 @@ export function startMirror(o: MirrorOptions): Server {
     // The mirror polls this: position + threshold move under the page
     // (the agent's hand, or another window). Failing to answer at all
     // reads as "session over" client-side. CORS is open because an
-    // EMBEDDER's page (the VS Code webview) polls from its own origin;
-    // the server never leaves localhost.
+    // EMBEDDER's page (the VS Code webview) polls from its own origin.
+    //
+    // THAT IS SAFE ONLY BECAUSE THE SOCKET IS LOOPBACK-BOUND. This comment
+    // used to say "the server never leaves localhost" while listen() bound
+    // every interface, so the sentence was a belief rather than a fact. The
+    // bind is explicit now; see the listen call at the end of this file.
     "/api/alive": (_url, _req, res) => {
       res.writeHead(200, { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" });
       res.end(JSON.stringify(aliveState()));
@@ -648,6 +652,7 @@ export function startMirror(o: MirrorOptions): Server {
       url.searchParams.get("tt") ?? undefined,
       url.searchParams.get("tq") ?? undefined,
       url.searchParams.get("tc") ?? undefined,
+      url.searchParams.get("to") ?? undefined,
     );
     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
     res.end(html);
@@ -668,6 +673,7 @@ export function startMirror(o: MirrorOptions): Server {
       url.searchParams.get("tt") ?? undefined,
       url.searchParams.get("tq") ?? undefined,
       url.searchParams.get("tc") ?? undefined,
+      url.searchParams.get("to") ?? undefined,
     );
     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
     res.end(page);
@@ -741,6 +747,18 @@ export function startMirror(o: MirrorOptions): Server {
     }
   });
 
-  server.listen(o.port);
+  // LOOPBACK ONLY, AND SAID EXPLICITLY (req-mirror-stays-on-the-machine).
+  //
+  // `listen(port)` with no host binds EVERY interface, which is not what the
+  // comment on the alive endpoint claimed and not what anybody intended. The
+  // mirror serves the whole record — the call log, every evidence form, every
+  // decision, the terminal — with no authentication anywhere, because the
+  // design assumed one machine. On a shared network it was readable by anyone
+  // on it.
+  //
+  // FOUND BY THE ISO 25010 CHECKLIST, not by a review. Security had no quality
+  // row because nobody thought this product had one; asking all nine
+  // characteristics in full is what turned it up (owner design 2026-08-07).
+  server.listen(o.port, "127.0.0.1");
   return server;
 }
