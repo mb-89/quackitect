@@ -13,6 +13,8 @@ source_refs:
   - uc-capture-a-stray step 4
   - ".se/req-mine-v2.md: notes and the toll"
 priority: should
+weighs_against:
+  - req-kickoff-refuses-pending-notes >
 ---
 
 ## Detail

@@ -14,6 +14,8 @@ source_refs:
   - uc-vendor-and-overlay ext 1a
   - ".se/req-mine-v2.md: dependencies and the ship review (divergence is mechanically detected; diverged never flips silently)"
 priority: should
+weighs_against:
+  - req-open-notes-stay-visible >
 ---
 
 ## Detail

@@ -12,4 +12,7 @@ source_refs:
   - uc-research-and-record-an-answer step 2
   - ".se/req-mine-v2.md: Logging, observability and the retro"
 priority: should
+weighs_with: req-repo-search-carries-intent — both measure whether a query is recorded with what it was for
+weighs_against:
+  - req-missing-document-stops-the-walk >
 ---

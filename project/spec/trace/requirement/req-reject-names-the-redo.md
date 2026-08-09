@@ -11,4 +11,7 @@ refines:
 source_refs:
   - uc-land-work-on-trunk ext 5a
 priority: should
+weighs_with: req-rejection-carries-its-reason — both measure whether a rejection says what to redo
+weighs_against:
+  - req-bless-outputs-ride-the-bless >
 ---

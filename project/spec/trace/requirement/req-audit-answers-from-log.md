@@ -7,9 +7,9 @@ verify_method: test
 breaks_if_removed: The retro guesses its counts and drifts from what actually ran.
 breaks_how_badly: abrasive
 refines:
-  - uc-stay-auditable
+  - uc-quality-maintainability
 source_refs:
-  - uc-stay-auditable step 4
+  - uc-quality-maintainability step 4
   - ".se/req-mine-v2.md: logging, observability and the retro (v2-068, v2-070)"
 priority: could
 ---

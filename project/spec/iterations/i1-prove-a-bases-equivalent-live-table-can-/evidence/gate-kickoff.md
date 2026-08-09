@@ -15,14 +15,12 @@ M0's retro closed with the inbox judged — three notes parked in the form pendi
 
 ## retro_drained
 
-- note-a0c85ded3278: done — the M2 trace-graph research is parked as a to-do on write-stories, which is the first state that consumes it
-- note-ef3f41d02983: obsolete — the twelve-prop proposal was struck to six and then to five
-- note-2b4aa8a09eb0: obsolete — the six-prop proposal was superseded by the five the owner settled on
-- note-5503456afc89: done — the five value props stand as nodes under project/spec/trace/value-prop/
-- note-0ed069030139: done — the filter pills and the radial graph are built in engine/trace.ts and engine/traceui.ts
-- note-d35e75426f30: done — the render landed; what it taught is recorded in guidance/craft/ux.md under reuse the surface
-- note-cafbaf9c591b: done — the value-prop item type and the frame-delta rework are built and checked
-- note-dc19338c2f63: done — a live-resolving argument is no longer re-checked against a stored claim
+- note-8668f3b9a915: obsolete — superseded by note-f9b229eb2abc, which states the same defect as the mechanical dependency rule rather than as a signature-provenance problem
+- note-f9b229eb2abc: done — the input check now binds every state, the busbar is authored, and rigor-matrix.test.ts guards all three cases
+- note-6dc92724115b: obsolete — superseded by note-ca4c7230bbc7; register membership was never the property worth checking
+- note-ca4c7230bbc7: done — trace-coverage.test.ts checks every adjacent layer pair both ways over the folders, with a non-empty-corpus guard
+- note-248b9c0a9a5b: carried in part — the form field rule is applied to log-risks and probe-assumptions; v1's batch re-bless is backlog, ready when the engine iterations open
+- note-07eb80639df5: carried in part — the four cards written today are stripped; the sweep of the older cards is backlog, ready when a card is next edited
 
 ## goal
 
@@ -73,3 +71,7 @@ pass — the M0 claims stand: the retro drained to the legal limit, the forms co
 
 - the bless pins the product column and the machine grows in place
 - the grown machine's first states are the next walk, presented to the owner before any step
+
+## raid_additions
+
+- none

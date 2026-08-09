@@ -12,4 +12,6 @@ source_refs:
   - uc-drain-the-inbox ext 6a
   - uc-drain-the-inbox ext 3c
 priority: should
+weighs_against:
+  - req-unknown-drain-ref-refused >
 ---

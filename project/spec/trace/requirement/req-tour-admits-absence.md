@@ -12,4 +12,6 @@ source_refs:
   - uc-learn-the-machinery ext 4a
   - ".se/req-mine-v1.md: the mirror — book, report, hand-off"
 priority: should
+weighs_against:
+  - req-desk-offers-a-tour >
 ---

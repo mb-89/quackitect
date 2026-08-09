@@ -7,11 +7,11 @@ verify_method: test
 breaks_if_removed: Every compaction or crash ends the iteration, and settled work gets re-litigated by the next session.
 breaks_how_badly: fatal
 refines:
-  - uc-stay-recoverable
+  - uc-quality-reliability
   - uc-resume-after-an-absence
   - uc-install-quackitect
 source_refs:
-  - uc-stay-recoverable step 5
+  - uc-quality-reliability step 5
   - stk-agent
   - ".se/req-mine-v1.md: the ledger and truth"
   - uc-resume-after-an-absence step 1
@@ -24,6 +24,20 @@ source_refs:
   - uc-resume-after-an-absence ext 6a
 priority: must
 ---
+
+## Scenario
+
+| part | value |
+| --- | --- |
+| source | A new agent session, carrying nothing from the one before it. |
+| stimulus | It boots against a project whose previous session ended mid-walk — by compaction, by crash, or by the person closing the window. |
+| artifact | The engine, reading the repository. |
+| environment | Normal operation. No process from the prior session survives, and no in-memory state is available. |
+| response | The engine serves the walk from its recorded position, hands over every document that position owes, and serves any handover written for the next session. |
+| response measure | The walk resumes at the recorded position with 0 bytes carried from the prior session, and 0 settled decisions re-opened. |
+
+The pass line is the response measure, and both halves of it matter. Resuming
+at the right position while re-litigating settled work is still a failure.
 
 ## Detail
 

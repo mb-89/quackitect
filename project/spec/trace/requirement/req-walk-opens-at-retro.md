@@ -11,4 +11,6 @@ refines:
 source_refs:
   - uc-open-an-iteration step 3
 priority: should
+weighs_against:
+  - req-gate-shows-the-evidence-form >
 ---

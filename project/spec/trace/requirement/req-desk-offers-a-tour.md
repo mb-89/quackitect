@@ -11,4 +11,6 @@ refines:
 source_refs:
   - uc-learn-the-machinery step 1
 priority: should
+weighs_against:
+  - req-fresh-machine-runs >
 ---

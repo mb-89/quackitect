@@ -13,6 +13,8 @@ source_refs:
   - ".se/req-mine-v2.md: Worktrees and parallel streams"
   - ".se/req-mine-v1.md: The ledger and truth"
 priority: should
+weighs_against:
+  - req-unshipped-dependency-refused >
 ---
 
 ## Detail

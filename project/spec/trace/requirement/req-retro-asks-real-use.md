@@ -11,4 +11,6 @@ refines:
 source_refs:
   - uc-drain-the-inbox step 2
 priority: should
+weighs_against:
+  - req-comparison-carries-both-sides >
 ---

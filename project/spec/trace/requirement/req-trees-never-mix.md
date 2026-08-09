@@ -7,10 +7,10 @@ verify_method: test
 breaks_if_removed: The private overlay leaks into the open engine, and the customer's reason to use the product dies.
 breaks_how_badly: fatal
 refines:
-  - uc-stay-maintainable
+  - uc-quality-flexibility
 source_refs:
-  - uc-stay-maintainable step 4
-  - uc-stay-maintainable ext 4a
+  - uc-quality-flexibility step 4
+  - uc-quality-flexibility ext 4a
   - stk-vehicle-owner
 priority: must
 ---

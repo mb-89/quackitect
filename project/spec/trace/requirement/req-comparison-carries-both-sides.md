@@ -13,6 +13,8 @@ source_refs:
   - uc-research-and-record-an-answer ext 6b
   - ".se/req-mine-sebots.md: Product-scope lessons (fixes and abandonments)"
 priority: should
+weighs_against:
+  - req-vendor-page-claim-only >
 ---
 
 ## Detail

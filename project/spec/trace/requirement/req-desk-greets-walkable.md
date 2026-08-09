@@ -13,4 +13,6 @@ source_refs:
   - uc-install-quackitect guarantee
   - stk-newcomer
 priority: should
+weighs_against:
+  - req-reachable-capability-is-traced >
 ---

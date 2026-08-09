@@ -12,4 +12,6 @@ source_refs:
   - uc-close-a-record step 5
   - uc-close-a-record guarantee
 priority: should
+weighs_against:
+  - req-archive-lists-every-closed-record >
 ---

@@ -13,6 +13,8 @@ source_refs:
   - uc-diverge-before-deciding guarantee
   - ".se/req-mine-v2.md: v2-023 Pugh shape"
 priority: should
+weighs_against:
+  - req-losers-stay-on-record >
 ---
 
 ## Detail

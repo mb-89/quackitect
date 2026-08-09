@@ -12,4 +12,6 @@ source_refs:
   - uc-browse-the-archive step 1
   - uc-browse-the-archive step 2
 priority: should
+weighs_against:
+  - req-archive-opens-to-a-person-only >
 ---

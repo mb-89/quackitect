@@ -16,6 +16,8 @@ source_refs:
   - uc-adjudicate-a-gate step 3
   - uc-land-work-on-trunk step 5
 priority: should
+weighs_against:
+  - req-gate-rounds-stay-readable >
 ---
 
 ## Detail

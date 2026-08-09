@@ -1,6 +1,6 @@
 {
   "change_size": "product",
-  "rigor_matrix_hash": "cef1f43c4858",
+  "rigor_matrix_hash": "1cb08f41a06f",
   "pinned_at": "2026-08-04T16:20:30.684Z",
   "demands": {
     "onboard-retro": {
@@ -21,7 +21,7 @@
     },
     "log-risks": {
       "applies": "full",
-      "evidence": "[[\"raid_opened\",true,\"\",[\"kind\",\"entry\",\"impact\",\"likelihood\",\"owner\",\"revisit\"],\"table\",\"\",[],[],[]]]"
+      "evidence": "[[\"raid_opened\",true,\"\",[],\"refs\",\"raid\",[],[],[]]]"
     },
     "frame-delta": {
       "applies": "full",
@@ -65,39 +65,47 @@
     },
     "derive-functions": {
       "applies": "full",
-      "evidence": "[[\"function_structure\",true,\"\",[],\"\",\"\",[],[],[]],[\"coverage\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"functions\",true,\"\",[],\"refs\",\"function\",[],[],[]],[\"flows\",true,\"\",[],\"refs\",\"flow\",[],[],[]],[\"neutrality\",true,\"\",[],\"free-form\",\"\",[],[],[]]]"
+    },
+    "identify-assumptions": {
+      "applies": "full",
+      "evidence": "[[\"assumptions\",true,\"\",[],\"refs\",\"raid\",[],[],[]],[\"sweep\",true,\"\",[],\"per-item\",\"\",[],[\"environment\",\"toolchain\",\"host\",\"platform\",\"neighbours\",\"people\"],[]]]"
     },
     "probe-assumptions": {
       "applies": "full",
-      "evidence": "[[\"probes\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"probes\",true,\"\",[\"probe\",\"probed\"],\"node-table\",\"raid\",[],[\"$assumptions\"],[]]]"
     },
     "gate-requirements": {
       "applies": "full",
-      "evidence": "[[\"verifiable\",true,\"\",[],\"\",\"\",[],[],[]],[\"traced\",true,\"\",[],\"\",\"\",[],[],[]],[\"functions_cover\",true,\"\",[],\"\",\"\",[],[],[]],[\"set_holds\",true,\"\",[],\"\",\"\",[],[],[]],[\"breaks_if_removed\",true,\"\",[],\"\",\"\",[],[],[]],[\"assumptions_probed\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[]"
     },
     "derive-criteria": {
       "applies": "full",
-      "evidence": "[[\"criteria\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"compounding\",true,\"\",[],\"compare-card\",\"\",[],[\"$compounding_suspects\"],[]],[\"comparisons\",true,\"\",[],\"compare-card\",\"\",[],[\"$criterion_axes\"],[]]]"
     },
     "partition-functions": {
       "applies": "full",
-      "evidence": "[[\"partitioning\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"clusters\",true,\"\",[],\"dsm\",\"function\",[\"shared-data\",\"sequence\",\"timing\",\"shared-failure-mode\",\"same-actor\",\"same-policy\",\"same-external-interface\",\"same-lifecycle\"],[\"$functions\"],[]]]"
     },
     "enumerate-space": {
       "applies": "full",
-      "evidence": "[[\"chart\",true,\"\",[],\"\",\"\",[],[],[]],[\"shortlist\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[]"
     },
     "run-candidates": {
       "applies": "tailored",
-      "evidence": "[[\"candidate_records\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[]"
+    },
+    "cut-criteria": {
+      "applies": "full",
+      "evidence": "[[\"cuts\",true,\"\",[],\"rank-cut\",\"\",[],[\"$criterion_axes\"],[]]]"
     },
     "evaluate-set": {
       "applies": "full",
-      "evidence": "[[\"scores\",true,\"\",[],\"\",\"\",[],[],[]],[\"front\",true,\"\",[],\"\",\"\",[],[],[]],[\"eliminations\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"scores\",true,\"\",[\"candidate\",\"axis\",\"score\",\"anchor\",\"prior_art\"],\"table\",\"\",[],[],[]],[\"front\",true,\"\",[],\"pareto-plot\",\"\",[],[],[]],[\"reading\",true,\"\",[],\"free-form\",\"\",[],[],[]]]"
     },
     "gate-candidates": {
       "applies": "full",
-      "evidence": "[[\"viable_set\",true,\"\",[],\"\",\"\",[],[],[]],[\"complete_allocation\",true,\"\",[],\"\",\"\",[],[],[]],[\"criteria_traced\",true,\"\",[],\"\",\"\",[],[],[]],[\"front_recorded\",true,\"\",[],\"\",\"\",[],[],[]],[\"feasibility_checked\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"reasons_hold\",true,\"\",[],\"free-form\",\"\",[],[],[]]]"
     },
     "converge-pugh": {
       "applies": "full",
@@ -129,7 +137,7 @@
     },
     "run-spikes": {
       "applies": "tailored",
-      "evidence": "[[\"spike_records\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[]"
     },
     "fold-back": {
       "applies": "full",
@@ -153,7 +161,7 @@
     },
     "build-steps": {
       "applies": "full",
-      "evidence": "[[\"build_record\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[]"
     },
     "verification": {
       "applies": "full",

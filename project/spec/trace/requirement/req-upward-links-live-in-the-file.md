@@ -12,4 +12,6 @@ source_refs:
   - uc-trace-a-decision-to-its-origin step 4
   - ".se/req-mine-sebots.md: the person's dial and the manual path"
 priority: should
+weighs_against:
+  - req-trace-source-never-mixes >
 ---

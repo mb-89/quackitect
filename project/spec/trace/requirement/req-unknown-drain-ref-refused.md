@@ -12,4 +12,6 @@ source_refs:
   - uc-drain-the-inbox step 3
   - ".se/req-mine-v2.md: notes and the toll (v2-082)"
 priority: should
+weighs_against:
+  - req-idea-lands-as-note >
 ---

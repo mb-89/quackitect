@@ -12,4 +12,6 @@ source_refs:
   - uc-research-and-record-an-answer step 4
   - ".se/req-mine-sebots.md: Capture, decisions, change"
 priority: should
+weighs_against:
+  - req-finding-names-its-home >
 ---

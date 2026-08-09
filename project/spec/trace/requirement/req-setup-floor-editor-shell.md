@@ -13,4 +13,6 @@ source_refs:
   - uc-install-quackitect step 1
   - ".se/req-mine-v2.md: distribution (v2-098)"
 priority: should
+weighs_against:
+  - req-setup-stops-before-partial >
 ---

@@ -12,4 +12,6 @@ source_refs:
   - uc-get-work-routed guarantee
   - ".se/req-mine-sebots.md: capture, decisions, change (rejections need memory)"
 priority: should
+weighs_against:
+  - req-record-arrives-prefilled >
 ---

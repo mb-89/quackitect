@@ -13,6 +13,8 @@ source_refs:
   - uc-trace-a-decision-to-its-origin step 2
   - uc-trace-a-decision-to-its-origin ext 2a
 priority: should
+weighs_against:
+  - req-desk-greets-walkable >
 ---
 
 ## Detail

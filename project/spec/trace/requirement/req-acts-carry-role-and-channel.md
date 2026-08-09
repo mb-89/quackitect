@@ -7,12 +7,12 @@ verify_method: test
 breaks_if_removed: Nobody can say who authorized what, and the authorization strength of every grant is unknowable.
 breaks_how_badly: crippling
 refines:
-  - uc-stay-auditable
+  - uc-quality-maintainability
   - uc-adjudicate-a-gate
   - uc-land-work-on-trunk
 source_refs:
-  - uc-stay-auditable step 3
-  - uc-stay-auditable ext 3a
+  - uc-quality-maintainability step 3
+  - uc-quality-maintainability ext 3a
   - ".se/req-mine-v2.md: gates, offers and grants (v2-021, v2-025)"
   - ".se/req-mine-v1.md: the ledger and truth (actor stamps)"
   - uc-adjudicate-a-gate step 6
@@ -20,6 +20,8 @@ source_refs:
   - ".se/req-mine-v1.md: the ledger and truth"
   - uc-land-work-on-trunk step 5
 priority: should
+weighs_against:
+  - req-repo-search-carries-intent >
 ---
 
 ## Detail

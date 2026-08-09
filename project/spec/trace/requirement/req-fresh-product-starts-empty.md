@@ -11,4 +11,6 @@ refines:
 source_refs:
   - uc-begin-a-product step 7
 priority: should
+weighs_against:
+  - req-extension-replaced-reported >
 ---

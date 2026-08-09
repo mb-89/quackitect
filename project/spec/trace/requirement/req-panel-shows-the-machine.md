@@ -12,4 +12,6 @@ source_refs:
   - uc-install-quackitect step 4
   - uc-install-quackitect guarantee
 priority: should
+weighs_against:
+  - req-filter-draws-only-what-serves >
 ---

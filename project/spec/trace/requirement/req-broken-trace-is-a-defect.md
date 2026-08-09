@@ -16,6 +16,8 @@ source_refs:
   - uc-trace-a-decision-to-its-origin ext 3a
   - ".se/req-mine-v1.md: the mirror — book, report, hand-off"
 priority: should
+weighs_against:
+  - req-acts-carry-role-and-channel >
 ---
 
 ## Detail

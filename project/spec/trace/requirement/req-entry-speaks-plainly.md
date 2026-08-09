@@ -7,14 +7,16 @@ verify_method: inspection
 breaks_if_removed: Newcomers bounce off the front door, and the i17 red-team and i19 cold-read rework repeats.
 breaks_how_badly: corrosive
 refines:
-  - uc-stay-learnable
+  - uc-quality-interaction-capability
 source_refs:
-  - uc-stay-learnable step 2
-  - uc-stay-learnable ext 2a
+  - uc-quality-interaction-capability step 2
+  - uc-quality-interaction-capability ext 2a
   - stk-newcomer
   - owner law 2026-07-12 — entry documents carry no method jargon
   - ".se/req-mine-v1.md: voice, entry, and readability"
 priority: should
+weighs_against:
+  - req-newcomer-leaves-able-to-ask >
 ---
 
 ## Scenario

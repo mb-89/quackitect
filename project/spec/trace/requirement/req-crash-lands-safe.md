@@ -7,9 +7,9 @@ verify_method: test
 breaks_if_removed: A silent break leaves a phantom offer standing, and a grant can land on work nobody is watching.
 breaks_how_badly: crippling
 refines:
-  - uc-stay-recoverable
+  - uc-quality-reliability
 source_refs:
-  - uc-stay-recoverable ext 4a
+  - uc-quality-reliability ext 4a
   - ".se/req-mine-v2.md: gates, offers and grants (v2-019, v2-032)"
 priority: must
 ---

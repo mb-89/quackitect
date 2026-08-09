@@ -3,12 +3,14 @@ id: req-newcomer-one-command
 type: "[[requirement]]"
 statement: When a newcomer runs the setup script on a fresh computer, the install path shall deliver the desk's greeting with exactly 1 command run by the person and 0 files edited by hand.
 kind: quality
+characteristic: flexibility
 verify_method: demonstration
 breaks_if_removed: Install quality decays one manual step per release and nobody counts.
 breaks_how_badly: abrasive
 refines:
-  - uc-install-quackitect
+  - uc-quality-flexibility
 source_refs:
+  - uc-install-quackitect
   - uc-install-quackitect step 2
   - uc-install-quackitect guarantee
   - stk-newcomer

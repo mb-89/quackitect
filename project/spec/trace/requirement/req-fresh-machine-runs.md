@@ -7,14 +7,16 @@ verify_method: demonstration
 breaks_if_removed: A colleague cannot run a clone, and the vehicle-owner audience is cut off.
 breaks_how_badly: crippling
 refines:
-  - uc-stay-portable
+  - uc-quality-flexibility
 source_refs:
-  - uc-stay-portable step 1
-  - uc-stay-portable ext 1a
+  - uc-quality-flexibility step 1
+  - uc-quality-flexibility ext 1a
   - ".se/req-mine-v2.md: distribution (v2-098)"
   - ".se/req-mine-v1.md: lifecycle and distribution"
   - stk-vehicle-owner
 priority: should
+weighs_against:
+  - req-setup-floor-editor-shell >
 ---
 
 ## Detail

@@ -7,13 +7,15 @@ verify_method: demonstration
 breaks_if_removed: Work is welded to one harness, and a host change strands mid-flight iterations.
 breaks_how_badly: crippling
 refines:
-  - uc-stay-portable
+  - uc-quality-flexibility
 source_refs:
-  - uc-stay-portable step 5
-  - uc-stay-portable ext 5a
+  - uc-quality-flexibility step 5
+  - uc-quality-flexibility ext 5a
   - ".se/req-mine-v2.md: worktrees and parallel streams (v2-017)"
   - the serial-read retreat, observed 2026-07-31
 priority: should
+weighs_against:
+  - req-trace-view-derived-from-files >
 ---
 
 ## Detail

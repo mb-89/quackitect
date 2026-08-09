@@ -11,6 +11,8 @@ refines:
 source_refs:
   - uc-install-quackitect ext 3a
 priority: should
+weighs_against:
+  - req-missing-provider-named >
 ---
 
 ## Detail

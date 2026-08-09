@@ -11,4 +11,6 @@ refines:
 source_refs:
   - uc-install-quackitect ext 3b
 priority: should
+weighs_against:
+  - req-engine-port-fallback >
 ---

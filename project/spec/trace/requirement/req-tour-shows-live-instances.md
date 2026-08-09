@@ -11,4 +11,7 @@ refines:
 source_refs:
   - uc-learn-the-machinery step 4
 priority: should
+weighs_with: req-tour-reads-what-stands — both measure whether the tour is derived from the live system rather than stored
+weighs_against:
+  - req-tour-speaks-plainly >
 ---

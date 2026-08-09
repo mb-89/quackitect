@@ -12,6 +12,8 @@ source_refs:
   - uc-close-a-record ext 6a
   - ".se/req-mine-v2.md: v2-042 ship merge removes worktree"
 priority: should
+weighs_against:
+  - req-small-fix-joins-open-record >
 ---
 
 ## Detail
