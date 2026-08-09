@@ -5,6 +5,7 @@ statement: When a new session opens the project, the engine shall serve the walk
 kind: quality
 verify_method: test
 breaks_if_removed: Every compaction or crash ends the iteration, and settled work gets re-litigated by the next session.
+breaks_how_badly: fatal
 refines:
   - uc-stay-recoverable
   - uc-resume-after-an-absence

@@ -5,6 +5,7 @@ statement: The engine shall append exactly one log line per dispatched call, car
 kind: quality
 verify_method: test
 breaks_if_removed: The audit has holes, and the person answers for acts the record never saw.
+breaks_how_badly: fatal
 refines:
   - uc-stay-auditable
   - uc-take-a-step

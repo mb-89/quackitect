@@ -5,6 +5,7 @@ statement: The tour shall use a method term only where the term's definition is 
 kind: constraint
 verify_method: inspection
 breaks_if_removed: The first door speaks jargon; the newcomer needs a translator before the tour helps.
+breaks_how_badly: corrosive
 refines:
   - uc-learn-the-machinery
 source_refs:

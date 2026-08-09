@@ -5,6 +5,7 @@ statement: When a node is selected in the trace, the engine shall show the node'
 kind: functional
 verify_method: demonstration
 breaks_if_removed: Reading a node means opening files one by one, and the survey pace dies.
+breaks_how_badly: corrosive
 refines:
   - uc-trace-a-decision-to-its-origin
 source_refs:

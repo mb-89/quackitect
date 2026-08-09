@@ -5,6 +5,7 @@ statement: If the panel cannot highlight the named part, then the stop shall run
 kind: functional
 verify_method: test
 breaks_if_removed: One unhighlightable part kills the tour, or the miss vanishes unrecorded.
+breaks_how_badly: crippling
 refines:
   - uc-learn-the-machinery
 source_refs:

@@ -5,6 +5,7 @@ statement: When a state owes evidence, the engine shall build the form itself an
 kind: functional
 verify_method: test
 breaks_if_removed: Forms drift per author and a claim stamps itself, so the evidence stops meaning one thing.
+breaks_how_badly: fatal
 refines:
   - uc-take-a-step
 source_refs:

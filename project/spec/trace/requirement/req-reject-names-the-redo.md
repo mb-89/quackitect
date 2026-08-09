@@ -5,6 +5,7 @@ statement: When the person rejects at the land gate, the engine shall keep the w
 kind: functional
 verify_method: test
 breaks_if_removed: A reject strands the work with no named path back; the person's no destroys instead of steers.
+breaks_how_badly: corrosive
 refines:
   - uc-land-work-on-trunk
 source_refs:

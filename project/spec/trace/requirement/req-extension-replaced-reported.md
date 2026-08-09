@@ -5,6 +5,7 @@ statement: If the editor extension stands installed at another version, then the
 kind: functional
 verify_method: test
 breaks_if_removed: A stale extension stays and the panel's behavior stops matching the engine's.
+breaks_how_badly: corrosive
 refines:
   - uc-install-quackitect
 source_refs:

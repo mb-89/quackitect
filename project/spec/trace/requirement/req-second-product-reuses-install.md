@@ -5,6 +5,7 @@ statement: Where the extension is already installed, the setup of an additional 
 kind: functional
 verify_method: demonstration
 breaks_if_removed: Every additional product costs a full install, and beginning one stops being light.
+breaks_how_badly: corrosive
 refines:
   - uc-begin-a-product
 source_refs:

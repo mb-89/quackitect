@@ -5,6 +5,7 @@ statement: When a person returns to the product after an absence, the panel shal
 kind: quality
 verify_method: demonstration
 breaks_if_removed: Coming back costs a conversation with whoever was here last, and unattended work stops being safe to leave.
+breaks_how_badly: crippling
 refines:
   - uc-resume-after-an-absence
 source_refs:

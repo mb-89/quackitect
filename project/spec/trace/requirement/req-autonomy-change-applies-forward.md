@@ -5,6 +5,7 @@ statement: When the autonomy setting changes mid-walk, the engine shall apply it
 kind: functional
 verify_method: test
 breaks_if_removed: A dial that only takes effect at a restart is not a live control, and an unrecorded change cannot be audited.
+breaks_how_badly: crippling
 refines:
   - uc-set-the-autonomy
 source_refs:

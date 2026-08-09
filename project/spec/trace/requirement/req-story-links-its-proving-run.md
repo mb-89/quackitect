@@ -5,6 +5,7 @@ statement: Where a story's evidence side is filled, the engine shall link that s
 kind: functional
 verify_method: inspection
 breaks_if_removed: Whether a story was ever proven is answered from memory instead of the recorded run.
+breaks_how_badly: abrasive
 refines:
   - uc-trace-a-decision-to-its-origin
 source_refs:

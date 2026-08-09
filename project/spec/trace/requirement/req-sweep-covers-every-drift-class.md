@@ -5,6 +5,7 @@ statement: When the sweep runs, the engine shall check every drift class in the 
 kind: functional
 verify_method: test
 breaks_if_removed: The sweep checks what is convenient; a skipped drift class drifts unbounded.
+breaks_how_badly: corrosive
 refines:
   - uc-let-the-system-catch-up
 source_refs:

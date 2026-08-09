@@ -5,6 +5,7 @@ statement: When a walk-governing source is edited through the lane, the engine s
 kind: functional
 verify_method: test
 breaks_if_removed: The edit lands in a tree the walk never compiles from, the reload changes nothing, and the driver believes a correction took effect that did not.
+breaks_how_badly: crippling
 refines:
   - uc-change-the-method-mid-walk
 source_refs:

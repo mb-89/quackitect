@@ -5,6 +5,7 @@ statement: While a field declares coverage over another type, the engine shall h
 kind: functional
 verify_method: test
 breaks_if_removed: A use case no requirement covers ships as covered; the trace lies where it matters most.
+breaks_how_badly: fatal
 refines:
   - uc-take-a-step
 source_refs:

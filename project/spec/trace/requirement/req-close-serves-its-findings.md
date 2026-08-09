@@ -5,6 +5,7 @@ statement: When a close is requested, the engine shall serve the record's findin
 kind: functional
 verify_method: test
 breaks_if_removed: The person rules on a report that quietly dropped what it found inconvenient.
+breaks_how_badly: crippling
 refines:
   - uc-close-a-record
 source_refs:

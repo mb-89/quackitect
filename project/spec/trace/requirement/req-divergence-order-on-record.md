@@ -5,6 +5,7 @@ statement: The engine shall record the order in which the problem, each option a
 kind: functional
 verify_method: inspection
 breaks_if_removed: Options back-filled after a made decision read exactly like real divergence, and ratification is undetectable.
+breaks_how_badly: corrosive
 refines:
   - uc-diverge-before-deciding
 source_refs:

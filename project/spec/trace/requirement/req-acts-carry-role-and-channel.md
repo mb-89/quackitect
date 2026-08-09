@@ -5,6 +5,7 @@ statement: The engine shall stamp every recorded act with the acting role and th
 kind: quality
 verify_method: test
 breaks_if_removed: Nobody can say who authorized what, and the authorization strength of every grant is unknowable.
+breaks_how_badly: crippling
 refines:
   - uc-stay-auditable
   - uc-adjudicate-a-gate

@@ -5,6 +5,7 @@ statement: The engine shall record every trace node's upward links in the node's
 kind: functional
 verify_method: inspection
 breaks_if_removed: The chain lives only inside the tool; a plain file reader cannot follow why.
+breaks_how_badly: corrosive
 refines:
   - uc-trace-a-decision-to-its-origin
 source_refs:

@@ -5,6 +5,7 @@ statement: The entry documents shall carry zero bare method terms, with every me
 kind: quality
 verify_method: inspection
 breaks_if_removed: Newcomers bounce off the front door, and the i17 red-team and i19 cold-read rework repeats.
+breaks_how_badly: corrosive
 refines:
   - uc-stay-learnable
 source_refs:

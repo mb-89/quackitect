@@ -5,6 +5,7 @@ statement: The setup script shall complete on a computer holding only an editor 
 kind: functional
 verify_method: test
 breaks_if_removed: Setup silently assumes tools a fresh machine lacks and the one-script promise fails off the dev box.
+breaks_how_badly: crippling
 refines:
   - uc-install-quackitect
 source_refs:

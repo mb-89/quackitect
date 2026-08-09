@@ -5,6 +5,7 @@ statement: When a blessed gate is opened for reading, the engine shall show its 
 kind: functional
 verify_method: demonstration
 breaks_if_removed: Who approved a level, and in which round, is reconstructed from memory.
+breaks_how_badly: corrosive
 refines:
   - uc-trace-a-decision-to-its-origin
 source_refs:

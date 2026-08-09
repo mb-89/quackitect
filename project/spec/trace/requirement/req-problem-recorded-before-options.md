@@ -5,6 +5,7 @@ statement: While ideation holds no recorded problem statement, the engine shall 
 kind: functional
 verify_method: test
 breaks_if_removed: Options generate against an unstated problem, so the answer smuggles in as the frame and divergence ratifies it.
+breaks_how_badly: corrosive
 refines:
   - uc-diverge-before-deciding
 source_refs:

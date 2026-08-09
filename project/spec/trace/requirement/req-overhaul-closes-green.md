@@ -5,6 +5,7 @@ statement: The engine shall close an overhaul only after a full-battery run star
 kind: functional
 verify_method: test
 breaks_if_removed: A sweep that touched everything closes unproven; the overhaul leaves the system worse.
+breaks_how_badly: crippling
 refines:
   - uc-let-the-system-catch-up
 source_refs:

@@ -5,6 +5,7 @@ statement: The engine shall answer the retro's declared counts from the recorded
 kind: quality
 verify_method: test
 breaks_if_removed: The retro guesses its counts and drifts from what actually ran.
+breaks_how_badly: abrasive
 refines:
   - uc-stay-auditable
 source_refs:

@@ -5,6 +5,7 @@ statement: When a retro opens, the engine shall fix its window of pending notes 
 kind: functional
 verify_method: test
 breaks_if_removed: "The inbox becomes history: notes accumulate faster than a retro can be declared finished."
+breaks_how_badly: crippling
 refines:
   - uc-drain-the-inbox
 source_refs:

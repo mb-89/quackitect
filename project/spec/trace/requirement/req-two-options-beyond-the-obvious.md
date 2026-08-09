@@ -5,6 +5,7 @@ statement: While the standing options number fewer than two, or every standing o
 kind: functional
 verify_method: test
 breaks_if_removed: The obvious answer passes with a token rival, and the choice was never checked against a real alternative.
+breaks_how_badly: crippling
 refines:
   - uc-diverge-before-deciding
 source_refs:

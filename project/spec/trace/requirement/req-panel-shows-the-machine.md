@@ -5,6 +5,7 @@ statement: When the workspace opens after setup, the editor shall show the panel
 kind: functional
 verify_method: demonstration
 breaks_if_removed: The machine runs but nothing shows where the walk stands, and the person steers blind.
+breaks_how_badly: crippling
 refines:
   - uc-install-quackitect
 source_refs:

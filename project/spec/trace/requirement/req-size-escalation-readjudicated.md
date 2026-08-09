@@ -5,6 +5,7 @@ statement: If mid-walk work outgrows the blessed change size, then the engine sh
 kind: functional
 verify_method: test
 breaks_if_removed: The walk outgrows its column silently and the struck rigor never returns.
+breaks_how_badly: crippling
 refines:
   - uc-open-an-iteration
 source_refs:

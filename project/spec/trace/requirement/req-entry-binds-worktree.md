@@ -5,6 +5,7 @@ statement: When the walk enters a seeded iteration, the engine shall bind a dedi
 kind: functional
 verify_method: test
 breaks_if_removed: The record has no isolated tree; a second stream or a mid-walk commit lands on trunk.
+breaks_how_badly: crippling
 refines:
   - uc-open-an-iteration
 source_refs:

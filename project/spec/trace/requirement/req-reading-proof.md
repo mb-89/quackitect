@@ -5,6 +5,7 @@ statement: When a document is delivered, the engine shall credit it only against
 kind: functional
 verify_method: test
 breaks_if_removed: A reader claims the reading it never received, and every state below opens on guidance nobody read.
+breaks_how_badly: fatal
 refines:
   - uc-be-handed-the-method
 source_refs:

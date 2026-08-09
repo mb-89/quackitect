@@ -5,6 +5,7 @@ statement: If an edit targets an archived record, then the engine shall refuse i
 kind: functional
 verify_method: test
 breaks_if_removed: A finished record stops being evidence the moment anyone can rewrite it.
+breaks_how_badly: fatal
 refines:
   - uc-browse-the-archive
   - uc-close-a-record

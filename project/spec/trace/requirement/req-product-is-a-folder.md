@@ -5,6 +5,7 @@ statement: The engine shall keep every artifact a product owns inside that produ
 kind: functional
 verify_method: test
 breaks_if_removed: A second product bleeds into the first, and deleting the folder stops being the whole uninstall.
+breaks_how_badly: crippling
 refines:
   - uc-begin-a-product
 source_refs:

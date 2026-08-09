@@ -5,6 +5,7 @@ statement: While ideation stands open, the engine shall open zero records and co
 kind: functional
 verify_method: test
 breaks_if_removed: Ideation grows records and commits, divergence stops being cheap, and nobody diverges before deciding.
+breaks_how_badly: crippling
 refines:
   - uc-diverge-before-deciding
 source_refs:

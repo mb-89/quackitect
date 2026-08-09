@@ -5,6 +5,7 @@ statement: When a newcomer completes their first tour, the engine shall leave at
 kind: quality
 verify_method: demonstration
 breaks_if_removed: The tour runs but teaches nothing measurable; nobody can say whether newcomers leave able to ask.
+breaks_how_badly: abrasive
 refines:
   - uc-learn-the-machinery
 source_refs:

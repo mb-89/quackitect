@@ -5,6 +5,7 @@ statement: If an agent attempts to browse the archive, then the engine shall ref
 kind: functional
 verify_method: test
 breaks_if_removed: Agents wander closed records, and the archive's person-only law erodes silently.
+breaks_how_badly: corrosive
 refines:
   - uc-browse-the-archive
 source_refs:

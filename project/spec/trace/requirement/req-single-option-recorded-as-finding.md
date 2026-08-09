@@ -5,6 +5,7 @@ statement: If exactly one option stands when divergence ends, then the engine sh
 kind: functional
 verify_method: test
 breaks_if_removed: A one-option outcome passes as a decision, and an over-constrained problem is never surfaced as a finding.
+breaks_how_badly: corrosive
 refines:
   - uc-diverge-before-deciding
 source_refs:

@@ -5,6 +5,7 @@ statement: When a builder overlay carries a card for an identity the engine also
 kind: functional
 verify_method: test
 breaks_if_removed: A builder's own method silently loses to the engine's, and layering becomes forking.
+breaks_how_badly: crippling
 refines:
   - uc-vendor-and-overlay
 source_refs:

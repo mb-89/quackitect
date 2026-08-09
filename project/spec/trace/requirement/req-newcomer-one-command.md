@@ -5,6 +5,7 @@ statement: When a newcomer runs the setup script on a fresh computer, the instal
 kind: quality
 verify_method: demonstration
 breaks_if_removed: Install quality decays one manual step per release and nobody counts.
+breaks_how_badly: abrasive
 refines:
   - uc-install-quackitect
 source_refs:

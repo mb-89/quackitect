@@ -5,6 +5,7 @@ statement: If the stated work is a doubt or an idea rather than a task, then the
 kind: functional
 verify_method: test
 breaks_if_removed: Doubts and ideas either vanish or mint empty records, and the inbox stops being the home for strays.
+breaks_how_badly: corrosive
 refines:
   - uc-get-work-routed
 source_refs:

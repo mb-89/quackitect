@@ -5,6 +5,7 @@ statement: While a new product is begun, the engine shall change zero files of a
 kind: functional
 verify_method: test
 breaks_if_removed: Beginning a second product damages the first, which is unrecoverable and unforgivable.
+breaks_how_badly: fatal
 refines:
   - uc-begin-a-product
 source_refs:

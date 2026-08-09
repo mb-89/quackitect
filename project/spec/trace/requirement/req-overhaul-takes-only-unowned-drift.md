@@ -5,6 +5,7 @@ statement: If a finding belongs to an open record or changes behaviour, then the
 kind: functional
 verify_method: test
 breaks_if_removed: The overhaul becomes a second lane for real work, escaping every gate that work owes.
+breaks_how_badly: crippling
 refines:
   - uc-let-the-system-catch-up
 source_refs:

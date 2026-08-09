@@ -5,6 +5,7 @@ statement: While any standing option lacks its cost entry or its shed entry, the
 kind: functional
 verify_method: test
 breaks_if_removed: Options carry no price, so the choice is made against alternatives that were never real.
+breaks_how_badly: corrosive
 refines:
   - uc-diverge-before-deciding
 source_refs:

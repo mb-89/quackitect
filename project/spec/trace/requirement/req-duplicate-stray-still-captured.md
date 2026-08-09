@@ -5,6 +5,7 @@ statement: If a captured finding duplicates a standing note, then the engine sha
 kind: functional
 verify_method: test
 breaks_if_removed: Finders stop to compare against the inbox before writing, and capture stops being frictionless.
+breaks_how_badly: abrasive
 refines:
   - uc-capture-a-stray
 source_refs:

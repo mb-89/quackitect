@@ -5,6 +5,7 @@ statement: When a reload is requested, the engine shall restart from the sources
 kind: functional
 verify_method: test
 breaks_if_removed: A reload serves half-old content from a half-remembered position, which is worse than not reloading.
+breaks_how_badly: crippling
 refines:
   - uc-change-the-method-mid-walk
 source_refs:

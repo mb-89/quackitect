@@ -5,6 +5,7 @@ statement: "The engine shall refuse a state's submit until its inputs are met: e
 kind: functional
 verify_method: test
 breaks_if_removed: A state stamps over work nobody did, and the panel reports that green as earned.
+breaks_how_badly: fatal
 refines:
   - uc-take-a-step
 source_refs:

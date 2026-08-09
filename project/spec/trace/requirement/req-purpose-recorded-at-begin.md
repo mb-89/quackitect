@@ -5,6 +5,7 @@ statement: When a new product is begun with a stated purpose, the engine shall c
 kind: functional
 verify_method: inspection
 breaks_if_removed: The product's purpose lives only in chat and is lost to the next session.
+breaks_how_badly: corrosive
 refines:
   - uc-begin-a-product
 source_refs:

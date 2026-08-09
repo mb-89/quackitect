@@ -5,6 +5,7 @@ statement: When a driver's call is admitted, the engine shall answer within 1 se
 kind: quality
 verify_method: test
 breaks_if_removed: The loop's rhythm dies, and drivers batch calls to dodge the lag.
+breaks_how_badly: corrosive
 refines:
   - uc-take-a-step
   - uc-resume-after-an-absence

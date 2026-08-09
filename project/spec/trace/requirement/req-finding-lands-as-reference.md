@@ -5,6 +5,7 @@ statement: When a research question settles, the product shall record the surviv
 kind: functional
 verify_method: inspection
 breaks_if_removed: The next session runs the same search again; findings die in chat.
+breaks_how_badly: corrosive
 refines:
   - uc-research-and-record-an-answer
 source_refs:

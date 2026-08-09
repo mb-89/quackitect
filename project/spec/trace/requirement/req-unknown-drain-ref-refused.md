@@ -5,6 +5,7 @@ statement: If a drain names a ref that no pending note carries, then the engine 
 kind: functional
 verify_method: test
 breaks_if_removed: Drains against nothing append as dead lines and the inbox count stops matching the drain log.
+breaks_how_badly: corrosive
 refines:
   - uc-drain-the-inbox
 source_refs:

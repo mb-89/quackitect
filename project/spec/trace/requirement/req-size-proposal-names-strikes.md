@@ -5,6 +5,7 @@ statement: When a change size is proposed for an iteration, the product shall pr
 kind: functional
 verify_method: test
 breaks_if_removed: The person blesses a size blind; struck cells surface only after the walk.
+breaks_how_badly: crippling
 refines:
   - uc-open-an-iteration
 source_refs:

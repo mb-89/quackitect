@@ -5,6 +5,7 @@ statement: When the person begins a new product, the engine shall scaffold its f
 kind: functional
 verify_method: test
 breaks_if_removed: A hand-rolled product tree drifts from the schema, and the engine misreads or refuses it later.
+breaks_how_badly: crippling
 refines:
   - uc-begin-a-product
 source_refs:
