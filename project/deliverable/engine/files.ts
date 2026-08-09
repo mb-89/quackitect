@@ -8,12 +8,12 @@
 //   - CAS on every write: read returns the hash, write demands it. This is
 //     also the read-before-write law, enforced mechanically.
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { dirname, extname, join, relative, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
 import { lintFix } from "./lintfix.ts";
-import { parseStateNote } from "./notes.ts";
+import { parseStateNote, writeNode } from "./notes.ts";
 import { isExcluded, isRootRef, resolveDeclaredRoot, resolveForRead, resolveInRoot } from "./paths.ts";
 
 /** Whole-file read budget (chars). Beyond this, offset/limit is required. */
@@ -385,7 +385,7 @@ export function fileWrite(root: string, path: string, content: string, baseHash:
   guardMachineNote(path, content);
   const nul = guardRawNul(path, content);
   mkdirSync(dirname(abs), { recursive: true });
-  writeFileSync(abs, nul.content, "utf8");
+  writeNode(abs, nul.content);
   const lint = lintFix(root, [path]);
   const final = lint !== undefined && lint.fixed.length > 0 ? readFileSync(abs, "utf8") : nul.content;
   mirrorMethod(path, root);
@@ -546,7 +546,7 @@ export function fileReplace(
     if (nul.corrected !== undefined) corrected.push(nul.corrected);
   }
   const changed = staged.map((s) => {
-    writeFileSync(s.abs, s.next, "utf8");
+    writeNode(s.abs, s.next);
     mirrorMethod(s.path, root);
     return { path: s.path, hash: contentHash(s.next), replacements: s.replacements };
   });
@@ -874,7 +874,7 @@ function writeStaged(
   }
   const applied = [...byFile.values()].map((f) => {
     const abs = resolveInRoot(root, f.path, SRC);
-    writeFileSync(abs, f.next, "utf8");
+    writeNode(abs, f.next);
     mirrorMethod(f.path, root);
     return { path: f.path, hash: contentHash(f.next), replacements: f.replacements };
   });

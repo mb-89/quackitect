@@ -10,10 +10,11 @@
 // REPORTED rather than passed over — an empty `rewritten` must never be the
 // only thing distinguishing "no references" from "references left dangling".
 // Nothing is written unless the move itself succeeds.
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { guardRawNul } from "./files.ts";
+import { writeNode } from "./notes.ts";
 import { isExcluded, resolveInRoot } from "./paths.ts";
 
 const SRC = "engine/move.ts";
@@ -151,7 +152,7 @@ export function fileMove(root: string, from: string, to: string): MoveResult {
     if (content.includes(NUL)) {
       const fixed = guardRawNul(rel, content, false);
       if (fixed.corrected === undefined) return;
-      writeFileSync(abs, fixed.content, "utf8");
+      writeNode(abs, fixed.content);
       corrected.push(fixed.corrected);
       content = fixed.content;
     }
@@ -159,7 +160,7 @@ export function fileMove(root: string, from: string, to: string): MoveResult {
     if (prose || source) {
       const r = applyPairs(content, prose ? pairs : sourcePairs);
       if (r.count > 0 && r.after !== content) {
-        writeFileSync(abs, r.after, "utf8");
+        writeNode(abs, r.after);
         rewritten.push({ path: rel, replacements: r.count });
         content = r.after;
       }

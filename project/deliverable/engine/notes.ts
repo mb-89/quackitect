@@ -8,7 +8,7 @@
 // both are accepted everywhere a list is expected. Conditions are FLAT
 // keys: exit_read, exit_script, entry_<type> — nested dictionaries render
 // as JSON blobs in Obsidian Properties and are refused by the compiler.
-import { readFileSync, statSync } from "node:fs";
+import { readFileSync, statSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { stripBom } from "./jsonio.ts";
@@ -85,6 +85,21 @@ const HELD = new Map<string, HeldFile>();
  *  is cheap. Sixty-six sweeps of the same corpus in one operation is the
  *  defect, and it is fixed by collecting the input once and passing it down
  *  (software.md, input-process-output). */
+
+/** THE WRITE DOOR, beside the read one.
+ *
+ *  Every write that lands on a file the model may hold goes through here, so
+ *  the model is TOLD rather than left to discover it. Outside a pass the stat
+ *  would catch it anyway; inside one the epoch short-circuits before the stat,
+ *  and an untold write is served stale for the rest of the operation.
+ *
+ *  IT WAS A HOLE UNTIL 2026-08-09. forgetPath existed and had no callers at
+ *  all — the door's own comment claimed "a lane write calls forgetPath" and
+ *  nothing did. A rule nobody calls is a comment. */
+export function writeNode(path: string, text: string): void {
+  writeFileSync(path, text);
+  forgetPath(path);
+}
 
 /** A write the lane made — told, not discovered, so the next read is correct
  *  without waiting for anything. */
@@ -214,9 +229,8 @@ export function withPass<T>(fn: () => T): T {
 function held(path: string): HeldFile | undefined {
   const key = resolve(path);
   const hit = HELD.get(key);
-  // ALREADY VERIFIED THIS OPERATION. The stat happened on the first access and
-  // nothing since then could have moved the file without a lane write, which
-  // calls forgetPath.
+  // ALREADY VERIFIED THIS OPERATION. The stat happened on the first access,
+  // and a write since then went through writeNode, which forgot it.
   if (hit !== undefined && DEPTH > 0 && hit.epoch === EPOCH) return hit;
   // NO TRUST WINDOW. It was tried on 2026-08-09 and the suite refused it in
   // four places, one of them a product law: "a state note edited on disk binds
