@@ -84,20 +84,31 @@ export function resolveRef(root: string, canvasPath: string, ref: string): strin
 // the compile touched is watched; a changed size or mtime rebuilds. The
 // canvas is always among them, so a state ADDED to the drawing invalidates
 // too — which a watch on the notes alone would miss.
-const CACHE = new Map<string, { decl: MachineDecl; sources: string[]; stamp: string; epoch: number; at: number }>();
+const CACHE = new Map<string, { decl: MachineDecl; sources: string[]; stamp: string; epoch: number }>();
 
-// ONE VALIDATION PER WALK STEP. The stamp stays CONTENT (the law above),
-// but one pull validates the same machine dozens of times while routing,
-// and re-hashing a dozen notes each time was ~1.5s of every booted walk
-// (profiled 2026-08-02). pull and advance bump the epoch, so "the next
-// call" still re-verifies; the time window is the backstop for surfaces
-// that poll between walk steps — the mirror re-verifies at most once a
-// second.
+// ONE VALIDATION PER CALL. The stamp stays CONTENT (the law above), but one
+// pull validates the same machine dozens of times while routing, and
+// re-hashing a dozen notes each time was ~1.5s of every booted walk (profiled
+// 2026-08-02).
+//
+// THE CALL IS THE BOUNDARY, and it is the read-it-live law's own unit: "a
+// state note edited on disk binds the NEXT call". A guard bumps this on EVERY
+// tool call (engine/tools.ts) and every mirror request (engine/mirror.ts), so
+// nothing here can outlive one call.
+//
+// THERE WAS A ONE-SECOND CLOCK HERE TOO, ANDed onto the epoch (owner question,
+// 2026-08-09). It was the backstop from before every tool bumped the epoch —
+// pull alone used to, and a gate check on any other tool went stale for up to
+// a second. Once the guard landed the clock guarded nothing: it could only cut
+// trust SHORTER, inside a call running over a second.
+//
+// It was harmless and it is gone anyway. A reader had to prove it harmless
+// before they could trust this file, and that proof cost more than the line
+// saved.
 let EPOCH = 1;
 export function bumpDrawingEpoch(): void {
   EPOCH++;
 }
-const TRUST_MS = 1000;
 
 // STAMPED BY CONTENT, not by size and mtime. Those two are the usual cheap
 // answer and they are wrong here: a priority edited from 0.01 to 0.75 keeps
@@ -121,18 +132,16 @@ function stampOf(paths: readonly string[]): string {
 export function compileMachineCached(root: string, canvasPath: string): MachineDecl {
   const key = `${resolve(root)}::${canvasPath}`;
   const hit = CACHE.get(key);
-  const now = Date.now();
   if (hit !== undefined) {
-    if (hit.epoch === EPOCH && now - hit.at < TRUST_MS) return hit.decl;
+    if (hit.epoch === EPOCH) return hit.decl;
     if (stampOf(hit.sources) === hit.stamp) {
       hit.epoch = EPOCH;
-      hit.at = now;
       return hit.decl;
     }
   }
   const sources: string[] = [];
   const decl = compileMachine(root, canvasPath, sources);
-  CACHE.set(key, { decl, sources, stamp: stampOf(sources), epoch: EPOCH, at: now });
+  CACHE.set(key, { decl, sources, stamp: stampOf(sources), epoch: EPOCH });
   return decl;
 }
 

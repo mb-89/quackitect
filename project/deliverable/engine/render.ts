@@ -600,6 +600,26 @@ function oneLine(s: string): string {
   return flat.length > FEED_BRIEF_CHARS ? `${flat.slice(0, FEED_BRIEF_CHARS - 1)}…` : flat;
 }
 
+/** THE SERVER ACTING ON ITS OWN BEHALF, not a person acting through it.
+ *
+ *  `mirror_slow` is the mirror timing its own request. `mirror_narration_now`
+ *  is a poll asking whether narration is due. Nobody clicked either one, and
+ *  labelling them "human" put fifty-two acts in the feed that the owner never
+ *  performed (owner, 2026-08-09: "they are not triggered by me… don't call it
+ *  human").
+ *
+ *  THE NAME IS A WEAK PLACE TO DECIDE THIS, and this list is the weakness: a
+ *  new server-side mirror tool defaults to "human" until somebody adds it here.
+ *  The sound fix is to stamp the actor where the call is MADE — mirror.ts knows
+ *  perfectly well which handler a body arrived on — and carry it on the log
+ *  record. See the note filed with this change. */
+const SELF_SERVED = new Set(["mirror_slow", "mirror_narration_now"]);
+
+function srcOf(tool: string): string {
+  if (SELF_SERVED.has(tool)) return "ui";
+  return tool.startsWith("mirror_") ? "human" : "agent";
+}
+
 export function feedRows(
   log: CallLog,
   since: string,
@@ -612,7 +632,7 @@ export function feedRows(
   const rows = records.slice(-500).map((rec) => ({
     ref: rec.ref,
     ts: rec.ts,
-    src: rec.tool.startsWith("mirror_") ? "human" : "agent",
+    src: srcOf(rec.tool),
     // Updates are NARRATION (bold), whatever their op — only se_note
     // strays are retro notes (italic). Two kinds, never conflated.
     type:
@@ -983,6 +1003,8 @@ const STYLE = `
   .logrow .lt { color: var(--se-feed-time); flex: 0 0 auto; }
   .logrow .lsrc { flex: 0 0 5.5ch; color: var(--se-feed-src-agent); }
   .logrow .lsrc.human { color: var(--se-feed-src-human); }
+  /* THE UI ACTING ALONE reads dimmer than either actor, because it is neither. */
+  .logrow .lsrc.ui { color: var(--se-feed-time); }
   .logrow .lkind { flex: 0 0 6.5ch; }
   .logrow .lkind.k-call { color: var(--se-feed-kind-call); }
   .logrow .lkind.k-update { font-weight: 700; color: var(--se-feed-kind-update); }
