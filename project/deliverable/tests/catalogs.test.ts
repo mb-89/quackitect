@@ -144,9 +144,12 @@ describe("the offers a finder actually makes", { concurrency: true }, () => {
 
   test("a literal rides beside a live source, so the offer is complete before the live one fills", () => {
     const args = argsOf("find_without", "trims");
-    // The repo's own trace has no clusters yet, which is precisely the state
-    // the report came from. The three literals must still be offered.
-    assert.deepEqual(args.picks.who_takes_over, ["the environment", "the user", "nobody"]);
+    // The trace had no clusters when this was reported (2026-08-08); i1's
+    // five landed on trunk 2026-08-09 and the live half now fills. The
+    // CLAIM is about the literal half: it rides whatever the live one holds.
+    for (const lit of ["the environment", "the user", "nobody"]) {
+      assert.ok(args.picks.who_takes_over.includes(lit), `${lit} is offered beside the live source`);
+    }
     assert.deepEqual(
       args.pick_sources.who_takes_over,
       ["$clusters", "the environment", "the user", "nobody"],

@@ -134,8 +134,27 @@ export function scaffoldInstance(t: FormTemplate, title: string): string {
   ].join("\n");
 }
 
+/** A HEADING INSIDE A FIELD STAYS INSIDE THE FIELD (seen four times on
+ *  2026-08-09). Sections are `## <field>`, so a `#` or `##` line in a body
+ *  would END the section and strand the rest under a made-up sibling —
+ *  invisibly, because the required-check still sees the first paragraph.
+ *  The voice rules ASK for small headings in long prose, so the author's
+ *  heading is meant: it demotes to `###` on write, lossless, never refused.
+ *  Fenced code is left alone. */
+function demoteHeadings(content: string): string {
+  let fenced = false;
+  return content
+    .split("\n")
+    .map((l) => {
+      if (/^\s*(```|~~~)/.test(l)) fenced = !fenced;
+      return !fenced && /^#{1,2}\s/.test(l) ? `###${l.slice(l.indexOf(" "))}` : l;
+    })
+    .join("\n");
+}
+
 /** Replace one section's body. A missing section is appended. */
-export function withFieldContent(instanceRaw: string, field: string, content: string): string {
+export function withFieldContent(instanceRaw: string, field: string, rawContent: string): string {
+  const content = demoteHeadings(rawContent);
   const lines = instanceRaw.split("\n");
   const start = lines.findIndex((l) => l.trim() === `## ${field}`);
   if (start === -1) return `${instanceRaw.replace(/\n*$/, "\n\n")}## ${field}\n\n${content}\n`;

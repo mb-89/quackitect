@@ -10,7 +10,8 @@
 // this: nothing errors, and the reader concludes the state is empty.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { join } from "node:path";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { itFind, pinIteration } from "../engine/iterations.ts";
 import { compileMachine } from "../engine/machines/compile.ts";
@@ -33,7 +34,7 @@ function gitInit(root: string): void {
 
 /** A root with one iteration open and its column pinned to major, which is
  *  the only column that carries enumerate-space. */
-async function rootWithMajorIteration(): Promise<{ session: Session; root: string }> {
+async function rootWithMajorIteration(): Promise<{ session: Session; root: string; id: string }> {
   const root = freshRoot();
   gitInit(root);
   const session = new Session(root);
@@ -43,7 +44,7 @@ async function rootWithMajorIteration(): Promise<{ session: Session; root: strin
   session.setAutonomy(1);
   const id = String(session.iterationSeed("prove the drawn view", "a drawn sub-machine opens in the mirror").seeded);
   pinIteration(root, itFind(root, id), "major");
-  return { session, root };
+  return { session, root, id };
 }
 
 test("a matrix row's drawn sub-machine resolves to its own drawing", async () => {
@@ -170,4 +171,69 @@ test("only a sub-machine that resolves is double-clickable", async () => {
   // The DOUBLE BORDER is a different fact and it stays: the state IS a
   // sub-machine whether or not its drawing exists yet.
   assert.match(html, /data-detail="state:run-candidates"[\s\S]{0,400}class="[^"]*inner"/, "it still draws as a sub-machine");
+});
+
+// A WALKED SUB-MACHINE MUST NOT LOOK UNSTARTED (owner report 2026-08-09).
+// From trunk, i1 read "not done" although every claim under its last gate
+// stood signed and blessed on disk. Two mechanisms, both fixed together:
+// a drawn sub-machine browsed from the desk resolved to NO iteration (only
+// the bound record answered), and a container or an end carries no claim of
+// its own, so nothing record-backed could ever paint them.
+test("a finished sub-machine paints its container and its end from the record", async () => {
+  const { session, root, id } = await rootWithMajorIteration();
+  const view = session.viewFor("enumerate-space");
+  assert.ok(view !== undefined);
+
+  // Leave every claimful state signed on disk, the way a finished walk does.
+  for (const s of view.decl.states.filter((x) => x.evidence_form.length > 0)) {
+    const ev = join(root, ".worktrees", id, "project", "spec", "iterations", id, "evidence", `${s.id}.md`);
+    mkdirSync(dirname(ev), { recursive: true });
+    // Each template gets the cheapest content its checks accept: a choice
+    // field wants its literal option with a reason, a chart wants two drawn
+    // rows, and a refs field reads `- none` as an honest empty (free prose
+    // is refused there — "no references").
+    const filled = (f: { template?: string }): string => {
+      if (f.template === "choice-with-rationale") return "yes — proven for the container-paint test";
+      if (f.template === "morph-box") return "| [[opt-a]] | one | drawn for the test | x |\n| [[opt-b]] | two | drawn for the test | x |";
+      return "- none — proven for the container-paint test";
+    };
+    const body = s.evidence_form.map((f) => `## ${f.name}\n\n${filled(f)}\n`).join("\n");
+    writeFileSync(ev, `---\nsigned_off: 2026-08-09T10:00:00.000Z\nby: agent\nauthors: human\n---\n\n${body}`, "utf8");
+  }
+
+  // The interior is green FROM THE DESK — nothing bound, no live run.
+  const green = new Set(session.recordDone(view.decl));
+  for (const s of view.decl.states.filter((x) => x.evidence_form.length > 0)) {
+    assert.ok(green.has(s.id), `${s.id} stands green from the desk — grey means the sub-machine found no iteration`);
+  }
+
+  // The host drawing paints the CONTAINER green.
+  const iteration = session.viewChain("enumerate-space").at(-2) ?? "";
+  const host = renderMirror({ session, root, lastPacket: undefined, mode: "manual" }, "machine", iteration);
+  assert.match(
+    host,
+    /data-detail="state:enumerate-space"[^>]*>[\s\S]{0,300}?class="state done"/,
+    "the container is green — grey is the bug: a walked sub-machine looking unstarted",
+  );
+
+  // And the sub-machine's own view paints its END green.
+  const sub = renderMirror({ session, root, lastPacket: undefined, mode: "manual" }, "machine", "enumerate-space");
+  assert.match(
+    sub,
+    /data-detail="state:end"[^>]*>[\s\S]{0,300}?class="state done"/,
+    "its end is green — the machine completed on the record",
+  );
+});
+
+// THE ROUTE CARRIES THE WHOLE FAN (owner, 2026-08-09). One drawn path named
+// one leg of the three-way join and the walk met the other legs one refusal
+// at a time. The route now reports every unsigned leg of a bar it runs
+// through or feeds, and the drawing draws them all.
+test("the route reports a bar's owed legs as its fan", async () => {
+  const { session } = await rootWithMajorIteration();
+  const chain = session.viewChain("enumerate-space").slice(1);
+  const r = session.route(`${chain.join("/")}/build_chart`);
+  const bar = r.fan.find((f) => f.at.endsWith("/build_chart"));
+  assert.ok(bar !== undefined, `the bar reports its fan — got ${JSON.stringify(r.fan)}`);
+  assert.ok(bar.legs.length >= 6, `the unsigned finder legs all ride along — got ${JSON.stringify(bar.legs)}`);
 });

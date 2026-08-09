@@ -98,7 +98,42 @@ export const TABLE_EDITOR: EditorKind = {
     // AT LEAST ONE ROW ALWAYS STANDS. An empty table still needs its editor,
     // and the delete handler already refuses to remove the last one.
     const rows = body.length > 0 ? body : [cols.map(function () { return ""; })];
-    return datalists + '<table class="sfnodetable sftable" style="width:100%;border-collapse:collapse;table-layout:fixed;">' + head + "<tbody>" + rows.map(rowHtml).join("") + "</tbody></table>";
+    const flat = datalists + '<table class="sfnodetable sftable" style="width:100%;border-collapse:collapse;table-layout:fixed;">' + head + "<tbody>" + rows.map(rowHtml).join("") + "</tbody></table>";
+    // THE GRID READ VIEW (owner, 2026-08-09: "the rows are the candidates,
+    // the columns are the axes, the points in the cells"). A pairwise table
+    // — two closed-pick key columns and a value — cannot be READ as a flat
+    // list: comparing two rows means finding them thirty-five lines apart.
+    // So it also renders as a MATRIX: first key down, second across, the
+    // value in the cell, the remaining columns behind a cell click. The
+    // stored shape does not change, and the flat rows stay the editor,
+    // folded underneath.
+    let grid = "";
+    if (cols.length >= 3 && picks[cols[0]] && picks[cols[1]] && !isFree(cols[0]) && !isFree(cols[1]) && body.length > 0) {
+      const rk = []; const ck = []; const cellAt = {};
+      body.forEach(function (r) {
+        const a = r[0] || ""; const b = r[1] || "";
+        if (a === "" || b === "") return;
+        if (rk.indexOf(a) < 0) rk.push(a);
+        if (ck.indexOf(b) < 0) ck.push(b);
+        cellAt[a + "\\u0001" + b] = r;
+      });
+      if (rk.length > 1 || ck.length > 1) {
+        const sticky = "position:sticky;left:0;background:var(--se-bg,var(--vscode-editor-background));";
+        const shortHead = function (s) { return escText(String(s).replace(/^req-/, "")); };
+        const gh = '<th style="' + hed + sticky + '">' + escText(cols[0]) + "</th>" + ck.map(function (c) { return '<th style="' + hed + 'min-width:56px;">' + shortHead(c) + "</th>"; }).join("");
+        const gr = rk.map(function (a) {
+          const tds = ck.map(function (b) {
+            const r = cellAt[a + "\\u0001" + b];
+            return '<td class="sfgridcell" tabindex="0" style="' + cel + 'text-align:center;cursor:pointer;" data-cell="' + escText(JSON.stringify(r || [])) + '">' + escText(r ? (r[2] || "") : "") + "</td>";
+          }).join("");
+          return "<tr><td style=\\"" + cel + sticky + 'white-space:nowrap;">' + escText(a) + "</td>" + tds + "</tr>";
+        }).join("");
+        grid = '<div style="overflow-x:auto;max-width:100%;margin-bottom:6px;"><table class="sfnodetable" data-cols="' + escText(JSON.stringify(cols)) + '" style="border-collapse:collapse;">' +
+          "<thead><tr>" + gh + "</tr></thead><tbody>" + gr + "</tbody></table></div>" +
+          '<div class="meta" style="font-size:11px;">the grid reads — click a cell for its detail; the rows below edit</div>';
+      }
+    }
+    return grid !== "" ? grid + '<details><summary class="meta" style="cursor:pointer;">edit the rows</summary>' + flat + "</details>" : flat;
   `,
   collect: `
   // A TYPED TABLE SERIALISES BY DOM ORDER, never by a stored index. The +

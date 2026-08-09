@@ -209,30 +209,6 @@ export function startMirror(o: MirrorOptions): Server {
         ),
       }),
     ],
-    "/target": ["mirror_target", (body) => ({ args: { to: body.to }, result: state.session.setTarget(String(body.to ?? "")) })],
-    // SET TARGET, the bar's button (owner design 2026-08-04): aims at the
-    // SELECTED state — the one whose details the machine page reported.
-    "/target/selected": [
-      "mirror_target",
-      () => {
-        if (selected === "") {
-          throw new Rejection({
-            clause: CLAUSES.REQUIRED_ARGS,
-            expected: "a selected state — click one in the machine view first; its details showing is what selected means",
-            got: "no selection",
-            remedy: { tool: "se_pull", args: {}, note: "or aim directly: POST /target {to}" },
-            source: "engine/mirror.ts",
-          });
-        }
-        // The selection is machine-scoped: a state picked inside a
-        // sub-machine aims THERE — "end" in i1 is iterations/i1/end,
-        // never the main machine's end. Setting over a locked target
-        // simply re-aims; the route recomputes as machines regenerate.
-        const chain = selectedMachine === "" ? [] : state.session.viewChain(selectedMachine).slice(1);
-        const to = chain.length === 0 ? selected : `${chain.join("/")}/${selected}`;
-        return { args: { to }, result: state.session.setTarget(to) };
-      },
-    ],
     "/escape": [
       "mirror_escape",
       (body) => ({ args: { reason: body.reason }, result: state.session.escape(String(body.reason ?? ""), "human") }),
@@ -290,6 +266,51 @@ export function startMirror(o: MirrorOptions): Server {
   };
 
   const jsonPosts: Record<string, (req: Req, res: Res) => void> = {
+    // SET TARGET ANSWERS IN PLACE (owner report 2026-08-09: as a redirect
+    // POST the button swallowed its own rejection — success and refusal
+    // both 303ed and the clicking page read nothing). A refusal now comes
+    // back as its own JSON and the client toasts it.
+    "/target": (req, res) =>
+      jsonPost(
+        req,
+        res,
+        "mirror_target",
+        (body) => ({
+          args: { to: body.to as string },
+          run: () => {
+            const r = state.session.setTarget(String(body.to ?? ""));
+            return { log: r, answer: { ok: true, result: r } };
+          },
+        }),
+        (e) => (e instanceof Rejection ? e.toJSON() : { error: whyOf(e) }),
+      ),
+    // SET TARGET, the bar's button (owner design 2026-08-04): aims at the
+    // SELECTED state — the one whose details the machine page reported.
+    "/target/selected": (req, res) =>
+      jsonPost(
+        req,
+        res,
+        "mirror_target",
+        () => {
+          if (selected === "") {
+            throw new Rejection({
+              clause: CLAUSES.REQUIRED_ARGS,
+              expected: "a selected state — click one in the machine view first; its details showing is what selected means",
+              got: "no selection",
+              remedy: { tool: "se_pull", args: {}, note: "or aim directly: POST /target {to}" },
+              source: "engine/mirror.ts",
+            });
+          }
+          // The selection is machine-scoped: a state picked inside a
+          // sub-machine aims THERE — "end" in i1 is iterations/i1/end,
+          // never the main machine's end. Setting over a locked target
+          // simply re-aims; the route recomputes as machines regenerate.
+          const chain = selectedMachine === "" ? [] : state.session.viewChain(selectedMachine).slice(1);
+          const to = chain.length === 0 ? selected : `${chain.join("/")}/${selected}`;
+          return { args: { to }, run: () => ({ log: state.session.setTarget(to), answer: { ok: true, to } }) };
+        },
+        (e) => (e instanceof Rejection ? e.toJSON() : { error: whyOf(e) }),
+      ),
     // THE READER'S SELECTION — view state. Logged like every call, but the
     // feed skips it (feedRows), so reading the machine stays quiet.
     "/selected": (req, res) =>
@@ -474,7 +495,19 @@ export function startMirror(o: MirrorOptions): Server {
         raw = readFileSync(abs, "utf8");
       }
       raw = raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, ""); // frontmatter is machine-facing
-      const html = p.endsWith(".md") ? (marked.parse(raw) as string) : `<pre>${raw.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>`;
+      let html = p.endsWith(".md") ? (marked.parse(raw) as string) : `<pre>${raw.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>`;
+      // A [[REFERENCE]] IN PROSE IS A LINK, NOT DEAD TEXT (owner report
+      // 2026-08-09). Where the id resolves in the document's own record, it
+      // becomes the same doclink every structured editor emits; where it
+      // does not resolve it stays text — an unresolved link is a finding.
+      if (p.endsWith(".md")) {
+        const links = state.session.docRefPaths(p);
+        const escAttr = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+        html = html.replace(/\[\[([^\]\n]+)\]\]/g, (whole: string, id: string) => {
+          const path = links[id.trim()];
+          return path === undefined ? whole : `<a class="doclink" data-path="${escAttr(path)}">${escAttr(id.trim())}</a>`;
+        });
+      }
       if (url.searchParams.get("page") === "1") {
         // A standalone page — ctrl/shift-click targets (new tab, new window).
         res.writeHead(200, { "content-type": "text/html; charset=utf-8" });

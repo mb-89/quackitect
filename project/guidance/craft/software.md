@@ -46,6 +46,30 @@ that one when you touch what it covers.
   - Empty is better than an echo. A field is filled only when it ADDS something.
 - Repeat only when strongly advised. Then say why.
 
+## A stored copy never beats a derived one
+
+The 2026-08-09 retro drained five defects with one shape. A value the
+system can COMPUTE was also WRITTEN somewhere, and the written copy won.
+
+- The chart's picks beat the option nodes.
+- A stored criteria order beat the computed one. A corrosive row sat first
+  of seventy-two, above every fatal one.
+- The cutoff mark rides a row's position. A recomputed order silently
+  redraws the boundary.
+- A duplicated form section beat the section the check read.
+- The live run's colouring beat the record. A finished machine drew grey.
+
+The rule:
+
+- Where a value can be derived, derive it on every look. Do not store it.
+- Where a stored copy must exist, the derived value wins every
+  disagreement. The disagreement is reported, never silent.
+- A mark on a row names its own row. A mark riding on position makes
+  every reorder a silent edit.
+
+The precedent is the green light: calculated from the live files on every
+look, never written (owner ruling 2026-08-07, v1's adr-verdict-cache).
+
 ## Comments and provenance
 
 - Write comments the way people write them: only where a reader would be surprised.

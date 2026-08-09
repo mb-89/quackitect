@@ -144,11 +144,15 @@ export const RANK_CUT_EDITOR: EditorKind = {
       let past = false;
       let kept = 0;
       let struck = 0;
-      rows.forEach(function (tr, i) {
-        const pos = tr.querySelector(".sfrcpos");
-        if (pos) pos.textContent = String(i + 1);
+      let rank = 0;
+      rows.forEach(function (tr) {
         const cutBox = tr.querySelector(".sfrccut");
         const isCut = cutBox && cutBox.value.trim() !== "";
+        const pos = tr.querySelector(".sfrcpos");
+        // A STRUCK ROW TAKES NO RANK (owner, 2026-08-09): the numbers count
+        // what is KEPT, so the cutoff's number reads as what it keeps. The
+        // stored lines keep their positional numbering — this is the read.
+        if (pos) pos.textContent = isCut ? "\\u2014" : String(++rank);
         const out = tr.querySelector(".sfrcout");
         // BELOW THE LINE AND STRUCK ARE DIFFERENT REASONS TO BE OUT, and the
         // row says which. Below the line needs no reason of its own.

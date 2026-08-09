@@ -201,6 +201,9 @@ interface RouteMarks {
   waypoints: Set<string>;
   /** The stops in order. The spline runs through their anchors. */
   path: string[];
+  /** A bar's owed legs the path does not run through — each drawn as its
+   *  own line into the bar, so the fan shows whole. */
+  fan?: { from: string; to: string }[];
   /** The destination, if it is in this drawing. */
   target?: string;
   /** The walk STANDS in this drawing — the one view that draws the here-arrow. */
@@ -342,6 +345,23 @@ function svgStateNode(
  *  every alive answer; a mismatch reloads the page. */
 export const ENGINE_LIFE = Date.now().toString(36);
 
+// THE FAN IS DRAWN WHOLE (owner, 2026-08-09): every leg a bar still owes
+// gets its own dashed line into it and its own dot, so the one drawn path
+// cannot hide the others.
+function svgFanLegs(route: RouteMarks | undefined, nodeOfState: Map<string, CNode>): string[] {
+  const parts: string[] = [];
+  for (const leg of route?.fan ?? []) {
+    const a = nodeOfState.get(leg.from);
+    const b = nodeOfState.get(leg.to);
+    if (a === undefined || b === undefined) continue;
+    const ax = a.x + a.width / 2;
+    const ay = a.y + a.height / 4;
+    parts.push(`<path d="M ${ax} ${ay} L ${b.x + b.width / 2} ${b.y + b.height / 4}" fill="none" class="route-line fan"/>`);
+    parts.push(`<circle cx="${ax}" cy="${ay}" r="8" class="route-stop"/>`);
+  }
+  return parts;
+}
+
 // THE ROUTE IS DRAWN OVER THE NODES (owner ruling 2026-07-29), reversing
 // the along-the-edges ruling of the same day. Riding the edges read as the
 // graph highlighting itself; a navigation system lays its line ON the map.
@@ -364,6 +384,7 @@ function svgRoute(route: RouteMarks | undefined, nodeOfState: Map<string, CNode>
   // Drawn as one unbroken line the map says the whole way is open, which is
   // the one moment it lies. So the line runs normally up to the closure and
   // FADES past it: the way exists, it is shut.
+  parts.push(...svgFanLegs(route, nodeOfState));
   const xy = (s: { cx: number; cy: number }): [number, number] => [s.cx, s.cy];
   const shut = route?.blocked === undefined ? -1 : stops.findIndex((s) => s.id === route.blocked?.at);
   const open = shut > 0 ? stops.slice(0, shut) : stops;
@@ -859,6 +880,8 @@ const STYLE = `
   /* THE BLUE LINE. Blue on purpose: the voice reserves green, red and
      yellow for verdicts, and a route is not a verdict. It is a way. */
   .route-line { fill: none; stroke: var(--se-walk); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+  /* A fan leg is owed, not chosen: same blue, dashed and lighter. */
+  .route-line.fan { stroke-dasharray: 10 9; opacity: .65; stroke-width: 4; }
   /* PAST A BRANCHING POINT THE LINE MEANS TWO DIFFERENT THINGS (owner design
      2026-08-07), and drawing them the same was a lie.
 
@@ -2302,11 +2325,19 @@ function detailFor(key) {
     return ["machine: " + D.viewed.id, '<div class="comment-detail">' + txt + "</div>" + jsonTable(D.viewed)];
   }
   if (key.startsWith("state:")) {
-    const id = key.slice(6);
+    // THE MACHINE RIDES INSIDE THE KEY, exactly as form keys carry it
+    // (owner report 2026-08-09: a popped-out details window has its own
+    // view — usually the walk's — so a bare state id re-resolved THERE and
+    // build_chart's details opened as gate-candidates).
+    const at = key.slice(6).split("@");
+    const id = at[0];
+    const mac = at[1] || "";
+    const known = D.states[id];
     // ONE TRUTH, TWO RENDERS (owner ruling 2026-08-04): a state with an
     // evidence form shows THE FORM as its details — the old detail view
-    // stays only for form-less states.
-    if ((D.states[id] || {}).has_form) { void showForm(id, "details"); return ["", '<div class="meta">loading…</div>']; }
+    // stays only for form-less states. A state this page's view does not
+    // know still resolves through its carried machine.
+    if (known ? known.has_form : mac !== "") { void showForm(id, "details", mac || undefined); return ["", '<div class="meta">loading…</div>']; }
     return ["state: " + id, stateDetail(id)];
   }
   return [key, jsonTable({})];
@@ -2339,9 +2370,27 @@ document.addEventListener("click", (ev) => {
     CURRENT_DETAIL = g.dataset.detail;
     // The engine mirrors the selection, so a control in ANOTHER surface
     // (the sidebar's SET TARGET) can act on the state whose details show.
-    if (g.dataset.detail.startsWith("state:")) void fetch("/selected", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: g.dataset.detail.slice(6), machine: viewedMachine() }) });
-    const [t, h] = detailFor(g.dataset.detail); showDetails(t, h);
+    // A state key stores its machine too, so a pop-out re-resolves the
+    // SAME state instead of whatever its own view would answer.
+    if (g.dataset.detail.startsWith("state:")) {
+      CURRENT_DETAIL = g.dataset.detail + "@" + viewedMachine();
+      void fetch("/selected", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: g.dataset.detail.slice(6), machine: viewedMachine() }) });
+    }
+    const [t, h] = detailFor(CURRENT_DETAIL); showDetails(t, h);
   }
+});
+// A GRID CELL OPENS ITS DETAIL (owner, 2026-08-09): the score grid shows
+// the value; the anchor and the prior-art name sit behind the click, in
+// the details pane like every other detail.
+document.addEventListener("click", (ev) => {
+  const c = ev.target.closest ? ev.target.closest(".sfgridcell") : null;
+  if (!c) return;
+  let row = []; let heads = [];
+  try { row = JSON.parse(c.dataset.cell || "[]"); } catch (e) { /* an unfilled cell stays quiet */ }
+  try { heads = JSON.parse((c.closest("table") || {}).dataset ? c.closest("table").dataset.cols || "[]" : "[]"); } catch (e) { /* no heads, no card */ }
+  if (row.length === 0 || heads.length === 0) return;
+  const kv = heads.map((h, i) => "<tr><td>" + escText(h) + "</td><td>" + escText(row[i] || "") + "</td></tr>").join("");
+  showDetails(escText(row[0] || "") + " · " + escText(row[1] || ""), '<table class="kv">' + kv + "</table>");
 });
 // Double-click a sub-machine state: enter it as a VIEWER (walk unmoved).
 document.addEventListener("dblclick", (ev) => {
@@ -2526,9 +2575,15 @@ addEventListener("keydown", (ev) => {
   // whole point of a target being separate from a tick.
   if (ev.key === "t" || ev.key === "T") {
     if (typeof CURRENT_DETAIL !== "string" || !CURRENT_DETAIL.startsWith("state:")) return;
-    const to = CURRENT_DETAIL.slice(6);
+    // The key may carry its machine after @ — the target wants the bare id.
+    const to = CURRENT_DETAIL.slice(6).split("@")[0];
     ev.preventDefault();
-    void fetch("/target", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ to }) });
+    void fetch("/target", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ to }) }).then(async (r) => {
+      try {
+        const d = await r.json();
+        if (d && (d.kind === "rejected" || d.error)) toast(d.expected || d.error || "refused");
+      } catch (e) { /* not JSON */ }
+    });
     return;
   }
   if (!/^[0-9]$/.test(ev.key)) return;
@@ -2931,7 +2986,15 @@ document.addEventListener("click", (ev) => {
       }
       return;
     }
-    void fetch(act.dataset.post, { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
+    // A JSON-answering control reports its refusal IN PLACE — the target
+    // button used to swallow it (owner report 2026-08-09). A redirecting
+    // control answers HTML, and reading it as JSON just stays quiet.
+    void fetch(act.dataset.post, { method: "POST", headers: { "content-type": "application/json" }, body: "{}" }).then(async (r) => {
+      try {
+        const d = await r.json();
+        if (d && (d.kind === "rejected" || d.error)) toast(d.expected || d.error || "refused");
+      } catch (e) { /* not JSON — a redirecting control */ }
+    });
     return;
   }
 
@@ -3395,6 +3458,34 @@ function stateEdgeDetail(m: MirrorState, decl: MachineDecl, e: MachineDecl["stat
   };
 }
 
+/** RECORD-COMPLETE, derived: every claimful state stands green, and every
+ *  drawn sub-machine is record-complete in turn. A machine with nothing
+ *  claimful anywhere proves nothing and stays incomplete, as does an
+ *  unwalked branch's machine — a false grey, never a false green. Memoised
+ *  per drawing; the memo doubles as the cycle guard. */
+function recordComplete(m: MirrorState, d: MachineDecl, rc: Map<string, boolean>, green?: Set<string>): boolean {
+  const known = rc.get(d.id);
+  if (known !== undefined) return known;
+  rc.set(d.id, false); // a cycle proves nothing
+  const g = green ?? new Set(m.session.recordDone(d));
+  let provable = false;
+  for (const s of d.states) {
+    const claimful = s.evidence_form.length > 0;
+    if (claimful || s.submachine !== undefined) provable = true;
+    if (claimful && !g.has(s.id)) return false;
+    if (s.submachine !== undefined && !subComplete(m, s.id, rc)) return false;
+  }
+  rc.set(d.id, provable);
+  return provable;
+}
+
+/** A container's derived green: its drawing resolves AND that machine is
+ *  record-complete. A seeded sub-machine with no drawing yet proves nothing. */
+function subComplete(m: MirrorState, id: string, rc: Map<string, boolean>): boolean {
+  const sub = m.session.viewFor(id);
+  return sub !== undefined && recordComplete(m, sub.decl, rc);
+}
+
 /** Highlights follow the WALK; the view may be elsewhere. */
 function drawingSets(
   m: MirrorState,
@@ -3436,6 +3527,16 @@ function drawingSets(
   // until its authoring state has run, and asking the resolver is the only way
   // to know — the declaration alone says nothing about whether it exists.
   const openIds = new Set([...subIds].filter((id) => m.session.viewFor(id) !== undefined));
+  // A WALKED SUB-MACHINE MUST NOT LOOK UNSTARTED (owner report 2026-08-09:
+  // from trunk, i1 read "not done" though every claim under its last gate
+  // stood signed). A container and an end carry no claim of their own, and
+  // the live run that used to colour them dies with the engine — so their
+  // green is DERIVED via recordComplete, below.
+  const rc = new Map<string, boolean>();
+  for (const id of openIds) if (subComplete(m, id, rc)) paint.add(id);
+  if (decl.states.some((s) => s.kind === "end") && recordComplete(m, decl, rc, paint)) {
+    for (const s of decl.states) if (s.kind === "end") paint.add(s.id);
+  }
   const meta: Record<string, StateMeta> = {};
   for (const s of decl.states) {
     meta[s.id] = {
@@ -3464,11 +3565,22 @@ function routeMarksFor(m: MirrorState, decl: MachineDecl): RouteMarks | undefine
       if (prefix === "") return q.split("/")[0];
       return q.startsWith(`${prefix}/`) ? q.slice(prefix.length + 1).split("/")[0] : undefined;
     };
+    // The fan's legs, projected onto this drawing like every other mark.
+    const fan: { from: string; to: string }[] = [];
+    for (const f of r.fan ?? []) {
+      const to = localOf(f.at);
+      if (to === undefined) continue;
+      for (const l of f.legs) {
+        const from = localOf(l);
+        if (from !== undefined && from !== to) fan.push({ from, to });
+      }
+    }
     const shutAt = r.stops_at === undefined ? undefined : localOf(r.stops_at.at);
     const rest = prefix === "" ? r.from : r.from.startsWith(`${prefix}/`) ? r.from.slice(prefix.length + 1) : undefined;
     return {
       waypoints,
       path: hops,
+      ...(fan.length > 0 ? { fan } : {}),
       here: rest !== undefined && !rest.includes("/"),
       ...(r.found && localOf(r.target) !== undefined ? { target: localOf(r.target) } : {}),
       ...(shutAt !== undefined && r.stops_at !== undefined ? { blocked: { at: shutAt, why: r.stops_at.why } } : {}),

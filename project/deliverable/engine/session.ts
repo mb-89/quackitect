@@ -27,7 +27,7 @@ import {
 } from "./machine.ts";
 import { bumpDrawingEpoch, compileMachine, compileMachineCached, resolveRef } from "./machines/compile.ts";
 import { chartPlan } from "./morphbox.ts";
-import { computeRoute, type RouteNode, type RouteResult } from "./route.ts";
+import { computeRoute, type RouteNode, type RouteResult, type RouteStep } from "./route.ts";
 
 /** THE STATE A RECORDED VISIT NAMES. A visit is stored qualified and
  *  occurrence-stamped ("expeditions/e30@0"), and the graph-is-evidence check
@@ -1740,6 +1740,7 @@ export class Session {
     judgments: { at: string; needs: string; why: string }[];
     reads: string[];
     stops_at?: { at: string; why: string };
+    fan: { at: string; legs: string[] }[];
   } {
     const from = this.active()[0] ?? this.machine.initial;
     // THE ROUTE IS RECOMPUTED, NEVER RE-DERIVED (measured 2026-08-02: 200 ms
@@ -1820,10 +1821,48 @@ export class Session {
       autonomy: this._autonomy,
       judgments,
       reads: this.routeReadList(r.steps),
+      // THE FAN AT A BAR RIDES THE ROUTE (owner, 2026-08-09): one drawn
+      // path hid the other legs, and the walk met them one refusal at a
+      // time — the three-way join cost an aim per leg before this.
+      fan: this.routeFan(r.steps),
       ...(judgments.length > 0 ? { stops_at: { at: judgments[0].at, why: judgments[0].why } } : {}),
     };
     this.routeMemo = { key: memoKey, machine: machineNow, value };
     return value;
+  }
+
+  /** A qualified id, split against its drawing. */
+  private stateAt(q: string): { prefix: string; decl?: MachineDecl; state?: StateDecl } {
+    const cut = q.lastIndexOf("/");
+    const prefix = cut < 0 ? "" : q.slice(0, cut);
+    const decl = this.declForPrefix(prefix);
+    const state = decl?.states.find((s) => s.id === (cut < 0 ? q : q.slice(cut + 1)));
+    return { prefix, decl, state };
+  }
+
+  /** THE ROUTE STAYS ONE WALKABLE PATH, but a state whose inputs meet at an
+   *  AND bar is owed EVERY leg. The unsigned legs the path does not itself
+   *  run through ride along here, so the drawing shows the whole fan and
+   *  the agent reads all of what is next. Bars worth reporting: ON the
+   *  path, or FED by it — the objective is usually one LEG of a fan, and
+   *  the bar it feeds owes the rest. */
+  private routeFan(steps: RouteStep[]): { at: string; legs: string[] }[] {
+    const out: { at: string; legs: string[] }[] = [];
+    const onPath = new Set(steps.flatMap((s) => [s.from, s.to]));
+    const candidates = new Set<string>(onPath);
+    for (const q of onPath) {
+      const { prefix, state } = this.stateAt(q);
+      for (const e of state?.edges ?? []) candidates.add(prefix === "" ? e.to : `${prefix}/${e.to}`);
+    }
+    for (const q of candidates) {
+      const { prefix, decl, state } = this.stateAt(q);
+      if (decl === undefined || state === undefined || state.evidence_form.length === 0) continue;
+      const legs = this.feedersUnsigned(decl, state)
+        .map((f) => (prefix === "" ? f : `${prefix}/${f}`))
+        .filter((ql) => !onPath.has(ql));
+      if (legs.length > 0) out.push({ at: q, legs });
+    }
+    return out;
   }
 
   /** The whole way's reading list, for the packet to carry unasked.
@@ -3284,6 +3323,25 @@ export class Session {
     return out;
   }
 
+  /** The id→path map for a DOCUMENT's own record — the /doc renderer's
+   *  wiki-link pass (owner report 2026-08-09: a [[cand-…]] in a free-form
+   *  field rendered as dead text). A doc under a record resolves that
+   *  record's corpus; everything else reads the working root's. */
+  docRefPaths(p: string): Record<string, string> {
+    try {
+      const m = /(?:^|[\\/])iterations[\\/]([^\\/]+)[\\/]/.exec(p) ?? /(?:^|[\\/])\.worktrees[\\/]([^\\/]+)[\\/]/.exec(p);
+      const own =
+        m === null
+          ? undefined
+          : itList(this.root)
+              .filter((x) => x.open)
+              .find((x) => x.id === m[1]);
+      return this.refPaths(own);
+    } catch {
+      return {};
+    }
+  }
+
   /** WHAT A CARD NEEDS TO JUDGE BY, per node. The statement is what the row
    *  demands; breaks_if_removed is what losing it costs. Those two carry the
    *  judgment, and everything else is one click away behind the link. */
@@ -3547,7 +3605,23 @@ export class Session {
       // A SUB-MACHINE BELONGS TO WHATEVER RECORD IS BOUND. Its evidence lands
       // in that record's folder, which is exactly where the green check looks.
       const boundId = this.bound?.id;
-      return boundId === undefined ? undefined : open.find((x) => x.id === boundId);
+      const bound = boundId === undefined ? undefined : open.find((x) => x.id === boundId);
+      if (bound !== undefined) return bound;
+      // FROM THE DESK NOTHING IS BOUND, and the bound fallback alone left a
+      // drawn sub-machine's whole interior grey when browsed from trunk
+      // (owner report 2026-08-09: i1 read "not done" though its claims stood).
+      // The host chain answers instead: whichever machine carries this drawing
+      // as a state, climbed until one of them IS an open iteration.
+      const all = this.reachableMachines();
+      let at = decl.id;
+      for (let hop = 0; hop < 8; hop++) {
+        const host = all.find((h) => h.states.some((s) => s.submachine !== undefined && s.id === at));
+        if (host === undefined) return undefined;
+        const under = open.find((x) => itShortId(x.id) === host.id);
+        if (under !== undefined) return under;
+        at = host.id;
+      }
+      return undefined;
     } catch {
       return undefined; // no git, no records — nothing to check
     }

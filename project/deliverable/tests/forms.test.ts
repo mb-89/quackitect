@@ -6,6 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { TABLE_EDITOR } from "../engine/editors/table.ts";
 import {
   confirmPrefill,
   lintForm,
@@ -272,4 +273,61 @@ test("the pool is requirements only, and a closed register entry pulls nothing",
   // that remain, the one the open register leans on comes first, so the
   // walk's bottom probe is the question most likely to be confirmed.
   assert.deepEqual(criterionAxisItems(root), ["req-leaned-on", "req-quiet"]);
+});
+
+// A HEADING INSIDE A FIELD STAYS INSIDE THE FIELD (2026-08-09, four times in
+// one sitting). A `##` line in a body ended the section: the rest parsed as a
+// made-up sibling, the required-check still saw the first paragraph, and the
+// loss was invisible at the moment it happened. The author's heading is MEANT
+// — voice.md asks for small headings in long prose — so it demotes to `###`
+// on write instead of being refused.
+test("a heading written into a field demotes and the field survives whole", () => {
+  const t = parseFormTemplate("t1", TPL);
+  let raw = scaffoldInstance(t, "page");
+  raw = withFieldContent(raw, "Goal", "first paragraph\n\n## A small heading\n\nsecond paragraph\n\n# a top heading too\n\ntail");
+  raw = withFieldContent(raw, "Done", "done");
+  const l = lintForm(t, raw, mkdtempSync(join(tmpdir(), "se-ev-")));
+  assert.ok(l.fields[0].content.includes("### A small heading"), "the heading demoted");
+  assert.ok(l.fields[0].content.includes("### a top heading too"), "a # demotes the same way");
+  assert.ok(l.fields[0].content.includes("tail"), "nothing after a heading is lost");
+  assert.doesNotMatch(raw, /^## A small heading$/m, "no made-up sibling section exists");
+});
+
+// THE GRID READ VIEW (owner, 2026-08-09: "the rows are the candidates, the
+// columns are the axes, the points in the cells"). A pairwise table — two
+// closed-pick key columns and a value — renders as a matrix beside its flat
+// rows: first key down, second across, the value in the cell, the remaining
+// columns behind a cell click. A plain table stays flat.
+test("a pairwise table renders its grid read view, and a plain table stays flat", () => {
+  const render = new Function("name", "fl", "args", "escText", "sfRowBtns", TABLE_EDITOR.render) as (
+    n: string,
+    f: { content: string },
+    a: Record<string, unknown>,
+    e: (s: unknown) => string,
+    b: () => string,
+  ) => string;
+  const escText = (s: unknown): string => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+  const btns = (): string => "";
+  const content = [
+    "| candidate | axis | score | anchor | prior_art |",
+    "| --- | --- | --- | --- | --- |",
+    "| cand-a | req-x | 3 | solid | none |",
+    "| cand-a | req-y | 4 | par | tool-z |",
+    "| cand-b | req-x | 1 | gesture | none |",
+  ].join("\n");
+  const args = {
+    columns: ["candidate", "axis", "score", "anchor", "prior_art"],
+    column_help: [],
+    picks: { candidate: ["cand-a", "cand-b"], axis: ["req-x", "req-y"], score: ["0", "1", "2", "3", "4", "5"] },
+    pick_free: [],
+    pick_sources: {},
+  };
+  const html = render("scores", { content }, args, escText, btns);
+  assert.match(html, /sfgridcell/, "the grid renders");
+  assert.match(html, /data-cols=/, "the grid carries its columns for the cell click");
+  assert.ok(html.includes("<details>"), "the flat rows fold under the grid, still the editor");
+  assert.match(html, /data-cell="\[&quot;cand-a&quot;,&quot;req-x&quot;/, "a cell carries its whole row for the details pane");
+
+  const flat = render("scores", { content }, { ...args, picks: {} }, escText, btns);
+  assert.doesNotMatch(flat, /sfgridcell/, "free key columns stay a flat table");
 });
