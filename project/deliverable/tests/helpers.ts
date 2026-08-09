@@ -196,36 +196,59 @@ export async function call(server: Server, name: string, args: Record<string, un
   return { isError: r.isError, body: JSON.parse(r.content[0].text) as Record<string, unknown> };
 }
 
-/** The guidance the pull demands on the way to the desk — the boot reading.
- *  A doc joins this list by being pulled at those states, or every walk in
- *  the suite stalls waiting for a proof the suite never gives.
- *
- *  AGENTS.md, then the contract, the walk and the voice LEFT THIS LIST when
- *  they were promoted to the prompt layer.
- *
- *  SOFTWARE AND UX LEFT IT on 2026-08-06, when they moved out of the guidance
- *  root behind applies_to. They bind the states that build something, and the
- *  way to the desk passes through none of them. */
-// REFUSALS RIDES EVERY PACKET, because it sits at the guidance ROOT and root
-// docs pull everywhere. That is the point of it: a clause stated only when it
-// fires is feedback, and the owner asked for feed-forward (ruling
-// 2026-08-06). So the human's proof owes it wherever the walk stands, and a
-// fixture that skips it fails at the first hop into idle.
-export const READ_DOCS = [
-  "project/guidance/method/boot.md",
-  "project/guidance/method/front-desk.md",
-  "project/guidance/refusals.md",
-] as const;
+/** WHAT THE WALK OWES, ASKED — NEVER NAMED (owner ruling 2026-08-06:
+ *  moving guidance must never break a test. It broke 18 assertions, every
+ *  one pinning a path no rule guarantees). The engine's route carries the
+ *  way's reading list, so the suite asks IT. A doc joins or leaves this
+ *  answer by joining or leaving the machine — no list here to go stale. */
+export function readDocs(root: string): string[] {
+  const s = new Session(root);
+  return (s.packet() as { route_reads?: string[] }).route_reads ?? [];
+}
 
-/** The craft guidance, and the states it binds. Pulled THERE, nowhere else. */
-export const CRAFT_DOCS = ["project/guidance/craft/software.md", "project/guidance/craft/ux.md"] as const;
+/** The craft guidance, derived from its folder — a moved or added card
+ *  changes the answer instead of falsifying a list. Sorted, so software
+ *  precedes ux by name and callers may index. */
+export function craftDocs(): string[] {
+  return readdirSync(join(REPO_ROOT, "project", "guidance", "craft"))
+    .filter((e) => e.endsWith(".md"))
+    .sort()
+    .map((e) => `project/guidance/craft/${e}`);
+}
 
-/** The human's side of the read proof: check every boot doc in the mirror.
- *  (The agent's side has no helper on purpose — its proofs are earned by
- *  reading through the lane, and the hash-supplying lane retired with the
- *  tick.) */
-export function checkDocs(session: { humanCheck: (p: string) => unknown }): void {
-  for (const p of READ_DOCS) session.humanCheck(p);
+/** THE NAMED SUBJECTS. A handful of tests are ABOUT a specific page — the
+ *  voice split, the contract's projection, the method the kickoff demands.
+ *  They take the path from HERE, so a guidance move edits one line and the
+ *  layout is pinned nowhere else (the testlint enforces that). */
+export const GUIDANCE = {
+  dir: "project/guidance",
+  contract: "project/guidance/contract.md",
+  voice: "project/guidance/voice.md",
+  refusalsPage: "project/guidance/refusals.md",
+  bootMethod: "project/guidance/method/boot.md",
+  frontDeskMethod: "project/guidance/method/front-desk.md",
+  retroMethod: "project/guidance/method/retro.md",
+} as const;
+
+/** A test that needs SOME real document to read, patch or check — not a
+ *  particular one — asks here instead of naming a path. */
+export function anyGuidanceDoc(): string {
+  return GUIDANCE.voice;
+}
+
+/** The human's side of the read proof: check everything the way demands,
+ *  asked from the session's own route. (The agent's side has no helper on
+ *  purpose — its proofs are earned by reading through the lane.) */
+export function checkDocs(session: { humanCheck: (p: string) => unknown; packet: () => unknown }): void {
+  const reads = (session.packet() as { route_reads?: string[] }).route_reads ?? [];
+  // ROOT DOCS PULL EVERYWHERE — the engine's own rule — and a suite
+  // wanders past the desk after boot, so the human's proof covers the
+  // guidance root too. Derived from the folder, never named: a doc joins
+  // by existing there.
+  const roots = readdirSync(join(REPO_ROOT, "project", "guidance"), { withFileTypes: true })
+    .filter((e) => e.isFile() && e.name.endsWith(".md"))
+    .map((e) => `project/guidance/${e.name}`);
+  for (const p of new Set([...reads, ...roots])) session.humanCheck(p);
 }
 
 /** A test root with a real repository in it. Anything that lists

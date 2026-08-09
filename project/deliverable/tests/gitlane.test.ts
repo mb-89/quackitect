@@ -24,7 +24,7 @@ test("a recorded visit yields its state, however deep the container", () => {
   assert.equal(visitState("iterations/i1/walk@7"), "walk", "and it reaches the innermost state at any depth");
 });
 
-import { bootedServer, call, freshRoot } from "./helpers.ts";
+import { anyGuidanceDoc, bootedServer, call, freshRoot } from "./helpers.ts";
 
 // A narrated call writes the record's decision trail INTO the bound worktree,
 // so a walk that is narrating can never present a clean tree. A sync is wanted
@@ -35,8 +35,8 @@ test("the dirty gate excuses the engine's own trail, and nothing else", () => {
   const trail = " M project/spec/expeditions/e31-x/decisions.jsonl";
   assert.deepEqual(dirtyLines(trail), [], "the engine's own trail is not somebody's uncommitted work");
   assert.deepEqual(dirtyLines("?? project/spec/iterations/i1-y/decisions.jsonl"), [], "an iteration's trail likewise");
-  const real = `${trail}\n M project/guidance/voice.md`;
-  assert.deepEqual(dirtyLines(real), [" M project/guidance/voice.md"], "real work still blocks a reconcile");
+  const real = `${trail}\n M ${anyGuidanceDoc()}`;
+  assert.deepEqual(dirtyLines(real), [` M ${anyGuidanceDoc()}`], "real work still blocks a reconcile");
   assert.deepEqual(dirtyLines(""), [], "a clean tree stays clean");
   // A merge cannot silently bury an untracked file — git aborts if one
   // would be overwritten, and that abort refuses typed. Counting them

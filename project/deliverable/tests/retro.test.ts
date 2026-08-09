@@ -13,7 +13,7 @@ import { backlogNotes } from "../engine/inbox.ts";
 import { seDir } from "../engine/paths.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, freshRoot, pullBoot, pullTo } from "./helpers.ts";
+import { anyGuidanceDoc, call, freshRoot, pullBoot, pullTo } from "./helpers.ts";
 
 test("draining splits: done and obsolete anywhere, carried and backlog only in the retro", async () => {
   const root = freshRoot();
@@ -94,7 +94,7 @@ test("since last_retro: the log query scopes to the period after the newest drai
   await pullTo(session, "retro");
   await call(server, "se_note_drain", { ref: String(minted.body.captured), disposition: "done", where: "test" });
   // … then act once more: the scoped query sees only the tail.
-  await call(server, "se_file_read", { path: "project/guidance/contract.md", offset: 1, limit: 1 });
+  await call(server, "se_file_read", { path: anyGuidanceDoc(), offset: 1, limit: 1 });
   const scoped = log.query({ filter: { since: "last_retro" } });
   assert.ok(scoped.total < log.query({}).total, "the floor cuts the earlier period off");
   assert.ok(scoped.total >= 1, "the tail after the drain is visible");

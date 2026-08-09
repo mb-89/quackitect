@@ -13,7 +13,7 @@ import { type MachineDecl, validateMachine } from "../engine/machine.ts";
 import { type ChangeColumn, compileColumn, readRigorMatrix } from "../engine/rigor-matrix.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, checkDocs, freshRoot } from "./helpers.ts";
+import { call, checkDocs, freshRoot, GUIDANCE } from "./helpers.ts";
 
 function gitInit(root: string): void {
   for (const a of [
@@ -290,7 +290,7 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
   assert.deepEqual(session.breadcrumb(), ["main", "iterations", sid]);
   // The METHOD guards the door (owner 2026-08-04) — the person proves by
   // checkbox, and only then does the retro open.
-  session.humanCheck("project/guidance/method/retro.md");
+  session.humanCheck(GUIDANCE.retroMethod);
   await session.advance(); // start → onboard-retro
   // THE EXIT IS THE HARD GATE (owner 2026-08-04): the retro's stored form
   // must stand complete before the walk moves.
@@ -470,7 +470,7 @@ test("no gate holds the first start — entering binds, stamps started, and M0 s
   await session.advance("iterations");
   await session.advance(sid);
   assert.deepEqual(session.breadcrumb(), ["main", "iterations", sid]);
-  session.humanCheck("project/guidance/method/retro.md");
+  session.humanCheck(GUIDANCE.retroMethod);
   // The target CLEARS on the descent — when it did not, the pull answered
   // wait forever with the walk wedged at the sub's start.
   session.setTarget(`iterations/${sid}`);

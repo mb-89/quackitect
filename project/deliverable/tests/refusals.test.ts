@@ -11,7 +11,7 @@ import { fileURLToPath } from "node:url";
 import { CLAUSES, clauseGuidance, Rejection } from "../engine/errors.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
-// tests/ sits in project/deliverable/, the page in project/guidance/.
+// tests/ sits in the deliverable; the page sits at the guidance root.
 const PAGE = join(here, "..", "..", "guidance", "refusals.md");
 
 describe("the clause-guidance pairing", () => {

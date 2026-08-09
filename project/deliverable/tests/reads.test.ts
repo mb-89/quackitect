@@ -10,7 +10,7 @@ import { pulledFor, scanGuidance } from "../engine/pull.ts";
 import { renderMirror } from "../engine/render.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { bootedServer, CRAFT_DOCS, call, checkDocs, freshRoot, readOne } from "./helpers.ts";
+import { bootedServer, call, checkDocs, craftDocs, freshRoot, GUIDANCE, readOne } from "./helpers.ts";
 
 // THREE HOMES, NOT ONE (owner ruling 2026-07-29). voice.md is about HOW YOU
 // TALK. It had accumulated rules about writing SOFTWARE and building
@@ -35,15 +35,16 @@ test("the guidance splits three ways, and every home reaches the reader", () => 
     pulledFor(root, docs, s.machine, { id, kind: "work", tags: [] } as unknown as Parameters<typeof pulledFor>[3]).map((p) => p.path);
   const idle = at("idle");
   const work = at("build-steps");
-  for (const home of CRAFT_DOCS) {
+  const craft = craftDocs();
+  for (const home of craft) {
     assert.ok(!idle.includes(home), `${home} still rides every packet — it names its own states now`);
     assert.ok(work.includes(home), `${home} is not pulled where it binds — a guidance nobody pulls is a guidance nobody reads`);
   }
-  assert.ok(!idle.includes("project/guidance/voice.md"), "a promoted source must not also ride the wire");
+  assert.ok(!idle.includes(GUIDANCE.voice), "a promoted source must not also ride the wire");
   const read = (p: string): string => readFileSync(join(root, ...p.split("/")), "utf8");
-  const voice = read("project/guidance/voice.md");
-  const software = read(CRAFT_DOCS[0]);
-  const ux = read(CRAFT_DOCS[1]);
+  const voice = read(GUIDANCE.voice);
+  const software = read(craft.find((p) => p.endsWith("software.md")) ?? "");
+  const ux = read(craft.find((p) => p.endsWith("ux.md")) ?? "");
   // Each rule sits in exactly one home. Two copies is how they drift apart.
   assert.match(software, /Do not repeat \(DRY\)/, "DRY is a software rule");
   assert.match(software, /Comments and provenance/, "so is how you comment");
@@ -262,7 +263,7 @@ test("THE HANDOVER RULE: the human walks boot on checkboxes, raises the slider �
   assert.deepEqual(session.active(), ["boot/prepare_idle"]);
   // The packet tells the agent what the session has checked.
   const info = session.packet() as { human_checked: string[] };
-  assert.ok(info.human_checked.includes("project/guidance/method/boot.md"));
+  assert.ok(info.human_checked.includes(GUIDANCE.bootMethod));
   // The slider rises; the agent pulls — but its head holds none of it, so
   // the machine demands the same reading before it walks anywhere.
   session.setAutonomy(0.6);
@@ -275,7 +276,7 @@ test("THE HANDOVER RULE: the human walks boot on checkboxes, raises the slider �
     if (doc === null) break;
     served.push(doc.path);
   }
-  assert.ok(served.includes("project/guidance/craft/software.md"), `the same list is owed: ${served.join(", ")}`);
+  assert.ok(served.includes(craftDocs().find((p) => p.endsWith("software.md")) ?? ""), `the same list is owed: ${served.join(", ")}`);
   // Proving the last document already moves the walk, so what matters here
   // is that the reading gate is discharged — not which door comes next.
   const landed = await call(server, "se_pull");

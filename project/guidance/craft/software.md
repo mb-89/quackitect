@@ -46,6 +46,26 @@ that one when you touch what it covers.
   - Empty is better than an echo. A field is filled only when it ADDS something.
 - Repeat only when strongly advised. Then say why.
 
+## Dependencies: pull assets, never lean on servers
+
+The rule, owner-ruled twice (2026-08-01, restated harder 2026-08-09):
+
+- PULLING an asset is free. A one-time download from a CDN or registry is
+  fine — you had to be online to clone the repo anyway.
+- DEPENDING on a server is forbidden. Nothing we ship may need someone
+  else's server at RUN time — no CDN script tags, no online renderers, no
+  API a page calls to do its job. The agent's own model service is the one
+  exception.
+- The pulled asset is VENDORED: committed under deliverable/vendor with a
+  README naming version, source, date and license.
+- A missing vendored asset REFUSES with the pull that fixes it. An online
+  fallback is the dependency wearing a disguise.
+
+The case that set the restatement: the mermaid check page loaded its
+renderer from a CDN on every open. Offline it checked nothing while
+looking like a checker. It now inlines the vendored renderer and works
+forever as generated.
+
 ## A stored copy never beats a derived one
 
 The 2026-08-09 retro drained five defects with one shape. A value the

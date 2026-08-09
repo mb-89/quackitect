@@ -20,7 +20,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, test } from "node:test";
 import { Session } from "../engine/session.ts";
-import { freshRoot } from "./helpers.ts";
+import { anyGuidanceDoc, freshRoot } from "./helpers.ts";
 
 describe("declared roots", { concurrency: true }, () => {
   // THE ROUTING RULE. An "@" address is session state exactly like .se/, so it
@@ -41,7 +41,7 @@ describe("declared roots", { concurrency: true }, () => {
   test("everything else still answers from the work root", () => {
     const s = new Session(freshRoot());
     assert.equal(s.laneRoot(), s.workRoot(), "no address at all");
-    assert.equal(s.laneRoot("project/guidance/craft/ux.md"), s.workRoot(), "an ordinary path");
+    assert.equal(s.laneRoot(anyGuidanceDoc()), s.workRoot(), "an ordinary path");
     assert.equal(s.laneRoot("project/**/*.md"), s.workRoot(), "an ordinary glob");
   });
 

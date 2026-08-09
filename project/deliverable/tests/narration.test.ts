@@ -8,7 +8,7 @@ import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, freshRoot } from "./helpers.ts";
+import { anyGuidanceDoc, call, freshRoot } from "./helpers.ts";
 
 /** Boot on one read, so the toll is armed and the walk stands at the desk. */
 async function booted(): Promise<{ server: ReturnType<typeof buildServer>; session: Session }> {
@@ -38,7 +38,7 @@ test("turned off, nothing is ever owed however long the silence runs", async () 
   const { server, session } = await booted();
   session.setNarration(0, 0); // both clocks stopped — nothing is ever owed
   for (let i = 0; i < 30; i++) {
-    const r = await call(server, "se_file_read", { path: "project/guidance/contract.md", offset: 1, limit: 1 });
+    const r = await call(server, "se_file_read", { path: anyGuidanceDoc(), offset: 1, limit: 1 });
     assert.equal(r.isError, false, JSON.stringify(r.body));
     assert.equal(r.body.toll_warning, undefined, "silence is legal at the top notch");
   }
@@ -47,7 +47,7 @@ test("turned off, nothing is ever owed however long the silence runs", async () 
 test("at the tightest notch the calls themselves fall due, warning first", async () => {
   const { server, session } = await booted();
   session.setNarration(1, 5); // every minute, or every 5 calls
-  const read = () => call(server, "se_file_read", { path: "project/guidance/contract.md", offset: 1, limit: 1 });
+  const read = () => call(server, "se_file_read", { path: anyGuidanceDoc(), offset: 1, limit: 1 });
   let warning: string | undefined;
   let refusal: Record<string, unknown> | undefined;
   for (let i = 0; i < 12 && refusal === undefined; i++) {
@@ -69,7 +69,7 @@ test("an update pays, whatever the cadence, and the count starts over", async ()
   session.setNarration(1, 5);
   for (let i = 0; i < 20; i++) {
     const r = await call(server, "se_file_read", {
-      path: "project/guidance/contract.md",
+      path: anyGuidanceDoc(),
       offset: 1,
       limit: 1,
       update: { op: "update", brief: "still reading" },
@@ -99,7 +99,7 @@ test("the control refuses a value outside its notches", async () => {
 test("a failing update is named by the refusal, never masked by the toll", async () => {
   const { server, session } = await booted();
   session.setNarration(1, 5);
-  const read = () => call(server, "se_file_read", { path: "project/guidance/contract.md", offset: 1, limit: 1 });
+  const read = () => call(server, "se_file_read", { path: anyGuidanceDoc(), offset: 1, limit: 1 });
   let warned = false;
   for (let i = 0; i < 12 && !warned; i++) {
     const r = await read();
@@ -107,7 +107,7 @@ test("a failing update is named by the refusal, never masked by the toll", async
   }
   assert.ok(warned, "the grace warning is burnt — the next unpaid call refuses");
   const r = await call(server, "se_file_read", {
-    path: "project/guidance/contract.md",
+    path: anyGuidanceDoc(),
     offset: 1,
     limit: 1,
     update: { op: "done", node: "d9999", brief: "no such node" },
