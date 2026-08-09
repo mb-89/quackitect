@@ -246,7 +246,19 @@ test("the voice lint: walls, sentences, chains and the pyramid - thresholds are 
     "nine unbroken lines are a wall",
   );
   assert.ok(lintProse(root, `${"word ".repeat(30)}end.`).some((f) => f.rule === "long-sentence"));
-  assert.ok(lintProse(root, "we need alpha, beta, gamma, delta and epsilon.").some((f) => f.rule === "comma-chain"));
+  assert.ok(
+    lintProse(root, "we walk the drawing, prove the reading, fill the form, stamp the claim and pull again.").some(
+      (f) => f.rule === "comma-chain",
+    ),
+    "a chain of THOUGHTS is the buried list",
+  );
+  // A PART MUST CARRY SUBSTANCE TO COUNT (e28 ruling, rebuilt 2026-08-09):
+  // an enumeration of bare NAMES is reference, and nobody wants `pill` on
+  // its own bullet.
+  assert.ok(
+    !lintProse(root, "we need alpha, beta, gamma, delta and epsilon.").some((f) => f.rule === "comma-chain"),
+    "a chain of bare names is reference, not a buried list",
+  );
   // A SPAN IS ONE THING. The separator set includes the slash, so a path
   // inside a code span split into an "item" per segment. Every card saying
   // where its node lives fired the chain rule on a path it could not fix.
@@ -312,14 +324,14 @@ test("the voice lint sweeps a whole tree and reports what it left out", async ()
   const { writeFileSync, mkdirSync } = await import("node:fs");
   const dir = join(root, "project", "guidance", "sweeptest");
   mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, "dirty.md"), "we need alpha, beta, gamma, delta and epsilon.\n", "utf8");
+  writeFileSync(join(dir, "dirty.md"), "we walk the drawing, prove the reading, fill the form, stamp the claim and pull again.\n", "utf8");
   writeFileSync(join(dir, "clean.md"), "# Heading\n\nshort and clean.\n", "utf8");
   writeFileSync(join(dir, "notprose.txt"), "never read by a prose lint\n", "utf8");
   // A STATE NOTE keeps its prose in the FRONTMATTER, where lintProse never
   // looked - and `guidance` is read by an agent on every single visit.
   writeFileSync(
     join(dir, "astate.md"),
-    "---\nstate: probe\nguidance: we need alpha, beta, gamma, delta and epsilon.\n---\n\nclean body.\n",
+    "---\nstate: probe\nguidance: we walk the drawing, prove the reading, fill the form, stamp the claim and pull again.\n---\n\nclean body.\n",
     "utf8",
   );
   const swept = await call(server, "se_lint", { glob: "project/guidance/sweeptest/*" });
@@ -337,7 +349,9 @@ test("the voice lint sweeps a whole tree and reports what it left out", async ()
   assert.ok(stateNote !== undefined, "and the one whose only bad prose is in its frontmatter");
   assert.equal(stateNote.findings[0].where, "guidance", "each finding says WHICH prose it is in");
   // Neither of the older forms is disturbed by the new one.
-  const one = await call(server, "se_lint", { text: "alpha, beta, gamma, delta and epsilon." });
+  const one = await call(server, "se_lint", {
+    text: "we walk the drawing, prove the reading, fill the form, stamp the claim and pull again.",
+  });
   assert.equal(one.body.count, 1, "a single block still lints");
   const none = await call(server, "se_lint", {});
   assert.equal(none.isError, true);

@@ -645,7 +645,7 @@ test("a slow mirror request lands in the call log with its path and wait", async
   const root = freshRoot();
   const session = new Session(root);
   const log = new CallLog(seDir(root));
-  process.env.SE_MIRROR_SLOW_MS = "0";
+  process.env.SE_SLOW_MS = "0";
   try {
     const server = startMirror({ session, root, port: 0, log, mode: "agent" });
     await new Promise((r) => server.on("listening", r));
@@ -656,7 +656,7 @@ test("a slow mirror request lands in the call log with its path and wait", async
       server.close();
     }
   } finally {
-    delete process.env.SE_MIRROR_SLOW_MS;
+    delete process.env.SE_SLOW_MS;
   }
   const slow = log.query({ filter: { tool: "mirror_slow" } });
   assert.ok(slow.total >= 1, "the request tripped the clock");

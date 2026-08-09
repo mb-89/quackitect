@@ -93,6 +93,7 @@ interface Cfg {
   long_sentence_words: number;
   wall_paragraph_lines: number;
   comma_chain_items: number;
+  comma_chain_min_item_words: number;
   dash_chain_items: number;
   sentence_run_items: number;
   run_sentence_words: number;
@@ -104,6 +105,7 @@ const DEFAULTS: Cfg = {
   long_sentence_words: 28,
   wall_paragraph_lines: 8,
   comma_chain_items: 3,
+  comma_chain_min_item_words: 2,
   dash_chain_items: 3,
   sentence_run_items: 3,
   run_sentence_words: 12,
@@ -137,6 +139,7 @@ function loadCfg(root: string): Cfg {
       long_sentence_words: num("long_sentence_words"),
       wall_paragraph_lines: num("wall_paragraph_lines"),
       comma_chain_items: num("comma_chain_items"),
+      comma_chain_min_item_words: num("comma_chain_min_item_words"),
       dash_chain_items: num("dash_chain_items"),
       sentence_run_items: num("sentence_run_items"),
       run_sentence_words: num("run_sentence_words"),
@@ -310,7 +313,14 @@ export function lintProse(root: string, text: string, rel?: string): LintFinding
       // token first, and the test does what it was written to do.
       const masked = s.replace(/`[^`]*`/g, "`x`").replace(/"[^"]*"/g, '"x"');
       const items = masked.split(/[,;·•/]|\s→\s/).filter((part) => part.trim() !== "" && !isLiteral(part));
-      if (items.length > cfg.comma_chain_items) {
+      // A PART MUST CARRY SUBSTANCE TO COUNT (e28, 2026-08-01 — rebuilt on
+      // trunk 2026-08-09 after the worktree fix never landed): the rule
+      // separates an enumeration of THOUGHTS from an enumeration of NAMES.
+      // "alpha, beta, gamma, delta" is reference; nobody wants `pill` on
+      // its own bullet. Fourteen of thirty-seven findings in one sweep
+      // were this miscount.
+      const weighty = items.filter((part) => part.trim().split(/\s+/).length >= cfg.comma_chain_min_item_words);
+      if (weighty.length > cfg.comma_chain_items) {
         findings.push({
           rule: "comma-chain",
           line: i + 1,

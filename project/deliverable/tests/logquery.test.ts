@@ -9,7 +9,11 @@
 // question sees a longer log. Nothing below compares record identity across
 // two calls, because that comparison is a race with the logger.
 import { strict as assert } from "node:assert";
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { test } from "node:test";
+import { CallLog } from "../engine/calllog.ts";
 import { bootedServer, call, freshRoot } from "./helpers.ts";
 
 interface Page {
@@ -135,4 +139,22 @@ test("with only one sitting in the log there is nothing to hand over", async () 
   );
   assert.equal(new CallLog(se).lastSession(), undefined);
   assert.equal(new CallLog(join(freshRoot(), ".se")).lastSession(), undefined, "and no log at all is also fine");
+});
+
+// THE SLOWNESS MINE (owner ruling 2026-08-09: the one-second rule is the
+// line, and slowness is mined from the one log rather than reported by the
+// person). min_ms answers "what took longer than X" over every door.
+test("min_ms filters the log to what was at least that slow", () => {
+  const dir = mkdtempSync(join(tmpdir(), "se-log-"));
+  const log = new CallLog(dir);
+  log.append({ tool: "se_pull", args: {}, ok: true, outcome: "result", duration_ms: 12 });
+  log.append({ tool: "se_file_read", args: {}, ok: true, outcome: "result", duration_ms: 1450 });
+  log.append({ tool: "mirror_slow", args: { path: "/x" }, ok: true, outcome: "result", duration_ms: 2100 });
+  const slow = log.query({ filter: { min_ms: 1000 } });
+  assert.equal(slow.total, 2, "only the breaches");
+  assert.deepEqual(
+    (slow.records ?? []).map((r: { tool: string }) => r.tool),
+    ["se_file_read", "mirror_slow"],
+    "both doors, one ask",
+  );
 });

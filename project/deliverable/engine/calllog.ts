@@ -37,6 +37,16 @@ export interface LastSession {
 const SE_VERSION = "3.0.0-bootstrap";
 const GB = 1024 * 1024 * 1024;
 
+/** THE ONE-SECOND RULE IS THE LINE (req-call-answers-in-one-second; owner
+ *  ruling 2026-08-09: a person's request over one second moves to the
+ *  background and reports). Every outside door — the lane's dispatch and
+ *  the mirror's — measures against this ONE number; slowness is mined from
+ *  the one log with min_ms. A function, not a constant: the env test seam
+ *  must work after the module has loaded. */
+export function slowMs(): number {
+  return Number(process.env.SE_SLOW_MS ?? 1000);
+}
+
 export class CallLog {
   readonly path: string;
 
@@ -114,7 +124,7 @@ export class CallLog {
    *  ruled out by SUBSTRING before it is parsed — the same trade find()
    *  makes — so a filtered query parses only its own records. The parsed
    *  checks stay as the exact half of the answer. */
-  private filtered(f: { tool?: string; ok?: boolean; text?: string; since?: string }): CallRecord[] {
+  private filtered(f: { tool?: string; ok?: boolean; text?: string; since?: string; min_ms?: number }): CallRecord[] {
     const rough: ((l: string) => boolean)[] = [];
     if (f.tool !== undefined) rough.push((l) => l.includes(`"tool":"${f.tool}"`));
     if (f.ok !== undefined) rough.push((l) => l.includes(`"ok":${f.ok}`));
@@ -129,6 +139,14 @@ export class CallLog {
         return m !== null && m[1] >= s;
       });
     }
+    // THE SLOWNESS MINE: what took longer than X, at ANY door, in one ask.
+    if (f.min_ms !== undefined) {
+      const min = f.min_ms;
+      rough.push((l) => {
+        const m = /"duration_ms":(\d+)/.exec(l);
+        return m !== null && Number(m[1]) >= min;
+      });
+    }
     const out: CallRecord[] = [];
     for (const line of this.lines()) {
       if (line.trim() === "" || !rough.every((k) => k(line))) continue;
@@ -140,17 +158,18 @@ export class CallLog {
     return out;
   }
 
-  private static exact(rec: CallRecord, f: { tool?: string; ok?: boolean; text?: string; since?: string }): boolean {
+  private static exact(rec: CallRecord, f: { tool?: string; ok?: boolean; text?: string; since?: string; min_ms?: number }): boolean {
     if (f.tool !== undefined && rec.tool !== f.tool) return false;
     if (f.ok !== undefined && rec.ok !== f.ok) return false;
     if (f.since !== undefined && rec.ts < f.since) return false;
+    if (f.min_ms !== undefined && rec.duration_ms < f.min_ms) return false;
     if (f.text !== undefined && !JSON.stringify(rec).toLowerCase().includes(f.text.toLowerCase())) return false;
     return true;
   }
 
   /** Generic aggregation: filter, group, count — the retro's query lane. */
   query(q: {
-    filter?: { tool?: string; ok?: boolean; since?: string; text?: string };
+    filter?: { tool?: string; ok?: boolean; since?: string; text?: string; min_ms?: number };
     group_by?: string;
     limit?: number;
     offset?: number;
@@ -162,7 +181,7 @@ export class CallLog {
     // retro; the retro mines only its own period (the raw log is kept,
     // owner ruling: forever-until-1GB).
     const since = f.since === "last_retro" ? this.lastRetroMark() : f.since;
-    const records = this.filtered({ tool: f.tool, ok: f.ok, text: f.text, since });
+    const records = this.filtered({ tool: f.tool, ok: f.ok, text: f.text, since, min_ms: f.min_ms });
     if (q.group_by !== undefined) {
       const groups: Record<string, number> = {};
       for (const r of records) {

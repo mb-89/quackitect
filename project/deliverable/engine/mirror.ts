@@ -10,7 +10,7 @@ import { createRequire } from "node:module";
 import { marked } from "marked";
 import { applyBaseOp, type BaseOp } from "./bases.ts";
 import { helpFor } from "./baseui.ts";
-import type { CallLog } from "./calllog.ts";
+import { type CallLog, slowMs } from "./calllog.ts";
 import { loadCards } from "./cards.ts";
 import { replayVisitsText } from "./decisions.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
@@ -729,13 +729,11 @@ export function startMirror(o: MirrorOptions): Server {
 
   // THE PERSON'S SURFACES GET THE SAME CLOCK AS THE LANE (owner, 2026-08-09:
   // "every time something takes long, I have to tell you"). Every request is
-  // timed at this one door, and a slow one lands in the SAME log the retro
+  // timed at this one door, and a breach lands in the SAME log the retro
   // already mines — tool mirror_slow, with the path and the wait. Fast
   // requests stay out: the alive poll runs constantly, and a log of
-  // heartbeats would bury what this exists to surface. Half the one-second
-  // budget is the tripwire, so the trend shows before the rule breaks.
-  // The env override is the test seam.
-  const SLOW_MS = Number(process.env.SE_MIRROR_SLOW_MS ?? 500);
+  // heartbeats would bury what this exists to surface. The line is the
+  // one-second rule, shared with the lane (calllog.SLOW_MS).
   const server = createServer((req, res) => {
     // Every request is a new drawing epoch — see machines/compile.ts.
     bumpDrawingEpoch();
@@ -747,7 +745,7 @@ export function startMirror(o: MirrorOptions): Server {
       if (!clocked) {
         clocked = true;
         const ms = Date.now() - started;
-        if (ms >= SLOW_MS) {
+        if (ms >= slowMs()) {
           try {
             o.log.append({
               tool: "mirror_slow",
