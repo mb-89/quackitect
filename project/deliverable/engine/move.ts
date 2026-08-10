@@ -13,7 +13,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
-import { guardRawNul } from "./files.ts";
+import { guardRawNul, invalidateContentCache } from "./files.ts";
 import { writeNode } from "./notes.ts";
 import { isExcluded, resolveInRoot } from "./paths.ts";
 
@@ -118,6 +118,8 @@ export function fileMove(root: string, from: string, to: string): MoveResult {
   const toRel = relative(root, absTo).split(sep).join("/");
   mkdirSync(dirname(absTo), { recursive: true });
   renameSync(absFrom, absTo);
+  invalidateContentCache(absFrom);
+  invalidateContentCache(absTo);
 
   const pairs = refPairs(fromRel, toRel);
   const sourcePairs = pairs.filter((p) => !p.prose_only);
@@ -153,6 +155,7 @@ export function fileMove(root: string, from: string, to: string): MoveResult {
       const fixed = guardRawNul(rel, content, false);
       if (fixed.corrected === undefined) return;
       writeNode(abs, fixed.content);
+      invalidateContentCache(abs);
       corrected.push(fixed.corrected);
       content = fixed.content;
     }
@@ -161,6 +164,7 @@ export function fileMove(root: string, from: string, to: string): MoveResult {
       const r = applyPairs(content, prose ? pairs : sourcePairs);
       if (r.count > 0 && r.after !== content) {
         writeNode(abs, r.after);
+        invalidateContentCache(abs);
         rewritten.push({ path: rel, replacements: r.count });
         content = r.after;
       }

@@ -97,7 +97,7 @@ export const LANE_RULES: LaneRule[] = [
     id: "run-wait",
     category: "waiting",
     tool: "se_run",
-    hint: "se_run {job, wait_ms: N} BLOCKS on the job's own completion and returns the moment it exits — a sleeping shell holds the lane for the full N seconds and learns nothing",
+    hint: "se_run {job} reads current status immediately. Poll that state when needed. A sleeping shell blocks the lane and learns nothing",
     threshold: 1,
     rx: /\bstart-sleep\b|(^|[;|&(\s])sleep\s+\d/i,
   },

@@ -50,11 +50,11 @@ describe("declared roots", { concurrency: true }, () => {
   // root selector must pass THAT SELECTOR to rootOf, never nothing.
   test("the glob and search handlers pass their selector to the root chooser", async () => {
     const { readFileSync } = await import("node:fs");
-    const src = readFileSync(new URL("../engine/tools.ts", import.meta.url), "utf8");
-    const globLine = src.split("\n").find((l) => l.includes("fileGlob(rootOf("));
-    const searchLine = src.split("\n").find((l) => l.includes("search(rootOf("));
-    assert.ok(globLine !== undefined && !globLine.includes("rootOf()"), "se_file_glob must route on its glob");
-    assert.ok(searchLine !== undefined && !searchLine.includes("rootOf()"), "se_file_search must route on its path scope");
+    const src = readFileSync(new URL("../engine/model-fs.ts", import.meta.url), "utf8");
+    const globLine = src.split("\n").find((line) => line.includes("fileGlob(this.rootOf("));
+    const searchLine = src.split("\n").find((line) => line.includes("search(this.rootOf("));
+    assert.ok(globLine?.includes("this.rootOf(glob)"), "se_file_glob must route on its glob");
+    assert.ok(searchLine?.includes("this.rootOf(opts.path)"), "se_file_search must route on its path scope");
   });
 
   // The refusal that misled the owner. It should never claim nothing is

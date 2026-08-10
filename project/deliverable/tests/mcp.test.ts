@@ -4,8 +4,42 @@ import { strict as assert } from "node:assert";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
+import { McpServer, requestContextAdapter } from "../engine/mcp.ts";
 import { buildServer } from "../engine/tools.ts";
 import { bootedServer, call, freshRoot as fresh } from "./helpers.ts";
+
+test("transport metadata becomes explicit per-request context", async () => {
+  const server = new McpServer(
+    { name: "context-test", version: "1" },
+    [
+      {
+        name: "context",
+        title: "context",
+        description: "returns request context",
+        inputSchema: { type: "object", properties: {} },
+        handler: (_args, context) => context,
+      },
+    ],
+    requestContextAdapter({ workspaceId: "workspace-test" }),
+  );
+  const response = await server.handle(
+    { jsonrpc: "2.0", id: "request-7", method: "tools/call", params: { name: "context", arguments: {} } },
+    {
+      protocolVersion: "future-version",
+      capabilities: { sampling: {} },
+      clientInfo: { name: "test-client", version: "2" },
+      sessionId: "session-test",
+    },
+  );
+  const content = (response!.result as { content: { text: string }[] }).content;
+  const context = JSON.parse(content[0].text) as Record<string, unknown>;
+  assert.equal(context.requestId, "request-7");
+  assert.equal(context.protocolVersion, "future-version");
+  assert.equal(context.workspaceId, "workspace-test");
+  assert.equal(context.sessionId, "session-test");
+  assert.deepEqual(context.capabilities, { sampling: {} });
+  assert.deepEqual(context.clientInfo, { name: "test-client", version: "2" });
+});
 
 test("initialize and tools/list serve the full lane", async () => {
   const server = buildServer(fresh());

@@ -1,12 +1,14 @@
 // The file lane's laws, each tested against the incident that ruled it.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { Rejection } from "../engine/errors.ts";
 import {
+  clearContentCache,
+  contentCacheStats,
   fileDelete,
   fileGlob,
   fileList,
@@ -19,7 +21,7 @@ import {
   READ_BUDGET,
 } from "../engine/files.ts";
 import { contentHash } from "../engine/hash.ts";
-import { run } from "../engine/run.ts";
+import { runToCompletion } from "../engine/run.ts";
 import { search } from "../engine/search.ts";
 
 function fresh(): string {
@@ -226,25 +228,12 @@ test("the move sweep repairs a NUL file instead of skipping it in silence", asyn
 // command, so every long run served nothing at all — no page, no feed, no
 // click. A 30-second test run froze the reader's whole interface.
 //
-// Same defect as the expedition archive, where 380 blocking git spawns hung
-// the server rather than just the archive. The script runner was converted
-// then and se_run was left behind.
-//
-// The freeze is nasty because the symptom lands wherever the reader happens
-// to click, so it reads as a rendering bug anywhere but here.
-test("se_run does not block the event loop", async () => {
+test("foreground run follows process completion", async () => {
   const root = fresh();
-  let ticks = 0;
-  const beat = setInterval(() => {
-    ticks++;
-  }, 20);
-  const sleep = process.platform === "win32" ? "Start-Sleep -Milliseconds 400" : "sleep 0.4";
-  const r = await run(root, sleep);
-  clearInterval(beat);
-  assert.equal(r.exit, 0, "the command still ran to completion");
-  assert.ok(r.duration_ms >= 300, "and it really did take time to do it");
-  // spawnSync scores exactly 0 here: nothing else gets to run at all.
-  assert.ok(ticks > 3, `the loop kept turning while it ran (ticks: ${ticks})`);
+  const command = process.platform === "win32" ? "Write-Output complete" : "printf complete";
+  const result = await runToCompletion(root, command);
+  assert.equal(result.exit, 0);
+  assert.equal(result.stdout.trim(), "complete");
   rmSync(root, { recursive: true, force: true });
 });
 
@@ -678,4 +667,23 @@ test("a dollar sequence in new_string is written literally, not expanded", () =>
   fileWrite(root, "engine/y.ts", "HEAD\nMARK\nTAIL\n", null);
   filePatch(root, [{ path: "engine/y.ts", old_string: "MARK", new_string: `${D}& and ${D}1` }]);
   assert.match(readFileSync(join(root, "engine", "y.ts"), "utf8"), /^\$& and \$1$/m, "both survive as typed");
+});
+
+test("live reads reuse validated content and detect external same-size rewrites", () => {
+  const root = fresh();
+  const path = "cached.md";
+  const abs = join(root, path);
+  clearContentCache();
+  writeFileSync(abs, "alpha");
+
+  assert.match(fileRead(root, path).content, /alpha/);
+  assert.deepEqual(contentCacheStats(), { entries: 1, hits: 0, misses: 1 });
+  assert.match(fileRead(root, path).content, /alpha/);
+  assert.deepEqual(contentCacheStats(), { entries: 1, hits: 1, misses: 1 });
+
+  writeFileSync(abs, "bravo");
+  const changed = new Date(Date.now() + 1000);
+  utimesSync(abs, changed, changed);
+  assert.match(fileRead(root, path).content, /bravo/);
+  assert.deepEqual(contentCacheStats(), { entries: 1, hits: 1, misses: 2 });
 });

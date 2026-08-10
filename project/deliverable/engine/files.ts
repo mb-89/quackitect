@@ -37,6 +37,42 @@ const IMAGE_TYPES: Record<string, string> = {
 
 const SRC = "engine/files.ts";
 
+interface ContentCacheEntry {
+  size: number;
+  mtimeMs: number;
+  ctimeMs: number;
+  bytes: Buffer;
+}
+
+const CONTENT_CACHE = new Map<string, ContentCacheEntry>();
+const CONTENT_CACHE_STATS = { hits: 0, misses: 0 };
+
+export function contentCacheStats(): { entries: number; hits: number; misses: number } {
+  return { entries: CONTENT_CACHE.size, ...CONTENT_CACHE_STATS };
+}
+
+export function clearContentCache(): void {
+  CONTENT_CACHE.clear();
+  CONTENT_CACHE_STATS.hits = 0;
+  CONTENT_CACHE_STATS.misses = 0;
+}
+
+export function invalidateContentCache(abs: string): void {
+  CONTENT_CACHE.delete(abs);
+}
+
+function currentBytes(abs: string, stat: { size: number; mtimeMs: number; ctimeMs: number }): Buffer {
+  const cached = CONTENT_CACHE.get(abs);
+  if (cached !== undefined && cached.size === stat.size && cached.mtimeMs === stat.mtimeMs && cached.ctimeMs === stat.ctimeMs) {
+    CONTENT_CACHE_STATS.hits++;
+    return cached.bytes;
+  }
+  const bytes = readFileSync(abs);
+  CONTENT_CACHE.set(abs, { size: stat.size, mtimeMs: stat.mtimeMs, ctimeMs: stat.ctimeMs, bytes });
+  CONTENT_CACHE_STATS.misses++;
+  return bytes;
+}
+
 function mustExist(root: string, path: string, source: string, allowDeclared = false): string {
   const abs = allowDeclared ? resolveForRead(root, path, source) : resolveInRoot(root, path, source);
   if (!existsSync(abs)) {
@@ -156,7 +192,8 @@ export function fileRead(
     bytes = gitShow(root, opts.ref, path);
   } else {
     const abs = mustExist(root, path, SRC, true);
-    if (statSync(abs).isDirectory()) {
+    const stat = statSync(abs);
+    if (stat.isDirectory()) {
       throw new Rejection({
         clause: CLAUSES.PATH_ESCAPE,
         expected: "a file",
@@ -165,7 +202,7 @@ export function fileRead(
         source: SRC,
       });
     }
-    bytes = readFileSync(abs);
+    bytes = currentBytes(abs, stat);
   }
   const mimeType = IMAGE_TYPES[extname(path).toLowerCase()];
   if (mimeType !== undefined) return imageRead(path, bytes, mimeType, opts.ref);
@@ -386,6 +423,7 @@ export function fileWrite(root: string, path: string, content: string, baseHash:
   const nul = guardRawNul(path, content);
   mkdirSync(dirname(abs), { recursive: true });
   writeNode(abs, nul.content);
+  invalidateContentCache(abs);
   const lint = lintFix(root, [path]);
   const final = lint !== undefined && lint.fixed.length > 0 ? readFileSync(abs, "utf8") : nul.content;
   mirrorMethod(path, root);
@@ -547,6 +585,7 @@ export function fileReplace(
   }
   const changed = staged.map((s) => {
     writeNode(s.abs, s.next);
+    invalidateContentCache(s.abs);
     mirrorMethod(s.path, root);
     return { path: s.path, hash: contentHash(s.next), replacements: s.replacements };
   });
@@ -875,6 +914,7 @@ function writeStaged(
   const applied = [...byFile.values()].map((f) => {
     const abs = resolveInRoot(root, f.path, SRC);
     writeNode(abs, f.next);
+    invalidateContentCache(abs);
     mirrorMethod(f.path, root);
     return { path: f.path, hash: contentHash(f.next), replacements: f.replacements };
   });
@@ -931,6 +971,7 @@ export function fileDelete(root: string, path: string, baseHash: string): { dele
     });
   }
   rmSync(abs);
+  invalidateContentCache(abs);
   mirrorMethod(path, root);
   return { deleted: path };
 }
