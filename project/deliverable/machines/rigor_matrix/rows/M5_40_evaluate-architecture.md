@@ -60,13 +60,16 @@ steps, the utility tree, and the four outputs.
 
 - The DECK deals the quality scenarios, worst damage grade first. Rule
   every card:
-  - addressed — name the carrying decision.
+  - addressed — the structure delivers the measure, and the path is the
+    evidence. Name a decision only where a recorded choice is why it
+    holds; not every quality needs one.
   - at risk — name the hinge and the tradeoff. The register risk mints
     on the click.
   - unaddressed — the register issue mints on the click. A standing
     finding for the gate.
-- The walk NAMES DECISIONS, so the decisions must be on file first. That
-  is why this state depends on record-adrs (owner ruling 2026-08-10).
+- The walk READS the register's decisions, so they are recorded first.
+  That is why this state depends on record-adrs (owner ruling
+  2026-08-10).
 - THE METRICS BELONG HERE, not at the decomposition (owner ruling
   2026-08-10; the corpus files DSM analysis under quantitative review).
   One typed line per number: what it moved. "Moved nothing" is a

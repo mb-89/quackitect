@@ -140,7 +140,10 @@ export function mintScenarioLines(content: string, mint: (l: ScenarioMint) => st
 export interface MetricRow {
   name: string;
   value: number;
-  detail: string;
+  /** What the number IS — the definition, shown on hover over the name. */
+  help: string;
+  /** The list behind the number, one entry per line. */
+  detail: string[];
 }
 
 export function structureMetrics(v: ElementMatrixView, elements: { id: string; implements: string[] }[]): MetricRow[] {
@@ -157,12 +160,38 @@ export function structureMetrics(v: ElementMatrixView, elements: { id: string; i
     {
       name: "interface debt",
       value: debt,
-      detail: debtPairs.map((c) => `${c.source} → ${c.destination}: ${c.missing.join(", ")}`).join(" · "),
+      help: "flows that cross an element boundary with no interface declared to carry them — contracts still owed",
+      detail: debtPairs.map((c) => `${c.source} → ${c.destination}: ${c.missing.join(", ")}`),
     },
-    { name: "allocation spread", value: spread.length, detail: spread.map(([f, els]) => `${f} (${els.join(", ")})`).join(" · ") },
-    { name: "two-way pairs", value: twoWay.length, detail: twoWay.map((c) => `${c.source} ⇄ ${c.destination}`).join(" · ") },
-    { name: "idle elements", value: v.idle.length, detail: v.idle.join(", ") },
-    { name: "unimplemented functions", value: v.unimplemented.length, detail: v.unimplemented.join(", ") },
-    { name: "undemanded interfaces", value: v.undemanded.length, detail: v.undemanded.map((u) => u.id).join(", ") },
+    {
+      name: "allocation spread",
+      value: spread.length,
+      help: "functions implemented by more than one element — a change to the function lands in several places",
+      detail: spread.map(([f, els]) => `${f} (${els.join(", ")})`),
+    },
+    {
+      name: "two-way pairs",
+      value: twoWay.length,
+      help: "element pairs exchanging flows in both directions — a candidate coupling cycle",
+      detail: twoWay.map((c) => `${c.source} ⇄ ${c.destination}`),
+    },
+    {
+      name: "idle elements",
+      value: v.idle.length,
+      help: "elements implementing no function — dead weight, or an allocation not finished",
+      detail: v.idle.slice(),
+    },
+    {
+      name: "unimplemented functions",
+      value: v.unimplemented.length,
+      help: "functions no element implements — the structure does not do them yet",
+      detail: v.unimplemented.slice(),
+    },
+    {
+      name: "undemanded interfaces",
+      value: v.undemanded.length,
+      help: "declared interfaces no crossing demands — obsolete, or ahead of the structure",
+      detail: v.undemanded.map((u) => u.id),
+    },
   ];
 }

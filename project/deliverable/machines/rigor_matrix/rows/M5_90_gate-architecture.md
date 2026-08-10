@@ -3,10 +3,8 @@ kind: matrix-row
 name: gate-architecture
 statement: "GATE architecture: the matrix review - the owner adjudicates the decomposition itself."
 state_kind: gate
-busbar: true
 filled_by: agent
 depends_on:
-  - record-adrs
   - evaluate-architecture
 legal_tools:
   - se_file_read

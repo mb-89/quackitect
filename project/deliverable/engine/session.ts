@@ -4275,9 +4275,13 @@ export class Session {
     // The note stays one line by construction — a newline would break the
     // verdict grammar the mint reads back.
     const note = (extra.note ?? "").replace(/\s+/g, " ").trim();
+    // NOT EVERY QUALITY NEEDS A DECISION (owner ruling 2026-08-10). A
+    // scenario the structure delivers by plain construction is addressed
+    // with the path as its evidence; the decision ref is named only where
+    // a recorded choice is why it holds.
     const line =
       kind === "addressed"
-        ? `- [[${requirement}]] — addressed by [[${extra.decision ?? ""}]]`
+        ? `- [[${requirement}]] — addressed${(extra.decision ?? "") === "" ? "" : ` by [[${extra.decision}]]`}`
         : kind === "at-risk"
           ? `- at risk: [[${requirement}]] hinges on [[${extra.hinge ?? ""}]] — ${note === "" ? "the tradeoff is unstated" : note}`
           : kind === "unaddressed"

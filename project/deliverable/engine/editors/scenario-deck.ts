@@ -47,15 +47,20 @@ ${CARD_PARTS}
       const fnsHtml = c.functions.length > 0 ? c.functions.map(link).join("<br>") : '<span style="color:var(--se-muted);">no function satisfies this row</span>';
       const implHtml = c.implementers.length > 0 ? c.implementers.map(link).join("<br>") : '<span style="color:var(--se-accent);">nothing carries this scenario \\u2014 unaddressed is one click away</span>';
       const path = '<div style="' + cardCel + 'flex:1;"><div style="' + cardMeta + 'padding-bottom:2px;">the path</div><div style="font-size:11px;color:var(--se-muted);">functions</div><div style="font-size:12px;line-height:1.5;">' + fnsHtml + '</div><div style="font-size:11px;color:var(--se-muted);margin-top:6px;">elements and interfaces</div><div style="font-size:12px;line-height:1.5;">' + implHtml + "</div></div>";
-      // Panel three: the verdict — three buttons, each a complete claim.
-      const decOpts = sd.decisions.length > 0 ? '<option value="">\\u2014 the carrying decision \\u2014</option>' + sd.decisions.map(function (d) { return '<option value="' + escText(d) + '">' + shortName(d) + "</option>"; }).join("") : '<option value="">no decisions stand in the register</option>';
+      // Panel three: the verdict. THE QUESTION IS PRINTED, and every button
+      // carries its meaning in visible text — a hover title is not enough
+      // (owner feedback 2026-08-10: the card must say what to do).
+      const hint = function (t) { return '<div style="font-size:10.5px;color:var(--se-muted);line-height:1.35;margin-top:2px;">' + t + "</div>"; };
+      const row = function (inner, help) { return '<div style="margin-top:8px;"><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">' + inner + "</div>" + hint(help) + "</div>"; };
+      const decOpts = '<option value="">\\u2014 no single decision, the path is the evidence \\u2014</option>' + sd.decisions.map(function (d) { return '<option value="' + escText(d) + '">' + shortName(d) + "</option>"; }).join("");
       const hinges = (c.implementers.length > 0 ? c.implementers : sd.elements);
       const hingeOpts = '<option value="">\\u2014 the hinge \\u2014</option>' + hinges.map(function (h) { return '<option value="' + escText(h) + '">' + shortName(h) + "</option>"; }).join("");
-      const row = function (inner) { return '<div style="display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap;">' + inner + "</div>"; };
-      const addressed = row('<select class="sfscndec" style="' + pick + '">' + decOpts + '</select><button class="sfscn" style="' + cardBtn + '" data-kind="addressed" data-req="' + escText(c.requirement) + '" title="the named decision carries this scenario">addressed</button>');
-      const atrisk = row('<select class="sfscnhinge" style="' + pick + '">' + hingeOpts + '</select><input class="sfscnnote" style="' + pick + 'flex:1;min-width:120px;" placeholder="the tradeoff, one line"><button class="sfscn" style="' + cardBtn + '" data-kind="at-risk" data-req="' + escText(c.requirement) + '" title="mints the register risk at once">at risk \\u2014 mint</button>');
-      const unaddr = row('<button class="sfscn" style="' + cardBtn + '" data-kind="unaddressed" data-req="' + escText(c.requirement) + '" title="mints the register issue at once \\u2014 a standing finding for the gate">unaddressed \\u2014 mint</button><button class="sfscn" style="' + cardBtn + '" data-kind="fitness" data-req="' + escText(c.requirement) + '" title="files the scenario as a fitness candidate \\u2014 the measure could automate at M7">fitness candidate</button>');
-      const verdict = '<div style="' + cardCel + 'flex:1;"><div style="' + cardMeta + 'padding-bottom:2px;">the verdict</div>' + addressed + atrisk + unaddr + "</div>";
+      const decPick = sd.decisions.length > 0 ? '<select class="sfscndec" style="' + pick + '">' + decOpts + "</select>" : "";
+      const addressed = row(decPick + '<button class="sfscn" style="' + cardBtn + '" data-kind="addressed" data-req="' + escText(c.requirement) + '">addressed</button>', "yes \\u2014 the structure on the path delivers the measure. Name a decision only where a recorded choice is why it holds." + (sd.decisions.length === 0 ? " The register holds no decisions yet." : ""));
+      const atrisk = row('<select class="sfscnhinge" style="' + pick + '">' + hingeOpts + '</select><input class="sfscnnote" style="' + pick + 'flex:1;min-width:120px;" placeholder="the tradeoff, one line"><button class="sfscn" style="' + cardBtn + '" data-kind="at-risk" data-req="' + escText(c.requirement) + '">at risk \\u2014 mint</button>', "it holds only while the hinge holds \\u2014 the click mints the register risk, graded with the requirement.");
+      const unaddr = row('<button class="sfscn" style="' + cardBtn + '" data-kind="unaddressed" data-req="' + escText(c.requirement) + '">unaddressed \\u2014 mint</button>', "nothing carries this scenario \\u2014 the click mints the register issue, a standing finding for the gate.");
+      const fit = row('<button class="sfscn" style="' + cardBtn + '" data-kind="fitness" data-req="' + escText(c.requirement) + '">fitness candidate</button>', "the response measure could run as an automated check at M7 \\u2014 files it in fitness_candidates.");
+      const verdict = '<div style="' + cardCel + 'flex:1;"><div style="' + cardMeta + 'padding-bottom:2px;">the verdict</div><div style="font-size:11.5px;line-height:1.4;">Does the structure, as decided, deliver the response measure?</div>' + addressed + atrisk + unaddr + fit + "</div>";
       const sides = '<div style="display:flex;gap:10px;align-items:stretch;">' + scen + path + verdict + "</div>";
       const nav = function (dir, label) { return '<button class="sfscnnav" style="' + cardBtn + '" type="button" data-dir="' + dir + '" title="browse \\u2014 decides nothing">' + label + "</button>"; };
       return '<div class="sfscncard" style="' + (i === 0 ? "" : "display:none;") + '">' + head + sides + '<div style="display:flex;gap:8px;margin-top:8px;align-items:center;">' + nav("-1", "\\u2190") + nav("1", "\\u2192") + "</div></div>";
@@ -81,9 +86,10 @@ ${CARD_PARTS}
       const kind = btn.dataset.kind;
       const body = { name: form, kind: kind, requirement: btn.dataset.req, machine: machine };
       if (kind === "addressed") {
+        // The decision ref is OPTIONAL — a scenario can hold by plain
+        // construction, with the path as its evidence.
         const dec = card ? card.querySelector(".sfscndec") : null;
-        if (!dec || dec.value === "") return;
-        body.decision = dec.value;
+        if (dec && dec.value !== "") body.decision = dec.value;
       }
       if (kind === "at-risk") {
         const hin = card ? card.querySelector(".sfscnhinge") : null;

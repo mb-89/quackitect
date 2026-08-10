@@ -32,7 +32,9 @@ A READING with a judgment beside it, dealt one card at a time.
 
 ONE VERDICT PER SCENARIO, three choices:
 
-- addressed — pick the carrying decision. ATAM calls this a non-risk.
+- addressed — the structure delivers the measure. The path is the
+  evidence. Name a decision only where a recorded choice is why it
+  holds; not every quality needs one. ATAM calls this a non-risk.
 - at risk — name the hinge and the tradeoff. The click mints a register
   RISK naming the hinge, graded with the requirement's own damage grade.
 - unaddressed — the click mints a register ISSUE. A standing finding for

@@ -45,7 +45,9 @@ Its four outputs, and where each lands:
   separate register kind (owner ruling 2026-08-10).
 - tradeoff - the same entry, where the hinge serves two qualities in
   opposite directions. The verdict line carries the tradeoff in one line.
-- non-risk - an "addressed" verdict naming the carrying decision.
+- non-risk - an "addressed" verdict. The path is the evidence; a
+  decision is named only where a recorded choice is why it holds. Not
+  every quality needs a decision.
 
 ## What ATAM lacks, and this state adds
 
@@ -67,7 +69,8 @@ half only. This state runs both:
   and interfaces carry the stimulus, where the response forms, what
   limits the measure.
 - Rule the card:
-  - addressed, naming the carrying decision.
+  - addressed — the structure delivers it. Name the decision only where
+    one is why.
   - at risk, naming the hinge and the tradeoff. The register risk mints
     on the click.
   - unaddressed. The register issue mints on the click - a standing
