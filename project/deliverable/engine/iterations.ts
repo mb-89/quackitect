@@ -318,7 +318,21 @@ export function generateSeeded(_root: string, it: Iteration, machineId: string, 
       kind: "work",
       statement: c.statement,
       guidance: `A build chunk — realization: ${c.realization}. The tag pulls the discipline's guidance.`,
-      evidence_form: [{ name: "built", description: "what was built and where — the commit or artifact", required: true }],
+      // A SPIKE'S EVIDENCE IS ITS EXPERIMENT REF, never free text (owner
+      // ruling 2026-08-10) — the result lives on the exp- node, and the
+      // form links it.
+      evidence_form:
+        kind === "spikes"
+          ? [
+              {
+                name: "built",
+                template: "refs",
+                of: "experiment",
+                description: "the experiment node this spike wrote — one reference",
+                required: true,
+              },
+            ]
+          : [{ name: "built", description: "what was built and where — the commit or artifact", required: true }],
       priority: 0.2,
       // A drawn step is WORK — without a grant it compiled to no tools at
       // all, and the first real spike could not run its own measurement.
