@@ -19,9 +19,7 @@ evidence:
   - name: sensitivity
     template: sensitivity
     reads: evaluate-set#scores
-    description: the computed flip conditions — the cells a one-point swing would move
-  - name: tripwires
-    description: one ruling per computed flip — credible mints a RAID tripwire with its fallback, dismissed carries its reason
+    description: the computed flip conditions — a credible ruling is a click, and the save mints its RAID tripwire
 major: full
 minor: none
 patch: none
@@ -48,4 +46,12 @@ specification_note: |
 
 ## Guidance
 
-Per [[meth-pugh-convergence]]: perturb weights (engine-computed where available), hunt the losing world, judge its credibility out loud. A credible flip becomes a RAID tripwire with its fallback ([[meth-raid]]) - never a silent dismissal.
+Per [[meth-pugh-convergence]]: the perturbation hunt is engine-computed and
+the card draws it — per rival, the deficit and the one-point swing cells,
+tabled only where three swings or fewer would flip the seat.
+
+THE RULING IS A CLICK (owner ruling 2026-08-10). Marking a cell credible and
+saving mints its RAID tripwire ([[meth-raid]]) with the fallback in its body;
+the ruling line keeps the minted ref. An unmarked cell stands visibly
+unruled on a card that redraws from the scores — nothing is dismissed in
+silence, because nothing disappears.

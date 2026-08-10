@@ -3,7 +3,7 @@
 // disagree with a plain-sum ranking — which is the method, not a bug.
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
-import { axesFromCuts, pughView, sensitivityView } from "../engine/pugh.ts";
+import { axesFromCuts, flipRulings, mintFlipLines, pughView, sensitivityView } from "../engine/pugh.ts";
 
 const grade = (id: string): string => (id === "req-a" ? "fatal" : "crippling");
 
@@ -64,6 +64,24 @@ test("sensitivity names each rival's deficit and its one-point swing cells", () 
   );
   assert.equal(sv.rivals[1].id, "cand-z");
   assert.equal(sv.rivals[1].deficit, 2);
+});
+
+test("a credible ruling line mints once and keeps its ref", () => {
+  const line = "- credible: [[cand-y]] over [[cand-x]] on [[req-a]]";
+  const minted: string[] = [];
+  const once = mintFlipLines(line, (r) => {
+    minted.push(`${r.rival}|${r.winner}|${r.axis}`);
+    return "raid-flip-y-on-a";
+  });
+  assert.equal(once, "- [[raid-flip-y-on-a]] — credible: [[cand-y]] over [[cand-x]] on [[req-a]]");
+  assert.deepEqual(minted, ["cand-y|cand-x|req-a"]);
+  // A minted line is left alone — the mint callback never fires again.
+  const twice = mintFlipLines(once, () => {
+    throw new Error("minted twice");
+  });
+  assert.equal(twice, once);
+  assert.deepEqual(flipRulings(once), [{ ref: "raid-flip-y-on-a", rival: "cand-y", winner: "cand-x", axis: "req-a" }]);
+  assert.deepEqual(flipRulings(line), [{ ref: "", rival: "cand-y", winner: "cand-x", axis: "req-a" }]);
 });
 
 test("fewer than two candidates is a named problem, never a winner", () => {

@@ -20,8 +20,6 @@ evidence:
     template: decision-matrix
     reads: evaluate-set#scores
     description: the convergence runs, computed — datum the strongest rival, then the leader takes the seat
-  - name: winner
-    description: the selected candidate and the why beyond the arithmetic — the veto lives here
 major: full
 minor: none
 patch: none
@@ -47,4 +45,9 @@ specification_note: |
 
 ## Guidance
 
-Per [[meth-pugh-convergence]] and steps 5-8 of [[meth-eight-step-decision]]. Datum = strongest viable rival; iterate with the winner as new datum; discuss high scorers with qualitative criteria before selecting. The output is accepted only in the decision-matrix form (machines/forms/decision-matrix.md) - v1's field-tested shape.
+Per [[meth-pugh-convergence]] and steps 5-8 of [[meth-eight-step-decision]]. Datum = strongest viable rival; iterate with the winner as new datum — all computed, drawn by the decision-matrix card.
+
+THERE IS NO WINNER FIELD (owner ruling 2026-08-10). The veto is withholding
+the submit: a person who disagrees with the computed winner does not sign.
+Anything beyond the arithmetic goes to follow_up here and into the deciding
+ADRs at record-adrs, where the why lives on.

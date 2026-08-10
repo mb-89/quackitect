@@ -153,6 +153,50 @@ export function pughView(scoresMd: string, cutsMd: string, gradeOf: (id: string)
   return { axes, candidates: candidates.map((c) => c.id), runs, winner: last.leader, stable: last.leader === last.datum, problems };
 }
 
+/** A CREDIBLE RULING LINE, as the sensitivity card's save emits it and as
+ *  the mint hook rewrites it. Unminted: "- credible: [[rival]] over
+ *  [[winner]] on [[axis]]". Minted, the raid ref leads the line. */
+const RULING = /^- credible: \[\[([^\]]+)\]\] over \[\[([^\]]+)\]\] on \[\[([^\]]+)\]\]\s*$/;
+const MINTED = /^- \[\[(raid-[^\]]+)\]\] — credible: \[\[([^\]]+)\]\] over \[\[([^\]]+)\]\] on \[\[([^\]]+)\]\]\s*$/;
+
+export interface FlipRuling {
+  rival: string;
+  winner: string;
+  axis: string;
+  /** The minted raid ref, empty while the ruling is unminted. */
+  ref: string;
+}
+
+/** Every ruling standing in a sensitivity section, minted or not. */
+export function flipRulings(content: string): FlipRuling[] {
+  const out: FlipRuling[] = [];
+  for (const line of content.split("\n")) {
+    const pending = line.trim().match(RULING);
+    if (pending !== null) {
+      out.push({ rival: pending[1], winner: pending[2], axis: pending[3], ref: "" });
+      continue;
+    }
+    const minted = line.trim().match(MINTED);
+    if (minted !== null) out.push({ ref: minted[1], rival: minted[2], winner: minted[3], axis: minted[4] });
+  }
+  return out;
+}
+
+/** Rewrite every unminted credible line with the ref `mint` answers for it.
+ *  Pure over the text — the caller owns the node write, so a test needs no
+ *  filesystem and the session needs no parser. */
+export function mintFlipLines(content: string, mint: (r: { rival: string; winner: string; axis: string }) => string): string {
+  return content
+    .split("\n")
+    .map((line) => {
+      const m = line.trim().match(RULING);
+      if (m === null) return line;
+      const ref = mint({ rival: m[1], winner: m[2], axis: m[3] });
+      return ref === "" ? line : `- [[${ref}]] — credible: [[${m[1]}]] over [[${m[2]}]] on [[${m[3]}]]`;
+    })
+    .join("\n");
+}
+
 /** The winner's fragile ground: per rival, how far below the line it sits
  *  and which cells a single one-point score move would raise. The ruling on
  *  each — credible or dismissed — is the state's judgment, never computed. */

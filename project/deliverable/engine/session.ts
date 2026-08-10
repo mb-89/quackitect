@@ -91,8 +91,9 @@ import {
   readItRecord,
   repinColumn,
 } from "./iterations.ts";
-import { parseStateNote, section, withPass } from "./notes.ts";
+import { parseStateNote, section, withPass, writeNode } from "./notes.ts";
 import { fansOut, methodFilesIn, pathKind, recordOwnerOf, resolveInRoot, seDir } from "./paths.ts";
+import { mintFlipLines } from "./pugh.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { anyJobRunning } from "./run.ts";
@@ -4195,6 +4196,55 @@ export class Session {
     return touched;
   }
 
+  /** The sensitivity card's credible rulings become RAID tripwires at the
+   *  moment they are saved (owner ruling 2026-08-10). One node per ruled
+   *  cell; a ruling whose node already stands reuses it, so a re-save never
+   *  duplicates. The line is rewritten with the minted ref, and the card
+   *  renders the tripwire link from then on. */
+  private mintFlipTripwires(fields: Record<string, string>, m: MachineDecl, by: string): void {
+    const traceRoot = this.traceRoot(this.declIteration(m));
+    const shortId = (id: string): string => id.replace(/^cand-/, "").replace(/^req-/, "");
+    for (const [f, content] of Object.entries(fields)) {
+      fields[f] = mintFlipLines(String(content), ({ rival, winner, axis }) => {
+        const id = `raid-flip-${shortId(rival)}-on-${shortId(axis)}`;
+        const abs = join(traceRoot, "raid", `${id}.md`);
+        if (!existsSync(abs)) {
+          mkdirSync(dirname(abs), { recursive: true });
+          writeNode(
+            abs,
+            [
+              "---",
+              `id: ${id}`,
+              'type: "[[raid]]"',
+              "kind: risk",
+              `statement: The convergence flips — ${rival} passes ${winner} if ${axis} moves by one point, and that story was ruled credible.`,
+              "owner: the adjudicator",
+              `trigger: any change to the scores on ${axis}, or new evidence on either candidate`,
+              "status: open",
+              "impact: The winner of the convergence changes, and everything downstream of it re-earns.",
+              "source_refs:",
+              "  - reverse-sensitivity, the sensitivity card's ruling",
+              `  - ${rival}`,
+              `  - ${winner}`,
+              `  - ${axis}`,
+              "---",
+              "",
+              `Ruled credible by ${by} at reverse-sensitivity. The cell stands one`,
+              "point from flipping the convergence; the fallback is the run that",
+              "re-converges after the flip, with the losers still on record.",
+              "",
+              "## Probe",
+              "",
+              `Re-run the convergence with ${axis} moved one point toward ${rival}.`,
+              "The trigger above brings this entry back the moment the ground moves.",
+            ].join("\n"),
+          );
+        }
+        return id;
+      });
+    }
+  }
+
   stateFormSave(name: string, fields: Record<string, string>, by: string, m: MachineDecl = this.currentMachine()): Record<string, unknown> {
     const t = stateFormFields(this.stateFormState(name, m));
     const h = this.stateFormHome(name, m);
@@ -4202,6 +4252,12 @@ export class Session {
     // inputs_checked is the checkbox column, not a section — both hands
     // (the page's boxes, the agent's fill) send it through this one door.
     const { inputs_checked, ...rest } = fields;
+    // A CREDIBLE RULING MINTS ITS TRIPWIRE ON SAVE (owner ruling 2026-08-10).
+    // The sensitivity card's buttons emit ruling lines; each new one becomes
+    // a RAID node here and the line is rewritten with the minted ref, so the
+    // card renders the tripwire link on the next look. Idempotent: a line
+    // already carrying its ref is left alone.
+    this.mintFlipTripwires(rest, m, by);
     // BOUND FIELDS LAND ON THE NODES FIRST. The section is written too, so a
     // reader of the file still sees what was answered — but the NODES are
     // what the check reads and what the next look rebuilds the section from.

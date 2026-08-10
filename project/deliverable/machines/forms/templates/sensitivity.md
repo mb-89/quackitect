@@ -28,13 +28,18 @@ A READING with a judgment beside it. The reading takes no input.
 
 ## What a person still owes
 
-ONE RULING PER FLIP, in the tripwires field, out loud.
+ONE CLICK PER CREDIBLE FLIP. Mark the cell, save, and the engine mints the
+RAID tripwire with its fallback — the ruling line keeps the minted ref and
+renders as a link from then on. Revert clears unsaved marks.
 
-- CREDIBLE — a plausible story moves those cells. It becomes a RAID
-  tripwire with its fallback, per meth-raid.
-- DISMISSED — with the reason. Never a silent dismissal.
+A cell left unmarked stands visibly unruled on a card that redraws from the
+scores. Nothing is dismissed in silence, because nothing disappears.
 
-## It stores nothing
+Only flips within three swings are tabled; a rival further out is named on
+one line and not asked about.
 
-The flips would drift from the scores the moment one number moved. The
-rulings persist — they are judgment, and judgment is typed.
+## What it stores
+
+Only the rulings — judgment, button-fed, never prose. The drawing itself
+would drift from the scores the moment one number moved, so it is computed
+on every look.
