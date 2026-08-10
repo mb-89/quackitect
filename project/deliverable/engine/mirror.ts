@@ -191,6 +191,22 @@ export function startMirror(o: MirrorOptions): Server {
         ),
       }),
     ],
+    // ONE VERDICT PER CLICK from the scenario deck — the line lands and the
+    // register entry mints before the answer returns.
+    "/form/scenario": [
+      "mirror_form_scenario",
+      (body) => ({
+        args: { name: body.name, kind: body.kind, requirement: body.requirement },
+        result: state.session.scenarioVerdict(
+          String(body.name ?? ""),
+          String(body.kind ?? ""),
+          String(body.requirement ?? ""),
+          { decision: String(body.decision ?? ""), hinge: String(body.hinge ?? ""), note: String(body.note ?? "") },
+          "human",
+          String(body.machine ?? ""),
+        ),
+      }),
+    ],
     "/form/save": [
       "mirror_form_save",
       (body) => ({

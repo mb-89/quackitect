@@ -44,6 +44,7 @@ export function visitState(visit: string): string {
 
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { mintScenarioLines } from "./atamwalk.ts";
 import { CallLog } from "./calllog.ts";
 import type { CanvasData } from "./canvas.ts";
 import { conditionNotePath } from "./conditions.ts";
@@ -4250,6 +4251,118 @@ export class Session {
     return this.stateFormSave(name, { sensitivity: current === "" ? line : `${current}\n${line}` }, by, m);
   }
 
+  /** ONE CLICK, ONE VERDICT (owner ruling 2026-08-10). The scenario deck
+   *  posts a verdict as it is made; the line lands in the walk section and
+   *  the save mints the register entry for at-risk and unaddressed before
+   *  the page redraws. A fitness click files the requirement in
+   *  fitness_candidates instead. Idempotent: a scenario already ruled
+   *  answers with the standing form. */
+  scenarioVerdict(
+    name: string,
+    kind: string,
+    requirement: string,
+    extra: { decision?: string; hinge?: string; note?: string },
+    by: string,
+    machineId?: string,
+  ): Record<string, unknown> {
+    const m = this.formMachine(machineId);
+    const h = this.stateFormHome(name, m);
+    const raw = readNode(h.instanceAbs);
+    const field = kind === "fitness" ? "fitness_candidates" : "walk";
+    const current = raw === "" ? "" : section(parseStateNote(raw).body, field).trim();
+    const already = kind === "fitness" ? current.includes(requirement) : current.includes(`[[${requirement}]]`);
+    if (already) return this.stateFormGet(name, m);
+    // The note stays one line by construction — a newline would break the
+    // verdict grammar the mint reads back.
+    const note = (extra.note ?? "").replace(/\s+/g, " ").trim();
+    const line =
+      kind === "addressed"
+        ? `- [[${requirement}]] — addressed by [[${extra.decision ?? ""}]]`
+        : kind === "at-risk"
+          ? `- at risk: [[${requirement}]] hinges on [[${extra.hinge ?? ""}]] — ${note === "" ? "the tradeoff is unstated" : note}`
+          : kind === "unaddressed"
+            ? `- unaddressed: [[${requirement}]]`
+            : `- ${requirement}`;
+    return this.stateFormSave(name, { [field]: current === "" ? line : `${current}\n${line}` }, by, m);
+  }
+
+  /** The scenario walk's at-risk and unaddressed verdicts become register
+   *  entries at the moment they are saved (owner rulings 2026-08-10): a risk
+   *  naming its hinge, an issue the gate must see. One node per scenario; a
+   *  re-save reuses the standing node. breaks_how_badly INHERITS the
+   *  requirement's own grade — the risk grades the same failure. how_likely
+   *  stays a minted comment, answered at the register review. */
+  private mintScenarioEntries(fields: Record<string, string>, m: MachineDecl, by: string): void {
+    const traceRoot = this.traceRoot(this.declIteration(m));
+    const gradeOf = (req: string): string => {
+      const fm = noteOf(join(traceDir(traceRoot), "requirement", `${req}.md`))?.frontmatter;
+      return typeof fm?.breaks_how_badly === "string" ? fm.breaks_how_badly : "";
+    };
+    for (const [f, content] of Object.entries(fields)) {
+      fields[f] = mintScenarioLines(String(content), ({ kind, requirement, hinge, note }) => {
+        const slug = requirement.replace(/^req-/, "");
+        const id = kind === "at-risk" ? `raid-ar-${slug}` : `raid-un-${slug}`;
+        const abs = join(traceDir(traceRoot), "raid", `${id}.md`);
+        if (!existsSync(abs)) {
+          mkdirSync(dirname(abs), { recursive: true });
+          const grade = gradeOf(requirement);
+          const gradeLine =
+            grade === ""
+              ? "breaks_how_badly: <!-- the damage grade — the words live in meth-damage-scale -->"
+              : `breaks_how_badly: ${grade}`;
+          writeNode(
+            abs,
+            kind === "at-risk"
+              ? [
+                  "---",
+                  `id: ${id}`,
+                  'type: "[[raid]]"',
+                  "kind: risk",
+                  `statement: The architecture leaves ${requirement} at risk — the response hinges on ${hinge}.`,
+                  "owner: the adjudicator",
+                  `trigger: any change to ${hinge}, or to the scenario on ${requirement}`,
+                  "status: open",
+                  `impact: ${note === "" ? "The scenario misses its measure when the hinge moves." : note}`,
+                  gradeLine,
+                  "how_likely: <!-- the likelihood grade — the words live in meth-likelihood-scale, graded at the register review -->",
+                  "source_refs:",
+                  "  - evaluate-architecture, the scenario walk's verdict",
+                  `  - ${requirement}`,
+                  `  - ${hinge}`,
+                  "---",
+                  "",
+                  `Walked at evaluate-architecture by ${by}. The scenario's response forms`,
+                  `at ${hinge}; the tradeoff on the verdict line is what a wrong turn there`,
+                  "costs. The damage grade inherits from the requirement it protects.",
+                ].join("\n")
+              : [
+                  "---",
+                  `id: ${id}`,
+                  'type: "[[raid]]"',
+                  "kind: issue",
+                  `statement: The structure does not address ${requirement} — nothing carries its scenario.`,
+                  "owner: the adjudicator",
+                  `trigger: any change to the element set, or to ${requirement}`,
+                  "status: open",
+                  "impact: The quality goes unprotected into the build.",
+                  gradeLine,
+                  "how_likely: expected",
+                  "source_refs:",
+                  "  - evaluate-architecture, the scenario walk's verdict",
+                  `  - ${requirement}`,
+                  "---",
+                  "",
+                  `Found unaddressed at evaluate-architecture by ${by}. Either the`,
+                  "structure grows a carrier for this scenario, or the requirement moves —",
+                  "the gate adjudicates which.",
+                ].join("\n"),
+          );
+        }
+        return id;
+      });
+    }
+  }
+
   /** The sensitivity card's credible rulings become RAID tripwires at the
    *  moment they are saved (owner ruling 2026-08-10). One node per ruled
    *  cell; a ruling whose node already stands reuses it, so a re-save never
@@ -4312,6 +4425,8 @@ export class Session {
     // card renders the tripwire link on the next look. Idempotent: a line
     // already carrying its ref is left alone.
     this.mintFlipTripwires(rest, m, by);
+    // The scenario walk's verdicts mint the same way — see mintScenarioEntries.
+    this.mintScenarioEntries(rest, m, by);
     // BOUND FIELDS LAND ON THE NODES FIRST. The section is written too, so a
     // reader of the file still sees what was answered — but the NODES are
     // what the check reads and what the next look rebuilds the section from.

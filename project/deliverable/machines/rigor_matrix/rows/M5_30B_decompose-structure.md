@@ -31,14 +31,15 @@ product: full
 specification: full
 major_note: |
   Applies in full: the element tree from the winner's picks, the standing
-  system and the grouping judgment; every function allocated to exactly
-  one element; every owed interface named at both ends; every requirement
-  satisfied by an element or an interface. What stood before is
+  system and the grouping judgment; every function allocated to at least
+  one element — many-to-many is legal (owner ruling 2026-08-10), and the
+  spread shows in the matrix; every owed interface named at both ends;
+  every requirement satisfied by an element or an interface. What stood before is
   superseded, never left ambiguous.
 minor_note: |
   ONE edit is legal at this size: new functions ALLOCATE into existing
   elements, and their requirements land on existing structure. Every new
-  function allocated exactly once, as ever. Elements, groups and
+  function allocated at least once, as ever. Elements, groups and
   interfaces stand.
 
   ESCALATE: wanting a new element or a new interface IS the architecture

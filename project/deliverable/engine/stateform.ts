@@ -8,6 +8,7 @@
 // comment law, reapplied).
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { type MetricRow, type ScenarioDeckView, scenarioDeckView, structureMetrics } from "./atamwalk.ts";
 import { catalogItems, trizParameterItems } from "./catalogs.ts";
 import { type Judgment, type RelationKind, type WalkResult, walk } from "./compare.ts";
 import { clusterDsm, type Dsm, flowMatrix } from "./dsm.ts";
@@ -191,6 +192,11 @@ export interface FieldArgs {
   /** The element matrix — owed cells from flow crossings, declared
    *  interfaces beside them. Computed from the trace nodes on every look. */
   ematrix: ElementMatrixView | null;
+  /** The scenario deck — ATAM's judged half: one card per quality
+   *  requirement, worst grade first, with its computed path. */
+  scenario: ScenarioDeckView | null;
+  /** The structure numbers — the evaluation's computed half. */
+  smetrics: MetricRow[] | null;
 }
 
 export function templateMeta(root: string, name: string): TemplateMeta {
@@ -288,6 +294,8 @@ export const NO_ARGS: FieldArgs = {
   matrix: null,
   sensitivity: null,
   ematrix: null,
+  scenario: null,
+  smetrics: null,
 };
 
 /** THE CHART, computed from the nodes. Rows are the clusters, cells are the
@@ -579,6 +587,8 @@ export function claimProblems(root: string, s: StateDecl, body: string, corpus: 
       // moment somebody adds an item.
       walk: null,
       dsm: null,
+      scenario: null,
+      smetrics: null,
       box: null,
       pareto: null,
       matrix: null,
@@ -961,50 +971,105 @@ export function fieldArgsFor(f: EvidenceField, root: string, traceRoot: string, 
     // the eliminations and both corners all fall out of them, so nothing here
     // is typed and nothing can disagree with the table it came from.
     pareto: f.template !== "pareto-plot" || f.reads === undefined ? null : viewOfScores(section(instanceRaw ?? "", f.reads)),
-    // THE M5 READINGS REACH ACROSS THE RECORD: the scores stand at
-    // evaluate-set and the signed order at cut-criteria, so the convergence
-    // is computed from the sibling forms rather than typed.
-    matrix: f.template !== "decision-matrix" || evidenceDir === undefined ? null : pughView(...m5Inputs(evidenceDir, traceRoot)),
-    sensitivity: f.template !== "sensitivity" || evidenceDir === undefined ? null : sensitivityView(...m5Inputs(evidenceDir, traceRoot)),
-    ematrix: f.template !== "element-matrix" ? null : elementMatrixArgs(traceRoot),
+    ...derivedViews(f, traceRoot, evidenceDir),
   };
 }
 
-/** The three node sets the element matrix computes from, read off the
- *  record's trace through the door. Lists accept YAML arrays and
- *  comma-joined strings alike — the house rule for every list. */
-export function elementMatrixArgs(traceRoot: string): ElementMatrixView {
-  const asList = (v: unknown): string[] => {
-    if (Array.isArray(v)) return v.map(String);
-    if (typeof v === "string" && v.trim() !== "")
-      return v
-        .split(",")
-        .map((s) => s.trim())
-        .filter((s) => s !== "");
-    return [];
+/** THE M5 READINGS REACH ACROSS THE RECORD: the scores stand at
+ *  evaluate-set and the signed order at cut-criteria, so the convergence is
+ *  computed from the sibling forms rather than typed. The structure views
+ *  read the trace nodes directly. */
+function derivedViews(
+  f: EvidenceField,
+  traceRoot: string,
+  evidenceDir?: string,
+): Pick<FieldArgs, "matrix" | "sensitivity" | "ematrix" | "scenario" | "smetrics"> {
+  return {
+    matrix: f.template !== "decision-matrix" || evidenceDir === undefined ? null : pughView(...m5Inputs(evidenceDir, traceRoot)),
+    sensitivity: f.template !== "sensitivity" || evidenceDir === undefined ? null : sensitivityView(...m5Inputs(evidenceDir, traceRoot)),
+    ematrix: f.template !== "element-matrix" ? null : elementMatrixArgs(traceRoot),
+    scenario: f.template !== "scenario-deck" ? null : scenarioDeckArgs(traceRoot),
+    smetrics: f.template !== "structure-metrics" ? null : structureMetricsArgs(traceRoot),
   };
+}
+
+/** YAML array or comma-joined string — the house rule for every list. */
+function fmList(v: unknown): string[] {
+  if (Array.isArray(v)) return v.map(String);
+  if (typeof v === "string" && v.trim() !== "")
+    return v
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => s !== "");
+  return [];
+}
+
+/** One trace folder's nodes, read through the door. The path takes the
+ *  RECORD ROOT — traceDir owns the append, like every trace read. */
+function traceFolder(traceRoot: string, folder: string): { id: string; fm: Record<string, unknown>; body: string }[] {
   const dir = traceDir(traceRoot);
-  const nodes = (folder: string): { id: string; fm: Record<string, unknown> }[] => {
-    try {
-      return readdirSync(join(dir, folder))
-        .filter((n) => n.endsWith(".md"))
-        .map((n) => {
-          const note = noteOf(join(dir, folder, n));
-          return { id: String(note?.frontmatter.id ?? n.replace(/\.md$/, "")), fm: note?.frontmatter ?? {} };
-        });
-    } catch {
-      return [];
-    }
-  };
+  try {
+    return readdirSync(join(dir, folder))
+      .filter((n) => n.endsWith(".md"))
+      .map((n) => {
+        const note = noteOf(join(dir, folder, n));
+        return { id: String(note?.frontmatter.id ?? n.replace(/\.md$/, "")), fm: note?.frontmatter ?? {}, body: note?.body ?? "" };
+      });
+  } catch {
+    return [];
+  }
+}
+
+/** The three node sets the element matrix computes from. */
+export function elementMatrixArgs(traceRoot: string): ElementMatrixView {
   return elementMatrixView(
-    nodes("element").map((n) => ({ id: n.id, group: String(n.fm.group ?? ""), implements: asList(n.fm.implements) })),
-    nodes("function").map((n) => ({ id: n.id, inputs: asList(n.fm.inputs), outputs: asList(n.fm.outputs) })),
-    nodes("interface").map((n) => ({
+    traceFolder(traceRoot, "element").map((n) => ({ id: n.id, group: String(n.fm.group ?? ""), implements: fmList(n.fm.implements) })),
+    traceFolder(traceRoot, "function").map((n) => ({ id: n.id, inputs: fmList(n.fm.inputs), outputs: fmList(n.fm.outputs) })),
+    traceFolder(traceRoot, "interface").map((n) => ({
       id: n.id,
       source: String(n.fm.source ?? ""),
       destination: String(n.fm.destination ?? ""),
-      carries: asList(n.fm.carries),
+      carries: fmList(n.fm.carries),
     })),
+  );
+}
+
+/** The scenario deck's inputs: quality requirements with their Scenario
+ *  sections, the satisfies edges, the implementers and the register's
+ *  decisions. All read from the record's trace on every look. */
+export function scenarioDeckArgs(traceRoot: string): ScenarioDeckView {
+  const reqs = traceFolder(traceRoot, "requirement")
+    .filter((n) => String(n.fm.kind ?? "") === "quality")
+    .map((n) => ({
+      id: n.id,
+      grade: String(n.fm.breaks_how_badly ?? ""),
+      characteristic: String(n.fm.characteristic ?? ""),
+      scenario: section(n.body, "Scenario"),
+    }));
+  const fns = traceFolder(traceRoot, "function").map((n) => ({ id: n.id, satisfies: fmList(n.fm.satisfies) }));
+  const impl = [...traceFolder(traceRoot, "element"), ...traceFolder(traceRoot, "interface")].map((n) => ({
+    id: n.id,
+    implements: fmList(n.fm.implements),
+    satisfies: fmList(n.fm.satisfies),
+  }));
+  const decisions = traceFolder(traceRoot, "raid")
+    .filter((n) => String(n.fm.kind ?? "") === "decision")
+    .map((n) => n.id);
+  return scenarioDeckView(
+    reqs,
+    fns,
+    impl,
+    decisions,
+    traceFolder(traceRoot, "element").map((n) => n.id),
+    catalogItems(traceRoot, "damage_levels"),
+  );
+}
+
+/** The structure numbers, computed off the same nodes as the matrix. */
+export function structureMetricsArgs(traceRoot: string): MetricRow[] {
+  return structureMetrics(
+    elementMatrixArgs(traceRoot),
+    traceFolder(traceRoot, "element").map((n) => ({ id: n.id, implements: fmList(n.fm.implements) })),
   );
 }
 

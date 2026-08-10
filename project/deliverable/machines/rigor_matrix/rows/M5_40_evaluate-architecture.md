@@ -1,11 +1,13 @@
 ---
 kind: matrix-row
 name: evaluate-architecture
-statement: "Evaluate the architecture: the ATAM-lite walk of the quality scenarios, with the structure metrics computed beside it."
+statement: "Evaluate the architecture: the ATAM walk of the quality scenarios, with the structure numbers computed beside it."
 state_kind: work
+busbar: true
 filled_by: agent
 depends_on:
   - decompose-structure
+  - record-adrs
 legal_tools:
   - se_file_read
   - se_file_write
@@ -17,20 +19,23 @@ legal_tools:
   - se_answer
 evidence:
   - name: walk
-    description: each quality scenario with its verdict and carrying decision
+    template: scenario-deck
+    description: the quality scenarios walked worst grade first, each ruled addressed, at risk or unaddressed — at-risk and unaddressed mint their register entry on the click
   - name: metrics
-    description: the structure numbers, computed — element coupling off the DSM, allocation balance off the function nodes — with one line saying what each number moved
+    template: structure-metrics
+    description: the structure numbers computed off the element matrix, one typed line per number saying what it moved
   - name: fitness_candidates
-    description: the measurable scenarios that could automate at M7
+    template: list
+    of: requirement
+    description: the measurable scenarios that could automate at M7 — filed by the deck's fitness button, or typed as references
 major: full
 minor: tailored
 patch: none
 product: full
 specification: full
 major_note: |
-  Applies in full: every quality scenario walked through the structure,
-  verdicts recorded, the DSM metrics computed, fitness candidates named
-  for M7.
+  Applies in full: every quality scenario dealt and ruled, the structure
+  numbers computed and interpreted, fitness candidates named for M7.
 minor_note: |
   Walk ONLY the quality scenarios the delta touches through the standing
   structure. Record each one as addressed, at risk or unaddressed. The
@@ -50,18 +55,26 @@ specification_note: |
 
 ## Guidance
 
-Per [[meth-atam-lite]]:
+Walk per [[meth-atam-lite]]. The card explains ATAM itself: the nine
+steps, the utility tree, and the four outputs.
 
-- Walk each quality scenario through the structure — which elements carry
-  the stimulus, where the response forms, what limits the measure.
-- Record it as addressed, at risk, or unaddressed.
-- Name candidate fitness functions.
-
-THE METRICS BELONG HERE, not at the decomposition (owner ruling
-2026-08-10, and the corpus files DSM analysis under quantitative REVIEW):
-element coupling and cycle counts off the element DSM, allocation balance
-off the function nodes. A number nobody interprets is noise — each one
-carries a line saying what it moved.
+- The DECK deals the quality scenarios, worst damage grade first. Rule
+  every card:
+  - addressed — name the carrying decision.
+  - at risk — name the hinge and the tradeoff. The register risk mints
+    on the click.
+  - unaddressed — the register issue mints on the click. A standing
+    finding for the gate.
+- The walk NAMES DECISIONS, so the decisions must be on file first. That
+  is why this state depends on record-adrs (owner ruling 2026-08-10).
+- THE METRICS BELONG HERE, not at the decomposition (owner ruling
+  2026-08-10; the corpus files DSM analysis under quantitative review).
+  One typed line per number: what it moved. "Moved nothing" is a
+  complete answer.
+- FITNESS CANDIDATES: mark the scenarios whose response measure could
+  run as an automated check. The list feeds M7's author-tests.
+- A scenario found during the walk becomes a quality requirement — a
+  ripple to M3, never a side list.
 
 Evaluation, never verification. Findings that shake the choice reopen
 converge-pugh; findings that shake requirements ripple to M3.

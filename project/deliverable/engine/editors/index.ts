@@ -24,7 +24,9 @@ import { NODE_TABLE_EDITOR } from "./node-table.ts";
 import { PARETO_PLOT_EDITOR } from "./pareto-plot.ts";
 import { PER_ITEM_EDITOR } from "./per-item.ts";
 import { RANK_CUT_EDITOR } from "./rank-cut.ts";
+import { SCENARIO_DECK_EDITOR } from "./scenario-deck.ts";
 import { SENSITIVITY_EDITOR } from "./sensitivity.ts";
+import { STRUCTURE_METRICS_EDITOR } from "./structure-metrics.ts";
 import { TABLE_EDITOR } from "./table.ts";
 
 export type { EditorKind };
@@ -42,6 +44,8 @@ export const EDITORS: EditorKind[] = [
   DECISION_MATRIX_EDITOR,
   SENSITIVITY_EDITOR,
   ELEMENT_MATRIX_EDITOR,
+  SCENARIO_DECK_EDITOR,
+  STRUCTURE_METRICS_EDITOR,
   PER_ITEM_EDITOR,
   CHOICE_RATIONALE_EDITOR,
   FINDINGS_EDITOR,
