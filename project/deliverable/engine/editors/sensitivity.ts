@@ -55,13 +55,24 @@ ${CARD_PARTS}
         else ledger.push(link(r.id) + " over " + link(sv.winner) + " on " + link(c.axis) + (ref === "pending" ? " \\u2014 minting" : " \\u2014 " + link(ref)));
       });
     });
-    const deck = cards.map(function (c, i) {
-      const head = '<div style="' + cardMeta + 'padding:4px 0;">' + link(c.rival) + " sits " + c.deficit + " sign" + (c.deficit === 1 ? "" : "s") + " below \\u00b7 " + c.need + " swing" + (c.need === 1 ? "" : "s") + " flip" + (c.need === 1 ? "s" : "") + " it \\u00b7 card " + (i + 1) + " of " + cards.length + "</div>";
-      const sides = '<div style="display:flex;gap:10px;align-items:stretch;">' + cardSide(c.axis, "cell") + cardSide(sv.winner, "winner") + cardSide(c.rival, "rival") + "</div>";
-      const rule = '<button class="sfflip" style="' + cardBtn + '" data-rival="' + escText(c.rival) + '" data-winner="' + escText(sv.winner) + '" data-axis="' + escText(c.axis) + '">rival wins \\u2014 credible</button>';
-      const next = i + 1 < cards.length ? '<button class="sfflipnext" style="' + cardBtn + '" type="button">stands \\u2014 next</button>' : '<span style="' + cardMeta + '">last card \\u2014 unruled cells stay visible</span>';
-      return '<div class="sfflipcard" data-on="' + (i === 0 ? "1" : "0") + '" style="' + (i === 0 ? "" : "display:none;") + '">' + head + sides + '<div style="display:flex;gap:8px;margin-top:8px;align-items:center;">' + rule + next + "</div></div>";
-    }).join("");
+    // ONE DECK PER FLIPPABLE RIVAL (owner ruling 2026-08-10): each rival
+    // that stands within reach deals its own stack, and the arrows browse a
+    // stack without deciding anything.
+    const decks = [];
+    sv.rivals.forEach(function (r) {
+      const mine = cards.filter(function (c) { return c.rival === r.id; });
+      if (mine.length === 0) return;
+      const groupHead = '<div style="' + cardMeta + 'padding:6px 0 2px;">' + link(r.id) + " sits " + r.deficit + " sign" + (r.deficit === 1 ? "" : "s") + " below " + link(sv.winner) + " \\u00b7 " + (r.deficit + 1) + " swing" + (r.deficit === 0 ? "" : "s") + " flip" + (r.deficit === 0 ? "s" : "") + " it \\u00b7 " + mine.length + " unruled cell" + (mine.length === 1 ? "" : "s") + "</div>";
+      const stack = mine.map(function (c, i) {
+        const head = '<div style="' + cardMeta + 'padding:4px 0;">card ' + (i + 1) + " of " + mine.length + "</div>";
+        const sides = '<div style="display:flex;gap:10px;align-items:stretch;">' + cardSide(c.axis, "cell") + cardSide(sv.winner, "winner") + cardSide(c.rival, "rival") + "</div>";
+        const rule = '<button class="sfflip" style="' + cardBtn + '" data-rival="' + escText(c.rival) + '" data-winner="' + escText(sv.winner) + '" data-axis="' + escText(c.axis) + '">rival wins \\u2014 credible</button>';
+        const nav = function (dir, label) { return '<button class="sfflipnav" style="' + cardBtn + '" type="button" data-dir="' + dir + '" title="browse \\u2014 decides nothing">' + label + "</button>"; };
+        return '<div class="sfflipcard" style="' + (i === 0 ? "" : "display:none;") + '">' + head + sides + '<div style="display:flex;gap:8px;margin-top:8px;align-items:center;">' + nav("-1", "\\u2190") + rule + nav("1", "\\u2192") + "</div></div>";
+      }).join("");
+      decks.push('<div class="sfflipgroup" style="margin:4px 0 10px;">' + groupHead + stack + "</div>");
+    });
+    const deck = decks.join("");
     const meta = "font-size:11px;color:var(--se-muted);padding:4px 0;";
     const intro = '<div style="' + meta + '">The computed ground under ' + link(sv.winner) + ": " + cards.length + " unruled cell" + (cards.length === 1 ? "" : "s") + ", " + ledger.length + " ruled. A ruling mints its RAID tripwire at once.</div>";
     const ledgerHtml = ledger.length > 0 ? '<div style="' + meta + '">' + ledger.join("<br>") + "</div>" : "";
@@ -85,16 +96,17 @@ ${CARD_PARTS}
       showFormAgain(form, machine, rule);
       return;
     }
-    const next = ev.target && ev.target.closest ? ev.target.closest(".sfflipnext") : null;
-    if (next) {
-      const card = next.closest(".sfflipcard");
-      const after = card ? card.nextElementSibling : null;
-      if (card && after && after.classList.contains("sfflipcard")) {
-        card.style.display = "none";
-        card.dataset.on = "0";
-        after.style.display = "";
-        after.dataset.on = "1";
-      }
+    const nav = ev.target && ev.target.closest ? ev.target.closest(".sfflipnav") : null;
+    if (nav) {
+      // The arrows browse the rival's own stack, wrapping at the ends, and
+      // decide nothing.
+      const group = nav.closest(".sfflipgroup");
+      const stack = group ? Array.prototype.slice.call(group.querySelectorAll(".sfflipcard")) : [];
+      if (stack.length < 2) return;
+      const at = stack.findIndex(function (c) { return c.style.display !== "none"; });
+      const to = (at + (nav.dataset.dir === "1" ? 1 : stack.length - 1)) % stack.length;
+      stack[at].style.display = "none";
+      stack[to].style.display = "";
     }
   });
   `,
