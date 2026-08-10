@@ -21,6 +21,7 @@ checks:
       - probed
       - mitigated
       - accepted
+      - deferred
       - closed
       - decided
       - superseded
@@ -151,8 +152,14 @@ test.
 - `owner` — a ROLE, never a person. Who watches it.
 - `trigger` — the event that brings it back for a look. This is the field that
   makes the register live rather than a graveyard.
-- `status` — open, probed, mitigated, accepted, closed. A decision instead
-  carries decided, later at most superseded.
+- `status` — open, probed, mitigated, accepted, deferred, closed. A
+  decision instead carries decided, later at most superseded.
+  - accepted — consciously lived with, on the record, indefinitely.
+  - deferred — parked behind `defer_until`, like a backlog item. Not an
+    acceptance: the until brings it back.
+- `defer_until` — REQUIRED on a deferred entry: the condition that brings
+  it back for a look, e.g. the first session on a POSIX machine. The
+  gate-prototype law refuses a deferral without one.
 - `impact` — what it costs if it bites. A sentence, not a score.
 - `breaks_how_badly` — the damage grade, on EVERY kind
   ([[meth-damage-scale]]). What it grades per kind: a risk that comes true,

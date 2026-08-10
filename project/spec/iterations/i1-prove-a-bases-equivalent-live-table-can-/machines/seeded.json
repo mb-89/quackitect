@@ -1,6 +1,6 @@
 {
   "change_size": "product",
-  "rigor_matrix_hash": "312772ca9ee9",
+  "rigor_matrix_hash": "01943e4760ed",
   "pinned_at": "2026-08-04T16:20:30.684Z",
   "demands": {
     "onboard-retro": {
@@ -137,7 +137,7 @@
     },
     "rank-unknowns": {
       "applies": "full",
-      "evidence": "[[\"ranking\",true,\"\",[],\"\",\"\",[],[],[]],[\"seeded\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"seeded\",true,\"\",[],\"exposure-pick\",\"raid\",[],[],[]]]"
     },
     "run-spikes": {
       "applies": "tailored",
@@ -145,11 +145,11 @@
     },
     "fold-back": {
       "applies": "full",
-      "evidence": "[[\"folded\",true,\"\",[],\"\",\"\",[],[],[]],[\"promotions\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"folded\",true,\"\",[\"folds_to\",\"promote\"],\"node-table\",\"experiment\",[],[\"$experiments\"],[]]]"
     },
     "gate-prototype": {
       "applies": "full",
-      "evidence": "[[\"assumptions_validated\",true,\"\",[],\"\",\"\",[],[],[]],[\"buildable\",true,\"\",[],\"\",\"\",[],[],[]],[\"results_recorded\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"buildable\",true,\"\",[],\"choice-with-rationale\",\"\",[\"yes\",\"no\"],[],[]]]"
     },
     "author-tests": {
       "applies": "full",

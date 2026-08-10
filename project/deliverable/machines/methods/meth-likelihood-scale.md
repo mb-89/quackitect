@@ -1,5 +1,7 @@
 ---
 kind: method
+catalog: likelihood_levels
+catalog_sections: THE THREE LEVELS
 statement: "How likely it goes wrong, in three graded words with tests — never a number nobody measured."
 ---
 

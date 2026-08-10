@@ -320,6 +320,23 @@ export function generateSeeded(_root: string, it: Iteration, machineId: string, 
       guidance: `A build chunk — realization: ${c.realization}. The tag pulls the discipline's guidance.`,
       evidence_form: [{ name: "built", description: "what was built and where — the commit or artifact", required: true }],
       priority: 0.2,
+      // A drawn step is WORK — without a grant it compiled to no tools at
+      // all, and the first real spike could not run its own measurement.
+      legal_tools: [
+        "se_file_read",
+        "se_file_write",
+        "se_file_patch",
+        "se_file_search",
+        "se_file_glob",
+        "se_file_list",
+        "se_run",
+        "se_test",
+        "se_git",
+        "se_log_query",
+        "se_answer",
+        "se_web_search",
+        "se_web_fetch",
+      ],
       tags: [`realization-${c.realization}`],
       edges: [
         ...chunks.filter((o) => o.depends_on.includes(c.id)).map((o) => ({ to: o.id, role: "normal" as const })),

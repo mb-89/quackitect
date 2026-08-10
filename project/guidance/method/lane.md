@@ -62,4 +62,9 @@ dropped exists nowhere — not on the result, not in the log. Ends carry
 verdicts: exit codes, totals, units. Prefer structured results (`se_test`) and
 fetch full output by ref (`se_log_query`) over shaping it in the shell.
 
+A RESULT THE HOST MOVED TO DISK IS RE-FETCHED BY REF, never by reading the
+host's file. The lane logged the full response; `se_log_query` with the
+call's ref serves it back. Retro finding 2026-08-10: several shell reads of
+host-persisted files stood where one log query belonged.
+
 Pass this file's rule to every subagent you spawn.

@@ -8,7 +8,7 @@ trigger: any change to el-walk-engine, or to the scenario on req-acts-carry-role
 status: open
 impact: every channel must pass the one dispatch seam, or the stamp lies
 breaks_how_badly: crippling
-how_likely: <!-- the likelihood grade — the words live in meth-likelihood-scale, graded at the register review -->
+how_likely: conceivable
 source_refs:
   - evaluate-architecture, the scenario walk's verdict
   - req-acts-carry-role-and-channel

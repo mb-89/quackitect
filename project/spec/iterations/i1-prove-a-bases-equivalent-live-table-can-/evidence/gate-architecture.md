@@ -1,5 +1,6 @@
 ---
 form: gate-architecture
+bless: blessed by human
 by: agent
 signed_off: 2026-08-10T17:47:42.627Z
 authors: agent

@@ -6,6 +6,8 @@ statement: Adjudicating AI work erodes the very skills that adjudication depends
 owner: the owner
 trigger: every retro, at the hands-on cadence check
 status: open
+breaks_how_badly: fatal
+how_likely: plausible
 impact: The adjudicator keeps signing but stops being able to tell a good answer from a plausible one, and nothing in the machine can detect that.
 source_refs:
   - the vision packet's autonomy range

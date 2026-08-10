@@ -17,9 +17,14 @@ legal_tools:
   - se_answer
 evidence:
   - name: folded
-    description: what each spike's evidence changed upstream
-  - name: promotions
-    description: spike output marked for entry into the build, or none
+    template: node-table
+    of: experiment
+    items:
+      - $experiments
+    columns:
+      - folds_to
+      - promote
+    description: per experiment — what it changed upstream, and what promotes into the build or none; the answers live on the experiment nodes
 major: full
 minor: tailored
 patch: none
@@ -47,4 +52,22 @@ specification_note: |
 
 ## Guidance
 
-Evidence updates requirements and architecture; the suspect mechanics reopen exactly what it invalidates - through the gates' reopen path, never silently. The fold-back is the twin-peaks descent ([[meth-twin-peaks]]): each peak informs the other. Keepers headed for the build are marked for promotion ([[meth-expedition-promotion]]).
+THE ANSWERS LIVE ON THE EXPERIMENT NODES (owner ruling 2026-08-10). The
+form is a VIEW — one row per experiment, editing the node's own two keys,
+exactly like the assumption probes:
+
+- `folds_to` — what the evidence changes upstream. A requirement, a
+  register entry, a structure edit — or nothing moved, said plainly.
+- `promote` — what enters the build through the gate, or none.
+
+A still-commented key counts as unanswered, and the submit refuses it by
+name — so no experiment can slip through unfolded.
+
+PROMOTIONS ARE A FILTER, NEVER A LIST: the experiments whose `promote` is
+not none. A typed copy would drift from the nodes.
+
+Evidence updates requirements and architecture; the suspect mechanics
+reopen exactly what it invalidates - through the gates' reopen path,
+never silently. The fold-back is the twin-peaks descent
+([[meth-twin-peaks]]): each peak informs the other. Promotion mechanics
+are [[meth-expedition-promotion]].

@@ -1255,3 +1255,28 @@
 {"ts":"2026-08-10T17:49:01.876Z","op":"done","visit":"iterations/i1/record-adrs@0","node":"d13","brief":"the gate stands signed and awaits the bless"}
 {"ts":"2026-08-10T17:55:09.244Z","op":"update","visit":"iterations/i1/gate-architecture@0","node":"d21","brief":"checking what the worktree holds uncommitted"}
 {"ts":"2026-08-10T17:55:29.374Z","op":"update","visit":"iterations/i1/gate-architecture@0","node":"d22","brief":"checkpointing the signed walk onto the record's branch"}
+{"ts":"2026-08-10T17:55:58.222Z","op":"update","visit":"iterations/i1/gate-architecture@0","node":"d23","brief":"recording the git-tier answer"}
+{"ts":"2026-08-10T18:08:56.431Z","op":"update","visit":"iterations/i1/start@1","node":"d38","brief":"aimed at M6's first state"}
+{"ts":"2026-08-10T18:10:10.974Z","op":"update","visit":"iterations/i1/rank-unknowns@0","node":"d39","brief":"grading the six ungraded register mints"}
+{"ts":"2026-08-10T18:10:32.456Z","op":"update","visit":"iterations/i1/rank-unknowns@0","node":"d40","brief":"ranking the unknowns and seeding three spikes"}
+{"ts":"2026-08-10T19:20:59.021Z","op":"update","visit":"iterations/i1/start@0","node":"d4","brief":"aiming the walk at the prototype gate"}
+{"ts":"2026-08-10T19:21:40.367Z","op":"update","visit":"iterations/i1/run-spikes/trunk-read-cost@0","node":"d5","brief":"the trunk-read measurement runs"}
+{"ts":"2026-08-10T19:26:01.729Z","op":"update","visit":"iterations/i1/start@0","node":"d1","brief":"re-aimed at the gate with the grant live"}
+{"ts":"2026-08-10T19:29:40.524Z","op":"update","visit":"iterations/i1/run-spikes/trunk-read-cost@0","node":"d2","brief":"the trunk-read measurement runs"}
+{"ts":"2026-08-10T19:29:56.351Z","op":"update","visit":"iterations/i1/run-spikes/trunk-read-cost@0","node":"d3","brief":"the batch-reader half of the measurement"}
+{"ts":"2026-08-10T19:30:28.650Z","op":"plan","visit":"iterations/i1/run-spikes/trunk-read-cost@0","parent":null,"nodes":[{"id":"d4","brief":"trunk-read-cost signed with its experiment"},{"id":"d5","brief":"the other two spikes signed with theirs"},{"id":"d6","brief":"fold-back's table answered on the nodes"},{"id":"d7","brief":"the gate submitted for the bless"}]}
+{"ts":"2026-08-10T19:30:36.930Z","op":"update","visit":"iterations/i1/run-spikes/trunk-read-cost@0","node":"d8","brief":"the finding lands in the decision it probes"}
+{"ts":"2026-08-10T19:30:51.475Z","op":"update","visit":"iterations/i1/run-spikes/trunk-read-cost@0","node":"d9","brief":"the finding lands in the decision it probes"}
+{"ts":"2026-08-10T19:31:01.361Z","op":"done","visit":"iterations/i1/run-spikes/trunk-read-cost@0","node":"d4","brief":"the spike signed with its experiment and the register updated"}
+{"ts":"2026-08-10T19:31:27.379Z","op":"update","visit":"iterations/i1/run-spikes/trunk-read-cost@0","node":"d10","brief":"aiming at the owed latency branch"}
+{"ts":"2026-08-10T19:31:47.755Z","op":"update","visit":"iterations/i1/run-spikes/latency-ledger@0","node":"d11","brief":"the latency experiment minted from today's ledger"}
+{"ts":"2026-08-10T19:32:05.163Z","op":"update","visit":"iterations/i1/run-spikes/latency-ledger@0","node":"d12","brief":"two of three signed; aiming at the last"}
+{"ts":"2026-08-10T19:32:31.742Z","op":"update","visit":"iterations/i1/run-spikes/kill-and-resume@0","node":"d13","brief":"the resume experiment minted from the day's five restarts"}
+{"ts":"2026-08-10T19:32:41.538Z","op":"update","visit":"iterations/i1/run-spikes/kill-and-resume@0","node":"d14","brief":"the finding lands in the risk it probes"}
+{"ts":"2026-08-10T19:32:50.258Z","op":"done","visit":"iterations/i1/run-spikes/trunk-read-cost@0","node":"d5","brief":"all three spikes signed with their experiments"}
+{"ts":"2026-08-10T19:33:03.915Z","op":"update","visit":"iterations/i1/run-spikes/kill-and-resume@0","node":"d15","brief":"routing through the join to fold-back"}
+{"ts":"2026-08-10T19:33:22.391Z","op":"update","visit":"iterations/i1/run-spikes/kill-and-resume@0","node":"d16","brief":"the fold keys answered on the nodes"}
+{"ts":"2026-08-10T19:34:13.208Z","op":"update","visit":"iterations/i1/fold-back@0","node":"d17","brief":"the view filled and submitted"}
+{"ts":"2026-08-10T19:34:42.322Z","op":"update","visit":"iterations/i1/gate-prototype@0","node":"d18","brief":"the gate filled and submitting"}
+{"ts":"2026-08-10T19:34:57.262Z","op":"update","visit":"iterations/i1/gate-prototype@0","node":"d19","brief":"the rounds rewritten in the gate's line grammar"}
+{"ts":"2026-08-10T19:35:14.840Z","op":"done","visit":"iterations/i1/run-spikes/trunk-read-cost@0","node":"d7","brief":"the gate signed; the bless is the owner's"}

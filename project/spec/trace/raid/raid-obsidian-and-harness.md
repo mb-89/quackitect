@@ -6,6 +6,8 @@ statement: Two things outside this project are load-bearing — Obsidian as the 
 owner: the owner
 trigger: on a breaking change to either
 status: open
+breaks_how_badly: fatal
+how_likely: plausible
 impact: A machine is a canvas a person edits in Obsidian, and the whole lane runs inside somebody else's agent harness. A breaking change to either stops the walk rather than degrading it.
 source_refs:
   - the machines-are-drawn law in software.md

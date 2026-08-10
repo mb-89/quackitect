@@ -6,6 +6,8 @@ statement: Four of the surviving 4-scores rest on external comparisons nobody in
 owner: the driving agent
 trigger: before M5 convergence reads the scores
 status: open
+breaks_how_badly: corrosive
+how_likely: plausible
 impact: A 4 needs its named comparison to hold; the anchor rule drops an unverified 4 to 3, and the front can shift when a score moves.
 source_refs:
   - iterations/i1 evidence gate-candidates, round_2_red_team and verdict

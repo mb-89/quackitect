@@ -8,7 +8,7 @@
 // comment law, reapplied).
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { type MetricRow, type ScenarioDeckView, scenarioDeckView, structureMetrics } from "./atamwalk.ts";
+import { type ExposureView, exposureView, type MetricRow, type ScenarioDeckView, scenarioDeckView, structureMetrics } from "./atamwalk.ts";
 import { catalogItems, trizParameterItems } from "./catalogs.ts";
 import { type Judgment, type RelationKind, type WalkResult, walk } from "./compare.ts";
 import { clusterDsm, type Dsm, flowMatrix } from "./dsm.ts";
@@ -197,6 +197,9 @@ export interface FieldArgs {
   scenario: ScenarioDeckView | null;
   /** The structure numbers — the evaluation's computed half. */
   smetrics: MetricRow[] | null;
+  /** The register's exposure chart — damage against likelihood, every
+   *  standing entry a dot. The spike pick is made looking at it. */
+  exposure: ExposureView | null;
 }
 
 export function templateMeta(root: string, name: string): TemplateMeta {
@@ -296,6 +299,7 @@ export const NO_ARGS: FieldArgs = {
   ematrix: null,
   scenario: null,
   smetrics: null,
+  exposure: null,
 };
 
 /** THE CHART, computed from the nodes. Rows are the clusters, cells are the
@@ -433,6 +437,7 @@ function resolveSource(i: string, root: string, traceRoot: string, instanceRaw?:
   if (i === "$clusters") return clusterItems(traceRoot);
   if (i === "$flows") return flowItems(traceRoot);
   if (i === "$options") return optionItems(traceRoot);
+  if (i === "$experiments") return typedItems(traceRoot, "experiment");
   if (i === "$candidates") return candidateItems(traceRoot);
   // THE CATALOGUES. A known set is never typed from memory and never hard
   // coded — it is read from the method card that holds it, so editing the card
@@ -589,6 +594,7 @@ export function claimProblems(root: string, s: StateDecl, body: string, corpus: 
       dsm: null,
       scenario: null,
       smetrics: null,
+      exposure: null,
       box: null,
       pareto: null,
       matrix: null,
@@ -602,6 +608,34 @@ export function claimProblems(root: string, s: StateDecl, body: string, corpus: 
   for (const f of s.evidence_form) {
     if (f.template === "element-matrix") out.push(...structureLawProblems(f.name, nodes));
     if (f.template === "scenario-deck") out.push(...deckLawProblems(f.name, section(body, f.name), nodes));
+  }
+  if (s.id.endsWith("gate-prototype")) out.push(...assumptionLawProblems(nodes, catalogItems(root, "damage_levels")));
+  return out;
+}
+
+/** The riskiest assumptions are validated — gate-prototype's law (owner
+ *  ruling 2026-08-10). An assumption in the worst two damage grades must
+ *  carry a probe result, a conscious acceptance, or a deferral WITH its
+ *  until — a deferral without one is a silent pass wearing a status. */
+export function assumptionLawProblems(corpus: { id: string; type: string; file?: string }[], damageOrder: string[]): string[] {
+  const out: string[] = [];
+  for (const n of corpus) {
+    if (n.type !== "raid" || n.file === undefined) continue;
+    const fm = noteOf(n.file)?.frontmatter ?? {};
+    if (String(fm.kind ?? "") !== "assumption") continue;
+    const status = String(fm.status ?? "");
+    if (status === "closed" || status === "superseded" || status === "accepted") continue;
+    if (status === "deferred") {
+      if (String(fm.defer_until ?? "").trim() === "") out.push(`${n.id}: deferred without its until — say what brings it back`);
+      continue;
+    }
+    // Index 0 and 1 are the two worst grades of the catalogue's worst-first
+    // order; the words themselves stay on the card.
+    const dmg = damageOrder.indexOf(String(fm.breaks_how_badly ?? ""));
+    const probe = String(fm.probe ?? "").trim();
+    const answered = probe !== "" && !probe.startsWith("<!--") && !/^unprobed/i.test(probe);
+    if (dmg >= 0 && dmg <= 1 && !answered)
+      out.push(`${n.id}: a ${damageOrder[dmg]} assumption stands unprobed — probe it, accept it, or defer it with an until`);
   }
   return out;
 }
@@ -1043,7 +1077,7 @@ function derivedViews(
   f: EvidenceField,
   traceRoot: string,
   evidenceDir?: string,
-): Pick<FieldArgs, "matrix" | "sensitivity" | "ematrix" | "scenario" | "smetrics"> {
+): Pick<FieldArgs, "matrix" | "sensitivity" | "ematrix" | "scenario" | "smetrics" | "exposure"> {
   return {
     matrix: f.template !== "decision-matrix" || evidenceDir === undefined ? null : pughView(...m5Inputs(evidenceDir, traceRoot)),
     sensitivity: f.template !== "sensitivity" || evidenceDir === undefined ? null : sensitivityView(...m5Inputs(evidenceDir, traceRoot)),
@@ -1052,6 +1086,7 @@ function derivedViews(
     // INFORMATION ONLY, riding the deck's field (owner ruling 2026-08-10):
     // the numbers render beneath the deck and nothing about them is typed.
     smetrics: f.template !== "scenario-deck" ? null : structureMetricsArgs(traceRoot),
+    exposure: f.template !== "exposure-pick" ? null : exposureArgs(traceRoot),
   };
 }
 
@@ -1126,6 +1161,20 @@ export function scenarioDeckArgs(traceRoot: string): ScenarioDeckView {
     traceFolder(traceRoot, "element").map((n) => n.id),
     catalogItems(traceRoot, "damage_levels"),
   );
+}
+
+/** The exposure chart's entries — the whole standing register with its two
+ *  grades, and the axis orders off the two catalogue cards. */
+export function exposureArgs(traceRoot: string): ExposureView {
+  const entries = traceFolder(traceRoot, "raid").map((n) => ({
+    id: n.id,
+    statement: String(n.fm.statement ?? ""),
+    kind: String(n.fm.kind ?? ""),
+    status: String(n.fm.status ?? ""),
+    damage: String(n.fm.breaks_how_badly ?? ""),
+    likelihood: String(n.fm.how_likely ?? ""),
+  }));
+  return exposureView(entries, catalogItems(traceRoot, "damage_levels"), catalogItems(traceRoot, "likelihood_levels"));
 }
 
 /** The structure numbers, computed off the same nodes as the matrix. */

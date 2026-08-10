@@ -19,10 +19,10 @@ legal_tools:
   - se_web_search
   - se_web_fetch
 evidence:
-  - name: ranking
-    description: the unknowns ranked, with what-if-wrong
   - name: seeded
-    description: the spike list with timeboxes
+    template: exposure-pick
+    of: raid
+    description: the chosen unknowns picked over the exposure chart — the biggest blockers for the coming build that a timeboxed probe can settle; one register ref per line, each becoming one parallel spike state
 major: full
 minor: tailored
 patch: none
@@ -53,4 +53,29 @@ specification_note: |
 
 ## Guidance
 
-Sources: the RAID register, the M5 tripwires, any requirement whose verify_method is doubtful. Rank by exposure - risk-based testing's probability times consequence ([[meth-risk-based-testing]]). This state SEEDS the iteration's spike machine: one parallel spike per chosen unknown, each timeboxed ([[meth-spike-tracer]]).
+THE RANKING IS A COMPUTATION, never typed (owner ruling 2026-08-10).
+Exposure is damage times likelihood — `breaks_how_badly` and `how_likely`
+off every open register entry, worst first. The what-if-wrong is the
+entry's own `impact` field, on the node where it lives. The register view
+shows the ranking; this form does not restate it.
+
+WHAT IS DECIDED HERE is one thing: WHICH unknowns get a spike. That pick
+is the `seeded` list — register refs, one per line, picked over the
+exposure chart.
+
+THE PICK METHOD, three filters in order:
+
+- EXPOSURE — start at the chart's hot corner and work outward.
+- SPIKEABILITY — a timeboxed probe must be able to settle it. An entry
+  only living can answer (the machinery's youth, a population measure)
+  is not a spike.
+- NOT ALREADY PROBED — an entry the iteration's own goal or a standing
+  mechanism already exercises gets no second probe.
+
+Sources for the pick: the RAID register, the M5 tripwires, any
+requirement whose verify_method is doubtful ([[meth-risk-based-testing]]).
+
+THE SEEDED LIST SEEDS THE SPIKE DRAWING: the record's
+`machines/spikes.md` gets one state per listed ref, all parallel, the
+join waiting for every one — the same shape as the candidate drawing.
+Each spike is timeboxed in its drawn statement ([[meth-spike-tracer]]).

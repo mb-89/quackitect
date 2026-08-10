@@ -6,6 +6,8 @@ statement: The convergence flips — cand-living-form passes cand-thin-worktree 
 owner: the adjudicator
 trigger: any change to the scores on req-walk-survives-host-swap, or new evidence on either candidate
 status: open
+breaks_how_badly: crippling
+how_likely: plausible
 impact: The winner of the convergence changes, and everything downstream of it re-earns.
 source_refs:
   - reverse-sensitivity, the sensitivity card's ruling

@@ -21,7 +21,13 @@ and becomes a fact about the filesystem: there is no method file in the tree
 to overwrite.
 
 The bet this rides: reading from trunk is fast enough per access, and a walk
-survives the method moving under it. Both are probed by this iteration.
+survives the method moving under it.
+
+THE READ HALF IS MEASURED (2026-08-10, exp-trunk-read-cost): 2.0 ms per
+file through one long-lived git batch reader, against 0.5 ms plain disk.
+The bet holds IN THAT SHAPE ONLY — a git process spawned per read costs
+47 to 54 ms and falls. The moving-trunk half stays with this iteration's
+own goal.
 
 ## Rejected options
 

@@ -60,10 +60,33 @@ the finding.
 - IT HAS A TIMEBOX, and running out is a verdict rather than a failure.
 - IT NAMES WHAT IT FAKED. Every probe stubs something, and an unnamed stub is
   where a false positive lives.
+- ITS FALLBACK IS PRE-AGREED. What happens if the answer is no, written
+  before the run — a fallback invented after a red is a rationalisation
+  with a plan attached.
+
+## HOW M6 RUNS THEM
+
+- The spike drawing deals one state per picked unknown, ALL PARALLEL. No
+  spike waits on another, and the join waits for every one — the same
+  shape as the candidate drawing.
+- Each spike writes ONE EXPERIMENT NODE ([[experiment]] item template):
+  the question, the timebox, the form, what was faked, the pre-agreed
+  fallback, the measured result, the verdict.
+- The finding also lands in the REGISTER ENTRY the spike probes — the
+  entry's body takes the dated measurement, and its status or likelihood
+  moves if the finding moves it. The experiment node is the run's record;
+  the register entry is the standing claim.
+- fold-back then reads the experiments and decides, per experiment, what
+  it changes upstream and what promotes toward the build — written on
+  the experiment node, never in a side list.
 
 ## Sources
 
 - Walking skeleton (Cockburn); tracer bullets (Pragmatic Programmer); SyA
   prototyping guidance.
+- The experiment record's shape: the lean experiment card (hypothesis,
+  test, measure, pass line) and v1's spike-findings template —
+  @ai/quackitect/product/quackitect/method/templates/M5-spike-findings.md,
+  which carried the pre-agreed fallback and the throwaway law.
 - The cost argument: generation became cheap while adjudication did not
   (`@ai/digest-ai-era-methods.md`, DORA 2025/2026 on the verification tax).
