@@ -66,7 +66,9 @@ test("no binary file lives under project/ — an unreadable figure is not an art
 // bin/ IS EXEMPT. A one-shot script reads its input and exits; there is no
 // second ask for a door to save.
 test("no new file read bypasses the door — the count may fall, never rise", () => {
-  const CEILING = 99;
+  // 100 since 2026-08-10: the vault's watcher reads .quack-watch.json direct —
+  // JSON config, not a note, so no door saves a shared parse.
+  const CEILING = 100;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {
