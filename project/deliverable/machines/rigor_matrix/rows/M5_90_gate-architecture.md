@@ -13,17 +13,7 @@ legal_tools:
   - se_file_list
   - se_log_query
   - se_answer
-evidence:
-  - name: choice_traced
-    description: the winner traced to the weighted criteria; both Pugh runs recorded where status-quo was used
-  - name: sensitivity_ruled
-    description: the verdict with tripwires in RAID
-  - name: matrix_review
-    description: every baseline matrix reviewed, none skipped
-  - name: evaluation_recorded
-    description: every quality scenario addressed or flagged
-  - name: adrs_traced
-    description: every deciding ADR addresses its requirement
+evidence: []
 major: full
 minor: tailored
 patch: none
@@ -58,11 +48,23 @@ specification_note: |
 
 ## Guidance
 
-The killer here is the MATRIX review. The clustering, the allocation and the
-interfaces are reviewed as data. Never as a picture.
+THE GATE ASKS NOTHING OF ITS OWN (owner ruling 2026-08-10). Everything it
+once asked is produced mechanically upstream:
 
-Diagrams are derived views. If standardised diagrams return, a visual review
-can be reinstated.
+- the choice trace — the Pugh card computes both runs from the signed
+  scores and cuts on every look.
+- the sensitivity rulings — the flip deck mints a tripwire per credible
+  flip, and an unruled cell returns until ruled.
+- the matrices — the element matrix computes owed cells and warnings
+  from the nodes on every look.
+- the evaluation — the scenario deck counts its unruled cards, and the
+  at-risk and unaddressed verdicts stand in the register.
+- the decisions — register nodes whose checks demand grades, rejected
+  options and consequences.
+
+THE BLESS IS THE REVIEW. Open the live surfaces — the matrix, the deck,
+the register — and adjudicate the decomposition AS DATA, never as a
+picture. Diagrams are derived views.
 
 M7 builds inside this baseline. A new element found mid-build returns HERE,
 never in silently.
