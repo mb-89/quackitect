@@ -437,6 +437,7 @@ function resolveSource(i: string, root: string, traceRoot: string, instanceRaw?:
   if (i === "$clusters") return clusterItems(traceRoot);
   if (i === "$flows") return flowItems(traceRoot);
   if (i === "$options") return optionItems(traceRoot);
+  if (i === "$experiments") return typedItems(traceRoot, "experiment");
   if (i === "$candidates") return candidateItems(traceRoot);
   // THE CATALOGUES. A known set is never typed from memory and never hard
   // coded — it is read from the method card that holds it, so editing the card

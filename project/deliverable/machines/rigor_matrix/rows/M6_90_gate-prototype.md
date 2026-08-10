@@ -15,12 +15,12 @@ legal_tools:
   - se_log_query
   - se_answer
 evidence:
-  - name: assumptions_validated
-    description: the ranked riskiest assumptions hold or the design changed
   - name: buildable
-    description: the design is buildable as evidenced
-  - name: results_recorded
-    description: every spike's evidence pinned; promotions marked
+    template: choice-with-rationale
+    options:
+      - "yes"
+      - "no"
+    description: the one judgment this gate asks — is the design buildable as evidenced, and why
 major: full
 minor: tailored
 patch: none
@@ -47,4 +47,15 @@ specification_note: |
 
 ## Guidance
 
-Review per [[meth-gate-review]]. Promotion of spike output into M7 is legal - the spike is downstream of the whole process.
+BUILDABLE is the gate's judgment — yes or no with the why.
+
+RESULTS RECORDED is struck as mechanical (owner ruling 2026-08-10):
+every seeded spike leaves an experiment node, and fold-back's submit
+refuses while any node's fold keys stand unanswered.
+
+ASSUMPTIONS VALIDATED is UNDER DISCUSSION with the owner (2026-08-10) —
+its shape here is not settled. Until it is, the bless reads the
+register's assumptions and their probe results as data.
+
+Review per [[meth-gate-review]]. Promotion of spike output into M7 is
+legal - the spike is downstream of the whole process.
