@@ -102,6 +102,7 @@ import {
   buildPortableForm,
   claimProblems,
   type EmbeddedDoc,
+  elementMatrixArgs,
   nodeField,
   parseIsland,
   stateFormFields,
@@ -4194,6 +4195,42 @@ export class Session {
       touched.push(p.id);
     }
     return touched;
+  }
+
+  /** ONE OWED CELL, ONE SKELETON (owner design 2026-08-10). The element
+   *  matrix's NAME button posts a cell; the interface node mints with the
+   *  crossing flows already in carries, and the judgment fields arrive as
+   *  comments per the house convention — answering them is the authoring.
+   *  Idempotent: a standing node is never overwritten. */
+  mintInterfaceCell(name: string, source: string, destination: string, machineId?: string): Record<string, unknown> {
+    const m = this.formMachine(machineId);
+    const traceRoot = this.traceRoot(this.declIteration(m));
+    const cell = elementMatrixArgs(traceRoot).cells.find((c) => c.source === source && c.destination === destination);
+    const id = `if-${source.replace(/^el-/, "")}-to-${destination.replace(/^el-/, "")}`;
+    const abs = join(traceRoot, "interface", `${id}.md`);
+    if (!existsSync(abs) && cell !== undefined) {
+      mkdirSync(dirname(abs), { recursive: true });
+      writeNode(
+        abs,
+        [
+          "---",
+          `id: ${id}`,
+          'type: "[[interface]]"',
+          "statement: <!-- the contract in one sentence -->",
+          `source: ${source}`,
+          `destination: ${destination}`,
+          "carries:",
+          ...(cell.missing.length > 0 ? cell.missing : cell.owed).map((f) => `  - ${f}`),
+          "form: <!-- call | file | protocol | shared store -- concretely -->",
+          "source_refs:",
+          "  - decompose-structure, the element matrix's owed cell",
+          "---",
+          "",
+          "<!-- the contract's detail -- direction, cadence, failure behavior -->",
+        ].join("\n"),
+      );
+    }
+    return this.stateFormGet(name, m);
   }
 
   /** ONE CLICK, ONE TRIPWIRE (owner ruling 2026-08-10). The flip deck posts

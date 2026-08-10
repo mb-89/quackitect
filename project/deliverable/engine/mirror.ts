@@ -161,6 +161,20 @@ export function startMirror(o: MirrorOptions): Server {
     // The slider — how much of the walk is the agent's. Logged like
     // every other hand on the machinery.
     "/autonomy": ["mirror_autonomy", (body) => ({ args: { value: body.value }, result: state.session.setAutonomy(Number(body.value)) })],
+    // ONE OWED CELL PER CLICK from the element matrix — the interface
+    // skeleton mints with its crossing flows before the answer returns.
+    "/form/ifcell": [
+      "mirror_form_ifcell",
+      (body) => ({
+        args: { name: body.name, source: body.source, destination: body.destination },
+        result: state.session.mintInterfaceCell(
+          String(body.name ?? ""),
+          String(body.source ?? ""),
+          String(body.destination ?? ""),
+          String(body.machine ?? ""),
+        ),
+      }),
+    ],
     // ONE RULING PER CLICK from the flip deck — the line lands and the
     // tripwire mints before the answer returns.
     "/form/flip": [

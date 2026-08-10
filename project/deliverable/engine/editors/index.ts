@@ -15,6 +15,7 @@ import { CHOICE_RATIONALE_EDITOR } from "./choice-rationale.ts";
 import { COMPARE_CARD_EDITOR } from "./compare-card.ts";
 import { DECISION_MATRIX_EDITOR } from "./decision-matrix.ts";
 import { DSM_EDITOR } from "./dsm.ts";
+import { ELEMENT_MATRIX_EDITOR } from "./element-matrix.ts";
 import { FINDINGS_EDITOR } from "./findings.ts";
 import type { EditorKind } from "./kinds.ts";
 import { LIST_EDITOR } from "./list.ts";
@@ -40,6 +41,7 @@ export const EDITORS: EditorKind[] = [
   PARETO_PLOT_EDITOR,
   DECISION_MATRIX_EDITOR,
   SENSITIVITY_EDITOR,
+  ELEMENT_MATRIX_EDITOR,
   PER_ITEM_EDITOR,
   CHOICE_RATIONALE_EDITOR,
   FINDINGS_EDITOR,

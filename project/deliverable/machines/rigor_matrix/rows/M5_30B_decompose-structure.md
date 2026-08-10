@@ -17,15 +17,13 @@ legal_tools:
   - se_answer
 evidence:
   - name: elements
+    template: list
     of: element
     description: the element set — one reference per line, each an element node with its black-box description
   - name: allocation
-    description: every function implemented by at least one element or interface — the DMM read off the implements keys, the spread argued here
-  - name: interfaces
-    of: interface
-    description: the element DSM's owed cells, each named by an interface node — one reference per line
-  - name: trace_complete
-    description: the union coverage — every requirement reached transitively through its functions or named directly in a satisfies; the count, the direct list, and zero unreached as the bar
+    template: element-matrix
+    of: element
+    description: the element matrix — every function's implementers, and every boundary-crossing cell named by its interface
 major: full
 minor: tailored
 patch: none

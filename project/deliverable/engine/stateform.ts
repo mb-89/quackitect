@@ -6,11 +6,12 @@
 // copy is one HTML with ONE JSON island — the island is the only thing
 // the save rewrites and the only thing the ingest reads (the v1 book's
 // comment law, reapplied).
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { catalogItems, trizParameterItems } from "./catalogs.ts";
 import { type Judgment, type RelationKind, type WalkResult, walk } from "./compare.ts";
 import { clusterDsm, type Dsm, flowMatrix } from "./dsm.ts";
+import { type ElementMatrixView, elementMatrixView } from "./elematrix.ts";
 import type { FormTemplate } from "./forms.ts";
 import { pendingNotes } from "./inbox.ts";
 import type { EvidenceField, MachineDecl, StateDecl } from "./machine.ts";
@@ -186,6 +187,9 @@ export interface FieldArgs {
   /** The winner's fragile cells, computed the same way. The rulings on them
    *  are the state's judgment and live in its own fields. */
   sensitivity: SensitivityView | null;
+  /** The element matrix — owed cells from flow crossings, declared
+   *  interfaces beside them. Computed from the trace nodes on every look. */
+  ematrix: ElementMatrixView | null;
 }
 
 export function templateMeta(root: string, name: string): TemplateMeta {
@@ -282,6 +286,7 @@ export const NO_ARGS: FieldArgs = {
   pareto: null,
   matrix: null,
   sensitivity: null,
+  ematrix: null,
 };
 
 /** THE CHART, computed from the nodes. Rows are the clusters, cells are the
@@ -577,6 +582,7 @@ export function claimProblems(root: string, s: StateDecl, body: string, corpus: 
       pareto: null,
       matrix: null,
       sensitivity: null,
+      ematrix: null,
     };
     out.push(...fieldProblems(f.name, metas.get(name) as TemplateMeta, args, content, nodes, root));
   }
@@ -959,7 +965,45 @@ export function fieldArgsFor(f: EvidenceField, root: string, traceRoot: string, 
     // is computed from the sibling forms rather than typed.
     matrix: f.template !== "decision-matrix" || evidenceDir === undefined ? null : pughView(...m5Inputs(evidenceDir, traceRoot)),
     sensitivity: f.template !== "sensitivity" || evidenceDir === undefined ? null : sensitivityView(...m5Inputs(evidenceDir, traceRoot)),
+    ematrix: f.template !== "element-matrix" ? null : elementMatrixArgs(traceRoot),
   };
+}
+
+/** The three node sets the element matrix computes from, read off the
+ *  record's trace through the door. Lists accept YAML arrays and
+ *  comma-joined strings alike — the house rule for every list. */
+export function elementMatrixArgs(traceRoot: string): ElementMatrixView {
+  const asList = (v: unknown): string[] => {
+    if (Array.isArray(v)) return v.map(String);
+    if (typeof v === "string" && v.trim() !== "")
+      return v
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s !== "");
+    return [];
+  };
+  const nodes = (folder: string): { id: string; fm: Record<string, unknown> }[] => {
+    try {
+      return readdirSync(join(traceRoot, folder))
+        .filter((n) => n.endsWith(".md"))
+        .map((n) => {
+          const note = noteOf(join(traceRoot, folder, n));
+          return { id: String(note?.frontmatter.id ?? n.replace(/\.md$/, "")), fm: note?.frontmatter ?? {} };
+        });
+    } catch {
+      return [];
+    }
+  };
+  return elementMatrixView(
+    nodes("element").map((n) => ({ id: n.id, group: String(n.fm.group ?? ""), implements: asList(n.fm.implements) })),
+    nodes("function").map((n) => ({ id: n.id, inputs: asList(n.fm.inputs), outputs: asList(n.fm.outputs) })),
+    nodes("interface").map((n) => ({
+      id: n.id,
+      source: String(n.fm.source ?? ""),
+      destination: String(n.fm.destination ?? ""),
+      carries: asList(n.fm.carries),
+    })),
+  );
 }
 
 /** The convergence's three inputs: the sibling score table, the sibling cut
