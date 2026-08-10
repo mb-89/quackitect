@@ -93,6 +93,38 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   assert.ok(found >= CEILING - 20, `${found} reads against a ceiling of ${CEILING} — lower the ceiling, the ratchet has slack`);
 });
 
+// THE WRITES GET THE SAME RATCHET (2026-08-10). A direct writeFileSync may
+// land on a file the door is holding, and an untold write is served stale
+// for the rest of a pass. writeNode writes AND tells; converting the rest
+// is gradual, and this holds the line meanwhile.
+//
+// bin/ IS EXEMPT for the read ratchet's reason. notes.ts is exempt because
+// writeNode's own write IS the door.
+test("no new file write bypasses the door — the count may fall, never rise", () => {
+  const CEILING = 36;
+  let found = 0;
+  const offenders: string[] = [];
+  const walk = (dir: URL, rel: string): void => {
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      if (e.isDirectory()) {
+        if (e.name !== "bin") walk(new URL(`${e.name}/`, dir), `${rel}${e.name}/`);
+        continue;
+      }
+      if (!e.name.endsWith(".ts") || e.name === "notes.ts") continue;
+      const n = (readFileSync(new URL(e.name, dir), "utf8").match(/writeFileSync\(/g) ?? []).length;
+      if (n > 0) offenders.push(`${rel}${e.name} (${n})`);
+      found += n;
+    }
+  };
+  walk(new URL("../engine/", import.meta.url), "engine/");
+  assert.ok(
+    found <= CEILING,
+    `${found} direct file writes, up from ${CEILING}. Write through writeNode — it writes and tells the door — ` +
+      `or, for a file the door can never hold, raise CEILING with a reason.\n${offenders.join("\n")}`,
+  );
+  assert.ok(found >= CEILING - 20, `${found} writes against a ceiling of ${CEILING} — lower the ceiling, the ratchet has slack`);
+});
+
 // AN EMPTY RESULT AND AN UNREADABLE FILE MUST NEVER LOOK ALIKE (found live
 // 2026-07-29). engine/worktree.ts carried ONE raw NUL byte, used as a
 // cache-key separator. ripgrep called the whole file binary and said so on a
