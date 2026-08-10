@@ -24,8 +24,8 @@ evidence:
   - name: interfaces
     of: interface
     description: the element DSM's owed cells, each named by an interface node — one reference per line
-  - name: trace_residue
-    description: the requirements the function chain does not reach — structural qualities and constraints — each named with where its coverage lives instead, or none
+  - name: trace_complete
+    description: the union coverage — every requirement reached transitively through its functions or named directly in a satisfies; the count, the direct list, and zero unreached as the bar
 major: full
 minor: tailored
 patch: none
@@ -84,15 +84,15 @@ LOOP, all in this one state because each moves the others:
   form. An interface no crossing demands is a question in the other
   direction.
 
-THE TRACE IS TRANSITIVE, NOT A SECOND EDGE (owner ruling 2026-08-10). A
-requirement is served by functions; its functions are implemented by
-elements; nothing writes a requirement id onto the structure. What the
-chain cannot carry is named instead: a structural quality (modularity, a
-replaceability demand) and an imposed constraint are answered by the
-SHAPE, not by a function — their coverage lives in evaluate-architecture's
-scenario walk and in the decision register's source_refs. The
-trace_residue field lists exactly those, each with where its coverage
-lives. A residue nobody listed is the leak this field exists to catch.
+THE TRACE IS COMPLETE, ON TWO PATHS (owner ruling 2026-08-10: residue is
+not allowed — a trace with holes cannot show the changes). Most
+requirements reach the structure transitively: served by functions,
+implemented by elements, and nothing is written twice. A requirement the
+function chain cannot carry — a structural quality the shape answers, an
+imposed constraint binding a choice — is named DIRECTLY in the answering
+element's or interface's `satisfies`. The union is the bar: every
+requirement reached by one path or the other, zero unreached, counted in
+the trace_complete field.
 
 THE BASELINE WORD survives only for the closing act: what stood before is
 superseded, and change from here means a new baseline (the CM law).

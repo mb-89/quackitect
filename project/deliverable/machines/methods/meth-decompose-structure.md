@@ -61,27 +61,30 @@ element pair owes one interface. Each owed cell is answered by an
 Two coverage directions, both checked: a crossing no interface carries is
 a hole; an interface no crossing demands is a question the other way.
 
-## The trace is transitive, and the residue is named
+## The trace is complete, on two paths
 
-NO SECOND EDGE (owner ruling 2026-08-10). Requirements already trace: a
-requirement refines its use cases and is served by functions; the
-functions are implemented by elements; an interface carries flows, the
-flows belong to functions, the functions serve requirements. Writing
-requirement ids onto the structure would be a second copy of a chain the
-nodes already carry, and second copies drift.
+NO RESIDUE (owner ruling 2026-08-10): a trace with holes cannot show the
+changes, and change visibility is what the graph is FOR.
 
-WHAT THE CHAIN CANNOT CARRY is answered elsewhere, and NAMED in the
-trace_residue field: a structural quality — modularity, replaceability, a
-quality the SHAPE answers rather than any function — gets its coverage
-from evaluate-architecture's scenario walk, where its verdict names the
-carrying decision. An imposed constraint gets its coverage from the
-decision register, whose entries carry source_refs to what forced them.
-The residue field lists exactly these requirements with where each one's
-coverage lives. A residue nobody listed is the leak the field catches.
+- THE TRANSITIVE PATH carries most requirements: a requirement is served
+  by functions, its functions are implemented by elements, an interface
+  carries flows that belong to functions. Nothing writes a requirement id
+  onto structure for this path — the chain already exists, and second
+  copies drift.
+- THE DIRECT PATH carries the rest: a requirement no function chain
+  reaches — a structural quality the SHAPE answers (modularity,
+  replaceability), an imposed constraint binding a choice, an
+  interface-kind requirement about a boundary itself — is named in the
+  answering element's or interface's `satisfies`, and only there.
 
-SysML's names still apply where they help a reader: behavior is ALLOCATED
-to structure (implements), and the scenario walk plays the satisfy role
-for the qualities.
+THE UNION IS THE LAW: every requirement reached by one path or the other,
+zero unreached. Perturb any node and the affected cone is in the graph,
+whole. The trace_complete field carries the count and the direct list;
+review-class now, engine-computed later like every coverage here.
+
+SysML's names hold on both paths: behavior ALLOCATED to structure
+(implements), structure SATISFIES requirements directly where the shape
+is the answer.
 
 ## The closing act
 

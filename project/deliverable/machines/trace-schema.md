@@ -34,6 +34,14 @@ edges:
     key: carries
     to: flow
     verb: carries
+  - from: element
+    key: satisfies
+    to: requirement
+    verb: satisfies
+  - from: interface
+    key: satisfies
+    to: requirement
+    verb: satisfies
 subsegments:
   - id: design
     label: design
@@ -149,6 +157,16 @@ design half.
 - `source` and `destination` on an interface are STRUCTURE, not trace —
   like `source_refs`, they are not checked as edges here. The element DSM
   is their view.
+
+THE TRACE IS COMPLETE, ON TWO PATHS (owner ruling 2026-08-10: a trace with
+residue cannot show the changes). Most requirements reach the structure
+TRANSITIVELY — served by functions, implemented by elements — and no
+requirement id is written onto structure for that path. A requirement the
+function chain cannot carry — a structural quality answered by the SHAPE,
+an imposed constraint binding a choice — is named DIRECTLY by the element
+or interface that answers it, in `satisfies`. The union is the law: every
+requirement reached by one path or the other, zero unreached. Perturb any
+node and the affected cone is in the graph, whole.
 
 ## Each edge's key is the frontmatter it lives under
 

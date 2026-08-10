@@ -80,6 +80,9 @@ exactly-once.
   functions serve requirements.
 - `form` — the concrete mechanism: a call, a file, a protocol, a shared
   store. Clarify the type of exchange and the properties of both ends.
+- `satisfies` — requirement ids this interface answers DIRECTLY, used only
+  where no flow chain carries the requirement — interface-kind
+  requirements about the boundary itself land here.
 - `source_refs` — what it derives from.
 
 ## Skeleton
@@ -94,6 +97,8 @@ destination: {{el-where-it-goes}}
 carries:
   - {{flow-...}}
 form: {{call | file | protocol | shared store — concretely}}
+satisfies:
+  - {{req-... — only what no flow chain carries; remove the key otherwise}}
 source_refs:
   - {{what it derives from}}
 ---

@@ -77,6 +77,11 @@ Three sources, per [[meth-decompose-structure]]:
   interface, and no element implementing nothing. Requirements reach the
   structure through this chain — a requirement is served by functions,
   and its functions are implemented here.
+- `satisfies` — requirement ids this element answers DIRECTLY, used only
+  where no function carries the requirement: a structural quality the
+  shape answers (modularity, replaceability), an imposed constraint
+  binding this choice. The transitive path through `implements` covers
+  everything else; the union must reach every requirement.
 - `source_refs` — the pick, decision or standing part it derives from.
 
 ## The body is the black box
@@ -97,6 +102,8 @@ realization: {{make | reuse | buy}}
 group: {{the group it belongs to — the DSM editor may rewrite this}}
 implements:
   - {{fn-... — the functions this element realizes}}
+satisfies:
+  - {{req-... — only what no function carries; remove the key otherwise}}
 source_refs:
   - {{the pick or standing part it derives from}}
 ---
