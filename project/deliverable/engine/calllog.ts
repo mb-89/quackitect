@@ -4,7 +4,7 @@
 // a run is citable evidence. Machine-local (.se/), never committed.
 
 import { randomBytes } from "node:crypto";
-import { appendFileSync, existsSync, mkdirSync, readFileSync, statSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { stripBom } from "./jsonio.ts";
 
@@ -37,8 +37,30 @@ export interface LastSession {
 const SE_VERSION = "3.0.0-bootstrap";
 const GB = 1024 * 1024 * 1024;
 
+/** THE ONE-SECOND RULE IS THE LINE (req-call-answers-in-one-second; owner
+ *  ruling 2026-08-09: a person's request over one second moves to the
+ *  background and reports). Every outside door — the lane's dispatch and
+ *  the mirror's — measures against this ONE number; slowness is mined from
+ *  the one log with min_ms. A function, not a constant: the env test seam
+ *  must work after the module has loaded. */
+export function slowMs(): number {
+  return Number(process.env.SE_SLOW_MS ?? 1000);
+}
+
+/** THE LIVE FILE'S CEILING. Roughly ten thousand records at the size this
+ *  log actually runs to (owner ruling 2026-08-09: cap it at ten thousand).
+ *  It is measured in BYTES because a byte is one stat call and a line count
+ *  is a full read — and reading the log to decide whether the log is too big
+ *  to read is the joke this whole change exists to stop. */
+const ROTATE_BYTES = 12 * 1024 * 1024;
+
+/** How often the size is checked. A stat is cheap; a stat per append is
+ *  still a syscall on the hot path for nothing. */
+const STAT_EVERY = 50;
+
 export class CallLog {
   readonly path: string;
+  private sinceStat = STAT_EVERY;
 
   constructor(seDir: string) {
     this.path = join(seDir, "calls.jsonl");
@@ -53,7 +75,57 @@ export class CallLog {
     };
     mkdirSync(dirname(this.path), { recursive: true });
     appendFileSync(this.path, `${JSON.stringify(rec)}\n`, "utf8");
+    this.rotateIfFull();
     return rec;
+  }
+
+  /** ROTATE BY RENAME, NEVER BY REWRITE (owner ruling 2026-08-09).
+   *
+   *  Trimming a JSONL to its last N lines means reading and rewriting the
+   *  whole file. That is the same synchronous cost this is removing, paid on
+   *  every rotation instead of every query, and a process that dies mid-write
+   *  leaves the log torn — the one file that must survive a crash.
+   *
+   *  A rename is one filesystem operation and it is atomic on the same
+   *  volume. The live file starts empty; the old one keeps every byte.
+   *
+   *  NOTHING IS EVER DELETED HERE. The standing ruling is that the raw log is
+   *  kept forever-until-1GB, and the owner reaffirmed it: at a gigabyte we
+   *  TALK about the old records rather than a collector quietly eating them. */
+  private rotateIfFull(): void {
+    if (--this.sinceStat > 0) return;
+    this.sinceStat = STAT_EVERY;
+    try {
+      if (statSync(this.path).size < ROTATE_BYTES) return;
+      renameSync(this.path, join(dirname(this.path), `calls-${new Date().toISOString().replace(/[:.]/g, "-")}.jsonl`));
+    } catch {
+      // a rotation that cannot happen must never cost a record
+    }
+  }
+
+  /** The archives, OLDEST FIRST — the order the live file continues from, so
+   *  a caller reading history then the live file reads it in time order. */
+  private archives(): string[] {
+    try {
+      return readdirSync(dirname(this.path))
+        .filter((n) => /^calls-.*\.jsonl$/.test(n))
+        .sort()
+        .map((n) => join(dirname(this.path), n));
+    } catch {
+      return [];
+    }
+  }
+
+  /** Total bytes across the live file and every archive — the number the
+   *  gigabyte conversation is about. */
+  bytesKept(): number {
+    let total = 0;
+    for (const p of [...this.archives(), this.path]) {
+      try {
+        total += statSync(p).size;
+      } catch {}
+    }
+    return total;
   }
 
   /** ONE PARSE, NOT FOUR THOUSAND (owner, 2026-07-29: clicking a log line
@@ -68,8 +140,19 @@ export class CallLog {
    *  Newest first: a reader clicks what they just saw, and the feed shows the
    *  newest at the top. */
   find(ref: string): CallRecord | undefined {
-    if (!existsSync(this.path)) return undefined;
-    const lines = stripBom(readFileSync(this.path, "utf8")).split("\n");
+    // NEWEST FILE FIRST, then back through the archives. A ref lookup is rare
+    // and must never MISS — a record the reader can see in the feed but not
+    // open would be worse than a slow open.
+    for (const p of [this.path, ...this.archives().reverse()]) {
+      const hit = CallLog.findIn(p, ref);
+      if (hit !== undefined) return hit;
+    }
+    return undefined;
+  }
+
+  private static findIn(path: string, ref: string): CallRecord | undefined {
+    if (!existsSync(path)) return undefined;
+    const lines = stripBom(readFileSync(path, "utf8")).split("\n");
     for (let i = lines.length - 1; i >= 0; i--) {
       const line = lines[i];
       if (!line.includes(ref)) continue;
@@ -81,58 +164,127 @@ export class CallLog {
     return undefined;
   }
 
-  private records(): CallRecord[] {
-    if (!existsSync(this.path)) return [];
-    const out: CallRecord[] = [];
-    for (const line of stripBom(readFileSync(this.path, "utf8")).split("\n")) {
-      if (line.trim() === "") continue;
+  /** THE LIVE FILE ONLY, unless the caller says how far back it needs.
+   *
+   *  This is the bounded default and it is the point of rotating. Nearly every
+   *  read wants recent records: the retro mines its own period, the banner
+   *  reads the previous sitting, the feed shows the newest page. Reaching into
+   *  the archives for those would put the whole history back on the event loop
+   *  and rotation would have bought nothing.
+   *
+   *  `since` is the one honest reason to go further. When the live file does
+   *  not reach back that far, archives are prepended until it does — so a
+   *  retro whose window crosses a rotation still sees its whole period.
+   *  Without that, the first retro after a rotation would silently mine half
+   *  its window and report a clean run that was not clean. */
+  private lines(since?: string): string[] {
+    const read = (p: string): string[] => (existsSync(p) ? stripBom(readFileSync(p, "utf8")).split("\n") : []);
+    const live = read(this.path);
+    if (since === undefined) return live;
+    const reaches = (ls: string[]): boolean => {
+      for (const l of ls) {
+        const m = /"ts":"([^"]+)"/.exec(l);
+        if (m !== null) return m[1] <= since;
+      }
+      return false;
+    };
+    let out = live;
+    for (const p of this.archives().reverse()) {
+      if (reaches(out)) break;
+      out = read(p).concat(out);
+    }
+    return out;
+  }
+
+  /** WHERE THE PREVIOUS RETRO ENDED, from drain lines alone. Only lines
+   *  that could hold a drain are parsed — the same substring trade find()
+   *  makes. carried and backlog are judgment dispositions the desk is
+   *  refused, so the newest of those marks a retro; any drain is the
+   *  fallback for logs written before that rule. */
+  private lastRetroMark(): string | undefined {
+    let judged: string | undefined;
+    let any: string | undefined;
+    // No `since` to hand it: a drain older than the live file is a retro that
+    // ended before the rotation, and the window opening at the live file's
+    // start is the honest answer rather than a scan of every archive.
+    for (const line of this.lines()) {
+      if (!line.includes('"se_note_drain"')) continue;
       try {
-        out.push(JSON.parse(line) as CallRecord);
+        const rec = JSON.parse(line) as CallRecord;
+        if (rec.tool !== "se_note_drain" || !rec.ok) continue;
+        any = rec.ts;
+        const d = String((rec.args as { disposition?: unknown }).disposition ?? "");
+        if (d === "carried" || d === "backlog") judged = rec.ts;
+      } catch {}
+    }
+    return judged ?? any;
+  }
+
+  /** THE WHOLE-LOG PARSE WAS THE SERVER KILLER (2026-08-09). query() parsed
+   *  every line of the log on every call, synchronously, on the single
+   *  event loop — at tens of megabytes that is seconds of silence, and the
+   *  MCP socket dropped mid-call six recorded times in two days. A line is
+   *  ruled out by SUBSTRING before it is parsed — the same trade find()
+   *  makes — so a filtered query parses only its own records. The parsed
+   *  checks stay as the exact half of the answer. */
+  private filtered(f: { tool?: string; ok?: boolean; text?: string; since?: string; min_ms?: number }): CallRecord[] {
+    const rough: ((l: string) => boolean)[] = [];
+    if (f.tool !== undefined) rough.push((l) => l.includes(`"tool":"${f.tool}"`));
+    if (f.ok !== undefined) rough.push((l) => l.includes(`"ok":${f.ok}`));
+    if (f.text !== undefined) {
+      const t = f.text.toLowerCase();
+      rough.push((l) => l.toLowerCase().includes(t));
+    }
+    if (f.since !== undefined) {
+      const s = f.since;
+      rough.push((l) => {
+        const m = /"ts":"([^"]+)"/.exec(l);
+        return m !== null && m[1] >= s;
+      });
+    }
+    // THE SLOWNESS MINE: what took longer than X, at ANY door, in one ask.
+    if (f.min_ms !== undefined) {
+      const min = f.min_ms;
+      rough.push((l) => {
+        const m = /"duration_ms":(\d+)/.exec(l);
+        return m !== null && Number(m[1]) >= min;
+      });
+    }
+    const out: CallRecord[] = [];
+    for (const line of this.lines(f.since)) {
+      if (line.trim() === "" || !rough.every((k) => k(line))) continue;
+      try {
+        const rec = JSON.parse(line) as CallRecord;
+        if (CallLog.exact(rec, f)) out.push(rec);
       } catch {}
     }
     return out;
   }
 
+  private static exact(rec: CallRecord, f: { tool?: string; ok?: boolean; text?: string; since?: string; min_ms?: number }): boolean {
+    if (f.tool !== undefined && rec.tool !== f.tool) return false;
+    if (f.ok !== undefined && rec.ok !== f.ok) return false;
+    if (f.since !== undefined && rec.ts < f.since) return false;
+    if (f.min_ms !== undefined && rec.duration_ms < f.min_ms) return false;
+    if (f.text !== undefined && !JSON.stringify(rec).toLowerCase().includes(f.text.toLowerCase())) return false;
+    return true;
+  }
+
   /** Generic aggregation: filter, group, count — the retro's query lane. */
   query(q: {
-    filter?: { tool?: string; ok?: boolean; since?: string; text?: string };
+    filter?: { tool?: string; ok?: boolean; since?: string; text?: string; min_ms?: number };
     group_by?: string;
     limit?: number;
     offset?: number;
   }): { total: number; groups?: Record<string, number>; records?: CallRecord[]; offset?: number; older?: number } {
     const dig = (obj: unknown, path: string): unknown =>
       path.split(".").reduce<unknown>((v, k) => (v && typeof v === "object" ? (v as Record<string, unknown>)[k] : undefined), obj);
-    const all = this.records();
     const f = q.filter ?? {};
-    // since: "last_retro" — the newest drain call marks the previous retro;
-    // the retro mines only its own period (the raw log is kept, owner
-    // ruling: forever-until-1GB, a garbage collector may harvest later).
-    // It used to mean the newest drain of ANY kind, and e22 broke that by
-    // letting the FRONT DESK drain too: a desk drain minutes ago handed the
-    // retro a window far too short, and nothing said so (found live
-    // 2026-07-29). carried and backlog are JUDGMENT dispositions and the desk
-    // is refused them, so the newest of those marks a retro and nothing else
-    // can. Any drain is still the fallback, for logs written before this.
-    let since = f.since;
-    if (since === "last_retro") {
-      const drains = all.filter((r) => r.tool === "se_note_drain" && r.ok);
-      const judged = drains.filter((r) => {
-        const d = String((r.args as { disposition?: unknown }).disposition ?? "");
-        return d === "carried" || d === "backlog";
-      });
-      const marks = judged.length > 0 ? judged : drains;
-      since = marks.length > 0 ? marks[marks.length - 1].ts : undefined;
-    }
-    const records = all.filter((rec) => {
-      if (f.tool !== undefined && rec.tool !== f.tool) return false;
-      if (f.ok !== undefined && rec.ok !== f.ok) return false;
-      if (since !== undefined && rec.ts < since) return false;
-      // TEXT narrows before the window does. Scanning fifty whole records to
-      // find one topic is the wrong shape when a substring match would do,
-      // and it is what pushed a query past the token ceiling.
-      if (f.text !== undefined && !JSON.stringify(rec).toLowerCase().includes(f.text.toLowerCase())) return false;
-      return true;
-    });
+    // since: "last_retro" — the newest judgment drain marks the previous
+    // retro; the retro mines only its own period (the raw log is kept,
+    // owner ruling: forever-until-1GB).
+    const since = f.since === "last_retro" ? this.lastRetroMark() : f.since;
+    const records = this.filtered({ tool: f.tool, ok: f.ok, text: f.text, since, min_ms: f.min_ms });
     if (q.group_by !== undefined) {
       const groups: Record<string, number> = {};
       for (const r of records) {

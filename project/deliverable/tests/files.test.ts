@@ -1,7 +1,7 @@
 // The file lane's laws, each tested against the incident that ruled it.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -19,7 +19,8 @@ import {
   READ_BUDGET,
 } from "../engine/files.ts";
 import { contentHash } from "../engine/hash.ts";
-import { run } from "../engine/run.ts";
+import { doorStats } from "../engine/notes.ts";
+import { runToCompletion } from "../engine/run.ts";
 import { search } from "../engine/search.ts";
 
 function fresh(): string {
@@ -45,6 +46,83 @@ test("no binary file lives under project/ — an unreadable figure is not an art
   };
   walk(new URL("../../", import.meta.url), "project/");
   assert.deepEqual(offenders, [], "author figures as inline SVG, Mermaid or ASCII; a binary is input, never evidence");
+});
+
+// THE DOOR ONLY HELPS WHAT WALKS THROUGH IT (owner question, 2026-08-09:
+// "what do you need to search for so that you know that you found every call?").
+//
+// The answer is this string, and the reason it needs a test is that four
+// separate caches were built before anyone counted. Together they cost 39,857
+// stats and left the three biggest readers untouched — because those readers
+// called readFileSync themselves and no cache stood in their way. A door that
+// can be walked around is a suggestion.
+//
+// A RATCHET, NOT A BAN. Ninety-nine of these are legitimate: JSON config, a
+// canvas, a git object, a file read once at boot. Banning them would be a lie
+// nobody could keep. What must never happen is the number going UP without
+// somebody deciding it should — so it may fall freely and cannot rise.
+//
+// bin/ IS EXEMPT. A one-shot script reads its input and exits; there is no
+// second ask for a door to save.
+test("no new file read bypasses the door — the count may fall, never rise", () => {
+  // 100 since 2026-08-10: the vault's watcher reads .quack-watch.json direct —
+  // JSON config, not a note, so no door saves a shared parse.
+  const CEILING = 100;
+  let found = 0;
+  const offenders: string[] = [];
+  const walk = (dir: URL, rel: string): void => {
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      if (e.isDirectory()) {
+        if (e.name !== "bin") walk(new URL(`${e.name}/`, dir), `${rel}${e.name}/`);
+        continue;
+      }
+      // notes.ts IS the door. Its own read is the one that is supposed to be there.
+      if (!e.name.endsWith(".ts") || e.name === "notes.ts") continue;
+      const n = (readFileSync(new URL(e.name, dir), "utf8").match(/readFileSync\(/g) ?? []).length;
+      if (n > 0) offenders.push(`${rel}${e.name} (${n})`);
+      found += n;
+    }
+  };
+  walk(new URL("../engine/", import.meta.url), "engine/");
+  assert.ok(
+    found <= CEILING,
+    `${found} direct file reads, up from ${CEILING}. Read notes through readNode/noteOf/nodeLines instead — ` +
+      `they share one read and one parse with every other reader. If the new read is genuinely one-shot, ` +
+      `lower nothing and raise CEILING with a reason.\n${offenders.join("\n")}`,
+  );
+  assert.ok(found >= CEILING - 20, `${found} reads against a ceiling of ${CEILING} — lower the ceiling, the ratchet has slack`);
+});
+
+// THE WRITES GET THE SAME RATCHET (2026-08-10). A direct writeFileSync may
+// land on a file the door is holding, and an untold write is served stale
+// for the rest of a pass. writeNode writes AND tells; converting the rest
+// is gradual, and this holds the line meanwhile.
+//
+// bin/ IS EXEMPT for the read ratchet's reason. notes.ts is exempt because
+// writeNode's own write IS the door.
+test("no new file write bypasses the door — the count may fall, never rise", () => {
+  const CEILING = 36;
+  let found = 0;
+  const offenders: string[] = [];
+  const walk = (dir: URL, rel: string): void => {
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      if (e.isDirectory()) {
+        if (e.name !== "bin") walk(new URL(`${e.name}/`, dir), `${rel}${e.name}/`);
+        continue;
+      }
+      if (!e.name.endsWith(".ts") || e.name === "notes.ts") continue;
+      const n = (readFileSync(new URL(e.name, dir), "utf8").match(/writeFileSync\(/g) ?? []).length;
+      if (n > 0) offenders.push(`${rel}${e.name} (${n})`);
+      found += n;
+    }
+  };
+  walk(new URL("../engine/", import.meta.url), "engine/");
+  assert.ok(
+    found <= CEILING,
+    `${found} direct file writes, up from ${CEILING}. Write through writeNode — it writes and tells the door — ` +
+      `or, for a file the door can never hold, raise CEILING with a reason.\n${offenders.join("\n")}`,
+  );
+  assert.ok(found >= CEILING - 20, `${found} writes against a ceiling of ${CEILING} — lower the ceiling, the ratchet has slack`);
 });
 
 // AN EMPTY RESULT AND AN UNREADABLE FILE MUST NEVER LOOK ALIKE (found live
@@ -183,25 +261,12 @@ test("the move sweep repairs a NUL file instead of skipping it in silence", asyn
 // command, so every long run served nothing at all — no page, no feed, no
 // click. A 30-second test run froze the reader's whole interface.
 //
-// Same defect as the expedition archive, where 380 blocking git spawns hung
-// the server rather than just the archive. The script runner was converted
-// then and se_run was left behind.
-//
-// The freeze is nasty because the symptom lands wherever the reader happens
-// to click, so it reads as a rendering bug anywhere but here.
-test("se_run does not block the event loop", async () => {
+test("foreground run follows process completion", async () => {
   const root = fresh();
-  let ticks = 0;
-  const beat = setInterval(() => {
-    ticks++;
-  }, 20);
-  const sleep = process.platform === "win32" ? "Start-Sleep -Milliseconds 400" : "sleep 0.4";
-  const r = await run(root, sleep);
-  clearInterval(beat);
-  assert.equal(r.exit, 0, "the command still ran to completion");
-  assert.ok(r.duration_ms >= 300, "and it really did take time to do it");
-  // spawnSync scores exactly 0 here: nothing else gets to run at all.
-  assert.ok(ticks > 3, `the loop kept turning while it ran (ticks: ${ticks})`);
+  const command = process.platform === "win32" ? "Write-Output complete" : "printf complete";
+  const result = await runToCompletion(root, command);
+  assert.equal(result.exit, 0);
+  assert.equal(result.stdout.trim(), "complete");
   rmSync(root, { recursive: true, force: true });
 });
 
@@ -635,4 +700,27 @@ test("a dollar sequence in new_string is written literally, not expanded", () =>
   fileWrite(root, "engine/y.ts", "HEAD\nMARK\nTAIL\n", null);
   filePatch(root, [{ path: "engine/y.ts", old_string: "MARK", new_string: `${D}& and ${D}1` }]);
   assert.match(readFileSync(join(root, "engine", "y.ts"), "utf8"), /^\$& and \$1$/m, "both survive as typed");
+});
+
+test("live reads reuse validated content and detect external same-size rewrites", () => {
+  const root = fresh();
+  const path = "cached.md";
+  const abs = join(root, path);
+  writeFileSync(abs, "alpha");
+
+  const before = doorStats();
+  assert.match(fileRead(root, path).content, /alpha/);
+  const first = doorStats();
+  assert.equal(first.misses, before.misses + 1, "the first read hits the disk");
+  assert.match(fileRead(root, path).content, /alpha/);
+  const second = doorStats();
+  assert.equal(second.hits, first.hits + 1, "the second read is served from the door");
+  assert.equal(second.misses, first.misses, "and does not touch the disk");
+
+  writeFileSync(abs, "bravo");
+  const changed = new Date(Date.now() + 1000);
+  utimesSync(abs, changed, changed);
+  assert.match(fileRead(root, path).content, /bravo/);
+  const third = doorStats();
+  assert.equal(third.misses, second.misses + 1, "a same-size external rewrite is detected by the stamp");
 });

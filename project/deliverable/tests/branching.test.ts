@@ -132,9 +132,13 @@ test("the trace runs one ring further, to the functions", async () => {
 // straddles its ring, which is exactly when the drawing gets tight.
 test("consecutive rings are parted by at least the vision's own gap", async () => {
   const { layoutTrace, loadTrace } = await import("../engine/trace.ts");
-  const layout = layoutTrace(loadTrace("project"));
+  // THE REAL ROOT, not the literal "project" (found 2026-08-08): a wrong
+  // root loads an empty corpus, rings.length stays under two, and the test
+  // passed while checking nothing.
+  const { fileURLToPath } = await import("node:url");
+  const layout = layoutTrace(loadTrace(fileURLToPath(new URL("../../..", import.meta.url))));
   const rings = layout.rings;
-  if (rings.length < 2) return; // nothing to check on a corpus with one ring
+  assert.ok(rings.length >= 2, "the repo's own corpus draws several rings — one ring means the corpus did not load");
 
   // The card's own height is what a ring occupies at its thinnest, so the
   // clear air between two rings is the centre gap less one card.

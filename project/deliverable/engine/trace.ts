@@ -8,9 +8,10 @@
 // minimisation, and that is one named rule — a child sits on its parent's own
 // angle and moves only to clear a neighbour — rather than a dependency the
 // always-on mirror would carry forever.
-import { readdirSync, readFileSync } from "node:fs";
+import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { parseStateNote } from "./notes.ts";
+import { contentHash } from "./hash.ts";
+import { nodeLines, noteOf, parseStateNote, passEpoch, readNode } from "./notes.ts";
 
 /** THE SHARED SPINE, in ring order from the centre outward. Every wedge holds
  *  these whole, and nothing branches until the last of them.
@@ -282,10 +283,35 @@ function checkList(v: unknown): TemplateCheck[] {
   return out;
 }
 
+/** STAMPED, like the corpus. conformance() asks for the template of EVERY
+ *  node, so a 328-node pass read, parsed and regexed one of a dozen template
+ *  files 328 times. There are only twelve of them and they change when
+ *  somebody edits a template, which the stamp sees.
+ *
+ *  THE OBJECT IS SHARED. Callers read its fields and never write them; one
+ *  that starts writing owes a copy at the call site. */
+const ITEM_TEMPLATES = new Map<string, { stamp: string; tpl: ItemTemplate | undefined }>();
+
 export function itemTemplate(root: string, type: string): ItemTemplate | undefined {
+  const path = join(root, itemTemplateRel(type));
+  let stamp: string;
+  try {
+    const s = statSync(path);
+    stamp = `${s.size}:${s.mtimeMs}`;
+  } catch {
+    return undefined; // no template is not an error; the type simply declares none
+  }
+  const hit = ITEM_TEMPLATES.get(path);
+  if (hit !== undefined && hit.stamp === stamp) return hit.tpl;
+  const built = buildItemTemplate(path, type);
+  ITEM_TEMPLATES.set(path, { stamp, tpl: built });
+  return built;
+}
+
+function buildItemTemplate(path: string, type: string): ItemTemplate | undefined {
   let note: { frontmatter: Record<string, unknown>; body: string };
   try {
-    note = parseStateNote(readFileSync(join(root, itemTemplateRel(type)), "utf8"));
+    note = parseStateNote(readFileSync(path, "utf8"));
   } catch {
     return undefined;
   }
@@ -390,12 +416,8 @@ export function fieldValue(tpl: ItemTemplate, fm: Record<string, unknown>, key: 
 export function conformance(root: string, node: TraceNode): string[] {
   const tpl = itemTemplate(root, node.type);
   if (tpl === undefined || node.file === undefined) return [];
-  let note: { frontmatter: Record<string, unknown>; body: string };
-  try {
-    note = parseStateNote(readFileSync(node.file, "utf8"));
-  } catch {
-    return [`${node.id}: unreadable`];
-  }
+  const note = noteOf(node.file);
+  if (note === undefined) return [`${node.id}: unreadable`];
   const out: string[] = [];
   if (tpl.id_prefix !== "" && !node.id.startsWith(tpl.id_prefix)) out.push(`${node.id}: a ${tpl.type} id starts with ${tpl.id_prefix}`);
   const missing = tpl.fields.filter((k) => {
@@ -408,7 +430,9 @@ export function conformance(root: string, node: TraceNode): string[] {
   if (absent.length > 0) out.push(`${node.id}: missing section — ${absent.map((h) => `## ${h}`).join(" · ")}`);
   // The declared checks run last, on resolved values — same rules for every
   // hand that submits, the agent's form and the person's panel edit alike.
-  const whole = readFileSync(node.file, "utf8");
+  // THE SAME FILE, NOT A SECOND READ. This used to call readFileSync again on
+  // the node it had just parsed, so every conformance check cost two reads.
+  const whole = readNode(node.file);
   for (const c of tpl.checks) {
     out.push(...applyCheck(node.id, c, fieldValue(tpl, note.frontmatter, c.field), note.frontmatter, note.body, whole));
   }
@@ -416,15 +440,117 @@ export function conformance(root: string, node: TraceNode): string[] {
 }
 
 /** Every trace node the product declares. */
-export function loadTrace(root: string): TraceNode[] {
-  const out: TraceNode[] = [];
-  for (const file of traceFiles(traceDir(root))) {
-    let fm: Record<string, unknown>;
+/** THE CORPUS IS RE-READ ONLY WHEN IT CHANGED (owner ruling 2026-08-09).
+ *
+ *  This is v1's adr-verdict-cache reapplied, and its two rules are the whole
+ *  design: key a computed answer to a HASH OF ITS INPUT plus the build
+ *  identity, and keep the cache OUT OF THE REPO, because "a cache is never
+ *  truth and the repo must stay cache-free".
+ *
+ *  WHY IT IS NOT A SECOND SOURCE OF TRUTH, which is the rule this must not
+ *  break. Nothing is stored that cannot be recomputed. Nothing is written
+ *  anywhere. A stale entry cannot survive an edit, because the edit moves the
+ *  mtime and the stamp stops matching. The files remain the only truth; this
+ *  only remembers that it already read them.
+ *
+ *  THE STAMP IS STAT, NEVER CONTENT. Hashing 328 files means READING 328
+ *  files, which is exactly the cost being avoided. Size and mtime answer the
+ *  same question for one syscall each, and the directory walk that lists them
+ *  is paid either way.
+ *
+ *  BUILD IDENTITY COMES FREE HERE. v1 needed it because its cache lived on
+ *  disk and outlived the engine. This one is in memory, so a reload cannot
+ *  reach a cache built by the code it replaced.
+ *
+ *  WHAT IT COST TO NOT HAVE IT: one se_pull took 274,270 ms entering an
+ *  iteration, because every hop of the walk reloaded the whole corpus for
+ *  every machine. The server answers nothing while that runs — the MCP
+ *  endpoint shares the event loop — so the transport gave up and the
+ *  extension had to be restarted. */
+const CORPUS = new Map<string, { stamp: string; nodes: TraceNode[]; epoch: number }>();
+
+/** ONE FILE, READ ONCE UNTIL IT MOVES — the same rule as the corpus, one
+ *  level down.
+ *
+ *  nodeField and nodeList each read a whole node off disk and split it, and
+ *  they are called PER NODE PER FIELD. criterionAxisItems alone asks for the
+ *  damage grade, the priority and the compounding partner of every row in a
+ *  150-row pool: 450 reads of 150 files, every time the criteria list is
+ *  resolved. The corpus stamp does not help them, because they take a path
+ *  rather than a node.
+ *
+ *  THE ARRAY IS SHARED, not copied. Every caller only reads it — find, slice,
+ *  findIndex — and a copy per call would give back the cost this removes. A
+ *  caller that starts mutating it owes a copy at the call site. */
+/** THE DOOR LIVES IN notes.ts, the file-and-parse layer. Re-exported here so
+ *  the readers that already import from trace keep one import. */
+export { nodeLines, noteOf, readNode };
+
+/** THE CORPUS'S VERSION, from the files themselves.
+ *
+ *  IT IS EXPENSIVE AND IT IS CORRECT, in that order of importance. Keying it on
+ *  the model's watcher generation was tried on 2026-08-09 and the suite refused
+ *  it: a corpus that misses an external edit reports a fallen claim as green,
+ *  and that is the one thing this must never do.
+ *
+ *  SO THE COST IS NOT FIXED HERE. It is 328 stats per call and it was called
+ *  sixty-six times to enter one record. The sixty-six is the defect; the 328 is
+ *  the price of an honest answer. Collect it ONCE per operation and pass it
+ *  down (software.md, input-process-output). */
+function corpusStamp(files: string[]): string {
+  const parts: string[] = [];
+  for (const f of files) {
     try {
-      fm = parseStateNote(readFileSync(file, "utf8")).frontmatter;
+      const s = statSync(f);
+      parts.push(`${f}:${s.size}:${s.mtimeMs}`);
     } catch {
-      continue; // a node that will not parse is the lint's problem, not the render's
+      parts.push(`${f}:gone`);
     }
+  }
+  return contentHash(parts.join("\n"));
+}
+
+/** THE CORPUS'S CURRENT STAMP, for keying anything computed FROM the corpus.
+ *
+ *  The same walk loadTrace does, and the reason a VERDICT can be reused: a
+ *  check whose inputs have not moved has not changed its mind. Ask for it once
+ *  per pass and key every verdict in that pass on it — asking per item would
+ *  pay the walk per item. */
+export function corpusVersion(root: string): string {
+  // THE CORPUS THIS PASS ALREADY BUILT carries the stamp with it. Asking again
+  // would re-sweep 328 files to recompute a string that is sitting in the map.
+  const era = passEpoch();
+  const hit = CORPUS.get(root);
+  if (hit !== undefined && era !== 0 && hit.epoch === era) return hit.stamp;
+  return corpusStamp(traceFiles(traceDir(root)));
+}
+
+export function loadTrace(root: string): TraceNode[] {
+  const hit = CORPUS.get(root);
+  // A COPY, NEVER THE STORED ARRAY. A caller that sorts what it was handed
+  // would otherwise reorder every later caller's corpus, and the bug would
+  // look like the sort rather than the sharing.
+  //
+  // BUILT IN THIS PASS ALREADY. The sweep below is what the pass exists to
+  // remove: 328 stats to decide whether to rebuild, paid 58 times to enter one
+  // record, on a corpus whose every file the pass had already verified. A
+  // lane write bumps the epoch, so a corpus built before it is never reused.
+  const era = passEpoch();
+  if (hit !== undefined && era !== 0 && hit.epoch === era) return hit.nodes.slice();
+  const files = traceFiles(traceDir(root));
+  const stamp = corpusStamp(files);
+  if (hit !== undefined && hit.stamp === stamp) {
+    hit.epoch = era;
+    return hit.nodes.slice();
+  }
+  const out: TraceNode[] = [];
+  for (const file of files) {
+    // THROUGH THE ONE DOOR, so the corpus and every later reader of the same
+    // node share one read and one parse. This used to read all 328 files for
+    // itself, and conformance then read every one of them again.
+    const note = noteOf(file);
+    if (note === undefined) continue; // a node that will not parse is the lint's problem
+    const fm = note.frontmatter;
     // THE CORPUS IS EVERY TYPED NODE, not only the ones that earn a ring. A
     // stakeholder draws nothing and is still an address a value prop points
     // at, so the layout — not the loader — decides what is drawn.
@@ -453,7 +579,8 @@ export function loadTrace(root: string): TraceNode[] {
       file,
     });
   }
-  return out;
+  CORPUS.set(root, { stamp, nodes: out, epoch: era });
+  return out.slice();
 }
 
 /** THE VISION HAS NO NODE OF ITS OWN YET (owner, 2026-08-05). Until the spec

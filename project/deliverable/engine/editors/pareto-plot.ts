@@ -79,7 +79,13 @@ export const PARETO_PLOT_EDITOR: EditorKind = {
       parts.push('<polyline class="sfppline" data-cand="' + esc(c.id) + '" points="' + pts.join(" ") + '" fill="none" stroke="' + colour + '" stroke-width="' + (kept ? 2.5 : 1) + '" opacity="' + (kept ? 1 : 0.35) + '"><title>' + esc(c.id) + (kept ? " (on the front)" : " (eliminated)") + "</title></polyline>");
     };
     cands.forEach(line);
-    const svg = '<svg class="sfpp" viewBox="0 0 ' + W + " " + H + '" style="width:100%;height:auto;overflow:visible;">' + parts.join("") + "</svg>";
+    // READABLE AT ANY AXIS COUNT (owner report 2026-08-09: thirty-five axes
+    // squeezed into a fixed card were unreadable, and nothing could grow it).
+    // The svg fills the box's HEIGHT and keeps its shape, so the native
+    // resize handle grows the whole drawing; what overflows the card scrolls
+    // sideways instead of being squeezed into it.
+    const svg = '<div class="sfppbox" style="resize:vertical;overflow:auto;height:280px;max-width:100%;">'
+      + '<svg class="sfpp" viewBox="0 0 ' + W + " " + H + '" style="height:100%;width:auto;overflow:visible;display:block;">' + parts.join("") + "</svg></div>";
     // THE LEGEND IS THE FRONT, in the same colours as its lines.
     const legend = r.front.map(function (id, i) {
       return '<span style="display:inline-flex;align-items:center;gap:4px;margin-right:10px;"><i style="width:10px;height:2px;background:' + pen(i, Math.max(1, r.front.length)) + ';display:inline-block;"></i>' + esc(id) + "</span>";

@@ -8,12 +8,12 @@
 //   - CAS on every write: read returns the hash, write demands it. This is
 //     also the read-before-write law, enforced mechanically.
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { dirname, extname, join, relative, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
 import { lintFix } from "./lintfix.ts";
-import { parseStateNote } from "./notes.ts";
+import { forgetPath, parseStateNote, readNodeBytes, writeNode } from "./notes.ts";
 import { isExcluded, isRootRef, resolveDeclaredRoot, resolveForRead, resolveInRoot } from "./paths.ts";
 
 /** Whole-file read budget (chars). Beyond this, offset/limit is required. */
@@ -156,7 +156,8 @@ export function fileRead(
     bytes = gitShow(root, opts.ref, path);
   } else {
     const abs = mustExist(root, path, SRC, true);
-    if (statSync(abs).isDirectory()) {
+    const stat = statSync(abs);
+    if (stat.isDirectory()) {
       throw new Rejection({
         clause: CLAUSES.PATH_ESCAPE,
         expected: "a file",
@@ -165,7 +166,10 @@ export function fileRead(
         source: SRC,
       });
     }
-    bytes = readFileSync(abs);
+    // Through the door: one store serves the engine's text readers and this
+    // byte reader. A read the door cannot make (a race with a delete) falls
+    // through to the direct read, whose error is the honest one.
+    bytes = readNodeBytes(abs) ?? readFileSync(abs);
   }
   const mimeType = IMAGE_TYPES[extname(path).toLowerCase()];
   if (mimeType !== undefined) return imageRead(path, bytes, mimeType, opts.ref);
@@ -385,7 +389,7 @@ export function fileWrite(root: string, path: string, content: string, baseHash:
   guardMachineNote(path, content);
   const nul = guardRawNul(path, content);
   mkdirSync(dirname(abs), { recursive: true });
-  writeFileSync(abs, nul.content, "utf8");
+  writeNode(abs, nul.content);
   const lint = lintFix(root, [path]);
   const final = lint !== undefined && lint.fixed.length > 0 ? readFileSync(abs, "utf8") : nul.content;
   mirrorMethod(path, root);
@@ -546,7 +550,7 @@ export function fileReplace(
     if (nul.corrected !== undefined) corrected.push(nul.corrected);
   }
   const changed = staged.map((s) => {
-    writeFileSync(s.abs, s.next, "utf8");
+    writeNode(s.abs, s.next);
     mirrorMethod(s.path, root);
     return { path: s.path, hash: contentHash(s.next), replacements: s.replacements };
   });
@@ -832,6 +836,25 @@ function applyExactOp(w: OpWork): { next: string; replacements: number } {
   // the single-replacement path was exposed, which is why replace_all never
   // showed it.
   const next = w.op.replace_all === true ? w.current.split(oldStr).join(newStr) : w.current.replace(oldStr, () => newStr);
+  // THE ROUND-TRIP VERIFY (owner ask 2026-08-07: escaping kept eating
+  // writes, and every instance was silent). new_string is DATA and must
+  // land verbatim. If the applied buffer does not contain it, something
+  // between the tool boundary and the buffer transformed it — refuse
+  // rather than report a success that is not one. This catches the CLASS,
+  // including whatever eats the next one.
+  if (newStr !== "" && !next.includes(newStr)) {
+    throw new Rejection({
+      clause: CLAUSES.WRITE_TRANSFORMED,
+      expected: `new_string to land verbatim in ${w.op.path}`,
+      got: `the applied text does not contain the payload (op ${w.i + 1}/${w.n}) — nothing was written`,
+      remedy: {
+        tool: "se_file_read",
+        args: { path: w.op.path },
+        note: "the payload was transformed on the way in — the escape-eating class has a new member; report it with the payload that triggered this",
+      },
+      source: SRC,
+    });
+  }
   return { next, replacements: w.op.replace_all === true ? count : 1 };
 }
 
@@ -855,7 +878,7 @@ function writeStaged(
   }
   const applied = [...byFile.values()].map((f) => {
     const abs = resolveInRoot(root, f.path, SRC);
-    writeFileSync(abs, f.next, "utf8");
+    writeNode(abs, f.next);
     mirrorMethod(f.path, root);
     return { path: f.path, hash: contentHash(f.next), replacements: f.replacements };
   });
@@ -912,6 +935,8 @@ export function fileDelete(root: string, path: string, baseHash: string): { dele
     });
   }
   rmSync(abs);
+  // The door may hold what was deleted; tell it rather than let the stat find out.
+  forgetPath(abs);
   mirrorMethod(path, root);
   return { deleted: path };
 }

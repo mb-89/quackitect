@@ -10,13 +10,14 @@ import { createRequire } from "node:module";
 import { marked } from "marked";
 import { applyBaseOp, type BaseOp } from "./bases.ts";
 import { helpFor } from "./baseui.ts";
-import type { CallLog } from "./calllog.ts";
+import { type CallLog, slowMs } from "./calllog.ts";
 import { loadCards } from "./cards.ts";
 import { replayVisitsText } from "./decisions.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { appendNote, pendingNotes, readNotes } from "./inbox.ts";
 import { bumpDrawingEpoch } from "./machines/compile.ts";
 import { handleHttp, type McpServer } from "./mcp.ts";
+import { beginPass, endPass } from "./notes.ts";
 import { loadPanel, renderPanel } from "./params.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { ENGINE_LIFE, feedRows, type MirrorState, renderMirror } from "./render.ts";
@@ -24,6 +25,7 @@ import { loadLevels } from "./scale.ts";
 import type { Session } from "./session.ts";
 import { survey } from "./survey.ts";
 import { editCell } from "./tables.ts";
+import { warmVault } from "./vault.ts";
 
 export interface MirrorOptions {
   session: Session;
@@ -37,6 +39,12 @@ export interface MirrorOptions {
 
 export function startMirror(o: MirrorOptions): Server {
   const state: MirrorState = { session: o.session, root: o.root, lastPacket: undefined, mode: o.mode, log: o.log };
+
+  // WARM THE VAULT OFF THE REQUEST PATH. The first table render should find
+  // rows rather than pay a build; started here, the card says "warming" at
+  // most once. Skipped under test, where a background build and its watcher
+  // would outlive the case that started the server.
+  if (process.env.NODE_TEST_CONTEXT === undefined) void warmVault(o.root);
 
   // THE READER'S SELECTION, mirrored server-side: the machine page reports
   // which state's details are open, so a control in ANOTHER surface (the
@@ -209,30 +217,6 @@ export function startMirror(o: MirrorOptions): Server {
         ),
       }),
     ],
-    "/target": ["mirror_target", (body) => ({ args: { to: body.to }, result: state.session.setTarget(String(body.to ?? "")) })],
-    // SET TARGET, the bar's button (owner design 2026-08-04): aims at the
-    // SELECTED state — the one whose details the machine page reported.
-    "/target/selected": [
-      "mirror_target",
-      () => {
-        if (selected === "") {
-          throw new Rejection({
-            clause: CLAUSES.REQUIRED_ARGS,
-            expected: "a selected state — click one in the machine view first; its details showing is what selected means",
-            got: "no selection",
-            remedy: { tool: "se_pull", args: {}, note: "or aim directly: POST /target {to}" },
-            source: "engine/mirror.ts",
-          });
-        }
-        // The selection is machine-scoped: a state picked inside a
-        // sub-machine aims THERE — "end" in i1 is iterations/i1/end,
-        // never the main machine's end. Setting over a locked target
-        // simply re-aims; the route recomputes as machines regenerate.
-        const chain = selectedMachine === "" ? [] : state.session.viewChain(selectedMachine).slice(1);
-        const to = chain.length === 0 ? selected : `${chain.join("/")}/${selected}`;
-        return { args: { to }, result: state.session.setTarget(to) };
-      },
-    ],
     "/escape": [
       "mirror_escape",
       (body) => ({ args: { reason: body.reason }, result: state.session.escape(String(body.reason ?? ""), "human") }),
@@ -290,6 +274,51 @@ export function startMirror(o: MirrorOptions): Server {
   };
 
   const jsonPosts: Record<string, (req: Req, res: Res) => void> = {
+    // SET TARGET ANSWERS IN PLACE (owner report 2026-08-09: as a redirect
+    // POST the button swallowed its own rejection — success and refusal
+    // both 303ed and the clicking page read nothing). A refusal now comes
+    // back as its own JSON and the client toasts it.
+    "/target": (req, res) =>
+      jsonPost(
+        req,
+        res,
+        "mirror_target",
+        (body) => ({
+          args: { to: body.to as string },
+          run: () => {
+            const r = state.session.setTarget(String(body.to ?? ""));
+            return { log: r, answer: { ok: true, result: r } };
+          },
+        }),
+        (e) => (e instanceof Rejection ? e.toJSON() : { error: whyOf(e) }),
+      ),
+    // SET TARGET, the bar's button (owner design 2026-08-04): aims at the
+    // SELECTED state — the one whose details the machine page reported.
+    "/target/selected": (req, res) =>
+      jsonPost(
+        req,
+        res,
+        "mirror_target",
+        () => {
+          if (selected === "") {
+            throw new Rejection({
+              clause: CLAUSES.REQUIRED_ARGS,
+              expected: "a selected state — click one in the machine view first; its details showing is what selected means",
+              got: "no selection",
+              remedy: { tool: "se_pull", args: {}, note: "or aim directly: POST /target {to}" },
+              source: "engine/mirror.ts",
+            });
+          }
+          // The selection is machine-scoped: a state picked inside a
+          // sub-machine aims THERE — "end" in i1 is iterations/i1/end,
+          // never the main machine's end. Setting over a locked target
+          // simply re-aims; the route recomputes as machines regenerate.
+          const chain = selectedMachine === "" ? [] : state.session.viewChain(selectedMachine).slice(1);
+          const to = chain.length === 0 ? selected : `${chain.join("/")}/${selected}`;
+          return { args: { to }, run: () => ({ log: state.session.setTarget(to), answer: { ok: true, to } }) };
+        },
+        (e) => (e instanceof Rejection ? e.toJSON() : { error: whyOf(e) }),
+      ),
     // THE READER'S SELECTION — view state. Logged like every call, but the
     // feed skips it (feedRows), so reading the machine stays quiet.
     "/selected": (req, res) =>
@@ -474,7 +503,19 @@ export function startMirror(o: MirrorOptions): Server {
         raw = readFileSync(abs, "utf8");
       }
       raw = raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, ""); // frontmatter is machine-facing
-      const html = p.endsWith(".md") ? (marked.parse(raw) as string) : `<pre>${raw.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>`;
+      let html = p.endsWith(".md") ? (marked.parse(raw) as string) : `<pre>${raw.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>`;
+      // A [[REFERENCE]] IN PROSE IS A LINK, NOT DEAD TEXT (owner report
+      // 2026-08-09). Where the id resolves in the document's own record, it
+      // becomes the same doclink every structured editor emits; where it
+      // does not resolve it stays text — an unresolved link is a finding.
+      if (p.endsWith(".md")) {
+        const links = state.session.docRefPaths(p);
+        const escAttr = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+        html = html.replace(/\[\[([^\]\n]+)\]\]/g, (whole: string, id: string) => {
+          const path = links[id.trim()];
+          return path === undefined ? whole : `<a class="doclink" data-path="${escAttr(path)}">${escAttr(id.trim())}</a>`;
+        });
+      }
       if (url.searchParams.get("page") === "1") {
         // A standalone page — ctrl/shift-click targets (new tab, new window).
         res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
@@ -641,6 +682,8 @@ export function startMirror(o: MirrorOptions): Server {
 
   // RENDER FIRST, THEN WRITE THE HEAD. See the note at the dispatcher's catch.
   const serveWidget = (widget: string, url: URL, res: Res): void => {
+    const profile = widget === "trace" || widget === "machine" ? ({} as Record<string, number>) : undefined;
+    const started = performance.now();
     const html = renderMirror(
       state,
       widget as "machine" | "details" | "log" | "terminal" | "table" | "trace",
@@ -653,7 +696,17 @@ export function startMirror(o: MirrorOptions): Server {
       url.searchParams.get("tq") ?? undefined,
       url.searchParams.get("tc") ?? undefined,
       url.searchParams.get("to") ?? undefined,
+      profile === undefined ? undefined : (phase, durationMs) => (profile[phase] = durationMs),
     );
+    if (profile !== undefined) {
+      o.log.append({
+        tool: "mirror_profile",
+        args: { path: url.pathname, widget, phases: profile },
+        ok: true,
+        outcome: "result",
+        duration_ms: performance.now() - started,
+      });
+    }
     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
     res.end(html);
   };
@@ -694,10 +747,45 @@ export function startMirror(o: MirrorOptions): Server {
     return false;
   };
 
+  // THE PERSON'S SURFACES GET THE SAME CLOCK AS THE LANE (owner, 2026-08-09:
+  // "every time something takes long, I have to tell you"). Every request is
+  // timed at this one door, and a breach lands in the SAME log the retro
+  // already mines — tool mirror_slow, with the path and the wait. Fast
+  // requests stay out: the alive poll runs constantly, and a log of
+  // heartbeats would bury what this exists to surface. The line is the
+  // one-second rule, shared with the lane (calllog.SLOW_MS).
   const server = createServer((req, res) => {
     // Every request is a new drawing epoch — see machines/compile.ts.
     bumpDrawingEpoch();
+    // AND ONE PASS OVER DISK (software.md, input-process-output). A render
+    // asks the same notes over and over; inside a pass the door stats each of
+    // them once. The boundary is already here — the drawing epoch draws it —
+    // and a request is exactly the operation the input belongs to.
+    beginPass();
     const url = new URL(req.url ?? "/", `http://localhost:${o.port}`);
+    const started = Date.now();
+    const finish = res.end.bind(res) as (...a: unknown[]) => Res;
+    let clocked = false;
+    (res as { end: unknown }).end = (...a: unknown[]): Res => {
+      if (!clocked) {
+        clocked = true;
+        const ms = Date.now() - started;
+        if (ms >= slowMs()) {
+          try {
+            o.log.append({
+              tool: "mirror_slow",
+              args: { path: url.pathname, method: req.method ?? "", ms },
+              ok: true,
+              outcome: "result",
+              duration_ms: ms,
+            });
+          } catch {
+            /* measuring must never break serving */
+          }
+        }
+      }
+      return finish(...a);
+    };
     try {
       if (url.pathname === "/mcp" && o.mcp !== undefined) {
         // THE AGENT'S LANE ON THE SHARED PORT. Every other route here is the
@@ -744,6 +832,12 @@ export function startMirror(o: MirrorOptions): Server {
       }
       res.writeHead(500, { "content-type": "text/plain; charset=utf-8" });
       res.end(body);
+    } finally {
+      // THE PASS CLOSES WITH THE SYNCHRONOUS BODY, not with the response. A
+      // route that continues asynchronously does the rest of its reading
+      // outside the pass, stat per access, which is the correct answer and
+      // the slower one.
+      endPass();
     }
   });
 

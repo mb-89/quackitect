@@ -1308,7 +1308,7 @@ export function coreTools(
           filter: {
             type: "object",
             description:
-              "{tool?, ok?, since?, text?} — since: an ISO timestamp, or 'last_retro' (everything after the previous retro, which is the newest carried/backlog drain — the desk cannot make those). text: a case-insensitive substring over the whole record, for finding a TOPIC without reading every hit",
+              "{tool?, ok?, since?, text?, min_ms?} — since: an ISO timestamp, or 'last_retro' (everything after the previous retro, which is the newest carried/backlog drain — the desk cannot make those). text: a case-insensitive substring over the whole record, for finding a TOPIC without reading every hit. min_ms: only records at least this slow — the slowness mine over every door, one-second rule and all",
           },
           group_by: { type: "string", description: "e.g. 'tool' or 'outcome'" },
           limit: { type: "number", default: 20 },

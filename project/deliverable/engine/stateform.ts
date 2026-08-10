@@ -15,11 +15,21 @@ import type { FormTemplate } from "./forms.ts";
 import { pendingNotes } from "./inbox.ts";
 import type { EvidenceField, MachineDecl, StateDecl } from "./machine.ts";
 import { bare, type MorphBox, type MorphCell, type MorphLine, type MorphRow, orderLines, storedOrder } from "./morphbox.ts";
-import { parseStateNote, section } from "./notes.ts";
+import { noteOf, parseStateNote, section } from "./notes.ts";
 import { type ParetoView, pareto, readScores } from "./pareto.ts";
 import { seDir } from "./paths.ts";
 import { type GuidanceDoc, pulledFor } from "./pull.ts";
-import { conformance, duplicateIds, itemTemplate, itemTemplateRel, loadTrace, refsIn, refsInRows, type TraceNode } from "./trace.ts";
+import {
+  conformance,
+  duplicateIds,
+  itemTemplate,
+  itemTemplateRel,
+  loadTrace,
+  nodeLines,
+  refsIn,
+  refsInRows,
+  type TraceNode,
+} from "./trace.ts";
 import { edgeProblems, traceSchema } from "./traceschema.ts";
 
 export interface A3Box {
@@ -173,7 +183,9 @@ export interface FieldArgs {
 
 export function templateMeta(root: string, name: string): TemplateMeta {
   try {
-    const fm = parseStateNote(readFileSync(join(root, fieldTemplateRel(name)), "utf8")).frontmatter;
+    // THROUGH THE DOOR: read once, parsed once, shared with every other reader
+    // of the same template. This was 125 reads and 58 ms to enter one record.
+    const fm = (noteOf(join(root, fieldTemplateRel(name))) ?? parseStateNote("")).frontmatter;
     return {
       editor: typeof fm.editor === "string" ? fm.editor : "text",
       line_pattern: typeof fm.line_pattern === "string" ? fm.line_pattern : "",
@@ -1256,7 +1268,7 @@ export function criterionAxisItems(traceRoot: string): string[] {
  *  what the graph needs, so anything else is fetched by whoever wants it. */
 export function nodeField(file: string, key: string): string {
   try {
-    const lines = readFileSync(file, "utf8").split("\n");
+    const lines = nodeLines(file);
     // FRONTMATTER ONLY. Past the closing fence a line that looks like a key
     // is prose, and reading prose as a value is how a field silently fills.
     const end = lines.indexOf("---", 1);
@@ -1280,7 +1292,7 @@ export function nodeField(file: string, key: string): string {
  *  convention. Reading the prompt as a value is how a field silently fills. */
 export function nodeList(file: string, key: string): string[] {
   try {
-    const lines = readFileSync(file, "utf8").split("\n");
+    const lines = nodeLines(file);
     const end = lines.indexOf("---", 1);
     const fm = lines.slice(0, end < 0 ? lines.length : end);
     const at = fm.findIndex((l) => l.startsWith(`${key}:`));

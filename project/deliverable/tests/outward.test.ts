@@ -67,7 +67,23 @@ test("outward options with no recorded query are red", () => {
   const root = rootWith({ "opt-a": priorArt("https://example.org/a-paper") }, 0);
   const r = run(root);
   assert.equal(r.code, 1, r.out);
-  assert.match(r.out, /records no se_web_search or se_web_fetch/);
+  assert.match(r.out, /no log segment records se_web_search, se_web_fetch or the native WebSearch/);
+});
+
+// THE BUG OF 2026-08-10. The contract allows the native WebSearch when the
+// lane's provider is unconfigured, and a hook logs it under the host tool's
+// own name. The check refused exactly that sanctioned path, and a rotated
+// log segment would have hidden even a lane search.
+test("a native WebSearch record in a rotated segment satisfies the check", () => {
+  const root = rootWith({ "opt-a": priorArt("https://example.org/a-paper") }, 0);
+  writeFileSync(
+    join(root, ".se", "calls.1.jsonl"),
+    `${JSON.stringify({ ref: "call-n", tool: "WebSearch" })}\n`,
+    "utf8",
+  );
+  const r = run(root);
+  assert.equal(r.code, 0, r.out);
+  assert.match(r.out, /green/);
 });
 
 test("an outward option citing our own repository is red", () => {

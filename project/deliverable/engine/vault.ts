@@ -14,16 +14,39 @@
 // A ROW IS NOT A COPY OF A FILE. It is the note's frontmatter plus a `file`
 // member carrying the fields Bases synthesises. The expression language reads
 // exactly this shape, so nothing translates between the index and a filter.
-import { type FSWatcher, mkdirSync, readdirSync, readFileSync, statSync, unlinkSync, watch, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { availableParallelism } from "node:os";
 import { basename, dirname, join, relative, sep } from "node:path";
+import parcelWatcher from "@parcel/watcher";
 import { type Ctx, DATEISH, evaluate, isTruthy, parseExpr, toDate } from "./expr.ts";
 import { parseStateNote } from "./notes.ts";
 
 export type Row = Record<string, unknown>;
 
-const SKIP_DIRS = new Set(["node_modules", ".git", ".obsidian", ".se", ".worktrees", "tests"]);
+interface VaultWatchConfig {
+  extensions: string[];
+  excludeDirectories: string[];
+}
+
+const DEFAULT_WATCH_CONFIG: VaultWatchConfig = {
+  extensions: [".md"],
+  excludeDirectories: ["node_modules", ".git", ".obsidian", ".se", ".worktrees", "tests"],
+};
+
+function loadWatchConfig(root: string): VaultWatchConfig {
+  try {
+    const raw = JSON.parse(readFileSync(join(root, "project", ".quack-watch.json"), "utf8")) as Partial<VaultWatchConfig>;
+    return {
+      extensions: Array.isArray(raw.extensions) ? raw.extensions.map(String) : DEFAULT_WATCH_CONFIG.extensions,
+      excludeDirectories: Array.isArray(raw.excludeDirectories)
+        ? raw.excludeDirectories.map(String)
+        : DEFAULT_WATCH_CONFIG.excludeDirectories,
+    };
+  } catch {
+    return { ...DEFAULT_WATCH_CONFIG };
+  }
+}
 
 /**
  * What a progress bar draws. A build of a large vault takes seconds, and the
@@ -46,7 +69,7 @@ export interface VaultStats {
   bytes: number;
 }
 
-function walk(dir: string, out: string[]): void {
+function walk(dir: string, out: string[], config: VaultWatchConfig): void {
   let entries: import("node:fs").Dirent[];
   try {
     entries = readdirSync(dir, { withFileTypes: true });
@@ -55,9 +78,9 @@ function walk(dir: string, out: string[]): void {
   }
   for (const e of entries) {
     if (e.isDirectory()) {
-      if (SKIP_DIRS.has(e.name)) continue;
-      walk(join(dir, e.name), out);
-    } else if (e.isFile() && e.name.endsWith(".md")) {
+      if (config.excludeDirectories.includes(e.name)) continue;
+      walk(join(dir, e.name), out, config);
+    } else if (e.isFile() && config.extensions.some((extension) => e.name.endsWith(extension))) {
       out.push(join(dir, e.name));
     }
   }
@@ -75,12 +98,25 @@ export class Vault {
   private rows: Row[] = [];
   private byPath = new Map<string, number>();
   private stats: VaultStats = { notes: 0, unreadable: 0, buildMs: 0, bytes: 0 };
-  private watcher: FSWatcher | null = null;
+  private watcher: parcelWatcher.AsyncSubscription | null = null;
+  private watcherStarting: Promise<void> | null = null;
+  private snapshotWrite: Promise<void> = Promise.resolve();
+  private stopped = false;
+  private built = false;
   private listeners: (() => void)[] = [];
+  private readonly watchConfig: VaultWatchConfig;
 
   constructor(root: string, dir?: string) {
     this.root = root;
     this.dir = dir ?? join(root, "project");
+    this.watchConfig = loadWatchConfig(root);
+  }
+
+  /** True once rows have been seated — by build, buildAsync or the index.
+   *  The render's read (warmRows) refuses to serve a mid-build vault as if
+   *  the vault were empty. */
+  ready(): boolean {
+    return this.built;
   }
 
   /** Read every note once. The only place the whole vault is touched. */
@@ -139,13 +175,15 @@ export class Vault {
 
   private files(): string[] {
     const files: string[] = [];
-    walk(this.dir, files);
+    walk(this.dir, files, this.watchConfig);
     files.sort();
     return files;
   }
 
   /** Take the rows, index them by path, and stamp what the build cost. */
   private seat(rows: Row[], started: number): VaultStats {
+    // Synchronous with the seating — no observer can see the gap.
+    this.built = true;
     this.rows = [];
     this.byPath = new Map();
     let bytes = 0;
@@ -219,6 +257,21 @@ export class Vault {
     this.stats.notes = this.rows.length;
   }
 
+  /** Move ONE note without turning the rename into a delete plus append. */
+  rename(fromPath: string, toPath: string): void {
+    const at = this.byPath.get(fromPath);
+    if (at === undefined) {
+      this.refresh(toPath);
+      return;
+    }
+    const abs = join(this.dir, toPath.split("/").join(sep));
+    const row = this.readOne(abs);
+    delete row.__bytes;
+    this.byPath.delete(fromPath);
+    this.byPath.set(toPath, at);
+    this.rows[at] = row;
+  }
+
   /**
    * Drop ONE note. The other half of live.
    *
@@ -267,42 +320,136 @@ export class Vault {
     return out;
   }
 
-  /** Watch the vault and keep the index current. Live in both directions. */
-  live(onChange: () => void): void {
-    this.listeners.push(onChange);
-    if (this.watcher !== null) return;
-    const pending = new Set<string>();
-    let timer: NodeJS.Timeout | null = null;
-    const w = watch(this.dir, { recursive: true }, (_event, name) => {
-      if (name === null) return;
-      const rel = String(name).split(sep).join("/");
-      if (!rel.endsWith(".md")) return;
-      if (rel.split("/").some((p) => SKIP_DIRS.has(p))) return;
-      pending.add(rel);
-      if (timer !== null) clearTimeout(timer);
-      // Coalesce: an editor writing a file fires several times.
-      timer = setTimeout(() => {
-        for (const p of pending) {
-          try {
-            statSync(join(this.dir, p.split("/").join(sep)));
-            this.refresh(p);
-          } catch {
-            this.forget(p);
-          }
+  /** Repair dropped watcher events with metadata checks, not content reads. */
+  reconcile(): number {
+    const seen = new Set<string>();
+    let changed = 0;
+    for (const abs of this.files()) {
+      const rel = relative(this.dir, abs).split(sep).join("/");
+      seen.add(rel);
+      const current = this.get(rel);
+      let stale = current === undefined;
+      if (current !== undefined) {
+        try {
+          const stat = statSync(abs);
+          const file = current.file as Row;
+          stale = Number(file.size ?? -1) !== stat.size || (file.mtime as Date).getTime() !== stat.mtime.getTime();
+        } catch {
+          stale = true;
         }
-        pending.clear();
-        for (const fn of this.listeners) fn();
-      }, 50);
-    });
-    // A watcher must never be the reason a process will not exit.
-    w.unref?.();
-    this.watcher = w;
+      }
+      if (stale) {
+        this.refresh(rel);
+        changed++;
+      }
+    }
+    for (const path of [...this.byPath.keys()]) {
+      if (seen.has(path)) continue;
+      this.forget(path);
+      changed++;
+    }
+    if (changed > 0) this.notify();
+    return changed;
   }
 
-  stop(): void {
-    this.watcher?.close();
-    this.watcher = null;
+  private watcherOptions(): parcelWatcher.Options {
+    return { ignore: this.watchConfig.excludeDirectories.map((directory) => `**/${directory}/**`) };
+  }
+
+  private snapshotPath(): string {
+    return join(this.root, ".se", "vault-watcher.snapshot");
+  }
+
+  private applyWatcherEvents(events: parcelWatcher.Event[]): number {
+    let changed = 0;
+    for (const event of events) {
+      const path = relative(this.dir, event.path).split(sep).join("/");
+      if (path === "" || path === ".." || path.startsWith("../")) continue;
+      if (!this.watchConfig.extensions.some((extension) => path.endsWith(extension))) continue;
+      if (path.split("/").some((part) => this.watchConfig.excludeDirectories.includes(part))) continue;
+      if (event.type === "delete") {
+        this.forget(path);
+      } else {
+        try {
+          this.refresh(path);
+        } catch {
+          this.forget(path);
+        }
+      }
+      changed++;
+    }
+    if (changed > 0) this.notify();
+    return changed;
+  }
+
+  private saveWatcherSnapshot(): Promise<void> {
+    this.snapshotWrite = this.snapshotWrite
+      .catch(() => undefined)
+      .then(async () => {
+        mkdirSync(dirname(this.snapshotPath()), { recursive: true });
+        await parcelWatcher.writeSnapshot(this.dir, this.snapshotPath(), this.watcherOptions());
+      });
+    return this.snapshotWrite;
+  }
+
+  private async startWatcher(): Promise<void> {
+    const options = this.watcherOptions();
+    const subscription = await parcelWatcher.subscribe(
+      this.dir,
+      (error, events) => {
+        if (error !== null) {
+          this.reconcile();
+          return;
+        }
+        this.applyWatcherEvents(events);
+        void this.saveWatcherSnapshot().catch(() => this.reconcile());
+      },
+      options,
+    );
+    if (this.stopped) {
+      await subscription.unsubscribe();
+      return;
+    }
+    this.watcher = subscription;
+    const snapshot = this.snapshotPath();
+    if (existsSync(snapshot)) {
+      try {
+        this.applyWatcherEvents(await parcelWatcher.getEventsSince(this.dir, snapshot, options));
+      } catch {
+        // Reconciliation below remains authoritative when a backend cannot replay.
+      }
+    }
+    this.reconcile();
+    await this.saveWatcherSnapshot();
+  }
+
+  /** Watch the vault and keep the index current. Live in both directions. */
+  live(onChange?: () => void): Promise<void> {
+    if (onChange !== undefined) this.listeners.push(onChange);
+    if (this.watcher !== null) return Promise.resolve();
+    if (this.watcherStarting !== null) return this.watcherStarting;
+    this.stopped = false;
+    this.watcherStarting = this.startWatcher()
+      .catch(() => {
+        this.reconcile();
+      })
+      .finally(() => {
+        this.watcherStarting = null;
+      });
+    return this.watcherStarting;
+  }
+
+  notify(): void {
+    for (const listener of this.listeners) listener();
+  }
+
+  async stop(): Promise<void> {
+    this.stopped = true;
     this.listeners = [];
+    if (this.watcherStarting !== null) await this.watcherStarting;
+    const watcher = this.watcher;
+    this.watcher = null;
+    if (watcher !== null) await watcher.unsubscribe();
   }
 
   private indexPath(): string {
@@ -513,17 +660,71 @@ interface CacheFile {
 /** One vault per root, so a second view does not pay for a second index. */
 const WARM = new Map<string, Vault>();
 
-export function vaultFor(root: string): Vault {
-  let v = WARM.get(root);
-  if (v === undefined) {
-    v = new Vault(root);
-    v.build();
-    WARM.set(root, v);
-  }
-  return v;
+export type VaultChange =
+  | { kind: "refresh"; path: string }
+  | { kind: "forget"; path: string }
+  | { kind: "rename"; from: string; to: string };
+
+function vaultPath(vault: Vault, path: string): string | undefined {
+  const normal = path.split(sep).join("/");
+  if (!normal.startsWith("project/")) return undefined;
+  const rel = normal.slice("project/".length);
+  const config = loadWatchConfig(vault.root);
+  if (!config.extensions.some((extension) => rel.endsWith(extension))) return undefined;
+  if (rel.split("/").some((part) => config.excludeDirectories.includes(part))) return undefined;
+  return rel;
 }
 
-/** What a surface calls, so a large vault never blocks the process that draws. */
+/** Apply deterministic MCP mutations without creating an otherwise-unused model. */
+export function updateWarmVault(root: string, changes: VaultChange[]): boolean {
+  const vault = WARM.get(root);
+  if (vault === undefined) return false;
+  let changed = false;
+  for (const change of changes) {
+    if (change.kind === "rename") {
+      const from = vaultPath(vault, change.from);
+      const to = vaultPath(vault, change.to);
+      if (from !== undefined && to !== undefined) vault.rename(from, to);
+      else if (from !== undefined) vault.forget(from);
+      else if (to !== undefined) vault.refresh(to);
+      else continue;
+    } else {
+      const path = vaultPath(vault, change.path);
+      if (path === undefined) continue;
+      if (change.kind === "refresh") vault.refresh(path);
+      else vault.forget(path);
+    }
+    changed = true;
+  }
+  if (changed) vault.notify();
+  return changed;
+}
+
+export function reconcileWarmVault(root: string): number {
+  return WARM.get(root)?.reconcile() ?? 0;
+}
+
+/** The warm rows if they are ready — never builds, never blocks. The
+ *  render's read: where nothing is ready yet it answers undefined, the card
+ *  says it is warming, and the next repaint finds the rows. */
+export function warmRows(root: string): Row[] | undefined {
+  const v = WARM.get(root);
+  return v?.ready() === true ? v.all() : undefined;
+}
+
+/** THE ONE ENTRY, so a large vault never blocks the process that draws. The
+ *  synchronous twin (vaultFor) retired 2026-08-10: its one render caller
+ *  moved to warmRows, and a builder nothing calls is the zero-caller disease
+ *  this file was caught by twice already.
+ *
+ *  AND THE VAULT IS KEPT CURRENT FROM HERE ON. live() existed with zero
+ *  callers until 2026-08-09: the vault was built on the first render and
+ *  never touched again, and an edited note showed its old row until restart.
+ *
+ *  A WATCHER IS SOUND HERE AND IS NOT SOUND FOR THE DOOR. The vault feeds a
+ *  RENDER, and a repaint arriving a few milliseconds late costs nobody
+ *  anything. A claim's green cannot tolerate the same gap, which is why
+ *  engine/notes.ts stats instead. Different guarantee, different mechanism. */
 export async function warmVault(root: string, onProgress?: (p: BuildProgress) => void): Promise<Vault> {
   let v = WARM.get(root);
   if (v === undefined) {
@@ -531,11 +732,12 @@ export async function warmVault(root: string, onProgress?: (p: BuildProgress) =>
     WARM.set(root, v);
     if (!v.loadIndex(onProgress)) await v.buildAsync(onProgress);
     v.saveIndex();
+    if (process.env.NODE_TEST_CONTEXT === undefined) void v.live();
   }
   return v;
 }
 
 export function forgetVault(root: string): void {
-  WARM.get(root)?.stop();
+  void WARM.get(root)?.stop();
   WARM.delete(root);
 }

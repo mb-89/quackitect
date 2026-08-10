@@ -14,7 +14,7 @@ import { seDir } from "../engine/paths.ts";
 import { feedRows, renderMirror } from "../engine/render.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, freshRoot, pullBoot } from "./helpers.ts";
+import { anyGuidanceDoc, call, freshRoot, pullBoot } from "./helpers.ts";
 
 function clause(e: unknown): string | undefined {
   return (e as { clause?: string }).clause;
@@ -75,7 +75,7 @@ test("the toll: armed after boot, one grace warning, then the refusal — any op
   // A cheap, non-moving lane call carries the toll — the walk stands at
   // idle with no target, so a bare pull would only offer doors; a windowed
   // read is the neutral carrier here.
-  const look = () => call(server, "se_file_read", { path: "project/guidance/contract.md", offset: 1, limit: 1 });
+  const look = () => call(server, "se_file_read", { path: anyGuidanceDoc(), offset: 1, limit: 1 });
   // The first call after boot arms the toll — no warning inside the window.
   let r = await look();
   assert.equal(r.body.toll_warning, undefined);
@@ -91,7 +91,7 @@ test("the toll: armed after boot, one grace warning, then the refusal — any op
   assert.equal((r.body.remedy as { args: { update?: unknown } }).args.update !== undefined, true);
   // Paying on the same call proceeds — and the op lands in graph AND log.
   r = await call(server, "se_file_read", {
-    path: "project/guidance/contract.md",
+    path: anyGuidanceDoc(),
     offset: 1,
     limit: 1,
     update: { op: "plan", items: ["wire the pane", "test it"] },
@@ -324,7 +324,7 @@ test("the unified feed derives src, type and brief — and the mirror carries th
   const session = new Session(root);
   const log = new CallLog(seDir(root));
   log.append({ tool: "se_file_read", args: { path: "project/x.md" }, ok: true, outcome: "result", duration_ms: 1 });
-  log.append({ tool: "mirror_check", args: { path: "project/guidance/voice.md" }, ok: true, outcome: "result", duration_ms: 1 });
+  log.append({ tool: "mirror_check", args: { path: anyGuidanceDoc() }, ok: true, outcome: "result", duration_ms: 1 });
   log.append({
     tool: "se_update",
     args: { via: "se_pull", visit: "idle@0", op: "plan", nodes: [{ id: "d1", brief: "x" }] },

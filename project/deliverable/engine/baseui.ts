@@ -20,7 +20,7 @@ import { join } from "node:path";
 import { baseSource, LAYOUTS } from "./bases.ts";
 import { GLOBALS, METHODS, type TypeName, typeOf } from "./expr.ts";
 import { type BaseSpec, type BaseView, listBases, loadBase, type Row, renderView, selectRows, unreadableRows, vaultDir } from "./tables.ts";
-import { vaultFor } from "./vault.ts";
+import { warmRows, warmVault } from "./vault.ts";
 
 const esc = (s: string): string => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const attr = (o: unknown): string => esc(JSON.stringify(o));
@@ -282,10 +282,21 @@ function codePanel(root: string, rel: string): string {
 }
 
 export function basesCard(root: string, head: string, selected?: string, rowsIn?: Row[]): string {
-  // THE WARM MODEL, not a fresh read. Re-reading the vault on every render is
-  // the thing this replaced: the index is built once, kept current by the
-  // watcher, and every view reads the same rows the filters do.
-  const rows = rowsIn ?? vaultFor(root).all();
+  // THE WARM MODEL, not a fresh read. The index is built once, kept current
+  // by the watcher and the lane's tells, and every view reads the same rows
+  // the filters do.
+  //
+  // AND A RENDER NEVER BUILDS IT (2026-08-10). The synchronous build on this
+  // chain froze every surface at once; now the card reads the rows that are
+  // ready, and where none are it KICKS the async build and says so. The
+  // mirror re-renders on its next poll, and a late table is a repaint —
+  // exactly the cost a render is allowed to pay.
+  const rows = rowsIn ?? warmRows(root);
+  if (rows === undefined) {
+    void warmVault(root);
+    return `<div class="widget" id="w-table"><div class="widget-head"><span>database</span>${head}</div>
+      <div class="widget-body bs-body"><div class="bs-empty">The vault is warming. This card fills itself on the next refresh.</div></div></div>`;
+  }
   const damaged = unreadableRows(rows);
   const props = propertyInventory(rows);
   const declared: Declared[] = [];

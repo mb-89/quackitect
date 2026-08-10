@@ -1202,3 +1202,29 @@
 {"ts":"2026-08-09T14:16:54.371Z","op":"done","visit":"front_desk@0","node":"d6","brief":"gate signed at 14:10 and blessed by the owner"}
 {"ts":"2026-08-09T14:17:09.658Z","op":"plan","visit":"iterations/i1/gate-candidates@0","parent":null,"nodes":[{"id":"d14","brief":"commit what the redo produced"},{"id":"d15","brief":"land it on trunk"},{"id":"d16","brief":"leave the iteration and open the retro"}]}
 {"ts":"2026-08-09T14:17:17.593Z","op":"update","visit":"iterations/i1/gate-candidates@0","node":"d17","brief":"staging the whole M4 milestone and the engine fixes"}
+{"ts":"2026-08-09T14:17:33.876Z","op":"done","visit":"iterations/i1/gate-candidates@0","node":"d14","brief":"committed the milestone and the six engine fixes"}
+{"ts":"2026-08-09T14:17:50.730Z","op":"update","visit":"iterations/i1/gate-candidates@0","node":"d18","brief":"landing 95 files on trunk"}
+{"ts":"2026-08-09T14:20:04.704Z","op":"update","visit":"iterations/i1/write-requirements@1","node":"d23","brief":"landing the record on trunk"}
+{"ts":"2026-08-09T18:58:04.708Z","op":"done","visit":"front_desk@0","node":"d2","brief":"the entering pull is 66s, down from 274s"}
+{"ts":"2026-08-09T18:58:15.102Z","op":"done","visit":"front_desk@0","node":"d3","brief":"the worktree carries crippling now"}
+{"ts":"2026-08-09T18:58:35.234Z","op":"done","visit":"front_desk@0","node":"d4","brief":"the worktree file matches trunk's fixed hash"}
+{"ts":"2026-08-10T12:33:37.193Z","op":"plan","visit":"iterations/i1/write-requirements@0","parent":null,"nodes":[{"id":"d31","brief":"walk to gate-candidates through whatever is owed"},{"id":"d32","brief":"re-submit the gate so the checks re-run"},{"id":"d33","brief":"hand the bless to the owner"}]}
+{"ts":"2026-08-10T12:34:38.944Z","op":"update","visit":"iterations/i1/enumerate-space/find_prior_art@0","node":"d34","brief":"no lane search records exist at all; checking whether rotation ate them"}
+{"ts":"2026-08-10T12:35:19.200Z","op":"update","visit":"iterations/i1/enumerate-space/find_prior_art@0","node":"d35","brief":"no search records under any name; grouping the log to see what the 08-09 pass recorded"}
+{"ts":"2026-08-10T12:37:50.060Z","op":"defer","visit":"iterations/i1/write-requirements@0","node":"d32","brief":"re-submit the gate so the checks re-run","to":"gate-candidates","hops":1,"trail":["iterations/i1/write-requirements","gate-candidates"]}
+{"ts":"2026-08-10T12:38:05.007Z","op":"done","visit":"iterations/i1/write-requirements@0","node":"d31","brief":"the walk stands at the gate; 21 states walked green"}
+{"ts":"2026-08-10T12:39:15.289Z","op":"obsolete","visit":"iterations/i1/write-requirements@0","node":"d33","brief":"no bless is owed — the gate stands blessed by the owner since 2026-08-09 14:10"}
+{"ts":"2026-08-10T12:44:15.121Z","op":"plan","visit":"iterations/i1/gate-candidates@0","parent":null,"nodes":[{"id":"d38","brief":"rewrite reasons_hold plainly and land it"},{"id":"d39","brief":"answer how it passed the lint, with the gap noted"}]}
+{"ts":"2026-08-10T12:44:46.445Z","op":"done","visit":"iterations/i1/gate-candidates@0","node":"d38","brief":"the argument opens the section now; teaser gone"}
+{"ts":"2026-08-10T12:44:55.005Z","op":"done","visit":"iterations/i1/gate-candidates@0","node":"d39","brief":"the gap is a retro lead now"}
+{"ts":"2026-08-10T12:48:06.016Z","op":"plan","visit":"iterations/i1/gate-candidates@0","parent":null,"nodes":[{"id":"d40","brief":"state the argument with its mechanism and an example"},{"id":"d41","brief":"answer the plain-meaning question on the record"}]}
+{"ts":"2026-08-10T12:48:15.869Z","op":"done","visit":"iterations/i1/gate-candidates@0","node":"d41","brief":"the plain answer stands recorded"}
+{"ts":"2026-08-10T12:48:53.076Z","op":"done","visit":"iterations/i1/gate-candidates@0","node":"d40","brief":"the section opens with its own job now: judging the reasons, not redoing the cut"}
+{"ts":"2026-08-10T12:55:59.583Z","op":"plan","visit":"iterations/i1/gate-candidates@0","parent":null,"nodes":[{"id":"d42","brief":"answer why the composer scored its own candidates"},{"id":"d43","brief":"write the subagent rule into the evaluate-set row"},{"id":"d44","brief":"fix the cripplin typo and drain its note"},{"id":"d45","brief":"aim back to the gate"}]}
+{"ts":"2026-08-10T12:57:20.047Z","op":"done","visit":"iterations/i1/gate-candidates@0","node":"d45","brief":"aimed back at the gate"}
+{"ts":"2026-08-10T12:57:45.499Z","op":"done","visit":"iterations/i1/gate-candidates@0","node":"d42","brief":"the why is answered and recorded; the walk stands at the gate again"}
+{"ts":"2026-08-10T13:01:25.713Z","op":"plan","visit":"iterations/i1/gate-candidates@1","parent":null,"nodes":[{"id":"d46","brief":"mint the three raid nodes"},{"id":"d47","brief":"add the derived-house measurement to raid-corpus-stays-small"},{"id":"d48","brief":"amend raid_additions to references"},{"id":"d49","brief":"submit the gate; the bless stays the owner's"}]}
+{"ts":"2026-08-10T13:03:04.138Z","op":"update","visit":"iterations/i1/start@3","node":"d51","brief":"aiming at the gate to fill and submit"}
+{"ts":"2026-08-10T13:03:22.625Z","op":"update","visit":"iterations/i1/gate-candidates@2","node":"d52","brief":"submitting with raid_additions as references"}
+{"ts":"2026-08-10T13:03:42.874Z","op":"update","visit":"iterations/i1/gate-candidates@2","node":"d53","brief":"syncing trunk into the worktree so the minted nodes resolve"}
+{"ts":"2026-08-10T13:04:25.058Z","op":"update","visit":"iterations/i1/gate-candidates@2","node":"d54","brief":"committing the worktree's mirrored method and the owner's edit, then syncing"}

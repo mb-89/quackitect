@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 import { compileMachine } from "../engine/machines/compile.ts";
 import { mainMachinePath, Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { bootedServer, call, checkDocs, freshRoot, proofFor, pullBoot } from "./helpers.ts";
+import { anyGuidanceDoc, bootedServer, call, checkDocs, freshRoot, proofFor, pullBoot } from "./helpers.ts";
 
 const REPO_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 
@@ -34,7 +34,7 @@ describe("boot", { concurrency: true }, () => {
     // BOOT READS ONE THING NOW. The contract, the walk, the lane and the voice
     // were PROMOTED to the prompt layer, where they are present every turn and
     // no compaction can erase them. Preflight refuses to boot when what was
-    // placed is not the projection of project/guidance/, so the promotion is
+    // placed is not the projection of the guidance root, so the promotion is
     // guarded mechanically rather than by trust.
     //
     // AND NOW IT READS NOTHING ON THE WAY OUT (owner ruling 2026-08-07). The
@@ -55,7 +55,7 @@ describe("boot", { concurrency: true }, () => {
 
   test("reading is legal at the mechanical start/end states — proofs can be earned from anywhere", async () => {
     const server = buildServer(freshRoot());
-    const r = await call(server, "se_file_read", { path: "project/guidance/contract.md" });
+    const r = await call(server, "se_file_read", { path: anyGuidanceDoc() });
     assert.equal(r.isError, false, JSON.stringify(r.body));
     assert.ok(typeof r.body.hash === "string" && (r.body.hash as string).length > 0);
   });

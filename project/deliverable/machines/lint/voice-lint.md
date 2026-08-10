@@ -2,6 +2,7 @@
 long_sentence_words: 28
 wall_paragraph_lines: 8
 comma_chain_items: 3
+comma_chain_min_item_words: 2
 dash_chain_items: 3
 pyramid_paragraphs: 5
 ---
@@ -21,6 +22,10 @@ in engine/lint.ts; only parameters belong here.
   A part that is ENTIRELY a code span or a quoted string does not count
   toward the chain. Naming the shapes a canvas accepts is reference, not
   a buried list, and nobody wants `pill` on its own bullet.
+- `comma_chain_min_item_words` — a part must carry at least this many
+  words to count toward the chain. An enumeration of bare NAMES is
+  reference; an enumeration of THOUGHTS is the buried list this rule
+  exists to catch.
 - `dash_chain_items` — a sentence hinged on more than this many
   dash-separated parts is a run-on. One dash sets off an aside and is
   never flagged.

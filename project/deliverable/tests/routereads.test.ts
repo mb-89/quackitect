@@ -7,21 +7,26 @@
 // person sees what the way demands — and one multi-read of that list
 // still credits the lot, so a single lane read can carry a whole walk.
 import { strict as assert } from "node:assert";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, freshRoot, READ_DOCS } from "./helpers.ts";
+import { call, freshRoot } from "./helpers.ts";
 
 test("the first packet names every document the way to the target demands", () => {
-  const s = new Session(freshRoot());
+  const root = freshRoot();
+  const s = new Session(root);
   const first = s.packet() as { target: string; route_reads: string[] };
   assert.equal(first.target, "front_desk", "the session aims at the front desk from its first breath");
   const reads = first.route_reads;
   assert.ok(Array.isArray(reads), "the way's reading arrives without being asked for");
-  for (const p of READ_DOCS) {
-    assert.ok(reads.includes(p), `${p} is demanded on the way and must be listed`);
+  // WHAT the way demands is the machine's own business (owner ruling
+  // 2026-08-06: no test pins a guidance path). What a LIST owes is that it
+  // is real: non-empty, and every named document stands on disk.
+  assert.ok(reads.length > 0, "the way demands something");
+  for (const p of reads) {
+    assert.ok(existsSync(join(root, p)), `${p} is listed, so it must exist`);
   }
 });
 

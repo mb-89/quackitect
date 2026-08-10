@@ -46,6 +46,216 @@ that one when you touch what it covers.
   - Empty is better than an echo. A field is filled only when it ADDS something.
 - Repeat only when strongly advised. Then say why.
 
+## Dependencies: pull assets, never lean on servers
+
+The rule, owner-ruled twice (2026-08-01, restated harder 2026-08-09):
+
+- PULLING an asset is free. A one-time download from a CDN or registry is
+  fine — you had to be online to clone the repo anyway.
+- DEPENDING on a server is forbidden. Nothing we ship may need someone
+  else's server at RUN time — no CDN script tags, no online renderers, no
+  API a page calls to do its job. The agent's own model service is the one
+  exception.
+- The pulled asset is VENDORED: committed under deliverable/vendor with a
+  README naming version, source, date and license.
+- A missing vendored asset REFUSES with the pull that fixes it. An online
+  fallback is the dependency wearing a disguise.
+
+The case that set the restatement: the mermaid check page loaded its
+renderer from a CDN on every open. Offline it checked nothing while
+looking like a checker. It now inlines the vendored renderer and works
+forever as generated.
+
+## A stored copy never beats a derived one
+
+The 2026-08-09 retro drained five defects with one shape. A value the
+system can COMPUTE was also WRITTEN somewhere, and the written copy won.
+
+- The chart's picks beat the option nodes.
+- A stored criteria order beat the computed one. A corrosive row sat first
+  of seventy-two, above every fatal one.
+- The cutoff mark rides a row's position. A recomputed order silently
+  redraws the boundary.
+- A duplicated form section beat the section the check read.
+- The live run's colouring beat the record. A finished machine drew grey.
+
+The rule:
+
+- Where a value can be derived, derive it on every look. Do not store it.
+- Where a stored copy must exist, the derived value wins every
+  disagreement. The disagreement is reported, never silent.
+- A mark on a row names its own row. A mark riding on position makes
+  every reorder a silent edit.
+
+The precedent is the green light: calculated from the live files on every
+look, never written (owner ruling 2026-08-07, v1's adr-verdict-cache).
+
+## Derive on every look, but never re-derive what has not changed
+
+The sibling of the rule above, and it must be read WITH it. "Derive on
+every look" is about where truth lives. It is not an instruction to read
+the same unchanged files forty times in one call.
+
+Owner ruling 2026-08-09, after a single `se_pull` took 274,270 ms entering
+an iteration. The server answers NOTHING while that runs, because the
+lane's endpoint shares one event loop with the mirror, so the transport
+gave up and the extension had to be restarted.
+
+### The rule
+
+CACHE THE COMPUTATION. Never cache the truth.
+
+- Key the answer to a HASH OF ITS INPUT plus the build identity.
+- Recompute when either moves. Never on a timer, never on a guess.
+- Keep it OUT OF THE REPO. A cache is never truth, and the repo stays
+  cache-free.
+
+This is v1's adr-verdict-cache, and its wording is the test: verdicts
+keyed to full input hash plus build identity, in the data home, because
+"a cache is never truth and the repo must stay cache-free".
+
+### Why it does not break the rule above
+
+Nothing is stored that anyone reads as an answer. A stamp is not a value.
+An edit moves the input, the stamp stops matching, and the work runs
+again. There is still ONE source of truth and it is still the files.
+
+AN IN-MEMORY CACHE GETS BUILD IDENTITY FREE. v1 needed to key on the
+build because its cache was on disk and outlived the engine. A map that
+dies with the process cannot be reached by the code that replaced it.
+
+### The stamp is stat, never content
+
+Where the input is files, hashing their CONTENT means READING them, which
+is the cost being avoided. Size and modification time answer the same
+question for one syscall each.
+
+### What it was worth here
+
+Measured on 328 nodes: a cold corpus load is 312.9 ms, a stamped one is
+4.3 ms. Eleven walk hops over three machines went from 10,325 ms to
+142 ms.
+
+### Where to look for the next one
+
+The test is one question: does this recompute the same answer from
+unchanged input more than once in a call?
+
+- A whole-corpus load behind a function that looks like a getter.
+- A per-node file read inside a loop over every node.
+- A check re-run per state when the corpus it reads is the same corpus.
+
+A CALL SITE HIDES THE COST. `loadTrace(root)` reads like a variable and
+costs a third of a second. Name the cost in the comment where the cheap
+spelling hides it.
+
+### Input, process, output — and the cache is the consolation prize
+
+Owner ruling 2026-08-09, and it OUTRANKS the section above.
+
+COLLECT THE INPUT ONCE. PROCESS IT. OUTPUT IT. Where it matters, check ONCE at
+the end whether the input moved while you worked, and redo or refuse if it did.
+
+WHAT YOU DO NOT DO is ask an outside system the same question sixty-six times.
+
+### The measurement that set it
+
+Entering one record asked for the same 328-node corpus SIXTY-SIX TIMES. Each
+hop of the walk asked what was green; each green pass asked for the corpus;
+each container asked again for itself.
+
+Stamping made each ask cost 4 ms instead of 300 ms. The route still asked
+sixty-six times.
+
+SO THE CACHE FIXED THE PRICE AND NOT THE SHAPE, and that is the trap: cheap
+waste stops appearing in profiles, so nobody removes it. The 21,648 stats that
+replaced the reads were invisible until somebody counted CALLS rather than
+milliseconds.
+
+### Where the defect actually lives
+
+A FUNCTION THAT FETCHES ITS OWN INPUT IS FINE AT THE TOP AND WRONG IN A LOOP.
+The walk's objective finder loads the corpus because it needs the corpus, which
+reads perfectly well at the call site — and it is called once per hop.
+
+Pass the input DOWN. A parameter cannot be fetched twice, cannot go stale
+within the operation, and needs no invalidation. It is the version of a cache
+that cannot be wrong.
+
+### When a cache is still right
+
+Between INDEPENDENT operations, where there is no call chain to thread through.
+The mirror renders and the lane pulls; neither can hand the other its inputs,
+so the model holds them and both read it.
+
+Inside ONE operation, a cache is an admission that the shape is wrong.
+
+### The test
+
+COUNT THE ASKS, NOT THE MILLISECONDS. If one operation asks an outside system
+for the same thing more than once, the number of times is the defect, whatever
+each one costs.
+
+### The pass, for readers too deep to thread a parameter through
+
+Some readers sit twenty frames below the operation. Threading a parameter to
+all of them is a refactor nobody will finish, and half-done it is worse than
+not started.
+
+SO THE OPERATION DECLARES ITSELF INSTEAD. It opens a PASS. Inside one, the
+door verifies each file ONCE and answers every later access from what it holds.
+
+- `withPass(fn)` wraps a synchronous operation.
+- `passEpoch()` keys anything derived from MANY files on the pass that built it.
+- Outside a pass, every access asks. That is what a test gets, and it is right.
+
+WHAT IT IS WORTH, measured on one record entry:
+
+- The door's stats: 19,730 to 583.
+- The corpus sweep: 19,024 stats to 2,952.
+- The route: 2,488 ms to 1,271 ms.
+
+### A pass covers reading, never writing
+
+TWO ATTEMPTS TO MAKE THE PASS AUTOMATIC FAILED, both on the same day, both on
+the same law.
+
+The first held files for 2,000 ms of wall clock. Five tests refused it.
+
+The second held them for one turn of the event loop — indivisible, with no
+interval of trust at all, since nothing else can run inside a synchronous
+region. Seven tests refused it, one of them a product law:
+
+> a state note edited on disk binds the NEXT call, no reload
+
+SHRINKING THE WINDOW FROM SECONDS TO MICROSECONDS DID NOT CHANGE THE CLASS OF
+THE BUG. That is the finding. Both failed because a caller writes through
+something other than the lane and reads back inside the same window.
+
+SO THE RULE IS NARROW ON PURPOSE. An operation that only READS may be a pass.
+The route and the mirror's render qualify. Anything that writes while it walks
+does not.
+
+### A door only helps what walks through it
+
+Four caches were built before anyone counted. Together they cost 39,857 stats
+and left the three biggest readers untouched, because those readers called
+`readFileSync` themselves and no cache stood in their way.
+
+A DOOR THAT CAN BE WALKED AROUND IS A SUGGESTION. So the count of direct reads
+is held by a ratchet test: it may fall freely and cannot rise
+(`tests/files.test.ts`).
+
+A ban would be a lie. Ninety-nine of those reads are legitimate — JSON, a
+canvas, a git object, a one-shot script. What must never happen is the number
+growing without somebody deciding it should.
+
+### And none of it makes a long scan acceptable inline
+
+Capping the work makes it cheaper. It does not make it correct to run on
+the request path. Anything that scans thousands of things belongs where
+`se_test` already goes: past a second, hand it off and report.
+
 ## Comments and provenance
 
 - Write comments the way people write them: only where a reader would be surprised.

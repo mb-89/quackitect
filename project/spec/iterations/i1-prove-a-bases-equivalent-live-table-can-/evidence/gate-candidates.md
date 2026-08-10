@@ -1,9 +1,7 @@
 ---
 form: gate-candidates
-bless: blessed by human
-by: agent
-signed_off: 2026-08-09T14:10:08.354Z
-authors: agent
+amended: "2026-08-10T12:48:53.103Z by agent — the section never said its own job — the cut is cut-criteria's, and this gate only judges whether the cut reasons are real"
+authors: agent, human
 files:
 ---
 
@@ -24,35 +22,22 @@ THE ONE THING THIS GATE IS FOR is whether the cut reasons are real and the front
 
 ## reasons_hold
 
-THIRTY-SEVEN CUTS, AND ONE ARGUMENT BEHIND ALL OF THEM. That is still the weakness and it is unchanged by the redo.
+- The judgment: the 37 strikes hold. They cannot help choose between the candidates
+- "No choice touches it" is one kind of judgment, applied 37 times. If the judgment pattern is wrong, all 37 strikes fall together, not one by one.
 
-Every struck axis carries the same reason: no pick in any of the five clusters touches the mechanism that serves it, so all five meet it identically BY CONSTRUCTION. Structural, not resemblance, and checkable against the candidate records.
+### One row was moved
 
-### Three checked at the source
+[[req-overlay-survives-update]] is graded fatal in the register. The reviewer read it as crippling: an overlay lost in an update is a failed upgrade, not the product ceasing to be what it claims. The row was moved in the sort, with the reason recorded. T
 
-- [[req-repo-search-carries-intent]]. No candidate's picks name the search verb. Checked against all five notes.
-- [[req-tour-speaks-plainly]]. No pick reaches the tour. The five vary the walk, the account, the record's life, the bootstrap and the holding pen.
-- [[req-engine-port-fallback]]. Runtime plumbing. [[cand-thin-worktree]] changes where the engine is READ from, which is not which port it binds.
+### The line
+After the 37 strikes, 35 axes remained. The line keeps 19.
 
-### Where the argument is thinnest
+The line sits between CRIPPLING and CORROSIVE on the damage scale:
 
-The bootstrap cluster sits next to several struck rows. [[req-engine-port-fallback]] was struck as plumbing, and a one-command install plausibly owns the port question. If that is wrong, one row returns and nothing else moves.
+- Above it: losing what the axis demands ends the product or stops a use case.
+- Below it: the system still works and people route around the damage.
 
-A SINGLE ARGUMENT APPLIED THIRTY-SEVEN TIMES IS ONE JUDGMENT. If it fails, thirty-seven axes come back together.
-
-### One row was moved, and it changed nothing
-
-[[req-overlay-survives-update]] is graded fatal and reads as crippling: an overlay that does not survive an update is a failed upgrade, not the product ceasing to be what it claims.
-
-IT WAS MOVED, NOT RE-GRADED. Editing the register to change my own sort is the aim the mechanism exists to prevent. The move is visible, carries its reason, and leaves the register alone.
-
-IT SITS ABOVE THE LINE EITHER WAY. A move that rescued something would deserve more suspicion than this one.
-
-### The line, and why it is where it is
-
-Between CRIPPLING and CORROSIVE. Above it, losing the axis ends the product or stops a use case. Below it, the system works and people route around the damage.
-
-NINETEEN IS ABOVE THE REFERENCE OF ELEVEN, and the extra rows earn it by being crippling rather than by being liked. Drawing at eleven would have cut inside the crippling band on no stated principle.
+The reference count is 11. The 8 extra rows all grade crippling. Cutting at 11 would split the crippling band on no stated principle.
 
 ## round_0_verify
 
@@ -83,30 +68,16 @@ NINETEEN IS ABOVE THE REFERENCE OF ELEVEN, and the extra rows earn it by being c
 
 ## raid_additions
 
-none can be minted from here — the gate holds no write tool, by design. Four entries are OWED, and they are named so the next state that can write them does.
+The four owed entries stand in the register, minted 2026-08-10 (the gate holds no write tool, so they were written from outside the walk on the owner's word):
 
-- AN ISSUE, not a risk, because it already happened. The candidates were composed and scored by the same agent, against the evidence rule on the evaluate-set matrix row. Trigger: any re-score by a second hand. Owner role: the adjudicator.
-- A RISK. Four of the surviving 4-scores rest on external comparisons not verified this session. Impact: the front shifts if any name turns out not to match. Trigger: before M5 convergence reads these scores.
-- A RISK. Thirty-seven strikes rest on one argument. Impact: if it fails, thirty-seven axes return and the line is re-cut. Trigger: any candidate added that touches a struck mechanism.
-- AN ASSUMPTION. [[cand-derived-house]] assumes the corpus stays small enough to rebuild on every look. Measured at 322 nodes, 465 ms cold and 119 ms warm, on 2026-08-09. Unmeasured above that. Trigger: the corpus passing a thousand nodes.
-
-THE FIRST ONE IS THE ONE TO ACT ON.
+- [[raid-composer-scored-own-candidates]] — the issue. Act on this one first: a second hand re-scores before M5 reads the numbers.
+- [[raid-unverified-score-comparisons]] — the risk on the four surviving 4-scores.
+- [[raid-strikes-share-one-argument]] — the risk that all 37 strikes fall together.
+- [[raid-corpus-stays-small]] — the assumption already stood in the register; the cand-derived-house measurement (322 nodes, 465 ms cold, 119 ms warm) joined it.
 
 ## verdict
 
 pass with overrides — the front is real, the cut is drawn on a principle a reader can check, and two process weaknesses remain unrepaired
-
-Five candidates stand, nothing dominates, and the trades are visible. Nineteen axes carry the comparison, drawn at the crippling-to-corrosive boundary.
-
-WHAT THE REDO FIXED. The last verdict named a missing depth cut and a suspect ranking. Both are answered: the order is computed from what each row breaks, and the line is drawn on the scale rather than on a count.
-
-THE OVERRIDES, and there are three.
-
-- THE COMPOSER SCORED ITS OWN CANDIDATES. The evaluate-set row says a research agent scores, never the builder. That rule was broken and nothing has re-scored since.
-- FOUR 4-SCORES NAME UNVERIFIED COMPARISONS. rustup, GitHub template repositories, GitHub's merge queue and a spreadsheet cell. Probably fair; probably is not evidence.
-- THE FORMS ARE NOT READABLE. The score table wants a matrix, the front plot cannot be resized and opens the wrong note, and wiki links in prose are dead text. All routed to the retro, and none of them touches the content.
-
-ONE THING IS WORTH THE OWNER'S EYE BEFORE M5. req-overlay-survives-update is graded fatal in the register and was moved down as crippling here. The move is recorded; the grade is not changed. Whichever is right, the register and the sort should agree.
 
 ## follow_up
 
@@ -117,4 +88,5 @@ ONE THING IS WORTH THE OWNER'S EYE BEFORE M5. req-overlay-survives-update is gra
 - THE OPTIONS OUTLIVE THIS ITERATION. Twenty-three standing nodes are what a later record composes candidates from, and the chart is the artifact this milestone actually produced.
 
 ## anything_else
+
 

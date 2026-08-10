@@ -4,7 +4,7 @@
 // the renderers. Pinned after the blank-panel regression (owner order
 // 2026-07-27): a narrated visit must NEVER render empty.
 import { strict as assert } from "node:assert";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { CallLog } from "../engine/calllog.ts";
@@ -578,4 +578,89 @@ test("the mirror binds loopback only, so the record never leaves the machine", (
   // AND NOTHING RE-OPENS IT. A second listener added later without a host
   // would undo this silently, which is why every call is checked, not one.
   assert.equal(listens.filter((a) => !/127\.0\.0\.1|localhost/.test(a)).length, 0, "no listen call binds every interface");
+});
+
+// A [[REFERENCE]] IN PROSE IS A LINK (owner report 2026-08-09). The /doc
+// render used to hand [[cand-…]] back as literal text, so a reference in a
+// free-form field was a dead end exactly where a reader wants to check the
+// claim. A resolved id becomes the same doclink the structured editors emit;
+// an unresolved one stays text — a finding, not something to hide.
+test("/doc resolves wiki links to doclinks and leaves unresolved ones as text", async () => {
+  const { startMirror } = await import("../engine/mirror.ts");
+  const root = freshRoot();
+  const session = new Session(root);
+  writeFileSync(join(root, "project", "linkdoc.md"), "see [[meth-morphological-analysis]] beside [[no-such-node]]\n", "utf8");
+  const server = startMirror({ session, root, port: 0, log: new CallLog(seDir(root)), mode: "agent" });
+  await new Promise((r) => server.on("listening", r));
+  const port = (server.address() as { port: number }).port;
+  try {
+    const d = (await (await fetch(`http://localhost:${port}/doc?path=${encodeURIComponent("project/linkdoc.md")}`)).json()) as {
+      html: string;
+    };
+    assert.match(
+      d.html,
+      /<a class="doclink" data-path="project\/deliverable\/machines\/methods\/meth-morphological-analysis\.md">meth-morphological-analysis<\/a>/,
+      "a resolved id is a link",
+    );
+    assert.ok(d.html.includes("[[no-such-node]]"), "an unresolved id stays text — a finding, not hidden");
+  } finally {
+    server.close();
+  }
+});
+
+// SET TARGET ANSWERS IN PLACE (owner report 2026-08-09). As a redirecting
+// POST the button swallowed its own rejection: success and refusal both
+// 303ed, and the clicking page read nothing — "the button does nothing".
+// The refusal now rides back as JSON for the client to toast.
+test("/target/selected with no selection answers its rejection in place", async () => {
+  const { startMirror } = await import("../engine/mirror.ts");
+  const root = freshRoot();
+  const session = new Session(root);
+  const server = startMirror({ session, root, port: 0, log: new CallLog(seDir(root)), mode: "agent" });
+  await new Promise((r) => server.on("listening", r));
+  const port = (server.address() as { port: number }).port;
+  try {
+    const r = await fetch(`http://localhost:${port}/target/selected`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: "{}",
+      redirect: "manual",
+    });
+    assert.equal(r.status, 200, "answered in place, not a redirect");
+    const d = (await r.json()) as { kind?: string; expected?: string };
+    assert.equal(d.kind, "rejected", "the rejection rides the answer");
+    assert.match(d.expected ?? "", /selected state/, "and says what was missing");
+  } finally {
+    server.close();
+  }
+});
+
+// EVERY SURFACE GETS THE SAME CLOCK (owner, 2026-08-09: "every time
+// something takes long, I have to tell you"). The dispatcher times every
+// request and a slow one lands in the call log as mirror_slow — the same
+// log the retro mines, so nobody has to keep slowness in the back of their
+// mind. The env seam drops the tripwire to zero so any request trips it.
+test("a slow mirror request lands in the call log with its path and wait", async () => {
+  const { startMirror } = await import("../engine/mirror.ts");
+  const root = freshRoot();
+  const session = new Session(root);
+  const log = new CallLog(seDir(root));
+  process.env.SE_SLOW_MS = "0";
+  try {
+    const server = startMirror({ session, root, port: 0, log, mode: "agent" });
+    await new Promise((r) => server.on("listening", r));
+    const port = (server.address() as { port: number }).port;
+    try {
+      await (await fetch(`http://localhost:${port}/api/packet`)).json();
+    } finally {
+      server.close();
+    }
+  } finally {
+    delete process.env.SE_SLOW_MS;
+  }
+  const slow = log.query({ filter: { tool: "mirror_slow" } });
+  assert.ok(slow.total >= 1, "the request tripped the clock");
+  const rec = (slow.records ?? [])[slow.records ? slow.records.length - 1 : 0] as unknown as { args: { path?: string; ms?: number } };
+  assert.equal(rec.args.path, "/api/packet", "the path is named");
+  assert.ok(typeof rec.args.ms === "number", "and the wait is a number");
 });

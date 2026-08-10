@@ -47,7 +47,13 @@ evidence:
 
       4 and 5 need that name. No name, no score above 3.
 
-      A research agent scores, never the builder. See
+      A research agent scores, never the builder — and the research
+      agent is SPAWNED (owner ruling 2026-08-10). The walking agent
+      starts a subagent with a clean context to fill this table. It
+      receives the candidate records, the surviving axes, these anchors
+      and the prior-art list. It receives nothing of the composer's
+      reasoning. Its scores land verbatim; a disagreement is recorded
+      beside a score, never written over it. See
       [[meth-scoring-anchors]].
   - name: front
     template: pareto-plot
@@ -133,3 +139,19 @@ Between them is the region the decision actually lives in. A narrow box is the
 all-options-equal signal arriving as a number.
 
 A DISTANCE IS NOT A WINNER. Ranking the front by nearness to utopia is the early collapse into one number this method exists to prevent, wearing a geometric disguise.
+
+THE SECOND HAND IS SPAWNED, NOT HOPED FOR (owner ruling 2026-08-10).
+
+The i1 walk broke the research-agent rule: one session, one agent, and the
+same hands composed and scored. The rule stood as one prose line with no
+mechanism, and a rule without a mechanism loses. The mechanism:
+
+- The walking agent spawns a subagent with a CLEAN context to fill the
+  score table.
+- The subagent gets the candidate records, the surviving axes, the anchors
+  and the prior-art list. It does not get the composer's rationale, and it
+  does not get any standing scores.
+- The returned scores land verbatim. A disagreement is recorded beside the
+  disputed score, never over it.
+- A score table authored by the composer is the breach i1 recorded as an
+  issue on 2026-08-09. Its cost is a full second-hand re-score.

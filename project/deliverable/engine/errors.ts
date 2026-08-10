@@ -87,4 +87,5 @@ export const CLAUSES = {
   METHOD_WRITE_BOUND: "SE-C-134", // a method write while a record is bound would fan that record's copy over trunk
   NARRATION_STALLED: "SE-C-133", // updates keep coming while the checklist never moves — warned once, then refused
   RAW_NUL: "SE-C-132", // a raw NUL byte in text — it makes the whole file unsearchable; in code it is corrected to the escape, elsewhere the intent is not knowable
+  WRITE_TRANSFORMED: "SE-C-135", // the applied text does not contain the payload — something transformed it on the way in; refused rather than silently corrupted
 } as const;

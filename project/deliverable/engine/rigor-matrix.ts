@@ -7,7 +7,7 @@
 // run. Struck states (applies: none) vanish; their dependencies CONTRACT
 // through them, so the seeded machine stays connected.
 import { createHash } from "node:crypto";
-import { readdirSync, readFileSync } from "node:fs";
+import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import {
@@ -19,7 +19,7 @@ import {
   type StateDecl,
   validateMachine,
 } from "./machine.ts";
-import { parseStateNote, section } from "./notes.ts";
+import { parseStateNote, passEpoch, section } from "./notes.ts";
 
 const SRC = "engine/rigor-matrix.ts";
 
@@ -275,8 +275,47 @@ export function matrixDir(root: string): string {
 /** The matrix CONTENT hash — a pin records it, so drift between a pinned
  *  machine and the live matrix stays detectable (and silent until asked —
  *  owner verdict 2026-07-30). Data only; the Bases view is presentation. */
+const HASH_CACHE = new Map<string, { stamp: string; hash: string; epoch: number }>();
+
+/** THE HASH IS THE HONEST KEY, AND THE STAMP IS THE HONEST KEY FOR THE HASH.
+ *
+ *  The matrix cache below is keyed on CONTENT on purpose, and that stays. What
+ *  changes is how often the content is read to produce that key: this was
+ *  called about a hundred times to enter one record, reading all 48 rows every
+ *  time — 4,836 readFileSync calls, the single largest count in the profile.
+ *
+ *  So the hash memoises against size and modification time, and the matrix
+ *  still memoises against the hash. A stat sweep decides whether to read;
+ *  content still decides whether to recompile. */
+function rowsStamp(dir: string): string {
+  const rows = join(dir, "rows");
+  const parts: string[] = [];
+  try {
+    for (const file of readdirSync(rows)
+      .filter((f) => f.endsWith(".md"))
+      .sort()) {
+      const s = statSync(join(rows, file));
+      parts.push(`${file}:${s.size}:${s.mtimeMs}`);
+    }
+  } catch {
+    return "gone";
+  }
+  return parts.join("|");
+}
+
 export function rigorMatrixContentHash(root: string): string {
   const dir = matrixDir(root);
+  const hit = HASH_CACHE.get(dir);
+  // THE PASS ALREADY DECIDED THIS. The stamp sweep below is 48 stats and it
+  // was paid about a hundred times to enter one record — 4,836 of them — to
+  // re-answer a question no synchronous operation can change the answer to.
+  const era = passEpoch();
+  if (hit !== undefined && era !== 0 && hit.epoch === era) return hit.hash;
+  const stamp = rowsStamp(dir);
+  if (hit !== undefined && hit.stamp === stamp) {
+    hit.epoch = era;
+    return hit.hash;
+  }
   const h = createHash("sha256");
   for (const file of readdirSync(join(dir, "rows"))
     .filter((f) => f.endsWith(".md"))
@@ -284,7 +323,9 @@ export function rigorMatrixContentHash(root: string): string {
     h.update(`rows/${file}\n`);
     h.update(readFileSync(join(dir, "rows", file)));
   }
-  return h.digest("hex").slice(0, 12);
+  const hash = h.digest("hex").slice(0, 12);
+  HASH_CACHE.set(dir, { stamp, hash, epoch: era });
+  return hash;
 }
 
 const MATRIX_CACHE = new Map<string, { stamp: string; matrix: RigorMatrix }>();

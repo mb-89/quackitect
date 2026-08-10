@@ -14,6 +14,7 @@ import { Rejection } from "../engine/errors.ts";
 import { filePatch, fileRead } from "../engine/files.ts";
 import { contentHash } from "../engine/hash.ts";
 import { search } from "../engine/search.ts";
+import { anyGuidanceDoc } from "./helpers.ts";
 
 function fresh(): string {
   return mkdtempSync(join(tmpdir(), "se-v3-disc-"));
@@ -485,13 +486,9 @@ test("the unchanged gate is PER SCOPE — pull's green does not fence files' run
 // test; anything else is honest about having no scoped answer.
 test("the change-to-test map is by name and refuses to guess", () => {
   const root = productRoot();
-  const r = mapChangedToTests(root, [
-    "project/deliverable/engine/pull.ts",
-    "project/deliverable/tests/files.test.ts",
-    "project/guidance/voice.md",
-  ]);
+  const r = mapChangedToTests(root, ["project/deliverable/engine/pull.ts", "project/deliverable/tests/files.test.ts", anyGuidanceDoc()]);
   assert.deepEqual(r.mapped, ["project/deliverable/tests/files.test.ts", "project/deliverable/tests/pull.test.ts"]);
-  assert.deepEqual(r.unmapped, ["project/guidance/voice.md"]);
+  assert.deepEqual(r.unmapped, [anyGuidanceDoc()]);
   assert.equal(suiteFiles(root).length, 3);
   rmSync(root, { recursive: true, force: true });
 });

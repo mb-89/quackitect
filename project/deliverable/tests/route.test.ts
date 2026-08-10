@@ -5,7 +5,7 @@ import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import { computeRoute, type RouteNode } from "../engine/route.ts";
 import { Session } from "../engine/session.ts";
-import { freshRoot, readEverything } from "./helpers.ts";
+import { craftDocs, freshRoot, GUIDANCE, readEverything } from "./helpers.ts";
 
 /** A hand-drawn graph, so the search is tested without booting a machine. */
 function graph(edges: Record<string, string[]>, priority: Record<string, number> = {}) {
@@ -84,9 +84,9 @@ test("the route collects every judgment and every document up front", () => {
   // contract followed it into the prompt layer. Software and ux then left
   // the guidance root for applies_to, so no doc rides EVERY packet any more
   // and what the route collects is what the way itself pulls.
-  assert.ok(!clear.reads.includes("project/guidance/contract.md"), "a promoted source never rides the route");
-  assert.ok(!clear.reads.includes("project/guidance/craft/software.md"), "and craft guidance rides only the states it names");
-  assert.ok(clear.reads.includes("project/guidance/method/front-desk.md"), "and guidance the target PULLS, which no condition names");
+  assert.ok(!clear.reads.includes(GUIDANCE.contract), "a promoted source never rides the route");
+  assert.ok(!clear.reads.some((p) => craftDocs().includes(p)), "and craft guidance rides only the states it names");
+  assert.ok(clear.reads.includes(GUIDANCE.frontDeskMethod), "and guidance the target PULLS, which no condition names");
   // Lowered, every hop needing a person is listed - not just the first, so
   // they can all be answered in one sitting.
   s.setAutonomy(0);

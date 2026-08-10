@@ -9,7 +9,7 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { generateContinueExpedition, generateExpeditionArchive, shortId } from "../engine/expmachine.ts";
 import { Session } from "../engine/session.ts";
-import { checkDocs, freshRoot, readEverything } from "./helpers.ts";
+import { anyGuidanceDoc, checkDocs, freshRoot, readEverything } from "./helpers.ts";
 
 async function bootHuman(s: Session): Promise<void> {
   checkDocs(s);
@@ -135,7 +135,7 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
   // walk into the worktree; `.se/` is SESSION state and stays at the project
   // root. The handover used to resolve into the worktree, which has no .se —
   // so it was written where the next session never looks, and failed silently.
-  assert.equal(s.laneRoot("project/guidance/voice.md"), s.workRoot(), "project content rides the branch");
+  assert.equal(s.laneRoot(anyGuidanceDoc()), s.workRoot(), "project content rides the branch");
   assert.equal(s.laneRoot(".se/HANDOVER.md"), root, "the handover belongs to the root, whatever branch we stand on");
   assert.equal(s.laneRoot(), s.workRoot(), "no path named — the work root, as before");
   // The leave gate holds until the page passes; then close, end, return.

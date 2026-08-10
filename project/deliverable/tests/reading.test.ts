@@ -19,7 +19,7 @@ import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, freshRoot, proofFor, READ_DOCS } from "./helpers.ts";
+import { call, freshRoot, proofFor } from "./helpers.ts";
 
 interface Reading {
   path: string;
@@ -43,18 +43,22 @@ test("the first packet hands over one file, not a list of chores", () => {
 
 test("one read of the reading carries the whole walk, with nothing handed in", async () => {
   const { session, server } = pair();
-  const owed = (session.packet() as { route_reads: string[] }).route_reads.length;
+  // THE EXPECTATION IS ASKED, NEVER NAMED (owner ruling 2026-08-06): the
+  // route's own list, captured before the read consumes it, is what the
+  // reading must carry — two mechanisms cross-checked, no path pinned.
+  const wants = [...(session.packet() as { route_reads: string[] }).route_reads];
+  const owed = wants.length;
 
   const got = await call(server, "se_file_read", { path: ".se/reading.md" });
   assert.equal(got.isError, false, JSON.stringify(got.body));
   const credited = got.body.credited as string[];
   assert.equal(credited.length, owed, "reading it credited every document inside it");
-  for (const p of READ_DOCS) {
+  for (const p of wants) {
     assert.ok(credited.includes(p), `${p} rode in the reading and was credited by it`);
   }
   const content = String(got.body.content);
   assert.ok(content.includes("# The reading"), "it introduces itself");
-  for (const p of READ_DOCS) {
+  for (const p of wants) {
     assert.ok(content.includes(`## ${p}`), `${p} is headed by its own path, so a reader can tell the parts apart`);
   }
 
@@ -85,7 +89,8 @@ test("a page credits only the documents it showed whole", async () => {
 
 test("the reading PULLS: one document a pull, until it stops asking", async () => {
   const { session, server } = pair();
-  const owed = (session.packet() as { route_reads: string[] }).route_reads.length;
+  const wants = [...(session.packet() as { route_reads: string[] }).route_reads];
+  const owed = wants.length;
 
   const seen: string[] = [];
   let r = await call(server, "se_pull");
@@ -103,7 +108,7 @@ test("the reading PULLS: one document a pull, until it stops asking", async () =
   assert.notEqual(r.body.pull, "read", "pulling until nothing comes back terminates");
   assert.deepEqual(seen.length, owed, "one pull per document the way demanded");
   assert.equal(new Set(seen).size, seen.length, "what is read is never served twice");
-  for (const p of READ_DOCS) assert.ok(seen.includes(p), `${p} was handed over by the loop`);
+  for (const p of wants) assert.ok(seen.includes(p), `${p} was handed over by the loop`);
 
   // THE POINT: the proofs credited what was served, so the walk goes on.
   assert.equal(r.body.pull, "do", JSON.stringify(r.body));
