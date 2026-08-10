@@ -196,6 +196,18 @@ export async function call(server: Server, name: string, args: Record<string, un
   return { isError: r.isError, body: JSON.parse(r.content[0].text) as Record<string, unknown> };
 }
 
+export async function waitForTestJob(server: Server, job: string): Promise<Record<string, unknown>> {
+  for (;;) {
+    const response = await call(server, "se_test", {
+      job,
+      update: { op: "update", brief: "Read durable test verdict" },
+    });
+    if (response.isError) throw new Error(JSON.stringify(response.body));
+    if (response.body.running === false) return response.body;
+    await new Promise<void>((resolve) => setImmediate(resolve));
+  }
+}
+
 /** WHAT THE WALK OWES, ASKED — NEVER NAMED (owner ruling 2026-08-06:
  *  moving guidance must never break a test. It broke 18 assertions, every
  *  one pinning a path no rule guarantees). The engine's route carries the

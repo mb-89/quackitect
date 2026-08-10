@@ -3628,7 +3628,14 @@ export function renderMirror(
   traceCorpus?: string,
   /** WHICH NODE IS THE CENTRE. Empty means the vision. */
   traceOrigin?: string,
+  onPhase?: (phase: string, durationMs: number) => void,
 ): string {
+  let phaseStarted = performance.now();
+  const phase = (name: string): void => {
+    const now = performance.now();
+    onPhase?.(name, now - phaseStarted);
+    phaseStarted = now;
+  };
   const skin = embed === true ? NATIVE : "";
   const bodyClass = embed === true ? ` class="embed${widget === undefined ? "" : " solo"}"` : "";
   const info = m.session.describe() as { active: string[]; status: string };
@@ -3638,48 +3645,43 @@ export function renderMirror(
   const walkMachine = m.session.currentMachine();
   const { decl, canvas } = viewedMachine(m, view ?? walkMachine.id);
   const viewingWalk = decl.id === walkMachine.id;
+  phase("session");
   const history = m.session.instance.history ?? [];
-  const { leafActive, done, paint, subIds, openIds, meta } = drawingSets(m, decl, info, viewingWalk);
-  const marks = routeMarksFor(m, decl);
-  // EVERY STATE COLLECTS ALL ITS INPUTS (owner ruling 2026-08-06), so every
-  // multi-feeder state draws as a busbar — not only the gates.
-  //
-  // The drawing used to filter kind === "gate" here, and the enforcement in
-  // session.ts skipped anything that was not a gate. The two agreed with each
-  // other and both were wrong: generalize-use-cases took its feeders as an
-  // OR, on screen and in the check alike. THE BAR AND THE REFUSAL MUST USE
-  // THE SAME RULE, or a person reads a promise the engine does not keep.
-  //
-  // FALLBACK AND RECOVERY EDGES ARE NOT INPUTS. A fallback is the
-  // guard-failure path and its recovery edge points back the way it came, so
-  // neither taps the bar.
-  const INPUT_ROLES = new Set(["normal", "approval"]);
-  const busbars = decl.states
-    // THE BAR IS AUTHORED, so only a row that declares one draws one. A state
-    // with two inputs and no declared bar is an OR, and drawing a bar over it
-    // would promise an AND the engine does not enforce.
-    .filter((g) => g.busbar === true)
-    .map((g) => ({
-      into: g.id,
-      feeders: decl.states.filter((p) => p.edges.some((e) => e.to === g.id && INPUT_ROLES.has(e.role ?? "normal"))).map((p) => p.id),
-    }))
-    .filter((b) => b.feeders.length >= 2);
-  const svg = machineSvg(canvas, leafActive, paint, subIds, openIds, meta, busbars, marks);
-  const crumbs = crumbsFor(m, decl);
-
-  // ONE LIST FOR THE WHOLE RENDER. expeditionList() spawns git per record
-  // and does not vary per state; calling it inside the loop made the archive
-  // cost a spawn for every record TIMES every record, blocking the server.
-  const archived = decl.states.some((s) => s.tags?.includes("archive-record"))
-    ? (m.session.expeditionList() as { archive: { id: string }[] }).archive
-    : [];
-  const states = stateDetails(m, decl, done, archived);
-  const comment = (canvas.nodes ?? []).find((n) => n.type === "text")?.text ?? "";
+  let svg = "";
+  let crumbs = "";
+  let states: ReturnType<typeof stateDetails> = {};
+  let comment = "";
+  if (widget !== "trace") {
+    const { leafActive, done, paint, subIds, openIds, meta } = drawingSets(m, decl, info, viewingWalk);
+    const marks = routeMarksFor(m, decl);
+    const INPUT_ROLES = new Set(["normal", "approval"]);
+    const busbars = decl.states
+      .filter((gate) => gate.busbar === true)
+      .map((gate) => ({
+        into: gate.id,
+        feeders: decl.states
+          .filter((parent) => parent.edges.some((edge) => edge.to === gate.id && INPUT_ROLES.has(edge.role ?? "normal")))
+          .map((parent) => parent.id),
+      }))
+      .filter((bar) => bar.feeders.length >= 2);
+    svg = machineSvg(canvas, leafActive, paint, subIds, openIds, meta, busbars, marks);
+    crumbs = crumbsFor(m, decl);
+    const archived = decl.states.some((state) => state.tags?.includes("archive-record"))
+      ? (m.session.expeditionList() as { archive: { id: string }[] }).archive
+      : [];
+    states = stateDetails(m, decl, done, archived);
+    comment = (canvas.nodes ?? []).find((node) => node.type === "text")?.text ?? "";
+  }
+  phase("machine");
+  const packet = widget === "trace" ? { legal_tools: [] } : m.session.packet();
+  phase("packet");
+  const checkedDocs = m.session.humanCheckedPaths();
+  phase("checked_docs");
   const data = `<script type="application/json" id="se-data">${JSON.stringify({
     build: ENGINE_LIFE,
     target: m.session.target,
-    describe: m.session.describe(),
-    packet: m.session.packet(),
+    describe: info,
+    packet,
     lastPacket: m.lastPacket ?? null,
     states,
     comment,
@@ -3690,8 +3692,9 @@ export function renderMirror(
     // Every doc the reader has checked AT ITS CURRENT VERSION. A condition
     // names docs that are not always in the state's own pulled list, so the
     // page needs the session's list rather than a per-state one.
-    checkedDocs: m.session.humanCheckedPaths(),
+    checkedDocs,
   }).replace(/</g, "\\u003c")}</script>`;
+  phase("data");
 
   // The slider — THE AUTONOMY: which states the agent enters by itself
   // (priority <= autonomy). 0 = the human clicks through everything
@@ -3798,8 +3801,9 @@ export function renderMirror(
   // in flight, which is what somebody looking at an open iteration means.
   const corpora = m.session.corpora();
   const pick = corpora.find((c) => c.id === traceCorpus) ?? corpora[corpora.length - 1] ?? corpora[0];
-  const traceWidget = (): string =>
-    traceCard(
+  const traceWidget = (): string => {
+    const started = performance.now();
+    const html = traceCard(
       pick?.path ?? m.root,
       csv(traceProps),
       csv(traceTypes),
@@ -3810,8 +3814,12 @@ export function renderMirror(
       pick?.id ?? "trunk",
       traceOrigin ?? "",
     );
+    onPhase?.("trace", performance.now() - started);
+    return html;
+  };
   // Read per render, so editing the look files needs no restart.
   const pal = look(m.root);
+  phase("shared");
 
   if (widget === "trace") {
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · trace</title><style>${pal}${STYLE}${TRACE_STYLE} #w-trace{flex:1;border-bottom:0;min-height:0} body.solo #sidebar{display:flex;flex-direction:column;height:100vh}${skin}</style>${ELEMENTS}</head>

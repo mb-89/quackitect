@@ -674,6 +674,8 @@ export function startMirror(o: MirrorOptions): Server {
 
   // RENDER FIRST, THEN WRITE THE HEAD. See the note at the dispatcher's catch.
   const serveWidget = (widget: string, url: URL, res: Res): void => {
+    const profile = widget === "trace" || widget === "machine" ? ({} as Record<string, number>) : undefined;
+    const started = performance.now();
     const html = renderMirror(
       state,
       widget as "machine" | "details" | "log" | "terminal" | "table" | "trace",
@@ -686,7 +688,17 @@ export function startMirror(o: MirrorOptions): Server {
       url.searchParams.get("tq") ?? undefined,
       url.searchParams.get("tc") ?? undefined,
       url.searchParams.get("to") ?? undefined,
+      profile === undefined ? undefined : (phase, durationMs) => (profile[phase] = durationMs),
     );
+    if (profile !== undefined) {
+      o.log.append({
+        tool: "mirror_profile",
+        args: { path: url.pathname, widget, phases: profile },
+        ok: true,
+        outcome: "result",
+        duration_ms: performance.now() - started,
+      });
+    }
     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
     res.end(html);
   };

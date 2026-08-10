@@ -21,7 +21,7 @@ export interface ToolDef {
   title: string;
   description: string;
   inputSchema: Record<string, unknown>;
-  handler: (args: Record<string, unknown>) => unknown | Promise<unknown>;
+  handler: (args: Record<string, unknown>, context: RequestContext) => unknown | Promise<unknown>;
 }
 
 /** Dispatch middleware — may throw a Rejection to refuse the call (the toll). */
@@ -49,6 +49,24 @@ interface JsonRpcRequest {
   params?: Record<string, unknown>;
 }
 
+export interface TransportRequestMetadata {
+  protocolVersion?: string;
+  capabilities?: Record<string, unknown>;
+  clientInfo?: { name: string; version?: string };
+  sessionId?: string;
+}
+
+export interface RequestContext {
+  requestId: string;
+  protocolVersion: string;
+  capabilities: Record<string, unknown>;
+  workspaceId?: string;
+  sessionId?: string;
+  clientInfo?: { name: string; version?: string };
+}
+
+export type RequestContextAdapter = (request: JsonRpcRequest, metadata: TransportRequestMetadata) => RequestContext;
+
 interface JsonRpcResponse {
   jsonrpc: "2.0";
   id: number | string | null;
@@ -58,15 +76,32 @@ interface JsonRpcResponse {
 
 export const PROTOCOL_VERSION = "2025-06-18";
 
+export function requestContextAdapter(defaults: { workspaceId?: string } = {}): RequestContextAdapter {
+  return (request, metadata) => ({
+    requestId: String(request.id ?? "notification"),
+    protocolVersion: metadata.protocolVersion ?? PROTOCOL_VERSION,
+    capabilities: metadata.capabilities ?? {},
+    ...defaults,
+    ...(metadata.sessionId === undefined ? {} : { sessionId: metadata.sessionId }),
+    ...(metadata.clientInfo === undefined ? {} : { clientInfo: metadata.clientInfo }),
+  });
+}
+
 export class McpServer {
   private tools = new Map<string, ToolDef>();
   private guards: DispatchGuard[] = [];
   private decorators: ResultDecorator[] = [];
   private observers: CallObserver[] = [];
+  private readonly contextFor: RequestContextAdapter;
   readonly serverInfo: { name: string; version: string };
 
-  constructor(serverInfo: { name: string; version: string }, tools: ToolDef[] = []) {
+  constructor(
+    serverInfo: { name: string; version: string },
+    tools: ToolDef[] = [],
+    contextFor: RequestContextAdapter = requestContextAdapter(),
+  ) {
     this.serverInfo = serverInfo;
+    this.contextFor = contextFor;
     for (const t of tools) this.register(t);
   }
 
@@ -103,7 +138,7 @@ export class McpServer {
   }
 
   /** Handle one message. Returns null for notifications (no response). */
-  async handle(msg: JsonRpcRequest): Promise<JsonRpcResponse | null> {
+  async handle(msg: JsonRpcRequest, metadata: TransportRequestMetadata = {}): Promise<JsonRpcResponse | null> {
     if (msg.id === undefined || msg.id === null) return null; // notification
     const id = msg.id;
     try {
@@ -137,7 +172,8 @@ export class McpServer {
           const started = Date.now();
           try {
             for (const guard of this.guards) guard(name, args);
-            let result = await tool.handler(args);
+            const context = this.contextFor(msg, metadata);
+            let result = await tool.handler(args, context);
             for (const d of this.decorators) result = d(name, result);
             // Attachments are split off BEFORE the log sees them: base64 in
             // calls.jsonl would bloat it for no reader's benefit.

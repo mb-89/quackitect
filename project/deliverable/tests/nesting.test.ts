@@ -17,7 +17,7 @@ import { type ArchiveEntry, buildArchive } from "../engine/expmachine.ts";
 import { compileMachine } from "../engine/machines/compile.ts";
 import { renderMirror } from "../engine/render.ts";
 import { mainMachinePath, Session } from "../engine/session.ts";
-import { bootedServer, call, checkDocs, freshRoot } from "./helpers.ts";
+import { bootedServer, call, checkDocs, freshRoot, waitForTestJob } from "./helpers.ts";
 
 function entries(n: number): ArchiveEntry[] {
   return Array.from({ length: n }, (_, i) => ({ sid: `e${i + 1}`, full: `e${i + 1}-x`, goal: "" }));
@@ -372,12 +372,14 @@ test("se_answer records an aq entry and the feed types it aq", async () => {
   assert.equal(aq?.brief, "Where does the ruling live?", "the feed line is the question");
 });
 
-test("se_test: one call runs both scripts with structured verdicts", async () => {
+test("se_test: one job runs both scripts with structured verdicts", async () => {
   const root = freshRoot();
   const server = await bootedServer(root);
-  const t = await call(server, "se_test");
-  assert.equal(t.isError, false, JSON.stringify(t.body));
-  const body = t.body as unknown as { ok: boolean; results: { script: string; ok: boolean; output: string }[] };
-  assert.equal(body.results.length, 2);
-  assert.equal(body.ok, true, JSON.stringify(body.results));
+  const started = await call(server, "se_test");
+  assert.equal(started.isError, false, JSON.stringify(started.body));
+  assert.equal(started.body.handed_off, true, JSON.stringify(started.body));
+  const body = await waitForTestJob(server, String(started.body.job));
+  const results = body.results as { script: string; ok: boolean; output: string }[];
+  assert.equal(results.length, 2);
+  assert.equal(body.ok, true, JSON.stringify(results));
 });

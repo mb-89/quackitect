@@ -10,7 +10,7 @@
 //   §5  — honest truncation everywhere; results carry the remedy inline.
 
 import { spawn } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { CallLog } from "./calllog.ts";
 import { parseUpdate } from "./decisions.ts";
@@ -26,19 +26,19 @@ import {
   testRecord,
 } from "./discipline.ts";
 import { CLAUSES, Rejection, type RejectionPayload } from "./errors.ts";
-import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileReplace, fileWrite, type PatchOp } from "./files.ts";
+import type { PatchOp } from "./files.ts";
 import { gitLand, gitLane, gitSync } from "./gitlane.ts";
+import { contentHash } from "./hash.ts";
 import { appendNote, drainNote, type Priority, readNotes } from "./inbox.ts";
 import { capJson, capMiddle } from "./jsonio.ts";
 import { LINT_CONFIG, lintProse } from "./lint.ts";
 import { bumpDrawingEpoch } from "./machines/compile.ts";
-import { McpServer, type ToolDef } from "./mcp.ts";
-import { fileMove } from "./move.ts";
+import { McpServer, requestContextAdapter, type ToolDef } from "./mcp.ts";
+import { ModelFileSystem } from "./model-fs.ts";
 import { openPanel } from "./panel.ts";
 import { fansOut, resolveInRoot, seDir } from "./paths.ts";
 import { type MirrorState, renderMirror } from "./render.ts";
-import { HOST_SAFE_WAIT_MS, jobList, jobStatus, jobStop, jobWait, runBackground, runOrHandoff, startJob } from "./run.ts";
-import { search } from "./search.ts";
+import { jobDone, jobList, jobStatus, jobStop, runBackground, runToCompletion, startJob } from "./run.ts";
 import { Session } from "./session.ts";
 import { shoot } from "./shoot.ts";
 import { survey } from "./survey.ts";
@@ -187,7 +187,7 @@ export function sessionTools(session: Session): ToolDef[] {
         "Re-project the PROMPT LAYER — AGENTS.md, CLAUDE.md and the Copilot instructions — from project/guidance/ into the tree the lane is working in. Preflight names this script as its own remedy when what was placed has gone stale, so this is the verb behind that remedy. It resolves the tree itself, so the projection cannot land in the one you are not standing in.",
       inputSchema: { type: "object", properties: {} },
       handler: async () =>
-        runOrHandoff(session.workRoot(), "node --experimental-strip-types project/deliverable/engine/bin/place-prompt-layer.ts", {}),
+        runToCompletion(session.workRoot(), "node --experimental-strip-types project/deliverable/engine/bin/place-prompt-layer.ts"),
     },
     {
       name: "se_format",
@@ -199,7 +199,7 @@ export function sessionTools(session: Session): ToolDef[] {
         properties: { check: { type: "boolean", description: "report what would change and write nothing" } },
       },
       handler: async (args) =>
-        runOrHandoff(
+        runToCompletion(
           session.workRoot(),
           `node --experimental-strip-types project/deliverable/engine/bin/format-vault.ts${args.check === true ? " --check" : ""}`,
           {},
@@ -346,12 +346,7 @@ const MAX_READ_PATHS = 20;
  *  typed refusal in place of its content and the rest still come back. Losing
  *  seven good reads because the eighth is large would make the cheap call
  *  useless exactly where it is worth most. */
-function readMany(
-  rootOf: (rel?: string) => string,
-  entries: unknown[],
-  ref: string | undefined,
-  optional: boolean,
-): Record<string, unknown> {
+function readMany(model: ModelFileSystem, entries: unknown[], ref: string | undefined, optional: boolean): Record<string, unknown> {
   if (entries.length > MAX_READ_PATHS) {
     throw new Rejection({
       clause: CLAUSES.REQUIRED_ARGS,
@@ -369,7 +364,7 @@ function readMany(
     const spec = typeof e === "string" ? { path: e } : (e as { path?: unknown; offset?: unknown; limit?: unknown; optional?: unknown });
     const path = String(spec.path ?? "");
     try {
-      return fileRead(rootOf(path), path, {
+      return model.read(path, {
         ...(spec.offset !== undefined ? { offset: Number(spec.offset) } : {}),
         ...(spec.limit !== undefined ? { limit: Number(spec.limit) } : {}),
         ...(ref !== undefined ? { ref } : {}),
@@ -401,14 +396,14 @@ export interface ReadingHook {
  *  it never have to be asked for again. Undefined when the ask is not
  *  the reading: the plain read handles it. */
 function serveReading(
-  rootOf: (rel?: string) => string,
+  model: ModelFileSystem,
   reading: ReadingHook | undefined,
   args: Record<string, unknown>,
 ): Record<string, unknown> | undefined {
   if (reading === undefined || args.ref !== undefined || args.paths !== undefined) return undefined;
   if (String(args.path ?? "").replace(/\\/g, "/") !== reading.path) return undefined;
   reading.build();
-  const res = fileRead(rootOf(reading.path), reading.path, {
+  const res = model.read(reading.path, {
     ...(args.offset !== undefined ? { offset: Number(args.offset) } : {}),
     ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
     maxChars: READING_BUDGET,
@@ -419,12 +414,7 @@ function serveReading(
   return { ...res, credited: reading.credit(offset, lines) };
 }
 
-function readManyGuarded(
-  rootOf: (rel?: string) => string,
-  paths: unknown,
-  ref: string | undefined,
-  optional: boolean,
-): Record<string, unknown> {
+function readManyGuarded(model: ModelFileSystem, paths: unknown, ref: string | undefined, optional: boolean): Record<string, unknown> {
   if (!Array.isArray(paths)) {
     throw new Rejection({
       clause: CLAUSES.REQUIRED_ARGS,
@@ -434,19 +424,16 @@ function readManyGuarded(
       source: "engine/tools.ts se_file_read",
     });
   }
-  return readMany(rootOf, paths, ref, optional);
+  return readMany(model, paths, ref, optional);
 }
 
 /** The job side of se_run: list, stop, wait or status. Undefined when the
  *  call names no job — the command side handles it. */
-function jobArm(args: Record<string, unknown>): unknown {
-  if (args.jobs === true) return { jobs: jobList() };
+function jobArm(args: Record<string, unknown>, root: string): unknown {
+  if (args.jobs === true) return { jobs: jobList(root) };
   if (args.job === undefined) return undefined;
-  if (args.stop === true) return jobStop(String(args.job));
-  // THE WAIT RIDES THE JOB'S OWN DONE-PROMISE — it returns the moment
-  // the command exits, where a sleep always serves its full sentence.
-  if (args.wait_ms !== undefined) return jobWait(String(args.job), Number(args.wait_ms));
-  return jobStatus(String(args.job));
+  if (args.stop === true) return jobStop(String(args.job), root);
+  return jobStatus(String(args.job), root);
 }
 
 /** A TRUNCATING PIPE CUTS BEFORE THE ENGINE SEES. What Select-Object
@@ -476,6 +463,7 @@ export function coreTools(
   doors: () => Record<string, unknown>[] = () => [],
   mirror?: () => MirrorState,
 ): ToolDef[] {
+  const model = new ModelFileSystem(rootOf);
   return [
     {
       name: "se_file_read",
@@ -505,9 +493,9 @@ export function coreTools(
       handler: (args) => {
         const ref = args.ref !== undefined ? String(args.ref) : undefined;
         const optional = args.optional === true;
-        const served = serveReading(rootOf, reading, args);
+        const served = serveReading(model, reading, args);
         if (served !== undefined) return served;
-        if (args.paths !== undefined) return readManyGuarded(rootOf, args.paths, ref, optional);
+        if (args.paths !== undefined) return readManyGuarded(model, args.paths, ref, optional);
         if (args.path === undefined) {
           throw new Rejection({
             clause: CLAUSES.REQUIRED_ARGS,
@@ -517,7 +505,7 @@ export function coreTools(
             source: "engine/tools.ts se_file_read",
           });
         }
-        return fileRead(rootOf(String(args.path)), String(args.path), {
+        return model.read(String(args.path), {
           ...(args.offset !== undefined ? { offset: Number(args.offset) } : {}),
           ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
           ...(ref !== undefined ? { ref } : {}),
@@ -541,8 +529,7 @@ export function coreTools(
       },
       // Some harnesses serialize the scalar null as its string — both mean CREATE.
       handler: (args) =>
-        fileWrite(
-          rootOf(String(args.path)),
+        model.write(
           String(args.path),
           String(args.content),
           args.base_hash === null || args.base_hash === "null" ? null : String(args.base_hash),
@@ -639,7 +626,7 @@ export function coreTools(
             source: "engine/tools.ts",
           });
         }
-        return filePatch(rootOf(ops.length > 0 ? String(ops[0].path) : undefined), ops);
+        return model.patch(ops);
       },
     },
     {
@@ -659,7 +646,7 @@ export function coreTools(
         required: ["glob", "pattern", "replacement"],
       },
       handler: (args) =>
-        fileReplace(rootOf(String(args.glob)), String(args.glob), String(args.pattern), String(args.replacement), {
+        model.replace(String(args.glob), String(args.pattern), String(args.replacement), {
           ...(args.flags !== undefined ? { flags: String(args.flags) } : {}),
           ...(args.expect_count !== undefined ? { expect_count: Number(args.expect_count) } : {}),
         }),
@@ -677,7 +664,7 @@ export function coreTools(
         },
         required: ["from", "to"],
       },
-      handler: (args) => fileMove(rootOf(String(args.from)), String(args.from), String(args.to)),
+      handler: (args) => model.move(String(args.from), String(args.to)),
     },
     {
       name: "se_file_delete",
@@ -688,7 +675,7 @@ export function coreTools(
         properties: { path: { type: "string" }, base_hash: { type: "string" } },
         required: ["path", "base_hash"],
       },
-      handler: (args) => fileDelete(rootOf(String(args.path)), String(args.path), String(args.base_hash)),
+      handler: (args) => model.delete(String(args.path), String(args.base_hash)),
     },
     {
       name: "se_file_list",
@@ -699,7 +686,7 @@ export function coreTools(
         type: "object",
         properties: { dir: { type: "string", default: "." } },
       },
-      handler: (args) => fileList(rootOf(String(args.dir ?? ".")), String(args.dir ?? ".")),
+      handler: (args) => model.list(String(args.dir ?? ".")),
     },
     {
       name: "se_file_glob",
@@ -718,8 +705,7 @@ export function coreTools(
       // Called with no argument, a bound worktree answered instead — and the
       // worktree has no .se/roots.json, so every declared root read as
       // undeclared while the READER resolved the same name fine.
-      handler: (args) =>
-        fileGlob(rootOf(String(args.glob)), String(args.glob), { ...(args.ref !== undefined ? { ref: String(args.ref) } : {}) }),
+      handler: (args) => model.glob(String(args.glob), { ...(args.ref !== undefined ? { ref: String(args.ref) } : {}) }),
     },
     {
       name: "se_file_search",
@@ -749,7 +735,7 @@ export function coreTools(
       },
       // The PATH scope carries the root selector here, for the same reason.
       handler: (args) =>
-        search(rootOf(args.path === undefined ? undefined : String(args.path)), String(args.query), {
+        model.search(String(args.query), {
           ...(args.path !== undefined ? { path: String(args.path) } : {}),
           ...(args.ref !== undefined ? { ref: String(args.ref) } : {}),
           ...(args.ignore_case === true ? { ignore_case: true } : {}),
@@ -803,7 +789,7 @@ export function coreTools(
     {
       name: "se_run",
       title: "se.run",
-      description: `Run a shell command from the project root (bash on POSIX, PowerShell on Windows) — for what ONLY a shell does: node, npm, builds, processes. THE LANE'S JOBS ARE REFUSED HERE: ${laneSummary()}. A first offence per category runs once with a warning; after that the category refuses (SE-C-129) with the lane call as the remedy. If the lane truly cannot do the job, pass no_tool_reason — the command runs once and your reason is logged for the retro.\n\nOutput is engine-captured and logged IN FULL under the returned call ref — a run is citable evidence.\n\nNOBODY WAITS. A command still running after 20s is HANDED OFF to the background and you get a job handle at once; ask again with {job} for its output so far, and {job, stop: true} to kill it and everything it spawned. Start long work in the background yourself with {background: true}. {jobs: true} lists this session's jobs.\n\nNEVER call this session's own mirror over HTTP from here — the run blocks the server's event loop, so the mirror cannot answer itself.`,
+      description: `Run a shell command from the project root (bash on POSIX, PowerShell on Windows) — for what ONLY a shell does: node, npm, builds, processes. THE LANE'S JOBS ARE REFUSED HERE: ${laneSummary()}. A first offence per category runs once with a warning; after that the category refuses (SE-C-129) with the lane call as the remedy. If the lane truly cannot do the job, pass no_tool_reason — the command runs once and your reason is logged for the retro.\n\nOutput is engine-captured and logged IN FULL under the returned call ref. Foreground waits for process completion. Background returns a job immediately. Use {job} for status or {job, stop: true} to cancel. {jobs: true} lists this session's jobs.\n\nNEVER call this session's own mirror over HTTP from here — the run blocks the server's event loop, so the mirror cannot answer itself.`,
       inputSchema: {
         type: "object",
         properties: {
@@ -815,19 +801,15 @@ export function coreTools(
           },
           background: { type: "boolean", description: "start it detached and return a job handle IMMEDIATELY — for work you know is long" },
           job: { type: "string", description: "ask an existing job how it is doing: its output so far, whether it still runs" },
-          wait_ms: {
-            type: "number",
-            description: `with job: BLOCK up to this long on the job's completion — returns the moment it exits. The replacement for every Start-Sleep. Capped at ${HOST_SAFE_WAIT_MS} — the host kills a longer block before it answers; poll until running is false.`,
-          },
           stop: { type: "boolean", description: "with job: kill it and every process it spawned" },
           jobs: { type: "boolean", description: "list every job this session started, newest first" },
-          handoff_ms: { type: "number", description: "how long to wait inline before handing off to the background (default 20000)" },
           timeout_ms: { type: "number" },
           cwd: { type: "string", description: "root-relative working directory" },
         },
       },
       handler: async (args) => {
-        const job = jobArm(args);
+        const root = rootOf();
+        const job = jobArm(args, root);
         if (job !== undefined) return job;
         if (args.command === undefined) {
           throw new Rejection({
@@ -849,11 +831,8 @@ export function coreTools(
         const cwd = args.cwd !== undefined ? { cwd: String(args.cwd) } : {};
         const res =
           args.background === true
-            ? runBackground(rootOf(), String(args.command), cwd)
-            : await runOrHandoff(rootOf(), String(args.command), {
-                ...cwd,
-                ...(args.handoff_ms !== undefined ? { handoff_ms: Number(args.handoff_ms) } : {}),
-              });
+            ? runBackground(root, String(args.command), cwd)
+            : await runToCompletion(root, String(args.command), cwd);
         return annotateRun(res, String(args.command), laneWarning);
       },
     },
@@ -861,7 +840,7 @@ export function coreTools(
       name: "se_test",
       title: "se.test",
       description:
-        "Run tests STRUCTURED — scoped by default, the battery when you earn it. {files: ['pull']} runs pull.test.ts (add name_pattern to narrow further) and returns counts plus ONLY the failures' detail, so nothing needs a temp file or a grep. NO ARGUMENTS runs the battery (preflight + full selftest) — and REFUSES (SE-C-131) while every change since the last green battery maps to a named test file: the refusal hands you that exact scoped call. Piecemeal past a third of the suite flips the other way: the battery becomes the sanctioned, cheaper call. AN UNCHANGED TREE REFUSES its scope (SE-C-130) — that verdict still stands; force: true is the flake door for both gates.",
+        "Run tests STRUCTURED as a durable job. Starting returns a handle immediately. Call again with {job} to read current status or the final verdict. Scoped runs use files and optional name_pattern. NO ARGUMENTS runs the earned battery. AN UNCHANGED TREE REFUSES its scope unless force is true.",
       inputSchema: {
         type: "object",
         properties: {
@@ -874,11 +853,7 @@ export function coreTools(
           force: { type: "boolean", description: "override both gates: unchanged tree, and battery/scope economics — for flake hunts" },
           job: {
             type: "string",
-            description: "fetch a handed-off run's verdict by its handle — the counts are recorded even when the original call timed out",
-          },
-          wait_ms: {
-            type: "number",
-            description: `with job: block up to this long for the verdict. Capped at ${HOST_SAFE_WAIT_MS} — the host kills a longer block before it answers; poll until running is false.`,
+            description: "read a test job's current status or final verdict without waiting",
           },
         },
       },
@@ -891,32 +866,26 @@ export function coreTools(
         // orphaned workers held a folder lock for four hours). Children run
         // in the job registry — whole-tree killed on timeout, reaped at
         // shutdown, visible to se_run {jobs: true}.
-        const spawnNode = async (argv: string[], timeout: number): Promise<{ status: number | null; out: string }> => {
+        const spawnNode = async (argv: string[]): Promise<{ status: number | null; out: string }> => {
           let out = "";
-          const started = startJob(`node --test (${argv.length} args)`, () => {
-            const child = spawn("node", argv, { cwd: root, windowsHide: true, detached: process.platform !== "win32" });
-            child.stdout?.setEncoding("utf8");
-            child.stderr?.setEncoding("utf8");
-            child.stdout?.on("data", (c: string) => {
-              out += c;
-            });
-            child.stderr?.on("data", (c: string) => {
-              out += c;
-            });
-            return child;
-          });
-          let v = jobStatus(started.job);
-          let waited = 0;
-          while (v.running && waited < timeout) {
-            const step = Math.min(HOST_SAFE_WAIT_MS, timeout - waited);
-            v = await jobWait(started.job, step);
-            waited += step;
-          }
-          if (v.running) {
-            jobStop(started.job);
-            return { status: null, out };
-          }
-          return { status: v.exit, out };
+          const started = startJob(
+            `node --test (${argv.length} args)`,
+            () => {
+              const child = spawn("node", argv, { cwd: root, windowsHide: true, detached: process.platform !== "win32" });
+              child.stdout?.setEncoding("utf8");
+              child.stderr?.setEncoding("utf8");
+              child.stdout?.on("data", (c: string) => {
+                out += c;
+              });
+              child.stderr?.on("data", (c: string) => {
+                out += c;
+              });
+              return child;
+            },
+            root,
+          );
+          const result = await jobDone(started.job);
+          return { status: result.exit, out };
         };
         const runScoped = async (): Promise<Record<string, unknown>> => {
           const { files, named } = scopedFiles(root, args.files);
@@ -929,7 +898,7 @@ export function coreTools(
             ...(args.name_pattern !== undefined ? [`--test-name-pattern=${String(args.name_pattern)}`] : []),
             ...files.map((f) => resolveInRoot(root, f, "engine/tools.ts se_test")),
           ];
-          const r = await spawnNode(argv, Number(process.env.SE_TEST_SCOPED_TIMEOUT_MS ?? 150_000));
+          const r = await spawnNode(argv);
           const tap = parseTap(r.out);
           const ok = r.status === 0 && tap.fail === 0;
           const streak = testRecord(se, root, ok, scope, files);
@@ -958,7 +927,7 @@ export function coreTools(
             const abs = resolveInRoot(root, rel, "engine/tools.ts se_test");
             // The battery is long BY DESIGN now that boot walks read real
             // guidance — 150s killed it mid-run. Configurable, generous default.
-            const r = await spawnNode([abs, "--root", root], Number(process.env.SE_TEST_TIMEOUT_MS ?? 600_000));
+            const r = await spawnNode([abs, "--root", root]);
             results.push({ script: rel, ok: r.status === 0, exit: r.status, output: capMiddle(r.out.trim(), 4000) });
           }
           const ok = results.every((x) => x.ok);
@@ -972,83 +941,59 @@ export function coreTools(
         // THE LAST RUN SIZES THE EXPECTATION (owner ruling 2026-08-03): a
         // battery caller is told how long the previous one took — measured,
         // never guessed — or told plainly that no record exists.
-        const pace = args.files === undefined && args.name_pattern === undefined ? batteryPace(se) : "";
-        const entry: { done: Promise<void>; verdict?: Record<string, unknown>; started: number; pace: string } = {
+        const battery = args.files === undefined && args.name_pattern === undefined;
+        const pace = battery ? batteryPace(se) : "";
+        const entry: TestJobEntry = {
           done: undefined as unknown as Promise<void>,
           started: Date.now(),
           pace,
         };
-        // FIRE AND FORGET (owner ruling 2026-08-03): the verdict writes
-        // itself into the call log at completion, fetched or not. A caller
-        // works elsewhere while the run lives, and the retro reads the
-        // battery's failure rate from the log.
-        let detached = false;
+        // FIRE AND FORGET: completion records the verdict through the job promise.
         entry.done = work.then(
-          // The handler runs long after the call, OUTSIDE buildServer's
-          // scope — it builds its own CallLog, and it may NEVER throw: a
-          // rejection here rode a pending fetch through the transport and
-          // killed the engine (2026-08-03).
-          (v) => {
-            entry.verdict = { job: id, running: false, ...v };
-            if (detached) {
-              try {
-                new CallLog(seDir(projectRoot)).append({
-                  tool: "se_test_verdict",
-                  args: { job: id, battery: pace !== "" },
-                  ok: v.ok === true,
-                  outcome: "result",
-                  duration_ms: Date.now() - entry.started,
-                  response: {
-                    ok: v.ok,
-                    ...(v.tests !== undefined ? { tests: v.tests } : {}),
-                    ...(v.results !== undefined ? { results: v.results } : {}),
-                  },
-                });
-              } catch {
-                // bookkeeping never kills the engine
-              }
+          (value) => {
+            entry.verdict = { job: id, running: false, ...value };
+            persistTestJob(se, id, entry);
+            try {
+              new CallLog(seDir(projectRoot)).append({
+                tool: "se_test_verdict",
+                args: { job: id, battery },
+                ok: value.ok === true,
+                outcome: "result",
+                duration_ms: Date.now() - entry.started,
+                response: {
+                  ok: value.ok,
+                  ...(value.tests !== undefined ? { tests: value.tests } : {}),
+                  ...(value.results !== undefined ? { results: value.results } : {}),
+                },
+              });
+            } catch {
+              // bookkeeping never kills the engine
             }
           },
-          (e) => {
-            entry.verdict = { job: id, running: false, refused: e instanceof Rejection ? e.toJSON() : String(e) };
-            if (detached) {
-              try {
-                new CallLog(seDir(projectRoot)).append({
-                  tool: "se_test_verdict",
-                  args: { job: id, battery: pace !== "" },
-                  ok: false,
-                  outcome: "rejected",
-                  duration_ms: Date.now() - entry.started,
-                  response: entry.verdict,
-                });
-              } catch {
-                // bookkeeping never kills the engine
-              }
+          (error) => {
+            entry.verdict = { job: id, running: false, refused: error instanceof Rejection ? error.toJSON() : String(error) };
+            persistTestJob(se, id, entry);
+            try {
+              new CallLog(seDir(projectRoot)).append({
+                tool: "se_test_verdict",
+                args: { job: id, battery },
+                ok: false,
+                outcome: "rejected",
+                duration_ms: Date.now() - entry.started,
+                response: entry.verdict,
+              });
+            } catch {
+              // bookkeeping never kills the engine
             }
           },
         );
         testVerdicts.set(id, entry);
-        let timer: NodeJS.Timeout | undefined;
-        const winner = await Promise.race<{ v: Record<string, unknown> } | { e: unknown } | "handoff">([
-          work.then(
-            (v) => ({ v }),
-            (e) => ({ e }),
-          ),
-          new Promise<"handoff">((r) => {
-            timer = setTimeout(() => r("handoff"), Number(process.env.SE_TEST_HANDOFF_MS ?? 45_000));
-          }),
-        ]);
-        if (timer !== undefined) clearTimeout(timer);
-        if (winner === "handoff") {
-          detached = true;
-          return {
-            handed_off: true,
-            job: id,
-            note: `still running — it moved to the background rather than hold you. The verdict LOGS ITSELF when the run ends (an se_test_verdict record in the call log); do other work meanwhile, or fetch with se_test {job: "${id}"} — each fetch waits at most ${HOST_SAFE_WAIT_MS / 1000}s.${pace}`,
-          };
-        }
-        if ("e" in (winner as object)) throw (winner as { e: unknown }).e;
-        return (winner as { v: Record<string, unknown> }).v;
+        persistTestJob(se, id, entry);
+        return {
+          handed_off: true,
+          job: id,
+          note: `running in the background. Call se_test with {job: "${id}"} to read status. The final verdict records itself.${pace}`,
+        };
       },
     },
     {
@@ -1165,7 +1110,7 @@ export function coreTools(
         // suspected. Only files WITH findings come back, so a clean tree
         // answers small, and anything dropped is named rather than implied.
         if (args.glob !== undefined) {
-          const g = fileGlob(root, String(args.glob));
+          const g = model.glob(String(args.glob));
           const md = g.files.filter((f) => f.endsWith(".md"));
           // A STATE NOTE KEEPS ITS PROSE IN THE FRONTMATTER. `guidance` is
           // read by an agent on every single visit, so it is the prose that
@@ -1414,16 +1359,58 @@ function kickTypecheck(root: string): void {
 }
 const EDIT_TOOLS = new Set(["se_file_write", "se_file_patch", "se_file_replace", "se_file_move"]);
 
-const testVerdicts = new Map<string, { done: Promise<void>; verdict?: Record<string, unknown>; started: number; pace: string }>();
+interface TestJobEntry {
+  done: Promise<void>;
+  verdict?: Record<string, unknown>;
+  started: number;
+  pace: string;
+}
+interface PersistedTestJob {
+  id: string;
+  started: number;
+  pace: string;
+  verdict?: Record<string, unknown>;
+}
+const testVerdicts = new Map<string, TestJobEntry>();
 let testSeq = 0;
+
+function testJobPath(se: string, id: string): string {
+  return join(se, "test-jobs", `${id}.jsonl`);
+}
+
+function persistTestJob(se: string, id: string, entry: TestJobEntry): void {
+  mkdirSync(join(se, "test-jobs"), { recursive: true });
+  const record: PersistedTestJob = {
+    id,
+    started: entry.started,
+    pace: entry.pace,
+    ...(entry.verdict === undefined ? {} : { verdict: entry.verdict }),
+  };
+  appendFileSync(testJobPath(se, id), `${JSON.stringify(record)}\n`, "utf8");
+}
+
+function recoverTestJob(se: string, id: string): TestJobEntry | undefined {
+  const path = testJobPath(se, id);
+  if (!existsSync(path)) return undefined;
+  const lines = readFileSync(path, "utf8").trimEnd().split("\n");
+  for (let index = lines.length - 1; index >= 0; index--) {
+    try {
+      const record = JSON.parse(lines[index]) as PersistedTestJob;
+      return { done: Promise.resolve(), started: record.started, pace: record.pace, verdict: record.verdict };
+    } catch {
+      // An incomplete final append never hides the preceding valid state.
+    }
+  }
+  return undefined;
+}
 
 /** THE VERDICT OUTLIVES THE CALL (found 2026-08-02: the battery outran
  *  the MCP client's timeout and the counts were lost). Past the
  *  handoff budget the caller gets a handle; the run carries on, the
  *  verdict is recorded, and {job} serves it. */
-async function testJobArm(args: Record<string, unknown>, se: string): Promise<Record<string, unknown>> {
+function testJobArm(args: Record<string, unknown>, se: string): Record<string, unknown> {
   const id = String(args.job);
-  const t = testVerdicts.get(id);
+  const t = testVerdicts.get(id) ?? recoverTestJob(se, id);
   if (t === undefined) {
     throw new Rejection({
       clause: CLAUSES.JOB_UNKNOWN,
@@ -1433,17 +1420,23 @@ async function testJobArm(args: Record<string, unknown>, se: string): Promise<Re
       source: "engine/tools.ts se_test",
     });
   }
-  if (args.wait_ms !== undefined) {
-    await Promise.race([t.done, new Promise((r) => setTimeout(r, Math.max(0, Math.min(Number(args.wait_ms), HOST_SAFE_WAIT_MS))))]);
-  }
   if (t.verdict !== undefined) return t.verdict;
+  if (!testVerdicts.has(id)) {
+    return {
+      job: id,
+      running: false,
+      state: "owner_unavailable",
+      elapsed_ms: Date.now() - t.started,
+      note: "The server owning this unfinished test job is unavailable. Start a new test run.",
+    };
+  }
   const progress = t.pace !== "" ? batteryProgress(se, t.started) : undefined;
   return {
     job: id,
     running: true,
     elapsed_ms: Date.now() - t.started,
     ...(progress !== undefined ? { progress } : {}),
-    note: `still running — ask again with {job}. Each wait blocks at most ${HOST_SAFE_WAIT_MS / 1000}s; poll until running is false.${t.pace}`,
+    note: `still running. Call again with {job} to read current status.${t.pace}`,
   };
 }
 
@@ -1505,7 +1498,11 @@ export function buildServer(
       "decision-graph update riding this call — narrate as you work. {op: plan|fork|done|obsolete|revert|update, brief?, items?, node?}: plan {items} starts the state's checklist; fork {brief, items?} opens an unplanned branch where you are; done|obsolete|revert {node, brief} resolves a node — everything started gets resolved, silently abandoning is illegal; update {node, brief} says what you are doing ON an item — the node is REQUIRED while any item stands open, because an update that moves nothing on the checklist is narration, not progress (with nothing open, a bare update is right); defer {node, to} parks a point for the state that can do it — it arrives there as an open to-do. Every call answers with update_result, carrying the open node map and any nudge. A volunteered update resets the toll; when the toll lapses, the next call must carry one.",
   };
   for (const t of tools) (t.inputSchema.properties as Record<string, unknown>).update = UPDATE_PROP;
-  const server = new McpServer({ name: "se-mcp", version: "3.0.0-bootstrap" }, tools);
+  const server = new McpServer(
+    { name: "se-mcp", version: "3.0.0-bootstrap" },
+    tools,
+    requestContextAdapter({ workspaceId: `workspace-${contentHash(root)}` }),
+  );
   const log = new CallLog(seDir(root));
   const toll = new Toll({ ...tollOpts, cadence: () => ({ minutes: session.narrationMinutes, calls: session.narrationCalls }) });
 

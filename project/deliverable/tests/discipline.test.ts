@@ -5,7 +5,7 @@
 // missing verbs here, and se_run learns to say no to the jobs it now covers.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -519,28 +519,46 @@ test("parseTap keeps the counts and only the failures' detail", () => {
 
 import { streakNudge } from "../engine/discipline.ts";
 // ── waiting, and the streak ────────────────────────────────────────────────
-// Found live 2026-08-02: an agent burned ~15 minutes of one hour in
-// 100-second Start-Sleep calls, hand-polling a background job the lane gave
-// it no way to wait on. The wait verb is the lane's answer; the rule makes
-// the sleep a named lane job; the streak carries the 95% law back on every
-// green result.
-import { jobWait, runBackground } from "../engine/run.ts";
+// A sleeping shell blocks the lane without learning anything. Jobs expose
+// immediate status to callers and a completion promise inside the engine.
+import { jobDone, runBackground } from "../engine/run.ts";
 
-test("the sleep classifies as a lane job pointing at the wait verb", () => {
+test("the sleep classifies as a lane job pointing at status polling", () => {
   assert.equal(classifyCommand("Start-Sleep -Seconds 100; Write-Output ok")?.category, "waiting");
   assert.equal(classifyCommand("sleep 5 && echo done")?.category, "waiting");
   assert.equal(classifyCommand("node --test x.test.ts")?.category, "tests", "tests still classify first");
 });
 
-test("jobWait returns the MOMENT the job exits, not at the bound", async () => {
+test("jobDone follows the process completion callback", async () => {
   const root = fresh();
-  const cmd = process.platform === "win32" ? "Start-Sleep -Milliseconds 300" : "sleep 0.3";
-  const j = runBackground(root, cmd, {});
-  const t0 = Date.now();
-  const v = await jobWait(j.job, 10_000);
-  const waited = Date.now() - t0;
-  assert.equal(v.running, false, "the job completed inside the wait");
-  assert.ok(waited < 5_000, `returned on completion (${waited}ms), nowhere near the 10s bound`);
+  const command = process.platform === "win32" ? "Write-Output done" : "printf done";
+  const job = runBackground(root, command, {});
+  const result = await jobDone(job.job);
+  assert.equal(result.running, false);
+  assert.equal(result.exit, 0);
+  appendFileSync(join(root, ".se", "jobs", `${job.job}.jsonl`), '{"id":', "utf8");
+  const moduleUrl = new URL("../engine/run.ts", import.meta.url).href;
+  const probe = spawnSync(
+    process.execPath,
+    [
+      "--input-type=module",
+      "--eval",
+      `import { jobList, jobStatus } from ${JSON.stringify(moduleUrl)}; const status = jobStatus(process.argv[1], process.argv[2]); const listed = jobList(process.argv[2]).find((item) => item.job === process.argv[1]); process.stdout.write(JSON.stringify({ status, listed }));`,
+      job.job,
+      root,
+    ],
+    { encoding: "utf8" },
+  );
+  assert.equal(probe.status, 0, probe.stderr);
+  const recovered = JSON.parse(probe.stdout) as {
+    status: { running: boolean; exit: number | null; stdout: string };
+    listed: { job: string; exit: number | null };
+  };
+  assert.equal(recovered.status.running, false);
+  assert.equal(recovered.status.exit, 0);
+  assert.equal(recovered.status.stdout.trim(), "done");
+  assert.equal(recovered.listed.job, job.job);
+  assert.equal(recovered.listed.exit, 0);
   rmSync(root, { recursive: true, force: true });
 });
 

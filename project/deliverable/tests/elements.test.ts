@@ -44,7 +44,7 @@ test("the reader's check is read from the session, not from one state's pull", (
   // often it was clicked, while the server recorded every click
   // (found live 2026-07-30).
   const src = renderSrc();
-  assert.match(src, /checkedDocs: m\.session\.humanCheckedPaths\(\)/, "the server has to send the session's checked list");
+  assert.match(src, /const checkedDocs = m\.session\.humanCheckedPaths\(\)/, "the server has to read the session's checked list");
   assert.match(src, /D\.checkedDocs/, "and the page has to read it");
 });
 
