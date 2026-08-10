@@ -105,6 +105,7 @@ import {
   type EmbeddedDoc,
   elementMatrixArgs,
   nodeField,
+  nodeList,
   parseIsland,
   stateFormFields,
   stateFormModel,
@@ -3459,7 +3460,15 @@ export class Session {
       const head = [`| ${f.of ?? "node"} | ${cols.join(" | ")} |`, `| ${["---", ...cols.map(() => "---")].join(" | ")} |`];
       const rows = (model.field_args[f.name]?.items ?? []).map((id) => {
         const file = byId.get(id)?.file;
-        const cells = cols.map((c) => (file === undefined ? "" : nodeField(file, c).replace(/\|/g, "\\|")));
+        // A LIST-VALUED KEY reads empty through the scalar reader, so the
+        // list reader answers where the scalar one has nothing — joined
+        // with · for the one-line cell, split on it by the write half.
+        const cells = cols.map((c) => {
+          if (file === undefined) return "";
+          const scalar = nodeField(file, c);
+          const v = scalar !== "" ? scalar : nodeList(file, c).join(" · ");
+          return v.replace(/\|/g, "\\|");
+        });
         return `| [[${id}]] | ${cells.join(" | ")} |`;
       });
       out[f.name] = [...head, ...rows].join("\n");
@@ -4129,7 +4138,22 @@ export class Session {
         if (file === undefined) continue;
         let raw = readFileSync(file, "utf8");
         cols.forEach((c, i) => {
-          raw = withFrontmatter(raw, c, (cells[i + 1] ?? "").replace(/\\\|/g, "|"));
+          const v = (cells[i + 1] ?? "").replace(/\\\|/g, "|");
+          // A key that is a LIST on disk stays a list: the cell splits on
+          // the · the read half joined with. The yaml writer quotes each
+          // entry itself, so a colon in a test name cannot break the node.
+          const isList = nodeField(file, c) === "" && nodeList(file, c).length > 0;
+          raw =
+            isList || v.includes(" · ")
+              ? withFrontmatterList(
+                  raw,
+                  c,
+                  v
+                    .split(" · ")
+                    .map((x) => x.trim())
+                    .filter((x) => x !== ""),
+                )
+              : withFrontmatter(raw, c, v);
         });
         writeFileSync(file, raw, "utf8");
         touched.push(id);
