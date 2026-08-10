@@ -80,6 +80,10 @@ checks:
     equals: decision
     require_section: Consequences
     hint: a decision says what it binds from now on
+  - field: kind
+    equals: decision
+    require_ref_in: source_refs
+    hint: a decision names what forced it — at least one id or link in source_refs
 ---
 
 # raid — one risk, assumption, issue, dependency, or decision

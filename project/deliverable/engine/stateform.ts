@@ -597,7 +597,67 @@ export function claimProblems(root: string, s: StateDecl, body: string, corpus: 
     };
     out.push(...fieldProblems(f.name, metas.get(name) as TemplateMeta, args, content, nodes, root));
   }
+  // THE STRUCTURAL LAWS run whether or not the field carries text — a
+  // computed field's section can be empty while the law is broken.
+  for (const f of s.evidence_form) {
+    if (f.template === "element-matrix") out.push(...structureLawProblems(f.name, nodes));
+    if (f.template === "scenario-deck") out.push(...deckLawProblems(f.name, section(body, f.name), nodes));
+  }
   return out;
+}
+
+/** THE STRUCTURAL LAWS, computed at every submit (owner ruling 2026-08-10:
+ *  what the engine can check, the engine checks). They read the corpus, so a
+ *  node landing later greys the signed claim through the stamp, and the
+ *  re-submit refuses until the law holds again. */
+export function structureLawProblems(fieldName: string, corpus: { id: string; type: string; file?: string }[]): string[] {
+  const out: string[] = [];
+  const fmOf = (n: { file?: string }): Record<string, unknown> => (n.file === undefined ? {} : (noteOf(n.file)?.frontmatter ?? {}));
+  const typed = (t: string) => corpus.filter((n) => n.type === t && n.file !== undefined);
+  const implementers = [...typed("element"), ...typed("interface")].map((n) => ({
+    id: n.id,
+    implements: fmList(fmOf(n).implements),
+    satisfies: fmList(fmOf(n).satisfies),
+  }));
+  const v = elementMatrixView(
+    typed("element").map((n) => ({ id: n.id, group: "", implements: fmList(fmOf(n).implements) })),
+    typed("function").map((n) => ({ id: n.id, inputs: fmList(fmOf(n).inputs), outputs: fmList(fmOf(n).outputs) })),
+    typed("interface").map((n) => ({
+      id: n.id,
+      source: String(fmOf(n).source ?? ""),
+      destination: String(fmOf(n).destination ?? ""),
+      carries: fmList(fmOf(n).carries),
+    })),
+  );
+  if (v.unimplemented.length > 0)
+    out.push(`${fieldName}: ${v.unimplemented.length} function(s) unimplemented — ${v.unimplemented.join(" · ")}`);
+  const owing = v.cells.filter((c) => c.missing.length > 0);
+  if (owing.length > 0)
+    out.push(`${fieldName}: owed crossings without an interface — ${owing.map((c) => `${c.source} → ${c.destination}`).join(" · ")}`);
+  out.push(...v.problems.map((p) => `${fieldName}: ${p}`));
+  // THE TRACE IS COMPLETE, ON TWO PATHS (machines/trace-schema.md): every
+  // requirement is reached through an implemented function that satisfies
+  // it, or by a direct satisfier. Zero unreached, or no signature.
+  const implementedFns = new Set(implementers.flatMap((i) => i.implements));
+  const directSat = new Set(implementers.flatMap((i) => i.satisfies));
+  const fnSat = typed("function").map((n) => ({ id: n.id, satisfies: fmList(fmOf(n).satisfies) }));
+  const unreached = typed("requirement")
+    .map((n) => n.id)
+    .filter((r) => !directSat.has(r) && !fnSat.some((f) => implementedFns.has(f.id) && f.satisfies.includes(r)));
+  if (unreached.length > 0)
+    out.push(`${fieldName}: ${unreached.length} requirement(s) unreached by the structure — ${unreached.join(" · ")}`);
+  return out;
+}
+
+/** Every quality scenario ruled — the deck's completeness law. */
+export function deckLawProblems(fieldName: string, walkContent: string, corpus: { id: string; type: string; file?: string }[]): string[] {
+  const quality = corpus
+    .filter(
+      (n) => n.type === "requirement" && n.file !== undefined && String(noteOf(n.file as string)?.frontmatter.kind ?? "") === "quality",
+    )
+    .map((n) => n.id);
+  const unruled = quality.filter((id) => !walkContent.includes(`[[${id}]]`));
+  return unruled.length > 0 ? [`${fieldName}: ${unruled.length} scenario(s) unruled — ${unruled.join(" · ")}`] : [];
 }
 
 /** A REFERENCE THAT RESOLVES TO NOTHING IS A DEFECT, not a warning. The form

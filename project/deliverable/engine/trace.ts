@@ -235,7 +235,10 @@ export interface ItemTemplate {
  *  - one_of: a closed vocabulary for the field's value.
  *  - ban_markers: literal placeholder markers over the WHOLE file.
  *  - equals + require_section: when the field holds this value, the body
- *    must carry the named `## <section>`. */
+ *    must carry the named `## <section>`.
+ *  - equals + require_ref_in: when the field holds this value, the NAMED
+ *    OTHER field must carry at least one traceable reference — a bare node
+ *    id or a wiki link. Prose alone names nothing a reviewer can follow. */
 export interface TemplateCheck {
   field: string;
   ears?: boolean;
@@ -245,6 +248,7 @@ export interface TemplateCheck {
   ban_markers?: string[];
   equals?: string;
   require_section?: string;
+  require_ref_in?: string;
   hint?: string;
 }
 
@@ -277,6 +281,7 @@ function checkList(v: unknown): TemplateCheck[] {
       ...(Array.isArray(r.ban_markers) ? { ban_markers: r.ban_markers.map(String) } : {}),
       ...(typeof r.equals === "string" ? { equals: r.equals } : {}),
       ...(typeof r.require_section === "string" ? { require_section: r.require_section } : {}),
+      ...(typeof r.require_ref_in === "string" ? { require_ref_in: r.require_ref_in } : {}),
       ...(typeof r.hint === "string" ? { hint: r.hint } : {}),
     });
   }
@@ -386,6 +391,14 @@ function applyCheck(id: string, c: TemplateCheck, value: string, fm: Record<stri
     if (!headings.has(`## ${c.require_section}`)) {
       out.push(`${id}: ${c.field} ${c.equals} demands — ## ${c.require_section}${suffix}`);
     }
+  }
+  if (c.equals !== undefined && c.require_ref_in !== undefined && value.trim() === c.equals) {
+    const v = fm[c.require_ref_in];
+    const entries = Array.isArray(v) ? v.map(String) : [String(v ?? "")];
+    // A traceable entry IS an id or carries a link. Prose beside them is
+    // welcome; prose alone is the finding.
+    const traceable = entries.some((e) => /\[\[[^\]]+\]\]/.test(e) || /^[a-z][a-z0-9]*-[\w.-]+$/i.test(e.trim()));
+    if (!traceable) out.push(`${id}: ${c.field} ${c.equals} demands a traceable ref in ${c.require_ref_in}${suffix}`);
   }
   return out;
 }

@@ -1,9 +1,15 @@
 // THE ATAM WALK IS ARITHMETIC UNTIL THE VERDICT: the deck's order, the paths
 // and the numbers all compute from the trace; only the ruling is typed.
 import { strict as assert } from "node:assert";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 import { mintScenarioLines, scenarioDeckView, structureMetrics } from "../engine/atamwalk.ts";
 import { elementMatrixView } from "../engine/elematrix.ts";
+import { deckLawProblems, structureLawProblems } from "../engine/stateform.ts";
+import { conformance, type TraceNode } from "../engine/trace.ts";
 
 const REQS = [
   { id: "req-mild", grade: "abrasive", characteristic: "reliability", scenario: "source, stimulus, response, measure" },
@@ -67,6 +73,98 @@ test("an unaddressed line mints; an addressed line never does", () => {
   });
   assert.equal(out.split("\n")[0], "- [[raid-un-mild]] — unaddressed: [[req-mild]]");
   assert.equal(out.split("\n")[1], "- [[req-hard]] — addressed by [[raid-choice]]");
+});
+
+// A LAW TEST WRITES REAL NODES: the laws read frontmatter through the door,
+// so the fixture is files, and the corpus is hand-built handles to them.
+function lawNode(dir: string, id: string, type: string, fmLines: string[]): { id: string; type: string; file: string } {
+  const file = join(dir, `${id}.md`);
+  writeFileSync(file, ["---", `id: ${id}`, ...fmLines, "---", ""].join("\n"));
+  return { id, type, file };
+}
+
+test("the structural laws refuse an incomplete decomposition and pass a closed one", () => {
+  const root = mkdtempSync(join(tmpdir(), "lawtest-"));
+  try {
+    const dir = join(root, "n");
+    mkdirSync(dir, { recursive: true });
+    const broken = [
+      lawNode(dir, "el-a", "element", ["implements:", "  - fn-p"]),
+      lawNode(dir, "fn-p", "function", ["satisfies:", "  - req-near", "outputs:", "  - flow-x"]),
+      lawNode(dir, "fn-lost", "function", ["satisfies:", "  - req-far"]),
+      lawNode(dir, "req-near", "requirement", []),
+      lawNode(dir, "req-far", "requirement", []),
+    ];
+    const found = structureLawProblems("allocation", broken);
+    assert.ok(found.some((p) => p.includes("fn-lost")));
+    assert.ok(found.some((p) => p.includes("req-far")));
+    const fixed = structureLawProblems("allocation", [...broken, lawNode(dir, "el-b", "element", ["implements:", "  - fn-lost"])]);
+    assert.deepEqual(fixed, []);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("an unruled quality scenario blocks the deck; verdict lines clear it", () => {
+  const root = mkdtempSync(join(tmpdir(), "decklaw-"));
+  try {
+    const dir = join(root, "n");
+    mkdirSync(dir, { recursive: true });
+    const corpus = [
+      lawNode(dir, "req-q1", "requirement", ["kind: quality"]),
+      lawNode(dir, "req-q2", "requirement", ["kind: quality"]),
+      lawNode(dir, "req-f", "requirement", ["kind: functional"]),
+    ];
+    const blocked = deckLawProblems("walk", "", corpus);
+    assert.equal(blocked.length, 1);
+    assert.ok(blocked[0].includes("req-q1") && blocked[0].includes("req-q2") && !blocked[0].includes("req-f"));
+    const ruled = "- [[req-q1]] — addressed\n- [[raid-x]] — unaddressed: [[req-q2]]";
+    assert.deepEqual(deckLawProblems("walk", ruled, corpus), []);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("a decision without a traceable source ref is a conformance finding", () => {
+  const root = mkdtempSync(join(tmpdir(), "decref-"));
+  try {
+    const decision = (refs: string[]): string =>
+      [
+        "---",
+        "id: raid-store-beside-trace",
+        'type: "[[raid]]"',
+        "kind: decision",
+        "statement: Scores live beside the trace, one file per candidate.",
+        "owner: the adjudicator",
+        "trigger: any second store appearing",
+        "status: decided",
+        "impact: Two stores would drift apart.",
+        "breaks_how_badly: crippling",
+        "how_likely: plausible",
+        "source_refs:",
+        ...refs.map((r) => `  - ${r}`),
+        "---",
+        "",
+        "## Rejected options",
+        "",
+        "- one big table",
+        "",
+        "## Consequences",
+        "",
+        "- every reader parses per-candidate files",
+      ].join("\n");
+    const file = join(root, "raid-store-beside-trace.md");
+    writeFileSync(file, decision(["the owner asked for it"]));
+    // The repo root off THIS FILE, never process.cwd() — a parallel suite
+    // may move the process's directory mid-run.
+    const repo = fileURLToPath(new URL("../../../", import.meta.url));
+    const node = { id: "raid-store-beside-trace", type: "raid", file } as unknown as TraceNode;
+    assert.ok(conformance(repo, node).some((p) => p.includes("traceable ref")));
+    writeFileSync(file, decision(["req-crash-lands-safe"]));
+    assert.ok(!conformance(repo, node).some((p) => p.includes("traceable ref")));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test("the structure numbers count debt, spread, both-way pairs and the idle ends", () => {
