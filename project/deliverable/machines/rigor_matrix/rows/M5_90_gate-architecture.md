@@ -7,7 +7,7 @@ busbar: true
 filled_by: agent
 depends_on:
   - record-adrs
-  - evaluate-baseline
+  - evaluate-architecture
 legal_tools:
   - se_file_read
   - se_file_search

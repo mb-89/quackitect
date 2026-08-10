@@ -5,7 +5,7 @@ statement: "ATAM-lite: walk the quality scenarios against the baseline analytica
 
 ## Situation
 
-M5's evaluate-baseline, on the consolidated winner.
+M5's evaluate-architecture, on the decomposed winner.
 
 Evaluation is a distinct act, and the levels are never conflated.
 
@@ -16,7 +16,8 @@ Evaluation is a distinct act, and the levels are never conflated.
 
 ## Procedure
 
-- Walk each quality scenario through the baseline matrices.
+- Walk each quality scenario through the structure — the elements, the
+  allocation and the interfaces.
   - Which elements carry the stimulus.
   - Where the response forms.
   - What limits the measure.

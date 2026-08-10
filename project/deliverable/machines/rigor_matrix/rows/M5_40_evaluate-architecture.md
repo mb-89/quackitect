@@ -1,11 +1,11 @@
 ---
 kind: matrix-row
-name: evaluate-baseline
-statement: "Evaluate the baseline: the ATAM-lite walk of the quality scenarios."
+name: evaluate-architecture
+statement: "Evaluate the architecture: the ATAM-lite walk of the quality scenarios, with the structure metrics computed beside it."
 state_kind: work
 filled_by: agent
 depends_on:
-  - consolidate-baseline
+  - decompose-structure
 legal_tools:
   - se_file_read
   - se_file_write
@@ -18,6 +18,8 @@ legal_tools:
 evidence:
   - name: walk
     description: each quality scenario with its verdict and carrying decision
+  - name: metrics
+    description: the structure numbers, computed — element coupling off the DSM, allocation balance off the function nodes — with one line saying what each number moved
   - name: fitness_candidates
     description: the measurable scenarios that could automate at M7
 major: full
@@ -26,12 +28,13 @@ patch: none
 product: full
 specification: full
 major_note: |
-  Applies in full: every quality scenario walked through the new
-  matrices, verdicts recorded, fitness candidates named for M7.
+  Applies in full: every quality scenario walked through the structure,
+  verdicts recorded, the DSM metrics computed, fitness candidates named
+  for M7.
 minor_note: |
   Walk ONLY the quality scenarios the delta touches through the standing
-  matrices. Record each one as addressed, at risk or unaddressed. The full
-  walk is not repeated.
+  structure. Record each one as addressed, at risk or unaddressed. The
+  full walk is not repeated.
 patch_note: |
   Does not apply. The quality-scenario walk holds as evaluated. STRIKE
   PROPOSAL - owner adjudicates.
@@ -49,8 +52,16 @@ specification_note: |
 
 Per [[meth-atam-lite]]:
 
-- Walk each quality scenario through the matrices.
+- Walk each quality scenario through the structure — which elements carry
+  the stimulus, where the response forms, what limits the measure.
 - Record it as addressed, at risk, or unaddressed.
 - Name candidate fitness functions.
 
-Evaluation, never verification.
+THE METRICS BELONG HERE, not at the decomposition (owner ruling
+2026-08-10, and the corpus files DSM analysis under quantitative REVIEW):
+element coupling and cycle counts off the element DSM, allocation balance
+off the function nodes. A number nobody interprets is noise — each one
+carries a line saying what it moved.
+
+Evaluation, never verification. Findings that shake the choice reopen
+converge-pugh; findings that shake requirements ripple to M3.
