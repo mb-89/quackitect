@@ -25,6 +25,7 @@ evidence:
     columns:
       - verified_by
     page_size: 25
+    link_base: project/deliverable/
     description: "every requirement's test addresses, written on the node — <test file> :: <test case name> for test rows; the artifact or named residue for the other methods"
 major: full
 minor: full

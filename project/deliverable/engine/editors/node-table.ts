@@ -27,9 +27,13 @@ export const NODE_TABLE_EDITOR: EditorKind = {
     // Every colour is a theme variable. A literal colour shows the default
     // control through, and that reads as a white box in a dark panel.
     const cel = "padding:5px 8px;border-top:1px solid var(--se-border);vertical-align:middle;";
-    const hed = "padding:5px 8px;text-align:left;font-weight:normal;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--se-muted);";
+    const hed = "padding:5px 8px;text-align:left;font-weight:normal;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--se-muted);position:relative;";
     const box = "width:100%;box-sizing:border-box;background:transparent;border:0;outline:none;font:inherit;font-size:12.5px;color:var(--se-fg);padding:0;";
-    const head = "<thead><tr>" + [args.of || "node"].concat(cols).map(function (c) { return '<th style="' + hed + '">' + escText(c) + "</th>"; }).join("") + "</tr></thead>";
+    // THE COLUMN EDGE IS A HANDLE — the same drag the live table has. The
+    // widths live in the behaviour's map and are reapplied on every redraw,
+    // because the form is redrawn whole on every look.
+    const grip = '<span class="sfntgrip" style="position:absolute;right:0;top:0;bottom:0;width:6px;cursor:col-resize;"></span>';
+    const head = "<thead><tr>" + [args.of || "node"].concat(cols).map(function (c) { return '<th style="' + hed + '" data-field="' + name + '" data-col="' + escText(c) + '">' + escText(c) + grip + "</th>"; }).join("") + "</tr></thead>";
     // A CONSTRAINED COLUMN OFFERS ITS SOURCE, and HOW it offers it is the
     // field's own declaration (owner ruling 2026-08-08).
     //
@@ -87,12 +91,29 @@ export const NODE_TABLE_EDITOR: EditorKind = {
         const todo = v === "" || (v.indexOf("<!--") === 0 && v.slice(-3) === "-->");
         const dim = todo ? "color:var(--se-muted);font-style:italic;" : "";
         if (picks[c] && !isFree(c)) return '<td style="' + cel + '">' + chooser(c, id, v, dim) + "</td>";
+        // A LIST CELL SHOWS ITS ENTRIES ONE PER LINE, and an entry in the
+        // address grammar links its file half. The entries are not edited
+        // here — the row's node is one click away and the bind rebuilds the
+        // cell from it; the hidden input keeps the row whole for the save.
+        if (!picks[c] && (v.indexOf(" · ") >= 0 || v.indexOf(" :: ") >= 0)) {
+          const lines = v.split(" · ").map(function (e) {
+            const t = e.trim().replace(/^"/, "").replace(/"$/, "");
+            const at = t.indexOf(" :: ");
+            if (at < 0) return '<div style="padding:1px 0;">' + escText(t) + "</div>";
+            const file = t.slice(0, at).trim();
+            const full = (args.link_base || "") + file;
+            return '<div style="padding:1px 0;">' +
+              '<a class="reflink" style="color:var(--se-accent);cursor:pointer;" data-path="' + escText(full) + '" title="open ' + escText(full) + ' in the editor">' + escText(file) + "</a>" +
+              '<span style="color:var(--se-muted);"> :: </span>' + escText(t.slice(at + 4).trim()) + "</div>";
+          }).join("");
+          return '<td style="' + cel + 'vertical-align:top;font-size:12.5px;">' + lines + '<input type="hidden" class="sfnt" data-field="' + name + '" data-item="' + escText(id) + '" data-col="' + escText(c) + '" value="' + escText(v) + '"></td>';
+        }
         const listed = picks[c] ? ' list="' + escText(listId(c)) + '"' : "";
         return '<td style="' + cel + '"><input class="sfnt" style="' + box + dim + '"' + listed + ' data-field="' + name + '" data-item="' + escText(id) + '" data-col="' + escText(c) + '" value="' + escText(v) + '"></td>';
       }).join("");
       return '<tr class="sfntrow" data-idx="' + rowAt[id] + '"><td style="' + cel + 'font-size:12.5px;white-space:nowrap;">' + nameCell + "</td>" + cellsHtml + "</tr>";
     };
-    const table = (list) => '<table class="sfnodetable" style="width:100%;border-collapse:collapse;table-layout:fixed;">' + head + "<tbody>" + list.map(rowHtml).join("") + "</tbody></table>";
+    const table = (list) => '<table class="sfnodetable" data-field="' + name + '" style="width:100%;border-collapse:collapse;table-layout:fixed;">' + head + "<tbody>" + list.map(rowHtml).join("") + "</tbody></table>";
     const ids = args.items || [];
     const rowAt = {};
     ids.forEach(function (id, i) { rowAt[id] = i; });
@@ -153,7 +174,32 @@ export const NODE_TABLE_EDITOR: EditorKind = {
   // NO BACKTICK BELOW, not even in a comment. This body is one template
   // literal and a backtick ends it.
   const sfntPage = {};
+  // THE COLUMN WIDTHS, keyed field then column. The form is redrawn whole on
+  // every look, so a width lives here and sfntApply re-applies it — exactly
+  // the pager's survival pattern. Dragging a header's right edge sets it.
+  const sfntW = {};
+  let sfntSizing = null;
+  document.addEventListener("mousedown", function (ev) {
+    const g = ev.target.closest ? ev.target.closest(".sfntgrip") : null;
+    if (!g) return;
+    const th = g.closest("th");
+    sfntSizing = { field: th.dataset.field, col: th.dataset.col, th: th, x: ev.clientX, w: th.offsetWidth };
+    ev.preventDefault();
+  });
+  document.addEventListener("mousemove", function (ev) {
+    if (!sfntSizing) return;
+    const w = Math.max(40, sfntSizing.w + (ev.clientX - sfntSizing.x));
+    sfntSizing.th.style.width = w + "px";
+    (sfntW[sfntSizing.field] = sfntW[sfntSizing.field] || {})[sfntSizing.col] = w;
+  });
+  document.addEventListener("mouseup", function () { sfntSizing = null; });
   function sfntApply() {
+    document.querySelectorAll(".sfnodetable").forEach(function (tbl) {
+      const ws = sfntW[tbl.dataset.field] || {};
+      tbl.querySelectorAll("th").forEach(function (th) {
+        if (ws[th.dataset.col] !== undefined) th.style.width = ws[th.dataset.col] + "px";
+      });
+    });
     document.querySelectorAll(".sfntpager").forEach(function (bar) {
       const f = bar.dataset.field;
       const total = Number(bar.dataset.total || 0);
@@ -202,6 +248,6 @@ export const NODE_TABLE_EDITOR: EditorKind = {
   });
   // The form is redrawn whole on every look, so the page has to be reapplied
   // rather than bound once to elements that will not survive.
-  setInterval(function () { if (document.querySelector(".sfntpager")) sfntApply(); }, 400);
+  setInterval(function () { if (document.querySelector(".sfnodetable, .sfntpager")) sfntApply(); }, 400);
   `,
 };

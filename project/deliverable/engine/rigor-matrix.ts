@@ -230,6 +230,7 @@ function optionalKeys(file: string, f: Record<string, unknown>): Partial<Evidenc
     ...str("writes"),
     ...str("reads"),
     ...str("reason"),
+    ...str("link_base"),
     ...(typeof f.page_size === "number" ? { page_size: f.page_size } : {}),
     ...(f.picks !== undefined ? { picks: picksOf(file, f) } : {}),
     ...list("options"),

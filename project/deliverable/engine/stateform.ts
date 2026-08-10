@@ -149,6 +149,10 @@ export interface FieldArgs {
   /** Rows per page. 0 means all of them, which is right for a short field
    *  and wrong for one over a live register. */
   page_size: number;
+  /** WHERE A LIST CELL'S FILE HALF LIVES. An entry in the address grammar
+   *  (`file :: case`) links its file, joined to this base. Empty means no
+   *  link. */
+  link_base: string;
   /** A comparison card's relation — `order` or `equivalence`. Empty for
    *  every other field. */
   relation: string;
@@ -285,6 +289,7 @@ export const NO_ARGS: FieldArgs = {
   pick_free: [],
   pick_sources: {},
   page_size: 0,
+  link_base: "",
   relation: "",
   writes: "",
   reason: "",
@@ -585,6 +590,7 @@ export function claimProblems(root: string, s: StateDecl, body: string, corpus: 
       pick_free: f.pick_free ?? [],
       pick_sources: {},
       page_size: f.page_size ?? 0,
+      link_base: f.link_base ?? "",
       relation: f.relation ?? "",
       writes: f.writes ?? "",
       reason: f.reason ?? "",
@@ -1078,6 +1084,7 @@ export function fieldArgsFor(f: EvidenceField, root: string, traceRoot: string, 
     pick_free: f.pick_free ?? [],
     pick_sources: f.picks ?? {},
     page_size: f.page_size ?? 0,
+    link_base: f.link_base ?? "",
     relation: f.relation ?? "",
     writes: f.writes ?? "",
     reason: f.reason ?? "",
@@ -1574,6 +1581,12 @@ export function nodeField(file: string, key: string): string {
  *
  *  A STILL-COMMENTED KEY HOLDS NOTHING, per the comment-is-unanswered
  *  convention. Reading the prompt as a value is how a field silently fills. */
+/** A QUOTED ENTRY READS UNQUOTED. The yaml writer quotes what needs quoting
+ *  (a test name carries colons), so a faithful read strips the wrapper —
+ *  otherwise every view shows the quotes and every write wraps them again. */
+const unquote = (s: string): string =>
+  s.length >= 2 && ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) ? s.slice(1, -1) : s;
+
 export function nodeList(file: string, key: string): string[] {
   try {
     const lines = nodeLines(file);
@@ -1586,16 +1599,16 @@ export function nodeList(file: string, key: string): string[] {
       return inline
         .replace(/^\[|\]$/g, "")
         .split(",")
-        .map((s) => s.trim())
+        .map((s) => unquote(s.trim()))
         .filter((s) => s !== "");
     }
-    if (inline !== "" && !inline.startsWith("<!--")) return [inline];
+    if (inline !== "" && !inline.startsWith("<!--")) return [unquote(inline)];
     const out: string[] = [];
     for (const l of fm.slice(at + 1)) {
       const m = /^\s+-\s+(.*)$/.exec(l);
       if (m === null) break;
       const v = m[1].trim();
-      if (v !== "" && !v.startsWith("<!--")) out.push(v);
+      if (v !== "" && !v.startsWith("<!--")) out.push(unquote(v));
     }
     return out;
   } catch {
