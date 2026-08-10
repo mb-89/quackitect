@@ -109,15 +109,14 @@ test("a branch that cannot reach the objective is not offered", () => {
   assert.equal(branchToReturnTo(m, "left", "no-such-state"), undefined);
 });
 
-// THE FUNCTIONS ARE A RING (owner ruling 2026-08-07). The trace ran to the
-// requirements and stopped, so the thing the requirements are answered BY was
-// invisible on the drawing.
-//
-// It is one entry in TRACE_LEVELS and one more ring; the loader's own comment
-// promises that, and this holds it to the promise.
-test("the trace runs one ring further, to the functions", async () => {
+// THE FUNCTIONS ARE A RING (owner ruling 2026-08-07), AND THE TESTS JOINED
+// THEM (owner ruling 2026-08-10). The trace ran to the requirements and
+// stopped, so what answers a requirement — and what verifies it — was
+// invisible on the drawing. Function and test share the first ring past the
+// spine, one per slice.
+test("the trace runs past the requirements, to functions and tests", async () => {
   const { TRACE_LEVELS } = await import("../engine/trace.ts");
-  assert.deepEqual(TRACE_LEVELS, ["value-prop", "story", "use-case", "requirement", "function"]);
+  assert.deepEqual(TRACE_LEVELS, ["value-prop", "story", "use-case", "requirement", "function", "test"]);
 
   // ORDER IS THE RADIUS. A function sits outside a requirement because it is
   // what answers one, and the edge runs requirement to function.

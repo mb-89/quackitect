@@ -3,7 +3,7 @@
 // touches no global.
 import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
-import { duplicateIds, layoutTrace, refsIn, shortLabel, TRACE_LEVELS, type TraceNode, traceSvg } from "../engine/trace.ts";
+import { duplicateIds, layoutTrace, refsIn, shortLabel, TRACE_LEVELS, type TraceNode, traceRings, traceSvg } from "../engine/trace.ts";
 
 function prop(id: string): TraceNode {
   return { id, type: "value-prop", statement: `${id} statement`, refines: [] };
@@ -164,15 +164,20 @@ describe("the radial trace graph", { concurrency: true }, () => {
     assert.equal(childOrder, parentOrder, "the children follow their parents' order");
   });
 
-  test("adding a LEVEL is one more ring and nothing else", () => {
+  test("adding a LEVEL is one more ring, and slice levels SHARE one", () => {
     // One node per level, so every level is live and every ring is earned.
+    // Past the spine the levels sit one per SLICE: function in design, test
+    // in tests, both on the same circle — so rings count per ring, not per
+    // level.
     const all: TraceNode[] = [prop("vp-a")];
     let parent = "vp-a";
-    for (const t of TRACE_LEVELS.slice(1)) {
+    for (const t of ["story", "use-case", "requirement"]) {
       all.push(child(`n-${t}`, t, parent));
       parent = `n-${t}`;
     }
-    assert.equal(layoutTrace(all).rings.length, TRACE_LEVELS.length);
+    all.push(child("n-function", "function", parent));
+    all.push(child("n-test", "test", parent));
+    assert.equal(layoutTrace(all).rings.length, traceRings().length);
   });
 
   // AN EMPTY RING IS NOISE (owner, 2026-08-06). A level nothing has reached

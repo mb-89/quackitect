@@ -175,3 +175,39 @@ describe("the requirement template's declared checks", () => {
     assert.ok(f[0]?.includes("unanswered"), f[0]);
   });
 });
+
+/** A requirement carrying only what the derivation reads: its type and its
+ *  verified_by addresses, quoted the way the author-tests state writes them. */
+function mintVerified(root: string, id: string, addresses: string[]): void {
+  const dir = join(root, "project/spec/trace/requirement");
+  mkdirSync(dir, { recursive: true });
+  const lines = ["---", `id: ${id}`, 'type: "[[requirement]]"', "verified_by:"];
+  for (const a of addresses) lines.push(`  - "${a}"`);
+  lines.push("---", "");
+  writeFileSync(join(dir, `${id}.md`), lines.join("\n"), "utf8");
+}
+
+// A TEST NODE IS DERIVED, ONE PER TEST FILE (owner ruling 2026-08-10). The
+// requirement carries the mapping in verified_by — a source file cannot hold
+// trace frontmatter — and the loader folds the addresses into typed nodes so
+// the trace graph's test slice draws.
+describe("the tests ride the requirements into the corpus", { concurrency: true }, () => {
+  test("verified_by folds into one test node per file, pointing at every requirement it verifies", () => {
+    const root = freshRoot();
+    mintVerified(root, "req-a", ["tests/route.test.ts :: the route weighs the slider", "tests/pull.test.ts :: the reading is owed"]);
+    mintVerified(root, "req-b", ["tests/route.test.ts :: a second case: colons survive"]);
+    const nodes = loadTrace(root);
+    const route = nodes.find((n) => n.id === "tests/route.test.ts");
+    const pull = nodes.find((n) => n.id === "tests/pull.test.ts");
+    assert.ok(route !== undefined && pull !== undefined, "one node per test file");
+    assert.equal(route.type, "test");
+    assert.deepEqual(route.refines, ["req-a", "req-b"]);
+    assert.deepEqual(pull.refines, ["req-a"]);
+    assert.equal(route.statement, "2 cases verifying 2 requirements");
+    // The yaml quotes stay in the file and out of the model: the case name
+    // reads back whole, colon and all, findable in the hay.
+    assert.ok(route.hay?.includes("a second case: colons survive"));
+    // A derived node is never conformance-checked — nobody authors it.
+    assert.deepEqual(conformance(root, route), []);
+  });
+});

@@ -139,7 +139,11 @@ export const NODE_TABLE_EDITOR: EditorKind = {
       '<button type="button" class="sfntprev" style="' + btn + '" title="previous page">‹</button>' +
       '<span class="sfntwhere"></span>' +
       '<button type="button" class="sfntnext" style="' + btn + '" title="next page">›</button>' +
-      '<select class="sfntper" style="' + btn + 'padding:0 4px;">' + opts + "</select></div>";
+      '<select class="sfntper" style="' + btn + 'padding:0 4px;">' + opts + "</select>" +
+      // THE MISSING-ONLY FILTER (owner, 2026-08-10): show only the rows with
+      // an empty cell — for the checks table, the requirements no test
+      // covers yet. It filters what SHOWS; the save still reads every row.
+      '<label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" class="sfntmiss" style="accent-color:var(--se-accent);margin:0;"> missing only</label></div>';
     return datalists + bar + table(ids);
   `,
   collect: `
@@ -174,6 +178,9 @@ export const NODE_TABLE_EDITOR: EditorKind = {
   // NO BACKTICK BELOW, not even in a comment. This body is one template
   // literal and a backtick ends it.
   const sfntPage = {};
+  // WHICH FIELDS SHOW ONLY THEIR MISSING ROWS — the filter's survival map,
+  // same pattern as the page and the widths.
+  const sfntMiss = {};
   // THE COLUMN WIDTHS, keyed field then column. The form is redrawn whole on
   // every look, so a width lives here and sfntApply re-applies it — exactly
   // the pager's survival pattern. Dragging a header's right edge sets it.
@@ -202,27 +209,44 @@ export const NODE_TABLE_EDITOR: EditorKind = {
     });
     document.querySelectorAll(".sfntpager").forEach(function (bar) {
       const f = bar.dataset.field;
-      const total = Number(bar.dataset.total || 0);
       const per = Number(bar.dataset.per || 0);
+      // The rows belong to the table right after the bar, so a form holding
+      // two paged fields never pages both at once.
+      const tbl = bar.nextElementSibling;
+      if (!tbl) return;
+      // A ROW BEING EDITED NEVER VANISHES. With the filter on, the first
+      // keystroke into an empty cell makes the row non-missing, and the next
+      // tick would hide it mid-edit. While focus is in the table, the view
+      // holds still.
+      if (tbl.contains(document.activeElement)) return;
+      const rows = Array.prototype.slice.call(tbl.querySelectorAll("tr.sfntrow"));
+      // MISSING MEANS AN EMPTY CELL: no value, or still the template comment.
+      const missing = function (tr) {
+        const ins = tr.querySelectorAll(".sfnt");
+        for (let i = 0; i < ins.length; i++) {
+          const v = (ins[i].value || "").trim();
+          if (v === "" || v.indexOf("<!--") === 0) return true;
+        }
+        return ins.length === 0;
+      };
+      const only = !!sfntMiss[f];
+      const want = only ? rows.filter(missing) : rows;
+      const total = want.length;
       const pages = per > 0 ? Math.max(1, Math.ceil(total / per)) : 1;
       const page = Math.min(Math.max(0, sfntPage[f] || 0), pages - 1);
       sfntPage[f] = page;
       const from = per > 0 ? page * per : 0;
       const to = per > 0 ? Math.min(total, from + per) : total;
       const where = bar.querySelector(".sfntwhere");
-      if (where) where.textContent = total === 0 ? "nothing here" : from + 1 + "\\u2013" + to + " of " + total;
+      if (where) where.textContent = total === 0 ? (only ? "nothing missing" : "nothing here") : from + 1 + "\\u2013" + to + " of " + total + (only ? " missing" : "");
       const prev = bar.querySelector(".sfntprev");
       const next = bar.querySelector(".sfntnext");
       if (prev) prev.disabled = page === 0;
       if (next) next.disabled = page >= pages - 1;
-      // The rows belong to the table right after the bar, so a form holding
-      // two paged fields never pages both at once.
-      const tbl = bar.nextElementSibling;
-      if (!tbl) return;
-      tbl.querySelectorAll("tr.sfntrow").forEach(function (tr) {
-        const i = Number(tr.dataset.idx || 0);
-        tr.style.display = per <= 0 || (i >= from && i < to) ? "" : "none";
-      });
+      const box = bar.querySelector(".sfntmiss");
+      if (box) box.checked = only;
+      rows.forEach(function (tr) { tr.style.display = "none"; });
+      want.slice(from, to).forEach(function (tr) { tr.style.display = ""; });
     });
   }
   document.addEventListener("click", function (ev) {
@@ -234,6 +258,15 @@ export const NODE_TABLE_EDITOR: EditorKind = {
     sfntApply();
   });
   document.addEventListener("change", function (ev) {
+    const c = ev.target.closest ? ev.target.closest(".sfntmiss") : null;
+    if (c) {
+      const cbar = c.closest(".sfntpager");
+      sfntMiss[cbar.dataset.field] = c.checked;
+      sfntPage[cbar.dataset.field] = 0;
+      if (document.activeElement) document.activeElement.blur();
+      sfntApply();
+      return;
+    }
     const s = ev.target.closest ? ev.target.closest(".sfntper") : null;
     if (!s) return;
     const bar = s.closest(".sfntpager");

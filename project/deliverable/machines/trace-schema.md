@@ -48,7 +48,7 @@ subsegments:
     levels: [function, element, interface]
   - id: test
     label: tests
-    levels: []
+    levels: [test]
 ---
 
 # The trace schema
@@ -195,8 +195,8 @@ Today there are two.
 
 - `design` holds what ANSWERS a requirement. The functions now, and the
   architecture and design elements later.
-- `test` holds what VERIFIES it: test definitions and test results. It is
-  empty so far, and it still holds its arc.
+- `test` holds what VERIFIES it: the test files, one node each. These
+  nodes are DERIVED — see the next section.
 
 THE DIVISION HAPPENS ONCE (owner design 2026-08-07). A requirement is the
 last node every slice can see. It may be pointed at from several slices, and
@@ -210,8 +210,27 @@ WHY IT IS DECLARED HERE and not in the drawing code: which slice a type lives
 in is the same kind of fact as what it may point at. A product that vendors
 this and adds a third slice edits this file.
 
-AN EMPTY SLICE STILL HOLDS ITS ARC. The space is reserved so the test levels
-land without moving anything already drawn.
+AN EMPTY SLICE STILL HOLDS ITS ARC. The space is reserved so a new level
+lands without moving anything already drawn. The test level landed this way
+on 2026-08-10.
+
+## The test nodes are derived, not authored
+
+A requirement names its checks in `verified_by`, as addresses:
+`<test file> :: <test case name>`.
+
+The loader folds those addresses into one node per test FILE, typed `test`,
+pointing at the requirements it verifies. The cases ride the node's
+statement.
+
+THE FACT LIVES ON THE REQUIREMENT, and only there. A source file cannot
+carry trace frontmatter, so the parent holds the mapping — the one sanctioned
+exception to "downward edges do not exist". One fact, one file, still.
+
+SO THERE IS NO EDGE ENTRY FOR `test` ABOVE. The edge list describes
+frontmatter on authored nodes, and nobody authors a test node. The
+`verified_by` grammar and its laws live with the author-tests state
+(rigor_matrix/rows/M7_10_author-tests.md).
 
 ## What this schema does not cover
 
