@@ -33,13 +33,13 @@ checks:
       - TBC
       - TBR
       - ???
-  - field: satisfies
+  - field: implements
     ban_markers:
       - TBD
       - TBC
       - TBR
       - ???
-    hint: an element that answers to no requirement is gold-plating — name what forces it
+    hint: an element that implements no function is gold-plating — name what it exists for
 ---
 
 # element — one building block of the architecture
@@ -68,9 +68,15 @@ Three sources, per [[meth-decompose-structure]]:
 - `realization` — make, reuse or buy.
 - `group` — the grouping this element belongs to. The same node-borne
   mechanism the function clusters use; the DSM editor writes it.
-- `satisfies` — the requirement ids this element answers to. The SysML
-  satisfy edge, on the structure side. An element satisfying nothing is
-  gold-plating; the coverage check reads both directions.
+- `implements` — the function ids this element implements. THE ALLOCATION
+  EDGE, and it points the same way `refines` does on a requirement: the
+  newer artifact names what it derives from. NOT ONE TO ONE: several
+  elements may implement one function — software tends to one-to-one,
+  systems spread, and the spread is what the DSM makes visible. What is
+  checked: every function implemented by at least one element or
+  interface, and no element implementing nothing. Requirements reach the
+  structure through this chain — a requirement is served by functions,
+  and its functions are implemented here.
 - `source_refs` — the pick, decision or standing part it derives from.
 
 ## The body is the black box
@@ -89,8 +95,8 @@ statement: {{what this element does, in one sentence}}
 kind: {{existing | new}}
 realization: {{make | reuse | buy}}
 group: {{the group it belongs to — the DSM editor may rewrite this}}
-satisfies:
-  - {{req-... — what forces this element}}
+implements:
+  - {{fn-... — the functions this element realizes}}
 source_refs:
   - {{the pick or standing part it derives from}}
 ---

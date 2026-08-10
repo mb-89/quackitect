@@ -20,12 +20,12 @@ evidence:
     of: element
     description: the element set — one reference per line, each an element node with its black-box description
   - name: allocation
-    description: every function carries its element — the DMM read off the function nodes, exceptions argued here
+    description: every function implemented by at least one element or interface — the DMM read off the implements keys, the spread argued here
   - name: interfaces
     of: interface
     description: the element DSM's owed cells, each named by an interface node — one reference per line
-  - name: requirements_trace
-    description: the satisfy coverage — every requirement lands on an element or an interface, and every element and interface answers to a requirement; name what has none
+  - name: trace_residue
+    description: the requirements the function chain does not reach — structural qualities and constraints — each named with where its coverage lives instead, or none
 major: full
 minor: tailored
 patch: none
@@ -71,9 +71,12 @@ LOOP, all in this one state because each moves the others:
   by several picks becomes its own element). One element node each, black
   box described as it is named. The `group` key on the element node holds
   the grouping — the same mechanism the function clusters use.
-- ALLOCATION. Every function carries an `element` key naming exactly one
-  element — the same node-borne pattern as `cluster`. Exactly-once is a
-  column property; it is review-class now and engine-computed later.
+- ALLOCATION. Every element names the functions it realizes in
+  `implements` — the same direction as `refines` on a requirement: the
+  newer artifact points at what it derives from. NOT one to one: several
+  elements or interfaces may implement one function, and the spread is
+  information. Checked: every function implemented at least once, nothing
+  implementing nothing — review-class now, engine-computed later.
 - INTERFACES. Where a flow's producer and consumer land in different
   elements, that element pair OWES an interface. The owed cells are
   computable from the flows and the allocation; each one is answered by an
@@ -81,11 +84,15 @@ LOOP, all in this one state because each moves the others:
   form. An interface no crossing demands is a question in the other
   direction.
 
-THEN THE TRACE. Every requirement lands on the structure: an element or an
-interface carries it in `satisfies`. Both directions are checked judgment:
-a requirement nothing satisfies is a hole, and an element or interface
-satisfying nothing is gold-plating. The standard vocabulary is SysML's own
-— requirements are SATISFIED by structure, behavior is ALLOCATED to it.
+THE TRACE IS TRANSITIVE, NOT A SECOND EDGE (owner ruling 2026-08-10). A
+requirement is served by functions; its functions are implemented by
+elements; nothing writes a requirement id onto the structure. What the
+chain cannot carry is named instead: a structural quality (modularity, a
+replaceability demand) and an imposed constraint are answered by the
+SHAPE, not by a function — their coverage lives in evaluate-architecture's
+scenario walk and in the decision register's source_refs. The
+trace_residue field lists exactly those, each with where its coverage
+lives. A residue nobody listed is the leak this field exists to catch.
 
 THE BASELINE WORD survives only for the closing act: what stood before is
 superseded, and change from here means a new baseline (the CM law).

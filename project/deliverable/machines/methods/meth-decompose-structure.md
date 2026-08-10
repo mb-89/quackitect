@@ -37,11 +37,16 @@ functions, written by the same editor.
 
 ### Allocation
 
-Every function carries an `element` key naming EXACTLY ONE element — the
-node-borne DMM. Exactly-once is a column property: review-class now,
-engine-computed later. A function no element takes, or an element no
-function needs, is a finding — the same four-holes logic derive-functions
-runs.
+Every element names the functions it realizes in `implements` — the
+node-borne DMM, pointing the same way `refines` points on a requirement:
+the newer artifact names what it derives from. THE MATCH IS NOT ONE TO
+ONE: several elements or interfaces may implement one function. Software
+tends to one-to-one; systems spread a function across sensor, converter
+and filter, and the spread is exactly what the DSM shows. Checked: every
+function implemented at least once, and nothing implementing nothing —
+the four-holes logic, review-class now, engine-computed later. Elements
+and interfaces both stand in the trace graph's design half, one radius
+past the functions.
 
 An element that turns out to need a support function sends you back one
 act, and that is the loop working, not a failure.
@@ -56,15 +61,27 @@ element pair owes one interface. Each owed cell is answered by an
 Two coverage directions, both checked: a crossing no interface carries is
 a hole; an interface no crossing demands is a question the other way.
 
-## The requirements trace
+## The trace is transitive, and the residue is named
 
-Every requirement lands on the structure: an element or an interface names
-it in `satisfies`. Interface-kind requirements land on interfaces
-naturally. Both directions are judgment with a computed count: a
-requirement nothing satisfies is a hole in the architecture; an element or
-interface satisfying nothing is gold-plating. The vocabulary is SysML's
-own — structure SATISFIES requirements, behavior is ALLOCATED to
-structure — so the trace reads the same to anyone who knows the standard.
+NO SECOND EDGE (owner ruling 2026-08-10). Requirements already trace: a
+requirement refines its use cases and is served by functions; the
+functions are implemented by elements; an interface carries flows, the
+flows belong to functions, the functions serve requirements. Writing
+requirement ids onto the structure would be a second copy of a chain the
+nodes already carry, and second copies drift.
+
+WHAT THE CHAIN CANNOT CARRY is answered elsewhere, and NAMED in the
+trace_residue field: a structural quality — modularity, replaceability, a
+quality the SHAPE answers rather than any function — gets its coverage
+from evaluate-architecture's scenario walk, where its verdict names the
+carrying decision. An imposed constraint gets its coverage from the
+decision register, whose entries carry source_refs to what forced them.
+The residue field lists exactly these requirements with where each one's
+coverage lives. A residue nobody listed is the leak the field catches.
+
+SysML's names still apply where they help a reader: behavior is ALLOCATED
+to structure (implements), and the scenario walk plays the satisfy role
+for the qualities.
 
 ## The closing act
 

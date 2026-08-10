@@ -8,13 +8,20 @@ applies_rigor:
 applies_type:
   - default
 checks:
-  - field: between
+  - field: source
     ban_markers:
       - TBD
       - TBC
       - TBR
       - ???
-    hint: an interface names BOTH element ends, or it is a wish about a boundary
+    hint: an interface names its source element, or it is a wish about a boundary
+  - field: destination
+    ban_markers:
+      - TBD
+      - TBC
+      - TBR
+      - ???
+    hint: an interface names its destination element — both ends, always
   - field: carries
     ban_markers:
       - TBD
@@ -63,14 +70,16 @@ exactly-once.
 - `id` — `if-<slug>`.
 - `type` — `"[[interface]]"`.
 - `statement` — what this contract is, in one sentence.
-- `between` — the two element ids, one per line. Both ends, always — an
-  interface only one side knows about is a future integration failure.
-- `carries` — the flow ids this interface transports.
+- `source` — the element id the exchange comes from.
+- `destination` — the element id it goes to. Both ends, always — an
+  interface only one side knows about is a future integration failure. A
+  genuinely two-way contract is two interfaces, one per direction, and
+  that is information rather than overhead.
+- `carries` — the flow ids this interface transports. Requirements reach
+  an interface through this chain: the flows belong to functions, and the
+  functions serve requirements.
 - `form` — the concrete mechanism: a call, a file, a protocol, a shared
   store. Clarify the type of exchange and the properties of both ends.
-- `satisfies` — requirement ids this interface answers to, where a
-  requirement lands on the boundary itself (interface-kind requirements
-  land here naturally).
 - `source_refs` — what it derives from.
 
 ## Skeleton
@@ -80,14 +89,11 @@ exactly-once.
 id: if-{{slug}}
 type: "[[interface]]"
 statement: {{the contract, in one sentence}}
-between:
-  - {{el-one-end}}
-  - {{el-other-end}}
+source: {{el-where-it-comes-from}}
+destination: {{el-where-it-goes}}
 carries:
   - {{flow-...}}
 form: {{call | file | protocol | shared store — concretely}}
-satisfies:
-  - {{req-... — or remove the key where none lands here}}
 source_refs:
   - {{what it derives from}}
 ---
