@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "One register holds the risks and the assumptions. It holds the issues and the dependencies too."
+statement: "One register holds the risks, assumptions, issues and dependencies — and the decisions, whose high-graded members are the ADRs."
 ---
 
 ## Situation
@@ -33,8 +33,11 @@ restating the other.
 - THE TRIGGER IS THE LIVE PART. Name the event that brings this back for a
   look. An entry with no trigger is filed, not watched, and the register
   becomes a graveyard the first time nobody re-reads it.
-- IMPACT IS A SENTENCE, NOT A SCORE. A probability nobody measured reads
-  exactly like one somebody did.
+- IMPACT IS A SENTENCE, AND THE GRADES RIDE BESIDE IT. Every entry carries
+  `breaks_how_badly` ([[meth-damage-scale]]) and `how_likely`
+  ([[meth-likelihood-scale]]) — ordinal words with tests, never numbers,
+  because a probability nobody measured reads exactly like one somebody
+  did.
 
 ## Telling the four kinds apart
 
@@ -44,6 +47,7 @@ restating the other.
 | assumption | treated as true without being established | you are already relying on it |
 | issue | has happened, hurts now | present tense |
 | dependency | outside your control, needed | somebody else owns it |
+| decision | chosen and relied on | it can only be superseded |
 
 A FALSIFIED ASSUMPTION BECOMES AN ISSUE. It has already happened, so it is not
 a risk. Change the kind, keep the id, say so in the body.
@@ -59,6 +63,7 @@ A CREDIBLE DECISION FLIP IS A RISK with its fallback recorded
 - M1 log-risks opens the register from the vision and the actual.
 - M3 identify-assumptions adds the assumptions the requirements lean on.
 - M5 reverse-sensitivity adds a tripwire per credible flip.
+- M5 record-adrs adds the decisions — every ADR is a register entry.
 - M7 and M8 add what the build and the validation turned up.
 - Any state may add one the moment it is noticed. Waiting for the right state
   is how an entry is lost.

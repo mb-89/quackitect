@@ -7,6 +7,8 @@ owner: the owner
 trigger: none — closed, and nothing brings it back
 status: closed
 impact: None. The concern it named is not one this product carries.
+breaks_how_badly: cosmetic
+how_likely: conceivable
 source_refs:
   - the gap claim in frame-delta
   - meth-state-of-the-art

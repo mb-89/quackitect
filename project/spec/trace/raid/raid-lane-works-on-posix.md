@@ -9,6 +9,8 @@ status: open
 probe: unprobed. The check is a full battery run on macOS or Linux, and no such machine is reachable from here. Reading the code for separator handling would find the places somebody remembered, which is exa
 probed: 2026-08-07
 impact: A separator difference makes a write land in the wrong tree silently — which is the exact failure class the method fan-out was built to end.
+breaks_how_badly: crippling
+how_likely: plausible
 source_refs:
   - engine/paths.ts
   - engine/files.ts

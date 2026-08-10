@@ -7,6 +7,8 @@ owner: the driving agent
 trigger: whenever a reload adds or removes a tool
 status: open
 impact: A verb the engine serves but the client cannot see reads as an unbuilt feature rather than a stale list. An hour goes into re-implementing something that already exists.
+breaks_how_badly: corrosive
+how_likely: expected
 source_refs:
   - engine/mcp.ts handleHttp
   - engine/bin/se-mcp.ts notifyToolListChanged

@@ -7,6 +7,8 @@ owner: the driving agent
 trigger: when the defect-per-session rate stops falling
 status: open
 impact: A defect found mid-walk costs the walk. Two were found this week that destroyed recorded evidence, and both were repaired only because somebody happened to look.
+breaks_how_badly: crippling
+how_likely: expected
 source_refs:
   - the suspect cascade that stripped nine signatures
   - the half-synced worktree that could not compile

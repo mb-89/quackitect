@@ -7,6 +7,8 @@ owner: the driving agent
 trigger: every retro, asking which piece the newest model generation made pointless
 status: open
 impact: Effort spent on a steering mechanism the model no longer needs is effort spent twice, and the mechanism then has to be removed rather than merely abandoned.
+breaks_how_badly: corrosive
+how_likely: expected
 source_refs:
   - the reading-proof mechanism
   - the narration toll

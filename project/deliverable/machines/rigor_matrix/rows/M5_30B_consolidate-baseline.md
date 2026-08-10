@@ -5,7 +5,7 @@ statement: "Consolidate the baseline: the winner's matrices ARE the architecture
 state_kind: work
 filled_by: agent
 depends_on:
-  - reverse-sensitivity
+  - declare-winner
 legal_tools:
   - se_file_read
   - se_file_write

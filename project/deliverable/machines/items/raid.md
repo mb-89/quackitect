@@ -14,6 +14,7 @@ checks:
       - assumption
       - issue
       - dependency
+      - decision
   - field: status
     one_of:
       - open
@@ -21,6 +22,8 @@ checks:
       - mitigated
       - accepted
       - closed
+      - decided
+      - superseded
   - field: owner
     ban_markers:
       - TBD
@@ -55,9 +58,31 @@ checks:
     equals: assumption
     require_section: Probe
     hint: an assumption carries how it would be checked, written when it is identified rather than when it is probed
+  - field: breaks_how_badly
+    ban_markers:
+      - TBD
+      - TBC
+      - TBR
+      - ???
+    hint: every entry carries its damage grade — the words live in meth-damage-scale
+  - field: how_likely
+    ban_markers:
+      - TBD
+      - TBC
+      - TBR
+      - ???
+    hint: every entry carries its likelihood grade — the words live in meth-likelihood-scale
+  - field: kind
+    equals: decision
+    require_section: Rejected options
+    hint: a decision keeps its losers on the record, or the choice cannot be argued with later
+  - field: kind
+    equals: decision
+    require_section: Consequences
+    hint: a decision says what it binds from now on
 ---
 
-# raid — one risk, assumption, issue, or dependency
+# raid — one risk, assumption, issue, dependency, or decision
 
 Lives in `project/spec/trace/raid/`. A STANDING ARTIFACT, exactly like a
 requirement: it outlives the iteration that recorded it, lands on trunk when
@@ -67,7 +92,7 @@ THE REGISTER IS A VIEW over these nodes, never their home. Filtering the same
 folder by kind is how one source serves the project chapter and the
 design-input chapter at once.
 
-## The four kinds, and how to tell them apart
+## The five kinds, and how to tell them apart
 
 | kind | what it is | the tell |
 | --- | --- | --- |
@@ -75,6 +100,14 @@ design-input chapter at once.
 | assumption | something you are TREATING as true without establishing it | you are already relying on it |
 | issue | something that HAS happened and is hurting now | it is present tense |
 | dependency | something outside your control that you need | somebody else owns it |
+| decision | a choice made and relied on | it was decided — it can only be superseded |
+
+AN ADR IS NOT ITS OWN KIND OF THING (owner ruling 2026-08-10). It is a
+decision whose damage grade is high — crippling or worse. The decisions
+chapter derives from this register, filtered by kind and grade.
+
+A DECISION IS NEVER MITIGATED. Its statuses are its own two: decided, and
+later at most superseded. The other statuses belong to the other kinds.
 
 A FALSIFIED ASSUMPTION BECOMES AN ISSUE, not a risk — it has already
 happened. Change the kind, keep the id, and say so in the body.
@@ -114,8 +147,16 @@ test.
 - `owner` — a ROLE, never a person. Who watches it.
 - `trigger` — the event that brings it back for a look. This is the field that
   makes the register live rather than a graveyard.
-- `status` — open, probed, mitigated, accepted, closed.
+- `status` — open, probed, mitigated, accepted, closed. A decision instead
+  carries decided, later at most superseded.
 - `impact` — what it costs if it bites. A sentence, not a score.
+- `breaks_how_badly` — the damage grade, on EVERY kind
+  ([[meth-damage-scale]]). What it grades per kind: a risk that comes true,
+  an issue left unsolved, an assumption that is wrong, a dependency that
+  fails to arrive, a decision that proves wrong.
+- `how_likely` — the likelihood grade, on every kind
+  ([[meth-likelihood-scale]]): expected, plausible or conceivable, each
+  with its test.
 - `source_refs` — what it came from and what leans on it: requirement ids,
   decisions, use cases, field evidence.
 - `probe` — the probe RESULT, on assumptions. Say what was checked and what
@@ -212,6 +253,8 @@ owner: {{role}}
 trigger: {{the event that brings it back}}
 status: open
 impact: {{what it costs if it bites}}
+breaks_how_badly: {{fatal | crippling | corrosive | abrasive | cosmetic}}
+how_likely: {{expected | plausible | conceivable}}
 probe: <!-- what the check found. Start with holds, false, unprobed or scheduled. -->
 probed: <!-- the date the check ran, as YYYY-MM-DD -->
 source_refs:
