@@ -20,6 +20,15 @@ function fresh(): string {
   return mkdtempSync(join(tmpdir(), "se-v3-disc-"));
 }
 
+// THE SLIDER IS THE PERSON'S ALONE (owner ruling 2026-08-10). No lane verb
+// may reach the autonomy dial — it moves through the mirror's human route
+// and the boot flag, nowhere else. This guard refuses the verb before it
+// can exist.
+test("no lane verb reaches the autonomy dial", () => {
+  const tools = readFileSync(new URL("../engine/tools.ts", import.meta.url), "utf8");
+  assert.ok(!tools.includes("setAutonomy"), "a lane verb touches the dial — the slider is the person's alone (owner ruling 2026-08-10)");
+});
+
 // ── the patch verbs ────────────────────────────────────────────────────────
 
 // THE APPEND WENT THROUGH THE SHELL, 285 TIMES. The handover's addenda were

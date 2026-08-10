@@ -7,7 +7,7 @@ applyTo: '**'
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
      from project/guidance/contract.md 5197fafd696e
      from project/guidance/walking.md bb556371c7df
-     from project/guidance/method/lane.md b1add3bca6ee
+     from project/guidance/method/lane.md f5ea60fd4c3c
      from project/guidance/voice.md 1af06d651e9b
 -->
 
@@ -388,6 +388,11 @@ A TRUNCATING PIPE CUTS BEFORE THE ENGINE SEES. What `Select-Object -First`
 dropped exists nowhere — not on the result, not in the log. Ends carry
 verdicts: exit codes, totals, units. Prefer structured results (`se_test`) and
 fetch full output by ref (`se_log_query`) over shaping it in the shell.
+
+A RESULT THE HOST MOVED TO DISK IS RE-FETCHED BY REF, never by reading the
+host's file. The lane logged the full response; `se_log_query` with the
+call's ref serves it back. Retro finding 2026-08-10: several shell reads of
+host-persisted files stood where one log query belonged.
 
 Pass this file's rule to every subagent you spawn.
 
