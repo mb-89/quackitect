@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { mintScenarioLines, scenarioDeckView, structureMetrics } from "../engine/atamwalk.ts";
+import { exposureView, mintScenarioLines, scenarioDeckView, structureMetrics } from "../engine/atamwalk.ts";
 import { elementMatrixView } from "../engine/elematrix.ts";
 import { deckLawProblems, structureLawProblems } from "../engine/stateform.ts";
 import { conformance, type TraceNode } from "../engine/trace.ts";
@@ -165,6 +165,28 @@ test("a decision without a traceable source ref is a conformance finding", () =>
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
+});
+
+test("the exposure chart places entries by their grades and names the ungraded", () => {
+  const damage = ["fatal", "crippling", "corrosive"];
+  const likelihood = ["expected", "plausible", "conceivable"];
+  const v = exposureView(
+    [
+      { id: "raid-a", statement: "s", kind: "risk", status: "open", damage: "fatal", likelihood: "plausible" },
+      { id: "raid-b", statement: "s", kind: "decision", status: "decided", damage: "corrosive", likelihood: "expected" },
+      { id: "raid-c", statement: "s", kind: "risk", status: "closed", damage: "fatal", likelihood: "expected" },
+      { id: "raid-d", statement: "s", kind: "risk", status: "open", damage: "", likelihood: "expected" },
+    ],
+    damage,
+    likelihood,
+  );
+  assert.deepEqual(
+    v.items.map((i) => i.id),
+    ["raid-a", "raid-b", "raid-d"],
+  );
+  assert.deepEqual([v.items[0].damage, v.items[0].likelihood], [0, 1]);
+  assert.deepEqual([v.items[1].damage, v.items[1].likelihood], [2, 0]);
+  assert.ok(v.problems.some((p) => p.includes("raid-d")));
 });
 
 test("the structure numbers count debt, spread, both-way pairs and the idle ends", () => {

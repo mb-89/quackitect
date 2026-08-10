@@ -8,7 +8,7 @@
 // comment law, reapplied).
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { type MetricRow, type ScenarioDeckView, scenarioDeckView, structureMetrics } from "./atamwalk.ts";
+import { type ExposureView, exposureView, type MetricRow, type ScenarioDeckView, scenarioDeckView, structureMetrics } from "./atamwalk.ts";
 import { catalogItems, trizParameterItems } from "./catalogs.ts";
 import { type Judgment, type RelationKind, type WalkResult, walk } from "./compare.ts";
 import { clusterDsm, type Dsm, flowMatrix } from "./dsm.ts";
@@ -197,6 +197,9 @@ export interface FieldArgs {
   scenario: ScenarioDeckView | null;
   /** The structure numbers — the evaluation's computed half. */
   smetrics: MetricRow[] | null;
+  /** The register's exposure chart — damage against likelihood, every
+   *  standing entry a dot. The spike pick is made looking at it. */
+  exposure: ExposureView | null;
 }
 
 export function templateMeta(root: string, name: string): TemplateMeta {
@@ -296,6 +299,7 @@ export const NO_ARGS: FieldArgs = {
   ematrix: null,
   scenario: null,
   smetrics: null,
+  exposure: null,
 };
 
 /** THE CHART, computed from the nodes. Rows are the clusters, cells are the
@@ -589,6 +593,7 @@ export function claimProblems(root: string, s: StateDecl, body: string, corpus: 
       dsm: null,
       scenario: null,
       smetrics: null,
+      exposure: null,
       box: null,
       pareto: null,
       matrix: null,
@@ -1043,7 +1048,7 @@ function derivedViews(
   f: EvidenceField,
   traceRoot: string,
   evidenceDir?: string,
-): Pick<FieldArgs, "matrix" | "sensitivity" | "ematrix" | "scenario" | "smetrics"> {
+): Pick<FieldArgs, "matrix" | "sensitivity" | "ematrix" | "scenario" | "smetrics" | "exposure"> {
   return {
     matrix: f.template !== "decision-matrix" || evidenceDir === undefined ? null : pughView(...m5Inputs(evidenceDir, traceRoot)),
     sensitivity: f.template !== "sensitivity" || evidenceDir === undefined ? null : sensitivityView(...m5Inputs(evidenceDir, traceRoot)),
@@ -1052,6 +1057,7 @@ function derivedViews(
     // INFORMATION ONLY, riding the deck's field (owner ruling 2026-08-10):
     // the numbers render beneath the deck and nothing about them is typed.
     smetrics: f.template !== "scenario-deck" ? null : structureMetricsArgs(traceRoot),
+    exposure: f.template !== "exposure-pick" ? null : exposureArgs(traceRoot),
   };
 }
 
@@ -1126,6 +1132,20 @@ export function scenarioDeckArgs(traceRoot: string): ScenarioDeckView {
     traceFolder(traceRoot, "element").map((n) => n.id),
     catalogItems(traceRoot, "damage_levels"),
   );
+}
+
+/** The exposure chart's entries — the whole standing register with its two
+ *  grades, and the axis orders off the two catalogue cards. */
+export function exposureArgs(traceRoot: string): ExposureView {
+  const entries = traceFolder(traceRoot, "raid").map((n) => ({
+    id: n.id,
+    statement: String(n.fm.statement ?? ""),
+    kind: String(n.fm.kind ?? ""),
+    status: String(n.fm.status ?? ""),
+    damage: String(n.fm.breaks_how_badly ?? ""),
+    likelihood: String(n.fm.how_likely ?? ""),
+  }));
+  return exposureView(entries, catalogItems(traceRoot, "damage_levels"), catalogItems(traceRoot, "likelihood_levels"));
 }
 
 /** The structure numbers, computed off the same nodes as the matrix. */

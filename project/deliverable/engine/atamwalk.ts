@@ -139,6 +139,44 @@ export function mintScenarioLines(content: string, mint: (l: ScenarioMint) => st
     .join("\n");
 }
 
+/** THE EXPOSURE CHART — every standing register entry placed by its two
+ *  grades: damage on one axis, likelihood on the other, both orders read
+ *  from the catalogues by the caller. The dots are the entries; the spike
+ *  pick is a judgment made LOOKING at this field, never a rule computed
+ *  from it. */
+export interface ExposureItem {
+  id: string;
+  statement: string;
+  kind: string;
+  /** Index into the damage order, worst first. -1 means ungraded. */
+  damage: number;
+  likelihood: number;
+}
+
+export interface ExposureView {
+  damageOrder: string[];
+  likelihoodOrder: string[];
+  items: ExposureItem[];
+  problems: string[];
+}
+
+export function exposureView(
+  entries: { id: string; statement: string; kind: string; status: string; damage: string; likelihood: string }[],
+  damageOrder: string[],
+  likelihoodOrder: string[],
+): ExposureView {
+  const problems: string[] = [];
+  const items = entries
+    .filter((e) => e.status !== "closed" && e.status !== "superseded")
+    .map((e) => {
+      const damage = damageOrder.indexOf(e.damage);
+      const likelihood = likelihoodOrder.indexOf(e.likelihood);
+      if (damage === -1 || likelihood === -1) problems.push(`${e.id} is ungraded — it cannot be placed on the chart`);
+      return { id: e.id, statement: e.statement, kind: e.kind, damage, likelihood };
+    });
+  return { damageOrder, likelihoodOrder, items, problems };
+}
+
 /** THE COMPUTED HALF — the structure numbers, each with the raw material for
  *  its one interpreting line. A number nobody interprets is noise, so the
  *  evidence field stores one line per row saying what the number moved. */

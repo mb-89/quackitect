@@ -20,9 +20,9 @@ legal_tools:
   - se_web_fetch
 evidence:
   - name: seeded
-    template: list
+    template: exposure-pick
     of: raid
-    description: the chosen unknowns — one register ref per line, each becoming one parallel spike state; the timebox rides the spike drawing
+    description: the chosen unknowns picked over the exposure chart — one register ref per line, each becoming one parallel spike state; the timebox rides the spike drawing
 major: full
 minor: tailored
 patch: none
@@ -60,7 +60,17 @@ entry's own `impact` field, on the node where it lives. The register view
 shows the ranking; this form does not restate it.
 
 WHAT IS DECIDED HERE is one thing: WHICH unknowns get a spike. That pick
-is the `seeded` list — register refs, one per line.
+is the `seeded` list — register refs, one per line, picked over the
+exposure chart.
+
+THE PICK METHOD, three filters in order:
+
+- EXPOSURE — start at the chart's hot corner and work outward.
+- SPIKEABILITY — a timeboxed probe must be able to settle it. An entry
+  only living can answer (the machinery's youth, a population measure)
+  is not a spike.
+- NOT ALREADY PROBED — an entry the iteration's own goal or a standing
+  mechanism already exercises gets no second probe.
 
 Sources for the pick: the RAID register, the M5 tripwires, any
 requirement whose verify_method is doubtful ([[meth-risk-based-testing]]).
