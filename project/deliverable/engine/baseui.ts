@@ -285,6 +285,15 @@ export function basesCard(root: string, head: string, selected?: string, rowsIn?
   // THE WARM MODEL, not a fresh read. Re-reading the vault on every render is
   // the thing this replaced: the index is built once, kept current by the
   // watcher, and every view reads the same rows the filters do.
+  //
+  // THE WATCHER IS STARTED BY vaultFor, and until 2026-08-09 it was not — this
+  // comment described a mechanism with no callers, and the rows here were a
+  // snapshot from the first render.
+  //
+  // STILL BLOCKING. vaultFor runs the SYNCHRONOUS build, and vault.ts says in
+  // as many words that anything with an interface behind it must use
+  // warmVault() instead. That needs this call chain to be async and is not
+  // done; see the note filed 2026-08-09.
   const rows = rowsIn ?? vaultFor(root).all();
   const damaged = unreadableRows(rows);
   const props = propertyInventory(rows);

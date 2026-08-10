@@ -518,6 +518,22 @@ export function vaultFor(root: string): Vault {
   if (v === undefined) {
     v = new Vault(root);
     v.build();
+    // AND IT IS KEPT CURRENT FROM HERE ON.
+    //
+    // live() existed with ZERO callers (found 2026-08-09 answering the owner),
+    // so the vault was built on the first base render and never touched again.
+    // Edit a note and the database showed the old row until the server
+    // restarted. The comment in baseui.ts claimed the watcher kept it current;
+    // nothing started the watcher.
+    //
+    // A WATCHER IS SOUND HERE AND IS NOT SOUND FOR THE DOOR. The vault feeds a
+    // RENDER, and a repaint arriving a few milliseconds late costs nobody
+    // anything. A claim's green cannot tolerate the same gap, which is why
+    // engine/notes.ts stats instead. Different guarantee, different mechanism.
+    //
+    // The listener is empty on purpose: refresh() has already updated the row
+    // by the time it fires, and the next render reads the fresh one.
+    v.live(() => {});
     WARM.set(root, v);
   }
   return v;
