@@ -10,7 +10,10 @@
 // So this reads two things and compares them.
 //
 //   - The option nodes. Each one found by an outward finder carries a source.
-//   - The call log. It records every se_web_search and se_web_fetch.
+//   - The call log. It records every outward query: the lane's se_web_search
+//     and se_web_fetch, and the native WebSearch/WebFetch the contract allows
+//     when the lane's provider is unconfigured — a hook records those under
+//     the host tool's own name.
 //
 // An outward option with no outward query behind it is the failure mode this
 // exists to name.
@@ -66,15 +69,21 @@ if (existsSync(optionDir)) {
 // option: one honest search turns up several options, and a rule demanding
 // one query each would only teach people to make queries.
 if (outward.length > 0) {
-  const log = join(root, ".se", "calls.jsonl");
-  if (!existsSync(log)) {
-    problems.push(`${outward.length} outward options stand, and the call log is missing at .se/calls.jsonl — the search cannot be proven`);
+  // THE LOG ROTATES, so the proof may sit in a rotated segment beside the
+  // current one. Sweep every calls*.jsonl rather than the newest alone.
+  const seDir = join(root, ".se");
+  const segments = existsSync(seDir) ? readdirSync(seDir).filter((n) => /^calls.*\.jsonl$/.test(n)) : [];
+  if (segments.length === 0) {
+    problems.push(`${outward.length} outward options stand, and no call log exists under .se/ — the search cannot be proven`);
   } else {
-    const text = readFileSync(log, "utf8");
-    const queries = (text.match(/"tool":"se_web_(search|fetch)"/g) ?? []).length;
+    let queries = 0;
+    for (const seg of segments) {
+      const text = readFileSync(join(seDir, seg), "utf8");
+      queries += (text.match(/"tool":"(se_web_(search|fetch)|WebSearch|WebFetch)"/g) ?? []).length;
+    }
     if (queries === 0) {
       problems.push(
-        `${outward.length} options claim outward sources and the log records no se_web_search or se_web_fetch — either the search did not happen, or it happened outside the lane`,
+        `${outward.length} options claim outward sources and no log segment records se_web_search, se_web_fetch or the native WebSearch — either the search did not happen, or it happened outside the lane`,
       );
     }
   }
