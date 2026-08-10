@@ -25,6 +25,7 @@ import { loadLevels } from "./scale.ts";
 import type { Session } from "./session.ts";
 import { survey } from "./survey.ts";
 import { editCell } from "./tables.ts";
+import { warmVault } from "./vault.ts";
 
 export interface MirrorOptions {
   session: Session;
@@ -38,6 +39,12 @@ export interface MirrorOptions {
 
 export function startMirror(o: MirrorOptions): Server {
   const state: MirrorState = { session: o.session, root: o.root, lastPacket: undefined, mode: o.mode, log: o.log };
+
+  // WARM THE VAULT OFF THE REQUEST PATH. The first table render should find
+  // rows rather than pay a build; started here, the card says "warming" at
+  // most once. Skipped under test, where a background build and its watcher
+  // would outlive the case that started the server.
+  if (process.env.NODE_TEST_CONTEXT === undefined) void warmVault(o.root);
 
   // THE READER'S SELECTION, mirrored server-side: the machine page reports
   // which state's details are open, so a control in ANOTHER surface (the

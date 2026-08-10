@@ -4,12 +4,12 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { Vault, vaultFor } from "../engine/vault.ts";
+import { Vault, warmVault } from "../engine/vault.ts";
 import { call, freshRoot } from "./helpers.ts";
 
 test("successful MCP file tools update the warm model synchronously", async (t) => {
   const root = freshRoot();
-  const vault = vaultFor(root);
+  const vault = await warmVault(root);
   t.after(() => vault.stop());
   const session = new Session(root);
   session.setAutonomy(1);

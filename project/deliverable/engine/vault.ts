@@ -102,6 +102,7 @@ export class Vault {
   private watcherStarting: Promise<void> | null = null;
   private snapshotWrite: Promise<void> = Promise.resolve();
   private stopped = false;
+  private built = false;
   private listeners: (() => void)[] = [];
   private readonly watchConfig: VaultWatchConfig;
 
@@ -109,6 +110,13 @@ export class Vault {
     this.root = root;
     this.dir = dir ?? join(root, "project");
     this.watchConfig = loadWatchConfig(root);
+  }
+
+  /** True once rows have been seated — by build, buildAsync or the index.
+   *  The render's read (warmRows) refuses to serve a mid-build vault as if
+   *  the vault were empty. */
+  ready(): boolean {
+    return this.built;
   }
 
   /** Read every note once. The only place the whole vault is touched. */
@@ -174,6 +182,8 @@ export class Vault {
 
   /** Take the rows, index them by path, and stamp what the build cost. */
   private seat(rows: Row[], started: number): VaultStats {
+    // Synchronous with the seating — no observer can see the gap.
+    this.built = true;
     this.rows = [];
     this.byPath = new Map();
     let bytes = 0;
@@ -694,26 +704,27 @@ export function reconcileWarmVault(root: string): number {
   return WARM.get(root)?.reconcile() ?? 0;
 }
 
-export function vaultFor(root: string): Vault {
-  let v = WARM.get(root);
-  if (v === undefined) {
-    v = new Vault(root);
-    v.build();
-    // AND IT IS KEPT CURRENT FROM HERE ON. live() existed with zero callers
-    // until 2026-08-09: the vault was built on the first render and never
-    // touched again, and an edited note showed its old row until restart.
-    //
-    // A WATCHER IS SOUND HERE AND IS NOT SOUND FOR THE DOOR. The vault feeds a
-    // RENDER, and a repaint arriving a few milliseconds late costs nobody
-    // anything. A claim's green cannot tolerate the same gap, which is why
-    // engine/notes.ts stats instead. Different guarantee, different mechanism.
-    if (process.env.NODE_TEST_CONTEXT === undefined) void v.live();
-    WARM.set(root, v);
-  }
-  return v;
+/** The warm rows if they are ready — never builds, never blocks. The
+ *  render's read: where nothing is ready yet it answers undefined, the card
+ *  says it is warming, and the next repaint finds the rows. */
+export function warmRows(root: string): Row[] | undefined {
+  const v = WARM.get(root);
+  return v?.ready() === true ? v.all() : undefined;
 }
 
-/** What a surface calls, so a large vault never blocks the process that draws. */
+/** THE ONE ENTRY, so a large vault never blocks the process that draws. The
+ *  synchronous twin (vaultFor) retired 2026-08-10: its one render caller
+ *  moved to warmRows, and a builder nothing calls is the zero-caller disease
+ *  this file was caught by twice already.
+ *
+ *  AND THE VAULT IS KEPT CURRENT FROM HERE ON. live() existed with zero
+ *  callers until 2026-08-09: the vault was built on the first render and
+ *  never touched again, and an edited note showed its old row until restart.
+ *
+ *  A WATCHER IS SOUND HERE AND IS NOT SOUND FOR THE DOOR. The vault feeds a
+ *  RENDER, and a repaint arriving a few milliseconds late costs nobody
+ *  anything. A claim's green cannot tolerate the same gap, which is why
+ *  engine/notes.ts stats instead. Different guarantee, different mechanism. */
 export async function warmVault(root: string, onProgress?: (p: BuildProgress) => void): Promise<Vault> {
   let v = WARM.get(root);
   if (v === undefined) {
@@ -721,6 +732,7 @@ export async function warmVault(root: string, onProgress?: (p: BuildProgress) =>
     WARM.set(root, v);
     if (!v.loadIndex(onProgress)) await v.buildAsync(onProgress);
     v.saveIndex();
+    if (process.env.NODE_TEST_CONTEXT === undefined) void v.live();
   }
   return v;
 }
