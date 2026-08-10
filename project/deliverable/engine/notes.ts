@@ -47,6 +47,12 @@ export function parseStateNote(raw: string): StateNote {
 
 interface HeldFile {
   stamp: string;
+  /** True while the stamp was minted inside the file's own timestamp tick.
+   *  A same-length rewrite in that tick keeps the stamp identical, so a
+   *  provisional entry is never served from the stamp — it re-reads until
+   *  a read observes the mtime cold. Measured 2026-08-10: 4 of 20 external
+   *  rewrites vanished behind an identical stamp on Windows' ~16 ms tick. */
+  provisional?: boolean;
   /** The base layer. Text, lines and note derive from it lazily. */
   bytes: Buffer;
   text?: string;
@@ -259,14 +265,22 @@ function held(path: string): HeldFile | undefined {
   // the input once per operation and pass it down (software.md, input-process
   // -output). A cache cannot fix a call count.
   let stamp: string;
+  let mtimeMs = 0;
   try {
     const s = statSync(key);
     stamp = `${s.size}:${s.mtimeMs}:${s.ctimeMs}`;
+    mtimeMs = s.mtimeMs;
   } catch {
     HELD.delete(key);
     return undefined;
   }
-  if (hit !== undefined && hit.stamp === stamp) {
+  // A PROVISIONAL ENTRY NEVER HITS ON ITS STAMP. The clock below DENIES
+  // trust, never extends it — which is why it survives the no-clock ruling
+  // (2026-08-10): a file whose mtime sits inside the current timestamp tick
+  // may have been rewritten same-length behind an identical stamp, so it is
+  // re-read until some read finds the mtime cold and the stamp becomes
+  // meaningful.
+  if (hit !== undefined && hit.stamp === stamp && hit.provisional !== true) {
     hit.epoch = EPOCH;
     STATS.hits += 1;
     return hit;
@@ -277,7 +291,8 @@ function held(path: string): HeldFile | undefined {
   } catch {
     return undefined;
   }
-  const fresh: HeldFile = { stamp, bytes, epoch: EPOCH };
+  // 25 ms clears Windows' default ~15.6 ms file-time quantum with room.
+  const fresh: HeldFile = { stamp, bytes, epoch: EPOCH, provisional: Date.now() - mtimeMs < 25 };
   HELD.set(key, fresh);
   STATS.misses += 1;
   return fresh;
