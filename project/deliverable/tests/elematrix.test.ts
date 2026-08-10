@@ -2,8 +2,12 @@
 // crossings from flows and allocation, debts against declared interfaces,
 // and the holes named on both sides.
 import { strict as assert } from "node:assert";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { test } from "node:test";
 import { elementMatrixView } from "../engine/elematrix.ts";
+import { elementMatrixArgs } from "../engine/stateform.ts";
 
 const ELEMENTS = [
   { id: "el-engine", group: "core", implements: ["fn-walk", "fn-log"] },
@@ -63,4 +67,24 @@ test("an interface naming an unknown element is a problem, not a cell", () => {
   const v = elementMatrixView(ELEMENTS, FUNCTIONS, [iface]);
   assert.equal(v.cells.length, 1);
   assert.ok(v.problems.some((p) => p.includes("el-ghost")));
+});
+
+// THE ARG ASSEMBLY TAKES A RECORD ROOT, never the trace folder itself — the
+// same contract every live source honours via traceDir. A direct join under
+// the root read nothing and rendered an empty matrix shaped like success.
+test("elementMatrixArgs reads the trace under project/spec/trace of a record root", () => {
+  const root = mkdtempSync(join(tmpdir(), "ematrix-"));
+  try {
+    const trace = join(root, "project", "spec", "trace");
+    mkdirSync(join(trace, "element"), { recursive: true });
+    mkdirSync(join(trace, "function"), { recursive: true });
+    writeFileSync(join(trace, "element", "el-a.md"), "---\nid: el-a\nimplements:\n  - fn-walk\n---\n");
+    writeFileSync(join(trace, "function", "fn-walk.md"), "---\nid: fn-walk\n---\n");
+    writeFileSync(join(trace, "function", "fn-orphan.md"), "---\nid: fn-orphan\n---\n");
+    const v = elementMatrixArgs(root);
+    assert.equal(v.elements.length, 1);
+    assert.deepEqual(v.unimplemented, ["fn-orphan"]);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });

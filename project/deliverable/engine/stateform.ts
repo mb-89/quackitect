@@ -31,6 +31,7 @@ import {
   refsIn,
   refsInRows,
   type TraceNode,
+  traceDir,
 } from "./trace.ts";
 import { edgeProblems, traceSchema } from "./traceschema.ts";
 
@@ -982,12 +983,13 @@ export function elementMatrixArgs(traceRoot: string): ElementMatrixView {
         .filter((s) => s !== "");
     return [];
   };
+  const dir = traceDir(traceRoot);
   const nodes = (folder: string): { id: string; fm: Record<string, unknown> }[] => {
     try {
-      return readdirSync(join(traceRoot, folder))
+      return readdirSync(join(dir, folder))
         .filter((n) => n.endsWith(".md"))
         .map((n) => {
-          const note = noteOf(join(traceRoot, folder, n));
+          const note = noteOf(join(dir, folder, n));
           return { id: String(note?.frontmatter.id ?? n.replace(/\.md$/, "")), fm: note?.frontmatter ?? {} };
         });
     } catch {
@@ -1014,7 +1016,7 @@ function m5Inputs(evidenceDir: string, traceRoot: string): [string, string, (id:
     return raw === "" ? "" : section(parseStateNote(raw).body, name);
   };
   const gradeOf = (id: string): string => {
-    const fm = noteOf(join(traceRoot, "requirement", `${id}.md`))?.frontmatter;
+    const fm = noteOf(join(traceDir(traceRoot), "requirement", `${id}.md`))?.frontmatter;
     return typeof fm?.breaks_how_badly === "string" ? fm.breaks_how_badly : "";
   };
   return [sectionOf("evaluate-set", "scores"), sectionOf("cut-criteria", "cuts"), gradeOf];

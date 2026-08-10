@@ -111,7 +111,7 @@ import {
   templateProblems,
 } from "./stateform.ts";
 import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
-import { corpusVersion, loadTrace, noteOf } from "./trace.ts";
+import { corpusVersion, loadTrace, noteOf, traceDir } from "./trace.ts";
 import { type Expedition, expClose, expFind, expList, expNew, readRecord } from "./worktree.ts";
 
 /** THE PULL is the machinery — one verb, legal in EVERY state: the agent
@@ -4207,7 +4207,7 @@ export class Session {
     const traceRoot = this.traceRoot(this.declIteration(m));
     const cell = elementMatrixArgs(traceRoot).cells.find((c) => c.source === source && c.destination === destination);
     const id = `if-${source.replace(/^el-/, "")}-to-${destination.replace(/^el-/, "")}`;
-    const abs = join(traceRoot, "interface", `${id}.md`);
+    const abs = join(traceDir(traceRoot), "interface", `${id}.md`);
     if (!existsSync(abs) && cell !== undefined) {
       mkdirSync(dirname(abs), { recursive: true });
       writeNode(
@@ -4261,7 +4261,7 @@ export class Session {
     for (const [f, content] of Object.entries(fields)) {
       fields[f] = mintFlipLines(String(content), ({ rival, winner, axis }) => {
         const id = `raid-flip-${shortId(rival)}-on-${shortId(axis)}`;
-        const abs = join(traceRoot, "raid", `${id}.md`);
+        const abs = join(traceDir(traceRoot), "raid", `${id}.md`);
         if (!existsSync(abs)) {
           mkdirSync(dirname(abs), { recursive: true });
           writeNode(
