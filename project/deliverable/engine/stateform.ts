@@ -609,6 +609,34 @@ export function claimProblems(root: string, s: StateDecl, body: string, corpus: 
     if (f.template === "element-matrix") out.push(...structureLawProblems(f.name, nodes));
     if (f.template === "scenario-deck") out.push(...deckLawProblems(f.name, section(body, f.name), nodes));
   }
+  if (s.id.endsWith("gate-prototype")) out.push(...assumptionLawProblems(nodes, catalogItems(root, "damage_levels")));
+  return out;
+}
+
+/** The riskiest assumptions are validated — gate-prototype's law (owner
+ *  ruling 2026-08-10). An assumption in the worst two damage grades must
+ *  carry a probe result, a conscious acceptance, or a deferral WITH its
+ *  until — a deferral without one is a silent pass wearing a status. */
+export function assumptionLawProblems(corpus: { id: string; type: string; file?: string }[], damageOrder: string[]): string[] {
+  const out: string[] = [];
+  for (const n of corpus) {
+    if (n.type !== "raid" || n.file === undefined) continue;
+    const fm = noteOf(n.file)?.frontmatter ?? {};
+    if (String(fm.kind ?? "") !== "assumption") continue;
+    const status = String(fm.status ?? "");
+    if (status === "closed" || status === "superseded" || status === "accepted") continue;
+    if (status === "deferred") {
+      if (String(fm.defer_until ?? "").trim() === "") out.push(`${n.id}: deferred without its until — say what brings it back`);
+      continue;
+    }
+    // Index 0 and 1 are the two worst grades of the catalogue's worst-first
+    // order; the words themselves stay on the card.
+    const dmg = damageOrder.indexOf(String(fm.breaks_how_badly ?? ""));
+    const probe = String(fm.probe ?? "").trim();
+    const answered = probe !== "" && !probe.startsWith("<!--") && !/^unprobed/i.test(probe);
+    if (dmg >= 0 && dmg <= 1 && !answered)
+      out.push(`${n.id}: a ${damageOrder[dmg]} assumption stands unprobed — probe it, accept it, or defer it with an until`);
+  }
   return out;
 }
 
