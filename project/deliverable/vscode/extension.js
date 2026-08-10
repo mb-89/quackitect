@@ -186,7 +186,7 @@ function evictPort(port) {
 }
 function placeConfigs(root) {
   const opened = path.join(root, "project");
-  const cage = path.join(opened, "_cage");
+  const cage = path.join(opened, "deliverable", "cage");
   const place = (src, destDir, destName) => {
     mkdirSync(destDir, { recursive: true });
     copyFileSync(path.join(cage, src), path.join(destDir, destName));
@@ -1368,7 +1368,7 @@ function sessionHeader(now) {
   return `Session ${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 function agentLaunch(root) {
-  const cageDir = path.join(root, "project", "_cage");
+  const cageDir = path.join(root, "project", "deliverable", "cage");
   const kickoff = `${sessionHeader()}
 
 ${readFileSync(path.join(cageDir, "kickoff.txt"), "utf8").trim()}`;
@@ -1457,7 +1457,7 @@ async function openCard(n) {
   await ensureCards();
   const card = cardBySlot(n);
   if (!shown(card)) {
-    void vscode.window.showInformationMessage(`$PRODUCT$: project/views/cards.md declares no card ${n}.`);
+    void vscode.window.showInformationMessage(`$PRODUCT$: project/deliverable/views/cards.md declares no card ${n}.`);
     return;
   }
   await showHelp(titleOf(card), cardHelp(card), false);

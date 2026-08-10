@@ -1,6 +1,6 @@
-// continue_expedition is GENERATED, not drawn (owner design 2026-07-27):
+﻿// continue_expedition is GENERATED, not drawn (owner design 2026-07-27):
 // its states ARE the open expeditions, read from their records at entry.
-// The standard expedition machine stays AUTHORED — states/work.md and
+// The standard expedition machine stays AUTHORED â€” states/work.md and
 // states/leave.md are the single source; the generator instantiates them
 // once per open expedition (id, statement and edges overridden). The
 // human clicks the expedition to enter; ONE reaching end completes the
@@ -9,18 +9,18 @@
 import { spawnSync } from "node:child_process";
 
 import { join } from "node:path";
-import { readNode } from "./notes.ts";
 import { type CanvasData, type CanvasEdge, type CanvasElement, nodeSize } from "./canvas.ts";
 import { type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
 import { stateFromNote } from "./machines/compile.ts";
+import { readNode } from "./notes.ts";
 import { type Expedition, expList, frontmatterOf, readRecord, recordRel } from "./worktree.ts";
 
 export interface GeneratedMachine {
   decl: MachineDecl;
   canvas: CanvasData;
-  /** state id (e5, e5-leave) → the full expedition id it belongs to. */
+  /** state id (e5, e5-leave) â†’ the full expedition id it belongs to. */
   expByState: Record<string, string>;
-  /** Nested generated machines: state id → its generator (archive decades). */
+  /** Nested generated machines: state id â†’ its generator (archive decades). */
   subGen?: Record<string, () => GeneratedMachine>;
 }
 
@@ -36,15 +36,15 @@ function mechanical(id: string, kind: "start" | "end"): StateDecl {
     statement: "",
     guidance:
       kind === "start"
-        ? "The seeded container: every open expedition stands as its own states. Pick ONE way forward — entering an expedition binds its worktree."
-        : "One expedition came home (or nothing was open) — the machine is complete here. The others stay parked for the next entry.",
+        ? "The seeded container: every open expedition stands as its own states. Pick ONE way forward â€” entering an expedition binds its worktree."
+        : "One expedition came home (or nothing was open) â€” the machine is complete here. The others stay parked for the next entry.",
     evidence_form: [],
     priority: 0.01,
     edges: [],
   };
 }
 
-/** expList needs a git repository — a bare root simply has none. */
+/** expList needs a git repository â€” a bare root simply has none. */
 function safeExpList(root: string): ReturnType<typeof expList> {
   try {
     return expList(root);
@@ -101,13 +101,13 @@ export function generateContinueExpedition(root: string): GeneratedMachine {
     const fm = readRecord(root, e);
     // A record that will not parse still gets a node, saying so. Dropping it
     // would leave a hole where an expedition used to be.
-    const goal = fm?.unreadable !== undefined ? `⚠ ${String(fm.unreadable)}` : String(fm?.goal ?? "");
+    const goal = fm?.unreadable !== undefined ? `âš  ${String(fm.unreadable)}` : String(fm?.goal ?? "");
     const workId = sid;
     const leaveId = `${sid}-leave`;
     expByState[workId] = e.id;
     expByState[leaveId] = e.id;
     states.push({ ...workTpl, id: workId, statement: goal !== "" ? goal : e.id, edges: [{ to: leaveId, role: "normal" }] });
-    // ALTERNATIVE into end — normal edges would AND-join: end would wait
+    // ALTERNATIVE into end â€” normal edges would AND-join: end would wait
     // for EVERY expedition, and one coming home is the whole point.
     states.push({ ...leaveTpl, id: leaveId, statement: "", edges: [{ to: "end", role: "alternative" }] });
     start.edges.push({ to: workId, role: "normal" });
@@ -152,16 +152,16 @@ export function generateContinueExpedition(root: string): GeneratedMachine {
 }
 
 /** THE ARCHIVE, generated (owner design 2026-07-27): every CLOSED
- *  expedition stands as its own read-only state — a gallery of dead
+ *  expedition stands as its own read-only state â€” a gallery of dead
  *  machines, all in parallel. Start reaches each one; each runs to end
- *  (alternative — one visit completes the machine). Nothing closed:
+ *  (alternative â€” one visit completes the machine). Nothing closed:
  *  start runs straight to end. Clicking one shows what the expedition
  *  did. */
 /** Session cache: a closed expedition's branch never moves, so its record
- *  is read once — only NEW closures are misses on a later open. */
+ *  is read once â€” only NEW closures are misses on a later open. */
 const recordCache = new Map<string, Map<string, Record<string, unknown> | undefined>>();
 
-/** Every missing record in ONE `git cat-file --batch` call — a spawn per
+/** Every missing record in ONE `git cat-file --batch` call â€” a spawn per
  *  record made the archive take seconds to open. */
 function closedRecords(root: string, closed: Expedition[]): Map<string, Record<string, unknown> | undefined> {
   let cache = recordCache.get(root);
@@ -169,13 +169,13 @@ function closedRecords(root: string, closed: Expedition[]): Map<string, Record<s
     cache = new Map();
     recordCache.set(root, cache);
   }
-  // The MERGED copy is the truth (retro flips land there) — read it fresh
+  // The MERGED copy is the truth (retro flips land there) â€” read it fresh
   // every time, it is one cheap file read; only the branch fallback caches.
   const out = new Map<string, Record<string, unknown> | undefined>();
   const missing: Expedition[] = [];
   for (const e of closed) {
     const merged = join(root, recordRel(e.id));
-    // ONE ASK, THROUGH THE DOOR. This was existsSync then readFileSync — two
+    // ONE ASK, THROUGH THE DOOR. This was existsSync then readFileSync â€” two
     // syscalls for one answer, 4,448 of the first to enter a record, and
     // neither of them shared with any other reader of the same file.
     //
@@ -236,10 +236,10 @@ function recordState(e: ArchiveEntry, kindWord: string): StateDecl {
     id: e.sid,
     kind: "work",
     statement: e.goal !== "" ? e.goal : e.full,
-    guidance: `An archived ${kindWord} — read-only. Its record and report are in the details.`,
+    guidance: `An archived ${kindWord} â€” read-only. Its record and report are in the details.`,
     evidence_form: [],
     // Human-only (owner ruling 2026-07-27): 1.5 sits above the whole
-    // slider — there is nothing for an agent to do in the archive, so no
+    // slider â€” there is nothing for an agent to do in the archive, so no
     // autonomy ever admits it.
     priority: 1.5,
     tags: kindWord === "expedition" ? ["archive-record"] : [],
@@ -308,7 +308,7 @@ function buildDecades(machineId: string, entries: ArchiveEntry[], kindWord: stri
   type GenNode = CanvasElement & { styleAttributes?: Record<string, unknown> };
   const nodes: GenNode[] = [];
   const edges: CanvasEdge[] = [];
-  // TOP TO BOTTOM (owner ruling 2026-07-28): decades stack vertically —
+  // TOP TO BOTTOM (owner ruling 2026-07-28): decades stack vertically â€”
   // the reading direction for records is downward at every nesting level;
   // a new decade lands at the bottom.
   const decCount = Math.ceil(entries.length / 10);
@@ -339,8 +339,8 @@ function buildDecades(machineId: string, entries: ArchiveEntry[], kindWord: stri
     states.push({
       id: decId,
       kind: "work",
-      statement: `${slice[0].sid} – ${slice[slice.length - 1].sid} (${slice.length} records)`,
-      guidance: `A decade of archived ${kindWord}s — click into it; the records stand inside as their own states.`,
+      statement: `${slice[0].sid} â€“ ${slice[slice.length - 1].sid} (${slice.length} records)`,
+      guidance: `A decade of archived ${kindWord}s â€” click into it; the records stand inside as their own states.`,
       evidence_form: [],
       priority: 1.5,
       tags: ["archive-decade"],
@@ -366,7 +366,7 @@ function buildDecades(machineId: string, entries: ArchiveEntry[], kindWord: stri
 
 /** ONE archive shape for both record kinds (owner ruling 2026-07-27, both
  *  archives). Ten or fewer: every record its own state. More: DECADE
- *  SUB-MACHINES — ten records per group, each group a state you CLICK
+ *  SUB-MACHINES â€” ten records per group, each group a state you CLICK
  *  INTO; hundreds nest the same way. */
 export function buildArchive(machineId: string, entries: ArchiveEntry[], kindWord: string): GeneratedMachine {
   return entries.length > 10 ? buildDecades(machineId, entries, kindWord) : buildRecordColumn(machineId, entries, kindWord);

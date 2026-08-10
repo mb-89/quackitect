@@ -1228,3 +1228,5 @@
 {"ts":"2026-08-10T13:03:22.625Z","op":"update","visit":"iterations/i1/gate-candidates@2","node":"d52","brief":"submitting with raid_additions as references"}
 {"ts":"2026-08-10T13:03:42.874Z","op":"update","visit":"iterations/i1/gate-candidates@2","node":"d53","brief":"syncing trunk into the worktree so the minted nodes resolve"}
 {"ts":"2026-08-10T13:04:25.058Z","op":"update","visit":"iterations/i1/gate-candidates@2","node":"d54","brief":"committing the worktree's mirrored method and the owner's edit, then syncing"}
+{"ts":"2026-08-10T13:05:06.745Z","op":"update","visit":"iterations/i1/gate-candidates@2","node":"d55","brief":"trunk syncs into the worktree; the minted nodes arrive"}
+{"ts":"2026-08-10T13:06:54.924Z","op":"defer","visit":"iterations/i1/gate-candidates@1","node":"d49","brief":"submit the gate; the bless stays the owner's","to":"gate-candidates","hops":1,"trail":["iterations/i1/gate-candidates","gate-candidates"]}

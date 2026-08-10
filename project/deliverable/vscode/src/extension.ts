@@ -174,7 +174,7 @@ function placeConfigs(root) {
   // The host looks for its dot-config at the top of the OPENED folder, so
   // that is where these land. Nothing else about them moved.
   const opened = path.join(root, "project");
-  const cage = path.join(opened, "_cage");
+  const cage = path.join(opened, "deliverable", "cage");
   const place = (src, destDir, destName) => {
     mkdirSync(destDir, { recursive: true });
     copyFileSync(path.join(cage, src), path.join(destDir, destName));
@@ -1689,7 +1689,7 @@ function sessionHeader(now) {
 }
 
 function agentLaunch(root) {
-  const cageDir = path.join(root, "project", "_cage");
+  const cageDir = path.join(root, "project", "deliverable", "cage");
   const kickoff = `${sessionHeader()}\n\n${readFileSync(path.join(cageDir, "kickoff.txt"), "utf8").trim()}`;
   const has = (cmd) => spawnSync(cmd, ["--version"], { encoding: "utf8", shell: true }).status === 0;
   if (has("claude")) return { host: "claude", kickoff, command: `claude ${psq(kickoff)}` };

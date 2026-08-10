@@ -96,7 +96,7 @@ if ($exportIx -ge 0) {
   $dest = (Resolve-Path -LiteralPath $dest).Path
   # /XD excludes by NAME wherever it appears: the repo history, every
   # worktree, the session state, node_modules and the generated cage dirs.
-  # /XF drops the generated MCP config; the _cage templates travel (their
+  # /XF drops the generated MCP config; the cage templates travel (their
   # file is mcp.json, a different name) and RUNME regenerates on launch.
   # .git rides BOTH lists: in a normal checkout it is a directory (/XD), in
   # a git WORKTREE the root carries a .git FILE (/XF) — missing that file
@@ -470,19 +470,19 @@ try {
 
 # Install the cage. .mcp.json and .claude\settings.json cannot be written by
 # remote tools (desktop security rule), so they ship as templates in
-# workspace\_cage and are placed locally here - declaratively, every run.
+# workspace\deliverable\cage and are placed locally here - declaratively, every run.
 Write-Host "$P - installing cage config" -ForegroundColor Cyan
 $ws = Join-Path $root "project"
 New-Item -ItemType Directory -Force -Path (Join-Path $ws ".claude") | Out-Null
-Copy-Item (Join-Path $ws "_cage\mcp.json") (Join-Path $ws ".mcp.json") -Force
-Copy-Item (Join-Path $ws "_cage\claude-settings.json") (Join-Path $ws ".claude\settings.json") -Force
+Copy-Item (Join-Path $ws "deliverable\cage\mcp.json") (Join-Path $ws ".mcp.json") -Force
+Copy-Item (Join-Path $ws "deliverable\cage\claude-settings.json") (Join-Path $ws ".claude\settings.json") -Force
 Write-Host "  project\.mcp.json + project\.claude\settings.json in place"
 # COPILOT'S CAGE IS SHAPED DIFFERENTLY. Its MCP config is a file like
 # Claude's, so it is placed here the same way. Its tool DENIAL is not a
 # file at all - Copilot takes that on the command line, so that half rides
-# the launch and lives in _cage\copilot-cage.json as data you can correct.
+# the launch and lives in deliverable\cage\copilot-cage.json as data you can correct.
 New-Item -ItemType Directory -Force -Path (Join-Path $ws ".copilot") | Out-Null
-Copy-Item (Join-Path $ws "_cage\copilot-mcp-config.json") (Join-Path $ws ".copilot\mcp-config.json") -Force
+Copy-Item (Join-Path $ws "deliverable\cage\copilot-mcp-config.json") (Join-Path $ws ".copilot\mcp-config.json") -Force
 Write-Host "  project\.copilot\mcp-config.json in place"
 
 # The FAST gate only (sub-second): canvases compile, hard deps answer, the
@@ -541,9 +541,9 @@ Write-Host "$P - the Mirror (your hand on the walk): the server opens http://loc
 # message - so RUNME sends it. The agent boots as far as the threshold
 # lets it, ANNOUNCES where it stands, and stops; a stopped agent cannot
 # hear the slider - the user messages it (e.g. "continue") to resume.
-# THE KICKOFF LIVES IN ONE FILE - workspace/_cage/kickoff.txt. The VS Code
+# THE KICKOFF LIVES IN ONE FILE - workspace/deliverable/cage/kickoff.txt. The VS Code
 # extension sends the same text, so the wording cannot fork.
-$kickoff = (Get-Content (Join-Path $ws "_cage\kickoff.txt") -Raw).Trim()
+$kickoff = (Get-Content (Join-Path $ws "deliverable\cage\kickoff.txt") -Raw).Trim()
 # THE TERMINAL PANE IS THE DEFAULT. The agent runs inside a pseudo-terminal
 # hosted beside it, so the Mirror shows it in the left column. That host is
 # started DETACHED: with the terminal in the browser this window has nothing
@@ -568,7 +568,7 @@ try {
     #
     # The cage is read from data - see copilot-cage.json, verified against a
     # live CLI and carrying the record of what was wrong before.
-    $cage = Get-Content (Join-Path $ws "_cage\copilot-cage.json") -Raw | ConvertFrom-Json
+    $cage = Get-Content (Join-Path $ws "deliverable\cage\copilot-cage.json") -Raw | ConvertFrom-Json
     $cageArgs = @($cage.mcp_args) + @($cage.exclude_args) + @($cage.allow_args) + @($cage.deny_args) + @($cage.extra_args)
     Write-Host "$P - agent host: GitHub Copilot CLI" -ForegroundColor Cyan
     if ($ownTerminal) {

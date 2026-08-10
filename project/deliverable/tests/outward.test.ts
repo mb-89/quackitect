@@ -76,11 +76,7 @@ test("outward options with no recorded query are red", () => {
 // log segment would have hidden even a lane search.
 test("a native WebSearch record in a rotated segment satisfies the check", () => {
   const root = rootWith({ "opt-a": priorArt("https://example.org/a-paper") }, 0);
-  writeFileSync(
-    join(root, ".se", "calls.1.jsonl"),
-    `${JSON.stringify({ ref: "call-n", tool: "WebSearch" })}\n`,
-    "utf8",
-  );
+  writeFileSync(join(root, ".se", "calls.1.jsonl"), `${JSON.stringify({ ref: "call-n", tool: "WebSearch" })}\n`, "utf8");
   const r = run(root);
   assert.equal(r.code, 0, r.out);
   assert.match(r.out, /green/);

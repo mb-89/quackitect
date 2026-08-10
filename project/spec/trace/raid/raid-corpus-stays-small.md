@@ -21,6 +21,10 @@ on every reload. Neither is bounded by anything but the corpus.
 
 Today that is fine: 146 requirements, 15 evidence files, one open worktree.
 
+A CANDIDATE LEANS ON IT TOO (gate-candidates, 2026-08-09). cand-derived-house
+assumes the corpus stays small enough to rebuild on every look. Measured that
+day: 322 nodes, 465 ms cold, 119 ms warm. Unmeasured above that.
+
 NOT ESTABLISHED: nobody has measured where it stops being fine. The number
 above is what exists, not what was tested.
 

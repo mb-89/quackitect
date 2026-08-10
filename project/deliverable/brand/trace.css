@@ -1,0 +1,86 @@
+/* THE TRACE GRAPH'S DIALS — yours to turn (owner ruling 2026-08-07).
+ *
+ * Nothing here is structural. Every value is a look: how faint a thing gets,
+ * how far out the drawing changes what it shows. Edit, save, and the mirror
+ * picks it up on its next paint — no restart, no rebuild.
+ *
+ * HOW ZOOM IS MEASURED. One number: how much of the whole drawing is on
+ * screen. 1 means all of it. 0.1 means a tenth, close in. Every threshold
+ * below is that number.
+ *
+ * NOTHING EVER REACHES ZERO. Far out, the cards still show the structure even
+ * when nobody can read them, and the separators still say where one section
+ * ends. Both floors are here.
+ */
+
+svg.trace {
+  /* ---- the cards, the edges and the rings ---- */
+
+  /* Never fainter than this, however far out. The structure has to stay
+   * visible even when the labels do not. */
+  --trace-card-floor: 0.22;
+  /* Full strength from here inward. */
+  --trace-card-full: 0.5;
+  /* Down to the floor from here outward. */
+  --trace-card-gone: 0.8;
+
+  /* ---- the section and slice labels on their arcs ---- */
+
+  --trace-band-floor: 0;
+  /* Full strength from here OUTWARD — the labels are the far view. */
+  --trace-band-full: 0.5;
+  /* Down to the floor from here inward. */
+  --trace-band-gone: 0.22;
+
+  /* ---- the separators: the spokes that part one section from the next ---- */
+
+  /* Like the cuts in a cake. Faint up close so they never fight the cards,
+   * clear far out where they are the only thing saying where a section ends. */
+  --trace-spoke-floor: 0.1;
+  --trace-spoke-full: 0.55;
+  --trace-spoke-gone: 0.2;
+  --trace-spoke-width: 2;
+  /* The slice separator is the quieter one — it parts design from tests
+   * INSIDE a section, so it must not read as loudly as a section boundary. */
+  --trace-cut-width: 1.2;
+  --trace-cut-dash: 10 14;
+
+  /* ---- type ---- */
+
+  /* Both are fractions of the inner ring, so the drawing scales as one. */
+  --trace-band-size: 0.34;
+  --trace-cut-size: 0.2;
+  /* The per-ring labels: "requirements", "functions". */
+  --trace-ring-size: 0.16;
+
+  /* ---- colour ---- */
+
+  --trace-band-fill: var(--se-fg);
+  --trace-cut-fill: var(--se-muted);
+  --trace-spoke-stroke: var(--se-border-strong);
+  --trace-hover: var(--se-accent);
+  /* The wash behind a piece when the pointer is over it. */
+  --trace-sector-hover: 0.06;
+
+  /* ---- zoom ---- */
+
+  /* HOW FAR A DOUBLE-CLICK ON A CARD CLOSES IN. Below 1 is closer; 0.5 halves
+   * what is on screen each time. A piece of the pie is fitted to the view
+   * instead, so this does not touch it. */
+  --trace-zoom-step: 0.5;
+
+  /* ---- the pieces you click ---- */
+
+  /* A faint outline ALWAYS, so you can see what you would hit before you hit
+   * it. Brighter under the pointer. Turn the resting one to 0 to have the
+   * pieces vanish until hovered. */
+  --trace-sector-line: 0.18;
+  --trace-sector-width: 1;
+  --trace-sector-line-hover: 0.85;
+  --trace-sector-width-hover: 2;
+
+  /* THE DASHED CIRCLES ARE OFF. The piece outlines already say where a level
+   * starts and ends, so the circles said it twice. Raise this to bring them
+   * back. */
+  --trace-ring-alpha: 0;
+}
