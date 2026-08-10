@@ -22,7 +22,7 @@ evidence:
   - name: seeded
     template: exposure-pick
     of: raid
-    description: the chosen unknowns picked over the exposure chart — one register ref per line, each becoming one parallel spike state; the timebox rides the spike drawing
+    description: the chosen unknowns picked over the exposure chart — the biggest blockers for the coming build that a timeboxed probe can settle; one register ref per line, each becoming one parallel spike state
 major: full
 minor: tailored
 patch: none

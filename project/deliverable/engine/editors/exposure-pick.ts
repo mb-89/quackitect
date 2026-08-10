@@ -58,8 +58,10 @@ export const EXPOSURE_PICK_EDITOR: EditorKind = {
         const y = cellY(it.likelihood) + (gy + 1) * (ch / (rowsN + 1));
         const p = paths ? paths[it.id] : null;
         const title = "<title>" + escText(it.id + " (" + it.kind + ") \\u2014 " + it.statement) + "</title>";
-        const ring = picked[it.id] ? 'stroke="var(--se-reg-pick)" stroke-width="2.5" ' : "";
-        dots += '<circle class="reflink" ' + (p ? 'data-path="' + escText(p) + '" ' : "") + ring + 'cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="6" fill="' + kindFill(it.kind) + '" fill-opacity="0.9" style="cursor:pointer;">' + title + "</circle>";
+        // Enclosure marks the pick: a separate neutral ring with a gap, and
+        // the unpicked step back through desaturation.
+        if (picked[it.id]) dots += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="9.5" fill="none" stroke="var(--se-reg-pick)" stroke-width="2"/>';
+        dots += '<circle class="reflink" ' + (p ? 'data-path="' + escText(p) + '" ' : "") + 'cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="6" fill="' + kindFill(it.kind) + '" fill-opacity="' + (picked[it.id] ? "1" : "0.55") + '" style="cursor:pointer;">' + title + "</circle>";
       });
     });
     let grid = "";
@@ -72,7 +74,7 @@ export const EXPOSURE_PICK_EDITOR: EditorKind = {
     const meta = "font-size:11px;color:var(--se-muted);padding:4px 0;";
     // THE LEGEND — only the kinds actually on the chart, plus the ring.
     const chip = function (color, label, ring) {
-      const dot = '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + (ring ? "transparent" : color) + ";" + (ring ? "border:2.5px solid var(--se-reg-pick);" : "") + 'vertical-align:middle;margin-right:4px;"></span>';
+      const dot = '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + (ring ? "transparent" : color) + ";" + (ring ? "border:2px solid var(--se-reg-pick);" : "") + 'vertical-align:middle;margin-right:4px;"></span>';
       return '<span style="margin-right:12px;white-space:nowrap;">' + dot + escText(label) + "</span>";
     };
     let legend = "";
