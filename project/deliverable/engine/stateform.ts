@@ -438,6 +438,7 @@ function resolveSource(i: string, root: string, traceRoot: string, instanceRaw?:
   if (i === "$flows") return flowItems(traceRoot);
   if (i === "$options") return optionItems(traceRoot);
   if (i === "$experiments") return typedItems(traceRoot, "experiment");
+  if (i === "$requirements") return typedItems(traceRoot, "requirement");
   if (i === "$candidates") return candidateItems(traceRoot);
   // THE CATALOGUES. A known set is never typed from memory and never hard
   // coded — it is read from the method card that holds it, so editing the card
@@ -609,7 +610,32 @@ export function claimProblems(root: string, s: StateDecl, body: string, corpus: 
     if (f.template === "element-matrix") out.push(...structureLawProblems(f.name, nodes));
     if (f.template === "scenario-deck") out.push(...deckLawProblems(f.name, section(body, f.name), nodes));
   }
+  out.push(...stateLawProblems(root, s, nodes));
+  return out;
+}
+
+/** The per-state laws, dispatched off the state id — kept out of
+ *  claimProblems so the field loop stays readable. */
+function stateLawProblems(root: string, s: StateDecl, nodes: TraceNode[]): string[] {
+  const out: string[] = [];
   if (s.id.endsWith("gate-prototype")) out.push(...assumptionLawProblems(nodes, catalogItems(root, "damage_levels")));
+  if (s.id.endsWith("author-tests")) out.push(...authorTestsLawProblems(nodes));
+  return out;
+}
+
+/** Every test-method requirement carries at least one test address —
+ *  author-tests' law (owner ruling 2026-08-10). Presence only for now;
+ *  the reverse sweep (no test without a requirement) and the
+ *  address-matches-the-recorded-run tooth ship warn-first later. */
+export function authorTestsLawProblems(corpus: { id: string; type: string; file?: string }[]): string[] {
+  const out: string[] = [];
+  for (const n of corpus) {
+    if (n.type !== "requirement" || n.file === undefined) continue;
+    const fm = noteOf(n.file)?.frontmatter ?? {};
+    if (String(fm.verify_method ?? "") !== "test") continue;
+    const v = fmList(fm.verified_by).filter((l) => !l.trim().startsWith("<!--"));
+    if (v.length === 0) out.push(`${n.id}: a test-method requirement with no verified_by — name the case, <test file> :: <test case name>`);
+  }
   return out;
 }
 
