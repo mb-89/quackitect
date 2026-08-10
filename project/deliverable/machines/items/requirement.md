@@ -143,11 +143,14 @@ How to write one is [[meth-requirement-authoring]]. The statement shapes are
 
 THE TEST LIVES ON THE ROW (owner ruling 2026-08-10). `verified_by` names
 the checks that verify this requirement — a LIST, at least one entry,
-written at M7 author-tests, never at authoring time. For
+written at M7 author-tests, NEVER at authoring time — which is why the
+key stays OUT of the skeleton: a key in the skeleton is demanded of every
+node at M3, and this one is not yet writable there. For
 `verify_method: test` each line is a case's address, `<test file> ::
 <test case name>`. For the other methods it names the evidence artifact,
 or the review-class residue plainly. There is no separate test note: the
-test definition is the test itself.
+test definition is the test itself. The author-tests law enforces the
+presence, at its own state.
 
 ## The template
 
@@ -177,13 +180,6 @@ kind: TODO — functional | quality | constraint | interface
 #   inspection    — a static attribute, examined directly
 #   demonstration — observed working, without instrumented capture
 verify_method: TODO — test | analysis | inspection | demonstration
-#
-# THE TEST ADDRESSES — written at M7 author-tests, never here. A LIST,
-# at least one entry. For a test row each line is <test file> :: <test
-# case name>; for the other methods, the evidence artifact or the named
-# residue.
-verified_by:
-  - <!-- written at author-tests -->
 #
 # What concretely breaks without this row, in one line. Unfillable means
 # this row is a deletion candidate, never a keeper with a TODO.
