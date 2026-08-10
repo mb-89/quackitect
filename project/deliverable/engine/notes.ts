@@ -47,7 +47,9 @@ export function parseStateNote(raw: string): StateNote {
 
 interface HeldFile {
   stamp: string;
-  text: string;
+  /** The base layer. Text, lines and note derive from it lazily. */
+  bytes: Buffer;
+  text?: string;
   lines?: string[];
   note?: StateNote;
   /** The pass that last verified this against disk. Equal to the current one
@@ -56,6 +58,12 @@ interface HeldFile {
 }
 
 const HELD = new Map<string, HeldFile>();
+const STATS = { hits: 0, misses: 0 };
+
+/** The door's own meter: entries held, served from held, read from disk. */
+export function doorStats(): { held: number; hits: number; misses: number } {
+  return { held: HELD.size, ...STATS };
+}
 
 /** THERE IS NO WATCHER HERE, AND THAT IS A DECISION (owner question, tried and
  *  measured 2026-08-09).
@@ -223,15 +231,23 @@ export function withPass<T>(fn: () => T): T {
  *  readFileSync themselves and no cache stood in the way. Caches that do not
  *  compose cannot be reasoned about; a door can.
  *
- *  THE STAT IS THE PLACEHOLDER, NOT THE DESIGN. The end state is a watcher
- *  that tells the model what moved, so this stats nothing at all. Until then a
- *  stat per access is the cheap, correct approximation. */
+ *  THE STAT IS THE DESIGN, NOT A PLACEHOLDER (settled 2026-08-09, the
+ *  no-watcher block above — this line once promised a watcher and the same
+ *  day's measurement ruled one out). Fewer asks come from the pass, never
+ *  from a longer leash.
+ *
+ *  BYTES ARE THE BASE LAYER (2026-08-10). fileRead reads through here too,
+ *  so one store serves the engine's text readers and the lane's byte reader.
+ *  The byte cache that briefly lived in files.ts folded in here. */
 function held(path: string): HeldFile | undefined {
   const key = resolve(path);
   const hit = HELD.get(key);
   // ALREADY VERIFIED THIS OPERATION. The stat happened on the first access,
   // and a write since then went through writeNode, which forgot it.
-  if (hit !== undefined && DEPTH > 0 && hit.epoch === EPOCH) return hit;
+  if (hit !== undefined && DEPTH > 0 && hit.epoch === EPOCH) {
+    STATS.hits += 1;
+    return hit;
+  }
   // NO TRUST WINDOW. It was tried on 2026-08-09 and the suite refused it in
   // four places, one of them a product law: "a state note edited on disk binds
   // the NEXT call, no reload" (editsafety). fs.watch is asynchronous, so
@@ -245,36 +261,50 @@ function held(path: string): HeldFile | undefined {
   let stamp: string;
   try {
     const s = statSync(key);
-    stamp = `${s.size}:${s.mtimeMs}`;
+    stamp = `${s.size}:${s.mtimeMs}:${s.ctimeMs}`;
   } catch {
     HELD.delete(key);
     return undefined;
   }
   if (hit !== undefined && hit.stamp === stamp) {
     hit.epoch = EPOCH;
+    STATS.hits += 1;
     return hit;
   }
-  let text: string;
+  let bytes: Buffer;
   try {
-    text = readFileSync(key, "utf8");
+    bytes = readFileSync(key);
   } catch {
     return undefined;
   }
-  const fresh: HeldFile = { stamp, text, epoch: EPOCH };
+  const fresh: HeldFile = { stamp, bytes, epoch: EPOCH };
   HELD.set(key, fresh);
+  STATS.misses += 1;
   return fresh;
+}
+
+function textOf(h: HeldFile): string {
+  h.text ??= h.bytes.toString("utf8");
+  return h.text;
 }
 
 /** The file's whole text, empty where it cannot be read. */
 export function readNode(path: string): string {
-  return held(path)?.text ?? "";
+  const h = held(path);
+  return h === undefined ? "" : textOf(h);
+}
+
+/** The raw bytes — the base layer, for the reader that serves images and
+ *  sniffs binary (fileRead). Undefined where the file cannot be read. */
+export function readNodeBytes(path: string): Buffer | undefined {
+  return held(path)?.bytes;
 }
 
 /** Its lines, split once. The array is SHARED — every caller only reads it. */
 export function nodeLines(path: string): string[] {
   const h = held(path);
   if (h === undefined) return [];
-  h.lines ??= h.text.split("\n");
+  h.lines ??= textOf(h).split("\n");
   return h.lines;
 }
 
@@ -282,7 +312,7 @@ export function nodeLines(path: string): string[] {
 export function noteOf(path: string): StateNote | undefined {
   const h = held(path);
   if (h === undefined) return undefined;
-  h.note ??= parseStateNote(h.text);
+  h.note ??= parseStateNote(textOf(h));
   return h.note;
 }
 

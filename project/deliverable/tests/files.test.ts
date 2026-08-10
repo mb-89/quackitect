@@ -7,8 +7,6 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { Rejection } from "../engine/errors.ts";
 import {
-  clearContentCache,
-  contentCacheStats,
   fileDelete,
   fileGlob,
   fileList,
@@ -21,6 +19,7 @@ import {
   READ_BUDGET,
 } from "../engine/files.ts";
 import { contentHash } from "../engine/hash.ts";
+import { doorStats } from "../engine/notes.ts";
 import { runToCompletion } from "../engine/run.ts";
 import { search } from "../engine/search.ts";
 
@@ -675,17 +674,21 @@ test("live reads reuse validated content and detect external same-size rewrites"
   const root = fresh();
   const path = "cached.md";
   const abs = join(root, path);
-  clearContentCache();
   writeFileSync(abs, "alpha");
 
+  const before = doorStats();
   assert.match(fileRead(root, path).content, /alpha/);
-  assert.deepEqual(contentCacheStats(), { entries: 1, hits: 0, misses: 1 });
+  const first = doorStats();
+  assert.equal(first.misses, before.misses + 1, "the first read hits the disk");
   assert.match(fileRead(root, path).content, /alpha/);
-  assert.deepEqual(contentCacheStats(), { entries: 1, hits: 1, misses: 1 });
+  const second = doorStats();
+  assert.equal(second.hits, first.hits + 1, "the second read is served from the door");
+  assert.equal(second.misses, first.misses, "and does not touch the disk");
 
   writeFileSync(abs, "bravo");
   const changed = new Date(Date.now() + 1000);
   utimesSync(abs, changed, changed);
   assert.match(fileRead(root, path).content, /bravo/);
-  assert.deepEqual(contentCacheStats(), { entries: 1, hits: 1, misses: 2 });
+  const third = doorStats();
+  assert.equal(third.misses, second.misses + 1, "a same-size external rewrite is detected by the stamp");
 });
