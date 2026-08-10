@@ -7,7 +7,7 @@
 // the save rewrites and the only thing the ingest reads (the v1 book's
 // comment law, reapplied).
 import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { catalogItems, trizParameterItems } from "./catalogs.ts";
 import { type Judgment, type RelationKind, type WalkResult, walk } from "./compare.ts";
 import { clusterDsm, type Dsm, flowMatrix } from "./dsm.ts";
@@ -15,9 +15,10 @@ import type { FormTemplate } from "./forms.ts";
 import { pendingNotes } from "./inbox.ts";
 import type { EvidenceField, MachineDecl, StateDecl } from "./machine.ts";
 import { bare, type MorphBox, type MorphCell, type MorphLine, type MorphRow, orderLines, storedOrder } from "./morphbox.ts";
-import { noteOf, parseStateNote, section } from "./notes.ts";
+import { noteOf, parseStateNote, readNode, section } from "./notes.ts";
 import { type ParetoView, pareto, readScores } from "./pareto.ts";
 import { seDir } from "./paths.ts";
+import { type PughView, pughView, type SensitivityView, sensitivityView } from "./pugh.ts";
 import { type GuidanceDoc, pulledFor } from "./pull.ts";
 import {
   conformance,
@@ -179,6 +180,12 @@ export interface FieldArgs {
    *  SAME LAW AGAIN. Domination is arithmetic over the scores, so a typed
    *  front is a second copy that can disagree with the table above it. */
   pareto: ParetoView | null;
+  /** The Pugh convergence runs, computed from the sibling evaluate-set
+   *  scores and cut-criteria's signed order. Null for every other field. */
+  matrix: PughView | null;
+  /** The winner's fragile cells, computed the same way. The rulings on them
+   *  are the state's judgment and live in its own fields. */
+  sensitivity: SensitivityView | null;
 }
 
 export function templateMeta(root: string, name: string): TemplateMeta {
@@ -273,6 +280,8 @@ export const NO_ARGS: FieldArgs = {
   dsm: null,
   box: null,
   pareto: null,
+  matrix: null,
+  sensitivity: null,
 };
 
 /** THE CHART, computed from the nodes. Rows are the clusters, cells are the
@@ -566,6 +575,8 @@ export function claimProblems(root: string, s: StateDecl, body: string, corpus: 
       dsm: null,
       box: null,
       pareto: null,
+      matrix: null,
+      sensitivity: null,
     };
     out.push(...fieldProblems(f.name, metas.get(name) as TemplateMeta, args, content, nodes, root));
   }
@@ -908,7 +919,7 @@ export function stateFormFields(s: StateDecl): FormTemplate {
 /** ONE FIELD'S ARGUMENTS, every live source resolved against the record's own
  *  trace. Extracted from stateFormModel because it grew past what one function
  *  should hold, and because the pick resolution below is worth reading alone. */
-export function fieldArgsFor(f: EvidenceField, root: string, traceRoot: string, instanceRaw?: string): FieldArgs {
+export function fieldArgsFor(f: EvidenceField, root: string, traceRoot: string, instanceRaw?: string, evidenceDir?: string): FieldArgs {
   const resolved = (f.items ?? []).flatMap((i) => resolveSource(i, root, traceRoot, instanceRaw));
   return {
     of: f.of ?? "",
@@ -943,7 +954,26 @@ export function fieldArgsFor(f: EvidenceField, root: string, traceRoot: string, 
     // the eliminations and both corners all fall out of them, so nothing here
     // is typed and nothing can disagree with the table it came from.
     pareto: f.template !== "pareto-plot" || f.reads === undefined ? null : viewOfScores(section(instanceRaw ?? "", f.reads)),
+    // THE M5 READINGS REACH ACROSS THE RECORD: the scores stand at
+    // evaluate-set and the signed order at cut-criteria, so the convergence
+    // is computed from the sibling forms rather than typed.
+    matrix: f.template !== "decision-matrix" || evidenceDir === undefined ? null : pughView(...m5Inputs(evidenceDir, traceRoot)),
+    sensitivity: f.template !== "sensitivity" || evidenceDir === undefined ? null : sensitivityView(...m5Inputs(evidenceDir, traceRoot)),
   };
+}
+
+/** The convergence's three inputs: the sibling score table, the sibling cut
+ *  order, and the damage grade off each requirement node. */
+function m5Inputs(evidenceDir: string, traceRoot: string): [string, string, (id: string) => string] {
+  const sectionOf = (state: string, name: string): string => {
+    const raw = readNode(join(evidenceDir, `${state}.md`));
+    return raw === "" ? "" : section(parseStateNote(raw).body, name);
+  };
+  const gradeOf = (id: string): string => {
+    const fm = noteOf(join(traceRoot, "requirement", `${id}.md`))?.frontmatter;
+    return typeof fm?.breaks_how_badly === "string" ? fm.breaks_how_badly : "";
+  };
+  return [sectionOf("evaluate-set", "scores"), sectionOf("cut-criteria", "cuts"), gradeOf];
 }
 
 /** The whole drawing's input, from the score table alone. */
@@ -969,6 +999,10 @@ export function stateFormModel(
    *  settled" over an empty list, which is the worst way to be wrong:
    *  confident, and shaped exactly like success. */
   traceRoot = root,
+  /** The record's evidence folder — the instance file's home. The M5
+   *  readings reach across sibling forms, so the folder is told, never
+   *  guessed. Absent, the cross-form views render their empty state. */
+  instanceAbs?: string,
 ): StateFormModel {
   const entryReads = new Set(s.entry?.read ?? []);
   const inputs: FormInput[] = pulledFor(root, docs, m, s).map((d) => ({
@@ -985,7 +1019,8 @@ export function stateFormModel(
     templateMetas[t] = templateMeta(root, t);
   }
   const fieldArgs: Record<string, FieldArgs> = {};
-  for (const f of s.evidence_form) fieldArgs[f.name] = fieldArgsFor(f, root, traceRoot, instanceRaw);
+  for (const f of s.evidence_form)
+    fieldArgs[f.name] = fieldArgsFor(f, root, traceRoot, instanceRaw, instanceAbs === undefined ? undefined : dirname(instanceAbs));
   const fieldHints: Record<string, FieldHint> = {};
   for (const f of s.evidence_form) {
     fieldHints[f.name] = fieldHint(root, templateMetas[f.template ?? "free-form"], f.of ?? "");

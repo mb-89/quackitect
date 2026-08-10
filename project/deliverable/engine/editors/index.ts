@@ -13,6 +13,7 @@
 
 import { CHOICE_RATIONALE_EDITOR } from "./choice-rationale.ts";
 import { COMPARE_CARD_EDITOR } from "./compare-card.ts";
+import { DECISION_MATRIX_EDITOR } from "./decision-matrix.ts";
 import { DSM_EDITOR } from "./dsm.ts";
 import { FINDINGS_EDITOR } from "./findings.ts";
 import type { EditorKind } from "./kinds.ts";
@@ -22,6 +23,7 @@ import { NODE_TABLE_EDITOR } from "./node-table.ts";
 import { PARETO_PLOT_EDITOR } from "./pareto-plot.ts";
 import { PER_ITEM_EDITOR } from "./per-item.ts";
 import { RANK_CUT_EDITOR } from "./rank-cut.ts";
+import { SENSITIVITY_EDITOR } from "./sensitivity.ts";
 import { TABLE_EDITOR } from "./table.ts";
 
 export type { EditorKind };
@@ -36,6 +38,8 @@ export const EDITORS: EditorKind[] = [
   MORPH_BOX_EDITOR,
   RANK_CUT_EDITOR,
   PARETO_PLOT_EDITOR,
+  DECISION_MATRIX_EDITOR,
+  SENSITIVITY_EDITOR,
   PER_ITEM_EDITOR,
   CHOICE_RATIONALE_EDITOR,
   FINDINGS_EDITOR,

@@ -17,9 +17,11 @@ legal_tools:
   - se_answer
 evidence:
   - name: sensitivity
-    description: robust, or weight-sensitive with the flip conditions
+    template: sensitivity
+    reads: evaluate-set#scores
+    description: the computed flip conditions — the cells a one-point swing would move
   - name: tripwires
-    description: the credible flips as RAID watch-items, or none
+    description: one ruling per computed flip — credible mints a RAID tripwire with its fallback, dismissed carries its reason
 major: full
 minor: none
 patch: none

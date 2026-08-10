@@ -3476,6 +3476,7 @@ export class Session {
       this.stateFormHeader(name, raw, m),
       raw,
       this.traceRoot(this.declIteration(m)),
+      h.instanceAbs,
     );
     // The section lint plus the TEMPLATE checks — generic engine code,
     // configured per field in the templates' own markdown. One verdict
@@ -4425,6 +4426,7 @@ export class Session {
       this.stateFormHeader(name, raw, m),
       raw,
       this.traceRoot(this.declIteration(m)),
+      h.instanceAbs,
     );
     const fills: Record<string, string> = {};
     if (raw !== undefined) {

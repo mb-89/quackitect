@@ -17,9 +17,11 @@ legal_tools:
   - se_answer
 evidence:
   - name: matrix_runs
-    description: the recorded runs with datum choices
+    template: decision-matrix
+    reads: evaluate-set#scores
+    description: the convergence runs, computed — datum the strongest rival, then the leader takes the seat
   - name: winner
-    description: the selected candidate and the why beyond the arithmetic
+    description: the selected candidate and the why beyond the arithmetic — the veto lives here
 major: full
 minor: none
 patch: none
