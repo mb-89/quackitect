@@ -1,9 +1,13 @@
 // THE SCENARIO DECK — ATAM's walk dealt one card at a time (owner ruling
 // 2026-08-10). A card shows the SCENARIO (the quality requirement and its
 // six-part section), the PATH (the elements and interfaces that carry it) and
-// the VERDICT: addressed, at risk, or unaddressed. A verdict posts at once;
-// at-risk and unaddressed mint their register entry before the page redraws.
-// The fitness button files the scenario in fitness_candidates instead.
+// the VERDICT: three parts separated by OR, each with its explainer FIRST.
+// A verdict posts at once; at-risk and unaddressed mint their register entry
+// before the page redraws. The fitness flag is not a verdict — it lands on
+// the requirement node as fitness_candidate: true.
+//
+// The structure numbers render beneath the deck, INFORMATION ONLY — nothing
+// about them is typed (owner ruling 2026-08-10).
 //
 // The panels and styles ride in from card-parts.ts — one copy, shared with
 // the compare card and the flip deck. No backtick in any body.
@@ -42,25 +46,27 @@ ${CARD_PARTS}
       // link opens the node where the section is edited.
       const scenTxt = c.scenario && c.scenario.trim() !== "" ? '<div style="margin-top:6px;font-size:11.5px;color:var(--se-muted);white-space:pre-wrap;line-height:1.45;">' + escText(c.scenario.trim()) + "</div>" : '<div style="margin-top:6px;font-size:11.5px;color:var(--se-accent);">no ## Scenario section \\u2014 write it on the node first</div>';
       const fx = (facts || {})[c.requirement] || {};
-      const scen = '<div style="' + cardCel + 'flex:1.4;"><div style="' + cardMeta + 'padding-bottom:2px;">the scenario</div><div style="font-size:10.5px;color:var(--se-muted);">' + link(c.requirement) + "</div>" + (fx.statement ? '<div style="margin-top:6px;line-height:1.45;">' + escText(fx.statement) + "</div>" : "") + scenTxt + "</div>";
+      const scen = '<div style="' + cardCel + 'flex:1.3;"><div style="' + cardMeta + 'padding-bottom:2px;">the scenario</div><div style="font-size:10.5px;color:var(--se-muted);">' + link(c.requirement) + "</div>" + (fx.statement ? '<div style="margin-top:6px;line-height:1.45;">' + escText(fx.statement) + "</div>" : "") + scenTxt + "</div>";
       // Panel two: the path — what the trace says carries the stimulus.
       const fnsHtml = c.functions.length > 0 ? c.functions.map(link).join("<br>") : '<span style="color:var(--se-muted);">no function satisfies this row</span>';
       const implHtml = c.implementers.length > 0 ? c.implementers.map(link).join("<br>") : '<span style="color:var(--se-accent);">nothing carries this scenario \\u2014 unaddressed is one click away</span>';
       const path = '<div style="' + cardCel + 'flex:1;"><div style="' + cardMeta + 'padding-bottom:2px;">the path</div><div style="font-size:11px;color:var(--se-muted);">functions</div><div style="font-size:12px;line-height:1.5;">' + fnsHtml + '</div><div style="font-size:11px;color:var(--se-muted);margin-top:6px;">elements and interfaces</div><div style="font-size:12px;line-height:1.5;">' + implHtml + "</div></div>";
-      // Panel three: the verdict. THE QUESTION IS PRINTED, and every button
-      // carries its meaning in visible text — a hover title is not enough
-      // (owner feedback 2026-08-10: the card must say what to do).
-      const hint = function (t) { return '<div style="font-size:10.5px;color:var(--se-muted);line-height:1.35;margin-top:2px;">' + t + "</div>"; };
-      const row = function (inner, help) { return '<div style="margin-top:8px;"><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">' + inner + "</div>" + hint(help) + "</div>"; };
-      const decOpts = '<option value="">\\u2014 no single decision, the path is the evidence \\u2014</option>' + sd.decisions.map(function (d) { return '<option value="' + escText(d) + '">' + shortName(d) + "</option>"; }).join("");
+      // Panel three: the verdict — THREE PARTS SEPARATED BY OR, explainer
+      // first in each (owner feedback 2026-08-10). Fitness sits apart below.
+      const explain = function (t) { return '<div style="font-size:10.5px;color:var(--se-muted);line-height:1.4;">' + t + "</div>"; };
+      const controls = function (inner) { return '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px;">' + inner + "</div>"; };
+      const orBar = '<div style="font-size:12px;font-weight:600;letter-spacing:.2em;color:var(--se-muted);text-align:center;padding:6px 0;">OR</div>';
+      const decOpts = sd.decisions.length > 0 ? '<option value="">\\u2014 the decision that makes it hold \\u2014</option>' + sd.decisions.map(function (d) { return '<option value="' + escText(d) + '">' + shortName(d) + "</option>"; }).join("") : '<option value="">no decisions stand in the register</option>';
       const hinges = (c.implementers.length > 0 ? c.implementers : sd.elements);
-      const hingeOpts = '<option value="">\\u2014 the hinge \\u2014</option>' + hinges.map(function (h) { return '<option value="' + escText(h) + '">' + shortName(h) + "</option>"; }).join("");
-      const decPick = sd.decisions.length > 0 ? '<select class="sfscndec" style="' + pick + '">' + decOpts + "</select>" : "";
-      const addressed = row(decPick + '<button class="sfscn" style="' + cardBtn + '" data-kind="addressed" data-req="' + escText(c.requirement) + '">addressed</button>', "yes \\u2014 the structure on the path delivers the measure. Name a decision only where a recorded choice is why it holds." + (sd.decisions.length === 0 ? " The register holds no decisions yet." : ""));
-      const atrisk = row('<select class="sfscnhinge" style="' + pick + '">' + hingeOpts + '</select><input class="sfscnnote" style="' + pick + 'flex:1;min-width:120px;" placeholder="the tradeoff, one line"><button class="sfscn" style="' + cardBtn + '" data-kind="at-risk" data-req="' + escText(c.requirement) + '">at risk \\u2014 mint</button>', "it holds only while the hinge holds \\u2014 the click mints the register risk, graded with the requirement.");
-      const unaddr = row('<button class="sfscn" style="' + cardBtn + '" data-kind="unaddressed" data-req="' + escText(c.requirement) + '">unaddressed \\u2014 mint</button>', "nothing carries this scenario \\u2014 the click mints the register issue, a standing finding for the gate.");
-      const fit = row('<button class="sfscn" style="' + cardBtn + '" data-kind="fitness" data-req="' + escText(c.requirement) + '">fitness candidate</button>', "the response measure could run as an automated check at M7 \\u2014 files it in fitness_candidates.");
-      const verdict = '<div style="' + cardCel + 'flex:1;"><div style="' + cardMeta + 'padding-bottom:2px;">the verdict</div><div style="font-size:11.5px;line-height:1.4;">Does the structure, as decided, deliver the response measure?</div>' + addressed + atrisk + unaddr + fit + "</div>";
+      const hingeOpts = '<option value="">\\u2014 the hinge element \\u2014</option>' + hinges.map(function (h) { return '<option value="' + escText(h) + '">' + shortName(h) + "</option>"; }).join("");
+      const addressed = "<div>" + explain("ADDRESSED \\u2014 yes. The structure on the path delivers the measure; the path is the evidence. Name a decision only where a recorded choice is why it holds.") + controls('<select class="sfscndec" style="' + pick + '"' + (sd.decisions.length === 0 ? " disabled" : "") + ">" + decOpts + '</select><button class="sfscn" style="' + cardBtn + '" data-kind="addressed" data-req="' + escText(c.requirement) + '">addressed</button>') + "</div>";
+      const atrisk = "<div>" + explain("AT RISK \\u2014 it holds only while one element holds. Name the hinge ELEMENT and the tradeoff; the click mints a register risk, graded with the requirement.") + controls('<select class="sfscnhinge" style="' + pick + '">' + hingeOpts + '</select><input class="sfscnnote" style="' + pick + 'flex:1;min-width:120px;" placeholder="the tradeoff, one line"><button class="sfscn" style="' + cardBtn + '" data-kind="at-risk" data-req="' + escText(c.requirement) + '">at risk \\u2014 mint risk</button>') + "</div>";
+      const unaddr = "<div>" + explain("UNADDRESSED \\u2014 nothing carries this scenario. The click mints a register ISSUE, a standing finding for the gate.") + controls('<button class="sfscn" style="' + cardBtn + '" data-kind="unaddressed" data-req="' + escText(c.requirement) + '">unaddressed \\u2014 mint issue</button>') + "</div>";
+      const fitWrap = 'margin-top:10px;padding-top:8px;border-top:1px solid var(--se-border);';
+      const fitness = c.fitness
+        ? '<div style="' + fitWrap + '">' + explain("flagged as fitness candidate \\u2713 \\u2014 the flag lives on the requirement node") + "</div>"
+        : '<div style="' + fitWrap + '">' + explain("FITNESS CANDIDATE \\u2014 not a verdict, a flag on the requirement. The measure could run as an automated check at M7; flagged rows land in fitness_candidates.") + controls('<button class="sfscn" style="' + cardBtn + '" data-kind="fitness" data-req="' + escText(c.requirement) + '">flag as fitness candidate</button>') + "</div>";
+      const verdict = '<div style="' + cardCel + 'flex:1.2;"><div style="' + cardMeta + 'padding-bottom:2px;">the verdict</div><div style="font-size:11.5px;line-height:1.4;margin-bottom:4px;">Does the structure, as decided, deliver the response measure?</div>' + addressed + orBar + atrisk + orBar + unaddr + fitness + "</div>";
       const sides = '<div style="display:flex;gap:10px;align-items:stretch;">' + scen + path + verdict + "</div>";
       const nav = function (dir, label) { return '<button class="sfscnnav" style="' + cardBtn + '" type="button" data-dir="' + dir + '" title="browse \\u2014 decides nothing">' + label + "</button>"; };
       return '<div class="sfscncard" style="' + (i === 0 ? "" : "display:none;") + '">' + head + sides + '<div style="display:flex;gap:8px;margin-top:8px;align-items:center;">' + nav("-1", "\\u2190") + nav("1", "\\u2192") + "</div></div>";
@@ -68,8 +74,21 @@ ${CARD_PARTS}
     const intro = '<div style="' + meta + '">The walk, worst grade first: ' + mine.length + " scenario" + (mine.length === 1 ? "" : "s") + " unruled, " + ledger.length + " ruled. A verdict posts at once; at-risk and unaddressed mint their register entry.</div>";
     const ledgerHtml = ledger.length > 0 ? '<div style="' + meta + '">' + ledger.join("<br>") + "</div>" : "";
     const empty = mine.length === 0 ? '<div style="' + meta + '">every scenario is ruled</div>' : "";
+    // THE STRUCTURE NUMBERS — information only. Hover a name for what it
+    // counts; the list behind a number is one entry per line.
+    const sm = args.smetrics;
+    let metricsHtml = "";
+    if (sm) {
+      const cellS = "padding:4px 8px;border-bottom:1px solid var(--se-border);font-size:12px;color:var(--se-fg);text-align:left;vertical-align:top;";
+      const thS = cellS + "font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--se-muted);";
+      const mrows = sm.map(function (r) {
+        const detail = r.detail.length > 0 ? r.detail.map(function (d) { return escText(d); }).join("<br>") : '<span style="color:var(--se-muted);">\\u2014</span>';
+        return '<tr><td style="' + cellS + 'white-space:nowrap;"><span title="' + escText(r.help) + '" style="cursor:help;text-decoration:underline dotted;">' + escText(r.name) + '</span></td><td style="' + cellS + 'font-variant-numeric:tabular-nums;">' + r.value + '</td><td style="' + cellS + '">' + detail + "</td></tr>";
+      }).join("");
+      metricsHtml = '<div style="' + cardMeta + 'padding:10px 0 2px;">the structure numbers \\u2014 information only</div><table style="border-collapse:collapse;width:100%;">' + '<tr><th style="' + thS + '">number</th><th style="' + thS + '">value</th><th style="' + thS + '">behind it</th></tr>' + mrows + '</table><div style="font-size:11px;color:var(--se-muted);padding:2px 0;">Computed on every look; hover a name for what it counts. The target is zero \\u2014 a nonzero number is worked in the deck above, or back at decompose-structure.</div>';
+    }
     const warn = sd.problems.length > 0 ? '<div style="' + meta + 'color:var(--se-accent);">' + sd.problems.map(function (p) { return "<div>" + escText(p) + "</div>"; }).join("") + "</div>" : "";
-    return '<div class="sfscndeck">' + intro + stack + empty + ledgerHtml + warn + "</div>";
+    return '<div class="sfscndeck">' + intro + stack + empty + ledgerHtml + metricsHtml + warn + "</div>";
   `,
   collect: "",
   behaviour: `

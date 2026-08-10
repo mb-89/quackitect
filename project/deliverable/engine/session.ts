@@ -4270,6 +4270,15 @@ export class Session {
     const raw = readNode(h.instanceAbs);
     const field = kind === "fitness" ? "fitness_candidates" : "walk";
     const current = raw === "" ? "" : section(parseStateNote(raw).body, field).trim();
+    // THE FLAG LIVES ON THE REQUIREMENT NODE (owner ruling 2026-08-10):
+    // fitness_candidate: true in its frontmatter, so the mark outlives the
+    // form. The list line below shows the same fact where the reader is.
+    if (kind === "fitness") {
+      const nodeAbs = join(traceDir(this.traceRoot(this.declIteration(m))), "requirement", `${requirement}.md`);
+      const nodeRaw = readNode(nodeAbs);
+      if (nodeRaw !== "" && !nodeRaw.includes("fitness_candidate:"))
+        writeNode(nodeAbs, withFrontmatter(nodeRaw, "fitness_candidate", "true"));
+    }
     const already = kind === "fitness" ? current.includes(requirement) : current.includes(`[[${requirement}]]`);
     if (already) return this.stateFormGet(name, m);
     // The note stays one line by construction — a newline would break the

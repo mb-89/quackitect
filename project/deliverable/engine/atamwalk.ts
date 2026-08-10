@@ -17,6 +17,9 @@ export interface QualityScenario {
   characteristic: string;
   /** The node's ## Scenario section, verbatim. Empty is a named problem. */
   scenario: string;
+  /** The fitness flag off the node — `fitness_candidate: true` in its
+   *  frontmatter. The flag lives on the requirement, never in the form. */
+  fitness?: boolean;
 }
 
 /** An element or interface: what it implements, what it satisfies directly. */
@@ -36,6 +39,7 @@ export interface ScenarioCard {
   grade: string;
   characteristic: string;
   scenario: string;
+  fitness: boolean;
   /** The functions that satisfy the requirement — the stimulus's carriers. */
   functions: string[];
   /** The elements and interfaces on the path: implementers of those
@@ -86,6 +90,7 @@ export function scenarioDeckView(
         grade: r.grade,
         characteristic: r.characteristic,
         scenario: r.scenario,
+        fitness: r.fitness === true,
         functions: carrying,
         implementers: impl,
       };

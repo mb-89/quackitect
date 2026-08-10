@@ -40,8 +40,12 @@ ONE VERDICT PER SCENARIO, three choices:
 - unaddressed — the click mints a register ISSUE. A standing finding for
   the gate.
 
-The fitness button files the scenario in fitness_candidates — a scenario
-whose measure could become an automated check.
+The fitness button is a FLAG, not a verdict: it writes
+`fitness_candidate: true` onto the requirement node and files the ref in
+fitness_candidates. More refs can be typed into that list by hand.
+
+The structure numbers render beneath the deck, information only — the
+target is zero everywhere, and nothing about them is typed.
 
 The arrows browse without deciding. An unruled scenario returns on the
 next look; nothing is dismissed in silence.

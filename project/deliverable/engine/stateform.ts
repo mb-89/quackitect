@@ -989,7 +989,9 @@ function derivedViews(
     sensitivity: f.template !== "sensitivity" || evidenceDir === undefined ? null : sensitivityView(...m5Inputs(evidenceDir, traceRoot)),
     ematrix: f.template !== "element-matrix" ? null : elementMatrixArgs(traceRoot),
     scenario: f.template !== "scenario-deck" ? null : scenarioDeckArgs(traceRoot),
-    smetrics: f.template !== "structure-metrics" ? null : structureMetricsArgs(traceRoot),
+    // INFORMATION ONLY, riding the deck's field (owner ruling 2026-08-10):
+    // the numbers render beneath the deck and nothing about them is typed.
+    smetrics: f.template !== "scenario-deck" ? null : structureMetricsArgs(traceRoot),
   };
 }
 
@@ -1045,6 +1047,7 @@ export function scenarioDeckArgs(traceRoot: string): ScenarioDeckView {
       grade: String(n.fm.breaks_how_badly ?? ""),
       characteristic: String(n.fm.characteristic ?? ""),
       scenario: section(n.body, "Scenario"),
+      fitness: n.fm.fitness_candidate === true || n.fm.fitness_candidate === "true",
     }));
   const fns = traceFolder(traceRoot, "function").map((n) => ({ id: n.id, satisfies: fmList(n.fm.satisfies) }));
   const impl = [...traceFolder(traceRoot, "element"), ...traceFolder(traceRoot, "interface")].map((n) => ({

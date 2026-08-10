@@ -21,9 +21,6 @@ evidence:
   - name: walk
     template: scenario-deck
     description: the quality scenarios walked worst grade first, each ruled addressed, at risk or unaddressed — at-risk and unaddressed mint their register entry on the click
-  - name: metrics
-    template: structure-metrics
-    description: the structure numbers computed off the element matrix, one typed line per number saying what it moved
   - name: fitness_candidates
     template: list
     of: requirement
@@ -34,8 +31,9 @@ patch: none
 product: full
 specification: full
 major_note: |
-  Applies in full: every quality scenario dealt and ruled, the structure
-  numbers computed and interpreted, fitness candidates named for M7.
+  Applies in full: every quality scenario dealt and ruled, and the
+  fitness candidates flagged for M7. The structure numbers render as
+  information beside the walk.
 minor_note: |
   Walk ONLY the quality scenarios the delta touches through the standing
   structure. Record each one as addressed, at risk or unaddressed. The
@@ -70,12 +68,12 @@ steps, the utility tree, and the four outputs.
 - The walk READS the register's decisions, so they are recorded first.
   That is why this state depends on record-adrs (owner ruling
   2026-08-10).
-- THE METRICS BELONG HERE, not at the decomposition (owner ruling
-  2026-08-10; the corpus files DSM analysis under quantitative review).
-  One typed line per number: what it moved. "Moved nothing" is a
-  complete answer.
-- FITNESS CANDIDATES: mark the scenarios whose response measure could
-  run as an automated check. The list feeds M7's author-tests.
+- THE STRUCTURE NUMBERS render beneath the deck, INFORMATION ONLY (owner
+  ruling 2026-08-10). The target is zero everywhere. A nonzero number is
+  worked in the deck, or back at decompose-structure — never typed about.
+- FITNESS CANDIDATES: flag the scenarios whose response measure could
+  run as an automated check. The flag lands on the requirement node as
+  fitness_candidate, and the list feeds M7's author-tests.
 - A scenario found during the walk becomes a quality requirement — a
   ripple to M3, never a side list.
 

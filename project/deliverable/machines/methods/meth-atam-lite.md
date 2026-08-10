@@ -55,8 +55,9 @@ The corpus splits design review into two halves: quantitative (computed,
 automatable) and qualitative (scenario judgment). ATAM is the qualitative
 half only. This state runs both:
 
-- The METRICS: the structure numbers off the element matrix, each with
-  one typed line saying what it moved.
+- The METRICS: the structure numbers off the element matrix, rendered
+  beneath the deck as INFORMATION ONLY. The target is zero everywhere; a
+  nonzero number is worked in the deck, or back at decompose-structure.
 - The FITNESS CANDIDATES: a quality scenario carries a response MEASURE.
   Where that measure could run as an automated check, mark it - it is a
   fitness function candidate for M7.
@@ -75,9 +76,8 @@ half only. This state runs both:
     on the click.
   - unaddressed. The register issue mints on the click - a standing
     finding for the gate.
-- Mark measurable scenarios as fitness candidates.
-- Write one line per structure number: what it moved. "Moved nothing" is
-  a complete answer.
+- Flag measurable scenarios as fitness candidates — the flag lands on
+  the requirement node.
 - A scenario discovered DURING the walk is a new quality requirement.
   Write it in the trace - a ripple to M3. The deck grows on the next
   look. No scenario pool exists beside the spec.
