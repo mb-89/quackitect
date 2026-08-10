@@ -372,7 +372,7 @@ test("se_answer records an aq entry and the feed types it aq", async () => {
   assert.equal(aq?.brief, "Where does the ruling live?", "the feed line is the question");
 });
 
-test("se_test: one job runs both scripts with structured verdicts", async () => {
+test("se_test: one job formats then runs both scripts with structured verdicts", async () => {
   const root = freshRoot();
   const server = await bootedServer(root);
   const started = await call(server, "se_test");
@@ -380,6 +380,9 @@ test("se_test: one job runs both scripts with structured verdicts", async () => 
   assert.equal(started.body.handed_off, true, JSON.stringify(started.body));
   const body = await waitForTestJob(server, String(started.body.job));
   const results = body.results as { script: string; ok: boolean; output: string }[];
-  assert.equal(results.length, 2);
+  assert.equal(results.length, 3);
+  assert.equal(results[0].script, "biome check --write --error-on-warnings .");
+  assert.equal(results[1].script, "project/deliverable/engine/bin/preflight.ts");
+  assert.equal(results[2].script, "project/deliverable/engine/bin/selftest.ts");
   assert.equal(body.ok, true, JSON.stringify(results));
 });

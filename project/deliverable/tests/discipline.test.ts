@@ -602,3 +602,16 @@ test("capMiddle backs off to whitespace — no token is ever split", () => {
   const head = capped.split("\n")[0];
   assert.ok(/word\d+$/.test(head.trim()), `the head ends on a whole token: …${head.slice(-20)}`);
 });
+
+test("the full battery formats before preflight and stops on format failure", () => {
+  const src = readFileSync(new URL("../engine/tools.ts", import.meta.url), "utf8");
+  const battery = src.slice(src.indexOf("const runBattery"), src.indexOf("const work ="));
+  const formatAt = battery.indexOf('spawnNode([BIOME_BIN, "check", "--write", "--error-on-warnings", "."]');
+  const preflightAt = battery.indexOf('"project/deliverable/engine/bin/preflight.ts"');
+  const failureAt = battery.indexOf("if (format.status !== 0)");
+  const returnAt = battery.indexOf("return { ok: false, results }", failureAt);
+  assert.ok(formatAt >= 0, "the battery runs Biome safe writes");
+  assert.ok(formatAt < preflightAt, "formatting precedes preflight and selftest");
+  assert.ok(failureAt > formatAt && returnAt > failureAt && returnAt < preflightAt, "a format failure stops the battery");
+  assert.equal((battery.match(/BIOME_BIN/g) ?? []).length, 1, "formatting runs once per full battery");
+});

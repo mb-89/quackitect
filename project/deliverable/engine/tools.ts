@@ -12,6 +12,7 @@
 import { spawn } from "node:child_process";
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { CallLog } from "./calllog.ts";
 import { parseUpdate } from "./decisions.ts";
 import {
@@ -44,6 +45,8 @@ import { shoot } from "./shoot.ts";
 import { survey } from "./survey.ts";
 import { Toll } from "./toll.ts";
 import { webFetch, webSearch } from "./web.ts";
+
+const BIOME_BIN = fileURLToPath(new URL("../node_modules/@biomejs/biome/bin/biome", import.meta.url));
 
 /** The last battery's measured wall, phrased for a caller sizing a wait.
  *  An expectation is measured or absent — never guessed. */
@@ -866,12 +869,12 @@ export function coreTools(
         // orphaned workers held a folder lock for four hours). Children run
         // in the job registry — whole-tree killed on timeout, reaped at
         // shutdown, visible to se_run {jobs: true}.
-        const spawnNode = async (argv: string[]): Promise<{ status: number | null; out: string }> => {
+        const spawnNode = async (argv: string[], cwd = root): Promise<{ status: number | null; out: string }> => {
           let out = "";
           const started = startJob(
             `node --test (${argv.length} args)`,
             () => {
-              const child = spawn("node", argv, { cwd: root, windowsHide: true, detached: process.platform !== "win32" });
+              const child = spawn("node", argv, { cwd, windowsHide: true, detached: process.platform !== "win32" });
               child.stdout?.setEncoding("utf8");
               child.stderr?.setEncoding("utf8");
               child.stdout?.on("data", (c: string) => {
@@ -921,8 +924,20 @@ export function coreTools(
         const runBattery = async (): Promise<Record<string, unknown>> => {
           batteryGate(se, root, force);
           testGate(se, root, force);
-          const scripts = ["project/deliverable/engine/bin/preflight.ts", "project/deliverable/engine/bin/selftest.ts"];
           const results: { script: string; ok: boolean; exit: number | null; output: string }[] = [];
+          const deliverable = resolveInRoot(root, "project/deliverable", "engine/tools.ts se_test");
+          const format = await spawnNode([BIOME_BIN, "check", "--write", "--error-on-warnings", "."], deliverable);
+          results.push({
+            script: "biome check --write --error-on-warnings .",
+            ok: format.status === 0,
+            exit: format.status,
+            output: capMiddle(format.out.trim(), 4000),
+          });
+          if (format.status !== 0) {
+            testRecord(se, root, false);
+            return { ok: false, results };
+          }
+          const scripts = ["project/deliverable/engine/bin/preflight.ts", "project/deliverable/engine/bin/selftest.ts"];
           for (const rel of scripts) {
             const abs = resolveInRoot(root, rel, "engine/tools.ts se_test");
             // The battery is long BY DESIGN now that boot walks read real
