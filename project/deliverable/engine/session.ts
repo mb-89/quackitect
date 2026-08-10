@@ -91,7 +91,7 @@ import {
   readItRecord,
   repinColumn,
 } from "./iterations.ts";
-import { parseStateNote, section, withPass, writeNode } from "./notes.ts";
+import { parseStateNote, readNode, section, withPass, writeNode } from "./notes.ts";
 import { fansOut, methodFilesIn, pathKind, recordOwnerOf, resolveInRoot, seDir } from "./paths.ts";
 import { mintFlipLines } from "./pugh.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
@@ -4194,6 +4194,23 @@ export class Session {
       touched.push(p.id);
     }
     return touched;
+  }
+
+  /** ONE CLICK, ONE TRIPWIRE (owner ruling 2026-08-10). The flip deck posts
+   *  a ruling as it is made; the line lands in the sensitivity section and
+   *  the save mints its node before the page redraws. Idempotent: a cell
+   *  already ruled answers with the standing form. The field name is the
+   *  method's own — the deck lives on the sensitivity reading. */
+  flipRuling(name: string, rival: string, winner: string, axis: string, by: string, machineId?: string): Record<string, unknown> {
+    const m = this.formMachine(machineId);
+    const h = this.stateFormHome(name, m);
+    // Through the door — the read ratchet holds, and the door already knows
+    // this file if anything else looked at it this pass.
+    const raw = readNode(h.instanceAbs);
+    const current = raw === "" ? "" : section(parseStateNote(raw).body, "sensitivity").trim();
+    if (current.includes(`[[${rival}]]`) && current.includes(`[[${axis}]]`)) return this.stateFormGet(name, m);
+    const line = `- credible: [[${rival}]] over [[${winner}]] on [[${axis}]]`;
+    return this.stateFormSave(name, { sensitivity: current === "" ? line : `${current}\n${line}` }, by, m);
   }
 
   /** The sensitivity card's credible rulings become RAID tripwires at the

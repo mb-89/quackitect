@@ -1,101 +1,101 @@
-// THE WINNER'S FRAGILE GROUND, DRAWN — AND RULED WITH A BUTTON. The
-// perturbation hunt is arithmetic: per rival, how far it sits below the
-// winner, and which cells a single one-point score move would raise.
+// THE FLIP DECK — one card per fragile cell, ruled one at a time (owner
+// ruling 2026-08-10: the same binary-card shape as the compare card, three
+// panels instead of two). A card shows the CELL (the requirement), the
+// WINNER and the RIVAL; the one verdict is "rival wins — credible", and
+// "next" moves on without ruling. Ruling posts at once — no save step —
+// and the engine mints the RAID tripwire before the page redraws.
 //
-// ONLY A REACHABLE FLIP IS SHOWN IN FULL (owner ruling 2026-08-10): a rival
-// needing more than three swings is named on one line and not tabled —
-// nobody rules on a seven-swing story. Nothing is silently dropped; the
-// line says what was left out and why.
+// ONLY A REACHABLE FLIP IS DEALT: a rival needing more than three swings is
+// named on one line and not asked about. Nothing is silently dropped.
 //
-// THE RULING IS A CLICK. Marking a cell credible arms it; SAVE writes the
-// ruling lines and the engine mints a RAID tripwire per new one, rewriting
-// the line with the minted ref (session.stateFormSave). REVERT re-renders
-// from disk and the unsaved clicks fall away. A standing ruling renders as
-// its tripwire link instead of a button.
-//
-// NO BACKTICK IN ANY BODY. Each is one template literal and a backtick ends
-// it.
+// The panels and styles ride in from card-parts.ts — one copy, shared with
+// the compare card. No backtick in any body.
+import { CARD_PARTS } from "../card-parts.ts";
 import type { EditorKind } from "./kinds.ts";
 
 export const SENSITIVITY_EDITOR: EditorKind = {
   id: "sensitivity",
   render: `
+${CARD_PARTS}
     const sv = args.sensitivity;
     if (!sv || sv.winner === "") {
       const why = sv && sv.problems.length > 0 ? sv.problems.join("; ") : "no stable winner stands yet";
       return '<div class="sfempty" style="color:var(--se-muted);font-style:italic;padding:6px 0;">Nothing to stress \\u2014 ' + why + '.</div>';
     }
-    const esc = function (s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); };
-    const short = function (id) { return esc(String(id).replace(/^req-/, "").replace(/^cand-/, "").replace(/-/g, " ")); };
-    const link = function (id, label) {
+    const shortName = function (id) { return escText(String(id).replace(/^req-/, "").replace(/^cand-/, "").replace(/-/g, " ")); };
+    const link = function (id) {
       const p = paths ? paths[id] : null;
-      if (!p) return label;
-      return '<a class="reflink" data-path="' + esc(p) + '" title="open ' + esc(id) + ' in the editor" style="color:inherit;cursor:pointer;text-decoration:underline dotted;">' + label + "</a>";
+      if (!p) return shortName(id);
+      return '<a class="reflink" data-path="' + escText(p) + '" title="open ' + escText(id) + '" style="color:inherit;cursor:pointer;text-decoration:underline dotted;">' + shortName(id) + "</a>";
     };
-    // THE STANDING RULINGS, read back off the section so a save survives a
-    // redraw. A minted line carries its raid ref first.
-    const existing = String(fl.content || "").split("\\n").map(function (l) { return l.trim(); }).filter(function (l) { return l.indexOf("- ") === 0; });
+    // THE STANDING RULINGS, read off the section: a ruled cell leaves the
+    // deck and shows in the ledger with its tripwire link.
+    const lines = String(fl.content || "").split("\\n").map(function (l) { return l.trim(); }).filter(function (l) { return l.indexOf("- ") === 0; });
     const ruledRef = function (rival, axis) {
-      for (let i = 0; i < existing.length; i++) {
-        const l = existing[i];
-        if (l.indexOf("[[" + rival + "]]") >= 0 && l.indexOf("[[" + axis + "]]") >= 0) {
-          const m = l.match(/\\[\\[(raid-[^\\]]+)\\]\\]/);
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].indexOf("[[" + rival + "]]") >= 0 && lines[i].indexOf("[[" + axis + "]]") >= 0) {
+          const m = lines[i].match(/\\[\\[(raid-[^\\]]+)\\]\\]/);
           return m ? m[1] : "pending";
         }
       }
       return "";
     };
-    const meta = "font-size:11px;color:var(--se-muted);padding:4px 0;";
-    const td = "padding:3px 8px;border:1px solid var(--se-border);";
-    const blocks = [];
+    const cards = [];
     const skipped = [];
+    const ledger = [];
     sv.rivals.forEach(function (r) {
       const need = r.deficit + 1;
       if (need > 3) {
-        skipped.push(link(r.id, short(r.id)) + " needs " + need + " swings \\u2014 out of reach by single points, not tabled");
+        skipped.push(link(r.id) + " needs " + need + " swings \\u2014 out of reach by single points, not asked");
         return;
       }
-      const head = link(r.id, short(r.id)) + " sits " + r.deficit + " sign" + (r.deficit === 1 ? "" : "s") + " below " + link(sv.winner, short(sv.winner)) + " \\u2014 " + need + " swing" + (need === 1 ? "" : "s") + " flip" + (need === 1 ? "s" : "") + " it";
-      const rows = r.swings.map(function (c) {
+      r.swings.forEach(function (c) {
         const ref = ruledRef(r.id, c.axis);
-        const line = "- credible: [[" + r.id + "]] over [[" + sv.winner + "]] on [[" + c.axis + "]]";
-        const ruling = ref === "" ?
-          '<button type="button" class="sfsensbtn" data-line="' + esc(line) + '" aria-pressed="false" style="font:inherit;font-size:11px;padding:1px 8px;border:1px solid var(--se-border);border-radius:3px;background:transparent;color:var(--se-fg);cursor:pointer;">credible</button>'
-          : ref === "pending" ? '<span style="color:var(--se-muted);">ruled \\u2014 save pending</span>' : link(ref, "tripwire");
-        return "<tr><td style=\\"" + td + '">' + link(c.axis, short(c.axis)) + '</td><td style="' + td + 'text-align:center;">' + link(sv.winner, short(sv.winner)) + " " + c.winner_score + " vs " + link(r.id, short(r.id)) + " " + c.rival_score + '</td><td style="' + td + '">' + ruling + "</td></tr>";
-      }).join("");
-      blocks.push('<details open style="margin:4px 0;"><summary style="' + meta + 'cursor:pointer;">' + head + "</summary>"
-        + '<div style="overflow-x:auto;"><table style="border-collapse:collapse;font-size:12px;"><tr><th style="' + td + 'color:var(--se-muted);">cell</th><th style="' + td + 'color:var(--se-muted);">winner vs rival</th><th style="' + td + 'color:var(--se-muted);">ruling</th></tr>' + rows + "</table></div></details>");
+        if (ref === "") cards.push({ rival: r.id, axis: c.axis, need: need, deficit: r.deficit });
+        else ledger.push(link(r.id) + " over " + link(sv.winner) + " on " + link(c.axis) + (ref === "pending" ? " \\u2014 minting" : " \\u2014 " + link(ref)));
+      });
     });
-    const warn = sv.problems.length > 0 ? '<div style="' + meta + 'color:var(--se-accent);">' + sv.problems.map(function (p) { return "<div>" + esc(p) + "</div>"; }).join("") + "</div>" : "";
+    const deck = cards.map(function (c, i) {
+      const head = '<div style="' + cardMeta + 'padding:4px 0;">' + link(c.rival) + " sits " + c.deficit + " sign" + (c.deficit === 1 ? "" : "s") + " below \\u00b7 " + c.need + " swing" + (c.need === 1 ? "" : "s") + " flip" + (c.need === 1 ? "s" : "") + " it \\u00b7 card " + (i + 1) + " of " + cards.length + "</div>";
+      const sides = '<div style="display:flex;gap:10px;align-items:stretch;">' + cardSide(c.axis, "cell") + cardSide(sv.winner, "winner") + cardSide(c.rival, "rival") + "</div>";
+      const rule = '<button class="sfflip" style="' + cardBtn + '" data-rival="' + escText(c.rival) + '" data-winner="' + escText(sv.winner) + '" data-axis="' + escText(c.axis) + '">rival wins \\u2014 credible</button>';
+      const next = i + 1 < cards.length ? '<button class="sfflipnext" style="' + cardBtn + '" type="button">stands \\u2014 next</button>' : '<span style="' + cardMeta + '">last card \\u2014 unruled cells stay visible</span>';
+      return '<div class="sfflipcard" data-on="' + (i === 0 ? "1" : "0") + '" style="' + (i === 0 ? "" : "display:none;") + '">' + head + sides + '<div style="display:flex;gap:8px;margin-top:8px;align-items:center;">' + rule + next + "</div></div>";
+    }).join("");
+    const meta = "font-size:11px;color:var(--se-muted);padding:4px 0;";
+    const intro = '<div style="' + meta + '">The computed ground under ' + link(sv.winner) + ": " + cards.length + " unruled cell" + (cards.length === 1 ? "" : "s") + ", " + ledger.length + " ruled. A ruling mints its RAID tripwire at once.</div>";
+    const ledgerHtml = ledger.length > 0 ? '<div style="' + meta + '">' + ledger.join("<br>") + "</div>" : "";
     const skippedHtml = skipped.length > 0 ? '<div style="' + meta + '">' + skipped.join(" \\u00b7 ") + "</div>" : "";
-    return '<div class="sfsens" data-field="' + esc(name) + '" data-existing="' + esc(JSON.stringify(existing)) + '">'
-      + '<div style="' + meta + '">The computed ground under ' + link(sv.winner, short(sv.winner)) + ". Mark a cell credible and save \\u2014 each ruling mints a RAID tripwire. Revert clears unsaved marks.</div>"
-      + blocks.join("") + skippedHtml + warn + "</div>";
+    const warn = sv.problems.length > 0 ? '<div style="' + meta + 'color:var(--se-accent);">' + sv.problems.map(function (p) { return "<div>" + escText(p) + "</div>"; }).join("") + "</div>" : "";
+    const empty = cards.length === 0 ? '<div style="' + meta + '">every reachable cell is ruled</div>' : "";
+    return '<div class="sfflipdeck">' + intro + deck + empty + ledgerHtml + skippedHtml + warn + "</div>";
   `,
-  collect: `
-  // THE RULINGS SERIALISE: the standing lines survive verbatim, and every
-  // armed button appends its line. The engine mints on save and rewrites
-  // the new lines with their raid refs, so the next render shows links.
-  document.querySelectorAll(".sfsens").forEach(function (box) {
-    const f = box.dataset.field;
-    if (!f) return;
-    let lines = [];
-    try { lines = JSON.parse(box.dataset.existing || "[]"); } catch (e) { lines = []; }
-    box.querySelectorAll('.sfsensbtn[aria-pressed="true"]').forEach(function (b) { lines.push(b.dataset.line); });
-    fields[f] = lines.join("\\n");
-  });
-  `,
+  collect: "",
   behaviour: `
-  // A CLICK ARMS A RULING; a second click disarms it. Bound to document so
-  // it survives every re-render, matched with closest like the row buttons.
-  document.addEventListener("click", function (ev) {
-    const b = ev.target && ev.target.closest ? ev.target.closest(".sfsensbtn") : null;
-    if (!b) return;
-    const armed = b.getAttribute("aria-pressed") === "true";
-    b.setAttribute("aria-pressed", armed ? "false" : "true");
-    b.style.background = armed ? "transparent" : "color-mix(in srgb, var(--se-ok) 30%, transparent)";
-    b.textContent = armed ? "credible" : "credible \\u2713";
+  // A RULING POSTS AT ONCE, like the compare card intends: the tripwire is
+  // minted server-side and the redraw deals the next card. "stands — next"
+  // only advances the deck; an unruled cell returns on the next look.
+  document.addEventListener("click", async function (ev) {
+    const rule = ev.target && ev.target.closest ? ev.target.closest(".sfflip") : null;
+    if (rule) {
+      const host = document.querySelector(".saveform");
+      const form = host ? host.dataset.form : "";
+      const machine = host && host.dataset.machine ? host.dataset.machine : viewedMachine();
+      await formPost("/form/flip", { name: form, rival: rule.dataset.rival, winner: rule.dataset.winner, axis: rule.dataset.axis, machine: machine });
+      showFormAgain(form, machine, rule);
+      return;
+    }
+    const next = ev.target && ev.target.closest ? ev.target.closest(".sfflipnext") : null;
+    if (next) {
+      const card = next.closest(".sfflipcard");
+      const after = card ? card.nextElementSibling : null;
+      if (card && after && after.classList.contains("sfflipcard")) {
+        card.style.display = "none";
+        card.dataset.on = "0";
+        after.style.display = "";
+        after.dataset.on = "1";
+      }
+    }
   });
   `,
 };

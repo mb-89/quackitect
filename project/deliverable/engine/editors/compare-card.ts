@@ -9,15 +9,17 @@
 // IT HAS NO COLLECTOR. Each button posts its own verdict and the page
 // re-renders on the next pair, so there is nothing sitting in the DOM waiting
 // for a save.
+//
+// THE PANEL AND THE STYLES ARE SHARED (card-parts.ts) — the sensitivity deck
+// draws the same shapes, and one copy serves both.
+import { CARD_PARTS } from "../card-parts.ts";
 import type { EditorKind } from "./kinds.ts";
 
 export const COMPARE_CARD_EDITOR: EditorKind = {
   id: "compare-card",
   render: `
+${CARD_PARTS}
     const st = args.walk || {};
-    const cel = "padding:10px 12px;border:1px solid var(--se-border);border-radius:6px;font-size:13px;color:var(--se-fg);";
-    const btn = "padding:6px 14px;border:1px solid var(--se-border);border-radius:5px;background:transparent;color:var(--se-fg);font:inherit;font-size:12px;cursor:pointer;";
-    const meta = "font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--se-muted);";
     if (!st.ask) {
       // NOTHING TO ASK HAS TWO CAUSES, and they must not read alike. Every
       // pair genuinely settled is success. An EMPTY SET is a broken source,
@@ -26,30 +28,12 @@ export const COMPARE_CARD_EDITOR: EditorKind = {
       const n = Number(st.answered || 0);
       const size = ((st.order || []).length);
       if (size === 0) {
-        return '<div style="' + meta + 'color:var(--se-accent);padding:6px 0;">nothing to compare — this field&#39;s item source resolved to an empty set</div>';
+        return '<div style="' + cardMeta + 'color:var(--se-accent);padding:6px 0;">nothing to compare — this field&#39;s item source resolved to an empty set</div>';
       }
-      return '<div style="' + meta + 'padding:6px 0;">' + n + " / " + n + " answered — every pair settled</div>";
+      return '<div style="' + cardMeta + 'padding:6px 0;">' + n + " / " + n + " answered — every pair settled</div>";
     }
-    // AN ID IS NOT ENOUGH TO JUDGE BY. Opening each note to answer one
-    // question turns a two-second card into a two-minute errand, and after
-    // three of those nobody finishes the pass.
-    //
-    // The statement is what the row demands, and breaks_if_removed is what
-    // it costs to lose. Those two are the judgment. The link stays for the
-    // rest of the note.
-    const side = function (id) {
-      const p = paths ? paths[id] : null;
-      const fx = (facts || {})[id] || {};
-      const open = p ? ' <a class="reflink" style="color:var(--se-accent);cursor:pointer;font-size:10.5px;" data-path="' + escText(p) + '">open</a>' : "";
-      const head = '<div style="font-size:10.5px;letter-spacing:.03em;color:var(--se-muted);">' + escText(id) + open + "</div>";
-      const stmt = fx.statement ? '<div style="margin-top:6px;line-height:1.45;">' + escText(fx.statement) + "</div>" : "";
-      const brk = fx.breaks_if_removed
-        ? '<div style="margin-top:6px;font-size:11.5px;color:var(--se-muted);line-height:1.4;"><i>without it:</i> ' + escText(fx.breaks_if_removed) + "</div>"
-        : "";
-      return '<div style="' + cel + 'flex:1;">' + head + stmt + brk + "</div>";
-    };
     const pick = function (v, label) {
-      return '<button class="sfcmp" style="' + btn + '" data-field="' + name + '" data-a="' + escText(st.ask.a) + '" data-b="' + escText(st.ask.b) + '" data-verdict="' + escText(v) + '">' + escText(label) + "</button>";
+      return '<button class="sfcmp" style="' + cardBtn + '" data-field="' + name + '" data-a="' + escText(st.ask.a) + '" data-b="' + escText(st.ask.b) + '" data-verdict="' + escText(v) + '">' + escText(label) + "</button>";
     };
     const isSame = args.relation === "equivalence";
     const buttons = isSame
@@ -73,12 +57,12 @@ export const COMPARE_CARD_EDITOR: EditorKind = {
     const total = Number(st.total || 0);
     const answered = Number(st.answered || 0);
     const asked = answered > 0 ? '<span style="opacity:.7;"> · ' + answered + " asked</span>" : "";
-    const bar = '<div style="' + meta + 'padding:6px 0;">' + done + " of " + total + " settled" + asked + "</div>";
+    const bar = '<div style="' + cardMeta + 'padding:6px 0;">' + done + " of " + total + " settled" + asked + "</div>";
     const cycles = (st.cycles || []).length > 0
-      ? '<div style="' + meta + 'color:var(--se-accent);padding:4px 0;">' + st.cycles.length + " contradiction(s) in your answers — see the form's findings</div>"
+      ? '<div style="' + cardMeta + 'color:var(--se-accent);padding:4px 0;">' + st.cycles.length + " contradiction(s) in your answers — see the form's findings</div>"
       : "";
     return bar + cycles
-      + '<div style="display:flex;gap:10px;align-items:stretch;">' + side(st.ask.a) + side(st.ask.b) + "</div>"
+      + '<div style="display:flex;gap:10px;align-items:stretch;">' + cardSide(st.ask.a) + cardSide(st.ask.b) + "</div>"
       + '<div style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap;">' + buttons.join("") + why + "</div>";
   `,
   collect: "",

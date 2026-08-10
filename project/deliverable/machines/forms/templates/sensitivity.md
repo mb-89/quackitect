@@ -28,14 +28,14 @@ A READING with a judgment beside it. The reading takes no input.
 
 ## What a person still owes
 
-ONE CLICK PER CREDIBLE FLIP. Mark the cell, save, and the engine mints the
-RAID tripwire with its fallback — the ruling line keeps the minted ref and
-renders as a link from then on. Revert clears unsaved marks.
+ONE CLICK PER CREDIBLE FLIP, one card at a time. Each card shows three
+panels — the cell (the requirement), the winner, the rival — and one
+verdict: "rival wins — credible". The click posts at once, the engine mints
+the RAID tripwire with its fallback, and the deck deals the next card.
+"Stands — next" advances without ruling; an unruled cell returns on the
+next look. Nothing is dismissed in silence, because nothing disappears.
 
-A cell left unmarked stands visibly unruled on a card that redraws from the
-scores. Nothing is dismissed in silence, because nothing disappears.
-
-Only flips within three swings are tabled; a rival further out is named on
+Only flips within three swings are dealt; a rival further out is named on
 one line and not asked about.
 
 ## What it stores
