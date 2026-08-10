@@ -4,6 +4,8 @@ type: "[[requirement]]"
 statement: When a reload is requested, the engine shall restart from the sources as they stand on disk and shall recompute the walk's position from recorded evidence.
 kind: functional
 verify_method: test
+verified_by:
+  - "tests/ticks.test.ts :: se_reload: refused off-idle, dry-runs its canary at idle, free under emergency"
 breaks_if_removed: A reload serves half-old content from a half-remembered position, which is worse than not reloading.
 breaks_how_badly: crippling
 refines:

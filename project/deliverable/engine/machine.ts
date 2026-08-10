@@ -96,6 +96,10 @@ export interface EvidenceField {
    *  the register, and a table nobody can page through is a table nobody
    *  fills. Absent means all rows at once, which is right for a short one. */
   page_size?: number;
+  /** WHERE A LIST CELL'S FILE HALF LIVES. An entry in the address grammar
+   *  (`file :: case`) links its file, joined to this base. Absent means no
+   *  link. */
+  link_base?: string;
   /** WHICH RELATION A COMPARISON CARD WALKS — `order` or `equivalence`. It
    *  decides what may be inferred from an answer, and that decides how many
    *  questions the card ever puts. */

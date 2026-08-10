@@ -4,6 +4,9 @@ type: "[[requirement]]"
 statement: When a person rejects a gate, the engine shall record the rejection with a reason naming what to redo.
 kind: functional
 verify_method: test
+verified_by:
+  - "tests/claimops.test.ts :: a reopen with no reason is refused, because it throws away accepted work"
+  - "tests/claimops.test.ts :: a reopen greys the claim and keeps its signature"
 breaks_if_removed: The agent guesses at what failed and fixes the sentence rather than the artifact.
 breaks_how_badly: corrosive
 refines:

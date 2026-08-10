@@ -4,6 +4,10 @@ type: "[[requirement]]"
 statement: If a gate's evidence holds an unfilled field, an unfilled round, or a citation resolving to no artifact, then the engine shall refuse to offer the gate for adjudication.
 kind: functional
 verify_method: test
+verified_by:
+  - "tests/forms.test.ts :: the lint: missing instance, empty required, files, status — and the prefill law end to end"
+  - "tests/iterations.test.ts :: the graph is evidence: an open decision point blocks the leave form"
+  - "tests/refs.test.ts :: a reference resolving to nothing is refused"
 breaks_if_removed: A person is asked to bless a form with holes in it, and their signature covers nothing.
 breaks_how_badly: fatal
 refines:

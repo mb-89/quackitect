@@ -4,6 +4,8 @@ type: "[[requirement]]"
 statement: The engine shall answer the retro's declared counts from the recorded log alone.
 kind: quality
 verify_method: test
+verified_by:
+  - "tests/retro.test.ts :: since last_retro: the log query scopes to the period after the newest drain call"
 breaks_if_removed: The retro guesses its counts and drifts from what actually ran.
 breaks_how_badly: abrasive
 refines:

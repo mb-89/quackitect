@@ -141,6 +141,20 @@ after.
 How to write one is [[meth-requirement-authoring]]. The statement shapes are
 [[meth-ears]]; quality scenarios are [[meth-quality-scenarios]].
 
+THE TEST LIVES ON THE ROW (owner ruling 2026-08-10). `verified_by` names
+the checks that verify this requirement — a LIST, at least one entry,
+written at M7 author-tests, NEVER at authoring time — which is why the
+key stays OUT of the skeleton: a key in the skeleton is demanded of every
+node at M3, and this one is not yet writable there. For
+`verify_method: test` each line is a case's address, `<test file> ::
+<test case name>`, split on the FIRST ` :: `. EVERY ENTRY IS
+DOUBLE-QUOTED — test names carry colons, and an unquoted colon-space
+breaks the frontmatter (it broke seven nodes on 2026-08-10). For the
+other methods it names the evidence artifact, or the review-class
+residue plainly. There is no separate test note: the
+test definition is the test itself. The author-tests law enforces the
+presence, at its own state.
+
 ## The template
 
 A new requirement is seeded from this fence. Replace every comment with the

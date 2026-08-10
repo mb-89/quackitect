@@ -4,6 +4,9 @@ type: "[[requirement]]"
 statement: When the person answers the change-size decision, the engine shall record that answer as the bless and compile the column the person named.
 kind: functional
 verify_method: test
+verified_by:
+  - "tests/iterations.test.ts :: the bless pins the machine and it grows in place — no wrapper, fills carried"
+  - "tests/iterations.test.ts :: the kickoff serves the rigor matrix's live evidence form, rounds included"
 breaks_if_removed: A chosen size needs a second confirmation, or the proposal overrides the person.
 breaks_how_badly: crippling
 refines:

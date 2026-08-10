@@ -5,6 +5,8 @@ statement: The engine shall keep 100 % of the artifacts a product owns as text a
 kind: quality
 characteristic: compatibility
 verify_method: test
+verified_by:
+  - "tests/files.test.ts :: a raw NUL in prose REFUSES — there the intent is not knowable"
 breaks_if_removed: The tree stops being readable by anything but this engine, and the product becomes the only way to see its own record.
 breaks_how_badly: fatal
 measure: 0 binary files under the product root, counted by the suite on every run.

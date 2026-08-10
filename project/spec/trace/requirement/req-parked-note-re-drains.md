@@ -4,6 +4,8 @@ type: "[[requirement]]"
 statement: When a new drain names a note standing in backlog, the engine shall accept it and shall record the new disposition as superseding the old.
 kind: functional
 verify_method: test
+verified_by:
+  - "tests/retro.test.ts :: the backlog home (v1 port): backlog demands its ready-when, parks the note, and migration re-drains it"
 breaks_if_removed: A parked note whose condition came true has no road back into scope.
 breaks_how_badly: corrosive
 refines:

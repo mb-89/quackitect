@@ -1,5 +1,6 @@
 ---
 form: gate-prototype
+bless: blessed by human
 by: agent
 signed_off: 2026-08-10T19:34:57.474Z
 authors: agent

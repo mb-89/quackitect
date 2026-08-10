@@ -4,6 +4,8 @@ type: "[[requirement]]"
 statement: When a close is requested, the engine shall serve the record's findings report, listing every finding the record produced.
 kind: functional
 verify_method: test
+verified_by:
+  - "tests/editsafety.test.ts :: closing on an unconfirmed report is refused, and the override is recorded"
 breaks_if_removed: The person rules on a report that quietly dropped what it found inconvenient.
 breaks_how_badly: crippling
 refines:

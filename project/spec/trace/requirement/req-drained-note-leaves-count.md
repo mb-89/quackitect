@@ -4,6 +4,9 @@ type: "[[requirement]]"
 statement: When a drain is accepted, the engine shall remove the note from the pending count and shall retain the note with its disposition.
 kind: functional
 verify_method: test
+verified_by:
+  - "tests/retro.test.ts :: draining splits: done and obsolete anywhere, carried and backlog only in the retro"
+  - "tests/retro.test.ts :: the backlog home (v1 port): backlog demands its ready-when, parks the note, and migration re-drains it"
 breaks_if_removed: The inbox cannot reach zero honestly, or a drained judgment vanishes and is re-litigated.
 breaks_how_badly: corrosive
 refines:

@@ -1,7 +1,7 @@
 ---
 form: trunk-read-cost
 by: agent
-signed_off: 2026-08-10T19:31:01.469Z
+signed_off: 2026-08-10T20:58:05.710Z
 authors: agent
 files:
 ---
@@ -14,7 +14,7 @@ The seeded spike against raid-dec-thin-tree's read bet. The measurement ran on t
 
 ## built
 
-The experiment node [[exp-trunk-read-cost]] — verdict holds, in the batch-reader shape only. Measured 2026-08-10: spawn-per-read 47 to 54 ms per file; one long-lived git cat-file batch process 2.0 ms per file (20 files, 41 ms); plain disk 0.5 ms. The finding is landed in [[raid-dec-thin-tree]]'s body, dated. The fallback stays unneeded.
+- [[exp-trunk-read-cost]]
 
 ## follow_up
 

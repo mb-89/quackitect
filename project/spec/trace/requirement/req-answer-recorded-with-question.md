@@ -4,6 +4,8 @@ type: "[[requirement]]"
 statement: When a person's direct question is answered, the engine shall record the question and its answer as two separate fields in one log entry.
 kind: functional
 verify_method: test
+verified_by:
+  - "tests/nesting.test.ts :: se_answer records an aq entry and the feed types it aq"
 breaks_if_removed: The answer lives only in chat and a lost turn erases it.
 breaks_how_badly: crippling
 refines:

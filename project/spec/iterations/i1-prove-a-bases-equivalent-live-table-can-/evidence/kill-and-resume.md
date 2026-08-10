@@ -1,7 +1,7 @@
 ---
 form: kill-and-resume
 by: agent
-signed_off: 2026-08-10T19:32:50.375Z
+signed_off: 2026-08-10T20:58:47.387Z
 authors: agent
 files:
 ---
@@ -14,7 +14,7 @@ The seeded spike against the files-only-memory hinge. The probe ran itself five 
 
 ## built
 
-The experiment node [[exp-kill-and-resume]] — verdict holds, with the limit named. Measured 2026-08-10: five restarts, five clean resumes from files alone; 28 signed states fast-forwarded on re-entry, worst 15.2 seconds; one context compaction survived the same way. The finding is landed in [[raid-ar-resume-needs-no-person]], dated. The OS-kill-mid-write and host-swap variants stay deferred with the POSIX probe.
+- [[exp-kill-and-resume]]
 
 ## follow_up
 

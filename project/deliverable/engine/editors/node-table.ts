@@ -27,9 +27,13 @@ export const NODE_TABLE_EDITOR: EditorKind = {
     // Every colour is a theme variable. A literal colour shows the default
     // control through, and that reads as a white box in a dark panel.
     const cel = "padding:5px 8px;border-top:1px solid var(--se-border);vertical-align:middle;";
-    const hed = "padding:5px 8px;text-align:left;font-weight:normal;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--se-muted);";
+    const hed = "padding:5px 8px;text-align:left;font-weight:normal;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--se-muted);position:relative;";
     const box = "width:100%;box-sizing:border-box;background:transparent;border:0;outline:none;font:inherit;font-size:12.5px;color:var(--se-fg);padding:0;";
-    const head = "<thead><tr>" + [args.of || "node"].concat(cols).map(function (c) { return '<th style="' + hed + '">' + escText(c) + "</th>"; }).join("") + "</tr></thead>";
+    // THE COLUMN EDGE IS A HANDLE — the same drag the live table has. The
+    // widths live in the behaviour's map and are reapplied on every redraw,
+    // because the form is redrawn whole on every look.
+    const grip = '<span class="sfntgrip" style="position:absolute;right:0;top:0;bottom:0;width:6px;cursor:col-resize;"></span>';
+    const head = "<thead><tr>" + [args.of || "node"].concat(cols).map(function (c) { return '<th style="' + hed + '" data-field="' + name + '" data-col="' + escText(c) + '">' + escText(c) + grip + "</th>"; }).join("") + "</tr></thead>";
     // A CONSTRAINED COLUMN OFFERS ITS SOURCE, and HOW it offers it is the
     // field's own declaration (owner ruling 2026-08-08).
     //
@@ -87,12 +91,29 @@ export const NODE_TABLE_EDITOR: EditorKind = {
         const todo = v === "" || (v.indexOf("<!--") === 0 && v.slice(-3) === "-->");
         const dim = todo ? "color:var(--se-muted);font-style:italic;" : "";
         if (picks[c] && !isFree(c)) return '<td style="' + cel + '">' + chooser(c, id, v, dim) + "</td>";
+        // A LIST CELL SHOWS ITS ENTRIES ONE PER LINE, and an entry in the
+        // address grammar links its file half. The entries are not edited
+        // here — the row's node is one click away and the bind rebuilds the
+        // cell from it; the hidden input keeps the row whole for the save.
+        if (!picks[c] && (v.indexOf(" · ") >= 0 || v.indexOf(" :: ") >= 0)) {
+          const lines = v.split(" · ").map(function (e) {
+            const t = e.trim().replace(/^"/, "").replace(/"$/, "");
+            const at = t.indexOf(" :: ");
+            if (at < 0) return '<div style="padding:1px 0;">' + escText(t) + "</div>";
+            const file = t.slice(0, at).trim();
+            const full = (args.link_base || "") + file;
+            return '<div style="padding:1px 0;">' +
+              '<a class="reflink" style="color:var(--se-accent);cursor:pointer;" data-path="' + escText(full) + '" title="open ' + escText(full) + ' in the editor">' + escText(file) + "</a>" +
+              '<span style="color:var(--se-muted);"> :: </span>' + escText(t.slice(at + 4).trim()) + "</div>";
+          }).join("");
+          return '<td style="' + cel + 'vertical-align:top;font-size:12.5px;">' + lines + '<input type="hidden" class="sfnt" data-field="' + name + '" data-item="' + escText(id) + '" data-col="' + escText(c) + '" value="' + escText(v) + '"></td>';
+        }
         const listed = picks[c] ? ' list="' + escText(listId(c)) + '"' : "";
         return '<td style="' + cel + '"><input class="sfnt" style="' + box + dim + '"' + listed + ' data-field="' + name + '" data-item="' + escText(id) + '" data-col="' + escText(c) + '" value="' + escText(v) + '"></td>';
       }).join("");
       return '<tr class="sfntrow" data-idx="' + rowAt[id] + '"><td style="' + cel + 'font-size:12.5px;white-space:nowrap;">' + nameCell + "</td>" + cellsHtml + "</tr>";
     };
-    const table = (list) => '<table class="sfnodetable" style="width:100%;border-collapse:collapse;table-layout:fixed;">' + head + "<tbody>" + list.map(rowHtml).join("") + "</tbody></table>";
+    const table = (list) => '<table class="sfnodetable" data-field="' + name + '" style="width:100%;border-collapse:collapse;table-layout:fixed;">' + head + "<tbody>" + list.map(rowHtml).join("") + "</tbody></table>";
     const ids = args.items || [];
     const rowAt = {};
     ids.forEach(function (id, i) { rowAt[id] = i; });
@@ -118,7 +139,11 @@ export const NODE_TABLE_EDITOR: EditorKind = {
       '<button type="button" class="sfntprev" style="' + btn + '" title="previous page">‹</button>' +
       '<span class="sfntwhere"></span>' +
       '<button type="button" class="sfntnext" style="' + btn + '" title="next page">›</button>' +
-      '<select class="sfntper" style="' + btn + 'padding:0 4px;">' + opts + "</select></div>";
+      '<select class="sfntper" style="' + btn + 'padding:0 4px;">' + opts + "</select>" +
+      // THE MISSING-ONLY FILTER (owner, 2026-08-10): show only the rows with
+      // an empty cell — for the checks table, the requirements no test
+      // covers yet. It filters what SHOWS; the save still reads every row.
+      '<label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" class="sfntmiss" style="accent-color:var(--se-accent);margin:0;"> missing only</label></div>';
     return datalists + bar + table(ids);
   `,
   collect: `
@@ -153,30 +178,75 @@ export const NODE_TABLE_EDITOR: EditorKind = {
   // NO BACKTICK BELOW, not even in a comment. This body is one template
   // literal and a backtick ends it.
   const sfntPage = {};
+  // WHICH FIELDS SHOW ONLY THEIR MISSING ROWS — the filter's survival map,
+  // same pattern as the page and the widths.
+  const sfntMiss = {};
+  // THE COLUMN WIDTHS, keyed field then column. The form is redrawn whole on
+  // every look, so a width lives here and sfntApply re-applies it — exactly
+  // the pager's survival pattern. Dragging a header's right edge sets it.
+  const sfntW = {};
+  let sfntSizing = null;
+  document.addEventListener("mousedown", function (ev) {
+    const g = ev.target.closest ? ev.target.closest(".sfntgrip") : null;
+    if (!g) return;
+    const th = g.closest("th");
+    sfntSizing = { field: th.dataset.field, col: th.dataset.col, th: th, x: ev.clientX, w: th.offsetWidth };
+    ev.preventDefault();
+  });
+  document.addEventListener("mousemove", function (ev) {
+    if (!sfntSizing) return;
+    const w = Math.max(40, sfntSizing.w + (ev.clientX - sfntSizing.x));
+    sfntSizing.th.style.width = w + "px";
+    (sfntW[sfntSizing.field] = sfntW[sfntSizing.field] || {})[sfntSizing.col] = w;
+  });
+  document.addEventListener("mouseup", function () { sfntSizing = null; });
   function sfntApply() {
+    document.querySelectorAll(".sfnodetable").forEach(function (tbl) {
+      const ws = sfntW[tbl.dataset.field] || {};
+      tbl.querySelectorAll("th").forEach(function (th) {
+        if (ws[th.dataset.col] !== undefined) th.style.width = ws[th.dataset.col] + "px";
+      });
+    });
     document.querySelectorAll(".sfntpager").forEach(function (bar) {
       const f = bar.dataset.field;
-      const total = Number(bar.dataset.total || 0);
       const per = Number(bar.dataset.per || 0);
+      // The rows belong to the table right after the bar, so a form holding
+      // two paged fields never pages both at once.
+      const tbl = bar.nextElementSibling;
+      if (!tbl) return;
+      // A ROW BEING EDITED NEVER VANISHES. With the filter on, the first
+      // keystroke into an empty cell makes the row non-missing, and the next
+      // tick would hide it mid-edit. While focus is in the table, the view
+      // holds still.
+      if (tbl.contains(document.activeElement)) return;
+      const rows = Array.prototype.slice.call(tbl.querySelectorAll("tr.sfntrow"));
+      // MISSING MEANS AN EMPTY CELL: no value, or still the template comment.
+      const missing = function (tr) {
+        const ins = tr.querySelectorAll(".sfnt");
+        for (let i = 0; i < ins.length; i++) {
+          const v = (ins[i].value || "").trim();
+          if (v === "" || v.indexOf("<!--") === 0) return true;
+        }
+        return ins.length === 0;
+      };
+      const only = !!sfntMiss[f];
+      const want = only ? rows.filter(missing) : rows;
+      const total = want.length;
       const pages = per > 0 ? Math.max(1, Math.ceil(total / per)) : 1;
       const page = Math.min(Math.max(0, sfntPage[f] || 0), pages - 1);
       sfntPage[f] = page;
       const from = per > 0 ? page * per : 0;
       const to = per > 0 ? Math.min(total, from + per) : total;
       const where = bar.querySelector(".sfntwhere");
-      if (where) where.textContent = total === 0 ? "nothing here" : from + 1 + "\\u2013" + to + " of " + total;
+      if (where) where.textContent = total === 0 ? (only ? "nothing missing" : "nothing here") : from + 1 + "\\u2013" + to + " of " + total + (only ? " missing" : "");
       const prev = bar.querySelector(".sfntprev");
       const next = bar.querySelector(".sfntnext");
       if (prev) prev.disabled = page === 0;
       if (next) next.disabled = page >= pages - 1;
-      // The rows belong to the table right after the bar, so a form holding
-      // two paged fields never pages both at once.
-      const tbl = bar.nextElementSibling;
-      if (!tbl) return;
-      tbl.querySelectorAll("tr.sfntrow").forEach(function (tr) {
-        const i = Number(tr.dataset.idx || 0);
-        tr.style.display = per <= 0 || (i >= from && i < to) ? "" : "none";
-      });
+      const box = bar.querySelector(".sfntmiss");
+      if (box) box.checked = only;
+      rows.forEach(function (tr) { tr.style.display = "none"; });
+      want.slice(from, to).forEach(function (tr) { tr.style.display = ""; });
     });
   }
   document.addEventListener("click", function (ev) {
@@ -188,6 +258,15 @@ export const NODE_TABLE_EDITOR: EditorKind = {
     sfntApply();
   });
   document.addEventListener("change", function (ev) {
+    const c = ev.target.closest ? ev.target.closest(".sfntmiss") : null;
+    if (c) {
+      const cbar = c.closest(".sfntpager");
+      sfntMiss[cbar.dataset.field] = c.checked;
+      sfntPage[cbar.dataset.field] = 0;
+      if (document.activeElement) document.activeElement.blur();
+      sfntApply();
+      return;
+    }
     const s = ev.target.closest ? ev.target.closest(".sfntper") : null;
     if (!s) return;
     const bar = s.closest(".sfntpager");
@@ -202,6 +281,6 @@ export const NODE_TABLE_EDITOR: EditorKind = {
   });
   // The form is redrawn whole on every look, so the page has to be reapplied
   // rather than bound once to elements that will not survive.
-  setInterval(function () { if (document.querySelector(".sfntpager")) sfntApply(); }, 400);
+  setInterval(function () { if (document.querySelector(".sfnodetable, .sfntpager")) sfntApply(); }, 400);
   `,
 };

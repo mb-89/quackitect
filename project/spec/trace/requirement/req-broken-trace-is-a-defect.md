@@ -4,6 +4,9 @@ type: "[[requirement]]"
 statement: The engine shall count every broken trace link as a defect and shall fail the gate reviewing it.
 kind: functional
 verify_method: test
+verified_by:
+  - "tests/trace-coverage.test.ts :: every refines edge lands on a node that exists"
+  - "tests/refs.test.ts :: a reference resolving to nothing is refused"
 breaks_if_removed: The trace renders whole while pointing at nothing, which is worse than rendering a hole.
 breaks_how_badly: corrosive
 refines:

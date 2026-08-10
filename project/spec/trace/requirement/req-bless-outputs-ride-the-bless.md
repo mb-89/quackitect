@@ -4,6 +4,8 @@ type: "[[requirement]]"
 statement: When a gate bless names a seeded output, the engine shall produce that output within the bless act.
 kind: functional
 verify_method: test
+verified_by:
+  - "tests/iterations.test.ts :: the bless pins the machine and it grows in place — no wrapper, fills carried"
 breaks_if_removed: The seeded output becomes a step after the gate, forgotten when the walk moves on.
 breaks_how_badly: corrosive
 refines:

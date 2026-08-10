@@ -1280,3 +1280,17 @@
 {"ts":"2026-08-10T19:34:42.322Z","op":"update","visit":"iterations/i1/gate-prototype@0","node":"d18","brief":"the gate filled and submitting"}
 {"ts":"2026-08-10T19:34:57.262Z","op":"update","visit":"iterations/i1/gate-prototype@0","node":"d19","brief":"the rounds rewritten in the gate's line grammar"}
 {"ts":"2026-08-10T19:35:14.840Z","op":"done","visit":"iterations/i1/run-spikes/trunk-read-cost@0","node":"d7","brief":"the gate signed; the bless is the owner's"}
+{"ts":"2026-08-10T19:35:21.165Z","op":"done","visit":"iterations/i1/run-spikes/trunk-read-cost@0","node":"d6","brief":"the fold view signed over the answered nodes"}
+{"ts":"2026-08-10T19:46:09.573Z","op":"update","visit":"iterations/i1/start@1","node":"d28","brief":"aimed back at the signed gate"}
+{"ts":"2026-08-10T19:58:35.665Z","op":"update","visit":"iterations/i1/start@2","node":"d41","brief":"aimed at author-tests"}
+{"ts":"2026-08-10T20:56:00.916Z","op":"update","visit":"iterations/i1/onboard-retro@0","node":"d1","brief":"walking the drawn route to author-tests, reading re-owed"}
+{"ts":"2026-08-10T20:57:41.095Z","op":"update","visit":"iterations/i1/run-spikes/trunk-read-cost@0","node":"d2","brief":"the record's own copy of the experiment nodes, so its resolver sees them"}
+{"ts":"2026-08-10T20:58:54.429Z","op":"update","visit":"iterations/i1/run-spikes/kill-and-resume@0","node":"d3","brief":"the three spike branches re-signed with their experiment refs"}
+{"ts":"2026-08-10T20:59:13.999Z","op":"plan","visit":"iterations/i1/author-tests@0","parent":null,"nodes":[{"id":"d4","brief":"map the 82 open test-method requirements honestly"},{"id":"d5","brief":"write the orphan-test list for tomorrow"},{"id":"d6","brief":"write the missed-requirement list"},{"id":"d7","brief":"submit author-tests if the law passes, then idle"}]}
+{"ts":"2026-08-10T21:04:44.122Z","op":"update","visit":"iterations/i1/author-tests@0","node":"d8","brief":"reading the cited tests before naming them"}
+{"ts":"2026-08-10T21:09:15.225Z","op":"update","visit":"iterations/i1/author-tests@0","node":"d9","brief":"the first seventeen verified mappings land on the nodes"}
+{"ts":"2026-08-10T21:10:22.856Z","op":"done","visit":"iterations/i1/author-tests@0","node":"d4","brief":"34 mapped honestly, 48 have no test to name — the finding itself"}
+{"ts":"2026-08-10T21:11:45.332Z","op":"update","visit":"iterations/i1/author-tests@0","node":"d10","brief":"the findings document with both lists"}
+{"ts":"2026-08-10T21:12:21.274Z","op":"done","visit":"iterations/i1/author-tests@0","node":"d5","brief":"the orphan list stands in the findings document"}
+{"ts":"2026-08-10T21:12:45.004Z","op":"done","visit":"iterations/i1/author-tests@0","node":"d6","brief":"each orphan cluster names the requirement it implies, in the findings"}
+{"ts":"2026-08-10T21:13:07.216Z","op":"update","visit":"iterations/i1/author-tests@0","node":"d11","brief":"the submit refusal recorded; checkpointing the record"}

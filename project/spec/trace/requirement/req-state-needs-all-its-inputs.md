@@ -4,6 +4,8 @@ type: "[[requirement]]"
 statement: "The engine shall refuse a state's submit until its inputs are met: every input when a busbar stands above it, otherwise at least one."
 kind: functional
 verify_method: test
+verified_by:
+  - "tests/drift.test.ts :: a collection bar's prerequisites include every input, not just the nearest one"
 breaks_if_removed: A state stamps over work nobody did, and the panel reports that green as earned.
 breaks_how_badly: fatal
 refines:

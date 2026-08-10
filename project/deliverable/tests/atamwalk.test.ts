@@ -8,7 +8,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { exposureView, mintScenarioLines, scenarioDeckView, structureMetrics } from "../engine/atamwalk.ts";
 import { elementMatrixView } from "../engine/elematrix.ts";
-import { assumptionLawProblems, deckLawProblems, structureLawProblems } from "../engine/stateform.ts";
+import { assumptionLawProblems, authorTestsLawProblems, deckLawProblems, structureLawProblems } from "../engine/stateform.ts";
 import { conformance, type TraceNode } from "../engine/trace.ts";
 
 const REQS = [
@@ -148,6 +148,28 @@ test("the assumption law refuses the hot and unprobed, and honours accept and de
     assert.equal(found.length, 2);
     assert.ok(found.some((p) => p.includes("raid-hot")));
     assert.ok(found.some((p) => p.includes("raid-parked") && p.includes("until")));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("a test-method requirement without its verified_by refuses; the other methods pass", () => {
+  const root = mkdtempSync(join(tmpdir(), "vblaw-"));
+  try {
+    const dir = join(root, "n");
+    mkdirSync(dir, { recursive: true });
+    const corpus = [
+      lawNode(dir, "req-bare", "requirement", ["verify_method: test"]),
+      lawNode(dir, "req-mapped", "requirement", [
+        "verify_method: test",
+        "verified_by:",
+        "  - tests/files.test.ts :: the door serves a fresh read",
+      ]),
+      lawNode(dir, "req-demo", "requirement", ["verify_method: demonstration"]),
+    ];
+    const found = authorTestsLawProblems(corpus);
+    assert.equal(found.length, 1);
+    assert.ok(found[0].includes("req-bare"));
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

@@ -4,6 +4,8 @@ type: "[[requirement]]"
 statement: While the corpus is split across the trunk and an open record, the engine shall resolve each trace view against its selected source alone, mixing zero trunk content into the open record's view.
 kind: functional
 verify_method: test
+verified_by:
+  - "tests/refs.test.ts :: every trace read goes through the one accessor, so the readers cannot drift"
 breaks_if_removed: An open record's half-made trace mixes with trunk truth; the reader cannot tell which world they read.
 breaks_how_badly: fatal
 refines:

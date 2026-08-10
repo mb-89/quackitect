@@ -5,6 +5,9 @@ statement: When a new session opens the project, the engine shall serve the walk
 kind: quality
 fitness_candidate: true
 verify_method: test
+verified_by:
+  - "tests/feed.test.ts :: replay: parked defers and open points survive an engine life"
+  - "tests/gitlane.test.ts :: a recorded visit yields its state, however deep the container"
 breaks_if_removed: Every compaction or crash ends the iteration, and settled work gets re-litigated by the next session.
 breaks_how_badly: fatal
 refines:

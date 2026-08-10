@@ -4,6 +4,8 @@ type: "[[requirement]]"
 statement: When a stray is captured, the engine shall leave the walk unchanged, with zero state transitions and zero plan changes caused by the capture.
 kind: functional
 verify_method: test
+verified_by:
+  - "tests/feed.test.ts :: se_note is legal in EVERY state — a stray is captured where it strikes"
 breaks_if_removed: Capturing a finding abandons the state in hand — the exact failure the note lane exists to prevent.
 breaks_how_badly: crippling
 refines:
