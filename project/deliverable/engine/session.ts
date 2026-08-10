@@ -3514,7 +3514,8 @@ export class Session {
     // and the lines now come from the register — so the state stands exactly
     // while every standing node carries its frontmatter, which is the claim
     // the state was making all along.
-    Object.assign(fills, this.bindView(s, model, m));
+    const boundFills = this.bindView(s, model, m);
+    Object.assign(fills, boundFills);
     // THE FORM'S OWN RECORD, not the session's binding. The mirror renders an
     // iteration's form from the desk with nothing bound, so resolving against
     // the binding made a node the record owns invisible on screen while the
@@ -3570,6 +3571,12 @@ export class Session {
       instance: h.instanceRel,
       exists: raw !== undefined,
       ...lint,
+      // THE BOUND FIELDS REACH THE SURFACE TOO. The lint reads the raw file,
+      // which for a bound field holds nothing — the derived table is the
+      // content, and without this override the mirror drew every cell empty.
+      fields: lint.fields.map((f) =>
+        boundFills[f.name] === undefined ? f : { ...f, content: boundFills[f.name], filled: boundFills[f.name].trim() !== "" },
+      ),
       problems: [...lint.problems, ...tp],
       met: lint.met && tp.length === 0,
     };
