@@ -70,10 +70,12 @@ THE MAPPING IS MANY-TO-MANY, both directions owed:
   the standing battery predates this rule, so the orphan count informs
   before it ever refuses.
 
-THE ADDRESS GRAMMAR, for software: `<test file> :: <test case name>`.
-A TypeScript test case is a registered NAME, not an exported function —
-the (file, name) pair is its durable address, and the battery records
-every pair it ran with its verdict, so the address is checkable.
+THE ADDRESS GRAMMAR, for software: `<test file> :: <test case name>`,
+split on the FIRST ` :: `. A TypeScript test case is a registered NAME,
+not an exported function — the (file, name) pair is its durable address,
+and the battery records every pair it ran with its verdict, so the
+address is checkable. WRITE EVERY ENTRY DOUBLE-QUOTED: test names carry
+colons, and an unquoted colon-space breaks the node's frontmatter.
 
 SOFTWARE-SPECIFIC BY DESIGN (owner ruling 2026-08-10): a non-software
 realization keeps the field and reshapes only the address grammar — a
