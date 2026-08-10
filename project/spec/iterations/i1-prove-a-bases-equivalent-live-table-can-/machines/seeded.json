@@ -1,6 +1,6 @@
 {
   "change_size": "product",
-  "rigor_matrix_hash": "1cb08f41a06f",
+  "rigor_matrix_hash": "312772ca9ee9",
   "pinned_at": "2026-08-04T16:20:30.684Z",
   "demands": {
     "onboard-retro": {
@@ -109,27 +109,31 @@
     },
     "converge-pugh": {
       "applies": "full",
-      "evidence": "[[\"matrix_runs\",true,\"\",[],\"\",\"\",[],[],[]],[\"winner\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"matrix_runs\",true,\"\",[],\"decision-matrix\",\"\",[],[],[]]]"
     },
     "reverse-sensitivity": {
       "applies": "full",
-      "evidence": "[[\"sensitivity\",true,\"\",[],\"\",\"\",[],[],[]],[\"tripwires\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"sensitivity\",true,\"\",[],\"sensitivity\",\"\",[],[],[]]]"
+    },
+    "declare-winner": {
+      "applies": "full",
+      "evidence": "[[\"winner\",true,\"\",[],\"decision-matrix\",\"\",[],[],[]],[\"comments\",true,\"\",[],\"\",\"\",[],[],[]]]"
     },
     "record-adrs": {
       "applies": "full",
       "evidence": "[[\"adrs\",true,\"\",[],\"\",\"\",[],[],[]]]"
     },
-    "consolidate-baseline": {
+    "decompose-structure": {
       "applies": "full",
-      "evidence": "[[\"baseline\",true,\"\",[],\"\",\"\",[],[],[]],[\"allocation_exact\",true,\"\",[],\"\",\"\",[],[],[]],[\"interfaces_both_ends\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"elements\",true,\"\",[],\"list\",\"element\",[],[],[]],[\"allocation\",true,\"\",[],\"element-matrix\",\"element\",[],[],[]]]"
     },
-    "evaluate-baseline": {
+    "evaluate-architecture": {
       "applies": "full",
-      "evidence": "[[\"walk\",true,\"\",[],\"\",\"\",[],[],[]],[\"fitness_candidates\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"walk\",true,\"\",[],\"scenario-deck\",\"\",[],[],[]],[\"fitness_candidates\",true,\"\",[],\"list\",\"requirement\",[],[],[]]]"
     },
     "gate-architecture": {
       "applies": "full",
-      "evidence": "[[\"choice_traced\",true,\"\",[],\"\",\"\",[],[],[]],[\"sensitivity_ruled\",true,\"\",[],\"\",\"\",[],[],[]],[\"matrix_review\",true,\"\",[],\"\",\"\",[],[],[]],[\"evaluation_recorded\",true,\"\",[],\"\",\"\",[],[],[]],[\"adrs_traced\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[]"
     },
     "rank-unknowns": {
       "applies": "full",

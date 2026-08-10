@@ -20,8 +20,6 @@ weighs_against:
 
 ## Scenario
 
-## Scenario
-
 - Source: a newcomer (stk-newcomer).
 - Stimulus: asks the front desk for a tour and completes it.
 - Artifact: the tour and the desk's offer list.

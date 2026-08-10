@@ -193,7 +193,7 @@ describe("the vault", { concurrency: true }, () => {
     const spec = loadBase(RIGOR);
     const matrix = spec.views.find((v) => v.name === "The matrix");
     assert.ok(matrix !== undefined, "the shipped base declares The matrix");
-    assert.equal(renderView(spec, matrix, readVault(REPO_ROOT)).rows, 52);
+    assert.equal(renderView(spec, matrix, readVault(REPO_ROOT)).rows, 53);
   });
 
   // The pivot and the flat view read ONE set of notes. Each rigor row carries
@@ -222,7 +222,7 @@ describe("the vault", { concurrency: true }, () => {
     const waits = spec.views[0];
     const r = renderView(spec, waits, rows);
     const labels = [...r.html.matchAll(/pv-row">([^<]+)</g)].map((m) => m[1]);
-    assert.equal(labels.length, 52, "every rigor step is a row");
+    assert.equal(labels.length, 53, "every rigor step is a row");
     const shared = r.columns.filter((c) => labels.includes(c));
     assert.ok(shared.length >= 45, `the axes name the same things — only ${shared.length} of ${r.columns.length} columns are also rows`);
   });

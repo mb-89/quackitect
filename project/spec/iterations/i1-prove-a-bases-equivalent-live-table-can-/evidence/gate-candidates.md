@@ -1,5 +1,8 @@
 ---
 form: gate-candidates
+bless: blessed by human
+by: agent
+signed_off: 2026-08-10T13:09:13.957Z
 amended: "2026-08-10T12:48:53.103Z by agent — the section never said its own job — the cut is cut-criteria's, and this gate only judges whether the cut reasons are real"
 authors: agent, human
 files:
@@ -68,12 +71,10 @@ The reference count is 11. The 8 extra rows all grade crippling. Cutting at 11 w
 
 ## raid_additions
 
-The four owed entries stand in the register, minted 2026-08-10 (the gate holds no write tool, so they were written from outside the walk on the owner's word):
-
-- [[raid-composer-scored-own-candidates]] — the issue. Act on this one first: a second hand re-scores before M5 reads the numbers.
-- [[raid-unverified-score-comparisons]] — the risk on the four surviving 4-scores.
-- [[raid-strikes-share-one-argument]] — the risk that all 37 strikes fall together.
-- [[raid-corpus-stays-small]] — the assumption already stood in the register; the cand-derived-house measurement (322 nodes, 465 ms cold, 119 ms warm) joined it.
+- raid-composer-scored-own-candidates
+- raid-unverified-score-comparisons
+- raid-strikes-share-one-argument
+- raid-corpus-stays-small
 
 ## verdict
 

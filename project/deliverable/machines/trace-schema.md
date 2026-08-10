@@ -22,10 +22,30 @@ edges:
     key: satisfies
     to: function
     verb: satisfies
+  - from: element
+    key: implements
+    to: function
+    verb: implements
+  - from: interface
+    key: implements
+    to: function
+    verb: implements
+  - from: interface
+    key: carries
+    to: flow
+    verb: carries
+  - from: element
+    key: satisfies
+    to: requirement
+    verb: satisfies
+  - from: interface
+    key: satisfies
+    to: requirement
+    verb: satisfies
 subsegments:
   - id: design
     label: design
-    levels: [function]
+    levels: [function, element, interface]
   - id: test
     label: tests
     levels: []
@@ -117,6 +137,37 @@ WHY `satisfies` AND NOT `implements`. An implementation names a mechanism,
 and a function is solution-neutral by construction. SysML uses «satisfy» for
 exactly this relation, so the word already travels.
 
+ONE LEVEL DOWN THE SAME ARGUMENT FLIPS (owner ruling 2026-08-10). An element
+IS a mechanism, so what it does to a function is `implements`. An interface
+implements a function too, where the function lives on the boundary itself.
+
+## The design slice grew on 2026-08-10
+
+Elements and interfaces stand one radius past the functions, both in the
+design half.
+
+- An element or an interface names the functions it realizes in
+  `implements`.
+- THE MATCH IS NOT ONE TO ONE. Several elements may implement one function
+  — software tends to one-to-one, systems spread — and the spread is
+  information the DSM shows, never a defect. What IS a defect is a function
+  nothing implements, or an element implementing nothing.
+- An interface also names the flows it transports in `carries`. That is how
+  a contract stays answerable to the function layer.
+- `source` and `destination` on an interface are STRUCTURE, not trace —
+  like `source_refs`, they are not checked as edges here. The element DSM
+  is their view.
+
+THE TRACE IS COMPLETE, ON TWO PATHS (owner ruling 2026-08-10: a trace with
+residue cannot show the changes). Most requirements reach the structure
+TRANSITIVELY — served by functions, implemented by elements — and no
+requirement id is written onto structure for that path. A requirement the
+function chain cannot carry — a structural quality answered by the SHAPE,
+an imposed constraint binding a choice — is named DIRECTLY by the element
+or interface that answers it, in `satisfies`. The union is the law: every
+requirement reached by one path or the other, zero unreached. Perturb any
+node and the affected cone is in the graph, whole.
+
 ## Each edge's key is the frontmatter it lives under
 
 A node writes its upward edge under the key its type declares. A requirement
@@ -176,6 +227,7 @@ land without moving anything already drawn.
 - v1's trace spine, at ref main: the child names its parents, in the child's
   own file.
 - SysML relationship kinds: «satisfy», «refine», «derive», «trace», «verify»,
-  «allocate». This schema uses the first two, and keeps allocation for M4.
+  «allocate». This schema uses the first two; allocation arrived 2026-08-10
+  as the `implements` edge from elements and interfaces.
 - INCOSE Systems Engineering Handbook, 4th edition: logical decomposition and
   allocation are separate acts, so they are separate edges.

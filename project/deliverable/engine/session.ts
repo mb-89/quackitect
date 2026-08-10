@@ -44,6 +44,7 @@ export function visitState(visit: string): string {
 
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { mintScenarioLines } from "./atamwalk.ts";
 import { CallLog } from "./calllog.ts";
 import type { CanvasData } from "./canvas.ts";
 import { conditionNotePath } from "./conditions.ts";
@@ -91,8 +92,9 @@ import {
   readItRecord,
   repinColumn,
 } from "./iterations.ts";
-import { parseStateNote, section, withPass } from "./notes.ts";
+import { parseStateNote, readNode, section, withPass, writeNode } from "./notes.ts";
 import { fansOut, methodFilesIn, pathKind, recordOwnerOf, resolveInRoot, seDir } from "./paths.ts";
+import { mintFlipLines } from "./pugh.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { anyJobRunning } from "./run.ts";
@@ -101,6 +103,7 @@ import {
   buildPortableForm,
   claimProblems,
   type EmbeddedDoc,
+  elementMatrixArgs,
   nodeField,
   parseIsland,
   stateFormFields,
@@ -109,7 +112,7 @@ import {
   templateProblems,
 } from "./stateform.ts";
 import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
-import { corpusVersion, loadTrace, noteOf } from "./trace.ts";
+import { corpusVersion, loadTrace, noteOf, traceDir } from "./trace.ts";
 import { type Expedition, expClose, expFind, expList, expNew, readRecord } from "./worktree.ts";
 
 /** THE PULL is the machinery — one verb, legal in EVERY state: the agent
@@ -3476,6 +3479,7 @@ export class Session {
       this.stateFormHeader(name, raw, m),
       raw,
       this.traceRoot(this.declIteration(m)),
+      h.instanceAbs,
     );
     // The section lint plus the TEMPLATE checks — generic engine code,
     // configured per field in the templates' own markdown. One verdict
@@ -4194,6 +4198,233 @@ export class Session {
     return touched;
   }
 
+  /** ONE OWED CELL, ONE SKELETON (owner design 2026-08-10). The element
+   *  matrix's NAME button posts a cell; the interface node mints with the
+   *  crossing flows already in carries, and the judgment fields arrive as
+   *  comments per the house convention — answering them is the authoring.
+   *  Idempotent: a standing node is never overwritten. */
+  mintInterfaceCell(name: string, source: string, destination: string, machineId?: string): Record<string, unknown> {
+    const m = this.formMachine(machineId);
+    const traceRoot = this.traceRoot(this.declIteration(m));
+    const cell = elementMatrixArgs(traceRoot).cells.find((c) => c.source === source && c.destination === destination);
+    const id = `if-${source.replace(/^el-/, "")}-to-${destination.replace(/^el-/, "")}`;
+    const abs = join(traceDir(traceRoot), "interface", `${id}.md`);
+    if (!existsSync(abs) && cell !== undefined) {
+      mkdirSync(dirname(abs), { recursive: true });
+      writeNode(
+        abs,
+        [
+          "---",
+          `id: ${id}`,
+          'type: "[[interface]]"',
+          "statement: <!-- the contract in one sentence -->",
+          `source: ${source}`,
+          `destination: ${destination}`,
+          "carries:",
+          ...(cell.missing.length > 0 ? cell.missing : cell.owed).map((f) => `  - ${f}`),
+          "form: <!-- call | file | protocol | shared store -- concretely -->",
+          "source_refs:",
+          "  - decompose-structure, the element matrix's owed cell",
+          "---",
+          "",
+          "<!-- the contract's detail -- direction, cadence, failure behavior -->",
+        ].join("\n"),
+      );
+    }
+    return this.stateFormGet(name, m);
+  }
+
+  /** ONE CLICK, ONE TRIPWIRE (owner ruling 2026-08-10). The flip deck posts
+   *  a ruling as it is made; the line lands in the sensitivity section and
+   *  the save mints its node before the page redraws. Idempotent: a cell
+   *  already ruled answers with the standing form. The field name is the
+   *  method's own — the deck lives on the sensitivity reading. */
+  flipRuling(name: string, rival: string, winner: string, axis: string, by: string, machineId?: string): Record<string, unknown> {
+    const m = this.formMachine(machineId);
+    const h = this.stateFormHome(name, m);
+    // Through the door — the read ratchet holds, and the door already knows
+    // this file if anything else looked at it this pass.
+    const raw = readNode(h.instanceAbs);
+    const current = raw === "" ? "" : section(parseStateNote(raw).body, "sensitivity").trim();
+    if (current.includes(`[[${rival}]]`) && current.includes(`[[${axis}]]`)) return this.stateFormGet(name, m);
+    const line = `- credible: [[${rival}]] over [[${winner}]] on [[${axis}]]`;
+    return this.stateFormSave(name, { sensitivity: current === "" ? line : `${current}\n${line}` }, by, m);
+  }
+
+  /** ONE CLICK, ONE VERDICT (owner ruling 2026-08-10). The scenario deck
+   *  posts a verdict as it is made; the line lands in the walk section and
+   *  the save mints the register entry for at-risk and unaddressed before
+   *  the page redraws. A fitness click files the requirement in
+   *  fitness_candidates instead. Idempotent: a scenario already ruled
+   *  answers with the standing form. */
+  scenarioVerdict(
+    name: string,
+    kind: string,
+    requirement: string,
+    extra: { decision?: string; hinge?: string; note?: string },
+    by: string,
+    machineId?: string,
+  ): Record<string, unknown> {
+    const m = this.formMachine(machineId);
+    const h = this.stateFormHome(name, m);
+    const raw = readNode(h.instanceAbs);
+    const field = kind === "fitness" ? "fitness_candidates" : "walk";
+    const current = raw === "" ? "" : section(parseStateNote(raw).body, field).trim();
+    // THE FLAG LIVES ON THE REQUIREMENT NODE (owner ruling 2026-08-10):
+    // fitness_candidate: true in its frontmatter, so the mark outlives the
+    // form. The list line below shows the same fact where the reader is.
+    if (kind === "fitness") {
+      const nodeAbs = join(traceDir(this.traceRoot(this.declIteration(m))), "requirement", `${requirement}.md`);
+      const nodeRaw = readNode(nodeAbs);
+      if (nodeRaw !== "" && !nodeRaw.includes("fitness_candidate:"))
+        writeNode(nodeAbs, withFrontmatter(nodeRaw, "fitness_candidate", "true"));
+    }
+    const already = kind === "fitness" ? current.includes(requirement) : current.includes(`[[${requirement}]]`);
+    if (already) return this.stateFormGet(name, m);
+    // The note stays one line by construction — a newline would break the
+    // verdict grammar the mint reads back.
+    const note = (extra.note ?? "").replace(/\s+/g, " ").trim();
+    // NOT EVERY QUALITY NEEDS A DECISION (owner ruling 2026-08-10). A
+    // scenario the structure delivers by plain construction is addressed
+    // with the path as its evidence; the decision ref is named only where
+    // a recorded choice is why it holds.
+    const line =
+      kind === "addressed"
+        ? `- [[${requirement}]] — addressed${(extra.decision ?? "") === "" ? "" : ` by [[${extra.decision}]]`}`
+        : kind === "at-risk"
+          ? `- at risk: [[${requirement}]] hinges on [[${extra.hinge ?? ""}]] — ${note === "" ? "the tradeoff is unstated" : note}`
+          : kind === "unaddressed"
+            ? `- unaddressed: [[${requirement}]]`
+            : `- ${requirement}`;
+    return this.stateFormSave(name, { [field]: current === "" ? line : `${current}\n${line}` }, by, m);
+  }
+
+  /** The scenario walk's at-risk and unaddressed verdicts become register
+   *  entries at the moment they are saved (owner rulings 2026-08-10): a risk
+   *  naming its hinge, an issue the gate must see. One node per scenario; a
+   *  re-save reuses the standing node. breaks_how_badly INHERITS the
+   *  requirement's own grade — the risk grades the same failure. how_likely
+   *  stays a minted comment, answered at the register review. */
+  private mintScenarioEntries(fields: Record<string, string>, m: MachineDecl, by: string): void {
+    const traceRoot = this.traceRoot(this.declIteration(m));
+    const gradeOf = (req: string): string => {
+      const fm = noteOf(join(traceDir(traceRoot), "requirement", `${req}.md`))?.frontmatter;
+      return typeof fm?.breaks_how_badly === "string" ? fm.breaks_how_badly : "";
+    };
+    for (const [f, content] of Object.entries(fields)) {
+      fields[f] = mintScenarioLines(String(content), ({ kind, requirement, hinge, note }) => {
+        const slug = requirement.replace(/^req-/, "");
+        const id = kind === "at-risk" ? `raid-ar-${slug}` : `raid-un-${slug}`;
+        const abs = join(traceDir(traceRoot), "raid", `${id}.md`);
+        if (!existsSync(abs)) {
+          mkdirSync(dirname(abs), { recursive: true });
+          const grade = gradeOf(requirement);
+          const gradeLine =
+            grade === ""
+              ? "breaks_how_badly: <!-- the damage grade — the words live in meth-damage-scale -->"
+              : `breaks_how_badly: ${grade}`;
+          writeNode(
+            abs,
+            kind === "at-risk"
+              ? [
+                  "---",
+                  `id: ${id}`,
+                  'type: "[[raid]]"',
+                  "kind: risk",
+                  `statement: The architecture leaves ${requirement} at risk — the response hinges on ${hinge}.`,
+                  "owner: the adjudicator",
+                  `trigger: any change to ${hinge}, or to the scenario on ${requirement}`,
+                  "status: open",
+                  `impact: ${note === "" ? "The scenario misses its measure when the hinge moves." : note}`,
+                  gradeLine,
+                  "how_likely: <!-- the likelihood grade — the words live in meth-likelihood-scale, graded at the register review -->",
+                  "source_refs:",
+                  "  - evaluate-architecture, the scenario walk's verdict",
+                  `  - ${requirement}`,
+                  `  - ${hinge}`,
+                  "---",
+                  "",
+                  `Walked at evaluate-architecture by ${by}. The scenario's response forms`,
+                  `at ${hinge}; the tradeoff on the verdict line is what a wrong turn there`,
+                  "costs. The damage grade inherits from the requirement it protects.",
+                ].join("\n")
+              : [
+                  "---",
+                  `id: ${id}`,
+                  'type: "[[raid]]"',
+                  "kind: issue",
+                  `statement: The structure does not address ${requirement} — nothing carries its scenario.`,
+                  "owner: the adjudicator",
+                  `trigger: any change to the element set, or to ${requirement}`,
+                  "status: open",
+                  "impact: The quality goes unprotected into the build.",
+                  gradeLine,
+                  "how_likely: expected",
+                  "source_refs:",
+                  "  - evaluate-architecture, the scenario walk's verdict",
+                  `  - ${requirement}`,
+                  "---",
+                  "",
+                  `Found unaddressed at evaluate-architecture by ${by}. Either the`,
+                  "structure grows a carrier for this scenario, or the requirement moves —",
+                  "the gate adjudicates which.",
+                ].join("\n"),
+          );
+        }
+        return id;
+      });
+    }
+  }
+
+  /** The sensitivity card's credible rulings become RAID tripwires at the
+   *  moment they are saved (owner ruling 2026-08-10). One node per ruled
+   *  cell; a ruling whose node already stands reuses it, so a re-save never
+   *  duplicates. The line is rewritten with the minted ref, and the card
+   *  renders the tripwire link from then on. */
+  private mintFlipTripwires(fields: Record<string, string>, m: MachineDecl, by: string): void {
+    const traceRoot = this.traceRoot(this.declIteration(m));
+    const shortId = (id: string): string => id.replace(/^cand-/, "").replace(/^req-/, "");
+    for (const [f, content] of Object.entries(fields)) {
+      fields[f] = mintFlipLines(String(content), ({ rival, winner, axis }) => {
+        const id = `raid-flip-${shortId(rival)}-on-${shortId(axis)}`;
+        const abs = join(traceDir(traceRoot), "raid", `${id}.md`);
+        if (!existsSync(abs)) {
+          mkdirSync(dirname(abs), { recursive: true });
+          writeNode(
+            abs,
+            [
+              "---",
+              `id: ${id}`,
+              'type: "[[raid]]"',
+              "kind: risk",
+              `statement: The convergence flips — ${rival} passes ${winner} if ${axis} moves by one point, and that story was ruled credible.`,
+              "owner: the adjudicator",
+              `trigger: any change to the scores on ${axis}, or new evidence on either candidate`,
+              "status: open",
+              "impact: The winner of the convergence changes, and everything downstream of it re-earns.",
+              "source_refs:",
+              "  - reverse-sensitivity, the sensitivity card's ruling",
+              `  - ${rival}`,
+              `  - ${winner}`,
+              `  - ${axis}`,
+              "---",
+              "",
+              `Ruled credible by ${by} at reverse-sensitivity. The cell stands one`,
+              "point from flipping the convergence; the fallback is the run that",
+              "re-converges after the flip, with the losers still on record.",
+              "",
+              "## Probe",
+              "",
+              `Re-run the convergence with ${axis} moved one point toward ${rival}.`,
+              "The trigger above brings this entry back the moment the ground moves.",
+            ].join("\n"),
+          );
+        }
+        return id;
+      });
+    }
+  }
+
   stateFormSave(name: string, fields: Record<string, string>, by: string, m: MachineDecl = this.currentMachine()): Record<string, unknown> {
     const t = stateFormFields(this.stateFormState(name, m));
     const h = this.stateFormHome(name, m);
@@ -4201,6 +4432,14 @@ export class Session {
     // inputs_checked is the checkbox column, not a section — both hands
     // (the page's boxes, the agent's fill) send it through this one door.
     const { inputs_checked, ...rest } = fields;
+    // A CREDIBLE RULING MINTS ITS TRIPWIRE ON SAVE (owner ruling 2026-08-10).
+    // The sensitivity card's buttons emit ruling lines; each new one becomes
+    // a RAID node here and the line is rewritten with the minted ref, so the
+    // card renders the tripwire link on the next look. Idempotent: a line
+    // already carrying its ref is left alone.
+    this.mintFlipTripwires(rest, m, by);
+    // The scenario walk's verdicts mint the same way — see mintScenarioEntries.
+    this.mintScenarioEntries(rest, m, by);
     // BOUND FIELDS LAND ON THE NODES FIRST. The section is written too, so a
     // reader of the file still sees what was answered — but the NODES are
     // what the check reads and what the next look rebuilds the section from.
@@ -4425,6 +4664,7 @@ export class Session {
       this.stateFormHeader(name, raw, m),
       raw,
       this.traceRoot(this.declIteration(m)),
+      h.instanceAbs,
     );
     const fills: Record<string, string> = {};
     if (raw !== undefined) {

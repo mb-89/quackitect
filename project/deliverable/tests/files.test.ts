@@ -702,11 +702,32 @@ test("a dollar sequence in new_string is written literally, not expanded", () =>
   assert.match(readFileSync(join(root, "engine", "y.ts"), "utf8"), /^\$& and \$1$/m, "both survive as typed");
 });
 
+// THE TICK HOLE, measured 2026-08-10: Windows quantizes file times to a
+// ~16 ms timer tick, so a same-length rewrite inside one tick keeps size,
+// mtime and ctime identical and the stamp cannot see it. The door refuses
+// to trust a stamp minted inside its own tick, so the law holds: a note
+// edited on disk binds the NEXT call, however fast the edit came.
+test("a same-tick same-length external rewrite still binds the next read", () => {
+  const root = fresh();
+  const abs = join(root, "tick.md");
+  for (let i = 0; i < 20; i++) {
+    writeFileSync(abs, "---\nsigned_off: 2026-08-10T00:00:00.000Z\n---\nbody\n", "utf8");
+    assert.match(fileRead(root, "tick.md").content, /2026-08-10/);
+    writeFileSync(abs, "---\nsigned_off: 2026-09-01T00:00:00.000Z\n---\nbody\n", "utf8");
+    assert.match(fileRead(root, "tick.md").content, /2026-09-01/, `iteration ${i}: the same-tick rewrite went unseen`);
+  }
+});
+
 test("live reads reuse validated content and detect external same-size rewrites", () => {
   const root = fresh();
   const path = "cached.md";
   const abs = join(root, path);
   writeFileSync(abs, "alpha");
+  // COLD ON PURPOSE: a file written inside the current timestamp tick is
+  // provisional and never served from its stamp, so the reuse this test
+  // asserts needs an mtime the tick guard trusts.
+  const aged = new Date(Date.now() - 1000);
+  utimesSync(abs, aged, aged);
 
   const before = doorStats();
   assert.match(fileRead(root, path).content, /alpha/);

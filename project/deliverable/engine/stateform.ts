@@ -6,18 +6,21 @@
 // copy is one HTML with ONE JSON island — the island is the only thing
 // the save rewrites and the only thing the ingest reads (the v1 book's
 // comment law, reapplied).
-import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { type MetricRow, type ScenarioDeckView, scenarioDeckView, structureMetrics } from "./atamwalk.ts";
 import { catalogItems, trizParameterItems } from "./catalogs.ts";
 import { type Judgment, type RelationKind, type WalkResult, walk } from "./compare.ts";
 import { clusterDsm, type Dsm, flowMatrix } from "./dsm.ts";
+import { type ElementMatrixView, elementMatrixView } from "./elematrix.ts";
 import type { FormTemplate } from "./forms.ts";
 import { pendingNotes } from "./inbox.ts";
 import type { EvidenceField, MachineDecl, StateDecl } from "./machine.ts";
 import { bare, type MorphBox, type MorphCell, type MorphLine, type MorphRow, orderLines, storedOrder } from "./morphbox.ts";
-import { noteOf, parseStateNote, section } from "./notes.ts";
+import { noteOf, parseStateNote, readNode, section } from "./notes.ts";
 import { type ParetoView, pareto, readScores } from "./pareto.ts";
 import { seDir } from "./paths.ts";
+import { type PughView, pughView, type SensitivityView, sensitivityView } from "./pugh.ts";
 import { type GuidanceDoc, pulledFor } from "./pull.ts";
 import {
   conformance,
@@ -29,6 +32,7 @@ import {
   refsIn,
   refsInRows,
   type TraceNode,
+  traceDir,
 } from "./trace.ts";
 import { edgeProblems, traceSchema } from "./traceschema.ts";
 
@@ -179,6 +183,20 @@ export interface FieldArgs {
    *  SAME LAW AGAIN. Domination is arithmetic over the scores, so a typed
    *  front is a second copy that can disagree with the table above it. */
   pareto: ParetoView | null;
+  /** The Pugh convergence runs, computed from the sibling evaluate-set
+   *  scores and cut-criteria's signed order. Null for every other field. */
+  matrix: PughView | null;
+  /** The winner's fragile cells, computed the same way. The rulings on them
+   *  are the state's judgment and live in its own fields. */
+  sensitivity: SensitivityView | null;
+  /** The element matrix — owed cells from flow crossings, declared
+   *  interfaces beside them. Computed from the trace nodes on every look. */
+  ematrix: ElementMatrixView | null;
+  /** The scenario deck — ATAM's judged half: one card per quality
+   *  requirement, worst grade first, with its computed path. */
+  scenario: ScenarioDeckView | null;
+  /** The structure numbers — the evaluation's computed half. */
+  smetrics: MetricRow[] | null;
 }
 
 export function templateMeta(root: string, name: string): TemplateMeta {
@@ -273,6 +291,11 @@ export const NO_ARGS: FieldArgs = {
   dsm: null,
   box: null,
   pareto: null,
+  matrix: null,
+  sensitivity: null,
+  ematrix: null,
+  scenario: null,
+  smetrics: null,
 };
 
 /** THE CHART, computed from the nodes. Rows are the clusters, cells are the
@@ -564,12 +587,77 @@ export function claimProblems(root: string, s: StateDecl, body: string, corpus: 
       // moment somebody adds an item.
       walk: null,
       dsm: null,
+      scenario: null,
+      smetrics: null,
       box: null,
       pareto: null,
+      matrix: null,
+      sensitivity: null,
+      ematrix: null,
     };
     out.push(...fieldProblems(f.name, metas.get(name) as TemplateMeta, args, content, nodes, root));
   }
+  // THE STRUCTURAL LAWS run whether or not the field carries text — a
+  // computed field's section can be empty while the law is broken.
+  for (const f of s.evidence_form) {
+    if (f.template === "element-matrix") out.push(...structureLawProblems(f.name, nodes));
+    if (f.template === "scenario-deck") out.push(...deckLawProblems(f.name, section(body, f.name), nodes));
+  }
   return out;
+}
+
+/** THE STRUCTURAL LAWS, computed at every submit (owner ruling 2026-08-10:
+ *  what the engine can check, the engine checks). They read the corpus, so a
+ *  node landing later greys the signed claim through the stamp, and the
+ *  re-submit refuses until the law holds again. */
+export function structureLawProblems(fieldName: string, corpus: { id: string; type: string; file?: string }[]): string[] {
+  const out: string[] = [];
+  const fmOf = (n: { file?: string }): Record<string, unknown> => (n.file === undefined ? {} : (noteOf(n.file)?.frontmatter ?? {}));
+  const typed = (t: string) => corpus.filter((n) => n.type === t && n.file !== undefined);
+  const implementers = [...typed("element"), ...typed("interface")].map((n) => ({
+    id: n.id,
+    implements: fmList(fmOf(n).implements),
+    satisfies: fmList(fmOf(n).satisfies),
+  }));
+  const v = elementMatrixView(
+    typed("element").map((n) => ({ id: n.id, group: "", implements: fmList(fmOf(n).implements) })),
+    typed("function").map((n) => ({ id: n.id, inputs: fmList(fmOf(n).inputs), outputs: fmList(fmOf(n).outputs) })),
+    typed("interface").map((n) => ({
+      id: n.id,
+      source: String(fmOf(n).source ?? ""),
+      destination: String(fmOf(n).destination ?? ""),
+      carries: fmList(fmOf(n).carries),
+    })),
+  );
+  if (v.unimplemented.length > 0)
+    out.push(`${fieldName}: ${v.unimplemented.length} function(s) unimplemented — ${v.unimplemented.join(" · ")}`);
+  const owing = v.cells.filter((c) => c.missing.length > 0);
+  if (owing.length > 0)
+    out.push(`${fieldName}: owed crossings without an interface — ${owing.map((c) => `${c.source} → ${c.destination}`).join(" · ")}`);
+  out.push(...v.problems.map((p) => `${fieldName}: ${p}`));
+  // THE TRACE IS COMPLETE, ON TWO PATHS (machines/trace-schema.md): every
+  // requirement is reached through an implemented function that satisfies
+  // it, or by a direct satisfier. Zero unreached, or no signature.
+  const implementedFns = new Set(implementers.flatMap((i) => i.implements));
+  const directSat = new Set(implementers.flatMap((i) => i.satisfies));
+  const fnSat = typed("function").map((n) => ({ id: n.id, satisfies: fmList(fmOf(n).satisfies) }));
+  const unreached = typed("requirement")
+    .map((n) => n.id)
+    .filter((r) => !directSat.has(r) && !fnSat.some((f) => implementedFns.has(f.id) && f.satisfies.includes(r)));
+  if (unreached.length > 0)
+    out.push(`${fieldName}: ${unreached.length} requirement(s) unreached by the structure — ${unreached.join(" · ")}`);
+  return out;
+}
+
+/** Every quality scenario ruled — the deck's completeness law. */
+export function deckLawProblems(fieldName: string, walkContent: string, corpus: { id: string; type: string; file?: string }[]): string[] {
+  const quality = corpus
+    .filter(
+      (n) => n.type === "requirement" && n.file !== undefined && String(noteOf(n.file as string)?.frontmatter.kind ?? "") === "quality",
+    )
+    .map((n) => n.id);
+  const unruled = quality.filter((id) => !walkContent.includes(`[[${id}]]`));
+  return unruled.length > 0 ? [`${fieldName}: ${unruled.length} scenario(s) unruled — ${unruled.join(" · ")}`] : [];
 }
 
 /** A REFERENCE THAT RESOLVES TO NOTHING IS A DEFECT, not a warning. The form
@@ -908,7 +996,7 @@ export function stateFormFields(s: StateDecl): FormTemplate {
 /** ONE FIELD'S ARGUMENTS, every live source resolved against the record's own
  *  trace. Extracted from stateFormModel because it grew past what one function
  *  should hold, and because the pick resolution below is worth reading alone. */
-export function fieldArgsFor(f: EvidenceField, root: string, traceRoot: string, instanceRaw?: string): FieldArgs {
+export function fieldArgsFor(f: EvidenceField, root: string, traceRoot: string, instanceRaw?: string, evidenceDir?: string): FieldArgs {
   const resolved = (f.items ?? []).flatMap((i) => resolveSource(i, root, traceRoot, instanceRaw));
   return {
     of: f.of ?? "",
@@ -943,7 +1031,123 @@ export function fieldArgsFor(f: EvidenceField, root: string, traceRoot: string, 
     // the eliminations and both corners all fall out of them, so nothing here
     // is typed and nothing can disagree with the table it came from.
     pareto: f.template !== "pareto-plot" || f.reads === undefined ? null : viewOfScores(section(instanceRaw ?? "", f.reads)),
+    ...derivedViews(f, traceRoot, evidenceDir),
   };
+}
+
+/** THE M5 READINGS REACH ACROSS THE RECORD: the scores stand at
+ *  evaluate-set and the signed order at cut-criteria, so the convergence is
+ *  computed from the sibling forms rather than typed. The structure views
+ *  read the trace nodes directly. */
+function derivedViews(
+  f: EvidenceField,
+  traceRoot: string,
+  evidenceDir?: string,
+): Pick<FieldArgs, "matrix" | "sensitivity" | "ematrix" | "scenario" | "smetrics"> {
+  return {
+    matrix: f.template !== "decision-matrix" || evidenceDir === undefined ? null : pughView(...m5Inputs(evidenceDir, traceRoot)),
+    sensitivity: f.template !== "sensitivity" || evidenceDir === undefined ? null : sensitivityView(...m5Inputs(evidenceDir, traceRoot)),
+    ematrix: f.template !== "element-matrix" ? null : elementMatrixArgs(traceRoot),
+    scenario: f.template !== "scenario-deck" ? null : scenarioDeckArgs(traceRoot),
+    // INFORMATION ONLY, riding the deck's field (owner ruling 2026-08-10):
+    // the numbers render beneath the deck and nothing about them is typed.
+    smetrics: f.template !== "scenario-deck" ? null : structureMetricsArgs(traceRoot),
+  };
+}
+
+/** YAML array or comma-joined string — the house rule for every list. */
+function fmList(v: unknown): string[] {
+  if (Array.isArray(v)) return v.map(String);
+  if (typeof v === "string" && v.trim() !== "")
+    return v
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => s !== "");
+  return [];
+}
+
+/** One trace folder's nodes, read through the door. The path takes the
+ *  RECORD ROOT — traceDir owns the append, like every trace read. */
+function traceFolder(traceRoot: string, folder: string): { id: string; fm: Record<string, unknown>; body: string }[] {
+  const dir = traceDir(traceRoot);
+  try {
+    return readdirSync(join(dir, folder))
+      .filter((n) => n.endsWith(".md"))
+      .map((n) => {
+        const note = noteOf(join(dir, folder, n));
+        return { id: String(note?.frontmatter.id ?? n.replace(/\.md$/, "")), fm: note?.frontmatter ?? {}, body: note?.body ?? "" };
+      });
+  } catch {
+    return [];
+  }
+}
+
+/** The three node sets the element matrix computes from. */
+export function elementMatrixArgs(traceRoot: string): ElementMatrixView {
+  return elementMatrixView(
+    traceFolder(traceRoot, "element").map((n) => ({ id: n.id, group: String(n.fm.group ?? ""), implements: fmList(n.fm.implements) })),
+    traceFolder(traceRoot, "function").map((n) => ({ id: n.id, inputs: fmList(n.fm.inputs), outputs: fmList(n.fm.outputs) })),
+    traceFolder(traceRoot, "interface").map((n) => ({
+      id: n.id,
+      source: String(n.fm.source ?? ""),
+      destination: String(n.fm.destination ?? ""),
+      carries: fmList(n.fm.carries),
+    })),
+  );
+}
+
+/** The scenario deck's inputs: quality requirements with their Scenario
+ *  sections, the satisfies edges, the implementers and the register's
+ *  decisions. All read from the record's trace on every look. */
+export function scenarioDeckArgs(traceRoot: string): ScenarioDeckView {
+  const reqs = traceFolder(traceRoot, "requirement")
+    .filter((n) => String(n.fm.kind ?? "") === "quality")
+    .map((n) => ({
+      id: n.id,
+      grade: String(n.fm.breaks_how_badly ?? ""),
+      characteristic: String(n.fm.characteristic ?? ""),
+      scenario: section(n.body, "Scenario"),
+      fitness: n.fm.fitness_candidate === true || n.fm.fitness_candidate === "true",
+    }));
+  const fns = traceFolder(traceRoot, "function").map((n) => ({ id: n.id, satisfies: fmList(n.fm.satisfies) }));
+  const impl = [...traceFolder(traceRoot, "element"), ...traceFolder(traceRoot, "interface")].map((n) => ({
+    id: n.id,
+    implements: fmList(n.fm.implements),
+    satisfies: fmList(n.fm.satisfies),
+  }));
+  const decisions = traceFolder(traceRoot, "raid")
+    .filter((n) => String(n.fm.kind ?? "") === "decision")
+    .map((n) => n.id);
+  return scenarioDeckView(
+    reqs,
+    fns,
+    impl,
+    decisions,
+    traceFolder(traceRoot, "element").map((n) => n.id),
+    catalogItems(traceRoot, "damage_levels"),
+  );
+}
+
+/** The structure numbers, computed off the same nodes as the matrix. */
+export function structureMetricsArgs(traceRoot: string): MetricRow[] {
+  return structureMetrics(
+    elementMatrixArgs(traceRoot),
+    traceFolder(traceRoot, "element").map((n) => ({ id: n.id, implements: fmList(n.fm.implements) })),
+  );
+}
+
+/** The convergence's three inputs: the sibling score table, the sibling cut
+ *  order, and the damage grade off each requirement node. */
+function m5Inputs(evidenceDir: string, traceRoot: string): [string, string, (id: string) => string] {
+  const sectionOf = (state: string, name: string): string => {
+    const raw = readNode(join(evidenceDir, `${state}.md`));
+    return raw === "" ? "" : section(parseStateNote(raw).body, name);
+  };
+  const gradeOf = (id: string): string => {
+    const fm = noteOf(join(traceDir(traceRoot), "requirement", `${id}.md`))?.frontmatter;
+    return typeof fm?.breaks_how_badly === "string" ? fm.breaks_how_badly : "";
+  };
+  return [sectionOf("evaluate-set", "scores"), sectionOf("cut-criteria", "cuts"), gradeOf];
 }
 
 /** The whole drawing's input, from the score table alone. */
@@ -969,6 +1173,10 @@ export function stateFormModel(
    *  settled" over an empty list, which is the worst way to be wrong:
    *  confident, and shaped exactly like success. */
   traceRoot = root,
+  /** The record's evidence folder — the instance file's home. The M5
+   *  readings reach across sibling forms, so the folder is told, never
+   *  guessed. Absent, the cross-form views render their empty state. */
+  instanceAbs?: string,
 ): StateFormModel {
   const entryReads = new Set(s.entry?.read ?? []);
   const inputs: FormInput[] = pulledFor(root, docs, m, s).map((d) => ({
@@ -985,7 +1193,8 @@ export function stateFormModel(
     templateMetas[t] = templateMeta(root, t);
   }
   const fieldArgs: Record<string, FieldArgs> = {};
-  for (const f of s.evidence_form) fieldArgs[f.name] = fieldArgsFor(f, root, traceRoot, instanceRaw);
+  for (const f of s.evidence_form)
+    fieldArgs[f.name] = fieldArgsFor(f, root, traceRoot, instanceRaw, instanceAbs === undefined ? undefined : dirname(instanceAbs));
   const fieldHints: Record<string, FieldHint> = {};
   for (const f of s.evidence_form) {
     fieldHints[f.name] = fieldHint(root, templateMetas[f.template ?? "free-form"], f.of ?? "");

@@ -1230,3 +1230,28 @@
 {"ts":"2026-08-10T13:04:25.058Z","op":"update","visit":"iterations/i1/gate-candidates@2","node":"d54","brief":"committing the worktree's mirrored method and the owner's edit, then syncing"}
 {"ts":"2026-08-10T13:05:06.745Z","op":"update","visit":"iterations/i1/gate-candidates@2","node":"d55","brief":"trunk syncs into the worktree; the minted nodes arrive"}
 {"ts":"2026-08-10T13:06:54.924Z","op":"defer","visit":"iterations/i1/gate-candidates@1","node":"d49","brief":"submit the gate; the bless stays the owner's","to":"gate-candidates","hops":1,"trail":["iterations/i1/gate-candidates","gate-candidates"]}
+{"ts":"2026-08-10T13:08:55.442Z","op":"update","visit":"iterations/i1/gate-candidates@2","node":"d56","brief":"submitting the gate with resolvable references"}
+{"ts":"2026-08-10T13:09:13.747Z","op":"update","visit":"iterations/i1/gate-candidates@2","node":"d57","brief":"resubmitting with bare ids, the shape log-risks uses"}
+{"ts":"2026-08-10T13:14:57.534Z","op":"update","visit":"iterations/i1/gate-candidates@2","node":"d58","brief":"the M5 render design is on the record as a note"}
+{"ts":"2026-08-10T13:18:09.295Z","op":"plan","visit":"iterations/i1/gate-candidates@2","parent":null,"nodes":[{"id":"d59","brief":"learn the editor framework from pareto-plot and its wiring"},{"id":"d60","brief":"build the decision-matrix render for converge-pugh"},{"id":"d61","brief":"build the sensitivity render for reverse-sensitivity"},{"id":"d62","brief":"wire both rows"},{"id":"d63","brief":"test scoped"},{"id":"d64","brief":"commit"}]}
+{"ts":"2026-08-10T17:28:13.998Z","op":"update","visit":"iterations/i1/start@0","node":"d3","brief":"aimed at gate-architecture inside i1"}
+{"ts":"2026-08-10T17:31:58.490Z","op":"update","visit":"iterations/i1/converge-pugh@0","node":"d4","brief":"reading the computed convergence before writing the runs record"}
+{"ts":"2026-08-10T17:32:59.012Z","op":"update","visit":"iterations/i1/converge-pugh@0","node":"d5","brief":"signing the computed convergence at converge-pugh"}
+{"ts":"2026-08-10T17:34:47.135Z","op":"update","visit":"iterations/i1/reverse-sensitivity@0","node":"d6","brief":"ruling the credible flips at reverse-sensitivity"}
+{"ts":"2026-08-10T17:35:17.422Z","op":"update","visit":"iterations/i1/declare-winner@0","node":"d7","brief":"declaring the computed winner on the record"}
+{"ts":"2026-08-10T17:35:42.297Z","op":"update","visit":"iterations/i1/record-adrs@0","node":"d8","brief":"mining the winner's picks for the deciding ADRs"}
+{"ts":"2026-08-10T17:37:18.363Z","op":"plan","visit":"iterations/i1/record-adrs@0","parent":null,"nodes":[{"id":"d9","brief":"five decisions minted into the register"},{"id":"d10","brief":"the adrs field lists them and signs"},{"id":"d11","brief":"decompose-structure until the laws go green"},{"id":"d12","brief":"the deck walked at evaluate-architecture"},{"id":"d13","brief":"gate-architecture presented for the owner's bless"}]}
+{"ts":"2026-08-10T17:37:58.580Z","op":"done","visit":"iterations/i1/record-adrs@0","node":"d9","brief":"five decisions stand in the register"}
+{"ts":"2026-08-10T17:40:29.494Z","op":"update","visit":"iterations/i1/decompose-structure@0","node":"d14","brief":"probing the owed crossings"}
+{"ts":"2026-08-10T17:42:48.918Z","op":"update","visit":"iterations/i1/decompose-structure@0","node":"d15","brief":"the re-score confirms the seat and the debt entry closes"}
+{"ts":"2026-08-10T17:43:20.703Z","op":"done","visit":"iterations/i1/record-adrs@0","node":"d10","brief":"the adrs signed two states back; closing the stale item"}
+{"ts":"2026-08-10T17:44:01.954Z","op":"update","visit":"iterations/i1/evaluate-architecture@0","node":"d16","brief":"three doubled Scenario headings unblocked the deck"}
+{"ts":"2026-08-10T17:45:04.424Z","op":"update","visit":"iterations/i1/evaluate-architecture@0","node":"d17","brief":"five measurable scenarios flagged on their nodes"}
+{"ts":"2026-08-10T17:45:23.633Z","op":"update","visit":"iterations/i1/evaluate-architecture@0","node":"d18","brief":"ruling all nineteen and signing"}
+{"ts":"2026-08-10T17:47:10.366Z","op":"update","visit":"iterations/i1/gate-architecture@0","node":"d19","brief":"the gate form filled and submitted for the bless"}
+{"ts":"2026-08-10T17:47:42.427Z","op":"update","visit":"iterations/i1/gate-architecture@0","node":"d20","brief":"the gate form rewritten in the round grammar"}
+{"ts":"2026-08-10T17:48:41.007Z","op":"done","visit":"iterations/i1/record-adrs@0","node":"d11","brief":"the structure went green under the laws"}
+{"ts":"2026-08-10T17:48:49.733Z","op":"done","visit":"iterations/i1/record-adrs@0","node":"d12","brief":"nineteen scenarios ruled and signed"}
+{"ts":"2026-08-10T17:49:01.876Z","op":"done","visit":"iterations/i1/record-adrs@0","node":"d13","brief":"the gate stands signed and awaits the bless"}
+{"ts":"2026-08-10T17:55:09.244Z","op":"update","visit":"iterations/i1/gate-architecture@0","node":"d21","brief":"checking what the worktree holds uncommitted"}
+{"ts":"2026-08-10T17:55:29.374Z","op":"update","visit":"iterations/i1/gate-architecture@0","node":"d22","brief":"checkpointing the signed walk onto the record's branch"}

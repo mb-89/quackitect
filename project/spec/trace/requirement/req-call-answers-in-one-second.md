@@ -3,6 +3,7 @@ id: req-call-answers-in-one-second
 type: "[[requirement]]"
 statement: When a driver's call is admitted, the engine shall answer within 1 second or return a background handle whose completion the driver observes, for every admitted call.
 kind: quality
+fitness_candidate: true
 characteristic: performance-efficiency
 verify_method: test
 breaks_if_removed: The loop's rhythm dies, and drivers batch calls to dodge the lag.
@@ -25,8 +26,6 @@ priority: should
 weighs_against:
   - req-resume-needs-no-person >
 ---
-
-## Scenario
 
 ## Scenario
 

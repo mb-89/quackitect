@@ -5,7 +5,7 @@ statement: Record the deciding ADRs, each addressing the requirements it shapes.
 state_kind: work
 filled_by: agent
 depends_on:
-  - reverse-sensitivity
+  - declare-winner
 legal_tools:
   - se_file_read
   - se_file_write
@@ -53,16 +53,20 @@ specification_note: |
 
 The why lives once, here.
 
-Every decision is its OWN FILE, with `kind: decision`. It carries:
+A DECISION IS A REGISTER ENTRY (owner ruling 2026-08-10): a raid node with
+`kind: decision`, in the same folder as the risks it sits beside. An ADR is
+nothing extra — it is a decision whose `breaks_how_badly` grades crippling
+or worse. The decisions chapter derives from the register, filtered.
 
-- an id
-- the decision in one line
-- a status
-- the `addresses` edge to the requirement or risk that forced it
+Each decision carries:
 
-The body holds the context, the options and the consequences.
+- the choice in one line, phrased so it could be argued with
+- `breaks_how_badly` — the impact if it proves wrong ([[meth-damage-scale]])
+- `how_likely` — how likely it proves wrong ([[meth-likelihood-scale]])
+- `status` decided, later at most superseded
+- `source_refs` to the requirement, quality or risk that forced it
+- a `## Rejected options` section — the losers stay history
+- a `## Consequences` section — what the choice binds from now on
 
-The RAID register view includes the decisions beside the risks and assumptions
-([[meth-raid]]). One surface to read, files apart underneath.
-
-The rejected options stay recorded as history.
+The register view shows the decisions beside the risks ([[meth-raid]]). One
+surface to read, files apart underneath.
