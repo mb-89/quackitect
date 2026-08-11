@@ -1657,10 +1657,16 @@ export function candidateItems(traceRoot: string): string[] {
 /** $claim-specs, resolved live: the specs no run can prove — every
  *  method but test. Verification observes these green by fresh eyes. */
 function claimSpecItems(traceRoot: string): string[] {
-  return traceFolder(traceRoot, "test-spec")
-    .filter((n) => String(n.fm.method ?? "") !== "test")
-    .map((n) => n.id)
-    .sort();
+  return (
+    traceFolder(traceRoot, "test-spec")
+      .filter((n) => String(n.fm.method ?? "") !== "test")
+      // A demonstrates-only spec belongs to VALIDATION: its run is M8's demo
+      // machine and the gate's musts_demonstrated. Verification's checklist
+      // holds only specs that verify requirements.
+      .filter((n) => fmList(n.fm.verifies).some((l) => !l.trim().startsWith("<!--") && !/^none\b/i.test(l.trim())))
+      .map((n) => n.id)
+      .sort()
+  );
 }
 
 /** $must-stories, resolved live: the stories graded must. Each one is
