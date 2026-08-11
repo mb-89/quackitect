@@ -8,7 +8,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
-import { parseStateNote, passEpoch } from "./notes.ts";
+import { parseStateNote, passEpoch, readNode, writeNode } from "./notes.ts";
 
 /** Free prose as a YAML scalar. Backslashes first, then quotes — the other
  *  order doubles the escape it just added. */
@@ -391,13 +391,15 @@ function stampRecordClosed(e: Expedition, merge: boolean, override?: string): vo
   );
 }
 
-/** Merge the branch to trunk and retire the record dir in the same breath. */
-function mergeToTrunk(root: string, e: Expedition): void {
+/** Merge the branch to trunk and retire the record dir in the same breath.
+ *  One core for both record kinds — an expedition and an iteration close
+ *  the same way, differing only in their names and their record homes. */
+function mergeAndRetire(root: string, branch: string, mergeMsg: string, dirRel: string, retireMsg: string): void {
   // ATOMIC (hit live 2026-07-28): a conflicting merge left the root
   // mid-merge with markers inside main.canvas — the server died and the
   // relaunch refused on the red canvas. The close now aborts the failed
   // merge and refuses TYPED; the root tree is never left broken.
-  const m = spawnSync("git", ["merge", "--no-ff", e.branch, "-m", `merge expedition ${e.id}`], {
+  const m = spawnSync("git", ["merge", "--no-ff", branch, "-m", mergeMsg], {
     cwd: root,
     encoding: "utf8",
     windowsHide: true,
@@ -411,7 +413,7 @@ function mergeToTrunk(root: string, e: Expedition): void {
     const aborted = spawnSync("git", ["merge", "--abort"], { cwd: root, windowsHide: true }).status === 0;
     throw new Rejection({
       clause: CLAUSES.CONDITION_UNMET,
-      expected: `the trunk merge of ${e.branch} to succeed`,
+      expected: `the trunk merge of ${branch} to succeed`,
       got: `conflicts in: ${conflicts || "(unknown)"}${aborted ? " — the merge was aborted, the root tree stands clean" : " — and the abort failed too; run git merge --abort by hand"}`,
       remedy: {
         tool: "se_run",
@@ -424,11 +426,52 @@ function mergeToTrunk(root: string, e: Expedition): void {
   // CLOSED RECORDS LIVE IN GIT (owner ruling 2026-07-28): history is
   // git's; the tree carries only live work. The record rode the merge —
   // retire its dir in the same breath; the branch keeps serving it.
-  const dirRel = `project/spec/expeditions/${e.id}`;
   git(root, ["rm", "-r", "-q", "--ignore-unmatch", dirRel], "rm record");
   if (spawnSync("git", ["diff", "--cached", "--quiet", "--", dirRel], { cwd: root }).status === 1) {
-    git(root, ["commit", "-q", "-m", `expedition ${e.id}: record retires to its branch`, "--", dirRel], "commit");
+    git(root, ["commit", "-q", "-m", retireMsg, "--", dirRel], "commit");
   }
+}
+
+function mergeToTrunk(root: string, e: Expedition): void {
+  mergeAndRetire(
+    root,
+    e.branch,
+    `merge expedition ${e.id}`,
+    `project/spec/expeditions/${e.id}`,
+    `expedition ${e.id}: record retires to its branch`,
+  );
+}
+
+/** CLOSE THE SHIPPED ITERATION — fired by the walk itself as it leaves
+ *  through the terminal (owner ruling 2026-08-11: after the last bless the
+ *  iteration archives itself, exactly like an expedition). The blessed
+ *  release gate was the human ruling, so this close carries no second
+ *  judgment and no report guard. Trunk strays settle, leftovers commit,
+ *  the branch merges, the record dir retires to its branch, the worktree
+ *  goes — the iteration archive lists it from then on. */
+export function itCloseShipped(
+  root: string,
+  rec: { id: string; branch: string; path: string },
+): { closed: string; trunk_committed?: string[] } {
+  const trunkCommitted = settleTrunk(root, rec.id);
+  const recAbs = join(rec.path, `project/spec/iterations/${rec.id}/record.md`);
+  const raw = readNode(recAbs);
+  if (raw !== "" && !/^closed: /m.test(raw)) {
+    writeNode(recAbs, raw.replace(/^status: .*$/m, `status: shipped\nclosed: ${new Date().toISOString()}`));
+  }
+  if (git(rec.path, ["status", "--porcelain"], "status").trim() !== "") {
+    git(rec.path, ["add", "-A"], "add");
+    git(rec.path, ["commit", "-q", "-m", `iteration ${rec.id}: shipped`], "commit");
+  }
+  mergeAndRetire(
+    root,
+    rec.branch,
+    `merge iteration ${rec.id}`,
+    `project/spec/iterations/${rec.id}`,
+    `iteration ${rec.id}: record retires to its branch`,
+  );
+  git(root, ["worktree", "remove", "--force", rec.path], "worktree remove");
+  return { closed: rec.id, ...(trunkCommitted.length > 0 ? { trunk_committed: trunkCommitted } : {}) };
 }
 
 /** Close IS the ruling: apply (merge=true) merges the changes to trunk;

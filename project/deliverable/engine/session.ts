@@ -74,7 +74,7 @@ import {
   withSignedOff,
   withStatus,
 } from "./forms.ts";
-import { drainNote, pendingNotes } from "./inbox.ts";
+import { appendNote, drainNote, pendingNotes } from "./inbox.ts";
 import {
   generateIterationArchive,
   generateIterations,
@@ -114,7 +114,7 @@ import {
 } from "./stateform.ts";
 import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
 import { corpusVersion, loadTrace, noteOf, traceDir } from "./trace.ts";
-import { type Expedition, expClose, expFind, expList, expNew, readRecord } from "./worktree.ts";
+import { type Expedition, expClose, expFind, expList, expNew, itCloseShipped, readRecord } from "./worktree.ts";
 
 /** THE PULL is the machinery — one verb, legal in EVERY state: the agent
  *  says pull and the machine says what to do. se_note is legal everywhere
@@ -5632,8 +5632,37 @@ export class Session {
     const prefix = this.subs.map((s) => s.decl.id).join("/");
     this.instance.history.push({ state: prefix === "" ? top.parentState : `${prefix}/${top.parentState}`, outcome: "filled", at: now });
     if (!this.inSub()) this.unbind(); // leaving the outermost sub leaves the context (worktree stays)
+    // THE SHIPPED ITERATION ARCHIVES ITSELF (owner ruling 2026-08-11): the
+    // walk leaving through the terminal is the trigger; the blessed release
+    // gate was the ruling, and the route cannot pass an unblessed gate.
+    if (pm.id === "iterations") this.closeShippedIteration(top.parentState);
     this.seedSubs();
     return this.landing();
+  }
+
+  /** Close and archive the iteration whose machine the walk just left —
+   *  merge, retire the record dir to its branch, drop the worktree, and
+   *  seed the needs-retro note the shipped row promises. Already-closed
+   *  or unknown records pass silently: the walk stands either way. */
+  private closeShippedIteration(state: string): void {
+    const full = this.top()?.gen?.expByState[state];
+    if (full === undefined) return;
+    let it: Iteration;
+    try {
+      it = itFind(this.root, full);
+    } catch {
+      return;
+    }
+    if (this.bound?.id === it.id) this.unbind();
+    itCloseShipped(this.root, it);
+    appendNote(
+      seDir(this.root),
+      `needs retro — iteration ${it.id} shipped and archived; the next kickoff's onboard-retro drains it.`,
+      "agent",
+      `needs retro: ${itShortId(it.id)} shipped`,
+      "should",
+    );
+    this.bumpGeneration();
   }
 
   /** One step inside the sub the walk stands in. */

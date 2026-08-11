@@ -3,4 +3,11 @@ views:
     name: All notes
     order:
       - file.path
-      - brief
+      - description
+    groupBy:
+      - property: type
+        direction: ASC
+      - property: sections
+        direction: ASC
+    columnSize:
+      file.path: 362

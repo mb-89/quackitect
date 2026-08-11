@@ -1,5 +1,0 @@
-{"ts":"2026-08-01T12:59:41.023Z","op":"plan","visit":"iterations/i1@0","parent":null,"nodes":[{"id":"d15","brief":"answer why the control change is not visible"},{"id":"d16","brief":"propose the change size and get the bless"}]}
-{"ts":"2026-08-01T13:00:30.330Z","op":"done","visit":"iterations/i1@0","node":"d15","brief":"answered: the extension hard-codes a second control bar"}
-{"ts":"2026-08-01T13:01:24.041Z","op":"update","visit":"iterations/i1@0","node":"d17","brief":"defect captured; returning to the change-size proposal"}
-{"ts":"2026-08-01T13:01:33.444Z","op":"update","visit":"iterations/i1@0","node":"d18","brief":"reading the rigor matrix columns to ground the size proposal"}
-{"ts":"2026-08-01T13:02:35.133Z","op":"update","visit":"iterations/i1@0","node":"d19","brief":"pausing i1 so the control-bar fix can land on trunk"}
