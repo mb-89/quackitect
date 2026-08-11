@@ -14,6 +14,9 @@ Thumbs.db
 # worktrees (later milestone)
 .worktrees/
 
+# built packages — assembled by engine/bin/package.ts, never committed
+dist/
+
 # placed by the extension into the OPENED folder from project/_cage/ — never committed
 project/.mcp.json
 project/.claude/settings.json

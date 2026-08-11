@@ -27,7 +27,7 @@ $root = $PSScriptRoot
 
 # THE PRODUCT NAME IS ONE FACT (brand.json at the root). Nothing below spells
 # it out, so an export renames the whole system by writing that one file.
-$brandFile = Join-Path $root "project\brand\brand.json"
+$brandFile = Join-Path $root "project\deliverable\brand\brand.json"
 $brand = if (Test-Path $brandFile) { Get-Content $brandFile -Raw | ConvertFrom-Json } else { [pscustomobject]@{ name = "se"; id = "se"; abbr = $null } }
 $P = $brand.name
 $brandId = $brand.id
@@ -132,49 +132,13 @@ if ($exportIx -ge 0) {
     # PowerShell, and JSON.parse refuses the file it produces.
     $utf8NoBom = New-Object System.Text.UTF8Encoding $false
     $brandJson = @{ name = $newName; id = $newId; abbr = $newAbbr.ToUpper() } | ConvertTo-Json
-    [System.IO.File]::WriteAllText((Join-Path $dest "project\brand\brand.json"), $brandJson, $utf8NoBom)
+    [System.IO.File]::WriteAllText((Join-Path $dest "project\deliverable\brand\brand.json"), $brandJson, $utf8NoBom)
     # A FRESH FRONT DOOR. This repo's README is about THIS repo - its branch
-    # layout, its history - which is noise to whoever receives the copy.
-    $readme = @"
-# $newName
-
-$newName runs inside VS Code. You walk a state machine with an AI agent, and
-a mirror beside your editor shows where the walk stands.
-
-## Install it, once
-
-    .\RUNME.ps1
-
-Run that ONE time. It installs whatever is missing, places the VS Code
-extension, and opens VS Code.
-
-## Then work in VS Code
-
-After that first run, open this folder in VS Code like any other project.
-The $($newAbbr.ToUpper()) button in the left bar opens the mirror.
-
-You do not run RUNME.ps1 again. It is the installer, not the way in.
-
-## What is in here
-
-- project/deliverable - the engine, the machines, the VS Code extension.
-- project/guidance - the rules the agent is bound by.
-- project/spec - where your own records get written.
-- project/ - the folder you open. Everything being built lives here.
-- project/deliverable/brand/brand.json - the product name. Change it, and every surface follows.
-- project/deliverable/brand/palette.css - every colour. Edit it. No code change, no restart.
-
-## Attaching an agent
-
-Open the command palette and run "$($newName): How to Attach Your Agent".
-
-## Give it to someone else
-
-    .\RUNME.ps1 --export C:\path\to\empty "Their Name" TN
-
-That makes a fresh copy under a new name, with its own empty git repo. Your
-history and your records stay here.
-"@
+    # layout, its history - which is noise to whoever receives the copy. The
+    # text lives ONCE, in brand\README.entry.md - the packager renders the
+    # same template, so the two front doors cannot drift apart.
+    $readme = [System.IO.File]::ReadAllText((Join-Path $root "project\deliverable\brand\README.entry.md"))
+    $readme = $readme.Replace('$PRODUCT$', $newName).Replace('$PRODUCT_ABBR$', $newAbbr.ToUpper())
     [System.IO.File]::WriteAllText((Join-Path $dest "README.md"), $readme, $utf8NoBom)
     git config user.name "$newName"
     git config user.email "export@$newId.local"
