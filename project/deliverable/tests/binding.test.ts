@@ -226,3 +226,33 @@ test("a cell still carrying its comment is unanswered, exactly like an empty one
   // and the table does not is the failure this field exists to catch.
   assert.match(claimProblems(root, state, "## probes\n\n| raid | probe |\n| --- | --- |\n", corpus).join(" "), /raid-a-holds \(no row\)/);
 });
+
+// A FILE REFERENCE RESOLVES ON DISK (owner ruling 2026-08-11). The package
+// field points at a built ZIP, and a path naming nothing is the lie this
+// check exists to refuse.
+test("a file-ref field demands the named file on disk", () => {
+  const root = freshRoot();
+  const tpl = join(root, "project", "deliverable", "machines", "forms", "templates");
+  mkdirSync(tpl, { recursive: true });
+  writeFileSync(join(tpl, "file-ref.md"), "---\nkind: form-template\nname: file-ref\neditor: list\nresolves: file\n---\n", "utf8");
+  const state = {
+    id: "package",
+    kind: "work",
+    statement: "",
+    guidance: "",
+    priority: 0,
+    edges: [],
+    evidence_form: [{ name: "package", description: "", required: true, template: "file-ref" }],
+  } as unknown as Parameters<typeof claimProblems>[1];
+  const body = (line: string): string => `## package\n\n- ${line}\n`;
+
+  assert.match(claimProblems(root, state, body("project/dist/missing.zip"), []).join(" "), /no file on disk at/);
+
+  mkdirSync(join(root, "project", "dist"), { recursive: true });
+  writeFileSync(join(root, "project", "dist", "built.zip"), "zip", "utf8");
+  assert.deepEqual(claimProblems(root, state, body("project/dist/built.zip"), []), []);
+  // Backslashes are what Windows copies, and they resolve the same.
+  assert.deepEqual(claimProblems(root, state, body("project\\dist\\built.zip"), []), []);
+  // An honest empty is a claim too.
+  assert.deepEqual(claimProblems(root, state, body("none — nothing built"), []), []);
+});

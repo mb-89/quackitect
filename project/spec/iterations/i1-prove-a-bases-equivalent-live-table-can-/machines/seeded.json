@@ -1,6 +1,6 @@
 {
   "change_size": "product",
-  "rigor_matrix_hash": "edbe34c5b5d1",
+  "rigor_matrix_hash": "ef2cbd21b550",
   "pinned_at": "2026-08-04T16:20:30.684Z",
   "demands": {
     "onboard-retro": {
@@ -199,21 +199,13 @@
       "applies": "full",
       "evidence": "[[\"meets_need\",true,\"\",[],\"per-item\",\"\",[],[\"$value-props\"],[]],[\"musts_demonstrated\",true,\"\",[],\"per-item\",\"\",[],[\"$must-stories\"],[]],[\"market_tier\",false,\"\",[],\"\",\"\",[],[],[]]]"
     },
-    "finalize-docs": {
-      "applies": "full",
-      "evidence": "[[\"docs\",true,\"\",[],\"\",\"\",[],[],[]]]"
-    },
     "package": {
       "applies": "full",
-      "evidence": "[[\"package\",true,\"\",[],\"\",\"\",[],[],[]],[\"entry_script\",true,\"\",[],\"\",\"\",[],[],[]]]"
-    },
-    "ship-review": {
-      "applies": "full",
-      "evidence": "[[\"review\",true,\"\",[],\"\",\"\",[],[],[]],[\"upstream\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"package\",true,\"\",[],\"file-ref\",\"\",[],[],[]],[\"works\",true,\"\",[],\"choice-with-rationale\",\"\",[\"yes\",\"no\"],[],[\"yes\"]]]"
     },
     "gate-release": {
       "applies": "full",
-      "evidence": "[[\"docs_match\",true,\"\",[],\"\",\"\",[],[],[]],[\"packaged\",true,\"\",[],\"\",\"\",[],[],[]],[\"dependencies_ruled\",true,\"\",[],\"\",\"\",[],[],[]],[\"handover_accepted\",true,\"\",[],\"\",\"\",[],[],[]],[\"market_block\",false,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"market_block\",false,\"\",[],\"\",\"\",[],[],[]]]"
     },
     "shipped": {
       "applies": "full",

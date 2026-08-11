@@ -60,7 +60,10 @@ test("readMatrix: the real matrix is complete", () => {
   // mechanical half stands between build-steps and verification.
   // 53 since declare-winner (owner ruling 2026-08-10): the selection is
   // recorded on its own state rather than implied by arithmetic.
-  assert.equal(m.rows.length, 54);
+  // 52 since the M9 cut (owner ruling 2026-08-11): finalize-docs and
+  // ship-review wait outside the matrix until the book and vendoring
+  // mechanisms exist.
+  assert.equal(m.rows.length, 52);
   for (const row of m.rows) {
     for (const col of ALL_COLUMNS) {
       const cell = m.cells.get(row.name)?.get(col);
@@ -91,8 +94,10 @@ test("compileColumn major: every row seeds; the machine validates", () => {
   const m = readRigorMatrix(ROOT);
   const decl = compileColumn(m, "major");
   validateMachine(decl);
-  // 54 rows + the mechanical start.
-  assert.equal(decl.states.length, 55);
+  // 52 rows + the mechanical start. finalize-docs and ship-review left the
+  // matrix (owner ruling 2026-08-11) until the book and vendoring mechanisms
+  // exist.
+  assert.equal(decl.states.length, 53);
   // Only a state that RUNS a machine descends; authoring states do not.
   assert.ok(decl.states.some((s) => s.id === "build-steps" && s.submachine === "build-chunks"));
   assert.ok(decl.states.some((s) => s.id === "run-spikes" && s.submachine === "spikes"));
@@ -200,8 +205,8 @@ test("compileColumn minor: the tailoring strikes exactly the M4-M5 exploration",
   ]) {
     assert.ok(!ids.has(struck), `minor should strike ${struck}`);
   }
-  // 42 applied rows + start (run-spikes rides rank-unknowns into minor).
-  assert.equal(decl.states.length, 44);
+  // 40 applied rows + start (run-spikes rides rank-unknowns into minor).
+  assert.equal(decl.states.length, 42);
 });
 
 test("the columns are monotone: what a smaller column walks, every larger column walks", () => {

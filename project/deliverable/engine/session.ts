@@ -2832,6 +2832,29 @@ export class Session {
         return { decl: g.decl, canvas: g.canvas };
       }
     }
+    // A SEEDED CONTAINER INSIDE AN OPEN RECORD RESOLVES WITHOUT A DESCENT
+    // (owner report 2026-08-11): the panel colours from trunk, and a fresh
+    // session used to grey every sub-machine the walk had not entered — the
+    // ripple then greyed everything downstream of it.
+    for (const cid of Session.NESTING_CONTAINERS) {
+      let gen: GeneratedMachine | undefined;
+      try {
+        gen = this.genFor(cid);
+      } catch {
+        continue;
+      }
+      for (const make of Object.values(gen?.subGen ?? {})) {
+        try {
+          const nested = make().subGen?.[id];
+          if (nested !== undefined) {
+            const g = nested();
+            return { decl: g.decl, canvas: g.canvas };
+          }
+        } catch {
+          // an ungenerable child colours nothing
+        }
+      }
+    }
     return undefined;
   }
 
@@ -3611,7 +3634,7 @@ export class Session {
    *  the same answer and there is nothing session-shaped about it. */
   private static readonly VERDICTS = new Map<string, boolean>();
 
-  private standingClaims(decl: MachineDecl, it: Iteration, claimful: Set<string>, pass: GreenPass): Set<string> {
+  private standingClaims(decl: MachineDecl, it: Iteration, claimful: Set<string>, pass: GreenPass, paint = false): Set<string> {
     // THE CORPUS IS LOADED ONCE, NOT ONCE PER STATE. claimProblems takes it as
     // an argument for exactly this reason and recordDone was not passing it,
     // so every claimful state re-read the whole trace — about fifteen full
@@ -3672,11 +3695,41 @@ export class Session {
           Session.VERDICTS.set(key, failed);
         }
         if (failed) continue;
-        if (s.kind === "gate" && !(typeof fm.bless === "string" && fm.bless.startsWith("blessed"))) continue;
+        // GREEN MEANS SUBMITTED (owner ruling 2026-08-11): for the PAINT a
+        // signed gate whose checks stand is green, and the bless rides as
+        // the thumbs-up mark. The ROUTE keeps demanding the bless — an
+        // unblessed gate is still the walk's next objective.
+        if (!paint && s.kind === "gate" && !(typeof fm.bless === "string" && fm.bless.startsWith("blessed"))) continue;
         standing.add(s.id);
       } catch {
         // an unreadable claim colours nothing
       }
+    }
+    for (const id of this.lawProvenClaims(decl, it, corpus, version, traceRoot)) standing.add(id);
+    return standing;
+  }
+
+  /** A LAW-PROVEN STATE HAS NO FORM TO SIGN — its claim IS its law
+   *  (rigor-matrix's refuseBadRow names the set). Green is the law passing,
+   *  recomputed against the corpus like any other verdict. */
+  private lawProvenClaims(
+    decl: MachineDecl,
+    it: Iteration,
+    corpus: ReturnType<typeof loadTrace>,
+    version: string,
+    traceRoot: string,
+  ): Set<string> {
+    const standing = new Set<string>();
+    for (const s of decl.states) {
+      if (s.evidence_form.length > 0 || s.submachine !== undefined) continue;
+      if (!s.id.endsWith("fill-story-evidence")) continue;
+      const key = [traceRoot, s.id, version, "law-only"].join("\0");
+      let failed = Session.VERDICTS.get(key);
+      if (failed === undefined) {
+        failed = claimProblems(this.traceRoot(it), s, "", corpus).length > 0;
+        Session.VERDICTS.set(key, failed);
+      }
+      if (!failed) standing.add(s.id);
     }
     return standing;
   }
@@ -3714,7 +3767,7 @@ export class Session {
    *
    *  IT NESTS BY CONSTRUCTION, because it asks recordDone, which asks this
    *  again for whatever containers that machine holds. */
-  private drawingDone(id: string, seen: Set<string>, pass: GreenPass): boolean {
+  private drawingDone(id: string, seen: Set<string>, pass: GreenPass, paint = false): boolean {
     if (seen.has(id)) return false; // a cycle proves nothing
     seen.add(id);
     // AN UNSEEDED DRAWING PROVES NOTHING, and asking for one THROWS: viewFor
@@ -3729,7 +3782,7 @@ export class Session {
       return false;
     }
     if (sub === undefined) return false;
-    const done = new Set(this.recordDone(sub, seen, pass));
+    const done = new Set(this.recordDone(sub, seen, pass, paint));
     let provable = false;
     for (const s of sub.states) {
       if (s.evidence_form.length === 0 && s.submachine === undefined) continue;
@@ -3757,8 +3810,9 @@ export class Session {
     return { done: new Map() };
   }
 
-  recordDone(decl: MachineDecl, seen: Set<string> = new Set(), pass: GreenPass = Session.newPass()): string[] {
-    const memo = pass.done.get(decl.id);
+  recordDone(decl: MachineDecl, seen: Set<string> = new Set(), pass: GreenPass = Session.newPass(), paint = false): string[] {
+    const memoKey = paint ? `${decl.id}\0paint` : decl.id;
+    const memo = pass.done.get(memoKey);
     if (memo !== undefined) return memo;
     const it = this.declIteration(decl);
     if (it === undefined) return [];
@@ -3766,11 +3820,11 @@ export class Session {
     // one. A container carries no evidence of its own and used to read as a
     // waypoint, which is what let the objective skip a whole sub-machine.
     const claimful = new Set(decl.states.filter((s) => s.evidence_form.length > 0).map((s) => s.id));
-    const green = this.standingClaims(decl, it, claimful, pass);
+    const green = this.standingClaims(decl, it, claimful, pass, paint);
     for (const s of decl.states) {
       if (s.submachine === undefined) continue;
       claimful.add(s.id);
-      if (this.drawingDone(s.id, seen, pass)) green.add(s.id);
+      if (this.drawingDone(s.id, seen, pass, paint)) green.add(s.id);
     }
     // GREEN STOPS AT THE FIRST INPUT THAT IS NOT GREEN. This is the ripple,
     // and it is a graph walk rather than a mark on a file. A claim may be word
@@ -3788,8 +3842,33 @@ export class Session {
     const done = [...green];
     // The mechanical start was necessarily walked on the way to any claim.
     if (done.length > 0) done.push("start");
-    pass.done.set(decl.id, done);
+    pass.done.set(memoKey, done);
     return done;
+  }
+
+  /** The panel's colour truth: green means SUBMITTED (owner ruling
+   *  2026-08-11) — a signed gate paints before its bless, and the bless
+   *  rides as the thumbs-up. The route never reads this. */
+  recordPaint(decl: MachineDecl): string[] {
+    return this.recordDone(decl, new Set(), Session.newPass(), true);
+  }
+
+  /** The gates whose claims carry a bless — the thumbs-up overlay's truth. */
+  blessedGates(decl: MachineDecl): string[] {
+    const it = this.declIteration(decl);
+    if (it === undefined) return [];
+    const out: string[] = [];
+    for (const s of decl.states) {
+      if (s.kind !== "gate") continue;
+      try {
+        const fm = noteOf(this.evidenceAbs(it, s.id))?.frontmatter;
+        if (fm !== undefined && typeof fm.signed_off === "string" && typeof fm.bless === "string" && fm.bless.startsWith("blessed"))
+          out.push(s.id);
+      } catch {
+        // an unreadable claim marks nothing
+      }
+    }
+    return out;
   }
 
   /** THE ITERATION THIS MACHINE BELONGS TO, if there is one and it is open.

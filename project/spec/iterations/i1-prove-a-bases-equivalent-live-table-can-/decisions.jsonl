@@ -1416,3 +1416,15 @@
 {"ts":"2026-08-11T13:21:33.196Z","op":"update","visit":"iterations/i1/gate-validation@0","node":"d3","brief":"the gate's battery fires; the form fills meanwhile"}
 {"ts":"2026-08-11T13:22:25.095Z","op":"update","visit":"iterations/i1/gate-validation@0","node":"d4","brief":"the owed demonstrations enter the register as one issue"}
 {"ts":"2026-08-11T13:24:05.696Z","op":"update","visit":"iterations/i1/gate-validation@0","node":"d5","brief":"gate-validation signed - committing and presenting for the bless"}
+{"ts":"2026-08-11T13:33:41.194Z","op":"plan","visit":"iterations/i1/onboard-retro@0","parent":null,"nodes":[{"id":"d1","brief":"find why signed states render grey in a fresh session"},{"id":"d2","brief":"law-proven states go green from their laws"},{"id":"d3","brief":"a signed unblessed gate renders green"},{"id":"d4","brief":"prove it from the served payload"},{"id":"d5","brief":"battery"},{"id":"d6","brief":"commit"},{"id":"d7","brief":"reload"}]}
+{"ts":"2026-08-11T13:58:39.551Z","op":"plan","visit":"iterations/i1/gate-validation@0","parent":null,"nodes":[{"id":"d4","brief":"read the M9 rows"},{"id":"d5","brief":"drop finalize-docs and ship-review"},{"id":"d6","brief":"recut package as the automated packager"},{"id":"d7","brief":"slim gate-release"},{"id":"d8","brief":"tests"},{"id":"d9","brief":"commit"},{"id":"d10","brief":"reload"}]}
+{"ts":"2026-08-11T14:13:11.855Z","op":"plan","visit":"iterations/i1/gate-validation@0","parent":null,"nodes":[{"id":"d2","brief":"confirm the bless on gate-validation"},{"id":"d3","brief":"recut package/gate-release rows per ruling"},{"id":"d4","brief":"reload and walk package"},{"id":"d5","brief":"stop at gate-release for the bless"}]}
+{"ts":"2026-08-11T14:13:15.079Z","op":"done","visit":"start@0","node":"d1","brief":"reading re-earned, walk stands at gate-validation"}
+{"ts":"2026-08-11T14:13:39.204Z","op":"done","visit":"iterations/i1/gate-validation@0","node":"d2","brief":"bless on file: blessed by human, 2026-08-11"}
+{"ts":"2026-08-11T14:15:25.298Z","op":"update","visit":"iterations/i1/gate-validation@0","node":"d6","brief":"reading the row evidence parser before the recut"}
+{"ts":"2026-08-11T14:17:52.204Z","op":"update","visit":"iterations/i1/gate-validation@0","node":"d7","brief":"answer recorded; escaping for the trunk recut"}
+{"ts":"2026-08-11T14:24:26.901Z","op":"done","visit":"start@0","node":"d2","brief":"reading walked back, standing at package"}
+{"ts":"2026-08-11T14:26:28.485Z","op":"update","visit":"iterations/i1/package@0","node":"d5","brief":"entry README template - one source for export and package"}
+{"ts":"2026-08-11T14:27:04.576Z","op":"update","visit":"iterations/i1/package@0","node":"d6","brief":"dist/ gitignored - built archives stay out of history"}
+{"ts":"2026-08-11T14:32:32.894Z","op":"update","visit":"iterations/i1/trace-design@1","node":"d11","brief":"package.ts claimed by dsp-boot-and-power, honestly"}
+{"ts":"2026-08-11T14:32:43.253Z","op":"defer_arrived","visit":"iterations/i1/package@1","node":"d12","brief":"fill and submit the package state","hops":1,"trail":["start","iterations/i1/package"]}

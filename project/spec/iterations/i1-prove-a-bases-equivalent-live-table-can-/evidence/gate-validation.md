@@ -1,5 +1,6 @@
 ---
 form: gate-validation
+bless: blessed by human
 by: agent
 signed_off: 2026-08-11T13:23:45.292Z
 authors: agent
