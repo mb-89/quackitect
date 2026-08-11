@@ -1609,7 +1609,7 @@ export function nodeField(file: string, key: string): string {
     // is prose, and reading prose as a value is how a field silently fills.
     const end = lines.indexOf("---", 1);
     const hit = lines.slice(0, end < 0 ? lines.length : end).find((l) => l.startsWith(`${key}:`));
-    return hit === undefined ? "" : hit.slice(key.length + 1).trim();
+    return hit === undefined ? "" : unquote(hit.slice(key.length + 1).trim());
   } catch {
     return "";
   }

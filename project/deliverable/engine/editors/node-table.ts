@@ -98,6 +98,9 @@ export const NODE_TABLE_EDITOR: EditorKind = {
         if (!picks[c] && (v.indexOf(" · ") >= 0 || v.indexOf(" :: ") >= 0)) {
           const lines = v.split(" · ").map(function (e) {
             const t = e.trim().replace(/^"/, "").replace(/"$/, "");
+            // An entry naming a NODE links its note, like the row's own name.
+            const np = paths ? paths[t] : null;
+            if (np) return '<div style="padding:1px 0;"><a class="reflink" style="color:var(--se-accent);cursor:pointer;" data-path="' + escText(np) + '" title="open ' + escText(np) + ' in the editor">' + escText(t) + "</a></div>";
             const at = t.indexOf(" :: ");
             if (at < 0) return '<div style="padding:1px 0;">' + escText(t) + "</div>";
             const file = t.slice(0, at).trim();

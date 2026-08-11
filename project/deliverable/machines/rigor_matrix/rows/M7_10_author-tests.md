@@ -25,9 +25,8 @@ evidence:
     columns:
       - method
       - verifies
-      - files
     page_size: 25
-    description: "the test-spec register — one row per spec; the law checks coverage both ways, the method match, and that every named file exists"
+    description: "the test-spec register — one row per spec; the files live on the spec node, and the law checks coverage both ways and the method match"
 major: full
 minor: full
 patch: tailored
