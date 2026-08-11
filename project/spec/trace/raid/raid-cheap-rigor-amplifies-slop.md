@@ -6,9 +6,9 @@ statement: Making rigor cheap removes the effort that used to stop people writin
 owner: the machine
 trigger: when any form's average filled length doubles against its own history
 status: open
-impact: The spec grows faster than anyone reads it, and the volume itself becomes the reason nobody checks the content.
 breaks_how_badly: crippling
 how_likely: plausible
+impact: The spec grows faster than anyone reads it, and the volume itself becomes the reason nobody checks the content.
 source_refs:
   - the ratchet
   - the length budgets

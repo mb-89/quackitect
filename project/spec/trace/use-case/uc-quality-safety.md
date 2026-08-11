@@ -9,7 +9,7 @@ precondition: An agent is walking with the autonomy slider above zero.
 guarantee: The irreversible act is refused or handed to the person, and nothing already landed is destroyed to make room for it.
 refines:
   - sty-what-a-quality-is
-killer: false
+priority: should
 ---
 
 ## What this characteristic covers

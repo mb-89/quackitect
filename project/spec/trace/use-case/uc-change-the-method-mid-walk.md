@@ -8,7 +8,7 @@ precondition: none
 guarantee: the walk continues under the corrected method, with both the change and the walk that provoked it on the record
 refines:
   - sty-improve-the-machine-mid-walk
-killer: false
+priority: should
 ---
 
 ## Main scenario

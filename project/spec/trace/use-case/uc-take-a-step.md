@@ -9,7 +9,7 @@ guarantee: the state's evidence form is filled and checked, and the walk may mov
 refines:
   - sty-walk-it-by-hand
   - sty-the-agent-proves-it-read
-killer: true
+priority: must
 ---
 
 ## Main scenario

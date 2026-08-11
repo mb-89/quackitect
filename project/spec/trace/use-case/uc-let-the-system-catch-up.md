@@ -8,7 +8,7 @@ precondition: none
 guarantee: what drifted is fixed where it lives, what needed a decision is a note, and the battery proves the sweep broke nothing
 refines:
   - sty-let-the-system-catch-up
-killer: false
+priority: should
 ---
 
 ## Main scenario

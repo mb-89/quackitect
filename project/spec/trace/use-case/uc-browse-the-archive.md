@@ -8,7 +8,7 @@ precondition: the record is closed and archived
 guarantee: the record is readable exactly as it finished, and nothing live was touched
 refines:
   - sty-look-at-a-closed-record
-killer: false
+priority: should
 ---
 
 ## Main scenario

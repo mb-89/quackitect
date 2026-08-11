@@ -6,9 +6,9 @@ statement: All 37 struck axes rest on one argument — no candidate choice touch
 owner: the driving agent
 trigger: any candidate added or changed that touches a struck mechanism
 status: open
-impact: The returned axes rejoin the sort, the line is re-cut, and the ranking can move. The failure is collective by construction, never one axis at a time.
 breaks_how_badly: crippling
 how_likely: plausible
+impact: The returned axes rejoin the sort, the line is re-cut, and the ranking can move. The failure is collective by construction, never one axis at a time.
 source_refs:
   - iterations/i1 evidence gate-candidates, reasons_hold
   - iterations/i1 evidence cut-criteria

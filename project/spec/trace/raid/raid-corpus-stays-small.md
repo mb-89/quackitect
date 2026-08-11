@@ -6,11 +6,11 @@ statement: The engine reads whole files and scans whole folders on every look, w
 owner: the driving agent
 trigger: when a pull takes longer than a second, or when the trace passes a thousand nodes
 status: open
+breaks_how_badly: corrosive
+how_likely: plausible
 probe: "holds. 248 trace nodes against a 1000-node trigger, and pulls answer well inside a second. The one time it bit was not size at all. The corpus was being loaded about fifteen times per call, and hoisting that to one load fixed it."
 probed: 2026-08-07
 impact: Green is recomputed from disk on every render. If that stops being cheap, the honest fix is a cache — and a cache is the thing this design just spent a day removing.
-breaks_how_badly: corrosive
-how_likely: plausible
 source_refs:
   - engine/session.ts recordDone
   - engine/paths.ts methodFilesIn

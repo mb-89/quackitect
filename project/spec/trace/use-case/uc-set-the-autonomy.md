@@ -9,7 +9,7 @@ guarantee: the agent enters only steps weighing under the setting, and the setti
 refines:
   - sty-hand-over-and-walk-away
   - sty-walk-it-by-hand
-killer: true
+priority: must
 ---
 
 ## Main scenario

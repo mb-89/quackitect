@@ -1,3 +1,7 @@
 ---
-none: no build chunks stand seeded — plan-build (M7) seeds the chunk drawing when the build is planned
+steps:
+  - id: trunk-batch-reader
+    statement: "every trunk-ref read rides one long-lived batch reader — promoted from exp-trunk-read-cost, standing in expmachine.ts"
+    depends_on: []
+    realization: software
 ---

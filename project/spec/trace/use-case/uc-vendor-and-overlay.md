@@ -8,7 +8,7 @@ precondition: the builder has their own repository
 guarantee: their method is loaded above the engine's, nothing of theirs sits under the engine, and an upstream version can be replaced whole
 refines:
   - sty-vendor-it-into-my-product
-killer: false
+priority: could
 ---
 
 ## Main scenario

@@ -8,7 +8,7 @@ precondition: none
 guarantee: the inbox stands at zero, and every note's disposition names where it went or what has to be true for it to come back
 refines:
   - sty-clear-the-inbox-with-a-retro
-killer: false
+priority: should
 ---
 
 ## Main scenario

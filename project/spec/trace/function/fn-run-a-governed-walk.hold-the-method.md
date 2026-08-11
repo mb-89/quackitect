@@ -6,6 +6,7 @@ statement: compile the authored method into the machine the walk runs on, and ke
 satisfies:
   - req-reachable-capability-is-traced
   - req-blessed-column-compiles-pinned
+  - req-drawn-state-equals-a-row
   - req-size-choice-is-the-bless
   - req-size-proposal-names-strikes
   - req-size-escalation-readjudicated

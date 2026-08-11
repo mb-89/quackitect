@@ -8,7 +8,7 @@ precondition: the record's states are filled, and its worktree holds the work
 guarantee: the work is on trunk in one piece, with a green battery and a person's bless behind it
 refines:
   - sty-land-the-work
-killer: false
+priority: should
 ---
 
 ## Main scenario

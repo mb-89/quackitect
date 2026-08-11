@@ -5,7 +5,7 @@ kind: issue
 statement: The five candidates were composed and scored by the same agent, against the evaluate-set rule that a research agent scores, never the builder.
 owner: the adjudicator
 trigger: any re-score by a second hand
-status: open
+status: closed
 impact: The 95 standing scores may carry composer bias, and that bias leaves no trace in the numbers. M5 must not converge on them until a second hand re-scores.
 breaks_how_badly: crippling
 how_likely: plausible
@@ -24,5 +24,14 @@ spawned a second agent, and no check refuses a composer-authored table.
 THE REPAIR STANDS IN THE METHOD since 2026-08-10: the evaluate-set row now
 requires the score table to be filled by a spawned clean-context subagent.
 
-THE DEBT STANDS UNTIL a full second-hand re-score runs under that rule.
-The trigger above closes this entry.
+THE DEBT IS PAID (2026-08-10). A clean-context subagent re-scored all 95
+cells without sight of the standing table.
+
+- THE SEAT IS CONFIRMED: cand-thin-worktree tops the second hand too — 35
+  raw points, over signalled-line 34, derived-house 33, living-form 29,
+  pushed-step 25.
+- THE RIVAL ORDER DIVERGES: the standing weighted runs put living-form
+  nearest; the second hand puts signalled-line and derived-house ahead of
+  it on raw sums. The divergence feeds [[raid-unverified-score-comparisons]]
+  and stands recorded here; the winner does not move under either hand.
+- The second hand's ten torn cells are kept with the walk record.

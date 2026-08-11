@@ -8,7 +8,7 @@ precondition: the gate's evidence form is filled
 guarantee: the gate is blessed or rejected by a person, and the record keeps whose hand it was and when
 refines:
   - sty-review-a-gate
-killer: true
+priority: must
 ---
 
 ## Main scenario

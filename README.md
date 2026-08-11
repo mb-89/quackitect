@@ -10,8 +10,8 @@ engine serves, every call it makes is logged, and (next milestone) every
 action it may take is decided by the state machine.
 
 v3 inverts v2's build order: **channel and visibility first, guidance early,
-ledger late.** v2's post-mortem in one line: enforcement without guidance
-regresses below convention. See `project/spec/v3-plan.md`.
+the record-keeping layer last.** v2's post-mortem in one line: enforcement
+without guidance regresses below convention. See `project/spec/v3-plan.md`.
 
 ## Layout
 
@@ -123,7 +123,7 @@ there is no fallback search engine.
 | — | `se_file_delete` | hash-guarded, no blind removal |
 | ls | `se_file_list` | junk dirs excluded |
 | Glob | `se_file_glob` | honest truncation flag |
-| Grep | `se_file_search` | ripgrep (hard dep); `ref:` searches any committed branch/tag via git grep (main = v1, v2 = v2); logged `intent` feeds the retro |
+| Grep | `se_file_search` | ripgrep (hard dep); `ref:` searches any committed branch/tag via git grep (main = v1, v2 = v2); the logged `intent` is reviewed in the periodic look-back |
 | Bash | `se_run` | full output kept in the call log under a citable ref |
 | WebFetch | `se_web_fetch` | HTML→text, paging offsets, declared truncation |
 | WebSearch | `se_web_search` | provider-backed (set `SE_BRAVE_API_KEY`); refuses honestly when unconfigured |
@@ -163,8 +163,8 @@ unmet), and the pull is never gated.
 ## Status
 
 - [x] M1a — cage + lane + log: selftests green, live wire verified.
-- [x] M1b — the main machine: canvas compiler (v2 grammar, ledger-free,
-      vault-relative refs), boot as a sub-machine with stepwise se_boot,
+- [x] M1b — the main machine: canvas compiler (v2 grammar, no
+      record-keeping layer, vault-relative refs), boot as a sub-machine with stepwise se_boot,
       THE STATE GATE wired into dispatch (per-state `legal_tools`, enforced
       not advisory), auto-boot SessionStart hook, banner, CANVAS-GUIDE.
 - [x] M2 (first cut) — the Mirror in manual mode: RUNME -Manual serves the
@@ -175,4 +175,5 @@ unmet), and the pull is never gated.
       voice, stance) and what prepare_idle actually checks: to be designed
       with the owner.
 - [ ] M3+ — work machines (se_next/se_submit against drawn process
-      machines), gates/blessing, minimal ledger. Worktrees later.
+      machines), approval steps where a person signs off, minimal
+      record-keeping. Worktrees later.

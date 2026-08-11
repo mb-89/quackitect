@@ -14,6 +14,10 @@ satisfies:
   - req-autonomy-gates-every-hop
   - req-autonomy-change-applies-forward
   - req-controls-never-advance-walk
+  - req-emergency-sits-above-full
+  - req-drumroll-arms-deliberately
+  - req-shutdown-fires-only-idle-or-end
+  - req-lane-fixes-what-machines-fix
   - req-walk-opens-at-retro
   - req-instruction-names-its-source
   - req-fallen-condition-named

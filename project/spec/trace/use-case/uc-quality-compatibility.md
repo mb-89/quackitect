@@ -9,7 +9,7 @@ precondition: The project is a plain folder of files on disk.
 guarantee: The other tool keeps working, and the lane serves the same rules whichever harness calls it.
 refines:
   - sty-what-a-quality-is
-killer: false
+priority: should
 ---
 
 ## What this characteristic covers

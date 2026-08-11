@@ -8,7 +8,7 @@ precondition: none
 guarantee: every owed document has been delivered whole and proven, and the state opens
 refines:
   - sty-the-agent-proves-it-read
-killer: true
+priority: must
 ---
 
 ## Main scenario

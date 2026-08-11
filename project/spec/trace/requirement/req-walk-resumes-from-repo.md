@@ -3,6 +3,7 @@ id: req-walk-resumes-from-repo
 type: "[[requirement]]"
 statement: When a new session opens the project, the engine shall serve the walk from its recorded position using the repository content alone.
 kind: quality
+fitness_candidate: true
 verify_method: test
 breaks_if_removed: Every compaction or crash ends the iteration, and settled work gets re-litigated by the next session.
 breaks_how_badly: fatal

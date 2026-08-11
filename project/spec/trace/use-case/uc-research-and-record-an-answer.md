@@ -8,7 +8,7 @@ precondition: none
 guarantee: the answer is recorded against its question, its sources are in the reference corpus, and no claim stands without evidence
 refines:
   - sty-ask-and-record-the-answer
-killer: false
+priority: should
 ---
 
 ## Main scenario

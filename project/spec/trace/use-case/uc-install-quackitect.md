@@ -8,7 +8,7 @@ precondition: a computer with an editor and a shell
 guarantee: the panel is drawn, the engine answers, and the front desk is waiting for a sentence
 refines:
   - sty-ramp-up
-killer: true
+priority: must
 ---
 
 ## Main scenario
