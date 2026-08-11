@@ -11,18 +11,11 @@ entry_read:
   - project/deliverable/machines/methods/meth-verification-discipline.md
 floor: true
 evidence:
-  - name: battery
-    description: the run reference and its verdict
   - name: claims
-    template: node-table
-    of: test-spec
+    template: checklist
     items:
       - $claim-specs
-    columns:
-      - method
-      - green_observed
-    page_size: 25
-    description: "one row per non-test spec. green_observed names who observed what, on the spec node."
+    description: "one checkbox per non-test spec — observed green by fresh eyes. The battery is the engine's and needs no field."
 major: full
 minor: full
 patch: full
@@ -53,10 +46,11 @@ Failure opens the fallback into fix-findings - collect everything, fix in
 one pass, one confirm run. The command is the project's battery; each
 project declares its own.
 
-THE CLAIMS HALF IS THE SAME TABLE IN GREEN (owner ruling 2026-08-11):
-every demonstration, inspection and analysis spec is observed green, and
-the observation is written on the spec node's `green_observed` — who
-observed what. The law refuses an empty one.
+THE CLAIMS HALF IS THE SAME CHECKLIST IN GREEN (owner ruling
+2026-08-11): every demonstration, inspection and analysis spec is
+observed green — one deliberate check per spec, refused while any box
+stands open. The battery carries no field: it runs mechanically and its
+verdict records itself.
 
 FRESH EYES VERIFY ([[meth-verification-discipline]]). A person adheres
 to the card. An agent SPAWNS A TESTER SUBAGENT — fresh context, reads

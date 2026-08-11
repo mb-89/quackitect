@@ -18,15 +18,10 @@ legal_tools:
   - se_run
 evidence:
   - name: red_observed
-    template: node-table
-    of: test-spec
+    template: checklist
     items:
-      - $test-specs
-    columns:
-      - method
-      - red_observed
-    page_size: 25
-    description: "one row per spec. red_observed is written on the spec node once, at its birth — the guidance names the three legal answers."
+      - $claim-specs
+    description: "one checkbox per non-test spec — the reds no run can show. The engine observes the test reds itself."
 major: full
 minor: full
 patch: full
@@ -53,16 +48,16 @@ specification_note: |
 
 Last before the build, before any code lands ([[meth-test-first]]). A check green with no realized design is suspect.
 
-THE OBSERVATION IS PER SPEC, ONCE, AT ITS BIRTH — written on the spec
-node's `red_observed`. Three legal answers:
+ONLY WHAT A PERSON MUST DO IS LISTED (owner ruling 2026-08-11). The
+checklist holds the NON-TEST specs — demonstration, inspection,
+analysis — where no run can show the red. One deliberate check per
+spec. Checking claims one of two things:
 
-- a run reference — the new checks ran and failed, mechanically
-- `claimed — <who observed what>` — for demonstration, inspection and
-  analysis specs, where no run can prove it
-- `impossible — <why>` — the manual override, for a spec covering
-  already-implemented behavior that can never show red. Visible, never
-  silent.
+- the red was observed — the procedure fails today, as it should
+- red is impossible for a spec covering standing behavior, and that is
+  accepted
 
-The law refuses a spec whose `red_observed` is empty. The mechanical
-lane — the engine running the new checks itself — takes the first
-answer over when the executor upgrade lands.
+THE TEST REDS ARE THE ENGINE'S. The new checks run and fail
+mechanically; the executor lane takes this over. Until it lands, the
+walker runs the new checks scoped and records the run ref in the
+situation.

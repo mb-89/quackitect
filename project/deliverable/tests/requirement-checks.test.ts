@@ -7,13 +7,8 @@ import { strict as assert } from "node:assert";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, test } from "node:test";
-import {
-  authorTestsLawProblems,
-  observeRedLawProblems,
-  specifyBuildLawProblems,
-  traceDesignLawProblems,
-  verificationClaimsLawProblems,
-} from "../engine/stateform.ts";
+import type { StateDecl } from "../engine/machine.ts";
+import { authorTestsLawProblems, claimProblems, specifyBuildLawProblems, traceDesignLawProblems } from "../engine/stateform.ts";
 import { conformance, earsShapeOK, itemTemplate, loadTrace } from "../engine/trace.ts";
 import { freshRoot } from "./helpers.ts";
 
@@ -316,42 +311,31 @@ describe("the design-spec law", { concurrency: true }, () => {
   });
 });
 
-// THE OBSERVATIONS (owner ruling 2026-08-11): red once at a spec's birth,
-// green per the fresh-eyes verification — both written on the spec node.
-describe("red and green observations", { concurrency: true }, () => {
-  test("a spec without red_observed refuses, and the visible override passes", () => {
+describe("the checklist field", { concurrency: true }, () => {
+  // CHECKING IS THE CLAIM (owner ruling 2026-08-11): a checklist field
+  // refuses while any named item stands unchecked. The observation tables
+  // at observe-red and verification ride this — no text, one deliberate
+  // click per row.
+  test("an unchecked item is named, and all-checked stands silent", () => {
     const root = freshRoot();
-    mintSpec(root, "tsp-new", "test", ["req-clean"], ["tests/x.test.ts"]);
-    const p = observeRedLawProblems(loadTrace(root)).join(" | ");
-    assert.match(p, /tsp-new: red never observed/);
-    const root2 = freshRoot();
-    mintSpec(
-      root2,
-      "tsp-old",
-      "test",
-      ["req-clean"],
-      ["tests/x.test.ts"],
-      ["red_observed: impossible — already implemented at spec birth"],
-    );
-    assert.deepEqual(observeRedLawProblems(loadTrace(root2)), []);
-  });
-
-  test("a non-test spec owes green_observed, a test spec is the battery's", () => {
-    const root = freshRoot();
-    mintSpec(root, "tsp-demo", "demonstration", ["req-clean"], []);
-    mintSpec(root, "tsp-run", "test", ["req-clean"], ["tests/x.test.ts"]);
-    const p = verificationClaimsLawProblems(loadTrace(root)).join(" | ");
-    assert.match(p, /tsp-demo: a demonstration spec not observed green/);
-    assert.doesNotMatch(p, /tsp-run/);
-    const root2 = freshRoot();
-    mintSpec(
-      root2,
-      "tsp-demo2",
-      "demonstration",
-      ["req-clean"],
+    const s = {
+      id: "s",
+      kind: "work",
+      statement: "",
+      guidance: "",
+      priority: 0.2,
+      edges: [],
+      evidence_form: [
+        { name: "quality", template: "checklist", items: ["boxes stay layered", "debt is visible"], required: true, description: "" },
+      ],
+    } as unknown as StateDecl;
+    const owed = "## quality\n\n- [x] boxes stay layered\n- [ ] debt is visible\n";
+    const p = claimProblems(root, s, owed, []).join(" | ");
+    assert.match(p, /quality: unchecked — debt is visible/);
+    const done = "## quality\n\n- [x] boxes stay layered\n- [x] debt is visible\n";
+    assert.deepEqual(
+      claimProblems(root, s, done, []).filter((x) => x.includes("unchecked")),
       [],
-      ["green_observed: claimed — the tester watched the walkthrough 2026-08-11"],
     );
-    assert.deepEqual(verificationClaimsLawProblems(loadTrace(root2)), []);
   });
 });

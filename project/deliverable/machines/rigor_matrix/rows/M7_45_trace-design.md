@@ -16,7 +16,16 @@ legal_tools:
   - se_answer
 evidence:
   - name: design_trace
-    description: "the sweep's counts and the unclaimed list, or clean. The guidance names the three checks."
+    template: node-table
+    of: design-spec
+    items:
+      - $design-specs
+    columns:
+      - realizes
+      - files
+    covers: element
+    page_size: 25
+    description: "the spec register against the elements — coverage is checked, never claimed. The laws add file existence and the unclaimed sweep."
 major: full
 minor: full
 patch: full
@@ -42,6 +51,10 @@ specification_note: |
 ---
 
 ## Guidance
+
+COVERAGE IS CHECKED, NOT CLAIMED — the field declares `covers:
+element`, the same mechanism the upper trace states use, so the
+register refuses while any element goes unrealized.
 
 THE MECHANICAL HALF OF THE DESIGN TRACE, after the build. Three checks,
 all law at submit:

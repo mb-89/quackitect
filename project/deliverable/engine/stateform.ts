@@ -448,6 +448,7 @@ function resolveSource(i: string, root: string, traceRoot: string, instanceRaw?:
   if (i === "$design-specs") return typedItems(traceRoot, "design-spec");
   if (i === "$promotions") return promotionItems(traceRoot);
   if (i === "$claim-specs") return claimSpecItems(traceRoot);
+  if (i === "$iq_checklist") return catalogItems(root, "iq_checklist");
   if (i === "$candidates") return candidateItems(traceRoot);
   // THE CATALOGUES. A known set is never typed from memory and never hard
   // coded — it is read from the method card that holds it, so editing the card
@@ -631,9 +632,7 @@ function stateLawProblems(root: string, s: StateDecl, nodes: TraceNode[]): strin
   if (s.id.endsWith("gate-prototype")) out.push(...assumptionLawProblems(nodes, catalogItems(root, "damage_levels")));
   if (s.id.endsWith("author-tests")) out.push(...authorTestsLawProblems(nodes));
   if (s.id.endsWith("specify-build")) out.push(...specifyBuildLawProblems(nodes, root));
-  if (s.id.endsWith("observe-red")) out.push(...observeRedLawProblems(nodes));
   if (s.id.endsWith("trace-design")) out.push(...traceDesignLawProblems(nodes, root));
-  if (s.id.endsWith("verification")) out.push(...verificationClaimsLawProblems(nodes));
   return out;
 }
 
@@ -710,39 +709,6 @@ function promotionAssignmentProblems(corpus: { id: string; type: string; file?: 
       continue;
     }
     if (steps !== undefined && !steps.has(chunk)) out.push(`${n.id}: chunk ${chunk} is not a step of the seeded drawing`);
-  }
-  return out;
-}
-
-/** THE OBSERVE-RED LAW (owner ruling 2026-08-11): per spec, once, at its
- *  birth, written on the node. Three legal answers — a run ref, claimed
- *  — <who observed what>, or impossible — <why>, the visible override. */
-export function observeRedLawProblems(corpus: { id: string; type: string; file?: string }[]): string[] {
-  const out: string[] = [];
-  for (const n of corpus) {
-    if (n.type !== "test-spec" || n.file === undefined) continue;
-    const red = String(noteOf(n.file)?.frontmatter.red_observed ?? "").trim();
-    if (red === "" || red.startsWith("<!--")) {
-      out.push(`${n.id}: red never observed — red_observed carries a run ref, claimed — <who observed what>, or impossible — <why>`);
-    }
-  }
-  return out;
-}
-
-/** THE CLAIMS LAW (owner ruling 2026-08-11): what no run can prove is
- *  observed green by fresh eyes — every non-test spec carries
- *  green_observed, naming who observed what. The battery answers for the
- *  test-method specs. */
-export function verificationClaimsLawProblems(corpus: { id: string; type: string; file?: string }[]): string[] {
-  const out: string[] = [];
-  for (const n of corpus) {
-    if (n.type !== "test-spec" || n.file === undefined) continue;
-    const fm = noteOf(n.file)?.frontmatter ?? {};
-    if (String(fm.method ?? "") === "test") continue;
-    const g = String(fm.green_observed ?? "").trim();
-    if (g === "" || g.startsWith("<!--")) {
-      out.push(`${n.id}: a ${String(fm.method ?? "")} spec not observed green — green_observed names who observed what`);
-    }
   }
   return out;
 }
@@ -1156,6 +1122,14 @@ export function fieldProblems(
   if (meta.editor === "per-item" && args.items.length > 0) {
     const missing = args.items.filter((i) => !new RegExp(`^- ${escapeRe(i)}: .+`, "m").test(content));
     if (missing.length > 0) out.push(`${name}: unanswered — ${missing.join(" · ")}`);
+  }
+  // CHECKING IS THE CLAIM (owner ruling 2026-08-11): a checklist refuses
+  // while any named item stands unchecked. There is no text to write — the
+  // deliberate click is the record, and an unchecked box is work still owed.
+  if (meta.editor === "checklist" && args.items.length > 0) {
+    const lines = new Set(content.split("\n").map((l) => l.trim()));
+    const unchecked = args.items.filter((i) => !lines.has(`- [x] ${i}`));
+    if (unchecked.length > 0) out.push(`${name}: unchecked — ${unchecked.join(" · ")}`);
   }
   // AN EMPTY SET IS A CLAIM, AND IT IS WRITTEN (2026-08-09). The refs template
   // already rules this — "one line saying none" is a legal answer — because a
