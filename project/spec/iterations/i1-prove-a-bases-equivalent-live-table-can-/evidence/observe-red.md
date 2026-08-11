@@ -1,7 +1,7 @@
 ---
 form: observe-red
 by: agent
-signed_off: 2026-08-11T10:10:47.828Z
+signed_off: 2026-08-11T13:14:56.168Z
 authors: agent
 files:
 ---
@@ -14,13 +14,15 @@ The seven non-test specs — four demonstrations, two inspections, one analysis 
 
 ## red_observed
 
-- [x] tsp-first-run
+- [x] tsp-derivation-analysis
 - [x] tsp-desk-and-gates
-- [x] tsp-tour-run
+- [x] tsp-first-run
+- [x] tsp-hand-walk
 - [x] tsp-panel-walkthrough
 - [x] tsp-prose-inspection
+- [x] tsp-reading-proof-run
 - [x] tsp-record-inspection
-- [x] tsp-derivation-analysis
+- [x] tsp-tour-run
 
 ## follow_up
 
