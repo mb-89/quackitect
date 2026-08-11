@@ -20,6 +20,7 @@ import {
   claimFeeders,
   completeState,
   downstreamCone,
+  INPUT_ROLES,
   type MachineDecl,
   type MachineInstance,
   reopenStates,
@@ -1636,22 +1637,35 @@ export class Session {
 
   /** THE FIRST OWED STATE INSIDE A SUB-MACHINE THAT LIES UPSTREAM OF THE AIM.
    *
-   *  Walks the inbound edges of THIS machine — every state, not only the ones
-   *  carrying a claim — and for each container it meets, asks that machine
-   *  what it still owes. The first answer wins, in the sub-machine's own
-   *  declaration order, so a chart that waits on its finders is named after
-   *  them rather than before. */
+   *  Walks the inbound INPUT edges of THIS machine, and for each container it
+   *  meets, asks that machine what it still owes. The first answer wins, in
+   *  the sub-machine's own declaration order, so a chart that waits on its
+   *  finders is named after them rather than before.
+   *
+   *  INPUT EDGES ONLY (owner emergency ruling 2026-08-11). Every idle door is
+   *  double-headed, and the compiler names each return half alternative.
+   *  Counting those as inbound made the WHOLE machine upstream of the front
+   *  desk, so an aim at the desk descended into whatever record stood open:
+   *  boot marched into i2, parked at a gate, and served the record's reading
+   *  as boot's own. The desk is never behind the work.
+   *
+   *  THE WALK'S OWN CONTAINER STILL ANSWERS. A walk standing inside a record
+   *  keeps finding its owed legs — the container it stands in is asked even
+   *  though no input edge makes it upstream of the aim. That keeps the same
+   *  day's wedge fix: a finished fan leg still learns its owed sibling. */
   private subObjective(decl: MachineDecl, prefix: string, local: string, pass: GreenPass): string | undefined {
     const upstream = new Set<string>();
     const stack = [local];
     while (stack.length > 0) {
       const at = stack.pop() as string;
       for (const src of decl.states) {
-        if (upstream.has(src.id) || !src.edges.some((e) => e.to === at)) continue;
+        if (upstream.has(src.id) || !src.edges.some((e) => e.to === at && INPUT_ROLES.has(e.role ?? "normal"))) continue;
         upstream.add(src.id);
         stack.push(src.id);
       }
     }
+    const here = this.active()[0] ?? "";
+    if (prefix === "" && here.includes("/")) upstream.add(here.split("/")[0]);
     for (const id of upstream) {
       const st = decl.states.find((s) => s.id === id);
       if (st?.submachine === undefined) continue;
@@ -3810,13 +3824,18 @@ export class Session {
     }
     if (sub === undefined) return false;
     const done = new Set(this.recordDone(sub, seen, pass, paint));
-    let provable = false;
     for (const s of sub.states) {
       if (s.evidence_form.length === 0 && s.submachine === undefined) continue;
-      provable = true;
       if (!done.has(s.id)) return false;
     }
-    return provable;
+    // AN EMPTY DRAWING IS VACUOUSLY FINISHED (owner ruling 2026-08-11). Zero
+    // spikes is a sanctioned outcome, and returning provable-only made the
+    // empty spike machine an unmet feeder forever: run-spikes drew grey, the
+    // ripple knocked signed fold-back out of green, the objective pinned on
+    // the standing state and the route to gate-prototype computed empty. The
+    // ripple still guards a vacuous container through its own feeders, and an
+    // UNSEEDED drawing still proves nothing — viewFor throws above.
+    return true;
   }
 
   /** COLLECT THE INPUT ONCE, PROCESS, OUTPUT (owner ruling 2026-08-09,
