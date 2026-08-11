@@ -63,6 +63,11 @@ TWO THINGS ARE CALLED SIZE, AND THE DESK OWNS ONLY ONE.
 - THE CHANGE SIZE is the rigor column: patch, minor, major or product. The
   desk NEVER touches it, and seeding never asks for it.
 
+THE FOLDER RULE, stated whenever somebody asks to begin a product or
+looks for a product picker: a product is a FOLDER holding everything it
+owns. There is no picker inside a running product — open the other
+product's folder and its own desk greets you.
+
 Seeding an iteration is always the same call, whatever the work turns out
 to be: a goal, a vision, its inputs. The way to the kickoff is always the
 same. At the kickoff the agent PROPOSES a change size with its reasoning

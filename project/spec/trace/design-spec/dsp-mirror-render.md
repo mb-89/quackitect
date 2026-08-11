@@ -3,13 +3,13 @@ id: dsp-mirror-render
 type: "[[design-spec]]"
 statement: the one surface a person looks at, carried by a loopback server rendering the machine, the forms, the feed and the tour
 realizes:
-  - el-mirror
-  - if-account-to-mirror
-  - if-front-desk-to-mirror
-  - if-holding-pen-to-mirror
-  - if-method-compiler-to-mirror
-  - if-record-store-to-mirror
-  - if-walk-engine-to-mirror
+  - "el-mirror"
+  - "if-account-to-mirror"
+  - "if-front-desk-to-mirror"
+  - "if-holding-pen-to-mirror"
+  - "if-method-compiler-to-mirror"
+  - "if-record-store-to-mirror"
+  - "if-walk-engine-to-mirror"
 files:
   - "project/deliverable/engine/render.ts"
   - "project/deliverable/engine/mirror.ts"

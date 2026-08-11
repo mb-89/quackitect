@@ -3175,11 +3175,17 @@ export class Session {
     };
   }
 
-  /** A FORM WRITE IS THE ONLY THING THAT CHANGES WHICH CLAIMS STAND, so it is
-   *  the one event the route memo has to hear about. Clearing it here keeps
-   *  the objective honest without making every read recompute green. */
+  /** A WRITE IS WHAT CHANGES WHICH CLAIMS STAND, so it is the one event the
+   *  route memo has to hear about. Clearing it here keeps the objective
+   *  honest without making every read recompute green.
+   *
+   *  THE VERDICT CACHE CLEARS WITH IT. Its key covers the corpus, the body
+   *  and the form — but trace-design's law reads the ENGINE TREE, an input
+   *  no key covers. A dead file deleted after a red verdict served that red
+   *  forever (found 2026-08-11, the walk wedged at a green state). */
   forgetRoute(): void {
     this.routeMemo = undefined;
+    Session.VERDICTS.clear();
   }
 
   formSave(name: string, fields: Record<string, string>, by = "agent", machineId?: string): Record<string, unknown> {
