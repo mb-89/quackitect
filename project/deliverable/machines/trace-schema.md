@@ -46,6 +46,10 @@ edges:
     key: verifies
     to: requirement
     verb: verifies
+  - from: test-spec
+    key: demonstrates
+    to: story
+    verb: demonstrates
   - from: design-spec
     key: realizes
     to: element
@@ -254,6 +258,13 @@ files (or, off software, the protocol documents) that realize it. That
 seam is checked MECHANICALLY and outside the graph — every test file
 referenced by at least one spec, every referenced file existing — so the
 graph stays at spec grain and never blows up to files or cases.
+
+THE DEMONSTRATES EDGE (owner ruling 2026-08-11). A demonstration-method
+spec may also carry `demonstrates:` naming the sty- ids its Procedure
+shows end to end. Every MUST story is named by this key on some
+demonstration spec - the M8 law refuses the validation gate while one
+is not. Running such a spec mints a report in the record, and the
+story's evidence slides cite that report.
 
 A first cut (2026-08-10) derived per-file test nodes from `verified_by`
 addresses written on the requirements. That inverted the edge — the parent

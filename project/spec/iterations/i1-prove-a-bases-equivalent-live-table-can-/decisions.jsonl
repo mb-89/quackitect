@@ -1403,3 +1403,7 @@
 {"ts":"2026-08-11T12:58:05.853Z","op":"update","visit":"iterations/i1/sweep-consistency@0","node":"d31","brief":"the last must deck fills"}
 {"ts":"2026-08-11T12:58:23.051Z","op":"done","visit":"iterations/i1/sweep-consistency@0","node":"d21","brief":"all six must decks filled from the reports"}
 {"ts":"2026-08-11T12:59:06.261Z","op":"done","visit":"iterations/i1/sweep-consistency@0","node":"d20","brief":"six reports minted - three observed, three named owed"}
+{"ts":"2026-08-11T13:00:49.213Z","op":"update","visit":"iterations/i1/author-tests@1","node":"d35","brief":"author-tests recheck: the two new specs join the claim"}
+{"ts":"2026-08-11T13:02:37.291Z","op":"update","visit":"iterations/i1/author-tests@1","node":"d36","brief":"routing around the container wedge to the sweep"}
+{"ts":"2026-08-11T13:03:17.860Z","op":"defer","visit":"iterations/i1/sweep-consistency@0","node":"d22","brief":"the sweep checklist walks","to":"sweep-consistency","hops":1,"trail":["iterations/i1/sweep-consistency","sweep-consistency"]}
+{"ts":"2026-08-11T13:05:21.288Z","op":"update","visit":"iterations/i1/author-tests@1","node":"d37","brief":"reloading to clear the position split-brain"}

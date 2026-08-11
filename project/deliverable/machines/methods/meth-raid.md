@@ -39,7 +39,7 @@ restating the other.
   because a probability nobody measured reads exactly like one somebody
   did.
 
-## Telling the four kinds apart
+## Telling the kinds apart
 
 | kind | what it is | the tell |
 | --- | --- | --- |
@@ -48,6 +48,7 @@ restating the other.
 | issue | has happened, hurts now | present tense |
 | dependency | outside your control, needed | somebody else owns it |
 | decision | chosen and relied on | it can only be superseded |
+| debt | a shortcut taken knowingly, cost deferred | somebody chose it, and it compounds |
 
 A FALSIFIED ASSUMPTION BECOMES AN ISSUE. It has already happened, so it is not
 a risk. Change the kind, keep the id, say so in the body.
@@ -64,7 +65,9 @@ A CREDIBLE DECISION FLIP IS A RISK with its fallback recorded
 - M3 identify-assumptions adds the assumptions the requirements lean on.
 - M5 reverse-sensitivity adds a tripwire per credible flip.
 - M5 record-adrs adds the decisions — every ADR is a register entry.
-- M7 and M8 add what the build and the validation turned up.
+- M7 and M8 add what the build and the validation turned up. The debt
+  taken at gate-implementation stands as kind `debt`, and the gate's
+  debt_taken field references it.
 - Any state may add one the moment it is noticed. Waiting for the right state
   is how an entry is lost.
 
