@@ -74,6 +74,20 @@
   --se-aq-answer: #cfd8dc;
 }
 
+/* THE REGISTER. One colour per entry kind on the exposure chart, and the
+ * ring that marks a picked entry. HUE MARKS KIND, ENCLOSURE MARKS STATE:
+ * the ring is a neutral outline — a saturated ring beside the kind hues
+ * vibrated (owner report 2026-08-10), and the literature marks selection
+ * by enclosure plus desaturating the rest, not by a second hue. */
+:root {
+  --se-reg-risk: #e07b39;
+  --se-reg-assumption: #7cc4e8;
+  --se-reg-issue: #f0879a;
+  --se-reg-dependency: #a8c88f;
+  --se-reg-decision: #c58fe8;
+  --se-reg-pick: #dde3e8;
+}
+
 /* THE STOP. A stronger red than a failure, and it is meant to be: this is
  * the machine refusing to go on, drawn over everything else. */
 :root {

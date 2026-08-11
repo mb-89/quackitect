@@ -7,6 +7,8 @@ owner: the adjudicator
 trigger: any re-score by a second hand
 status: closed
 impact: The 95 standing scores may carry composer bias, and that bias leaves no trace in the numbers. M5 must not converge on them until a second hand re-scores.
+breaks_how_badly: crippling
+how_likely: plausible
 source_refs:
   - iterations/i1 evidence gate-candidates, round_0_verify and verdict
   - M4_30_evaluate-set scores guidance
