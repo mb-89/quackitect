@@ -578,17 +578,18 @@ export function loadTrace(root: string): TraceNode[] {
       type,
       statement: typeof fm.statement === "string" ? fm.statement : "",
       // THE UPWARD EDGE HAS ONE SLOT AND SEVERAL NAMES (owner ruling
-      // 2026-08-07, machines/trace-schema.md). A requirement writes
-      // `refines:` because it breaks its use case into finer grain. A
-      // function writes `satisfies:` because it does not refine a
-      // requirement at all — it is what the system does so the requirement
-      // holds. The relation differs, so the word does.
+      // 2026-08-07, machines/trace-schema.md): refines, satisfies,
+      // implements, verifies — the relation differs, so the word does.
       //
       // The MODEL keeps one slot on purpose. Everything downstream — the
       // wedge walk, the coverage checks, the drawing — asks the same
       // question of every node: what does this serve? Splitting the slot
       // would fork that question per type for no gain.
-      refines: [...asList(fm.refines), ...asList(fm.satisfies)],
+      //
+      // EVERY SCHEMA KEY FOLDS, or its whole level goes invisible: the
+      // elements, the interfaces and the test-specs each shipped with their
+      // key missing here, and none of them drew until somebody looked.
+      refines: [...asList(fm.refines), ...asList(fm.satisfies), ...asList(fm.implements), ...asList(fm.verifies)],
       hay: pairs,
       file,
     });

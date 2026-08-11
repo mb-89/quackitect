@@ -200,6 +200,11 @@ describe("the test-spec law", { concurrency: true }, () => {
     writeFileSync(join(root, "project/deliverable/tests/x.test.ts"), "// a case\n", "utf8");
     mintSpec(root, "tsp-x", "test", ["req-clean"], ["tests/x.test.ts"]);
     assert.deepEqual(authorTestsLawProblems(loadTrace(root)), []);
+    // THE EDGE REACHES THE DRAWN SLOT. verifies folds into refines like
+    // satisfies and implements — a spec with an empty slot has no wedge,
+    // and the whole test slice draws nothing.
+    const spec = loadTrace(root).find((n) => n.id === "tsp-x");
+    assert.deepEqual(spec?.refines, ["req-clean"]);
   });
 
   test("a method mismatch, an unresolved id and an empty files list are each named", () => {
