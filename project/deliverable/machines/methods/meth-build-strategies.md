@@ -5,7 +5,7 @@ statement: "Know the build strategies and let them shape the order. They inform 
 
 ## Situation
 
-Guidance for M7 plan-build. A chunk plan without shape is a pile.
+Guidance for M7 specify-build. A chunk plan without shape is a pile.
 
 The strategies below are LENSES on the same plan, never exclusive
 choices — a good plan usually shows two at once (owner ruling

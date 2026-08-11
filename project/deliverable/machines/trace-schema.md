@@ -46,10 +46,18 @@ edges:
     key: verifies
     to: requirement
     verb: verifies
+  - from: design-spec
+    key: realizes
+    to: element
+    verb: realizes
+  - from: design-spec
+    key: realizes
+    to: interface
+    verb: realizes
 subsegments:
   - id: design
     label: design
-    levels: [function, element, interface]
+    levels: [function, element, interface, design-spec]
   - id: test
     label: tests
     levels: [test-spec]
@@ -62,6 +70,19 @@ which.
 
 An edge not listed here is a defect. Not a warning, not a convention — the
 node is wrong, and the check that reads this file says so.
+
+## A LINK IS A CONTRIBUTION (owner ruling 2026-08-11)
+
+An edge says the child ACTUALLY SERVES the parent. Nothing else earns one.
+
+- Never make up a link to give something a home.
+- A node that contributes to nothing stays visibly unlinked. That is the
+  finding — surface it, discuss it, and usually CUT it.
+- The stance binds every seam, drawn and mechanical alike. A test file
+  claimed by a spec really realizes it. A code file claimed by a design
+  spec really carries that design.
+- "Everything has a place" is not the goal. A thing without a place is
+  cut, not filed.
 
 ## The spine
 
@@ -238,6 +259,26 @@ A first cut (2026-08-10) derived per-file test nodes from `verified_by`
 addresses written on the requirements. That inverted the edge — the parent
 held the mapping — and drew at file grain. Both retired with this ruling;
 `verified_by` is no longer written.
+
+## The design slice ends in design-spec nodes (owner ruling 2026-08-11)
+
+A design-spec is an AUTHORED node ([[design-spec]]), one per design
+concern below the architectural line, written at M7 specify-build. It
+carries the upward edge like every other child: `realizes:` names the
+element or interface ids it details. The graph draws
+element ← design-spec at the design slice's outer edge.
+
+THE FILES ARE REALIZATION, NOT TRACE — the same law as test specs. A
+spec's `files:` names the code it lands in. The seam is checked
+MECHANICALLY and outside the graph, at trace-design:
+
+- every design spec names files that exist
+- every deliverable code file is claimed by at least one spec — the
+  unclaimed list is the dead-code view
+
+The grain is the FILE for now (v1 went finer, with `// design:` region
+markers). Dead code inside a claimed file is invisible at this grain —
+accepted and noted.
 
 ## What this schema does not cover
 

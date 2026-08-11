@@ -16,37 +16,36 @@ legal_tools:
   - se_answer
   - se_test
 evidence:
-  - name: build_planned
-    description: the seeded chunk machine exists and was walked
-  - name: models_adhered
-    description: the build fills the allocated elements - no unsanctioned element
-  - name: red_observed
-    description: every new check failed before the build
-  - name: designs_realized
-    description: every requirement has a realized design
-  - name: verification_green
-    description: the battery passes, all iterations
   - name: quality_ok
-    description: internal quality reviewed
+    template: choice-with-rationale
+    options:
+      - acceptable
+      - not-acceptable
+    description: "internal quality over the mechanical floor — the judgment, with its reason on the line"
+  - name: debt_taken
+    description: "the debt accepted this iteration: one note ref per line, or none with the why. Every quick-and-dirty is a visible backlog note."
   - name: risks_acceptable
-    description: implementation risks judged and folded into the RAID register
+    template: choice-with-rationale
+    options:
+      - acceptable
+      - not-acceptable
+    description: "the implementation risks added or regraded this iteration, judged — name the raid ids in the rationale, or say none moved"
 major: full
 minor: full
 patch: tailored
 product: full
 specification: tailored
 major_note: |
-  Applies in full: built inside the NEW baseline, no unsanctioned
-  element. A red was observed and the designs realized. The battery is green, and quality and
-  risks judged.
+  Applies in full: the machine already proved the mechanics upstream.
+  This gate judges what no law can - internal quality with its debt,
+  and the risks.
 minor_note: |
-  Applies in full: build planned and walked, models adhered, red observed,
-  designs realized for every new requirement, battery green, quality and
-  risks judged. The delivery gate does not scale down.
+  Applies in full: the same two judgments over the delta. The delivery
+  gate does not scale down.
 patch_note: |
-  Tailored to three checks: the battery is green, the reproduction failed
-  first, and the fix stayed inside the allocated elements. The rest of the
-  form assumes a planned build that did not happen here.
+  Tailored: the mechanics are proved upstream even for a patch (the
+  reproduction failed first, the battery is green, the sweep held). The
+  two judgments remain.
 
   ESCALATE: an unsanctioned element in the diff sends the work to major
   through the architecture gate - the same law as at every size.
@@ -61,4 +60,20 @@ specification_note: |
 
 ## Guidance
 
-Review per [[meth-gate-review]]. Models-adhered-to is a matrix check: the build filled the allocated elements and only those; a genuinely-needed new element goes back through the architecture gate.
+Review per [[meth-gate-review]]. FIVE CHECKS LEFT THIS FORM because the
+machine proves them upstream (owner ruling 2026-08-11):
+
+- build planned — the seeded drawing refuses build-steps when absent
+- red observed — observe-red's law, per spec, at its birth
+- designs realized and models adhered — trace-design's sweep, both ways
+- verification green — the battery and the claims table, law-checked
+
+What remains is JUDGMENT. Internal quality per the SyA chapter
+(@ai/sya_kb/digest/sya/22_Driving-Internal-Quality.md): the mechanical
+floor is green by construction; what needs a human-grade eye is the
+DEBT — every quick-and-dirty taken this iteration stands as a visible
+note, listed in debt_taken, and the choice says whether the sum is
+acceptable. Risks the same: what the build added or regraded, judged.
+
+A genuinely-needed new element goes back through the architecture gate,
+as always.

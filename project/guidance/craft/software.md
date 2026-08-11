@@ -6,9 +6,10 @@ applies_to:
   - overhaul
   - run-spikes
   - author-tests
-  - plan-build
+  - specify-build
   - observe-red
   - build-steps
+  - trace-design
   - verification
   - fix-findings
   - gate-implementation

@@ -56,9 +56,11 @@ test("readMatrix: the real matrix is complete", () => {
   // cutting an axis inside evaluate-set means cutting with the totals
   // already visible, which is the poisoning the weights-first order exists
   // to prevent, arriving one step later.
+  // 54 since trace-design (owner ruling 2026-08-11): the design trace's
+  // mechanical half stands between build-steps and verification.
   // 53 since declare-winner (owner ruling 2026-08-10): the selection is
   // recorded on its own state rather than implied by arithmetic.
-  assert.equal(m.rows.length, 53);
+  assert.equal(m.rows.length, 54);
   for (const row of m.rows) {
     for (const col of ALL_COLUMNS) {
       const cell = m.cells.get(row.name)?.get(col);
@@ -89,8 +91,8 @@ test("compileColumn major: every row seeds; the machine validates", () => {
   const m = readRigorMatrix(ROOT);
   const decl = compileColumn(m, "major");
   validateMachine(decl);
-  // 53 rows + the mechanical start.
-  assert.equal(decl.states.length, 54);
+  // 54 rows + the mechanical start.
+  assert.equal(decl.states.length, 55);
   // Only a state that RUNS a machine descends; authoring states do not.
   assert.ok(decl.states.some((s) => s.id === "build-steps" && s.submachine === "build-chunks"));
   assert.ok(decl.states.some((s) => s.id === "run-spikes" && s.submachine === "spikes"));
@@ -148,7 +150,7 @@ test("compileColumn patch: struck states vanish and dependencies contract", () =
   // 19 applied rows + start. identify-assumptions applies at patch too: when a
   // patch exists BECAUSE something stopped holding, that is an assumption
   // turning into an issue, and it is the one case patch-size must record.
-  assert.equal(decl.states.length, 20);
+  assert.equal(decl.states.length, 21);
 });
 
 test("compileColumn: the verification loop compiles as fallback and recovery", () => {
@@ -196,7 +198,7 @@ test("compileColumn minor: the tailoring strikes exactly the M4-M5 exploration",
     assert.ok(!ids.has(struck), `minor should strike ${struck}`);
   }
   // 42 applied rows + start (run-spikes rides rank-unknowns into minor).
-  assert.equal(decl.states.length, 43);
+  assert.equal(decl.states.length, 44);
 });
 
 test("the columns are monotone: what a smaller column walks, every larger column walks", () => {
@@ -224,7 +226,11 @@ test("evidence is frontmatter data: every non-terminal row carries fields", () =
     // own states. Four rows carried a field here that nothing could ever
     // serve, because the walk descends past this state and completes it on
     // the way out.
-    if (row.state_kind !== "gate" && row.runs === undefined) {
+    // A FALLBACK STATE MAY CARRY NONE (owner ruling 2026-08-11): its proof
+    // is the state it recovers re-passing. fix-findings' findings are the
+    // red verifications, generated — a form here would re-ask what the
+    // confirm run answers.
+    if (row.state_kind !== "gate" && row.runs === undefined && row.edge_role !== "fallback") {
       assert.ok(row.evidence_form.length > 0, `${row.name} carries no evidence fields`);
     }
     if (row.runs !== undefined)

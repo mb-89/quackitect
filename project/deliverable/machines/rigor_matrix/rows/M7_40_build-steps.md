@@ -47,11 +47,11 @@ specification_note: |
 
 The placeholder between the red observation and verification.
 
-plan-build seeds the iteration's chunk drawing, and entering this state runs
+specify-build seeds the iteration's chunk drawing, and entering this state runs
 it. One state per chunk, with parallel builders on independent chunks, and
 every fill recorded with its actor.
 
 An unreplaced placeholder FAILS MECHANICALLY. The compiled machine refuses to
 serve this state plain when no drawing was seeded.
 
-Seed the drawing at plan-build, always.
+Seed the drawing at specify-build, always.

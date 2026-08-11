@@ -7,7 +7,13 @@ import { strict as assert } from "node:assert";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, test } from "node:test";
-import { authorTestsLawProblems } from "../engine/stateform.ts";
+import {
+  authorTestsLawProblems,
+  observeRedLawProblems,
+  specifyBuildLawProblems,
+  traceDesignLawProblems,
+  verificationClaimsLawProblems,
+} from "../engine/stateform.ts";
 import { conformance, earsShapeOK, itemTemplate, loadTrace } from "../engine/trace.ts";
 import { freshRoot } from "./helpers.ts";
 
@@ -178,15 +184,27 @@ describe("the requirement template's declared checks", () => {
 });
 
 /** A test-spec node written the way author-tests writes one. */
-function mintSpec(root: string, id: string, method: string, verifies: string[], files: string[]): void {
+function mintSpec(root: string, id: string, method: string, verifies: string[], files: string[], extra: string[] = []): void {
   const dir = join(root, "project/spec/trace/test-spec");
   mkdirSync(dir, { recursive: true });
   const lines = ["---", `id: ${id}`, 'type: "[[test-spec]]"', `statement: ${id} holds`, `method: ${method}`, "verifies:"];
   for (const v of verifies) lines.push(`  - ${v}`);
   lines.push("files:");
   for (const f of files) lines.push(`  - ${f}`);
-  lines.push("---", "");
+  lines.push(...extra, "---", "");
   writeFileSync(join(dir, `${id}.md`), lines.join("\n"), "utf8");
+}
+
+/** A bare typed node — enough for the design laws, which read types and
+ *  frontmatter rather than full conformance. */
+function mintTyped(root: string, folder: string, id: string, type: string, extra: string[] = []): void {
+  const dir = join(root, `project/spec/trace/${folder}`);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(
+    join(dir, `${id}.md`),
+    ["---", `id: ${id}`, `type: "[[${type}]]"`, `statement: ${id} stands`, ...extra, "---", ""].join("\n"),
+    "utf8",
+  );
 }
 
 // THE AUTHOR-TESTS LAW (owner ruling 2026-08-11): test-spec nodes carry the
@@ -229,5 +247,111 @@ describe("the test-spec law", { concurrency: true }, () => {
     mint(root, "req-alone", GOOD);
     const p = authorTestsLawProblems(loadTrace(root)).join(" | ");
     assert.match(p, /req-alone: no test-spec verifies it/);
+  });
+});
+
+// THE SPECIFY-BUILD AND TRACE-DESIGN LAWS (owner ruling 2026-08-11):
+// design-spec nodes carry the realizes edge, every element is realized,
+// files are named before the build and exist after it, and the reverse
+// sweep lists every engine file no spec claims.
+describe("the design-spec law", { concurrency: true }, () => {
+  test("a spec realizes its element, and the law stands silent", () => {
+    const root = freshRoot();
+    mintTyped(root, "element", "el-a", "element");
+    mintTyped(root, "design-spec", "dsp-a", "design-spec", ["realizes:", "  - el-a", "files:", "  - project/deliverable/engine/a.ts"]);
+    assert.deepEqual(specifyBuildLawProblems(loadTrace(root), root), []);
+    // The realizes edge folds into the drawn slot like every schema key.
+    const spec = loadTrace(root).find((n) => n.id === "dsp-a");
+    assert.deepEqual(spec?.refines, ["el-a"]);
+  });
+
+  test("an unrealized element, an unresolved id and an empty files list are each named", () => {
+    const root = freshRoot();
+    mintTyped(root, "element", "el-b", "element");
+    mintTyped(root, "element", "el-lone", "element");
+    mintTyped(root, "design-spec", "dsp-w", "design-spec", ["realizes:", "  - el-b", "  - el-ghost"]);
+    const p = specifyBuildLawProblems(loadTrace(root), root).join(" | ");
+    assert.match(p, /dsp-w: realizes el-ghost, and no element or interface carries that id/);
+    assert.match(p, /dsp-w: a design-spec naming no files/);
+    assert.match(p, /el-lone: no design-spec realizes it/);
+  });
+
+  test("a promoted experiment is assigned to a step of the drawing, or named", () => {
+    const root = freshRoot();
+    mkdirSync(join(root, "project/spec/iterations/itx/machines"), { recursive: true });
+    writeFileSync(
+      join(root, "project/spec/iterations/itx/machines/build-chunks.md"),
+      ["---", "steps:", "  - id: c1", '    statement: "the first chunk"', "---", ""].join("\n"),
+      "utf8",
+    );
+    mintTyped(root, "experiment", "exp-p", "experiment", ["promote: the probe enters"]);
+    let p = specifyBuildLawProblems(loadTrace(root), root).join(" | ");
+    assert.match(p, /exp-p: promoted and unassigned/);
+    mintTyped(root, "experiment", "exp-p", "experiment", ["promote: the probe enters", "chunk: c9"]);
+    p = specifyBuildLawProblems(loadTrace(root), root).join(" | ");
+    assert.match(p, /exp-p: chunk c9 is not a step of the seeded drawing/);
+    mintTyped(root, "experiment", "exp-p", "experiment", ["promote: the probe enters", "chunk: c1"]);
+    assert.deepEqual(specifyBuildLawProblems(loadTrace(root), root), []);
+  });
+
+  test("trace-design names a ghost file and sweeps the unclaimed", () => {
+    // An ISOLATED subroot: freshRoot mirrors the real engine tree, and the
+    // sweep would list a hundred genuinely unclaimed files before stray.ts.
+    const root = join(freshRoot(), "isolated");
+    mkdirSync(join(root, "project/deliverable/engine"), { recursive: true });
+    writeFileSync(join(root, "project/deliverable/engine/real.ts"), "// code\n", "utf8");
+    writeFileSync(join(root, "project/deliverable/engine/stray.ts"), "// nobody claims me\n", "utf8");
+    mintTyped(root, "element", "el-a", "element");
+    mintTyped(root, "design-spec", "dsp-a", "design-spec", [
+      "realizes:",
+      "  - el-a",
+      "files:",
+      "  - project/deliverable/engine/real.ts",
+      "  - project/deliverable/engine/ghost.ts",
+    ]);
+    const p = traceDesignLawProblems(loadTrace(root), root).join(" | ");
+    assert.match(p, /dsp-a: names project\/deliverable\/engine\/ghost\.ts, which does not exist/);
+    assert.match(p, /1 engine files no design-spec claims .*stray\.ts/);
+    assert.doesNotMatch(p, /real\.ts, which does not exist/);
+  });
+});
+
+// THE OBSERVATIONS (owner ruling 2026-08-11): red once at a spec's birth,
+// green per the fresh-eyes verification — both written on the spec node.
+describe("red and green observations", { concurrency: true }, () => {
+  test("a spec without red_observed refuses, and the visible override passes", () => {
+    const root = freshRoot();
+    mintSpec(root, "tsp-new", "test", ["req-clean"], ["tests/x.test.ts"]);
+    const p = observeRedLawProblems(loadTrace(root)).join(" | ");
+    assert.match(p, /tsp-new: red never observed/);
+    const root2 = freshRoot();
+    mintSpec(
+      root2,
+      "tsp-old",
+      "test",
+      ["req-clean"],
+      ["tests/x.test.ts"],
+      ["red_observed: impossible — already implemented at spec birth"],
+    );
+    assert.deepEqual(observeRedLawProblems(loadTrace(root2)), []);
+  });
+
+  test("a non-test spec owes green_observed, a test spec is the battery's", () => {
+    const root = freshRoot();
+    mintSpec(root, "tsp-demo", "demonstration", ["req-clean"], []);
+    mintSpec(root, "tsp-run", "test", ["req-clean"], ["tests/x.test.ts"]);
+    const p = verificationClaimsLawProblems(loadTrace(root)).join(" | ");
+    assert.match(p, /tsp-demo: a demonstration spec not observed green/);
+    assert.doesNotMatch(p, /tsp-run/);
+    const root2 = freshRoot();
+    mintSpec(
+      root2,
+      "tsp-demo2",
+      "demonstration",
+      ["req-clean"],
+      [],
+      ["green_observed: claimed — the tester watched the walkthrough 2026-08-11"],
+    );
+    assert.deepEqual(verificationClaimsLawProblems(loadTrace(root2)), []);
   });
 });

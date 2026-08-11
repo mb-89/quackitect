@@ -22,9 +22,6 @@ legal_tools:
   - se_run
   - se_lint
   - se_git
-evidence:
-  - name: findings_fixed
-    description: every finding and its fix, one pass
 major: full
 minor: full
 patch: full
@@ -53,4 +50,18 @@ specification_note: |
 
 The battery law's fix half ([[meth-test-first]]). FALLBACK from verification while verification_attempts < 3; the recovery edge re-runs verification ONCE. Collect EVERY finding the run surfaced before fixing anything; fix them all; then the single confirm run. When the guard exhausts, the machine escapes to a human.
 
-HOW to find each fault is its own method ([[meth-find-the-fault]]): reproduce first, simplify until only the error remains, bisect the space that holds it, one change per run. For a physical system, reproduce and fix in simulation first.
+NO EVIDENCE OF ITS OWN (owner ruling 2026-08-11). The findings ARE the
+red verifications — a generated list, nothing anyone answers here. The
+proof is the confirm run going green, and verification records that.
+
+THE GATEKEEPER WATCHES THE FIXES ([[meth-verification-discipline]]).
+The same tester that verified stays across the rounds. Show it the
+deltas; never respawn it to reread from zero.
+
+HOW to find each fault is its own method ([[meth-find-the-fault]]):
+
+- reproduce first
+- simplify until only the error remains
+- bisect the space that holds it
+- one change per run
+- for a physical system, reproduce and fix in simulation first
