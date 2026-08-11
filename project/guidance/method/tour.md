@@ -77,6 +77,10 @@ guide.
    continues inside. Nothing is seeded to make this stop work.
    No records yet? Say so plainly. An empty shelf is the honest answer,
    and the front desk is where a newcomer starts filling it.
+6. BACK AT THE DESK. The tour ends where work begins: return to the
+   front desk, show its live offer list, and ask what they want to do.
+   The newcomer leaves the tour able to ask for real work in their own
+   words — that is the tour's exit condition, not the last exhibit.
 
 ## Emphasis
 
