@@ -116,8 +116,9 @@ before, the result is the after, the steps are the bridge.
   - A real command.
   - A real file.
   - A real number.
-- MARK THE KILLERS. A killer story is one the product dies without, and M8
-  demonstrates exactly those end to end.
+- GRADE THE PRIORITY. MoSCoW, the house scale: must | should | could. M8
+  demonstrates every MUST story end to end - a demonstration spec names
+  it, and its run's report fills the slides.
 - `refines` NAMES THE VALUE PROP, and that is the edge the trace graph draws.
   A story with none hangs off nothing and never appears under a proposition.
 

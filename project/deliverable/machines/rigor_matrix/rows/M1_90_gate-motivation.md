@@ -40,7 +40,7 @@ major_note: |
 minor_note: |
   Tailored to the delta: is THIS extension worth having - argued in one
   short exchange, not the full interestingness discussion. The resident
-  vision is axiom and stays out of scope. The killer survives scaled:
+  vision is axiom and stays out of scope. The make-or-break check survives scaled:
   the delta is real and worth building.
 patch_note: |
   Does not apply. The vision axiom is not re-litigated for a behavior fix.

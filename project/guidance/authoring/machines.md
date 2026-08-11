@@ -125,7 +125,7 @@ live): the agent enters a state by itself only when
 `priority <= autonomy`; the human always may, and work INSIDE a state is
 never gated — only entering is. So autonomy 0 is manual mode (the human
 clicks through everything, even mechanical steps), 0.5 is everyday work,
-1 is fully autonomous — at 1 even the killers are the agent's.
+1 is fully autonomous — at 1 even the milestone gates are the agent's.
 
 The scale is UNIFORM — 0.2 per band with a 0.01 floor — and it LIVES in
 machines/scale.md (Obsidian-editable; the engine reads it). Calibrate
@@ -140,7 +140,7 @@ against these anchors, don't invent new bands:
   undo: starting an expedition, choosing which one to continue.
 - **0.6 — consequential.** Hard to undo or shapes what follows: closing
   and merging an expedition, accepting a design.
-- **0.8 — killer / milestone.** The decisions the whole walk exists to
+- **0.8 — milestone.** The decisions the whole walk exists to
   surface. 0.8 does NOT mean "always human" — it means the human holds it
   until they deliberately slide there.
 - **1 — ideation.** No state carries priority 1; it is the slider's last

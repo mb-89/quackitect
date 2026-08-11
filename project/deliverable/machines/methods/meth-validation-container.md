@@ -1,15 +1,42 @@
 ---
 kind: method
-statement: "Validation fills the story: every slide's right side gets its evidence, all stories, all iterations - and executable slices graduate to permanent acceptance scenarios."
+statement: "Validation fills the story: every slide's evidence half, all stories, all iterations - the must stories demonstrated for real, each run minting its report."
 ---
 
 ## Situation
+
 M8. Validation attaches to stories and value props, never to requirements (verification's job, done at M7). The pass lines written at M1 on the needs are what "meets the need" means.
 
 ## Procedure
+
 - Walk every story - this iteration's and every earlier one's: shipping new work must not silently break an old need.
-- Fill each slide's evidence_ref from the shipped system: a run record, a demo, a measurement. A slide that cannot be filled is a finding.
-- Demonstrate the killer use cases for real - a green suite can still miss a whole capability.
+- Fill each slide's evidence half from the shipped system: a run record, a report, a measurement. A slide that cannot be filled is a finding.
+- DEMONSTRATE THE MUST STORIES for real - a green suite can still miss a whole capability. A demonstration-method test-spec names each must story under `demonstrates:`; its Procedure is what runs.
+- EVERY RUN MINTS A REPORT: reports/rpt-<story>.md in the record. The report is the durable run record the slides and the gate cite.
 - Where a validated slice is executable, convert it to an acceptance scenario: that slice of validation becomes verification permanently and the battery carries it from now on.
-- Gaps land in RAID. The gate's bless IS the sign-off - hash-bound, channel-recorded.
-- Market iterations only: the expensive real-world tier (colleague cold-read, physical measurement, pilot) is mandatory here; everyday iterations run the cheap tier only.
+- The gate answers per value prop and per must story; its bless IS the sign-off - hash-bound, channel-recorded.
+- Market iterations only: the real-world tier per [[meth-market-tier]] is mandatory here; everyday iterations run the cheap tier only.
+
+## The report
+
+One demonstration run, recorded. Seed from this fence:
+
+```skeleton
+---
+spec: <the tsp- id whose Procedure ran>
+story: <the sty- id it demonstrates>
+date: <YYYY-MM-DD>
+performed_by: <the role - the driving agent, the owner>
+verdict: <observed working | failed - what broke>
+---
+
+## Observed
+
+<!-- What was watched for and what happened, one line per Procedure step.
+Reference what the observation left behind: a log ref, a screen, a
+measurement. Nothing retold. -->
+```
+
+A demonstration is OBSERVED WORKING end to end, in any discipline: a bench
+run, a walkthrough, a pilot session. The auto-generated form of this note
+is future work; until then run-demos writes it by hand.

@@ -97,6 +97,7 @@ test("compileColumn major: every row seeds; the machine validates", () => {
   assert.ok(decl.states.some((s) => s.id === "build-steps" && s.submachine === "build-chunks"));
   assert.ok(decl.states.some((s) => s.id === "run-spikes" && s.submachine === "spikes"));
   assert.ok(decl.states.some((s) => s.id === "run-candidates" && s.submachine === "candidates"));
+  assert.ok(decl.states.some((s) => s.id === "run-demos" && s.submachine === "demos"));
   // TWO KINDS OF SUBMACHINE, and enumerate-space is the first of the second
   // kind. build-chunks, spikes and candidates are SEEDED — their shape varies
   // per record, so the state above authors the drawing. `finders` is STATIC,
@@ -114,7 +115,7 @@ test("compileColumn major: every row seeds; the machine validates", () => {
   assert.ok(decl.states.some((s) => s.id === "enumerate-space" && s.submachine === "enumerate-space.canvas"));
   assert.ok(
     decl.states.every(
-      (s) => s.submachine === undefined || ["build-steps", "run-spikes", "run-candidates", "enumerate-space"].includes(s.id),
+      (s) => s.submachine === undefined || ["build-steps", "run-spikes", "run-candidates", "run-demos", "enumerate-space"].includes(s.id),
     ),
   );
   const shipped = decl.states.find((s) => s.id === "shipped");
@@ -150,7 +151,9 @@ test("compileColumn patch: struck states vanish and dependencies contract", () =
   // 19 applied rows + start. identify-assumptions applies at patch too: when a
   // patch exists BECAUSE something stopped holding, that is an assumption
   // turning into an issue, and it is the one case patch-size must record.
-  assert.equal(decl.states.length, 21);
+  // log-gaps left the matrix entirely (owner ruling 2026-08-11): gaps ride
+  // the gate's raid_additions, and run-demos does not apply at patch.
+  assert.equal(decl.states.length, 20);
 });
 
 test("compileColumn: the verification loop compiles as fallback and recovery", () => {
@@ -230,7 +233,10 @@ test("evidence is frontmatter data: every non-terminal row carries fields", () =
     // is the state it recovers re-passing. fix-findings' findings are the
     // red verifications, generated — a form here would re-ask what the
     // confirm run answers.
-    if (row.state_kind !== "gate" && row.runs === undefined && row.edge_role !== "fallback") {
+    // A LAW-PROVEN STATE MAY CARRY NONE (owner ruling 2026-08-11):
+    // fill-story-evidence's claim is computed — every slide's evidence half
+    // non-empty — and a field here would re-ask what the law answers.
+    if (row.state_kind !== "gate" && row.runs === undefined && row.edge_role !== "fallback" && row.name !== "fill-story-evidence") {
       assert.ok(row.evidence_form.length > 0, `${row.name} carries no evidence fields`);
     }
     if (row.runs !== undefined)

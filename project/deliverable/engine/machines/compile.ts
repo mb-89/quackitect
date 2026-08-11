@@ -170,7 +170,7 @@ function stateFromElement(machineId: string, root: string, canvasPath: string, e
       throw new MachineCompileError(
         machineId,
         `canvas node ${el.id}`,
-        `${subId}.canvas declares no priority in its frontmatter — every state has one (0.01 mechanical .. 0.8 killer; 1 ideation; above 1 human-only)`,
+        `${subId}.canvas declares no priority in its frontmatter — every state has one (0.01 mechanical .. 0.8 milestone; 1 ideation; above 1 human-only)`,
       );
     }
     // A sub-canvas may carry conditions in its frontmatter (flat keys,
@@ -526,7 +526,11 @@ export function stateFromNote(machineId: string, ref: string, notePath: string, 
   }
   const priority = asPriority(x.priority);
   if (priority === undefined) {
-    throw new MachineCompileError(machineId, ref, "every state carries a priority (frontmatter `priority:` 0.01 mechanical .. 0.8 killer)");
+    throw new MachineCompileError(
+      machineId,
+      ref,
+      "every state carries a priority (frontmatter `priority:` 0.01 mechanical .. 0.8 milestone)",
+    );
   }
   const legalTools = asList(x.legal_tools);
   const repairTools = asList(x.repair_tools);

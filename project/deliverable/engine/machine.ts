@@ -253,7 +253,7 @@ export interface StateDecl {
   /** The concrete slash-name of the form's Follow-up box. */
   follow_up_label?: string;
   /** HUMAN INVOLVEMENT (owner ruling 2026-07-26): the weight of the
-   *  decision to ENTER this state, 0.01 (mechanical) .. 1 (killer). The
+   *  decision to ENTER this state, 0.01 (mechanical) .. 1 (milestone). The
    *  agent may enter only when priority <= the session threshold; the
    *  human always may. Required on every state. */
   priority: number;

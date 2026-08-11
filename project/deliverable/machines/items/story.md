@@ -58,9 +58,11 @@ actor: TODO — the stk- id whose story this is
 refines:
   - TODO — the vp- id this story realizes
 #
-# Does the product die without this pass working? A killer story is
-# demonstrated end to end at M8; the rest are checked more cheaply.
-killer: false
+# MoSCoW, the house scale: must | should | could. A must story is
+# demonstrated end to end at M8: a demonstration-method test-spec names it
+# under demonstrates:, the run gets a report, the report fills the slides.
+# The rest are checked more cheaply.
+priority: TODO — must | should | could
 ---
 
 ## Deck

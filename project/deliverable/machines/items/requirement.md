@@ -192,7 +192,7 @@ breaks_if_removed: TODO — what fails when this row is struck
 breaks_how_badly: TODO — fatal | crippling | corrosive | abrasive | cosmetic
 #
 # The uc- ids this derives from. A cross-cutting quality names every use
-# case whose pass it protects — the killer set at minimum.
+# case whose pass it protects — the must stories' cases at minimum.
 refines:
   - TODO — the uc- id this derives from
 #

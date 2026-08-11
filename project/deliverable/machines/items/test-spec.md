@@ -101,6 +101,12 @@ statement: TODO — the <concern> holds, verified by <method> over <scope>
 #   demonstration — observed working, without instrumented capture
 method: TODO — test | analysis | inspection | demonstration
 #
+# METHOD demonstration only: the sty- ids this procedure demonstrates end
+# to end. Every MUST story is named by this key on some demonstration
+# spec — that is the edge the M8 law checks. Omit for the other methods.
+# demonstrates:
+#   - <the sty- id>
+#
 # THE TRACE EDGE: the req- ids this spec answers for. At least one.
 verifies:
   - TODO — a req- id
