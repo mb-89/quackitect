@@ -136,6 +136,9 @@ export function reservedColours(root: string): string[] {
 export interface StateMeta {
   /** Passed against a demand that has since moved — no longer green. */
   suspect?: boolean;
+  /** A blessed gate — the thumbs-up rides the green (owner ruling
+   *  2026-08-11: green means submitted; green plus thumb means blessed). */
+  blessed?: boolean;
   has_exit: boolean;
   exit_met: boolean;
   has_entry: boolean;
@@ -335,6 +338,9 @@ function svgStateNode(
   const sub = subLabel(meta[sid]?.subtitle);
   parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + (sub !== undefined ? -6 : 6)}" class="label">${esc(sid)}</text>`);
   if (sub !== undefined) parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + 24}" class="sublabel">${esc(sub)}</text>`);
+  if (meta[sid]?.blessed === true) {
+    parts.push(`<text x="${n.x + n.width - 14}" y="${n.y + 26}" class="bless-mark">👍</text>`);
+  }
   parts.push("</g>");
   return parts;
 }
@@ -894,6 +900,7 @@ const STYLE = `
   .clickable:hover .state, .clickable:hover .comment { stroke: var(--se-fg); }
   .label { fill: var(--se-fg); font-size: 26px; text-anchor: middle; font-family: inherit; pointer-events: none; }
   .sublabel { fill: var(--se-muted); font-size: 17px; text-anchor: middle; font-family: inherit; pointer-events: none; }
+  .bless-mark { font-size: 18px; text-anchor: end; pointer-events: none; }
   .edge { stroke: var(--se-dim); stroke-width: 2.5; }
   .arrowhead { fill: var(--se-dim); }
   button.ghost:disabled { opacity: .45; cursor: default; }
@@ -3489,7 +3496,7 @@ function recordComplete(m: MirrorState, d: MachineDecl, rc: Map<string, boolean>
   const known = rc.get(d.id);
   if (known !== undefined) return known;
   rc.set(d.id, false); // a cycle proves nothing
-  const g = green ?? new Set(m.session.recordDone(d));
+  const g = green ?? new Set(m.session.recordPaint(d));
   let provable = false;
   for (const s of d.states) {
     const claimful = s.evidence_form.length > 0;
@@ -3537,7 +3544,11 @@ function drawingSets(
   // ONLY record-backed states PAINT (owner ruling 2026-08-04): the green
   // set is the record's standing claims, which outlive the engine life.
   // Session-walked states elsewhere stay uncoloured, as ruled 2026-07-31.
-  const paint = new Set(m.session.recordDone(decl));
+  // GREEN MEANS SUBMITTED (owner ruling 2026-08-11): the paint uses the
+  // paint-mode green, where a signed gate stands before its bless and the
+  // bless rides as the thumbs-up mark.
+  const paint = new Set(m.session.recordPaint(decl));
+  const blessed = new Set(m.session.blessedGates(decl));
   // DRIFT IS COMPUTED ON THE WAY TO THE SCREEN (owner ruling 2026-08-05):
   // green must mean still green NOW, so the demand diff is recomputed on
   // every look rather than only when a pin is rewritten. It costs one hash
@@ -3567,6 +3578,7 @@ function drawingSets(
   for (const s of decl.states) {
     meta[s.id] = {
       suspect: suspect.has(s.id),
+      ...(blessed.has(s.id) ? { blessed: true } : {}),
       has_exit: s.exit !== undefined,
       exit_met: m.session.conditionMet(decl, s, "leave"),
       has_entry: s.entry !== undefined,
