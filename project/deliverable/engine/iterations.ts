@@ -765,11 +765,17 @@ function generateIterationWalk(root: string, it: Iteration, sid: string): Genera
  *  in-group predecessor; independent states share the row. */
 function groupLayers(m: MachineDecl, groupOf: (s: StateDecl) => string): Map<string, number> {
   const byId = new Map(m.states.map((s) => [s.id, s]));
-  const preds = new Map<string, string[]>();
+  // A RECOVERY EDGE IS THE LOOP'S BACK HALF, never a dependency. Counted, it
+  // made every fallback pair a cycle; the cycle guard cut the walk mid-way and
+  // the half-computed layer got MEMOIZED — fix-findings drew at the top of its
+  // group, rows away from the verification it serves (owner report 2026-08-11).
+  const preds = new Map<string, { id: string; role: string }[]>();
   for (const s of m.states) {
     for (const e of s.edges) {
+      const role = e.role ?? "normal";
+      if (role === "recovery") continue;
       const list = preds.get(e.to) ?? [];
-      list.push(s.id);
+      list.push({ id: s.id, role });
       preds.set(e.to, list);
     }
   }
@@ -782,8 +788,11 @@ function groupLayers(m: MachineDecl, groupOf: (s: StateDecl) => string): Map<str
     const s = byId.get(id);
     let layer = 0;
     for (const p of preds.get(id) ?? []) {
-      const ps = byId.get(p);
-      if (s !== undefined && ps !== undefined && groupOf(ps) === groupOf(s)) layer = Math.max(layer, layerOf(p, visiting) + 1);
+      const ps = byId.get(p.id);
+      if (s === undefined || ps === undefined || groupOf(ps) !== groupOf(s)) continue;
+      // A fallback detour sits BESIDE the state it recovers, so the loop
+      // draws tight: one row, both arrows short.
+      layer = Math.max(layer, layerOf(p.id, visiting) + (p.role === "fallback" ? 0 : 1));
     }
     visiting.delete(id);
     memo.set(id, layer);
@@ -835,7 +844,11 @@ function placeRow(ctx: LayoutCtx, row: StateDecl[], atY: number, inputsOf?: Map<
   }
   const total = sized.reduce((w, x) => w + x.el.width, 0) + LAYOUT.gapX * (sized.length - 1);
   if (want.size > 0) {
-    const byWant = [...sized].sort((a, b) => (want.get(a.s.id) ?? 0) - (want.get(b.s.id) ?? 0));
+    // A wantless node TRAILS the row — sorted first, its x started at the
+    // cursor's negative infinity. A fallback state has no want by construction.
+    const byWant = [...sized].sort(
+      (a, b) => (want.get(a.s.id) ?? Number.POSITIVE_INFINITY) - (want.get(b.s.id) ?? Number.POSITIVE_INFINITY),
+    );
     let cursor = Number.NEGATIVE_INFINITY;
     for (const item of byWant) {
       const w = want.get(item.s.id);

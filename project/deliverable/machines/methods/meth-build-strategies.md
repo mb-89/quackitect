@@ -16,5 +16,29 @@ Guidance for M7 plan-build. A chunk plan without a strategy is a pile: the strat
 - Promoted spike output enters as pre-verified starting chunks ([[meth-expedition-promotion]]) - a strategy that ignores what already exists re-buys it.
 - Record the strategy WITH the plan so the reviewer can judge the order, not only the pieces.
 
+## Parallel strands (integrated flow management)
+
+The strategy names the ORDER. This names the WIDTH: how much of the plan
+can run at once.
+
+- Split the build into LOTS - strands of chunks that can run in parallel.
+- Shape the dependencies so a later lot leans on ideally ONE earlier lot.
+  A lot waiting on three others is a bottleneck drawn in advance.
+- Parallel is not isolated. Strands exchange inputs and updates at NAMED
+  points - a dependency edge in the drawing, never a hallway assumption.
+- The dependency edges ARE the strands: chunks with no path between them
+  fan out to parallel builders; a chain builds in series. Draw the edges
+  first, and the parallelism falls out instead of being asserted.
+- The check before seeding: for every edge, ask what actually FLOWS across
+  it. An edge carrying nothing is dropped; a missing flow is an edge that
+  was forgotten.
+
 ## Sources
-SyA Architecting (walking skeleton) and Testing Tactics (integration strategies), owner-mapped digest @ai/sya_kb.
+
+- SyA Architecting (walking skeleton) and Testing Tactics (integration
+  strategies), owner-mapped digest @ai/sya_kb.
+- Integrated flow management: the SyA business lecture -
+  @ai/sya_kb/kb/content/Integrated Flow management.md (split integration
+  into lots, later lots ideally dependent on one earlier lot, parallelize).
+  The owner recalls the course taught it on an airport build; the slide
+  itself is in SyA_Business.pdf, not text-searchable - primary not seen.

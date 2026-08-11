@@ -6,6 +6,8 @@ state_kind: work
 filled_by: agent
 depends_on:
   - author-tests
+entry_read:
+  - project/deliverable/machines/methods/meth-build-strategies.md
 seeds: build-chunks
 legal_tools:
   - se_file_read

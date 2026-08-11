@@ -8,8 +8,8 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { generateIterations, generateSeeded, itPinRel, itSeed, itSeededRel, pinIteration } from "../engine/iterations.ts";
-import { type MachineDecl, validateMachine } from "../engine/machine.ts";
+import { generateIterations, generateSeeded, itPinRel, itSeed, itSeededRel, pinIteration, pinnedCanvas } from "../engine/iterations.ts";
+import { type MachineDecl, type StateDecl, validateMachine } from "../engine/machine.ts";
 import { type ChangeColumn, compileColumn, readRigorMatrix } from "../engine/rigor-matrix.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
@@ -594,4 +594,57 @@ test("completing a claimful state without its claim refuses, and the walk stands
         ? [sub.instance.current]
         : [];
   assert.ok(after.includes(claimful), "and the walk has not moved");
+});
+
+// The recovery edge made the fallback pair a cycle; the cycle guard cut the
+// walk mid-way and the half-computed layer was memoized, so fix-findings drew
+// rows above the verification it serves (owner report 2026-08-11).
+test("a fallback state rides beside the state it recovers", () => {
+  const work = (id: string, edges: StateDecl["edges"]): StateDecl => ({
+    id,
+    kind: "work",
+    statement: `${id} does its work`,
+    guidance: "",
+    evidence_form: [],
+    priority: 0.2,
+    group: "M7",
+    edges,
+  });
+  const pill = (id: string, kind: "start" | "end", edges: StateDecl["edges"]): StateDecl => ({
+    id,
+    kind,
+    statement: "",
+    guidance: "",
+    evidence_form: [],
+    priority: 0.01,
+    edges,
+  });
+  const m: MachineDecl = {
+    id: "m",
+    reentry: "resume",
+    initial: "start",
+    states: [
+      pill("start", "start", [{ to: "plan", role: "normal" }]),
+      work("plan", [{ to: "verify", role: "normal" }]),
+      // verify stands BEFORE fix on purpose: computing its layer first is
+      // exactly what poisoned the memo through the recovery cycle.
+      work("verify", [
+        { to: "fix", role: "fallback" },
+        { to: "gate", role: "normal" },
+      ]),
+      work("fix", [{ to: "verify", role: "recovery" }]),
+      work("gate", [{ to: "end", role: "normal" }]),
+      pill("end", "end", []),
+    ],
+  };
+  const canvas = pinnedCanvas(m);
+  const at = (id: string): { x: number; y: number; width: number } => {
+    const n = canvas.nodes?.find((n) => n.id === `n-${id}`);
+    assert.ok(n !== undefined, `node n-${id} is drawn`);
+    return n;
+  };
+  assert.equal(at("fix").y, at("verify").y, "the loop draws tight — one row");
+  assert.ok(at("fix").x > at("verify").x + at("verify").width, "the detour trails to the right");
+  assert.ok(Number.isFinite(at("fix").x), "a wantless node lands at the cursor, never at negative infinity");
+  assert.ok(at("gate").y > at("verify").y, "the flow continues below");
 });

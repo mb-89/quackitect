@@ -6,6 +6,8 @@ state_kind: work
 filled_by: agent
 depends_on:
   - gate-prototype
+entry_read:
+  - project/deliverable/machines/methods/meth-test-design.md
 legal_tools:
   - se_file_read
   - se_file_write
