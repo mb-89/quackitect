@@ -1658,9 +1658,33 @@ export class Session {
       const subPrefix = Session.qual(prefix, id);
       const sub = this.declForPrefix(subPrefix);
       if (sub === undefined) continue;
-      const done = new Set(this.recordDone(sub, new Set(), pass));
-      const owed = sub.states.filter((s) => s.evidence_form.length > 0).find((s) => !done.has(s.id));
-      if (owed !== undefined) return Session.qual(subPrefix, owed.id);
+      const owed = this.deepOwed(subPrefix, sub, pass);
+      if (owed !== undefined) return owed;
+    }
+    return undefined;
+  }
+
+  /** THE FIRST OWED CLAIM IN A SUB-MACHINE, HOWEVER DEEP (owner ruling
+   *  2026-08-11). One level was not enough: aimed at the front desk with a
+   *  composer leg owed two containers down, the objective fell back to the
+   *  aim, the branch return could not map it into the leg's machine, and the
+   *  walk stood on a finished leg answering `do` with nowhere to go. Every
+   *  such wedge cost an escape to the desk and a re-aim by hand.
+   *
+   *  Declaration order is walk order in these machines, so the first undone
+   *  claimful state found this way is the same one a person reading the
+   *  drawing would name. A container met on the way is asked the same
+   *  question before the walk moves past it. */
+  private deepOwed(prefix: string, decl: MachineDecl, pass: GreenPass): string | undefined {
+    const done = new Set(this.recordDone(decl, new Set(), pass));
+    for (const s of decl.states) {
+      if (s.evidence_form.length > 0 && !done.has(s.id)) return Session.qual(prefix, s.id);
+      if (s.submachine === undefined) continue;
+      const subPrefix = Session.qual(prefix, s.id);
+      const sub = this.declForPrefix(subPrefix);
+      if (sub === undefined) continue;
+      const nested = this.deepOwed(subPrefix, sub, pass);
+      if (nested !== undefined) return nested;
     }
     return undefined;
   }

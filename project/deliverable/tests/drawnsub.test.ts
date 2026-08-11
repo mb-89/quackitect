@@ -239,6 +239,18 @@ test("a finished sub-machine does NOT paint its container while the container's 
   );
 });
 
+// THE OBJECTIVE DESCENDS HOWEVER DEEP THE WORK HIDES (owner ruling
+// 2026-08-11). Aimed at the desk with a leg owed two containers down, the
+// one-level descent fell back to the aim. The walk then stood on a finished
+// fan leg answering `do` with nowhere to go, and every such wedge cost an
+// escape to the desk and a re-aim by hand.
+test("the route names the owed state deep inside a container, not the aim", async () => {
+  const { session } = await rootWithMajorIteration();
+  const r = session.route("front_desk");
+  assert.notEqual(r.target, "front_desk", "the objective is the owed work, not the aim");
+  assert.match(r.target, /^iterations\/i\d+\//, `it lies inside the iteration — got ${r.target}`);
+});
+
 // THE ROUTE CARRIES THE WHOLE FAN (owner, 2026-08-09). One drawn path named
 // one leg of the three-way join and the walk met the other legs one refusal
 // at a time. The route now reports every unsigned leg of a bar it runs
