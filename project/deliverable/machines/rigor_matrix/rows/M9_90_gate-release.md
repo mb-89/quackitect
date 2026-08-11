@@ -17,8 +17,6 @@ legal_tools:
   - se_answer
   - se_git
 evidence:
-  - name: packaged
-    description: versioned, assembled by script, README and installer and extension in place, the works check on record
   - name: market_block
     description: (market) real-world validation green - blocks the ship only for to-market iterations
     required: false
@@ -49,3 +47,5 @@ specification_note: |
 Review per [[meth-gate-review]]. The retro waits beyond the terminal - its field-feedback question opens the next start. Market iterations: no ship without the real-world checks green.
 
 TWO ROWS WAIT OUTSIDE THE MATRIX (owner ruling 2026-08-11): finalize-docs returns when the emitted book exists, and ship-review returns when the vendoring and dependency-ruling system does. Their gate fields (docs_match, dependencies_ruled) left with them, and handover_accepted folded into the bless itself.
+
+NO packaged FIELD EITHER (owner ruling 2026-08-11): the package state cannot be left until its own claim stands - the ZIP on disk, the works check yes - and this gate depends on that state. Restating it here would be a second copy of a signed claim.

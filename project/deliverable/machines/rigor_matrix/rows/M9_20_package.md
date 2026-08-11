@@ -19,9 +19,14 @@ legal_tools:
   - se_git
 evidence:
   - name: package
-    description: the versioned artifact with its contents listed - README, installer, extension
+    description: the built ZIP - ONE line, the root-relative path to the versioned archive
+    template: file-ref
   - name: works
-    description: the package used for real - what was installed, what was observed, or the honest gap
+    description: the package used for real - does it work? yes passes plainly, no owes its rationale
+    template: choice-with-rationale
+    options: ["yes", "no"]
+    passing: ["yes"]
+    rationale_for: ["no"]
 major: full
 minor: full
 patch: tailored

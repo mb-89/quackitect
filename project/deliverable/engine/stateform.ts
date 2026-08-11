@@ -954,11 +954,29 @@ export function deckLawProblems(fieldName: string, walkContent: string, corpus: 
   return unruled.length > 0 ? [`${fieldName}: ${unruled.length} scenario(s) unruled — ${unruled.join(" · ")}`] : [];
 }
 
+/** A FILE REFERENCE RESOLVES ON DISK, not in the trace (owner ruling
+ *  2026-08-11, cutting the package field over from free-form). Some
+ *  artifacts are files and not nodes — a built package, an exported
+ *  archive — and the only honest resolver for those is the filesystem. */
+function fileRefProblems(name: string, content: string, root?: string): string[] {
+  if (root === undefined) return [];
+  const lines = content
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l !== "");
+  if (lines.some((l) => /^-?\s*none\b/i.test(l))) return [];
+  const paths = lines.map((l) => l.replace(/^-\s*/, "").replace(/\\/g, "/"));
+  if (paths.length === 0) return [`${name}: no file named — one root-relative path per line, or one line saying none`];
+  const missing = paths.filter((p) => !existsSync(join(root, p)));
+  return missing.length > 0 ? [`${name}: no file on disk at — ${missing.join(" · ")}`] : [];
+}
+
 /** A REFERENCE THAT RESOLVES TO NOTHING IS A DEFECT, not a warning. The form
  *  points at standing artifacts, so an id naming no file means the reviewing
  *  gate would follow it and find nothing there. The corpus is absent where it
  *  is not loaded, and then the check stays quiet rather than guessing. */
 function refProblems(name: string, meta: TemplateMeta, args: FieldArgs, content: string, corpus?: TraceNode[], root?: string): string[] {
+  if (meta.resolves === "file") return fileRefProblems(name, content, root);
   if (meta.resolves !== "artifact" || corpus === undefined) return [];
   // A CARD ANSWERS IN ROWS, NOT IN A LIST. Reading it with the list rule
   // found nothing, so the field refused as empty while its own line check
