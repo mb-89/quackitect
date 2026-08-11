@@ -842,8 +842,14 @@ export function authorTestsLawProblems(corpus: { id: string; type: string; file?
 function specEdgeProblems(spec: string, fm: Record<string, unknown>, reqMethod: Map<string, string>, covered: Set<string>): string[] {
   const out: string[] = [];
   const method = String(fm.method ?? "");
-  const verifies = fmList(fm.verifies).filter((l) => !l.trim().startsWith("<!--"));
-  if (verifies.length === 0) out.push(`${spec}: a test-spec verifying nothing — verifies names at least one req- id`);
+  // A DEMONSTRATION SPEC MAY VERIFY NOTHING (owner ruling 2026-08-11):
+  // its upward edge is `demonstrates:` naming the must story it shows end
+  // to end, and the mechanics stay with the sibling test-method specs. A
+  // none-convention line under verifies is honesty, not an id.
+  const verifies = fmList(fm.verifies).filter((l) => !l.trim().startsWith("<!--") && !/^none\b/i.test(l.trim()));
+  const demonstrates = fmList(fm.demonstrates).filter((l) => !l.trim().startsWith("<!--"));
+  if (verifies.length === 0 && demonstrates.length === 0)
+    out.push(`${spec}: a test-spec verifying nothing — verifies names at least one req- id, or demonstrates names the story it shows`);
   for (const raw of verifies) {
     const id = raw.replace(/^\[\[/, "").replace(/\]\]$/, "").trim();
     const m = reqMethod.get(id);
