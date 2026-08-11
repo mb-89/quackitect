@@ -9,8 +9,6 @@ status: open
 breaks_how_badly: corrosive
 how_likely: plausible
 impact: A 4 needs its named comparison to hold; the anchor rule drops an unverified 4 to 3, and the front can shift when a score moves.
-breaks_how_badly: corrosive
-how_likely: plausible
 source_refs:
   - iterations/i1 evidence gate-candidates, round_2_red_team and verdict
   - meth-scoring-anchors

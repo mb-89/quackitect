@@ -11,8 +11,6 @@ how_likely: conceivable
 probe: holds, and the premise is obsolete. Node's own docs give type stripping Stability 2 (Stable) as of v25.2.0 and v24.12.0, on by default since v23.6.0, with --no-strip-types as the opt-out. It is no lon
 probed: 2026-08-07
 impact: Nothing in the lane starts. Not one tool, not the mirror, not the tests — every engine entry point is TypeScript run directly on that flag.
-breaks_how_badly: fatal
-how_likely: conceivable
 source_refs:
   - engine/bin/se-mcp.ts
   - engine/bin/preflight.ts

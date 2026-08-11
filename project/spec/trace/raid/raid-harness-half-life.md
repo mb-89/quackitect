@@ -9,8 +9,6 @@ status: open
 breaks_how_badly: corrosive
 how_likely: expected
 impact: Effort spent on a steering mechanism the model no longer needs is effort spent twice, and the mechanism then has to be removed rather than merely abandoned.
-breaks_how_badly: corrosive
-how_likely: expected
 source_refs:
   - the reading-proof mechanism
   - the narration toll

@@ -9,8 +9,6 @@ status: open
 breaks_how_badly: fatal
 how_likely: plausible
 impact: A machine is a canvas a person edits in Obsidian, and the whole lane runs inside somebody else's agent harness. A breaking change to either stops the walk rather than degrading it.
-breaks_how_badly: fatal
-how_likely: plausible
 source_refs:
   - the machines-are-drawn law in software.md
   - the cage that blocks the native tools

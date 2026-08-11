@@ -9,8 +9,6 @@ status: open
 breaks_how_badly: corrosive
 how_likely: expected
 impact: A pitch built on unmeasured belief collapses the first time somebody asks for the number, and the design decisions resting on it have to be re-argued.
-breaks_how_badly: corrosive
-how_likely: expected
 source_refs:
   - the vision packet's Moore pitch
   - the gap claim in frame-delta

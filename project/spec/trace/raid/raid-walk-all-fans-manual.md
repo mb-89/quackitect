@@ -9,8 +9,6 @@ status: mitigated
 breaks_how_badly: corrosive
 how_likely: conceivable
 impact: The walker chose branches by guess. On 2026-08-07 that sent a walk down an already-finished branch while the unfinished one sat untouched, and the gate ahead would have refused on a feeder nobody had been sent to.
-breaks_how_badly: corrosive
-how_likely: conceivable
 source_refs:
   - engine/route.ts computeRoute
   - engine/machine.ts claimFeeders

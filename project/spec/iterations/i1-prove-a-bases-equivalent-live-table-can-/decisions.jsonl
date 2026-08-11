@@ -1350,3 +1350,7 @@
 {"ts":"2026-08-11T10:42:06.522Z","op":"done","visit":"iterations/i1/verification@0","node":"d4","brief":"the dated derivation analysis stands in the record"}
 {"ts":"2026-08-11T10:42:36.723Z","op":"done","visit":"iterations/i1/verification@0","node":"d5","brief":"the four bare method terms read plainly now"}
 {"ts":"2026-08-11T10:44:42.762Z","op":"update","visit":"iterations/i1/verification@1","node":"d11","brief":"the fix round commits; the gatekeeper gets the deltas"}
+{"ts":"2026-08-11T10:45:23.043Z","op":"update","visit":"iterations/i1/verification@1","node":"d12","brief":"fix-round re-verification: battery restarted, re-reading raid file and new analysis"}
+{"ts":"2026-08-11T10:46:36.656Z","op":"update","visit":"iterations/i1/verification@1","node":"d13","brief":"the confirm run found a second duplicate-key node — sweeping them all"}
+{"ts":"2026-08-11T10:46:59.707Z","op":"update","visit":"iterations/i1/verification@1","node":"d14","brief":"battery still red: 12 raid files carry the duplicate-key pair, listing exact lines"}
+{"ts":"2026-08-11T10:47:16.763Z","op":"update","visit":"iterations/i1/verification@1","node":"d15","brief":"one regex dedupes the twelve doubled grade pairs"}

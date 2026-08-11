@@ -9,8 +9,6 @@ status: open
 breaks_how_badly: crippling
 how_likely: plausible
 impact: The returned axes rejoin the sort, the line is re-cut, and the ranking can move. The failure is collective by construction, never one axis at a time.
-breaks_how_badly: crippling
-how_likely: plausible
 source_refs:
   - iterations/i1 evidence gate-candidates, reasons_hold
   - iterations/i1 evidence cut-criteria
