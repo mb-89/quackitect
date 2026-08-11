@@ -20,6 +20,7 @@ satisfies:
   - req-finding-keeps-its-sources
   - req-no-claim-without-evidence
   - req-comparison-carries-both-sides
+  - req-narration-toll-is-collected
   - req-vendor-page-claim-only
   - req-missing-provider-named
   - req-every-artifact-is-readable-text

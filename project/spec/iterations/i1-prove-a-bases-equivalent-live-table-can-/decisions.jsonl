@@ -1312,3 +1312,24 @@
 {"ts":"2026-08-11T07:40:04.961Z","op":"update","visit":"iterations/i1/author-tests@0","node":"d12","brief":"regenerating the table for the rebless"}
 {"ts":"2026-08-11T07:41:46.879Z","op":"done","visit":"front_desk@0","node":"d7","brief":"all seams zero and every test file claimed"}
 {"ts":"2026-08-11T07:42:10.500Z","op":"update","visit":"iterations/i1/author-tests@0","node":"d13","brief":"checkpointing the backfill"}
+{"ts":"2026-08-11T07:42:40.470Z","op":"plan","visit":"iterations/i1/author-tests@0","parent":null,"nodes":[{"id":"d14","brief":"the files column leaves the checks table"},{"id":"d15","brief":"requirement ids render as clickable links"},{"id":"d16","brief":"scalar reads come back unquoted"},{"id":"d17","brief":"battery"},{"id":"d18","brief":"commit"},{"id":"d19","brief":"reload"},{"id":"d20","brief":"report"}]}
+{"ts":"2026-08-11T09:53:28.368Z","op":"plan","visit":"iterations/i1/generalize-use-cases@0","parent":null,"nodes":[{"id":"d1","brief":"re-bless the rechecked upper-trace states"},{"id":"d2","brief":"walk M7: author-tests through specify-build"},{"id":"d3","brief":"observe-red"},{"id":"d4","brief":"build-steps"},{"id":"d5","brief":"trace-design rounds: specs"},{"id":"d6","brief":"dead code out"},{"id":"d7","brief":"until the sweep is clean"},{"id":"d8","brief":"verification with the fresh-eyes tester, fix-findings as needed"},{"id":"d9","brief":"gate-implementation until pass"},{"id":"d10","brief":"retro, then the end state"}]}
+{"ts":"2026-08-11T09:53:42.375Z","op":"update","visit":"iterations/i1/generalize-use-cases@0","node":"d11","brief":"generalize-use-cases re-lists the register with the three backfills"}
+{"ts":"2026-08-11T09:54:55.754Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d12","brief":"write-requirements rechecks — rebuilding the register list from the corpus"}
+{"ts":"2026-08-11T09:55:29.884Z","op":"update","visit":"iterations/i1/write-requirements@0","node":"d13","brief":"the register re-lists all 173 rows and re-submits"}
+{"ts":"2026-08-11T09:56:10.579Z","op":"update","visit":"iterations/i1/derive-functions@0","node":"d14","brief":"derive-functions: mapping the tree against the 20 backfilled rows"}
+{"ts":"2026-08-11T09:58:06.385Z","op":"update","visit":"iterations/i1/derive-functions@0","node":"d15","brief":"the PiP to-do idea is noted; the function tree grows for the backfill"}
+{"ts":"2026-08-11T09:58:44.655Z","op":"obsolete","visit":"iterations/i1/generalize-use-cases@0","node":"d7","brief":"folded into the trace-design rounds item — a split artifact"}
+{"ts":"2026-08-11T09:59:50.003Z","op":"update","visit":"iterations/i1/decompose-structure@0","node":"d16","brief":"decompose-structure: allocating the new register function"}
+{"ts":"2026-08-11T10:00:10.198Z","op":"update","visit":"iterations/i1/decompose-structure@0","node":"d17","brief":"el-mirror implements the register function"}
+{"ts":"2026-08-11T10:02:07.311Z","op":"update","visit":"iterations/i1/specify-build@0","node":"d18","brief":"specify-build opens — inventorying the engine for the spec partition"}
+{"ts":"2026-08-11T10:03:24.627Z","op":"update","visit":"iterations/i1/specify-build@0","node":"d19","brief":"authoring the seventeen design specs"}
+{"ts":"2026-08-11T10:05:35.357Z","op":"update","visit":"iterations/i1/specify-build@0","node":"d20","brief":"the drawing carries the promoted chunk"}
+{"ts":"2026-08-11T10:07:40.672Z","op":"done","visit":"iterations/i1/generalize-use-cases@0","node":"d1","brief":"every upper-trace recheck re-blessed — the walk stands in M7"}
+{"ts":"2026-08-11T10:09:52.987Z","op":"update","visit":"iterations/i1/specify-build@0","node":"d21","brief":"probing why the signed specify-build claim stays grey"}
+{"ts":"2026-08-11T10:10:25.205Z","op":"update","visit":"iterations/i1/specify-build@0","node":"d22","brief":"the two clobbered cells are repaired with the real lists"}
+{"ts":"2026-08-11T10:10:47.678Z","op":"done","visit":"iterations/i1/generalize-use-cases@0","node":"d3","brief":"observe-red checked off — seven claim specs, impossibility accepted"}
+{"ts":"2026-08-11T10:11:17.649Z","op":"done","visit":"iterations/i1/generalize-use-cases@0","node":"d4","brief":"the promoted chunk records its standing realization"}
+{"ts":"2026-08-11T10:11:48.257Z","op":"update","visit":"iterations/i1/trace-design@0","node":"d23","brief":"trace-design opens — the liveness sweep runs before any claim"}
+{"ts":"2026-08-11T10:13:30.417Z","op":"update","visit":"iterations/i1/trace-design@0","node":"d24","brief":"reachability clean: 100 of 100 engine files live — syncing the record with trunk"}
+{"ts":"2026-08-11T10:13:57.662Z","op":"update","visit":"iterations/i1/trace-design@0","node":"d25","brief":"record checkpoint before the trunk sync"}

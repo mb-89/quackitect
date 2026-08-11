@@ -7,7 +7,8 @@ import { strict as assert } from "node:assert";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, test } from "node:test";
-import { authorTestsLawProblems } from "../engine/stateform.ts";
+import type { StateDecl } from "../engine/machine.ts";
+import { authorTestsLawProblems, claimProblems, specifyBuildLawProblems, traceDesignLawProblems } from "../engine/stateform.ts";
 import { conformance, earsShapeOK, itemTemplate, loadTrace } from "../engine/trace.ts";
 import { freshRoot } from "./helpers.ts";
 
@@ -178,15 +179,27 @@ describe("the requirement template's declared checks", () => {
 });
 
 /** A test-spec node written the way author-tests writes one. */
-function mintSpec(root: string, id: string, method: string, verifies: string[], files: string[]): void {
+function mintSpec(root: string, id: string, method: string, verifies: string[], files: string[], extra: string[] = []): void {
   const dir = join(root, "project/spec/trace/test-spec");
   mkdirSync(dir, { recursive: true });
   const lines = ["---", `id: ${id}`, 'type: "[[test-spec]]"', `statement: ${id} holds`, `method: ${method}`, "verifies:"];
   for (const v of verifies) lines.push(`  - ${v}`);
   lines.push("files:");
   for (const f of files) lines.push(`  - ${f}`);
-  lines.push("---", "");
+  lines.push(...extra, "---", "");
   writeFileSync(join(dir, `${id}.md`), lines.join("\n"), "utf8");
+}
+
+/** A bare typed node — enough for the design laws, which read types and
+ *  frontmatter rather than full conformance. */
+function mintTyped(root: string, folder: string, id: string, type: string, extra: string[] = []): void {
+  const dir = join(root, `project/spec/trace/${folder}`);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(
+    join(dir, `${id}.md`),
+    ["---", `id: ${id}`, `type: "[[${type}]]"`, `statement: ${id} stands`, ...extra, "---", ""].join("\n"),
+    "utf8",
+  );
 }
 
 // THE AUTHOR-TESTS LAW (owner ruling 2026-08-11): test-spec nodes carry the
@@ -229,5 +242,100 @@ describe("the test-spec law", { concurrency: true }, () => {
     mint(root, "req-alone", GOOD);
     const p = authorTestsLawProblems(loadTrace(root)).join(" | ");
     assert.match(p, /req-alone: no test-spec verifies it/);
+  });
+});
+
+// THE SPECIFY-BUILD AND TRACE-DESIGN LAWS (owner ruling 2026-08-11):
+// design-spec nodes carry the realizes edge, every element is realized,
+// files are named before the build and exist after it, and the reverse
+// sweep lists every engine file no spec claims.
+describe("the design-spec law", { concurrency: true }, () => {
+  test("a spec realizes its element, and the law stands silent", () => {
+    const root = freshRoot();
+    mintTyped(root, "element", "el-a", "element");
+    mintTyped(root, "design-spec", "dsp-a", "design-spec", ["realizes:", "  - el-a", "files:", "  - project/deliverable/engine/a.ts"]);
+    assert.deepEqual(specifyBuildLawProblems(loadTrace(root), root), []);
+    // The realizes edge folds into the drawn slot like every schema key.
+    const spec = loadTrace(root).find((n) => n.id === "dsp-a");
+    assert.deepEqual(spec?.refines, ["el-a"]);
+  });
+
+  test("an unrealized element, an unresolved id and an empty files list are each named", () => {
+    const root = freshRoot();
+    mintTyped(root, "element", "el-b", "element");
+    mintTyped(root, "element", "el-lone", "element");
+    mintTyped(root, "design-spec", "dsp-w", "design-spec", ["realizes:", "  - el-b", "  - el-ghost"]);
+    const p = specifyBuildLawProblems(loadTrace(root), root).join(" | ");
+    assert.match(p, /dsp-w: realizes el-ghost, and no element or interface carries that id/);
+    assert.match(p, /dsp-w: a design-spec naming no files/);
+    assert.match(p, /el-lone: no design-spec realizes it/);
+  });
+
+  test("a promoted experiment is assigned to a step of the drawing, or named", () => {
+    const root = freshRoot();
+    mkdirSync(join(root, "project/spec/iterations/itx/machines"), { recursive: true });
+    writeFileSync(
+      join(root, "project/spec/iterations/itx/machines/build-chunks.md"),
+      ["---", "steps:", "  - id: c1", '    statement: "the first chunk"', "---", ""].join("\n"),
+      "utf8",
+    );
+    mintTyped(root, "experiment", "exp-p", "experiment", ["promote: the probe enters"]);
+    let p = specifyBuildLawProblems(loadTrace(root), root).join(" | ");
+    assert.match(p, /exp-p: promoted and unassigned/);
+    mintTyped(root, "experiment", "exp-p", "experiment", ["promote: the probe enters", "chunk: c9"]);
+    p = specifyBuildLawProblems(loadTrace(root), root).join(" | ");
+    assert.match(p, /exp-p: chunk c9 is not a step of the seeded drawing/);
+    mintTyped(root, "experiment", "exp-p", "experiment", ["promote: the probe enters", "chunk: c1"]);
+    assert.deepEqual(specifyBuildLawProblems(loadTrace(root), root), []);
+  });
+
+  test("trace-design names a ghost file and sweeps the unclaimed", () => {
+    // An ISOLATED subroot: freshRoot mirrors the real engine tree, and the
+    // sweep would list a hundred genuinely unclaimed files before stray.ts.
+    const root = join(freshRoot(), "isolated");
+    mkdirSync(join(root, "project/deliverable/engine"), { recursive: true });
+    writeFileSync(join(root, "project/deliverable/engine/real.ts"), "// code\n", "utf8");
+    writeFileSync(join(root, "project/deliverable/engine/stray.ts"), "// nobody claims me\n", "utf8");
+    mintTyped(root, "element", "el-a", "element");
+    mintTyped(root, "design-spec", "dsp-a", "design-spec", [
+      "realizes:",
+      "  - el-a",
+      "files:",
+      "  - project/deliverable/engine/real.ts",
+      "  - project/deliverable/engine/ghost.ts",
+    ]);
+    const p = traceDesignLawProblems(loadTrace(root), root).join(" | ");
+    assert.match(p, /dsp-a: names project\/deliverable\/engine\/ghost\.ts, which does not exist/);
+    assert.match(p, /1 engine files no design-spec claims .*stray\.ts/);
+    assert.doesNotMatch(p, /real\.ts, which does not exist/);
+  });
+});
+
+describe("the checklist field", { concurrency: true }, () => {
+  // CHECKING IS THE CLAIM (owner ruling 2026-08-11): a checklist field
+  // refuses while any named item stands unchecked. The observation tables
+  // at observe-red and verification ride this — no text, one deliberate
+  // click per row.
+  test("an unchecked item is named, and all-checked stands silent", () => {
+    const root = freshRoot();
+    const s = {
+      id: "s",
+      kind: "work",
+      statement: "",
+      guidance: "",
+      priority: 0.2,
+      edges: [],
+      evidence_form: [
+        { name: "quality", template: "checklist", items: ["boxes stay layered", "debt is visible"], required: true, description: "" },
+      ],
+    } as unknown as StateDecl;
+    const owed = "## quality\n\n- [x] boxes stay layered\n- [ ] debt is visible\n";
+    const p = claimProblems(root, s, owed, []).join(" | ");
+    assert.match(p, /quality: unchecked — debt is visible/);
+    const done = "## quality\n\n- [x] boxes stay layered\n- [x] debt is visible\n";
+    assert.deepEqual(
+      claimProblems(root, s, done, []).filter((x) => x.includes("unchecked")),
+      [],
+    );
   });
 });

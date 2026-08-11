@@ -15,6 +15,7 @@ checks:
       - issue
       - dependency
       - decision
+      - debt
   - field: status
     one_of:
       - open
@@ -87,7 +88,7 @@ checks:
     hint: a decision names what forced it — at least one id or link in source_refs
 ---
 
-# raid — one risk, assumption, issue, dependency, or decision
+# raid — one risk, assumption, issue, dependency, decision, or debt
 
 Lives in `project/spec/trace/raid/`. A STANDING ARTIFACT, exactly like a
 requirement: it outlives the iteration that recorded it, lands on trunk when
@@ -97,7 +98,7 @@ THE REGISTER IS A VIEW over these nodes, never their home. Filtering the same
 folder by kind is how one source serves the project chapter and the
 design-input chapter at once.
 
-## The five kinds, and how to tell them apart
+## The six kinds, and how to tell them apart
 
 | kind | what it is | the tell |
 | --- | --- | --- |
@@ -106,6 +107,17 @@ design-input chapter at once.
 | issue | something that HAS happened and is hurting now | it is present tense |
 | dependency | something outside your control that you need | somebody else owns it |
 | decision | a choice made and relied on | it was decided — it can only be superseded |
+| debt | quality traded for speed, consciously | you chose it, and it stays until repaid |
+
+## Debt is the sixth kind (owner ruling 2026-08-11)
+
+Every conscious quick-and-dirty becomes an entry of kind `debt`, graded
+like the rest. DEBT IS VISIBLE OR IT IS LYING ([[meth-internal-quality]]).
+
+- The `trigger` is the payback condition — debt without one is filed
+  and forgotten.
+- `mitigated` means repaid; `accepted` means lived with, on the record.
+- The implementation gate lists what the iteration took, in debt_taken.
 
 AN ADR IS NOT ITS OWN KIND OF THING (owner ruling 2026-08-10). It is a
 decision whose damage grade is high — crippling or worse. The decisions
@@ -146,7 +158,7 @@ test.
 
 - `id` — `raid-<slug>`.
 - `type` — `"[[raid]]"`.
-- `kind` — risk, assumption, issue or dependency.
+- `kind` — risk, assumption, issue, dependency, decision or debt.
 - `statement` — one sentence, plainly. What is at stake, not how you feel
   about it.
 - `owner` — a ROLE, never a person. Who watches it.

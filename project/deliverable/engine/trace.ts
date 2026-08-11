@@ -589,7 +589,7 @@ export function loadTrace(root: string): TraceNode[] {
       // EVERY SCHEMA KEY FOLDS, or its whole level goes invisible: the
       // elements, the interfaces and the test-specs each shipped with their
       // key missing here, and none of them drew until somebody looked.
-      refines: [...asList(fm.refines), ...asList(fm.satisfies), ...asList(fm.implements), ...asList(fm.verifies)],
+      refines: [...asList(fm.refines), ...asList(fm.satisfies), ...asList(fm.implements), ...asList(fm.verifies), ...asList(fm.realizes)],
       hay: pairs,
       file,
     });

@@ -6,6 +6,8 @@ state_kind: work
 filled_by: agent
 depends_on:
   - author-tests
+entry_read:
+  - project/deliverable/machines/methods/meth-build-strategies.md
 seeds: build-chunks
 legal_tools:
   - se_file_read
@@ -70,5 +72,5 @@ A promoted spike enters as a pre-verified starting chunk.
 A monolithic build is lost on interruption. Small chunks make progress
 durable.
 
-Name the build STRATEGY with the plan ([[meth-build-strategies]]). The chosen
-strategy orders the chunks.
+The strategies inform the order, several at once ([[meth-build-strategies]]).
+Nothing enforces a pick; the plan records which lenses shaped it.

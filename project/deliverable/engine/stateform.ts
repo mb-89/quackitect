@@ -445,6 +445,10 @@ function resolveSource(i: string, root: string, traceRoot: string, instanceRaw?:
   if (i === "$experiments") return typedItems(traceRoot, "experiment");
   if (i === "$requirements") return typedItems(traceRoot, "requirement");
   if (i === "$test-specs") return typedItems(traceRoot, "test-spec");
+  if (i === "$design-specs") return typedItems(traceRoot, "design-spec");
+  if (i === "$promotions") return promotionItems(traceRoot);
+  if (i === "$claim-specs") return claimSpecItems(traceRoot);
+  if (i === "$iq_checklist") return catalogItems(root, "iq_checklist");
   if (i === "$candidates") return candidateItems(traceRoot);
   // THE CATALOGUES. A known set is never typed from memory and never hard
   // coded — it is read from the method card that holds it, so editing the card
@@ -627,7 +631,139 @@ function stateLawProblems(root: string, s: StateDecl, nodes: TraceNode[]): strin
   const out: string[] = [];
   if (s.id.endsWith("gate-prototype")) out.push(...assumptionLawProblems(nodes, catalogItems(root, "damage_levels")));
   if (s.id.endsWith("author-tests")) out.push(...authorTestsLawProblems(nodes));
+  if (s.id.endsWith("specify-build")) out.push(...specifyBuildLawProblems(nodes, root));
+  if (s.id.endsWith("trace-design")) out.push(...traceDesignLawProblems(nodes, root));
   return out;
+}
+
+/** THE SPECIFY-BUILD LAW (owner ruling 2026-08-11): the design below the
+ *  line is defined spec-first as design-spec nodes, the same shape as
+ *  author-tests — and every promoted spike is assigned to a step.
+ *
+ *  Files are NAMED, not existing: a spec is written before its code
+ *  lands. Existence and the dead-code sweep get teeth at trace-design. */
+export function specifyBuildLawProblems(corpus: { id: string; type: string; file?: string }[], recordRoot: string): string[] {
+  return [...designCoverageProblems(corpus), ...promotionAssignmentProblems(corpus, recordRoot)];
+}
+
+/** The coverage half, shared with trace-design: edges resolve, every
+ *  element and interface realized, every spec names files. */
+function designCoverageProblems(corpus: { id: string; type: string; file?: string }[]): string[] {
+  const out: string[] = [];
+  const targets = new Set<string>();
+  for (const n of corpus) if (n.type === "element" || n.type === "interface") targets.add(n.id);
+  const covered = new Set<string>();
+  for (const n of corpus) {
+    if (n.type !== "design-spec" || n.file === undefined) continue;
+    const fm = noteOf(n.file)?.frontmatter ?? {};
+    const realizes = fmList(fm.realizes).filter((l) => !l.trim().startsWith("<!--"));
+    if (realizes.length === 0) out.push(`${n.id}: a design-spec realizing nothing — realizes names at least one element or interface id`);
+    for (const raw of realizes) {
+      const id = raw.replace(/^\[\[/, "").replace(/\]\]$/, "").trim();
+      if (!targets.has(id)) {
+        out.push(`${n.id}: realizes ${id}, and no element or interface carries that id`);
+        continue;
+      }
+      covered.add(id);
+    }
+    const files = fmList(fm.files).filter((l) => !l.trim().startsWith("<!--") && !/^none\b/i.test(l.trim()));
+    if (files.length === 0) out.push(`${n.id}: a design-spec naming no files — name the code it lands in, planned names included`);
+  }
+  for (const t of targets) {
+    if (!covered.has(t)) out.push(`${t}: no design-spec realizes it — the design below the line is specified before the build`);
+  }
+  return out;
+}
+
+/** The step ids of the record's seeded chunk drawing, or undefined when
+ *  none is seeded yet — assignment against no drawing checks names only. */
+function seededStepIds(recordRoot: string): Set<string> | undefined {
+  const dir = join(recordRoot, "project", "spec", "iterations");
+  try {
+    for (const e of readdirSync(dir)) {
+      const abs = join(dir, e, "machines", "build-chunks.md");
+      if (!existsSync(abs)) continue;
+      const fm = noteOf(abs)?.frontmatter ?? {};
+      const raw = Array.isArray(fm.steps) ? fm.steps : Array.isArray(fm.chunks) ? fm.chunks : [];
+      return new Set(raw.map((c) => String((c as Record<string, unknown>)?.id ?? "")).filter((x) => x !== ""));
+    }
+  } catch {
+    return undefined;
+  }
+  return undefined;
+}
+
+/** Promotions are a filter, never a list — and none may be lost: every
+ *  promoted experiment carries `chunk:` naming its step in the drawing. */
+function promotionAssignmentProblems(corpus: { id: string; type: string; file?: string }[], recordRoot: string): string[] {
+  const out: string[] = [];
+  const steps = seededStepIds(recordRoot);
+  for (const n of corpus) {
+    if (n.type !== "experiment" || n.file === undefined) continue;
+    const fm = noteOf(n.file)?.frontmatter ?? {};
+    const p = String(fm.promote ?? "").trim();
+    if (p === "" || /^none\b/i.test(p)) continue;
+    const chunk = String(fm.chunk ?? "").trim();
+    if (chunk === "") {
+      out.push(`${n.id}: promoted and unassigned — chunk names the step of the seeded drawing it enters as`);
+      continue;
+    }
+    if (steps !== undefined && !steps.has(chunk)) out.push(`${n.id}: chunk ${chunk} is not a step of the seeded drawing`);
+  }
+  return out;
+}
+
+/** THE TRACE-DESIGN LAW (owner ruling 2026-08-11): the mechanical half
+ *  of the design trace, after the build. Coverage again, existence now,
+ *  and the dead-code sweep — file grain: every engine file claimed by a
+ *  spec, and the unclaimed list is the finding. */
+export function traceDesignLawProblems(corpus: { id: string; type: string; file?: string }[], recordRoot: string): string[] {
+  const out = designCoverageProblems(corpus);
+  const claimed = new Set<string>();
+  for (const n of corpus) {
+    if (n.type !== "design-spec" || n.file === undefined) continue;
+    const fm = noteOf(n.file)?.frontmatter ?? {};
+    for (const raw of fmList(fm.files)) {
+      const f = raw.trim();
+      if (f.startsWith("<!--") || /^none\b/i.test(f)) continue;
+      claimed.add(f.replace(/\\/g, "/"));
+      if (!existsSync(join(recordRoot, f))) out.push(`${n.id}: names ${f}, which does not exist`);
+    }
+  }
+  const unclaimed = unclaimedEngineFiles(recordRoot, claimed);
+  if (unclaimed.length > 0) {
+    const shown = unclaimed.slice(0, 12).join(" · ");
+    out.push(`${unclaimed.length} engine files no design-spec claims — the dead-code view: ${shown}${unclaimed.length > 12 ? " · …" : ""}`);
+  }
+  return out;
+}
+
+/** The reverse sweep's subject: every .ts under the engine, as
+ *  root-relative forward-slash paths. Tests live outside — the test-spec
+ *  sweep claims those. */
+function unclaimedEngineFiles(recordRoot: string, claimed: Set<string>): string[] {
+  const base = join(recordRoot, "project", "deliverable", "engine");
+  const out: string[] = [];
+  const walk = (d: string, rel: string): void => {
+    let entries: import("node:fs").Dirent[];
+    try {
+      entries = readdirSync(d, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const e of entries) {
+      const r = rel === "" ? e.name : `${rel}/${e.name}`;
+      if (e.isDirectory()) {
+        walk(join(d, e.name), r);
+        continue;
+      }
+      if (!e.name.endsWith(".ts")) continue;
+      const full = `project/deliverable/engine/${r}`;
+      if (!claimed.has(full)) out.push(full);
+    }
+  };
+  walk(base, "");
+  return out.sort();
 }
 
 /** THE AUTHOR-TESTS LAW (owner ruling 2026-08-11): verification is defined
@@ -986,6 +1122,14 @@ export function fieldProblems(
   if (meta.editor === "per-item" && args.items.length > 0) {
     const missing = args.items.filter((i) => !new RegExp(`^- ${escapeRe(i)}: .+`, "m").test(content));
     if (missing.length > 0) out.push(`${name}: unanswered — ${missing.join(" · ")}`);
+  }
+  // CHECKING IS THE CLAIM (owner ruling 2026-08-11): a checklist refuses
+  // while any named item stands unchecked. There is no text to write — the
+  // deliberate click is the record, and an unchecked box is work still owed.
+  if (meta.editor === "checklist" && args.items.length > 0) {
+    const lines = new Set(content.split("\n").map((l) => l.trim()));
+    const unchecked = args.items.filter((i) => !lines.has(`- [x] ${i}`));
+    if (unchecked.length > 0) out.push(`${name}: unchecked — ${unchecked.join(" · ")}`);
   }
   // AN EMPTY SET IS A CLAIM, AND IT IS WRITTEN (2026-08-09). The refs template
   // already rules this — "one line saying none" is a legal answer — because a
@@ -1463,6 +1607,28 @@ export function candidateItems(traceRoot: string): string[] {
   return typedItems(traceRoot, "candidate");
 }
 
+/** $claim-specs, resolved live: the specs no run can prove — every
+ *  method but test. Verification observes these green by fresh eyes. */
+function claimSpecItems(traceRoot: string): string[] {
+  return traceFolder(traceRoot, "test-spec")
+    .filter((n) => String(n.fm.method ?? "") !== "test")
+    .map((n) => n.id)
+    .sort();
+}
+
+/** $promotions, resolved live: the experiments whose `promote:` names
+ *  something entering the build. PROMOTIONS ARE A FILTER, NEVER A LIST
+ *  (M6 fold-back): an experiment saying none is honestly absent here. */
+function promotionItems(traceRoot: string): string[] {
+  return traceFolder(traceRoot, "experiment")
+    .filter((n) => {
+      const p = String(n.fm.promote ?? "").trim();
+      return p !== "" && !/^none\b/i.test(p);
+    })
+    .map((n) => n.id)
+    .sort();
+}
+
 function typedItems(traceRoot: string, type: string): string[] {
   try {
     return loadTrace(traceRoot)
@@ -1609,7 +1775,7 @@ export function nodeField(file: string, key: string): string {
     // is prose, and reading prose as a value is how a field silently fills.
     const end = lines.indexOf("---", 1);
     const hit = lines.slice(0, end < 0 ? lines.length : end).find((l) => l.startsWith(`${key}:`));
-    return hit === undefined ? "" : hit.slice(key.length + 1).trim();
+    return hit === undefined ? "" : unquote(hit.slice(key.length + 1).trim());
   } catch {
     return "";
   }

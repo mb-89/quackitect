@@ -10,6 +10,11 @@ satisfies:
   - req-boot-stands-agentless
   - req-engine-port-fallback
   - req-mirror-stays-on-the-machine
+  - req-reader-keeps-their-place
+  - req-every-update-reaches-the-render
+  - req-colors-are-configuration
+  - req-decision-graph-reads-as-branches
+  - req-controls-draw-from-their-spec
 inputs:
   - flow-position
   - flow-trace-graph

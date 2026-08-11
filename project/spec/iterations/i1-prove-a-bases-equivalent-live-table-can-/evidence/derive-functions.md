@@ -1,7 +1,7 @@
 ---
 form: derive-functions
 by: agent
-signed_off: 2026-08-08T14:03:19.975Z
+signed_off: 2026-08-11T09:58:44.805Z
 reopened: "2026-08-07T16:35:13.649Z — hold-the-work carried the whole record lifecycle; the owner ruled it means holding work so the walk can be left and resumed"
 authors: agent
 files:
@@ -17,23 +17,24 @@ The register is large and the vocabulary is uneven, because it grew use case by 
 
 ## functions
 
-- fn-run-a-governed-walk
-- fn-run-a-governed-walk.serve-a-step
-- fn-run-a-governed-walk.hold-the-method
-- fn-run-a-governed-walk.keep-the-record
-- fn-run-a-governed-walk.hold-a-stray
-- fn-run-a-governed-walk.judge-a-claim
-- fn-run-a-governed-walk.route-the-work
-- fn-run-a-governed-walk.hold-the-work
-- fn-run-a-governed-walk.land-the-work
-- fn-run-a-governed-walk.close-a-record
-- fn-run-a-governed-walk.keep-the-archive
-- fn-run-a-governed-walk.diverge-before-deciding
-- fn-run-a-governed-walk.answer-with-tests
-- fn-run-a-governed-walk.catch-the-system-up
-- fn-run-a-governed-walk.show-where-it-stands
-- fn-run-a-governed-walk.stand-up-a-product
-- fn-run-a-governed-walk.teach-the-newcomer
+- [[fn-run-a-governed-walk]]
+- [[fn-run-a-governed-walk.answer-with-tests]]
+- [[fn-run-a-governed-walk.catch-the-system-up]]
+- [[fn-run-a-governed-walk.close-a-record]]
+- [[fn-run-a-governed-walk.diverge-before-deciding]]
+- [[fn-run-a-governed-walk.hold-a-stray]]
+- [[fn-run-a-governed-walk.hold-the-method]]
+- [[fn-run-a-governed-walk.hold-the-work]]
+- [[fn-run-a-governed-walk.judge-a-claim]]
+- [[fn-run-a-governed-walk.keep-the-archive]]
+- [[fn-run-a-governed-walk.keep-the-record]]
+- [[fn-run-a-governed-walk.land-the-work]]
+- [[fn-run-a-governed-walk.route-the-work]]
+- [[fn-run-a-governed-walk.serve-a-step]]
+- [[fn-run-a-governed-walk.show-where-it-stands]]
+- [[fn-run-a-governed-walk.stand-up-a-product]]
+- [[fn-run-a-governed-walk.teach-the-newcomer]]
+- [[fn-run-a-governed-walk.work-the-register]]
 
 ## neutrality
 

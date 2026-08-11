@@ -11,6 +11,7 @@
 // inside a guard falls through to the next branch, and finally to the plain
 // textarea at the end of sfEditor. per-item relies on that.
 
+import { CHECKLIST_EDITOR } from "./checklist.ts";
 import { CHOICE_RATIONALE_EDITOR } from "./choice-rationale.ts";
 import { COMPARE_CARD_EDITOR } from "./compare-card.ts";
 import { DECISION_MATRIX_EDITOR } from "./decision-matrix.ts";
@@ -47,6 +48,7 @@ export const EDITORS: EditorKind[] = [
   SCENARIO_DECK_EDITOR,
   EXPOSURE_PICK_EDITOR,
   PER_ITEM_EDITOR,
+  CHECKLIST_EDITOR,
   CHOICE_RATIONALE_EDITOR,
   FINDINGS_EDITOR,
 ];

@@ -1,7 +1,7 @@
 ---
 form: generalize-use-cases
 by: agent
-signed_off: 2026-08-07T19:43:56.228Z
+signed_off: 2026-08-11T09:53:42.510Z
 authors: agent
 files: null
 ---
@@ -34,37 +34,40 @@ Thirty-one use cases over twenty-two stories.
 
 ## use_cases
 
-- uc-quality-functional-suitability
-- uc-quality-performance-efficiency
-- uc-quality-compatibility
-- uc-quality-interaction-capability
-- uc-quality-reliability
-- uc-quality-security
-- uc-quality-maintainability
-- uc-quality-flexibility
-- uc-quality-safety
-- uc-install-quackitect
-- uc-learn-the-machinery
-- uc-get-work-routed
-- uc-begin-a-product
-- uc-open-an-iteration
-- uc-set-the-autonomy
-- uc-take-a-step
-- uc-be-handed-the-method
-- uc-adjudicate-a-gate
-- uc-capture-a-stray
-- uc-drain-the-inbox
-- uc-land-work-on-trunk
-- uc-resume-after-an-absence
-- uc-trace-a-decision-to-its-origin
-- uc-vendor-and-overlay
-- uc-answer-a-question-with-tests
-- uc-change-the-method-mid-walk
-- uc-browse-the-archive
-- uc-close-a-record
-- uc-diverge-before-deciding
-- uc-let-the-system-catch-up
-- uc-research-and-record-an-answer
+- [[uc-adjudicate-a-gate]]
+- [[uc-answer-a-question-with-tests]]
+- [[uc-be-handed-the-method]]
+- [[uc-begin-a-product]]
+- [[uc-browse-the-archive]]
+- [[uc-capture-a-stray]]
+- [[uc-change-the-method-mid-walk]]
+- [[uc-close-a-record]]
+- [[uc-diverge-before-deciding]]
+- [[uc-drain-the-inbox]]
+- [[uc-get-work-routed]]
+- [[uc-install-quackitect]]
+- [[uc-land-work-on-trunk]]
+- [[uc-learn-the-machinery]]
+- [[uc-let-the-system-catch-up]]
+- [[uc-open-an-iteration]]
+- [[uc-quality-compatibility]]
+- [[uc-quality-flexibility]]
+- [[uc-quality-functional-suitability]]
+- [[uc-quality-interaction-capability]]
+- [[uc-quality-maintainability]]
+- [[uc-quality-performance-efficiency]]
+- [[uc-quality-reliability]]
+- [[uc-quality-safety]]
+- [[uc-quality-security]]
+- [[uc-research-and-record-an-answer]]
+- [[uc-resume-after-an-absence]]
+- [[uc-set-the-autonomy]]
+- [[uc-shape-the-view]]
+- [[uc-take-a-step]]
+- [[uc-trace-a-decision-to-its-origin]]
+- [[uc-vendor-and-overlay]]
+- [[uc-view-notes-as-a-table]]
+- [[uc-watch-the-walk-live]]
 
 ## follow_up
 

@@ -14,6 +14,8 @@ satisfies:
   - req-reject-names-the-redo
   - req-moved-evidence-invalidates-the-bless
   - req-bless-outputs-ride-the-bless
+  - req-bound-field-rebuilds-from-nodes
+  - req-structure-verdicts-are-mechanical
 inputs:
   - flow-compiled-machine
   - flow-filled-claim
