@@ -8,7 +8,7 @@ precondition: none
 guarantee: the position, the open work and everything pending are readable from the surface
 refines:
   - sty-come-back-after-a-week
-killer: false
+priority: should
 ---
 
 ## Main scenario

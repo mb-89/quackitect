@@ -3,6 +3,8 @@ id: tsp-panel-walkthrough
 type: "[[test-spec]]"
 statement: The panel shows the machine and its claims, a returning person orients from it alone, and the walk survives a host swap, verified by demonstration in the editor.
 method: "demonstration"
+demonstrates:
+  - "sty-hand-over-and-walk-away"
 verifies:
   - "req-panel-shows-the-machine"
   - "req-selected-node-shows-its-claim"

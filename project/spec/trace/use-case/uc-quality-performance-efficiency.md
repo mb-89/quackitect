@@ -9,7 +9,7 @@ precondition: The system is running and the record has whatever it has accumulat
 guarantee: A call answers inside the bound the register names, and a call that cannot says so rather than hanging.
 refines:
   - sty-what-a-quality-is
-killer: false
+priority: should
 ---
 
 ## What this characteristic covers

@@ -8,7 +8,7 @@ precondition: none
 guarantee: the question is answered, and any red is understood and fixed rather than carried
 refines:
   - sty-ask-the-tests-a-question
-killer: false
+priority: should
 ---
 
 ## Main scenario

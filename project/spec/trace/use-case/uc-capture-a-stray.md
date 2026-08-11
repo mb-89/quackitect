@@ -8,7 +8,7 @@ precondition: none
 guarantee: the finding is in the inbox, counted and visible, and the work in hand did not move
 refines:
   - sty-capture-a-stray
-killer: false
+priority: should
 ---
 
 ## Main scenario

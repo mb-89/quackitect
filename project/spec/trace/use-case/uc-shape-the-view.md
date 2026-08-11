@@ -8,7 +8,7 @@ precondition: a view stands open
 guarantee: the shape is written to the view file verbatim, and the next render reads it back identically
 refines:
   - sty-work-the-register-as-a-table
-killer: false
+priority: should
 ---
 
 ## Main scenario

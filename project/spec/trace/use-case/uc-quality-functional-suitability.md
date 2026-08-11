@@ -9,7 +9,7 @@ precondition: A record is open and the column was compiled from the rigor matrix
 guarantee: Every step the matrix demanded is present and does what it says, and a step that cannot be served says so.
 refines:
   - sty-what-a-quality-is
-killer: false
+priority: should
 ---
 
 ## What this characteristic covers

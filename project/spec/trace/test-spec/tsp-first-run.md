@@ -3,6 +3,9 @@ id: tsp-first-run
 type: "[[test-spec]]"
 statement: A newcomer reaches the desk's greeting from a fresh machine with one command, and the boot stands without an agent, verified by demonstration on a real machine.
 method: "demonstration"
+demonstrates:
+  - "sty-ramp-up"
+  - "sty-start-a-new-product"
 verifies:
   - "req-newcomer-one-command"
   - "req-newcomer-orients-unaided"

@@ -1,6 +1,6 @@
 {
   "change_size": "product",
-  "rigor_matrix_hash": "8976c70174ce",
+  "rigor_matrix_hash": "edbe34c5b5d1",
   "pinned_at": "2026-08-04T16:20:30.684Z",
   "demands": {
     "onboard-retro": {
@@ -185,19 +185,19 @@
     },
     "fill-story-evidence": {
       "applies": "full",
-      "evidence": "[[\"slides_filled\",true,\"\",[],\"\",\"\",[],[],[]],[\"demos_seeded\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[]"
+    },
+    "run-demos": {
+      "applies": "full",
+      "evidence": "[]"
     },
     "sweep-consistency": {
       "applies": "full",
-      "evidence": "[[\"swept\",true,\"\",[],\"\",\"\",[],[],[]]]"
-    },
-    "log-gaps": {
-      "applies": "full",
-      "evidence": "[[\"gaps\",true,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"swept\",true,\"\",[],\"checklist\",\"\",[],[\"$sweep_surfaces\"],[]]]"
     },
     "gate-validation": {
       "applies": "full",
-      "evidence": "[[\"meets_need\",true,\"\",[],\"\",\"\",[],[],[]],[\"killers_demonstrated\",true,\"\",[],\"\",\"\",[],[],[]],[\"acceptance_converted\",true,\"\",[],\"\",\"\",[],[],[]],[\"consistency_swept\",true,\"\",[],\"\",\"\",[],[],[]],[\"gaps_logged\",true,\"\",[],\"\",\"\",[],[],[]],[\"market_tier\",false,\"\",[],\"\",\"\",[],[],[]]]"
+      "evidence": "[[\"meets_need\",true,\"\",[],\"per-item\",\"\",[],[\"$value-props\"],[]],[\"musts_demonstrated\",true,\"\",[],\"per-item\",\"\",[],[\"$must-stories\"],[]],[\"market_tier\",false,\"\",[],\"\",\"\",[],[],[]]]"
     },
     "finalize-docs": {
       "applies": "full",

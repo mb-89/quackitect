@@ -9,7 +9,7 @@ precondition: The system is installed and running.
 guarantee: The front door speaks plainly, every refusal says what to do instead, and the newcomer can say what the product is before their first session ends.
 refines:
   - sty-what-a-quality-is
-killer: true
+priority: must
 ---
 
 ## What this characteristic covers

@@ -9,7 +9,7 @@ precondition: The lane is armed and every call passes through it.
 guarantee: Every act carries the role and channel that made it, and nothing crosses a boundary the person did not open.
 refines:
   - sty-what-a-quality-is
-killer: false
+priority: should
 ---
 
 ## What this characteristic covers

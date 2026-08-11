@@ -8,7 +8,7 @@ precondition: the front desk is reachable
 guarantee: the person can name the parts they will use and knows what to ask the desk for
 refines:
   - sty-take-the-tour
-killer: false
+priority: should
 ---
 
 ## Main scenario

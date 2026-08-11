@@ -8,7 +8,7 @@ precondition: the record's work has landed
 guarantee: every finding is ruled applied or dismissed with a reason, the trunk is clean, and the record is archived
 refines:
   - sty-close-the-day
-killer: false
+priority: should
 ---
 
 ## Main scenario

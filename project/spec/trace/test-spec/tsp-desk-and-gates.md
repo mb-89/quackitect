@@ -3,6 +3,8 @@ id: tsp-desk-and-gates
 type: "[[test-spec]]"
 statement: The desk greets walkable, takes plain words, and routes small work into open records, and a gate shows its evidence whole, verified by demonstration at the live desk.
 method: "demonstration"
+demonstrates:
+  - "sty-review-a-gate"
 verifies:
   - "req-desk-greets-walkable"
   - "req-desk-takes-plain-words"

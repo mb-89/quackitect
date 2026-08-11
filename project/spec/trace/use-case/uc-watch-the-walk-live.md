@@ -8,7 +8,7 @@ precondition: the panel is open beside the editor
 guarantee: every update reaches the render, and nothing the reader did not touch moves
 refines:
   - sty-watch-the-walk-live
-killer: false
+priority: should
 ---
 
 ## Main scenario

@@ -8,7 +8,7 @@ precondition: the notes inbox is drained, and the product's standing baseline ex
 guarantee: the iteration has its own state machine, compiled from a change size a person chose
 refines:
   - sty-next-iteration
-killer: true
+priority: must
 ---
 
 ## Main scenario

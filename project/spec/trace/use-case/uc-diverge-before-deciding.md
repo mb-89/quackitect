@@ -8,7 +8,7 @@ precondition: none
 guarantee: more than one option stands, each with what it costs and what it sheds, and the choice is recorded against the alternatives
 refines:
   - sty-diverge-on-purpose
-killer: false
+priority: should
 ---
 
 ## Main scenario

@@ -9,7 +9,7 @@ precondition: The work has run and its record sits in the repository.
 guarantee: The cause is answerable from the record alone, and what a change invalidates is named rather than discovered.
 refines:
   - sty-what-a-quality-is
-killer: true
+priority: must
 ---
 
 ## What this characteristic covers

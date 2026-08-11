@@ -8,7 +8,7 @@ precondition: a view file names the kind and the columns
 guarantee: every row derives from a note, and every edit landed in exactly that note
 refines:
   - sty-work-the-register-as-a-table
-killer: false
+priority: could
 ---
 
 ## Main scenario

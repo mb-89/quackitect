@@ -9,7 +9,7 @@ precondition: A walk is in flight and its position is committed to the repositor
 guarantee: The walk resumes from where it stood, and a break that cannot be resumed says so instead of pretending.
 refines:
   - sty-what-a-quality-is
-killer: true
+priority: must
 ---
 
 ## What this characteristic covers

@@ -9,7 +9,7 @@ precondition: The walk's position is committed to the repository.
 guarantee: The same walk continues under the new arrangement with zero repair steps.
 refines:
   - sty-what-a-quality-is
-killer: true
+priority: must
 ---
 
 ## What this characteristic covers

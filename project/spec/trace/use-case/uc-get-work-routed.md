@@ -9,7 +9,7 @@ guarantee: the work sits in exactly one vehicle, chosen by the person, with the 
 refines:
   - sty-next-iteration
   - sty-hand-over-and-walk-away
-killer: true
+priority: must
 ---
 
 ## Main scenario

@@ -8,7 +8,7 @@ precondition: one product is already installed and running
 guarantee: the new product has its own folder and its own machine, and the old one is untouched
 refines:
   - sty-start-a-new-product
-killer: true
+priority: must
 ---
 
 ## Main scenario

@@ -8,7 +8,7 @@ precondition: the artifact in question is a node in the trace
 guarantee: the chain from the artifact to the proposition and to the approving hand is on screen, with no step reconstructed from memory
 refines:
   - sty-answer-why-a-year-later
-killer: false
+priority: should
 ---
 
 ## Main scenario

@@ -11,8 +11,8 @@ priority: must
 
 - Any decision from years back answers its "why" in one click from the record.
   Metric: clicks from the record to the rationale. Target: one.
-- A killer gate carries a person's adjudication, never the agent's.
-  Metric: the share of killer gates blessed by the agent rather than the person. Target: zero.
+- A milestone gate carries a person's adjudication, never the agent's.
+  Metric: the share of milestone gates blessed by the agent rather than the person. Target: zero.
 - The project's standing is readable from one live board at any moment.
   Metric: commands from question to current board. Target: one, recomputed live on every render.
 - A new session resumes without re-deriving settled decisions.
