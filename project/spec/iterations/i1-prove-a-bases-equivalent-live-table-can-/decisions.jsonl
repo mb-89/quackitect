@@ -1410,3 +1410,9 @@
 {"ts":"2026-08-11T13:07:36.562Z","op":"update","visit":"iterations/i1/author-tests@0","node":"d1","brief":"the demo specs drop verifies - demonstrates is their edge"}
 {"ts":"2026-08-11T13:08:11.014Z","op":"update","visit":"iterations/i1/author-tests@0","node":"d2","brief":"the two demo specs answer verifies with the none convention"}
 {"ts":"2026-08-11T13:08:56.294Z","op":"update","visit":"iterations/i1/author-tests@0","node":"d3","brief":"zero-step routes to every target - reloading once more"}
+{"ts":"2026-08-11T13:11:01.846Z","op":"update","visit":"iterations/i1/author-tests@0","node":"d1","brief":"re-aiming to force a fresh route from author-tests"}
+{"ts":"2026-08-11T13:19:06.337Z","op":"update","visit":"iterations/i1/sweep-consistency@0","node":"d1","brief":"the sweep signed; entering the demo machine"}
+{"ts":"2026-08-11T13:20:26.366Z","op":"update","visit":"iterations/i1/run-demos/sty-ramp-up@0","node":"d2","brief":"the six demo states fill from their reports"}
+{"ts":"2026-08-11T13:21:33.196Z","op":"update","visit":"iterations/i1/gate-validation@0","node":"d3","brief":"the gate's battery fires; the form fills meanwhile"}
+{"ts":"2026-08-11T13:22:25.095Z","op":"update","visit":"iterations/i1/gate-validation@0","node":"d4","brief":"the owed demonstrations enter the register as one issue"}
+{"ts":"2026-08-11T13:24:05.696Z","op":"update","visit":"iterations/i1/gate-validation@0","node":"d5","brief":"gate-validation signed - committing and presenting for the bless"}

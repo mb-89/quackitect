@@ -842,8 +842,14 @@ export function authorTestsLawProblems(corpus: { id: string; type: string; file?
 function specEdgeProblems(spec: string, fm: Record<string, unknown>, reqMethod: Map<string, string>, covered: Set<string>): string[] {
   const out: string[] = [];
   const method = String(fm.method ?? "");
-  const verifies = fmList(fm.verifies).filter((l) => !l.trim().startsWith("<!--"));
-  if (verifies.length === 0) out.push(`${spec}: a test-spec verifying nothing — verifies names at least one req- id`);
+  // A DEMONSTRATION SPEC MAY VERIFY NOTHING (owner ruling 2026-08-11):
+  // its upward edge is `demonstrates:` naming the must story it shows end
+  // to end, and the mechanics stay with the sibling test-method specs. A
+  // none-convention line under verifies is honesty, not an id.
+  const verifies = fmList(fm.verifies).filter((l) => !l.trim().startsWith("<!--") && !/^none\b/i.test(l.trim()));
+  const demonstrates = fmList(fm.demonstrates).filter((l) => !l.trim().startsWith("<!--"));
+  if (verifies.length === 0 && demonstrates.length === 0)
+    out.push(`${spec}: a test-spec verifying nothing — verifies names at least one req- id, or demonstrates names the story it shows`);
   for (const raw of verifies) {
     const id = raw.replace(/^\[\[/, "").replace(/\]\]$/, "").trim();
     const m = reqMethod.get(id);
@@ -1651,10 +1657,16 @@ export function candidateItems(traceRoot: string): string[] {
 /** $claim-specs, resolved live: the specs no run can prove — every
  *  method but test. Verification observes these green by fresh eyes. */
 function claimSpecItems(traceRoot: string): string[] {
-  return traceFolder(traceRoot, "test-spec")
-    .filter((n) => String(n.fm.method ?? "") !== "test")
-    .map((n) => n.id)
-    .sort();
+  return (
+    traceFolder(traceRoot, "test-spec")
+      .filter((n) => String(n.fm.method ?? "") !== "test")
+      // A demonstrates-only spec belongs to VALIDATION: its run is M8's demo
+      // machine and the gate's musts_demonstrated. Verification's checklist
+      // holds only specs that verify requirements.
+      .filter((n) => fmList(n.fm.verifies).some((l) => !l.trim().startsWith("<!--") && !/^none\b/i.test(l.trim())))
+      .map((n) => n.id)
+      .sort()
+  );
 }
 
 /** $must-stories, resolved live: the stories graded must. Each one is
