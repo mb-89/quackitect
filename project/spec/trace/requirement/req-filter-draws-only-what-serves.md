@@ -4,9 +4,6 @@ type: "[[requirement]]"
 statement: When the person filters the trace, the engine shall redraw the view with only nodes serving the filter and zero empty levels drawn.
 kind: functional
 verify_method: test
-verified_by:
-  - "tests/trace.test.ts :: a TEXT match keeps its whole line of descent, and drops everything else"
-  - "tests/trace.test.ts :: a TYPE filter removes rings rather than greying them"
 breaks_if_removed: The person hunts one node in a thousand-node field; empty levels imply holes that are not there.
 breaks_how_badly: corrosive
 refines:

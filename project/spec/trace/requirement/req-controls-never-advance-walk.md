@@ -4,8 +4,6 @@ type: "[[requirement]]"
 statement: The engine shall advance the walk only on a driver's pull, with zero advances caused by a control movement.
 kind: functional
 verify_method: test
-verified_by:
-  - "tests/threshold.test.ts :: the slider takes effect live: raise the autonomy and the agent's next pull passes"
 breaks_if_removed: Raising the dial wakes an absent agent, and the person's hand can race the walk.
 breaks_how_badly: crippling
 refines:

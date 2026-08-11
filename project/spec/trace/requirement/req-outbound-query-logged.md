@@ -4,9 +4,6 @@ type: "[[requirement]]"
 statement: When research runs outside the repo, the engine shall log every outbound query alongside a reference to what came back.
 kind: functional
 verify_method: test
-verified_by:
-  - "tests/outward.test.ts :: an outward option with a real source and a recorded query is green"
-  - "tests/outward.test.ts :: outward options with no recorded query are red"
 breaks_if_removed: The search that shaped an answer is unrecoverable; the answer cannot be audited.
 breaks_how_badly: corrosive
 refines:

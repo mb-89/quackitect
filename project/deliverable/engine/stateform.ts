@@ -444,6 +444,7 @@ function resolveSource(i: string, root: string, traceRoot: string, instanceRaw?:
   if (i === "$options") return optionItems(traceRoot);
   if (i === "$experiments") return typedItems(traceRoot, "experiment");
   if (i === "$requirements") return typedItems(traceRoot, "requirement");
+  if (i === "$test-specs") return typedItems(traceRoot, "test-spec");
   if (i === "$candidates") return candidateItems(traceRoot);
   // THE CATALOGUES. A known set is never typed from memory and never hard
   // coded — it is read from the method card that holds it, so editing the card
@@ -629,20 +630,64 @@ function stateLawProblems(root: string, s: StateDecl, nodes: TraceNode[]): strin
   return out;
 }
 
-/** Every test-method requirement carries at least one test address —
- *  author-tests' law (owner ruling 2026-08-10). Presence only for now;
- *  the reverse sweep (no test without a requirement) and the
- *  address-matches-the-recorded-run tooth ship warn-first later. */
+/** THE AUTHOR-TESTS LAW (owner ruling 2026-08-11): verification is defined
+ *  test-first as test-spec nodes, and the seams are mechanical.
+ *
+ *  - every requirement is verified by at least one test-spec
+ *  - a spec's method equals the verify_method of every requirement it names
+ *  - a spec's verifies entries resolve to requirements
+ *  - a test-method spec NAMES its files — planned names count, because the
+ *    spec is written test-first; existence gets teeth at verification
+ *
+ *  The reverse sweep — a test FILE no spec references — ships warn-first
+ *  later (owner: "we'll come to that"), so it is not a refusal here. */
 export function authorTestsLawProblems(corpus: { id: string; type: string; file?: string }[]): string[] {
   const out: string[] = [];
+  const reqMethod = new Map<string, string>();
   for (const n of corpus) {
     if (n.type !== "requirement" || n.file === undefined) continue;
+    reqMethod.set(n.id, String(noteOf(n.file)?.frontmatter.verify_method ?? ""));
+  }
+  const covered = new Set<string>();
+  for (const n of corpus) {
+    if (n.type !== "test-spec" || n.file === undefined) continue;
     const fm = noteOf(n.file)?.frontmatter ?? {};
-    if (String(fm.verify_method ?? "") !== "test") continue;
-    const v = fmList(fm.verified_by).filter((l) => !l.trim().startsWith("<!--"));
-    if (v.length === 0) out.push(`${n.id}: a test-method requirement with no verified_by — name the case, <test file> :: <test case name>`);
+    out.push(...specEdgeProblems(n.id, fm, reqMethod, covered));
+    out.push(...specFileProblems(n.id, fm));
+  }
+  for (const [id, m] of reqMethod) {
+    if (!covered.has(id)) out.push(`${id}: no test-spec verifies it — every requirement gets its ${m} spec, defined before the build`);
   }
   return out;
+}
+
+/** One spec's trace half: the verifies entries resolve, and the methods match. */
+function specEdgeProblems(spec: string, fm: Record<string, unknown>, reqMethod: Map<string, string>, covered: Set<string>): string[] {
+  const out: string[] = [];
+  const method = String(fm.method ?? "");
+  const verifies = fmList(fm.verifies).filter((l) => !l.trim().startsWith("<!--"));
+  if (verifies.length === 0) out.push(`${spec}: a test-spec verifying nothing — verifies names at least one req- id`);
+  for (const raw of verifies) {
+    const id = raw.replace(/^\[\[/, "").replace(/\]\]$/, "").trim();
+    const m = reqMethod.get(id);
+    if (m === undefined) {
+      out.push(`${spec}: verifies ${id}, and no requirement carries that id`);
+      continue;
+    }
+    covered.add(id);
+    if (m !== method) out.push(`${spec}: a ${method} spec verifies ${id}, whose verify_method is ${m} — the methods must match`);
+  }
+  return out;
+}
+
+/** One spec's realization half: a test spec names its files. NAMED, not
+ *  existing — a test-first spec is written before its file lands, so
+ *  existence gets its teeth at verification, never here. */
+function specFileProblems(spec: string, fm: Record<string, unknown>): string[] {
+  if (String(fm.method ?? "") !== "test") return [];
+  const files = fmList(fm.files).filter((l) => !l.trim().startsWith("<!--") && !l.trim().toLowerCase().startsWith("none"));
+  if (files.length === 0) return [`${spec}: a test spec references no files — name the files that realize it, planned names included`];
+  return [];
 }
 
 /** The riskiest assumptions are validated — gate-prototype's law (owner

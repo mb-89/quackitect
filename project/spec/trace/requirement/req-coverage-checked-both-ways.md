@@ -4,9 +4,6 @@ type: "[[requirement]]"
 statement: While a field declares coverage over another type, the engine shall hold the state unmet until both directions hold with zero orphans on either side.
 kind: functional
 verify_method: test
-verified_by:
-  - "tests/trace-coverage.test.ts :: every requirement connects to at least one use-case"
-  - "tests/trace-coverage.test.ts :: every use-case is refined by at least one requirement"
 breaks_if_removed: A use case no requirement covers ships as covered; the trace lies where it matters most.
 breaks_how_badly: fatal
 refines:

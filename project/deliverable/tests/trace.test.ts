@@ -176,7 +176,7 @@ describe("the radial trace graph", { concurrency: true }, () => {
       parent = `n-${t}`;
     }
     all.push(child("n-function", "function", parent));
-    all.push(child("n-test", "test", parent));
+    all.push(child("n-tsp", "test-spec", parent));
     assert.equal(layoutTrace(all).rings.length, traceRings().length);
   });
 

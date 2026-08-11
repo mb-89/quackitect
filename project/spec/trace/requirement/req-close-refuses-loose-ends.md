@@ -4,9 +4,6 @@ type: "[[requirement]]"
 statement: If a record holds unlanded work or an unruled finding, then the engine shall refuse the close and name what stands.
 kind: functional
 verify_method: test
-verified_by:
-  - "tests/editsafety.test.ts :: closing on an unconfirmed report is refused, and the override is recorded"
-  - "tests/iterations.test.ts :: the graph is evidence: an open decision point blocks the leave form"
 breaks_if_removed: A record closes over work nobody landed and findings nobody ruled, and the archive lies.
 breaks_how_badly: fatal
 refines:

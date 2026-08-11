@@ -4,9 +4,6 @@ type: "[[requirement]]"
 statement: When a state owes evidence, the engine shall build the form itself and shall stamp the returned claim only where every field's shape passes.
 kind: functional
 verify_method: test
-verified_by:
-  - "tests/forms.test.ts :: a template parses: fields, requiredness, the instance name — garbage refuses"
-  - "tests/forms.test.ts :: the lint: missing instance, empty required, files, status — and the prefill law end to end"
 breaks_if_removed: Forms drift per author and a claim stamps itself, so the evidence stops meaning one thing.
 breaks_how_badly: fatal
 refines:

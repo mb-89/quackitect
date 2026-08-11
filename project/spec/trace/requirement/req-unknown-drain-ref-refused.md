@@ -4,8 +4,6 @@ type: "[[requirement]]"
 statement: If a drain names a ref that no pending note carries, then the engine shall refuse the call and shall name the unknown ref.
 kind: functional
 verify_method: test
-verified_by:
-  - "tests/retro.test.ts :: draining splits: done and obsolete anywhere, carried and backlog only in the retro"
 breaks_if_removed: Drains against nothing append as dead lines and the inbox count stops matching the drain log.
 breaks_how_badly: corrosive
 refines:

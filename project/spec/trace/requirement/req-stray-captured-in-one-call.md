@@ -4,8 +4,6 @@ type: "[[requirement]]"
 statement: The engine shall capture a stray finding in one call carrying the finder's own words, from any state, with zero prerequisite steps.
 kind: functional
 verify_method: test
-verified_by:
-  - "tests/feed.test.ts :: se_note is legal in EVERY state — a stray is captured where it strikes"
 breaks_if_removed: Capture costs a detour, so findings are chased mid-walk or dropped.
 breaks_how_badly: corrosive
 refines:

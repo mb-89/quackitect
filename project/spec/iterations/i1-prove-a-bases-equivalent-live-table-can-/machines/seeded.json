@@ -1,6 +1,6 @@
 {
   "change_size": "product",
-  "rigor_matrix_hash": "21935506bf56",
+  "rigor_matrix_hash": "b867bd570681",
   "pinned_at": "2026-08-04T16:20:30.684Z",
   "demands": {
     "onboard-retro": {
@@ -153,7 +153,7 @@
     },
     "author-tests": {
       "applies": "full",
-      "evidence": "[[\"checks\",true,\"\",[\"verified_by\"],\"node-table\",\"requirement\",[],[\"$requirements\"],[]]]"
+      "evidence": "[[\"checks\",true,\"\",[\"method\",\"verifies\",\"files\"],\"node-table\",\"test-spec\",[],[\"$test-specs\"],[]]]"
     },
     "plan-build": {
       "applies": "full",

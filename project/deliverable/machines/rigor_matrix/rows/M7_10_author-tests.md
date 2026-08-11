@@ -19,14 +19,15 @@ legal_tools:
 evidence:
   - name: checks
     template: node-table
-    of: requirement
+    of: test-spec
     items:
-      - $requirements
+      - $test-specs
     columns:
-      - verified_by
+      - method
+      - verifies
+      - files
     page_size: 25
-    link_base: project/deliverable/
-    description: "every requirement's test addresses, written on the node — <test file> :: <test case name> for test rows; the artifact or named residue for the other methods"
+    description: "the test-spec register — one row per spec; the law checks coverage both ways, the method match, and that every named file exists"
 major: full
 minor: full
 patch: tailored
@@ -58,31 +59,32 @@ specification_note: |
 
 ## Guidance
 
-THE TEST DEFINITION IS THE TEST ITSELF (owner ruling 2026-08-10). No
-test notes and no specs typed in this form: every requirement carries
-`verified_by` in its own frontmatter, and this form is the VIEW that
-edits it — the probe-assumptions shape.
+THE SPEC IS THE ARTIFACT (owner ruling 2026-08-11). This state authors
+TEST-SPEC nodes ([[test-spec]]): one per verification collection, minted
+from the item template's skeleton into project/spec/trace/test-spec/.
+The spec carries the trace edge — `verifies:` names the requirement ids —
+and the graph draws requirement ← test-spec in the test slice.
 
-THE MAPPING IS MANY-TO-MANY, both directions owed:
+TEST-FIRST IS THE POINT. A requirement with no test yet gets its spec
+NOW, defining how it will be verified, before the build. The build
+realizes the spec; the spec never waits for the build.
 
-- every requirement is verified by AT LEAST ONE check — the engine
-  refuses a test-method row without one at this state's submit.
-- every test maps back to a requirement — the reverse sweep parses the
-  test files and names the orphans. It ships WARN-FIRST (the guard law):
-  the standing battery predates this rule, so the orphan count informs
-  before it ever refuses.
+THE LAW, all mechanical at this state's submit:
 
-THE ADDRESS GRAMMAR, for software: `<test file> :: <test case name>`,
-split on the FIRST ` :: `. A TypeScript test case is a registered NAME,
-not an exported function — the (file, name) pair is its durable address,
-and the battery records every pair it ran with its verdict, so the
-address is checkable. WRITE EVERY ENTRY DOUBLE-QUOTED: test names carry
-colons, and an unquoted colon-space breaks the node's frontmatter.
+- every requirement is verified by at least one spec
+- a spec's `method` equals the `verify_method` of every requirement it
+  names — a requirement needing two methods gets two specs
+- every `verifies` entry resolves to a requirement
+- a test-method spec names files that exist under the deliverable
 
-SOFTWARE-SPECIFIC BY DESIGN (owner ruling 2026-08-10): a non-software
-realization keeps the field and reshapes only the address grammar — a
-measurement protocol, an inspection record. That reshape waits for the
-first non-software product.
+THE FILES ARE REALIZATION, NOT TRACE. For software, every case in a
+referenced file is ONE STEP of its spec, and the case name states the
+step's claim — nothing is copied into the note. The reverse sweep — a
+test FILE no spec references — ships WARN-FIRST, later.
+
+THE TEMPLATE VARIES BY METHOD, four shapes in one card ([[test-spec]]):
+Steps for test, Procedure for demonstration, Checklist for inspection,
+Model for analysis. The conformance check demands the matching section.
 
 HOW TO WRITE A GOOD TEST — the house rules live in
 guidance/craft/software.md, under writing tests. What this state adds:
@@ -91,11 +93,11 @@ guidance/craft/software.md, under writing tests. What this state adds:
   requirement's voice, and arguable.
 - ONE QUESTION PER TEST. A test asserting five things answers none when
   it goes red.
-- MAP HONESTLY. An existing battery test may already carry a
-  requirement — READ IT before naming it. A mapping nobody checked is
-  fabricated coverage.
-- NON-TEST METHODS: analysis, inspection and demonstration rows name
-  their evidence artifact, or the review-class residue plainly.
+- MAP HONESTLY. An existing battery file may already carry a
+  requirement — READ IT before a spec claims it. A mapping nobody
+  checked is fabricated coverage.
+- NON-TEST METHODS get specs too: the Procedure, Checklist or Model
+  section IS the definition, and the files list may honestly say none.
 - The M5 fitness candidates automate where measurable
   ([[meth-examples-checkable]]).
 

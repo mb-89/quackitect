@@ -4,8 +4,6 @@ type: "[[requirement]]"
 statement: The engine shall report every test run as totals with each failure carrying its failing assertion.
 kind: functional
 verify_method: test
-verified_by:
-  - "tests/discipline.test.ts :: parseTap keeps the counts and only the failures' detail"
 breaks_if_removed: The verdict rides raw output through a truncating pipe, and the end that carries it is exactly what gets cut.
 breaks_how_badly: crippling
 refines:

@@ -4,9 +4,6 @@ type: "[[requirement]]"
 statement: When a retro opens, the engine shall fix its window of pending notes and shall refuse the close while any note in that window lacks a disposition.
 kind: functional
 verify_method: test
-verified_by:
-  - "tests/retro.test.ts :: since last_retro: the log query scopes to the period after the newest drain call"
-  - "tests/mcp.test.ts :: last_retro means the previous RETRO, not the last desk drain"
 breaks_if_removed: "The inbox becomes history: notes accumulate faster than a retro can be declared finished."
 breaks_how_badly: crippling
 refines:

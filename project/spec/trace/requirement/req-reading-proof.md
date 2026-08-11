@@ -4,9 +4,6 @@ type: "[[requirement]]"
 statement: When a document is delivered, the engine shall credit it only against a proof that the whole document arrived.
 kind: functional
 verify_method: test
-verified_by:
-  - "tests/reading.test.ts :: a wrong answer credits nothing, and the same document comes again"
-  - "tests/reading.test.ts :: a page credits only the documents it showed whole"
 breaks_if_removed: A reader claims the reading it never received, and every state below opens on guidance nobody read.
 breaks_how_badly: fatal
 refines:

@@ -4,8 +4,6 @@ type: "[[requirement]]"
 statement: When the land gate is blessed, the engine shall merge the record's branch onto trunk as one merge, or stop and merge nothing.
 kind: functional
 verify_method: test
-verified_by:
-  - "tests/editsafety.test.ts :: the close is atomic: a conflicting merge aborts and refuses typed, the root stands clean"
 breaks_if_removed: A half-landed record leaves trunk in a state nobody chose and nobody can name.
 breaks_how_badly: crippling
 refines:

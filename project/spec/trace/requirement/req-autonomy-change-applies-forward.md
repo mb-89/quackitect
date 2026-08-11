@@ -4,8 +4,6 @@ type: "[[requirement]]"
 statement: When the autonomy setting changes mid-walk, the engine shall apply it from the next pull onward and shall record the change.
 kind: functional
 verify_method: test
-verified_by:
-  - "tests/route.test.ts :: the route weighs the slider hop by hop and names where it stops"
 breaks_if_removed: A dial that only takes effect at a restart is not a live control, and an unrecorded change cannot be audited.
 breaks_how_badly: crippling
 refines:

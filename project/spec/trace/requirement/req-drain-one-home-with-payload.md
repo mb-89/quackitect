@@ -4,9 +4,6 @@ type: "[[requirement]]"
 statement: When a note is drained, the engine shall accept the drain only with exactly one home, that home's payload, and that home's legal context, per the Detail table.
 kind: functional
 verify_method: test
-verified_by:
-  - "tests/retro.test.ts :: the backlog home (v1 port): backlog demands its ready-when, parks the note, and migration re-drains it"
-  - "tests/retro.test.ts :: draining splits: done and obsolete anywhere, carried and backlog only in the retro"
 breaks_if_removed: Notes drain homeless or payloadless and the next retro re-reads and re-litigates every one.
 breaks_how_badly: corrosive
 refines:

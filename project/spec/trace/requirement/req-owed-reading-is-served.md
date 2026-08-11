@@ -4,8 +4,6 @@ type: "[[requirement]]"
 statement: When a state owes reading, the engine shall name and serve every owed document without a path from the reader.
 kind: functional
 verify_method: test
-verified_by:
-  - "tests/reading.test.ts :: the first packet hands over one file, not a list of chores"
 breaks_if_removed: The reader works out what it owes, and a skipped document is invisible until the work built on it fails.
 breaks_how_badly: crippling
 refines:

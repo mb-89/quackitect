@@ -4,9 +4,6 @@ type: "[[requirement]]"
 statement: When the engine refuses a call, it shall answer with a typed refusal whose remedy, executed unchanged, is accepted on the next call.
 kind: interface
 verify_method: test
-verified_by:
-  - "tests/mcp.test.ts :: required args enforced at dispatch (R8) — missing arg refused with remedy"
-  - "tests/files.test.ts :: oversize whole-file read is REFUSED with offset/limit remedy — never silently truncated (i8d law)"
 breaks_if_removed: A refusal becomes a dead end instead of a redirection, and the walk stalls on every wrong turn.
 breaks_how_badly: crippling
 refines:

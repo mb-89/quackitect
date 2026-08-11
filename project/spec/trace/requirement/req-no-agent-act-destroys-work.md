@@ -5,9 +5,6 @@ statement: While an agent walks at any autonomy setting, the engine shall leave 
 kind: quality
 characteristic: safety
 verify_method: test
-verified_by:
-  - "tests/gitlane.test.ts :: se_git laws: no push, no rebase, allowlist only, restore unstages only"
-  - "tests/files.test.ts :: CAS: write demands the disk hash; null creates; create-over-existing refused"
 breaks_if_removed: An unattended night can end with committed work gone and no way back, which makes the unattended walk unsafe to leave.
 breaks_how_badly: crippling
 measure: 0 agent-reachable operations that make committed content unrecoverable from git, across the whole lane surface.

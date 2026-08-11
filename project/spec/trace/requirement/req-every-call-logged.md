@@ -5,8 +5,6 @@ statement: The engine shall append exactly one log line per dispatched call, car
 kind: quality
 fitness_candidate: true
 verify_method: test
-verified_by:
-  - "tests/boot.test.ts :: the gate is logged like everything else — a refused pre-boot call lands in the log"
 breaks_if_removed: The audit has holes, and the person answers for acts the record never saw.
 breaks_how_badly: fatal
 refines:

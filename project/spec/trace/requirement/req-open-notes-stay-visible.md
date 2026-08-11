@@ -4,8 +4,6 @@ type: "[[requirement]]"
 statement: The engine shall show every undrained note in the inbox count and the feed until a recorded disposition removes it.
 kind: functional
 verify_method: test
-verified_by:
-  - "tests/surveywindow.test.ts :: se_survey windows its notes, and the counts stay whole"
 breaks_if_removed: Captured findings vanish from sight, and the inbox becomes a write-only hole.
 breaks_how_badly: crippling
 refines:

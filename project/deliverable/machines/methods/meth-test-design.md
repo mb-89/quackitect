@@ -82,8 +82,8 @@ and better information — that is all it buys, and it is enough.
 A suite is designed, never accumulated. Five properties:
 
 - THE SUITE IS THE REGISTER'S MIRROR, both directions. Every requirement
-  is verified by at least one check (`verified_by` on the row), and every
-  check maps back to a requirement — an orphan on either side is a
+  is verified by at least one [[test-spec]] (`verifies` on the spec), and
+  every test file maps back to a spec — an orphan on either side is a
   finding.
 - RISK DRIVES DEPTH. "No risk, no test": exposure (probability times
   consequence) decides which rows get advanced methods and high coverage,

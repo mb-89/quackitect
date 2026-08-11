@@ -55,7 +55,7 @@ export interface Subsegments {
 export const TRACE_SUBSEGMENTS: Subsegments = {
   of: [
     { id: "design", label: "design", levels: ["function"] },
-    { id: "test", label: "tests", levels: ["test"] },
+    { id: "test", label: "tests", levels: ["test-spec"] },
   ],
 };
 
@@ -557,10 +557,6 @@ export function loadTrace(root: string): TraceNode[] {
     return hit.nodes.slice();
   }
   const out: TraceNode[] = [];
-  // THE TESTS RIDE THE REQUIREMENTS IN, one map entry per test FILE. The
-  // mapping fact lives on the requirement (verified_by), because a source
-  // file cannot carry trace frontmatter — one fact, one file.
-  const tests = new Map<string, { cases: Set<string>; reqs: Set<string> }>();
   for (const file of files) {
     // THROUGH THE ONE DOOR, so the corpus and every later reader of the same
     // node share one read and one parse. This used to read all 328 files for
@@ -574,15 +570,6 @@ export function loadTrace(root: string): TraceNode[] {
     const type = typeName(fm.type);
     if (type === "") continue;
     const id = typeof fm.id === "string" ? fm.id : (file.split(/[\\/]/).pop() ?? "").replace(/\.md$/, "");
-    for (const v of asList(fm.verified_by)) {
-      const at = v.indexOf(" :: ");
-      if (at < 0) continue;
-      const tf = v.slice(0, at).trim();
-      const entry = tests.get(tf) ?? { cases: new Set<string>(), reqs: new Set<string>() };
-      entry.cases.add(v.slice(at + 4).trim());
-      entry.reqs.add(id);
-      tests.set(tf, entry);
-    }
     const pairs = Object.entries(fm)
       .map(([k, v]) => `${k}:${Array.isArray(v) ? v.join(" ") : String(v)}`)
       .join(" ");
@@ -604,22 +591,6 @@ export function loadTrace(root: string): TraceNode[] {
       refines: [...asList(fm.refines), ...asList(fm.satisfies)],
       hay: pairs,
       file,
-    });
-  }
-  // A TEST IS A DERIVED NODE, one per test file, folded from the addresses
-  // the requirements carry. File grain keeps the test ring readable — the
-  // cases ride the statement and the hay. No file under trace/ backs these
-  // and no item template exists on purpose: conformance skips what nobody
-  // authors. The path base mirrors the author-tests link_base; unify them
-  // when the address grammar grows a second product shape.
-  for (const [tf, e] of [...tests.entries()].sort(([a], [b]) => a.localeCompare(b))) {
-    out.push({
-      id: tf,
-      type: "test",
-      statement: `${e.cases.size} ${e.cases.size === 1 ? "case" : "cases"} verifying ${e.reqs.size} ${e.reqs.size === 1 ? "requirement" : "requirements"}`,
-      refines: [...e.reqs].sort(),
-      hay: `type:test ${tf} ${[...e.cases].join(" ")}`,
-      file: join(root, "project", "deliverable", tf),
     });
   }
   CORPUS.set(root, { stamp, nodes: out, epoch: era });

@@ -1294,3 +1294,8 @@
 {"ts":"2026-08-10T21:12:21.274Z","op":"done","visit":"iterations/i1/author-tests@0","node":"d5","brief":"the orphan list stands in the findings document"}
 {"ts":"2026-08-10T21:12:45.004Z","op":"done","visit":"iterations/i1/author-tests@0","node":"d6","brief":"each orphan cluster names the requirement it implies, in the findings"}
 {"ts":"2026-08-10T21:13:07.216Z","op":"update","visit":"iterations/i1/author-tests@0","node":"d11","brief":"the submit refusal recorded; checkpointing the record"}
+{"ts":"2026-08-11T07:02:47.434Z","op":"update","visit":"iterations/i1/author-tests@0","node":"d1","brief":"verified_by leaves the requirement nodes"}
+{"ts":"2026-08-11T07:03:51.055Z","op":"plan","visit":"iterations/i1/author-tests@0","parent":null,"nodes":[{"id":"d2","brief":"write the 25 spec notes"},{"id":"d3","brief":"validate coverage with the law probe"},{"id":"d4","brief":"checkpoint and report"}]}
+{"ts":"2026-08-11T07:07:21.094Z","op":"update","visit":"iterations/i1/author-tests@0","node":"d5","brief":"twenty of twenty-five specs stand"}
+{"ts":"2026-08-11T07:08:04.777Z","op":"done","visit":"iterations/i1/author-tests@0","node":"d2","brief":"twenty-five specs written, four shapes"}
+{"ts":"2026-08-11T07:08:15.359Z","op":"done","visit":"iterations/i1/author-tests@0","node":"d3","brief":"the law answers zero problems over the whole register"}

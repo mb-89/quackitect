@@ -4,8 +4,6 @@ type: "[[requirement]]"
 statement: When an archived record is opened, the engine shall show it exactly as it stood at close, with zero states omitted and zero bytes differing.
 kind: functional
 verify_method: test
-verified_by:
-  - "tests/archive.test.ts :: a closed record is read from its branch once, then cached"
 breaks_if_removed: The archive becomes a retelling instead of a record, and answering for old work stops being possible.
 breaks_how_badly: fatal
 refines:

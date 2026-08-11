@@ -4,9 +4,6 @@ type: "[[requirement]]"
 statement: When the walk reaches a gate, the engine shall hold the walk until a verdict is recorded, and shall accept that verdict from the agent only where the session autonomy allows it.
 kind: functional
 verify_method: test
-verified_by:
-  - "tests/pull.test.ts :: a step above the slider comes back as `wait`, naming the step and the person"
-  - "tests/iterations.test.ts :: the bless pins the machine and it grows in place — no wrapper, fills carried"
 breaks_if_removed: A gate passes with no verdict at all, and adjudication disappears instead of moving to whoever the slider put in charge.
 breaks_how_badly: fatal
 refines:

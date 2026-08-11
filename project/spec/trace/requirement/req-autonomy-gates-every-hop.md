@@ -4,9 +4,6 @@ type: "[[requirement]]"
 statement: When a pull is served, the engine shall weigh the next hop against the autonomy setting and shall stop before any hop that outweighs it, naming the waiting step.
 kind: functional
 verify_method: test
-verified_by:
-  - "tests/route.test.ts :: the route weighs the slider hop by hop and names where it stops"
-  - "tests/pull.test.ts :: the slider is weighed BEFORE the reading, so a forbidden step owes nothing"
 breaks_if_removed: The agent walks past the person's dial and the one control they hold means nothing.
 breaks_how_badly: fatal
 refines:

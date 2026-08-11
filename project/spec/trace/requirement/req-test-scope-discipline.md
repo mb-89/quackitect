@@ -4,9 +4,6 @@ type: "[[requirement]]"
 statement: When a test run names a scope, the engine shall run exactly that scope and shall answer from the recorded verdict where the scope has not changed.
 kind: functional
 verify_method: test
-verified_by:
-  - "tests/discipline.test.ts :: the unchanged gate is PER SCOPE — pull's green does not fence files' run"
-  - "tests/discipline.test.ts :: piecemeal past the threshold flips: scoped refuses toward the battery, the battery is granted"
 breaks_if_removed: Tests run to reassure rather than to answer, and the battery's cost buys nothing.
 breaks_how_badly: corrosive
 refines:
