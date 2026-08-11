@@ -1428,3 +1428,9 @@
 {"ts":"2026-08-11T14:27:04.576Z","op":"update","visit":"iterations/i1/package@0","node":"d6","brief":"dist/ gitignored - built archives stay out of history"}
 {"ts":"2026-08-11T14:32:32.894Z","op":"update","visit":"iterations/i1/trace-design@1","node":"d11","brief":"package.ts claimed by dsp-boot-and-power, honestly"}
 {"ts":"2026-08-11T14:32:43.253Z","op":"defer_arrived","visit":"iterations/i1/package@1","node":"d12","brief":"fill and submit the package state","hops":1,"trail":["start","iterations/i1/package"]}
+{"ts":"2026-08-11T14:41:42.168Z","op":"plan","visit":"iterations/i1/gate-release@0","parent":null,"nodes":[{"id":"d13","brief":"answer the product-folder question"},{"id":"d14","brief":"check and build archive-on-close if missing"},{"id":"d15","brief":"note the bless-repaint gap for the SVG talk"},{"id":"d16","brief":"walk through shipped and close the iteration"}]}
+{"ts":"2026-08-11T14:41:48.836Z","op":"done","visit":"start@0","node":"d4","brief":"gate-release blessed by human on file"}
+{"ts":"2026-08-11T14:42:27.325Z","op":"update","visit":"iterations/i1/gate-release@0","node":"d17","brief":"reading the shipped row for its close mechanics"}
+{"ts":"2026-08-11T14:44:05.899Z","op":"update","visit":"iterations/i1/gate-release@0","node":"d18","brief":"reading the bind path to place the symmetric close"}
+{"ts":"2026-08-11T14:47:57.110Z","op":"update","visit":"iterations/i1/gate-release@0","node":"d19","brief":"reading the close test scaffold before building"}
+{"ts":"2026-08-11T14:57:23.957Z","op":"done","visit":"start@0","node":"d2","brief":"the walk stands on shipped - stepping out"}

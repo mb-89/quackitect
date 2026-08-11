@@ -1,5 +1,7 @@
 ---
 form: package
+by: agent
+signed_off: 2026-08-11T14:35:36.506Z
 authors: agent
 files:
 ---
@@ -8,7 +10,7 @@ files:
 
 ## current_situation
 
-The M9 recut stands: package is the automated step after the blessed gate-validation. The packager script exists (engine/bin/package.ts, commit 63f3ba43), the archive is built at dist/quackitect-3.0.0.zip, and it was used for real outside the repo.
+The M9 recut stands: package is the automated step after the blessed gate-validation. The packager script exists (engine/bin/package.ts, trunk commit 63f3ba43, synced into the record), and the archive is built at dist/quackitect-3.0.0.zip in this record's tree and on trunk.
 
 ## package
 

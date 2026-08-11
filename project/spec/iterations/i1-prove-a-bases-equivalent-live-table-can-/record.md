@@ -1,6 +1,7 @@
 ---
 id: i1-prove-a-bases-equivalent-live-table-can-
-status: open
+status: shipped
+closed: 2026-08-11T15:02:29.462Z
 started: 2026-08-04T08:11:36.635Z
 opened: 2026-08-04T00:00:00.000Z
 goal: Design quackitect — the product's first iteration, authoring the vision and the design input in full, traced end to end.
