@@ -4,7 +4,7 @@ type: "[[test-spec]]"
 statement: A person at autonomy 0 drives every step themselves - the machine advances on their acts alone and never walks ahead of them, verified by demonstration at the live panel.
 method: "demonstration"
 verifies:
-  - "req-autonomy-gates-every-hop"
+  - "none — demonstrates: sty-walk-it-by-hand carries the edge; the mechanics are test-verified by tsp-walk-discipline"
 demonstrates:
   - "sty-walk-it-by-hand"
 files:
@@ -12,6 +12,10 @@ files:
 ---
 
 ## Scope
+
+The mechanics are test-verified by [[tsp-walk-discipline]]
+(req-autonomy-gates-every-hop); THIS spec demonstrates the story end to
+end, and `demonstrates:` is its upward edge.
 
 The manual drive: the slider at 0, a person clicking through states the
 agent would otherwise enter alone. The claim is the dial's floor - at 0

@@ -4,9 +4,7 @@ type: "[[test-spec]]"
 statement: A fresh agent is handed the method one document at a time and cannot reach the work until it proves it read them - observed on a real session's reading loop.
 method: "demonstration"
 verifies:
-  - "req-reading-proof"
-  - "req-compaction-reowes-the-reading"
-  - "req-owed-reading-is-served"
+  - "none — demonstrates: sty-the-agent-proves-it-read carries the edge; the mechanics are test-verified by tsp-reading-loop"
 demonstrates:
   - "sty-the-agent-proves-it-read"
 files:

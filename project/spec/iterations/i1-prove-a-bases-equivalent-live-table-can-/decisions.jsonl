@@ -1407,3 +1407,6 @@
 {"ts":"2026-08-11T13:02:37.291Z","op":"update","visit":"iterations/i1/author-tests@1","node":"d36","brief":"routing around the container wedge to the sweep"}
 {"ts":"2026-08-11T13:03:17.860Z","op":"defer","visit":"iterations/i1/sweep-consistency@0","node":"d22","brief":"the sweep checklist walks","to":"sweep-consistency","hops":1,"trail":["iterations/i1/sweep-consistency","sweep-consistency"]}
 {"ts":"2026-08-11T13:05:21.288Z","op":"update","visit":"iterations/i1/author-tests@1","node":"d37","brief":"reloading to clear the position split-brain"}
+{"ts":"2026-08-11T13:07:36.562Z","op":"update","visit":"iterations/i1/author-tests@0","node":"d1","brief":"the demo specs drop verifies - demonstrates is their edge"}
+{"ts":"2026-08-11T13:08:11.014Z","op":"update","visit":"iterations/i1/author-tests@0","node":"d2","brief":"the two demo specs answer verifies with the none convention"}
+{"ts":"2026-08-11T13:08:56.294Z","op":"update","visit":"iterations/i1/author-tests@0","node":"d3","brief":"zero-step routes to every target - reloading once more"}
