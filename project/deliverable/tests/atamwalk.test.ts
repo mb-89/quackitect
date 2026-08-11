@@ -153,22 +153,21 @@ test("the assumption law refuses the hot and unprobed, and honours accept and de
   }
 });
 
-test("a test-method requirement without its verified_by refuses; the other methods pass", () => {
+// EVERY method is covered by a spec now (owner ruling 2026-08-11) — the
+// verified_by shape this case guarded is retired. The full law lives in
+// tests/requirement-checks.test.ts; this holds the dispatch-level claim.
+test("a requirement of any method refuses uncovered, and a matching spec covers it", () => {
   const root = mkdtempSync(join(tmpdir(), "vblaw-"));
   try {
     const dir = join(root, "n");
     mkdirSync(dir, { recursive: true });
     const corpus = [
       lawNode(dir, "req-bare", "requirement", ["verify_method: test"]),
-      lawNode(dir, "req-mapped", "requirement", [
-        "verify_method: test",
-        "verified_by:",
-        "  - tests/files.test.ts :: the door serves a fresh read",
-      ]),
       lawNode(dir, "req-demo", "requirement", ["verify_method: demonstration"]),
+      lawNode(dir, "tsp-demo", "test-spec", ["method: demonstration", "verifies:", "  - req-demo"]),
     ];
     const found = authorTestsLawProblems(corpus);
-    assert.equal(found.length, 1);
+    assert.equal(found.length, 1, found.join(" | "));
     assert.ok(found[0].includes("req-bare"));
   } finally {
     rmSync(root, { recursive: true, force: true });

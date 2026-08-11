@@ -116,7 +116,7 @@ test("a branch that cannot reach the objective is not offered", () => {
 // spine, one per slice.
 test("the trace runs past the requirements, to functions and tests", async () => {
   const { TRACE_LEVELS } = await import("../engine/trace.ts");
-  assert.deepEqual(TRACE_LEVELS, ["value-prop", "story", "use-case", "requirement", "function", "test"]);
+  assert.deepEqual(TRACE_LEVELS, ["value-prop", "story", "use-case", "requirement", "function", "test-spec"]);
 
   // ORDER IS THE RADIUS. A function sits outside a requirement because it is
   // what answers one, and the edge runs requirement to function.

@@ -42,13 +42,17 @@ edges:
     key: satisfies
     to: requirement
     verb: satisfies
+  - from: test-spec
+    key: verifies
+    to: requirement
+    verb: verifies
 subsegments:
   - id: design
     label: design
     levels: [function, element, interface]
   - id: test
     label: tests
-    levels: [test]
+    levels: [test-spec]
 ---
 
 # The trace schema
@@ -195,8 +199,8 @@ Today there are two.
 
 - `design` holds what ANSWERS a requirement. The functions now, and the
   architecture and design elements later.
-- `test` holds what VERIFIES it: the test files, one node each. These
-  nodes are DERIVED — see the next section.
+- `test` holds what VERIFIES it: the test-spec nodes, authored at M7
+  author-tests — see the next section.
 
 THE DIVISION HAPPENS ONCE (owner design 2026-08-07). A requirement is the
 last node every slice can see. It may be pointed at from several slices, and
@@ -214,23 +218,26 @@ AN EMPTY SLICE STILL HOLDS ITS ARC. The space is reserved so a new level
 lands without moving anything already drawn. The test level landed this way
 on 2026-08-10.
 
-## The test nodes are derived, not authored
+## The test slice holds test-spec nodes (owner ruling 2026-08-11)
 
-A requirement names its checks in `verified_by`, as addresses:
-`<test file> :: <test case name>`.
+A test-spec is an AUTHORED node ([[test-spec]]), one per verification
+collection, written test-first at M7 author-tests. It carries the upward
+edge like every other child: `verifies:` names the requirement ids.
 
-The loader folds those addresses into one node per test FILE, typed `test`,
-pointing at the requirements it verifies. The cases ride the node's
-statement.
+THE METHOD MUST MATCH. A spec's `method` equals the `verify_method` of
+every requirement it verifies — the engine checks it at the author-tests
+submit.
 
-THE FACT LIVES ON THE REQUIREMENT, and only there. A source file cannot
-carry trace frontmatter, so the parent holds the mapping — the one sanctioned
-exception to "downward edges do not exist". One fact, one file, still.
+THE FILES ARE REALIZATION, NOT TRACE. A spec's `files:` names the test
+files (or, off software, the protocol documents) that realize it. That
+seam is checked MECHANICALLY and outside the graph — every test file
+referenced by at least one spec, every referenced file existing — so the
+graph stays at spec grain and never blows up to files or cases.
 
-SO THERE IS NO EDGE ENTRY FOR `test` ABOVE. The edge list describes
-frontmatter on authored nodes, and nobody authors a test node. The
-`verified_by` grammar and its laws live with the author-tests state
-(rigor_matrix/rows/M7_10_author-tests.md).
+A first cut (2026-08-10) derived per-file test nodes from `verified_by`
+addresses written on the requirements. That inverted the edge — the parent
+held the mapping — and drew at file grain. Both retired with this ruling;
+`verified_by` is no longer written.
 
 ## What this schema does not cover
 

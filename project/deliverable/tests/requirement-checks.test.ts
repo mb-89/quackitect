@@ -7,6 +7,7 @@ import { strict as assert } from "node:assert";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, test } from "node:test";
+import { authorTestsLawProblems } from "../engine/stateform.ts";
 import { conformance, earsShapeOK, itemTemplate, loadTrace } from "../engine/trace.ts";
 import { freshRoot } from "./helpers.ts";
 
@@ -176,38 +177,52 @@ describe("the requirement template's declared checks", () => {
   });
 });
 
-/** A requirement carrying only what the derivation reads: its type and its
- *  verified_by addresses, quoted the way the author-tests state writes them. */
-function mintVerified(root: string, id: string, addresses: string[]): void {
-  const dir = join(root, "project/spec/trace/requirement");
+/** A test-spec node written the way author-tests writes one. */
+function mintSpec(root: string, id: string, method: string, verifies: string[], files: string[]): void {
+  const dir = join(root, "project/spec/trace/test-spec");
   mkdirSync(dir, { recursive: true });
-  const lines = ["---", `id: ${id}`, 'type: "[[requirement]]"', "verified_by:"];
-  for (const a of addresses) lines.push(`  - "${a}"`);
+  const lines = ["---", `id: ${id}`, 'type: "[[test-spec]]"', `statement: ${id} holds`, `method: ${method}`, "verifies:"];
+  for (const v of verifies) lines.push(`  - ${v}`);
+  lines.push("files:");
+  for (const f of files) lines.push(`  - ${f}`);
   lines.push("---", "");
   writeFileSync(join(dir, `${id}.md`), lines.join("\n"), "utf8");
 }
 
-// A TEST NODE IS DERIVED, ONE PER TEST FILE (owner ruling 2026-08-10). The
-// requirement carries the mapping in verified_by — a source file cannot hold
-// trace frontmatter — and the loader folds the addresses into typed nodes so
-// the trace graph's test slice draws.
-describe("the tests ride the requirements into the corpus", { concurrency: true }, () => {
-  test("verified_by folds into one test node per file, pointing at every requirement it verifies", () => {
+// THE AUTHOR-TESTS LAW (owner ruling 2026-08-11): test-spec nodes carry the
+// verifies edge, the method must match the requirement's verify_method, and
+// a test spec's files must exist. Coverage is both-ways at spec grain.
+describe("the test-spec law", { concurrency: true }, () => {
+  test("a matching spec covers its requirement, and the law stands silent", () => {
     const root = freshRoot();
-    mintVerified(root, "req-a", ["tests/route.test.ts :: the route weighs the slider", "tests/pull.test.ts :: the reading is owed"]);
-    mintVerified(root, "req-b", ["tests/route.test.ts :: a second case: colons survive"]);
-    const nodes = loadTrace(root);
-    const route = nodes.find((n) => n.id === "tests/route.test.ts");
-    const pull = nodes.find((n) => n.id === "tests/pull.test.ts");
-    assert.ok(route !== undefined && pull !== undefined, "one node per test file");
-    assert.equal(route.type, "test");
-    assert.deepEqual(route.refines, ["req-a", "req-b"]);
-    assert.deepEqual(pull.refines, ["req-a"]);
-    assert.equal(route.statement, "2 cases verifying 2 requirements");
-    // The yaml quotes stay in the file and out of the model: the case name
-    // reads back whole, colon and all, findable in the hay.
-    assert.ok(route.hay?.includes("a second case: colons survive"));
-    // A derived node is never conformance-checked — nobody authors it.
-    assert.deepEqual(conformance(root, route), []);
+    mint(root, "req-clean", GOOD);
+    mkdirSync(join(root, "project/deliverable/tests"), { recursive: true });
+    writeFileSync(join(root, "project/deliverable/tests/x.test.ts"), "// a case\n", "utf8");
+    mintSpec(root, "tsp-x", "test", ["req-clean"], ["tests/x.test.ts"]);
+    assert.deepEqual(authorTestsLawProblems(loadTrace(root)), []);
+  });
+
+  test("a method mismatch, an unresolved id and an empty files list are each named", () => {
+    const root = freshRoot();
+    mint(root, "req-clean", GOOD); // verify_method: test
+    mintSpec(root, "tsp-wrong", "demonstration", ["req-clean", "req-ghost"], []);
+    mintSpec(root, "tsp-bare", "test", ["req-clean"], []);
+    const p = authorTestsLawProblems(loadTrace(root)).join(" | ");
+    assert.match(p, /tsp-wrong: a demonstration spec verifies req-clean.*methods must match/);
+    assert.match(p, /tsp-wrong: verifies req-ghost, and no requirement carries that id/);
+    assert.match(p, /tsp-bare: a test spec references no files/);
+    // A PLANNED file never refuses here — the spec is test-first, and
+    // existence gets its teeth at verification.
+    const root2 = freshRoot();
+    mint(root2, "req-clean", GOOD);
+    mintSpec(root2, "tsp-early", "test", ["req-clean"], ["tests/not-written-yet.test.ts"]);
+    assert.deepEqual(authorTestsLawProblems(loadTrace(root2)), []);
+  });
+
+  test("a requirement no spec verifies is named, with its method", () => {
+    const root = freshRoot();
+    mint(root, "req-alone", GOOD);
+    const p = authorTestsLawProblems(loadTrace(root)).join(" | ");
+    assert.match(p, /req-alone: no test-spec verifies it/);
   });
 });
