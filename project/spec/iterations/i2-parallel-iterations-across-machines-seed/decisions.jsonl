@@ -1,0 +1,9 @@
+{"ts":"2026-08-11T15:31:24.647Z","op":"done","visit":"front_desk@1","node":"d19","brief":"bound to i2, walking M0 toward the kickoff"}
+{"ts":"2026-08-11T15:34:21.411Z","op":"update","visit":"iterations/i2/gate-kickoff@0","node":"d21","brief":"the categorical-autonomy ruling captured into the i2 scope"}
+{"ts":"2026-08-11T15:38:33.417Z","op":"update","visit":"iterations/i2/gate-kickoff@0","node":"d22","brief":"the two open questions answered - identity and size"}
+{"ts":"2026-08-11T15:41:30.203Z","op":"update","visit":"iterations/i2/gate-kickoff@0","node":"d23","brief":"grounding the value-prop discussion in the six statements"}
+{"ts":"2026-08-11T15:42:49.358Z","op":"update","visit":"iterations/i2/gate-kickoff@0","node":"d24","brief":"the ontology question answered - split held, merge declined"}
+{"ts":"2026-08-11T15:44:07.972Z","op":"update","visit":"iterations/i2/gate-kickoff@0","node":"d25","brief":"the engine-prop shape agreed and folded into the i2 proposal"}
+{"ts":"2026-08-11T15:49:03.166Z","op":"done","visit":"front_desk@1","node":"d20","brief":"the discussion closed with the owner's go at major"}
+{"ts":"2026-08-11T15:55:27.519Z","op":"update","visit":"iterations/i2/gate-kickoff@0","node":"d26","brief":"checking whether the amended submit landed before the bless refused"}
+{"ts":"2026-08-11T15:57:20.976Z","op":"plan","visit":"iterations/i2/gate-kickoff@0","parent":null,"nodes":[{"id":"d27","brief":"bless the kickoff on the owner's word"},{"id":"d28","brief":"pin the major machine and show it stands"},{"id":"d29","brief":"walk M1 while the owner watches"}]}
