@@ -17,6 +17,8 @@ files:
   - "tests/logquery.test.ts"
   - "tests/nesting.test.ts"
   - "tests/outward.test.ts"
+  - "tests/refusals.test.ts"
+  - "tests/remedies.test.ts"
 ---
 
 ## Scope

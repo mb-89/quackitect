@@ -1,7 +1,7 @@
 ---
 id: sty-what-a-quality-is
 type: "[[story]]"
-statement: When I meet a demand that is not about what the system does but about how well it does it, I want the register to have a place for it, so I can write it down instead of arguing about where it goes.
+statement: When I meet a demand that is not about what the system does but about how well it does it, I want the register to hold it under the nine quality characteristics of ISO/IEC 25010:2023, so I can write it down instead of arguing about where it goes.
 actor: stk-engineer-driving-agents
 refines:
   - vp-qualities

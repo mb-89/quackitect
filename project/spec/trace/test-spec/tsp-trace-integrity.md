@@ -12,6 +12,7 @@ files:
   - "tests/refs.test.ts"
   - "tests/traceschema.test.ts"
   - "tests/frontmatter.test.ts"
+  - "tests/requirement-checks.test.ts"
 ---
 
 ## Scope

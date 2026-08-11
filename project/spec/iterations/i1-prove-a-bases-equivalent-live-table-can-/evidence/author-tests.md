@@ -1,5 +1,6 @@
 ---
 form: author-tests
+amended: "2026-08-11T07:42:02.686Z by agent — the register grew under the signed claim: the 2026-08-11 backfill added 20 requirements and 4 specs, and the prose summarized the smaller register"
 by: agent
 signed_off: 2026-08-11T07:10:37.625Z
 authors: agent
@@ -10,7 +11,7 @@ files:
 
 ## current_situation
 
-The verification register reshaped today (owner ruling 2026-08-11): test-spec nodes carry the verifies edge, one per collection, four method shapes in one template. The 53 verified_by mappings migrated into the specs; the 49 untested requirements got their specs test-first; the 48 non-test rows got demonstration, inspection and analysis specs. 25 specs cover all 150 requirements, and the law answers zero problems.
+The backfill landed (owner ruling 2026-08-11): 2 new stories, 3 new use cases and 20 new requirements reverse-engineered from the orphan tests — the live table, the autonomy surface, the design-check machinery and the panel's watching contract. 4 new specs and 6 extended file lists claim them. 29 specs cover all 170 requirements, every one of the 91 test files is referenced by at least one spec, and the law, the conformance and the both-way coverage all answer zero.
 
 ## checks
 
@@ -44,7 +45,7 @@ The verification register reshaped today (owner ruling 2026-08-11): test-spec no
 
 ## follow_up
 
-The planned test files land with their builds: tests/ideation.test.ts, tests/latency.test.ts (expected RED until the async round), tests/scaffold.test.ts, tests/setup.test.ts, tests/overlay.test.ts, tests/overhaul.test.ts, tests/tour.test.ts. The reverse file sweep ships warn-first later. The test report generates from these specs crossed with the recorded verdicts — design owed.
+The planned test files land with their builds: ideation, latency (expected RED until the async round), scaffold, setup, overlay, overhaul, tour. The 20 backfilled rows owe their M4 criteria judgments (weighs_against), so derive-criteria greys until the pairs are walked. The test report generates from these specs crossed with the recorded verdicts — design owed.
 
 ## anything_else
 

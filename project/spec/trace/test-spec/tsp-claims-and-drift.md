@@ -17,6 +17,7 @@ files:
   - "tests/suspect.test.ts"
   - "tests/stamp.test.ts"
   - "tests/reads.test.ts"
+  - "tests/rounds.test.ts"
 ---
 
 ## Scope

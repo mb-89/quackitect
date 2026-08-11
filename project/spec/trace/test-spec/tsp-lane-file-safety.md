@@ -7,12 +7,14 @@ verifies:
   - "req-no-agent-act-destroys-work"
   - "req-every-artifact-is-readable-text"
   - "req-repo-search-carries-intent"
+  - "req-lane-fixes-what-machines-fix"
 files:
   - "tests/files.test.ts"
   - "tests/patchguard.test.ts"
   - "tests/search.test.ts"
   - "tests/roots.test.ts"
   - "tests/gitlane.test.ts"
+  - "tests/lintfix.test.ts"
 ---
 
 ## Scope

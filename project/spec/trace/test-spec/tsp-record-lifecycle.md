@@ -21,6 +21,7 @@ files:
   - "tests/drift.test.ts"
   - "tests/sizes.test.ts"
   - "tests/floor.test.ts"
+  - "tests/rigor-matrix.test.ts"
 ---
 
 ## Scope
