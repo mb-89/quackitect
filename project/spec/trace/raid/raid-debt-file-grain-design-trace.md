@@ -1,0 +1,21 @@
+---
+id: raid-debt-file-grain-design-trace
+type: "[[raid]]"
+kind: debt
+statement: The design-to-code sweep runs at file grain, so dead code inside a claimed file stays invisible to it.
+owner: the driving agent
+trigger: when the file-grain sweep stops finding anything new, or when a region-marker mechanism lands
+status: open
+impact: A dead function inside a live file never surfaces as an unclaimed finding, and only a reachability probe or a reader catches it.
+breaks_how_badly: corrosive
+how_likely: plausible
+source_refs:
+  - note-0c5b06e4d056
+  - tsp — trace-design's own guidance names the grain and its cost
+---
+
+Quality traded for speed, consciously: v1 went finer with `// design:`
+region markers and swept declarations outside every region. The file
+grain shipped first because it makes the whole seam mechanical today.
+The payback is the region mechanism, owed when the coarse sweep goes
+quiet.

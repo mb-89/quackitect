@@ -1354,3 +1354,10 @@
 {"ts":"2026-08-11T10:46:36.656Z","op":"update","visit":"iterations/i1/verification@1","node":"d13","brief":"the confirm run found a second duplicate-key node — sweeping them all"}
 {"ts":"2026-08-11T10:46:59.707Z","op":"update","visit":"iterations/i1/verification@1","node":"d14","brief":"battery still red: 12 raid files carry the duplicate-key pair, listing exact lines"}
 {"ts":"2026-08-11T10:47:16.763Z","op":"update","visit":"iterations/i1/verification@1","node":"d15","brief":"one regex dedupes the twelve doubled grade pairs"}
+{"ts":"2026-08-11T10:47:46.825Z","op":"done","visit":"iterations/i1/verification@0","node":"d7","brief":"the dedupe landed; the gatekeeper re-runs on the new tree"}
+{"ts":"2026-08-11T10:48:11.391Z","op":"update","visit":"iterations/i1/verification@1","node":"d16","brief":"third battery run after the 12-file raid dedupe, sweep re-checked in parallel"}
+{"ts":"2026-08-11T10:49:04.127Z","op":"update","visit":"iterations/i1/verification@1","node":"d17","brief":"the third battery closes in on its verdict"}
+{"ts":"2026-08-11T10:49:04.424Z","op":"update","visit":"iterations/i1/verification@1","node":"d18","brief":"polling the third battery run to its verdict"}
+{"ts":"2026-08-11T10:49:32.570Z","op":"update","visit":"iterations/i1/verification@1","node":"d19","brief":"verification submits on the gatekeeper's green"}
+{"ts":"2026-08-11T10:50:02.231Z","op":"update","visit":"iterations/i1/gate-implementation@0","node":"d20","brief":"verification signed — the gate opens; the debt enters the register first"}
+{"ts":"2026-08-11T10:52:04.694Z","op":"done","visit":"iterations/i1/verification@0","node":"d8","brief":"gate-implementation signed and blessed — pass, residues named"}
