@@ -1465,7 +1465,10 @@ export class Session {
       if (t === undefined) continue;
       land(prefix, t, { from: q, to: e.to });
     }
-    if (st.kind === "end" && prefix !== "") {
+    // A TERMINAL closes the machine exactly as end does (machine.ts), so
+    // the pop out of it is a real hop the route must see — without it the
+    // walk wedges on a shipped state with no drawn way out.
+    if ((st.kind === "end" || st.kind === "terminal") && prefix !== "") {
       const pcut = prefix.lastIndexOf("/");
       const pprefix = pcut < 0 ? "" : prefix.slice(0, pcut);
       const pid = pcut < 0 ? prefix : prefix.slice(pcut + 1);
