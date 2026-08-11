@@ -449,6 +449,9 @@ function resolveSource(i: string, root: string, traceRoot: string, instanceRaw?:
   if (i === "$promotions") return promotionItems(traceRoot);
   if (i === "$claim-specs") return claimSpecItems(traceRoot);
   if (i === "$iq_checklist") return catalogItems(root, "iq_checklist");
+  if (i === "$sweep_surfaces") return catalogItems(root, "sweep_surfaces");
+  if (i === "$value-props") return typedItems(traceRoot, "value-prop");
+  if (i === "$must-stories") return mustStoryItems(traceRoot);
   if (i === "$candidates") return candidateItems(traceRoot);
   // THE CATALOGUES. A known set is never typed from memory and never hard
   // coded — it is read from the method card that holds it, so editing the card
@@ -633,6 +636,8 @@ function stateLawProblems(root: string, s: StateDecl, nodes: TraceNode[]): strin
   if (s.id.endsWith("author-tests")) out.push(...authorTestsLawProblems(nodes));
   if (s.id.endsWith("specify-build")) out.push(...specifyBuildLawProblems(nodes, root));
   if (s.id.endsWith("trace-design")) out.push(...traceDesignLawProblems(nodes, root));
+  if (s.id.endsWith("fill-story-evidence")) out.push(...fillStoryLawProblems(nodes, false));
+  if (s.id.endsWith("gate-validation")) out.push(...fillStoryLawProblems(nodes, true));
   return out;
 }
 
@@ -671,6 +676,42 @@ function designCoverageProblems(corpus: { id: string; type: string; file?: strin
   }
   for (const t of targets) {
     if (!covered.has(t)) out.push(`${t}: no design-spec realizes it — the design below the line is specified before the build`);
+  }
+  return out;
+}
+
+/** THE FILL-STORY LAW (owner ruling 2026-08-11): validation is computed,
+ *  never claimed. A story is FILLED when every slide's evidence half
+ *  carries something, so the unfilled list IS the finding and the state
+ *  carries no form. The must stories fill from their demonstration
+ *  reports, which run-demos mints AFTER the fill state — so the musts,
+ *  and their demonstration coverage, get their teeth at the gate. */
+export function fillStoryLawProblems(corpus: { id: string; type: string; file?: string }[], includeMusts: boolean): string[] {
+  const out: string[] = [];
+  const demonstrated = new Set<string>();
+  for (const n of corpus) {
+    if (n.type !== "test-spec" || n.file === undefined) continue;
+    const fm = noteOf(n.file)?.frontmatter ?? {};
+    if (String(fm.method ?? "") !== "demonstration") continue;
+    for (const d of fmList(fm.demonstrates)) demonstrated.add(d.trim());
+  }
+  for (const n of corpus) {
+    if (n.type !== "story" || n.file === undefined) continue;
+    const note = noteOf(n.file);
+    if (note === undefined) continue;
+    const must = String(note.frontmatter.priority ?? "") === "must";
+    if (must && !includeMusts) continue;
+    if (must && !demonstrated.has(n.id)) {
+      out.push(`${n.id}: a must story no demonstration names — a demonstration-method spec carries it under demonstrates:`);
+    }
+    // A TEMPLATE PLACEHOLDER IS NOT EVIDENCE: comments are stripped before
+    // the emptiness check, so "<!-- Empty until M8. -->" counts as empty.
+    const unfilled = section(note.body, "Deck")
+      .split(/\n---\n/)
+      .map((s, i) => ({ i: i + 1, right: (s.split("|||")[1] ?? "").replace(/<!--[\s\S]*?-->/g, "").trim() }))
+      .filter((s) => s.right === "")
+      .map((s) => String(s.i));
+    if (unfilled.length > 0) out.push(`${n.id}: evidence half empty on slide ${unfilled.join(", ")}`);
   }
   return out;
 }
@@ -1612,6 +1653,15 @@ export function candidateItems(traceRoot: string): string[] {
 function claimSpecItems(traceRoot: string): string[] {
   return traceFolder(traceRoot, "test-spec")
     .filter((n) => String(n.fm.method ?? "") !== "test")
+    .map((n) => n.id)
+    .sort();
+}
+
+/** $must-stories, resolved live: the stories graded must. Each one is
+ *  demonstrated end to end at M8 and answers the gate with its report. */
+function mustStoryItems(traceRoot: string): string[] {
+  return traceFolder(traceRoot, "story")
+    .filter((n) => String(n.fm.priority ?? "") === "must")
     .map((n) => n.id)
     .sort();
 }

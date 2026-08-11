@@ -19,7 +19,10 @@ legal_tools:
   - se_lint
 evidence:
   - name: swept
-    description: the changes and the surfaces updated for each
+    template: checklist
+    items:
+      - $sweep_surfaces
+    description: "the surface classes walked - the meth-consistency-sweep card holds the classes, and checking a box claims its documents teach the current behavior"
 major: full
 minor: full
 patch: full
@@ -47,3 +50,5 @@ specification_note: |
 ## Guidance
 
 Per [[meth-consistency-sweep]]. A doc that still teaches the superseded way is a defect here, not a later surprise.
+
+LIST WHAT THE ITERATION CHANGED first - the evidence trail has it. Then walk the surface classes on the card, and for each class find every document teaching a changed behavior and fix it. Checking the box is the claim, per class.

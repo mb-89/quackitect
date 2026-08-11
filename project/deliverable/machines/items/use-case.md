@@ -89,9 +89,10 @@ guarantee: TODO — what holds after it succeeds
 refines:
   - TODO — the sty- id this generalizes
 #
-# Does the product die without this goal being reachable? A killer use case
-# is demonstrated end to end at M8.
-killer: false
+# MoSCoW, the house scale: must | should | could — the same grade the
+# whole chain carries, value prop to requirement. The demo duty lives on
+# the STORIES: a must story is demonstrated end to end at M8.
+priority: TODO — must | should | could
 ---
 
 ## Main scenario

@@ -21,7 +21,7 @@ product: full
 specification: tailored
 major_note: |
   Applies in full - the gate a major exists to pass. The matrix review is
-  the killer. The decomposition and the clustering are reviewed, and so are the allocation and the interfaces. Reviewed
+  the make-or-break check. The decomposition and the clustering are reviewed, and so are the allocation and the interfaces. Reviewed
   as data. M7 builds inside this baseline; a new element found mid-build
   returns HERE.
 minor_note: |

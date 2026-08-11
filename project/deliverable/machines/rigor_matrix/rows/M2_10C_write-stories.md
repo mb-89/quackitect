@@ -30,11 +30,11 @@ product: full
 specification: full
 major_note: |
   Applies for the change: every need it introduces gets its story,
-  killers marked. Resident stories the change invalidates are REVISED,
+  priorities graded. Resident stories the change invalidates are REVISED,
   not silently outgrown - a story that no longer matches the to-be world
   is a defect from here on.
 minor_note: |
-  Applies for the delta: every new need gets its story, killers marked,
+  Applies for the delta: every new need gets its story, priorities graded,
   slides as the examples' birth. Resident stories stand untouched - a new
   story that REWRITES an old one is a sign the delta is bigger than
   declared.
@@ -45,12 +45,12 @@ patch_note: |
 product_note: |
   STANDING ARTIFACT: the story decks, evidence sides FILLED - at rest the
   stories are the product's living validation record, not a design-time
-  leftover. Every value prop realized by at least one story; killers
-  marked; every slide's evidence current.
+  leftover. Every value prop realized by at least one story; priorities
+  graded; every slide's evidence current.
 specification_note: |
   DOCUMENT FORM: story DECKS - one deck per story, slides split into a
   statement half and an evidence half. The book renders them as decks;
-  killer stories marked in their frontmatter so the validation chapter
+  must stories graded in their frontmatter so the validation chapter
   can pull exactly those.
 ---
 
@@ -70,6 +70,6 @@ SEVERAL STORIES MAY SERVE ONE VALUE PROP, and most do. `refines` names the prop,
 
 COVERAGE IS CHECKED, NEVER WRITTEN DOWN. The field declares `covers: value-prop`, so the engine refuses this state while any story refines no proposition, and while any proposition is refined by no story.
 
-THERE IS NO COVERAGE FIELD, deliberately (owner ruling 2026-08-06). A form field asking whoever fills it to restate a computed result gets a paragraph that agrees with the engine until the day it does not. What is NOT computed - which stories are killers, and why the product dies without each - is judgment, and it goes under `anything_else`.
+THERE IS NO COVERAGE FIELD, deliberately (owner ruling 2026-08-06). A form field asking whoever fills it to restate a computed result gets a paragraph that agrees with the engine until the day it does not. What is NOT computed - which stories are MUSTS, and why each earns its demonstration - is judgment, and it goes under `anything_else`.
 
 THE SET IS NEVER COMPLETE, and does not have to be. Coverage is not the same as completeness: every proposition having a story does not mean every pass is told. A missing story surfaces later the same way a missing value prop does - something gets built that no story covers. Add it then, rather than stalling here for exhaustiveness.

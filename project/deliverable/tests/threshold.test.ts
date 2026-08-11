@@ -1,5 +1,5 @@
 // THE THRESHOLD (owner ruling 2026-07-26): every state carries a priority
-// (0.01 mechanical .. 0.8 killer, 1 ideation); the AGENT enters a state by itself only
+// (0.01 mechanical .. 0.8 milestone, 1 ideation); the AGENT enters a state by itself only
 // when priority <= the session autonomy. The human always may — HTTP is
 // the human's hand, MCP is the agent's. Reaching end ends the SESSION:
 // onClosed fires, the server shuts down, the mirror turns red.

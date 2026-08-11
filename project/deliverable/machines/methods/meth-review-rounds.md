@@ -61,12 +61,12 @@ WITH ITS DISSENT, never as a clean pass.
   - Risk rises where a person has to judge.
 - TRUST COMPUTED MARKS. They are deterministic.
 - SCALE TO SIZE. Do not red-team a trivial gate.
-- THE AGENT NEVER SELF-CERTIFIES A KILLER. v1's answer was a human
+- THE AGENT NEVER SELF-CERTIFIES A MILESTONE GATE. v1's answer was a human
   adjudicator.
   - For unattended runs the substitute must be mechanical or adversarial,
     never absent.
-  - Until one exists, a self-blessed killer is an OVERRIDE, logged with its
-    dissent.
+  - Until one exists, a self-blessed milestone is an OVERRIDE, logged with
+    its dissent.
 - VERDICT. One of three, and never a silent pass.
   - PASS.
   - PASS WITH NOTED OVERRIDES.

@@ -362,17 +362,14 @@ test("the computed order wins over a stored one, and only a recorded move overri
   assert.deepEqual(order, ["req-early", "req-late"], "the computed order stands, the stored numbers do not");
 
   // A MOVE IS A DECISION SOMEBODY SIGNED, so it is honoured.
-  const moved = ["1. [[req-late]] [moved: it gates the killer use case]", "2. [[req-early]]"].join("\n");
+  const moved = ["1. [[req-late]] [moved: it gates the must set]", "2. [[req-early]]"].join("\n");
   const html2 = drawRankCut({ content: moved }, { items: ["req-early", "req-late"] });
   const order2 = [...html2.matchAll(/data-id="([^"]+)"/g)].map((m) => m[1]);
   assert.deepEqual(order2, ["req-late", "req-early"], "a recorded move overrides the sort");
 });
 
 test("the ranking carries its last saved state, so it can be reverted to", () => {
-  const stored = [
-    "1. [[req-b]] [cutoff] [moved: it gates the killer use case]",
-    "2. [[req-a]] [cut: measured identically everywhere]",
-  ].join("\n");
+  const stored = ["1. [[req-b]] [cutoff] [moved: it gates the must set]", "2. [[req-a]] [cut: measured identically everywhere]"].join("\n");
   const html = drawRankCut({ content: stored }, { items: ["req-a", "req-b"] });
   // THE ACT CLASSES RIDE ALONG (owner, 2026-08-09). Save and revert wear the
   // accent so they read as the two acts on offer, rather than as decoration.

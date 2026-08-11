@@ -124,7 +124,7 @@ the consumer: if most rows are must, no candidate can differ.
 - `refines` names the uc- ids whose steps demand this row. The engine
   checks both directions against the use-case corpus.
 - A CROSS-CUTTING QUALITY serves no single pass. It names every use case
-  whose pass it protects — the killer set at minimum. A quality refining
+  whose pass it protects — the must stories' cases at minimum. A quality refining
   nothing fails traced, and honestly so.
 - `source_refs` carries everything else: stk- ids, norm clauses, recorded
   decisions, field evidence. It is the rationale's home, as links.

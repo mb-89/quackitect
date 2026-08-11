@@ -79,15 +79,15 @@ export function pareto(candidates: Scored[], axes: string[]): ParetoResult {
   const front: string[] = [];
   const eliminated: Elimination[] = [];
   for (const c of candidates) {
-    const killer = candidates.find((o) => o.id !== c.id && dominates(o, c, axes));
-    if (killer === undefined) {
+    const dominator = candidates.find((o) => o.id !== c.id && dominates(o, c, axes));
+    if (dominator === undefined) {
       front.push(c.id);
       continue;
     }
     eliminated.push({
       id: c.id,
-      by: killer.id,
-      lost_on: axes.filter((x) => (killer.scores[x] ?? 0) > (c.scores[x] ?? 0)),
+      by: dominator.id,
+      lost_on: axes.filter((x) => (dominator.scores[x] ?? 0) > (c.scores[x] ?? 0)),
     });
   }
   const utopia: Record<string, number> = {};

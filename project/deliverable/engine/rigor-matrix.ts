@@ -212,15 +212,20 @@ function refuseBadRow(row: RigorMatrixRow): void {
   // the state it recovers re-passing. fix-findings' findings ARE the red
   // verifications, generated — a form here would re-ask what the confirm
   // run answers.
+  // A LAW-PROVEN STATE IS EXEMPT TOO (owner ruling 2026-08-11): its proof
+  // is computed. fill-story-evidence's claim — every slide's evidence half
+  // non-empty — is a law over the story nodes, and a field here would
+  // re-ask what the law answers.
   if (
     row.state_kind !== "terminal" &&
     row.state_kind !== "gate" &&
     row.runs === undefined &&
     row.edge_role !== "fallback" &&
+    row.name !== "fill-story-evidence" &&
     row.evidence_form.length === 0
   ) {
     throw new Error(
-      `matrix row ${row.name} carries no evidence — leaving a state demands evidence; only a terminal, a gate, a sub-machine or a fallback state is exempt`,
+      `matrix row ${row.name} carries no evidence — leaving a state demands evidence; only a terminal, a gate, a sub-machine, a fallback or a law-proven state is exempt`,
     );
   }
 }
