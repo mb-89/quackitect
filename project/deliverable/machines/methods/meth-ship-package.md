@@ -1,13 +1,33 @@
 ---
 kind: method
-statement: "The release package: versioned artifact, baselined configuration, README - and the one-script entry per realization kind."
+statement: "The package assembles by script and is checked by using it: README, the one-time installer and the editor extension travel inside."
 ---
 
 ## Situation
-M9's package state. Everything a receiver needs, nothing that requires the sender.
+
+M9 package. The step is AUTOMATED: a script assembles the artifact, and
+assembling by hand is the defect. The human-shaped work is the check
+that the package works.
+
+## What a package holds
+
+- a README - an entry document in plain language, no method jargon
+- the one-time installer script - the single command a fresh machine runs
+- the editor extension - the panel a person works in
+- the versioned engine and method underneath them
 
 ## Procedure
-- Version the artifact; baseline the configuration it was built against.
-- README at the root: what this is, for whom, where to start - plain language, no method jargon.
-- The one-script entry (the RUNME equivalent), per realization kind: software installs and runs with one click; a design installs everything needed to CHECK the design in detail (viewers, models, calc sheets); a pure document may need none - record the skip.
-- Docs complete and matching the actual surface is the gate's make-or-break check - the book emits as a projection, never hand-finalized.
+
+- Bump the version and assemble by script. The script is part of the
+  product; improving it is packaging work.
+- Check it WORKS by using it: install from the package, reach the desk's
+  greeting. What was observed is the evidence - never "should install".
+- Release notes ride along, one entry per version.
+- A gap the check cannot close is named plainly, never papered over.
+
+## Waiting outside the matrix
+
+finalize-docs (the emitted book) and ship-review (dependency rulings)
+left the matrix on 2026-08-11 until their mechanisms exist. When the
+book pipeline lands, the docs duty returns as its own row; until then
+the consistency sweep at M8 carries the teaching surfaces.
