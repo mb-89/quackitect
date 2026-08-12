@@ -277,7 +277,7 @@ export function expeditionTools(session: Session): ToolDef[] {
       name: "se_seed_expedition",
       title: "se.seed.expedition",
       description:
-        "Seed an expedition: mints its record and worktree (branch exp/<id>). Declare kind (spike | fix | explore) and goal. It stands in the expeditions container at once — entering there binds it.",
+        "Seed an expedition: mints its record and worktree (branch exp/<id>) and pushes that branch to the shared remote, so other machines see it. Declare kind (spike | fix | explore) and goal. It stands in the expeditions container at once — entering there binds it.",
       inputSchema: {
         type: "object",
         properties: {

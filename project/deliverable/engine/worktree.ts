@@ -7,6 +7,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { pushSeed } from "./claims.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { parseStateNote, passEpoch, readNode, writeNode } from "./notes.ts";
 
@@ -44,6 +45,8 @@ export function slug(s: string): string {
 
 export interface Expedition {
   id: string;
+  /** The seed stub reached the remote at mint (absent on old records). */
+  announced?: boolean;
   branch: string;
   path: string;
   open: boolean;
@@ -274,7 +277,11 @@ export function expNew(root: string, kind: string, goal: string): Expedition {
   );
   git(path, ["add", "-A"], "add");
   git(path, ["commit", "-q", "-m", `expedition ${id}: open`], "commit");
-  return { id, branch: `exp/${id}`, path, open: true };
+  // The stub reaches the remote in the same act (owner ruling 2026-08-12:
+  // expeditions travel), so every peer machine lists it from its next
+  // fetch; no remote is a recorded seed, not a block.
+  const announced = pushSeed(path, `exp/${id}`).ok;
+  return { id, branch: `exp/${id}`, path, open: true, announced };
 }
 
 export function expFind(root: string, id: string): Expedition {
