@@ -605,6 +605,37 @@ classifier denied writing `.claude/settings.json`. It carries no remedy,
 because it is not the engine's refusal, and it is the only one in the run that
 had to be routed around rather than followed.
 
+### SE-C-134 fired, and the thing it guards happened anyway
+
+This one is a defect, found by looking at the tree after the walk stopped.
+
+`SE-C-134` exists to stop a bound record's method writes from fanning that
+record's copy over trunk. It fired **4 times**. The agent read it, and escaped
+over it once with the reason "method write: engine/help.ts and tools.ts need
+editing outside i8's worktree per SE-C-134".
+
+**Then the files landed on trunk regardless.** After the walk stopped, the main
+working tree held:
+
+```
+ M project/deliverable/engine/tools.ts      (+37 lines)
+ ?? project/deliverable/engine/help.ts
+ ?? project/deliverable/tests/sehelp.test.ts
+```
+
+All three are **byte-identical** to the copies in i8's own worktree. So the
+clause detected the situation it was written for, refused, said so — and the
+write reached trunk on some other path anyway.
+
+Nothing was lost, because the same content is committed on `it/i8-…`. The
+trunk copies were discarded. But a guard that refuses and is then bypassed is
+worse than no guard, because the record says the write was stopped.
+
+Worth checking at the retro: whether the lane resolves
+`project/deliverable/...` against the repository root even while a record is
+bound, in which case every bound write targets trunk by default and the clause
+is guarding a door that is not the one being used.
+
 ### The demand log — what I wanted and could not do
 
 This is the list i8 exists to produce mechanically. It arrives here from the
