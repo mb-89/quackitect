@@ -153,7 +153,19 @@ function refStamp(root: string): string {
 function refStampNow(root: string): string {
   const g = join(root, ".git");
   const parts: string[] = [];
-  for (const p of [join(g, "packed-refs"), join(g, "refs", "heads"), join(g, "refs", "heads", "it"), join(g, "refs", "heads", "exp")]) {
+  // THE REMOTE HALF IS STAMPED TOO, since listBranches now reads it: a
+  // fetch that brought a new pushed record would otherwise leave the
+  // cached listing standing, and the record would stay invisible until
+  // something local happened to move.
+  for (const p of [
+    join(g, "packed-refs"),
+    join(g, "refs", "heads"),
+    join(g, "refs", "heads", "it"),
+    join(g, "refs", "heads", "exp"),
+    join(g, "refs", "remotes", "origin"),
+    join(g, "refs", "remotes", "origin", "it"),
+    join(g, "refs", "remotes", "origin", "exp"),
+  ]) {
     try {
       const s = statSync(p);
       parts.push(`${s.size}:${s.mtimeMs}`);
@@ -183,10 +195,28 @@ export function listBranches(root: string, glob: string): string[] {
     throw hit.failure;
   }
   try {
-    const branches = git(root, ["branch", "--list", glob, "--format=%(refname:short)"], "branch --list")
-      .split("\n")
-      .map((b) => b.trim())
-      .filter((b) => b !== "");
+    // LOCAL AND PUSHED BOTH COUNT (2026-08-12, first run on a second
+    // machine). A fresh clone carries no local it/* or exp/* branches at
+    // all — git creates a local branch only for the one it checks out — so
+    // a machine-local listing made every pushed record INVISIBLE. The
+    // container, the survey and the archive all read empty on a box that
+    // had just cloned the repo, and the record the walk was sent to run
+    // could not be seen from the machine sent to run it.
+    //
+    // The remote half is normalised to its short name (origin/it/i8 reads
+    // as it/i8) and merged with the local half, so a record standing on
+    // both sides is listed exactly once. The symbolic origin/HEAD entry
+    // carries an arrow and is dropped.
+    const lines = (out: string): string[] =>
+      out
+        .split("\n")
+        .map((b) => b.trim())
+        .filter((b) => b !== "" && !b.includes("->"));
+    const local = lines(git(root, ["branch", "--list", glob, "--format=%(refname:short)"], "branch --list"));
+    const remote = lines(git(root, ["branch", "--remotes", "--list", `*/${glob}`, "--format=%(refname:short)"], "branch --list --remotes")).map((b) =>
+      b.slice(b.indexOf("/") + 1),
+    );
+    const branches = [...new Set([...local, ...remote])];
     branchList.set(key, { stamp, branches });
     return branches;
   } catch (e) {

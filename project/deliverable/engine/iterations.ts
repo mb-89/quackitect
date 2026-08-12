@@ -73,6 +73,57 @@ export function itList(root: string): Iteration[] {
   return out.sort((a, b) => Number(a.id.match(/^i(\d+)/)?.[1] ?? 0) - Number(b.id.match(/^i(\d+)/)?.[1] ?? 0));
 }
 
+/** ADOPT A PUSHED ITERATION — the second machine's half of the seed.
+ *
+ *  The seed mints a record, a branch and a worktree in one act, so on the
+ *  box that seeded it the three always stand together. A PEER MACHINE
+ *  CLONES AND GETS THE BRANCH ALONE: no worktree, therefore not open,
+ *  therefore absent from the container and from the survey. The record sat
+ *  on the remote the whole time and the machine sent to run it could not
+ *  see it (first run on a second machine, 2026-08-12).
+ *
+ *  Adopting binds the missing half. The branch is checked out into the
+ *  path the rest of the engine already expects, and from that moment the
+ *  iteration is open exactly like a seeded one — no call site learns a new
+ *  state, because the state it wants is the one that now exists.
+ *
+ *  IT MINTS NOTHING. No record is written, and no branch is created where
+ *  the remote did not already carry one. Adopting an open iteration is a
+ *  no-op, so a second call is safe. */
+export function itAdopt(root: string, id: string): Iteration {
+  const it = itList(root).find((x) => x.id === id);
+  if (it === undefined) {
+    throw new Rejection({
+      clause: CLAUSES.REQUIRED_ARGS,
+      expected: `an iteration branch it/${id} on this machine or its remote`,
+      got: "no such iteration in the listing",
+      remedy: { tool: "se_survey", args: {}, note: "list what actually stands, then adopt one of those ids" },
+      source: SRC,
+    });
+  }
+  // ALREADY BOUND IS ALREADY DONE. Re-adopting must never disturb a
+  // worktree that may be carrying uncommitted work.
+  if (it.open) return it;
+  mkdirSync(worktreesDir(root), { recursive: true });
+  const local = listBranches(root, `it/${id}`).length > 0 && existsSync(join(root, ".git", "refs", "heads", "it", id));
+  // A LOCAL BRANCH IS CHECKED OUT AS IT STANDS. A remote-only one gets a
+  // local branch tracking it, which is what makes the later push land back
+  // on the branch the peer is watching.
+  git(
+    root,
+    local ? ["worktree", "add", it.path, it.branch] : ["worktree", "add", it.path, "-b", it.branch, "--track", `origin/${it.branch}`],
+    "worktree add",
+  );
+  bustBranchList();
+  // The engine runs from the worktree's own copy, and a fresh checkout
+  // carries no node_modules — the same install the seed does.
+  const deliverable = join(it.path, "project", "deliverable");
+  if (existsSync(join(deliverable, "package.json")) && !existsSync(join(deliverable, "node_modules"))) {
+    spawnSync("npm", ["install", "--no-audit", "--no-fund"], { cwd: deliverable, stdio: "ignore", shell: process.platform === "win32" });
+  }
+  return { ...it, open: true };
+}
+
 /** THE SEED: goal + rough vision, plus context inputs (an expedition id,
  *  retro note refs). Mints the record on its own branch and worktree —
  *  the iteration stands in the container at once. */
