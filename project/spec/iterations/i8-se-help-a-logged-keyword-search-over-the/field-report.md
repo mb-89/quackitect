@@ -89,14 +89,28 @@ se-mcp: engine child exited (1) — respawning on the next request
 The spawn at `project/deliverable/engine/panel.ts:11` carries no `error`
 handler, so ENOENT reaches the top and kills the engine child.
 
-- **There is no flag to suppress it.** No `--no-open`, no `BROWSER` check.
-  `engine/shoot.ts` has a browser-discovery list; the panel opener does not use
-  it.
-- **Workaround used:** a no-op `xdg-open` placed on `PATH`. The repository was
-  not touched.
-- **The real fix** is one line: attach an `error` handler to that spawn, or
-  skip opening when no display is present. A headless run should never depend
-  on a desktop handler existing.
+The file's own opening comment says "a window is a convenience, the lane never
+dies over it", and there is a `try`/`catch` around the spawn meant to keep that
+promise. **It cannot.** Node reports a missing binary by emitting `error` on the
+child on a later tick, so it is not a synchronous throw and the `catch` never
+sees it. With no listener, it surfaces as an uncaught exception.
+
+Measured both ways on this box, with `xdg-open` absent from `PATH`:
+
+- Old code: `UNCAUGHT (old code): ENOENT`. The `catch` did not fire.
+- Fixed code: `survived 2s with no xdg-open — fix holds`.
+
+**Fixed in this branch** (`engine/panel.ts`): every spawn gets an `error`
+listener, so a missing desktop handler is ignored exactly as the comment always
+claimed it was.
+
+**There is also an escape hatch the handover never mentions:**
+`SE_PANEL_DISABLE=1` in the environment skips the panel entirely. It was in the
+code the whole time. A headless run should set it, and section 3 of the
+handover should say so — it is strictly simpler than the stub below.
+
+- **Workaround used before the fix:** a no-op `xdg-open` placed on `PATH`.
+  Either that or `SE_PANEL_DISABLE=1` unblocks an unpatched checkout.
 
 #### Defect 2 — it shuts down when its console closes
 
