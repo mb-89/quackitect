@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: if-account-to-mirror
 type: "[[interface]]"
 statement: The mirror derives its log, reference and trace views from the account's files on every look.

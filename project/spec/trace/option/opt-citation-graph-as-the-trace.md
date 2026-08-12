@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: opt-citation-graph-as-the-trace
 type: "[[option]]"
 statement: make every decision cite the earlier decisions it rests on, so the citation graph IS the trace and nobody maintains a second one

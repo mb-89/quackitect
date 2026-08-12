@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-one-script-installs
 type: "[[requirement]]"
 statement: When the one setup script at the product root runs, the script shall perform the whole install per the Detail table with zero further commands from the person.

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: dsp-walk-machine
 type: "[[design-spec]]"
 statement: the pull-driven walk over compiled machines, carried by one session that recomputes position on every call

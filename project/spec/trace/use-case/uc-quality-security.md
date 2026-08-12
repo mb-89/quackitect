@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-quality-security
 type: "[[use-case]]"
 statement: Keep an act attributable and a boundary closed

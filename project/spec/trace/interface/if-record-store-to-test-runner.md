@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: if-record-store-to-test-runner
 type: "[[interface]]"
 statement: The runner works the record's bound worktree — the tree on disk is the contract.

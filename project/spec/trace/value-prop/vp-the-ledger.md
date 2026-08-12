@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: vp-the-ledger
 type: "[[value-prop]]"
 statement: As an engineer, I need every decision recorded, attributed and refusable.

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: cluster-the-holding-pen
 type: "[[cluster]]"
 name: thought held outside every record until it has a home

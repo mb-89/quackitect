@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-close-refuses-loose-ends
 type: "[[requirement]]"
 statement: If a record holds unlanded work or an unruled finding, then the engine shall refuse the close and name what stands.

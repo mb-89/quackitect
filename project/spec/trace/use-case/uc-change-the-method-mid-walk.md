@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-change-the-method-mid-walk
 type: "[[use-case]]"
 statement: Correct the method while a walk is standing on it, and continue on the corrected version.

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-mirror-stays-on-the-machine
 type: "[[requirement]]"
 statement: While the mirror serves, the engine shall accept connections from the machine it runs on only, refusing 100 % of connections originating off that machine.

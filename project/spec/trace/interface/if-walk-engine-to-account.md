@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: if-walk-engine-to-account
 type: "[[interface]]"
 statement: Every dispatched call and every stamped claim lands in the account's log, role and channel on each.

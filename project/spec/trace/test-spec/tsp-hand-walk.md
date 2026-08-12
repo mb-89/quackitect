@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: tsp-hand-walk
 type: "[[test-spec]]"
 statement: A person at autonomy 0 drives every step themselves - the machine advances on their acts alone and never walks ahead of them, verified by demonstration at the live panel.

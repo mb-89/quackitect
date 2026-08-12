@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-landing-needs-no-close
 type: "[[requirement]]"
 statement: While a record stands open, the engine shall accept landings without requiring a close.

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: if-front-desk-to-mirror
 type: "[[interface]]"
 statement: The desk's recommendation rides the survey payload the mirror renders.

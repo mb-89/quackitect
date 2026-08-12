@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-retro-asks-real-use
 type: "[[requirement]]"
 statement: When a retro opens, the engine shall ask what came back from real use since the previous retro and shall store every answer as a note before draining begins.

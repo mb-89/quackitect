@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: dsp-note-pen
 type: "[[design-spec]]"
 statement: strays held in one inbox until a retro drains each to exactly one home, carried by an append-only notes file

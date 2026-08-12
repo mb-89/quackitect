@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: sty-ask-the-tests-a-question
 type: "[[story]]"
 statement: An engineer who has just changed something asks the tests one question and gets one answer, instead of running everything and reading a wall.

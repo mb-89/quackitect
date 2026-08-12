@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: stk-agent
 type: "[[stakeholder]]"
 statement: The AI agent the product governs — it reads the guidance, walks the machine, and has to recover from every refusal on its own.
@@ -22,6 +23,9 @@ weight: 0.8
   the engine could carry and does not is taken out of the thinking.
 - It cannot tell a rule it must obey from a rule it may weigh, unless the
   wording says which.
+- It now works BESIDE PEERS it never talks to: another machine's agent holds
+  claims it must honor sight unseen, and its own claim is all that keeps its
+  iteration its own.
 
 ## Notes (not load-bearing)
 

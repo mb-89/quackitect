@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: vp-rigor-without-toil
 type: "[[value-prop]]"
 statement: As an engineer, I need the rigor without the paperwork.

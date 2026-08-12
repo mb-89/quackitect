@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: opt-one-store-for-what-happened
 type: "[[option]]"
 statement: keep one append-only store of what happened, and derive the log view, the trace view and the inbox count from it

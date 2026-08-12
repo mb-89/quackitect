@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: sty-work-the-register-as-a-table
 type: "[[story]]"
 statement: An engineer opens a register of a hundred notes as one live table, edits cells instead of files, and every edit lands in the note it came from.

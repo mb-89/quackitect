@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-ideation-opens-no-record
 type: "[[requirement]]"
 statement: While ideation stands open, the engine shall open zero records and commit zero files.

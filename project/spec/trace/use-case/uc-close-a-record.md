@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-close-a-record
 type: "[[use-case]]"
 statement: Close a record, ruling on every finding it produced rather than dropping them.

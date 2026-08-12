@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-archive-releases-worktrees
 type: "[[requirement]]"
 statement: When a record archives, the engine shall remove every worktree bound to it, leaving zero worktrees referencing the record.

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: raid-ar-call-answers-in-one-second
 type: "[[raid]]"
 kind: risk

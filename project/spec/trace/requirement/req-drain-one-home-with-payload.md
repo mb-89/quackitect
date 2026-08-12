@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-drain-one-home-with-payload
 type: "[[requirement]]"
 statement: When a note is drained, the engine shall accept the drain only with exactly one home, that home's payload, and that home's legal context, per the Detail table.

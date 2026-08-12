@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: vp-systematic-engineering
 type: "[[value-prop]]"
 statement: As an engineer driving agents, I need the machine to ENFORCE the engineering order rather than remind me of it.
@@ -17,6 +18,8 @@ priority: must
 ## Unlike
 
 Spec-to-code tools plus review discipline. Those generate FROM a spec and never force the spec's own quality. The difference is that the discipline here is mechanical rather than aspirational — the engine refuses instead of reminding.
+
+The ENGINE beneath this machine is its own proposition ([[vp-the-engine]]): this one promises the flagship SE machine, not the platform. Neither swallows the other.
 
 ## Notes (not load-bearing)
 

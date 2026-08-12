@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-emergency-sits-above-full
 type: "[[requirement]]"
 statement: While emergency mode is armed, the engine shall hold every tool legal wherever the walk stands, arming only at the top rung, surviving the reload it was granted through, and disarming the moment the dial drops.

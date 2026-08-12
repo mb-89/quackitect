@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-adjudicate-a-gate
 type: "[[use-case]]"
 statement: Judge whether the work behind a gate is good enough to build on, and record the judgment.

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-trace-a-decision-to-its-origin
 type: "[[use-case]]"
 statement: Follow any piece of the spec back to the promise it serves and the hand that approved it.

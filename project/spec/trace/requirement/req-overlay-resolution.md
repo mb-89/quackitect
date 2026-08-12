@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-overlay-resolution
 type: "[[requirement]]"
 statement: When a builder overlay carries a card for an identity the engine also ships, the engine shall serve the overlay's card at every point that identity is resolved.

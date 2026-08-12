@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-quality-compatibility
 type: "[[use-case]]"
 statement: Share the tree with the tools already on it

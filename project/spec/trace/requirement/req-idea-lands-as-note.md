@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-idea-lands-as-note
 type: "[[requirement]]"
 statement: If the stated work is a doubt or an idea rather than a task, then the desk shall capture it as a note and shall open no record.

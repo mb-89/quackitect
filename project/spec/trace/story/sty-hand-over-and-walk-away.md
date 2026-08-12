@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: sty-hand-over-and-walk-away
 type: "[[story]]"
 statement: An engineer with a few ideas hands them to the agent, raises the slider and leaves the room, and finds the walk stopped exactly where their hand was needed.
@@ -34,7 +35,7 @@ se_note for the strays (the day's captures stand in .se/notes.jsonl), se_seed_it
 
 ---
 
-They drag the slider to the top and say "go". Then they close the laptop.
+They set the dial to its top rung and say "go". Then they close the laptop.
 |||
 Emergency mode arms deliberately (req-drumroll-arms-deliberately); the owner's standing order of 2026-08-11: "you are at emergency mode, full autonomy."
 

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-land-work-on-trunk
 type: "[[use-case]]"
 statement: Move a record's finished work onto the trunk, with the checks it owes run rather than assumed.

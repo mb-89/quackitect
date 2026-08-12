@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-every-update-reaches-the-render
 type: "[[requirement]]"
 statement: When a narration update lands, the panel shall change its render to carry it, and every script block the panel serves shall parse whole.

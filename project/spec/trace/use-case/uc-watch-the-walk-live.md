@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-watch-the-walk-live
 type: "[[use-case]]"
 statement: Watch the walk move in the panel without steering it, and keep your place while it moves.

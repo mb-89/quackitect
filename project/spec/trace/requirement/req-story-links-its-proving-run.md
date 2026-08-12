@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-story-links-its-proving-run
 type: "[[requirement]]"
 statement: Where a story's evidence side is filled, the engine shall link that story to the recorded run that proved it.

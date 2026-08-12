@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: nbr-vscode
 type: "[[neighbour]]"
 statement: VS Code, the host the mirror runs inside — it draws the panels and owns the editor the walk opens files in.

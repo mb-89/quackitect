@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-archive-read-only
 type: "[[requirement]]"
 statement: If an edit targets an archived record, then the engine shall refuse it, state that the archive is read-only, and change zero bytes of the record.

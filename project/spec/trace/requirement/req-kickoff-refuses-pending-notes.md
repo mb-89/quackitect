@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-kickoff-refuses-pending-notes
 type: "[[requirement]]"
 statement: While the notes inbox holds pending notes, the engine shall refuse the iteration kickoff and name the pending count.

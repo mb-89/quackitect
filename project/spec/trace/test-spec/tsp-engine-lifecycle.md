@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: tsp-engine-lifecycle
 type: "[[test-spec]]"
 statement: The engine restarts clean, lands crashes safe, answers inside its latency line, and serves its own machine only, verified by test over the process lifecycle.

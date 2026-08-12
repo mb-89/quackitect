@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: tsp-design-checks
 type: "[[test-spec]]"
 statement: The design-phase machinery computes its structural verdicts, binds its forms to the nodes, and compiles a drawing like a row, verified by test over the M4-to-M6 engines.

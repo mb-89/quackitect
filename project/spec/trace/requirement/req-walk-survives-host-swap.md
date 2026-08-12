@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-walk-survives-host-swap
 type: "[[requirement]]"
 statement: When the project is reopened under a different supported host, the engine shall serve the walk from the same recorded position with zero host-specific repair steps.

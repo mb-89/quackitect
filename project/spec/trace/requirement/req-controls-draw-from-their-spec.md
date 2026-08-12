@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-controls-draw-from-their-spec
 type: "[[requirement]]"
 statement: The engine shall draw the control bar from its spec file, and shall refuse an undeclared widget type by name.

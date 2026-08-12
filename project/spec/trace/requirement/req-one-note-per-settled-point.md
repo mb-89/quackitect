@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-one-note-per-settled-point
 type: "[[requirement]]"
 statement: Where a point settles over a live discussion, the method shall demand one consolidated note at settlement instead of one note per exchange.

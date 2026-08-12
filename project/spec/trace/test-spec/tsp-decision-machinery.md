@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: tsp-decision-machinery
 type: "[[test-spec]]"
 statement: The choosing machinery stays closed until real alternatives stand, records the case against every loser, and treats none-chosen as a legal outcome, verified by test over the decision editors and laws.

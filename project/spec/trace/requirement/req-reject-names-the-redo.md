@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-reject-names-the-redo
 type: "[[requirement]]"
 statement: When the person rejects at the land gate, the engine shall keep the work in the record's worktree and name each round to redo.

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: opt-the-stray-is-a-log-entry
 type: "[[option]]"
 statement: delete the note store and let a stray be a log entry of its own kind, with pending computed as a query rather than kept as a state

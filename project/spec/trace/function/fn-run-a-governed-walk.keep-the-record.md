@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: fn-run-a-governed-walk.keep-the-record
 type: "[[function]]"
 cluster: the-account
@@ -13,6 +14,7 @@ satisfies:
   - req-answer-recorded-with-question
   - req-upward-links-live-in-the-file
   - req-trace-view-derived-from-files
+  - req-nodes-scoped-to-iteration
   - req-trace-source-never-mixes
   - req-broken-trace-is-a-defect
   - req-story-links-its-proving-run

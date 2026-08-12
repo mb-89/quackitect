@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-shutdown-fires-only-idle-or-end
 type: "[[requirement]]"
 statement: While the shutdown toggle is set, the engine shall shut the system down after 5 idle minutes with a once-per-minute countdown shown, or when the walk passes the main machine's end state, and at no other moment.
