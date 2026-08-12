@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: if-method-compiler-to-walk-engine
 type: "[[interface]]"
 statement: The engine walks the machine the compiler pinned to the record — handed in process, never re-read mid-walk.

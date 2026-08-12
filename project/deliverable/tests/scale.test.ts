@@ -14,7 +14,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { parseStateNote } from "../engine/notes.ts";
 import { renderMirror } from "../engine/render.ts";
-import { loadLevels } from "../engine/scale.ts";
+import { loadLevels, tierOf, valueFor } from "../engine/scale.ts";
 import { Session } from "../engine/session.ts";
 import { freshRoot } from "./helpers.ts";
 
@@ -26,6 +26,23 @@ test("the scale offers a notch at zero, so a full block is one click away", () =
   assert.ok(zero !== undefined, "the scale declares a level at 0");
   assert.ok(zero.name !== "", "and names it, so the notch says what it does");
   assert.equal(Math.min(...levels.map((l) => l.value)), 0, "nothing sits below it");
+});
+
+// THE TIER LADDER IS THE VOCABULARY (owner cut-over ruling 2026-08-12):
+// mechanical, operational, tactical, strategic, ideation — the words are
+// the truth, the numbers their transitional anchors.
+test("the ladder speaks the owner's tiers in order, and the words map to their anchors", () => {
+  const levels = loadLevels(ROOT);
+  const words = levels
+    .filter((l) => l.value > 0)
+    .sort((a, b) => a.value - b.value)
+    .map((l) => l.name.split(" — ")[0]);
+  assert.deepEqual(words, ["mechanical", "operational", "tactical", "strategic", "ideation"]);
+  assert.equal(valueFor(levels, "tactical"), 0.6);
+  assert.equal(valueFor(levels, "strategic"), 0.8);
+  assert.equal(tierOf(levels, 1), "ideation");
+  assert.equal(tierOf(levels, 0.4), "operational");
+  assert.equal(tierOf(levels, 0.1), "blocked");
 });
 
 // BLOCKED IS NOT A BUTTON (owner, 2026-08-01). It is what no rung being
@@ -46,10 +63,12 @@ test("no state is authored at priority zero, or the block would not block", () =
   const dir = fileURLToPath(new URL("../machines/states/", import.meta.url));
   const files = readdirSync(dir).filter((f) => f.endsWith(".md"));
   assert.ok(files.length > 0, "there are authored states to check");
+  const levels = loadLevels(ROOT);
   for (const f of files) {
     const fm = parseStateNote(readFileSync(dir + f, "utf8")).frontmatter;
     if (fm.priority === undefined) continue;
-    const p = Number(fm.priority);
-    assert.ok(p > 0, `${f} is authored at priority ${p}; autonomy 0 would still admit it`);
+    const raw = fm.priority;
+    const p = typeof raw === "number" || !Number.isNaN(Number(raw)) ? Number(raw) : (valueFor(levels, String(raw)) ?? Number.NaN);
+    assert.ok(p > 0, `${f} is authored at priority ${String(raw)} (resolves ${p}); autonomy 0 would still admit it`);
   }
 });

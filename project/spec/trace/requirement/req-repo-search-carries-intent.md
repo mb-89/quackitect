@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-repo-search-carries-intent
 type: "[[requirement]]"
 statement: The lane shall record every repo search in the call log with its stated intent.

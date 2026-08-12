@@ -1,8 +1,8 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from project/guidance/contract.md 5197fafd696e
-     from project/guidance/walking.md bb556371c7df
+     from project/guidance/contract.md 82021a5541e2
+     from project/guidance/walking.md d159c5daa6cc
      from project/guidance/method/lane.md f5ea60fd4c3c
-     from project/guidance/voice.md 1af06d651e9b
+     from project/guidance/voice.md faf3174b30d8
 -->
 
 # contract — the binding rules of the session
@@ -28,9 +28,9 @@ not name. The engine does the checking.
 
 ## 3. Autonomy is the person's dial
 
-A step weighing more than the slider is theirs. Present it, then STOP, saying
+A step weighing more than the dial is theirs. Present it, then STOP, saying
 plainly which step waits and that a message (continue is enough) resumes you.
-The slider alone cannot wake you. The dial can move mid-session.
+The dial alone cannot wake you, and it can move mid-session.
 
 ## 4. Strays are notes
 
@@ -85,7 +85,7 @@ A TURN ENDS WHEN THE WORK DOES, NOT WHEN A PIECE OF IT DOES (owner ruling
 the last sentence claimed. Write the report and keep going in the same turn.
 Size is not a reason to hand back; large work is done by doing it.
 
-THE ONLY SANCTIONED STOP IS THE MACHINE'S OWN: a threshold above the slider, a
+THE ONLY SANCTIONED STOP IS THE MACHINE'S OWN: a threshold above the dial, a
 gate, or idle. A question anywhere else is an unsanctioned stop, and the
 engine cannot see it — it happens in chat, where nothing counts it.
 
@@ -167,7 +167,7 @@ names which of five you got.
   A GATE IS THE SAME MECHANISM. It takes `submit` and `bless` like any other
   form, and at high autonomy the agent uses both (owner ruling 2026-08-09).
   Blessing your own gate is normal here when the person has said so. Below the
-  slider it is theirs, exactly like every other step.
+  dial it is theirs, exactly like every other step.
 
   BOTH IN ONE PULL IS LEGAL: `form: {"verdict": "pass — why", "submit": true,
   "bless": true}` fills, stamps and blesses in a single call.
@@ -203,7 +203,7 @@ names which of five you got.
   here. Ask with a choice; the refusal names what is actually offered.
 - `do` — the happy path was walked for you, every hop to the next branching
   point. `here` is where you landed. Do the work, pull again.
-- `wait` — out of work, or the next step outweighs the slider. Name the
+- `wait` — out of work, or the next step outweighs the dial. Name the
   waiting step plainly, then STOP (contract rule 3). If the work is done,
   stop pulling.
 
@@ -216,7 +216,7 @@ recover in one turn. A result carrying a `banner` is shown VERBATIM.
 
 A PULL MAY MOVE THE WALK. There is no passive position query: "where am I" is
 the pull's `where`. It only advances through states whose conditions pass and
-whose weight fits the slider, so following it is safe by construction.
+whose weight fits the dial, so following it is safe by construction.
 
 ## What the agent still decides
 
@@ -237,7 +237,7 @@ wherever the walk stands, so the person's hand can never race you.
 
 ## The person's hand
 
-They AIM; they never walk. Their controls are the slider, the target and the
+They AIM; they never walk. Their controls are the autonomy dial, the target and the
 checkboxes. Nothing they press moves the machine a state forward or back —
 the walk advances on the agent's pull and nothing else.
 
@@ -508,7 +508,7 @@ Write plainly. These are rules, not suggestions. They bind every output:
   - "I need you to open a record, because rule 8 says I may not" beats "let me know how you want to proceed".
 - Separate what needs the person from what does not. Work that is already unblocked starts now; it does not wait behind an unanswered question.
 - This binds SHORT answers too. A message that answers a question and stops leaves the reader to work out what to do with the answer.
-- THE ONLY SANCTIONED STOP IS THE MACHINE'S OWN: a threshold above the slider, a gate, or idle. Stopping anywhere else to ask is an unsanctioned stop.
+- THE ONLY SANCTIONED STOP IS THE MACHINE'S OWN: a threshold above the dial, a gate, or idle. Stopping anywhere else to ask is an unsanctioned stop.
 - NEVER MENTION YOUR OWN CONTEXT. Not as a reason, not as a warning, not as colour.
   - The reader cannot act on it, and it is not a fact about the work.
 - RUNNING OUT IS SURVIVABLE BY DESIGN. The walk resumes from the repository and the reading is re-owed, so stopping early buys nothing and costs the work in flight.

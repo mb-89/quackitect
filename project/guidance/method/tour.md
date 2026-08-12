@@ -52,12 +52,12 @@ guide.
 
 0. THE WHOLE THING. One breath, no jargon: an AI does engineering work
    here, but every step runs through a state machine that logs it, gates
-   it, and demands evidence - and the human holds a slider that decides
+   it, and demands evidence - and the human holds the autonomy dial that decides
    how far the AI may walk alone. Everything on screen is that machine,
    live.
 1. THE MIRROR. The drawing is the machine; the arrow is where the walk
    stands. The feed is everything that happened, one line per act -
-   click a line for its detail. The slider is the human's grip: it sets
+   click a line for its detail. The dial is the human's grip: it sets
    how far the agent may walk alone.
 2. THE MAIN MACHINE.
    - Idle is the switchboard.

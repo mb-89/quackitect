@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-quality-interaction-capability
 type: "[[use-case]]"
 statement: Understand the machine well enough to drive it

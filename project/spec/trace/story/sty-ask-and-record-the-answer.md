@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: sty-ask-and-record-the-answer
 type: "[[story]]"
 statement: An engineer asks a question the system cannot answer from inside itself, and both the search and the answer end up on the record rather than in a chat window.

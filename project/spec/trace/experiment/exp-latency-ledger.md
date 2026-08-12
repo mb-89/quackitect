@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: exp-latency-ledger
 type: "[[experiment]]"
 statement: Does the serving path hold the one-second line today, measured over the recorded call log rather than remembered incidents?

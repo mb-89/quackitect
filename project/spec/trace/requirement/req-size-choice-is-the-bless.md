@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-size-choice-is-the-bless
 type: "[[requirement]]"
 statement: When the person answers the change-size decision, the engine shall record that answer as the bless and compile the column the person named.

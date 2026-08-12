@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: sty-vendor-it-into-my-product
 type: "[[story]]"
 statement: A builder with their own product and their own method installs quackitect under it, overlays what they do differently, and takes the next upstream version without merging anything.

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: tsp-reading-proof-run
 type: "[[test-spec]]"
 statement: A fresh agent is handed the method one document at a time and cannot reach the work until it proves it read them - observed on a real session's reading loop.

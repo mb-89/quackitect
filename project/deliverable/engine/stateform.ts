@@ -332,6 +332,10 @@ export function fieldBox(f: EvidenceField, traceRoot: string, stored: string): M
     // so the chart shows it — a search whose result vanishes is worse than an
     // untidy chart.
     const unplaced: MorphRow = { id: "", name: "unplaced", cells: [] };
+    // A DECISION ROW BEATS A CLUSTER ROW (owner ruling 2026-08-11): an option
+    // naming its design question lands in that question's row, so a scoped
+    // iteration's choices stand apart instead of lumping into one cluster.
+    const byQuestion = new Map<string, MorphRow>();
     for (const n of nodes.filter((x) => x.type === "option").sort((a, b) => a.id.localeCompare(b.id))) {
       const cell: MorphCell = {
         id: n.id,
@@ -339,8 +343,21 @@ export function fieldBox(f: EvidenceField, traceRoot: string, stored: string): M
         found_by: at(n, "found_by"),
         pruned: at(n, "pruned_because"),
       };
+      const q = at(n, "question").trim();
+      if (q !== "") {
+        const r = byQuestion.get(q) ?? { id: q, name: q, cells: [] as MorphCell[] };
+        r.cells.push(cell);
+        byQuestion.set(q, r);
+        continue;
+      }
       (byCluster.get(bare(at(n, "cluster"))) ?? unplaced).cells.push(cell);
     }
+    // THE BOX IS THE CURRENT SOLUTION'S, never the whole product's (owner
+    // ruling 2026-08-11): once any question row exists, the cluster rows -
+    // the resident corpus - leave the chart entirely.
+    const questionRows = [...byQuestion.values()].sort((a, b) => a.id.localeCompare(b.id));
+    if (questionRows.length > 0) rows.length = 0;
+    rows.push(...questionRows);
     if (unplaced.cells.length > 0) rows.push(unplaced);
     const cands: MorphLine[] = nodes
       .filter((n) => n.type === "candidate")
@@ -734,13 +751,36 @@ function seededStepIds(recordRoot: string): Set<string> | undefined {
   return undefined;
 }
 
+/** The record's OWN experiments: the ids its fold-back evidence names.
+ *  A standing experiment from an earlier record keeps its assignment to
+ *  THAT record's drawing, which this tree does not carry — sweeping it
+ *  against the current drawing failed i2 on i1's promotion (2026-08-12).
+ *  No fold-back evidence means no scoping, so unit fixtures keep the
+ *  whole-corpus sweep. */
+function foldBackExperiments(recordRoot: string): Set<string> | undefined {
+  const dir = join(recordRoot, "project", "spec", "iterations");
+  try {
+    for (const e of readdirSync(dir)) {
+      const abs = join(dir, e, "evidence", "fold-back.md");
+      if (!existsSync(abs)) continue;
+      const body = noteOf(abs)?.body ?? "";
+      return new Set([...body.matchAll(/\[\[(exp-[^\]]+)\]\]/g)].map((m) => m[1]));
+    }
+  } catch {
+    return undefined;
+  }
+  return undefined;
+}
+
 /** Promotions are a filter, never a list — and none may be lost: every
  *  promoted experiment carries `chunk:` naming its step in the drawing. */
 function promotionAssignmentProblems(corpus: { id: string; type: string; file?: string }[], recordRoot: string): string[] {
   const out: string[] = [];
   const steps = seededStepIds(recordRoot);
+  const own = foldBackExperiments(recordRoot);
   for (const n of corpus) {
     if (n.type !== "experiment" || n.file === undefined) continue;
+    if (own !== undefined && !own.has(n.id)) continue;
     const fm = noteOf(n.file)?.frontmatter ?? {};
     const p = String(fm.promote ?? "").trim();
     if (p === "" || /^none\b/i.test(p)) continue;
@@ -1072,12 +1112,15 @@ function nodeTableProblems(name: string, args: FieldArgs, content: string): stri
   return missing.length > 0 ? [`${name}: unanswered — ${missing.join(" · ")}`] : [];
 }
 
-/** Which cluster each option serves, read once for the whole chart. */
+/** Which ROW each option belongs to: its design question where it names one,
+ *  its cluster otherwise (owner ruling 2026-08-11 - a row is a DECISION, and
+ *  a scoped iteration's decisions are finer than the product's clusters). */
 function optionClusters(corpus: TraceNode[]): Map<string, string> {
   const out = new Map<string, string>();
   for (const n of corpus) {
     if (n.type !== "option" || n.file === undefined) continue;
-    out.set(n.id, bare(nodeField(n.file, "cluster")));
+    const q = nodeField(n.file, "question").trim();
+    out.set(n.id, q !== "" ? q : bare(nodeField(n.file, "cluster")));
   }
   return out;
 }
@@ -1100,10 +1143,12 @@ function chartProblems(name: string, content: string, corpus?: TraceNode[]): str
     ];
   }
   if (corpus === undefined) return [];
-  const clusters = corpus.filter((n) => n.type === "cluster").map((n) => n.id);
-  if (clusters.length === 0) return [];
   const serves = optionClusters(corpus);
-  const unfinished: string[] = [];
+  // A ROW IS A DECISION (owner ruling 2026-08-11): demanded rows are those
+  // where the LINES' OWN picks offer at least two live alternatives. A
+  // one-cell row is a settled ruling, and inherited clusters never re-demand.
+  const lines: { id: string; byKey: Map<string, number> }[] = [];
+  const used = new Map<string, Set<string>>();
   for (const line of rows) {
     const cells = line
       .trim()
@@ -1113,17 +1158,30 @@ function chartProblems(name: string, content: string, corpus?: TraceNode[]): str
       .map((c) => c.trim());
     const id = bare(cells[0] ?? "");
     if (!id.startsWith("cand-")) continue;
-    const visited = new Set(
-      (cells[3] ?? "")
-        .split(/[·,]/)
-        .map((p) => serves.get(bare(p)))
-        .filter((c): c is string => c !== undefined && c !== ""),
-    );
-    const left = clusters.filter((c) => !visited.has(c));
-    if (left.length > 0) unfinished.push(`${id} misses ${left.join(", ")}`);
+    const byKey = new Map<string, number>();
+    for (const p of (cells[3] ?? "")
+      .split(/[·,]/)
+      .map((x) => bare(x))
+      .filter((x) => x !== "")) {
+      const k = serves.get(p);
+      if (k === undefined || k === "") continue;
+      byKey.set(k, (byKey.get(k) ?? 0) + 1);
+      const seen = used.get(k) ?? new Set<string>();
+      seen.add(p);
+      used.set(k, seen);
+    }
+    lines.push({ id, byKey });
   }
-  if (unfinished.length === 0) return [];
-  return [`${name}: a line that skips a cluster is not a candidate — one option per cluster · ${unfinished.join(" · ")}`];
+  const demanded = [...used.entries()].filter(([, opts]) => opts.size >= 2).map(([k]) => k);
+  const problems: string[] = [];
+  for (const l of lines) {
+    const misses = demanded.filter((k) => (l.byKey.get(k) ?? 0) === 0);
+    if (misses.length > 0) problems.push(`${l.id} misses ${misses.join(", ")}`);
+    const doubles = [...l.byKey.entries()].filter(([, count]) => count > 1).map(([k]) => k);
+    if (doubles.length > 0) problems.push(`${l.id} picks twice in ${doubles.join(", ")}`);
+  }
+  if (problems.length === 0) return [];
+  return [`${name}: one option per row, and every decided row on every line — ${problems.join(" · ")}`];
 }
 
 /** THE TABLE'S OWN SHAPE — a header, a rule, and rows of the right width.

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-engine-folder-is-sealed
 type: "[[requirement]]"
 statement: Where the engine is vendored in a host repository, the engine shall resolve every resource it serves from inside its own folder and shall write zero files into it.

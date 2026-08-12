@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: sty-watch-the-walk-live
 type: "[[story]]"
 statement: An engineer leaves the agent walking, watches the panel tell the story live, and never loses their place while it moves.

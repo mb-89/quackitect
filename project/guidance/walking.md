@@ -43,7 +43,7 @@ names which of five you got.
   A GATE IS THE SAME MECHANISM. It takes `submit` and `bless` like any other
   form, and at high autonomy the agent uses both (owner ruling 2026-08-09).
   Blessing your own gate is normal here when the person has said so. Below the
-  slider it is theirs, exactly like every other step.
+  dial it is theirs, exactly like every other step.
 
   BOTH IN ONE PULL IS LEGAL: `form: {"verdict": "pass — why", "submit": true,
   "bless": true}` fills, stamps and blesses in a single call.
@@ -79,7 +79,7 @@ names which of five you got.
   here. Ask with a choice; the refusal names what is actually offered.
 - `do` — the happy path was walked for you, every hop to the next branching
   point. `here` is where you landed. Do the work, pull again.
-- `wait` — out of work, or the next step outweighs the slider. Name the
+- `wait` — out of work, or the next step outweighs the dial. Name the
   waiting step plainly, then STOP (contract rule 3). If the work is done,
   stop pulling.
 
@@ -92,7 +92,7 @@ recover in one turn. A result carrying a `banner` is shown VERBATIM.
 
 A PULL MAY MOVE THE WALK. There is no passive position query: "where am I" is
 the pull's `where`. It only advances through states whose conditions pass and
-whose weight fits the slider, so following it is safe by construction.
+whose weight fits the dial, so following it is safe by construction.
 
 ## What the agent still decides
 
@@ -113,7 +113,7 @@ wherever the walk stands, so the person's hand can never race you.
 
 ## The person's hand
 
-They AIM; they never walk. Their controls are the slider, the target and the
+They AIM; they never walk. Their controls are the autonomy dial, the target and the
 checkboxes. Nothing they press moves the machine a state forward or back —
 the walk advances on the agent's pull and nothing else.
 

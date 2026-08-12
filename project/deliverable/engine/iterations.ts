@@ -10,6 +10,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { type CanvasData, type CanvasEdge, type CanvasElement, nodeSize } from "./canvas.ts";
+import { pushSeed } from "./claims.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { buildArchive, type GeneratedMachine } from "./expmachine.ts";
 import { type EvidenceField, type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
@@ -38,6 +39,8 @@ export interface Iteration {
   branch: string;
   path: string;
   open: boolean;
+  /** Whether the seed's stub push reached the remote in the seeding act. */
+  announced?: boolean;
 }
 
 export function itRecordRel(id: string): string {
@@ -135,7 +138,10 @@ export function itSeed(root: string, goal: string, vision: string, inputs: strin
   );
   git(path, ["add", "-A"], "add");
   git(path, ["commit", "-q", "-m", `iteration ${id}: seed`], "commit");
-  return { id, branch: `it/${id}`, path, open: true };
+  // The stub reaches the remote in the same act, so every peer machine
+  // lists it from its next fetch; no remote is a recorded seed, not a block.
+  const announced = pushSeed(path, `it/${id}`).ok;
+  return { id, branch: `it/${id}`, path, open: true, announced };
 }
 
 export function itFind(root: string, id: string): Iteration {
@@ -431,6 +437,23 @@ export function pinIteration(root: string, it: Iteration, changeSize: string): R
   };
   mkdirSync(dirname(pinAbs), { recursive: true });
   writeFileSync(pinAbs, JSON.stringify(pin, null, 2), "utf8");
+  // EVERY SEEDED DRAWING GETS ITS PLACEHOLDER IN THE PIN'S OWN ACT, so no
+  // route refuses over a machine a later state has not authored yet. A
+  // drawn sub-canvas needs none, and an authored drawing is never touched.
+  const scaffolded: string[] = [];
+  for (const s of machine.states) {
+    if (s.submachine === undefined) continue;
+    if (existsSync(join(root, "project", "deliverable", "machines", `${s.submachine}.canvas`))) continue;
+    const abs = join(it.path, itSeededRel(it.id, s.submachine));
+    if (existsSync(abs)) continue;
+    mkdirSync(dirname(abs), { recursive: true });
+    writeFileSync(
+      abs,
+      '---\nnone: "not authored yet - the authoring state writes this drawing; this placeholder keeps the route drawable until then"\n---\n',
+      "utf8",
+    );
+    scaffolded.push(s.submachine);
+  }
   git(it.path, ["add", "-A"], "add");
   // BOOKKEEPING, NOT AUTHORED WORK: this commit lands a generated file. It
   // skips the hook because a fresh worktree carries no node_modules, so the
@@ -441,6 +464,7 @@ export function pinIteration(root: string, it: Iteration, changeSize: string): R
     pinned: changeSize,
     rigor_matrix_hash: pin.rigor_matrix_hash,
     states: machine.states.length,
+    ...(scaffolded.length > 0 ? { scaffolded } : {}),
     ...(reopened.length > 0 ? { reopened } : {}),
   };
 }

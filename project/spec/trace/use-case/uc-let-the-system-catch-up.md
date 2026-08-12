@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-let-the-system-catch-up
 type: "[[use-case]]"
 statement: Bring the method back into agreement with itself, in one pass, with no feature to hang it on.

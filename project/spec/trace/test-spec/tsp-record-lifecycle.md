@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: tsp-record-lifecycle
 type: "[[test-spec]]"
 statement: A record opens on the person's word, binds its own tree, walks from the retro, and grows only by adjudicated escalation, verified by test over the iteration machinery.

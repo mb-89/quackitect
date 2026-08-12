@@ -120,7 +120,7 @@ entry demand (that is the state's assignment, read inside it).
 ## Priority — the human-involvement scale
 
 Every state carries a `priority`, the weight of the DECISION TO ENTER it.
-The session runs with an AUTONOMY (CLI at launch, the mirror's slider,
+The session runs with an AUTONOMY (CLI at launch, the mirror's rungs,
 live): the agent enters a state by itself only when
 `priority <= autonomy`; the human always may, and work INSIDE a state is
 never gated — only entering is. So autonomy 0 is manual mode (the human
@@ -143,7 +143,7 @@ against these anchors, don't invent new bands:
 - **0.8 — milestone.** The decisions the whole walk exists to
   surface. 0.8 does NOT mean "always human" — it means the human holds it
   until they deliberately slide there.
-- **1 — ideation.** No state carries priority 1; it is the slider's last
+- **1 — ideation.** No state carries priority 1; it is the dial's last
   notch. At 1 the agent, left idle, finds its own work — pending notes,
   backlog, research. (The behavior ships later; until then 1 acts as 0.8.)
 

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: cluster-the-bootstrap
 type: "[[cluster]]"
 name: bringing a product into existence on a machine that has none

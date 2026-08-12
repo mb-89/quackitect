@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-quality-functional-suitability
 type: "[[use-case]]"
 statement: Get what the method actually promises, not a subset of it

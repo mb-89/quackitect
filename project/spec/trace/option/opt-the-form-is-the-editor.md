@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: opt-the-form-is-the-editor
 type: "[[option]]"
 statement: give the evidence form a second job as the node editor, so filling a field writes the standing artifact directly

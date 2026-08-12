@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: nbr-output-tools
 type: "[[neighbour]]"
 statement: The discipline's own output tools — the LLM coding harnesses for software, and each other field's generators.

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: opt-idempotent-scaffold-with-drift-detection
 type: "[[option]]"
 statement: make scaffolding repeatable on an existing tree, and report where the tree has drifted from the template rather than overwriting it

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: if-holding-pen-to-mirror
 type: "[[interface]]"
 statement: The mirror shows the pending notes from the pen's store, open ones always visible.

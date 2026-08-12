@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-second-product-reuses-install
 type: "[[requirement]]"
 statement: Where the extension is already installed, the setup of an additional product shall complete with zero further installs of the extension.

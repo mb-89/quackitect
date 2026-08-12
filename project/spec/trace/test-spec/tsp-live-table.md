@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: tsp-live-table
 type: "[[test-spec]]"
 statement: The live table derives from the notes, lands every edit in its note, keeps its whole shape on the view file, and refuses what it cannot draw, verified by test over the table stack.

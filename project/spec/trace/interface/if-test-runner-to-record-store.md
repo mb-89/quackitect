@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: if-test-runner-to-record-store
 type: "[[interface]]"
 statement: The runner's structured verdict lands in the record, and landing demands a fresh green from it.

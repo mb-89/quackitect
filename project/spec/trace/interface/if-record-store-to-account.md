@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: if-record-store-to-account
 type: "[[interface]]"
 statement: A closing record serves its findings into the account as references with their sources.

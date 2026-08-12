@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-set-the-autonomy
 type: "[[use-case]]"
 statement: Set how much of the walk the agent takes on its own, and change it at any time.

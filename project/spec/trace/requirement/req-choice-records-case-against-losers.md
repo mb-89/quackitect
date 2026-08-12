@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-choice-records-case-against-losers
 type: "[[requirement]]"
 statement: When an option is chosen, the engine shall record the reasoning against each unchosen option beside the choice.

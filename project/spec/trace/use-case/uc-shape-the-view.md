@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-shape-the-view
 type: "[[use-case]]"
 statement: Sort, group, filter and reshape the table, and keep the whole shape on the view's own file.

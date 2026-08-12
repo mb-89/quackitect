@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-view-notes-as-a-table
 type: "[[use-case]]"
 statement: See every note of a kind as one row each, live from the files, and edit them there.

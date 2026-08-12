@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-compaction-reowes-the-reading
 type: "[[requirement]]"
 statement: When a reader's context is compacted, the engine shall owe the full reading again.

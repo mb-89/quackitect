@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-tour-shows-live-instances
 type: "[[requirement]]"
 statement: While a tour stop runs, the tour shall show a live instance of the named kind rather than a general description.

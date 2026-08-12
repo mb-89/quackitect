@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-tour-highlights-the-named-part
 type: "[[requirement]]"
 statement: While a tour stop names a part, the panel shall highlight that part.

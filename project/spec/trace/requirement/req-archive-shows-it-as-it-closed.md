@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-archive-shows-it-as-it-closed
 type: "[[requirement]]"
 statement: When an archived record is opened, the engine shall show it exactly as it stood at close, with zero states omitted and zero bytes differing.

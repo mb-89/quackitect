@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-finding-keeps-its-sources
 type: "[[requirement]]"
 statement: The reference corpus shall hold every kept finding with links to the sources that support it.

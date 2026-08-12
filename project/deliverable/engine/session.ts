@@ -11,6 +11,7 @@
 // the next refused call's remedy re-boots the agent in one turn.
 import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
+import { claimEntry, machineId } from "./claims.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { dirtyLines, git, gitLand, gitSync } from "./gitlane.ts";
 import { contentHash } from "./hash.ts";
@@ -20,6 +21,7 @@ import {
   claimFeeders,
   completeState,
   downstreamCone,
+  INPUT_ROLES,
   type MachineDecl,
   type MachineInstance,
   reopenStates,
@@ -27,7 +29,7 @@ import {
 } from "./machine.ts";
 import { bumpDrawingEpoch, compileMachine, compileMachineCached, resolveRef } from "./machines/compile.ts";
 import { chartPlan } from "./morphbox.ts";
-import { computeRoute, type RouteNode, type RouteResult, type RouteStep } from "./route.ts";
+import { computeRoute, type RouteNode, type RouteResult, type RouteStep, routeWraps } from "./route.ts";
 
 /** THE STATE A RECORDED VISIT NAMES. A visit is stored qualified and
  *  occurrence-stamped ("expeditions/e30@0"), and the graph-is-evidence check
@@ -98,7 +100,7 @@ import { mintFlipLines } from "./pugh.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { anyJobRunning } from "./run.ts";
-import { levelName, loadLevels } from "./scale.ts";
+import { levelName, loadLevels, tierOf } from "./scale.ts";
 import {
   buildPortableForm,
   claimProblems,
@@ -946,10 +948,33 @@ export class Session {
 
   iterationOpen(id: string): Record<string, unknown> {
     const it = itFind(this.root, id);
+    // The record store opens a record only over a standing claim. Without
+    // a claims branch there is no pool and entry stays free.
+    const mid = machineId(join(this.root, ".se"));
+    const gate = claimEntry(this.root, it.id, mid);
+    if (!gate.ok) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `${it.id} unclaimed, or claimed by this machine (machine-${mid})`,
+        got: `claimed by machine-${gate.holder?.machine ?? "?"} since ${gate.holder?.at ?? "?"}`,
+        remedy: {
+          tool: "se_pull",
+          args: {},
+          note: "pick another iteration from the claimable listing; a person may force-release a claim judged abandoned",
+        },
+        source: "engine/session.ts claim-gate",
+      });
+    }
     this.bound = it;
     markStarted(this.root, it);
     this.decisions.setExtraSink(join(it.path, "project", "spec", "iterations", it.id, "decisions.jsonl"));
-    return { bound: it.id, note: "the lane now works in this iteration's worktree" };
+    return {
+      bound: it.id,
+      note: "the lane now works in this iteration's worktree",
+      ...(gate.claimed_now === true
+        ? { claimed: `machine-${mid}${gate.offline === true ? " (recorded offline; announces at the next opportunity)" : ""}` }
+        : {}),
+    };
   }
 
   /** THE BLESS PINS (owner verdicts 2026-07-30): leaving an iteration
@@ -1636,31 +1661,68 @@ export class Session {
 
   /** THE FIRST OWED STATE INSIDE A SUB-MACHINE THAT LIES UPSTREAM OF THE AIM.
    *
-   *  Walks the inbound edges of THIS machine — every state, not only the ones
-   *  carrying a claim — and for each container it meets, asks that machine
-   *  what it still owes. The first answer wins, in the sub-machine's own
-   *  declaration order, so a chart that waits on its finders is named after
-   *  them rather than before. */
+   *  Walks the inbound INPUT edges of THIS machine, and for each container it
+   *  meets, asks that machine what it still owes. The first answer wins, in
+   *  the sub-machine's own declaration order, so a chart that waits on its
+   *  finders is named after them rather than before.
+   *
+   *  INPUT EDGES ONLY (owner emergency ruling 2026-08-11). Every idle door is
+   *  double-headed, and the compiler names each return half alternative.
+   *  Counting those as inbound made the WHOLE machine upstream of the front
+   *  desk, so an aim at the desk descended into whatever record stood open:
+   *  boot marched into i2, parked at a gate, and served the record's reading
+   *  as boot's own. The desk is never behind the work.
+   *
+   *  THE WALK'S OWN CONTAINER STILL ANSWERS. A walk standing inside a record
+   *  keeps finding its owed legs — the container it stands in is asked even
+   *  though no input edge makes it upstream of the aim. That keeps the same
+   *  day's wedge fix: a finished fan leg still learns its owed sibling. */
   private subObjective(decl: MachineDecl, prefix: string, local: string, pass: GreenPass): string | undefined {
     const upstream = new Set<string>();
     const stack = [local];
     while (stack.length > 0) {
       const at = stack.pop() as string;
       for (const src of decl.states) {
-        if (upstream.has(src.id) || !src.edges.some((e) => e.to === at)) continue;
+        if (upstream.has(src.id) || !src.edges.some((e) => e.to === at && INPUT_ROLES.has(e.role ?? "normal"))) continue;
         upstream.add(src.id);
         stack.push(src.id);
       }
     }
+    const here = this.active()[0] ?? "";
+    if (prefix === "" && here.includes("/")) upstream.add(here.split("/")[0]);
     for (const id of upstream) {
       const st = decl.states.find((s) => s.id === id);
       if (st?.submachine === undefined) continue;
       const subPrefix = Session.qual(prefix, id);
       const sub = this.declForPrefix(subPrefix);
       if (sub === undefined) continue;
-      const done = new Set(this.recordDone(sub, new Set(), pass));
-      const owed = sub.states.filter((s) => s.evidence_form.length > 0).find((s) => !done.has(s.id));
-      if (owed !== undefined) return Session.qual(subPrefix, owed.id);
+      const owed = this.deepOwed(subPrefix, sub, pass);
+      if (owed !== undefined) return owed;
+    }
+    return undefined;
+  }
+
+  /** THE FIRST OWED CLAIM IN A SUB-MACHINE, HOWEVER DEEP (owner ruling
+   *  2026-08-11). One level was not enough: aimed at the front desk with a
+   *  composer leg owed two containers down, the objective fell back to the
+   *  aim, the branch return could not map it into the leg's machine, and the
+   *  walk stood on a finished leg answering `do` with nowhere to go. Every
+   *  such wedge cost an escape to the desk and a re-aim by hand.
+   *
+   *  Declaration order is walk order in these machines, so the first undone
+   *  claimful state found this way is the same one a person reading the
+   *  drawing would name. A container met on the way is asked the same
+   *  question before the walk moves past it. */
+  private deepOwed(prefix: string, decl: MachineDecl, pass: GreenPass): string | undefined {
+    const done = new Set(this.recordDone(decl, new Set(), pass));
+    for (const s of decl.states) {
+      if (s.evidence_form.length > 0 && !done.has(s.id)) return Session.qual(prefix, s.id);
+      if (s.submachine === undefined) continue;
+      const subPrefix = Session.qual(prefix, s.id);
+      const sub = this.declForPrefix(subPrefix);
+      if (sub === undefined) continue;
+      const nested = this.deepOwed(subPrefix, sub, pass);
+      if (nested !== undefined) return nested;
     }
     return undefined;
   }
@@ -1870,7 +1932,10 @@ export class Session {
     // behind the walk that reaches the objective, and return to it. An OR
     // branch is never offered, because there the branch is where a DECISION
     // was made and walking backwards would un-make it.
-    const back = r.steps.length === 0 && from !== objective ? this.branchReturn(from, objective) : undefined;
+    // A found route that WRAPS out of the shared machine is the loop-the-
+    // machine line: prefer the branch return there too.
+    const wrapped = r.steps.length > 0 && routeWraps(from, objective, r.steps);
+    const back = (r.steps.length === 0 || wrapped) && from !== objective ? this.branchReturn(from, objective) : undefined;
     if (back !== undefined) r = back;
     const judgments = this.routeJudgments(r.steps);
     const value = {
@@ -2297,7 +2362,13 @@ export class Session {
     }
     const { machine, ids } = this.leaves();
     if (this._target === "" && !this.inSub() && ids.length === 1 && ids[0] === "front_desk") {
-      return this.optionsAt(this.machine, "idle");
+      // The desk borrows idle's doors, and a borrowed offer loses the hub
+      // itself. Idle is the one state with no owed work — the reload's
+      // home — and every borrowed door sails PAST it, the nearest being
+      // end, which shuts the server down. So the hub is offered too.
+      const hub = this.machine.states.find((s) => s.id === "idle");
+      const doors = this.optionsAt(this.machine, "idle");
+      return hub === undefined ? doors : [this.doorOption(this.machine, hub, "idle", "normal"), ...doors];
     }
     return ids.flatMap((id) => this.optionsAt(machine, id));
   }
@@ -2367,6 +2438,14 @@ export class Session {
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
       target: targetNow(),
       autonomy: this._autonomy,
+      ...(() => {
+        // The tiers are the vocabulary; the number is the transitional carrier.
+        try {
+          return { tier: tierOf(loadLevels(this.root), this._autonomy) };
+        } catch {
+          return {};
+        }
+      })(),
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
     });
 
@@ -3786,13 +3865,18 @@ export class Session {
     }
     if (sub === undefined) return false;
     const done = new Set(this.recordDone(sub, seen, pass, paint));
-    let provable = false;
     for (const s of sub.states) {
       if (s.evidence_form.length === 0 && s.submachine === undefined) continue;
-      provable = true;
       if (!done.has(s.id)) return false;
     }
-    return provable;
+    // AN EMPTY DRAWING IS VACUOUSLY FINISHED (owner ruling 2026-08-11). Zero
+    // spikes is a sanctioned outcome, and returning provable-only made the
+    // empty spike machine an unmet feeder forever: run-spikes drew grey, the
+    // ripple knocked signed fold-back out of green, the objective pinned on
+    // the standing state and the route to gate-prototype computed empty. The
+    // ripple still guards a vacuous container through its own feeders, and an
+    // UNSEEDED drawing still proves nothing — viewFor throws above.
+    return true;
   }
 
   /** COLLECT THE INPUT ONCE, PROCESS, OUTPUT (owner ruling 2026-08-09,

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-entry-speaks-plainly
 type: "[[requirement]]"
 statement: The entry documents shall carry zero bare method terms, with every method term present linked to its definition.

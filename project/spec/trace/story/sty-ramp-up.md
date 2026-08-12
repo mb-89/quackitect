@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: sty-ramp-up
 type: "[[story]]"
 statement: An engineer with nothing installed gets from an empty machine to the front desk, and everything they must click on the way is in this one story.

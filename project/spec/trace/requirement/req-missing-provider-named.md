@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-missing-provider-named
 type: "[[requirement]]"
 statement: If no web-search provider is configured, then the engine shall name the missing provider and keep serving direct URL fetches.

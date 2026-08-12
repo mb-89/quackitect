@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-reload-restarts-clean
 type: "[[requirement]]"
 statement: When a reload is requested, the engine shall restart from the sources as they stand on disk and shall recompute the walk's position from recorded evidence.

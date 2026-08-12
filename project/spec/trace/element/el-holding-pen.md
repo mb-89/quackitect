@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: el-holding-pen
 type: "[[element]]"
 statement: Captures strays as log entries in one call and holds structured divergence — problem first, options with costs, losers kept on record.

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: sty-capture-a-stray
 type: "[[story]]"
 statement: An engineer spots something wrong that is not today's job, records it in one breath, and keeps going without losing either the finding or the thread.

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-setup-stops-before-partial
 type: "[[requirement]]"
 statement: If a tool the setup needs is missing, then the script shall stop before changing anything and shall name each missing tool and where to get it.

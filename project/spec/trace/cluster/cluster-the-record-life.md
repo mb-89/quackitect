@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: cluster-the-record-life
 type: "[[cluster]]"
 name: a record from the moment it is routed to the moment it is archived

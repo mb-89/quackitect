@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-autonomy-gates-every-hop
 type: "[[requirement]]"
 statement: When a pull is served, the engine shall weigh the next hop against the autonomy setting and shall stop before any hop that outweighs it, naming the waiting step.

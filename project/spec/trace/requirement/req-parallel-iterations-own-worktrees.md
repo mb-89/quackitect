@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-parallel-iterations-own-worktrees
 type: "[[requirement]]"
 statement: Where two planned iterations have no unmet dependencies, the engine shall allow both to stand open at the same time, each in its own worktree.

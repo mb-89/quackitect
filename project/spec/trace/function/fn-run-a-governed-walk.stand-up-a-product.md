@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: fn-run-a-governed-walk.stand-up-a-product
 type: "[[function]]"
 cluster: the-bootstrap
@@ -12,6 +13,7 @@ satisfies:
   - req-extension-replaced-reported
   - req-fresh-machine-runs
   - req-scaffold-from-template
+  - req-pin-writes-seeded-scaffolds
   - req-begin-touches-nothing-existing
   - req-begin-says-own-window
   - req-purpose-recorded-at-begin

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: tsp-walk-window
 type: "[[test-spec]]"
 statement: The panel carries every update to the render, holds the reader's place, and keeps its colors and scripts honest, verified by test over the mirror's contract.

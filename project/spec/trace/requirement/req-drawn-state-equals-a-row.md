@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-drawn-state-equals-a-row
 type: "[[requirement]]"
 statement: When a drawn state declares evidence, the engine shall compile it exactly as a matrix row's declaration, and shall descend only into a sub-machine that resolves.

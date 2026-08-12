@@ -46,6 +46,20 @@ export interface RouteResult {
   note?: string;
 }
 
+/** A forward route that leaves the machine BOTH ends stand in has gone
+ *  round the world: out through the record's end and back in at its start.
+ *  The walk on a finished fan leg wants the branch return instead — a
+ *  loop-the-machine line is never the intent. */
+export function routeWraps(from: string, objective: string, steps: RouteStep[]): boolean {
+  const a = from.split("/");
+  const b = objective.split("/");
+  let n = 0;
+  while (n < a.length - 1 && n < b.length - 1 && a[n] === b[n]) n++;
+  if (n === 0) return false;
+  const prefix = `${a.slice(0, n).join("/")}/`;
+  return steps.some((s) => !s.from.startsWith(prefix) || !s.to.startsWith(prefix));
+}
+
 /** Breadth-first, so the answer is the FEWEST hops. Ties are broken by the
  *  order the drawing lists the edges, which is the order a reader sees. */
 export function computeRoute(

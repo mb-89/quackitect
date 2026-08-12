@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: tsp-trace-integrity
 type: "[[test-spec]]"
 statement: The trace holds both ways with zero dangling edges, and every reader resolves against one chosen corpus, verified by test over the trace loaders and checks.

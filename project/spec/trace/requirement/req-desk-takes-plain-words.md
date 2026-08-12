@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-desk-takes-plain-words
 type: "[[requirement]]"
 statement: When a person states wanted work at the front desk, the desk shall accept it as free text and shall demand no format of the person.

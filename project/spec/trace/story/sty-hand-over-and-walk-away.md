@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: sty-hand-over-and-walk-away
 type: "[[story]]"
 statement: An engineer with a few ideas hands them to the agent, raises the slider and leaves the room, and finds the walk stopped exactly where their hand was needed.

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: opt-triage-queue-in-front
 type: "[[option]]"
 statement: hold arriving strays in a queue that sits in front of the backlog, so nothing becomes work without a person deciding it is work

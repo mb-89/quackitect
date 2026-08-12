@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-upward-links-live-in-the-file
 type: "[[requirement]]"
 statement: The engine shall record every trace node's upward links in the node's own file, readable from the file alone.

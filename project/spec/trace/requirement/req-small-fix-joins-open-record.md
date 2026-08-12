@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-small-fix-joins-open-record
 type: "[[requirement]]"
 statement: If the work is a single small fix while a record stands open, then the desk shall place it in the open record and shall open no new record.

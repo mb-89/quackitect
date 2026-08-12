@@ -7,6 +7,8 @@ filled_by: agent
 depends_on:
   - gate-architecture
 seeds: spikes
+exit_script:
+  - project/deliverable/engine/bin/grades-complete.ts
 legal_tools:
   - se_file_read
   - se_file_write

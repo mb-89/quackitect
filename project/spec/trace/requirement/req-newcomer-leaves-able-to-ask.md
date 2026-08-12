@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-newcomer-leaves-able-to-ask
 type: "[[requirement]]"
 statement: When a newcomer completes their first tour, the engine shall leave at least 2 of 3 newcomers able to name the parts they will use and to pick a fitting desk offer unaided within the same session.

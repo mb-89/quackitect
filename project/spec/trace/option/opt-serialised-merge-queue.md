@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: opt-serialised-merge-queue
 type: "[[option]]"
 statement: land every branch through one first-in-first-out queue, with conflict resolution tiered by how much judgment it needs

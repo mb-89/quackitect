@@ -1,8 +1,10 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: opt-the-branch-is-the-record
 type: "[[option]]"
 statement: delete the record lifecycle entirely and let a git branch be the record, its life the branch's life, and its archive the history
 cluster: cluster-the-record-life
+question: what the record is
 found_by: without
 source: "trimming the largest cluster, per meth-trimming — six functions removed and git asked to take over"
 ---

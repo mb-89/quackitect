@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-view-writes-round-trip
 type: "[[requirement]]"
 statement: When a view control writes, the engine shall land the write in the view's own file so that the file parses again and the next render reads it back identically.

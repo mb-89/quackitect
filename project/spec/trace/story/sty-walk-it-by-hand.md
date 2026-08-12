@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: sty-walk-it-by-hand
 type: "[[story]]"
 statement: An engineer who wants no AI in the loop walks the same machine themselves, filling every form by hand, and reaches the same place.

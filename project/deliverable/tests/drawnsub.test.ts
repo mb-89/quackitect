@@ -239,6 +239,27 @@ test("a finished sub-machine does NOT paint its container while the container's 
   );
 });
 
+// THE DESK IS NEVER BEHIND THE WORK (owner emergency ruling 2026-08-11, same
+// day as and superseding the descend-however-deep rule for walks standing
+// OUTSIDE the record). Every idle door is double-headed and the return halves
+// compile as alternative; counting them as feeders made the whole machine
+// upstream of front_desk, so boot descended into the open iteration and
+// served the record's reading as its own. From outside a record, the
+// objective of a desk aim IS the desk.
+//
+// NOT PINNED HERE: the wedge the descend rule fixed — a walk standing on a
+// finished fan leg INSIDE the record still learns its owed sibling, via the
+// active-chain ask in subObjective. Standing a fixture walk mid-record means
+// signing its gates one by one, which is its own piece of work.
+test("an aim at the front desk never descends into an open record", async () => {
+  const { session } = await rootWithMajorIteration();
+  const r = session.route("front_desk");
+  assert.equal(r.target, "front_desk", `the aim stands — got ${r.target}`);
+  for (const s of r.steps) {
+    assert.ok(!s.to.startsWith("iterations/"), `the route to the desk enters ${s.to}`);
+  }
+});
+
 // THE ROUTE CARRIES THE WHOLE FAN (owner, 2026-08-09). One drawn path named
 // one leg of the three-way join and the walk met the other legs one refusal
 // at a time. The route now reports every unsigned leg of a bar it runs

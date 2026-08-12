@@ -289,6 +289,25 @@ describe("the design-spec law", { concurrency: true }, () => {
     assert.deepEqual(specifyBuildLawProblems(loadTrace(root), root), []);
   });
 
+  test("a standing experiment from another record stays out of the assignment sweep", () => {
+    const root = freshRoot();
+    mkdirSync(join(root, "project/spec/iterations/itx/machines"), { recursive: true });
+    writeFileSync(
+      join(root, "project/spec/iterations/itx/machines/build-chunks.md"),
+      ["---", "steps:", "  - id: c1", '    statement: "the first chunk"', "---", ""].join("\n"),
+      "utf8",
+    );
+    mkdirSync(join(root, "project/spec/iterations/itx/evidence"), { recursive: true });
+    writeFileSync(
+      join(root, "project/spec/iterations/itx/evidence/fold-back.md"),
+      ["## folded", "", "| experiment | folds_to | promote |", "| --- | --- | --- |", "| [[exp-mine]] | holds | enters |", ""].join("\n"),
+      "utf8",
+    );
+    mintTyped(root, "experiment", "exp-mine", "experiment", ["promote: the probe enters", "chunk: c1"]);
+    mintTyped(root, "experiment", "exp-other", "experiment", ["promote: another record's find", "chunk: zz-elsewhere"]);
+    assert.deepEqual(specifyBuildLawProblems(loadTrace(root), root), []);
+  });
+
   test("trace-design names a ghost file and sweeps the unclaimed", () => {
     // An ISOLATED subroot: freshRoot mirrors the real engine tree, and the
     // sweep would list a hundred genuinely unclaimed files before stray.ts.

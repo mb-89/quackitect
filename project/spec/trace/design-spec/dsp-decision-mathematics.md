@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: dsp-decision-mathematics
 type: "[[design-spec]]"
 statement: the M4 and M5 mechanics computed from nodes, carried by one module per method with nothing typed by hand

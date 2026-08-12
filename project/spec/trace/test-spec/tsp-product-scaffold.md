@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: tsp-product-scaffold
 type: "[[test-spec]]"
 statement: A product begins from the template without touching anything existing, owns its folder whole, and installs from one script that stops before partial, verified by test over the scaffold and setup paths.

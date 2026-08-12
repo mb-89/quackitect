@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-no-agent-act-destroys-work
 type: "[[requirement]]"
 statement: While an agent walks at any autonomy setting, the engine shall leave 100 % of work already committed recoverable from the repository, without a person's act.

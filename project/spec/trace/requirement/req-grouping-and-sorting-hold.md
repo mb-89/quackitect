@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-grouping-and-sorting-hold
 type: "[[requirement]]"
 statement: When rows are grouped or sorted, the engine shall order them per the Detail table, with every row still appearing and the counts whole at every level.

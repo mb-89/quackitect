@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: opt-abandon-by-deleting-the-branch
 type: "[[option]]"
 statement: make abandoning work a deletion rather than a ruling, so a failed attempt costs nothing to throw away

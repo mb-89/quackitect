@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: sty-answer-why-a-year-later
 type: "[[story]]"
 statement: Someone asks why a decision was made a year ago, and the answer is found by clicking rather than by asking whoever is still around.

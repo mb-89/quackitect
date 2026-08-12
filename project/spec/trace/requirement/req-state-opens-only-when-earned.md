@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-state-opens-only-when-earned
 type: "[[requirement]]"
 statement: The engine shall open a state only when every document it owes is credited and every entry condition holds, naming whatever is missing.

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-gate-evidence-must-be-sound
 type: "[[requirement]]"
 statement: If a gate's evidence holds an unfilled field, an unfilled round, or a citation resolving to no artifact, then the engine shall refuse to offer the gate for adjudication.

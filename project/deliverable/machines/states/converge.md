@@ -1,7 +1,7 @@
 ---
 state: converge
 state_kind: work
-priority: 0.2
+priority: operational
 legal_tools: all
 guidance: |
   CONVERGE - cluster the harvest, then judge it.

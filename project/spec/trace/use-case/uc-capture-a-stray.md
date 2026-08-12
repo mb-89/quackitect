@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-capture-a-stray
 type: "[[use-case]]"
 statement: Record a finding that is not the current job, without leaving the current job.

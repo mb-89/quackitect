@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-reading-proof
 type: "[[requirement]]"
 statement: When a document is delivered, the engine shall credit it only against a proof that the whole document arrived.

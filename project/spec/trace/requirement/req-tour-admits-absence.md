@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-tour-admits-absence
 type: "[[requirement]]"
 statement: If zero instances of a stop's kind exist, then the stop shall state the absence and show no invented example.
