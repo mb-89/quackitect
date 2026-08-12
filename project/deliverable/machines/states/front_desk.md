@@ -1,7 +1,7 @@
 ---
 state: front_desk
 state_kind: work
-priority: 0.2
+priority: mechanical
 statement: In doubt, go here. Need a tour? Ask.
 tags: front-desk
 legal_tools: all, se_note_drain

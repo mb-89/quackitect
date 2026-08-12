@@ -63,10 +63,12 @@ test("no state is authored at priority zero, or the block would not block", () =
   const dir = fileURLToPath(new URL("../machines/states/", import.meta.url));
   const files = readdirSync(dir).filter((f) => f.endsWith(".md"));
   assert.ok(files.length > 0, "there are authored states to check");
+  const levels = loadLevels(ROOT);
   for (const f of files) {
     const fm = parseStateNote(readFileSync(dir + f, "utf8")).frontmatter;
     if (fm.priority === undefined) continue;
-    const p = Number(fm.priority);
-    assert.ok(p > 0, `${f} is authored at priority ${p}; autonomy 0 would still admit it`);
+    const raw = fm.priority;
+    const p = typeof raw === "number" || !Number.isNaN(Number(raw)) ? Number(raw) : (valueFor(levels, String(raw)) ?? Number.NaN);
+    assert.ok(p > 0, `${f} is authored at priority ${String(raw)} (resolves ${p}); autonomy 0 would still admit it`);
   }
 });

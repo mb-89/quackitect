@@ -1,7 +1,7 @@
 ---
 state: find_by_probing
 state_kind: work
-priority: 0.4
+priority: operational
 tags: finders
 entry_read:
   - project/deliverable/machines/methods/meth-spike-tracer.md

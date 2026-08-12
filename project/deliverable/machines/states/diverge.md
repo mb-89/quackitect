@@ -1,7 +1,7 @@
 ---
 state: diverge
 state_kind: work
-priority: 0.2
+priority: operational
 legal_tools: all
 guidance: |
   DIVERGE - run METHOD CARDS from `project/deliverable/machines/methods/`,

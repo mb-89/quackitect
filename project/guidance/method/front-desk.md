@@ -28,7 +28,7 @@ walkable this minute — peek the doors and the machinery, pick a handful,
 one plain line each. A new feature joins the list by existing, never by
 an edit to this file. Then close with the fixed line:
 
-> The slider next to the drawing sets how much I do on my own.
+> The autonomy dial next to the drawing sets how much I do on my own.
 
 Then stop and wait. Every LATER visit in the same session works as the
 sections below say — sweep, advise, execute.
@@ -114,7 +114,7 @@ Waiting is the desk's normal resting state.
 
 When no specific routed goal is active, stay at the desk and stop.
 
-Say plainly that the slider alone cannot wake a stopped agent.
+Say plainly that the dial alone cannot wake a stopped agent.
 
 Say plainly that a message resumes it.
 

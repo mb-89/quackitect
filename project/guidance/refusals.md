@@ -135,7 +135,7 @@ holds that job elsewhere — it is never an obstacle to route around.
 Entry and exit conditions want their evidence. The pull tells you which one
 stands in the way and how to work it.
 
-### SE-C-113 — the step outweighs the slider
+### SE-C-113 — the step outweighs the dial
 A step weighing more than the session autonomy is the person's. Present it,
 then stop. A message from them resumes the walk.
 

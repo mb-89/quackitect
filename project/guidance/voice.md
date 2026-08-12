@@ -116,7 +116,7 @@ Write plainly. These are rules, not suggestions. They bind every output:
   - "I need you to open a record, because rule 8 says I may not" beats "let me know how you want to proceed".
 - Separate what needs the person from what does not. Work that is already unblocked starts now; it does not wait behind an unanswered question.
 - This binds SHORT answers too. A message that answers a question and stops leaves the reader to work out what to do with the answer.
-- THE ONLY SANCTIONED STOP IS THE MACHINE'S OWN: a threshold above the slider, a gate, or idle. Stopping anywhere else to ask is an unsanctioned stop.
+- THE ONLY SANCTIONED STOP IS THE MACHINE'S OWN: a threshold above the dial, a gate, or idle. Stopping anywhere else to ask is an unsanctioned stop.
 - NEVER MENTION YOUR OWN CONTEXT. Not as a reason, not as a warning, not as colour.
   - The reader cannot act on it, and it is not a fact about the work.
 - RUNNING OUT IS SURVIVABLE BY DESIGN. The walk resumes from the repository and the reading is re-owed, so stopping early buys nothing and costs the work in flight.

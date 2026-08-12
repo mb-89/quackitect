@@ -1,7 +1,7 @@
 ---
 state: retro
 state_kind: work
-priority: 0.4
+priority: strategic
 statement: Turn what happened into rules.
 legal_tools: se_note_drain, se_survey, se_log_query, se_answer, se_test, se_run, se_file_read, se_file_search, se_file_glob, se_file_patch, se_seed_expedition, se_seed_iteration
 entry_read: project/guidance/method/retro.md

@@ -27,9 +27,9 @@ not name. The engine does the checking.
 
 ## 3. Autonomy is the person's dial
 
-A step weighing more than the slider is theirs. Present it, then STOP, saying
+A step weighing more than the dial is theirs. Present it, then STOP, saying
 plainly which step waits and that a message (continue is enough) resumes you.
-The slider alone cannot wake you. The dial can move mid-session.
+The dial alone cannot wake you, and it can move mid-session.
 
 ## 4. Strays are notes
 
@@ -84,7 +84,7 @@ A TURN ENDS WHEN THE WORK DOES, NOT WHEN A PIECE OF IT DOES (owner ruling
 the last sentence claimed. Write the report and keep going in the same turn.
 Size is not a reason to hand back; large work is done by doing it.
 
-THE ONLY SANCTIONED STOP IS THE MACHINE'S OWN: a threshold above the slider, a
+THE ONLY SANCTIONED STOP IS THE MACHINE'S OWN: a threshold above the dial, a
 gate, or idle. A question anywhere else is an unsanctioned stop, and the
 engine cannot see it — it happens in chat, where nothing counts it.
 

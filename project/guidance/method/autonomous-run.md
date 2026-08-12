@@ -10,7 +10,7 @@ This is what the agent does when the owner sets full autonomy and says go
 ahead. It runs without further instruction until the stop condition.
 
 It is a LOOP OVER MACHINES THAT ALREADY EXIST. It invents no new lane and
-skips no guard. Every state on the way still weighs the slider, proves its
+skips no guard. Every state on the way still weighs the dial, proves its
 reads and runs its scripts.
 
 ## The trigger

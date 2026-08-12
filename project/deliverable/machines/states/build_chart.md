@@ -2,7 +2,7 @@
 state: build_chart
 state_kind: work
 busbar: true
-priority: 0.2
+priority: operational
 tags: finders
 entry_read:
   - project/deliverable/machines/methods/meth-morphological-analysis.md
