@@ -16,7 +16,8 @@ over a strategic decision while withholding the mechanical work it implies.
 
 NO STATE IS EVER AUTHORED AT 0, and that is what makes a full block
 possible. The gate refuses when a state's priority is GREATER than the
-autonomy, so 0.01 is the least a step can weigh and 0 admits nothing at all.
+autonomy, so mechanical is the least a step can weigh and 0 admits nothing
+at all.
 
 BLOCKED IS A CONTROL POSITION, NOT A PRIORITY ANCHOR. The other rungs are
 both: positions to click, and anchors to calibrate a state's `priority:`

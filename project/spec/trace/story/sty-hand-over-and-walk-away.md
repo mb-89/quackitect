@@ -35,7 +35,7 @@ se_note for the strays (the day's captures stand in .se/notes.jsonl), se_seed_it
 
 ---
 
-They drag the slider to the top and say "go". Then they close the laptop.
+They set the dial to its top rung and say "go". Then they close the laptop.
 |||
 Emergency mode arms deliberately (req-drumroll-arms-deliberately); the owner's standing order of 2026-08-11: "you are at emergency mode, full autonomy."
 

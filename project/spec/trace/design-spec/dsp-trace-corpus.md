@@ -9,6 +9,7 @@ files:
   - "project/deliverable/engine/trace.ts"
   - "project/deliverable/engine/traceschema.ts"
   - "project/deliverable/engine/frontmatter.ts"
+  - "project/deliverable/engine/bin/backfill-minted.ts"
 ---
 
 ## Responsibility

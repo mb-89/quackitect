@@ -157,3 +157,43 @@
 {"ts":"2026-08-12T13:57:55.594Z","op":"update","visit":"iterations/i2/build-steps/b10-node-scoping@0","node":"d3","brief":"the view debt stands on the register"}
 {"ts":"2026-08-12T13:58:35.232Z","op":"plan","visit":"iterations/i2/trace-design@0","parent":null,"nodes":[{"id":"d4","brief":"trace-design signed"},{"id":"d5","brief":"verification with the fresh-eyes tester"},{"id":"d6","brief":"gate-implementation through shipped"}]}
 {"ts":"2026-08-12T14:00:08.594Z","op":"update","visit":"iterations/i2/trace-design@1","node":"d7","brief":"merging trunk's build into the record tree for the trace"}
+{"ts":"2026-08-12T14:03:01.888Z","op":"update","visit":"iterations/i2/trace-design@2","node":"d8","brief":"the two new bin scripts claim their honest specs"}
+{"ts":"2026-08-12T14:07:56.893Z","op":"done","visit":"iterations/i2/trace-design@0","node":"d4","brief":"trace-design green after the merge and the honest claims"}
+{"ts":"2026-08-12T14:14:00.118Z","op":"update","visit":"iterations/i2/gate-implementation@0","node":"d9","brief":"verification green — gate-implementation form next, reading its method cards"}
+{"ts":"2026-08-12T14:14:03.940Z","op":"done","visit":"iterations/i2/trace-design@0","node":"d5","brief":"verification signed green after the tester round"}
+{"ts":"2026-08-12T14:16:33.415Z","op":"plan","visit":"iterations/i2/gate-implementation@0","parent":"d6","nodes":[{"id":"d10","brief":"gate-implementation filled: pass"},{"id":"d11","brief":"debt and risks named"},{"id":"d12","brief":"submit + bless"}]}
+{"ts":"2026-08-12T14:20:49.766Z","op":"update","visit":"iterations/i2/gate-implementation@0","node":"d13","brief":"raid_additions as a none bullet, the one refused shape"}
+{"ts":"2026-08-12T14:21:10.016Z","op":"update","visit":"iterations/i2/sweep-consistency@0","node":"d14","brief":"gate-implementation signed and blessed; sweep-consistency next"}
+{"ts":"2026-08-12T14:21:36.782Z","op":"done","visit":"iterations/i2/gate-implementation@0","node":"d10","brief":"the gate form landed complete"}
+{"ts":"2026-08-12T14:22:01.203Z","op":"done","visit":"iterations/i2/gate-implementation@0","node":"d11","brief":"the debt and risk fields stamped with the gate"}
+{"ts":"2026-08-12T14:22:05.293Z","op":"done","visit":"iterations/i2/gate-implementation@0","node":"d12","brief":"the bless rode the stamping submit"}
+{"ts":"2026-08-12T14:25:17.095Z","op":"plan","visit":"iterations/i2/sweep-consistency@0","parent":null,"nodes":[{"id":"d15","brief":"scale.md drops the 0.01 remnant"},{"id":"d16","brief":"authoring/machines.md priority section re-taught as tiers"},{"id":"d17","brief":"iterations.canvas priority as a word"},{"id":"d18","brief":"seed tool description names the push"},{"id":"d19","brief":"front-desk seeding bullet on the claim lane"},{"id":"d20","brief":"the swept checklist filed with residue"}]}
+{"ts":"2026-08-12T14:28:57.753Z","op":"done","visit":"iterations/i2/sweep-consistency@0","node":"d18","brief":"the seed description names the shared-remote push"}
+{"ts":"2026-08-12T14:31:29.736Z","op":"plan","visit":"iterations/i2/gate-validation@0","parent":null,"nodes":[{"id":"d23","brief":"the gatekeeper re-observes the seven demonstrations"},{"id":"d24","brief":"meets_need drafted per value prop"},{"id":"d25","brief":"musts_demonstrated drafted per story"},{"id":"d26","brief":"story evidence halves filled from the reports"},{"id":"d27","brief":"gate-validation submitted and blessed"}]}
+{"ts":"2026-08-12T14:31:35.773Z","op":"done","visit":"iterations/i2/sweep-consistency@0","node":"d20","brief":"the sweep signed on the earlier submit"}
+{"ts":"2026-08-12T14:33:18.210Z","op":"update","visit":"iterations/i2/gate-validation@0","node":"d28","brief":"drafting the per-prop answers, minting the adjudication assumption"}
+{"ts":"2026-08-12T14:33:30.871Z","op":"update","visit":"iterations/i2/gate-validation@0","node":"d29","brief":"the adjudication assumption minted into the register"}
+{"ts":"2026-08-12T14:33:32.069Z","op":"plan","visit":"iterations/i2/gate-validation@0","parent":null,"nodes":[{"id":"d30","brief":"claim lane demo in scratch lab"},{"id":"d31","brief":"first-run in scratch clone"},{"id":"d32","brief":"desk-and-gates observation"},{"id":"d33","brief":"tour-run observation"},{"id":"d34","brief":"panel-walkthrough observation"},{"id":"d35","brief":"hand-walk observation"},{"id":"d36","brief":"derivation-analysis argument"}]}
+{"ts":"2026-08-12T14:35:14.035Z","op":"update","visit":"iterations/i2/gate-validation@0","node":"d37","brief":"prior-art scan done; waiting on the gatekeeper's reports"}
+{"ts":"2026-08-12T14:42:38.011Z","op":"plan","visit":"iterations/i2/gate-validation@0","parent":"d30","nodes":[{"id":"d38","brief":"claim-lane demo script written"},{"id":"d39","brief":"seeds via the shipped itSeed"},{"id":"d40","brief":"claims via the entry act"}]}
+{"ts":"2026-08-12T14:43:20.247Z","op":"done","visit":"iterations/i2/gate-validation@0","node":"d38","brief":"all seven demo scripts authored"}
+{"ts":"2026-08-12T14:43:34.428Z","op":"obsolete","visit":"iterations/i2/gate-validation@0","node":"d39","brief":"phantom item from a mis-split brief"}
+{"ts":"2026-08-12T14:43:44.787Z","op":"obsolete","visit":"iterations/i2/gate-validation@0","node":"d40","brief":"phantom item from a mis-split brief"}
+{"ts":"2026-08-12T14:44:09.736Z","op":"update","visit":"iterations/i2/gate-validation@0","node":"d41","brief":"running the claim-lane demo against a scratch bare origin"}
+{"ts":"2026-08-12T14:45:43.617Z","op":"done","visit":"iterations/i2/gate-validation@0","node":"d31","brief":"first boot re-observed green on the current build"}
+{"ts":"2026-08-12T14:46:36.000Z","op":"done","visit":"iterations/i2/gate-validation@0","node":"d35","brief":"hand-walk re-observed green; served wait text still says slider"}
+{"ts":"2026-08-12T14:50:06.060Z","op":"done","visit":"iterations/i2/gate-validation@0","node":"d36","brief":"derivation re-observed: tier views recompute live from scale.md"}
+{"ts":"2026-08-12T14:53:48.675Z","op":"done","visit":"iterations/i2/gate-validation@0","node":"d32","brief":"desk half green; gate-form reach stalled and noted as a finding"}
+{"ts":"2026-08-12T14:53:53.326Z","op":"done","visit":"iterations/i2/gate-validation@0","node":"d33","brief":"tour sources re-observed live; findings noted"}
+{"ts":"2026-08-12T14:54:01.841Z","op":"done","visit":"iterations/i2/gate-validation@0","node":"d30","brief":"claim-lane demonstration green end to end in the scratch lab"}
+{"ts":"2026-08-12T14:54:12.061Z","op":"done","visit":"iterations/i2/gate-validation@0","node":"d34","brief":"panel surfaces re-observed via a listening mirror on a scratch root"}
+{"ts":"2026-08-12T14:57:03.478Z","op":"update","visit":"iterations/i2/gate-validation@0","node":"d42","brief":"the reports landed; adjudicating the gate-walk finding first"}
+{"ts":"2026-08-12T14:57:48.847Z","op":"update","visit":"iterations/i2/gate-validation@0","node":"d43","brief":"gate-walk finding adjudicated: harness addressing, not the walker"}
+{"ts":"2026-08-12T14:58:07.024Z","op":"update","visit":"iterations/i2/gate-validation@0","node":"d44","brief":"windows long-path defect entered in the register"}
+{"ts":"2026-08-12T14:58:16.872Z","op":"update","visit":"iterations/i2/gate-validation@0","node":"d45","brief":"claim-surface gap entered as a debt with its trigger"}
+{"ts":"2026-08-12T14:58:43.011Z","op":"done","visit":"iterations/i2/gate-validation@0","node":"d23","brief":"all seven observations adjudicated and registered"}
+{"ts":"2026-08-12T14:59:00.179Z","op":"done","visit":"iterations/i2/gate-validation@0","node":"d26","brief":"the story decks carry the fresh observations"}
+{"ts":"2026-08-12T15:00:28.911Z","op":"update","visit":"iterations/i2/gate-validation@0","node":"d46","brief":"gate-validation filled from the observation reports"}
+{"ts":"2026-08-12T15:00:42.715Z","op":"update","visit":"iterations/i2/gate-validation@0","node":"d47","brief":"round zero in the named-item grammar, the verdict token corrected"}
+{"ts":"2026-08-12T15:00:51.211Z","op":"update","visit":"iterations/i2/gate-validation@0","node":"d48","brief":"the verdict separator as the em-dash the parser wants"}
+{"ts":"2026-08-12T15:01:04.896Z","op":"done","visit":"iterations/i2/gate-validation@0","node":"d27","brief":"gate-validation signed and blessed with overrides"}

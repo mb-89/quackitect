@@ -13,6 +13,7 @@ files:
   - "project/deliverable/engine/elematrix.ts"
   - "project/deliverable/engine/morphbox.ts"
   - "project/deliverable/engine/bin/flow-closure.ts"
+  - "project/deliverable/engine/bin/grades-complete.ts"
 ---
 
 ## Responsibility

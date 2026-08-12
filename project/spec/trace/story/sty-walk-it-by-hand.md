@@ -13,13 +13,13 @@ priority: must
 
 The engineer has a reason not to use an agent today. Client rules, a sensitive tree, or simply not wanting one. The reason does not matter; the system must still work.
 |||
-The demonstration is OWED to the owner: reports/rpt-walk-it-by-hand.md - minutes at the panel with the slider at 0.
+The demonstration is OWED to the owner: reports/rpt-walk-it-by-hand.md - minutes at the panel with the dial at blocked.
 
 ---
 
-They drag the slider to zero. No agent may enter any state on its own from here.
+They set the dial to blocked. No agent may enter any state on its own from here.
 |||
-req-autonomy-gates-every-hop: "Where the autonomy setting is zero, the engine shall enter zero steps on an agent's behalf."
+req-autonomy-gates-every-hop, and observed 2026-08-12: at the blocked setting the agent's pull answers wait naming the exact step and weight, while the person's own check advanced exactly one state (the fresh-eyes run, job-msq7cn9j-6).
 
 ---
 

@@ -27,13 +27,21 @@ its own pass criterion, so a partial cut-over fails by name.
 
 ## Checklist
 
-- the session autonomy control offers exactly the tiers — operational,
-  tactical, strategic, with emergency above; pass: no numeric input and
-  no slider control remains on any surface
+The cut-over ruling (raid-dec-autonomy-tier-ladder) sanctions two
+transitional carriers, and the sweep reads them as exempt: the anchor
+column in machines/scale.md (the words are the truth, the numbers their
+carriers), and the numeric autonomy field riding the wire beside the
+tier word. The anti-slider law in guidance/craft/ux.md is the rule
+AGAINST sliders and is never a hit.
+
+- the session autonomy control offers exactly the ladder's tiers; pass:
+  no numeric input and no slider control remains on any surface
 - state notes, matrix rows and guidance speak tier words; pass: a sweep
   for numeric autonomy weights and slider wording over machines/ and
-  guidance/ returns nothing binding
-- the mirror header and the session store show a tier; pass: no 0-to-1
-  value renders anywhere a person reads
+  guidance/ returns nothing binding beyond the sanctioned carriers
+- the mirror header and the session store show the tier word; pass: no
+  bare 0-to-1 value renders WITHOUT its tier word beside it
 - the weighing machinery gates on tiers; pass: the engine's comparison
-  reads tier order, not floats — inspected at the cut-over commit
+  reads tier order natively — this line binds when the transitional
+  anchors are removed, and until then the word-to-anchor resolution
+  (valueFor, asPriority) is the sanctioned carrier
