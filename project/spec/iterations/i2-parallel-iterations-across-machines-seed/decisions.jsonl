@@ -205,3 +205,7 @@
 {"ts":"2026-08-12T15:11:26.795Z","op":"done","visit":"iterations/i2/package@0","node":"d4","brief":"quackitect-4.0.0.zip assembled by the script in 17 seconds"}
 {"ts":"2026-08-12T15:12:06.750Z","op":"update","visit":"iterations/i2/package@0","node":"d9","brief":"the 4.0.0 entry lands in RELEASES.md, the standing home"}
 {"ts":"2026-08-12T15:12:42.248Z","op":"update","visit":"iterations/i2/package@0","node":"d10","brief":"packaging defect found by the use-check: scratch probes ride the zip"}
+{"ts":"2026-08-12T15:14:41.174Z","op":"update","visit":"iterations/i2/package@1","node":"d13","brief":"the record's M8-M9 work committed ahead of the merge"}
+{"ts":"2026-08-12T15:15:45.339Z","op":"defer","visit":"iterations/i2/package@0","node":"d6","brief":"gate-release and shipped","to":"gate-release","hops":1,"trail":["iterations/i2/package","gate-release"]}
+{"ts":"2026-08-12T15:16:35.866Z","op":"update","visit":"iterations/i2/package@1","node":"d14","brief":"cold-booting the packaged engine through its own desk-offer test"}
+{"ts":"2026-08-12T15:18:23.198Z","op":"update","visit":"iterations/i2/gate-release@0","node":"d15","brief":"gate-release filled: pass, submit and bless riding"}

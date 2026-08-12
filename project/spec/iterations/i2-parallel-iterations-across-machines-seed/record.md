@@ -1,6 +1,7 @@
 ---
 id: i2-parallel-iterations-across-machines-seed
-status: open
+status: shipped
+closed: 2026-08-12T15:18:25.916Z
 started: 2026-08-11T15:31:15.887Z
 opened: 2026-08-11T15:21:26.396Z
 goal: "Parallel iterations across machines: seeds live on git, a claim marks who works what, and the backlog cuts into maximally independent iterations."
