@@ -41,9 +41,21 @@ export class ModelFileSystem {
     return fileRead(this.rootOf(path), path, opts);
   }
 
+  /** A trace node minted in a bound record carries its record id, so the
+   *  reference views can default to the iteration's own delta. The id is
+   *  the worktree's own name — the root the write resolves into. */
+  private static stamp(root: string, path: string, content: string): string {
+    if (!/^project\/spec\/trace\/[^/]+\/[^/]+\.md$/.test(path.replace(/\\/g, "/"))) return content;
+    const m = root.replace(/\\/g, "/").match(/\/\.worktrees\/([^/]+)\/?$/);
+    if (m === null) return content;
+    if (!content.startsWith("---\n") || /^minted_in:/m.test(content)) return content;
+    return content.replace(/^---\n/, `---\nminted_in: ${m[1]}\n`);
+  }
+
   write(path: string, content: string, baseHash: string | null) {
     const root = this.rootOf(path);
-    const result = fileWrite(root, path, content, baseHash);
+    const stamped = baseHash === null ? ModelFileSystem.stamp(root, path, content) : content;
+    const result = fileWrite(root, path, stamped, baseHash);
     publish({ root, changes: [{ kind: "refresh", path: result.path }] });
     return result;
   }

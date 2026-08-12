@@ -437,6 +437,23 @@ export function pinIteration(root: string, it: Iteration, changeSize: string): R
   };
   mkdirSync(dirname(pinAbs), { recursive: true });
   writeFileSync(pinAbs, JSON.stringify(pin, null, 2), "utf8");
+  // EVERY SEEDED DRAWING GETS ITS PLACEHOLDER IN THE PIN'S OWN ACT, so no
+  // route refuses over a machine a later state has not authored yet. A
+  // drawn sub-canvas needs none, and an authored drawing is never touched.
+  const scaffolded: string[] = [];
+  for (const s of machine.states) {
+    if (s.submachine === undefined) continue;
+    if (existsSync(join(root, "project", "deliverable", "machines", `${s.submachine}.canvas`))) continue;
+    const abs = join(it.path, itSeededRel(it.id, s.submachine));
+    if (existsSync(abs)) continue;
+    mkdirSync(dirname(abs), { recursive: true });
+    writeFileSync(
+      abs,
+      '---\nnone: "not authored yet - the authoring state writes this drawing; this placeholder keeps the route drawable until then"\n---\n',
+      "utf8",
+    );
+    scaffolded.push(s.submachine);
+  }
   git(it.path, ["add", "-A"], "add");
   // BOOKKEEPING, NOT AUTHORED WORK: this commit lands a generated file. It
   // skips the hook because a fresh worktree carries no node_modules, so the
@@ -447,6 +464,7 @@ export function pinIteration(root: string, it: Iteration, changeSize: string): R
     pinned: changeSize,
     rigor_matrix_hash: pin.rigor_matrix_hash,
     states: machine.states.length,
+    ...(scaffolded.length > 0 ? { scaffolded } : {}),
     ...(reopened.length > 0 ? { reopened } : {}),
   };
 }

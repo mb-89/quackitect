@@ -29,7 +29,7 @@ import {
 } from "./machine.ts";
 import { bumpDrawingEpoch, compileMachine, compileMachineCached, resolveRef } from "./machines/compile.ts";
 import { chartPlan } from "./morphbox.ts";
-import { computeRoute, type RouteNode, type RouteResult, type RouteStep } from "./route.ts";
+import { computeRoute, type RouteNode, type RouteResult, type RouteStep, routeWraps } from "./route.ts";
 
 /** THE STATE A RECORDED VISIT NAMES. A visit is stored qualified and
  *  occurrence-stamped ("expeditions/e30@0"), and the graph-is-evidence check
@@ -1932,7 +1932,10 @@ export class Session {
     // behind the walk that reaches the objective, and return to it. An OR
     // branch is never offered, because there the branch is where a DECISION
     // was made and walking backwards would un-make it.
-    const back = r.steps.length === 0 && from !== objective ? this.branchReturn(from, objective) : undefined;
+    // A found route that WRAPS out of the shared machine is the loop-the-
+    // machine line: prefer the branch return there too.
+    const wrapped = r.steps.length > 0 && routeWraps(from, objective, r.steps);
+    const back = (r.steps.length === 0 || wrapped) && from !== objective ? this.branchReturn(from, objective) : undefined;
     if (back !== undefined) r = back;
     const judgments = this.routeJudgments(r.steps);
     const value = {
