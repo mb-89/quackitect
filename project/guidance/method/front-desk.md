@@ -122,6 +122,10 @@ On the person's word, do the bureaucracy from the desk:
 
 - Seed (`se_seed_expedition`, `se_seed_iteration`) with an honest goal
   and vision — the discussion is the design input; carry it in.
+- A seeded iteration is SHARED at once: the seed pushes its `it/<id>`
+  branch to the shared remote, and any machine there can claim and run
+  it. Entering claims it. A claim already held refuses, naming the
+  holder.
 - PREFILL EVERYTHING YOU REASONABLY CAN. The desk is a secretary: it
   fills the form from the conversation so the person confirms rather than
   composes. For an expedition that is the goal. For an iteration it is
