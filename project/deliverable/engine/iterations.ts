@@ -10,6 +10,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { type CanvasData, type CanvasEdge, type CanvasElement, nodeSize } from "./canvas.ts";
+import { pushSeed } from "./claims.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { buildArchive, type GeneratedMachine } from "./expmachine.ts";
 import { type EvidenceField, type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
@@ -38,6 +39,8 @@ export interface Iteration {
   branch: string;
   path: string;
   open: boolean;
+  /** Whether the seed's stub push reached the remote in the seeding act. */
+  announced?: boolean;
 }
 
 export function itRecordRel(id: string): string {
@@ -135,7 +138,10 @@ export function itSeed(root: string, goal: string, vision: string, inputs: strin
   );
   git(path, ["add", "-A"], "add");
   git(path, ["commit", "-q", "-m", `iteration ${id}: seed`], "commit");
-  return { id, branch: `it/${id}`, path, open: true };
+  // The stub reaches the remote in the same act, so every peer machine
+  // lists it from its next fetch; no remote is a recorded seed, not a block.
+  const announced = pushSeed(path, `it/${id}`).ok;
+  return { id, branch: `it/${id}`, path, open: true, announced };
 }
 
 export function itFind(root: string, id: string): Iteration {

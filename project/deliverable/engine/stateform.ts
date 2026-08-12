@@ -751,13 +751,36 @@ function seededStepIds(recordRoot: string): Set<string> | undefined {
   return undefined;
 }
 
+/** The record's OWN experiments: the ids its fold-back evidence names.
+ *  A standing experiment from an earlier record keeps its assignment to
+ *  THAT record's drawing, which this tree does not carry — sweeping it
+ *  against the current drawing failed i2 on i1's promotion (2026-08-12).
+ *  No fold-back evidence means no scoping, so unit fixtures keep the
+ *  whole-corpus sweep. */
+function foldBackExperiments(recordRoot: string): Set<string> | undefined {
+  const dir = join(recordRoot, "project", "spec", "iterations");
+  try {
+    for (const e of readdirSync(dir)) {
+      const abs = join(dir, e, "evidence", "fold-back.md");
+      if (!existsSync(abs)) continue;
+      const body = noteOf(abs)?.body ?? "";
+      return new Set([...body.matchAll(/\[\[(exp-[^\]]+)\]\]/g)].map((m) => m[1]));
+    }
+  } catch {
+    return undefined;
+  }
+  return undefined;
+}
+
 /** Promotions are a filter, never a list — and none may be lost: every
  *  promoted experiment carries `chunk:` naming its step in the drawing. */
 function promotionAssignmentProblems(corpus: { id: string; type: string; file?: string }[], recordRoot: string): string[] {
   const out: string[] = [];
   const steps = seededStepIds(recordRoot);
+  const own = foldBackExperiments(recordRoot);
   for (const n of corpus) {
     if (n.type !== "experiment" || n.file === undefined) continue;
+    if (own !== undefined && !own.has(n.id)) continue;
     const fm = noteOf(n.file)?.frontmatter ?? {};
     const p = String(fm.promote ?? "").trim();
     if (p === "" || /^none\b/i.test(p)) continue;

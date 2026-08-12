@@ -26,6 +26,20 @@ export function levelName(levels: AutonomyLevel[], priority: number): string {
   return (rungs.find((l) => l.value >= priority) ?? rungs[rungs.length - 1]).name.split(" — ")[0];
 }
 
+/** The session's rung: the highest level the dial reaches, the bare word. */
+export function tierOf(levels: AutonomyLevel[], autonomy: number): string {
+  const rungs = levels.filter((l) => l.value > 0).sort((a, b) => a.value - b.value);
+  const held = [...rungs].reverse().find((l) => l.value <= autonomy);
+  return (held?.name ?? "blocked").split(" — ")[0];
+}
+
+/** The anchor a tier WORD admits — the words are the truth and the number
+ *  is the transitional carrier while the numeric scale still runs. */
+export function valueFor(levels: AutonomyLevel[], word: string): number | undefined {
+  const bare = word.trim().toLowerCase();
+  return levels.find((l) => l.name.split(" — ")[0].trim().toLowerCase() === bare || l.abbr.toLowerCase() === bare)?.value;
+}
+
 export function loadLevels(root: string): AutonomyLevel[] {
   const note = parseStateNote(readFileSync(scalePath(root), "utf8"));
   const rows = section(note.body, "Levels")

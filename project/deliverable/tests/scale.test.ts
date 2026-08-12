@@ -14,7 +14,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { parseStateNote } from "../engine/notes.ts";
 import { renderMirror } from "../engine/render.ts";
-import { loadLevels } from "../engine/scale.ts";
+import { loadLevels, tierOf, valueFor } from "../engine/scale.ts";
 import { Session } from "../engine/session.ts";
 import { freshRoot } from "./helpers.ts";
 
@@ -26,6 +26,23 @@ test("the scale offers a notch at zero, so a full block is one click away", () =
   assert.ok(zero !== undefined, "the scale declares a level at 0");
   assert.ok(zero.name !== "", "and names it, so the notch says what it does");
   assert.equal(Math.min(...levels.map((l) => l.value)), 0, "nothing sits below it");
+});
+
+// THE TIER LADDER IS THE VOCABULARY (owner cut-over ruling 2026-08-12):
+// mechanical, operational, tactical, strategic, ideation — the words are
+// the truth, the numbers their transitional anchors.
+test("the ladder speaks the owner's tiers in order, and the words map to their anchors", () => {
+  const levels = loadLevels(ROOT);
+  const words = levels
+    .filter((l) => l.value > 0)
+    .sort((a, b) => a.value - b.value)
+    .map((l) => l.name.split(" — ")[0]);
+  assert.deepEqual(words, ["mechanical", "operational", "tactical", "strategic", "ideation"]);
+  assert.equal(valueFor(levels, "tactical"), 0.6);
+  assert.equal(valueFor(levels, "strategic"), 0.8);
+  assert.equal(tierOf(levels, 1), "ideation");
+  assert.equal(tierOf(levels, 0.4), "operational");
+  assert.equal(tierOf(levels, 0.1), "blocked");
 });
 
 // BLOCKED IS NOT A BUTTON (owner, 2026-08-01). It is what no rung being

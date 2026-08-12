@@ -62,6 +62,16 @@ describe("the offer", { concurrency: true }, () => {
     assert.equal(typeof desk.priority, "number", "the weight rides along with the waiting options");
   });
 
+  test("idle itself is among the desk's doors — the hub is a destination, not only a thoroughfare", async () => {
+    const s = await sessionAtIdle(root());
+    s.setTarget("");
+    await readEverything(s);
+    const r = (await s.pull()) as Record<string, unknown>;
+    const idle = (r.options as Record<string, unknown>[]).find((o) => o.to === "idle");
+    assert.ok(idle !== undefined, "idle is offered at the desk");
+    assert.equal(idle.open, true, "nothing blocks parking at the hub");
+  });
+
   test("an option above the slider is offered as NOT open, and says who it needs", async () => {
     const s = await sessionAtIdle(root());
     s.setAutonomy(0.4);

@@ -11,6 +11,7 @@
 // the next refused call's remedy re-boots the agent in one turn.
 import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
+import { claimEntry, machineId } from "./claims.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { dirtyLines, git, gitLand, gitSync } from "./gitlane.ts";
 import { contentHash } from "./hash.ts";
@@ -99,7 +100,7 @@ import { mintFlipLines } from "./pugh.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { anyJobRunning } from "./run.ts";
-import { levelName, loadLevels } from "./scale.ts";
+import { levelName, loadLevels, tierOf } from "./scale.ts";
 import {
   buildPortableForm,
   claimProblems,
@@ -947,10 +948,33 @@ export class Session {
 
   iterationOpen(id: string): Record<string, unknown> {
     const it = itFind(this.root, id);
+    // The record store opens a record only over a standing claim. Without
+    // a claims branch there is no pool and entry stays free.
+    const mid = machineId(join(this.root, ".se"));
+    const gate = claimEntry(this.root, it.id, mid);
+    if (!gate.ok) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `${it.id} unclaimed, or claimed by this machine (machine-${mid})`,
+        got: `claimed by machine-${gate.holder?.machine ?? "?"} since ${gate.holder?.at ?? "?"}`,
+        remedy: {
+          tool: "se_pull",
+          args: {},
+          note: "pick another iteration from the claimable listing; a person may force-release a claim judged abandoned",
+        },
+        source: "engine/session.ts claim-gate",
+      });
+    }
     this.bound = it;
     markStarted(this.root, it);
     this.decisions.setExtraSink(join(it.path, "project", "spec", "iterations", it.id, "decisions.jsonl"));
-    return { bound: it.id, note: "the lane now works in this iteration's worktree" };
+    return {
+      bound: it.id,
+      note: "the lane now works in this iteration's worktree",
+      ...(gate.claimed_now === true
+        ? { claimed: `machine-${mid}${gate.offline === true ? " (recorded offline; announces at the next opportunity)" : ""}` }
+        : {}),
+    };
   }
 
   /** THE BLESS PINS (owner verdicts 2026-07-30): leaving an iteration
@@ -2335,7 +2359,13 @@ export class Session {
     }
     const { machine, ids } = this.leaves();
     if (this._target === "" && !this.inSub() && ids.length === 1 && ids[0] === "front_desk") {
-      return this.optionsAt(this.machine, "idle");
+      // The desk borrows idle's doors, and a borrowed offer loses the hub
+      // itself. Idle is the one state with no owed work — the reload's
+      // home — and every borrowed door sails PAST it, the nearest being
+      // end, which shuts the server down. So the hub is offered too.
+      const hub = this.machine.states.find((s) => s.id === "idle");
+      const doors = this.optionsAt(this.machine, "idle");
+      return hub === undefined ? doors : [this.doorOption(this.machine, hub, "idle", "normal"), ...doors];
     }
     return ids.flatMap((id) => this.optionsAt(machine, id));
   }
@@ -2405,6 +2435,14 @@ export class Session {
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
       target: targetNow(),
       autonomy: this._autonomy,
+      ...(() => {
+        // The tiers are the vocabulary; the number is the transitional carrier.
+        try {
+          return { tier: tierOf(loadLevels(this.root), this._autonomy) };
+        } catch {
+          return {};
+        }
+      })(),
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
     });
 
