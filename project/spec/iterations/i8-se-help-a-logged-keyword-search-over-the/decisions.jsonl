@@ -3,3 +3,6 @@
 {"ts":"2026-08-12T20:36:53.532Z","op":"plan","visit":"iterations/i8/gate-kickoff@0","parent":null,"nodes":[{"id":"d5","brief":"Fill and submit gate-kickoff with change_size=minor"},{"id":"d6","brief":"Walk the grown M0 machine to build se.help"}]}
 {"ts":"2026-08-12T20:37:21.978Z","op":"update","visit":"iterations/i8/gate-kickoff@0","node":"d7","brief":"Fixing gate-kickoff field formats per refusal and resubmitting"}
 {"ts":"2026-08-12T20:37:49.159Z","op":"update","visit":"iterations/i8/gate-kickoff@0","node":"d8","brief":"Matched retro_drained item key format from $inbox, resubmitting"}
+{"ts":"2026-08-12T20:39:35.434Z","op":"done","visit":"front_desk@0","node":"d3","brief":"Opened raid-risk-se-help-search-half-unproven at log-risks"}
+{"ts":"2026-08-12T20:42:45.063Z","op":"update","visit":"iterations/i8/write-requirements@0","node":"d9","brief":"Reopening gate-kickoff to correct the mis-pinned change_size"}
+{"ts":"2026-08-12T20:43:18.588Z","op":"update","visit":"iterations/i8/gate-kickoff@1","node":"d10","brief":"Resubmitting gate-kickoff with corrected change_size text and retro_drained"}

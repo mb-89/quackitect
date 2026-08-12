@@ -2,7 +2,8 @@
 form: gate-kickoff
 bless: blessed by agent
 by: agent
-signed_off: 2026-08-12T20:37:49.251Z
+signed_off: 2026-08-12T20:43:18.685Z
+reopened: "2026-08-12T20:42:45.065Z — Pinned change_size=patch despite the form choosing minor, due to a substring-order bug in kickoffSizeFromForm (engine/session.ts:4851-4852, see note-ee44c2873e55).…"
 authors: agent
 files:
 ---
@@ -15,7 +16,9 @@ The retro drained with the inbox at zero and i8 stands claimed in its worktree. 
 
 ## retro_drained
 
-- note-616cdd16f195 — Prior-art refs (v1/v2 branches) unreachable from: captured this gate as a stray; left open, not drained, for the build state to resolve.
+- note-2cf36c6e3806 — gate-kickoff bless pinned change_size=patch desp: root cause found (note-ee44c2873e55); fixed by editing this form's change_size rationale and reopening this gate to re-earn the claim.
+- note-ee44c2873e55 — Root cause: kickoffSizeFromForm substring-order : acted on now — rationale text edited to drop the ambiguous "patch" substring so the parser resolves minor; left open for the retro to fix the parser itself.
+- note-616cdd16f195 — Prior-art refs (v1/v2 branches) unreachable from: still open; left for the build state to resolve with a legal se_run call.
 
 ## goal
 
@@ -35,7 +38,7 @@ se.help: a logged keyword search over the lane's tools and guidance, whose every
 
 ## change_size
 
-minor — a new, self-contained lane capability (a search-and-logging verb plus two small companions) with requirements already fixed by the vision and a clear done condition. Bigger than a one-line patch (new engine module, new tool exposure, a logged demand table), but nothing here is expected to move the architectural baseline, so it stops short of major.
+minor — a new, self-contained lane capability (a search-and-logging verb plus two small companions) with requirements already fixed by the vision and a clear done condition. Bigger than a one-liner (new engine module, new tool exposure, a logged demand table), but nothing here is expected to move the architectural baseline, so it stops short of the next rung up.
 
 ## round_0_verify
 

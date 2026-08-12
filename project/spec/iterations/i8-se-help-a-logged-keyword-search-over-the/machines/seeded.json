@@ -1,15 +1,33 @@
 {
-  "change_size": "patch",
+  "change_size": "minor",
   "rigor_matrix_hash": "ad12f2c8bb3b",
-  "pinned_at": "2026-08-12T20:37:49.488Z",
+  "pinned_at": "2026-08-12T20:43:18.901Z",
+  "reopened": [
+    "author-tests",
+    "build-steps",
+    "gate-implementation",
+    "gate-kickoff",
+    "gate-release",
+    "onboard-retro",
+    "package",
+    "write-requirements"
+  ],
   "demands": {
     "onboard-retro": {
-      "applies": "tailored",
+      "applies": "full",
       "evidence": "[[\"field_feedback\",true,\"\",[],\"\",\"\",[],[],[]],[\"notes_drained\",true,\"\",[],\"per-item\",\"\",[],[\"$inbox\"],[]],[\"call_log_mined\",true,\"\",[],\"list\",\"\",[],[],[]],[\"waste_leads\",false,\"\",[],\"list\",\"\",[],[],[]],[\"promotions\",true,\"\",[],\"list\",\"\",[],[],[]],[\"process_stale\",true,\"\",[],\"\",\"\",[],[],[]]]"
     },
     "gate-kickoff": {
-      "applies": "tailored",
+      "applies": "full",
       "evidence": "[[\"retro_drained\",true,\"\",[],\"per-item\",\"\",[],[\"$inbox\"],[]],[\"goal\",true,\"\",[],\"\",\"\",[],[],[]],[\"pulled_in\",true,\"\",[],\"list\",\"\",[],[],[]],[\"left_out\",true,\"\",[],\"list\",\"\",[],[],[]],[\"change_size\",true,\"\",[],\"choice-with-rationale\",\"\",[\"patch\",\"minor\",\"major\",\"product\"],[],[]]]"
+    },
+    "draft-vision": {
+      "applies": "inherit",
+      "evidence": "[[\"big_idea\",true,\"\",[],\"\",\"\",[],[],[]],[\"to_be_world\",true,\"\",[],\"\",\"\",[],[],[]],[\"goal_system\",true,\"\",[],\"\",\"\",[],[],[]],[\"moore_pitch\",true,\"\",[],\"\",\"\",[],[],[]]]"
+    },
+    "define-actual": {
+      "applies": "inherit",
+      "evidence": "[[\"as_is\",true,\"\",[],\"\",\"\",[],[],[]]]"
     },
     "log-risks": {
       "applies": "tailored",
@@ -19,9 +37,41 @@
       "applies": "tailored",
       "evidence": "[[\"gap_claim\",true,\"\",[],\"\",\"\",[],[],[]],[\"why_now\",true,\"\",[],\"\",\"\",[],[],[]],[\"value_props\",true,\"\",[],\"refs\",\"value-prop\",[],[],[]],[\"business_case\",false,\"\",[],\"\",\"\",[],[],[]]]"
     },
-    "write-requirements": {
+    "scope-non-goals": {
       "applies": "tailored",
+      "evidence": "[[\"scope\",true,\"\",[],\"\",\"\",[],[],[]],[\"non_goals\",true,\"\",[],\"\",\"\",[],[],[]]]"
+    },
+    "gate-motivation": {
+      "applies": "tailored",
+      "evidence": "[[\"vision_scope_stated\",true,\"\",[],\"\",\"\",[],[],[]],[\"problem_agreed\",true,\"\",[],\"\",\"\",[],[],[]],[\"prior_art_positioned\",true,\"\",[],\"\",\"\",[],[],[]],[\"success_measurable\",true,\"\",[],\"\",\"\",[],[],[]],[\"risks_logged\",true,\"\",[],\"\",\"\",[],[],[]]]"
+    },
+    "draw-context": {
+      "applies": "inherit",
+      "evidence": "[[\"boundary\",true,\"\",[],\"\",\"\",[],[],[]],[\"neighbours\",true,\"\",[],\"refs\",\"neighbour\",[],[],[]],[\"intended_use\",true,\"\",[],\"\",\"\",[],[],[]],[\"excluded_use\",true,\"\",[],\"\",\"\",[],[],[]]]"
+    },
+    "map-stakeholders": {
+      "applies": "inherit",
+      "evidence": "[[\"roles\",true,\"\",[],\"refs\",\"stakeholder\",[],[],[]],[\"coverage\",true,\"\",[],\"\",\"\",[],[],[]]]"
+    },
+    "write-stories": {
+      "applies": "tailored",
+      "evidence": "[[\"stories\",true,\"\",[],\"refs\",\"story\",[],[],[]]]"
+    },
+    "generalize-use-cases": {
+      "applies": "tailored",
+      "evidence": "[[\"use_cases\",true,\"\",[],\"refs\",\"use-case\",[],[],[]]]"
+    },
+    "gate-inputs": {
+      "applies": "tailored",
+      "evidence": "[[\"picture_judged\",true,\"\",[],\"\",\"\",[],[],[]],[\"unspecified_capability\",true,\"\",[],\"\",\"\",[],[],[]],[\"passes_concrete\",true,\"\",[],\"\",\"\",[],[],[]]]"
+    },
+    "write-requirements": {
+      "applies": "full",
       "evidence": "[[\"register\",true,\"\",[],\"refs\",\"requirement\",[],[],[]],[\"set_criteria\",true,\"\",[],\"per-item\",\"\",[],[\"complete\",\"consistent\",\"affordable\",\"bounded\",\"comprehensible\",\"no_tbd\"],[]]]"
+    },
+    "derive-functions": {
+      "applies": "tailored",
+      "evidence": "[[\"functions\",true,\"\",[],\"refs\",\"function\",[],[],[]],[\"flows\",true,\"\",[],\"refs\",\"flow\",[],[],[]],[\"neutrality\",true,\"\",[],\"free-form\",\"\",[],[],[]]]"
     },
     "identify-assumptions": {
       "applies": "tailored",
@@ -31,16 +81,56 @@
       "applies": "tailored",
       "evidence": "[[\"probes\",true,\"\",[\"probe\",\"probed\"],\"node-table\",\"raid\",[],[\"$assumptions\"],[]]]"
     },
-    "author-tests": {
+    "gate-requirements": {
+      "applies": "full",
+      "evidence": "[]"
+    },
+    "record-adrs": {
       "applies": "tailored",
+      "evidence": "[[\"adrs\",true,\"\",[],\"refs\",\"raid\",[],[],[]]]"
+    },
+    "decompose-structure": {
+      "applies": "tailored",
+      "evidence": "[[\"elements\",true,\"\",[],\"list\",\"element\",[],[],[]],[\"allocation\",true,\"\",[],\"element-matrix\",\"element\",[],[],[]]]"
+    },
+    "evaluate-architecture": {
+      "applies": "tailored",
+      "evidence": "[[\"walk\",true,\"\",[],\"scenario-deck\",\"\",[],[],[]],[\"fitness_candidates\",true,\"\",[],\"list\",\"requirement\",[],[],[]]]"
+    },
+    "gate-architecture": {
+      "applies": "tailored",
+      "evidence": "[]"
+    },
+    "rank-unknowns": {
+      "applies": "tailored",
+      "evidence": "[[\"seeded\",true,\"\",[],\"exposure-pick\",\"raid\",[],[],[]]]"
+    },
+    "run-spikes": {
+      "applies": "tailored",
+      "evidence": "[]"
+    },
+    "fold-back": {
+      "applies": "tailored",
+      "evidence": "[[\"folded\",true,\"\",[\"folds_to\",\"promote\"],\"node-table\",\"experiment\",[],[\"$experiments\"],[]]]"
+    },
+    "gate-prototype": {
+      "applies": "tailored",
+      "evidence": "[[\"buildable\",true,\"\",[],\"choice-with-rationale\",\"\",[\"yes\",\"no\"],[],[]]]"
+    },
+    "author-tests": {
+      "applies": "full",
       "evidence": "[[\"checks\",true,\"\",[\"method\",\"verifies\"],\"node-table\",\"test-spec\",[],[\"$test-specs\"],[]]]"
+    },
+    "specify-build": {
+      "applies": "full",
+      "evidence": "[[\"design_specs\",true,\"\",[\"realizes\",\"files\"],\"node-table\",\"design-spec\",[],[\"$design-specs\"],[]],[\"promotions\",true,\"\",[\"promote\",\"chunk\"],\"node-table\",\"experiment\",[],[\"$promotions\"],[]]]"
     },
     "observe-red": {
       "applies": "full",
       "evidence": "[[\"red_observed\",true,\"\",[],\"checklist\",\"\",[],[\"$claim-specs\"],[]]]"
     },
     "build-steps": {
-      "applies": "tailored",
+      "applies": "full",
       "evidence": "[]"
     },
     "trace-design": {
@@ -56,10 +146,14 @@
       "evidence": "[]"
     },
     "gate-implementation": {
-      "applies": "tailored",
+      "applies": "full",
       "evidence": "[[\"quality_ok\",true,\"\",[],\"checklist\",\"\",[],[\"$iq_checklist\"],[]],[\"debt_taken\",true,\"\",[],\"refs\",\"raid\",[],[],[]],[\"risks_acceptable\",true,\"\",[],\"choice-with-rationale\",\"\",[\"acceptable\",\"not-acceptable\"],[],[]]]"
     },
     "fill-story-evidence": {
+      "applies": "tailored",
+      "evidence": "[]"
+    },
+    "run-demos": {
       "applies": "tailored",
       "evidence": "[]"
     },
@@ -67,12 +161,16 @@
       "applies": "full",
       "evidence": "[[\"swept\",true,\"\",[],\"checklist\",\"\",[],[\"$sweep_surfaces\"],[]]]"
     },
-    "package": {
+    "gate-validation": {
       "applies": "tailored",
+      "evidence": "[[\"meets_need\",true,\"\",[],\"per-item\",\"\",[],[\"$value-props\"],[]],[\"musts_demonstrated\",true,\"\",[],\"per-item\",\"\",[],[\"$must-stories\"],[]],[\"market_tier\",false,\"\",[],\"\",\"\",[],[],[]]]"
+    },
+    "package": {
+      "applies": "full",
       "evidence": "[[\"package\",true,\"\",[],\"file-ref\",\"\",[],[],[]],[\"works\",true,\"\",[],\"choice-with-rationale\",\"\",[\"yes\",\"no\"],[],[\"yes\"]]]"
     },
     "gate-release": {
-      "applies": "tailored",
+      "applies": "full",
       "evidence": "[[\"market_block\",false,\"\",[],\"\",\"\",[],[],[]]]"
     },
     "shipped": {
