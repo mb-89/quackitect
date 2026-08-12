@@ -194,6 +194,18 @@ In order, this is what a `runme.sh` must do:
    bootstrap process itself.
 7. On a fresh clone, fetch the iteration refs before expecting to see any
    record. See section 3.
+8. `chmod +x project/deliverable/hooks/pre-commit`. Git refused to run it:
+
+   ```
+   hint: The 'project/deliverable/hooks/pre-commit' hook was ignored
+   because it's not set as executable.
+   ```
+
+   Git tracks only the owner-execute bit, and a repository authored on
+   Windows carries none. **Every commit made on this machine silently
+   skipped the pre-commit hook.** Nothing warned beyond that hint, and a
+   run that never reads git's stderr would not know the hook had been
+   skipped at all.
 
 ---
 
@@ -337,11 +349,22 @@ iteration was adopted by the bootstrap rather than claimed through the lane.
 Whether a second machine would have been refused is **untested**. The question
 in the handover ("did claiming i8 behave") has no answer from this run.
 
-### `raid-dep-claim-push-credentials` — **HELD for read, PARTIAL for push**
+### `raid-dep-claim-push-credentials` — **HELD**
 
-`git ls-remote origin` succeeded, listing 19 pushed `it/*` branches, so
-credentials are present and the remote is reachable. Push is recorded in
-section 5 with its actual result.
+Both halves held on this box.
+
+- **Read:** `git ls-remote origin` succeeded, listing 19 pushed `it/*`
+  branches.
+- **Fetch:** `git fetch origin "refs/heads/it/*:refs/remotes/origin/it/*"`
+  brought all 19 down.
+- **Push:** the branch carrying this report and the engine fix pushed to
+  `origin` and created a new remote branch. The push landed.
+
+Credentials were already present in the container; nothing had to be
+configured. The one qualification is that the push was made by the **uncaged
+bootstrap role**, not through `se_git` — the lane's `GIT_PUSH` clause
+(SE-C-003) reserves pushing for the owner, so the claim lane's own push was
+not the thing exercised.
 
 ### `raid-harness-half-life` — **BROKE, in one specific way**
 
