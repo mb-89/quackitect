@@ -54,5 +54,7 @@ se_seed_iteration with the prefill discipline of guidance/craft/ux.md - a prefil
 ---
 
 Two products, two folders, two windows, one installed engine. Nothing was configured and nothing was shared but the engine itself.
+
+
 |||
 The end-to-end second-product run is the owed piece: reports/rpt-start-a-new-product.md.

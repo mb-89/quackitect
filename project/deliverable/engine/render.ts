@@ -3199,10 +3199,14 @@ function applyAlive(a) {
       b.setAttribute("aria-pressed", on ? "true" : "false");
     }
   }
-  if (a.ping && a.ping.seq !== lastPingSeq) { lastPingSeq = a.ping.seq; pingSurface(a.ping.target); }
-  // A re-render drops the class. Put the light back rather than losing it
+  if (a.ping && a.ping.seq !== lastPingSeq) {
+    lastPingSeq = a.ping.seq;
+    pingSurface(a.ping.target);
+    if (window.seTracePing) window.seTracePing(a.ping.target);
+  }  // A re-render drops the class. Put the light back rather than losing it
   // mid-sentence — the ping outlives the DOM that carried it.
   else if (litTarget !== null && !document.querySelector(".se-ping, .se-ping-svg")) applyPing();
+  if (a.trace_trail && window.seTraceTrail) window.seTraceTrail(a.trace_trail);
   if (logPanel && a.acts !== lastActs) { lastActs = a.acts; refreshLog(); }
   // THE PERSON PULLED (owner design 2026-08-04): the answer lands in the
   // details, and a form the walk owes gets a panel of its own — the inline
