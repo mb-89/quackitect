@@ -44,6 +44,7 @@ const EXCLUDE_DIRS = new Set([
   ".obsidian",
   ".vscode",
   ".github",
+  "scratchpad",
 ]);
 const EXCLUDE_FILES = new Set([".git", ".mcp.json", "Thumbs.db", ".DS_Store"]);
 

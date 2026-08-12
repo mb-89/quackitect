@@ -197,3 +197,11 @@
 {"ts":"2026-08-12T15:00:42.715Z","op":"update","visit":"iterations/i2/gate-validation@0","node":"d47","brief":"round zero in the named-item grammar, the verdict token corrected"}
 {"ts":"2026-08-12T15:00:51.211Z","op":"update","visit":"iterations/i2/gate-validation@0","node":"d48","brief":"the verdict separator as the em-dash the parser wants"}
 {"ts":"2026-08-12T15:01:04.896Z","op":"done","visit":"iterations/i2/gate-validation@0","node":"d27","brief":"gate-validation signed and blessed with overrides"}
+{"ts":"2026-08-12T15:05:44.768Z","op":"update","visit":"iterations/i2/author-tests@0","node":"d2","brief":"the reboot replays i2's owed reading; the walk re-runs toward package"}
+{"ts":"2026-08-12T15:08:50.536Z","op":"update","visit":"iterations/i2/gate-validation@0","node":"d3","brief":"the missing demonstration spec minted; the slide law can turn green"}
+{"ts":"2026-08-12T15:09:03.140Z","op":"plan","visit":"iterations/i2/package@0","parent":null,"nodes":[{"id":"d4","brief":"the package assembles by script"},{"id":"d5","brief":"the package is checked by using it"},{"id":"d6","brief":"gate-release and shipped"}]}
+{"ts":"2026-08-12T15:10:28.441Z","op":"update","visit":"iterations/i2/package@0","node":"d7","brief":"version bumped major: the word priorities break old engines"}
+{"ts":"2026-08-12T15:10:41.985Z","op":"update","visit":"iterations/i2/package@0","node":"d8","brief":"release notes authored, one entry per version"}
+{"ts":"2026-08-12T15:11:26.795Z","op":"done","visit":"iterations/i2/package@0","node":"d4","brief":"quackitect-4.0.0.zip assembled by the script in 17 seconds"}
+{"ts":"2026-08-12T15:12:06.750Z","op":"update","visit":"iterations/i2/package@0","node":"d9","brief":"the 4.0.0 entry lands in RELEASES.md, the standing home"}
+{"ts":"2026-08-12T15:12:42.248Z","op":"update","visit":"iterations/i2/package@0","node":"d10","brief":"packaging defect found by the use-check: scratch probes ride the zip"}
