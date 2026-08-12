@@ -17,6 +17,7 @@ import { CLAUSES, Rejection } from "./errors.ts";
 import { appendNote, pendingNotes, readNotes } from "./inbox.ts";
 import { bumpDrawingEpoch } from "./machines/compile.ts";
 import { handleHttp, type McpServer } from "./mcp.ts";
+import { subscribeModelMutations } from "./model-fs.ts";
 import { beginPass, endPass } from "./notes.ts";
 import { loadPanel, renderPanel } from "./params.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
@@ -25,6 +26,7 @@ import { loadLevels } from "./scale.ts";
 import type { Session } from "./session.ts";
 import { survey } from "./survey.ts";
 import { editCell } from "./tables.ts";
+import { recordTraceWrites, traceWriteTrail } from "./trace.ts";
 import { warmVault } from "./vault.ts";
 
 export interface MirrorOptions {
@@ -45,6 +47,15 @@ export function startMirror(o: MirrorOptions): Server {
   // most once. Skipped under test, where a background build and its watcher
   // would outlive the case that started the server.
   if (process.env.NODE_TEST_CONTEXT === undefined) void warmVault(o.root);
+
+  // A SLOT ON THE MODEL'S MUTATION SIGNAL. The model fires once per batch and
+  // does not wait; this only stamps ids, and the graph animates from there.
+  subscribeModelMutations(o.root, (batch) => {
+    recordTraceWrites(
+      o.root,
+      batch.changes.map((c) => (c.kind === "rename" ? c.to : c.path)),
+    );
+  });
 
   // THE READER'S SELECTION, mirrored server-side: the machine page reports
   // which state's details are open, so a control in ANOTHER surface (the
@@ -80,6 +91,8 @@ export function startMirror(o: MirrorOptions): Server {
     acts: existsSync(o.log.path) ? statSync(o.log.path).size : 0,
     // The agent's pointing finger — the page pulses the target on a new seq.
     ...(state.session.ping === undefined ? {} : { ping: state.session.ping }),
+    // Which trace nodes the agent just wrote — the graph blinks then fades them.
+    trace_trail: traceWriteTrail(),
     ...(lastPull === undefined ? {} : { last_pull: lastPull }),
   });
 

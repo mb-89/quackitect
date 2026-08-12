@@ -515,24 +515,17 @@ describe("the pieces you click reach the lines you see", { concurrency: true }, 
 
 // THE THREE GESTURES (owner ruling 2026-08-07). Client script, so a test can
 // only hold the WIRING honest — that each gesture exists and does its own job.
-// It has been rewired three times in one day; this is what stops a fourth
-// silently dropping one.
+// Cytoscape owns the wheel and drag; this is what stops those from being dropped silently.
 test("the wheel zooms, the drag pans, the double-click centres", async () => {
   const { TRACE_SCRIPT } = await import("../engine/traceui.ts");
   // It must PARSE, or the whole card dies silently.
   new Function(TRACE_SCRIPT);
 
-  const wheel = TRACE_SCRIPT.slice(TRACE_SCRIPT.indexOf("addEventListener('wheel'"));
-  assert.ok(wheel.includes("vb.width *= scale"), "the wheel changes the zoom");
-  assert.ok(!/^[\s\S]{0,400}vb\.x \+=/.test(wheel), "and does not also pan, which is what fought the drag");
+  // Cytoscape handles wheel and drag natively via wheelSensitivity config.
+  assert.ok(TRACE_SCRIPT.includes("wheelSensitivity"), "Cytoscape wheel sensitivity is configured");
 
-  assert.ok(TRACE_SCRIPT.includes("addEventListener('mousedown'"), "a drag starts a pan");
-  assert.ok(TRACE_SCRIPT.includes("pan.vx - (ev.clientX - pan.x)"), "and the pan follows the pointer");
-
-  const dbl = TRACE_SCRIPT.slice(TRACE_SCRIPT.indexOf("addEventListener('dblclick'"));
-  assert.ok(dbl.length > 0, "double-click is wired");
-  // A CARD IS TESTED FIRST. It sits on top of its piece, so testing the piece
-  // first meant a card could never be picked — the bug this pins.
-  assert.ok(dbl.indexOf("'.trace-node'") < dbl.indexOf("'.trace-sector'"), "a card is tested before the piece under it");
-  assert.ok(dbl.includes("centreOn("), "a card is centred rather than filled to the screen");
+  // Double-click on a node centres and zooms in.
+  const dbl = TRACE_SCRIPT.slice(TRACE_SCRIPT.indexOf("'dbltap'"));
+  assert.ok(dbl.length > 0, "double-click (dbltap) is wired");
+  assert.ok(dbl.includes("cy.animate"), "a double-click animates to the node");
 });

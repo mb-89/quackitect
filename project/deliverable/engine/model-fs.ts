@@ -1,33 +1,15 @@
 import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileReplace, fileWrite, type PatchOp } from "./files.ts";
 import { fileMove } from "./move.ts";
 import { search } from "./search.ts";
+import { emitModelMutations } from "./signals.ts";
 import { reconcileWarmVault, updateWarmVault, type VaultChange } from "./vault.ts";
 
-export interface ModelMutationBatch {
-  root: string;
-  changes: VaultChange[];
-}
+export type { ModelMutationBatch, ModelMutationListener } from "./signals.ts";
+export { subscribeModelMutations } from "./signals.ts";
 
-export type ModelMutationListener = (batch: ModelMutationBatch) => void;
-
-const listeners = new Map<string, Set<ModelMutationListener>>();
-
-export function subscribeModelMutations(root: string, listener: ModelMutationListener): () => void {
-  let group = listeners.get(root);
-  if (group === undefined) {
-    group = new Set();
-    listeners.set(root, group);
-  }
-  group.add(listener);
-  return () => {
-    group?.delete(listener);
-    if (group?.size === 0) listeners.delete(root);
-  };
-}
-
-function publish(batch: ModelMutationBatch): void {
+function publish(batch: { root: string; changes: VaultChange[] }): void {
   updateWarmVault(batch.root, batch.changes);
-  for (const listener of listeners.get(batch.root) ?? []) listener(batch);
+  emitModelMutations({ ...batch, origin: "lane" });
 }
 
 export class ModelFileSystem {

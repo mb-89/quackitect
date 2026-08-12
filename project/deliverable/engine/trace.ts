@@ -9,9 +9,10 @@
 // angle and moves only to clear a neighbour — rather than a dependency the
 // always-on mirror would carry forever.
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative, resolve } from "node:path";
 import { contentHash } from "./hash.ts";
 import { nodeLines, noteOf, parseStateNote, passEpoch, readNode } from "./notes.ts";
+import { buildMindmapTree, type MindmapGraphNode, toPumlMindmap } from "./puml_mindmap.ts";
 
 /** THE SHARED SPINE, in ring order from the centre outward. Every wedge holds
  *  these whole, and nothing branches until the last of them.
@@ -188,6 +189,36 @@ function traceFiles(dir: string, depth = 0): string[] {
 
 export function traceDir(root: string): string {
   return join(root, "project", "spec", "trace");
+}
+
+// THE WRITE TRAIL — which trace nodes were touched, and when. A slot on the
+// model's mutation signal fills it; the graph blinks a fresh one, then fades
+// it. Keyed by node id, which for a trace node is its filename.
+const TRAIL = new Map<string, number>();
+const TRAIL_MS = 90_000;
+
+/** A slot for the model's mutation signal. Paths outside the trace are ignored. */
+export function recordTraceWrites(root: string, paths: string[]): void {
+  const at = Date.now();
+  const rootAbs = resolve(root);
+  for (const p of paths) {
+    const eventAbs = resolve(p);
+    const rel = relative(rootAbs, eventAbs).replace(/\\/g, "/");
+    if (!rel.startsWith("project/spec/trace/") || !rel.endsWith(".md")) continue;
+    const id = (rel.split("/").pop() ?? "").replace(/\.md$/, "");
+    if (id !== "") TRAIL.set(id, at);
+  }
+}
+
+/** The still-visible tail of the trail, oldest first. */
+export function traceWriteTrail(): { id: string; at: number }[] {
+  const now = Date.now();
+  const out: { id: string; at: number }[] = [];
+  for (const [id, at] of TRAIL) {
+    if (now - at > TRAIL_MS) TRAIL.delete(id);
+    else out.push({ id, at });
+  }
+  return out.sort((a, b) => a.at - b.at);
 }
 
 /** A TYPED NODE NAMES ITS OWN TEMPLATE (owner, 2026-08-05). `type:
@@ -596,6 +627,24 @@ export function loadTrace(root: string): TraceNode[] {
   }
   CORPUS.set(root, { stamp, nodes: out, epoch: era });
   return out.slice();
+}
+
+/** A GENERIC MINDMAP PROJECTION OF TRACE DATA, built in memory from the same
+ *  markdown corpus loadTrace already reads. Nothing here becomes canonical
+ *  storage: this is a derived view for renderers and debugging. */
+export function traceAsPumlMindmap(root: string, title = "trace"): string {
+  const all = loadTrace(root);
+  const source: MindmapGraphNode[] = [
+    { id: "vision", label: "vision", parents: [] },
+    ...all.map((n) => {
+      const direct = [...n.refines];
+      const fallback = direct.length === 0 && n.type === TRACE_LEVELS[0] ? ["vision"] : direct;
+      const label = n.statement.trim() === "" ? `${n.id} (${n.type})` : `${n.id} (${n.type}) - ${shortLabel(n.id)}`;
+      return { id: n.id, label, parents: fallback };
+    }),
+  ];
+  const tree = buildMindmapTree(source, "vision");
+  return toPumlMindmap(tree, title);
 }
 
 /** THE VISION HAS NO NODE OF ITS OWN YET (owner, 2026-08-05). Until the spec

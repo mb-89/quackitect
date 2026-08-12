@@ -36,6 +36,7 @@ import { LINT_CONFIG, lintProse } from "./lint.ts";
 import { bumpDrawingEpoch } from "./machines/compile.ts";
 import { McpServer, requestContextAdapter, type ToolDef } from "./mcp.ts";
 import { ModelFileSystem } from "./model-fs.ts";
+import { writeNode } from "./notes.ts";
 import { openPanel } from "./panel.ts";
 import { fansOut, resolveInRoot, seDir } from "./paths.ts";
 import { type MirrorState, renderMirror } from "./render.ts";
@@ -44,6 +45,7 @@ import { Session } from "./session.ts";
 import { shoot } from "./shoot.ts";
 import { survey } from "./survey.ts";
 import { Toll } from "./toll.ts";
+import { traceAsPumlMindmap } from "./trace.ts";
 import { webFetch, webSearch } from "./web.ts";
 
 const BIOME_BIN = fileURLToPath(new URL("../node_modules/@biomejs/biome/bin/biome", import.meta.url));
@@ -787,6 +789,51 @@ export function coreTools(
           ...(args.height !== undefined ? { height: Number(args.height) } : {}),
           name: w ?? "page",
         });
+      },
+    },
+    {
+      name: "se_trace_puml",
+      title: "se.trace.puml",
+      description:
+        "DEBUG EXPORT OF THE TRACE CORPUS AS A PLANTUML MINDMAP. This is DERIVED from the current markdown trace data in memory and is never canonical storage. Use it to inspect or feed an external renderer without writing files.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          title: { type: "string", description: "optional mindmap title (default: trace)" },
+        },
+      },
+      handler: (args) => {
+        const title = args.title === undefined ? "trace" : String(args.title);
+        return { title, puml: traceAsPumlMindmap(rootOf(), title) };
+      },
+    },
+    {
+      name: "se_trace_puml_dump",
+      title: "se.trace.puml.dump",
+      description:
+        "WRITE THE DERIVED TRACE MINDMAP TO project/scratchpad as a .puml file for inspection. The source remains markdown trace data; this dump is disposable output.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          title: { type: "string", description: "optional mindmap title (default: trace)" },
+          name: {
+            type: "string",
+            description:
+              "optional output basename in scratchpad (default: trace-mindmap). Only letters, digits, dot, dash, underscore are kept",
+          },
+        },
+      },
+      handler: (args) => {
+        const title = args.title === undefined ? "trace" : String(args.title);
+        const raw = args.name === undefined ? "trace-mindmap" : String(args.name);
+        const safe = raw.replace(/[^A-Za-z0-9._-]/g, "-").replace(/^[-.]+|[-.]+$/g, "") || "trace-mindmap";
+        const rel = `project/scratchpad/${safe}.puml`;
+        const dir = rootOf("project/scratchpad");
+        mkdirSync(dir, { recursive: true });
+        const puml = traceAsPumlMindmap(rootOf(), title);
+        const abs = rootOf(rel);
+        writeNode(abs, puml);
+        return { path: rel, bytes: Buffer.byteLength(puml, "utf8"), title };
       },
     },
     {
