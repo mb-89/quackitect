@@ -59,17 +59,25 @@ test("the blue line: from a cold start to the front desk, every hop named", () =
   assert.equal(r.steps[5].priority, 0.2, "and every hop carries the weight of ENTERING it");
 });
 
-test("the route weighs the slider hop by hop and names where it stops", () => {
+// THE DESK STOPPED BEING A BLOCKABLE TARGET (owner tier cut-over 2026-08-12).
+// This case used to run at 0.1 and shut at the front desk, back when mechanical
+// was 0.01 and the desk 0.2. Both sit on the mechanical rung now, so no dial
+// opens the boot lane and shuts the desk.
+//
+// It takes a target on a HIGHER RUNG, and overhaul is one: strategic, 0.8. At
+// 0.2 the whole mechanical way is open and that last door is shut, which is the
+// hop-by-hop weighing this case exists to prove.
+test("the route weighs the dial hop by hop and names where it stops", () => {
   const s = new Session(freshRoot());
-  s.setAutonomy(0.1);
-  const r = s.route("front_desk");
+  s.setAutonomy(0.2);
+  const r = s.route("overhaul");
   assert.equal(r.steps.length, 6, "the whole way is still shown - a closed road does not erase the map");
-  assert.equal(r.stops_at?.at, "front_desk");
+  assert.equal(r.stops_at?.at, "overhaul", "it names the hop the dial shuts");
   assert.match(String(r.stops_at?.why), /above the session autonomy/);
-  // Raise the slider and the same route runs clear. A route that ignored
+  // Raise the dial and the same route runs clear. A route that ignored
   // the threshold would be a hole straight through contract rule 3.
   s.setAutonomy(1);
-  assert.equal(s.route("front_desk").stops_at, undefined);
+  assert.equal(s.route("overhaul").stops_at, undefined);
 });
 
 test("the route collects every judgment and every document up front", () => {
@@ -122,15 +130,19 @@ test("the sweep stops at the slider, and the target defaults to the front desk",
   const root = freshRoot();
   const s = new Session(root);
   assert.equal(s.target, "front_desk", "every engine start aims at the desk");
-  s.setAutonomy(0.1);
+  // The desk shares the mechanical rung since the tier cut-over, so it can no
+  // longer be the door the dial shuts. Expeditions at 0.4 is the nearest one
+  // that can, and the aim is set before the reading so the walk heads there.
+  s.setAutonomy(0.2);
+  s.setTarget("expeditions");
   await readEverything(s);
-  const out = await s.sweep("front_desk", "agent");
-  assert.equal(out.arrived, false, "a sweep never walks past the slider");
+  const out = await s.sweep("expeditions", "agent");
+  assert.equal(out.arrived, false, "a sweep never walks past the dial");
   assert.deepEqual(s.active(), ["idle"], "it goes as far as it may and stops there");
   assert.equal((out.refusal as { clause: string }).clause, "SE-C-113");
   // Aiming somewhere the drawing cannot reach is refused, not stored.
   assert.throws(() => s.setTarget("nowhere-at-all"));
-  assert.equal(s.target, "front_desk", "so the blue line never points at nowhere");
+  assert.equal(s.target, "expeditions", "so the blue line never points at nowhere");
 });
 
 test("the drawing carries the route: a spline OVER the nodes, its stops, an arrow", async () => {
@@ -174,8 +186,13 @@ test("a blocked route draws a closure, and the way past it is FADED", async () =
   const { renderMirror } = await import("../engine/render.ts");
   const root = freshRoot();
   const s = new Session(root);
-  s.setAutonomy(0.1); // the front desk sits at 0.2
-  assert.equal(s.route("front_desk").stops_at?.at, "front_desk");
+  // 0.2 opens the whole mechanical boot lane and shuts overhaul, which is
+  // strategic at 0.8 — so the drawing carries an open stretch AND a closure.
+  // It used to shut at the front desk; the tier cut-over of 2026-08-12 put the
+  // desk on the mechanical rung, so closing anything now takes a heavier door.
+  s.setAutonomy(0.2);
+  s.setTarget("overhaul");
+  assert.equal(s.route("overhaul").stops_at?.at, "overhaul");
   const html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });
 
   assert.match(html, /class="route-line"\/>/, "the open part is drawn normally");

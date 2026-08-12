@@ -940,8 +940,8 @@ export class Session {
     return { created: e.id, branch: e.branch, note: "it stands in the expeditions container — enter there to work" };
   }
 
-  iterationSeed(goal: string, vision: string, inputs: string[] = []): Record<string, unknown> {
-    const it = itSeed(this.root, goal, vision, inputs);
+  iterationSeed(goal: string, vision: string, inputs: string[] = [], dependsOn: string[] = []): Record<string, unknown> {
+    const it = itSeed(this.root, goal, vision, inputs, dependsOn);
     this.bumpGeneration(); // a new record changes what the container expands to
     return { seeded: it.id, branch: it.branch, note: "it stands in the iterations container as its kickoff" };
   }

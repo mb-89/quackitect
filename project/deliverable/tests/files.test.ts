@@ -35,7 +35,14 @@ function fresh(): string {
 // The owner's reason, in their words: if it is not human readable it is not a
 // first-class artifact.
 test("no binary file lives under project/ — an unreadable figure is not an artifact", () => {
-  const skip = new Set(["node_modules", ".git", ".obsidian", ".worktrees"]);
+  // THE SCRATCHPAD IS EXEMPT (owner ruling 2026-08-12): it is the agent's
+  // workbench and may hold whatever the work needs — a standards PDF, a heap
+  // profile, a rendered probe. It is gitignored, and package.ts already keeps
+  // it out of the shipped archive, so nothing here reaches the PRODUCT.
+  //
+  // The rule was always about what the product OWNS. Reaching into the
+  // workbench made it refuse inputs, which is not what it is for.
+  const skip = new Set(["node_modules", ".git", ".obsidian", ".worktrees", "scratchpad"]);
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {
     for (const e of readdirSync(dir, { withFileTypes: true })) {
