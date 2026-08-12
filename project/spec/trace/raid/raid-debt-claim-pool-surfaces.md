@@ -25,3 +25,7 @@ The remaining work: an act that opens the pool, the holder listing on
 the desk surface, and the force release as a person's act. claimListing,
 claimsLedger and forceRelease stand ready in engine/claims.ts, referenced
 nowhere outside tests.
+
+Sweep 2026-08-12 (the first retro debt sweep): re-accepted consciously,
+minted the same day it was taken. The trigger stands - the first real
+second machine, or the next desk surface touch.

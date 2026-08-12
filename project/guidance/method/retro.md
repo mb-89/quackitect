@@ -79,23 +79,31 @@ The trigger is a NOTE carrying "needs retro":
    in .se/notes.jsonl): keep it (condition still unmet), pull it
    (re-drain as carried, into this round's scope), or drop it (re-drain
    as obsolete, reason recorded). Re-draining IS the migration mechanism.
-5. Drain the assistant's persistent memory (owner rule 2026-08-06,
+5. Sweep the register for DEBTS (owner ruling 2026-08-12). List every
+   raid entry of kind `debt`. Each one is repaid now, rescheduled with
+   its trigger re-affirmed, or consciously re-accepted - and the look is
+   recorded on the entry, dated. A debt nobody re-reads is a lie in the
+   ledger.
+6. Drain the assistant's persistent memory (owner rule 2026-08-06,
    supersedes the 2026-07-27 rule). The agent may write memory freely
    between retros; the retro is where it drains. Read every memory entry:
    whatever holds project rules, project state, or working guidance moves
    INTO the repo (guidance, machines, prompts) and leaves the memory.
    Memory keeps only personal data and harness mechanics the repo cannot
    hold. The agent runs this sweep itself.
-6. Hunt wasted effort. Rework, reversals, avoidable refactors,
+7. Hunt wasted effort. Rework, reversals, avoidable refactors,
    reinventing instead of reusing. Each one is a lead.
-7. Mine the record, using the timestamp step 1 stored — never the whole
+8. Mine the record, using the timestamp step 1 stored — never the whole
    log, and never "last_retro" again by this point.
 
-   Rank four things:
+   Rank five things:
    - refusal clauses by frequency
    - top tools
    - failure rates
    - slow calls
+   - the AGENT VOIDS: gaps between consecutive calls that no tool
+     accounts for, ranked beside the slow calls (a void is the agent's
+     own turn cost, and the log is the only place it shows)
 
    A command that keeps failing or a refusal that keeps firing is a lead.
    The fix may be a tool, a refusal, or better guidance.
@@ -160,14 +168,14 @@ The trigger is a NOTE carrying "needs retro":
      SPLIT before anything clever is attempted inside it.
    COMPARE ACROSS RUNS, not within one. The record appends, so a test that
    has been getting slower for a fortnight is visible here and nowhere else.
-8. Tally the previous retro's improvements, and promote the wins. Dismiss
+9. Tally the previous retro's improvements, and promote the wins. Dismiss
    the duds WITH the reason recorded, so a dud is never re-proposed.
-9. Check the contract. Walk the contract rule by rule against the
+10. Check the contract. Walk the contract rule by rule against the
    period's recorded trail — the call log, the decision graph, the
    notes. A violation is a lead: propose how the rule gets teeth (a
    refusal, a lint, guidance) so it cannot recur. The check reads what
    the lane recorded — private thinking is not in the store.
-10. Aim every improvement at a durable home: guidance, a machine, a
+11. Aim every improvement at a durable home: guidance, a machine, a
    condition note, a form template, an engine refusal. Emit only the few
    highest-leverage notes. Each one specific and checkable — a concrete
    change, never "improve X".

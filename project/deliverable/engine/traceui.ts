@@ -58,32 +58,28 @@ function normalizePositiveSpan(from: number, to: number): { from: number; to: nu
   return { from, to: end };
 }
 
-/** Build all Cytoscape elements and overlay geometry from a loaded + laid-out trace. */
-function buildGeometry(root: string, all: ReturnType<typeof loadTrace>, selected: string[], types: string[], find: string, origin: string) {
-  const subsegments = traceSubsegments(root);
-  const laid = layoutTrace(all, selected, { types, find, origin }, subsegments);
-
-  const NODE_W = 126;
-  const NODE_H = 24;
-  const NODE_R = Math.hypot(NODE_W * 0.5, NODE_H * 0.5);
-
-  const placed = laid.nodes.map((n) => ({ ...n, x: n.x, y: n.y }));
-
-  const wedgeByRoot = new Map(
-    (laid.bands ?? []).filter((b) => b.kind === "segment").map((b) => [b.root, { from: b.from, to: b.to, center: (b.from + b.to) / 2 }]),
-  );
-
-  const levelStats = new Map<number, { sum: number; count: number }>();
-  for (const n of placed) {
+/** Mean distance from centre per level — the radius book both remap ends read. */
+function levelMeans(nodes: { x: number; y: number; level: number }[]): Map<number, number> {
+  const stats = new Map<number, { sum: number; count: number }>();
+  for (const n of nodes) {
     const r = Math.hypot(n.x, n.y);
-    const hit = levelStats.get(n.level) ?? { sum: 0, count: 0 };
+    const hit = stats.get(n.level) ?? { sum: 0, count: 0 };
     hit.sum += r;
     hit.count += 1;
-    levelStats.set(n.level, hit);
+    stats.set(n.level, hit);
   }
-  const levelMeanRadius = new Map<number, number>();
-  for (const [level, st] of levelStats.entries()) levelMeanRadius.set(level, st.sum / Math.max(1, st.count));
+  const means = new Map<number, number>();
+  for (const [level, st] of stats.entries()) means.set(level, st.sum / Math.max(1, st.count));
+  return means;
+}
 
+function clampToWedges(
+  placed: { x: number; y: number; level: number; root: string }[],
+  bands: { kind: string; root: string; from: number; to: number }[],
+): void {
+  const wedgeByRoot = new Map(
+    bands.filter((b) => b.kind === "segment").map((b) => [b.root, { from: b.from, to: b.to, center: (b.from + b.to) / 2 }]),
+  );
   for (const n of placed) {
     let theta = Math.atan2(n.y, n.x);
     const r = Math.hypot(n.x, n.y);
@@ -100,47 +96,46 @@ function buildGeometry(root: string, all: ReturnType<typeof loadTrace>, selected
     n.x = Math.cos(theta) * r;
     n.y = Math.sin(theta) * r;
   }
+}
 
+function retargetLevelRadii(placed: { x: number; y: number; level: number }[], nodeH: number): void {
   const levels = [...new Set(placed.map((n) => n.level).filter((x) => x >= 0))].sort((a, b) => a - b);
-  if (levels.length > 1) {
-    const byLevel = new Map<number, typeof placed>();
-    for (const lv of levels) byLevel.set(lv, []);
-    for (const n of placed) if (n.level >= 0) byLevel.get(n.level)?.push(n);
-    const meanNow = new Map<number, number>();
-    for (const lv of levels) {
-      const lane = byLevel.get(lv) ?? [];
-      meanNow.set(lv, lane.reduce((s, n) => s + Math.hypot(n.x, n.y), 0) / Math.max(1, lane.length));
-    }
-    const rMin = meanNow.get(levels[0]) ?? 0;
-    const rMax = meanNow.get(levels[levels.length - 1]) ?? rMin;
-    const minGap = NODE_H * 1.45;
-    const target = new Map<number, number>();
-    for (let i = 0; i < levels.length; i++) {
-      const t = i / Math.max(1, levels.length - 1);
-      target.set(levels[i], rMin + (rMax - rMin) * t ** 0.78);
-    }
-    for (let i = 1; i < levels.length; i++) {
-      const floor = (target.get(levels[i - 1]) ?? 0) + minGap;
-      if ((target.get(levels[i]) ?? 0) < floor) target.set(levels[i], floor);
-    }
-    for (const n of placed) {
-      if (n.level < 0) continue;
-      const oldMean = meanNow.get(n.level) ?? Math.hypot(n.x, n.y);
-      const newMean = target.get(n.level) ?? oldMean;
-      const rr = Math.hypot(n.x, n.y);
-      const theta = Math.atan2(n.y, n.x);
-      const boost = n.level === 3 ? NODE_H * 2.2 : 0;
-      const shifted = newMean + (rr - oldMean) * 0.62 + boost;
-      n.x = Math.cos(theta) * shifted;
-      n.y = Math.sin(theta) * shifted;
-    }
+  if (levels.length <= 1) return;
+  const byLevel = new Map<number, { x: number; y: number; level: number }[]>();
+  for (const lv of levels) byLevel.set(lv, []);
+  for (const n of placed) if (n.level >= 0) byLevel.get(n.level)?.push(n);
+  const meanNow = new Map<number, number>();
+  for (const lv of levels) {
+    const lane = byLevel.get(lv) ?? [];
+    meanNow.set(lv, lane.reduce((s, n) => s + Math.hypot(n.x, n.y), 0) / Math.max(1, lane.length));
   }
+  const rMin = meanNow.get(levels[0]) ?? 0;
+  const rMax = meanNow.get(levels[levels.length - 1]) ?? rMin;
+  const minGap = nodeH * 1.45;
+  const target = new Map<number, number>();
+  for (let i = 0; i < levels.length; i++) {
+    const t = i / Math.max(1, levels.length - 1);
+    target.set(levels[i], rMin + (rMax - rMin) * t ** 0.78);
+  }
+  for (let i = 1; i < levels.length; i++) {
+    const floor = (target.get(levels[i - 1]) ?? 0) + minGap;
+    if ((target.get(levels[i]) ?? 0) < floor) target.set(levels[i], floor);
+  }
+  for (const n of placed) {
+    if (n.level < 0) continue;
+    const oldMean = meanNow.get(n.level) ?? Math.hypot(n.x, n.y);
+    const newMean = target.get(n.level) ?? oldMean;
+    const rr = Math.hypot(n.x, n.y);
+    const theta = Math.atan2(n.y, n.x);
+    const boost = n.level === 3 ? nodeH * 2.2 : 0;
+    const shifted = newMean + (rr - oldMean) * 0.62 + boost;
+    n.x = Math.cos(theta) * shifted;
+    n.y = Math.sin(theta) * shifted;
+  }
+}
 
-  // deconflict
-  const threshold = NODE_W * 0.52;
-  function overlaps(a: { x: number; y: number }, b: { x: number; y: number }) {
-    return Math.hypot(a.x - b.x, a.y - b.y) < threshold;
-  }
+function deconflict(placed: { x: number; y: number }[], threshold: number): void {
+  const overlaps = (a: { x: number; y: number }, b: { x: number; y: number }): boolean => Math.hypot(a.x - b.x, a.y - b.y) < threshold;
   for (let pass = 0; pass < 36; pass++) {
     let moved = false;
     for (let i = 0; i < placed.length; i++) {
@@ -160,9 +155,9 @@ function buildGeometry(root: string, all: ReturnType<typeof loadTrace>, selected
     }
     if (!moved) break;
   }
+}
 
-  // uniform scale
-  let scaleFactor = 1;
+function uniformScale(placed: { x: number; y: number }[], threshold: number): number {
   let need = 1;
   for (let i = 0; i < placed.length; i++) {
     for (let j = i + 1; j < placed.length; j++) {
@@ -171,50 +166,60 @@ function buildGeometry(root: string, all: ReturnType<typeof loadTrace>, selected
       need = Math.max(need, threshold / dist);
     }
   }
-  if (need > 1) {
-    scaleFactor = need * 1.02;
-    for (const n of placed) {
-      n.x *= scaleFactor;
-      n.y *= scaleFactor;
-    }
-  }
-
-  // remap radius
-  const finalLevelStats = new Map<number, { sum: number; count: number }>();
+  if (need <= 1) return 1;
+  const scaleFactor = need * 1.02;
   for (const n of placed) {
-    if (n.level < 0) continue;
-    const r = Math.hypot(n.x, n.y);
-    const hit = finalLevelStats.get(n.level) ?? { sum: 0, count: 0 };
-    hit.sum += r;
-    hit.count += 1;
-    finalLevelStats.set(n.level, hit);
+    n.x *= scaleFactor;
+    n.y *= scaleFactor;
   }
-  const finalLevelMeanRadius = new Map<number, number>();
-  for (const [level, st] of finalLevelStats.entries()) finalLevelMeanRadius.set(level, st.sum / Math.max(1, st.count));
+  return scaleFactor;
+}
 
+function radiusRemapper(origMeans: Map<number, number>, finalMeans: Map<number, number>, scaleFactor: number): (r: number) => number {
   const remapAnchors: { orig: number; final: number }[] = [{ orig: 0, final: 0 }];
-  for (const [level, origMean] of levelMeanRadius.entries()) {
-    const finalMean = finalLevelMeanRadius.get(level);
+  for (const [level, origMean] of origMeans.entries()) {
+    const finalMean = finalMeans.get(level);
     if (!Number.isFinite(origMean) || !Number.isFinite(finalMean)) continue;
-    remapAnchors.push({ orig: origMean, final: finalMean! });
+    remapAnchors.push({ orig: origMean, final: finalMean as number });
   }
   remapAnchors.sort((a, b) => a.orig - b.orig);
-
-  function remapRadius(r: number): number {
+  return (r: number): number => {
     if (!Number.isFinite(r)) return r;
     if (remapAnchors.length < 2) return r * scaleFactor;
     if (r <= remapAnchors[0].orig) return remapAnchors[0].final;
     for (let i = 1; i < remapAnchors.length; i++) {
-      const a = remapAnchors[i - 1],
-        b = remapAnchors[i];
+      const a = remapAnchors[i - 1];
+      const b = remapAnchors[i];
       if (r > b.orig) continue;
       const span = Math.max(1e-6, b.orig - a.orig);
       return a.final + (b.final - a.final) * ((r - a.orig) / span);
     }
-    const a = remapAnchors[remapAnchors.length - 2],
-      b = remapAnchors[remapAnchors.length - 1];
+    const a = remapAnchors[remapAnchors.length - 2];
+    const b = remapAnchors[remapAnchors.length - 1];
     return b.final + (r - b.orig) * ((b.final - a.final) / Math.max(1e-6, b.orig - a.orig));
-  }
+  };
+}
+
+/** Build all Cytoscape elements and overlay geometry from a loaded + laid-out trace. */
+function buildGeometry(root: string, all: ReturnType<typeof loadTrace>, selected: string[], types: string[], find: string, origin: string) {
+  const subsegments = traceSubsegments(root);
+  const laid = layoutTrace(all, selected, { types, find, origin }, subsegments);
+
+  const NODE_W = 126;
+  const NODE_H = 24;
+  const NODE_R = Math.hypot(NODE_W * 0.5, NODE_H * 0.5);
+
+  const placed = laid.nodes.map((n) => ({ ...n, x: n.x, y: n.y }));
+
+  const levelMeanRadius = levelMeans(placed);
+  clampToWedges(placed, laid.bands ?? []);
+  retargetLevelRadii(placed, NODE_H);
+
+  const threshold = NODE_W * 0.52;
+  deconflict(placed, threshold);
+  const scaleFactor = uniformScale(placed, threshold);
+
+  const remapRadius = radiusRemapper(levelMeanRadius, levelMeans(placed.filter((n) => n.level >= 0)), scaleFactor);
 
   const segmentBands = (laid.bands ?? []).filter((b) => b.kind === "segment");
   const outerGuideFromBand = remapRadius(Math.max(1, ...segmentBands.map((b) => b.r)));

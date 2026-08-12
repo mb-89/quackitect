@@ -23,3 +23,8 @@ Candidate fixes, one act each:
 - the installer sets core.longpaths true on Windows
 - or itSeed caps the slug so the id does not ride the path twice at
   full length
+
+Sweep 2026-08-12: the first fix landed - preflight sets core.longpaths
+on every Windows clone, idempotent at every boot (engine/bin/preflight.ts).
+The entry stays open until a peer's deep-root seed passes for real; the
+trigger is that seed.

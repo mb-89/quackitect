@@ -619,7 +619,7 @@ function oneLine(s: string): string {
  *  The sound fix is to stamp the actor where the call is MADE — mirror.ts knows
  *  perfectly well which handler a body arrived on — and carry it on the log
  *  record. See the note filed with this change. */
-const SELF_SERVED = new Set(["mirror_slow", "mirror_narration_now"]);
+const SELF_SERVED = new Set(["mirror_slow", "mirror_narration_now", "mirror_profile"]);
 
 function srcOf(tool: string): string {
   if (SELF_SERVED.has(tool)) return "ui";
@@ -633,7 +633,9 @@ export function feedRows(
 ): { capped: boolean; rows: Array<Record<string, unknown>> } {
   const q = log.query({ filter: { since }, limit: 501 });
   // The reader's selection is view state — logged, never shown as a feed row.
-  const records = (q.records ?? []).filter((r) => r.tool !== "mirror_select");
+  // Self-served polls and timings never show either (owner ruling 2026-08-12:
+  // a poll is not an act) — the log keeps them for the slowness mine.
+  const records = (q.records ?? []).filter((r) => r.tool !== "mirror_select" && !SELF_SERVED.has(r.tool));
   const capped = records.length > 500;
   const rows = records.slice(-500).map((rec) => ({
     ref: rec.ref,

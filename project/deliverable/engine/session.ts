@@ -658,7 +658,7 @@ export class Session {
           remedy: {
             tool: "se_pull",
             args: {},
-            note: "STOP and tell the human PLAINLY: this step waits for their hand (they advance it in the mirror, or raise the slider), and the slider alone cannot wake you — they must SEND YOU A MESSAGE (e.g. 'continue') after changing it. Then end your turn. A later pull re-weighs the step.",
+            note: "STOP and tell the human PLAINLY: this step waits for their hand (they advance it in the mirror, or raise the dial), and the dial alone cannot wake you — they must SEND YOU A MESSAGE (e.g. 'continue') after changing it. Then end your turn. A later pull re-weighs the step.",
           },
           source: "engine/session.ts threshold",
         });
@@ -2519,7 +2519,7 @@ export class Session {
         do:
           options.length > 0
             ? "say plainly that nothing is owed here and STOP - options are available, but do not take one unless a goal is set or the person routes it"
-            : "say plainly that nothing is owed and STOP - the slider alone cannot wake you, so ask them to message you",
+            : "say plainly that nothing is owed and STOP - the dial alone cannot wake you, so ask them to message you",
         ...extra(),
       };
     }
@@ -2584,7 +2584,7 @@ export class Session {
         waiting_for: "the person",
         at: first.to,
         why: `entering ${first.to} weighs ${first.priority}, above the session autonomy ${this._autonomy}`,
-        do: "tell them plainly WHICH step waits and STOP — the slider alone cannot wake you, so they must send a message after moving it",
+        do: "tell them plainly WHICH step waits and STOP — the dial alone cannot wake you, so they must send a message after moving it",
         ...extra(),
       };
     }
@@ -2746,7 +2746,7 @@ export class Session {
         waiting_for: "the person",
         at: swept.stopped_at,
         why: ref.got ?? "the next step weighs more than the session autonomy",
-        do: "tell them plainly WHICH step waits and STOP — the slider alone cannot wake you, so they must send a message after moving it",
+        do: "tell them plainly WHICH step waits and STOP — the dial alone cannot wake you, so they must send a message after moving it",
         ...extra(),
       };
     }
@@ -5661,6 +5661,9 @@ export class Session {
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
       status: this.instance.status,
       autonomy: this._autonomy,
+      tier: tierOf(loadLevels(this.root), this._autonomy),
+      // The server's clock, so no hand ever shells for the time (note-8acddaec).
+      now: new Date().toISOString(),
       // Only when ON. Nothing about the resting packet hints that it exists.
       ...(this._emergency ? { emergency: true } : {}),
       power: this.power,

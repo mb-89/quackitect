@@ -133,6 +133,10 @@ if (spawnSync("git", ["--version"], { stdio: "ignore" }).status !== 0) failures.
 // every preflight re-points it. Idempotent, ~50ms, and no clone can forget.
 if (existsSync(join(root, "project", "deliverable", "hooks", "pre-commit"))) {
   spawnSync("git", ["config", "core.hooksPath", "project/deliverable/hooks"], { cwd: root, stdio: "ignore" });
+  // Windows caps paths at 260 chars and the seeded record path carries the
+  // iteration id twice — a deep product root crosses the cap and git answers
+  // "Filename too long" (raid-issue-windows-longpaths).
+  if (process.platform === "win32") spawnSync("git", ["config", "core.longpaths", "true"], { cwd: root, stdio: "ignore" });
 }
 // THE SHELL IS NOT COVERED BY THE SUITE. Nothing imports extension.js, so a
 // syntax error in it ships GREEN and VS Code then loads no extension at all,

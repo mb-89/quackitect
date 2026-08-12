@@ -23,3 +23,8 @@ The remaining work: the $-item resolvers filter to the bound record's
 minted_in by default, an opt-in widens to the corpus, and the coverage
 laws stay corpus-wide. The stamps this debt rests on are already on
 every node.
+
+Sweep 2026-08-12 (the first retro debt sweep): re-accepted consciously.
+The trigger stands unchanged - the next form listing another record's
+nodes, or the owner's next reiteration. Five inbox notes folded into
+this one entry at the same retro.
