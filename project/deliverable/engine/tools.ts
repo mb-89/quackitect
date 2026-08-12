@@ -30,6 +30,7 @@ import { CLAUSES, Rejection, type RejectionPayload } from "./errors.ts";
 import type { PatchOp } from "./files.ts";
 import { gitLand, gitLane, gitSync } from "./gitlane.ts";
 import { contentHash } from "./hash.ts";
+import { rankDemand, searchHelp } from "./help.ts";
 import { appendNote, drainNote, type Priority, readNotes } from "./inbox.ts";
 import { capJson, capMiddle } from "./jsonio.ts";
 import { LINT_CONFIG, lintProse } from "./lint.ts";
@@ -467,6 +468,7 @@ export function coreTools(
   reading?: ReadingHook,
   doors: () => Record<string, unknown>[] = () => [],
   mirror?: () => MirrorState,
+  catalog: () => ToolDef[] = () => [],
 ): ToolDef[] {
   const model = new ModelFileSystem(rootOf);
   return [
@@ -1304,6 +1306,35 @@ export function coreTools(
       }),
     },
     {
+      name: "se_help",
+      title: "se.help",
+      description:
+        "A keyword search over the lane's tools and guidance pages — ask in plain words, get ranked matches with a snippet of each match's own description. Every MISS (nothing scored) is appended to a durable demand log, so a retro reads a RANKED list of what agents kept failing to find instead of hand-mining the shell command history (guidance/method/retro.md step 8). Pass demands: true to read that ranked list instead of searching.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          query: { type: "string", description: "plain words describing what you need — required unless demands is set" },
+          demands: { type: "boolean", description: "true: skip the search and return the ranked miss log instead" },
+          limit: { type: "number", description: "demands mode only — how many ranked shapes to return, default 20" },
+        },
+      },
+      handler: (args) => {
+        if (args.demands === true) {
+          return { demands: rankDemand(projectRoot, args.limit !== undefined ? Number(args.limit) : undefined) };
+        }
+        if (typeof args.query !== "string" || args.query.trim() === "") {
+          throw new Rejection({
+            clause: CLAUSES.REQUIRED_ARGS,
+            expected: "query (plain words), or demands: true",
+            got: "neither",
+            remedy: { tool: "se_help", args: { query: "<what you need>" }, note: "say what you're looking for, in plain words" },
+            source: "engine/tools.ts se_help",
+          });
+        }
+        return searchHelp(projectRoot, args.query, catalog());
+      },
+    },
+    {
       name: "se_log_query",
       title: "se.log.query",
       description:
@@ -1535,7 +1566,7 @@ export function buildServer(
   tollOpts: { windowMs?: number; now?: () => number } = {},
 ): McpServer {
   // (a fresh Session fails fast on a misdrawn machine)
-  const tools = [
+  const tools: ToolDef[] = [
     ...sessionTools(session),
     ...expeditionTools(session),
     ...coreTools(
@@ -1549,6 +1580,11 @@ export function buildServer(
       },
       () => session.doors(),
       () => ({ session, root, lastPacket: undefined, mode: "manual" }),
+      // LAZY ON PURPOSE: se_help wants the FULL assembled catalog (session +
+      // expedition + core tools), which does not exist until this very
+      // array finishes building. The closure is only ever CALLED from a
+      // later request, by which point `tools` below is fully assigned.
+      () => tools,
     ),
   ];
   // THE UPDATE FIELD — every lane tool accepts it: a decision-graph op
