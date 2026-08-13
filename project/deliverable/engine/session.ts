@@ -11,7 +11,7 @@
 // the next refused call's remedy re-boots the agent in one turn.
 import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
-import { claimEntry, machineId } from "./claims.ts";
+import { claimEntry, completeClaim, machineId } from "./claims.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { dirtyLines, git, gitLand, gitSync } from "./gitlane.ts";
 import { contentHash } from "./hash.ts";
@@ -96,7 +96,7 @@ import {
   repinColumn,
 } from "./iterations.ts";
 import { parseStateNote, readNode, section, withPass, writeNode } from "./notes.ts";
-import { fansOut, methodFilesIn, pathKind, recordOwnerOf, resolveInRoot, seDir } from "./paths.ts";
+import { fansOut, METHOD_FILES, METHOD_PREFIXES, methodFilesIn, pathKind, recordOwnerOf, resolveInRoot, seDir } from "./paths.ts";
 import { mintFlipLines } from "./pugh.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
@@ -858,7 +858,14 @@ export class Session {
    *  nothing else on a tree that is already level. */
   private backfillMethod(): { trees: number; files: number } {
     const trees = this.methodTrees().filter((t) => t !== this.root);
-    if (trees.length === 0) return { trees: 0, files: 0 };
+    return { trees: trees.length, files: this.backfillInto(trees) };
+  }
+
+  /** The backfill's engine, over a chosen set of trees. Split out so ENTRY
+   *  can level one tree without reloading, which is the only way to make a
+   *  record's tree whole before an agent starts working in it. */
+  private backfillInto(trees: string[]): number {
+    if (trees.length === 0) return 0;
     let files = 0;
     for (const rel of methodFilesIn(this.root)) {
       let bytes: string;
@@ -879,7 +886,7 @@ export class Session {
         }
       }
     }
-    return { trees: trees.length, files };
+    return files;
   }
 
   /** Where the LANE works: the bound expedition's worktree, else the root. */
@@ -1025,6 +1032,61 @@ export class Session {
     return { seeded: it.id, branch: it.branch, note: "it stands in the iterations container as its kickoff" };
   }
 
+  /** A RECORD'S TREE IS LEVEL AND COMMITTED BEFORE ANY WORK STARTS IN IT.
+   *
+   *  TWO FAULTS MEET HERE, and neither is fixable without the other.
+   *
+   *  THE MIRROR IS PARTIAL. The write-time fan-out copies a method file when
+   *  that file is WRITTEN, so anything edited while a tree was not open stays
+   *  behind. Only a RELOAD backfills the whole set. Measured 2026-08-13: a
+   *  seeded worktree held trunk's session.ts against its own older
+   *  stateform.ts and would not compile — the exact fault paths.ts warns
+   *  about, live in 24 trees at once. A PARTIAL SYNC IS WORSE THAN NONE: an
+   *  unsynced tree is merely old and self-consistent, a half-synced one is
+   *  broken, and it breaks at whatever moment somebody runs a check inside it.
+   *
+   *  THE MIRROR IS UNCOMMITTED. Only the BOUND tree is ever swept up, and only
+   *  at a reload, so every other open worktree accumulates it forever — 68 to
+   *  117 files in 24 of 28 trees. That costs three ways. A pre-commit hook
+   *  type-checks the tree it stands in, so it judges a hundred mirrored files
+   *  that have nothing to do with the commit, and FAILS on them. Any commit
+   *  that is not path-scoped sweeps the whole mirror onto the record's branch
+   *  by accident. And a peer that clones the branch gets NONE of it, so a
+   *  cloud machine walks the method as it stood at seed time — which is how
+   *  one feature was built twice, differently, on two branches.
+   *
+   *  SO ENTRY LEVELS THE TREE, THEN COMMITS IT. Levelling without committing
+   *  leaves the hook judging unstaged work; committing without levelling
+   *  commits something that does not compile. Both, in that order, or neither.
+   *
+   *  ENTRY IS THE RIGHT MOMENT, not the write. One commit per fanned-out file
+   *  per tree would make a 170-file sweep across twenty trees 3400 commits.
+   *  Entry happens once per record, and is exactly when the tree starts
+   *  mattering to somebody.
+   *
+   *  PATH-SCOPED, AND BEST-EFFORT. Only method paths are staged, so a record's
+   *  own content is never swept in behind the agent's back. A tree that
+   *  refuses to commit does not block entry: the walk is still correct, and it
+   *  is the tidiness that is lost rather than the work. */
+  private levelTree(tree: string): { levelled: number; committed: number } {
+    if (tree === this.root) return { levelled: 0, committed: 0 };
+    const levelled = this.backfillInto([tree]);
+    let committed = 0;
+    try {
+      for (const p of [...METHOD_PREFIXES, ...METHOD_FILES]) git(tree, "add", "--", p);
+      const names = git(tree, "diff", "--cached", "--name-only").stdout;
+      if (names === "") return { levelled, committed: 0 };
+      committed = names.split("\n").filter((l) => l !== "").length;
+      // --no-verify because the hook type-checks the WHOLE tree, and this
+      // commit exists precisely to make that tree checkable. Running it
+      // against the state this call is fixing would refuse the fix.
+      git(tree, "commit", "--no-verify", "-m", `the machine levels this tree's method with trunk (${committed} files)`);
+    } catch {
+      // A tree that will not commit is untidy, never broken. Entry stands.
+    }
+    return { levelled, committed };
+  }
+
   iterationOpen(id: string): Record<string, unknown> {
     const it = itFind(this.root, id);
     // The record store opens a record only over a standing claim, and entry
@@ -1034,24 +1096,35 @@ export class Session {
     const mid = machineId(join(this.root, ".se"));
     const gate = claimEntry(this.root, it.id, mid);
     if (!gate.ok) {
+      // A SHIPPED RECORD AND A HELD ONE ARE DIFFERENT REFUSALS. Held is a
+      // wait: the holder may finish or a person may force-release it. Shipped
+      // is final, and telling the reader to wait for it would send them to
+      // stand at a door that is never opening again.
+      const shipped = gate.shipped === true;
       throw new Rejection({
         clause: CLAUSES.CONDITION_UNMET,
         expected: `${it.id} unclaimed, or claimed by this machine (machine-${mid})`,
-        got: `claimed by machine-${gate.holder?.machine ?? "?"} since ${gate.holder?.at ?? "?"}`,
+        got: shipped
+          ? `${it.id} SHIPPED on ${gate.holder?.done ?? "?"} — a shipped iteration is never walked again`
+          : `claimed by machine-${gate.holder?.machine ?? "?"} since ${gate.holder?.at ?? "?"}`,
         remedy: {
           tool: "se_pull",
           args: {},
-          note: "pick another iteration from the claimable listing; a person may force-release a claim judged abandoned",
+          note: shipped
+            ? "the work is done and its record lives on its branch — read it there, or pick unfinished work from the claimable listing"
+            : "pick another iteration from the claimable listing; a person may force-release a claim judged abandoned",
         },
         source: "engine/session.ts claim-gate",
       });
     }
+    const mirror = this.levelTree(it.path);
     this.bound = it;
     markStarted(this.root, it);
     this.decisions.setExtraSink(join(it.path, "project", "spec", "iterations", it.id, "decisions.jsonl"));
     return {
       bound: it.id,
       note: "the lane now works in this iteration's worktree",
+      ...(mirror.committed > 0 ? { method_levelled: mirror.committed } : {}),
       ...(gate.claimed_now === true
         ? { claimed: `machine-${mid}${gate.offline === true ? " (recorded offline; announces at the next opportunity)" : ""}` }
         : {}),
@@ -6144,6 +6217,17 @@ export class Session {
     }
     if (this.bound?.id === it.id) this.unbind();
     itCloseShipped(this.root, it);
+    // THE CLAIM IS SPENT HERE, and this is the only place it can be. A claim
+    // was taken at entry and nothing ever ended it, so the ledger showed
+    // finished records as live holdings forever — i3 and i8 both stood that
+    // way on 2026-08-13, shipped and still reading as claimed. A peer asking
+    // the ledger what is free could not tell work in progress from work that
+    // is over.
+    //
+    // BEST-EFFORT ON PURPOSE. The record IS shipped, on disk and in git,
+    // whatever the ledger manages to record; a network that will not answer
+    // must not unship it. The stamp lands locally and announces later.
+    completeClaim(this.root, it.id, machineId(join(this.root, ".se")));
     appendNote(
       seDir(this.root),
       `needs retro — iteration ${it.id} shipped and archived; the next kickoff's onboard-retro drains it.`,
