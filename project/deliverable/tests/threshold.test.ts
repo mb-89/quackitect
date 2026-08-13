@@ -28,7 +28,7 @@ test("autonomy 0 is manual mode: the agent's pull waits, the human walks freely"
   assert.equal(w.body.pull, "wait");
   assert.equal(w.body.autonomy, 0);
   assert.match(String(w.body.why), /above the session autonomy 0/);
-  assert.match(String(w.body.do), /slider alone cannot wake you/);
+  assert.match(String(w.body.do), /dial alone cannot wake you/);
   // The human's hand (default channel): the same step just goes.
   await session.advance();
   assert.deepEqual(session.active(), ["boot/start"]);
