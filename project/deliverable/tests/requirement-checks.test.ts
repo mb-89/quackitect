@@ -8,7 +8,13 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, test } from "node:test";
 import type { StateDecl } from "../engine/machine.ts";
-import { authorTestsLawProblems, claimProblems, specifyBuildLawProblems, traceDesignLawProblems } from "../engine/stateform.ts";
+import {
+  authorTestsLawProblems,
+  checklistOwed,
+  claimProblems,
+  specifyBuildLawProblems,
+  traceDesignLawProblems,
+} from "../engine/stateform.ts";
 import { conformance, earsShapeOK, itemTemplate, loadTrace } from "../engine/trace.ts";
 import { freshRoot } from "./helpers.ts";
 
@@ -356,5 +362,58 @@ describe("the checklist field", { concurrency: true }, () => {
       claimProblems(root, s, done, []).filter((x) => x.includes("unchecked")),
       [],
     );
+  });
+
+  // A THIRD STATE, FOR WHAT CANNOT BE HONESTLY OBSERVED (owner ruling
+  // 2026-08-13): `- [owed] <item> — <ref>` stands in for a tick when the
+  // claim cannot be checked, and only when <ref> names an OPEN raid entry.
+  const checklistState = () =>
+    ({
+      id: "s",
+      kind: "work",
+      statement: "",
+      guidance: "",
+      priority: 0.2,
+      edges: [],
+      evidence_form: [
+        { name: "quality", template: "checklist", items: ["boxes stay layered", "debt is visible"], required: true, description: "" },
+      ],
+    }) as unknown as StateDecl;
+
+  test("an owed box addressed to an open register entry passes, and is not counted as checked", () => {
+    const root = freshRoot();
+    mintTyped(root, "raid", "raid-x", "raid", ["status: open"]);
+    const body = "## quality\n\n- [x] boxes stay layered\n- [owed] debt is visible — raid-x\n";
+    assert.deepEqual(claimProblems(root, checklistState(), body, loadTrace(root)), []);
+  });
+
+  test("an owed box with no ref refuses, exactly like an unchecked box", () => {
+    const root = freshRoot();
+    const body = "## quality\n\n- [x] boxes stay layered\n- [owed] debt is visible\n";
+    const p = claimProblems(root, checklistState(), body, loadTrace(root)).join(" | ");
+    assert.match(p, /quality: unchecked — debt is visible/);
+  });
+
+  test("an owed box with an unresolvable ref refuses, naming the bad ref", () => {
+    const root = freshRoot();
+    mintTyped(root, "raid", "raid-closed", "raid", ["status: closed"]);
+    const missing = "## quality\n\n- [x] boxes stay layered\n- [owed] debt is visible — raid-ghost\n";
+    assert.match(
+      claimProblems(root, checklistState(), missing, loadTrace(root)).join(" | "),
+      /debt is visible \(owed ref "raid-ghost" is not an open raid entry\)/,
+    );
+    const closed = "## quality\n\n- [x] boxes stay layered\n- [owed] debt is visible — raid-closed\n";
+    assert.match(
+      claimProblems(root, checklistState(), closed, loadTrace(root)).join(" | "),
+      /debt is visible \(owed ref "raid-closed" is not an open raid entry\)/,
+    );
+  });
+
+  test("the owed count and its refs reach the report, naming only what resolved", () => {
+    const root = freshRoot();
+    mintTyped(root, "raid", "raid-x", "raid", ["status: open"]);
+    const content = "- [x] boxes stay layered\n- [owed] debt is visible — raid-x\n- [owed] boxes stay layered — raid-ghost\n";
+    const owed = checklistOwed(["boxes stay layered", "debt is visible"], content, loadTrace(root));
+    assert.deepEqual(owed, [{ item: "debt is visible", ref: "raid-x" }]);
   });
 });
