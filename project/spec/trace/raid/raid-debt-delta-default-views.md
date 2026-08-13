@@ -28,3 +28,7 @@ Sweep 2026-08-12 (the first retro debt sweep): re-accepted consciously.
 The trigger stands unchanged - the next form listing another record's
 nodes, or the owner's next reiteration. Five inbox notes folded into
 this one entry at the same retro.
+
+Sweep 2026-08-13 (second retro debt sweep): re-accepted consciously. i8's
+forms opened reference tables but none surfaced the corpus-wide list this
+debt names. Trigger stands unchanged.

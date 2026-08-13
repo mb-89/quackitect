@@ -3,7 +3,7 @@ state: retro
 state_kind: work
 priority: strategic
 statement: Turn what happened into rules.
-legal_tools: se_note_drain, se_survey, se_log_query, se_answer, se_test, se_run, se_file_read, se_file_search, se_file_glob, se_file_patch, se_seed_expedition, se_seed_iteration
+legal_tools: se_note_drain, se_survey, se_log_query, se_answer, se_test, se_run, se_file_read, se_file_search, se_file_glob, se_file_patch, se_file_write, se_seed_expedition, se_seed_iteration
 entry_read: project/guidance/method/retro.md
 motivation: Lessons expire. A stray nobody judges rots into noise, and a mistake nobody names repeats. The retro turns what happened into rules while it is cheap, and it empties the inbox so the next decision starts clean.
 inputs:

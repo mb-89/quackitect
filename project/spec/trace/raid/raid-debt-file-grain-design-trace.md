@@ -20,3 +20,7 @@ region markers and swept declarations outside every region. The file
 grain shipped first because it makes the whole seam mechanical today.
 The payback is the region mechanism, owed when the coarse sweep goes
 quiet.
+
+Sweep 2026-08-13 (second retro debt sweep): re-accepted consciously. The
+file-grain sweep has not gone quiet and no region-marker mechanism has
+landed. Trigger stands unchanged.
