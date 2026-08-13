@@ -12,7 +12,7 @@ import { dirname, join } from "node:path";
 import { headline } from "./inbox.ts";
 import { stripBom } from "./jsonio.ts";
 import type { ToolDef } from "./mcp.ts";
-import { parseStateNote } from "./notes.ts";
+import { noteOf } from "./notes.ts";
 import { scanGuidance } from "./pull.ts";
 
 export interface HelpMatch {
@@ -134,8 +134,8 @@ function distinctMatches(queryWords: string[], identity: string, body: string): 
 }
 
 function guidanceStatement(root: string, path: string): string {
-  const raw = readFileSync(join(root, path), "utf8");
-  const note = parseStateNote(raw);
+  const note = noteOf(join(root, path));
+  if (note === undefined) return "";
   const fmStatement = note.frontmatter.statement;
   return typeof fmStatement === "string" && fmStatement.trim() !== "" ? fmStatement : note.statement;
 }
