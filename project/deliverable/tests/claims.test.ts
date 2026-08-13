@@ -12,9 +12,11 @@ import { promisify } from "node:util";
 import {
   announceClaims,
   claimEntry,
+  claimIsDone,
   claimIteration,
   claimListing,
   claimsLedger,
+  completeClaim,
   forceRelease,
   machineId,
   pushSeed,
@@ -274,6 +276,70 @@ describe("the claim verb", { concurrency: true }, () => {
     const gb3 = claimEntry(b, "i-e", "bbbb2222");
     assert.equal(gb3.ok, true);
     assert.equal(gb3.claimed_now, undefined);
+  });
+
+  // A CLAIM WAS TAKEN AT ENTRY AND NOTHING EVER ENDED IT. Both shipped
+  // iterations stood in the ledger reading as live holdings on 2026-08-13,
+  // so a peer asking what was free could not tell work in progress from work
+  // that was over. These four cases pin the word that closes the door.
+  test("a shipped iteration is DONE in the ledger, and done is not released", () => {
+    const l = lab();
+    const a = l.clone("machine-a");
+    assert.equal(claimEntry(a, "i-done", "aaaa1111").ok, true);
+    assert.equal(claimIsDone(a, "i-done"), false);
+    assert.equal(completeClaim(a, "i-done", "aaaa1111").ok, true);
+    assert.equal(claimIsDone(a, "i-done"), true);
+    // THE LEDGER SAYS IT ON THE ORIGIN, not merely at home: a completion that
+    // does not reach a peer leaves that peer free to walk finished work.
+    const peer = l.clone("peer");
+    const row = claimsLedger(peer).find((x) => x.iteration === "i-done");
+    assert.ok(row?.done !== undefined, "the peer reads the completion off the origin");
+    assert.equal(row.released_by, undefined, "done is its own word — a completion is not a release");
+  });
+
+  test("no second walk of a shipped record, by any machine including the one that shipped it", () => {
+    const l = lab();
+    const a = l.clone("machine-a");
+    const b = l.clone("machine-b");
+    claimEntry(a, "i8-x", "aaaa1111");
+    completeClaim(a, "i8-x", "aaaa1111");
+    // The OWNER'S RULE: there is not going to be another i8.
+    const other = claimEntry(b, "i8-x", "bbbb2222");
+    assert.equal(other.ok, false);
+    assert.equal(other.shipped, true);
+    // AND NOT THE SHIPPER EITHER. A holder's own claim admits it back in, so
+    // the done check has to stand AHEAD of that branch or the machine that
+    // finished the work walks it a second time.
+    const again = claimEntry(a, "i8-x", "aaaa1111");
+    assert.equal(again.ok, false);
+    assert.equal(again.shipped, true);
+  });
+
+  test("a release reopens and a completion does not — the two words behave differently", () => {
+    const l = lab();
+    const a = l.clone("machine-a");
+    const b = l.clone("machine-b");
+    claimEntry(a, "i-two", "aaaa1111");
+    forceRelease(a, "i-two", "the owner", "abandoned");
+    assert.equal(claimEntry(b, "i-two", "bbbb2222").ok, true, "released means back in the pool");
+    completeClaim(b, "i-two", "bbbb2222");
+    assert.equal(claimEntry(b, "i-two", "bbbb2222").ok, false, "done means gone from the pool");
+    assert.equal(claimListing(a).find((r) => r.iteration === "i-two")?.state, undefined, "no seed branch, so it is not offered at all");
+  });
+
+  test("completing is idempotent, and completing an unclaimed record still records it", () => {
+    const l = lab();
+    const a = l.clone("machine-a");
+    // A record that shipped before the ledger existed has no claim to append
+    // to. Skipping it would leave the ledger silent about exactly the records
+    // that are finished, so the file is written carrying the stamp.
+    assert.equal(completeClaim(a, "i-never-claimed", "aaaa1111").ok, true);
+    assert.equal(claimIsDone(a, "i-never-claimed"), true);
+    // A resumed walk re-runs its close, so a second call reports rather than
+    // stacking another commit.
+    const second = completeClaim(a, "i-never-claimed", "aaaa1111");
+    assert.equal(second.ok, true);
+    assert.equal(second.already, true);
   });
 
   test("the machine id mints once, eight hex, and stays put", () => {
