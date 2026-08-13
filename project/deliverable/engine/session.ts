@@ -89,6 +89,7 @@ import {
   itSeed,
   itShortId,
   markStarted,
+  pinIsStale,
   pinIteration,
   pinnedCanvas,
   readItRecord,
@@ -103,6 +104,7 @@ import { anyJobRunning } from "./run.ts";
 import { levelName, loadLevels, tierOf } from "./scale.ts";
 import {
   buildPortableForm,
+  chosenOption,
   claimProblems,
   type EmbeddedDoc,
   elementMatrixArgs,
@@ -251,14 +253,25 @@ export class Session {
     // or unfamiliar stamp simply does not restore. There is no cleanup step
     // to forget, so a crash or a power cut cannot leave the last session's
     // sliders standing either.
+    this.restoreSettings();
+    this.syncKeepAwake();
+    this.armIdleTimer();
+  }
+
+  /** THE LAST ENGINE'S SETTINGS, restored only under the same session stamp.
+   *  Its own phase, and its own function: the constructor crossed the
+   *  complexity ceiling when the reading credit joined it. */
+  private restoreSettings(): void {
     try {
-      const s = JSON.parse(readFileSync(join(seDir(root), "settings.json"), "utf8")) as {
+      const s = JSON.parse(readFileSync(join(seDir(this.root), "settings.json"), "utf8")) as {
         autonomy?: number;
         emergency?: boolean;
         block_sleep?: boolean;
         shutdown_at_idle?: boolean;
         narration_minutes?: number;
         narration_calls?: number;
+        reads?: Record<string, string>;
+        reads_pid?: number;
         session?: string;
       };
       const mine = process.env.SE_SESSION;
@@ -272,12 +285,30 @@ export class Session {
           this._narrationMinutes = s.narration_minutes;
         if (typeof s.narration_calls === "number" && Number.isInteger(s.narration_calls) && s.narration_calls >= 0)
           this._narrationCalls = s.narration_calls;
+        this.restoreReadCredit(s.reads, s.reads_pid);
       }
     } catch {
       /* no store yet — the defaults stand */
     }
-    this.syncKeepAwake();
-    this.armIdleTimer();
+  }
+
+  /** THE READING CREDIT SURVIVES AN ENGINE RELOAD (owner ruling 2026-08-13).
+   *  The agent read the words. Replacing the process did not unread them.
+   *
+   *  TWO CONDITIONS, AND THE SECOND IS THE ONE THAT WAS MISSING. The session
+   *  stamp says this is the same session, so a compaction still re-owes the
+   *  whole reading. The PROCESS ID says the engine actually restarted —
+   *  without it a second Session built inside one process would inherit a
+   *  credit it never earned, which is what reads.test.ts exists to forbid.
+   *
+   *  Freshness is decided nowhere near here. Every entry is re-checked against
+   *  disk wherever it is used, so a document whose words moved is owed again
+   *  by construction rather than by a second mechanism that could disagree. */
+  private restoreReadCredit(reads: Record<string, string> | undefined, pid: number | undefined): void {
+    if (pid === undefined || pid === process.pid) return;
+    for (const [p, h] of Object.entries(reads ?? {})) {
+      if (typeof h === "string" && h !== "") this.readBuffer.set(p, h);
+    }
   }
 
   private persistSettings(): void {
@@ -293,6 +324,8 @@ export class Session {
           shutdown_at_idle: this._shutdownAtIdle,
           narration_minutes: this._narrationMinutes,
           narration_calls: this._narrationCalls,
+          reads: Object.fromEntries(this.readBuffer),
+          reads_pid: process.pid,
         })}\n`,
         "utf8",
       );
@@ -2136,6 +2169,7 @@ export class Session {
       this.readBuffer.set(p.path, p.hash);
       credited.push(p.path);
     }
+    if (credited.length > 0) this.persistSettings();
     return credited;
   }
 
@@ -2630,6 +2664,7 @@ export class Session {
     const given = this.normWords(String(form.read));
     if (pending.expect.every((e) => given.includes(this.normWords(e)))) {
       this.readBuffer.set(pending.path, pending.hash);
+      this.persistSettings();
       this.pendingRead = null;
       return "ok";
     }
@@ -4045,8 +4080,12 @@ export class Session {
     // mark onto the ones that had stopped passing. recordDone re-runs those
     // same form checks on every look, so the mark bought nothing and cost a
     // signature each time it fired.
+    // THE PIN CATCHES UP WHENEVER THE MATRIX MOVED, and steps reopen only
+    // where a demand moved with it. Returning early on an empty reopen list
+    // left the record walking a snapshot taken before the correction, which
+    // is how i3 kept skipping a state the column already required.
+    if (!pinIsStale(this.root, it)) return;
     const moved = iterationDrift(this.root, it);
-    if (moved.length === 0) return;
     // ONLY A STANDING CLAIM CAN BE REOPENED, and standing is the RECORD's
     // word, not this session's. Reading the instance's own history instead
     // meant a drift could only ever reopen steps filled since the last engine
@@ -4851,7 +4890,7 @@ export class Session {
     const abs = join(it.path, `project/spec/iterations/${it.id}/evidence/gate-kickoff.md`);
     if (!existsSync(abs)) return undefined;
     const txt = stripComments(section(parseStateNote(readFileSync(abs, "utf8")).body, "change_size")).toLowerCase();
-    return (CHANGE_COLUMNS as readonly string[]).find((c) => txt.includes(c));
+    return chosenOption(txt, CHANGE_COLUMNS);
   }
 
   /** ONE self-contained HTML: the sheet, the fills, the reading and the
@@ -5111,11 +5150,15 @@ export class Session {
   rememberRead(path: string, hash: string, ref?: string): void {
     if (ref !== undefined || path.trim() === "" || hash.trim() === "" || path.startsWith("@")) return;
     const lane = this.diskHash(path);
-    if (lane !== "" && lane === hash) this.readBuffer.set(path, hash);
+    if (lane !== "" && lane === hash) {
+      this.readBuffer.set(path, hash);
+      this.persistSettings();
+    }
   }
 
   clearReadBuffer(): void {
     this.readBuffer.clear();
+    this.persistSettings();
   }
 
   /** Whether the walk has passed through boot once already. */

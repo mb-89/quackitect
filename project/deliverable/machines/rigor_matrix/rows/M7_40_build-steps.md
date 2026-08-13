@@ -55,3 +55,15 @@ An unreplaced placeholder FAILS MECHANICALLY. The compiled machine refuses to
 serve this state plain when no drawing was seeded.
 
 Seed the drawing at specify-build, always.
+
+M7 IS ALREADY A CHAIN: author-tests, then specify-build, then observe-red,
+then this row. Each link is a real precedence, and specify-build sits inside
+it rather than beside it.
+
+SO A SKIPPED BUILD IS NOT A MISSING EDGE. On 2026-08-13 i3 walked from
+author-tests into an empty placeholder without ever visiting specify-build,
+while this chain stood exactly as written. Adding a second edge only made a
+cycle, and the compiler said so.
+
+The defect is in how the walk ENFORCES this precedence, not in whether the
+precedence is declared.

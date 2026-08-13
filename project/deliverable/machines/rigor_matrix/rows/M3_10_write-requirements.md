@@ -94,7 +94,7 @@ THE SET QUESTIONS, one argument each:
 - bounded - every row sits inside scope and answers to a source; nothing gold-plated.
 - comprehensible - a reader from any involved discipline can say what the system must do, from the set alone.
 - no_tbd - the sweep for TBD | TBC | TBR | ??? found zero, and you ran it.
-- behaviour_modelled - every row demanding behaviour OVER TIME carries its sequence or state model in `## Behaviour`; name the rows that needed one, and say plainly where none did. A one-condition row cannot state an order and cannot state what exists before the first trigger, so a set of them hides exactly the hole that shipped the claim ledger with nothing to create it (owner ruling 2026-08-13). The shape is in [[meth-requirement-authoring]].
+- behaviour_modelled - the LOOK is owed, never the model. Name the rows where a sequence, a state model or a lifecycle earned its place in `## Behaviour`, and name the rows where one would have been noise. "None here wanted one" is a complete answer. A model on every row is slop and worse than the gap it closes (owner correction 2026-08-13); the test and the shapes are in [[meth-requirement-authoring]].
 
 Position the concrete set against the standard checklists for this deliverable kind ([[meth-state-of-the-art]]). Expect iteration with the functions ([[meth-twin-peaks]]).
 

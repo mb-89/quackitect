@@ -129,10 +129,11 @@ requirements need that precision, and a table beats thirty sibling rows.
 Free prose stays a defect. A rationale is a LINK in `source_refs`, never a
 paragraph, so a changed rationale never forces re-review of the demand.
 
-BEHAVIOUR OVER TIME GETS A `## Behaviour` SECTION (owner ruling 2026-08-13).
-An ordered exchange, a thing with states, a lifecycle — a one-condition
-row cannot say any of those, and a set of them can hide a hole. Text form
-for now; PlantUML lands later.
+A BEHAVIOUR MODEL IS ONE OPTION FOR A ROW, never a duty (owner ruling
+2026-08-13, corrected the same day). An ordered exchange, a thing with
+states, a lifecycle — a one-condition row cannot say any of those, and a set
+of them can hide a hole. Use it where it says what prose cannot; say in one
+line where it does not. A model on every row is slop. Text form for now.
 
 IT DERIVES FROM USE CASES. `refines` names the uc- ids whose steps and
 extensions demand it. The engine checks both directions: a requirement
@@ -238,10 +239,12 @@ this comment for other kinds. -->
 tables, lists, limit sets. It BINDS as part of the demand. One concern per
 node still holds: detail that verifies differently is a sibling row. -->
 
-<!-- `## Behaviour` — REQUIRED where the demand is about behaviour over time:
-an ordered exchange between parties, a thing with states, or a lifecycle. It
-BINDS like Detail. Write it as TEXT for now; PlantUML lands later and the
-text converts without loss.
+<!-- OPTIONAL `## Behaviour` — one WAY to write a row, never a duty. It suits
+an ordered exchange, a thing with states, or a lifecycle. The test: does the
+model say something the statement and the Detail cannot? A missing transition
+or a participant nobody creates, yes. One condition and one response, no —
+that is slop. It BINDS like Detail. Write it as TEXT for now; PlantUML lands
+later and the text converts without loss.
 
     (nothing)  -> unclaimed: the seed pushes the stub
     unclaimed  -> claimed:   a machine enters

@@ -1,15 +1,15 @@
 ---
 id: raid-corpus-stays-small
 type: "[[raid]]"
-kind: assumption
-statement: The engine reads whole files and scans whole folders on every look, which assumes the corpus stays small enough for that to be free.
+kind: issue
+statement: The engine reads whole files and scans whole folders on every look, and the corpus is no longer small enough for that to be free.
 owner: the driving agent
-trigger: when a pull takes longer than a second, or when the trace passes a thousand nodes
+trigger: fired 2026-08-13 — the first half of its own trigger, a pull past one second
 status: open
 breaks_how_badly: corrosive
-how_likely: plausible
-probe: "holds. 248 trace nodes against a 1000-node trigger, and pulls answer well inside a second. The one time it bit was not size at all. The corpus was being loaded about fifteen times per call, and hoisting that to one load fixed it."
-probed: 2026-08-07
+how_likely: expected
+probe: "FALSE as an assumption. Its own trigger fired: 6 of 29 pulls past one second in the 2026-08-13 window, and /widget/machine at 3285 ms with 3275 ms inside the machine phase. Whether the cause is size or shape is NOT settled by this probe."
+probed: 2026-08-13
 impact: Green is recomputed from disk on every render. If that stops being cheap, the honest fix is a cache — and a cache is the thing this design just spent a day removing.
 source_refs:
   - engine/session.ts recordDone
@@ -49,3 +49,36 @@ If it holds at ten times, this is closed for the foreseeable life of the
 product. If it does not, the answer is a content-keyed cache outside the spec,
 the shape v1 settled in adr-verdict-cache — never a mark written back into the
 artifacts.
+
+## PROBED 2026-08-13 — FALSE, SO IT IS NOW AN ISSUE
+
+The entry named its own trigger: "when a pull takes longer than a second".
+That has happened, repeatedly and measurably.
+
+- 6 of 29 `se_pull` calls exceeded one second in the window opening
+  2026-08-12T15:52:54Z.
+- `/widget/machine` answered in 3285 ms, with 3275 ms of that inside the
+  machine phase alone.
+- 134 calls of 1065 broke the one-second rule.
+
+So it has already happened and it is present tense. Per meth-assumption-
+probing, the kind changes and the id stays.
+
+### WHAT THE PROBE DOES NOT SETTLE
+
+Whether the cause is SIZE or SHAPE. The entry's own history warns about
+exactly this confusion: the one previous bite was fifteen corpus loads per
+call, not a large corpus.
+
+The register grew from 146 requirements to 177 in the same period, so size
+moved too. Neither number alone explains 3275 ms.
+
+NAMING THE CAUSE IS NOT THIS STATE'S WORK. i12 carries it, and its charter
+names the machine page and the pull's pagination directly.
+
+### WHAT RESTS ON THIS
+
+`req-call-answers-in-one-second` now rests on something known false, and
+`cand-derived-house` assumed the same smallness at gate-candidates on
+2026-08-09. Both are named here so the trace carries the consequence rather
+than the finding alone.

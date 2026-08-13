@@ -506,6 +506,24 @@ export function choiceOf(content: string): string {
   return i < 0 ? first : first.slice(0, i).trim();
 }
 
+/** THE CHOSEN OPTION, read by the same extractor that validated the pick.
+ *
+ *  The field is `<choice> — <why>`, and the why is prose which may perfectly
+ *  reasonably name another option. So the answer comes from the CHOICE half,
+ *  and nothing is inferred from the sentence beside it.
+ *
+ *  TWO PARSERS FOR ONE FACT, AND THEY DISAGREED. The kickoff's pin used to
+ *  scan the whole field for any column name in declaration order. `patch`
+ *  came first, so a rationale ending "a new line is not a patch" pinned an
+ *  iteration blessed as MINOR to the patch column — eleven approved states
+ *  struck, and a build skipped, because a patch seeds no chunks.
+ *
+ *  Pinned by tests/change-size.test.ts, including that exact sentence. */
+export function chosenOption(content: string, options: readonly string[]): string | undefined {
+  const choice = choiceOf(content).toLowerCase();
+  return options.find((o) => o === choice);
+}
+
 /** The rationale half, or "" where the line carries none. */
 export function rationaleOf(content: string): string {
   const first = (content.split("\n")[0] ?? "").trim();

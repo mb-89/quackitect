@@ -80,3 +80,93 @@
 {"ts":"2026-08-13T08:22:52.966Z","op":"update","visit":"iterations/i3/gate-kickoff@0","node":"d144","brief":"reading the plan at trunk, where the i9 section actually stands"}
 {"ts":"2026-08-13T08:23:24.297Z","op":"update","visit":"iterations/i3/gate-kickoff@0","node":"d145","brief":"recording the fan-out and agent-void answers before blessing the gate"}
 {"ts":"2026-08-13T08:23:28.910Z","op":"update","visit":"iterations/i3/gate-kickoff@0","node":"d146","brief":"blessing the kickoff at minor on the owner's word"}
+{"ts":"2026-08-13T08:23:43.393Z","op":"update","visit":"iterations/i3/gate-kickoff@0","node":"d147","brief":"checking whether the bless landed on the gate evidence"}
+{"ts":"2026-08-13T08:23:55.302Z","op":"update","visit":"iterations/i3/gate-kickoff@0","node":"d148","brief":"advancing past the blessed kickoff so the machine compiles"}
+{"ts":"2026-08-13T08:24:10.021Z","op":"update","visit":"iterations/i3/gate-kickoff@0","node":"d149","brief":"proving the raid method, the entry read past the blessed kickoff"}
+{"ts":"2026-08-13T08:24:30.290Z","op":"update","visit":"iterations/i3/gate-kickoff@0","node":"d150","brief":"aiming at log-risks, the first M1 door the gate offers"}
+{"ts":"2026-08-13T08:24:36.841Z","op":"update","visit":"iterations/i3/gate-kickoff@0","node":"d151","brief":"taking the log-risks door by its full address"}
+{"ts":"2026-08-13T08:25:02.018Z","op":"update","visit":"iterations/i3/log-risks@0","node":"d152","brief":"minting the i9 dependency the red-team round found"}
+{"ts":"2026-08-13T08:25:20.233Z","op":"update","visit":"iterations/i3/log-risks@0","node":"d153","brief":"sampling recent call timestamps to put a real number on the voids"}
+{"ts":"2026-08-13T08:25:52.322Z","op":"update","visit":"iterations/i3/log-risks@0","node":"d154","brief":"recording the measured void sample beside the explanation"}
+{"ts":"2026-08-13T08:26:02.765Z","op":"update","visit":"iterations/i3/log-risks@0","node":"d155","brief":"submitting log-risks with the three entries this change exposed"}
+{"ts":"2026-08-13T08:26:17.653Z","op":"update","visit":"iterations/i3/log-risks@0","node":"d156","brief":"resubmitting log-risks with the two sections the asks list omitted"}
+{"ts":"2026-08-13T08:27:00.913Z","op":"update","visit":"iterations/i3/log-risks@0","node":"d157","brief":"noting the doubt about what i8's cloud run actually built"}
+{"ts":"2026-08-13T08:27:09.431Z","op":"update","visit":"iterations/i3/log-risks@0","node":"d158","brief":"reading the reading file whole, which credits the owed document"}
+{"ts":"2026-08-13T08:27:18.143Z","op":"update","visit":"iterations/i3/log-risks@0","node":"d159","brief":"advancing to the requirements state"}
+{"ts":"2026-08-13T08:27:29.431Z","op":"update","visit":"iterations/i3/write-requirements@0","node":"d160","brief":"proving the assumption-hunting card"}
+{"ts":"2026-08-13T08:27:43.614Z","op":"update","visit":"iterations/i3/write-requirements@0","node":"d161","brief":"listing the use cases the new requirements must refine"}
+{"ts":"2026-08-13T08:28:12.783Z","op":"update","visit":"iterations/i3/write-requirements@0","node":"d162","brief":"writing the reading-credit requirement with its lifecycle model"}
+{"ts":"2026-08-13T08:28:27.902Z","op":"update","visit":"iterations/i3/write-requirements@0","node":"d163","brief":"writing the red-objective requirement with its exchange model"}
+{"ts":"2026-08-13T08:28:52.728Z","op":"update","visit":"iterations/i3/write-requirements@0","node":"d164","brief":"stripping the behaviour model that only restated the statement"}
+{"ts":"2026-08-13T08:29:07.017Z","op":"update","visit":"iterations/i3/write-requirements@0","node":"d165","brief":"writing the grey-state verb requirement, no model needed"}
+{"ts":"2026-08-13T08:29:19.333Z","op":"update","visit":"iterations/i3/write-requirements@0","node":"d166","brief":"escaping to correct the behaviour-model guidance from a mandate to an option"}
+{"ts":"2026-08-13T08:30:33.937Z","op":"update","visit":"iterations/i3/frame-delta@0","node":"d171","brief":"listing the resident value props this delta inherits"}
+{"ts":"2026-08-13T08:30:57.871Z","op":"update","visit":"iterations/i3/frame-delta@0","node":"d172","brief":"submitting frame-delta, which inherits the frame and authors no new props"}
+{"ts":"2026-08-13T08:31:10.111Z","op":"update","visit":"iterations/i3/frame-delta@0","node":"d173","brief":"crediting the corrected method card, re-owed because its content moved"}
+{"ts":"2026-08-13T08:31:18.191Z","op":"update","visit":"iterations/i3/frame-delta@0","node":"d174","brief":"reading the verdict on the corrected guidance"}
+{"ts":"2026-08-13T08:31:48.281Z","op":"update","visit":"iterations/i3/frame-delta@0","node":"d175","brief":"submitting the three requirements with the behaviour look recorded"}
+{"ts":"2026-08-13T08:31:54.735Z","op":"update","visit":"iterations/i3/frame-delta@0","node":"d176","brief":"pulling with no payload to reach the state that asks for the form"}
+{"ts":"2026-08-13T08:32:13.506Z","op":"update","visit":"iterations/i3/write-requirements@1","node":"d177","brief":"submitting the three requirements with the behaviour look recorded"}
+{"ts":"2026-08-13T08:32:23.851Z","op":"update","visit":"iterations/i3/write-requirements@1","node":"d178","brief":"listing the whole requirement register, which the coverage check reads"}
+{"ts":"2026-08-13T08:32:58.970Z","op":"update","visit":"iterations/i3/write-requirements@1","node":"d179","brief":"sending the whole register, which the coverage check reads both ways"}
+{"ts":"2026-08-13T08:33:31.714Z","op":"update","visit":"iterations/i3/write-requirements@1","node":"d180","brief":"checking what the next state owes before reading it whole"}
+{"ts":"2026-08-13T08:33:38.064Z","op":"update","visit":"iterations/i3/write-requirements@1","node":"d181","brief":"reading both owed documents whole to credit them"}
+{"ts":"2026-08-13T08:33:45.150Z","op":"update","visit":"iterations/i3/write-requirements@1","node":"d182","brief":"advancing past the credited reading"}
+{"ts":"2026-08-13T08:34:24.607Z","op":"update","visit":"iterations/i3/identify-assumptions@0","node":"d183","brief":"minting the session-identity assumption the credit rests on"}
+{"ts":"2026-08-13T08:34:40.937Z","op":"update","visit":"iterations/i3/identify-assumptions@0","node":"d184","brief":"minting the line-ending assumption under the content hash"}
+{"ts":"2026-08-13T08:35:00.577Z","op":"update","visit":"iterations/i3/identify-assumptions@0","node":"d185","brief":"minting the assumption the grey-state verb rests on"}
+{"ts":"2026-08-13T08:35:21.462Z","op":"update","visit":"iterations/i3/identify-assumptions@0","node":"d186","brief":"submitting the assumption sweep with three minted and three nil answers"}
+{"ts":"2026-08-13T08:35:41.088Z","op":"update","visit":"iterations/i3/identify-assumptions@0","node":"d187","brief":"crediting the assumption-probing method"}
+{"ts":"2026-08-13T08:35:49.357Z","op":"update","visit":"iterations/i3/identify-assumptions@0","node":"d188","brief":"listing every standing assumption for the probe"}
+{"ts":"2026-08-13T08:36:10.071Z","op":"update","visit":"iterations/i3/identify-assumptions@0","node":"d189","brief":"reading the four assumptions minted before this record"}
+{"ts":"2026-08-13T08:36:50.104Z","op":"update","visit":"iterations/i3/identify-assumptions@0","node":"d190","brief":"the corpus assumption is falsified by its own trigger and becomes an issue"}
+{"ts":"2026-08-13T08:37:07.717Z","op":"update","visit":"iterations/i3/identify-assumptions@0","node":"d191","brief":"counting condition types for the grey-verb probe"}
+{"ts":"2026-08-13T08:37:37.444Z","op":"update","visit":"iterations/i3/identify-assumptions@0","node":"d192","brief":"submitting the probe of all nine visible assumptions"}
+{"ts":"2026-08-13T08:38:04.941Z","op":"update","visit":"iterations/i3/identify-assumptions@0","node":"d193","brief":"noting the missing input half: no trunk resync at iteration entry"}
+{"ts":"2026-08-13T08:38:11.833Z","op":"update","visit":"iterations/i3/identify-assumptions@0","node":"d194","brief":"pulling with no payload to see what the probe state asks for"}
+{"ts":"2026-08-13T08:38:42.575Z","op":"update","visit":"iterations/i3/probe-assumptions@0","node":"d195","brief":"submitting the probe with one falsification and its fallout"}
+{"ts":"2026-08-13T08:39:08.895Z","op":"update","visit":"iterations/i3/probe-assumptions@0","node":"d196","brief":"stamping probe and probed onto the five entries minted today"}
+{"ts":"2026-08-13T08:39:41.803Z","op":"update","visit":"iterations/i3/probe-assumptions@0","node":"d197","brief":"recording the profile numbers and the issue-sweep gap"}
+{"ts":"2026-08-13T08:40:05.788Z","op":"update","visit":"iterations/i3/probe-assumptions@0","node":"d198","brief":"noting that the retro's sweep covers debts only, never issues"}
+{"ts":"2026-08-13T08:40:29.172Z","op":"update","visit":"iterations/i3/probe-assumptions@0","node":"d199","brief":"resubmitting the probe with every node stamped"}
+{"ts":"2026-08-13T08:40:57.290Z","op":"update","visit":"iterations/i3/author-tests@0","node":"d200","brief":"finding the test files the three new requirements belong beside"}
+{"ts":"2026-08-13T08:41:07.360Z","op":"update","visit":"iterations/i3/author-tests@0","node":"d201","brief":"locating the reading test file"}
+{"ts":"2026-08-13T08:41:25.629Z","op":"update","visit":"iterations/i3/author-tests@0","node":"d202","brief":"reading the existing reading test's setup before authoring the reds"}
+{"ts":"2026-08-13T08:42:45.891Z","op":"update","visit":"iterations/i3/author-tests@0","node":"d203","brief":"noting the hot-model question with the 14x variance as its clue"}
+{"ts":"2026-08-13T08:42:58.779Z","op":"update","visit":"iterations/i3/author-tests@0","node":"d204","brief":"escaping to author the tests, which the state cannot write while bound"}
+{"ts":"2026-08-13T08:47:05.948Z","op":"update","visit":"iterations/i3/author-tests@1","node":"d214","brief":"writing the test-spec for the feedback loop, with two steps owed and named"}
+{"ts":"2026-08-13T08:47:20.688Z","op":"update","visit":"iterations/i3/author-tests@1","node":"d215","brief":"checking whether a view scope toggle is planned anywhere"}
+{"ts":"2026-08-13T08:47:30.376Z","op":"update","visit":"iterations/i3/author-tests@1","node":"d216","brief":"reading the two demands nearest the scope toggle"}
+{"ts":"2026-08-13T08:47:58.883Z","op":"update","visit":"iterations/i3/author-tests@1","node":"d217","brief":"correcting the delta answer and recording that the scope toggle is unplanned"}
+{"ts":"2026-08-13T08:48:20.605Z","op":"update","visit":"iterations/i3/author-tests@1","node":"d218","brief":"noting the unplanned scope toggle and where it would land"}
+{"ts":"2026-08-13T08:48:33.259Z","op":"update","visit":"iterations/i3/author-tests@1","node":"d219","brief":"listing every test-spec for the coverage check"}
+{"ts":"2026-08-13T08:48:52.835Z","op":"update","visit":"iterations/i3/author-tests@1","node":"d220","brief":"submitting the checks with the new spec and its two owed steps"}
+{"ts":"2026-08-13T08:49:11.465Z","op":"update","visit":"iterations/i3/observe-red@0","node":"d221","brief":"running the new checks to observe the red before any build"}
+{"ts":"2026-08-13T08:49:17.589Z","op":"update","visit":"iterations/i3/observe-red@0","node":"d222","brief":"reading the red verdict"}
+{"ts":"2026-08-13T08:49:42.707Z","op":"update","visit":"iterations/i3/observe-red@0","node":"d223","brief":"escaping to fix reds that fail for the wrong reason"}
+{"ts":"2026-08-13T08:51:46.834Z","op":"update","visit":"iterations/i3/observe-red@1","node":"d232","brief":"recording the observed red with its run ref"}
+{"ts":"2026-08-13T08:52:10.063Z","op":"update","visit":"iterations/i3/observe-red@1","node":"d233","brief":"resubmitting observe-red with the non-test checklist filled"}
+{"ts":"2026-08-13T08:52:26.500Z","op":"update","visit":"iterations/i3/observe-red@1","node":"d234","brief":"resubmitting with bare checklist lines"}
+{"ts":"2026-08-13T08:52:40.444Z","op":"update","visit":"iterations/i3/observe-red@1","node":"d235","brief":"crediting the build's reading"}
+{"ts":"2026-08-13T08:52:53.676Z","op":"update","visit":"iterations/i3/observe-red@1","node":"d236","brief":"advancing into the build states"}
+{"ts":"2026-08-13T08:53:26.796Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d237","brief":"recording that build-steps was skipped whole and silently"}
+{"ts":"2026-08-13T08:53:52.151Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d238","brief":"locating readBuffer, the credit that dies with the process"}
+{"ts":"2026-08-13T08:54:12.554Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d239","brief":"probing whether a session identity exists for the credit to key to"}
+{"ts":"2026-08-13T08:54:32.224Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d240","brief":"reading the settings load and save, the pattern the credit will reuse"}
+{"ts":"2026-08-13T08:55:05.257Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d241","brief":"escaping to build the reading credit in session.ts"}
+{"ts":"2026-08-13T09:14:52.101Z","op":"update","visit":"iterations/i3/trace-design@1","node":"d289","brief":"recording that the pin holds i3 to its old machine and the fork that opens"}
+{"ts":"2026-08-13T09:14:57.444Z","op":"update","visit":"iterations/i3/trace-design@1","node":"d290","brief":"final battery check"}
+{"ts":"2026-08-13T09:25:28.814Z","op":"update","visit":"iterations/i3/trace-design@1","node":"d291","brief":"finding how the pinned machine is written and whether it can be recompiled"}
+{"ts":"2026-08-13T09:25:46.467Z","op":"update","visit":"iterations/i3/trace-design@1","node":"d292","brief":"reading movedDemands to see what counts as drift"}
+{"ts":"2026-08-13T09:26:08.044Z","op":"update","visit":"iterations/i3/trace-design@1","node":"d293","brief":"reading the demand shape before adding topology to it"}
+{"ts":"2026-08-13T09:26:27.439Z","op":"update","visit":"iterations/i3/trace-design@1","node":"d294","brief":"escaping to teach the drift ledger about machine topology"}
+{"ts":"2026-08-13T09:29:27.865Z","op":"update","visit":"iterations/i3/trace-design@2","node":"d313","brief":"escaping to reload the engine so the drift fix takes effect"}
+{"ts":"2026-08-13T09:31:16.435Z","op":"update","visit":"iterations/i3/start@0","node":"d7","brief":"proving the retro method to reach i3's walk"}
+{"ts":"2026-08-13T09:31:30.477Z","op":"update","visit":"iterations/i3/gate-kickoff@0","node":"d8","brief":"proving the raid card to reach the walk's live position"}
+{"ts":"2026-08-13T09:31:46.193Z","op":"update","visit":"iterations/i3/log-risks@0","node":"d9","brief":"proving the requirement card to reach the live position"}
+{"ts":"2026-08-13T09:31:56.349Z","op":"update","visit":"iterations/i3/write-requirements@0","node":"d10","brief":"proving the assumption card to reach the live position"}
+{"ts":"2026-08-13T09:32:09.044Z","op":"update","visit":"iterations/i3/write-requirements@0","node":"d11","brief":"proving the test-design card, the last owed here"}
+{"ts":"2026-08-13T09:32:16.647Z","op":"update","visit":"iterations/i3/write-requirements@0","node":"d12","brief":"proving the last document to reach i3's live position"}
+{"ts":"2026-08-13T09:32:29.023Z","op":"update","visit":"iterations/i3/author-tests@0","node":"d13","brief":"proving the last document to see where the re-pinned walk lands"}
+{"ts":"2026-08-13T09:33:10.626Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d14","brief":"recording that the drift fix is forward-only and why"}
+{"ts":"2026-08-13T09:36:53.727Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d15","brief":"escaping to rechain the build states and fix the snapshot refresh"}
