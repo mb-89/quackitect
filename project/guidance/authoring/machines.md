@@ -75,8 +75,9 @@ state_kind: work             # work | gate | terminal | start | end (required)
 legal_tools: all             # THE STATE GATE: tools legal here (`all` opens the lane;
                              # se_pull is ALWAYS legal — it is the machinery)
 guidance: One or two short sentences the agent gets in its packet. Never empty.
-priority: 0.25               # HUMAN INVOLVEMENT: the weight of ENTERING this
-                             # state, 0.01 .. 1 (required — see the scale below)
+priority: operational        # HUMAN INVOLVEMENT: the weight of ENTERING this
+                             # state, as a RUNG WORD (required — see the scale
+                             # below). Never a number.
 tags: review                 # optional; joins the state to guidance (the pull's tag rule)
 exit_read:                   # conditions are FLAT keys: <entry|exit>_<type>.
   - workspace/AGENTS.md      # YAML lists render as chips in Obsidian —
@@ -142,8 +143,19 @@ weighing. Author `priority:` as a rung word:
   but the axiomatic vision. The dial's last notch, and the dangerous one
   — scale.md says why.
 
-Blocked (0) is a CONTROL POSITION, never an authored priority. No state
-is authored at 0, so the blocked setting admits nothing at all.
+**blocked** is the sixth word, and it sits ABOVE every rung rather than
+below them. A state authored `blocked` can never be entered by the agent,
+at any setting. The person always may. The archives are drawn that way.
+
+THE TWO SIDES OF THE WORD SIT AT OPPOSITE ENDS. On the control, blocked
+is the position where no rung is pressed. On a state, it is above the top
+rung. The gate refuses when priority is GREATER than autonomy, so
+"nothing gets through" is the bottom of one range and the top of the
+other.
+
+NEVER AUTHOR A STATE AT 0. It would do the opposite of what the word
+says: 0 > 0 is false, so the state would run at the blocked setting. The
+engine reads a state's blocked above the ladder for exactly that reason.
 
 A sub-machine state's priority lives in the SUB-CANVAS's
 `metadata.frontmatter.priority` (the canvas is the state); the compiler

@@ -542,7 +542,10 @@ const BRIEFS: Record<string, (a: Record<string, unknown>) => string> = {
   se_pull: briefPull,
   mirror_tick: (a) => (a.back !== undefined ? `back → ${a.back}` : a.to !== undefined ? `tick → ${a.to}` : "tick advance"),
   mirror_check: (a) => `check ${a.path}`,
-  mirror_autonomy: (a) => `autonomy → ${a.value}`,
+  // The word is the truth, the number its carrier. A record written before
+  // the cut-over carries no word, and says so rather than drawing the
+  // number alone (req-autonomy-is-categorical).
+  mirror_autonomy: (a) => (typeof a.tier === "string" ? `autonomy → ${a.tier} (${a.value})` : `autonomy → ${a.value} (tier not recorded)`),
   mirror_narration: (a) => `updates → ${a.value}`,
   mirror_script: (a) => `run scripts · ${a.state}`,
   se_update: (a) => {

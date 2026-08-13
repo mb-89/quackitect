@@ -49,7 +49,7 @@ milestone starts from what this one found rather than searching from nothing.
   is not the place to do it.
 - Then the rounds, in increasing scrutiny: verify, validate, red-team.
 - Risk-weighted: deepest scrutiny on the most central, most-reversed, human-judged items. Scale to size - do not red-team a trivial gate.
-- A milestone gate is never self-certified below the slider - the bless is the person's until the dial hands it over.
+- A milestone gate is never self-certified below the dial - the bless is the person's until the dial hands it over.
 - A reopen names states; the executor re-activates them and their downstream cone. Reopen edges are never drawn.
 - The gate's bless is the adjudication act itself, recorded with the hand that made it. Where a milestone needs sign-off, the bless IS the sign-off.
 - A bless does not outlive its evidence. When an input under the claim moves, the sign-off and the bless come off and a `suspect:` line goes on, naming what moved.
