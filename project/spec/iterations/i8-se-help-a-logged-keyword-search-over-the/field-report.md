@@ -921,7 +921,160 @@ wrong one here.
 This is the same finding as section 7, arrived at three separate times. It is
 the single most repeated failure of the run.
 
-## 7. The one rule this run had to break
+## 7. What to change so the next cloud run just works
+
+The owner's standing goal: **dump work into the cloud, get something back,
+interact very little.** This run did not look like that. It worked, but it
+took constant hand-holding, and none of that hand-holding was interesting.
+
+This section is the agenda that would remove it. It is ordered by how much
+friction each one removes, not by how hard it is.
+
+### 7.1 Ship a headless entrypoint — the single biggest win
+
+Everything in section 1 was hand-assembled by an agent reading prose and
+guessing. Each of these is a step a person had to discover the hard way:
+
+- suppress the panel, or the server dies at startup
+- hold stdin open, or backgrounding kills it
+- pass the cage on the command line rather than placing files
+- fetch the `it/*` refspec, or no record is visible
+- adopt the iteration, because no lane verb does it
+
+**None of that is judgment. All of it is a script.** Version 1 of this system
+shipped a `runme.sh` beside its PowerShell script for exactly this reason;
+this version ships only PowerShell.
+
+What the script must do, and section 1.7 has the detail:
+
+- verify Node, install, start the server with the right environment
+- wait for the health check instead of racing it
+- fetch the refspec and adopt the named record
+- launch the caged child with the cage on its command line
+- **exit non-zero with ONE clear sentence** when a step fails
+
+That last point matters most. Every failure in this run presented as "the
+server is not there", which is the least informative symptom possible.
+
+### 7.2 Make the two roles a first-class feature, not an improvisation
+
+**A running agent cannot cage itself** (1.6). That is structural, and it will
+never change: the deny list and the MCP server are read at session start.
+
+So every headless run needs a supervisor and a walker. Right now the
+supervisor is whatever agent happened to be started, improvising with shell
+commands. It should be a MODE THE SYSTEM OWNS, with a defined job:
+
+- bring the lane up and keep it up
+- launch and relaunch the caged walker
+- stream progress somewhere the person can read
+- never touch the record itself
+
+Section 6.9 shows why this cannot be folded back into the walker: when the
+lane is unresponsive the caged agent cannot even call `se_run` to look. The
+role that recovers the lane must live outside the lane.
+
+### 7.3 Give the walker a lane it can trust
+
+The walker currently treats any failed call as a wall. It needs two things:
+
+- **A health check with retry semantics it is told about.** A timeout is not a
+  death (6.9). The walker should retry a failed lane call a few times before
+  concluding anything, and the guidance should say so plainly.
+- **A supervisor that restarts the engine when it is genuinely gone**, so the
+  walker never has to care about the difference.
+
+Add a deadline to background jobs while here. One hung job was polled 56
+times because nothing ever said "this is not coming back" (section 5).
+
+### 7.4 Commit on every state, not every milestone
+
+Three sessions running ended with 46, 29 and 28 files uncommitted, each
+rescued from outside the walk. On a durable machine the milestone rhythm is
+right. On an ephemeral one it loses work.
+
+**The state, not the milestone, should be the commit unit.** A state that
+produced files and signed its evidence has everything a commit needs. This
+also dissolves the hook conflict in 6.10, because the tree is then rarely
+dirty for long.
+
+### 7.5 Close the write leak that causes divergence
+
+`SE-C-134` guards five write tools and not `se_run` (6.3). The result was
+`se_help` implemented twice, differently, on two branches, and three merge
+conflicts at the end of this run.
+
+Two candidate fixes, and the second is better:
+
+- extend the clause to every write path including `se_run`
+- **bind the lane's ROOT to the worktree while a record is bound**, so a write
+  from inside a record cannot address trunk at all
+
+The second removes the class of bug instead of adding another check.
+
+### 7.6 Let the owner pre-authorise gates for one session
+
+`gate-release` needs a person by design, and that is right. But in an
+unattended run the person is not there, and the walk stops with the work
+finished and unshipped.
+
+The dial already carries "how much may the agent do alone" per session, set at
+launch and not committed. **The same idea extends to naming gates the owner
+has authorised for this run** — a launch-time list, host-local, never
+committed, recorded in the gate as authorised-in-advance rather than blessed
+by the agent on its own judgment.
+
+That is the difference between an unattended run that ships and one that
+parks a finished iteration at the last step.
+
+### 7.7 Choose test scope from the import graph
+
+A scoped run is the right default and the lane is right to enforce it. But the
+author picks the scope from memory, and in this run that missed the two files
+the change actually broke (6.1).
+
+**The scope should be derived: what imports the files I changed, transitively.**
+A scoped run that misses a dependent test file should be refused the same way
+an unscoped one is.
+
+### 7.8 Check content, not existence, in the trace sweep
+
+`se_help` passed every gate while not existing (6.2). The sweep confirms a
+file is present, never that it carries what the design spec claims. Already
+minted as `raid-issue-trace-design-checks-existence-not-content`.
+
+### 7.9 Stop re-verifying the whole product every iteration
+
+M7's claims checklist is `applies: full` at every size, so an iteration about
+a keyword search inherited eight whole-product claims including one about the
+editor panel (section 4). The owed box makes that survivable. It does not make
+it right.
+
+**A standing claim should be re-checked when its subject changes, not when any
+iteration happens to reach M7.**
+
+### 7.10 Expose `itAdopt` as a lane verb
+
+A peer machine still cannot pick up a pushed record by itself. The engine
+function exists; nothing in the lane calls it. Until it does, every cloud run
+needs the supervisor to adopt the record from outside the cage.
+
+### 7.11 Make the packager stop blocking the lane
+
+`package.ts` copies the entire root synchronously and then zips it, and the
+lane goes unresponsive for the duration (6.9). At minimum the release step
+should not be able to starve the engine it runs inside. The mechanism is not
+yet settled, so this one needs a diagnosis before a fix.
+
+---
+
+**If only three of these land**, make them 7.1, 7.4 and 7.6: a script that
+brings it up, a commit rhythm that survives the host, and a way for the owner
+to authorise the last gate in advance. Those three turn this run's experience
+into an unattended run that starts, works and ships without a person in the
+loop.
+
+## 8. The one rule this run had to break
 
 **"The machine commits, not you."** The bootstrap role broke it, deliberately,
 at the end of the run. This is recorded rather than glossed.
@@ -948,7 +1101,7 @@ point before it can be stopped, or it needs a checkpoint the machine itself
 takes when a session ends. Right now the safe moment to stop is not a moment
 the agent can see coming.
 
-## 8. Where this file lives, and why
+## 9. Where this file lives, and why
 
 The handover asks for this file in the record's folder, committed with the
 work, so whoever reviews i8 gets it whether or not they think to ask.
