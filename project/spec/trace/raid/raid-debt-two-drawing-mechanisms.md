@@ -20,3 +20,8 @@ a state machine, and after seeding it must use the same mechanisms as a
 drawn one. Steps stay rows-with-fills for now, deliberately. The payback
 is the unification, and the picture-in-picture to-do design is the
 natural moment for it.
+
+Sweep 2026-08-13 (second retro debt sweep): re-accepted consciously. No
+picture-in-picture design discussion and no change to the seeded-machine
+compiler happened this period (i8 built se.help, unrelated). Trigger stands
+unchanged.

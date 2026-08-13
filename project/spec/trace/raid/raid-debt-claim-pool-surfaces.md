@@ -29,3 +29,13 @@ nowhere outside tests.
 Sweep 2026-08-12 (the first retro debt sweep): re-accepted consciously,
 minted the same day it was taken. The trigger stands - the first real
 second machine, or the next desk surface touch.
+
+Sweep 2026-08-13 (second retro debt sweep): the trigger partially fired
+- a real second machine (a headless Linux container) joined this period -
+but the debt was NOT repaid, because the peer used the new itAdopt path
+(see the i8 field-report, section 2.4) rather than the claim lane. The
+claim pool's listing and force-release stand exactly as unshipped as
+before. Re-accepted consciously; trigger re-affirmed, widened to also
+read "or itAdopt sees real multi-machine use without the claim lane ever
+being exercised, which would argue adoption is the load-bearing path and
+this debt's shipped-surface urgency should be re-weighed by the owner."

@@ -79,21 +79,39 @@ function list(v: unknown): string[] {
 const SCAN_CACHE = new Map<string, { docs: GuidanceDoc[] }>();
 const WATCHED = new Map<string, FSWatcher | null>();
 
+// ONE WATCHER PER DIRECTORY, NEVER `recursive: true` (found 2026-08-13,
+// note-15acce44d2f3). unref() is supposed to let a watcher hold the cache
+// warm without holding the process open, and it does — on a single,
+// non-recursive watch. Measured on this platform: `watch(dir, {recursive:
+// true}, cb).unref()` still keeps node alive indefinitely (a `node --test`
+// run that finished every case sat for hours until killed by hand).
+// Non-recursive watches on the same tree, each unref'd, exit clean in
+// under 150ms. The tradeoff this accepts: a subdirectory created AFTER
+// boot goes unwatched until the next restart — correct and slow beats
+// fast and wrong, and a brand-new guidance folder is rare next to an
+// edited file in an existing one.
 function watchGuidance(root: string, dir: string): boolean {
   if (WATCHED.has(root)) return WATCHED.get(root) !== null;
   try {
-    const w = watch(dir, { recursive: true }, () => {
+    const onChange = (): void => {
       SCAN_CACHE.delete(root);
-    });
-    // A watcher must never hold the process open. The engine outlives any
-    // one scan; a test root does not, and a held handle there would keep
-    // node alive after the suite finished.
-    w.unref();
-    w.on("error", () => {
+    };
+    const onError = (): void => {
       SCAN_CACHE.delete(root);
       WATCHED.set(root, null);
-    });
-    WATCHED.set(root, w);
+    };
+    let first: FSWatcher | undefined;
+    const watchOne = (d: string): void => {
+      const w = watch(d, { recursive: false }, onChange);
+      w.unref();
+      w.on("error", onError);
+      first ??= w;
+      for (const e of readdirSync(d, { withFileTypes: true })) {
+        if (e.isDirectory()) watchOne(join(d, e.name));
+      }
+    };
+    watchOne(dir);
+    WATCHED.set(root, first ?? null);
     return true;
   } catch {
     WATCHED.set(root, null);

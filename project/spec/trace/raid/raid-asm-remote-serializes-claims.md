@@ -34,3 +34,15 @@ loser's announce reports the holder and reconciles. 7 of 7 cases green
 on the shipped claim module (engine/claims.ts). Still faked: the hosted
 forge's receive layer - the trigger stands for the first real-remote
 collision.
+
+## Retro sweep 2026-08-13
+
+Not advanced by the second-machine run. The claim lane was never reached:
+the iteration was pulled in through the new itAdopt path (a checkout, not
+a claim push), so no real-remote collision happened and the trigger did
+not fire. Status stays open, unchanged from the 2026-08-12 measurement.
+Worth a related question for a future retro: itAdopt mints nothing and
+races nobody today (two machines adopting the same branch both just get a
+worktree), but if it ever gains a write path, it will want the same
+first-push-wins scrutiny this entry gives claims. See the i8 field-report
+§3.

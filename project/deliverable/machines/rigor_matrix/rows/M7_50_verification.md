@@ -9,6 +9,7 @@ depends_on:
   - trace-design
 entry_read:
   - project/deliverable/machines/methods/meth-verification-discipline.md
+legal_tools: se_file_read, se_file_search, se_file_glob
 floor: true
 evidence:
   - name: claims

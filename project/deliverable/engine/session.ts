@@ -4849,7 +4849,14 @@ export class Session {
     const abs = join(it.path, `project/spec/iterations/${it.id}/evidence/gate-kickoff.md`);
     if (!existsSync(abs)) return undefined;
     const txt = stripComments(section(parseStateNote(readFileSync(abs, "utf8")).body, "change_size")).toLowerCase();
-    return (CHANGE_COLUMNS as readonly string[]).find((c) => txt.includes(c));
+    // THE CHOSEN OPTION IS THE TEXT BEFORE THE FIRST " — ", NEVER A SUBSTRING
+    // SCAN OVER THE WHOLE RATIONALE (note-ee44c2873e55). A rationale that
+    // compares its choice against the other options by name — which
+    // meth-gate-review asks for — used to false-match whichever column name
+    // happened to appear earliest in CHANGE_COLUMNS order, not the one the
+    // author actually chose.
+    const chosen = txt.split("—")[0]?.trim();
+    return (CHANGE_COLUMNS as readonly string[]).find((c) => chosen === c);
   }
 
   /** ONE self-contained HTML: the sheet, the fills, the reading and the
