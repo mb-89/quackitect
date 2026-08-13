@@ -213,9 +213,9 @@ export function listBranches(root: string, glob: string): string[] {
         .map((b) => b.trim())
         .filter((b) => b !== "" && !b.includes("->"));
     const local = lines(git(root, ["branch", "--list", glob, "--format=%(refname:short)"], "branch --list"));
-    const remote = lines(git(root, ["branch", "--remotes", "--list", `*/${glob}`, "--format=%(refname:short)"], "branch --list --remotes")).map((b) =>
-      b.slice(b.indexOf("/") + 1),
-    );
+    const remote = lines(
+      git(root, ["branch", "--remotes", "--list", `*/${glob}`, "--format=%(refname:short)"], "branch --list --remotes"),
+    ).map((b) => b.slice(b.indexOf("/") + 1));
     const branches = [...new Set([...local, ...remote])];
     branchList.set(key, { stamp, branches });
     return branches;

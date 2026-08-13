@@ -17,7 +17,9 @@ export function openPanel(url: string): void {
     // 2026-08-12). The file's own promise is that the lane never dies over
     // a window; this is that promise actually kept.
     const fire = (cmd: string, args: string[], extra: object = {}) =>
-      spawn(cmd, args, { stdio: "ignore", detached: true, ...extra }).on("error", () => {}).unref();
+      spawn(cmd, args, { stdio: "ignore", detached: true, ...extra })
+        .on("error", () => {})
+        .unref();
     if (process.platform === "win32") fire("cmd", ["/c", "start", "", url], { windowsHide: true });
     else if (process.platform === "darwin") fire("open", [url]);
     else fire("xdg-open", [url]);
