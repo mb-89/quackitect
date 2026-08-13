@@ -1,0 +1,82 @@
+{"ts":"2026-08-13T07:53:48.456Z","op":"update","visit":"iterations/i3/start@0","node":"d66","brief":"proving the retro method, which is i3's first state"}
+{"ts":"2026-08-13T07:54:01.432Z","op":"plan","visit":"iterations/i3/onboard-retro@0","parent":null,"nodes":[{"id":"d67","brief":"mark the retro boundary from the log"},{"id":"d68","brief":"field feedback from the owner"},{"id":"d69","brief":"drain the notes inbox to zero"},{"id":"d70","brief":"walk the parked backlog"},{"id":"d71","brief":"sweep the register debts"},{"id":"d72","brief":"drain the assistant memory into the repo"},{"id":"d73","brief":"mine the call log and the se_run count"},{"id":"d74","brief":"promotions and the process-stale check"},{"id":"d75","brief":"submit the onboard-retro form"}]}
+{"ts":"2026-08-13T07:54:06.858Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d76","brief":"fetching the oldest record in the window to fix the boundary timestamp"}
+{"ts":"2026-08-13T07:54:20.435Z","op":"done","visit":"iterations/i3/onboard-retro@0","node":"d67","brief":"the retro window opens at 2026-08-12T15:52:54.523Z"}
+{"ts":"2026-08-13T07:54:53.211Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d77","brief":"checking the two inbox notes whose truth the code can answer in seconds"}
+{"ts":"2026-08-13T07:55:23.836Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d78","brief":"reading the handover note in full before judging it"}
+{"ts":"2026-08-13T07:55:47.084Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d79","brief":"answering the owner's claim question inline, then back to the drain"}
+{"ts":"2026-08-13T07:55:55.986Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d80","brief":"checking idle.md for the handover demand the note reports"}
+{"ts":"2026-08-13T07:56:06.219Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d81","brief":"reading idle.md whole to settle whether the handover demand survives"}
+{"ts":"2026-08-13T07:57:13.027Z","op":"done","visit":"iterations/i3/onboard-retro@0","node":"d68","brief":"field feedback is this session's owner input, captured as three notes"}
+{"ts":"2026-08-13T07:57:41.627Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d82","brief":"draining the planning notes the version plan already carries"}
+{"ts":"2026-08-13T07:57:46.179Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d83","brief":"se.help ruled and seeded as i8"}
+{"ts":"2026-08-13T07:57:50.663Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d84","brief":"the reference design lands in the version plan's glossary section"}
+{"ts":"2026-08-13T07:58:02.254Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d85","brief":"reference-register rulings carried by the same plan section"}
+{"ts":"2026-08-13T07:58:07.022Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d86","brief":"the reference-register correction is true and already recorded"}
+{"ts":"2026-08-13T07:58:31.604Z","op":"done","visit":"front_desk@0","node":"d55","brief":"i3 is entered and bound; the walk continues under this state's own items"}
+{"ts":"2026-08-13T07:58:36.845Z","op":"plan","visit":"iterations/i3/onboard-retro@0","parent":"d69","nodes":[{"id":"d87","brief":"drain the 2026-08-12 planning notes"},{"id":"d88","brief":"drain the notes older than the planning session"},{"id":"d89","brief":"drain today's own notes"},{"id":"d90","brief":"collect the method edits into one escape"}]}
+{"ts":"2026-08-13T07:58:42.353Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d91","brief":"product-folder marker and modules land in the version plan"}
+{"ts":"2026-08-13T07:58:47.362Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d92","brief":"module-qualified ids and the one-sweep ruling are both in the plan"}
+{"ts":"2026-08-13T07:58:53.152Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d93","brief":"the stale security row is written into i11's scope with its fix"}
+{"ts":"2026-08-13T07:58:57.867Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d94","brief":"the theme-6 rulings are seeded as the judgment iterations"}
+{"ts":"2026-08-13T07:59:03.676Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d95","brief":"the v2 keeper sort is the plan's Part 2, and every item is seeded"}
+{"ts":"2026-08-13T07:59:09.184Z","op":"done","visit":"iterations/i3/onboard-retro@0","node":"d87","brief":"the 2026-08-12 planning notes are drained against the version plan"}
+{"ts":"2026-08-13T07:59:18.584Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d96","brief":"pulling the next window of pending notes"}
+{"ts":"2026-08-13T07:59:47.769Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d97","brief":"the .se judgment calls are settled in the plan's i9 section"}
+{"ts":"2026-08-13T07:59:53.303Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d98","brief":"the merged iteration proposal is the seeded set"}
+{"ts":"2026-08-13T07:59:58.883Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d99","brief":"the .se move ruling is in the plan and seeded as i9"}
+{"ts":"2026-08-13T08:00:05.728Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d100","brief":"machine-format ruling D1 is a standing decision in the plan"}
+{"ts":"2026-08-13T08:01:37.010Z","op":"done","visit":"iterations/i3/onboard-retro@0","node":"d88","brief":"every 2026-08-12 planning note is drained against the version plan"}
+{"ts":"2026-08-13T08:01:45.822Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d101","brief":"pulling the last 20 pending notes"}
+{"ts":"2026-08-13T08:02:18.666Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d102","brief":"v1 mine part 5 lands in the hashing and conformance sections"}
+{"ts":"2026-08-13T08:02:23.683Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d103","brief":"v1 mine part 6 is mined into the plan and the voice guidance"}
+{"ts":"2026-08-13T08:02:28.567Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d104","brief":"v1 mine part 7 is mined, with the book seeded as i20"}
+{"ts":"2026-08-13T08:02:34.279Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d105","brief":"the v1 code mine is quoted into i16, i18 and the .se section"}
+{"ts":"2026-08-13T08:02:46.359Z","op":"done","visit":"iterations/i3/onboard-retro@0","node":"d90","brief":"all 47 notes swept: exactly two need a method edit made unbound"}
+{"ts":"2026-08-13T08:02:53.144Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d106","brief":"theme 2's dependency gap is seeded as i22"}
+{"ts":"2026-08-13T08:02:57.855Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d107","brief":"theme 3's attribution question has its own plan section"}
+{"ts":"2026-08-13T08:03:03.289Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d108","brief":"theme 4's structure candidates are placed and the collision recorded"}
+{"ts":"2026-08-13T08:03:08.027Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d109","brief":"theme 5's phone loop is seeded as i24"}
+{"ts":"2026-08-13T08:03:14.765Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d110","brief":"phone loop placed, and the second-hand claim retracted before use"}
+{"ts":"2026-08-13T08:03:30.125Z","op":"done","visit":"iterations/i3/onboard-retro@0","node":"d89","brief":"every planning-session note is drained; four of today's need judgment"}
+{"ts":"2026-08-13T08:03:42.546Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d111","brief":"the requirements-method note is answered by today's guidance"}
+{"ts":"2026-08-13T08:03:48.670Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d112","brief":"the autonomy note parks against i12 and i14, which already name both halves"}
+{"ts":"2026-08-13T08:03:53.958Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d113","brief":"the i8 claim hazard parks on the cloud agent's next entry"}
+{"ts":"2026-08-13T08:03:59.172Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d114","brief":"the formatter drift parks on the owner's word for a 170-file rewrite"}
+{"ts":"2026-08-13T08:04:13.340Z","op":"update","visit":"iterations/i3/onboard-retro@0","node":"d115","brief":"the bound-retro defect parks with three candidate fixes named"}
+{"ts":"2026-08-13T08:06:17.679Z","op":"update","visit":"iterations/i3/onboard-retro@1","node":"d118","brief":"idle.md fixed unbound and the last note carried; the inbox stands at zero"}
+{"ts":"2026-08-13T08:06:40.009Z","op":"update","visit":"iterations/i3/onboard-retro@1","node":"d119","brief":"sampling the parked backlog past the first 20 to judge the whole"}
+{"ts":"2026-08-13T08:07:07.152Z","op":"update","visit":"iterations/i3/onboard-retro@1","node":"d120","brief":"the context-is-not-a-reason wording is already in the contract"}
+{"ts":"2026-08-13T08:09:14.988Z","op":"done","visit":"iterations/i3/onboard-retro@0","node":"d70","brief":"207 parked notes walked, four pulled into i3 and two drained done"}
+{"ts":"2026-08-13T08:09:25.727Z","op":"update","visit":"iterations/i3/onboard-retro@1","node":"d121","brief":"confirming the debt list is complete before sweeping it"}
+{"ts":"2026-08-13T08:09:44.411Z","op":"update","visit":"iterations/i3/onboard-retro@1","node":"d122","brief":"checking whether the claim-pool debt file exists in i3's worktree at all"}
+{"ts":"2026-08-13T08:10:12.779Z","op":"update","visit":"iterations/i3/onboard-retro@1","node":"d123","brief":"recording that the bound debt sweep sees two of three debts"}
+{"ts":"2026-08-13T08:10:26.285Z","op":"update","visit":"iterations/i3/onboard-retro@1","node":"d124","brief":"reading both visible debts to re-affirm, repay or reschedule each"}
+{"ts":"2026-08-13T08:10:44.062Z","op":"done","visit":"iterations/i3/onboard-retro@0","node":"d71","brief":"both visible debts swept and dated; the third was swept on trunk earlier today"}
+{"ts":"2026-08-13T08:11:09.516Z","op":"done","visit":"iterations/i3/onboard-retro@0","node":"d72","brief":"the memory drain cannot run through the lane; the gap is recorded"}
+{"ts":"2026-08-13T08:11:16.658Z","op":"update","visit":"iterations/i3/onboard-retro@1","node":"d125","brief":"grouping the window by tool for the se_run count and the audit"}
+{"ts":"2026-08-13T08:11:32.490Z","op":"update","visit":"iterations/i3/onboard-retro@1","node":"d126","brief":"counting failures by tool for the rejection ranking"}
+{"ts":"2026-08-13T08:11:42.782Z","op":"plan","visit":"iterations/i3/onboard-retro@1","parent":"d73","nodes":[{"id":"d127","brief":"counting SE-C-133"},{"id":"d128","brief":"the stall check"},{"id":"d129","brief":"across the window"}]}
+{"ts":"2026-08-13T08:11:52.020Z","op":"obsolete","visit":"iterations/i3/onboard-retro@1","node":"d127","brief":"a phantom item the chained-brief auto-apply manufactured"}
+{"ts":"2026-08-13T08:11:55.989Z","op":"obsolete","visit":"iterations/i3/onboard-retro@1","node":"d128","brief":"a phantom item from the same auto-apply"}
+{"ts":"2026-08-13T08:12:10.076Z","op":"obsolete","visit":"iterations/i3/onboard-retro@1","node":"d129","brief":"the last phantom item from the auto-apply"}
+{"ts":"2026-08-13T08:12:39.783Z","op":"done","visit":"iterations/i3/onboard-retro@0","node":"d73","brief":"the log is mined and the three shell calls each name a missing verb"}
+{"ts":"2026-08-13T08:13:14.959Z","op":"update","visit":"iterations/i3/onboard-retro@1","node":"d130","brief":"parking the SE-C-134 cost note against the fan-out build"}
+{"ts":"2026-08-13T08:13:19.839Z","op":"update","visit":"iterations/i3/onboard-retro@1","node":"d131","brief":"parking the retro time-slideshow ask against i19"}
+{"ts":"2026-08-13T08:13:25.786Z","op":"update","visit":"iterations/i3/onboard-retro@1","node":"d132","brief":"parking the stale-register-sweep finding against i22"}
+{"ts":"2026-08-13T08:13:31.548Z","op":"update","visit":"iterations/i3/onboard-retro@1","node":"d133","brief":"parking the memory-drain gap on the owner's root declaration"}
+{"ts":"2026-08-13T08:13:37.227Z","op":"update","visit":"iterations/i3/onboard-retro@1","node":"d134","brief":"parking the three named missing verbs against i8"}
+{"ts":"2026-08-13T08:14:28.795Z","op":"done","visit":"iterations/i3/onboard-retro@0","node":"d74","brief":"promotions all landed unbound, and the stale check names what was not compared"}
+{"ts":"2026-08-13T08:14:35.982Z","op":"update","visit":"iterations/i3/onboard-retro@1","node":"d135","brief":"reading the built form, since two required sections were not in the asks list"}
+{"ts":"2026-08-13T08:15:14.233Z","op":"update","visit":"iterations/i3/onboard-retro@1","node":"d136","brief":"resubmitting the four fields the form named"}
+{"ts":"2026-08-13T08:16:07.792Z","op":"done","visit":"iterations/i3/onboard-retro@0","node":"d75","brief":"the retro form is stamped and the walk stands at i3's kickoff gate"}
+{"ts":"2026-08-13T08:16:59.578Z","op":"update","visit":"iterations/i3/gate-kickoff@0","node":"d137","brief":"submitting the kickoff brief with the change size proposed, not blessed"}
+{"ts":"2026-08-13T08:17:39.863Z","op":"update","visit":"iterations/i3/gate-kickoff@0","node":"d138","brief":"minting the register entry the red-team round produced"}
+{"ts":"2026-08-13T08:18:10.644Z","op":"update","visit":"iterations/i3/gate-kickoff@0","node":"d139","brief":"resubmitting the kickoff gate with every field in its named shape"}
+{"ts":"2026-08-13T08:18:18.137Z","op":"update","visit":"iterations/i3/gate-kickoff@0","node":"d140","brief":"stamping the kickoff brief, leaving the bless to the owner"}
+{"ts":"2026-08-13T08:18:32.292Z","op":"update","visit":"iterations/i3/gate-kickoff@0","node":"d141","brief":"checking the record's evidence files to see whether the gate stamped"}
+{"ts":"2026-08-13T08:18:37.230Z","op":"update","visit":"iterations/i3/gate-kickoff@0","node":"d142","brief":"reading the gate evidence header for its signature"}
+{"ts":"2026-08-13T08:22:41.243Z","op":"update","visit":"iterations/i3/gate-kickoff@0","node":"d143","brief":"checking whether the fan-out is planned before ruling it into i3"}
+{"ts":"2026-08-13T08:22:52.966Z","op":"update","visit":"iterations/i3/gate-kickoff@0","node":"d144","brief":"reading the plan at trunk, where the i9 section actually stands"}
+{"ts":"2026-08-13T08:23:24.297Z","op":"update","visit":"iterations/i3/gate-kickoff@0","node":"d145","brief":"recording the fan-out and agent-void answers before blessing the gate"}
+{"ts":"2026-08-13T08:23:28.910Z","op":"update","visit":"iterations/i3/gate-kickoff@0","node":"d146","brief":"blessing the kickoff at minor on the owner's word"}

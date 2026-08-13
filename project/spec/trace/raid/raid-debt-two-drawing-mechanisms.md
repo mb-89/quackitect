@@ -19,3 +19,8 @@ a state machine, and after seeding it must use the same mechanisms as a
 drawn one. Steps stay rows-with-fills for now, deliberately. The payback
 is the unification, and the picture-in-picture to-do design is the
 natural moment for it.
+
+Sweep 2026-08-13, at i3's onboarding retro: RE-ACCEPTED consciously.
+Neither trigger has fired. The picture-in-picture design discussion is
+still parked as note-ed999c4b64b1, and the seeded-machine compiler has
+not been touched. The trigger stands unchanged.
