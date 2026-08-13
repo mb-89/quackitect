@@ -9,6 +9,8 @@ realizes:
   - "if-test-runner-to-record-store"
 files:
   - "project/deliverable/engine/lint.ts"
+  - "project/deliverable/engine/bin/grades-complete.ts"
+  - "project/deliverable/engine/bin/backfill-minted.ts"
   - "project/deliverable/engine/lintfix.ts"
   - "project/deliverable/engine/bin/selftest.ts"
   - "project/deliverable/engine/bin/smoketest.ts"

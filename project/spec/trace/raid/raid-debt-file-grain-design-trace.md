@@ -20,3 +20,11 @@ region markers and swept declarations outside every region. The file
 grain shipped first because it makes the whole seam mechanical today.
 The payback is the region mechanism, owed when the coarse sweep goes
 quiet.
+
+Sweep 2026-08-13, at i3's onboarding retro: RESCHEDULED, trigger
+re-affirmed and now named. i7 is the seeded iteration that repays it -
+"the trace sharpens: finer grain than files, and the dead-code sweep
+widens past the engine". The version plan records v1's answer in full:
+elements are design regions, files are themes, and every v1 Go file
+opened with `// design: <region-id>  implements: <req-ids>`. The debt
+is repaid when i7 runs, and not before.
