@@ -36,6 +36,7 @@ import { LINT_CONFIG, lintProse } from "./lint.ts";
 import { bumpDrawingEpoch } from "./machines/compile.ts";
 import { McpServer, requestContextAdapter, type ToolDef } from "./mcp.ts";
 import { ModelFileSystem } from "./model-fs.ts";
+import { writeNode } from "./notes.ts";
 import { openPanel } from "./panel.ts";
 import { fansOut, resolveInRoot, seDir } from "./paths.ts";
 import { type MirrorState, renderMirror } from "./render.ts";
@@ -44,6 +45,7 @@ import { Session } from "./session.ts";
 import { shoot } from "./shoot.ts";
 import { survey } from "./survey.ts";
 import { Toll } from "./toll.ts";
+import { traceAsPumlMindmap } from "./trace.ts";
 import { webFetch, webSearch } from "./web.ts";
 
 const BIOME_BIN = fileURLToPath(new URL("../node_modules/@biomejs/biome/bin/biome", import.meta.url));
@@ -104,7 +106,7 @@ export function sessionTools(session: Session): ToolDef[] {
       name: "se_pull",
       title: "se.pull",
       description:
-        'THE PULL — your ONLY verb. Say pull, do what comes back, pull again. There is nothing else to learn. The machine owns every decision; you decide nothing about the walk unless it ASKS you to. You never name a target, never name a path, never ask which state you are in, and never ask which tools are legal. BLOCKING IS AN INSTRUCTION, NOT AN ERROR — a pull does not refuse a walk that cannot move yet, it tells you what to do about it. FIVE ANSWERS, and `pull` names which one you got. `read` — a document rides along in `document`, and `prove` names its LAST WORDS: read it, then pull again with form: {"read": "<those words>"}. One document per pull, and the next arrives when this one is proven. The tail is asked for because a host that truncates a big result drops the END, so quoting it is what shows the text arrived whole. `fill` — the next step wants evidence: the machine BUILT the form and handed it to you, so fill it and return it ON THE NEXT PULL as form: {"<section>": "<text>"}. There is no submit VERB — the pull is the only call — but there IS a submit FLAG, and it rides in the form. THREE KEYS ARE ACTS, not sections: `submit: true` stamps it (every check runs, then it signs), `bless: true`/`bless: false` is the thumb on a gate, and a fill carrying NEITHER is saved and deliberately left unstamped so you can finish it later. So a form you mean to finish carries `submit: true`; without it the fields land, nothing signs, and the same form comes back looking untouched. A GATE IS THE SAME MECHANISM and takes both flags — at high autonomy the agent blesses its own (owner ruling 2026-08-09); below the slider it belongs to the person. All three in one pull is legal. `choose` — the road splits: the machine offers its doors, and you answer ON THE NEXT PULL as form: {"choice": "<to>"} (a LIST is legal where the work fans out to several agents — the first is walked, the rest come back as not_walked). A choice exists ONLY where one was offered. `do` — the happy path was WALKED for you, every hop to the next branching point in one call: `here` is where you landed, with its guidance. `wait` — the machine is out of work, or the next step weighs more than the session autonomy: say plainly which step waits and STOP, because the slider alone cannot wake you and the person must message you after moving it. A genuinely illegal call still refuses typed — a choice outside the offer, a form nothing asked for.',
+        'THE PULL — your ONLY verb. Say pull, do what comes back, pull again. There is nothing else to learn. The machine owns every decision; you decide nothing about the walk unless it ASKS you to. You never name a target, never name a path, never ask which state you are in, and never ask which tools are legal. BLOCKING IS AN INSTRUCTION, NOT AN ERROR — a pull does not refuse a walk that cannot move yet, it tells you what to do about it. FIVE ANSWERS, and `pull` names which one you got. `read` — a document rides along in `document`, and `prove` names its LAST WORDS: read it, then pull again with form: {"read": "<those words>"}. One document per pull, and the next arrives when this one is proven. The tail is asked for because a host that truncates a big result drops the END, so quoting it is what shows the text arrived whole. `fill` — the next step wants evidence: the machine BUILT the form and handed it to you, so fill it and return it ON THE NEXT PULL as form: {"<section>": "<text>"}. There is no submit VERB — the pull is the only call — but there IS a submit FLAG, and it rides in the form. THREE KEYS ARE ACTS, not sections: `submit: true` stamps it (every check runs, then it signs), `bless: true`/`bless: false` is the thumb on a gate, and a fill carrying NEITHER is saved and deliberately left unstamped so you can finish it later. So a form you mean to finish carries `submit: true`; without it the fields land, nothing signs, and the same form comes back looking untouched. A GATE IS THE SAME MECHANISM and takes both flags — at high autonomy the agent blesses its own (owner ruling 2026-08-09); below the dial it belongs to the person. All three in one pull is legal. `choose` — the road splits: the machine offers its doors, and you answer ON THE NEXT PULL as form: {"choice": "<to>"} (a LIST is legal where the work fans out to several agents — the first is walked, the rest come back as not_walked). A choice exists ONLY where one was offered. `do` — the happy path was WALKED for you, every hop to the next branching point in one call: `here` is where you landed, with its guidance. `wait` — the machine is out of work, or the next step weighs more than the session autonomy: say plainly which step waits and STOP, because the dial alone cannot wake you and the person must message you after moving it. A genuinely illegal call still refuses typed — a choice outside the offer, a form nothing asked for.',
       inputSchema: {
         type: "object",
         properties: {
@@ -212,7 +214,7 @@ export function sessionTools(session: Session): ToolDef[] {
       name: "se_aim",
       title: "se.aim",
       description:
-        "AIM THE WALK at a state, then pull and be carried there. The machine draws the route and walks every hop whose conditions already pass, stopping only where something is genuinely owed — so a state that is already green is walked THROUGH, never landed on. Name any state in the machine you stand in, or a fully qualified one like iterations/i1/write-requirements. THIS IS HOW YOU MOVE: taking an offered door aims one hop, which draws a route one segment long and lands you on every state in between. Aim far instead. Aiming is not walking and changes nothing — the pull still refuses whatever the conditions and the slider refuse.",
+        "AIM THE WALK at a state, then pull and be carried there. The machine draws the route and walks every hop whose conditions already pass, stopping only where something is genuinely owed — so a state that is already green is walked THROUGH, never landed on. Name any state in the machine you stand in, or a fully qualified one like iterations/i1/write-requirements. THIS IS HOW YOU MOVE: taking an offered door aims one hop, which draws a route one segment long and lands you on every state in between. Aim far instead. Aiming is not walking and changes nothing — the pull still refuses whatever the conditions and the dial refuse.",
       inputSchema: {
         type: "object",
         properties: { to: { type: "string", description: "the state to aim at — the route is drawn to it and the pull follows it" } },
@@ -275,7 +277,7 @@ export function expeditionTools(session: Session): ToolDef[] {
       name: "se_seed_expedition",
       title: "se.seed.expedition",
       description:
-        "Seed an expedition: mints its record and worktree (branch exp/<id>). Declare kind (spike | fix | explore) and goal. It stands in the expeditions container at once — entering there binds it.",
+        "Seed an expedition: mints its record and worktree (branch exp/<id>) and pushes that branch to the shared remote, so other machines see it. Declare kind (spike | fix | explore) and goal. It stands in the expeditions container at once — entering there binds it.",
       inputSchema: {
         type: "object",
         properties: {
@@ -290,18 +292,29 @@ export function expeditionTools(session: Session): ToolDef[] {
       name: "se_seed_iteration",
       title: "se.seed.iteration",
       description:
-        "Seed an iteration: goal + rough vision, plus input refs (an expedition id, retro note refs). Mints its record and worktree (branch it/<id>); it stands in the iterations container in M0 — the retro onboards, the kickoff proposes a size, and the bless pins the rest. No size is asked at the seed.",
+        "Seed an iteration: goal + rough vision, plus input refs (an expedition id, retro note refs) and the iterations it WAITS FOR. Mints its record and worktree (branch it/<id>) and pushes that branch to the shared remote, so another machine can claim it; it stands in the iterations container in M0 — the retro onboards, the kickoff proposes a size, and the bless pins the rest. No size is asked at the seed. DEPENDS_ON IS THE CONTAINER'S ONLY WIRING: naming another open iteration draws the edge dep -> this, so the drawing shows the real shape (independent ones side by side, dependent ones in series) AND the walk refuses to enter this one until that dependency leaves the open set. No dependency means it hangs off start and can be claimed immediately.",
       inputSchema: {
         type: "object",
         properties: {
           goal: { type: "string", description: "what this iteration is after" },
           vision: { type: "string", description: "roughly how — what done looks like" },
           inputs: { type: "array", items: { type: "string" }, description: "context refs: an expedition id, retro note refs" },
+          depends_on: {
+            type: "array",
+            items: { type: "string" },
+            description:
+              "iteration ids this one WAITS FOR — it cannot be entered until each has left the open set. Omit for work that can start now.",
+          },
         },
         required: ["goal", "vision"],
       },
       handler: (args) =>
-        session.iterationSeed(String(args.goal), String(args.vision), Array.isArray(args.inputs) ? args.inputs.map(String) : []),
+        session.iterationSeed(
+          String(args.goal),
+          String(args.vision),
+          Array.isArray(args.inputs) ? args.inputs.map(String) : [],
+          Array.isArray(args.depends_on) ? args.depends_on.map(String) : [],
+        ),
     },
     {
       name: "se_exp_close",
@@ -787,6 +800,51 @@ export function coreTools(
           ...(args.height !== undefined ? { height: Number(args.height) } : {}),
           name: w ?? "page",
         });
+      },
+    },
+    {
+      name: "se_trace_puml",
+      title: "se.trace.puml",
+      description:
+        "DEBUG EXPORT OF THE TRACE CORPUS AS A PLANTUML MINDMAP. This is DERIVED from the current markdown trace data in memory and is never canonical storage. Use it to inspect or feed an external renderer without writing files.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          title: { type: "string", description: "optional mindmap title (default: trace)" },
+        },
+      },
+      handler: (args) => {
+        const title = args.title === undefined ? "trace" : String(args.title);
+        return { title, puml: traceAsPumlMindmap(rootOf(), title) };
+      },
+    },
+    {
+      name: "se_trace_puml_dump",
+      title: "se.trace.puml.dump",
+      description:
+        "WRITE THE DERIVED TRACE MINDMAP TO project/scratchpad as a .puml file for inspection. The source remains markdown trace data; this dump is disposable output.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          title: { type: "string", description: "optional mindmap title (default: trace)" },
+          name: {
+            type: "string",
+            description:
+              "optional output basename in scratchpad (default: trace-mindmap). Only letters, digits, dot, dash, underscore are kept",
+          },
+        },
+      },
+      handler: (args) => {
+        const title = args.title === undefined ? "trace" : String(args.title);
+        const raw = args.name === undefined ? "trace-mindmap" : String(args.name);
+        const safe = raw.replace(/[^A-Za-z0-9._-]/g, "-").replace(/^[-.]+|[-.]+$/g, "") || "trace-mindmap";
+        const rel = `project/scratchpad/${safe}.puml`;
+        const dir = rootOf("project/scratchpad");
+        mkdirSync(dir, { recursive: true });
+        const puml = traceAsPumlMindmap(rootOf(), title);
+        const abs = rootOf(rel);
+        writeNode(abs, puml);
+        return { path: rel, bytes: Buffer.byteLength(puml, "utf8"), title };
       },
     },
     {

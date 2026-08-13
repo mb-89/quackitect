@@ -43,6 +43,66 @@ can follow.
 (ISO 29148 "singular" is deliberately relaxed here; the trace and verify
 unit is the NODE, not the sentence.)
 
+## BEHAVIOUR OVER TIME GETS A MODEL, AND THE MODEL RIDES IN THE ROW
+
+Owner ruling 2026-08-13, after the claim ledger shipped with seven correct
+rows and not one row that created it.
+
+A row states one condition and one response. It cannot state an ORDER. It
+cannot state what exists BEFORE the first trigger fires.
+
+Seven rows about claiming never showed that nothing created the ledger. Each
+was true. The set had a hole no row could describe.
+
+### When a model is owed
+
+- Two or more parties exchange something in a fixed order. That is a
+  SEQUENCE.
+- A thing has states and moves between them. That is a STATE MODEL.
+- A thing is created, used and retired. That is a LIFECYCLE, and all three
+  get drawn.
+
+Where any of those is true, the row carries a `## Behaviour` section. It
+BINDS exactly as `## Detail` binds.
+
+### Write it as text for now
+
+PlantUML support is coming. Text converts to it without loss, so write the
+SHAPE and never a picture.
+
+A sequence, one line per exchange:
+
+    person -> desk: seed an iteration
+    desk -> remote: push the stub
+    machine -> ledger: claim  (the ledger MUST EXIST by now)
+    ledger -> machine: admitted, or refused naming the holder
+
+A state model, one line per transition:
+
+    (nothing)  -> unclaimed: the seed pushes the stub
+    unclaimed  -> claimed:   a machine enters
+    claimed    -> released:  a person forces, recording who and why
+    released   -> claimed:   another machine enters
+
+### The first line is the one that pays
+
+`(nothing) -> ...` forces the question "what brings this into being". That is
+the question the claim lane never asked, and it cost a machine's whole
+iteration.
+
+THE PARTICIPANT TEST. Every participant in the model is created by something
+the model shows, or by a row you can name. A participant that appears from
+nowhere IS the gap.
+
+The test takes seconds and reads at a glance. Seven prose rows never showed
+it at all.
+
+### It is not mechanical yet
+
+No check counts these. The set question `behaviour_modelled` on
+[[M3_10_write-requirements]] is what forces the look, and the look is
+recorded either way — including "no row here demands behaviour over time".
+
 ## EVERY VALUE CARRIES ITS UNIT AND TOLERANCE
 
 A bare number is unverifiable. A naked target ("fast", "reliable") is a

@@ -25,6 +25,8 @@ Surfaces section below is the checklist the sweep state serves.
 ## Surfaces
 
 - command and tool docs
+- engine-served strings (grep the engine for the changed vocabulary - the
+  wait instructions, refusal texts and panel markup are taught surfaces too)
 - method cards
 - matrix rows
 - templates and skeletons

@@ -1,7 +1,7 @@
 ---
 state: read_contract
 state_kind: work
-priority: 0.01
+priority: mechanical
 tags: boot
 legal_tools: se_file_read, se_note
 guidance: |

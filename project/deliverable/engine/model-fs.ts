@@ -1,33 +1,15 @@
 import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileReplace, fileWrite, type PatchOp } from "./files.ts";
 import { fileMove } from "./move.ts";
 import { search } from "./search.ts";
+import { emitModelMutations } from "./signals.ts";
 import { reconcileWarmVault, updateWarmVault, type VaultChange } from "./vault.ts";
 
-export interface ModelMutationBatch {
-  root: string;
-  changes: VaultChange[];
-}
+export type { ModelMutationBatch, ModelMutationListener } from "./signals.ts";
+export { subscribeModelMutations } from "./signals.ts";
 
-export type ModelMutationListener = (batch: ModelMutationBatch) => void;
-
-const listeners = new Map<string, Set<ModelMutationListener>>();
-
-export function subscribeModelMutations(root: string, listener: ModelMutationListener): () => void {
-  let group = listeners.get(root);
-  if (group === undefined) {
-    group = new Set();
-    listeners.set(root, group);
-  }
-  group.add(listener);
-  return () => {
-    group?.delete(listener);
-    if (group?.size === 0) listeners.delete(root);
-  };
-}
-
-function publish(batch: ModelMutationBatch): void {
+function publish(batch: { root: string; changes: VaultChange[] }): void {
   updateWarmVault(batch.root, batch.changes);
-  for (const listener of listeners.get(batch.root) ?? []) listener(batch);
+  emitModelMutations({ ...batch, origin: "lane" });
 }
 
 export class ModelFileSystem {
@@ -41,9 +23,21 @@ export class ModelFileSystem {
     return fileRead(this.rootOf(path), path, opts);
   }
 
+  /** A trace node minted in a bound record carries its record id, so the
+   *  reference views can default to the iteration's own delta. The id is
+   *  the worktree's own name — the root the write resolves into. */
+  private static stamp(root: string, path: string, content: string): string {
+    if (!/^project\/spec\/trace\/[^/]+\/[^/]+\.md$/.test(path.replace(/\\/g, "/"))) return content;
+    const m = root.replace(/\\/g, "/").match(/\/\.worktrees\/([^/]+)\/?$/);
+    if (m === null) return content;
+    if (!content.startsWith("---\n") || /^minted_in:/m.test(content)) return content;
+    return content.replace(/^---\n/, `---\nminted_in: ${m[1]}\n`);
+  }
+
   write(path: string, content: string, baseHash: string | null) {
     const root = this.rootOf(path);
-    const result = fileWrite(root, path, content, baseHash);
+    const stamped = baseHash === null ? ModelFileSystem.stamp(root, path, content) : content;
+    const result = fileWrite(root, path, stamped, baseHash);
     publish({ root, changes: [{ kind: "refresh", path: result.path }] });
     return result;
   }

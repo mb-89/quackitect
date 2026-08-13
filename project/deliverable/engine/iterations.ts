@@ -10,6 +10,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { type CanvasData, type CanvasEdge, type CanvasElement, nodeSize } from "./canvas.ts";
+import { pushSeed } from "./claims.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { buildArchive, type GeneratedMachine } from "./expmachine.ts";
 import { type EvidenceField, type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
@@ -38,6 +39,8 @@ export interface Iteration {
   branch: string;
   path: string;
   open: boolean;
+  /** Whether the seed's stub push reached the remote in the seeding act. */
+  announced?: boolean;
 }
 
 export function itRecordRel(id: string): string {
@@ -73,7 +76,7 @@ export function itList(root: string): Iteration[] {
 /** THE SEED: goal + rough vision, plus context inputs (an expedition id,
  *  retro note refs). Mints the record on its own branch and worktree —
  *  the iteration stands in the container at once. */
-export function itSeed(root: string, goal: string, vision: string, inputs: string[] = []): Iteration {
+export function itSeed(root: string, goal: string, vision: string, inputs: string[] = [], dependsOn: string[] = []): Iteration {
   if (goal.trim() === "" || vision.trim() === "") {
     throw new Rejection({
       clause: CLAUSES.REQUIRED_ARGS,
@@ -117,6 +120,12 @@ export function itSeed(root: string, goal: string, vision: string, inputs: strin
       `vision: ${JSON.stringify(vision)}`,
       "inputs:",
       ...inputs.map((i) => `  - ${JSON.stringify(i)}`),
+      // THE CONTAINER IS A DAG, AND THIS KEY IS ITS ONLY INPUT (owner ruling
+      // 2026-08-12). An iteration naming another here cannot be entered until
+      // that one leaves the open set, because the drawn edge runs dep -> this
+      // and the walk never enters a state whose inbound edges have not fired.
+      "depends_on:",
+      ...dependsOn.map((d) => `  - ${JSON.stringify(d)}`),
       "---",
       "",
       `# ${id}`,
@@ -135,7 +144,10 @@ export function itSeed(root: string, goal: string, vision: string, inputs: strin
   );
   git(path, ["add", "-A"], "add");
   git(path, ["commit", "-q", "-m", `iteration ${id}: seed`], "commit");
-  return { id, branch: `it/${id}`, path, open: true };
+  // The stub reaches the remote in the same act, so every peer machine
+  // lists it from its next fetch; no remote is a recorded seed, not a block.
+  const announced = pushSeed(path, `it/${id}`).ok;
+  return { id, branch: `it/${id}`, path, open: true, announced };
 }
 
 export function itFind(root: string, id: string): Iteration {
@@ -431,6 +443,23 @@ export function pinIteration(root: string, it: Iteration, changeSize: string): R
   };
   mkdirSync(dirname(pinAbs), { recursive: true });
   writeFileSync(pinAbs, JSON.stringify(pin, null, 2), "utf8");
+  // EVERY SEEDED DRAWING GETS ITS PLACEHOLDER IN THE PIN'S OWN ACT, so no
+  // route refuses over a machine a later state has not authored yet. A
+  // drawn sub-canvas needs none, and an authored drawing is never touched.
+  const scaffolded: string[] = [];
+  for (const s of machine.states) {
+    if (s.submachine === undefined) continue;
+    if (existsSync(join(root, "project", "deliverable", "machines", `${s.submachine}.canvas`))) continue;
+    const abs = join(it.path, itSeededRel(it.id, s.submachine));
+    if (existsSync(abs)) continue;
+    mkdirSync(dirname(abs), { recursive: true });
+    writeFileSync(
+      abs,
+      '---\nnone: "not authored yet - the authoring state writes this drawing; this placeholder keeps the route drawable until then"\n---\n',
+      "utf8",
+    );
+    scaffolded.push(s.submachine);
+  }
   git(it.path, ["add", "-A"], "add");
   // BOOKKEEPING, NOT AUTHORED WORK: this commit lands a generated file. It
   // skips the hook because a fresh worktree carries no node_modules, so the
@@ -441,6 +470,7 @@ export function pinIteration(root: string, it: Iteration, changeSize: string): R
     pinned: changeSize,
     rigor_matrix_hash: pin.rigor_matrix_hash,
     states: machine.states.length,
+    ...(scaffolded.length > 0 ? { scaffolded } : {}),
     ...(reopened.length > 0 ? { reopened } : {}),
   };
 }
@@ -625,17 +655,64 @@ export function generateIterations(root: string): GeneratedMachine {
   const states: StateDecl[] = [start];
   const expByState: Record<string, string> = {};
   const subGen: Record<string, () => GeneratedMachine> = {};
-  const nodes: GenNode[] = [];
-  const edges: GenEdge[] = [];
-  // TOP TO BOTTOM, like every machine reads (owner ruling 2026-08-04): the
-  // start pill, the open iterations stacked, the end pill.
-  nodes.push(pill("n-start", "start.md", 0));
-  let nextY = 300;
+
+  // THE CONTAINER IS A DAG, NEVER A STACK (owner ruling 2026-08-12, from a
+  // screenshot of twenty-four iterations drawn as one vertical chain).
+  //
+  // The chain was a LAYOUT artifact, not a declaration one: the decl already
+  // fanned start to every iteration and every iteration to end, and the canvas
+  // was then hand-built by stacking boxes down one axis. So the drawing said
+  // "series" while the machine meant "parallel", which is the worst pairing —
+  // the reader believes the picture.
+  //
+  // Now `depends_on` in the record drives the edges, and pinnedCanvas lays the
+  // result out. That buys BOTH halves at once:
+  //   - INDEPENDENT ITERATIONS SIT SIDE BY SIDE, because the layout rows states
+  //     by dependency depth.
+  //   - AN ITERATION WHOSE DEPENDENCY IS UNMET CANNOT BE ENTERED, because the
+  //     walk never enters a state whose inbound edges have not fired. No new
+  //     guard, no second rule to keep in step with the drawing.
+  //
+  // A SHIPPED DEPENDENCY STOPS CONSTRAINING. Only OPEN iterations are wired, so
+  // closing one frees everything waiting on it on the next paint.
+  const openIds = new Set(open.map((it) => itShortId(it.id)));
+  const declared = new Map<string, string[]>();
+  for (const it of open) {
+    const sid = itShortId(it.id);
+    const fm = readItRecord(root, it);
+    const raw = Array.isArray(fm?.depends_on) ? (fm.depends_on as unknown[]) : [];
+    declared.set(
+      sid,
+      raw.map((d) => itShortId(String(d))).filter((d) => d !== sid && openIds.has(d)),
+    );
+  }
+  // A CYCLE IS A DRAWING DEFECT AND MUST NOT WEDGE THE WALK. The edge that
+  // closes the loop is dropped and the rest still draws; the pair is visible
+  // as two iterations that both wait on nothing.
+  const reaches = (from: string, to: string, seen: Set<string>): boolean => {
+    if (from === to) return true;
+    if (seen.has(from)) return false;
+    seen.add(from);
+    return (declared.get(from) ?? []).some((d) => reaches(d, to, seen));
+  };
+  const depsOf = new Map<string, string[]>();
+  for (const [sid, deps] of declared) {
+    depsOf.set(
+      sid,
+      deps.filter((d) => !reaches(d, sid, new Set([sid]))),
+    );
+  }
+  const dependents = new Map<string, string[]>();
+  for (const [sid, deps] of depsOf) {
+    for (const d of deps) dependents.set(d, [...(dependents.get(d) ?? []), sid]);
+  }
+
   for (const it of open) {
     const sid = itShortId(it.id);
     const fm = readItRecord(root, it);
     const goal = typeof fm?.goal === "string" ? fm.goal : it.id;
     expByState[sid] = it.id;
+    const outs = dependents.get(sid) ?? [];
     states.push({
       id: sid,
       kind: "work",
@@ -645,24 +722,16 @@ export function generateIterations(root: string): GeneratedMachine {
       evidence_form: [],
       priority: 0.2,
       submachine: "generated",
-      edges: [{ to: "end", role: "normal" }],
+      // A dependency edge is the ONLY thing that makes an iteration wait. With
+      // nothing waiting on this one, it runs straight to the end pill.
+      edges: outs.length > 0 ? outs.map((o) => ({ to: o, role: "normal" as const })) : [{ to: "end", role: "normal" as const }],
     });
     subGen[sid] = () => generateIterationWalk(root, it, sid);
-    start.edges.push({ to: sid, role: "normal" });
-    const size = nodeSize(sid, goal);
-    nodes.push({ id: `n-${sid}`, type: "file", file: `${sid}.md`, x: -size.width / 2, y: nextY, ...size });
-    nextY += size.height + 160;
+    // ONLY THE ROOTS HANG OFF START. Everything else is reached through the
+    // iteration it waits for, which is what makes the wait real.
+    if ((depsOf.get(sid) ?? []).length === 0) start.edges.push({ to: sid, role: "normal" });
   }
-  nodes.push(pill("n-end", "end.md", nextY));
-  const els = new Map<string, CanvasElement>(nodes.map((n) => [n.id, n]));
-  for (const it of open) {
-    const sid = itShortId(it.id);
-    edges.push(sidedEdge(els, "n-start", `n-${sid}`), sidedEdge(els, `n-${sid}`, "n-end"));
-  }
-  if (open.length === 0) {
-    start.edges.push({ to: "end", role: "normal" });
-    edges.push(sidedEdge(els, "n-start", "n-end"));
-  }
+  if (open.length === 0) start.edges.push({ to: "end", role: "normal" });
   states.push({
     id: "end",
     kind: "end",
@@ -674,9 +743,11 @@ export function generateIterations(root: string): GeneratedMachine {
   });
   const decl: MachineDecl = { id: "iterations", reentry: "restart", initial: "start", states };
   validateMachine(decl);
+  // ONE LAYOUT FOR EVERY MACHINE. pinnedCanvas rows states by dependency depth
+  // and puts independent ones side by side, which is exactly what the container
+  // needs and exactly what the hand-rolled stack could never do.
   const canvas: CanvasData = {
-    nodes: nodes as CanvasElement[],
-    edges,
+    ...pinnedCanvas(decl),
     metadata: { frontmatter: { reentry: "restart", priority: 0.4 } },
   };
   return { decl, canvas, expByState, ...(Object.keys(subGen).length > 0 ? { subGen } : {}) };

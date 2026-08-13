@@ -619,7 +619,7 @@ function oneLine(s: string): string {
  *  The sound fix is to stamp the actor where the call is MADE — mirror.ts knows
  *  perfectly well which handler a body arrived on — and carry it on the log
  *  record. See the note filed with this change. */
-const SELF_SERVED = new Set(["mirror_slow", "mirror_narration_now"]);
+const SELF_SERVED = new Set(["mirror_slow", "mirror_narration_now", "mirror_profile"]);
 
 function srcOf(tool: string): string {
   if (SELF_SERVED.has(tool)) return "ui";
@@ -633,7 +633,9 @@ export function feedRows(
 ): { capped: boolean; rows: Array<Record<string, unknown>> } {
   const q = log.query({ filter: { since }, limit: 501 });
   // The reader's selection is view state — logged, never shown as a feed row.
-  const records = (q.records ?? []).filter((r) => r.tool !== "mirror_select");
+  // Self-served polls and timings never show either (owner ruling 2026-08-12:
+  // a poll is not an act) — the log keeps them for the slowness mine.
+  const records = (q.records ?? []).filter((r) => r.tool !== "mirror_select" && !SELF_SERVED.has(r.tool));
   const capped = records.length > 500;
   const rows = records.slice(-500).map((rec) => ({
     ref: rec.ref,
@@ -3199,10 +3201,14 @@ function applyAlive(a) {
       b.setAttribute("aria-pressed", on ? "true" : "false");
     }
   }
-  if (a.ping && a.ping.seq !== lastPingSeq) { lastPingSeq = a.ping.seq; pingSurface(a.ping.target); }
-  // A re-render drops the class. Put the light back rather than losing it
+  if (a.ping && a.ping.seq !== lastPingSeq) {
+    lastPingSeq = a.ping.seq;
+    pingSurface(a.ping.target);
+    if (window.seTracePing) window.seTracePing(a.ping.target);
+  }  // A re-render drops the class. Put the light back rather than losing it
   // mid-sentence — the ping outlives the DOM that carried it.
   else if (litTarget !== null && !document.querySelector(".se-ping, .se-ping-svg")) applyPing();
+  if (a.trace_trail && window.seTraceTrail) window.seTraceTrail(a.trace_trail);
   if (logPanel && a.acts !== lastActs) { lastActs = a.acts; refreshLog(); }
   // THE PERSON PULLED (owner design 2026-08-04): the answer lands in the
   // details, and a form the walk owes gets a panel of its own — the inline

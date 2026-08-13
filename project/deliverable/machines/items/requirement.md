@@ -129,6 +129,11 @@ requirements need that precision, and a table beats thirty sibling rows.
 Free prose stays a defect. A rationale is a LINK in `source_refs`, never a
 paragraph, so a changed rationale never forces re-review of the demand.
 
+BEHAVIOUR OVER TIME GETS A `## Behaviour` SECTION (owner ruling 2026-08-13).
+An ordered exchange, a thing with states, a lifecycle — a one-condition
+row cannot say any of those, and a set of them can hide a hole. Text form
+for now; PlantUML lands later.
+
 IT DERIVES FROM USE CASES. `refines` names the uc- ids whose steps and
 extensions demand it. The engine checks both directions: a requirement
 refining no use case is an orphan, and a use case no requirement covers is a
@@ -232,6 +237,17 @@ this comment for other kinds. -->
 <!-- OPTIONAL `## Detail` — the structured precision an agent builds from:
 tables, lists, limit sets. It BINDS as part of the demand. One concern per
 node still holds: detail that verifies differently is a sibling row. -->
+
+<!-- `## Behaviour` — REQUIRED where the demand is about behaviour over time:
+an ordered exchange between parties, a thing with states, or a lifecycle. It
+BINDS like Detail. Write it as TEXT for now; PlantUML lands later and the
+text converts without loss.
+
+    (nothing)  -> unclaimed: the seed pushes the stub
+    unclaimed  -> claimed:   a machine enters
+
+Draw the FIRST line — what brings the thing into being. A participant that
+appears from nowhere is the gap. See [[meth-requirement-authoring]]. -->
 
 <!-- A genuinely non-EARS statement records its exemption in frontmatter as
 `ears: exempt — <reason citing a recorded decision>`. A bare exemption is a

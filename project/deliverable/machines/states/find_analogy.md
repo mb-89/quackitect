@@ -1,7 +1,7 @@
 ---
 state: find_analogy
 state_kind: work
-priority: 0.2
+priority: operational
 tags: finders
 entry_read:
   - project/deliverable/machines/methods/meth-analogy-transfer.md

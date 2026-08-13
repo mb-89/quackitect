@@ -28,6 +28,7 @@ import {
 } from "../machine.ts";
 import { loadStateNote, readNode } from "../notes.ts";
 import { parseEvidence } from "../rigor-matrix.ts";
+import { loadLevels, valueFor } from "../scale.ts";
 
 const ROLES: ReadonlySet<string> = new Set(["normal", "alternative", "fallback", "recovery", "approval", "error"]);
 
@@ -165,7 +166,7 @@ function stateFromElement(machineId: string, root: string, canvasPath: string, e
     const subPath = resolveRef(root, canvasPath, ref);
     sources?.push(subPath);
     const subFm = existsSync(subPath) ? (loadCanvas(subPath).metadata?.frontmatter ?? {}) : {};
-    const subPriority = asPriority(subFm.priority);
+    const subPriority = asPriority(subFm.priority, root);
     if (subPriority === undefined) {
       throw new MachineCompileError(
         machineId,
@@ -460,9 +461,19 @@ function asList(v: unknown): string[] | undefined {
     .filter((t) => t !== "");
 }
 
-function asPriority(v: unknown): number | undefined {
+function asPriority(v: unknown, root: string): number | undefined {
+  // A TIER WORD IS THE AUTHORED TRUTH (owner cut-over ruling 2026-08-12);
+  // its number is the transitional anchor from the drawn scale. Numeric
+  // stays legal while the sweep runs.
+  if (typeof v === "string" && v.trim() !== "" && Number.isNaN(Number(v))) {
+    try {
+      return valueFor(loadLevels(root), v);
+    } catch {
+      return undefined;
+    }
+  }
   const n = typeof v === "number" ? v : typeof v === "string" && v !== "" ? Number(v) : NaN;
-  // Above 1 = beyond the slider: the agent can never enter, the human
+  // Above 1 = beyond the dial: the agent can never enter, the human
   // always may (the archives browse at 1.5).
   return Number.isFinite(n) && n >= 0 && n <= 1.5 ? n : undefined;
 }
@@ -524,12 +535,12 @@ export function stateFromNote(machineId: string, ref: string, notePath: string, 
   if (guidance === undefined || guidance.trim() === "") {
     throw new MachineCompileError(machineId, ref, "every state carries guidance (frontmatter `guidance:`)");
   }
-  const priority = asPriority(x.priority);
+  const priority = asPriority(x.priority, root);
   if (priority === undefined) {
     throw new MachineCompileError(
       machineId,
       ref,
-      "every state carries a priority (frontmatter `priority:` 0.01 mechanical .. 0.8 milestone)",
+      "every state carries a priority (frontmatter `priority:` — a tier word from machines/scale.md, mechanical .. ideation)",
     );
   }
   const legalTools = asList(x.legal_tools);

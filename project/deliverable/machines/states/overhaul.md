@@ -1,7 +1,7 @@
 ---
 state: overhaul
 state_kind: work
-priority: 1
+priority: strategic
 statement: Everything catches up.
 legal_tools: se_survey, se_log_query, se_run, se_test, se_lint, se_file_read, se_file_search, se_file_glob, se_file_patch, se_file_write, se_file_delete, se_file_move, se_note, se_seed_expedition
 entry_read: project/guidance/method/overhaul.md

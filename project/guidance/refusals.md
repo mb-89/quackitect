@@ -46,6 +46,12 @@ forward with a new commit.
 ### SE-C-003 — the agent never pushes
 Pushing is the owner's act. Do not attempt it, and do not ask the shell to.
 
+THE ENGINE'S OWN RIGHT IS SEED STUBS AND THE CLAIM FILE (owner rulings
+2026-08-11 and 2026-08-12). The machinery itself pushes the iteration
+seed stub, the expedition seed stub and the claim file, as acts of the
+claim lane (engine/claims.ts) — never on an agent's request. Everything
+else keeps refusing here.
+
 ### SE-C-004 — git beyond the allowlist
 `se_git` covers an allowlist of verbs. A job outside it belongs to the
 engine, not to a workaround. If a merge or sync fails here, the result names
@@ -130,7 +136,7 @@ holds that job elsewhere — it is never an obstacle to route around.
 Entry and exit conditions want their evidence. The pull tells you which one
 stands in the way and how to work it.
 
-### SE-C-113 — the step outweighs the slider
+### SE-C-113 — the step outweighs the dial
 A step weighing more than the session autonomy is the person's. Present it,
 then stop. A message from them resumes the walk.
 

@@ -379,7 +379,7 @@ export type StepOutcome = "filled" | "failed";
  *  points back the way it came, so neither is an input. The drawing uses the
  *  same rule for its busbars, and the two must never disagree — a person
  *  reading a bar is reading a promise the engine has to keep. */
-const INPUT_ROLES = new Set(["normal", "approval"]);
+export const INPUT_ROLES = new Set(["normal", "approval"]);
 
 /** THE CLAIM-BEARING FEEDERS of a state, looking THROUGH states that carry no
  *  claim of their own (owner ruling 2026-08-07).

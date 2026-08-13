@@ -1,7 +1,7 @@
 ---
 state: end
 state_kind: end
-priority: 0.01
+priority: mechanical
 guidance: This is the end state of a state machine. The machine is complete here. In a sub-machine, the walk returns to the parent on the next pull.
 ---
 

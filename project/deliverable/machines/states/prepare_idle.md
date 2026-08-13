@@ -1,7 +1,7 @@
 ---
 state: prepare_idle
 state_kind: work
-priority: 0.01
+priority: mechanical
 tags: boot
 exit_script:
   - project/deliverable/engine/bin/preflight.ts

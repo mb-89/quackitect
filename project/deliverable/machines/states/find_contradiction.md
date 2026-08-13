@@ -1,7 +1,7 @@
 ---
 state: find_contradiction
 state_kind: work
-priority: 0.2
+priority: operational
 tags: finders
 entry_read:
   - project/deliverable/machines/methods/meth-triz.md

@@ -17,7 +17,9 @@ legal_tools:
   - se_answer
 evidence:
   - name: adrs
-    description: the decision records, each traced
+    template: refs
+    of: raid
+    description: the decision entries in the register - one raid id of kind decision per line, each traced
 major: full
 minor: tailored
 patch: none

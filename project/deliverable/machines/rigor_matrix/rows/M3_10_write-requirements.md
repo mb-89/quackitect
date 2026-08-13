@@ -67,6 +67,7 @@ evidence:
       - bounded
       - comprehensible
       - no_tbd
+      - behaviour_modelled
     description: the set-level questions, each answered with the argument that makes it true — a bare yes is not an answer
 ---
 
@@ -93,6 +94,7 @@ THE SET QUESTIONS, one argument each:
 - bounded - every row sits inside scope and answers to a source; nothing gold-plated.
 - comprehensible - a reader from any involved discipline can say what the system must do, from the set alone.
 - no_tbd - the sweep for TBD | TBC | TBR | ??? found zero, and you ran it.
+- behaviour_modelled - every row demanding behaviour OVER TIME carries its sequence or state model in `## Behaviour`; name the rows that needed one, and say plainly where none did. A one-condition row cannot state an order and cannot state what exists before the first trigger, so a set of them hides exactly the hole that shipped the claim ledger with nothing to create it (owner ruling 2026-08-13). The shape is in [[meth-requirement-authoring]].
 
 Position the concrete set against the standard checklists for this deliverable kind ([[meth-state-of-the-art]]). Expect iteration with the functions ([[meth-twin-peaks]]).
 

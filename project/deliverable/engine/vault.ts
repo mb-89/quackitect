@@ -21,6 +21,7 @@ import { basename, dirname, join, relative, sep } from "node:path";
 import parcelWatcher from "@parcel/watcher";
 import { type Ctx, DATEISH, evaluate, isTruthy, parseExpr, toDate } from "./expr.ts";
 import { parseStateNote } from "./notes.ts";
+import { emitModelMutations } from "./signals.ts";
 
 export type Row = Record<string, unknown>;
 
@@ -102,6 +103,9 @@ export class Vault {
   private watcherStarting: Promise<void> | null = null;
   private snapshotWrite: Promise<void> = Promise.resolve();
   private stopped = false;
+  // Until the first sweep and any replayed backlog have landed, an external
+  // change is just the vault catching up — raising it would flash everything.
+  private externalLive = false;
   private built = false;
   private listeners: (() => void)[] = [];
   private readonly watchConfig: VaultWatchConfig;
@@ -402,6 +406,13 @@ export class Vault {
           return;
         }
         this.applyWatcherEvents(events);
+        if (this.externalLive && events.length > 0) {
+          emitModelMutations({
+            root: this.root,
+            origin: "external",
+            changes: events.map((e) => ({ kind: "refresh", path: e.path })),
+          });
+        }
         void this.saveWatcherSnapshot().catch(() => this.reconcile());
       },
       options,
@@ -421,6 +432,7 @@ export class Vault {
     }
     this.reconcile();
     await this.saveWatcherSnapshot();
+    this.externalLive = true;
   }
 
   /** Watch the vault and keep the index current. Live in both directions. */
