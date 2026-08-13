@@ -230,6 +230,27 @@ function refuseBadRow(row: RigorMatrixRow): void {
   }
 }
 
+/** A TRIM THAT TRIMS NOTHING, OR TRIMS EVERYTHING, IS A TYPO. Both are silent
+ *  otherwise: an unknown size never matches, so the field is asked at every
+ *  size and the author believes it is not; all four sizes means the question
+ *  is asked nowhere, and deleting the field would have said so honestly. */
+function refuseBadOmit(file: string, f: Record<string, unknown>): void {
+  if (f.omit === undefined) return;
+  if (!Array.isArray(f.omit)) throw new Error(`matrix row ${file} field ${String(f.name)} carries omit that is not a list of change sizes`);
+  const sizes = f.omit.map(String);
+  const unknown = sizes.filter((s) => !(CHANGE_COLUMNS as readonly string[]).includes(s));
+  if (unknown.length > 0) {
+    throw new Error(
+      `matrix row ${file} field ${String(f.name)} omits unknown change size(s) ${unknown.join(", ")} — one of ${CHANGE_COLUMNS.join(" | ")}`,
+    );
+  }
+  if (CHANGE_COLUMNS.every((c) => sizes.includes(c))) {
+    throw new Error(
+      `matrix row ${file} field ${String(f.name)} is omitted at every change size — nothing would ever ask it, so delete the field instead`,
+    );
+  }
+}
+
 /** Every optional key, each present only where the frontmatter carried it in
  *  a shape the field can use. */
 function optionalKeys(file: string, f: Record<string, unknown>): Partial<EvidenceField> {
@@ -265,6 +286,10 @@ function optionalKeys(file: string, f: Record<string, unknown>): Partial<Evidenc
     // default — a known set means the cell holds a member of it. This names
     // the exceptions, and the comparison cards are the reason it exists.
     ...list("pick_free"),
+    // WHICH CHANGE SIZES DO NOT ASK THIS. The mechanical half of "smaller at
+    // this size" — see EvidenceField.omit for why it is a list of sizes and
+    // not a rigor level.
+    ...list("omit"),
   };
 }
 
@@ -277,6 +302,7 @@ function evidenceField(file: string, entry: unknown, i: number): EvidenceField {
     throw new Error(`matrix row ${file} evidence entry ${i + 1} declares no name`);
   }
   refuseBadShapes(file, f);
+  refuseBadOmit(file, f);
   return {
     name: f.name,
     description: typeof f.description === "string" ? f.description : "",
@@ -496,7 +522,14 @@ function priorityOf(row: RigorMatrixRow): number {
 /** What a row compiles to, minus what differs per compilation: guidance
  *  source, sub-machine descent and edges. Both compilers spread this, so
  *  the gate rounds and the kickoff tag cannot drift apart. */
-function rowState(row: RigorMatrixRow): Omit<StateDecl, "guidance" | "edges"> {
+function rowState(row: RigorMatrixRow, column?: ChangeColumn): Omit<StateDecl, "guidance" | "edges"> {
+  // THE TRIM IS MECHANICAL, NOT A JUDGMENT (owner ruling 2026-08-13). A field
+  // naming this size in its `omit` is not asked here — the state stays, its
+  // form is shorter, and no agent decides how brief to be.
+  //
+  // WITHOUT A COLUMN NOTHING IS DROPPED: the whole-matrix view shows every
+  // question a row can ask, which is what somebody reading the matrix wants.
+  const asked = column === undefined ? row.evidence_form : row.evidence_form.filter((f) => !(f.omit ?? []).includes(column));
   return {
     id: row.name,
     kind: row.state_kind,
@@ -509,7 +542,7 @@ function rowState(row: RigorMatrixRow): Omit<StateDecl, "guidance" | "edges"> {
     // rounds were doctrine since meth-gate-review was written, no evidence
     // form ever collected them, and consequently NOT ONE was filled in any
     // gate of any iteration.
-    evidence_form: row.state_kind === "gate" ? [...row.evidence_form, ...STANDARD_ROUNDS] : row.evidence_form,
+    evidence_form: row.state_kind === "gate" ? [...asked, ...STANDARD_ROUNDS] : asked,
     priority: priorityOf(row),
     // Absent stays minimal — the always-legal three and nothing else. The
     // kickoff sets each state's rights, so a row opens only what it declares.
@@ -629,13 +662,24 @@ export function compileColumn(matrix: RigorMatrix, column: ChangeColumn): Machin
   for (const row of matrix.rows) {
     if (!applied.has(row.name)) continue;
     const cell = matrix.cells.get(row.name)!.get(column)!;
-    states.push({
-      ...rowState(row),
+    const state = {
+      ...rowState(row, column),
       guidance: [cell.body, row.guidance].filter(Boolean).join("\n\n"),
       ...(row.runs ? { submachine: row.runs } : {}),
       busbar: row.busbar,
       edges: edgesFrom.get(row.name) ?? [],
-    });
+    };
+    // TRIMMING TO NOTHING IS STRIKING, SAID QUIETLY. A work state whose every
+    // field names this size in its `omit` still stands in the walk and still
+    // has to be left — with no question to answer and no evidence to sign.
+    // Say so at read time instead: either the state is struck at this size, or
+    // it keeps a question worth asking.
+    if (row.evidence_form.length > 0 && state.evidence_form.length === 0 && row.state_kind !== "gate" && row.state_kind !== "terminal") {
+      throw new Error(
+        `matrix row ${row.name} omits every one of its fields at ${column} — a state with nothing to ask is struck, not trimmed; set ${column}: none instead`,
+      );
+    }
+    states.push(state);
   }
   const decl: MachineDecl = { id: `iteration-${column}`, reentry: "resume", initial: "start", states };
   validateMachine(decl);

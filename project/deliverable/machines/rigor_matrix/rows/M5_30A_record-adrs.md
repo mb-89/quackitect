@@ -21,7 +21,7 @@ evidence:
     of: raid
     description: the decision entries in the register - one raid id of kind decision per line, each traced
 major: full
-minor: tailored
+minor: none
 patch: none
 product: full
 specification: full
@@ -30,10 +30,11 @@ major_note: |
   quality that forced it, rejected options as history. The why lives
   once, here.
 minor_note: |
-  Applies for NON-architecture decisions the delta forces: a library
-  choice, a data-shape ruling, a protocol detail. Each addresses the
-  requirement that forced it, rejected options recorded. Architecture
-  ADRs cannot happen here - their existence escalates the column.
+  Does not apply (owner ruling 2026-08-13). A minor makes no architecture
+  decisions, so there is no decision to record.
+
+  ESCALATE: a choice worth an ADR is the architecture moving. Promote the
+  iteration rather than recording one here.
 patch_note: |
   Does not apply. A patch decides nothing an ADR must carry; the fix's
   why lives in its commit and the leave form. STRIKE PROPOSAL - owner

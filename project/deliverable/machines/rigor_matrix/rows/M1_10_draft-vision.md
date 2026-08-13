@@ -20,12 +20,16 @@ legal_tools:
 evidence:
   - name: big_idea
     description: one breath, standalone-readable
+    omit:
+      - minor
     guidance: |
       One or two sentences a stranger understands with no context. Say what
       the product does and why anyone would want it. No history, no method
       words. Read it alone: if it is not interesting by itself, stop here.
   - name: to_be_world
     description: who does what in the to-be world, alive
+    omit:
+      - minor
     guidance: |
       Describe a working day AFTER the product exists. Name people by role.
       Present tense, a scene, not a feature list. The reader should be able
@@ -39,6 +43,8 @@ evidence:
       The method: [[meth-goal-system]].
   - name: moore_pitch
     description: all five slots filled
+    omit:
+      - minor
     guidance: |
       Fill the five slots in this exact shape: FOR (target customer) WHO
       (need), THE (product name) IS A (category) THAT (key benefit).
@@ -55,11 +61,17 @@ major_note: |
   untouched inherits; one that shifts a goal or a conflict rewrites the
   affected part of the packet, and only that part.
 minor_note: |
-  INHERIT with a delta note. Point to the resident vision; state in one
-  paragraph how the delta serves it. The axiom is not re-derived.
+  ONE QUESTION SURVIVES AT THIS SIZE: the goal system. A minor cannot move
+  the big idea, the to-be world or the pitch - a product whose identity
+  changed is not a minor - so the form drops those three mechanically
+  (owner ruling 2026-08-13) rather than asking anyone to answer them
+  briefly.
 
-  ESCALATE: a delta the resident vision cannot absorb reframes the
-  product - that is major at least, and the vision walks in full there.
+  WHAT IS STILL WORTH ASKING: a delta can pull an existing goal against
+  another one. Naming that conflict, and ruling which wins, is cheap here
+  and expensive anywhere later.
+
+  ESCALATE: a delta that needs a NEW goal is arguing for a new vision.
 patch_note: |
   Does not apply. The vision is axiomatic and a patch never touches it.
   STRIKE PROPOSAL - owner adjudicates.

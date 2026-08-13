@@ -137,3 +137,77 @@ test("a reopened claim's packet says it is a RECHECK, and a fresh one says nothi
   assert.match(block, /Rewrite ONLY the fields/, "it says not to rewrite what the change did not touch");
   assert.match(block, /re-runs every check/, "and it says the checks are not skipped");
 });
+
+// THE DEADLOCK A REOPEN USED TO CREATE (found live on i3, 2026-08-13).
+//
+// Three rules met and closed a loop:
+//
+// - a claim reopened after its signature does not stand, so its state cannot
+//   be left;
+// - `met` asks only whether the fields are FILLED, and they still are, so the
+//   pull decided nothing was owed and served no form;
+// - a form payload with nothing owed is illegal.
+//
+// So the agent that reopened the claim could never re-earn it. Every submit was
+// refused for having nothing to submit to, and the mark stayed.
+//
+// The contract has always said the submit IS the rebless, and that a newer
+// signature clears the mark by itself. It could not, because no submit was
+// reachable.
+//
+// IT DID NOT LOOK LIKE THIS FROM THE OUTSIDE. The state reported only that its
+// claim did not stand, so the form was rewritten, reformatted into a table and
+// re-submitted several times. The form was never the problem.
+test("a reopened claim is OWED again, so the submit that clears it is reachable", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  const session = new Session(root);
+  await session.advance();
+  await session.advance();
+  checkDocs(session);
+  await session.advance();
+  await session.advance();
+  await session.advance();
+  session.setAutonomy(1);
+  const id = String(session.iterationSeed("prove a reopen is re-earnable", "a reopened claim comes back owed").seeded);
+  const sid = id.match(/^(i\d+)-/)?.[1] as string;
+  await session.advance("iterations");
+  await session.advance(sid);
+
+  const it = itFind(root, id);
+  pinIteration(root, it, "patch");
+  const decl = session.currentMachine();
+  const step = decl.states.find((s) => s.evidence_form.length > 0 && s.kind !== "gate");
+  assert.ok(step !== undefined, "the column must ask for evidence somewhere");
+
+  // A COMPLETE, SIGNED CLAIM — every field carries content. This is the case
+  // that deadlocked: an EMPTY form was always owed, so it never showed.
+  const ev = join(root, ".worktrees", id, "project", "spec", "iterations", id, "evidence", `${step.id}.md`);
+  mkdirSync(dirname(ev), { recursive: true });
+  const filled = step.evidence_form.map((f) => `## ${f.name}\n\nwhat was claimed the first time\n`).join("\n");
+  writeFileSync(ev, `---\nsigned_off: 2026-08-13T09:00:00.000Z\nauthors: human\n---\n\n${filled}`, "utf8");
+
+  // Reopen it, the way the walk does when ground moves under a claim.
+  writeFileSync(
+    ev,
+    readFileSync(ev, "utf8").replace(/^authors: human$/m, 'authors: human\nreopened: "2026-08-13T10:00:00.000Z — the ground moved"'),
+    "utf8",
+  );
+  assert.equal(
+    reopenedAfterSigning(parseStateNote(readFileSync(ev, "utf8")).frontmatter),
+    true,
+    "the fixture really is reopened after signing",
+  );
+
+  // THE CLAIM. The pull must OWE this form, so a submit against it is legal.
+  // Before the fix it answered `do`, and every submit was refused as having
+  // nothing to submit to.
+  const answer = (await session.pull()) as { pull: string; for?: string; forms?: { form?: string }[] };
+  assert.notEqual(answer.pull, "wait", "a reopened claim is work, not a reason to stop");
+  if (answer.pull === "fill") {
+    assert.ok(
+      (answer.forms ?? []).some((f) => f.form === step.id),
+      `the reopened form is the one served: ${JSON.stringify((answer.forms ?? []).map((f) => f.form))}`,
+    );
+  }
+});

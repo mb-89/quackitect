@@ -20,7 +20,7 @@
 // VALUE PROPS ARE THE TOP and are not checked upward. They hang off the
 // vision, which is a document rather than a trace node.
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync } from "node:fs";
+import { readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -29,6 +29,7 @@ import { parseStateNote } from "../engine/notes.ts";
 const here = dirname(fileURLToPath(import.meta.url));
 // tests/ sits in project/deliverable/, the trace in project/spec/trace/.
 const TRACE = join(here, "..", "..", "spec", "trace");
+const TOOLS = join(here, "..", "engine", "tools.ts");
 
 interface Node {
   id: string;
@@ -80,6 +81,66 @@ test("every refines edge lands on a node that exists", () => {
     for (const n of nodesIn(kind)) for (const r of n.refines) if (!ids.has(r)) dangling.push(`${n.id} -> ${r}`);
   }
   assert.deepEqual(dangling, [], "a refines edge naming nothing is a broken trace");
+});
+
+// THE LIVE OFFER, WALKED MECHANICALLY (req-reachable-capability-is-traced).
+//
+// The row splits three ways. The doors are drawn from the machine, and the
+// panel's actions are code in no single shape, so both are still walked by
+// hand. The lane verbs are not like them: they are declared in one file, in
+// one shape, and a regex finds every one.
+//
+// The row was first committed 2026-08-09. Four days later the i3 tester
+// counted 14 of 35 verbs named nowhere in the trace. That is the miss this
+// check makes impossible.
+//
+// WHAT THIS FILE CHECKS, AND WHAT IT DOES NOT. The row makes three demands
+// of every verb. Two of them are mechanical below: named in the trace at
+// all, and named in the use-case layer. The third — at least one requirement
+// demanding it — is not checked here, and stays analysis.
+function registeredVerbs(): string[] {
+  const src = readFileSync(TOOLS, "utf8");
+  return [...new Set([...src.matchAll(/^\s+name: "(se_[a-z_]+)",$/gm)].map((m) => m[1]))].sort();
+}
+
+/** Every word one layer of the trace says, or the whole of it. */
+function traceText(sub = "."): string {
+  const walk = (dir: string): string[] =>
+    readdirSync(dir).flatMap((e) => {
+      const full = join(dir, e);
+      if (statSync(full).isDirectory()) return walk(full);
+      return e.endsWith(".md") ? [readFileSync(full, "utf8")] : [];
+    });
+  return walk(join(TRACE, sub)).join("\n");
+}
+
+function unnamedIn(sub: string): string[] {
+  const text = traceText(sub);
+  return registeredVerbs().filter((v) => !new RegExp(`\\b${v}\\b`).test(text));
+}
+
+describe("the live offer against the trace", () => {
+  // A GREEN OVER AN EMPTY READ IS NOT A GREEN. Both reads are guarded, and
+  // the verb list is guarded against its own shape: the enumerator matches a
+  // literal declaration line, so a verb registered differently would go
+  // silently missing and take its own check with it.
+  test("the verb list and the trace are actually being read", () => {
+    assert.equal(registeredVerbs().length, 35, "the lane's verb count moved — confirm the enumerator still sees every one");
+    assert.ok(traceText().length > 10000, "the trace read as good as empty — the path or the walk is wrong");
+    assert.ok(traceText("use-case").length > 10000, "the use-case layer read as good as empty");
+  });
+
+  test("every lane verb the engine registers is named in the trace", () => {
+    assert.deepEqual(unnamedIn("."), [], "a verb a person can call, that no node in the trace names");
+  });
+
+  // req-reachable-capability-is-traced asks for a use case saying what
+  // somebody DOES with each capability. Named in a raid or a neighbour note
+  // does not satisfy that — those sit off the value-prop-to-requirement
+  // chain, so nothing downstream can reach them.
+  test("every lane verb is named in a use case, not merely somewhere", () => {
+    assert.deepEqual(unnamedIn("use-case"), [], "a verb with no use case saying what somebody does with it");
+  });
 });
 
 for (const { child, parent } of CHAIN) {

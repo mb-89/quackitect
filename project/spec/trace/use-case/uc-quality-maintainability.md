@@ -47,6 +47,11 @@ an attacker.
 5. The person states what happened, attributed, without asking any session.
 6. Something upstream changes; the machine names every claim that stops standing because of it.
 
+## Lane doors
+
+- `se_log_query` serves the recorded calls back, by ref or by filter. Step 1 of the scenario above is this verb.
+- `se_format` parses and reprints the vault's frontmatter, so the corpus stays mechanically readable as it grows. It is a parse-and-print, which a regex verb cannot be.
+
 ## Extensions
 
 - 2a. A dispatch left no line: the record has a hole; the audit reports the gap instead of presenting the record as whole.

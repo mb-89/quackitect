@@ -126,6 +126,13 @@ Tests answer a question: did THIS change break THAT. A scoped run answers a
 small diff. The battery is for when the diff outgrows scoped runs — the
 refusal computes the flip point and hands you the right call.
 
+### SE-C-136 — a scoped run with no question
+Say what the run answers, in one line. The scope already says which tests
+ran. Only the question says why, and the record keeps it.
+
+The battery needs none. Its question is fixed and always the same: does the
+whole tree still stand.
+
 ## The walk
 
 ### SE-C-110 — the tool is not legal in this state

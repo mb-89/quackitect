@@ -43,6 +43,86 @@ can follow.
 (ISO 29148 "singular" is deliberately relaxed here; the trace and verify
 unit is the NODE, not the sentence.)
 
+## A BEHAVIOUR MODEL IS ONE WAY TO WRITE A ROW, AND IT RIDES IN THE ROW
+
+Owner ruling 2026-08-13, after the claim ledger shipped with seven correct
+rows and not one row that created it.
+
+IT IS AN OPTION, NEVER A DUTY (owner correction, the same day). A model on
+every row produces slop, and slop is worse than the gap it was meant to
+close. Most rows do not want one.
+
+A row states one condition and one response. It cannot state an ORDER. It
+cannot state what exists BEFORE the first trigger fires.
+
+Seven rows about claiming never showed that nothing created the ledger. Each
+was true. The set had a hole no row could describe.
+
+### When a model earns its place
+
+Three shapes are candidates.
+
+- Two or more parties exchange something in a fixed order. That is a
+  SEQUENCE.
+- A thing has states and moves between them. That is a STATE MODEL.
+- A thing is created, used and retired. That is a LIFECYCLE.
+
+Being a candidate is not enough. THE TEST IS ONE QUESTION: does the model say
+something the statement and the Detail cannot?
+
+- YES, usually, where the gap is a MISSING TRANSITION or a participant nobody
+  creates. Those are invisible in prose and obvious in two lines of model.
+- NO, usually, where the demand is one condition and one response. A diagram
+  of that restates the statement in a second notation, and now two things can
+  drift apart.
+
+Where it earns its place, the row carries a `## Behaviour` section and it
+BINDS exactly as `## Detail` binds.
+
+Where it does not, SAY SO IN ONE LINE and move on. A named absence is worth
+more than a diagram nobody needed, and it stops the next reader asking.
+
+### Write it as text for now
+
+PlantUML support is coming. Text converts to it without loss, so write the
+SHAPE and never a picture.
+
+A sequence, one line per exchange:
+
+    person -> desk: seed an iteration
+    desk -> remote: push the stub
+    machine -> ledger: claim  (the ledger MUST EXIST by now)
+    ledger -> machine: admitted, or refused naming the holder
+
+A state model, one line per transition:
+
+    (nothing)  -> unclaimed: the seed pushes the stub
+    unclaimed  -> claimed:   a machine enters
+    claimed    -> released:  a person forces, recording who and why
+    released   -> claimed:   another machine enters
+
+### The first line is the one that pays
+
+`(nothing) -> ...` forces the question "what brings this into being". That is
+the question the claim lane never asked, and it cost a machine's whole
+iteration.
+
+THE PARTICIPANT TEST. Every participant in the model is created by something
+the model shows, or by a row you can name. A participant that appears from
+nowhere IS the gap.
+
+The test takes seconds and reads at a glance. Seven prose rows never showed
+it at all.
+
+### It is not mechanical, and it should not become so
+
+No check counts these, and none should. A count would push the author toward
+writing models to satisfy it, which is the slop the owner named.
+
+The set question `behaviour_modelled` on [[M3_10_write-requirements]] forces
+the LOOK, not the model. Naming the rows where a model would have been noise
+is a complete answer, and "none here wanted one" is a complete answer too.
+
 ## EVERY VALUE CARRIES ITS UNIT AND TOLERANCE
 
 A bare number is unverifiable. A naked target ("fast", "reliable") is a

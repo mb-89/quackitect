@@ -65,7 +65,16 @@ const rev = (repo: string, ref: string): string | undefined => {
   return r.ok ? r.stdout : undefined;
 };
 
-const fetchClaims = (repo: string): boolean => gitIO(repo, ["fetch", "origin", "claims"]).ok;
+/** ONLINE MEANS THE REMOTE ANSWERS, never that the branch is already there.
+ *  A fetch of a branch nobody has created yet FAILS, and that failure used to
+ *  read as offline — so the very first claim recorded locally and never
+ *  announced. ls-remote tells the two apart: it exits clean for a remote that
+ *  answers, whatever branches it happens to hold, and fails only when the
+ *  remote is genuinely out of reach. */
+const fetchClaims = (repo: string): boolean => {
+  if (gitIO(repo, ["fetch", "origin", "claims"]).ok) return true;
+  return gitIO(repo, ["ls-remote", "--heads", "origin"]).ok;
+};
 
 const treeHas = (repo: string, ref: string, path: string): boolean => gitIO(repo, ["cat-file", "-e", `${ref}:${path}`]).ok;
 
@@ -178,6 +187,8 @@ export function claimIteration(repo: string, iteration: string, machine: string)
 
 export interface EntryGate {
   ok: boolean;
+  /** A ledger governs this entry. Always true since the pool opens itself —
+   *  kept because a caller reads intent from it, not just from `ok`. */
   pool: boolean;
   claimed_now?: boolean;
   offline?: boolean;
@@ -185,16 +196,23 @@ export interface EntryGate {
 }
 
 /** THE ENTRY GATE — the record store opens a record only over a standing
- *  claim. No claims branch anywhere means no pool: entry is free, exactly
- *  as a single-machine product works today. With a pool: this machine's
- *  claim admits, another's refuses naming the holder, and an unclaimed
- *  iteration is claimed in the entry act. */
+ *  claim, and entry is what mints one. This machine's claim admits,
+ *  another's refuses naming the holder, and an unclaimed iteration is
+ *  claimed in the entry act.
+ *
+ *  THE POOL OPENS ITSELF. A missing claims branch is not a product without a
+ *  pool; it is a pool nobody has opened, and only a claim can open it. This
+ *  used to return "no pool" and record nothing, which made the branch
+ *  uncreatable: no branch meant no claim, and no claim meant no branch. Every
+ *  entry was admitted and none was recorded, which is how a second machine
+ *  worked i8 on 2026-08-12 with no claim to show for it. So a missing branch
+ *  falls straight through to the claim, which mints it from an empty tree.
+ *  Owner ruling 2026-08-13: no product needs an opening act of its own. */
 export function claimEntry(repo: string, iteration: string, machine: string): EntryGate {
   fetchClaims(repo);
   const tip = rev(repo, ORIGIN_REF) ?? rev(repo, CLAIMS_REF);
-  if (tip === undefined) return { ok: true, pool: false };
   const path = claimPath(iteration);
-  if (treeHas(repo, tip, path)) {
+  if (tip !== undefined && treeHas(repo, tip, path)) {
     const holder = parseClaim(iteration, readBlob(repo, tip, path));
     if (holder.released_by === undefined) {
       if (holder.machine === machine) return { ok: true, pool: true };

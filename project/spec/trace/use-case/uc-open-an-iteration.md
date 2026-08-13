@@ -21,6 +21,11 @@ priority: must
 5. The person chooses. The bless IS the choice.
 6. The engine compiles the chosen column into this iteration's own state machine and pins it to the record.
 
+## Lane doors
+
+- `se_seed_iteration` opens the iteration.
+- `se_seed_expedition` opens the larger vehicle, for work that outgrows one iteration.
+
 ## Extensions
 
 - 3a. The inbox still has pending notes. The kickoff refuses until they are drained, and says so.

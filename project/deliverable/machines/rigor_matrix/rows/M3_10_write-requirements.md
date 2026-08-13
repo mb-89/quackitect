@@ -67,6 +67,7 @@ evidence:
       - bounded
       - comprehensible
       - no_tbd
+      - behaviour_modelled
     description: the set-level questions, each answered with the argument that makes it true — a bare yes is not an answer
 ---
 
@@ -93,6 +94,7 @@ THE SET QUESTIONS, one argument each:
 - bounded - every row sits inside scope and answers to a source; nothing gold-plated.
 - comprehensible - a reader from any involved discipline can say what the system must do, from the set alone.
 - no_tbd - the sweep for TBD | TBC | TBR | ??? found zero, and you ran it.
+- behaviour_modelled - the LOOK is owed, never the model. Name the rows where a sequence, a state model or a lifecycle earned its place in `## Behaviour`, and name the rows where one would have been noise. "None here wanted one" is a complete answer. A model on every row is slop and worse than the gap it closes (owner correction 2026-08-13); the test and the shapes are in [[meth-requirement-authoring]].
 
 Position the concrete set against the standard checklists for this deliverable kind ([[meth-state-of-the-art]]). Expect iteration with the functions ([[meth-twin-peaks]]).
 

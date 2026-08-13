@@ -18,8 +18,12 @@ legal_tools:
 evidence:
   - name: gap_claim
     description: what each alternative sheds, positioned against the scanned field
+    omit:
+      - minor
   - name: why_now
     description: what matured to make the gap closable
+    omit:
+      - minor
   - name: value_props
     template: refs
     of: value-prop
@@ -38,11 +42,14 @@ major_note: |
   pass lines. The resident frame inherits where the change does not touch
   it. This is where a major proves it deserves its cost.
 minor_note: |
-  THE CENTER OF GRAVITY BEGINS HERE. The delta's new needs are written in
-  full: which value prop they extend (or the one new prop they create),
-  their need|outcome lines, and their PASS LINES - a criterion nothing
-  will check is not a criterion, at any size. The resident gap claim and
-  why-now are inherited by pointer.
+  THE CENTER OF GRAVITY BEGINS HERE, and only the new half is asked. The
+  delta's new needs are written in full: which value prop they extend (or
+  the one new prop they create), their need|outcome lines, and their PASS
+  LINES - a criterion nothing will check is not a criterion, at any size.
+
+  THE GAP CLAIM AND THE WHY-NOW ARE NOT ASKED (owner ruling 2026-08-13).
+  They stand from the resident frame, and the form drops them mechanically
+  at this size rather than asking anyone to be brief about them.
 patch_note: |
   CLARIFICATION ONLY. The one design-input act a patch may perform: where
   the design output went wrong because the input was unclear, fix the

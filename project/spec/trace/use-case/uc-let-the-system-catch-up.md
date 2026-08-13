@@ -20,6 +20,11 @@ priority: should
 4. A finding that needs a decision becomes a note instead of a guess.
 5. The full battery runs, because a sweep that touched everything has to prove it broke nothing.
 
+## Lane doors
+
+- `se_reopen` sends a standing claim back to be re-earned. The signature is kept, never erased.
+- `se_amend` fixes a submitted form without reopening it, for the correction that does not change what the claim says. The checks still run.
+
 ## Extensions
 
 - 1a. The drift belongs to an open record. It is that record's work, not the overhaul's — the overhaul exists for what nothing owns.

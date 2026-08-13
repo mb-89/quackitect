@@ -27,6 +27,9 @@ evidence:
     options: ["yes", "no"]
     passing: ["yes"]
     rationale_for: ["no"]
+  - name: emit_back
+    description: what this record learned about the SHARED method - a matrix row, a form, a method card, a refusal, a missing check - one line each naming the target and the change, or none-found stated plainly
+    template: list
 major: full
 minor: full
 patch: tailored
@@ -56,3 +59,17 @@ specification_note: |
 Per [[meth-ship-package]]: the packaging is AUTOMATED - a script assembles the artifact, and assembling by hand is the defect. The human-shaped work is the check: use the package and record what was observed.
 
 The package holds a README, the one-time installer script, and the editor extension, with the versioned engine and method underneath them.
+
+## The emit
+
+THE OUTPUT PHASE EMITS BACK (owner ruling 2026-08-13). A record is input, process, output, and the output is owed to the shared method as well as to the product.
+
+`emit_back` is that debt, and [[meth-emit-back]] holds the shape.
+
+What to name: a state whose guidance was wrong or missing while you walked it, a form that asked for the wrong evidence, a method card that did not answer its own question, a refusal that blocked without a remedy, a check that should exist.
+
+What not to name: anything about this record's own subject. That is the product's output, not the method's.
+
+IT IS A CAPTURE, NEVER A WRITE. SE-C-134 refuses a method write while a record is bound, because such a write lands in this worktree and fans out over trunk. Name the change here; make it unbound.
+
+The next record's `promotions` field at onboard-retro consumes this list, and the machine it is seeded with is compiled from the matrix as it then stands. So a landed improvement travels with no further act - the emit is what gets it landed.

@@ -21,6 +21,10 @@ priority: should
 5. The record's strays are committed so the trunk is left clean.
 6. The record is archived, readable exactly as it stood.
 
+## Lane doors
+
+- `se_exp_close` is the door. It refuses while any finding in the report stands unruled.
+
 ## Extensions
 
 - 2a. The record produced no findings. It closes without the ruling step, and the empty report is itself the claim.

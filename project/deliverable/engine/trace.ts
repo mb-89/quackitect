@@ -12,7 +12,6 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { contentHash } from "./hash.ts";
 import { nodeLines, noteOf, parseStateNote, passEpoch, readNode } from "./notes.ts";
-import { buildMindmapTree, type MindmapGraphNode, toPumlMindmap } from "./puml_mindmap.ts";
 
 /** THE SHARED SPINE, in ring order from the centre outward. Every wedge holds
  *  these whole, and nothing branches until the last of them.
@@ -627,24 +626,6 @@ export function loadTrace(root: string): TraceNode[] {
   }
   CORPUS.set(root, { stamp, nodes: out, epoch: era });
   return out.slice();
-}
-
-/** A GENERIC MINDMAP PROJECTION OF TRACE DATA, built in memory from the same
- *  markdown corpus loadTrace already reads. Nothing here becomes canonical
- *  storage: this is a derived view for renderers and debugging. */
-export function traceAsPumlMindmap(root: string, title = "trace"): string {
-  const all = loadTrace(root);
-  const source: MindmapGraphNode[] = [
-    { id: "vision", label: "vision", parents: [] },
-    ...all.map((n) => {
-      const direct = [...n.refines];
-      const fallback = direct.length === 0 && n.type === TRACE_LEVELS[0] ? ["vision"] : direct;
-      const label = n.statement.trim() === "" ? `${n.id} (${n.type})` : `${n.id} (${n.type}) - ${shortLabel(n.id)}`;
-      return { id: n.id, label, parents: fallback };
-    }),
-  ];
-  const tree = buildMindmapTree(source, "vision");
-  return toPumlMindmap(tree, title);
 }
 
 /** THE VISION HAS NO NODE OF ITS OWN YET (owner, 2026-08-05). Until the spec

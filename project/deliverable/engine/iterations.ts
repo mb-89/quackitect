@@ -18,6 +18,12 @@ import { noteOf, parseStateNote, readNode } from "./notes.ts";
 import { CHANGE_COLUMNS, type ChangeColumn, compileColumn, compileM0, readRigorMatrix, rigorMatrixContentHash } from "./rigor-matrix.ts";
 import { bustBranchList, listBranches, slug, worktreesDir } from "./worktree.ts";
 
+/** THE PIN'S PLACEHOLDER, verbatim. It is written when an iteration pins a
+ *  column and read back when the walk tries to enter the drawing it stands
+ *  for — so it lives in ONE place and the two ends cannot drift apart. */
+export const SCAFFOLD_NONE =
+  "not authored yet - the authoring state writes this drawing; this placeholder keeps the route drawable until then";
+
 const SRC = "engine/iterations.ts";
 
 function git(root: string, args: string[], what: string): string {
@@ -253,13 +259,31 @@ export function generateSeeded(_root: string, it: Iteration, machineId: string, 
     };
   });
   if (chunks.length === 0) {
+    // THE SCAFFOLD USED TO READ AS AN AUTHORED NONE, and a whole build was
+    // skipped that way, in silence, on 2026-08-13. The pin writes
+    // `none: "<SCAFFOLD_NONE>"` so the ROUTE stays drawable before the
+    // authoring state has run, and this branch then served the run state as a
+    // bare start-to-end pill that walked through without a word.
+    //
+    // REFUSING HERE IS STILL THE WRONG SEAM. drawnsub.test.ts pins that the
+    // placeholder must RESOLVE, because the machine view has to draw a route
+    // through a sub-machine nobody has authored yet. Two tests refused that
+    // refusal, and they were right to.
+    //
+    // SO THE DECL IS MARKED INSTEAD, and session.ts seedSubs refuses to WALK
+    // INTO a marked one. Drawing and routing stay legal; entering does not.
+    // That is the seam the earlier note prescribed.
+    //
     // AN EXPLICIT NONE passes the run state without ceremony — zero spikes
     // is a normal outcome when the drawing says WHY (the explicit-absence law).
+    // Only the scaffold's own literal is marked, so an authored none is
+    // untouched.
     if (typeof fm.none === "string" && fm.none.trim() !== "") {
       const decl: MachineDecl = {
         id: machineId,
         reentry: "resume",
         initial: "start",
+        ...(fm.none.trim() === SCAFFOLD_NONE ? { scaffold: true } : {}),
         states: [
           {
             id: "start",
@@ -453,11 +477,7 @@ export function pinIteration(root: string, it: Iteration, changeSize: string): R
     const abs = join(it.path, itSeededRel(it.id, s.submachine));
     if (existsSync(abs)) continue;
     mkdirSync(dirname(abs), { recursive: true });
-    writeFileSync(
-      abs,
-      '---\nnone: "not authored yet - the authoring state writes this drawing; this placeholder keeps the route drawable until then"\n---\n',
-      "utf8",
-    );
+    writeFileSync(abs, `---\nnone: "${SCAFFOLD_NONE}"\n---\n`, "utf8");
     scaffolded.push(s.submachine);
   }
   git(it.path, ["add", "-A"], "add");
@@ -478,6 +498,12 @@ export function pinIteration(root: string, it: Iteration, changeSize: string): R
 export interface StepDemand {
   applies: string;
   evidence: string;
+  /** THE STEP'S PLACE IN THE MACHINE, not what it asks for. Dependencies, the
+   *  busbar, and the sub-machine it seeds or runs.
+   *
+   *  Absent on a pin taken before this field existed, and that absence is read
+   *  as "says nothing" rather than as a change. */
+  shape?: string;
 }
 
 /** THE DEMANDS LEDGER: what each applied step ASKS FOR at this column — the
@@ -488,7 +514,7 @@ export function demandsFor(rigorMatrix: ReturnType<typeof readRigorMatrix>, chan
   for (const row of rigorMatrix.rows) {
     const cell = rigorMatrix.cells.get(row.name)!.get(changeSize)!;
     if (cell.applies === "none") continue;
-    demands[row.name] = { applies: cell.applies, evidence: demandOf(row.evidence_form) };
+    demands[row.name] = { applies: cell.applies, evidence: demandOf(row.evidence_form), shape: shapeOf(row) };
   }
   return demands;
 }
@@ -522,6 +548,19 @@ export function demandOf(fields: EvidenceField[]): string {
   );
 }
 
+/** THE STEP'S TOPOLOGY, digested. What a step ASKS FOR and where it SITS are
+ *  different facts, and only the first was ever compared.
+ *
+ *  So a row could gain a dependency and no standing iteration would notice.
+ *  That happened on 2026-08-13: build-steps was given a dependency on the
+ *  state that seeds its drawing, and i3's pinned machine kept walking straight
+ *  past it, because no demand had moved.
+ *
+ *  Sorted, so re-ordering a list is not a change. */
+function shapeOf(row: { depends_on?: string[]; busbar?: boolean; seeds?: string; runs?: string }): string {
+  return JSON.stringify([[...(row.depends_on ?? [])].sort(), row.busbar === true, row.seeds ?? "", row.runs ?? ""]);
+}
+
 /** A PIN TAKEN BEFORE demandOf EXISTED stored the whole field list. Compare
  *  it through the same stripper, or changing the digest would reopen every
  *  step in every standing iteration exactly once — a migration nobody asked
@@ -544,7 +583,15 @@ function structural(evidence: string): string {
  *  and a WEAKENED demand never does either: what was filed already covers it.
  *
  *  Only steps the previous ledger knew are compared. A step that did not exist
- *  then is not in the pinned machine, so there is nothing there to reopen. */
+ *  then is not in the pinned machine, so there is nothing there to reopen, and
+ *  an escalation must reopen exactly what GREW rather than everything the
+ *  bigger column added.
+ *
+ *  THE STEP'S SHAPE COUNTS AS WELL AS ITS DEMAND (owner ruling 2026-08-13). A
+ *  row that gains a dependency changes where the walk may go, and a pin taken
+ *  before that change would keep walking past a state the column now requires.
+ *  Seen live: build-steps was given its dependency on the state that seeds its
+ *  drawing, and i3 walked straight past it because no demand had moved. */
 export function movedDemands(prev: Record<string, StepDemand>, now: Record<string, StepDemand>): string[] {
   return Object.keys(prev)
     .filter((id) => {
@@ -552,6 +599,10 @@ export function movedDemands(prev: Record<string, StepDemand>, now: Record<strin
       const n = now[id];
       if (n === undefined) return false;
       if (o === undefined || (APPLIES_RANK[n.applies] ?? 0) > (APPLIES_RANK[o.applies] ?? 0)) return true;
+      // AN ABSENT SHAPE SAYS NOTHING. Comparing it against a present one would
+      // reopen every step of every standing iteration exactly once, which is a
+      // migration wearing a finding's clothes.
+      if (o.shape !== undefined && n.shape !== undefined && o.shape !== n.shape) return true;
       return structural(n.evidence) !== structural(o.evidence);
     })
     .sort();
@@ -571,15 +622,22 @@ export function movedDemands(prev: Record<string, StepDemand>, now: Record<strin
  *
  *  IT IS NOT AN ESCALATION. The change size is untouched, so pinIteration's
  *  refusal to de-escalate has nothing to say here. */
-export function repinColumn(root: string, it: Iteration): void {
+/** THE PIN, OPENED ONCE PER QUESTION. Three callers ask this file something —
+ *  what does it say, has it gone stale, which demands moved — and each opened
+ *  and parsed it for itself. One reader now, and an absent pin answers
+ *  undefined rather than making every caller test for it. */
+function readPin(it: Iteration): ParsedPin | undefined {
   const pinAbs = join(it.path, itPinRel(it.id));
-  if (!existsSync(pinAbs)) return;
-  const pin = parsePin(readFileSync(pinAbs, "utf8")) as ParsedPin & Record<string, unknown>;
-  if (pin.change_size === undefined) return;
+  return existsSync(pinAbs) ? parsePin(readFileSync(pinAbs, "utf8")) : undefined;
+}
+
+export function repinColumn(root: string, it: Iteration): void {
+  const pin = readPin(it) as (ParsedPin & Record<string, unknown>) | undefined;
+  if (pin?.change_size === undefined) return;
   pin.demands = demandsFor(readRigorMatrix(root), pin.change_size as ChangeColumn);
   pin.rigor_matrix_hash = rigorMatrixContentHash(root);
   delete pin.machine; // derived from change_size now — a stored copy only goes stale
-  writeFileSync(pinAbs, JSON.stringify(pin, null, 2), "utf8");
+  writeFileSync(join(it.path, itPinRel(it.id)), JSON.stringify(pin, null, 2), "utf8");
 }
 
 /** THE LIVE DRIFT: which of this iteration's steps were passed against a
@@ -599,12 +657,26 @@ export function repinColumn(root: string, it: Iteration): void {
  *  all" for about 3ms against a ~900ms render; only a moved hash pays for the
  *  read and the diff. */
 export function iterationDrift(root: string, it: Iteration): string[] {
-  const pinAbs = join(it.path, itPinRel(it.id));
-  if (!existsSync(pinAbs)) return [];
-  const pin = parsePin(readFileSync(pinAbs, "utf8"));
-  if (pin.change_size === undefined || pin.demands === undefined) return [];
+  const pin = readPin(it);
+  if (pin?.change_size === undefined || pin.demands === undefined) return [];
   if (pin.rigor_matrix_hash === rigorMatrixContentHash(root)) return [];
   return movedDemands(pin.demands, demandsFor(readRigorMatrix(root), pin.change_size as ChangeColumn));
+}
+
+/** DID THE MATRIX MOVE UNDER THIS PIN — and nothing about which steps care.
+ *
+ *  TWO QUESTIONS USED TO SHARE ONE ANSWER. `iterationDrift` returns an empty
+ *  list both when the matrix is unchanged and when it changed in a way no
+ *  step's demand noticed, and the walk read the second as the first.
+ *
+ *  So a matrix edit that reshaped the MACHINE — a new dependency, a state the
+ *  column regained — never refreshed the pin, and the record went on walking a
+ *  snapshot taken before the fix. Seen live on 2026-08-13: build-steps was
+ *  given its dependency on specify-build and i3 kept skipping it. */
+export function pinIsStale(root: string, it: Iteration): boolean {
+  const pin = readPin(it);
+  if (pin?.change_size === undefined) return false;
+  return pin.rigor_matrix_hash !== rigorMatrixContentHash(root);
 }
 
 /** tailored is always tailored DOWN (owner ruling 2026-07-30); inherit

@@ -100,6 +100,21 @@ export interface EvidenceField {
    *  (`file :: case`) links its file, joined to this base. Absent means no
    *  link. */
   link_base?: string;
+  /** THE CHANGE SIZES THAT DO NOT ASK THIS QUESTION (owner ruling 2026-08-13).
+   *
+   *  A rigor cell could only ever do two things: keep the state or strike it,
+   *  and swap its guidance prose. So "keep the step but ask less at this size"
+   *  had no mechanical form, and the note asked the agent to be brief — a
+   *  judgment, made afresh every time, by whoever happened to be walking.
+   *
+   *  Naming the sizes here makes the trim MECHANICAL. The column compiler
+   *  drops the field; nothing at that size can ask for it, and nothing at any
+   *  other size loses it.
+   *
+   *  ABSENT MEANS ASKED EVERYWHERE, on purpose. A key nobody wrote must never
+   *  silently delete a question — the safe direction for a typo is to ask too
+   *  much. */
+  omit?: string[];
   /** WHICH RELATION A COMPARISON CARD WALKS — `order` or `equivalence`. It
    *  decides what may be inferred from an answer, and that decides how many
    *  questions the card ever puts. */
@@ -275,6 +290,11 @@ export interface MachineDecl {
   reentry: "restart" | "resume";
   initial: string;
   states: StateDecl[];
+  /** THE DRAWING IS A PLACEHOLDER, NOT AN AUTHORED ONE. The pin scaffolds a
+   *  seeded sub-machine so the route stays drawable before its authoring
+   *  state has run. Such a decl may be DRAWN and ROUTED THROUGH; it may not
+   *  be WALKED INTO. Set only by the scaffold branch in iterations.ts. */
+  scaffold?: boolean;
 }
 
 export interface MachineInstance {
@@ -559,8 +579,26 @@ export function reopenStates(
   }
 
   inst.history.push({ state: stateIds.join(","), outcome: "reopened", evidence: reason.slice(0, 300), at: now });
-  inst.active = [...stateIds];
-  inst.current = stateIds[0];
+
+  // TOKENS GO ON THE FRONTIER, NOT ON EVERY REOPENED STATE (owner, 2026-08-13).
+  //
+  // A re-pin reopened eight scattered steps and this line put a token on all
+  // eight. The walk then stood in M0's kickoff gate and M3's requirements at
+  // once — two steps on ONE sequential chain, which no legal marking holds.
+  // The mirror painted eight live states, the pull offered eight, and the
+  // input check refused the later ones on arrival. Enforcement held; the
+  // POSITION was a lie.
+  //
+  // A reopened state below another reopened state is re-reached by walking:
+  // its inbound fuel was just dropped above, so it re-arms and fires again
+  // once its feeders sign. Only the roots need placing by hand.
+  //
+  // A GENUINE FORK KEEPS ITS SEVERAL TOKENS. The frontier of a real AND branch
+  // is several states, none downstream of another, and this filter leaves
+  // every one of them standing.
+  const frontier = stateIds.filter((id) => !stateIds.some((other) => other !== id && downstreamCone(m, [other]).has(id)));
+  inst.active = [...frontier];
+  inst.current = frontier[0];
   inst.status = "open"; // a reopen revives a closed instance by construction
   if (inst.claims !== undefined) for (const id of cone) delete inst.claims[id];
   return { reopened: [...stateIds], cone: [...cone], superseded };

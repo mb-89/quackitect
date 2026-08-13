@@ -24,5 +24,6 @@ priority: must
 
 - 2a. Every unclaimed iteration has unshipped dependencies. The machinery says which dependency blocks which iteration, and nothing is claimable yet.
 - 3a. The remote is unreachable. The claim is taken locally and unpushed, the desync knowingly accepted (owner ruling 2026-08-11); it reconciles at the next push, and a conflict there is the person's to resolve.
+- 3b. No claim ledger exists yet, because this is the product's first claim. The engine brings the ledger into being as part of the claim, with no person's act. A remote that answers while holding no ledger is online, never unreachable.
 - 4a. A peer's claim push won the race. The push rejects, the engine re-fetches, marks the iteration taken, and offers the next unclaimed one.
 - 5a. A claim stands but its machine has gone silent. A person judges abandonment and releases it with the quiet force flag - against silence, never malice.

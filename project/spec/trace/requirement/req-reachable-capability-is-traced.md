@@ -56,9 +56,35 @@ WHY IT IS A QUALITY AND NOT A FUNCTIONAL ROW. Nothing here says what the
 system does. It says how COMPLETE the register is against what the system
 does, which is a property of the set rather than a member of it.
 
-VERIFIED BY ANALYSIS, not test. Nothing can enumerate "capabilities a person
-can reach" mechanically — the doors are drawn, the verbs are declared, the
-panel actions are code. Somebody walks all three and compares. Naming that as
-analysis is the honest answer; claiming a test would be the dishonest one.
+PART OF IT IS NOW MECHANICAL (i3). The offer has three parts, and they are
+not alike:
+
+- THE LANE VERBS are declared in one file, in one shape. A regex finds every
+  one, and `tests/trace-coverage.test.ts` fails when ANY ONE of them is
+  missing — from the trace at all, or from the use-case layer specifically.
+- THE DOORS are drawn from the machine and depend on where the walk stands.
+- THE PANEL ACTIONS are code, in no single shape.
+
+The last two are still walked by hand and compared, and calling that analysis
+is the honest answer.
+
+WHY THE VERB THIRD WAS PROMOTED. This row was first committed 2026-08-09.
+Four days later the i3 tester counted 14 of 35 lane verbs named nowhere in
+the trace at all.
+
+THE MECHANICAL CHECK IS A FLOOR, AND THE ROW STILL FAILS ABOVE IT. The check
+asks only that the trace name the verb somewhere. This row asks for a use
+case saying what somebody does with the capability, AND at least one
+requirement demanding it.
+
+THE USE-CASE HALF IS CLOSED AND CHECKED. All 35 verbs sit in a use case
+saying what somebody does with them, and the check fails if one falls out.
+
+THE REQUIREMENT HALF IS OPEN. Measured 2026-08-13: 34 of 35 verbs are named
+in no requirement. Only `se_pull` is.
+
+That gap is named here and NOT closed by naming it, which is the ruling this
+row's own source_refs cite. It wants its own piece of work: deciding which
+requirement demands each verb, 34 times, is judgment rather than placement.
 
 THIS ROW CAME FROM THE CHECKLIST (owner design 2026-08-07).
