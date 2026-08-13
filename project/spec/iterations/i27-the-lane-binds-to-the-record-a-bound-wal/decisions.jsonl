@@ -1,0 +1,5 @@
+{"ts":"2026-08-13T18:18:29.203Z","op":"plan","visit":"iterations/i27/onboard-retro@0","parent":null,"nodes":[{"id":"d1","brief":"mine the log for this retro"},{"id":"d2","brief":"drain the pending note"},{"id":"d3","brief":"fill and submit the onboard retro"}]}
+{"ts":"2026-08-13T18:20:30.611Z","op":"update","visit":"iterations/i27/gate-kickoff@0","node":"d4","brief":"checking whether the submit signed, by the evidence not the payload"}
+{"ts":"2026-08-13T18:22:45.033Z","op":"done","visit":"iterations/i27/onboard-retro@0","node":"d3","brief":"the onboard retro is signed"}
+{"ts":"2026-08-13T18:24:14.722Z","op":"done","visit":"iterations/i27/onboard-retro@0","node":"d2","brief":"the overflow note is carried to i11"}
+{"ts":"2026-08-13T18:30:47.711Z","op":"plan","visit":"iterations/i27/gate-kickoff@0","parent":null,"nodes":[{"id":"d5","brief":"give the assumption its probe section"},{"id":"d6","brief":"resubmit the kickoff with the one-line reasons"}]}
