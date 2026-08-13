@@ -1,7 +1,8 @@
 ---
 form: author-tests
 by: agent
-signed_off: 2026-08-12T21:38:45.908Z
+signed_off: 2026-08-13T10:51:05.186Z
+reopened: "2026-08-13T10:50:32.151Z — sty-ask-the-lane-what-it-can-do's Deck evidence halves are empty, another gate-validation law gap to fix"
 authors: agent
 files:
 ---
@@ -15,6 +16,7 @@ M7 author-tests: the delta's four requirements all carry verify_method: test. te
 ## checks
 
 - tsp-help-search — one test-spec verifying all four new requirements (req-help-searches-tools-and-guidance, req-help-miss-is-logged, req-help-demand-ranked, req-help-query-logged-with-result), method: test, realized by tests/sehelp.test.ts (already written this session, five cases: name/description match ranks first, guidance-statement match surfaces it, a miss logs and demands rank by shape, the no-query-no-demands refusal, and the standard call-log visibility).
+- tsp-lane-help-run — the demonstration-method test-spec carrying demonstrates: sty-ask-the-lane-what-it-can-do (must), the edge gate-validation's law requires; mechanics ride the same tests/sehelp.test.ts and tsp-help-search, reconfirmed live by the full battery (job test-msrcohsf-11). Minted after the M7 pass to close a gap found at gate-validation. The story's own Deck evidence halves were filled in the same pass.
 
 ## follow_up
 

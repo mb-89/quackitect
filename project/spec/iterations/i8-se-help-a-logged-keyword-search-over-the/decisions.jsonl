@@ -177,3 +177,59 @@
 {"ts":"2026-08-13T10:21:44.305Z","op":"done","visit":"iterations/i8/gate-implementation@0","node":"d8","brief":"M7/M8 milestones complete: gate-implementation and gate-validation both blessed"}
 {"ts":"2026-08-13T10:21:48.885Z","op":"done","visit":"iterations/i8/sweep-consistency@0","node":"d40","brief":"all M8 states finished and gate-validation blessed"}
 {"ts":"2026-08-13T10:21:52.521Z","op":"update","visit":"iterations/i8/gate-validation@0","node":"d48","brief":"pulling to walk from gate-validation toward shipped"}
+{"ts":"2026-08-13T10:38:46.342Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d51","brief":"At gate-validation; checking whether it already stands blessed"}
+{"ts":"2026-08-13T10:38:54.173Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d52","brief":"Aiming i8 walk at shipped per owner authorisation"}
+{"ts":"2026-08-13T10:39:36.377Z","op":"defer","visit":"iterations/i8/gate-validation@0","node":"d43","brief":"carry i8 to close","to":"iterations/i8/gate-validation","hops":1,"trail":["iterations/i8/gate-validation","iterations/i8/gate-validation"]}
+{"ts":"2026-08-13T10:40:23.593Z","op":"defer_arrived","visit":"iterations/i8/gate-validation@1","node":"d53","brief":"carry i8 to close","hops":1,"trail":["iterations/i8/gate-validation","iterations/i8/gate-validation"]}
+{"ts":"2026-08-13T10:40:29.972Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d54","brief":"Aimed at package; pulling to walk forward from gate-validation"}
+{"ts":"2026-08-13T10:42:18.300Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d55","brief":"Reading the 4 owed demonstration test-specs to check their demonstrates: frontmatter"}
+{"ts":"2026-08-13T10:42:37.637Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d56","brief":"Checking tsp-hand-walk's method field for the sty-walk-it-by-hand demonstration"}
+{"ts":"2026-08-13T10:43:07.088Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d57","brief":"Listing all story files to check for must-priority stories missing a demonstration"}
+{"ts":"2026-08-13T10:43:46.580Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d58","brief":"Reading claimProblems in full to find why gate-validation stays not-green"}
+{"ts":"2026-08-13T10:46:10.584Z","op":"done","visit":"iterations/i8/gate-validation@1","node":"d53","brief":"Root cause found: sty-ask-the-lane-what-it-can-do has no demonstration trace-node"}
+{"ts":"2026-08-13T10:46:18.989Z","op":"fork","visit":"iterations/i8/gate-validation@1","parent":null,"node":"d59","brief":"Minting the missing tsp-lane-help-run demonstration trace-node","nodes":[]}
+{"ts":"2026-08-13T10:46:59.324Z","op":"fork","visit":"iterations/i8/gate-validation@1","parent":"d59","node":"d60","brief":"Reopening author-tests to mint the missing demonstration trace-node","nodes":[]}
+{"ts":"2026-08-13T10:47:02.226Z","op":"update","visit":"iterations/i8/author-tests@5","node":"d61","brief":"Aiming at reopened author-tests to gain write access"}
+{"ts":"2026-08-13T10:47:05.409Z","op":"update","visit":"iterations/i8/author-tests@5","node":"d62","brief":"Pulling now that position is author-tests"}
+{"ts":"2026-08-13T10:47:20.565Z","op":"update","visit":"iterations/i8/author-tests@5","node":"d63","brief":"Pull result exceeded tool size cap; fetching it back by ref via the log"}
+{"ts":"2026-08-13T10:47:36.116Z","op":"update","visit":"iterations/i8/author-tests@5","node":"d64","brief":"Checking author-tests evidence file size before editing"}
+{"ts":"2026-08-13T10:47:39.733Z","op":"update","visit":"iterations/i8/author-tests@5","node":"d65","brief":"Reading the full small author-tests evidence file"}
+{"ts":"2026-08-13T10:48:55.702Z","op":"done","visit":"iterations/i8/gate-validation@1","node":"d60","brief":"author-tests re-signed with the new demonstration row; reopen cleared"}
+{"ts":"2026-08-13T10:48:59.289Z","op":"done","visit":"iterations/i8/gate-validation@1","node":"d59","brief":"Missing demonstration trace-node minted; author-tests re-signed clean"}
+{"ts":"2026-08-13T10:49:01.887Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d66","brief":"Re-aiming at shipped now that the law gap is fixed"}
+{"ts":"2026-08-13T10:49:12.988Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d67","brief":"Checking value-prop count against gate-validation's meets_need list"}
+{"ts":"2026-08-13T10:49:31.585Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d68","brief":"Checking whether fill-story-evidence actually filled the new story's Deck slides"}
+{"ts":"2026-08-13T10:49:41.961Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d69","brief":"Listing i8 evidence dir to check for a run-demos file"}
+{"ts":"2026-08-13T10:49:58.550Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d70","brief":"Reading an already-filled must story for the Deck evidence format"}
+{"ts":"2026-08-13T10:50:23.187Z","op":"plan","visit":"iterations/i8/gate-validation@1","parent":null,"nodes":[{"id":"d71","brief":"fill sty-ask-the-lane deck evidence"},{"id":"d72","brief":"re-verify gate-validation route"}]}
+{"ts":"2026-08-13T10:50:56.753Z","op":"done","visit":"iterations/i8/gate-validation@1","node":"d71","brief":"Story Deck evidence filled for all 6 slides"}
+{"ts":"2026-08-13T10:51:04.654Z","op":"update","visit":"iterations/i8/author-tests@6","node":"d73","brief":"Resubmitting author-tests to clear the second reopen"}
+{"ts":"2026-08-13T10:51:18.308Z","op":"done","visit":"iterations/i8/gate-validation@1","node":"d72","brief":"author-tests re-signed after deck fix; checking route again"}
+{"ts":"2026-08-13T10:51:38.917Z","op":"update","visit":"iterations/i8/package@0","node":"d74","brief":"Reading the package method card for the exact script to run"}
+{"ts":"2026-08-13T10:51:41.552Z","op":"update","visit":"iterations/i8/package@0","node":"d75","brief":"Locating package.json to find the assembly script command"}
+{"ts":"2026-08-13T10:51:46.098Z","op":"update","visit":"iterations/i8/package@0","node":"d76","brief":"Reading deliverable/package.json scripts section"}
+{"ts":"2026-08-13T10:51:49.470Z","op":"update","visit":"iterations/i8/package@0","node":"d77","brief":"Finding a prior iteration's package.md for the real command used"}
+{"ts":"2026-08-13T10:51:52.925Z","op":"update","visit":"iterations/i8/package@0","node":"d78","brief":"Broadening search for any package.md across the whole repo including archive"}
+{"ts":"2026-08-13T10:52:21.172Z","op":"update","visit":"iterations/i8/package@0","node":"d79","brief":"Reading the choice-with-rationale template doc for the passing-value semantics"}
+{"ts":"2026-08-13T10:52:42.089Z","op":"update","visit":"iterations/i8/package@0","node":"d80","brief":"Reading RELEASES.md for the documented packaging and install procedure"}
+{"ts":"2026-08-13T10:52:54.571Z","op":"update","visit":"iterations/i8/package@0","node":"d81","brief":"Reading the packaging script to know what it produces and how to run it"}
+{"ts":"2026-08-13T10:53:07.614Z","op":"update","visit":"iterations/i8/package@0","node":"d82","brief":"Checking whether PowerShell exists in this Linux container for package.ts"}
+{"ts":"2026-08-13T10:53:17.724Z","op":"update","visit":"iterations/i8/package@0","node":"d83","brief":"Checking for a POSIX zip tool to make package.ts cross-platform"}
+{"ts":"2026-08-13T10:55:53.714Z","op":"plan","visit":"iterations/i8/package@1","parent":null,"nodes":[{"id":"d93","brief":"run package.ts for real"},{"id":"d94","brief":"check the package works headlessly"},{"id":"d95","brief":"fill package form"},{"id":"d96","brief":"fill gate-release"},{"id":"d97","brief":"reach shipped"}]}
+{"ts":"2026-08-13T10:56:25.166Z","op":"update","visit":"iterations/i8/package@1","node":"d98","brief":"Reading RUNME.ps1 to see what the install/check step actually needs"}
+{"ts":"2026-08-13T10:56:55.017Z","op":"update","visit":"iterations/i8/package@1","node":"d99","brief":"Extracting the packaged zip to a scratch dir to check it boots"}
+{"ts":"2026-08-13T10:57:01.553Z","op":"update","visit":"iterations/i8/package@1","node":"d100","brief":"Installing deps in the extracted package to simulate the installer"}
+{"ts":"2026-08-13T11:02:29.281Z","op":"plan","visit":"iterations/i8/package@0","parent":null,"nodes":[{"id":"d3","brief":"produce the release archive"},{"id":"d4","brief":"verify structure headlessly"},{"id":"d5","brief":"run scoped suite against the packaged copy"},{"id":"d6","brief":"fill package + works"},{"id":"d7","brief":"gate-release"}]}
+{"ts":"2026-08-13T11:04:46.700Z","op":"plan","visit":"iterations/i8/package@0","parent":null,"nodes":[{"id":"d3","brief":"confirm manifest completeness"},{"id":"d4","brief":"typecheck the packaged copy"},{"id":"d5","brief":"run non-server unit tests"},{"id":"d6","brief":"fill package + works evidence"},{"id":"d7","brief":"gate-release then shipped"}]}
+{"ts":"2026-08-13T11:04:56.885Z","op":"update","visit":"iterations/i8/package@0","node":"d8","brief":"Cleaning the scratch copy's leftover .se dir from the earlier boot mistake"}
+{"ts":"2026-08-13T11:05:18.795Z","op":"update","visit":"iterations/i8/package@0","node":"d9","brief":"Checking the packaged tree's manifest and rendered README"}
+{"ts":"2026-08-13T11:05:29.647Z","op":"update","visit":"iterations/i8/package@0","node":"d10","brief":"Typechecking the packaged copy's deliverable"}
+{"ts":"2026-08-13T11:05:40.378Z","op":"done","visit":"iterations/i8/package@0","node":"d4","brief":"tsc --noEmit clean on the packaged copy"}
+{"ts":"2026-08-13T11:05:54.506Z","op":"update","visit":"iterations/i8/package@0","node":"d11","brief":"Checking whether the record's own dist/ archive exists from the earlier run"}
+{"ts":"2026-08-13T11:06:10.037Z","op":"update","visit":"iterations/i8/package@0","node":"d12","brief":"Reading an existing raid entry as a template for the new package gap"}
+{"ts":"2026-08-13T11:06:29.142Z","op":"update","visit":"iterations/i8/package@0","node":"d13","brief":"Filed a raid entry for the unverifiable live install/desk-greeting check"}
+{"ts":"2026-08-13T11:06:40.206Z","op":"update","visit":"iterations/i8/package@0","node":"d14","brief":"Submitting package's evidence form"}
+{"ts":"2026-08-13T11:06:52.383Z","op":"update","visit":"iterations/i8/package@0","node":"d15","brief":"Resubmitting package with corrected fields"}
+{"ts":"2026-08-13T11:07:12.482Z","op":"done","visit":"iterations/i8/package@0","node":"d6","brief":"package submitted; walk advanced straight to gate-release"}
+{"ts":"2026-08-13T11:07:42.232Z","op":"plan","visit":"iterations/i8/gate-release@0","parent":null,"nodes":[{"id":"d16","brief":"submit and bless gate-release"},{"id":"d17","brief":"reach shipped"},{"id":"d18","brief":"commit"},{"id":"d19","brief":"report"}]}
+{"ts":"2026-08-13T11:08:25.283Z","op":"update","visit":"iterations/i8/gate-release@0","node":"d20","brief":"Resubmitting gate-release after the connection blip"}

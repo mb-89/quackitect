@@ -1,6 +1,7 @@
 ---
 id: i8-se-help-a-logged-keyword-search-over-the
-status: open
+status: shipped
+closed: 2026-08-13T11:10:04.662Z
 started: 2026-08-12T20:31:12.989Z
 opened: 2026-08-12T19:37:47.760Z
 goal: "se.help: a logged keyword search over the lane's tools and guidance, whose every MISS is recorded as a ranked missing-tool demand — replacing the retro's hand-mining of the shell log."
