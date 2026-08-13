@@ -24,9 +24,12 @@ satisfies:
   - req-trees-never-mix
   - req-setup-serves-shipped-method
   - req-method-reuse-is-vendoring
+  - req-a-method-change-reaches-every-tree
+  - req-entry-levels-the-record-tree
 inputs:
   - flow-method-sources
   - flow-overlay
+  - flow-resolved-target
 outputs:
   - flow-compiled-machine
   - flow-divergence-report

@@ -6,6 +6,7 @@ cluster: the-record-life
 statement: answer one question about a change by running the narrowest scope that settles it
 satisfies:
   - req-test-run-carries-its-question
+  - req-story-links-its-proving-run
   - req-test-scope-discipline
   - req-test-result-is-structured
   - req-red-is-never-carried

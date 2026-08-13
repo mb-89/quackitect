@@ -13,6 +13,14 @@ satisfies:
   - req-outbound-query-logged
   - req-answer-recorded-with-question
   - req-upward-links-live-in-the-file
+  - req-broken-trace-is-a-defect
+  - req-every-artifact-is-readable-text
+  - req-narration-toll-is-collected
+  - req-nodes-scoped-to-iteration
+  - req-trace-source-never-mixes
+  - req-trace-view-derived-from-files
+inputs:
+  - flow-resolved-target
   - req-trace-view-derived-from-files
   - req-nodes-scoped-to-iteration
   - req-trace-source-never-mixes
