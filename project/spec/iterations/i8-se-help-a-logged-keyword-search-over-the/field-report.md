@@ -695,7 +695,132 @@ run are currently unlogged.
 
 ---
 
-## 6. The one rule this run had to break
+## 6. What went wrong, and what each mistake teaches
+
+The owner's ruling on this run: getting it wrong the first time is acceptable,
+and not learning from it is not. So every mistake is here with its lesson,
+including the ones the driving agent made rather than the system.
+
+### 6.1 A scoped test run only answers about what it scoped
+
+The owed-checkbox commit changed `engine/session.ts`, a file most of the
+engine touches. Its author ran a broad scoped set —
+`mirror-contract`, `forms`, `pull`, `pull-seam`, `claims`, `iterations`,
+`reopen`, `route` — and reported "no new failures". `drawnsub` and
+`threshold` were not in that set.
+
+**The lesson is not "run the battery more".** Scoped-by-default is right and
+the lane is right to enforce it. The lesson is that **the scope must be
+chosen by what DEPENDS ON the changed file, not by what the author was
+thinking about.** A change to a widely-imported module has a scope the author
+cannot pick from memory.
+
+What would fix it mechanically: derive the scope from the import graph of the
+changed files, and refuse a scoped run that misses a dependent test file.
+
+### 6.2 `se_help` passed every gate while not existing
+
+The feature was specified, designed, traced, tested and gate-blessed — and
+was never wired into `tools.ts`. **The full battery caught it. No scoped run
+could have**, because nothing in any scope imported the module that was
+missing.
+
+This is now `raid-issue-trace-design-checks-existence-not-content`: the trace
+sweep checks that a file EXISTS, never that its content carries what the
+design spec claims. A design spec naming an interface should be able to
+assert that interface is reachable.
+
+It is also the strongest argument in this run for M7 demanding the battery.
+Three battery runs earned their cost by finding this one thing.
+
+### 6.3 A guard that refuses and is then bypassed is worse than no guard
+
+`SE-C-134` fired four times to stop a bound record's writes reaching trunk.
+The files reached trunk anyway, through `se_run`, which the clause did not
+cover. The record said the write was stopped.
+
+The retro fixed the refusal TEXT to say plainly which five tools it guards.
+That is honest, but the hole is still there.
+
+**The lesson: a guard must name what it does NOT cover, and a guard that
+cannot cover the general case should say so in its own refusal.** Otherwise
+the log reads as a clean stop.
+
+The damage was real and took a while to see: `se_help` ended up implemented
+twice, differently, on two branches, because the same feature was authored
+once inside the record and once on trunk.
+
+### 6.4 A cleanup must check what still points at the thing removed
+
+Removing the leaked `engine/help.ts` from trunk left `engine/tools.ts`
+importing it. **The branch did not compile for several commits.**
+
+Nothing caught it because the `pre-commit` hook was not executable — see 1.7.
+The hook found it on its FIRST run after the retro set the bit. The fix for a
+reported defect immediately caught a live one.
+
+### 6.5 A raw call count is not a measurement
+
+`se_test` appeared 97 times in the log, which reads as ninety-seven test
+runs. It was **16 runs and 81 polls**, and 56 of those polls were one hung
+job. A reader — or an owner — looking at the raw count would conclude the
+battery was being run compulsively. The opposite was true: scope discipline
+held at 13 scoped against 3 battery.
+
+**The lesson: any tool that both STARTS work and POLLS work needs those
+counted separately**, in the log and in any report built from it. `se_log_query`
+grouping by tool cannot tell them apart today.
+
+### 6.6 A control has to differ by only the thing being tested
+
+Investigating those two failing test files, the driving agent first compared
+the working branch against `v3` and concluded this run had caused a
+regression. `v3` already carried i8's merged content, so it differed by far
+more than the commits under suspicion.
+
+The correct control — the parent commit on the same branch — showed the
+failures were already there, and that one of the suspected commits had
+actually REDUCED them.
+
+**The lesson: when a comparison spans a merge, it is not a control.** The
+first conclusion was stated confidently and was wrong, and a wrong regression
+claim routes real work.
+
+### 6.7 A supervisor that reports liveness reports nothing
+
+The bootstrap agent supervised the caged walks by polling every ten minutes
+and reporting "still running". To the owner that is indistinguishable from a
+hang, and they said so.
+
+**The lesson, and it generalises to every unattended cloud run: a supervising
+agent must STREAM events — commits landing, tests finishing, silence passing
+a threshold — not sample liveness.** The fix used here was a monitor emitting
+one line per commit plus an explicit "quiet for 3 minutes" signal.
+
+### 6.8 A pattern that matches your own process kills your own process
+
+`pkill -f "se-mcp.ts"` matched the supervising shell's own command line,
+because that line contained the pattern. It killed the shell mid-command and
+took the server with it, twice, and the symptom looked like the server
+refusing to start.
+
+The same trap made `pgrep -cf "<prompt fragment>"` report a finished walk as
+still alive.
+
+**The lesson: never match a process by a string your own command line
+contains.**
+
+### 6.9 The walk does not commit often enough to survive an ephemeral host
+
+Three sessions in a row ended with work uncommitted — 46 files, then 29, then
+28 — and each had to be rescued from outside the walk. The machine commits at
+milestone transitions, which is the right rhythm on a durable machine and the
+wrong one here.
+
+This is the same finding as section 7, arrived at three separate times. It is
+the single most repeated failure of the run.
+
+## 7. The one rule this run had to break
 
 **"The machine commits, not you."** The bootstrap role broke it, deliberately,
 at the end of the run. This is recorded rather than glossed.
@@ -722,7 +847,7 @@ point before it can be stopped, or it needs a checkpoint the machine itself
 takes when a session ends. Right now the safe moment to stop is not a moment
 the agent can see coming.
 
-## 7. Where this file lives, and why
+## 8. Where this file lives, and why
 
 The handover asks for this file in the record's folder, committed with the
 work, so whoever reviews i8 gets it whether or not they think to ask.
