@@ -911,6 +911,56 @@ behind J5 and J2 respectively.
 
 ## The ordering rules that actually bind
 
+### The run order, set by the owner 2026-08-13
+
+THE ENABLERS RUN FIRST, IN THIS ORDER: i27, i28, i11, i12. Then i9.
+
+THEY ARE NOT A CHAIN. Only i28 waits on i27 mechanically. The rest is
+PRIORITY, not prerequisite, so they may run at once where there are machines
+for them — the order says which to start when there is one machine free, not
+which to hold back.
+
+WHY EACH ONE EARNS ITS PLACE.
+
+- i27 binds the lane to the record. The step-out it removes ran eight times in
+  a single session, three of them inside one verification.
+- i28 lets work run in the cloud. THE OWNER'S ARGUMENT, and it beats the
+  others: every one of them saves time inside one machine, and this one adds
+  machines. It multiplies the whole set rather than any single record.
+- i11 stops the pull overflowing. A gate fill answered 236KB, and the reading
+  detour that forces ran a dozen times in a day.
+- i12 halves the battery's wall clock, which every later iteration pays on
+  every run.
+- i9 is the only agent record that unlocks DECISIONS of the owner's: i9 leads
+  to i10, and i10 makes i21 and i22 available. Running it early spreads the
+  owner's load instead of piling those two on later.
+
+THE OWNER'S DECISIONS BELONG INSIDE THAT WINDOW, not before it and not after.
+i4 and then i20, made while the enablers run. Agents are busy for that whole
+stretch, so a decision taken then costs no waiting — and i23 stands unblocked
+the moment the enablers land, with no gap where a machine idles.
+
+EVERYTHING ELSE IS FILL, in no order: i5, i6, i7, i13, i15, i17, i18, i29,
+i30. i19 and i25 unlock nothing and can go whenever.
+
+### An open question this raises
+
+Part 4 carries a v1 law: ORDER IS NOT DEPENDENCY — depends_on states real
+prerequisites only, never display order.
+
+i23 now waits on i4, i27 and i11 in the graph. i4 is a real prerequisite. The
+other two are a JUDGMENT: i23 is the largest build in the set, and running it
+before the lane binding and the pull fix makes it pay both taxes the whole
+way. That is a cost argument, not an impossibility, so under the strict
+reading of the law those two edges do not belong there.
+
+They are kept because the owner asked for the order to be visible on the
+board, and the board draws edges rather than priorities. THE REAL FIX is a
+priority the container can draw without blocking, and until that exists the
+choice is between an invisible order and an over-strict one. Owner's to rule.
+
+### The file-level rules
+
 i13 AND i14 TOUCH THE SAME FILES. Do not race them.
 
 i10 AND i13 DO NOT OVERLAP — i10 rewrites spec ids and `source_refs`, i13
