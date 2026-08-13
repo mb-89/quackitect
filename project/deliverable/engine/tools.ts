@@ -293,18 +293,29 @@ export function expeditionTools(session: Session): ToolDef[] {
       name: "se_seed_iteration",
       title: "se.seed.iteration",
       description:
-        "Seed an iteration: goal + rough vision, plus input refs (an expedition id, retro note refs). Mints its record and worktree (branch it/<id>) and pushes that branch to the shared remote, so another machine can claim it; it stands in the iterations container in M0 — the retro onboards, the kickoff proposes a size, and the bless pins the rest. No size is asked at the seed.",
+        "Seed an iteration: goal + rough vision, plus input refs (an expedition id, retro note refs) and the iterations it WAITS FOR. Mints its record and worktree (branch it/<id>) and pushes that branch to the shared remote, so another machine can claim it; it stands in the iterations container in M0 — the retro onboards, the kickoff proposes a size, and the bless pins the rest. No size is asked at the seed. DEPENDS_ON IS THE CONTAINER'S ONLY WIRING: naming another open iteration draws the edge dep -> this, so the drawing shows the real shape (independent ones side by side, dependent ones in series) AND the walk refuses to enter this one until that dependency leaves the open set. No dependency means it hangs off start and can be claimed immediately.",
       inputSchema: {
         type: "object",
         properties: {
           goal: { type: "string", description: "what this iteration is after" },
           vision: { type: "string", description: "roughly how — what done looks like" },
           inputs: { type: "array", items: { type: "string" }, description: "context refs: an expedition id, retro note refs" },
+          depends_on: {
+            type: "array",
+            items: { type: "string" },
+            description:
+              "iteration ids this one WAITS FOR — it cannot be entered until each has left the open set. Omit for work that can start now.",
+          },
         },
         required: ["goal", "vision"],
       },
       handler: (args) =>
-        session.iterationSeed(String(args.goal), String(args.vision), Array.isArray(args.inputs) ? args.inputs.map(String) : []),
+        session.iterationSeed(
+          String(args.goal),
+          String(args.vision),
+          Array.isArray(args.inputs) ? args.inputs.map(String) : [],
+          Array.isArray(args.depends_on) ? args.depends_on.map(String) : [],
+        ),
     },
     {
       name: "se_exp_close",

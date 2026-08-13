@@ -134,12 +134,32 @@ test("the drawn view is laid out like an iteration, not from authored coordinate
   assert.equal(new Set(legs.map((l) => at(l).x)).size, legs.length, "and they stand apart across it");
 });
 
-// A seeded sub-machine must NOT take this path. Its shape varies per record,
-// so compiling a file for it would serve the wrong thing.
-test("a seeded sub-machine is left to its generator", async () => {
+// A seeded sub-machine must NOT take the drawn path. Its shape varies per
+// record, so compiling a shared machines/ file for it would serve the wrong
+// thing.
+//
+// WHAT IT SERVES INSTEAD IS THE PIN'S PLACEHOLDER (owner ruling, b9). Pinning
+// writes a two-state start-to-end stub into the record for every seeded
+// sub-machine, so no route refuses over a drawing a later state has not
+// authored yet — engine/iterations.ts, "EVERY SEEDED DRAWING GETS ITS
+// PLACEHOLDER IN THE PIN'S OWN ACT".
+//
+// THIS TEST USED TO ASSERT undefined, which was right before the scaffolds
+// existed. The rule it guards did not move: never a machines/ drawing.
+test("a seeded sub-machine gets the pin's placeholder, never a machines/ drawing", async () => {
   const { session } = await rootWithMajorIteration();
   const view = session.viewFor("build-steps");
-  assert.equal(view, undefined, "build-chunks is seeded — no drawing to compile until the record authors one");
+  assert.ok(view !== undefined, "the placeholder resolves — the pin wrote one so the route stays drawable");
+  assert.deepEqual(
+    view?.decl.states.map((s) => s.id),
+    ["start", "end"],
+    "and it is the STUB, not a compiled drawing — build-chunks has no authored states yet",
+  );
+  assert.match(
+    String(view?.decl.states.find((s) => s.id === "start")?.guidance),
+    /Nothing was seeded, explicitly/,
+    "the stub says why it is empty, so a reader who opens it is not left guessing",
+  );
 });
 
 // A STATE THAT CANNOT BE OPENED MUST NOT LOOK LIKE ONE THAT CAN (owner report
@@ -148,7 +168,12 @@ test("a seeded sub-machine is left to its generator", async () => {
 // so the reader was thrown out of the drawing they were reading.
 //
 // Nothing errored, which is what made it read as a feature.
-test("only a sub-machine that resolves is double-clickable", async () => {
+//
+// THE RULE IS UNCHANGED; WHAT MOVED IS WHICH STATES RESOLVE. Since the pin
+// scaffolds a placeholder for every seeded sub-machine (owner ruling, b9), a
+// pinned iteration holds none that cannot be opened — so both cases below now
+// open, and the empty one explains itself once opened.
+test("a sub-machine is double-clickable exactly when its drawing resolves", async () => {
   const { session, root } = await rootWithMajorIteration();
   // The iteration is the crumb just above the drawn sub-machine.
   const iteration = session.viewChain("enumerate-space").at(-2) ?? "";
@@ -163,10 +188,22 @@ test("only a sub-machine that resolves is double-clickable", async () => {
   assert.equal(drawn.open, true, "a drawn sub-machine has its drawing, so it opens");
 
   // run-candidates is SEEDED: build-chart authors its drawing, and build-chart
-  // has not run. There is nothing to open, and that must be visible.
+  // has not run. The pin left it a placeholder, so it opens — onto a stub that
+  // says nothing was seeded yet, which is the honest answer.
   const seeded = marked("run-candidates");
-  assert.equal(seeded.open, false, "an unseeded sub-machine is not double-clickable");
-  assert.equal(seeded.shut, true, "and it says so, rather than looking identical to one that opens");
+  assert.equal(seeded.open, true, "the pin's placeholder resolves, so a seeded sub-machine opens too");
+  assert.equal(seeded.shut, false, "and it is not marked unopenable, because it is not");
+  assert.match(
+    String(session.viewFor("run-candidates")?.decl.states.find((s) => s.id === "start")?.guidance),
+    /Nothing was seeded, explicitly/,
+    "what opens is the stub, and the stub says why it is empty",
+  );
+
+  // NOT PINNED HERE: the shut marker itself. render.ts still writes
+  // data-nosub="1" for a sub-machine whose drawing does not resolve, and that
+  // branch is unchanged — but a pinned iteration no longer holds such a state,
+  // so this fixture cannot reach it. Covering it again means rendering a
+  // machine view outside a pinned record, which is its own piece of work.
 
   // The DOUBLE BORDER is a different fact and it stays: the state IS a
   // sub-machine whether or not its drawing exists yet.

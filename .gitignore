@@ -14,6 +14,11 @@ Thumbs.db
 # worktrees (later milestone)
 .worktrees/
 
+# the scratchpad is the agent's workbench — whatever it wants, never committed
+# (owner ruling 2026-08-12). The no-binaries rule stops reaching into it, which
+# is what req-every-artifact-is-readable-text was always about: the PRODUCT.
+project/scratchpad/
+
 # built packages — assembled by engine/bin/package.ts, never committed
 dist/
 

@@ -1,0 +1,237 @@
+{"ts":"2026-08-12T20:33:11.798Z","op":"done","visit":"front_desk@0","node":"d1","brief":"Onboard-retro filled and submitted for i8"}
+{"ts":"2026-08-12T20:33:53.532Z","op":"update","visit":"iterations/i8/onboard-retro@0","node":"d4","brief":"onboard-retro form reformatted to template and resubmitted"}
+{"ts":"2026-08-12T20:36:53.532Z","op":"plan","visit":"iterations/i8/gate-kickoff@0","parent":null,"nodes":[{"id":"d5","brief":"Fill and submit gate-kickoff with change_size=minor"},{"id":"d6","brief":"Walk the grown M0 machine to build se.help"}]}
+{"ts":"2026-08-12T20:37:21.978Z","op":"update","visit":"iterations/i8/gate-kickoff@0","node":"d7","brief":"Fixing gate-kickoff field formats per refusal and resubmitting"}
+{"ts":"2026-08-12T20:37:49.159Z","op":"update","visit":"iterations/i8/gate-kickoff@0","node":"d8","brief":"Matched retro_drained item key format from $inbox, resubmitting"}
+{"ts":"2026-08-12T20:39:35.434Z","op":"done","visit":"front_desk@0","node":"d3","brief":"Opened raid-risk-se-help-search-half-unproven at log-risks"}
+{"ts":"2026-08-12T20:42:45.063Z","op":"update","visit":"iterations/i8/write-requirements@0","node":"d9","brief":"Reopening gate-kickoff to correct the mis-pinned change_size"}
+{"ts":"2026-08-12T20:43:18.588Z","op":"update","visit":"iterations/i8/gate-kickoff@1","node":"d10","brief":"Resubmitting gate-kickoff with corrected change_size text and retro_drained"}
+{"ts":"2026-08-12T20:47:01.594Z","op":"update","visit":"iterations/i8/author-tests@0","node":"d11","brief":"Investigating tools.ts registration pattern before implementing se_help"}
+{"ts":"2026-08-12T20:47:46.850Z","op":"update","visit":"iterations/i8/author-tests@0","node":"d12","brief":"Wrote write-requirements evidence directly; checking busbar state"}
+{"ts":"2026-08-12T20:47:56.676Z","op":"update","visit":"iterations/i8/author-tests@0","node":"d13","brief":"Submitting write-requirements form fields via se_pull"}
+{"ts":"2026-08-12T20:56:51.095Z","op":"update","visit":"iterations/i8/draft-vision@0","node":"d18","brief":"Filling draft-vision (INHERIT tailoring) for i8"}
+{"ts":"2026-08-12T20:59:34.785Z","op":"done","visit":"front_desk@0","node":"d2","brief":"M1 landed and gate-motivation blessed"}
+{"ts":"2026-08-12T20:59:56.767Z","op":"update","visit":"iterations/i8/map-stakeholders@0","node":"d19","brief":"M2: map-stakeholders filled, inherited"}
+{"ts":"2026-08-12T21:00:42.944Z","op":"update","visit":"iterations/i8/write-stories@0","node":"d20","brief":"M2: write-stories filled with new story deck"}
+{"ts":"2026-08-12T21:00:54.890Z","op":"update","visit":"iterations/i8/write-stories@0","node":"d21","brief":"M2 write-stories: listing full resident set plus the new story"}
+{"ts":"2026-08-12T21:01:01.840Z","op":"update","visit":"iterations/i8/write-stories@0","node":"d22","brief":"Reading meth-cockburn-use-case for generalize-use-cases"}
+{"ts":"2026-08-12T21:01:22.153Z","op":"update","visit":"iterations/i8/generalize-use-cases@0","node":"d23","brief":"M2: generalize-use-cases, full resident set plus new use case"}
+{"ts":"2026-08-12T21:02:17.157Z","op":"done","visit":"iterations/i8/gate-kickoff@0","node":"d6","brief":"M1+M2 landed; at write-requirements (M3) now"}
+{"ts":"2026-08-12T21:03:15.195Z","op":"update","visit":"iterations/i8/write-requirements@0","node":"d24","brief":"write-requirements: fixed EARS shape, listing full resident register"}
+{"ts":"2026-08-12T21:03:24.246Z","op":"update","visit":"iterations/i8/write-requirements@0","node":"d25","brief":"Reading meth-assumption-hunting for M3 identify-assumptions"}
+{"ts":"2026-08-12T21:05:10.000Z","op":"update","visit":"iterations/i8/derive-functions@0","node":"d26","brief":"M3: derive-functions filled, one new function node"}
+{"ts":"2026-08-12T21:05:18.413Z","op":"update","visit":"iterations/i8/derive-functions@0","node":"d27","brief":"M3 derive-functions: full resident set plus new function/flows"}
+{"ts":"2026-08-12T21:05:56.985Z","op":"update","visit":"iterations/i8/identify-assumptions@0","node":"d28","brief":"M3: identify-assumptions filled, one new assumption"}
+{"ts":"2026-08-12T21:06:05.625Z","op":"update","visit":"iterations/i8/identify-assumptions@0","node":"d29","brief":"M3: added Probe section, resubmitting identify-assumptions"}
+{"ts":"2026-08-12T21:06:31.275Z","op":"update","visit":"iterations/i8/probe-assumptions@0","node":"d30","brief":"Checking session job list — se_help test job at 14 minutes"}
+{"ts":"2026-08-12T21:21:04.282Z","op":"update","visit":"iterations/i8/probe-assumptions@0","node":"d31","brief":"resuming i8 probe-assumptions, fetching full form via log query"}
+{"ts":"2026-08-12T21:22:44.125Z","op":"update","visit":"iterations/i8/probe-assumptions@0","node":"d32","brief":"checking help-demand.jsonl for real usage data to probe vocabulary-overlap assumption"}
+{"ts":"2026-08-12T21:23:35.878Z","op":"update","visit":"iterations/i8/probe-assumptions@0","node":"d33","brief":"writing probe/probed fields onto both open assumption nodes"}
+{"ts":"2026-08-12T21:23:38.030Z","op":"update","visit":"iterations/i8/probe-assumptions@0","node":"d34","brief":"submitting probe-assumptions now that both open probes are recorded on their nodes"}
+{"ts":"2026-08-12T21:23:40.042Z","op":"update","visit":"iterations/i8/probe-assumptions@0","node":"d35","brief":"re-pulling to see current form state after node writes"}
+{"ts":"2026-08-12T21:24:31.292Z","op":"update","visit":"iterations/i8/probe-assumptions@0","node":"d36","brief":"filling current_situation and follow_up, submitting probe-assumptions"}
+{"ts":"2026-08-12T21:24:54.827Z","op":"update","visit":"iterations/i8/probe-assumptions@0","node":"d37","brief":"writing the probes node-table into the evidence form, all 5 assumptions"}
+{"ts":"2026-08-12T21:24:57.040Z","op":"update","visit":"iterations/i8/probe-assumptions@0","node":"d38","brief":"submitting probe-assumptions with the full probes table written"}
+{"ts":"2026-08-12T21:25:06.683Z","op":"update","visit":"iterations/i8/gate-requirements@0","node":"d39","brief":"arrived at gate-requirements milestone gate, pulling for the review form"}
+{"ts":"2026-08-12T21:26:18.061Z","op":"update","visit":"iterations/i8/gate-requirements@0","node":"d40","brief":"checking gate-inputs matrix row for its evidence field list vs standard rounds"}
+{"ts":"2026-08-12T21:26:37.227Z","op":"update","visit":"iterations/i8/gate-requirements@0","node":"d41","brief":"gate-requirements round_0_verify: checking new requirement files exist"}
+{"ts":"2026-08-12T21:26:41.848Z","op":"update","visit":"iterations/i8/gate-requirements@0","node":"d42","brief":"gate-requirements round_0_verify: confirming flow-call-log node exists"}
+{"ts":"2026-08-12T21:26:50.863Z","op":"update","visit":"iterations/i8/gate-requirements@0","node":"d43","brief":"gate-requirements round_0_verify: checking prior sehelp test job status"}
+{"ts":"2026-08-12T21:26:53.911Z","op":"update","visit":"iterations/i8/gate-requirements@0","node":"d44","brief":"gate-requirements round_0_verify: reading prior sehelp test results from the call log"}
+{"ts":"2026-08-12T21:26:57.092Z","op":"update","visit":"iterations/i8/gate-requirements@0","node":"d45","brief":"gate-requirements round_0_verify: searching log for the sehelp test job's final verdict"}
+{"ts":"2026-08-12T21:27:09.650Z","op":"update","visit":"iterations/i8/gate-requirements@0","node":"d46","brief":"gate-requirements round_0_verify: checking if the sehelp test job ever completed"}
+{"ts":"2026-08-12T21:27:54.421Z","op":"update","visit":"iterations/i8/gate-requirements@0","node":"d47","brief":"capturing the long-running test job as a stray note"}
+{"ts":"2026-08-12T21:27:57.534Z","op":"update","visit":"iterations/i8/gate-requirements@0","node":"d48","brief":"capturing the long-running test job as a stray note"}
+{"ts":"2026-08-12T21:28:36.183Z","op":"update","visit":"iterations/i8/gate-requirements@0","node":"d49","brief":"filling and self-blessing gate-requirements per contract rule 3 and iteration precedent"}
+{"ts":"2026-08-12T21:28:53.308Z","op":"update","visit":"iterations/i8/gate-requirements@0","node":"d50","brief":"fixing round_0_verify item labels and round_2_red_team finding=>answer format"}
+{"ts":"2026-08-12T21:29:22.229Z","op":"update","visit":"iterations/i8/record-adrs@0","node":"d51","brief":"checking damage-scale ordering for ADR threshold"}
+{"ts":"2026-08-12T21:29:32.022Z","op":"update","visit":"iterations/i8/record-adrs@0","node":"d52","brief":"reading M5 record-adrs row definition for its evidence fields"}
+{"ts":"2026-08-12T21:29:42.385Z","op":"update","visit":"iterations/i8/record-adrs@0","node":"d53","brief":"reading refs template for empty-list convention"}
+{"ts":"2026-08-12T21:29:50.551Z","op":"update","visit":"iterations/i8/record-adrs@0","node":"d54","brief":"no delta decision reaches the ADR bar; submitting record-adrs with none"}
+{"ts":"2026-08-12T21:30:08.652Z","op":"update","visit":"iterations/i8/decompose-structure@0","node":"d55","brief":"checking el-walk-engine for the right allocation target"}
+{"ts":"2026-08-12T21:30:22.547Z","op":"update","visit":"iterations/i8/decompose-structure@0","node":"d56","brief":"checking el-front-desk as an alternate allocation candidate"}
+{"ts":"2026-08-12T21:30:29.468Z","op":"update","visit":"iterations/i8/decompose-structure@0","node":"d57","brief":"locating the decompose-structure matrix row file"}
+{"ts":"2026-08-12T21:30:31.416Z","op":"update","visit":"iterations/i8/decompose-structure@0","node":"d58","brief":"reading decompose-structure row for its evidence field names"}
+{"ts":"2026-08-12T21:30:39.090Z","op":"update","visit":"iterations/i8/decompose-structure@0","node":"d59","brief":"allocating help-find-a-capability onto the existing el-walk-engine element"}
+{"ts":"2026-08-12T21:30:49.171Z","op":"update","visit":"iterations/i8/decompose-structure@0","node":"d60","brief":"locating the element-matrix template file"}
+{"ts":"2026-08-12T21:30:50.899Z","op":"update","visit":"iterations/i8/decompose-structure@0","node":"d61","brief":"reading element-matrix template for its expected field format"}
+{"ts":"2026-08-12T21:31:01.466Z","op":"update","visit":"iterations/i8/decompose-structure@0","node":"d62","brief":"submitting decompose-structure: full element list plus the one allocation"}
+{"ts":"2026-08-12T21:31:04.612Z","op":"update","visit":"iterations/i8/decompose-structure@0","node":"d63","brief":"filling current_situation and follow_up, resubmitting decompose-structure"}
+{"ts":"2026-08-12T21:31:11.676Z","op":"update","visit":"iterations/i8/evaluate-architecture@0","node":"d64","brief":"reading meth-atam-lite for the evaluate-architecture walk procedure"}
+{"ts":"2026-08-12T21:31:16.989Z","op":"update","visit":"iterations/i8/evaluate-architecture@0","node":"d65","brief":"locating the quality-scenario deck to walk against the new structure"}
+{"ts":"2026-08-12T21:31:26.008Z","op":"update","visit":"iterations/i8/evaluate-architecture@0","node":"d66","brief":"reading sty-what-a-quality-is to learn where quality scenario nodes live"}
+{"ts":"2026-08-12T21:31:33.558Z","op":"update","visit":"iterations/i8/evaluate-architecture@0","node":"d67","brief":"reading the scenario-deck template for the walk-form mechanics"}
+{"ts":"2026-08-12T21:31:59.823Z","op":"update","visit":"iterations/i8/evaluate-architecture@0","node":"d68","brief":"reading atamwalk.test.ts to learn the wire format for the walk field"}
+{"ts":"2026-08-12T21:32:15.628Z","op":"update","visit":"iterations/i8/evaluate-architecture@0","node":"d69","brief":"checking whether a quality requirement already carries an ATAM verdict on its own node"}
+{"ts":"2026-08-12T21:32:23.692Z","op":"update","visit":"iterations/i8/evaluate-architecture@0","node":"d70","brief":"checking every iteration for a prior evaluate-architecture evidence file"}
+{"ts":"2026-08-12T21:33:35.332Z","op":"update","visit":"iterations/i8/evaluate-architecture@0","node":"d71","brief":"reading atamwalk.ts to confirm exact wire syntax before writing the walk field"}
+{"ts":"2026-08-12T21:33:42.522Z","op":"update","visit":"iterations/i8/evaluate-architecture@0","node":"d72","brief":"reading deckLawProblems source for the exact accepted line patterns"}
+{"ts":"2026-08-12T21:34:28.641Z","op":"update","visit":"iterations/i8/evaluate-architecture@0","node":"d73","brief":"correcting req-mirror-stays-on-the-machine's stale detail — the fix already landed"}
+{"ts":"2026-08-12T21:35:06.566Z","op":"update","visit":"iterations/i8/evaluate-architecture@0","node":"d74","brief":"submitting the full 19-scenario ATAM walk, worst grade first"}
+{"ts":"2026-08-12T21:35:11.108Z","op":"update","visit":"iterations/i8/gate-architecture@0","node":"d75","brief":"checking whether the ATAM walk submit succeeded via the call log"}
+{"ts":"2026-08-12T21:35:16.174Z","op":"update","visit":"iterations/i8/gate-architecture@0","node":"d76","brief":"arrived at gate-architecture, checking its priority and self-bless eligibility"}
+{"ts":"2026-08-12T21:35:33.757Z","op":"update","visit":"iterations/i8/gate-architecture@0","node":"d77","brief":"checking whether the at-risk line auto-minted a raid entry on submit"}
+{"ts":"2026-08-12T21:35:36.709Z","op":"update","visit":"iterations/i8/gate-architecture@0","node":"d78","brief":"confirming the minted at-risk raid node exists on disk"}
+{"ts":"2026-08-12T21:35:50.111Z","op":"update","visit":"iterations/i8/gate-architecture@0","node":"d79","brief":"self-blessing gate-architecture, same override pattern as the prior three gates"}
+{"ts":"2026-08-12T21:35:52.628Z","op":"update","visit":"iterations/i8/gate-architecture@0","node":"d80","brief":"fixing raid_additions to a plain ref line, resubmitting gate-architecture"}
+{"ts":"2026-08-12T21:36:06.756Z","op":"update","visit":"iterations/i8/rank-unknowns@0","node":"d81","brief":"checking the standing search-risk's grade to weigh it for rank-unknowns"}
+{"ts":"2026-08-12T21:36:11.150Z","op":"update","visit":"iterations/i8/rank-unknowns@0","node":"d82","brief":"locating the rank-unknowns matrix row file"}
+{"ts":"2026-08-12T21:36:13.268Z","op":"update","visit":"iterations/i8/rank-unknowns@0","node":"d83","brief":"reading rank-unknowns row for its exact evidence field names"}
+{"ts":"2026-08-12T21:36:23.592Z","op":"update","visit":"iterations/i8/rank-unknowns@0","node":"d84","brief":"reading the auto-minted at-risk node to check its grades before ranking"}
+{"ts":"2026-08-12T21:36:43.661Z","op":"update","visit":"iterations/i8/rank-unknowns@0","node":"d85","brief":"locating the exposure-pick template for the seeded field's none-convention"}
+{"ts":"2026-08-12T21:36:45.822Z","op":"update","visit":"iterations/i8/rank-unknowns@0","node":"d86","brief":"reading the exposure-pick template's none-convention"}
+{"ts":"2026-08-12T21:36:53.661Z","op":"update","visit":"iterations/i8/rank-unknowns@0","node":"d87","brief":"recording no unknowns worth a spike, all three hot entries filtered out"}
+{"ts":"2026-08-12T21:36:57.265Z","op":"update","visit":"iterations/i8/rank-unknowns@0","node":"d88","brief":"checking rank-unknowns submit result via the call log"}
+{"ts":"2026-08-12T21:37:02.363Z","op":"update","visit":"iterations/i8/rank-unknowns@0","node":"d89","brief":"reading the owed document directly to get its real last words for the read proof"}
+{"ts":"2026-08-12T21:37:07.084Z","op":"update","visit":"iterations/i8/rank-unknowns@0","node":"d90","brief":"proving the read of software.md, pulling for the next instruction"}
+{"ts":"2026-08-12T21:37:13.673Z","op":"update","visit":"iterations/i8/fold-back@0","node":"d91","brief":"fold-back passes empty — no spikes ran, nothing to fold"}
+{"ts":"2026-08-12T21:37:16.018Z","op":"update","visit":"iterations/i8/fold-back@0","node":"d92","brief":"filling current_situation and follow_up, resubmitting fold-back"}
+{"ts":"2026-08-12T21:37:34.100Z","op":"update","visit":"iterations/i8/gate-prototype@0","node":"d93","brief":"self-blessing gate-prototype, same override pattern as the four gates before it"}
+{"ts":"2026-08-12T21:37:40.096Z","op":"update","visit":"iterations/i8/gate-prototype@0","node":"d94","brief":"checking the choice-with-rationale template's exact accepted format"}
+{"ts":"2026-08-12T21:37:43.947Z","op":"update","visit":"iterations/i8/gate-prototype@0","node":"d95","brief":"fixing buildable to the exact option-then-rationale format, resubmitting"}
+{"ts":"2026-08-12T21:37:46.913Z","op":"update","visit":"iterations/i8/gate-prototype@0","node":"d96","brief":"checking gate-prototype submit result via the call log"}
+{"ts":"2026-08-12T21:37:49.990Z","op":"update","visit":"iterations/i8/gate-prototype@0","node":"d97","brief":"reading meth-test-design.md directly for the read-proof's last words"}
+{"ts":"2026-08-12T21:37:53.195Z","op":"update","visit":"iterations/i8/gate-prototype@0","node":"d98","brief":"proving the read of meth-test-design.md, pulling for the next instruction"}
+{"ts":"2026-08-12T21:37:58.781Z","op":"update","visit":"iterations/i8/author-tests@1","node":"d99","brief":"checking whether test-spec nodes already exist for the four help requirements"}
+{"ts":"2026-08-12T21:38:13.228Z","op":"update","visit":"iterations/i8/author-tests@1","node":"d100","brief":"reading tsp-notes-inbox.md as a precedent for the test-spec node shape"}
+{"ts":"2026-08-12T21:38:21.254Z","op":"update","visit":"iterations/i8/author-tests@1","node":"d101","brief":"locating the test-spec item template file"}
+{"ts":"2026-08-12T21:38:23.308Z","op":"update","visit":"iterations/i8/author-tests@1","node":"d102","brief":"reading the test-spec item template for its exact skeleton"}
+{"ts":"2026-08-12T21:38:37.258Z","op":"update","visit":"iterations/i8/author-tests@1","node":"d103","brief":"authoring tsp-help-search test-spec covering all four help requirements"}
+{"ts":"2026-08-12T21:38:41.743Z","op":"update","visit":"iterations/i8/author-tests@1","node":"d104","brief":"submitting author-tests with the new tsp-help-search test-spec"}
+{"ts":"2026-08-12T21:38:45.817Z","op":"update","visit":"iterations/i8/author-tests@1","node":"d105","brief":"filling current_situation and follow_up, resubmitting author-tests"}
+{"ts":"2026-08-12T21:38:48.568Z","op":"update","visit":"iterations/i8/author-tests@1","node":"d106","brief":"checking author-tests submit result via the call log"}
+{"ts":"2026-08-12T21:38:51.272Z","op":"update","visit":"iterations/i8/author-tests@1","node":"d107","brief":"reading meth-build-strategies.md directly for the read-proof's last words"}
+{"ts":"2026-08-12T21:38:53.793Z","op":"update","visit":"iterations/i8/author-tests@1","node":"d108","brief":"proving the read of meth-build-strategies.md, pulling for the next instruction"}
+{"ts":"2026-08-12T21:39:05.338Z","op":"update","visit":"iterations/i8/specify-build@0","node":"d109","brief":"locating the design-spec item template"}
+{"ts":"2026-08-12T21:39:07.553Z","op":"update","visit":"iterations/i8/specify-build@0","node":"d110","brief":"reading the design-spec item template for its exact skeleton"}
+{"ts":"2026-08-12T21:39:21.412Z","op":"update","visit":"iterations/i8/specify-build@0","node":"d111","brief":"authoring dsp-help-search design-spec realizing el-walk-engine"}
+{"ts":"2026-08-12T21:39:31.612Z","op":"update","visit":"iterations/i8/specify-build@0","node":"d112","brief":"locating the specify-build matrix row file"}
+{"ts":"2026-08-12T21:39:35.241Z","op":"update","visit":"iterations/i8/specify-build@0","node":"d113","brief":"reading specify-build row for design_specs and promotions field shapes"}
+{"ts":"2026-08-12T21:39:58.896Z","op":"update","visit":"iterations/i8/specify-build@0","node":"d114","brief":"submitting specify-build with the one design-spec and no promotions"}
+{"ts":"2026-08-12T21:40:04.873Z","op":"update","visit":"iterations/i8/specify-build@0","node":"d115","brief":"filling current_situation and follow_up, resubmitting specify-build"}
+{"ts":"2026-08-12T21:40:19.936Z","op":"update","visit":"iterations/i8/observe-red@0","node":"d116","brief":"running the new sehelp tests now that observe-red allows se_run/se_test"}
+{"ts":"2026-08-12T21:40:32.024Z","op":"update","visit":"iterations/i8/observe-red@0","node":"d117","brief":"checking package.json for the exact node test-runner invocation"}
+{"ts":"2026-08-12T21:40:38.837Z","op":"update","visit":"iterations/i8/observe-red@0","node":"d118","brief":"running sehelp.test.ts directly via se_run since se_test is illegal at observe-red"}
+{"ts":"2026-08-12T21:41:45.189Z","op":"update","visit":"iterations/i8/observe-red@0","node":"d119","brief":"retrying sehelp.test.ts in the background — the foreground run hit the transport timeout"}
+{"ts":"2026-08-12T21:41:49.213Z","op":"update","visit":"iterations/i8/observe-red@0","node":"d120","brief":"checking initial status of the background sehelp test run"}
+{"ts":"2026-08-12T21:42:16.810Z","op":"update","visit":"iterations/i8/observe-red@0","node":"d121","brief":"confirming the sehelp test run's final exit code"}
+{"ts":"2026-08-12T21:42:31.869Z","op":"update","visit":"iterations/i8/observe-red@0","node":"d122","brief":"stopping the hung sehelp test job — all subtests finished, process itself never exits"}
+{"ts":"2026-08-12T21:42:37.743Z","op":"update","visit":"iterations/i8/observe-red@0","node":"d123","brief":"reading bootedServer to check teardown pattern other test files rely on"}
+{"ts":"2026-08-12T21:42:56.024Z","op":"update","visit":"iterations/i8/observe-red@0","node":"d124","brief":"capturing the confirmed process-hang-after-teardown as a stray note"}
+{"ts":"2026-08-12T21:43:05.381Z","op":"update","visit":"iterations/i8/observe-red@0","node":"d125","brief":"submitting observe-red with the two real failures and the hang finding"}
+{"ts":"2026-08-12T21:43:34.004Z","op":"update","visit":"iterations/i8/observe-red@0","node":"d126","brief":"fixing red_observed to the checklist format, resubmitting observe-red"}
+{"ts":"2026-08-12T21:43:38.744Z","op":"update","visit":"iterations/i8/observe-red@0","node":"d127","brief":"checking the per-item template's exact checkbox line syntax"}
+{"ts":"2026-08-12T21:43:47.814Z","op":"update","visit":"iterations/i8/observe-red@0","node":"d128","brief":"reading the checklist template's exact line_pattern regex"}
+{"ts":"2026-08-12T21:43:55.463Z","op":"plan","visit":"iterations/i8/observe-red@0","parent":null,"nodes":[{"id":"d129","brief":"fixing red_observed to bare checked items"},{"id":"d130","brief":"no appended text"},{"id":"d131","brief":"resubmitting"}]}
+{"ts":"2026-08-12T21:44:03.719Z","op":"done","visit":"iterations/i8/observe-red@0","node":"d129","brief":"red_observed fixed to bare checked items and submitted successfully"}
+{"ts":"2026-08-12T21:44:07.782Z","op":"obsolete","visit":"iterations/i8/observe-red@0","node":"d130","brief":"artifact of a comma-split brief, not a real separate work item"}
+{"ts":"2026-08-12T21:44:18.168Z","op":"obsolete","visit":"iterations/i8/observe-red@0","node":"d131","brief":"artifact of the same comma-split brief, not a real separate work item"}
+{"ts":"2026-08-12T21:44:31.091Z","op":"update","visit":"iterations/i8/trace-design@0","node":"d132","brief":"submitting trace-design, letting the mechanical sweep report what's missing if anything"}
+{"ts":"2026-08-12T21:44:35.609Z","op":"update","visit":"iterations/i8/trace-design@0","node":"d133","brief":"filling current_situation and follow_up, resubmitting trace-design"}
+{"ts":"2026-08-12T21:44:43.724Z","op":"update","visit":"iterations/i8/trace-design@0","node":"d134","brief":"checking the wait state cleanly — trace-design signed off, no further route drawn"}
+{"ts":"2026-08-13T06:45:41.952Z","op":"update","visit":"iterations/i8/trace-design@0","node":"d5","brief":"checking trace-design evidence before resuming the walk"}
+{"ts":"2026-08-13T06:45:46.025Z","op":"done","visit":"front_desk@0","node":"d4","brief":"confirmed trace-design already signed off; resolving nav confusion"}
+{"ts":"2026-08-13T06:45:49.929Z","op":"update","visit":"iterations/i8/trace-design@0","node":"d6","brief":"locating next state after trace-design in the machine drawing"}
+{"ts":"2026-08-13T06:48:36.247Z","op":"fork","visit":"iterations/i8/trace-design@0","parent":null,"node":"d7","brief":"malformed files: field on dsp-help-search likely blocks trace-design exit","nodes":[]}
+{"ts":"2026-08-13T06:51:19.750Z","op":"update","visit":"iterations/i8/trace-design@0","node":"d8","brief":"found 2 unclaimed engine files (puml_mindmap.ts, signals.ts) blocking the sweep"}
+{"ts":"2026-08-13T06:51:22.686Z","op":"update","visit":"iterations/i8/trace-design@0","node":"d9","brief":"tracing puml_mindmap.ts import chain; checking signals.ts next"}
+{"ts":"2026-08-13T06:51:32.186Z","op":"update","visit":"iterations/i8/trace-design@0","node":"d10","brief":"claiming puml_mindmap.ts under dsp-trace-corpus, signals.ts under dsp-live-register"}
+{"ts":"2026-08-13T06:57:18.665Z","op":"update","visit":"iterations/i8/verification@0","node":"d11","brief":"hit a real blocker at verification: legal_tools empty, cannot inspect the 8 claim-specs"}
+{"ts":"2026-08-13T09:23:34.675Z","op":"update","visit":"iterations/i8/verification@1","node":"d15","brief":"reading requirement nodes for M7 tester verification of 7 test-specs"}
+{"ts":"2026-08-13T09:23:37.087Z","op":"update","visit":"iterations/i8/verification@1","node":"d16","brief":"reading requirement nodes for prose-inspection spec"}
+{"ts":"2026-08-13T09:23:39.547Z","op":"update","visit":"iterations/i8/verification@1","node":"d17","brief":"reading requirement nodes for record-inspection spec"}
+{"ts":"2026-08-13T09:25:12.759Z","op":"done","visit":"front_desk@1","node":"d3","brief":"tester subagent verifying 7 test-specs; findings will return to caller for gate"}
+{"ts":"2026-08-13T09:25:21.628Z","op":"update","visit":"iterations/i8/verification@1","node":"d18","brief":"mapping machine state files before searching desk/tour/gate/autonomy implementations"}
+{"ts":"2026-08-13T09:26:42.062Z","op":"update","visit":"iterations/i8/verification@1","node":"d19","brief":"checking autonomy control rendering in render/mirror"}
+{"ts":"2026-08-13T09:26:42.833Z","op":"update","visit":"iterations/i8/verification@1","node":"d20","brief":"checking mirror header autonomy tier word rendering"}
+{"ts":"2026-08-13T09:26:59.564Z","op":"update","visit":"iterations/i8/verification@1","node":"d21","brief":"inspecting the autonomy control markup in render.ts"}
+{"ts":"2026-08-13T09:27:17.652Z","op":"update","visit":"iterations/i8/verification@1","node":"d22","brief":"checking params.ts rungs rendering to resolve slider-vs-buttons question"}
+{"ts":"2026-08-13T09:27:51.732Z","op":"defer","visit":"front_desk@1","node":"d4","brief":"carry i8 through remaining milestones to close","to":"M7_60_fix-findings","hops":1,"trail":["front_desk","M7_60_fix-findings"]}
+{"ts":"2026-08-13T09:28:33.822Z","op":"update","visit":"iterations/i8/verification@1","node":"d23","brief":"searching for recorded analysis backing tsp-derivation-analysis"}
+{"ts":"2026-08-13T09:29:53.842Z","op":"update","visit":"iterations/i8/verification@1","node":"d24","brief":"reading the entry README to check plain-language and one-command install claims"}
+{"ts":"2026-08-13T09:30:25.068Z","op":"update","visit":"iterations/i8/verification@1","node":"d25","brief":"checking whether RUNME.ps1 sits at true repo root outside project/"}
+{"ts":"2026-08-13T09:30:45.102Z","op":"update","visit":"iterations/i8/verification@1","node":"d26","brief":"checking small-fix routing and gate evidence form rendering"}
+{"ts":"2026-08-13T09:31:05.015Z","op":"update","visit":"iterations/i8/verification@1","node":"d27","brief":"checking roles-vs-usernames stamp vocabulary in calllog.ts"}
+{"ts":"2026-08-13T09:42:18.796Z","op":"update","visit":"iterations/i8/verification@2","node":"d33","brief":"submitting the claims checklist with the owed boxes and full evidence"}
+{"ts":"2026-08-13T09:44:29.587Z","op":"done","visit":"front_desk@0","node":"d1","brief":"back at i8/verification post-reload, fields already saved from before"}
+{"ts":"2026-08-13T09:45:09.480Z","op":"plan","visit":"iterations/i8/gate-implementation@0","parent":null,"nodes":[{"id":"d5","brief":"fill gate-implementation's quality checklist and rounds"},{"id":"d6","brief":"run the earned battery if needed"},{"id":"d7","brief":"submit + bless gate-implementation"},{"id":"d8","brief":"carry i8 through remaining M7/M8 milestones to close"}]}
+{"ts":"2026-08-13T09:46:06.297Z","op":"update","visit":"iterations/i8/gate-implementation@0","node":"d9","brief":"firing the full battery — scoped runs are green, this is the gate's own dated confirmation"}
+{"ts":"2026-08-13T09:48:38.617Z","op":"update","visit":"iterations/i8/gate-implementation@0","node":"d10","brief":"isolating the 19 battery failures vs the 13-failure baseline"}
+{"ts":"2026-08-13T09:52:19.639Z","op":"update","visit":"iterations/i8/gate-implementation@1","node":"d16","brief":"re-running the full battery after the slider-fix regressions are patched"}
+{"ts":"2026-08-13T10:06:22.127Z","op":"plan","visit":"iterations/i8/gate-implementation@3","parent":"d5","nodes":[{"id":"d33","brief":"submitting gate-implementation: quality checklist"},{"id":"d34","brief":"both rounds"},{"id":"d35","brief":"verdict"},{"id":"d36","brief":"self-bless"}]}
+{"ts":"2026-08-13T10:07:34.916Z","op":"update","visit":"iterations/i8/gate-implementation@3","node":"d37","brief":"resubmitting gate-implementation with corrected field formats"}
+{"ts":"2026-08-13T10:09:48.965Z","op":"update","visit":"iterations/i8/sweep-consistency@0","node":"d38","brief":"extending raid-issue-must-demos-owed to name all 4 owed M7 specs"}
+{"ts":"2026-08-13T10:09:54.075Z","op":"obsolete","visit":"iterations/i8/gate-implementation@0","node":"d5","brief":"stale — gate-implementation already passed and blessed"}
+{"ts":"2026-08-13T10:11:45.607Z","op":"plan","visit":"iterations/i8/sweep-consistency@0","parent":null,"nodes":[{"id":"d39","brief":"fill and submit sweep-consistency"},{"id":"d40","brief":"carry i8 through the remaining M8 states to close"}]}
+{"ts":"2026-08-13T10:12:01.532Z","op":"update","visit":"iterations/i8/sweep-consistency@0","node":"d41","brief":"fixing the swept checklist's line-wrapped item text to match exactly"}
+{"ts":"2026-08-13T10:14:00.579Z","op":"plan","visit":"iterations/i8/gate-validation@0","parent":null,"nodes":[{"id":"d42","brief":"fill and submit gate-validation"},{"id":"d43","brief":"carry i8 to close"}]}
+{"ts":"2026-08-13T10:19:36.429Z","op":"update","visit":"iterations/i8/gate-validation@0","node":"d44","brief":"checking exact round_1_validate field requirement format"}
+{"ts":"2026-08-13T10:20:10.722Z","op":"update","visit":"iterations/i8/gate-validation@0","node":"d45","brief":"fixed missing 'exercised against the goal' line item, resubmitting"}
+{"ts":"2026-08-13T10:20:23.170Z","op":"update","visit":"iterations/i8/gate-validation@0","node":"d46","brief":"checking whether gate-validation submit landed"}
+{"ts":"2026-08-13T10:21:17.487Z","op":"update","visit":"iterations/i8/gate-validation@0","node":"d47","brief":"aiming i8 at shipped to draw the route through M9"}
+{"ts":"2026-08-13T10:21:31.138Z","op":"done","visit":"iterations/i8/gate-validation@0","node":"d42","brief":"gate-validation submitted and blessed by agent"}
+{"ts":"2026-08-13T10:21:37.561Z","op":"done","visit":"iterations/i8/gate-implementation@0","node":"d7","brief":"gate-implementation was submitted and blessed earlier this session"}
+{"ts":"2026-08-13T10:21:39.473Z","op":"obsolete","visit":"front_desk@1","node":"d13","brief":"superseded by d7 actually finishing the gate"}
+{"ts":"2026-08-13T10:21:41.086Z","op":"obsolete","visit":"front_desk@2","node":"d20","brief":"superseded by d7 actually finishing the gate"}
+{"ts":"2026-08-13T10:21:42.659Z","op":"done","visit":"iterations/i8/sweep-consistency@0","node":"d39","brief":"sweep-consistency filled and submitted earlier this session"}
+{"ts":"2026-08-13T10:21:44.305Z","op":"done","visit":"iterations/i8/gate-implementation@0","node":"d8","brief":"M7/M8 milestones complete: gate-implementation and gate-validation both blessed"}
+{"ts":"2026-08-13T10:21:48.885Z","op":"done","visit":"iterations/i8/sweep-consistency@0","node":"d40","brief":"all M8 states finished and gate-validation blessed"}
+{"ts":"2026-08-13T10:21:52.521Z","op":"update","visit":"iterations/i8/gate-validation@0","node":"d48","brief":"pulling to walk from gate-validation toward shipped"}
+{"ts":"2026-08-13T10:38:46.342Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d51","brief":"At gate-validation; checking whether it already stands blessed"}
+{"ts":"2026-08-13T10:38:54.173Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d52","brief":"Aiming i8 walk at shipped per owner authorisation"}
+{"ts":"2026-08-13T10:39:36.377Z","op":"defer","visit":"iterations/i8/gate-validation@0","node":"d43","brief":"carry i8 to close","to":"iterations/i8/gate-validation","hops":1,"trail":["iterations/i8/gate-validation","iterations/i8/gate-validation"]}
+{"ts":"2026-08-13T10:40:23.593Z","op":"defer_arrived","visit":"iterations/i8/gate-validation@1","node":"d53","brief":"carry i8 to close","hops":1,"trail":["iterations/i8/gate-validation","iterations/i8/gate-validation"]}
+{"ts":"2026-08-13T10:40:29.972Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d54","brief":"Aimed at package; pulling to walk forward from gate-validation"}
+{"ts":"2026-08-13T10:42:18.300Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d55","brief":"Reading the 4 owed demonstration test-specs to check their demonstrates: frontmatter"}
+{"ts":"2026-08-13T10:42:37.637Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d56","brief":"Checking tsp-hand-walk's method field for the sty-walk-it-by-hand demonstration"}
+{"ts":"2026-08-13T10:43:07.088Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d57","brief":"Listing all story files to check for must-priority stories missing a demonstration"}
+{"ts":"2026-08-13T10:43:46.580Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d58","brief":"Reading claimProblems in full to find why gate-validation stays not-green"}
+{"ts":"2026-08-13T10:46:10.584Z","op":"done","visit":"iterations/i8/gate-validation@1","node":"d53","brief":"Root cause found: sty-ask-the-lane-what-it-can-do has no demonstration trace-node"}
+{"ts":"2026-08-13T10:46:18.989Z","op":"fork","visit":"iterations/i8/gate-validation@1","parent":null,"node":"d59","brief":"Minting the missing tsp-lane-help-run demonstration trace-node","nodes":[]}
+{"ts":"2026-08-13T10:46:59.324Z","op":"fork","visit":"iterations/i8/gate-validation@1","parent":"d59","node":"d60","brief":"Reopening author-tests to mint the missing demonstration trace-node","nodes":[]}
+{"ts":"2026-08-13T10:47:02.226Z","op":"update","visit":"iterations/i8/author-tests@5","node":"d61","brief":"Aiming at reopened author-tests to gain write access"}
+{"ts":"2026-08-13T10:47:05.409Z","op":"update","visit":"iterations/i8/author-tests@5","node":"d62","brief":"Pulling now that position is author-tests"}
+{"ts":"2026-08-13T10:47:20.565Z","op":"update","visit":"iterations/i8/author-tests@5","node":"d63","brief":"Pull result exceeded tool size cap; fetching it back by ref via the log"}
+{"ts":"2026-08-13T10:47:36.116Z","op":"update","visit":"iterations/i8/author-tests@5","node":"d64","brief":"Checking author-tests evidence file size before editing"}
+{"ts":"2026-08-13T10:47:39.733Z","op":"update","visit":"iterations/i8/author-tests@5","node":"d65","brief":"Reading the full small author-tests evidence file"}
+{"ts":"2026-08-13T10:48:55.702Z","op":"done","visit":"iterations/i8/gate-validation@1","node":"d60","brief":"author-tests re-signed with the new demonstration row; reopen cleared"}
+{"ts":"2026-08-13T10:48:59.289Z","op":"done","visit":"iterations/i8/gate-validation@1","node":"d59","brief":"Missing demonstration trace-node minted; author-tests re-signed clean"}
+{"ts":"2026-08-13T10:49:01.887Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d66","brief":"Re-aiming at shipped now that the law gap is fixed"}
+{"ts":"2026-08-13T10:49:12.988Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d67","brief":"Checking value-prop count against gate-validation's meets_need list"}
+{"ts":"2026-08-13T10:49:31.585Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d68","brief":"Checking whether fill-story-evidence actually filled the new story's Deck slides"}
+{"ts":"2026-08-13T10:49:41.961Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d69","brief":"Listing i8 evidence dir to check for a run-demos file"}
+{"ts":"2026-08-13T10:49:58.550Z","op":"update","visit":"iterations/i8/gate-validation@1","node":"d70","brief":"Reading an already-filled must story for the Deck evidence format"}
+{"ts":"2026-08-13T10:50:23.187Z","op":"plan","visit":"iterations/i8/gate-validation@1","parent":null,"nodes":[{"id":"d71","brief":"fill sty-ask-the-lane deck evidence"},{"id":"d72","brief":"re-verify gate-validation route"}]}
+{"ts":"2026-08-13T10:50:56.753Z","op":"done","visit":"iterations/i8/gate-validation@1","node":"d71","brief":"Story Deck evidence filled for all 6 slides"}
+{"ts":"2026-08-13T10:51:04.654Z","op":"update","visit":"iterations/i8/author-tests@6","node":"d73","brief":"Resubmitting author-tests to clear the second reopen"}
+{"ts":"2026-08-13T10:51:18.308Z","op":"done","visit":"iterations/i8/gate-validation@1","node":"d72","brief":"author-tests re-signed after deck fix; checking route again"}
+{"ts":"2026-08-13T10:51:38.917Z","op":"update","visit":"iterations/i8/package@0","node":"d74","brief":"Reading the package method card for the exact script to run"}
+{"ts":"2026-08-13T10:51:41.552Z","op":"update","visit":"iterations/i8/package@0","node":"d75","brief":"Locating package.json to find the assembly script command"}
+{"ts":"2026-08-13T10:51:46.098Z","op":"update","visit":"iterations/i8/package@0","node":"d76","brief":"Reading deliverable/package.json scripts section"}
+{"ts":"2026-08-13T10:51:49.470Z","op":"update","visit":"iterations/i8/package@0","node":"d77","brief":"Finding a prior iteration's package.md for the real command used"}
+{"ts":"2026-08-13T10:51:52.925Z","op":"update","visit":"iterations/i8/package@0","node":"d78","brief":"Broadening search for any package.md across the whole repo including archive"}
+{"ts":"2026-08-13T10:52:21.172Z","op":"update","visit":"iterations/i8/package@0","node":"d79","brief":"Reading the choice-with-rationale template doc for the passing-value semantics"}
+{"ts":"2026-08-13T10:52:42.089Z","op":"update","visit":"iterations/i8/package@0","node":"d80","brief":"Reading RELEASES.md for the documented packaging and install procedure"}
+{"ts":"2026-08-13T10:52:54.571Z","op":"update","visit":"iterations/i8/package@0","node":"d81","brief":"Reading the packaging script to know what it produces and how to run it"}
+{"ts":"2026-08-13T10:53:07.614Z","op":"update","visit":"iterations/i8/package@0","node":"d82","brief":"Checking whether PowerShell exists in this Linux container for package.ts"}
+{"ts":"2026-08-13T10:53:17.724Z","op":"update","visit":"iterations/i8/package@0","node":"d83","brief":"Checking for a POSIX zip tool to make package.ts cross-platform"}
+{"ts":"2026-08-13T10:55:53.714Z","op":"plan","visit":"iterations/i8/package@1","parent":null,"nodes":[{"id":"d93","brief":"run package.ts for real"},{"id":"d94","brief":"check the package works headlessly"},{"id":"d95","brief":"fill package form"},{"id":"d96","brief":"fill gate-release"},{"id":"d97","brief":"reach shipped"}]}
+{"ts":"2026-08-13T10:56:25.166Z","op":"update","visit":"iterations/i8/package@1","node":"d98","brief":"Reading RUNME.ps1 to see what the install/check step actually needs"}
+{"ts":"2026-08-13T10:56:55.017Z","op":"update","visit":"iterations/i8/package@1","node":"d99","brief":"Extracting the packaged zip to a scratch dir to check it boots"}
+{"ts":"2026-08-13T10:57:01.553Z","op":"update","visit":"iterations/i8/package@1","node":"d100","brief":"Installing deps in the extracted package to simulate the installer"}
+{"ts":"2026-08-13T11:02:29.281Z","op":"plan","visit":"iterations/i8/package@0","parent":null,"nodes":[{"id":"d3","brief":"produce the release archive"},{"id":"d4","brief":"verify structure headlessly"},{"id":"d5","brief":"run scoped suite against the packaged copy"},{"id":"d6","brief":"fill package + works"},{"id":"d7","brief":"gate-release"}]}
+{"ts":"2026-08-13T11:04:46.700Z","op":"plan","visit":"iterations/i8/package@0","parent":null,"nodes":[{"id":"d3","brief":"confirm manifest completeness"},{"id":"d4","brief":"typecheck the packaged copy"},{"id":"d5","brief":"run non-server unit tests"},{"id":"d6","brief":"fill package + works evidence"},{"id":"d7","brief":"gate-release then shipped"}]}
+{"ts":"2026-08-13T11:04:56.885Z","op":"update","visit":"iterations/i8/package@0","node":"d8","brief":"Cleaning the scratch copy's leftover .se dir from the earlier boot mistake"}
+{"ts":"2026-08-13T11:05:18.795Z","op":"update","visit":"iterations/i8/package@0","node":"d9","brief":"Checking the packaged tree's manifest and rendered README"}
+{"ts":"2026-08-13T11:05:29.647Z","op":"update","visit":"iterations/i8/package@0","node":"d10","brief":"Typechecking the packaged copy's deliverable"}
+{"ts":"2026-08-13T11:05:40.378Z","op":"done","visit":"iterations/i8/package@0","node":"d4","brief":"tsc --noEmit clean on the packaged copy"}
+{"ts":"2026-08-13T11:05:54.506Z","op":"update","visit":"iterations/i8/package@0","node":"d11","brief":"Checking whether the record's own dist/ archive exists from the earlier run"}
+{"ts":"2026-08-13T11:06:10.037Z","op":"update","visit":"iterations/i8/package@0","node":"d12","brief":"Reading an existing raid entry as a template for the new package gap"}
+{"ts":"2026-08-13T11:06:29.142Z","op":"update","visit":"iterations/i8/package@0","node":"d13","brief":"Filed a raid entry for the unverifiable live install/desk-greeting check"}
+{"ts":"2026-08-13T11:06:40.206Z","op":"update","visit":"iterations/i8/package@0","node":"d14","brief":"Submitting package's evidence form"}
+{"ts":"2026-08-13T11:06:52.383Z","op":"update","visit":"iterations/i8/package@0","node":"d15","brief":"Resubmitting package with corrected fields"}
+{"ts":"2026-08-13T11:07:12.482Z","op":"done","visit":"iterations/i8/package@0","node":"d6","brief":"package submitted; walk advanced straight to gate-release"}
+{"ts":"2026-08-13T11:07:42.232Z","op":"plan","visit":"iterations/i8/gate-release@0","parent":null,"nodes":[{"id":"d16","brief":"submit and bless gate-release"},{"id":"d17","brief":"reach shipped"},{"id":"d18","brief":"commit"},{"id":"d19","brief":"report"}]}
+{"ts":"2026-08-13T11:08:25.283Z","op":"update","visit":"iterations/i8/gate-release@0","node":"d20","brief":"Resubmitting gate-release after the connection blip"}
+{"ts":"2026-08-13T11:13:00.050Z","op":"update","visit":"iterations/i8/shipped@0","node":"d28","brief":"Walking out to front_desk to resolve the merge via se_run with explicit cwd"}
+{"ts":"2026-08-13T11:20:00.215Z","op":"update","visit":"iterations/i8/shipped@0","node":"d4","brief":"At shipped again; pulling once more to trigger the close"}

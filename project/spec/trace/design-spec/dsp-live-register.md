@@ -14,6 +14,7 @@ files:
   - "project/deliverable/engine/expr.ts"
   - "project/deliverable/engine/bin/bench-vault.ts"
   - "project/deliverable/engine/bin/format-vault.ts"
+  - "project/deliverable/engine/signals.ts"
 ---
 
 ## Responsibility

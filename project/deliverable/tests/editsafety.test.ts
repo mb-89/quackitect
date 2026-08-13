@@ -41,10 +41,14 @@ test("the drawing is data: a state note edited on disk binds the next call, no r
   const session = await sessionAtIdle(root);
   const notePath = join(root, "project", "deliverable", "machines", "states", "idle.md");
   const before = readFileSync(notePath, "utf8");
-  assert.match(before, /^priority: 0\.01$/m, "idle costs nothing to enter");
+  // IDLE IS AUTHORED AS A TIER WORD NOW (owner cut-over ruling 2026-08-12,
+  // machines/scale.md). The line used to read `priority: 0.01`.
+  assert.match(before, /^priority: mechanical$/m, "idle enters at the mechanical rung");
   // SAME BYTE COUNT ON PURPOSE — a cache stamped by size and mtime would
   // sail straight past this edit. The content hash is what catches it.
-  const after = before.replace(/^priority: 0\.01$/m, "priority: 0.75");
+  // `mechanical` is ten characters, so the number replacing it is padded to
+  // ten: 0.75000000 parses as 0.75 and leaves the file exactly as long.
+  const after = before.replace(/^priority: mechanical$/m, "priority: 0.75000000");
   assert.equal(after.length, before.length, "the edit changes no byte count");
   writeFileSync(notePath, after);
   const idle = (session.packet() as { states: { id: string; priority: number }[] }).states.find((s) => s.id === "idle");
