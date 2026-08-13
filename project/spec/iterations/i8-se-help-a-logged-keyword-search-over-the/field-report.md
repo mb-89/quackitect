@@ -810,7 +810,53 @@ still alive.
 **The lesson: never match a process by a string your own command line
 contains.**
 
-### 6.9 The walk does not commit often enough to survive an ephemeral host
+### 6.9 The release step cannot smoke-test what it packages
+
+At M9 the walk packaged the release and then tried to prove the packaged
+server runs, by starting it:
+
+```
+cd /tmp/qk-install-check/project/deliverable
+node engine/bin/se-mcp.ts --root ../..
+```
+
+**That killed the lane the walk was standing in.** Every following `se_` call
+failed with a connection error, and the walk could not even call `se_run` to
+clean up after itself — the tool it needed was the thing that had gone.
+
+The post-mortem, from outside the cage:
+
+- The second instance did **not** linger holding the port. It had already
+  exited.
+- The shared engine's own process was still alive and **deaf**: the shim was
+  up, the HTTP listener was gone, nothing was on 7333.
+- So it was not a port conflict that resolves itself. The second instance took
+  the live listener down on its way through and left a process that would
+  never recover.
+
+Recovery needed an UNCAGED role — kill the deaf process by PID, restart, and
+verify the handshake. A caged agent whose lane is down has no way back by
+construction.
+
+**The design gap: the package step's natural proof is to run what it built,
+and running what it built destroys the lane it is running in.** There is no
+safe in-container smoke test of a packaged server while the lane depends on
+that same server.
+
+Three ways out, for the owner to pick:
+
+- Prove the package WITHOUT starting it — files present, entrypoint resolvable,
+  manifest correct, the packaged tree's own unit tests.
+- Give the packaged instance a private port AND a private state directory, and
+  have the engine refuse to start a second instance against a root that already
+  has a live one.
+- Accept it cannot be honestly verified in-container, and record it as owed —
+  which is what the checkbox built in this very iteration exists for.
+
+The lesson generalises past this repo: **any tool that can be asked to test
+itself needs a guard against being run against its own live instance.**
+
+### 6.10 The walk does not commit often enough to survive an ephemeral host
 
 Three sessions in a row ended with work uncommitted — 46 files, then 29, then
 28 — and each had to be rescued from outside the walk. The machine commits at
