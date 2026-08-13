@@ -14,6 +14,8 @@ priority: must
   Metric: the share of a session's person-minutes spent on redlines and adjudications rather than on writing artifacts. Target: the majority.
 - An idea becomes a durable note without leaving the step in hand.
   Metric: acts from idea to durable note. Target: one.
+- An agent finds the lane tool or guidance page it needs without already knowing its name, and a capability gap it hits leaves a trace instead of vanishing.
+  Metric: se_run calls as a share of all lane calls (guidance/method/retro.md step 8 counted 3249/28612 on 2026-08-07). Target: falling, retro over retro.
 
 ## Unlike
 

@@ -125,7 +125,10 @@ describe("the live offer against the trace", () => {
   // literal declaration line, so a verb registered differently would go
   // silently missing and take its own check with it.
   test("the verb list and the trace are actually being read", () => {
-    assert.equal(registeredVerbs().length, 35, "the lane's verb count moved — confirm the enumerator still sees every one");
+    // 35 at i3, 36 when se_help merged in from the other machine. The exact
+    // count is the point: a new verb SHOULD break this line once, so somebody
+    // confirms the enumerator still sees every one before raising it.
+    assert.equal(registeredVerbs().length, 36, "the lane's verb count moved — confirm the enumerator still sees every one");
     assert.ok(traceText().length > 10000, "the trace read as good as empty — the path or the walk is wrong");
     assert.ok(traceText("use-case").length > 10000, "the use-case layer read as good as empty");
   });

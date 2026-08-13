@@ -553,6 +553,41 @@ export function templateProblems(model: StateFormModel, fills: Record<string, st
   return out;
 }
 
+/** The owed claims a checklist field is carrying — item plus the register
+ *  ref it is addressed to. Only VALID owed lines are reported: an
+ *  unresolved ref already surfaces as a problem, so it is never silently
+ *  folded into the same count as a genuine debt. */
+export function checklistOwed(items: string[], content: string, corpus?: TraceNode[]): { item: string; ref: string }[] {
+  const lines = new Set(content.split("\n").map((l) => l.trim()));
+  const out: { item: string; ref: string }[] = [];
+  for (const i of items) {
+    const st = checklistItemStatus(i, lines, corpus);
+    if (st.kind === "owed") out.push({ item: i, ref: st.ref });
+  }
+  return out;
+}
+
+/** Every checklist field's owed claims across a whole form — what a state's
+ *  verdict and a gate's record both carry, so a debt behind a `submit:
+ *  true` stays visible to whoever reads the result. */
+export function templateOwed(
+  model: StateFormModel,
+  fills: Record<string, string>,
+  root?: string,
+): { field: string; item: string; ref: string }[] {
+  const corpus = root === undefined ? undefined : loadTrace(root);
+  const out: { field: string; item: string; ref: string }[] = [];
+  for (const f of model.template.fields) {
+    const meta = model.template_meta[model.field_templates[f.name] ?? "free-form"];
+    if (meta === undefined || meta.editor !== "checklist") continue;
+    const content = (fills[f.name] ?? "").trim();
+    if (content === "") continue;
+    const args = model.field_args[f.name] ?? NO_ARGS;
+    out.push(...checklistOwed(args.items, content, corpus).map((o) => ({ field: f.name, ...o })));
+  }
+  return out;
+}
+
 /** THE REFERENCES MUST BE OF THE TYPE THE FIELD ASKED FOR. `of: value-prop`
  *  names an item template, and every referenced node must declare that same
  *  type. Without it a field asking for value props accepts a stakeholder, and
@@ -1254,6 +1289,34 @@ function tableProblems(name: string, args: FieldArgs, content: string): string[]
   return [];
 }
 
+/** ONE ITEM'S STANDING against a checklist field's raw content — checked,
+ *  owed to a live register entry, owed to something that will not resolve,
+ *  or simply unchecked. Shared by the check (fieldProblems) and the report
+ *  (checklistOwed), so the two can never disagree about what counts. */
+type ChecklistStatus =
+  | { kind: "checked" }
+  | { kind: "owed"; ref: string }
+  | { kind: "owed_unresolved"; ref: string }
+  | { kind: "unchecked" };
+
+function checklistItemStatus(item: string, lines: Set<string>, corpus?: TraceNode[]): ChecklistStatus {
+  if (lines.has(`- [x] ${item}`)) return { kind: "checked" };
+  const prefix = `- [owed] ${item} — `;
+  const owedLine = [...lines].find((l) => l.startsWith(prefix));
+  if (owedLine === undefined) return { kind: "unchecked" };
+  const ref = owedLine.slice(prefix.length).trim();
+  return openRaidRef(ref, corpus) ? { kind: "owed", ref } : { kind: "owed_unresolved", ref };
+}
+
+/** Does `ref` name an OPEN entry in the raid register? An owed box points at
+ *  a register entry rather than a tick, so the ref has to resolve to a
+ *  standing debt — closed, decided or missing entries refuse exactly like an
+ *  unchecked box, because there is nobody left holding the claim. */
+function openRaidRef(ref: string, corpus?: TraceNode[]): boolean {
+  const n = (corpus ?? []).find((n) => n.type === "raid" && n.id === ref);
+  return n !== undefined && n.file !== undefined && nodeField(n.file, "status") === "open";
+}
+
 export function fieldProblems(
   name: string,
   meta: TemplateMeta,
@@ -1296,10 +1359,26 @@ export function fieldProblems(
   // CHECKING IS THE CLAIM (owner ruling 2026-08-11): a checklist refuses
   // while any named item stands unchecked. There is no text to write — the
   // deliberate click is the record, and an unchecked box is work still owed.
+  //
+  // A THIRD STATE, FOR WHAT CANNOT BE HONESTLY OBSERVED (owner ruling
+  // 2026-08-13). The `none` door below solves the same shape of problem for
+  // an empty set: rather than fabricate a row, write an honest claim of a
+  // different shape. `- [owed] <item> — <ref>` does the same for one claim
+  // an unattended agent cannot check — <ref> MUST resolve to an OPEN entry
+  // in the raid register, so the debt is addressed to someone with a
+  // trigger, not merely declared. It never counts as checked; a missing or
+  // unresolved ref refuses exactly like an unchecked box, because today the
+  // only honest alternative to an owed box is a stall — and this is
+  // strictly more information than a tick.
   if (meta.editor === "checklist" && args.items.length > 0) {
     const lines = new Set(content.split("\n").map((l) => l.trim()));
-    const unchecked = args.items.filter((i) => !lines.has(`- [x] ${i}`));
-    if (unchecked.length > 0) out.push(`${name}: unchecked — ${unchecked.join(" · ")}`);
+    const unmet = args.items.flatMap((i) => {
+      const st = checklistItemStatus(i, lines, corpus);
+      if (st.kind === "unchecked") return [i];
+      if (st.kind === "owed_unresolved") return [`${i} (owed ref "${st.ref}" is not an open raid entry)`];
+      return [];
+    });
+    if (unmet.length > 0) out.push(`${name}: unchecked — ${unmet.join(" · ")}`);
   }
   // AN EMPTY SET IS A CLAIM, AND IT IS WRITTEN (2026-08-09). The refs template
   // already rules this — "one line saying none" is a legal answer — because a

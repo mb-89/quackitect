@@ -38,12 +38,10 @@ address, over a run that attempts at least one.
 
 ## Detail
 
-THE DEMAND IS NOT MET TODAY, and that is why this row exists rather than
-describing what already works.
-
-`server.listen(o.port)` passes no host, and Node then binds every interface.
-The comment three lines above it says "the server never leaves localhost",
-which is what somebody believed rather than what the call does.
+MET, as of a later fix this row's own source_refs predate: `server.listen(o.port,
+"127.0.0.1")` now passes the loopback host explicitly (engine/mirror.ts:915),
+so Node binds only that interface. Found stale during the i8 ATAM walk
+(evaluate-architecture) — this section still described the pre-fix call.
 
 WHAT IS EXPOSED IF THIS IS WRONG. The mirror serves the whole record: the
 call log, every evidence form, every decision, the terminal widget. There is

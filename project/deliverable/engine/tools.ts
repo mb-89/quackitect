@@ -31,6 +31,7 @@ import { CLAUSES, Rejection, type RejectionPayload } from "./errors.ts";
 import type { PatchOp } from "./files.ts";
 import { gitLand, gitLane, gitSync } from "./gitlane.ts";
 import { contentHash } from "./hash.ts";
+import { rankDemand, searchHelp } from "./help.ts";
 import { appendNote, drainNote, type Priority, readNotes } from "./inbox.ts";
 import { capJson, capMiddle } from "./jsonio.ts";
 import { LINT_CONFIG, lintProse } from "./lint.ts";
@@ -1559,6 +1560,39 @@ export function buildServer(
       () => ({ session, root, lastPacket: undefined, mode: "manual" }),
     ),
   ];
+  // WIRED HERE, NOT INSIDE coreTools. searchHelp needs the FULL assembled
+  // catalog (session + expedition + core tools), which exists only once
+  // the array above is built (dsp-help-search.md's own interface note).
+  tools.push({
+    name: "se_help",
+    title: "se.help",
+    description:
+      "Search the lane's tools and guidance by plain words — ranked word-overlap over each tool's name/title/description and each guidance page's path/statement. A miss (zero matches) is appended to a durable ranked demand log; se_help {demands: true} reads that log back, grouped by shape, most-demanded first. Does not do synonym or stem matching, does not replace reading a tool's full schema, and does not search the codebase or the web — se_file_search and se_web_search do that.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: { type: "string", description: "plain words — what you're trying to find" },
+        demands: { type: "boolean", description: "true: return the ranked missing-tool demand log instead of searching" },
+      },
+    },
+    handler: (args) => {
+      if (args.demands === true) return { demands: rankDemand(root) };
+      if (typeof args.query !== "string" || args.query.trim() === "") {
+        throw new Rejection({
+          clause: CLAUSES.REQUIRED_ARGS,
+          expected: "se_help requires: query (or demands: true)",
+          got: `received: ${Object.keys(args).join(", ") || "nothing"}`,
+          remedy: {
+            tool: "se_help",
+            args: { query: "<plain words>" },
+            note: "search with a query, or pass demands: true for the ranked miss log",
+          },
+          source: "engine/tools.ts se_help",
+        });
+      }
+      return searchHelp(root, args.query, tools);
+    },
+  });
   // THE UPDATE FIELD — every lane tool accepts it: a decision-graph op
   // riding the call. Declared on every schema so harnesses send it as an
   // object (an undeclared property arrives as a JSON string — v2 lesson).

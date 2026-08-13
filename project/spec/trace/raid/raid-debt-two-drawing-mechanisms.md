@@ -25,3 +25,12 @@ Sweep 2026-08-13, at i3's onboarding retro: RE-ACCEPTED consciously.
 Neither trigger has fired. The picture-in-picture design discussion is
 still parked as note-ed999c4b64b1, and the seeded-machine compiler has
 not been touched. The trigger stands unchanged.
+
+Sweep 2026-08-13, second retro of the same day, on another machine:
+re-accepted consciously. No picture-in-picture design discussion and no
+change to the seeded-machine compiler happened that period either — i8
+built se.help, which is unrelated. Trigger stands unchanged.
+
+BOTH SWEEPS ARE KEPT ON PURPOSE. Two machines swept this row the same
+day and reached the same verdict independently, which is worth more than
+either entry alone. They were merged rather than deduplicated.
