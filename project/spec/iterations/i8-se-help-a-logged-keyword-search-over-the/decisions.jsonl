@@ -129,3 +129,11 @@
 {"ts":"2026-08-12T21:44:31.091Z","op":"update","visit":"iterations/i8/trace-design@0","node":"d132","brief":"submitting trace-design, letting the mechanical sweep report what's missing if anything"}
 {"ts":"2026-08-12T21:44:35.609Z","op":"update","visit":"iterations/i8/trace-design@0","node":"d133","brief":"filling current_situation and follow_up, resubmitting trace-design"}
 {"ts":"2026-08-12T21:44:43.724Z","op":"update","visit":"iterations/i8/trace-design@0","node":"d134","brief":"checking the wait state cleanly — trace-design signed off, no further route drawn"}
+{"ts":"2026-08-13T06:45:41.952Z","op":"update","visit":"iterations/i8/trace-design@0","node":"d5","brief":"checking trace-design evidence before resuming the walk"}
+{"ts":"2026-08-13T06:45:46.025Z","op":"done","visit":"front_desk@0","node":"d4","brief":"confirmed trace-design already signed off; resolving nav confusion"}
+{"ts":"2026-08-13T06:45:49.929Z","op":"update","visit":"iterations/i8/trace-design@0","node":"d6","brief":"locating next state after trace-design in the machine drawing"}
+{"ts":"2026-08-13T06:48:36.247Z","op":"fork","visit":"iterations/i8/trace-design@0","parent":null,"node":"d7","brief":"malformed files: field on dsp-help-search likely blocks trace-design exit","nodes":[]}
+{"ts":"2026-08-13T06:51:19.750Z","op":"update","visit":"iterations/i8/trace-design@0","node":"d8","brief":"found 2 unclaimed engine files (puml_mindmap.ts, signals.ts) blocking the sweep"}
+{"ts":"2026-08-13T06:51:22.686Z","op":"update","visit":"iterations/i8/trace-design@0","node":"d9","brief":"tracing puml_mindmap.ts import chain; checking signals.ts next"}
+{"ts":"2026-08-13T06:51:32.186Z","op":"update","visit":"iterations/i8/trace-design@0","node":"d10","brief":"claiming puml_mindmap.ts under dsp-trace-corpus, signals.ts under dsp-live-register"}
+{"ts":"2026-08-13T06:57:18.665Z","op":"update","visit":"iterations/i8/verification@0","node":"d11","brief":"hit a real blocker at verification: legal_tools empty, cannot inspect the 8 claim-specs"}

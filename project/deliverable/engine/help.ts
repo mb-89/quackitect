@@ -32,8 +32,65 @@ export interface HelpResult {
 const SNIPPET_CAP = 160;
 const MAX_MATCHES = 10;
 
+// Function words carry no search intent and are common enough to coincide
+// with unrelated prose across a corpus this size — left in, "nothing" alone
+// would false-match any nonsense query against se_file_read's own
+// description ("nothing is ever silently truncated").
+const STOPWORDS = new Set([
+  "a",
+  "an",
+  "the",
+  "is",
+  "are",
+  "was",
+  "were",
+  "be",
+  "been",
+  "being",
+  "to",
+  "of",
+  "in",
+  "on",
+  "at",
+  "by",
+  "for",
+  "with",
+  "from",
+  "as",
+  "and",
+  "or",
+  "but",
+  "nor",
+  "so",
+  "if",
+  "then",
+  "than",
+  "this",
+  "that",
+  "these",
+  "those",
+  "it",
+  "its",
+  "not",
+  "no",
+  "do",
+  "does",
+  "did",
+  "have",
+  "has",
+  "had",
+  "what",
+  "which",
+  "who",
+  "whom",
+  "when",
+  "where",
+  "why",
+  "how",
+]);
+
 function words(s: string): string[] {
-  return s.toLowerCase().match(/[a-z0-9]+/g) ?? [];
+  return (s.toLowerCase().match(/[a-z0-9]+/g) ?? []).filter((w) => !STOPWORDS.has(w));
 }
 
 /** How many of the query's words appear in the haystack — the whole scoring
@@ -45,6 +102,35 @@ function overlapScore(queryWords: string[], haystack: string): number {
   let score = 0;
   for (const w of queryWords) if (hay.has(w)) score += 1;
   return score;
+}
+
+// A word living in the tool's OWN NAME/title, or the guidance doc's OWN
+// PATH, is a far stronger relevance signal than the same word turning up
+// somewhere in the body prose — weighted so "drain a stray note" ranks
+// se_note_drain (drain+note in its own name) over se_note (note only,
+// drain absent, tied by body prose alone) on merit, not an alphabetical
+// coin-flip.
+const IDENTITY_WEIGHT = 3;
+
+// A word or two shared with a huge corpus by accident is noise, not a
+// match — require most of the query's distinct words to turn up (identity
+// or body, either counts once), scaled to the query's own length rather
+// than a flat count. A flat floor of 2 let se_help's own description (it
+// talks about "matches" and a miss scoring "nothing") false-hit a
+// five-word nonsense query on two coincidental words; 60% asks for three
+// of five there while still asking for only two of three on a short,
+// real query ("drain a stray note" only ever lands two of its three
+// content words on any single candidate).
+function minMatches(queryWords: string[]): number {
+  return Math.max(1, Math.ceil(queryWords.length * 0.6));
+}
+
+function distinctMatches(queryWords: string[], identity: string, body: string): number {
+  const idHay = new Set(words(identity));
+  const bodyHay = new Set(words(body));
+  let n = 0;
+  for (const w of queryWords) if (idHay.has(w) || bodyHay.has(w)) n += 1;
+  return n;
 }
 
 function guidanceStatement(root: string, path: string): string {
@@ -60,15 +146,19 @@ function guidanceStatement(root: string, path: string): string {
  *  assembled it. A miss is recorded before this returns. */
 export function searchHelp(root: string, query: string, tools: ToolDef[]): HelpResult {
   const qWords = words(query);
+  const floor = minMatches(qWords);
   const matches: HelpMatch[] = [];
   for (const t of tools) {
-    const score = overlapScore(qWords, `${t.name} ${t.title} ${t.description}`);
-    if (score > 0) matches.push({ kind: "tool", name: t.name, score, snippet: headline(t.description, SNIPPET_CAP) });
+    const identity = `${t.name} ${t.title}`;
+    if (distinctMatches(qWords, identity, t.description) < floor) continue;
+    const score = overlapScore(qWords, identity) * IDENTITY_WEIGHT + overlapScore(qWords, t.description);
+    matches.push({ kind: "tool", name: t.name, score, snippet: headline(t.description, SNIPPET_CAP) });
   }
   for (const d of scanGuidance(root)) {
     const statement = guidanceStatement(root, d.path);
-    const score = overlapScore(qWords, `${d.path} ${statement}`);
-    if (score > 0) matches.push({ kind: "guidance", name: d.path, score, snippet: headline(statement, SNIPPET_CAP) });
+    if (distinctMatches(qWords, d.path, statement) < floor) continue;
+    const score = overlapScore(qWords, d.path) * IDENTITY_WEIGHT + overlapScore(qWords, statement);
+    matches.push({ kind: "guidance", name: d.path, score, snippet: headline(statement, SNIPPET_CAP) });
   }
   matches.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
   const top = matches.slice(0, MAX_MATCHES);

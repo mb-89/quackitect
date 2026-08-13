@@ -6,7 +6,8 @@ statement: A plain-words keyword search over the lane's tools and guidance, with
 realizes:
   - "el-walk-engine"
 files:
-  - "project/deliverable/engine/help.ts, project/deliverable/engine/tools.ts"
+  - "project/deliverable/engine/help.ts"
+  - "project/deliverable/engine/tools.ts"
 ---
 
 ## Responsibility
