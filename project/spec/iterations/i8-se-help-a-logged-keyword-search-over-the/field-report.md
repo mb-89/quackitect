@@ -824,19 +824,50 @@ node engine/bin/se-mcp.ts --root ../..
 failed with a connection error, and the walk could not even call `se_run` to
 clean up after itself — the tool it needed was the thing that had gone.
 
-The post-mortem, from outside the cage:
+The post-mortem, from outside the cage. **The first version of this section
+got the mechanism wrong, and the correction is the useful part.**
+
+What is certain:
 
 - The second instance did **not** linger holding the port. It had already
-  exited.
-- The shared engine's own process was still alive and **deaf**: the shim was
-  up, the HTTP listener was gone, nothing was on 7333.
-- So it was not a port conflict that resolves itself. The second instance took
-  the live listener down on its way through and left a process that would
-  never recover.
+  exited when the outage was investigated.
+- During the outage `GET /` did not answer inside a 5-second timeout, and
+  nothing showed as listening on 7333.
+- **Both server processes stayed alive the whole time**, with the correct
+  working directory.
+- The server log records **no crash** — only its clean startup lines.
 
-Recovery needed an UNCAGED role — kill the deaf process by PID, restart, and
-verify the handshake. A caged agent whose lane is down has no way back by
-construction.
+The first reading was "the listener is gone and will never recover", and the
+supervising role killed the processes and restarted them on that basis. Two
+pieces of evidence say that was wrong:
+
+- The caged agent reported the lane **self-recovering** after two or three
+  retries, with no intervention.
+- A later outage cleared by itself, back to `200`, with no restart at all.
+
+**So the engine BLOCKS; it does not die.** A timeout was read as a death, and
+a restart was applied to a server that was merely busy. The restart appeared
+to work, which is exactly how a wrong diagnosis survives.
+
+The trigger is `package.ts`, not the packaged server. It copies the ENTIRE
+project root to a temp directory with a synchronous `cpSync`, then spawns
+`zip -r` across the result. The lane goes unresponsive for the duration and
+returns afterwards.
+
+**The mechanism is not settled**, and the honest options are:
+
+- I/O and CPU starvation in a small container makes the engine miss its
+  window.
+- The engine's own file watchers churn on the copy.
+- Something in the packaging touches state the engine holds.
+
+Naming it as unsettled is deliberate. A confident wrong mechanism is what
+this section already produced once.
+
+**What still stands regardless of mechanism:** a caged agent whose lane is
+unresponsive cannot call `se_run` to investigate or clean up, because the
+tool it needs is the thing that is gone. Diagnosis needed the UNCAGED role.
+That part of the finding survives the correction.
 
 **The design gap: the package step's natural proof is to run what it built,
 and running what it built destroys the lane it is running in.** There is no
