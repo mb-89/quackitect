@@ -568,6 +568,33 @@ The missing verb is therefore not "a shell". It is **`se_test` legal at
 `observe-red`**, plus job control (`list`, `poll`, `stop`) as first-class lane
 verbs rather than `se_run` arguments.
 
+### The test lane held its scope, and the job lane did not hold its patience
+
+Two numbers that look like one problem and are not.
+
+**Scope discipline HELD.** Across the whole run, 16 test runs were started:
+
+- 13 SCOPED — named files, several narrowed further by `name_pattern` to a
+  single test.
+- 3 BATTERY — and M7 verification demands the battery by its own text ("the
+  full battery runs mechanically", `floor: true`).
+
+So the battery ran three times where the method asked for it, not once out of
+habit. The lane's `TEST_SCOPE` clause did its job.
+
+**Job polling did NOT.** 81 further calls were polls of already-running jobs,
+and **56 of them were the same job**: `test-msqkf74m-1`. That job never
+finished, because of the recursive `fs.watch` defect. The agent polled a dead
+job fifty-six times.
+
+The root cause is fixed. The poll loop is not: nothing in the lane gives a
+job a deadline, so an agent facing a hung job has no signal to stop asking. A
+job that has not moved deserves an answer that says so.
+
+**Do not read the two together.** A raw `se_test` count looks like the battery
+ran twenty-six times. It ran three. The polls are the noise, and the noise is
+the defect.
+
 ### Refusals — 10 distinct clauses, 139 firings
 
 | times | clause | what it is |
