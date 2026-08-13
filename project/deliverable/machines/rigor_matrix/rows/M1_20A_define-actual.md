@@ -21,7 +21,7 @@ evidence:
   - name: as_is
     description: where we stand, good and bad, witnesses named
 major: tailored
-minor: inherit
+minor: none
 patch: none
 product: full
 specification: full
@@ -30,9 +30,12 @@ major_note: |
   witnesses - a major usually exists because the recorded as-is no longer
   tells the whole story. The untouched baseline inherits by pointer.
 minor_note: |
-  INHERIT the resident baseline; state only the NEW pains the delta
-  answers, one paragraph each, witnesses named. The v2 state-inheritance
-  note already carried this rule - it becomes the default at this size.
+  Does not apply (owner ruling 2026-08-13). The as-is baseline stands: a
+  minor changes what the system DOES, not the record of the pains it was
+  built to answer.
+
+  ESCALATE: a delta answering a pain nobody had recorded is arguing for a
+  new baseline, and that is major territory.
 patch_note: |
   Does not apply. The as-is baseline stands; a patch changes behavior, not
   the recorded pains. STRIKE PROPOSAL - owner adjudicates.

@@ -171,9 +171,16 @@ export function startMirror(o: MirrorOptions): Server {
     // THE NOW BUTTON. It does not narrate for the agent — it makes an
     // update DUE, so the next call has to carry one.
     "/narration-now": ["mirror_narration_now", () => ({ args: {}, result: state.session.narrationDueNow() })],
-    // The slider — how much of the walk is the agent's. Logged like
-    // every other hand on the machinery.
-    "/autonomy": ["mirror_autonomy", (body) => ({ args: { value: body.value }, result: state.session.setAutonomy(Number(body.value)) })],
+    // The rungs — how much of the walk is the agent's. Logged like every
+    // other hand on the machinery, and the TIER WORD rides with the number
+    // so the feed never draws a bare value (req-autonomy-is-categorical).
+    "/autonomy": [
+      "mirror_autonomy",
+      (body) => {
+        const result = state.session.setAutonomy(Number(body.value));
+        return { args: { value: body.value, ...(typeof result.tier === "string" ? { tier: result.tier } : {}) }, result };
+      },
+    ],
     // ONE OWED CELL PER CLICK from the element matrix — the interface
     // skeleton mints with its crossing flows before the answer returns.
     "/form/ifcell": [

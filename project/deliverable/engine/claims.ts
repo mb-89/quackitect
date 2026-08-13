@@ -19,6 +19,8 @@ export interface ClaimTaken {
   iteration: string;
   machine: string;
   at: string;
+  /** Set when the iteration SHIPPED. A done claim is spent, never freed. */
+  done?: string;
 }
 
 export interface ClaimResult {
@@ -38,6 +40,7 @@ export interface LedgerRow {
   machine: string;
   at: string;
   released_by?: string;
+  done?: string;
 }
 
 /** Mint once, eight hex, machine-local and outside every push. */
@@ -65,7 +68,16 @@ const rev = (repo: string, ref: string): string | undefined => {
   return r.ok ? r.stdout : undefined;
 };
 
-const fetchClaims = (repo: string): boolean => gitIO(repo, ["fetch", "origin", "claims"]).ok;
+/** ONLINE MEANS THE REMOTE ANSWERS, never that the branch is already there.
+ *  A fetch of a branch nobody has created yet FAILS, and that failure used to
+ *  read as offline — so the very first claim recorded locally and never
+ *  announced. ls-remote tells the two apart: it exits clean for a remote that
+ *  answers, whatever branches it happens to hold, and fails only when the
+ *  remote is genuinely out of reach. */
+const fetchClaims = (repo: string): boolean => {
+  if (gitIO(repo, ["fetch", "origin", "claims"]).ok) return true;
+  return gitIO(repo, ["ls-remote", "--heads", "origin"]).ok;
+};
 
 const treeHas = (repo: string, ref: string, path: string): boolean => gitIO(repo, ["cat-file", "-e", `${ref}:${path}`]).ok;
 
@@ -78,6 +90,7 @@ const parseClaim = (iteration: string, body: string): ClaimTaken & { released_by
     machine: key("machine") ?? "",
     at: key("at") ?? "",
     ...(key("released_by") === undefined ? {} : { released_by: key("released_by") }),
+    ...(key("done") === undefined ? {} : { done: key("done") }),
   };
 };
 
@@ -156,6 +169,12 @@ export function claimIteration(repo: string, iteration: string, machine: string)
     if (originTip !== undefined) {
       if (treeHas(repo, originTip, path)) {
         const holder = parseClaim(iteration, readBlob(repo, originTip, path));
+        // A DONE claim is SPENT. The iteration shipped, so there is no second
+        // walk of it and no second holder — not even the machine that shipped
+        // it. Checked BEFORE the release branch on purpose: released means
+        // back in the pool, done means gone from it, and only one of those
+        // two words may ever hand the record out again.
+        if (holder.done !== undefined) return { ok: false, offline: false, taken: holder };
         // A RELEASED claim is claimable again: the new claim rewrites the file.
         if (holder.released_by === undefined) {
           if (holder.machine !== machine) return { ok: false, offline: false, taken: holder };
@@ -178,24 +197,41 @@ export function claimIteration(repo: string, iteration: string, machine: string)
 
 export interface EntryGate {
   ok: boolean;
+  /** A ledger governs this entry. Always true since the pool opens itself —
+   *  kept because a caller reads intent from it, not just from `ok`. */
   pool: boolean;
   claimed_now?: boolean;
   offline?: boolean;
   holder?: ClaimTaken;
+  /** The refusal is FINAL, not a wait. The record shipped and no later claim
+   *  can open it, so the caller says so rather than offering another try. */
+  shipped?: boolean;
 }
 
 /** THE ENTRY GATE — the record store opens a record only over a standing
- *  claim. No claims branch anywhere means no pool: entry is free, exactly
- *  as a single-machine product works today. With a pool: this machine's
- *  claim admits, another's refuses naming the holder, and an unclaimed
- *  iteration is claimed in the entry act. */
+ *  claim, and entry is what mints one. This machine's claim admits,
+ *  another's refuses naming the holder, and an unclaimed iteration is
+ *  claimed in the entry act.
+ *
+ *  THE POOL OPENS ITSELF. A missing claims branch is not a product without a
+ *  pool; it is a pool nobody has opened, and only a claim can open it. This
+ *  used to return "no pool" and record nothing, which made the branch
+ *  uncreatable: no branch meant no claim, and no claim meant no branch. Every
+ *  entry was admitted and none was recorded, which is how a second machine
+ *  worked i8 on 2026-08-12 with no claim to show for it. So a missing branch
+ *  falls straight through to the claim, which mints it from an empty tree.
+ *  Owner ruling 2026-08-13: no product needs an opening act of its own. */
 export function claimEntry(repo: string, iteration: string, machine: string): EntryGate {
   fetchClaims(repo);
   const tip = rev(repo, ORIGIN_REF) ?? rev(repo, CLAIMS_REF);
-  if (tip === undefined) return { ok: true, pool: false };
   const path = claimPath(iteration);
-  if (treeHas(repo, tip, path)) {
+  if (tip !== undefined && treeHas(repo, tip, path)) {
     const holder = parseClaim(iteration, readBlob(repo, tip, path));
+    // SHIPPED IS THE END OF THE RECORD, not a claim somebody is holding.
+    // There is no second i8, so the gate refuses even the machine that did
+    // the work — re-entering a shipped record would walk a machine whose
+    // evidence already stands signed and whose worktree is gone.
+    if (holder.done !== undefined) return { ok: false, pool: true, shipped: true, holder };
     if (holder.released_by === undefined) {
       if (holder.machine === machine) return { ok: true, pool: true };
       return { ok: false, pool: true, holder };
@@ -204,6 +240,55 @@ export function claimEntry(repo: string, iteration: string, machine: string): En
   const r = claimIteration(repo, iteration, machine);
   if (r.ok) return { ok: true, pool: true, claimed_now: true, offline: r.offline };
   return { ok: false, pool: true, holder: r.taken };
+}
+
+/** DONE — the work SHIPPED, so the claim is spent rather than freed.
+ *
+ *  A RELEASE AND A COMPLETION ARE NOT THE SAME ACT, and conflating them was
+ *  the hole. forceRelease hands an iteration back to the pool and the next
+ *  machine may take it. This ENDS it: a shipped iteration is never walked
+ *  again, and there is never a second i8 (owner ruling 2026-08-13). So the
+ *  ledger needs two words, and `done` is the one that closes the door.
+ *
+ *  WHY THE LEDGER AND NOT THE RECORD. The record's own status says shipped
+ *  already, and it says so on a branch nobody fetches by default. The ledger
+ *  is the one file every machine reads before it enters anything, so it is
+ *  the only place a completion actually reaches a peer.
+ *
+ *  IT WORKS WITH OR WITHOUT A STANDING CLAIM. A record that shipped before
+ *  the ledger existed has nothing to append to, and the close must still be
+ *  recordable — so a missing claim file is WRITTEN carrying the done stamp
+ *  rather than skipped. Skipping would leave the ledger silent about exactly
+ *  the records that are finished, which is the worst half to lose.
+ *
+ *  IT IS IDEMPOTENT. A second close finds the stamp and reports it rather
+ *  than stacking another commit; closes are re-run by resumed walks.
+ *
+ *  OFFLINE IS RECORDED, NEVER LOST — the local ref carries it and a later
+ *  announce pushes it, exactly as a claim does. A ship must not need a
+ *  network to be true. */
+export function completeClaim(repo: string, iteration: string, machine: string): { ok: boolean; offline: boolean; already?: boolean } {
+  const path = claimPath(iteration);
+  for (let round = 0; round < 3; round++) {
+    const online = fetchClaims(repo);
+    // Fast-forward the local ref onto the origin's ONLY where the origin
+    // already contains it. A bare reset would silently drop a claim this
+    // machine recorded and has not announced yet.
+    const originTip = rev(repo, ORIGIN_REF);
+    const local = rev(repo, CLAIMS_REF);
+    if (originTip !== undefined && (local === undefined || gitIO(repo, ["merge-base", "--is-ancestor", CLAIMS_REF, originTip]).ok)) {
+      gitIO(repo, ["update-ref", CLAIMS_REF, originTip]);
+    }
+    const base = rev(repo, CLAIMS_REF) ?? rev(repo, ORIGIN_REF);
+    const standing = base !== undefined && treeHas(repo, base, path) ? readBlob(repo, base, path) : undefined;
+    if (standing !== undefined && parseClaim(iteration, standing).done !== undefined) return { ok: true, offline: false, already: true };
+    const body = standing ?? `machine: ${machine}\nat: ${new Date().toISOString()}\n`;
+    const content = `${body.replace(/\n*$/, "\n")}done: ${new Date().toISOString()}\nshipped_by: ${machine}\n`;
+    buildClaimCommit(repo, base, path, content, `done ${iteration} — shipped`, machine);
+    if (!online) return { ok: true, offline: true };
+    if (push(repo)) return { ok: true, offline: false };
+  }
+  return { ok: false, offline: false };
 }
 
 /** RELEASE — a person's second commit on the same file, recording who
@@ -232,7 +317,10 @@ export function pushSeed(repo: string, branch: string): { ok: boolean } {
 
 export interface ListingRow {
   iteration: string;
-  state: "unclaimed" | "claimed" | "released";
+  /** done is TERMINAL and the other three are not. An agent picking work
+   *  reads this word alone, so it has to separate what shipped from what is
+   *  merely free. */
+  state: "unclaimed" | "claimed" | "released" | "done";
   machine?: string;
   at?: string;
   age_ms?: number;
@@ -258,9 +346,11 @@ export function claimListing(repo: string): ListingRow[] {
       const claim = ledger.get(iteration);
       if (claim === undefined) return { iteration, state: "unclaimed" as const };
       const age = Number.isNaN(Date.parse(claim.at)) ? {} : { age_ms: Date.now() - Date.parse(claim.at) };
+      const state =
+        claim.done !== undefined ? ("done" as const) : claim.released_by === undefined ? ("claimed" as const) : ("released" as const);
       return {
         iteration,
-        state: claim.released_by === undefined ? ("claimed" as const) : ("released" as const),
+        state,
         machine: claim.machine,
         at: claim.at,
         ...age,
@@ -279,4 +369,10 @@ export function claimsLedger(repo: string): LedgerRow[] {
     .split("\n")
     .filter((p) => p.endsWith(".md"))
     .map((p) => parseClaim(p.replace(/^claims\//, "").replace(/\.md$/, ""), readBlob(repo, ref, p)));
+}
+
+/** Has this iteration shipped, per the ledger? One question, asked by the
+ *  listing and by anything that must not offer finished work as available. */
+export function claimIsDone(repo: string, iteration: string): boolean {
+  return claimsLedger(repo).some((r) => r.iteration === iteration && r.done !== undefined);
 }

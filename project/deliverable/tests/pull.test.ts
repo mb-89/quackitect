@@ -38,7 +38,8 @@ describe("the pull instructs where a refusal would have thrown", { concurrency: 
     assert.equal(r.waiting_for, "the person");
     assert.equal(r.at, "overhaul", "the agent must be able to say WHICH step waits");
     assert.match(String(r.why), /above the session autonomy 0\.4/);
-    assert.match(String(r.do), /slider alone cannot wake you/, "and that a message is what resumes it");
+    // The served wait says DIAL, matching contract rule 3's own wording.
+    assert.match(String(r.do), /dial alone cannot wake you/, "and that a message is what resumes it");
   });
 
   test("the slider is weighed BEFORE the reading, so a forbidden step owes nothing", async () => {

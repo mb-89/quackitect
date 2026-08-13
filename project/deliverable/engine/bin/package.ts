@@ -8,7 +8,7 @@
 import { spawnSync } from "node:child_process";
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, relative, sep } from "node:path";
+import { join, relative, resolve, sep } from "node:path";
 import { loadBrand } from "../brand.ts";
 
 function arg(name: string): string | undefined {
@@ -73,16 +73,19 @@ const readme = readFileSync(join(root, "project", "deliverable", "brand", "READM
 writeFileSync(join(stage, "README.md"), readme, "utf8");
 
 mkdirSync(outDir, { recursive: true });
-const zipPath = join(outDir, `${brand.id}-${version}.zip`);
+const zipPath = resolve(join(outDir, `${brand.id}-${version}.zip`));
 rmSync(zipPath, { force: true });
-const r = spawnSync(
-  "powershell",
-  ["-NoProfile", "-Command", `Compress-Archive -Path '${stage}\\*' -DestinationPath '${zipPath}' -CompressionLevel Optimal`],
-  { stdio: ["ignore", "inherit", "inherit"] },
-);
+const r =
+  process.platform === "win32"
+    ? spawnSync(
+        "powershell",
+        ["-NoProfile", "-Command", `Compress-Archive -Path '${stage}\\*' -DestinationPath '${zipPath}' -CompressionLevel Optimal`],
+        { stdio: ["ignore", "inherit", "inherit"] },
+      )
+    : spawnSync("zip", ["-r", "-X", zipPath, "."], { cwd: stage, stdio: ["ignore", "inherit", "inherit"] });
 rmSync(stage, { recursive: true, force: true });
 if (r.status !== 0) {
-  process.stderr.write("packaging FAILED — Compress-Archive did not produce the archive\n");
+  process.stderr.write("packaging FAILED — the archive tool did not produce the archive\n");
   process.exit(1);
 }
 process.stdout.write(`${zipPath}\n`);

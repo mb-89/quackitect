@@ -27,7 +27,7 @@ The agent HAS a finger: `se_panel {ping: "<surface>"}` lights the named
 surface yellow in every open mirror window. Targets:
 
 - a card id, which is its title from
-  `project/deliverable/deliverable/views/cards.md`, slugged
+  `project/deliverable/views/cards.md`, slugged
 - the widget a card shows
 - a drawn state id
 - an element id

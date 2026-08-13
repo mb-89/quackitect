@@ -7,7 +7,7 @@
 // the save rewrites and the only thing the ingest reads (the v1 book's
 // comment law, reapplied).
 import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { type ExposureView, exposureView, type MetricRow, type ScenarioDeckView, scenarioDeckView, structureMetrics } from "./atamwalk.ts";
 import { catalogItems, trizParameterItems } from "./catalogs.ts";
 import { type Judgment, type RelationKind, type WalkResult, walk } from "./compare.ts";
@@ -506,6 +506,24 @@ export function choiceOf(content: string): string {
   return i < 0 ? first : first.slice(0, i).trim();
 }
 
+/** THE CHOSEN OPTION, read by the same extractor that validated the pick.
+ *
+ *  The field is `<choice> — <why>`, and the why is prose which may perfectly
+ *  reasonably name another option. So the answer comes from the CHOICE half,
+ *  and nothing is inferred from the sentence beside it.
+ *
+ *  TWO PARSERS FOR ONE FACT, AND THEY DISAGREED. The kickoff's pin used to
+ *  scan the whole field for any column name in declaration order. `patch`
+ *  came first, so a rationale ending "a new line is not a patch" pinned an
+ *  iteration blessed as MINOR to the patch column — eleven approved states
+ *  struck, and a build skipped, because a patch seeds no chunks.
+ *
+ *  Pinned by tests/change-size.test.ts, including that exact sentence. */
+export function chosenOption(content: string, options: readonly string[]): string | undefined {
+  const choice = choiceOf(content).toLowerCase();
+  return options.find((o) => o === choice);
+}
+
 /** The rationale half, or "" where the line carries none. */
 export function rationaleOf(content: string): string {
   const first = (content.split("\n")[0] ?? "").trim();
@@ -531,6 +549,41 @@ export function templateProblems(model: StateFormModel, fills: Record<string, st
     const content = (fills[f.name] ?? "").trim();
     if (content === "") continue;
     out.push(...fieldProblems(f.name, meta, model.field_args[f.name] ?? NO_ARGS, content, corpus, root));
+  }
+  return out;
+}
+
+/** The owed claims a checklist field is carrying — item plus the register
+ *  ref it is addressed to. Only VALID owed lines are reported: an
+ *  unresolved ref already surfaces as a problem, so it is never silently
+ *  folded into the same count as a genuine debt. */
+export function checklistOwed(items: string[], content: string, corpus?: TraceNode[]): { item: string; ref: string }[] {
+  const lines = new Set(content.split("\n").map((l) => l.trim()));
+  const out: { item: string; ref: string }[] = [];
+  for (const i of items) {
+    const st = checklistItemStatus(i, lines, corpus);
+    if (st.kind === "owed") out.push({ item: i, ref: st.ref });
+  }
+  return out;
+}
+
+/** Every checklist field's owed claims across a whole form — what a state's
+ *  verdict and a gate's record both carry, so a debt behind a `submit:
+ *  true` stays visible to whoever reads the result. */
+export function templateOwed(
+  model: StateFormModel,
+  fills: Record<string, string>,
+  root?: string,
+): { field: string; item: string; ref: string }[] {
+  const corpus = root === undefined ? undefined : loadTrace(root);
+  const out: { field: string; item: string; ref: string }[] = [];
+  for (const f of model.template.fields) {
+    const meta = model.template_meta[model.field_templates[f.name] ?? "free-form"];
+    if (meta === undefined || meta.editor !== "checklist") continue;
+    const content = (fills[f.name] ?? "").trim();
+    if (content === "") continue;
+    const args = model.field_args[f.name] ?? NO_ARGS;
+    out.push(...checklistOwed(args.items, content, corpus).map((o) => ({ field: f.name, ...o })));
   }
   return out;
 }
@@ -751,12 +804,14 @@ function seededStepIds(recordRoot: string): Set<string> | undefined {
   return undefined;
 }
 
-/** The record's OWN experiments: the ids its fold-back evidence names.
- *  A standing experiment from an earlier record keeps its assignment to
- *  THAT record's drawing, which this tree does not carry — sweeping it
- *  against the current drawing failed i2 on i1's promotion (2026-08-12).
- *  No fold-back evidence means no scoping, so unit fixtures keep the
- *  whole-corpus sweep. */
+/** The record's OWN experiments, where its fold-back says so. An experiment
+ *  from an earlier record keeps its assignment to THAT record's drawing, which
+ *  this tree does not carry — sweeping it against the current drawing failed i2
+ *  on i1's promotion (2026-08-12).
+ *
+ *  UNDEFINED MEANS THE RECORD HAS NO FOLD-BACK, which is not the same as
+ *  "folded nothing back". A minor strikes M6 whole, so it never has one. The
+ *  caller falls back to the experiment's own owner there. */
 function foldBackExperiments(recordRoot: string): Set<string> | undefined {
   const dir = join(recordRoot, "project", "spec", "iterations");
   try {
@@ -777,11 +832,38 @@ function foldBackExperiments(recordRoot: string): Set<string> | undefined {
 function promotionAssignmentProblems(corpus: { id: string; type: string; file?: string }[], recordRoot: string): string[] {
   const out: string[] = [];
   const steps = seededStepIds(recordRoot);
+  // A PROMOTION BELONGS TO THE ITERATION THAT RAN THE SPIKE (owner ruling
+  // 2026-08-13). It is a spike aimed at a later step of the SAME record and it
+  // does not outlive it — exactly like the spike, which never travelled.
+  //
+  // THE OWNER IS ON THE EXPERIMENT, not inferred from a sibling artifact. This
+  // used to scope by looking for the record's fold-back evidence, which broke
+  // twice: absent evidence meant "do not scope", so striking M6 at minor turned
+  // the scoping off silently, and my first repair of that skipped every
+  // experiment in any root that merely had an iterations directory — which is
+  // every unit fixture. The tester caught the second one.
+  //
+  // AN EXPERIMENT WITH NO OWNER IS IN SCOPE. Absence cannot prove it belongs to
+  // somebody else, and the safe direction is to ask rather than to skip.
+  //
+  // TWO WAYS TO KNOW THE OWNER, and they answer in different situations.
+  //
+  // The record's FOLD-BACK names the experiments it promoted, and where that
+  // evidence exists it is the direct answer. A minor strikes M6 whole, so it
+  // never has one — and reading absence as "folded nothing back" is what broke
+  // the sweep's own test, because every unit fixture is also absent.
+  //
+  // So absence falls through to the experiment's OWN `minted_in`. An experiment
+  // with no owner at all stays in scope: absence cannot prove it belongs to
+  // somebody else, and the safe direction is to ask rather than to skip.
   const own = foldBackExperiments(recordRoot);
+  const owner = basename(recordRoot);
   for (const n of corpus) {
     if (n.type !== "experiment" || n.file === undefined) continue;
     if (own !== undefined && !own.has(n.id)) continue;
     const fm = noteOf(n.file)?.frontmatter ?? {};
+    const mintedIn = String(fm.minted_in ?? "").trim();
+    if (own === undefined && mintedIn !== "" && mintedIn !== owner) continue;
     const p = String(fm.promote ?? "").trim();
     if (p === "" || /^none\b/i.test(p)) continue;
     const chunk = String(fm.chunk ?? "").trim();
@@ -1207,6 +1289,34 @@ function tableProblems(name: string, args: FieldArgs, content: string): string[]
   return [];
 }
 
+/** ONE ITEM'S STANDING against a checklist field's raw content — checked,
+ *  owed to a live register entry, owed to something that will not resolve,
+ *  or simply unchecked. Shared by the check (fieldProblems) and the report
+ *  (checklistOwed), so the two can never disagree about what counts. */
+type ChecklistStatus =
+  | { kind: "checked" }
+  | { kind: "owed"; ref: string }
+  | { kind: "owed_unresolved"; ref: string }
+  | { kind: "unchecked" };
+
+function checklistItemStatus(item: string, lines: Set<string>, corpus?: TraceNode[]): ChecklistStatus {
+  if (lines.has(`- [x] ${item}`)) return { kind: "checked" };
+  const prefix = `- [owed] ${item} — `;
+  const owedLine = [...lines].find((l) => l.startsWith(prefix));
+  if (owedLine === undefined) return { kind: "unchecked" };
+  const ref = owedLine.slice(prefix.length).trim();
+  return openRaidRef(ref, corpus) ? { kind: "owed", ref } : { kind: "owed_unresolved", ref };
+}
+
+/** Does `ref` name an OPEN entry in the raid register? An owed box points at
+ *  a register entry rather than a tick, so the ref has to resolve to a
+ *  standing debt — closed, decided or missing entries refuse exactly like an
+ *  unchecked box, because there is nobody left holding the claim. */
+function openRaidRef(ref: string, corpus?: TraceNode[]): boolean {
+  const n = (corpus ?? []).find((n) => n.type === "raid" && n.id === ref);
+  return n !== undefined && n.file !== undefined && nodeField(n.file, "status") === "open";
+}
+
 export function fieldProblems(
   name: string,
   meta: TemplateMeta,
@@ -1249,10 +1359,26 @@ export function fieldProblems(
   // CHECKING IS THE CLAIM (owner ruling 2026-08-11): a checklist refuses
   // while any named item stands unchecked. There is no text to write — the
   // deliberate click is the record, and an unchecked box is work still owed.
+  //
+  // A THIRD STATE, FOR WHAT CANNOT BE HONESTLY OBSERVED (owner ruling
+  // 2026-08-13). The `none` door below solves the same shape of problem for
+  // an empty set: rather than fabricate a row, write an honest claim of a
+  // different shape. `- [owed] <item> — <ref>` does the same for one claim
+  // an unattended agent cannot check — <ref> MUST resolve to an OPEN entry
+  // in the raid register, so the debt is addressed to someone with a
+  // trigger, not merely declared. It never counts as checked; a missing or
+  // unresolved ref refuses exactly like an unchecked box, because today the
+  // only honest alternative to an owed box is a stall — and this is
+  // strictly more information than a tick.
   if (meta.editor === "checklist" && args.items.length > 0) {
     const lines = new Set(content.split("\n").map((l) => l.trim()));
-    const unchecked = args.items.filter((i) => !lines.has(`- [x] ${i}`));
-    if (unchecked.length > 0) out.push(`${name}: unchecked — ${unchecked.join(" · ")}`);
+    const unmet = args.items.flatMap((i) => {
+      const st = checklistItemStatus(i, lines, corpus);
+      if (st.kind === "unchecked") return [i];
+      if (st.kind === "owed_unresolved") return [`${i} (owed ref "${st.ref}" is not an open raid entry)`];
+      return [];
+    });
+    if (unmet.length > 0) out.push(`${name}: unchecked — ${unmet.join(" · ")}`);
   }
   // AN EMPTY SET IS A CLAIM, AND IT IS WRITTEN (2026-08-09). The refs template
   // already rules this — "one line saying none" is a legal answer — because a
@@ -1754,14 +1880,30 @@ function mustStoryItems(traceRoot: string): string[] {
     .sort();
 }
 
-/** $promotions, resolved live: the experiments whose `promote:` names
- *  something entering the build. PROMOTIONS ARE A FILTER, NEVER A LIST
- *  (M6 fold-back): an experiment saying none is honestly absent here. */
+/** $promotions, resolved live: the experiments THIS RECORD promoted, whose
+ *  `promote:` names something entering the build. PROMOTIONS ARE A FILTER,
+ *  NEVER A LIST (M6 fold-back): an experiment saying none is honestly absent.
+ *
+ *  A PROMOTION BELONGS TO THE ITERATION THAT RAN THE SPIKE (owner ruling
+ *  2026-08-13). It is a spike aimed at a later step of the SAME record, and it
+ *  has no business outliving it — exactly like the spike, which does not.
+ *
+ *  IT USED TO RETURN EVERY PROMOTED EXPERIMENT IN THE PROJECT, with no owner
+ *  and no expiry. So i2's promotion turned up in i3's build form, and would
+ *  have turned up in i4's and i5's, each of them asked to plan a chunk that
+ *  somebody else had already built. i3 hit exactly that and could only satisfy
+ *  it by copying a step it had not done.
+ *
+ *  THE RECORD'S ID IS THE BASENAME OF ITS TRACE ROOT, so nothing new is
+ *  threaded through. At trunk nothing matches, which is right: no record is
+ *  open, so no promotion is owed. */
 function promotionItems(traceRoot: string): string[] {
+  const owner = basename(traceRoot);
   return traceFolder(traceRoot, "experiment")
     .filter((n) => {
       const p = String(n.fm.promote ?? "").trim();
-      return p !== "" && !/^none\b/i.test(p);
+      if (p === "" || /^none\b/i.test(p)) return false;
+      return String(n.fm.minted_in ?? "").trim() === owner;
     })
     .map((n) => n.id)
     .sort();

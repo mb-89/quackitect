@@ -1,7 +1,7 @@
 {
 	"metadata":{
 		"version":"1.0-1.0",
-		"frontmatter":{"reentry":"restart","priority":0.2}
+		"frontmatter":{"reentry":"restart","priority":"mechanical"}
 	},
 	"nodes":[
 		{"id":"n-start","type":"file","file":"deliverable/machines/states/start.md","styleAttributes":{"shape":"pill"},"x":0,"y":0,"width":160,"height":160},

@@ -22,7 +22,7 @@ evidence:
       - "no"
     description: the one judgment this gate asks — is the design buildable as evidenced, and why
 major: full
-minor: tailored
+minor: none
 patch: none
 product: full
 specification: tailored
@@ -30,9 +30,8 @@ major_note: |
   Applies in full: the riskiest assumptions validated by evidence, the
   design buildable, every spike's evidence pinned.
 minor_note: |
-  Applies when spikes ran: the delta's riskiest assumptions hold or the
-  design changed, evidence pinned. With no spikes, the gate passes on the
-  recorded "none" from rank-unknowns - a pass-through, not a skip.
+  Does not apply (owner ruling 2026-08-13). M6 is struck whole at this
+  size, so this gate would guard an empty milestone.
 patch_note: |
   Does not apply. Nothing was proved because nothing needed proving.
   STRIKE PROPOSAL - owner adjudicates.

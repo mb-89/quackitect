@@ -27,7 +27,7 @@ evidence:
   - name: excluded_use
     description: the does-NOT-do list
 major: full
-minor: inherit
+minor: none
 patch: none
 product: full
 specification: full
@@ -36,12 +36,12 @@ major_note: |
   redrawn for the change. Architecture moves ripple to the boundary more
   often than predicted - this is the cheap place to catch it.
 minor_note: |
-  INHERIT unless the delta touches the boundary. A new neighbour or a
-  changed interface is redrawn and the excluded-use list re-checked;
-  otherwise the resident context stands by pointer.
+  Does not apply (owner ruling 2026-08-13). Boundary and neighbours do not
+  move at this size, so the state could only ever answer "unchanged" - and
+  a step whose only honest answer is nothing is a step that teaches skimming.
 
-  ESCALATE: a boundary that moves structurally - new system, new
-  integration seam - is major territory.
+  ESCALATE: a new neighbour, or an interface that changes shape, IS the
+  boundary moving. Promote the iteration to major.
 patch_note: |
   Does not apply. Boundary and neighbours do not move for a behavior fix.
   STRIKE PROPOSAL - owner adjudicates.

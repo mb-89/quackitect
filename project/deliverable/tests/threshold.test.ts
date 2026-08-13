@@ -1,5 +1,7 @@
 // THE THRESHOLD (owner ruling 2026-07-26): every state carries a priority
-// (0.01 mechanical .. 0.8 milestone, 1 ideation); the AGENT enters a state by itself only
+// (0.2 mechanical .. 0.8 strategic, 1 ideation — the rungs of machines/scale.md,
+// re-anchored by the owner's tier cut-over of 2026-08-12); the AGENT enters a
+// state by itself only
 // when priority <= the session autonomy. The human always may — HTTP is
 // the human's hand, MCP is the agent's. Reaching end ends the SESSION:
 // onClosed fires, the server shuts down, the mirror turns red.
@@ -21,14 +23,16 @@ test("autonomy 0 is manual mode: the agent's pull waits, the human walks freely"
   session.setAutonomy(0);
   const server = buildServer(r, session);
   // The agent's hand (MCP): even the mechanical first step outweighs 0 —
-  // the 0.01 floor exists exactly for this. The pull SAYS so instead of
-  // refusing, and the saying is the look: where, autonomy, and the step.
+  // the 0.2 mechanical rung exists exactly for this, and no state is ever
+  // authored at 0 (machines/scale.md). The pull SAYS so instead of refusing,
+  // and the saying is the look: where, autonomy, and the step.
   const w = await call(server, "se_pull");
   assert.equal(w.isError, false, "a wall is an instruction, never an error");
   assert.equal(w.body.pull, "wait");
   assert.equal(w.body.autonomy, 0);
   assert.match(String(w.body.why), /above the session autonomy 0/);
-  assert.match(String(w.body.do), /slider alone cannot wake you/);
+  // The served wait says DIAL, matching contract rule 3's own wording.
+  assert.match(String(w.body.do), /dial alone cannot wake you/);
   // The human's hand (default channel): the same step just goes.
   await session.advance();
   assert.deepEqual(session.active(), ["boot/start"]);
@@ -103,10 +107,19 @@ test("priority and autonomy ride every packet — the agent can weigh its next s
   const session = new Session(freshRoot());
   const info = session.packet() as { autonomy: number; states: { priority: number; next: { to: string; priority?: number }[] }[] };
   assert.equal(info.autonomy, 0.4);
-  assert.equal(info.states[0].priority, 0.01);
-  assert.equal(info.states[0].next[0].priority, 0.01); // boot, from its canvas frontmatter
+  // MECHANICAL IS 0.2, not the old 0.01 floor (owner tier cut-over ruling
+  // 2026-08-12, machines/scale.md). These states author the WORD `mechanical`;
+  // the number is the transitional anchor the compiler reads off that scale.
+  assert.equal(info.states[0].priority, 0.2);
+  // THE SWEEP LANDED (i3, tsp-autonomy-tiers). This is the weight of
+  // ENTERING the boot sub-machine, from boot.canvas's MACHINE-level
+  // frontmatter, which now authors the word `mechanical` like everything
+  // else. It read 0.01 until the sweep reached it, and every rung of
+  // machines/scale.md treats 0.01 and 0.2 alike, so nothing behaves
+  // differently — this line moved because the number left the drawing.
+  assert.equal(info.states[0].next[0].priority, 0.2); // boot.canvas frontmatter
   const peek = session.stateInfo("idle") as { priority: number; next: { to: string; priority?: number }[] };
-  assert.equal(peek.priority, 0.01);
+  assert.equal(peek.priority, 0.2);
   const exp = peek.next.find((n) => n.to === "expeditions");
   assert.equal(exp?.priority, 0.4);
 });

@@ -126,6 +126,13 @@ Tests answer a question: did THIS change break THAT. A scoped run answers a
 small diff. The battery is for when the diff outgrows scoped runs — the
 refusal computes the flip point and hands you the right call.
 
+### SE-C-136 — a scoped run with no question
+Say what the run answers, in one line. The scope already says which tests
+ran. Only the question says why, and the record keeps it.
+
+The battery needs none. Its question is fixed and always the same: does the
+whole tree still stand.
+
 ## The walk
 
 ### SE-C-110 — the tool is not legal in this state
@@ -236,6 +243,17 @@ edit unbound, then aim back. The walk is left standing where it was.
 
 A RECORD'S OWN CONTENT IS NEVER REFUSED here. Evidence and decisions under
 the record's own folder are exactly what a bound walk is for.
+
+THIS CLAUSE GUARDS FIVE TOOLS ONLY: se_file_write, se_file_patch,
+se_file_replace, se_file_delete, se_file_move. It does not and cannot watch
+se_run's shell commands, which is exactly the gap the i8 field report found
+on 2026-08-12: refused here, the walk reached for se_run with a
+no_tool_reason instead of stepping out, and the write landed on trunk
+anyway (both copies came out byte-identical, so nothing was lost, but the
+refusal's whole point was bypassed). `no_tool_reason` exists for jobs no
+lane tool can do, never as a second door around a refusal that already
+named its own remedy. When SE-C-134 fires, the remedy is escape-edit-return
+— always, even though se_run would technically let the bytes through.
 
 ## Notes and prose
 

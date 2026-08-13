@@ -1,7 +1,7 @@
 {
 	"metadata":{
 		"version":"1.0-1.0",
-		"frontmatter":{"reentry":"restart","priority":1.5}
+		"frontmatter":{"reentry":"restart","priority":"blocked"}
 	},
 	"nodes":[
 		{"id":"n-comment","type":"text","text":"ITERATION ARCHIVE — closed iterations. Browsing lives in the mirror; this machine stays minimal. EMPTY until persistence lands.","x":-1100,"y":-340,"width":660,"height":120},

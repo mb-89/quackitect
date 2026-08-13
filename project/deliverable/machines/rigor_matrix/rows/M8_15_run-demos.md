@@ -19,7 +19,7 @@ legal_tools:
   - se_run
   - se_test
 major: full
-minor: tailored
+minor: none
 patch: none
 product: full
 specification: tailored
@@ -27,8 +27,13 @@ major_note: |
   Applies in full: every must story's demonstration performed against
   the shipped system, every run minting its report.
 minor_note: |
-  The NEW must stories demonstrate; resident reports stand unless the
-  delta's behavior touched what they show - those re-run.
+  Does not apply (owner ruling 2026-08-13). The package state already ends
+  with a person using the built artifact and recording what they saw. At
+  this size a demo is that same act done twice.
+
+  WHAT STAYS INSTEAD: fill-story-evidence. A minor may add a story, and a
+  story nobody checked against the running system is the gap this would
+  otherwise leave.
 patch_note: |
   Does not apply. No musts enter at patch grain; the resident
   demonstrations are product cadence.

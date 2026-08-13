@@ -15,7 +15,7 @@ legal_tools:
   - se_answer
 evidence: []
 major: full
-minor: tailored
+minor: none
 patch: none
 product: full
 specification: tailored
@@ -25,11 +25,12 @@ major_note: |
   as data. M7 builds inside this baseline; a new element found mid-build
   returns HERE.
 minor_note: |
-  Tailored to ONE question: the new allocations reviewed - the delta's
-  functions land in the right existing elements, and nothing else moved.
-  A light look, and the tripwire's second net: the reviewer who sees a
-  new element or interface in the diff sends the work to major through
-  this gate's full form.
+  Does not apply (owner ruling 2026-08-13). Only decompose-structure
+  survives M5 at this size, and it allocates new functions into standing
+  structure. A gate over one allocation reviews nothing M3's gate did not.
+
+  ESCALATE: decompose-structure unable to allocate into what stands IS the
+  signal, and it promotes the whole iteration.
 patch_note: |
   Does not apply - AND THIS IS THE TRIPWIRE CELL. The build half of the
   patch must stay inside the allocated elements. A patch that needs a new

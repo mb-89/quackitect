@@ -58,18 +58,41 @@ describe("the front is heavier at product, and that is the whole difference", ()
   // The owner's ruling: a product iteration defines the vision, the
   // stakeholders and the early phases for the WHOLE product. Later iterations
   // inherit those and define design input only for their own scope.
+  //
+  // WHAT CHANGED ON 2026-08-13. "Inherit" still cost a whole step: the walk
+  // stood in the state and signed a form whose only honest answer was
+  // "unchanged". The owner ruled that two of the three are STRUCK at minor
+  // instead — a new stakeholder brings a new value proposition, and a moved
+  // boundary is a new integration seam, and either one promotes the iteration
+  // to major. Nothing is lost; the escalation is named in each row's own note.
   const FRONT = ["draft-vision", "define-actual", "map-stakeholders"];
+  const STRUCK_AT_MINOR = ["define-actual", "map-stakeholders"];
 
   for (const step of FRONT) {
-    test(`${step} applies in full at product and is tailored or inherited below it`, () => {
+    test(`${step} applies in full at product and never re-authors below it`, () => {
       const cells = mx.cells.get(step);
       assert.ok(cells !== undefined, `${step} is a row`);
       assert.equal(cells.get("product")?.applies, "full", "product authors it for the whole product");
       assert.notEqual(cells.get("major")?.applies, "full", "major does not re-author the product's vision");
-      assert.equal(cells.get("minor")?.applies, "inherit", "minor takes it by pointer");
       assert.equal(cells.get("patch")?.applies, "none", "a patch never touches it");
     });
   }
+
+  test("the two front steps whose only minor answer was 'unchanged' are struck there", () => {
+    for (const step of STRUCK_AT_MINOR) {
+      assert.equal(mx.cells.get(step)?.get("minor")?.applies, "none", `${step} still stands at minor with nothing to say`);
+    }
+  });
+
+  // THE THIRD ONE SURVIVES, and shows why the trim is per FIELD and not only
+  // per state: a minor cannot restate the product, but a delta CAN pull one
+  // standing goal against another, and naming that is cheap here.
+  test("draft-vision survives minor, trimmed to the goal system alone", () => {
+    assert.equal(mx.cells.get("draft-vision")?.get("minor")?.applies, "inherit", "the vision packet stands by pointer");
+    const row = mx.rows.find((r) => r.name === "draft-vision");
+    const asked = (row?.evidence_form ?? []).filter((f) => !(f.omit ?? []).includes("minor")).map((f) => f.name);
+    assert.deepEqual(asked, ["goal_system"], "a minor may surface a goal conflict; it may not restate the product");
+  });
 
   test("product outranks major only on front steps", () => {
     const rank: Record<string, number> = { none: 0, inherit: 1, tailored: 2, full: 3 };

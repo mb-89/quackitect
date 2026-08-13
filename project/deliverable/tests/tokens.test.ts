@@ -22,7 +22,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { completeState, type MachineDecl, type MachineInstance } from "../engine/machine.ts";
+import { completeState, type MachineDecl, type MachineInstance, reopenStates } from "../engine/machine.ts";
 import { compileMachine } from "../engine/machines/compile.ts";
 import { freshRoot } from "./helpers.ts";
 
@@ -274,5 +274,76 @@ describe("the token set", { concurrency: true }, () => {
     const source = readFileSync(RENDER, "utf8");
     assert.match(source, /const curBtn = info\.active\s*\n\s*\.map\(/, "curBtn maps over the whole list");
     assert.match(source, /closest\("\.cur-state"\)/, "several buttons cannot share one id");
+  });
+});
+
+// THE POSITION A REOPEN LEAVES BEHIND (owner, 2026-08-13).
+//
+// Re-pinning i3 from patch to minor moved the demands of eight standing steps,
+// and the reopen put a token on all eight. The owner opened the mirror and saw
+// the walk standing in M0's kickoff gate and M3's write-requirements at the
+// same time — two steps on ONE sequential chain.
+//
+// Nothing illegal was signed: the input check refused every out-of-order
+// arrival. What was wrong was the POSITION, and a position is what the mirror
+// draws and what the pull offers. A drawing that says eight when one is true
+// is a drawing nobody can adjudicate from.
+describe("a reopen's token set", { concurrency: true }, () => {
+  const chain = (): MachineDecl =>
+    ({
+      id: "t",
+      states: [
+        { id: "kickoff", edges: [{ to: "stories", role: "normal" }] },
+        { id: "stories", edges: [{ to: "requirements", role: "normal" }] },
+        { id: "requirements", edges: [{ to: "build", role: "normal" }] },
+        { id: "build", edges: [] },
+        { id: "sidecar", edges: [] },
+      ],
+    }) as unknown as MachineDecl;
+
+  const blank = (): MachineInstance =>
+    ({
+      machine: "t",
+      iteration: "t",
+      current: "build",
+      counters: {},
+      history: [],
+      fired: [],
+      active: ["build"],
+      escapes: [],
+      status: "open",
+    }) as unknown as MachineInstance;
+
+  // THE EXACT SHAPE THAT BIT. Both steps were standing, both had a moved
+  // demand, and both got a token.
+  test("reopening two steps on one chain leaves ONE token, at the upstream end", () => {
+    const inst = blank();
+    reopenStates(chain(), inst, ["kickoff", "requirements"], "the rigor matrix moved", "now");
+    assert.deepEqual(inst.active, ["kickoff"], "requirements is downstream of kickoff — the walk re-reaches it, it is not stood in");
+    assert.equal(inst.current, "kickoff", "and current agrees with the token");
+  });
+
+  // ORDER OF THE ARGUMENT MUST NOT DECIDE IT. The moved list arrives in
+  // whatever order the ledger yields.
+  test("the frontier is the same whichever way round the reopen is asked", () => {
+    const inst = blank();
+    reopenStates(chain(), inst, ["requirements", "kickoff"], "the rigor matrix moved", "now");
+    assert.deepEqual(inst.active, ["kickoff"], "downstream-ness decides, never argument order");
+  });
+
+  // AND THE FORK STILL FORKS. Cutting tokens down to the frontier must not cut
+  // a genuine parallel down to one — two steps with no path between them are
+  // both frontier, and both keep their token.
+  test("two reopened steps with no path between them keep both tokens", () => {
+    const inst = blank();
+    reopenStates(chain(), inst, ["requirements", "sidecar"], "the rigor matrix moved", "now");
+    assert.deepEqual([...(inst.active ?? [])].sort(), ["requirements", "sidecar"], "neither reaches the other, so neither is dropped");
+  });
+
+  // ONE STEP IS THE ORDINARY CASE and must survive the filter untouched.
+  test("reopening a single step stands the walk in it", () => {
+    const inst = blank();
+    reopenStates(chain(), inst, ["stories"], "the rigor matrix moved", "now");
+    assert.deepEqual(inst.active, ["stories"]);
   });
 });

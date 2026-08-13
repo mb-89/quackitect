@@ -62,6 +62,22 @@ const restore = (repo: string, origin: string): void => {
   git(repo, "remote", "set-url", "origin", origin);
 };
 
+/** A POOL NOBODY HAS OPENED — a bare origin and one clone, with no claims
+ *  branch anywhere. This is what a freshly seeded product actually looks
+ *  like. `lab` above creates the branch by hand, so every case built on it
+ *  starts PAST the interesting moment, and that is exactly why the gate
+ *  could answer "no pool" and no test noticed. */
+const virgin = (): { dir: string; origin: string; repo: string } => {
+  const dir = mkdtempSync(join(tmpdir(), "virgin-"));
+  git(dir, "init", "--bare", "origin.git");
+  const origin = join(dir, "origin.git");
+  git(dir, "clone", origin, "machine");
+  const repo = join(dir, "machine");
+  git(repo, "config", "user.email", "machine@machines.invalid");
+  git(repo, "config", "user.name", "machine");
+  return { dir, origin, repo };
+};
+
 describe("the claim verb", { concurrency: true }, () => {
   test("a claim is one add-only file naming the machine id and the UTC time, pushed in the same act", () => {
     const l = lab();
@@ -205,12 +221,39 @@ describe("the claim verb", { concurrency: true }, () => {
     assert.equal(after?.state, "released");
   });
 
-  test("the entry gate: no pool anywhere is free entry", () => {
+  test("the entry gate opens the pool itself when no claims branch exists", () => {
     const dir = mkdtempSync(join(tmpdir(), "gate-"));
     git(dir, "init");
     const g = claimEntry(dir, "i-any", "aaaa1111");
     assert.equal(g.ok, true);
-    assert.equal(g.pool, false);
+    // NO BRANCH IS NOT NO POOL. The gate used to answer pool:false here and
+    // record nothing, which made the branch uncreatable: only a claim mints
+    // it, and no claim could run. Every entry anywhere was then unclaimed.
+    assert.equal(g.pool, true);
+    assert.equal(g.claimed_now, true);
+    // No remote at all, so the claim lands locally and announces later.
+    assert.equal(g.offline, true);
+    const row = claimsLedger(dir).find((x) => x.iteration === "i-any");
+    assert.ok(row !== undefined, "the ledger stands after the first entry");
+    assert.equal(row.machine, "aaaa1111");
+  });
+
+  test("a first entry opens the pool on a remote that has no claims branch yet", () => {
+    const v = virgin();
+    const g = claimEntry(v.repo, "i-first", "aaaa1111");
+    assert.equal(g.ok, true);
+    assert.equal(g.pool, true);
+    assert.equal(g.claimed_now, true);
+    // ONLINE, so the claim announces in the same act. A fetch of a branch
+    // that does not exist FAILS, and reading that failure as offline was the
+    // second half of the bug — the first claim would mint the branch locally
+    // and never push it, leaving every peer blind.
+    assert.equal(g.offline, false);
+    // The proof lives on the ORIGIN, never in the claimant's own repo.
+    git(v.dir, "clone", "--branch", "claims", v.origin, "peer");
+    const row = claimsLedger(join(v.dir, "peer")).find((x) => x.iteration === "i-first");
+    assert.ok(row !== undefined, "a peer cloning the origin reads the first claim");
+    assert.equal(row.machine, "aaaa1111");
   });
 
   test("the entry gate lifecycle: entry claims, a held record refuses with its holder, a release reopens it", () => {

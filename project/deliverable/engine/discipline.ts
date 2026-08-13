@@ -236,6 +236,12 @@ export function testFingerprint(root: string): string {
   return contentHash(parts.join("\0"));
 }
 
+/** The battery's question is FIXED, and that is why the no-argument call
+ *  needs no argument. It asks one thing and always the same thing. A scoped
+ *  run is the opposite: only the caller knows what it wanted to learn, so
+ *  the lane makes them say it. */
+export const BATTERY_QUESTION = "does the whole tree still stand?";
+
 interface ScopeVerdict {
   fingerprint: string;
   ok: boolean;
@@ -244,6 +250,11 @@ interface ScopeVerdict {
    *  rides the result: a long streak means the caller keeps re-proving the
    *  proven — test on change, not on anxiety (owner ruling 2026-08-02). */
   streak?: number;
+  /** WHAT THIS RUN WAS ASKED (req-test-run-carries-its-question). The scope
+   *  says which tests ran; only the question says why. Without it a later
+   *  reader cannot tell a real question from a reassurance run, and those
+   *  are exactly what the discipline exists to separate. */
+  question?: string;
 }
 
 interface TestState {
@@ -304,13 +315,26 @@ export function testGate(seDir: string, root: string, force: boolean, scope = "b
   });
 }
 
-export function testRecord(seDir: string, root: string, ok: boolean, scope = "battery", files: string[] = []): number {
+export function testRecord(
+  seDir: string,
+  root: string,
+  ok: boolean,
+  scope = "battery",
+  files: string[] = [],
+  question = BATTERY_QUESTION,
+): number {
   const fp = testFingerprint(root);
   if (fp === "") return 0;
   const state = loadTestState(seDir);
   const prior = scope === "battery" ? state.battery : state.scoped?.[scope];
   const streak = ok ? (prior?.ok === true ? (prior.streak ?? 1) + 1 : 1) : 0;
-  const verdict: ScopeVerdict = { fingerprint: fp, ok, ts: new Date().toISOString(), ...(streak > 0 ? { streak } : {}) };
+  const verdict: ScopeVerdict = {
+    fingerprint: fp,
+    ok,
+    ts: new Date().toISOString(),
+    ...(streak > 0 ? { streak } : {}),
+    question,
+  };
   if (scope === "battery") {
     const head = spawnSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" });
     state.battery = { ...verdict, ...(head.status === 0 ? { head: head.stdout.trim() } : {}) };
