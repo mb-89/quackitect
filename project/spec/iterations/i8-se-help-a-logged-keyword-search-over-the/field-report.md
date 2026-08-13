@@ -974,7 +974,50 @@ Section 6.9 shows why this cannot be folded back into the walker: when the
 lane is unresponsive the caged agent cannot even call `se_run` to look. The
 role that recovers the lane must live outside the lane.
 
-### 7.3 Give the walker a lane it can trust
+### 7.3 Give the lane a real lifecycle — this caused more outages than any bug
+
+The lane went down five times in this run. **Only one was a genuine engine
+problem.** The rest were the supervisor and the engine mishandling the
+server's lifecycle, and every one of them cost the walker minutes of failed
+retries.
+
+Two defects, both fixable, both cheap:
+
+**The engine kills whatever holds its port.** Its own log:
+
+```
+se-mcp: mirror port 7333 was busy — stopped pid(s) 19708 and retrying
+```
+
+A STARTING instance shoots a HEALTHY one and takes its place. That turns a
+careless restart into a cascade: the new instance killed the old, then quit
+itself, and the lane stayed down for six-plus retries instead of never going
+down at all.
+
+**A server should refuse to start when its port is held, and say whose it
+is.** Taking the port by force is only ever right if the holder is known dead,
+and the engine does not check.
+
+**Nothing tells a supervisor the lane is in use.** The supervisor restarted
+the server while the walker was mid-call, because the walker had reported
+finishing and the supervisor believed it. There is no "is anyone using this"
+check, so **the only safe restart is one nobody needs** — which is not a rule
+anybody can follow.
+
+What would fix both:
+
+- a health endpoint that reports whether a session is attached and when it
+  last called
+- a refusal, not a kill, when the port is held
+- one supervised lifecycle — start, health, stop — instead of ad-hoc
+  `kill` and re-launch by whoever notices
+
+**None of this is exotic.** It is what any long-running local service does. The
+lane is currently started by hand, killed by hand, and defended by nothing, and
+that is the largest single source of friction in this run — larger than any
+defect in the walk itself.
+
+### 7.4 Give the walker a lane it can trust
 
 The walker currently treats any failed call as a wall. It needs two things:
 
@@ -987,7 +1030,7 @@ The walker currently treats any failed call as a wall. It needs two things:
 Add a deadline to background jobs while here. One hung job was polled 56
 times because nothing ever said "this is not coming back" (section 5).
 
-### 7.4 Commit on every state, not every milestone
+### 7.5 Commit on every state, not every milestone
 
 Three sessions running ended with 46, 29 and 28 files uncommitted, each
 rescued from outside the walk. On a durable machine the milestone rhythm is
@@ -998,7 +1041,7 @@ produced files and signed its evidence has everything a commit needs. This
 also dissolves the hook conflict in 6.10, because the tree is then rarely
 dirty for long.
 
-### 7.5 Close the write leak that causes divergence
+### 7.6 Close the write leak that causes divergence
 
 `SE-C-134` guards five write tools and not `se_run` (6.3). The result was
 `se_help` implemented twice, differently, on two branches, and three merge
@@ -1012,7 +1055,7 @@ Two candidate fixes, and the second is better:
 
 The second removes the class of bug instead of adding another check.
 
-### 7.6 Let the owner pre-authorise gates for one session
+### 7.7 Let the owner pre-authorise gates for one session
 
 `gate-release` needs a person by design, and that is right. But in an
 unattended run the person is not there, and the walk stops with the work
@@ -1027,7 +1070,7 @@ by the agent on its own judgment.
 That is the difference between an unattended run that ships and one that
 parks a finished iteration at the last step.
 
-### 7.7 Choose test scope from the import graph
+### 7.8 Choose test scope from the import graph
 
 A scoped run is the right default and the lane is right to enforce it. But the
 author picks the scope from memory, and in this run that missed the two files
@@ -1037,13 +1080,13 @@ the change actually broke (6.1).
 A scoped run that misses a dependent test file should be refused the same way
 an unscoped one is.
 
-### 7.8 Check content, not existence, in the trace sweep
+### 7.9 Check content, not existence, in the trace sweep
 
 `se_help` passed every gate while not existing (6.2). The sweep confirms a
 file is present, never that it carries what the design spec claims. Already
 minted as `raid-issue-trace-design-checks-existence-not-content`.
 
-### 7.9 Stop re-verifying the whole product every iteration
+### 7.10 Stop re-verifying the whole product every iteration
 
 M7's claims checklist is `applies: full` at every size, so an iteration about
 a keyword search inherited eight whole-product claims including one about the
@@ -1053,13 +1096,13 @@ it right.
 **A standing claim should be re-checked when its subject changes, not when any
 iteration happens to reach M7.**
 
-### 7.10 Expose `itAdopt` as a lane verb
+### 7.11 Expose `itAdopt` as a lane verb
 
 A peer machine still cannot pick up a pushed record by itself. The engine
 function exists; nothing in the lane calls it. Until it does, every cloud run
 needs the supervisor to adopt the record from outside the cage.
 
-### 7.11 Make the packager stop blocking the lane
+### 7.12 Make the packager stop blocking the lane
 
 `package.ts` copies the entire root synchronously and then zips it, and the
 lane goes unresponsive for the duration (6.9). At minimum the release step
@@ -1068,7 +1111,7 @@ yet settled, so this one needs a diagnosis before a fix.
 
 ---
 
-**If only three of these land**, make them 7.1, 7.4 and 7.6: a script that
+**If only three of these land**, make them 7.1, 7.3 and 7.7: a script that
 brings it up, a commit rhythm that survives the host, and a way for the owner
 to authorise the last gate in advance. Those three turn this run's experience
 into an unattended run that starts, works and ships without a person in the
