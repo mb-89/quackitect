@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: tsp-test-discipline
 type: "[[test-spec]]"
 statement: A test run answers a named question with a structured verdict, a first green needs its red, and a red is never carried, verified by test over the test lane.

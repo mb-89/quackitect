@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: stk-engineer-driving-agents
 type: "[[stakeholder]]"
 statement: An engineer who drives AI agents to build a product, and is answerable for what they produce.

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-resume-after-an-absence
 type: "[[use-case]]"
 statement: Find out where the work stands after being away, without asking anybody.

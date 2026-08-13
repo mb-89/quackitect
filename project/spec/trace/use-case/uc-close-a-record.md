@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-close-a-record
 type: "[[use-case]]"
 statement: Close a record, ruling on every finding it produced rather than dropping them.
@@ -19,6 +20,10 @@ priority: should
 4. The person rules each one, saying where an applied finding landed and why a dismissed one was rejected.
 5. The record's strays are committed so the trunk is left clean.
 6. The record is archived, readable exactly as it stood.
+
+## Lane doors
+
+- `se_exp_close` is the door. It refuses while any finding in the report stands unruled.
 
 ## Extensions
 

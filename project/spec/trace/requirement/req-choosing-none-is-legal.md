@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-choosing-none-is-legal
 type: "[[requirement]]"
 statement: When the person rules that no option qualifies, the engine shall record the outcome as none chosen, with what has to change for an option to qualify.

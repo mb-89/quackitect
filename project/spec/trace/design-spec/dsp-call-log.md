@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: dsp-call-log
 type: "[[design-spec]]"
 statement: every call appended with role and channel, carried by one jsonl log and the views that count it

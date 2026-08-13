@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: dsp-boot-and-power
 type: "[[design-spec]]"
 statement: the engine standing up and lying down, carried by the host bridge, the stop hook, the boot bench and the packager

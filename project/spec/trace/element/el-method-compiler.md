@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: el-method-compiler
 type: "[[element]]"
 statement: Holds the shipped method and compiles it — matrix rows to machines, templates to forms — and sweeps the system back into step when drift is found.

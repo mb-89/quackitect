@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-close-leaves-trunk-clean
 type: "[[requirement]]"
 statement: When a record closes, the engine shall commit the record's strays, leaving zero uncommitted changes from the record on the trunk.

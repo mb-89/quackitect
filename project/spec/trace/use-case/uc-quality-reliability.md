@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-quality-reliability
 type: "[[use-case]]"
 statement: Rely on the walk to survive a break

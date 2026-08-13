@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: el-bootstrap
 type: "[[element]]"
 statement: Stands a product up from a bare computer — one script installs the floor, the scaffold converges a fresh empty product from the template and reports drift.

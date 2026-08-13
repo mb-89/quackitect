@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-structure-verdicts-are-mechanical
 type: "[[requirement]]"
 statement: When a gate reviews the design's structure, the engine shall compute the structural verdicts per the Detail table, with zero verdicts typed by hand.

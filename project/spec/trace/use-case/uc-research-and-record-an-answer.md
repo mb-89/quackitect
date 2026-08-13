@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-research-and-record-an-answer
 type: "[[use-case]]"
 statement: Settle a question the repo cannot answer from inside itself, and leave both the search and the answer on the record.
@@ -19,6 +20,11 @@ priority: should
 4. What survives becomes a reference node, so the next person starts from the finding rather than searching again.
 5. The answer is recorded against the question as two fields, in one place.
 6. Anything the sources do not actually support is left out.
+
+## Lane doors
+
+- `se_web_search` and `se_web_fetch` reach outside the repository. Every query is logged like any other call.
+- `se_answer` records the question and the answer as one entry, so the answer outlives the session that gave it.
 
 ## Extensions
 

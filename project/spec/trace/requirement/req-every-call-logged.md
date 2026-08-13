@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-every-call-logged
 type: "[[requirement]]"
 statement: The engine shall append exactly one log line per dispatched call, carrying the call's outcome.

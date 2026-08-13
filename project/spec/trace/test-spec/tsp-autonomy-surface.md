@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: tsp-autonomy-surface
 type: "[[test-spec]]"
 statement: The autonomy surface arms, disarms and shuts down exactly as the dial and its toggles say, verified by test over the control machinery.

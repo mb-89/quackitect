@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-pull-answers-from-record
 type: "[[requirement]]"
 statement: When a driver asks what to do, the engine shall answer from the walk's recorded position with one instruction carrying everything the step needs.

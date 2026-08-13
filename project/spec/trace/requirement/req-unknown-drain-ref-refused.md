@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-unknown-drain-ref-refused
 type: "[[requirement]]"
 statement: If a drain names a ref that no pending note carries, then the engine shall refuse the call and shall name the unknown ref.

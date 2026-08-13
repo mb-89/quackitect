@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: opt-the-machine-pushes-the-step
 type: "[[option]]"
 statement: invert the direction so the machine hands the next step to whoever is listening, instead of waiting to be asked for it

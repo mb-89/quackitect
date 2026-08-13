@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: fn-run-a-governed-walk.serve-a-step
 type: "[[function]]"
 cluster: the-walk
@@ -14,6 +15,8 @@ satisfies:
   - req-a-placeholder-drawing-refuses-entry
   - req-missing-document-stops-the-walk
   - req-autonomy-gates-every-hop
+  - req-autonomy-is-categorical
+  - req-walk-branches-at-waypoint
   - req-autonomy-change-applies-forward
   - req-controls-never-advance-walk
   - req-emergency-sits-above-full

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-take-a-step
 type: "[[use-case]]"
 statement: Do one step of the walk and record what it produced.
@@ -20,6 +21,27 @@ priority: must
 4. The form is filled, field by field.
 5. The submit checks the fields' shapes and stamps the claim.
 6. The walk may move to the next state.
+
+## Lane doors
+
+Step 1 is `se_pull`. It is the only verb that moves the walk. `se_aim` points
+it at a state first, and aiming alone changes nothing.
+
+Step 3 is done through the lane, never through the host's own tools:
+
+- `se_file_read` reads a file, and hands back the hash to write against.
+- `se_file_search` finds text; the intent stated is logged with the query.
+- `se_file_glob` lists files by pattern.
+- `se_file_list` shows what a folder holds.
+- `se_file_write` creates a file, or overwrites one at the hash it was read at.
+- `se_file_patch` makes many edits, over many files, in one atomic call.
+- `se_file_replace` runs one regex over a glob, and reports every place it landed.
+- `se_file_move` renames.
+- `se_file_delete` removes.
+- `se_run` runs a command, with its output captured whole under a ref.
+
+Extension 6a is answered by `se_why`. It names every condition holding a
+state grey, each with its own remedy, rather than only the first to fail.
 
 ## Extensions
 

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-acts-carry-role-and-channel
 type: "[[requirement]]"
 statement: The engine shall stamp every recorded act with the acting role and the arrival channel, and with zero personal identifiers.

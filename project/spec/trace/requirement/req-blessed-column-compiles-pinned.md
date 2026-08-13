@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-blessed-column-compiles-pinned
 type: "[[requirement]]"
 statement: When the change size is blessed, the engine shall compile the chosen column into a state machine owned by the iteration and pin it to the record.

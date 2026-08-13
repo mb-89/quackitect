@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-filter-draws-only-what-serves
 type: "[[requirement]]"
 statement: When the person filters the trace, the engine shall redraw the view with only nodes serving the filter and zero empty levels drawn.

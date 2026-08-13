@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-vendor-and-overlay
 type: "[[use-case]]"
 statement: Run the engine inside another product and replace parts of its method without forking it.
@@ -19,6 +20,10 @@ priority: could
 4. The resolution chain prefers theirs where they exist and serves the engine's where they do not.
 5. They walk a record, and their cards arrive at the states they wrote them for.
 6. A new engine version arrives. They replace the folder whole, with nothing to merge.
+
+## Lane doors
+
+- `se_prompt_place` re-projects the prompt layer from the guidance into the tree the lane is working in. It resolves that tree itself, so the projection cannot land in the wrong one.
 
 ## Extensions
 

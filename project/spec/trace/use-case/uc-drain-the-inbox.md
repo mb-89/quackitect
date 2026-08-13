@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-drain-the-inbox
 type: "[[use-case]]"
 statement: Walk every pending note once and give each exactly one home.
@@ -19,6 +20,12 @@ priority: should
 4. Each note is CHECKED against the code before it is judged — most of what pends turns out to be already built, and the check costs seconds.
 5. Each is dispositioned into exactly one home: done, obsolete, carried, or backlog.
 6. The inbox reaches zero.
+
+## Lane doors
+
+- `se_note` captures a stray anywhere, and moves nothing.
+- `se_note_drain` takes one back out, with the disposition it earned.
+- `se_survey` serves the standing rows, each with the condition that makes it ready.
 
 ## Extensions
 

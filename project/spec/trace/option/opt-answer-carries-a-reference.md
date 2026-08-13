@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: opt-answer-carries-a-reference
 type: "[[option]]"
 statement: write the whole record to disk and return a reference to it, so the answer stays small however large the thing it names

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-let-the-system-catch-up
 type: "[[use-case]]"
 statement: Bring the method back into agreement with itself, in one pass, with no feature to hang it on.
@@ -18,6 +19,11 @@ priority: should
 3. Each finding is fixed where it lives rather than worked around.
 4. A finding that needs a decision becomes a note instead of a guess.
 5. The full battery runs, because a sweep that touched everything has to prove it broke nothing.
+
+## Lane doors
+
+- `se_reopen` sends a standing claim back to be re-earned. The signature is kept, never erased.
+- `se_amend` fixes a submitted form without reopening it, for the correction that does not change what the claim says. The checks still run.
 
 ## Extensions
 

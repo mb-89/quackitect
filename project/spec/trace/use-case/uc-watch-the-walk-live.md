@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-watch-the-walk-live
 type: "[[use-case]]"
 statement: Watch the walk move in the panel without steering it, and keep your place while it moves.
@@ -17,6 +18,11 @@ priority: should
 2. Every narration update changes the render — the checklist, the feed, the machine's colors.
 3. The engineer holds a detail open on one thing while the walk moves elsewhere. Their place holds.
 4. Afterwards they read the decision trail as branches off each point, briefs whole.
+
+## Lane doors
+
+- `se_panel` serves the live surface.
+- `se_shoot` renders it to a picture, so a pane is judged by seeing it rather than by reading its markup.
 
 ## Extensions
 

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-tour-ends-at-the-desk
 type: "[[requirement]]"
 statement: When the last stop completes, the tour shall return to the front desk and show the offer list.

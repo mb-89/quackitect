@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-decision-graph-reads-as-branches
 type: "[[requirement]]"
 statement: When the decision trail renders, the engine shall draw each point's updates as branches that never merge back, with briefs cut at word boundaries and marks distinguishing landed from abandoned.

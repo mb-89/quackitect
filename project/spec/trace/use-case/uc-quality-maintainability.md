@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-quality-maintainability
 type: "[[use-case]]"
 statement: Answer what happened and change it safely
@@ -45,6 +46,11 @@ an attacker.
 4. The person follows a verdict back through the trace to the evidence that carried it.
 5. The person states what happened, attributed, without asking any session.
 6. Something upstream changes; the machine names every claim that stops standing because of it.
+
+## Lane doors
+
+- `se_log_query` serves the recorded calls back, by ref or by filter. Step 1 of the scenario above is this verb.
+- `se_format` parses and reprints the vault's frontmatter, so the corpus stays mechanically readable as it grows. It is a parse-and-print, which a regex verb cannot be.
 
 ## Extensions
 

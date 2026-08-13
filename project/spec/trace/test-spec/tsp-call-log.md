@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: tsp-call-log
 type: "[[test-spec]]"
 statement: Every dispatched call lands on the log with its outcome, refusals carry executable remedies, and recorded answers survive, verified by test over the MCP lane and the log.

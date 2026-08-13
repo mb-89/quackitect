@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-duplicate-stray-still-captured
 type: "[[requirement]]"
 statement: If a captured finding duplicates a standing note, then the engine shall store it anyway, refusing zero captures for duplication.

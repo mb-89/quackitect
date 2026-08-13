@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: sty-start-a-new-product
 type: "[[story]]"
 statement: An engineer standing at the front desk wants to begin a product that does not exist yet, and finds out where a product is chosen.
@@ -53,5 +54,7 @@ se_seed_iteration with the prefill discipline of guidance/craft/ux.md - a prefil
 ---
 
 Two products, two folders, two windows, one installed engine. Nothing was configured and nothing was shared but the engine itself.
+
+
 |||
 The end-to-end second-product run is the owed piece: reports/rpt-start-a-new-product.md.

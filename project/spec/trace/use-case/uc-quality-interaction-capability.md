@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-quality-interaction-capability
 type: "[[use-case]]"
 statement: Understand the machine well enough to drive it
@@ -46,6 +47,10 @@ Its sub-characteristics, so nobody has to open the standard to use this:
 4. The desk routes them, naming what it recommends and why.
 5. They hit a refusal, and the refusal names the exact call to make instead.
 6. Before the session ends they can say what the product is and what it is for.
+
+## Lane doors
+
+- `se_lint` runs the voice checks over a text, a file, or a whole glob. It catches form, never meaning: walls of text, long sentences, comma chains, missing structure.
 
 ## Extensions
 

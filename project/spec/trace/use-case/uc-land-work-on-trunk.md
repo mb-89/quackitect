@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-land-work-on-trunk
 type: "[[use-case]]"
 statement: Move a record's finished work onto the trunk, with the checks it owes run rather than assumed.
@@ -19,6 +20,12 @@ priority: should
 4. The gate's rounds are filled from what the run and the artifacts actually show.
 5. The person reads the form, opens some of what it points at, and blesses it.
 6. The work lands on trunk in one piece and the worktree goes.
+
+## Lane doors
+
+- `se_git_sync` keeps the record and trunk in step mid-iteration, long before anything lands.
+- `se_git_land` is the landing itself, behind the release gate.
+- `se_git` runs the allowlisted git verbs. The push stays with the person.
 
 ## Extensions
 

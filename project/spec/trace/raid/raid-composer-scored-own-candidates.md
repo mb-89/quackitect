@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: raid-composer-scored-own-candidates
 type: "[[raid]]"
 kind: issue

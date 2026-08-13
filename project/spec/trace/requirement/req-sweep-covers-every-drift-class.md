@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-sweep-covers-every-drift-class
 type: "[[requirement]]"
 statement: When the sweep runs, the engine shall check every drift class in the Detail table and report findings for each class.

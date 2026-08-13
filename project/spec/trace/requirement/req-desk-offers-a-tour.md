@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-desk-offers-a-tour
 type: "[[requirement]]"
 statement: The front desk shall list a tour among its offers.

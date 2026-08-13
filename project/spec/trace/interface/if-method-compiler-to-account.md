@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: if-method-compiler-to-account
 type: "[[interface]]"
 statement: Divergence reports and sweep results land in the account's files, dated and referenced.

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-browse-the-archive
 type: "[[use-case]]"
 statement: Read a finished record as it stood, without disturbing anything running now.
@@ -18,6 +19,15 @@ priority: should
 3. Its states are drawn as they finished — which passed, which were struck, where the walk went.
 4. They open a state and read its evidence form as it was filled.
 5. A gate additionally shows its rounds, its verdict, and the hand that blessed it with the day.
+
+## Lane doors
+
+A past version of the repository is read at a committed `ref`, without
+checking it out. Three verbs take one:
+
+- `se_file_read`
+- `se_file_search`
+- `se_file_glob`
 
 ## Extensions
 

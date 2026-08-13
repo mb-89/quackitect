@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-entry-binds-worktree
 type: "[[requirement]]"
 statement: When the walk enters a seeded iteration, the engine shall bind a dedicated worktree and branch to the record and stamp the record started.

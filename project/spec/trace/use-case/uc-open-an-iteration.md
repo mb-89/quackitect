@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-open-an-iteration
 type: "[[use-case]]"
 statement: Open an iteration on an existing product and set the rigor its work deserves.
@@ -19,6 +20,11 @@ priority: must
 4. The agent proposes a change size with its reasoning, and names the cells a smaller column would strike.
 5. The person chooses. The bless IS the choice.
 6. The engine compiles the chosen column into this iteration's own state machine and pins it to the record.
+
+## Lane doors
+
+- `se_seed_iteration` opens the iteration.
+- `se_seed_expedition` opens the larger vehicle, for work that outgrows one iteration.
 
 ## Extensions
 

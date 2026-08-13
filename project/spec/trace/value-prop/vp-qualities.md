@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: vp-qualities
 type: "[[value-prop]]"
 statement: As an engineer driving agents I need the product to hold its qualities under stress, not only on the happy path.

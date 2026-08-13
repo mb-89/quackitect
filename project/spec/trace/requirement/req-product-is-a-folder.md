@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-product-is-a-folder
 type: "[[requirement]]"
 statement: The engine shall keep every artifact a product owns inside that product's own root folder, with zero product-owned files outside it.

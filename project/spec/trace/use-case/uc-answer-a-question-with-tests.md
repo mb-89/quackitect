@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-answer-a-question-with-tests
 type: "[[use-case]]"
 statement: Answer one question about a change by running only the tests that could answer it.
@@ -19,6 +20,13 @@ priority: should
 4. Every red is understood before it is touched.
 5. Each is fixed properly, or the test is corrected where it asserted a rule that no longer holds.
 6. The scope runs green and the work moves on.
+
+## Lane doors
+
+- `se_test` runs the tests as a durable job, and the handle survives a client timeout.
+
+A scoped run states the question it answers. The verdict records that
+question beside the scope.
 
 ## Extensions
 

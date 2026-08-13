@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-gate-needs-a-persons-verdict
 type: "[[requirement]]"
 statement: When the walk reaches a gate, the engine shall hold the walk until a verdict is recorded, and shall accept that verdict from the agent only where the session autonomy allows it.

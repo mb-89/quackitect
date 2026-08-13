@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: uc-change-the-method-mid-walk
 type: "[[use-case]]"
 statement: Correct the method while a walk is standing on it, and continue on the corrected version.
@@ -18,6 +19,10 @@ priority: should
 3. They ask the engine to reload; it restarts on the new sources.
 4. The walk recomputes its position rather than remembering it, and re-earns whatever it owes.
 5. The state opens again under the corrected guidance, with what was already filled still standing.
+
+## Lane doors
+
+- `se_reload` restarts the engine on the new sources, mid-session, and the walk reboots at its start.
 
 ## Extensions
 

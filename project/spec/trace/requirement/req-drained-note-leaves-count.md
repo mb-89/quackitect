@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-drained-note-leaves-count
 type: "[[requirement]]"
 statement: When a drain is accepted, the engine shall remove the note from the pending count and shall retain the note with its disposition.

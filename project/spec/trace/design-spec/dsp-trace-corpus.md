@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: dsp-trace-corpus
 type: "[[design-spec]]"
 statement: the trace read live from node files, carried by one loader with a stat-stamped cache and schema-checked edges
@@ -8,6 +9,7 @@ files:
   - "project/deliverable/engine/trace.ts"
   - "project/deliverable/engine/traceschema.ts"
   - "project/deliverable/engine/frontmatter.ts"
+  - "project/deliverable/engine/bin/backfill-minted.ts"
 ---
 
 ## Responsibility

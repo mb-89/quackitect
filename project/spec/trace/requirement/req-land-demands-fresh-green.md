@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-land-demands-fresh-green
 type: "[[requirement]]"
 statement: When the walk reaches the land gate, the engine shall run the full battery to its end and refuse the advance while any test fails.

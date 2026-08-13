@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-test-result-is-structured
 type: "[[requirement]]"
 statement: The engine shall report every test run as totals with each failure carrying its failing assertion.

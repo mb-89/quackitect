@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: tsp-tour-resilience
 type: "[[test-spec]]"
 statement: A tour stop states an absence rather than inventing an example, and survives a missing highlight while recording the miss, verified by test over the tour machinery.

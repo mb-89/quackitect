@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: stk-newcomer
 type: "[[stakeholder]]"
 statement: Someone meeting this project with no context, who has to get oriented before any of it makes sense.

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-narration-toll-is-collected
 type: "[[requirement]]"
 statement: While the narration cadence is set, the engine shall demand an update within the notch's window, warning once and then refusing the next call without one.

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-rejection-carries-its-reason
 type: "[[requirement]]"
 statement: When a person rejects a gate, the engine shall record the rejection with a reason naming what to redo.

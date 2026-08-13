@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: nbr-engineer
 type: "[[neighbour]]"
 statement: The engineer driving the work. They aim the walk, judge the evidence, and decide at every gate.

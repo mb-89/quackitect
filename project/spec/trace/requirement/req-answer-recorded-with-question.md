@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-answer-recorded-with-question
 type: "[[requirement]]"
 statement: When a person's direct question is answered, the engine shall record the question and its answer as two separate fields in one log entry.

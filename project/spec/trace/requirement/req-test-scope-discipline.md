@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-test-scope-discipline
 type: "[[requirement]]"
 statement: When a test run names a scope, the engine shall run exactly that scope and shall answer from the recorded verdict where the scope has not changed.

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: vp-autonomy-range
 type: "[[value-prop]]"
 statement: As an engineer, I need to set how much the agent does, and I need the system to work at EVERY setting — including none.

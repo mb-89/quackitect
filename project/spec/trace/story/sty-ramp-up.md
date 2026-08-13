@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: sty-ramp-up
 type: "[[story]]"
 statement: An engineer with nothing installed gets from an empty machine to the front desk, and everything they must click on the way is in this one story.
@@ -34,9 +35,9 @@ The folder rule stands at the desk since trunk commit 1b239b66 (guidance/front-d
 
 ---
 
-The panel appears beside the editor. A state machine is drawn on it, one node lit, and a slider sits above the drawing.
+The panel appears beside the editor. A state machine is drawn on it, one node lit, and the autonomy rungs sit above the drawing.
 |||
-Observed daily and on 2026-08-11: the panel beside the editing area with the machine drawn - tsp-panel-walkthrough's first step.
+Observed daily, and re-observed 2026-08-12 on the current build: the panel page carries all six rung words and zero slider controls (the fresh-eyes run, job-msq7dmcl-8).
 
 ---
 

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: fn-run-a-governed-walk.hold-the-work
 type: "[[function]]"
 cluster: the-record-life
@@ -8,6 +9,7 @@ satisfies:
   - req-parallel-iterations-own-worktrees
   - req-unshipped-dependency-refused
   - req-landing-needs-no-close
+  - req-boot-ends-at-front-desk
   - req-walk-resumes-from-repo
   - req-walk-survives-host-swap
   - req-resume-needs-no-person

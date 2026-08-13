@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: tsp-desk-and-gates
 type: "[[test-spec]]"
 statement: The desk greets walkable, takes plain words, and routes small work into open records, and a gate shows its evidence whole, verified by demonstration at the live desk.

@@ -1,4 +1,5 @@
 ---
+minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: tsp-archive
 type: "[[test-spec]]"
 statement: The archive lists every closed record, opens to a person only, shows each record as it closed, and holds nothing writable, verified by test over the archive machinery.
