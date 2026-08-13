@@ -26,7 +26,7 @@ evidence:
     of: raid
     description: the chosen unknowns picked over the exposure chart — the biggest blockers for the coming build that a timeboxed probe can settle; one register ref per line, each becoming one parallel spike state
 major: full
-minor: tailored
+minor: none
 patch: none
 product: full
 specification: tailored
@@ -36,10 +36,11 @@ major_note: |
   unknown. A major with zero spikes is legal but rare - record the "none"
   argument carefully.
 minor_note: |
-  Applies where the delta carries unknowns: rank them, spike the ones
-  that would hurt most if wrong, timeboxed. NONE IS A NORMAL OUTCOME -
-  record "no unknowns worth a spike" and move on; do not invent spikes
-  to fill the state.
+  Does not apply (owner ruling 2026-08-13). M6 is struck whole at this
+  size, so there is nothing to rank unknowns for.
+
+  ESCALATE: an unknown big enough to need a timeboxed probe is bigger than
+  a minor.
 patch_note: |
   Does not apply. An unknown big enough to spike is bigger than a patch.
   STRIKE PROPOSAL - owner adjudicates.

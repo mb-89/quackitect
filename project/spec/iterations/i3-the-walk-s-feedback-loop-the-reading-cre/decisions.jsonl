@@ -170,3 +170,133 @@
 {"ts":"2026-08-13T09:32:29.023Z","op":"update","visit":"iterations/i3/author-tests@0","node":"d13","brief":"proving the last document to see where the re-pinned walk lands"}
 {"ts":"2026-08-13T09:33:10.626Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d14","brief":"recording that the drift fix is forward-only and why"}
 {"ts":"2026-08-13T09:36:53.727Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d15","brief":"escaping to rechain the build states and fix the snapshot refresh"}
+{"ts":"2026-08-13T09:53:19.880Z","op":"update","visit":"iterations/i3/author-tests@0","node":"d4","brief":"listing the minor column so the struck cells can be judged"}
+{"ts":"2026-08-13T09:53:56.427Z","op":"update","visit":"iterations/i3/author-tests@0","node":"d5","brief":"taking the door the re-pinned machine now offers"}
+{"ts":"2026-08-13T09:54:10.772Z","op":"update","visit":"iterations/i3/author-tests@0","node":"d6","brief":"proving the build-strategies card that specify-build demands"}
+{"ts":"2026-08-13T09:54:20.716Z","op":"update","visit":"iterations/i3/author-tests@0","node":"d7","brief":"proving the function-structures card that derive-functions demands"}
+{"ts":"2026-08-13T09:54:53.037Z","op":"update","visit":"iterations/i3/author-tests@0","node":"d8","brief":"proving the verification card, the last owed reading"}
+{"ts":"2026-08-13T09:55:22.707Z","op":"update","visit":"iterations/i3/author-tests@0","node":"d9","brief":"walking the minor states patch had struck"}
+{"ts":"2026-08-13T10:00:38.866Z","op":"fork","visit":"iterations/i3/author-tests@0","parent":null,"node":"d10","brief":"reopen puts a token on every reopened state; frontier only","nodes":[]}
+{"ts":"2026-08-13T10:34:41.258Z","op":"update","visit":"iterations/i3/draft-vision@0","node":"d37","brief":"stepping out to reload the engine onto the trim"}
+{"ts":"2026-08-13T10:35:35.580Z","op":"done","visit":"front_desk@0","node":"d1","brief":"one field served instead of four — the trim is mechanical, live"}
+{"ts":"2026-08-13T10:35:59.812Z","op":"update","visit":"iterations/i3/draft-vision@0","node":"d4","brief":"re-fetching the oversize pull by ref"}
+{"ts":"2026-08-13T10:36:08.825Z","op":"update","visit":"iterations/i3/draft-vision@0","node":"d5","brief":"stamping draft-vision"}
+{"ts":"2026-08-13T10:36:41.797Z","op":"update","visit":"iterations/i3/scope-non-goals@0","node":"d6","brief":"scope and non-goals filled and stamped"}
+{"ts":"2026-08-13T10:37:32.482Z","op":"plan","visit":"iterations/i3/gate-motivation@0","parent":"d2","nodes":[{"id":"d7","brief":"gate-motivation reviewed"},{"id":"d8","brief":"red team run"},{"id":"d9","brief":"blessed with the strike risk recorded"}]}
+{"ts":"2026-08-13T10:38:11.673Z","op":"update","visit":"iterations/i3/gate-motivation@0","node":"d10","brief":"minting the two register entries the red team produced"}
+{"ts":"2026-08-13T10:38:56.985Z","op":"done","visit":"iterations/i3/gate-motivation@0","node":"d7","brief":"gate-motivation rounds in the format the form demands"}
+{"ts":"2026-08-13T10:39:04.420Z","op":"done","visit":"iterations/i3/gate-motivation@0","node":"d8","brief":"raid additions as resolvable references"}
+{"ts":"2026-08-13T10:39:19.657Z","op":"done","visit":"iterations/i3/gate-motivation@0","node":"d9","brief":"gate-motivation blessed; two register entries stand"}
+{"ts":"2026-08-13T10:39:27.838Z","op":"update","visit":"iterations/i3/gate-motivation@0","node":"d11","brief":"method read credited, entering M2"}
+{"ts":"2026-08-13T10:40:19.876Z","op":"update","visit":"iterations/i3/write-stories@0","node":"d12","brief":"write-stories points at the standing set — no new need was declared"}
+{"ts":"2026-08-13T10:40:37.962Z","op":"plan","visit":"iterations/i3/write-stories@0","parent":"d2","nodes":[{"id":"d13","brief":"write-stories submitted — standing set"},{"id":"d14","brief":"no new story"},{"id":"d15","brief":"reason argued"}]}
+{"ts":"2026-08-13T10:41:04.234Z","op":"update","visit":"iterations/i3/write-stories@0","node":"d16","brief":"use-case read credited; listing the standing set"}
+{"ts":"2026-08-13T10:41:21.708Z","op":"done","visit":"iterations/i3/write-stories@0","node":"d13","brief":"write-stories signed against the standing set"}
+{"ts":"2026-08-13T10:41:26.596Z","op":"done","visit":"iterations/i3/write-stories@0","node":"d14","brief":"pulling with no payload — the machine says what it wants"}
+{"ts":"2026-08-13T10:41:42.303Z","op":"done","visit":"iterations/i3/write-stories@0","node":"d15","brief":"generalize-use-cases: standing set, no extension owed"}
+{"ts":"2026-08-13T10:42:00.052Z","op":"update","visit":"iterations/i3/derive-functions@0","node":"d17","brief":"checking the register against the six mechanisms now in scope"}
+{"ts":"2026-08-13T10:43:10.195Z","op":"update","visit":"iterations/i3/derive-functions@0","node":"d18","brief":"four requirement rows written for the mechanisms that landed late"}
+{"ts":"2026-08-13T10:43:27.286Z","op":"update","visit":"iterations/i3/derive-functions@0","node":"d19","brief":"reopening write-requirements to carry the four late rows"}
+{"ts":"2026-08-13T10:43:41.545Z","op":"update","visit":"iterations/i3/write-requirements@1","node":"d20","brief":"reopening write-requirements to carry the four late rows"}
+{"ts":"2026-08-13T10:43:55.227Z","op":"update","visit":"iterations/i3/write-requirements@1","node":"d21","brief":"sizing the standing register before re-submitting it"}
+{"ts":"2026-08-13T10:45:19.739Z","op":"done","visit":"front_desk@0","node":"d2","brief":"M3 work signed: seven rows, all landing on standing functions"}
+{"ts":"2026-08-13T10:45:39.468Z","op":"update","visit":"iterations/i3/derive-functions@0","node":"d22","brief":"seven requirements wired onto three standing functions"}
+{"ts":"2026-08-13T10:46:22.163Z","op":"plan","visit":"iterations/i3/derive-functions@0","parent":null,"nodes":[{"id":"d23","brief":"finish derive-functions"},{"id":"d24","brief":"gate-requirements"},{"id":"d25","brief":"M7 to gate-implementation"}]}
+{"ts":"2026-08-13T10:46:59.139Z","op":"update","visit":"iterations/i3/gate-requirements@0","node":"d26","brief":"gate-requirements: red team found the scope growth, recording it"}
+{"ts":"2026-08-13T10:47:28.478Z","op":"update","visit":"iterations/i3/gate-requirements@0","node":"d27","brief":"register entry minted for the scope-growth hole"}
+{"ts":"2026-08-13T10:47:31.604Z","op":"done","visit":"iterations/i3/derive-functions@0","node":"d23","brief":"derive-functions signed — seven rows on standing functions"}
+{"ts":"2026-08-13T10:47:53.921Z","op":"done","visit":"iterations/i3/derive-functions@0","node":"d24","brief":"gate-requirements blessed; the scope-growth hole is in the register"}
+{"ts":"2026-08-13T10:48:12.381Z","op":"update","visit":"iterations/i3/decompose-structure@0","node":"d28","brief":"decompose-structure: nothing added, so the architecture holds and it stays minor"}
+{"ts":"2026-08-13T10:52:16.517Z","op":"plan","visit":"iterations/i3/author-tests@0","parent":null,"nodes":[{"id":"d29","brief":"answer the graph question"},{"id":"d30","brief":"author-tests for the four new rows"},{"id":"d31","brief":"specify-build and the build drawing"},{"id":"d32","brief":"trace-design and fix-findings"},{"id":"d33","brief":"stop at gate-implementation"}]}
+{"ts":"2026-08-13T10:53:51.783Z","op":"update","visit":"iterations/i3/author-tests@0","node":"d34","brief":"checking what a design spec must actually connect to"}
+{"ts":"2026-08-13T10:55:23.175Z","op":"done","visit":"iterations/i3/author-tests@0","node":"d29","brief":"checked: the design sweep passes three-for-three with the four rows missing"}
+{"ts":"2026-08-13T11:00:51.311Z","op":"update","visit":"iterations/i3/author-tests@0","node":"d35","brief":"answering the trace question with the three-of-four count"}
+{"ts":"2026-08-13T11:03:13.662Z","op":"update","visit":"iterations/i3/author-tests@0","node":"d36","brief":"grain note filed for the retro; back to the walk"}
+{"ts":"2026-08-13T11:04:34.520Z","op":"update","visit":"iterations/i3/author-tests@0","node":"d37","brief":"stepping out to build the two owed mechanisms"}
+{"ts":"2026-08-13T11:17:37.871Z","op":"update","visit":"iterations/i3/author-tests@0","node":"d4","brief":"the frontier requirement joins the spec that already claims its file"}
+{"ts":"2026-08-13T11:18:15.575Z","op":"update","visit":"iterations/i3/author-tests@0","node":"d5","brief":"two specs minted; four late requirements now verified"}
+{"ts":"2026-08-13T11:18:35.034Z","op":"update","visit":"iterations/i3/author-tests@0","node":"d6","brief":"feedback-loop spec now claims the two steps it had owed"}
+{"ts":"2026-08-13T11:18:54.508Z","op":"update","visit":"iterations/i3/author-tests@0","node":"d7","brief":"author-tests submitted with four specs and one owed step named"}
+{"ts":"2026-08-13T11:19:09.480Z","op":"done","visit":"start@0","node":"d2","brief":"M7's front half walked: author-tests signed with four specs"}
+{"ts":"2026-08-13T11:19:51.536Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d8","brief":"build drawing authored — nine chunks, edges only where real"}
+{"ts":"2026-08-13T11:20:12.838Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d9","brief":"specify-build submitted with the drawing seeded"}
+{"ts":"2026-08-13T11:20:23.930Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d10","brief":"specify-build signed; entering the build drawing"}
+{"ts":"2026-08-13T11:20:49.569Z","op":"fork","visit":"iterations/i3/specify-build@0","parent":"d3","node":"d11","brief":"route reports arrived while standing two states short","nodes":[]}
+{"ts":"2026-08-13T11:21:26.294Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d12","brief":"bisecting: does the route reach verification"}
+{"ts":"2026-08-13T11:21:31.939Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d13","brief":"bisecting further: trace-design"}
+{"ts":"2026-08-13T11:21:58.586Z","op":"done","visit":"iterations/i3/specify-build@0","node":"d11","brief":"diagnosed: the router stops at the sub-machine boundary and mislabels it"}
+{"ts":"2026-08-13T11:22:04.678Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d14","brief":"aiming at build-steps to cross the boundary"}
+{"ts":"2026-08-13T11:22:07.763Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d15","brief":"walking into the build drawing"}
+{"ts":"2026-08-13T11:22:16.984Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d16","brief":"re-stamping specify-build to see what refuses"}
+{"ts":"2026-08-13T11:22:56.239Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d17","brief":"reopening specify-build to get its problems named"}
+{"ts":"2026-08-13T11:23:00.488Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d18","brief":"pulling for specify-build's named problems"}
+{"ts":"2026-08-13T11:26:10.811Z","op":"done","visit":"start@0","node":"d3","brief":"blocked at specify-build: submit and the completion guard disagree"}
+{"ts":"2026-08-13T11:28:02.415Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d19","brief":"re-explaining the blocker in plain words"}
+{"ts":"2026-08-13T11:31:21.826Z","op":"fork","visit":"iterations/i3/specify-build@0","parent":null,"node":"d20","brief":"measuring what makes a served form 380k characters","nodes":[]}
+{"ts":"2026-08-13T11:31:59.165Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d21","brief":"pagination ruling noted with the measured sizes"}
+{"ts":"2026-08-13T11:33:31.723Z","op":"done","visit":"iterations/i3/specify-build@0","node":"d20","brief":"root cause found: every form carries facts for all 467 corpus nodes"}
+{"ts":"2026-08-13T11:36:25.343Z","op":"plan","visit":"iterations/i3/specify-build@0","parent":null,"nodes":[{"id":"d22","brief":"shrink the agent's copy of a form"},{"id":"d23","brief":"read the failing check and close specify-build"},{"id":"d24","brief":"walk i3 to release"}]}
+{"ts":"2026-08-13T11:38:02.593Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d5","brief":"forcing the leave so the failing check names itself"}
+{"ts":"2026-08-13T11:38:06.782Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d6","brief":"pulling toward build-steps"}
+{"ts":"2026-08-13T11:38:24.928Z","op":"done","visit":"start@0","node":"d2","brief":"the corpus check enforces the node-table line pattern; the submit does not"}
+{"ts":"2026-08-13T11:38:47.168Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d7","brief":"design_specs written as table rows, values taken from the nodes"}
+{"ts":"2026-08-13T11:38:52.404Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d8","brief":"testing whether the table clears the corpus check"}
+{"ts":"2026-08-13T11:39:13.661Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d9","brief":"stepping out to make the completion guard name its failure"}
+{"ts":"2026-08-13T11:42:48.960Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d5","brief":"stepping out to fix the reopen deadlock"}
+{"ts":"2026-08-13T11:46:11.971Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d4","brief":"reading the claim's actual stamps instead of guessing"}
+{"ts":"2026-08-13T11:46:44.974Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d5","brief":"emptying a field so the pull serves the form with its problems"}
+{"ts":"2026-08-13T11:46:50.586Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d6","brief":"pulling for the served problems"}
+{"ts":"2026-08-13T11:47:21.643Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d7","brief":"the drawing was missing the promoted spike's chunk"}
+{"ts":"2026-08-13T11:47:40.002Z","op":"done","visit":"start@0","node":"d2","brief":"the promotion named a chunk the drawing lacked — both closed"}
+{"ts":"2026-08-13T11:50:38.159Z","op":"update","visit":"iterations/i3/build-steps/start@0","node":"d8","brief":"explaining the blocker in plain terms"}
+{"ts":"2026-08-13T11:55:43.497Z","op":"fork","visit":"iterations/i3/build-steps/start@0","parent":"d3","node":"d9","brief":"I invented a build step to pass a check — must be undone","nodes":[]}
+{"ts":"2026-08-13T11:59:49.016Z","op":"done","visit":"iterations/i3/build-steps/start@0","node":"d9","brief":"not fabricated: the chunk demands `built` before it can be passed"}
+{"ts":"2026-08-13T12:04:28.008Z","op":"done","visit":"start@0","node":"d2","brief":"borrowed chunk removed; the drawing records why it was there"}
+{"ts":"2026-08-13T12:04:38.460Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d5","brief":"reopening specify-build to record the true promotions"}
+{"ts":"2026-08-13T12:04:54.032Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d6","brief":"promotions is none, honestly and by the scoped filter"}
+{"ts":"2026-08-13T12:05:24.961Z","op":"done","visit":"start@0","node":"d3","brief":"specify-build signed with no borrowed chunk"}
+{"ts":"2026-08-13T12:05:38.941Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d7","brief":"checking what a node-table accepts when it has no rows"}
+{"ts":"2026-08-13T12:05:51.102Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d8","brief":"reopening the form to read its verdict on an empty promotion set"}
+{"ts":"2026-08-13T12:05:55.616Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d9","brief":"reading the form's verdict"}
+{"ts":"2026-08-13T12:06:06.030Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d10","brief":"promotions is an empty table — no spike, no promotion"}
+{"ts":"2026-08-13T12:06:15.165Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d11","brief":"checking whether specify-build finally completes"}
+{"ts":"2026-08-13T12:06:30.912Z","op":"done","visit":"start@0","node":"d4","brief":"reading the stamps once more"}
+{"ts":"2026-08-13T12:06:50.599Z","op":"plan","visit":"iterations/i3/specify-build@0","parent":null,"nodes":[{"id":"d12","brief":"make the guard name the failing field"},{"id":"d13","brief":"finish i3"}]}
+{"ts":"2026-08-13T12:09:52.642Z","op":"done","visit":"start@0","node":"d2","brief":"root cause: striking M6 removed the artifact the scoping keys off"}
+{"ts":"2026-08-13T12:12:43.821Z","op":"update","visit":"iterations/i3/build-steps/start@0","node":"d5","brief":"entering the first chunk"}
+{"ts":"2026-08-13T12:13:06.060Z","op":"update","visit":"iterations/i3/build-steps/reading-credit@0","node":"d6","brief":"chunk 1 of 9"}
+{"ts":"2026-08-13T12:13:12.420Z","op":"update","visit":"iterations/i3/build-steps/reading-credit@0","node":"d7","brief":"chunk 1 signed"}
+{"ts":"2026-08-13T12:13:31.543Z","op":"update","visit":"iterations/i3/build-steps/claim-pool@0","node":"d8","brief":"chunk 2 of 9"}
+{"ts":"2026-08-13T12:16:22.136Z","op":"done","visit":"start@0","node":"d3","brief":"nine chunks built; the sweep finds nothing unclaimed"}
+{"ts":"2026-08-13T12:16:40.089Z","op":"plan","visit":"iterations/i3/trace-design@0","parent":null,"nodes":[{"id":"d9","brief":"run the verification battery"},{"id":"d10","brief":"the implementation gate"},{"id":"d11","brief":"validation and release"}]}
+{"ts":"2026-08-13T12:16:49.683Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d12","brief":"aiming at verification, the nearer step"}
+{"ts":"2026-08-13T12:16:57.361Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d13","brief":"pulling to move off trace-design"}
+{"ts":"2026-08-13T12:17:22.405Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d14","brief":"probing whether any route runs past trace-design"}
+{"ts":"2026-08-13T12:17:42.492Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d15","brief":"reopening trace-design to read its verdict"}
+{"ts":"2026-08-13T12:17:48.820Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d16","brief":"reading trace-design's problems"}
+{"ts":"2026-08-13T12:18:03.720Z","op":"done","visit":"start@0","node":"d2","brief":"trace-design was clean; the empty route is something else"}
+{"ts":"2026-08-13T12:18:35.212Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d17","brief":"reading verification's row for what blocks the edge"}
+{"ts":"2026-08-13T12:21:51.066Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d18","brief":"checking trace-design's stamps against its reopen"}
+{"ts":"2026-08-13T12:22:57.909Z","op":"done","visit":"iterations/i3/trace-design@0","node":"d9","brief":"the sweep's finding: two engine files claimed by nothing"}
+{"ts":"2026-08-13T12:23:24.295Z","op":"plan","visit":"iterations/i3/trace-design@0","parent":null,"nodes":[{"id":"d19","brief":"claim the two swept files"},{"id":"d20","brief":"make the router say why it cannot move"},{"id":"d21","brief":"close i3"}]}
+{"ts":"2026-08-13T12:24:17.212Z","op":"done","visit":"iterations/i3/trace-design@0","node":"d19","brief":"both claimed by the spec that owns them, checked by imports"}
+{"ts":"2026-08-13T12:24:23.644Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d22","brief":"checking whether the claims cleared the sweep"}
+{"ts":"2026-08-13T12:24:38.544Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d23","brief":"stepping out to fix the silent stall"}
+{"ts":"2026-08-13T12:36:06.380Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d5","brief":"dropping the claim on the deleted file"}
+{"ts":"2026-08-13T12:36:25.815Z","op":"done","visit":"start@0","node":"d2","brief":"sweep answered: one file claimed, one cut"}
+{"ts":"2026-08-13T12:36:31.368Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d6","brief":"pulling for what the machine wants now"}
+{"ts":"2026-08-13T12:36:41.887Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d7","brief":"reading the three unclaimed files before deciding"}
+{"ts":"2026-08-13T12:37:09.868Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d8","brief":"the two live files claimed by their owners"}
+{"ts":"2026-08-13T12:37:35.462Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d9","brief":"backfill claimed, not cut — its work is not finished"}
+{"ts":"2026-08-13T12:37:44.918Z","op":"update","visit":"iterations/i3/trace-design@0","node":"d10","brief":"asking the sweep again"}
+{"ts":"2026-08-13T12:38:52.794Z","op":"done","visit":"start@0","node":"d3","brief":"sweep cleared; at the battery"}
+{"ts":"2026-08-13T12:45:06.218Z","op":"plan","visit":"iterations/i3/verification@0","parent":null,"nodes":[{"id":"d11","brief":"why verification has no tools"},{"id":"d12","brief":"how i1 passed it"},{"id":"d13","brief":"finish the gate"}]}
+{"ts":"2026-08-13T13:30:12.142Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d4","brief":"checking the worktree copies"}
+{"ts":"2026-08-13T13:30:21.068Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d5","brief":"worktree copies carry the owner trunk records"}
+{"ts":"2026-08-13T13:30:26.849Z","op":"update","visit":"iterations/i3/specify-build@0","node":"d6","brief":"pulling toward verification"}
+{"ts":"2026-08-13T13:33:42.087Z","op":"update","visit":"iterations/i3/verification@0","node":"d7","brief":"verification failed as recorded, taking the fallback"}
+{"ts":"2026-08-13T13:35:14.283Z","op":"done","visit":"start@0","node":"d2","brief":"the tester's seven verdicts are recorded on the verification form"}
+{"ts":"2026-08-13T13:35:19.704Z","op":"plan","visit":"iterations/i3/verification@0","parent":null,"nodes":[{"id":"d8","brief":"confirm the fallback can never open"},{"id":"d9","brief":"fix se_test to record its question"},{"id":"d10","brief":"trace the untraced lane verbs"},{"id":"d11","brief":"re-verify with the tester"},{"id":"d12","brief":"press the implementation gate"}]}
+{"ts":"2026-08-13T13:37:21.374Z","op":"update","visit":"iterations/i3/verification@0","node":"d13","brief":"stepping out to trunk to change the engine"}
+{"ts":"2026-08-13T14:08:04.038Z","op":"done","visit":"start@0","node":"d2","brief":"the walk stands at verification again"}
+{"ts":"2026-08-13T14:09:07.139Z","op":"obsolete","visit":"start@0","node":"d3","brief":"no sync needed — the record shares these working files"}

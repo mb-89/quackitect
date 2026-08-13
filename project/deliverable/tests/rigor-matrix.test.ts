@@ -187,26 +187,55 @@ test("compileColumn: a gate's outgoing edges are approvals", () => {
   for (const e of gate!.edges) assert.equal(e.role, "approval");
 });
 
-test("compileColumn minor: the tailoring strikes exactly the M4-M5 exploration", () => {
+// WHAT A MINOR IS, decided step by step with the owner on 2026-08-13 after
+// the first real minor iteration walked it and found the shape too heavy.
+//
+// THE RULE BEHIND THE LIST: a step whose only honest answer at this size is
+// "unchanged" is struck, not kept. Keeping it taught skimming, and skimming is
+// what makes every other question cheaper to skip too. Where a step would
+// genuinely change something, its own note now says what promotes the
+// iteration instead.
+test("compileColumn minor: exploration, architecture and prototyping are all struck", () => {
   const m = readRigorMatrix(ROOT);
   const decl = compileColumn(m, "minor");
   validateMachine(decl);
   const ids = new Set(decl.states.map((s) => s.id));
   for (const struck of [
+    // M1-M2: the frame and the inputs that cannot move without escalating.
     "pressure-test",
+    "define-actual",
+    "draw-context",
+    "map-stakeholders",
+    "gate-inputs",
+    // M4: the whole candidate exploration.
     "derive-criteria",
     "partition-functions",
     "enumerate-space",
     "evaluate-set",
     "gate-candidates",
+    // M5: everything but decompose-structure, which allocates into what stands.
     "converge-pugh",
     "declare-winner",
     "reverse-sensitivity",
+    "record-adrs",
+    "evaluate-architecture",
+    "gate-architecture",
+    // M6: whole. Needing a spike is the tell that this is a major.
+    "rank-unknowns",
+    "run-spikes",
+    "fold-back",
+    "gate-prototype",
+    // M8: the package state already ends with a person using the artifact.
+    "run-demos",
   ]) {
     assert.ok(!ids.has(struck), `minor should strike ${struck}`);
   }
-  // 40 applied rows + start (run-spikes rides rank-unknowns into minor).
-  assert.equal(decl.states.length, 42);
+  // WHAT MUST SURVIVE, named so a future strike cannot take them quietly.
+  for (const kept of ["write-requirements", "gate-requirements", "decompose-structure", "fill-story-evidence", "gate-validation"]) {
+    assert.ok(ids.has(kept), `minor must keep ${kept}`);
+  }
+  // 28 applied rows, plus start and end.
+  assert.equal(decl.states.length, 30);
 });
 
 test("the columns are monotone: what a smaller column walks, every larger column walks", () => {

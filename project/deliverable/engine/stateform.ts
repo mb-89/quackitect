@@ -7,7 +7,7 @@
 // the save rewrites and the only thing the ingest reads (the v1 book's
 // comment law, reapplied).
 import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { type ExposureView, exposureView, type MetricRow, type ScenarioDeckView, scenarioDeckView, structureMetrics } from "./atamwalk.ts";
 import { catalogItems, trizParameterItems } from "./catalogs.ts";
 import { type Judgment, type RelationKind, type WalkResult, walk } from "./compare.ts";
@@ -769,12 +769,14 @@ function seededStepIds(recordRoot: string): Set<string> | undefined {
   return undefined;
 }
 
-/** The record's OWN experiments: the ids its fold-back evidence names.
- *  A standing experiment from an earlier record keeps its assignment to
- *  THAT record's drawing, which this tree does not carry — sweeping it
- *  against the current drawing failed i2 on i1's promotion (2026-08-12).
- *  No fold-back evidence means no scoping, so unit fixtures keep the
- *  whole-corpus sweep. */
+/** The record's OWN experiments, where its fold-back says so. An experiment
+ *  from an earlier record keeps its assignment to THAT record's drawing, which
+ *  this tree does not carry — sweeping it against the current drawing failed i2
+ *  on i1's promotion (2026-08-12).
+ *
+ *  UNDEFINED MEANS THE RECORD HAS NO FOLD-BACK, which is not the same as
+ *  "folded nothing back". A minor strikes M6 whole, so it never has one. The
+ *  caller falls back to the experiment's own owner there. */
 function foldBackExperiments(recordRoot: string): Set<string> | undefined {
   const dir = join(recordRoot, "project", "spec", "iterations");
   try {
@@ -795,11 +797,38 @@ function foldBackExperiments(recordRoot: string): Set<string> | undefined {
 function promotionAssignmentProblems(corpus: { id: string; type: string; file?: string }[], recordRoot: string): string[] {
   const out: string[] = [];
   const steps = seededStepIds(recordRoot);
+  // A PROMOTION BELONGS TO THE ITERATION THAT RAN THE SPIKE (owner ruling
+  // 2026-08-13). It is a spike aimed at a later step of the SAME record and it
+  // does not outlive it — exactly like the spike, which never travelled.
+  //
+  // THE OWNER IS ON THE EXPERIMENT, not inferred from a sibling artifact. This
+  // used to scope by looking for the record's fold-back evidence, which broke
+  // twice: absent evidence meant "do not scope", so striking M6 at minor turned
+  // the scoping off silently, and my first repair of that skipped every
+  // experiment in any root that merely had an iterations directory — which is
+  // every unit fixture. The tester caught the second one.
+  //
+  // AN EXPERIMENT WITH NO OWNER IS IN SCOPE. Absence cannot prove it belongs to
+  // somebody else, and the safe direction is to ask rather than to skip.
+  //
+  // TWO WAYS TO KNOW THE OWNER, and they answer in different situations.
+  //
+  // The record's FOLD-BACK names the experiments it promoted, and where that
+  // evidence exists it is the direct answer. A minor strikes M6 whole, so it
+  // never has one — and reading absence as "folded nothing back" is what broke
+  // the sweep's own test, because every unit fixture is also absent.
+  //
+  // So absence falls through to the experiment's OWN `minted_in`. An experiment
+  // with no owner at all stays in scope: absence cannot prove it belongs to
+  // somebody else, and the safe direction is to ask rather than to skip.
   const own = foldBackExperiments(recordRoot);
+  const owner = basename(recordRoot);
   for (const n of corpus) {
     if (n.type !== "experiment" || n.file === undefined) continue;
     if (own !== undefined && !own.has(n.id)) continue;
     const fm = noteOf(n.file)?.frontmatter ?? {};
+    const mintedIn = String(fm.minted_in ?? "").trim();
+    if (own === undefined && mintedIn !== "" && mintedIn !== owner) continue;
     const p = String(fm.promote ?? "").trim();
     if (p === "" || /^none\b/i.test(p)) continue;
     const chunk = String(fm.chunk ?? "").trim();
@@ -1772,14 +1801,30 @@ function mustStoryItems(traceRoot: string): string[] {
     .sort();
 }
 
-/** $promotions, resolved live: the experiments whose `promote:` names
- *  something entering the build. PROMOTIONS ARE A FILTER, NEVER A LIST
- *  (M6 fold-back): an experiment saying none is honestly absent here. */
+/** $promotions, resolved live: the experiments THIS RECORD promoted, whose
+ *  `promote:` names something entering the build. PROMOTIONS ARE A FILTER,
+ *  NEVER A LIST (M6 fold-back): an experiment saying none is honestly absent.
+ *
+ *  A PROMOTION BELONGS TO THE ITERATION THAT RAN THE SPIKE (owner ruling
+ *  2026-08-13). It is a spike aimed at a later step of the SAME record, and it
+ *  has no business outliving it — exactly like the spike, which does not.
+ *
+ *  IT USED TO RETURN EVERY PROMOTED EXPERIMENT IN THE PROJECT, with no owner
+ *  and no expiry. So i2's promotion turned up in i3's build form, and would
+ *  have turned up in i4's and i5's, each of them asked to plan a chunk that
+ *  somebody else had already built. i3 hit exactly that and could only satisfy
+ *  it by copying a step it had not done.
+ *
+ *  THE RECORD'S ID IS THE BASENAME OF ITS TRACE ROOT, so nothing new is
+ *  threaded through. At trunk nothing matches, which is right: no record is
+ *  open, so no promotion is owed. */
 function promotionItems(traceRoot: string): string[] {
+  const owner = basename(traceRoot);
   return traceFolder(traceRoot, "experiment")
     .filter((n) => {
       const p = String(n.fm.promote ?? "").trim();
-      return p !== "" && !/^none\b/i.test(p);
+      if (p === "" || /^none\b/i.test(p)) return false;
+      return String(n.fm.minted_in ?? "").trim() === owner;
     })
     .map((n) => n.id)
     .sort();

@@ -26,7 +26,7 @@ evidence:
       - promote
     description: per experiment — what it changed upstream, and what promotes into the build or none; the answers live on the experiment nodes
 major: full
-minor: tailored
+minor: none
 patch: none
 product: full
 specification: tailored
@@ -34,8 +34,8 @@ major_note: |
   Applies in full: evidence updates requirements and architecture through
   the reopen path, keepers marked for promotion into the build.
 minor_note: |
-  Applies when spikes ran: evidence folds into the delta's requirements,
-  keepers marked for promotion. With no spikes the state passes empty.
+  Does not apply (owner ruling 2026-08-13). Nothing was spiked at this
+  size, so there is nothing to fold back.
 patch_note: |
   Does not apply. No spikes ran, nothing folds back. STRIKE PROPOSAL -
   owner adjudicates.

@@ -1,7 +1,8 @@
 ---
 form: write-requirements
+reopened: "2026-08-13T10:43:41.549Z — the delta grew after this signed: four mechanisms landed with no requirement row, and the register must carry them"
 by: agent
-signed_off: 2026-08-13T08:32:59.306Z
+signed_off: 2026-08-13T10:44:36.187Z
 authors: agent
 files:
 ---
@@ -10,16 +11,25 @@ files:
 
 ## current_situation
 
-Three requirements stand, written into the resident register rather than into this record.
+Seven requirements stand, written into the resident register rather than into this record.
 
-All three trace to a note taken when the defect was met, so none was invented at authoring time. Each names a file and a line in its source_refs.
+All seven trace to a defect met in use, so none was invented at authoring time. Each names a file and a line in its source_refs.
 
-The register grew by exactly three rows. Nothing existing was reworded, because this delta repairs behaviour against demands that already stand rather than changing what is demanded.
+THE FIRST THREE were written when this state first signed: the reading credit, the red objective, and the grey verb.
 
-The behaviour-model rule was itself corrected mid-state, on the owner's word, from a duty to an option. These three rows are the first written under the corrected rule, and the ratio came out one in three.
+THE OTHER FOUR ARRIVED LATER, and this state was reopened to carry them. The delta grew after it signed - the mechanical size read, the reopen frontier, the placeholder entry guard and the per-size field trim all landed afterwards, each from a defect the owner met while the iteration was running.
+
+THAT GROWTH IS ITSELF WORTH RECORDING. A signed upstream step does not reopen when scope grows downstream of it, because nothing measures scope. The machine could not see the gap; it was found by reading the register against what had been built.
+
+Nothing existing was reworded. This delta repairs behaviour against demands that already stand rather than changing what is demanded.
+
+The behaviour-model rule was corrected mid-state, on the owner's word, from a duty to an option. All seven rows carry a `## Behaviour` block, because every one of them is a lifecycle with a transition that must not exist - which is the test the corrected rule sets.
 
 ## register
 
+- req-a-placeholder-drawing-refuses-entry
+- req-a-reopen-stands-where-it-can-work
+- req-a-size-may-drop-a-question
 - req-acts-carry-role-and-channel
 - req-answer-recorded-with-question
 - req-archive-lists-every-closed-record
@@ -174,6 +184,7 @@ The behaviour-model rule was itself corrected mid-state, on the owner's word, fr
 - req-test-result-is-structured
 - req-test-run-carries-its-question
 - req-test-scope-discipline
+- req-the-size-is-read-by-one-extractor
 - req-tour-admits-absence
 - req-tour-ends-at-the-desk
 - req-tour-highlights-the-named-part

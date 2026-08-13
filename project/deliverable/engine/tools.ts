@@ -16,6 +16,7 @@ import { fileURLToPath } from "node:url";
 import { CallLog } from "./calllog.ts";
 import { parseUpdate } from "./decisions.ts";
 import {
+  BATTERY_QUESTION,
   batteryGate,
   laneSummary,
   laneVerdict,
@@ -36,7 +37,6 @@ import { LINT_CONFIG, lintProse } from "./lint.ts";
 import { bumpDrawingEpoch } from "./machines/compile.ts";
 import { McpServer, requestContextAdapter, type ToolDef } from "./mcp.ts";
 import { ModelFileSystem } from "./model-fs.ts";
-import { writeNode } from "./notes.ts";
 import { openPanel } from "./panel.ts";
 import { fansOut, resolveInRoot, seDir } from "./paths.ts";
 import { type MirrorState, renderMirror } from "./render.ts";
@@ -45,7 +45,6 @@ import { Session } from "./session.ts";
 import { shoot } from "./shoot.ts";
 import { survey } from "./survey.ts";
 import { Toll } from "./toll.ts";
-import { traceAsPumlMindmap } from "./trace.ts";
 import { webFetch, webSearch } from "./web.ts";
 
 const BIOME_BIN = fileURLToPath(new URL("../node_modules/@biomejs/biome/bin/biome", import.meta.url));
@@ -221,6 +220,19 @@ export function sessionTools(session: Session): ToolDef[] {
         required: ["to"],
       },
       handler: (args) => session.setTarget(String(args.to)),
+    },
+    {
+      name: "se_why",
+      title: "se.why",
+      description:
+        "WHY IS THIS STATE GREY — every condition holding it, in one answer. The walk already computes these to decide whether a step opens; it throws the FIRST failing one and discards the rest, so asking used to mean a cluster of probes against files the lane already holds. Each blocker carries what was expected, what is there instead, and an executable remedy — the same payload the refusal would have carried, because it IS that payload. An EMPTY list means the claim stands: nothing is holding it, and if the walk still will not go there, the reason is the route or the dial rather than the state. Name any state in the machine you stand in, or a fully qualified one like iterations/i1/write-requirements.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          state: { type: "string", description: "the state to explain — defaults to where the walk stands" },
+        },
+      },
+      handler: (args) => session.whyGrey(args.state === undefined ? undefined : String(args.state)),
     },
     {
       name: "se_reopen",
@@ -803,51 +815,6 @@ export function coreTools(
       },
     },
     {
-      name: "se_trace_puml",
-      title: "se.trace.puml",
-      description:
-        "DEBUG EXPORT OF THE TRACE CORPUS AS A PLANTUML MINDMAP. This is DERIVED from the current markdown trace data in memory and is never canonical storage. Use it to inspect or feed an external renderer without writing files.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          title: { type: "string", description: "optional mindmap title (default: trace)" },
-        },
-      },
-      handler: (args) => {
-        const title = args.title === undefined ? "trace" : String(args.title);
-        return { title, puml: traceAsPumlMindmap(rootOf(), title) };
-      },
-    },
-    {
-      name: "se_trace_puml_dump",
-      title: "se.trace.puml.dump",
-      description:
-        "WRITE THE DERIVED TRACE MINDMAP TO project/scratchpad as a .puml file for inspection. The source remains markdown trace data; this dump is disposable output.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          title: { type: "string", description: "optional mindmap title (default: trace)" },
-          name: {
-            type: "string",
-            description:
-              "optional output basename in scratchpad (default: trace-mindmap). Only letters, digits, dot, dash, underscore are kept",
-          },
-        },
-      },
-      handler: (args) => {
-        const title = args.title === undefined ? "trace" : String(args.title);
-        const raw = args.name === undefined ? "trace-mindmap" : String(args.name);
-        const safe = raw.replace(/[^A-Za-z0-9._-]/g, "-").replace(/^[-.]+|[-.]+$/g, "") || "trace-mindmap";
-        const rel = `project/scratchpad/${safe}.puml`;
-        const dir = rootOf("project/scratchpad");
-        mkdirSync(dir, { recursive: true });
-        const puml = traceAsPumlMindmap(rootOf(), title);
-        const abs = rootOf(rel);
-        writeNode(abs, puml);
-        return { path: rel, bytes: Buffer.byteLength(puml, "utf8"), title };
-      },
-    },
-    {
       name: "se_run",
       title: "se.run",
       description: `Run a shell command from the project root (bash on POSIX, PowerShell on Windows) — for what ONLY a shell does: node, npm, builds, processes. THE LANE'S JOBS ARE REFUSED HERE: ${laneSummary()}. A first offence per category runs once with a warning; after that the category refuses (SE-C-129) with the lane call as the remedy. If the lane truly cannot do the job, pass no_tool_reason — the command runs once and your reason is logged for the retro.\n\nOutput is engine-captured and logged IN FULL under the returned call ref. Foreground waits for process completion. Background returns a job immediately. Use {job} for status or {job, stop: true} to cancel. {jobs: true} lists this session's jobs.\n\nNEVER call this session's own mirror over HTTP from here — the run blocks the server's event loop, so the mirror cannot answer itself.`,
@@ -901,7 +868,7 @@ export function coreTools(
       name: "se_test",
       title: "se.test",
       description:
-        "Run tests STRUCTURED as a durable job. Starting returns a handle immediately. Call again with {job} to read current status or the final verdict. Scoped runs use files and optional name_pattern. NO ARGUMENTS runs the earned battery. AN UNCHANGED TREE REFUSES its scope unless force is true.",
+        "Run tests STRUCTURED as a durable job. Starting returns a handle immediately. Call again with {job} to read current status or the final verdict. Scoped runs use files and optional name_pattern, and MUST state the question they answer. NO ARGUMENTS runs the earned battery, whose question is fixed. AN UNCHANGED TREE REFUSES its scope unless force is true.",
       inputSchema: {
         type: "object",
         properties: {
@@ -909,6 +876,11 @@ export function coreTools(
             type: "array",
             items: { type: "string" },
             description: "test files to run scoped — 'pull', 'pull.test.ts' and the full path all name the same file",
+          },
+          question: {
+            type: "string",
+            description:
+              "what this run answers, in one line — 'did the frontier change break the token sync?'. Required for a scoped run and recorded with the verdict. The scope says which tests ran; only this says why.",
           },
           name_pattern: { type: "string", description: "--test-name-pattern: run only tests whose name matches" },
           force: { type: "boolean", description: "override both gates: unchanged tree, and battery/scope economics — for flake hunts" },
@@ -948,7 +920,7 @@ export function coreTools(
           const result = await jobDone(started.job);
           return { status: result.exit, out };
         };
-        const runScoped = async (): Promise<Record<string, unknown>> => {
+        const runScoped = async (question: string): Promise<Record<string, unknown>> => {
           const { files, named } = scopedFiles(root, args.files);
           const scope = `${files.join(",")}${args.name_pattern !== undefined ? `#${String(args.name_pattern)}` : ""}`;
           testGate(se, root, force, scope);
@@ -962,7 +934,7 @@ export function coreTools(
           const r = await spawnNode(argv);
           const tap = parseTap(r.out);
           const ok = r.status === 0 && tap.fail === 0;
-          const streak = testRecord(se, root, ok, scope, files);
+          const streak = testRecord(se, root, ok, scope, files, question);
           const nudge = streakNudge(streak);
           // Counts plus failures — the slice every temp-file grep was after.
           // A long green streak carries the owner's law back with the result:
@@ -970,6 +942,7 @@ export function coreTools(
           // question, not to reassure.
           return {
             ok,
+            question,
             scope: { files, ...(args.name_pattern !== undefined ? { name_pattern: String(args.name_pattern) } : {}) },
             tests: { total: tap.total, pass: tap.pass, fail: tap.fail },
             ...(tap.failures.length > 0 ? { failures: tap.failures } : {}),
@@ -1007,9 +980,14 @@ export function coreTools(
           // The verdict is REMEMBERED with the tree it judged, so an identical
           // tree can be answered from the record instead of another 90 seconds.
           testRecord(se, root, ok);
-          return { ok, results };
+          return { ok, question: BATTERY_QUESTION, results };
         };
-        const work = args.files !== undefined || args.name_pattern !== undefined ? runScoped() : runBattery();
+        // THE QUESTION IS CHECKED BEFORE THE HANDOFF, on purpose. A refusal
+        // raised inside the async body becomes the JOB's verdict, so a call
+        // that could never run would still answer with a handle and fail
+        // quietly a second later (found by verdictlog.test.ts, 2026-08-13).
+        const scoped = args.files !== undefined || args.name_pattern !== undefined;
+        const work = scoped ? runScoped(scopedQuestion(args.question)) : runBattery();
         const id = `test-${Date.now().toString(36)}-${++testSeq}`;
         // THE LAST RUN SIZES THE EXPECTATION (owner ruling 2026-08-03): a
         // battery caller is told how long the previous one took — measured,
@@ -1538,6 +1516,25 @@ function scopedFiles(root: string, filesArg: unknown): { files: string[]; named:
     });
   }
   return { files, named: named.length > 0 };
+}
+
+/** THE QUESTION A SCOPED RUN ANSWERS (req-test-run-carries-its-question).
+ *  The scope already says which tests ran. Only this says why, and without
+ *  it a later reader cannot tell a real question from a reassurance run. */
+function scopedQuestion(questionArg: unknown): string {
+  const question = typeof questionArg === "string" ? questionArg.trim() : "";
+  if (question !== "") return question;
+  throw new Rejection({
+    clause: CLAUSES.TEST_NO_QUESTION,
+    expected: "question: one line saying what this run answers",
+    got: "a scoped run with no question",
+    remedy: {
+      tool: "se_test",
+      args: { files: ["<your files>"], question: "did <this change> break <that behaviour>?" },
+      note: "the battery needs none — its question is fixed. A scoped run is yours, so say what you wanted to learn.",
+    },
+    source: "engine/tools.ts se_test",
+  });
 }
 
 export function buildServer(

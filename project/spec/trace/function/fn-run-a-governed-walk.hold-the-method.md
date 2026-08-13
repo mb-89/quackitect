@@ -10,6 +10,9 @@ satisfies:
   - req-size-choice-is-the-bless
   - req-size-proposal-names-strikes
   - req-size-escalation-readjudicated
+  - req-the-size-is-read-by-one-extractor
+  - req-a-size-may-drop-a-question
+  - req-reading-credit-survives-a-reload
   - req-reload-restarts-clean
   - req-guidance-edit-lands-where-it-compiles
   - req-diverged-trees-reported-never-merged

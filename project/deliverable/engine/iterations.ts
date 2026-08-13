@@ -18,6 +18,12 @@ import { noteOf, parseStateNote, readNode } from "./notes.ts";
 import { CHANGE_COLUMNS, type ChangeColumn, compileColumn, compileM0, readRigorMatrix, rigorMatrixContentHash } from "./rigor-matrix.ts";
 import { bustBranchList, listBranches, slug, worktreesDir } from "./worktree.ts";
 
+/** THE PIN'S PLACEHOLDER, verbatim. It is written when an iteration pins a
+ *  column and read back when the walk tries to enter the drawing it stands
+ *  for — so it lives in ONE place and the two ends cannot drift apart. */
+export const SCAFFOLD_NONE =
+  "not authored yet - the authoring state writes this drawing; this placeholder keeps the route drawable until then";
+
 const SRC = "engine/iterations.ts";
 
 function git(root: string, args: string[], what: string): string {
@@ -253,29 +259,31 @@ export function generateSeeded(_root: string, it: Iteration, machineId: string, 
     };
   });
   if (chunks.length === 0) {
-    // THE SCAFFOLD READS AS AN AUTHORED NONE, AND THAT IS A KNOWN HOLE. The
-    // seeding act writes `none: "not authored yet ..."` so the ROUTE stays
-    // drawable, and this branch then serves the run state as a bare start to
-    // end. A whole build was skipped that way, in silence, on 2026-08-13.
+    // THE SCAFFOLD USED TO READ AS AN AUTHORED NONE, and a whole build was
+    // skipped that way, in silence, on 2026-08-13. The pin writes
+    // `none: "<SCAFFOLD_NONE>"` so the ROUTE stays drawable before the
+    // authoring state has run, and this branch then served the run state as a
+    // bare start-to-end pill that walked through without a word.
     //
-    // REFUSING HERE IS THE WRONG SEAM. drawnsub.test.ts pins that the
+    // REFUSING HERE IS STILL THE WRONG SEAM. drawnsub.test.ts pins that the
     // placeholder must RESOLVE, because the machine view has to draw a route
-    // through a sub-machine nobody has authored yet. Two tests refused the
+    // through a sub-machine nobody has authored yet. Two tests refused that
     // refusal, and they were right to.
     //
-    // The guard belongs where the walk ENTERS the sub-machine, not where the
-    // drawing is compiled to be looked at. What closes the hole meanwhile is
-    // the ORDERING: build-steps depends on specify-build across a busbar, so
-    // the route cannot reach the build without passing the state that seeds
-    // it.
+    // SO THE DECL IS MARKED INSTEAD, and session.ts seedSubs refuses to WALK
+    // INTO a marked one. Drawing and routing stay legal; entering does not.
+    // That is the seam the earlier note prescribed.
     //
     // AN EXPLICIT NONE passes the run state without ceremony — zero spikes
     // is a normal outcome when the drawing says WHY (the explicit-absence law).
+    // Only the scaffold's own literal is marked, so an authored none is
+    // untouched.
     if (typeof fm.none === "string" && fm.none.trim() !== "") {
       const decl: MachineDecl = {
         id: machineId,
         reentry: "resume",
         initial: "start",
+        ...(fm.none.trim() === SCAFFOLD_NONE ? { scaffold: true } : {}),
         states: [
           {
             id: "start",
@@ -469,11 +477,7 @@ export function pinIteration(root: string, it: Iteration, changeSize: string): R
     const abs = join(it.path, itSeededRel(it.id, s.submachine));
     if (existsSync(abs)) continue;
     mkdirSync(dirname(abs), { recursive: true });
-    writeFileSync(
-      abs,
-      '---\nnone: "not authored yet - the authoring state writes this drawing; this placeholder keeps the route drawable until then"\n---\n',
-      "utf8",
-    );
+    writeFileSync(abs, `---\nnone: "${SCAFFOLD_NONE}"\n---\n`, "utf8");
     scaffolded.push(s.submachine);
   }
   git(it.path, ["add", "-A"], "add");
@@ -618,15 +622,22 @@ export function movedDemands(prev: Record<string, StepDemand>, now: Record<strin
  *
  *  IT IS NOT AN ESCALATION. The change size is untouched, so pinIteration's
  *  refusal to de-escalate has nothing to say here. */
-export function repinColumn(root: string, it: Iteration): void {
+/** THE PIN, OPENED ONCE PER QUESTION. Three callers ask this file something —
+ *  what does it say, has it gone stale, which demands moved — and each opened
+ *  and parsed it for itself. One reader now, and an absent pin answers
+ *  undefined rather than making every caller test for it. */
+function readPin(it: Iteration): ParsedPin | undefined {
   const pinAbs = join(it.path, itPinRel(it.id));
-  if (!existsSync(pinAbs)) return;
-  const pin = parsePin(readFileSync(pinAbs, "utf8")) as ParsedPin & Record<string, unknown>;
-  if (pin.change_size === undefined) return;
+  return existsSync(pinAbs) ? parsePin(readFileSync(pinAbs, "utf8")) : undefined;
+}
+
+export function repinColumn(root: string, it: Iteration): void {
+  const pin = readPin(it) as (ParsedPin & Record<string, unknown>) | undefined;
+  if (pin?.change_size === undefined) return;
   pin.demands = demandsFor(readRigorMatrix(root), pin.change_size as ChangeColumn);
   pin.rigor_matrix_hash = rigorMatrixContentHash(root);
   delete pin.machine; // derived from change_size now — a stored copy only goes stale
-  writeFileSync(pinAbs, JSON.stringify(pin, null, 2), "utf8");
+  writeFileSync(join(it.path, itPinRel(it.id)), JSON.stringify(pin, null, 2), "utf8");
 }
 
 /** THE LIVE DRIFT: which of this iteration's steps were passed against a
@@ -646,10 +657,8 @@ export function repinColumn(root: string, it: Iteration): void {
  *  all" for about 3ms against a ~900ms render; only a moved hash pays for the
  *  read and the diff. */
 export function iterationDrift(root: string, it: Iteration): string[] {
-  const pinAbs = join(it.path, itPinRel(it.id));
-  if (!existsSync(pinAbs)) return [];
-  const pin = parsePin(readFileSync(pinAbs, "utf8"));
-  if (pin.change_size === undefined || pin.demands === undefined) return [];
+  const pin = readPin(it);
+  if (pin?.change_size === undefined || pin.demands === undefined) return [];
   if (pin.rigor_matrix_hash === rigorMatrixContentHash(root)) return [];
   return movedDemands(pin.demands, demandsFor(readRigorMatrix(root), pin.change_size as ChangeColumn));
 }
@@ -665,10 +674,8 @@ export function iterationDrift(root: string, it: Iteration): string[] {
  *  snapshot taken before the fix. Seen live on 2026-08-13: build-steps was
  *  given its dependency on specify-build and i3 kept skipping it. */
 export function pinIsStale(root: string, it: Iteration): boolean {
-  const pinAbs = join(it.path, itPinRel(it.id));
-  if (!existsSync(pinAbs)) return false;
-  const pin = parsePin(readFileSync(pinAbs, "utf8"));
-  if (pin.change_size === undefined) return false;
+  const pin = readPin(it);
+  if (pin?.change_size === undefined) return false;
   return pin.rigor_matrix_hash !== rigorMatrixContentHash(root);
 }
 

@@ -14,6 +14,8 @@ satisfies:
   - req-every-update-reaches-the-render
   - req-colors-are-configuration
   - req-decision-graph-reads-as-branches
+  - req-one-verb-says-why-a-state-is-grey
+  - req-a-reopen-stands-where-it-can-work
   - req-controls-draw-from-their-spec
 inputs:
   - flow-position

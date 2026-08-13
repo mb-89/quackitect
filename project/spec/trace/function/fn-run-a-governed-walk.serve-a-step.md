@@ -10,6 +10,8 @@ satisfies:
   - req-owed-reading-is-served
   - req-reading-proof
   - req-compaction-reowes-the-reading
+  - req-red-objective-serves-its-fill
+  - req-a-placeholder-drawing-refuses-entry
   - req-missing-document-stops-the-walk
   - req-autonomy-gates-every-hop
   - req-autonomy-change-applies-forward

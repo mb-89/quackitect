@@ -25,7 +25,7 @@ evidence:
   - name: coverage
     description: every value prop's audience resolves to a role here, and every always-on class is present or ruled out with its reason
 major: tailored
-minor: inherit
+minor: none
 patch: none
 product: full
 specification: full
@@ -35,8 +35,11 @@ major_note: |
   its disposition re-marked. New roles recorded; the rest stands by
   pointer.
 minor_note: |
-  INHERIT; add only a role the delta newly serves. No new role is the
-  normal outcome, and saying so is a complete answer.
+  Does not apply (owner ruling 2026-08-13). The stakeholder set stands at
+  this size, so the state could only ever answer "unchanged".
+
+  ESCALATE: a new stakeholder brings a new value proposition with it, and
+  that is major territory.
 patch_note: |
   Does not apply. No new roles enter through a patch. STRIKE PROPOSAL -
   owner adjudicates.

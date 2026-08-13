@@ -12,6 +12,7 @@ verifies:
   - "req-walk-resumes-from-repo"
   - "req-state-opens-only-when-earned"
   - "req-state-needs-all-its-inputs"
+  - "req-a-reopen-stands-where-it-can-work"
   - "req-land-target-routes-to-gate"
   - "req-instruction-names-its-source"
 files:
@@ -51,3 +52,28 @@ claim. The load-bearing steps: a step above the slider comes back as
 wait, naming the step and the person; the slider is weighed BEFORE the
 reading; a recorded visit yields its state, however deep the container;
 replay: parked defers and open points survive an engine life.
+
+## Where the reopen's token set is verified
+
+`req-a-reopen-stands-where-it-can-work` joins this spec rather than getting its
+own, because its cases live in `tests/tokens.test.ts`, which this spec already
+claims. The token set IS walk discipline: where the walk stands is the same
+subject as whether it may advance.
+
+FOUR STEPS, added 2026-08-13:
+
+- reopening two steps on one chain leaves ONE token, at the upstream end.
+- the frontier is the same whichever way round the reopen is asked.
+- two reopened steps with no path between them keep both tokens.
+- reopening a single step stands the walk in it.
+
+WHAT MADE IT NECESSARY: re-recording an iteration's size reopened eight steps
+and put a token on every one. The walk then stood in M0's kickoff gate and M3's
+requirements at once - two steps on one sequential chain, which no legal
+marking holds. Enforcement was never wrong; the POSITION was, and a position is
+what the mirror draws and what the pull offers.
+
+A NOTE ON THE GRAIN, worth keeping where somebody will read it. These four
+cases were APPENDED to a file this spec already claimed, so a file-level sweep
+for unclaimed test files would not have noticed them. That is the gap recorded
+for the retro, and this paragraph is an instance of it.

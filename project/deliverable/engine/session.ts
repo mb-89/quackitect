@@ -142,7 +142,25 @@ import { type Expedition, expClose, expFind, expList, expNew, itCloseShipped, re
  *  Their safety is not the gate's. reopenClaim and amendClaim each refuse an
  *  unsubmitted form, and an amend that breaks a check is refused with the file
  *  put back. */
-const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_pull", "se_note", "se_panel", "se_note_drain", "se_aim", "se_reopen", "se_amend"]);
+/*  se_why joins them because A DIAGNOSTIC IS NEEDED EXACTLY WHERE THE WALK IS
+ *  STUCK. A verb that explains why a state is grey, but is only callable from
+ *  states where nothing is grey, is useless at the one moment it exists for.
+ *
+ *  It was written gated and its own first test caught it: refused at
+ *  boot/read_contract, which is precisely the kind of place somebody asks.
+ *
+ *  IT CHANGES NOTHING. It reads the conditions the walk was about to compute
+ *  anyway and returns them. There is no state to corrupt by asking. */
+const ALWAYS_LEGAL: ReadonlySet<string> = new Set([
+  "se_pull",
+  "se_note",
+  "se_panel",
+  "se_note_drain",
+  "se_aim",
+  "se_reopen",
+  "se_amend",
+  "se_why",
+]);
 /** RESTRICTED tools: "all" does NOT grant these — a state must name them.
  *  Nothing is restricted today.
  *
@@ -197,6 +215,21 @@ interface SubRun {
  *  HTTP is the human, MCP is the agent. The threshold gates only the
  *  agent's hand — the human always may. */
 export type Channel = "human" | "agent";
+
+/** ONE CONDITION HOLDING A STATE GREY, said so somebody can act on it.
+ *
+ *  It is a Rejection's payload plus a `kind`, on purpose: the walk throws
+ *  these and the verb lists them, so what you read when you ask is exactly
+ *  what you would have been refused with. */
+export interface Blocker {
+  /** The machine-readable reason, for a caller that wants to branch. */
+  kind: "form_incomplete" | "unsubmitted" | "unsigned_feeder" | "unblessed_gate";
+  clause: string;
+  expected: string;
+  got: string;
+  remedy: { tool: string; args: Record<string, unknown>; note: string };
+  source: string;
+}
 
 export class Session {
   private readonly root: string;
@@ -1345,12 +1378,79 @@ export class Session {
     // Claimful completions only — mechanical hops stay free of the corpus
     // load this check costs.
     const decl = this.state(m, stateId);
-    if (outcome === "filled" && decl.evidence_form.length > 0 && !new Set(this.recordDone(m)).has(stateId)) {
+    // THE CORPUS LOAD IS PAID ONLY BY A CLAIMFUL COMPLETION. Hoisting it above
+    // this condition put a full green recomputation on every mechanical hop and
+    // took recordDone to 3683 ms over 200 nodes against a 1000 ms budget —
+    // caught by drift.test.ts, three lines under the comment that warned of it.
+    const claimfulNow = outcome === "filled" && decl.evidence_form.length > 0;
+    const done = claimfulNow ? new Set(this.recordDone(m)) : new Set<string>();
+    if (claimfulNow && !done.has(stateId)) {
+      // NAME THE CLAIM THAT ACTUALLY FELL (i3, 2026-08-13).
+      //
+      // recordDone runs a RIPPLE, and says so twenty lines above: green stops
+      // at the first input that is not green, because a claim may be word for
+      // word fine and still rest on ground that moved.
+      //
+      // This refusal reported only that the claim does not stand. So a state
+      // whose own form is perfect and whose INPUT fell reads as a broken form,
+      // and the reader goes to inspect a form with nothing wrong with it.
+      //
+      // It cost this iteration a long detour. specify-build was submitted,
+      // signed, re-submitted, rewritten field by field and reformatted into a
+      // table — all of it against a form that was never the problem.
+      //
+      // The engine knew which input had fallen the whole time.
+      const claimful = new Set(m.states.filter((s) => s.evidence_form.length > 0 || s.submachine !== undefined).map((s) => s.id));
+      const fallen = claimFeeders(m, stateId, claimful).filter((f) => !done.has(f));
+      // AND WHEN NOTHING UPSTREAM FELL, SAY WHAT IS WRONG WITH THIS ONE
+      // (owner instruction 2026-08-13: "then make the message name the field").
+      //
+      // The content check runs the claim's own fields against the corpus. It
+      // knows exactly which field failed and what it wanted, and the refusal
+      // threw that away. The reader was left guessing a field and trying again.
+      //
+      // Same rule as the fallen-input half above: a check reports in the words
+      // of the question IT asked.
+      const own =
+        fallen.length > 0
+          ? []
+          : ((): string[] => {
+              try {
+                // this.traceRoot(it) IN FULL, not a renamed local. A guard test
+                // greps for exactly this spelling, because a claim check
+                // resolving against the wrong record is the drift it catches.
+                const it = this.declIteration(m);
+                if (it === undefined) return [];
+                const body = noteOf(this.evidenceAbs(it, stateId))?.body;
+                if (body === undefined) return [];
+                return claimProblems(this.traceRoot(it), decl, body, loadTrace(this.traceRoot(it)));
+              } catch {
+                return []; // an unreadable claim falls back to the plain sentence
+              }
+            })();
       throw new Rejection({
         clause: CLAUSES.CONDITION_UNMET,
         expected: `${stateId}'s claim to stand before it completes — it declares ${decl.evidence_form.length} evidence field(s)`,
-        got: 'a "filled" completion with the claim neither signed nor standing — the walk has not moved',
-        remedy: { tool: "se_pull", args: {}, note: "pull — the machine serves the owed form; submit it and the completion follows" },
+        got:
+          fallen.length > 0
+            ? `${stateId}'s OWN claim may be fine. It is dropped because these inputs are not standing: ${fallen.join(", ")}`
+            : own.length > 0
+              ? `${stateId}'s claim does not pass its own checks: ${own.join(" · ")}`
+              : 'a "filled" completion with the claim neither signed nor standing — the walk has not moved',
+        remedy:
+          fallen.length > 0
+            ? {
+                tool: "se_pull",
+                args: {},
+                note: `re-earn ${fallen.join(", ")} first — green ripples forward, and this one follows without being touched`,
+              }
+            : own.length > 0
+              ? {
+                  tool: "se_pull",
+                  args: {},
+                  note: "fix the named field, then submit again — the claim re-stamps and the completion follows",
+                }
+              : { tool: "se_pull", args: {}, note: "pull — the machine serves the owed form; submit it and the completion follows" },
         source: "engine/session.ts claim-guard",
       });
     }
@@ -2536,7 +2636,7 @@ export class Session {
         ...head(),
         ...this.refusedBlock([standingForm]),
         for: standingForm,
-        forms: [this.formGet(standingForm)],
+        forms: [this.formForAgent(standingForm)],
         do: 'work the state, then return fills on the next pull as form: {"<section>": "<text>"} - multi-pass is fine; finish with {"submit": true}: the submit checks the fields and stamps the claim',
         ...extra(),
       };
@@ -2576,11 +2676,39 @@ export class Session {
     }
 
     if (r.steps.length === 0) {
+      // A RED OBJECTIVE IS WORK, NOT AN ARRIVAL (i3's charter).
+      //
+      // Standing ON the target with its claim owed used to answer "the target
+      // is where the walk already stands" and stop. That is true about
+      // POSITION and useless about WORK: the route is empty because there is
+      // nowhere to GO, never because there is nothing to DO.
+      //
+      // The engine held the verdict the whole time. Aiming at a state whose
+      // form is owed is the most ordinary thing an agent does, and it was
+      // answered with a sentence about geography.
+      //
+      // SO ASK THE STATE. If it owes a form, that form IS the answer, served
+      // exactly as the sweep serves one. Only a target that owes nothing falls
+      // through to the wait, and there the sentence is finally true.
+      const owed = r.found ? this.pullFormsOwed().filter((n) => !this.formsMet([n])) : [];
+      if (owed.length > 0) {
+        return {
+          pull: "fill",
+          ...head(),
+          ...this.refusedBlock(owed),
+          for: pullTarget,
+          forms: owed.map((n) => this.formForAgent(n)),
+          do: 'fill every required section, then return it on the next pull as form: {"<section>": "<text>"} — there is no submit verb, and pulling without it hands back this same form',
+          ...extra(),
+        };
+      }
+      const stalled = this.stalledClaim(r, head, extra);
+      if (stalled !== undefined) return stalled;
       return {
         pull: "wait",
         ...head(),
         waiting_for: "the person",
-        why: r.found ? "the target is where the walk already stands" : (r.note ?? "no way there"),
+        why: r.found ? "the target is where the walk already stands, and it owes nothing" : (r.note ?? "no way there"),
         ...extra(),
       };
     }
@@ -2645,7 +2773,7 @@ export class Session {
         ...head(),
         ...this.refusedBlock(unmet),
         for: first.to,
-        forms: unmet.map((n) => this.formGet(n)),
+        forms: unmet.map((n) => this.formForAgent(n)),
         do: 'fill every required section, then return it on the next pull as form: {"<section>": "<text>"} — there is no submit verb, and pulling without it hands back this same form',
         ...extra(),
       };
@@ -2808,7 +2936,7 @@ export class Session {
           ...this.refusedBlock(formsNow),
           walked: swept.swept ?? [],
           for: swept.stopped_at,
-          forms: formsNow.map((n) => this.formGet(n)),
+          forms: formsNow.map((n) => this.formForAgent(n)),
           ...(swept.banners !== undefined ? { banners: swept.banners } : {}),
           do: 'fill every required section, then return it on the next pull as form: {"<section>": "<text>"} — there is no submit verb, and pulling without it hands back this same form',
           ...extra(),
@@ -3247,9 +3375,117 @@ export class Session {
       .map((n) => ({ ref: n.ref, text: n.text }));
   }
 
+  /** A REOPENED CLAIM IS OWED AGAIN, and without this the walk DEADLOCKS.
+   *
+   *  Three rules meet and close a loop (found live on i3, 2026-08-13):
+   *
+   *  - A claim reopened after its signature does not stand, so the state
+   *    cannot be left.
+   *  - `met` asks only whether the fields are FILLED, and they are, so the
+   *    pull decides nothing is owed and serves no form.
+   *  - A form payload with nothing owed is illegal (SE-C-110).
+   *
+   *  So the agent that reopened the claim can never re-earn it. Every submit
+   *  is refused for having nothing to submit to, and the reopen mark stays.
+   *
+   *  The contract already says the submit IS the rebless, and that a newer
+   *  signature clears the mark by itself. It could not, because no submit was
+   *  reachable. This makes the form owed so that sentence can be true.
+   *
+   *  IT COST MOST OF AN AFTERNOON, and none of it looked like this: the state
+   *  was reported as a claim that does not stand, so the form was rewritten,
+   *  reformatted and re-submitted repeatedly. The form was never the problem. */
+  private formReopened(name: string): boolean {
+    try {
+      const it = this.declIteration(this.currentMachine());
+      if (it === undefined) return false;
+      const fm = noteOf(this.evidenceAbs(it, name))?.frontmatter;
+      return fm !== undefined && reopenedAfterSigning(fm);
+    } catch {
+      return false; // an unreadable claim is the tick's refusal to name, not this one's
+    }
+  }
+
+  /** THE CORPUS CHECK'S VERDICT ON ONE STATE, or an empty list.
+   *
+   *  A claim can be complete, signed, and still refused: the form lint asks
+   *  whether the fields are filled, and the corpus check asks whether what
+   *  they say survives against the trace as it now stands. The second is the
+   *  one that keeps a walk from leaving a state, and it had no voice anywhere
+   *  the walk could hear it.
+   *
+   *  EMPTY MEANS NOTHING TO SAY — either the claim stands, or the state has no
+   *  claim, or it could not be read. None of those is a stall this can explain,
+   *  and inventing a reason would be worse than the silence it replaces. */
+  private claimStall(stateId: string): string[] {
+    try {
+      const m = this.currentMachine();
+      const bare = stateId.slice(stateId.lastIndexOf("/") + 1);
+      const decl = m.states.find((s) => s.id === bare);
+      if (decl === undefined || decl.evidence_form.length === 0) return [];
+      if (new Set(this.recordDone(m)).has(bare)) return [];
+      const it = this.declIteration(m);
+      if (it === undefined) return [];
+      const body = noteOf(this.evidenceAbs(it, bare))?.body;
+      if (body === undefined) return [];
+      return claimProblems(this.traceRoot(it), decl, body, loadTrace(this.traceRoot(it)));
+    } catch {
+      return [];
+    }
+  }
+
+  /** A CLAIM THAT WILL NOT STAND IS THE OTHER WAY A ZERO-STEP ROUTE HAPPENS.
+   *
+   *  The objective is the work owed next. When it is the state the walk is
+   *  standing IN, the route is legitimately zero steps — and that means one of
+   *  two opposite things:
+   *
+   *  - the state is done, and the walk has arrived;
+   *  - the state's claim is refused, so the walk cannot leave it and the
+   *    objective can never move off it.
+   *
+   *  Both used to answer "the target is where the walk already stands". The
+   *  second is a STALL wearing an arrival's words, and it is SILENT: no
+   *  completion is attempted, so no guard fires to explain it.
+   *
+   *  i3 sat in exactly this for an afternoon over two unclaimed engine files,
+   *  with the sweep's verdict computed on every pull and shown nowhere.
+   *
+   *  THE FORM LINT CANNOT SEE IT. The form was met and signed; only the corpus
+   *  check knows. This is the one place in the pull that can ask. */
+  private stalledClaim(
+    r: { found: boolean; from?: string },
+    head: () => Record<string, unknown>,
+    extra: () => Record<string, unknown>,
+  ): Record<string, unknown> | undefined {
+    if (!r.found) return undefined;
+    const at = r.from ?? this.active()[0] ?? "";
+    const stalled = this.claimStall(at);
+    if (stalled.length === 0) return undefined;
+    return {
+      pull: "do",
+      ...head(),
+      stopped_at: at,
+      refusal: {
+        kind: "rejected",
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `${at}'s claim to stand, so the walk can leave it`,
+        got: `the route cannot move: ${at} IS the next work owed, and its claim does not pass its own checks — ${stalled.join(" · ")}`,
+        remedy: {
+          tool: "se_pull",
+          args: {},
+          note: "fix what is named, then submit the form again — the claim re-stamps and the route opens",
+        },
+        source: "engine/session.ts route",
+      },
+      do: "the stopped step says what it wants — do that, then pull again",
+      ...extra(),
+    };
+  }
+
   private formsMet(names: string[]): boolean {
     try {
-      return names.every((n) => this.formLint(n).met);
+      return names.every((n) => this.formLint(n).met && !this.formReopened(n));
     } catch {
       return false; // unbound or missing template — the tick's refusal names it
     }
@@ -3266,6 +3502,34 @@ export class Session {
    *  IT IS NEVER THE AGENT'S JOB TO ASK WHY (owner ruling 2026-08-07). The
    *  machine holds the verdict, so handing it over is the machine's job — not
    *  a question the agent has to know to ask. */
+  /** THE AGENT'S COPY OF A FORM, without the reference corpus.
+   *
+   *  Every form carries `ref_paths` and `ref_facts`: the path, statement and
+   *  breaks_if_removed of EVERY node in the record. The mirror needs them — a
+   *  card asking which of two rows matters more cannot be answered from two
+   *  ids. That need is real, and it is the MIRROR's.
+   *
+   *  The agent renders no cards. It reads ids and opens the files itself. So it
+   *  was paying for 467 nodes of facts on every single form: measured at about
+   *  380,000 characters against 3,700 for an ordinary answer. A hundred times
+   *  the size, for something never read.
+   *
+   *  IT COST A DIAGNOSIS, NOT ONLY TOKENS. The same answer carries `problems`,
+   *  naming exactly which check refuses a claim. At that size the host moves
+   *  the response to disk and every reader truncates it, so the one field that
+   *  explains a stuck state is the one field that never arrives. i3 sat blocked
+   *  on precisely that.
+   *
+   *  THE MIRROR'S COPY IS UNTOUCHED — formGet still returns everything.
+   *
+   *  THIS IS THE NARROW REPAIR. The general rule the owner ruled on 2026-08-13
+   *  is a size limit on every lane answer with a handle to page the rest, so
+   *  the class cannot come back somewhere else. That is retro work. */
+  private formForAgent(name: string): Record<string, unknown> {
+    const { ref_paths: _paths, ref_facts: _facts, ...rest } = this.formGet(name) as Record<string, unknown>;
+    return rest;
+  }
+
   refusedBlock(names: string[]): Record<string, unknown> {
     const problems = names.flatMap((n) => {
       try {
@@ -4829,7 +5093,27 @@ export class Session {
     return unsigned.length === feeders.length ? unsigned.map((p) => p.id) : [];
   }
 
-  private assertStateFormMet(stateId: string): void {
+  /** EVERY CONDITION HOLDING A STATE GREY, collected instead of thrown.
+   *
+   *  The walk has always known this. It computed the conditions one at a time
+   *  and threw the FIRST one that failed, so the answer to "why is this grey"
+   *  existed for a microsecond and was discarded. Asking it took a cluster of
+   *  shell probes against files the lane already holds.
+   *
+   *  ONE MECHANISM, TWO CALLERS. `assertStateFormMet` throws the first of
+   *  these; `se_why` reports all of them. A second copy of the reasoning would
+   *  drift, and the drift would be invisible — the verb would explain a state
+   *  the walk judges by other rules.
+   *
+   *  THE ORDER IS THE WALK'S OWN, so the first entry is exactly what the next
+   *  pull would refuse with.
+   *
+   *  WHAT IS NOT HERE, deliberately: the autonomy dial. The dial governs the
+   *  HOP, not the state — a step above the dial is not grey, it is waiting for
+   *  a person. Reporting it as a blocker would tell somebody to fix a claim
+   *  that is already fine. */
+  stateBlockers(stateId: string): Blocker[] {
+    const out: Blocker[] = [];
     const lint = this.stateFormGet(stateId) as {
       met?: boolean;
       signed?: boolean;
@@ -4839,16 +5123,20 @@ export class Session {
       bless?: string;
     };
     if (lint.met !== true) {
-      throw new Rejection({
+      out.push({
+        kind: "form_incomplete",
         clause: CLAUSES.CONDITION_UNMET,
         expected: `the ${stateId} evidence form complete (${String(lint.instance)})`,
         got: (lint.problems ?? []).join(" · ") || "unfilled",
         remedy: { tool: "se_pull", args: {}, note: 'the pull serves the form; fill it, then finish with {"submit": true}' },
         source: "engine/session.ts stateform",
       });
-    }
-    if (lint.signed !== true) {
-      throw new Rejection({
+    } else if (lint.signed !== true) {
+      // ONLY WHEN COMPLETE. "Fill it" and "submit it" are the same instruction
+      // twice on an unfilled form, and a list of two says the state is twice
+      // as stuck as it is.
+      out.push({
+        kind: "unsubmitted",
         clause: CLAUSES.CONDITION_UNMET,
         expected: `the ${stateId} form SUBMITTED — the submit checks the fields and stamps the claim`,
         got: "complete but not submitted",
@@ -4861,7 +5149,8 @@ export class Session {
       const gs = m.states.find((x) => x.id === stateId);
       const feeders = gs === undefined ? [] : this.feedersUnsigned(m, gs);
       if (feeders.length > 0) {
-        throw new Rejection({
+        out.push({
+          kind: "unsigned_feeder",
           clause: CLAUSES.CONDITION_UNMET,
           expected: `a state requires ALL its inputs — every feeder form signed before ${stateId} passes`,
           got: `unsigned feeders: ${feeders.join(", ")}`,
@@ -4871,7 +5160,8 @@ export class Session {
       }
     }
     if (lint.gate === true && !(lint.bless ?? "").startsWith("blessed")) {
-      throw new Rejection({
+      out.push({
+        kind: "unblessed_gate",
         clause: CLAUSES.CONDITION_UNMET,
         expected: `the ${stateId} gate blessed — the 👍 in the form, by the human or a hand above the gate's rung`,
         got: (lint.bless ?? "") === "" ? "submitted, awaiting the bless" : String(lint.bless),
@@ -4883,6 +5173,53 @@ export class Session {
         source: "engine/session.ts bless",
       });
     }
+    return out;
+  }
+
+  private assertStateFormMet(stateId: string): void {
+    // THE FIRST BLOCKER IS THE REFUSAL, unchanged. The walk refuses exactly
+    // where it refused before, with the same clause and the same remedy.
+    const first = this.stateBlockers(stateId)[0];
+    if (first === undefined) return;
+    const { kind: _kind, ...rejection } = first;
+    throw new Rejection(rejection);
+  }
+
+  /** THE VERB'S ANSWER. One state, every condition holding it, and a plain
+   *  sentence saying which of the two cases you are in.
+   *
+   *  NO ARGUMENT MEANS WHERE THE WALK STANDS, which is the question somebody
+   *  actually has when they ask. */
+  whyGrey(stateId?: string): Record<string, unknown> {
+    const at = stateId ?? this.active()[0];
+    if (at === undefined) {
+      return { state: null, standing: false, blockers: [], says: "the walk stands nowhere" };
+    }
+    // A QUALIFIED ID NAMES ITS OWN MACHINE. The form lookup takes the bare
+    // name, so "iterations/i3/write-requirements" is asked as its last part.
+    const bare = at.slice(at.lastIndexOf("/") + 1);
+    let blockers: Blocker[];
+    try {
+      blockers = this.stateBlockers(bare);
+    } catch (e) {
+      // AN UNKNOWN STATE IS AN ANSWER, not a crash. The verb exists to be
+      // asked from a position of not knowing, so it must survive a wrong name.
+      return {
+        state: at,
+        standing: false,
+        blockers: [],
+        says: `${bare} could not be read as a state of this machine: ${String((e as Error).message)}`,
+      };
+    }
+    return {
+      state: at,
+      standing: blockers.length === 0,
+      blockers,
+      says:
+        blockers.length === 0
+          ? `${bare} stands — nothing holds it. If the walk still will not go there, the reason is the route or the dial, not this state.`
+          : `${bare} is held by ${blockers.length}: ${blockers.map((b) => b.kind).join(", ")}. The first is what the next pull refuses with.`,
+    };
   }
 
   /** The blessed size may live in the kickoff's own stored form. */
@@ -6073,6 +6410,34 @@ export class Session {
           source: "engine/session.ts seed",
         });
       }
+    }
+    // A PLACEHOLDER MAY BE DRAWN AND ROUTED THROUGH. IT MAY NOT BE WALKED
+    // INTO (owner report 2026-08-13).
+    //
+    // The pin scaffolds every seeded drawing so the route stays drawable
+    // before its authoring state has run. That scaffold compiled to a bare
+    // start-to-end pill, and the walk went straight through it without a
+    // word — i3 passed specify-build, seeded nothing, and build-steps found
+    // the placeholder and reported itself done. A whole build was skipped in
+    // silence.
+    //
+    // THIS IS THE SEAM iterations.ts NAMES. Refusing at compile time breaks
+    // the machine view, which must draw a route through a sub-machine nobody
+    // has authored yet. Refusing at ENTRY breaks nothing and closes the hole.
+    //
+    // An AUTHORED none is not a scaffold and walks through as it always did.
+    if (decl.scaffold === true) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `${subState.submachine} is authored before the walk enters it — the state that seeds it writes the drawing`,
+        got: `${subState.submachine} still carries the pin's placeholder, so entering would walk an empty machine and report it done`,
+        remedy: {
+          tool: "se_pull",
+          args: {},
+          note: `go back to the state that seeds ${subState.submachine} and author its drawing — one step per piece of work; the run state passes once real steps stand`,
+        },
+        source: "engine/session.ts seed",
+      });
     }
     // RE-ENTRY RESETS (owner ruling 2026-07-27): a machine left through its
     // end starts over — evidence from the previous pass is cleared; the old

@@ -18,7 +18,7 @@ legal_tools:
   - se_answer
   - se_run
 major: full
-minor: tailored
+minor: none
 patch: none
 product: tailored
 specification: tailored
@@ -26,8 +26,10 @@ major_note: |
   Applies in full: every seeded spike runs here, parallel, each within
   its timebox; the machine joins before the evidence folds back.
 minor_note: |
-  Runs whatever the tailored ranking seeded - often nothing: an explicit
-  none in the drawing passes this state without ceremony.
+  Does not apply (owner ruling 2026-08-13). No spikes are seeded at this
+  size, so there are none to run.
+
+  ESCALATE: needing a spike is the tell that this is a major.
 patch_note: |
   Does not apply - rank-unknowns is struck at patch, so there is no
   drawing to run. STRIKE PROPOSAL - owner adjudicates.

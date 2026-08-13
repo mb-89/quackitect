@@ -24,7 +24,7 @@ evidence:
   - name: passes_concrete
     description: is every pass written concretely enough to script at M6 — the formulated stage of the example system, which at M2 IS the story slides
 major: full
-minor: tailored
+minor: none
 patch: none
 product: full
 specification: tailored
@@ -34,10 +34,12 @@ major_note: |
   current. The gate's reason is strongest exactly here - system-level
   writing on a wrong user picture is what a major cannot afford.
 minor_note: |
-  Applies, scoped to the delta: the new needs are realized by stories,
-  the stories sit in use cases, no new role is missed. Requirements
-  written on unblessed stories propagate garbage at every size - the
-  gate holds, only its scope shrinks.
+  FOLDED INTO THE REQUIREMENTS GATE (owner ruling 2026-08-13). With context
+  and stakeholders struck at this size, this gate would guard stories and
+  use cases alone - and both feed gate-requirements, which reviews them in
+  the same breath.
+
+  NOT DROPPED, MOVED. The inputs judgment is made, once, at M3's gate.
 patch_note: |
   Does not apply. The user-level picture did not move, so there is nothing
   for the gate to judge. STRIKE PROPOSAL - owner adjudicates.
