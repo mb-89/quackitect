@@ -856,7 +856,31 @@ Three ways out, for the owner to pick:
 The lesson generalises past this repo: **any tool that can be asked to test
 itself needs a guard against being run against its own live instance.**
 
-### 6.10 The walk does not commit often enough to survive an ephemeral host
+### 6.10 A "commit everything" hook fights a running walk
+
+The supervising session carries a stop hook that refuses to end a turn while
+the repository has uncommitted changes. It fired on three consecutive turns
+while a caged walk was mid-milestone.
+
+Every time, the honest answer was to NOT commit:
+
+- The record files were the walk's own work in flight. Committing them would
+  cut a milestone in half and hand the machine a record it never signed.
+- The engine file in the main tree was a byte-identical SE-C-134 leak of the
+  walk's edit. Committing it would have recreated the two-branch divergence
+  that had already produced two different `se_help` implementations.
+
+**A hook cannot tell deliberate work-in-flight from abandoned changes.** On a
+durable machine that is harmless noise. On an ephemeral one it pushes toward
+the corrupting action, because "uncommitted work is destroyed work" is also
+true — the two rules point opposite ways and neither knows about the other.
+
+What resolves it is not a better hook. It is the walk committing at its own
+boundaries often enough that the tree is rarely dirty for long — see 6.11.
+Until then the supervising role has to override the hook knowingly, and say
+why each time.
+
+### 6.11 The walk does not commit often enough to survive an ephemeral host
 
 Three sessions in a row ended with work uncommitted — 46 files, then 29, then
 28 — and each had to be rescued from outside the walk. The machine commits at
