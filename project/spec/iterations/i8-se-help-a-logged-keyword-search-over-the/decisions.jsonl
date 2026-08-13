@@ -233,3 +233,4 @@
 {"ts":"2026-08-13T11:07:12.482Z","op":"done","visit":"iterations/i8/package@0","node":"d6","brief":"package submitted; walk advanced straight to gate-release"}
 {"ts":"2026-08-13T11:07:42.232Z","op":"plan","visit":"iterations/i8/gate-release@0","parent":null,"nodes":[{"id":"d16","brief":"submit and bless gate-release"},{"id":"d17","brief":"reach shipped"},{"id":"d18","brief":"commit"},{"id":"d19","brief":"report"}]}
 {"ts":"2026-08-13T11:08:25.283Z","op":"update","visit":"iterations/i8/gate-release@0","node":"d20","brief":"Resubmitting gate-release after the connection blip"}
+{"ts":"2026-08-13T11:13:00.050Z","op":"update","visit":"iterations/i8/shipped@0","node":"d28","brief":"Walking out to front_desk to resolve the merge via se_run with explicit cwd"}
