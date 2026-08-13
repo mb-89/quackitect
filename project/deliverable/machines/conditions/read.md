@@ -45,7 +45,7 @@ both proofs and asks again.
 
 THE TAKEOVER RULE: the human's checked docs are the SESSION's reading
 list (`human_checked` in every packet). When the agent takes over — the
-slider rises mid-walk — its walk must earn that same reading through the
+dial rises mid-walk — its walk must earn that same reading through the
 lane, even past transitions the human already walked: their checkmark is
 not the agent's reading.
 

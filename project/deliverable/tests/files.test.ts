@@ -69,7 +69,9 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   // JSON config, not a note, so no door saves a shared parse.
   // 101 since 2026-08-12: claims.ts reads the machine-id file — one tiny
   // id outside the note system, minted once.
-  const CEILING = 101;
+  // 102 since 2026-08-13: help.ts reads the demand log (.se/help-demand.jsonl)
+  // direct — a JSONL log outside the note system, same shape as the two above.
+  const CEILING = 102;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {

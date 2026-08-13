@@ -137,3 +137,43 @@
 {"ts":"2026-08-13T06:51:22.686Z","op":"update","visit":"iterations/i8/trace-design@0","node":"d9","brief":"tracing puml_mindmap.ts import chain; checking signals.ts next"}
 {"ts":"2026-08-13T06:51:32.186Z","op":"update","visit":"iterations/i8/trace-design@0","node":"d10","brief":"claiming puml_mindmap.ts under dsp-trace-corpus, signals.ts under dsp-live-register"}
 {"ts":"2026-08-13T06:57:18.665Z","op":"update","visit":"iterations/i8/verification@0","node":"d11","brief":"hit a real blocker at verification: legal_tools empty, cannot inspect the 8 claim-specs"}
+{"ts":"2026-08-13T09:23:34.675Z","op":"update","visit":"iterations/i8/verification@1","node":"d15","brief":"reading requirement nodes for M7 tester verification of 7 test-specs"}
+{"ts":"2026-08-13T09:23:37.087Z","op":"update","visit":"iterations/i8/verification@1","node":"d16","brief":"reading requirement nodes for prose-inspection spec"}
+{"ts":"2026-08-13T09:23:39.547Z","op":"update","visit":"iterations/i8/verification@1","node":"d17","brief":"reading requirement nodes for record-inspection spec"}
+{"ts":"2026-08-13T09:25:12.759Z","op":"done","visit":"front_desk@1","node":"d3","brief":"tester subagent verifying 7 test-specs; findings will return to caller for gate"}
+{"ts":"2026-08-13T09:25:21.628Z","op":"update","visit":"iterations/i8/verification@1","node":"d18","brief":"mapping machine state files before searching desk/tour/gate/autonomy implementations"}
+{"ts":"2026-08-13T09:26:42.062Z","op":"update","visit":"iterations/i8/verification@1","node":"d19","brief":"checking autonomy control rendering in render/mirror"}
+{"ts":"2026-08-13T09:26:42.833Z","op":"update","visit":"iterations/i8/verification@1","node":"d20","brief":"checking mirror header autonomy tier word rendering"}
+{"ts":"2026-08-13T09:26:59.564Z","op":"update","visit":"iterations/i8/verification@1","node":"d21","brief":"inspecting the autonomy control markup in render.ts"}
+{"ts":"2026-08-13T09:27:17.652Z","op":"update","visit":"iterations/i8/verification@1","node":"d22","brief":"checking params.ts rungs rendering to resolve slider-vs-buttons question"}
+{"ts":"2026-08-13T09:27:51.732Z","op":"defer","visit":"front_desk@1","node":"d4","brief":"carry i8 through remaining milestones to close","to":"M7_60_fix-findings","hops":1,"trail":["front_desk","M7_60_fix-findings"]}
+{"ts":"2026-08-13T09:28:33.822Z","op":"update","visit":"iterations/i8/verification@1","node":"d23","brief":"searching for recorded analysis backing tsp-derivation-analysis"}
+{"ts":"2026-08-13T09:29:53.842Z","op":"update","visit":"iterations/i8/verification@1","node":"d24","brief":"reading the entry README to check plain-language and one-command install claims"}
+{"ts":"2026-08-13T09:30:25.068Z","op":"update","visit":"iterations/i8/verification@1","node":"d25","brief":"checking whether RUNME.ps1 sits at true repo root outside project/"}
+{"ts":"2026-08-13T09:30:45.102Z","op":"update","visit":"iterations/i8/verification@1","node":"d26","brief":"checking small-fix routing and gate evidence form rendering"}
+{"ts":"2026-08-13T09:31:05.015Z","op":"update","visit":"iterations/i8/verification@1","node":"d27","brief":"checking roles-vs-usernames stamp vocabulary in calllog.ts"}
+{"ts":"2026-08-13T09:42:18.796Z","op":"update","visit":"iterations/i8/verification@2","node":"d33","brief":"submitting the claims checklist with the owed boxes and full evidence"}
+{"ts":"2026-08-13T09:44:29.587Z","op":"done","visit":"front_desk@0","node":"d1","brief":"back at i8/verification post-reload, fields already saved from before"}
+{"ts":"2026-08-13T09:45:09.480Z","op":"plan","visit":"iterations/i8/gate-implementation@0","parent":null,"nodes":[{"id":"d5","brief":"fill gate-implementation's quality checklist and rounds"},{"id":"d6","brief":"run the earned battery if needed"},{"id":"d7","brief":"submit + bless gate-implementation"},{"id":"d8","brief":"carry i8 through remaining M7/M8 milestones to close"}]}
+{"ts":"2026-08-13T09:46:06.297Z","op":"update","visit":"iterations/i8/gate-implementation@0","node":"d9","brief":"firing the full battery — scoped runs are green, this is the gate's own dated confirmation"}
+{"ts":"2026-08-13T09:48:38.617Z","op":"update","visit":"iterations/i8/gate-implementation@0","node":"d10","brief":"isolating the 19 battery failures vs the 13-failure baseline"}
+{"ts":"2026-08-13T09:52:19.639Z","op":"update","visit":"iterations/i8/gate-implementation@1","node":"d16","brief":"re-running the full battery after the slider-fix regressions are patched"}
+{"ts":"2026-08-13T10:06:22.127Z","op":"plan","visit":"iterations/i8/gate-implementation@3","parent":"d5","nodes":[{"id":"d33","brief":"submitting gate-implementation: quality checklist"},{"id":"d34","brief":"both rounds"},{"id":"d35","brief":"verdict"},{"id":"d36","brief":"self-bless"}]}
+{"ts":"2026-08-13T10:07:34.916Z","op":"update","visit":"iterations/i8/gate-implementation@3","node":"d37","brief":"resubmitting gate-implementation with corrected field formats"}
+{"ts":"2026-08-13T10:09:48.965Z","op":"update","visit":"iterations/i8/sweep-consistency@0","node":"d38","brief":"extending raid-issue-must-demos-owed to name all 4 owed M7 specs"}
+{"ts":"2026-08-13T10:09:54.075Z","op":"obsolete","visit":"iterations/i8/gate-implementation@0","node":"d5","brief":"stale — gate-implementation already passed and blessed"}
+{"ts":"2026-08-13T10:11:45.607Z","op":"plan","visit":"iterations/i8/sweep-consistency@0","parent":null,"nodes":[{"id":"d39","brief":"fill and submit sweep-consistency"},{"id":"d40","brief":"carry i8 through the remaining M8 states to close"}]}
+{"ts":"2026-08-13T10:12:01.532Z","op":"update","visit":"iterations/i8/sweep-consistency@0","node":"d41","brief":"fixing the swept checklist's line-wrapped item text to match exactly"}
+{"ts":"2026-08-13T10:14:00.579Z","op":"plan","visit":"iterations/i8/gate-validation@0","parent":null,"nodes":[{"id":"d42","brief":"fill and submit gate-validation"},{"id":"d43","brief":"carry i8 to close"}]}
+{"ts":"2026-08-13T10:19:36.429Z","op":"update","visit":"iterations/i8/gate-validation@0","node":"d44","brief":"checking exact round_1_validate field requirement format"}
+{"ts":"2026-08-13T10:20:10.722Z","op":"update","visit":"iterations/i8/gate-validation@0","node":"d45","brief":"fixed missing 'exercised against the goal' line item, resubmitting"}
+{"ts":"2026-08-13T10:20:23.170Z","op":"update","visit":"iterations/i8/gate-validation@0","node":"d46","brief":"checking whether gate-validation submit landed"}
+{"ts":"2026-08-13T10:21:17.487Z","op":"update","visit":"iterations/i8/gate-validation@0","node":"d47","brief":"aiming i8 at shipped to draw the route through M9"}
+{"ts":"2026-08-13T10:21:31.138Z","op":"done","visit":"iterations/i8/gate-validation@0","node":"d42","brief":"gate-validation submitted and blessed by agent"}
+{"ts":"2026-08-13T10:21:37.561Z","op":"done","visit":"iterations/i8/gate-implementation@0","node":"d7","brief":"gate-implementation was submitted and blessed earlier this session"}
+{"ts":"2026-08-13T10:21:39.473Z","op":"obsolete","visit":"front_desk@1","node":"d13","brief":"superseded by d7 actually finishing the gate"}
+{"ts":"2026-08-13T10:21:41.086Z","op":"obsolete","visit":"front_desk@2","node":"d20","brief":"superseded by d7 actually finishing the gate"}
+{"ts":"2026-08-13T10:21:42.659Z","op":"done","visit":"iterations/i8/sweep-consistency@0","node":"d39","brief":"sweep-consistency filled and submitted earlier this session"}
+{"ts":"2026-08-13T10:21:44.305Z","op":"done","visit":"iterations/i8/gate-implementation@0","node":"d8","brief":"M7/M8 milestones complete: gate-implementation and gate-validation both blessed"}
+{"ts":"2026-08-13T10:21:48.885Z","op":"done","visit":"iterations/i8/sweep-consistency@0","node":"d40","brief":"all M8 states finished and gate-validation blessed"}
+{"ts":"2026-08-13T10:21:52.521Z","op":"update","visit":"iterations/i8/gate-validation@0","node":"d48","brief":"pulling to walk from gate-validation toward shipped"}

@@ -112,6 +112,7 @@ import {
   stateFormFields,
   stateFormModel,
   tableRow,
+  templateOwed,
   templateProblems,
 } from "./stateform.ts";
 import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
@@ -3633,6 +3634,12 @@ export class Session {
     // same form passed its submit from inside the walk.
     const forIt = this.declIteration(m);
     const tp = templateProblems(model, fills, this.traceRoot(forIt));
+    // AN OWED BOX IS NOT GREEN, AND IT DOES NOT DISAPPEAR (owner ruling
+    // 2026-08-13). It never contributes to `problems` once its ref resolves,
+    // so it has to ride somewhere else or a debt behind a clean submit would
+    // be invisible to the next reader — this is that somewhere else, on the
+    // same object a gate reads as the state's verdict.
+    const owed = templateOwed(model, fills, this.traceRoot(forIt));
     const fmData = raw === undefined ? ({} as Record<string, unknown>) : parseStateNote(raw).frontmatter;
     return {
       state_form: true,
@@ -3690,6 +3697,11 @@ export class Session {
       ),
       problems: [...lint.problems, ...tp],
       met: lint.met && tp.length === 0,
+      // NAMED, NOT JUST COUNTED. A debt visible only as a number invites a
+      // reader to skim past it; the ref is what lets the next person go
+      // look (owner ruling 2026-08-13).
+      owed_count: owed.length,
+      owed,
     };
   }
 
@@ -4849,7 +4861,14 @@ export class Session {
     const abs = join(it.path, `project/spec/iterations/${it.id}/evidence/gate-kickoff.md`);
     if (!existsSync(abs)) return undefined;
     const txt = stripComments(section(parseStateNote(readFileSync(abs, "utf8")).body, "change_size")).toLowerCase();
-    return (CHANGE_COLUMNS as readonly string[]).find((c) => txt.includes(c));
+    // THE CHOSEN OPTION IS THE TEXT BEFORE THE FIRST " — ", NEVER A SUBSTRING
+    // SCAN OVER THE WHOLE RATIONALE (note-ee44c2873e55). A rationale that
+    // compares its choice against the other options by name — which
+    // meth-gate-review asks for — used to false-match whichever column name
+    // happened to appear earliest in CHANGE_COLUMNS order, not the one the
+    // author actually chose.
+    const chosen = txt.split("—")[0]?.trim();
+    return (CHANGE_COLUMNS as readonly string[]).find((c) => chosen === c);
   }
 
   /** ONE self-contained HTML: the sheet, the fills, the reading and the
