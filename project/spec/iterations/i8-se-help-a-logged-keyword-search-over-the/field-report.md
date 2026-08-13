@@ -568,6 +568,33 @@ The missing verb is therefore not "a shell". It is **`se_test` legal at
 `observe-red`**, plus job control (`list`, `poll`, `stop`) as first-class lane
 verbs rather than `se_run` arguments.
 
+### The test lane held its scope, and the job lane did not hold its patience
+
+Two numbers that look like one problem and are not.
+
+**Scope discipline HELD.** Across the whole run, 16 test runs were started:
+
+- 13 SCOPED — named files, several narrowed further by `name_pattern` to a
+  single test.
+- 3 BATTERY — and M7 verification demands the battery by its own text ("the
+  full battery runs mechanically", `floor: true`).
+
+So the battery ran three times where the method asked for it, not once out of
+habit. The lane's `TEST_SCOPE` clause did its job.
+
+**Job polling did NOT.** 81 further calls were polls of already-running jobs,
+and **56 of them were the same job**: `test-msqkf74m-1`. That job never
+finished, because of the recursive `fs.watch` defect. The agent polled a dead
+job fifty-six times.
+
+The root cause is fixed. The poll loop is not: nothing in the lane gives a
+job a deadline, so an agent facing a hung job has no signal to stop asking. A
+job that has not moved deserves an answer that says so.
+
+**Do not read the two together.** A raw `se_test` count looks like the battery
+ran twenty-six times. It ran three. The polls are the noise, and the noise is
+the defect.
+
 ### Refusals — 10 distinct clauses, 139 firings
 
 | times | clause | what it is |
@@ -668,7 +695,386 @@ run are currently unlogged.
 
 ---
 
-## 6. The one rule this run had to break
+## 6. What went wrong, and what each mistake teaches
+
+The owner's ruling on this run: getting it wrong the first time is acceptable,
+and not learning from it is not. So every mistake is here with its lesson,
+including the ones the driving agent made rather than the system.
+
+### 6.1 A scoped test run only answers about what it scoped
+
+The owed-checkbox commit changed `engine/session.ts`, a file most of the
+engine touches. Its author ran a broad scoped set —
+`mirror-contract`, `forms`, `pull`, `pull-seam`, `claims`, `iterations`,
+`reopen`, `route` — and reported "no new failures". `drawnsub` and
+`threshold` were not in that set.
+
+**The lesson is not "run the battery more".** Scoped-by-default is right and
+the lane is right to enforce it. The lesson is that **the scope must be
+chosen by what DEPENDS ON the changed file, not by what the author was
+thinking about.** A change to a widely-imported module has a scope the author
+cannot pick from memory.
+
+What would fix it mechanically: derive the scope from the import graph of the
+changed files, and refuse a scoped run that misses a dependent test file.
+
+### 6.2 `se_help` passed every gate while not existing
+
+The feature was specified, designed, traced, tested and gate-blessed — and
+was never wired into `tools.ts`. **The full battery caught it. No scoped run
+could have**, because nothing in any scope imported the module that was
+missing.
+
+This is now `raid-issue-trace-design-checks-existence-not-content`: the trace
+sweep checks that a file EXISTS, never that its content carries what the
+design spec claims. A design spec naming an interface should be able to
+assert that interface is reachable.
+
+It is also the strongest argument in this run for M7 demanding the battery.
+Three battery runs earned their cost by finding this one thing.
+
+### 6.3 A guard that refuses and is then bypassed is worse than no guard
+
+`SE-C-134` fired four times to stop a bound record's writes reaching trunk.
+The files reached trunk anyway, through `se_run`, which the clause did not
+cover. The record said the write was stopped.
+
+The retro fixed the refusal TEXT to say plainly which five tools it guards.
+That is honest, but the hole is still there.
+
+**The lesson: a guard must name what it does NOT cover, and a guard that
+cannot cover the general case should say so in its own refusal.** Otherwise
+the log reads as a clean stop.
+
+The damage was real and took a while to see: `se_help` ended up implemented
+twice, differently, on two branches, because the same feature was authored
+once inside the record and once on trunk.
+
+### 6.4 A cleanup must check what still points at the thing removed
+
+Removing the leaked `engine/help.ts` from trunk left `engine/tools.ts`
+importing it. **The branch did not compile for several commits.**
+
+Nothing caught it because the `pre-commit` hook was not executable — see 1.7.
+The hook found it on its FIRST run after the retro set the bit. The fix for a
+reported defect immediately caught a live one.
+
+### 6.5 A raw call count is not a measurement
+
+`se_test` appeared 97 times in the log, which reads as ninety-seven test
+runs. It was **16 runs and 81 polls**, and 56 of those polls were one hung
+job. A reader — or an owner — looking at the raw count would conclude the
+battery was being run compulsively. The opposite was true: scope discipline
+held at 13 scoped against 3 battery.
+
+**The lesson: any tool that both STARTS work and POLLS work needs those
+counted separately**, in the log and in any report built from it. `se_log_query`
+grouping by tool cannot tell them apart today.
+
+### 6.6 A control has to differ by only the thing being tested
+
+Investigating those two failing test files, the driving agent first compared
+the working branch against `v3` and concluded this run had caused a
+regression. `v3` already carried i8's merged content, so it differed by far
+more than the commits under suspicion.
+
+The correct control — the parent commit on the same branch — showed the
+failures were already there, and that one of the suspected commits had
+actually REDUCED them.
+
+**The lesson: when a comparison spans a merge, it is not a control.** The
+first conclusion was stated confidently and was wrong, and a wrong regression
+claim routes real work.
+
+### 6.7 A supervisor that reports liveness reports nothing
+
+The bootstrap agent supervised the caged walks by polling every ten minutes
+and reporting "still running". To the owner that is indistinguishable from a
+hang, and they said so.
+
+**The lesson, and it generalises to every unattended cloud run: a supervising
+agent must STREAM events — commits landing, tests finishing, silence passing
+a threshold — not sample liveness.** The fix used here was a monitor emitting
+one line per commit plus an explicit "quiet for 3 minutes" signal.
+
+### 6.8 A pattern that matches your own process kills your own process
+
+`pkill -f "se-mcp.ts"` matched the supervising shell's own command line,
+because that line contained the pattern. It killed the shell mid-command and
+took the server with it, twice, and the symptom looked like the server
+refusing to start.
+
+The same trap made `pgrep -cf "<prompt fragment>"` report a finished walk as
+still alive.
+
+**The lesson: never match a process by a string your own command line
+contains.**
+
+### 6.9 The release step cannot smoke-test what it packages
+
+At M9 the walk packaged the release and then tried to prove the packaged
+server runs, by starting it:
+
+```
+cd /tmp/qk-install-check/project/deliverable
+node engine/bin/se-mcp.ts --root ../..
+```
+
+**That killed the lane the walk was standing in.** Every following `se_` call
+failed with a connection error, and the walk could not even call `se_run` to
+clean up after itself — the tool it needed was the thing that had gone.
+
+The post-mortem, from outside the cage. **The first version of this section
+got the mechanism wrong, and the correction is the useful part.**
+
+What is certain:
+
+- The second instance did **not** linger holding the port. It had already
+  exited when the outage was investigated.
+- During the outage `GET /` did not answer inside a 5-second timeout, and
+  nothing showed as listening on 7333.
+- **Both server processes stayed alive the whole time**, with the correct
+  working directory.
+- The server log records **no crash** — only its clean startup lines.
+
+The first reading was "the listener is gone and will never recover", and the
+supervising role killed the processes and restarted them on that basis. Two
+pieces of evidence say that was wrong:
+
+- The caged agent reported the lane **self-recovering** after two or three
+  retries, with no intervention.
+- A later outage cleared by itself, back to `200`, with no restart at all.
+
+**So the engine BLOCKS; it does not die.** A timeout was read as a death, and
+a restart was applied to a server that was merely busy. The restart appeared
+to work, which is exactly how a wrong diagnosis survives.
+
+The trigger is `package.ts`, not the packaged server. It copies the ENTIRE
+project root to a temp directory with a synchronous `cpSync`, then spawns
+`zip -r` across the result. The lane goes unresponsive for the duration and
+returns afterwards.
+
+**The mechanism is not settled**, and the honest options are:
+
+- I/O and CPU starvation in a small container makes the engine miss its
+  window.
+- The engine's own file watchers churn on the copy.
+- Something in the packaging touches state the engine holds.
+
+Naming it as unsettled is deliberate. A confident wrong mechanism is what
+this section already produced once.
+
+**What still stands regardless of mechanism:** a caged agent whose lane is
+unresponsive cannot call `se_run` to investigate or clean up, because the
+tool it needs is the thing that is gone. Diagnosis needed the UNCAGED role.
+That part of the finding survives the correction.
+
+**The design gap: the package step's natural proof is to run what it built,
+and running what it built destroys the lane it is running in.** There is no
+safe in-container smoke test of a packaged server while the lane depends on
+that same server.
+
+Three ways out, for the owner to pick:
+
+- Prove the package WITHOUT starting it — files present, entrypoint resolvable,
+  manifest correct, the packaged tree's own unit tests.
+- Give the packaged instance a private port AND a private state directory, and
+  have the engine refuse to start a second instance against a root that already
+  has a live one.
+- Accept it cannot be honestly verified in-container, and record it as owed —
+  which is what the checkbox built in this very iteration exists for.
+
+The lesson generalises past this repo: **any tool that can be asked to test
+itself needs a guard against being run against its own live instance.**
+
+### 6.10 A "commit everything" hook fights a running walk
+
+The supervising session carries a stop hook that refuses to end a turn while
+the repository has uncommitted changes. It fired on three consecutive turns
+while a caged walk was mid-milestone.
+
+Every time, the honest answer was to NOT commit:
+
+- The record files were the walk's own work in flight. Committing them would
+  cut a milestone in half and hand the machine a record it never signed.
+- The engine file in the main tree was a byte-identical SE-C-134 leak of the
+  walk's edit. Committing it would have recreated the two-branch divergence
+  that had already produced two different `se_help` implementations.
+
+**A hook cannot tell deliberate work-in-flight from abandoned changes.** On a
+durable machine that is harmless noise. On an ephemeral one it pushes toward
+the corrupting action, because "uncommitted work is destroyed work" is also
+true — the two rules point opposite ways and neither knows about the other.
+
+What resolves it is not a better hook. It is the walk committing at its own
+boundaries often enough that the tree is rarely dirty for long — see 6.11.
+Until then the supervising role has to override the hook knowingly, and say
+why each time.
+
+### 6.11 The walk does not commit often enough to survive an ephemeral host
+
+Three sessions in a row ended with work uncommitted — 46 files, then 29, then
+28 — and each had to be rescued from outside the walk. The machine commits at
+milestone transitions, which is the right rhythm on a durable machine and the
+wrong one here.
+
+This is the same finding as section 7, arrived at three separate times. It is
+the single most repeated failure of the run.
+
+## 7. What to change so the next cloud run just works
+
+The owner's standing goal: **dump work into the cloud, get something back,
+interact very little.** This run did not look like that. It worked, but it
+took constant hand-holding, and none of that hand-holding was interesting.
+
+This section is the agenda that would remove it. It is ordered by how much
+friction each one removes, not by how hard it is.
+
+### 7.1 Ship a headless entrypoint — the single biggest win
+
+Everything in section 1 was hand-assembled by an agent reading prose and
+guessing. Each of these is a step a person had to discover the hard way:
+
+- suppress the panel, or the server dies at startup
+- hold stdin open, or backgrounding kills it
+- pass the cage on the command line rather than placing files
+- fetch the `it/*` refspec, or no record is visible
+- adopt the iteration, because no lane verb does it
+
+**None of that is judgment. All of it is a script.** Version 1 of this system
+shipped a `runme.sh` beside its PowerShell script for exactly this reason;
+this version ships only PowerShell.
+
+What the script must do, and section 1.7 has the detail:
+
+- verify Node, install, start the server with the right environment
+- wait for the health check instead of racing it
+- fetch the refspec and adopt the named record
+- launch the caged child with the cage on its command line
+- **exit non-zero with ONE clear sentence** when a step fails
+
+That last point matters most. Every failure in this run presented as "the
+server is not there", which is the least informative symptom possible.
+
+### 7.2 Make the two roles a first-class feature, not an improvisation
+
+**A running agent cannot cage itself** (1.6). That is structural, and it will
+never change: the deny list and the MCP server are read at session start.
+
+So every headless run needs a supervisor and a walker. Right now the
+supervisor is whatever agent happened to be started, improvising with shell
+commands. It should be a MODE THE SYSTEM OWNS, with a defined job:
+
+- bring the lane up and keep it up
+- launch and relaunch the caged walker
+- stream progress somewhere the person can read
+- never touch the record itself
+
+Section 6.9 shows why this cannot be folded back into the walker: when the
+lane is unresponsive the caged agent cannot even call `se_run` to look. The
+role that recovers the lane must live outside the lane.
+
+### 7.3 Give the walker a lane it can trust
+
+The walker currently treats any failed call as a wall. It needs two things:
+
+- **A health check with retry semantics it is told about.** A timeout is not a
+  death (6.9). The walker should retry a failed lane call a few times before
+  concluding anything, and the guidance should say so plainly.
+- **A supervisor that restarts the engine when it is genuinely gone**, so the
+  walker never has to care about the difference.
+
+Add a deadline to background jobs while here. One hung job was polled 56
+times because nothing ever said "this is not coming back" (section 5).
+
+### 7.4 Commit on every state, not every milestone
+
+Three sessions running ended with 46, 29 and 28 files uncommitted, each
+rescued from outside the walk. On a durable machine the milestone rhythm is
+right. On an ephemeral one it loses work.
+
+**The state, not the milestone, should be the commit unit.** A state that
+produced files and signed its evidence has everything a commit needs. This
+also dissolves the hook conflict in 6.10, because the tree is then rarely
+dirty for long.
+
+### 7.5 Close the write leak that causes divergence
+
+`SE-C-134` guards five write tools and not `se_run` (6.3). The result was
+`se_help` implemented twice, differently, on two branches, and three merge
+conflicts at the end of this run.
+
+Two candidate fixes, and the second is better:
+
+- extend the clause to every write path including `se_run`
+- **bind the lane's ROOT to the worktree while a record is bound**, so a write
+  from inside a record cannot address trunk at all
+
+The second removes the class of bug instead of adding another check.
+
+### 7.6 Let the owner pre-authorise gates for one session
+
+`gate-release` needs a person by design, and that is right. But in an
+unattended run the person is not there, and the walk stops with the work
+finished and unshipped.
+
+The dial already carries "how much may the agent do alone" per session, set at
+launch and not committed. **The same idea extends to naming gates the owner
+has authorised for this run** — a launch-time list, host-local, never
+committed, recorded in the gate as authorised-in-advance rather than blessed
+by the agent on its own judgment.
+
+That is the difference between an unattended run that ships and one that
+parks a finished iteration at the last step.
+
+### 7.7 Choose test scope from the import graph
+
+A scoped run is the right default and the lane is right to enforce it. But the
+author picks the scope from memory, and in this run that missed the two files
+the change actually broke (6.1).
+
+**The scope should be derived: what imports the files I changed, transitively.**
+A scoped run that misses a dependent test file should be refused the same way
+an unscoped one is.
+
+### 7.8 Check content, not existence, in the trace sweep
+
+`se_help` passed every gate while not existing (6.2). The sweep confirms a
+file is present, never that it carries what the design spec claims. Already
+minted as `raid-issue-trace-design-checks-existence-not-content`.
+
+### 7.9 Stop re-verifying the whole product every iteration
+
+M7's claims checklist is `applies: full` at every size, so an iteration about
+a keyword search inherited eight whole-product claims including one about the
+editor panel (section 4). The owed box makes that survivable. It does not make
+it right.
+
+**A standing claim should be re-checked when its subject changes, not when any
+iteration happens to reach M7.**
+
+### 7.10 Expose `itAdopt` as a lane verb
+
+A peer machine still cannot pick up a pushed record by itself. The engine
+function exists; nothing in the lane calls it. Until it does, every cloud run
+needs the supervisor to adopt the record from outside the cage.
+
+### 7.11 Make the packager stop blocking the lane
+
+`package.ts` copies the entire root synchronously and then zips it, and the
+lane goes unresponsive for the duration (6.9). At minimum the release step
+should not be able to starve the engine it runs inside. The mechanism is not
+yet settled, so this one needs a diagnosis before a fix.
+
+---
+
+**If only three of these land**, make them 7.1, 7.4 and 7.6: a script that
+brings it up, a commit rhythm that survives the host, and a way for the owner
+to authorise the last gate in advance. Those three turn this run's experience
+into an unattended run that starts, works and ships without a person in the
+loop.
+
+## 8. The one rule this run had to break
 
 **"The machine commits, not you."** The bootstrap role broke it, deliberately,
 at the end of the run. This is recorded rather than glossed.
@@ -695,7 +1101,7 @@ point before it can be stopped, or it needs a checkpoint the machine itself
 takes when a session ends. Right now the safe moment to stop is not a moment
 the agent can see coming.
 
-## 7. Where this file lives, and why
+## 9. Where this file lives, and why
 
 The handover asks for this file in the record's folder, committed with the
 work, so whoever reviews i8 gets it whether or not they think to ask.
