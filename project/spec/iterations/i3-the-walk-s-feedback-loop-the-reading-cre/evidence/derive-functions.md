@@ -1,7 +1,7 @@
 ---
 form: derive-functions
 by: agent
-signed_off: 2026-08-13T10:46:22.475Z
+signed_off: 2026-08-13T14:31:55.730Z
 authors: agent
 files:
 ---
@@ -22,6 +22,10 @@ NO NEW FUNCTION, and that is a result rather than a convenience. This state's ow
 
 Nothing needed one. Every repair is a function the system already had, done correctly.
 
+ONE ROW WAS ADDED TO THE LIST, and it is not this iteration's. [[fn-run-a-governed-walk.share-the-pool]] came from the previous iteration and arrived when trunk was synced into the record. It serves the ten claim-lane requirements the coverage check named.
+
+TWO OF THOSE TEN HAD NO FUNCTION AT ALL. req-pool-opens-on-first-claim and req-absent-ledger-is-not-offline were written at the front desk today, both refining uc-claim-an-iteration, and neither was wired to a function. They are now on share-the-pool's satisfies list, where they belong.
+
 ## functions
 
 - [[fn-run-a-governed-walk]]
@@ -38,6 +42,7 @@ Nothing needed one. Every repair is a function the system already had, done corr
 - [[fn-run-a-governed-walk.land-the-work]]
 - [[fn-run-a-governed-walk.route-the-work]]
 - [[fn-run-a-governed-walk.serve-a-step]]
+- [[fn-run-a-governed-walk.share-the-pool]]
 - [[fn-run-a-governed-walk.show-where-it-stands]]
 - [[fn-run-a-governed-walk.stand-up-a-product]]
 - [[fn-run-a-governed-walk.teach-the-newcomer]]

@@ -1,7 +1,7 @@
 ---
 form: observe-red
 by: agent
-signed_off: 2026-08-13T08:52:26.787Z
+signed_off: 2026-08-13T14:33:16.500Z
 authors: agent
 files:
 ---
@@ -34,6 +34,7 @@ THE SEVEN NON-TEST SPECS ARE CHECKED AS RED-IMPOSSIBLE, which the guidance names
 
 ## red_observed
 
+- [x] tsp-autonomy-tiers
 - [x] tsp-derivation-analysis
 - [x] tsp-desk-and-gates
 - [x] tsp-first-run
@@ -50,3 +51,16 @@ THE SEVEN NON-TEST SPECS ARE CHECKED AS RED-IMPOSSIBLE, which the guidance names
 
 ## anything_else
 
+ONE SPEC WAS ADDED AFTER THIS STATE SIGNED, and its red is real rather than red-impossible.
+
+tsp-autonomy-tiers arrived when trunk was synced into the record, late in the walk. It belongs to the previous iteration's tier cut-over.
+
+Its red was observed before anything was built, by the tester, on 2026-08-13:
+
+- Line 2 failed. Five machine canvases still carried numeric autonomy weights, and four files still said "slider". Both named with files and lines.
+- Line 3 failed. render.ts drew the posted autonomy value with no tier word beside it.
+- Lines 1 and 4 passed, line 4 by its own written exemption.
+
+That red is what put the cut-over into this iteration's scope. It was not planned work here.
+
+THE OTHER SEVEN STAY RED-IMPOSSIBLE, unchanged. Each covers standing behaviour older than this delta and none is in its scope.

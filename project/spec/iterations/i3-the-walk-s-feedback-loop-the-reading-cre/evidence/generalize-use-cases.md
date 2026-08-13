@@ -1,7 +1,7 @@
 ---
 form: generalize-use-cases
 by: agent
-signed_off: 2026-08-13T10:41:42.576Z
+signed_off: 2026-08-13T14:29:45.854Z
 authors: agent
 files:
 ---
@@ -10,11 +10,15 @@ files:
 
 ## current_situation
 
-The standing set, unchanged. No use case is added and none is extended.
+The standing set, unchanged by this delta. No use case is added here and none is extended.
 
 That follows from write-stories: no story was added, so nothing needs generalizing. A use case exists to be complete enough that requirements derive from it, and the requirements this delta writes derive from steps that are already written.
 
 frame-delta's own follow_up named the two they derive from: [[uc-be-handed-the-method]] and [[uc-take-a-step]]. Both stand, and both already carry the steps in question.
+
+ONE ROW WAS ADDED TO THE LIST, and it is not this iteration's. [[uc-claim-an-iteration]] came from the previous iteration and arrived when trunk was synced into the record. It refines [[sty-work-on-two-machines]], which arrived in the same sync.
+
+That single missing row is what greyed every state below write-stories. The claim was signed when neither node existed here. The coverage check runs both ways over the rows this form lists, so a story no listed row refines breaks it.
 
 ## use_cases
 
@@ -25,6 +29,7 @@ frame-delta's own follow_up named the two they derive from: [[uc-be-handed-the-m
 - [[uc-browse-the-archive]]
 - [[uc-capture-a-stray]]
 - [[uc-change-the-method-mid-walk]]
+- [[uc-claim-an-iteration]]
 - [[uc-close-a-record]]
 - [[uc-diverge-before-deciding]]
 - [[uc-drain-the-inbox]]

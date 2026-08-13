@@ -1,6 +1,7 @@
 ---
 id: i3-the-walk-s-feedback-loop-the-reading-cre
-status: open
+status: shipped
+closed: 2026-08-13T14:56:27.552Z
 started: 2026-08-13T07:53:12.397Z
 opened: 2026-08-11T15:22:43.131Z
 goal: "The walk's feedback loop: the reading credit survives a reload, a red objective serves its fill, and one verb answers why a state is grey."

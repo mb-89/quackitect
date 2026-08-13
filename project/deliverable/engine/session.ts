@@ -695,7 +695,7 @@ export class Session {
         clause: CLAUSES.REQUIRED_ARGS,
         expected: "an autonomy between 0 (every step is the human's) and 1 (fully autonomous)",
         got: String(value),
-        remedy: { tool: "se_pull", args: {}, note: "the autonomy is set from the mirror's slider or at launch (--autonomy)" },
+        remedy: { tool: "se_pull", args: {}, note: "the autonomy is set from the mirror's rungs or at launch (--autonomy)" },
         source: "engine/session.ts autonomy",
       });
     }
@@ -706,7 +706,19 @@ export class Session {
     if (value < 1) this._emergency = false;
     this.persistSettings();
     this.notifyChange(); // a holding agent wakes and re-reads the packet
-    return { autonomy: value, was, ...(this._emergency ? { emergency: true } : {}) };
+    return { autonomy: value, was, ...this.tierFor(value), ...(this._emergency ? { emergency: true } : {}) };
+  }
+
+  /** THE TIER WORD FOR A VALUE (req-autonomy-is-categorical). The word is
+   *  the truth and the number is its transitional carrier, so the two travel
+   *  together — a bare number on any surface is the thing that row forbids.
+   *  Empty only when the ladder itself cannot be read. */
+  private tierFor(value: number): Record<string, string> {
+    try {
+      return { tier: tierOf(loadLevels(this.root), value) };
+    } catch {
+      return {};
+    }
   }
 
   /** The autonomy gate: an AGENT tick may enter a state only when its
@@ -2574,14 +2586,7 @@ export class Session {
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
       target: targetNow(),
       autonomy: this._autonomy,
-      ...(() => {
-        // The tiers are the vocabulary; the number is the transitional carrier.
-        try {
-          return { tier: tierOf(loadLevels(this.root), this._autonomy) };
-        } catch {
-          return {};
-        }
-      })(),
+      ...this.tierFor(this._autonomy),
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
     });
 

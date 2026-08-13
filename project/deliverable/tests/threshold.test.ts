@@ -111,13 +111,13 @@ test("priority and autonomy ride every packet — the agent can weigh its next s
   // 2026-08-12, machines/scale.md). These states author the WORD `mechanical`;
   // the number is the transitional anchor the compiler reads off that scale.
   assert.equal(info.states[0].priority, 0.2);
-  // STILL 0.01 HERE, on purpose. This is the weight of ENTERING the boot
-  // sub-machine, and it comes from boot.canvas's MACHINE-level frontmatter,
-  // which the tier sweep has not reached. Numeric anchors stay legal while
-  // that sweep runs (engine/machines/compile.ts, asPriority). Every rung of
+  // THE SWEEP LANDED (i3, tsp-autonomy-tiers). This is the weight of
+  // ENTERING the boot sub-machine, from boot.canvas's MACHINE-level
+  // frontmatter, which now authors the word `mechanical` like everything
+  // else. It read 0.01 until the sweep reached it, and every rung of
   // machines/scale.md treats 0.01 and 0.2 alike, so nothing behaves
-  // differently; when the sweep lands, this line moves to 0.2 and says so.
-  assert.equal(info.states[0].next[0].priority, 0.01); // boot.canvas frontmatter
+  // differently — this line moved because the number left the drawing.
+  assert.equal(info.states[0].next[0].priority, 0.2); // boot.canvas frontmatter
   const peek = session.stateInfo("idle") as { priority: number; next: { to: string; priority?: number }[] };
   assert.equal(peek.priority, 0.2);
   const exp = peek.next.find((n) => n.to === "expeditions");

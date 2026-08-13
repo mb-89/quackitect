@@ -31,6 +31,25 @@ with ideation, and the 1.5 tier is never reached and ignored. The numbers
 beside the rungs are transitional anchors for the weighing; the words are
 the truth.
 
+BLOCKED IS ALSO A PRIORITY, and it is the same word for the same thing. A
+drawing authored `priority: blocked` can never be entered by the agent, at
+any setting. The person may always enter it. The archives are drawn that
+way.
+
+THE TWO SIDES SIT AT OPPOSITE ENDS, and that is not a contradiction. On the
+control, blocked is the position where no rung is pressed. On a state, it is
+above every rung. The gate refuses when priority is GREATER than autonomy,
+so "nothing gets through" is the bottom of one range and the top of the
+other.
+
+Authoring a state at 0 would do the opposite of what the word says: 0 > 0 is
+false, so it would run at the blocked setting.
+
+SO THE ENGINE MATCHES THE RESOLVED VALUE, NEVER THE SPELLING. The list below
+resolves a name, its abbreviation and any case alike, so `blocked`,
+`Blocked`, `BLOCKED` and `B` all mean the same rung. Anything that resolves
+to 0 is read as a state priority above every rung.
+
 IDEATION IS THE DANGEROUS ONE, and it is marked. Every other rung delegates
 work that already exists; ideation delegates the CREATION of work, so it has
 no natural stopping point and it spends budget until something stops it. The

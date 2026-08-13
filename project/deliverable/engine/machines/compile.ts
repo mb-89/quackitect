@@ -461,13 +461,32 @@ function asList(v: unknown): string[] | undefined {
     .filter((t) => t !== "");
 }
 
+/** BLOCKED, AUTHORED ON A STATE. The agent can never enter it, at any
+ *  setting; the person always may. The archives are drawn that way.
+ *
+ *  IT MUST NOT RESOLVE THROUGH THE LADDER, and that is the whole reason this
+ *  line stands above the lookup. On the CONTROL, blocked is 0 — the position
+ *  where no rung is pressed. As a state's PRIORITY, 0 is the one value that
+ *  breaks the promise, because the gate refuses on `priority > autonomy` and
+ *  0 > 0 is false. The same word means "nothing gets through" on both sides,
+ *  and reaching it needs the opposite end of the range on each. */
+const BLOCKED_PRIORITY = 1.5;
+
 function asPriority(v: unknown, root: string): number | undefined {
   // A TIER WORD IS THE AUTHORED TRUTH (owner cut-over ruling 2026-08-12);
   // its number is the transitional anchor from the drawn scale. Numeric
   // stays legal while the sweep runs.
   if (typeof v === "string" && v.trim() !== "" && Number.isNaN(Number(v))) {
     try {
-      return valueFor(loadLevels(root), v);
+      const resolved = valueFor(loadLevels(root), v);
+      // MATCH THE RESULT, NEVER THE SPELLING. The ladder resolves a word,
+      // its abbreviation and any case alike, so `blocked`, `Blocked`, `B`
+      // and `b` all arrive here as 0. An exact string match let three of
+      // those through (found by the i3 tester, 2026-08-13), and 0 is the
+      // one value that breaks the block: the gate refuses on
+      // `priority > autonomy`, and 0 > 0 is false. Matching the resolved
+      // number also survives the level being renamed in scale.md.
+      return resolved === 0 ? BLOCKED_PRIORITY : resolved;
     } catch {
       return undefined;
     }

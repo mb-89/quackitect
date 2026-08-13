@@ -300,3 +300,33 @@
 {"ts":"2026-08-13T13:37:21.374Z","op":"update","visit":"iterations/i3/verification@0","node":"d13","brief":"stepping out to trunk to change the engine"}
 {"ts":"2026-08-13T14:08:04.038Z","op":"done","visit":"start@0","node":"d2","brief":"the walk stands at verification again"}
 {"ts":"2026-08-13T14:09:07.139Z","op":"obsolete","visit":"start@0","node":"d3","brief":"no sync needed — the record shares these working files"}
+{"ts":"2026-08-13T14:09:41.408Z","op":"update","visit":"iterations/i3/verification@0","node":"d6","brief":"the record's work is committed"}
+{"ts":"2026-08-13T14:10:35.959Z","op":"done","visit":"start@0","node":"d4","brief":"the two closed findings are checked, the five open ones are not"}
+{"ts":"2026-08-13T14:15:35.273Z","op":"update","visit":"iterations/i3/verification@0","node":"d7","brief":"verifying tsp-autonomy-tiers line 2: numeric weights and slider wording under machines/"}
+{"ts":"2026-08-13T14:16:00.629Z","op":"update","visit":"iterations/i3/verification@0","node":"d8","brief":"settling whether the bare autonomy label is live markup or orphaned slider-era code"}
+{"ts":"2026-08-13T14:28:39.784Z","op":"done","visit":"front_desk@0","node":"d19","brief":"a story arrived in the sync and no row named it"}
+{"ts":"2026-08-13T14:29:19.371Z","op":"update","visit":"iterations/i3/generalize-use-cases@0","node":"d22","brief":"the walk moves through, so this is not the walk"}
+{"ts":"2026-08-13T14:29:45.576Z","op":"update","visit":"iterations/i3/generalize-use-cases@0","node":"d23","brief":"the synced story gets the use case that refines it"}
+{"ts":"2026-08-13T14:31:10.042Z","op":"update","visit":"iterations/i3/derive-functions@1","node":"d24","brief":"walking forward to find the next fallen claim"}
+{"ts":"2026-08-13T14:31:41.527Z","op":"update","visit":"iterations/i3/derive-functions@1","node":"d25","brief":"the two new pool rows get the function that serves them"}
+{"ts":"2026-08-13T14:31:55.381Z","op":"update","visit":"iterations/i3/derive-functions@1","node":"d26","brief":"resubmitting derive-functions with the pool function listed"}
+{"ts":"2026-08-13T14:33:16.193Z","op":"obsolete","visit":"front_desk@0","node":"d21","brief":"duplicate of d5"}
+{"ts":"2026-08-13T14:33:42.395Z","op":"done","visit":"front_desk@0","node":"d20","brief":"four fallen claims re-earned, all from the sync"}
+{"ts":"2026-08-13T14:34:23.212Z","op":"update","visit":"iterations/i3/verification@1","node":"d27","brief":"round 4: re-sweeping for numeric autonomy weights across the whole tree"}
+{"ts":"2026-08-13T14:34:41.468Z","op":"update","visit":"iterations/i3/verification@1","node":"d28","brief":"round 4: scoped sweep of machines and guidance for slider wording"}
+{"ts":"2026-08-13T14:35:00.538Z","op":"update","visit":"iterations/i3/verification@1","node":"d29","brief":"round 4: checking the feed's tier rendering and the blocked resolution path"}
+{"ts":"2026-08-13T14:35:25.603Z","op":"update","visit":"iterations/i3/verification@1","node":"d30","brief":"round 4: probing whether a blocked authoring can resolve to zero"}
+{"ts":"2026-08-13T14:35:46.570Z","op":"update","visit":"iterations/i3/verification@1","node":"d31","brief":"round 4: reading the new canvas priority words and the new scale check"}
+{"ts":"2026-08-13T14:40:02.101Z","op":"done","visit":"start@0","node":"d5","brief":"the gate waits on the cut-over reds the tester found"}
+{"ts":"2026-08-13T14:46:37.851Z","op":"done","visit":"front_desk@1","node":"d38","brief":"the row carries all four whole, with the tester's reasons"}
+{"ts":"2026-08-13T14:47:04.970Z","op":"done","visit":"front_desk@1","node":"d39","brief":"verification closes: four observed, four carried by the debt row"}
+{"ts":"2026-08-13T14:49:37.973Z","op":"done","visit":"front_desk@1","node":"d40","brief":"the implementation gate is judged and blessed"}
+{"ts":"2026-08-13T14:50:45.944Z","op":"update","visit":"iterations/i3/sweep-consistency@0","node":"d43","brief":"walking to validation"}
+{"ts":"2026-08-13T14:51:32.826Z","op":"update","visit":"iterations/i3/sweep-consistency@0","node":"d44","brief":"the entry document teaches se_test's new contract"}
+{"ts":"2026-08-13T14:51:56.500Z","op":"update","visit":"iterations/i3/sweep-consistency@0","node":"d45","brief":"the consistency sweep is run and signed"}
+{"ts":"2026-08-13T14:52:09.489Z","op":"update","visit":"iterations/i3/gate-validation@0","node":"d46","brief":"walking on toward release"}
+{"ts":"2026-08-13T14:53:11.774Z","op":"update","visit":"iterations/i3/gate-validation@0","node":"d47","brief":"the validation gate is judged and blessed"}
+{"ts":"2026-08-13T14:53:33.590Z","op":"done","visit":"front_desk@1","node":"d35","brief":"verification closed with the debt row carrying four"}
+{"ts":"2026-08-13T14:55:30.282Z","op":"update","visit":"iterations/i3/package@0","node":"d48","brief":"the package is built and its contents checked"}
+{"ts":"2026-08-13T14:55:44.184Z","op":"update","visit":"iterations/i3/gate-release@0","node":"d49","brief":"on to the release entry"}
+{"ts":"2026-08-13T14:56:18.568Z","op":"update","visit":"iterations/i3/gate-release@0","node":"d50","brief":"the release gate is judged and blessed"}
