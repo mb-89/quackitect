@@ -56,35 +56,35 @@ describe("marshalling", { concurrency: true }, () => {
 });
 
 describe("the inline crossing", { concurrency: true }, () => {
-  test("a record's own path crosses and comes back naming the store", () => {
+  test("a record's own path crosses and comes back naming the store", async () => {
     const { channel, sat } = wired();
-    const out = channel.send(OWNED, {});
+    const out = await channel.send(OWNED, {});
 
     assert.equal(out.from, "satellite");
     assert.equal(out.store, sat.tree, "the answer says WHICH tree produced it");
   });
 
-  test("the record's own copy wins, and trunk answers for what it did not change", () => {
+  test("the record's own copy wins, and trunk answers for what it did not change", async () => {
     const { channel } = wired();
 
-    const own = channel.send("project/spec/iterations/i27-x/delta.md", {});
+    const own = await channel.send("project/spec/iterations/i27-x/delta.md", {});
     assert.equal(own.from, "satellite", "a record path routes to its satellite");
 
     // A method path is the core's, so it never crosses at all.
-    const shared = channel.send("project/deliverable/engine/paths.ts", {});
+    const shared = await channel.send("project/deliverable/engine/paths.ts", {});
     assert.equal(shared.from, "core");
   });
 
-  test("the answer is a COPY, so nothing inline hands out a live reference", () => {
+  test("the answer is a COPY, so nothing inline hands out a live reference", async () => {
     const { channel } = wired();
-    const a = channel.send(OWNED, {});
-    const b = channel.send(OWNED, {});
+    const a = await channel.send(OWNED, {});
+    const b = await channel.send(OWNED, {});
 
     assert.deepEqual(a.body, b.body, "the same call answers the same");
     assert.notEqual(a.body, b.body, "and never with the same object twice");
   });
 
-  test("a call for a record nothing serves is refused, not answered emptily", () => {
+  test("a call for a record nothing serves is refused, not answered emptily", async () => {
     const sat = servingSatellite();
     const core = new Core("/machine", 2);
     // The core knows of a record the crossing has no satellite for — the exact
@@ -92,10 +92,10 @@ describe("the inline crossing", { concurrency: true }, () => {
     core.attach({ record: "i99-ghost", root: "/nowhere" });
     const channel = new Channel(core, inlineCrossing(new Map([[sat.record, sat]])));
 
-    assert.throws(() => channel.send("project/spec/iterations/i99-ghost/evidence/a.md", {}), /no satellite is attached/);
+    await assert.rejects(() => channel.send("project/spec/iterations/i99-ghost/evidence/a.md", {}), /no satellite is attached/);
   });
 
-  test("a stopped satellite refuses rather than serving a half-levelled tree", () => {
+  test("a stopped satellite refuses rather than serving a half-levelled tree", async () => {
     const tree = mkdtempSync(join(tmpdir(), "se-xport-"));
     const abs = join(tree, RECORD, "delta", "project/deliverable/engine/session.ts");
     mkdirSync(dirname(abs), { recursive: true });
@@ -115,6 +115,6 @@ describe("the inline crossing", { concurrency: true }, () => {
     core.attach({ record: sat.record, root: sat.tree });
     const channel = new Channel(core, inlineCrossing(new Map([[sat.record, sat]])));
 
-    assert.throws(() => channel.send(OWNED, {}), /not serving/);
+    await assert.rejects(() => channel.send(OWNED, {}), /not serving/);
   });
 });

@@ -828,3 +828,12 @@
 {"ts":"2026-08-14T18:54:59.892Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d99","brief":"the flag rides SE_ARGS, so RUNME needs no change"}
 {"ts":"2026-08-14T18:55:11.719Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d89","brief":"the mode rides the packet and the launch argument reaches it"}
 {"ts":"2026-08-14T18:55:50.770Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d100","brief":"formatting fixed; committing the mode flag"}
+{"ts":"2026-08-14T18:57:42.287Z","op":"plan","visit":"iterations/i27/gate-implementation@0","parent":null,"nodes":[{"id":"d101","brief":"make the crossing asynchronous, as a real boundary demands"},{"id":"d102","brief":"write the thread crossing"},{"id":"d103","brief":"write the process crossing"}]}
+{"ts":"2026-08-14T18:57:51.871Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d104","brief":"inline follows the async contract it need not"}
+{"ts":"2026-08-14T18:58:12.038Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d105","brief":"channel tests follow the async contract"}
+{"ts":"2026-08-14T18:58:26.371Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d101","brief":"the crossing is async, as a boundary demands"}
+{"ts":"2026-08-14T18:59:07.251Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d106","brief":"one satellite entry answering both a worker and a child"}
+{"ts":"2026-08-14T18:59:32.481Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d107","brief":"both real boundaries, sharing their pending-call bookkeeping"}
+{"ts":"2026-08-14T19:00:11.748Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d108","brief":"testing both boundaries for real, including id correlation"}
+{"ts":"2026-08-14T19:01:04.102Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d109","brief":"the override case gets a real repo; the stop case attaches first"}
+{"ts":"2026-08-14T19:01:19.389Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d102","brief":"the thread boundary starts, serves and correlates"}
