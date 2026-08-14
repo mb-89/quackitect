@@ -716,3 +716,8 @@
 {"ts":"2026-08-14T17:20:08.292Z","op":"update","visit":"iterations/i27/build-steps/channel@0","node":"d22","brief":"stamping the channel form, which the last fill saved unsigned"}
 {"ts":"2026-08-14T17:20:24.885Z","op":"update","visit":"iterations/i27/build-steps/channel@0","node":"d23","brief":"channel signed; going to clear-jump's form"}
 {"ts":"2026-08-14T17:20:57.702Z","op":"update","visit":"iterations/i27/build-steps/start@1","node":"d24","brief":"checkpointing the record before the reload"}
+{"ts":"2026-08-14T17:21:07.232Z","op":"update","visit":"iterations/i27/build-steps/start@1","node":"d25","brief":"stepping out to reload the machine"}
+{"ts":"2026-08-14T17:23:50.040Z","op":"plan","visit":"iterations/i27/gate-requirements@0","parent":null,"nodes":[{"id":"d2","brief":"recheck gate-requirements after the refines fix"},{"id":"d3","brief":"sign clear-jump"}]}
+{"ts":"2026-08-14T17:25:05.095Z","op":"done","visit":"iterations/i27/gate-requirements@0","node":"d3","brief":"clear-jump submitted with its production proof"}
+{"ts":"2026-08-14T17:25:25.787Z","op":"done","visit":"iterations/i27/gate-requirements@0","node":"d2","brief":"gate-requirements walked through green; no recheck was owed"}
+{"ts":"2026-08-14T17:25:28.574Z","op":"update","visit":"iterations/i27/build-steps/clear-jump@0","node":"d4","brief":"clear-jump signed; committing the record"}
