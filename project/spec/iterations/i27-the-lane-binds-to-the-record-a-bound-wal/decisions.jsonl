@@ -707,3 +707,12 @@
 {"ts":"2026-08-14T17:15:13.224Z","op":"update","visit":"iterations/i27/build-steps/satellite-process@0","node":"d15","brief":"surfacing what the sweep actually answered"}
 {"ts":"2026-08-14T17:16:02.012Z","op":"update","visit":"iterations/i27/build-steps/satellite-process@0","node":"d16","brief":"the test now proves the agent's reading before it sweeps"}
 {"ts":"2026-08-14T17:16:37.009Z","op":"done","visit":"iterations/i27/build-steps/satellite-process@0","node":"d11","brief":"the one-call jump lands and the bounded sweep is green"}
+{"ts":"2026-08-14T17:17:25.823Z","op":"update","visit":"iterations/i27/build-steps/satellite-process@0","node":"d17","brief":"satellite.ts written with the real merge-based git adapter"}
+{"ts":"2026-08-14T17:17:50.537Z","op":"update","visit":"iterations/i27/build-steps/satellite-process@0","node":"d18","brief":"satellite tests written"}
+{"ts":"2026-08-14T17:18:22.895Z","op":"done","visit":"iterations/i27/build-steps/satellite-process@0","node":"d8","brief":"satellite built and green; submitting the form"}
+{"ts":"2026-08-14T17:19:09.139Z","op":"plan","visit":"iterations/i27/build-steps/channel@0","parent":null,"nodes":[{"id":"d19","brief":"build the channel with the naming clause"},{"id":"d20","brief":"sign the channel and clear-jump forms"}]}
+{"ts":"2026-08-14T17:19:30.598Z","op":"update","visit":"iterations/i27/build-steps/channel@0","node":"d21","brief":"channel tests written"}
+{"ts":"2026-08-14T17:20:02.822Z","op":"done","visit":"iterations/i27/build-steps/channel@0","node":"d19","brief":"channel built and green"}
+{"ts":"2026-08-14T17:20:08.292Z","op":"update","visit":"iterations/i27/build-steps/channel@0","node":"d22","brief":"stamping the channel form, which the last fill saved unsigned"}
+{"ts":"2026-08-14T17:20:24.885Z","op":"update","visit":"iterations/i27/build-steps/channel@0","node":"d23","brief":"channel signed; going to clear-jump's form"}
+{"ts":"2026-08-14T17:20:57.702Z","op":"update","visit":"iterations/i27/build-steps/start@1","node":"d24","brief":"checkpointing the record before the reload"}
