@@ -15,6 +15,7 @@ realizes:
 files:
   - "project/deliverable/engine/core.ts"
   - "project/deliverable/engine/satellite.ts"
+  - "project/deliverable/engine/channel.ts"
   - "project/deliverable/engine/bin/se-mcp.ts"
 ---
 

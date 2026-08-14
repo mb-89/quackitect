@@ -764,3 +764,20 @@
 {"ts":"2026-08-14T17:53:04.182Z","op":"update","visit":"iterations/i27/build-steps/form-checks@0","node":"d45","brief":"going to the last unsigned feeder"}
 {"ts":"2026-08-14T17:54:26.049Z","op":"update","visit":"iterations/i27/build-steps/refusal-remedies@0","node":"d46","brief":"submitting the last feeder"}
 {"ts":"2026-08-14T17:54:54.747Z","op":"done","visit":"iterations/i27/build-steps/form-checks@0","node":"d43","brief":"the build-steps join closed on the last feeder"}
+{"ts":"2026-08-14T17:58:07.454Z","op":"plan","visit":"iterations/i27/trace-design@0","parent":null,"nodes":[{"id":"d47","brief":"make the hook name the sanctioned stops"},{"id":"d48","brief":"walk to gate-implementation"}]}
+{"ts":"2026-08-14T17:58:21.827Z","op":"update","visit":"iterations/i27/trace-design@0","node":"d49","brief":"the hook now names the three sanctioned stops"}
+{"ts":"2026-08-14T17:58:42.836Z","op":"done","visit":"iterations/i27/trace-design@0","node":"d47","brief":"the hook names the three sanctioned stops, 14 of 14 green"}
+{"ts":"2026-08-14T17:58:51.417Z","op":"update","visit":"iterations/i27/trace-design@0","node":"d50","brief":"reading credited; walking on"}
+{"ts":"2026-08-14T18:00:00.161Z","op":"update","visit":"iterations/i27/trace-design@0","node":"d51","brief":"claiming channel.ts and bound.ts in the design trace"}
+{"ts":"2026-08-14T18:00:08.560Z","op":"update","visit":"iterations/i27/trace-design@0","node":"d52","brief":"stamping trace-design"}
+{"ts":"2026-08-14T18:01:02.250Z","op":"update","visit":"iterations/i27/trace-design@0","node":"d53","brief":"dropping a planned file that was never built"}
+{"ts":"2026-08-14T18:01:45.611Z","op":"update","visit":"iterations/i27/trace-design@0","node":"d54","brief":"resubmitting the trace with the unbuilt file dropped"}
+{"ts":"2026-08-14T18:02:14.947Z","op":"done","visit":"iterations/i27/trace-design@0","node":"d48","brief":"trace-design signed; the walk is at verification"}
+{"ts":"2026-08-14T18:02:26.859Z","op":"plan","visit":"iterations/i27/verification@0","parent":null,"nodes":[{"id":"d55","brief":"run the battery"},{"id":"d56","brief":"judge each of the ten specs"},{"id":"d57","brief":"fill verification"}]}
+{"ts":"2026-08-14T18:02:33.563Z","op":"update","visit":"iterations/i27/verification@0","node":"d58","brief":"reading the ten specs to judge each"}
+{"ts":"2026-08-14T18:03:39.609Z","op":"update","visit":"iterations/i27/verification@0","node":"d59","brief":"the removed mindmap file is gone from both evidence copies"}
+{"ts":"2026-08-14T18:04:57.766Z","op":"update","visit":"iterations/i27/verification@0","node":"d60","brief":"the autonomy red now has a register entry to be owed against"}
+{"ts":"2026-08-14T18:06:14.109Z","op":"done","visit":"iterations/i27/verification@0","node":"d56","brief":"each of the ten specs judged, one observed and nine owed"}
+{"ts":"2026-08-14T18:06:29.834Z","op":"update","visit":"iterations/i27/verification@0","node":"d61","brief":"quoting the statement so the frontmatter parses"}
+{"ts":"2026-08-14T18:06:52.879Z","op":"done","visit":"iterations/i27/verification@0","node":"d57","brief":"verification submitted with one observed and nine owed"}
+{"ts":"2026-08-14T18:07:09.874Z","op":"plan","visit":"iterations/i27/verification@0","parent":null,"nodes":[{"id":"d62","brief":"commit verification"},{"id":"d63","brief":"walk to gate-implementation"}]}
