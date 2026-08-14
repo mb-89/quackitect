@@ -77,8 +77,27 @@ function lastPull(): { pull?: string; where?: unknown; target?: unknown } | unde
     try {
       const rec = JSON.parse(line) as { tool?: string; ok?: boolean; response?: unknown };
       if (rec.tool !== "se_pull" || rec.ok !== true) continue;
-      const r = typeof rec.response === "string" ? (JSON.parse(rec.response) as unknown) : rec.response;
-      return (r ?? {}) as { pull?: string; where?: unknown; target?: unknown };
+      if (typeof rec.response !== "string") return (rec.response ?? {}) as { pull?: string; where?: unknown; target?: unknown };
+      try {
+        return JSON.parse(rec.response) as { pull?: string; where?: unknown; target?: unknown };
+      } catch {
+        // A LONG RESPONSE IS STORED TRUNCATED, so parsing the whole of it
+        // throws and the tooth silently loses its bite. Found live on
+        // 2026-08-14: the hook passed a mid-work stop twice, because every
+        // recent pull's response was too long to store whole.
+        //
+        // Only three fields decide the verdict and all three sit near the
+        // FRONT of the answer, so they survive the cut. Read them directly.
+        const pull = /"pull"\s*:\s*"([a-z]+)"/.exec(rec.response)?.[1];
+        if (pull === undefined) continue;
+        const target = /"target"\s*:\s*"([^"]*)"/.exec(rec.response)?.[1];
+        const where = /"where"\s*:\s*\[([^\]]*)\]/.exec(rec.response)?.[1];
+        return {
+          pull,
+          target,
+          where: where === undefined ? undefined : where.split(",").map((s) => s.trim().replace(/^"|"$/g, "")),
+        };
+      }
     } catch {
       // the first line of the tail may be a torn record; a broken line is skipped
     }

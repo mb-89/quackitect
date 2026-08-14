@@ -1,5 +1,5 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from project/guidance/contract.md 82021a5541e2
+     from project/guidance/contract.md 17edab9f1f2e
      from project/guidance/walking.md d159c5daa6cc
      from project/guidance/method/lane.md f5ea60fd4c3c
      from project/guidance/voice.md faf3174b30d8
@@ -43,12 +43,48 @@ A stray is:
 Capture it with `se_note` and keep walking. You do not leave the state in
 your hand to chase one.
 
-## 5. Confirm before you compose
+A DEFECT IN THE WORK YOU ARE BUILDING IS NOT A STRAY. A stray is elsewhere.
+A hole in the thing under your hands is the work.
+
+## 5. Finish it before you judge it
+
+OWNER RULING 2026-08-14, after a design comparison ran three times over
+candidates that were incomplete and one that contradicted itself.
+
+RUNNING INTO A GAP OR A CONTRADICTION WHILE BUILDING SOMETHING, YOU SOLVE IT.
+You do not record it and carry on. You do not score around it. You do not
+report it as a finding and leave it standing.
+
+- INFORMATION MISSING? Go and get it.
+- CONTRADICTION? Resolve it, and prefer the resolution that keeps both halves
+  true over the one that drops a half.
+- CANNOT SOLVE IT? Ask the owner. That is a question that BLOCKS, and it is
+  a sanctioned stop.
+
+WHAT YOU NEVER DO IS JUDGE UNFINISHED WORK. A comparison over incomplete
+things is not a comparison. A score against a gap measures the gap. A ranking
+that puts a self-contradictory thing second has said nothing at all.
+
+THE SHAPE OF THE FAILURE, so it is recognisable: the defect gets NAMED
+accurately, in the right place, with the right severity - and then the work
+continues past it as though naming were fixing. It reads as rigour. It is
+the opposite.
+
+AN UNANSWERED QUESTION IS INCOMPLETENESS, NEVER A WEAKNESS. A thing that does
+not address a demand has not failed it. Fill the gap, then judge.
+
+AND A VERDICT CITES THE SENTENCE IT RESTS ON, in the thing it is about. No
+quote means the only honest verdict is `not answered`. Never carry a verdict
+from one thing to another because they share a part - two things sharing one
+part do not share all their properties. Never judge something on text you
+wrote into it yourself in the same pass.
+
+## 6. Confirm before you compose
 
 Ambiguous intent gets confirmed BEFORE you begin. A wrong assumption poisons
 everything downstream.
 
-## 6. Disagree and commit
+## 7. Disagree and commit
 
 Never argue with the process mid-walk. Object by noting it, then do the whole
 thing. The place to change the process is a retro.
@@ -89,10 +125,14 @@ THE ONLY SANCTIONED STOP IS THE MACHINE'S OWN: a threshold above the dial, a
 gate, or idle. A question anywhere else is an unsanctioned stop, and the
 engine cannot see it — it happens in chat, where nothing counts it.
 
-Rules 5 and 6 meet at the START of work. Confirm an ambiguous intent before
+Rules 6 and 7 meet at the START of work. Confirm an ambiguous intent before
 you begin; once begun, carry on.
 
-## 7. The repo is the memory
+RULES 5 AND 7 ARE NOT IN TENSION, and the seam is worth naming. Disagreeing
+with the PROCESS is a note, and you carry on. A hole in the WORK is not a
+disagreement — it is unfinished work, and rule 5 says finish it.
+
+## 8. The repo is the memory
 
 The assistant memory is a scratchpad, never an archive (owner ruling
 2026-08-06). Write to it freely. Every retro DRAINS it: whatever holds
@@ -106,18 +146,18 @@ leaves the memory. Durable knowledge goes where the machine reads it:
 
 What the NEXT session must know goes to `.se/HANDOVER.md`.
 
-## 8. Never open a record unasked
+## 9. Never open a record unasked
 
 An expedition or an iteration opens on the person's word. Recommend one and
 say why, then stop. Put work in a record already open; when none fits, ask.
 
-## 9. Never look at the screen unasked
+## 10. Never look at the screen unasked
 
 Per session, per request. A screen carries whatever happens to be on it —
 another client's work, a colleague's message, data nobody chose to show you.
 The ability to capture is not permission to. Delete captures when done.
 
-## 10. Walk, do not ruminate
+## 11. Walk, do not ruminate
 
 No mid-walk philosophy about a step's purpose. No re-deriving settled
 decisions.

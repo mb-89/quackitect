@@ -10,11 +10,18 @@
 // working directory, the platform refuses no escape, and one path string
 // reached two different trees on 2026-08-14.
 import { strict as assert } from "node:assert";
-import { mkdtempSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { test } from "node:test";
 import * as paths from "../engine/paths.ts";
+import { anyGuidanceDoc } from "./helpers.ts";
+
+// ASKED, NEVER NAMED. These tests are about the SEAM, not about any one page,
+// so moving guidance must change the answer rather than falsify the test.
+const GUIDE = anyGuidanceDoc();
+
+import { resolve as seam } from "../engine/resolve.ts";
 
 const ROOT = mkdtempSync(join(tmpdir(), "se-resolve-"));
 
@@ -45,7 +52,7 @@ test("a declared root is read-only, so the write lane refuses it", () => {
 
 test("the kind of a path decides its store, never where the walk stands", () => {
   assert.equal(paths.pathKind(".se/notes.jsonl"), "session");
-  assert.equal(paths.pathKind("project/guidance/contract.md"), "method");
+  assert.equal(paths.pathKind(GUIDE), "method");
   assert.equal(paths.pathKind("project/deliverable/engine/session.ts"), "method");
   assert.equal(paths.pathKind("project/spec/iterations/i27-x/evidence/a.md"), "record");
   assert.equal(paths.pathKind("project/spec/trace/requirement/req-x.md"), "content");
@@ -67,23 +74,132 @@ test("the engine's own tests count as method, so a tree cannot keep old ones", (
   assert.equal(paths.fansOut("project/deliverable/tests/resolution.test.ts"), true);
 });
 
-// ------------------------------------------- what the seam still owes (RED)
+// ------------------------------ the machine root is derivable from a worktree
 
-test("every resolution names the store it resolved to", () => {
-  const resolved: unknown = paths.resolveInRoot(ROOT, "project/spec/thing.md", "test");
-  const names = typeof resolved === "object" && resolved !== null && "store" in (resolved as object);
-  assert.equal(
-    names,
-    true,
-    "RED by design. The seam answers a bare path string. req-a-write-lands-where-it-is-meant wants the store ON the answer, because a wrong resolution is invisible without it.",
-  );
+test("the machine root is derived from a worktree path", () => {
+  const machine = join(ROOT, "repo");
+  const worktree = join(machine, ".worktrees", "i27-x");
+  assert.equal(paths.machineRootOf(worktree), machine);
 });
 
-test("a call naming trunk is routed to its owner rather than refused as an escape", () => {
-  const routes = typeof (paths as Record<string, unknown>).routeToOwner === "function";
-  assert.equal(
-    routes,
-    true,
-    "RED by design. Routing is not resolution. A path resolving outside its record is a misresolution; a call naming trunk names a different OWNER. req-version-control-resolves-like-every-call wants the second routed.",
-  );
+test("a root that is not a worktree is its own machine root", () => {
+  assert.equal(paths.machineRootOf(ROOT), ROOT);
+});
+
+test("a caller knowing only its worktree still sends session state to the machine", () => {
+  const machine = join(ROOT, "repo");
+  const worktree = join(machine, ".worktrees", "i27-x");
+  // This is se_lint's exact situation on 2026-08-14: one ambient root, and
+  // it was the worktree.
+  const r = seam(worktree, ".se/HANDOVER.md", "lint");
+  assert.equal(r.store, machine, "the handover is the machine's, whatever tree the caller stands in");
+  assert.equal(r.abs.includes(".worktrees"), false);
+});
+
+test("a caller knowing only its worktree still keeps content in that worktree", () => {
+  const machine = join(ROOT, "repo");
+  const worktree = join(machine, ".worktrees", "i27-x");
+  const r = seam(worktree, "project/spec/trace/requirement/req-x.md", "lint");
+  assert.equal(r.store, worktree, "a record's content stays its own");
+});
+
+// ------------------------------------ the store comes from the path's KIND
+
+test("session state resolves to the machine root even while a record is bound", () => {
+  const WORKTREE = join(ROOT, ".worktrees", "i27-x");
+  const r = seam({ machine: ROOT, bound: WORKTREE }, ".se/HANDOVER.md", "test");
+  assert.equal(r.store, ROOT, "the handover belongs to the machine, never to a branch");
+  assert.equal(r.abs.includes(".worktrees"), false);
+});
+
+test("shared method resolves to the machine root even while a record is bound", () => {
+  const WORKTREE = join(ROOT, ".worktrees", "i27-x");
+  const r = seam({ machine: ROOT, bound: WORKTREE }, GUIDE, "test");
+  assert.equal(r.store, ROOT);
+});
+
+test("content rides the bound tree, which is what makes a record's work its own", () => {
+  const WORKTREE = join(ROOT, ".worktrees", "i27-x");
+  const r = seam({ machine: ROOT, bound: WORKTREE }, "project/spec/trace/requirement/req-x.md", "test");
+  assert.equal(r.store, WORKTREE);
+});
+
+test("two lanes asking for one path get one answer, which is the 2026-08-14 defect", () => {
+  const WORKTREE = join(ROOT, ".worktrees", "i27-x");
+  const asLint = seam({ machine: ROOT, bound: WORKTREE }, ".se/HANDOVER.md", "lint");
+  const asFileLane = seam({ machine: ROOT }, ".se/HANDOVER.md", "files");
+  assert.equal(asLint.abs, asFileLane.abs, "one path string must reach one tree");
+  assert.equal(asLint.store, asFileLane.store);
+});
+
+// ------------------------------------------------ the seam says where it went
+
+test("every resolution names the store it resolved to", () => {
+  const r = seam(ROOT, "project/spec/thing.md", "test");
+  assert.equal(r.store, ROOT, "the answer must name the root that served it");
+  assert.equal(r.abs.startsWith(ROOT), true);
+});
+
+test("every resolution names the owner, so routing is visible at the call", () => {
+  assert.deepEqual(seam(ROOT, GUIDE, "test").owner, { kind: "core" });
+  assert.deepEqual(seam(ROOT, "project/spec/iterations/i27-x/evidence/a.md", "test").owner, {
+    kind: "record",
+    container: "iterations",
+    id: "i27-x",
+  });
+  assert.deepEqual(seam(ROOT, "project/spec/trace/requirement/req-x.md", "test").owner, { kind: "bound" });
+});
+
+test("a call naming a different owner is routed rather than refused as an escape", () => {
+  // Method belongs to the core. Today SE-C-134 refuses this write from inside
+  // a record; routing says who owns it instead of saying no.
+  assert.deepEqual(paths.routeToOwner("project/deliverable/engine/paths.ts"), { kind: "core" });
+  assert.deepEqual(paths.routeToOwner(".se/HANDOVER.md"), { kind: "core" });
+});
+
+test("routing never refuses, because a misresolution and a different owner are not the same thing", () => {
+  // The seam REFUSES an escaping path...
+  assert.throws(() => seam(ROOT, "../../elsewhere.md", "test"), /inside the project root/);
+  // ...and routing ANSWERS for a path owned elsewhere. Confusing the two is
+  // what closes the door method changes and commits both use.
+  assert.deepEqual(paths.routeToOwner(GUIDE), { kind: "core" });
+});
+
+// ------------------------------- a write is proved by reading back, per kind
+//
+// tsp-read-back-inspection checks the SHAPE of these: every case writes, then
+// reads back from the store the answer named. None concludes from the write
+// not throwing.
+
+/** Write through the seam, then read back from the store it named. */
+function writeThenReadBack(rel: string, body: string): { readBack: string; store: string } {
+  const r = seam(ROOT, rel, "test");
+  mkdirSync(dirname(r.abs), { recursive: true });
+  writeFileSync(r.abs, body, "utf8");
+  return { readBack: readFileSync(join(r.store, rel), "utf8"), store: r.store };
+}
+
+test("a method write reads back from the store the answer named", () => {
+  const { readBack, store } = writeThenReadBack("project/guidance/probe.md", "method body");
+  assert.equal(readBack, "method body");
+  assert.equal(store, ROOT);
+});
+
+test("a record write reads back from that record's store", () => {
+  const rel = "project/spec/iterations/i27-x/evidence/probe.md";
+  const { readBack, store } = writeThenReadBack(rel, "record body");
+  assert.equal(readBack, "record body");
+  assert.equal(store, ROOT);
+});
+
+test("a session write reads back from the project root and never from a worktree", () => {
+  const { readBack, store } = writeThenReadBack(".se/probe.md", "session body");
+  assert.equal(readBack, "session body");
+  assert.equal(store, ROOT);
+});
+
+test("a repo-root file reads back from the root", () => {
+  const { readBack, store } = writeThenReadBack("README-probe.md", "root body");
+  assert.equal(readBack, "root body");
+  assert.equal(store, ROOT);
 });

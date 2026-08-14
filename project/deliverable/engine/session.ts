@@ -889,8 +889,18 @@ export class Session {
     return files;
   }
 
-  /** Where the LANE works: the bound expedition's worktree, else the root. */
+  /** Where the LANE works: the bound expedition's worktree, else the root.
+   *
+   *  THE SELF-HOSTING EXCEPTION ACTS HERE, and only here. Quackitect works on
+   *  itself, so its records get NO worktree and walk on trunk. A method change
+   *  made inside a record lands where the walk is standing, and it applies to
+   *  the walk that made it.
+   *
+   *  Every other product keeps its worktree. A TEST ROOT IS NEVER
+   *  SELF-HOSTING, so everything that depends on a second tree still gets one
+   *  where it is tested. */
   workRoot(): string {
+    if (isSelfHosting(this.root)) return this.root;
     return this.bound?.path ?? this.root;
   }
 
@@ -932,6 +942,16 @@ export class Session {
     // never make the owner's roots read as undeclared (found live 2026-07-30).
     const kind = pathKind(rel);
     if (kind === "session") return this.root;
+    // SHARED METHOD BELONGS TO THE MACHINE, never to a branch. resolve.ts says
+    // the same thing in storeFor: the core owns session state and shared
+    // method, so both resolve to the machine root whatever tree is bound.
+    //
+    // Before this, a method write from inside a record landed in the record's
+    // own worktree and fanned out over trunk at the merge. That is the
+    // 2026-08-07 accident, and refusing the write was the old answer to it.
+    // Resolving the write is the better one: nothing is refused, and the file
+    // cannot land in a tree that does not own it.
+    if (kind === "method") return this.root;
     // A RECORD'S OWN CONTENT IS READ FROM THE RECORD'S TREE, bound or not.
     // The mirror painted i1's states out of trunk while i1's worktree held
     // the fall that knocked them down, and both halves were working — they
@@ -4461,7 +4481,7 @@ export class Session {
    *  guarantees is that an amend cannot smuggle a reopen past the checks: the
    *  form is re-checked after the edit, and an amend that breaks a check is
    *  refused with the file untouched. */
-  reopenClaim(name: string, reason: string, by: string, machineId?: string): Record<string, unknown> {
+  reopenClaim(name: string, reason: string, by: string, machineId?: string, confirm?: boolean): Record<string, unknown> {
     this.forgetRoute();
     const m = this.formMachine(machineId);
     this.stateFormState(name, m); // refuses an undeclared or form-less state
@@ -4485,6 +4505,32 @@ export class Session {
         source: "engine/session.ts reopen",
       });
     }
+    // SAY WHAT IT WILL DROP, BEFORE DROPPING IT (i27, 2026-08-14).
+    //
+    // A reopen keeps the SIGNATURE and se_reopen says so. It does not keep
+    // the BLESS, and nothing said so. On 2026-08-14 a reopen taken on the
+    // engine's own bad advice erased a person's adjudication, and the walk
+    // stopped until they were asked again.
+    //
+    // A signature records who wrote it. A bless records who ADJUDICATED it,
+    // and at a low dial only a person can. Losing one silently is not the
+    // same kind of loss, so this one is confirmed rather than assumed.
+    const blessedBy = parseStateNote(raw).frontmatter.bless;
+    const byAPerson = typeof blessedBy === "string" && blessedBy.includes("human");
+    if (byAPerson && confirm !== true) {
+      const falls = this.wouldFall(name, m);
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: "a confirmed reopen — this one destroys a person's adjudication",
+        got: `${name} carries "${blessedBy}", and a reopen drops it. ${falls.length} state(s) fall with it: ${falls.join(", ") || "none"}`,
+        remedy: {
+          tool: "se_reopen",
+          args: { state: name, reason, confirm: true },
+          note: "if the claim's own content still passes, se_amend fixes the field and LEAVES THE TREE STANDING — the bless with it. Reopen only when the work is genuinely wrong.",
+        },
+        source: "engine/session.ts reopen",
+      });
+    }
     writeFileSync(h.instanceAbs, withReopened(raw, new Date().toISOString(), reason), "utf8");
     this.notifyChange();
     // The walk's tokens follow the file. reopenStates handles the join re-arming
@@ -4495,6 +4541,18 @@ export class Session {
       reopenStates(run.decl, run.instance, [name], reason, new Date().toISOString());
     }
     return { reopened: name, why: reason.trim(), by, still_green: this.recordDone(m) };
+  }
+
+  /** WHAT A REOPEN OF THIS STATE WOULD TAKE WITH IT.
+   *
+   *  Green ripples through the feeders, so everything downstream of a
+   *  reopened claim falls. Counting it BEFORE the write is what turns a
+   *  surprise into a decision. */
+  private wouldFall(name: string, m: MachineDecl): string[] {
+    const standing = new Set(this.recordDone(m));
+    if (!standing.has(name)) return [];
+    const claimful = new Set(m.states.filter((s) => s.evidence_form.length > 0 || s.submachine !== undefined).map((s) => s.id));
+    return [...standing].filter((s) => s !== name && claimful.has(s) && claimFeeders(m, s, claimful).includes(name));
   }
 
   amendClaim(name: string, fills: Record<string, string>, reason: string, by: string, machineId?: string): Record<string, unknown> {
@@ -5191,6 +5249,58 @@ export class Session {
    *  completion-time sentence, and for a state simply not walked yet it says
    *  nothing `form_incomplete` has not already said. The guard keeps it as
    *  its own fallback. */
+  /** WHAT IS WRONG WITH THIS ONE CLAIM'S OWN CONTENT, ignoring its feeders.
+   *
+   *  Extracted so the fallen-input remedy can ask it about the state that
+   *  FELL, which is how the refusal knows whether to name se_amend or
+   *  se_reopen. Asking about feeders here would recurse; the ripple already
+   *  walks them. */
+  private ownClaimProblems(stateId: string, m: MachineDecl): string[] {
+    const decl = m.states.find((s) => s.id === stateId);
+    if (decl === undefined) return [];
+    try {
+      // this.traceRoot(it) IN FULL, not a renamed local. A guard test greps
+      // for exactly this spelling, because a claim check resolving against
+      // the wrong record is the drift it catches.
+      const it = this.declIteration(m);
+      if (it === undefined) return [];
+      const body = noteOf(this.evidenceAbs(it, stateId))?.body;
+      if (body === undefined) return [];
+      return claimProblems(this.traceRoot(it), decl, body, loadTrace(this.traceRoot(it)));
+    } catch {
+      return []; // an unreadable claim falls back to the plain sentence
+    }
+  }
+
+  /** WHICH VERB FIXES A FALLEN INPUT, decided rather than guessed.
+   *
+   *  A claim loses its green two ways, and they want different verbs.
+   *
+   *  - ITS CONTENT STILL PASSES. The ripple dropped it because something
+   *    upstream moved. A small correction goes in with se_amend, which LEAVES
+   *    THE TREE STANDING.
+   *  - ITS CONTENT NO LONGER PASSES. The work is genuinely wrong, and
+   *    se_reopen sends it back to be re-earned.
+   *
+   *  se_reopen on the first case is what cost a bless on 2026-08-14. The
+   *  resubmit dropped the person's adjudication and everything downstream
+   *  fell with it. */
+  private fallenRemedy(fallen: string, m: MachineDecl): { tool: string; args: Record<string, unknown>; note: string } {
+    const problems = this.ownClaimProblems(fallen, m);
+    if (problems.length === 0) {
+      return {
+        tool: "se_amend",
+        args: { state: fallen, fills: {}, reason: "<what the upstream change touched>" },
+        note: `${fallen}'s own content still passes, so it lost its green to the ripple rather than to a defect. Amend the field the change touched and the tree stays standing. se_reopen would drop this claim, everything downstream, and any bless on it.`,
+      };
+    }
+    return {
+      tool: "se_reopen",
+      args: { state: fallen, reason: "<why it stopped standing>" },
+      note: `${fallen}'s own content no longer passes: ${problems.join(" ")}. That is a defect rather than a ripple, so it is re-earned rather than amended.`,
+    };
+  }
+
   claimBlockers(stateId: string, machine?: MachineDecl): Blocker[] {
     const m = machine ?? this.currentMachine();
     const decl = m.states.find((s) => s.id === stateId);
@@ -5210,11 +5320,15 @@ export class Session {
           clause: CLAUSES.CONDITION_UNMET,
           expected,
           got: `${stateId}'s OWN claim may be fine. It is dropped because these inputs are not standing: ${fallen.join(", ")}`,
-          remedy: {
-            tool: "se_pull",
-            args: {},
-            note: `re-earn ${fallen.join(", ")} first — green ripples forward, and this one follows without being touched`,
-          },
+          // NAME THE VERB, never just the word "re-earn" (i27, 2026-08-14).
+          // This remedy used to say se_pull with no arguments, which only
+          // repeats the refusal. The agent picked the verb whose NAME matched
+          // the sentence, chose se_reopen where se_amend was right, and the
+          // guess cost a person's bless and a six-milestone cascade.
+          //
+          // The engine already knows which verb fits, because it can ask the
+          // fallen claim whether its OWN content still passes.
+          remedy: this.fallenRemedy(fallen[0], m),
           source: "engine/session.ts claim-guard",
         },
       ];
@@ -5222,20 +5336,7 @@ export class Session {
     // AND WHEN NOTHING UPSTREAM FELL, SAY WHAT IS WRONG WITH THIS ONE (owner
     // instruction 2026-08-13). The content check knows which field failed and
     // what it wanted; a check reports in the words of the question IT asked.
-    const own = ((): string[] => {
-      try {
-        // this.traceRoot(it) IN FULL, not a renamed local. A guard test greps
-        // for exactly this spelling, because a claim check resolving against
-        // the wrong record is the drift it catches.
-        const it = this.declIteration(m);
-        if (it === undefined) return [];
-        const body = noteOf(this.evidenceAbs(it, stateId))?.body;
-        if (body === undefined) return [];
-        return claimProblems(this.traceRoot(it), decl, body, loadTrace(this.traceRoot(it)));
-      } catch {
-        return []; // an unreadable claim falls back to the plain sentence
-      }
-    })();
+    const own = this.ownClaimProblems(stateId, m);
     if (own.length > 0) {
       return [
         {
@@ -6625,4 +6726,27 @@ export class Session {
       history: this.instance.history.slice(-10),
     };
   }
+}
+
+/** Does this product declare itself SELF-HOSTING?
+ *
+ *  The declaration lives in `project/product.md`, a file the PRODUCT owns and
+ *  commits, so it travels with the repository. Session state is host-local and
+ *  would not.
+ *
+ *  Cached per root. The declaration is a property of the repository, so it
+ *  does not change under a running session. */
+const SELF_HOSTING = new Map<string, boolean>();
+export function isSelfHosting(root: string): boolean {
+  const known = SELF_HOSTING.get(root);
+  if (known !== undefined) return known;
+  let declared = false;
+  try {
+    declared = /^self_hosting:[ \t]*true[ \t]*$/m.test(readFileSync(join(root, "project", "product.md"), "utf8"));
+  } catch {
+    // No declaration is a declaration of false. Every product but this one.
+    declared = false;
+  }
+  SELF_HOSTING.set(root, declared);
+  return declared;
 }

@@ -12,7 +12,7 @@ measure: With every state between the walk and the target already standing, ONE 
 refines:
   - uc-take-a-step
   - uc-resume-after-an-absence
-  - uc-quality-performance
+  - uc-quality-performance-efficiency
 source_refs:
   - "owner ruling 2026-08-14: a jump to a state that everything is good for and that needs no checks shall be one tool call - you declare the target, you say you want to go there, and the machine answers everything is ready, you are there now"
   - "owner ruling 2026-08-14: you don't need to reevaluate anything"

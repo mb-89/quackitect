@@ -115,7 +115,13 @@ test("no new file write bypasses the door — the count may fall, never rise", (
   // 38 since 2026-08-12: claims.ts mints the machine-id file, and the pin
   // scaffolds seeded placeholder drawings — generated files the door never
   // holds, the same class as the pin's own write.
-  const CEILING = 38;
+  //
+  // 39 since 2026-08-14: bound.ts spills an oversized answer to
+  // `.se/answers/<tool>.json`. That is SESSION state — machine-local,
+  // gitignored, overwritten by the next big answer and read back only by the
+  // cursor on the answer that wrote it. The door holds corpus, so this is a
+  // file it can never hold.
+  const CEILING = 39;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {
