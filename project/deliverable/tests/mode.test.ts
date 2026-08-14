@@ -10,6 +10,8 @@ import { join } from "node:path";
 import { describe, test } from "node:test";
 import { DEFAULT_MODE, MODE_HELP, modeForRun, modeWasChosen, RUN_MODES, readMode, writeMode } from "../engine/mode.ts";
 import { seDir } from "../engine/paths.ts";
+import { Session } from "../engine/session.ts";
+import { freshRoot } from "./helpers.ts";
 
 const root = (): string => mkdtempSync(join(tmpdir(), "se-mode-"));
 
@@ -81,5 +83,55 @@ describe("the run mode", { concurrency: true }, () => {
 
   test("an unknown launch argument is refused loudly", () => {
     assert.throws(() => modeForRun(root(), "turbo"), /unknown run mode/);
+  });
+});
+
+// THE WALK HAS TWO ANSWERS ABOUT THE MODE, and a surface that carried one
+// could not be right about both. `--mode` decides THIS run and deliberately
+// leaves the stored choice alone, so the two differ whenever a flag was typed.
+//
+// The packet says `mode` for what is running and `stored` for what the next
+// launch takes. Before this split it reported the stored value as though it
+// were the live boundary, which is a lie exactly when the flag was used.
+describe("the mode a walk reports", { concurrency: true }, () => {
+  test("the packet says what is RUNNING, and separately what is stored", () => {
+    const r = freshRoot();
+    writeMode(r, "thread");
+    const s = new Session(r);
+    s.noteRunningMode("inline");
+    const p = s.packet() as { run: { mode: string; stored: string } };
+    assert.equal(p.run.mode, "inline", "the boundary this walk actually crosses");
+    assert.equal(p.run.stored, "thread", "and the choice the next launch takes");
+  });
+
+  test("with no launch flag, what runs IS the stored choice", () => {
+    const r = freshRoot();
+    writeMode(r, "thread");
+    assert.equal(new Session(r).runningMode(), "thread");
+  });
+
+  // THE CONTROL SOME HOSTS ONLY HAVE. The VS Code extension launches from a
+  // fixed .mcp.json with no command line, so --mode never reaches it.
+  test("the mirror's control stores the choice and says a restart applies it", () => {
+    const r = freshRoot();
+    const s = new Session(r);
+    s.noteRunningMode("process");
+    const out = s.setRunMode("thread");
+    assert.equal(out.mode, "thread");
+    assert.equal(out.was, "process");
+    assert.equal(out.applies, "on the next launch", "a boundary cannot move under a walk in flight");
+    assert.equal(readMode(r), "thread", "and the next launch reads it");
+  });
+
+  test("choosing the mode already running promises no restart", () => {
+    const r = freshRoot();
+    const s = new Session(r);
+    s.noteRunningMode("thread");
+    assert.equal(s.setRunMode("thread").applies, "already running");
+  });
+
+  test("an unknown mode is refused, and the refusal names the three that exist", () => {
+    const s = new Session(freshRoot());
+    assert.throws(() => s.setRunMode("fused"), /process, thread, inline/);
   });
 });

@@ -849,3 +849,107 @@
 {"ts":"2026-08-14T19:08:39.318Z","op":"plan","visit":"iterations/i27/gate-implementation@0","parent":null,"nodes":[{"id":"d117","brief":"note the missing wake for the retro"}]}
 {"ts":"2026-08-14T19:09:12.214Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d117","brief":"the missing wake is noted for the retro"}
 {"ts":"2026-08-14T19:09:16.165Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d118","brief":"committing the amended gate and the handover"}
+{"ts":"2026-08-14T19:11:20.933Z","op":"plan","visit":"iterations/i27/gate-implementation@0","parent":null,"nodes":[{"id":"d119","brief":"record whose bless this is"},{"id":"d120","brief":"bless the gate and walk on to the close"}]}
+{"ts":"2026-08-14T19:11:25.810Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d119","brief":"the owner's word is on the record beside the stamp"}
+{"ts":"2026-08-14T19:11:49.638Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d121","brief":"verification carries the new battery figure"}
+{"ts":"2026-08-14T19:12:08.685Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d122","brief":"asking what actually holds verification"}
+{"ts":"2026-08-14T19:12:31.185Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d123","brief":"the design spec claims the transports, the mode and the satellite entry"}
+{"ts":"2026-08-14T19:14:44.619Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d124","brief":"the design spec claims the transports, the mode and the satellite entry"}
+{"ts":"2026-08-14T19:14:48.407Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d125","brief":"the design spec claims the transports, the mode and the satellite entry"}
+{"ts":"2026-08-14T19:15:41.369Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d120","brief":"gate-implementation completed once verification stood"}
+{"ts":"2026-08-14T19:16:38.516Z","op":"plan","visit":"iterations/i27/sweep-consistency@0","parent":null,"nodes":[{"id":"d126","brief":"method cards taught a retired clause — fixed"},{"id":"d127","brief":"sweep the engine-served strings"},{"id":"d128","brief":"sweep the command and tool docs"},{"id":"d129","brief":"sweep the book and entry documents"},{"id":"d130","brief":"fill sweep-consistency"}]}
+{"ts":"2026-08-14T19:16:44.597Z","op":"done","visit":"iterations/i27/sweep-consistency@0","node":"d126","brief":"M9_20_package and meth-emit-back now teach the write, not the refusal"}
+{"ts":"2026-08-14T19:17:23.743Z","op":"update","visit":"iterations/i27/sweep-consistency@0","node":"d131","brief":"the trace layer still says rebase where the code says reconcile"}
+{"ts":"2026-08-14T19:17:28.391Z","op":"update","visit":"iterations/i27/sweep-consistency@0","node":"d132","brief":"the trace layer still says rebase where the code says reconcile"}
+{"ts":"2026-08-14T19:17:33.703Z","op":"update","visit":"iterations/i27/sweep-consistency@0","node":"d133","brief":"the trace layer still says rebase where the code says reconcile"}
+{"ts":"2026-08-14T19:17:38.388Z","op":"update","visit":"iterations/i27/sweep-consistency@0","node":"d134","brief":"reconcile lands in the element layer"}
+{"ts":"2026-08-14T19:17:42.771Z","op":"update","visit":"iterations/i27/sweep-consistency@0","node":"d135","brief":"reconcile lands in the design-spec layer"}
+{"ts":"2026-08-14T19:18:21.441Z","op":"done","visit":"iterations/i27/sweep-consistency@0","node":"d127","brief":"engine strings were already clean; the trace layer carried the old verb and now does not"}
+{"ts":"2026-08-14T19:18:48.261Z","op":"update","visit":"iterations/i27/sweep-consistency@0","node":"d136","brief":"the claim lane named a forbidden verb as its own mechanism"}
+{"ts":"2026-08-14T19:19:47.872Z","op":"done","visit":"iterations/i27/sweep-consistency@0","node":"d128","brief":"the tool docs are one help text and RUNME renders it — proving the mode line reaches it"}
+{"ts":"2026-08-14T19:20:29.080Z","op":"update","visit":"iterations/i27/sweep-consistency@0","node":"d137","brief":"the emit-back card still sent the agent to the desk to make a small edit"}
+{"ts":"2026-08-14T19:22:02.544Z","op":"fork","visit":"iterations/i27/sweep-consistency@0","parent":"d129","node":"d138","brief":"the packet reported the stored mode as the running one, and the UI control had no route","nodes":[]}
+{"ts":"2026-08-14T19:22:10.113Z","op":"update","visit":"iterations/i27/sweep-consistency@0","node":"d139","brief":"the mirror can store the mode now, and says which launch applies it"}
+{"ts":"2026-08-14T19:22:21.167Z","op":"update","visit":"iterations/i27/sweep-consistency@0","node":"d140","brief":"a host drawing the control reads the three modes from the engine, not its own copy"}
+{"ts":"2026-08-14T19:22:31.046Z","op":"update","visit":"iterations/i27/sweep-consistency@0","node":"d141","brief":"a host drawing the control reads the three modes from the engine, not its own copy"}
+{"ts":"2026-08-14T19:23:20.618Z","op":"update","visit":"iterations/i27/sweep-consistency@0","node":"d142","brief":"five cases pin the running-versus-stored split and the control"}
+{"ts":"2026-08-14T19:25:54.395Z","op":"done","visit":"iterations/i27/sweep-consistency@0","node":"d138","brief":"the packet now separates running from stored, and the mirror has a route that stores"}
+{"ts":"2026-08-14T19:26:00.823Z","op":"fork","visit":"iterations/i27/sweep-consistency@0","parent":"d129","node":"d143","brief":"the mode row can be declared in the panel spec if a choice already posts","nodes":[]}
+{"ts":"2026-08-14T19:27:04.467Z","op":"obsolete","visit":"iterations/i27/sweep-consistency@0","node":"d143","brief":"a declared row would draw a select that posts nothing — worse than no control"}
+{"ts":"2026-08-14T19:28:01.279Z","op":"plan","visit":"iterations/i27/gate-validation@0","parent":null,"nodes":[{"id":"d144","brief":"read the eight must stories' demonstrations"},{"id":"d145","brief":"run the battery for round 0"},{"id":"d146","brief":"do the prior-art comparison for round 1"},{"id":"d147","brief":"red-team the result"},{"id":"d148","brief":"bless gate-validation"}]}
+{"ts":"2026-08-14T19:28:42.892Z","op":"done","visit":"iterations/i27/gate-validation@0","node":"d144","brief":"five of eight musts stand demonstrated with references; three are owed reports"}
+{"ts":"2026-08-14T19:29:02.737Z","op":"update","visit":"iterations/i27/gate-validation@0","node":"d149","brief":"a story's demonstration cited the loop i27 removed; it now shows both costs"}
+{"ts":"2026-08-14T19:29:23.254Z","op":"update","visit":"iterations/i27/gate-validation@0","node":"d150","brief":"checking whether a runner really ships the transport flag i built"}
+{"ts":"2026-08-14T19:29:31.947Z","op":"update","visit":"iterations/i27/gate-validation@0","node":"d151","brief":"reading the runner's own docs for the transport flag"}
+{"ts":"2026-08-14T19:31:08.796Z","op":"update","visit":"iterations/i27/gate-validation@0","node":"d152","brief":"the red is mine: packet read the mode file twice per call"}
+{"ts":"2026-08-14T19:31:24.126Z","op":"update","visit":"iterations/i27/gate-validation@0","node":"d153","brief":"the red is mine: packet read the mode file twice per call"}
+{"ts":"2026-08-14T19:31:54.097Z","op":"done","visit":"iterations/i27/sweep-consistency@0","node":"d130","brief":"sweep-consistency is filled and submitted"}
+{"ts":"2026-08-14T19:32:00.430Z","op":"done","visit":"iterations/i27/sweep-consistency@0","node":"d129","brief":"entry and guidance surfaces carry nothing this iteration made stale"}
+{"ts":"2026-08-14T19:33:08.229Z","op":"fork","visit":"iterations/i27/gate-validation@0","parent":"d145","node":"d154","brief":"two answers sent a bare autonomy number, which the categorical row forbids","nodes":[]}
+{"ts":"2026-08-14T19:33:11.443Z","op":"update","visit":"iterations/i27/gate-validation@0","node":"d155","brief":"the tier word now rides every answer that carried a number"}
+{"ts":"2026-08-14T19:33:30.010Z","op":"update","visit":"iterations/i27/gate-validation@0","node":"d156","brief":"gathering what this review adds to the register"}
+{"ts":"2026-08-14T19:33:48.303Z","op":"update","visit":"iterations/i27/gate-validation@0","node":"d157","brief":"one read site in mode.ts again, and one file hit per packet"}
+{"ts":"2026-08-14T19:33:51.544Z","op":"update","visit":"iterations/i27/gate-validation@0","node":"d158","brief":"battery again, covering the tier change and the read-site fix"}
+{"ts":"2026-08-14T19:34:25.620Z","op":"done","visit":"iterations/i27/gate-validation@0","node":"d147","brief":"the red team's live card is transport equivalence, asserted and unexercised"}
+{"ts":"2026-08-14T19:34:28.583Z","op":"update","visit":"iterations/i27/gate-validation@0","node":"d159","brief":"reading the battery verdict"}
+{"ts":"2026-08-14T19:34:51.252Z","op":"done","visit":"iterations/i27/gate-validation@0","node":"d154","brief":"the cut-over is complete; the register says why removal waits"}
+{"ts":"2026-08-14T19:34:54.001Z","op":"update","visit":"iterations/i27/gate-validation@0","node":"d160","brief":"reading the battery verdict"}
+{"ts":"2026-08-14T19:35:08.203Z","op":"update","visit":"iterations/i27/gate-validation@0","node":"d161","brief":"checking whether the architecture milestone settled the cheap-alternative issue"}
+{"ts":"2026-08-14T19:35:24.636Z","op":"done","visit":"iterations/i27/gate-validation@0","node":"d146","brief":"the cheap alternative was compared at declare-winner and lost by one point"}
+{"ts":"2026-08-14T19:35:53.348Z","op":"update","visit":"iterations/i27/gate-validation@0","node":"d162","brief":"packet touched the disk on every call; the mode is read once per session now"}
+{"ts":"2026-08-14T19:35:56.627Z","op":"update","visit":"iterations/i27/gate-validation@0","node":"d163","brief":"battery with the disk hit off the packet path"}
+{"ts":"2026-08-14T19:36:21.096Z","op":"update","visit":"iterations/i27/gate-validation@0","node":"d164","brief":"the register now matches what the architecture milestone actually found"}
+{"ts":"2026-08-14T19:36:24.179Z","op":"update","visit":"iterations/i27/gate-validation@0","node":"d165","brief":"reading the battery verdict"}
+{"ts":"2026-08-14T19:36:37.116Z","op":"update","visit":"iterations/i27/gate-validation@0","node":"d166","brief":"reading the battery verdict"}
+{"ts":"2026-08-14T19:37:05.188Z","op":"done","visit":"iterations/i27/gate-validation@0","node":"d145","brief":"three reds found and fixed; reading the verdict that covers them"}
+{"ts":"2026-08-14T19:37:08.100Z","op":"update","visit":"iterations/i27/gate-validation@0","node":"d167","brief":"reading the verdict the gate will cite"}
+{"ts":"2026-08-14T19:37:11.053Z","op":"update","visit":"iterations/i27/gate-validation@0","node":"d168","brief":"waiting on the battery that round 0 cites"}
+{"ts":"2026-08-14T19:37:22.394Z","op":"update","visit":"iterations/i27/gate-validation@0","node":"d169","brief":"the must-check is prose at every gate, including this one"}
+{"ts":"2026-08-14T19:39:17.632Z","op":"done","visit":"iterations/i27/gate-validation@0","node":"d148","brief":"gate-validation filled from what the record says and blessed"}
+{"ts":"2026-08-14T19:39:29.382Z","op":"update","visit":"iterations/i27/gate-validation@0","node":"d170","brief":"answering the types check for round 0"}
+{"ts":"2026-08-14T19:39:36.531Z","op":"plan","visit":"iterations/i27/gate-validation@0","parent":null,"nodes":[{"id":"d171","brief":"answer the types check"},{"id":"d172","brief":"refill the gate with the fields' real item names"},{"id":"d173","brief":"bless gate-validation"}]}
+{"ts":"2026-08-14T19:40:53.775Z","op":"done","visit":"iterations/i27/gate-validation@0","node":"d171","brief":"types clean at exit 0 in 3.9 seconds"}
+{"ts":"2026-08-14T19:42:24.679Z","op":"done","visit":"iterations/i27/gate-validation@0","node":"d172","brief":"version bumped to 4.1.0 with its release entry in plain language"}
+{"ts":"2026-08-14T19:42:28.361Z","op":"plan","visit":"iterations/i27/package@0","parent":null,"nodes":[{"id":"d174","brief":"assemble the package by script"},{"id":"d175","brief":"check it works by using it"},{"id":"d176","brief":"fill package and walk to gate-release"}]}
+{"ts":"2026-08-14T19:43:04.373Z","op":"done","visit":"iterations/i27/package@0","node":"d174","brief":"dist/quackitect-4.1.0.zip assembled by script in 17 seconds"}
+{"ts":"2026-08-14T19:43:28.552Z","op":"update","visit":"iterations/i27/package@0","node":"d177","brief":"running the packaged engine from the extracted tree"}
+{"ts":"2026-08-14T19:44:01.930Z","op":"update","visit":"iterations/i27/package@0","node":"d178","brief":"installing inside the extracted copy so the desk can be reached from it"}
+{"ts":"2026-08-14T19:44:40.179Z","op":"update","visit":"iterations/i27/package@0","node":"d179","brief":"reading the install inside the extracted package"}
+{"ts":"2026-08-14T19:44:52.968Z","op":"update","visit":"iterations/i27/package@0","node":"d180","brief":"starting the packaged engine to reach the desk from the package"}
+{"ts":"2026-08-14T19:44:58.115Z","op":"update","visit":"iterations/i27/package@0","node":"d181","brief":"asking the packaged engine where it stands"}
+{"ts":"2026-08-14T19:45:12.047Z","op":"done","visit":"iterations/i27/package@0","node":"d175","brief":"installed from the package and reached the desk on a root it made itself"}
+{"ts":"2026-08-14T19:45:54.160Z","op":"done","visit":"iterations/i27/package@0","node":"d176","brief":"package filled from what was observed, with the uninstalled path named"}
+{"ts":"2026-08-14T19:46:01.476Z","op":"update","visit":"iterations/i27/package@0","node":"d182","brief":"the archive path wants the list prefix"}
+{"ts":"2026-08-14T19:47:24.997Z","op":"plan","visit":"iterations/i27/gate-release@0","parent":null,"nodes":[{"id":"d183","brief":"read the version from the manifest in one place"},{"id":"d184","brief":"raise the read ceiling with its reason"},{"id":"d185","brief":"battery, then fill gate-release"}]}
+{"ts":"2026-08-14T19:47:32.939Z","op":"update","visit":"iterations/i27/gate-release@0","node":"d186","brief":"four hardcoded version strings now read the manifest"}
+{"ts":"2026-08-14T19:47:59.019Z","op":"update","visit":"iterations/i27/gate-release@0","node":"d187","brief":"two of three imports placed"}
+{"ts":"2026-08-14T19:48:11.330Z","op":"done","visit":"iterations/i27/gate-release@0","node":"d183","brief":"the version is one fact read from the manifest, in four places that hardcoded it"}
+{"ts":"2026-08-14T19:48:25.700Z","op":"done","visit":"iterations/i27/gate-release@0","node":"d184","brief":"ceiling raised to 104 with the reason the test asks for"}
+{"ts":"2026-08-14T19:48:30.054Z","op":"update","visit":"iterations/i27/gate-release@0","node":"d188","brief":"battery over the version fix"}
+{"ts":"2026-08-14T19:48:41.933Z","op":"update","visit":"iterations/i27/gate-release@0","node":"d189","brief":"the shipped archive predates the version fix and will need rebuilding"}
+{"ts":"2026-08-14T19:48:53.793Z","op":"update","visit":"iterations/i27/gate-release@0","node":"d190","brief":"nothing pinned the old string; reading the verdict"}
+{"ts":"2026-08-14T19:49:07.816Z","op":"update","visit":"iterations/i27/gate-release@0","node":"d191","brief":"waiting on the battery that clears the version fix"}
+{"ts":"2026-08-14T19:49:17.092Z","op":"update","visit":"iterations/i27/gate-release@0","node":"d192","brief":"the release notes carry the version fix a user can see"}
+{"ts":"2026-08-14T19:49:20.888Z","op":"done","visit":"iterations/i27/gate-validation@0","node":"d173","brief":"gate-validation was blessed earlier; the node stayed open by mistake"}
+{"ts":"2026-08-14T19:49:23.842Z","op":"update","visit":"iterations/i27/gate-release@0","node":"d193","brief":"reading the battery verdict"}
+{"ts":"2026-08-14T19:49:26.747Z","op":"update","visit":"iterations/i27/gate-release@0","node":"d194","brief":"reading the battery verdict"}
+{"ts":"2026-08-14T19:49:33.813Z","op":"update","visit":"iterations/i27/gate-release@0","node":"d195","brief":"proving the version module answers the manifest"}
+{"ts":"2026-08-14T19:49:38.648Z","op":"update","visit":"iterations/i27/gate-release@0","node":"d196","brief":"SE_VERSION answers 4.1.0 from the manifest"}
+{"ts":"2026-08-14T19:49:41.610Z","op":"update","visit":"iterations/i27/gate-release@0","node":"d197","brief":"reading the battery verdict"}
+{"ts":"2026-08-14T19:49:48.984Z","op":"done","visit":"iterations/i27/gate-release@0","node":"d185","brief":"the version fix is proven at 4.1.0; the battery verdict decides the rest"}
+{"ts":"2026-08-14T19:49:51.792Z","op":"update","visit":"iterations/i27/gate-release@0","node":"d198","brief":"reading the battery verdict"}
+{"ts":"2026-08-14T19:49:56.990Z","op":"plan","visit":"iterations/i27/gate-release@0","parent":null,"nodes":[{"id":"d199","brief":"rebuild the archive over the version fix"},{"id":"d200","brief":"prove the rebuilt package announces 4.1.0"},{"id":"d201","brief":"amend package with the rebuild"},{"id":"d202","brief":"fill and bless gate-release"}]}
+{"ts":"2026-08-14T19:50:16.556Z","op":"done","visit":"iterations/i27/gate-release@0","node":"d199","brief":"archive rebuilt in 16 seconds at the same path"}
+{"ts":"2026-08-14T19:50:28.460Z","op":"update","visit":"iterations/i27/gate-release@0","node":"d203","brief":"starting the rebuilt package to read its banner"}
+{"ts":"2026-08-14T19:50:32.700Z","op":"update","visit":"iterations/i27/gate-release@0","node":"d204","brief":"reading the rebuilt package's startup banner"}
+{"ts":"2026-08-14T19:50:59.191Z","op":"done","visit":"iterations/i27/gate-release@0","node":"d200","brief":"the rebuilt archive announces se-mcp 4.1.0 from its own banner"}
+{"ts":"2026-08-14T19:51:45.852Z","op":"obsolete","visit":"iterations/i27/gate-release@0","node":"d201","brief":"the gate records the rebuild; a standing claim stays unamended and true"}
+{"ts":"2026-08-14T19:52:25.419Z","op":"update","visit":"iterations/i27/gate-release@0","node":"d205","brief":"re-stamping package after the rebuild rippled it"}
+{"ts":"2026-08-14T19:52:28.287Z","op":"update","visit":"iterations/i27/gate-release@0","node":"d206","brief":"package re-stamped; asking the gate again"}
+{"ts":"2026-08-14T19:52:42.481Z","op":"update","visit":"iterations/i27/gate-release@0","node":"d207","brief":"asking what really holds package"}
+{"ts":"2026-08-14T19:52:54.274Z","op":"update","visit":"iterations/i27/gate-release@0","node":"d208","brief":"tracing the ripple to its source"}
+{"ts":"2026-08-14T19:53:00.287Z","op":"update","visit":"iterations/i27/gate-release@0","node":"d209","brief":"tracing the ripple to its source"}
+{"ts":"2026-08-14T19:53:30.646Z","op":"obsolete","visit":"iterations/i27/gate-release@0","node":"d202","brief":"written before the ripple showed; the chain must be re-stamped first"}
+{"ts":"2026-08-14T19:53:35.593Z","op":"plan","visit":"iterations/i27/gate-release@0","parent":null,"nodes":[{"id":"d210","brief":"claim version.ts where the stamp it feeds lives"},{"id":"d211","brief":"re-stamp the chain from verification up"},{"id":"d212","brief":"fill and bless gate-release"}]}
+{"ts":"2026-08-14T19:53:40.500Z","op":"done","visit":"iterations/i27/gate-release@0","node":"d210","brief":"dsp-call-log claims version.ts, beside the stamp it feeds"}
+{"ts":"2026-08-14T19:53:45.417Z","op":"update","visit":"iterations/i27/gate-release@0","node":"d213","brief":"asking the walk whether the chain re-stamps itself"}

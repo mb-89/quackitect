@@ -43,7 +43,7 @@ than beside it. A caller never asks the delta anything; every read reaches it
 through the one resolver no verb may bypass.
 
 WHAT GOES STALE. Trunk moves and an override does not. That is caught at entry
-by the supervisor, which rebases the delta and stops the record when it will
+by the supervisor, which reconciles the delta and stops the record when it will
 not apply, reporting the divergence rather than composing a mixture.
 
 METHOD AND ENGINE ARE THE SAME KIND OF THING here: files in the record's

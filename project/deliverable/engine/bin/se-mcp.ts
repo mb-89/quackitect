@@ -34,6 +34,7 @@ import { appendFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
+import { SE_VERSION } from "../version.ts";
 
 const argv = [
   ...process.argv.slice(2),
@@ -301,6 +302,7 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   process.stderr.write(`se-mcp: satellites run ${runMode}\n`);
 
   const session = new Session(root); // fails fast on a misdrawn machine
+  session.noteRunningMode(runMode); // the packet must report what RAN, not what is stored
   if (autonomyRaw !== undefined) session.setAutonomy(Number(autonomyRaw)); // refuses out-of-range
   // SESSION OVER — reaching end stops everything. The grace period lets the
   // closing tool response flush to stdout and the mirror serve its red page.
@@ -367,7 +369,7 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
     bootMirror();
   }
 
-  process.stderr.write(`se-mcp 3.0.0-bootstrap root=${root} autonomy=${session.autonomy}${headless ? " headless" : ""}\n`);
+  process.stderr.write(`se-mcp ${SE_VERSION} root=${root} autonomy=${session.autonomy}${headless ? " headless" : ""}\n`);
   if (!headless) {
     runStdio(mcpServer, () => {
       process.stderr.write("se-mcp: the console quit — telling the mirror, then shutting down\n");

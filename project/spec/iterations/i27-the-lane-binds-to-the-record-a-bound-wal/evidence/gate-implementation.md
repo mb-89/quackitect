@@ -1,6 +1,7 @@
 ---
 form: gate-implementation
-amended: "2026-08-14T19:07:55.700Z by agent — the split is no longer tested-and-unwired: it crosses real worker threads and real child processes, with the transport a launch flag"
+bless: blessed by human
+amended: "2026-08-14T19:11:21.014Z by agent — recording whose adjudication the bless carries, before it is applied"
 by: agent
 signed_off: 2026-08-14T18:09:26.069Z
 authors: agent
@@ -85,10 +86,24 @@ What waits behind it:
 
 ## anything_else
 
+WHOSE BLESS THIS IS. The owner's, given in words on 2026-08-14: "Okay. Go ahead. Let's finish up this iteration."
+
+THE ACTOR STAMP WILL SAY AGENT, because the agent's hand pressed it. That gap is exactly what `raid-asm-dial-carries-adjudication` is about, and this line is the record the assumption asks for: the adjudication is the owner's and the keystroke is not.
+
+IT WAS NOT A GLANCE. The owner read this gate, refused it, and demanded rework. What they pushed back on, and what came of it:
+
+- "Nine of ten owed — dig in again." Four were inspections and analysis a careful reader performs. Doing them found a committed trace node carrying an account name.
+- "The autonomy number leaves the answer." It has. `packet()` hands over the tier alone.
+- "Prior art — why didn't you do it?" Done, on three shapes, each to a primary source.
+- "Explain the modules with no caller." Explained, then removed as a finding by building the thing.
+- "Wouldn't it make sense to split into processes?" It is split, and it crosses real workers and real children.
+
+THREE FINDINGS THE OWNER STRUCK, and they stay struck: the pull-ahead was a conscious decision, the shell hole was always there, and the tsserver sharing does not transfer.
+
 THREE THINGS THE BOXES ABOVE COULD NOT HOLD.
 
-WHY `nothing speculative shipped` IS TICKED WHILE THREE MODULES HAVE NO CALLER. Speculative means built for a need nobody established. `dsp-core-and-satellite` traces to elements and interfaces that trace to requirements, and the chunks were blessed at gate-architecture. The code is ahead of its caller, which is incompleteness rather than speculation. Flagged here because a reader could reasonably disagree, and a gate is the place to disagree.
+WHY `nothing speculative shipped` IS TICKED. `dsp-core-and-satellite` traces to elements and interfaces that trace to requirements, and the chunks were blessed at gate-architecture. The code was ahead of its caller when this gate was first written; it no longer is.
 
 WHY `debt_taken` SAYS none. No quick-and-dirty was taken. The shortcuts this record met were pre-existing and each was registered rather than worked around.
 
-WHAT THE RECORD FOUND THAT NOBODY WAS LOOKING FOR. Four defects surfaced only because something else was being built: the stop hook wired above the workspace, a duplicate `inputs:` key that made a corpus file unparseable and hid an undeclared crossing, a `GitLane` interface promising `rebase` when SE-C-002 forbids exactly that, and a committed trace node carrying an account name. None would have been found by testing the thing under construction, and the last one would have been hidden by owing the claim that caught it.
+WHAT THE RECORD FOUND THAT NOBODY WAS LOOKING FOR. Five defects surfaced only because something else was being built: the stop hook wired above the workspace, a duplicate `inputs:` key that made a corpus file unparseable and hid an undeclared crossing, a `GitLane` interface promising `rebase` when SE-C-002 forbids it, a committed trace node carrying an account name, and a `Crossing` typed synchronously when no boundary can be. None would have been found by testing the thing under construction.

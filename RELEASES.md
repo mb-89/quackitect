@@ -2,6 +2,28 @@
 
 One entry per shipped version, newest first.
 
+## 4.1.0 — 2026-08-14
+
+Fixing how you work no longer means stepping outside your work.
+
+- Find the method wrong halfway through a job and you can correct it where
+  you are. The change lands in the one place the method lives, and it applies
+  to you at once. Before this it meant leaving the job, editing somewhere
+  else, and coming back.
+- Where a job runs is now a setting. Pick a separate process for each one -
+  the default, so a crash stays with the job that caused it. Or a thread,
+  which starts more cheaply. Or neither, which is the plain baseline the
+  other two are measured against.
+- Choose it with `--mode process`, `--mode thread` or `--mode inline` when
+  you start. The panel can store the choice instead, and the next start
+  takes it.
+- The panel and the editor read the available choices from the system, so
+  neither keeps its own copy of the list.
+- The system reports its own version again. It had been announcing an old
+  one since 4.0.0, in the line it prints at startup and in every call it
+  logged. Older entries keep what they recorded.
+- Nothing breaks. Everything authored for 4.0.0 keeps working.
+
 ## 4.0.0 — 2026-08-12
 
 Work shares across machines.

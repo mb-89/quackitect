@@ -24,7 +24,7 @@ than routing.
 
 ## Four acts, each all-or-nothing
 
-- START. Level the record's tree, rebase its delta on trunk, commit what was
+- START. Level the record's tree, reconcile its delta on trunk, commit what was
   brought, then serve.
   - A conflict stops the record at entry with the conflict named.
   - A partial levelling never serves, because nothing is in flight at a start.

@@ -31,8 +31,8 @@ right answer.
 
 - No override, trunk still: trunk serves.
 - Override, trunk still: the record's file serves.
-- No override, trunk moved: the new trunk serves, with nothing to rebase.
-- Override, trunk moved: the delta rebases, or the record stops at entry with
+- No override, trunk moved: the new trunk serves, with nothing to reconcile.
+- Override, trunk moved: the delta reconciles, or the record stops at entry with
   the conflict named.
 
 The fourth cell is the one that matters. A composed mixture nobody assembled
@@ -56,7 +56,7 @@ THE RED CASES ARE THE DESIGN'S OWED WORK.
 
 - A record's own folder may override an engine file, and the composition asks
   the record first and trunk second.
-- Entry levels the record's tree and rebases its delta before the first call,
+- Entry levels the record's tree and reconciles its delta before the first call,
   or stops the record with the conflict named.
 
 Neither mechanism exists. The red is what the build turns green.

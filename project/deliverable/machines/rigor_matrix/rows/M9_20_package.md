@@ -70,6 +70,6 @@ What to name: a state whose guidance was wrong or missing while you walked it, a
 
 What not to name: anything about this record's own subject. That is the product's output, not the method's.
 
-IT IS A CAPTURE, NEVER A WRITE. SE-C-134 refuses a method write while a record is bound, because such a write lands in this worktree and fans out over trunk. Name the change here; make it unbound.
+IT IS A CAPTURE, AND IT MAY ALSO BE A WRITE (owner ruling 2026-08-14). Shared method resolves to the machine root from any bound tree. The change lands on the one copy, from where you stand. Make it if it is yours to make. Name it here either way — this list is what the next record reads.
 
 The next record's `promotions` field at onboard-retro consumes this list, and the machine it is seeded with is compiled from the matrix as it then stands. So a landed improvement travels with no further act - the emit is what gets it landed.

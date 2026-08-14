@@ -77,12 +77,7 @@ const isMode = (v: unknown): v is RunMode => typeof v === "string" && (RUN_MODES
  *  A setting that can stop the engine starting is worse than one that is
  *  occasionally ignored. */
 export function readMode(root: string): RunMode {
-  try {
-    const raw = JSON.parse(readFileSync(join(seDir(root), FILE), "utf8")) as { mode?: unknown };
-    return isMode(raw.mode) ? raw.mode : DEFAULT_MODE;
-  } catch {
-    return DEFAULT_MODE;
-  }
+  return storedMode(root).mode;
 }
 
 /** Set it. The person's hand does this from the mirror; a launch argument does
@@ -105,6 +100,24 @@ export function modeForRun(root: string, argMode?: string): RunMode {
     return argMode;
   }
   return readMode(root);
+}
+
+/** BOTH ANSWERS FROM ONE READ.
+ *
+ *  packet() is on the hot path — recordDone paints green across the whole
+ *  corpus — and asking readMode and modeWasChosen separately costs two file
+ *  hits per call. Over two hundred nodes that blew the drift budget by 107 ms.
+ *
+ *  The catch branch keeps modeWasChosen's exact meaning: a file that exists
+ *  but holds garbage still counts as chosen, and answers the default. */
+export function storedMode(root: string): { mode: RunMode; chosen: boolean } {
+  const file = join(seDir(root), FILE);
+  try {
+    const raw = JSON.parse(readFileSync(file, "utf8")) as { mode?: unknown };
+    return { mode: isMode(raw.mode) ? raw.mode : DEFAULT_MODE, chosen: true };
+  } catch {
+    return { mode: DEFAULT_MODE, chosen: existsSync(file) };
+  }
 }
 
 /** Has a mode ever been chosen, or is the default answering?

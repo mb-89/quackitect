@@ -6,7 +6,7 @@ kind: issue
 statement: A decided decision from i1 already rules that a write is judged by its PATH, and this milestone argued for moving the root without comparing the two.
 owner: the driving agent
 trigger: fired already - found at gate-motivation's red team
-status: open
+status: closed
 impact: The iteration may build the expensive answer to a question the cheap answer already settles. Both close the same hole, and only one was costed.
 breaks_how_badly: crippling
 how_likely: expected
@@ -70,3 +70,27 @@ argument the packet made, because the packet never met the alternative.
 The architecture milestone compares them properly, with the read case as
 the deciding question. Until then the iteration is building one of two
 answers without having priced the other.
+
+## Closed 2026-08-14, at gate-validation
+
+The comparison ran, and the cheap answer was in the field under its own
+name. [[cand-judged-path]] was scored and audited beside four rivals.
+
+`evidence/declare-winner.md` records both judgments, made blind and
+separately:
+
+- ON DEMANDS it is eliminated. "cand-judged-path also fails the method
+  row."
+- ON SCORE it survives and trails. "cand-judged-path trails by exactly
+  one."
+
+Those two look like a contradiction and the record already settles it.
+[[raid-dec-a-must-outranks-a-score]] is the ruling: a line that fails a
+must is out, whatever it scores. So the one-point gap does not reinstate
+it.
+
+WHAT THE MARGIN STILL MEANS is recorded in the same file rather than here.
+The declaration says the seat is held by one point, and names two moves
+that would hand it over, both needing no new information. That is a live
+property of the winner, not an unmade comparison, so it does not keep this
+entry open.

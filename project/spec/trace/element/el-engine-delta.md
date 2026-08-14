@@ -47,7 +47,7 @@ output takes.
 Trunk moves, an override does not, and the composed result is a mixture nobody
 assembled.
 
-That is caught at entry by [[el-satellite-supervisor]], which rebases the
+That is caught at entry by [[el-satellite-supervisor]], which reconciles the
 delta and stops the record when it will not apply.
 
 ## The same mechanism serves method

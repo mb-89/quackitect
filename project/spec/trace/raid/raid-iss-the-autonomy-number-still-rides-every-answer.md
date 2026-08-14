@@ -55,3 +55,22 @@ One of two things, and they are not the same:
 
 THE SECOND IS THE OWNER'S CALL, not the verifier's. A verifier who rewrites the
 criterion to match what was built has verified nothing.
+
+## Corrected 2026-08-14, at gate-validation
+
+"The categorical tier is present and correct everywhere the number appears"
+was NOT true when this entry was written. Two answers carried a bare number
+with no tier at all:
+
+- the route answer in `engine/session.ts`, beside `judgments`
+- `describe()`, the tick's own answer
+
+A bare number is precisely what [[req-autonomy-is-categorical]] forbids, so
+those two were a live violation rather than a transitional carrier. Both now
+carry the tier word beside the number.
+
+WHAT REMAINS IS THE REMOVAL, and it is deliberately not in this iteration.
+[[raid-risk-autonomy-rework-breaks-walking]] says cut over first and remove
+after, never both in one commit. The cut-over is now complete: every answer
+carrying the number carries the word. The removal is the next record's work,
+and which of the two closings above applies is still the owner's call.

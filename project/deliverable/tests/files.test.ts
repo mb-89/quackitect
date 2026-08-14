@@ -81,7 +81,13 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   // 103 since 2026-08-14: mode.ts reads .se/mode.json — the run mode, one tiny
   // JSON object of session state, read at start. Same shape as the three
   // above, and no door would ever hold it.
-  const CEILING = 103;
+  // 104 since 2026-08-14: version.ts reads the package manifest ONCE at import,
+  // for the product's own version. It was hardcoded as "3.0.0-bootstrap" in
+  // four places and stopped following the product at the 4.0.0 release, so
+  // every logged call across v4 carried a version the product had left behind.
+  // There is no node here to route through a door — only the manifest, which
+  // the packaging script already reads for the same fact.
+  const CEILING = 104;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {

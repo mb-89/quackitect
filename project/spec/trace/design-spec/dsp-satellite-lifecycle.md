@@ -27,7 +27,7 @@ never serves.
 Four acts across `if-satellite-supervisor-to-satellite`, which is process
 control rather than a call.
 
-- START. Level the tree, rebase the delta on trunk, commit what was brought,
+- START. Level the tree, reconcile the delta on trunk, commit what was brought,
   compose the machine, then serve.
 - WATCH. Detect a death, time a call, beat a process.
 - REPLACE. The delta changed, so a replacement comes up and the old one

@@ -1,6 +1,7 @@
 ---
 id: i27-the-lane-binds-to-the-record-a-bound-wal
-status: open
+status: shipped
+closed: 2026-08-14T19:54:00.895Z
 started: 2026-08-13T18:17:34.105Z
 opened: 2026-08-13T15:10:43.192Z
 goal: "The lane binds to the record: a bound walk never has to leave its worktree, and the write it makes lands where the walk stands."

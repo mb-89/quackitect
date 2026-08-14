@@ -16,6 +16,9 @@ files:
   - "project/deliverable/engine/core.ts"
   - "project/deliverable/engine/satellite.ts"
   - "project/deliverable/engine/channel.ts"
+  - "project/deliverable/engine/transports.ts"
+  - "project/deliverable/engine/mode.ts"
+  - "project/deliverable/engine/bin/se-satellite.ts"
   - "project/deliverable/engine/bin/se-mcp.ts"
 ---
 

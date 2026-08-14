@@ -26,7 +26,7 @@ written against, and the trunk revision it now faces.
 
 ## When it fires
 
-At entry, when the supervisor rebases the delta. A divergence
+At entry, when the supervisor reconciles the delta. A divergence
 stops the record starting, and this is the durable account of why.
 
 ## Why it goes to the account and not only to the person

@@ -11,6 +11,7 @@ realizes:
   - "if-record-store-to-account"
 files:
   - "project/deliverable/engine/calllog.ts"
+  - "project/deliverable/engine/version.ts"
   - "project/deliverable/engine/survey.ts"
 ---
 

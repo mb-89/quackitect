@@ -19,7 +19,7 @@ The real case of 2026-08-11: M8's rows still asked for hand-written fields the o
 
 The engineer edits the guidance where it actually lives — the row the state compiled from, not a copy of it.
 |||
-The escape-edit-return loop per SE-C-134: stepped out, recut the rows and laws on trunk (commit 2dd52fec), stepped back.
+Demonstrated twice, and the cost fell between. On 2026-08-11 it took the escape-edit-return loop: stepped out, recut the rows and laws on trunk (commit 2dd52fec), stepped back. On 2026-08-14 the same kind of edit landed from inside the bound record in one call, because shared method now resolves to the machine root and SE-C-134 was retired ([[req-an-engine-change-applies-in-its-own-record]]).
 
 ---
 

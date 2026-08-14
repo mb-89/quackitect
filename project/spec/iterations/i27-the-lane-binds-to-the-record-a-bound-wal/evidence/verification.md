@@ -1,6 +1,6 @@
 ---
 form: verification
-amended: "2026-08-14T18:21:50.469Z by agent — nine claims were owed on the fresh-eyes rule; four are inspections or analysis a careful reader performs, and doing them found a real defect"
+amended: "2026-08-14T19:11:49.700Z by agent — the battery was rerun after the process split landed; the figure and the job ref moved"
 by: agent
 signed_off: 2026-08-14T18:06:53.500Z
 authors: agent
@@ -13,9 +13,11 @@ files:
 
 The build closed with thirteen signed chunks, and the mechanical half of verification is done.
 
-THE BATTERY IS GREEN: 1271 of 1271, preflight green, lint clean. Job `test-mst98hdl-12`.
+THE BATTERY IS GREEN: 1296 of 1296 across 134 suites, preflight green, lint clean. Job `test-mstbg14t-24`.
 
-The checklist below is the other half, and it is where this verification is honest rather than complete.
+THE FIGURE MOVED after this form was first signed, from 1271 to 1296. Twenty-five tests arrived with the process split, which the owner ordered built after reading the implementation gate. The claims below are unaffected — none of them is about the split — and the form is amended rather than re-earned for exactly that reason.
+
+The checklist is the other half, and it is where this verification is honest rather than complete.
 
 ## claims
 

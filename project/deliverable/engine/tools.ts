@@ -48,6 +48,7 @@ import { Session } from "./session.ts";
 import { shoot } from "./shoot.ts";
 import { survey } from "./survey.ts";
 import { Toll } from "./toll.ts";
+import { SE_VERSION } from "./version.ts";
 import { webFetch, webSearch } from "./web.ts";
 
 const BIOME_BIN = fileURLToPath(new URL("../node_modules/@biomejs/biome/bin/biome", import.meta.url));
@@ -1645,7 +1646,7 @@ export function buildServer(
   };
   for (const t of tools) (t.inputSchema.properties as Record<string, unknown>).update = UPDATE_PROP;
   const server = new McpServer(
-    { name: "se-mcp", version: "3.0.0-bootstrap" },
+    { name: "se-mcp", version: SE_VERSION },
     tools,
     requestContextAdapter({ workspaceId: `workspace-${contentHash(root)}` }),
   );

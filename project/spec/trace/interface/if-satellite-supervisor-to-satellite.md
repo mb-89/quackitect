@@ -21,7 +21,7 @@ teeth. Four acts cross it and each is all-or-nothing.
 
 ## Start
 
-The supervisor levels the record's tree, rebases its delta on trunk,
+The supervisor levels the record's tree, reconciles its delta on trunk,
 commits what it brought, composes the machine, and only then hands the
 satellite its three things and lets it serve. A conflict at any step means no
 satellite starts and the record stops at entry with the conflict named.
