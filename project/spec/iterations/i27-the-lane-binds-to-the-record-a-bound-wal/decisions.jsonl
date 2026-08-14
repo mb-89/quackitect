@@ -799,3 +799,5 @@
 {"ts":"2026-08-14T18:22:33.277Z","op":"plan","visit":"iterations/i27/gate-implementation@0","parent":null,"nodes":[{"id":"d75","brief":"amend the gate with the comparison and the corrected counts"},{"id":"d76","brief":"confirm the tree still stands"}]}
 {"ts":"2026-08-14T18:22:37.449Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d75","brief":"both forms amended, signatures kept"}
 {"ts":"2026-08-14T18:22:41.826Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d77","brief":"committing the rework while the battery runs"}
+{"ts":"2026-08-14T18:23:34.067Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d78","brief":"battery past the halfway mark"}
+{"ts":"2026-08-14T18:24:25.220Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d76","brief":"battery green again at 1271 of 1271 after the rework"}
