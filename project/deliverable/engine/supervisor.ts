@@ -110,3 +110,59 @@ export const WATCH = {
 
 /** Is this deadline safe against the measured worst case? */
 export const deadlineIsSafe = (ms: number): boolean => ms > 94;
+
+/** What a call did, as the caller observed it.
+ *
+ *  DETECTION IS FREE AND NEEDS NO PROTOCOL. exp-inflight-death measured three
+ *  break kinds — exit, crash and outside kill — all reaching the caller as one
+ *  observable end state inside 100 ms. So a death is REPORTED here rather than
+ *  timed, and the deadline is left to catch the thing that announces nothing. */
+export type CallEnd = { kind: "answered"; ms: number } | { kind: "died"; ms: number } | { kind: "pending"; ms: number };
+
+export interface WatchVerdict {
+  state: "alive" | "dead" | "wedged";
+  /** Named whenever the satellite is not alive. A verdict without a reason is
+   *  a diagnosis nobody can act on. */
+  why?: string;
+}
+
+/** WATCH, first half: THE DEADLINE ON THE CALL, and it is THE MECHANISM.
+ *
+ *  A death announces itself. A HANG does not: exp-watchdog measured a
+ *  satellite whose event loop stayed free answering 8 of 8 beats while its
+ *  call never returned. The beat called that healthy. Only the deadline sees
+ *  it. */
+export function callVerdict(end: CallEnd, deadlineMs: number = WATCH.deadlineMs): WatchVerdict {
+  if (end.kind === "died") return { state: "dead", why: `the satellite died ${end.ms} ms into the call` };
+  if (end.kind === "answered") return { state: "alive" };
+  if (end.ms >= deadlineMs) {
+    return { state: "wedged", why: `the call passed its ${deadlineMs} ms deadline without answering or dying` };
+  }
+  return { state: "alive" };
+}
+
+/** How many beats have gone unanswered, read off the CLOCK rather than a timer.
+ *
+ *  `now` is passed in, so the logic is testable without waiting and the caller
+ *  owns the schedule. One whole interval with no beat counts as one missed. */
+export function missedBeats(lastBeatAt: number, now: number, beatMs: number = WATCH.beatMs): number {
+  if (beatMs <= 0) return 0;
+  const elapsed = now - lastBeatAt;
+  return elapsed <= 0 ? 0 : Math.floor(elapsed / beatMs);
+}
+
+/** WATCH, second half: THE BEAT ON THE PROCESS.
+ *
+ *  It is an ADDITION to the deadline, never a replacement, and it earns its
+ *  place on two narrow things dsp-satellite-lifecycle names:
+ *
+ *  - it finds a blocked loop in 600 ms, where a generous deadline takes
+ *    seconds;
+ *  - it sees a wedge while the satellite is IDLE, which no deadline can,
+ *    because an idle satellite has no call to time. */
+export function beatVerdict(missed: number, allowance: number = WATCH.allowance): WatchVerdict {
+  if (missed >= allowance) {
+    return { state: "wedged", why: `${missed} beats missed and the allowance is ${allowance}` };
+  }
+  return { state: "alive" };
+}

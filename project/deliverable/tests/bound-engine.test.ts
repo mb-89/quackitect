@@ -12,7 +12,7 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { composeForRecord, isOverridable, overridesIn } from "../engine/delta.ts";
 import * as paths from "../engine/paths.ts";
-import { deadlineIsSafe, levelRecordTree, replaceComposition, WATCH } from "../engine/supervisor.ts";
+import { beatVerdict, callVerdict, deadlineIsSafe, levelRecordTree, missedBeats, replaceComposition, WATCH } from "../engine/supervisor.ts";
 
 const ROOT = mkdtempSync(join(tmpdir(), "se-delta-"));
 const RECORD = "project/spec/iterations/i27-x";
@@ -145,4 +145,45 @@ test("a replacement that loads takes over", () => {
 test("the watch deadline sits above the slowest measured death", () => {
   assert.equal(deadlineIsSafe(WATCH.deadlineMs), true, "a crash took 94.1 ms to reach the caller in exp-inflight-death");
   assert.equal(deadlineIsSafe(50), false, "a deadline under that would call a crash a hang");
+});
+
+// ------------------------------------------------- WATCH: the deadline and the beat
+
+test("a call that answers is alive, and one that dies is dead with the reason named", () => {
+  assert.equal(callVerdict({ kind: "answered", ms: 12 }).state, "alive");
+  const dead = callVerdict({ kind: "died", ms: 94 });
+  assert.equal(dead.state, "dead");
+  assert.match(String(dead.why), /94 ms/, "a verdict without a reason is a diagnosis nobody can act on");
+});
+
+test("a call still pending past its deadline is WEDGED — the hang the beat calls healthy", () => {
+  const v = callVerdict({ kind: "pending", ms: WATCH.deadlineMs }, WATCH.deadlineMs);
+  assert.equal(v.state, "wedged");
+  assert.match(String(v.why), /deadline/);
+});
+
+test("a call pending inside its deadline is not yet wedged", () => {
+  assert.equal(callVerdict({ kind: "pending", ms: WATCH.deadlineMs - 1 }, WATCH.deadlineMs).state, "alive");
+});
+
+test("the deadline never calls a crash a hang", () => {
+  // exp-inflight-death: the slowest death reached the caller at 94.1 ms.
+  assert.equal(callVerdict({ kind: "died", ms: 95 }, WATCH.deadlineMs).state, "dead");
+});
+
+test("a beat arriving on time keeps the satellite alive", () => {
+  assert.equal(missedBeats(1_000, 1_000, WATCH.beatMs), 0);
+  assert.equal(beatVerdict(missedBeats(1_000, 1_150, WATCH.beatMs)).state, "alive", "inside one interval, nothing is missed");
+});
+
+test("three missed beats at 200 ms declare a wedge in 600 ms", () => {
+  assert.equal(missedBeats(1_000, 1_600, WATCH.beatMs), WATCH.allowance);
+  const v = beatVerdict(missedBeats(1_000, 1_600, WATCH.beatMs));
+  assert.equal(v.state, "wedged", "600 ms is the figure dsp-satellite-lifecycle records");
+  assert.match(String(v.why), /allowance/);
+});
+
+test("the beat sees a wedge while the satellite is IDLE, which no deadline can", () => {
+  // No call is in flight, so there is nothing for callVerdict to time at all.
+  assert.equal(beatVerdict(missedBeats(0, 800, 200)).state, "wedged");
 });
