@@ -223,6 +223,22 @@ export const fansOut = (rel: string): boolean => pathKind(rel) === "method";
  *  THIS FUNCTION NEVER REFUSES. It answers who owns the path and stops. */
 export type Owner = { kind: "core" } | { kind: "record"; container: "iterations" | "expeditions"; id: string } | { kind: "bound" };
 
+/** THE MACHINE ROOT, derived from any root.
+ *
+ *  A record's worktree lives at <machine>/.worktrees/<id>, so the machine
+ *  root is whatever stands before that. Derivable rather than passed, which
+ *  is what makes the seam adoptable: a caller that knows ONE root can still
+ *  send session state and shared method to the right place.
+ *
+ *  THIS IS THE 2026-08-14 DEFECT'S ROOT CAUSE. se_lint resolved
+ *  `.se/HANDOVER.md` against a worktree while the file lane resolved it
+ *  against the machine root. Both were correct against their own ambient
+ *  root, and neither answer said which. */
+export function machineRootOf(root: string): string {
+  const m = /^(.*)[\\/]\.worktrees[\\/][^\\/]+$/.exec(root);
+  return m === null ? root : m[1];
+}
+
 export function routeToOwner(rel: string): Owner {
   const kind = pathKind(rel);
   // Session state and method are machine-wide. One copy, served by the core —

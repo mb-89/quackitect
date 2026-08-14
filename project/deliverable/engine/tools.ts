@@ -13,6 +13,7 @@ import { spawn } from "node:child_process";
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { setAnswerSpill } from "./bound.ts";
 import { CallLog } from "./calllog.ts";
 import { parseUpdate } from "./decisions.ts";
 import {
@@ -41,6 +42,7 @@ import { ModelFileSystem } from "./model-fs.ts";
 import { openPanel } from "./panel.ts";
 import { fansOut, resolveInRoot, seDir } from "./paths.ts";
 import { type MirrorState, renderMirror } from "./render.ts";
+import { resolve as resolveSeam } from "./resolve.ts";
 import { jobDone, jobList, jobStatus, jobStop, runBackground, runToCompletion, startJob } from "./run.ts";
 import { Session } from "./session.ts";
 import { shoot } from "./shoot.ts";
@@ -1156,7 +1158,13 @@ export function coreTools(
         },
       },
       handler: (args) => {
-        const root = rootOf();
+        // THE ROOT-PICKER TAKES A PATH, and se_lint called it with none.
+        // That is the whole of the 2026-08-14 defect: laneRoot(rel) already
+        // chose the right tree per path kind, and this handler asked for the
+        // default instead, so `.se/...` resolved into whatever worktree was
+        // bound. The per-path calls are below; this one is only for lintProse,
+        // which reads configuration rather than the file under test.
+        const root = rootOf(LINT_CONFIG);
         // THE SWEEP. Linting one file at a time is why nothing was ever
         // linted: the tool could only be pointed at prose somebody already
         // suspected. Only files WITH findings come back, so a clean tree
@@ -1174,7 +1182,14 @@ export function coreTools(
             // AGAIN as separate strings — two passes, duplicate findings, and
             // only the two keys somebody remembered to list. lintProse reads
             // every prose key now and tags each finding with its own.
-            const raw = readFileSync(resolveInRoot(root, p, "engine/tools.ts se_lint"), "utf8");
+            // THROUGH THE SEAM (i27 seam-sweep, 2026-08-14). This used to
+            // call resolveInRoot with se_lint's own ambient root, so a lint
+            // run inside a record resolved `.se/...` into the worktree while
+            // the file lane served the same path from the machine root.
+            // Neither answer said which. resolve() picks the store from what
+            // the path IS, so both lanes now reach one tree.
+            const at = resolveSeam(rootOf(p), p, "engine/tools.ts se_lint");
+            const raw = readFileSync(at.abs, "utf8");
             const findings: unknown[] = lintProse(root, raw, p);
             return { path: p, count: findings.length, findings };
           };
@@ -1201,9 +1216,12 @@ export function coreTools(
               source: "engine/tools.ts se_lint",
             });
           }
-          const abs = resolveInRoot(root, p, "engine/tools.ts se_lint");
-          const findings = lintProse(root, readFileSync(abs, "utf8"), p);
-          return { path: p, findings, count: findings.length, config: LINT_CONFIG };
+          // THROUGH THE SEAM, and the answer NAMES ITS STORE. This is the
+          // exact call that answered ENOENT against a worktree on 2026-08-14
+          // while se_file_read served the same path from the machine root.
+          const at = resolveSeam(rootOf(p), p, "engine/tools.ts se_lint");
+          const findings = lintProse(root, readFileSync(at.abs, "utf8"), p);
+          return { path: p, store: at.store, findings, count: findings.length, config: LINT_CONFIG };
         }
         if (typeof args.text === "string") {
           const findings = lintProse(root, args.text);
@@ -1543,6 +1561,9 @@ export function buildServer(
   session = new Session(root),
   tollOpts: { windowMs?: number; now?: () => number } = {},
 ): McpServer {
+  // WHERE AN OVERSIZED ANSWER SPILLS, so the bound can page rather than only
+  // point. Machine-local and never committed.
+  setAnswerSpill(seDir(root));
   // (a fresh Session fails fast on a misdrawn machine)
   const tools = [
     ...sessionTools(session),

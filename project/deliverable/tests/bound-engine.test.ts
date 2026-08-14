@@ -12,6 +12,7 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { composeForRecord, isOverridable, overridesIn } from "../engine/delta.ts";
 import * as paths from "../engine/paths.ts";
+import { deadlineIsSafe, levelRecordTree, replaceComposition, WATCH } from "../engine/supervisor.ts";
 
 const ROOT = mkdtempSync(join(tmpdir(), "se-delta-"));
 const RECORD = "project/spec/iterations/i27-x";
@@ -79,20 +80,69 @@ test("only method and engine are overridable, because a record's evidence is not
   assert.equal(isOverridable("project/spec/iterations/i27-y/evidence/a.md"), false);
 });
 
+test("a record that overrides nothing levels with nothing to rebase", () => {
+  const clean = "project/spec/iterations/i27-clean";
+  const r = levelRecordTree(ROOT, clean, { rebase: () => ({ ok: true }), commit: () => ({ ok: true }) });
+  assert.equal(r.levelled, true);
+  assert.deepEqual(r.overrides, [], "most records hold no override at all");
+});
+
 test("entry levels the record's tree and rebases its delta before the first call", () => {
-  const levels = typeof (paths as Record<string, unknown>).levelRecordTree === "function";
-  assert.equal(
-    levels,
-    true,
-    "RED by design. el-satellite-supervisor's START act levels, rebases and commits before serving, or stops the record with the conflict named. Nothing does it today.",
-  );
+  let rebased = false;
+  let committed = false;
+  const r = levelRecordTree(ROOT, RECORD, {
+    rebase: () => {
+      rebased = true;
+      return { ok: true };
+    },
+    commit: () => {
+      committed = true;
+      return { ok: true };
+    },
+  });
+  assert.equal(r.levelled, true);
+  assert.equal(rebased, true, "the delta is rebased on trunk");
+  assert.equal(committed, true, "and what it brought is committed before anything serves");
 });
 
 test("a stale override stops the record at entry rather than composing a mixture", () => {
-  const stops = typeof (paths as Record<string, unknown>).levelRecordTree === "function";
-  assert.equal(
-    stops,
-    true,
-    "RED by design. This is the fourth cell of the table — an override that no longer applies to the trunk file beneath it. if-engine-delta-to-account carries the report; nothing raises it.",
+  const r = levelRecordTree(ROOT, RECORD, {
+    rebase: () => ({ ok: false, conflict: "session.ts: both modified" }),
+    commit: () => {
+      throw new Error("a record that did not level must never commit");
+    },
+  });
+  assert.equal(r.levelled, false, "a partial levelling never serves");
+  assert.equal(r.conflict, "session.ts: both modified", "the conflict is NAMED, not summarised");
+});
+
+test("a levelling that cannot commit is not a levelling", () => {
+  const r = levelRecordTree(ROOT, RECORD, { rebase: () => ({ ok: true }), commit: () => ({ ok: false }) });
+  assert.equal(r.levelled, false, "all-or-nothing means the commit is part of it");
+});
+
+test("a replacement that will not load leaves the working composition serving", () => {
+  const r = replaceComposition(
+    "the engine that works",
+    () => "the broken delta",
+    (c) => ({ ok: c !== "the broken delta", why: "it does not load" }),
   );
+  assert.equal(r.serving, "the engine that works", "nginx rolls back to the old workers, and so do we");
+  assert.equal(r.replaced, false);
+  assert.equal(r.why, "it does not load");
+});
+
+test("a replacement that loads takes over", () => {
+  const r = replaceComposition(
+    "old",
+    () => "new",
+    () => ({ ok: true }),
+  );
+  assert.equal(r.serving, "new");
+  assert.equal(r.replaced, true);
+});
+
+test("the watch deadline sits above the slowest measured death", () => {
+  assert.equal(deadlineIsSafe(WATCH.deadlineMs), true, "a crash took 94.1 ms to reach the caller in exp-inflight-death");
+  assert.equal(deadlineIsSafe(50), false, "a deadline under that would call a crash a hang");
 });

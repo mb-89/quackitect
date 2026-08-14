@@ -156,6 +156,11 @@ export class McpServer {
           });
         case "ping":
           return this.ok(id, {});
+        // THE ONE EXIT THE BOUND CANNOT COVER (i27, 2026-08-14). A tools list
+        // must arrive as a tools ARRAY the client can parse, so paging it
+        // into a text page would leave the agent with no tools at all. It is
+        // kept small by keeping DESCRIPTIONS short, which is authorship
+        // rather than mechanism, and this comment is the only guard there is.
         case "tools/list":
           return this.ok(id, {
             tools: [...this.tools.values()].map((t) => ({
@@ -192,8 +197,11 @@ export class McpServer {
               // Rejections are results, not protocol errors: the model must
               // read clause + executable remedy and recover in one turn.
               this.observe({ tool: name, args, ok: false, duration_ms: Date.now() - started, outcome: "rejected", response: e.toJSON() });
+              // THE BOUND HOLDS ON REFUSALS TOO. An unreadable refusal is
+              // worse than an unreadable result: the reason a submit was
+              // rejected sits inside it, and no cheap question answers it.
               return this.ok(id, {
-                content: [{ type: "text", text: JSON.stringify(e.toJSON(), null, 1) }],
+                content: [{ type: "text", text: boundAnswer(`${name}-refused`, e.toJSON()).text }],
                 isError: true,
               });
             }
@@ -205,8 +213,13 @@ export class McpServer {
               outcome: "errored",
               response: String((e as Error).message),
             });
+            // BOUNDED LIKE THE OTHER TWO. An error's message can carry a
+            // whole stack or a whole file, and an unreadable error is the
+            // worst of the three: there is no remedy in it to follow.
             return this.ok(id, {
-              content: [{ type: "text", text: JSON.stringify({ kind: "errored", message: String((e as Error).message) }) }],
+              content: [
+                { type: "text", text: boundAnswer(`${name}-errored`, { kind: "errored", message: String((e as Error).message) }).text },
+              ],
               isError: true,
             });
           }
@@ -215,7 +228,14 @@ export class McpServer {
           return this.err(id, -32601, `method not found: ${msg.method}`);
       }
     } catch (e) {
-      return this.err(id, -32603, `internal: ${String((e as Error).message)}`);
+      // THE LAST EXIT, and it is bounded too. A protocol-level error carries
+      // no remedy, so all it can do is be readable.
+      const message = String((e as Error).message);
+      return this.err(
+        id,
+        -32603,
+        `internal: ${message.length > 4000 ? `${message.slice(0, 4000)} … (${message.length} chars, the whole of it is in the call log)` : message}`,
+      );
     }
   }
 
