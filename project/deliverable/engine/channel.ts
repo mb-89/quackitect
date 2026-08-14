@@ -40,9 +40,20 @@ export interface Up {
   body: unknown;
 }
 
-/** Whatever actually carries a message to the other process, injected so the
- *  clause and the routing are testable without two processes. */
-export type Crossing = (down: Down) => Up;
+/** Whatever actually carries a message to the other side, injected so the
+ *  clause and the routing are testable without two processes.
+ *
+ *  IT IS ASYNCHRONOUS, AND IT HAS TO BE. The first cut of this type was
+ *  synchronous, and that was a contract no real boundary could keep: a child
+ *  process answers over IPC and a worker thread over a message port, and
+ *  neither returns on the same tick. A synchronous crossing can only ever be
+ *  the inline one, so a synchronous type would have made the fast path the
+ *  only path — the exact failure `transports.ts` warns about, baked into the
+ *  signature instead of the implementation.
+ *
+ *  Found on 2026-08-14, writing the second transport against a contract the
+ *  first one had shaped. */
+export type Crossing = (down: Down) => Promise<Up>;
 
 /** THE NAMING CLAUSE, as a function, so it reads the same everywhere it is
  *  applied. An answer names a store or it does not cross. */
@@ -73,12 +84,12 @@ export class Channel {
    *
    *  A call the core owns never crosses at all. Paying 144 microseconds to
    *  ask a satellite about trunk would be a crossing bought for nothing. */
-  send(rel: string, payload: unknown, caller?: string): Delivered {
+  async send(rel: string, payload: unknown, caller?: string): Promise<Delivered> {
     const routed = this.core.route(rel, caller);
     if (routed.to === "core" || routed.satellite === undefined) {
       return { from: "core", store: this.core.trunk, body: undefined };
     }
-    const up = this.cross({ record: routed.satellite.record, rel, payload });
+    const up = await this.cross({ record: routed.satellite.record, rel, payload });
     if (!namesItsStore(up)) {
       throw new Error(
         `${routed.satellite.record} answered without naming its store — an answer that crossed a process boundary and cannot say which tree produced it is one nobody can check`,

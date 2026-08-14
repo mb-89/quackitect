@@ -5,6 +5,8 @@ comma_chain_items: 3
 comma_chain_min_item_words: 2
 dash_chain_items: 3
 pyramid_paragraphs: 5
+blocking:
+  - wall
 ---
 
 # Voice lint — the rule parameters
@@ -37,6 +39,29 @@ in engine/lint.ts; only parameters belong here.
   grew past one thought and wants splitting.
 - `pyramid_paragraphs` — a document with this many paragraphs and no
   headings wants the pyramid shape.
+- `blocking` — which rules REFUSE a form submit. Everything else is
+  reported beside the form and lets the submit through.
+
+## WHICH RULES BITE IS DATA, and this is where you set it
+
+The voice lint runs at every form submit. What it does with a finding is
+this list's decision, not the engine's.
+
+A rule NAMED here refuses the submit, and the refusal quotes the line.
+A rule not named here is reported and does not stop anybody.
+
+`wall` IS THE DEFAULT AND THE ONLY ONE, because it is already law
+everywhere else: SE-C-125 refuses a wall of prose at the lane, and a
+renderer cannot invent the paragraphs an author did not write. Adding it
+here makes one rule behave the same way in both places.
+
+WHY THE OTHERS ARE NOT ON IT BY DEFAULT. A gate that can only say yes
+teaches people to skim, and so does one that says no about a comma. Start
+with the rule that is already binding, watch what the reports say, and add
+the next one deliberately.
+
+The names are the rules' own: `wall`, `long-sentence`, `comma-chain`,
+`dash-chain`, `sentence-run`, `item-grew`, `pyramid`, `external-link`.
 
 ## Why the last three exist
 

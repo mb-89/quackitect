@@ -17,6 +17,7 @@ import { CLAUSES, Rejection } from "./errors.ts";
 import { appendNote, pendingNotes, readNotes } from "./inbox.ts";
 import { bumpDrawingEpoch } from "./machines/compile.ts";
 import { handleHttp, type McpServer } from "./mcp.ts";
+import { MODE_HELP, RUN_MODES, readMode } from "./mode.ts";
 import { subscribeModelMutations } from "./model-fs.ts";
 import { beginPass, endPass } from "./notes.ts";
 import { loadPanel, renderPanel } from "./params.ts";
@@ -179,6 +180,19 @@ export function startMirror(o: MirrorOptions): Server {
       (body) => {
         const result = state.session.setAutonomy(Number(body.value));
         return { args: { value: body.value, ...(typeof result.tier === "string" ? { tier: result.tier } : {}) }, result };
+      },
+    ],
+    // WHERE SATELLITES RUN. The launch flag decides the CURRENT run; this
+    // stores the choice for the next one, and the answer says so rather than
+    // pretending the boundary moved under a walk in flight.
+    //
+    // IT IS THE ONLY CONTROL SOME HOSTS HAVE. The VS Code extension launches
+    // from a fixed .mcp.json with no command line, so --mode never reaches it.
+    "/mode": [
+      "mirror_mode",
+      (body) => {
+        const result = state.session.setRunMode(String(body.value ?? ""));
+        return { args: { value: body.value, applies: result.applies }, result };
       },
     ],
     // ONE OWED CELL PER CLICK from the element matrix — the interface
@@ -659,6 +673,15 @@ export function startMirror(o: MirrorOptions): Server {
           autonomy: loadLevels(state.root),
           power: state.session.power,
           narration: { minutes: state.session.narrationMinutes, calls: state.session.narrationCalls },
+          // The run modes ride the same answer, for the same reason: a host
+          // that kept its own list of three would drift when a fourth lands.
+          // `running` is this process; `stored` is what the next launch takes.
+          run: {
+            modes: RUN_MODES,
+            help: MODE_HELP,
+            running: state.session.runningMode(),
+            stored: readMode(state.root),
+          },
         }),
       );
     },

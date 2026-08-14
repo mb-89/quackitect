@@ -30,9 +30,9 @@ had it to the matrix that needs it.
 fires at the NEXT record's opening. The knowledge has to survive the seam in
 somebody's head or in a note.
 
-## The record cannot write the method, and that is deliberate
+## The record may write the method, and the emit is still owed
 
-SE-C-134 refuses a method write while a record is bound. These are SHARED:
+These paths are SHARED:
 
 - guidance
 - machines
@@ -41,12 +41,20 @@ SE-C-134 refuses a method write while a record is bound. These are SHARED:
 - the engine
 - the tests
 
-The reason is not caution. A write to one while bound lands in that record's
-worktree and fans out from there, pushing the record's copy over trunk. It
-happened twice on 2026-08-07, and the first time it deleted two lane verbs.
+A write to any of them resolves to the MACHINE ROOT, whatever tree is bound.
+It lands on the one copy. It cannot land in the record's worktree and fan out
+over trunk from there.
 
-SO THE EMIT IS A CAPTURE, NEVER A WRITE. The record names what should change
-and why. The change itself is made unbound.
+THAT USED TO BE A REFUSAL. SE-C-134 blocked the write outright. The reason was
+real: on 2026-08-07 such a write pushed a record's copy over trunk and deleted
+two lane verbs. The resolution seam removed the danger by construction, so the
+owner retired the clause on 2026-08-14.
+
+SO THE EMIT IS STILL OWED, FOR A DIFFERENT REASON. The write fixes the method.
+It tells the next record nothing. `promotions` at onboard-retro reads this
+list and nothing else.
+
+Make the change where you stand. Name it here as well.
 
 ## How to emit
 
@@ -55,7 +63,7 @@ and the change.
 
     matrix M3_10 — set question for behaviour models, after the claim gap
     meth-ears — the exempt clause needs an example
-    guidance/refusals.md — SE-C-134 wants the escape call spelled out
+    guidance/refusals.md — a clause fired without naming its remedy
 
 State `none-found` plainly where there is nothing. A blank reads as done and
 is worth less than a named gap.
@@ -74,14 +82,15 @@ record's output, not the method's.
 
 ## Where it lands
 
-The list is a HANDOFF, not a change. Two things consume it:
+The list is a HANDOFF. Two things consume it:
 
 - The next record's `promotions` field at onboard-retro, which is where the
   look is owed.
-- Whoever is unbound at the desk, who can make the edit immediately.
+- Anyone who makes the edit immediately, bound or not.
 
 The second is faster and is preferred when the change is small and settled.
-An escape, an edit, and an aim back is one turn.
+It is one call now. The escape, the edit at the desk and the aim back were
+the old refusal's cost, and that refusal is retired.
 
 ## Later
 

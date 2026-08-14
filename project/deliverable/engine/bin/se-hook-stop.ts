@@ -128,6 +128,21 @@ process.stdin.on("end", () => {
     if (pull === "wait" && target === "") process.exit(0);
     const where = Array.isArray(last.where) ? (last.where as unknown[]).join(", ") : String(last.where ?? "");
     const aimed = pull === "wait";
+    // THE ONLY STOPS THAT ARE SANCTIONED, named rather than implied (owner
+    // ruling 2026-08-14: "you don't need to stop working unless I explicitly
+    // told you to or you need a decision from me").
+    //
+    // The old wording said only "a question that BLOCKS", and that was read as
+    // covering any question the agent felt uncertain about. It is narrower
+    // than that: the walk stops where a PERSON is genuinely required, or where
+    // it cannot go on.
+    const SANCTIONED =
+      "THREE STOPS ARE SANCTIONED AND NOTHING ELSE IS. " +
+      "(1) A GATE THE PERSON OWNS — gate-implementation is theirs to bless; the rest are yours at this dial. " +
+      "(2) A DECISION ONLY THEY CAN MAKE — no answer you could pick would let the walk continue honestly. " +
+      "(3) SOMETHING BROKE and no remedy gets you past it. " +
+      "Being unsure is not one. Having a lot left is not one. Having just finished a piece is not one. " +
+      "Stopping for one of the three? Say which, in one line, and stop again — this tooth bites once per stop.";
     process.stdout.write(
       JSON.stringify({
         decision: "block",
@@ -136,13 +151,11 @@ process.stdin.on("end", () => {
             (where !== "" ? `, standing at ${where}` : "") +
             '. The pull answered "wait" because nothing routed FROM HERE, which is not the same as nothing to do. ' +
             "Take the door that leads toward the target and keep walking. " +
-            "If you are stopped on a question that BLOCKS (no answer could let the walk continue from here), " +
-            "ask it in one line and stop again; this tooth bites once per stop."
+            SANCTIONED
           : `[se] The walk stands mid-work: the last pull answered "${pull}"` +
             (where !== "" ? ` at ${where}` : "") +
             ". A report is not a checkpoint and size is not a reason — call se_pull and keep walking. " +
-            "If you are stopped on a question that BLOCKS (no answer could let the walk continue from here), " +
-            "ask it in one line and stop again; this tooth bites once per stop.",
+            SANCTIONED,
       }),
     );
   } catch {

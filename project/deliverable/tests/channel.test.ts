@@ -21,35 +21,36 @@ function wired(cross: Crossing): { core: Core; channel: Channel } {
   return { core, channel: new Channel(core, cross) };
 }
 
-/** A satellite that answers properly, naming the tree it resolved against. */
-const honest: Crossing = (down) => ({ store: SAT_TREE, body: `served ${down.rel}` });
+/** A satellite that answers properly, naming the tree it resolved against.
+ *  ASYNC, because no real boundary answers on the same tick. */
+const honest: Crossing = async (down) => ({ store: SAT_TREE, body: `served ${down.rel}` });
 
 describe("the crossing", { concurrency: true }, () => {
-  test("a call the CORE owns never crosses — a crossing bought for nothing is still bought", () => {
+  test("a call the CORE owns never crosses — a crossing bought for nothing is still bought", async () => {
     let crossed = 0;
-    const { channel } = wired((down) => {
+    const { channel } = wired(async (down) => {
       crossed++;
       return { store: SAT_TREE, body: down.rel };
     });
 
-    const out = channel.send(anyGuidanceDoc(), {});
+    const out = await channel.send(anyGuidanceDoc(), {});
     assert.equal(out.from, "core");
     assert.equal(out.store, TRUNK, "the core names its own trunk");
     assert.equal(crossed, 0, "shared method is the core's, so nothing is asked of a satellite");
   });
 
-  test("a call the satellite owns crosses, and the answer names the store it came from", () => {
+  test("a call the satellite owns crosses, and the answer names the store it came from", async () => {
     const { channel } = wired(honest);
-    const out = channel.send(OWNED, { some: "payload" });
+    const out = await channel.send(OWNED, { some: "payload" });
 
     assert.equal(out.from, "satellite");
     assert.equal(out.store, SAT_TREE, "the answer says WHICH tree produced it");
     assert.equal(out.satellite?.record, "i27-x");
   });
 
-  test("AN ANSWER THAT NAMES NO STORE IS REFUSED, because nobody could check it", () => {
-    const { channel } = wired(() => ({ store: "", body: "trust me" }) as never);
-    assert.throws(() => channel.send(OWNED, {}), /naming its store/, "the clause rides the crossing, not the caller's memory");
+  test("AN ANSWER THAT NAMES NO STORE IS REFUSED, because nobody could check it", async () => {
+    const { channel } = wired(async () => ({ store: "", body: "trust me" }) as never);
+    await assert.rejects(() => channel.send(OWNED, {}), /naming its store/, "the clause rides the crossing, not the caller's memory");
   });
 
   test("the clause reads the same wherever it is applied", () => {
@@ -58,14 +59,14 @@ describe("the crossing", { concurrency: true }, () => {
     assert.equal(namesItsStore(undefined), false);
   });
 
-  test("an unattached record falls back to the core rather than crossing to nowhere", () => {
+  test("an unattached record falls back to the core rather than crossing to nowhere", async () => {
     let crossed = 0;
-    const { channel } = wired((down) => {
+    const { channel } = wired(async (down) => {
       crossed++;
       return { store: SAT_TREE, body: down.rel };
     });
 
-    const out = channel.send("project/spec/iterations/i99-nobody/evidence/a.md", {});
+    const out = await channel.send("project/spec/iterations/i99-nobody/evidence/a.md", {});
     assert.equal(out.from, "core");
     assert.equal(crossed, 0);
   });

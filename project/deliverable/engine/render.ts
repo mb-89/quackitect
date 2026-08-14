@@ -546,6 +546,9 @@ const BRIEFS: Record<string, (a: Record<string, unknown>) => string> = {
   // the cut-over carries no word, and says so rather than drawing the
   // number alone (req-autonomy-is-categorical).
   mirror_autonomy: (a) => (typeof a.tier === "string" ? `autonomy → ${a.tier} (${a.value})` : `autonomy → ${a.value} (tier not recorded)`),
+  // The boundary is chosen at launch, so the feed says WHEN it takes effect
+  // rather than implying the walk just changed transport underfoot.
+  mirror_mode: (a) => `satellites → ${a.value} (${a.applies})`,
   mirror_narration: (a) => `updates → ${a.value}`,
   mirror_script: (a) => `run scripts · ${a.state}`,
   se_update: (a) => {
