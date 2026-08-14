@@ -811,3 +811,11 @@
 {"ts":"2026-08-14T18:40:29.214Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d83","brief":"the prior-art-at-every-gate idea is noted for the retro"}
 {"ts":"2026-08-14T18:41:25.095Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d84","brief":"handover carries the rework, the corrections and the open design question"}
 {"ts":"2026-08-14T18:41:30.197Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d85","brief":"committing the note and the discussion record"}
+{"ts":"2026-08-14T18:44:52.940Z","op":"plan","visit":"iterations/i27/gate-implementation@0","parent":null,"nodes":[{"id":"d86","brief":"answer what is cached and what the flag costs"}]}
+{"ts":"2026-08-14T18:47:01.463Z","op":"plan","visit":"iterations/i27/gate-implementation@0","parent":null,"nodes":[{"id":"d87","brief":"define the process mode and thread it through startup"},{"id":"d88","brief":"give core and channel a live caller"},{"id":"d89","brief":"expose the mode so the UI can flip it"}]}
+{"ts":"2026-08-14T18:47:41.503Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d86","brief":"the caching answer is recorded"}
+{"ts":"2026-08-14T18:47:58.736Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d90","brief":"testing the mode setting"}
+{"ts":"2026-08-14T18:48:42.290Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d91","brief":"the modes are process and thread; fused is not an option"}
+{"ts":"2026-08-14T18:49:25.929Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d87","brief":"three transports over one architecture, process by default"}
+{"ts":"2026-08-14T18:49:43.517Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d92","brief":"tests follow the three transports"}
+{"ts":"2026-08-14T18:50:01.344Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d93","brief":"committing the three-transport mode"}
