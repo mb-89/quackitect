@@ -108,3 +108,53 @@ test("an absent log passes rather than breaking the turn", () => {
   assert.equal(r.status, 0);
   assert.equal(r.stdout.trim(), "");
 });
+
+// THE CALL LOG STORES A RESPONSE AS A STRING, and a long one is stored CUT.
+// Every test above hands the hook an OBJECT, which is why the string path was
+// never exercised and the tooth was toothless in the field.
+//
+// FOUND LIVE 2026-08-14. The hook passed a mid-work stop twice against the
+// real log. Every recent pull's response was too long to store whole, so
+// JSON.parse threw, the line was skipped as torn, and no pull was ever found.
+
+const pullString = (response: string): object => ({
+  ref: "call-000000000002",
+  ts: "2026-08-09T16:00:00.000Z",
+  tool: "se_pull",
+  args: {},
+  ok: true,
+  outcome: "result",
+  response,
+});
+
+test("a response stored as a whole STRING still blocks", () => {
+  const out = verdict([pullString(JSON.stringify({ pull: "do", where: ["retro"], target: "" }))], {});
+  const d = JSON.parse(out) as { decision: string; reason: string };
+  assert.equal(d.decision, "block");
+  assert.match(d.reason, /"do" at retro/);
+});
+
+test("a response stored TRUNCATED still blocks — the tooth must not need the whole answer", () => {
+  // Exactly what the log holds: the head of a huge fill, cut mid-object.
+  const cut =
+    '{"pull":"fill","where":["iterations/i27/build-steps/delta-compose"],"target":"front_desk","forms":[{"state_form":true,"title":"Evi';
+  const out = verdict([pullString(cut)], {});
+  assert.notEqual(out, "", "a cut response must not silently pass the stop");
+  const d = JSON.parse(out) as { decision: string; reason: string };
+  assert.equal(d.decision, "block");
+  assert.match(d.reason, /fill/, "the reason still names the pull");
+  assert.match(d.reason, /delta-compose/, "and still names where the walk stands");
+});
+
+test("a truncated WAIT with no target still passes — the fix must not make the tooth bite the machine's own stop", () => {
+  const cut = '{"pull":"wait","where":["front_desk"],"target":"","forms":[{"state_form":true,"title":"Evi';
+  assert.equal(verdict([pullString(cut)], {}), "", "the desk with nothing routed is sanctioned, cut or whole");
+});
+
+test("a truncated wait WITH a target still blocks", () => {
+  const cut = '{"pull":"wait","where":["front_desk"],"target":"iterations/i27/specify-build","forms":[{"state_form":true';
+  const out = verdict([pullString(cut)], {});
+  const d = JSON.parse(out) as { decision: string; reason: string };
+  assert.equal(d.decision, "block");
+  assert.match(d.reason, /A target is set/);
+});
