@@ -606,3 +606,78 @@
 {"ts":"2026-08-14T14:45:11.134Z","op":"update","visit":"iterations/i27/gate-prototype@2","node":"d571","brief":"testing whether green ripples forward from the blessed gate"}
 {"ts":"2026-08-14T14:45:27.177Z","op":"update","visit":"iterations/i27/gate-prototype@2","node":"d572","brief":"asking the why-verb about the state the guard names"}
 {"ts":"2026-08-14T14:46:01.995Z","op":"update","visit":"iterations/i27/gate-prototype@2","node":"d573","brief":"reloading so the guard and the why-verb share one mechanism"}
+{"ts":"2026-08-14T14:48:07.342Z","op":"done","visit":"front_desk@0","node":"d4","brief":"the reload fixed it — eleven states rippled green"}
+{"ts":"2026-08-14T14:48:14.293Z","op":"update","visit":"iterations/i27/write-requirements@0","node":"d8","brief":"reading the register list"}
+{"ts":"2026-08-14T14:48:29.408Z","op":"update","visit":"iterations/i27/write-requirements@0","node":"d9","brief":"dropping the deleted row from the register"}
+{"ts":"2026-08-14T14:48:33.981Z","op":"update","visit":"iterations/i27/write-requirements@0","node":"d10","brief":"re-earning write-requirements"}
+{"ts":"2026-08-14T14:48:39.142Z","op":"update","visit":"iterations/i27/write-requirements@0","node":"d11","brief":"walking on toward specify-build"}
+{"ts":"2026-08-14T14:49:09.548Z","op":"update","visit":"iterations/i27/cut-criteria@0","node":"d12","brief":"locating the struck row in the cuts table"}
+{"ts":"2026-08-14T14:49:25.637Z","op":"defer","visit":"front_desk@0","node":"d6","brief":"note the landing conflict","to":"specify-build","hops":1,"trail":["front_desk","specify-build"]}
+{"ts":"2026-08-14T14:49:39.475Z","op":"update","visit":"iterations/i27/cut-criteria@0","node":"d13","brief":"cutting the dangling ref out of the ranked list"}
+{"ts":"2026-08-14T14:49:43.500Z","op":"update","visit":"iterations/i27/cut-criteria@0","node":"d14","brief":"re-earning cut-criteria"}
+{"ts":"2026-08-14T14:49:47.476Z","op":"update","visit":"iterations/i27/cut-criteria@0","node":"d15","brief":"walking on"}
+{"ts":"2026-08-14T14:53:45.988Z","op":"done","visit":"front_desk@0","node":"d5","brief":"specify-build reached; the reopen lesson answered"}
+{"ts":"2026-08-14T14:53:50.517Z","op":"plan","visit":"iterations/i27/specify-build@0","parent":null,"nodes":[{"id":"d16","brief":"fix the landing conflict"},{"id":"d17","brief":"author the design specs"},{"id":"d18","brief":"seed the chunk machine"},{"id":"d19","brief":"submit specify-build"}]}
+{"ts":"2026-08-14T14:53:56.745Z","op":"update","visit":"iterations/i27/specify-build@0","node":"d20","brief":"reading trunk's copy of the settings file"}
+{"ts":"2026-08-14T14:54:13.238Z","op":"done","visit":"iterations/i27/specify-build@0","node":"d16","brief":"the two copies are byte-identical, so the add/add resolves"}
+{"ts":"2026-08-14T14:54:24.727Z","op":"update","visit":"iterations/i27/specify-build@0","node":"d21","brief":"listing the standing design specs"}
+{"ts":"2026-08-14T14:54:35.154Z","op":"update","visit":"iterations/i27/specify-build@0","node":"d22","brief":"checking whether the five new elements are realized anywhere"}
+{"ts":"2026-08-14T14:54:47.555Z","op":"update","visit":"iterations/i27/specify-build@0","node":"d23","brief":"reading the design-spec template and an example"}
+{"ts":"2026-08-14T14:55:20.309Z","op":"update","visit":"iterations/i27/specify-build@0","node":"d24","brief":"the seam's design spec"}
+{"ts":"2026-08-14T14:55:41.079Z","op":"update","visit":"iterations/i27/specify-build@0","node":"d25","brief":"the core and satellite design spec"}
+{"ts":"2026-08-14T14:56:20.937Z","op":"done","visit":"iterations/i27/specify-build@0","node":"d17","brief":"four design specs cover the five new elements"}
+{"ts":"2026-08-14T14:57:04.676Z","op":"update","visit":"iterations/i27/specify-build@0","node":"d26","brief":"twelve chunks in six lots, two lenses recorded"}
+{"ts":"2026-08-14T14:57:27.771Z","op":"done","visit":"iterations/i27/specify-build@0","node":"d18","brief":"twelve chunks in six lots, two lenses recorded"}
+{"ts":"2026-08-14T14:57:38.825Z","op":"update","visit":"iterations/i27/specify-build@0","node":"d27","brief":"learning what specify-build still wants"}
+{"ts":"2026-08-14T14:57:57.636Z","op":"update","visit":"iterations/i27/specify-build@0","node":"d28","brief":"asking for the form's served shape"}
+{"ts":"2026-08-14T14:58:09.175Z","op":"update","visit":"iterations/i27/specify-build@0","node":"d29","brief":"correcting the delta spec's compiler path"}
+{"ts":"2026-08-14T14:59:05.935Z","op":"done","visit":"iterations/i27/specify-build@0","node":"d19","brief":"specify-build filled and submitted"}
+{"ts":"2026-08-14T14:59:28.453Z","op":"update","visit":"iterations/i27/specify-build@0","node":"d30","brief":"confirming specify-build stamped"}
+{"ts":"2026-08-14T15:03:20.904Z","op":"plan","visit":"iterations/i27/specify-build@0","parent":null,"nodes":[{"id":"d31","brief":"note the linkable-mentions idea"},{"id":"d32","brief":"observe the eight reds"},{"id":"d33","brief":"start the build"}]}
+{"ts":"2026-08-14T15:03:25.221Z","op":"done","visit":"iterations/i27/specify-build@0","node":"d31","brief":"linkable mentions noted as note-e0b6769a3a5a"}
+{"ts":"2026-08-14T15:03:45.974Z","op":"update","visit":"iterations/i27/specify-build@0","node":"d34","brief":"reassigning the two standing promotions to this drawing"}
+{"ts":"2026-08-14T15:03:58.779Z","op":"update","visit":"iterations/i27/specify-build@0","node":"d35","brief":"re-submitting with both promotions placed"}
+{"ts":"2026-08-14T15:04:18.309Z","op":"update","visit":"iterations/i27/specify-build@0","node":"d36","brief":"amending the promotions table and its wrong explanation"}
+{"ts":"2026-08-14T15:04:22.511Z","op":"update","visit":"iterations/i27/specify-build@0","node":"d37","brief":"walking to observe-red"}
+{"ts":"2026-08-14T15:05:57.626Z","op":"done","visit":"iterations/i27/specify-build@0","node":"d32","brief":"the ten non-test specs ruled, one inspection actually run"}
+{"ts":"2026-08-14T15:06:29.571Z","op":"update","visit":"iterations/i27/build-steps/seam-route@0","node":"d38","brief":"confirming observe-red stamped"}
+{"ts":"2026-08-14T15:11:14.815Z","op":"plan","visit":"iterations/i27/build-steps/seam-route@0","parent":null,"nodes":[{"id":"d39","brief":"open the build machine"},{"id":"d40","brief":"seam-resolve: the store on the answer, with write-then-read-back cases"},{"id":"d41","brief":"seam-route: route a call naming another owner"}]}
+{"ts":"2026-08-14T15:11:49.705Z","op":"update","visit":"iterations/i27/build-steps/seam-route@0","node":"d42","brief":"stepping out once to build a stretch"}
+{"ts":"2026-08-14T15:21:13.534Z","op":"update","visit":"iterations/i27/rank-unknowns@1","node":"d72","brief":"resuming the walk back after a timeout"}
+{"ts":"2026-08-14T15:21:27.128Z","op":"update","visit":"iterations/i27/build-steps/seam-route@1","node":"d73","brief":"pulling again after the replay error"}
+{"ts":"2026-08-14T15:22:07.900Z","op":"done","visit":"front_desk@1","node":"d68","brief":"back in the build machine with seam-route signed"}
+{"ts":"2026-08-14T15:22:15.846Z","op":"plan","visit":"iterations/i27/build-steps/seam-route@1","parent":null,"nodes":[{"id":"d74","brief":"fill seam-resolve"},{"id":"d75","brief":"fill answer-bound"},{"id":"d76","brief":"fill refusal-remedies"},{"id":"d77","brief":"fill delta-compose"}]}
+{"ts":"2026-08-14T15:22:46.116Z","op":"update","visit":"iterations/i27/build-steps/seam-resolve@0","node":"d78","brief":"filling seam-resolve"}
+{"ts":"2026-08-14T15:22:52.579Z","op":"done","visit":"iterations/i27/build-steps/seam-route@1","node":"d74","brief":"seam-resolve filled"}
+{"ts":"2026-08-14T15:23:14.502Z","op":"update","visit":"iterations/i27/build-steps/seam-sweep@0","node":"d79","brief":"aiming at answer-bound"}
+{"ts":"2026-08-14T15:23:24.194Z","op":"update","visit":"iterations/i27/build-steps/seam-sweep@0","node":"d80","brief":"walking to answer-bound"}
+{"ts":"2026-08-14T15:23:41.201Z","op":"update","visit":"iterations/i27/build-steps/seam-sweep@0","node":"d81","brief":"stepping out to build seam-sweep"}
+{"ts":"2026-08-14T15:51:46.174Z","op":"update","visit":"iterations/i27/rank-unknowns@2","node":"d185","brief":"resuming after the timeout"}
+{"ts":"2026-08-14T15:52:02.048Z","op":"update","visit":"iterations/i27/build-steps/seam-sweep@1","node":"d186","brief":"pulling again after the replay error"}
+{"ts":"2026-08-14T15:52:24.737Z","op":"update","visit":"iterations/i27/build-steps/seam-sweep@1","node":"d187","brief":"filling seam-sweep"}
+{"ts":"2026-08-14T15:52:30.410Z","op":"done","visit":"front_desk@2","node":"d179","brief":"seam-sweep filled"}
+{"ts":"2026-08-14T15:52:44.847Z","op":"update","visit":"iterations/i27/build-steps/seam-sweep@1","node":"d188","brief":"aiming at answer-bound"}
+{"ts":"2026-08-14T15:52:52.812Z","op":"update","visit":"iterations/i27/build-steps/seam-sweep@1","node":"d189","brief":"walking to answer-bound"}
+{"ts":"2026-08-14T15:53:14.768Z","op":"update","visit":"iterations/i27/build-steps/answer-bound@0","node":"d190","brief":"filling answer-bound"}
+{"ts":"2026-08-14T15:53:20.456Z","op":"done","visit":"front_desk@2","node":"d180","brief":"answer-bound filled"}
+{"ts":"2026-08-14T15:53:35.873Z","op":"update","visit":"iterations/i27/build-steps/answer-bound@0","node":"d191","brief":"aiming at refusal-remedies"}
+{"ts":"2026-08-14T15:53:44.141Z","op":"update","visit":"iterations/i27/build-steps/answer-bound@0","node":"d192","brief":"walking to refusal-remedies"}
+{"ts":"2026-08-14T15:53:57.746Z","op":"update","visit":"iterations/i27/build-steps/refusal-remedies@0","node":"d193","brief":"stepping out to finish the chunk"}
+{"ts":"2026-08-14T16:12:51.560Z","op":"update","visit":"iterations/i27/rank-unknowns@3","node":"d254","brief":"resuming the walk"}
+{"ts":"2026-08-14T16:13:07.865Z","op":"update","visit":"iterations/i27/build-steps/delta-compose@0","node":"d255","brief":"resuming the walk"}
+{"ts":"2026-08-14T16:13:15.791Z","op":"update","visit":"iterations/i27/build-steps/delta-compose@0","node":"d256","brief":"proving the hook bites mid-work"}
+{"ts":"2026-08-14T16:13:32.336Z","op":"update","visit":"iterations/i27/build-steps/delta-compose@0","node":"d257","brief":"isolating logic from root"}
+{"ts":"2026-08-14T16:14:06.272Z","op":"done","visit":"front_desk@3","node":"d247","brief":"boot proven green; the hook is what is left"}
+{"ts":"2026-08-14T16:14:21.949Z","op":"plan","visit":"iterations/i27/build-steps/delta-compose@0","parent":null,"nodes":[{"id":"d258","brief":"find why the hook does not bite"},{"id":"d259","brief":"write the handover"}]}
+{"ts":"2026-08-14T16:14:51.239Z","op":"update","visit":"iterations/i27/build-steps/delta-compose@0","node":"d260","brief":"stepping out to fix the hook"}
+{"ts":"2026-08-14T16:27:44.505Z","op":"done","visit":"front_desk@0","node":"d6","brief":"walk arrived at i27 build-steps/delta-compose"}
+{"ts":"2026-08-14T16:28:23.399Z","op":"plan","visit":"iterations/i27/build-steps/delta-compose@0","parent":null,"nodes":[{"id":"d9","brief":"verify delta-compose green"},{"id":"d10","brief":"fill and submit the delta-compose form"},{"id":"d11","brief":"walk on to supervisor-level"}]}
+{"ts":"2026-08-14T16:28:29.627Z","op":"done","visit":"iterations/i27/build-steps/delta-compose@0","node":"d9","brief":"bound-engine.test.ts 15 of 15 green, job test-mst5vivp-1"}
+{"ts":"2026-08-14T16:28:52.658Z","op":"update","visit":"iterations/i27/build-steps/delta-compose@0","node":"d12","brief":"submitting the delta-compose evidence form"}
+{"ts":"2026-08-14T16:29:22.491Z","op":"done","visit":"iterations/i27/build-steps/delta-compose@0","node":"d10","brief":"delta-compose submitted; walk moved to supervisor-level"}
+{"ts":"2026-08-14T16:30:17.777Z","op":"done","visit":"iterations/i27/build-steps/delta-compose@0","node":"d11","brief":"at supervisor-level; submitting its evidence"}
+{"ts":"2026-08-14T16:32:35.743Z","op":"update","visit":"iterations/i27/build-steps/supervisor-watch@0","node":"d13","brief":"SE-C-134 fired; escaping to the desk to write the engine"}
+{"ts":"2026-08-14T16:36:10.349Z","op":"update","visit":"iterations/i27/build-steps/supervisor-watch@1","node":"d20","brief":"filling supervisor-watch"}
+{"ts":"2026-08-14T16:36:40.187Z","op":"update","visit":"iterations/i27/build-steps/supervisor-watch@1","node":"d21","brief":"answering the owner on the escape tax and the pull errors"}
+{"ts":"2026-08-14T16:39:24.486Z","op":"update","visit":"iterations/i27/build-steps/core-process@0","node":"d22","brief":"recorded the walk-back defect; reading the core-and-satellite design next"}
+{"ts":"2026-08-14T16:40:34.935Z","op":"plan","visit":"iterations/i27/build-steps/core-process@0","parent":null,"nodes":[{"id":"d23","brief":"checkpoint the record's evidence on its branch"},{"id":"d24","brief":"declare this product self-hosting so the guard cannot fire"},{"id":"d25","brief":"kill SE-C-134 and route the write instead"}]}

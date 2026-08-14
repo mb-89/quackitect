@@ -37,7 +37,6 @@ WHAT CAME BEFORE THIS PASS, unchanged. The solution-freedom rework restated req-
 - project/spec/trace/requirement/req-a-method-change-reaches-every-tree.md
 - project/spec/trace/requirement/req-parallel-iterations-own-worktrees.md
 - project/spec/trace/requirement/req-archive-releases-worktrees.md
-- project/spec/trace/requirement/req-entry-binds-worktree.md
 - project/spec/trace/requirement/req-entry-levels-the-record-tree.md
 - project/spec/trace/requirement/req-a-shipped-record-is-never-reclaimed.md
 - project/spec/trace/requirement/req-record-status-comes-from-the-record.md

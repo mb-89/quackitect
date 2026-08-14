@@ -21,7 +21,7 @@ NINE DEMANDS NOW STAND OUTSIDE THIS POOL, up from eight. None of them is scored 
 
 WHAT STILL STANDS FROM THE LAST PASS, unchanged.
 
-req-entry-binds-worktree is struck. The owner ruled on 2026-08-14 that nothing is lost by removing it, and both halves are held elsewhere: somewhere to work is req-parallel-iterations-own-worktrees, restated as an outcome; stamped started is req-record-status-comes-from-the-record.
+req-entry-binds-worktree is struck, and its node was DELETED on 2026-08-14 at author-tests, which is why it no longer appears in the ranked list below. The owner ruled on 2026-08-14 that nothing is lost by removing it, and both halves are held elsewhere: somewhere to work is req-parallel-iterations-own-worktrees, restated as an outcome; stamped started is req-record-status-comes-from-the-record.
 
 Two survivors were restated as outcomes and both keep their rank. req-parallel-iterations-own-worktrees now demands that no record's unlanded work alter or overwrite another's. req-archive-releases-worktrees now demands zero working copies on disk and retrieval from the repository alone.
 
@@ -43,7 +43,6 @@ THE CUTOFF STILL FALLS ON RANK 12, and no row was moved out of rank order in any
 10. [[req-call-answers-in-one-second]]
 11. [[req-archive-releases-worktrees]]
 12. [[req-parallel-iterations-own-worktrees]] [cutoff]
-13. [[req-entry-binds-worktree]] [cut: superseded by owner ruling 2026-08-14 - somewhere to work is rank 12 and stamped started is req-record-status-comes-from-the-record, so it discriminates on nothing of its own]
 14. [[req-acts-carry-role-and-channel]] [cut: the acting role and channel are stamped identically whichever tree the call reached]
 15. [[req-overlay-drift-reported]] [cut: drift reporting compares identity and path the same way under all four]
 16. [[req-overlay-survives-update]] [cut: the overlay is untouched by where a path resolves]
