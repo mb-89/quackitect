@@ -4461,7 +4461,7 @@ export class Session {
    *  guarantees is that an amend cannot smuggle a reopen past the checks: the
    *  form is re-checked after the edit, and an amend that breaks a check is
    *  refused with the file untouched. */
-  reopenClaim(name: string, reason: string, by: string, machineId?: string): Record<string, unknown> {
+  reopenClaim(name: string, reason: string, by: string, machineId?: string, confirm?: boolean): Record<string, unknown> {
     this.forgetRoute();
     const m = this.formMachine(machineId);
     this.stateFormState(name, m); // refuses an undeclared or form-less state
@@ -4485,6 +4485,32 @@ export class Session {
         source: "engine/session.ts reopen",
       });
     }
+    // SAY WHAT IT WILL DROP, BEFORE DROPPING IT (i27, 2026-08-14).
+    //
+    // A reopen keeps the SIGNATURE and se_reopen says so. It does not keep
+    // the BLESS, and nothing said so. On 2026-08-14 a reopen taken on the
+    // engine's own bad advice erased a person's adjudication, and the walk
+    // stopped until they were asked again.
+    //
+    // A signature records who wrote it. A bless records who ADJUDICATED it,
+    // and at a low dial only a person can. Losing one silently is not the
+    // same kind of loss, so this one is confirmed rather than assumed.
+    const blessedBy = parseStateNote(raw).frontmatter.bless;
+    const byAPerson = typeof blessedBy === "string" && blessedBy.includes("human");
+    if (byAPerson && confirm !== true) {
+      const falls = this.wouldFall(name, m);
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: "a confirmed reopen — this one destroys a person's adjudication",
+        got: `${name} carries "${blessedBy}", and a reopen drops it. ${falls.length} state(s) fall with it: ${falls.join(", ") || "none"}`,
+        remedy: {
+          tool: "se_reopen",
+          args: { state: name, reason, confirm: true },
+          note: "if the claim's own content still passes, se_amend fixes the field and LEAVES THE TREE STANDING — the bless with it. Reopen only when the work is genuinely wrong.",
+        },
+        source: "engine/session.ts reopen",
+      });
+    }
     writeFileSync(h.instanceAbs, withReopened(raw, new Date().toISOString(), reason), "utf8");
     this.notifyChange();
     // The walk's tokens follow the file. reopenStates handles the join re-arming
@@ -4495,6 +4521,18 @@ export class Session {
       reopenStates(run.decl, run.instance, [name], reason, new Date().toISOString());
     }
     return { reopened: name, why: reason.trim(), by, still_green: this.recordDone(m) };
+  }
+
+  /** WHAT A REOPEN OF THIS STATE WOULD TAKE WITH IT.
+   *
+   *  Green ripples through the feeders, so everything downstream of a
+   *  reopened claim falls. Counting it BEFORE the write is what turns a
+   *  surprise into a decision. */
+  private wouldFall(name: string, m: MachineDecl): string[] {
+    const standing = new Set(this.recordDone(m));
+    if (!standing.has(name)) return [];
+    const claimful = new Set(m.states.filter((s) => s.evidence_form.length > 0 || s.submachine !== undefined).map((s) => s.id));
+    return [...standing].filter((s) => s !== name && claimful.has(s) && claimFeeders(m, s, claimful).includes(name));
   }
 
   amendClaim(name: string, fills: Record<string, string>, reason: string, by: string, machineId?: string): Record<string, unknown> {

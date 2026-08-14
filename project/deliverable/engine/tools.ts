@@ -241,13 +241,18 @@ export function sessionTools(session: Session): ToolDef[] {
       name: "se_reopen",
       title: "se.reopen",
       description:
-        "SEND A STANDING CLAIM BACK to be re-earned. Use it when the work is wrong or its ground moved — the state goes grey, its form is owed again, and everything downstream falls with it because green ripples through the feeders. The SIGNATURE IS KEPT: a reopen records that the claim must be re-done, it never erases who signed it or when. Re-submitting stamps a newer signature, which clears the mark by itself. FOR A SMALL FIX THAT DOES NOT CHANGE THE CLAIM — a renamed reference, a moved path, a typo — use se_amend instead, which leaves the tree standing.",
+        "SEND A STANDING CLAIM BACK to be re-earned. Use it when the work is WRONG — the state goes grey, its form is owed again, and everything downstream falls with it because green ripples through the feeders. The SIGNATURE IS KEPT, but a BLESS IS NOT: a reopen of a claim a person blessed is refused unless you pass confirm, and the refusal names how many states fall with it. WHEN THE GROUND MOVED BUT THE CLAIM'S OWN CONTENT STILL PASSES, use se_amend instead — it fixes the field and leaves the tree standing, the bless with it. A fallen-input refusal now names which of the two fits.",
       inputSchema: {
         type: "object",
         properties: {
           state: { type: "string", description: "the state whose claim must be re-earned" },
           reason: { type: "string", description: "why it stopped standing — one line, and the record keeps it" },
           machine: { type: "string", description: "which machine the state belongs to — needed from outside it, e.g. i1" },
+          confirm: {
+            type: "boolean",
+            description:
+              "required only when the claim carries a PERSON'S bless — the reopen destroys that adjudication, and the refusal says how many states fall with it",
+          },
         },
         required: ["state", "reason"],
       },
@@ -257,6 +262,7 @@ export function sessionTools(session: Session): ToolDef[] {
           String(args.reason),
           "agent",
           args.machine === undefined ? undefined : String(args.machine),
+          args.confirm === true,
         ),
     },
     {
