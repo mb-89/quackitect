@@ -11,6 +11,7 @@ realizes:
   - "if-resolution-seam-to-engine-delta"
   - "if-resolution-seam-to-method-compiler"
   - "if-record-store-to-resolution-seam"
+  - "if-resolution-seam-to-account"
 files:
   - "project/deliverable/engine/paths.ts"
   - "project/deliverable/engine/resolve.ts"

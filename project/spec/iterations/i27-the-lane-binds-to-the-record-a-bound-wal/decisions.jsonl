@@ -721,3 +721,34 @@
 {"ts":"2026-08-14T17:25:05.095Z","op":"done","visit":"iterations/i27/gate-requirements@0","node":"d3","brief":"clear-jump submitted with its production proof"}
 {"ts":"2026-08-14T17:25:25.787Z","op":"done","visit":"iterations/i27/gate-requirements@0","node":"d2","brief":"gate-requirements walked through green; no recheck was owed"}
 {"ts":"2026-08-14T17:25:28.574Z","op":"update","visit":"iterations/i27/build-steps/clear-jump@0","node":"d4","brief":"clear-jump signed; committing the record"}
+{"ts":"2026-08-14T17:25:53.301Z","op":"update","visit":"iterations/i27/build-steps/clear-jump@0","node":"d5","brief":"handover brought up to date"}
+{"ts":"2026-08-14T17:26:04.456Z","op":"plan","visit":"iterations/i27/build-steps/clear-jump@0","parent":null,"nodes":[{"id":"d6","brief":"confirm the tree stands after core"},{"id":"d7","brief":"satellite"},{"id":"d8","brief":"channel and clear-jump"}]}
+{"ts":"2026-08-14T17:27:14.748Z","op":"update","visit":"iterations/i27/build-steps/clear-jump@0","node":"d9","brief":"battery running past the minute mark, as the last three did"}
+{"ts":"2026-08-14T17:27:34.287Z","op":"done","visit":"iterations/i27/build-steps/clear-jump@0","node":"d6","brief":"battery 1261 of 1263; the two reds are one corrupt frontmatter"}
+{"ts":"2026-08-14T17:27:53.850Z","op":"update","visit":"iterations/i27/build-steps/clear-jump@0","node":"d10","brief":"merging the duplicate inputs key without dropping an id"}
+{"ts":"2026-08-14T17:28:09.730Z","op":"done","visit":"iterations/i27/build-steps/clear-jump@0","node":"d7","brief":"the duplicate key is merged and the corpus parses"}
+{"ts":"2026-08-14T17:28:13.190Z","op":"done","visit":"iterations/i27/build-steps/clear-jump@0","node":"d8","brief":"all thirteen chunks signed and the tree stands"}
+{"ts":"2026-08-14T17:28:50.170Z","op":"plan","visit":"iterations/i27/build-steps/clear-jump@0","parent":null,"nodes":[{"id":"d11","brief":"build form-checks, the last owed chunk"}]}
+{"ts":"2026-08-14T17:32:19.944Z","op":"fork","visit":"iterations/i27/build-steps/clear-jump@0","parent":"d11","node":"d12","brief":"the stop hook did not bite; finding out whether it is wired","nodes":[]}
+{"ts":"2026-08-14T17:32:31.356Z","op":"update","visit":"iterations/i27/build-steps/clear-jump@0","node":"d13","brief":"the root settings wires Stop; checking the one the workspace reads"}
+{"ts":"2026-08-14T17:33:27.611Z","op":"update","visit":"iterations/i27/build-steps/clear-jump@0","node":"d14","brief":"the Stop hook sits one directory above the workspace"}
+{"ts":"2026-08-14T17:34:08.735Z","op":"update","visit":"iterations/i27/build-steps/clear-jump@0","node":"d15","brief":"RUNME places the template every run, so the template is the only durable fix"}
+{"ts":"2026-08-14T17:34:20.873Z","op":"update","visit":"iterations/i27/build-steps/clear-jump@0","node":"d16","brief":"the cage template carries no Stop hook at all"}
+{"ts":"2026-08-14T17:37:10.891Z","op":"done","visit":"front_desk@1","node":"d18","brief":"the hook blocked a live mid-work stop, verbatim"}
+{"ts":"2026-08-14T17:37:35.741Z","op":"done","visit":"iterations/i27/build-steps/clear-jump@0","node":"d12","brief":"the hook was wired above the workspace; the cage template carries it now"}
+{"ts":"2026-08-14T17:38:19.548Z","op":"update","visit":"iterations/i27/record-adrs@1","node":"d22","brief":"asking which branch the architecture join is still waiting on"}
+{"ts":"2026-08-14T17:38:56.622Z","op":"update","visit":"iterations/i27/record-adrs@1","node":"d23","brief":"declaring the seam-to-account crossing the check found"}
+{"ts":"2026-08-14T17:39:12.246Z","op":"update","visit":"iterations/i27/record-adrs@1","node":"d24","brief":"the architecture join stands again; walking on to form-checks"}
+{"ts":"2026-08-14T17:39:38.754Z","op":"update","visit":"iterations/i27/specify-build@1","node":"d25","brief":"the seam's design spec now realizes its account crossing"}
+{"ts":"2026-08-14T17:39:53.969Z","op":"plan","visit":"iterations/i27/build-steps/form-checks@0","parent":null,"nodes":[{"id":"d26","brief":"read the two standing notes"},{"id":"d27","brief":"run the voice lint at submit"},{"id":"d28","brief":"refuse a grade outside its catalogue"},{"id":"d29","brief":"stop the node-table truncating in silence"}]}
+{"ts":"2026-08-14T17:39:58.086Z","op":"update","visit":"iterations/i27/build-steps/form-checks@0","node":"d30","brief":"grades note read; reading the node-table one"}
+{"ts":"2026-08-14T17:41:42.681Z","op":"done","visit":"iterations/i27/build-steps/form-checks@0","node":"d26","brief":"both notes read, and one of them misnames its mechanism"}
+{"ts":"2026-08-14T17:43:17.291Z","op":"update","visit":"iterations/i27/build-steps/form-checks@0","node":"d31","brief":"the grade check reads the catalogue from the card that declares it"}
+{"ts":"2026-08-14T17:43:24.537Z","op":"update","visit":"iterations/i27/build-steps/form-checks@0","node":"d32","brief":"fixing the broken identifier"}
+{"ts":"2026-08-14T17:43:39.393Z","op":"update","visit":"iterations/i27/build-steps/form-checks@0","node":"d33","brief":"running the catalogue check against the real register"}
+{"ts":"2026-08-14T17:44:08.397Z","op":"update","visit":"iterations/i27/build-steps/form-checks@0","node":"d34","brief":"using concatenation, since the braces were eaten twice"}
+{"ts":"2026-08-14T17:44:55.530Z","op":"update","visit":"iterations/i27/build-steps/form-checks@0","node":"d35","brief":"reading the first nine off-scale entries to judge each direction"}
+{"ts":"2026-08-14T17:45:06.876Z","op":"done","visit":"iterations/i27/build-steps/form-checks@0","node":"d28","brief":"the catalogue check is armed and names every off-scale grade"}
+{"ts":"2026-08-14T17:47:06.762Z","op":"update","visit":"iterations/i27/build-steps/form-checks@0","node":"d36","brief":"testing the ellipsis guard"}
+{"ts":"2026-08-14T17:47:30.082Z","op":"update","visit":"iterations/i27/build-steps/form-checks@0","node":"d37","brief":"the cage template needed the hook in the record's tree too"}
+{"ts":"2026-08-14T17:47:41.053Z","op":"done","visit":"iterations/i27/build-steps/form-checks@0","node":"d29","brief":"a cell that lost its tail is refused, and the cage test proved the tree split"}

@@ -1178,9 +1178,29 @@ const rowId = (cells: string[]): string => (cells[0] ?? "").replace(/^\[\[|\]\]$
  *  minted prompt pass as a claim. */
 const unanswered = (v: string): boolean => v.trim() === "" || /^<!--[\s\S]*-->$/.test(v.trim());
 
+/** A CELL THAT LOST ITS TAIL, recognised by the mark a cut leaves.
+ *
+ *  A node-table cell lands verbatim on the node's frontmatter. On 2026-08-14
+ *  four of this record's experiments reached their nodes ENDING IN AN ELLIPSIS
+ *  with the clause that carried the meaning gone, and all four were rewritten
+ *  by hand (note-324983b06229).
+ *
+ *  NOTHING IN THIS ENGINE WRITES AN ELLIPSIS. A search of the whole deliverable
+ *  for the character as a string literal, and for any maxlength, returns
+ *  nothing, and neither the read half nor the write half of the node-table
+ *  shortens a cell. So the cut came from somewhere this code cannot see — a
+ *  host, or the author's own abbreviation.
+ *
+ *  THE GUARD DOES NOT NEED THE CULPRIT. Whatever cut it, a frontmatter value
+ *  that trails off is not an answer, and the one outcome that must not stand
+ *  is the SILENT one: the form shows the whole text, the node carries a
+ *  fragment, and the ellipsis reads as style rather than as loss. */
+const LOST_ITS_TAIL = /(?:…|\.\.\.)\s*$/;
+
 function nodeTableProblems(name: string, args: FieldArgs, content: string): string[] {
   const rows = content.split("\n").map(tableRow);
   const missing: string[] = [];
+  const cut: string[] = [];
   for (const id of args.items) {
     const row = rows.find((c) => rowId(c) === id);
     if (row === undefined) {
@@ -1188,10 +1208,19 @@ function nodeTableProblems(name: string, args: FieldArgs, content: string): stri
       continue;
     }
     for (const [i, c] of args.columns.entries()) {
-      if (unanswered(row[i + 1] ?? "")) missing.push(`${id}.${c}`);
+      const cell = row[i + 1] ?? "";
+      if (unanswered(cell)) missing.push(`${id}.${c}`);
+      else if (LOST_ITS_TAIL.test(cell)) cut.push(`${id}.${c}`);
     }
   }
-  return missing.length > 0 ? [`${name}: unanswered — ${missing.join(" · ")}`] : [];
+  const out: string[] = [];
+  if (missing.length > 0) out.push(`${name}: unanswered — ${missing.join(" · ")}`);
+  if (cut.length > 0) {
+    out.push(
+      `${name}: ends in an ellipsis, so it lost its tail — ${cut.join(" · ")}. This cell lands verbatim on the node, and a value that trails off reads as a whole sentence to whoever opens it. Type the rest, or say the whole thing shorter.`,
+    );
+  }
+  return out;
 }
 
 /** Which ROW each option belongs to: its design question where it names one,
