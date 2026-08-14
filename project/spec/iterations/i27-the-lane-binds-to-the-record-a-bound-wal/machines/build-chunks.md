@@ -24,6 +24,10 @@ steps:
     statement: "the voice lint runs at submit, a grade outside its catalogue refuses, and a node-table cell never truncates in silence"
     depends_on: []
     realization: code
+  - id: clear-jump
+    statement: "a jump to a state nothing is owed for lands in ONE call, and a jump that cannot finish leaves the walk exactly where it stood"
+    depends_on: []
+    realization: code
   - id: delta-compose
     statement: "compose a record's machine from its own folder first and trunk second, and name every file that came from the record"
     depends_on: [seam-resolve]
@@ -72,7 +76,8 @@ Six lots, and every later lot leans on exactly one earlier lot.
 
 - THE SEAM: seam-resolve, seam-route, seam-sweep.
 - THE BOUND: answer-bound. Leans on nothing.
-- THE ENGINE'S OWN DEBTS: refusal-remedies, form-checks. Lean on nothing.
+- THE ENGINE'S OWN DEBTS: refusal-remedies, form-checks, clear-jump. Lean on
+  nothing.
 - THE DELTA: delta-compose. Leans on the seam.
 - THE SUPERVISOR: supervisor-level, supervisor-watch. Leans on the delta.
 - THE PROCESSES: core-process, satellite-process, channel. Lean on the
@@ -104,10 +109,41 @@ The eight reds authored at author-tests are the work list.
 - answer-bound: the bound exists, a small answer is whole, and a large one
   carries a reference.
 
-seam-sweep, supervisor-watch, refusal-remedies, form-checks and the three
-process chunks turn no authored red green. They are owed by the design, by
-the register, or by defects this record found while walking, and each says
-which above.
+seam-sweep, supervisor-watch, refusal-remedies, form-checks, clear-jump and
+the three process chunks turn no authored red green. They are owed by the
+design, by the register, or by defects this record found while walking, and
+each says which above.
+
+## clear-jump, added mid-build on 2026-08-14
+
+ADDED ON THE OWNER'S WORD, after the gap was found and reported: the
+requirement stood with no chunk behind it.
+
+`req-a-clear-jump-is-one-call` was minted at this record's own
+write-requirements, from an owner ruling of the same day. It says the engine
+shall land the walk on a named target within ONE call and answer that it
+arrived.
+
+TWELVE CHUNKS WERE PLANNED AND NONE OF THEM WAS THE JUMP. A requirement with
+no chunk is a requirement nobody builds, and the build plan is where that
+shows.
+
+THE DEFECT IT CLOSES IS MEASURED, not supposed. Aiming from the front desk
+into a build chunk draws about forty-four hops. The engine re-walks all of
+them, the first call times out part-way, and the retry then trips on
+`completeState: <state> is not active` because the half-finished replay left
+the position between two states. Eight occurrences across two sessions,
+recorded in `note-c76d90e3c17a`.
+
+SO THE CHUNK HAS TWO HALVES AND BOTH ARE LOAD-BEARING.
+
+- ONE CALL. The caller names the target and asks to go, and the answer says
+  it arrived.
+- ALL OR NOTHING. A jump that cannot finish leaves the walk exactly where it
+  stood, so a retry always starts from a position the machine agrees with.
+
+The second half is what actually kills the error. The first half is what the
+requirement asked for.
 
 ## What is deliberately not here
 

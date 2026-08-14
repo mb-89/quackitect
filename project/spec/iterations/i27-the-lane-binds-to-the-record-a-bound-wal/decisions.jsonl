@@ -681,3 +681,29 @@
 {"ts":"2026-08-14T16:36:40.187Z","op":"update","visit":"iterations/i27/build-steps/supervisor-watch@1","node":"d21","brief":"answering the owner on the escape tax and the pull errors"}
 {"ts":"2026-08-14T16:39:24.486Z","op":"update","visit":"iterations/i27/build-steps/core-process@0","node":"d22","brief":"recorded the walk-back defect; reading the core-and-satellite design next"}
 {"ts":"2026-08-14T16:40:34.935Z","op":"plan","visit":"iterations/i27/build-steps/core-process@0","parent":null,"nodes":[{"id":"d23","brief":"checkpoint the record's evidence on its branch"},{"id":"d24","brief":"declare this product self-hosting so the guard cannot fire"},{"id":"d25","brief":"kill SE-C-134 and route the write instead"}]}
+{"ts":"2026-08-14T16:40:38.023Z","op":"done","visit":"front_desk@1","node":"d16","brief":"supervisor-watch signed"}
+{"ts":"2026-08-14T16:41:56.428Z","op":"done","visit":"iterations/i27/build-steps/core-process@0","node":"d23","brief":"evidence committed on it/i27 as be703899"}
+{"ts":"2026-08-14T16:42:29.528Z","op":"update","visit":"iterations/i27/build-steps/core-process@0","node":"d26","brief":"escaping once more to land the flag in the engine"}
+{"ts":"2026-08-14T16:59:33.167Z","op":"plan","visit":"iterations/i27/build-steps/core-process@0","parent":null,"nodes":[{"id":"d3","brief":"prove the method write lands from inside the record"},{"id":"d4","brief":"build core-process"}]}
+{"ts":"2026-08-14T17:00:04.456Z","op":"done","visit":"iterations/i27/build-steps/core-process@0","node":"d3","brief":"the method write landed from inside the record — SE-C-134 is gone in practice"}
+{"ts":"2026-08-14T17:00:14.750Z","op":"update","visit":"iterations/i27/build-steps/core-process@0","node":"d5","brief":"checking which tree the git lane answers from now"}
+{"ts":"2026-08-14T17:01:32.059Z","op":"update","visit":"iterations/i27/build-steps/core-process@0","node":"d6","brief":"reverting the flag: it needs the record on trunk first"}
+{"ts":"2026-08-14T17:01:47.642Z","op":"update","visit":"iterations/i27/build-steps/core-process@0","node":"d7","brief":"product.md now says plainly that nothing reads the flag yet"}
+{"ts":"2026-08-14T17:02:26.465Z","op":"done","visit":"front_desk@0","node":"d1","brief":"back in the record, and the tax is gone"}
+{"ts":"2026-08-14T17:02:45.834Z","op":"update","visit":"iterations/i27/build-steps/core-process@0","node":"d8","brief":"handover corrected on the flag"}
+{"ts":"2026-08-14T17:03:11.855Z","op":"update","visit":"iterations/i27/build-steps/core-process@0","node":"d9","brief":"stepping out to reload the engine"}
+{"ts":"2026-08-14T17:06:12.592Z","op":"update","visit":"iterations/i27/build-steps/core-process@0","node":"d3","brief":"reading the core-and-satellite design from the record's tree"}
+{"ts":"2026-08-14T17:07:32.782Z","op":"update","visit":"iterations/i27/build-steps/core-process@0","node":"d4","brief":"core.ts routes a bound path by the caller, never by the path alone"}
+{"ts":"2026-08-14T17:07:49.424Z","op":"update","visit":"iterations/i27/build-steps/core-process@0","node":"d5","brief":"answered the owner on the not-active errors"}
+{"ts":"2026-08-14T17:08:37.681Z","op":"update","visit":"iterations/i27/build-steps/core-process@0","node":"d6","brief":"tests written for the routing table, the ledgers and the lease"}
+{"ts":"2026-08-14T17:09:13.899Z","op":"done","visit":"front_desk@0","node":"d2","brief":"core.ts built and tested; submitting the form"}
+{"ts":"2026-08-14T17:10:17.862Z","op":"plan","visit":"iterations/i27/build-steps/satellite-process@0","parent":null,"nodes":[{"id":"d7","brief":"rename rebase to reconcile, because SE-C-002 forbids the operation the name promised"},{"id":"d8","brief":"build the satellite with a real git adapter"}]}
+{"ts":"2026-08-14T17:10:54.582Z","op":"update","visit":"iterations/i27/build-steps/satellite-process@0","node":"d9","brief":"clear-jump added to the build plan on the owner's word"}
+{"ts":"2026-08-14T17:12:44.833Z","op":"plan","visit":"iterations/i27/build-steps/satellite-process@0","parent":null,"nodes":[{"id":"d10","brief":"bound the sweep in time so it answers instead of being cut off"},{"id":"d11","brief":"let a caller name a target and go in one call"}]}
+{"ts":"2026-08-14T17:12:51.695Z","op":"update","visit":"iterations/i27/build-steps/satellite-process@0","node":"d12","brief":"the budget default names the class constant"}
+{"ts":"2026-08-14T17:13:14.086Z","op":"done","visit":"iterations/i27/build-steps/satellite-process@0","node":"d10","brief":"the sweep now stops on a whole state at its budget"}
+{"ts":"2026-08-14T17:13:51.714Z","op":"update","visit":"iterations/i27/build-steps/satellite-process@0","node":"d13","brief":"tests written for the one-call jump and the bounded sweep"}
+{"ts":"2026-08-14T17:14:30.792Z","op":"update","visit":"iterations/i27/build-steps/satellite-process@0","node":"d14","brief":"the budget test asserts the invariant rather than a hop count"}
+{"ts":"2026-08-14T17:15:13.224Z","op":"update","visit":"iterations/i27/build-steps/satellite-process@0","node":"d15","brief":"surfacing what the sweep actually answered"}
+{"ts":"2026-08-14T17:16:02.012Z","op":"update","visit":"iterations/i27/build-steps/satellite-process@0","node":"d16","brief":"the test now proves the agent's reading before it sweeps"}
+{"ts":"2026-08-14T17:16:37.009Z","op":"done","visit":"iterations/i27/build-steps/satellite-process@0","node":"d11","brief":"the one-call jump lands and the bounded sweep is green"}
