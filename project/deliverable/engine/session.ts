@@ -95,6 +95,7 @@ import {
   readItRecord,
   repinColumn,
 } from "./iterations.ts";
+import { modeWasChosen, readMode } from "./mode.ts";
 import { parseStateNote, readNode, section, withPass, writeNode } from "./notes.ts";
 import { fansOut, METHOD_FILES, METHOD_PREFIXES, methodFilesIn, pathKind, recordOwnerOf, resolveInRoot, seDir } from "./paths.ts";
 import { mintFlipLines } from "./pugh.ts";
@@ -6324,6 +6325,11 @@ export class Session {
       active: this.active(),
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
       status: this.instance.status,
+      // WHERE A SATELLITE RUNS, on every packet so neither hand has to ask.
+      // One architecture, three transports — process, thread, inline — and the
+      // person flips it. `chosen: false` means the default is answering, which
+      // reads differently from a choice somebody made.
+      run: { mode: readMode(this.root), chosen: modeWasChosen(this.root) },
       // THE TIER IS THE ANSWER, AND THE NUMBER DOES NOT RIDE WITH IT (owner
       // ruling 2026-08-14: "the number leaves the answer").
       //

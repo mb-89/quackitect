@@ -822,3 +822,9 @@
 {"ts":"2026-08-14T18:50:50.202Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d94","brief":"the inline crossing, marshalling like the others"}
 {"ts":"2026-08-14T18:51:17.847Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d95","brief":"testing that inline cannot cheat the contract"}
 {"ts":"2026-08-14T18:51:40.787Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d88","brief":"the inline crossing makes core, satellite and channel work together"}
+{"ts":"2026-08-14T18:51:58.226Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d96","brief":"the mode rides every packet so a surface can offer it"}
+{"ts":"2026-08-14T18:52:13.638Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d97","brief":"checking how the host is told to launch the engine"}
+{"ts":"2026-08-14T18:52:31.433Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d98","brief":"--mode lands on the launch, and a bad value stops it"}
+{"ts":"2026-08-14T18:54:59.892Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d99","brief":"the flag rides SE_ARGS, so RUNME needs no change"}
+{"ts":"2026-08-14T18:55:11.719Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d89","brief":"the mode rides the packet and the launch argument reaches it"}
+{"ts":"2026-08-14T18:55:50.770Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d100","brief":"formatting fixed; committing the mode flag"}

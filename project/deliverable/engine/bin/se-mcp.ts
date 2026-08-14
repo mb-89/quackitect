@@ -270,6 +270,24 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
 
   const autonomyRaw = argValue("--autonomy") ?? argValue("--threshold") ?? process.env.SE_AUTONOMY ?? process.env.SE_THRESHOLD;
 
+  // WHERE SATELLITES RUN, for THIS run only. One architecture, three
+  // transports — process, thread, inline — and the argument wins over the
+  // stored choice WITHOUT overwriting it, so a measurement run cannot silently
+  // change what the person set from the mirror.
+  //
+  // A BAD VALUE STOPS THE LAUNCH, and that is deliberate: an unreadable stored
+  // setting falls back to the default quietly, but a person who typed a mode
+  // by hand is owed the news that it was not a mode.
+  const { modeForRun } = await import("../mode.ts");
+  let runMode: string;
+  try {
+    runMode = modeForRun(root, argValue("--mode") ?? process.env.SE_MODE);
+  } catch (e) {
+    process.stderr.write(`se-mcp: ${String((e as Error).message)}\n`);
+    process.exit(1);
+  }
+  process.stderr.write(`se-mcp: satellites run ${runMode}\n`);
+
   const session = new Session(root); // fails fast on a misdrawn machine
   if (autonomyRaw !== undefined) session.setAutonomy(Number(autonomyRaw)); // refuses out-of-range
   // SESSION OVER — reaching end stops everything. The grace period lets the
