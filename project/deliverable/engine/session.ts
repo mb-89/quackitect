@@ -891,16 +891,10 @@ export class Session {
 
   /** Where the LANE works: the bound expedition's worktree, else the root.
    *
-   *  THE SELF-HOSTING EXCEPTION ACTS HERE, and only here. Quackitect works on
-   *  itself, so its records get NO worktree and walk on trunk. A method change
-   *  made inside a record lands where the walk is standing, and it applies to
-   *  the walk that made it.
-   *
-   *  Every other product keeps its worktree. A TEST ROOT IS NEVER
-   *  SELF-HOSTING, so everything that depends on a second tree still gets one
-   *  where it is tested. */
+   *  SHARED METHOD NO LONGER COMES THROUGH HERE. laneRoot sends it to the
+   *  machine root whatever tree is bound, which is what retired SE-C-134.
+   *  This answers for everything else, and a record keeps its own tree. */
   workRoot(): string {
-    if (isSelfHosting(this.root)) return this.root;
     return this.bound?.path ?? this.root;
   }
 
@@ -964,7 +958,15 @@ export class Session {
    *
    *  An OPEN record owns its worktree, so that is the only copy that counts.
    *  A CLOSED one has landed and its tree is gone, so undefined here falls
-   *  back to the working root and finds the landed archive. */
+   *  back to the working root and finds the landed archive.
+   *
+   *  SELF-HOSTING WOULD CHANGE THIS, and it is NOT switched on here yet. A
+   *  record can only walk on trunk once its content IS on trunk, and i27's
+   *  content stands on its own branch. Levelling is what moves it, and that
+   *  is supervisor-level's act with a real git adapter behind it. Flipping
+   *  the answer before the levelling would point the walk at a trunk that
+   *  does not hold the record — measured on 2026-08-14, when it hid four
+   *  design specs. */
   private recordRoot(rel: string): string | undefined {
     const owner = recordOwnerOf(rel);
     if (owner === undefined) return undefined;
@@ -6726,27 +6728,4 @@ export class Session {
       history: this.instance.history.slice(-10),
     };
   }
-}
-
-/** Does this product declare itself SELF-HOSTING?
- *
- *  The declaration lives in `project/product.md`, a file the PRODUCT owns and
- *  commits, so it travels with the repository. Session state is host-local and
- *  would not.
- *
- *  Cached per root. The declaration is a property of the repository, so it
- *  does not change under a running session. */
-const SELF_HOSTING = new Map<string, boolean>();
-export function isSelfHosting(root: string): boolean {
-  const known = SELF_HOSTING.get(root);
-  if (known !== undefined) return known;
-  let declared = false;
-  try {
-    declared = /^self_hosting:[ \t]*true[ \t]*$/m.test(readFileSync(join(root, "project", "product.md"), "utf8"));
-  } catch {
-    // No declaration is a declaration of false. Every product but this one.
-    declared = false;
-  }
-  SELF_HOSTING.set(root, declared);
-  return declared;
 }
