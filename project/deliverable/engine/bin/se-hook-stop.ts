@@ -17,8 +17,22 @@
 // log — the hook never calls the mirror over HTTP, which would deadlock
 // the session's own server):
 //
-// - the last pull answered "wait" — the machine's own stop: idle, the
-//   desk with no goal, or a step above the slider;
+// - the last pull answered "wait" AND NO TARGET IS SET — the machine's own
+//   stop: idle, the desk with nothing routed, or a step above the slider;
+//
+//   THE TARGET HALF WAS MISSING AND AN ESCAPE WALKED STRAIGHT THROUGH THE
+//   GAP (owner instruction 2026-08-14). The escape hatch lands at the front
+//   desk, and the desk answers "wait". So the sequence was: escape for a
+//   real reason, land at the desk, stop — and the tooth had nothing to
+//   bite, because the last pull said "wait".
+//
+//   Measured that day: three stops, two of them post-escape and both
+//   passed. A routed goal stood the whole time and idle was an open door
+//   at weight 0.2 against a dial of 1.
+//
+//   A "wait" WITH A TARGET IS NOT THE MACHINE'S OWN STOP. It is an agent
+//   declining to walk toward something it was pointed at, which is the
+//   exact thing this hook exists to refuse;
 // - no pull is on record — the engine never ran here;
 // - stop_hook_active is set — this stop was already blocked once. The
 //   valve for a question that genuinely BLOCKS: ask it in one line, stop
@@ -55,7 +69,7 @@ function tailOf(path: string): string {
 }
 
 /** The newest se_pull's answer, read from the log tail. */
-function lastPull(): { pull?: string; where?: unknown } | undefined {
+function lastPull(): { pull?: string; where?: unknown; target?: unknown } | undefined {
   const lines = tailOf(join(root, ".se", "calls.jsonl")).split("\n");
   for (let i = lines.length - 1; i >= 0; i--) {
     const line = lines[i].trim();
@@ -64,7 +78,7 @@ function lastPull(): { pull?: string; where?: unknown } | undefined {
       const rec = JSON.parse(line) as { tool?: string; ok?: boolean; response?: unknown };
       if (rec.tool !== "se_pull" || rec.ok !== true) continue;
       const r = typeof rec.response === "string" ? (JSON.parse(rec.response) as unknown) : rec.response;
-      return (r ?? {}) as { pull?: string; where?: unknown };
+      return (r ?? {}) as { pull?: string; where?: unknown; target?: unknown };
     } catch {
       // the first line of the tail may be a torn record; a broken line is skipped
     }
@@ -87,17 +101,29 @@ process.stdin.on("end", () => {
     }
     const last = lastPull() ?? {};
     const pull = last.pull;
-    if (pull === undefined || pull === "wait") process.exit(0);
+    if (pull === undefined) process.exit(0);
+    // A TARGET IS A STANDING INSTRUCTION FROM THE PERSON. While one is set,
+    // the walk has somewhere to be, and "nothing to route" is false whatever
+    // the desk answered.
+    const target = typeof last.target === "string" ? last.target.trim() : "";
+    if (pull === "wait" && target === "") process.exit(0);
     const where = Array.isArray(last.where) ? (last.where as unknown[]).join(", ") : String(last.where ?? "");
+    const aimed = pull === "wait";
     process.stdout.write(
       JSON.stringify({
         decision: "block",
-        reason:
-          `[se] The walk stands mid-work: the last pull answered "${pull}"` +
-          (where !== "" ? ` at ${where}` : "") +
-          ". A report is not a checkpoint and size is not a reason — call se_pull and keep walking. " +
-          "If you are stopped on a question that BLOCKS (no answer could let the walk continue from here), " +
-          "ask it in one line and stop again; this tooth bites once per stop.",
+        reason: aimed
+          ? `[se] A target is set (${target}) and the walk is not on it` +
+            (where !== "" ? `, standing at ${where}` : "") +
+            '. The pull answered "wait" because nothing routed FROM HERE, which is not the same as nothing to do. ' +
+            "Take the door that leads toward the target and keep walking. " +
+            "If you are stopped on a question that BLOCKS (no answer could let the walk continue from here), " +
+            "ask it in one line and stop again; this tooth bites once per stop."
+          : `[se] The walk stands mid-work: the last pull answered "${pull}"` +
+            (where !== "" ? ` at ${where}` : "") +
+            ". A report is not a checkpoint and size is not a reason — call se_pull and keep walking. " +
+            "If you are stopped on a question that BLOCKS (no answer could let the walk continue from here), " +
+            "ask it in one line and stop again; this tooth bites once per stop.",
       }),
     );
   } catch {
