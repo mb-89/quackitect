@@ -844,3 +844,8 @@
 {"ts":"2026-08-14T19:03:38.947Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d114","brief":"the write ceiling names the mode file's reason"}
 {"ts":"2026-08-14T19:03:50.953Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d115","brief":"the read ceiling names the mode file too"}
 {"ts":"2026-08-14T19:04:06.586Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d110","brief":"three guards fired on the new flag and all three are answered"}
+{"ts":"2026-08-14T19:04:18.287Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d116","brief":"battery before the gate"}
+{"ts":"2026-08-14T19:07:55.589Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d111","brief":"the gate carries the split as built and crossed"}
+{"ts":"2026-08-14T19:08:39.318Z","op":"plan","visit":"iterations/i27/gate-implementation@0","parent":null,"nodes":[{"id":"d117","brief":"note the missing wake for the retro"}]}
+{"ts":"2026-08-14T19:09:12.214Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d117","brief":"the missing wake is noted for the retro"}
+{"ts":"2026-08-14T19:09:16.165Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d118","brief":"committing the amended gate and the handover"}
