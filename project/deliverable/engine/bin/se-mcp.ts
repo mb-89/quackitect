@@ -137,6 +137,18 @@ ENGINE — read by the server (this file is where they are defined).
 
   --root         the project root (holds project/ and workspace/);
                  file lane serves that tree, call log lands in <root>/.se/
+  --mode         WHERE SATELLITES RUN: process | thread | inline.
+                 process (default) a child per record — a crash stays with the
+                                   record that caused it
+                 thread            a worker per record — cheaper to start, and
+                                   a hard crash takes everything
+                 inline            no crossing at all — the BASELINE the other
+                                   two are measured against
+                 One architecture either way: core, satellite and channel are
+                 always there, and only the boundary moves. The flag decides
+                 THIS RUN and does not overwrite what the mirror last stored;
+                 the stored choice lives in <root>/.se/mode.json and is what a
+                 host launching from a fixed .mcp.json reads.
   --autonomy     0..1 — which states the AGENT enters by itself (priority <=
                  autonomy). 0: every step is the human's; 1: fully autonomous.
                  Default 0.4. Env: SE_AUTONOMY. Live-adjustable in the mirror.

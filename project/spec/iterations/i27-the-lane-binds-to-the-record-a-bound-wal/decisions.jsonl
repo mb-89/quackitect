@@ -837,3 +837,10 @@
 {"ts":"2026-08-14T19:00:11.748Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d108","brief":"testing both boundaries for real, including id correlation"}
 {"ts":"2026-08-14T19:01:04.102Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d109","brief":"the override case gets a real repo; the stop case attaches first"}
 {"ts":"2026-08-14T19:01:19.389Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d102","brief":"the thread boundary starts, serves and correlates"}
+{"ts":"2026-08-14T19:01:24.100Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d103","brief":"the process boundary starts, serves and isolates"}
+{"ts":"2026-08-14T19:01:31.829Z","op":"plan","visit":"iterations/i27/gate-implementation@0","parent":null,"nodes":[{"id":"d110","brief":"confirm the tree stands with the boundaries in"},{"id":"d111","brief":"take it back to the gate"}]}
+{"ts":"2026-08-14T19:02:34.747Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d112","brief":"battery past the halfway mark with the boundaries in"}
+{"ts":"2026-08-14T19:03:29.928Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d113","brief":"--mode is documented where every other switch is"}
+{"ts":"2026-08-14T19:03:38.947Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d114","brief":"the write ceiling names the mode file's reason"}
+{"ts":"2026-08-14T19:03:50.953Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d115","brief":"the read ceiling names the mode file too"}
+{"ts":"2026-08-14T19:04:06.586Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d110","brief":"three guards fired on the new flag and all three are answered"}

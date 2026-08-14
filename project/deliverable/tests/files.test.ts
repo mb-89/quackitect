@@ -78,7 +78,10 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   // id outside the note system, minted once.
   // 102 since 2026-08-13: help.ts reads the demand log (.se/help-demand.jsonl)
   // direct — a JSONL log outside the note system, same shape as the two above.
-  const CEILING = 102;
+  // 103 since 2026-08-14: mode.ts reads .se/mode.json — the run mode, one tiny
+  // JSON object of session state, read at start. Same shape as the three
+  // above, and no door would ever hold it.
+  const CEILING = 103;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {
@@ -121,7 +124,12 @@ test("no new file write bypasses the door — the count may fall, never rise", (
   // gitignored, overwritten by the next big answer and read back only by the
   // cursor on the answer that wrote it. The door holds corpus, so this is a
   // file it can never hold.
-  const CEILING = 39;
+  //
+  // 40 since 2026-08-14: mode.ts writes `.se/mode.json`, the run mode the
+  // person chose. Session state again — host-local, uncommitted, one small
+  // object, and deliberately NOT corpus: what suits one machine's cores is not
+  // a fact about the product.
+  const CEILING = 40;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {
