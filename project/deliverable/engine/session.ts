@@ -889,8 +889,18 @@ export class Session {
     return files;
   }
 
-  /** Where the LANE works: the bound expedition's worktree, else the root. */
+  /** Where the LANE works: the bound expedition's worktree, else the root.
+   *
+   *  THE SELF-HOSTING EXCEPTION ACTS HERE, and only here. Quackitect works on
+   *  itself, so its records get NO worktree and walk on trunk. A method change
+   *  made inside a record lands where the walk is standing, and it applies to
+   *  the walk that made it.
+   *
+   *  Every other product keeps its worktree. A TEST ROOT IS NEVER
+   *  SELF-HOSTING, so everything that depends on a second tree still gets one
+   *  where it is tested. */
   workRoot(): string {
+    if (isSelfHosting(this.root)) return this.root;
     return this.bound?.path ?? this.root;
   }
 
@@ -932,6 +942,16 @@ export class Session {
     // never make the owner's roots read as undeclared (found live 2026-07-30).
     const kind = pathKind(rel);
     if (kind === "session") return this.root;
+    // SHARED METHOD BELONGS TO THE MACHINE, never to a branch. resolve.ts says
+    // the same thing in storeFor: the core owns session state and shared
+    // method, so both resolve to the machine root whatever tree is bound.
+    //
+    // Before this, a method write from inside a record landed in the record's
+    // own worktree and fanned out over trunk at the merge. That is the
+    // 2026-08-07 accident, and refusing the write was the old answer to it.
+    // Resolving the write is the better one: nothing is refused, and the file
+    // cannot land in a tree that does not own it.
+    if (kind === "method") return this.root;
     // A RECORD'S OWN CONTENT IS READ FROM THE RECORD'S TREE, bound or not.
     // The mirror painted i1's states out of trunk while i1's worktree held
     // the fall that knocked them down, and both halves were working — they
@@ -6706,4 +6726,27 @@ export class Session {
       history: this.instance.history.slice(-10),
     };
   }
+}
+
+/** Does this product declare itself SELF-HOSTING?
+ *
+ *  The declaration lives in `project/product.md`, a file the PRODUCT owns and
+ *  commits, so it travels with the repository. Session state is host-local and
+ *  would not.
+ *
+ *  Cached per root. The declaration is a property of the repository, so it
+ *  does not change under a running session. */
+const SELF_HOSTING = new Map<string, boolean>();
+export function isSelfHosting(root: string): boolean {
+  const known = SELF_HOSTING.get(root);
+  if (known !== undefined) return known;
+  let declared = false;
+  try {
+    declared = /^self_hosting:[ \t]*true[ \t]*$/m.test(readFileSync(join(root, "project", "product.md"), "utf8"));
+  } catch {
+    // No declaration is a declaration of false. Every product but this one.
+    declared = false;
+  }
+  SELF_HOSTING.set(root, declared);
+  return declared;
 }

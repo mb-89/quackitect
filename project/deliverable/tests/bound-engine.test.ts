@@ -13,9 +13,13 @@ import { test } from "node:test";
 import { composeForRecord, isOverridable, overridesIn } from "../engine/delta.ts";
 import * as paths from "../engine/paths.ts";
 import { beatVerdict, callVerdict, deadlineIsSafe, levelRecordTree, missedBeats, replaceComposition, WATCH } from "../engine/supervisor.ts";
+import { anyGuidanceDoc } from "./helpers.ts";
 
 const ROOT = mkdtempSync(join(tmpdir(), "se-delta-"));
 const RECORD = "project/spec/iterations/i27-x";
+// ASKED, NEVER NAMED. A test that needs SOME guidance page asks helpers for
+// one, so moving guidance changes the answer instead of falsifying the test.
+const GUIDE = anyGuidanceDoc();
 
 /** Put a file in the record's delta folder, as an agent editing the engine
  *  from inside their own record would. */
@@ -28,11 +32,7 @@ function override(rel: string, body: string): void {
 // ------------------------------------- the ground the delta stands on today
 
 test("method files are shared by every tree", () => {
-  for (const p of [
-    "project/guidance/contract.md",
-    "project/deliverable/machines/items/element.md",
-    "project/deliverable/engine/session.ts",
-  ]) {
+  for (const p of [GUIDE, "project/deliverable/machines/items/element.md", "project/deliverable/engine/session.ts"]) {
     assert.equal(paths.fansOut(p), true, `${p} must reach every tree`);
   }
 });
@@ -69,14 +69,14 @@ test("a record's own folder may override an engine file, record first and trunk 
 });
 
 test("the override list is what the record has done to the machine", () => {
-  override("project/guidance/contract.md", "a local rule");
+  override(GUIDE, "a local rule");
   const list = overridesIn(ROOT, RECORD);
-  assert.deepEqual(list, ["project/deliverable/engine/session.ts", "project/guidance/contract.md"]);
+  assert.deepEqual(list, ["project/deliverable/engine/session.ts", GUIDE].sort());
 });
 
 test("only method and engine are overridable, because a record's evidence is not a delta", () => {
   assert.equal(isOverridable("project/deliverable/engine/session.ts"), true);
-  assert.equal(isOverridable("project/guidance/contract.md"), true);
+  assert.equal(isOverridable(GUIDE), true);
   assert.equal(isOverridable("project/spec/iterations/i27-y/evidence/a.md"), false);
 });
 

@@ -1,23 +1,26 @@
-// THE METHOD GUARD AND THE FAN-OUT — the two mechanisms nothing tested.
+// WHERE A METHOD WRITE LANDS, AND WHERE A RECORD'S OWN WORK LANDS.
 //
-// WHY THIS FILE EXISTS. Before it, the only thing proving SE-C-134 works was
-// that it fired at whoever was driving. A search of the whole test folder for
-// METHOD_WRITE_BOUND, SE-C-134 and fansOut returned nothing (2026-08-14).
+// WHY THIS FILE EXISTS. Nothing tested either mechanism. A search of the whole
+// test folder for METHOD_WRITE_BOUND, SE-C-134 and fansOut returned nothing
+// (2026-08-14). The only thing proving the old guard worked was that it fired
+// at whoever was driving.
 //
-// That was survivable only while this product used worktrees on itself. It is
-// about to stop, on the self-hosting flag, so the live exercise goes away and
-// these take its place.
+// SE-C-134 IS NOW RETIRED, and these tests pin what replaced it: shared method
+// RESOLVES to the machine root instead of being REFUSED from a record. The
+// danger is the same one either way — a record's copy of the engine fanning
+// out over trunk at a merge, which really happened on 2026-08-07.
 //
-// A TEST ROOT IS NEVER SELF-HOSTING, so the guard still fires here after this
-// product stops tripping it. That is the whole point of writing them first.
+// A TEST ROOT IS NEVER SELF-HOSTING, so a bound record here really does get a
+// worktree. Without that, none of these assertions would mean anything.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, test } from "node:test";
+import { CLAUSES } from "../engine/errors.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, freshRoot } from "./helpers.ts";
+import { anyGuidanceDoc, call, freshRoot } from "./helpers.ts";
 
 /** A fresh root that is a real git repo, the way worktree.test.ts does it. */
 function gitRoot(): string {
@@ -35,25 +38,37 @@ function gitRoot(): string {
 }
 
 describe("the method guard", { concurrency: true }, () => {
-  test("a method write from inside a bound record is refused, and the refusal carries its remedy", async () => {
+  test("shared method resolves to the MACHINE ROOT from inside a bound record", () => {
     const root = gitRoot();
     const s = new Session(root);
     const minted = s.expeditionNew("spike", "Guard The Method") as { created: string };
     s.expeditionOpen(minted.created);
     assert.ok(s.workRoot().includes(".worktrees"), "the record must actually be bound for this to mean anything");
 
-    const server = buildServer(root, s);
-    const refused = await call(server, "se_file_write", {
-      path: "project/guidance/contract.md",
-      content: "a method file, written from inside a record",
-      base_hash: null,
-    });
-    const body = refused.body as { clause?: string; remedy?: { tool?: string; args?: Record<string, unknown> } };
+    // THE CLAIM THAT RETIRED SE-C-134. A method path resolves to the machine
+    // root whatever tree is bound, so the write cannot land in a tree that
+    // does not own it. Refusing it was the old answer to the same danger.
+    for (const rel of [
+      anyGuidanceDoc(),
+      "project/deliverable/machines/items/element.md",
+      "project/deliverable/engine/session.ts",
+      "project/deliverable/tests/pull.test.ts",
+    ]) {
+      assert.equal(s.laneRoot(rel), root, `${rel} is shared method and belongs to the machine`);
+    }
 
-    assert.equal(refused.isError, true, "a method write while bound must refuse");
-    assert.equal(body.clause, "SE-C-134");
-    assert.equal(body.remedy?.tool, "se_pull", "a refusal carries an executable remedy");
-    assert.equal(typeof body.remedy?.args?.escape, "string", "and the remedy is the escape, not a sentence");
+    // AND THE TWO WERE NOT COLLAPSED INTO ONE ANSWER. A record's own content
+    // still rides its own tree, which is what a bound walk is for.
+    const own = `project/spec/expeditions/${minted.created}/evidence/scratch.md`;
+    assert.notEqual(s.laneRoot(own), root, "the record's own work stays in the record's tree");
+  });
+
+  test("the retired clause is gone from the registry and its number is not reused", () => {
+    assert.equal(
+      Object.values(CLAUSES).includes("SE-C-134" as never),
+      false,
+      "SE-C-134 is retired — resolution replaced it, so nothing may issue it again",
+    );
   });
 
   test("a record's OWN evidence is never refused while bound", async () => {

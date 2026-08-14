@@ -15,6 +15,12 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import * as paths from "../engine/paths.ts";
+import { anyGuidanceDoc } from "./helpers.ts";
+
+// ASKED, NEVER NAMED. These tests are about the SEAM, not about any one page,
+// so moving guidance must change the answer rather than falsify the test.
+const GUIDE = anyGuidanceDoc();
+
 import { resolve as seam } from "../engine/resolve.ts";
 
 const ROOT = mkdtempSync(join(tmpdir(), "se-resolve-"));
@@ -46,7 +52,7 @@ test("a declared root is read-only, so the write lane refuses it", () => {
 
 test("the kind of a path decides its store, never where the walk stands", () => {
   assert.equal(paths.pathKind(".se/notes.jsonl"), "session");
-  assert.equal(paths.pathKind("project/guidance/contract.md"), "method");
+  assert.equal(paths.pathKind(GUIDE), "method");
   assert.equal(paths.pathKind("project/deliverable/engine/session.ts"), "method");
   assert.equal(paths.pathKind("project/spec/iterations/i27-x/evidence/a.md"), "record");
   assert.equal(paths.pathKind("project/spec/trace/requirement/req-x.md"), "content");
@@ -108,7 +114,7 @@ test("session state resolves to the machine root even while a record is bound", 
 
 test("shared method resolves to the machine root even while a record is bound", () => {
   const WORKTREE = join(ROOT, ".worktrees", "i27-x");
-  const r = seam({ machine: ROOT, bound: WORKTREE }, "project/guidance/contract.md", "test");
+  const r = seam({ machine: ROOT, bound: WORKTREE }, GUIDE, "test");
   assert.equal(r.store, ROOT);
 });
 
@@ -135,7 +141,7 @@ test("every resolution names the store it resolved to", () => {
 });
 
 test("every resolution names the owner, so routing is visible at the call", () => {
-  assert.deepEqual(seam(ROOT, "project/guidance/contract.md", "test").owner, { kind: "core" });
+  assert.deepEqual(seam(ROOT, GUIDE, "test").owner, { kind: "core" });
   assert.deepEqual(seam(ROOT, "project/spec/iterations/i27-x/evidence/a.md", "test").owner, {
     kind: "record",
     container: "iterations",
@@ -156,7 +162,7 @@ test("routing never refuses, because a misresolution and a different owner are n
   assert.throws(() => seam(ROOT, "../../elsewhere.md", "test"), /inside the project root/);
   // ...and routing ANSWERS for a path owned elsewhere. Confusing the two is
   // what closes the door method changes and commits both use.
-  assert.deepEqual(paths.routeToOwner("project/guidance/refusals.md"), { kind: "core" });
+  assert.deepEqual(paths.routeToOwner(GUIDE), { kind: "core" });
 });
 
 // ------------------------------- a write is proved by reading back, per kind

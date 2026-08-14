@@ -222,38 +222,37 @@ Nothing was written. Read the file, then report the payload that triggered
 this: the escape-eating class has a new member, and the payload is the
 evidence.
 
-### SE-C-134 — a method write while a record is bound
-Method cannot be changed from inside a record. These are SHARED:
+### A retired clause — the method write, once SE-C-134
+RETIRED by owner ruling, 2026-08-14. It refused a method write made from
+inside a record. The number is retired and is not reused, and no section here
+claims it: this is history, not a rule you can trip.
+
+WHAT IT WAS FOR. A method write from inside a record used to land in that
+record's own worktree, and fan out over trunk at the merge. On 2026-08-07 that
+overwrote trunk's tool list and deleted two lane verbs.
+
+WHY IT IS GONE. The refusal was REPLACED BY A RESOLUTION, never merely
+dropped. Shared method resolves to the MACHINE ROOT whatever tree is bound, so
+a method write cannot land in a tree that does not own it. There is nothing
+left to refuse.
+
+SHARED MEANS THESE:
 
 - guidance
 - machines
-- matrix rows
-- templates
 - the engine
 - the tests
+- the prompt layer
 
-A write to one while a record is bound lands in that record's worktree and
-fans out from there, pushing the record's copy over trunk.
+WHAT IT COST WHILE IT STOOD. Escape to the desk, edit there, aim back — and
+the walk back re-walked the whole machine, timing out on the first pull and
+erroring on the second. Six times in one session, and twice more on the day it
+was removed.
 
-That is not theoretical. It happened twice on 2026-08-07, and the first time
-it overwrote trunk's tool list and deleted two lane verbs.
-
-The remedy is one call. Step out with `se_pull {escape: "<why>"}`, make the
-edit unbound, then aim back. The walk is left standing where it was.
-
-A RECORD'S OWN CONTENT IS NEVER REFUSED here. Evidence and decisions under
-the record's own folder are exactly what a bound walk is for.
-
-THIS CLAUSE GUARDS FIVE TOOLS ONLY: se_file_write, se_file_patch,
-se_file_replace, se_file_delete, se_file_move. It does not and cannot watch
-se_run's shell commands, which is exactly the gap the i8 field report found
-on 2026-08-12: refused here, the walk reached for se_run with a
-no_tool_reason instead of stepping out, and the write landed on trunk
-anyway (both copies came out byte-identical, so nothing was lost, but the
-refusal's whole point was bypassed). `no_tool_reason` exists for jobs no
-lane tool can do, never as a second door around a refusal that already
-named its own remedy. When SE-C-134 fires, the remedy is escape-edit-return
-— always, even though se_run would technically let the bytes through.
+THE HOLE IT NEVER COVERED. It guarded five path-carrying tools and could not
+watch `se_run`'s shell commands, which are handed no path to judge. That is
+`raid-iss-the-shell-writes-method-with-no-path-to-judge`, and resolution does
+not close it either. A shell still writes wherever it is pointed.
 
 ## Notes and prose
 

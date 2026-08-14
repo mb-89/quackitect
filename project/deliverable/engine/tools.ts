@@ -40,7 +40,7 @@ import { bumpDrawingEpoch } from "./machines/compile.ts";
 import { McpServer, requestContextAdapter, type ToolDef } from "./mcp.ts";
 import { ModelFileSystem } from "./model-fs.ts";
 import { openPanel } from "./panel.ts";
-import { fansOut, resolveInRoot, seDir } from "./paths.ts";
+import { resolveInRoot, seDir } from "./paths.ts";
 import { type MirrorState, renderMirror } from "./render.ts";
 import { resolve as resolveSeam } from "./resolve.ts";
 import { jobDone, jobList, jobStatus, jobStop, runBackground, runToCompletion, startJob } from "./run.ts";
@@ -1701,27 +1701,22 @@ export function buildServer(
   server.addGuard((tool) => {
     if (WRITE_TOOLS.has(tool)) session.forgetRoute();
   });
-  server.addGuard((tool, args) => {
-    if (!WRITE_TOOLS.has(tool) || session.workRoot() === root) return;
-    const paths: string[] = [];
-    for (const k of ["path", "glob", "from", "to"]) if (typeof args[k] === "string") paths.push(args[k] as string);
-    if (Array.isArray(args.ops)) {
-      for (const op of args.ops as Record<string, unknown>[]) if (typeof op.path === "string") paths.push(op.path);
-    }
-    const offending = paths.filter((p) => fansOut(p));
-    if (offending.length === 0) return;
-    throw new Rejection({
-      clause: CLAUSES.METHOD_WRITE_BOUND,
-      expected: "a method write from trunk — step out of the record first",
-      got: `${offending.join(", ")} — written while a record's worktree is bound`,
-      remedy: {
-        tool: "se_pull",
-        args: { escape: "method cannot be changed from inside a record" },
-        note: "escape to the front desk, make the edit there, then aim back. The walk is left standing, so nothing is lost. A record's OWN evidence is never refused here.",
-      },
-      source: "engine/tools.ts method guard",
-    });
-  });
+  // SE-C-134 STOOD HERE, and it is retired (owner ruling 2026-08-14).
+  //
+  // It refused a method write made from inside a record, because such a write
+  // landed in the record's own worktree and then fanned out over trunk at the
+  // merge. That really happened on 2026-08-07: it overwrote trunk's tool list
+  // and deleted two lane verbs.
+  //
+  // THE REFUSAL IS REPLACED BY A RESOLUTION, never merely dropped. Shared
+  // method now resolves to the MACHINE ROOT whatever tree is bound, in
+  // session.laneRoot, which is what resolve.ts already said in storeFor. A
+  // method write cannot land in a tree that does not own it, so there is
+  // nothing left to refuse.
+  //
+  // WHAT IT COST WHILE IT STOOD: escape to the desk, edit, aim back, and a
+  // 44-hop replay that timed out twice on the way in. Six times in one
+  // session on 2026-08-14, and twice more the day it was removed.
 
   let updateComplaint: RejectionPayload | undefined;
   let updateRejection: Rejection | undefined;
