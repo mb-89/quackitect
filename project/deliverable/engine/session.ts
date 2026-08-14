@@ -5191,6 +5191,58 @@ export class Session {
    *  completion-time sentence, and for a state simply not walked yet it says
    *  nothing `form_incomplete` has not already said. The guard keeps it as
    *  its own fallback. */
+  /** WHAT IS WRONG WITH THIS ONE CLAIM'S OWN CONTENT, ignoring its feeders.
+   *
+   *  Extracted so the fallen-input remedy can ask it about the state that
+   *  FELL, which is how the refusal knows whether to name se_amend or
+   *  se_reopen. Asking about feeders here would recurse; the ripple already
+   *  walks them. */
+  private ownClaimProblems(stateId: string, m: MachineDecl): string[] {
+    const decl = m.states.find((s) => s.id === stateId);
+    if (decl === undefined) return [];
+    try {
+      // this.traceRoot(it) IN FULL, not a renamed local. A guard test greps
+      // for exactly this spelling, because a claim check resolving against
+      // the wrong record is the drift it catches.
+      const it = this.declIteration(m);
+      if (it === undefined) return [];
+      const body = noteOf(this.evidenceAbs(it, stateId))?.body;
+      if (body === undefined) return [];
+      return claimProblems(this.traceRoot(it), decl, body, loadTrace(this.traceRoot(it)));
+    } catch {
+      return []; // an unreadable claim falls back to the plain sentence
+    }
+  }
+
+  /** WHICH VERB FIXES A FALLEN INPUT, decided rather than guessed.
+   *
+   *  A claim loses its green two ways, and they want different verbs.
+   *
+   *  - ITS CONTENT STILL PASSES. The ripple dropped it because something
+   *    upstream moved. A small correction goes in with se_amend, which LEAVES
+   *    THE TREE STANDING.
+   *  - ITS CONTENT NO LONGER PASSES. The work is genuinely wrong, and
+   *    se_reopen sends it back to be re-earned.
+   *
+   *  se_reopen on the first case is what cost a bless on 2026-08-14. The
+   *  resubmit dropped the person's adjudication and everything downstream
+   *  fell with it. */
+  private fallenRemedy(fallen: string, m: MachineDecl): { tool: string; args: Record<string, unknown>; note: string } {
+    const problems = this.ownClaimProblems(fallen, m);
+    if (problems.length === 0) {
+      return {
+        tool: "se_amend",
+        args: { state: fallen, fills: {}, reason: "<what the upstream change touched>" },
+        note: `${fallen}'s own content still passes, so it lost its green to the ripple rather than to a defect. Amend the field the change touched and the tree stays standing. se_reopen would drop this claim, everything downstream, and any bless on it.`,
+      };
+    }
+    return {
+      tool: "se_reopen",
+      args: { state: fallen, reason: "<why it stopped standing>" },
+      note: `${fallen}'s own content no longer passes: ${problems.join(" ")}. That is a defect rather than a ripple, so it is re-earned rather than amended.`,
+    };
+  }
+
   claimBlockers(stateId: string, machine?: MachineDecl): Blocker[] {
     const m = machine ?? this.currentMachine();
     const decl = m.states.find((s) => s.id === stateId);
@@ -5210,11 +5262,15 @@ export class Session {
           clause: CLAUSES.CONDITION_UNMET,
           expected,
           got: `${stateId}'s OWN claim may be fine. It is dropped because these inputs are not standing: ${fallen.join(", ")}`,
-          remedy: {
-            tool: "se_pull",
-            args: {},
-            note: `re-earn ${fallen.join(", ")} first — green ripples forward, and this one follows without being touched`,
-          },
+          // NAME THE VERB, never just the word "re-earn" (i27, 2026-08-14).
+          // This remedy used to say se_pull with no arguments, which only
+          // repeats the refusal. The agent picked the verb whose NAME matched
+          // the sentence, chose se_reopen where se_amend was right, and the
+          // guess cost a person's bless and a six-milestone cascade.
+          //
+          // The engine already knows which verb fits, because it can ask the
+          // fallen claim whether its OWN content still passes.
+          remedy: this.fallenRemedy(fallen[0], m),
           source: "engine/session.ts claim-guard",
         },
       ];
@@ -5222,20 +5278,7 @@ export class Session {
     // AND WHEN NOTHING UPSTREAM FELL, SAY WHAT IS WRONG WITH THIS ONE (owner
     // instruction 2026-08-13). The content check knows which field failed and
     // what it wanted; a check reports in the words of the question IT asked.
-    const own = ((): string[] => {
-      try {
-        // this.traceRoot(it) IN FULL, not a renamed local. A guard test greps
-        // for exactly this spelling, because a claim check resolving against
-        // the wrong record is the drift it catches.
-        const it = this.declIteration(m);
-        if (it === undefined) return [];
-        const body = noteOf(this.evidenceAbs(it, stateId))?.body;
-        if (body === undefined) return [];
-        return claimProblems(this.traceRoot(it), decl, body, loadTrace(this.traceRoot(it)));
-      } catch {
-        return []; // an unreadable claim falls back to the plain sentence
-      }
-    })();
+    const own = this.ownClaimProblems(stateId, m);
     if (own.length > 0) {
       return [
         {

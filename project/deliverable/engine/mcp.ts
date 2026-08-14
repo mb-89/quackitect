@@ -12,6 +12,7 @@
 // in tool names, so dotted names live in titles/descriptions only.
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { createInterface } from "node:readline";
+import { boundAnswer } from "./bound.ts";
 import { Rejection } from "./errors.ts";
 
 export interface ToolDef {
@@ -179,8 +180,11 @@ export class McpServer {
             // calls.jsonl would bloat it for no reader's benefit.
             const { payload, blocks } = this.splitAttachments(result);
             this.observe({ tool: name, args, ok: true, duration_ms: Date.now() - started, outcome: "result", response: payload });
+            // THE BOUND FIRES HERE because this is the one place every
+            // answer is serialised. A host that truncates gives back nothing
+            // the engine can act on; the bound gives back a remedy.
             return this.ok(id, {
-              content: [{ type: "text", text: JSON.stringify(payload, null, 1) }, ...blocks],
+              content: [{ type: "text", text: boundAnswer(name, payload).text }, ...blocks],
               isError: false,
             });
           } catch (e) {
