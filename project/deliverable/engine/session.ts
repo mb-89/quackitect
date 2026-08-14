@@ -2414,6 +2414,18 @@ export class Session {
     return s.trim().replace(/\s+/g, " ").toLowerCase();
   }
 
+  /** HOW LONG A SWEEP MAY RUN BEFORE IT ANSWERS.
+   *
+   *  NOT A PERFORMANCE BUDGET. It is the guarantee that the sweep ALWAYS
+   *  returns a whole answer, standing on a whole state, inside any caller's
+   *  timeout. A sweep that is cut off instead of answering is the one thing
+   *  that leaves the walk between two states.
+   *
+   *  Twenty seconds is well under every timeout the lane has been driven
+   *  through, and a forty-four hop route has never taken half of it once the
+   *  hops are whole. */
+  static readonly SWEEP_BUDGET_MS = 20_000;
+
   /** THE SWEEP — the route, walked. It collapses ROUND TRIPS and nothing
    *  else: every hop still enters its state, still weighs the slider, still
    *  proves its reads, still runs its scripts, still writes its own line to
@@ -2422,7 +2434,8 @@ export class Session {
    *  THE ROUTE IS RECOMPUTED AFTER EVERY HOP, which is the detour: if the
    *  ground moved, the way is worked out again FROM WHERE THE WALK NOW
    *  STANDS rather than followed off a cliff. */
-  async sweep(target: string, channel: Channel): Promise<Record<string, unknown>> {
+  async sweep(target: string, channel: Channel, budgetMs: number = Session.SWEEP_BUDGET_MS): Promise<Record<string, unknown>> {
+    const started = Date.now();
     const walked: string[] = [];
     // A BANNER EARNED MID-SWEEP MUST SURVIVE THE SWEEP. advance hands
     // its banner back per hop, and a sweep that swallowed it lost the boot
@@ -2431,6 +2444,24 @@ export class Session {
     const banners: string[] = [];
     const carry = (): Record<string, unknown> => (banners.length > 0 ? { banners } : {});
     for (let guard = 0; guard < 64; guard++) {
+      // THE SWEEP MUST ANSWER, NEVER BE CUT OFF. A long route walked past the
+      // caller's timeout leaves the walk mid-hop, and the next pull then
+      // computes from a position the machine disagrees with — the
+      // `completeState: <state> is not active` error, eight times across two
+      // sessions (note-c76d90e3c17a).
+      //
+      // So the budget is checked BETWEEN hops, where the walk always stands
+      // on a whole state. Stopping here is not a failure: the route
+      // recomputes from wherever it stopped, and the next sweep carries on.
+      if (walked.length > 0 && Date.now() - started >= budgetMs) {
+        return {
+          ...this.packet(),
+          swept: walked,
+          arrived: false,
+          ...carry(),
+          note: `swept ${walked.length} hop(s) and stopped ON A STATE at the ${budgetMs} ms budget rather than being cut off mid-hop — sweep again and the route recomputes from here`,
+        };
+      }
       const r = this.route(target);
       if (r.steps.length === 0) {
         return { ...this.packet(), swept: walked, arrived: r.found, ...carry(), ...(r.found ? {} : { note: r.note }) };

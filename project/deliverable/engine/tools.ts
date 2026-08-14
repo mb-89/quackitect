@@ -219,10 +219,25 @@ export function sessionTools(session: Session): ToolDef[] {
         "AIM THE WALK at a state, then pull and be carried there. The machine draws the route and walks every hop whose conditions already pass, stopping only where something is genuinely owed — so a state that is already green is walked THROUGH, never landed on. Name any state in the machine you stand in, or a fully qualified one like iterations/i1/write-requirements. THIS IS HOW YOU MOVE: taking an offered door aims one hop, which draws a route one segment long and lands you on every state in between. Aim far instead. Aiming is not walking and changes nothing — the pull still refuses whatever the conditions and the dial refuse.",
       inputSchema: {
         type: "object",
-        properties: { to: { type: "string", description: "the state to aim at — the route is drawn to it and the pull follows it" } },
+        properties: {
+          to: { type: "string", description: "the state to aim at — the route is drawn to it and the pull follows it" },
+          go: {
+            type: "boolean",
+            description:
+              "TAKE ME THERE IN THIS CALL. Aiming alone only draws the route; with go the machine walks it and the answer says whether it ARRIVED. Nothing is owed on the way means one call and you are there. Something owed means it stops on that state and says which, and the walk stands where it stopped — never between two states.",
+          },
+        },
         required: ["to"],
       },
-      handler: (args) => session.setTarget(String(args.to)),
+      handler: async (args) => {
+        const aimed = session.setTarget(String(args.to));
+        if (args.go !== true) return aimed;
+        // req-a-clear-jump-is-one-call: the caller named the target and asked
+        // to be taken there in the SAME call, so the sweep runs here rather
+        // than waiting for a pull. The sweep is time-bounded, so this answers
+        // whether or not the whole route fits.
+        return { ...aimed, ...(await session.sweep(String(args.to), "agent")) };
+      },
     },
     {
       name: "se_why",

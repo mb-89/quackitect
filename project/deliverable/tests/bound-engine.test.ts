@@ -82,17 +82,17 @@ test("only method and engine are overridable, because a record's evidence is not
 
 test("a record that overrides nothing levels with nothing to rebase", () => {
   const clean = "project/spec/iterations/i27-clean";
-  const r = levelRecordTree(ROOT, clean, { rebase: () => ({ ok: true }), commit: () => ({ ok: true }) });
+  const r = levelRecordTree(ROOT, clean, { reconcile: () => ({ ok: true }), commit: () => ({ ok: true }) });
   assert.equal(r.levelled, true);
   assert.deepEqual(r.overrides, [], "most records hold no override at all");
 });
 
-test("entry levels the record's tree and rebases its delta before the first call", () => {
-  let rebased = false;
+test("entry levels the record's tree and reconciles its delta before the first call", () => {
+  let reconciled = false;
   let committed = false;
   const r = levelRecordTree(ROOT, RECORD, {
-    rebase: () => {
-      rebased = true;
+    reconcile: () => {
+      reconciled = true;
       return { ok: true };
     },
     commit: () => {
@@ -101,13 +101,13 @@ test("entry levels the record's tree and rebases its delta before the first call
     },
   });
   assert.equal(r.levelled, true);
-  assert.equal(rebased, true, "the delta is rebased on trunk");
+  assert.equal(reconciled, true, "the delta is reconciled with trunk BY MERGE — SE-C-002 forbids a rebase");
   assert.equal(committed, true, "and what it brought is committed before anything serves");
 });
 
 test("a stale override stops the record at entry rather than composing a mixture", () => {
   const r = levelRecordTree(ROOT, RECORD, {
-    rebase: () => ({ ok: false, conflict: "session.ts: both modified" }),
+    reconcile: () => ({ ok: false, conflict: "session.ts: both modified" }),
     commit: () => {
       throw new Error("a record that did not level must never commit");
     },
@@ -117,7 +117,7 @@ test("a stale override stops the record at entry rather than composing a mixture
 });
 
 test("a levelling that cannot commit is not a levelling", () => {
-  const r = levelRecordTree(ROOT, RECORD, { rebase: () => ({ ok: true }), commit: () => ({ ok: false }) });
+  const r = levelRecordTree(ROOT, RECORD, { reconcile: () => ({ ok: true }), commit: () => ({ ok: false }) });
   assert.equal(r.levelled, false, "all-or-nothing means the commit is part of it");
 });
 

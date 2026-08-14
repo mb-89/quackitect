@@ -9,10 +9,18 @@
 import { overridesIn } from "./delta.ts";
 
 /** The git work levelling needs, injected so the logic is testable without a
- *  repository. The real one wraps the git lane. */
+ *  repository. The real one wraps the git lane.
+ *
+ *  IT RECONCILES, IT DOES NOT REBASE. SE-C-002 forbids a rebase outright:
+ *  never rewrite, and superseded content stays in history. A diverged branch
+ *  reconciles by MERGE, which only adds a revertable commit.
+ *
+ *  The method was called `rebase` when this interface was first written, and
+ *  the name promised the one operation the git lane refuses. Found while
+ *  building the real adapter on 2026-08-14. */
 export interface GitLane {
-  /** Rebase the record's delta onto trunk. */
-  rebase(recordRel: string): { ok: boolean; conflict?: string };
+  /** Bring trunk into the record's tree by merge. */
+  reconcile(recordRel: string): { ok: boolean; conflict?: string };
   /** Commit whatever the levelling brought into the record's tree. */
   commit(recordRel: string, message: string): { ok: boolean };
 }
@@ -28,7 +36,7 @@ export interface LevelResult {
 
 /** START, and it is all-or-nothing.
  *
- *  Level the record's tree, rebase its delta on trunk, commit what was
+ *  Level the record's tree, reconcile its delta with trunk, commit what was
  *  brought, and only then serve. A conflict stops the record at entry with
  *  the conflict NAMED, rather than composing a mixture nobody assembled.
  *
@@ -42,17 +50,17 @@ export interface LevelResult {
 export function levelRecordTree(root: string, recordRel: string, git: GitLane): LevelResult {
   const overrides = overridesIn(root, recordRel);
 
-  // A record that overrides nothing has nothing to rebase, and trunk moving
-  // under it is not a conflict. Most records are this one.
+  // A record that overrides nothing has nothing to reconcile, and trunk
+  // moving under it is not a conflict. Most records are this one.
   if (overrides.length === 0) return { levelled: true, overrides };
 
-  const rebased = git.rebase(recordRel);
-  if (!rebased.ok) {
+  const reconciled = git.reconcile(recordRel);
+  if (!reconciled.ok) {
     // THE FOURTH CELL OF THE TABLE: an override that no longer applies to the
-    // trunk file beneath it. Reported, never merged.
+    // trunk file beneath it. Reported, never resolved by guesswork.
     return {
       levelled: false,
-      conflict: rebased.conflict ?? "the record's delta would not rebase on trunk",
+      conflict: reconciled.conflict ?? "the record's delta would not reconcile with trunk",
       overrides,
     };
   }
