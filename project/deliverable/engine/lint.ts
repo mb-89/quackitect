@@ -358,3 +358,40 @@ export function lintProse(root: string, text: string, rel?: string): LintFinding
   }
   return findings.map(tag);
 }
+
+/** WHICH VOICE RULES REFUSE A SUBMIT, read from the config card.
+ *
+ *  The lint runs at every form submit. What it DOES with a finding is the
+ *  card's decision rather than this engine's, which is the same rule the
+ *  thresholds already follow: the logic lives here, the parameters are data.
+ *
+ *  A rule named in `blocking:` refuses. Everything else is reported beside
+ *  the form and lets the submit through.
+ *
+ *  THE DEFAULT IS `wall` ALONE, because it is already law elsewhere: SE-C-125
+ *  refuses a wall of prose at the lane, and no renderer can invent the
+ *  paragraphs an author did not write. Naming it here makes one rule behave
+ *  the same way in both places.
+ *
+ *  AN UNREADABLE CARD BLOCKS NOTHING. A missing file must not silently start
+ *  refusing every submit in the product. */
+export function blockingRules(root: string): string[] {
+  let text: string;
+  try {
+    text = readFileSync(join(root, ...LINT_CONFIG.split("/")), "utf8");
+  } catch {
+    return [];
+  }
+  const lines = text.split(/\r?\n/);
+  const end = lines.indexOf("---", 1);
+  const front = lines.slice(0, end < 0 ? lines.length : end);
+  const at = front.findIndex((l) => l.trim() === "blocking:");
+  if (at < 0) return [];
+  const out: string[] = [];
+  for (const l of front.slice(at + 1)) {
+    const m = /^\s+-\s+(\S+)\s*$/.exec(l);
+    if (m === null) break;
+    out.push(m[1]);
+  }
+  return out;
+}

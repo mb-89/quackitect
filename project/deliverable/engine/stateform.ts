@@ -15,6 +15,7 @@ import { clusterDsm, type Dsm, flowMatrix } from "./dsm.ts";
 import { type ElementMatrixView, elementMatrixView } from "./elematrix.ts";
 import type { FormTemplate } from "./forms.ts";
 import { pendingNotes } from "./inbox.ts";
+import { blockingRules, lintProse } from "./lint.ts";
 import type { EvidenceField, MachineDecl, StateDecl } from "./machine.ts";
 import { bare, type MorphBox, type MorphCell, type MorphLine, type MorphRow, orderLines, storedOrder } from "./morphbox.ts";
 import { noteOf, parseStateNote, readNode, section } from "./notes.ts";
@@ -1197,6 +1198,28 @@ const unanswered = (v: string): boolean => v.trim() === "" || /^<!--[\s\S]*-->$/
  *  fragment, and the ellipsis reads as style rather than as loss. */
 const LOST_ITS_TAIL = /(?:…|\.\.\.)\s*$/;
 
+/** THE VOICE LINT AT SUBMIT, and the card decides which of its rules BITE.
+ *
+ *  `blocking:` in machines/lint/voice-lint.md names the rules that refuse.
+ *  Everything else the lint finds is a report and lets the submit through, so
+ *  a comma never stands in the way of a form.
+ *
+ *  WHY HERE RATHER THAN AT A LATER SWEEP. Prose written into a form is prose
+ *  the author is looking at right now. An overhaul that finds it weeks later
+ *  is finding it after the reader already read it.
+ *
+ *  ONLY PROSE. A table, a checklist and a reference list are STRUCTURE, and
+ *  running sentence rules over them would flag the shape of a form rather
+ *  than anything anybody wrote. */
+function voiceProblems(name: string, meta: TemplateMeta, content: string, root?: string): string[] {
+  if (root === undefined || meta.editor !== "text" || content.trim() === "") return [];
+  const bite = new Set(blockingRules(root));
+  if (bite.size === 0) return [];
+  return lintProse(root, content)
+    .filter((f) => bite.has(f.rule))
+    .map((f) => `${name}: ${f.rule} — ${f.hint} ("${f.excerpt}")`);
+}
+
 function nodeTableProblems(name: string, args: FieldArgs, content: string): string[] {
   const rows = content.split("\n").map(tableRow);
   const missing: string[] = [];
@@ -1355,7 +1378,7 @@ export function fieldProblems(
   root?: string,
 ): string[] {
   if (meta.editor === "choice-rationale") return choiceProblems(name, args, content);
-  const out: string[] = [...refProblems(name, meta, args, content, corpus, root)];
+  const out: string[] = [...refProblems(name, meta, args, content, corpus, root), ...voiceProblems(name, meta, content, root)];
   // EVERY CELL IS REQUIRED. The rows are the register itself, so an empty
   // cell is a standing node nobody answered for — which is exactly the state
   // this field exists to refuse. "No check exists yet" is a legal answer and

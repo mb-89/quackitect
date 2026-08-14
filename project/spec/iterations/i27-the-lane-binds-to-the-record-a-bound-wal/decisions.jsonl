@@ -752,3 +752,12 @@
 {"ts":"2026-08-14T17:47:06.762Z","op":"update","visit":"iterations/i27/build-steps/form-checks@0","node":"d36","brief":"testing the ellipsis guard"}
 {"ts":"2026-08-14T17:47:30.082Z","op":"update","visit":"iterations/i27/build-steps/form-checks@0","node":"d37","brief":"the cage template needed the hook in the record's tree too"}
 {"ts":"2026-08-14T17:47:41.053Z","op":"done","visit":"iterations/i27/build-steps/form-checks@0","node":"d29","brief":"a cell that lost its tail is refused, and the cage test proved the tree split"}
+{"ts":"2026-08-14T17:48:01.656Z","op":"update","visit":"iterations/i27/build-steps/form-checks@0","node":"d38","brief":"handover records exactly where form-checks stands"}
+{"ts":"2026-08-14T17:49:10.290Z","op":"update","visit":"iterations/i27/build-steps/form-checks@0","node":"d39","brief":"which voice rules bite is now data, defaulting to the wall alone"}
+{"ts":"2026-08-14T17:49:25.544Z","op":"update","visit":"iterations/i27/build-steps/form-checks@0","node":"d40","brief":"the lint can say which of its rules refuse"}
+{"ts":"2026-08-14T17:49:52.402Z","op":"update","visit":"iterations/i27/build-steps/form-checks@0","node":"d41","brief":"the voice lint now runs on prose fields at submit"}
+{"ts":"2026-08-14T17:50:07.878Z","op":"update","visit":"iterations/i27/build-steps/form-checks@0","node":"d42","brief":"the voice check is its own function, under the complexity gate"}
+{"ts":"2026-08-14T17:51:45.028Z","op":"done","visit":"iterations/i27/build-steps/form-checks@0","node":"d27","brief":"the voice lint runs at submit, and the card says which rules bite"}
+{"ts":"2026-08-14T17:52:19.671Z","op":"done","visit":"iterations/i27/build-steps/clear-jump@0","node":"d11","brief":"all three parts of form-checks built and tested"}
+{"ts":"2026-08-14T17:52:34.996Z","op":"plan","visit":"iterations/i27/build-steps/form-checks@0","parent":null,"nodes":[{"id":"d43","brief":"close the build-steps join"}]}
+{"ts":"2026-08-14T17:52:46.496Z","op":"update","visit":"iterations/i27/build-steps/form-checks@0","node":"d44","brief":"committing form-checks before the last feeder"}
