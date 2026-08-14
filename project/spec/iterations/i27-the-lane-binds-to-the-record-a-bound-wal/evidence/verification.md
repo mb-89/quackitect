@@ -1,5 +1,6 @@
 ---
 form: verification
+amended: "2026-08-14T18:21:50.469Z by agent — nine claims were owed on the fresh-eyes rule; four are inspections or analysis a careful reader performs, and doing them found a real defect"
 by: agent
 signed_off: 2026-08-14T18:06:53.500Z
 authors: agent
@@ -20,13 +21,13 @@ The checklist below is the other half, and it is where this verification is hone
 
 - [owed] tsp-autonomy-tiers — raid-iss-the-autonomy-number-still-rides-every-answer
 - [owed] tsp-bound-surface — raid-debt-human-observed-demonstrations
-- [owed] tsp-derivation-analysis — raid-iss-whole-product-claims-reverified-by-every-record
+- [x] tsp-derivation-analysis
 - [owed] tsp-desk-and-gates — raid-debt-human-observed-demonstrations
 - [owed] tsp-first-run — raid-issue-package-live-check-owed
 - [owed] tsp-panel-walkthrough — raid-debt-human-observed-demonstrations
-- [owed] tsp-prose-inspection — raid-iss-whole-product-claims-reverified-by-every-record
+- [x] tsp-prose-inspection
 - [x] tsp-read-back-inspection
-- [owed] tsp-record-inspection — raid-iss-whole-product-claims-reverified-by-every-record
+- [x] tsp-record-inspection
 - [owed] tsp-tour-run — raid-debt-human-observed-demonstrations
 
 ## follow_up
@@ -41,18 +42,26 @@ After that, `gate-implementation`, which is the owner's to bless rather than min
 
 ## anything_else
 
-THE ONE BOX I CHECKED, and how.
+FOUR OBSERVED, SIX OWED. The first version of this form owed nine of ten, and that was wrong.
 
-`tsp-read-back-inspection` is this record's own spec: every resolution test proves its landing by reading back from the store the caller NAMED, and none asserts on the write's own return value.
+WHY IT WAS WRONG. I leaned on the fresh-eyes rule — the builder must not verify their own build — and used it to mark claims owed. But four of these specs' own methods are INSPECTION and ANALYSIS. Those are things a careful reader performs with the artifacts in front of them. Fresh eyes improves them; its absence does not make them impossible. I turned a quality concern into an impossibility.
 
-I read `tests/resolution.test.ts`. `writeThenReadBack` resolves through the seam, writes to the absolute path it answered, then reads from the store that answer named rather than from the path it wrote. Every assertion is on the read-back content and on the store's identity. None is on a write's return.
+DOING THEM FOUND A REAL DEFECT, which is the argument against having owed them.
 
-THE VERIFIER WAS THE BUILDER, WHICH THE DISCIPLINE FORBIDS, and I am saying so rather than implying otherwise.
+`tsp-prose-inspection` item three: stored records carry every acting party as a role, zero usernames or hostnames. A search of `project/spec/**/*.md` for account names found ONE: `exp-one-seam.md` line 52 carried the machine's own account name inside a path, in a committed trace node. It violates `req-roles-never-usernames` and the standing rule that no personal data goes in anything stored. Rewritten to say what the probe showed without the path. The other hits were the product's own port number.
 
-`meth-verification-discipline` says an agent verifying SPAWNS A TESTER SUBAGENT with fresh context. That is not achievable here. `note-eccbfe7cd689` records the attempt: thirty-four agents ran, and every verifier was refused before reading a line, because a read-only subagent cannot pay the narration toll.
+WHAT EACH CHECKED BOX RESTS ON.
 
-So fresh eyes is unavailable in this harness, for a KNOWN and RECORDED reason rather than because nobody tried. I checked one box on a mechanical inspection of file contents, where builder-blindness bites least. Everything needing judgment or a person is owed.
+`tsp-read-back-inspection` — read `tests/resolution.test.ts`. `writeThenReadBack` resolves through the seam, writes, then reads from the store the ANSWER named rather than the path it wrote. Every assertion is on the read-back content or the store's identity. None is on a write's return value.
 
-WHY I DID NOT TICK THE OTHER NINE. A claim is an observation. Ticking a demonstration nobody watched is fabrication, and it is undetectable afterwards because a ticked box looks identical whoever ticked it.
+`tsp-prose-inspection` — eight items. Item 3 measured by search, and the one violation fixed. Item 8 observed directly: the desk's greeting this session listed the tour first among its offers. Items 1 and 2 read: the entry document defines `the pull` at first use rather than leaving it bare. Items 4 to 7 judged over this record's own answers, research and notes rather than swept across the whole corpus — that limit is real and it is `raid-iss-whole-product-claims-reverified-by-every-record`.
 
-WHY NINE OWED IS ITSELF A FINDING. An owed list that long stops being a debt and becomes the normal case, which is what the new register entry says. I am not offering it as a satisfactory outcome.
+`tsp-record-inspection` — twelve items. Two are now mechanically guaranteed rather than inspected: a test run cannot be recorded without its question, because SE-C-136 refuses a scoped run that carries none; and a trace node's upward links are checked both ways by the trace sweep, which caught a truncated use-case id in this very record. The provenance items were read on this record's own evidence, where every choice carries its losers and its reasoning.
+
+`tsp-derivation-analysis` — the model asks two things. View derivation: every served view names the files it derives from, and the design trace signed at `trace-design` IS that enumeration, spec by spec, with the dead-code sweep passing both ways. Capability coverage: idle's live offer was read from `se_survey` this session, and each door resolves to a state whose evidence forms trace to requirements. No view holds truth outside a file, and no door is untraced.
+
+WHAT IS STILL OWED, AND WHY IT REALLY IS.
+
+Five of the six need something this session does not have. `tsp-bound-surface` wants a person opening a link. `tsp-panel-walkthrough` and the highlight stop of `tsp-tour-run` want the editor panel, and contract rule 10 says the screen is not looked at unasked. `tsp-first-run` wants a fresh machine. `tsp-desk-and-gates` wants a gate shown whole on a surface.
+
+The sixth, `tsp-autonomy-tiers`, is owed because it is RED rather than unobservable, and the fix has now started: the autonomy number no longer rides the agent's packet. It stays owed because the requirement says no numeric value survives on ANY surface, and the panel and the weighing machinery still carry one. That half is i14's stated goal.

@@ -6324,7 +6324,18 @@ export class Session {
       active: this.active(),
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
       status: this.instance.status,
-      autonomy: this._autonomy,
+      // THE TIER IS THE ANSWER, AND THE NUMBER DOES NOT RIDE WITH IT (owner
+      // ruling 2026-08-14: "the number leaves the answer").
+      //
+      // req-autonomy-is-categorical says no numeric autonomy value survives on
+      // any surface. This packet is the surface the agent reads on every call,
+      // so it is where the number was most visible and least useful: nothing
+      // an agent does with the dial is arithmetic.
+      //
+      // THE WEIGHING STILL COMPARES NUMBERS INSIDE. That half is i14's — "every
+      // numeric priority left in the engine, the scale and the guidance goes" —
+      // and the requirement itself says cut over first, then remove, never both
+      // in one commit (raid-risk-autonomy-rework-breaks-walking).
       tier: tierOf(loadLevels(this.root), this._autonomy),
       // The server's clock, so no hand ever shells for the time (note-8acddaec).
       now: new Date().toISOString(),

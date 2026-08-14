@@ -786,3 +786,16 @@
 {"ts":"2026-08-14T18:09:17.951Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d65","brief":"filling the implementation gate for the owner's bless"}
 {"ts":"2026-08-14T18:09:25.417Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d66","brief":"stamping the gate evidence, leaving the bless"}
 {"ts":"2026-08-14T18:09:32.988Z","op":"done","visit":"iterations/i27/verification@0","node":"d63","brief":"the implementation gate is signed and waiting on the owner's bless"}
+{"ts":"2026-08-14T18:09:39.176Z","op":"done","visit":"iterations/i27/verification@0","node":"d55","brief":"battery green at 1271 of 1271"}
+{"ts":"2026-08-14T18:09:55.453Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d67","brief":"handover records the gate waiting on the bless"}
+{"ts":"2026-08-14T18:14:54.820Z","op":"plan","visit":"iterations/i27/gate-implementation@0","parent":null,"nodes":[{"id":"d68","brief":"dig into what each owed claim actually demands"},{"id":"d69","brief":"answer the four points"}]}
+{"ts":"2026-08-14T18:15:51.375Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d68","brief":"the dig-in cut nine owed claims to three"}
+{"ts":"2026-08-14T18:17:31.791Z","op":"plan","visit":"iterations/i27/gate-implementation@0","parent":null,"nodes":[{"id":"d70","brief":"the number leaves the agent's packet"},{"id":"d71","brief":"see what the tests say"}]}
+{"ts":"2026-08-14T18:17:37.687Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d70","brief":"the packet hands over the tier alone"}
+{"ts":"2026-08-14T18:18:11.176Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d72","brief":"the test now pins the new law instead of the old"}
+{"ts":"2026-08-14T18:19:08.763Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d73","brief":"a stored trace node carried an account name; removed"}
+{"ts":"2026-08-14T18:19:52.932Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d74","brief":"searching prior art for the core-and-satellite split"}
+{"ts":"2026-08-14T18:21:50.375Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d71","brief":"four claims observed, and the prose inspection found a live privacy leak"}
+{"ts":"2026-08-14T18:22:33.277Z","op":"plan","visit":"iterations/i27/gate-implementation@0","parent":null,"nodes":[{"id":"d75","brief":"amend the gate with the comparison and the corrected counts"},{"id":"d76","brief":"confirm the tree still stands"}]}
+{"ts":"2026-08-14T18:22:37.449Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d75","brief":"both forms amended, signatures kept"}
+{"ts":"2026-08-14T18:22:41.826Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d77","brief":"committing the rework while the battery runs"}

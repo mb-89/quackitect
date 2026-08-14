@@ -49,8 +49,12 @@ the engine writes no rule for it.
 
 ### The platform refuses nothing
 
-`..\..\..\..\Users` resolved to `c:\Users\ichbi\Desktop\ai\Users` — outside
-the worktree, outside the project, no complaint.
+`..\..\..\..\Users` resolved cleanly to a folder OUTSIDE the worktree and
+outside the project — four levels up, in the user's home area — with no
+complaint from the platform.
+
+The real path is left out on purpose: it carried the machine's own account
+name, and a stored trace node is not a place for one.
 
 So rooting alone is not enough. The REFUSE act on
 [[el-resolution-seam]] is required rather than a nicety, and this run is why.
