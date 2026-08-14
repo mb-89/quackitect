@@ -452,3 +452,11 @@ level that shows twenty things has stopped helping them choose.
   - An expedition opened to put the system into VS Code ended up holding a handover law, a rigor column, log paging and a palette file. Nobody looking for those would look there.
   - Amend the goal when the bundle grows past it, or the archive keeps the work and loses the thread.
 - Commits stay fine-grained, and records do not. The two answer different questions.
+- WORK IS PATCHED INTO A SEEDED RECORD ONLY, never into a started one (owner ruling 2026-08-14).
+  - A seed is a proposal. Editing it is still composing the record.
+  - A started record's scope is signed. Work arriving by a later edit to its seed was never in what anybody blessed.
+  - Late work goes to the options pool instead. It reaches a record by the normal route, at the next seeding.
+- EVERY WORK ITEM HAS EXACTLY ONE HOLDER, at every moment (owner ruling 2026-08-14). The holder is the pool, a retro, an iteration, or the archive.
+  - An item held by nothing is the failure this rule exists to stop.
+  - It happened on 2026-08-13. Eight notes were drained to a record, the record's scope disowned them, and for ten minutes they were nowhere.
+  - The machinery belongs to i17, the options pool. Until it lands, the rule holds by authorship.
