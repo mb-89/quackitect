@@ -708,7 +708,10 @@ export class Session {
     if (value < 1) this._emergency = false;
     this.persistSettings();
     this.notifyChange(); // a holding agent wakes and re-reads the packet
-    return { autonomy: value, was, ...this.tierFor(value), ...(this._emergency ? { emergency: true } : {}) };
+    // THE ANSWER IS THE WORD, and the word for what it was (owner ruling
+    // 2026-08-14). The person's control sends a number in; nothing sends one
+    // back out.
+    return { ...this.tierFor(value), was: this.tierFor(was).tier ?? "", ...(this._emergency ? { emergency: true } : {}) };
   }
 
   /** WHAT IS RUNNING RIGHT NOW, which is not always what is stored.
@@ -2073,7 +2076,9 @@ export class Session {
         judgments.push({
           at: s.to,
           needs: "the slider, or the person's own hand",
-          why: `entering ${s.to} weighs ${s.priority}, above the session autonomy ${this._autonomy}`,
+          // THE WORD, NEVER THE NUMBER (owner ruling 2026-08-14). A served
+          // string is an answer like any other.
+          why: `entering ${s.to} is ${this.tierFor(s.priority).tier ?? "heavier"} work, above this session's ${this.tierFor(this._autonomy).tier ?? "dial"}`,
         });
       }
       for (const key of Object.keys(s.demands)) {
@@ -2114,7 +2119,8 @@ export class Session {
    *  being asked one question at a time. */
   route(target: string): RouteResult & {
     from: string;
-    autonomy: number;
+    /** The tier WORD. No number rides an answer (owner ruling 2026-08-14). */
+    tier?: string;
     judgments: { at: string; needs: string; why: string }[];
     reads: string[];
     stops_at?: { at: string; why: string };
@@ -2135,7 +2141,7 @@ export class Session {
 
   private routeNow(target: string): RouteResult & {
     from: string;
-    autonomy: number;
+    tier?: string;
     judgments: { at: string; needs: string; why: string }[];
     reads: string[];
     stops_at?: { at: string; why: string };
@@ -2224,11 +2230,11 @@ export class Session {
       // `aimed_at` keeps the far target visible, so a reader can see both
       // where they are headed and what stands in the way of it.
       ...(objective === aim ? {} : { aimed_at: aim }),
-      // THE WORD RIDES WITH THE NUMBER (req-autonomy-is-categorical). A bare
-      // number is what that row forbids, and this answer sent one. The number
-      // itself stays for now on purpose: raid-risk-autonomy-rework-breaks-walking
-      // says cut over first and remove after, never both in one commit.
-      autonomy: this._autonomy,
+      // THE NUMBER IS GONE FROM THE ANSWER (owner ruling 2026-08-14, final:
+      // "that number leaves... there's no call to be made"). The tier WORD is
+      // the autonomy, and req-autonomy-is-categorical says so. The cut-over
+      // that raid-risk-autonomy-rework-breaks-walking asked for came first and
+      // is complete; this is the removal it said would follow.
       ...this.tierFor(this._autonomy),
       judgments,
       reads: this.routeReadList(r.steps),
@@ -2625,7 +2631,11 @@ export class Session {
       ...(t.statement !== "" ? { statement: t.statement } : {}),
       priority: t.priority,
       open: open && !overWeight,
-      ...(overWeight ? { needs: `the person — ${t.priority} is above the session autonomy ${this._autonomy}` } : {}),
+      ...(overWeight
+        ? {
+            needs: `the person — ${this.tierFor(t.priority).tier ?? "heavier"} work is above this session's ${this.tierFor(this._autonomy).tier ?? "dial"}`,
+          }
+        : {}),
       ...(open ? {} : { blocked_by: Object.keys(this.conditionStatus(decl, t, "enter") ?? {}) }),
     };
   }
@@ -2753,7 +2763,8 @@ export class Session {
       where: this.active(),
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
       target: targetNow(),
-      autonomy: this._autonomy,
+      // The tier word IS the autonomy. No number rides any answer
+      // (owner ruling 2026-08-14).
       ...this.tierFor(this._autonomy),
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
     });
@@ -2920,7 +2931,7 @@ export class Session {
         ...head(),
         waiting_for: "the person",
         at: first.to,
-        why: `entering ${first.to} weighs ${first.priority}, above the session autonomy ${this._autonomy}`,
+        why: `entering ${first.to} is ${this.tierFor(first.priority).tier ?? "heavier"} work, above this session's ${this.tierFor(this._autonomy).tier ?? "dial"}`,
         do: "tell them plainly WHICH step waits and STOP — the dial alone cannot wake you, so they must send a message after moving it",
         ...extra(),
       };
@@ -6841,9 +6852,7 @@ export class Session {
       active: this.active(),
       ...(this.inSub() ? { submachine: { id: this.top()!.decl.id, active: activeStates(this.top()!.instance) } } : {}),
       status: this.instance.status,
-      // The word, beside the number — describe() was the last answer sending a
-      // bare one (req-autonomy-is-categorical).
-      autonomy: this._autonomy,
+      // The tier word, and no number (owner ruling 2026-08-14).
       ...this.tierFor(this._autonomy),
       ...(this._emergency ? { emergency: true } : {}),
       power: this.power,

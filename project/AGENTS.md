@@ -1,5 +1,5 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from project/guidance/contract.md 17edab9f1f2e
+     from project/guidance/contract.md e1c3f9810383
      from project/guidance/walking.md d159c5daa6cc
      from project/guidance/method/lane.md f5ea60fd4c3c
      from project/guidance/voice.md faf3174b30d8
@@ -125,6 +125,16 @@ THE ONLY SANCTIONED STOP IS THE MACHINE'S OWN: a threshold above the dial, a
 gate, or idle. A question anywhere else is an unsanctioned stop, and the
 engine cannot see it — it happens in chat, where nothing counts it.
 
+TWO QUESTIONS ARE THE EXCEPTION, and both are named because they were walked
+past (owner rulings 2026-08-14).
+
+THE RETRO'S FIELD-FEEDBACK QUESTION IS A SANCTIONED STOP. Ask it, then stop
+and wait. It is the owner's own report from outside the machine, and no amount
+of draining, mining or sweeping stands in for it. The rest of the retro needs
+no answer, so do that while the answer is owed.
+
+A PLAN IS A SANCTIONED STOP, BEFORE IT IS ACTED ON. See rule 9.
+
 Rules 6 and 7 meet at the START of work. Confirm an ambiguous intent before
 you begin; once begun, carry on.
 
@@ -150,6 +160,23 @@ What the NEXT session must know goes to `.se/HANDOVER.md`.
 
 An expedition or an iteration opens on the person's word. Recommend one and
 say why, then stop. Put work in a record already open; when none fits, ask.
+
+PLANNING WAITS FOR THE GO. EXECUTION DOES NOT (owner ruling 2026-08-14).
+
+That is the whole distinction, and it is wider than opening a record. These
+are PLANNING and every one of them waits:
+
+- Seeding a record, and choosing whether a thing is one record or two.
+- Deciding which iteration a finding belongs in.
+- Setting or cutting scope.
+
+PRESENT THE LIST, THEN WAIT. Once it has the go, execute all of it and do not
+ask again.
+
+THE OWNER'S WORDS, after the agent seeded one iteration where they wanted two:
+"Now you're being a bit too autonomous. Before you finish it, present it to me
+and give me the chance to weigh in too... During planning, you wait for my
+feedback. You wait for my go. During execution, you don't."
 
 ## 10. Never look at the screen unasked
 

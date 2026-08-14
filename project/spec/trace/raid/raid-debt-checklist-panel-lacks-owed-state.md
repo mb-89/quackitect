@@ -7,6 +7,7 @@ statement: The checklist editor's panel UI (engine/editors/checklist.ts) has no 
 owner: the owner
 trigger: the owner reviews the panel's checklist rendering and decides the visual state and the ref-entry affordance
 status: open
+looked: 2026-08-14
 impact: A returning person reading a checklist field in the panel cannot tell an owed item from an unchecked one by looking - the distinction only shows in the raw markdown. The mechanism (engine/stateform.ts checklistItemStatus, the "- [owed] <item> - <ref>" line form) is fully functional for an agent writing it directly through a form fill; only the panel's own render/collect JS was not extended.
 breaks_how_badly: abrasive
 how_likely: certain

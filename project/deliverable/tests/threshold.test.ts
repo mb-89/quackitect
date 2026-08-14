@@ -29,8 +29,11 @@ test("autonomy 0 is manual mode: the agent's pull waits, the human walks freely"
   const w = await call(server, "se_pull");
   assert.equal(w.isError, false, "a wall is an instruction, never an error");
   assert.equal(w.body.pull, "wait");
-  assert.equal(w.body.autonomy, 0);
-  assert.match(String(w.body.why), /above the session autonomy 0/);
+  // THE WORD, AND NO NUMBER (owner ruling 2026-08-14: "that number leaves...
+  // there's no call to be made"). The tier IS the autonomy.
+  assert.equal(w.body.autonomy, undefined, "no answer carries a bare number");
+  assert.equal(w.body.tier, "blocked", "the dial at its floor is the blocked rung");
+  assert.match(String(w.body.why), /above this session's blocked/);
   // The served wait says DIAL, matching contract rule 3's own wording.
   assert.match(String(w.body.do), /dial alone cannot wake you/);
   // The human's hand (default channel): the same step just goes.

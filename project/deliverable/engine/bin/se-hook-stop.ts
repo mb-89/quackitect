@@ -136,13 +136,27 @@ process.stdin.on("end", () => {
     // covering any question the agent felt uncertain about. It is narrower
     // than that: the walk stops where a PERSON is genuinely required, or where
     // it cannot go on.
+    // A FOURTH JOINED THEM ON 2026-08-14, on the owner's word: "in the last few
+    // retros, you never asked me for field feedback. So you don't stop. You just
+    // continue with your stuff... asking me for field feedback is a reason to
+    // stop."
+    //
+    // It fits (2) on its face and was never read that way, because the agent
+    // could always find more retro to do and kept walking past the question.
+    // Only the FIRST retro step that needs a person gets named here; the rest
+    // of the retro proceeds while the answer is owed.
     const SANCTIONED =
-      "THREE STOPS ARE SANCTIONED AND NOTHING ELSE IS. " +
+      "FOUR STOPS ARE SANCTIONED AND NOTHING ELSE IS. " +
       "(1) A GATE THE PERSON OWNS — gate-implementation is theirs to bless; the rest are yours at this dial. " +
       "(2) A DECISION ONLY THEY CAN MAKE — no answer you could pick would let the walk continue honestly. " +
       "(3) SOMETHING BROKE and no remedy gets you past it. " +
+      "(4) THE RETRO'S FIELD-FEEDBACK QUESTION — ask it, then STOP and wait. It is the owner's own report from outside the machine, " +
+      "nothing else in the retro can stand in for it, and walking on past it has quietly skipped it for several retros running. " +
+      "(5) A PLAN, BEFORE IT IS ACTED ON. PLANNING WAITS FOR THE OWNER'S GO; EXECUTION DOES NOT (owner ruling 2026-08-14). " +
+      "Seeding a record, splitting or merging one, deciding which iteration a finding belongs to, choosing scope — all planning. Present the list and WAIT. " +
+      "Once the plan has the go, execute the whole of it without asking again. " +
       "Being unsure is not one. Having a lot left is not one. Having just finished a piece is not one. " +
-      "Stopping for one of the three? Say which, in one line, and stop again — this tooth bites once per stop.";
+      "Stopping for one of the four? Say which, in one line, and stop again — this tooth bites once per stop.";
     process.stdout.write(
       JSON.stringify({
         decision: "block",
