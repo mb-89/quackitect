@@ -761,3 +761,6 @@
 {"ts":"2026-08-14T17:52:19.671Z","op":"done","visit":"iterations/i27/build-steps/clear-jump@0","node":"d11","brief":"all three parts of form-checks built and tested"}
 {"ts":"2026-08-14T17:52:34.996Z","op":"plan","visit":"iterations/i27/build-steps/form-checks@0","parent":null,"nodes":[{"id":"d43","brief":"close the build-steps join"}]}
 {"ts":"2026-08-14T17:52:46.496Z","op":"update","visit":"iterations/i27/build-steps/form-checks@0","node":"d44","brief":"committing form-checks before the last feeder"}
+{"ts":"2026-08-14T17:53:04.182Z","op":"update","visit":"iterations/i27/build-steps/form-checks@0","node":"d45","brief":"going to the last unsigned feeder"}
+{"ts":"2026-08-14T17:54:26.049Z","op":"update","visit":"iterations/i27/build-steps/refusal-remedies@0","node":"d46","brief":"submitting the last feeder"}
+{"ts":"2026-08-14T17:54:54.747Z","op":"done","visit":"iterations/i27/build-steps/form-checks@0","node":"d43","brief":"the build-steps join closed on the last feeder"}
