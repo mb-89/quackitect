@@ -801,3 +801,8 @@
 {"ts":"2026-08-14T18:22:41.826Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d77","brief":"committing the rework while the battery runs"}
 {"ts":"2026-08-14T18:23:34.067Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d78","brief":"battery past the halfway mark"}
 {"ts":"2026-08-14T18:24:25.220Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d76","brief":"battery green again at 1271 of 1271 after the rework"}
+{"ts":"2026-08-14T18:24:29.128Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d69","brief":"all four points answered and reworked"}
+{"ts":"2026-08-14T18:28:37.925Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d79","brief":"reporting what the red team found"}
+{"ts":"2026-08-14T18:35:43.485Z","op":"plan","visit":"iterations/i27/gate-implementation@0","parent":null,"nodes":[{"id":"d80","brief":"check what M4's prior art actually searched"},{"id":"d81","brief":"check what se-mcp actually runs"}]}
+{"ts":"2026-08-14T18:37:59.905Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d81","brief":"se-mcp builds one Session; both roles run fused in it"}
+{"ts":"2026-08-14T18:38:04.881Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d80","brief":"M4 searched confinement; the process split came after that state"}
