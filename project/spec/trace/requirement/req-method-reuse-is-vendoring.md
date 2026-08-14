@@ -13,4 +13,6 @@ source_refs:
   - uc-begin-a-product ext 7a
   - ".se/req-mine-v2.md: dependencies and the ship review"
 priority: could
+weighs_against:
+  - req-landing-needs-no-close > — an undeclared dependency outlives the record; hoarded landings are recoverable by landing
 ---

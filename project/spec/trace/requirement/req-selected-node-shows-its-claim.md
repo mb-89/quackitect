@@ -12,4 +12,6 @@ refines:
 source_refs:
   - uc-trace-a-decision-to-its-origin step 3
 priority: could
+weighs_against:
+  - req-method-reuse-is-vendoring > — survey pace is paid every session; a silent method fork is paid once and reconciled
 ---

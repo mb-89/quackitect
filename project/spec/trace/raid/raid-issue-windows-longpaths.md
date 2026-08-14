@@ -9,7 +9,7 @@ trigger: the first seed from any deeply nested product root, or the next install
 status: open
 impact: A peer machine that clones into a deep folder cannot seed at all - the two-machine flow dies at its first act. The fresh-eyes observer hit it on the first claim-lane run in a ~140-character temp path.
 breaks_how_badly: crippling
-how_likely: possible
+how_likely: plausible
 source_refs:
   - sty-work-on-two-machines
 ---

@@ -5,6 +5,7 @@ type: "[[function]]"
 cluster: the-account
 statement: put the whole standing position in front of a person, without them asking anybody
 satisfies:
+  - req-a-surface-resolves-to-what-it-shows
   - req-panel-shows-the-machine
   - req-selected-node-shows-its-claim
   - req-filter-draws-only-what-serves

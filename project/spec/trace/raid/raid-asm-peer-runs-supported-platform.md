@@ -11,7 +11,7 @@ probed: "2026-08-13"
 probe: "held narrowly, on a DIFFERENT platform than the 2026-08-12 answer named. The peer that actually showed up on 2026-08-13 ran Linux 6.18 x64 / Node 22.22, not the Windows the owner's answer assumed. The engine ran there — but only after finding and fixing two headless-Linux startup defects (xdg-open ENOENT killing the engine child; the server quitting when its stdin/console closes, which is what backgrounding does). Both are fixed and committed. The installer (RUNME, PowerShell) and packager (Compress-Archive) were never exercised — this peer bootstrapped through the CLI directly, bypassing both."
 impact: A non-Windows peer cannot install (RUNME is PowerShell, the packager shells to Compress-Archive), and the two-machine must demonstration stalls at step one.
 breaks_how_badly: crippling
-how_likely: possible
+how_likely: expected
 ---
 
 ## Probe

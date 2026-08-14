@@ -12,6 +12,8 @@ refines:
 source_refs:
   - reverse-engineered from tests/gitgraph.test.ts
 priority: could
+weighs_against:
+  - req-story-links-its-proving-run > — abandoned reading like landed misleads on every look; an unlinked run is one lookup
 ---
 
 ## Detail

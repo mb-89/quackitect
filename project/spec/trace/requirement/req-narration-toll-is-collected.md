@@ -12,6 +12,8 @@ refines:
 source_refs:
   - reverse-engineered from tests/narration.test.ts and tests/feed.test.ts
 priority: should
+weighs_against:
+  - req-drawn-state-equals-a-row > — the person's only view into a delegated walk outranks the drawing's authoring parity
 ---
 
 ## Detail

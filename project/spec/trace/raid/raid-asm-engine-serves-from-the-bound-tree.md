@@ -3,7 +3,7 @@ minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
 id: raid-asm-engine-serves-from-the-bound-tree
 type: "[[raid]]"
 kind: assumption
-statement: A self-hosting product can bind its lane root to a record's worktree without the running engine losing the ground it stands on.
+statement: A running engine can serve content from a store it does not itself live in, without losing the ground it stands on.
 owner: the driving agent
 trigger: at the first reload taken while a record is bound, once the lane root moves
 status: open

@@ -18,6 +18,7 @@ source_refs:
 priority: should
 weighs_against:
   - req-overlay-resolution >
+  - req-acts-carry-role-and-channel < — a privacy breach is unrecoverable once written; a destroyed builder edit comes back from history
 ---
 
 ## Detail

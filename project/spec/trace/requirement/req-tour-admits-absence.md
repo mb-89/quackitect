@@ -14,5 +14,6 @@ source_refs:
   - ".se/req-mine-v1.md: the mirror — book, report, hand-off"
 priority: should
 weighs_against:
+  - req-tour-outlives-a-missing-highlight > — an invented record teaches a falsehood; a missing highlight only costs the pointing
   - req-desk-offers-a-tour >
 ---

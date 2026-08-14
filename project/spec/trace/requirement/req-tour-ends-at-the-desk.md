@@ -12,4 +12,6 @@ refines:
 source_refs:
   - uc-learn-the-machinery step 5
 priority: could
+weighs_against:
+  - req-tour-highlights-the-named-part > — a tour that never connects to an ask wastes the whole tour; a missing highlight wastes one stop
 ---

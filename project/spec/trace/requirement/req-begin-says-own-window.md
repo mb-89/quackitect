@@ -13,4 +13,6 @@ source_refs:
   - uc-begin-a-product step 4
   - uc-begin-a-product step 5
 priority: could
+weighs_against:
+  - req-colors-are-configuration > — a person waiting for a hand-off is felt now; palette drift is felt at the next theme change
 ---

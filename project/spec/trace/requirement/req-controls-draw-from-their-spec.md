@@ -12,6 +12,8 @@ refines:
 source_refs:
   - reverse-engineered from tests/params.test.ts and tests/scale.test.ts
 priority: should
+weighs_against:
+  - req-selected-node-shows-its-claim > — a spec edit that changes nothing beats a slower survey
 ---
 
 ## Detail

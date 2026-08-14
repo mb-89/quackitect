@@ -18,6 +18,8 @@ source_refs:
   - stk-newcomer
   - ".se/req-mine-sebots.md: the person's dial and the manual path (the checklist bar)"
 priority: could
+weighs_against:
+  - req-parallel-iterations-own-worktrees > — a newcomer who cannot install never arrives; queued streams only wait
 ---
 
 ## Scenario

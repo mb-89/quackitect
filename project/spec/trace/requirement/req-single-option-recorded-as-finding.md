@@ -12,4 +12,6 @@ refines:
 source_refs:
   - uc-diverge-before-deciding ext 3a
 priority: could
+weighs_against:
+  - req-narration-toll-is-collected > — a false decision enters the record; missing narration only hides progress
 ---

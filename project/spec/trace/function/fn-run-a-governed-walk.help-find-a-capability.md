@@ -2,7 +2,7 @@
 minted_in: i8-se-help-a-logged-keyword-search-over-the
 id: fn-run-a-governed-walk.help-find-a-capability
 type: "[[function]]"
-cluster: self-description
+cluster: the-account
 statement: point an agent at the lane tool or guidance page a plain-words query describes, and record it when none fits
 satisfies:
   - req-help-searches-tools-and-guidance

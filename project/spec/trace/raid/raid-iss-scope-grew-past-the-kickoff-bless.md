@@ -9,7 +9,7 @@ trigger: fired already - at write-requirements, which owes a row for each
 status: open
 impact: A gate signed a scope that no longer matches the work. The verification round then checks the claims that exist rather than the behaviour that shipped, and the gap is invisible because both sides are internally consistent.
 breaks_how_badly: corrosive
-how_likely: certain
+how_likely: expected
 source_refs:
   - project/spec/iterations/i27-the-lane-binds-to-the-record-a-bound-wal/evidence/gate-kickoff.md
   - raid-iss-scope-grew-past-a-signed-state

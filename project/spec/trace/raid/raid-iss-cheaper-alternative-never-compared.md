@@ -9,7 +9,7 @@ trigger: fired already - found at gate-motivation's red team
 status: open
 impact: The iteration may build the expensive answer to a question the cheap answer already settles. Both close the same hole, and only one was costed.
 breaks_how_badly: crippling
-how_likely: certain
+how_likely: expected
 source_refs:
   - raid-dec-two-layer-auth
   - cand-thin-worktree

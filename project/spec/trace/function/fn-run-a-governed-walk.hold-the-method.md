@@ -5,6 +5,7 @@ type: "[[function]]"
 cluster: the-walk
 statement: compile the authored method into the machine the walk runs on, and keep the two in agreement
 satisfies:
+  - req-shared-change-reaches-without-unlanded-work-reaching
   - req-reachable-capability-is-traced
   - req-blessed-column-compiles-pinned
   - req-drawn-state-equals-a-row
@@ -25,6 +26,7 @@ satisfies:
   - req-setup-serves-shipped-method
   - req-method-reuse-is-vendoring
   - req-a-method-change-reaches-every-tree
+  - req-an-engine-change-applies-in-its-own-record
   - req-entry-levels-the-record-tree
 inputs:
   - flow-method-sources

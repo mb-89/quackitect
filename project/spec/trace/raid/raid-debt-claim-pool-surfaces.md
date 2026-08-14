@@ -9,7 +9,7 @@ trigger: the first real second machine joins, or the next desk surface touch, or
 status: open
 impact: The engine claims and refuses correctly, but a person cannot open the pool, see who holds what, or free a dead machine's claim from any shipped surface. The fresh-eyes observer had to create the claims branch by hand to demonstrate the pool.
 breaks_how_badly: abrasive
-how_likely: certain
+how_likely: expected
 source_refs:
   - sty-work-on-two-machines
   - raid-asm-remote-serializes-claims

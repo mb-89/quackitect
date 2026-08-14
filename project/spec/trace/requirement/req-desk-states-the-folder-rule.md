@@ -13,6 +13,8 @@ source_refs:
   - uc-begin-a-product step 2
   - uc-begin-a-product ext 2a
 priority: could
+weighs_against:
+  - req-begin-says-own-window > — distrusting the folder model is durable; waiting in the wrong window ends when they look
 ---
 
 ## Detail
