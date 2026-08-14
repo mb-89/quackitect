@@ -806,3 +806,8 @@
 {"ts":"2026-08-14T18:35:43.485Z","op":"plan","visit":"iterations/i27/gate-implementation@0","parent":null,"nodes":[{"id":"d80","brief":"check what M4's prior art actually searched"},{"id":"d81","brief":"check what se-mcp actually runs"}]}
 {"ts":"2026-08-14T18:37:59.905Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d81","brief":"se-mcp builds one Session; both roles run fused in it"}
 {"ts":"2026-08-14T18:38:04.881Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d80","brief":"M4 searched confinement; the process split came after that state"}
+{"ts":"2026-08-14T18:39:11.432Z","op":"plan","visit":"iterations/i27/gate-implementation@0","parent":null,"nodes":[{"id":"d82","brief":"read the cores assumption and the channel cost"},{"id":"d83","brief":"answer whether to split now"}]}
+{"ts":"2026-08-14T18:40:06.678Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d82","brief":"the cores assumption argues for the split; the channel cost argues against the speed case"}
+{"ts":"2026-08-14T18:40:29.214Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d83","brief":"the prior-art-at-every-gate idea is noted for the retro"}
+{"ts":"2026-08-14T18:41:25.095Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d84","brief":"handover carries the rework, the corrections and the open design question"}
+{"ts":"2026-08-14T18:41:30.197Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d85","brief":"committing the note and the discussion record"}
