@@ -54,6 +54,29 @@ test("the machine's own wait passes — idle, the desk, or a step above the slid
   assert.equal(verdict([pullRecord({ pull: "wait", where: ["front_desk"] })], {}), "");
 });
 
+test("a wait WITH A TARGET blocks — an escape does not launder a stop", () => {
+  // MEASURED 2026-08-14: the escape hatch lands at the front desk, the desk
+  // answers wait, and the tooth had nothing to bite. Two stops that day were
+  // post-escape and both passed, while a routed goal stood the whole time.
+  const out = verdict([pullRecord({ pull: "wait", where: ["front_desk"], target: "iterations/i27" })], {});
+  const d = JSON.parse(out) as { decision: string; reason: string };
+  assert.equal(d.decision, "block");
+  assert.match(d.reason, /iterations\/i27/, "the reason names the target the walk is not on");
+  assert.match(d.reason, /not the same as nothing to do/, "and says why a wait is not idle here");
+});
+
+test("a wait with an EMPTY target still passes — that is genuine idle", () => {
+  assert.equal(verdict([pullRecord({ pull: "wait", where: ["front_desk"], target: "" })], {}), "");
+});
+
+test("a wait with a whitespace target passes — blank is blank", () => {
+  assert.equal(verdict([pullRecord({ pull: "wait", where: ["idle"], target: "   " })], {}), "");
+});
+
+test("a targeted wait already blocked once passes — the valve covers it too", () => {
+  assert.equal(verdict([pullRecord({ pull: "wait", where: ["front_desk"], target: "iterations/i27" })], { stop_hook_active: true }), "");
+});
+
 test("a stop already blocked once passes — the valve for a blocking question", () => {
   assert.equal(verdict([pullRecord({ pull: "fill", where: ["work"] })], { stop_hook_active: true }), "");
 });

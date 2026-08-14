@@ -578,6 +578,35 @@ export function stateFromNote(machineId: string, ref: string, notePath: string, 
   // word, and it compiles to the one field the kernel, the submit check and
   // the layout all read.
   const busbar = x.busbar === true || kind === "join";
+  // A STATE THAT RUNS A MACHINE CARRIES NO EVIDENCE OF ITS OWN (owner ruling
+  // 2026-08-14). Evidence belongs to a state, and a sub-machine is not a
+  // state doing work — it is a machine. Where a summary is wanted at the end
+  // of one, it goes in a state INSIDE that machine.
+  //
+  // WHY THIS IS A RULE AND NOT A STYLE. The walk enters a sub-machine at its
+  // start, runs it, leaves at its end, and moves on. It never lands on the
+  // parent, so the parent's form is never served. A form that cannot be
+  // served cannot be filled, and the claim guard then drops every state
+  // downstream for an input that can never be earned.
+  //
+  // MEASURED 2026-08-14 IN i27: enumerate-space and run-candidates both
+  // declared forms nothing could serve. The record deadlocked at
+  // cut-criteria with no legal move left, and the only exit was the escape
+  // hatch. Recorded as note-bb725251735e.
+  //
+  // THE CORRECTION IS NAMED RATHER THAN SILENT, per the failure-mode
+  // ordering: prevent by construction where you can, else correct and say
+  // so. Dropping the fields quietly would be the silent pass that
+  // req-a-wrong-act-never-passes-silently forbids.
+  const runsMachine = submachine !== undefined && submachine !== "";
+  const declared = [...evidenceForm(machineId, ref, x, note.body), ...(kind === "gate" ? STANDARD_ROUNDS : [])];
+  if (runsMachine && declared.length > 0) {
+    process.stderr.write(
+      `[compile] ${machineId}/${stateId} runs the ${String(submachine)} machine and declared ${declared.length} evidence field(s). ` +
+        `A state that runs a machine carries no evidence of its own — the walk never lands on it, so the form could never be served. ` +
+        `Dropped. Put the evidence in a state inside ${String(submachine)}.\n`,
+    );
+  }
   return {
     id: stateId,
     kind,
@@ -587,7 +616,7 @@ export function stateFromNote(machineId: string, ref: string, notePath: string, 
     statement: asString(x.statement) ?? "",
     guidance,
     priority,
-    evidence_form: [...evidenceForm(machineId, ref, x, note.body), ...(kind === "gate" ? STANDARD_ROUNDS : [])],
+    evidence_form: runsMachine ? [] : declared,
     ...(busbar ? { busbar: true } : {}),
     ...(submachine !== undefined && submachine !== "" ? { submachine } : {}),
     ...(legalTools !== undefined ? { legal_tools: legalTools } : {}),

@@ -224,7 +224,7 @@ export type Channel = "human" | "agent";
  *  what you would have been refused with. */
 export interface Blocker {
   /** The machine-readable reason, for a caller that wants to branch. */
-  kind: "form_incomplete" | "unsubmitted" | "unsigned_feeder" | "unblessed_gate";
+  kind: "form_incomplete" | "unsubmitted" | "unsigned_feeder" | "unblessed_gate" | "fallen_input" | "claim_content";
   clause: string;
   expected: string;
   got: string;
@@ -1486,57 +1486,24 @@ export class Session {
       // table — all of it against a form that was never the problem.
       //
       // The engine knew which input had fallen the whole time.
-      const claimful = new Set(m.states.filter((s) => s.evidence_form.length > 0 || s.submachine !== undefined).map((s) => s.id));
-      const fallen = claimFeeders(m, stateId, claimful).filter((f) => !done.has(f));
-      // AND WHEN NOTHING UPSTREAM FELL, SAY WHAT IS WRONG WITH THIS ONE
-      // (owner instruction 2026-08-13: "then make the message name the field").
       //
-      // The content check runs the claim's own fields against the corpus. It
-      // knows exactly which field failed and what it wanted, and the refusal
-      // threw that away. The reader was left guessing a field and trying again.
-      //
-      // Same rule as the fallen-input half above: a check reports in the words
-      // of the question IT asked.
-      const own =
-        fallen.length > 0
-          ? []
-          : ((): string[] => {
-              try {
-                // this.traceRoot(it) IN FULL, not a renamed local. A guard test
-                // greps for exactly this spelling, because a claim check
-                // resolving against the wrong record is the drift it catches.
-                const it = this.declIteration(m);
-                if (it === undefined) return [];
-                const body = noteOf(this.evidenceAbs(it, stateId))?.body;
-                if (body === undefined) return [];
-                return claimProblems(this.traceRoot(it), decl, body, loadTrace(this.traceRoot(it)));
-              } catch {
-                return []; // an unreadable claim falls back to the plain sentence
-              }
-            })();
+      // ONE MECHANISM, TWO QUESTIONS (owner instruction 2026-08-14). The
+      // ripple and the content check used to live here alone, so se_why —
+      // the verb built to explain a grey state — ran neither and answered
+      // `standing: true` for a state this guard was dropping. Both now read
+      // claimBlockers, so the two answers cannot differ.
+      const held = this.claimBlockers(stateId, m)[0];
+      if (held !== undefined) {
+        throw new Rejection({ clause: held.clause, expected: held.expected, got: held.got, remedy: held.remedy, source: held.source });
+      }
+      // THE FALLBACK, when nothing nameable holds the claim. A "filled"
+      // completion whose claim is neither signed nor standing means the walk
+      // simply has not moved, and there is no input and no field to point at.
       throw new Rejection({
         clause: CLAUSES.CONDITION_UNMET,
         expected: `${stateId}'s claim to stand before it completes — it declares ${decl.evidence_form.length} evidence field(s)`,
-        got:
-          fallen.length > 0
-            ? `${stateId}'s OWN claim may be fine. It is dropped because these inputs are not standing: ${fallen.join(", ")}`
-            : own.length > 0
-              ? `${stateId}'s claim does not pass its own checks: ${own.join(" · ")}`
-              : 'a "filled" completion with the claim neither signed nor standing — the walk has not moved',
-        remedy:
-          fallen.length > 0
-            ? {
-                tool: "se_pull",
-                args: {},
-                note: `re-earn ${fallen.join(", ")} first — green ripples forward, and this one follows without being touched`,
-              }
-            : own.length > 0
-              ? {
-                  tool: "se_pull",
-                  args: {},
-                  note: "fix the named field, then submit again — the claim re-stamps and the completion follows",
-                }
-              : { tool: "se_pull", args: {}, note: "pull — the machine serves the owed form; submit it and the completion follows" },
+        got: 'a "filled" completion with the claim neither signed nor standing — the walk has not moved',
+        remedy: { tool: "se_pull", args: {}, note: "pull — the machine serves the owed form; submit it and the completion follows" },
         source: "engine/session.ts claim-guard",
       });
     }
@@ -5202,6 +5169,92 @@ export class Session {
    *  HOP, not the state — a step above the dial is not grey, it is waiting for
    *  a person. Reporting it as a blocker would tell somebody to fix a claim
    *  that is already fine. */
+  /** WHAT HOLDS A STATE'S CLAIM — the ripple and the content check, computed
+   *  once and read by both callers.
+   *
+   *  THE WHY AND THE GUARD WERE TWO MECHANISMS (owner instruction 2026-08-14,
+   *  in emergency). The completion guard ran the ripple over the claim's
+   *  feeders and the content check over its fields. se_why ran NEITHER: it
+   *  asked the form's own conditions and the feeders' signatures, which is a
+   *  weaker question, because a feeder can be signed and still not standing
+   *  when ITS feeder fell.
+   *
+   *  SO THE TWO DISAGREED ABOUT ONE STATE AT ONE MOMENT. i27 stood at
+   *  cut-criteria with se_why reporting `standing: true, blockers: []` while
+   *  the guard dropped it for an input that was not standing. The verb built
+   *  to explain a block reported no block, and the record deadlocked.
+   *
+   *  ONE MECHANISM NOW INFORMS BOTH QUESTIONS. The guard throws the first
+   *  entry; the verb lists them all. Neither computes anything of its own.
+   *
+   *  WHAT IS NOT HERE: the "neither signed nor standing" case. That is a
+   *  completion-time sentence, and for a state simply not walked yet it says
+   *  nothing `form_incomplete` has not already said. The guard keeps it as
+   *  its own fallback. */
+  claimBlockers(stateId: string, machine?: MachineDecl): Blocker[] {
+    const m = machine ?? this.currentMachine();
+    const decl = m.states.find((s) => s.id === stateId);
+    if (decl === undefined || decl.evidence_form.length === 0) return [];
+    const done = new Set(this.recordDone(m));
+    if (done.has(stateId)) return [];
+    const expected = `${stateId}'s claim to stand before it completes — it declares ${decl.evidence_form.length} evidence field(s)`;
+    // NAME THE CLAIM THAT ACTUALLY FELL (i3, 2026-08-13). recordDone runs a
+    // RIPPLE: green stops at the first input that is not green, because a
+    // claim may be word for word fine and still rest on ground that moved.
+    const claimful = new Set(m.states.filter((s) => s.evidence_form.length > 0 || s.submachine !== undefined).map((s) => s.id));
+    const fallen = claimFeeders(m, stateId, claimful).filter((f) => !done.has(f));
+    if (fallen.length > 0) {
+      return [
+        {
+          kind: "fallen_input",
+          clause: CLAUSES.CONDITION_UNMET,
+          expected,
+          got: `${stateId}'s OWN claim may be fine. It is dropped because these inputs are not standing: ${fallen.join(", ")}`,
+          remedy: {
+            tool: "se_pull",
+            args: {},
+            note: `re-earn ${fallen.join(", ")} first — green ripples forward, and this one follows without being touched`,
+          },
+          source: "engine/session.ts claim-guard",
+        },
+      ];
+    }
+    // AND WHEN NOTHING UPSTREAM FELL, SAY WHAT IS WRONG WITH THIS ONE (owner
+    // instruction 2026-08-13). The content check knows which field failed and
+    // what it wanted; a check reports in the words of the question IT asked.
+    const own = ((): string[] => {
+      try {
+        // this.traceRoot(it) IN FULL, not a renamed local. A guard test greps
+        // for exactly this spelling, because a claim check resolving against
+        // the wrong record is the drift it catches.
+        const it = this.declIteration(m);
+        if (it === undefined) return [];
+        const body = noteOf(this.evidenceAbs(it, stateId))?.body;
+        if (body === undefined) return [];
+        return claimProblems(this.traceRoot(it), decl, body, loadTrace(this.traceRoot(it)));
+      } catch {
+        return []; // an unreadable claim falls back to the plain sentence
+      }
+    })();
+    if (own.length > 0) {
+      return [
+        {
+          kind: "claim_content",
+          clause: CLAUSES.CONDITION_UNMET,
+          expected,
+          got: `${stateId}'s claim does not pass its own checks: ${own.join(" · ")}`,
+          remedy: {
+            tool: "se_pull",
+            args: {},
+            note: "fix the named field, then submit again — the claim re-stamps and the completion follows",
+          },
+          source: "engine/session.ts claim-guard",
+        },
+      ];
+    }
+    return [];
+  }
+
   stateBlockers(stateId: string): Blocker[] {
     const out: Blocker[] = [];
     const lint = this.stateFormGet(stateId) as {
@@ -5249,6 +5302,11 @@ export class Session {
         });
       }
     }
+    // THE CLAIM'S OWN BLOCKERS, from the same mechanism the walk's guard
+    // throws with. Before this the verb ran neither the ripple nor the
+    // content check, so it answered `standing: true` for a state the guard
+    // was dropping (owner instruction 2026-08-14).
+    out.push(...this.claimBlockers(stateId));
     if (lint.gate === true && !(lint.bless ?? "").startsWith("blessed")) {
       out.push({
         kind: "unblessed_gate",
