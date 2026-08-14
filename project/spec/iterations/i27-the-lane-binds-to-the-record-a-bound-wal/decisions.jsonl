@@ -781,3 +781,8 @@
 {"ts":"2026-08-14T18:06:29.834Z","op":"update","visit":"iterations/i27/verification@0","node":"d61","brief":"quoting the statement so the frontmatter parses"}
 {"ts":"2026-08-14T18:06:52.879Z","op":"done","visit":"iterations/i27/verification@0","node":"d57","brief":"verification submitted with one observed and nine owed"}
 {"ts":"2026-08-14T18:07:09.874Z","op":"plan","visit":"iterations/i27/verification@0","parent":null,"nodes":[{"id":"d62","brief":"commit verification"},{"id":"d63","brief":"walk to gate-implementation"}]}
+{"ts":"2026-08-14T18:07:24.914Z","op":"done","visit":"iterations/i27/verification@0","node":"d62","brief":"verification committed as 0bcaf436"}
+{"ts":"2026-08-14T18:07:32.910Z","op":"update","visit":"iterations/i27/verification@0","node":"d64","brief":"reading credited; on to fix-findings"}
+{"ts":"2026-08-14T18:09:17.951Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d65","brief":"filling the implementation gate for the owner's bless"}
+{"ts":"2026-08-14T18:09:25.417Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d66","brief":"stamping the gate evidence, leaving the bless"}
+{"ts":"2026-08-14T18:09:32.988Z","op":"done","visit":"iterations/i27/verification@0","node":"d63","brief":"the implementation gate is signed and waiting on the owner's bless"}
