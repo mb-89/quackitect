@@ -819,3 +819,6 @@
 {"ts":"2026-08-14T18:49:25.929Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d87","brief":"three transports over one architecture, process by default"}
 {"ts":"2026-08-14T18:49:43.517Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d92","brief":"tests follow the three transports"}
 {"ts":"2026-08-14T18:50:01.344Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d93","brief":"committing the three-transport mode"}
+{"ts":"2026-08-14T18:50:50.202Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d94","brief":"the inline crossing, marshalling like the others"}
+{"ts":"2026-08-14T18:51:17.847Z","op":"update","visit":"iterations/i27/gate-implementation@0","node":"d95","brief":"testing that inline cannot cheat the contract"}
+{"ts":"2026-08-14T18:51:40.787Z","op":"done","visit":"iterations/i27/gate-implementation@0","node":"d88","brief":"the inline crossing makes core, satellite and channel work together"}
