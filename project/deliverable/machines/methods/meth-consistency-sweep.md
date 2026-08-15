@@ -19,14 +19,18 @@ Surfaces section below is the checklist the sweep state serves.
   - Update it, or mark it.
 - The machine's own notes are surfaces too. A changed practice means the
   method note changes in the same sweep.
+- Engine-served strings are taught surfaces too. Grep the engine for the
+  changed vocabulary.
+  - the wait instructions
+  - the refusal texts
+  - the panel markup
 - Name the residue: a surface known stale and left is listed with its
   reason, never silently skipped.
 
 ## Surfaces
 
 - command and tool docs
-- engine-served strings (grep the engine for the changed vocabulary - the
-  wait instructions, refusal texts and panel markup are taught surfaces too)
+- engine-served strings
 - method cards
 - matrix rows
 - templates and skeletons

@@ -87,7 +87,12 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   // every logged call across v4 carried a version the product had left behind.
   // There is no node here to route through a door — only the manifest, which
   // the packaging script already reads for the same fact.
-  const CEILING = 104;
+  // 105 since 2026-08-15: testreporters.ts reads .se/test-timings.jsonl to
+  // count what a run recorded. A JSONL append log outside the note system,
+  // read once per run to answer one question — did the bookkeeping land. The
+  // read is the POINT: it is what makes a silent instrument failure visible,
+  // and routing it through a note door would share a parse with nobody.
+  const CEILING = 105;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {

@@ -314,6 +314,34 @@ describe("the design-spec law", { concurrency: true }, () => {
     assert.deepEqual(specifyBuildLawProblems(loadTrace(root), root), []);
   });
 
+  test("a second record's fold-back is not read as this record's own", () => {
+    // TWO RECORDS ON DISK, which is what landing another record's spec makes.
+    // itx-here carries the drawing. ity-there carries the only fold-back.
+    const root = freshRoot();
+    mkdirSync(join(root, "project/spec/iterations/itx-here/machines"), { recursive: true });
+    writeFileSync(
+      join(root, "project/spec/iterations/itx-here/machines/build-chunks.md"),
+      ["---", "steps:", "  - id: c1", '    statement: "the first chunk"', "---", ""].join("\n"),
+      "utf8",
+    );
+    mkdirSync(join(root, "project/spec/iterations/ity-there/evidence"), { recursive: true });
+    writeFileSync(
+      join(root, "project/spec/iterations/ity-there/evidence/fold-back.md"),
+      ["## folded", "", "| experiment | folds_to | promote |", "| --- | --- | --- |", "| [[exp-theirs]] | holds | enters |", ""].join("\n"),
+      "utf8",
+    );
+    mintTyped(root, "experiment", "exp-theirs", "experiment", ["minted_in: ity-there", "promote: their probe enters", "chunk: their-step"]);
+    // UNNAMED, the scan takes itx-here's drawing and ity-there's fold-back, so
+    // their promotion is swept against our steps. This is the observed failure.
+    assert.match(
+      specifyBuildLawProblems(loadTrace(root), root).join(" | "),
+      /exp-theirs: chunk their-step is not a step of the seeded drawing/,
+    );
+    // NAMED, itx-here has no fold-back of its own, so ownership falls to
+    // minted_in and their experiment is somebody else's business.
+    assert.deepEqual(specifyBuildLawProblems(loadTrace(root), root, "itx"), []);
+  });
+
   test("trace-design names a ghost file and sweeps the unclaimed", () => {
     // An ISOLATED subroot: freshRoot mirrors the real engine tree, and the
     // sweep would list a hundred genuinely unclaimed files before stray.ts.

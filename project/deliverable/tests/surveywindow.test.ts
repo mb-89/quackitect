@@ -6,6 +6,8 @@
 // root, where the lane could not read it back. A listing carries a title and
 // a priority; the body is one se_log_query {ref} away.
 import { strict as assert } from "node:assert";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { test } from "node:test";
 import { bootedServer, call, freshRoot, gitInit } from "./helpers.ts";
 
@@ -112,4 +114,45 @@ test("se_log_query answers for a note ref, so a reference can be followed", asyn
   const bad = await call(server, "se_log_query", { ref: "note-000000000000" });
   assert.equal(bad.isError, true);
   assert.match(String(bad.body.expected), /note ref/);
+});
+
+// req-survey-counts-only-open-records: itList calls a record open when its
+// WORKTREE DIRECTORY exists, and a close leaves that directory behind. So a
+// shipped record stayed in the list headed "what stands open", and the desk
+// advises from that list.
+//
+// Seen on 2026-08-15: i27 read as open the day after it shipped, and the count
+// it inflated was the one the front desk had just used to recommend.
+test("a shipped iteration leaves the open list, whatever its worktree says", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  const server = await bootedServer(root);
+
+  const seeded = await call(server, "se_seed_iteration", {
+    goal: "a record seeded only to be marked shipped",
+    vision: "it exists so the listing can be asked whether a shipped record still stands open",
+  });
+  const id = String((seeded.body as { seeded?: string }).seeded ?? "");
+  assert.notEqual(id, "", `the seed answers with its id: ${JSON.stringify(seeded.body)}`);
+
+  const opened = (await call(server, "se_survey", {})).body as unknown as { iterations: { id: string }[] };
+  assert.ok(
+    opened.iterations.some((i) => i.id === id),
+    `a seeded iteration stands open: ${JSON.stringify(opened.iterations)}`,
+  );
+
+  // The close leaves the worktree behind, so the record's own status is the
+  // only thing that can say it is finished. While a record is open its record
+  // is read from ITS OWN TREE, which is where a close stamps the status.
+  const dir = join(root, ".worktrees", id, "project", "spec", "iterations", id);
+  mkdirSync(dir, { recursive: true });
+  const shipped = ["---", `id: ${id}`, "status: shipped", 'goal: "a record seeded only to be marked shipped"', "---", ""];
+  writeFileSync(join(dir, "record.md"), shipped.join("\n"), "utf8");
+
+  const after = (await call(server, "se_survey", {})).body as unknown as {
+    counts: { iterations: number };
+    iterations: { id: string }[];
+  };
+  assert.ok(!after.iterations.some((i) => i.id === id), `a shipped record is not open: ${JSON.stringify(after.iterations)}`);
+  assert.equal(after.counts.iterations, after.iterations.length, "the count matches the list it counts");
 });

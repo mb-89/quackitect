@@ -830,6 +830,9 @@ export function generateIterations(root: string): GeneratedMachine {
     for (const d of deps) dependents.set(d, [...(dependents.get(d) ?? []), sid]);
   }
 
+  // THE ROOTS ARE COLLECTED BEFORE THEY ARE WIRED, because the ROLE depends
+  // on how many there are, and that is not known inside the loop.
+  const roots: string[] = [];
   for (const it of open) {
     const sid = itShortId(it.id);
     const fm = readItRecord(root, it);
@@ -852,8 +855,21 @@ export function generateIterations(root: string): GeneratedMachine {
     subGen[sid] = () => generateIterationWalk(root, it, sid);
     // ONLY THE ROOTS HANG OFF START. Everything else is reached through the
     // iteration it waits for, which is what makes the wait real.
-    if ((depsOf.get(sid) ?? []).length === 0) start.edges.push({ to: sid, role: "normal" });
+    if ((depsOf.get(sid) ?? []).length === 0) roots.push(sid);
   }
+  // A CONTAINER HOLDING SEVERAL OPEN ITERATIONS OFFERS THEM, rather than
+  // walking into whichever happens to be first.
+  //
+  // Entering one BINDS it, so a bare pull used to take the walker's decision
+  // without saying so. Worse, from inside one there is no drawn way back: on
+  // 2026-08-15 reaching a sibling drew fifteen hops through two unrelated
+  // iterations, and the only way out was an escape to the front desk — which
+  // in an unattended run is a dead stop.
+  //
+  // ALTERNATIVE is the role that already means OR here. With one root the
+  // edge stays normal, because entering the only thing open is not a choice.
+  const rootRole = roots.length > 1 ? ("alternative" as const) : ("normal" as const);
+  for (const sid of roots) start.edges.push({ to: sid, role: rootRole });
   if (open.length === 0) start.edges.push({ to: "end", role: "normal" });
   states.push({
     id: "end",
