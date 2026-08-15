@@ -3053,6 +3053,29 @@ export class Session {
    *  Evidence wins when both could read — deterministic, and documented
    *  on the tool. */
   private pullSaveOrChoose(form: Record<string, unknown>): { saved?: Record<string, unknown>; fanOut: string[] } {
+    // A STUCK JOIN IS THE ONE PLACE A CHOICE OUTRANKS EVERYTHING (found live
+    // 2026-08-15, and it stopped the walk dead).
+    //
+    // One agent walks one leg of a fan, arrives at the join, and the join
+    // refuses because a parallel leg was never walked. From there:
+    //
+    // - THE ROUTE TO THAT LEG RUNS THROUGH THE JOIN IT IS BLOCKING, so se_aim
+    //   sweeps zero hops however many times it is asked.
+    // - A CHOICE WAS REFUSED TWICE OVER: once because the join owed a form,
+    //   and again because a target was set.
+    // - se_amend, WHICH THE REFUSAL ITSELF RECOMMENDS, cannot run — the leg
+    //   has no form on disk, because it was never served.
+    //
+    // joinStuck and walkBackTo existed for exactly this and could not be
+    // reached. Filling the join is pointless while a leg is unwalked, so the
+    // leg wins over both guards.
+    if (form.choice !== undefined && Object.keys(form).length === 1) {
+      const stuck = this.joinStuck();
+      const pick = String(Array.isArray(form.choice) ? form.choice[0] : form.choice);
+      if (stuck?.feeders.some((f) => this.qualHere(f) === pick || f === pick) === true) {
+        return { fanOut: this.pullPickChoice(form.choice) };
+      }
+    }
     const owed = this.pullFormsOwed();
     if (owed.length > 0) {
       // submit and bless are ACTS, not sections: the save lands the fills
@@ -3117,7 +3140,7 @@ export class Session {
     // to it, so no route could ever be drawn.
     const stuck = this.joinStuck();
     if (stuck !== undefined) {
-      const leg = stuck.feeders.find((f) => this.qualHere(f) === picks[0]);
+      const leg = stuck.feeders.find((f) => this.qualHere(f) === picks[0] || f === picks[0]);
       if (leg !== undefined) {
         this.walkBackTo(leg);
         return [];

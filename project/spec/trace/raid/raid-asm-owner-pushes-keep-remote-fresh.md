@@ -11,7 +11,7 @@ probed: "not yet - scheduled at M7"
 probe: "scheduled - ship locally unpushed, then have a second clone claim a dependent stub and read the refusal. Runs at M7."
 impact: Dependency gating reads shipped state from the remote; work pushes stay the owner's act, so an unpushed shipped iteration blocks every peer's dependent claims while looking like a gating bug.
 breaks_how_badly: corrosive
-how_likely: likely
+how_likely: expected
 ---
 
 ## Probe

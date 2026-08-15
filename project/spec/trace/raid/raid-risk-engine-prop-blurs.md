@@ -9,7 +9,7 @@ trigger: a story serves neither prop cleanly, or a requirement maps to both prop
 status: open
 impact: A blurred prop split makes the M8 coverage law undiscriminating - stories point at a blob, and the Unlike lines go mushy against distinct competitors.
 breaks_how_badly: abrasive
-how_likely: possible
+how_likely: plausible
 ---
 
 The named conflict from i2's goal system. The resolution is the split

@@ -3,11 +3,11 @@ minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: tsp-design-checks
 type: "[[test-spec]]"
 statement: The design-phase machinery computes its structural verdicts, binds its forms to the nodes, and compiles a drawing like a row, verified by test over the M4-to-M6 engines.
-method: test
+method: "test"
 verifies:
-  - req-structure-verdicts-are-mechanical
-  - req-bound-field-rebuilds-from-nodes
-  - req-drawn-state-equals-a-row
+  - "req-structure-verdicts-are-mechanical"
+  - "req-bound-field-rebuilds-from-nodes"
+  - "req-drawn-state-equals-a-row"
 files:
   - tests/atamwalk.test.ts
   - tests/dsm.test.ts

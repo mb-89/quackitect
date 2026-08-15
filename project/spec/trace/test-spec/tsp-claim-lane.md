@@ -13,6 +13,8 @@ verifies:
   - "req-claim-wears-its-age"
   - "req-offline-claim-reconciles"
   - "req-force-release-recorded"
+  - "req-a-held-iteration-names-its-holder"
+  - "req-work-starts-without-a-reachable-remote"
 files:
   - "tests/claims.test.ts"
 ---

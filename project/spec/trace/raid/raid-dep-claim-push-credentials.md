@@ -9,7 +9,7 @@ trigger: the first claim push from a machine whose git has no credential helper 
 status: open
 impact: A machine without push credentials can see seeds but never claim - it reads as a broken lock when it is a missing login.
 breaks_how_badly: abrasive
-how_likely: likely
+how_likely: expected
 ---
 
 Pushing to github.com/mb-89/quackitect needs an authenticated git on

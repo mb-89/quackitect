@@ -15,6 +15,9 @@ verifies:
   - "req-size-proposal-names-strikes"
   - "req-bless-outputs-ride-the-bless"
   - "req-blessed-column-compiles-pinned"
+  - "req-the-iteration-list-comes-from-git"
+  - "req-a-worktree-exists-only-while-a-walk-is-bound"
+  - "req-entering-repairs-itself-or-names-the-remedy"
 files:
   - "tests/iterations.test.ts"
   - "tests/container.test.ts"

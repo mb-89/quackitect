@@ -10,6 +10,7 @@ verifies:
   - "req-call-answers-in-one-second"
   - "req-mirror-stays-on-the-machine"
   - "req-engine-port-fallback"
+  - "req-the-lane-runs-without-a-console"
 files:
   - "tests/ticks.test.ts"
   - "tests/lifetime.test.ts"

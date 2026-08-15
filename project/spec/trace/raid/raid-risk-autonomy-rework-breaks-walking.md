@@ -9,7 +9,7 @@ trigger: any refusal or wait naming priority, weight or the slider after the cat
 status: open
 impact: A broken weighing check stops every walk on every machine at once - the exact tool the parallel iterations depend on.
 breaks_how_badly: corrosive
-how_likely: possible
+how_likely: plausible
 ---
 
 The rework replaces the 0-to-1 numbers with the categorical tiers

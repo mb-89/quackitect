@@ -9,7 +9,7 @@ trigger: the owner (or an agent with a Windows machine and VS Code) runs RUNME.p
 status: open
 impact: package's "works" field is answered from headless-verifiable evidence only (file manifest, rendered README, typecheck, the scoped suite run against the packaged copy) rather than the literal install-and-see-the-greeting check the method card describes.
 breaks_how_badly: corrosive
-how_likely: certain
+how_likely: expected
 source_refs:
   - project/deliverable/machines/methods/meth-ship-package.md
   - raid-issue-must-demos-owed

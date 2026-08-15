@@ -9,7 +9,7 @@ trigger: two machines land trunk work in the same day, or any merge conflict tou
 status: open
 impact: A forked or half-merged record breaks the answer-why-a-year-later promise exactly when parallel work makes attribution matter most.
 breaks_how_badly: corrosive
-how_likely: possible
+how_likely: plausible
 ---
 
 The claim lock keeps machines off the SAME iteration; this risk covers

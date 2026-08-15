@@ -473,3 +473,111 @@
 {"ts":"2026-08-15T18:55:11.793Z","op":"update","visit":"iterations/i28/enumerate-space/find_prior_art@0","node":"d7","brief":"the script gets the corpus and the machine's .se separately"}
 {"ts":"2026-08-15T18:55:21.154Z","op":"update","visit":"iterations/i28/enumerate-space/find_prior_art@0","node":"d8","brief":"typechecking the two-root spawn"}
 {"ts":"2026-08-15T18:55:33.066Z","op":"done","visit":"iterations/i28/enumerate-space/find_prior_art@0","node":"d6","brief":"both roots handed to scripts; typecheck clean"}
+{"ts":"2026-08-15T18:58:12.648Z","op":"update","visit":"iterations/i28/gate-motivation@0","node":"d5","brief":"sweeping toward the outward-search condition"}
+{"ts":"2026-08-15T18:58:42.690Z","op":"update","visit":"iterations/i28/gate-requirements@0","node":"d6","brief":"testing the outward-search condition with both roots"}
+{"ts":"2026-08-15T18:59:11.850Z","op":"done","visit":"start@0","node":"d1","brief":"the two-root fix carried the walk past outward-search"}
+{"ts":"2026-08-15T18:59:38.336Z","op":"fork","visit":"iterations/i28/record-adrs@0","parent":null,"node":"d7","brief":"final sweep to rank-unknowns","nodes":[]}
+{"ts":"2026-08-15T18:59:54.133Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d8","brief":"testing the grade check against this worktree"}
+{"ts":"2026-08-15T19:00:26.503Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d9","brief":"reading the likelihood scale's definitions"}
+{"ts":"2026-08-15T19:00:41.517Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d10","brief":"unlikely and rare become conceivable"}
+{"ts":"2026-08-15T19:00:47.333Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d11","brief":"possible becomes plausible"}
+{"ts":"2026-08-15T19:00:54.489Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d12","brief":"certain and likely become expected"}
+{"ts":"2026-08-15T19:00:57.968Z","op":"done","visit":"iterations/i28/record-adrs@0","node":"d7","brief":"all 18 register grades put on the scale"}
+{"ts":"2026-08-15T19:01:19.313Z","op":"fork","visit":"iterations/i28/run-spikes@0","parent":null,"node":"d13","brief":"reading the drawing shape to author the spikes","nodes":[]}
+{"ts":"2026-08-15T19:01:34.231Z","op":"done","visit":"iterations/i28/run-spikes@0","node":"d13","brief":"the spike drawing is authored with three timeboxed probes"}
+{"ts":"2026-08-15T19:01:50.070Z","op":"fork","visit":"iterations/i28/run-spikes@0","parent":null,"node":"d14","brief":"entering the spike machine","nodes":[]}
+{"ts":"2026-08-15T19:03:05.124Z","op":"plan","visit":"iterations/i28/run-spikes/spike-does-a-backgrounded-lane-survive@0","parent":null,"nodes":[{"id":"d15","brief":"read the experiment node shape"},{"id":"d16","brief":"run what can be run here for each spike"},{"id":"d17","brief":"write three experiment nodes"},{"id":"d18","brief":"fill and submit the three spikes"}]}
+{"ts":"2026-08-15T19:03:26.038Z","op":"done","visit":"iterations/i28/run-spikes/spike-does-a-backgrounded-lane-survive@0","node":"d15","brief":"experiment node shape read; unsettled is a legal verdict"}
+{"ts":"2026-08-15T19:03:43.266Z","op":"update","visit":"iterations/i28/run-spikes/spike-does-a-backgrounded-lane-survive@0","node":"d19","brief":"spawning a detached child whose parent exits"}
+{"ts":"2026-08-15T19:04:19.708Z","op":"update","visit":"iterations/i28/run-spikes/spike-does-a-backgrounded-lane-survive@0","node":"d20","brief":"timing the runner against a 45-second detached child"}
+{"ts":"2026-08-15T19:05:39.074Z","op":"done","visit":"iterations/i28/run-spikes/spike-does-a-backgrounded-lane-survive@0","node":"d16","brief":"the caller is not released: 45,600 ms for a 45 s child"}
+{"ts":"2026-08-15T19:05:53.985Z","op":"update","visit":"iterations/i28/run-spikes/spike-does-a-backgrounded-lane-survive@0","node":"d21","brief":"first spike submitted with a real verdict"}
+{"ts":"2026-08-15T19:06:15.019Z","op":"update","visit":"iterations/i28/run-spikes/spike-does-a-backgrounded-lane-survive@0","node":"d22","brief":"walking to the runtime spike"}
+{"ts":"2026-08-15T19:06:43.607Z","op":"update","visit":"iterations/i28/run-spikes/spike-what-runtime-a-default-install-gives@0","node":"d23","brief":"probing the runtime floor the entrypoint depends on"}
+{"ts":"2026-08-15T19:07:05.939Z","op":"update","visit":"iterations/i28/run-spikes/spike-what-runtime-a-default-install-gives@0","node":"d24","brief":"the declared floor and the invocation disagree"}
+{"ts":"2026-08-15T19:07:20.306Z","op":"update","visit":"iterations/i28/run-spikes/spike-what-runtime-a-default-install-gives@0","node":"d25","brief":"second spike written"}
+{"ts":"2026-08-15T19:07:24.890Z","op":"done","visit":"iterations/i28/run-spikes/spike-does-a-backgrounded-lane-survive@0","node":"d17","brief":"two experiment nodes written with real findings"}
+{"ts":"2026-08-15T19:07:42.434Z","op":"fork","visit":"iterations/i28/run-spikes/spike-what-runtime-a-default-install-gives@0","parent":null,"node":"d26","brief":"walking to the POSIX spike","nodes":[]}
+{"ts":"2026-08-15T19:07:54.677Z","op":"update","visit":"iterations/i28/run-spikes/spike-does-the-lane-behave-on-posix@0","node":"d27","brief":"scanning the engine's platform assumptions"}
+{"ts":"2026-08-15T19:08:22.143Z","op":"plan","visit":"iterations/i28/run-spikes/spike-does-the-lane-behave-on-posix@0","parent":"d26","nodes":[{"id":"d28","brief":"69 platform sites"},{"id":"d29","brief":"all guarded"},{"id":"d30","brief":"POSIX side never executed"}]}
+{"ts":"2026-08-15T19:08:36.006Z","op":"done","visit":"iterations/i28/run-spikes/spike-does-the-lane-behave-on-posix@0","node":"d28","brief":"third spike written and submitted"}
+{"ts":"2026-08-15T19:09:37.106Z","op":"done","visit":"iterations/i28/run-spikes/spike-does-a-backgrounded-lane-survive@0","node":"d18","brief":"three spikes folded back with their findings"}
+{"ts":"2026-08-15T19:09:51.366Z","op":"update","visit":"iterations/i28/fold-back@0","node":"d31","brief":"writing folds_to and promote onto the three nodes"}
+{"ts":"2026-08-15T19:10:35.589Z","op":"done","visit":"iterations/i28/run-spikes/spike-does-the-lane-behave-on-posix@0","node":"d29","brief":"fold-back signed; M6 complete"}
+{"ts":"2026-08-15T19:10:38.992Z","op":"done","visit":"iterations/i28/run-spikes/spike-does-the-lane-behave-on-posix@0","node":"d30","brief":"the test-design method card is read"}
+{"ts":"2026-08-15T19:11:26.103Z","op":"done","visit":"iterations/i28/run-spikes/spike-what-runtime-a-default-install-gives@0","node":"d26","brief":"raid_additions needed the dash form"}
+{"ts":"2026-08-15T19:11:57.769Z","op":"fork","visit":"iterations/i28/gate-prototype@0","parent":null,"node":"d32","brief":"walking into M7","nodes":[]}
+{"ts":"2026-08-15T19:12:12.896Z","op":"update","visit":"iterations/i28/gate-prototype@0","node":"d33","brief":"probing whether the session identity survived two reloads"}
+{"ts":"2026-08-15T19:12:38.276Z","op":"update","visit":"iterations/i28/gate-prototype@0","node":"d34","brief":"reading the assumption to write its probe"}
+{"ts":"2026-08-15T19:12:53.417Z","op":"done","visit":"iterations/i28/gate-prototype@0","node":"d32","brief":"the assumption falls, probed from this session's own two reloads"}
+{"ts":"2026-08-15T19:12:56.978Z","op":"update","visit":"iterations/i28/gate-prototype@0","node":"d35","brief":"re-submitting the gate with the assumption probed"}
+{"ts":"2026-08-15T19:13:47.824Z","op":"update","visit":"iterations/i28/author-tests@0","node":"d36","brief":"proving the build-strategies read"}
+{"ts":"2026-08-15T19:14:05.863Z","op":"done","visit":"iterations/i28/run-spikes@0","node":"d14","brief":"at author-tests; i28's requirements have no spec yet"}
+{"ts":"2026-08-15T19:14:13.310Z","op":"plan","visit":"iterations/i28/author-tests@0","parent":null,"nodes":[{"id":"d37","brief":"read each new requirement's verify_method"},{"id":"d38","brief":"mint the test-specs i28 owes"},{"id":"d39","brief":"fill and submit author-tests"}]}
+{"ts":"2026-08-15T19:14:22.503Z","op":"update","visit":"iterations/i28/author-tests@0","node":"d40","brief":"reading the last three verify methods"}
+{"ts":"2026-08-15T19:14:40.193Z","op":"update","visit":"iterations/i28/author-tests@0","node":"d41","brief":"reading the console requirement's method"}
+{"ts":"2026-08-15T19:14:44.117Z","op":"update","visit":"iterations/i28/author-tests@0","node":"d42","brief":"reading the offline requirement's method"}
+{"ts":"2026-08-15T19:14:48.948Z","op":"done","visit":"iterations/i28/author-tests@0","node":"d37","brief":"six of seven are test, one is demonstration"}
+{"ts":"2026-08-15T19:15:12.968Z","op":"update","visit":"iterations/i28/author-tests@0","node":"d43","brief":"six requirements placed in their existing families"}
+{"ts":"2026-08-15T19:15:18.246Z","op":"update","visit":"iterations/i28/author-tests@0","node":"d44","brief":"reading the spec's actual verifies shape"}
+{"ts":"2026-08-15T19:15:25.111Z","op":"update","visit":"iterations/i28/author-tests@0","node":"d45","brief":"placing six requirements in their existing spec families"}
+{"ts":"2026-08-15T19:15:45.448Z","op":"done","visit":"iterations/i28/author-tests@0","node":"d38","brief":"one new spec minted, six requirements placed in existing families"}
+{"ts":"2026-08-15T19:16:01.181Z","op":"done","visit":"iterations/i28/author-tests@0","node":"d39","brief":"every new requirement is verified by a spec"}
+{"ts":"2026-08-15T19:16:10.020Z","op":"fork","visit":"iterations/i28/author-tests@0","parent":null,"node":"d46","brief":"checking the regenerated checks table","nodes":[]}
+{"ts":"2026-08-15T19:16:13.477Z","op":"update","visit":"iterations/i28/author-tests@0","node":"d47","brief":"pulling the fresh prefill"}
+{"ts":"2026-08-15T19:16:20.631Z","op":"done","visit":"iterations/i28/author-tests@0","node":"d46","brief":"the table carries every new requirement"}
+{"ts":"2026-08-15T19:17:03.503Z","op":"fork","visit":"iterations/i28/author-tests@0","parent":null,"node":"d48","brief":"writing the checks table into the form section","nodes":[]}
+{"ts":"2026-08-15T19:17:32.016Z","op":"done","visit":"iterations/i28/author-tests@0","node":"d48","brief":"answering all three probes as before"}
+{"ts":"2026-08-15T19:17:49.087Z","op":"fork","visit":"iterations/i28/author-tests@0","parent":null,"node":"d49","brief":"answering the probes space-joined","nodes":[]}
+{"ts":"2026-08-15T19:17:59.756Z","op":"update","visit":"iterations/i28/author-tests@0","node":"d50","brief":"counting the bullet dash as the fourth token"}
+{"ts":"2026-08-15T19:18:23.500Z","op":"done","visit":"iterations/i28/author-tests@0","node":"d49","brief":"the read cleared; specify-build is open"}
+{"ts":"2026-08-15T19:18:49.601Z","op":"fork","visit":"iterations/i28/specify-build@0","parent":null,"node":"d51","brief":"minting the entrypoint's design spec","nodes":[]}
+{"ts":"2026-08-15T19:19:11.044Z","op":"update","visit":"iterations/i28/specify-build@0","node":"d52","brief":"filling specify-build"}
+{"ts":"2026-08-15T19:19:46.441Z","op":"done","visit":"iterations/i28/specify-build@0","node":"d51","brief":"the entrypoint spec is registered"}
+{"ts":"2026-08-15T19:20:20.352Z","op":"fork","visit":"iterations/i28/observe-red@0","parent":null,"node":"d53","brief":"reading ux.md, owed at observe-red","nodes":[]}
+{"ts":"2026-08-15T19:20:25.959Z","op":"done","visit":"iterations/i28/observe-red@0","node":"d53","brief":"ux.md read end to end"}
+{"ts":"2026-08-15T19:21:04.572Z","op":"fork","visit":"iterations/i28/observe-red@0","parent":null,"node":"d54","brief":"recording the reds that no run can show","nodes":[]}
+{"ts":"2026-08-15T19:21:20.048Z","op":"update","visit":"iterations/i28/observe-red@0","node":"d55","brief":"bare item names and an open ref"}
+{"ts":"2026-08-15T19:21:49.041Z","op":"fork","visit":"iterations/i28/build-steps@0","parent":null,"node":"d56","brief":"finding the chunk drawing's name","nodes":[]}
+{"ts":"2026-08-15T19:21:53.507Z","op":"done","visit":"iterations/i28/build-steps@0","node":"d56","brief":"the drawing is build-chunks.md"}
+{"ts":"2026-08-15T19:22:10.204Z","op":"fork","visit":"iterations/i28/build-steps@0","parent":null,"node":"d57","brief":"the chunk drawing is authored, risk-first","nodes":[]}
+{"ts":"2026-08-15T19:22:26.851Z","op":"done","visit":"iterations/i28/build-steps@0","node":"d57","brief":"the drawing is authored; the build is the next work"}
+{"ts":"2026-08-15T19:23:55.595Z","op":"done","visit":"iterations/i28/observe-red@0","node":"d54","brief":"entering the chunk machine to build"}
+{"ts":"2026-08-15T19:24:36.613Z","op":"plan","visit":"iterations/i28/build-steps/chunk-pin-the-runtime@0","parent":null,"nodes":[{"id":"d58","brief":"pin the runtime"},{"id":"d59","brief":"release the caller"},{"id":"d60","brief":"build the seven steps"}]}
+{"ts":"2026-08-15T19:24:51.915Z","op":"done","visit":"iterations/i28/build-steps/chunk-pin-the-runtime@0","node":"d58","brief":"the floor is pinned to the version this engine is proven on"}
+{"ts":"2026-08-15T19:25:54.054Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d61","brief":"the entrypoint is written with an explicit platform detach"}
+{"ts":"2026-08-15T19:26:18.591Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d62","brief":"the test asserts the caller returned, not that the lane answers"}
+{"ts":"2026-08-15T19:26:22.864Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d63","brief":"typechecking the entrypoint and its test"}
+{"ts":"2026-08-15T19:26:29.748Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d64","brief":"running the new checks"}
+{"ts":"2026-08-15T19:27:02.404Z","op":"done","visit":"iterations/i28/build-steps/chunk-pin-the-runtime@0","node":"d60","brief":"the entrypoint is built and its checks pass"}
+{"ts":"2026-08-15T19:27:19.043Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d65","brief":"walking the detach leg"}
+{"ts":"2026-08-15T19:27:35.026Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d66","brief":"asking for the unwalked leg"}
+{"ts":"2026-08-15T19:27:56.612Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d67","brief":"proving the verification-discipline read"}
+{"ts":"2026-08-15T19:28:17.575Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d68","brief":"taking the unwalked leg as the offer"}
+{"ts":"2026-08-15T19:28:24.136Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d69","brief":"sweeping round to the unwalked leg"}
+{"ts":"2026-08-15T19:29:01.541Z","op":"done","visit":"iterations/i28/build-steps/chunk-pin-the-runtime@0","node":"d59","brief":"the detach lives in the script, so the drawing matches the build"}
+{"ts":"2026-08-15T19:29:06.362Z","op":"fork","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","parent":null,"node":"d70","brief":"walking past the corrected join","nodes":[]}
+{"ts":"2026-08-15T19:29:14.237Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d71","brief":"aiming at verification"}
+{"ts":"2026-08-15T19:29:44.088Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d72","brief":"the drawing matches the seeded machine again"}
+{"ts":"2026-08-15T19:29:51.592Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d73","brief":"reopening the join so the leg becomes the offer"}
+{"ts":"2026-08-15T19:29:55.298Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d74","brief":"asking for the offered leg"}
+{"ts":"2026-08-15T19:30:15.545Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d75","brief":"recording the detach leg from its own angle"}
+{"ts":"2026-08-15T19:31:26.553Z","op":"done","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d70","brief":"the deadlock is the engine's; fixing it"}
+{"ts":"2026-08-15T19:31:31.162Z","op":"fork","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","parent":null,"node":"d76","brief":"reading the stuck-join offer site","nodes":[]}
+{"ts":"2026-08-15T19:31:36.216Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d77","brief":"reading the choice site that walks back to a leg"}
+{"ts":"2026-08-15T19:31:50.526Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d78","brief":"taking the leg now the join owes a form"}
+{"ts":"2026-08-15T19:31:59.585Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d79","brief":"re-signing the recheck so nothing is owed"}
+{"ts":"2026-08-15T19:32:52.561Z","op":"done","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d76","brief":"the cloud agent now has guidance rather than nothing"}
+{"ts":"2026-08-15T19:33:08.971Z","op":"fork","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","parent":null,"node":"d80","brief":"the entrypoint hands the agent its briefing","nodes":[]}
+{"ts":"2026-08-15T19:33:20.058Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d81","brief":"a test that the briefing exists and is handed over"}
+{"ts":"2026-08-15T19:33:33.501Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d82","brief":"running the four checks"}
+{"ts":"2026-08-15T19:33:46.433Z","op":"done","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d80","brief":"the briefing is handed over and checked"}
+{"ts":"2026-08-15T19:33:55.050Z","op":"fork","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","parent":null,"node":"d83","brief":"reading where a choice is refused while a form is owed","nodes":[]}
+{"ts":"2026-08-15T19:34:06.781Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d84","brief":"reading the dispatch above the owed branch"}
+{"ts":"2026-08-15T19:34:21.115Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d85","brief":"a stuck join's unwalked leg outranks both guards"}
+{"ts":"2026-08-15T19:34:34.580Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d86","brief":"typechecking the join fix"}
+{"ts":"2026-08-15T19:34:42.560Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d87","brief":"testing the join fix against the walk"}
+{"ts":"2026-08-15T19:34:50.499Z","op":"update","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d88","brief":"waiting on the walk tests"}
+{"ts":"2026-08-15T19:34:55.265Z","op":"done","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d83","brief":"the join fix typechecks; testing it now"}
+{"ts":"2026-08-15T19:35:03.752Z","op":"fork","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","parent":null,"node":"d89","brief":"polling the walk tests","nodes":[]}
+{"ts":"2026-08-15T19:35:08.471Z","op":"done","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d89","brief":"51 of 51 pass; the join fix breaks nothing"}
