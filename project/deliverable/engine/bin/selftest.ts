@@ -46,6 +46,21 @@ if (process.env.SE_SELFTEST_SKIP === "1") {
 
 const root = resolve(argValue("--root") ?? process.cwd());
 const dir = join(root, "project", "deliverable");
+// THE RECORDS GO WHERE THE LANE READS THEM, which is not always beside the
+// tree being tested. While an iteration is bound, `root` is that iteration's
+// WORKTREE, so a run records into a .se nothing ever opens: two green
+// batteries on 2026-08-15 wrote 1301 rows each into a directory the lane does
+// not resolve, and their output said nothing about it.
+//
+// The spawner passes the lane's own .se. The local one is the fallback for a
+// hand-run that sets nothing.
+const seHome =
+  process.env[TIMINGS_DIR_ENV] !== undefined && process.env[TIMINGS_DIR_ENV] !== ""
+    ? String(process.env[TIMINGS_DIR_ENV])
+    : join(root, ".se");
+// A RUN SAYS WHERE IT RECORDED. The defect above was invisible until somebody
+// diffed a line count.
+process.stdout.write(`timings home: ${seHome}\n`);
 const testsDir = join(dir, "tests");
 if (!existsSync(testsDir)) {
   process.stdout.write(`selftest: no tests at ${testsDir}\n`);
@@ -66,7 +81,7 @@ const CAP_MS = 300_000;
 // The cap kills the WHOLE TREE — spawnSync killed only the runner and left
 // its per-file workers orphaned (two held a folder lock for four hours,
 // 2026-08-02).
-const lastRunPath = join(root, ".se", "test-last-run.json");
+const lastRunPath = join(seHome, "test-last-run.json");
 const prior = (() => {
   try {
     const rec = JSON.parse(readFileSync(lastRunPath, "utf8")) as {
@@ -86,10 +101,10 @@ const prior = (() => {
 const startedAt = Date.now();
 // The reporter appends a beat per finished file; the header is the parent's,
 // so a poll can answer N of M and a kill can name what never finished.
-const progressPath = join(root, ".se", "test-progress.jsonl");
+const progressPath = join(seHome, "test-progress.jsonl");
 const expectedFiles = files.map((f) => `project/deliverable/${f.replace(/\\/g, "/")}`);
 try {
-  mkdirSync(join(root, ".se"), { recursive: true });
+  mkdirSync(seHome, { recursive: true });
   writeFileSync(
     progressPath,
     `${JSON.stringify({ start: new Date(startedAt).toISOString(), files_total: expectedFiles.length, cores: availableParallelism(), ...(prior.tests !== undefined ? { tests_last_run: prior.tests } : {}) })}\n`,
@@ -141,7 +156,7 @@ const r = await new Promise<{ status: number | null; killed: boolean; out: strin
       cwd: dir,
       windowsHide: true,
       detached: process.platform !== "win32",
-      env: { ...process.env, SE_SELFTEST_SKIP: "1", [TIMINGS_DIR_ENV]: join(root, ".se") },
+      env: { ...process.env, SE_SELFTEST_SKIP: "1", [TIMINGS_DIR_ENV]: seHome },
     },
   );
   let acc = "";

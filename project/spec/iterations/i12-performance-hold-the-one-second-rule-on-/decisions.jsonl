@@ -238,3 +238,41 @@
 {"ts":"2026-08-15T11:05:42.975Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d238","brief":"reading the seam suite verdict"}
 {"ts":"2026-08-15T11:06:07.822Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d239","brief":"battery on the fixed selftest — the end-to-end proof available without a reload"}
 {"ts":"2026-08-15T11:06:11.469Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d240","brief":"checkpointing the build while the battery runs"}
+{"ts":"2026-08-15T11:06:21.080Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d241","brief":"build checkpointed"}
+{"ts":"2026-08-15T11:06:33.367Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d242","brief":"reading the battery verdict"}
+{"ts":"2026-08-15T11:06:57.116Z","op":"done","visit":"iterations/i12/build-steps@0","node":"d235","brief":"the timings seam suite is green at 8 of 8"}
+{"ts":"2026-08-15T11:07:00.300Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d243","brief":"checking whether the battery writes into the worktree's .se"}
+{"ts":"2026-08-15T11:07:04.218Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d244","brief":"polling the battery"}
+{"ts":"2026-08-15T11:07:07.571Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d245","brief":"polling the battery"}
+{"ts":"2026-08-15T11:07:18.312Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d246","brief":"polling the battery past the 77s mark"}
+{"ts":"2026-08-15T11:07:21.803Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d247","brief":"polling the battery"}
+{"ts":"2026-08-15T11:07:25.416Z","op":"obsolete","visit":"iterations/i12/build-steps@0","node":"d237","brief":"the pole measurement waits on the instrument proving itself"}
+{"ts":"2026-08-15T11:07:29.542Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d248","brief":"polling the battery"}
+{"ts":"2026-08-15T11:07:39.189Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d249","brief":"reading the ratchet to raise its ceiling with a reason"}
+{"ts":"2026-08-15T11:07:46.482Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d250","brief":"ceiling raised to 105 with the reason the ratchet demands"}
+{"ts":"2026-08-15T11:07:51.765Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d251","brief":"checking whether the battery finally wrote its progress header"}
+{"ts":"2026-08-15T11:08:09.073Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d252","brief":"making the battery print where it records"}
+{"ts":"2026-08-15T11:08:20.281Z","op":"done","visit":"iterations/i12/build-steps@0","node":"d236","brief":"battery ran green except the ratchet, which is now raised with its reason"}
+{"ts":"2026-08-15T11:08:47.912Z","op":"plan","visit":"iterations/i12/build-steps@0","parent":null,"nodes":[{"id":"d253","brief":"send the records where the lane reads"},{"id":"d254","brief":"prove it on a real run"}]}
+{"ts":"2026-08-15T11:09:06.863Z","op":"done","visit":"iterations/i12/build-steps@0","node":"d253","brief":"the records now go where the lane reads them"}
+{"ts":"2026-08-15T11:09:12.512Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d255","brief":"reading the declaration order to place seHome correctly"}
+{"ts":"2026-08-15T11:09:18.845Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d256","brief":"typechecking before the proof run"}
+{"ts":"2026-08-15T11:09:25.551Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d257","brief":"the proof run: does the battery now record where the lane reads"}
+{"ts":"2026-08-15T11:09:33.023Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d258","brief":"polling the proof run"}
+{"ts":"2026-08-15T11:09:36.337Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d259","brief":"polling the proof run"}
+{"ts":"2026-08-15T11:09:53.157Z","op":"done","visit":"iterations/i12/build-steps@0","node":"d254","brief":"the live proof needs a reload, which needs idle"}
+{"ts":"2026-08-15T11:10:05.662Z","op":"plan","visit":"iterations/i12/build-steps@0","parent":null,"nodes":[{"id":"d260","brief":"read the proof verdict"},{"id":"d261","brief":"walk verification"},{"id":"d262","brief":"reach the close"}]}
+{"ts":"2026-08-15T11:10:09.045Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d263","brief":"polling the battery"}
+{"ts":"2026-08-15T11:10:13.039Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d264","brief":"polling the battery"}
+{"ts":"2026-08-15T11:10:16.270Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d265","brief":"polling the battery"}
+{"ts":"2026-08-15T11:10:19.948Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d266","brief":"polling the battery"}
+{"ts":"2026-08-15T11:10:23.639Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d267","brief":"polling the battery"}
+{"ts":"2026-08-15T11:10:26.989Z","op":"obsolete","visit":"iterations/i12/build-steps@0","node":"d262","brief":"the close is a milestone away, not a checklist item here"}
+{"ts":"2026-08-15T11:10:30.710Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d268","brief":"polling the battery"}
+{"ts":"2026-08-15T11:10:34.355Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d269","brief":"polling the battery"}
+{"ts":"2026-08-15T11:10:37.675Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d270","brief":"polling the battery"}
+{"ts":"2026-08-15T11:10:42.240Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d271","brief":"polling the battery"}
+{"ts":"2026-08-15T11:10:45.647Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d272","brief":"polling the battery"}
+{"ts":"2026-08-15T11:10:49.614Z","op":"done","visit":"iterations/i12/build-steps@0","node":"d260","brief":"battery finished, reading its verdict"}
+{"ts":"2026-08-15T11:11:01.479Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d273","brief":"checking the worktree .se the battery now names"}
+{"ts":"2026-08-15T11:11:09.093Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d274","brief":"committing the green build"}

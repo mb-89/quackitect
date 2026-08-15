@@ -1013,7 +1013,7 @@ export function coreTools(
             const abs = resolveInRoot(root, rel, "engine/tools.ts se_test");
             // The battery is long BY DESIGN now that boot walks read real
             // guidance — 150s killed it mid-run. Configurable, generous default.
-            const r = await spawnNode([abs, "--root", root]);
+            const r = await spawnNode([abs, "--root", root], root, { [TIMINGS_DIR_ENV]: se });
             results.push({ script: rel, ok: r.status === 0, exit: r.status, output: capMiddle(r.out.trim(), 4000) });
           }
           const ok = results.every((x) => x.ok);
