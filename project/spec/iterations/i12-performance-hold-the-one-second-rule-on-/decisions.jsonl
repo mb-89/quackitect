@@ -405,3 +405,5 @@
 {"ts":"2026-08-15T11:47:20.969Z","op":"update","visit":"iterations/i12/specify-build@1","node":"d396","brief":"running requirement-checks scoped"}
 {"ts":"2026-08-15T11:47:40.080Z","op":"done","visit":"iterations/i12/specify-build@1","node":"d393","brief":"26 of 26 green, the new test reproduces and pins the cross-record sweep"}
 {"ts":"2026-08-15T11:47:57.835Z","op":"update","visit":"iterations/i12/specify-build@1","node":"d397","brief":"reloading so the lane picks up the scoping fix"}
+{"ts":"2026-08-15T11:49:36.642Z","op":"update","visit":"iterations/i12/specify-build@0","node":"d9","brief":"the record segment was read from the wrong end of the state id"}
+{"ts":"2026-08-15T11:51:08.130Z","op":"update","visit":"iterations/i12/specify-build@0","node":"d10","brief":"answering the reload-in-place question from the two owning requirements"}

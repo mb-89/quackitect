@@ -705,7 +705,10 @@ function stateLawProblems(root: string, s: StateDecl, nodes: TraceNode[]): strin
   const out: string[] = [];
   if (s.id.endsWith("gate-prototype")) out.push(...assumptionLawProblems(nodes, catalogItems(root, "damage_levels")));
   if (s.id.endsWith("author-tests")) out.push(...authorTestsLawProblems(nodes));
-  if (s.id.endsWith("specify-build")) out.push(...specifyBuildLawProblems(nodes, root, s.id.split("/")[1]));
+  // THE RECORD IS THE SEGMENT BEFORE THE STATE. The id arrives as
+  // `i12/specify-build` here and `iterations/i12/specify-build` elsewhere, so
+  // counting from the end is the reading that holds for both.
+  if (s.id.endsWith("specify-build")) out.push(...specifyBuildLawProblems(nodes, root, s.id.split("/").at(-2)));
   if (s.id.endsWith("trace-design")) out.push(...traceDesignLawProblems(nodes, root));
   if (s.id.endsWith("fill-story-evidence")) out.push(...fillStoryLawProblems(nodes, false));
   if (s.id.endsWith("gate-validation")) out.push(...fillStoryLawProblems(nodes, true));
