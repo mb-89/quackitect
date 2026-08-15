@@ -37,7 +37,9 @@ describe("the pull instructs where a refusal would have thrown", { concurrency: 
     assert.equal(r.pull, "wait", "THE LAW: a threshold is an instruction, never a throw");
     assert.equal(r.waiting_for, "the person");
     assert.equal(r.at, "overhaul", "the agent must be able to say WHICH step waits");
-    assert.match(String(r.why), /above the session autonomy 0\.4/);
+    // The word, never the number (owner ruling 2026-08-14).
+    assert.equal(r.autonomy, undefined, "no answer carries a bare number");
+    assert.match(String(r.why), /above this session's \w+/);
     // The served wait says DIAL, matching contract rule 3's own wording.
     assert.match(String(r.do), /dial alone cannot wake you/, "and that a message is what resumes it");
   });

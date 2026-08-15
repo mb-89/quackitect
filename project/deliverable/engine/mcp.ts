@@ -12,6 +12,7 @@
 // in tool names, so dotted names live in titles/descriptions only.
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { createInterface } from "node:readline";
+import { boundAnswer } from "./bound.ts";
 import { Rejection } from "./errors.ts";
 
 export interface ToolDef {
@@ -155,6 +156,11 @@ export class McpServer {
           });
         case "ping":
           return this.ok(id, {});
+        // THE ONE EXIT THE BOUND CANNOT COVER (i27, 2026-08-14). A tools list
+        // must arrive as a tools ARRAY the client can parse, so paging it
+        // into a text page would leave the agent with no tools at all. It is
+        // kept small by keeping DESCRIPTIONS short, which is authorship
+        // rather than mechanism, and this comment is the only guard there is.
         case "tools/list":
           return this.ok(id, {
             tools: [...this.tools.values()].map((t) => ({
@@ -179,8 +185,11 @@ export class McpServer {
             // calls.jsonl would bloat it for no reader's benefit.
             const { payload, blocks } = this.splitAttachments(result);
             this.observe({ tool: name, args, ok: true, duration_ms: Date.now() - started, outcome: "result", response: payload });
+            // THE BOUND FIRES HERE because this is the one place every
+            // answer is serialised. A host that truncates gives back nothing
+            // the engine can act on; the bound gives back a remedy.
             return this.ok(id, {
-              content: [{ type: "text", text: JSON.stringify(payload, null, 1) }, ...blocks],
+              content: [{ type: "text", text: boundAnswer(name, payload).text }, ...blocks],
               isError: false,
             });
           } catch (e) {
@@ -188,8 +197,11 @@ export class McpServer {
               // Rejections are results, not protocol errors: the model must
               // read clause + executable remedy and recover in one turn.
               this.observe({ tool: name, args, ok: false, duration_ms: Date.now() - started, outcome: "rejected", response: e.toJSON() });
+              // THE BOUND HOLDS ON REFUSALS TOO. An unreadable refusal is
+              // worse than an unreadable result: the reason a submit was
+              // rejected sits inside it, and no cheap question answers it.
               return this.ok(id, {
-                content: [{ type: "text", text: JSON.stringify(e.toJSON(), null, 1) }],
+                content: [{ type: "text", text: boundAnswer(`${name}-refused`, e.toJSON()).text }],
                 isError: true,
               });
             }
@@ -201,8 +213,13 @@ export class McpServer {
               outcome: "errored",
               response: String((e as Error).message),
             });
+            // BOUNDED LIKE THE OTHER TWO. An error's message can carry a
+            // whole stack or a whole file, and an unreadable error is the
+            // worst of the three: there is no remedy in it to follow.
             return this.ok(id, {
-              content: [{ type: "text", text: JSON.stringify({ kind: "errored", message: String((e as Error).message) }) }],
+              content: [
+                { type: "text", text: boundAnswer(`${name}-errored`, { kind: "errored", message: String((e as Error).message) }).text },
+              ],
               isError: true,
             });
           }
@@ -211,7 +228,14 @@ export class McpServer {
           return this.err(id, -32601, `method not found: ${msg.method}`);
       }
     } catch (e) {
-      return this.err(id, -32603, `internal: ${String((e as Error).message)}`);
+      // THE LAST EXIT, and it is bounded too. A protocol-level error carries
+      // no remedy, so all it can do is be readable.
+      const message = String((e as Error).message);
+      return this.err(
+        id,
+        -32603,
+        `internal: ${message.length > 4000 ? `${message.slice(0, 4000)} … (${message.length} chars, the whole of it is in the call log)` : message}`,
+      );
     }
   }
 

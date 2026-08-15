@@ -73,7 +73,7 @@ test("the route weighs the dial hop by hop and names where it stops", () => {
   const r = s.route("overhaul");
   assert.equal(r.steps.length, 6, "the whole way is still shown - a closed road does not erase the map");
   assert.equal(r.stops_at?.at, "overhaul", "it names the hop the dial shuts");
-  assert.match(String(r.stops_at?.why), /above the session autonomy/);
+  assert.match(String(r.stops_at?.why), /above this session's \w+/);
   // Raise the dial and the same route runs clear. A route that ignored
   // the threshold would be a hole straight through contract rule 3.
   s.setAutonomy(1);
@@ -200,7 +200,7 @@ test("a blocked route draws a closure, and the way past it is FADED", async () =
   assert.match(html, /class="route-shut"/, "with a barrier laid across the line");
   // Faded, never hidden: the way EXISTS, it is shut.
   assert.match(html, /\.route-line\.shut \{ opacity: \.28; \}/);
-  assert.ok(html.includes("above the session autonomy"), "and the barrier says why");
+  assert.ok(html.includes("above this session's"), "and the barrier says why, in the tier's own word");
 });
 
 // A TARGET YOU CANNOT NAME IS NOT A TARGET (found live 2026-07-29). The search

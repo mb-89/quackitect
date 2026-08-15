@@ -78,7 +78,16 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   // id outside the note system, minted once.
   // 102 since 2026-08-13: help.ts reads the demand log (.se/help-demand.jsonl)
   // direct — a JSONL log outside the note system, same shape as the two above.
-  const CEILING = 102;
+  // 103 since 2026-08-14: mode.ts reads .se/mode.json — the run mode, one tiny
+  // JSON object of session state, read at start. Same shape as the three
+  // above, and no door would ever hold it.
+  // 104 since 2026-08-14: version.ts reads the package manifest ONCE at import,
+  // for the product's own version. It was hardcoded as "3.0.0-bootstrap" in
+  // four places and stopped following the product at the 4.0.0 release, so
+  // every logged call across v4 carried a version the product had left behind.
+  // There is no node here to route through a door — only the manifest, which
+  // the packaging script already reads for the same fact.
+  const CEILING = 104;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {
@@ -115,7 +124,18 @@ test("no new file write bypasses the door — the count may fall, never rise", (
   // 38 since 2026-08-12: claims.ts mints the machine-id file, and the pin
   // scaffolds seeded placeholder drawings — generated files the door never
   // holds, the same class as the pin's own write.
-  const CEILING = 38;
+  //
+  // 39 since 2026-08-14: bound.ts spills an oversized answer to
+  // `.se/answers/<tool>.json`. That is SESSION state — machine-local,
+  // gitignored, overwritten by the next big answer and read back only by the
+  // cursor on the answer that wrote it. The door holds corpus, so this is a
+  // file it can never hold.
+  //
+  // 40 since 2026-08-14: mode.ts writes `.se/mode.json`, the run mode the
+  // person chose. Session state again — host-local, uncommitted, one small
+  // object, and deliberately NOT corpus: what suits one machine's cores is not
+  // a fact about the product.
+  const CEILING = 40;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {

@@ -17,8 +17,22 @@
 // log — the hook never calls the mirror over HTTP, which would deadlock
 // the session's own server):
 //
-// - the last pull answered "wait" — the machine's own stop: idle, the
-//   desk with no goal, or a step above the slider;
+// - the last pull answered "wait" AND NO TARGET IS SET — the machine's own
+//   stop: idle, the desk with nothing routed, or a step above the slider;
+//
+//   THE TARGET HALF WAS MISSING AND AN ESCAPE WALKED STRAIGHT THROUGH THE
+//   GAP (owner instruction 2026-08-14). The escape hatch lands at the front
+//   desk, and the desk answers "wait". So the sequence was: escape for a
+//   real reason, land at the desk, stop — and the tooth had nothing to
+//   bite, because the last pull said "wait".
+//
+//   Measured that day: three stops, two of them post-escape and both
+//   passed. A routed goal stood the whole time and idle was an open door
+//   at weight 0.2 against a dial of 1.
+//
+//   A "wait" WITH A TARGET IS NOT THE MACHINE'S OWN STOP. It is an agent
+//   declining to walk toward something it was pointed at, which is the
+//   exact thing this hook exists to refuse;
 // - no pull is on record — the engine never ran here;
 // - stop_hook_active is set — this stop was already blocked once. The
 //   valve for a question that genuinely BLOCKS: ask it in one line, stop
@@ -55,7 +69,7 @@ function tailOf(path: string): string {
 }
 
 /** The newest se_pull's answer, read from the log tail. */
-function lastPull(): { pull?: string; where?: unknown } | undefined {
+function lastPull(): { pull?: string; where?: unknown; target?: unknown } | undefined {
   const lines = tailOf(join(root, ".se", "calls.jsonl")).split("\n");
   for (let i = lines.length - 1; i >= 0; i--) {
     const line = lines[i].trim();
@@ -63,8 +77,27 @@ function lastPull(): { pull?: string; where?: unknown } | undefined {
     try {
       const rec = JSON.parse(line) as { tool?: string; ok?: boolean; response?: unknown };
       if (rec.tool !== "se_pull" || rec.ok !== true) continue;
-      const r = typeof rec.response === "string" ? (JSON.parse(rec.response) as unknown) : rec.response;
-      return (r ?? {}) as { pull?: string; where?: unknown };
+      if (typeof rec.response !== "string") return (rec.response ?? {}) as { pull?: string; where?: unknown; target?: unknown };
+      try {
+        return JSON.parse(rec.response) as { pull?: string; where?: unknown; target?: unknown };
+      } catch {
+        // A LONG RESPONSE IS STORED TRUNCATED, so parsing the whole of it
+        // throws and the tooth silently loses its bite. Found live on
+        // 2026-08-14: the hook passed a mid-work stop twice, because every
+        // recent pull's response was too long to store whole.
+        //
+        // Only three fields decide the verdict and all three sit near the
+        // FRONT of the answer, so they survive the cut. Read them directly.
+        const pull = /"pull"\s*:\s*"([a-z]+)"/.exec(rec.response)?.[1];
+        if (pull === undefined) continue;
+        const target = /"target"\s*:\s*"([^"]*)"/.exec(rec.response)?.[1];
+        const where = /"where"\s*:\s*\[([^\]]*)\]/.exec(rec.response)?.[1];
+        return {
+          pull,
+          target,
+          where: where === undefined ? undefined : where.split(",").map((s) => s.trim().replace(/^"|"$/g, "")),
+        };
+      }
     } catch {
       // the first line of the tail may be a torn record; a broken line is skipped
     }
@@ -87,17 +120,56 @@ process.stdin.on("end", () => {
     }
     const last = lastPull() ?? {};
     const pull = last.pull;
-    if (pull === undefined || pull === "wait") process.exit(0);
+    if (pull === undefined) process.exit(0);
+    // A TARGET IS A STANDING INSTRUCTION FROM THE PERSON. While one is set,
+    // the walk has somewhere to be, and "nothing to route" is false whatever
+    // the desk answered.
+    const target = typeof last.target === "string" ? last.target.trim() : "";
+    if (pull === "wait" && target === "") process.exit(0);
     const where = Array.isArray(last.where) ? (last.where as unknown[]).join(", ") : String(last.where ?? "");
+    const aimed = pull === "wait";
+    // THE ONLY STOPS THAT ARE SANCTIONED, named rather than implied (owner
+    // ruling 2026-08-14: "you don't need to stop working unless I explicitly
+    // told you to or you need a decision from me").
+    //
+    // The old wording said only "a question that BLOCKS", and that was read as
+    // covering any question the agent felt uncertain about. It is narrower
+    // than that: the walk stops where a PERSON is genuinely required, or where
+    // it cannot go on.
+    // A FOURTH JOINED THEM ON 2026-08-14, on the owner's word: "in the last few
+    // retros, you never asked me for field feedback. So you don't stop. You just
+    // continue with your stuff... asking me for field feedback is a reason to
+    // stop."
+    //
+    // It fits (2) on its face and was never read that way, because the agent
+    // could always find more retro to do and kept walking past the question.
+    // Only the FIRST retro step that needs a person gets named here; the rest
+    // of the retro proceeds while the answer is owed.
+    const SANCTIONED =
+      "FOUR STOPS ARE SANCTIONED AND NOTHING ELSE IS. " +
+      "(1) A GATE THE PERSON OWNS — gate-implementation is theirs to bless; the rest are yours at this dial. " +
+      "(2) A DECISION ONLY THEY CAN MAKE — no answer you could pick would let the walk continue honestly. " +
+      "(3) SOMETHING BROKE and no remedy gets you past it. " +
+      "(4) THE RETRO'S FIELD-FEEDBACK QUESTION — ask it, then STOP and wait. It is the owner's own report from outside the machine, " +
+      "nothing else in the retro can stand in for it, and walking on past it has quietly skipped it for several retros running. " +
+      "(5) A PLAN, BEFORE IT IS ACTED ON. PLANNING WAITS FOR THE OWNER'S GO; EXECUTION DOES NOT (owner ruling 2026-08-14). " +
+      "Seeding a record, splitting or merging one, deciding which iteration a finding belongs to, choosing scope — all planning. Present the list and WAIT. " +
+      "Once the plan has the go, execute the whole of it without asking again. " +
+      "Being unsure is not one. Having a lot left is not one. Having just finished a piece is not one. " +
+      "Stopping for one of the four? Say which, in one line, and stop again — this tooth bites once per stop.";
     process.stdout.write(
       JSON.stringify({
         decision: "block",
-        reason:
-          `[se] The walk stands mid-work: the last pull answered "${pull}"` +
-          (where !== "" ? ` at ${where}` : "") +
-          ". A report is not a checkpoint and size is not a reason — call se_pull and keep walking. " +
-          "If you are stopped on a question that BLOCKS (no answer could let the walk continue from here), " +
-          "ask it in one line and stop again; this tooth bites once per stop.",
+        reason: aimed
+          ? `[se] A target is set (${target}) and the walk is not on it` +
+            (where !== "" ? `, standing at ${where}` : "") +
+            '. The pull answered "wait" because nothing routed FROM HERE, which is not the same as nothing to do. ' +
+            "Take the door that leads toward the target and keep walking. " +
+            SANCTIONED
+          : `[se] The walk stands mid-work: the last pull answered "${pull}"` +
+            (where !== "" ? ` at ${where}` : "") +
+            ". A report is not a checkpoint and size is not a reason — call se_pull and keep walking. " +
+            SANCTIONED,
       }),
     );
   } catch {

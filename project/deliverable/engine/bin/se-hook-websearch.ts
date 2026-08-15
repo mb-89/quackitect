@@ -17,6 +17,7 @@ import { randomBytes } from "node:crypto";
 import { appendFileSync, mkdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { SE_VERSION } from "../version.ts";
 
 // bin -> engine -> deliverable -> product -> the project root.
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..");
@@ -43,7 +44,7 @@ process.stdin.on("end", () => {
           ok: true,
           outcome: "result",
           duration_ms: 0,
-          se_version: "3.0.0-bootstrap",
+          se_version: SE_VERSION,
         })}\n`,
         "utf8",
       );

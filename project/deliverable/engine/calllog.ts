@@ -34,7 +34,10 @@ export interface LastSession {
   answers?: string[];
 }
 
-const SE_VERSION = "3.0.0-bootstrap";
+// One fact, read from the manifest. It was hardcoded here and stopped
+// following the product at 4.0.0 (see version.ts).
+import { SE_VERSION } from "./version.ts";
+
 const GB = 1024 * 1024 * 1024;
 
 /** THE ONE-SECOND RULE IS THE LINE (req-call-answers-in-one-second; owner

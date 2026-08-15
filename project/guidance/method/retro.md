@@ -51,6 +51,20 @@ The trigger is a NOTE carrying "needs retro":
    this step owes.
 2. Field feedback. Ask the owner what came back from the
    field since the last look. Capture every answer as a note.
+
+   THIS IS A SANCTIONED STOP, AND THE ONLY ONE THE RETRO HAS (owner ruling
+   2026-08-14). Ask the question, then STOP and wait for the answer.
+
+   WHY IT NEEDED SAYING. The step was walked past in several retros running.
+   The owner: "in the last few retros, you never asked me for field feedback.
+   So you don't stop. You just continue with your stuff."
+
+   It is easy to walk past because there is always more retro to do. That is
+   exactly why it is named: no amount of draining, mining or sweeping is a
+   substitute for the one report that comes from OUTSIDE the machine.
+
+   WHAT DOES NOT WAIT. The drain, the log mining, the debt sweep and the
+   memory drain need no answer. Do them, and stop on the question.
 3. Drain the notes inbox, walking EVERY pending note once. Disposition each
    with se_note_drain, routing it to exactly ONE home.
 

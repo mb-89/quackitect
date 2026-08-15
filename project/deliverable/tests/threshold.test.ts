@@ -29,8 +29,11 @@ test("autonomy 0 is manual mode: the agent's pull waits, the human walks freely"
   const w = await call(server, "se_pull");
   assert.equal(w.isError, false, "a wall is an instruction, never an error");
   assert.equal(w.body.pull, "wait");
-  assert.equal(w.body.autonomy, 0);
-  assert.match(String(w.body.why), /above the session autonomy 0/);
+  // THE WORD, AND NO NUMBER (owner ruling 2026-08-14: "that number leaves...
+  // there's no call to be made"). The tier IS the autonomy.
+  assert.equal(w.body.autonomy, undefined, "no answer carries a bare number");
+  assert.equal(w.body.tier, "blocked", "the dial at its floor is the blocked rung");
+  assert.match(String(w.body.why), /above this session's blocked/);
   // The served wait says DIAL, matching contract rule 3's own wording.
   assert.match(String(w.body.do), /dial alone cannot wake you/);
   // The human's hand (default channel): the same step just goes.
@@ -103,20 +106,28 @@ test("the hatch is never gated: an escape at autonomy 0 still reaches the desk",
   assert.deepEqual(session.active(), ["front_desk"], "the desk weighs 0.2 and the hatch lands there anyway");
 });
 
-test("priority and autonomy ride every packet — the agent can weigh its next states", () => {
+test("the TIER rides every packet and the autonomy NUMBER does not", () => {
   const session = new Session(freshRoot());
-  const info = session.packet() as { autonomy: number; states: { priority: number; next: { to: string; priority?: number }[] }[] };
-  assert.equal(info.autonomy, 0.4);
-  // MECHANICAL IS 0.2, not the old 0.01 floor (owner tier cut-over ruling
-  // 2026-08-12, machines/scale.md). These states author the WORD `mechanical`;
-  // the number is the transitional anchor the compiler reads off that scale.
+  const info = session.packet() as {
+    autonomy?: number;
+    tier?: string;
+    states: { priority: number; next: { to: string; priority?: number }[] }[];
+  };
+
+  // OWNER RULING 2026-08-14: "the number leaves the answer".
+  // req-autonomy-is-categorical says no numeric autonomy value survives on any
+  // surface, and this packet is the surface the agent reads on every call.
+  assert.equal(info.autonomy, undefined, "the agent is handed the tier, never the number behind it");
+  assert.equal(typeof info.tier, "string", "and the tier word is what it is handed instead");
+
+  // THE AGENT CAN STILL WEIGH ITS NEXT STATES, which is what the old version
+  // of this test was really protecting. It reads `open` and `needs` on the
+  // offered doors, in words, rather than comparing two numbers itself.
+  //
+  // STATE PRIORITIES STILL CARRY NUMBERS. That half is i14's — "every numeric
+  // priority left in the engine, the scale and the guidance goes" — and the
+  // requirement itself says cut over first, then remove, never both at once.
   assert.equal(info.states[0].priority, 0.2);
-  // THE SWEEP LANDED (i3, tsp-autonomy-tiers). This is the weight of
-  // ENTERING the boot sub-machine, from boot.canvas's MACHINE-level
-  // frontmatter, which now authors the word `mechanical` like everything
-  // else. It read 0.01 until the sweep reached it, and every rung of
-  // machines/scale.md treats 0.01 and 0.2 alike, so nothing behaves
-  // differently — this line moved because the number left the drawing.
   assert.equal(info.states[0].next[0].priority, 0.2); // boot.canvas frontmatter
   const peek = session.stateInfo("idle") as { priority: number; next: { to: string; priority?: number }[] };
   assert.equal(peek.priority, 0.2);

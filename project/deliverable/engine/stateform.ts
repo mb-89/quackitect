@@ -15,6 +15,7 @@ import { clusterDsm, type Dsm, flowMatrix } from "./dsm.ts";
 import { type ElementMatrixView, elementMatrixView } from "./elematrix.ts";
 import type { FormTemplate } from "./forms.ts";
 import { pendingNotes } from "./inbox.ts";
+import { blockingRules, lintProse } from "./lint.ts";
 import type { EvidenceField, MachineDecl, StateDecl } from "./machine.ts";
 import { bare, type MorphBox, type MorphCell, type MorphLine, type MorphRow, orderLines, storedOrder } from "./morphbox.ts";
 import { noteOf, parseStateNote, readNode, section } from "./notes.ts";
@@ -1178,9 +1179,51 @@ const rowId = (cells: string[]): string => (cells[0] ?? "").replace(/^\[\[|\]\]$
  *  minted prompt pass as a claim. */
 const unanswered = (v: string): boolean => v.trim() === "" || /^<!--[\s\S]*-->$/.test(v.trim());
 
+/** A CELL THAT LOST ITS TAIL, recognised by the mark a cut leaves.
+ *
+ *  A node-table cell lands verbatim on the node's frontmatter. On 2026-08-14
+ *  four of this record's experiments reached their nodes ENDING IN AN ELLIPSIS
+ *  with the clause that carried the meaning gone, and all four were rewritten
+ *  by hand (note-324983b06229).
+ *
+ *  NOTHING IN THIS ENGINE WRITES AN ELLIPSIS. A search of the whole deliverable
+ *  for the character as a string literal, and for any maxlength, returns
+ *  nothing, and neither the read half nor the write half of the node-table
+ *  shortens a cell. So the cut came from somewhere this code cannot see — a
+ *  host, or the author's own abbreviation.
+ *
+ *  THE GUARD DOES NOT NEED THE CULPRIT. Whatever cut it, a frontmatter value
+ *  that trails off is not an answer, and the one outcome that must not stand
+ *  is the SILENT one: the form shows the whole text, the node carries a
+ *  fragment, and the ellipsis reads as style rather than as loss. */
+const LOST_ITS_TAIL = /(?:…|\.\.\.)\s*$/;
+
+/** THE VOICE LINT AT SUBMIT, and the card decides which of its rules BITE.
+ *
+ *  `blocking:` in machines/lint/voice-lint.md names the rules that refuse.
+ *  Everything else the lint finds is a report and lets the submit through, so
+ *  a comma never stands in the way of a form.
+ *
+ *  WHY HERE RATHER THAN AT A LATER SWEEP. Prose written into a form is prose
+ *  the author is looking at right now. An overhaul that finds it weeks later
+ *  is finding it after the reader already read it.
+ *
+ *  ONLY PROSE. A table, a checklist and a reference list are STRUCTURE, and
+ *  running sentence rules over them would flag the shape of a form rather
+ *  than anything anybody wrote. */
+function voiceProblems(name: string, meta: TemplateMeta, content: string, root?: string): string[] {
+  if (root === undefined || meta.editor !== "text" || content.trim() === "") return [];
+  const bite = new Set(blockingRules(root));
+  if (bite.size === 0) return [];
+  return lintProse(root, content)
+    .filter((f) => bite.has(f.rule))
+    .map((f) => `${name}: ${f.rule} — ${f.hint} ("${f.excerpt}")`);
+}
+
 function nodeTableProblems(name: string, args: FieldArgs, content: string): string[] {
   const rows = content.split("\n").map(tableRow);
   const missing: string[] = [];
+  const cut: string[] = [];
   for (const id of args.items) {
     const row = rows.find((c) => rowId(c) === id);
     if (row === undefined) {
@@ -1188,10 +1231,19 @@ function nodeTableProblems(name: string, args: FieldArgs, content: string): stri
       continue;
     }
     for (const [i, c] of args.columns.entries()) {
-      if (unanswered(row[i + 1] ?? "")) missing.push(`${id}.${c}`);
+      const cell = row[i + 1] ?? "";
+      if (unanswered(cell)) missing.push(`${id}.${c}`);
+      else if (LOST_ITS_TAIL.test(cell)) cut.push(`${id}.${c}`);
     }
   }
-  return missing.length > 0 ? [`${name}: unanswered — ${missing.join(" · ")}`] : [];
+  const out: string[] = [];
+  if (missing.length > 0) out.push(`${name}: unanswered — ${missing.join(" · ")}`);
+  if (cut.length > 0) {
+    out.push(
+      `${name}: ends in an ellipsis, so it lost its tail — ${cut.join(" · ")}. This cell lands verbatim on the node, and a value that trails off reads as a whole sentence to whoever opens it. Type the rest, or say the whole thing shorter.`,
+    );
+  }
+  return out;
 }
 
 /** Which ROW each option belongs to: its design question where it names one,
@@ -1326,7 +1378,7 @@ export function fieldProblems(
   root?: string,
 ): string[] {
   if (meta.editor === "choice-rationale") return choiceProblems(name, args, content);
-  const out: string[] = [...refProblems(name, meta, args, content, corpus, root)];
+  const out: string[] = [...refProblems(name, meta, args, content, corpus, root), ...voiceProblems(name, meta, content, root)];
   // EVERY CELL IS REQUIRED. The rows are the register itself, so an empty
   // cell is a standing node nobody answered for — which is exactly the state
   // this field exists to refuse. "No check exists yet" is a legal answer and
