@@ -25,6 +25,16 @@
   "outputStyle": "voice",
   "enableAllProjectMcpServers": true,
   "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"../project/deliverable/engine/bin/se-hook-stop.ts\""
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "WebSearch",

@@ -431,3 +431,38 @@
 {"ts":"2026-08-15T18:41:09.484Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d107","brief":"the grade check could never pass; exit code now follows the verdict"}
 {"ts":"2026-08-15T18:41:19.960Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d108","brief":"re-running the grade check"}
 {"ts":"2026-08-15T18:42:16.938Z","op":"done","visit":"iterations/i28/rank-unknowns@0","node":"d103","brief":"the blocking node lives on trunk, not in this worktree"}
+{"ts":"2026-08-15T18:42:21.800Z","op":"fork","visit":"iterations/i28/rank-unknowns@0","parent":null,"node":"d109","brief":"committing before the sync","nodes":[]}
+{"ts":"2026-08-15T18:42:30.617Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d110","brief":"syncing trunk in to reach the blocking node"}
+{"ts":"2026-08-15T18:42:49.061Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d111","brief":"checking whether trunk already fixed the exit code"}
+{"ts":"2026-08-15T18:43:12.989Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d112","brief":"reading which root the script condition passes"}
+{"ts":"2026-08-15T18:43:17.604Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d113","brief":"finding the root the engine passes to a script condition"}
+{"ts":"2026-08-15T18:43:29.350Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d114","brief":"reading the script-condition spawn"}
+{"ts":"2026-08-15T18:43:45.225Z","op":"done","visit":"iterations/i28/rank-unknowns@0","node":"d109","brief":"the script condition reads the repo root, never the bound worktree"}
+{"ts":"2026-08-15T18:45:20.595Z","op":"fork","visit":"iterations/i28/rank-unknowns@0","parent":null,"node":"d115","brief":"diagnosing the two-corpus seam, then fixing it","nodes":[]}
+{"ts":"2026-08-15T18:45:31.678Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d116","brief":"finding the bound tree's path in the session"}
+{"ts":"2026-08-15T18:45:37.842Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d117","brief":"reading the lane's own root accessor"}
+{"ts":"2026-08-15T18:45:44.316Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d118","brief":"the script condition now judges the tree the lane writes to"}
+{"ts":"2026-08-15T18:45:56.803Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d119","brief":"counting the bypasses of workRoot"}
+{"ts":"2026-08-15T18:46:10.673Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d120","brief":"running the binding tests against the fix"}
+{"ts":"2026-08-15T18:46:15.771Z","op":"done","visit":"iterations/i28/rank-unknowns@0","node":"d115","brief":"one call site bypassed workRoot; now pointed at it"}
+{"ts":"2026-08-15T18:46:21.367Z","op":"fork","visit":"iterations/i28/rank-unknowns@0","parent":null,"node":"d121","brief":"reading the binding-test verdict","nodes":[]}
+{"ts":"2026-08-15T18:46:28.059Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d122","brief":"waiting on the verdict"}
+{"ts":"2026-08-15T18:46:40.704Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d123","brief":"still waiting"}
+{"ts":"2026-08-15T18:46:48.057Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d124","brief":"polling the scoped run"}
+{"ts":"2026-08-15T18:47:14.130Z","op":"done","visit":"iterations/i28/rank-unknowns@0","node":"d121","brief":"69 of 69 pass; no test covers a script condition"}
+{"ts":"2026-08-15T18:47:33.435Z","op":"plan","visit":"iterations/i28/rank-unknowns@0","parent":null,"nodes":[{"id":"d125","brief":"count every this.root in the engine"},{"id":"d126","brief":"give workRoot the worktree-management case"},{"id":"d127","brief":"route every caller through it"},{"id":"d128","brief":"typecheck and run the suite"}]}
+{"ts":"2026-08-15T18:47:48.422Z","op":"done","visit":"iterations/i28/rank-unknowns@0","node":"d125","brief":"87 sites, 82 in session.ts and 5 in vault.ts"}
+{"ts":"2026-08-15T18:48:21.073Z","op":"done","visit":"iterations/i28/rank-unknowns@0","node":"d126","brief":"machineRoot names the repo-owning case beside workRoot"}
+{"ts":"2026-08-15T18:48:38.672Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d129","brief":"routing every read through the accessor"}
+{"ts":"2026-08-15T18:48:50.456Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d130","brief":"repairing the assignment and the accessor body"}
+{"ts":"2026-08-15T18:48:56.886Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d131","brief":"reading the constructor line the typecheck flags"}
+{"ts":"2026-08-15T18:49:04.623Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d132","brief":"typechecking the routed engine"}
+{"ts":"2026-08-15T18:49:16.234Z","op":"done","visit":"iterations/i28/rank-unknowns@0","node":"d127","brief":"every caller routed; the field is touched twice and nowhere else"}
+{"ts":"2026-08-15T18:50:13.863Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d133","brief":"reading the battery"}
+{"ts":"2026-08-15T18:50:28.120Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d134","brief":"checking whether the cage failures are mine"}
+{"ts":"2026-08-15T18:50:39.931Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d135","brief":"waiting out the battery before touching the cage"}
+{"ts":"2026-08-15T18:50:57.175Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d136","brief":"wiring the Stop hook the template never shipped"}
+{"ts":"2026-08-15T18:51:01.595Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d137","brief":"re-running cage and drift alone"}
+{"ts":"2026-08-15T18:51:12.219Z","op":"done","visit":"iterations/i28/rank-unknowns@0","node":"d128","brief":"battery ran: 1311 of 1314 pass"}
+{"ts":"2026-08-15T18:51:18.788Z","op":"fork","visit":"iterations/i28/rank-unknowns@0","parent":null,"node":"d138","brief":"polling the cage and drift run","nodes":[]}
+{"ts":"2026-08-15T18:51:43.941Z","op":"done","visit":"iterations/i28/rank-unknowns@0","node":"d138","brief":"18 of 18 pass; all three battery failures resolved"}
