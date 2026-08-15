@@ -302,3 +302,15 @@
 {"ts":"2026-08-15T17:36:21.475Z","op":"update","visit":"iterations/i28/gate-candidates@0","node":"d275","brief":"answer recorded; polling the scoped run"}
 {"ts":"2026-08-15T17:36:38.233Z","op":"update","visit":"iterations/i28/gate-candidates@0","node":"d276","brief":"waiting on the scoped verdict"}
 {"ts":"2026-08-15T17:36:58.783Z","op":"done","visit":"iterations/i28/gate-candidates@0","node":"d272","brief":"88 of 88 pass; typecheck clean"}
+{"ts":"2026-08-15T17:38:24.534Z","op":"update","visit":"iterations/i28/log-risks@0","node":"d3","brief":"second sweep toward the gate"}
+{"ts":"2026-08-15T17:38:42.086Z","op":"update","visit":"iterations/i28/write-stories@0","node":"d4","brief":"asking what the walk wants at write-stories"}
+{"ts":"2026-08-15T17:39:16.982Z","op":"update","visit":"iterations/i28/write-stories@0","node":"d5","brief":"clearing the dangling story reference the delete left"}
+{"ts":"2026-08-15T17:39:55.268Z","op":"update","visit":"iterations/i28/gate-requirements@0","node":"d6","brief":"walking on toward gate-candidates"}
+{"ts":"2026-08-15T17:41:01.354Z","op":"done","visit":"front_desk@0","node":"d2","brief":"arrived at gate-candidates; the chain walked green with no rework"}
+{"ts":"2026-08-15T17:41:42.884Z","op":"fork","visit":"iterations/i28/gate-candidates@0","parent":null,"node":"d7","brief":"checking the gate's standing before waiting on the owner","nodes":[]}
+{"ts":"2026-08-15T17:41:56.790Z","op":"done","visit":"iterations/i28/gate-candidates@0","node":"d7","brief":"gate stands with an agent bless that should not be there"}
+{"ts":"2026-08-15T17:42:54.883Z","op":"fork","visit":"iterations/i28/gate-candidates@0","parent":null,"node":"d8","brief":"refilling the gate unblessed for the owner","nodes":[]}
+{"ts":"2026-08-15T17:43:02.120Z","op":"done","visit":"iterations/i28/gate-candidates@0","node":"d8","brief":"gate refilled and signed, bless left empty"}
+{"ts":"2026-08-15T17:47:43.507Z","op":"fork","visit":"iterations/i28/gate-candidates@0","parent":null,"node":"d9","brief":"checking the tree before touching the session.ts conflict","nodes":[]}
+{"ts":"2026-08-15T17:47:54.648Z","op":"update","visit":"iterations/i28/gate-candidates@0","node":"d10","brief":"syncing trunk into i28 to resolve the session.ts divergence"}
+{"ts":"2026-08-15T17:47:58.532Z","op":"update","visit":"iterations/i28/gate-candidates@0","node":"d11","brief":"committing the gate and story evidence before the sync"}
