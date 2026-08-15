@@ -7,7 +7,7 @@ statement: The reference views still list the whole corpus - the minted_in stamp
 owner: the driving agent
 trigger: the next form opened in a record whose table lists another record's nodes, or the owner's next reiteration of the delta demand
 status: open
-looked: 2026-08-14
+looked: 2026-08-15
 breaks_how_badly: abrasive
 how_likely: expected
 impact: Every reference table in a record lists the standing corpus beside the delta - 38 test-specs where 7 are the iteration's own - and the reader wades through history, exactly what the owner has flagged three times.
@@ -33,3 +33,12 @@ this one entry at the same retro.
 Sweep 2026-08-13 (second retro debt sweep): re-accepted consciously. i8's
 forms opened reference tables but none surfaced the corpus-wide list this
 debt names. Trigger stands unchanged.
+
+## Swept 2026-08-15, at i12's retro: RESCHEDULED to i15
+
+The debt is that the resolvers do not default to the bound iteration's delta.
+i15 is the database iteration — "our own reader over Obsidian Bases
+compatible files" — and the resolvers are what it builds. Fixing them
+elsewhere would mean touching the same code twice.
+
+The trigger stands unchanged.

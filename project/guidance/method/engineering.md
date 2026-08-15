@@ -204,3 +204,98 @@ So, for any change a person will LOOK at:
 
 Never report a UI change as done from a green test alone. A test proves the
 function; only the reload proves the owner can see it.
+
+## The engine checks a written file, and the agent never asks
+
+OWNER RULING 2026-08-15. "We are going to have a register of checking tools
+in the engine. The engine says: I am editing a TypeScript file, I am applying
+all the checks for TypeScript on it, and then I continue. Auto-formatting,
+like ruff for Python — the engine would just do that. It would not even ask.
+But if it detects a problem it cannot auto-format, it will reject with a
+decent remedy."
+
+A REGISTER, KEYED BY FILE KIND. Not a list of TypeScript rules. Each kind
+names the tools that apply to it, and a tool declares its own output format
+so the engine can read a verdict from it. TypeScript is one entry. Python
+with ruff is another. Markdown is another.
+
+THREE OUTCOMES ON A WRITE, and only the third reaches the agent.
+
+- CLEAN. The write lands and nothing is said.
+- FIXABLE. The engine applies the fix and says so on the result. It does not
+  ask. The linter already behaves this way on se_file_patch, which is the
+  proof the shape works: "the linter's safe fixes ran on <path> — the
+  returned hashes are the fixed content".
+- NOT FIXABLE. The write is REFUSED, with the tool's own message and an
+  executable remedy, like every other refusal in the lane.
+
+WHY THE AGENT IS OUT OF THE LOOP. A check the agent has to remember to run is
+a check that gets skipped under pressure. i12 spent four shell calls on
+`npx tsc --noEmit` because no verb existed, and the honest reading is not
+that a verb was missing — it is that the agent was doing the engine's job.
+
+WHAT THIS REPLACES: the standing verify loop in this file names a scoped test
+run after a checker pass. The checker half becomes automatic; the test half
+stays the agent's, because only the agent knows which question a run answers.
+
+## se_package builds the artifact
+
+OWNER RULING 2026-08-15, agreed at i12's retro. The M9 package state requires
+a versioned archive and the lane has no verb that builds one, so the agent
+reaches for the shell. It happened twice in i12, once refused for a bad
+argument.
+
+The verb wraps engine/bin/package.ts, answers with the artifact path, and the
+package state's file-ref field resolves it against disk as it already does.
+
+## A merge into trunk re-checks every open iteration
+
+OWNER RULING 2026-08-15, at i12's retro: "rechecking every open iteration, I
+think makes sense. We can do that."
+
+WHEN AN ITERATION'S BRANCH MERGES INTO TRUNK, the files it changed are files
+other open iterations have already signed claims against. Nothing re-checks
+them, so a claim can go on standing over a corpus that has moved beneath it.
+
+THE RULE: after the merge, re-run each open iteration's claim checks against
+trunk, and mark what no longer holds. It is the ripple the engine already
+computes, pointed at a different trigger.
+
+WHAT IT COST WHEN IT WAS MISSING. i12's milestone walk found SIX separate
+steps that cost something for this one cause. write-requirements was amended
+twice because a merge renamed one requirement and added fourteen. observe-red
+had to adjudicate two specs that arrived mid-walk. trace-design went red
+because the merged iteration's design layer had never reached trunk at all,
+leaving eleven engine files with no spec claiming them.
+
+THE MIRROR IMAGE IS THE SAME FIX. An iteration can also ship its CODE and
+leave its TRACE behind, because nothing checks the trace after the merge
+either. One check answers both directions: run the trace-design laws against
+trunk, and re-check every open iteration's register and claims against the
+corpus as it now stands.
+
+IT IS CHEAP. The corpus load measures 4.3 ms warm against 312.9 ms cold, and
+the comparison is set operations over the realizes and files edges. The one
+constraint that matters: the graph must be built from TRUNK, never from the
+merging iteration's own tree.
+
+## A failed gate returns the walk to idle
+
+OWNER RULING 2026-08-15: "A fail of a gate, in my opinion, lands you back at
+idle, and then you need to decide how you go about it. Sometimes you can go
+back maybe only one gate, sometimes we need to go back two gates. A dismissed
+gate goes back to idle."
+
+TODAY A FAILED GATE HAS NOWHERE TO GO. gate-implementation's only successor
+is the next state, so a verdict of `fail` stamps nothing and moves nothing.
+When the owner failed i12's implementation gate the walk did not move, and
+the agent had to route around it by hand.
+
+WHY IDLE AND NOT A NAMED PREDECESSOR. How far back a fail should send the
+walk is a judgment that depends on what failed, and the machine cannot know
+it. Idle is the one position from which every route can be drawn, so it is
+the honest destination.
+
+THE VERDICT STILL STANDS ON THE FORM. The fail is recorded with its
+rationale; only the POSITION moves. Nothing about the ruling is lost by
+returning to idle.

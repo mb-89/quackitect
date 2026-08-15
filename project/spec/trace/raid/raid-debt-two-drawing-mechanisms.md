@@ -7,7 +7,7 @@ statement: A seeded machine's steps are frontmatter rows in one drawing file, wh
 owner: the maintainer
 trigger: the picture-in-picture to-do machine design discussion, or the next change to the seeded-machine compiler
 status: open
-looked: 2026-08-14
+looked: 2026-08-15
 impact: Every feature the drawn machines gain must be built twice or the seeded ones fall behind; the owner has ruled the split wrong.
 breaks_how_badly: corrosive
 how_likely: expected
@@ -35,3 +35,18 @@ built se.help, which is unrelated. Trigger stands unchanged.
 BOTH SWEEPS ARE KEPT ON PURPOSE. Two machines swept this row the same
 day and reached the same verdict independently, which is worth more than
 either entry alone. They were merged rather than deduplicated.
+
+## Swept 2026-08-15, at i12's retro: RESCHEDULED to i13
+
+i13 is the machine format — "state machines become PlantUML files with our
+own Cytoscape renderer, coordinates go, the hash moves from bytes to the
+extracted graph". A rewrite of how a machine is stored is the one place where
+collapsing two mechanisms into one costs nothing extra.
+
+ONE FINDING FROM i12 BELONGS WITH IT, because it argues the same way from the
+other side: moving the machine render to Cytoscape would NOT help performance.
+The render consumes a canvas that already exists and reads no disk; the four
+seconds sit in the greenness derivation behind it. So i13's case rests on
+maintainability alone, and should not borrow a speed argument it does not have.
+
+The trigger stands unchanged.

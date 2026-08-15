@@ -7,7 +7,7 @@ statement: Four demonstration specs went unobserved at i3's verification - each 
 owner: the owner
 trigger: the consolidation pass that collects everything needing a person, or any iteration whose delta actually touches one of the four specs
 status: open
-looked: 2026-08-14
+looked: 2026-08-15
 breaks_how_badly: abrasive
 how_likely: expected
 impact: Verification refuses while any claim box stands open, so four specs nobody at a terminal can observe stop every iteration from closing. The alternative is checking boxes on unobserved claims, which is worse.
@@ -77,3 +77,20 @@ THE FOUR BOXES AT i3's VERIFICATION ARE CHECKED AGAINST THIS ROW, and
 the form says in plain words that they were not observed. The card's law
 is not bent quietly: it is overridden once, on the record, by the person
 whose call it is.
+
+## Swept 2026-08-15, at i12's retro: RE-ACCEPTED, and it got heavier
+
+AT i3'S CLOSE IT WAS FOUR SPECS. At i12's validation gate it was EIGHT of
+eight must stories owed, so the entire must column of a validation gate rests
+on the battery, and the battery says nothing about a person opening a link.
+
+WHAT CHANGED IN ITS FAVOUR: the owner ruled at this retro that validations
+will not be performed every iteration, and that the red team may note this
+every time and it is accepted every time. "This is too much effort. So for
+now, we're just gonna live with that."
+
+SO THE RE-ACCEPTANCE IS EXPLICIT rather than inherited. What must NOT happen
+is the re-adjudication: this entry's own impact line already said so, and
+nothing read it. That half is now fixed — M7_50_verification carries a rule
+that a spec named here arrives PRE-FILLED as owed, so the debt carries the
+claim instead of every iteration answering it again.

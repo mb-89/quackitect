@@ -943,6 +943,10 @@ the moment the enablers land, with no gap where a machine idles.
 EVERYTHING ELSE IS FILL, in no order: i5, i6, i7, i13, i15, i17, i18, i29,
 i30. i19 and i25 unlock nothing and can go whenever.
 
+i19 GREW ON 2026-08-15. It now carries the whole milestone one-pager
+programme, all ten pages and the deck. It still unlocks nothing, so its place
+in the order does not change. It is no longer a small filler.
+
 ### An open question this raises
 
 Part 4 carries a v1 law: ORDER IS NOT DEPENDENCY — depends_on states real
@@ -1073,3 +1077,99 @@ implemented. The files worth opening are named against their iterations above.
 V2, at ref `v2`, with its idea inventory at `project/V2-INVENTORY.md`. That
 inventory was produced by a full walk of the v2 corpus and every idea in it
 carries its source key. v2 needs no further opening.
+
+## The milestone one-pager, all of it in i19 emit.report (owner design, 2026-08-15)
+
+EVERY GATE PRODUCES A ONE-PAGER: an HTML page that reads like a slide but does
+more, embedded beside the state machine. Open a submitted milestone and the
+one-pager sits next to the drawing. Bless from there, or drill into any of it.
+Export it later for a report. When the iteration closes, its one-pagers become
+a deck.
+
+IT IS A PROJECTION OF THE GATE, NOTHING MORE. The gate form already carries
+the verdict, the three rounds, the register additions and the checklists. The
+one-pager renders them. It authors nothing, and a field it needs that does not
+exist is a finding about the FORM, not a reason to write prose.
+
+IT IS A LIVE VIEW, NOT A COPY. The evidence layer points at the requirements,
+tests, runs and register entries where they live. A slide that copies evidence
+goes stale; a view that points at it cannot. INCOSE's 2025 work on engineering
+reviews and the ASPICE assessor literature both land on the same point: a
+review is better served by artifacts with their links intact than by a
+document that flattened them.
+
+SO IT IS MECHANICAL BY CONSTRUCTION. The agent fills the form as it does
+today. The engine renders. No extra step, and the page cannot drift from the
+evidence because it IS the evidence.
+
+### All ten pages land in i19, and none of them are spread (owner ruling, 2026-08-15)
+
+THE PROGRAMME WAS SPREAD ACROSS TEN ITERATIONS AND IS NOT ANY MORE. Every
+milestone one-pager, and the combined deck, land in i19 emit.report.
+
+| what | where |
+| --- | --- |
+| M0 kickoff to M9 release, all ten pages | i19 emit.report |
+| the combined deck | i19 emit.report |
+
+THE OWNER'S REASON, 2026-08-15. The one-pager needs their input, and the
+enablers must run as fast as possible. A page assigned to an enabler puts an
+owner decision on the critical path. i19 is a judgment iteration where the
+owner already sits, and the deck already landed there, so the whole programme
+goes where its input already lives.
+
+IT CAME OFF i28 FIRST AND BY NAME. M0 kickoff was i28's row. i28 is the cloud
+enabler, and keeping it free of owner input is the whole point of the move.
+
+WHAT THE MOVE COSTS, stated rather than hidden. The spread had an argument and
+that argument is now dropped:
+
+- The first two pages were to teach the template and make the rest cheaper.
+  Now all ten are learned in one iteration.
+- Run order meant each page existed before the iteration after it needed to
+  look at one. Now no iteration has a one-pager until i19 lands.
+
+WHAT SURVIVES THE MOVE UNCHANGED. Each iteration WALKS every milestone, so
+any iteration can build any milestone's page — that is why the reassignment is
+legal at all. And J1 was always the assembly point; it is now the build point
+too, so the deck stops being assembly of parts built elsewhere and becomes one
+piece of work.
+
+### What the research settled, so it is not re-derived
+
+THE CONTENT SHAPE IS THE PYRAMID: the conclusion first, three to five
+supporting blocks, evidence beneath each. BLUF at the top — the recommendation
+before anything else. Numbers rather than adjectives.
+
+THE HOUSE FORMAT ALREADY EXISTS and the one-pager should not invent a second
+one: assertion-evidence (Michael Alley), one claim carried by evidence beside
+it, never a bullet list. meth-story-slideshow holds it, with `---` between
+slides and `|||` splitting the halves.
+
+NASA NPR 7123.1A APPENDIX G WAS READ IN FULL, and most of it does not
+transfer. Two of its ideas were considered and DROPPED as already ours:
+
+- "Available to participants prior to the review" is our entry conditions, and
+  ours is stronger. NASA lists what must be available because the pack is
+  paper; our claim guard refuses the gate while any upstream form is
+  incomplete. A missing input gives us a shut gate, not a thin pack.
+- "Updated X" — the delta framing — is raid-debt-delta-default-views, already
+  rescheduled to i15.
+
+WHAT DID TRANSFER became a gate rule rather than a one-pager feature: every
+review's first entrance criterion is that the previous review's open items are
+closed or carry a plan. That is now two rules — a Repayment section on every
+debt, and an override that must name a register entry. Both live where gates
+are defined, and the one-pager shows them for free because it projects the
+gate.
+
+## Two mechanical checks for i11's bundle (2026-08-15)
+
+i11 is the engine-fix bundle of named defects. Two more, both from i12's retro,
+both small and both with their rule already written down.
+
+- A DEBT WITHOUT A REPAYMENT SECTION REFUSES. The check row is already in
+  machines/items/raid.md, mirroring the assumption's Probe rule. Six standing
+  debts predate it and want the section adding.
+- A VERDICT OF `pass with overrides` REFUSES WHILE raid_additions SAYS none.
+  The rule and its measurement are in meth-gate-review.md.

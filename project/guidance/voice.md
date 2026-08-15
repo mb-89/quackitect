@@ -87,6 +87,20 @@ Write plainly. These are rules, not suggestions. They bind every output:
 - Prefer the plain phrase. Use the id only where traceability needs it.
 - An unexpanded id reads as precision and carries nothing.
 
+### Forbidden words
+
+The list is short on purpose. A word joins it when a READER says it did not land, never because a writer guessed it might not.
+
+- RECORD, where a specific vehicle is meant. Say ITERATION or EXPEDITION.
+  - The generic is legal only where the sentence genuinely covers both. Most uses turn out to be specific.
+  - THE ENGINE COINED IT AND NOW TEACHES IT (owner, 2026-08-15): "it is its own generic term for, like, two days. Nobody introduced it." It sits in the contract, the forms, the state guidance and the refusals, so every call trains the next reader to say it. Correcting prose fixes the symptom; sweeping the served strings is the fix.
+- WEDGE, and every form of it (owner, 2026-08-15: "it is absolutely not clear to me what this means in that context").
+  - It came from the engine's own wedge-guard. Say what happened instead: "every signed state read as missing", or "the engine looked in the wrong folder".
+
+BOTH SHARE ONE SHAPE, and that is why this is a list rather than another rule. Each is a term the SYSTEM uses internally, carried into prose aimed at a person. "Keep internals out of prose" already forbids that and caught neither, because both read as ordinary English to the writer.
+
+So the list is the rule's memory: the specific words that got through. A rule with no examples cannot be checked.
+
 ### AI involvement
 - The AI-involvement marks measure involvement. Never quality, and never trust.
 - The author owns all published content, whatever the AI share. "The AI wrote it, I did not review it" is unacceptable.

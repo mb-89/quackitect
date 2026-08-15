@@ -1,8 +1,8 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
      from project/guidance/contract.md e1c3f9810383
-     from project/guidance/walking.md d159c5daa6cc
+     from project/guidance/walking.md 3e7d963ee5a6
      from project/guidance/method/lane.md f5ea60fd4c3c
-     from project/guidance/voice.md faf3174b30d8
+     from project/guidance/voice.md 0b6faf79ff32
 -->
 
 # contract — the binding rules of the session
@@ -209,7 +209,7 @@ proof, the position.
 ## The pull
 
 One call, one optional payload. It answers with an INSTRUCTION, and `pull`
-names which of five you got.
+names which of four you got.
 
 - `read` — a document rides in `document`; `prove` names its last words. Read
   it, pull again with `form: {"read": "<those words>"}`. Keep going until no
@@ -254,7 +254,8 @@ names which of five you got.
 
   RE-DERIVING A STANDING CLAIM IS WASTE, and it is the waste this block exists
   to stop. A reopened form used to arrive looking exactly like a fresh one.
-- `choose` — the road splits; the options ride along with weight and
+- OPTIONS RIDE A `do` — there is no separate `choose` instruction, and the
+  engine has never emitted one. Where the road splits; the options ride along with weight and
   openness. Answer `form: {"choice": "<to>"}` only when a routed goal needs
   that door. A LIST is legal where work fans out; one is walked, the rest
   come back as `not_walked`. You never choose unasked, and you do not choose
@@ -545,6 +546,20 @@ Write plainly. These are rules, not suggestions. They bind every output:
 - The reader adjudicates from chat and the board. They have not read the evidence files where the ids live.
 - Prefer the plain phrase. Use the id only where traceability needs it.
 - An unexpanded id reads as precision and carries nothing.
+
+### Forbidden words
+
+The list is short on purpose. A word joins it when a READER says it did not land, never because a writer guessed it might not.
+
+- RECORD, where a specific vehicle is meant. Say ITERATION or EXPEDITION.
+  - The generic is legal only where the sentence genuinely covers both. Most uses turn out to be specific.
+  - THE ENGINE COINED IT AND NOW TEACHES IT (owner, 2026-08-15): "it is its own generic term for, like, two days. Nobody introduced it." It sits in the contract, the forms, the state guidance and the refusals, so every call trains the next reader to say it. Correcting prose fixes the symptom; sweeping the served strings is the fix.
+- WEDGE, and every form of it (owner, 2026-08-15: "it is absolutely not clear to me what this means in that context").
+  - It came from the engine's own wedge-guard. Say what happened instead: "every signed state read as missing", or "the engine looked in the wrong folder".
+
+BOTH SHARE ONE SHAPE, and that is why this is a list rather than another rule. Each is a term the SYSTEM uses internally, carried into prose aimed at a person. "Keep internals out of prose" already forbids that and caught neither, because both read as ordinary English to the writer.
+
+So the list is the rule's memory: the specific words that got through. A rule with no examples cannot be checked.
 
 ### AI involvement
 - The AI-involvement marks measure involvement. Never quality, and never trust.

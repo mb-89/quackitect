@@ -7,7 +7,7 @@ statement: The claim pool has no shipped opening act, and the listing and the fo
 owner: the driving agent
 trigger: the first real second machine joins, or the next desk surface touch, or itAdopt sees real multi-machine use without the claim lane ever being exercised
 status: open
-looked: 2026-08-14
+looked: 2026-08-15
 impact: The engine claims and refuses correctly, but a person cannot open the pool, see who holds what, or free a dead machine's claim from any shipped surface. The fresh-eyes observer had to create the claims branch by hand to demonstrate the pool.
 breaks_how_badly: abrasive
 how_likely: expected
@@ -56,3 +56,13 @@ be re-weighed by the owner rather than assumed.
 
 The two sweeps ran independently and found different things. Both are
 kept.
+
+## Swept 2026-08-15, at i12's retro: RESCHEDULED to i23
+
+The debt is that the claim pool exists as engine functions with no product
+surface. i23 is the UI sitting — "cut the HTML mirror, settle the VS Code
+shell, and build the coverage dashboard, with the owner at the screen" — and
+which surfaces exist is exactly what gets decided there, with the person
+present.
+
+The trigger stands unchanged.
