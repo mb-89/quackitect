@@ -5795,8 +5795,16 @@ export class Session {
       // check it had no write path to: i28's rank-unknowns refused on a
       // register node that does not exist in its tree, and no lane verb could
       // reach the file being complained about.
+      // TWO ROOTS, BECAUSE A SCRIPT NEEDS BOTH. The corpus it judges is the
+      // bound record's, and `.se/` is session state that belongs to the
+      // machine — the same split laneRoot already enforces for every path.
+      // Handing over only the work tree broke the outward-search check, which
+      // reads the call log to prove a search actually ran.
       const where = this.workRoot();
-      const child = spawn("node", [abs, "--root", where], { cwd: where });
+      const child = spawn("node", [abs, "--root", where], {
+        cwd: where,
+        env: { ...process.env, SE_HOME: seDir(this.machineRoot()) },
+      });
       let out = "";
       let pending = "";
       // A SCRIPT REPORTS ITS OWN PROGRESS on stdout, as

@@ -71,7 +71,10 @@ if (existsSync(optionDir)) {
 if (outward.length > 0) {
   // THE LOG ROTATES, so the proof may sit in a rotated segment beside the
   // current one. Sweep every calls*.jsonl rather than the newest alone.
-  const seDir = join(root, ".se");
+  // `.se/` IS SESSION STATE AND BELONGS TO THE MACHINE, never to the record's
+  // tree. The engine hands it over, because --root now names the corpus being
+  // judged and a bound worktree has no call log of its own.
+  const seDir = process.env.SE_HOME ?? join(root, ".se");
   const segments = existsSync(seDir) ? readdirSync(seDir).filter((n) => /^calls.*\.jsonl$/.test(n)) : [];
   if (segments.length === 0) {
     problems.push(`${outward.length} outward options stand, and no call log exists under .se/ — the search cannot be proven`);
