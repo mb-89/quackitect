@@ -3127,11 +3127,19 @@ export class Session {
         };
       }
     }
+    // A BRANCH POINT SHOWS ITS DOORS. `do` means the happy path was walked up
+    // TO the next branch, and the walker then has to know what the branch is.
+    //
+    // Without this a container full of open iterations answered `do` at its
+    // own start with nothing to answer WITH, and the only way to learn the
+    // doors was to guess one and read the refusal.
+    const branchOpts = this.pullOptions();
     return {
       pull: "do",
       ...head(),
       walked: swept.swept ?? [],
       arrived: swept.arrived === true,
+      ...(branchOpts.length > 1 ? { options: branchOpts } : {}),
       here: this.pullHere(),
       ...(swept.banners !== undefined ? { banners: swept.banners } : {}),
       ...(swept.refusal !== undefined ? { stopped_at: swept.stopped_at, refusal: swept.refusal } : {}),

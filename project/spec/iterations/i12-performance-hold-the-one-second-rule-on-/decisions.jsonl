@@ -311,3 +311,56 @@
 {"ts":"2026-08-15T11:16:30.239Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d305","brief":"reading the choose branch above the do branch"}
 {"ts":"2026-08-15T11:16:41.244Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d306","brief":"locating the offer branch"}
 {"ts":"2026-08-15T11:16:58.132Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d307","brief":"finding the container generator"}
+{"ts":"2026-08-15T11:17:17.565Z","op":"defer","visit":"iterations/i12/build-steps@0","node":"d291","brief":"build the container fix","to":"build-steps","hops":1,"trail":["iterations/i12/build-steps","build-steps"]}
+{"ts":"2026-08-15T11:17:24.170Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d308","brief":"asking the machine to run the chunk drawing now it is authored"}
+{"ts":"2026-08-15T11:18:00.881Z","op":"plan","visit":"iterations/i12/build-steps/fanout-cap@0","parent":null,"nodes":[{"id":"d309","brief":"fill the built chunks"},{"id":"d310","brief":"build container-choose"},{"id":"d311","brief":"reach verification"}]}
+{"ts":"2026-08-15T11:18:17.053Z","op":"update","visit":"iterations/i12/build-steps/fanout-cap@0","node":"d312","brief":"walking to the reporter-wiring chunk"}
+{"ts":"2026-08-15T11:18:32.501Z","op":"update","visit":"iterations/i12/build-steps/reporter-wiring@0","node":"d313","brief":"filling reporter-wiring"}
+{"ts":"2026-08-15T11:18:38.247Z","op":"update","visit":"iterations/i12/build-steps/reporter-wiring@0","node":"d314","brief":"submitting reporter-wiring"}
+{"ts":"2026-08-15T11:19:07.300Z","op":"update","visit":"iterations/i12/build-steps/records-home@0","node":"d315","brief":"filling records-home"}
+{"ts":"2026-08-15T11:19:40.519Z","op":"done","visit":"iterations/i12/build-steps/fanout-cap@0","node":"d309","brief":"three instrument chunks filled and signed"}
+{"ts":"2026-08-15T11:19:45.044Z","op":"update","visit":"iterations/i12/build-steps/timing-report@0","node":"d316","brief":"timing-report submitted; the survey and container chunks remain"}
+{"ts":"2026-08-15T11:19:58.258Z","op":"update","visit":"iterations/i12/build-steps/timing-report@0","node":"d317","brief":"walking to the survey chunk, which is already built"}
+{"ts":"2026-08-15T11:20:15.953Z","op":"update","visit":"iterations/i12/build-steps/survey-open-only@0","node":"d318","brief":"filling the survey chunk"}
+{"ts":"2026-08-15T11:20:33.048Z","op":"update","visit":"iterations/i12/build-steps/survey-open-only@0","node":"d319","brief":"walking to the container chunk"}
+{"ts":"2026-08-15T11:20:42.085Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d320","brief":"finding where the container chains its record states"}
+{"ts":"2026-08-15T11:20:55.618Z","op":"obsolete","visit":"iterations/i12/build-steps/fanout-cap@0","node":"d311","brief":"verification is a state the machine reaches, not an item here"}
+{"ts":"2026-08-15T11:21:13.900Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d321","brief":"finding the iterations generator"}
+{"ts":"2026-08-15T11:21:20.929Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d322","brief":"reading how the iterations container wires its start edges"}
+{"ts":"2026-08-15T11:21:41.127Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d323","brief":"a multi-root container now offers its iterations"}
+{"ts":"2026-08-15T11:21:52.659Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d324","brief":"a multi-root container now offers its iterations"}
+{"ts":"2026-08-15T11:21:58.068Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d325","brief":"testing the container change against its own suites"}
+{"ts":"2026-08-15T11:22:06.904Z","op":"done","visit":"iterations/i12/build-steps/fanout-cap@0","node":"d310","brief":"container change written; reading its verdict"}
+{"ts":"2026-08-15T11:22:10.884Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d326","brief":"reading the container verdict"}
+{"ts":"2026-08-15T11:22:24.188Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d327","brief":"reading the container verdict"}
+{"ts":"2026-08-15T11:22:27.698Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d328","brief":"reading the container verdict"}
+{"ts":"2026-08-15T11:22:31.777Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d329","brief":"reading the container verdict"}
+{"ts":"2026-08-15T11:22:36.244Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d330","brief":"reading the container verdict"}
+{"ts":"2026-08-15T11:22:50.383Z","op":"plan","visit":"iterations/i12/build-steps/container-choose@0","parent":null,"nodes":[{"id":"d331","brief":"prove the container offers"},{"id":"d332","brief":"sign the chunk"},{"id":"d333","brief":"reach verification"}]}
+{"ts":"2026-08-15T11:23:26.879Z","op":"done","visit":"iterations/i12/build-steps/container-choose@0","node":"d331","brief":"the container offer case is written"}
+{"ts":"2026-08-15T11:23:31.371Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d334","brief":"reading the container offer verdict"}
+{"ts":"2026-08-15T11:23:52.739Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d335","brief":"giving the fixture repo a commit so a second worktree can be added"}
+{"ts":"2026-08-15T11:23:58.880Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d336","brief":"re-running the container offer case"}
+{"ts":"2026-08-15T11:24:04.459Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d337","brief":"reading the container offer verdict"}
+{"ts":"2026-08-15T11:24:19.500Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d338","brief":"listing the pull's instruction words"}
+{"ts":"2026-08-15T11:25:01.615Z","op":"done","visit":"iterations/i12/build-steps/container-choose@0","node":"d333","brief":"verification is the machine's next state, not an item here"}
+{"ts":"2026-08-15T11:25:06.462Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d339","brief":"reading the container offer verdict"}
+{"ts":"2026-08-15T11:25:12.105Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d340","brief":"reading the container offer verdict"}
+{"ts":"2026-08-15T11:25:23.553Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d341","brief":"correcting my own assertion about where the walk should stand"}
+{"ts":"2026-08-15T11:25:28.742Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d342","brief":"re-reading the assertion after the linter reflowed it"}
+{"ts":"2026-08-15T11:25:36.925Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d343","brief":"correcting my own assertion about where the walk should stand"}
+{"ts":"2026-08-15T11:25:55.350Z","op":"done","visit":"iterations/i12/build-steps/container-choose@0","node":"d332","brief":"container offer green at 2 of 2; all six chunks built"}
+{"ts":"2026-08-15T11:26:12.110Z","op":"plan","visit":"iterations/i12/build-steps/container-choose@0","parent":null,"nodes":[{"id":"d344","brief":"read the battery verdict"},{"id":"d345","brief":"sign container-choose"},{"id":"d346","brief":"walk verification"}]}
+{"ts":"2026-08-15T11:26:18.581Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d347","brief":"reading the battery verdict"}
+{"ts":"2026-08-15T11:26:23.438Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d348","brief":"reading the battery verdict"}
+{"ts":"2026-08-15T11:26:28.153Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d349","brief":"reading the battery verdict"}
+{"ts":"2026-08-15T11:26:33.926Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d350","brief":"reading the battery verdict"}
+{"ts":"2026-08-15T11:26:39.504Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d351","brief":"reading the battery verdict"}
+{"ts":"2026-08-15T11:26:45.403Z","op":"obsolete","visit":"iterations/i12/build-steps/container-choose@0","node":"d346","brief":"verification is a state the machine reaches"}
+{"ts":"2026-08-15T11:26:51.042Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d352","brief":"reading the battery verdict"}
+{"ts":"2026-08-15T11:26:55.116Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d353","brief":"reading the battery verdict"}
+{"ts":"2026-08-15T11:27:00.057Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d354","brief":"reading the battery verdict"}
+{"ts":"2026-08-15T11:27:04.992Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d355","brief":"reading the battery verdict"}
+{"ts":"2026-08-15T11:27:11.762Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d356","brief":"reading the battery verdict"}
+{"ts":"2026-08-15T11:27:17.386Z","op":"done","visit":"iterations/i12/build-steps/container-choose@0","node":"d345","brief":"container-choose is built and its case is green"}
+{"ts":"2026-08-15T11:27:30.558Z","op":"done","visit":"iterations/i12/build-steps/container-choose@0","node":"d344","brief":"battery green at 1312 of 1312"}
