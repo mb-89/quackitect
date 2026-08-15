@@ -116,7 +116,7 @@ function projectRoot() {
   return null;
 }
 
-// PATH node first (22.6+ strips types natively). VS Code's own runtime is
+// PATH node first (24+ runs .ts with no flag). VS Code's own runtime is
 // the fallback — Electron runs as plain node when asked to.
 function nodeRunner() {
   const probe = spawnSync("node", ["--version"], { encoding: "utf8", shell: process.platform === "win32" });
@@ -335,7 +335,7 @@ async function ensureServer() {
   }
   const runner = nodeRunner();
   if (runner === null) {
-    void vscode.window.showErrorMessage("$PRODUCT$ needs Node 22.6 or newer — install it, then retry: winget install OpenJS.NodeJS.LTS");
+    void vscode.window.showErrorMessage("$PRODUCT$ needs Node 24 or newer — install it, then retry: winget install OpenJS.NodeJS.LTS");
     return false;
   }
   if (!(await ensureDeps(root))) {

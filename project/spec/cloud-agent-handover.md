@@ -67,9 +67,15 @@ with another lane.
 ### 3.1 What must already exist
 
 - **git**
-- **Node.js 22.6 or newer.** The engine runs TypeScript files directly, so it
-  needs Node's type stripping. If `node something.ts` fails complaining about
-  types, your Node is too old — use Node 24.
+- **Node.js 24 or newer.** The engine runs TypeScript files directly, with no
+  flag, so it needs the version where that is the default. `package.json`
+  declares `>=24.0.0` and the entrypoint reads that declaration rather than
+  carrying a copy of it.
+
+  An earlier version of this page said 22.6. That is the version where type
+  stripping became possible behind a flag, which is not the same thing, and a
+  host landing on 22.x would pass the check and then die inside a spawned
+  script.
 
 ### 3.2 Install
 

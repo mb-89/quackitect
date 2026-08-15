@@ -25,7 +25,7 @@ Demonstrated with two clones (m1, m2) of one bare origin. Each minted its own ma
 
 The second machine need not be one they own. A rented host with a shell and nothing else becomes the second pair of hands from one pasted line, with nobody at its keyboard afterwards.
 |||
-OWED, and it is i28's subject. Today a fresh clone sees no iterations at all, because the reader asks the disk rather than git. [[nbr-cloud-host]] carries the four properties that make an unattended host different: unconfigured, unattended, ephemeral, and no session to wake.
+THE MECHANISM IS BUILT IN i28 AND THE DEMONSTRATION IS STILL OWED. `engine/bin/se-start.ts` takes a cloned host from one command to a walking agent in seven steps, each failing by its own name. The adopt step takes a real claim, so a second machine given the same iteration id is refused and told who holds it. What has not happened is the run: no host nobody prepared has been observed reaching a walking agent, and that is [[raid-debt-cloud-validation-needs-a-machine-this-one-cannot-make]]. [[nbr-cloud-host]] carries the four properties that make an unattended host different: unconfigured, unattended, ephemeral, and no session to wake.
 
 ---
 

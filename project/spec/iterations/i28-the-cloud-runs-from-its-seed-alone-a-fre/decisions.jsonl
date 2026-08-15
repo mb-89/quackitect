@@ -581,3 +581,59 @@
 {"ts":"2026-08-15T19:34:55.265Z","op":"done","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d83","brief":"the join fix typechecks; testing it now"}
 {"ts":"2026-08-15T19:35:03.752Z","op":"fork","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","parent":null,"node":"d89","brief":"polling the walk tests","nodes":[]}
 {"ts":"2026-08-15T19:35:08.471Z","op":"done","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d89","brief":"51 of 51 pass; the join fix breaks nothing"}
+{"ts":"2026-08-15T19:38:14.863Z","op":"update","visit":"iterations/i28/log-risks@0","node":"d5","brief":"sweeping through M2 and M3"}
+{"ts":"2026-08-15T19:38:44.164Z","op":"update","visit":"iterations/i28/write-requirements@0","node":"d6","brief":"sweeping through M4"}
+{"ts":"2026-08-15T19:39:16.213Z","op":"done","visit":"start@0","node":"d1","brief":"two thirds of the way back"}
+{"ts":"2026-08-15T19:39:46.657Z","op":"fork","visit":"iterations/i28/evaluate-set@0","parent":null,"node":"d7","brief":"sweeping through M5 and M6","nodes":[]}
+{"ts":"2026-08-15T19:40:17.746Z","op":"update","visit":"iterations/i28/evaluate-architecture@0","node":"d8","brief":"sweeping through M6 into M7"}
+{"ts":"2026-08-15T19:40:46.836Z","op":"done","visit":"iterations/i28/evaluate-set@0","node":"d7","brief":"at author-tests, four hops from the leg"}
+{"ts":"2026-08-15T19:41:11.042Z","op":"fork","visit":"iterations/i28/build-steps/chunk-release-the-caller@0","parent":null,"node":"d9","brief":"recording the detach leg at last","nodes":[]}
+{"ts":"2026-08-15T19:41:16.666Z","op":"update","visit":"iterations/i28/build-steps/chunk-release-the-caller@0","node":"d10","brief":"stamping the detach leg"}
+{"ts":"2026-08-15T19:41:28.111Z","op":"fork","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","parent":null,"node":"d11","brief":"walking on from the join","nodes":[]}
+{"ts":"2026-08-15T19:42:52.239Z","op":"done","visit":"iterations/i28/build-steps/chunk-release-the-caller@0","node":"d9","brief":"both build legs signed; the build machine is complete"}
+{"ts":"2026-08-15T19:42:58.094Z","op":"update","visit":"iterations/i28/trace-design@0","node":"d12","brief":"stamping the design trace"}
+{"ts":"2026-08-15T19:43:21.496Z","op":"done","visit":"iterations/i28/build-steps/chunk-the-seven-steps@0","node":"d11","brief":"trace-design signed; every element realized"}
+{"ts":"2026-08-15T19:43:53.930Z","op":"fork","visit":"iterations/i28/trace-design@0","parent":null,"node":"d13","brief":"reading what the unclaimed files do","nodes":[]}
+{"ts":"2026-08-15T19:47:58.511Z","op":"update","visit":"iterations/i28/trace-design@0","node":"d14","brief":"12 unclaimed files all arrived in today's levelling commit from trunk"}
+{"ts":"2026-08-15T19:49:21.945Z","op":"update","visit":"iterations/i28/trace-design@0","node":"d15","brief":"four live files filed under the specs that genuinely own their subject"}
+{"ts":"2026-08-15T19:50:19.406Z","op":"done","visit":"iterations/i28/trace-design@0","node":"d13","brief":"12 files claimed honestly, stale puml reference cut"}
+{"ts":"2026-08-15T19:52:50.862Z","op":"update","visit":"iterations/i28/verification@0","node":"d16","brief":"i27 authored these specs; the landing brought code without trace"}
+{"ts":"2026-08-15T19:53:22.218Z","op":"update","visit":"iterations/i28/verification@0","node":"d17","brief":"tester: running i28 entrypoint to observe its failure line and exit code"}
+{"ts":"2026-08-15T19:53:29.422Z","op":"plan","visit":"iterations/i28/verification@0","parent":null,"nodes":[{"id":"d18","brief":"record i27's lost trace and its recovery point"},{"id":"d19","brief":"verification: fresh-eyes tester runs the nine test specs"},{"id":"d20","brief":"fill and submit the verification form"},{"id":"d21","brief":"stop at gate-implementation for the owner"}]}
+{"ts":"2026-08-15T19:53:52.276Z","op":"done","visit":"iterations/i28/verification@0","node":"d18","brief":"raid node carries the two commits and the recovery list"}
+{"ts":"2026-08-15T19:54:13.096Z","op":"update","visit":"iterations/i28/verification@0","node":"d22","brief":"situation and follow-up saved; claims wait on the tester"}
+{"ts":"2026-08-15T19:54:59.391Z","op":"update","visit":"iterations/i28/verification@0","node":"d23","brief":"tester: running trace schema and coverage over i28's new nodes"}
+{"ts":"2026-08-15T19:55:42.694Z","op":"update","visit":"iterations/i28/verification@0","node":"d24","brief":"tester: checking whether the fourth test case predates the signed build evidence"}
+{"ts":"2026-08-15T19:55:55.890Z","op":"update","visit":"iterations/i28/verification@0","node":"d25","brief":"tester: re-running the typecheck the build evidence claims exits 0"}
+{"ts":"2026-08-15T19:56:21.216Z","op":"update","visit":"iterations/i28/verification@0","node":"d26","brief":"tester: measuring whether the start step's spawn shape releases its caller here"}
+{"ts":"2026-08-15T19:57:25.647Z","op":"done","visit":"iterations/i28/verification@0","node":"d19","brief":"nine test specs judged and findings collected"}
+{"ts":"2026-08-15T19:59:42.761Z","op":"plan","visit":"iterations/i28/verification@0","parent":null,"nodes":[{"id":"d27","brief":"record the 15 findings as verification's claims"},{"id":"d28","brief":"fix: launch must launch a walking agent"},{"id":"d29","brief":"fix: adopt must claim the iteration"},{"id":"d30","brief":"fix: --root honoured by start and install"},{"id":"d31","brief":"retract the detach measurement and its four dependents"},{"id":"d32","brief":"settle the step order against the specs"},{"id":"d33","brief":"fix the tests that cannot fail"},{"id":"d34","brief":"confirm run, then stop at gate-implementation"}]}
+{"ts":"2026-08-15T20:00:58.718Z","op":"update","visit":"iterations/i28/verification@0","node":"d35","brief":"re-measuring the detach claim before retracting a signed experiment"}
+{"ts":"2026-08-15T20:03:07.346Z","op":"done","visit":"iterations/i28/verification@0","node":"d28","brief":"launch places the cage and spawns the agent; adopt claims"}
+{"ts":"2026-08-15T20:03:13.295Z","op":"done","visit":"iterations/i28/verification@0","node":"d29","brief":"adopt now calls claimIteration and refuses a held iteration"}
+{"ts":"2026-08-15T20:03:47.653Z","op":"done","visit":"iterations/i28/verification@0","node":"d30","brief":"one derived root; the flag that lied is gone"}
+{"ts":"2026-08-15T20:04:38.960Z","op":"done","visit":"iterations/i28/verification@0","node":"d33","brief":"the skip is gone and the tests bind to the real code"}
+{"ts":"2026-08-15T20:05:12.200Z","op":"done","visit":"iterations/i28/verification@0","node":"d31","brief":"the experiment carries both numbers and says why the first was wrong"}
+{"ts":"2026-08-15T20:05:50.170Z","op":"update","visit":"iterations/i28/verification@0","node":"d36","brief":"the briefing now matches the code's steps and the real measurement"}
+{"ts":"2026-08-15T20:06:22.825Z","op":"done","visit":"iterations/i28/verification@0","node":"d32","brief":"code now runs the spec's order; the spec carries the retraction"}
+{"ts":"2026-08-15T20:06:46.530Z","op":"update","visit":"iterations/i28/verification@0","node":"d37","brief":"types pinned to the runtime major; confirming the toolchain still builds"}
+{"ts":"2026-08-15T20:08:24.306Z","op":"update","visit":"iterations/i28/verification@0","node":"d38","brief":"minting the anchor the three inspection specs owe against"}
+{"ts":"2026-08-15T20:09:06.202Z","op":"done","visit":"iterations/i28/verification@0","node":"d27","brief":"claims, findings and their disposition recorded"}
+{"ts":"2026-08-15T20:09:12.898Z","op":"done","visit":"iterations/i28/verification@0","node":"d20","brief":"verification submitted with all fifteen findings recorded"}
+{"ts":"2026-08-15T20:10:26.285Z","op":"update","visit":"iterations/i28/gate-implementation@0","node":"d39","brief":"battery running for the gate's verify round"}
+{"ts":"2026-08-15T20:12:52.937Z","op":"update","visit":"iterations/i28/gate-implementation@0","node":"d40","brief":"gate evidence filled; verify round waits on the battery"}
+{"ts":"2026-08-15T20:14:54.507Z","op":"done","visit":"iterations/i28/verification@0","node":"d21","brief":"handover written; i28 waits at the gate for the owner"}
+{"ts":"2026-08-15T20:15:10.419Z","op":"done","visit":"iterations/i28/verification@0","node":"d34","brief":"battery green and the gate stands unblessed"}
+{"ts":"2026-08-15T20:16:56.825Z","op":"plan","visit":"iterations/i28/gate-implementation@0","parent":null,"nodes":[{"id":"d41","brief":"bless gate-implementation on the owner's go"},{"id":"d42","brief":"walk the states after the gate to the ship"},{"id":"d43","brief":"report what the owner must do to run it in the cloud"}]}
+{"ts":"2026-08-15T20:18:40.353Z","op":"plan","visit":"iterations/i28/sweep-consistency@0","parent":null,"nodes":[{"id":"d44","brief":"sweep the surfaces that teach what i28 changed"},{"id":"d45","brief":"fix the stale node pin and the retracted measurement where they are taught"},{"id":"d46","brief":"fill and submit sweep-consistency"},{"id":"d47","brief":"walk on to gate-validation"}]}
+{"ts":"2026-08-15T20:19:45.790Z","op":"done","visit":"iterations/i28/sweep-consistency@0","node":"d45","brief":"six documents brought current across two surface classes"}
+{"ts":"2026-08-15T20:21:43.721Z","op":"update","visit":"iterations/i28/gate-validation@0","node":"d48","brief":"the story i28 refines now says what stands and what is owed"}
+{"ts":"2026-08-15T20:22:27.443Z","op":"update","visit":"iterations/i28/gate-validation@0","node":"d49","brief":"an unprobed assumption the launch step rests on, filed before the verdict"}
+{"ts":"2026-08-15T20:23:43.642Z","op":"done","visit":"iterations/i28/sweep-consistency@0","node":"d47","brief":"gate-validation filled with the demonstration gap named"}
+{"ts":"2026-08-15T20:26:27.882Z","op":"update","visit":"iterations/i28/gate-validation@0","node":"d50","brief":"the cloud shape's blocker recorded, not reworked"}
+{"ts":"2026-08-15T20:27:58.519Z","op":"done","visit":"iterations/i28/gate-implementation@0","node":"d43","brief":"gate-validation carries the cloud finding as its second override"}
+{"ts":"2026-08-15T20:30:34.869Z","op":"update","visit":"iterations/i28/gate-validation@0","node":"d51","brief":"the gate's missing input is run-demos, not a broken engine"}
+{"ts":"2026-08-15T20:34:57.293Z","op":"plan","visit":"iterations/i28/run-demos@0","parent":null,"nodes":[{"id":"d52","brief":"narrow feedersUnsigned so an unauthored scaffold is not an input"},{"id":"d53","brief":"typecheck and run the walk tests"},{"id":"d54","brief":"walk gate-validation to the ship"},{"id":"d55","brief":"tell the cloud agent to cage its own subagent"}]}
+{"ts":"2026-08-15T20:35:24.666Z","op":"done","visit":"iterations/i28/run-demos@0","node":"d52","brief":"unauthored scaffolds no longer count as inputs"}
+{"ts":"2026-08-15T20:36:04.187Z","op":"done","visit":"iterations/i28/run-demos@0","node":"d55","brief":"the card now teaches the caged-subagent arrival"}
+{"ts":"2026-08-15T20:37:34.747Z","op":"done","visit":"iterations/i28/run-demos@0","node":"d53","brief":"battery 1321 of 1322, the one failure fixed and confirmed"}

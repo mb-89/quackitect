@@ -9,6 +9,7 @@ files:
   - "project/deliverable/engine/files.ts"
   - "project/deliverable/engine/signals.ts"
   - "project/deliverable/engine/paths.ts"
+  - "project/deliverable/engine/resolve.ts"
   - "project/deliverable/engine/search.ts"
   - "project/deliverable/engine/move.ts"
   - "project/deliverable/engine/run.ts"

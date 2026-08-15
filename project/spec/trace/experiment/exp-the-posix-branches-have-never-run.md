@@ -36,10 +36,17 @@ THE MOST IMPORTANT ONE EXPLAINS THE FIRST SPIKE. `selftest.ts:158` reads:
 
     detached: process.platform !== "win32"
 
-SO THE ENGINE ALREADY KNOWS WINDOWS CANNOT DETACH, and only asks for detaching
-on POSIX. The 45,600 ms measured in
-[[exp-does-a-backgrounded-lane-release-its-caller]] is the WINDOWS path
-behaving as the source expects.
+SO THE ENGINE ASKS FOR DETACHING ONLY ON POSIX, and this finding is about that
+branch never having run.
+
+IT IS NOT ABOUT WINDOWS BEING UNABLE TO RELEASE A CALLER. This paragraph said
+so, on the strength of a measurement that has since been retracted.
+[[exp-does-a-backgrounded-lane-release-its-caller]] re-timed the parent at 74
+ms and carries both numbers. The caller is released on both platforms.
+
+WHAT THE SPLIT IS ACTUALLY FOR is a POSIX process group, so a closing session
+does not take the lane down. Windows has none to ask for. That is the branch
+that has never executed, and it is the one this node is about.
 
 ## Why the verdict is unsettled rather than holds
 

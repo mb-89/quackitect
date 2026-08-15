@@ -6,7 +6,7 @@ statement: One command takes a bare machine to a walking agent on a named iterat
 method: "demonstration"
 verifies:
   - "req-one-command-starts-an-unattended-machine"
-files: []
+files: "none — a demonstration is observed on a host, not run from a file in this repository"
 ---
 
 ## Scope
@@ -53,13 +53,21 @@ hangs. That is not a third outcome; it is the first one failing quietly.
 
 ## What this spec already knows will be watched hardest
 
-THE `start` STEP. [[exp-does-a-backgrounded-lane-release-its-caller]] measured
-45,600 ms for a 45-second child on Windows, so the command did not return and
-the four steps after it never ran.
+THE `launch` STEP, because it is the only one whose success cannot be seen
+from the outside. Every other step prints and exits. This one must leave an
+agent walking, and a machine that prints `launch: ... walking` while nothing
+walks looks exactly like a success.
 
-[[exp-the-posix-branches-have-never-run]] found why that is not a prediction
-for Linux: the engine asks for detaching only when the platform is not win32,
-so the target platform takes a branch that has never executed.
+THE `start` STEP, for a different reason than this spec first recorded. It
+carried a measurement of 45,600 ms and a conclusion that the command never
+returned. That measurement is RETRACTED:
+[[exp-does-a-backgrounded-lane-release-its-caller]] re-timed the parent process
+itself at 74 ms and carries both numbers.
+
+WHAT STILL MAKES `start` WORTH WATCHING is the POSIX detach, which is a
+different question. [[exp-the-posix-branches-have-never-run]] found that the
+engine asks for detaching only when the platform is not win32, so the target
+platform takes a branch that has never executed.
 
 SO THIS DEMONSTRATION IS ALSO THE FIRST RUN of that branch, and its failure is
 an expected finding rather than a surprise.

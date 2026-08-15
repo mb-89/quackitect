@@ -10,7 +10,7 @@ status: open
 impact: The entrypoint reports success, the lane starts, and the engine fails on a syntax or API it cannot use. The failure surfaces deep in the walk rather than at the step that caused it, which is the exact symptom the entrypoint exists to remove.
 breaks_how_badly: crippling
 how_likely: plausible
-probe: "partially probed. The floor IS declared: package.json line 8 says node >=22.6. No host has confirmed a default install reaches it."
+probe: "partially probed. The floor is declared and CORRECTED: package.json line 8 said node >=22.6 and now says >=24.0.0, because unflagged TypeScript execution is not what 22.6 buys. The entrypoint's verify step reads that declaration rather than carrying a copy. What is still unprobed is whether a bare host's default install reaches 24 — that needs a host this machine cannot make."
 probed: "2026-08-15"
 source_refs:
   - req-one-command-starts-an-unattended-machine
