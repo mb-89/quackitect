@@ -276,3 +276,38 @@
 {"ts":"2026-08-15T11:10:49.614Z","op":"done","visit":"iterations/i12/build-steps@0","node":"d260","brief":"battery finished, reading its verdict"}
 {"ts":"2026-08-15T11:11:01.479Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d273","brief":"checking the worktree .se the battery now names"}
 {"ts":"2026-08-15T11:11:09.093Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d274","brief":"committing the green build"}
+{"ts":"2026-08-15T11:11:16.823Z","op":"done","visit":"iterations/i12/build-steps@0","node":"d261","brief":"build committed, battery green at 1309 of 1309"}
+{"ts":"2026-08-15T11:11:23.226Z","op":"plan","visit":"iterations/i12/build-steps@0","parent":null,"nodes":[{"id":"d275","brief":"submit build-steps"},{"id":"d276","brief":"walk verification"},{"id":"d277","brief":"reach the implementation gate"}]}
+{"ts":"2026-08-15T11:11:37.164Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d278","brief":"reading i27's chunk drawing for its shape"}
+{"ts":"2026-08-15T11:12:06.161Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d279","brief":"authoring the chunk drawing specify-build should have seeded"}
+{"ts":"2026-08-15T11:12:22.220Z","op":"done","visit":"iterations/i12/build-steps@0","node":"d275","brief":"the chunk drawing is authored with six chunks"}
+{"ts":"2026-08-15T11:12:38.136Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d280","brief":"recorded that i27 ruled out the pool in favour of a heavy-slot lease"}
+{"ts":"2026-08-15T11:12:46.573Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d281","brief":"finding the survey's open list"}
+{"ts":"2026-08-15T11:12:51.556Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d282","brief":"reading itList and its use in the survey"}
+{"ts":"2026-08-15T11:12:55.794Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d283","brief":"reading itList's open rule"}
+{"ts":"2026-08-15T11:13:06.138Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d284","brief":"reading the survey's iteration loop"}
+{"ts":"2026-08-15T11:13:11.054Z","op":"done","visit":"iterations/i12/build-steps@0","node":"d277","brief":"the gate is a milestone away; the chunk work tracks it"}
+{"ts":"2026-08-15T11:13:33.362Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d285","brief":"the survey now excludes a shipped record from the open list"}
+{"ts":"2026-08-15T11:13:38.056Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d286","brief":"reading the survey test file to add the shipped case"}
+{"ts":"2026-08-15T11:14:09.938Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d287","brief":"adding the imports the survey case needs"}
+{"ts":"2026-08-15T11:14:22.901Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d288","brief":"the survey case is written"}
+{"ts":"2026-08-15T11:14:26.921Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d289","brief":"running the survey suite"}
+{"ts":"2026-08-15T11:14:31.832Z","op":"done","visit":"iterations/i12/build-steps@0","node":"d276","brief":"survey fix written with its case"}
+{"ts":"2026-08-15T11:14:37.042Z","op":"plan","visit":"iterations/i12/build-steps@0","parent":null,"nodes":[{"id":"d290","brief":"green the survey case"},{"id":"d291","brief":"build the container fix"},{"id":"d292","brief":"walk verification"}]}
+{"ts":"2026-08-15T11:14:41.702Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d293","brief":"re-running the survey suite"}
+{"ts":"2026-08-15T11:14:45.090Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d294","brief":"reading the survey verdict"}
+{"ts":"2026-08-15T11:14:49.639Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d295","brief":"reading the survey verdict"}
+{"ts":"2026-08-15T11:15:01.884Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d296","brief":"finding which file readItRecord reads"}
+{"ts":"2026-08-15T11:15:06.569Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d297","brief":"reading the record resolver above itList"}
+{"ts":"2026-08-15T11:15:25.872Z","op":"obsolete","visit":"iterations/i12/build-steps@0","node":"d292","brief":"verification is a state, not a checklist item here"}
+{"ts":"2026-08-15T11:15:29.970Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d298","brief":"reading the survey verdict"}
+{"ts":"2026-08-15T11:15:33.431Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d299","brief":"reading the survey verdict"}
+{"ts":"2026-08-15T11:15:45.823Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d300","brief":"finding where the pull offers a choice"}
+{"ts":"2026-08-15T11:15:50.336Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d301","brief":"locating the choose instruction"}
+{"ts":"2026-08-15T11:15:54.985Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d302","brief":"reading the pull's instruction chooser"}
+{"ts":"2026-08-15T11:16:04.334Z","op":"done","visit":"iterations/i12/build-steps@0","node":"d290","brief":"the survey suite is green at 6 of 6"}
+{"ts":"2026-08-15T11:16:17.968Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d303","brief":"finding the do-versus-choose branch"}
+{"ts":"2026-08-15T11:16:22.360Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d304","brief":"reading the branch that returns choose"}
+{"ts":"2026-08-15T11:16:30.239Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d305","brief":"reading the choose branch above the do branch"}
+{"ts":"2026-08-15T11:16:41.244Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d306","brief":"locating the offer branch"}
+{"ts":"2026-08-15T11:16:58.132Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d307","brief":"finding the container generator"}

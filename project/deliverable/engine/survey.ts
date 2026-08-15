@@ -46,13 +46,27 @@ const GOAL_CAP = 200;
 const goalOf = (fm: Record<string, unknown> | undefined): string =>
   fm?.unreadable !== undefined ? `⚠ ${String(fm.unreadable)}` : headline(String(fm?.goal ?? ""), GOAL_CAP);
 
+/** The statuses a record cannot be walked from. Neither belongs in a list
+ *  headed "what stands open", and the archive doors already hold both. */
+const FINISHED = new Set(["shipped", "closed"]);
+
 export function survey(projectRoot: string, opts: SurveyOptions = {}): Survey {
   const exps = expList(projectRoot)
     .filter((e) => e.open)
     .map((e) => ({ id: e.id, goal: goalOf(readRecord(projectRoot, e)) }));
+  // A SHIPPED RECORD IS NOT OPEN, whatever its worktree says. itList calls a
+  // record open when its worktree directory EXISTS, and a close leaves that
+  // directory behind — so i27 stood in the open list the day after it shipped
+  // and the desk advised from a count one too high.
+  //
+  // The record's own status is the truth, and the goal read below already
+  // fetches it, so the filter costs nothing. The expedition list above wants
+  // the same guard the day an expedition is seen doing this.
   const its = itList(projectRoot)
     .filter((i) => i.open)
-    .map((i) => ({ id: i.id, goal: goalOf(readItRecord(projectRoot, i)) }));
+    .map((i) => ({ it: i, fm: readItRecord(projectRoot, i) }))
+    .filter(({ fm }) => !FINISHED.has(String(fm?.status ?? "")))
+    .map(({ it, fm }) => ({ id: it.id, goal: goalOf(fm) }));
   const withText = opts.detail === "full";
   const allNotes = pendingNotes(seDir(projectRoot))
     .sort(byPriority)
