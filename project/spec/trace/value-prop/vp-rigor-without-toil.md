@@ -14,10 +14,6 @@ priority: must
   Metric: the share of a session's person-minutes spent on redlines and adjudications rather than on writing artifacts. Target: the majority.
 - An idea becomes a durable note without leaving the step in hand.
   Metric: acts from idea to durable note. Target: one.
-- WAITING IS TOIL TOO. The machine answers fast enough that the person is judging rather than watching it think.
-  Metric: the share of surface requests answered inside a second. Target: all of them.
-  Metric: an answer a host has to move to disk before the agent can read it. Target: none.
-  Added by i12. The existing one-second guard covers lane CALLS only, so a render could pass a second with nothing failing.
 
 ## Unlike
 

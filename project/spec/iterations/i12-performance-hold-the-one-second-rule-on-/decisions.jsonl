@@ -77,3 +77,9 @@
 {"ts":"2026-08-15T10:19:37.746Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d89","brief":"checking whether the newest verbs appear anywhere in the trace"}
 {"ts":"2026-08-15T10:19:57.934Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d90","brief":"comparing the worktree's trace against trunk's for the same verbs"}
 {"ts":"2026-08-15T10:20:25.136Z","op":"done","visit":"iterations/i12/gate-motivation@0","node":"d84","brief":"the red is the worktree being three days behind trunk"}
+{"ts":"2026-08-15T10:20:31.485Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d91","brief":"checkpointing before the sync so the merge has nothing untracked to refuse over"}
+{"ts":"2026-08-15T10:20:51.671Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d92","brief":"confirming which files the checkpoint actually took"}
+{"ts":"2026-08-15T10:21:05.361Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d93","brief":"tracing where the earlier evidence files were committed"}
+{"ts":"2026-08-15T10:21:26.129Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d94","brief":"syncing trunk in — the levelling covers method and engine but not spec"}
+{"ts":"2026-08-15T10:21:33.040Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d95","brief":"reading trunk's value prop to reconcile it with my extension"}
+{"ts":"2026-08-15T10:22:07.155Z","op":"revert","visit":"iterations/i12/gate-motivation@0","node":"d85","brief":"value-prop extension backed out for the merge, re-applied after"}
