@@ -86,10 +86,16 @@ for (const n of entries) {
   }
 }
 
+// THE EXIT CODE FOLLOWED NOTHING. It was set to 1 after the branch rather than
+// inside it, so the green path printed "grades green" and failed anyway, and
+// the condition behind rank-unknowns could never pass whatever the register
+// said.
 if (problems.length === 0) {
   process.stdout.write(
     entries.length === 0 ? "grades: no register entries yet\n" : `grades green: every live entry carries both grades, on the scale\n`,
   );
-} else process.stdout.write(`grades RED — ${problems.length} problem${problems.length === 1 ? "" : "s"}\n\n`);
-for (const p of problems) process.stdout.write(`- ${p}\n`);
-process.exitCode = 1;
+} else {
+  process.stdout.write(`grades RED — ${problems.length} problem${problems.length === 1 ? "" : "s"}\n\n`);
+  for (const p of problems) process.stdout.write(`- ${p}\n`);
+  process.exitCode = 1;
+}

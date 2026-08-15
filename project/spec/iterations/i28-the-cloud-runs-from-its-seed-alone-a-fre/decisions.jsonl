@@ -314,3 +314,120 @@
 {"ts":"2026-08-15T17:47:43.507Z","op":"fork","visit":"iterations/i28/gate-candidates@0","parent":null,"node":"d9","brief":"checking the tree before touching the session.ts conflict","nodes":[]}
 {"ts":"2026-08-15T17:47:54.648Z","op":"update","visit":"iterations/i28/gate-candidates@0","node":"d10","brief":"syncing trunk into i28 to resolve the session.ts divergence"}
 {"ts":"2026-08-15T17:47:58.532Z","op":"update","visit":"iterations/i28/gate-candidates@0","node":"d11","brief":"committing the gate and story evidence before the sync"}
+{"ts":"2026-08-15T17:48:10.074Z","op":"update","visit":"iterations/i28/gate-candidates@0","node":"d12","brief":"syncing trunk in now the tree is clean"}
+{"ts":"2026-08-15T17:48:27.328Z","op":"update","visit":"iterations/i28/gate-candidates@0","node":"d13","brief":"measuring how far v3's session.ts moved since the branch point"}
+{"ts":"2026-08-15T17:49:14.080Z","op":"update","visit":"iterations/i28/gate-candidates@0","node":"d14","brief":"checking whether the fix is already on trunk"}
+{"ts":"2026-08-15T17:49:49.408Z","op":"done","visit":"iterations/i28/gate-candidates@0","node":"d9","brief":"trunk already carries the fix; comparing the two files directly"}
+{"ts":"2026-08-15T18:00:19.349Z","op":"fork","visit":"iterations/i28/gate-candidates@0","parent":null,"node":"d15","brief":"replacing the restart note with the recompute one","nodes":[]}
+{"ts":"2026-08-15T18:00:23.508Z","op":"done","visit":"iterations/i28/gate-candidates@0","node":"d15","brief":"note corrected; walking on from the blessed gate"}
+{"ts":"2026-08-15T18:01:34.232Z","op":"plan","visit":"iterations/i28/converge-pugh@0","parent":null,"nodes":[{"id":"d16","brief":"converge-pugh: record the run and the graft it owes"},{"id":"d17","brief":"reverse-sensitivity: measure how much the winner leans on the unanswered axis"},{"id":"d18","brief":"carry the bootstrap graft into the architecture states"}]}
+{"ts":"2026-08-15T18:02:11.530Z","op":"done","visit":"iterations/i28/converge-pugh@0","node":"d16","brief":"the pugh run is recorded with the graft it owes"}
+{"ts":"2026-08-15T18:03:30.823Z","op":"update","visit":"iterations/i28/reverse-sensitivity@0","node":"d19","brief":"deficit 0 against the nearest rival; the flip is one band"}
+{"ts":"2026-08-15T18:03:35.165Z","op":"done","visit":"iterations/i28/converge-pugh@0","node":"d17","brief":"the flip is one credible band; the two candidates do not exclude each other"}
+{"ts":"2026-08-15T18:04:06.015Z","op":"update","visit":"iterations/i28/declare-winner@0","node":"d20","brief":"at declare-winner, reading what it asks"}
+{"ts":"2026-08-15T18:04:30.636Z","op":"update","visit":"iterations/i28/declare-winner@0","node":"d21","brief":"winner declared with the startup graft and folder question open"}
+{"ts":"2026-08-15T18:05:01.213Z","op":"done","visit":"iterations/i28/converge-pugh@0","node":"d18","brief":"winner declared; the graft is recorded as owed"}
+{"ts":"2026-08-15T18:05:11.456Z","op":"plan","visit":"iterations/i28/record-adrs@0","parent":null,"nodes":[{"id":"d22","brief":"mint the lease ADR"},{"id":"d23","brief":"mint the worktree-lifetime ADR"},{"id":"d24","brief":"mint the git-is-the-list ADR"},{"id":"d25","brief":"record them and submit"}]}
+{"ts":"2026-08-15T18:05:28.580Z","op":"done","visit":"iterations/i28/record-adrs@0","node":"d22","brief":"the lease ADR is minted with its cost and prior art"}
+{"ts":"2026-08-15T18:05:43.540Z","op":"done","visit":"iterations/i28/record-adrs@0","node":"d23","brief":"the worktree-lifetime ADR is minted"}
+{"ts":"2026-08-15T18:06:02.399Z","op":"done","visit":"iterations/i28/record-adrs@0","node":"d24","brief":"the git-is-the-list ADR is minted with its probe numbers"}
+{"ts":"2026-08-15T18:06:07.294Z","op":"update","visit":"iterations/i28/record-adrs@0","node":"d26","brief":"linting the three ADRs before recording them"}
+{"ts":"2026-08-15T18:06:11.498Z","op":"update","visit":"iterations/i28/record-adrs@0","node":"d27","brief":"sweeping every decision node"}
+{"ts":"2026-08-15T18:06:22.454Z","op":"update","visit":"iterations/i28/record-adrs@0","node":"d28","brief":"lint cleared on the new ADRs"}
+{"ts":"2026-08-15T18:06:41.340Z","op":"done","visit":"iterations/i28/record-adrs@0","node":"d25","brief":"three ADRs recorded and traced"}
+{"ts":"2026-08-15T18:07:14.595Z","op":"update","visit":"iterations/i28/record-adrs@0","node":"d29","brief":"adding rejected options and consequences to all three ADRs"}
+{"ts":"2026-08-15T18:07:30.228Z","op":"fork","visit":"iterations/i28/record-adrs@0","parent":null,"node":"d30","brief":"submitting the three ADRs now their sections are complete","nodes":[]}
+{"ts":"2026-08-15T18:07:50.930Z","op":"update","visit":"iterations/i28/record-adrs@0","node":"d31","brief":"checking whether the ADR form signed"}
+{"ts":"2026-08-15T18:08:14.594Z","op":"done","visit":"iterations/i28/record-adrs@0","node":"d30","brief":"three ADRs signed and their status corrected to decided"}
+{"ts":"2026-08-15T18:08:17.461Z","op":"update","visit":"iterations/i28/record-adrs@0","node":"d32","brief":"walking on from record-adrs"}
+{"ts":"2026-08-15T18:08:40.775Z","op":"fork","visit":"iterations/i28/record-adrs@0","parent":null,"node":"d33","brief":"finding the branch evaluate-architecture still waits on","nodes":[]}
+{"ts":"2026-08-15T18:08:47.560Z","op":"done","visit":"iterations/i28/record-adrs@0","node":"d33","brief":"decompose-structure is the owed branch"}
+{"ts":"2026-08-15T18:09:08.855Z","op":"plan","visit":"iterations/i28/decompose-structure@0","parent":null,"nodes":[{"id":"d34","brief":"read the element node shape"},{"id":"d35","brief":"list the functions in scope"},{"id":"d36","brief":"mint the element set from the winner"},{"id":"d37","brief":"name the owed interfaces"},{"id":"d38","brief":"fill elements and allocation"}]}
+{"ts":"2026-08-15T18:09:16.779Z","op":"done","visit":"iterations/i28/decompose-structure@0","node":"d34","brief":"element node shape is read"}
+{"ts":"2026-08-15T18:09:22.927Z","op":"done","visit":"iterations/i28/decompose-structure@0","node":"d35","brief":"20 functions exist; five were touched by this iteration"}
+{"ts":"2026-08-15T18:09:32.053Z","op":"update","visit":"iterations/i28/decompose-structure@0","node":"d39","brief":"reading the claim ledger before deciding new elements"}
+{"ts":"2026-08-15T18:09:41.882Z","op":"update","visit":"iterations/i28/decompose-structure@0","node":"d40","brief":"reading the record store's current statement"}
+{"ts":"2026-08-15T18:09:54.464Z","op":"update","visit":"iterations/i28/decompose-structure@0","node":"d41","brief":"reading bootstrap, which must carry the startup requirement"}
+{"ts":"2026-08-15T18:10:07.501Z","op":"update","visit":"iterations/i28/decompose-structure@0","node":"d42","brief":"reading the two functions the new elements would implement"}
+{"ts":"2026-08-15T18:10:16.848Z","op":"update","visit":"iterations/i28/decompose-structure@0","node":"d43","brief":"checking which requirements the pool function carries"}
+{"ts":"2026-08-15T18:10:48.468Z","op":"defer","visit":"iterations/i28/decompose-structure@0","node":"d36","brief":"mint the element set from the winner","to":"sweep-consistency","hops":1,"trail":["iterations/i28/decompose-structure","sweep-consistency"]}
+{"ts":"2026-08-15T18:11:08.324Z","op":"update","visit":"iterations/i28/decompose-structure@0","node":"d44","brief":"two new elements minted; naming their interfaces next"}
+{"ts":"2026-08-15T18:11:42.765Z","op":"done","visit":"iterations/i28/decompose-structure@0","node":"d37","brief":"two elements revised for the lease and the git list"}
+{"ts":"2026-08-15T18:12:08.421Z","op":"update","visit":"iterations/i28/decompose-structure@0","node":"d45","brief":"linting the four touched elements"}
+{"ts":"2026-08-15T18:12:11.820Z","op":"update","visit":"iterations/i28/decompose-structure@0","node":"d46","brief":"sweeping every element node"}
+{"ts":"2026-08-15T18:12:21.302Z","op":"update","visit":"iterations/i28/decompose-structure@0","node":"d47","brief":"reading the claim ledger body to add headings"}
+{"ts":"2026-08-15T18:12:32.850Z","op":"update","visit":"iterations/i28/decompose-structure@0","node":"d48","brief":"adding headings and splitting the grown item"}
+{"ts":"2026-08-15T18:12:36.968Z","op":"update","visit":"iterations/i28/decompose-structure@0","node":"d49","brief":"re-sweeping the elements"}
+{"ts":"2026-08-15T18:13:08.266Z","op":"done","visit":"iterations/i28/decompose-structure@0","node":"d38","brief":"twelve elements, two new and two revised"}
+{"ts":"2026-08-15T18:13:22.272Z","op":"update","visit":"iterations/i28/decompose-structure@0","node":"d50","brief":"reading the allocation matrix shape"}
+{"ts":"2026-08-15T18:13:25.596Z","op":"fork","visit":"iterations/i28/decompose-structure@0","parent":null,"node":"d51","brief":"reading the element-matrix template","nodes":[]}
+{"ts":"2026-08-15T18:14:01.996Z","op":"done","visit":"iterations/i28/decompose-structure@0","node":"d51","brief":"allocation carries the argued spread and the four owed crossings"}
+{"ts":"2026-08-15T18:14:26.553Z","op":"update","visit":"iterations/i28/decompose-structure@0","node":"d52","brief":"checking whether the decomposition signed"}
+{"ts":"2026-08-15T18:14:31.633Z","op":"update","visit":"iterations/i28/decompose-structure@0","node":"d53","brief":"walking to evaluate-architecture"}
+{"ts":"2026-08-15T18:14:55.150Z","op":"fork","visit":"iterations/i28/decompose-structure@0","parent":null,"node":"d54","brief":"narrowing the two new elements to what they actually do","nodes":[]}
+{"ts":"2026-08-15T18:14:58.304Z","op":"update","visit":"iterations/i28/decompose-structure@0","node":"d55","brief":"asking the engine which crossings remain owed"}
+{"ts":"2026-08-15T18:15:16.895Z","op":"done","visit":"iterations/i28/decompose-structure@0","node":"d54","brief":"narrowing cut ten owed crossings to one"}
+{"ts":"2026-08-15T18:15:21.964Z","op":"fork","visit":"iterations/i28/decompose-structure@0","parent":null,"node":"d56","brief":"reading the interface field list before minting","nodes":[]}
+{"ts":"2026-08-15T18:15:42.729Z","op":"done","visit":"iterations/i28/decompose-structure@0","node":"d56","brief":"the one owed interface is minted"}
+{"ts":"2026-08-15T18:15:58.398Z","op":"update","visit":"iterations/i28/decompose-structure@0","node":"d57","brief":"resubmitting the decomposition with the interface in place"}
+{"ts":"2026-08-15T18:16:20.516Z","op":"fork","visit":"iterations/i28/decompose-structure@0","parent":null,"node":"d58","brief":"correcting the crossing count in the signed allocation","nodes":[]}
+{"ts":"2026-08-15T18:16:24.757Z","op":"done","visit":"iterations/i28/decompose-structure@0","node":"d58","brief":"allocation corrected; checks should pass now"}
+{"ts":"2026-08-15T18:17:00.023Z","op":"plan","visit":"iterations/i28/evaluate-architecture@0","parent":null,"nodes":[{"id":"d59","brief":"read the scenario-deck verdict shape"},{"id":"d60","brief":"walk all 20 scenarios worst grade first"},{"id":"d61","brief":"name the fitness candidates"},{"id":"d62","brief":"submit the architecture evaluation"}]}
+{"ts":"2026-08-15T18:18:28.575Z","op":"done","visit":"iterations/i28/evaluate-architecture@0","node":"d59","brief":"verdict shape read: three-way, addressed names its decision"}
+{"ts":"2026-08-15T18:18:46.908Z","op":"done","visit":"iterations/i28/evaluate-architecture@0","node":"d60","brief":"nineteen scenarios ruled, five at risk"}
+{"ts":"2026-08-15T18:18:57.632Z","op":"done","visit":"iterations/i28/evaluate-architecture@0","node":"d61","brief":"eight fitness candidates named for M7"}
+{"ts":"2026-08-15T18:19:05.400Z","op":"update","visit":"iterations/i28/evaluate-architecture@0","node":"d63","brief":"finding the verdict line shape from a prior iteration"}
+{"ts":"2026-08-15T18:19:17.557Z","op":"update","visit":"iterations/i28/evaluate-architecture@0","node":"d64","brief":"locating the scenario verdict parser"}
+{"ts":"2026-08-15T18:19:43.047Z","op":"done","visit":"iterations/i28/evaluate-architecture@0","node":"d62","brief":"verdict lines rewritten as wiki links"}
+{"ts":"2026-08-15T18:19:53.018Z","op":"fork","visit":"iterations/i28/evaluate-architecture@0","parent":null,"node":"d65","brief":"walking to gate-architecture","nodes":[]}
+{"ts":"2026-08-15T18:20:47.088Z","op":"update","visit":"iterations/i28/gate-architecture@0","node":"d66","brief":"minting the three risks the ATAM walk found"}
+{"ts":"2026-08-15T18:21:03.418Z","op":"update","visit":"iterations/i28/gate-architecture@0","node":"d67","brief":"second risk minted"}
+{"ts":"2026-08-15T18:21:23.339Z","op":"update","visit":"iterations/i28/gate-architecture@0","node":"d68","brief":"third risk minted; all five verdicts now have register entries"}
+{"ts":"2026-08-15T18:21:26.670Z","op":"update","visit":"iterations/i28/gate-architecture@0","node":"d69","brief":"linting the new risks"}
+{"ts":"2026-08-15T18:21:32.356Z","op":"update","visit":"iterations/i28/gate-architecture@0","node":"d70","brief":"lint cleared on the new risks"}
+{"ts":"2026-08-15T18:22:32.855Z","op":"done","visit":"iterations/i28/evaluate-architecture@0","node":"d65","brief":"gate-architecture filled and signed, unblessed for the owner"}
+{"ts":"2026-08-15T18:22:44.063Z","op":"fork","visit":"iterations/i28/gate-architecture@0","parent":null,"node":"d71","brief":"re-asking for the gate form before filling","nodes":[]}
+{"ts":"2026-08-15T18:22:59.069Z","op":"update","visit":"iterations/i28/gate-architecture@0","node":"d72","brief":"YAML fixed; asking for the gate form"}
+{"ts":"2026-08-15T18:23:39.434Z","op":"done","visit":"iterations/i28/gate-architecture@0","node":"d71","brief":"gate-architecture filled and signed, unblessed"}
+{"ts":"2026-08-15T18:29:57.376Z","op":"plan","visit":"iterations/i28/gate-architecture@0","parent":null,"nodes":[{"id":"d73","brief":"answer the two questions"},{"id":"d74","brief":"sweep lapse and lapsing out of the nodes"},{"id":"d75","brief":"make the list have exactly one reader"},{"id":"d76","brief":"close the batching risk with the mechanism"},{"id":"d77","brief":"re-earn the architecture gate"}]}
+{"ts":"2026-08-15T18:30:09.068Z","op":"done","visit":"iterations/i28/gate-architecture@0","node":"d73","brief":"both questions answered and recorded"}
+{"ts":"2026-08-15T18:30:42.187Z","op":"update","visit":"iterations/i28/gate-architecture@0","node":"d78","brief":"sweeping the invented word out of the trace"}
+{"ts":"2026-08-15T18:30:48.313Z","op":"update","visit":"iterations/i28/gate-architecture@0","node":"d79","brief":"sweeping the remaining forms"}
+{"ts":"2026-08-15T18:31:02.237Z","op":"update","visit":"iterations/i28/gate-architecture@0","node":"d80","brief":"repairing the three lines the blunt regex broke"}
+{"ts":"2026-08-15T18:31:09.355Z","op":"done","visit":"iterations/i28/gate-architecture@0","node":"d74","brief":"the invented word is gone from every node and the id"}
+{"ts":"2026-08-15T18:31:18.769Z","op":"update","visit":"iterations/i28/gate-architecture@0","node":"d81","brief":"fixing the reference the move left behind"}
+{"ts":"2026-08-15T18:31:50.430Z","op":"update","visit":"iterations/i28/gate-architecture@0","node":"d82","brief":"minting the one-reader decision"}
+{"ts":"2026-08-15T18:32:45.188Z","op":"plan","visit":"iterations/i28/gate-architecture@0","parent":null,"nodes":[{"id":"d83","brief":"record the no-expiry ruling as the decision"},{"id":"d84","brief":"remove the renewer element and its interface"},{"id":"d85","brief":"restore the claim ledger's force release"},{"id":"d86","brief":"fix what the worktree decision said about expiry"},{"id":"d87","brief":"re-earn every form that rested on the lease"}]}
+{"ts":"2026-08-15T18:32:57.213Z","op":"done","visit":"iterations/i28/gate-architecture@0","node":"d83","brief":"the no-expiry ruling is recorded as a decision"}
+{"ts":"2026-08-15T18:33:00.826Z","op":"update","visit":"iterations/i28/gate-architecture@0","node":"d88","brief":"the interface the renewer owned is gone"}
+{"ts":"2026-08-15T18:33:04.779Z","op":"done","visit":"iterations/i28/gate-architecture@0","node":"d84","brief":"renewer element and interface removed"}
+{"ts":"2026-08-15T18:33:08.606Z","op":"update","visit":"iterations/i28/gate-architecture@0","node":"d89","brief":"the run-out risk cannot happen now; removed"}
+{"ts":"2026-08-15T18:33:11.826Z","op":"update","visit":"iterations/i28/gate-architecture@0","node":"d90","brief":"reading the ledger before restoring the force release"}
+{"ts":"2026-08-15T18:33:22.676Z","op":"done","visit":"iterations/i28/gate-architecture@0","node":"d85","brief":"the ledger says a person ends a claim and nothing else does"}
+{"ts":"2026-08-15T18:33:26.854Z","op":"update","visit":"iterations/i28/gate-architecture@0","node":"d91","brief":"reading the worktree decision for expiry language"}
+{"ts":"2026-08-15T18:33:35.208Z","op":"done","visit":"iterations/i28/gate-architecture@0","node":"d86","brief":"the worktree decision now rests on a person's release, not a timer"}
+{"ts":"2026-08-15T18:33:41.941Z","op":"update","visit":"iterations/i28/gate-architecture@0","node":"d92","brief":"finding every reference to the deleted nodes"}
+{"ts":"2026-08-15T18:34:12.902Z","op":"update","visit":"iterations/i28/gate-architecture@0","node":"d93","brief":"record-adrs carries the reversal and the one-reader rule"}
+{"ts":"2026-08-15T18:34:46.216Z","op":"update","visit":"iterations/i28/gate-architecture@0","node":"d94","brief":"decompose-structure loses the renewer and its crossing"}
+{"ts":"2026-08-15T18:35:30.386Z","op":"update","visit":"iterations/i28/gate-architecture@0","node":"d95","brief":"two verdicts move to addressed by mechanism"}
+{"ts":"2026-08-15T18:35:46.875Z","op":"done","visit":"iterations/i28/gate-architecture@0","node":"d76","brief":"the batching risk is mitigated by the one-reader decision"}
+{"ts":"2026-08-15T18:36:36.615Z","op":"done","visit":"iterations/i28/gate-architecture@0","node":"d87","brief":"all four forms carry the reversal"}
+{"ts":"2026-08-15T18:36:43.063Z","op":"done","visit":"iterations/i28/gate-architecture@0","node":"d75","brief":"one verb answers what exists, recorded as a decision"}
+{"ts":"2026-08-15T18:37:01.411Z","op":"update","visit":"iterations/i28/gate-architecture@0","node":"d96","brief":"clearing lint on the decision nodes"}
+{"ts":"2026-08-15T18:37:07.330Z","op":"done","visit":"iterations/i28/gate-architecture@0","node":"d77","brief":"both rulings worked in; blessing on the owner's word"}
+{"ts":"2026-08-15T18:37:43.152Z","op":"fork","visit":"iterations/i28/rank-unknowns@0","parent":null,"node":"d97","brief":"reading software.md, owed at rank-unknowns","nodes":[]}
+{"ts":"2026-08-15T18:37:48.314Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d98","brief":"reading on"}
+{"ts":"2026-08-15T18:37:52.567Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d99","brief":"reading to the end for the proof"}
+{"ts":"2026-08-15T18:37:55.892Z","op":"done","visit":"iterations/i28/rank-unknowns@0","node":"d97","brief":"software.md read end to end"}
+{"ts":"2026-08-15T18:38:18.391Z","op":"fork","visit":"iterations/i28/rank-unknowns@0","parent":null,"node":"d100","brief":"grading the two risks with legal likelihood values","nodes":[]}
+{"ts":"2026-08-15T18:38:40.075Z","op":"done","visit":"iterations/i28/rank-unknowns@0","node":"d100","brief":"three unknowns seeded, all blocking the entrypoint"}
+{"ts":"2026-08-15T18:39:21.238Z","op":"fork","visit":"iterations/i28/rank-unknowns@0","parent":null,"node":"d101","brief":"stamping rank-unknowns","nodes":[]}
+{"ts":"2026-08-15T18:39:37.469Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d102","brief":"checking the stamp"}
+{"ts":"2026-08-15T18:39:43.442Z","op":"done","visit":"iterations/i28/rank-unknowns@0","node":"d101","brief":"rank-unknowns signed with three spikes seeded"}
+{"ts":"2026-08-15T18:39:52.472Z","op":"fork","visit":"iterations/i28/rank-unknowns@0","parent":null,"node":"d103","brief":"fixing the off-scale grade the exit check named","nodes":[]}
+{"ts":"2026-08-15T18:40:19.010Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d104","brief":"the named id has no matching filename"}
+{"ts":"2026-08-15T18:40:30.464Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d105","brief":"listing issue nodes to find the named one"}
+{"ts":"2026-08-15T18:40:36.398Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d106","brief":"reading the grade check's own source"}
+{"ts":"2026-08-15T18:41:09.484Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d107","brief":"the grade check could never pass; exit code now follows the verdict"}
+{"ts":"2026-08-15T18:41:19.960Z","op":"update","visit":"iterations/i28/rank-unknowns@0","node":"d108","brief":"re-running the grade check"}
+{"ts":"2026-08-15T18:42:16.938Z","op":"done","visit":"iterations/i28/rank-unknowns@0","node":"d103","brief":"the blocking node lives on trunk, not in this worktree"}

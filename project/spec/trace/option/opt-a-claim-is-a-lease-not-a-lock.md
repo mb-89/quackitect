@@ -40,13 +40,13 @@ ends through the close, and that on an ephemeral host a stopped container is
 the expected ending rather than the exceptional one.
 
 A LEASE MAKES THAT ENDING ORDINARY. Nothing has to notice the crash. The claim
-lapses on its own, and whatever the folder's existence hangs off lapses with
+runs out on its own, and whatever the folder's existence hangs off runs out with
 it.
 
 ## What survived the translation, and what did not
 
 SURVIVED: the inversion of who proves what, the duration-plus-renewal shape,
-and the acceptance that a lapsed holder may be alive but unreachable.
+and the acceptance that a holder whose claim has run out may be alive but unreachable.
 
 DID NOT SURVIVE: fencing tokens. That literature's sharpest point is that a
 lease alone does not stop a paused holder waking up and writing, so a
@@ -66,7 +66,7 @@ A CLOCK BECOMES LOAD-BEARING. Lease expiry depends on time comparisons across
 machines, and the same literature is emphatic that time jumps.
 
 AND IT FIGHTS THE OFFLINE RULING, partially. A machine working offline cannot
-renew, so its lease lapses and another machine may take the iteration. That is
+renew, so its lease runs out and another machine may take the iteration. That is
 the desync the owner already accepted knowingly, so it is a cost that was
 priced rather than a new one — but it becomes automatic rather than rare.
 

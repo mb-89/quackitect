@@ -56,7 +56,7 @@ candidate cannot be taken without revisiting it.
 
 IT FIGHTS THE OFFLINE RULING. Work starts offline and the claim warns rather
 than blocking — but a machine that cannot reach the remote cannot renew, so
-its lease lapses and another machine may take the iteration. The desync the
+its lease runs out and another machine may take the iteration. The desync the
 owner accepted knowingly becomes automatic rather than rare.
 
 A CLOCK BECOMES LOAD-BEARING, which nothing in this system currently is.
