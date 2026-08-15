@@ -59,3 +59,37 @@ the card and the specs, then verifies. The tester is a GATEKEEPER for
 this state and its fix-findings loop: one tester across the rounds,
 shown the deltas after each fix pass, never respawned to reread from
 zero.
+
+## A claim already owed against an open debt arrives PRE-FILLED
+
+OWNER RULING 2026-08-15: "If a verification is already marked as debt, then
+don't mention it again. We have them as debt, don't we? If we have, we need
+nothing to do."
+
+THE CLAIMS CHECKLIST ARRIVES BLANK EVERY ITERATION, so every iteration
+re-adjudicates the same unwatched demonstrations. i12 spent two rounds of a
+fresh-eyes verification on five specs that three open register entries
+already carried.
+
+THE RULE: a spec named in the source_refs of a register entry whose kind is
+`debt` and whose status is `open` arrives as `- [owed] <spec> — <entry>`,
+not as a blank box. The iteration then adjudicates only what its own delta
+touched.
+
+IF THE ENTRY CLOSES, the box goes blank again and somebody has to answer it.
+That is the whole safety property: the debt carries the claim, and closing
+the debt hands it back.
+
+IT IS MECHANICAL. The checklist is built from a list of spec ids; a debt
+entry lists spec ids in its own source_refs. Matching one against the other
+is a set operation, and the entry's status is a frontmatter field.
+
+THE REGISTER ALREADY SAYS SO ABOUT ITSELF.
+raid-iss-whole-product-claims-reverified-by-every-record states the problem
+in its own statement, and raid-debt-human-observed-demonstrations names the
+four specs in its impact line: "Verification refuses while any claim box
+stands open, so four specs nobody at a terminal can observe stop every
+iteration from closing. The alternative is checking boxes on unobserved
+claims, which is worse."
+
+Both were written before i12 and neither is read by anything.

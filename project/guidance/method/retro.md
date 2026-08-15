@@ -51,6 +51,20 @@ The trigger is a NOTE carrying "needs retro":
    this step owes.
 2. Field feedback. Ask the owner what came back from the
    field since the last look. Capture every answer as a note.
+
+   THIS IS A SANCTIONED STOP, AND THE ONLY ONE THE RETRO HAS (owner ruling
+   2026-08-14). Ask the question, then STOP and wait for the answer.
+
+   WHY IT NEEDED SAYING. The step was walked past in several retros running.
+   The owner: "in the last few retros, you never asked me for field feedback.
+   So you don't stop. You just continue with your stuff."
+
+   It is easy to walk past because there is always more retro to do. That is
+   exactly why it is named: no amount of draining, mining or sweeping is a
+   substitute for the one report that comes from OUTSIDE the machine.
+
+   WHAT DOES NOT WAIT. The drain, the log mining, the debt sweep and the
+   memory drain need no answer. Do them, and stop on the question.
 3. Drain the notes inbox, walking EVERY pending note once. Disposition each
    with se_note_drain, routing it to exactly ONE home.
 
@@ -168,14 +182,45 @@ The trigger is a NOTE carrying "needs retro":
      SPLIT before anything clever is attempted inside it.
    COMPARE ACROSS RUNS, not within one. The record appends, so a test that
    has been getting slower for a fortnight is visible here and nowhere else.
-9. Tally the previous retro's improvements, and promote the wins. Dismiss
+9. WALK THE MILESTONES, one iteration at a time (owner ruling 2026-08-15).
+   Every iteration that closed in this window gets its milestone steps
+   walked in order, and the walk lands as a TABLE the owner reads.
+
+   THE OWNER'S WORDS: "walk over all milestone steps of all iterations
+   that we did and give me tabulated information about all the milestone
+   steps. What went well from M1 to M2, from M2 to M3, and so on. Where
+   do you see improvements? Where can you mechanize?"
+
+   ONE ROW PER STEP, in walk order, with four columns.
+
+   | step | what went well | what cost | mechanizable |
+
+   - WHAT WENT WELL is what the step actually produced, not that it was
+     completed. A signed form is not an achievement.
+   - WHAT COST is the round trips, the refusals, the rework, the
+     re-reading. The log has the numbers and this column takes them.
+   - MECHANIZABLE names the check, the refusal or the prefill that would
+     have removed the cost. Empty is a legal answer and a common one.
+
+   THE FILTER THAT MAKES IT WORTH READING: a row's improvement is
+   dropped if it is ALREADY PLANNED somewhere. Check the register, the
+   backlog and version-planning before writing it. A list that repeats
+   what is already scheduled teaches the reader to skim it.
+
+   WHY A TABLE AND NOT PROSE. The steps are comparable to each other and
+   that is the whole value. Which step cost the most is a question prose
+   cannot answer at a glance.
+
+   WHY IT IS A STEP AND NOT A REQUEST. The owner asked for this list and
+   then had to ask again, because nothing in the method held it.
+10. Tally the previous retro's improvements, and promote the wins. Dismiss
    the duds WITH the reason recorded, so a dud is never re-proposed.
-10. Check the contract. Walk the contract rule by rule against the
+11. Check the contract. Walk the contract rule by rule against the
    period's recorded trail — the call log, the decision graph, the
    notes. A violation is a lead: propose how the rule gets teeth (a
    refusal, a lint, guidance) so it cannot recur. The check reads what
    the lane recorded — private thinking is not in the store.
-11. Aim every improvement at a durable home: guidance, a machine, a
+12. Aim every improvement at a durable home: guidance, a machine, a
    condition note, a form template, an engine refusal. Emit only the few
    highest-leverage notes. Each one specific and checkable — a concrete
    change, never "improve X".

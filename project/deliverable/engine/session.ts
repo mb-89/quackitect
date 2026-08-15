@@ -95,6 +95,7 @@ import {
   readItRecord,
   repinColumn,
 } from "./iterations.ts";
+import { RUN_MODES, type RunMode, readMode, storedMode, writeMode } from "./mode.ts";
 import { parseStateNote, readNode, section, withPass, writeNode } from "./notes.ts";
 import { fansOut, METHOD_FILES, METHOD_PREFIXES, methodFilesIn, pathKind, recordOwnerOf, resolveInRoot, seDir } from "./paths.ts";
 import { mintFlipLines } from "./pugh.ts";
@@ -224,7 +225,7 @@ export type Channel = "human" | "agent";
  *  what you would have been refused with. */
 export interface Blocker {
   /** The machine-readable reason, for a caller that wants to branch. */
-  kind: "form_incomplete" | "unsubmitted" | "unsigned_feeder" | "unblessed_gate";
+  kind: "form_incomplete" | "unsubmitted" | "unsigned_feeder" | "unblessed_gate" | "fallen_input" | "claim_content";
   clause: string;
   expected: string;
   got: string;
@@ -306,6 +307,7 @@ export class Session {
         narration_calls?: number;
         reads?: Record<string, string>;
         reads_pid?: number;
+        target?: string;
         session?: string;
       };
       const mine = process.env.SE_SESSION;
@@ -320,6 +322,7 @@ export class Session {
         if (typeof s.narration_calls === "number" && Number.isInteger(s.narration_calls) && s.narration_calls >= 0)
           this._narrationCalls = s.narration_calls;
         this.restoreReadCredit(s.reads, s.reads_pid);
+        this.restoreTarget(s.target, s.reads_pid);
       }
     } catch {
       /* no store yet — the defaults stand */
@@ -338,6 +341,35 @@ export class Session {
    *  Freshness is decided nowhere near here. Every entry is re-checked against
    *  disk wherever it is used, so a document whose words moved is owed again
    *  by construction rather than by a second mechanism that could disagree. */
+  /** THE TARGET SURVIVES AN ENGINE RELOAD (owner ruling 2026-08-15): "the point
+   *  of boot is to boot the agent, not the machine".
+   *
+   *  IT DOES NOT CONTRADICT THE DESK RULE. Every engine START still aims at the
+   *  front desk (2026-07-29), because a start has no matching session stamp to
+   *  restore from. Only a RELOAD restores, on the same two conditions the
+   *  reading credit uses: the stamp says this is the same session, and the
+   *  process id says the engine actually restarted.
+   *
+   *  THE POSITION IS STILL NOT REMEMBERED, and req-reload-restarts-clean is
+   *  right to forbid it. Evidence gives the position, the target gives the
+   *  direction, and the recompute walks back on its own. Before this, a reload
+   *  mid-record landed at the desk with nothing aimed, so the agent paid an
+   *  aim and a sweep to stand where it already stood.
+   *
+   *  AN UNREACHABLE RESTORED TARGET IS SAFE. The route simply cannot be drawn
+   *  and the pull answers wait, which is the same answer a stale aim has always
+   *  produced. */
+  private restoreTarget(target: string | undefined, pid: number | undefined): void {
+    if (pid === undefined || pid === process.pid) return;
+    if (typeof target === "string" && target !== "") this._target = target;
+  }
+
+  /** The ONE place the target moves, so no site can forget to persist it. */
+  private aimAt(to: string): void {
+    this._target = to;
+    this.persistSettings();
+  }
+
   private restoreReadCredit(reads: Record<string, string> | undefined, pid: number | undefined): void {
     if (pid === undefined || pid === process.pid) return;
     for (const [p, h] of Object.entries(reads ?? {})) {
@@ -360,6 +392,7 @@ export class Session {
           narration_calls: this._narrationCalls,
           reads: Object.fromEntries(this.readBuffer),
           reads_pid: process.pid,
+          target: this._target,
         })}\n`,
         "utf8",
       );
@@ -678,7 +711,9 @@ export class Session {
       throw new Rejection({
         clause: CLAUSES.ABOVE_THRESHOLD,
         expected: "the autonomy at its top rung before emergency arms — it is a step past full delegation, never a way around it",
-        got: `autonomy ${this._autonomy}`,
+        // THE WORD, NEVER THE NUMBER (owner ruling 2026-08-14). Three refusal
+        // lines still carried the raw dial after i27 moved the rest.
+        got: `the autonomy sits at ${this.tierFor(this._autonomy).tier ?? "a lower rung"}`,
         remedy: { tool: "se_pull", args: {}, note: "raise the autonomy to the top rung first" },
         source: "engine/session.ts emergency",
       });
@@ -707,7 +742,78 @@ export class Session {
     if (value < 1) this._emergency = false;
     this.persistSettings();
     this.notifyChange(); // a holding agent wakes and re-reads the packet
-    return { autonomy: value, was, ...this.tierFor(value), ...(this._emergency ? { emergency: true } : {}) };
+    // THE ANSWER IS THE WORD, and the word for what it was (owner ruling
+    // 2026-08-14). The person's control sends a number in; nothing sends one
+    // back out.
+    return { ...this.tierFor(value), was: this.tierFor(was).tier ?? "", ...(this._emergency ? { emergency: true } : {}) };
+  }
+
+  /** WHAT IS RUNNING RIGHT NOW, which is not always what is stored.
+   *
+   *  `--mode` decides THIS RUN and deliberately does not overwrite the stored
+   *  choice, so the two can differ. A packet reporting only the stored value
+   *  would then lie about the boundary the walk is actually crossing.
+   *
+   *  Null until the launch says. The stored value is the honest fallback. */
+  private _runningMode: RunMode | null = null;
+
+  /** Told by the launch which boundary this process actually got. */
+  noteRunningMode(mode: string): void {
+    this._runningMode = (RUN_MODES as string[]).includes(mode) ? (mode as RunMode) : null;
+  }
+
+  /** What is running now — the launch's answer, or the stored one. */
+  runningMode(): RunMode {
+    return this._runningMode ?? readMode(this.root);
+  }
+
+  /** THE PACKET'S MODE BLOCK, FROM ONE READ OF THE FILE.
+   *
+   *  packet() is on the hot path. recordDone paints green across the whole
+   *  corpus, so a second read per call is two hundred extra file hits over a
+   *  two-hundred-node corpus — which is exactly how it blew the drift
+   *  budget. */
+  private _storedMode: { mode: RunMode; chosen: boolean } | null = null;
+
+  private runBlock(): { mode: RunMode; stored: RunMode; chosen: boolean } {
+    // READ ONCE PER SESSION, never once per packet. recordDone paints green
+    // across the whole corpus, so one filesystem hit per call cost 100 ms over
+    // two hundred nodes and blew the drift budget — a cost that did not exist
+    // before this block did.
+    //
+    // A SESSION-LIFETIME CACHE CANNOT BE WRONG IN A WAY THAT MATTERS. The
+    // stored choice only takes effect at the NEXT launch. setRunMode refreshes
+    // it, so this process always reports its own writes.
+    this._storedMode ??= storedMode(this.root);
+    const { mode, chosen } = this._storedMode;
+    return { mode: this._runningMode ?? mode, stored: mode, chosen };
+  }
+
+  /** THE STORED RUN MODE — where satellites run from the NEXT launch on.
+   *
+   *  IT DOES NOT MOVE THIS RUN, and it does not pretend to. The boundary is
+   *  chosen once at start. A server cannot re-spawn its own satellites
+   *  underneath a walk in flight. The answer says which launch applies it.
+   *
+   *  IT EXISTS BECAUSE A HOST HAS NO COMMAND LINE. The VS Code extension
+   *  launches from a fixed .mcp.json, so `--mode` never reaches it. Without
+   *  this control that host could not flip the mode at all. */
+  setRunMode(mode: string): Record<string, unknown> {
+    if (!(RUN_MODES as string[]).includes(mode)) {
+      throw new Rejection({
+        clause: CLAUSES.REQUIRED_ARGS,
+        expected: "one of " + RUN_MODES.join(", ") + " — where satellites run",
+        got: String(mode),
+        remedy: { tool: "se_pull", args: {}, note: "the run mode is set from the mirror, or at launch with --mode" },
+        source: "engine/session.ts run mode",
+      });
+    }
+    const was = readMode(this.root);
+    writeMode(this.root, mode as RunMode);
+    this._storedMode = { mode: mode as RunMode, chosen: true };
+    this.notifyChange();
+    const running = this.runningMode();
+    return { mode, was, running, applies: mode === running ? "already running" : "on the next launch" };
   }
 
   /** THE TIER WORD FOR A VALUE (req-autonomy-is-categorical). The word is
@@ -732,8 +838,8 @@ export class Session {
       if (t.priority > this._autonomy) {
         throw new Rejection({
           clause: CLAUSES.ABOVE_THRESHOLD,
-          expected: `a state within the session autonomy ${this._autonomy}`,
-          got: `${id} weighs ${t.priority} — this step is the human's`,
+          expected: `a state within this session's ${this.tierFor(this._autonomy).tier ?? "dial"}`,
+          got: `${id} is ${this.tierFor(t.priority).tier ?? "heavier"} work — this step is the person's`,
           remedy: {
             tool: "se_pull",
             args: {},
@@ -798,7 +904,7 @@ export class Session {
     setTimeout(() => process.exit(42), 400);
     return {
       reload: "armed",
-      note: "the engine restarts in under a second on the NEW sources — the walk reboots at start; tick when the lane answers",
+      note: "the engine restarts in under a second on the NEW sources — the walk reboots at start and walks back to your target, which survives the restart; tick when the lane answers",
       ...reconciled,
     };
   }
@@ -889,7 +995,11 @@ export class Session {
     return files;
   }
 
-  /** Where the LANE works: the bound expedition's worktree, else the root. */
+  /** Where the LANE works: the bound expedition's worktree, else the root.
+   *
+   *  SHARED METHOD NO LONGER COMES THROUGH HERE. laneRoot sends it to the
+   *  machine root whatever tree is bound, which is what retired SE-C-134.
+   *  This answers for everything else, and a record keeps its own tree. */
   workRoot(): string {
     return this.bound?.path ?? this.root;
   }
@@ -932,6 +1042,16 @@ export class Session {
     // never make the owner's roots read as undeclared (found live 2026-07-30).
     const kind = pathKind(rel);
     if (kind === "session") return this.root;
+    // SHARED METHOD BELONGS TO THE MACHINE, never to a branch. resolve.ts says
+    // the same thing in storeFor: the core owns session state and shared
+    // method, so both resolve to the machine root whatever tree is bound.
+    //
+    // Before this, a method write from inside a record landed in the record's
+    // own worktree and fanned out over trunk at the merge. That is the
+    // 2026-08-07 accident, and refusing the write was the old answer to it.
+    // Resolving the write is the better one: nothing is refused, and the file
+    // cannot land in a tree that does not own it.
+    if (kind === "method") return this.root;
     // A RECORD'S OWN CONTENT IS READ FROM THE RECORD'S TREE, bound or not.
     // The mirror painted i1's states out of trunk while i1's worktree held
     // the fall that knocked them down, and both halves were working — they
@@ -944,7 +1064,15 @@ export class Session {
    *
    *  An OPEN record owns its worktree, so that is the only copy that counts.
    *  A CLOSED one has landed and its tree is gone, so undefined here falls
-   *  back to the working root and finds the landed archive. */
+   *  back to the working root and finds the landed archive.
+   *
+   *  SELF-HOSTING WOULD CHANGE THIS, and it is NOT switched on here yet. A
+   *  record can only walk on trunk once its content IS on trunk, and i27's
+   *  content stands on its own branch. Levelling is what moves it, and that
+   *  is supervisor-level's act with a real git adapter behind it. Flipping
+   *  the answer before the levelling would point the walk at a trunk that
+   *  does not hold the record — measured on 2026-08-14, when it hid four
+   *  design specs. */
   private recordRoot(rel: string): string | undefined {
     const owner = recordOwnerOf(rel);
     if (owner === undefined) return undefined;
@@ -1399,7 +1527,7 @@ export class Session {
       this.instance.escapes.push({ state: stoodIn, exhausted_guard: reason.slice(0, 300), at: nowMain });
       this.instance.active = ["front_desk"];
       this.instance.current = "front_desk";
-      this._target = "";
+      this.aimAt("");
       this.unbind();
       this.notifyChange();
       return {
@@ -1425,7 +1553,7 @@ export class Session {
     this.instance.active = [...activeStates(this.instance).filter((s) => s !== parent), "front_desk"];
     this.instance.current = "front_desk";
     this.subs = [];
-    this._target = "";
+    this.aimAt("");
     this.unbind();
     this.notifyChange();
     return {
@@ -1486,57 +1614,24 @@ export class Session {
       // table — all of it against a form that was never the problem.
       //
       // The engine knew which input had fallen the whole time.
-      const claimful = new Set(m.states.filter((s) => s.evidence_form.length > 0 || s.submachine !== undefined).map((s) => s.id));
-      const fallen = claimFeeders(m, stateId, claimful).filter((f) => !done.has(f));
-      // AND WHEN NOTHING UPSTREAM FELL, SAY WHAT IS WRONG WITH THIS ONE
-      // (owner instruction 2026-08-13: "then make the message name the field").
       //
-      // The content check runs the claim's own fields against the corpus. It
-      // knows exactly which field failed and what it wanted, and the refusal
-      // threw that away. The reader was left guessing a field and trying again.
-      //
-      // Same rule as the fallen-input half above: a check reports in the words
-      // of the question IT asked.
-      const own =
-        fallen.length > 0
-          ? []
-          : ((): string[] => {
-              try {
-                // this.traceRoot(it) IN FULL, not a renamed local. A guard test
-                // greps for exactly this spelling, because a claim check
-                // resolving against the wrong record is the drift it catches.
-                const it = this.declIteration(m);
-                if (it === undefined) return [];
-                const body = noteOf(this.evidenceAbs(it, stateId))?.body;
-                if (body === undefined) return [];
-                return claimProblems(this.traceRoot(it), decl, body, loadTrace(this.traceRoot(it)));
-              } catch {
-                return []; // an unreadable claim falls back to the plain sentence
-              }
-            })();
+      // ONE MECHANISM, TWO QUESTIONS (owner instruction 2026-08-14). The
+      // ripple and the content check used to live here alone, so se_why —
+      // the verb built to explain a grey state — ran neither and answered
+      // `standing: true` for a state this guard was dropping. Both now read
+      // claimBlockers, so the two answers cannot differ.
+      const held = this.claimBlockers(stateId, m)[0];
+      if (held !== undefined) {
+        throw new Rejection({ clause: held.clause, expected: held.expected, got: held.got, remedy: held.remedy, source: held.source });
+      }
+      // THE FALLBACK, when nothing nameable holds the claim. A "filled"
+      // completion whose claim is neither signed nor standing means the walk
+      // simply has not moved, and there is no input and no field to point at.
       throw new Rejection({
         clause: CLAUSES.CONDITION_UNMET,
         expected: `${stateId}'s claim to stand before it completes — it declares ${decl.evidence_form.length} evidence field(s)`,
-        got:
-          fallen.length > 0
-            ? `${stateId}'s OWN claim may be fine. It is dropped because these inputs are not standing: ${fallen.join(", ")}`
-            : own.length > 0
-              ? `${stateId}'s claim does not pass its own checks: ${own.join(" · ")}`
-              : 'a "filled" completion with the claim neither signed nor standing — the walk has not moved',
-        remedy:
-          fallen.length > 0
-            ? {
-                tool: "se_pull",
-                args: {},
-                note: `re-earn ${fallen.join(", ")} first — green ripples forward, and this one follows without being touched`,
-              }
-            : own.length > 0
-              ? {
-                  tool: "se_pull",
-                  args: {},
-                  note: "fix the named field, then submit again — the claim re-stamps and the completion follows",
-                }
-              : { tool: "se_pull", args: {}, note: "pull — the machine serves the owed form; submit it and the completion follows" },
+        got: 'a "filled" completion with the claim neither signed nor standing — the walk has not moved',
+        remedy: { tool: "se_pull", args: {}, note: "pull — the machine serves the owed form; submit it and the completion follows" },
         source: "engine/session.ts claim-guard",
       });
     }
@@ -1747,7 +1842,7 @@ export class Session {
     // routeAim is the ONE normalisation: a target naming a node that
     // descends means that machine's start. A private main-only copy here
     // missed "iterations/i1" and wedged the walk at the sub's start.
-    if (here === this.routeAim(this._target)) this._target = "";
+    if (here === this.routeAim(this._target)) this.aimAt("");
   }
 
   /** What the route search can see, beyond file content. Bumped wherever the
@@ -1770,7 +1865,7 @@ export class Session {
   setTarget(to: string): Record<string, unknown> {
     const wanted = to.trim();
     if (wanted === "") {
-      this._target = "";
+      this.aimAt("");
       return { ...this.route(this.active()[0] ?? this.machine.initial), target: this._target };
     }
     const r = this.route(wanted);
@@ -1787,7 +1882,7 @@ export class Session {
         source: "engine/session.ts target",
       });
     }
-    this._target = wanted;
+    this.aimAt(wanted);
     this.clearTargetIfArrived();
     // The reader's OWN name wins the report. route() answers with the
     // normalised aim so the render can place the dot, and spreading it last
@@ -2015,7 +2110,9 @@ export class Session {
         judgments.push({
           at: s.to,
           needs: "the slider, or the person's own hand",
-          why: `entering ${s.to} weighs ${s.priority}, above the session autonomy ${this._autonomy}`,
+          // THE WORD, NEVER THE NUMBER (owner ruling 2026-08-14). A served
+          // string is an answer like any other.
+          why: `entering ${s.to} is ${this.tierFor(s.priority).tier ?? "heavier"} work, above this session's ${this.tierFor(this._autonomy).tier ?? "dial"}`,
         });
       }
       for (const key of Object.keys(s.demands)) {
@@ -2056,7 +2153,8 @@ export class Session {
    *  being asked one question at a time. */
   route(target: string): RouteResult & {
     from: string;
-    autonomy: number;
+    /** The tier WORD. No number rides an answer (owner ruling 2026-08-14). */
+    tier?: string;
     judgments: { at: string; needs: string; why: string }[];
     reads: string[];
     stops_at?: { at: string; why: string };
@@ -2077,7 +2175,7 @@ export class Session {
 
   private routeNow(target: string): RouteResult & {
     from: string;
-    autonomy: number;
+    tier?: string;
     judgments: { at: string; needs: string; why: string }[];
     reads: string[];
     stops_at?: { at: string; why: string };
@@ -2166,7 +2264,12 @@ export class Session {
       // `aimed_at` keeps the far target visible, so a reader can see both
       // where they are headed and what stands in the way of it.
       ...(objective === aim ? {} : { aimed_at: aim }),
-      autonomy: this._autonomy,
+      // THE NUMBER IS GONE FROM THE ANSWER (owner ruling 2026-08-14, final:
+      // "that number leaves... there's no call to be made"). The tier WORD is
+      // the autonomy, and req-autonomy-is-categorical says so. The cut-over
+      // that raid-risk-autonomy-rework-breaks-walking asked for came first and
+      // is complete; this is the removal it said would follow.
+      ...this.tierFor(this._autonomy),
       judgments,
       reads: this.routeReadList(r.steps),
       // THE FAN AT A BAR RIDES THE ROUTE (owner, 2026-08-09): one drawn
@@ -2425,6 +2528,18 @@ export class Session {
     return s.trim().replace(/\s+/g, " ").toLowerCase();
   }
 
+  /** HOW LONG A SWEEP MAY RUN BEFORE IT ANSWERS.
+   *
+   *  NOT A PERFORMANCE BUDGET. It is the guarantee that the sweep ALWAYS
+   *  returns a whole answer, standing on a whole state, inside any caller's
+   *  timeout. A sweep that is cut off instead of answering is the one thing
+   *  that leaves the walk between two states.
+   *
+   *  Twenty seconds is well under every timeout the lane has been driven
+   *  through, and a forty-four hop route has never taken half of it once the
+   *  hops are whole. */
+  static readonly SWEEP_BUDGET_MS = 20_000;
+
   /** THE SWEEP — the route, walked. It collapses ROUND TRIPS and nothing
    *  else: every hop still enters its state, still weighs the slider, still
    *  proves its reads, still runs its scripts, still writes its own line to
@@ -2433,7 +2548,8 @@ export class Session {
    *  THE ROUTE IS RECOMPUTED AFTER EVERY HOP, which is the detour: if the
    *  ground moved, the way is worked out again FROM WHERE THE WALK NOW
    *  STANDS rather than followed off a cliff. */
-  async sweep(target: string, channel: Channel): Promise<Record<string, unknown>> {
+  async sweep(target: string, channel: Channel, budgetMs: number = Session.SWEEP_BUDGET_MS): Promise<Record<string, unknown>> {
+    const started = Date.now();
     const walked: string[] = [];
     // A BANNER EARNED MID-SWEEP MUST SURVIVE THE SWEEP. advance hands
     // its banner back per hop, and a sweep that swallowed it lost the boot
@@ -2442,6 +2558,24 @@ export class Session {
     const banners: string[] = [];
     const carry = (): Record<string, unknown> => (banners.length > 0 ? { banners } : {});
     for (let guard = 0; guard < 64; guard++) {
+      // THE SWEEP MUST ANSWER, NEVER BE CUT OFF. A long route walked past the
+      // caller's timeout leaves the walk mid-hop, and the next pull then
+      // computes from a position the machine disagrees with — the
+      // `completeState: <state> is not active` error, eight times across two
+      // sessions (note-c76d90e3c17a).
+      //
+      // So the budget is checked BETWEEN hops, where the walk always stands
+      // on a whole state. Stopping here is not a failure: the route
+      // recomputes from wherever it stopped, and the next sweep carries on.
+      if (walked.length > 0 && Date.now() - started >= budgetMs) {
+        return {
+          ...this.packet(),
+          swept: walked,
+          arrived: false,
+          ...carry(),
+          note: `swept ${walked.length} hop(s) and stopped ON A STATE at the ${budgetMs} ms budget rather than being cut off mid-hop — sweep again and the route recomputes from here`,
+        };
+      }
       const r = this.route(target);
       if (r.steps.length === 0) {
         return { ...this.packet(), swept: walked, arrived: r.found, ...carry(), ...(r.found ? {} : { note: r.note }) };
@@ -2531,7 +2665,11 @@ export class Session {
       ...(t.statement !== "" ? { statement: t.statement } : {}),
       priority: t.priority,
       open: open && !overWeight,
-      ...(overWeight ? { needs: `the person — ${t.priority} is above the session autonomy ${this._autonomy}` } : {}),
+      ...(overWeight
+        ? {
+            needs: `the person — ${this.tierFor(t.priority).tier ?? "heavier"} work is above this session's ${this.tierFor(this._autonomy).tier ?? "dial"}`,
+          }
+        : {}),
       ...(open ? {} : { blocked_by: Object.keys(this.conditionStatus(decl, t, "enter") ?? {}) }),
     };
   }
@@ -2659,7 +2797,8 @@ export class Session {
       where: this.active(),
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
       target: targetNow(),
-      autonomy: this._autonomy,
+      // The tier word IS the autonomy. No number rides any answer
+      // (owner ruling 2026-08-14).
       ...this.tierFor(this._autonomy),
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
     });
@@ -2826,7 +2965,7 @@ export class Session {
         ...head(),
         waiting_for: "the person",
         at: first.to,
-        why: `entering ${first.to} weighs ${first.priority}, above the session autonomy ${this._autonomy}`,
+        why: `entering ${first.to} is ${this.tierFor(first.priority).tier ?? "heavier"} work, above this session's ${this.tierFor(this._autonomy).tier ?? "dial"}`,
         do: "tell them plainly WHICH step waits and STOP — the dial alone cannot wake you, so they must send a message after moving it",
         ...extra(),
       };
@@ -3022,11 +3161,19 @@ export class Session {
         };
       }
     }
+    // A BRANCH POINT SHOWS ITS DOORS. `do` means the happy path was walked up
+    // TO the next branch, and the walker then has to know what the branch is.
+    //
+    // Without this a container full of open iterations answered `do` at its
+    // own start with nothing to answer WITH, and the only way to learn the
+    // doors was to guess one and read the refusal.
+    const branchOpts = this.pullOptions();
     return {
       pull: "do",
       ...head(),
       walked: swept.swept ?? [],
       arrived: swept.arrived === true,
+      ...(branchOpts.length > 1 ? { options: branchOpts } : {}),
       here: this.pullHere(),
       ...(swept.banners !== undefined ? { banners: swept.banners } : {}),
       ...(swept.refusal !== undefined ? { stopped_at: swept.stopped_at, refusal: swept.refusal } : {}),
@@ -4494,7 +4641,7 @@ export class Session {
    *  guarantees is that an amend cannot smuggle a reopen past the checks: the
    *  form is re-checked after the edit, and an amend that breaks a check is
    *  refused with the file untouched. */
-  reopenClaim(name: string, reason: string, by: string, machineId?: string): Record<string, unknown> {
+  reopenClaim(name: string, reason: string, by: string, machineId?: string, confirm?: boolean): Record<string, unknown> {
     this.forgetRoute();
     const m = this.formMachine(machineId);
     this.stateFormState(name, m); // refuses an undeclared or form-less state
@@ -4518,6 +4665,32 @@ export class Session {
         source: "engine/session.ts reopen",
       });
     }
+    // SAY WHAT IT WILL DROP, BEFORE DROPPING IT (i27, 2026-08-14).
+    //
+    // A reopen keeps the SIGNATURE and se_reopen says so. It does not keep
+    // the BLESS, and nothing said so. On 2026-08-14 a reopen taken on the
+    // engine's own bad advice erased a person's adjudication, and the walk
+    // stopped until they were asked again.
+    //
+    // A signature records who wrote it. A bless records who ADJUDICATED it,
+    // and at a low dial only a person can. Losing one silently is not the
+    // same kind of loss, so this one is confirmed rather than assumed.
+    const blessedBy = parseStateNote(raw).frontmatter.bless;
+    const byAPerson = typeof blessedBy === "string" && blessedBy.includes("human");
+    if (byAPerson && confirm !== true) {
+      const falls = this.wouldFall(name, m);
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: "a confirmed reopen — this one destroys a person's adjudication",
+        got: `${name} carries "${blessedBy}", and a reopen drops it. ${falls.length} state(s) fall with it: ${falls.join(", ") || "none"}`,
+        remedy: {
+          tool: "se_reopen",
+          args: { state: name, reason, confirm: true },
+          note: "if the claim's own content still passes, se_amend fixes the field and LEAVES THE TREE STANDING — the bless with it. Reopen only when the work is genuinely wrong.",
+        },
+        source: "engine/session.ts reopen",
+      });
+    }
     writeFileSync(h.instanceAbs, withReopened(raw, new Date().toISOString(), reason), "utf8");
     this.notifyChange();
     // The walk's tokens follow the file. reopenStates handles the join re-arming
@@ -4528,6 +4701,18 @@ export class Session {
       reopenStates(run.decl, run.instance, [name], reason, new Date().toISOString());
     }
     return { reopened: name, why: reason.trim(), by, still_green: this.recordDone(m) };
+  }
+
+  /** WHAT A REOPEN OF THIS STATE WOULD TAKE WITH IT.
+   *
+   *  Green ripples through the feeders, so everything downstream of a
+   *  reopened claim falls. Counting it BEFORE the write is what turns a
+   *  surprise into a decision. */
+  private wouldFall(name: string, m: MachineDecl): string[] {
+    const standing = new Set(this.recordDone(m));
+    if (!standing.has(name)) return [];
+    const claimful = new Set(m.states.filter((s) => s.evidence_form.length > 0 || s.submachine !== undefined).map((s) => s.id));
+    return [...standing].filter((s) => s !== name && claimful.has(s) && claimFeeders(m, s, claimful).includes(name));
   }
 
   amendClaim(name: string, fills: Record<string, string>, reason: string, by: string, machineId?: string): Record<string, unknown> {
@@ -4628,8 +4813,8 @@ export class Session {
     if (by !== "human" && this._autonomy <= s.priority) {
       throw new Rejection({
         clause: CLAUSES.ABOVE_THRESHOLD,
-        expected: `a hand above this gate's weight — autonomy > ${s.priority}, or the human's thumb in the form`,
-        got: `agent at autonomy ${this._autonomy}`,
+        expected: `a hand above this gate's weight — ${this.tierFor(s.priority).tier ?? "heavier"} work, or the person's thumb in the form`,
+        got: `the agent stands at ${this.tierFor(this._autonomy).tier ?? "a lower rung"}`,
         remedy: { tool: "se_pull", args: {}, note: "present the gate to the person and stop — their bless resumes the walk" },
         source: "engine/session.ts bless",
       });
@@ -5202,6 +5387,135 @@ export class Session {
    *  HOP, not the state — a step above the dial is not grey, it is waiting for
    *  a person. Reporting it as a blocker would tell somebody to fix a claim
    *  that is already fine. */
+  /** WHAT HOLDS A STATE'S CLAIM — the ripple and the content check, computed
+   *  once and read by both callers.
+   *
+   *  THE WHY AND THE GUARD WERE TWO MECHANISMS (owner instruction 2026-08-14,
+   *  in emergency). The completion guard ran the ripple over the claim's
+   *  feeders and the content check over its fields. se_why ran NEITHER: it
+   *  asked the form's own conditions and the feeders' signatures, which is a
+   *  weaker question, because a feeder can be signed and still not standing
+   *  when ITS feeder fell.
+   *
+   *  SO THE TWO DISAGREED ABOUT ONE STATE AT ONE MOMENT. i27 stood at
+   *  cut-criteria with se_why reporting `standing: true, blockers: []` while
+   *  the guard dropped it for an input that was not standing. The verb built
+   *  to explain a block reported no block, and the record deadlocked.
+   *
+   *  ONE MECHANISM NOW INFORMS BOTH QUESTIONS. The guard throws the first
+   *  entry; the verb lists them all. Neither computes anything of its own.
+   *
+   *  WHAT IS NOT HERE: the "neither signed nor standing" case. That is a
+   *  completion-time sentence, and for a state simply not walked yet it says
+   *  nothing `form_incomplete` has not already said. The guard keeps it as
+   *  its own fallback. */
+  /** WHAT IS WRONG WITH THIS ONE CLAIM'S OWN CONTENT, ignoring its feeders.
+   *
+   *  Extracted so the fallen-input remedy can ask it about the state that
+   *  FELL, which is how the refusal knows whether to name se_amend or
+   *  se_reopen. Asking about feeders here would recurse; the ripple already
+   *  walks them. */
+  private ownClaimProblems(stateId: string, m: MachineDecl): string[] {
+    const decl = m.states.find((s) => s.id === stateId);
+    if (decl === undefined) return [];
+    try {
+      // this.traceRoot(it) IN FULL, not a renamed local. A guard test greps
+      // for exactly this spelling, because a claim check resolving against
+      // the wrong record is the drift it catches.
+      const it = this.declIteration(m);
+      if (it === undefined) return [];
+      const body = noteOf(this.evidenceAbs(it, stateId))?.body;
+      if (body === undefined) return [];
+      return claimProblems(this.traceRoot(it), decl, body, loadTrace(this.traceRoot(it)));
+    } catch {
+      return []; // an unreadable claim falls back to the plain sentence
+    }
+  }
+
+  /** WHICH VERB FIXES A FALLEN INPUT, decided rather than guessed.
+   *
+   *  A claim loses its green two ways, and they want different verbs.
+   *
+   *  - ITS CONTENT STILL PASSES. The ripple dropped it because something
+   *    upstream moved. A small correction goes in with se_amend, which LEAVES
+   *    THE TREE STANDING.
+   *  - ITS CONTENT NO LONGER PASSES. The work is genuinely wrong, and
+   *    se_reopen sends it back to be re-earned.
+   *
+   *  se_reopen on the first case is what cost a bless on 2026-08-14. The
+   *  resubmit dropped the person's adjudication and everything downstream
+   *  fell with it. */
+  private fallenRemedy(fallen: string, m: MachineDecl): { tool: string; args: Record<string, unknown>; note: string } {
+    const problems = this.ownClaimProblems(fallen, m);
+    if (problems.length === 0) {
+      return {
+        tool: "se_amend",
+        args: { state: fallen, fills: {}, reason: "<what the upstream change touched>" },
+        note: `${fallen}'s own content still passes, so it lost its green to the ripple rather than to a defect. Amend the field the change touched and the tree stays standing. se_reopen would drop this claim, everything downstream, and any bless on it.`,
+      };
+    }
+    return {
+      tool: "se_reopen",
+      args: { state: fallen, reason: "<why it stopped standing>" },
+      note: `${fallen}'s own content no longer passes: ${problems.join(" ")}. That is a defect rather than a ripple, so it is re-earned rather than amended.`,
+    };
+  }
+
+  claimBlockers(stateId: string, machine?: MachineDecl): Blocker[] {
+    const m = machine ?? this.currentMachine();
+    const decl = m.states.find((s) => s.id === stateId);
+    if (decl === undefined || decl.evidence_form.length === 0) return [];
+    const done = new Set(this.recordDone(m));
+    if (done.has(stateId)) return [];
+    const expected = `${stateId}'s claim to stand before it completes — it declares ${decl.evidence_form.length} evidence field(s)`;
+    // NAME THE CLAIM THAT ACTUALLY FELL (i3, 2026-08-13). recordDone runs a
+    // RIPPLE: green stops at the first input that is not green, because a
+    // claim may be word for word fine and still rest on ground that moved.
+    const claimful = new Set(m.states.filter((s) => s.evidence_form.length > 0 || s.submachine !== undefined).map((s) => s.id));
+    const fallen = claimFeeders(m, stateId, claimful).filter((f) => !done.has(f));
+    if (fallen.length > 0) {
+      return [
+        {
+          kind: "fallen_input",
+          clause: CLAUSES.CONDITION_UNMET,
+          expected,
+          got: `${stateId}'s OWN claim may be fine. It is dropped because these inputs are not standing: ${fallen.join(", ")}`,
+          // NAME THE VERB, never just the word "re-earn" (i27, 2026-08-14).
+          // This remedy used to say se_pull with no arguments, which only
+          // repeats the refusal. The agent picked the verb whose NAME matched
+          // the sentence, chose se_reopen where se_amend was right, and the
+          // guess cost a person's bless and a six-milestone cascade.
+          //
+          // The engine already knows which verb fits, because it can ask the
+          // fallen claim whether its OWN content still passes.
+          remedy: this.fallenRemedy(fallen[0], m),
+          source: "engine/session.ts claim-guard",
+        },
+      ];
+    }
+    // AND WHEN NOTHING UPSTREAM FELL, SAY WHAT IS WRONG WITH THIS ONE (owner
+    // instruction 2026-08-13). The content check knows which field failed and
+    // what it wanted; a check reports in the words of the question IT asked.
+    const own = this.ownClaimProblems(stateId, m);
+    if (own.length > 0) {
+      return [
+        {
+          kind: "claim_content",
+          clause: CLAUSES.CONDITION_UNMET,
+          expected,
+          got: `${stateId}'s claim does not pass its own checks: ${own.join(" · ")}`,
+          remedy: {
+            tool: "se_pull",
+            args: {},
+            note: "fix the named field, then submit again — the claim re-stamps and the completion follows",
+          },
+          source: "engine/session.ts claim-guard",
+        },
+      ];
+    }
+    return [];
+  }
+
   stateBlockers(stateId: string): Blocker[] {
     const out: Blocker[] = [];
     const lint = this.stateFormGet(stateId) as {
@@ -5249,6 +5563,11 @@ export class Session {
         });
       }
     }
+    // THE CLAIM'S OWN BLOCKERS, from the same mechanism the walk's guard
+    // throws with. Before this the verb ran neither the ripple nor the
+    // content check, so it answered `standing: true` for a state the guard
+    // was dropping (owner instruction 2026-08-14).
+    out.push(...this.claimBlockers(stateId));
     if (lint.gate === true && !(lint.bless ?? "").startsWith("blessed")) {
       out.push({
         kind: "unblessed_gate",
@@ -6132,7 +6451,23 @@ export class Session {
       active: this.active(),
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
       status: this.instance.status,
-      autonomy: this._autonomy,
+      // WHERE A SATELLITE RUNS, on every packet so neither hand has to ask.
+      // One architecture, three transports — process, thread, inline — and the
+      // person flips it. `chosen: false` means the default is answering, which
+      // reads differently from a choice somebody made.
+      run: this.runBlock(),
+      // THE TIER IS THE ANSWER, AND THE NUMBER DOES NOT RIDE WITH IT (owner
+      // ruling 2026-08-14: "the number leaves the answer").
+      //
+      // req-autonomy-is-categorical says no numeric autonomy value survives on
+      // any surface. This packet is the surface the agent reads on every call,
+      // so it is where the number was most visible and least useful: nothing
+      // an agent does with the dial is arithmetic.
+      //
+      // THE WEIGHING STILL COMPARES NUMBERS INSIDE. That half is i14's — "every
+      // numeric priority left in the engine, the scale and the guidance goes" —
+      // and the requirement itself says cut over first, then remove, never both
+      // in one commit (raid-risk-autonomy-rework-breaks-walking).
       tier: tierOf(loadLevels(this.root), this._autonomy),
       // The server's clock, so no hand ever shells for the time (note-8acddaec).
       now: new Date().toISOString(),
@@ -6559,7 +6894,8 @@ export class Session {
       active: this.active(),
       ...(this.inSub() ? { submachine: { id: this.top()!.decl.id, active: activeStates(this.top()!.instance) } } : {}),
       status: this.instance.status,
-      autonomy: this._autonomy,
+      // The tier word, and no number (owner ruling 2026-08-14).
+      ...this.tierFor(this._autonomy),
       ...(this._emergency ? { emergency: true } : {}),
       power: this.power,
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },

@@ -75,6 +75,10 @@ checks:
       - ???
     hint: every entry carries its likelihood grade — the words live in meth-likelihood-scale
   - field: kind
+    equals: debt
+    require_section: Repayment
+    hint: a debt declares what repaying it consists of at the moment it is taken, not when somebody gets round to it
+  - field: kind
     equals: decision
     require_section: Rejected options
     hint: a decision keeps its losers on the record, or the choice cannot be argued with later
@@ -114,8 +118,10 @@ design-input chapter at once.
 Every conscious quick-and-dirty becomes an entry of kind `debt`, graded
 like the rest. DEBT IS VISIBLE OR IT IS LYING ([[meth-internal-quality]]).
 
-- The `trigger` is the payback condition — debt without one is filed
-  and forgotten.
+- The `trigger` is WHEN it comes back — debt without one is filed and
+  forgotten.
+- The Repayment SECTION is WHAT CLOSES IT, and the two are different
+  sentences (owner ruling 2026-08-15).
 - `mitigated` means repaid; `accepted` means lived with, on the record.
 - The implementation gate lists what the iteration took, in debt_taken.
 
@@ -245,6 +251,29 @@ somebody who already knew to look there.
 The state stands exactly while every standing assumption carries this field.
 Nothing else is counted, so a new assumption turns the state grey the moment
 it is written, which is what a standing artifact means.
+
+## The Repayment section, on every debt (owner ruling 2026-08-15)
+
+A debt declares WHAT REPAYING IT CONSISTS OF at the moment it is taken, not
+when somebody gets round to it. This is the assumption's Probe rule, applied
+to the sixth kind, and for the same reason: writing the check is what
+separates a debt from a shrug.
+
+TRIGGER AND REPAYMENT ARE DIFFERENT SENTENCES, and conflating them is what
+made this necessary.
+
+- TRIGGER answers WHEN. "Ready when the machine format is next touched."
+- REPAYMENT answers WHAT. "The two drawing mechanisms collapse into one, so a
+  seeded machine's steps and an authored machine's states are the same kind of
+  thing."
+
+THE MEASUREMENT THAT SET THE RULE. At i12's retro all six standing debts were
+swept. Every one carried a trigger. NOT ONE said what repayment would consist
+of, so each handed the next reader a wake-up call and no work.
+
+A REPAYMENT THAT CANNOT BE WRITTEN IS NOT A DEBT. Debt is quality traded for
+speed, consciously, and if nobody can say what buying it back looks like then
+nothing was traded — something was simply left undone, and that is an issue.
 
 ## The Probe section, on every assumption
 

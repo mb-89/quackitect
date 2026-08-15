@@ -13,20 +13,29 @@
 import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 
-// selftest runs with cwd = project/deliverable, so the root is two up. A
-// reporter has no argv of its own to be told this.
-const ROOT = join(process.cwd(), "..", "..");
-const OUT = join(ROOT, ".se", "test-timings.jsonl");
+// THE SPAWNER TELLS IT WHERE TO WRITE. A reporter has no argv of its own, so
+// it used to derive the root from its working directory — a guess about who
+// spawned it, and wrong for any caller that does not chdir into
+// project/deliverable. Every write below is inside a try that swallows its
+// error, so a wrong guess loses the records without a sound.
+//
+// The cwd form stays as the fallback, for a hand-run that sets nothing.
+const SE =
+  process.env.SE_TIMINGS_DIR !== undefined && process.env.SE_TIMINGS_DIR !== ""
+    ? process.env.SE_TIMINGS_DIR
+    : join(process.cwd(), "..", "..", ".se");
+const ROOT = dirname(SE);
+const OUT = join(SE, "test-timings.jsonl");
 // THE LAST RUN, STANDING (owner, 2026-08-02): one findable summary, replaced
 // per run, so the retro reads the hotspots without aggregating the append log.
-const LAST = join(ROOT, ".se", "test-last-run.json");
+const LAST = join(SE, "test-last-run.json");
 
 // THE BEAT FILE: one line per finished CASE, appended AS IT HAPPENS. The
 // end-of-run record cannot serve a killed run; this stream survives any
 // kill, so a poll reads live counts and a kill names what was mid-flight.
 // Per-case, not per-suite: suite events fire once per top-level group, so
 // counting them ran past the file total on the first real run.
-const PROGRESS = join(ROOT, ".se", "test-progress.jsonl");
+const PROGRESS = join(SE, "test-progress.jsonl");
 
 export default async function* timings(source) {
   const run = new Date().toISOString();

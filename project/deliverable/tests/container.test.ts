@@ -131,12 +131,27 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
   await s.advance(sidB);
   assert.deepEqual(s.active(), [`expeditions/${sidB}`]);
   assert.ok(s.workRoot().includes(b.created), "entering bound the worktree");
-  // ONE LANE, TWO TREES (owner ruling 2026-07-28). Project content follows the
-  // walk into the worktree; `.se/` is SESSION state and stays at the project
-  // root. The handover used to resolve into the worktree, which has no .se —
-  // so it was written where the next session never looks, and failed silently.
-  assert.equal(s.laneRoot(anyGuidanceDoc()), s.workRoot(), "project content rides the branch");
+  // ONE LANE, THREE KINDS (owner ruling 2026-07-28, refined 2026-08-14 when
+  // SE-C-134 was retired). Each kind gets its own answer, and mixing any two
+  // of them is a bug this line exists to catch.
+  //
+  //   SHARED METHOD belongs to the MACHINE. Guidance resolves to the root
+  //   whatever tree is bound, so a method change made from inside a record
+  //   cannot land in a tree that does not own it and fan out at the merge.
+  //   That danger is real: on 2026-08-07 it deleted two lane verbs.
+  //
+  //   SESSION state stays at the project root. The handover used to resolve
+  //   into the worktree, which has no .se — so it was written where the next
+  //   session never looks, and failed silently.
+  //
+  //   THE RECORD'S OWN CONTENT rides the branch. That is what binding is for.
+  assert.equal(s.laneRoot(anyGuidanceDoc()), root, "shared method belongs to the machine, never to a branch");
   assert.equal(s.laneRoot(".se/HANDOVER.md"), root, "the handover belongs to the root, whatever branch we stand on");
+  assert.equal(
+    s.laneRoot(`project/spec/expeditions/${b.created}/evidence/scratch.md`),
+    s.workRoot(),
+    "the record's own content rides the branch",
+  );
   assert.equal(s.laneRoot(), s.workRoot(), "no path named — the work root, as before");
   // The leave gate holds until the page passes; then close, end, return.
   await assert.rejects(

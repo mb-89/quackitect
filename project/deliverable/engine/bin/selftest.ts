@@ -19,8 +19,8 @@ import { spawn, spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { availableParallelism } from "node:os";
 import { join, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
 import { killTree } from "../run.ts";
+import { TIMINGS_DIR_ENV, testConcurrency, testReporterArgs } from "../testreporters.ts";
 
 function argValue(flag: string): string | undefined {
   const i = process.argv.indexOf(flag);
@@ -46,6 +46,21 @@ if (process.env.SE_SELFTEST_SKIP === "1") {
 
 const root = resolve(argValue("--root") ?? process.cwd());
 const dir = join(root, "project", "deliverable");
+// THE RECORDS GO WHERE THE LANE READS THEM, which is not always beside the
+// tree being tested. While an iteration is bound, `root` is that iteration's
+// WORKTREE, so a run records into a .se nothing ever opens: two green
+// batteries on 2026-08-15 wrote 1301 rows each into a directory the lane does
+// not resolve, and their output said nothing about it.
+//
+// The spawner passes the lane's own .se. The local one is the fallback for a
+// hand-run that sets nothing.
+const seHome =
+  process.env[TIMINGS_DIR_ENV] !== undefined && process.env[TIMINGS_DIR_ENV] !== ""
+    ? String(process.env[TIMINGS_DIR_ENV])
+    : join(root, ".se");
+// A RUN SAYS WHERE IT RECORDED. The defect above was invisible until somebody
+// diffed a line count.
+process.stdout.write(`timings home: ${seHome}\n`);
 const testsDir = join(dir, "tests");
 if (!existsSync(testsDir)) {
   process.stdout.write(`selftest: no tests at ${testsDir}\n`);
@@ -54,18 +69,10 @@ if (!existsSync(testsDir)) {
 const files = readdirSync(testsDir)
   .filter((f) => f.endsWith(".test.ts"))
   .map((f) => join("tests", f));
-// EVERY RUN IS TIMED (owner ruling 2026-07-31). Two reporters: the ordinary
-// one keeps the human output exactly as it was, and test-timings writes the
-// per-test record to .se/ for the retro to read. A suite whose cost is only
-// visible when somebody goes looking is a suite nobody measures.
-const REPORTERS = [
-  "--test-reporter=spec",
-  "--test-reporter-destination=stdout",
-  // A file:// URL, not a path. On Windows the ESM loader reads a bare
-  // absolute path as the protocol "c:" and refuses.
-  `--test-reporter=${pathToFileURL(join(dir, "engine", "bin", "test-timings.mjs")).href}`,
-  "--test-reporter-destination=stderr",
-];
+// EVERY RUN IS TIMED (owner ruling 2026-07-31). The reporter pair is built in
+// engine/testreporters.ts, shared with the scoped path so the two cannot drift
+// apart again — the scoped one carried no timing reporter at all until i12.
+const REPORTERS = testReporterArgs("spec");
 // THE CAP OUTGREW ITS SUITE ONCE (2026-08-02): the pull-lane tests pay a
 // real boot walk each, the wall clock crossed the old 110s, and spawnSync
 // KILLED the run mid-stream — truncated output, no summary, an exit code
@@ -74,7 +81,7 @@ const CAP_MS = 300_000;
 // The cap kills the WHOLE TREE — spawnSync killed only the runner and left
 // its per-file workers orphaned (two held a folder lock for four hours,
 // 2026-08-02).
-const lastRunPath = join(root, ".se", "test-last-run.json");
+const lastRunPath = join(seHome, "test-last-run.json");
 const prior = (() => {
   try {
     const rec = JSON.parse(readFileSync(lastRunPath, "utf8")) as {
@@ -94,10 +101,10 @@ const prior = (() => {
 const startedAt = Date.now();
 // The reporter appends a beat per finished file; the header is the parent's,
 // so a poll can answer N of M and a kill can name what never finished.
-const progressPath = join(root, ".se", "test-progress.jsonl");
+const progressPath = join(seHome, "test-progress.jsonl");
 const expectedFiles = files.map((f) => `project/deliverable/${f.replace(/\\/g, "/")}`);
 try {
-  mkdirSync(join(root, ".se"), { recursive: true });
+  mkdirSync(seHome, { recursive: true });
   writeFileSync(
     progressPath,
     `${JSON.stringify({ start: new Date(startedAt).toISOString(), files_total: expectedFiles.length, cores: availableParallelism(), ...(prior.tests !== undefined ? { tests_last_run: prior.tests } : {}) })}\n`,
@@ -142,12 +149,16 @@ function snapshotWorkers(): string {
   }
 }
 const r = await new Promise<{ status: number | null; killed: boolean; out: string }>((resolveRun) => {
-  const child = spawn(process.execPath, ["--test", ...REPORTERS, ...files], {
-    cwd: dir,
-    windowsHide: true,
-    detached: process.platform !== "win32",
-    env: { ...process.env, SE_SELFTEST_SKIP: "1" },
-  });
+  const child = spawn(
+    process.execPath,
+    ["--test", `--test-concurrency=${String(testConcurrency(availableParallelism()))}`, ...REPORTERS, ...files],
+    {
+      cwd: dir,
+      windowsHide: true,
+      detached: process.platform !== "win32",
+      env: { ...process.env, SE_SELFTEST_SKIP: "1", [TIMINGS_DIR_ENV]: seHome },
+    },
+  );
   let acc = "";
   let killed = false;
   const timer = setTimeout(() => {

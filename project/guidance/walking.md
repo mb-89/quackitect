@@ -18,7 +18,7 @@ proof, the position.
 ## The pull
 
 One call, one optional payload. It answers with an INSTRUCTION, and `pull`
-names which of five you got.
+names which of four you got.
 
 - `read` — a document rides in `document`; `prove` names its last words. Read
   it, pull again with `form: {"read": "<those words>"}`. Keep going until no
@@ -63,7 +63,8 @@ names which of five you got.
 
   RE-DERIVING A STANDING CLAIM IS WASTE, and it is the waste this block exists
   to stop. A reopened form used to arrive looking exactly like a fresh one.
-- `choose` — the road splits; the options ride along with weight and
+- OPTIONS RIDE A `do` — there is no separate `choose` instruction, and the
+  engine has never emitted one. Where the road splits; the options ride along with weight and
   openness. Answer `form: {"choice": "<to>"}` only when a routed goal needs
   that door. A LIST is legal where work fans out; one is walked, the rest
   come back as `not_walked`. You never choose unasked, and you do not choose

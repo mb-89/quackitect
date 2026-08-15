@@ -34,6 +34,7 @@ import { appendFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
+import { SE_VERSION } from "../version.ts";
 
 const argv = [
   ...process.argv.slice(2),
@@ -137,6 +138,18 @@ ENGINE — read by the server (this file is where they are defined).
 
   --root         the project root (holds project/ and workspace/);
                  file lane serves that tree, call log lands in <root>/.se/
+  --mode         WHERE SATELLITES RUN: process | thread | inline.
+                 process (default) a child per record — a crash stays with the
+                                   record that caused it
+                 thread            a worker per record — cheaper to start, and
+                                   a hard crash takes everything
+                 inline            no crossing at all — the BASELINE the other
+                                   two are measured against
+                 One architecture either way: core, satellite and channel are
+                 always there, and only the boundary moves. The flag decides
+                 THIS RUN and does not overwrite what the mirror last stored;
+                 the stored choice lives in <root>/.se/mode.json and is what a
+                 host launching from a fixed .mcp.json reads.
   --autonomy     0..1 — which states the AGENT enters by itself (priority <=
                  autonomy). 0: every step is the human's; 1: fully autonomous.
                  Default 0.4. Env: SE_AUTONOMY. Live-adjustable in the mirror.
@@ -153,7 +166,8 @@ ENGINE — read by the server (this file is where they are defined).
   --help         this text (-h, -?, -Help)
 
   RELOAD: se_reload (agent or mirror hand, at idle only) restarts the
-  engine onto the current sources without a reconnect — the walk reboots.
+  engine onto the current sources without a reconnect — the walk reboots at
+  start and returns to its aimed target.
   Nothing ever swaps on its own. SE_HOT_DISABLE=1 runs in-process instead.
 `);
   process.exit(0);
@@ -270,7 +284,26 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
 
   const autonomyRaw = argValue("--autonomy") ?? argValue("--threshold") ?? process.env.SE_AUTONOMY ?? process.env.SE_THRESHOLD;
 
+  // WHERE SATELLITES RUN, for THIS run only. One architecture, three
+  // transports — process, thread, inline — and the argument wins over the
+  // stored choice WITHOUT overwriting it, so a measurement run cannot silently
+  // change what the person set from the mirror.
+  //
+  // A BAD VALUE STOPS THE LAUNCH, and that is deliberate: an unreadable stored
+  // setting falls back to the default quietly, but a person who typed a mode
+  // by hand is owed the news that it was not a mode.
+  const { modeForRun } = await import("../mode.ts");
+  let runMode: string;
+  try {
+    runMode = modeForRun(root, argValue("--mode") ?? process.env.SE_MODE);
+  } catch (e) {
+    process.stderr.write(`se-mcp: ${String((e as Error).message)}\n`);
+    process.exit(1);
+  }
+  process.stderr.write(`se-mcp: satellites run ${runMode}\n`);
+
   const session = new Session(root); // fails fast on a misdrawn machine
+  session.noteRunningMode(runMode); // the packet must report what RAN, not what is stored
   if (autonomyRaw !== undefined) session.setAutonomy(Number(autonomyRaw)); // refuses out-of-range
   // SESSION OVER — reaching end stops everything. The grace period lets the
   // closing tool response flush to stdout and the mirror serve its red page.
@@ -337,7 +370,7 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
     bootMirror();
   }
 
-  process.stderr.write(`se-mcp 3.0.0-bootstrap root=${root} autonomy=${session.autonomy}${headless ? " headless" : ""}\n`);
+  process.stderr.write(`se-mcp ${SE_VERSION} root=${root} autonomy=${session.autonomy}${headless ? " headless" : ""}\n`);
   if (!headless) {
     runStdio(mcpServer, () => {
       process.stderr.write("se-mcp: the console quit — telling the mirror, then shutting down\n");

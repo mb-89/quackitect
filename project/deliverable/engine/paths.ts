@@ -209,6 +209,48 @@ export function pathKind(rel: string): PathKind {
  *  it. */
 export const fansOut = (rel: string): boolean => pathKind(rel) === "method";
 
+/** WHO OWNS THIS PATH. Routing, which is NOT resolution.
+ *
+ *  THE DISTINCTION IS THE SEAM'S MOST IMPORTANT RULE. A path that RESOLVES
+ *  outside its record is a misresolution and is refused. A call naming a
+ *  different OWNER is not that — it is a routing decision, and refusing it
+ *  would close the door that method changes and commits both use.
+ *
+ *  Confusing the two is what SE-C-134 does today: it refuses a method write
+ *  from inside a record, where the honest answer is that the core owns method
+ *  and the call belongs there.
+ *
+ *  THIS FUNCTION NEVER REFUSES. It answers who owns the path and stops. */
+export type Owner = { kind: "core" } | { kind: "record"; container: "iterations" | "expeditions"; id: string } | { kind: "bound" };
+
+/** THE MACHINE ROOT, derived from any root.
+ *
+ *  A record's worktree lives at <machine>/.worktrees/<id>, so the machine
+ *  root is whatever stands before that. Derivable rather than passed, which
+ *  is what makes the seam adoptable: a caller that knows ONE root can still
+ *  send session state and shared method to the right place.
+ *
+ *  THIS IS THE 2026-08-14 DEFECT'S ROOT CAUSE. se_lint resolved
+ *  `.se/HANDOVER.md` against a worktree while the file lane resolved it
+ *  against the machine root. Both were correct against their own ambient
+ *  root, and neither answer said which. */
+export function machineRootOf(root: string): string {
+  const m = /^(.*)[\\/]\.worktrees[\\/][^\\/]+$/.exec(root);
+  return m === null ? root : m[1];
+}
+
+export function routeToOwner(rel: string): Owner {
+  const kind = pathKind(rel);
+  // Session state and method are machine-wide. One copy, served by the core —
+  // which is what lets a method change reach every tree without the caller
+  // stepping out of anything.
+  if (kind === "session" || kind === "method") return { kind: "core" };
+  const owner = recordOwnerOf(rel);
+  if (owner !== undefined) return { kind: "record", container: owner.container, id: owner.id };
+  // Everything else rides the tree the walk is working in.
+  return { kind: "bound" };
+}
+
 /** EVERY METHOD FILE IN A TREE, root-relative.
  *
  *  THE FAN-OUT ALONE WAS NOT ENOUGH. It copies a method file when that file

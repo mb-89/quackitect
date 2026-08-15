@@ -11,8 +11,10 @@
 
 import { spawn } from "node:child_process";
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
+import { availableParallelism } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { setAnswerSpill } from "./bound.ts";
 import { CallLog } from "./calllog.ts";
 import { parseUpdate } from "./decisions.ts";
 import {
@@ -39,13 +41,16 @@ import { bumpDrawingEpoch } from "./machines/compile.ts";
 import { McpServer, requestContextAdapter, type ToolDef } from "./mcp.ts";
 import { ModelFileSystem } from "./model-fs.ts";
 import { openPanel } from "./panel.ts";
-import { fansOut, resolveInRoot, seDir } from "./paths.ts";
+import { resolveInRoot, seDir } from "./paths.ts";
 import { type MirrorState, renderMirror } from "./render.ts";
+import { resolve as resolveSeam } from "./resolve.ts";
 import { jobDone, jobList, jobStatus, jobStop, runBackground, runToCompletion, startJob } from "./run.ts";
 import { Session } from "./session.ts";
 import { shoot } from "./shoot.ts";
 import { survey } from "./survey.ts";
+import { TIMINGS_DIR_ENV, testConcurrency, testReporterArgs, timedSince, timingReport } from "./testreporters.ts";
 import { Toll } from "./toll.ts";
+import { SE_VERSION } from "./version.ts";
 import { webFetch, webSearch } from "./web.ts";
 
 const BIOME_BIN = fileURLToPath(new URL("../node_modules/@biomejs/biome/bin/biome", import.meta.url));
@@ -217,10 +222,25 @@ export function sessionTools(session: Session): ToolDef[] {
         "AIM THE WALK at a state, then pull and be carried there. The machine draws the route and walks every hop whose conditions already pass, stopping only where something is genuinely owed — so a state that is already green is walked THROUGH, never landed on. Name any state in the machine you stand in, or a fully qualified one like iterations/i1/write-requirements. THIS IS HOW YOU MOVE: taking an offered door aims one hop, which draws a route one segment long and lands you on every state in between. Aim far instead. Aiming is not walking and changes nothing — the pull still refuses whatever the conditions and the dial refuse.",
       inputSchema: {
         type: "object",
-        properties: { to: { type: "string", description: "the state to aim at — the route is drawn to it and the pull follows it" } },
+        properties: {
+          to: { type: "string", description: "the state to aim at — the route is drawn to it and the pull follows it" },
+          go: {
+            type: "boolean",
+            description:
+              "TAKE ME THERE IN THIS CALL. Aiming alone only draws the route; with go the machine walks it and the answer says whether it ARRIVED. Nothing is owed on the way means one call and you are there. Something owed means it stops on that state and says which, and the walk stands where it stopped — never between two states.",
+          },
+        },
         required: ["to"],
       },
-      handler: (args) => session.setTarget(String(args.to)),
+      handler: async (args) => {
+        const aimed = session.setTarget(String(args.to));
+        if (args.go !== true) return aimed;
+        // req-a-clear-jump-is-one-call: the caller named the target and asked
+        // to be taken there in the SAME call, so the sweep runs here rather
+        // than waiting for a pull. The sweep is time-bounded, so this answers
+        // whether or not the whole route fits.
+        return { ...aimed, ...(await session.sweep(String(args.to), "agent")) };
+      },
     },
     {
       name: "se_why",
@@ -239,13 +259,18 @@ export function sessionTools(session: Session): ToolDef[] {
       name: "se_reopen",
       title: "se.reopen",
       description:
-        "SEND A STANDING CLAIM BACK to be re-earned. Use it when the work is wrong or its ground moved — the state goes grey, its form is owed again, and everything downstream falls with it because green ripples through the feeders. The SIGNATURE IS KEPT: a reopen records that the claim must be re-done, it never erases who signed it or when. Re-submitting stamps a newer signature, which clears the mark by itself. FOR A SMALL FIX THAT DOES NOT CHANGE THE CLAIM — a renamed reference, a moved path, a typo — use se_amend instead, which leaves the tree standing.",
+        "SEND A STANDING CLAIM BACK to be re-earned. Use it when the work is WRONG — the state goes grey, its form is owed again, and everything downstream falls with it because green ripples through the feeders. The SIGNATURE IS KEPT, but a BLESS IS NOT: a reopen of a claim a person blessed is refused unless you pass confirm, and the refusal names how many states fall with it. WHEN THE GROUND MOVED BUT THE CLAIM'S OWN CONTENT STILL PASSES, use se_amend instead — it fixes the field and leaves the tree standing, the bless with it. A fallen-input refusal now names which of the two fits.",
       inputSchema: {
         type: "object",
         properties: {
           state: { type: "string", description: "the state whose claim must be re-earned" },
           reason: { type: "string", description: "why it stopped standing — one line, and the record keeps it" },
           machine: { type: "string", description: "which machine the state belongs to — needed from outside it, e.g. i1" },
+          confirm: {
+            type: "boolean",
+            description:
+              "required only when the claim carries a PERSON'S bless — the reopen destroys that adjudication, and the refusal says how many states fall with it",
+          },
         },
         required: ["state", "reason"],
       },
@@ -255,6 +280,7 @@ export function sessionTools(session: Session): ToolDef[] {
           String(args.reason),
           "agent",
           args.machine === undefined ? undefined : String(args.machine),
+          args.confirm === true,
         ),
     },
     {
@@ -869,7 +895,7 @@ export function coreTools(
       name: "se_test",
       title: "se.test",
       description:
-        "Run tests STRUCTURED as a durable job. Starting returns a handle immediately. Call again with {job} to read current status or the final verdict. Scoped runs use files and optional name_pattern, and MUST state the question they answer. NO ARGUMENTS runs the earned battery, whose question is fixed. AN UNCHANGED TREE REFUSES its scope unless force is true.",
+        "Run tests STRUCTURED as a durable job. Starting returns a handle immediately. Call again with {job} to read current status or the final verdict. Scoped runs use files and optional name_pattern, and MUST state the question they answer. NO ARGUMENTS runs the earned battery, whose question is fixed. AN UNCHANGED TREE REFUSES its scope unless force is true. EVERY RUN RECORDS ITS TIMINGS — one row per case, appended where the lane can read them — and the verdict says how many cases it timed, so a silent instrument failure shows instead of passing as green. Mine them with se_log_query's min_ms filter.",
       inputSchema: {
         type: "object",
         properties: {
@@ -900,12 +926,21 @@ export function coreTools(
         // orphaned workers held a folder lock for four hours). Children run
         // in the job registry — whole-tree killed on timeout, reaped at
         // shutdown, visible to se_run {jobs: true}.
-        const spawnNode = async (argv: string[], cwd = root): Promise<{ status: number | null; out: string }> => {
+        const spawnNode = async (
+          argv: string[],
+          cwd = root,
+          extraEnv: Record<string, string> = {},
+        ): Promise<{ status: number | null; out: string }> => {
           let out = "";
           const started = startJob(
             `node --test (${argv.length} args)`,
             () => {
-              const child = spawn("node", argv, { cwd, windowsHide: true, detached: process.platform !== "win32" });
+              const child = spawn("node", argv, {
+                cwd,
+                windowsHide: true,
+                detached: process.platform !== "win32",
+                env: { ...process.env, ...extraEnv },
+              });
               child.stdout?.setEncoding("utf8");
               child.stderr?.setEncoding("utf8");
               child.stdout?.on("data", (c: string) => {
@@ -928,12 +963,15 @@ export function coreTools(
           if (named) scopedGate(se, root, files, force);
           const argv = [
             "--test",
-            "--test-reporter=tap",
+            `--test-concurrency=${String(testConcurrency(availableParallelism()))}`,
+            ...testReporterArgs("tap"),
             ...(args.name_pattern !== undefined ? [`--test-name-pattern=${String(args.name_pattern)}`] : []),
             ...files.map((f) => resolveInRoot(root, f, "engine/tools.ts se_test")),
           ];
-          const r = await spawnNode(argv);
+          const startedAt = Date.now();
+          const r = await spawnNode(argv, root, { [TIMINGS_DIR_ENV]: se });
           const tap = parseTap(r.out);
+          const timed = timedSince(se, startedAt);
           const ok = r.status === 0 && tap.fail === 0;
           const streak = testRecord(se, root, ok, scope, files, question);
           const nudge = streakNudge(streak);
@@ -946,9 +984,10 @@ export function coreTools(
             question,
             scope: { files, ...(args.name_pattern !== undefined ? { name_pattern: String(args.name_pattern) } : {}) },
             tests: { total: tap.total, pass: tap.pass, fail: tap.fail },
+            ...timingReport(timed, tap.total),
             ...(tap.failures.length > 0 ? { failures: tap.failures } : {}),
             ...(nudge !== undefined ? { green_streak: streak, nudge } : {}),
-            ...(r.status !== 0 && tap.total === 0 ? { output: capMiddle(r.out.trim(), 4000) } : {}),
+            ...(tap.total === 0 ? { output: capMiddle(r.out.trim(), 4000) } : {}),
           };
         };
         // The battery: EARNED, not habitual. The gate computes the scoped
@@ -974,7 +1013,7 @@ export function coreTools(
             const abs = resolveInRoot(root, rel, "engine/tools.ts se_test");
             // The battery is long BY DESIGN now that boot walks read real
             // guidance — 150s killed it mid-run. Configurable, generous default.
-            const r = await spawnNode([abs, "--root", root]);
+            const r = await spawnNode([abs, "--root", root], root, { [TIMINGS_DIR_ENV]: se });
             results.push({ script: rel, ok: r.status === 0, exit: r.status, output: capMiddle(r.out.trim(), 4000) });
           }
           const ok = results.every((x) => x.ok);
@@ -1156,7 +1195,13 @@ export function coreTools(
         },
       },
       handler: (args) => {
-        const root = rootOf();
+        // THE ROOT-PICKER TAKES A PATH, and se_lint called it with none.
+        // That is the whole of the 2026-08-14 defect: laneRoot(rel) already
+        // chose the right tree per path kind, and this handler asked for the
+        // default instead, so `.se/...` resolved into whatever worktree was
+        // bound. The per-path calls are below; this one is only for lintProse,
+        // which reads configuration rather than the file under test.
+        const root = rootOf(LINT_CONFIG);
         // THE SWEEP. Linting one file at a time is why nothing was ever
         // linted: the tool could only be pointed at prose somebody already
         // suspected. Only files WITH findings come back, so a clean tree
@@ -1174,7 +1219,14 @@ export function coreTools(
             // AGAIN as separate strings — two passes, duplicate findings, and
             // only the two keys somebody remembered to list. lintProse reads
             // every prose key now and tags each finding with its own.
-            const raw = readFileSync(resolveInRoot(root, p, "engine/tools.ts se_lint"), "utf8");
+            // THROUGH THE SEAM (i27 seam-sweep, 2026-08-14). This used to
+            // call resolveInRoot with se_lint's own ambient root, so a lint
+            // run inside a record resolved `.se/...` into the worktree while
+            // the file lane served the same path from the machine root.
+            // Neither answer said which. resolve() picks the store from what
+            // the path IS, so both lanes now reach one tree.
+            const at = resolveSeam(rootOf(p), p, "engine/tools.ts se_lint");
+            const raw = readFileSync(at.abs, "utf8");
             const findings: unknown[] = lintProse(root, raw, p);
             return { path: p, count: findings.length, findings };
           };
@@ -1201,9 +1253,12 @@ export function coreTools(
               source: "engine/tools.ts se_lint",
             });
           }
-          const abs = resolveInRoot(root, p, "engine/tools.ts se_lint");
-          const findings = lintProse(root, readFileSync(abs, "utf8"), p);
-          return { path: p, findings, count: findings.length, config: LINT_CONFIG };
+          // THROUGH THE SEAM, and the answer NAMES ITS STORE. This is the
+          // exact call that answered ENOENT against a worktree on 2026-08-14
+          // while se_file_read served the same path from the machine root.
+          const at = resolveSeam(rootOf(p), p, "engine/tools.ts se_lint");
+          const findings = lintProse(root, readFileSync(at.abs, "utf8"), p);
+          return { path: p, store: at.store, findings, count: findings.length, config: LINT_CONFIG };
         }
         if (typeof args.text === "string") {
           const findings = lintProse(root, args.text);
@@ -1543,6 +1598,9 @@ export function buildServer(
   session = new Session(root),
   tollOpts: { windowMs?: number; now?: () => number } = {},
 ): McpServer {
+  // WHERE AN OVERSIZED ANSWER SPILLS, so the bound can page rather than only
+  // point. Machine-local and never committed.
+  setAnswerSpill(seDir(root));
   // (a fresh Session fails fast on a misdrawn machine)
   const tools = [
     ...sessionTools(session),
@@ -1603,7 +1661,7 @@ export function buildServer(
   };
   for (const t of tools) (t.inputSchema.properties as Record<string, unknown>).update = UPDATE_PROP;
   const server = new McpServer(
-    { name: "se-mcp", version: "3.0.0-bootstrap" },
+    { name: "se-mcp", version: SE_VERSION },
     tools,
     requestContextAdapter({ workspaceId: `workspace-${contentHash(root)}` }),
   );
@@ -1674,27 +1732,22 @@ export function buildServer(
   server.addGuard((tool) => {
     if (WRITE_TOOLS.has(tool)) session.forgetRoute();
   });
-  server.addGuard((tool, args) => {
-    if (!WRITE_TOOLS.has(tool) || session.workRoot() === root) return;
-    const paths: string[] = [];
-    for (const k of ["path", "glob", "from", "to"]) if (typeof args[k] === "string") paths.push(args[k] as string);
-    if (Array.isArray(args.ops)) {
-      for (const op of args.ops as Record<string, unknown>[]) if (typeof op.path === "string") paths.push(op.path);
-    }
-    const offending = paths.filter((p) => fansOut(p));
-    if (offending.length === 0) return;
-    throw new Rejection({
-      clause: CLAUSES.METHOD_WRITE_BOUND,
-      expected: "a method write from trunk — step out of the record first",
-      got: `${offending.join(", ")} — written while a record's worktree is bound`,
-      remedy: {
-        tool: "se_pull",
-        args: { escape: "method cannot be changed from inside a record" },
-        note: "escape to the front desk, make the edit there, then aim back. The walk is left standing, so nothing is lost. A record's OWN evidence is never refused here.",
-      },
-      source: "engine/tools.ts method guard",
-    });
-  });
+  // SE-C-134 STOOD HERE, and it is retired (owner ruling 2026-08-14).
+  //
+  // It refused a method write made from inside a record, because such a write
+  // landed in the record's own worktree and then fanned out over trunk at the
+  // merge. That really happened on 2026-08-07: it overwrote trunk's tool list
+  // and deleted two lane verbs.
+  //
+  // THE REFUSAL IS REPLACED BY A RESOLUTION, never merely dropped. Shared
+  // method now resolves to the MACHINE ROOT whatever tree is bound, in
+  // session.laneRoot, which is what resolve.ts already said in storeFor. A
+  // method write cannot land in a tree that does not own it, so there is
+  // nothing left to refuse.
+  //
+  // WHAT IT COST WHILE IT STOOD: escape to the desk, edit, aim back, and a
+  // 44-hop replay that timed out twice on the way in. Six times in one
+  // session on 2026-08-14, and twice more the day it was removed.
 
   let updateComplaint: RejectionPayload | undefined;
   let updateRejection: Rejection | undefined;

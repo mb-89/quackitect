@@ -100,3 +100,44 @@ THE RECORDED TRADEOFF: the corpus decomposes per candidate, inside solution
 elaboration, and compares structures. This machine compares at pick grain
 and decomposes ONCE, after the winner — one decomposition instead of five,
 at the price that the scores judged mechanisms, not structures.
+
+## A FLOW THAT CROSSES THE EDGE BECOMES AN INTERFACE TO ITS NEIGHBOUR
+
+Owner ruling 2026-08-15: "Obviously we have interfaces to our neighbours.
+They need to be modelled. In the early phases, neighbours have flows, and
+then when we make the flows concrete, they have interfaces. There is no way
+around this."
+
+THE LAW, checked both ways like every other coverage law here.
+
+- Every flow marked `crosses: in` or `crosses: out` has an interface naming
+  the element on our side and the NEIGHBOUR on theirs.
+- Every element-to-neighbour interface carries at least one crossing flow.
+
+Direction in means the neighbour is the source. Direction out means the
+neighbour is the sink. `nbr-` is a legal target for an interface edge, which
+before this ruling it was not.
+
+## Why this state and not M4
+
+M4's flow closure EXCUSES a crossing flow the half that faces the world, and
+that is right: at M4 there is no design yet to name the other side. The
+excusal was never collected anywhere.
+
+THE MEASUREMENT THAT SET THE RULE, 2026-08-15: 26 flows carried `crosses:`,
+40 interfaces existed, and a search of every interface and element file for
+`nbr-` returned ZERO. Twenty-six declarations that something crosses the
+edge, and not one saying what is on the other side.
+
+Among them were flow-surface and flow-instruction crossing out — the person's
+screen and the agent's answer — and flow-intent crossing in, the person's own
+words. The three boundaries the product exists to serve, each declared at M4
+and then dropped.
+
+THE GENERAL SHAPE, worth more than this instance: AN EXEMPTION GRANTED IN AN
+EARLY PHASE IS A DEBT ON A LATER ONE. Wherever a law says "excused here",
+something must collect it later, or the excusal is a silent permanent hole.
+
+THE ENGINE CHECK IS OWED. Until it lands the law holds by authorship at this
+state's submit, and trace-design re-checks it after the build like the other
+structural laws.

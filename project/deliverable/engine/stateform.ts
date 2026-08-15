@@ -15,6 +15,7 @@ import { clusterDsm, type Dsm, flowMatrix } from "./dsm.ts";
 import { type ElementMatrixView, elementMatrixView } from "./elematrix.ts";
 import type { FormTemplate } from "./forms.ts";
 import { pendingNotes } from "./inbox.ts";
+import { blockingRules, lintProse } from "./lint.ts";
 import type { EvidenceField, MachineDecl, StateDecl } from "./machine.ts";
 import { bare, type MorphBox, type MorphCell, type MorphLine, type MorphRow, orderLines, storedOrder } from "./morphbox.ts";
 import { noteOf, parseStateNote, readNode, section } from "./notes.ts";
@@ -704,7 +705,10 @@ function stateLawProblems(root: string, s: StateDecl, nodes: TraceNode[]): strin
   const out: string[] = [];
   if (s.id.endsWith("gate-prototype")) out.push(...assumptionLawProblems(nodes, catalogItems(root, "damage_levels")));
   if (s.id.endsWith("author-tests")) out.push(...authorTestsLawProblems(nodes));
-  if (s.id.endsWith("specify-build")) out.push(...specifyBuildLawProblems(nodes, root));
+  // THE RECORD IS THE SEGMENT BEFORE THE STATE. The id arrives as
+  // `i12/specify-build` here and `iterations/i12/specify-build` elsewhere, so
+  // counting from the end is the reading that holds for both.
+  if (s.id.endsWith("specify-build")) out.push(...specifyBuildLawProblems(nodes, root, s.id.split("/").at(-2)));
   if (s.id.endsWith("trace-design")) out.push(...traceDesignLawProblems(nodes, root));
   if (s.id.endsWith("fill-story-evidence")) out.push(...fillStoryLawProblems(nodes, false));
   if (s.id.endsWith("gate-validation")) out.push(...fillStoryLawProblems(nodes, true));
@@ -717,8 +721,12 @@ function stateLawProblems(root: string, s: StateDecl, nodes: TraceNode[]): strin
  *
  *  Files are NAMED, not existing: a spec is written before its code
  *  lands. Existence and the dead-code sweep get teeth at trace-design. */
-export function specifyBuildLawProblems(corpus: { id: string; type: string; file?: string }[], recordRoot: string): string[] {
-  return [...designCoverageProblems(corpus), ...promotionAssignmentProblems(corpus, recordRoot)];
+export function specifyBuildLawProblems(
+  corpus: { id: string; type: string; file?: string }[],
+  recordRoot: string,
+  record?: string,
+): string[] {
+  return [...designCoverageProblems(corpus), ...promotionAssignmentProblems(corpus, recordRoot, record)];
 }
 
 /** The coverage half, shared with trace-design: edges resolve, every
@@ -788,10 +796,11 @@ export function fillStoryLawProblems(corpus: { id: string; type: string; file?: 
 
 /** The step ids of the record's seeded chunk drawing, or undefined when
  *  none is seeded yet — assignment against no drawing checks names only. */
-function seededStepIds(recordRoot: string): Set<string> | undefined {
+function seededStepIds(recordRoot: string, only: string | undefined): Set<string> | undefined {
   const dir = join(recordRoot, "project", "spec", "iterations");
   try {
     for (const e of readdirSync(dir)) {
+      if (only !== undefined && e !== only) continue;
       const abs = join(dir, e, "machines", "build-chunks.md");
       if (!existsSync(abs)) continue;
       const fm = noteOf(abs)?.frontmatter ?? {};
@@ -812,10 +821,11 @@ function seededStepIds(recordRoot: string): Set<string> | undefined {
  *  UNDEFINED MEANS THE RECORD HAS NO FOLD-BACK, which is not the same as
  *  "folded nothing back". A minor strikes M6 whole, so it never has one. The
  *  caller falls back to the experiment's own owner there. */
-function foldBackExperiments(recordRoot: string): Set<string> | undefined {
+function foldBackExperiments(recordRoot: string, only: string | undefined): Set<string> | undefined {
   const dir = join(recordRoot, "project", "spec", "iterations");
   try {
     for (const e of readdirSync(dir)) {
+      if (only !== undefined && e !== only) continue;
       const abs = join(dir, e, "evidence", "fold-back.md");
       if (!existsSync(abs)) continue;
       const body = noteOf(abs)?.body ?? "";
@@ -827,11 +837,63 @@ function foldBackExperiments(recordRoot: string): Set<string> | undefined {
   return undefined;
 }
 
+/** THE RECORD THE WALK IS IN, as its directory name. The state id carries the
+ *  short id — `iterations/i12/specify-build` — and the directory is the one it
+ *  prefixes.
+ *
+ *  WHY IT IS NOT A SCAN. Both lookups above used to read whichever record
+ *  readdir handed back first, which is right only while one record's files sit
+ *  on disk. Landing i27's spec into i12's tree put two drawings and one
+ *  fold-back side by side, so i12 read its OWN drawing (i12- sorts first)
+ *  against i27's fold-back, and i27's promotions were swept against i12's
+ *  steps (2026-08-15). Both functions' doc comments already said "the
+ *  record's"; neither had a way to know which record that was.
+ *
+ *  UNDEFINED FALLS BACK TO THE SCAN. The unit fixtures call the laws directly
+ *  with no state, naming their record `itx` inside a temp root, so there is no
+ *  short id to resolve and the lone record on disk is the right answer. */
+/** A RECORD'S ONE NAME (owner ruling 2026-08-15): the short id. "Why are there
+ *  even two names? Just keep the short one, throw away the long one. We don't
+ *  need two names for one note."
+ *
+ *  Reducing every spelling to it before comparing is what makes the rename
+ *  safe to do in pieces: a folder still called `i12-some-long-slug`, a folder
+ *  called `i12`, a worktree named either way and a state id carrying just
+ *  `i12` all answer to the same record.
+ *
+ *  A name that is not id-shaped comes back unchanged, so the unit fixtures
+ *  naming their record `itx-here` keep matching on the prefix rule below. */
+function shortRecordId(s: string): string {
+  return /^([a-z]+\d+)/.exec(s)?.[1] ?? s;
+}
+
+function recordDirFor(recordRoot: string, record: string | undefined): string | undefined {
+  let names: string[];
+  try {
+    names = readdirSync(join(recordRoot, "project", "spec", "iterations"));
+  } catch {
+    return undefined;
+  }
+  // TWO WAYS TO NAME THE RECORD, tried in order, because neither answers
+  // everywhere. The state id carries the short id where the walk knows it, and
+  // its shape differs between callers. A BOUND TREE IS NAMED FOR ITS RECORD,
+  // so its own basename answers whenever work is bound — which is exactly when
+  // a second record's files can be sitting in the same tree.
+  for (const cand of [record, basename(recordRoot)]) {
+    if (cand === undefined || cand === "") continue;
+    for (const e of names) {
+      if (e === cand || e.startsWith(`${cand}-`) || shortRecordId(e) === shortRecordId(cand)) return e;
+    }
+  }
+  return undefined;
+}
+
 /** Promotions are a filter, never a list — and none may be lost: every
  *  promoted experiment carries `chunk:` naming its step in the drawing. */
-function promotionAssignmentProblems(corpus: { id: string; type: string; file?: string }[], recordRoot: string): string[] {
+function promotionAssignmentProblems(corpus: { id: string; type: string; file?: string }[], recordRoot: string, record?: string): string[] {
   const out: string[] = [];
-  const steps = seededStepIds(recordRoot);
+  const only = recordDirFor(recordRoot, record);
+  const steps = seededStepIds(recordRoot, only);
   // A PROMOTION BELONGS TO THE ITERATION THAT RAN THE SPIKE (owner ruling
   // 2026-08-13). It is a spike aimed at a later step of the SAME record and it
   // does not outlive it — exactly like the spike, which never travelled.
@@ -856,14 +918,16 @@ function promotionAssignmentProblems(corpus: { id: string; type: string; file?: 
   // So absence falls through to the experiment's OWN `minted_in`. An experiment
   // with no owner at all stays in scope: absence cannot prove it belongs to
   // somebody else, and the safe direction is to ask rather than to skip.
-  const own = foldBackExperiments(recordRoot);
-  const owner = basename(recordRoot);
+  const own = foldBackExperiments(recordRoot, only);
+  // THE OWNER IS COMPARED AS A SHORT ID, because minted_in carries the short
+  // form after the 2026-08-15 rename and the long one before it.
+  const owner = shortRecordId(only ?? basename(recordRoot));
   for (const n of corpus) {
     if (n.type !== "experiment" || n.file === undefined) continue;
     if (own !== undefined && !own.has(n.id)) continue;
     const fm = noteOf(n.file)?.frontmatter ?? {};
     const mintedIn = String(fm.minted_in ?? "").trim();
-    if (own === undefined && mintedIn !== "" && mintedIn !== owner) continue;
+    if (own === undefined && mintedIn !== "" && shortRecordId(mintedIn) !== owner) continue;
     const p = String(fm.promote ?? "").trim();
     if (p === "" || /^none\b/i.test(p)) continue;
     const chunk = String(fm.chunk ?? "").trim();
@@ -1178,9 +1242,51 @@ const rowId = (cells: string[]): string => (cells[0] ?? "").replace(/^\[\[|\]\]$
  *  minted prompt pass as a claim. */
 const unanswered = (v: string): boolean => v.trim() === "" || /^<!--[\s\S]*-->$/.test(v.trim());
 
+/** A CELL THAT LOST ITS TAIL, recognised by the mark a cut leaves.
+ *
+ *  A node-table cell lands verbatim on the node's frontmatter. On 2026-08-14
+ *  four of this record's experiments reached their nodes ENDING IN AN ELLIPSIS
+ *  with the clause that carried the meaning gone, and all four were rewritten
+ *  by hand (note-324983b06229).
+ *
+ *  NOTHING IN THIS ENGINE WRITES AN ELLIPSIS. A search of the whole deliverable
+ *  for the character as a string literal, and for any maxlength, returns
+ *  nothing, and neither the read half nor the write half of the node-table
+ *  shortens a cell. So the cut came from somewhere this code cannot see — a
+ *  host, or the author's own abbreviation.
+ *
+ *  THE GUARD DOES NOT NEED THE CULPRIT. Whatever cut it, a frontmatter value
+ *  that trails off is not an answer, and the one outcome that must not stand
+ *  is the SILENT one: the form shows the whole text, the node carries a
+ *  fragment, and the ellipsis reads as style rather than as loss. */
+const LOST_ITS_TAIL = /(?:…|\.\.\.)\s*$/;
+
+/** THE VOICE LINT AT SUBMIT, and the card decides which of its rules BITE.
+ *
+ *  `blocking:` in machines/lint/voice-lint.md names the rules that refuse.
+ *  Everything else the lint finds is a report and lets the submit through, so
+ *  a comma never stands in the way of a form.
+ *
+ *  WHY HERE RATHER THAN AT A LATER SWEEP. Prose written into a form is prose
+ *  the author is looking at right now. An overhaul that finds it weeks later
+ *  is finding it after the reader already read it.
+ *
+ *  ONLY PROSE. A table, a checklist and a reference list are STRUCTURE, and
+ *  running sentence rules over them would flag the shape of a form rather
+ *  than anything anybody wrote. */
+function voiceProblems(name: string, meta: TemplateMeta, content: string, root?: string): string[] {
+  if (root === undefined || meta.editor !== "text" || content.trim() === "") return [];
+  const bite = new Set(blockingRules(root));
+  if (bite.size === 0) return [];
+  return lintProse(root, content)
+    .filter((f) => bite.has(f.rule))
+    .map((f) => `${name}: ${f.rule} — ${f.hint} ("${f.excerpt}")`);
+}
+
 function nodeTableProblems(name: string, args: FieldArgs, content: string): string[] {
   const rows = content.split("\n").map(tableRow);
   const missing: string[] = [];
+  const cut: string[] = [];
   for (const id of args.items) {
     const row = rows.find((c) => rowId(c) === id);
     if (row === undefined) {
@@ -1188,10 +1294,19 @@ function nodeTableProblems(name: string, args: FieldArgs, content: string): stri
       continue;
     }
     for (const [i, c] of args.columns.entries()) {
-      if (unanswered(row[i + 1] ?? "")) missing.push(`${id}.${c}`);
+      const cell = row[i + 1] ?? "";
+      if (unanswered(cell)) missing.push(`${id}.${c}`);
+      else if (LOST_ITS_TAIL.test(cell)) cut.push(`${id}.${c}`);
     }
   }
-  return missing.length > 0 ? [`${name}: unanswered — ${missing.join(" · ")}`] : [];
+  const out: string[] = [];
+  if (missing.length > 0) out.push(`${name}: unanswered — ${missing.join(" · ")}`);
+  if (cut.length > 0) {
+    out.push(
+      `${name}: ends in an ellipsis, so it lost its tail — ${cut.join(" · ")}. This cell lands verbatim on the node, and a value that trails off reads as a whole sentence to whoever opens it. Type the rest, or say the whole thing shorter.`,
+    );
+  }
+  return out;
 }
 
 /** Which ROW each option belongs to: its design question where it names one,
@@ -1326,7 +1441,7 @@ export function fieldProblems(
   root?: string,
 ): string[] {
   if (meta.editor === "choice-rationale") return choiceProblems(name, args, content);
-  const out: string[] = [...refProblems(name, meta, args, content, corpus, root)];
+  const out: string[] = [...refProblems(name, meta, args, content, corpus, root), ...voiceProblems(name, meta, content, root)];
   // EVERY CELL IS REQUIRED. The rows are the register itself, so an empty
   // cell is a standing node nobody answered for — which is exactly the state
   // this field exists to refuse. "No check exists yet" is a legal answer and
