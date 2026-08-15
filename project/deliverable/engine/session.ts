@@ -711,7 +711,9 @@ export class Session {
       throw new Rejection({
         clause: CLAUSES.ABOVE_THRESHOLD,
         expected: "the autonomy at its top rung before emergency arms — it is a step past full delegation, never a way around it",
-        got: `autonomy ${this._autonomy}`,
+        // THE WORD, NEVER THE NUMBER (owner ruling 2026-08-14). Three refusal
+        // lines still carried the raw dial after i27 moved the rest.
+        got: `the autonomy sits at ${this.tierFor(this._autonomy).tier ?? "a lower rung"}`,
         remedy: { tool: "se_pull", args: {}, note: "raise the autonomy to the top rung first" },
         source: "engine/session.ts emergency",
       });
@@ -836,8 +838,8 @@ export class Session {
       if (t.priority > this._autonomy) {
         throw new Rejection({
           clause: CLAUSES.ABOVE_THRESHOLD,
-          expected: `a state within the session autonomy ${this._autonomy}`,
-          got: `${id} weighs ${t.priority} — this step is the human's`,
+          expected: `a state within this session's ${this.tierFor(this._autonomy).tier ?? "dial"}`,
+          got: `${id} is ${this.tierFor(t.priority).tier ?? "heavier"} work — this step is the person's`,
           remedy: {
             tool: "se_pull",
             args: {},
@@ -4811,8 +4813,8 @@ export class Session {
     if (by !== "human" && this._autonomy <= s.priority) {
       throw new Rejection({
         clause: CLAUSES.ABOVE_THRESHOLD,
-        expected: `a hand above this gate's weight — autonomy > ${s.priority}, or the human's thumb in the form`,
-        got: `agent at autonomy ${this._autonomy}`,
+        expected: `a hand above this gate's weight — ${this.tierFor(s.priority).tier ?? "heavier"} work, or the person's thumb in the form`,
+        got: `the agent stands at ${this.tierFor(this._autonomy).tier ?? "a lower rung"}`,
         remedy: { tool: "se_pull", args: {}, note: "present the gate to the person and stop — their bless resumes the walk" },
         source: "engine/session.ts bless",
       });
