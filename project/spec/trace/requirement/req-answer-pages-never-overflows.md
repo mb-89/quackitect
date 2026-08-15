@@ -19,10 +19,11 @@ priority: must
 
 The demand has two halves and both bind.
 
-- NOTHING IS CUT. The whole answer stays reachable. A page is a window
-  onto it, never a shorter version of it.
+- NOTHING IS CUT. The whole answer stays reachable.
+  - A page is a window onto it.
+  - A page is never a shorter version of it.
 - THE CURSOR IS NAMED IN THE ANSWER. The reader is told the call that
-  fetches the next page, not left to work one out.
+  fetches the next page.
 
 WHY CUTTING IS WORSE THAN WAITING. A slow answer announces itself. A cut
 answer does not, and nothing in it says what went missing.
@@ -30,9 +31,12 @@ answer does not, and nothing in it says what went missing.
 ## What stands today
 
 The bound is live and it works. This record's own kickoff answer came
-back at 259015 bytes, bounded to 60000, carrying `page`, a `next` naming
-`se_file_read` with its offset and limit, and the note that the whole
-answer is on disk.
+back at 259015 bytes against a bound of 60000, and it carried three
+things.
+
+- `page`, saying which window arrived.
+- `next`, naming `se_file_read` with its offset and limit.
+- a note saying the whole answer is on disk.
 
 So the row is met at the pull. It is written because the demand had no
 node, and a demand with no node is a promise nothing shows.

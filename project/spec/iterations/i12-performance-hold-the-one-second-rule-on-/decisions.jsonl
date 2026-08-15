@@ -185,3 +185,56 @@
 {"ts":"2026-08-15T10:49:00.235Z","op":"done","visit":"iterations/i12/probe-assumptions@0","node":"d165","brief":"probe cells rewritten short so the nodes take them whole"}
 {"ts":"2026-08-15T10:49:20.480Z","op":"plan","visit":"iterations/i12/gate-requirements@0","parent":null,"nodes":[{"id":"d188","brief":"pass the requirements gate"},{"id":"d189","brief":"build the timings fix"},{"id":"d190","brief":"measure and close"}]}
 {"ts":"2026-08-15T10:49:26.504Z","op":"update","visit":"iterations/i12/gate-requirements@0","node":"d191","brief":"checkpointing M3 before the gate"}
+{"ts":"2026-08-15T10:49:32.234Z","op":"update","visit":"iterations/i12/gate-requirements@0","node":"d192","brief":"M3 checkpointed"}
+{"ts":"2026-08-15T10:49:49.557Z","op":"update","visit":"iterations/i12/gate-requirements@0","node":"d193","brief":"opening the requirements gate"}
+{"ts":"2026-08-15T10:50:04.976Z","op":"update","visit":"iterations/i12/gate-requirements@0","node":"d194","brief":"linting the register for round 0"}
+{"ts":"2026-08-15T10:50:21.777Z","op":"update","visit":"iterations/i12/gate-requirements@0","node":"d195","brief":"fixing the two lint findings on my own requirement row"}
+{"ts":"2026-08-15T10:51:12.372Z","op":"done","visit":"iterations/i12/gate-requirements@0","node":"d188","brief":"requirements gate submitted and blessed"}
+{"ts":"2026-08-15T10:51:32.695Z","op":"update","visit":"iterations/i12/gate-requirements@0","node":"d196","brief":"reading the craft rules the build states demand"}
+{"ts":"2026-08-15T10:51:55.402Z","op":"update","visit":"iterations/i12/gate-requirements@0","node":"d197","brief":"craft rules read — entering the build"}
+{"ts":"2026-08-15T10:52:12.045Z","op":"update","visit":"iterations/i12/author-tests@0","node":"d198","brief":"build strategies read — at author-tests"}
+{"ts":"2026-08-15T10:52:35.513Z","op":"update","visit":"iterations/i12/author-tests@0","node":"d199","brief":"reading a test-spec node before allocating the new rows"}
+{"ts":"2026-08-15T10:52:48.489Z","op":"update","visit":"iterations/i12/author-tests@0","node":"d200","brief":"allocating the five new rows onto four test-specs"}
+{"ts":"2026-08-15T10:53:38.976Z","op":"obsolete","visit":"iterations/i12/gate-requirements@0","node":"d190","brief":"too coarse; the build items track it"}
+{"ts":"2026-08-15T10:53:44.160Z","op":"update","visit":"iterations/i12/author-tests@0","node":"d201","brief":"running the new tests to see the red before the fix"}
+{"ts":"2026-08-15T10:53:59.205Z","op":"update","visit":"iterations/i12/author-tests@0","node":"d202","brief":"reading the red"}
+{"ts":"2026-08-15T10:54:27.961Z","op":"done","visit":"iterations/i12/gate-requirements@0","node":"d189","brief":"tests authored and red observed, 2 of 2 failing"}
+{"ts":"2026-08-15T10:55:15.783Z","op":"update","visit":"iterations/i12/author-tests@0","node":"d203","brief":"resubmitting author-tests with the checks table"}
+{"ts":"2026-08-15T10:55:38.494Z","op":"plan","visit":"iterations/i12/author-tests@0","parent":null,"nodes":[{"id":"d204","brief":"walk decompose-structure"},{"id":"d205","brief":"specify and build the fix"},{"id":"d206","brief":"verify and close"}]}
+{"ts":"2026-08-15T10:55:50.713Z","op":"update","visit":"iterations/i12/decompose-structure@0","node":"d207","brief":"opening decompose-structure to see its computed matrix"}
+{"ts":"2026-08-15T10:56:37.508Z","op":"done","visit":"iterations/i12/author-tests@0","node":"d204","brief":"decompose-structure signed with the structure unchanged"}
+{"ts":"2026-08-15T10:56:56.739Z","op":"update","visit":"iterations/i12/author-tests@0","node":"d208","brief":"structure signed — walking to specify-build"}
+{"ts":"2026-08-15T10:57:12.611Z","op":"update","visit":"iterations/i12/author-tests@0","node":"d209","brief":"the i27 must had no test-spec either — giving it one"}
+{"ts":"2026-08-15T10:57:57.075Z","op":"update","visit":"iterations/i12/author-tests@0","node":"d210","brief":"resubmitting author-tests with the i27 must covered"}
+{"ts":"2026-08-15T10:58:02.561Z","op":"update","visit":"iterations/i12/author-tests@0","node":"d211","brief":"coverage closed — walking to specify-build"}
+{"ts":"2026-08-15T10:58:27.334Z","op":"update","visit":"iterations/i12/specify-build@0","node":"d212","brief":"the scoped runner lives in tools.ts — naming it on the spec it realizes"}
+{"ts":"2026-08-15T10:58:47.460Z","op":"done","visit":"iterations/i12/author-tests@0","node":"d205","brief":"build specified: risk first, the instrument before what it justifies"}
+{"ts":"2026-08-15T10:59:38.408Z","op":"update","visit":"iterations/i12/observe-red@0","node":"d213","brief":"reading ux rules before observe-red"}
+{"ts":"2026-08-15T10:59:42.438Z","op":"update","visit":"iterations/i12/observe-red@0","node":"d214","brief":"opening observe-red"}
+{"ts":"2026-08-15T11:00:12.484Z","op":"done","visit":"iterations/i12/author-tests@0","node":"d206","brief":"red observed and recorded, 2 of 2 failing"}
+{"ts":"2026-08-15T11:01:04.213Z","op":"plan","visit":"iterations/i12/build-steps@0","parent":null,"nodes":[{"id":"d215","brief":"share the reporter wiring"},{"id":"d216","brief":"tell the reporter where to write"},{"id":"d217","brief":"report what was timed"},{"id":"d218","brief":"cap the fan-out"}]}
+{"ts":"2026-08-15T11:01:14.153Z","op":"done","visit":"iterations/i12/build-steps@0","node":"d216","brief":"the spawner now tells the reporter where to write"}
+{"ts":"2026-08-15T11:01:22.438Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d219","brief":"keeping the relative-path base the reporter reports files against"}
+{"ts":"2026-08-15T11:01:35.793Z","op":"done","visit":"iterations/i12/build-steps@0","node":"d217","brief":"the scoped run attaches the reporter and reports what it timed"}
+{"ts":"2026-08-15T11:01:53.281Z","op":"done","visit":"iterations/i12/build-steps@0","node":"d215","brief":"the reporter wiring is shared and the phase is split out"}
+{"ts":"2026-08-15T11:01:59.484Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d220","brief":"reading the import block to see where the new line landed"}
+{"ts":"2026-08-15T11:02:15.482Z","op":"done","visit":"iterations/i12/build-steps@0","node":"d218","brief":"the fan-out is capped from the core count on both paths"}
+{"ts":"2026-08-15T11:02:19.898Z","op":"plan","visit":"iterations/i12/build-steps@0","parent":null,"nodes":[{"id":"d221","brief":"typecheck the fix"},{"id":"d222","brief":"run the timings tests"},{"id":"d223","brief":"run the battery"}]}
+{"ts":"2026-08-15T11:02:23.692Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d224","brief":"typechecking the build"}
+{"ts":"2026-08-15T11:02:33.781Z","op":"done","visit":"iterations/i12/build-steps@0","node":"d221","brief":"typecheck green on the merged tree"}
+{"ts":"2026-08-15T11:02:37.350Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d225","brief":"reading the verdict on the fix"}
+{"ts":"2026-08-15T11:02:50.804Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d226","brief":"checking which root the handler passes to the reporter"}
+{"ts":"2026-08-15T11:03:14.737Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d227","brief":"the reporter now resolves from the engine, not the tree under test"}
+{"ts":"2026-08-15T11:03:19.771Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d228","brief":"re-running the timings tests"}
+{"ts":"2026-08-15T11:03:23.476Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d229","brief":"reading the verdict"}
+{"ts":"2026-08-15T11:03:47.747Z","op":"obsolete","visit":"iterations/i12/build-steps@0","node":"d223","brief":"the battery waits until the scoped case is green"}
+{"ts":"2026-08-15T11:03:51.851Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d230","brief":"reading the inner verdict"}
+{"ts":"2026-08-15T11:04:16.319Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d231","brief":"a scoped run that matched no case is no longer green"}
+{"ts":"2026-08-15T11:04:21.049Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d232","brief":"re-running to see the inner run's output"}
+{"ts":"2026-08-15T11:04:26.855Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d233","brief":"reading the inner run's raw output"}
+{"ts":"2026-08-15T11:04:52.932Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d234","brief":"reverting the green rule — it is a separate finding, not this scope"}
+{"ts":"2026-08-15T11:05:34.550Z","op":"done","visit":"iterations/i12/build-steps@0","node":"d222","brief":"tests rewritten to the seam a nested runner cannot reach"}
+{"ts":"2026-08-15T11:05:39.342Z","op":"plan","visit":"iterations/i12/build-steps@0","parent":null,"nodes":[{"id":"d235","brief":"green the timings suite"},{"id":"d236","brief":"run the battery"},{"id":"d237","brief":"measure the tallest pole"}]}
+{"ts":"2026-08-15T11:05:42.975Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d238","brief":"reading the seam suite verdict"}
+{"ts":"2026-08-15T11:06:07.822Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d239","brief":"battery on the fixed selftest — the end-to-end proof available without a reload"}
+{"ts":"2026-08-15T11:06:11.469Z","op":"update","visit":"iterations/i12/build-steps@0","node":"d240","brief":"checkpointing the build while the battery runs"}

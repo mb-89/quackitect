@@ -11,6 +11,7 @@
 
 import { spawn } from "node:child_process";
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
+import { availableParallelism } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { setAnswerSpill } from "./bound.ts";
@@ -47,6 +48,7 @@ import { jobDone, jobList, jobStatus, jobStop, runBackground, runToCompletion, s
 import { Session } from "./session.ts";
 import { shoot } from "./shoot.ts";
 import { survey } from "./survey.ts";
+import { TIMINGS_DIR_ENV, testConcurrency, testReporterArgs, timedSince, timingReport } from "./testreporters.ts";
 import { Toll } from "./toll.ts";
 import { SE_VERSION } from "./version.ts";
 import { webFetch, webSearch } from "./web.ts";
@@ -924,12 +926,21 @@ export function coreTools(
         // orphaned workers held a folder lock for four hours). Children run
         // in the job registry — whole-tree killed on timeout, reaped at
         // shutdown, visible to se_run {jobs: true}.
-        const spawnNode = async (argv: string[], cwd = root): Promise<{ status: number | null; out: string }> => {
+        const spawnNode = async (
+          argv: string[],
+          cwd = root,
+          extraEnv: Record<string, string> = {},
+        ): Promise<{ status: number | null; out: string }> => {
           let out = "";
           const started = startJob(
             `node --test (${argv.length} args)`,
             () => {
-              const child = spawn("node", argv, { cwd, windowsHide: true, detached: process.platform !== "win32" });
+              const child = spawn("node", argv, {
+                cwd,
+                windowsHide: true,
+                detached: process.platform !== "win32",
+                env: { ...process.env, ...extraEnv },
+              });
               child.stdout?.setEncoding("utf8");
               child.stderr?.setEncoding("utf8");
               child.stdout?.on("data", (c: string) => {
@@ -952,12 +963,15 @@ export function coreTools(
           if (named) scopedGate(se, root, files, force);
           const argv = [
             "--test",
-            "--test-reporter=tap",
+            `--test-concurrency=${String(testConcurrency(availableParallelism()))}`,
+            ...testReporterArgs("tap"),
             ...(args.name_pattern !== undefined ? [`--test-name-pattern=${String(args.name_pattern)}`] : []),
             ...files.map((f) => resolveInRoot(root, f, "engine/tools.ts se_test")),
           ];
-          const r = await spawnNode(argv);
+          const startedAt = Date.now();
+          const r = await spawnNode(argv, root, { [TIMINGS_DIR_ENV]: se });
           const tap = parseTap(r.out);
+          const timed = timedSince(se, startedAt);
           const ok = r.status === 0 && tap.fail === 0;
           const streak = testRecord(se, root, ok, scope, files, question);
           const nudge = streakNudge(streak);
@@ -970,9 +984,10 @@ export function coreTools(
             question,
             scope: { files, ...(args.name_pattern !== undefined ? { name_pattern: String(args.name_pattern) } : {}) },
             tests: { total: tap.total, pass: tap.pass, fail: tap.fail },
+            ...timingReport(timed, tap.total),
             ...(tap.failures.length > 0 ? { failures: tap.failures } : {}),
             ...(nudge !== undefined ? { green_streak: streak, nudge } : {}),
-            ...(r.status !== 0 && tap.total === 0 ? { output: capMiddle(r.out.trim(), 4000) } : {}),
+            ...(tap.total === 0 ? { output: capMiddle(r.out.trim(), 4000) } : {}),
           };
         };
         // The battery: EARNED, not habitual. The gate computes the scoped

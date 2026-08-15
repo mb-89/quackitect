@@ -5,6 +5,8 @@ type: "[[test-spec]]"
 statement: A record opens on the person's word, binds its own tree, walks from the retro, and grows only by adjudicated escalation, verified by test over the iteration machinery.
 method: "test"
 verifies:
+  - "req-container-offers-its-records"
+  - "req-survey-counts-only-open-records"
   - "req-record-opens-on-word"
   - "req-entry-binds-worktree"
   - "req-walk-opens-at-retro"

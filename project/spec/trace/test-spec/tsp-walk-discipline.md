@@ -5,6 +5,8 @@ type: "[[test-spec]]"
 statement: The walk advances only on a pull, weighs the slider on every hop, and answers from the record, verified by test over the pull and route machinery.
 method: "test"
 verifies:
+  - "req-a-clear-jump-is-one-call"
+  - "req-answer-pages-never-overflows"
   - "req-autonomy-gates-every-hop"
   - "req-autonomy-change-applies-forward"
   - "req-controls-never-advance-walk"

@@ -5,6 +5,7 @@ type: "[[test-spec]]"
 statement: The engine restarts clean, lands crashes safe, answers inside its latency line, and serves its own machine only, verified by test over the process lifecycle.
 method: "test"
 verifies:
+  - "req-surface-answers-in-one-second"
   - "req-crash-lands-safe"
   - "req-reload-restarts-clean"
   - "req-call-answers-in-one-second"
