@@ -48,3 +48,32 @@
 {"ts":"2026-08-15T10:10:29.617Z","op":"update","visit":"iterations/i12/gate-kickoff@0","node":"d62","brief":"checking the raid item template so both new nodes answer it"}
 {"ts":"2026-08-15T10:10:58.382Z","op":"update","visit":"iterations/i12/gate-kickoff@0","node":"d63","brief":"correcting both raid nodes against the item template"}
 {"ts":"2026-08-15T10:11:02.186Z","op":"update","visit":"iterations/i12/gate-kickoff@0","node":"d64","brief":"submitting the kickoff gate with the refs in their dashed shape"}
+{"ts":"2026-08-15T10:11:15.914Z","op":"update","visit":"iterations/i12/gate-kickoff@0","node":"d65","brief":"checking whether the kickoff signed and blessed"}
+{"ts":"2026-08-15T10:11:27.513Z","op":"update","visit":"iterations/i12/gate-kickoff@0","node":"d66","brief":"kickoff blessed — walking into the compiled minor column"}
+{"ts":"2026-08-15T10:12:43.473Z","op":"obsolete","visit":"iterations/i12/gate-kickoff@0","node":"d45","brief":"re-planned at the build states below"}
+{"ts":"2026-08-15T10:12:58.760Z","op":"obsolete","visit":"iterations/i12/gate-kickoff@0","node":"d46","brief":"re-planned at the build states below"}
+{"ts":"2026-08-15T10:13:08.977Z","op":"update","visit":"iterations/i12/draft-vision@0","node":"d67","brief":"raid method read — moving to log-risks"}
+{"ts":"2026-08-15T10:13:52.665Z","op":"plan","visit":"iterations/i12/log-risks@0","parent":null,"nodes":[{"id":"d68","brief":"mint the register entries"},{"id":"d69","brief":"fill log-risks"},{"id":"d70","brief":"reach the build states"}]}
+{"ts":"2026-08-15T10:14:07.181Z","op":"done","visit":"iterations/i12/log-risks@0","node":"d68","brief":"four register entries stand for this record"}
+{"ts":"2026-08-15T10:14:22.948Z","op":"done","visit":"iterations/i12/log-risks@0","node":"d69","brief":"log-risks filled and submitted"}
+{"ts":"2026-08-15T10:14:45.391Z","op":"update","visit":"iterations/i12/log-risks@0","node":"d71","brief":"log-risks submitted — checking what the walk offers next"}
+{"ts":"2026-08-15T10:15:11.638Z","op":"update","visit":"iterations/i12/log-risks@0","node":"d72","brief":"minting the goal-conflict decision log-risks asked for"}
+{"ts":"2026-08-15T10:15:22.610Z","op":"update","visit":"iterations/i12/log-risks@0","node":"d73","brief":"amending log-risks to carry the goal-conflict decision"}
+{"ts":"2026-08-15T10:15:32.934Z","op":"update","visit":"iterations/i12/log-risks@0","node":"d74","brief":"walking the frame-delta branch the join still owes"}
+{"ts":"2026-08-15T10:15:46.749Z","op":"update","visit":"iterations/i12/frame-delta@0","node":"d75","brief":"finding the value prop this delta extends"}
+{"ts":"2026-08-15T10:16:08.066Z","op":"obsolete","visit":"iterations/i12/log-risks@0","node":"d70","brief":"too coarse to show progress, replaced by per-state items"}
+{"ts":"2026-08-15T10:16:24.392Z","op":"plan","visit":"iterations/i12/frame-delta@0","parent":null,"nodes":[{"id":"d76","brief":"frame-delta"},{"id":"d77","brief":"scope-non-goals"},{"id":"d78","brief":"gate-motivation"}]}
+{"ts":"2026-08-15T10:17:06.926Z","op":"done","visit":"iterations/i12/frame-delta@0","node":"d76","brief":"frame-delta is signed"}
+{"ts":"2026-08-15T10:17:26.546Z","op":"done","visit":"iterations/i12/frame-delta@0","node":"d77","brief":"scope-non-goals is signed"}
+{"ts":"2026-08-15T10:17:32.593Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d79","brief":"requirement-authoring read — opening the motivation gate"}
+{"ts":"2026-08-15T10:17:43.371Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d80","brief":"checking the new trace nodes against the schema"}
+{"ts":"2026-08-15T10:17:46.702Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d81","brief":"linting the register while the trace tests run"}
+{"ts":"2026-08-15T10:18:00.700Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d82","brief":"fixing the two lint findings on my own register entries"}
+{"ts":"2026-08-15T10:18:11.525Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d83","brief":"noted the register's standing lint debt for the overhaul"}
+{"ts":"2026-08-15T10:18:30.037Z","op":"obsolete","visit":"iterations/i12/frame-delta@0","node":"d78","brief":"too coarse now that a red stands in front of it"}
+{"ts":"2026-08-15T10:18:54.471Z","op":"plan","visit":"iterations/i12/gate-motivation@0","parent":null,"nodes":[{"id":"d84","brief":"isolate the trace-coverage red"},{"id":"d85","brief":"fix or attribute it"},{"id":"d86","brief":"fill gate-motivation"}]}
+{"ts":"2026-08-15T10:18:58.016Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d87","brief":"reading the isolated verb-count verdict"}
+{"ts":"2026-08-15T10:19:22.033Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d88","brief":"listing the registered verbs to diff against the trace"}
+{"ts":"2026-08-15T10:19:37.746Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d89","brief":"checking whether the newest verbs appear anywhere in the trace"}
+{"ts":"2026-08-15T10:19:57.934Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d90","brief":"comparing the worktree's trace against trunk's for the same verbs"}
+{"ts":"2026-08-15T10:20:25.136Z","op":"done","visit":"iterations/i12/gate-motivation@0","node":"d84","brief":"the red is the worktree being three days behind trunk"}
