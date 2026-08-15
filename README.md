@@ -47,7 +47,7 @@ which edit. Here is the whole rule.
 
 | you changed | you need |
 | --- | --- |
-| `project/deliverable/deliverable/brand/palette.css` | nothing. It is read on every render. |
+| `project/deliverable/brand/palette.css` | nothing. It is read on every render. |
 | a machine drawing, guidance, a rigor-matrix row | nothing. They are read live. |
 | `project/deliverable/engine/**.ts` | restart the se server. Node caches modules at import, so a correct file on disk means nothing to a process already running. |
 | `project/deliverable/vscode/src/extension.ts` | re-run `RUNME.ps1`. |
@@ -125,6 +125,7 @@ there is no fallback search engine.
 | Glob | `se_file_glob` | honest truncation flag |
 | Grep | `se_file_search` | ripgrep (hard dep); `ref:` searches any committed branch/tag via git grep (main = v1, v2 = v2); the logged `intent` is reviewed in the periodic look-back |
 | Bash | `se_run` | full output kept in the call log under a citable ref |
+| `npm test` | `se_test` | structured and durable; a scoped run must state the QUESTION it answers, and the verdict records it beside the scope |
 | WebFetch | `se_web_fetch` | HTML→text, paging offsets, declared truncation |
 | WebSearch | `se_web_search` | provider-backed (set `SE_BRAVE_API_KEY`); refuses honestly when unconfigured |
 | — | `se_log_query` | the agent's own trail is queryable |

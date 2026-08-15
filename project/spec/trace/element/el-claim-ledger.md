@@ -2,7 +2,7 @@
 minted_in: i2-parallel-iterations-across-machines-seed
 id: el-claim-ledger
 type: "[[element]]"
-statement: Marks whose piece is whose — one add-only claim file per iteration on the claims branch, pushed at claim time, recorded locally when offline, released only by a person's recorded force.
+statement: Marks whose piece is whose — one add-only claim file per iteration on the claims branch, opened by its own first claim, pushed at claim time, recorded locally when offline, released only by a person's recorded force.
 kind: planned
 realization: make
 group: the-record-life
@@ -26,3 +26,7 @@ record store opens a record only over a standing claim.
 
 Realization: git supplies the branch, the push semantics and the history;
 the claim verb and the reconcile are ours.
+
+The ledger OPENS ITSELF (2026-08-13). A product whose claims branch does
+not exist yet gets it minted by the first claim, so no product needs an
+opening act somebody has to remember.

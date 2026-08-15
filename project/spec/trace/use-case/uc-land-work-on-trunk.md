@@ -21,6 +21,12 @@ priority: should
 5. The person reads the form, opens some of what it points at, and blesses it.
 6. The work lands on trunk in one piece and the worktree goes.
 
+## Lane doors
+
+- `se_git_sync` keeps the record and trunk in step mid-iteration, long before anything lands.
+- `se_git_land` is the landing itself, behind the release gate.
+- `se_git` runs the allowlisted git verbs. The push stays with the person.
+
 ## Extensions
 
 - 3a. Tests are red. The walk does not advance, nothing is marked known-broken, and each red is understood and fixed properly.

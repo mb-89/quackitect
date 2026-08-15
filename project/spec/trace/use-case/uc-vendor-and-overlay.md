@@ -21,6 +21,10 @@ priority: could
 5. They walk a record, and their cards arrive at the states they wrote them for.
 6. A new engine version arrives. They replace the folder whole, with nothing to merge.
 
+## Lane doors
+
+- `se_prompt_place` re-projects the prompt layer from the guidance into the tree the lane is working in. It resolves that tree itself, so the projection cannot land in the wrong one.
+
 ## Extensions
 
 - 1a. Something of theirs is written under the engine's folder. That is the one rule this use case rests on, and breaking it turns the next update into a merge.

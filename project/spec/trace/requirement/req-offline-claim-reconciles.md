@@ -20,3 +20,11 @@ The owner's ruling, recorded on i2's gate-motivation: the failure to
 reach origin is accepted silently, the desync knowingly, and the
 conflict at the next push is ours to resolve. Rare by construction -
 offline usually means no agent either - but it must work.
+
+UNREACHABLE MEANS UNREACHABLE (2026-08-13). A remote that answers and
+simply carries no claim ledger yet is NOT offline, and this row does not
+govern it. [[req-absent-ledger-is-not-offline]] does.
+
+The two were conflated in the i2 build, because asking a remote for a
+branch it does not have fails exactly like a remote that is not there.
+Every product's first claim recorded locally and never announced.

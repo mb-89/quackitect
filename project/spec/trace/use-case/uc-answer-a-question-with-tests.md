@@ -21,6 +21,13 @@ priority: should
 5. Each is fixed properly, or the test is corrected where it asserted a rule that no longer holds.
 6. The scope runs green and the work moves on.
 
+## Lane doors
+
+- `se_test` runs the tests as a durable job, and the handle survives a client timeout.
+
+A scoped run states the question it answers. The verdict records that
+question beside the scope.
+
 ## Extensions
 
 - 2a. The named scope holds no test file. The run refuses and lists the suite rather than running everything by default.

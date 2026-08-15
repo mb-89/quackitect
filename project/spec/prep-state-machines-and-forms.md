@@ -30,6 +30,10 @@ Evidence forms are untyped. Worse, 70 of their 122 fields never reach the agent,
 
 4. **Wire the escalation reopen ledger.** The list of steps that must be re-earned is computed, written into the pin, and then discarded. Yes wire it, or no delete it.
 
+   Live repro on record: i8's escalation patch→minor (note-f529d8167267,
+   drained backlog at the 2026-08-13 retro) offered a busbar missing every
+   M1/M2 state minor's tailored gate-inputs should require.
+
 5. **What is the `product` change size for?** It compiles to a machine identical to `major` — same 51 states, same identifiers. Give it steps, merge it into `major`, or leave it as posture-only.
 
 6. **Deliver evidence fields to the agent.** The tick packet omits them. Yes add them to the packet, or no keep evidence a person-only surface. ==> yes

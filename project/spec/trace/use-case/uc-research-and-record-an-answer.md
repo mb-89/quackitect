@@ -21,6 +21,11 @@ priority: should
 5. The answer is recorded against the question as two fields, in one place.
 6. Anything the sources do not actually support is left out.
 
+## Lane doors
+
+- `se_web_search` and `se_web_fetch` reach outside the repository. Every query is logged like any other call.
+- `se_answer` records the question and the answer as one entry, so the answer outlives the session that gave it.
+
 ## Extensions
 
 - 2a. No search provider is configured. A specific URL can still be fetched, and the gap is named rather than worked around.

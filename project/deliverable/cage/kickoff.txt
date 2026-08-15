@@ -10,4 +10,4 @@ Boot stability rules:
 - Keep any direct reads small with offset/limit.
 - If a state allows no tools, do not read/search there. Pull only.
 
-Then report in one short message: where you stand, and why you stopped (the pull's wait says which). If you are waiting on a step that is mine, stop and make it clear that the slider alone cannot wake you: after I change it or move the machine in the mirror, I have to send you a message (continue is enough), and you pick up from wherever the machine stands.
+Then report in one short message: where you stand, and why you stopped (the pull's wait says which). If you are waiting on a step that is mine, stop and make it clear that the dial alone cannot wake you: after I change it or move the machine in the mirror, I have to send you a message (continue is enough), and you pick up from wherever the machine stands.

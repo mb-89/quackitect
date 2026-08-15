@@ -13,6 +13,8 @@ satisfies:
   - req-force-release-recorded
   - req-machine-id-anonymous
   - req-engine-pushes-only-machinery
+  - req-pool-opens-on-first-claim
+  - req-absent-ledger-is-not-offline
 inputs:
   - flow-repository
 outputs:

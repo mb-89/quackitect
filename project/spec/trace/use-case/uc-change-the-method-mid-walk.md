@@ -20,6 +20,10 @@ priority: should
 4. The walk recomputes its position rather than remembering it, and re-earns whatever it owes.
 5. The state opens again under the corrected guidance, with what was already filled still standing.
 
+## Lane doors
+
+- `se_reload` restarts the engine on the new sources, mid-session, and the walk reboots at its start.
+
 ## Extensions
 
 - 2a. The change is a rigor-matrix row or engine source, and the walk is inside a record. Those compile from the trunk while a bound write lands in the record's worktree, so the change must be made where it compiles or it takes no effect.

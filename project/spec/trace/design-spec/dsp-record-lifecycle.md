@@ -8,6 +8,7 @@ realizes:
   - "if-front-desk-to-record-store"
 files:
   - "project/deliverable/engine/iterations.ts"
+  - "project/deliverable/engine/claims.ts"
   - "project/deliverable/engine/worktree.ts"
 ---
 

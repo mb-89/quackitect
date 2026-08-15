@@ -20,6 +20,15 @@ priority: should
 4. They open a state and read its evidence form as it was filled.
 5. A gate additionally shows its rounds, its verdict, and the hand that blessed it with the day.
 
+## Lane doors
+
+A past version of the repository is read at a committed `ref`, without
+checking it out. Three verbs take one:
+
+- `se_file_read`
+- `se_file_search`
+- `se_file_glob`
+
 ## Extensions
 
 - 1a. Browsing is attempted by an agent. The archive sits above every autonomy setting, so only a person's own hand opens it — there is nothing for an agent to do in a closed record.

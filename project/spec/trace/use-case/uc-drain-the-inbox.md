@@ -21,6 +21,12 @@ priority: should
 5. Each is dispositioned into exactly one home: done, obsolete, carried, or backlog.
 6. The inbox reaches zero.
 
+## Lane doors
+
+- `se_note` captures a stray anywhere, and moves nothing.
+- `se_note_drain` takes one back out, with the disposition it earned.
+- `se_survey` serves the standing rows, each with the condition that makes it ready.
+
 ## Extensions
 
 - 3a. A note describes something already shipped. It drains as done, saying where, so the next retro does not re-read it.
