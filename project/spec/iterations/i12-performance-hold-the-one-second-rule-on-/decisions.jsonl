@@ -382,3 +382,28 @@
 {"ts":"2026-08-15T11:34:59.023Z","op":"done","visit":"iterations/i12/trace-design@0","node":"d369","brief":"116 of i27's trace nodes are missing from trunk"}
 {"ts":"2026-08-15T11:35:15.248Z","op":"update","visit":"iterations/i12/trace-design@0","node":"d373","brief":"taking our side on the nine conflicts, where trunk is newer"}
 {"ts":"2026-08-15T11:35:19.810Z","op":"update","visit":"iterations/i12/trace-design@0","node":"d374","brief":"staging the resolved merge"}
+{"ts":"2026-08-15T11:35:27.705Z","op":"done","visit":"iterations/i12/trace-design@0","node":"d370","brief":"i27's design layer is landed"}
+{"ts":"2026-08-15T11:35:55.852Z","op":"done","visit":"iterations/i12/trace-design@0","node":"d371","brief":"the class-fix note is written"}
+{"ts":"2026-08-15T11:36:02.950Z","op":"update","visit":"iterations/i12/trace-design@0","node":"d375","brief":"dropping the deleted file from the spec that still names it"}
+{"ts":"2026-08-15T11:36:08.831Z","op":"update","visit":"iterations/i12/trace-design@0","node":"d376","brief":"reading how the spec names the deleted file"}
+{"ts":"2026-08-15T11:36:20.655Z","op":"update","visit":"iterations/i12/trace-design@0","node":"d377","brief":"pulling the fresh design trace after the landing"}
+{"ts":"2026-08-15T11:36:41.244Z","op":"update","visit":"iterations/i12/trace-design@0","node":"d378","brief":"amending build-steps against the landed corpus"}
+{"ts":"2026-08-15T11:36:50.855Z","op":"update","visit":"iterations/i12/trace-design@0","node":"d379","brief":"walking back into the chunk machine to re-stand its claim"}
+{"ts":"2026-08-15T11:37:20.931Z","op":"done","visit":"iterations/i12/trace-design@0","node":"d372","brief":"the sweep passes; the block is build-steps' own unfilled form"}
+{"ts":"2026-08-15T11:37:55.746Z","op":"plan","visit":"iterations/i12/trace-design@0","parent":null,"nodes":[{"id":"d380","brief":"re-enter and fill build-steps"},{"id":"d381","brief":"green trace-design"},{"id":"d382","brief":"reach verification"}]}
+{"ts":"2026-08-15T11:38:35.567Z","op":"update","visit":"iterations/i12/write-requirements@2","node":"d384","brief":"re-reading the register after the landing"}
+{"ts":"2026-08-15T11:39:17.405Z","op":"update","visit":"iterations/i12/write-requirements@2","node":"d385","brief":"amending the register against the landed corpus"}
+{"ts":"2026-08-15T11:41:34.860Z","op":"update","visit":"iterations/i12/write-requirements@2","node":"d386","brief":"resuming the sweep toward build-steps"}
+{"ts":"2026-08-15T11:42:51.172Z","op":"update","visit":"iterations/i12/derive-functions@0","node":"d387","brief":"allocating i27's surface requirement to show-where-it-stands"}
+{"ts":"2026-08-15T11:43:00.748Z","op":"done","visit":"iterations/i12/trace-design@0","node":"d380","brief":"the register and the function allocation now match the landed corpus"}
+{"ts":"2026-08-15T11:43:29.453Z","op":"update","visit":"iterations/i12/derive-functions@0","node":"d388","brief":"resubmitting derive-functions with both holes filled"}
+{"ts":"2026-08-15T11:43:49.387Z","op":"update","visit":"iterations/i12/specify-build@1","node":"d389","brief":"derive-functions green, swept to specify-build"}
+{"ts":"2026-08-15T11:45:20.793Z","op":"fork","visit":"iterations/i12/specify-build@1","parent":"d381","node":"d390","brief":"specify-build's claim reads another record's drawing and fold-back","nodes":[{"id":"d391","brief":"confirm which record each scan lands on"},{"id":"d392","brief":"scope both lookups to the record's own directory"},{"id":"d393","brief":"cover it with a test"},{"id":"d394","brief":"re-sign specify-build"}]}
+{"ts":"2026-08-15T11:45:27.070Z","op":"done","visit":"iterations/i12/specify-build@1","node":"d391","brief":"i27's fold-back is the only one on disk, so every record reads it as its own"}
+{"ts":"2026-08-15T11:46:45.702Z","op":"done","visit":"iterations/i12/specify-build@1","node":"d392","brief":"both lookups now resolve the record from the state id, scan only as fallback"}
+{"ts":"2026-08-15T11:47:16.177Z","op":"update","visit":"iterations/i12/specify-build@1","node":"d395","brief":"test written, running it scoped to see the red half pass"}
+{"ts":"2026-08-15T11:47:20.969Z","op":"update","visit":"iterations/i12/specify-build@1","node":"d396","brief":"running requirement-checks scoped"}
+{"ts":"2026-08-15T11:47:40.080Z","op":"done","visit":"iterations/i12/specify-build@1","node":"d393","brief":"26 of 26 green, the new test reproduces and pins the cross-record sweep"}
+{"ts":"2026-08-15T11:47:57.835Z","op":"update","visit":"iterations/i12/specify-build@1","node":"d397","brief":"reloading so the lane picks up the scoping fix"}
+{"ts":"2026-08-15T11:49:36.642Z","op":"update","visit":"iterations/i12/specify-build@0","node":"d9","brief":"the record segment was read from the wrong end of the state id"}
+{"ts":"2026-08-15T11:51:08.130Z","op":"update","visit":"iterations/i12/specify-build@0","node":"d10","brief":"answering the reload-in-place question from the two owning requirements"}

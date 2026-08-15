@@ -1,7 +1,7 @@
 ---
 form: derive-functions
 by: agent
-signed_off: 2026-08-15T10:36:19.349Z
+signed_off: 2026-08-15T11:43:29.767Z
 authors: agent
 files:
 ---
@@ -10,11 +10,17 @@ files:
 
 ## current_situation
 
-No new function was written. The delta's five requirements land on three functions that already exist, and the tree keeps its shape.
+No new function was written BY THIS RECORD. The delta's five requirements land on three functions that already exist, and the tree keeps its shape.
 
 That is the honest result for a performance record. Nothing here asks the system to DO something new. It asks three things it already does to answer inside a bound, to report truthfully, and to hand back an instruction rather than a decision.
 
-ONE HOLE WAS FOUND AND FILLED. req-a-clear-jump-is-one-call, minted in i27, was served by no function at all. That is the first of the four holes this step exists to catch, and it was caught mechanically at the submit rather than by a reviewer.
+THE STRUCTURE MOVED TWICE ANYWAY, both times because a coverage check refused a submit that a reviewer would have passed.
+
+FIRST HOLE. req-a-clear-jump-is-one-call, minted in i27, was served by no function at all. It is now allocated to serve-a-step.
+
+SECOND HOLE, found after i27's design layer was landed on trunk mid-record. req-a-surface-resolves-to-what-it-shows had a design and no owner in the structure: i27 allocated it to el-core, el-resolution-seam and if-satellite-supervisor-to-mirror, and to no function. It is now allocated to show-where-it-stands, with the reasoning written into that node.
+
+ONE FUNCTION ARRIVED WITH THE LANDING. fn-run-a-governed-walk.resolve-a-path is i27's, and it carries four of the five requirements that refused this form. The tree is twenty-one functions now, not twenty.
 
 ## functions
 
@@ -31,6 +37,7 @@ ONE HOLE WAS FOUND AND FILLED. req-a-clear-jump-is-one-call, minted in i27, was 
 - fn-run-a-governed-walk.keep-the-archive
 - fn-run-a-governed-walk.keep-the-record
 - fn-run-a-governed-walk.land-the-work
+- fn-run-a-governed-walk.resolve-a-path
 - fn-run-a-governed-walk.route-the-work
 - fn-run-a-governed-walk.serve-a-step
 - fn-run-a-governed-walk.share-the-pool
@@ -102,9 +109,10 @@ THE ONE PLACE NEUTRALITY WAS NEARLY LOST. "Be faster" is not a function at all. 
 
 ## follow_up
 
-- Every hole this step exists to catch was looked for, and one was found.
-- A requirement no function serves: req-a-clear-jump-is-one-call, from i27, now allocated to serve-a-step.
-- A function no requirement asked for: none, since none was added.
+- Every hole this step exists to catch was looked for, and two were found.
+- A requirement no function serves, first pass: req-a-clear-jump-is-one-call, from i27, now allocated to serve-a-step.
+- A requirement no function serves, after the landing: req-a-surface-resolves-to-what-it-shows, from i27, now allocated to show-where-it-stands.
+- A function no requirement asked for: none.
 - A use-case step no function covers: uc-quality-performance-efficiency step 6, added this record, lands on show-where-it-stands.
 - An output nobody consumes: flow-test-timings was the candidate, and two consumers are named, so it stands.
 
@@ -124,11 +132,15 @@ NO OTHER FLOW MOVED, because the delta adds no function.
 
 ON A MILESTONE WHOSE MAIN RESULT IS SOMEBODY ELSE'S MISSING EDGE.
 
-req-a-clear-jump-is-one-call is a MUST, graded corrosive, minted in the record that shipped the day before this one. It refines three use cases and carries a measured source: five pulls at 150092, 122748, 104578, 96647 and 80422 ms.
+Two of them, and the second is the sharper case.
 
-And no function served it. The demand existed and nothing in the structure said what does it.
+req-a-clear-jump-is-one-call is a MUST, graded corrosive, minted in the record that shipped the day before this one. It refines three use cases and carries a measured source: five pulls at 150092, 122748, 104578, 96647 and 80422 ms. And no function served it.
 
-The check caught it in one submit, from the other side of the coverage. It is worth recording because it is the strongest argument in the machine for checking coverage mechanically rather than at a review: the row was written carefully by somebody who cared about it, and the edge was still missing.
+req-a-surface-resolves-to-what-it-shows is also a MUST, also graded fatal, and it had MORE design attached than the first one: two elements, an interface, a test spec, and a paragraph in two option nodes arguing that it stays satisfied. Every one of those is a claim about how the demand is met. None of them is a claim about WHAT DOES IT.
+
+THAT IS THE ARGUMENT FOR CHECKING COVERAGE FROM BOTH SIDES. A requirement can accumulate design, tests and prose defending it, and still have no owner in the function structure, because every one of those artifacts points DOWN at the requirement and none points across. Only the sweep from the requirement side asks the question nothing else asks.
+
+Both rows were written carefully by somebody who cared about them. Both edges were still missing, and neither was found by reading.
 
 ## allocation
 
