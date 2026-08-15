@@ -895,7 +895,7 @@ export function coreTools(
       name: "se_test",
       title: "se.test",
       description:
-        "Run tests STRUCTURED as a durable job. Starting returns a handle immediately. Call again with {job} to read current status or the final verdict. Scoped runs use files and optional name_pattern, and MUST state the question they answer. NO ARGUMENTS runs the earned battery, whose question is fixed. AN UNCHANGED TREE REFUSES its scope unless force is true.",
+        "Run tests STRUCTURED as a durable job. Starting returns a handle immediately. Call again with {job} to read current status or the final verdict. Scoped runs use files and optional name_pattern, and MUST state the question they answer. NO ARGUMENTS runs the earned battery, whose question is fixed. AN UNCHANGED TREE REFUSES its scope unless force is true. EVERY RUN RECORDS ITS TIMINGS — one row per case, appended where the lane can read them — and the verdict says how many cases it timed, so a silent instrument failure shows instead of passing as green. Mine them with se_log_query's min_ms filter.",
       inputSchema: {
         type: "object",
         properties: {
