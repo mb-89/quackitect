@@ -307,6 +307,7 @@ export class Session {
         narration_calls?: number;
         reads?: Record<string, string>;
         reads_pid?: number;
+        target?: string;
         session?: string;
       };
       const mine = process.env.SE_SESSION;
@@ -321,6 +322,7 @@ export class Session {
         if (typeof s.narration_calls === "number" && Number.isInteger(s.narration_calls) && s.narration_calls >= 0)
           this._narrationCalls = s.narration_calls;
         this.restoreReadCredit(s.reads, s.reads_pid);
+        this.restoreTarget(s.target, s.reads_pid);
       }
     } catch {
       /* no store yet — the defaults stand */
@@ -339,6 +341,35 @@ export class Session {
    *  Freshness is decided nowhere near here. Every entry is re-checked against
    *  disk wherever it is used, so a document whose words moved is owed again
    *  by construction rather than by a second mechanism that could disagree. */
+  /** THE TARGET SURVIVES AN ENGINE RELOAD (owner ruling 2026-08-15): "the point
+   *  of boot is to boot the agent, not the machine".
+   *
+   *  IT DOES NOT CONTRADICT THE DESK RULE. Every engine START still aims at the
+   *  front desk (2026-07-29), because a start has no matching session stamp to
+   *  restore from. Only a RELOAD restores, on the same two conditions the
+   *  reading credit uses: the stamp says this is the same session, and the
+   *  process id says the engine actually restarted.
+   *
+   *  THE POSITION IS STILL NOT REMEMBERED, and req-reload-restarts-clean is
+   *  right to forbid it. Evidence gives the position, the target gives the
+   *  direction, and the recompute walks back on its own. Before this, a reload
+   *  mid-record landed at the desk with nothing aimed, so the agent paid an
+   *  aim and a sweep to stand where it already stood.
+   *
+   *  AN UNREACHABLE RESTORED TARGET IS SAFE. The route simply cannot be drawn
+   *  and the pull answers wait, which is the same answer a stale aim has always
+   *  produced. */
+  private restoreTarget(target: string | undefined, pid: number | undefined): void {
+    if (pid === undefined || pid === process.pid) return;
+    if (typeof target === "string" && target !== "") this._target = target;
+  }
+
+  /** The ONE place the target moves, so no site can forget to persist it. */
+  private aimAt(to: string): void {
+    this._target = to;
+    this.persistSettings();
+  }
+
   private restoreReadCredit(reads: Record<string, string> | undefined, pid: number | undefined): void {
     if (pid === undefined || pid === process.pid) return;
     for (const [p, h] of Object.entries(reads ?? {})) {
@@ -361,6 +392,7 @@ export class Session {
           narration_calls: this._narrationCalls,
           reads: Object.fromEntries(this.readBuffer),
           reads_pid: process.pid,
+          target: this._target,
         })}\n`,
         "utf8",
       );
@@ -1493,7 +1525,7 @@ export class Session {
       this.instance.escapes.push({ state: stoodIn, exhausted_guard: reason.slice(0, 300), at: nowMain });
       this.instance.active = ["front_desk"];
       this.instance.current = "front_desk";
-      this._target = "";
+      this.aimAt("");
       this.unbind();
       this.notifyChange();
       return {
@@ -1519,7 +1551,7 @@ export class Session {
     this.instance.active = [...activeStates(this.instance).filter((s) => s !== parent), "front_desk"];
     this.instance.current = "front_desk";
     this.subs = [];
-    this._target = "";
+    this.aimAt("");
     this.unbind();
     this.notifyChange();
     return {
@@ -1808,7 +1840,7 @@ export class Session {
     // routeAim is the ONE normalisation: a target naming a node that
     // descends means that machine's start. A private main-only copy here
     // missed "iterations/i1" and wedged the walk at the sub's start.
-    if (here === this.routeAim(this._target)) this._target = "";
+    if (here === this.routeAim(this._target)) this.aimAt("");
   }
 
   /** What the route search can see, beyond file content. Bumped wherever the
@@ -1831,7 +1863,7 @@ export class Session {
   setTarget(to: string): Record<string, unknown> {
     const wanted = to.trim();
     if (wanted === "") {
-      this._target = "";
+      this.aimAt("");
       return { ...this.route(this.active()[0] ?? this.machine.initial), target: this._target };
     }
     const r = this.route(wanted);
@@ -1848,7 +1880,7 @@ export class Session {
         source: "engine/session.ts target",
       });
     }
-    this._target = wanted;
+    this.aimAt(wanted);
     this.clearTargetIfArrived();
     // The reader's OWN name wins the report. route() answers with the
     // normalised aim so the render can place the dot, and spreading it last
