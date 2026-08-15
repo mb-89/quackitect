@@ -5396,6 +5396,24 @@ export class Session {
    *  FALLBACK AND RECOVERY EDGES ARE NOT INPUTS. A fallback hangs off its
    *  dependency as the guard-failure path, and the recovery edge points back
    *  the way it came. Neither is something the state waits for. */
+  /** Is this submachine still the pin's placeholder? The same question the
+   *  entry guard asks before refusing to walk into one, asked here so a
+   *  placeholder is not counted as an input it can never satisfy. A drawing
+   *  that will not compile is not a scaffold — it is broken, and the entry
+   *  guard reports that with its own clause. */
+  private submachineIsScaffold(name: string): boolean {
+    try {
+      const decl = compileMachineCached(this.machineRoot(), resolveRef(this.machineRoot(), mainMachinePath(this.machineRoot()), name));
+      // Written with ?? rather than an equality on purpose. scaffold-entry's
+      // inspection anchors on the entry guard's literal and takes the FIRST
+      // match in this file, so a second copy of that phrase up here silently
+      // pointed the assertion at the wrong block.
+      return decl.scaffold ?? false;
+    } catch {
+      return false;
+    }
+  }
+
   private feedersUnsigned(fm: MachineDecl, state: StateDecl): string[] {
     const REQUIRED = new Set(["normal", "approval"]);
     // A PLACEHOLDER THAT RUNS A SUBMACHINE IS AN INPUT TOO (owner instruction
@@ -5410,9 +5428,28 @@ export class Session {
     // THAT IS THE WORST SHAPE AVAILABLE: green everywhere at the submit, and a
     // dead chain found six states later by the claim-guard. The refusal never
     // landed where the work was, so nothing could be fixed while it was cheap.
+    // AN UNAUTHORED SCAFFOLD IS NOT AN INPUT, and the line above without this
+    // one deadlocked i28 at gate-validation on 2026-08-15.
+    //
+    // THE SHAPE OF THE DEADLOCK, because it is not obvious. A gate fed by a
+    // `runs:` placeholder nobody has authored can never be filled: the gate
+    // owes no form while a feeder is unsigned (standingStateFormOwed), and the
+    // feeder can never sign, because ENTERING an unauthored scaffold is itself
+    // refused a few hundred lines below. The walk had no legal move left.
+    //
+    // IT ALSO BROKE A RULE THAT HELD BEFORE. i27 shipped through this same
+    // gate with demos unauthored, which was legal and still is. Counting the
+    // placeholder made a past-legal walk impossible, which is the tell that
+    // the widening went one step too far.
+    //
+    // SO THE TEST IS AUTHORED-NESS, NOT EXISTENCE. An AUTHORED submachine is a
+    // real input and still guards — that is the defect the owner reported the
+    // same morning, where six states stamped on top of an unfinished fan. An
+    // unauthored one means nobody planned that work, and the state that would
+    // author it is the real input.
     const feeders = fm.states.filter(
       (p) =>
-        (p.evidence_form.length > 0 || p.submachine !== undefined) &&
+        (p.evidence_form.length > 0 || (p.submachine !== undefined && !this.submachineIsScaffold(p.submachine))) &&
         p.edges.some((e) => e.to === state.id && REQUIRED.has(e.role ?? "normal")),
     );
     if (feeders.length === 0) return [];

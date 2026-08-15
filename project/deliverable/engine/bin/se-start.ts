@@ -1,17 +1,29 @@
-// ONE COMMAND FROM A BARE MACHINE TO A WALKING AGENT.
+// ONE COMMAND FROM A CLONED REPOSITORY TO A WALKING AGENT.
 //
-//   node engine/bin/se-start.ts --repo <url> --iteration <id> [--root <dir>]
+//   node project/deliverable/engine/bin/se-start.ts --repo <url> --iteration <id>
 //
 // SEVEN STEPS, AND EACH EXITS NON-ZERO NAMING ITSELF. Every failure of the
 // first cloud run presented as "the server is not there", which points at the
 // wrong step in six of the seven cases. The step name IS the diagnosis.
+//
+// THE ROOT IS WHERE THIS FILE LIVES, and there is no flag to say otherwise.
+// A `--root` flag stood here and was honoured by three steps while two ignored
+// it, so `--root <fresh dir>` cloned there and then started the lane on the
+// entrypoint's own tree. Found at i28's verification. One tree, derived, is
+// the fix — a flag that is right for some steps is worse than no flag.
+//
+// SO THE HOST CLONES AND THEN RUNS THIS. It already must: this file is IN the
+// repository, so nothing can invoke it before a clone exists. `--repo` is
+// therefore CHECKED against origin rather than used to clone. That catches the
+// real failure, which is a machine walking the wrong checkout.
 import { spawn, spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DELIVERABLE = resolve(HERE, "..", "..");
+const ROOT = resolve(DELIVERABLE, "..", "..");
 
 function arg(flag: string): string | undefined {
   const i = process.argv.indexOf(flag);
@@ -22,6 +34,14 @@ function arg(flag: string): string | undefined {
 function die(step: string, why: string): never {
   process.stderr.write(`${step}: ${why}\n`);
   process.exit(1);
+}
+
+/** NOT A STEP FAILURE, so it does not wear a step's name. A caller who forgot
+ *  an argument was told `verify:` and went looking at the runtime. Exit 2
+ *  separates "you called it wrong" from "a step failed". */
+function usage(why: string): never {
+  process.stderr.write(`${why}\nusage: se-start.ts --repo <url> --iteration <id> [--mirror-port <n>] [--agent <cmd>]\n`);
+  process.exit(2);
 }
 
 const say = (step: string, what: string): void => {
@@ -35,7 +55,7 @@ const say = (step: string, what: string): void => {
 // IT COMPARES AGAINST A PIN, NOT A FLOOR WE CANNOT PROVE. The declaration said
 // >=22.6 while the engine spawns `node <file>.ts` with no flag, so a host on
 // 22.x satisfied the check and then died inside a spawned script.
-function verify(): void {
+function verify(repo: string): void {
   const pkg = join(DELIVERABLE, "package.json");
   if (!existsSync(pkg)) die("verify", `no package.json at ${pkg}`);
   const declared = (JSON.parse(readFileSync(pkg, "utf8")) as { engines?: { node?: string } }).engines?.node;
@@ -43,7 +63,27 @@ function verify(): void {
   const want = Number(/(\d+)/.exec(declared)?.[1] ?? "0");
   const have = Number(/v(\d+)/.exec(process.version)?.[1] ?? "0");
   if (have < want) die("verify", `this engine needs node ${declared} and found ${process.version}`);
-  say("verify", `node ${process.version} meets ${declared}`);
+  // THE CHECKOUT IS THE ONE THE CALLER MEANT. A machine walking the wrong
+  // repository looks healthy the whole way and ships to the wrong place.
+  const origin = spawnSync("git", ["remote", "get-url", "origin"], { cwd: ROOT, encoding: "utf8" });
+  if (origin.status !== 0) die("verify", `no git origin at ${ROOT}, so this is not a clone of ${repo}`);
+  const url = origin.stdout.trim();
+  if (!sameRepo(url, repo)) die("verify", `this checkout is ${url} and the run asked for ${repo}`);
+  say("verify", `node ${process.version} meets ${declared}, origin is ${url}`);
+}
+
+/** Two addresses for one repository. ssh and https spellings differ, and a
+ *  trailing `.git` is optional, so compare the part that identifies it. */
+function sameRepo(a: string, b: string): boolean {
+  const bare = (s: string): string =>
+    s
+      .trim()
+      .replace(/\.git$/, "")
+      .replace(/^git@([^:]+):/, "$1/")
+      .replace(/^[a-z+]+:\/\//, "")
+      .replace(/\/+$/, "")
+      .toLowerCase();
+  return bare(a) === bare(b);
 }
 
 // ── install ─────────────────────────────────────────────────────────────────
@@ -64,19 +104,33 @@ function install(): void {
 // THE LANE STARTS AND THIS COMMAND RETURNS. Four steps run after this one, and
 // none of them runs if start blocks.
 //
-// MEASURED, 2026-08-15: a child sleeping 45 s held its caller for 45,600 ms on
-// Windows with detached, unref and stdio ignore all set
-// (exp-does-a-backgrounded-lane-release-its-caller).
+// MEASURED TWICE, AND THE FIRST MEASUREMENT WAS WRONG. i28 recorded a caller
+// held for 45,600 ms and built a platform split on it. At verification the
+// same shape was re-timed against the PARENT PROCESS rather than the lane
+// runner that launched it: 74 ms, with a child sleeping 20 s. The first run
+// timed the harness, which waits on the child it inherited. See
+// exp-does-a-backgrounded-lane-release-its-caller, which carries both numbers.
 //
-// SO THE DETACH IS EXPLICIT AND PLATFORM-AWARE, the same split selftest.ts
-// already makes: POSIX gets its own process group, Windows cannot and says so.
+// SO THE CALLER IS RELEASED ON BOTH PLATFORMS. The detach below is NOT for
+// that. On POSIX it puts the lane in its own process group so a closing
+// session does not take it down. Windows has no process group to ask for, and
+// `detached` there opens a console instead — which an unattended host has
+// nobody to see. Whether a POSIX host reaps the lane anyway is still owed, on
+// a machine this one cannot make.
+/** THE OPTIONS ARE EXPORTED SO THE TEST BINDS TO THEM. The release test used
+ *  to re-declare this shape as a string literal, which meant changing the real
+ *  spawn left it green. Found at i28's verification. */
+export const LANE_SPAWN = {
+  detached: process.platform !== "win32",
+  stdio: "ignore",
+} as const;
+
 function start(port: number): number {
   const lane = join(HERE, "se-mcp.ts");
   if (!existsSync(lane)) die("start", `no lane at ${lane}`);
-  const child = spawn(process.execPath, [lane, "--root", resolve(DELIVERABLE, "..", ".."), "--headless", "--mirror-port", String(port)], {
+  const child = spawn(process.execPath, [lane, "--root", ROOT, "--headless", "--mirror-port", String(port)], {
+    ...LANE_SPAWN,
     cwd: DELIVERABLE,
-    detached: process.platform !== "win32",
-    stdio: "ignore",
     env: { ...process.env, SE_PANEL_SUPPRESS: "1" },
   });
   if (child.pid === undefined) die("start", "the lane process did not spawn");
@@ -106,81 +160,126 @@ async function wait(port: number, seconds = 60): Promise<void> {
 }
 
 // ── fetch ───────────────────────────────────────────────────────────────────
-function fetchRefs(root: string, repo: string): void {
-  if (!existsSync(join(root, ".git"))) {
-    const c = spawnSync("git", ["clone", repo, root], { encoding: "utf8" });
-    if (c.status !== 0) die("fetch", (c.stderr || "git clone failed").trim().split("\n").pop() ?? "git clone failed");
-    say("fetch", "clone made");
-    return;
-  }
-  const r = spawnSync("git", ["fetch", "--all", "--prune"], { cwd: root, encoding: "utf8" });
+// IT BRINGS THE REFS AND THEN PROVES THE ONE IT CAME FOR IS THERE. A fetch
+// that succeeds against a repository missing the iteration is a green light
+// into a failure four steps later.
+function fetchRefs(iteration: string): void {
+  const r = spawnSync("git", ["fetch", "--all", "--prune"], { cwd: ROOT, encoding: "utf8" });
   if (r.status !== 0) die("fetch", (r.stderr || "git fetch failed").trim().split("\n").pop() ?? "git fetch failed");
-  say("fetch", "refs up to date");
+  const branch = `it/${iteration}`;
+  const known = spawnSync("git", ["rev-parse", "--verify", "--quiet", `refs/remotes/origin/${branch}`], {
+    cwd: ROOT,
+    encoding: "utf8",
+  });
+  if (known.status !== 0) die("fetch", `refs are up to date and this repository has no ${branch}`);
+  say("fetch", `refs up to date, ${branch} present`);
 }
 
 // ── adopt ───────────────────────────────────────────────────────────────────
+// IT CLAIMS, and a claim is the whole point of the step. It stood here for one
+// iteration reading `git rev-parse` and printing "is present", which claims
+// nothing — two machines given the same id would both have started walking.
+// Found at i28's verification.
+//
 // IT NAMES THE HOLDER, or warns that the claim did not land. Work starts
 // without a reachable remote; the claim failing is a warning, never a stop.
-function adopt(root: string, iteration: string): void {
-  const branch = `it/${iteration}`;
-  const known = spawnSync("git", ["rev-parse", "--verify", `refs/remotes/origin/${branch}`], { cwd: root, encoding: "utf8" });
-  if (known.status !== 0) die("adopt", `no branch ${branch} in this repository`);
-  say("adopt", `${iteration} is present`);
+// A claim already HELD BY SOMEBODY ELSE is a stop, because the alternative is
+// two machines walking one iteration.
+//
+// THE ENGINE IS IMPORTED HERE AND NOT AT THE TOP. install runs before this
+// step, and a top-level import would need the engine's modules to load before
+// verify has said a word about the runtime.
+async function adopt(iteration: string): Promise<void> {
+  const { claimIteration, machineId } = await import("../claims.ts");
+  const machine = machineId(join(ROOT, ".se"));
+  const r = claimIteration(ROOT, iteration, machine);
+  if (r.taken !== undefined) die("adopt", `${iteration} is held by machine ${r.taken.machine} since ${r.taken.at}`);
+  if (r.offline) {
+    say("adopt", `${iteration} claimed locally by machine ${machine} — the remote did not answer, so nothing is announced`);
+    return;
+  }
+  if (!r.ok) {
+    say("adopt", `${iteration} recorded locally by machine ${machine} — the announce did not land`);
+    return;
+  }
+  say("adopt", `${iteration} claimed by machine ${machine}`);
 }
 
 // ── launch ──────────────────────────────────────────────────────────────────
+// IT STARTS THE AGENT. It stood here checking two files existed and printing
+// "ready", which produced no walking agent at all — the one thing
+// req-one-command-starts-an-unattended-machine demands, graded fatal. Found at
+// i28's verification.
+//
 // THE CAGE RIDES THE COMMAND LINE. An agent without it is not caged, and that
 // is the one thing this step must never do quietly.
-function launch(root: string, iteration: string): void {
-  const cage = join(root, "project", "deliverable", "cage", "claude-settings.json");
+function launch(iteration: string, agent: string, pid: number): void {
+  const cage = join(ROOT, "project", "deliverable", "cage", "claude-settings.json");
   if (!existsSync(cage)) die("launch", `no cage template at ${cage}`);
   // THE AGENT MUST NOT HAVE TO WORK OUT WHERE IT IS. Nobody is beside it, so
-  // the last thing this command does is hand over the card written for
-  // exactly this situation, by path, along with its first act.
-  const card = join(root, "project", "guidance", "method", "cloud-runner.md");
+  // the card written for exactly this situation is handed over by path.
+  const card = join(ROOT, "project", "guidance", "method", "cloud-runner.md");
   if (!existsSync(card)) die("launch", `no cloud-runner guidance at ${card} — an unattended agent would start with nothing`);
-  say("launch", `ready — cage at ${cage}, iteration ${iteration}`);
+
+  // THE CAGE IS PLACED, not assumed. A fresh clone carries the template and
+  // not the host's settings file, so an agent started here would run uncaged.
+  const settings = join(ROOT, "project", ".claude", "settings.json");
+  if (!existsSync(settings)) {
+    mkdirSync(dirname(settings), { recursive: true });
+    copyFileSync(cage, settings);
+    say("launch", `cage placed at ${settings}`);
+  }
+
+  const probe = spawnSync(agent, ["--version"], { encoding: "utf8", shell: process.platform === "win32" });
+  if (probe.status !== 0) die("launch", `no agent named ${agent} on this machine — pass --agent <cmd> for the one that is`);
+
+  const child = spawn(agent, [briefing(iteration, card, pid)], {
+    ...LANE_SPAWN,
+    cwd: join(ROOT, "project"),
+    shell: process.platform === "win32",
+  });
+  if (child.pid === undefined) die("launch", `${agent} did not spawn`);
+  child.unref();
+  say("launch", `${agent} walking ${iteration} as pid ${child.pid}, caged by ${settings}`);
 }
 
 /** WHAT THE AGENT IS TOLD, and it is told rather than left to discover. An
- *  unattended machine has nobody to ask, so the entrypoint's last words are
- *  the briefing: where it is, what to read, and what to do first. */
-function brief(root: string, iteration: string, pid: number): void {
-  const card = join(root, "project", "guidance", "method", "cloud-runner.md");
-  process.stdout.write(
-    [
-      "",
-      "YOU ARE AN AGENT ON A CLOUD MACHINE. Nobody is watching this run.",
-      "",
-      `  iteration : ${iteration}`,
-      `  lane pid  : ${pid}`,
-      `  read this : ${card}`,
-      "",
-      "YOUR FIRST ACT IS se_pull WITH NO PAYLOAD. Everything follows from what it answers.",
-      "",
-      "THE SEVEN STEPS ABOVE ALREADY RAN. Do not repeat them, and do not build a second entrypoint.",
-      "",
-    ].join("\n"),
-  );
+ *  unattended machine has nobody to ask, so this is the briefing: where it is,
+ *  what to read, and what to do first. */
+function briefing(iteration: string, card: string, pid: number): string {
+  return [
+    "YOU ARE AN AGENT ON A CLOUD MACHINE. Nobody is watching this run.",
+    "",
+    `  iteration : ${iteration}`,
+    `  lane pid  : ${pid}`,
+    `  read this : ${card}`,
+    "",
+    "READ THAT CARD FIRST. It says what is different about running unattended.",
+    "",
+    "YOUR FIRST ACT AFTER IT IS se_pull WITH NO PAYLOAD. Everything follows from what it answers.",
+    "",
+    "THE SEVEN STEPS ALREADY RAN. Do not repeat them, and do not build a second entrypoint.",
+  ].join("\n");
 }
 
 async function main(): Promise<void> {
   const repo = arg("--repo");
   const iteration = arg("--iteration");
-  const root = resolve(arg("--root") ?? resolve(DELIVERABLE, "..", ".."));
   const port = Number(arg("--mirror-port") ?? 7333);
-  if (repo === undefined || iteration === undefined) {
-    die("verify", "usage: se-start.ts --repo <url> --iteration <id> [--root <dir>] [--mirror-port <n>]");
-  }
-  verify();
+  const agent = arg("--agent") ?? "claude";
+  if (repo === undefined || iteration === undefined) usage("--repo and --iteration are both required");
+  verify(repo);
   install();
-  fetchRefs(root, repo);
   const pid = start(port);
   await wait(port);
-  adopt(root, iteration);
-  launch(root, iteration);
-  process.stdout.write(`started: lane pid ${pid}, iteration ${iteration}\n`);
-  brief(root, iteration, pid);
+  fetchRefs(iteration);
+  await adopt(iteration);
+  launch(iteration, agent, pid);
+  process.stdout.write(`started: lane pid ${pid}, iteration ${iteration}, agent ${agent}\n`);
 }
 
-await main();
+// RUN ONLY WHEN INVOKED, so a test may import the parts above without
+// standing up a lane as a side effect of the import.
+if (process.argv[1] !== undefined && resolve(process.argv[1]) === resolve(fileURLToPath(import.meta.url))) {
+  await main();
+}
