@@ -12,4 +12,6 @@ refines:
 source_refs:
   - uc-answer-a-question-with-tests step 1
 priority: could
+weighs_against:
+  - req-one-note-per-settled-point > — a run whose question is lost cannot be judged; note fragments can be merged later
 ---

@@ -12,6 +12,8 @@ refines:
 source_refs:
   - uc-learn-the-machinery step 3
 priority: could
+weighs_against:
+  - req-pin-writes-seeded-scaffolds > — a newcomer who cannot map words to parts learns nothing; a placeholder gap is a known refusal
 ---
 
 ## Detail

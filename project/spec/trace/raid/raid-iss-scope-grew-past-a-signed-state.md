@@ -9,7 +9,7 @@ trigger: the next iteration whose scope grows after its requirements state signs
 status: open
 impact: Requirements get authored after their code. A row written afterwards describes what was built rather than what was needed, and the whole point of the milestone order is lost without anything going red.
 breaks_how_badly: corrosive
-how_likely: likely
+how_likely: expected
 probe: "found by hand on 2026-08-13, by reading i3's register against what had actually been built. No mechanical check exists, and none was attempted."
 probed: 2026-08-13
 source_refs:

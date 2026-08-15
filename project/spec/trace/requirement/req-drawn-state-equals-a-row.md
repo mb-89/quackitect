@@ -12,6 +12,8 @@ refines:
 source_refs:
   - reverse-engineered from tests/drawnsub.test.ts and tests/arrows.test.ts
 priority: should
+weighs_against:
+  - req-grouping-and-sorting-hold > — a weaker authoring path is structural; a mis-sorted table is one view
 ---
 
 ## Detail

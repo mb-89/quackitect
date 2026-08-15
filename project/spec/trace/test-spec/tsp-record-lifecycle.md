@@ -8,7 +8,7 @@ verifies:
   - "req-container-offers-its-records"
   - "req-survey-counts-only-open-records"
   - "req-record-opens-on-word"
-  - "req-entry-binds-worktree"
+  - "req-record-status-comes-from-the-record"
   - "req-walk-opens-at-retro"
   - "req-unshipped-dependency-refused"
   - "req-landing-needs-no-close"
@@ -17,6 +17,8 @@ verifies:
   - "req-size-proposal-names-strikes"
   - "req-bless-outputs-ride-the-bless"
   - "req-blessed-column-compiles-pinned"
+  - "req-a-shipped-record-is-never-reclaimed"
+  - "req-a-records-dependency-is-declared"
 files:
   - "tests/iterations.test.ts"
   - "tests/container.test.ts"
@@ -51,3 +53,15 @@ claim. The load-bearing steps: no gate holds the first start — entering
 binds, stamps started, and M0 stands; the bless pins the machine and it
 grows in place — no wrapper, fills carried; escalation reopens exactly
 the grown steps; the pin stores the COLUMN, never a frozen machine.
+
+## Two requirements joined here at i27
+
+[[req-a-shipped-record-is-never-reclaimed]] and
+[[req-a-records-dependency-is-declared]] were minted by i27 and belong to this
+collection rather than to a new one. Both are about a record's life, both
+verify by test, and both are caught by the same machinery this spec already
+covers.
+
+A SEPARATE SPEC WOULD HAVE SPLIT ONE CONCERN. The rule is one spec, one
+verification concern, and the concern here is the record's life from the word
+that opens it to the landing that ends it.

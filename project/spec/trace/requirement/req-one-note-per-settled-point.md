@@ -12,4 +12,6 @@ refines:
 source_refs:
   - uc-capture-a-stray ext 1b
 priority: could
+weighs_against:
+  - req-duplicate-stray-still-captured > — a drowned retro misses findings; a duplicate capture only costs a drain
 ---

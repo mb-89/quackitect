@@ -10,6 +10,7 @@ satisfies:
   - req-archive-read-only
   - req-archive-opens-to-a-person-only
   - req-archive-releases-worktrees
+  - req-record-status-comes-from-the-record
 inputs:
   - flow-closed-record
 outputs:

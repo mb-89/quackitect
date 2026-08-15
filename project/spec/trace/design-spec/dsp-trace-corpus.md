@@ -10,7 +10,6 @@ files:
   - "project/deliverable/engine/traceschema.ts"
   - "project/deliverable/engine/frontmatter.ts"
   - "project/deliverable/engine/bin/backfill-minted.ts"
-  - "project/deliverable/engine/puml_mindmap.ts"
 ---
 
 ## Responsibility

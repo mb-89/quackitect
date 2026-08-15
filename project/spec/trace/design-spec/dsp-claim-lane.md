@@ -2,7 +2,7 @@
 minted_in: i2-parallel-iterations-across-machines-seed
 id: dsp-claim-lane
 type: "[[design-spec]]"
-statement: claiming as record-then-announce over the claims branch — one add-only file per iteration, rebase-and-retry on a lost race, release as a second recorded commit
+statement: claiming as record-then-announce over the claims branch — one add-only file per iteration, fetch-and-retry on a lost race, release as a second recorded commit
 realizes:
   - "el-claim-ledger"
   - "if-claim-ledger-to-record-store"
@@ -36,7 +36,8 @@ outside git).
 ## Behavior and constraints
 
 - Add-only claim files: two claims never edit one file, so the branch
-  merges without conflict and reconcile is a rebase.
+  merges without conflict. A lost race is a fetch and a retry. It is never
+  a rebase, which SE-C-002 refuses outright.
 - The work tree never rides a claim push; the push carries machinery
   artifacts only (the seed stub and the claim file are the two
   sanctioned exceptions to the never-push law).

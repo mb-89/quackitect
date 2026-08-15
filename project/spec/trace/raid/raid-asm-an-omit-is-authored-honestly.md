@@ -9,7 +9,7 @@ trigger: the next row that gains an omit, or the first form that felt too short 
 status: open
 impact: A question that mattered stops being asked, silently and for good. Unlike a struck state, which is visible as a gap in the walk, a dropped field leaves a form that looks complete.
 breaks_how_badly: corrosive
-how_likely: unlikely
+how_likely: conceivable
 probe: "unprobed. Two rows carry an omit today and both were authored in the same hour as the mechanism, by the same hand, so they are not independent evidence."
 probed: "2026-08-13"
 source_refs:

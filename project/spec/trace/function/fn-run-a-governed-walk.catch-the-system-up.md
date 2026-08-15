@@ -6,6 +6,10 @@ cluster: the-walk
 statement: find where the system has fallen behind its own standard and bring it back, in one pass
 satisfies:
   - req-overhaul-opens-without-deliverable
+  - req-finding-keeps-its-sources
+  - req-finding-lands-as-reference
+  - req-no-claim-without-evidence
+  - req-missing-provider-named
   - req-overhaul-takes-only-unowned-drift
   - req-overhaul-closes-green
   - req-sweep-covers-every-drift-class

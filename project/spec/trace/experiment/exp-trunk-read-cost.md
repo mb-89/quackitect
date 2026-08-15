@@ -11,9 +11,9 @@ faked: none — the runs hit the real repository over twenty real method files
 fallback: worktree copies of the method tree, the fan-out class returning
 verdict: holds
 measured: 2026-08-10 — spawn-per-read 47 to 54 ms per file; one long-lived batch reader 2.0 ms per file (20 files, 41 ms total); plain disk 0.5 ms
-folds_to: raid-dec-thin-tree carries the dated measurement — the bet holds in the batch-reader shape only, and no requirement moves
+folds_to: "raid-dec-thin-tree carries the dated measurement — the bet holds in the batch-reader shape only, and no requirement moves"
 promote: "the long-lived batch reader as the M7 build's trunk-read shape — a spawn per read is ruled out by measurement"
-chunk: "trunk-batch-reader"
+chunk: delta-compose
 source_refs:
   - rank-unknowns, the seeded pick
 ---

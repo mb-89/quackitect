@@ -19,6 +19,8 @@ source_refs:
   - uc-resume-after-an-absence step 4
   - uc-resume-after-an-absence step 5
 priority: should
+weighs_with:
+  - req-the-answer-never-exceeds-its-bound ! — one is what the panel shows a returning person, the other what any lane answer may weigh
 weighs_against:
   - req-walk-survives-host-swap >
 ---

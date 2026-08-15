@@ -12,4 +12,6 @@ refines:
 source_refs:
   - uc-learn-the-machinery ext 3a
 priority: could
+weighs_against:
+  - req-desk-offers-a-tour > — a tour that dies on one part beats a tour nobody is offered
 ---

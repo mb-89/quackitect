@@ -16,6 +16,7 @@ satisfies:
   - req-compaction-reowes-the-reading
   - req-red-objective-serves-its-fill
   - req-a-placeholder-drawing-refuses-entry
+  - req-the-answer-never-exceeds-its-bound
   - req-missing-document-stops-the-walk
   - req-autonomy-gates-every-hop
   - req-autonomy-is-categorical

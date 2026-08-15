@@ -12,4 +12,6 @@ refines:
 source_refs:
   - uc-capture-a-stray ext 2a
 priority: could
+weighs_against:
+  - req-clean-sweep-is-dated > — friction at capture loses findings outright; an undated clean sweep loses only the date
 ---

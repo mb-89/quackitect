@@ -12,6 +12,7 @@ files:
   - "project/deliverable/engine/discipline.ts"
   - "project/deliverable/engine/promptlayer.ts"
   - "project/deliverable/engine/params.ts"
+  - "project/deliverable/engine/bound.ts"
   - "project/deliverable/engine/bin/se-mcp.ts"
   - "project/deliverable/engine/bin/se-manual.ts"
 ---

@@ -14,7 +14,7 @@ source_refs:
   - ".se/req-mine-v1.md: tests and the battery"
 priority: should
 weighs_against:
-  - req-entry-binds-worktree >
+  - req-parallel-iterations-own-worktrees >
 ---
 
 ## Detail

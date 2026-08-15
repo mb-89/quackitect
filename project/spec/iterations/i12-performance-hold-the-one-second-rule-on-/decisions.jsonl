@@ -375,3 +375,10 @@
 {"ts":"2026-08-15T11:30:35.214Z","op":"update","visit":"iterations/i12/trace-design@0","node":"d366","brief":"reading the three unlanded specs to bring them to trunk"}
 {"ts":"2026-08-15T11:31:04.349Z","op":"done","visit":"iterations/i12/trace-design@0","node":"d363","brief":"i27's four design specs are on its branch and not on trunk"}
 {"ts":"2026-08-15T11:31:09.243Z","op":"update","visit":"iterations/i12/trace-design@0","node":"d367","brief":"committing before the blocking question"}
+{"ts":"2026-08-15T11:31:17.810Z","op":"update","visit":"iterations/i12/trace-design@0","node":"d368","brief":"committed; the sweep's findings are the owner's to route"}
+{"ts":"2026-08-15T11:31:38.321Z","op":"done","visit":"iterations/i12/trace-design@0","node":"d364","brief":"the sweep's findings are recorded and put to the owner"}
+{"ts":"2026-08-15T11:31:49.370Z","op":"defer","visit":"iterations/i12/trace-design@0","node":"d365","brief":"reach verification","to":"verification","hops":1,"trail":["iterations/i12/trace-design","verification"]}
+{"ts":"2026-08-15T11:34:13.456Z","op":"plan","visit":"iterations/i12/trace-design@0","parent":null,"nodes":[{"id":"d369","brief":"measure what of i27's trace is missing"},{"id":"d370","brief":"land it on trunk"},{"id":"d371","brief":"write the class-fix note"},{"id":"d372","brief":"green the sweep"}]}
+{"ts":"2026-08-15T11:34:59.023Z","op":"done","visit":"iterations/i12/trace-design@0","node":"d369","brief":"116 of i27's trace nodes are missing from trunk"}
+{"ts":"2026-08-15T11:35:15.248Z","op":"update","visit":"iterations/i12/trace-design@0","node":"d373","brief":"taking our side on the nine conflicts, where trunk is newer"}
+{"ts":"2026-08-15T11:35:19.810Z","op":"update","visit":"iterations/i12/trace-design@0","node":"d374","brief":"staging the resolved merge"}

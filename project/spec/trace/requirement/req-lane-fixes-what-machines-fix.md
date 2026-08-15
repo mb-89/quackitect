@@ -12,6 +12,8 @@ refines:
 source_refs:
   - reverse-engineered from tests/lintfix.test.ts
 priority: should
+weighs_against:
+  - req-controls-draw-from-their-spec > — a cost on every write beats a control bar that drifts from its spec
 ---
 
 ## Detail

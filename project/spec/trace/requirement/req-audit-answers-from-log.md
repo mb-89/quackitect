@@ -13,6 +13,8 @@ source_refs:
   - uc-quality-maintainability step 4
   - ".se/req-mine-v2.md: logging, observability and the retro (v2-068, v2-070)"
 priority: could
+weighs_against:
+  - req-decision-graph-reads-as-branches > — a retro that drifts from what ran misroutes real work; an unreadable trail only costs reading
 ---
 
 ## Scenario

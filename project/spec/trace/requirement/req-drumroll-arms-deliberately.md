@@ -12,6 +12,8 @@ refines:
 source_refs:
   - reverse-engineered from tests/drumroll.test.ts
 priority: should
+weighs_against:
+  - req-purpose-recorded-at-begin > — accidental full delegation reaches the whole walk; a lost purpose reaches one product
 ---
 
 ## Detail

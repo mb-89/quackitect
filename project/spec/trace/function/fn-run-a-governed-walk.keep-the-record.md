@@ -13,21 +13,22 @@ satisfies:
   - req-outbound-query-logged
   - req-answer-recorded-with-question
   - req-upward-links-live-in-the-file
-  - req-trace-view-derived-from-files
+  - req-broken-trace-is-a-defect
+  - req-every-artifact-is-readable-text
+  - req-narration-toll-is-collected
   - req-nodes-scoped-to-iteration
   - req-trace-source-never-mixes
-  - req-broken-trace-is-a-defect
+  - req-trace-view-derived-from-files
   - req-story-links-its-proving-run
   - req-finding-lands-as-reference
   - req-finding-keeps-its-sources
   - req-no-claim-without-evidence
   - req-comparison-carries-both-sides
-  - req-narration-toll-is-collected
   - req-vendor-page-claim-only
   - req-missing-provider-named
-  - req-every-artifact-is-readable-text
   - req-no-agent-act-destroys-work
 inputs:
+  - flow-resolved-target
   - flow-dispatched-call
   - flow-stamped-claim
   - flow-outside-result

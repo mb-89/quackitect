@@ -14,7 +14,7 @@ source_refs:
   - opt-worktree-holds-only-the-record
   - cand-thin-worktree
   - req-trace-source-never-mixes
-  - req-entry-binds-worktree
+  - req-parallel-iterations-own-worktrees
 ---
 
 The winner's core seam. SE-C-134 stops being a rule the agent must remember

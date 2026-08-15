@@ -15,6 +15,8 @@ source_refs:
   - meth-requirement-authoring — population measure form
   - i19 cold read
 priority: could
+weighs_against:
+  - req-newcomer-one-command > — entry documents rotting unnoticed outlasts one install path's step count
 ---
 
 ## Scenario
