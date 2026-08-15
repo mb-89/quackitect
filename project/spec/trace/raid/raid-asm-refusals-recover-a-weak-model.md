@@ -10,8 +10,8 @@ status: open
 impact: The refusal contract is doctrine without a check. A clause whose remedy does not actually work costs every agent that meets it a wasted turn, and nobody finds out.
 breaks_how_badly: corrosive
 how_likely: plausible
-probe: "scheduled, and never probed. The check is one prepared session with a weak model, which the owner holds. Minted 2026-08-13 from a ruling of 2026-08-12, so it has no earlier result to decay."
-probed: 2026-08-13
+probe: "scheduled, never probed. The check is one prepared session with a weak model, which the owner holds."
+probed: "2026-08-13"
 source_refs:
   - "engine/errors.ts lines 2-3, where the contract is written"
   - "guidance/refusals.md, the feed-forward side of every clause"

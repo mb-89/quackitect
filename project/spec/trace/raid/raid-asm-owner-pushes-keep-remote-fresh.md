@@ -7,8 +7,8 @@ statement: The owner's pushes of landed work keep the remote fresh enough that a
 owner: the owner
 trigger: a peer refuses a claim over a dependency that shipped locally but was never pushed
 status: open
-probed: "not yet — scheduled at M7"
-probe: "scheduled — ship an iteration locally unpushed, then ask a second clone to claim a dependent stub and read the refusal text; runs at M7 with the dependency gating"
+probed: "not yet - scheduled at M7"
+probe: "scheduled - ship locally unpushed, then have a second clone claim a dependent stub and read the refusal. Runs at M7."
 impact: Dependency gating reads shipped state from the remote; work pushes stay the owner's act, so an unpushed shipped iteration blocks every peer's dependent claims while looking like a gating bug.
 breaks_how_badly: corrosive
 how_likely: likely

@@ -11,7 +11,7 @@ impact: The verb answers "blocked, reason unavailable" for some states. That is 
 breaks_how_badly: crippling
 how_likely: plausible
 probe: "partially probed, holds so far. Five condition types stand under machines/conditions and every one carries a note saying what it wants. The weight-against-dial case answers itself, since the engine holds both numbers. The COMPUTED pile is not counted, and that half decides the verb's contract."
-probed: 2026-08-13
+probed: "2026-08-13"
 source_refs:
   - req-one-verb-says-why-a-state-is-grey
   - "the contract's condition rule: every entry/exit key is a condition type, and its note says what it wants"

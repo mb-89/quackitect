@@ -13,6 +13,7 @@ satisfies:
   - req-walk-resumes-from-repo
   - req-walk-survives-host-swap
   - req-resume-needs-no-person
+  - req-a-worktree-exists-only-while-a-walk-is-bound
 inputs:
   - flow-open-record
   - flow-repository

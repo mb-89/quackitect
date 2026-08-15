@@ -15,6 +15,9 @@ satisfies:
   - req-engine-pushes-only-machinery
   - req-pool-opens-on-first-claim
   - req-absent-ledger-is-not-offline
+  - req-the-iteration-list-comes-from-git
+  - req-a-held-iteration-names-its-holder
+  - req-work-starts-without-a-reachable-remote
 inputs:
   - flow-repository
 outputs:

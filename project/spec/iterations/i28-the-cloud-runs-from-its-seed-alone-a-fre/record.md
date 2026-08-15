@@ -169,3 +169,63 @@ WHAT THE SWEEP ACTUALLY FINDS, measured rather than assumed. 28 folders stood on
 SO THE ARCHIVE IS ALREADY CLEAN, and the owner's expectation of old archived iterations lying around does not match the disk. What IS lying around is 27 folders for iterations nobody is working, which exist only because seeding creates one and nothing ever removes it.
 
 THAT IS THE SAME DEFECT FROM THE OTHER END, and the sweep is worth doing for exactly the reason given: the archive reads from git, and so should the container. A folder on disk should mean somebody is working that iteration right now, and nothing else.
+
+## OWNER DESIGN, 2026-08-15: GIT IS THE TRUTH AND THE DISK IS A WORKSPACE
+
+THE OWNER STATED THE WHOLE RULE, in their own words, after the entry defect above. It is the same rule said five ways, and it supersedes nothing here — it completes what the field report of 2026-08-14 started.
+
+THE FIVE POINTS.
+
+- A SEEDED ITERATION LIVES IN GIT. Seeding does not put a folder on disk. "A seeded iteration is not seeded when it's on disc. It needs to be visible on Git."
+- THE ITERATIONS VIEW IS A MERGE of the seeds visible in git and the iterations live on this machine. "the view that opens for me, it's constructed from the iterations on my machine and the iterations in Git that are seeded."
+- THE STATE MACHINE SEES A BRANCH THAT IS NOT ON DISK. A seed another machine pushed is SELECTABLE here without downloading anything. "I don't need to download the work tree so I can see it as a selectable iteration."
+- ENTERING IS WHAT DOWNLOADS IT. "when I choose to enter that seed, then I download the data." The folder is created at the moment of entry and at no other moment.
+- ARCHIVED ITERATIONS HAVE NO FOLDER ANYWHERE, and every machine reads the archive through git. "every iteration, no matter on which machine it's running, should see the archive through Git."
+
+WHAT THIS MEANS IN ONE SENTENCE: a folder on disk means somebody is working that iteration right now, on this machine, and nothing else.
+
+THE WRITE SIDE ALREADY WORKS, and knowing that changes where the work is. Seeding pushes `it/<id>` to the shared remote as one of the engine's own sanctioned pushes, so a seed IS in git today. What is broken is the READER: project/deliverable/engine/iterations.ts line 71 sets `open: existsSync(path)`, so the container asks the disk and never asks git. Plus the fetch refspec a fresh clone needs before it can see `refs/heads/it/*` at all.
+
+SO THIS IS NOT A MISSING FEATURE. It is a reader pointed at the wrong source.
+
+WHY IT MATTERS FOR THE CLOUD, which is this record's whole subject. A cloud machine clones and has no worktrees. Under today's reader it sees zero iterations and cannot be given work at all. The owner put it plainly: how else would the cloud machine see the iterations.
+
+## THE ONE OPEN CHOICE, put to the owner 2026-08-15
+
+AN ITERATION CLAIMED BY ANOTHER MACHINE. The owner said they would be fine with it simply not showing up.
+
+THE TRADEOFF THAT MAKES IT A CHOICE RATHER THAN A DEFAULT. Hiding it means in-flight work appears on NO surface anywhere. [[raid-debt-claim-pool-surfaces]] already records that the holder listing and the force release exist as engine functions with no product surface at all. So a claimed iteration would vanish from the owner's board and appear nowhere else, while the engine knows exactly who holds it.
+
+THE CHEAP ALTERNATIVE, costing about the same to build: the container draws a claimed iteration greyed, carrying its holder, and refuses entry with that holder named. The information already exists in the claim ledger.
+
+RULED 2026-08-15: GREYED, WITH ITS HOLDER. The owner's words: "I would say, yeah, I agree with you. It's better to have it grayed out. That's the better shot. Do it like that."
+
+SO A CLAIMED ITERATION IS DRAWN AND REFUSED, never hidden. It appears in the container carrying who holds it, and entry refuses naming that holder. The information already exists in the claim ledger and today reaches no surface at all, which is [[raid-debt-claim-pool-surfaces]]. This is the first surface it reaches.
+
+## THE ENGINE PUSHES WHAT THE LANE NEEDS, owner ruling 2026-08-15
+
+THE OWNER'S POINT, and it closes a gap the design would otherwise have left: entering an iteration writes a claim, and a claim is a change in git that somebody would have to push. Their words: "the same way you can push claims, I think the engine can already push claims. I feel like the engine can also push seeds. That's fine for me."
+
+BOTH ARE ALREADY SANCTIONED AND THE RULING MAKES IT EXPLICIT. guidance/refusals.md under SE-C-003 records that the machinery itself pushes the iteration seed stub, the expedition seed stub and the claim file, as acts of the claim lane in engine/claims.ts. The agent's own push refusal stands untouched.
+
+WHAT THAT UNBLOCKS HERE. Materialise-on-entry needs a fetch rather than a push, so it is free. The claim written at entry needs a push, and that push is the engine's own and already exists. Nothing in the five points waits on a person pressing anything.
+
+## OWNER RULING, 2026-08-15: EVERY GATE CAN WRITE
+
+THEIR WORDS, after this iteration's own M1 gate found a hole it could not record: "A gate cannot write. I am not sure if we can keep that. The idea is that a gate can create debt. That means it needs to be able to mint notes, and then it should also be able to write. I put you in emergency mode. When you start implementing, fix that for all gates. All gates need to be able to write."
+
+THIS IS SCOPE FOR THIS ITERATION, and it applies to EVERY gate rather than to the one that hit it.
+
+WHAT PROVOKED IT, so the fix has a case to test against. The motivation gate's red-team round found that a crashed walk leaves a folder that means nothing. The finding is real and the gate graded it. It could not mint the register entry, because gate states grant only read tools, so the entry was carried in follow-up and written one state later.
+
+THE METHOD ALREADY CONTRADICTED ITSELF HERE, and that is the stronger argument than the inconvenience.
+
+- meth-raid says any state may add an entry the moment it is noticed, and that waiting for the right state is how an entry is lost.
+- machines/items/raid.md says the implementation gate lists what the iteration took in `debt_taken`, and a debt is a node.
+- So a gate is REQUIRED to reference debt nodes it is structurally forbidden to create.
+
+A GATE THAT CANNOT RECORD WHAT IT FINDS turns a finding into a note for somebody else, which is exactly the shape the contract's rule 5 names: the defect gets named accurately, in the right place, with the right severity, and then the work continues past it as though naming were fixing.
+
+WHAT TO BUILD. Gate states grant the write tools, at minimum se_file_write, se_file_patch and se_note. The rigor matrix rows for every gate carry it, so it is one sweep rather than a per-gate decision.
+
+THE ONE THING TO KEEP, and it is why the restriction existed. A gate must not quietly rewrite the evidence it is judging. The guard is authorship rather than tool grants: a gate writes NEW nodes and its own form, and never edits an upstream form it is reviewing. That distinction is checkable and the blanket refusal was not.

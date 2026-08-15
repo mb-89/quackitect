@@ -3,7 +3,7 @@ minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: fn-run-a-governed-walk.stand-up-a-product
 type: "[[function]]"
 cluster: the-bootstrap
-statement: take a computer with nothing on it to a product standing at its own front desk
+statement: take a computer with nothing on it to a product that is running, whether it stops at its own front desk or walks straight into work
 satisfies:
   - req-one-script-installs
   - req-setup-floor-editor-shell
@@ -18,6 +18,8 @@ satisfies:
   - req-begin-says-own-window
   - req-purpose-recorded-at-begin
   - req-fresh-product-starts-empty
+  - req-one-command-starts-an-unattended-machine
+  - req-the-lane-runs-without-a-console
 inputs:
   - flow-bare-computer
   - flow-product-template

@@ -23,6 +23,12 @@ Demonstrated with two clones (m1, m2) of one bare origin. Each minted its own ma
 
 ---
 
+The second machine need not be one they own. A rented host with a shell and nothing else becomes the second pair of hands from one pasted line, with nobody at its keyboard afterwards.
+|||
+OWED, and it is i28's subject. Today a fresh clone sees no iterations at all, because the reader asks the disk rather than git. [[nbr-cloud-host]] carries the four properties that make an unattended host different: unconfigured, unattended, ephemeral, and no session to wake.
+
+---
+
 At the desk they seed the batch. Every stub lands on the remote the moment it exists - git knows each iteration before anyone works it.
 |||
 itSeed answered announced: true, and ls-remote showed refs/heads/it/i1-claim-lane-demo on the origin immediately after the seeding act.

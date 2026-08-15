@@ -23,6 +23,7 @@ source_refs:
 priority: should
 weighs_against:
   - req-repo-search-carries-intent >
+  - req-engine-folder-is-sealed >
 ---
 
 ## Detail

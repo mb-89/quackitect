@@ -225,7 +225,14 @@ export type Channel = "human" | "agent";
  *  what you would have been refused with. */
 export interface Blocker {
   /** The machine-readable reason, for a caller that wants to branch. */
-  kind: "form_incomplete" | "unsubmitted" | "unsigned_feeder" | "unblessed_gate" | "fallen_input" | "claim_content";
+  kind:
+    | "form_incomplete"
+    | "unsubmitted"
+    | "unsigned_feeder"
+    | "unblessed_gate"
+    | "fallen_input"
+    | "claim_content"
+    | "submachine_unfinished";
   clause: string;
   expected: string;
   got: string;
@@ -5344,17 +5351,44 @@ export class Session {
    *  the way it came. Neither is something the state waits for. */
   private feedersUnsigned(fm: MachineDecl, state: StateDecl): string[] {
     const REQUIRED = new Set(["normal", "approval"]);
+    // A PLACEHOLDER THAT RUNS A SUBMACHINE IS AN INPUT TOO (owner instruction
+    // 2026-08-15, after i28 stamped six states on top of an unfinished one).
+    //
+    // THE TWO GUARDS DISAGREED ABOUT WHAT AN INPUT IS. claimBlockers builds
+    // `claimful` as `evidence_form.length > 0 || submachine !== undefined`.
+    // This filter tested only the first half, so a `runs:` placeholder was not
+    // a feeder here at all and the submit stamped straight over an unseeded
+    // fan.
+    //
+    // THAT IS THE WORST SHAPE AVAILABLE: green everywhere at the submit, and a
+    // dead chain found six states later by the claim-guard. The refusal never
+    // landed where the work was, so nothing could be fixed while it was cheap.
     const feeders = fm.states.filter(
-      (p) => p.evidence_form.length > 0 && p.edges.some((e) => e.to === state.id && REQUIRED.has(e.role ?? "normal")),
+      (p) =>
+        (p.evidence_form.length > 0 || p.submachine !== undefined) &&
+        p.edges.some((e) => e.to === state.id && REQUIRED.has(e.role ?? "normal")),
     );
     if (feeders.length === 0) return [];
-    const unsigned = feeders.filter((p) => {
-      try {
-        return (this.stateFormGet(p.id, fm) as { signed?: boolean }).signed !== true;
-      } catch {
-        return true;
+    // A SUBMACHINE STATE HAS NO SIGNATURE TO READ, so it is asked the question
+    // the claim-guard asks instead: does the record call it done. An unseeded
+    // drawing answers no, because drawingDone catches viewFor's refusal.
+    //
+    // COMPUTED ONLY WHERE SUCH A FEEDER EXISTS. recordDone paints the whole
+    // machine and this runs on the submit path, so it stays off the hot path
+    // for every state fed only by ordinary forms.
+    let done: Set<string> | undefined;
+    const finished = (p: StateDecl): boolean => {
+      if (p.evidence_form.length === 0) {
+        done ??= new Set(this.recordDone(fm));
+        return done.has(p.id);
       }
-    });
+      try {
+        return (this.stateFormGet(p.id, fm) as { signed?: boolean }).signed === true;
+      } catch {
+        return false;
+      }
+    };
+    const unsigned = feeders.filter((p) => !finished(p));
     // THE BAR IS THE AND: every input signed, or the state does not stamp.
     if (state.busbar === true) return unsigned.map((p) => p.id);
     // NO BAR IS THE OR, and the OR still demands ONE. A state waits until an
@@ -5526,7 +5560,14 @@ export class Session {
       gate?: boolean;
       bless?: string;
     };
-    if (lint.met !== true) {
+    // A PLACEHOLDER OWES NO FORM, so it must never be reported as owing one
+    // (owner, 2026-08-15). run-candidates declares `runs:` and no evidence at
+    // all. Saying its "evidence form" was unfilled named a path no state ever
+    // writes, and the only honest reading of that message is to go and write
+    // the file by hand — which is exactly what happened.
+    const here = this.currentMachine().states.find((s) => s.id === stateId);
+    const owesForm = here === undefined || here.evidence_form.length > 0;
+    if (owesForm && lint.met !== true) {
       out.push({
         kind: "form_incomplete",
         clause: CLAUSES.CONDITION_UNMET,
@@ -5562,6 +5603,24 @@ export class Session {
           source: "engine/session.ts stateform",
         });
       }
+    }
+    // WHAT ACTUALLY HOLDS A PLACEHOLDER: its drawing. An unseeded one proves
+    // nothing and drawingDone answers false, so the state never goes green and
+    // everything under it falls. Naming the drawing points at the state that
+    // authors it; naming a form points at a file to write by hand.
+    if (here?.submachine !== undefined && !new Set(this.recordDone(this.currentMachine())).has(stateId)) {
+      out.push({
+        kind: "submachine_unfinished",
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `${stateId} runs a drawing — it is finished when every state that drawing declares is green`,
+        got: "the drawing is unseeded or its states are not all green",
+        remedy: {
+          tool: "se_pull",
+          args: {},
+          note: "walk the state that AUTHORS the drawing and let it seed one; a drawing written by hand is not seeded and proves nothing",
+        },
+        source: "engine/session.ts stateform",
+      });
     }
     // THE CLAIM'S OWN BLOCKERS, from the same mechanism the walk's guard
     // throws with. Before this the verb ran neither the ripple nor the
