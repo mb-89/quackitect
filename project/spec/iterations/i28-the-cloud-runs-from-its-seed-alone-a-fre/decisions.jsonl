@@ -466,3 +466,10 @@
 {"ts":"2026-08-15T18:51:12.219Z","op":"done","visit":"iterations/i28/rank-unknowns@0","node":"d128","brief":"battery ran: 1311 of 1314 pass"}
 {"ts":"2026-08-15T18:51:18.788Z","op":"fork","visit":"iterations/i28/rank-unknowns@0","parent":null,"node":"d138","brief":"polling the cage and drift run","nodes":[]}
 {"ts":"2026-08-15T18:51:43.941Z","op":"done","visit":"iterations/i28/rank-unknowns@0","node":"d138","brief":"18 of 18 pass; all three battery failures resolved"}
+{"ts":"2026-08-15T18:53:48.105Z","op":"update","visit":"iterations/i28/gate-motivation@0","node":"d4","brief":"sweeping on"}
+{"ts":"2026-08-15T18:54:19.749Z","op":"update","visit":"iterations/i28/gate-requirements@0","node":"d5","brief":"sweeping through M4 and M5"}
+{"ts":"2026-08-15T18:54:46.183Z","op":"done","visit":"start@0","node":"d1","brief":"the condition now reads the worktree; the call log needs the machine root"}
+{"ts":"2026-08-15T18:54:58.000Z","op":"fork","visit":"iterations/i28/enumerate-space/find_prior_art@0","parent":null,"node":"d6","brief":"finding the env convention for the .se directory","nodes":[]}
+{"ts":"2026-08-15T18:55:11.793Z","op":"update","visit":"iterations/i28/enumerate-space/find_prior_art@0","node":"d7","brief":"the script gets the corpus and the machine's .se separately"}
+{"ts":"2026-08-15T18:55:21.154Z","op":"update","visit":"iterations/i28/enumerate-space/find_prior_art@0","node":"d8","brief":"typechecking the two-root spawn"}
+{"ts":"2026-08-15T18:55:33.066Z","op":"done","visit":"iterations/i28/enumerate-space/find_prior_art@0","node":"d6","brief":"both roots handed to scripts; typecheck clean"}
