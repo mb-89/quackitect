@@ -11,7 +11,7 @@ impact: A question that mattered stops being asked, silently and for good. Unlik
 breaks_how_badly: corrosive
 how_likely: unlikely
 probe: "unprobed. Two rows carry an omit today and both were authored in the same hour as the mechanism, by the same hand, so they are not independent evidence."
-probed: 2026-08-13
+probed: "2026-08-13"
 source_refs:
   - "engine/machine.ts, EvidenceField.omit — absent means asked everywhere"
   - "engine/rigor-matrix.ts rowState, the column filter"

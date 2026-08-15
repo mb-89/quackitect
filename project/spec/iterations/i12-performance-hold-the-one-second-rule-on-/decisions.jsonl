@@ -136,3 +136,52 @@
 {"ts":"2026-08-15T10:36:02.994Z","op":"update","visit":"iterations/i12/derive-functions@0","node":"d143","brief":"resubmitting derive-functions with flows and neutrality"}
 {"ts":"2026-08-15T10:36:19.090Z","op":"update","visit":"iterations/i12/derive-functions@0","node":"d144","brief":"flows given as references"}
 {"ts":"2026-08-15T10:36:31.871Z","op":"done","visit":"iterations/i12/derive-functions@0","node":"d136","brief":"derive-functions signed"}
+{"ts":"2026-08-15T10:36:37.052Z","op":"update","visit":"iterations/i12/derive-functions@0","node":"d145","brief":"checkpointing M2 and M3"}
+{"ts":"2026-08-15T10:36:42.977Z","op":"update","visit":"iterations/i12/derive-functions@0","node":"d146","brief":"checkpointed — walking on to the requirements gate"}
+{"ts":"2026-08-15T10:36:50.359Z","op":"update","visit":"iterations/i12/derive-functions@0","node":"d147","brief":"walking the assumptions branch the gate still owes"}
+{"ts":"2026-08-15T10:37:32.494Z","op":"plan","visit":"iterations/i12/identify-assumptions@0","parent":null,"nodes":[{"id":"d148","brief":"sweep the six sources"},{"id":"d149","brief":"fill identify-assumptions"},{"id":"d150","brief":"probe the assumptions"}]}
+{"ts":"2026-08-15T10:37:37.446Z","op":"update","visit":"iterations/i12/identify-assumptions@0","node":"d151","brief":"correcting the node type on the environment assumption"}
+{"ts":"2026-08-15T10:37:52.941Z","op":"update","visit":"iterations/i12/identify-assumptions@0","node":"d152","brief":"toolchain assumption: Node's TAP keeps carrying durations"}
+{"ts":"2026-08-15T10:38:09.299Z","op":"done","visit":"iterations/i12/identify-assumptions@0","node":"d148","brief":"six sources swept, three turned something up"}
+{"ts":"2026-08-15T10:38:33.998Z","op":"done","visit":"iterations/i12/identify-assumptions@0","node":"d149","brief":"identify-assumptions submitted with the six-source sweep"}
+{"ts":"2026-08-15T10:38:56.503Z","op":"update","visit":"iterations/i12/identify-assumptions@0","node":"d153","brief":"reading the probing method before probing every standing assumption"}
+{"ts":"2026-08-15T10:39:08.809Z","op":"update","visit":"iterations/i12/identify-assumptions@0","node":"d154","brief":"battery run one, for the wall-clock baseline probe"}
+{"ts":"2026-08-15T10:39:12.496Z","op":"update","visit":"iterations/i12/identify-assumptions@0","node":"d155","brief":"opening the probe form while the battery runs"}
+{"ts":"2026-08-15T10:39:44.462Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d156","brief":"retrying after the engine blocked under battery load"}
+{"ts":"2026-08-15T10:39:50.164Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d157","brief":"polling battery run one again"}
+{"ts":"2026-08-15T10:40:06.637Z","op":"obsolete","visit":"iterations/i12/derive-functions@0","node":"d137","brief":"the milestones track the walk better than one coarse item"}
+{"ts":"2026-08-15T10:40:09.957Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d158","brief":"polling battery run one past the 77s mark"}
+{"ts":"2026-08-15T10:40:13.087Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d159","brief":"polling battery run one"}
+{"ts":"2026-08-15T10:40:20.777Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d160","brief":"reading the scoped runner's seams while the battery finishes"}
+{"ts":"2026-08-15T10:40:23.775Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d161","brief":"polling battery run one"}
+{"ts":"2026-08-15T10:40:26.899Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d162","brief":"reading the se_test handler around the scoped spawn"}
+{"ts":"2026-08-15T10:40:48.359Z","op":"done","visit":"iterations/i12/identify-assumptions@0","node":"d150","brief":"battery green at 1301 of 1301 after the merge"}
+{"ts":"2026-08-15T10:41:09.906Z","op":"plan","visit":"iterations/i12/probe-assumptions@0","parent":null,"nodes":[{"id":"d163","brief":"answer the worker-pool question"},{"id":"d164","brief":"probe the wall clock"},{"id":"d165","brief":"finish M3"}]}
+{"ts":"2026-08-15T10:41:15.213Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d166","brief":"checking where the test run sets its concurrency"}
+{"ts":"2026-08-15T10:41:20.564Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d167","brief":"reading how the battery sizes its own parallelism"}
+{"ts":"2026-08-15T10:41:24.271Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d168","brief":"reading selftest's parallelism block directly"}
+{"ts":"2026-08-15T10:41:36.356Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d169","brief":"reading what i27's satellite process actually carries"}
+{"ts":"2026-08-15T10:42:00.893Z","op":"done","visit":"iterations/i12/probe-assumptions@0","node":"d163","brief":"answered from the code: no worker pool, and the cause is CPU starvation"}
+{"ts":"2026-08-15T10:42:09.917Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d170","brief":"battery run two on the unchanged tree, for the baseline spread"}
+{"ts":"2026-08-15T10:42:19.997Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d171","brief":"capturing run one's summary before run two lands"}
+{"ts":"2026-08-15T10:42:30.600Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d172","brief":"checking whether the battery wrote its summary into the record's tree"}
+{"ts":"2026-08-15T10:42:35.789Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d173","brief":"reading the progress file to see where the battery is writing"}
+{"ts":"2026-08-15T10:42:55.179Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d174","brief":"polling battery run two"}
+{"ts":"2026-08-15T10:43:32.176Z","op":"obsolete","visit":"iterations/i12/probe-assumptions@0","node":"d164","brief":"blocked until I know where the battery writes its timings"}
+{"ts":"2026-08-15T10:43:38.542Z","op":"plan","visit":"iterations/i12/probe-assumptions@0","parent":null,"nodes":[{"id":"d175","brief":"find where the timings are written"},{"id":"d176","brief":"probe the wall clock"}]}
+{"ts":"2026-08-15T10:43:54.233Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d177","brief":"polling run two before checking the timings files"}
+{"ts":"2026-08-15T10:44:03.688Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d178","brief":"searching i27's spec for the warm-process pool"}
+{"ts":"2026-08-15T10:44:16.570Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d179","brief":"searching i27's own branch for the warm-process idea"}
+{"ts":"2026-08-15T10:44:23.193Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d180","brief":"reading the satellite lifecycle design spec"}
+{"ts":"2026-08-15T10:44:36.709Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d181","brief":"reading the supervisor-to-test-runner interface"}
+{"ts":"2026-08-15T10:44:50.520Z","op":"done","visit":"iterations/i12/probe-assumptions@0","node":"d175","brief":"checking whether two battery runs appended to the timings log"}
+{"ts":"2026-08-15T10:45:31.007Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d182","brief":"recording the warm-process answer and the timings finding"}
+{"ts":"2026-08-15T10:46:01.270Z","op":"done","visit":"iterations/i12/probe-assumptions@0","node":"d176","brief":"the battery's timings hole recorded as a standing issue"}
+{"ts":"2026-08-15T10:46:54.666Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d183","brief":"submitting probe-assumptions with two probes run and one empty"}
+{"ts":"2026-08-15T10:47:27.373Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d184","brief":"reading the stored probe values whole"}
+{"ts":"2026-08-15T10:47:48.851Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d185","brief":"recovering the probe lines my submit truncated"}
+{"ts":"2026-08-15T10:48:09.346Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d186","brief":"noted the owner's objection to a fixed worker number"}
+{"ts":"2026-08-15T10:48:30.907Z","op":"update","visit":"iterations/i12/probe-assumptions@0","node":"d187","brief":"restoring the seven probe fields my submit truncated"}
+{"ts":"2026-08-15T10:49:00.235Z","op":"done","visit":"iterations/i12/probe-assumptions@0","node":"d165","brief":"probe cells rewritten short so the nodes take them whole"}
+{"ts":"2026-08-15T10:49:20.480Z","op":"plan","visit":"iterations/i12/gate-requirements@0","parent":null,"nodes":[{"id":"d188","brief":"pass the requirements gate"},{"id":"d189","brief":"build the timings fix"},{"id":"d190","brief":"measure and close"}]}
+{"ts":"2026-08-15T10:49:26.504Z","op":"update","visit":"iterations/i12/gate-requirements@0","node":"d191","brief":"checkpointing M3 before the gate"}

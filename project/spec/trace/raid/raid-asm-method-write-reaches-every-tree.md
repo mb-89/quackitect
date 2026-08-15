@@ -7,7 +7,8 @@ statement: A shared method write reaches every tree, so a method fix made inside
 owner: the driving agent
 trigger: a shared method file differs between trunk and a record's worktree
 status: open
-probe: "unprobed - the merge at this record's close is the check, and until then the engine's own worktree case is the only witness."
+probed: "2026-08-15"
+probe: "unprobed - the merge at close is still the check. product.md now states the method resolution is already live, which strengthens it without settling it."
 impact: i27 emitted the meth-consistency-sweep fix to this record's promotions. If the write stayed in the worktree alone, the promotion is not landed and the same emit repeats in the next record.
 breaks_how_badly: abrasive
 how_likely: conceivable

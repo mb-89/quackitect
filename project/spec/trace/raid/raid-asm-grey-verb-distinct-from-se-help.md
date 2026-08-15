@@ -11,7 +11,7 @@ impact: Two verbs ship with overlapping surfaces and neither owner notices, beca
 breaks_how_badly: abrasive
 how_likely: plausible
 probe: "scheduled. The check is putting both verb signatures side by side, and se.help does not exist yet. i8 is being worked on another machine, so the probe waits on that landing rather than guessing at it."
-probed: 2026-08-13
+probed: "2026-08-13"
 source_refs:
   - "i3's kickoff gate, round 2 red team, 2026-08-13"
   - "project/spec/version-planning.md § i8 — se.help"
