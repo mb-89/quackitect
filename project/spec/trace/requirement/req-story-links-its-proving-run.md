@@ -13,4 +13,6 @@ source_refs:
   - uc-trace-a-decision-to-its-origin ext 6a
   - ".se/req-mine-v1.md: the mirror — book, report, hand-off"
 priority: could
+weighs_against:
+  - req-test-run-carries-its-question > — proof answered from memory is the weaker of the two memory failures
 ---

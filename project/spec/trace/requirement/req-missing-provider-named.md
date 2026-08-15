@@ -13,4 +13,6 @@ source_refs:
   - uc-research-and-record-an-answer ext 2a
   - ".se/req-mine-v1.md: Refusals and honesty"
 priority: should
+weighs_against:
+  - req-divergence-order-on-record > — a silently worked-around gap is never fixed; a back-filled option is at least recoverable by reading
 ---

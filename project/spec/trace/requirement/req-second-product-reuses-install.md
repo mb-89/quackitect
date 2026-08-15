@@ -13,4 +13,6 @@ source_refs:
   - uc-begin-a-product step 6
   - ".se/req-mine-v1.md: lifecycle and distribution"
 priority: could
+weighs_against:
+  - req-tour-ends-at-the-desk > — a heavy second product is paid by every builder; a dead-ended tour by newcomers only
 ---

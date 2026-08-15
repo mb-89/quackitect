@@ -2,7 +2,7 @@
 minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: req-archive-releases-worktrees
 type: "[[requirement]]"
-statement: When a record archives, the engine shall remove every worktree bound to it, leaving zero worktrees referencing the record.
+statement: When a record archives, the engine shall leave zero working copies of it occupying disk, and shall keep the record retrievable from the repository alone.
 kind: functional
 verify_method: test
 breaks_if_removed: Stale worktrees survive the archive, and nobody can prove nothing unfinished survived the close.

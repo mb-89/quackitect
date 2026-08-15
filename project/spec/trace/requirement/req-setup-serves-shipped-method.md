@@ -12,4 +12,6 @@ refines:
 source_refs:
   - uc-vendor-and-overlay step 2
 priority: could
+weighs_against:
+  - req-second-product-reuses-install > — not being able to try the engine blocks adoption; a repeated install only slows it
 ---

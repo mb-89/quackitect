@@ -13,4 +13,6 @@ source_refs:
   - uc-begin-a-product step 1
   - ".se/req-mine-sebots.md: state — derived, append-only, on disk"
 priority: could
+weighs_against:
+  - req-setup-serves-shipped-method > — a purpose lost to the next session beats a builder having to overlay before trying
 ---

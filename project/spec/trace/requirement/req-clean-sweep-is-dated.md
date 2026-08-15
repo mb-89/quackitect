@@ -12,4 +12,6 @@ refines:
 source_refs:
   - uc-let-the-system-catch-up ext 2a
 priority: could
+weighs_against:
+  - req-newcomer-orients-unaided > — both are measurement gaps; the method's own agreement is checked more often than a cold read
 ---

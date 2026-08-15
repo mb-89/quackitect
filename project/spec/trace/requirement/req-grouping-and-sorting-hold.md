@@ -12,6 +12,8 @@ refines:
 source_refs:
   - reverse-engineered from tests/grouping.test.ts
 priority: should
+weighs_against:
+  - req-lane-fixes-what-machines-fix > — a table that looks authoritative and answers wrongly beats a second corrective call
 ---
 
 ## Detail

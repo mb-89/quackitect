@@ -9,7 +9,7 @@ trigger: the next form opened in a record whose table lists another record's nod
 status: open
 looked: 2026-08-14
 breaks_how_badly: abrasive
-how_likely: certain
+how_likely: expected
 impact: Every reference table in a record lists the standing corpus beside the delta - 38 test-specs where 7 are the iteration's own - and the reader wades through history, exactly what the owner has flagged three times.
 source_refs:
   - req-nodes-scoped-to-iteration

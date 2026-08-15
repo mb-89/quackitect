@@ -7,11 +7,11 @@ statement: The git remote serializes pushes, so a claim's first-push-wins race i
 owner: the driving agent
 trigger: a claim push succeeds on two machines for the same iteration, or the remote's policy allows force pushes on the claims branch
 status: open
-probed: 2026-08-12
+probed: "2026-08-12"
 probe: "holds locally, genuinely concurrent — the M7 race test (tests/claims.test.ts) pushes one claim name from two clients IN FLIGHT AT ONCE against a bare origin: exactly one lands, the loser rejects non-fast-forward and learns the holder. Still faked: the network and the hosted forge's receive layer; the trigger keeps watch for the first two-machine claim against the real remote."
 impact: If the remote does not serialize - no network at claim time, or a force-push policy on the claims branch - two machines can hold the same iteration and duplicate a day of work.
 breaks_how_badly: corrosive
-how_likely: rare
+how_likely: conceivable
 ---
 
 ## Probe

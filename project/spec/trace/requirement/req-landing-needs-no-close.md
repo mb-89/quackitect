@@ -12,4 +12,6 @@ refines:
 source_refs:
   - uc-close-a-record ext 5a
 priority: could
+weighs_against:
+  - req-drumroll-arms-deliberately > — hoarded work is a daily tax; the drumroll is one control on one surface
 ---

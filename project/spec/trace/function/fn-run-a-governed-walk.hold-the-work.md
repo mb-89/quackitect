@@ -5,7 +5,6 @@ type: "[[function]]"
 cluster: the-record-life
 statement: hold work in progress so the walk can be left and picked up again
 satisfies:
-  - req-entry-binds-worktree
   - req-parallel-iterations-own-worktrees
   - req-unshipped-dependency-refused
   - req-landing-needs-no-close
@@ -53,3 +52,16 @@ Everything here follows from that one sentence:
 WHAT IT IS NOT. Opening a record is routing. Landing is landing. The archive
 is what happens after the holding stops. Each of those is now its own
 function, and each has its own rationale.
+
+## One row left this function at i27
+
+req-entry-binds-worktree was struck and its node deleted, on the owner's
+ruling of 2026-08-14. Both halves it carried are still here.
+
+- SOMEWHERE TO WORK is [[req-parallel-iterations-own-worktrees]], which states
+  the outcome rather than the mechanism.
+- STAMPED STARTED is [[req-record-status-comes-from-the-record]], which sits
+  on the function that routes work rather than on this one.
+
+The rationale above already said it: the worktree exists because unfinished
+work needs somewhere to be. That sentence outlived the row.

@@ -11,7 +11,7 @@ impact: The credit is written under one identity and looked up under another. Ev
 breaks_how_badly: crippling
 how_likely: plausible
 probe: "unprobed, deliberately. The check needs an se_reload, and reloading mid-walk would disturb a bound record to answer a question that is not yet blocking. It runs before the credit's storage shape is chosen, inside this iteration."
-probed: 2026-08-13
+probed: "2026-08-13"
 source_refs:
   - req-reading-credit-survives-a-reload
   - "note-6fc953ffcdc8, which names the SE_SESSION token as the intended key"

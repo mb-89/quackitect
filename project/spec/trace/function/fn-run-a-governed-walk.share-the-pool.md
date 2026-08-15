@@ -13,6 +13,8 @@ satisfies:
   - req-force-release-recorded
   - req-machine-id-anonymous
   - req-engine-pushes-only-machinery
+  - req-a-shipped-record-is-never-reclaimed
+  - req-a-records-dependency-is-declared
   - req-pool-opens-on-first-claim
   - req-absent-ledger-is-not-offline
 inputs:

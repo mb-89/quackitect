@@ -2,9 +2,11 @@
 minted_in: i1-prove-a-bases-equivalent-live-table-can-
 id: fn-run-a-governed-walk
 type: "[[function]]"
+cluster: the-account
 statement: carry engineering work through a recorded method, one governed step at a time
 satisfies:
   - req-product-is-a-folder
+  - req-a-wrong-act-never-passes-silently
 inputs:
   - flow-intent
   - flow-method-sources

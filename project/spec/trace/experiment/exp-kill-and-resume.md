@@ -11,8 +11,8 @@ faked: the kills were sanctioned process replacements (se_reload), not an OS kil
 fallback: a position journal outside the record, which would be the files-only law failing
 verdict: holds
 measured: 2026-08-10 — five engine restarts in one session, each rebooting from files alone; the record re-entry fast-forwarded 28 signed states, worst 15.2 seconds; one context compaction survived the same way; nothing lost but the in-flight reading credit
-folds_to: raid-ar-resume-needs-no-person carries the dated probe — the hinge holds today, and the hard-kill variant stays deferred with the POSIX until
-promote: none — the files-only property holds by construction, and the build must not erode it
+folds_to: "raid-ar-resume-needs-no-person carries the dated probe — the hinge holds today, and the hard-kill variant stays deferred with the POSIX until"
+promote: "none — the files-only property holds by construction, and the build must not erode it"
 source_refs:
   - rank-unknowns, the seeded pick
 ---

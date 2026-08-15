@@ -11,7 +11,7 @@ impact: The refusal contract is doctrine without a check. A clause whose remedy 
 breaks_how_badly: corrosive
 how_likely: plausible
 probe: "scheduled, and never probed. The check is one prepared session with a weak model, which the owner holds. Minted 2026-08-13 from a ruling of 2026-08-12, so it has no earlier result to decay."
-probed: 2026-08-13
+probed: "2026-08-13"
 source_refs:
   - "engine/errors.ts lines 2-3, where the contract is written"
   - "guidance/refusals.md, the feed-forward side of every clause"

@@ -15,6 +15,9 @@ source_refs:
   - uc-learn-the-machinery guarantee
   - "meth-requirement-authoring: population measure rule"
 priority: should
+weighs_with:
+  - req-resume-needs-no-person ! — one measures what a tour teaches a newcomer, the other what the panel shows a returning person; a design can do either well alone
+  - req-the-answer-never-exceeds-its-bound ! — one is a person's grasp after a tour, the other a payload size at the lane
 weighs_against:
   - req-tour-reads-what-stands >
 ---

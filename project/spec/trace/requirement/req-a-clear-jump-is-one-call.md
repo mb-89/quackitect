@@ -4,7 +4,7 @@ id: req-a-clear-jump-is-one-call
 type: "[[requirement]]"
 statement: When a caller names a state as the target and asks in the SAME call to be taken there, and nothing between the walk and that state is owed, the engine shall land the walk on it within that one call and answer that it arrived.
 kind: quality
-characteristic: performance
+characteristic: performance-efficiency
 verify_method: test
 breaks_if_removed: Returning to work already done costs as much as doing it, so every step out of a record is paid for twice and the walk gets slower the further it has come.
 breaks_how_badly: corrosive

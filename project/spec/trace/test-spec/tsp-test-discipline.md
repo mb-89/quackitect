@@ -5,6 +5,7 @@ type: "[[test-spec]]"
 statement: A test run answers a named question with a structured verdict, a first green needs its red, and a red is never carried, verified by test over the test lane.
 method: "test"
 verifies:
+  - "req-scoped-run-records-its-timings"
   - "req-test-scope-discipline"
   - "req-test-result-is-structured"
   - "req-first-green-needs-a-red"

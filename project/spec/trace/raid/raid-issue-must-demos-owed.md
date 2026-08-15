@@ -9,7 +9,7 @@ trigger: a fresh machine or a first-time reader becomes available, or the owner 
 status: open
 impact: The validation record carries three demonstrations by name only; their reports state not-performed, the population claims on tsp-first-run stand at zero observations, and i8's M7 verification carried tsp-panel-walkthrough, tsp-desk-and-gates and tsp-tour-run as owed against this same entry for the same underlying reason.
 breaks_how_badly: corrosive
-how_likely: certain
+how_likely: expected
 source_refs:
   - reports/rpt-ramp-up.md
   - reports/rpt-start-a-new-product.md

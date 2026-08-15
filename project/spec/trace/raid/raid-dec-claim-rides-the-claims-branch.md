@@ -9,7 +9,7 @@ trigger: the M7 origin-half race measurement falsifies raid-asm-remote-serialize
 status: decided
 impact: If this proves wrong, the claim lane is redesigned while the fleet falls back to preassign partitioning; the visible-ledger promise and the offline claim path both rest on this shape.
 breaks_how_badly: crippling
-how_likely: rare
+how_likely: conceivable
 source_refs:
   - req-claim-is-one-pushed-file
   - req-claim-race-first-push-wins

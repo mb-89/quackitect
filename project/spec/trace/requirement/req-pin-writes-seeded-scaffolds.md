@@ -12,4 +12,6 @@ refines:
 source_refs:
   - uc-open-an-iteration step 6
 priority: should
+weighs_against:
+  - req-audit-answers-from-log > — a route refusal stops the walk; a guessed retro count only misinforms it
 ---

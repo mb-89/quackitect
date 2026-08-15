@@ -5,6 +5,9 @@ type: "[[function]]"
 cluster: the-walk
 statement: hand the driver one instruction carrying everything that step needs
 satisfies:
+  - req-a-clear-jump-is-one-call
+  - req-answer-pages-never-overflows
+  - req-container-offers-its-records
   - req-pull-answers-from-record
   - req-state-opens-only-when-earned
   - req-state-needs-all-its-inputs
@@ -13,6 +16,7 @@ satisfies:
   - req-compaction-reowes-the-reading
   - req-red-objective-serves-its-fill
   - req-a-placeholder-drawing-refuses-entry
+  - req-the-answer-never-exceeds-its-bound
   - req-missing-document-stops-the-walk
   - req-autonomy-gates-every-hop
   - req-autonomy-is-categorical

@@ -12,4 +12,6 @@ refines:
 source_refs:
   - uc-diverge-before-deciding ext 1a
 priority: could
+weighs_against:
+  - req-single-option-recorded-as-finding > — undetectable ratification poisons every divergence; one unexamined option poisons one
 ---

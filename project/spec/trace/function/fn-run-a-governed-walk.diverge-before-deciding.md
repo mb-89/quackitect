@@ -6,6 +6,8 @@ cluster: the-holding-pen
 statement: hold several real options open until one is chosen, and keep the losers readable afterwards
 satisfies:
   - req-ideation-opens-no-record
+  - req-comparison-carries-both-sides
+  - req-vendor-page-claim-only
   - req-problem-recorded-before-options
   - req-two-options-beyond-the-obvious
   - req-option-carries-cost-and-shed
