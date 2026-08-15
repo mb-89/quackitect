@@ -5,6 +5,8 @@ type: "[[function]]"
 cluster: the-account
 statement: put the whole standing position in front of a person, without them asking anybody
 satisfies:
+  - req-surface-answers-in-one-second
+  - req-survey-counts-only-open-records
   - req-panel-shows-the-machine
   - req-selected-node-shows-its-claim
   - req-filter-draws-only-what-serves

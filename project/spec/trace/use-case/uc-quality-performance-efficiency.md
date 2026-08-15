@@ -5,11 +5,12 @@ type: "[[use-case]]"
 statement: Get an answer fast enough to keep working
 actor: stk-engineer-driving-agents
 kind: quality-area
-trigger: Any call into the lane, at any corpus size.
+trigger: Any call into the lane, or any surface a person opens, at any corpus size.
 precondition: The system is running and the record has whatever it has accumulated.
-guarantee: A call answers inside the bound the register names, and a call that cannot says so rather than hanging.
+guarantee: A call or a look answers inside the bound the register names, and one that cannot says so rather than hanging.
 refines:
   - sty-what-a-quality-is
+  - sty-judge-without-waiting
 priority: should
 ---
 
@@ -34,9 +35,11 @@ Its sub-characteristics, so nobody has to open the standard to use this:
 3. The record grows over weeks of work, and the bound still holds.
 4. A call that will take longer than the bound hands off rather than blocking, and returns a handle.
 5. The person asks the handle how it is doing, and gets the output so far.
+6. The person opens a surface to look at what stands, and it renders inside the bound named for a look.
 
 ## Extensions
 
 - 2a. The answer exceeds the bound: the excess is the defect, and it is measured rather than felt.
+- 6a. The surface exceeds the bound: the excess is recorded where somebody reads it, rather than being paid silently on every look.
 - 3a. The record has grown past what the shape can serve: the growth is the finding, and the fix is the shape rather than a bigger machine.
 - 4a. The handed-off work never finishes: the handle says it is still running, and the person can stop it and everything it spawned.

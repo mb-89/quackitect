@@ -16,6 +16,10 @@ priority: must
   Metric: acts from idea to durable note. Target: one.
 - An agent finds the lane tool or guidance page it needs without already knowing its name, and a capability gap it hits leaves a trace instead of vanishing.
   Metric: se_run calls as a share of all lane calls (guidance/method/retro.md step 8 counted 3249/28612 on 2026-08-07). Target: falling, retro over retro.
+- WAITING IS TOIL TOO. The machine answers fast enough that the person is judging rather than watching it think.
+  Metric: the share of surface requests answered inside a second. Target: all of them.
+  Metric: an answer a host has to move to disk before the agent can read it. Target: none.
+  Added by i12. The existing one-second guard covers lane CALLS only, so a render could pass a second with nothing failing.
 
 ## Unlike
 

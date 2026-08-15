@@ -83,3 +83,56 @@
 {"ts":"2026-08-15T10:21:26.129Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d94","brief":"syncing trunk in — the levelling covers method and engine but not spec"}
 {"ts":"2026-08-15T10:21:33.040Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d95","brief":"reading trunk's value prop to reconcile it with my extension"}
 {"ts":"2026-08-15T10:22:07.155Z","op":"revert","visit":"iterations/i12/gate-motivation@0","node":"d85","brief":"value-prop extension backed out for the merge, re-applied after"}
+{"ts":"2026-08-15T10:22:15.367Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d96","brief":"syncing trunk into the record now the overlap is settled"}
+{"ts":"2026-08-15T10:22:25.942Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d97","brief":"re-applying the waiting-is-toil criterion on trunk's prop"}
+{"ts":"2026-08-15T10:22:30.341Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d98","brief":"re-running the trace tests after the sync"}
+{"ts":"2026-08-15T10:22:38.298Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d99","brief":"reading the post-sync trace verdict"}
+{"ts":"2026-08-15T10:23:02.973Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d100","brief":"recording the levelling gap as a standing issue"}
+{"ts":"2026-08-15T10:23:30.845Z","op":"obsolete","visit":"iterations/i12/gate-motivation@0","node":"d86","brief":"superseded by the round-0 checklist"}
+{"ts":"2026-08-15T10:23:35.591Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d101","brief":"reading the typecheck on the merged tree"}
+{"ts":"2026-08-15T10:23:41.604Z","op":"plan","visit":"iterations/i12/gate-motivation@0","parent":null,"nodes":[{"id":"d102","brief":"fill gate-motivation"},{"id":"d103","brief":"reach the build milestone"}]}
+{"ts":"2026-08-15T10:25:06.739Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d104","brief":"submitting the motivation gate"}
+{"ts":"2026-08-15T10:25:22.158Z","op":"done","visit":"iterations/i12/gate-motivation@0","node":"d102","brief":"gate-motivation passed and blessed"}
+{"ts":"2026-08-15T10:25:32.655Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d105","brief":"story method read — opening M2"}
+{"ts":"2026-08-15T10:25:57.962Z","op":"update","visit":"iterations/i12/write-requirements@0","node":"d106","brief":"M2 walked through — the minor column landed the walk at write-requirements"}
+{"ts":"2026-08-15T10:26:17.709Z","op":"update","visit":"iterations/i12/write-requirements@0","node":"d107","brief":"checking the standing one-second requirement before writing siblings"}
+{"ts":"2026-08-15T10:26:25.200Z","op":"update","visit":"iterations/i12/write-requirements@0","node":"d108","brief":"reading the standing one-second row to shape its siblings"}
+{"ts":"2026-08-15T10:26:45.104Z","op":"update","visit":"iterations/i12/write-requirements@0","node":"d109","brief":"reading the requirement template before minting rows"}
+{"ts":"2026-08-15T10:27:17.412Z","op":"obsolete","visit":"iterations/i12/gate-motivation@0","node":"d103","brief":"replaced by the M3 checklist"}
+{"ts":"2026-08-15T10:27:30.613Z","op":"plan","visit":"iterations/i12/write-requirements@0","parent":null,"nodes":[{"id":"d110","brief":"mint the requirement rows"},{"id":"d111","brief":"fill write-requirements"}]}
+{"ts":"2026-08-15T10:27:44.771Z","op":"update","visit":"iterations/i12/write-requirements@0","node":"d112","brief":"third row: the answer pages rather than overflowing"}
+{"ts":"2026-08-15T10:27:56.804Z","op":"update","visit":"iterations/i12/write-requirements@0","node":"d113","brief":"fourth row: the survey excludes shipped records"}
+{"ts":"2026-08-15T10:28:10.293Z","op":"done","visit":"iterations/i12/write-requirements@0","node":"d110","brief":"five requirement rows minted"}
+{"ts":"2026-08-15T10:28:43.257Z","op":"update","visit":"iterations/i12/write-requirements@0","node":"d114","brief":"submitting the requirement register"}
+{"ts":"2026-08-15T10:28:57.773Z","op":"update","visit":"iterations/i12/write-requirements@0","node":"d115","brief":"dropping the banned word from the paging row"}
+{"ts":"2026-08-15T10:29:01.751Z","op":"update","visit":"iterations/i12/write-requirements@0","node":"d116","brief":"listing the whole requirement register for the covers check"}
+{"ts":"2026-08-15T10:29:38.942Z","op":"update","visit":"iterations/i12/write-requirements@0","node":"d117","brief":"resubmitting with the full register"}
+{"ts":"2026-08-15T10:29:52.094Z","op":"update","visit":"iterations/i12/write-requirements@0","node":"d118","brief":"sweeping the register for invalid characteristic values"}
+{"ts":"2026-08-15T10:30:06.474Z","op":"done","visit":"iterations/i12/write-requirements@0","node":"d111","brief":"register corrected and resubmitted"}
+{"ts":"2026-08-15T10:30:22.888Z","op":"plan","visit":"iterations/i12/write-requirements@0","parent":null,"nodes":[{"id":"d119","brief":"derive functions"},{"id":"d120","brief":"identify and probe assumptions"},{"id":"d121","brief":"reach the build"}]}
+{"ts":"2026-08-15T10:30:30.960Z","op":"update","visit":"iterations/i12/write-requirements@0","node":"d122","brief":"opening derive-functions to see what it asks"}
+{"ts":"2026-08-15T10:30:47.103Z","op":"update","visit":"iterations/i12/write-requirements@0","node":"d123","brief":"amending the use-case claim the new rows rippled"}
+{"ts":"2026-08-15T10:31:00.342Z","op":"update","visit":"iterations/i12/write-requirements@0","node":"d124","brief":"the upstream form is owed rather than rippled — walking to it"}
+{"ts":"2026-08-15T10:31:16.561Z","op":"update","visit":"iterations/i12/write-stories@0","node":"d125","brief":"reading a standing story to copy its deck shape"}
+{"ts":"2026-08-15T10:31:39.827Z","op":"update","visit":"iterations/i12/write-stories@0","node":"d126","brief":"story written for the delta's new need"}
+{"ts":"2026-08-15T10:31:45.456Z","op":"done","visit":"iterations/i12/write-requirements@0","node":"d119","brief":"story minted; functions come after the use cases"}
+{"ts":"2026-08-15T10:32:04.035Z","op":"update","visit":"iterations/i12/write-stories@0","node":"d127","brief":"submitting the story set"}
+{"ts":"2026-08-15T10:32:14.165Z","op":"update","visit":"iterations/i12/write-stories@0","node":"d128","brief":"stories signed — reading the use-case method"}
+{"ts":"2026-08-15T10:32:23.695Z","op":"update","visit":"iterations/i12/write-stories@0","node":"d129","brief":"checking which use case already generalizes a quality story"}
+{"ts":"2026-08-15T10:32:40.051Z","op":"update","visit":"iterations/i12/write-stories@0","node":"d130","brief":"extending the performance use case to cover a person's look"}
+{"ts":"2026-08-15T10:32:57.687Z","op":"update","visit":"iterations/i12/write-stories@0","node":"d131","brief":"submitting the use-case set"}
+{"ts":"2026-08-15T10:33:21.369Z","op":"obsolete","visit":"iterations/i12/write-requirements@0","node":"d121","brief":"too coarse to track the walk state by state"}
+{"ts":"2026-08-15T10:33:48.392Z","op":"update","visit":"iterations/i12/derive-functions@0","node":"d132","brief":"listing the function tree before allocating the new rows"}
+{"ts":"2026-08-15T10:33:54.911Z","op":"update","visit":"iterations/i12/derive-functions@0","node":"d133","brief":"reading a function node to learn how it names what it serves"}
+{"ts":"2026-08-15T10:34:01.770Z","op":"update","visit":"iterations/i12/derive-functions@0","node":"d134","brief":"reading all function statements to allocate correctly"}
+{"ts":"2026-08-15T10:34:21.415Z","op":"done","visit":"iterations/i12/write-requirements@0","node":"d120","brief":"five requirements allocated across three functions"}
+{"ts":"2026-08-15T10:34:42.001Z","op":"plan","visit":"iterations/i12/derive-functions@0","parent":null,"nodes":[{"id":"d135","brief":"submit derive-functions"},{"id":"d136","brief":"walk the requirements gate"},{"id":"d137","brief":"reach the build"}]}
+{"ts":"2026-08-15T10:34:48.656Z","op":"update","visit":"iterations/i12/derive-functions@0","node":"d138","brief":"reading the unallocated requirement the coverage check named"}
+{"ts":"2026-08-15T10:35:05.484Z","op":"update","visit":"iterations/i12/derive-functions@0","node":"d139","brief":"listing the flows before answering the flows field"}
+{"ts":"2026-08-15T10:35:13.660Z","op":"update","visit":"iterations/i12/derive-functions@0","node":"d140","brief":"checking whether the verdict flow already carries the timings"}
+{"ts":"2026-08-15T10:35:20.031Z","op":"update","visit":"iterations/i12/derive-functions@0","node":"d141","brief":"reading the call-log flow, the closest analogue to a durable timings record"}
+{"ts":"2026-08-15T10:35:26.925Z","op":"update","visit":"iterations/i12/derive-functions@0","node":"d142","brief":"minting the timings flow the new requirement produces"}
+{"ts":"2026-08-15T10:35:31.587Z","op":"done","visit":"iterations/i12/derive-functions@0","node":"d135","brief":"the timings output and the unallocated clear-jump row both land on functions"}
+{"ts":"2026-08-15T10:36:02.994Z","op":"update","visit":"iterations/i12/derive-functions@0","node":"d143","brief":"resubmitting derive-functions with flows and neutrality"}
+{"ts":"2026-08-15T10:36:19.090Z","op":"update","visit":"iterations/i12/derive-functions@0","node":"d144","brief":"flows given as references"}
+{"ts":"2026-08-15T10:36:31.871Z","op":"done","visit":"iterations/i12/derive-functions@0","node":"d136","brief":"derive-functions signed"}

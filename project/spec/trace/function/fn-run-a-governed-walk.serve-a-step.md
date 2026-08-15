@@ -5,6 +5,9 @@ type: "[[function]]"
 cluster: the-walk
 statement: hand the driver one instruction carrying everything that step needs
 satisfies:
+  - req-a-clear-jump-is-one-call
+  - req-answer-pages-never-overflows
+  - req-container-offers-its-records
   - req-pull-answers-from-record
   - req-state-opens-only-when-earned
   - req-state-needs-all-its-inputs
