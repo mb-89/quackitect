@@ -1,5 +1,6 @@
 ---
 form: write-requirements
+amended: "2026-08-15T11:39:17.488Z by agent — landing i27's design layer renamed req-entry-binds-worktree to req-entry-levels-the-record-tree and added fourteen requirements. The set the claim attested to has…"
 by: agent
 signed_off: 2026-08-15T10:30:06.814Z
 authors: agent
@@ -21,11 +22,20 @@ One row is already met. req-answer-pages-never-overflows describes behaviour the
 ## register
 
 - req-a-clear-jump-is-one-call
+- req-a-method-change-reaches-every-tree
 - req-a-placeholder-drawing-refuses-entry
+- req-a-read-comes-from-where-it-is-meant
+- req-a-records-dependency-is-declared
 - req-a-reopen-stands-where-it-can-work
+- req-a-resolution-is-proven-by-read-back
+- req-a-shipped-record-is-never-reclaimed
 - req-a-size-may-drop-a-question
+- req-a-surface-resolves-to-what-it-shows
+- req-a-write-lands-where-it-is-meant
+- req-a-wrong-act-never-passes-silently
 - req-absent-ledger-is-not-offline
 - req-acts-carry-role-and-channel
+- req-an-engine-change-applies-in-its-own-record
 - req-answer-pages-never-overflows
 - req-answer-recorded-with-question
 - req-archive-lists-every-closed-record
@@ -81,7 +91,7 @@ One row is already met. req-answer-pages-never-overflows describes behaviour the
 - req-engine-folder-is-sealed
 - req-engine-port-fallback
 - req-engine-pushes-only-machinery
-- req-entry-binds-worktree
+- req-entry-levels-the-record-tree
 - req-entry-speaks-plainly
 - req-every-artifact-is-readable-text
 - req-every-call-logged
@@ -162,6 +172,7 @@ One row is already met. req-answer-pages-never-overflows describes behaviour the
 - req-recommendation-is-derived
 - req-record-arrives-prefilled
 - req-record-opens-on-word
+- req-record-status-comes-from-the-record
 - req-red-is-never-carried
 - req-red-objective-serves-its-fill
 - req-refusal-carries-remedy
@@ -182,6 +193,7 @@ One row is already met. req-answer-pages-never-overflows describes behaviour the
 - req-setup-floor-editor-shell
 - req-setup-serves-shipped-method
 - req-setup-stops-before-partial
+- req-shared-change-reaches-without-unlanded-work-reaching
 - req-shutdown-fires-only-idle-or-end
 - req-single-option-recorded-as-finding
 - req-size-choice-is-the-bless
@@ -201,6 +213,7 @@ One row is already met. req-answer-pages-never-overflows describes behaviour the
 - req-test-result-is-structured
 - req-test-run-carries-its-question
 - req-test-scope-discipline
+- req-the-answer-never-exceeds-its-bound
 - req-the-size-is-read-by-one-extractor
 - req-tour-admits-absence
 - req-tour-ends-at-the-desk
@@ -217,6 +230,7 @@ One row is already met. req-answer-pages-never-overflows describes behaviour the
 - req-unshipped-dependency-refused
 - req-upward-links-live-in-the-file
 - req-vendor-page-claim-only
+- req-version-control-resolves-like-every-call
 - req-view-writes-round-trip
 - req-walk-branches-at-waypoint
 - req-walk-opens-at-retro

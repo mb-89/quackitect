@@ -705,7 +705,7 @@ function stateLawProblems(root: string, s: StateDecl, nodes: TraceNode[]): strin
   const out: string[] = [];
   if (s.id.endsWith("gate-prototype")) out.push(...assumptionLawProblems(nodes, catalogItems(root, "damage_levels")));
   if (s.id.endsWith("author-tests")) out.push(...authorTestsLawProblems(nodes));
-  if (s.id.endsWith("specify-build")) out.push(...specifyBuildLawProblems(nodes, root));
+  if (s.id.endsWith("specify-build")) out.push(...specifyBuildLawProblems(nodes, root, s.id.split("/")[1]));
   if (s.id.endsWith("trace-design")) out.push(...traceDesignLawProblems(nodes, root));
   if (s.id.endsWith("fill-story-evidence")) out.push(...fillStoryLawProblems(nodes, false));
   if (s.id.endsWith("gate-validation")) out.push(...fillStoryLawProblems(nodes, true));
@@ -718,8 +718,12 @@ function stateLawProblems(root: string, s: StateDecl, nodes: TraceNode[]): strin
  *
  *  Files are NAMED, not existing: a spec is written before its code
  *  lands. Existence and the dead-code sweep get teeth at trace-design. */
-export function specifyBuildLawProblems(corpus: { id: string; type: string; file?: string }[], recordRoot: string): string[] {
-  return [...designCoverageProblems(corpus), ...promotionAssignmentProblems(corpus, recordRoot)];
+export function specifyBuildLawProblems(
+  corpus: { id: string; type: string; file?: string }[],
+  recordRoot: string,
+  record?: string,
+): string[] {
+  return [...designCoverageProblems(corpus), ...promotionAssignmentProblems(corpus, recordRoot, record)];
 }
 
 /** The coverage half, shared with trace-design: edges resolve, every
@@ -789,10 +793,11 @@ export function fillStoryLawProblems(corpus: { id: string; type: string; file?: 
 
 /** The step ids of the record's seeded chunk drawing, or undefined when
  *  none is seeded yet — assignment against no drawing checks names only. */
-function seededStepIds(recordRoot: string): Set<string> | undefined {
+function seededStepIds(recordRoot: string, only: string | undefined): Set<string> | undefined {
   const dir = join(recordRoot, "project", "spec", "iterations");
   try {
     for (const e of readdirSync(dir)) {
+      if (only !== undefined && e !== only) continue;
       const abs = join(dir, e, "machines", "build-chunks.md");
       if (!existsSync(abs)) continue;
       const fm = noteOf(abs)?.frontmatter ?? {};
@@ -813,10 +818,11 @@ function seededStepIds(recordRoot: string): Set<string> | undefined {
  *  UNDEFINED MEANS THE RECORD HAS NO FOLD-BACK, which is not the same as
  *  "folded nothing back". A minor strikes M6 whole, so it never has one. The
  *  caller falls back to the experiment's own owner there. */
-function foldBackExperiments(recordRoot: string): Set<string> | undefined {
+function foldBackExperiments(recordRoot: string, only: string | undefined): Set<string> | undefined {
   const dir = join(recordRoot, "project", "spec", "iterations");
   try {
     for (const e of readdirSync(dir)) {
+      if (only !== undefined && e !== only) continue;
       const abs = join(dir, e, "evidence", "fold-back.md");
       if (!existsSync(abs)) continue;
       const body = noteOf(abs)?.body ?? "";
@@ -828,11 +834,39 @@ function foldBackExperiments(recordRoot: string): Set<string> | undefined {
   return undefined;
 }
 
+/** THE RECORD THE WALK IS IN, as its directory name. The state id carries the
+ *  short id — `iterations/i12/specify-build` — and the directory is the one it
+ *  prefixes.
+ *
+ *  WHY IT IS NOT A SCAN. Both lookups above used to read whichever record
+ *  readdir handed back first, which is right only while one record's files sit
+ *  on disk. Landing i27's spec into i12's tree put two drawings and one
+ *  fold-back side by side, so i12 read its OWN drawing (i12- sorts first)
+ *  against i27's fold-back, and i27's promotions were swept against i12's
+ *  steps (2026-08-15). Both functions' doc comments already said "the
+ *  record's"; neither had a way to know which record that was.
+ *
+ *  UNDEFINED FALLS BACK TO THE SCAN. The unit fixtures call the laws directly
+ *  with no state, naming their record `itx` inside a temp root, so there is no
+ *  short id to resolve and the lone record on disk is the right answer. */
+function recordDirFor(recordRoot: string, record: string | undefined): string | undefined {
+  if (record === undefined || record === "") return undefined;
+  try {
+    for (const e of readdirSync(join(recordRoot, "project", "spec", "iterations"))) {
+      if (e === record || e.startsWith(`${record}-`)) return e;
+    }
+  } catch {
+    return undefined;
+  }
+  return undefined;
+}
+
 /** Promotions are a filter, never a list — and none may be lost: every
  *  promoted experiment carries `chunk:` naming its step in the drawing. */
-function promotionAssignmentProblems(corpus: { id: string; type: string; file?: string }[], recordRoot: string): string[] {
+function promotionAssignmentProblems(corpus: { id: string; type: string; file?: string }[], recordRoot: string, record?: string): string[] {
   const out: string[] = [];
-  const steps = seededStepIds(recordRoot);
+  const only = recordDirFor(recordRoot, record);
+  const steps = seededStepIds(recordRoot, only);
   // A PROMOTION BELONGS TO THE ITERATION THAT RAN THE SPIKE (owner ruling
   // 2026-08-13). It is a spike aimed at a later step of the SAME record and it
   // does not outlive it — exactly like the spike, which never travelled.
@@ -857,8 +891,8 @@ function promotionAssignmentProblems(corpus: { id: string; type: string; file?: 
   // So absence falls through to the experiment's OWN `minted_in`. An experiment
   // with no owner at all stays in scope: absence cannot prove it belongs to
   // somebody else, and the safe direction is to ask rather than to skip.
-  const own = foldBackExperiments(recordRoot);
-  const owner = basename(recordRoot);
+  const own = foldBackExperiments(recordRoot, only);
+  const owner = only ?? basename(recordRoot);
   for (const n of corpus) {
     if (n.type !== "experiment" || n.file === undefined) continue;
     if (own !== undefined && !own.has(n.id)) continue;

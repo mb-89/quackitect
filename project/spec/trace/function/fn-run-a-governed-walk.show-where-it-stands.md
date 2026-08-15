@@ -20,6 +20,7 @@ satisfies:
   - req-one-verb-says-why-a-state-is-grey
   - req-a-reopen-stands-where-it-can-work
   - req-controls-draw-from-their-spec
+  - req-a-surface-resolves-to-what-it-shows
 inputs:
   - flow-position
   - flow-trace-graph
@@ -58,3 +59,28 @@ AND IT SHOWS THE RECORD TO ONE MACHINE. This function serves the whole record
 anywhere. That is safe only while the socket cannot be reached from off the
 machine, so the loopback bind is part of what this function does rather than
 a deployment detail somebody else owns.
+
+## One row arrived at i12, from i27's landing
+
+req-a-surface-resolves-to-what-it-shows was minted in i27 and allocated to
+el-core, el-resolution-seam and if-satellite-supervisor-to-mirror. No function
+carried it, so the demand had a design and no owner in the structure.
+
+IT BELONGS HERE, and the reason is the requirement's own Detail. The agent's
+side was specified and the person's was not: the lane already had
+[[req-a-read-comes-from-where-it-is-meant]] and
+[[req-a-write-lands-where-it-is-meant]]. Those two govern the lane's calls,
+which is [[fn-run-a-governed-walk.resolve-a-path]]. The surfaces a person
+actually uses are this function, and nothing said the same about them.
+
+BOTH HALVES ARE ALREADY WHAT THIS FUNCTION DOES. Resolving against the record
+being shown is putting the STANDING position in front of a person — a panel
+answering from another record's content is not showing where it stands.
+Naming the record on what it shows is the same argument the rationale above
+makes about drawing only what serves: a surface that resolves correctly and
+says nothing is indistinguishable from one that resolves wrongly.
+
+IT IS NOT [[fn-run-a-governed-walk.resolve-a-path]]. That function resolves a
+path for a caller and proves it by read-back. This one is answerable for what
+a person SEES, which fails differently — a correct resolution drawn under the
+wrong record's name is still a person reading the wrong thing.
