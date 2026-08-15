@@ -637,3 +637,6 @@
 {"ts":"2026-08-15T20:35:24.666Z","op":"done","visit":"iterations/i28/run-demos@0","node":"d52","brief":"unauthored scaffolds no longer count as inputs"}
 {"ts":"2026-08-15T20:36:04.187Z","op":"done","visit":"iterations/i28/run-demos@0","node":"d55","brief":"the card now teaches the caged-subagent arrival"}
 {"ts":"2026-08-15T20:37:34.747Z","op":"done","visit":"iterations/i28/run-demos@0","node":"d53","brief":"battery 1321 of 1322, the one failure fixed and confirmed"}
+{"ts":"2026-08-15T20:43:44.570Z","op":"plan","visit":"iterations/i28/gate-prototype@0","parent":null,"nodes":[{"id":"d2","brief":"clear gate-prototype's deferred assumption"},{"id":"d3","brief":"sweep back to gate-validation and fill it"},{"id":"d4","brief":"package the release for the owner to try"}]}
+{"ts":"2026-08-15T20:46:43.364Z","op":"done","visit":"iterations/i28/gate-prototype@0","node":"d3","brief":"gate-validation blessed and signed"}
+{"ts":"2026-08-15T20:48:31.868Z","op":"done","visit":"iterations/i28/gate-prototype@0","node":"d4","brief":"quackitect-4.0.0.zip built and extraction verified"}

@@ -1,6 +1,7 @@
 ---
 id: i28-the-cloud-runs-from-its-seed-alone-a-fre
-status: open
+status: shipped
+closed: 2026-08-15T20:49:48.268Z
 started: 2026-08-15T14:39:57.813Z
 opened: 2026-08-13T15:43:52.568Z
 goal: "The cloud runs from its seed alone: a fresh machine, a record id and one command produce a working walk, with nothing typed by a person and nothing read as prose."
