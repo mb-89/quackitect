@@ -305,7 +305,7 @@ export class Session {
    *  complexity ceiling when the reading credit joined it. */
   private restoreSettings(): void {
     try {
-      const s = JSON.parse(readFileSync(join(seDir(this.root), "settings.json"), "utf8")) as {
+      const s = JSON.parse(readFileSync(join(seDir(this.machineRoot()), "settings.json"), "utf8")) as {
         autonomy?: number;
         emergency?: boolean;
         block_sleep?: boolean;
@@ -386,9 +386,9 @@ export class Session {
 
   private persistSettings(): void {
     try {
-      mkdirSync(seDir(this.root), { recursive: true });
+      mkdirSync(seDir(this.machineRoot()), { recursive: true });
       writeFileSync(
-        join(seDir(this.root), "settings.json"),
+        join(seDir(this.machineRoot()), "settings.json"),
         `${JSON.stringify({
           session: process.env.SE_SESSION ?? null,
           autonomy: this._autonomy,
@@ -771,7 +771,7 @@ export class Session {
 
   /** What is running now — the launch's answer, or the stored one. */
   runningMode(): RunMode {
-    return this._runningMode ?? readMode(this.root);
+    return this._runningMode ?? readMode(this.machineRoot());
   }
 
   /** THE PACKET'S MODE BLOCK, FROM ONE READ OF THE FILE.
@@ -791,7 +791,7 @@ export class Session {
     // A SESSION-LIFETIME CACHE CANNOT BE WRONG IN A WAY THAT MATTERS. The
     // stored choice only takes effect at the NEXT launch. setRunMode refreshes
     // it, so this process always reports its own writes.
-    this._storedMode ??= storedMode(this.root);
+    this._storedMode ??= storedMode(this.machineRoot());
     const { mode, chosen } = this._storedMode;
     return { mode: this._runningMode ?? mode, stored: mode, chosen };
   }
@@ -815,8 +815,8 @@ export class Session {
         source: "engine/session.ts run mode",
       });
     }
-    const was = readMode(this.root);
-    writeMode(this.root, mode as RunMode);
+    const was = readMode(this.machineRoot());
+    writeMode(this.machineRoot(), mode as RunMode);
     this._storedMode = { mode: mode as RunMode, chosen: true };
     this.notifyChange();
     const running = this.runningMode();
@@ -829,7 +829,7 @@ export class Session {
    *  Empty only when the ladder itself cannot be read. */
   private tierFor(value: number): Record<string, string> {
     try {
-      return { tier: tierOf(loadLevels(this.root), value) };
+      return { tier: tierOf(loadLevels(this.machineRoot()), value) };
     } catch {
       return {};
     }
@@ -937,15 +937,15 @@ export class Session {
    *  Unbound, there is one tree and nothing to do. */
   private reconcileTrees(): Record<string, unknown> {
     const wt = this.bound?.path;
-    if (wt === undefined || wt === this.root) return {};
+    if (wt === undefined || wt === this.machineRoot()) return {};
     try {
-      for (const tree of [wt, this.root]) {
+      for (const tree of [wt, this.machineRoot()]) {
         if (dirtyLines(git(tree, "status", "--porcelain").stdout).length === 0) continue;
         git(tree, "add", "-A");
         git(tree, "commit", "-m", "the machine commits what stood on disk at a reload");
       }
-      const landed = gitLand(this.root, wt);
-      const synced = gitSync(this.root, wt);
+      const landed = gitLand(this.machineRoot(), wt);
+      const synced = gitSync(this.machineRoot(), wt);
       return { trees: { landed: landed.commits ?? [], synced: synced.commits ?? [] } };
     } catch (e) {
       // A RECONCILE THAT FAILS NEVER BLOCKS THE RELOAD. The reload is still
@@ -970,7 +970,7 @@ export class Session {
    *  UNCHANGED FILES ARE NOT REWRITTEN, so this costs a read per file and
    *  nothing else on a tree that is already level. */
   private backfillMethod(): { trees: number; files: number } {
-    const trees = this.methodTrees().filter((t) => t !== this.root);
+    const trees = this.methodTrees().filter((t) => t !== this.machineRoot());
     return { trees: trees.length, files: this.backfillInto(trees) };
   }
 
@@ -980,10 +980,10 @@ export class Session {
   private backfillInto(trees: string[]): number {
     if (trees.length === 0) return 0;
     let files = 0;
-    for (const rel of methodFilesIn(this.root)) {
+    for (const rel of methodFilesIn(this.machineRoot())) {
       let bytes: string;
       try {
-        bytes = readFileSync(join(this.root, rel), "utf8");
+        bytes = readFileSync(join(this.machineRoot(), rel), "utf8");
       } catch {
         continue;
       }
@@ -1008,7 +1008,29 @@ export class Session {
    *  machine root whatever tree is bound, which is what retired SE-C-134.
    *  This answers for everything else, and a record keeps its own tree. */
   workRoot(): string {
-    return this.bound?.path ?? this.root;
+    return this.bound?.path ?? this.machineRoot();
+  }
+
+  /** THE CHECKOUT THAT OWNS THE WORKTREES, and the machine's own state with
+   *  them (owner ruling 2026-08-15).
+   *
+   *  THREE THINGS BELONG TO THE MACHINE AND NEVER TO A BRANCH.
+   *
+   *  - Worktree management itself: listing, seeding, finding, landing,
+   *    syncing. A tree cannot be asked to enumerate the trees.
+   *  - `.se/` session state: the call log, the notes, the handover, settings,
+   *    the mode and the autonomy levels. One per machine, not one per record.
+   *  - The claim ledger and the machine id, which say WHICH machine this is.
+   *
+   *  WHY IT IS A METHOD AND NOT THE RAW FIELD. Eighty-seven callers reached
+   *  past `workRoot` straight to the field, and most of them were right to
+   *  want the repo. One of them was not, and nothing distinguished it: a
+   *  state's script condition ran against the repo while every file verb
+   *  wrote to the bound worktree, so the check judged a corpus the agent had
+   *  no write path to. Naming the intention is what makes the odd one out
+   *  visible. */
+  machineRoot(): string {
+    return this.root;
   }
 
   /** THE CORPORA A READER MAY CHOOSE BETWEEN (owner ruling 2026-08-06).
@@ -1020,9 +1042,9 @@ export class Session {
    *  which one they mean instead of the engine guessing — which it did three
    *  times before this existed, differently each time. */
   corpora(): { id: string; label: string; path: string }[] {
-    const out = [{ id: "trunk", label: "trunk", path: this.root }];
+    const out = [{ id: "trunk", label: "trunk", path: this.machineRoot() }];
     try {
-      for (const it of itList(this.root).filter((x) => x.open)) {
+      for (const it of itList(this.machineRoot()).filter((x) => x.open)) {
         out.push({ id: it.id, label: it.id.split("-")[0] ?? it.id, path: it.path });
       }
     } catch {
@@ -1048,7 +1070,7 @@ export class Session {
     // lives in the project root's .se/roots.json, so a bound worktree must
     // never make the owner's roots read as undeclared (found live 2026-07-30).
     const kind = pathKind(rel);
-    if (kind === "session") return this.root;
+    if (kind === "session") return this.machineRoot();
     // SHARED METHOD BELONGS TO THE MACHINE, never to a branch. resolve.ts says
     // the same thing in storeFor: the core owns session state and shared
     // method, so both resolve to the machine root whatever tree is bound.
@@ -1058,7 +1080,7 @@ export class Session {
     // 2026-08-07 accident, and refusing the write was the old answer to it.
     // Resolving the write is the better one: nothing is refused, and the file
     // cannot land in a tree that does not own it.
-    if (kind === "method") return this.root;
+    if (kind === "method") return this.machineRoot();
     // A RECORD'S OWN CONTENT IS READ FROM THE RECORD'S TREE, bound or not.
     // The mirror painted i1's states out of trunk while i1's worktree held
     // the fall that knocked them down, and both halves were working — they
@@ -1086,8 +1108,8 @@ export class Session {
     try {
       const found =
         owner.container === "iterations"
-          ? itList(this.root).find((x) => x.id === owner.id)
-          : expList(this.root).find((x) => x.id === owner.id);
+          ? itList(this.machineRoot()).find((x) => x.id === owner.id)
+          : expList(this.machineRoot()).find((x) => x.id === owner.id);
       return found?.open === true ? found.path : undefined;
     } catch {
       // A record list that cannot be read must not take path resolution down
@@ -1101,14 +1123,14 @@ export class Session {
    *  A closed record's tree is gone, and its branch is history. Only what is
    *  open can be walked, so only what is open needs the method. */
   methodTrees(): string[] {
-    const trees = new Set<string>([this.root]);
+    const trees = new Set<string>([this.machineRoot()]);
     try {
-      for (const it of itList(this.root)) if (it.open) trees.add(it.path);
+      for (const it of itList(this.machineRoot())) if (it.open) trees.add(it.path);
     } catch {
       // no iterations yet — trunk is the whole story
     }
     try {
-      for (const e of expList(this.root)) if (e.open) trees.add(e.path);
+      for (const e of expList(this.machineRoot())) if (e.open) trees.add(e.path);
     } catch {
       // likewise for expeditions
     }
@@ -1156,13 +1178,13 @@ export class Session {
   }
 
   expeditionNew(kind: string, goal: string): Record<string, unknown> {
-    const e = expNew(this.root, kind, goal);
+    const e = expNew(this.machineRoot(), kind, goal);
     this.bumpGeneration(); // a new record changes what the container expands to
     return { created: e.id, branch: e.branch, note: "it stands in the expeditions container — enter there to work" };
   }
 
   iterationSeed(goal: string, vision: string, inputs: string[] = [], dependsOn: string[] = []): Record<string, unknown> {
-    const it = itSeed(this.root, goal, vision, inputs, dependsOn);
+    const it = itSeed(this.machineRoot(), goal, vision, inputs, dependsOn);
     this.bumpGeneration(); // a new record changes what the container expands to
     return { seeded: it.id, branch: it.branch, note: "it stands in the iterations container as its kickoff" };
   }
@@ -1204,7 +1226,7 @@ export class Session {
    *  refuses to commit does not block entry: the walk is still correct, and it
    *  is the tidiness that is lost rather than the work. */
   private levelTree(tree: string): { levelled: number; committed: number } {
-    if (tree === this.root) return { levelled: 0, committed: 0 };
+    if (tree === this.machineRoot()) return { levelled: 0, committed: 0 };
     const levelled = this.backfillInto([tree]);
     let committed = 0;
     try {
@@ -1223,13 +1245,13 @@ export class Session {
   }
 
   iterationOpen(id: string): Record<string, unknown> {
-    const it = itFind(this.root, id);
+    const it = itFind(this.machineRoot(), id);
     // The record store opens a record only over a standing claim, and entry
     // is what mints one. A product whose claims branch does not exist yet
     // gets it created by this first entry, so nothing ever runs unclaimed
     // for want of an opening act.
-    const mid = machineId(join(this.root, ".se"));
-    const gate = claimEntry(this.root, it.id, mid);
+    const mid = machineId(join(this.machineRoot(), ".se"));
+    const gate = claimEntry(this.machineRoot(), it.id, mid);
     if (!gate.ok) {
       // A SHIPPED RECORD AND A HELD ONE ARE DIFFERENT REFUSALS. Held is a
       // wait: the holder may finish or a person may force-release it. Shipped
@@ -1254,7 +1276,7 @@ export class Session {
     }
     const mirror = this.levelTree(it.path);
     this.bound = it;
-    markStarted(this.root, it);
+    markStarted(this.machineRoot(), it);
     this.decisions.setExtraSink(join(it.path, "project", "spec", "iterations", it.id, "decisions.jsonl"));
     return {
       bound: it.id,
@@ -1273,8 +1295,8 @@ export class Session {
    *  a larger size escalates; pinIteration refuses de-escalation itself. */
   private pinKickoff(fullId: string | undefined): void {
     if (fullId === undefined) return;
-    const it = itFind(this.root, fullId);
-    const rec = readItRecord(this.root, it);
+    const it = itFind(this.machineRoot(), fullId);
+    const rec = readItRecord(this.machineRoot(), it);
     const size = typeof rec?.change_size === "string" ? rec.change_size : this.kickoffSizeFromForm(it);
     const pinAbs = join(it.path, itPinRel(it.id));
     if (size === undefined) {
@@ -1300,7 +1322,7 @@ export class Session {
         // an unreadable pin falls through and is re-pinned
       }
     }
-    const pin = pinIteration(this.root, it, size);
+    const pin = pinIteration(this.machineRoot(), it, size);
     this.rewalk(pin, `escalated to ${size}`);
   }
 
@@ -1368,9 +1390,9 @@ export class Session {
   }
 
   expeditionList(): Record<string, unknown> {
-    const all = expList(this.root);
+    const all = expList(this.machineRoot());
     const describe = (e: Expedition): Record<string, unknown> => {
-      const fm = readRecord(this.root, e);
+      const fm = readRecord(this.machineRoot(), e);
       return {
         id: e.id,
         ...(typeof fm?.goal === "string" ? { goal: fm.goal } : {}),
@@ -1386,7 +1408,7 @@ export class Session {
   }
 
   expeditionOpen(id: string): Record<string, unknown> {
-    this.bound = expFind(this.root, id);
+    this.bound = expFind(this.machineRoot(), id);
     // While bound, decision ops ALSO land in the record: the reasoning is
     // part of the persistent walk (owner ruling 2026-07-27), parts per visit.
     this.decisions.setExtraSink(join(this.bound.path, "project", "spec", "expeditions", this.bound.id, "decisions.jsonl"));
@@ -1423,7 +1445,7 @@ export class Session {
         source: "engine/session.ts close",
       });
     }
-    const result = expClose(this.root, this.bound, merge, override);
+    const result = expClose(this.machineRoot(), this.bound, merge, override);
     this.unbind();
     // THE CLOSE DELETES THE STATE THE WALK STANDS ON. Archiving the record
     // takes its states out of the drawing, and a walk left on one can route
@@ -1709,7 +1731,7 @@ export class Session {
   get machine(): MachineDecl {
     let fresh: MachineDecl;
     try {
-      fresh = compileMachineCached(this.root, mainMachinePath(this.root));
+      fresh = compileMachineCached(this.machineRoot(), mainMachinePath(this.machineRoot()));
     } catch {
       return this._machine;
     }
@@ -1764,7 +1786,7 @@ export class Session {
         continue;
       }
       try {
-        decl = compileMachineCached(this.root, resolveRef(this.root, mainMachinePath(this.root), st.submachine));
+        decl = compileMachineCached(this.machineRoot(), resolveRef(this.machineRoot(), mainMachinePath(this.machineRoot()), st.submachine));
       } catch {
         return undefined;
       }
@@ -2447,8 +2469,8 @@ export class Session {
       parts.push({ path: rel, hash, from, to: out.length });
       out.push("");
     }
-    mkdirSync(seDir(this.root), { recursive: true });
-    writeFileSync(join(seDir(this.root), "reading.md"), out.join("\n"), "utf8");
+    mkdirSync(seDir(this.machineRoot()), { recursive: true });
+    writeFileSync(join(seDir(this.machineRoot()), "reading.md"), out.join("\n"), "utf8");
     this.readingParts = parts;
     return paths;
   }
@@ -3251,10 +3273,10 @@ export class Session {
   }
 
   private genFor(id: string): GeneratedMachine | undefined {
-    if (id === "expeditions") return generateContinueExpedition(this.root);
-    if (id === "iterations") return generateIterations(this.root);
-    if (id === "expedition_archive") return generateExpeditionArchive(this.root);
-    if (id === "iteration_archive") return generateIterationArchive(this.root);
+    if (id === "expeditions") return generateContinueExpedition(this.machineRoot());
+    if (id === "iterations") return generateIterations(this.machineRoot());
+    if (id === "expedition_archive") return generateExpeditionArchive(this.machineRoot());
+    if (id === "iteration_archive") return generateIterationArchive(this.machineRoot());
     return undefined;
   }
 
@@ -3394,8 +3416,8 @@ export class Session {
     const found = this.drawnHost(id);
     if (found === undefined) return undefined;
     try {
-      const path = resolveRef(this.root, mainMachinePath(this.root), found.ref);
-      const decl = compileMachineCached(this.root, path);
+      const path = resolveRef(this.machineRoot(), mainMachinePath(this.machineRoot()), found.ref);
+      const decl = compileMachineCached(this.machineRoot(), path);
       return { decl, canvas: pinnedCanvas(decl) };
     } catch {
       return undefined;
@@ -3603,7 +3625,7 @@ export class Session {
    *  no_pending_note condition holds against ("needs retro" gates
    *  start_iteration; the retro's drain clears them). */
   private blockingNotes(markers: string[]): { ref: string; text: string }[] {
-    return pendingNotes(seDir(this.root))
+    return pendingNotes(seDir(this.machineRoot()))
       .filter((n) => markers.some((m) => n.text.toLowerCase().includes(m.toLowerCase())))
       .map((n) => ({ ref: n.ref, text: n.text }));
   }
@@ -3930,7 +3952,7 @@ export class Session {
   /** The dispatch between the two form kinds: a state of the machine on
    *  display with evidence fields, unshadowed by a named template. */
   private isStateForm(name: string, m: MachineDecl = this.currentMachine()): boolean {
-    if (existsSync(join(this.root, formTemplatePath(name)))) return false;
+    if (existsSync(join(this.machineRoot(), formTemplatePath(name)))) return false;
     return m.states.some((s) => s.id === name && s.evidence_form.length > 0);
   }
 
@@ -3938,7 +3960,7 @@ export class Session {
    *  (its evidence folder ON ITS BRANCH), the bound record as fallback,
    *  or the session store when neither exists. */
   private stateFormHome(name: string, m: MachineDecl = this.currentMachine()): { instanceAbs: string; instanceRel: string } {
-    const it = itList(this.root).find((x) => x.open && itShortId(x.id) === m.id);
+    const it = itList(this.machineRoot()).find((x) => x.open && itShortId(x.id) === m.id);
     if (it !== undefined) {
       const rel = `project/spec/iterations/${it.id}/evidence/${name}.md`;
       return { instanceAbs: join(it.path, rel), instanceRel: rel };
@@ -3949,7 +3971,7 @@ export class Session {
       return { instanceAbs: join(this.workRoot(), rel), instanceRel: rel };
     }
     const rel = `.se/forms/${name}.md`;
-    return { instanceAbs: join(this.root, rel), instanceRel: rel };
+    return { instanceAbs: join(this.machineRoot(), rel), instanceRel: rel };
   }
 
   private stateFormState(name: string, m: MachineDecl = this.currentMachine()): StateDecl {
@@ -3968,7 +3990,9 @@ export class Session {
 
   private brandName(): string {
     try {
-      const b = JSON.parse(readFileSync(join(this.root, "project", "deliverable", "brand", "brand.json"), "utf8")) as { name?: string };
+      const b = JSON.parse(readFileSync(join(this.machineRoot(), "project", "deliverable", "brand", "brand.json"), "utf8")) as {
+        name?: string;
+      };
       return typeof b.name === "string" ? b.name : "se";
     } catch {
       return "se";
@@ -3983,7 +4007,7 @@ export class Session {
     return {
       project: this.brandName(),
       state: `${m.id}/${name}`,
-      ...(s !== undefined ? { level: levelName(loadLevels(this.root), s.priority) } : {}),
+      ...(s !== undefined ? { level: levelName(loadLevels(this.machineRoot()), s.priority) } : {}),
       ...(this.bound !== undefined ? { record: this.bound.id } : {}),
       "signed off": typeof fm.signed_off === "string" ? fm.signed_off.slice(0, 10) : "",
       by: typeof fm.by === "string" ? fm.by : "",
@@ -4023,7 +4047,7 @@ export class Session {
       // pointed into the wrong tree, so every link on an open record's form
       // reported a file that is not there.
       for (const n of loadTrace(root)) {
-        if (n.file !== undefined) out[n.id] = relative(this.root, n.file).split(sep).join("/");
+        if (n.file !== undefined) out[n.id] = relative(this.machineRoot(), n.file).split(sep).join("/");
       }
     } catch {
       // no corpus, no links — the ids still read
@@ -4032,7 +4056,7 @@ export class Session {
     // the reader cannot follow is decoration: it costs a line, teaches the
     // name of a file, and leaves them to find it by hand.
     for (const dir of ["methods", "items", "forms/templates", "lint"]) {
-      const abs = join(this.root, "project", "deliverable", "machines", ...dir.split("/"));
+      const abs = join(this.machineRoot(), "project", "deliverable", "machines", ...dir.split("/"));
       try {
         for (const e of readdirSync(abs)) {
           if (!e.endsWith(".md")) continue;
@@ -4058,7 +4082,7 @@ export class Session {
       const own =
         m === null
           ? undefined
-          : itList(this.root)
+          : itList(this.machineRoot())
               .filter((x) => x.open)
               .find((x) => x.id === m[1]);
       return this.refPaths(own);
@@ -4126,8 +4150,8 @@ export class Session {
     const h = this.stateFormHome(name, m);
     const raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : undefined;
     const model = stateFormModel(
-      this.root,
-      scanGuidance(this.root),
+      this.machineRoot(),
+      scanGuidance(this.machineRoot()),
       m,
       s,
       this.stateFormHeader(name, raw, m),
@@ -4516,7 +4540,7 @@ export class Session {
   private declIteration(decl: MachineDecl): Iteration | undefined {
     if (decl.id === this.machine.id) return undefined;
     try {
-      const open = itList(this.root).filter((x) => x.open);
+      const open = itList(this.machineRoot()).filter((x) => x.open);
       const own = open.find((x) => itShortId(x.id) === decl.id);
       if (own !== undefined) return own;
       // A SUB-MACHINE BELONGS TO WHATEVER RECORD IS BOUND. Its evidence lands
@@ -4563,7 +4587,7 @@ export class Session {
   suspectStates(decl: MachineDecl): string[] {
     const it = this.declIteration(decl);
     if (it === undefined) return [];
-    const moved = iterationDrift(this.root, it).filter((id) => decl.states.some((s) => s.id === id));
+    const moved = iterationDrift(this.machineRoot(), it).filter((id) => decl.states.some((s) => s.id === id));
     if (moved.length === 0) return [];
     // ONLY A PASS CAN LAPSE (owner, 2026-08-05). The cone runs to the end of
     // the machine, and most of it was never walked. Emptying those cards
@@ -4592,8 +4616,8 @@ export class Session {
     // where a demand moved with it. Returning early on an empty reopen list
     // left the record walking a snapshot taken before the correction, which
     // is how i3 kept skipping a state the column already required.
-    if (!pinIsStale(this.root, it)) return;
-    const moved = iterationDrift(this.root, it);
+    if (!pinIsStale(this.machineRoot(), it)) return;
+    const moved = iterationDrift(this.machineRoot(), it);
     // ONLY A STANDING CLAIM CAN BE REOPENED, and standing is the RECORD's
     // word, not this session's. Reading the instance's own history instead
     // meant a drift could only ever reopen steps filled since the last engine
@@ -4604,7 +4628,7 @@ export class Session {
     // CONSUME IT EITHER WAY. The walk has now seen this move, whether or not
     // anything was standing to reopen. Leaving the pin stale would re-fire it
     // on the next pull, and the re-earned step would reopen forever.
-    repinColumn(this.root, it);
+    repinColumn(this.machineRoot(), it);
     // The frame under the walk's feet is the OLD machine until it is swapped,
     // so the reopened step would still serve the form it was reopened for.
     this.repinSwap();
@@ -5706,8 +5730,8 @@ export class Session {
     const h = this.stateFormHome(name, m);
     const raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : undefined;
     const model = stateFormModel(
-      this.root,
-      scanGuidance(this.root),
+      this.machineRoot(),
+      scanGuidance(this.machineRoot()),
       m,
       s,
       this.stateFormHeader(name, raw, m),
@@ -5733,7 +5757,7 @@ export class Session {
     for (const i of model.inputs) {
       if (i.path === undefined) continue;
       try {
-        docs.push({ path: i.path, content: readFileSync(join(this.root, i.path), "utf8") });
+        docs.push({ path: i.path, content: readFileSync(join(this.machineRoot(), i.path), "utf8") });
       } catch {
         docs.push({ path: i.path, content: "(unreadable at export time)" });
       }
@@ -5765,7 +5789,14 @@ export class Session {
    *  seconds read as a crashed browser window. */
   private spawnScript(abs: string): Promise<{ status: number | null; out: string }> {
     return new Promise((resolve) => {
-      const child = spawn("node", [abs, "--root", this.root], { cwd: this.root });
+      // A CONDITION JUDGES THE TREE THE LANE WRITES TO, never the repo root.
+      // It ran with the machine root, so a state's check read trunk while every file
+      // verb wrote to the bound worktree. The agent was asked to satisfy a
+      // check it had no write path to: i28's rank-unknowns refused on a
+      // register node that does not exist in its tree, and no lane verb could
+      // reach the file being complained about.
+      const where = this.workRoot();
+      const child = spawn("node", [abs, "--root", where], { cwd: where });
       let out = "";
       let pending = "";
       // A SCRIPT REPORTS ITS OWN PROGRESS on stdout, as
@@ -5853,7 +5884,7 @@ export class Session {
       const outputs: string[] = [];
       let ok = true;
       for (const rel of scripts) {
-        const abs = resolveInRoot(this.root, rel, "engine/session.ts script");
+        const abs = resolveInRoot(this.machineRoot(), rel, "engine/session.ts script");
         const r = await this.spawnScript(abs);
         const out = r.out.trim().slice(0, 4000);
         outputs.push(`${rel} → exit ${r.status}${out === "" ? "" : `\n${out}`}`);
@@ -6027,7 +6058,7 @@ export class Session {
    *  where the human's checkboxes are made, bound expedition or not. */
   private rootDiskHash(rel: string): string {
     try {
-      return contentHash(readFileSync(resolveInRoot(this.root, rel, "engine/session.ts reads")));
+      return contentHash(readFileSync(resolveInRoot(this.machineRoot(), rel, "engine/session.ts reads")));
     } catch {
       return "";
     }
@@ -6146,7 +6177,7 @@ export class Session {
   private entryRequirements(m: MachineDecl, t: StateDecl): string[] {
     const req = new Set<string>(t.entry?.read ?? []);
     if (!this.pullGateExempt(m, t)) {
-      for (const d of pulledFor(this.root, scanGuidance(this.root), m, t)) req.add(d.path);
+      for (const d of pulledFor(this.machineRoot(), scanGuidance(this.machineRoot()), m, t)) req.add(d.path);
     }
     for (const p of t.exit?.read ?? []) req.delete(p);
     return [...req];
@@ -6290,7 +6321,7 @@ export class Session {
         // THE CHANNEL RULE: this is the mirror, so it is the person's own
         // hand. Every disposition stands, wherever the walk happens to be.
         return drainNote(
-          seDir(this.root),
+          seDir(this.machineRoot()),
           String(args.ref ?? ""),
           String(args.disposition ?? ""),
           args.where === undefined ? undefined : String(args.where),
@@ -6313,7 +6344,7 @@ export class Session {
    *  every time (no cache): an edited doc must show its fresh hash, or a
    *  stale check could pass forever. `checked` is the human's ledger. */
   pulled(m: MachineDecl, s: StateDecl): (PulledDoc & { checked: boolean })[] {
-    const out = pulledFor(this.root, scanGuidance(this.root), m, s).map((d) => {
+    const out = pulledFor(this.machineRoot(), scanGuidance(this.machineRoot()), m, s).map((d) => {
       const hash = d.hash !== "" ? d.hash : this.diskHash(d.path);
       return { ...d, hash, checked: this.humanChecked(d.path, hash) };
     });
@@ -6527,7 +6558,7 @@ export class Session {
       // numeric priority left in the engine, the scale and the guidance goes" —
       // and the requirement itself says cut over first, then remove, never both
       // in one commit (raid-risk-autonomy-rework-breaks-walking).
-      tier: tierOf(loadLevels(this.root), this._autonomy),
+      tier: tierOf(loadLevels(this.machineRoot()), this._autonomy),
       // The server's clock, so no hand ever shells for the time (note-8acddaec).
       now: new Date().toISOString(),
       // Only when ON. Nothing about the resting packet hints that it exists.
@@ -6605,12 +6636,12 @@ export class Session {
     if (full === undefined) return;
     let it: Iteration;
     try {
-      it = itFind(this.root, full);
+      it = itFind(this.machineRoot(), full);
     } catch {
       return;
     }
     if (this.bound?.id === it.id) this.unbind();
-    itCloseShipped(this.root, it);
+    itCloseShipped(this.machineRoot(), it);
     // THE CLAIM IS SPENT HERE, and this is the only place it can be. A claim
     // was taken at entry and nothing ever ended it, so the ledger showed
     // finished records as live holdings forever — i3 and i8 both stood that
@@ -6621,9 +6652,9 @@ export class Session {
     // BEST-EFFORT ON PURPOSE. The record IS shipped, on disk and in git,
     // whatever the ledger manages to record; a network that will not answer
     // must not unship it. The stamp lands locally and announces later.
-    completeClaim(this.root, it.id, machineId(join(this.root, ".se")));
+    completeClaim(this.machineRoot(), it.id, machineId(join(this.machineRoot(), ".se")));
     appendNote(
-      seDir(this.root),
+      seDir(this.machineRoot()),
       `needs retro — iteration ${it.id} shipped and archived; the next kickoff's onboard-retro drains it.`,
       "agent",
       `needs retro: ${itShortId(it.id)} shipped`,
@@ -6794,7 +6825,7 @@ export class Session {
    *  session has nothing behind it, and that is normal rather than an error. */
   private lastSessionBriefing(): string | undefined {
     try {
-      const last = new CallLog(seDir(this.root)).lastSession();
+      const last = new CallLog(seDir(this.machineRoot())).lastSession();
       if (last === undefined) return undefined;
       const when = `${last.from.slice(0, 10)} ${last.from.slice(11, 16)}–${last.to.slice(11, 16)}`;
       const lines = [`Last session (${when}): ${last.calls} calls.`];
@@ -6889,7 +6920,10 @@ export class Session {
       decl = gen.decl;
     } else {
       try {
-        decl = compileMachineCached(this.root, resolveRef(this.root, mainMachinePath(this.root), subState.submachine!));
+        decl = compileMachineCached(
+          this.machineRoot(),
+          resolveRef(this.machineRoot(), mainMachinePath(this.machineRoot()), subState.submachine!),
+        );
       } catch (e) {
         // A broken drawing refuses TYPED and the engine survives; the next
         // tick retries the seed once the canvas is fixed.
