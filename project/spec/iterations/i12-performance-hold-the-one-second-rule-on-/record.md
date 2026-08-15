@@ -1,6 +1,7 @@
 ---
 id: i12
-status: open
+status: shipped
+closed: 2026-08-15T13:18:13.392Z
 started: 2026-08-15T09:56:26.198Z
 opened: 2026-08-12T19:41:19.492Z
 goal: "Performance: hold the one-second rule on the surfaces that break it, and paginate the pull instead of overflowing it."

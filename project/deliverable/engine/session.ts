@@ -904,7 +904,7 @@ export class Session {
     setTimeout(() => process.exit(42), 400);
     return {
       reload: "armed",
-      note: "the engine restarts in under a second on the NEW sources — the walk reboots at start; tick when the lane answers",
+      note: "the engine restarts in under a second on the NEW sources — the walk reboots at start and walks back to your target, which survives the restart; tick when the lane answers",
       ...reconciled,
     };
   }

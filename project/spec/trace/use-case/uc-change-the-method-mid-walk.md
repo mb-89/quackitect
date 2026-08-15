@@ -22,7 +22,7 @@ priority: should
 
 ## Lane doors
 
-- `se_reload` restarts the engine on the new sources, mid-session, and the walk reboots at its start.
+- `se_reload` restarts the engine on the new sources, mid-session. The walk reboots at its start and recomputes its position from recorded evidence; the AIMED TARGET survives the restart, so it walks back to where it stood without a call from the agent.
 
 ## Extensions
 

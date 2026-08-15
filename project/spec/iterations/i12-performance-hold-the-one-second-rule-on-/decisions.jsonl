@@ -1,1 +1,54 @@
-{"ts":"2026-08-15T12:44:19.882Z","op":"done","visit":"iterations/i12/build-steps/record-one-name@0","node":"d97","brief":"all three measured paths read as the machine printed them"}
+{"ts":"2026-08-15T12:50:23.229Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d23","brief":"restoring the record's 88KB decision history"}
+{"ts":"2026-08-15T12:50:35.409Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d24","brief":"parking the 88KB history beside the live graph rather than overwriting it"}
+{"ts":"2026-08-15T12:51:50.059Z","op":"update","visit":"iterations/i12/gate-motivation@0","node":"d25","brief":"sweeping back to where the battery can run"}
+{"ts":"2026-08-15T12:52:06.855Z","op":"update","visit":"iterations/i12/build-steps/fanout-cap@0","node":"d26","brief":"battery over the corpus rename and the engine changes"}
+{"ts":"2026-08-15T12:52:12.564Z","op":"update","visit":"iterations/i12/build-steps/fanout-cap@0","node":"d27","brief":"moving to the unbuilt chunk while the battery runs"}
+{"ts":"2026-08-15T12:54:39.184Z","op":"done","visit":"front_desk@0","node":"d7","brief":"battery green a third time at 1314 of 1314 after the corpus rename"}
+{"ts":"2026-08-15T12:56:17.720Z","op":"plan","visit":"iterations/i12/gate-implementation@0","parent":null,"nodes":[{"id":"d28","brief":"record the owner's bless"},{"id":"d29","brief":"fill the story evidence and the deferred proving-run link"},{"id":"d30","brief":"gate-validation"},{"id":"d31","brief":"package and gate-release"}]}
+{"ts":"2026-08-15T12:56:22.407Z","op":"plan","visit":"iterations/i12/gate-implementation@0","parent":null,"nodes":[]}
+{"ts":"2026-08-15T12:56:43.368Z","op":"done","visit":"iterations/i12/gate-implementation@0","node":"d28","brief":"the gate is blessed and the walk moved to the stories"}
+{"ts":"2026-08-15T12:56:50.604Z","op":"update","visit":"iterations/i12/fill-story-evidence@0","node":"d32","brief":"reading the story that carries the deferred proving-run link"}
+{"ts":"2026-08-15T12:57:06.244Z","op":"update","visit":"iterations/i12/fill-story-evidence@0","node":"d33","brief":"fetching the slow-surface records the story quotes"}
+{"ts":"2026-08-15T12:57:40.950Z","op":"done","visit":"iterations/i12/gate-implementation@0","node":"d29","brief":"every slide filled with a followable ref, and the deferred link discharged"}
+{"ts":"2026-08-15T12:57:45.201Z","op":"plan","visit":"iterations/i12/fill-story-evidence@0","parent":null,"nodes":[{"id":"d34","brief":"let the law name any story still unfilled"},{"id":"d35","brief":"author the demo drawing"},{"id":"d36","brief":"walk sweep-consistency"},{"id":"d37","brief":"gate-validation"}]}
+{"ts":"2026-08-15T12:58:03.019Z","op":"update","visit":"iterations/i12/fill-story-evidence@0","node":"d38","brief":"finding the must stories the drawing needs"}
+{"ts":"2026-08-15T12:58:16.414Z","op":"obsolete","visit":"iterations/i12/fill-story-evidence@0","node":"d35","brief":"no must story was minted here and run-demos is struck at minor"}
+{"ts":"2026-08-15T12:58:24.547Z","op":"update","visit":"iterations/i12/sweep-consistency@0","node":"d39","brief":"getting the surface classes the sweep walks"}
+{"ts":"2026-08-15T12:58:40.347Z","op":"update","visit":"iterations/i12/sweep-consistency@0","node":"d40","brief":"sweeping engine strings for the reload's own promise"}
+{"ts":"2026-08-15T12:58:56.438Z","op":"update","visit":"iterations/i12/sweep-consistency@0","node":"d41","brief":"three surfaces taught the old reload behaviour and now teach the new"}
+{"ts":"2026-08-15T12:59:03.914Z","op":"update","visit":"iterations/i12/sweep-consistency@0","node":"d42","brief":"the two engine surfaces now teach the new reload behaviour"}
+{"ts":"2026-08-15T12:59:10.255Z","op":"update","visit":"iterations/i12/sweep-consistency@0","node":"d43","brief":"the use case now teaches the reload that keeps its aim"}
+{"ts":"2026-08-15T12:59:25.992Z","op":"done","visit":"iterations/i12/fill-story-evidence@0","node":"d34","brief":"the story law passed, so no story stood unfilled"}
+{"ts":"2026-08-15T12:59:34.762Z","op":"update","visit":"iterations/i12/sweep-consistency@0","node":"d44","brief":"sweeping the container's own guidance"}
+{"ts":"2026-08-15T12:59:45.404Z","op":"update","visit":"iterations/i12/sweep-consistency@0","node":"d45","brief":"the container now teaches that it offers rather than enters"}
+{"ts":"2026-08-15T12:59:49.594Z","op":"update","visit":"iterations/i12/sweep-consistency@0","node":"d46","brief":"walking the guidance chapters for changed behaviours"}
+{"ts":"2026-08-15T12:59:55.971Z","op":"update","visit":"iterations/i12/sweep-consistency@0","node":"d47","brief":"reading each guidance hit in place"}
+{"ts":"2026-08-15T13:00:08.351Z","op":"update","visit":"iterations/i12/sweep-consistency@0","node":"d48","brief":"the retro's reading list now names the timings it can mine"}
+{"ts":"2026-08-15T13:00:35.808Z","op":"done","visit":"iterations/i12/fill-story-evidence@0","node":"d36","brief":"six documents taught a superseded behaviour and were fixed in place"}
+{"ts":"2026-08-15T13:00:40.948Z","op":"update","visit":"iterations/i12/sweep-consistency@0","node":"d49","brief":"stamping the sweep and moving to the validation gate"}
+{"ts":"2026-08-15T13:01:05.718Z","op":"update","visit":"iterations/i12/gate-validation@0","node":"d50","brief":"reading the tail of the changed guidance for its proof"}
+{"ts":"2026-08-15T13:01:10.833Z","op":"update","visit":"iterations/i12/gate-validation@0","node":"d51","brief":"reading the document's last words"}
+{"ts":"2026-08-15T13:01:14.315Z","op":"update","visit":"iterations/i12/gate-validation@0","node":"d52","brief":"proving the re-owed reading"}
+{"ts":"2026-08-15T13:02:16.760Z","op":"done","visit":"iterations/i12/fill-story-evidence@0","node":"d37","brief":"validation filled with eight owed demonstrations and the rule still broken"}
+{"ts":"2026-08-15T13:02:45.250Z","op":"plan","visit":"iterations/i12/gate-validation@0","parent":null,"nodes":[{"id":"d53","brief":"bless validation at this dial"},{"id":"d54","brief":"package"},{"id":"d55","brief":"gate-release"}]}
+{"ts":"2026-08-15T13:04:50.204Z","op":"plan","visit":"iterations/i12/package@0","parent":null,"nodes":[{"id":"d56","brief":"mine the log for everything over a second"},{"id":"d57","brief":"rank it by cost"},{"id":"d58","brief":"present the list and wait"}]}
+{"ts":"2026-08-15T13:04:58.458Z","op":"update","visit":"iterations/i12/package@0","node":"d59","brief":"finding the calls over ten seconds"}
+{"ts":"2026-08-15T13:05:03.829Z","op":"update","visit":"iterations/i12/package@0","node":"d60","brief":"reading the worst pulls to see what they were doing"}
+{"ts":"2026-08-15T13:05:15.881Z","op":"update","visit":"iterations/i12/package@0","node":"d61","brief":"checking whether the pull is still slow today"}
+{"ts":"2026-08-15T13:05:33.538Z","op":"update","visit":"iterations/i12/package@0","node":"d62","brief":"reading the profiler that already exists"}
+{"ts":"2026-08-15T13:06:17.873Z","op":"done","visit":"iterations/i12/package@0","node":"d57","brief":"the machine compile is 99% of it and the profiler already proved it"}
+{"ts":"2026-08-15T13:10:43.818Z","op":"plan","visit":"iterations/i12/package@0","parent":null,"nodes":[{"id":"d63","brief":"name what the machine phase actually compiles"},{"id":"d64","brief":"write the finding down for the retro"},{"id":"d65","brief":"package and gate-release"}]}
+{"ts":"2026-08-15T13:10:53.295Z","op":"update","visit":"iterations/i12/package@0","node":"d66","brief":"finding the code the machine phase brackets"}
+{"ts":"2026-08-15T13:11:00.089Z","op":"update","visit":"iterations/i12/package@0","node":"d67","brief":"listing the phase markers in order"}
+{"ts":"2026-08-15T13:11:12.743Z","op":"update","visit":"iterations/i12/package@0","node":"d68","brief":"reading the block the machine phase brackets"}
+{"ts":"2026-08-15T13:12:23.226Z","op":"update","visit":"iterations/i12/package@0","node":"d69","brief":"returning to the packaging state"}
+{"ts":"2026-08-15T13:12:32.672Z","op":"update","visit":"iterations/i12/package@0","node":"d70","brief":"building the versioned package"}
+{"ts":"2026-08-15T13:13:21.528Z","op":"done","visit":"iterations/i12/gate-implementation@0","node":"d30","brief":"validation is blessed and the walk moved past it"}
+{"ts":"2026-08-15T13:13:54.597Z","op":"done","visit":"iterations/i12/gate-validation@0","node":"d54","brief":"dist/quackitect-4.1.0.zip built by script, exit 0"}
+{"ts":"2026-08-15T13:13:59.089Z","op":"done","visit":"iterations/i12/package@0","node":"d65","brief":"the package form carries the built archive and six emit-backs"}
+{"ts":"2026-08-15T13:14:25.022Z","op":"update","visit":"iterations/i12/gate-release@0","node":"d71","brief":"reading the release gate's fields from the served answer"}
+{"ts":"2026-08-15T13:14:30.362Z","op":"update","visit":"iterations/i12/gate-release@0","node":"d72","brief":"listing the release gate's field names"}
+{"ts":"2026-08-15T13:14:36.656Z","op":"update","visit":"iterations/i12/gate-release@0","node":"d73","brief":"reading the release row's evidence fields"}
+{"ts":"2026-08-15T13:15:16.173Z","op":"done","visit":"iterations/i12/gate-validation@0","node":"d55","brief":"the release gate is filled and submitted for the owner's thumb"}
+{"ts":"2026-08-15T13:17:11.529Z","op":"done","visit":"iterations/i12/gate-validation@0","node":"d53","brief":"the vocabulary list is filed and the iteration's result is recorded"}
+{"ts":"2026-08-15T13:17:58.598Z","op":"done","visit":"iterations/i12/gate-implementation@0","node":"d31","brief":"package and release both stand, so the iteration can close"}

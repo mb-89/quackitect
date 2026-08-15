@@ -418,7 +418,8 @@ file and grepped for a single failure.
 - THE BATTERY IS FIRE AND FORGET (owner ruling 2026-08-03). Call it only
   when the scoped runs make you expect green, then DO OTHER WORK while it
   runs — never sit polling it. Its verdict logs itself when the run ends
-  (an se_test_verdict record), and the retro reads the failure rate from
+  (an se_test_verdict record), and the retro reads the failure rate — and now
+  the per-case timings, and the slow surfaces through se_log_query's min_ms — from
   the log. The one exception: do not start work that touches the same
   files the running battery is proving.
 

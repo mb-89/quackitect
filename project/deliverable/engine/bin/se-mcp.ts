@@ -166,7 +166,8 @@ ENGINE — read by the server (this file is where they are defined).
   --help         this text (-h, -?, -Help)
 
   RELOAD: se_reload (agent or mirror hand, at idle only) restarts the
-  engine onto the current sources without a reconnect — the walk reboots.
+  engine onto the current sources without a reconnect — the walk reboots at
+  start and returns to its aimed target.
   Nothing ever swaps on its own. SE_HOT_DISABLE=1 runs in-process instead.
 `);
   process.exit(0);

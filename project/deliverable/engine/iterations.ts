@@ -770,7 +770,7 @@ export function generateIterations(root: string): GeneratedMachine {
     kind: "start",
     statement: "",
     guidance:
-      "The seeded container: every open iteration stands as its own machine. Entering one binds its worktree and stamps it started.",
+      "The seeded container: every open iteration stands as its own machine. PICK ONE way forward — with several open the pull OFFERS them rather than entering one for you. Entering binds its worktree and stamps it started.",
     evidence_form: [],
     priority: 0.01,
     edges: [],
