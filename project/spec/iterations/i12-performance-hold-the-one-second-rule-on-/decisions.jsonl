@@ -407,3 +407,5 @@
 {"ts":"2026-08-15T11:47:57.835Z","op":"update","visit":"iterations/i12/specify-build@1","node":"d397","brief":"reloading so the lane picks up the scoping fix"}
 {"ts":"2026-08-15T11:49:36.642Z","op":"update","visit":"iterations/i12/specify-build@0","node":"d9","brief":"the record segment was read from the wrong end of the state id"}
 {"ts":"2026-08-15T11:51:08.130Z","op":"update","visit":"iterations/i12/specify-build@0","node":"d10","brief":"answering the reload-in-place question from the two owning requirements"}
+{"ts":"2026-08-15T11:57:42.907Z","op":"plan","visit":"iterations/i12/specify-build@0","parent":null,"nodes":[{"id":"d2","brief":"make the record resolution shape-independent"},{"id":"d3","brief":"re-sign specify-build"},{"id":"d4","brief":"fill build-steps evidence"},{"id":"d5","brief":"green trace-design and verification"}]}
+{"ts":"2026-08-15T11:57:46.103Z","op":"update","visit":"iterations/i12/specify-build@0","node":"d6","brief":"checking the fallback keeps the fixtures green"}
