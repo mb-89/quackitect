@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: sty-land-the-work
 type: "[[story]]"
 statement: The iteration is finished, and its engineer gets it onto the trunk with the gates it earned rather than the ones it skipped.

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-problem-recorded-before-options
 type: "[[requirement]]"
 statement: While ideation holds no recorded problem statement, the engine shall refuse option entries.

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: flow-field-feedback
 type: "[[flow]]"
 statement: what came back from real use

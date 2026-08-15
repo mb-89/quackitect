@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: raid-risk-a-write-lands-in-the-wrong-tree-silently
 type: "[[raid]]"
 kind: issue

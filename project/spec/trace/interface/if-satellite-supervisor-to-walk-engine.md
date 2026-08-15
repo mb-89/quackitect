@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: if-satellite-supervisor-to-walk-engine
 type: "[[interface]]"
 statement: The supervisor starts the walk engine with its machine and its position, and never hands either again.

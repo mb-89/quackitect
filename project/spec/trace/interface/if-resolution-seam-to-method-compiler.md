@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: if-resolution-seam-to-method-compiler
 type: "[[interface]]"
 statement: The seam hands the compiler the resolved store each method file came from.

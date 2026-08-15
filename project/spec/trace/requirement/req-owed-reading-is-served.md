@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-owed-reading-is-served
 type: "[[requirement]]"
 statement: When a state owes reading, the engine shall name and serve every owed document without a path from the reader.

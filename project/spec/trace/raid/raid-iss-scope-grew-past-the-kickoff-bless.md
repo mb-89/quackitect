@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: raid-iss-scope-grew-past-the-kickoff-bless
 type: "[[raid]]"
 kind: issue
@@ -11,7 +11,7 @@ impact: A gate signed a scope that no longer matches the work. The verification 
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:
-  - project/spec/iterations/i27-the-lane-binds-to-the-record-a-bound-wal/evidence/gate-kickoff.md
+  - project/spec/iterations/i27/evidence/gate-kickoff.md
   - raid-iss-scope-grew-past-a-signed-state
 ---
 

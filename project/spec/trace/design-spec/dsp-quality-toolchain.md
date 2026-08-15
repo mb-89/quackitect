@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: dsp-quality-toolchain
 type: "[[design-spec]]"
 statement: the mechanical quality floor, carried by the battery scripts, the voice lint and the write-path fixer

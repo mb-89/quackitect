@@ -1,5 +1,5 @@
 ---
-minted_in: i12-performance-hold-the-one-second-rule-on-
+minted_in: i12
 id: raid-iss-record-entry-levels-method-not-spec
 type: "[[raid]]"
 kind: issue
@@ -11,7 +11,7 @@ impact: The walk reads the red as its own and starts debugging work it never did
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:
-  - i12-performance-hold-the-one-second-rule-on-
+  - i12
   - raid-asm-battery-timings-measure-work
 ---
 

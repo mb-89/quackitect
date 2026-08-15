@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: uc-learn-the-machinery
 type: "[[use-case]]"
 statement: Learn what the system is and what it can do, from the system itself.

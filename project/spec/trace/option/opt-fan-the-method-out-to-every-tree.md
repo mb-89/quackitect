@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-fan-the-method-out-to-every-tree
 type: "[[option]]"
 statement: land a method change in trunk and every open tree in one act, so no walk ever has to leave its own tree to reach shared content

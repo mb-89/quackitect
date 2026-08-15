@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: if-method-compiler-to-satellite
 type: "[[interface]]"
 statement: The satellite walks the machine the compiler pinned for its record — handed in at start, never re-read mid-walk.

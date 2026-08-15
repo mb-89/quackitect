@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: opt-the-branch-is-the-record
 type: "[[option]]"
 statement: delete the record lifecycle entirely and let a git branch be the record, its life the branch's life, and its archive the history

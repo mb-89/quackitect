@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-table-refuses-what-it-cannot-draw
 type: "[[requirement]]"
 statement: If a view names a layout, view type or operator outside the engine's vocabulary, then the engine shall refuse by name and list what it accepts.

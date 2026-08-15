@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: tsp-lane-file-safety
 type: "[[test-spec]]"
 statement: No lane act destroys committed work and every artifact stays readable text, verified by test over the file and git lanes.

@@ -1,5 +1,5 @@
 ---
-minted_in: i8-se-help-a-logged-keyword-search-over-the
+minted_in: i8
 id: fn-run-a-governed-walk.help-find-a-capability
 type: "[[function]]"
 cluster: the-account

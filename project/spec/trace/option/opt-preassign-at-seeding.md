@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: opt-preassign-at-seeding
 type: "[[option]]"
 statement: no runtime claiming at all - the person assigns each seeded iteration to a machine up front, and the assignment rides the stub

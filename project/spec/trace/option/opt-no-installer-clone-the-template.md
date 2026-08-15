@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: opt-no-installer-clone-the-template
 type: "[[option]]"
 statement: delete the installer and make the product a repository template, so standing one up is a clone and a dependency install

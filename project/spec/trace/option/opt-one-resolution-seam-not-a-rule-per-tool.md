@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-one-resolution-seam-not-a-rule-per-tool
 type: "[[option]]"
 statement: route every path through one resolver that no tool may bypass, so which tree a call reaches is decided in one place rather than per verb

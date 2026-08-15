@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: if-resolution-seam-to-engine-delta
 type: "[[interface]]"
 statement: The seam asks the delta which store holds a shared target.

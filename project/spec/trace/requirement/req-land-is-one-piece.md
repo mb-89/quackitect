@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-land-is-one-piece
 type: "[[requirement]]"
 statement: When the land gate is blessed, the engine shall merge the record's branch onto trunk as one merge, or stop and merge nothing.

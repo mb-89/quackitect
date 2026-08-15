@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: exp-trunk-read-cost
 type: "[[experiment]]"
 statement: Can a per-access read of a method file at a committed trunk ref stay inside the walk's patience, measured against plain disk?

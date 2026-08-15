@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: dsp-claim-lane
 type: "[[design-spec]]"
 statement: claiming as record-then-announce over the claims branch — one add-only file per iteration, fetch-and-retry on a lost race, release as a second recorded commit

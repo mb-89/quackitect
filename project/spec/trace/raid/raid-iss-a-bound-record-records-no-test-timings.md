@@ -1,5 +1,5 @@
 ---
-minted_in: i12-performance-hold-the-one-second-rule-on-
+minted_in: i12
 id: raid-iss-a-bound-record-records-no-test-timings
 type: "[[raid]]"
 kind: issue
@@ -14,7 +14,7 @@ source_refs:
   - req-scoped-run-records-its-timings
   - raid-asm-battery-timings-measure-work
   - raid-iss-record-entry-levels-method-not-spec
-  - i12-performance-hold-the-one-second-rule-on-
+  - i12
 ---
 
 ## What was observed

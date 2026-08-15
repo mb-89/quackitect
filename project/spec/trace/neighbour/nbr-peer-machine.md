@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: nbr-peer-machine
 type: "[[neighbour]]"
 statement: A peer machine - another install of this product, with its own engine, agent and minted machine id, working the same remote.

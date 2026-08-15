@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: exp-one-seam
 type: "[[experiment]]"
 statement: Can every lane verb be routed through one resolution seam, the shell included, measured as the count of paths built without the resolver?

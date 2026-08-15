@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: exp-inflight-death
 type: "[[experiment]]"
 statement: What does a caller see when the process serving its call dies mid-answer, and do the break kinds look the same to it?

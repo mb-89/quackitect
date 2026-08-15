@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: opt-seeds-ride-their-stub-branch
 type: "[[option]]"
 statement: a seed is visible because its iteration branch pushes at seeding - the stub IS the announcement

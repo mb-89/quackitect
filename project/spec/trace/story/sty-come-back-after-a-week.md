@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: sty-come-back-after-a-week
 type: "[[story]]"
 statement: An engineer who has been away a week opens the product and finds out where the work stands without asking anybody.

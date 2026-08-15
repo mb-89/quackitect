@@ -1,5 +1,5 @@
 ---
-minted_in: i12-performance-hold-the-one-second-rule-on-
+minted_in: i12
 id: req-scoped-run-records-its-timings
 type: "[[requirement]]"
 statement: When a scoped test run completes, the engine shall record each case's file, name and duration to the timings log.
@@ -11,7 +11,7 @@ refines:
   - uc-answer-a-question-with-tests
 source_refs:
   - raid-asm-battery-timings-measure-work
-  - i12-performance-hold-the-one-second-rule-on-
+  - i12
 priority: must
 ---
 

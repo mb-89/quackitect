@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: exp-satellite-start
 type: "[[experiment]]"
 statement: Can a satellite start inside the one-second budget, measured as the median start with the engine module load included?

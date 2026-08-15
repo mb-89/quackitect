@@ -1,5 +1,5 @@
 ---
-minted_in: i3-the-walk-s-feedback-loop-the-reading-cre
+minted_in: i3
 id: raid-asm-grey-verb-distinct-from-se-help
 type: "[[raid]]"
 kind: assumption

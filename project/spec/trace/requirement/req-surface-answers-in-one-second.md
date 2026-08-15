@@ -1,5 +1,5 @@
 ---
-minted_in: i12-performance-hold-the-one-second-rule-on-
+minted_in: i12
 id: req-surface-answers-in-one-second
 type: "[[requirement]]"
 statement: When a person opens a surface, the mirror shall answer within 1 second, for every surface request.
@@ -14,7 +14,7 @@ refines:
 source_refs:
   - vp-rigor-without-toil
   - req-call-answers-in-one-second
-  - i12-performance-hold-the-one-second-rule-on-
+  - i12
 priority: should
 ---
 

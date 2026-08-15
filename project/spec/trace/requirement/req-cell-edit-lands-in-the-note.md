@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-cell-edit-lands-in-the-note
 type: "[[requirement]]"
 statement: When a table cell is edited, the engine shall write exactly that key on the note behind the row, leaving the note's body byte-identical.

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-parallel-iterations-own-worktrees
 type: "[[requirement]]"
 statement: While two or more records stand open, the engine shall let no record's unlanded work alter or overwrite another record's, so zero record is put in the way of any other.

@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: req-pin-writes-seeded-scaffolds
 type: "[[requirement]]"
 statement: When the kickoff bless pins the machine, the engine shall write every seeded sub-machine's placeholder drawing in the same act, so no route refuses over a not-yet-authored machine.

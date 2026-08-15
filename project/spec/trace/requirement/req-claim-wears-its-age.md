@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: req-claim-wears-its-age
 type: "[[requirement]]"
 statement: The claimable listing shall show, for every iteration, its claim state, the claiming machine id, and the claim's age.

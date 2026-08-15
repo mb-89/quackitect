@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-unshipped-dependency-refused
 type: "[[requirement]]"
 statement: If an iteration declares a dependency on an iteration that has not shipped, then the engine shall refuse its open AND its claim, naming the unmet dependency both times.

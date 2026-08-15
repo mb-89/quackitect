@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: tsp-panel-walkthrough
 type: "[[test-spec]]"
 statement: The panel shows the machine and its claims, a returning person orients from it alone, and the walk survives a host swap, verified by demonstration in the editor.

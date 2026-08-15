@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: stk-vehicle-owner
 type: "[[stakeholder]]"
 statement: A builder who runs the method on their own product, and needs their own guidance to stay their own.

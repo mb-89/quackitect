@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-single-option-recorded-as-finding
 type: "[[requirement]]"
 statement: If exactly one option stands when divergence ends, then the engine shall record the outcome as a finding naming the suspected constraint, never as a choice.

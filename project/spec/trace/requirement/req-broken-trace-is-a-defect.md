@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-broken-trace-is-a-defect
 type: "[[requirement]]"
 statement: The engine shall count every broken trace link as a defect and shall fail the gate reviewing it.

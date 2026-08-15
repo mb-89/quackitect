@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-method-reuse-is-vendoring
 type: "[[requirement]]"
 statement: If reuse of another product's method is requested at begin, then the engine shall name the vendoring path and copy zero method files as part of the scaffold.

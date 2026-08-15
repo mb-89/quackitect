@@ -1,5 +1,5 @@
 ---
-minted_in: i8-se-help-a-logged-keyword-search-over-the
+minted_in: i8
 id: raid-risk-se-help-search-half-unproven
 type: "[[raid]]"
 kind: risk

@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-the-tree-is-an-argument-not-part-of-the-path
 type: "[[option]]"
 statement: split the one path string into two arguments, the tree and the path within it, so the tree stops being encoded in text that has to be parsed to be understood

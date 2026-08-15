@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: tsp-bound-resolution
 type: "[[test-spec]]"
 statement: One seam resolves every path, refuses what falls outside its record, names the store it used, and routes a call naming a different owner.

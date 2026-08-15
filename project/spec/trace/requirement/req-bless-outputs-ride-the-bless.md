@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-bless-outputs-ride-the-bless
 type: "[[requirement]]"
 statement: When a gate bless names a seeded output, the engine shall produce that output within the bless act.

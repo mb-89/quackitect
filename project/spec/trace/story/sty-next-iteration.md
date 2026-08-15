@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: sty-next-iteration
 type: "[[story]]"
 statement: A product already exists and its engineer wants to start the next iteration, without re-deriving anything the last one settled.

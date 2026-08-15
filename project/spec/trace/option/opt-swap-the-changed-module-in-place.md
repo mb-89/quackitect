@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-swap-the-changed-module-in-place
 type: "[[option]]"
 statement: keep one engine process and load its modules per record, so a changed file is swapped in for the record that changed it and every other record keeps the module it already holds

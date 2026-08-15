@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: req-claim-is-one-pushed-file
 type: "[[requirement]]"
 statement: When a machine claims an unclaimed iteration, the engine shall record the claim as one file naming the machine id and the UTC time, on the dedicated claims branch, and push it in the same act.

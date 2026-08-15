@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: dsp-lane-door
 type: "[[design-spec]]"
 statement: the typed tool lane, carried by one registry of verbs with schemas, clauses and remedies

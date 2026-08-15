@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-the-caller-names-the-tree
 type: "[[option]]"
 statement: delete the resolution decision and make every path carry its tree, so nothing infers which store an act belongs to

@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: if-satellite-supervisor-to-record-store
 type: "[[interface]]"
 statement: When a record closes, the supervisor reaps its satellite first and releases the worktree second, so nothing holds a tree open that the close is trying to remove.

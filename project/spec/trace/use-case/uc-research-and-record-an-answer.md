@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: uc-research-and-record-an-answer
 type: "[[use-case]]"
 statement: Settle a question the repo cannot answer from inside itself, and leave both the search and the answer on the record.

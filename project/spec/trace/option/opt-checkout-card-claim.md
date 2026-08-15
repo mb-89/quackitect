@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: opt-checkout-card-claim
 type: "[[option]]"
 statement: the claim reads like a library checkout card - holder and since-when standing ON the thing itself, and overdue judged by any passer-by

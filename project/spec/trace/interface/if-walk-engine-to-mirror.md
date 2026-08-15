@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: if-walk-engine-to-mirror
 type: "[[interface]]"
 statement: The mirror fetches the engine's forms and feed over the local port, and never advances the walk.

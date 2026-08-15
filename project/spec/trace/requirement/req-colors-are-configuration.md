@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-colors-are-configuration
 type: "[[requirement]]"
 statement: The engine shall take every drawn color from the one palette file, with zero color literals written in renderers.

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-trace-view-derived-from-files
 type: "[[requirement]]"
 statement: The engine shall derive every trace view from the node files alone, with zero truth stored only in the view.

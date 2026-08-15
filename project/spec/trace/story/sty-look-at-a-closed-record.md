@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: sty-look-at-a-closed-record
 type: "[[story]]"
 statement: An engineer opens a finished record to see how something was decided, and reads it as it stood rather than as it would look today.

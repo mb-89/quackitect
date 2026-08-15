@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: el-satellite-supervisor
 type: "[[element]]"
 statement: Owns a satellite's whole life, and never lets a half-ready one serve.

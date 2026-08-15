@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: if-core-to-mirror
 type: "[[interface]]"
 statement: The core hands the mirror the whole standing position, because several processes now stand behind one machine.

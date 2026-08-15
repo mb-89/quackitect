@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-query-is-the-file
 type: "[[requirement]]"
 statement: The engine shall serve a view's query as the view file's own content, verbatim, with zero query state held outside the file.

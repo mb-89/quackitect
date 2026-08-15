@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-record-arrives-prefilled
 type: "[[requirement]]"
 statement: When the person chooses a vehicle, the desk shall seed the record with every field carrying a proposed value drawn from the person's words, so that the person confirms rather than composes.

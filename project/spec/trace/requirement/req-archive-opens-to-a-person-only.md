@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-archive-opens-to-a-person-only
 type: "[[requirement]]"
 statement: If an agent attempts to browse the archive, then the engine shall refuse at every autonomy setting, naming the person-only rule.

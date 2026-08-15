@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: tsp-record-inspection
 type: "[[test-spec]]"
 statement: The records carry their provenance — purpose, reasoning, order, losers, sources and links — each readable from the file that owns it, verified by inspection of the stored records.

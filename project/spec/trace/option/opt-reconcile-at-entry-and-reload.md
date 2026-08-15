@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-reconcile-at-entry-and-reload
 type: "[[option]]"
 statement: level every open tree against trunk at entry and at reload rather than at every write, so a method change reaches all of them without a write costing N writes

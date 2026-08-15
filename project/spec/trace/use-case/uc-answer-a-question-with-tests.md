@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: uc-answer-a-question-with-tests
 type: "[[use-case]]"
 statement: Answer one question about a change by running only the tests that could answer it.

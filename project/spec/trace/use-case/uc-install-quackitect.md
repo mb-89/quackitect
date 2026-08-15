@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: uc-install-quackitect
 type: "[[use-case]]"
 statement: Install the machine on a computer that does not have it, and reach the front desk.

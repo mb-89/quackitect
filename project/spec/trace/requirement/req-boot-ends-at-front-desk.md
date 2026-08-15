@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: req-boot-ends-at-front-desk
 type: "[[requirement]]"
 statement: When a session boots, the engine shall land the walk at the front desk within 20 seconds of the first pull on the reference machine.

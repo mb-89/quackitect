@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: nbr-agent-harness
 type: "[[neighbour]]"
 statement: The AI agent harness that drives the walk — Claude Code or the Copilot CLI, whichever is installed.

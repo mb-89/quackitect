@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: flow-option-sketch
 type: "[[flow]]"
 statement: one way out, with its cost and what it sheds

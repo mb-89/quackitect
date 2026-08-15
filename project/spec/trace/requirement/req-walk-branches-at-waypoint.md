@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: req-walk-branches-at-waypoint
 type: "[[requirement]]"
 statement: When a completed leg leaves its busbar waiting, the walk shall return to the fork the legs hang off and offer the next owed leg from there, without an escape; the drawn route shall follow that same path.

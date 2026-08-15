@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: cluster-the-account
 type: "[[cluster]]"
 name: what the system writes down, and what it puts in front of a person

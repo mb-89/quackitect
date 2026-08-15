@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-tour-speaks-plainly
 type: "[[requirement]]"
 statement: The tour shall use a method term only where the term's definition is one interaction away.

@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-a-records-work-lives-in-a-worktree-on-disk
 type: "[[option]]"
 statement: keep a record's working copy in an ordinary worktree on durable storage, so every tool a person already uses can see it and nothing is lost when a process dies

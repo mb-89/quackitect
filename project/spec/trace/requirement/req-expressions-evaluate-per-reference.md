@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-expressions-evaluate-per-reference
 type: "[[requirement]]"
 statement: When a formula runs, the engine shall evaluate it per the expression reference, and shall refuse an expression outside the language with its position named.

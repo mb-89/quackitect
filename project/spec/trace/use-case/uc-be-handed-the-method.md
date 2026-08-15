@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: uc-be-handed-the-method
 type: "[[use-case]]"
 statement: Receive everything a step demands be read, and prove it arrived whole.

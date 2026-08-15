@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: if-front-desk-to-record-store
 type: "[[interface]]"
 statement: The seed verbs open a record in the store on the person's word, prefilled from the conversation.

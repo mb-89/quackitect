@@ -1,5 +1,5 @@
 ---
-minted_in: i3-the-walk-s-feedback-loop-the-reading-cre
+minted_in: i3
 id: raid-iss-minor-lost-its-looking-places
 type: "[[raid]]"
 kind: issue

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-walk-resumes-from-repo
 type: "[[requirement]]"
 statement: When a new session opens the project, the engine shall serve the walk from its recorded position using the repository content alone.

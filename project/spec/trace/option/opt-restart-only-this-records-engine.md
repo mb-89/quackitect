@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-restart-only-this-records-engine
 type: "[[option]]"
 statement: give each record its own engine process, so an engine change restarts that record's process alone and every other record keeps running the version it started with

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: flow-archive-listing
 type: "[[flow]]"
 statement: the closed records, each shown as it stood

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-reachable-capability-is-traced
 type: "[[requirement]]"
 statement: The engine shall leave zero capabilities a person can reach from the live offer without a use case and at least one requirement covering them.

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-reader-keeps-their-place
 type: "[[requirement]]"
 statement: While a person reads the panel, the engine shall change only what the last act touched, with zero pane resets, zero size changes and zero scroll jumps caused by unrelated acts.

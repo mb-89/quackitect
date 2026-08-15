@@ -1,5 +1,5 @@
 ---
-minted_in: i3-the-walk-s-feedback-loop-the-reading-cre
+minted_in: i3
 id: raid-asm-an-omit-is-authored-honestly
 type: "[[raid]]"
 kind: assumption

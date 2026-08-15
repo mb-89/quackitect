@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: el-walk-engine
 type: "[[element]]"
 statement: Serves every step of a governed walk — computes the position, hands out instructions and readings, and judges every claim against its form.

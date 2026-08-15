@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: req-a-surface-resolves-to-what-it-shows
 type: "[[requirement]]"
 statement: When a person-facing surface reads or writes, it shall resolve against the record it is showing, and shall name that record on what it shows.

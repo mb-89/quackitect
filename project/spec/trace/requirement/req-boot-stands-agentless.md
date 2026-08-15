@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-boot-stands-agentless
 type: "[[requirement]]"
 statement: Where no agent is available, the boot shall complete with every panel control live.

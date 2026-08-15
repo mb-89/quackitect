@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: flow-trace-graph
 type: "[[flow]]"
 statement: the upward links, derived from the node files

@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: if-walk-engine-to-resolution-seam
 type: "[[interface]]"
 statement: The walk engine hands every dispatched call to the seam before it reaches storage, and takes back the store it resolved to or the refusal that stopped it.

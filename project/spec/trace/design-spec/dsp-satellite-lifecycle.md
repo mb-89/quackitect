@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: dsp-satellite-lifecycle
 type: "[[design-spec]]"
 statement: four all-or-nothing acts over a satellite's life, with a deadline on the call and a beat on the process, so a half-ready satellite never serves and a wedged one is found

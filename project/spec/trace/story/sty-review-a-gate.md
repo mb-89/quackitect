@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: sty-review-a-gate
 type: "[[story]]"
 statement: The walk has stopped at a gate, and the engineer reads what it produced, disagrees with one part, sends it back, and blesses the second attempt.

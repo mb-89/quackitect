@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-recommendation-is-derived
 type: "[[requirement]]"
 statement: When the desk recommends a vehicle, the desk shall derive the recommendation from the state standing at that moment and shall carry every part the Detail table names.

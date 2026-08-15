@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: raid-dec-door-stat-per-access
 type: "[[raid]]"
 kind: decision

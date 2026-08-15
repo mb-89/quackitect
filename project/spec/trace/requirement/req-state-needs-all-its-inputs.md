@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-state-needs-all-its-inputs
 type: "[[requirement]]"
 statement: "The engine shall refuse a state's submit until its inputs are met: every input when a busbar stands above it, otherwise at least one."

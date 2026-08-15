@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-begin-says-own-window
 type: "[[requirement]]"
 statement: When the scaffold completes, the engine shall state that the new product opens in its own window and that the current product keeps running.

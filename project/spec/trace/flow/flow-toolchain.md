@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: flow-toolchain
 type: "[[flow]]"
 statement: the installed tools and editor surface

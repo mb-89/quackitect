@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-thin-tree-reads-shared-from-trunk
 type: "[[option]]"
 statement: keep only the record's own folder in its tree and read shared content from trunk at the moment it is needed, so there is no shared file in the tree to overwrite

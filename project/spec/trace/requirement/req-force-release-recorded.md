@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: req-force-release-recorded
 type: "[[requirement]]"
 statement: When a person judges a claim abandoned, the engine shall release it on an explicit force act that records who forced and why; the force is never offered as an everyday control.

@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-confine-the-root-to-the-bound-tree
 type: "[[option]]"
 statement: hold the bound tree as a capability and resolve every path beneath it, so a path naming another tree cannot be expressed at all

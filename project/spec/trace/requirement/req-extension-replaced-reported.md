@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-extension-replaced-reported
 type: "[[requirement]]"
 statement: If the editor extension stands installed at another version, then the script shall replace it and shall report the version that now stands.

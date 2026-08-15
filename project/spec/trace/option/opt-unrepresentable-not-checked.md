@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: opt-unrepresentable-not-checked
 type: "[[option]]"
 statement: make an illegal act impossible to express rather than refusing it when somebody expresses it

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: opt-decision-trace-schema
 type: "[[option]]"
 statement: fix one minimum evidence record per decision event, so every decision can be reconstructed from the record alone

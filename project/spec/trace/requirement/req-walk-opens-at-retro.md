@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-walk-opens-at-retro
 type: "[[requirement]]"
 statement: When an iteration opens, the engine shall place the walk's first state at the retro.

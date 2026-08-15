@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-size-escalation-readjudicated
 type: "[[requirement]]"
 statement: If mid-walk work outgrows the blessed change size, then the engine shall surface the escalation and obtain a fresh person adjudication before the added work proceeds.

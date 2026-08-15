@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: tsp-claim-lane
 type: "[[test-spec]]"
 statement: A seeded iteration reaches the remote, the pool opens itself on the first claim, and a claim is one atomic pushed file that races first-push-wins, wears its age, reconciles offline, and releases only by a recorded force — verified by test over the claim lane.

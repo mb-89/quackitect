@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: exp-kill-and-resume
 type: "[[experiment]]"
 statement: Does a killed engine resume the walk from the repository alone, position intact and no person re-explaining anything?

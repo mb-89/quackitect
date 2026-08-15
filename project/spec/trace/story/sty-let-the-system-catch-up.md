@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: sty-let-the-system-catch-up
 type: "[[story]]"
 statement: An engineer who has been shipping faster than the method could follow stops and lets everything catch up, in one pass rather than a hundred small ones.

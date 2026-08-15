@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: req-a-records-dependency-is-declared
 type: "[[requirement]]"
 statement: The engine shall take a record's prerequisites from a declared list on the record, and shall refuse entry until each named record has left the open set.

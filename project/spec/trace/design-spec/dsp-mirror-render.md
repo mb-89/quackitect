@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: dsp-mirror-render
 type: "[[design-spec]]"
 statement: the one surface a person looks at, carried by a loopback server rendering the machine, the forms, the feed and the tour

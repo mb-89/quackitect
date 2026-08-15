@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: tsp-walk-discipline
 type: "[[test-spec]]"
 statement: The walk advances only on a pull, weighs the slider on every hop, and answers from the record, verified by test over the pull and route machinery.

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: dsp-evidence-forms
 type: "[[design-spec]]"
 statement: evidence forms built from state declarations and checked at every save, carried by one form model over markdown sections

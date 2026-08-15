@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-the-engine-runs-from-the-record-it-serves
 type: "[[option]]"
 statement: load the engine's code from the record's own tree rather than from trunk, so an engine edit made inside a record is the code that record runs and no other record can see it

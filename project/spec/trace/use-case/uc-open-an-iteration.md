@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: uc-open-an-iteration
 type: "[[use-case]]"
 statement: Open an iteration on an existing product and set the rigor its work deserves.

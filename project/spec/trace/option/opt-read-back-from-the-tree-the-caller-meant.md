@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-read-back-from-the-tree-the-caller-meant
 type: "[[option]]"
 statement: close every write with a read from the tree the caller named, so the write is proved by what came back rather than by its own verdict

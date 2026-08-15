@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: raid-asm-the-target-machine-is-many-throttled-cores
 type: "[[raid]]"
 kind: assumption

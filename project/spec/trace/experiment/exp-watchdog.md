@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: exp-watchdog
 type: "[[experiment]]"
 statement: Would a heartbeat between core and satellite catch a hang that a per-call deadline would not?

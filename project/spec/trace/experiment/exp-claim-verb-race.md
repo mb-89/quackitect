@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: exp-claim-verb-race
 type: "[[experiment]]"
 statement: Does the claim verb's whole mechanism work — first push wins, the loser sees the holder, an offline claim reconciles, and a force release records — before the M7 build stands on it?

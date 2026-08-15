@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: tsp-tour-run
 type: "[[test-spec]]"
 statement: A tour derives its stops from the live machinery, shows live instances, highlights the named part, and ends at the desk, verified by demonstration of a full tour.

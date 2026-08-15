@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-capture-moves-nothing
 type: "[[requirement]]"
 statement: When a stray is captured, the engine shall leave the walk unchanged, with zero state transitions and zero plan changes caused by the capture.

@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: if-engine-delta-to-walk-engine
 type: "[[interface]]"
 statement: The walk engine runs the composition the delta resolved for its record, and never loads a module by any other route.

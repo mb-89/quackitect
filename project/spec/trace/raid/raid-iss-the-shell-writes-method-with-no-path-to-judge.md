@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: raid-iss-the-shell-writes-method-with-no-path-to-judge
 type: "[[raid]]"
 kind: issue

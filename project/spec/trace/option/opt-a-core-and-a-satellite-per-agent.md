@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-a-core-and-a-satellite-per-agent
 type: "[[option]]"
 statement: run one core that knows the whole state and one satellite per agent that knows its own, so an engine change reaches the satellite of the agent who made it and no other

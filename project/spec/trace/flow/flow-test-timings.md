@@ -1,5 +1,5 @@
 ---
-minted_in: i12-performance-hold-the-one-second-rule-on-
+minted_in: i12
 id: flow-test-timings
 type: "[[flow]]"
 statement: every test case's duration, recorded per run and kept across runs

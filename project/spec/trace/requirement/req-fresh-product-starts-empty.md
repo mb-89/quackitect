@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-fresh-product-starts-empty
 type: "[[requirement]]"
 statement: When a newly scaffolded product is opened for the first time, its front desk shall present an empty machine, with zero records, notes, or backlog inherited from any other product.

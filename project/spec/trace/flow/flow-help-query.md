@@ -1,5 +1,5 @@
 ---
-minted_in: i8-se-help-a-logged-keyword-search-over-the
+minted_in: i8
 id: flow-help-query
 type: "[[flow]]"
 statement: what an agent is looking for, in plain words

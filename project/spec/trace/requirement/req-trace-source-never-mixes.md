@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-trace-source-never-mixes
 type: "[[requirement]]"
 statement: While the corpus is split across the trunk and an open record, the engine shall resolve each trace view against its selected source alone, mixing zero trunk content into the open record's view.

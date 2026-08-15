@@ -1,5 +1,5 @@
 ---
-minted_in: i3-the-walk-s-feedback-loop-the-reading-cre
+minted_in: i3
 id: tsp-placeholder-refuses-entry
 type: "[[test-spec]]"
 statement: A seeded sub-machine still carrying its placeholder may be drawn and routed through, and may not be walked into.

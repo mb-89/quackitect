@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-land-target-routes-to-gate
 type: "[[requirement]]"
 statement: When the person sets landing as the walk's target, the engine shall route the walk to the land gate through states whose conditions pass.

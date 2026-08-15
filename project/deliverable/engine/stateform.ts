@@ -852,6 +852,21 @@ function foldBackExperiments(recordRoot: string, only: string | undefined): Set<
  *  UNDEFINED FALLS BACK TO THE SCAN. The unit fixtures call the laws directly
  *  with no state, naming their record `itx` inside a temp root, so there is no
  *  short id to resolve and the lone record on disk is the right answer. */
+/** A RECORD'S ONE NAME (owner ruling 2026-08-15): the short id. "Why are there
+ *  even two names? Just keep the short one, throw away the long one. We don't
+ *  need two names for one note."
+ *
+ *  Reducing every spelling to it before comparing is what makes the rename
+ *  safe to do in pieces: a folder still called `i12-some-long-slug`, a folder
+ *  called `i12`, a worktree named either way and a state id carrying just
+ *  `i12` all answer to the same record.
+ *
+ *  A name that is not id-shaped comes back unchanged, so the unit fixtures
+ *  naming their record `itx-here` keep matching on the prefix rule below. */
+function shortRecordId(s: string): string {
+  return /^([a-z]+\d+)/.exec(s)?.[1] ?? s;
+}
+
 function recordDirFor(recordRoot: string, record: string | undefined): string | undefined {
   let names: string[];
   try {
@@ -866,7 +881,9 @@ function recordDirFor(recordRoot: string, record: string | undefined): string | 
   // a second record's files can be sitting in the same tree.
   for (const cand of [record, basename(recordRoot)]) {
     if (cand === undefined || cand === "") continue;
-    for (const e of names) if (e === cand || e.startsWith(`${cand}-`)) return e;
+    for (const e of names) {
+      if (e === cand || e.startsWith(`${cand}-`) || shortRecordId(e) === shortRecordId(cand)) return e;
+    }
   }
   return undefined;
 }
@@ -902,13 +919,15 @@ function promotionAssignmentProblems(corpus: { id: string; type: string; file?: 
   // with no owner at all stays in scope: absence cannot prove it belongs to
   // somebody else, and the safe direction is to ask rather than to skip.
   const own = foldBackExperiments(recordRoot, only);
-  const owner = only ?? basename(recordRoot);
+  // THE OWNER IS COMPARED AS A SHORT ID, because minted_in carries the short
+  // form after the 2026-08-15 rename and the long one before it.
+  const owner = shortRecordId(only ?? basename(recordRoot));
   for (const n of corpus) {
     if (n.type !== "experiment" || n.file === undefined) continue;
     if (own !== undefined && !own.has(n.id)) continue;
     const fm = noteOf(n.file)?.frontmatter ?? {};
     const mintedIn = String(fm.minted_in ?? "").trim();
-    if (own === undefined && mintedIn !== "" && mintedIn !== owner) continue;
+    if (own === undefined && mintedIn !== "" && shortRecordId(mintedIn) !== owner) continue;
     const p = String(fm.promote ?? "").trim();
     if (p === "" || /^none\b/i.test(p)) continue;
     const chunk = String(fm.chunk ?? "").trim();

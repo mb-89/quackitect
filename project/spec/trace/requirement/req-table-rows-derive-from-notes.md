@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-table-rows-derive-from-notes
 type: "[[requirement]]"
 statement: While a live table is open, the engine shall derive every row from the note files on every look, with zero rows held only by the view.

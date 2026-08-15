@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: req-entry-levels-the-record-tree
 type: "[[requirement]]"
 statement: When a record is entered, the engine shall bring its tree level with the method source and commit what it brought, before any work starts in it.

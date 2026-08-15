@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-reload-the-whole-engine
 type: "[[option]]"
 statement: restart the one engine process when its code changes, so every record's walk picks up the new version together

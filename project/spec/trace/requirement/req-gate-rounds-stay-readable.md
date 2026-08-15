@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-gate-rounds-stay-readable
 type: "[[requirement]]"
 statement: When a blessed gate is opened for reading, the engine shall show its rounds as they were filled, each round carrying the approving role and its channel.

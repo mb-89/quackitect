@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: req-the-answer-never-exceeds-its-bound
 type: "[[requirement]]"
 statement: The engine shall keep every lane answer within a declared size bound, serving anything larger by reference with an offset and a limit.

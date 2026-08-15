@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: tsp-bound-engine-and-method
 type: "[[test-spec]]"
 statement: An agent changes the engine or the method from inside their record, the change takes effect on their next call, and no other record is altered by it.

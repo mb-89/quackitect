@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: dsp-engine-delta
 type: "[[design-spec]]"
 statement: two-level resolution for every engine and method file, the record's own folder first and trunk second, so a record holds only what it changed

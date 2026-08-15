@@ -1,5 +1,5 @@
 ---
-minted_in: i8-se-help-a-logged-keyword-search-over-the
+minted_in: i8
 id: req-help-searches-tools-and-guidance
 type: "[[requirement]]"
 statement: The se_help tool shall rank lane tools and guidance pages by keyword match against a plain-words query, returning each match's name and enough of its description to judge fit.

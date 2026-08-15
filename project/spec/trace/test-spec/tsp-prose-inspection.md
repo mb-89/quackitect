@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: tsp-prose-inspection
 type: "[[test-spec]]"
 statement: The published prose holds its laws — plain entry documents, roles over names, claims backed by kept sources — verified by inspection of the artifacts.

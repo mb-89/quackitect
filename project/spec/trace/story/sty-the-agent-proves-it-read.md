@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: sty-the-agent-proves-it-read
 type: "[[story]]"
 statement: A fresh agent arrives at a step it has never seen, is handed the method it owes one document at a time, and cannot reach the work until it proves it read them.

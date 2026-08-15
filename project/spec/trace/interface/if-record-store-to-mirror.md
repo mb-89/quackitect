@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: if-record-store-to-mirror
 type: "[[interface]]"
 statement: The mirror shows the walk's position and the archive listing, served on request.

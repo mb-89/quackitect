@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: raid-risk-many-writers-one-ledger
 type: "[[raid]]"
 kind: risk

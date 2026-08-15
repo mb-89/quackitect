@@ -1,5 +1,5 @@
 ---
-minted_in: i12-performance-hold-the-one-second-rule-on-
+minted_in: i12
 id: raid-asm-wall-clock-is-a-baseline
 type: "[[raid]]"
 kind: assumption
@@ -14,7 +14,7 @@ breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:
   - req-call-answers-in-one-second
-  - i12-performance-hold-the-one-second-rule-on-
+  - i12
   - raid-asm-battery-timings-measure-work
 ---
 

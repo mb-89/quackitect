@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-lane-fixes-what-machines-fix
 type: "[[requirement]]"
 statement: When a write lands on a file the toolchain covers, the engine shall return the formatted and safe-fixed content with the changes named, and shall leave an uncovered file exactly as written.

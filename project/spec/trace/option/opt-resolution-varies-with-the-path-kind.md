@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-resolution-varies-with-the-path-kind
 type: "[[option]]"
 statement: make the resolution rule a function of the path's declared kind, so method, record content, session state and repository-root files each resolve by their own stated rule

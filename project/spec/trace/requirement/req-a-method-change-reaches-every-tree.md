@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: req-a-method-change-reaches-every-tree
 type: "[[requirement]]"
 statement: When an agent changes method while working on a record, the engine shall put that change into effect for that agent's next call without the agent leaving the record.

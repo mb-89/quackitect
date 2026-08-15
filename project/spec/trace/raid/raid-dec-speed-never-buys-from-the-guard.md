@@ -1,5 +1,5 @@
 ---
-minted_in: i12-performance-hold-the-one-second-rule-on-
+minted_in: i12
 id: raid-dec-speed-never-buys-from-the-guard
 type: "[[raid]]"
 kind: decision
@@ -12,7 +12,7 @@ breaks_how_badly: crippling
 how_likely: plausible
 source_refs:
   - req-call-answers-in-one-second
-  - i12-performance-hold-the-one-second-rule-on-
+  - i12
   - raid-asm-battery-timings-measure-work
 ---
 

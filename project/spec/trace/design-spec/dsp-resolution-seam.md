@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: dsp-resolution-seam
 type: "[[design-spec]]"
 statement: one resolver every verb calls, which decides the store, refuses what falls outside the record, and returns the store beside the path

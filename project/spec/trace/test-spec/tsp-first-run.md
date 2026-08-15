@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: tsp-first-run
 type: "[[test-spec]]"
 statement: A newcomer reaches the desk's greeting from a fresh machine with one command, and the boot stands without an agent, verified by demonstration on a real machine.

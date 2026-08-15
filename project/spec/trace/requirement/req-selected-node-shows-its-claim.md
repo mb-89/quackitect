@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-selected-node-shows-its-claim
 type: "[[requirement]]"
 statement: When a node is selected in the trace, the engine shall show the node's statement and type with zero further navigation.

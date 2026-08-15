@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: tsp-reading-loop
 type: "[[test-spec]]"
 statement: The reading loop serves every owed document and credits only a proven read, verified by test over the pull's reading path.

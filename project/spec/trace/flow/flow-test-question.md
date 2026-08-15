@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: flow-test-question
 type: "[[flow]]"
 statement: the question a test run is asked to settle

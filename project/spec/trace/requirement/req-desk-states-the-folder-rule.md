@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-desk-states-the-folder-rule
 type: "[[requirement]]"
 statement: When asked to begin a product or asked for a product picker, the front desk shall state the folder rule.
