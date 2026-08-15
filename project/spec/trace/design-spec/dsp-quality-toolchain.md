@@ -8,6 +8,7 @@ realizes:
   - "if-record-store-to-test-runner"
   - "if-test-runner-to-record-store"
 files:
+  - "project/deliverable/engine/testreporters.ts"
   - "project/deliverable/engine/tools.ts"
   - "project/deliverable/engine/lint.ts"
   - "project/deliverable/engine/bin/grades-complete.ts"

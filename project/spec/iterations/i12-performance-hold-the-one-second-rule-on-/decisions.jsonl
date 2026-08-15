@@ -364,3 +364,14 @@
 {"ts":"2026-08-15T11:27:11.762Z","op":"update","visit":"iterations/i12/build-steps/container-choose@0","node":"d356","brief":"reading the battery verdict"}
 {"ts":"2026-08-15T11:27:17.386Z","op":"done","visit":"iterations/i12/build-steps/container-choose@0","node":"d345","brief":"container-choose is built and its case is green"}
 {"ts":"2026-08-15T11:27:30.558Z","op":"done","visit":"iterations/i12/build-steps/container-choose@0","node":"d344","brief":"battery green at 1312 of 1312"}
+{"ts":"2026-08-15T11:27:40.382Z","op":"plan","visit":"iterations/i12/build-steps/container-choose@0","parent":null,"nodes":[{"id":"d357","brief":"sign the last chunk"},{"id":"d358","brief":"walk verification"}]}
+{"ts":"2026-08-15T11:28:03.721Z","op":"done","visit":"iterations/i12/build-steps/container-choose@0","node":"d357","brief":"container-choose signed"}
+{"ts":"2026-08-15T11:28:40.233Z","op":"update","visit":"iterations/i12/trace-design@0","node":"d359","brief":"reading the verification discipline"}
+{"ts":"2026-08-15T11:28:54.092Z","op":"update","visit":"iterations/i12/trace-design@0","node":"d360","brief":"opening trace-design"}
+{"ts":"2026-08-15T11:29:04.334Z","op":"update","visit":"iterations/i12/trace-design@0","node":"d361","brief":"claiming the new engine file before the dead-code sweep"}
+{"ts":"2026-08-15T11:29:43.312Z","op":"update","visit":"iterations/i12/trace-design@0","node":"d362","brief":"submitting trace-design with the new file claimed"}
+{"ts":"2026-08-15T11:29:56.573Z","op":"done","visit":"iterations/i12/build-steps/container-choose@0","node":"d358","brief":"trace-design signed with every changed file claimed"}
+{"ts":"2026-08-15T11:30:18.597Z","op":"plan","visit":"iterations/i12/trace-design@0","parent":null,"nodes":[{"id":"d363","brief":"find i27's unlanded design specs"},{"id":"d364","brief":"resolve the dead-code sweep"},{"id":"d365","brief":"reach verification"}]}
+{"ts":"2026-08-15T11:30:35.214Z","op":"update","visit":"iterations/i12/trace-design@0","node":"d366","brief":"reading the three unlanded specs to bring them to trunk"}
+{"ts":"2026-08-15T11:31:04.349Z","op":"done","visit":"iterations/i12/trace-design@0","node":"d363","brief":"i27's four design specs are on its branch and not on trunk"}
+{"ts":"2026-08-15T11:31:09.243Z","op":"update","visit":"iterations/i12/trace-design@0","node":"d367","brief":"committing before the blocking question"}
