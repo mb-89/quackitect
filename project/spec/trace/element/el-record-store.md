@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: el-record-store
 type: "[[element]]"
 statement: Holds the records — binds a thin worktree per open record, lands finished work on trunk, closes records clean and keeps the archive readable.

@@ -1,5 +1,5 @@
 ---
-minted_in: i12-performance-hold-the-one-second-rule-on-
+minted_in: i12
 id: sty-judge-without-waiting
 type: "[[story]]"
 statement: The engineer opens the drawing to make a call, and spends the next four seconds watching the machine think instead of judging.

@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: req-engine-pushes-only-machinery
 type: "[[requirement]]"
 statement: The engine shall push only seed stubs and claim files; every other push remains the person's own act, and agent-requested pushes stay refused.

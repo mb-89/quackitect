@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: fn-run-a-governed-walk.hold-a-stray
 type: "[[function]]"
 cluster: the-holding-pen

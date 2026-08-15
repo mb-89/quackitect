@@ -1,5 +1,5 @@
 ---
-minted_in: i8-se-help-a-logged-keyword-search-over-the
+minted_in: i8
 id: dsp-help-search
 type: "[[design-spec]]"
 statement: A plain-words keyword search over the lane's tools and guidance, with every miss appended to a durable ranked demand log, carried by engine/help.ts and registered onto el-walk-engine's dispatch table in engine/tools.ts.

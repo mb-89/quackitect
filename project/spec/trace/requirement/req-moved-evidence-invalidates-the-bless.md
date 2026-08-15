@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-moved-evidence-invalidates-the-bless
 type: "[[requirement]]"
 statement: When the evidence under a bless changes, the engine shall mark the depending gate suspect and shall refuse any verdict answering the older offer.

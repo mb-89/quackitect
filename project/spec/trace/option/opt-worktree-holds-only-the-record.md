@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: opt-worktree-holds-only-the-record
 type: "[[option]]"
 statement: give the isolated tree only the record's own folder, and read every shared file from trunk at the moment it is needed

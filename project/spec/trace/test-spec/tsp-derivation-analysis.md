@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: tsp-derivation-analysis
 type: "[[test-spec]]"
 statement: Every trace view derives from the node files alone and every reachable capability is covered, verified by analysis over the derivation chain.

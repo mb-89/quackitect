@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: fn-run-a-governed-walk.resolve-a-path
 type: "[[function]]"
 cluster: the-walk

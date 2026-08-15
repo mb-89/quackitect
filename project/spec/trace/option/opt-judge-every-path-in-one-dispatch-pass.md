@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-judge-every-path-in-one-dispatch-pass
 type: "[[option]]"
 statement: leave the root where it is and check every call's path against one rule at the single dispatch point, refusing what falls outside the record

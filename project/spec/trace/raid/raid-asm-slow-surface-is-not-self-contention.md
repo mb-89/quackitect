@@ -1,5 +1,5 @@
 ---
-minted_in: i12-performance-hold-the-one-second-rule-on-
+minted_in: i12
 id: raid-asm-slow-surface-is-not-self-contention
 type: "[[raid]]"
 kind: assumption
@@ -15,7 +15,7 @@ how_likely: plausible
 source_refs:
   - req-surface-answers-in-one-second
   - raid-asm-battery-timings-measure-work
-  - i12-performance-hold-the-one-second-rule-on-
+  - i12
 ---
 
 ## Why it is open

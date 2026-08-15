@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: if-holding-pen-to-front-desk
 type: "[[interface]]"
 statement: The desk reads the pending note inbox from the pen's store before it advises.

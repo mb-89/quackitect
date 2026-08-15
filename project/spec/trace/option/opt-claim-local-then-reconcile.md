@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: opt-claim-local-then-reconcile
 type: "[[option]]"
 statement: the claim lands locally the moment it is taken and pushes whenever the remote is next reachable - visibility and offline work separated in time

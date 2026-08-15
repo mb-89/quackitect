@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: if-satellite-supervisor-to-test-runner
 type: "[[interface]]"
 statement: A test run is started inside the satellite that owns the record, in that record's tree.

@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-refuse-an-ambiguous-path-by-default
 type: "[[option]]"
 statement: refuse a path whose tree is not decidable rather than picking one, so the unsafe case is the one that stops

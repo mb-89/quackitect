@@ -1,5 +1,5 @@
 ---
-minted_in: i12-performance-hold-the-one-second-rule-on-
+minted_in: i12
 id: raid-asm-method-write-reaches-every-tree
 type: "[[raid]]"
 kind: assumption
@@ -13,8 +13,8 @@ impact: i27 emitted the meth-consistency-sweep fix to this record's promotions. 
 breaks_how_badly: abrasive
 how_likely: conceivable
 source_refs:
-  - i27-the-lane-binds-to-the-record-a-bound-wal
-  - i12-performance-hold-the-one-second-rule-on-
+  - i27
+  - i12
 ---
 
 ## Why it is open

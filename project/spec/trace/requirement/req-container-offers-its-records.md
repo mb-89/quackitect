@@ -1,5 +1,5 @@
 ---
-minted_in: i12-performance-hold-the-one-second-rule-on-
+minted_in: i12
 id: req-container-offers-its-records
 type: "[[requirement]]"
 statement: While more than one record stands open in a container, the pull at that container's start shall offer them as a choice rather than entering one.
@@ -11,7 +11,7 @@ refines:
   - uc-open-an-iteration
 source_refs:
   - uc-get-work-routed
-  - i12-performance-hold-the-one-second-rule-on-
+  - i12
 priority: should
 ---
 

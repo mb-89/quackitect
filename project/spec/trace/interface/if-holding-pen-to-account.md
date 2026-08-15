@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: if-holding-pen-to-account
 type: "[[interface]]"
 statement: A ruled divergence lands its choice in the account's files, losers on record.

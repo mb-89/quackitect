@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: req-autonomy-is-categorical
 type: "[[requirement]]"
 statement: The session autonomy shall be a categorical tier - operational, tactical, strategic, with emergency above - and no numeric autonomy value and no slider shall remain on any surface, state note or guidance page.

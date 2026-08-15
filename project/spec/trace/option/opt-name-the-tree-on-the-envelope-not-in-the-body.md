@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-name-the-tree-on-the-envelope-not-in-the-body
 type: "[[option]]"
 statement: carry the resolved tree on every answer's envelope rather than inside the payload, so a misroute becomes visible without adding to what already overflows

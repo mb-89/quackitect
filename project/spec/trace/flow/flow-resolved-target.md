@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: flow-resolved-target
 type: "[[flow]]"
 statement: the one tree and path a call was resolved to, named rather than assumed

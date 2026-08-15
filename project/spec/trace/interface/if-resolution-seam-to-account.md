@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: if-resolution-seam-to-account
 type: "[[interface]]"
 statement: Every resolution the seam performs is recorded with the store it resolved against, so a wrong tree is visible in the log rather than at a merge.

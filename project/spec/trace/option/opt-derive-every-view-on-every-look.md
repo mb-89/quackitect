@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: opt-derive-every-view-on-every-look
 type: "[[option]]"
 statement: store nothing derived and recompute every view from the corpus on every look, because the corpus is small enough to afford it

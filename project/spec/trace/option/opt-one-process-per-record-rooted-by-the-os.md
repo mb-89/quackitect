@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-one-process-per-record-rooted-by-the-os
 type: "[[option]]"
 statement: run one engine process per bound record with its working directory set to that record's tree, so the operating system resolves every relative path and the engine holds no rule at all

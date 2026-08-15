@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: req-seed-lands-on-remote
 type: "[[requirement]]"
 statement: When an iteration is seeded, the engine shall push its stub to the remote in the same act, so every peer machine lists it from its next fetch.

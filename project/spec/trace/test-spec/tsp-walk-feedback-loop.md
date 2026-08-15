@@ -1,5 +1,5 @@
 ---
-minted_in: i3-the-walk-s-feedback-loop-the-reading-cre
+minted_in: i3
 id: tsp-walk-feedback-loop
 type: "[[test-spec]]"
 statement: The walk says what it knows — a reading credit survives a reload and dies with the words, a red objective serves its fill, and one verb names every condition holding a state grey.

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: el-mirror
 type: "[[element]]"
 statement: Shows where the machine stands — the drawing, the forms, the feed — and walks a newcomer through what actually exists, ending at the desk.

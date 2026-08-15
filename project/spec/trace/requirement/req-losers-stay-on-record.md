@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-losers-stay-on-record
 type: "[[requirement]]"
 statement: The engine shall keep every unchosen option readable after the choice, each with its recorded reasoning.

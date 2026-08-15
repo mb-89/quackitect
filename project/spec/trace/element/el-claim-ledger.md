@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: el-claim-ledger
 type: "[[element]]"
 statement: Marks whose piece is whose — one add-only claim file per iteration on the claims branch, opened by its own first claim, pushed at claim time, recorded locally when offline, released only by a person's recorded force.

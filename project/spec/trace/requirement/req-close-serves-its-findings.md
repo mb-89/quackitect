@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-close-serves-its-findings
 type: "[[requirement]]"
 statement: When a close is requested, the engine shall serve the record's findings report, listing every finding the record produced.

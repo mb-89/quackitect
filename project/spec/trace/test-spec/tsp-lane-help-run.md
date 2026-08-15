@@ -1,5 +1,5 @@
 ---
-minted_in: i8-se-help-a-logged-keyword-search-over-the
+minted_in: i8
 id: tsp-lane-help-run
 type: "[[test-spec]]"
 statement: An agent finds the right lane tool from a plain-words query through se_help, and a genuine miss is logged for the retro, verified by demonstration through the automated suite and the full battery.

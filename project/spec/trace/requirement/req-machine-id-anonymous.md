@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: req-machine-id-anonymous
 type: "[[requirement]]"
 statement: The engine shall mint a random short machine id at first boot, store it machine-locally outside git, and use it in every claim; no hostname and no personal datum shall reach the remote.

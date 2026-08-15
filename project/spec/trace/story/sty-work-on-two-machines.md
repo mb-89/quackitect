@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: sty-work-on-two-machines
 type: "[[story]]"
 statement: An engineer seeds a batch at the desk, opens the laptop, and each machine claims and ships its own iteration - two shipped in the time one used to take.

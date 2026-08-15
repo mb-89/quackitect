@@ -1,5 +1,5 @@
 ---
-minted_in: i3-the-walk-s-feedback-loop-the-reading-cre
+minted_in: i3
 id: req-reading-credit-survives-a-reload
 type: "[[requirement]]"
 statement: When the engine reloads, the engine shall keep the reading credit for every document whose content is unchanged.

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-first-green-needs-a-red
 type: "[[requirement]]"
 statement: If a test reaches its first green with no recorded red and no recorded exemption, then the engine shall withhold the verdict and flag the test.

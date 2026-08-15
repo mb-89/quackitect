@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: tsp-trace-graph-view
 type: "[[test-spec]]"
 statement: The trace graph draws only what serves the filter, with zero empty levels, verified by test over the layout.

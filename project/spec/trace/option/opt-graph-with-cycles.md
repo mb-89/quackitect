@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: opt-graph-with-cycles
 type: "[[option]]"
 statement: hold the walk as a graph of nodes and edges that permits cycles, with the position carried in a shared state object

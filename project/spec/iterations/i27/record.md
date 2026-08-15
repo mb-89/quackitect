@@ -1,5 +1,5 @@
 ---
-id: i27-the-lane-binds-to-the-record-a-bound-wal
+id: i27
 status: shipped
 closed: 2026-08-14T19:54:00.895Z
 started: 2026-08-13T18:17:34.105Z
@@ -10,7 +10,7 @@ inputs:
 depends_on:
 ---
 
-# i27-the-lane-binds-to-the-record-a-bound-wal
+# i27
 
 ## Goal
 

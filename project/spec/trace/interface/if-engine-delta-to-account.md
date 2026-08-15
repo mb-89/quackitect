@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: if-engine-delta-to-account
 type: "[[interface]]"
 statement: A record's override that no longer applies to trunk is reported as divergence, never composed into a mixture.

@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: if-engine-delta-to-mirror
 type: "[[interface]]"
 statement: The delta tells the mirror which files each record overrides, so a person can see what a record has done to the machine without diffing anything.

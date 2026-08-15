@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: tsp-autonomy-tiers
 type: "[[test-spec]]"
 statement: No numeric autonomy value and no slider survives on any surface, state note or guidance page once the categorical tiers land — verified by inspection over the shipped tree.

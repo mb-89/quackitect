@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: tsp-claim-guardrails
 type: "[[test-spec]]"
 statement: The claim lane's outbound surface carries no personal datum and pushes nothing beyond seed stubs and claim files — verified by test at the lane's git boundary.

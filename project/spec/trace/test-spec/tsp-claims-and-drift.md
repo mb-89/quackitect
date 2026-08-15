@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: tsp-claims-and-drift
 type: "[[test-spec]]"
 statement: A claim is built and checked by the engine, stamps only when sound, and loses its green the moment its ground moves, verified by test over forms, claims and drift.

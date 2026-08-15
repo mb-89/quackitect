@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: exp-channel-cost
 type: "[[experiment]]"
 statement: What does one call-log append cost across a local channel to another process, against a direct append, measured in microseconds each?

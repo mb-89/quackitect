@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: tsp-node-scoping
 type: "[[test-spec]]"
 statement: Every trace node carries its minting iteration, reference views default to the current iteration's delta with an opt-in for the whole corpus, and the coverage laws keep reading everything — verified by test over the loader and the table views.

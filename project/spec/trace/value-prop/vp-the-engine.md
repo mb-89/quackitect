@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: vp-the-engine
 type: "[[value-prop]]"
 statement: As an engineer, I need to draw MY process as a state machine and have the engine give it teeth - for any number of agents and machines at once.

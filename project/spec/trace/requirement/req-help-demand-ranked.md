@@ -1,5 +1,5 @@
 ---
-minted_in: i8-se-help-a-logged-keyword-search-over-the
+minted_in: i8
 id: req-help-demand-ranked
 type: "[[requirement]]"
 statement: The se_help tool shall expose the logged misses as a ranked demand list, grouped by query shape, most-demanded first.

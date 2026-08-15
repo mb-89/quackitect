@@ -1,5 +1,5 @@
 ---
-minted_in: i3-the-walk-s-feedback-loop-the-reading-cre
+minted_in: i3
 id: req-red-objective-serves-its-fill
 type: "[[requirement]]"
 statement: If the route's objective is a state whose claim is red, then the engine shall serve that state's fill.

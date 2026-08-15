@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: vp-systematic-engineering
 type: "[[value-prop]]"
 statement: As an engineer driving agents, I need the machine to ENFORCE the engineering order rather than remind me of it.

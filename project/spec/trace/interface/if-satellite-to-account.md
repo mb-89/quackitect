@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: if-satellite-to-account
 type: "[[interface]]"
 statement: Every call a satellite serves and every claim it stamps is logged with the record it belongs to.

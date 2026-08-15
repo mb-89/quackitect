@@ -1,7 +1,8 @@
 ---
 form: specify-build
 by: agent
-signed_off: 2026-08-15T10:59:20.411Z
+signed_off: 2026-08-15T12:38:30.856Z
+reopened: "2026-08-15T12:36:56.450Z — The owner ruled the implementation gate failed and named two changes: strike the cubic clause from the goal, since record.md line 85 already measured it as not a problem,…"
 authors: agent
 files:
 ---
@@ -53,6 +54,7 @@ No spike is promoted. This iteration ran none, because the defects were found by
 - BUILD THREE: cap the test fan-out from the core count read at run time, never from a constant, so the engine keeps a core while a run is in flight.
 - THEN RE-TAKE THE RANKING. Everything the kickoff ordered is provisional until a measurement exists that was taken today.
 - The container routing and survey defects follow, and neither is blocked by the instrument.
+- BUILD SEVEN, added 2026-08-15 after the owner failed the implementation gate: a record gets ONE name, the short id. It leans on nothing and starts beside the other independent lots. It is not tidying — the record-scoping fallback that keeps two laws honest is load-bearing today and fails silently into the bug this record removed, and one name closes that by construction rather than documenting it.
 
 ## anything_else
 

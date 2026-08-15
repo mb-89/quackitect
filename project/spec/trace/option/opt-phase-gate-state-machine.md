@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: opt-phase-gate-state-machine
 type: "[[option]]"
 statement: hold the walk in an explicit phase machine where a phase cannot start until the one before it recorded that it ended

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-finding-lands-as-reference
 type: "[[requirement]]"
 statement: When a research question settles, the product shall record the surviving finding as a reference node in the trace corpus.

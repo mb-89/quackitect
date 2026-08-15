@@ -1,5 +1,5 @@
 ---
-minted_in: i12-performance-hold-the-one-second-rule-on-
+minted_in: i12
 id: raid-asm-waiting-makes-a-person-look-less
 type: "[[raid]]"
 kind: assumption

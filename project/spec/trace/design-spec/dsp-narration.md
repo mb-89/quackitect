@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: dsp-narration
 type: "[[design-spec]]"
 statement: the decision graph riding every changing call, carried by typed ops with a toll that keeps the story gapless

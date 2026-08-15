@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-keep-one-root-and-address-the-record-inside-it
 type: "[[option]]"
 statement: hold the lane's root fixed at the repository for the whole session and address a record as a path underneath it, so no call's meaning depends on what is bound

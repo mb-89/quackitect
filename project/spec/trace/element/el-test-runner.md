@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: el-test-runner
 type: "[[element]]"
 statement: Answers one question about a change by running the narrowest test scope that settles it, and returns a structured verdict.

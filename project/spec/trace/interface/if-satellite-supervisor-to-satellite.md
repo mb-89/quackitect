@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: if-satellite-supervisor-to-satellite
 type: "[[interface]]"
 statement: The supervisor owns a satellite's start, replacement and reaping, and never hands over a half-ready one.

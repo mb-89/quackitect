@@ -1,5 +1,5 @@
 ---
-minted_in: i3-the-walk-s-feedback-loop-the-reading-cre
+minted_in: i3
 id: req-the-size-is-read-by-one-extractor
 type: "[[requirement]]"
 statement: The engine shall read a blessed change size with the same extractor that validated the choice, taking the chosen option alone and never scanning the surrounding reasoning.

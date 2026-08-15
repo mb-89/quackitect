@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: opt-claim-as-git-note
 type: "[[option]]"
 statement: the claim is a git note attached to the seed stub's own commit, in a pushed notes ref

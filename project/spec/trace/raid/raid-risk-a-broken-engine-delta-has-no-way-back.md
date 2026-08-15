@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: raid-risk-a-broken-engine-delta-has-no-way-back
 type: "[[raid]]"
 kind: risk

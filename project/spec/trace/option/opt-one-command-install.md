@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: opt-one-command-install
 type: "[[option]]"
 statement: collapse the whole install to a single command with no interactive wizard, so nothing stands between a bare machine and a running product

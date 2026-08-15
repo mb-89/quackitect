@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-vendor-page-claim-only
 type: "[[requirement]]"
 statement: Where a source is a vendor's own page, the record shall mark the finding as a claimed feature and never as a quality judgment.

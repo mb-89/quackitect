@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: opt-worktree-per-record
 type: "[[option]]"
 statement: give every unit of work its own working directory on its own branch, sharing one object database underneath

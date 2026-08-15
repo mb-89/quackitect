@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-panel-shows-the-machine
 type: "[[requirement]]"
 statement: When the workspace opens after setup, the editor shall show the panel beside the editing area with the machine drawn on it.

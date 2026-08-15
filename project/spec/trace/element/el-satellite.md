@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: el-satellite
 type: "[[element]]"
 statement: Serves one agent's work on one record — its walk, its tree, and the engine that agent is running — and knows nothing of any other record.

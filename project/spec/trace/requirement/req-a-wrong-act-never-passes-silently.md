@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: req-a-wrong-act-never-passes-silently
 type: "[[requirement]]"
 statement: When a call violates a rule the engine holds, the engine shall prevent it by construction, apply the correction and name it in the answer, or refuse with a remedy, and shall complete zero violating calls reporting success.

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-test-run-carries-its-question
 type: "[[requirement]]"
 statement: The engine shall record every test run with the question and scope it was asked to answer.

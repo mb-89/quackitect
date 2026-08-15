@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-overlay-drift-reported
 type: "[[requirement]]"
 statement: When the loaded engine no longer matches what the overlay or the vendored folder expects, the engine shall report every diverged identity and path instead of serving a default.

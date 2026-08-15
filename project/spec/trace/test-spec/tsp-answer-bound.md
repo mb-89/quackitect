@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: tsp-answer-bound
 type: "[[test-spec]]"
 statement: No lane answer exceeds a declared size, and an answer that would carries a reference to the rest instead.

@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: req-nodes-scoped-to-iteration
 type: "[[requirement]]"
 statement: The engine shall stamp every trace node with its minting iteration and default every reference view to the current iteration's nodes, with an opt-in toggle for the rest; the coverage laws keep reading the whole corpus.

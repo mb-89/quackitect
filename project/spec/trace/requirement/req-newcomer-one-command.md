@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-newcomer-one-command
 type: "[[requirement]]"
 statement: When a newcomer runs the setup script on a fresh computer, the install path shall deliver the desk's greeting with exactly 1 command run by the person and 0 files edited by hand.

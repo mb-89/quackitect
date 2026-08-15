@@ -1,5 +1,5 @@
 ---
-minted_in: i12-performance-hold-the-one-second-rule-on-
+minted_in: i12
 id: req-survey-counts-only-open-records
 type: "[[requirement]]"
 statement: When the survey lists what stands open, it shall exclude every record whose status is shipped.
@@ -10,7 +10,7 @@ breaks_how_badly: abrasive
 refines:
   - uc-get-work-routed
 source_refs:
-  - i12-performance-hold-the-one-second-rule-on-
+  - i12
 priority: should
 ---
 
@@ -20,7 +20,7 @@ The survey is the one call that answers "what stands open", and both the
 front desk and the retro open with it.
 
 Observed on 2026-08-15. `se_survey` answered `counts.iterations: 28` and
-listed `i27-the-lane-binds-to-the-record-a-bound-wal` among them. That
+listed `i27` among them. That
 record reads `status: shipped`, closed 2026-08-14T19:54:00.895Z.
 
 WHAT IT COSTS IS ADVICE RATHER THAN DATA. The desk's method says to sweep

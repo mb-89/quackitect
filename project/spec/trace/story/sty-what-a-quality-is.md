@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: sty-what-a-quality-is
 type: "[[story]]"
 statement: When I meet a demand that is not about what the system does but about how well it does it, I want the register to hold it under the nine quality characteristics of ISO/IEC 25010:2023, so I can write it down instead of arguing about where it goes.

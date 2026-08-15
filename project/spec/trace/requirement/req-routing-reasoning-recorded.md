@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-routing-reasoning-recorded
 type: "[[requirement]]"
 statement: When work lands in a vehicle, the engine shall record the recommendation, the person's choice, and the reasoning on the record.

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-resume-needs-no-person
 type: "[[requirement]]"
 statement: When a person returns to the product after an absence, the panel shall show them where everything stands with zero questions to another person.

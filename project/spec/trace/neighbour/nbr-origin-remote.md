@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: nbr-origin-remote
 type: "[[neighbour]]"
 statement: The git remote - the coordination surface parallel machines meet on, and the serializer the claim lock leans on.

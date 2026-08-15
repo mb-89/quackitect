@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: uc-claim-an-iteration
 type: "[[use-case]]"
 statement: Claim an unclaimed iteration from the shared pool so this machine may work it and no peer takes it too.

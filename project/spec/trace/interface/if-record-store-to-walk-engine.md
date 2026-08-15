@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: if-record-store-to-walk-engine
 type: "[[interface]]"
 statement: The engine reads the walk's position from the record — the repository is the memory, so a resume needs no person.

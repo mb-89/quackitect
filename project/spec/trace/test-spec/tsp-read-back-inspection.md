@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: tsp-read-back-inspection
 type: "[[test-spec]]"
 statement: Every resolution test proves its landing by reading back from the store the caller named, and none asserts on the write's own return value.

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-stray-captured-in-one-call
 type: "[[requirement]]"
 statement: The engine shall capture a stray finding in one call carrying the finder's own words, from any state, with zero prerequisite steps.

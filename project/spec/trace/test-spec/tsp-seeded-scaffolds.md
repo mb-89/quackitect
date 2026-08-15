@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: tsp-seeded-scaffolds
 type: "[[test-spec]]"
 statement: The kickoff bless writes every seeded sub-machine's placeholder drawing in the same act, so no route refuses over a machine M4 has not authored yet — verified by test at the pin.

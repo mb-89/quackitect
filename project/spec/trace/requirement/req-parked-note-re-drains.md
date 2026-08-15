@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-parked-note-re-drains
 type: "[[requirement]]"
 statement: When a new drain names a note standing in backlog, the engine shall accept it and shall record the new disposition as superseding the old.

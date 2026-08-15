@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-a-records-work-lives-on-a-ram-disk
 type: "[[option]]"
 statement: put a record's whole working copy on a RAM disk when the record opens, work there for the length of the walk, and push it back to durable storage at the gates

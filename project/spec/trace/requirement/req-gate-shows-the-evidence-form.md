@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-gate-shows-the-evidence-form
 type: "[[requirement]]"
 statement: When a gate is offered for adjudication, the engine shall present the gate's evidence form itself, never a summary of it.

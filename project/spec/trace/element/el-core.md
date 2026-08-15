@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: el-core
 type: "[[element]]"
 statement: Owns what must be one thing on a machine, and routes every call to whatever owns its path.

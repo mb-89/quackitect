@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: sty-take-the-tour
 type: "[[story]]"
 statement: A newcomer at the front desk says "tour" and is walked through the live system rather than shown a document about it.

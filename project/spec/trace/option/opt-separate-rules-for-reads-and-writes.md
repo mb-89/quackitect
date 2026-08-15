@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-separate-rules-for-reads-and-writes
 type: "[[option]]"
 statement: resolve a read and a write by two different rules, so a write is confined to the record while a read may reach anywhere it can name and says where it came from

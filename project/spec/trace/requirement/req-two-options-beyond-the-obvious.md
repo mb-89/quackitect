@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-two-options-beyond-the-obvious
 type: "[[requirement]]"
 statement: While the standing options number fewer than two, or every standing option restates the recorded incumbent, the engine shall keep the choosing step closed.

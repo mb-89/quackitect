@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: uc-begin-a-product
 type: "[[use-case]]"
 statement: Begin a product that does not exist yet, without disturbing the one already running.

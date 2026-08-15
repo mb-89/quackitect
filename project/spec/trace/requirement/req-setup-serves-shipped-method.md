@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-setup-serves-shipped-method
 type: "[[requirement]]"
 statement: When the setup runs in a host repository with no overlay present, the product shall come up serving the engine's shipped method with zero builder-authored configuration files.

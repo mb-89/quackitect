@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-tour-reads-what-stands
 type: "[[requirement]]"
 statement: When a tour runs, the engine shall derive every stop from the live machinery and read zero stored tour scripts.

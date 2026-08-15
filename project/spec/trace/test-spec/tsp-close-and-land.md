@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: tsp-close-and-land
 type: "[[test-spec]]"
 statement: A close refuses loose ends, serves its findings, and lands as one merge or none, with the two trees never mixing, verified by test over the close and land paths.

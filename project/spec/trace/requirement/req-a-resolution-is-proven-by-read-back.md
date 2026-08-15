@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: req-a-resolution-is-proven-by-read-back
 type: "[[requirement]]"
 statement: Where a test proves that a call reached the intended tree, it shall prove it by reading back from that tree, never by the call's own verdict.

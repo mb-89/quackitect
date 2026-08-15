@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: tsp-notes-inbox
 type: "[[test-spec]]"
 statement: A stray is captured in one call from anywhere, stays visible until dispositioned, and drains into exactly one home, verified by test over the notes machinery.

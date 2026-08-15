@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: raid-lane-works-on-posix
 type: "[[raid]]"
 kind: assumption

@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: req-a-clear-jump-is-one-call
 type: "[[requirement]]"
 statement: When a caller names a state as the target and asks in the SAME call to be taken there, and nothing between the walk and that state is owed, the engine shall land the walk on it within that one call and answer that it arrived.

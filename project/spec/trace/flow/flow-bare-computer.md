@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: flow-bare-computer
 type: "[[flow]]"
 statement: a computer holding an editor and a shell

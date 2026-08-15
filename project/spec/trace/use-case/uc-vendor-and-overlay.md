@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: uc-vendor-and-overlay
 type: "[[use-case]]"
 statement: Run the engine inside another product and replace parts of its method without forking it.

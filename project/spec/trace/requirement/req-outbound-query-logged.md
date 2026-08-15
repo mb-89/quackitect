@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-outbound-query-logged
 type: "[[requirement]]"
 statement: When research runs outside the repo, the engine shall log every outbound query alongside a reference to what came back.

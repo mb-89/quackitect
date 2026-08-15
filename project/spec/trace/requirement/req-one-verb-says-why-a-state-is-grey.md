@@ -1,5 +1,5 @@
 ---
-minted_in: i3-the-walk-s-feedback-loop-the-reading-cre
+minted_in: i3
 id: req-one-verb-says-why-a-state-is-grey
 type: "[[requirement]]"
 statement: When asked why a state is grey, the engine shall name every condition standing in the way of that state.

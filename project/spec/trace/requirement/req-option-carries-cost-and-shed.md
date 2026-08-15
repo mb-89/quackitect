@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-option-carries-cost-and-shed
 type: "[[requirement]]"
 statement: While any standing option lacks its cost entry or its shed entry, the engine shall keep the choosing step closed.

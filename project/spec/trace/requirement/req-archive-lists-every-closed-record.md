@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-archive-lists-every-closed-record
 type: "[[requirement]]"
 statement: The archive shall list every closed record with its identifier and statement, and zero live records.

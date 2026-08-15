@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: tsp-two-machines-run
 type: "[[test-spec]]"
 statement: Two machines share one remote - the seed lands there at once, entry claims it, a second machine sees the holder and is refused the same claim, verified by demonstration in a two-clone lab.

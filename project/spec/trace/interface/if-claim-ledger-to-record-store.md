@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: if-claim-ledger-to-record-store
 type: "[[interface]]"
 statement: A record opens only over a standing claim — the store binds a worktree only when the ledger says this machine holds the iteration.

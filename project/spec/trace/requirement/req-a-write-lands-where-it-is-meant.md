@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: req-a-write-lands-where-it-is-meant
 type: "[[requirement]]"
 statement: When the lane writes a file, the engine shall land it in the tree the caller meant, and shall name the tree it resolved to whenever the path admits more than one.

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: dsp-front-desk
 type: "[[design-spec]]"
 statement: the place a walk waits and a person routes, carried by the drawn main machine and its desk state

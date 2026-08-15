@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: req-record-status-comes-from-the-record
 type: "[[requirement]]"
 statement: The engine shall read a record's status from the record itself, and shall resolve the archive through git, so that every machine shows the same record in the same state.

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: dsp-trace-corpus
 type: "[[design-spec]]"
 statement: the trace read live from node files, carried by one loader with a stat-stamped cache and schema-checked edges

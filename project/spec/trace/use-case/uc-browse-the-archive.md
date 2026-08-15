@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: uc-browse-the-archive
 type: "[[use-case]]"
 statement: Read a finished record as it stood, without disturbing anything running now.

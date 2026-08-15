@@ -1,5 +1,5 @@
 ---
-minted_in: i3-the-walk-s-feedback-loop-the-reading-cre
+minted_in: i3
 id: tsp-size-compiles-mechanically
 type: "[[test-spec]]"
 statement: The recorded change size decides the machine by computation, never by reading around a choice or by asking whoever walks to be brief.

@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: opt-claim-file-per-iteration
 type: "[[option]]"
 statement: the claim is one small add-only file per iteration on a dedicated claims branch, and the remote's push acceptance is the lock

@@ -1,5 +1,5 @@
 ---
-minted_in: i3-the-walk-s-feedback-loop-the-reading-cre
+minted_in: i3
 id: req-a-reopen-stands-where-it-can-work
 type: "[[requirement]]"
 statement: When several steps reopen at once, the engine shall stand the walk only in those with no other reopened step upstream of them.

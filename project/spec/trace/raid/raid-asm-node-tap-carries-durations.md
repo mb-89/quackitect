@@ -1,5 +1,5 @@
 ---
-minted_in: i12-performance-hold-the-one-second-rule-on-
+minted_in: i12
 id: raid-asm-node-tap-carries-durations
 type: "[[raid]]"
 kind: assumption
@@ -14,7 +14,7 @@ breaks_how_badly: abrasive
 how_likely: conceivable
 source_refs:
   - req-scoped-run-records-its-timings
-  - i12-performance-hold-the-one-second-rule-on-
+  - i12
 ---
 
 ## Why it is an assumption rather than a fact

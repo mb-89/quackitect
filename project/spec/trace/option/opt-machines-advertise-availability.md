@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: opt-machines-advertise-availability
 type: "[[option]]"
 statement: reverse the direction - machines advertise that they are FREE, and assignment happens at the desk against the availability list instead of machines claiming work

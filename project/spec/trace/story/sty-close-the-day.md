@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: sty-close-the-day
 type: "[[story]]"
 statement: An engineer closes the record that held the day's work, and every finding it produced gets ruled on rather than quietly dropped.

@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-mark-the-tree-at-bind-while-intent-is-still-known
 type: "[[option]]"
 statement: stamp the target tree onto the record at the moment of binding, when the caller still knows which one they meant, and resolve every later path against that stamp alone

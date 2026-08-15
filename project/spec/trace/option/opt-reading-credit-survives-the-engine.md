@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: opt-reading-credit-survives-the-engine
 type: "[[option]]"
 statement: key the reading credit to the document's own hash so it survives a restart, and re-owe only what actually changed

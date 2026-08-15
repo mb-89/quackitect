@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-autonomy-change-applies-forward
 type: "[[requirement]]"
 statement: When the autonomy setting changes mid-walk, the engine shall apply it from the next pull onward and shall record the change.

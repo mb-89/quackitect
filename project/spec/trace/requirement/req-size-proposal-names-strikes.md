@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-size-proposal-names-strikes
 type: "[[requirement]]"
 statement: When a change size is proposed for an iteration, the product shall present the proposal with its reasoning and the cells each smaller column strikes.

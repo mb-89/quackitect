@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: tsp-overhaul-sweep
 type: "[[test-spec]]"
 statement: An overhaul closes only on a fresh green battery and takes only unowned drift, and the sweep covers every drift class with a dated verdict, verified by test over the overhaul machinery.

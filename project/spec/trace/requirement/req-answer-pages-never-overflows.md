@@ -1,5 +1,5 @@
 ---
-minted_in: i12-performance-hold-the-one-second-rule-on-
+minted_in: i12
 id: req-answer-pages-never-overflows
 type: "[[requirement]]"
 statement: If an answer exceeds the response bound, then the engine shall serve a first page and name the cursor that walks the rest.
@@ -11,7 +11,7 @@ refines:
   - uc-take-a-step
 source_refs:
   - vp-rigor-without-toil
-  - i12-performance-hold-the-one-second-rule-on-
+  - i12
 priority: must
 ---
 

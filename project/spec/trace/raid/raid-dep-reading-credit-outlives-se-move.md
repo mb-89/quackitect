@@ -1,5 +1,5 @@
 ---
-minted_in: i3-the-walk-s-feedback-loop-the-reading-cre
+minted_in: i3
 id: raid-dep-reading-credit-outlives-se-move
 type: "[[raid]]"
 kind: dependency

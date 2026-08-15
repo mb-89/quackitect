@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: if-method-compiler-to-mirror
 type: "[[interface]]"
 statement: The mirror draws the compiled machine the compiler produced, served on request.

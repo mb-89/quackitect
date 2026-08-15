@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: flow-sweep-result
 type: "[[flow]]"
 statement: what a catch-up sweep found, or its dated clean verdict

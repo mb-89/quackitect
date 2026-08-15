@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-fresh-machine-runs
 type: "[[requirement]]"
 statement: When a person sets up the product on a fresh machine, the engine shall reach a verified working state through the published entry point with zero steps outside it.

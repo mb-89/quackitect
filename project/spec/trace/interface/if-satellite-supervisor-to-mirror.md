@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: if-satellite-supervisor-to-mirror
 type: "[[interface]]"
 statement: The supervisor tells the mirror which satellites are up and where each walk stands.

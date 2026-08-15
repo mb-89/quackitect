@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: el-account
 type: "[[element]]"
 statement: Keeps the record of what happened — every call logged with role and channel, the trace derived from files, findings landing as references with their sources.

@@ -1,5 +1,5 @@
 ---
-minted_in: i3-the-walk-s-feedback-loop-the-reading-cre
+minted_in: i3
 id: raid-asm-session-identity-survives-a-reload
 type: "[[raid]]"
 kind: assumption

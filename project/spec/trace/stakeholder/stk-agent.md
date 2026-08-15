@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: stk-agent
 type: "[[stakeholder]]"
 statement: The AI agent the product governs — it reads the guidance, walks the machine, and has to recover from every refusal on its own.

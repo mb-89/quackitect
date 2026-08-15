@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: opt-token-block-with-staff-and-ticket
 type: "[[option]]"
 statement: let a walker enter a section only while holding its token, and issue written tickets against a held token when several must follow one after another

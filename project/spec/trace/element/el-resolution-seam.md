@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: el-resolution-seam
 type: "[[element]]"
 statement: The one place a path is resolved and judged, which no verb may go around.

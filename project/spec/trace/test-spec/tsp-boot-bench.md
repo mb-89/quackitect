@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: tsp-boot-bench
 type: "[[test-spec]]"
 statement: A session boot lands the walk at the front desk within 20 seconds of the first pull on the reference machine, serving boot's own reading only — verified by test with a measured clock.

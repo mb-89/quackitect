@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: req-a-shipped-record-is-never-reclaimed
 type: "[[requirement]]"
 statement: When a record ships, the engine shall mark its claim spent in the ledger, and shall refuse entry to it thereafter from every machine including the one that shipped it.

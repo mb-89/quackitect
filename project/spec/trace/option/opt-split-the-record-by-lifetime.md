@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: opt-split-the-record-by-lifetime
 type: "[[option]]"
 statement: split the record into the part that outlives it and the part that dies with it, and give the two different homes

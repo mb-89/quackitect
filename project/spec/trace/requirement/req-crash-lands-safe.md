@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-crash-lands-safe
 type: "[[requirement]]"
 statement: If the channel holding a live offer falls silent, then the engine shall collapse the offer to the dismissed state with zero grants recorded.

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-refusal-carries-remedy
 type: "[[requirement]]"
 statement: When the engine refuses a call, it shall answer with a typed refusal whose remedy, executed unchanged, is accepted on the next call.

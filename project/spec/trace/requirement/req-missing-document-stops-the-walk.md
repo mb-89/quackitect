@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-missing-document-stops-the-walk
 type: "[[requirement]]"
 statement: If a state owes a document that does not exist, then the engine shall stop the walk and name the missing document.

@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-grant-the-method-reach-per-state
 type: "[[option]]"
 statement: confine every state to the bound tree by default and let a state's own grant widen its reach, so the states whose job is method keep it and no other state can

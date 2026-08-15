@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: sty-improve-the-machine-mid-walk
 type: "[[story]]"
 statement: An engineer who finds the machine wrong halfway through a walk fixes it and keeps going, instead of finishing on a method they no longer believe.

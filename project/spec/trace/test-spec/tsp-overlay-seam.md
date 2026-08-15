@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: tsp-overlay-seam
 type: "[[test-spec]]"
 statement: The vendored engine and a builder overlay never mix trees, drift is reported by identity, and a walk-governing edit lands where it compiles, verified by test over the overlay seam.

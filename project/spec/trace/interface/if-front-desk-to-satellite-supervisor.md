@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: if-front-desk-to-satellite-supervisor
 type: "[[interface]]"
 statement: Entering a record from the desk asks the supervisor to raise its satellite, and the desk gets back either a serving satellite or the reason there is none.

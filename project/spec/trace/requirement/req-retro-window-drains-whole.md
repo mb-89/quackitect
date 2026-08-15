@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-retro-window-drains-whole
 type: "[[requirement]]"
 statement: When a retro opens, the engine shall fix its window of pending notes and shall refuse the close while any note in that window lacks a disposition.

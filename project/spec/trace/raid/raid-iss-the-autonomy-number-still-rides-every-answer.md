@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: raid-iss-the-autonomy-number-still-rides-every-answer
 type: "[[raid]]"
 kind: issue

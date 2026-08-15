@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: uc-diverge-before-deciding
 type: "[[use-case]]"
 statement: Produce several real options for a problem before any of them is chosen.

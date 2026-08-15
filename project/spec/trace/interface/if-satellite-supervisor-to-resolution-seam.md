@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: if-satellite-supervisor-to-resolution-seam
 type: "[[interface]]"
 statement: The supervisor tells the seam which tree a satellite is rooted at, once, at start — and the seam judges every later path against that one answer.

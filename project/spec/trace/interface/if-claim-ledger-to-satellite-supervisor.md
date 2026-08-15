@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: if-claim-ledger-to-satellite-supervisor
 type: "[[interface]]"
 statement: A satellite is started only for a record this machine holds the claim on, so no two machines can serve the same record at once.

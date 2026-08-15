@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: req-shared-change-reaches-without-unlanded-work-reaching
 type: "[[requirement]]"
 statement: While a record is open, a change to shared method shall reach that record's walk, and no other record's unlanded work shall reach it.

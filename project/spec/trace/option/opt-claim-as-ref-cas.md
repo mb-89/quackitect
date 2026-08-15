@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: opt-claim-as-ref-cas
 type: "[[option]]"
 statement: the claim is a git ref under refs/claims/, taken by an atomic compare-and-swap push of the ref itself

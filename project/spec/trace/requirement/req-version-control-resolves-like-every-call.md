@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: req-version-control-resolves-like-every-call
 type: "[[requirement]]"
 statement: When a call reaches version control, the engine shall resolve it against the same store as every other call made in that context, and shall answer with the store it used.

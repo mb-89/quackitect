@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-setup-floor-editor-shell
 type: "[[requirement]]"
 statement: The setup script shall complete on a computer holding only an editor and a shell, installing every further dependency itself.

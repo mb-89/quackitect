@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: raid-ar-walk-survives-host-swap
 type: "[[raid]]"
 kind: risk

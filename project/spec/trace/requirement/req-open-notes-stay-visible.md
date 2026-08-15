@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-open-notes-stay-visible
 type: "[[requirement]]"
 statement: The engine shall show every undrained note in the inbox count and the feed until a recorded disposition removes it.

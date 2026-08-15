@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: nbr-obsidian
 type: "[[neighbour]]"
 statement: Obsidian, where a person draws the machines and edits the markdown that is the system's truth.

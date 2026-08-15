@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: opt-stable-ids-not-copies
 type: "[[option]]"
 statement: link stable ids to the authoritative text instead of duplicating it, and check mechanically for orphans and stale links

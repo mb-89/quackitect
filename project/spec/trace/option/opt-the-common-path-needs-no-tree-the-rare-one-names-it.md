@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-the-common-path-needs-no-tree-the-rare-one-names-it
 type: "[[option]]"
 statement: resolve an unqualified path into the bound record without ceremony and demand an explicit tree name for anything outside it, so the common case costs nothing and the rare case cannot happen by accident

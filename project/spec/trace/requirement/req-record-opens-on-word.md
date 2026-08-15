@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-record-opens-on-word
 type: "[[requirement]]"
 statement: The engine shall open an expedition or an iteration only on the person's recorded choice.

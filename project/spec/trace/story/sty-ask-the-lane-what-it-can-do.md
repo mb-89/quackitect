@@ -1,5 +1,5 @@
 ---
-minted_in: i8-se-help-a-logged-keyword-search-over-the
+minted_in: i8
 id: sty-ask-the-lane-what-it-can-do
 type: "[[story]]"
 statement: An agent mid-task does not know the exact verb it needs, asks the lane in plain words, and either gets pointed at the right tool or leaves a trace of what was missing.

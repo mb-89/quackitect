@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: vp-vendoring
 type: "[[value-prop]]"
 statement: As a builder with my own product, I need to run quackitect as it is, or overlay it with my own method without forking it.

@@ -1,5 +1,5 @@
 ---
-minted_in: i3-the-walk-s-feedback-loop-the-reading-cre
+minted_in: i3
 id: req-a-placeholder-drawing-refuses-entry
 type: "[[requirement]]"
 statement: While a seeded sub-machine still carries the placeholder its size record wrote, the engine shall refuse to walk into it and shall name the step that authors it.

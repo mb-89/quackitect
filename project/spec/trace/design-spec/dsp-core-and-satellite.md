@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: dsp-core-and-satellite
 type: "[[design-spec]]"
 statement: one core process owning what must be one thing, one satellite per agent owning one record, and a local channel between them that names the store on every answer

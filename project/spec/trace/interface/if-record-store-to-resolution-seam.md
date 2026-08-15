@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: if-record-store-to-resolution-seam
 type: "[[interface]]"
 statement: The record store tells the seam where a record's working copy actually is, so the seam judges paths against the tree that exists rather than one it assumed.

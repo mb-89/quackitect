@@ -1,5 +1,5 @@
 ---
-minted_in: i12-performance-hold-the-one-second-rule-on-
+minted_in: i12
 id: raid-risk-git-fake-drifts-from-git
 type: "[[raid]]"
 kind: risk
@@ -11,7 +11,7 @@ impact: claims.test.ts holds the claim lane's only proof. A drifted fake turns s
 breaks_how_badly: crippling
 how_likely: plausible
 source_refs:
-  - i12-performance-hold-the-one-second-rule-on-
+  - i12
   - raid-asm-remote-serializes-claims
 ---
 

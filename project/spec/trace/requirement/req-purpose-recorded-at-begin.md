@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-purpose-recorded-at-begin
 type: "[[requirement]]"
 statement: When a new product is begun with a stated purpose, the engine shall carry that purpose into the scaffolded product as one recorded statement.

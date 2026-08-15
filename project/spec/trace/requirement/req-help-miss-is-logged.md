@@ -1,5 +1,5 @@
 ---
-minted_in: i8-se-help-a-logged-keyword-search-over-the
+minted_in: i8
 id: req-help-miss-is-logged
 type: "[[requirement]]"
 statement: The se_help tool shall record every query that returns no match to a durable demand log, with the query text and a timestamp.

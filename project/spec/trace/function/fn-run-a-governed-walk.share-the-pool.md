@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: fn-run-a-governed-walk.share-the-pool
 type: "[[function]]"
 cluster: the-record-life

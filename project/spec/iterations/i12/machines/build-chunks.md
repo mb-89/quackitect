@@ -24,6 +24,10 @@ steps:
     statement: "the survey's open list excludes a shipped iteration"
     depends_on: []
     realization: code
+  - id: record-one-name
+    statement: "a record has ONE name, the short id, so the folder IS the id and the scoping fallback can be deleted rather than documented"
+    depends_on: []
+    realization: code
 ---
 
 # The build plan
@@ -91,3 +95,34 @@ NO WORKER POOL, and the ruling is not this record's to make. i27 considered
 one and replaced it with the heavy-slot lease in `core-process`, on the
 owner's ruling of 2026-08-14. `fanout-cap` caps what already forks; it does
 not pool anything.
+
+## The seventh chunk, added 2026-08-15 on the owner's ruling
+
+`record-one-name` was not in the first plan. It arrives from the implementation
+gate, which the owner failed.
+
+THE OWNER'S WORDS: "Why are there even two names? Just keep the short one,
+throw away the long one. We don't need two names for one note."
+
+WHAT THE TWO NAMES ARE. A record answers to `i12` and to
+`i12`. The second is the folder on
+disk, and `minted_in:` on 660 trace nodes carries it.
+
+WHY IT IS MORE THAN TIDYING, and this is the part the owner could not have
+known when they asked. `recordDirFor` in engine/stateform.ts answers "which
+record is this law about". It tries the short id from the state, and falls back
+to the folder's own name. The first branch does not fire, because the state id
+arrives in different shapes from different callers. So THE FALLBACK IS THE
+LOAD-BEARING PATH.
+
+AND IT FAILS SILENTLY. If a worktree is ever named anything but its record,
+both branches miss, the function returns nothing, and the law resumes the
+scan-first-hit behaviour this record removed — the one that made i12 read i27's
+fold-back as its own. No error, no red, just a law judging the wrong record.
+
+WITH ONE NAME THE HOLE CLOSES BY CONSTRUCTION. The folder IS the id, the first
+branch fires, and the fallback plus the scan can be deleted rather than left as
+a trap. The owner's readability fix and the silent-failure fix are the same
+change.
+
+IT LEANS ON NOTHING, so it starts at once beside the other independent lots.

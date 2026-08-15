@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-form-is-built-and-checked
 type: "[[requirement]]"
 statement: When a state owes evidence, the engine shall build the form itself and shall stamp the returned claim only where every field's shape passes.

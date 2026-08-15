@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-clean-sweep-is-dated
 type: "[[requirement]]"
 statement: When a sweep finds zero findings, the engine shall record the clean verdict with its date.

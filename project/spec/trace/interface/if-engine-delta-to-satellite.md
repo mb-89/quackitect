@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: if-engine-delta-to-satellite
 type: "[[interface]]"
 statement: The delta hands the satellite its composed machine, naming every file that came from the record.

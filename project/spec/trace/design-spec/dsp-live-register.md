@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: dsp-live-register
 type: "[[design-spec]]"
 statement: notes as one live table, carried by base view files evaluated over the vault on every look

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: uc-take-a-step
 type: "[[use-case]]"
 statement: Do one step of the walk and record what it produced.

@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-the-claim-file-registers-the-tree
 type: "[[option]]"
 statement: give the claim file a second job and let it say which tree holds each record, so where a record lives is answered by the artifact that already says who holds it

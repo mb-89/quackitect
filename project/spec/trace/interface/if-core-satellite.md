@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: if-core-satellite
 type: "[[interface]]"
 statement: The core routes a call to the satellite that owns its record and answers for trunk itself, and every answer that crosses names the store it came from.

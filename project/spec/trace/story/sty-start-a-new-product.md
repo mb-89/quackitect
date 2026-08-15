@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: sty-start-a-new-product
 type: "[[story]]"
 statement: An engineer standing at the front desk wants to begin a product that does not exist yet, and finds out where a product is chosen.

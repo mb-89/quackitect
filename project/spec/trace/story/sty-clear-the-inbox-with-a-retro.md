@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: sty-clear-the-inbox-with-a-retro
 type: "[[story]]"
 statement: The notes inbox has grown all week, and one retro walks it to zero without anything being lost or re-litigated.

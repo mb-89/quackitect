@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-the-satellite-holds-the-record-in-its-own-memory
 type: "[[option]]"
 statement: hold a record's working copy inside the process serving it rather than on any volume, so a read is a memory lookup and a write is a memory write, with durable storage touched only when the record lands

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-every-artifact-is-readable-text
 type: "[[requirement]]"
 statement: The engine shall keep 100 % of the artifacts a product owns as text another tool can open without this system, with zero binary files under the product root.

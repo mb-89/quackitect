@@ -1,5 +1,5 @@
 ---
-minted_in: i2-parallel-iterations-across-machines-seed
+minted_in: i2
 id: raid-asm-peer-runs-supported-platform
 type: "[[raid]]"
 kind: assumption

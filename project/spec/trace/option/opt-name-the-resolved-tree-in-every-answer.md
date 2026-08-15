@@ -1,5 +1,5 @@
 ---
-minted_in: i27-the-lane-binds-to-the-record-a-bound-wal
+minted_in: i27
 id: opt-name-the-resolved-tree-in-every-answer
 type: "[[option]]"
 statement: resolve as today and return the tree that was resolved with every answer, so a wrong resolution is visible at the call rather than at a merge

@@ -1,5 +1,5 @@
 ---
-minted_in: i1-prove-a-bases-equivalent-live-table-can-
+minted_in: i1
 id: req-overhaul-closes-green
 type: "[[requirement]]"
 statement: The engine shall close an overhaul only after a full-battery run started after the last fix reports zero failures.
