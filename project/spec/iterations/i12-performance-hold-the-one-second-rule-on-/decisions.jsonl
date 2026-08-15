@@ -1,0 +1,50 @@
+{"ts":"2026-08-15T09:56:57.573Z","op":"update","visit":"iterations/i12/start@0","node":"d16","brief":"captured the container-routing trap that cost the escape"}
+{"ts":"2026-08-15T09:57:05.319Z","op":"update","visit":"iterations/i12/start@0","node":"d17","brief":"at i12/start — taking the reading owed before onboard-retro"}
+{"ts":"2026-08-15T09:57:16.726Z","op":"update","visit":"iterations/i12/start@0","node":"d18","brief":"retro method proven — entering onboard-retro for i12"}
+{"ts":"2026-08-15T09:57:47.408Z","op":"plan","visit":"iterations/i12/onboard-retro@0","parent":null,"nodes":[{"id":"d19","brief":"mark the retro boundary"},{"id":"d20","brief":"mine the call log and test timings"},{"id":"d21","brief":"drain the notes inbox"},{"id":"d22","brief":"fill and submit onboard-retro"}]}
+{"ts":"2026-08-15T09:57:50.770Z","op":"done","visit":"iterations/i12/onboard-retro@0","node":"d19","brief":"boundary read from the oldest record in the last_retro window"}
+{"ts":"2026-08-15T09:57:56.699Z","op":"update","visit":"iterations/i12/onboard-retro@0","node":"d23","brief":"mining tool counts for the window opened 2026-08-14 21:47"}
+{"ts":"2026-08-15T09:58:03.232Z","op":"update","visit":"iterations/i12/onboard-retro@0","node":"d24","brief":"19 mirror_slow records in the window — reading what they name"}
+{"ts":"2026-08-15T09:58:12.723Z","op":"update","visit":"iterations/i12/onboard-retro@0","node":"d25","brief":"widget/details over 2.7s on all 7 hits — now reading the battery summary"}
+{"ts":"2026-08-15T09:58:40.000Z","op":"update","visit":"iterations/i12/onboard-retro@0","node":"d26","brief":"battery wall is 77s and one claims.test.ts case holds 75.2s of it — measuring it alone"}
+{"ts":"2026-08-15T09:58:50.515Z","op":"update","visit":"iterations/i12/onboard-retro@0","node":"d27","brief":"carrying the container-routing defect into i12's scope"}
+{"ts":"2026-08-15T09:59:00.080Z","op":"done","visit":"iterations/i12/onboard-retro@0","node":"d21","brief":"inbox drained to zero — both notes carried into i12's scope"}
+{"ts":"2026-08-15T09:59:03.146Z","op":"update","visit":"iterations/i12/onboard-retro@0","node":"d28","brief":"reading the scoped claims.test.ts verdict"}
+{"ts":"2026-08-15T09:59:20.255Z","op":"update","visit":"iterations/i12/onboard-retro@0","node":"d29","brief":"looking for i27's promotion list, which this retro must read first"}
+{"ts":"2026-08-15T09:59:32.026Z","op":"update","visit":"iterations/i12/onboard-retro@0","node":"d30","brief":"checking whether i12 walks in a worktree, against i27's no-worktree exception"}
+{"ts":"2026-08-15T09:59:42.453Z","op":"update","visit":"iterations/i12/onboard-retro@0","node":"d31","brief":"i12 walks in a worktree — checking if i27's self-host exception shipped"}
+{"ts":"2026-08-15T09:59:51.606Z","op":"update","visit":"iterations/i12/onboard-retro@0","node":"d32","brief":"worktree is by design (session.ts:1035) — back to the claims.test.ts measurement"}
+{"ts":"2026-08-15T10:00:20.122Z","op":"done","visit":"iterations/i12/onboard-retro@0","node":"d20","brief":"retro mining finished"}
+{"ts":"2026-08-15T10:00:36.808Z","op":"fork","visit":"iterations/i12/onboard-retro@0","parent":null,"node":"d33","brief":"scoped run wrote no timings — finding out which .se root the writer used","nodes":[]}
+{"ts":"2026-08-15T10:00:52.756Z","op":"update","visit":"iterations/i12/onboard-retro@0","node":"d34","brief":"timing reporters are attached in selftest.ts — reading how it picks files"}
+{"ts":"2026-08-15T10:01:00.906Z","op":"update","visit":"iterations/i12/onboard-retro@0","node":"d35","brief":"selftest.ts is battery-only — hunting the scoped runner"}
+{"ts":"2026-08-15T10:01:06.603Z","op":"update","visit":"iterations/i12/onboard-retro@0","node":"d36","brief":"locating every node --test spawn in the engine"}
+{"ts":"2026-08-15T10:01:11.447Z","op":"update","visit":"iterations/i12/onboard-retro@0","node":"d37","brief":"reading runScoped in tools.ts to see which reporters it attaches"}
+{"ts":"2026-08-15T10:01:35.406Z","op":"update","visit":"iterations/i12/onboard-retro@0","node":"d38","brief":"looking up i27's emit_back, which the promotions field must read first"}
+{"ts":"2026-08-15T10:01:39.600Z","op":"done","visit":"iterations/i12/onboard-retro@0","node":"d33","brief":"proved at tools.ts:953 that a scoped run attaches only the TAP reporter"}
+{"ts":"2026-08-15T10:01:48.967Z","op":"update","visit":"iterations/i12/onboard-retro@0","node":"d39","brief":"i27's evidence is not on trunk — checking its own branch"}
+{"ts":"2026-08-15T10:01:57.231Z","op":"update","visit":"iterations/i12/onboard-retro@0","node":"d40","brief":"reading i27's emit_back list from its package evidence"}
+{"ts":"2026-08-15T10:02:03.958Z","op":"update","visit":"iterations/i12/onboard-retro@0","node":"d41","brief":"reading i27's full emit_back list"}
+{"ts":"2026-08-15T10:02:14.541Z","op":"update","visit":"iterations/i12/onboard-retro@0","node":"d42","brief":"reading the consistency-sweep card i27 handed to this record"}
+{"ts":"2026-08-15T10:02:49.487Z","op":"update","visit":"iterations/i12/onboard-retro@0","node":"d43","brief":"fixing the wrapped surfaces item i27 emitted to this record"}
+{"ts":"2026-08-15T10:04:05.780Z","op":"done","visit":"iterations/i12/onboard-retro@0","node":"d22","brief":"onboard-retro filled and submitted"}
+{"ts":"2026-08-15T10:04:30.783Z","op":"plan","visit":"iterations/i12/gate-kickoff@0","parent":null,"nodes":[{"id":"d44","brief":"fill gate-kickoff at minor"},{"id":"d45","brief":"fix the scoped-run timings hole"},{"id":"d46","brief":"measure claims.test.ts alone"},{"id":"d47","brief":"fix the container routing trap"},{"id":"d48","brief":"fix the survey open-count"}]}
+{"ts":"2026-08-15T10:04:35.218Z","op":"update","visit":"iterations/i12/gate-kickoff@0","node":"d49","brief":"confirming the kickoff form's field names"}
+{"ts":"2026-08-15T10:04:42.762Z","op":"update","visit":"iterations/i12/gate-kickoff@0","node":"d50","brief":"reading the change_size template so the choice is written in its shape"}
+{"ts":"2026-08-15T10:04:53.508Z","op":"update","visit":"iterations/i12/gate-kickoff@0","node":"d51","brief":"reading the kickoff instance's required fields in full"}
+{"ts":"2026-08-15T10:06:46.422Z","op":"done","visit":"iterations/i12/gate-kickoff@0","node":"d44","brief":"kickoff filled, submitted and blessed at minor"}
+{"ts":"2026-08-15T10:07:03.072Z","op":"update","visit":"iterations/i12/gate-kickoff@0","node":"d52","brief":"linting the card I changed, for the gate's round 0"}
+{"ts":"2026-08-15T10:07:13.364Z","op":"update","visit":"iterations/i12/gate-kickoff@0","node":"d53","brief":"running the catalogue tests against the card edit"}
+{"ts":"2026-08-15T10:07:18.901Z","op":"update","visit":"iterations/i12/gate-kickoff@0","node":"d54","brief":"looking for a typecheck script for the gate's types check"}
+{"ts":"2026-08-15T10:07:24.398Z","op":"update","visit":"iterations/i12/gate-kickoff@0","node":"d55","brief":"running the typecheck for the gate's types answer"}
+{"ts":"2026-08-15T10:07:27.715Z","op":"update","visit":"iterations/i12/gate-kickoff@0","node":"d56","brief":"reading the catalogue test verdict"}
+{"ts":"2026-08-15T10:08:07.967Z","op":"obsolete","visit":"iterations/i12/gate-kickoff@0","node":"d48","brief":"re-planned after the bless, when the compiled machine exists"}
+{"ts":"2026-08-15T10:08:11.837Z","op":"update","visit":"iterations/i12/gate-kickoff@0","node":"d57","brief":"reading an assumption node to learn the raid shape"}
+{"ts":"2026-08-15T10:08:24.179Z","op":"update","visit":"iterations/i12/gate-kickoff@0","node":"d58","brief":"checking the raid frontmatter vocabulary before minting"}
+{"ts":"2026-08-15T10:08:54.188Z","op":"update","visit":"iterations/i12/gate-kickoff@0","node":"d59","brief":"minting the contention assumption the whole iteration order rests on"}
+{"ts":"2026-08-15T10:09:07.712Z","op":"update","visit":"iterations/i12/gate-kickoff@0","node":"d60","brief":"minting the method-write fan-out assumption"}
+{"ts":"2026-08-15T10:10:07.945Z","op":"update","visit":"iterations/i12/gate-kickoff@0","node":"d61","brief":"resubmitting the kickoff gate in the shapes it named"}
+{"ts":"2026-08-15T10:10:22.184Z","op":"obsolete","visit":"iterations/i12/gate-kickoff@0","node":"d47","brief":"re-planned below the gate, where the compiled machine holds it"}
+{"ts":"2026-08-15T10:10:29.617Z","op":"update","visit":"iterations/i12/gate-kickoff@0","node":"d62","brief":"checking the raid item template so both new nodes answer it"}
+{"ts":"2026-08-15T10:10:58.382Z","op":"update","visit":"iterations/i12/gate-kickoff@0","node":"d63","brief":"correcting both raid nodes against the item template"}
+{"ts":"2026-08-15T10:11:02.186Z","op":"update","visit":"iterations/i12/gate-kickoff@0","node":"d64","brief":"submitting the kickoff gate with the refs in their dashed shape"}
