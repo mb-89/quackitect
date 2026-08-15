@@ -71,6 +71,34 @@ test("the reading credit survives a reload", async () => {
   assert.deepEqual(afterReload, [], "RED until i3: the credit keys to document content and survives the reload, so nothing is owed again");
 });
 
+// THE OTHER HALF OF RELOADING IN PLACE (owner ruling 2026-08-15): "the point of
+// boot is to boot the agent, not the machine".
+//
+// The position is deliberately NOT remembered — req-reload-restarts-clean
+// recomputes it from evidence. The target is what says which way to walk, so
+// without it the recompute has nowhere to go and stops at the desk. Observed
+// twice mid-i12: a reload cost an aim and a sweep to stand where it stood.
+//
+// req-reload-restarts-clean
+test("the aimed target survives a reload, and a fresh session starts unaimed", () => {
+  const root = freshRoot();
+  const before = new Session(root);
+  before.setTarget("idle");
+  assert.equal(before.target, "idle", "the aim did not take, so this case would prove nothing");
+
+  simulateReload(root);
+  assert.equal(new Session(root).target, "idle", "a reload keeps the aim, so the recompute walks back with no call from the agent");
+
+  // A DIFFERENT SESSION HAS AIMED AT NOTHING. Every real start still lands at
+  // the desk (owner ruling 2026-07-29), because only a matching session stamp
+  // restores. Same guard the reading credit rides, for the same reason.
+  const p = join(root, ".se", "settings.json");
+  const s = JSON.parse(readFileSync(p, "utf8")) as Record<string, unknown>;
+  s.session = "a-different-session";
+  writeFileSync(p, `${JSON.stringify(s)}\n`, "utf8");
+  assert.equal(new Session(root).target, "front_desk", "a new session inherits no aim");
+});
+
 // THE OTHER HALF OF THE SAME DEMAND. A credit that survived everything would
 // be worse than one that survives nothing, because the reader would hold old
 // words while the engine called them read.
