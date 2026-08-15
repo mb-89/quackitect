@@ -853,13 +853,20 @@ function foldBackExperiments(recordRoot: string, only: string | undefined): Set<
  *  with no state, naming their record `itx` inside a temp root, so there is no
  *  short id to resolve and the lone record on disk is the right answer. */
 function recordDirFor(recordRoot: string, record: string | undefined): string | undefined {
-  if (record === undefined || record === "") return undefined;
+  let names: string[];
   try {
-    for (const e of readdirSync(join(recordRoot, "project", "spec", "iterations"))) {
-      if (e === record || e.startsWith(`${record}-`)) return e;
-    }
+    names = readdirSync(join(recordRoot, "project", "spec", "iterations"));
   } catch {
     return undefined;
+  }
+  // TWO WAYS TO NAME THE RECORD, tried in order, because neither answers
+  // everywhere. The state id carries the short id where the walk knows it, and
+  // its shape differs between callers. A BOUND TREE IS NAMED FOR ITS RECORD,
+  // so its own basename answers whenever work is bound — which is exactly when
+  // a second record's files can be sitting in the same tree.
+  for (const cand of [record, basename(recordRoot)]) {
+    if (cand === undefined || cand === "") continue;
+    for (const e of names) if (e === cand || e.startsWith(`${cand}-`)) return e;
   }
   return undefined;
 }
