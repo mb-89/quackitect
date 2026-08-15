@@ -1,0 +1,25 @@
+{"ts":"2026-08-15T14:40:32.065Z","op":"update","visit":"iterations/i28/start@0","node":"d17","brief":"inside i28 at M0 - reading the retro method that onboards it"}
+{"ts":"2026-08-15T14:40:56.210Z","op":"plan","visit":"iterations/i28/onboard-retro@0","parent":null,"nodes":[{"id":"d18","brief":"mark the retro window boundary"},{"id":"d19","brief":"mine the call log"},{"id":"d20","brief":"sweep the debts"},{"id":"d21","brief":"drain the assistant memory"},{"id":"d22","brief":"fill onboard-retro except field feedback"}]}
+{"ts":"2026-08-15T14:41:04.519Z","op":"done","visit":"iterations/i28/onboard-retro@0","node":"d18","brief":"taking the oldest record in the window as the boundary"}
+{"ts":"2026-08-15T14:41:09.170Z","op":"update","visit":"iterations/i28/onboard-retro@0","node":"d23","brief":"ranking the refusal clauses in the window"}
+{"ts":"2026-08-15T14:41:32.316Z","op":"update","visit":"iterations/i28/onboard-retro@0","node":"d24","brief":"ranking the slow calls against the one-second rule"}
+{"ts":"2026-08-15T14:41:54.915Z","op":"done","visit":"iterations/i28/onboard-retro@0","node":"d19","brief":"the call log is mined for this window"}
+{"ts":"2026-08-15T14:42:12.797Z","op":"update","visit":"iterations/i28/onboard-retro@0","node":"d25","brief":"checking what today's earlier sweep actually wrote into the debt entries"}
+{"ts":"2026-08-15T14:43:25.087Z","op":"update","visit":"iterations/i28/onboard-retro@0","node":"d26","brief":"answering the owner on what blocked i28"}
+{"ts":"2026-08-15T14:44:10.551Z","op":"done","visit":"iterations/i28/onboard-retro@0","node":"d20","brief":"debts were swept 3 hours ago by the previous retro; no trigger moved since"}
+{"ts":"2026-08-15T14:44:37.036Z","op":"done","visit":"iterations/i28/onboard-retro@0","node":"d21","brief":"no memory was written this session, so nothing is owed to the repo from it"}
+{"ts":"2026-08-15T14:45:36.456Z","op":"done","visit":"iterations/i28/onboard-retro@0","node":"d22","brief":"onboard-retro filled and submitted from the three-hour window"}
+{"ts":"2026-08-15T14:46:01.310Z","op":"plan","visit":"iterations/i28/gate-kickoff@0","parent":null,"nodes":[{"id":"d27","brief":"read the kickoff gate form"},{"id":"d28","brief":"propose the change size with reasoning"},{"id":"d29","brief":"present it and wait for the owner"}]}
+{"ts":"2026-08-15T14:46:11.178Z","op":"done","visit":"iterations/i28/gate-kickoff@0","node":"d27","brief":"reading the kickoff gate's field list out of the paged answer"}
+{"ts":"2026-08-15T14:46:26.261Z","op":"update","visit":"iterations/i28/gate-kickoff@0","node":"d30","brief":"reading the size columns before proposing one"}
+{"ts":"2026-08-15T14:46:32.268Z","op":"update","visit":"iterations/i28/gate-kickoff@0","node":"d31","brief":"confirming the change-size column names before proposing one"}
+{"ts":"2026-08-15T14:47:03.791Z","op":"update","visit":"iterations/i28/gate-kickoff@0","node":"d32","brief":"reading the change-size names from the machine model"}
+{"ts":"2026-08-15T14:47:09.878Z","op":"update","visit":"iterations/i28/gate-kickoff@0","node":"d33","brief":"reading the size vocabulary from the matrix rows themselves"}
+{"ts":"2026-08-15T14:47:36.322Z","op":"done","visit":"iterations/i28/gate-kickoff@0","node":"d28","brief":"owner's close-and-sweep ruling recorded as scope, with the forced order named"}
+{"ts":"2026-08-15T14:49:03.571Z","op":"update","visit":"iterations/i28/gate-kickoff@0","node":"d34","brief":"kickoff gate filled and submitted, proposing major"}
+{"ts":"2026-08-15T14:49:33.776Z","op":"update","visit":"iterations/i28/gate-kickoff@0","node":"d35","brief":"gate refused on shapes and wants real register entries - minting them"}
+{"ts":"2026-08-15T14:50:04.066Z","op":"update","visit":"iterations/i28/gate-kickoff@0","node":"d36","brief":"minting the kill-criterion assumption with its probe"}
+{"ts":"2026-08-15T14:50:19.232Z","op":"update","visit":"iterations/i28/gate-kickoff@0","node":"d37","brief":"minting the risk that a close eats uncommitted work"}
+{"ts":"2026-08-15T14:50:32.751Z","op":"update","visit":"iterations/i28/gate-kickoff@0","node":"d38","brief":"minting the ordering risk for the four lifecycle steps"}
+{"ts":"2026-08-15T14:50:47.150Z","op":"done","visit":"iterations/i28/gate-kickoff@0","node":"d29","brief":"four register entries minted, and the gate can be resubmitted"}
+{"ts":"2026-08-15T14:51:06.101Z","op":"plan","visit":"iterations/i28/gate-kickoff@0","parent":null,"nodes":[{"id":"d39","brief":"lint the four new register entries"},{"id":"d40","brief":"resubmit the kickoff gate in the shapes it named"}]}

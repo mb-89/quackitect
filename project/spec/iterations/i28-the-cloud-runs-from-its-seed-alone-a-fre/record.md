@@ -134,3 +134,38 @@ THREE PIECES OF WORK FALL OUT OF THIS, all inside this record's scope.
 - RECONCILE THE TWO DEFINITIONS. One answer to "is this iteration open", read from the record's status, used by both the container and the survey. Disk presence is a cache, never the truth.
 - THE CLOSE RETIRES THE WORKTREE. Nothing in the engine removes one today; a search for a worktree removal across the engine returns nothing. The owner's standing rule is already in this record: if it is in git, the disk copy is waste.
 - THE LANE HAS NO WORKTREE VERB. se_git's allowlist has no `worktree` and refuses `-C` under SE-C-004, so clearing this needed se_run under no_tool_reason four times. A machine that cannot retire its own worktrees cannot bootstrap itself in the cloud, which is this record's whole point.
+
+## OWNER RULING, 2026-08-15: STARTING AN ITERATION IS ENTERING IT
+
+THEIR WORDS, on being told what blocked this record's own entry: "Starting an iteration is going in it and starting it, not cleaning stuff up." And: "humans also need to be able to do this, and we can't have this. We can't have a system where you need to tinker around the edges every time just because you start some work. This just needs to work."
+
+THIS BINDS THIS RECORD'S SCOPE, and it is wider than the defect that produced it. The three fixes listed above are each necessary and together they are not sufficient. Each one removes a way the entry can break. None of them makes the entry SAY what is wrong and repair it.
+
+WHAT THE DEMAND ASKS FOR, stated so it can be tested:
+
+- ENTERING AN ITERATION NEVER REQUIRES REPAIR. Not by a person and not by an agent. Where the machine needs something moved, the machine moves it.
+- WHERE IT CANNOT, IT SAYS SO IN ONE SENTENCE, and the sentence names the remedy. A door silently absent from an offer is the worst available failure. Nothing is wrong, nothing is refused, and the thing simply is not there.
+- A PERSON MUST BE ABLE TO DO IT. Clearing this one meant reading two engine files, comparing 34 paths byte for byte, and running five shell commands under an explicit exemption. That is not a bar anybody should clear to begin a day's work.
+
+WHY IT BELONGS HERE RATHER THAN IN A NOTE. The acceptance criterion already written into this record is that a fresh machine, a seed id and one command produce a walking agent. An entry needing a person to diagnose a stale folder fails that criterion on a machine that is already set up, never mind a fresh one.
+
+THE SCOPE IT ADDS: the entry path checks itself, repairs what it can, and refuses with a named remedy where it cannot. Silent absence from the offer stops being a possible outcome.
+
+THE BLAST RADIUS, measured rather than assumed: every seeded iteration on this machine has a folder on disk today. Nothing in the engine removes one. So this recurs at the next close whose iteration anything depends on, and i23 was already the second casualty of this one.
+
+## OWNER RULING, 2026-08-15: THE CLOSE REMOVES THE FOLDER, AND THE DISK GETS SWEPT
+
+THEIR WORDS: "when an iteration is done, we don't need the folder anymore. So bake it in that on closing, the folder gets removed." And: "clean up all the other iterations. We have probably a lot of old iterations lying around that we don't need anymore. Clean this stuff up. If an iteration is in the archive, then it doesn't have to be on disc anymore. The archive reads from Git. That's the whole idea."
+
+THE ORDER IS FORCED, and it is the one thing that must not be got wrong. Today the container reads "open" from whether the folder exists. Sweeping the folders before that test changes would make every seeded iteration vanish from the offer, 26 of them in one act. So the sequence is:
+
+1. The open test moves to the record's status, read from git.
+2. Entering a git-only seed materialises its folder at that moment.
+3. The close removes the folder.
+4. Only then is the disk swept.
+
+WHAT THE SWEEP ACTUALLY FINDS, measured rather than assumed. 28 folders stood on disk at the start of this walk. Exactly one belonged to a finished iteration, i27, and it has been retired. The other 27 all belong to OPEN seeded iterations. i1, i2, i3, i8 and i12 already have no folder at all.
+
+SO THE ARCHIVE IS ALREADY CLEAN, and the owner's expectation of old archived iterations lying around does not match the disk. What IS lying around is 27 folders for iterations nobody is working, which exist only because seeding creates one and nothing ever removes it.
+
+THAT IS THE SAME DEFECT FROM THE OTHER END, and the sweep is worth doing for exactly the reason given: the archive reads from git, and so should the container. A folder on disk should mean somebody is working that iteration right now, and nothing else.

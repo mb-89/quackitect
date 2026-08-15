@@ -1,0 +1,267 @@
+{
+  "change_size": "major",
+  "rigor_matrix_hash": "621bdc456311",
+  "pinned_at": "2026-08-15T14:52:58.740Z",
+  "demands": {
+    "onboard-retro": {
+      "applies": "full",
+      "evidence": "[[\"field_feedback\",true,\"\",[],\"\",\"\",[],[],[]],[\"notes_drained\",true,\"\",[],\"per-item\",\"\",[],[\"$inbox\"],[]],[\"call_log_mined\",true,\"\",[],\"list\",\"\",[],[],[]],[\"waste_leads\",false,\"\",[],\"list\",\"\",[],[],[]],[\"promotions\",true,\"\",[],\"list\",\"\",[],[],[]],[\"process_stale\",true,\"\",[],\"\",\"\",[],[],[]]]",
+      "shape": "[[],false,\"\",\"\"]"
+    },
+    "gate-kickoff": {
+      "applies": "full",
+      "evidence": "[[\"retro_drained\",true,\"\",[],\"per-item\",\"\",[],[\"$inbox\"],[]],[\"goal\",true,\"\",[],\"\",\"\",[],[],[]],[\"pulled_in\",true,\"\",[],\"list\",\"\",[],[],[]],[\"left_out\",true,\"\",[],\"list\",\"\",[],[],[]],[\"change_size\",true,\"\",[],\"choice-with-rationale\",\"\",[\"patch\",\"minor\",\"major\",\"product\"],[],[]]]",
+      "shape": "[[\"onboard-retro\"],true,\"\",\"\"]"
+    },
+    "draft-vision": {
+      "applies": "tailored",
+      "evidence": "[[\"big_idea\",true,\"\",[],\"\",\"\",[],[],[]],[\"to_be_world\",true,\"\",[],\"\",\"\",[],[],[]],[\"goal_system\",true,\"\",[],\"\",\"\",[],[],[]],[\"moore_pitch\",true,\"\",[],\"\",\"\",[],[],[]]]",
+      "shape": "[[\"gate-kickoff\"],false,\"\",\"\"]"
+    },
+    "define-actual": {
+      "applies": "tailored",
+      "evidence": "[[\"as_is\",true,\"\",[],\"\",\"\",[],[],[]]]",
+      "shape": "[[\"draft-vision\"],false,\"\",\"\"]"
+    },
+    "log-risks": {
+      "applies": "full",
+      "evidence": "[[\"raid_opened\",true,\"\",[],\"refs\",\"raid\",[],[],[]]]",
+      "shape": "[[\"draft-vision\"],false,\"\",\"\"]"
+    },
+    "frame-delta": {
+      "applies": "full",
+      "evidence": "[[\"gap_claim\",true,\"\",[],\"\",\"\",[],[],[]],[\"why_now\",true,\"\",[],\"\",\"\",[],[],[]],[\"value_props\",true,\"\",[],\"refs\",\"value-prop\",[],[],[]],[\"business_case\",false,\"\",[],\"\",\"\",[],[],[]]]",
+      "shape": "[[\"define-actual\"],false,\"\",\"\"]"
+    },
+    "scope-non-goals": {
+      "applies": "full",
+      "evidence": "[[\"scope\",true,\"\",[],\"\",\"\",[],[],[]],[\"non_goals\",true,\"\",[],\"\",\"\",[],[],[]]]",
+      "shape": "[[\"frame-delta\"],false,\"\",\"\"]"
+    },
+    "pressure-test": {
+      "applies": "tailored",
+      "evidence": "[[\"prfaq\",true,\"\",[],\"\",\"\",[],[],[]],[\"findings_folded\",true,\"\",[],\"\",\"\",[],[],[]]]",
+      "shape": "[[\"frame-delta\"],false,\"\",\"\"]"
+    },
+    "gate-motivation": {
+      "applies": "full",
+      "evidence": "[[\"vision_scope_stated\",true,\"\",[],\"\",\"\",[],[],[]],[\"problem_agreed\",true,\"\",[],\"\",\"\",[],[],[]],[\"prior_art_positioned\",true,\"\",[],\"\",\"\",[],[],[]],[\"success_measurable\",true,\"\",[],\"\",\"\",[],[],[]],[\"risks_logged\",true,\"\",[],\"\",\"\",[],[],[]]]",
+      "shape": "[[\"log-risks\",\"pressure-test\",\"scope-non-goals\"],true,\"\",\"\"]"
+    },
+    "draw-context": {
+      "applies": "full",
+      "evidence": "[[\"boundary\",true,\"\",[],\"\",\"\",[],[],[]],[\"neighbours\",true,\"\",[],\"refs\",\"neighbour\",[],[],[]],[\"intended_use\",true,\"\",[],\"\",\"\",[],[],[]],[\"excluded_use\",true,\"\",[],\"\",\"\",[],[],[]]]",
+      "shape": "[[\"gate-motivation\"],false,\"\",\"\"]"
+    },
+    "map-stakeholders": {
+      "applies": "tailored",
+      "evidence": "[[\"roles\",true,\"\",[],\"refs\",\"stakeholder\",[],[],[]],[\"coverage\",true,\"\",[],\"\",\"\",[],[],[]]]",
+      "shape": "[[\"gate-motivation\"],false,\"\",\"\"]"
+    },
+    "write-stories": {
+      "applies": "full",
+      "evidence": "[[\"stories\",true,\"\",[],\"refs\",\"story\",[],[],[]]]",
+      "shape": "[[\"gate-motivation\"],false,\"\",\"\"]"
+    },
+    "generalize-use-cases": {
+      "applies": "full",
+      "evidence": "[[\"use_cases\",true,\"\",[],\"refs\",\"use-case\",[],[],[]]]",
+      "shape": "[[\"write-stories\"],false,\"\",\"\"]"
+    },
+    "gate-inputs": {
+      "applies": "full",
+      "evidence": "[[\"picture_judged\",true,\"\",[],\"\",\"\",[],[],[]],[\"unspecified_capability\",true,\"\",[],\"\",\"\",[],[],[]],[\"passes_concrete\",true,\"\",[],\"\",\"\",[],[],[]]]",
+      "shape": "[[\"draw-context\",\"generalize-use-cases\",\"map-stakeholders\"],true,\"\",\"\"]"
+    },
+    "write-requirements": {
+      "applies": "full",
+      "evidence": "[[\"register\",true,\"\",[],\"refs\",\"requirement\",[],[],[]],[\"set_criteria\",true,\"\",[],\"per-item\",\"\",[],[\"complete\",\"consistent\",\"affordable\",\"bounded\",\"comprehensible\",\"no_tbd\",\"behaviour_modelled\"],[]]]",
+      "shape": "[[\"gate-inputs\"],false,\"\",\"\"]"
+    },
+    "derive-functions": {
+      "applies": "full",
+      "evidence": "[[\"functions\",true,\"\",[],\"refs\",\"function\",[],[],[]],[\"flows\",true,\"\",[],\"refs\",\"flow\",[],[],[]],[\"neutrality\",true,\"\",[],\"free-form\",\"\",[],[],[]]]",
+      "shape": "[[\"write-requirements\"],false,\"\",\"\"]"
+    },
+    "identify-assumptions": {
+      "applies": "full",
+      "evidence": "[[\"assumptions\",true,\"\",[],\"refs\",\"raid\",[],[],[]],[\"sweep\",true,\"\",[],\"per-item\",\"\",[],[\"environment\",\"toolchain\",\"host\",\"platform\",\"neighbours\",\"people\"],[]]]",
+      "shape": "[[\"write-requirements\"],false,\"\",\"\"]"
+    },
+    "probe-assumptions": {
+      "applies": "full",
+      "evidence": "[[\"probes\",true,\"\",[\"probe\",\"probed\"],\"node-table\",\"raid\",[],[\"$assumptions\"],[]]]",
+      "shape": "[[\"identify-assumptions\"],false,\"\",\"\"]"
+    },
+    "gate-requirements": {
+      "applies": "full",
+      "evidence": "[]",
+      "shape": "[[\"derive-functions\",\"probe-assumptions\"],true,\"\",\"\"]"
+    },
+    "derive-criteria": {
+      "applies": "full",
+      "evidence": "[[\"compounding\",true,\"\",[],\"compare-card\",\"\",[],[\"$compounding_suspects\"],[]],[\"comparisons\",true,\"\",[],\"compare-card\",\"\",[],[\"$criterion_axes\"],[]]]",
+      "shape": "[[\"gate-requirements\"],false,\"\",\"\"]"
+    },
+    "partition-functions": {
+      "applies": "full",
+      "evidence": "[[\"clusters\",true,\"\",[],\"dsm\",\"function\",[\"shared-data\",\"sequence\",\"timing\",\"shared-failure-mode\",\"same-actor\",\"same-policy\",\"same-external-interface\",\"same-lifecycle\"],[\"$functions\"],[]]]",
+      "shape": "[[\"gate-requirements\"],false,\"\",\"\"]"
+    },
+    "enumerate-space": {
+      "applies": "full",
+      "evidence": "[]",
+      "shape": "[[\"derive-criteria\",\"partition-functions\"],true,\"candidates\",\"enumerate-space.canvas\"]"
+    },
+    "run-candidates": {
+      "applies": "full",
+      "evidence": "[]",
+      "shape": "[[\"enumerate-space\"],false,\"\",\"candidates\"]"
+    },
+    "cut-criteria": {
+      "applies": "full",
+      "evidence": "[[\"cuts\",true,\"\",[],\"rank-cut\",\"\",[],[\"$criterion_axes\"],[]]]",
+      "shape": "[[\"run-candidates\"],true,\"\",\"\"]"
+    },
+    "evaluate-set": {
+      "applies": "full",
+      "evidence": "[[\"scores\",true,\"\",[\"candidate\",\"axis\",\"score\",\"anchor\",\"prior_art\"],\"table\",\"\",[],[],[]],[\"front\",true,\"\",[],\"pareto-plot\",\"\",[],[],[]],[\"reading\",true,\"\",[],\"free-form\",\"\",[],[],[]]]",
+      "shape": "[[\"cut-criteria\"],false,\"\",\"\"]"
+    },
+    "gate-candidates": {
+      "applies": "full",
+      "evidence": "[[\"reasons_hold\",true,\"\",[],\"free-form\",\"\",[],[],[]]]",
+      "shape": "[[\"evaluate-set\"],true,\"\",\"\"]"
+    },
+    "converge-pugh": {
+      "applies": "full",
+      "evidence": "[[\"matrix_runs\",true,\"\",[],\"decision-matrix\",\"\",[],[],[]]]",
+      "shape": "[[\"gate-candidates\"],false,\"\",\"\"]"
+    },
+    "reverse-sensitivity": {
+      "applies": "full",
+      "evidence": "[[\"sensitivity\",true,\"\",[],\"sensitivity\",\"\",[],[],[]]]",
+      "shape": "[[\"converge-pugh\"],false,\"\",\"\"]"
+    },
+    "declare-winner": {
+      "applies": "full",
+      "evidence": "[[\"winner\",true,\"\",[],\"decision-matrix\",\"\",[],[],[]],[\"comments\",true,\"\",[],\"\",\"\",[],[],[]]]",
+      "shape": "[[\"reverse-sensitivity\"],false,\"\",\"\"]"
+    },
+    "record-adrs": {
+      "applies": "full",
+      "evidence": "[[\"adrs\",true,\"\",[],\"refs\",\"raid\",[],[],[]]]",
+      "shape": "[[\"declare-winner\"],false,\"\",\"\"]"
+    },
+    "decompose-structure": {
+      "applies": "full",
+      "evidence": "[[\"elements\",true,\"\",[],\"list\",\"element\",[],[],[]],[\"allocation\",true,\"\",[],\"element-matrix\",\"element\",[],[],[]]]",
+      "shape": "[[\"declare-winner\"],false,\"\",\"\"]"
+    },
+    "evaluate-architecture": {
+      "applies": "full",
+      "evidence": "[[\"walk\",true,\"\",[],\"scenario-deck\",\"\",[],[],[]],[\"fitness_candidates\",true,\"\",[],\"list\",\"requirement\",[],[],[]]]",
+      "shape": "[[\"decompose-structure\",\"record-adrs\"],true,\"\",\"\"]"
+    },
+    "gate-architecture": {
+      "applies": "full",
+      "evidence": "[]",
+      "shape": "[[\"evaluate-architecture\"],false,\"\",\"\"]"
+    },
+    "rank-unknowns": {
+      "applies": "full",
+      "evidence": "[[\"seeded\",true,\"\",[],\"exposure-pick\",\"raid\",[],[],[]]]",
+      "shape": "[[\"gate-architecture\"],false,\"spikes\",\"\"]"
+    },
+    "run-spikes": {
+      "applies": "full",
+      "evidence": "[]",
+      "shape": "[[\"rank-unknowns\"],false,\"\",\"spikes\"]"
+    },
+    "fold-back": {
+      "applies": "full",
+      "evidence": "[[\"folded\",true,\"\",[\"folds_to\",\"promote\"],\"node-table\",\"experiment\",[],[\"$experiments\"],[]]]",
+      "shape": "[[\"run-spikes\"],false,\"\",\"\"]"
+    },
+    "gate-prototype": {
+      "applies": "full",
+      "evidence": "[[\"buildable\",true,\"\",[],\"choice-with-rationale\",\"\",[\"yes\",\"no\"],[],[]]]",
+      "shape": "[[\"fold-back\"],true,\"\",\"\"]"
+    },
+    "author-tests": {
+      "applies": "full",
+      "evidence": "[[\"checks\",true,\"\",[\"method\",\"verifies\"],\"node-table\",\"test-spec\",[],[\"$test-specs\"],[]]]",
+      "shape": "[[\"gate-prototype\"],false,\"\",\"\"]"
+    },
+    "specify-build": {
+      "applies": "full",
+      "evidence": "[[\"design_specs\",true,\"\",[\"realizes\",\"files\"],\"node-table\",\"design-spec\",[],[\"$design-specs\"],[]],[\"promotions\",true,\"\",[\"promote\",\"chunk\"],\"node-table\",\"experiment\",[],[\"$promotions\"],[]]]",
+      "shape": "[[\"author-tests\"],false,\"build-chunks\",\"\"]"
+    },
+    "observe-red": {
+      "applies": "full",
+      "evidence": "[[\"red_observed\",true,\"\",[],\"checklist\",\"\",[],[\"$claim-specs\"],[]]]",
+      "shape": "[[\"specify-build\"],false,\"\",\"\"]"
+    },
+    "build-steps": {
+      "applies": "full",
+      "evidence": "[]",
+      "shape": "[[\"observe-red\"],false,\"\",\"build-chunks\"]"
+    },
+    "trace-design": {
+      "applies": "full",
+      "evidence": "[[\"design_trace\",true,\"\",[\"realizes\",\"files\"],\"node-table\",\"design-spec\",[],[\"$design-specs\"],[]]]",
+      "shape": "[[\"build-steps\"],false,\"\",\"\"]"
+    },
+    "verification": {
+      "applies": "full",
+      "evidence": "[[\"claims\",true,\"\",[],\"checklist\",\"\",[],[\"$claim-specs\"],[]]]",
+      "shape": "[[\"trace-design\"],false,\"\",\"\"]"
+    },
+    "fix-findings": {
+      "applies": "full",
+      "evidence": "[]",
+      "shape": "[[\"verification\"],false,\"\",\"\"]"
+    },
+    "gate-implementation": {
+      "applies": "full",
+      "evidence": "[[\"quality_ok\",true,\"\",[],\"checklist\",\"\",[],[\"$iq_checklist\"],[]],[\"debt_taken\",true,\"\",[],\"refs\",\"raid\",[],[],[]],[\"risks_acceptable\",true,\"\",[],\"choice-with-rationale\",\"\",[\"acceptable\",\"not-acceptable\"],[],[]]]",
+      "shape": "[[\"verification\"],true,\"\",\"\"]"
+    },
+    "fill-story-evidence": {
+      "applies": "full",
+      "evidence": "[]",
+      "shape": "[[\"gate-implementation\"],false,\"demos\",\"\"]"
+    },
+    "run-demos": {
+      "applies": "full",
+      "evidence": "[]",
+      "shape": "[[\"fill-story-evidence\"],false,\"\",\"demos\"]"
+    },
+    "sweep-consistency": {
+      "applies": "full",
+      "evidence": "[[\"swept\",true,\"\",[],\"checklist\",\"\",[],[\"$sweep_surfaces\"],[]]]",
+      "shape": "[[\"fill-story-evidence\"],false,\"\",\"\"]"
+    },
+    "gate-validation": {
+      "applies": "full",
+      "evidence": "[[\"meets_need\",true,\"\",[],\"per-item\",\"\",[],[\"$value-props\"],[]],[\"musts_demonstrated\",true,\"\",[],\"per-item\",\"\",[],[\"$must-stories\"],[]],[\"market_tier\",false,\"\",[],\"\",\"\",[],[],[]]]",
+      "shape": "[[\"run-demos\",\"sweep-consistency\"],true,\"\",\"\"]"
+    },
+    "package": {
+      "applies": "full",
+      "evidence": "[[\"package\",true,\"\",[],\"file-ref\",\"\",[],[],[]],[\"works\",true,\"\",[],\"choice-with-rationale\",\"\",[\"yes\",\"no\"],[],[\"yes\"]],[\"emit_back\",true,\"\",[],\"list\",\"\",[],[],[]]]",
+      "shape": "[[\"gate-validation\"],false,\"\",\"\"]"
+    },
+    "gate-release": {
+      "applies": "full",
+      "evidence": "[[\"market_block\",false,\"\",[],\"\",\"\",[],[],[]]]",
+      "shape": "[[\"package\"],true,\"\",\"\"]"
+    },
+    "shipped": {
+      "applies": "full",
+      "evidence": "[]",
+      "shape": "[[\"gate-release\"],false,\"\",\"\"]"
+    }
+  }
+}
