@@ -8,7 +8,7 @@ owner: the driving agent
 trigger: before M5 treats cand-narrow-grammar-plus-explicit's elimination as settled
 status: open
 breaks_how_badly: cosmetic
-how_likely: possible
+how_likely: plausible
 impact: a candidate could be eliminated from further consideration on a score that reflects how thoroughly it was written up rather than a genuine performance difference from its closest sibling.
 source_refs:
   - project/spec/iterations/i15-the-database-our-own-reader-over-obsidia/evidence/evaluate-set.md

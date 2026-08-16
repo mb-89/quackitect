@@ -8,7 +8,7 @@ owner: the driving agent
 trigger: if M6/M7 ever reopens candidate selection for cluster-the-query
 status: open
 breaks_how_badly: crippling
-how_likely: possible
+how_likely: plausible
 impact: the winner's margin over its closest rival on this axis rests on a guarantee the rival's own record names as unverified; hardening it elsewhere in the system would flip this cell without anyone touching i15's own work.
 source_refs:
   - project/spec/iterations/i15-the-database-our-own-reader-over-obsidia/evidence/reverse-sensitivity.md

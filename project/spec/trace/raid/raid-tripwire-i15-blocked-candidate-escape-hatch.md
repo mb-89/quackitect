@@ -8,7 +8,7 @@ owner: the driving agent
 trigger: if M6/M7 ever reopens candidate selection for cluster-the-disposition
 status: open
 breaks_how_badly: crippling
-how_likely: possible
+how_likely: plausible
 impact: the winner's own margin over its closest rival on this axis rests on one describable, buildable fix the rival does not yet have; if that fix lands, the seat is no longer stable.
 source_refs:
   - project/spec/iterations/i15-the-database-our-own-reader-over-obsidia/evidence/reverse-sensitivity.md

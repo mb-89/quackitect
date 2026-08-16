@@ -11,7 +11,7 @@ probed: 2026-08-16
 status: open
 impact: the deletion warning reports a clean list, the author deletes on it, and the prose citations orphan exactly as before — with a green check now saying they did not.
 breaks_how_badly: crippling
-how_likely: certain
+how_likely: expected
 source_refs:
   - req-a-deletion-names-what-points-at-the-node
   - "i34: 17 dangling citations in the live corpus and 3 in engine comments, found by a vocabulary sweep rather than by the graph"

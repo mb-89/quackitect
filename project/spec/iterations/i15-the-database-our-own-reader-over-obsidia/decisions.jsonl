@@ -277,3 +277,10 @@
 {"ts":"2026-08-16T18:27:44.878Z","op":"done","visit":"iterations/i15/evaluate-architecture@0","node":"d253","brief":"all three missing RAID entries minted"}
 {"ts":"2026-08-16T18:28:01.899Z","op":"update","visit":"iterations/i15/rank-unknowns@0","node":"d262","brief":"recorded the button-fed-field-bypass engine gap as a note"}
 {"ts":"2026-08-16T18:28:11.031Z","op":"done","visit":"iterations/i15/rank-unknowns@0","node":"d260","brief":"rank-unknowns: one spike seeded, three filters explained"}
+{"ts":"2026-08-16T18:34:01.100Z","op":"fork","visit":"iterations/i15/rank-unknowns@0","parent":null,"node":"d263","brief":"fix 12 off-scale breaks_how_badly/how_likely values blocking rank-unknowns exit","nodes":[]}
+{"ts":"2026-08-16T18:34:14.387Z","op":"done","visit":"iterations/i15/rank-unknowns@0","node":"d263","brief":"corrected 12 RAID how_likely/breaks_how_badly values to the fixed vocab"}
+{"ts":"2026-08-16T18:34:45.090Z","op":"plan","visit":"iterations/i15/run-spikes@0","parent":null,"nodes":[{"id":"d264","brief":"author machines/spikes.md for the one seeded spike"},{"id":"d265","brief":"run the spike inside run-spikes"},{"id":"d266","brief":"fold the finding back into raid-risk-i15-query-latency-unmeasured-at-real-scale"}]}
+{"ts":"2026-08-16T18:34:47.436Z","op":"done","visit":"iterations/i15/run-spikes@0","node":"d264","brief":"wrote spikes.md with the one seeded, timeboxed spike step"}
+{"ts":"2026-08-16T18:35:25.291Z","op":"update","visit":"iterations/i15/run-spikes/spike-query-latency-at-real-scale@0","node":"d267","brief":"running the real-corpus timing spike via se_run"}
+{"ts":"2026-08-16T18:36:20.320Z","op":"update","visit":"iterations/i15/run-spikes/spike-query-latency-at-real-scale@0","node":"d268","brief":"wrote exp-i15-query-latency-at-real-corpus-scale with the measured finding"}
+{"ts":"2026-08-16T18:36:28.384Z","op":"update","visit":"iterations/i15/run-spikes/spike-query-latency-at-real-scale@0","node":"d269","brief":"folded the spike's finding into the risk entry's body and status"}

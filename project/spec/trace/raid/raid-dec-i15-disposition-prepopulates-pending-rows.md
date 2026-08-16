@@ -7,7 +7,7 @@ statement: record-a-coupling-disposition writes one disposition row per ranked c
 owner: the driving agent
 status: decided
 breaks_how_badly: crippling
-how_likely: unlikely
+how_likely: plausible
 source_refs:
   - req-a-wrong-act-never-passes-silently
   - opt-prepopulate-pending-disposition-rows

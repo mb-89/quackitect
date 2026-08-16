@@ -9,7 +9,7 @@ trigger: a green battery leaves .se/test-timings.jsonl and .se/test-progress.jso
 status: open
 impact: The one path believed to record test cost does not record it while a record is bound. Every ranking of what to speed up therefore comes from the last run that happened on trunk, and it goes stale silently.
 breaks_how_badly: crippling
-how_likely: certain
+how_likely: expected
 source_refs:
   - req-scoped-run-records-its-timings
   - raid-asm-battery-timings-measure-work

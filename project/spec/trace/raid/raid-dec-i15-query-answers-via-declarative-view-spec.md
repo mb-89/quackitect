@@ -7,7 +7,7 @@ statement: answer-a-structured-query evaluates the pinned subset's declarative Y
 owner: the driving agent
 status: decided
 breaks_how_badly: crippling
-how_likely: unlikely
+how_likely: plausible
 source_refs:
   - req-trace-view-derived-from-files
   - req-query-is-deterministic

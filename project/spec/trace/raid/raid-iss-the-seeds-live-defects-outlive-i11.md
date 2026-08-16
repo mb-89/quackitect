@@ -8,8 +8,8 @@ owner: the owner
 trigger: seeding the next engine iteration, or any of these being hit again
 status: open
 impact: without this list the seed's unfixed half is invisible — i11's record reads as though the whole bundle shipped, and the next reader either re-audits it or trusts a stale list.
-breaks_how_badly: moderate
-how_likely: certain
+breaks_how_badly: corrosive
+how_likely: expected
 weighs_with: none
 weighs_against: none
 source_refs:

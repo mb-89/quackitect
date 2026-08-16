@@ -9,7 +9,7 @@ trigger: any of the three landing without the others, or a later state asking an
 status: decided
 impact: without these the agent runs checks the engine should run, reads promotions belonging to shipped records, and shapes output the log can never recover.
 breaks_how_badly: crippling
-how_likely: certain
+how_likely: conceivable
 weighs_with: none
 weighs_against: none
 source_refs:
