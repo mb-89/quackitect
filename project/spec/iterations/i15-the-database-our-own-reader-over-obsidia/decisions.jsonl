@@ -245,3 +245,4 @@
 {"ts":"2026-08-16T18:04:37.788Z","op":"update","visit":"iterations/i15/run-candidates/cand-narrow-grammar-plus-explicit@0","node":"d231","brief":"wrote cand-narrow-grammar-plus-explicit's four sections"}
 {"ts":"2026-08-16T18:04:41.294Z","op":"done","visit":"iterations/i15/run-candidates/cand-continue-v1s-shape@0","node":"d226","brief":"cand-narrow-grammar-plus-explicit composed and submitted, all 5 candidates done"}
 {"ts":"2026-08-16T18:04:49.111Z","op":"plan","visit":"iterations/i15/cut-criteria@0","parent":null,"nodes":[{"id":"d232","brief":"cut non-differentiating axes"},{"id":"d233","brief":"check/adjust the mechanical breaks_how_badly sort"},{"id":"d234","brief":"draw the vital-few threshold line"}]}
+{"ts":"2026-08-16T18:07:24.975Z","op":"done","visit":"iterations/i15/cut-criteria@0","node":"d232","brief":"cut 96 of 103 axes as non-differentiating, kept 7"}
