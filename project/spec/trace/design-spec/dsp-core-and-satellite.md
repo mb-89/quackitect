@@ -17,6 +17,8 @@ files:
   - "project/deliverable/engine/satellite.ts"
   - "project/deliverable/engine/channel.ts"
   - "project/deliverable/engine/transports.ts"
+  - "project/deliverable/engine/supervisor.ts"
+  - "project/deliverable/engine/delta.ts"
   - "project/deliverable/engine/mode.ts"
   - "project/deliverable/engine/bin/se-satellite.ts"
   - "project/deliverable/engine/bin/se-mcp.ts"
@@ -24,15 +26,21 @@ files:
 
 ## Responsibility
 
-THE CORE owns trunk, the mirror, the claim ledger, the note inbox, the call
-log, the routing table, and the count of heavy slots. It decides who owns a
-path and either answers or routes.
+THE CORE owns trunk, the mirror, the note inbox, the call log, the routing
+table, and the count of heavy slots. It decides who owns a path and either
+answers or routes.
 
 A SATELLITE owns one agent's work on one record: the walk position, the bound
 record, that record's thin tree, and the engine it is running.
 
+THE CORE NEVER WALKS, and a satellite never touches the shared state directly.
+
 WHAT NEITHER DOES. Neither re-realizes the elements it contains. The walk
 engine still walks, the test runner still runs tests, the seam still resolves.
+
+TWO HELPERS RIDE ALONGSIDE. The supervisor watches heartbeats and levels a
+record tree against trunk. The delta composes what one record overrides on top
+of what trunk serves.
 
 ## Interface
 
@@ -46,6 +54,15 @@ and the beat.
 
 THE NAMING CLAUSE RIDES THE CROSSING deliberately. An answer that crossed a
 process boundary is the one a reader cannot check by eye.
+
+THREE TRANSPORTS CARRY THE SAME CROSSING, and the run mode picks which.
+
+- inline, on this thread
+- a worker thread
+- a child process
+
+THE SEPARATION IS PRESENT IN ALL THREE, which is what makes three modes a
+setting rather than three products.
 
 ## Behavior and constraints
 
@@ -71,6 +88,12 @@ working directory, runs no record's engine composition, and would outlive the
 satellite that asked — which [[if-satellite-supervisor-to-test-runner]]
 forbids outright.
 
+A SATELLITE THAT MISSES ITS BEATS IS JUDGED BY THE SUPERVISOR, never by
+itself.
+
+THE CHILD-PROCESS TRANSPORT STARTS ALL OR NOTHING. The whole spec arrives as
+one argument, or the satellite does not start.
+
 ## Rationale
 
 THE SHARED STATE GETS AN OWNER BY DESIGN, which is the one thing
@@ -82,3 +105,20 @@ shape costs nothing until a second agent arrives.
 WHAT IT LEANS ON is probed rather than assumed:
 [[raid-asm-machine-wide-state-serves-over-a-local-channel]] holds for the call
 log at the number above.
+
+## Standing
+
+BUILT AND TESTED, NOT YET ON THE LIVE PATH. The running server does not import
+this cluster. Six test files exercise it directly.
+
+The finding is recorded in
+[[raid-debt-core-and-satellite-is-off-the-live-path]].
+
+## What i34 takes out of it
+
+THE CLAIM LEDGER IS GONE FROM THIS SPEC. i27's version listed it among what
+the core owns, and i28's listed the claim file. The owner retired the whole
+machine-locking specification on 2026-08-16, so neither phrase survives here.
+
+WHAT THE CORE OWNS IS UNCHANGED OTHERWISE. Trunk, the mirror, the inbox, the
+log, the routing table and the slot count are all still one thing per machine.

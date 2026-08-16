@@ -18,6 +18,7 @@ files:
   - "project/deliverable/engine/bin/smoketest.ts"
   - "project/deliverable/engine/bin/preflight.ts"
   - "project/deliverable/engine/bin/test-timings.mjs"
+  - "project/deliverable/engine/testreporters.ts"
 ---
 
 ## Responsibility

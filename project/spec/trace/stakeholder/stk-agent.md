@@ -26,6 +26,10 @@ weight: 0.8
 - It now works BESIDE PEERS it never talks to: another machine's agent holds
   claims it must honor sight unseen, and its own claim is all that keeps its
   iteration its own.
+- IT NOW BOOTS ON MACHINES NOBODY PREPARED, unattended, with nobody to ask.
+  A first step it cannot pass is not a degraded experience, it is a closed
+  door, and weaker models already fail the boot reading proof outright
+  (added at i28, 2026-08-15).
 
 ## Notes (not load-bearing)
 

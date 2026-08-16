@@ -21,6 +21,11 @@ weight: 1
 - Process that costs them hours gets abandoned, however sound it is.
 - They work alone as often as in a team, and the same machine has to serve
   both without becoming two machines.
+- THEY NOW START WORK THEY WILL NOT WATCH. An unattended run separates
+  authorising a gate from seeing it reached, so judgment has to be given
+  ahead of time or the run parks at the last step (added at i28, 2026-08-15).
+- STARTING WORK MUST NOT BE WORK. Their own ruling, 2026-08-15: "Starting an
+  iteration is going in it and starting it, not cleaning stuff up."
 
 ## Notes (not load-bearing)
 

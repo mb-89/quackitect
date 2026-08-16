@@ -20,6 +20,9 @@ verifies:
   - "req-a-shipped-record-is-never-reclaimed"
   - "req-a-records-dependency-is-declared"
   - "req-a-records-own-status-decides-whether-it-is-open"
+  - "req-entering-repairs-itself-or-names-the-remedy"
+  - "req-the-iteration-list-comes-from-git"
+  - "req-a-worktree-exists-only-while-a-walk-is-bound"
 files:
   - "tests/iterations.test.ts"
   - "tests/container.test.ts"
@@ -66,3 +69,21 @@ covers.
 A SEPARATE SPEC WOULD HAVE SPLIT ONE CONCERN. The rule is one spec, one
 verification concern, and the concern here is the record's life from the word
 that opens it to the landing that ends it.
+
+## Three more joined here at i28, and two of them i34 supersedes
+
+THE MERGE OF i28 BROUGHT THREE. [[req-entering-repairs-itself-or-names-the-remedy]]
+stands unchanged and is about entry doing its own repair.
+
+TWO ARE CONTRADICTED BY i34 AND ARE LISTED HERE ON PURPOSE, so that the
+supersession is visible rather than silent.
+
+- [[req-the-iteration-list-comes-from-git]] says the list of records comes from
+  git's branches. i34 makes the record's own status the answer.
+- [[req-a-worktree-exists-only-while-a-walk-is-bound]] says a worktree stands
+  only for a bound walk. i34 removes worktrees entirely.
+
+THEY ARE NOT DELETED AT THE MERGE, because a merge records what the other side
+said. They are retired by the chunks that actually change the behaviour —
+`status-is-the-open-flag` and `cut-worktrees-from-seed` — and each takes its
+requirement node down with it.

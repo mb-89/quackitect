@@ -29,6 +29,7 @@ satisfies:
   - req-shutdown-fires-only-idle-or-end
   - req-lane-fixes-what-machines-fix
   - req-walk-opens-at-retro
+  - req-entering-repairs-itself-or-names-the-remedy
   - req-instruction-names-its-source
   - req-fallen-condition-named
   - req-crash-lands-safe
