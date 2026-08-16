@@ -62,3 +62,6 @@
 {"ts":"2026-08-16T16:19:07.648Z","op":"plan","visit":"iterations/i15/log-risks@0","parent":null,"nodes":[{"id":"d60","brief":"review goal_system conflicts as raid candidates"},{"id":"d61","brief":"mint new raid entries"},{"id":"d62","brief":"reference register in raid_opened"}]}
 {"ts":"2026-08-16T16:19:15.972Z","op":"update","visit":"iterations/i15/log-risks@0","node":"d63","brief":"reading raid item template for exact field list"}
 {"ts":"2026-08-16T16:19:20.830Z","op":"update","visit":"iterations/i15/log-risks@0","node":"d64","brief":"reading full risk-entry example for the risk-kind skeleton"}
+{"ts":"2026-08-16T16:19:40.877Z","op":"update","visit":"iterations/i15/log-risks@0","node":"d65","brief":"minted raid-risk-i15-query-toil-outweighs-savings"}
+{"ts":"2026-08-16T16:19:50.332Z","op":"update","visit":"iterations/i15/log-risks@0","node":"d66","brief":"minted raid-asm-i15-corpus-suits-lexical-matching"}
+{"ts":"2026-08-16T16:20:01.565Z","op":"done","visit":"iterations/i15/log-risks@0","node":"d62","brief":"log-risks form filled and submitted, five open raid entries referenced"}
