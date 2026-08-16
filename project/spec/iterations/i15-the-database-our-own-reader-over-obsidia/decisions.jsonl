@@ -76,3 +76,13 @@
 {"ts":"2026-08-16T16:29:18.132Z","op":"plan","visit":"iterations/i15/gate-motivation@0","parent":null,"nodes":[{"id":"d72","brief":"correct raid-asm-v1-ref-for-spec-queries-is-reachable"},{"id":"d73","brief":"amend gate-kickoff"},{"id":"d74","brief":"amend log-risks / draft-vision"},{"id":"d75","brief":"amend frame-delta"},{"id":"d76","brief":"amend pressure-test"},{"id":"d77","brief":"amend define-actual"},{"id":"d78","brief":"note the 25 vs 26 file-count discrepancy"},{"id":"d79","brief":"resume the gate-motivation walk"}]}
 {"ts":"2026-08-16T16:29:52.313Z","op":"plan","visit":"iterations/i15/gate-motivation@0","parent":null,"nodes":[]}
 {"ts":"2026-08-16T16:30:01.061Z","op":"done","visit":"iterations/i15/gate-motivation@0","node":"d72","brief":"raid closed: ref main confirmed reachable, 25 files not 26"}
+{"ts":"2026-08-16T16:31:02.213Z","op":"update","visit":"iterations/i15/gate-motivation@0","node":"d80","brief":"amending frame-delta's why_now and follow_up"}
+{"ts":"2026-08-16T16:31:08.698Z","op":"update","visit":"iterations/i15/gate-motivation@0","node":"d81","brief":"amending pressure-test's prfaq"}
+{"ts":"2026-08-16T16:31:14.067Z","op":"update","visit":"iterations/i15/gate-motivation@0","node":"d82","brief":"amending define-actual's as_is"}
+{"ts":"2026-08-16T16:31:18.635Z","op":"update","visit":"iterations/i15/gate-motivation@0","node":"d83","brief":"amending log-risks' follow_up"}
+{"ts":"2026-08-16T16:31:22.457Z","op":"done","visit":"iterations/i15/gate-motivation@0","node":"d74","brief":"log-risks and draft-vision both amended"}
+{"ts":"2026-08-16T16:31:30.455Z","op":"update","visit":"iterations/i15/gate-motivation@0","node":"d84","brief":"amending scope-non-goals; then filing the 25-vs-26 note"}
+{"ts":"2026-08-16T16:31:36.923Z","op":"done","visit":"iterations/i15/gate-motivation@0","node":"d78","brief":"filed the 25-vs-26 discrepancy note"}
+{"ts":"2026-08-16T16:31:44.125Z","op":"done","visit":"iterations/i15/gate-motivation@0","node":"d73","brief":"gate-kickoff amend confirmed complete (done earlier)"}
+{"ts":"2026-08-16T16:31:52.207Z","op":"done","visit":"iterations/i15/gate-motivation@0","node":"d75","brief":"frame-delta amend confirmed complete (done earlier)"}
+{"ts":"2026-08-16T16:34:32.040Z","op":"done","visit":"iterations/i15/gate-motivation@0","node":"d79","brief":"gate-motivation filled and submitted with the correction folded in"}

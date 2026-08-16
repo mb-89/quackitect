@@ -1,5 +1,6 @@
 ---
 form: scope-non-goals
+amended: "2026-08-16T16:31:30.497Z by agent — ref \"main\" resolves — verified 2026-08-16; correcting the harvest scope line, the non-goal deferral, and the follow_up"
 by: agent
 signed_off: 2026-08-16T16:25:22.079Z
 authors: agent
@@ -18,7 +19,7 @@ THIS STATE SCOPES THE DELTA rather than restating gate-kickoff's pulled_in list 
 
 THIS EFFORT TAKES ON SEVEN PIECES, all named at gate-kickoff and unchanged by frame-delta's sharpening.
 
-- LOCATE AND HARVEST v1's 26 .base query files and adr-query-in-engine.md, once raid-asm-v1-ref-for-spec-queries-is-reachable resolves at a state where se_run or se_git is legal.
+- LOCATE AND HARVEST v1's 25 .base query files (not 26 — corrected 2026-08-16) and adr-query-in-engine.md, from ref "main" (raid-asm-v1-ref-for-spec-queries-is-reachable, closed).
 - EXPOSE THE EXISTING READER (tables.ts, bases.ts, baseui.ts, basesclient.ts) as a read-only MCP lane verb, with the unknown-field refusal gap_claim identified as genuinely missing — the existing widget refuses an unmatched FILTER shape, not yet a requested-but-absent COLUMN.
 - EXTEND THE PINNED SUBSET test-first, only where a harvested v1 query needs it, reopening adr-query-in-engine rather than smuggling in an extension.
 - ADD CONFORMANCE FIXTURES pinning the subset against drift, beside the existing tests/fixtures/*.base.
@@ -34,7 +35,7 @@ EVERY LINE NAMES WHERE THE WORK GOES, or says why nothing receives it.
 - EMBEDDINGS for the BM25 sibling — no record yet; record.md defers them until BM25 ships and its misses are measured, and that measurement has no iteration of its own.
 - PORTING v1's BOOK TABLE-INTERACTIVITY SCRIPT — i20 (emit.book), named at gate-kickoff.
 - ANY UI CHANGE TO THE EXISTING MIRROR BASES WIDGET beyond what the MCP verb and the subset extension require — no record; it already works, and gate-kickoff scoped it out by name.
-- RESOLVING raid-asm-v1-ref-for-spec-queries-is-reachable AND raid-risk-i15-ships-without-a-live-prior-art-scan AT THIS STATE — this record's own harvesting sub-step and next gate own them, per log-risks' follow_up; not scope-non-goals' job to close.
+- RESOLVING raid-risk-i15-ships-without-a-live-prior-art-scan AT THIS STATE — the next gate owns it, per log-risks' follow_up; not scope-non-goals' job to close. (raid-asm-v1-ref-for-spec-queries-is-reachable closed 2026-08-16, outside this state's walk.)
 
 ## follow_up
 
@@ -42,7 +43,7 @@ pressure-test remains; log-risks already stands signed, so the gate joins as soo
 
 WHAT THE GATE INHERITS: a scope of seven items unchanged from gate-kickoff's proposal, and a non-goal list of five where every line names a receiving record or says plainly why none exists.
 
-WHAT PRESSURE-TEST SHOULD WEIGH HARDEST: the two claims frame-delta's why_now flagged as not yet matured — the v1 ref's reachability and the missing live prior-art scan — are the same two this scope defers to later states. Pressure-test is where a working-backwards read should ask whether deferring both together is safe.
+WHAT PRESSURE-TEST SHOULD WEIGH HARDEST: one claim frame-delta's why_now flagged as not yet matured — the missing live prior-art scan — is still deferred to a later state. The v1 ref's reachability, flagged alongside it, closed 2026-08-16.
 
 ## anything_else
 

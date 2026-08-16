@@ -1,5 +1,6 @@
 ---
 form: log-risks
+amended: "2026-08-16T16:31:18.683Z by agent — ref \"main\" resolves — verified 2026-08-16; one of the two carried-forward raid entries is now closed"
 by: agent
 signed_off: 2026-08-16T16:22:13.867Z
 authors: agent
@@ -34,7 +35,7 @@ WHAT THE NEXT STATES INHERIT AS SETTLED.
 - The conflict is named, not resolved by argument: build toil now against toil removed later. gate-kickoff already priced the now-cost as major.
 - The delta-default resolver change trades convenience for a safer default; the coverage laws stay corpus-wide, per the swept debt (raid-debt-delta-default-views).
 
-THE TWO OPEN RAID ENTRIES FROM GATE-KICKOFF CARRY FORWARD UNCHANGED: raid-asm-v1-ref-for-spec-queries-is-reachable and raid-risk-i15-ships-without-a-live-prior-art-scan. Neither is this state's tool to resolve.
+ONE OPEN RAID ENTRY FROM GATE-KICKOFF CARRIES FORWARD: raid-risk-i15-ships-without-a-live-prior-art-scan. Not this state's tool to resolve. raid-asm-v1-ref-for-spec-queries-is-reachable closed 2026-08-16 — ref "main" resolves and holds the harvest source (25 .base files, not 26, plus the ADR).
 
 ## anything_else
 

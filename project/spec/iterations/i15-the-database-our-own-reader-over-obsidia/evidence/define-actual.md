@@ -1,5 +1,6 @@
 ---
 form: define-actual
+amended: "2026-08-16T16:31:14.130Z by agent — ref \"main\" resolves — verified 2026-08-16; only the prior-art-scan question remains open"
 by: agent
 signed_off: 2026-08-16T16:18:42.505Z
 authors: agent
@@ -28,7 +29,7 @@ AN UNNAMED COUPLING HAS NO WAY TO SURFACE ITSELF. The trace graph answers struct
 
 THE $-ITEM RESOLVERS DEFAULT WIDE. They resolve against the whole corpus rather than the bound record's own delta, with no scoped default and no opt-in boundary. WITNESS: raid-debt-delta-default-views.md, rescheduled into i15 at i12's retro, 2026-08-15.
 
-TWO OPEN QUESTIONS STAND FROM THIS ITERATION'S OWN KICKOFF, UNCHANGED SINCE. Whether the v1 ref holding the 26 .base query files is reachable from this repository's history, and whether a live prior-art scan against Obsidian's own Bases, Dataview, or another markdown-query tool ever ran. WITNESS: raid-asm-v1-ref-for-spec-queries-is-reachable and raid-risk-i15-ships-without-a-live-prior-art-scan, both minted at gate-kickoff, 2026-08-16.
+ONE OPEN QUESTION STANDS FROM THIS ITERATION'S OWN KICKOFF. Whether a live prior-art scan against Obsidian's own Bases, Dataview, or another markdown-query tool ever ran. WITNESS: raid-risk-i15-ships-without-a-live-prior-art-scan, minted at gate-kickoff, 2026-08-16. The sibling question — whether the v1 ref holding the .base query files is reachable — closed 2026-08-16: ref "main" resolves and holds 25 files, not 26, plus adr-query-in-engine.md. WITNESS: raid-asm-v1-ref-for-spec-queries-is-reachable, closed.
 
 ## follow_up
 

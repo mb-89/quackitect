@@ -1,5 +1,6 @@
 ---
 form: frame-delta
+amended: "2026-08-16T16:31:02.257Z by agent — ref \"main\" resolves — verified 2026-08-16; correcting the stale \"does not yet resolve\" claim and its downstream follow_up"
 by: agent
 signed_off: 2026-08-16T16:24:00.812Z
 authors: agent
@@ -40,7 +41,7 @@ V1 LEFT 26 WORKING QUERY FILES TO HARVEST rather than invent. requirements.base 
 
 THE COST OF NOT HAVING IT IS NOW MEASURED, NOT SUSPECTED. The same two proofs named in gap_claim — a missed DECIDED decision caught only by a red team, and 170 of a requirement set's rows left unexamined while every mechanical check passed — are dated to 2026-08-13, one iteration before this one opened. The corpus they were run against has grown to roughly 300 trace files by this walk's own count.
 
-WHAT DID NOT MATURE, said so the case is not overstated: the v1 ref holding the 26 query files does not yet resolve in this checkout (raid-asm-v1-ref-for-spec-queries-is-reachable, still open), and no live scan compared this design against Obsidian's own Bases plugin or Dataview (raid-risk-i15-ships-without-a-live-prior-art-scan, still open). The case rests on the measured cost of searching today and a design already proven once, not on every open question being closed.
+WHAT DID NOT MATURE, said so the case is not overstated: no live scan compared this design against Obsidian's own Bases plugin or Dataview (raid-risk-i15-ships-without-a-live-prior-art-scan, still open). The v1 ref resolves at "main" (raid-asm-v1-ref-for-spec-queries-is-reachable, closed 2026-08-16; the ref holds 25 .base files, not 26). The case rests on the measured cost of searching today and a design already proven once, not on every open question being closed.
 
 ## value_props
 
@@ -62,7 +63,7 @@ M1'S REMAINING BRANCHES are scope-non-goals and pressure-test; the gate joins on
 
 WHAT SCOPE-NON-GOALS INHERITS: gate-kickoff already wrote and blessed a left_out list — the dashboard, embeddings, the book table-interactivity port, and any UI change to the existing mirror widget beyond what the verb and the subset extension require. This state should test that list against the delta drafted here rather than re-derive it.
 
-WHAT PRESSURE-TEST INHERITS, and it is the sharper job: two claims this frame rests on are still open raid entries rather than settled fact — that the v1 ref is reachable at all, and that no live prior-art scan means no maintained plugin already does this better. Both are named in why_now's own "what did not mature" paragraph; pressure-test is where they get pushed on, not argued away here.
+WHAT PRESSURE-TEST INHERITS, and it is the sharper job: one claim this frame rests on is still an open raid entry rather than settled fact — that no live prior-art scan means no maintained plugin already does this better. It is named in why_now's own "what did not mature" paragraph; pressure-test is where it gets pushed on, not argued away here. The v1-ref-reachability assumption closed 2026-08-16 and needs no further pressure.
 
 ONE THING VALUE_PROPS LEAVES SETTLED: this delta authors no new value prop. The vision facets it serves (vp-the-ledger, vp-rigor-without-toil) were argued at draft-vision and are not re-argued here.
 

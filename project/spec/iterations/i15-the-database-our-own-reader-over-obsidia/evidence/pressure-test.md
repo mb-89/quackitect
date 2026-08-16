@@ -1,5 +1,6 @@
 ---
 form: pressure-test
+amended: "2026-08-16T16:31:08.736Z by agent — ref \"main\" resolves — verified 2026-08-16; the hostile question's premise no longer holds"
 by: agent
 signed_off: 2026-08-16T16:26:37.526Z
 authors: agent
@@ -34,7 +35,7 @@ Q: i6's REQUIREMENTS GATE IS ALREADY WAITING ON THIS SIBLING FOR ITS CROSS-COUPL
 A: Yes, and this is worth naming plainly rather than smoothing over. i6's mechanized check gets a candidate list either way — the question is whether that list is TRUSTWORTHY on day one. It is not, yet. This is a genuine dependency risk this packet had not stated in those terms; folded below.
 
 Q: THE HARVEST HALF OF THE GOAL HAS NO CONFIRMED SOURCE — the v1 ref still does not resolve in this checkout. What ships if it never does?
-A: raid-asm-v1-ref-for-spec-queries-is-reachable's own kill criterion answers this: if no ref anywhere in history holds the query files, the harvest is unreachable and the iteration re-opens to descope to hand-authored queries from the prose description instead. Nothing here assumes the harvest succeeds.
+A: RESOLVED 2026-08-16: the premise no longer holds. Ref "main" resolves and holds spec/queries/ (25 .base files, not 26) plus adr-query-in-engine.md, confirmed by se_file_glob/se_file_read at ref:main. raid-asm-v1-ref-for-spec-queries-is-reachable is closed. The harvest has a confirmed source.
 
 Q: THE BUSINESS CASE CLAIMS "NO THIRD, SILENT CASE" — A QUERY EITHER RETURNS A ROW OR REFUSES BY NAME. Does that hold for both new verbs, or only one?
 A: Only one, and this is the finding this state exists to catch. Folded below.
