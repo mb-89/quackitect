@@ -309,3 +309,6 @@
 {"ts":"2026-08-16T18:57:22.116Z","op":"done","visit":"iterations/i15/build-steps/build-coupling-disposer@0","node":"d290","brief":"typecheck run on disposition.ts"}
 {"ts":"2026-08-16T18:57:39.986Z","op":"update","visit":"iterations/i15/trace-design@0","node":"d292","brief":"submitting trace-design's coverage sweep"}
 {"ts":"2026-08-16T19:01:50.245Z","op":"update","visit":"iterations/i15/verification@0","node":"d293","brief":"tester's GREEN report back, updating the stale spec line"}
+{"ts":"2026-08-16T19:06:57.369Z","op":"update","visit":"iterations/i15/verification@0","node":"d294","brief":"root-causing the AND-join wedge blocking fix-findings entry"}
+{"ts":"2026-08-16T19:08:17.894Z","op":"update","visit":"iterations/i15/verification@0","node":"d295","brief":"asking se_why to explain fix-findings' grey state directly"}
+{"ts":"2026-08-16T19:09:07.434Z","op":"update","visit":"iterations/i15/verification@0","node":"d296","brief":"resubmitting verification's claim unchanged after reopen"}
