@@ -22,6 +22,13 @@ guidance: |
     and needs no leaving.
 
   Pull onward when the inbox stands at zero.
+
+  AN EMPTY INBOX MEANS THE RETRO IS ALREADY DONE. Survey first; if nothing
+  pends, do NOT start one — pull onward. A retro with nothing to drain
+  produces an empty report and costs a full state's work to say so.
+
+  THIS IS THE RULE FOR EVERY RETRO, wherever it is reached: the standalone
+  one at the desk, and the onboard-retro inside an iteration's M0.
 ---
 
 # Retro
@@ -29,6 +36,31 @@ guidance: |
 The retro is one state (the one-state rule) - its legality zone rides
 legal_tools, its method rides the entry read. Leaving it should leave
 the inbox empty.
+
+## An empty inbox skips the retro (owner ruling 2026-08-16)
+
+THE CADENCE DOUBLE-FIRES AND THE OWNER NAMED IT. Run a retro at the desk, then
+open an iteration, and the iteration's own onboard-retro runs a second one
+minutes later with nothing left to drain.
+
+THEIR WORDS: "If we have just made a retro, meaning the notes are empty, then
+we don't start another one. If you start a retro anywhere and the notes are
+empty, then you just skip it." And, on the onboarding half: "if the onboarding
+retro doesn't fire, then you just skip it."
+
+THE TRIGGER IS THE INBOX, not a timer and not a memory of having just run one.
+se_survey answers it in one call, which is why the retro opens with the survey.
+
+WHAT ABOUT THE FIELD-FEEDBACK QUESTION, which the contract calls a sanctioned
+stop nothing else stands in for? A skipped retro does not skip it — it was
+asked by the retro that emptied the inbox, minutes earlier. Asking twice in one
+sitting is the duplication this rule exists to remove.
+
+THE MECHANICAL HALF IS NOT BUILT. Today this rule holds by authorship: the
+agent surveys, sees zero, and pulls onward. Making the engine skip it needs a
+condition the router can route PAST rather than block on, and onboard-retro
+sits on an iteration's mandatory path where an unmet entry condition would
+wedge the record instead of skipping the state.
 
 ## The outward doors are legal here (owner ruling 2026-08-15)
 
