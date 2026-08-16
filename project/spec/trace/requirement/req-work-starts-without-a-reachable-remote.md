@@ -17,6 +17,7 @@ source_refs:
 priority: must
 weighs_with:
   - req-the-lane-runs-without-a-console ! — one is listing/entering work offline, the other is the process surviving stdin close and port conflict; different failure modes under the same use case
+---
 
 ## Detail
 
