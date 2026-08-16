@@ -285,3 +285,13 @@
 {"ts":"2026-08-16T18:36:20.320Z","op":"update","visit":"iterations/i15/run-spikes/spike-query-latency-at-real-scale@0","node":"d268","brief":"wrote exp-i15-query-latency-at-real-corpus-scale with the measured finding"}
 {"ts":"2026-08-16T18:36:28.384Z","op":"update","visit":"iterations/i15/run-spikes/spike-query-latency-at-real-scale@0","node":"d269","brief":"folded the spike's finding into the risk entry's body and status"}
 {"ts":"2026-08-16T18:37:32.266Z","op":"done","visit":"iterations/i15/run-spikes@0","node":"d266","brief":"fold-back submitted; folds_to/promote written on the exp node"}
+{"ts":"2026-08-16T18:40:04.216Z","op":"fork","visit":"iterations/i15/gate-prototype@0","parent":null,"node":"d270","brief":"actually probe the two crippling/fatal assumptions blocking gate-prototype's route","nodes":[]}
+{"ts":"2026-08-16T18:42:46.360Z","op":"fork","visit":"iterations/i15/fold-back@1","parent":"d270","node":"d271","brief":"using fold-back's write access to probe/defer the two assumptions blocking gate-prototype","nodes":[]}
+{"ts":"2026-08-16T18:43:08.577Z","op":"done","visit":"iterations/i15/fold-back@1","node":"d271","brief":"both blocking assumptions resolved on disk"}
+{"ts":"2026-08-16T18:47:52.022Z","op":"plan","visit":"iterations/i15/author-tests@0","parent":null,"nodes":[{"id":"d272","brief":"write query.ts + disposition.ts stubs"},{"id":"d273","brief":"write query.test.ts (red)"},{"id":"d274","brief":"write coupling-rank.test.ts (red)"},{"id":"d275","brief":"mint tsp-query-answers"},{"id":"d276","brief":"mint tsp-coupling-rank"},{"id":"d277","brief":"mint tsp-coupling-disposition"},{"id":"d278","brief":"submit author-tests checks"}]}
+{"ts":"2026-08-16T18:47:57.948Z","op":"done","visit":"iterations/i15/author-tests@0","node":"d272","brief":"both stub modules written, throwing not-yet-built"}
+{"ts":"2026-08-16T18:48:10.126Z","op":"done","visit":"iterations/i15/author-tests@0","node":"d273","brief":"query.test.ts written, four red cases"}
+{"ts":"2026-08-16T18:48:21.549Z","op":"done","visit":"iterations/i15/author-tests@0","node":"d274","brief":"coupling-rank.test.ts written, two red cases"}
+{"ts":"2026-08-16T18:49:10.790Z","op":"done","visit":"iterations/i15/author-tests@0","node":"d276","brief":"tsp-coupling-rank minted"}
+{"ts":"2026-08-16T18:49:23.075Z","op":"done","visit":"iterations/i15/author-tests@0","node":"d277","brief":"tsp-coupling-disposition minted with its checklist"}
+{"ts":"2026-08-16T18:49:27.055Z","op":"done","visit":"iterations/i15/author-tests@0","node":"d275","brief":"tsp-query-answers minted"}
