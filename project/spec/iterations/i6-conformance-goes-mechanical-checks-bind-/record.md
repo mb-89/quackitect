@@ -1,6 +1,15 @@
 ---
 id: i6-conformance-goes-mechanical-checks-bind-
-status: open
+status: shipped
+closed: 2026-08-16T19:53:31.589Z
+carried_count: 6
+carried:
+  - book chapters — raid-debt-human-observed-demonstrations (sweep-consistency.md)
+  - tsp-bound-surface — raid-debt-the-bound-surface-demo-leans-on-two-open-records (verification.md)
+  - tsp-desk-and-gates — raid-debt-human-observed-demonstrations (verification.md)
+  - tsp-first-run — raid-debt-human-observed-demonstrations (verification.md)
+  - tsp-panel-walkthrough — raid-debt-human-observed-demonstrations (verification.md)
+  - tsp-tour-run — raid-debt-human-observed-demonstrations (verification.md)
 started: 2026-08-16T15:24:20.916Z
 opened: 2026-08-11T15:23:49.685Z
 goal: "Conformance goes mechanical: checks bind to the named elements and run at the write, not at a review."
