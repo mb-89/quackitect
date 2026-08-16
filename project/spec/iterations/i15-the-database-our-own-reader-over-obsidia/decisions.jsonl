@@ -312,3 +312,4 @@
 {"ts":"2026-08-16T19:06:57.369Z","op":"update","visit":"iterations/i15/verification@0","node":"d294","brief":"root-causing the AND-join wedge blocking fix-findings entry"}
 {"ts":"2026-08-16T19:08:17.894Z","op":"update","visit":"iterations/i15/verification@0","node":"d295","brief":"asking se_why to explain fix-findings' grey state directly"}
 {"ts":"2026-08-16T19:09:07.434Z","op":"update","visit":"iterations/i15/verification@0","node":"d296","brief":"resubmitting verification's claim unchanged after reopen"}
+{"ts":"2026-08-16T19:13:25.216Z","op":"update","visit":"iterations/i15/run-candidates/cand-continue-v1s-shape@0","node":"d297","brief":"resuming i15 walk, orienting at run-candidates/cand-continue-v1s-shape re-ask"}
