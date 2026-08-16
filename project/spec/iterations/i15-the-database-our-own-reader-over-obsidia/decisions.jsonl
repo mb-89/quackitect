@@ -313,3 +313,6 @@
 {"ts":"2026-08-16T19:08:17.894Z","op":"update","visit":"iterations/i15/verification@0","node":"d295","brief":"asking se_why to explain fix-findings' grey state directly"}
 {"ts":"2026-08-16T19:09:07.434Z","op":"update","visit":"iterations/i15/verification@0","node":"d296","brief":"resubmitting verification's claim unchanged after reopen"}
 {"ts":"2026-08-16T19:13:25.216Z","op":"update","visit":"iterations/i15/run-candidates/cand-continue-v1s-shape@0","node":"d297","brief":"resuming i15 walk, orienting at run-candidates/cand-continue-v1s-shape re-ask"}
+{"ts":"2026-08-16T19:17:54.439Z","op":"fork","visit":"iterations/i15/verification@1","parent":null,"node":"d298","brief":"fix nesting.test.ts:377 fixture missing biome.json, blocking verification's battery gate","nodes":[]}
+{"ts":"2026-08-16T19:24:22.794Z","op":"update","visit":"iterations/i15/verification@1","node":"d299","brief":"escaping: SE-C-123 wedge-guard blocks all write access"}
+{"ts":"2026-08-16T19:27:39.965Z","op":"update","visit":"iterations/i15/run-candidates/start@6","node":"d300","brief":"walking all five M5 candidates in parallel per build_chart follow_up"}
