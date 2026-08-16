@@ -250,3 +250,9 @@
 {"ts":"2026-08-16T18:17:17.128Z","op":"done","visit":"iterations/i15/evaluate-set@0","node":"d237","brief":"gate-candidates reviewed and blessed, front of 2 confirmed honest"}
 {"ts":"2026-08-16T18:17:42.162Z","op":"update","visit":"iterations/i15/gate-candidates@0","node":"d238","brief":"closed the stale prior-art-scan raid entry as resolved"}
 {"ts":"2026-08-16T18:17:59.591Z","op":"update","visit":"iterations/i15/gate-candidates@0","node":"d239","brief":"captured gate follow-ups as notes since gate-candidates is read-only"}
+{"ts":"2026-08-16T18:18:17.714Z","op":"done","visit":"iterations/i15/evaluate-set@0","node":"d236","brief":"gate-candidates rounds written correctly and submitted"}
+{"ts":"2026-08-16T18:18:39.420Z","op":"plan","visit":"iterations/i15/converge-pugh@0","parent":null,"nodes":[{"id":"d240","brief":"close stale prior-art-scan raid entry"},{"id":"d241","brief":"mint broken-trace-defect raid entry"},{"id":"d242","brief":"mint narrow-grammar-timing raid note"}]}
+{"ts":"2026-08-16T18:18:53.185Z","op":"done","visit":"iterations/i15/cut-criteria@0","node":"d234","brief":"minted both new raid entries and closed the stale one"}
+{"ts":"2026-08-16T18:18:58.259Z","op":"done","visit":"iterations/i15/converge-pugh@0","node":"d241","brief":"all deferred gate follow-ups actioned"}
+{"ts":"2026-08-16T18:19:09.634Z","op":"done","visit":"iterations/i15/evaluate-set@0","node":"d235","brief":"converge-pugh computed a stable winner: cand-explicit-and-safe"}
+{"ts":"2026-08-16T18:19:14.649Z","op":"plan","visit":"iterations/i15/reverse-sensitivity@0","parent":null,"nodes":[{"id":"d243","brief":"review engine-computed perturbation hunt"},{"id":"d244","brief":"rule each swing-cell credible or not"},{"id":"d245","brief":"mint RAID tripwires for credible flips"}]}
