@@ -304,3 +304,4 @@
 {"ts":"2026-08-16T18:56:04.467Z","op":"done","visit":"iterations/i15/build-steps/build-query-evaluator@0","node":"d283","brief":"real implementation written, reusing loadTrace/noteOf"}
 {"ts":"2026-08-16T18:56:08.076Z","op":"done","visit":"iterations/i15/build-steps/build-query-evaluator@0","node":"d284","brief":"typecheck run"}
 {"ts":"2026-08-16T18:56:12.603Z","op":"done","visit":"iterations/i15/build-steps/build-query-evaluator@0","node":"d285","brief":"tests/query.test.ts 4/4 green"}
+{"ts":"2026-08-16T18:57:14.827Z","op":"plan","visit":"iterations/i15/build-steps/build-coupling-disposer@0","parent":null,"nodes":[{"id":"d287","brief":"implement rankCandidateCouplings for real (BM25)"},{"id":"d288","brief":"implement recordCouplingDisposition for real"},{"id":"d289","brief":"run tests/coupling-rank.test.ts scoped"},{"id":"d290","brief":"typecheck"},{"id":"d291","brief":"submit built"}]}
