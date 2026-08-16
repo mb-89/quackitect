@@ -53,3 +53,5 @@
 {"ts":"2026-08-16T16:16:43.018Z","op":"done","visit":"iterations/i15/draft-vision@0","node":"d49","brief":"found resident vision at vp-the-engine.md; reading it for the big_idea section"}
 {"ts":"2026-08-16T16:16:47.282Z","op":"update","visit":"iterations/i15/draft-vision@0","node":"d55","brief":"listing all value-props to find which i15 serves"}
 {"ts":"2026-08-16T16:16:51.079Z","op":"update","visit":"iterations/i15/draft-vision@0","node":"d56","brief":"reading remaining value-props to identify which i15 serves or bends"}
+{"ts":"2026-08-16T16:17:49.023Z","op":"done","visit":"iterations/i15/draft-vision@0","node":"d50","brief":"to_be_world drafted, inherited from vp-the-ledger with delta"}
+{"ts":"2026-08-16T16:17:55.138Z","op":"done","visit":"iterations/i15/draft-vision@0","node":"d51","brief":"goal_system was filled and submitted with draft-vision"}
