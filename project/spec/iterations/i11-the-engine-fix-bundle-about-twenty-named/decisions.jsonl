@@ -1,0 +1,2 @@
+{"ts":"2026-08-16T10:59:49.770Z","op":"plan","visit":"iterations/i11/gate-kickoff@0","parent":null,"nodes":[{"id":"d155","brief":"check i11's list against what i34 rewrote"},{"id":"d156","brief":"propose scope and change size at the kickoff"}]}
+{"ts":"2026-08-16T11:01:37.244Z","op":"done","visit":"iterations/i11/gate-kickoff@0","node":"d156","brief":"kickoff signed and blessed at minor"}
