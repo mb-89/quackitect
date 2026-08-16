@@ -140,3 +140,13 @@
 {"ts":"2026-08-16T17:06:51.303Z","op":"done","visit":"iterations/i15/identify-assumptions@0","node":"d122","brief":"closed via probe-assumptions submit: marked scheduled, needs build"}
 {"ts":"2026-08-16T17:06:55.337Z","op":"done","visit":"iterations/i15/gate-requirements@0","node":"d127","brief":"meth-gate-review read; now reading the register to review"}
 {"ts":"2026-08-16T17:09:42.484Z","op":"plan","visit":"iterations/i15/gate-requirements@0","parent":null,"nodes":[{"id":"d133","brief":"register reviewed"},{"id":"d134","brief":"writing round_0-2"}]}
+{"ts":"2026-08-16T17:13:55.107Z","op":"plan","visit":"iterations/i15/derive-criteria@0","parent":null,"nodes":[{"id":"d135","brief":"identify criterion pool (should+promoted could rows)"},{"id":"d136","brief":"flag compounding suspects"},{"id":"d137","brief":"walk pairwise comparisons"}]}
+{"ts":"2026-08-16T17:14:14.203Z","op":"done","visit":"iterations/i15/gate-requirements@0","node":"d128","brief":"gate-requirements signed: round_0_verify filled"}
+{"ts":"2026-08-16T17:14:17.559Z","op":"done","visit":"iterations/i15/gate-requirements@0","node":"d129","brief":"round_1_validate filled"}
+{"ts":"2026-08-16T17:14:24.544Z","op":"done","visit":"iterations/i15/gate-requirements@0","node":"d130","brief":"round_2_red_team filled"}
+{"ts":"2026-08-16T17:14:27.013Z","op":"done","visit":"iterations/i15/gate-requirements@0","node":"d131","brief":"raid_additions filled: 2 existing raid refs cited"}
+{"ts":"2026-08-16T17:14:30.325Z","op":"done","visit":"iterations/i15/gate-requirements@0","node":"d132","brief":"verdict filled: pass with overrides"}
+{"ts":"2026-08-16T17:14:34.210Z","op":"done","visit":"iterations/i15/gate-requirements@0","node":"d133","brief":"gate-requirements signed and blessed pass-with-overrides"}
+{"ts":"2026-08-16T17:14:36.148Z","op":"done","visit":"iterations/i15/gate-requirements@0","node":"d134","brief":"all four rounds written into gate-requirements form"}
+{"ts":"2026-08-16T17:16:35.011Z","op":"update","visit":"iterations/i15/derive-criteria@0","node":"d138","brief":"compounding pair 1/5 done, checking next pair"}
+{"ts":"2026-08-16T17:16:56.539Z","op":"update","visit":"iterations/i15/derive-criteria@0","node":"d139","brief":"trying answer on the should-side node instead of the must-side"}

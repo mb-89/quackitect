@@ -21,6 +21,7 @@ source_refs:
   - note-afb66f5e0dee
   - req-call-answers-in-one-second
 priority: must
+weighs_with: none
 ---
 
 ## Scenario

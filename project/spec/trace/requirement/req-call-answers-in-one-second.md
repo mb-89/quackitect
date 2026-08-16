@@ -24,6 +24,7 @@ source_refs:
   - uc-capture-a-stray step 3
   - uc-answer-a-question-with-tests ext 3a
 priority: should
+weighs_with: none
 weighs_against:
   - req-resume-needs-no-person >
 ---
