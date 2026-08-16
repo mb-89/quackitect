@@ -266,3 +266,9 @@
 {"ts":"2026-08-16T18:22:57.135Z","op":"update","visit":"iterations/i15/decompose-structure@0","node":"d251","brief":"wrote both new elements"}
 {"ts":"2026-08-16T18:23:03.595Z","op":"done","visit":"iterations/i15/decompose-structure@0","node":"d250","brief":"decompose-structure filled: 2 new elements, 3 functions allocated"}
 {"ts":"2026-08-16T18:23:11.097Z","op":"plan","visit":"iterations/i15/evaluate-architecture@0","parent":null,"nodes":[{"id":"d252","brief":"rule every quality scenario card"},{"id":"d253","brief":"flag fitness candidates for M7"}]}
+{"ts":"2026-08-16T18:25:06.808Z","op":"update","visit":"iterations/i15/evaluate-architecture@0","node":"d254","brief":"re-pulling fill form before resubmitting corrected walk syntax"}
+{"ts":"2026-08-16T18:25:29.514Z","op":"update","visit":"iterations/i15/evaluate-architecture@0","node":"d255","brief":"resubmitting walk field with bracketed req ids per the remedy"}
+{"ts":"2026-08-16T18:25:45.236Z","op":"update","visit":"iterations/i15/evaluate-architecture@0","node":"d256","brief":"reopened evaluate-architecture to re-earn the walk claim with correct syntax"}
+{"ts":"2026-08-16T18:25:48.050Z","op":"update","visit":"iterations/i15/evaluate-architecture@0","node":"d257","brief":"pulling to re-enter evaluate-architecture's fill state after reopen"}
+{"ts":"2026-08-16T18:26:01.934Z","op":"update","visit":"iterations/i15/evaluate-architecture@0","node":"d258","brief":"resubmitting walk with correct wiki-bracket syntax after reopen"}
+{"ts":"2026-08-16T18:26:25.534Z","op":"done","visit":"iterations/i15/evaluate-architecture@0","node":"d252","brief":"gate-architecture reviewed and blessed clean"}
