@@ -43,3 +43,4 @@
 {"ts":"2026-08-16T15:56:11.355Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d42","brief":"finding what ties change_size=major to this gate's own bless-weight"}
 {"ts":"2026-08-16T15:56:14.259Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d43","brief":"locating i15's compiled machine file to check gate-kickoff's priority"}
 {"ts":"2026-08-16T15:56:20.915Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d44","brief":"locating gate-kickoff's own state definition and authored priority"}
+{"ts":"2026-08-16T16:15:51.451Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d45","brief":"submitting gate-kickoff with pass-with-overrides bless"}
