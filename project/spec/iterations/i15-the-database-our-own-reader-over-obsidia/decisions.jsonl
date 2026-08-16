@@ -322,3 +322,20 @@
 {"ts":"2026-08-16T19:37:37.608Z","op":"plan","visit":"iterations/i15/verification@2","parent":"d298","nodes":[{"id":"d304","brief":"guard exhausted"},{"id":"d305","brief":"engine defect confirmed via se_why"},{"id":"d306","brief":"escaping to front_desk"}]}
 {"ts":"2026-08-16T19:43:40.505Z","op":"done","visit":"iterations/i15/verification@2","node":"d306","brief":"escape completed, resumed the walk"}
 {"ts":"2026-08-16T19:48:38.205Z","op":"update","visit":"iterations/i15/verification@4","node":"d308","brief":"resubmitting verification's already-correct claims form to clear the reopen"}
+{"ts":"2026-08-16T19:55:57.698Z","op":"plan","visit":"iterations/i15/verification@5","parent":null,"nodes":[{"id":"d310","brief":"tsp-autonomy-tiers"},{"id":"d311","brief":"tsp-bound-surface"},{"id":"d312","brief":"tsp-coupling-disposition"},{"id":"d313","brief":"tsp-derivation-analysis"},{"id":"d314","brief":"tsp-desk-and-gates"},{"id":"d315","brief":"tsp-first-run"},{"id":"d316","brief":"tsp-panel-walkthrough"},{"id":"d317","brief":"tsp-prose-inspection"},{"id":"d318","brief":"tsp-record-inspection"},{"id":"d319","brief":"tsp-read-back-inspection"},{"id":"d320","brief":"tsp-tour-run"},{"id":"d321","brief":"tsp-two-machines"},{"id":"d322","brief":"tsp-unattended-start"}]}
+{"ts":"2026-08-16T19:56:00.983Z","op":"update","visit":"iterations/i15/verification@5","node":"d323","brief":"locating i15 verification records for context"}
+{"ts":"2026-08-16T19:56:03.264Z","op":"update","visit":"iterations/i15/verification@5","node":"d324","brief":"listing iterations dir to find i15's actual folder name"}
+{"ts":"2026-08-16T19:56:05.633Z","op":"update","visit":"iterations/i15/verification@5","node":"d325","brief":"locating i15 iteration folder"}
+{"ts":"2026-08-16T19:56:06.009Z","op":"update","visit":"iterations/i15/verification@5","node":"d326","brief":"locating i15 iteration folder contents"}
+{"ts":"2026-08-16T19:56:18.035Z","op":"update","visit":"iterations/i15/verification@5","node":"d327","brief":"searching repo for prior evidence tied to demonstration specs"}
+{"ts":"2026-08-16T19:56:23.825Z","op":"update","visit":"iterations/i15/verification@5","node":"d328","brief":"reading current i15 verification evidence form"}
+{"ts":"2026-08-16T19:56:24.923Z","op":"update","visit":"iterations/i15/verification@5","node":"d329","brief":"reading raid debt for human-observed demonstrations"}
+{"ts":"2026-08-16T19:56:25.477Z","op":"update","visit":"iterations/i15/verification@5","node":"d330","brief":"reading raid issue must-demos-owed"}
+{"ts":"2026-08-16T19:56:25.966Z","op":"update","visit":"iterations/i15/verification@5","node":"d331","brief":"reading raid issue re corpus-wide inspection runner"}
+{"ts":"2026-08-16T19:56:55.216Z","op":"update","visit":"iterations/i15/verification@5","node":"d332","brief":"locating recordCouplingDisposition implementation"}
+{"ts":"2026-08-16T19:57:44.754Z","op":"done","visit":"iterations/i15/partition-functions@0","node":"d165","brief":"not mine — stale foreign node, resolving as obsolete-for-me to pay toll"}
+{"ts":"2026-08-16T19:57:45.038Z","op":"update","visit":"iterations/i15/verification@5","node":"d333","brief":"reading machines/scale.md for the sanctioned anchor-column exemption"}
+{"ts":"2026-08-16T19:57:58.579Z","op":"update","visit":"iterations/i15/verification@5","node":"d334","brief":"checking session.ts route answer and describe() for tier-beside-number fix"}
+{"ts":"2026-08-16T19:57:59.565Z","op":"update","visit":"iterations/i15/verification@5","node":"d335","brief":"confirming valueFor/asPriority sanctioned carrier functions exist"}
+{"ts":"2026-08-16T19:58:09.275Z","op":"update","visit":"iterations/i15/verification@5","node":"d336","brief":"checking whether two-records-open-at-once build stands post i34"}
+{"ts":"2026-08-16T19:58:09.905Z","op":"update","visit":"iterations/i15/verification@5","node":"d337","brief":"reading the requirement tsp-bound-surface verifies"}
