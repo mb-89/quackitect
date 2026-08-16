@@ -68,7 +68,8 @@ async function standingClaim(): Promise<{
   // not order against a date — that is a legacy shape, not the shape formDone
   // writes, and it is left alone rather than guessed at.
   const signedAt = "2026-08-07T10:00:00.000Z";
-  const ev = join(root, ".worktrees", id, "project", "spec", "iterations", id, "evidence", `${state.id}.md`);
+  // ONE TREE SINCE i34: a record's evidence stands under the root.
+  const ev = join(root, "project", "spec", "iterations", id, "evidence", `${state.id}.md`);
   mkdirSync(dirname(ev), { recursive: true });
   writeFileSync(
     ev,

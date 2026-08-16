@@ -223,7 +223,8 @@ test("a finished sub-machine does NOT paint its container while the container's 
 
   // Leave every claimful state signed on disk, the way a finished walk does.
   for (const s of view.decl.states.filter((x) => x.evidence_form.length > 0)) {
-    const ev = join(root, ".worktrees", id, "project", "spec", "iterations", id, "evidence", `${s.id}.md`);
+    // ONE TREE SINCE i34: a record's evidence stands under the root.
+    const ev = join(root, "project", "spec", "iterations", id, "evidence", `${s.id}.md`);
     mkdirSync(dirname(ev), { recursive: true });
     // Each template gets the cheapest content its checks accept: a choice
     // field wants its literal option with a reason, a chart wants two drawn

@@ -3327,6 +3327,15 @@ export class Session {
     });
   }
 
+  /** WHICH RECORD IS OPEN, or nothing. The minted_in stamp asks this: a trace
+   *  node written while a record is bound carries that record's id.
+   *
+   *  IT USED TO BE READ OFF A PATH — the `<id>` in `.worktrees/<id>` — which
+   *  i34 removes. The walk has always known the answer; nothing was asking. */
+  boundRecordId(): string | undefined {
+    return this.bound?.id;
+  }
+
   /** Where the walk is, machine-wise: ["main"] or ["main", "boot", …]. */
   breadcrumb(): string[] {
     return [this.machine.id, ...this.subs.map((s) => s.decl.id)];

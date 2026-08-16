@@ -346,3 +346,9 @@
 {"ts":"2026-08-16T08:01:50.457Z","op":"done","visit":"iterations/i34/build-steps@0","node":"d354","brief":"a record is read from one path and the git retrieval half is gone"}
 {"ts":"2026-08-16T08:02:23.383Z","op":"update","visit":"iterations/i34/build-steps/level-records@0","node":"d387","brief":"one case left: the pin"}
 {"ts":"2026-08-16T08:02:35.705Z","op":"update","visit":"iterations/i34/build-steps/level-records@0","node":"d388","brief":"the pin is read from the root like every other record file"}
+{"ts":"2026-08-16T08:06:12.982Z","op":"update","visit":"iterations/i34/build-steps/cut-worktrees-from-seed@0","node":"d389","brief":"minted_in is scraped from a worktree path and needs a new source"}
+{"ts":"2026-08-16T08:06:51.639Z","op":"update","visit":"iterations/i34/build-steps/cut-worktrees-from-seed@0","node":"d390","brief":"minted_in asks the walk which record is bound"}
+{"ts":"2026-08-16T08:06:59.047Z","op":"update","visit":"iterations/i34/build-steps/cut-worktrees-from-seed@0","node":"d391","brief":"the session answers which record is bound"}
+{"ts":"2026-08-16T08:07:02.978Z","op":"done","visit":"iterations/i34/build-steps@0","node":"d355","brief":"a close stamps the record and leaves its folder standing"}
+{"ts":"2026-08-16T08:07:31.398Z","op":"update","visit":"iterations/i34/build-steps/cut-worktrees-from-seed@0","node":"d392","brief":"the claim cases write evidence to the one tree"}
+{"ts":"2026-08-16T08:07:49.372Z","op":"update","visit":"iterations/i34/build-steps/cut-worktrees-from-seed@0","node":"d393","brief":"five cases repointed; the expedition ones keep their worktrees"}

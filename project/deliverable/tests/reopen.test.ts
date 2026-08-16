@@ -53,14 +53,15 @@ test("a matrix that moves under a standing claim reopens it WITHOUT touching its
   // A STANDING CLAIM, written by an earlier session — stamped on disk, and
   // absent from this instance's history. That is the normal case after any
   // restart, and it is the case the reopen used to miss entirely.
-  const ev = join(root, ".worktrees", id, "project", "spec", "iterations", id, "evidence", `${step.id}.md`);
+  // ONE TREE SINCE i34: a record's evidence stands under the root.
+  const ev = join(root, "project", "spec", "iterations", id, "evidence", `${step.id}.md`);
   mkdirSync(dirname(ev), { recursive: true });
   writeFileSync(ev, `---\nsigned_off: an earlier session\nauthors: human\n---\n\nwhat was claimed the first time\n`, "utf8");
   assert.ok(session.recordDone(decl).includes(step.id), "green from the record");
 
   // The matrix moves under it: the pinned ledger now records a demand the
   // live matrix no longer makes.
-  const pinAbs = join(root, ".worktrees", id, itPinRel(id));
+  const pinAbs = join(root, itPinRel(id));
   const pin = JSON.parse(readFileSync(pinAbs, "utf8")) as { demands: Record<string, { evidence: string }>; rigor_matrix_hash: string };
   for (const d of Object.values(pin.demands)) d.evidence = "what it used to ask";
   pin.rigor_matrix_hash = "0000stalehash";
@@ -182,7 +183,8 @@ test("a reopened claim is OWED again, so the submit that clears it is reachable"
 
   // A COMPLETE, SIGNED CLAIM — every field carries content. This is the case
   // that deadlocked: an EMPTY form was always owed, so it never showed.
-  const ev = join(root, ".worktrees", id, "project", "spec", "iterations", id, "evidence", `${step.id}.md`);
+  // ONE TREE SINCE i34: a record's evidence stands under the root.
+  const ev = join(root, "project", "spec", "iterations", id, "evidence", `${step.id}.md`);
   mkdirSync(dirname(ev), { recursive: true });
   const filled = step.evidence_form.map((f) => `## ${f.name}\n\nwhat was claimed the first time\n`).join("\n");
   writeFileSync(ev, `---\nsigned_off: 2026-08-13T09:00:00.000Z\nauthors: human\n---\n\n${filled}`, "utf8");

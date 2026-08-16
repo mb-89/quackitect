@@ -517,8 +517,14 @@ export function coreTools(
   reading?: ReadingHook,
   doors: () => Record<string, unknown>[] = () => [],
   mirror?: () => MirrorState,
+  /** WHICH RECORD IS BOUND, for the minted_in stamp. It used to be scraped
+   *  off the write's root as a `.worktrees/<id>` segment, and i34 removes
+   *  worktrees — so the stamp had to be asked of the walk rather than of a
+   *  path. Defaults to nothing, which stamps nothing, exactly as writing
+   *  outside a record always did. */
+  boundRecord: () => string | undefined = () => undefined,
 ): ToolDef[] {
-  const model = new ModelFileSystem(rootOf);
+  const model = new ModelFileSystem(rootOf, boundRecord);
   return [
     {
       name: "se_file_read",
@@ -1616,6 +1622,7 @@ export function buildServer(
       },
       () => session.doors(),
       () => ({ session, root, lastPacket: undefined, mode: "manual" }),
+      () => session.boundRecordId(),
     ),
   ];
   // WIRED HERE, NOT INSIDE coreTools. searchHelp needs the FULL assembled
