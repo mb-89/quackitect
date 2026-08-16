@@ -321,3 +321,4 @@
 {"ts":"2026-08-16T19:35:59.975Z","op":"update","visit":"iterations/i15/verification@2","node":"d303","brief":"se_why shows both successors unblocked upstream; trying gate-implementation route"}
 {"ts":"2026-08-16T19:37:37.608Z","op":"plan","visit":"iterations/i15/verification@2","parent":"d298","nodes":[{"id":"d304","brief":"guard exhausted"},{"id":"d305","brief":"engine defect confirmed via se_why"},{"id":"d306","brief":"escaping to front_desk"}]}
 {"ts":"2026-08-16T19:43:40.505Z","op":"done","visit":"iterations/i15/verification@2","node":"d306","brief":"escape completed, resumed the walk"}
+{"ts":"2026-08-16T19:48:38.205Z","op":"update","visit":"iterations/i15/verification@4","node":"d308","brief":"resubmitting verification's already-correct claims form to clear the reopen"}
