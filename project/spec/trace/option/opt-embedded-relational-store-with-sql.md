@@ -4,6 +4,7 @@ id: opt-embedded-relational-store-with-sql
 type: "[[option]]"
 statement: load nodes, edges, states and notes into an embedded relational store and answer the query as SQL over real tables
 cluster: cluster-the-query
+question: how does answer-a-structured-query evaluate a query against the corpus
 found_by: prior-art
 source: "the relational query model generally (SQL SELECT/WHERE/named columns); embeddable engines such as SQLite are the common implementation"
 ---

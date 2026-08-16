@@ -4,6 +4,7 @@ id: opt-block-candidates-before-individual-review
 type: "[[option]]"
 statement: group near-duplicate candidates into blocks before disposition, so a person judges one block instead of every member individually
 cluster: cluster-the-disposition
+question: how does a ranked candidate coupling get its disposition
 found_by: contradiction
 source: "TRIZ separation IN LEVEL, dissolving “rank widely to avoid missing a real coupling” vs “keep the list short enough for a person to review” — generalises “blocking” from Fellegi & Sunter-descended record linkage practice (en.wikipedia.org/wiki/Record_linkage, § Blocking)"
 ---

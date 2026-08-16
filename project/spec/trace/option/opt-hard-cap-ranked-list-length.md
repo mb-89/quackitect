@@ -4,6 +4,7 @@ id: opt-hard-cap-ranked-list-length
 type: "[[option]]"
 statement: cap the number of candidates rank-candidate-couplings ever returns at a fixed N, dropping the rest rather than grouping them
 cluster: cluster-the-disposition
+question: how does a ranked candidate coupling get its disposition
 found_by: heuristic
 source: "meth-heuristics-catalog: \"Make the common case cheap; make the rare case possible.\""
 ---

@@ -4,6 +4,7 @@ id: opt-obsidian-cli-as-external-evaluator
 type: "[[option]]"
 statement: shell out to the Obsidian application itself (its CLI) to evaluate the query, instead of an evaluator this engine owns
 cluster: cluster-the-query
+question: how does answer-a-structured-query evaluate a query against the corpus
 found_by: transform
 source: "SCAMPER Substitute, held against \"who evaluates the query\"; already considered and rejected in v1's adr-query-in-engine (spec/decisions/adr-query-in-engine.md at ref main): \"Datum: the Obsidian CLI as an external evaluator. It loses on the trust chain and the one-binary law.\""
 ---

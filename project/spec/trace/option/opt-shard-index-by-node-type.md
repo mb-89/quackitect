@@ -4,6 +4,7 @@ id: opt-shard-index-by-node-type
 type: "[[option]]"
 statement: split the query index into one shard per node type, each with its own fixed field vocabulary, instead of one flat store over every kind
 cluster: cluster-the-query
+question: how does answer-a-structured-query evaluate a query against the corpus
 found_by: analogy
 source: "library card catalogues — MARC's fixed tag/subfield vocabulary per bibliographic type, one drawer per subject"
 ---

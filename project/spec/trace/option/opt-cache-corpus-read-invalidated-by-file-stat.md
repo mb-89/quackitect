@@ -4,6 +4,7 @@ id: opt-cache-corpus-read-invalidated-by-file-stat
 type: "[[option]]"
 statement: cache the loaded corpus for the query, and invalidate the cache only when a cheap file-stat check shows a write actually happened
 cluster: cluster-the-query
+question: how does answer-a-structured-query evaluate a query against the corpus
 found_by: contradiction
 source: "TRIZ separation IN TIME, dissolving “the query answers fast” vs “the query answer is reliably current” — the same mechanism already runs in this engine's own corpus loader, project/deliverable/engine/trace.ts loadTrace() and corpusVersion(), lines 562-588 (passEpoch()/corpusStamp())"
 ---

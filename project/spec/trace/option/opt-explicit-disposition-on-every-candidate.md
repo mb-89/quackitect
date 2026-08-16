@@ -4,6 +4,7 @@ id: opt-explicit-disposition-on-every-candidate
 type: "[[option]]"
 statement: surface every ranked candidate to a person and require an explicit verdict on each one before any is recorded
 cluster: cluster-the-disposition
+question: how does a ranked candidate coupling get its disposition
 found_by: prior-art
 source: "this engine's own judge-a-claim function (fn-run-a-governed-walk.judge-a-claim, cluster-the-walk), which already builds a form, checks what comes back, and carries a person's verdict on it — our own predecessor mechanism, one cluster over"
 ---

@@ -4,6 +4,7 @@ id: opt-prepopulate-pending-disposition-rows
 type: "[[option]]"
 statement: write one disposition row per ranked candidate up front, stamped pending, so an undisposed candidate is a visibly incomplete record rather than an absent one
 cluster: cluster-the-disposition
+question: how does a ranked candidate coupling get its disposition
 found_by: heuristic
 source: "meth-heuristics-catalog: \"Make the illegal unrepresentable, not merely checked.\" and \"The default should be the safe thing\" — both bite the same mechanism"
 ---

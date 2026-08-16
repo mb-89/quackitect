@@ -1,5 +1,7 @@
 ---
 form: build_chart
+by: agent
+signed_off: 2026-08-16T17:59:34.501Z
 authors: agent
 files:
 ---
@@ -12,13 +14,13 @@ All seven M4 finders submitted: prior-art, contradiction, analogy, without, heur
 
 ## chart
 
-| candidate | cluster-the-query | cluster-the-disposition | story |
+| candidate | name | statement | picks |
 | --- | --- | --- | --- |
-| cand-continue-v1s-shape | opt-declarative-view-spec-evaluated-in-process | opt-probabilistic-threshold-classification | cheapest: keep v1's YAML view-spec shape, add a threshold band so only borderline candidates reach a person |
-| cand-explicit-and-safe | opt-declarative-view-spec-evaluated-in-process | opt-prepopulate-pending-disposition-rows | same query shape, but every candidate gets a disposition row up front — no threshold silently disposes anything |
-| cand-fast-path-plus-blocking | opt-cache-corpus-read-invalidated-by-file-stat | opt-block-candidates-before-individual-review | optimise for scale on both rows: a stat-invalidated cache for reads, grouped review for a wide candidate pool |
-| cand-relational-plus-ensemble | opt-embedded-relational-store-with-sql | opt-ensemble-ranking-agreement-required | heaviest build: a real relational store, two independent rankers required to agree before a candidate surfaces |
-| cand-narrow-grammar-plus-explicit | opt-closed-regex-grammar-for-filter-expressions | opt-explicit-disposition-on-every-candidate | narrowest scope on both rows: the probed regex grammar, and the judge-a-claim-shaped explicit review with no auto-classification |
+| cand-continue-v1s-shape | Continue v1's shape | cheapest: keep v1's YAML view-spec shape, add a threshold band so only borderline candidates reach a person | [[opt-declarative-view-spec-evaluated-in-process]] · [[opt-probabilistic-threshold-classification]] |
+| cand-explicit-and-safe | Explicit and safe | same query shape, but every candidate gets a disposition row up front, so no threshold silently disposes anything | [[opt-declarative-view-spec-evaluated-in-process]] · [[opt-prepopulate-pending-disposition-rows]] |
+| cand-fast-path-plus-blocking | Fast path plus blocking | optimise for scale on both rows: a stat-invalidated cache for reads, grouped review for a wide candidate pool | [[opt-cache-corpus-read-invalidated-by-file-stat]] · [[opt-block-candidates-before-individual-review]] |
+| cand-relational-plus-ensemble | Relational plus ensemble | heaviest build: a real relational store, two independent rankers required to agree before a candidate surfaces | [[opt-embedded-relational-store-with-sql]] · [[opt-ensemble-ranking-agreement-required]] |
+| cand-narrow-grammar-plus-explicit | Narrow grammar plus explicit | narrowest scope on both rows: the probed regex grammar, and the judge-a-claim-shaped explicit review with no auto-classification | [[opt-closed-regex-grammar-for-filter-expressions]] · [[opt-explicit-disposition-on-every-candidate]] |
 
 ## why_these
 

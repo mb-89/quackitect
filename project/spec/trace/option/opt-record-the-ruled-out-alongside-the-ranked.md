@@ -4,6 +4,7 @@ id: opt-record-the-ruled-out-alongside-the-ranked
 type: "[[option]]"
 statement: record why each non-chosen candidate was excluded, not only the disposition given to the top-ranked one
 cluster: cluster-the-disposition
+question: how does a ranked candidate coupling get its disposition
 found_by: analogy
 source: "differential diagnosis in clinical medicine — a ranked list of candidate conditions, where the clinician records why each excluded candidate was ruled out, not only the working diagnosis"
 ---

@@ -4,6 +4,7 @@ id: opt-declarative-view-spec-evaluated-in-process
 type: "[[option]]"
 statement: store the query as a declarative YAML view spec (filter + field list), evaluated against the loaded corpus in-process
 cluster: cluster-the-query
+question: how does answer-a-structured-query evaluate a query against the corpus
 found_by: prior-art
 source: "Obsidian Bases, core plugin (help.obsidian.md/bases; confirmed via the Aug 2026 Obsidian changelog: formula editor, sort filters, table views with columns); v1's own 25 harvested .base files at ref main, e.g. spec/queries/requirements.base (filters.and, views.sort, views.groupBy)"
 ---

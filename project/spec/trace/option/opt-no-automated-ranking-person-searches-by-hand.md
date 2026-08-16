@@ -4,6 +4,7 @@ id: opt-no-automated-ranking-person-searches-by-hand
 type: "[[option]]"
 statement: build nothing new; a person or agent keeps finding candidate couplings by hand with existing search tools, the way this session's own defect chase just did
 cluster: cluster-the-disposition
+question: how does a ranked candidate coupling get its disposition
 found_by: without
 source: "meth-trimming — the null option, checked against how this exact session found related nodes before any ranking function existed"
 ---

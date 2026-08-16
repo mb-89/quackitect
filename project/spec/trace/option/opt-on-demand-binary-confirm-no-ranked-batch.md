@@ -4,6 +4,7 @@ id: opt-on-demand-binary-confirm-no-ranked-batch
 type: "[[option]]"
 statement: instead of a ranked batch handed to a person, the person names one candidate at a time and the system answers coupled or not against a fixed threshold
 cluster: cluster-the-disposition
+question: how does a ranked candidate coupling get its disposition
 found_by: transform
 source: "SCAMPER Reverse, held against the rank-then-review direction"
 ---

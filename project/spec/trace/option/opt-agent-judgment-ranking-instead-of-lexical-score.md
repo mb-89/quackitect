@@ -4,6 +4,7 @@ id: opt-agent-judgment-ranking-instead-of-lexical-score
 type: "[[option]]"
 statement: rank candidates by asking an agent to judge resemblance to the change description, instead of a lexical score like BM25
 cluster: cluster-the-disposition
+question: how does a ranked candidate coupling get its disposition
 found_by: transform
 source: "SCAMPER Substitute, held against \"what scores a candidate\""
 ---

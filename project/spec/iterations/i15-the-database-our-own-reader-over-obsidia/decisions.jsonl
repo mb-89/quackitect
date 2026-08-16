@@ -225,3 +225,15 @@
 {"ts":"2026-08-16T17:55:33.337Z","op":"done","visit":"iterations/i15/enumerate-space/find_by_probing@0","node":"d210","brief":"probe run and confirmed via se_run, minted the closed-grammar option"}
 {"ts":"2026-08-16T17:55:58.124Z","op":"done","visit":"iterations/i15/enumerate-space/find_by_probing@0","node":"d212","brief":"find_by_probing form filled and submitted"}
 {"ts":"2026-08-16T17:56:40.403Z","op":"plan","visit":"iterations/i15/enumerate-space/build_chart@0","parent":null,"nodes":[{"id":"d213","brief":"draw shortlisted candidates across the derived chart"},{"id":"d214","brief":"prune incompatible cells loudly"},{"id":"d215","brief":"submit build_chart"}]}
+{"ts":"2026-08-16T17:59:10.341Z","op":"update","visit":"iterations/i15/enumerate-space/build_chart@0","node":"d216","brief":"wired all 24 options into the question-row system the chart reads"}
+{"ts":"2026-08-16T17:59:34.057Z","op":"update","visit":"iterations/i15/enumerate-space/build_chart@0","node":"d217","brief":"rebuilt chart table with correct id/name/statement/picks columns"}
+{"ts":"2026-08-16T17:59:42.098Z","op":"update","visit":"iterations/i15/run-candidates@0","node":"d218","brief":"chart submitted and signed, checking candidate-seed remedy"}
+{"ts":"2026-08-16T17:59:50.448Z","op":"update","visit":"iterations/i15/run-candidates@0","node":"d219","brief":"following remedy: walk stopped at cut-criteria, pulling again"}
+{"ts":"2026-08-16T18:00:44.492Z","op":"update","visit":"iterations/i15/run-candidates@0","node":"d220","brief":"retrying pull once more after chart submit before investigating seeding"}
+{"ts":"2026-08-16T18:02:40.032Z","op":"update","visit":"iterations/i15/run-candidates@0","node":"d221","brief":"recorded build_chart's missing machines/candidates.md derivation as a note"}
+{"ts":"2026-08-16T18:02:49.923Z","op":"done","visit":"iterations/i15/enumerate-space/build_chart@0","node":"d213","brief":"authored machines/candidates.md with the five drawn candidates"}
+{"ts":"2026-08-16T18:02:52.623Z","op":"done","visit":"iterations/i15/enumerate-space/build_chart@0","node":"d215","brief":"retesting run-candidates after authoring machines/candidates.md"}
+{"ts":"2026-08-16T18:03:27.867Z","op":"plan","visit":"iterations/i15/run-candidates/cand-continue-v1s-shape@0","parent":null,"nodes":[{"id":"d222","brief":"compose cand-continue-v1s-shape"},{"id":"d223","brief":"compose cand-explicit-and-safe"},{"id":"d224","brief":"compose cand-fast-path-plus-blocking"},{"id":"d225","brief":"compose cand-relational-plus-ensemble"},{"id":"d226","brief":"compose cand-narrow-grammar-plus-explicit"}]}
+{"ts":"2026-08-16T18:03:30.602Z","op":"done","visit":"iterations/i15/run-candidates/cand-continue-v1s-shape@0","node":"d222","brief":"cand-continue-v1s-shape composed and submitted"}
+{"ts":"2026-08-16T18:03:34.288Z","op":"update","visit":"iterations/i15/run-candidates/cand-continue-v1s-shape@0","node":"d227","brief":"adding required current_situation/follow_up, resubmitting"}
+{"ts":"2026-08-16T18:03:47.165Z","op":"update","visit":"iterations/i15/run-candidates/cand-explicit-and-safe@0","node":"d228","brief":"wrote cand-explicit-and-safe's four sections"}

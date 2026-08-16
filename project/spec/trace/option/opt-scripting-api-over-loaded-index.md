@@ -4,6 +4,7 @@ id: opt-scripting-api-over-loaded-index
 type: "[[option]]"
 statement: expose the loaded corpus as a programmatic API (filter/map/groupBy methods) instead of a declarative query syntax, and answer by running a short script
 cluster: cluster-the-query
+question: how does answer-a-structured-query evaluate a query against the corpus
 found_by: prior-art
 source: "Obsidian Dataview's DataviewJS mode (github.com/blacksmithgu/obsidian-dataview README: \"dv.pages(...).where(...).groupBy(...)\")"
 ---

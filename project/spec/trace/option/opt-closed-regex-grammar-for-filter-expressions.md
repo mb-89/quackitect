@@ -4,6 +4,7 @@ id: opt-closed-regex-grammar-for-filter-expressions
 type: "[[option]]"
 statement: match each filter expression against one closed regex (field == "value"), never a general boolean expression parser, and refuse whatever the regex does not match
 cluster: cluster-the-query
+question: how does answer-a-structured-query evaluate a query against the corpus
 found_by: probe
 source: "a throwaway node -e spike run this session (se_run, exit 0, 60ms wall time) — not committed anywhere, per the throwaway law"
 ---
