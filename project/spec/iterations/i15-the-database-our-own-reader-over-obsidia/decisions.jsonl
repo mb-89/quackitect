@@ -27,3 +27,19 @@
 {"ts":"2026-08-16T15:50:37.053Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d32","brief":"looking for the query-execution half beyond bases.ts's editor functions"}
 {"ts":"2026-08-16T15:50:40.494Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d33","brief":"reading engine/tables.ts, the query-execution engine"}
 {"ts":"2026-08-16T15:51:12.109Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d34","brief":"checking whether an agent-callable query lane verb already exists"}
+{"ts":"2026-08-16T15:53:07.724Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d35","brief":"minting the v1-ref assumption as a raid register entry"}
+{"ts":"2026-08-16T15:53:14.012Z","op":"done","visit":"iterations/i15/gate-kickoff@0","node":"d29","brief":"minted both raid entries — ref assumption and prior-art-scan risk"}
+{"ts":"2026-08-16T15:53:19.571Z","op":"done","visit":"iterations/i15/gate-kickoff@0","node":"d26","brief":"confirmed prior art: tables.ts/bases.ts already do most of the reader; no MCP verb yet"}
+{"ts":"2026-08-16T15:53:22.381Z","op":"done","visit":"iterations/i15/gate-kickoff@0","node":"d25","brief":"i15 only shares files with i13 via a must-not-race note"}
+{"ts":"2026-08-16T15:53:26.318Z","op":"done","visit":"iterations/i15/gate-kickoff@0","node":"d27","brief":"no se_query verb exists; web search tools unavailable here"}
+{"ts":"2026-08-16T15:54:51.835Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d36","brief":"reformatted every field to its exact template pattern, resubmitting"}
+{"ts":"2026-08-16T15:54:58.497Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d37","brief":"adding the required Probe section to the assumption entry"}
+{"ts":"2026-08-16T15:55:05.070Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d38","brief":"adding the required Probe section to the assumption entry"}
+{"ts":"2026-08-16T15:55:07.903Z","op":"done","visit":"iterations/i15/gate-kickoff@0","node":"d28","brief":"pulled_in/left_out/change_size were drafted and saved earlier"}
+{"ts":"2026-08-16T15:55:16.299Z","op":"done","visit":"iterations/i15/gate-kickoff@0","node":"d30","brief":"gate-kickoff form signed; self-blessing per the unattended-run autonomy dial"}
+{"ts":"2026-08-16T15:55:40.222Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d39","brief":"resuming per stop-hook: only gate-implementation is the owner's at this dial"}
+{"ts":"2026-08-16T15:56:03.990Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d40","brief":"checking the project's own change-size scale definitions before re-judging"}
+{"ts":"2026-08-16T15:56:05.862Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d41","brief":"reading the change-size ladder definitions"}
+{"ts":"2026-08-16T15:56:11.355Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d42","brief":"finding what ties change_size=major to this gate's own bless-weight"}
+{"ts":"2026-08-16T15:56:14.259Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d43","brief":"locating i15's compiled machine file to check gate-kickoff's priority"}
+{"ts":"2026-08-16T15:56:20.915Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d44","brief":"locating gate-kickoff's own state definition and authored priority"}
