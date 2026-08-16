@@ -68,7 +68,7 @@ THE HOST CLONED THE REPOSITORY, then ran one command:
 THE CLONE COMES FIRST because this file lives inside the repository. Nothing
 can run it before a clone exists.
 
-IT RAN SEVEN STEPS. Each one prints `<step>: <what happened>` and exits
+IT RAN SIX STEPS. Each one prints `<step>: <what happened>` and exits
 non-zero naming itself if it fails.
 
 | step | what it did |
@@ -77,9 +77,13 @@ non-zero naming itself if it fails.
 | install | installed the project and nothing else |
 | start | spawned the lane and RETURNED |
 | wait | polled the mirror until it answered |
-| fetch | fetched refs, and checked your iteration's branch is among them |
-| adopt | CLAIMED the iteration for this machine |
+| fetch | fetched refs, so this clone has trunk and every record on it |
 | launch | placed the cage, then started you with the briefing |
+
+THERE WAS A SEVENTH, `adopt`, AND i34 DELETED IT. It claimed the iteration for
+this machine, so two machines could not walk one record. The whole claim
+system is retired: a record is a folder on trunk, a clone that has trunk has
+every record, and one agent works one clone.
 
 YOU DO NOT RE-RUN ANY OF THIS. It already happened. If you are reading this,
 the lane is up and the iteration is yours.
@@ -140,27 +144,21 @@ THE PIN IS IN `package.json` under `engines.node`, and the verify step reads
 it rather than carrying a copy. A syntax error deep in a spawned script almost
 always means the runtime is below the pin.
 
-### The claim did not land
+### Another machine may be walking the same record
 
-WORK STARTS ANYWAY. If the remote is unreachable, the iteration list comes
-from local refs and the walk enters without a claim, recording that the claim
-did not land.
+NOTHING STOPS IT, AND NOTHING IS MEANT TO. There is no claim, no lock and no
+holder to name. i34 retired the whole mechanism on the owner's ruling: "it's
+just two agents on two different clones."
 
-DESYNC IS ACCEPTED, not prevented. Two machines can hold the same iteration
-if one of them was offline when it started. That is a known cost, ruled on
-rather than overlooked.
+WHAT STANDS INSTEAD IS AN ASSUMPTION WITH A TRIGGER,
+[[raid-asm-only-one-agent-works-a-clone-at-a-time]]. Its trigger is the first
+time two agents are asked to work the same checkout.
 
-### A claim is held by another machine
+SO THE DIVISION IS THE PERSON'S. If you were handed a record, it is yours
+because somebody said so, not because you took it.
 
-THE `adopt` STEP REFUSES AND NAMES THE HOLDER. You will not be started at all,
-which is the point — two machines walking one iteration is worse than none.
-
-IT STAYS HELD. A claim does not expire and no timer takes it away — a machine
-keeps its iteration however long it sits idle (owner ruling 2026-08-15,
-[[raid-dec-a-claim-ends-only-when-a-person-releases-it]]).
-
-SO DO NOT WAIT FOR IT TO CLEAR. Take a different iteration, or leave a note
-saying which one is blocked and by whom.
+IF YOU SUSPECT A SECOND MACHINE IS ON YOUR RECORD, leave a note saying which
+record and why you think so. Do not try to arbitrate it.
 
 ## What you must not do
 
