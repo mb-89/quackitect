@@ -10,6 +10,7 @@ verifies:
   - "req-archive-read-only"
   - "req-archive-releases-worktrees"
   - "req-archive-shows-it-as-it-closed"
+  - "req-a-closed-records-folder-stays-on-trunk"
 files:
   - "tests/archive.test.ts"
   - "tests/container.test.ts"

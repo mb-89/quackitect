@@ -10,7 +10,7 @@ status: open
 impact: The credit is written under one identity and looked up under another. Every reload then re-owes the whole reading exactly as today, and the fix ships looking correct while changing nothing.
 breaks_how_badly: crippling
 how_likely: plausible
-probe: "unprobed, deliberately. The check needs an se_reload, and reloading mid-walk would disturb a bound record to answer a question that is not yet blocking. It runs before the credit's storage shape is chosen, inside this iteration."
+probe: "holds by inspection, probed 2026-08-14 — the shim holds the harness connection and never restarts, and it respawns the engine child with no env override, so SE_SESSION passes through verbatim. RESTORED 2026-08-16 from ref 5c9f850f after a truncation; the value standing on disk beforehand was an older unprobed text, cut mid-sentence, and the two disagreed in substance rather than only in length."
 probed: "2026-08-13"
 source_refs:
   - req-reading-credit-survives-a-reload

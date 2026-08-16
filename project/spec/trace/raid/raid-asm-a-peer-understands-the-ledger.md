@@ -8,7 +8,7 @@ owner: the driving agent
 trigger: at the first entry attempt by a machine whose engine predates a ledger word
 status: open
 probe: "HOLDS for the property that matters, probed 2026-08-13 against the real parser. A ledger entry carrying an unknown word (handed_back, meaning the claim was given up) was written to a bare origin and read by a clone. The parser skipped the word and reported the claim as standing; a different machine entering was REFUSED, naming the holder. So an unknown word fails toward refusing rather than granting, and no double-claim is possible through this door. WHAT THE PROBE ALSO SHOWED: that direction is wrong in the other sense - a record genuinely handed back reads as held, so real work reads as unavailable. Safe against collision, lossy against availability."
-probed: 2026-08-13
+probed: "2026-08-13"
 impact: A peer silently ignores a word it does not know. The terminal done state reads as absent, and the peer claims a record that shipped - which is the exact failure the done state was added to prevent.
 breaks_how_badly: crippling
 how_likely: plausible

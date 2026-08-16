@@ -19,6 +19,7 @@ verifies:
   - "req-blessed-column-compiles-pinned"
   - "req-a-shipped-record-is-never-reclaimed"
   - "req-a-records-dependency-is-declared"
+  - "req-a-records-own-status-decides-whether-it-is-open"
 files:
   - "tests/iterations.test.ts"
   - "tests/container.test.ts"

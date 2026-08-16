@@ -8,7 +8,7 @@ verify_method: test
 breaks_if_removed: The ledger shows finished work as a live holding forever, so a peer asking what is free cannot tell work in progress from work that is over.
 breaks_how_badly: crippling
 refines:
-  - uc-claim-an-iteration
+  - uc-close-a-record
 source_refs:
   - uc-close-a-record
   - "owner ruling 2026-08-13: there is not going to be another i8"

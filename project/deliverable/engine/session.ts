@@ -1664,6 +1664,30 @@ export class Session {
         source: "engine/session.ts claim-guard",
       });
     }
+    // A COMPLETION THAT WOULD OPEN SEVERAL ALTERNATIVES CHOOSES NONE OF THEM
+    // (owner ruling 2026-08-16, req-a-pull-carrying-no-choice-enters-no-iteration).
+    //
+    // WHAT WENT WRONG WITHOUT IT. completeState fires every alternative edge
+    // at once and then takes `inst.active[0]` as the new position. So a state
+    // with several open doors did not offer them — it walked through the first
+    // one, and "first" meant whatever order the edges were built in.
+    //
+    // IT COST FIVE ENTRIES INTO THE WRONG ITERATION ON ONE DAY. Each was a
+    // bare pull after a dropped connection. Entering BINDS the record and
+    // stamps it started, so a connection failure was starting work nobody
+    // chose, and nothing recorded that nobody chose it.
+    //
+    // `only` IS THE CHOICE. The choose path passes the named target through,
+    // so a chosen door completes exactly as before. What is refused is the
+    // completion that names none.
+    //
+    // STANDING STILL IS THE ANSWER, not a refusal. The walk stays where it is
+    // and the pull reports the doors, which is what an offer IS here — there
+    // is no `choose` instruction and there never was.
+    //
+    // ONE ALTERNATIVE IS NOT A CHOICE. A lone alternative edge is how a return
+    // and a single-visit machine are drawn, and both must keep walking through.
+    if (only === undefined && outcome === "filled" && decl.edges.filter((e) => e.role === "alternative").length > 1) return;
     const snap = {
       active: inst.active === undefined ? undefined : [...inst.active],
       fired: inst.fired === undefined ? undefined : [...inst.fired],
@@ -1805,7 +1829,7 @@ export class Session {
    *    own start, not on the state;
    *  - reaching a submachine's END and advancing pops back out and follows
    *    the parent state's edges. One tick, two moves. */
-  private expandNode(q: string): RouteNode | undefined {
+  private expandNode(q: string, objective?: string): RouteNode | undefined {
     const cut = q.lastIndexOf("/");
     const prefix = cut < 0 ? "" : q.slice(0, cut);
     const id = cut < 0 ? q : q.slice(cut + 1);
@@ -1819,9 +1843,40 @@ export class Session {
     // not, so popping out of one container landed ON the next container and
     // the route stepped straight over every state inside it. Five compose
     // states sat outside the search and the walk reported no path to them.
+    // A ROUTE NEVER PASSES THROUGH A RECORD WHEN A PLAIN DOOR EXISTS
+    // (owner report 2026-08-16, req-a-pull-carrying-no-choice-enters-no-iteration).
+    //
+    // WHY THIS IS THE ROOT AND THE EDGE ORDER WAS NOT. The container's own
+    // guidance promised an offer and the offer was real, but the ROUTER never
+    // reads an offer. It searches, and a record was just another node on the
+    // way. So a target OUTSIDE the container — the front desk, most often —
+    // drew its shortest path straight through whichever record came first,
+    // and walking that path ENTERED it, bound it, and stamped it started.
+    //
+    // THE OWNER SAW BOTH HALVES. Five entries into i4 after dropped sockets,
+    // and separately: aiming at the intended iteration "drew a route THROUGH
+    // two more — starting those as well".
+    //
+    // A RECORD IS WORK, NOT A CORRIDOR. Passing through one is never incidental
+    // to going somewhere else, because entering it takes it up.
+    //
+    // THE GUARD IS CONSERVATIVE ON PURPOSE. It only withholds a record when the
+    // same state also offers a door that is NOT a record, so no container can
+    // be stranded by it — where a record is the only way on, the route still
+    // goes through it. The iterations container gained exactly such a door in
+    // this iteration: its selection state carries an edge to `end`.
+    const recordsSkippable =
+      objective !== undefined &&
+      st.edges.some((e) => {
+        const t = decl.states.find((s) => s.id === e.to);
+        return t !== undefined && t.submachine === undefined;
+      });
     const land = (pfx: string, t: StateDecl, tick: RouteNode["nexts"][number]["tick"]): void => {
       const at = Session.qual(pfx, t.id);
       if (t.submachine !== undefined) {
+        // Only a GENERATED sub is a record. An authored sub-machine is part of
+        // the method's own drawing and is walked through as it always was.
+        if (recordsSkippable && t.submachine === "generated" && objective !== at && !objective.startsWith(`${at}/`)) return;
         const inner = this.declForPrefix(at);
         if (inner !== undefined) {
           nexts.push({ to: Session.qual(at, inner.initial), tick });
@@ -2058,15 +2113,35 @@ export class Session {
    *  claimful state found this way is the same one a person reading the
    *  drawing would name. A container met on the way is asked the same
    *  question before the walk moves past it. */
-  private deepOwed(prefix: string, decl: MachineDecl, pass: GreenPass): string | undefined {
+  private deepOwed(prefix: string, decl: MachineDecl, pass: GreenPass, here: string = this.active()[0] ?? ""): string | undefined {
     const done = new Set(this.recordDone(decl, new Set(), pass));
     for (const s of decl.states) {
       if (s.evidence_form.length > 0 && !done.has(s.id)) return Session.qual(prefix, s.id);
       if (s.submachine === undefined) continue;
       const subPrefix = Session.qual(prefix, s.id);
+      // A RECORD THE WALK IS NOT INSIDE OWES NOTHING (owner ruling 2026-08-16,
+      // req-a-pull-carrying-no-choice-enters-no-iteration).
+      //
+      // THIS IS THE OTHER HALF OF THE 2026-08-11 FIX, and that fix's own
+      // comment describes the same failure: "an aim at the desk descended into
+      // whatever record stood open: boot marched into i2". Restricting the
+      // upstream walk to INPUT edges closed one route in. This closes the
+      // other: subObjective deliberately adds the container the walk STANDS
+      // in, and from a container's own selection state that meant descending
+      // into whichever record came first and calling its work the objective.
+      //
+      // The router then drew the way there, and walking it ENTERED that
+      // record — binding it and stamping it started. Five times on 2026-08-16,
+      // every one on a bare pull after a dropped socket.
+      //
+      // A RECORD'S WORK BEGINS WHEN SOMEBODY CHOOSES IT. Until then it is not
+      // a prerequisite of anything, so it is not an objective. Standing INSIDE
+      // one, the walk still finds its owed legs, which is what the same day's
+      // fix bought and what this must not take away.
+      if (s.submachine === "generated" && here !== subPrefix && !here.startsWith(`${subPrefix}/`)) continue;
       const sub = this.declForPrefix(subPrefix);
       if (sub === undefined) continue;
-      const nested = this.deepOwed(subPrefix, sub, pass);
+      const nested = this.deepOwed(subPrefix, sub, pass, here);
       if (nested !== undefined) return nested;
     }
     return undefined;
@@ -2265,7 +2340,7 @@ export class Session {
     // (software.md, input-process-output).
     const pass = Session.newPass();
     const objective = this.nextObjective(aim, pass);
-    let r = computeRoute(from, objective, (q) => this.expandNode(q));
+    let r = computeRoute(from, objective, (q) => this.expandNode(q, objective));
     // NO WAY FORWARD IS NOT THE SAME AS NO WAY (owner design 2026-08-07).
     //
     // A fan hands out ONE leg. Walk it to the end and the drawing offers
@@ -4843,24 +4918,34 @@ export class Session {
         source: "engine/session.ts amend",
       });
     }
-    // AN AMEND RE-STAMPS THE SIGNATURE'S DATE (owner ruling 2026-08-16).
+    // AN AMEND LEAVES THE SIGNATURE'S DATE ALONE, and the comment that once
+    // stood here argued the opposite from a wrong diagnosis. Both halves of
+    // that argument were false, and the correction is kept because the wrong
+    // reasoning is easy to reach again.
     //
-    // WITHOUT THIS AN AMEND CANNOT DO THE ONE JOB THE REFUSAL NAMES IT FOR.
-    // A fallen_input tells the caller to amend, because the claim's own
-    // content still passes and only the corpus moved. But the guard compares
-    // the SIGNATURE against the corpus, so a signature stamped before the
-    // move still reads as older than it, whatever text the amend rewrote.
-    // Seven amends up a six-level chain cleared nothing on 2026-08-16.
+    // IT CLAIMED THE GUARD COMPARES THE SIGNATURE AGAINST THE CORPUS. It does
+    // not. standingClaims reads three things and no timestamp among them: a
+    // signature is PRESENT, the form is not reopened after signing, and
+    // claimProblems comes back empty. A date plays no part.
     //
-    // RE-STAMPING IS SAFE HERE AND NOWHERE ELSE. Every check has just re-run
-    // against the corpus as it now stands, and `broke` is empty — which is
-    // exactly the condition a submit proves before it signs. What stays
-    // untouched is WHO signed and the bless, so nothing downstream falls and
-    // no thumb is forged.
-    const stamped = next.replace(/^signed_off:.*$/m, () => `signed_off: ${new Date().toISOString().slice(0, 10)}`);
-    if (stamped !== next) writeFileSync(h.instanceAbs, stamped, "utf8");
+    // IT CLAIMED SEVEN AMENDS UP A SIX-LEVEL CHAIN CLEARED NOTHING. They
+    // cleared nothing because they were aimed at the wrong states. The chain
+    // had ONE root: write-stories listed sty-work-on-two-machines, which had
+    // been deleted, so its own content genuinely stopped passing. One amend
+    // at that root cleared all six levels at once.
+    //
+    // WHY THE ROOT WAS HARD TO SEE, which is the part worth keeping. A
+    // fallen_input names the FIRST fallen input of the state that refused,
+    // never the root of the chain, and it attaches fallenRemedy's verdict for
+    // THAT state. So the refusal recommended se_amend on a state whose own
+    // content was fine, and following it changed nothing. se_why walks one
+    // level per call and reaches the root; the refusal does not.
+    //
+    // AND RE-STAMPING WOULD HAVE BEEN A LIE. The panel shows the signing date
+    // to a person. Moving it on every amend destroys when the claim was
+    // actually signed, to satisfy a check that never reads it.
     this.notifyChange();
-    return { amended: name, fields: Object.keys(fills), why: reason.trim(), by, signature_kept: true, restamped: stamped !== next };
+    return { amended: name, fields: Object.keys(fills), why: reason.trim(), by, signature_kept: true };
   }
 
   /** THE BLESS (owner design 2026-08-04, v1's thumbs reborn): a gate's

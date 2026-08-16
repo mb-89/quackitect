@@ -11,7 +11,6 @@ realizes:
   - "if-satellite-supervisor-to-test-runner"
   - "if-satellite-supervisor-to-mirror"
   - "if-front-desk-to-satellite-supervisor"
-  - "if-claim-ledger-to-satellite-supervisor"
 files:
   - "project/deliverable/engine/supervisor.ts"
   - "project/deliverable/engine/worktree.ts"

@@ -9,7 +9,7 @@ breaks_if_removed: An iteration builds on unshipped work and its baseline shifts
 breaks_how_badly: crippling
 refines:
   - uc-open-an-iteration
-  - uc-claim-an-iteration
+  - uc-open-an-iteration
 source_refs:
   - uc-open-an-iteration step 1
   - ".se/req-mine-v2.md: Worktrees and parallel streams"

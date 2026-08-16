@@ -5,6 +5,7 @@ type: "[[function]]"
 cluster: the-account
 statement: record every act and every claim so the reasoning can be reconstructed without asking anybody
 satisfies:
+  - req-a-records-own-status-decides-whether-it-is-open
   - req-every-call-logged
   - req-acts-carry-role-and-channel
   - req-roles-never-usernames

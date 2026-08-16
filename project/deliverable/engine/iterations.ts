@@ -765,16 +765,25 @@ export function generateIterations(root: string): GeneratedMachine {
   } catch {
     open = [];
   }
-  const start: StateDecl = {
-    id: "start",
+  // THE CONTAINER'S FIRST STATE IS THE SELECTION (owner ruling 2026-08-16,
+  // asked for three times). It keeps the START kind, so nothing about the
+  // machine's mechanics changes, and it takes the name of the job it does.
+  //
+  // IT IS THE SAME STATE, RENAMED, RATHER THAN A NEW ONE IN FRONT. A separate
+  // select state one hop past start was built first and measured: the walk
+  // ARRIVES at a container by landing on its initial state, so the offer stood
+  // one hop ahead of where the walk stopped and came back empty.
+  const select: StateDecl = {
+    id: "select",
     kind: "start",
-    statement: "",
+    statement: "Pick the iteration to walk.",
     guidance:
-      "The seeded container: every open iteration stands as its own machine. PICK ONE way forward — with several open the pull OFFERS them rather than entering one for you. Entering binds its worktree and stamps it started.",
+      "CHOOSE ONE, or leave. Every open iteration is offered as a door, and nothing is entered until you take one — taking one BINDS that iteration and stamps it started.\n\nA pull carrying no choice gets the offer back. It never gets an iteration.\n\nAn iteration waiting on another is not offered here. It is reached through the one it waits for, which is what makes the wait real.",
     evidence_form: [],
     priority: 0.01,
     edges: [],
   };
+  const start = select;
   const states: StateDecl[] = [start];
   const expByState: Record<string, string> = {};
   const subGen: Record<string, () => GeneratedMachine> = {};
@@ -857,53 +866,28 @@ export function generateIterations(root: string): GeneratedMachine {
     // iteration it waits for, which is what makes the wait real.
     if ((depsOf.get(sid) ?? []).length === 0) roots.push(sid);
   }
-  // SELECTION IS ITS OWN STATE (owner ruling 2026-08-16, asked for three
-  // times). The container's start is a START state, and a start state is
-  // walked THROUGH rather than landed on — so a pull carrying no choice fell
-  // straight into whichever iteration the edges happened to offer first.
-  //
-  // THAT IS NOT A COSMETIC FAULT. Entering an iteration BINDS it and stamps it
-  // started. On 2026-08-16 a dropped connection did it five separate times,
-  // each landing in i4, and once the walk was inside, aiming at the intended
-  // iteration drew a route THROUGH two more — starting those as well.
-  //
-  // A WORK STATE IS LANDED ON. The walk stops here and offers its doors, and
-  // nothing binds until a choice arrives. The owner's words: "the start of the
-  // iteration state machine goes into a select state, and in a select state
-  // you then select the state machine you want to go into."
-  //
   // ALTERNATIVE is the role that already means OR here. With one root the edge
-  // stays normal, because entering the only thing open is not a choice — but
-  // the walk still LANDS on select first, so even that one is entered on
-  // purpose rather than by falling through.
+  // stays normal, because entering the only thing open is not a choice.
   const rootRole = roots.length > 1 ? ("alternative" as const) : ("normal" as const);
-  const select: StateDecl = {
-    id: "select",
-    kind: "work",
-    statement: "Pick the iteration to walk.",
-    guidance:
-      "CHOOSE ONE, or leave. Every open iteration is offered as a door; nothing is entered until you take one, and taking one BINDS that iteration and stamps it started.\n\nThe walk stops here on purpose. A pull carrying no choice gets the offer back, never an iteration.\n\nAn iteration waiting on another is not offered — it is reached through the one it waits for, which is what makes the wait real.",
-    evidence_form: [],
-    priority: 0.2,
-    edges: [],
-  };
-  for (const sid of roots) start.edges.push({ to: sid, role: rootRole });
-  if (open.length === 0) start.edges.push({ to: "end", role: "normal" });
-  // THE SELECT STATE IS BUILT AND NOT WIRED YET, and the reason is measured.
-  // Inserting it between start and the roots turned a working offer into a
-  // fall-through: containerchoice's "a container holding two open iterations
-  // offers them rather than entering one" went red with an EMPTY offer, which
-  // means the walk passed through select and into the first iteration.
+  // LEAVING IS A DRAWN DOOR, AND IT COMES FIRST. This is the whole defect.
   //
-  // SO A WORK STATE WITH NOTHING OWED DOES NOT HOLD THE WALK. Landing is not
-  // the same as stopping, and the thing that makes the container stop today is
-  // the `alternative` role on start's own edges, not the kind of the state.
+  // Before this, the container had NO exit that did not pass through an
+  // iteration: its first state fanned to the open records, and each record's
+  // only edge ran to `end`. So a route to anywhere outside — the front desk,
+  // idle, a retro — could only be drawn THROUGH an iteration, and drawing it
+  // is what entered it.
   //
-  // WHAT THE SELECT STATE STILL HAS TO SOLVE is not this test's case, which
-  // already passes. It is the RECOVERY case: after a dropped connection, a
-  // bare pull entered an iteration five times on 2026-08-16. That path does
-  // not go through the offer at all, and no test covers it.
-  void select;
+  // THAT IS THE FIVE ENTRIES INTO i4 ON 2026-08-16, and it explains why every
+  // one happened on a bare recovery pull. The standing target was the front
+  // desk. The only way the router could reach it was through the first record
+  // on the list, and entering BINDS that record and stamps it started.
+  //
+  // FIRST IN THE EDGE LIST IS NOT COSMETIC. `tryMove` walks the edges in order
+  // and takes the first whose role is authored, so edge order IS the default
+  // when nothing chose. The default must be to leave, never to take up work
+  // nobody picked.
+  select.edges.push({ to: "end", role: "normal" });
+  for (const sid of roots) select.edges.push({ to: sid, role: rootRole });
   states.push({
     id: "end",
     kind: "end",
@@ -913,7 +897,7 @@ export function generateIterations(root: string): GeneratedMachine {
     priority: 0.01,
     edges: [],
   });
-  const decl: MachineDecl = { id: "iterations", reentry: "restart", initial: "start", states };
+  const decl: MachineDecl = { id: "iterations", reentry: "restart", initial: "select", states };
   validateMachine(decl);
   // ONE LAYOUT FOR EVERY MACHINE. pinnedCanvas rows states by dependency depth
   // and puts independent ones side by side, which is exactly what the container

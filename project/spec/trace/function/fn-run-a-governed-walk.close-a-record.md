@@ -5,6 +5,7 @@ type: "[[function]]"
 cluster: the-record-life
 statement: end a record by ruling on everything it produced, leaving nothing loose
 satisfies:
+  - req-a-shipped-record-is-never-reclaimed
   - req-close-refuses-loose-ends
   - req-close-leaves-trunk-clean
   - req-close-serves-its-findings

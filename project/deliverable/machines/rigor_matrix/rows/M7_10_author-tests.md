@@ -18,6 +18,9 @@ legal_tools:
   - se_log_query
   - se_answer
   - se_run
+  # Same rule as M5_30B: this state owns the test-spec nodes, so it can retire
+  # one. A removed requirement leaves its spec behind otherwise.
+  - se_file_delete
 evidence:
   - name: checks
     template: node-table

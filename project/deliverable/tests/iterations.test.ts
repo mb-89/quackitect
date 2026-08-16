@@ -52,9 +52,15 @@ test("a seed stands in the container at once — its machine is M0", () => {
   const kick = walk.decl.states.find((s) => s.id === "gate-kickoff")!;
   assert.equal(kick.group, "M0", "milestones are groups on the states");
   assert.deepEqual(kick.tags, ["iteration-kickoff"]);
-  // Not a git repo → an empty container that runs start to end.
+  // Not a git repo → an empty container that runs straight to end.
+  //
+  // THE FIRST STATE IS NAMED `select` SINCE i34. It keeps the START kind and
+  // everything about the machine's mechanics, and it took the name of the job
+  // it does: with records open it offers them and enters none. With none open
+  // there is nothing to pick, and the single edge to `end` is all it carries.
   const empty = generateIterations(freshRoot());
-  assert.deepEqual(empty.decl.states.find((s) => s.id === "start")?.edges, [{ to: "end", role: "normal" }]);
+  assert.deepEqual(empty.decl.states.find((s) => s.id === "select")?.edges, [{ to: "end", role: "normal" }]);
+  assert.equal(empty.decl.initial, "select", "the container starts on its selection state");
 });
 
 test("any state's form is fetchable by its machine — the walk elsewhere", () => {
