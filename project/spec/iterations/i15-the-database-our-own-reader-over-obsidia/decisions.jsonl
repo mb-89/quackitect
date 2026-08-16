@@ -257,3 +257,5 @@
 {"ts":"2026-08-16T18:19:09.634Z","op":"done","visit":"iterations/i15/evaluate-set@0","node":"d235","brief":"converge-pugh computed a stable winner: cand-explicit-and-safe"}
 {"ts":"2026-08-16T18:19:14.649Z","op":"plan","visit":"iterations/i15/reverse-sensitivity@0","parent":null,"nodes":[{"id":"d243","brief":"review engine-computed perturbation hunt"},{"id":"d244","brief":"rule each swing-cell credible or not"},{"id":"d245","brief":"mint RAID tripwires for credible flips"}]}
 {"ts":"2026-08-16T18:20:45.982Z","op":"done","visit":"iterations/i15/reverse-sensitivity@0","node":"d245","brief":"ruled every swing cell, three credible flips found"}
+{"ts":"2026-08-16T18:21:03.779Z","op":"done","visit":"iterations/i15/converge-pugh@0","node":"d240","brief":"declared cand-explicit-and-safe the winner, comments carry the open risks"}
+{"ts":"2026-08-16T18:21:08.929Z","op":"done","visit":"iterations/i15/reverse-sensitivity@0","node":"d243","brief":"declare-winner form completed and submitted"}
