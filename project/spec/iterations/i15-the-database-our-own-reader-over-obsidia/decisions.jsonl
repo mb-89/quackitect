@@ -182,3 +182,20 @@
 {"ts":"2026-08-16T17:41:48.655Z","op":"update","visit":"iterations/i15/partition-functions@0","node":"d168","brief":"named cluster-the-query, classed same-external-interface"}
 {"ts":"2026-08-16T17:41:51.907Z","op":"update","visit":"iterations/i15/partition-functions@0","node":"d169","brief":"named cluster-the-disposition, classed sequence"}
 {"ts":"2026-08-16T17:42:03.831Z","op":"done","visit":"iterations/i15/partition-functions@0","node":"d164","brief":"clusters DSM built and submitted for the 3 new i15 functions"}
+{"ts":"2026-08-16T17:44:16.703Z","op":"plan","visit":"iterations/i15/enumerate-space/find_prior_art@0","parent":null,"nodes":[{"id":"d170","brief":"research prior art / literature for the-query cluster"},{"id":"d171","brief":"research prior art / literature for the-disposition cluster"},{"id":"d172","brief":"benchmark shipped products incl. Obsidian Bases + Dataview"},{"id":"d173","brief":"write dry wells"},{"id":"d174","brief":"mint option nodes, fill form"}]}
+{"ts":"2026-08-16T17:44:27.765Z","op":"update","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d175","brief":"researching current Obsidian Bases capabilities"}
+{"ts":"2026-08-16T17:44:28.855Z","op":"update","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d176","brief":"researching Dataview as prior competitor"}
+{"ts":"2026-08-16T17:44:29.259Z","op":"update","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d177","brief":"researching disposition/triage prior art"}
+{"ts":"2026-08-16T17:44:46.313Z","op":"update","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d178","brief":"fetching Obsidian's own Bases docs as primary source"}
+{"ts":"2026-08-16T17:44:47.620Z","op":"update","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d179","brief":"fetching Bases formula/filter syntax reference"}
+{"ts":"2026-08-16T17:46:15.008Z","op":"done","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d171","brief":"confirmed v1 predecessor's .base shape (filters/views/sort)"}
+{"ts":"2026-08-16T17:46:24.333Z","op":"update","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d180","brief":"checking record linkage literature for the disposition cluster"}
+{"ts":"2026-08-16T17:46:38.838Z","op":"update","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d181","brief":"fetching Dataview's own README as benchmarking source"}
+{"ts":"2026-08-16T17:47:31.987Z","op":"update","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d182","brief":"minting option nodes for cluster-the-query"}
+{"ts":"2026-08-16T17:47:37.412Z","op":"update","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d183","brief":"minting option nodes for cluster-the-query"}
+{"ts":"2026-08-16T17:47:43.412Z","op":"update","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d184","brief":"minting option nodes for cluster-the-query"}
+{"ts":"2026-08-16T17:47:48.319Z","op":"update","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d185","brief":"minting option nodes for cluster-the-query"}
+{"ts":"2026-08-16T17:47:54.323Z","op":"update","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d186","brief":"minting option nodes for cluster-the-disposition"}
+{"ts":"2026-08-16T17:47:59.305Z","op":"done","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d172","brief":"benchmarked Obsidian Bases/Dataview (shipped) and record linkage (literature)"}
+{"ts":"2026-08-16T17:48:39.248Z","op":"done","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d174","brief":"find_prior_art form filled and submitted"}
+{"ts":"2026-08-16T17:48:42.766Z","op":"update","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d187","brief":"fixing applies field format, resubmitting find_prior_art"}
