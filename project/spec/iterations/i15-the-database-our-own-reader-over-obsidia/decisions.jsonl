@@ -89,3 +89,5 @@
 {"ts":"2026-08-16T16:35:22.449Z","op":"update","visit":"iterations/i15/draw-context@0","node":"d85","brief":"raid file's own frontmatter closed now that se_file_patch is legal here"}
 {"ts":"2026-08-16T16:35:26.619Z","op":"done","visit":"iterations/i15/gate-motivation@0","node":"d76","brief":"pressure-test amend confirmed complete (done earlier)"}
 {"ts":"2026-08-16T16:35:33.289Z","op":"done","visit":"iterations/i15/gate-motivation@0","node":"d77","brief":"define-actual amend confirmed complete — correction pass fully closed out"}
+{"ts":"2026-08-16T16:37:11.509Z","op":"update","visit":"iterations/i15/draw-context@0","node":"d86","brief":"fixing a second YAML colon break in the same raid file"}
+{"ts":"2026-08-16T16:37:16.975Z","op":"update","visit":"iterations/i15/draw-context@0","node":"d87","brief":"fixing a third YAML colon break, same raid file"}
