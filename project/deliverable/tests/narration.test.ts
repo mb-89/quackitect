@@ -6,9 +6,33 @@
 // hold, counted in calls as well as minutes, and the top notch owes nothing.
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
+import { parseUpdate } from "../engine/decisions.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { anyGuidanceDoc, call, freshRoot } from "./helpers.ts";
+
+// A CHAINED BRIEF IS CORRECTED WHATEVER OP CARRIES IT (i11, narration-grace).
+//
+// An update's chain has been applied as the plan it wanted to be since
+// 2026-08-02 — it was the lane's most-hit refusal, 174 of one window's 505.
+// A fork's chain still refused, and the split it needed was already computed.
+test("a chained fork brief is corrected, and stays a fork", () => {
+  const u = parseUpdate({ op: "fork", brief: "the red is stale, the fixture moved, the run never completed" });
+  // IT STAYS A FORK. A fork BLOCKS the current item and a plan does not, so
+  // rewriting the op would change what the call means.
+  assert.equal(u.op, "fork");
+  assert.deepEqual(u.items, ["the red is stale", "the fixture moved", "the run never completed"]);
+  assert.equal(u.brief, "the red is stale", "the detour is named by its first part");
+  assert.match(String(u.corrected ?? ""), /fork kept its shape/, "a correction is announced, never silent");
+});
+
+test("an update's chain still becomes a plan, and a resolution's still refuses", () => {
+  const u = parseUpdate({ op: "update", brief: "read three files, found the root, fixed it" });
+  assert.equal(u.op, "plan", "an update is not a blocking detour, so its chain is a plain checklist");
+  assert.equal(u.items?.length, 3);
+  // WHICH PART RESOLVED THE NODE IS NOT THE ENGINE'S TO GUESS.
+  assert.throws(() => parseUpdate({ op: "done", node: "d1", brief: "fixed a, then b, then c" }));
+});
 
 /** Boot on one read, so the toll is armed and the walk stands at the desk. */
 async function booted(): Promise<{ server: ReturnType<typeof buildServer>; session: Session }> {

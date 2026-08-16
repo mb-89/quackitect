@@ -3043,6 +3043,19 @@ document.addEventListener("click", (ev) => {
   // clicks on is replaced by every poll.
   const n = ev.target.closest ? ev.target.closest(".rung[data-level]") : null;
   if (n) {
+    // THE STOP-AT BANK IS THE SAME CONTROL ASKING A DIFFERENT QUESTION, so it
+    // shares this handler and differs only in where the press lands. None of
+    // the autonomy machinery below applies to it: no emergency drumroll, no
+    // hidden slider, and its lowest notch is a floor rather than an off.
+    if (n.dataset.bank === "stopat") {
+      if (n.classList.contains("locked")) return;
+      const to = Number(n.dataset.level);
+      for (const b of document.querySelectorAll('button.rung[data-bank="stopat"]')) {
+        b.classList.toggle("on", Number(b.dataset.rung) <= to);
+      }
+      void fetch("/stop-at", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ value: to }) });
+      return;
+    }
     // THE HELP FOLLOWS THE RUNG PRESSED. data-level is only where the click
     // LANDS, and on a release the two differ — explaining "blocked" to
     // someone who clicked the mechanical rung is the wrong mapping.
@@ -3073,7 +3086,7 @@ document.addEventListener("click", (ev) => {
         n.classList.add("on");
         n.classList.add("emergency");
         n.textContent = "E";
-        for (const b of document.querySelectorAll("button.rung[data-rung]")) b.classList.add("on");
+        for (const b of document.querySelectorAll('button.rung[data-bank="autonomy"]')) b.classList.add("on");
         const bar = document.getElementById("thr");
         if (bar) bar.value = 1;
         void fetch("/autonomy", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ value: 1 }) })
@@ -3087,7 +3100,7 @@ document.addEventListener("click", (ev) => {
     const v = Number(n.dataset.level);
     // PAINT FIRST, THEN TELL THE ENGINE. The bar redraws on the next poll,
     // and waiting for that is seconds of a button that looks dead.
-    for (const b of document.querySelectorAll("button.rung[data-rung]")) {
+    for (const b of document.querySelectorAll('button.rung[data-bank="autonomy"]')) {
       b.classList.toggle("on", Number(b.dataset.rung) <= v);
     }
     const live = document.getElementById("thr");

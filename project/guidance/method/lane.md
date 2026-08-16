@@ -57,7 +57,13 @@ WHEN A CALL IS REFUSED you get a typed rejection. It carries:
 Follow the remedy and recover in one turn. Never work around a refusal with
 another lane.
 
-A TRUNCATING PIPE CUTS BEFORE THE ENGINE SEES. What `Select-Object -First`
+A TRUNCATING PIPE IS REFUSED (SE-C-137), and a filter after a pipe counts:
+`Select-String`, `findstr` and `grep` drop the lines they do not match, which
+is where the totals live. The refusal names the lane verb that handles length
+instead — `se_test`, `se_file_search`, `se_file_read`, or a whole run paged
+back by ref. `no_tool_reason` runs it anyway and logs why.
+
+WHAT IT CUTS. What `Select-Object -First`
 dropped exists nowhere — not on the result, not in the log. Ends carry
 verdicts: exit codes, totals, units. Prefer structured results (`se_test`) and
 fetch full output by ref (`se_log_query`) over shaping it in the shell.

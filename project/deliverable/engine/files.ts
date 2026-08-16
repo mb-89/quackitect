@@ -15,6 +15,7 @@ import { contentHash } from "./hash.ts";
 import { lintFix } from "./lintfix.ts";
 import { forgetPath, parseStateNote, readNodeBytes, writeNode } from "./notes.ts";
 import { isExcluded, isRootRef, resolveDeclaredRoot, resolveForRead, resolveInRoot } from "./paths.ts";
+import { search } from "./search.ts";
 
 /** Whole-file read budget (chars). Beyond this, offset/limit is required. */
 export const READ_BUDGET = 50_000;
@@ -876,9 +877,68 @@ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
   return writeStaged(root, staged, corrected);
 }
 
-export function fileDelete(root: string, path: string, baseHash: string): { deleted: string } {
+/** How many citing nodes ride back. Beyond this the count still tells the
+ *  truth, so a wide deletion never reads as a narrow one. */
+const CITED_CAP = 40;
+
+/** One frontmatter scalar, or "". Flat keys only; ids never nest. */
+function frontmatterId(text: string): string {
+  const m = /^id:[ \t]*(.*)$/m.exec(text);
+  return m === null ? "" : m[1].trim().replace(/^["']|["']$/g, "");
+}
+
+/** WHO POINTS AT THIS NODE — asked BEFORE the delete lands, which is the whole
+ *  of req-a-deletion-names-what-points-at-the-node.
+ *
+ *  THE GRAPH IS NOT ENOUGH ON ITS OWN. raid-asm-the-trace-graph-holds-every-
+ *  reference probed FALSE IN PART: the frontmatter edges found i34's orphaned
+ *  requirements and missed seventeen citations that live in prose. So this
+ *  sweeps the TEXT for the id, which catches the edges as a side effect —
+ *  a `refines:` entry and a sentence are both the id, written down.
+ *
+ *  IT NEVER REFUSES. The row says so in as many words: deleting a node with
+ *  dependents is legal and often right, and what happens next is a judgment
+ *  that stays one. */
+function citedBy(root: string, abs: string, text: string): { list: { id: string; path: string; lines: number[] }[]; total: number } {
+  const id = frontmatterId(text);
+  if (id === "") return { list: [], total: 0 };
+  const quoted = id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  let hits: { path: string; line: number }[];
+  try {
+    hits = search(root, quoted, { limit: 500 }).matches.filter((m) => m.context !== true);
+  } catch {
+    // A SEARCH THAT CANNOT RUN MUST NOT BLOCK A DELETE. The row asks for a
+    // list beside the deletion, never for the deletion to depend on one.
+    return { list: [], total: 0 };
+  }
+  const self = relative(root, abs).split(sep).join("/");
+  const byFile = new Map<string, number[]>();
+  for (const h of hits) {
+    const p = h.path.split(sep).join("/");
+    if (p === self) continue;
+    byFile.set(p, [...(byFile.get(p) ?? []), h.line]);
+  }
+  const list = [...byFile.entries()].slice(0, CITED_CAP).map(([p, lines]) => {
+    let citing = p.replace(/^.*\//, "").replace(/\.[^.]+$/, "");
+    try {
+      const own = frontmatterId(readFileSync(resolveInRoot(root, p, SRC), "utf8"));
+      if (own !== "") citing = own;
+    } catch {
+      // Unreadable is not a reason to drop the hit; the path still names it.
+    }
+    return { id: citing, path: p, lines };
+  });
+  return { list, total: byFile.size };
+}
+
+export function fileDelete(
+  root: string,
+  path: string,
+  baseHash: string,
+): { deleted: string; cited_by: { id: string; path: string; lines: number[] }[]; cited_by_total?: number } {
   const abs = mustExist(root, path, SRC);
-  const disk = contentHash(readFileSync(abs, "utf8"));
+  const text = readFileSync(abs, "utf8");
+  const disk = contentHash(text);
   if (disk !== baseHash) {
     throw new Rejection({
       clause: CLAUSES.CAS_MISMATCH,
@@ -888,10 +948,19 @@ export function fileDelete(root: string, path: string, baseHash: string): { dele
       source: SRC,
     });
   }
+  // ASKED BEFORE THE REMOVAL, because the file's own id line is the thing being
+  // searched for and the sweep needs the content that is about to go.
+  const cited = citedBy(root, abs, text);
   rmSync(abs);
   // The door may hold what was deleted; tell it rather than let the stat find out.
   forgetPath(abs);
-  return { deleted: path };
+  // AN EMPTY LIST, NEVER SILENCE. A delete that names nothing and a delete
+  // nobody asked about must not look alike (the row's one invariant).
+  //
+  // THE TOTAL IS THE UNCAPPED ONE. A capped list reporting its own length as
+  // the total would say the deletion was narrow at exactly the moment it was
+  // widest — the silent truncation the lane refuses everywhere else.
+  return { deleted: path, cited_by: cited.list, ...(cited.total > cited.list.length ? { cited_by_total: cited.total } : {}) };
 }
 
 export interface ListEntry {

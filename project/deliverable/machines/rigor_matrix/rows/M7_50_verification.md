@@ -7,6 +7,8 @@ filled_by: engine
 command: npm --prefix project/deliverable test
 depends_on:
   - trace-design
+exit_script:
+  - project/deliverable/engine/bin/battery.ts
 entry_read:
   - project/deliverable/machines/methods/meth-verification-discipline.md
 legal_tools: se_file_read, se_file_search, se_file_glob
@@ -46,6 +48,19 @@ The one place the full battery runs ([[meth-test-first]]), engine-filled.
 Failure opens the fallback into fix-findings - collect everything, fix in
 one pass, one confirm run. The command is the project's battery; each
 project declares its own.
+
+THE SUBMIT FIRES IT, and until i11 nothing did. `filled_by: engine` reached
+three places in the code - a validation error, a priority, and a copied
+field - and no path ever ran the command. So the agent ran the battery from
+wherever it stood, which is the habit this row was written to prevent.
+
+[[battery]] IS THE MECHANISM, declared as this row's `exit_script`. It reads
+the `command` above rather than carrying its own, so the row stays the one
+place the project's battery is named.
+
+THIS STATE GRANTS NO TEST VERB, ON PURPOSE. It never did, and that is what
+made the i11 refusal a trap for one afternoon: the battery was allowed only
+here, and here could not call it. Nothing calls it now except the engine.
 
 THE CLAIMS HALF IS THE SAME CHECKLIST IN GREEN (owner ruling
 2026-08-11): every demonstration, inspection and analysis spec is

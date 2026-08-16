@@ -54,6 +54,44 @@ test("the machine's own wait passes — idle, the desk, or a step above the slid
   assert.equal(verdict([pullRecord({ pull: "wait", where: ["front_desk"] })], {}), "");
 });
 
+// THE STOP-AT NOTCH DECIDES (owner design 2026-08-16, machines/stopat.md).
+//
+// One fixed rule was right about eight stops in a day and wrong about five,
+// and no tuning lets it tell them apart: the REASON a stop happened is not in
+// the walk's position. The person can see it, so the notch is theirs.
+
+test("stop @ state end passes every stop — the engine is the one holding", () => {
+  // Under this notch the ENGINE refuses each transition, so the agent handing
+  // back IS the machine's own stop. Blocking it would fight the engine.
+  assert.equal(verdict([pullRecord({ pull: "do", where: ["iterations/i11/build-steps/x"], stop_at: "state end" })], {}), "");
+});
+
+test("stop @ agent judgement is the default, and blocks mid-work exactly as before", () => {
+  const withNotch = verdict([pullRecord({ pull: "do", where: ["retro"], stop_at: "agent judgement" })], {});
+  const without = verdict([pullRecord({ pull: "do", where: ["retro"] })], {});
+  assert.equal(JSON.parse(withNotch).decision, "block");
+  assert.equal(JSON.parse(without).decision, "block", "an absent notch reads as the default, never as a licence");
+});
+
+test("stop @ bless passes at a gate and blocks anywhere else", () => {
+  assert.equal(verdict([pullRecord({ pull: "fill", where: ["iterations/i11/gate-implementation"], stop_at: "bless" })], {}), "");
+  const away = verdict([pullRecord({ pull: "do", where: ["iterations/i11/build-steps/x"], stop_at: "bless" })], {});
+  const d = JSON.parse(away) as { decision: string; reason: string };
+  assert.equal(d.decision, "block");
+  assert.match(d.reason, /stop @ bless/, "the refusal names the notch that is asking");
+});
+
+test("stop @ blockers only passes a REFUSED pull and blocks a working one", () => {
+  // The unattended-run notch: nothing brings the person back until the walk
+  // genuinely cannot go on.
+  const refused = { ...pullRecord({ pull: "do", where: ["x"], stop_at: "blockers only" }), ok: false };
+  const working = pullRecord({ pull: "do", where: ["x"], stop_at: "blockers only" });
+  assert.equal(verdict([working, refused], {}), "", "a refused pull is the block this notch waits for");
+  const d = JSON.parse(verdict([working], {})) as { decision: string; reason: string };
+  assert.equal(d.decision, "block");
+  assert.match(d.reason, /blockers only/);
+});
+
 test("a wait WITH A TARGET blocks — an escape does not launder a stop", () => {
   // MEASURED 2026-08-14: the escape hatch lands at the front desk, the desk
   // answers wait, and the tooth had nothing to bite. Two stops that day were

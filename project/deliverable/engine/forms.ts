@@ -168,6 +168,27 @@ export function withFieldContent(instanceRaw: string, field: string, rawContent:
   return [...lines.slice(0, start + 1), "", content, "", ...lines.slice(end)].join("\n");
 }
 
+/** ONE SECTION'S BODY, exactly as it stands on disk — the mirror of
+ *  withFieldContent, and what an amend's old/new patch matches against.
+ *  undefined means the section is not there at all, which is a different
+ *  answer from an empty one. */
+export function fieldContent(instanceRaw: string, field: string): string | undefined {
+  const lines = instanceRaw.split("\n");
+  const start = lines.findIndex((l) => l.trim() === `## ${field}`);
+  if (start === -1) return undefined;
+  let end = lines.length;
+  for (let i = start + 1; i < lines.length; i++) {
+    if (lines[i].startsWith("## ")) {
+      end = i;
+      break;
+    }
+  }
+  return lines
+    .slice(start + 1, end)
+    .join("\n")
+    .trim();
+}
+
 /** Confirm ONE prefill: its comment markers fall away, the content stands.
  *  The index counts the section's comment blocks in order. */
 export function confirmPrefill(instanceRaw: string, field: string, index: number): string {

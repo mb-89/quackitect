@@ -45,7 +45,7 @@ import { resolveInRoot, seDir } from "./paths.ts";
 import { type MirrorState, renderMirror } from "./render.ts";
 import { resolve as resolveSeam } from "./resolve.ts";
 import { jobDone, jobList, jobStatus, jobStop, runBackground, runToCompletion, startJob } from "./run.ts";
-import { Session } from "./session.ts";
+import { type AmendOp, Session } from "./session.ts";
 import { shoot } from "./shoot.ts";
 import { survey } from "./survey.ts";
 import { TIMINGS_DIR_ENV, testConcurrency, testReporterArgs, timedSince, timingReport } from "./testreporters.ts";
@@ -287,16 +287,35 @@ export function sessionTools(session: Session): ToolDef[] {
       name: "se_amend",
       title: "se.amend",
       description:
-        "FIX A SUBMITTED FORM WITHOUT REOPENING IT. For the small correction that does not change what the claim says: a reference renamed under it, a path that moved, a typo. The signature stays, because nothing it attested to has changed — invalidating a whole tree to fix a spelling is the cost that leaves spellings wrong. The amend is RECORDED on the file, so a reader sees it happened, when, and why. THE CHECKS STILL RUN: an amend that breaks one is refused and the file is put back untouched, with se_reopen named as what to use instead. Judgement is yours — the engine only guarantees an amend cannot smuggle a reopen past the checks.",
+        "FIX A SUBMITTED FORM WITHOUT REOPENING IT, by PATCHING it: ops:[{field, old_string, new_string}], the same shape se_file_patch takes. For the small correction that does not change what the claim says: a reference renamed under it, a path that moved, a typo. The signature stays, because nothing it attested to has changed — invalidating a whole tree to fix a spelling is the cost that leaves spellings wrong. The amend is RECORDED on the file, so a reader sees it happened, when, and why. THE CHECKS STILL RUN: an amend that breaks one is refused and the file is put back untouched, with se_reopen named as what to use instead. Judgement is yours — the engine only guarantees an amend cannot smuggle a reopen past the checks.",
       inputSchema: {
         type: "object",
         properties: {
           state: { type: "string", description: "the state whose submitted form is being corrected" },
-          fills: { type: "object", description: "the fields to rewrite, whole, as {field: text} — only the named ones move" },
+          ops: {
+            type: "array",
+            description:
+              "the usual shape: patch a field in place. Each op is {field, old_string, new_string, all?}. old_string must match the field EXACTLY ONCE or the op refuses — pass all: true to replace every occurrence. Several ops chain, each seeing the last one's result.",
+            items: {
+              type: "object",
+              properties: {
+                field: { type: "string", description: "the form section to patch" },
+                old_string: { type: "string", description: "the text as the form carries it now" },
+                new_string: { type: "string", description: "what it becomes" },
+                all: { type: "boolean", description: "replace every occurrence instead of refusing an ambiguous match" },
+              },
+              required: ["field", "old_string", "new_string"],
+            },
+          },
+          fills: {
+            type: "object",
+            description:
+              "rewrite fields WHOLE, as {field: text}. For a small correction prefer ops — resending two thousand characters to change eleven is how a paragraph nobody meant to touch goes missing. A fills entry wins over an op on the same field.",
+          },
           reason: { type: "string", description: "what was wrong — one line, and the file keeps it" },
           machine: { type: "string", description: "which machine the state belongs to — needed from outside it, e.g. i1" },
         },
-        required: ["state", "fills", "reason"],
+        required: ["state", "reason"],
       },
       handler: (args) =>
         session.amendClaim(
@@ -305,6 +324,7 @@ export function sessionTools(session: Session): ToolDef[] {
           String(args.reason),
           "agent",
           args.machine === undefined ? undefined : String(args.machine),
+          (args.ops ?? []) as AmendOp[],
         ),
     },
   ];
@@ -482,6 +502,69 @@ function readManyGuarded(model: ModelFileSystem, paths: unknown, ref: string | u
   return readMany(model, paths, ref, optional);
 }
 
+/** WORDS THAT MEAN THE SAME THING TO A CALLER. The lane's verbs disagree about
+ *  what to call their subject: search takes `query`, glob takes `glob`, list
+ *  takes `dir`, the readers and writers take `path`, and run takes `command`.
+ *  Every one of those is defensible on its own and the set is not learnable,
+ *  so a caller pays a round trip for a word.
+ *
+ *  MEASURED ON i11'S OWN WALK: two refusals in one call pair, both `pattern`,
+ *  one meaning `query` and one meaning `glob`.
+ *
+ *  A GROUP IS A MEANING, NOT A RENAME. Nothing is renamed — every verb keeps
+ *  the name it has, and a caller who uses a sibling's word is understood. */
+const ARG_SYNONYMS: readonly (readonly string[])[] = [
+  ["query", "pattern", "regex", "search", "q", "text"],
+  ["glob", "pattern", "files", "file_pattern"],
+  ["path", "file", "filepath", "file_path", "dir", "directory", "folder"],
+  ["command", "cmd", "shell"],
+];
+
+/** Which of the tool's OWN argument names a wrong word could have meant. Only
+ *  names the tool actually declares, and only ones the caller did not already
+ *  send — so a call carrying both `path` and `dir` never has one rewritten
+ *  over the other. */
+function candidateArgs(wrong: string, args: Record<string, unknown>, known: string[]): string[] {
+  const out = new Set<string>();
+  for (const group of ARG_SYNONYMS) {
+    if (!group.includes(wrong)) continue;
+    for (const name of group) {
+      if (name !== wrong && known.includes(name) && !(name in args)) out.add(name);
+    }
+  }
+  return [...out];
+}
+
+/** THE ONE-CANDIDATE REPAIR, and it is never silent.
+ *
+ *  A wrong argument name is still refused when it is AMBIGUOUS — two possible
+ *  meanings is a guess, and the lane does not guess at its boundary. What
+ *  changes is the unambiguous case: `pattern` on a verb that declares `query`
+ *  and no other synonym can only have meant `query`.
+ *
+ *  THE REPAIR IS REPORTED on the result as `arg_repaired`, because "a wrong
+ *  arg name is refused rather than silently ignored" was the right instinct.
+ *  Silence is the problem; the round trip was only the remedy. */
+let argRepairs: { from: string; to: string; note: string }[] | undefined;
+
+function repairArgNames(tool: string, args: Record<string, unknown>, known: string[]): void {
+  if (known.length === 0) return;
+  const repaired: { from: string; to: string }[] = [];
+  for (const wrong of Object.keys(args).filter((k) => !known.includes(k))) {
+    const could = candidateArgs(wrong, args, known);
+    if (could.length !== 1) continue;
+    args[could[0]] = args[wrong];
+    delete args[wrong];
+    repaired.push({ from: wrong, to: could[0] });
+  }
+  if (repaired.length > 0) {
+    argRepairs = repaired.map((r) => ({
+      ...r,
+      note: `${tool} calls it \`${r.to}\` — read as that, and nothing was guessed`,
+    }));
+  }
+}
+
 /** The job side of se_run: list, stop, wait or status. Undefined when the
  *  call names no job — the command side handles it. */
 function jobArm(args: Record<string, unknown>, root: string): unknown {
@@ -496,18 +579,57 @@ function jobArm(args: Record<string, unknown>, root: string): unknown {
  *  rides at the moment of risk; a marker after the fact costs nothing
  *  and once turned "(425.501917ms)" read from a shaped slice into a
  *  confidently wrong 425 SECONDS. */
-function annotateRun(res: unknown, command: string, laneWarning: unknown): unknown {
-  const shaped = /select-object\s+-(first|last|skip)|(^|[;|&(\s])(head|tail)\s+-|\bcut\s+-c|\bmeasure-object\b/i.test(command);
-  const extra = {
-    ...(laneWarning !== undefined ? { lane_warning: laneWarning } : {}),
-    ...(shaped
-      ? {
-          output_shaped:
-            "a truncating pipe shaped this output BEFORE capture — what it dropped exists nowhere. Trust ends and totals only from unshaped output (se_test is structured; se_log_query serves full se_run output by ref).",
-        }
-      : {}),
+function annotateRun(res: unknown, laneWarning: unknown): unknown {
+  if (laneWarning === undefined) return res;
+  return { ...(res as unknown as Record<string, unknown>), lane_warning: laneWarning };
+}
+
+/** A SHAPE THAT CUTS BEFORE THE ENGINE SEES. Select-Object -First, head, tail,
+ *  cut -c, Measure-Object: each one drops output between the command and the
+ *  capture, so what it removed exists NOWHERE — not on the result, not in the
+ *  log, not under the ref.
+ *
+ *  A FILTER AFTER A PIPE IS THE SAME THING, and it was the one actually doing
+ *  the damage. `| Select-String fail` keeps the matching lines and throws away
+ *  the TAP summary — which is where the counts live. That is how a run came
+ *  back as exit 1 with empty output on 2026-08-16, inside the iteration
+ *  building this refusal.
+ *
+ *  BEFORE a pipe they are a different offence: reaching for the shell's
+ *  searcher instead of the lane's, which SE-C-129 already covers. */
+const SHAPED =
+  /select-object\s+-(first|last|skip)|(^|[;|&(\s])(head|tail)\s+-|\bcut\s+-c|\bmeasure-object\b|\|\s*(select-string|sls|findstr|grep|rg)\b/i;
+
+/** WHICH LANE VERB WAS ACTUALLY WANTED. The pipe is reached for when the raw
+ *  output is expected to be long, and every long thing the lane produces has a
+ *  verb that answers it structured or by reference. */
+function shapedRemedy(command: string): { tool: string; args: Record<string, unknown>; note: string } {
+  if (/--test\b|\bnpm\b.*\btest\b|\bjest\b|\bvitest\b/i.test(command)) {
+    return {
+      tool: "se_test",
+      args: { files: ["<the file your change touched>"], question: "<what this run answers>" },
+      note: "se_test answers STRUCTURED — counts and only the failures' detail. Nothing to shape, and nothing lost.",
+    };
+  }
+  if (/\b(rg|ripgrep|grep|findstr|select-string)\b/i.test(command)) {
+    return {
+      tool: "se_file_search",
+      args: { query: "<pattern>", intent: "<why you are looking>", limit: 30 },
+      note: "se_file_search windows with `limit` and says `truncated` when it did — a cut the reader can SEE, which a pipe never gives.",
+    };
+  }
+  if (/\b(cat|type|get-content|gc)\b/i.test(command)) {
+    return {
+      tool: "se_file_read",
+      args: { path: "<path>", offset: 1, limit: 200 },
+      note: "the reader pages by line with offset/limit, and an oversize whole-file read is refused rather than silently truncated.",
+    };
+  }
+  return {
+    tool: "se_run",
+    args: { command: "<the same command, unshaped>" },
+    note: "run it whole — the lane captures the FULL output under the call's ref, and se_log_query {ref} serves it back a page at a time. Shaping is what makes it unrecoverable.",
   };
-  return Object.keys(extra).length === 0 ? res : { ...(res as unknown as Record<string, unknown>), ...extra };
 }
 
 export function coreTools(
@@ -523,6 +645,10 @@ export function coreTools(
    *  path. Defaults to nothing, which stamps nothing, exactly as writing
    *  outside a record always did. */
   boundRecord: () => string | undefined = () => undefined,
+  /** WHERE THE WALK STANDS, asked of the live session. The battery refusal
+   *  needs it, and building a whole Session to ask cost a settings restore, a
+   *  keep-awake sync and an idle timer nobody ever cleared — per call. */
+  whereNow: () => string = () => "",
 ): ToolDef[] {
   const model = new ModelFileSystem(rootOf, boundRecord);
   return [
@@ -730,7 +856,8 @@ export function coreTools(
     {
       name: "se_file_delete",
       title: "se.file.delete",
-      description: "Hash-guarded delete: base_hash must match disk — no blind removal.",
+      description:
+        "Hash-guarded delete: base_hash must match disk — no blind removal. THE ANSWER NAMES WHO POINTED AT IT: for a trace node, cited_by lists every file citing its id, in frontmatter edges AND in prose, with line numbers. It never refuses — deleting a node with dependents is legal and often right, and the list is there while the decision is still being made. An unreferenced node answers with an empty list rather than silence.",
       inputSchema: {
         type: "object",
         properties: { path: { type: "string" }, base_hash: { type: "string" } },
@@ -884,6 +1011,25 @@ export function coreTools(
         // THE DISCIPLINE LADDER (engine/discipline.ts): a command doing a lane
         // tool's job runs once with a warning, then refuses. Judged BEFORE the
         // spawn, so a blocked category costs nothing to block.
+        // REFUSED AT THE BOUNDARY, NOT ANNOTATED AFTER (owner ruling
+        // 2026-08-16). The lane already warned about this and the warning did
+        // not work: an agent shaped output through Select-String IN THIS
+        // ITERATION, while building the fix for it, and got exit 1 with empty
+        // stdout. A warning that has failed twice is evidence about warnings.
+        //
+        // WHY IT HAPPENS SO OFTEN is the part worth answering, and the remedy
+        // answers it: the pipe is reached for when the raw output is expected
+        // to be long, so the refusal names the verb that handles length.
+        if (SHAPED.test(String(args.command)) && args.no_tool_reason === undefined) {
+          const remedy = shapedRemedy(String(args.command));
+          throw new Rejection({
+            clause: CLAUSES.OUTPUT_SHAPED,
+            expected: "output the engine can capture whole — ends carry verdicts: exit codes, totals, units",
+            got: `a truncating shape in the command: ${String(args.command).slice(0, 200)}`,
+            remedy,
+            source: "engine/tools.ts se_run",
+          });
+        }
         const laneWarning = laneVerdict(
           seDir(projectRoot),
           String(args.command),
@@ -894,7 +1040,7 @@ export function coreTools(
           args.background === true
             ? runBackground(root, String(args.command), cwd)
             : await runToCompletion(root, String(args.command), cwd);
-        return annotateRun(res, String(args.command), laneWarning);
+        return annotateRun(res, laneWarning);
       },
     },
     {
@@ -1033,6 +1179,41 @@ export function coreTools(
         // that could never run would still answer with a handle and fail
         // quietly a second later (found by verdictlog.test.ts, 2026-08-13).
         const scoped = args.files !== undefined || args.name_pattern !== undefined;
+        // THE FULL BATTERY BELONGS TO verification, AND NOW THE LANE SAYS SO
+        // (req-the-full-battery-runs-where-the-method-says, i11 2026-08-16).
+        //
+        // M7_50_verification HAS SAID IT ALL ALONG: `filled_by: engine`, "THE
+        // ONE PLACE the full battery runs", and the battery "carries no field:
+        // it runs mechanically and its verdict records itself". Two runs per
+        // iteration is the design — that one, plus fix-findings' single confirm.
+        //
+        // FIVE RAN ON 2026-08-16, every one on an agent's own judgment, none
+        // sanctioned by any row. A rule that only asks is what this replaces.
+        //
+        // CHECKED BEFORE THE HANDOFF, for the reason the comment above gives:
+        // a refusal raised inside the async body becomes the JOB's verdict, so
+        // the call would answer with a handle and fail quietly a second later.
+        if (!scoped && !force) {
+          // ASKED OF THE LIVE SESSION, never built. This once constructed a
+          // whole Session to read one string, which re-ran the settings
+          // restore, the keep-awake sync and armIdleTimer — and the restore
+          // reinstated a stale target. A throwaway object with side effects
+          // is not a cheap read.
+          const at = whereNow();
+          if (!/(^|\/)verification$/.test(at)) {
+            throw new Rejection({
+              clause: CLAUSES.CONDITION_UNMET,
+              expected: "the full battery runs at verification, where the engine fires it and its verdict records itself",
+              got: `an agent-initiated battery at ${at === "" ? "no state" : at}`,
+              remedy: {
+                tool: "se_test",
+                args: { files: ["<the file your change touched>"], question: "<what this run answers>" },
+                note: "a scoped run answers a question about a change and is always legal; the whole suite is the engine's job at verification, and force: true is for a flake hunt",
+              },
+              source: "engine/tools.ts se_test",
+            });
+          }
+        }
         const work = scoped ? runScoped(scopedQuestion(args.question)) : runBattery();
         const id = `test-${Date.now().toString(36)}-${++testSeq}`;
         // THE LAST RUN SIZES THE EXPECTATION (owner ruling 2026-08-03): a
@@ -1086,6 +1267,23 @@ export function coreTools(
         );
         testVerdicts.set(id, entry);
         persistTestJob(se, id, entry);
+        // A SCOPED RUN ANSWERS THE CALLER THAT ASKED (i11 2026-08-16).
+        //
+        // MEASURED THE DAY BEFORE THIS LANDED: 494 se_test calls produced 66
+        // verdicts. About 428 asked only whether a job had finished, and a
+        // fifty-second battery cost ten calls to watch.
+        //
+        // THE JOB MACHINERY STAYS UNDER IT. The verdict is still persisted and
+        // still logged, so `{job}` keeps working and nothing that reads a job
+        // by id has to change — the caller simply stops having to.
+        //
+        // THE BATTERY STILL HANDS OFF, and that is not an oversight. It is the
+        // engine's to fire at verification, where nobody is waiting on the
+        // answer, and blocking a caller for fifty seconds buys nothing.
+        if (scoped) {
+          await entry.done;
+          return entry.verdict ?? { job: id, running: false };
+        }
         return {
           handed_off: true,
           job: id,
@@ -1620,6 +1818,7 @@ export function buildServer(
       () => session.doors(),
       () => ({ session, root, lastPacket: undefined, mode: "manual" }),
       () => session.boundRecordId(),
+      () => session.active()[0] ?? "",
     ),
   ];
   // WIRED HERE, NOT INSIDE coreTools. searchHelp needs the FULL assembled
@@ -1848,6 +2047,14 @@ export function buildServer(
     };
   });
 
+  // THE REPAIRED ARGUMENT NAME rides home on the call it saved.
+  server.addDecorator((_tool, result) => {
+    const r = argRepairs;
+    argRepairs = undefined;
+    if (r === undefined || typeof result !== "object" || result === null || Array.isArray(result)) return result;
+    return { ...(result as Record<string, unknown>), arg_repaired: r };
+  });
+
   // R8 + unknown-args: the declared shape is the accepted one (whitelist).
   const shapes = new Map(
     tools.map((t) => [
@@ -1861,6 +2068,7 @@ export function buildServer(
   server.addGuard((tool, args) => {
     const shape = shapes.get(tool);
     if (shape === undefined) return;
+    repairArgNames(tool, args, shape.known);
     // ABSENT means the key was not sent. NULL IS A VALUE (base_hash: null creates).
     const missing = shape.required.filter((k) => !(k in args) || args[k] === undefined);
     if (missing.length > 0) {
@@ -1882,7 +2090,16 @@ export function buildServer(
         clause: CLAUSES.UNKNOWN_ARGS,
         expected: `only: ${shape.known.join(", ")}`,
         got: `unknown argument${unknown.length > 1 ? "s" : ""}: ${unknown.join(", ")}`,
-        remedy: { tool, args: {}, note: "a wrong arg name is refused rather than silently ignored — rename and retry" },
+        remedy: {
+          tool,
+          args: {},
+          note: unknown
+            .map((k) => {
+              const could = candidateArgs(k, args, shape.known);
+              return could.length === 0 ? k : `${k} — did you mean ${could.join(" or ")}?`;
+            })
+            .join(" · "),
+        },
         source: "engine/tools.ts unknown-args",
       });
     }

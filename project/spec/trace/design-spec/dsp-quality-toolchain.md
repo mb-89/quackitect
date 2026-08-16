@@ -17,6 +17,8 @@ files:
   - "project/deliverable/engine/bin/selftest.ts"
   - "project/deliverable/engine/bin/smoketest.ts"
   - "project/deliverable/engine/bin/preflight.ts"
+  - "project/deliverable/engine/bin/red-observed.ts"
+  - "project/deliverable/engine/bin/battery.ts"
   - "project/deliverable/engine/bin/test-timings.mjs"
 ---
 

@@ -203,6 +203,24 @@ test("a blocked route draws a closure, and the way past it is FADED", async () =
   assert.ok(html.includes("above this session's"), "and the barrier says why, in the tier's own word");
 });
 
+// THE SAME LIE AT A CONTAINER'S DOOR (i11's audit, from the 2026-08-12 seed).
+//
+// The case above shuts a plain state. A CONTAINER is the harder half and the
+// seed names it: at 0.2 the pull refuses to enter expeditions, whose door
+// weighs 0.4 — but entering a submachine resolves to its START state, which is
+// mechanical. If the route weighs the state ENTERED rather than the door, the
+// line reads open the whole way and the walk then stops anyway.
+test("a container's own weight shuts the route, not its start state's", () => {
+  const s = new Session(freshRoot());
+  s.setAutonomy(0.2);
+  const r = s.route("expeditions");
+  assert.equal(r.found, true, "the way is drawn");
+  // THE STOP LANDS WHERE THE WALK WOULD: the container's start, which is the
+  // state actually entered. What was missing was the WEIGHT, not the name.
+  assert.equal(r.stops_at?.at, "expeditions/start", `the route must shut at the container: ${JSON.stringify(r.stops_at)}`);
+  assert.match(r.stops_at?.why ?? "", /operational work, above this session's mechanical/, "and it says whose weight shut it");
+});
+
 // A TARGET YOU CANNOT NAME IS NOT A TARGET (found live 2026-07-29). The search
 // expands a submachine into its inner states, so the container's own id was
 // never a node in the graph. Aiming at "expeditions" was refused as unreachable

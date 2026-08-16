@@ -12,7 +12,7 @@ measure: 0 successful requests from a non-loopback source address, over a run th
 refines:
   - uc-quality-security
 source_refs:
-  - "engine/mirror.ts: server.listen(o.port) — no host argument, so Node binds every interface"
+  - "engine/mirror.ts: server.listen(o.port, \"127.0.0.1\") — the loopback host is passed explicitly"
   - "engine/mirror.ts: access-control-allow-origin is * on the alive endpoint"
   - "guidance/voice.md: people & privacy"
 priority: must
@@ -38,10 +38,20 @@ address, over a run that attempts at least one.
 
 ## Detail
 
-MET, as of a later fix this row's own source_refs predate: `server.listen(o.port,
-"127.0.0.1")` now passes the loopback host explicitly (engine/mirror.ts:915),
-so Node binds only that interface. Found stale during the i8 ATAM walk
-(evaluate-architecture) — this section still described the pre-fix call.
+THE MIRROR SERVES ONE MACHINE, and the binding host is what enforces it.
+Passing no host makes Node listen on every interface, which is the whole of
+the hole this row guards.
+
+WHETHER IT IS MET TODAY IS NOT WRITTEN HERE (i11, 2026-08-16). It used to be,
+and it went stale twice: this section once opened "THE DEMAND IS NOT MET
+TODAY" long after the fix landed, and a reader of the register saw an open
+fatal hole that did not exist. It nearly cost a session a false emergency.
+The row's own source_refs then stayed stale for another iteration, still
+citing the broken call as evidence.
+
+VERIFICATION STATUS BELONGS IN EVIDENCE, NEVER IN A REQUIREMENT BODY. A row
+that narrates whether it is currently satisfied goes stale every time somebody
+satisfies it, and the reader cannot tell a stale narration from a live one.
 
 WHAT IS EXPOSED IF THIS IS WRONG. The mirror serves the whole record: the
 call log, every evidence form, every decision, the terminal widget. There is

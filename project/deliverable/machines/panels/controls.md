@@ -20,7 +20,8 @@ edits it in the real world, and Obsidian reads it.
 ## Types
 
 - `rungs` — a bank of cumulative switches. Fields: source.
-  The source names where the rungs come from; `scale` is machines/scale.md.
+  The source names where the rungs come from; `scale` is machines/scale.md and
+  `stopat` is machines/stopat.md.
 - `int` — a line edit that takes whole numbers only. Fields: key, unit, min, max.
 - `action` — a button that posts and does nothing else. Fields: post.
 - `text` — a line edit for free text. Fields: key, placeholder, separator.
@@ -52,6 +53,8 @@ screen twice, which is the same two-drawings fault the sliders had.
 ## Parameters
 
 - autonomy | rungs | scale | what the agent may decide alone — each rung is a kind of work, and every rung below it comes with it
+- stop @ | rungs | stopat | how far the agent walks before handing back — agent judgement is the default, and the two above it unlock one press at a time
+- go on | action | /release | let the agent take ONE more state — only does anything at stop @ state end, where the engine holds every transition
 - walk | actions | SET TARGET | /target/selected | PULL | /pull | drive the walk by hand — SET TARGET aims at the state whose details are open; PULL advances one instruction, and the answer lands in the details
 - updates | int | narration_minutes | min | 0 | 1440 | an update every n minutes at least — 0 stops this clock
 - | int | narration_calls | calls | 0 | 1440 | an update every n calls at least — 0 stops this clock
@@ -62,6 +65,20 @@ screen twice, which is the same two-drawings fault the sliders had.
 THE NOTE ROW IS ITS OWN PANEL (note-entry.md) and the sidebar draws it under
 this one. It is a separate control with a separate spec, so it is not
 restated here.
+
+## The stop-at row
+
+IT SITS UNDER AUTONOMY AND ANSWERS THE NEIGHBOURING QUESTION. Autonomy says
+what the agent may decide alone; stop-at says how far it may walk before
+handing back.
+
+THE LABEL IS THE ROW'S, NOT THE BUTTONS'. `stop @` sits in front, once, the way
+`autonomy` does. Repeating it on each notch would make four long buttons out of
+four short ones, and the row already carries its own name by the rule above.
+
+THE NOTCHES ARE machines/stopat.md, which holds what each one means and why the
+control exists at all. Editing that file moves the buttons on the next reload;
+nothing here restates them.
 
 ## The shutdown row
 

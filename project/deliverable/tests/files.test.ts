@@ -398,7 +398,11 @@ test("delete is hash-guarded", () => {
     (e: unknown) => e instanceof Rejection && e.clause === "SE-C-104",
   );
   const r = fileRead(root, "d.md");
-  assert.deepEqual(fileDelete(root, "d.md", r.hash), { deleted: "d.md" });
+  // AN EMPTY LIST, NEVER SILENCE (req-a-deletion-names-what-points-at-the-node).
+  // A file with no `id:` is not a trace node, so nothing can point at it — and
+  // the answer still carries the list, so "nothing cites this" and "nobody
+  // asked" cannot look alike.
+  assert.deepEqual(fileDelete(root, "d.md", r.hash), { deleted: "d.md", cited_by: [] });
 });
 
 test("glob matches ** and excludes junk dirs", () => {

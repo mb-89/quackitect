@@ -5,6 +5,7 @@ type: "[[function]]"
 cluster: the-walk
 statement: hand the driver one instruction carrying everything that step needs
 satisfies:
+  - req-a-deletion-names-what-points-at-the-node
   - req-a-pull-carrying-no-choice-enters-no-iteration
   - req-a-clear-jump-is-one-call
   - req-answer-pages-never-overflows

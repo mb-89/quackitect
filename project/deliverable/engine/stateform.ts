@@ -905,8 +905,20 @@ function promotionAssignmentProblems(corpus: { id: string; type: string; file?: 
   // experiment in any root that merely had an iterations directory — which is
   // every unit fixture. The tester caught the second one.
   //
-  // AN EXPERIMENT WITH NO OWNER IS IN SCOPE. Absence cannot prove it belongs to
-  // somebody else, and the safe direction is to ask rather than to skip.
+  // AN EXPERIMENT WITH NO OWNER IS OUT OF SCOPE (owner ruling 2026-08-16, and
+  // it REVERSES what stood here). The old rule was "absence cannot prove it
+  // belongs to somebody else, so ask rather than skip", and the asking is what
+  // the owner struck: "A promotion does not need to survive its iteration. A
+  // promotion doesn't even have to be accessible as far as I'm concerned. We
+  // should only look at promotions from within our own iteration."
+  //
+  // WHAT ASKING COST. specify-build refused i11 TWICE over promotions naming
+  // chunks of drawings that shipped with i27, and the agent withdrew both —
+  // work nobody needed, on experiments nobody was going to build.
+  //
+  // NOTHING IS LOST BY SKIPPING. An experiment the current record minted is
+  // stamped `minted_in` by the engine at the write, so an unstamped one cannot
+  // be this record's. The only thing the old rule caught was other records'.
   //
   // TWO WAYS TO KNOW THE OWNER, and they answer in different situations.
   //
@@ -915,19 +927,27 @@ function promotionAssignmentProblems(corpus: { id: string; type: string; file?: 
   // never has one — and reading absence as "folded nothing back" is what broke
   // the sweep's own test, because every unit fixture is also absent.
   //
-  // So absence falls through to the experiment's OWN `minted_in`. An experiment
-  // with no owner at all stays in scope: absence cannot prove it belongs to
-  // somebody else, and the safe direction is to ask rather than to skip.
+  // So absence falls through to the experiment's OWN `minted_in`.
   const own = foldBackExperiments(recordRoot, only);
   // THE OWNER IS COMPARED AS A SHORT ID, because minted_in carries the short
   // form after the 2026-08-15 rename and the long one before it.
-  const owner = shortRecordId(only ?? basename(recordRoot));
+  // UNDEFINED MEANS THE ENGINE CANNOT NAME THE RECORD, which is a different
+  // thing from naming a record that owns nothing. Nothing can be called
+  // somebody else's business until we know whose business this is.
+  const owner = only === undefined ? undefined : shortRecordId(only);
   for (const n of corpus) {
     if (n.type !== "experiment" || n.file === undefined) continue;
     if (own !== undefined && !own.has(n.id)) continue;
     const fm = noteOf(n.file)?.frontmatter ?? {};
     const mintedIn = String(fm.minted_in ?? "").trim();
-    if (own === undefined && mintedIn !== "" && shortRecordId(mintedIn) !== owner) continue;
+    // OURS OR NOT ASKED ABOUT. An absent stamp is not this record's either —
+    // that is the half the ruling reversed, and it is what `$promotions` has
+    // always done, so the two agree now instead of disagreeing about a blank.
+    //
+    // ONLY WHERE THE OWNER IS KNOWN. With no resolvable record there is no
+    // "ours" to compare against, and skipping everything would turn the law off
+    // silently — the exact failure mode the comment above records twice.
+    if (own === undefined && owner !== undefined && shortRecordId(mintedIn) !== owner) continue;
     const p = String(fm.promote ?? "").trim();
     if (p === "" || /^none\b/i.test(p)) continue;
     const chunk = String(fm.chunk ?? "").trim();

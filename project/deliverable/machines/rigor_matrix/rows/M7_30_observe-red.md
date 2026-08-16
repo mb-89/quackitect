@@ -6,6 +6,8 @@ state_kind: work
 filled_by: agent
 depends_on:
   - specify-build
+exit_script:
+  - project/deliverable/engine/bin/red-observed.ts
 legal_tools:
   - se_file_read
   - se_file_write
@@ -57,7 +59,20 @@ spec. Checking claims one of two things:
 - red is impossible for a spec covering standing behavior, and that is
   accepted
 
-THE TEST REDS ARE THE ENGINE'S. The new checks run and fail
-mechanically; the executor lane takes this over. Until it lands, the
-walker runs the new checks scoped and records the run ref in the
-situation.
+THE TEST REDS ARE THE ENGINE'S, and now mechanically so. The submit
+fires [[red-observed]]: it reads every test-spec minted in the open
+record whose method is `test`, runs the files they name, and refuses
+unless at least one case FAILS. The agent never runs them.
+
+WHY A REFUSAL AND NOT A WARNING (owner ruling 2026-08-16). This state
+had no test verb to begin with, so the agent reached for the shell, and
+a truncating pipe ate the output it reached for. The owner rejected
+granting the verb in the same breath as proposing this: it keeps the
+agent deciding when a check runs, which is the habit being removed.
+
+THREE THINGS FAIL IT, and each names a different hole.
+
+- A check that PASSES before the build. Green from birth proves nothing.
+- A file that does not exist. The check was never written.
+- A run with no TAP summary, or zero cases. An instrument failure must
+  never read as a red.

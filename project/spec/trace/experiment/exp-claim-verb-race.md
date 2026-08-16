@@ -12,8 +12,8 @@ fallback: preassign partitioning holds the fleet while the lock is redesigned �
 verdict: holds
 measured: 2026-08-11 — 9 of 9 checks pass in 2.9 s; the loser rejects with fetch-first and re-fetch shows the holder; the offline claim rebases and lands (add-only files never conflict); the force release is one more commit and the history keeps who held what; a fresh pull reads all three claims
 folds_to: "raid-asm-remote-serializes-claims carries the dated local-half measurement extended to the whole verb; nothing upstream moves — the winner and its ADR stand as decided"
-promote: "the verb's mechanism as measured — record then announce, rebase-and-retry on rejection, release as a second commit — enters the M7 build through the gate; the spike code itself is throwaway"
-chunk: core-process
+promote: "none — WITHDRAWN 2026-08-16 by i11. It promoted the claim verb's mechanism (record then announce, rebase-and-retry on rejection, release as a second commit) into chunk core-process. i34 deleted the claim system whole, so there is no verb left to promote it into. The 9-of-9 measurement stands and is not retracted; only the promotion is."
+chunk: "none — core-process belonged to a drawing that shipped, and the mechanism it would have entered no longer exists"
 source_refs:
   - rank-unknowns, the seeded pick of 2026-08-11
   - the owner's sanction of the same day — build the verb early, race it locally, promote on green

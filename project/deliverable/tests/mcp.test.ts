@@ -105,16 +105,44 @@ test("a tool with ALTERNATIVE required args refuses in its handler, and says bot
   assert.ok(n.body.remedy);
 });
 
-test("unknown arg NAME refused — the String(undefined) incident cannot recur", async () => {
+// A SIBLING VERB'S WORD IS UNDERSTOOD, AND THE REPAIR IS ANNOUNCED (i11).
+//
+// The lane's verbs disagree about what to call their subject — search takes
+// `query`, glob takes `glob`, list takes `dir` — and the set is not learnable,
+// so a caller paid a round trip for a word. `pattern` cost two on 2026-08-16.
+//
+// WHAT MUST NOT CHANGE is the reason this case was written: a wrong name is
+// never SILENTLY ignored. Silence was the defect; the round trip was only the
+// remedy. So the repair rides back on the result.
+test("a sibling's arg name resolves and says so; an ambiguous one still refuses", async () => {
   const root = fresh();
   writeFileSync(join(root, "f.md"), "content");
   const server = await bootedServer(root);
-  const r = await call(server, "se_file_search", { pattern: "x", intent: "testing" }); // wrong: 'pattern' not 'query'
-  assert.equal(r.isError, true);
-  assert.equal(r.body.clause, "SE-C-046"); // missing 'query' reported first, with accepted-args note
+
+  const r = await call(server, "se_file_search", { pattern: "content", intent: "testing" }); // search calls it 'query'
+  assert.notEqual(r.isError, true, `a lone sibling word should resolve: ${JSON.stringify(r.body).slice(0, 200)}`);
+  assert.deepEqual(
+    (r.body.arg_repaired as { from: string; to: string }[] | undefined)?.map((x) => [x.from, x.to]),
+    [["pattern", "query"]],
+    "the repair must be announced — silent is the one thing it may not be",
+  );
+
+  // THE SAME WORD, A DIFFERENT VERB, A DIFFERENT ANSWER. Nothing is renamed;
+  // each verb keeps its own name and the caller is understood.
+  const g = await call(server, "se_file_glob", { pattern: "*.md" });
+  assert.notEqual(g.isError, true);
+  assert.equal((g.body.arg_repaired as { to: string }[] | undefined)?.[0]?.to, "glob");
+
+  // ALREADY SATISFIED IS NOT A NEAR MISS. `query` was sent, so `pattern` can
+  // only be a second thing, and rewriting one over the other would lose it.
   const r2 = await call(server, "se_file_search", { query: "x", intent: "t", pattern: "x" });
   assert.equal(r2.isError, true);
   assert.equal(r2.body.clause, "SE-C-101");
+
+  // AND A WORD THAT MEANS NOTHING HERE still refuses, with the accepted set.
+  const r3 = await call(server, "se_file_search", { query: "x", intent: "t", zzz: 1 });
+  assert.equal(r3.isError, true);
+  assert.equal(r3.body.clause, "SE-C-101");
 });
 
 test("a full read-edit-verify round trip over the wire, and every call logged", async () => {

@@ -59,7 +59,11 @@ describe("the offer", { concurrency: true }, () => {
     assert.ok(options.length > 1, "the desk should still surface the live doors");
     const desk = options.find((o) => o.to === "front_desk");
     assert.ok(desk !== undefined, "the front desk is one of them");
-    assert.equal(typeof desk.priority, "number", "the weight rides along with the waiting options");
+    // THE WEIGHT IS A WORD (req-autonomy-is-categorical; owner 2026-08-16).
+    // Every door of every pull used to carry `priority: 0.2`, so the number
+    // the answer had stopped saying at the top was said a dozen times below it.
+    assert.equal(desk.priority, undefined, "no served surface carries a bare autonomy number");
+    assert.equal(desk.weight, "mechanical", "the weight rides along as the rung's own word");
   });
 
   test("idle itself is among the desk's doors — the hub is a destination, not only a thoroughfare", async () => {

@@ -23,7 +23,7 @@ import { beginPass, endPass } from "./notes.ts";
 import { loadPanel, renderPanel } from "./params.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { ENGINE_LIFE, feedRows, type MirrorState, renderMirror } from "./render.ts";
-import { loadLevels } from "./scale.ts";
+import { loadLevels, loadStopAt } from "./scale.ts";
 import type { Session } from "./session.ts";
 import { survey } from "./survey.ts";
 import { editCell } from "./tables.ts";
@@ -182,6 +182,20 @@ export function startMirror(o: MirrorOptions): Server {
         return { args: { value: body.value, ...(typeof result.tier === "string" ? { tier: result.tier } : {}) }, result };
       },
     ],
+    // HOW FAR THE AGENT WALKS BEFORE HANDING BACK. The autonomy dial's
+    // neighbour, logged the same way, and like every control it MOVES NOTHING:
+    // the walk still advances on the agent's pull and nothing else.
+    "/stop-at": [
+      "mirror_stop_at",
+      (body) => {
+        const result = state.session.setStopAt(Number(body.value));
+        return { args: { value: body.value, ...(typeof result.stop_at === "string" ? { stop_at: result.stop_at } : {}) }, result };
+      },
+    ],
+    // ONE PRESS, ONE STATE. Under `stop @ state end` the engine holds every
+    // transition; this spends a single release. It grants permission and never
+    // walks — the agent's next pull is still what moves the machine.
+    "/release": ["mirror_release", () => ({ args: {}, result: state.session.releaseOnce() })],
     // WHERE SATELLITES RUN. The launch flag decides the CURRENT run; this
     // stores the choice for the next one, and the answer says so rather than
     // pretending the boundary moved under a walk in flight.
@@ -754,6 +768,11 @@ export function startMirror(o: MirrorOptions): Server {
       const values = {
         rungs: loadLevels(state.root),
         autonomy: state.session.autonomy,
+        // THE SECOND BANK. Missing here would not fail loudly — renderPanel
+        // reads an absent value as the OFF state and draws a row of dead
+        // buttons, which is the hole the comment above this block records.
+        stopat: loadStopAt(state.root),
+        stop_at: state.session.stopAtValue,
         emergency: state.session.emergency,
         ints: { narration_minutes: state.session.narrationMinutes, narration_calls: state.session.narrationCalls },
         toggles: { "block-auto-sleep": power.block_sleep, "shutdown-at-idle": power.shutdown_at_idle },

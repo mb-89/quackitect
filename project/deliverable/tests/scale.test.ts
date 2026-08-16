@@ -14,7 +14,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { parseStateNote } from "../engine/notes.ts";
 import { renderMirror } from "../engine/render.ts";
-import { loadLevels, tierOf, valueFor } from "../engine/scale.ts";
+import { loadLevels, loadStopAt, notchName, tierOf, valueFor, weightName } from "../engine/scale.ts";
 import { Session } from "../engine/session.ts";
 import { freshRoot } from "./helpers.ts";
 
@@ -45,6 +45,45 @@ test("the ladder speaks the owner's tiers in order, and the words map to their a
   assert.equal(tierOf(levels, 0.1), "blocked");
 });
 
+// A STATE'S WEIGHT LOOKS UP THE LADDER; THE DIAL LOOKS DOWN IT.
+//
+// tierOf answers "which rung does this SETTING reach", so a value below the
+// lowest rung reaches nothing and comes back "blocked". Applied to a STATE
+// that is exactly backwards. Seen live 2026-08-16 the moment the pull's doors
+// started serving words: `iterations/end`, a terminal and the lightest step in
+// the drawing, came back as `weight: "blocked"`.
+test("a state's weight is the least rung that admits it, never the dial's answer", () => {
+  const levels = loadLevels(fileURLToPath(new URL("../../..", import.meta.url)));
+  assert.equal(weightName(levels, 0.01), "mechanical", "a terminal is the LIGHTEST step, not the heaviest");
+  assert.equal(tierOf(levels, 0.01), "blocked", "and the dial at the same value genuinely reaches nothing");
+  assert.equal(weightName(levels, 0.4), "operational", "an exact anchor names its own rung");
+  assert.equal(weightName(levels, 0.5), "tactical", "and anything between rounds UP to the rung that admits it");
+  // ABOVE THE TOP RUNG IS THE ONE CASE WHERE "blocked" IS RIGHT: nothing
+  // admits it, so the agent never may. The archives are drawn that way.
+  assert.equal(weightName(levels, 1.5), "blocked", "the archives are the person's at any setting");
+});
+
+// THE SHIPPED NOTCHES PARSE, and this case exists because they did not.
+//
+// stopat.md was authored with its notch lines WRAPPED, the way every other
+// paragraph in it is. Everything under the heading is read as a level line, so
+// the file threw on load — and the control drew the autonomy rungs under a
+// `stop @` label, which is a button that lies about what it sets.
+//
+// A SYNTHETIC BANK CANNOT CATCH THAT. The panel tests hand renderPanel a
+// hand-written list, so they stayed green while the real file was unreadable.
+// This reads the shipped file.
+test("the shipped stop-at notches parse, and say what the owner specified", () => {
+  const notches = loadStopAt(fileURLToPath(new URL("../../..", import.meta.url)));
+  assert.deepEqual(
+    notches.map((n) => n.name.split(" — ")[0]),
+    ["state end", "agent judgement", "bless", "blockers only"],
+    "the four notches, in the order they unlock",
+  );
+  assert.equal(notchName(notches, 2), "agent judgement", "the default a session starts at");
+  assert.equal(notchName(notches, 99), "", "an unknown value names nothing rather than guessing a notch");
+});
+
 // BLOCKED IS NOT A BUTTON (owner, 2026-08-01). It is what no rung being
 // pressed MEANS, so it is reachable by RELEASING the lowest rung rather than
 // by a switch of its own. The control is switches, never a slider.
@@ -53,7 +92,10 @@ test("the mirror reaches blocked by releasing the lowest rung", () => {
   const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
   assert.doesNotMatch(html, /id="thr" type="range"/, "the autonomy slider is gone");
   assert.doesNotMatch(html, />B</, "blocked has no button of its own");
-  assert.match(html, /class="rung on" data-level="0"/, "pressing the lit lowest rung drops to blocked");
+  // THE BANK IS NAMED ON EVERY BUTTON since the stop-at dial joined the bar
+  // (i11). Two rung banks sit side by side and post to different routes, so a
+  // pattern that matched either one would prove nothing about this control.
+  assert.match(html, /class="rung on" data-bank="autonomy" data-level="0"/, "pressing the lit lowest rung drops to blocked");
 });
 
 // THE WORDS ARE THE TRUTH (req-autonomy-is-categorical, tsp-autonomy-tiers).

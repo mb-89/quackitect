@@ -7,9 +7,13 @@ import { strict as assert } from "node:assert";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { bootedServer, call, freshRoot, waitForTestJob } from "./helpers.ts";
+import { bootedServer, call, freshRoot } from "./helpers.ts";
 
-test("a handed-off scoped run logs its own verdict without being fetched", async () => {
+// A SCOPED RUN ANSWERS ITS CALLER NOW (i11's test-verb), so there is no handle
+// to fetch and nothing to poll. The verdict must STILL log itself: the retro
+// reads the log, not the answer, and a failure nobody re-reads is exactly what
+// this file exists to keep visible.
+test("a scoped run answers its caller AND logs its own verdict", async () => {
   const root = freshRoot();
   const server = await bootedServer(root);
   // A fixture root carries no tests directory — plant one green case.
@@ -24,16 +28,22 @@ test("a handed-off scoped run logs its own verdict without being fetched", async
     force: true,
     question: "does a handed-off run log its own verdict?",
   });
-  assert.equal(started.body.handed_off, true, JSON.stringify(started.body));
+  // 428 OF 494 se_test CALLS IN ONE DAY ASKED ONLY WHETHER A JOB HAD FINISHED.
+  // A scoped run is short by construction, so it blocks and answers.
+  assert.equal(started.body.handed_off, undefined, `a scoped run answers rather than handing back: ${JSON.stringify(started.body)}`);
+  assert.equal(started.body.running, false, JSON.stringify(started.body));
   const job = String(started.body.job);
-  const verdict = await waitForTestJob(server, job);
-  assert.equal(verdict.running, false, `the run finished: ${JSON.stringify(verdict)}`);
+  const verdict = started.body as Record<string, unknown>;
   const secondServer = await bootedServer(root);
   const recovered = await call(secondServer, "se_test", { job });
   assert.equal(recovered.body.job, verdict.job);
   assert.equal(recovered.body.running, false);
   assert.equal(recovered.body.ok, verdict.ok);
   assert.deepEqual(recovered.body.tests, verdict.tests);
+  // THE HANDOFF SURVIVES WHERE IT IS STILL RIGHT: the battery is long, so it
+  // hands back a handle and its verdict lands in the log on its own.
+  const battery = await call(server, "se_test", { force: true });
+  assert.equal(battery.body.handed_off, true, `the battery still hands off: ${JSON.stringify(battery.body)}`);
   const query = await call(server, "se_log_query", { filter: { tool: "se_test_verdict" } });
   const records = query.body.records as { args: { job: string }; ok: boolean }[];
   assert.equal(records.length, 1, `the verdict logged itself: total ${String(query.body.total)}`);

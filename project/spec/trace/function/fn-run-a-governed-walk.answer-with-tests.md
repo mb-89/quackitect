@@ -5,6 +5,7 @@ type: "[[function]]"
 cluster: the-record-life
 statement: answer one question about a change by running the narrowest scope that settles it
 satisfies:
+  - req-the-full-battery-runs-where-the-method-says
   - req-scoped-run-records-its-timings
   - req-test-run-carries-its-question
   - req-story-links-its-proving-run

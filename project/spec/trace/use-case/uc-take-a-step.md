@@ -10,6 +10,7 @@ guarantee: the state's evidence form is filled and checked, and the walk may mov
 refines:
   - sty-walk-it-by-hand
   - sty-the-agent-proves-it-read
+  - sty-carry-a-finding-without-stopping
 priority: must
 ---
 
@@ -49,5 +50,7 @@ state grey, each with its own remedy, rather than only the first to fail.
 - 3a. A tool outside the legal set is reached for. The refusal names the clause, what was expected, and the exact call to make instead.
 - 4a. A field takes node references. A line naming nothing is refused, and the type's template is one click away.
 - 4b. A field declares coverage over another type. Both directions are checked, and an orphan on either side keeps the state unmet.
+- 4c. A check turns up a real defect that breaks nothing here. It is recorded as an OWED item naming an open register entry with an owner, the state signs, and the walk moves on. The close refuses while any owed item stands.
+- 4d. An owed item names no open register entry. The submit refuses it, because a disposition nobody agreed to is not a disposition.
 - 5a. A required field is empty. The submit names which, and nothing is stamped.
 - 6a. The next state's entry conditions do not hold. The walk stops here and names what is missing.

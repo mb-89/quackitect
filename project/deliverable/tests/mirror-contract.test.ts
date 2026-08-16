@@ -497,13 +497,21 @@ test("the checklist warns once when narration outruns it, then refuses", () => {
   assert.ok(typeof last.nudge === "string", "five updates with nothing closed earns the warning");
   assert.match(String(last.nudge), /PROGRESS view/);
   assert.equal(last.update, "update", "the warned call itself still lands - the warning is free");
-  // IGNORE THE WARNING AND THE NEXT ONE REFUSES (owner ruling 2026-08-07).
-  // It took the toll's shape because advice lost: in one 15-hour window the
-  // nudge fired five times and was ignored five times.
+  // THE GRACE IS THE GAP BETWEEN THE TWO (i11, narration-grace). Both
+  // thresholds used to be five, so the warning and the refusal arrived one
+  // call apart - which is a two-stage refusal wearing a warning's clothes.
+  // Real work runs past six updates while reading its way to a root cause.
+  for (let i = 5; i < 12; i++) {
+    last = s.decisions.apply("idle@0", { op: "update", node: items[0].id, brief: `still working ${i}` }) as Record<string, unknown>;
+    assert.equal(last.update, "update", `update ${i + 1} is inside the grace and must land`);
+  }
+  // IGNORE IT LONG ENOUGH AND IT REFUSES (owner ruling 2026-08-07). It took
+  // the toll's shape because advice lost: in one 15-hour window the nudge
+  // fired five times and was ignored five times.
   assert.throws(
     () => s.decisions.apply("idle@0", { op: "update", node: items[0].id, brief: "ignoring the warning" }),
     (e: Error & { clause?: string }) => e.clause === "SE-C-133",
-    "the update after the warning is refused",
+    "the update after the grace runs out is refused",
   );
   // THE REMEDY IS NEVER REFUSED, or the refusal would be a trap with no way
   // out. Closing something is always legal, and it clears the count.

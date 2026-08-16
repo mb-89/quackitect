@@ -91,4 +91,5 @@ export const CLAUSES = {
   RAW_NUL: "SE-C-132", // a raw NUL byte in text — it makes the whole file unsearchable; in code it is corrected to the escape, elsewhere the intent is not knowable
   WRITE_TRANSFORMED: "SE-C-135", // the applied text does not contain the payload — something transformed it on the way in; refused rather than silently corrupted
   TEST_NO_QUESTION: "SE-C-136", // a scoped run with no question — the scope says which tests ran, only the question says why
+  OUTPUT_SHAPED: "SE-C-137", // a truncating pipe would cut the output BEFORE the engine sees it — refused at the boundary, because what it drops exists nowhere
 } as const;

@@ -63,8 +63,23 @@ the conflict — that is information, not an obstacle.
 Fill every required field. The schema is the contract.
 
 ### SE-C-101 — an unknown argument name
-A wrong arg name is refused, never silently coerced. Check the schema before
-inventing a field.
+A wrong arg name is never silently coerced. Check the schema before inventing
+a field.
+
+A SIBLING VERB'S WORD IS UNDERSTOOD, and the repair is announced. The lane's
+verbs disagree about what to call their subject: search takes `query`, glob
+takes `glob`, list takes `dir`, the readers and writers take `path`. Sending
+one verb's word to another resolves, and `arg_repaired` on the result says
+what was read as what.
+
+TWO CASES STILL REFUSE, and both are the same rule: the lane does not guess.
+
+- The canonical name was ALREADY SENT. Then the extra word is a second thing,
+  and rewriting one over the other would lose it.
+- The word could mean two of the verb's own arguments. Two meanings is a
+  guess.
+
+The refusal names the candidates it considered.
 
 ### SE-C-102 — the path escapes the root
 Paths are root-relative to the project root. Outside the root there are two
@@ -103,6 +118,30 @@ Scope the command down, or hand it off and poll the job.
 
 ### SE-C-128 — the job is unknown
 Job handles belong to the session that started them.
+
+### SE-C-137 — a truncating shape in the command
+A TRUNCATING PIPE CUTS BEFORE THE ENGINE SEES. `Select-Object -First`, `head`,
+`tail`, `cut -c` and `Measure-Object` drop output between the command and the
+capture, so what they removed exists NOWHERE — not on the result, not in the
+log, not under the ref.
+
+ENDS CARRY VERDICTS: exit codes, totals, units. A shape that keeps the head
+throws away exactly the part that says whether it worked.
+
+THE REFUSAL NAMES THE VERB YOU WANTED, because the pipe is reached for when
+the output is expected to be long and every long thing has a verb for it.
+
+- A test run wants `se_test` — structured counts, only the failures' detail.
+- A search wants `se_file_search` — it windows with `limit` and SAYS when it
+  truncated, which a pipe never does.
+- A file wants `se_file_read` — it pages by line and refuses an oversize read
+  rather than cutting it silently.
+- Anything else: run it whole. The lane captures the full output under the
+  call's ref, and `se_log_query {ref}` serves it back a page at a time.
+
+`no_tool_reason` RUNS IT ANYWAY and logs why. It was a warning until
+2026-08-16, and the warning failed twice — the second time inside the
+iteration that was building this refusal.
 
 ### SE-C-129 — the shell asked to do a lane tool's job
 `se_run` is for what the lane cannot do. The lane's own jobs stay in the
@@ -180,10 +219,17 @@ with the update field.
 
 ### SE-C-120 — the update is malformed
 A brief is ONE line carrying ONE thought. A brief chaining three or more
-parts wanted to be a plan — send `{op: plan, items: [...]}` instead. Owner
-ruling 2026-08-06: the refusal goes uniform on every op, with the engine's
-proposed split riding the remedy; until that lands, resolutions refuse and
-other ops auto-apply as plans.
+parts is an unrendered list, and the engine already computes the split.
+
+WHAT IS CORRECTED, never refused:
+
+- An `update` chain becomes the PLAN it wanted to be. The parts are the items.
+- A `fork` chain stays a FORK and the parts become its items, named by the
+  first. A fork blocks the current item and a plan does not, so rewriting the
+  op would change what the call means.
+
+WHAT STILL REFUSES: a RESOLUTION's chained brief. Which part resolved the
+node is not the engine's to guess.
 
 ### SE-C-121 — the node is unknown or resolved
 Updates name an OPEN node. Check the node map that rides every result.
@@ -192,9 +238,17 @@ Updates name an OPEN node. Check the node map that rides every result.
 Everything started gets resolved. Resolve or re-home the children first.
 
 ### SE-C-133 — the checklist stopped moving
-Narration that never closes anything records intent, not progress. After five
-updates with nothing resolved you get one warning, riding the result as a
-`nudge`. Ignore it and the next update refuses.
+Narration that never closes anything records intent, not progress.
+
+TWO THRESHOLDS, AND THE GAP BETWEEN THEM IS THE GRACE.
+
+- FIVE updates with nothing resolved: a warning rides the result as a `nudge`.
+- TWELVE: the next non-resolving update refuses.
+
+BOTH USED TO BE FIVE, so the warning and the refusal arrived one call apart.
+That is not a warning, it is a two-stage refusal — and the counter measures
+updates since anything CLOSED, which real work legitimately runs past while
+reading its way to a root cause.
 
 The way out is always open. A resolving op is never refused, because it is the
 remedy:

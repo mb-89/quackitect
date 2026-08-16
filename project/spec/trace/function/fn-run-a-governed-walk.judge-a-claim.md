@@ -5,6 +5,8 @@ type: "[[function]]"
 cluster: the-walk
 statement: build the form a step owes, check what comes back, and carry a person's verdict on it
 satisfies:
+  - req-a-harmless-finding-is-carried-not-stopped-on
+  - req-a-harmless-finding-names-an-open-entry
   - req-form-is-built-and-checked
   - req-coverage-checked-both-ways
   - req-gate-needs-a-persons-verdict

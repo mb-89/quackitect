@@ -54,6 +54,7 @@ import {
   confirmPrefill,
   type FormLint,
   type FormTemplate,
+  fieldContent,
   formTemplatePath,
   lintForm,
   parseFormTemplate,
@@ -99,7 +100,7 @@ import { mintFlipLines } from "./pugh.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { anyJobRunning } from "./run.ts";
-import { levelName, loadLevels, tierOf } from "./scale.ts";
+import { levelName, loadLevels, loadStopAt, notchName, tierOf, weightName } from "./scale.ts";
 import {
   buildPortableForm,
   chosenOption,
@@ -132,6 +133,15 @@ import { type Expedition, expClose, expFind, expList, expNew, itCloseShipped, re
  *  take the next offered door, which means it wanders one hop at a time and
  *  no route is ever drawn. That is not a walk; it is guessing with extra
  *  steps. */
+/** One old→new patch against a submitted form's field. `all` replaces every
+ *  occurrence; without it an ambiguous match refuses rather than guessing. */
+export interface AmendOp {
+  field: string;
+  old_string: string;
+  new_string: string;
+  all?: boolean;
+}
+
 /*  se_reopen and se_amend join them because A CLAIM IS FIXED FROM OUTSIDE IT
  *  (owner ruling 2026-08-07). Both act on a state you are not standing in —
  *  that is the whole point, since standing in it means it is already owed and
@@ -260,6 +270,18 @@ export class Session {
    *  2026-07-29): the desk is where a person says what they want, so it is
    *  the destination unless somebody names another. */
   private _target = "front_desk";
+  /** THE STOP-AT NOTCH — how far the agent walks before handing back. The
+   *  autonomy dial's neighbour: autonomy says what it may DECIDE alone, this
+   *  says how far it may GO.
+   *
+   *  2 IS `agent judgement`, today's behaviour and where a session starts. The
+   *  two notches above it unlock one press at a time, exactly like the autonomy
+   *  rungs above the resting one. machines/stopat.md holds what each means. */
+  private _stopAt = 2;
+  /** ONE RELEASE, GRANTED BY THE PERSON. Under `state end` the engine holds
+   *  every transition; a press spends one. It is permission, never a move —
+   *  the agent's pull is still what walks (req-controls-never-advance-walk). */
+  private _released = false;
   /** Fires once, after the tick that closes the MAIN machine — the server
    *  entry hooks the session shutdown here. */
   onClosed?: () => void;
@@ -310,6 +332,7 @@ export class Session {
         reads?: Record<string, string>;
         reads_pid?: number;
         target?: string;
+        stop_at?: number;
         session?: string;
       };
       const mine = process.env.SE_SESSION;
@@ -325,6 +348,10 @@ export class Session {
           this._narrationCalls = s.narration_calls;
         this.restoreReadCredit(s.reads, s.reads_pid);
         this.restoreTarget(s.target, s.reads_pid);
+        // THE NOTCH SURVIVES A RELOAD, and the release does not. Permission is
+        // for one transition; carrying it across an engine swap would spend a
+        // press the person made for a state that no longer stands.
+        if (typeof s.stop_at === "number") this._stopAt = s.stop_at;
       }
     } catch {
       /* no store yet — the defaults stand */
@@ -363,7 +390,18 @@ export class Session {
    *  produced. */
   private restoreTarget(target: string | undefined, pid: number | undefined): void {
     if (pid === undefined || pid === process.pid) return;
-    if (typeof target === "string" && target !== "") this._target = target;
+    // AN EMPTY TARGET IS A DELIBERATE CLEAR, NOT A MISSING ONE. `aimAt("")` is
+    // how the walk says it arrived and is aimed at nothing, and it persists
+    // that empty string faithfully. Refusing to restore it left `_target` at
+    // its field default, `front_desk` — so a cleared aim came back pointing at
+    // a state BEHIND the walk, and every packet reported the machine headed
+    // for the desk while it walked deeper into a record.
+    //
+    // SEEN LIVE 2026-08-16: `target: front_desk` on every pull inside i11,
+    // after a reload, with nobody having aimed there.
+    //
+    // `undefined` still restores nothing, which is the real "never set".
+    if (typeof target === "string") this._target = target;
   }
 
   /** The ONE place the target moves, so no site can forget to persist it. */
@@ -395,6 +433,7 @@ export class Session {
           reads: Object.fromEntries(this.readBuffer),
           reads_pid: process.pid,
           target: this._target,
+          stop_at: this._stopAt,
         })}\n`,
         "utf8",
       );
@@ -818,6 +857,17 @@ export class Session {
     return { mode, was, running, applies: mode === running ? "already running" : "on the next launch" };
   }
 
+  /** A STATE'S WEIGHT AS A WORD. The dial's own word comes from tierFor; this
+   *  is the other direction, and mixing them says "blocked" about the lightest
+   *  step in the drawing. */
+  private weightFor(priority: number): string {
+    try {
+      return weightName(loadLevels(this.machineRoot()), priority);
+    } catch {
+      return "";
+    }
+  }
+
   /** THE TIER WORD FOR A VALUE (req-autonomy-is-categorical). The word is
    *  the truth and the number is its transitional carrier, so the two travel
    *  together — a bare number on any surface is the thing that row forbids.
@@ -830,10 +880,97 @@ export class Session {
     }
   }
 
+  /** The notch as a number, for the control that draws it. */
+  get stopAtValue(): number {
+    return this._stopAt;
+  }
+
+  /** The notch's bare word. Empty only when stopat.md cannot be read, which
+   *  the hook reads as the default rather than as a licence. */
+  stopAtName(): string {
+    try {
+      return notchName(loadStopAt(this.machineRoot()), this._stopAt);
+    } catch {
+      return "";
+    }
+  }
+
+  /** THE PERSON'S HAND ON THE NOTCH. Like the autonomy dial, it moves
+   *  mid-session and nothing it does advances the walk. */
+  setStopAt(to: number | string): Record<string, unknown> {
+    const notches = loadStopAt(this.machineRoot());
+    const wanted =
+      typeof to === "number"
+        ? notches.find((n) => n.value === to)
+        : notches.find(
+            (n) =>
+              n.name.split(" — ")[0].toLowerCase() === String(to).trim().toLowerCase() ||
+              n.abbr.toLowerCase() === String(to).trim().toLowerCase(),
+          );
+    if (wanted === undefined) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `one of the notches: ${notches.map((n) => n.name.split(" — ")[0]).join(", ")}`,
+        got: String(to),
+        remedy: { tool: "se_pull", args: {}, note: "the notches are machines/stopat.md; edit that file to change them" },
+        source: "engine/session.ts stopAt",
+      });
+    }
+    this._stopAt = wanted.value;
+    this._released = false; // a moved notch spends no stale permission
+    this.persistSettings();
+    this.notifyChange();
+    return { stop_at: this.stopAtName() };
+  }
+
+  /** The person pressing "go on" under `state end`. One transition, then held
+   *  again — which is what "one press, one state" means. */
+  releaseOnce(): Record<string, unknown> {
+    this._released = true;
+    this.notifyChange();
+    return { released: true, stop_at: this.stopAtName() };
+  }
+
+  /** THE HOLD. Under `state end` the ENGINE refuses to change state, and the
+   *  person's press is what stops it refusing.
+   *
+   *  IT IS NOT AN AUTONOMY RULE. Autonomy weighs a step against a dial and
+   *  says whose step it is. This says nothing about whose — it says the agent
+   *  hands back at every boundary, whatever the step weighs.
+   *
+   *  THE PERSON IS NEVER HELD. The hold exists so a person can watch; holding
+   *  their own hand would be absurd. */
+  private holdsTransition(channel: Channel): boolean {
+    if (channel !== "agent") return false;
+    if (this.stopAtName() !== "state end") return false;
+    if (this._released) {
+      this._released = false; // spent
+      return false;
+    }
+    return true;
+  }
+
   /** The autonomy gate: an AGENT tick may enter a state only when its
    *  priority <= the session autonomy. The human's hand is never gated. */
   private gatePriority(m: MachineDecl, targetIds: string[], channel: Channel): void {
     if (channel !== "agent") return;
+    // THE HOLD COMES FIRST, and it is a different question from the dial's.
+    // Autonomy asks how HEAVY the step is; this asks nothing about the step at
+    // all. Under `state end` the agent hands back at every boundary, and the
+    // person's press is what stops the engine refusing.
+    if (targetIds.length > 0 && this.holdsTransition(channel)) {
+      throw new Rejection({
+        clause: CLAUSES.ABOVE_THRESHOLD,
+        expected: "a released transition — stop @ state end holds every one",
+        got: `a walk into ${targetIds.join(", ")} with no release spent`,
+        remedy: {
+          tool: "se_pull",
+          args: {},
+          note: "STOP and say plainly which state waits. The person releases the next one in the mirror; one press, one state. Nothing they press moves the walk — your pull still does that, once the hold lifts. They can also move the stop @ notch down.",
+        },
+        source: "engine/session.ts stopAt",
+      });
+    }
     for (const id of targetIds) {
       const t = m.states.find((s) => s.id === id);
       if (t === undefined) continue;
@@ -1687,7 +1824,33 @@ export class Session {
         land(pprefix, t, { from: q, advance: true });
       }
     }
-    return { priority: st.priority, demands: { ...(st.entry ?? {}) }, exit_demands: { ...(st.exit ?? {}) }, nexts };
+    return {
+      priority: this.entryWeight(prefix, decl, id, st.priority),
+      demands: { ...(st.entry ?? {}) },
+      exit_demands: { ...(st.exit ?? {}) },
+      nexts,
+    };
+  }
+
+  /** THE DOOR'S OWN WEIGHT, NOT THE ROOM'S (i11's audit of the 2026-08-12
+   *  seed, which calls this "THE MAP LIES").
+   *
+   *  Entering a container lands on its START state, which is mechanical — so a
+   *  route into `expeditions` weighed 0.01 while the door weighs 0.4. At a dial
+   *  of 0.2 the line drew OPEN the whole way and the walk then stopped, and
+   *  `stops_at` came back undefined: nothing told the reader the way was shut.
+   *  The gate refused correctly. Only the map was wrong, which is worse than a
+   *  refusal because it is silent.
+   *
+   *  ONLY THE INITIAL STATE PAYS IT. Once inside, the door has been paid, and
+   *  charging every state within would shut a container from the inside. */
+  private entryWeight(prefix: string, decl: MachineDecl, id: string, own: number): number {
+    if (prefix === "" || decl.initial !== id) return own;
+    const cut = prefix.lastIndexOf("/");
+    const parent = this.declForPrefix(cut < 0 ? "" : prefix.slice(0, cut))?.states.find(
+      (s) => s.id === (cut < 0 ? prefix : prefix.slice(cut + 1)),
+    );
+    return parent?.submachine === undefined ? own : Math.max(own, parent.priority);
   }
 
   get target(): string {
@@ -2549,11 +2712,23 @@ export class Session {
       to,
       role,
       ...(t.statement !== "" ? { statement: t.statement } : {}),
-      priority: t.priority,
+      // THE WORD, NEVER THE NUMBER, ON A SERVED SURFACE
+      // (req-autonomy-is-categorical; owner, 2026-08-16: "I don't want the old
+      // scale anywhere anymore").
+      //
+      // THIS WAS THE LAST LEAK, and it was the loudest: every door of every
+      // pull carried `priority: 0.2`, so the number the answer had stopped
+      // saying at the top was said a dozen times just below it. It is where
+      // the agent read one and repeated it back to the owner in chat.
+      //
+      // THE NUMBER STILL RUNS THE COMPARISON one line above. That half is
+      // i14's, and raid-risk-autonomy-rework-breaks-walking asked for the
+      // cut-over first and the removal second, never both at once.
+      weight: this.weightFor(t.priority),
       open: open && !overWeight,
       ...(overWeight
         ? {
-            needs: `the person — ${this.tierFor(t.priority).tier ?? "heavier"} work is above this session's ${this.tierFor(this._autonomy).tier ?? "dial"}`,
+            needs: `the person — ${this.weightFor(t.priority) || "heavier"} work is above this session's ${this.tierFor(this._autonomy).tier ?? "dial"}`,
           }
         : {}),
       ...(open ? {} : { blocked_by: Object.keys(this.conditionStatus(decl, t, "enter") ?? {}) }),
@@ -2737,7 +2912,11 @@ export class Session {
       payload.form !== undefined && readProof === null ? this.pullSaveOrChoose(payload.form) : { saved: undefined, fanOut: [] };
 
     const extra = (): Record<string, unknown> => ({
-      ...(saved !== undefined ? { form_saved: saved } : {}),
+      // THE ECHO IS THE AGENT'S COPY TOO. Every `forms:` path already stripped
+      // the corpus and this one did not, so a submit answered with the whole
+      // record's facts plus the text the agent had just written — 290KB where
+      // a receipt was wanted.
+      ...(saved !== undefined ? { form_saved: this.agentCopy(saved as Record<string, unknown>, true) } : {}),
       ...(fanOut.length > 0
         ? { not_walked: fanOut, note: "one agent is walking, so only the first choice was taken — the others are yours to hand out" }
         : {}),
@@ -3148,7 +3327,13 @@ export class Session {
       const t = this.machine.states.find((x) => x.id === e.to);
       return t === undefined
         ? { to: e.to }
-        : { to: e.to, ...(t.statement !== "" ? { statement: t.statement } : {}), kind: t.kind, priority: t.priority };
+        : {
+            to: e.to,
+            ...(t.statement !== "" ? { statement: t.statement } : {}),
+            kind: t.kind,
+            // The desk's offer is a served surface too, and the same rule binds it.
+            weight: this.weightFor(t.priority),
+          };
     });
   }
 
@@ -3713,8 +3898,78 @@ export class Session {
    *  is a size limit on every lane answer with a handle to page the rest, so
    *  the class cannot come back somewhere else. That is retro work. */
   private formForAgent(name: string): Record<string, unknown> {
-    const { ref_paths: _paths, ref_facts: _facts, ...rest } = this.formGet(name) as Record<string, unknown>;
-    return rest;
+    return this.agentCopy(this.formGet(name) as Record<string, unknown>, false);
+  }
+
+  /** EMPTY IS NOT INFORMATION. A key whose value is "", 0, [], {} or null says
+   *  nothing the key's absence does not, and it costs a line either way.
+   *  `false` is excluded on purpose — it is an answer, not a blank. */
+  private static blank(v: unknown): boolean {
+    if (v === null || v === undefined) return true;
+    if (typeof v === "string") return v === "";
+    if (typeof v === "number") return v === 0;
+    if (typeof v === "boolean") return false;
+    if (Array.isArray(v)) return v.length === 0;
+    return Object.keys(v as object).length === 0;
+  }
+
+  /** One dictionary with every blank pruned, recursively. Returns undefined
+   *  when nothing survives, so the caller can drop the key entirely. */
+  private static pruned(rec: unknown): Record<string, unknown> | undefined {
+    if (rec === null || typeof rec !== "object" || Array.isArray(rec)) return undefined;
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(rec as Record<string, unknown>)) {
+      const kept = v !== null && typeof v === "object" && !Array.isArray(v) ? Session.pruned(v) : Session.blank(v) ? undefined : v;
+      if (kept !== undefined) out[k] = kept;
+    }
+    return Object.keys(out).length === 0 ? undefined : out;
+  }
+
+  /** WHAT THE AGENT CAN ACTUALLY USE, and nothing else. Measured on i11's own
+   *  walk: one ordinary pull answered 290,280 bytes, of which 5,080 lines out
+   *  of 5,311 were things no agent reads.
+   *
+   *  FOUR THINGS COME OFF, and each is a different kind of waste.
+   *
+   *  - `ref_paths` and `ref_facts`, the whole record's corpus. The MIRROR needs
+   *    them to render a card from two ids; the agent opens the file instead.
+   *  - Blank argument slots. A free-form field shipped 27 keys, every one "",
+   *    [] or null, because the model carries a slot for every editor there is.
+   *  - `template.fields`, which restates `fields` name for name.
+   *  - On an ECHO, the field bodies. The agent wrote them one call ago.
+   *
+   *  THE ECHO IS THE ONLY PLACE BODIES GO. A form that is OWED keeps its
+   *  content, because a half-filled form coming back must show what already
+   *  stands — that is exactly what stops a recheck being answered from
+   *  scratch. What is dropped is the copy handed straight back to whoever
+   *  just sent it. */
+  private agentCopy(form: Record<string, unknown>, echo: boolean): Record<string, unknown> {
+    const { ref_paths: _paths, ref_facts: _facts, field_args, field_hints, template_meta, template, fields, ...rest } = form;
+    const out: Record<string, unknown> = { ...rest };
+    for (const [key, value] of [
+      ["field_args", field_args],
+      ["field_hints", field_hints],
+      ["template_meta", template_meta],
+    ] as const) {
+      const kept = Session.pruned(value);
+      if (kept !== undefined) out[key] = kept;
+    }
+    if (template !== null && typeof template === "object") {
+      const { fields: _dup, ...restTemplate } = template as Record<string, unknown>;
+      const kept = Session.pruned(restTemplate);
+      if (kept !== undefined) out.template = kept;
+    }
+    if (Array.isArray(fields)) {
+      out.fields = fields.map((f) => {
+        const field = f as Record<string, unknown>;
+        if (!echo) return field;
+        const { content, prefills: _pre, ...head } = field;
+        // THE LENGTH STANDS IN FOR THE BODY. It proves the text landed whole,
+        // which is the one thing the sender cannot check for itself.
+        return { ...head, chars: typeof content === "string" ? content.length : 0 };
+      });
+    }
+    return out;
   }
 
   refusedBlock(names: string[]): Record<string, unknown> {
@@ -4678,7 +4933,67 @@ export class Session {
     return [...standing].filter((s) => s !== name && claimful.has(s) && claimFeeders(m, s, claimful).includes(name));
   }
 
-  amendClaim(name: string, fills: Record<string, string>, reason: string, by: string, machineId?: string): Record<string, unknown> {
+  /** THE PATCH HALF OF AN AMEND. `fills` rewrites a field WHOLE, which for a
+   *  renamed reference or a typo means resending two thousand characters to
+   *  change eleven — and every resend is a chance to lose a paragraph nobody
+   *  meant to touch.
+   *
+   *  SO AN OP IS old_string → new_string, matched against the field as it
+   *  stands. It must match EXACTLY ONCE, or the caller says `all: true` and
+   *  means every occurrence. Zero matches and an ambiguous match both refuse,
+   *  for the reason se_file_patch refuses them: a patch that lands somewhere
+   *  other than where its author looked is worse than no patch.
+   *
+   *  OPS AND FILLS COMPOSE. Several ops against one field chain, each seeing
+   *  the last one's result; a `fills` entry for the same field wins, because
+   *  a whole rewrite is unambiguous. */
+  private amendOps(raw: string, ops: AmendOp[], name: string): Record<string, string> {
+    const out: Record<string, string> = {};
+    for (const op of ops) {
+      const field = String(op.field ?? "");
+      const body = out[field] ?? fieldContent(raw, field);
+      const refuse = (expected: string, got: string): never => {
+        throw new Rejection({
+          clause: CLAUSES.CONDITION_UNMET,
+          expected,
+          got,
+          remedy: {
+            tool: "se_amend",
+            args: {
+              state: name,
+              ops: [{ field, old_string: "<text as it stands>", new_string: "<what it becomes>" }],
+              reason: "<what was wrong>",
+            },
+            note: "read the field on the pull first — old_string must be the text exactly as the form carries it",
+          },
+          source: "engine/session.ts amend",
+        });
+      };
+      if (body === undefined) refuse(`a section called ${field} on ${name}`, "no such section in the form");
+      const old = String(op.old_string ?? "");
+      if (old === "") refuse("old_string — the text being replaced", "an empty old_string");
+      const hits = (body as string).split(old).length - 1;
+      if (hits === 0) refuse(`old_string to appear in ${field}`, "it does not appear — nothing was changed");
+      if (hits > 1 && op.all !== true) {
+        refuse(
+          `old_string to appear once in ${field}`,
+          `it appears ${String(hits)} times — say all: true to replace every one, or give more surrounding text`,
+        );
+      }
+      const next = String(op.new_string ?? "");
+      out[field] = op.all === true ? (body as string).split(old).join(next) : (body as string).replace(old, next);
+    }
+    return out;
+  }
+
+  amendClaim(
+    name: string,
+    fillsIn: Record<string, string>,
+    reason: string,
+    by: string,
+    machineId?: string,
+    ops: AmendOp[] = [],
+  ): Record<string, unknown> {
     this.forgetRoute();
     const m = this.formMachine(machineId);
     this.stateFormState(name, m);
@@ -4693,6 +5008,11 @@ export class Session {
         source: "engine/session.ts amend",
       });
     }
+    // THE OPS RESOLVE AGAINST THE FILE AS IT STANDS, and become fills. From
+    // here down there is one path, so every guard below — the check re-run,
+    // the restore, the refusal that names se_reopen — covers both shapes
+    // without knowing which was used.
+    const fills = { ...this.amendOps(raw, ops, name), ...fillsIn };
     if (reason.trim() === "" || Object.keys(fills).length === 0) {
       throw new Rejection({
         clause: CLAUSES.CONDITION_UNMET,
@@ -4700,8 +5020,12 @@ export class Session {
         got: Object.keys(fills).length === 0 ? "no fields" : "no reason",
         remedy: {
           tool: "se_amend",
-          args: { state: name, fills: { "<field>": "<text>" }, reason: "<what was wrong>" },
-          note: "both are required",
+          args: {
+            state: name,
+            ops: [{ field: "<field>", old_string: "<text as it stands>", new_string: "<what it becomes>" }],
+            reason: "<what was wrong>",
+          },
+          note: "ops patch a field in place; fills rewrite one whole. One of the two, and always a reason",
         },
         source: "engine/session.ts amend",
       });
@@ -5695,6 +6019,46 @@ export class Session {
     throw new Rejection(rejection);
   }
 
+  /** THE ROOT OF THE RIPPLE, followed to the end in ONE answer.
+   *
+   *  A grey state is usually grey because a feeder is unsigned, and that feeder
+   *  because ITS feeder is. The verb named only the first hop, so finding the
+   *  actual cause took one call per hop and the reader had to know to keep
+   *  asking.
+   *
+   *  MEASURED 2026-08-16: four grey states in i11, and the cause was one
+   *  register three states upstream naming three deleted requirements. Fixing
+   *  three lines turned all four green in a single pull. The hunt for those
+   *  three lines was the expensive part, and it was a chain of se_why calls.
+   *
+   *  A ROOT IS A GREY STATE WITH NO UNSIGNED FEEDER OF ITS OWN. That is where
+   *  work actually has to happen; everything between is waiting. */
+  private greyRoots(bare: string, seen: Set<string>): { state: string; blockers: Blocker[] }[] {
+    if (seen.has(bare)) return [];
+    seen.add(bare);
+    let blockers: Blocker[];
+    try {
+      blockers = this.stateBlockers(bare);
+    } catch {
+      return [];
+    }
+    if (blockers.length === 0) return [];
+    const feeders = blockers
+      .filter((b) => b.kind === "unsigned_feeder")
+      .flatMap((b) =>
+        String(b.got)
+          .replace(/^unsigned feeders:\s*/, "")
+          .split(","),
+      )
+      .map((s) => s.trim())
+      .filter((s) => s !== "");
+    if (feeders.length === 0) return [{ state: bare, blockers }];
+    const upstream = feeders.flatMap((f) => this.greyRoots(f, seen));
+    // A FEEDER THAT READS AS UNSIGNED BUT HOLDS NOTHING leaves this state as
+    // the root. Reporting nothing at all would be worse than reporting here.
+    return upstream.length === 0 ? [{ state: bare, blockers }] : upstream;
+  }
+
   /** THE VERB'S ANSWER. One state, every condition holding it, and a plain
    *  sentence saying which of the two cases you are in.
    *
@@ -5721,14 +6085,28 @@ export class Session {
         says: `${bare} could not be read as a state of this machine: ${String((e as Error).message)}`,
       };
     }
+    if (blockers.length === 0) {
+      return {
+        state: at,
+        standing: true,
+        blockers,
+        says: `${bare} stands — nothing holds it. If the walk still will not go there, the reason is the route or the dial, not this state.`,
+      };
+    }
+    // THE WHOLE CHAIN, NOT THE FIRST LINK. Asked about a state whose only
+    // problem is an unsigned feeder, the answer used to name that feeder and
+    // stop — so the reader asked again, and again, until they reached the
+    // state that actually needs work.
+    const roots = this.greyRoots(bare, new Set()).filter((r) => r.state !== bare);
     return {
       state: at,
-      standing: blockers.length === 0,
+      standing: false,
       blockers,
+      ...(roots.length > 0 ? { root: roots } : {}),
       says:
-        blockers.length === 0
-          ? `${bare} stands — nothing holds it. If the walk still will not go there, the reason is the route or the dial, not this state.`
-          : `${bare} is held by ${blockers.length}: ${blockers.map((b) => b.kind).join(", ")}. The first is what the next pull refuses with.`,
+        roots.length === 0
+          ? `${bare} is held by ${blockers.length}: ${blockers.map((b) => b.kind).join(", ")}. The first is what the next pull refuses with. Nothing upstream is waiting — the work is here.`
+          : `${bare} is WAITING, not broken. The work is at ${roots.map((r) => r.state).join(", ")}, held by ${roots.map((r) => r.blockers.map((b) => b.kind).join("/")).join(" · ")}. Fix that and this goes green with it.`,
     };
   }
 
@@ -5851,7 +6229,12 @@ export class Session {
       child.stderr.on("data", (d: Buffer) => {
         out += d;
       });
-      const timer = setTimeout(() => child.kill(), 120_000);
+      // A CONDITION SCRIPT MAY LEGITIMATELY BE LONG. 120 seconds was sized for
+      // a check that reads the corpus; verification's script runs the whole
+      // battery, which tools.ts already records as "long BY DESIGN now that
+      // boot walks read real guidance — 150s killed it mid-run". A cap that
+      // kills the battery reads as a red that never happened.
+      const timer = setTimeout(() => child.kill(), 600_000);
       child.on("error", (e) => {
         clearTimeout(timer);
         this.clearProgress();
@@ -5912,7 +6295,12 @@ export class Session {
       for (const rel of scripts) {
         const abs = resolveInRoot(this.machineRoot(), rel, "engine/session.ts script");
         const r = await this.spawnScript(abs);
-        const out = r.out.trim().slice(0, 4000);
+        // THE TAIL, BECAUSE ENDS CARRY VERDICTS. A head slice keeps the run's
+        // opening banner and drops the failing tests block, which is the only
+        // part of a red anybody needs. Seen on this state's own first red:
+        // 4000 characters of passing cases and not one failure.
+        const whole = r.out.trim();
+        const out = whole.length <= 4000 ? whole : `…[${String(whole.length - 4000)} earlier chars]\n${whole.slice(-4000)}`;
         outputs.push(`${rel} → exit ${r.status}${out === "" ? "" : `\n${out}`}`);
         if (r.status !== 0) ok = false;
       }
@@ -6486,9 +6874,24 @@ export class Session {
     channel: Channel,
     supplied: Record<string, string>,
   ): Promise<void> {
-    if (from.exit?.script !== undefined) await this.scriptRun(from.id); // a tick attempt runs the script
+    // A FALLBACK IS THE DRAWN PATH FOR THE CONDITION FAILING, so the condition
+    // may not guard it (found live 2026-08-16, in the mechanism that had just
+    // been built).
+    //
+    // verification's exit script runs the battery. Its FALLBACK is fix-findings
+    // — "Fix the battery's findings: all of them, in one pass" — which exists
+    // for precisely the case where that script comes back red. Gating every
+    // exit on the script made the repair unreachable exactly when it was
+    // needed, and the walk had to step out to the desk to get at it.
+    //
+    // THE FORWARD EDGES ARE STILL GUARDED, which is the whole point: a red
+    // battery may not walk on to the gate. It may only walk to the state whose
+    // job is fixing it.
+    const escaping = to !== undefined && from.edges.some((e) => e.to === to && (e.role === "fallback" || e.role === "error"));
+    if (from.exit?.script !== undefined && !escaping) await this.scriptRun(from.id); // a tick attempt runs the script
     for (const [key, args] of Object.entries(from.exit ?? {})) {
       if (key === "read" || key === "read_consume") continue; // channel-proven below, not evidence
+      if (escaping) continue;
       if (!this.conditionKeyMet(m, from, key, "leave")) this.refuseCondition(m, from, "exit", key, args);
     }
     const targetId = to ?? (from.edges.length === 1 ? from.edges[0].to : undefined);
@@ -6585,6 +6988,10 @@ export class Session {
       // and the requirement itself says cut over first, then remove, never both
       // in one commit (raid-risk-autonomy-rework-breaks-walking).
       tier: tierOf(loadLevels(this.machineRoot()), this._autonomy),
+      // THE NOTCH RIDES EVERY PULL, and it has to: the stop hook's only ground
+      // truth is the call log, so a setting the packet does not carry is a
+      // setting the hook cannot obey.
+      stop_at: this.stopAtName(),
       // The server's clock, so no hand ever shells for the time (note-8acddaec).
       now: new Date().toISOString(),
       // Only when ON. Nothing about the resting packet hints that it exists.

@@ -19,6 +19,57 @@ function yamlScalar(s: string): string {
 
 const SRC = "engine/worktree.ts";
 
+// A DISPOSITION IS AGREED, NOT ASSERTED, and these are the register statuses
+// that count as agreed (i11, 2026-08-16). Everything else still HOLDS the close.
+//
+// THE RULE FOR TELLING THEM APART: has somebody ruled on this entry, or is it
+// still waiting for one? `open` and `probed` are waiting — an assumption that
+// has been probed is still live, because the probe told you something rather
+// than disposing of it.
+//
+// `accepted` AND `deferred` LOOK WRONG HERE AND ARE NOT. They are exactly
+// where a carried finding drifts, and both are real rulings: accepted means
+// somebody chose to live with it, deferred means somebody chose to move it.
+// Treating either as unresolved would make the close refuse work already ruled
+// on, which is what teaches people to stop using the bucket.
+//
+// raid-asm-an-entry-status-says-whether-it-is-open ASKED THIS AND COULD NOT
+// ANSWER IT, because there was no close-side reader to compare against. This is
+// that reader, so the ruling lands with it.
+const DISPOSED: ReadonlySet<string> = new Set(["closed", "superseded", "mitigated", "decided", "accepted", "deferred"]);
+
+/** THE OWED ITEMS STILL STANDING IN A RECORD (req-close-refuses-loose-ends).
+ *
+ *  THE ROW WAS MINTED IN i1 AND HAD NO IMPLEMENTATION until i11. It is a must
+ *  graded fatal saying the engine shall refuse the close while any finding
+ *  stands without a recorded ruling. A probe went looking for the mechanism, to
+ *  compare it against the form-side guard, and found nothing there.
+ *
+ *  IT READS THE RECORD AS IT STANDS ON DISK rather than re-deriving from form
+ *  models. The close judges what was written, and an owed line is written.
+ *
+ *  A MISSING ENTRY HOLDS THE CLOSE. The form-side guard already refuses an
+ *  unresolved ref at submit, so a missing one here means the entry was deleted
+ *  after the form signed — which is the deletion-orphans defect, and the close
+ *  is the last place to catch it. */
+export function owedStanding(root: string, recordDir: string): { item: string; ref: string; where: string }[] {
+  const evidence = join(root, recordDir, "evidence");
+  if (!existsSync(evidence)) return [];
+  const out: { item: string; ref: string; where: string }[] = [];
+  for (const file of readdirSync(evidence)) {
+    if (!file.endsWith(".md")) continue;
+    for (const line of readFileSync(join(evidence, file), "utf8").split("\n")) {
+      const m = /^- \[owed\] (.+?) — (\S+)\s*$/.exec(line.trim());
+      if (m === null) continue;
+      const ref = m[2].replace(/^\[\[|\]\]$/g, "");
+      const node = join(root, "project", "spec", "trace", "raid", `${ref}.md`);
+      const status = existsSync(node) ? (/^status: *(\w+)/m.exec(readFileSync(node, "utf8"))?.[1] ?? "") : "";
+      if (!DISPOSED.has(status)) out.push({ item: m[1], ref, where: file });
+    }
+  }
+  return out;
+}
+
 function git(root: string, args: string[], what: string): string {
   const r = spawnSync("git", args, { cwd: root, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
   if (r.status !== 0) {
@@ -399,6 +450,27 @@ function stampRecordClosed(root: string, e: Expedition, merge: boolean, override
         tool: "se_exp_close",
         args: { merge, override: "<who authorised the unattended close, and where they said it>" },
         note: "confirm the report in the mirror, or close with the override — it is stamped on the record and shows in the archive",
+      },
+      source: SRC,
+    });
+  }
+  // AN OWED ITEM HOLDS THE CLOSE (req-close-refuses-loose-ends, built i11).
+  // The third guard on this act, beside the report and the override.
+  //
+  // THE BUCKET HAS TWO ENDS AND ONLY ONE EXISTED. The form side has accepted
+  // `- [owed] <item> — <ref>` for months and refuses an unresolved ref at
+  // submit. Nothing read those items again, so a finding could be carried past
+  // every gate and out of the record with nobody looking at it twice.
+  const standing = owedStanding(root, `project/spec/expeditions/${e.id}`);
+  if (standing.length > 0) {
+    throw new Rejection({
+      clause: CLAUSES.CONDITION_UNMET,
+      expected: "every owed item cleared or its register entry ruled on — a close carries no finding nobody looked at twice",
+      got: standing.map((o) => `${o.item} — ${o.ref} (${o.where})`).join(" · "),
+      remedy: {
+        tool: "se_file_patch",
+        args: { ops: [{ path: "project/spec/trace/raid/<the entry>.md", old_string: "status: open", new_string: "status: accepted" }] },
+        note: "fix the item and tick its box, or rule on its register entry — accepted, deferred, mitigated, closed or superseded all count as ruled",
       },
       source: SRC,
     });

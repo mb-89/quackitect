@@ -68,18 +68,35 @@ function tailOf(path: string): string {
   }
 }
 
+interface LastPull {
+  pull?: string;
+  where?: unknown;
+  target?: unknown;
+  stop_at?: unknown;
+  /** False when the newest pull was REFUSED. Under `blockers only` that is
+   *  the one thing that sanctions a stop. */
+  ok?: boolean;
+}
+
 /** The newest se_pull's answer, read from the log tail. */
-function lastPull(): { pull?: string; where?: unknown; target?: unknown } | undefined {
+function lastPull(): LastPull | undefined {
   const lines = tailOf(join(root, ".se", "calls.jsonl")).split("\n");
+  let refused = false;
   for (let i = lines.length - 1; i >= 0; i--) {
     const line = lines[i].trim();
     if (line === "") continue;
     try {
       const rec = JSON.parse(line) as { tool?: string; ok?: boolean; response?: unknown };
-      if (rec.tool !== "se_pull" || rec.ok !== true) continue;
-      if (typeof rec.response !== "string") return (rec.response ?? {}) as { pull?: string; where?: unknown; target?: unknown };
+      if (rec.tool !== "se_pull") continue;
+      if (rec.ok !== true) {
+        // A REFUSED PULL IS STILL THE NEWEST WORD ABOUT THE WALK. It says the
+        // walk could not move, which is exactly what `blockers only` waits for.
+        refused = true;
+        continue;
+      }
+      if (typeof rec.response !== "string") return { ...((rec.response ?? {}) as LastPull), ok: !refused };
       try {
-        return JSON.parse(rec.response) as { pull?: string; where?: unknown; target?: unknown };
+        return { ...(JSON.parse(rec.response) as LastPull), ok: !refused };
       } catch {
         // A LONG RESPONSE IS STORED TRUNCATED, so parsing the whole of it
         // throws and the tooth silently loses its bite. Found live on
@@ -92,9 +109,12 @@ function lastPull(): { pull?: string; where?: unknown; target?: unknown } | unde
         if (pull === undefined) continue;
         const target = /"target"\s*:\s*"([^"]*)"/.exec(rec.response)?.[1];
         const where = /"where"\s*:\s*\[([^\]]*)\]/.exec(rec.response)?.[1];
+        const stopAt = /"stop_at"\s*:\s*"([^"]*)"/.exec(rec.response)?.[1];
         return {
           pull,
           target,
+          stop_at: stopAt,
+          ok: !refused,
           where: where === undefined ? undefined : where.split(",").map((s) => s.trim().replace(/^"|"$/g, "")),
         };
       }
@@ -121,13 +141,41 @@ process.stdin.on("end", () => {
     const last = lastPull() ?? {};
     const pull = last.pull;
     if (pull === undefined) process.exit(0);
+    // THE NOTCH DECIDES, NOT THIS FILE (owner design 2026-08-16). One fixed
+    // rule was right about eight stops in a day and wrong about five, and no
+    // amount of tuning lets it see the difference — the reason a stop happened
+    // is not in the walk's position. The person can see it, so the notch is
+    // theirs. machines/stopat.md holds what each one means.
+    //
+    // AN UNREADABLE OR ABSENT NOTCH IS `agent judgement`, the default, which
+    // is the behaviour every line below this already described.
+    const notch = typeof last.stop_at === "string" ? last.stop_at.trim().toLowerCase() : "";
+    // STATE END: the ENGINE holds every transition and refuses to move. The
+    // agent stopping is then not a failure of nerve, it is the machine's own
+    // stop — exactly what this hook exists to let through.
+    if (notch === "state end") process.exit(0);
+    // BLOCKERS ONLY: nothing brings the person back until the walk cannot go
+    // on. The newest pull being REFUSED is that, and it is the only thing that
+    // is — an unattended run is what this notch is for.
+    if (notch === "blockers only" && last.ok === false) process.exit(0);
+    // BLESS: run to where a thumb is owed anyway, and stop there. A gate is
+    // the only place that is true, and the walk's own position names it.
+    const at = Array.isArray(last.where) ? (last.where as unknown[]).map(String).join(", ") : String(last.where ?? "");
+    if (notch === "bless" && /(^|\/)gate[-_]/.test(at)) process.exit(0);
     // A TARGET IS A STANDING INSTRUCTION FROM THE PERSON. While one is set,
     // the walk has somewhere to be, and "nothing to route" is false whatever
     // the desk answered.
     const target = typeof last.target === "string" ? last.target.trim() : "";
     if (pull === "wait" && target === "") process.exit(0);
-    const where = Array.isArray(last.where) ? (last.where as unknown[]).join(", ") : String(last.where ?? "");
+    const where = at;
     const aimed = pull === "wait";
+    // WHAT THE NOTCH IS ASKING FOR, said in the refusal rather than left for
+    // the reader to infer from a setting they may not have looked at.
+    const NOTCHED: Record<string, string> = {
+      bless: "[se] stop @ bless: you run until a BLESS is owed, and no gate is owed here. ",
+      "blockers only": "[se] stop @ blockers only: you stop only when the walk CANNOT go on, and the last pull was not refused. ",
+    };
+    const prefix = NOTCHED[notch] ?? "";
     // THE ONLY STOPS THAT ARE SANCTIONED, named rather than implied (owner
     // ruling 2026-08-14: "you don't need to stop working unless I explicitly
     // told you to or you need a decision from me").
@@ -160,16 +208,18 @@ process.stdin.on("end", () => {
     process.stdout.write(
       JSON.stringify({
         decision: "block",
-        reason: aimed
-          ? `[se] A target is set (${target}) and the walk is not on it` +
-            (where !== "" ? `, standing at ${where}` : "") +
-            '. The pull answered "wait" because nothing routed FROM HERE, which is not the same as nothing to do. ' +
-            "Take the door that leads toward the target and keep walking. " +
-            SANCTIONED
-          : `[se] The walk stands mid-work: the last pull answered "${pull}"` +
-            (where !== "" ? ` at ${where}` : "") +
-            ". A report is not a checkpoint and size is not a reason — call se_pull and keep walking. " +
-            SANCTIONED,
+        reason:
+          prefix +
+          (aimed
+            ? `[se] A target is set (${target}) and the walk is not on it` +
+              (where !== "" ? `, standing at ${where}` : "") +
+              '. The pull answered "wait" because nothing routed FROM HERE, which is not the same as nothing to do. ' +
+              "Take the door that leads toward the target and keep walking. " +
+              SANCTIONED
+            : `[se] The walk stands mid-work: the last pull answered "${pull}"` +
+              (where !== "" ? ` at ${where}` : "") +
+              ". A report is not a checkpoint and size is not a reason — call se_pull and keep walking. " +
+              SANCTIONED),
       }),
     );
   } catch {

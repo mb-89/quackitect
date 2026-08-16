@@ -13,7 +13,7 @@
 // name and the two stay distinguishable.
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
-import { branchingPoints, branchKind, branchToReturnTo, type MachineDecl } from "../engine/machine.ts";
+import { branchingPoints, branchKind, branchToReturnTo, completeState, type MachineDecl, type MachineInstance } from "../engine/machine.ts";
 
 const state = (id: string, to: string[], extra: Record<string, unknown> = {}) =>
   ({
@@ -42,6 +42,49 @@ const andMachine = (): MachineDecl =>
       state("end", []),
     ],
   }) as unknown as MachineDecl;
+
+// A RE-ENTRY MUST NOT COST A LEG THAT ALREADY STANDS (i11, walk-repairs).
+//
+// activatePowered absorbs fuel aimed at any ACTIVE state, so that a second
+// trigger during activity never re-runs it later. A re-entry re-activates a
+// state the walk already finished, which looks exactly like that second
+// trigger — and the fear is that it eats the fuel a busbar is still counting.
+//
+// THIS DRIVES IT: walk one leg, re-enter that leg the way a reboot does, then
+// finish the other and demand the bar opens.
+test("a busbar opens after a re-entry re-walks a leg that already stands", () => {
+  const m = andMachine();
+  const inst = {
+    machine: "m",
+    iteration: "",
+    current: "left",
+    active: ["left", "right"],
+    fired: [],
+    counters: {},
+    history: [],
+    escapes: [],
+    status: "open",
+  } as unknown as MachineInstance;
+
+  // THE RE-WALK PUT A TOKEN ON THE BAR ITSELF. That is what makes the absorb
+  // bite: fuel aimed at an ACTIVE state is dropped, and here the bar is active.
+  inst.active = ["left", "right", "join"];
+  completeState(m, inst, "left", "filled", "now");
+  assert.ok(
+    !(inst.fired ?? []).includes("left->join"),
+    "this case is pointless unless the absorb actually fires — fuel into an active state must have been dropped",
+  );
+
+  // The re-walk moves off the bar without completing it, and the second leg
+  // finishes. left's fuel is GONE, so only its standing evidence can vouch
+  // for that edge.
+  inst.active = ["right"];
+  completeState(m, inst, "right", "filled", "now", undefined, () => new Set(["left"]));
+  assert.ok(
+    (inst.active ?? []).includes("join"),
+    `the busbar stayed shut after a re-entry ate a finished leg's fuel — fired=${JSON.stringify(inst.fired)} active=${JSON.stringify(inst.active)}`,
+  );
+});
 
 /** The same shape with no busbar. One leg is the answer. */
 const orMachine = (): MachineDecl =>

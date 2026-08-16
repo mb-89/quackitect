@@ -22,6 +22,14 @@ const VALUES = {
     { value: 1, abbr: "I", name: "ideation" },
   ],
   autonomy: 0.2,
+  // THE SECOND BANK, drawn from its own file and its own position.
+  stopat: [
+    { value: 1, abbr: "SE", name: "state end" },
+    { value: 2, abbr: "AJ", name: "agent judgement" },
+    { value: 3, abbr: "BL", name: "bless" },
+    { value: 4, abbr: "BO", name: "blockers only" },
+  ],
+  stop_at: 2,
   ints: { narration_minutes: 5, narration_calls: 20 },
 };
 
@@ -55,7 +63,7 @@ describe("parameter panels", { concurrency: true }, () => {
     const from = src.indexOf("const values = {", at);
     assert.ok(from > at, "the endpoint no longer builds a values object");
     const body = src.slice(from, src.indexOf("};", from));
-    for (const key of ["rungs", "autonomy", "emergency", "ints", "toggles"]) {
+    for (const key of ["rungs", "autonomy", "emergency", "ints", "toggles", "stopat", "stop_at"]) {
       assert.ok(new RegExp(`\\b${key}\\s*:`).test(body), `/widget/controls never passes ${key}, so the panel draws it as off`);
     }
   });
@@ -79,10 +87,10 @@ describe("parameter panels", { concurrency: true }, () => {
     assert.ok(params.length >= 4, "the panel declares its parameters");
     assert.deepEqual(
       params.map((p) => p.type),
-      ["rungs", "actions", "int", "int", "action", "text", "toggles"],
+      ["rungs", "rungs", "action", "actions", "int", "int", "action", "text", "toggles"],
     );
     const html = renderPanel(params, VALUES);
-    assert.match(html, /class="rung on" data-level="0"/, "the lowest lit rung releases to blocked");
+    assert.match(html, /class="rung on" data-bank="autonomy" data-level="0"/, "the lowest lit rung releases to blocked");
     assert.match(html, /id="narration-minutes"[^>]*value="5"/);
     assert.match(html, /id="narration-calls"[^>]*value="20"/);
     assert.match(html, /class="rung param-action" data-post="\/narration-now"/);
@@ -91,6 +99,20 @@ describe("parameter panels", { concurrency: true }, () => {
     assert.match(html, /class="rung param-action" data-post="\/target\/selected"/);
     assert.match(html, /class="rung param-action" data-post="\/pull"/);
     assert.doesNotMatch(html, /type="range"/, "a spec cannot produce a slider");
+    // THE STOP-AT BANK IS THE SAME CONTROL ASKING A DIFFERENT QUESTION, and
+    // the two must never be confused: each button says which bank it posts to.
+    assert.match(html, /data-bank="stopat" data-level="3"/, "bless is one press up from the default");
+    assert.match(html, /class="rung on" data-bank="stopat" data-level="1" data-rung="2"/, "agent judgement is lit as the default");
+    assert.doesNotMatch(
+      html,
+      /class="[^"]*danger[^"]*" data-bank="stopat"/,
+      "no notch is drawn as a hazard — that is autonomy's top rung only",
+    );
+    // ITS LOWEST NOTCH IS A FLOOR, NOT AN OFF SWITCH. Autonomy's bottom is
+    // blocked and releasing into it is the design; not stopping at all is this
+    // control's TOP, so its bottom can never be released away.
+    assert.doesNotMatch(html, /data-bank="stopat" data-level="0"/, "state end is the tightest setting, never an off");
+    assert.match(html, /class="rung param-action" data-post="\/release"/, "and the press that spends one held transition");
     // The shutdown row: two buttons that do not exclude each other, which is
     // why it is `toggles` and not `choice`.
     assert.match(html, /data-toggle="block-auto-sleep"/);
@@ -113,7 +135,12 @@ describe("parameter panels", { concurrency: true }, () => {
   test("blocked has no button, because no rung pressed is what blocked means", () => {
     const html = renderPanel(loadPanel(REPO_ROOT, "controls"), { ...VALUES, autonomy: 0 });
     assert.doesNotMatch(html, />B</, "the blocked rung is never drawn");
-    assert.doesNotMatch(html, /class="rung on"/, "nothing is lit at blocked");
+    // BLOCKED IS THIS BANK'S BOTTOM, NOT THE BAR'S. The stop-at row beside it
+    // is lit at its own default and always will be: `state end` is its
+    // tightest setting rather than an off, so a bar-wide "nothing is lit"
+    // would be asserting that a second control cannot exist.
+    assert.doesNotMatch(html, /class="rung on" data-bank="autonomy"/, "no autonomy rung is lit at blocked");
+    assert.match(html, /class="rung on" data-bank="stopat"/, "and the stop-at bank is untouched by the autonomy dial");
   });
 
   test("a rung above the next one up is locked, so climbing is one at a time", () => {

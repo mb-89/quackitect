@@ -377,7 +377,11 @@ test("se_answer records an aq entry and the feed types it aq", async () => {
 test("se_test: one job formats then runs both scripts with structured verdicts", async () => {
   const root = freshRoot();
   const server = await bootedServer(root);
-  const started = await call(server, "se_test");
+  // FORCE, BECAUSE THIS CASE PROVES THE BATTERY'S SHAPE and does not earn one
+  // (i11). The full battery belongs to verification now
+  // (req-the-full-battery-runs-where-the-method-says), and this fixture stands
+  // at the front desk — so without force it meets the refusal it is not about.
+  const started = await call(server, "se_test", { force: true });
   assert.equal(started.isError, false, JSON.stringify(started.body));
   assert.equal(started.body.handed_off, true, JSON.stringify(started.body));
   const body = await waitForTestJob(server, String(started.body.job));

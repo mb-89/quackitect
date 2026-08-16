@@ -59,6 +59,11 @@ export interface PanelValues {
   /** The rung bank's current position, and the rungs themselves. */
   rungs: { value: number; abbr: string; name: string }[];
   autonomy: number;
+  /** THE SECOND BANK, and the reason renderRungs reads its parameter at all.
+   *  Same grammar, same cumulative behaviour, a different question — how far
+   *  the agent walks before handing back (machines/stopat.md). */
+  stopat?: { value: number; abbr: string; name: string }[];
+  stop_at?: number;
   /** The hidden rung past the top one. Drawn only when it is on. */
   emergency?: boolean;
   /** Whatever an `int` param's key asks for. */
@@ -86,13 +91,26 @@ const esc = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;"
  * above it with it. BLOCKED IS NOT A BUTTON — it is what no rung pressed
  * means, so it is reached by releasing the lowest one.
  */
-function renderRung(l: PanelValues["rungs"][number], below: number, v: PanelValues): string {
-  const on = v.autonomy >= l.value;
-  const reachable = on || v.autonomy >= below;
-  const target = on ? below : l.value;
+interface Bank {
+  /** Which control this button belongs to — the click handler's routing. */
+  id: "autonomy" | "stopat";
+  /** Where the bank stands now. */
+  at: number;
+  /** The lowest notch that may never be released. The stop-at bank has one:
+   *  `state end` is the tightest setting, not an off switch, so releasing it
+   *  would leave the control meaning nothing. */
+  floor: number;
+  /** The top rung draws as a hazard, and only autonomy's does. */
+  hazard: boolean;
+}
+
+function renderRung(l: PanelValues["rungs"][number], below: number, v: PanelValues, bank: Bank): string {
+  const on = bank.at >= l.value;
+  const reachable = on || bank.at >= below;
+  const target = on ? Math.max(below, bank.floor) : l.value;
   // Ideation is the one rung that delegates the CREATION of work, so it
   // is the one rung drawn as a hazard rather than as a setting.
-  const top = l.value >= 1;
+  const top = bank.hazard && l.value >= 1;
   const danger = top ? " danger" : "";
   // THE HIDDEN RUNG. Past the top one is emergency, and it is not a
   // separate button: the top rung BECOMES it. Nothing names it while it
@@ -110,13 +128,29 @@ function renderRung(l: PanelValues["rungs"][number], below: number, v: PanelValu
   // value. They differ on a release, and the help has to follow the rung
   // that was pressed. Sending the landing position explained "blocked" to
   // a reader who had just clicked the mechanical rung.
-  return `<button type="button" class="${cls}" data-level="${target}" data-rung="${l.value}" title="${esc(armed ? "emergency" : l.name)} — ${esc(why)}">${esc(armed ? "E" : l.abbr)}</button>`;
+  return `<button type="button" class="${cls}" data-bank="${bank.id}" data-level="${target}" data-rung="${l.value}" title="${esc(armed ? "emergency" : l.name)} — ${esc(why)}">${esc(armed ? "E" : l.abbr)}</button>`;
 }
 
-function renderRungs(_p: Param, v: PanelValues): string {
-  const climbable = v.rungs.filter((l) => l.value > 0);
-  const buttons = climbable.map((l, i) => renderRung(l, i === 0 ? 0 : climbable[i - 1].value, v)).join("");
-  return `<span class="rungs">${buttons}</span><input id="thr" type="hidden" value="${v.autonomy}">`;
+/** THE SOURCE NAMES THE BANK, and an unknown one REFUSES rather than
+ *  falling back. A silent fallback would draw the autonomy dial under a
+ *  `stop @` label — a control that lies about what it sets. */
+function renderRungs(p: Param, v: PanelValues): string {
+  const source = p.fields[0] ?? "scale";
+  if (source !== "scale" && source !== "stopat") {
+    return `<span class="rungs"><em>unknown rungs source "${esc(source)}" — controls.md names scale or stopat</em></span>`;
+  }
+  const stop = source === "stopat";
+  const levels = (stop ? (v.stopat ?? []) : v.rungs).filter((l) => l.value > 0);
+  // THE TIGHTEST NOTCH IS THE FLOOR, not an off switch. Autonomy's bottom IS
+  // off — blocked — and reaching it by releasing the lowest rung is the
+  // design. Stop-at has no off: not stopping at all is `blockers only`, which
+  // is the TOP. So its lowest notch cannot be released.
+  const bank: Bank = stop
+    ? { id: "stopat", at: v.stop_at ?? 0, floor: levels[0]?.value ?? 0, hazard: false }
+    : { id: "autonomy", at: v.autonomy, floor: 0, hazard: true };
+  const buttons = levels.map((l, i) => renderRung(l, i === 0 ? 0 : levels[i - 1].value, v, bank)).join("");
+  const live = stop ? "" : `<input id="thr" type="hidden" value="${v.autonomy}">`;
+  return `<span class="rungs">${buttons}</span>${live}`;
 }
 
 function renderInt(p: Param, v: PanelValues): string {

@@ -323,6 +323,22 @@ function correctChains(
       corrected = `narration landed as a plan — a chain is a list, and its parts are the items: [${parts.map((p) => JSON.stringify(p)).join(", ")}]`;
     }
   }
+  // A FORK'S CHAINED BRIEF IS CORRECTED TOO, and for the same reason an
+  // update's is: the split is already computed, and throwing it away to
+  // refuse costs a round trip for a comma.
+  //
+  // IT STAYS A FORK. A fork is a blocking detour and an update is not, so
+  // turning one into a plan would change what the call MEANS. Only the shape
+  // is corrected: the parts become the detour's items, and its first part
+  // names it — which is what "fix A, then B, then C" says.
+  if (opOut === "fork" && briefOut !== undefined) {
+    const parts = chainOf(briefOut);
+    if (parts !== null) {
+      itemsOut = [...parts, ...(itemsOut ?? [])];
+      briefOut = parts[0];
+      corrected = `the fork kept its shape and its chain became its items — named by its first part: [${parts.map((p) => JSON.stringify(p)).join(", ")}]`;
+    }
+  }
   if (itemsOut?.some((it) => chainOf(it) !== null)) {
     itemsOut = itemsOut.flatMap((it) => chainOf(it) ?? [it]);
     corrected = corrected ?? "a chained item was split into the items it listed";
@@ -462,7 +478,23 @@ export class Decisions {
    *  already and prose lost, which is the case for a mechanical nudge.
    *  High enough that ordinary narration passes untouched. */
   private sinceResolve = 0;
+  /** WARN HERE. The nudge rides the result and costs nothing. */
   private static readonly NUDGE_AFTER = 5;
+  /** REFUSE HERE, and the gap between the two IS the grace.
+   *
+   *  BOTH USED TO BE 5, so the warning and the refusal arrived one call apart:
+   *  the fifth update was nudged and the sixth was refused. A rule that warns
+   *  and then bites immediately is not a warning, it is a two-stage refusal.
+   *
+   *  WHY THAT IS WRONG HERE. The counter measures updates since anything
+   *  CLOSED, and a chunk of real work legitimately runs longer than six calls
+   *  without finishing an item — reading four files to find a root cause
+   *  closes nothing and is not a stall. Seven refusals on this iteration's own
+   *  walk, every one during work that was moving.
+   *
+   *  THE TEETH STAY. Twelve updates with nothing closed is a genuinely stalled
+   *  checklist, and the remedy is still one call away and never refused. */
+  private static readonly REFUSE_AFTER = 12;
   /** What attachTo corrected on THIS call — read once by apply(). */
   private lastCorrection: string | undefined;
 
@@ -482,7 +514,7 @@ export class Decisions {
    *  map rides the refusal, so the id needed to obey it is already in hand. */
   private refuseIfStalled(u: DecisionOp): void {
     if (u.op === "done" || u.op === "obsolete" || u.op === "revert" || u.op === "defer") return;
-    if (this.sinceResolve < Decisions.NUDGE_AFTER) return;
+    if (this.sinceResolve < Decisions.REFUSE_AFTER) return;
     const openNodes = [...this.nodes.values()].filter((n) => n.status === "open").map((n) => ({ id: n.id, brief: n.brief }));
     if (openNodes.length === 0) return;
     throw new Rejection({

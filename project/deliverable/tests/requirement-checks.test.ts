@@ -286,6 +286,9 @@ describe("the design-spec law", { concurrency: true }, () => {
       "utf8",
     );
     mintTyped(root, "experiment", "exp-p", "experiment", ["promote: the probe enters"]);
+    // UNNAMED, the engine cannot resolve which record this is — a temp root's
+    // basename names none of them — so there is no "ours" to scope by and every
+    // promotion is asked about. That is the only honest answer here.
     let p = specifyBuildLawProblems(loadTrace(root), root).join(" | ");
     assert.match(p, /exp-p: promoted and unassigned/);
     mintTyped(root, "experiment", "exp-p", "experiment", ["promote: the probe enters", "chunk: c9"]);
@@ -293,6 +296,18 @@ describe("the design-spec law", { concurrency: true }, () => {
     assert.match(p, /exp-p: chunk c9 is not a step of the seeded drawing/);
     mintTyped(root, "experiment", "exp-p", "experiment", ["promote: the probe enters", "chunk: c1"]);
     assert.deepEqual(specifyBuildLawProblems(loadTrace(root), root), []);
+    // NAME THE RECORD AND ONLY ITS OWN PROMOTIONS ARE ASKED ABOUT (owner ruling
+    // 2026-08-16): "We should only look at promotions from within our own
+    // iteration." An unstamped experiment cannot be shown to be ours — the
+    // engine writes minted_in at the write — and asking anyway is what refused
+    // i11 twice over drawings that shipped with i27.
+    mintTyped(root, "experiment", "exp-orphan", "experiment", ["promote: an unowned probe", "chunk: c9"]);
+    assert.match(
+      specifyBuildLawProblems(loadTrace(root), root).join(" | "),
+      /exp-orphan: chunk c9 is not a step/,
+      "with no record named, an unowned promotion is still asked about",
+    );
+    assert.deepEqual(specifyBuildLawProblems(loadTrace(root), root, "itx"), [], "named, it is somebody else's business");
   });
 
   test("a standing experiment from another record stays out of the assignment sweep", () => {

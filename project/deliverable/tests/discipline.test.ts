@@ -14,7 +14,7 @@ import { Rejection } from "../engine/errors.ts";
 import { filePatch, fileRead } from "../engine/files.ts";
 import { contentHash } from "../engine/hash.ts";
 import { search } from "../engine/search.ts";
-import { anyGuidanceDoc } from "./helpers.ts";
+import { anyGuidanceDoc, bootedServer, call, freshRoot } from "./helpers.ts";
 
 function fresh(): string {
   return mkdtempSync(join(tmpdir(), "se-v3-disc-"));
@@ -27,6 +27,78 @@ function fresh(): string {
 test("no lane verb reaches the autonomy dial", () => {
   const tools = readFileSync(new URL("../engine/tools.ts", import.meta.url), "utf8");
   assert.ok(!tools.includes("setAutonomy"), "a lane verb touches the dial — the slider is the person's alone (owner ruling 2026-08-10)");
+});
+
+// A FAILING LEAF KEEPS ITS MESSAGE (i11, from the 2026-08-12 seed).
+//
+// The parser matched `^not ok` with no leading space, so a failure inside a
+// describe() block was invisible: TAP indents the child and reports the PARENT
+// at the top level as "1 subtest failed" with the suite's location. The one
+// line that says WHAT failed was dropped, every time.
+//
+// MEASURED 2026-08-16: three failures had to be re-run through the shell with
+// a different reporter to be read at all — each a logged escape from the lane
+// that exists to replace exactly that.
+test("a failure inside a suite reports its own assertion, not the parent's roll-up", () => {
+  const tap = [
+    "TAP version 13",
+    "    # Subtest: a promoted experiment is assigned to a step",
+    "    not ok 3 - a promoted experiment is assigned to a step",
+    "      ---",
+    '      error: "The input did not match /exp-p: promoted and unassigned/"',
+    "      code: 'ERR_ASSERTION'",
+    "      ...",
+    "not ok 1 - the design-spec law",
+    "  ---",
+    "  failureType: 'subtestsFailed'",
+    "  error: '1 subtest failed'",
+    "  ...",
+    "# tests 2",
+    "# pass 1",
+    "# fail 1",
+  ].join("\n");
+  const r = parseTap(tap);
+  assert.equal(r.fail, 1, "the counts come from the summary and are untouched");
+  assert.equal(r.failures.length, 1, "the roll-up is dropped where a leaf survived it");
+  assert.match(r.failures[0].name, /a promoted experiment/, "the leaf is what gets named");
+  assert.match(r.failures[0].detail, /did not match/, "and its assertion rides with it");
+
+  // A ROLL-UP ALONE IS STILL BETTER THAN SILENCE. Where no leaf was captured
+  // — a crash before the subtest reported — the parent is all there is.
+  const only = parseTap(["not ok 1 - the design-spec law", "  ---", "  error: '1 subtest failed'", "  ...", "# fail 1"].join("\n"));
+  assert.equal(only.failures.length, 1, "nothing more specific means the parent still reports");
+});
+
+// A TRUNCATING SHAPE IS REFUSED, NOT ANNOTATED (owner ruling 2026-08-16).
+//
+// The lane warned about this for months and the warning did not work: an agent
+// piped a test run through Select-String IN THIS ITERATION, while building the
+// fix for it, and got exit 1 with empty stdout. The red had to be re-run to be
+// read at all.
+//
+// WHAT THE PIPE DESTROYS is unrecoverable by design — it cuts between the
+// command and the capture, so the dropped part is not on the result, not in
+// the log and not under the ref.
+test("a truncating shape refuses before the spawn, and names the verb that was wanted", async () => {
+  const server = await bootedServer(freshRoot());
+  const cases: [string, string][] = [
+    ["node --test project/deliverable/tests/pull.test.ts | Select-String -Pattern fail", "se_test"],
+    ["rg TODO project | Select-Object -First 20", "se_file_search"],
+    ["Get-Content big.log | Select-Object -First 50", "se_file_read"],
+    ["git log --oneline | head -5", "se_run"],
+  ];
+  for (const [command, wanted] of cases) {
+    const r = await call(server, "se_run", { command });
+    assert.equal(r.isError, true, `${command} should refuse`);
+    assert.equal(r.body.clause, "SE-C-137");
+    assert.equal((r.body.remedy as { tool: string }).tool, wanted, `${command} wanted ${wanted}`);
+  }
+  // THE ESCAPE STAYS OPEN AND LOGGED, the same door every other lane rule has.
+  const forced = await call(server, "se_run", {
+    command: "git log --oneline | head -2",
+    no_tool_reason: "proving the escape still runs",
+  });
+  assert.notEqual(forced.isError, true, "no_tool_reason runs it anyway");
 });
 
 // ── the patch verbs ────────────────────────────────────────────────────────

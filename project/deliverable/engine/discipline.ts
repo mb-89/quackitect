@@ -501,18 +501,32 @@ export function parseTap(out: string): TapResult {
       if (counts[1] === "fail") res.fail = Number(counts[2]);
       continue;
     }
-    // TOP-LEVEL failures only — a failing subtest reports through its parent,
-    // and counting both would double every incident.
-    const notOk = line.match(/^not ok \d+ - (.*)$/);
+    // EVERY DEPTH, NOT ONLY THE TOP (i11, from the 2026-08-12 seed).
+    //
+    // This matched `^not ok` with no leading space, so a failure inside a
+    // describe() block was invisible: TAP indents the child and reports the
+    // PARENT at the top level with `1 subtest failed` and the suite's
+    // location. The one line that says WHAT failed — the assertion's message
+    // and diff — was dropped, every time.
+    //
+    // MEASURED 2026-08-16: three separate failures had to be re-run through
+    // the shell with a different reporter to be read at all, each one a
+    // logged escape from the lane the lane exists to replace.
+    const notOk = line.match(/^(\s*)not ok \d+ - (.*)$/);
     if (notOk === null) continue;
     if (res.failures.length >= 10) continue;
     const detail: string[] = [];
     for (let j = i + 1; j < lines.length && detail.length < 30; j++) {
       const l = lines[j];
-      if (/^(not )?ok \d+ - /.test(l) || /^# /.test(l)) break;
+      if (/^\s*(not )?ok \d+ - /.test(l) || /^\s*# /.test(l)) break;
       detail.push(l);
     }
-    res.failures.push({ name: notOk[1], detail: capMiddle(detail.join("\n"), 2000) });
+    res.failures.push({ name: notOk[2], detail: capMiddle(detail.join("\n"), 2000) });
   }
+  // THE ROLL-UP IS DROPPED WHERE A LEAF SURVIVED IT. A parent saying "1 subtest
+  // failed" is the shape of a report with the report removed, and it is only
+  // worth printing when nothing more specific was captured.
+  const leaves = res.failures.filter((f) => !/subtestsFailed|\d+ subtests? failed/.test(f.detail));
+  if (leaves.length > 0) res.failures = leaves;
   return res;
 }

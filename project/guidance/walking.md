@@ -114,9 +114,18 @@ wherever the walk stands, so the person's hand can never race you.
 
 ## The person's hand
 
-They AIM; they never walk. Their controls are the autonomy dial, the target and the
-checkboxes. Nothing they press moves the machine a state forward or back —
-the walk advances on the agent's pull and nothing else.
+They AIM; they never walk. Their controls are the autonomy dial, the STOP-AT
+dial, the target and the checkboxes. Nothing they press moves the machine a
+state forward or back — the walk advances on the agent's pull and nothing else.
+
+THE TWO DIALS ASK NEIGHBOURING QUESTIONS. Autonomy says what the agent may
+DECIDE alone. Stop-at says how far it may GO before handing back, and its four
+notches are machines/stopat.md: `state end`, `agent judgement` (the default),
+`bless`, `blockers only`.
+
+AT `state end` THE ENGINE HOLDS EVERY TRANSITION and the person releases them
+one at a time. That is still not them walking: the press stops the engine
+refusing, and the agent's pull is what moves.
 
 ## The reading
 
@@ -157,10 +166,18 @@ the rhythm; the log should tell the story without gaps.
   narration wearing progress's clothes. With nothing open, a bare update is
   right.
 - THE BRIEF IS ONE LINE, 90 characters. A brief that chains three or more
-  separator-joined parts wanted to be a plan, and the engine APPLIES it as
-  one — the parts become the items, and the result names the correction. A
-  RESOLUTION's chained brief still refuses (SE-C-120): which part resolved
-  the node is not the engine's to guess.
+  separator-joined parts is corrected rather than refused, and the result
+  names the correction. An `update` chain becomes the PLAN it wanted to be.
+  A `fork` chain STAYS a fork and its parts become that detour's items,
+  named by the first — a fork blocks the current item and a plan does not,
+  so rewriting the op would change what the call means. A RESOLUTION's
+  chained brief still refuses (SE-C-120): which part resolved the node is
+  not the engine's to guess.
+- THE STALL WARNS AT FIVE AND REFUSES AT TWELVE (SE-C-133), and the gap is
+  the grace. Both were five, so the warning bit one call later — which is a
+  two-stage refusal, not a warning. The counter measures updates since
+  anything CLOSED, and real work runs past six while reading its way to a
+  root cause.
 
 HOW OFTEN IS THE PERSON'S CONTROL, on the mirror's bar. Five notches, both
 clocks running — minutes and calls, whichever falls due first. A low notch is
@@ -189,8 +206,15 @@ the machine holding that job, not an obstacle to route around.
 ## Tests
 
 Test to answer a question — did THIS change break THAT — never to reassure.
-Scoped runs are the default and the battery is EARNED; the lane enforces
-both. A red is understood and fixed properly, then you move.
+A red is understood and fixed properly, then you move.
+
+A SCOPED RUN IS THE ONLY ONE YOU MAKE. It blocks and answers, so there is
+nothing to poll: no handle, no second call asking whether it finished.
+
+THE FULL BATTERY IS THE ENGINE'S. It runs once, at verification, fired by
+that state's own exit script — you never call it and there is no state where
+you may. Asking for one anywhere else is refused, and `force: true` is for a
+flake hunt.
 
 ## Conditions
 
