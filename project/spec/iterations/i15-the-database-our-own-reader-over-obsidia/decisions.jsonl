@@ -139,3 +139,4 @@
 {"ts":"2026-08-16T17:06:40.850Z","op":"plan","visit":"iterations/i15/gate-requirements@0","parent":null,"nodes":[{"id":"d127","brief":"read meth-gate-review"},{"id":"d128","brief":"round_0_verify"},{"id":"d129","brief":"round_1_validate"},{"id":"d130","brief":"round_2_red_team"},{"id":"d131","brief":"raid_additions"},{"id":"d132","brief":"verdict"}]}
 {"ts":"2026-08-16T17:06:51.303Z","op":"done","visit":"iterations/i15/identify-assumptions@0","node":"d122","brief":"closed via probe-assumptions submit: marked scheduled, needs build"}
 {"ts":"2026-08-16T17:06:55.337Z","op":"done","visit":"iterations/i15/gate-requirements@0","node":"d127","brief":"meth-gate-review read; now reading the register to review"}
+{"ts":"2026-08-16T17:09:42.484Z","op":"plan","visit":"iterations/i15/gate-requirements@0","parent":null,"nodes":[{"id":"d133","brief":"register reviewed"},{"id":"d134","brief":"writing round_0-2"}]}
