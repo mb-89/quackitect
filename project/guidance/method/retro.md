@@ -127,15 +127,17 @@ The trigger is a NOTE carrying "needs retro":
    COUNT DOWN. Every shell command is a candidate sign of a MISSING lane
    verb, and the retro is where that verb gets named.
 
-   COUNT IT AND COMPARE IT. `se_log_query {group_by: "tool"}` gives the
-   whole distribution in one call. Write the se_run number down and put it
-   beside the last retro's. A number that is not falling means this step
-   ran and changed nothing.
+   COUNT IT. `se_log_query {group_by: "tool"}` gives the whole
+   distribution in one call.
 
-   THE MEASUREMENT THAT SET THIS RULE: on 2026-08-07 se_run stood at 3249
-   calls out of 28612 — the SECOND most-used tool in the system, ahead of
-   se_file_search. A lane whose escape hatch is its second-busiest door is
-   missing verbs, and nobody had counted.
+   DO NOT COMPARE IT TO AN OLD RETRO'S NUMBER (owner ruling 2026-08-16:
+   "stop comparing se_run against an old retro... this is not useful. We're
+   beyond that"). A ratio against a stale baseline says nothing about
+   whether THIS window's shell calls were avoidable, which is the only
+   question this step asks.
+
+   ASK INSTEAD: what did the shell do this window that a lane verb could
+   have done? Name the verb.
 
    GROUP THE COMMANDS BY SHAPE, not by date. Four runs of one script is one
    missing verb, not four incidents. Name the verb, and if it is cheap

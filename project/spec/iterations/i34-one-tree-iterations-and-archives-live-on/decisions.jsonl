@@ -1,0 +1,54 @@
+{"ts":"2026-08-16T05:19:44.688Z","op":"done","visit":"iterations/start@2","node":"d63","brief":"wrong diagnosis corrected in the record"}
+{"ts":"2026-08-16T05:19:47.766Z","op":"done","visit":"iterations/start@2","node":"d62","brief":"i34 entered and bound at iterations/i34/start"}
+{"ts":"2026-08-16T05:20:04.278Z","op":"done","visit":"iterations/start@2","node":"d61","brief":"cause found: the running engine had not reloaded onto the seeded iteration"}
+{"ts":"2026-08-16T05:21:00.939Z","op":"plan","visit":"iterations/i34/onboard-retro@0","parent":null,"nodes":[{"id":"d67","brief":"mark the retro window boundary"},{"id":"d68","brief":"mine the call log for clauses and tools"},{"id":"d69","brief":"drain the 32 pending notes"},{"id":"d70","brief":"check promotions and process staleness"},{"id":"d71","brief":"fill and submit onboard-retro"}]}
+{"ts":"2026-08-16T05:21:07.129Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d72","brief":"fetching the oldest record in the window"}
+{"ts":"2026-08-16T05:21:12.648Z","op":"done","visit":"iterations/i34/onboard-retro@0","node":"d67","brief":"window opens 2026-08-15T13:33:04.173Z"}
+{"ts":"2026-08-16T05:21:22.708Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d73","brief":"counting failures by tool across the window"}
+{"ts":"2026-08-16T05:22:03.604Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d74","brief":"draining the worktree cluster into i34"}
+{"ts":"2026-08-16T05:22:22.854Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d75","brief":"owner adds a selection state to i34's scope"}
+{"ts":"2026-08-16T05:22:27.002Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d76","brief":"selection-state ruling carried into i34"}
+{"ts":"2026-08-16T05:22:31.214Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d77","brief":"carrying the measurement bundle"}
+{"ts":"2026-08-16T05:22:41.559Z","op":"done","visit":"iterations/i34/onboard-retro@0","node":"d68","brief":"log mined across 2882 calls in the window"}
+{"ts":"2026-08-16T05:22:45.918Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d78","brief":"carrying the i27 trunk-only ruling"}
+{"ts":"2026-08-16T05:22:49.709Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d79","brief":"carrying the archive-on-disk ruling"}
+{"ts":"2026-08-16T05:22:54.091Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d80","brief":"carrying the change map"}
+{"ts":"2026-08-16T05:22:59.725Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d81","brief":"carrying i28's orphaned worktree"}
+{"ts":"2026-08-16T05:23:06.439Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d82","brief":"carrying the wrong-tree complaint"}
+{"ts":"2026-08-16T05:23:23.674Z","op":"done","visit":"iterations/i34/onboard-retro@0","node":"d69","brief":"eleven worktree-cluster notes carried into i34"}
+{"ts":"2026-08-16T05:23:29.723Z","op":"plan","visit":"iterations/i34/onboard-retro@0","parent":null,"nodes":[{"id":"d83","brief":"park the remaining notes with ready-whens"},{"id":"d84","brief":"fill onboard-retro and submit"}]}
+{"ts":"2026-08-16T05:23:35.748Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d85","brief":"carrying the seed-crash findings"}
+{"ts":"2026-08-16T05:23:42.431Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d86","brief":"carrying the correction beside what it corrects"}
+{"ts":"2026-08-16T05:24:03.763Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d87","brief":"the kill-the-old-path rule governs i34's step 4"}
+{"ts":"2026-08-16T05:24:10.736Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d88","brief":"parking the git-lane size gap"}
+{"ts":"2026-08-16T05:24:17.231Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d89","brief":"parking the trace-left-behind finding on the close"}
+{"ts":"2026-08-16T05:24:22.274Z","op":"done","visit":"iterations/i34/onboard-retro@0","node":"d70","brief":"no local change earned promotion this window"}
+{"ts":"2026-08-16T05:24:27.956Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d90","brief":"parking the strategic-gates ruling"}
+{"ts":"2026-08-16T05:24:33.178Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d91","brief":"parking the delete-rights rule i34 will meet"}
+{"ts":"2026-08-16T05:24:38.429Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d92","brief":"parking the node-table truncation"}
+{"ts":"2026-08-16T05:24:42.842Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d93","brief":"parking the probe-result ruling"}
+{"ts":"2026-08-16T05:24:49.096Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d94","brief":"parking the unchecked-assertion rule, which fired again today"}
+{"ts":"2026-08-16T05:24:54.519Z","op":"done","visit":"iterations/i34/onboard-retro@0","node":"d71","brief":"superseded by d84, which is the same item"}
+{"ts":"2026-08-16T05:24:59.008Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d95","brief":"parking the compare-card help"}
+{"ts":"2026-08-16T05:25:04.128Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d96","brief":"parking the engine code-review iteration"}
+{"ts":"2026-08-16T05:25:09.130Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d97","brief":"parking the recompute-on-change finding"}
+{"ts":"2026-08-16T05:25:14.587Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d98","brief":"parking the manual-steps count with three new cases"}
+{"ts":"2026-08-16T05:25:19.131Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d99","brief":"parking the source-text assertion break"}
+{"ts":"2026-08-16T05:25:28.586Z","op":"done","visit":"iterations/i34/onboard-retro@0","node":"d83","brief":"every pending note is drained"}
+{"ts":"2026-08-16T05:25:32.954Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d100","brief":"inbox empty; composing the form"}
+{"ts":"2026-08-16T05:27:00.296Z","op":"done","visit":"iterations/i34/onboard-retro@0","node":"d84","brief":"onboard-retro filled and submitted"}
+{"ts":"2026-08-16T05:27:29.477Z","op":"plan","visit":"iterations/i34/gate-kickoff@0","parent":null,"nodes":[{"id":"d101","brief":"read the kickoff form"},{"id":"d102","brief":"propose the change size with reasoning"},{"id":"d103","brief":"present the size decision to the owner"}]}
+{"ts":"2026-08-16T05:27:37.543Z","op":"update","visit":"iterations/i34/gate-kickoff@0","node":"d104","brief":"extracting the kickoff field list"}
+{"ts":"2026-08-16T05:29:15.400Z","op":"done","visit":"iterations/i34/gate-kickoff@0","node":"d101","brief":"kickoff form read and filled"}
+{"ts":"2026-08-16T05:29:58.845Z","op":"done","visit":"iterations/i34/gate-kickoff@0","node":"d102","brief":"major proposed with no strikes, form saved unstamped"}
+{"ts":"2026-08-16T05:30:39.615Z","op":"done","visit":"iterations/i34/gate-kickoff@0","node":"d103","brief":"form is submit-ready and waiting on the size decision"}
+{"ts":"2026-08-16T05:30:45.837Z","op":"update","visit":"iterations/i34/gate-kickoff@0","node":"d105","brief":"last format fix on the kickoff form"}
+{"ts":"2026-08-16T05:33:30.945Z","op":"plan","visit":"iterations/i34/gate-kickoff@0","parent":null,"nodes":[{"id":"d106","brief":"record the se_run comparison correction"},{"id":"d107","brief":"read what the rigor matrix puts in major but not minor"},{"id":"d108","brief":"answer what going minor actually costs"}]}
+{"ts":"2026-08-16T05:33:47.181Z","op":"done","visit":"iterations/i34/gate-kickoff@0","node":"d106","brief":"correction recorded against the retro card"}
+{"ts":"2026-08-16T05:33:54.192Z","op":"update","visit":"iterations/i34/gate-kickoff@0","node":"d109","brief":"extracting every row's major and minor grade"}
+{"ts":"2026-08-16T05:34:54.237Z","op":"done","visit":"iterations/i34/gate-kickoff@0","node":"d107","brief":"minor drops 23 design-selection rows and keeps every build and verify row"}
+{"ts":"2026-08-16T05:35:03.247Z","op":"update","visit":"iterations/i34/gate-kickoff@0","node":"d110","brief":"draining the correction note so the form can stamp"}
+{"ts":"2026-08-16T05:35:23.650Z","op":"update","visit":"iterations/i34/gate-kickoff@0","node":"d111","brief":"cutting the stale-baseline comparison from the retro card"}
+{"ts":"2026-08-16T05:35:28.554Z","op":"update","visit":"iterations/i34/gate-kickoff@0","node":"d112","brief":"correction landed in the card and drained"}
+{"ts":"2026-08-16T05:35:56.610Z","op":"done","visit":"iterations/i34/gate-kickoff@0","node":"d108","brief":"minor's cost is answered from the matrix rows"}
+{"ts":"2026-08-16T05:36:17.718Z","op":"plan","visit":"iterations/i34/gate-kickoff@0","parent":null,"nodes":[{"id":"d113","brief":"bless the kickoff so the minor machine compiles"},{"id":"d114","brief":"walk toward the build where the selection state is built"}]}
