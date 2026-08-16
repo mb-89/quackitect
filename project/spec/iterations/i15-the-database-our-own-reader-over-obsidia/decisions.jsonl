@@ -316,3 +316,7 @@
 {"ts":"2026-08-16T19:17:54.439Z","op":"fork","visit":"iterations/i15/verification@1","parent":null,"node":"d298","brief":"fix nesting.test.ts:377 fixture missing biome.json, blocking verification's battery gate","nodes":[]}
 {"ts":"2026-08-16T19:24:22.794Z","op":"update","visit":"iterations/i15/verification@1","node":"d299","brief":"escaping: SE-C-123 wedge-guard blocks all write access"}
 {"ts":"2026-08-16T19:27:39.965Z","op":"update","visit":"iterations/i15/run-candidates/start@6","node":"d300","brief":"walking all five M5 candidates in parallel per build_chart follow_up"}
+{"ts":"2026-08-16T19:31:55.056Z","op":"update","visit":"iterations/i15/verification@2","node":"d301","brief":"battery red on nesting.test.ts:377 only; routing to fix-findings"}
+{"ts":"2026-08-16T19:33:54.191Z","op":"update","visit":"iterations/i15/verification@2","node":"d302","brief":"se_why confirms fix-findings form complete but unsubmitted; submitting directly"}
+{"ts":"2026-08-16T19:35:59.975Z","op":"update","visit":"iterations/i15/verification@2","node":"d303","brief":"se_why shows both successors unblocked upstream; trying gate-implementation route"}
+{"ts":"2026-08-16T19:37:37.608Z","op":"plan","visit":"iterations/i15/verification@2","parent":"d298","nodes":[{"id":"d304","brief":"guard exhausted"},{"id":"d305","brief":"engine defect confirmed via se_why"},{"id":"d306","brief":"escaping to front_desk"}]}
