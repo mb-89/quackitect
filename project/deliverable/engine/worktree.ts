@@ -454,27 +454,6 @@ function stampRecordClosed(root: string, e: Expedition, merge: boolean, override
       source: SRC,
     });
   }
-  // AN OWED ITEM HOLDS THE CLOSE (req-close-refuses-loose-ends, built i11).
-  // The third guard on this act, beside the report and the override.
-  //
-  // THE BUCKET HAS TWO ENDS AND ONLY ONE EXISTED. The form side has accepted
-  // `- [owed] <item> — <ref>` for months and refuses an unresolved ref at
-  // submit. Nothing read those items again, so a finding could be carried past
-  // every gate and out of the record with nobody looking at it twice.
-  const standing = owedStanding(root, `project/spec/expeditions/${e.id}`);
-  if (standing.length > 0) {
-    throw new Rejection({
-      clause: CLAUSES.CONDITION_UNMET,
-      expected: "every owed item cleared or its register entry ruled on — a close carries no finding nobody looked at twice",
-      got: standing.map((o) => `${o.item} — ${o.ref} (${o.where})`).join(" · "),
-      remedy: {
-        tool: "se_file_patch",
-        args: { ops: [{ path: "project/spec/trace/raid/<the entry>.md", old_string: "status: open", new_string: "status: accepted" }] },
-        note: "fix the item and tick its box, or rule on its register entry — accepted, deferred, mitigated, closed or superseded all count as ruled",
-      },
-      source: SRC,
-    });
-  }
   // QUOTED, because the writer controls the field and NOT its content.
   // An override is free prose from a person, so it carries colons, quotes
   // and line breaks. Unquoted, "in chat, 2026-07-29: after reading" is a
@@ -486,10 +465,38 @@ function stampRecordClosed(root: string, e: Expedition, merge: boolean, override
     recAbs,
     raw.replace(
       /^status: open$/m,
-      `status: closed\nclosed: ${new Date().toISOString()}\nruling: ${merge ? "applied" : "dismissed"}${stamped === "" ? "" : `\nreport_override: ${yamlScalar(stamped)}`}`,
+      `status: closed\nclosed: ${new Date().toISOString()}\nruling: ${merge ? "applied" : "dismissed"}${stamped === "" ? "" : `\nreport_override: ${yamlScalar(stamped)}`}${carriedStamp(owedStanding(root, `project/spec/expeditions/${e.id}`))}`,
     ),
     "utf8",
   );
+}
+
+/** THE CLOSE HANDS OVER, IT DOES NOT REFUSE (owner ruling 2026-08-16).
+ *
+ *  IT REFUSED UNTIL TODAY, and the refusal was the wrong shape. Disposing an
+ *  owed item means fixing the thing or RULING its register entry, and a ruling
+ *  is usually the person's. So the refusal put a person-blocking step at the
+ *  very end of every record — at the one moment the only thing left to do is
+ *  ship, which is when the pressure to wave it through is highest.
+ *
+ *  AND IT TRAPPED THE WALK. A close that will not pass leaves the walk standing
+ *  in the last state with no legal move, which is the failure the owner named
+ *  after it happened three times in one day.
+ *
+ *  CARRYING IS STILL A DISPOSITION. "Carried to the next record, on the record"
+ *  is an agreed outcome, which is what NASA NPR 7123.1 means by a review
+ *  completing on dispositions rather than on every finding being fixed.
+ *
+ *  THE STOP MOVES TO THE SEED. The count rides the closed record, so the next
+ *  record can read it, surface it and — above a threshold — be a pruning
+ *  record rather than a new one. That half is not built here; this is the end
+ *  that stops the trap. */
+function carriedStamp(standing: { item: string; ref: string; where: string }[]): string {
+  if (standing.length === 0) return "";
+  // ON THE RECORD, NOT IN A SIDE FILE. A carried list nobody counts is the
+  // same as losing them slowly, and the record is what the next one reads.
+  const lines = standing.map((o) => `  - ${o.item} — ${o.ref} (${o.where})`).join("\n");
+  return `\ncarried_count: ${String(standing.length)}\ncarried:\n${lines}`;
 }
 
 // `mergeAndRetire` AND `mergeToTrunk` ARE GONE (i34). They merged a record's
@@ -514,18 +521,32 @@ function stampRecordClosed(root: string, e: Expedition, merge: boolean, override
 export function itCloseShipped(
   root: string,
   rec: { id: string; branch: string; path: string },
-): { closed: string; trunk_committed?: string[] } {
+): { closed: string; trunk_committed?: string[]; carried?: { item: string; ref: string; where: string }[] } {
   const trunkCommitted = settleTrunk(root, rec.id);
   const recAbs = join(root, `project/spec/iterations/${rec.id}/record.md`);
   const raw = readNode(recAbs);
+  // THE ITERATION CLOSE CARRIES TOO, and until today it did nothing at all.
+  //
+  // THE GUARD WAS BUILT ON THE EXPEDITION CLOSE ONLY — `stampRecordClosed`,
+  // reached from expClose, reading a hardcoded `project/spec/expeditions/`
+  // path. An iteration closes through HERE and never looked. i11 shipped past
+  // nine owed items with the mechanism it had just built watching the wrong
+  // door, and the evidence said three times that the close would refuse.
+  const standing = owedStanding(root, `project/spec/iterations/${rec.id}`);
   if (raw !== "" && !/^closed: /m.test(raw)) {
-    writeNode(recAbs, raw.replace(/^status: .*$/m, `status: shipped\nclosed: ${new Date().toISOString()}`));
+    writeNode(recAbs, raw.replace(/^status: .*$/m, `status: shipped\nclosed: ${new Date().toISOString()}${carriedStamp(standing)}`));
   }
   if (git(root, ["status", "--porcelain"], "status").trim() !== "") {
     git(root, ["add", "-A"], "add");
     git(root, ["commit", "-q", "-m", `iteration ${rec.id}: shipped`], "commit");
   }
-  return { closed: rec.id, ...(trunkCommitted.length > 0 ? { trunk_committed: trunkCommitted } : {}) };
+  // THE ANSWER NAMES WHAT WAS CARRIED, so a handover is never silent. A close
+  // that carries nine findings and says nothing is the same as losing them.
+  return {
+    closed: rec.id,
+    ...(trunkCommitted.length > 0 ? { trunk_committed: trunkCommitted } : {}),
+    ...(standing.length > 0 ? { carried: standing } : {}),
+  };
 }
 
 /** Close IS the ruling: apply (merge=true) or dismiss (merge=false). The

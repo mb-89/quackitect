@@ -51,16 +51,20 @@ NOTHING RE-ASKED. The nine did not reappear as unfilled boxes, and no later stat
 
 ---
 
-At the close, the engine refuses while any owed item stands, and names each one with its entry. The engineer clears them or argues them, and the record cannot ship with one silently open.
+At the close, the engine HANDS every owed item to the next record, names each one with its entry, and writes the count on the closed record. The record ships, and the finding travels rather than being lost.
 |||
-BUILT AND UNIT-TESTED, NOT YET RUN ON A REAL CLOSE. `owedStanding` in engine/worktree.ts reads every evidence file for owed lines and `stampRecordClosed` refuses while any names an entry whose status is not disposed. Covered by tests/bucket.test.ts.
+THIS SLIDE SAID "REFUSES" UNTIL 2026-08-16, and the owner changed it after the refusing shape trapped the walk three times in one day. A close that will not pass leaves the walk standing in the last state with no legal move, and disposing a finding usually needs the person's ruling — asked at the worst possible moment, when the only thing left to do is ship.
 
-IT WILL FIRE ON THIS RECORD. i11 carries nine owed items against two OPEN entries, so its own close is the first real run of this step.
+CARRYING IS STILL A DISPOSITION. "Carried to the next record, on the record" is an agreed outcome, which is what NASA NPR 7123.1 means by a review completing on dispositions rather than on every finding being fixed.
+
+THE COUNT IS WHAT KEEPS IT HONEST. `carried_count` rides the closed record, so a number that grows every record is a signal rather than a list nobody reads.
 
 ---
 
-The finding was neither fixed out of turn nor lost. It rode the iteration in the open, and the close is what made sure somebody looked at it again.
+The finding was neither fixed out of turn nor lost. It rode the iteration in the open, and the handover is what made sure somebody looks at it again.
 |||
+THE FIRST REAL RUN FAILED, and it is worth keeping on the record. i11's own close was supposed to catch nine owed items and did not: the guard had been built on the EXPEDITION close, reading a hardcoded expeditions path, while an iteration closes through a different function that never looked. The record shipped past all nine.
+
 THE HONEST LIMIT, recorded rather than argued away: nine owed items on one form is the number raid-iss-whole-product-claims-reverified-by-every-record warns turns a debt into the normal case.
 
-WHAT KEEPS IT FROM BEING A FORMALITY HERE is that the three specs the delta actually endangered were observed rather than bucketed, and the guard refused a bad reference. The mechanism carried real findings and rejected a sloppy one on its first use.
+WHAT KEEPS IT FROM BEING A FORMALITY is that the three specs the delta actually endangered were observed rather than bucketed, and the guard refused a bad reference — catching its own author rather than a hypothetical.

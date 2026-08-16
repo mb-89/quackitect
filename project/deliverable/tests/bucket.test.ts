@@ -1,5 +1,8 @@
 // i11's bucket: a finding that blocks nothing is carried as an owed item
-// naming an open register entry, and the close refuses while one stands.
+// naming an open register entry, and the close HANDS IT to the next record.
+//
+// IT REFUSED UNTIL 2026-08-16 and the owner changed it, because a close that
+// will not pass leaves the walk standing in the last state with no legal move.
 //
 // THESE WERE FIRST WRITTEN AGAINST A BOOTED SERVER AND FAILED ON THE FIXTURE.
 // Every case hit SE-C-110 — "nothing asked for a form", "no bound expedition" —
@@ -12,7 +15,7 @@
 // and it is where reachability gets judged. What belongs here is whether the
 // mechanism is correct, and these call it.
 import { strict as assert } from "node:assert";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { checklistOwed } from "../engine/stateform.ts";
@@ -71,13 +74,39 @@ test("an owed item naming nothing is not counted as a carried finding", () => {
   assert.deepEqual(owed, [], "an owed item pointing at nothing was counted as a genuine carried finding");
 });
 
+// THE CASE THAT WOULD HAVE CAUGHT i11's OWN DEFECT, and did not exist.
+//
+// The close guard was built on `stampRecordClosed`, reached only from the
+// EXPEDITION close, reading a hardcoded `project/spec/expeditions/` path. An
+// iteration closes through `itCloseShipped`, which never looked at all.
+//
+// SO i11 SHIPPED PAST NINE OWED ITEMS with the mechanism it had just built
+// watching the wrong door, and its own evidence said three times that the
+// close would refuse. Every case below passed while that was true, because
+// each drove the READER directly and none drove the caller.
+//
+// THIS ONE READS THE SOURCE, the same way discipline.test.ts guards the
+// autonomy dial. A behavioural case would need a git tree; the defect is one
+// hardcoded path, and a reader with a pattern catches it.
+test("the iteration close reads the ITERATION's owed items, not the expeditions folder", () => {
+  const src = readFileSync(new URL("../engine/worktree.ts", import.meta.url), "utf8");
+  const at = src.indexOf("export function itCloseShipped");
+  assert.ok(at > 0, "the iteration close is gone");
+  const body = src.slice(at, src.indexOf("\n}\n", at));
+  assert.match(
+    body,
+    /owedStanding\(root, `project\/spec\/iterations\//,
+    "the iteration close does not read its own record's owed items — this is exactly how i11 shipped past nine",
+  );
+});
+
 // req-close-refuses-loose-ends
 //
 // THE ROW WAS MINTED IN i1 AND HAD NO IMPLEMENTATION until i11. It is a `must`
 // graded fatal. A probe went looking for the mechanism to compare against the
 // form-side guard and found nothing there; the owner ruled the same day that
 // the close site gets built here.
-test("an owed item whose entry is still open holds the close", () => {
+test("an owed item whose entry is still open is carried by the close", () => {
   const root = freshRoot();
   entry(root, "raid-risk-a-throwaway-that-is-open", "open");
   evidence(
@@ -99,7 +128,7 @@ test("an owed item whose entry is still open holds the close", () => {
 // are exactly where a carried finding drifts, and both are real rulings.
 // Treating either as unresolved would make the close refuse work somebody had
 // already decided — which is what teaches people to stop using the bucket.
-test("an owed item whose entry was accepted no longer holds the close", () => {
+test("an owed item whose entry was accepted is not carried — it was ruled on", () => {
   const root = freshRoot();
   entry(root, "raid-risk-a-throwaway-somebody-accepted", "accepted");
   evidence(
