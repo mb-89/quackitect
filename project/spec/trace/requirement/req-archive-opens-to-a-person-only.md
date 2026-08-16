@@ -13,5 +13,4 @@ source_refs:
   - uc-browse-the-archive ext 1a
 priority: should
 weighs_against:
-  - req-archive-releases-worktrees >
 ---

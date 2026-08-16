@@ -12,7 +12,6 @@ implements:
   - fn-run-a-governed-walk.close-a-record
   - fn-run-a-governed-walk.keep-the-archive
 satisfies:
-  - req-the-iteration-list-comes-from-git
 source_refs:
   - cand-thin-worktree
   - raid-dec-thin-tree

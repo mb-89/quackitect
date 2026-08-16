@@ -11,8 +11,8 @@ files: "none — a demonstration is observed on a host, not run from a file in t
 
 ## Scope
 
-THE SEVEN STEPS OF [[el-entrypoint]], observed as one run rather than as
-seven checks.
+THE SIX STEPS OF [[el-entrypoint]], observed as one run rather than as six
+checks.
 
 WHY A DEMONSTRATION AND NOT A TEST. The claim is that a machine NOBODY
 PREPARED reaches a walking agent. A test on a prepared machine cannot make
@@ -35,9 +35,13 @@ WHAT IS WATCHED FOR, at each step.
 | install | the project installs and nothing else does | python3, make or g++ appearing |
 | start | the lane answers AND the command returns | the command not returning |
 | wait | the health check is waited for | a race, or a fixed sleep |
-| fetch | the iteration's refs arrive | a refspec error not naming the refspec |
-| adopt | the named iteration is claimed, or the holder is named | a silent failure to claim |
+| fetch | trunk arrives, and the named record's folder is on it | a refspec error not naming the refspec |
 | launch | a caged walker is running | an agent with no cage on its command line |
+
+THERE WAS A SEVENTH STEP AND i34 DELETED IT. `adopt` claimed the iteration for
+the machine, and its watch line read "the named iteration is claimed, or the
+holder is named". The claim system is retired whole, so there is nothing to
+claim and no holder to name.
 
 ## The pass line
 
@@ -45,7 +49,7 @@ TWO THINGS, BOTH OBSERVED.
 
 - A walking agent exists on that machine, on that iteration, with nobody
   having typed anything after the one command.
-- OR the run exited non-zero and its last line names exactly one of the seven
+- OR the run exited non-zero and its last line names exactly one of the six
   steps.
 
 ANYTHING ELSE IS A FAIL, and the most important anything-else is a run that

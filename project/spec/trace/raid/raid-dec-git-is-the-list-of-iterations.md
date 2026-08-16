@@ -10,7 +10,6 @@ status: decided
 breaks_how_badly: fatal
 how_likely: conceivable
 source_refs:
-  - req-the-iteration-list-comes-from-git
   - req-work-starts-without-a-reachable-remote
   - opt-collect-the-list-before-the-look
   - raid-asm-git-answers-open-without-a-worktree

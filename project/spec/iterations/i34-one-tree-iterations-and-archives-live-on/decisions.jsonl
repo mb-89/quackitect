@@ -413,3 +413,17 @@
 {"ts":"2026-08-16T08:36:54.113Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d447","brief":"the last dangling imports"}
 {"ts":"2026-08-16T08:37:19.446Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d448","brief":"the confirming battery before the branches go"}
 {"ts":"2026-08-16T08:38:37.018Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d449","brief":"the entrypoint has six steps, and the adopt case is deleted"}
+{"ts":"2026-08-16T08:49:55.540Z","op":"done","visit":"front_desk@0","node":"d2","brief":"1299 of 1299 green from trunk, no worktrees and no record branches"}
+{"ts":"2026-08-16T08:56:28.619Z","op":"plan","visit":"iterations/i34/draft-vision@0","parent":null,"nodes":[{"id":"d3","brief":"sweep to the first owed state"},{"id":"d4","brief":"submit the build chunks whose code is done"},{"id":"d5","brief":"verification"}]}
+{"ts":"2026-08-16T08:57:20.111Z","op":"done","visit":"iterations/i34/draft-vision@0","node":"d3","brief":"generalize-use-cases re-signed with i28's use case on the list"}
+{"ts":"2026-08-16T08:57:49.008Z","op":"update","visit":"iterations/i34/write-requirements@0","node":"d6","brief":"i28's use case describes the old model; two of its requirements contradict i34"}
+{"ts":"2026-08-16T08:58:06.994Z","op":"update","visit":"iterations/i34/write-requirements@0","node":"d7","brief":"the unattended use case describes six steps and no claim"}
+{"ts":"2026-08-16T08:59:07.814Z","op":"update","visit":"iterations/i34/write-requirements@0","node":"d8","brief":"stripping the seven superseded ids from every list that names them"}
+{"ts":"2026-08-16T08:59:24.513Z","op":"update","visit":"iterations/i34/write-requirements@0","node":"d9","brief":"deleting the seven superseded requirements, one by one"}
+{"ts":"2026-08-16T08:59:46.313Z","op":"done","visit":"iterations/i34/draft-vision@0","node":"d4","brief":"seven superseded requirements deleted with every referrer repaired"}
+{"ts":"2026-08-16T09:01:06.845Z","op":"update","visit":"iterations/i34/write-requirements@0","node":"d10","brief":"write-requirements signed; sweeping to the build states"}
+{"ts":"2026-08-16T09:01:41.228Z","op":"update","visit":"iterations/i34/derive-functions@0","node":"d11","brief":"i28's offline requirement joins the function that stands a product up"}
+{"ts":"2026-08-16T09:03:04.201Z","op":"update","visit":"iterations/i34/author-tests@0","node":"d12","brief":"the offline requirement is rewritten to one tree and given its spec"}
+{"ts":"2026-08-16T09:03:49.944Z","op":"update","visit":"iterations/i34/observe-red@0","node":"d13","brief":"the demonstration spec describes six steps and no adopt"}
+{"ts":"2026-08-16T09:04:51.324Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d14","brief":"delete-the-seam filled"}
+{"ts":"2026-08-16T09:07:28.173Z","op":"defer","visit":"iterations/i34/draft-vision@0","node":"d5","brief":"verification","to":"verification","hops":1,"trail":["iterations/i34/draft-vision","verification"]}

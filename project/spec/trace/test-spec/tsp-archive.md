@@ -8,7 +8,6 @@ verifies:
   - "req-archive-lists-every-closed-record"
   - "req-archive-opens-to-a-person-only"
   - "req-archive-read-only"
-  - "req-archive-releases-worktrees"
   - "req-archive-shows-it-as-it-closed"
   - "req-a-closed-records-folder-stays-on-trunk"
 files:

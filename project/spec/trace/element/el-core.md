@@ -10,7 +10,6 @@ implements:
   - fn-run-a-governed-walk
 satisfies:
   - req-version-control-resolves-like-every-call
-  - req-a-method-change-reaches-every-tree
   - req-a-surface-resolves-to-what-it-shows
 source_refs:
   - cand-core-satellite

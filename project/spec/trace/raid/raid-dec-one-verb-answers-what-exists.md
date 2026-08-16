@@ -10,7 +10,6 @@ status: decided
 breaks_how_badly: crippling
 how_likely: conceivable
 source_refs:
-  - req-the-iteration-list-comes-from-git
   - req-call-answers-in-one-second
   - raid-dec-git-is-the-list-of-iterations
   - el-record-store

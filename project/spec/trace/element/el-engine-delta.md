@@ -10,9 +10,7 @@ implements:
   - fn-run-a-governed-walk.hold-the-method
 satisfies:
   - req-an-engine-change-applies-in-its-own-record
-  - req-a-method-change-reaches-every-tree
   - req-overlay-resolution
-  - req-shared-change-reaches-without-unlanded-work-reaching
 source_refs:
   - cand-core-satellite
   - cand-live-engine

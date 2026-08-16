@@ -12,7 +12,6 @@ satisfies:
   - req-an-engine-change-applies-in-its-own-record
   - req-a-read-comes-from-where-it-is-meant
   - req-a-write-lands-where-it-is-meant
-  - req-parallel-iterations-own-worktrees
   - req-entry-levels-the-record-tree
 source_refs:
   - cand-core-satellite

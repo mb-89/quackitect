@@ -15,7 +15,6 @@ probed: "2026-08-15"
 source_refs:
   - raid-dec-one-verb-answers-what-exists
   - req-call-answers-in-one-second
-  - req-the-iteration-list-comes-from-git
   - raid-dec-git-is-the-list-of-iterations
   - raid-asm-git-answers-open-without-a-worktree
 ---

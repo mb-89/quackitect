@@ -10,7 +10,6 @@ status: decided
 breaks_how_badly: crippling
 how_likely: conceivable
 source_refs:
-  - req-a-worktree-exists-only-while-a-walk-is-bound
   - raid-dec-a-claim-ends-only-when-a-person-releases-it
   - cand-the-lifecycle-is-the-claim
   - opt-the-folder-cannot-exist-without-a-live-claim

@@ -1,8 +1,8 @@
 ---
 form: generalize-use-cases
-amended: "2026-08-16T07:13:49.366Z by agent — the follow_up held uc-claim-an-iteration open pending a gate ruling; the gate ruled, the owner widened it, and the node is deleted — the form must not read as…"
 by: agent
-signed_off: 2026-08-16T05:54:30.271Z
+signed_off: 2026-08-16T08:57:13.801Z
+amended: "2026-08-16T07:13:49.366Z by agent — the follow_up held uc-claim-an-iteration open pending a gate ruling; the gate ruled, the owner widened it, and the node is deleted — the form must not read as…"
 authors: agent
 files:
 ---
@@ -51,6 +51,7 @@ THE DELTA ADDS NO USE CASE. i34 removes a mechanism and creates no new goal for 
 - uc-resume-after-an-absence
 - uc-set-the-autonomy
 - uc-shape-the-view
+- uc-start-an-unattended-machine
 - uc-take-a-step
 - uc-trace-a-decision-to-its-origin
 - uc-vendor-and-overlay
@@ -59,9 +60,15 @@ THE DELTA ADDS NO USE CASE. i34 removes a mechanism and creates no new goal for 
 
 ## follow_up
 
-THE USE CASE THIS FORM HELD BACK IS GONE. uc-claim-an-iteration was retired by gate-requirements, then the owner widened the ruling to the whole claim system, and the node was deleted on 2026-08-16 with twenty others. Its story sty-work-on-two-machines went with it.
+THE SET IS 36, ONE MORE THAN THIS FORM FIRST CARRIED, and the extra one arrived from outside this iteration.
 
-SO THE SUPERSESSION LIST IS CLOSED, not open. Both halves have been ruled and executed: the five contradicting requirements are deleted, and the one use case with its story is deleted.
+uc-start-an-unattended-machine CAME WITH i28. Its specification existed only on i28's branch while its code stood on trunk, so merging i28 back brought the node into the corpus. It refines sty-work-on-two-machines and nothing else.
+
+THE COVERAGE CHECK IS WHAT CAUGHT IT, and it caught it twice over. First it refused this state because a use case refined a story that had been deleted. Then, once the story was restored, it refused again because no use case in THIS list covered that story. Both refusals were right and neither needed a reviewer.
+
+uc-claim-an-iteration IS GONE, and that part of the earlier answer stands. The owner retired the machine-locking specification whole, and the use case went with it.
+
+THE STORY DID NOT GO WITH IT, and that was the correction. sty-work-on-two-machines was deleted alongside the claim system and then restored, because the engineer's want — two machines working at once — never rested on a lock. The owner's own words: "it's just two agents on two different clones." Only its mechanism changed.
 
 FOUR USE CASES ARE TOUCHED WITHOUT BEING BROKEN.
 
@@ -70,7 +77,7 @@ FOUR USE CASES ARE TOUCHED WITHOUT BEING BROKEN.
 - uc-browse-the-archive gets a folder that stays on disk.
 - uc-close-a-record gets a close that no longer retires anything.
 
-NEXT: the build states. The requirements, functions, assumptions and tests are all standing.
+NEXT: the build states, whose code is already written and green.
 
 ## anything_else
 

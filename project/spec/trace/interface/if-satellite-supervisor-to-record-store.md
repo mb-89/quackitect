@@ -11,7 +11,6 @@ carries:
 form: call
 source_refs:
   - decompose-structure, the element matrix's owed cell
-  - req-archive-releases-worktrees
 ---
 
 The order is the interface: reap, then release. A live process holding a

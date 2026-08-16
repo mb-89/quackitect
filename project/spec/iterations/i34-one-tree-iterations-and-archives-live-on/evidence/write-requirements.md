@@ -1,8 +1,8 @@
 ---
 form: write-requirements
-amended: "2026-08-16T06:53:05.596Z by agent — The chain below this form was repaired: generalize-use-cases still named the deleted use case, which is where the fallen tree actually rooted. This form's register…"
 by: agent
-signed_off: 2026-08-16T05:50:34.821Z
+signed_off: 2026-08-16T09:00:35.014Z
+amended: "2026-08-16T06:53:05.596Z by agent — The chain below this form was repaired: generalize-use-cases still named the deleted use case, which is where the fallen tree actually rooted. This form's register…"
 authors: agent
 files:
 ---
@@ -21,7 +21,6 @@ THEY ARE FOUR AND NOT FIFTEEN ON PURPOSE. Each one is a pass line from the motiv
 
 - req-a-clear-jump-is-one-call
 - req-a-closed-records-folder-stays-on-trunk
-- req-a-method-change-reaches-every-tree
 - req-a-placeholder-drawing-refuses-entry
 - req-a-pull-carrying-no-choice-enters-no-iteration
 - req-a-read-comes-from-where-it-is-meant
@@ -41,7 +40,6 @@ THEY ARE FOUR AND NOT FIFTEEN ON PURPOSE. Each one is a pass line from the motiv
 - req-archive-lists-every-closed-record
 - req-archive-opens-to-a-person-only
 - req-archive-read-only
-- req-archive-releases-worktrees
 - req-archive-shows-it-as-it-closed
 - req-audit-answers-from-log
 - req-autonomy-change-applies-forward
@@ -87,6 +85,7 @@ THEY ARE FOUR AND NOT FIFTEEN ON PURPOSE. Each one is a pass line from the motiv
 - req-emergency-sits-above-full
 - req-engine-folder-is-sealed
 - req-engine-port-fallback
+- req-entering-repairs-itself-or-names-the-remedy
 - req-entry-levels-the-record-tree
 - req-entry-speaks-plainly
 - req-every-artifact-is-readable-text
@@ -136,6 +135,7 @@ THEY ARE FOUR AND NOT FIFTEEN ON PURPOSE. Each one is a pass line from the motiv
 - req-no-agent-act-destroys-work
 - req-no-claim-without-evidence
 - req-nodes-scoped-to-iteration
+- req-one-command-starts-an-unattended-machine
 - req-one-note-per-settled-point
 - req-one-script-installs
 - req-one-verb-says-why-a-state-is-grey
@@ -150,7 +150,6 @@ THEY ARE FOUR AND NOT FIFTEEN ON PURPOSE. Each one is a pass line from the motiv
 - req-overlay-survives-update
 - req-owed-reading-is-served
 - req-panel-shows-the-machine
-- req-parallel-iterations-own-worktrees
 - req-parked-note-re-drains
 - req-pin-writes-seeded-scaffolds
 - req-problem-recorded-before-options
@@ -185,7 +184,6 @@ THEY ARE FOUR AND NOT FIFTEEN ON PURPOSE. Each one is a pass line from the motiv
 - req-setup-floor-editor-shell
 - req-setup-serves-shipped-method
 - req-setup-stops-before-partial
-- req-shared-change-reaches-without-unlanded-work-reaching
 - req-shutdown-fires-only-idle-or-end
 - req-single-option-recorded-as-finding
 - req-size-choice-is-the-bless
@@ -206,6 +204,7 @@ THEY ARE FOUR AND NOT FIFTEEN ON PURPOSE. Each one is a pass line from the motiv
 - req-test-run-carries-its-question
 - req-test-scope-discipline
 - req-the-answer-never-exceeds-its-bound
+- req-the-lane-runs-without-a-console
 - req-the-size-is-read-by-one-extractor
 - req-tour-admits-absence
 - req-tour-ends-at-the-desk
@@ -216,7 +215,6 @@ THEY ARE FOUR AND NOT FIFTEEN ON PURPOSE. Each one is a pass line from the motiv
 - req-tour-speaks-plainly
 - req-trace-source-never-mixes
 - req-trace-view-derived-from-files
-- req-trees-never-mix
 - req-two-options-beyond-the-obvious
 - req-unknown-drain-ref-refused
 - req-unshipped-dependency-refused
@@ -228,6 +226,7 @@ THEY ARE FOUR AND NOT FIFTEEN ON PURPOSE. Each one is a pass line from the motiv
 - req-walk-opens-at-retro
 - req-walk-resumes-from-repo
 - req-walk-survives-host-swap
+- req-work-starts-without-a-reachable-remote
 
 ## set_criteria
 
@@ -241,21 +240,26 @@ THEY ARE FOUR AND NOT FIFTEEN ON PURPOSE. Each one is a pass line from the motiv
 
 ## follow_up
 
-THE FINDING THIS STATE PRODUCED, and it is bigger than the four new rows.
+THE SUPERSESSION THIS FORM NAMED IS DONE. It said five standing requirements contradict i34 and must be superseded rather than left to rot beside it. Seven were retired in the end, and the two extra ones arrived from outside.
 
-FIVE STANDING REQUIREMENTS CONTRADICT i34 AND MUST BE SUPERSEDED, not left to rot beside it. A new mechanism must kill the old path (note-9790deb26c96), and that rule applies to demands exactly as it applies to code.
+THE FIVE THIS ITERATION FOUND.
 
-- req-parallel-iterations-own-worktrees — head-on. i34 removes worktrees entirely.
-- req-archive-releases-worktrees — there will be no worktree to release at a close.
-- req-trees-never-mix — there is one tree, so nothing can mix. The demand becomes vacuous rather than false, which is worse: it would pass forever while checking nothing.
-- req-a-method-change-reaches-every-tree — the fan-out exists only because several trees hold copies. With one tree it is satisfied by construction.
+- req-parallel-iterations-own-worktrees — head-on. There are no worktrees.
+- req-archive-releases-worktrees — there is no worktree to release at a close.
+- req-trees-never-mix — one tree, so nothing can mix. It would have passed forever while checking nothing, which is worse than failing.
+- req-a-method-change-reaches-every-tree — satisfied by construction, so it measures nothing.
 - req-shared-change-reaches-without-unlanded-work-reaching — same reason.
 
-THREE MORE NEED A LOOK RATHER THAN A VERDICT, because they touch the claim ledger that goes with the branches: req-claim-is-one-pushed-file, req-claim-race-first-push-wins, req-claim-wears-its-age. Also req-offline-claim-reconciles, req-absent-ledger-is-not-offline and req-force-release-recorded.
+TWO MORE CAME IN WITH i28, whose specification was merged back into the corpus during this iteration's rescue step.
 
-I AM NOT SUPERSEDING THEM HERE. Retiring a standing demand is a ruling, and the state in hand writes requirements rather than kills them. It is named so the requirements gate cannot pass without facing it.
+- req-a-worktree-exists-only-while-a-walk-is-bound — its whole behaviour model is the worktree lifecycle i34 deletes.
+- req-the-iteration-list-comes-from-git — half right and superseded by a better row. It wanted open state read from the record's status rather than from a directory, which is exactly req-a-records-own-status-decides-whether-it-is-open. What it got wrong is where the record lives: on git refs rather than on trunk.
 
-NEXT: identify-assumptions and probe-assumptions at M3, then gate-requirements — which is where the supersession list gets adjudicated.
+THIRTY-SIX REFERRING LINES WERE REPAIRED, across twenty-six files: five elements, three functions, one interface, one flow, six raid entries, five test-specs and five other requirements. Each landing was read back rather than counted.
+
+THE USE CASE WAS REWRITTEN TOO. uc-start-an-unattended-machine described six steps ending in a claim; it now describes five ending in a walk, and says plainly what i34 took out of it.
+
+NEXT: the build states, whose code is written and green at 1299 of 1299.
 
 ## anything_else
 

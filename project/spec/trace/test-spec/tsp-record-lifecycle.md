@@ -21,8 +21,7 @@ verifies:
   - "req-a-records-dependency-is-declared"
   - "req-a-records-own-status-decides-whether-it-is-open"
   - "req-entering-repairs-itself-or-names-the-remedy"
-  - "req-the-iteration-list-comes-from-git"
-  - "req-a-worktree-exists-only-while-a-walk-is-bound"
+  - "req-work-starts-without-a-reachable-remote"
 files:
   - "tests/iterations.test.ts"
   - "tests/container.test.ts"

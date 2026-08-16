@@ -5,14 +5,12 @@ type: "[[function]]"
 cluster: the-record-life
 statement: hold work in progress so the walk can be left and picked up again
 satisfies:
-  - req-parallel-iterations-own-worktrees
   - req-unshipped-dependency-refused
   - req-landing-needs-no-close
   - req-boot-ends-at-front-desk
   - req-walk-resumes-from-repo
   - req-walk-survives-host-swap
   - req-resume-needs-no-person
-  - req-a-worktree-exists-only-while-a-walk-is-bound
 inputs:
   - flow-open-record
   - flow-repository

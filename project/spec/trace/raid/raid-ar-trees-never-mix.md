@@ -11,7 +11,6 @@ breaks_how_badly: fatal
 how_likely: conceivable
 source_refs:
   - evaluate-architecture, the scenario walk's verdict
-  - req-trees-never-mix
   - el-engine-delta
 ---
 

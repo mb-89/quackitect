@@ -14,8 +14,6 @@ refines:
 source_refs:
   - "owner ruling 2026-08-14: an engine change that one agent makes while working on his own work set shouldn't have an influence on other agents working on something else, and he shouldn't have to step out his own work set to change the way he works on his own work set"
   - "owner ruling 2026-08-14: the engine is hot swappable, and an engine swap doesn't poison the work of another agent in another record"
-  - req-a-method-change-reaches-every-tree
-  - req-shared-change-reaches-without-unlanded-work-reaching
 priority: must
 ---
 

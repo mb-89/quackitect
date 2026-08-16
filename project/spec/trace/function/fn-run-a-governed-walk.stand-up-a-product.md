@@ -20,6 +20,7 @@ satisfies:
   - req-fresh-product-starts-empty
   - req-one-command-starts-an-unattended-machine
   - req-the-lane-runs-without-a-console
+  - req-work-starts-without-a-reachable-remote
 inputs:
   - flow-bare-computer
   - flow-product-template

@@ -12,7 +12,6 @@ verifies:
   - "req-land-demands-fresh-green"
   - "req-reject-names-the-redo"
   - "req-diverged-trees-reported-never-merged"
-  - "req-trees-never-mix"
 files:
   - "tests/editsafety.test.ts"
   - "tests/gitlane.test.ts"

@@ -11,7 +11,6 @@ implements:
 satisfies:
   - req-entry-levels-the-record-tree
   - req-an-engine-change-applies-in-its-own-record
-  - req-archive-releases-worktrees
   - req-crash-lands-safe
 source_refs:
   - cand-core-satellite

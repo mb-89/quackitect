@@ -9,7 +9,6 @@ demonstrates:
 verifies:
   - "req-panel-shows-the-machine"
   - "req-selected-node-shows-its-claim"
-  - "req-parallel-iterations-own-worktrees"
   - "req-resume-needs-no-person"
   - "req-walk-survives-host-swap"
 files:
