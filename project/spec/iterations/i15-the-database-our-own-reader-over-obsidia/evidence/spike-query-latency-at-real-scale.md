@@ -1,5 +1,7 @@
 ---
 form: spike-query-latency-at-real-scale
+by: agent
+signed_off: 2026-08-16T18:36:54.556Z
 authors: agent
 files:
 ---
@@ -12,7 +14,7 @@ rank-unknowns seeded one spike: settle whether el-query-evaluator's declarative 
 
 ## built
 
-[[exp-i15-query-latency-at-real-corpus-scale]]
+- exp-i15-query-latency-at-real-corpus-scale
 
 ## follow_up
 
