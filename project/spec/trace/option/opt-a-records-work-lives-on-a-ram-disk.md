@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: put a record's whole working copy on a RAM disk when the record opens, work there for the length of the walk, and push it back to durable storage at the gates
 cluster: cluster-the-walk
 question: where a record's working files live while it is open
-found_by: prior_art
+found_by: prior-art
 source: "owner ruling 2026-08-14: research RAM discs on Windows — when you start an iteration you put it in RAM, you work only in RAM, at the end you push it out of RAM, you commit at the gates so not too much gets lost"
 ---
 

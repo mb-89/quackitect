@@ -10,6 +10,7 @@ verifies:
   - "req-close-refuses-loose-ends"
 files:
   - "tests/bucket.test.ts"
+  - "tests/owed-ref.test.ts"
 ---
 
 ## Scope
@@ -18,9 +19,14 @@ The bucket, both ends. The permission that lets a state sign with a defect
 recorded, the guard that makes the disposition agreed rather than asserted, and
 the close that will not pass while one stands.
 
-WHAT IS DELIBERATELY OUT: which of the register's eight status values count as
-open. That is owed by raid-asm-an-entry-status-says-whether-it-is-open and
-cannot be settled until the close-side reader exists.
+WHICH OF THE EIGHT STATUS VALUES COUNT AS OPEN IS NOW IN, and it was
+deliberately out until i6. `tests/owed-ref.test.ts` drives all eight: closed,
+decided and superseded are settled and carry nothing; open, probed, mitigated,
+accepted and deferred are live and carry a claim.
+
+WHAT IS STILL OUT is the half that made it unsettleable — whether the CLOSE
+reads the same list. There is no close-side reader to compare against, and
+raid-asm-an-entry-status-says-whether-it-is-open stays open on exactly that.
 
 ## Approach
 

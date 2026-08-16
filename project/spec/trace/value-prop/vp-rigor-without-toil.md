@@ -20,6 +20,10 @@ priority: must
   Metric: the share of surface requests answered inside a second. Target: all of them.
   Metric: an answer a host has to move to disk before the agent can read it. Target: none.
   Added by i12. The existing one-second guard covers lane CALLS only, so a render could pass a second with nothing failing.
+- A BROKEN RULE COSTS ONE REFUSAL, NOT A HUNT. The break is named where it is made, while the author is still there and the fix is one move.
+  Metric: lane calls spent recovering from a break a write-time check could have refused. Target: zero.
+  Metric: corpus-shape rules enforced by a check rather than by prose, as a share of all of them. Target: rising, retro over retro.
+  Added by i6. MEASURED LIVE 2026-08-16, at this iteration's own log-risks: one unquoted colon in a frontmatter value was accepted at the write, threw the next pull, and cost four calls to find and fix. The same corpus's submit-time check refused five failures at once, named every field, and cost one call to satisfy.
 
 ## Unlike
 

@@ -9,7 +9,7 @@ import { appendFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFile
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { classifyCommand, laneVerdict, testFingerprint, testGate, testRecord } from "../engine/discipline.ts";
+import { classifyCommand, laneVerdict, testFingerprint, testRecord } from "../engine/discipline.ts";
 import { Rejection } from "../engine/errors.ts";
 import { filePatch, fileRead } from "../engine/files.ts";
 import { contentHash } from "../engine/hash.ts";
@@ -397,29 +397,33 @@ function gitRoot(): string {
   return root;
 }
 
-// A RE-RUN OVER AN UNCHANGED TREE PROVES NOTHING NEW. se_test held 5,706
-// seconds of one build's wall clock; a share of those runs asked a question
-// the previous run had already answered.
-test("an unchanged tree refuses a re-run; any tracked change opens the gate again", () => {
+// THE UNCHANGED GATE IS DELETED, WITH SE-C-130 AND SE-C-131 (owner ruling
+// 2026-08-16). `testGate` refused a re-run over an identical tree and
+// `scopedGate` refused the wrong scope; the engine decides the scope now, and
+// an unchanged tree is an ANSWER rather than a refusal — `decideScope` returns
+// scope "nothing" and says which verdict still stands.
+//
+// THE CASES WENT WITH THE CODE. They were the only callers left: nothing in
+// the lane reached testGate, so its refusal could never be seen by anybody, and
+// a clause nobody can reach is one this iteration exists to remove.
+//
+// WHAT REPLACED THEM sits below, driving decideScope directly.
+test("an unchanged tree is answered rather than refused", () => {
   const root = gitRoot();
   const se = join(root, ".se");
   testRecord(se, root, true);
-  assert.throws(
-    () => testGate(se, root, false),
-    (e: unknown) => e instanceof Rejection && e.clause === "SE-C-130" && e.got.includes("GREEN"),
-    "the standing verdict is quoted back, colour and all",
-  );
-  assert.doesNotThrow(() => testGate(se, root, true), "force is the flake-hunt door");
-  writeFileSync(join(root, "a.ts"), "two\n");
-  assert.doesNotThrow(() => testGate(se, root, false), "a dirty file moves the fingerprint");
+  const d = decideScope(se, root, false);
+  assert.equal(d.scope, "nothing", `nothing moved, so nothing runs: ${JSON.stringify(d)}`);
+  assert.match(d.why, /still stands/, "and the standing verdict is quoted back");
   rmSync(root, { recursive: true, force: true });
 });
 
-test("outside a git repo the gate stands aside — it never blocks what it cannot fingerprint", () => {
+test("outside a git repo the engine cannot scope, so it runs everything", () => {
   const root = fresh();
   const se = join(root, ".se");
   testRecord(se, root, true);
-  assert.doesNotThrow(() => testGate(se, root, false));
+  const d = decideScope(se, root, false);
+  assert.equal(d.scope, "battery", `git cannot say what changed: ${JSON.stringify(d)}`);
   assert.equal(testFingerprint(root), "");
   rmSync(root, { recursive: true, force: true });
 });
@@ -452,13 +456,14 @@ test("corrections from mixed batches all arrive on one result", () => {
   rmSync(root, { recursive: true, force: true });
 });
 
-// ── the scope economy ──────────────────────────────────────────────────────
-// Imported here, after the first cut shipped: one session ran the full
-// battery ~60 times in two hours, mostly to answer single-test questions,
-// then grepped a temp file for the one failure it cared about. The battery
-// is the exception now; the scoped run is the default; and gaming the rule
-// is unprofitable by construction.
-import { batteryGate, flipThreshold, mapChangedToTests, parseTap, scopedGate, suiteFiles } from "../engine/discipline.ts";
+// ── the scope decision ─────────────────────────────────────────────────────
+// THE ENGINE DECIDES WHAT GETS TESTED, AND THE AGENT NEVER DOES (owner ruling
+// 2026-08-16). These cases used to drive two REFUSALS — one pushing toward the
+// battery, one pushing away from it — and on 2026-08-16 the two closed on each
+// other and left no legal test call at all.
+//
+// THERE IS ONE DECIDER NOW. Every case below asks what it chose and why.
+import { decideScope, flipThreshold, mapChangedToTests, parseTap, suiteFiles } from "../engine/discipline.ts";
 
 function productRoot(): string {
   // A root that LOOKS like the product: engine modules and their tests.
@@ -477,20 +482,17 @@ function productRoot(): string {
   return root;
 }
 
-// THE REFUSAL HANDS OVER THE SCOPED CALL, COMPUTED FROM THE DIFF. The gate
-// does not just say no to the battery — it names the cheaper question.
-test("the battery refuses while every change maps to a test file, and names the scope", () => {
+// THE DECISION NAMES THE FILES, COMPUTED FROM THE DIFF. It does not ask the
+// caller which tests answer the change — it works that out.
+test("a change that maps to a test file is answered by that file, and the decision says so", () => {
   const root = productRoot();
   const se = join(root, ".se");
   testRecord(se, root, true); // a green battery stands
   writeFileSync(join(root, "project", "deliverable", "engine", "pull.ts"), "// changed\n");
-  try {
-    batteryGate(se, root, false);
-    assert.fail("expected the scope refusal");
-  } catch (e) {
-    assert.ok(e instanceof Rejection && e.clause === "SE-C-131");
-    assert.deepEqual((e as Rejection).remedy.args, { files: ["project/deliverable/tests/pull.test.ts"] }, "the remedy IS the scoped call");
-  }
+  const d = decideScope(se, root, false);
+  assert.equal(d.scope, "scoped");
+  assert.deepEqual(d.files, ["project/deliverable/tests/pull.test.ts"], "the engine picked the file, not the caller");
+  assert.match(d.why, /map/, "and it says why in one line");
   rmSync(root, { recursive: true, force: true });
 });
 
@@ -499,67 +501,69 @@ test("an unmapped change buys the battery — no scoped run answers for it", () 
   const se = join(root, ".se");
   testRecord(se, root, true);
   writeFileSync(join(root, "project", "deliverable", "engine", "render.ts"), "// no test file exists for render\n");
-  assert.doesNotThrow(() => batteryGate(se, root, false));
+  const d = decideScope(se, root, false);
+  assert.equal(d.scope, "battery");
+  assert.match(d.why, /no test that answers/, "the reason names the gap rather than a threshold");
   rmSync(root, { recursive: true, force: true });
 });
 
-test("with no battery memory the battery runs — a first run cannot be refused toward history", () => {
+test("with no battery memory the battery runs — a first run has no baseline to scope against", () => {
   const root = productRoot();
-  assert.doesNotThrow(() => batteryGate(join(root, ".se"), root, false));
+  const d = decideScope(join(root, ".se"), root, false);
+  assert.equal(d.scope, "battery");
   rmSync(root, { recursive: true, force: true });
 });
 
-test("a RED battery re-runs freely — a standing failure is never fenced off", () => {
+test("a RED battery re-runs whole — a standing failure is never scoped around", () => {
   const root = productRoot();
   const se = join(root, ".se");
   testRecord(se, root, false);
   writeFileSync(join(root, "project", "deliverable", "engine", "pull.ts"), "// changed\n");
-  assert.doesNotThrow(() => batteryGate(se, root, false));
+  const d = decideScope(se, root, false);
+  assert.equal(d.scope, "battery");
+  assert.match(d.why, /RED/);
   rmSync(root, { recursive: true, force: true });
 });
 
-// THE FLIP: past a third of the suite piecemeal, the battery is GRANTED and
-// scoped runs refuse toward it. Gaming the scope rule is never profitable —
-// approximating the battery one file at a time makes the battery legal.
-test("piecemeal past the threshold flips: scoped refuses toward the battery, the battery is granted", () => {
+// NOTHING IS AN ANSWER. An unchanged tree keeps its last verdict, and saying
+// so beats refusing: the caller learns the same thing and the walk does not
+// stop.
+test("an unchanged tree answers nothing, and says the verdict still stands", () => {
+  const root = productRoot();
+  const se = join(root, ".se");
+  testRecord(se, root, true);
+  const d = decideScope(se, root, false);
+  assert.equal(d.scope, "nothing");
+  assert.match(d.why, /still stands/);
+  rmSync(root, { recursive: true, force: true });
+});
+
+// THE FLIP IS NOW A REASON, NOT A REFUSAL. Past a third of the suite
+// piecemeal, running it one file at a time stops being cheaper than running
+// it — so the engine simply runs it.
+test("piecemeal past the flip becomes the battery, and the reason says the count", () => {
   const root = productRoot();
   const se = join(root, ".se");
   testRecord(se, root, true);
   const threshold = flipThreshold(root);
-  // Walk the odometer up to one below the flip, as distinct scoped records.
-  for (let i = 0; i < threshold - 1; i++) {
+  for (let i = 0; i < threshold; i++) {
     testRecord(se, root, true, `scope-${i}`, [`project/deliverable/tests/f${i}.test.ts`]);
   }
-  assert.doesNotThrow(
-    () => scopedGate(se, root, ["project/deliverable/tests/f0.test.ts"], false),
-    "already-seen files do not advance the odometer",
-  );
-  try {
-    scopedGate(se, root, ["project/deliverable/tests/fresh.test.ts"], false);
-    assert.fail("expected the flip");
-  } catch (e) {
-    assert.ok(e instanceof Rejection && e.clause === "SE-C-131" && e.remedy.tool === "se_test");
-  }
   writeFileSync(join(root, "project", "deliverable", "engine", "pull.ts"), "// changed\n");
-  // The same odometer that refuses piecemeal GRANTS the battery, even though
-  // the diff maps — the two gates pivot together or the agent is wedged.
-  testRecord(se, root, true, "scope-x", [`project/deliverable/tests/fresh.test.ts`]);
-  assert.doesNotThrow(() => batteryGate(se, root, false));
-  // And a battery run resets the odometer.
-  testRecord(se, root, true);
-  assert.doesNotThrow(() => scopedGate(se, root, ["project/deliverable/tests/f0.test.ts"], false));
+  const d = decideScope(se, root, false);
+  assert.equal(d.scope, "battery", "the odometer decides the battery rather than refusing the scoped run");
+  assert.match(d.why, new RegExp(String(threshold)), "and the reason carries the number");
   rmSync(root, { recursive: true, force: true });
 });
 
-test("the unchanged gate is PER SCOPE — pull's green does not fence files' run", () => {
+test("force is a flake hunt and runs everything, whatever the diff says", () => {
   const root = productRoot();
   const se = join(root, ".se");
-  testRecord(se, root, true, "pull-scope", ["project/deliverable/tests/pull.test.ts"]);
-  assert.throws(
-    () => testGate(se, root, false, "pull-scope"),
-    (e: unknown) => e instanceof Rejection && e.clause === "SE-C-130",
-  );
-  assert.doesNotThrow(() => testGate(se, root, false, "files-scope"), "a scope never run is never fenced");
+  testRecord(se, root, true);
+  writeFileSync(join(root, "project", "deliverable", "engine", "pull.ts"), "// changed\n");
+  const d = decideScope(se, root, true);
+  assert.equal(d.scope, "battery");
+  assert.match(d.why, /flake/);
   rmSync(root, { recursive: true, force: true });
 });
 

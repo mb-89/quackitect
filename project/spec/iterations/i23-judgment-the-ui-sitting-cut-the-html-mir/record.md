@@ -11,7 +11,7 @@ inputs:
   - "spec/man-verification-validation.md at ref main"
 depends_on:
   - i4-the-panel-round-the-archived-iteration-b
-  - i27-the-lane-binds-to-the-record-a-bound-wal
+  - i27
   - i11-the-engine-fix-bundle-about-twenty-named
 ---
 

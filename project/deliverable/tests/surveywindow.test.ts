@@ -131,6 +131,7 @@ test("a shipped iteration leaves the open list, whatever its worktree says", asy
   const seeded = await call(server, "se_seed_iteration", {
     goal: "a record seeded only to be marked shipped",
     vision: "it exists so the listing can be asked whether a shipped record still stands open",
+    depends_on: [],
   });
   const id = String((seeded.body as { seeded?: string }).seeded ?? "");
   assert.notEqual(id, "", `the seed answers with its id: ${JSON.stringify(seeded.body)}`);

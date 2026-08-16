@@ -24,6 +24,9 @@ satisfies:
   - req-method-reuse-is-vendoring
   - req-an-engine-change-applies-in-its-own-record
   - req-a-method-change-reaches-every-tree
+  - req-a-check-binds-without-engine-code
+  - req-an-unbound-rule-is-reported
+  - req-no-state-demands-what-it-cannot-supply
 inputs:
   - flow-method-sources
   - flow-overlay

@@ -6,8 +6,6 @@
 // human clicks the expedition to enter; ONE reaching end completes the
 // machine, the others stay parked. Nothing open: start runs to end.
 // The drawn continue_expedition.canvas is a stub saying exactly this.
-import { spawnSync } from "node:child_process";
-
 import { join } from "node:path";
 import { type CanvasData, type CanvasEdge, type CanvasElement, nodeSize } from "./canvas.ts";
 import { type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
@@ -168,69 +166,30 @@ export function generateContinueExpedition(root: string): GeneratedMachine {
  *  (alternative — one visit completes the machine). Nothing closed:
  *  start runs straight to end. Clicking one shows what the expedition
  *  did. */
-/** Session cache: a closed expedition's branch never moves, so its record
- *  is read once — only NEW closures are misses on a later open. */
-const recordCache = new Map<string, Map<string, Record<string, unknown> | undefined>>();
-
-/** Every missing record in ONE `git cat-file --batch` call — a spawn per
- *  record made the archive take seconds to open. */
+/** THE ARCHIVE READS FOLDERS, AND THAT IS THE WHOLE READ (i6).
+ *
+ *  A closed expedition's record used to live on its branch, so a record not
+ *  found on disk was fetched with `git cat-file --batch` over `<branch>:<rel>`
+ *  — batched because a spawn per record made the archive take seconds to open,
+ *  and cached because a closed branch never moves.
+ *
+ *  i34 PUT THE ARCHIVE ON DISK. The folder stays where it is when a record
+ *  closes, so a record that is not on disk is not anywhere. The fallback read
+ *  branches the seed no longer creates, and it went with them.
+ *
+ *  A MISSING RECORD NOW READS AS MISSING, which is the honest answer and the
+ *  one the callers already handle. */
 function closedRecords(root: string, closed: Expedition[]): Map<string, Record<string, unknown> | undefined> {
-  let cache = recordCache.get(root);
-  if (cache === undefined) {
-    cache = new Map();
-    recordCache.set(root, cache);
-  }
-  // The MERGED copy is the truth (retro flips land there) — read it fresh
-  // every time, it is one cheap file read; only the branch fallback caches.
   const out = new Map<string, Record<string, unknown> | undefined>();
-  const missing: Expedition[] = [];
   for (const e of closed) {
-    const merged = join(root, recordRel(e.id));
     // ONE ASK, THROUGH THE DOOR. This was existsSync then readFileSync — two
     // syscalls for one answer, 4,448 of the first to enter a record, and
     // neither of them shared with any other reader of the same file.
     //
     // EMPTY READS AS ABSENT, which is exact here: a record file always carries
     // frontmatter, so an empty one is a file that is not there.
-    const text = readNode(merged);
-    if (text !== "") {
-      out.set(e.id, frontmatterOf(text, `${e.id} record`));
-    } else if (cache.has(e.id)) {
-      out.set(e.id, cache.get(e.id));
-    } else {
-      missing.push(e);
-    }
-  }
-  if (missing.length === 0) return out;
-  const input = `${missing.map((e) => `${e.branch}:${recordRel(e.id)}`).join("\n")}\n`;
-  const r = spawnSync("git", ["cat-file", "--batch"], { cwd: root, input, maxBuffer: 64 * 1024 * 1024 });
-  if (r.status !== 0) {
-    for (const e of missing) {
-      cache.set(e.id, readRecord(root, e));
-      out.set(e.id, cache.get(e.id));
-    }
-    return out;
-  }
-  const buf: Buffer = r.stdout;
-  let off = 0;
-  for (const e of missing) {
-    const nl = buf.indexOf(0x0a, off);
-    if (nl < 0) {
-      cache.set(e.id, undefined);
-      out.set(e.id, undefined);
-      continue;
-    }
-    const header = buf.subarray(off, nl).toString("utf8").split(" ");
-    off = nl + 1;
-    if (header[1] !== "blob") {
-      cache.set(e.id, undefined);
-      out.set(e.id, undefined);
-      continue;
-    }
-    const size = Number(header[2]);
-    cache.set(e.id, frontmatterOf(buf.subarray(off, off + size).toString("utf8"), `${e.id} record`));
-    out.set(e.id, cache.get(e.id));
-    off += size + 1;
+    const text = readNode(join(root, recordRel(e.id)));
+    out.set(e.id, text === "" ? undefined : frontmatterOf(text, `${e.id} record`));
   }
   return out;
 }

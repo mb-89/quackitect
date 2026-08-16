@@ -257,10 +257,92 @@ export function checkDocs(session: { humanCheck: (p: string) => unknown; packet:
   // wanders past the desk after boot, so the human's proof covers the
   // guidance root too. Derived from the folder, never named: a doc joins
   // by existing there.
-  const roots = readdirSync(join(REPO_ROOT, "project", "guidance"), { withFileTypes: true })
+  for (const p of new Set([...reads, ...guidanceRoots()])) session.humanCheck(p);
+}
+
+/** CREDIT THE AGENT'S READING, PAGED, until the whole surface is read.
+ *
+ *  `.se/reading.md` IS THE READING, and reading it credits every document it
+ *  carries. Tests read it WHOLE in one call, which worked for as long as the
+ *  guidance corpus stayed under the whole-file read cap.
+ *
+ *  IT CROSSED THE CAP ON 2026-08-16, at 120,452 characters against 120,000 —
+ *  452 over, from one section added to refusals.md. Every read was refused
+ *  with SE-C-103, so nothing was credited, so every state with a reading
+ *  demand refused. Four cases across two files failed pointing at front_desk,
+ *  and none of them was about front_desk.
+ *
+ *  IT IS A SELF-CONSUMING QUEUE, NOT A FILE. Every read CREDITS what it read
+ *  and the surface is rebuilt without it, so `total_lines` shrinks between
+ *  calls — 2559, 2205, 1984, 1738 across four pages, measured 2026-08-16.
+ *  Paging it by advancing offsets therefore SKIPS content: offset 401 lands
+ *  past where the unread text moved to.
+ *
+ *  SO IT IS ALWAYS READ FROM THE TOP, over and over, until it stops shrinking.
+ *  That is what the pull does one document at a time, and it is the only
+ *  correct way to consume a surface that edits itself under the reader. */
+export async function creditReading(
+  server: unknown,
+  call: (s: never, name: string, args: Record<string, unknown>) => Promise<{ body: Record<string, unknown> }>,
+): Promise<void> {
+  let previous = -1;
+  for (let round = 0; round < 60; round++) {
+    const r = await call(server as never, "se_file_read", { path: ".se/reading.md", offset: 1, limit: 400 });
+    const body = r.body as { content?: string; total_lines?: number };
+    if (typeof body.content !== "string") break;
+    const lines = body.total_lines ?? 0;
+    if (lines === previous) break; // nothing left to credit
+    previous = lines;
+  }
+  // AND EVERY ROOT THE HUMAN CHECKED, read directly.
+  //
+  // `assertHandover` demands that the agent hold EVERY path the human ticked:
+  // "the human checked these as read while driving — your head must hold them
+  // too". checkDocs ticks every guidance root, and the reading surface only
+  // ever offers what the ROUTE needs — three documents where the human had
+  // seven. The four left over blocked every hop, naming front_desk.
+  //
+  // READING A DOCUMENT CREDITS IT, which the engine's own remedy says: "Reading
+  // through se_file_read credits too."
+  // EACH READ PAYS ITS OWN TOLL. The narration toll refuses the next lane call
+  // once twenty have passed without an update, and crediting the reading is
+  // fifteen calls in a row. Without this the toll fires on whatever the test
+  // does NEXT — which cost a case that then reported `arrived: undefined` and
+  // looked like a routing defect.
+  const paying = { op: "update", brief: "reading guidance to credit the walk" };
+  for (const p of guidanceDocs()) {
+    await call(server as never, "se_file_read", { path: p, update: paying });
+  }
+}
+
+/** The guidance root documents, derived from the folder rather than named. A
+ *  doc joins the set by existing there — the same rule checkDocs uses, so the
+ *  two cannot drift apart. */
+export function guidanceRoots(): string[] {
+  return readdirSync(join(REPO_ROOT, "project", "guidance"), { withFileTypes: true })
     .filter((e) => e.isFile() && e.name.endsWith(".md"))
     .map((e) => `project/guidance/${e.name}`);
-  for (const p of new Set([...reads, ...roots])) session.humanCheck(p);
+}
+
+/** EVERY guidance document, roots and subfolders alike.
+ *
+ *  checkDocs ticks the ROOTS plus whatever the route happened to demand, and a
+ *  route demand can sit anywhere — `method/boot.md` is one. So the agent's set
+ *  has to be the superset, or assertHandover blocks on whatever the human
+ *  ticked and the agent was never offered.
+ *
+ *  DERIVED, NEVER NAMED. Naming the four that bit today would leave the fifth
+ *  to bite next month. */
+export function guidanceDocs(): string[] {
+  const out: string[] = [];
+  const walk = (abs: string, rel: string): void => {
+    for (const e of readdirSync(abs, { withFileTypes: true })) {
+      if (e.isDirectory()) walk(join(abs, e.name), `${rel}/${e.name}`);
+      else if (e.name.endsWith(".md")) out.push(`${rel}/${e.name}`);
+    }
+  };
+  walk(join(REPO_ROOT, "project", "guidance"), "project/guidance");
+  return out;
 }
 
 /** A test root with a real repository in it. Anything that lists

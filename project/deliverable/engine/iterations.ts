@@ -15,6 +15,7 @@ import { buildArchive, type GeneratedMachine } from "./expmachine.ts";
 import { type EvidenceField, type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
 import { noteOf, parseStateNote, readNode } from "./notes.ts";
 import { CHANGE_COLUMNS, type ChangeColumn, compileColumn, compileM0, readRigorMatrix, rigorMatrixContentHash } from "./rigor-matrix.ts";
+import { dependsOnLines } from "./seed.ts";
 import { slug } from "./worktree.ts";
 
 /** THE PIN'S PLACEHOLDER, verbatim. It is written when an iteration pins a
@@ -130,8 +131,8 @@ export function itSeed(root: string, goal: string, vision: string, inputs: strin
       got: goal.trim() === "" ? "an empty goal" : "an empty vision",
       remedy: {
         tool: "se_seed_iteration",
-        args: { goal: "<what>", vision: "<roughly how / what done looks like>" },
-        note: "inputs: [] may carry an expedition id or note refs",
+        args: { goal: "<what>", vision: "<roughly how / what done looks like>", depends_on: [] },
+        note: "inputs: [] may carry an expedition id or note refs; depends_on: [] states that this waits for nothing",
       },
       source: SRC,
     });
@@ -159,8 +160,7 @@ export function itSeed(root: string, goal: string, vision: string, inputs: strin
       // 2026-08-12). An iteration naming another here cannot be entered until
       // that one leaves the open set, because the drawn edge runs dep -> this
       // and the walk never enters a state whose inbound edges have not fired.
-      "depends_on:",
-      ...dependsOn.map((d) => `  - ${JSON.stringify(d)}`),
+      ...dependsOnLines(dependsOn),
       "---",
       "",
       `# ${id}`,
@@ -194,7 +194,7 @@ export function itFind(root: string, id: string): Iteration {
       got: id,
       remedy: {
         tool: "se_seed_iteration",
-        args: { goal: "<what>", vision: "<roughly how>" },
+        args: { goal: "<what>", vision: "<roughly how>", depends_on: [] },
         note: "the iterations container lists the seeded ones",
       },
       source: SRC,

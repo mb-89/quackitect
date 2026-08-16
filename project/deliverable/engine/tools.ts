@@ -17,18 +17,7 @@ import { fileURLToPath } from "node:url";
 import { setAnswerSpill } from "./bound.ts";
 import { CallLog } from "./calllog.ts";
 import { parseUpdate } from "./decisions.ts";
-import {
-  BATTERY_QUESTION,
-  batteryGate,
-  laneSummary,
-  laneVerdict,
-  parseTap,
-  scopedGate,
-  streakNudge,
-  suiteFiles,
-  testGate,
-  testRecord,
-} from "./discipline.ts";
+import { BATTERY_QUESTION, decideScope, laneSummary, laneVerdict, parseTap, streakNudge, testRecord } from "./discipline.ts";
 import { CLAUSES, Rejection, type RejectionPayload } from "./errors.ts";
 import type { PatchOp } from "./files.ts";
 import { gitLane } from "./gitlane.ts";
@@ -45,6 +34,7 @@ import { resolveInRoot, seDir } from "./paths.ts";
 import { type MirrorState, renderMirror } from "./render.ts";
 import { resolve as resolveSeam } from "./resolve.ts";
 import { jobDone, jobList, jobStatus, jobStop, runBackground, runToCompletion, startJob } from "./run.ts";
+import { requiredDependsOn } from "./seed.ts";
 import { type AmendOp, Session } from "./session.ts";
 import { shoot } from "./shoot.ts";
 import { survey } from "./survey.ts";
@@ -336,22 +326,39 @@ export function expeditionTools(session: Session): ToolDef[] {
       name: "se_seed_expedition",
       title: "se.seed.expedition",
       description:
-        "Seed an expedition: mints its record and worktree (branch exp/<id>) and pushes that branch to the shared remote, so other machines see it. Declare kind (spike | fix | explore) and goal. It stands in the expeditions container at once — entering there binds it.",
+        "Seed an expedition: kind (spike | fix | explore), goal, and depends_on — the ids it WAITS FOR, which is the container's DAG and the only thing stopping two agents being handed the same files. An empty list is legal and states that it waits for nothing; omitting the key refuses, because a silence and a decision must not be the same bytes on disk. The seed mints a record folder on trunk and nothing else (i34): no branch, no worktree, no push. It stands in the expeditions container at once — entering there binds it.",
       inputSchema: {
         type: "object",
         properties: {
           kind: { type: "string", description: "spike | fix | explore" },
           goal: { type: "string", description: "what this expedition is after" },
+          depends_on: {
+            type: "array",
+            items: { type: "string" },
+            description:
+              "REQUIRED. Record ids this one WAITS FOR. An EMPTY LIST is legal and is a stated decision: nothing is waited on. Omitting the key refuses, because a silence and a decision must not be the same bytes on disk.",
+          },
         },
+        // depends_on IS REQUIRED AND IS NOT ON THIS LIST, on purpose (i6).
+        // The generic required-args check fires BEFORE the handler and answers
+        // with `depends_on: "<value>"` — which is the exact failure the row
+        // exists to prevent, because it leaves the caller to guess whether an
+        // empty list is legal. requiredDependsOn refuses instead, and its
+        // remedy shows the call to make.
         required: ["kind", "goal"],
       },
-      handler: (args) => session.expeditionNew(String(args.kind), String(args.goal)),
+      handler: (args) =>
+        session.expeditionNew(
+          String(args.kind),
+          String(args.goal),
+          requiredDependsOn("se_seed_expedition", args.depends_on, { kind: args.kind, goal: args.goal }),
+        ),
     },
     {
       name: "se_seed_iteration",
       title: "se.seed.iteration",
       description:
-        "Seed an iteration: goal + rough vision, plus input refs (an expedition id, retro note refs) and the iterations it WAITS FOR. Mints its record and worktree (branch it/<id>) and pushes that branch to the shared remote, so another machine can claim it; it stands in the iterations container in M0 — the retro onboards, the kickoff proposes a size, and the bless pins the rest. No size is asked at the seed. DEPENDS_ON IS THE CONTAINER'S ONLY WIRING: naming another open iteration draws the edge dep -> this, so the drawing shows the real shape (independent ones side by side, dependent ones in series) AND the walk refuses to enter this one until that dependency leaves the open set. No dependency means it hangs off start and can be claimed immediately.",
+        "Seed an iteration: goal, rough vision, input refs, and depends_on — the ids it WAITS FOR, which is the container's DAG and the only thing stopping two agents being handed the same files. An empty list is legal and states that it waits for nothing; omitting the key refuses, because a silence and a decision must not be the same bytes on disk. Naming another open iteration draws the edge dep -> this, so the drawing shows the real shape (independent ones side by side, dependent ones in series) AND the walk refuses to enter this one until that dependency leaves the open set. The seed mints a record folder on trunk and nothing else (i34): no branch, no worktree, no push. It stands in the iterations container in M0 — the retro onboards, the kickoff proposes a size, and the bless pins the rest. No size is asked at the seed.",
       inputSchema: {
         type: "object",
         properties: {
@@ -362,9 +369,11 @@ export function expeditionTools(session: Session): ToolDef[] {
             type: "array",
             items: { type: "string" },
             description:
-              "iteration ids this one WAITS FOR — it cannot be entered until each has left the open set. Omit for work that can start now.",
+              "REQUIRED. Iteration ids this one WAITS FOR — it cannot be entered until each has left the open set. An EMPTY LIST is legal and is a stated decision: nothing is waited on. Omitting the key refuses, because a silence and a decision must not be the same bytes on disk.",
           },
         },
+        // Required, and deliberately not on this list — see se_seed_expedition
+        // above. The generic check would pre-empt the remedy that matters.
         required: ["goal", "vision"],
       },
       handler: (args) =>
@@ -372,7 +381,7 @@ export function expeditionTools(session: Session): ToolDef[] {
           String(args.goal),
           String(args.vision),
           Array.isArray(args.inputs) ? args.inputs.map(String) : [],
-          Array.isArray(args.depends_on) ? args.depends_on.map(String) : [],
+          requiredDependsOn("se_seed_iteration", args.depends_on, { goal: args.goal, vision: args.vision }),
         ),
     },
     {
@@ -607,8 +616,11 @@ function shapedRemedy(command: string): { tool: string; args: Record<string, unk
   if (/--test\b|\bnpm\b.*\btest\b|\bjest\b|\bvitest\b/i.test(command)) {
     return {
       tool: "se_test",
-      args: { files: ["<the file your change touched>"], question: "<what this run answers>" },
-      note: "se_test answers STRUCTURED — counts and only the failures' detail. Nothing to shape, and nothing lost.",
+      // NO SCOPE ARGUMENT, since the owner's ruling (2026-08-16). You say what
+      // you want to know; the engine reads what changed and decides whether
+      // that is the battery, a named set, or nothing at all.
+      args: { question: "<what this run answers>" },
+      note: "se_test answers STRUCTURED — counts, only the failures' detail, and `decided` saying what ran and why. Nothing to shape, and nothing lost.",
     };
   }
   if (/\b(rg|ripgrep|grep|findstr|select-string)\b/i.test(command)) {
@@ -645,10 +657,11 @@ export function coreTools(
    *  path. Defaults to nothing, which stamps nothing, exactly as writing
    *  outside a record always did. */
   boundRecord: () => string | undefined = () => undefined,
-  /** WHERE THE WALK STANDS, asked of the live session. The battery refusal
-   *  needs it, and building a whole Session to ask cost a settings restore, a
-   *  keep-awake sync and an idle timer nobody ever cleared — per call. */
-  whereNow: () => string = () => "",
+  // `whereNow` IS DELETED (i6). It existed for one caller: the battery refusal
+  // that asked WHERE the walk stood before deciding whether an agent-initiated
+  // battery was legal. The owner's ruling moved that decision into the engine
+  // — the agent asks for a test and `decideScope` reads what CHANGED — so the
+  // position stopped being an input and the parameter stopped being read.
 ): ToolDef[] {
   const model = new ModelFileSystem(rootOf, boundRecord);
   return [
@@ -1047,22 +1060,16 @@ export function coreTools(
       name: "se_test",
       title: "se.test",
       description:
-        "Run tests STRUCTURED as a durable job. Starting returns a handle immediately. Call again with {job} to read current status or the final verdict. Scoped runs use files and optional name_pattern, and MUST state the question they answer. NO ARGUMENTS runs the earned battery, whose question is fixed. AN UNCHANGED TREE REFUSES its scope unless force is true. EVERY RUN RECORDS ITS TIMINGS — one row per case, appended where the lane can read them — and the verdict says how many cases it timed, so a silent instrument failure shows instead of passing as green. Mine them with se_log_query's min_ms filter.",
+        "ASK FOR A TEST; THE ENGINE DECIDES WHAT RUNS (owner ruling 2026-08-16). You say WHAT YOU WANT TO KNOW and nothing else. The engine reads what actually changed, picks the scope — the whole battery, a named set of test files, or nothing at all — runs it, and the verdict SAYS what it picked and why, in `decided`. There is no argument that widens or narrows it, because choosing the scope was never the agent's job. NOTHING is a real answer: an unchanged tree keeps its last verdict, and the result says so rather than refusing. `force` is the one thing a person asks for directly — a flake hunt, which is the whole suite by definition. THE CONFORMANCE SWEEP RIDES THE SAME DECISION: where the diff is mostly DOCUMENTS, the engine sweeps the corpus alongside the tests and says so in `decided.sweep`, because a battery says nothing about prose and the sweep says everything. Structured as a durable job: starting returns a handle, and calling again with {job} reads its status or final verdict. EVERY RUN RECORDS ITS TIMINGS, one row per case, and the verdict says how many it timed so a silent instrument failure shows instead of passing as green.",
       inputSchema: {
         type: "object",
         properties: {
-          files: {
-            type: "array",
-            items: { type: "string" },
-            description: "test files to run scoped — 'pull', 'pull.test.ts' and the full path all name the same file",
-          },
           question: {
             type: "string",
             description:
-              "what this run answers, in one line — 'did the frontier change break the token sync?'. Required for a scoped run and recorded with the verdict. The scope says which tests ran; only this says why.",
+              "what you want to know, in one line — 'did the frontier change break the token sync?'. REQUIRED, and recorded with the verdict. The engine says which tests ran; only this says why you asked.",
           },
-          name_pattern: { type: "string", description: "--test-name-pattern: run only tests whose name matches" },
-          force: { type: "boolean", description: "override both gates: unchanged tree, and battery/scope economics — for flake hunts" },
+          force: { type: "boolean", description: "a flake hunt: run the whole suite whatever the diff says" },
           job: {
             type: "string",
             description: "read a test job's current status or final verdict without waiting",
@@ -1108,16 +1115,13 @@ export function coreTools(
           const result = await jobDone(started.job);
           return { status: result.exit, out };
         };
-        const runScoped = async (question: string): Promise<Record<string, unknown>> => {
-          const { files, named } = scopedFiles(root, args.files);
-          const scope = `${files.join(",")}${args.name_pattern !== undefined ? `#${String(args.name_pattern)}` : ""}`;
-          testGate(se, root, force, scope);
-          if (named) scopedGate(se, root, files, force);
+        const runScoped = async (question: string, chosen: string[], why: string, sweep: boolean): Promise<Record<string, unknown>> => {
+          const files = chosen;
+          const scope = files.join(",");
           const argv = [
             "--test",
             `--test-concurrency=${String(testConcurrency(availableParallelism()))}`,
             ...testReporterArgs("tap"),
-            ...(args.name_pattern !== undefined ? [`--test-name-pattern=${String(args.name_pattern)}`] : []),
             ...files.map((f) => resolveInRoot(root, f, "engine/tools.ts se_test")),
           ];
           const startedAt = Date.now();
@@ -1131,10 +1135,12 @@ export function coreTools(
           // A long green streak carries the owner's law back with the result:
           // in ~95% of cases the change broke nothing; test to answer a
           // question, not to reassure.
+          const swept = sweep ? [await runSweep()] : [];
           return {
             ok,
             question,
-            scope: { files, ...(args.name_pattern !== undefined ? { name_pattern: String(args.name_pattern) } : {}) },
+            decided: { scope: "scoped", files, why, sweep },
+            ...(swept.length > 0 ? { results: swept } : {}),
             tests: { total: tap.total, pass: tap.pass, fail: tap.fail },
             ...timingReport(timed, tap.total),
             ...(tap.failures.length > 0 ? { failures: tap.failures } : {}),
@@ -1144,9 +1150,21 @@ export function coreTools(
         };
         // The battery: EARNED, not habitual. The gate computes the scoped
         // remedy from the diff since the last green battery.
-        const runBattery = async (): Promise<Record<string, unknown>> => {
-          batteryGate(se, root, force);
-          testGate(se, root, force);
+        // THE SWEEP RIDES THE DECISION, NEVER A VERB (owner ruling 2026-08-16).
+        // A verb an agent can call is a verb an agent will call, and the whole
+        // reason this check left the write is that it costs too much to run per
+        // write. `decideScope` already reads the diff; when that diff is mostly
+        // DOCUMENTS it says so, and the sweep runs with the tests.
+        //
+        // IT REPORTS AND NEVER DECIDES THE VERDICT HERE. The sweep BLOCKS at
+        // sweep-consistency's own exit, which is the state whose job is
+        // clearing it. Riding a test run, it is news.
+        const runSweep = async (): Promise<{ script: string; ok: boolean; exit: number | null; output: string }> => {
+          const abs = resolveInRoot(root, "project/deliverable/engine/bin/sweep.ts", "engine/tools.ts se_test");
+          const r = await spawnNode([abs, "--root", root], root);
+          return { script: "project/deliverable/engine/bin/sweep.ts", ok: true, exit: r.status, output: capMiddle(r.out.trim(), 4000) };
+        };
+        const runBattery = async (why: string, sweep: boolean): Promise<Record<string, unknown>> => {
           const results: { script: string; ok: boolean; exit: number | null; output: string }[] = [];
           const deliverable = resolveInRoot(root, "project/deliverable", "engine/tools.ts se_test");
           const format = await spawnNode([BIOME_BIN, "check", "--write", "--error-on-warnings", "."], deliverable);
@@ -1168,58 +1186,55 @@ export function coreTools(
             const r = await spawnNode([abs, "--root", root], root, { [TIMINGS_DIR_ENV]: se });
             results.push({ script: rel, ok: r.status === 0, exit: r.status, output: capMiddle(r.out.trim(), 4000) });
           }
+          if (sweep) results.push(await runSweep());
           const ok = results.every((x) => x.ok);
           // The verdict is REMEMBERED with the tree it judged, so an identical
           // tree can be answered from the record instead of another 90 seconds.
           testRecord(se, root, ok);
-          return { ok, question: BATTERY_QUESTION, results };
+          return { ok, question: BATTERY_QUESTION, decided: { scope: "battery", files: [], why, sweep }, results };
         };
         // THE QUESTION IS CHECKED BEFORE THE HANDOFF, on purpose. A refusal
         // raised inside the async body becomes the JOB's verdict, so a call
         // that could never run would still answer with a handle and fail
         // quietly a second later (found by verdictlog.test.ts, 2026-08-13).
-        const scoped = args.files !== undefined || args.name_pattern !== undefined;
-        // THE FULL BATTERY BELONGS TO verification, AND NOW THE LANE SAYS SO
-        // (req-the-full-battery-runs-where-the-method-says, i11 2026-08-16).
+        // THE ENGINE DECIDES WHAT RUNS (owner ruling 2026-08-16). The agent
+        // asked a question; this reads what changed and picks the scope.
         //
-        // M7_50_verification HAS SAID IT ALL ALONG: `filled_by: engine`, "THE
-        // ONE PLACE the full battery runs", and the battery "carries no field:
-        // it runs mechanically and its verdict records itself". Two runs per
-        // iteration is the design — that one, plus fix-findings' single confirm.
+        // WHAT THIS REPLACED. Two refusals guarded the scope from opposite
+        // sides — one refused the battery toward a scoped run, the other
+        // refused scoped runs toward the battery — and on 2026-08-16 they
+        // closed on each other at i6's sixth build chunk. Each remedy was the
+        // other refusal, and no test call was legal at all.
         //
-        // FIVE RAN ON 2026-08-16, every one on an agent's own judgment, none
-        // sanctioned by any row. A rule that only asks is what this replaces.
+        // THE CAUSE WAS THE AGENT CHOOSING AND THE ENGINE GRADING THE CHOICE.
+        // Two graders with different subjects eventually disagree, and the
+        // agent standing between them has no move. One decider has nothing to
+        // disagree with.
         //
-        // CHECKED BEFORE THE HANDOFF, for the reason the comment above gives:
-        // a refusal raised inside the async body becomes the JOB's verdict, so
-        // the call would answer with a handle and fail quietly a second later.
-        if (!scoped && !force) {
-          // ASKED OF THE LIVE SESSION, never built. This once constructed a
-          // whole Session to read one string, which re-ran the settings
-          // restore, the keep-awake sync and armIdleTimer — and the restore
-          // reinstated a stale target. A throwaway object with side effects
-          // is not a cheap read.
-          const at = whereNow();
-          if (!/(^|\/)verification$/.test(at)) {
-            throw new Rejection({
-              clause: CLAUSES.CONDITION_UNMET,
-              expected: "the full battery runs at verification, where the engine fires it and its verdict records itself",
-              got: `an agent-initiated battery at ${at === "" ? "no state" : at}`,
-              remedy: {
-                tool: "se_test",
-                args: { files: ["<the file your change touched>"], question: "<what this run answers>" },
-                note: "a scoped run answers a question about a change and is always legal; the whole suite is the engine's job at verification, and force: true is for a flake hunt",
-              },
-              source: "engine/tools.ts se_test",
-            });
-          }
+        // DECIDED BEFORE THE HANDOFF, because a refusal raised inside the
+        // async body becomes the JOB's verdict — the call would answer with a
+        // handle and fail quietly a second later.
+        const decision = decideScope(se, root, force);
+        // NOTHING IS AN ANSWER, NOT A REFUSAL. An unchanged tree keeps its
+        // last verdict, and saying so plainly beats SE-C-130's old refusal:
+        // the caller learns the same thing and the walk does not stop.
+        if (decision.scope === "nothing") {
+          return {
+            ok: true,
+            ran: false,
+            question: scopedQuestion(args.question),
+            decided: { scope: "nothing", files: [], why: decision.why },
+          };
         }
-        const work = scoped ? runScoped(scopedQuestion(args.question)) : runBattery();
+        const work =
+          decision.scope === "scoped"
+            ? runScoped(scopedQuestion(args.question), decision.files, decision.why, decision.sweep)
+            : runBattery(decision.why, decision.sweep);
         const id = `test-${Date.now().toString(36)}-${++testSeq}`;
         // THE LAST RUN SIZES THE EXPECTATION (owner ruling 2026-08-03): a
         // battery caller is told how long the previous one took — measured,
         // never guessed — or told plainly that no record exists.
-        const battery = args.files === undefined && args.name_pattern === undefined;
+        const battery = decision.scope === "battery";
         const pace = battery ? batteryPace(se) : "";
         const entry: TestJobEntry = {
           done: undefined as unknown as Promise<void>,
@@ -1280,7 +1295,7 @@ export function coreTools(
         // THE BATTERY STILL HANDS OFF, and that is not an oversight. It is the
         // engine's to fire at verification, where nobody is waiting on the
         // answer, and blocking a caller for fifty seconds buys nothing.
-        if (scoped) {
+        if (decision.scope === "scoped") {
           await entry.done;
           return entry.verdict ?? { job: id, running: false };
         }
@@ -1748,32 +1763,10 @@ function testJobArm(args: Record<string, unknown>, se: string): Record<string, u
   };
 }
 
-/** 'pull', 'pull.test.ts', 'tests/pull.test.ts', full path — one file.
- *  No names at all means the whole suite. Unknown names refuse with the
- *  glob that lists it. */
-function scopedFiles(root: string, filesArg: unknown): { files: string[]; named: boolean } {
-  const named = (Array.isArray(filesArg) ? (filesArg as unknown[]).map(String) : []).map((f) => {
-    const base = f.split("/").pop() as string;
-    const file = base.endsWith(".test.ts") ? base : `${base}.test.ts`;
-    return `project/deliverable/tests/${file}`;
-  });
-  const files = named.length > 0 ? [...new Set(named)].sort() : suiteFiles(root);
-  const missing = files.filter((f) => !existsSync(resolveInRoot(root, f, "engine/tools.ts se_test")));
-  if (missing.length > 0) {
-    throw new Rejection({
-      clause: CLAUSES.REQUIRED_ARGS,
-      expected: "test files that exist under project/deliverable/tests/",
-      got: `unknown: ${missing.join(", ")}`,
-      remedy: {
-        tool: "se_file_glob",
-        args: { glob: "project/deliverable/tests/*.test.ts" },
-        note: "list the suite, then name your scope",
-      },
-      source: "engine/tools.ts se_test",
-    });
-  }
-  return { files, named: named.length > 0 };
-}
+// `scopedFiles` IS GONE (owner ruling 2026-08-16). It turned the agent's
+// `files` argument into a scope, and there is no such argument any more — the
+// engine reads what changed and decides. `decideScope` in discipline.ts names
+// the files, and they are already full paths.
 
 /** THE QUESTION A SCOPED RUN ANSWERS (req-test-run-carries-its-question).
  *  The scope already says which tests ran. Only this says why, and without
@@ -1787,8 +1780,8 @@ function scopedQuestion(questionArg: unknown): string {
     got: "a scoped run with no question",
     remedy: {
       tool: "se_test",
-      args: { files: ["<your files>"], question: "did <this change> break <that behaviour>?" },
-      note: "the battery needs none — its question is fixed. A scoped run is yours, so say what you wanted to learn.",
+      args: { question: "did <this change> break <that behaviour>?" },
+      note: "the battery needs none — its question is fixed. Anything narrower is yours, so say what you wanted to learn. You do not name the scope; the engine reads what changed.",
     },
     source: "engine/tools.ts se_test",
   });
@@ -1818,7 +1811,6 @@ export function buildServer(
       () => session.doors(),
       () => ({ session, root, lastPacket: undefined, mode: "manual" }),
       () => session.boundRecordId(),
-      () => session.active()[0] ?? "",
     ),
   ];
   // WIRED HERE, NOT INSIDE coreTools. searchHelp needs the FULL assembled

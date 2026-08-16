@@ -8,6 +8,7 @@ satisfies:
   - req-a-deletion-names-what-points-at-the-node
   - req-a-pull-carrying-no-choice-enters-no-iteration
   - req-a-clear-jump-is-one-call
+  - req-a-wrong-act-never-passes-silently
   - req-answer-pages-never-overflows
   - req-container-offers-its-records
   - req-pull-answers-from-record
@@ -34,6 +35,7 @@ satisfies:
   - req-instruction-names-its-source
   - req-fallen-condition-named
   - req-crash-lands-safe
+  - req-a-fallback-fires-when-its-condition-fails
   - req-refusal-carries-remedy
   - req-call-answers-in-one-second
 inputs:

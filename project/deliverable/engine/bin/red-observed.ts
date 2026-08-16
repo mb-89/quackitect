@@ -18,10 +18,22 @@
 // before its design is realized is not a check — it is a sentence that happens
 // to be true, and green-from-birth is the one thing test-first exists to catch.
 //
+// AND THE FAILURE IS AN ASSERTION, NOT A CRASH (i6,
+// req-a-red-is-an-assertion-not-a-crash). A check that crashes from birth
+// proves as little as one that is green from birth: it never reached its
+// expectation, so nothing about the design was measured. The counts cannot
+// tell the two apart — `# fail 4` is the same four either way — but the TAP
+// diagnostic can, and parseTap now carries the kind.
+//
+// A CRASH ALONGSIDE AN ASSERTION IS REPORTED, NOT REFUSED. Some checks
+// legitimately throw before the build exists. The refusal is for a red made of
+// crashes ALONE.
+//
 //   node engine/bin/red-observed.ts --root <project root>
 import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { parseTap } from "../discipline.ts";
 import { itList } from "../iterations.ts";
 
 function argValue(flag: string): string | undefined {
@@ -151,11 +163,13 @@ if (files.size > 0) {
     windowsHide: true,
   });
   const out = `${r.stdout ?? ""}${r.stderr ?? ""}`;
-  const count = (key: string): number => Number(new RegExp(`^# ${key} (\\d+)$`, "m").exec(out)?.[1] ?? "-1");
-  const pass = count("pass");
-  const fail = count("fail");
+  const summary = /^# pass \d+$/m.test(out) && /^# fail \d+$/m.test(out);
+  const tap = parseTap(out);
+  const { pass, fail } = tap;
+  const crashes = tap.failures.filter((f) => f.kind === "crash");
+  const asserts = tap.failures.filter((f) => f.kind === "assertion");
   process.stdout.write(`##progress 1 1 done\n`);
-  if (pass < 0 || fail < 0) {
+  if (!summary) {
     // NO SUMMARY MEANS NO RUN. The runner died before reporting, and reading
     // that as red would pass this state on an instrument failure.
     problems.push(`the runner produced no TAP summary — it did not complete:\n${out.trim().slice(0, 2000)}`);
@@ -165,8 +179,28 @@ if (files.size > 0) {
     problems.push(
       `all ${String(pass)} new cases PASS before the build — a check green from birth proves nothing. Either the design is already realized, or the check does not test what it says.`,
     );
+  } else if (asserts.length === 0) {
+    // EVERY FAILURE CRASHED. Nothing reached an expectation, so nothing about
+    // the design was measured. The likeliest cause is the check file itself.
+    problems.push(
+      `${String(fail)} of ${String(pass + fail)} new cases fail, and every one CRASHED rather than failing an assertion. A crash never reaches its expectation, so it says the check file is broken — not that the design is unrealized. Look at these first:\n${crashes
+        .map((f) => `    ${f.name}\n${f.detail.replace(/^/gm, "      ")}`)
+        .join("\n")}`,
+    );
   } else {
-    process.stdout.write(`red observed: ${String(fail)} of ${String(pass + fail)} new cases fail, as they should\n`);
+    process.stdout.write(
+      `red observed: ${String(asserts.length)} of ${String(pass + fail)} new cases fail on an assertion, as they should\n`,
+    );
+    // A CRASH ALONGSIDE AN ASSERTION IS NEWS WITHOUT BEING A REFUSAL. The red
+    // stands on the assertions; the crashing cases are named so they are not
+    // mistaken for part of it.
+    if (crashes.length > 0) {
+      process.stdout.write(
+        `note: ${String(crashes.length)} further case(s) CRASHED rather than asserting, and prove nothing about the design — ${crashes
+          .map((f) => f.name)
+          .join(", ")}\n`,
+      );
+    }
     process.stdout.write(`specs: ${specs.join(", ")}\n`);
   }
 }

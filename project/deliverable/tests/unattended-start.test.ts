@@ -17,11 +17,12 @@
 // assertion running nowhere at all.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { test } from "node:test";
 
-import { LANE_SPAWN } from "../engine/bin/se-start.ts";
+import { LANE_SPAWN, recordOnTrunk } from "../engine/bin/se-start.ts";
+import { freshRoot } from "./helpers.ts";
 
 const DELIVERABLE = join(import.meta.dirname, "..");
 const ENTRYPOINT = join(DELIVERABLE, "engine", "bin", "se-start.ts");
@@ -137,6 +138,43 @@ test("verify refuses a checkout whose origin is not the repository asked for", (
 // and a clone that has trunk has every record, so there is nothing to adopt.
 // What stops two agents sharing one record is now an assumption with a
 // trigger, raid-asm-only-one-agent-works-a-clone-at-a-time, rather than a lock.
+
+// THE FETCH STEP PROVES THE RECORD, AND THE RECORD IS A FOLDER ON TRUNK (i6).
+//
+// It asked git for `refs/remotes/origin/it/<id>` and died without it. i34 made
+// the seed mint a folder and no branch, so the branch a cloud start demanded
+// stopped being created the day the seed stopped creating it. Every one still
+// on the remote is a leftover — twenty-six of them, which cannot be deleted
+// while this check reads them.
+test("the fetch step proves the record by its folder on trunk", () => {
+  const root = freshRoot();
+  const id = "i99-a-fixture-iteration";
+  assert.equal(recordOnTrunk(root, id), "", "a clone without the folder does not hold the record");
+
+  const rel = join("project", "spec", "iterations", id, "record.md");
+  mkdirSync(join(root, dirname(rel)), { recursive: true });
+  writeFileSync(join(root, rel), `---\nid: ${id}\nstatus: seeded\n---\n`, "utf8");
+  assert.equal(
+    recordOnTrunk(root, id),
+    `project/spec/iterations/${id}/record.md`,
+    "the folder IS the iteration, and the path is what comes back",
+  );
+});
+
+// NO BRANCH IS CONSULTED ANY MORE, and that is the property the twenty-six
+// leftover branches wait on. A source check, because the alternative is
+// standing up a remote to prove a negative.
+//
+// COMMENTS ARE STRIPPED FIRST. The entrypoint's own comment records why the
+// branch check went, and it has to be free to say the words — a check that
+// forbids naming the thing it removed forbids explaining the removal.
+test("the entrypoint reads no it/* branch", () => {
+  const code = SOURCE.split("\n")
+    .filter((l) => !l.trimStart().startsWith("//"))
+    .join("\n");
+  assert.ok(!/refs\/remotes\/origin/.test(code), "se-start.ts must not resolve a remote branch — a record is a folder on trunk");
+  assert.ok(!/it\/\$\{iteration\}/.test(code), "se-start.ts must not build an it/<id> branch name");
+});
 
 // LAUNCH STARTS AN AGENT. It stood for one iteration checking two files
 // existed and printing "ready", which produced no walking agent at all — the

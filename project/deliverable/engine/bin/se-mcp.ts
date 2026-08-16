@@ -25,7 +25,7 @@
 //
 // TWO HANDS, ONE SESSION: the MCP lane (stdio) is the agent's hand, the
 // embedded mirror (HTTP) is the human's — the same Session, the same walk.
-// The autonomy gates only the agent; the slider in the mirror moves it live.
+// The autonomy gates only the agent; the DIAL in the mirror moves it live.
 //
 // SESSION OVER: anybody reaching end shuts the whole session down — the
 // child exits deliberately (code 0) and the shim follows it down.

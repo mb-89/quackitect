@@ -3,7 +3,6 @@
 // HTTP is the person, MCP is the agent, and the threshold gates only the
 // agent — so every route here moves the walk by the person's hand.
 
-import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { createServer, type Server } from "node:http";
 import { createRequire } from "node:module";
@@ -568,33 +567,31 @@ export function startMirror(o: MirrorOptions): Server {
     "/api/statetodos": (url, _req, res) => {
       json(res, state.session.decisions.stateTodos(url.searchParams.get("state") ?? ""));
     },
-    // A record's decision history, per visit — tree copy first, the
-    // branch when only it holds the file (dismissed expeditions).
+    // A record's decision history, per visit. THE FOLDER IS THE ONLY PLACE IT
+    // LIVES (i6): this fell back to `git show exp/<id>:<rel>` for a dismissed
+    // expedition whose file was only on its branch. i34 keeps the folder where
+    // it is through the close, dismissal included, so the branch held nothing
+    // the tree does not.
     "/api/recdecisions": (url, _req, res) => {
       const expId = url.searchParams.get("exp") ?? "";
       const rel = `project/spec/expeditions/${expId}/decisions.jsonl`;
       const abs = resolveInRoot(o.root, rel, "mirror /api/recdecisions");
-      let raw = "";
-      if (existsSync(abs)) raw = readFileSync(abs, "utf8");
-      else {
-        const r = spawnSync("git", ["show", `exp/${expId}:${rel}`], { cwd: o.root, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
-        raw = r.status === 0 ? r.stdout : "";
-      }
+      const raw = existsSync(abs) ? readFileSync(abs, "utf8") : "";
       json(res, { exp: expId, visits: replayVisitsText(raw) });
     },
     // Serve a guidance document, rendered — links in the details pane.
     "/doc": (url, _req, res) => {
       const p = url.searchParams.get("path") ?? "";
       const abs = resolveInRoot(o.root, p, "mirror /doc");
-      // A dismissed expedition's report lives only on its branch — read
-      // it there when the tree copy is absent.
-      const exp = url.searchParams.get("exp");
+      // THE REPORT IS ON DISK OR IT IS NOWHERE (i6). This fell back to
+      // `git show exp/<id>:<path>` because a dismissed expedition's report
+      // lived only on its branch. i34 leaves the folder where it is through
+      // the close, so a missing file is missing rather than elsewhere.
       let raw: string;
-      if (!existsSync(abs) && exp !== null) {
-        const r = spawnSync("git", ["show", `exp/${exp}:${p}`], { cwd: o.root, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
-        raw = r.status === 0 ? r.stdout : `report not found on branch exp/${exp}`;
-      } else {
+      if (existsSync(abs)) {
         raw = readFileSync(abs, "utf8");
+      } else {
+        raw = `not found: ${p}`;
       }
       raw = raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, ""); // frontmatter is machine-facing
       let html = p.endsWith(".md") ? (marked.parse(raw) as string) : `<pre>${raw.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>`;

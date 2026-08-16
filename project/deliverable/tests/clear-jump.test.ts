@@ -15,13 +15,19 @@ import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, checkDocs, freshRoot } from "./helpers.ts";
+import { call, checkDocs, creditReading, freshRoot } from "./helpers.ts";
 
 /** Boot to idle with BOTH proofs in hand.
  *
  *  The human's proof is checkDocs. The AGENT's is earned by reading through
- *  the lane, and `.se/reading.md` credits every owed document in one call —
- *  which is exactly what the packet tells an agent to do.
+ *  the lane: `.se/reading.md` IS the reading, and reading it credits every
+ *  document it carries.
+ *
+ *  IT IS READ PAGED, NOT WHOLE (i6). One whole-file read worked until the
+ *  guidance corpus crossed the read cap on 2026-08-16 — 120,452 characters
+ *  against 120,000. Every read was then refused, nothing was credited, and
+ *  these cases failed pointing at front_desk while having nothing to do with
+ *  front_desk.
  *
  *  Both are needed here because a sweep on the agent channel weighs the
  *  agent's reading, and boot alone leaves that owed. */
@@ -36,7 +42,7 @@ async function bootBoth(): Promise<{ s: Session; server: ReturnType<typeof build
   assert.equal(s.active()[0], "idle", "boot did not reach idle");
 
   const server = buildServer(root, s);
-  await call(server, "se_file_read", { path: ".se/reading.md" });
+  await creditReading(server, call);
   return { s, server };
 }
 

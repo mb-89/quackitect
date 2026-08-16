@@ -10,6 +10,7 @@ satisfies:
   - req-setup-stops-before-partial
   - req-newcomer-one-command
   - req-second-product-reuses-install
+  - req-product-is-a-folder
   - req-extension-replaced-reported
   - req-fresh-machine-runs
   - req-scaffold-from-template

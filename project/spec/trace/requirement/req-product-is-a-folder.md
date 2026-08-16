@@ -17,8 +17,6 @@ priority: must
 
 ## Detail
 
-## Detail
-
 What a product owns, and what therefore lives in its folder:
 
 - the spec and every trace node

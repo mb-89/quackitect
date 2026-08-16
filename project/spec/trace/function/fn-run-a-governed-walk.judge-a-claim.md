@@ -9,6 +9,7 @@ satisfies:
   - req-a-harmless-finding-names-an-open-entry
   - req-form-is-built-and-checked
   - req-coverage-checked-both-ways
+  - req-a-coverage-check-computes-both-sides
   - req-gate-needs-a-persons-verdict
   - req-gate-evidence-must-be-sound
   - req-gate-shows-the-evidence-form
@@ -19,6 +20,7 @@ satisfies:
   - req-bless-outputs-ride-the-bless
   - req-bound-field-rebuilds-from-nodes
   - req-structure-verdicts-are-mechanical
+  - req-a-ripple-names-its-root
 inputs:
   - flow-compiled-machine
   - flow-filled-claim

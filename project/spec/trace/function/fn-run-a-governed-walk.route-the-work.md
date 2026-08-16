@@ -6,6 +6,7 @@ cluster: the-record-life
 statement: turn a sentence about wanted work into the right vehicle to hold it
 satisfies:
   - req-a-records-dependency-is-declared
+  - req-a-seed-states-its-dependency
   - req-desk-takes-plain-words
   - req-desk-greets-walkable
   - req-desk-offers-a-tour

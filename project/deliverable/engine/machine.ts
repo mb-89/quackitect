@@ -432,6 +432,58 @@ export function claimFeeders(m: MachineDecl, id: string, claimful: Set<string>):
   return [...out];
 }
 
+/** THE RIPPLE NAMES ITS ROOT, NOT ITS FIRST HOP (i6).
+ *
+ *  A fallen claim usually fell because ITS input fell, and that one because its
+ *  own did. The refusal named the first hop, so a reader amended a state that
+ *  was merely waiting, watched nothing change, and asked again.
+ *
+ *  LIVED 2026-08-16: a value outside its vocabulary trapped a walk for ELEVEN
+ *  calls, four states later. Three amends were aimed at states that were fine.
+ *  se_why found it in two, because se_why already walked the chain and the
+ *  refusal did not.
+ *
+ *  A ROOT IS A FALLEN CLAIM WITH NO FALLEN INPUT OF ITS OWN. That is where work
+ *  has to happen; everything between it and here is waiting.
+ *
+ *  THE PATH COMES BACK WITH IT, root first, so a reader can see how a state
+ *  four hops away is the reason this one will not go.
+ *
+ *  A CYCLE RETURNS NO ROOT. The caller falls back to naming the first hop,
+ *  which is still better than silence.
+ *
+ *  req-a-ripple-names-its-root */
+export function fallenChain(m: MachineDecl, id: string, done: Set<string>, claimful: Set<string>): { roots: string[]; path: string[] } {
+  const fell = (at: string): string[] => claimFeeders(m, at, claimful).filter((f) => !done.has(f));
+  // WHICH FALLEN STATE EACH ONE FEEDS, so the path can be read back out.
+  const feeds = new Map<string, string>();
+  const seen = new Set<string>([id]);
+  const roots: string[] = [];
+  const queue = fell(id);
+  for (const f of queue) feeds.set(f, id);
+  while (queue.length > 0) {
+    const f = queue.shift() as string;
+    if (seen.has(f)) continue;
+    seen.add(f);
+    const up = fell(f);
+    if (up.length === 0) {
+      roots.push(f);
+      continue;
+    }
+    for (const x of up) {
+      if (!feeds.has(x)) feeds.set(x, f);
+      if (!seen.has(x)) queue.push(x);
+    }
+  }
+  const path: string[] = [];
+  let at: string | undefined = roots[0];
+  while (at !== undefined && !path.includes(at)) {
+    path.push(at);
+    at = feeds.get(at);
+  }
+  return { roots, path };
+}
+
 /** The downstream cone: everything reachable from the named states. Anything
  *  downstream was derived from what is being reopened, so it cannot stand. */
 export function downstreamCone(m: MachineDecl, stateIds: string[]): Set<string> {

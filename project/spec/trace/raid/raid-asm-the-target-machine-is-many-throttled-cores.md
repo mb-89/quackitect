@@ -6,7 +6,7 @@ kind: assumption
 statement: The machines this product must run well on have many cores and weak single-core speed, because they thermally throttle, and that cannot be avoided by choosing better hardware.
 owner: the owner
 trigger: at any design choice argued on speed, and at every scoring of req-call-answers-in-one-second
-status: held
+status: accepted
 probe: "Run the same scoped call on the throttled laptop and on a normal desktop and compare wall-clock. The laptop's figure is the one the one-second rule must be met on."
 probed: "not from this session - reported by the owner on 2026-08-14 and accepted on their word. The machine is elsewhere."
 impact: Every argument that trades parallelism for single-threaded simplicity is arguing against the target hardware. A design that is fast on one strong core and mediocre across many is the wrong shape for the machines this is used on.

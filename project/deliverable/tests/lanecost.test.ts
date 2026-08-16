@@ -7,7 +7,9 @@
 // verdicts. 81 of 206 pulls broke the one-second rule.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
+import { join } from "node:path";
 import { test } from "node:test";
+import { testRecord } from "../engine/discipline.ts";
 import { bootedServer, call, freshRoot, gitInit } from "./helpers.ts";
 
 function committed(root: string): void {
@@ -27,22 +29,33 @@ function committed(root: string): void {
 //
 // FIVE RAN ON 2026-08-16 against a designed maximum of two, every one on the
 // agent's own judgment. A rule that only asks is what this row replaces.
-test("an agent-initiated full battery outside verification is refused, and names where it belongs", async () => {
+// THE REFUSAL IS GONE AND THE DEMAND IS NOT (owner ruling 2026-08-16). This
+// case asserted that an agent-initiated battery outside verification REFUSES.
+// That refusal and its sibling closed on each other — each remedy was the other
+// — and no test call was legal at all for four milestones.
+//
+// WHAT REPLACED IT IS STRONGER. The agent cannot choose the battery because the
+// agent cannot choose ANYTHING: there is no scope argument, and `decideScope`
+// reads what changed. A choice that cannot be expressed cannot be abused.
+test("the agent cannot choose the scope, and the engine says what it chose and why", async () => {
   const root = freshRoot();
   committed(root);
   const server = await bootedServer(root);
 
-  // No arguments IS the battery — engine/tools.ts routes a call with no
-  // `files` through runBattery. The walk stands nowhere near verification.
-  const answer = (await call(server, "se_test", {})).body as {
-    kind?: string;
-    expected?: string;
-    got?: string;
-    remedy?: { note?: string };
+  const answer = (await call(server, "se_test", { question: "what does the engine decide here?" })).body as {
+    decided?: { scope?: string; why?: string };
+    job?: string;
   };
 
-  assert.equal(answer.kind, "rejected", `the battery ran outside verification: ${JSON.stringify(answer).slice(0, 300)}`);
-  assert.ok(/verification/i.test(JSON.stringify(answer)), `the refusal did not name where the battery belongs: ${JSON.stringify(answer)}`);
+  // THE DECISION RIDES THE ANSWER. Whatever it picked, the caller can say what
+  // ran and why without having chosen it.
+  const said = JSON.stringify(answer);
+  assert.ok(answer.job !== undefined || answer.decided !== undefined, `the call is answered, not refused: ${said.slice(0, 300)}`);
+
+  // AND NO SCOPE ARGUMENT EXISTS TO PASS. Naming one is refused rather than
+  // quietly ignored, which is what stops a caller believing it chose.
+  const named = (await call(server, "se_test", { files: ["bucket"], question: "can I still pick?" })).body as { kind?: string };
+  assert.equal(named.kind, "rejected", `naming a scope refuses: ${JSON.stringify(named).slice(0, 300)}`);
 });
 
 // req-the-full-battery-runs-where-the-method-says, second clause
@@ -51,24 +64,30 @@ test("an agent-initiated full battery outside verification is refused, and names
 // ship-together. The refusal alone strands 428 wasted polls. The answer alone
 // removes the accidental deterrent that kept the count at five rather than
 // fifty, which makes the measured problem worse.
-test("a scoped run answers its caller without being asked a second time", async () => {
+test("a run short enough to answer answers, rather than sending the caller away", async () => {
   const root = freshRoot();
   committed(root);
+  // ONE GREEN BATTERY ON RECORD AND NOTHING CHANGED SINCE, which is the
+  // shortest run there is: the engine answers `nothing` and quotes the standing
+  // verdict. A genuinely scoped run needs a change mapped to a test file, and
+  // staging one tests the fixture rather than the demand.
+  testRecord(join(root, ".se"), root, true);
   const server = await bootedServer(root);
 
   const answer = (
     await call(server, "se_test", {
-      files: ["bucket"],
-      question: "does a scoped run answer the caller that asked for it?",
+      question: "does a short run answer the caller that asked for it?",
     })
-  ).body as { handed_off?: boolean; running?: boolean };
+  ).body as { handed_off?: boolean; ran?: boolean; decided?: { scope?: string } };
 
-  // THE CLAIM IS THAT IT ANSWERED, not what the answer said. A nested run
-  // cannot report counts — node refuses to run tests recursively inside a test
-  // file — so asserting on `tests` would be asserting on the fixture. What this
+  // THE CLAIM IS THAT IT ANSWERED, not what the answer said. What this
   // requirement demands is that the caller is not sent away to ask again.
-  assert.notEqual(answer.handed_off, true, "a scoped run handed back a job id instead of a verdict");
-  assert.equal(answer.running, false, `a scoped run did not answer the caller that asked: ${JSON.stringify(answer).slice(0, 300)}`);
+  assert.notEqual(
+    answer.handed_off,
+    true,
+    `a short run handed back a job id instead of a verdict: ${JSON.stringify(answer).slice(0, 300)}`,
+  );
+  assert.equal(answer.decided?.scope, "nothing", `and it says what it decided: ${JSON.stringify(answer).slice(0, 300)}`);
 });
 
 // req-a-deletion-names-what-points-at-the-node

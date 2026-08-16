@@ -19,6 +19,7 @@ import {
   type StateDecl,
   validateMachine,
 } from "./machine.ts";
+import { assertCanSupply } from "./machines/supply.ts";
 import { parseStateNote, passEpoch, section } from "./notes.ts";
 
 const SRC = "engine/rigor-matrix.ts";
@@ -87,6 +88,10 @@ export interface RigorMatrix {
   rows: RigorMatrixRow[];
   /** row name -> column -> cell */
   cells: Map<string, Map<string, RigorMatrixCell>>;
+  /** WHERE IT WAS READ FROM. The compile needs it to resolve a field's form
+   *  template, and threading a second root through every caller is how a
+   *  lookup starts finding nothing and reporting it as clean. */
+  root: string;
 }
 
 function asList(v: unknown): string[] {
@@ -508,7 +513,7 @@ function readRigorMatrixFresh(root: string): RigorMatrix {
       if (!byName.has(d)) throw new Error(`matrix row ${row.name} depends on undeclared row ${d}`);
     }
   }
-  return { rows, cells: cellsOf(rows, fmByName) };
+  return { rows, cells: cellsOf(rows, fmByName), root };
 }
 
 /** Priority anchors per state kind (the autonomy scale's bands). */
@@ -683,6 +688,7 @@ export function compileColumn(matrix: RigorMatrix, column: ChangeColumn): Machin
   }
   const decl: MachineDecl = { id: `iteration-${column}`, reentry: "resume", initial: "start", states };
   validateMachine(decl);
+  assertCanSupply(matrix.root, decl);
   return decl;
 }
 

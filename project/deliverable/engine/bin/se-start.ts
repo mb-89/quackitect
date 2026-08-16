@@ -163,16 +163,37 @@ async function wait(port: number, seconds = 60): Promise<void> {
 // IT BRINGS THE REFS AND THEN PROVES THE ONE IT CAME FOR IS THERE. A fetch
 // that succeeds against a repository missing the iteration is a green light
 // into a failure four steps later.
+//
+// THE PROOF IS THE FOLDER ON TRUNK, NOT A BRANCH (i6). This asked git for
+// `refs/remotes/origin/it/<id>` and died without it. i34 made a record a
+// FOLDER on trunk: the seed mints no branch, pushes nothing, and there is
+// nothing for a peer to claim. So the branch a cloud start demanded stopped
+// being created the day the seed stopped creating it, and every one still on
+// the remote is a leftover — twenty-six of them, which can go once nothing
+// reads them.
+//
+// WHAT IS ACTUALLY BEING ASKED: does this clone hold the record the run was
+// sent for? A folder with a record.md in it answers that, and it answers it
+// after the fetch has brought trunk up to date.
+/** THE PATH THAT IS THE ITERATION, and "" when this clone does not hold it.
+ *  Split out from the step so the question can be asked without a process
+ *  exiting — `die` is the right ending for a step and the wrong one for a
+ *  check somebody wants to drive. */
+export function recordOnTrunk(root: string, iteration: string): string {
+  const rel = `project/spec/iterations/${iteration}/record.md`;
+  return existsSync(join(root, rel)) ? rel : "";
+}
+
 function fetchRefs(iteration: string): void {
   const r = spawnSync("git", ["fetch", "--all", "--prune"], { cwd: ROOT, encoding: "utf8" });
   if (r.status !== 0) die("fetch", (r.stderr || "git fetch failed").trim().split("\n").pop() ?? "git fetch failed");
-  const branch = `it/${iteration}`;
-  const known = spawnSync("git", ["rev-parse", "--verify", "--quiet", `refs/remotes/origin/${branch}`], {
-    cwd: ROOT,
-    encoding: "utf8",
-  });
-  if (known.status !== 0) die("fetch", `refs are up to date and this repository has no ${branch}`);
-  say("fetch", `refs up to date, ${branch} present`);
+  if (recordOnTrunk(ROOT, iteration) === "") {
+    die(
+      "fetch",
+      `refs are up to date and this repository has no project/spec/iterations/${iteration}/record.md — a record is a folder on trunk, so that path IS the iteration`,
+    );
+  }
+  say("fetch", `refs up to date, ${iteration} stands on trunk`);
 }
 
 // ── adopt: DELETED (i34) ────────────────────────────────────────────────────

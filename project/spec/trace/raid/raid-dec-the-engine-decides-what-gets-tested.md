@@ -78,3 +78,75 @@ iteration opened without the person's word, which contract rule 9 forbids.
 
 THE DESK IS WHERE A PERSON SAYS WHAT THEY WANT NEXT, and that is exactly the
 decision that follows a ship.
+
+## Built at i6, after the two refusals closed on each other
+
+THE DECISION STOOD SINCE i11 AND THE MECHANISM DID NOT. Until 2026-08-16
+the agent still chose the scope and the engine graded the choice, through
+two refusals guarding it from opposite sides.
+
+- SE-C-131's battery gate refused the battery while every change mapped
+  to a scoped run, and handed over the scoped call.
+- SE-C-131's flip refused scoped runs once the piecemeal odometer crossed
+  a third of the suite, and handed over the battery.
+- SE-C-112 refused an agent-initiated battery anywhere but verification.
+
+THEY CLOSED AT i6's SIXTH BUILD CHUNK. The odometer stood at 42 and the
+walk was four milestones from verification. The scoped run refused toward
+the battery; the battery refused toward a scoped run. Each remedy was the
+other refusal, and narrowing to one file changed nothing because the flip
+counts the odometer rather than the call.
+
+THE CAUSE WAS NOT THE THRESHOLD. Two graders with different subjects
+eventually disagree, and an agent standing between them has no move.
+Tuning the flip would have moved the collision, not removed it.
+
+## Rejected options
+
+### Raise the flip threshold
+
+TREATS THE SYMPTOM. A higher flip means the collision happens later in a
+longer iteration. Any threshold has a value at which both rules refuse.
+
+### Let the battery run anywhere
+
+RE-OPENS WHAT SE-C-112 EXISTS FOR. Five agent-judged batteries ran on
+2026-08-16, none sanctioned by any row, and the battery is expensive
+enough that habit is costly.
+
+### Teach the agent to read both rules
+
+REJECTED ON THIS ITERATION'S OWN THESIS. A rule that must be read and
+reasoned about, in the moment, under a refusal, is exactly what does not
+hold. And `force` is a flake hunt, not a way past a rule.
+
+### Make the flip advisory
+
+KEEPS THE AGENT CHOOSING, which is the thing the owner ruled out.
+
+## Consequences
+
+- `se_test` TAKES A `question` AND NOTHING ELSE. `files` and
+  `name_pattern` are gone from the schema. No argument widens or narrows
+  the scope.
+- THE VERDICT CARRIES `decided` — the scope, the files and one line of
+  reasoning. The agent can always say what ran and why.
+- NOTHING IS AN ANSWER. An unchanged tree keeps its last verdict and the
+  result says so, which is what SE-C-130 meant and could not do without
+  stopping the walk.
+- `force: true` IS THE ONE THING A PERSON PASSES, and it means the whole
+  suite, because a flake is not known to live in one file.
+- TWO CLAUSE NUMBERS ARE RETIRED, SE-C-130 and SE-C-131, and neither is
+  reused.
+
+WHAT IT COSTS. The agent can no longer narrow a run to chase one case.
+That was the point: chasing one case is how a suite gets run sixty times
+in two hours.
+
+## Where it lives
+
+- `engine/discipline.ts` — `decideScope(seDir, root, force)` returns
+  `{scope, files, why}`. It replaced `batteryGate` and `scopedGate`.
+- `engine/tools.ts` — `se_test` calls it and dispatches on the answer.
+- `tests/discipline.test.ts` — seven cases drive the decision where two
+  used to drive the refusals.

@@ -29,6 +29,7 @@ import {
 import { loadStateNote, readNode } from "../notes.ts";
 import { parseEvidence } from "../rigor-matrix.ts";
 import { loadLevels, valueFor } from "../scale.ts";
+import { assertCanSupply } from "./supply.ts";
 
 const ROLES: ReadonlySet<string> = new Set(["normal", "alternative", "fallback", "recovery", "approval", "error"]);
 
@@ -346,6 +347,11 @@ export function compileMachine(root: string, canvasPath: string, sources?: strin
   };
   try {
     validateMachine(machine);
+    // NO STATE DEMANDS WHAT IT CANNOT SUPPLY (i6). Refusing here names the
+    // state, the field and the verbs — a fix somebody can make. Refusing at
+    // the state names nothing, and the only ways out are an escape or the
+    // shell.
+    assertCanSupply(root, machine);
   } catch (e) {
     throw new MachineCompileError(machineId, "machine", String((e as Error).message));
   }

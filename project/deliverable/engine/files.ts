@@ -11,6 +11,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { dirname, extname, join, relative, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
+import { guardParses } from "./guard.ts";
 import { contentHash } from "./hash.ts";
 import { lintFix } from "./lintfix.ts";
 import { forgetPath, parseStateNote, readNodeBytes, writeNode } from "./notes.ts";
@@ -303,6 +304,8 @@ export interface WriteResult {
   lint_fixed?: string;
   /** Linter findings the safe fixes could not reach (engine/lintfix.ts). */
   lint_findings?: string;
+  /** What the corpus already carried, reported rather than refused. */
+  standing_breaks?: string[];
 }
 
 // THE METHOD MIRROR IS DELETED (i34). The session registered a callback here
@@ -345,6 +348,12 @@ export function fileWrite(root: string, path: string, content: string, baseHash:
     }
   }
   guardMachineNote(path, content);
+  // THE WRITE GUARD STANDS HERE, with the other two, because this is the last
+  // point before anything lands (req-a-write-that-breaks-the-corpus-refuses).
+  // THE GUARD ANSWERS TWICE. It THROWS on a break this write made, and RETURNS
+  // what the corpus already carried. The seam is who caused it
+  // (raid-dec-a-check-refuses-a-wrong-write-and-reports-a-wrong-corpus).
+  const standing = guardParses(root, path, content);
   const nul = guardRawNul(path, content);
   mkdirSync(dirname(abs), { recursive: true });
   writeNode(abs, nul.content);
@@ -360,6 +369,9 @@ export function fileWrite(root: string, path: string, content: string, baseHash:
       ? { lint_fixed: "the linter's safe fixes ran after the write — the returned hash is the fixed content" }
       : {}),
     ...(lint?.findings !== undefined ? { lint_findings: lint.findings } : {}),
+    // IT RIDES THE WRITE'S OWN RESULT so the author sees it without asking.
+    // A report nobody reads is the same as no check.
+    ...(standing.length > 0 ? { standing_breaks: standing } : {}),
   };
 }
 

@@ -19,6 +19,7 @@ import {
   claimFeeders,
   completeState,
   downstreamCone,
+  fallenChain,
   INPUT_ROLES,
   type MachineDecl,
   type MachineInstance,
@@ -101,6 +102,7 @@ import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { anyJobRunning } from "./run.ts";
 import { levelName, loadLevels, loadStopAt, notchName, tierOf, weightName } from "./scale.ts";
+import { requiredDependsOn } from "./seed.ts";
 import {
   buildPortableForm,
   chosenOption,
@@ -240,6 +242,17 @@ export interface Blocker {
     | "fallen_input"
     | "claim_content"
     | "submachine_unfinished";
+  /** THE UPSTREAM STATES THIS BLOCKER IS ABOUT, as data (i6).
+   *
+   *  The chain walk used to recover these by PARSING `got` — stripping a
+   *  prefix off the sentence and splitting on commas. That read one blocker
+   *  kind and silently skipped the other, so a walk held by a fallen input
+   *  reported no upstream at all and the reader was told the work was here.
+   *
+   *  A NAME IS DATA. It travels as a list or it does not travel.
+   *
+   *  req-a-ripple-names-its-root */
+  states?: string[];
   clause: string;
   expected: string;
   got: string;
@@ -1173,8 +1186,8 @@ export class Session {
   // ONE TREE MAKES BOTH QUESTIONS EMPTY. A write is the file every reader
   // opens, the instant it lands.
 
-  expeditionNew(kind: string, goal: string): Record<string, unknown> {
-    const e = expNew(this.machineRoot(), kind, goal);
+  expeditionNew(kind: string, goal: string, dependsOn: string[] = []): Record<string, unknown> {
+    const e = expNew(this.machineRoot(), kind, goal, dependsOn);
     this.bumpGeneration(); // a new record changes what the container expands to
     return { created: e.id, branch: e.branch, note: "it stands in the expeditions container — enter there to work" };
   }
@@ -1631,6 +1644,30 @@ export class Session {
       },
       source: "engine/session.ts wedge-guard",
     });
+  }
+
+  /** THE OUTCOME A HOP COMPLETES WITH, and it is the drawing that says which.
+   *
+   *  A `fallback` or `error` edge IS the drawn path for the thing going wrong,
+   *  so taking one is not a state finishing its work — it is a state failing
+   *  and the machine having somewhere to put it.
+   *
+   *  WITHOUT THIS THE FALLBACK WAS UNREACHABLE. `completeState` fires fallback
+   *  edges only on a non-filled outcome, and every hop completed "filled", so
+   *  a fallback edge could never fire at all. verification's exit script would
+   *  come back red, the forward door stayed shut on the condition, and the
+   *  repair door the drawing put there for exactly that case never opened.
+   *  Found live 2026-08-16, with the walk holding read verbs and no legal move.
+   *
+   *  AND IT LEAVES THE STATE RED (owner ruling 2026-08-16: "if we complete on
+   *  failed outcome, then it must be marked red"). `settledStates` counts a
+   *  state green only where its LATEST history outcome is "filled", so a
+   *  failed completion takes it back out of the green set by construction.
+   *  Walking on is not the same as passing, and the record says so. */
+  private outcomeFor(m: MachineDecl, cur: string, to: string | undefined): "filled" | "failed" {
+    if (to === undefined) return "filled";
+    const taken = this.state(m, cur).edges.filter((e) => e.to === to);
+    return taken.some((e) => e.role === "fallback" || e.role === "error") ? "failed" : "filled";
   }
 
   /** A sub governs as long as it stands — including its visible end
@@ -5846,6 +5883,21 @@ export class Session {
    *  resubmit dropped the person's adjudication and everything downstream
    *  fell with it. */
   private fallenRemedy(fallen: string, m: MachineDecl): { tool: string; args: Record<string, unknown>; note: string } {
+    // A THIRD CASE, FOUND WHEN THE REMEDY STARTED NAMING THE ROOT (i6). The
+    // first hop is always a state the walk has been through, so it always had
+    // a form to amend. A ROOT NEED NOT HAVE ONE: the honest reason a chain
+    // starts somewhere is often that nobody has walked there yet.
+    //
+    // se_amend on a form that was never submitted patches nothing and reads as
+    // a refusal. There is no claim to fix — there is a state to walk.
+    const signed = (this.stateFormGet(fallen) as { signed?: boolean }).signed === true;
+    if (!signed) {
+      return {
+        tool: "se_aim",
+        args: { to: fallen, go: true },
+        note: `${fallen} has no standing claim to fix — its form is not submitted. Go there, fill it and submit; nothing between it and here can move first.`,
+      };
+    }
     const problems = this.ownClaimProblems(fallen, m);
     if (problems.length === 0) {
       return {
@@ -5861,6 +5913,27 @@ export class Session {
     };
   }
 
+  /** THE RIPPLE NAMES ITS ROOT, NOT ITS FIRST HOP (i6).
+   *
+   *  A fallen claim usually fell because ITS input fell, and that one because
+   *  its own did. The refusal named the first hop, so the reader amended a
+   *  state that was merely waiting, watched nothing change, and asked again.
+   *
+   *  LIVED 2026-08-16, in this iteration: a value outside its vocabulary
+   *  trapped the walk for ELEVEN calls four states later. Three amends were
+   *  aimed at states that were fine. se_why found it in two, because se_why
+   *  already walked the chain and the refusal did not.
+   *
+   *  A ROOT IS A FALLEN CLAIM WITH NO FALLEN INPUT OF ITS OWN. That is where
+   *  work has to happen; everything between it and here is waiting.
+   *
+   *  THE PATH COMES BACK WITH IT, so the reader can see how a state four hops
+   *  away is the reason this one will not go.
+   *
+   *  A CYCLE RETURNS NO ROOT, and the caller falls back to the first hop
+   *  rather than reporting nothing.
+   *
+   *  req-a-ripple-names-its-root */
   claimBlockers(stateId: string, machine?: MachineDecl): Blocker[] {
     const m = machine ?? this.currentMachine();
     const decl = m.states.find((s) => s.id === stateId);
@@ -5874,12 +5947,23 @@ export class Session {
     const claimful = new Set(m.states.filter((s) => s.evidence_form.length > 0 || s.submachine !== undefined).map((s) => s.id));
     const fallen = claimFeeders(m, stateId, claimful).filter((f) => !done.has(f));
     if (fallen.length > 0) {
+      // THE ROOT, NOT THE FIRST HOP (i6). A cycle returns no root, and then
+      // the first hop is still better than silence.
+      const { roots, path } = fallenChain(m, stateId, done, claimful);
+      const at = roots[0] ?? fallen[0];
+      const chain =
+        path.length > 1
+          ? ` THE CHAIN STARTS AT ${roots.join(", ")}: ${path.join(" → ")}. Fixing anything between changes nothing until the root stands.`
+          : "";
       return [
         {
           kind: "fallen_input",
+          // THE NAMES TRAVEL AS DATA, so the chain walk behind se_why follows
+          // this kind instead of reading past it.
+          states: fallen,
           clause: CLAUSES.CONDITION_UNMET,
           expected,
-          got: `${stateId}'s OWN claim may be fine. It is dropped because these inputs are not standing: ${fallen.join(", ")}`,
+          got: `${stateId}'s OWN claim may be fine. It is dropped because these inputs are not standing: ${fallen.join(", ")}.${chain}`,
           // NAME THE VERB, never just the word "re-earn" (i27, 2026-08-14).
           // This remedy used to say se_pull with no arguments, which only
           // repeats the refusal. The agent picked the verb whose NAME matched
@@ -5888,7 +5972,11 @@ export class Session {
           //
           // The engine already knows which verb fits, because it can ask the
           // fallen claim whether its OWN content still passes.
-          remedy: this.fallenRemedy(fallen[0], m),
+          //
+          // AND IT ASKS THE ROOT (i6). Asking the first hop picked the verb
+          // for a state that is merely waiting, so the answer was right about
+          // the wrong subject.
+          remedy: this.fallenRemedy(at, m),
           source: "engine/session.ts claim-guard",
         },
       ];
@@ -5962,6 +6050,7 @@ export class Session {
       if (feeders.length > 0) {
         out.push({
           kind: "unsigned_feeder",
+          states: feeders,
           clause: CLAUSES.CONDITION_UNMET,
           expected: `a state requires ALL its inputs — every feeder form signed before ${stateId} passes`,
           got: `unsigned feeders: ${feeders.join(", ")}`,
@@ -6043,14 +6132,14 @@ export class Session {
       return [];
     }
     if (blockers.length === 0) return [];
+    // BOTH KINDS OF UPSTREAM, READ AS DATA (i6). This parsed the feeder names
+    // out of one blocker's sentence and ignored `fallen_input` entirely — so a
+    // walk held by a ripple was told "the work is here" while the work was
+    // three states upstream.
     const feeders = blockers
-      .filter((b) => b.kind === "unsigned_feeder")
-      .flatMap((b) =>
-        String(b.got)
-          .replace(/^unsigned feeders:\s*/, "")
-          .split(","),
-      )
-      .map((s) => s.trim())
+      .filter((b) => b.kind === "unsigned_feeder" || b.kind === "fallen_input")
+      .flatMap((b) => b.states ?? [])
+      .map((s) => s.slice(s.lastIndexOf("/") + 1))
       .filter((s) => s !== "");
     if (feeders.length === 0) return [{ state: bare, blockers }];
     const upstream = feeders.flatMap((f) => this.greyRoots(f, seen));
@@ -6716,8 +6805,16 @@ export class Session {
   humanTool(name: string, args: Record<string, unknown>): Record<string, unknown> {
     this.gate(name);
     switch (name) {
+      // THE PERSON'S DOOR IS HELD TO THE SAME DEMAND (i6), and reads the same
+      // remedy. The mirror's seed form always sends depends_on, empty box
+      // included — the field was shown, so a blank one is a statement rather
+      // than a silence. requiredDependsOn takes the empty string as [].
       case "se_seed_expedition":
-        return this.expeditionNew(String(args.kind ?? ""), String(args.goal ?? ""));
+        return this.expeditionNew(
+          String(args.kind ?? ""),
+          String(args.goal ?? ""),
+          requiredDependsOn("se_seed_expedition", args.depends_on, { kind: args.kind, goal: args.goal }),
+        );
       case "se_seed_iteration":
         return this.iterationSeed(
           String(args.goal ?? ""),
@@ -6728,6 +6825,7 @@ export class Session {
                 .split(",")
                 .map((s) => s.trim())
                 .filter((s) => s !== ""),
+          requiredDependsOn("se_seed_iteration", args.depends_on, { goal: args.goal, vision: args.vision }),
         );
       case "se_exp_close":
         return this.expeditionClose(args.merge !== false && args.merge !== "false");
@@ -7115,12 +7213,13 @@ export class Session {
     // evidence fields leaves only on a COMPLETE stored form — the claim
     // stands in the record before the walk moves.
     if (inIteration && this.state(top.decl, cur).evidence_form.length > 0) this.assertStateFormMet(cur);
-    this.completeGuarded(top.decl, top.instance, cur, "filled", now, to);
+    const outcome = this.outcomeFor(top.decl, cur, to);
+    this.completeGuarded(top.decl, top.instance, cur, outcome, now, to);
     // Leaving the state is what destroys what it consumed.
     this.consumeDocs(this.state(top.decl, cur));
-    top.instance.history.push({ state: cur, outcome: "filled", at: now });
+    top.instance.history.push({ state: cur, outcome, at: now });
     const prefix = this.subs.map((s) => s.decl.id).join("/");
-    this.instance.history.push({ state: `${prefix}/${cur}`, outcome: "filled", at: now });
+    this.instance.history.push({ state: `${prefix}/${cur}`, outcome, at: now });
     this.seedSubs(); // a sub state may itself host a sub-machine — nesting is arbitrary
     this.autoBind();
     this.notifyChange();
@@ -7148,9 +7247,10 @@ export class Session {
     }
     if (target !== undefined) this.gatePriority(this.machine, [target], channel);
     await this.assertConditions(this.machine, this.state(this.machine, cur), to, channel, supplied);
-    this.completeGuarded(this.machine, this.instance, cur, "filled", now, to);
+    const outcome = this.outcomeFor(this.machine, cur, to);
+    this.completeGuarded(this.machine, this.instance, cur, outcome, now, to);
     this.consumeDocs(this.state(this.machine, cur));
-    this.instance.history.push({ state: cur, outcome: "filled", at: now });
+    this.instance.history.push({ state: cur, outcome, at: now });
     this.seedSubs();
     return this.landing();
   }

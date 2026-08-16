@@ -386,7 +386,7 @@ function svgRoute(route: RouteMarks | undefined, nodeOfState: Map<string, CNode>
   }
   if (stops.length < 2) return parts;
   // A ROAD CLOSURE (owner ruling 2026-07-29). The route already knows the hop
-  // the walk cannot pass — usually a state sitting above the autonomy slider.
+  // the walk cannot pass — usually a state sitting above the autonomy dial.
   // Drawn as one unbroken line the map says the whole way is open, which is
   // the one moment it lies. So the line runs normally up to the closure and
   // FADES past it: the way exists, it is shut.
@@ -1437,8 +1437,8 @@ document.addEventListener("click", (ev) => {
 // THE PARITY LAW — a state's human-callable tools as links; the modal
 // takes the arguments and shows the result in place.
 const HUMAN_TOOLS = {
-  se_seed_expedition: [{ name: "kind", hint: "spike | fix | explore" }, { name: "goal", hint: "what this expedition is after", long: true }],
-  se_seed_iteration: [{ name: "goal", hint: "what this iteration is after", long: true }, { name: "vision", hint: "roughly how — what done looks like", long: true }, { name: "inputs", hint: "context refs, comma-separated: an expedition id, note refs" }],
+  se_seed_expedition: [{ name: "kind", hint: "spike | fix | explore" }, { name: "goal", hint: "what this expedition is after", long: true }, { name: "depends_on", hint: "ids this waits for, comma-separated — leave EMPTY to state that it waits for nothing", always: true }],
+  se_seed_iteration: [{ name: "goal", hint: "what this iteration is after", long: true }, { name: "vision", hint: "roughly how — what done looks like", long: true }, { name: "inputs", hint: "context refs, comma-separated: an expedition id, note refs" }, { name: "depends_on", hint: "ids this waits for, comma-separated — leave EMPTY to state that it waits for nothing; the container orders the work from this", always: true }],
   se_reload: [],
   // No arguments — it just answers. It lives HERE and nowhere else (owner
   // ruling 2026-07-28): human-runnable lane tools are offered through the
@@ -1453,7 +1453,7 @@ function toolModal(name) {
   const fields = HUMAN_TOOLS[name] || [];
   let html = fields.map((f) =>
     '<div style="padding:6px 0 2px"><b>' + f.name + '</b></div><div class="comment-text">' + escText(f.hint) + "</div>" +
-    (f.long ? '<textarea class="formfield toolarg" data-arg="' + f.name + '"></textarea>' : '<input class="formfield toolarg" style="min-height:0" data-arg="' + f.name + '">')
+    (f.long ? '<textarea class="formfield toolarg"' + (f.always ? ' data-always="1"' : '') + ' data-arg="' + f.name + '"></textarea>' : '<input class="formfield toolarg"' + (f.always ? ' data-always="1"' : '') + ' style="min-height:0" data-arg="' + f.name + '">')
   ).join("");
   html += '<div style="padding:10px 0"><button class="primary runtool" data-tool="' + name + '">run</button></div><div id="tool-result"></div>';
   openModal("tool · " + name, html);
@@ -1471,7 +1471,10 @@ document.addEventListener("click", async (ev) => {
   const rt = ev.target.closest ? ev.target.closest(".runtool") : null;
   if (rt) {
     const args = {};
-    document.querySelectorAll(".toolarg").forEach((i) => { if (i.value !== "") args[i.dataset.arg] = i.value; });
+    // AN ALWAYS FIELD SENDS ITS BLANK. Dropping empties is right for an
+    // optional argument and wrong for a required one: the box was shown, so
+    // leaving it empty is the person's answer, not their silence.
+    document.querySelectorAll(".toolarg").forEach((i) => { if (i.value !== "" || i.dataset.always) args[i.dataset.arg] = i.value; });
     const r = await fetch("/tool", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: rt.dataset.tool, args }) });
     const data = await r.json();
     const out = document.getElementById("tool-result");

@@ -1221,28 +1221,55 @@ function refProblems(name: string, meta: TemplateMeta, args: FieldArgs, content:
   return out;
 }
 
-/** COVERAGE IS MUTUAL (owner ruling 2026-08-06). `covers: value-prop` on a
- *  reference field means two things at once, and both are mechanical.
+/** COVERAGE IS MUTUAL (owner ruling 2026-08-06) AND BOTH SIDES ARE COMPUTED
+ *  (owner ruling 2026-08-16). `covers: value-prop` on a reference field means
+ *  two things at once, and neither is a judgment call.
  *
  *  Every referenced node must refine one of the covered type. A story serving
  *  no proposition is work nobody asked for.
  *
- *  And every standing node of that type must be refined by one of them. A
- *  proposition no story serves is a promise nothing shows.
+ *  And every standing node of that type must be refined by SOMETHING IN THE
+ *  CORPUS. A proposition no story serves is a promise nothing shows.
  *
- *  Neither is a judgment call, so neither waits for a reviewer to notice it. */
+ *  THE SECOND HALF USED TO READ THE AGENT'S LISTING, and that was the defect.
+ *  The covered side came from disk and the covering side came from whatever
+ *  the agent typed, so the check could be satisfied by naming nodes without
+ *  examining any of them.
+ *
+ *  MEASURED FOUR TIMES ON i6's OWN WALK, 2026-08-16. write-stories cost five
+ *  typed names, generalize-use-cases twenty-two, write-requirements
+ *  thirty-three, and derive-functions a fifty-five-row table echoed back at
+ *  the engine. Nothing was examined on any of them, and the cost of passing
+ *  grew with the corpus while the value stayed at zero.
+ *
+ *  BOTH SETS ARE ON DISK. The nodes are files and every `refines` edge is in
+ *  frontmatter, so the engine can enumerate the covering side exactly as it
+ *  already enumerates the covered one.
+ *
+ *  WHAT THE FIELD STILL CARRIES is the one thing the corpus cannot answer:
+ *  which nodes THIS delta touched. That is judgment, and it stays.
+ *
+ *  req-a-coverage-check-computes-both-sides */
 function coverProblems(name: string, covers: string, refs: string[], byId: Map<string, TraceNode>, corpus: TraceNode[]): string[] {
   if (covers === "" || covers === undefined) return [];
   const out: string[] = [];
+  // THE LISTED SIDE IS STILL CHECKED, because a node the author names that
+  // serves nothing is a fact about THEIR work rather than about the corpus.
   const orphan = refs.filter((r) => {
     const n = byId.get(r);
     return n !== undefined && !n.refines.some((p) => byId.get(p)?.type === covers);
   });
   if (orphan.length > 0) out.push(`${name}: each one refines a ${covers} — ${orphan.join(" · ")} refines none`);
+  // THE COVERING SIDE IS COMPUTED FROM THE WHOLE CORPUS, not from `refs`.
+  // Every node that refines something of the covered type counts, whether or
+  // not anybody listed it.
   const served = new Set<string>();
-  for (const r of refs) for (const p of byId.get(r)?.refines ?? []) served.add(p);
+  for (const n of corpus) for (const p of n.refines) served.add(p);
   const bare = corpus.filter((n) => n.type === covers && !served.has(n.id)).map((n) => n.id);
-  if (bare.length > 0) out.push(`${name}: each ${covers} is covered — nothing here refines ${bare.join(" · ")}`);
+  // AND THE HOLE IS STILL REFUSED. Computing both sides must not soften the
+  // check into a report: a node of the covered type that NOTHING in the
+  // corpus refines is a real gap, and it is still named by id.
+  if (bare.length > 0) out.push(`${name}: each ${covers} is covered — nothing in the corpus refines ${bare.join(" · ")}`);
   return out;
 }
 
@@ -1449,13 +1476,36 @@ function checklistItemStatus(item: string, lines: Set<string>, corpus?: TraceNod
   return openRaidRef(ref, corpus) ? { kind: "owed", ref } : { kind: "owed_unresolved", ref };
 }
 
-/** Does `ref` name an OPEN entry in the raid register? An owed box points at
- *  a register entry rather than a tick, so the ref has to resolve to a
- *  standing debt — closed, decided or missing entries refuse exactly like an
- *  unchecked box, because there is nobody left holding the claim. */
+/** THE STATUSES WITH NOBODY LEFT HOLDING THE CLAIM. A closed entry is
+ *  finished, a decided one has had its answer, a superseded one was replaced.
+ *  None of the three can carry an owed box. */
+const SETTLED = new Set(["closed", "decided", "superseded"]);
+
+/** Does `ref` name a LIVE entry in the raid register? An owed box points at a
+ *  register entry rather than a tick, so the ref has to resolve to a standing
+ *  debt — settled or missing entries refuse exactly like an unchecked box,
+ *  because there is nobody left holding the claim.
+ *
+ *  IT TESTED `status === "open"` AND ITS OWN COMMENT SAID OTHERWISE (i6). The
+ *  comment named three dead statuses; the code refused all five that are not
+ *  `open`, which are `probed`, `mitigated`, `accepted` and `deferred` — every
+ *  one of them a live entry with an owner and a trigger.
+ *
+ *  ACCEPTED IS THE ONE THAT BIT. Accepted debt is the strongest carrier there
+ *  is: somebody looked at it and decided to ship anyway, on the record. Two
+ *  cloud demonstrations name such an entry in their own text as the reason
+ *  they cannot be observed, and the check called it unresolved.
+ *
+ *  THE CORPUS DISAGREED WITH ITSELF TOO, which is how the narrow rule survived.
+ *  `raid-debt-human-observed-demonstrations` carries live accepted debt as
+ *  `open`; `raid-debt-cloud-validation-needs-a-machine-this-one-cannot-make`
+ *  carries the same shape as `accepted`. Only the first one ever worked here,
+ *  so the rule looked right for as long as nobody used the other. */
 function openRaidRef(ref: string, corpus?: TraceNode[]): boolean {
   const n = (corpus ?? []).find((n) => n.type === "raid" && n.id === ref);
-  return n !== undefined && n.file !== undefined && nodeField(n.file, "status") === "open";
+  if (n === undefined || n.file === undefined) return false;
+  const status = nodeField(n.file, "status");
+  return status !== "" && !SETTLED.has(status);
 }
 
 export function fieldProblems(

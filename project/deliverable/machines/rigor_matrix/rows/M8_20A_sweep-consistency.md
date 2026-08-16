@@ -1,11 +1,13 @@
 ---
 kind: matrix-row
 name: sweep-consistency
-statement: "Sweep the describing surfaces: everything this iteration changed is re-documented where it is taught."
+statement: "Sweep the describing surfaces: everything this iteration changed is re-documented where it is taught, and the corpus reads back clean."
 state_kind: work
 filled_by: agent
 depends_on:
   - fill-story-evidence
+exit_script:
+  - project/deliverable/engine/bin/sweep.ts
 floor: true
 legal_tools:
   - se_file_read
@@ -52,3 +54,15 @@ specification_note: |
 Per [[meth-consistency-sweep]]. A doc that still teaches the superseded way is a defect here, not a later surprise.
 
 LIST WHAT THE ITERATION CHANGED first - the evidence trail has it. Then walk the surface classes on the card, and for each class find every document teaching a changed behavior and fix it. Checking the box is the claim, per class.
+
+## The mechanical half runs on the way out
+
+THE CONFORMANCE SWEEP IS THIS ROW'S EXIT SCRIPT, and it is the engine's rather than the agent's. It reads every node under `project/spec` and reports four kinds: a node that will not parse, a value outside its key's vocabulary, a rule with no way forward, and a rule bound to a node the corpus does not hold.
+
+THE CHECKED BOXES ARE THE JUDGMENT AND THE SWEEP IS THE ARITHMETIC. A person decides whether a document still teaches the current behaviour. Nobody has to decide whether a frontmatter word is in its own list, so nobody is asked.
+
+THERE IS NO VERB FOR IT, ON PURPOSE (owner ruling 2026-08-16). A check that moved out of the write because it costs too much per write must not come back as something an agent can call whenever it feels uncertain. The engine decides when it runs.
+
+IT BLOCKS HERE AND ONLY HERE. The write guard REPORTS a standing break and lands the write; the sweep is where that break finally stops something, and the thing it stops is leaving the state whose job was to clear it.
+
+MEASURED 2026-08-16: 1015 nodes in 388 ms.

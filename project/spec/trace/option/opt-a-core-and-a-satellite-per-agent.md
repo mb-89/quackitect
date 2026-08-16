@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: run one core that knows the whole state and one satellite per agent that knows its own, so an engine change reaches the satellite of the agent who made it and no other
 cluster: cluster-the-walk
 question: how a change to the engine's own code takes effect
-found_by: prior_art
+found_by: prior-art
 source: "owner ruling 2026-08-14: a core system that manages the subsystems, the subsystems know about their own state and the core knows the whole state; it degenerates into one core and one satellite, and every agent gets its own satellite"
 ---
 

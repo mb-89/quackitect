@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: hold a record's working copy inside the process serving it rather than on any volume, so a read is a memory lookup and a write is a memory write, with durable storage touched only when the record lands
 cluster: cluster-the-walk
 question: where a record's working files live while it is open
-found_by: transforming
+found_by: transform
 source: "taking the RAM disk idea and asking what it is FOR — if the point is that the work lives in memory, a volume is one way to get there and the process's own heap is another"
 ---
 

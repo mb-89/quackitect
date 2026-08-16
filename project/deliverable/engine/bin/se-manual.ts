@@ -31,7 +31,7 @@ if (process.argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
   --help            this text (-h, -?)
 
   GET  /            the panel (looking never moves the walk)
-  POST /autonomy    move the session autonomy (the slider posts here)
+  POST /autonomy    move the session autonomy (the dial posts here)
   GET  /api/packet  where the walk stands, as JSON
   GET  /api/alive   position + autonomy — the mirror polls this
   GET  /widget/machine | /widget/details    single widgets (tab/window)

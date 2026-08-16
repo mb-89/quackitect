@@ -6,9 +6,10 @@ kind: assumption
 statement: A conformance check bound to the trace corpus can run on every write and still leave the write inside its one-second budget.
 owner: the driving agent
 trigger: the first bound check that reads more than the file being written
-status: open
+status: probed
+probed_on: 2026-08-16
 probe: "Time a write through se_file_write with one corpus-reading check armed, on the largest realistic corpus. Compare against the same write with no check. If the armed write stays under a second, the write path carries the checks. If it does not, the checks move to a batched runner and the write reports rather than refuses."
-probed: "not yet — no bound check exists to time. The probe is cheap and belongs to this iteration's first build chunk, not to its gates."
+probed: "2026-08-16, and it HOLDS with two orders of magnitude of margin for a content-only check. The call log records duration_ms on every write. Twelve consecutive se_file_write calls of 2251 to 3086 bytes ran in 4 to 12 ms against a 1000 ms budget. What stays open is the corpus-READING half, which no check exercises yet."
 impact: The whole thesis rests on it. Conformance runs at the WRITE precisely so a broken rule is heard when it is cheap. If a check cannot fit in a write, the checks fall back to a review and this iteration has rebuilt what it set out to replace.
 breaks_how_badly: crippling
 how_likely: plausible

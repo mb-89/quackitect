@@ -374,7 +374,7 @@ test("se_answer records an aq entry and the feed types it aq", async () => {
   assert.equal(aq?.brief, "Where does the ruling live?", "the feed line is the question");
 });
 
-test("se_test: one job formats then runs both scripts with structured verdicts", async () => {
+test("se_test: one job formats, runs both scripts and sweeps, with structured verdicts", async () => {
   const root = freshRoot();
   const server = await bootedServer(root);
   // FORCE, BECAUSE THIS CASE PROVES THE BATTERY'S SHAPE and does not earn one
@@ -386,9 +386,13 @@ test("se_test: one job formats then runs both scripts with structured verdicts",
   assert.equal(started.body.handed_off, true, JSON.stringify(started.body));
   const body = await waitForTestJob(server, String(started.body.job));
   const results = body.results as { script: string; ok: boolean; output: string }[];
-  assert.equal(results.length, 3);
+  // FOUR SINCE i6: the CONFORMANCE SWEEP rides the battery. There is no verb
+  // for it, so the engine runs it where it decides — the boot, this row's
+  // sibling at sweep-consistency, and here.
+  assert.equal(results.length, 4, JSON.stringify(results.map((r) => r.script)));
   assert.equal(results[0].script, "biome check --write --error-on-warnings .");
   assert.equal(results[1].script, "project/deliverable/engine/bin/preflight.ts");
   assert.equal(results[2].script, "project/deliverable/engine/bin/selftest.ts");
+  assert.equal(results[3].script, "project/deliverable/engine/bin/sweep.ts");
   assert.equal(body.ok, true, JSON.stringify(results));
 });

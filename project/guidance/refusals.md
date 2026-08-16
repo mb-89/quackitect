@@ -81,6 +81,31 @@ TWO CASES STILL REFUSE, and both are the same rule: the lane does not guess.
 
 The refusal names the candidates it considered.
 
+### SE-C-138 — the write would leave the corpus unreadable
+A corpus node's frontmatter must parse. A write carrying frontmatter the
+engine's own reader cannot load is refused BEFORE anything lands.
+
+THE COMMON CAUSE IS ONE COLON. A colon followed by a space inside an
+unquoted YAML value reads as a nested mapping. `impact: The second is worse:
+it taxes an unrelated edit` does not parse; quoting the whole value fixes it.
+
+THE REFUSAL CARRIES FOUR THINGS, because three of them are a diagnosis and
+the fourth is what makes it actionable.
+
+- the file
+- the line, counted in the file rather than in the block
+- the offending line, quoted back
+- the fix, as the same value quoted
+
+WHY IT IS A REFUSAL AND NOT A REPORT. The break arrived with THIS write, so
+the author is present and one edit closes it. A break the corpus already
+carried lands and reports instead — that is the seam, and it turns on who
+caused it rather than on how serious it is.
+
+MEASURED, on 2026-08-16: a write carrying this shape was accepted, and the
+next pull threw naming a line and a column in no particular file. Four calls
+to find and fix. One refusal here costs none.
+
 ### SE-C-102 — the path escapes the root
 Paths are root-relative to the project root. Outside the root there are two
 doors only: a committed `ref` for the past, a declared `@name` root for
@@ -156,21 +181,40 @@ The ladder blocks after one warned run.
 
 ## Tests
 
-### SE-C-130 — the tree is unchanged
-An unchanged tree keeps its last verdict. Re-running proves nothing.
-`force: true` is the flake door, and only that.
+### SE-C-136 — a run with no question
+Say what you want to know, in one line. The engine says which tests ran; only
+this says why you asked, and the record keeps it.
 
-### SE-C-131 — the wrong test scope
-Tests answer a question: did THIS change break THAT. A scoped run answers a
-small diff. The battery is for when the diff outgrows scoped runs — the
-refusal computes the flip point and hands you the right call.
+### Two retired clauses — the test scope, once SE-C-130 and SE-C-131
+RETIRED by owner ruling, 2026-08-16. THE AGENT ASKS FOR A TEST AND THE ENGINE
+DECIDES WHAT RUNS. Neither number is reused, and nothing here claims them.
 
-### SE-C-136 — a scoped run with no question
-Say what the run answers, in one line. The scope already says which tests
-ran. Only the question says why, and the record keeps it.
+WHAT THEY WERE FOR. SE-C-130 refused a re-run over an unchanged tree.
+SE-C-131 graded the scope: it refused the battery while every change mapped to
+a scoped run, and refused scoped runs once piecemeal coverage crossed a flip.
 
-The battery needs none. Its question is fixed and always the same: does the
-whole tree still stand.
+WHY THEY ARE GONE. They guarded the same decision from opposite sides, and on
+2026-08-16 they closed on each other. At i6's sixth build chunk the odometer
+stood at 42 and the battery was illegal outside verification, so NO TEST CALL
+WAS LEGAL — with four milestones still to walk before the state that fires the
+battery. Each refusal's remedy was the other refusal. Narrowing to one file
+changed nothing, because the flip counts the odometer rather than the call.
+
+THE CAUSE WAS NOT THE THRESHOLD. It was that the AGENT chose the scope and the
+ENGINE graded the choice. Two graders with different subjects eventually
+disagree, and an agent standing between them has no move.
+
+WHAT REPLACED THEM is a decision rather than a pair of refusals. `se_test`
+takes a `question` and nothing else. The engine reads what changed, picks the
+battery, a named set of files, or nothing at all, and the verdict carries
+`decided: {scope, files, why}`.
+
+NOTHING IS NOW AN ANSWER. An unchanged tree keeps its last verdict and the
+result says so, which is what SE-C-130 meant and could not do without
+stopping the walk.
+
+`force: true` REMAINS, and it is the one thing a person asks for directly: a
+flake hunt, which is the whole suite by definition.
 
 ## The walk
 

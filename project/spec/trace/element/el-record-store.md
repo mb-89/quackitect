@@ -2,7 +2,7 @@
 minted_in: i1
 id: el-record-store
 type: "[[element]]"
-statement: Holds the records — what exists is read from git branches, never from folders on disk.
+statement: Holds the records — what exists is read from the folders on trunk, in one batched call.
 kind: existing
 realization: make
 group: the-record-life
@@ -20,18 +20,23 @@ source_refs:
 
 ## What it does
 
-The record life's substrate is git branches. What records exist is answered by
-branches, so a machine sees work it has never downloaded.
+The record life's substrate is ONE TREE. What records exist is answered by the
+folders standing on trunk, so a clone that has trunk has every record.
 
-Landing is one piece onto trunk with a fresh green. Closing refuses loose
-ends. The archive lists every closed record as it closed, read-only, and needs
-no folder anywhere.
+Closing refuses loose ends and leaves the folder where it is. The archive lists
+every closed record as it closed, read-only, from those same folders.
+
+THIS SECTION SAID THE OPPOSITE UNTIL i6's SWEEP. It read "the substrate is git
+branches" and "needs no folder anywhere", while the section below it recorded
+i34 removing exactly that. One file, two answers, and the newer one was right.
 
 ## How the list is read
 
-THE LIST READS FROM TRUNK, never from each branch tip, and it reads in ONE
-batched call. Asking git once per iteration measured 1004 ms over 33 branches
-against 58.7 ms batched ([[raid-dec-git-is-the-list-of-iterations]]).
+THE LIST READS FROM TRUNK and it reads in ONE batched call. Asking git once per
+iteration measured 1004 ms over 33 branches against 58.7 ms batched
+([[raid-dec-git-is-the-list-of-iterations]]). That measurement is why the read
+is batched; since i34 it reads directories rather than refs, and the reason for
+batching is unchanged.
 
 ## What moved away from it, and then came back
 

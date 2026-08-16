@@ -290,30 +290,15 @@ function saveTestState(seDir: string, s: TestState): void {
   writeFileSync(testStatePath(seDir), JSON.stringify(s, null, 1), "utf8");
 }
 
-/** One scope, one memory. The battery and every scoped set each remember the
- *  tree they judged; an identical tree refuses (SE-C-130) — force is the
- *  flake door. */
-export function testGate(seDir: string, root: string, force: boolean, scope = "battery"): void {
-  if (force) return;
-  const fp = testFingerprint(root);
-  if (fp === "") return;
-  const state = loadTestState(seDir);
-  const last = scope === "battery" ? state.battery : state.scoped?.[scope];
-  if (last === undefined || last.fingerprint !== fp) return;
-  throw new Rejection({
-    clause: CLAUSES.TEST_UNCHANGED,
-    expected: "a tracked change since the last run of this scope — nothing moved, so its verdict still stands",
-    got: `an identical tree (${scope === "battery" ? "battery" : scope} was ${last.ok ? "GREEN" : "RED"} at ${last.ts})`,
-    remedy: {
-      tool: "se_test",
-      args: { force: true },
-      note: last.ok
-        ? "that green still stands — force repeats it anyway (flake hunt is the one honest reason)"
-        : "that red still stands: the same tree fails the same way — change something, then run",
-    },
-    source: SRC,
-  });
-}
+// `testGate` IS DELETED (owner ruling 2026-08-16), with SE-C-130 and SE-C-131.
+//
+// It refused a re-run over an identical tree. `decideScope` answers the same
+// question without refusing anything: scope "nothing", with the standing
+// verdict quoted back. An unchanged tree is news, not an obstacle.
+//
+// NOTHING IN THE LANE EVER CALLED IT after the rewrite. Its own tests were the
+// only callers left, so the refusal it threw could not be seen by anybody — and
+// a clause nobody can reach is a documented promise the engine does not keep.
 
 export function testRecord(
   seDir: string,
@@ -432,49 +417,146 @@ export function mapChangedToTests(root: string, changed: string[]): { mapped: st
   return { mapped: [...mapped].sort(), unmapped };
 }
 
-/** THE BATTERY GATE. Refuses (SE-C-131) when every change since the last
- *  green battery maps to a scoped run — and the refusal HANDS OVER that
- *  scoped call, computed from the diff. The battery is granted when: force,
- *  no battery memory yet, an unmapped change exists, the last battery was
- *  red, or the piecemeal odometer crossed the flip. */
-export function batteryGate(seDir: string, root: string, force: boolean): void {
-  if (force) return;
-  const state = loadTestState(seDir);
-  if (state.battery === undefined || state.battery.ok === false) return;
-  if ((state.scoped_since_battery ?? []).length >= flipThreshold(root)) return; // the flip GRANTS it
-  const changed = changedSinceBattery(root, seDir);
-  if (changed === undefined || changed.length === 0) return; // no git / nothing changed: SE-C-130's business
-  const { mapped, unmapped } = mapChangedToTests(root, changed);
-  if (unmapped.length > 0 || mapped.length === 0) return;
-  throw new Rejection({
-    clause: CLAUSES.TEST_SCOPE,
-    expected: "a scoped run — every change since the last green battery has a named test file",
-    got: `a full battery over changes covered by: ${mapped.join(", ")}`,
-    remedy: {
-      tool: "se_test",
-      args: { files: mapped },
-      note: "the scoped run answers this diff in seconds; the battery re-earns its place when a change has no mapped test, or piecemeal coverage crosses the flip",
-    },
-    source: SRC,
-  });
+/** WHAT THE ENGINE DECIDED TO RUN, and why. */
+export interface ScopeDecision {
+  /** battery, a named set of test files, or nothing at all. */
+  scope: "battery" | "scoped" | "nothing";
+  /** The files a scoped run covers. Empty for battery and for nothing. */
+  files: string[];
+  /** One line the agent shows the reader. The engine's reasoning, not a hint. */
+  why: string;
+  /** WHETHER THIS DIFF WANTS THE CONFORMANCE SWEEP TOO (owner ruling
+   *  2026-08-16). A change made of DOCUMENTS is exactly the change a test
+   *  battery says nothing about and the sweep says everything about.
+   *
+   *  IT RIDES THE TEST DECISION BECAUSE THE SWEEP HAS NO VERB. The engine
+   *  already reads the diff here to size the run; asking one more question of
+   *  the same diff costs nothing and gives the sweep a third mechanically
+   *  clear moment, beside the boot and sweep-consistency's exit. */
+  sweep: boolean;
 }
 
-/** THE FLIP. Once distinct scoped files since the last battery cross the
- *  threshold, further piecemeal runs refuse TOWARD the battery — running the
- *  suite one file at a time is never cheaper than running the suite. */
-export function scopedGate(seDir: string, root: string, files: string[], force: boolean): void {
-  if (force) return;
-  const seen = new Set(loadTestState(seDir).scoped_since_battery ?? []);
-  for (const f of files) seen.add(f);
+/** A CORPUS DOCUMENT: markdown under the spec or the method. Code has tests
+ *  that answer for it; these have the sweep and nothing else. */
+function isDocument(rel: string): boolean {
+  const p = rel.replace(/\\/g, "/");
+  if (!p.endsWith(".md")) return false;
+  return p.includes("project/spec/") || p.includes("/machines/") || p.includes("project/guidance/");
+}
+
+/** HALF THE DIFF OR MORE, and at least three of them. One document beside a
+ *  code change is ordinary; a diff that is mostly prose is a different kind of
+ *  change, and the battery is the wrong question to ask about it. */
+function mostlyDocuments(changed: string[]): boolean {
+  const docs = changed.filter(isDocument).length;
+  return docs >= 3 && docs * 2 >= changed.length;
+}
+
+/** THE ENGINE DECIDES WHAT GETS TESTED, AND THE AGENT NEVER DOES (owner
+ *  ruling 2026-08-16).
+ *
+ *  THE AGENT ASKS FOR A TEST AND SAYS WHAT IT WANTS TO KNOW. This function
+ *  reads what actually changed, picks the scope, and the result SAYS what it
+ *  picked. There is no argument the agent can pass to widen or narrow it.
+ *
+ *  WHAT IT REPLACED, and why the replacement is structural rather than a
+ *  threshold tweak. Two refusals used to guard this from opposite sides:
+ *  batteryGate refused the battery while every change mapped to a scoped run,
+ *  and scopedGate refused scoped runs once the piecemeal odometer crossed the
+ *  flip. Each refusal's remedy was the OTHER refusal.
+ *
+ *  ON 2026-08-16 THEY CLOSED ON EACH OTHER. At i6's sixth build chunk the
+ *  odometer stood at 42 and the battery was illegal outside verification, so
+ *  no test call was legal at all — with four milestones still to walk before
+ *  the state that fires the battery. Narrowing to one file changed nothing,
+ *  because the flip counts the odometer rather than the call.
+ *
+ *  THE CAUSE WAS NOT THE THRESHOLD. It was that the agent chose the scope and
+ *  the engine graded the choice. Two graders with different subjects will
+ *  eventually disagree, and an agent standing between them has no move. Now
+ *  there is one decider and nothing to disagree with. */
+export function decideScope(seDir: string, root: string, force: boolean): ScopeDecision {
+  const state = loadTestState(seDir);
+  const seen = state.scoped_since_battery ?? [];
   const threshold = flipThreshold(root);
-  if (seen.size < threshold) return;
-  throw new Rejection({
-    clause: CLAUSES.TEST_SCOPE,
-    expected: `scoped runs below the flip (${threshold} distinct files since the last battery)`,
-    got: `${seen.size} distinct files piecemeal — the battery is now the cheaper call`,
-    remedy: { tool: "se_test", args: {}, note: "run the battery; it resets the odometer and covers everything at once" },
-    source: SRC,
-  });
+
+  // A FLAKE HUNT IS THE ONE THING THE PERSON ASKS FOR DIRECTLY, and it is the
+  // whole battery by definition — a flake is not known to live in one file.
+  if (force) return { scope: "battery", files: [], why: "force: a flake hunt runs everything", sweep: true };
+
+  // NO MEMORY, OR A STANDING RED. Neither leaves anything to be scoped against.
+  if (state.battery === undefined) {
+    return { scope: "battery", files: [], why: "no battery has run here yet, so there is no baseline to scope against", sweep: true };
+  }
+  if (state.battery.ok === false) {
+    return {
+      scope: "battery",
+      files: [],
+      why: "the last battery was RED — a standing failure is re-run whole until it is understood",
+      sweep: true,
+    };
+  }
+
+  const changed = changedSinceBattery(root, seDir);
+  if (changed === undefined) {
+    return { scope: "battery", files: [], why: "git cannot say what changed, so the safe answer is everything", sweep: true };
+  }
+  // THE DIFF ANSWERS ONE MORE QUESTION while it is open. Documents get the
+  // sweep whatever the test scope turns out to be.
+  const sweep = mostlyDocuments(changed);
+  // NOTHING MOVED. The last verdict still stands, and re-running proves
+  // nothing. This used to be SE-C-130's refusal; it is now an ANSWER.
+  if (changed.length === 0) {
+    return {
+      scope: "nothing",
+      files: [],
+      why: `nothing has changed since the last battery, which was ${state.battery.ok ? "GREEN" : "RED"} at ${state.battery.ts} — that verdict still stands`,
+      sweep: false,
+    };
+  }
+
+  const { mapped, unmapped } = mapChangedToTests(root, changed);
+  if (unmapped.length > 0) {
+    return {
+      scope: "battery",
+      files: [],
+      why: `${String(unmapped.length)} changed file(s) have no test that answers for them (${unmapped.slice(0, 3).join(", ")}${unmapped.length > 3 ? ", …" : ""}), so no scoped run covers this diff`,
+      sweep,
+    };
+  }
+  if (mapped.length === 0) {
+    // A DIFF OF PURE DOCUMENTS LANDS HERE, and the battery is the wrong answer
+    // to it. The sweep is the check that reads documents, so it rides along
+    // and the `why` says which question was actually asked.
+    return {
+      scope: "battery",
+      files: [],
+      why: sweep
+        ? "the diff is mostly DOCUMENTS and maps to no test file, so the sweep is the check that answers it — the battery runs behind it"
+        : "the diff maps to no test file at all, so nothing narrower is possible",
+      sweep,
+    };
+  }
+
+  // THE FLIP. Running the suite one file at a time is never cheaper than
+  // running the suite. This used to REFUSE toward the battery; it now simply
+  // IS the battery, which is what it always meant.
+  const wouldSee = new Set([...seen, ...mapped]);
+  if (wouldSee.size >= threshold) {
+    return {
+      scope: "battery",
+      files: [],
+      why: `${String(wouldSee.size)} distinct files would have run piecemeal since the last battery (flip ${String(threshold)}) — the whole suite is now the cheaper call`,
+      sweep,
+    };
+  }
+
+  return {
+    scope: "scoped",
+    files: mapped,
+    why: `${String(changed.length)} changed file(s) map to ${String(mapped.length)} test file(s), and every change is covered`,
+    sweep,
+  };
 }
 
 // ── TAP, structured ────────────────────────────────────────────────────────
@@ -482,11 +564,39 @@ export function scopedGate(seDir: string, root: string, files: string[], force: 
 // run cap and a failure's stack lives somewhere in the flood. A structured
 // verdict carries the counts and ONLY the failures' detail — the slice the
 // greps were always after.
+/** TWO REDS LOOK IDENTICAL IN THE COUNTS, and only one of them is news (i6).
+ *
+ *  - `assertion` — the check ran, reached its expectation, and the expectation
+ *    was unmet. That is the design not yet realized.
+ *  - `crash` — the check threw before reaching any expectation. A missing
+ *    import, a typo in a helper, a file that does not parse.
+ *
+ *  `# fail 4` is the same four either way, which is why observe-red used to
+ *  pass on an instrument failure. The distinction was already on the wire and
+ *  was being thrown away.
+ *
+ *  req-a-red-is-an-assertion-not-a-crash */
+export type FailureKind = "assertion" | "crash";
+
+export interface TapFailure {
+  name: string;
+  detail: string;
+  kind: FailureKind;
+}
+
 export interface TapResult {
   total: number;
   pass: number;
   fail: number;
-  failures: { name: string; detail: string }[];
+  failures: TapFailure[];
+}
+
+/** Node's TAP reporter writes a diagnostic block under each `not ok`, and an
+ *  assertion failure carries `code: 'ERR_ASSERTION'` in it. Nothing new has to
+ *  be measured. Quotes are optional here because reporters differ on them and
+ *  the code itself is the signal. */
+function failureKind(detail: string): FailureKind {
+  return /^\s*code:\s*["']?ERR_ASSERTION["']?\s*$/m.test(detail) ? "assertion" : "crash";
 }
 
 export function parseTap(out: string): TapResult {
@@ -521,7 +631,10 @@ export function parseTap(out: string): TapResult {
       if (/^\s*(not )?ok \d+ - /.test(l) || /^\s*# /.test(l)) break;
       detail.push(l);
     }
-    res.failures.push({ name: notOk[2], detail: capMiddle(detail.join("\n"), 2000) });
+    const body = detail.join("\n");
+    // THE KIND IS READ BEFORE THE CAP. capMiddle drops the middle of a long
+    // block, and the diagnostic keys sit exactly there.
+    res.failures.push({ name: notOk[2], detail: capMiddle(body, 2000), kind: failureKind(body) });
   }
   // THE ROLL-UP IS DROPPED WHERE A LEAF SURVIVED IT. A parent saying "1 subtest
   // failed" is the shape of a report with the report removed, and it is only

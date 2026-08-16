@@ -13,6 +13,7 @@ satisfies:
   - req-test-result-is-structured
   - req-red-is-never-carried
   - req-first-green-needs-a-red
+  - req-a-red-is-an-assertion-not-a-crash
 inputs:
   - flow-test-question
   - flow-worktree
@@ -37,3 +38,9 @@ still behaves. The two share nothing but the word check.
 Withholding a first green that never went red belongs here for the same
 reason: it is a statement about what the run PROVED, which only the thing
 that ran it can know.
+
+AND SO IS TELLING AN ASSERTION FROM A CRASH (i6). A check that crashes
+from birth proves as little as one that is green from birth — it never
+reached its expectation, so nothing about the design was measured. The
+counts cannot tell the two apart and the run's own report can, which puts
+the distinction with the thing that ran it.

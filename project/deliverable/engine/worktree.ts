@@ -5,11 +5,12 @@
 // the record; the archive is git history (exp/* branches).
 
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { RECORD_FINISHED } from "./iterations.ts";
 import { parseStateNote, passEpoch, readNode, writeNode } from "./notes.ts";
+import { dependsOnLines } from "./seed.ts";
 
 /** Free prose as a YAML scalar. Backslashes first, then quotes — the other
  *  order doubles the escape it just added. */
@@ -155,127 +156,44 @@ export function readRecord(root: string, e: Expedition): Record<string, unknown>
 // THE ARCHIVE LIVES ON DISK NOW, so the folder is still there and there is
 // nothing to retrieve.
 
-/** THE BRANCH LISTING IS A SPAWNED PROCESS, AND ONE RENDER ASKS FOUR TIMES.
- *  The expeditions container, the expedition archive, the iterations
- *  container and the iteration archive each want a list, so each render paid
- *  four git processes - 4.9 seconds of one profiled session sat inside
- *  spawnSync under exactly these two callers.
- *
- *  IT WAS A ONE-SECOND TTL AND THAT WAS THE WRONG SHAPE (measured
- *  2026-08-09). A timer only helps when the burst is shorter than the timer.
- *  Entering a record takes 3.7 s and the mirror polls every second, so the
- *  window was GUARANTEED to lapse mid-operation and spawn again. A profile of
- *  that entry found 301 ticks with 20.6 % in JavaScript: the walk was not
- *  computing, it was BLOCKED, and a bare git spawn is 40.6 ms of blocking.
- *
- *  SO IT IS STAMPED, NOT TIMED. The answer changes when git's ref store
- *  changes, and that is a stat rather than a clock. Same rule as the corpus
- *  (software.md): key the answer to a hash of its input, and recompute when
- *  the input moves rather than when a timer says so.
- *
- *  WHY STATTING THE SUBDIRECTORIES. Our globs are `it/*` and `exp/*`, so the
- *  refs live one level down and the parent's mtime does not move when a child
- *  is added. A directory's mtime DOES move when one of its own entries is
- *  created or removed, which is exactly the change a NAME listing cares
- *  about. A branch repointed to a new commit rewrites a file without renaming
- *  it, and that cannot change this answer.
- *
- *  Anything in the lane that moves a ref still calls bustBranchList. */
-const branchList = new Map<string, { stamp: string; branches?: string[]; failure?: Rejection }>();
-
-/** The four ref paths, stat'd once per pass. Every branch list asks for this
- *  and the walk asks for branch lists constantly — 1,580 stats to enter one
- *  record, for four files that cannot move inside one synchronous operation. */
-const REF_STAMP = new Map<string, { epoch: number; value: string }>();
-
-function refStamp(root: string): string {
-  const era = passEpoch();
-  const seen = REF_STAMP.get(root);
-  if (seen !== undefined && era !== 0 && seen.epoch === era) return seen.value;
-  const value = refStampNow(root);
-  if (era !== 0) REF_STAMP.set(root, { epoch: era, value });
-  return value;
-}
-
-function refStampNow(root: string): string {
-  const g = join(root, ".git");
-  const parts: string[] = [];
-  // THE REMOTE HALF IS STAMPED TOO, since listBranches now reads it: a
-  // fetch that brought a new pushed record would otherwise leave the
-  // cached listing standing, and the record would stay invisible until
-  // something local happened to move.
-  for (const p of [
-    join(g, "packed-refs"),
-    join(g, "refs", "heads"),
-    join(g, "refs", "heads", "it"),
-    join(g, "refs", "heads", "exp"),
-    join(g, "refs", "remotes", "origin"),
-    join(g, "refs", "remotes", "origin", "it"),
-    join(g, "refs", "remotes", "origin", "exp"),
-  ]) {
-    try {
-      const s = statSync(p);
-      parts.push(`${s.size}:${s.mtimeMs}`);
-    } catch {
-      parts.push("gone");
-    }
-  }
-  return parts.join("|");
-}
-
-export function bustBranchList(): void {
-  branchList.clear();
-  REF_STAMP.clear();
-  EXP_LIST.clear();
-}
-
-export function listBranches(root: string, glob: string): string[] {
-  const key = `${root} :: ${glob}`;
-  const stamp = refStamp(root);
-  const hit = branchList.get(key);
-  if (hit !== undefined && hit.stamp === stamp) {
-    if (hit.branches !== undefined) return hit.branches;
-    // A FAILURE IS CACHED TOO (profiled 2026-08-02): a root with no
-    // repository failed this spawn dozens of times per walk — half a
-    // second of every booted suite walk — because only successes were
-    // remembered.
-    throw hit.failure;
-  }
-  try {
-    // LOCAL AND PUSHED BOTH COUNT (2026-08-12, first run on a second
-    // machine). A fresh clone carries no local it/* or exp/* branches at
-    // all — git creates a local branch only for the one it checks out — so
-    // a machine-local listing made every pushed record INVISIBLE. The
-    // container, the survey and the archive all read empty on a box that
-    // had just cloned the repo, and the record the walk was sent to run
-    // could not be seen from the machine sent to run it.
-    //
-    // The remote half is normalised to its short name (origin/it/i8 reads
-    // as it/i8) and merged with the local half, so a record standing on
-    // both sides is listed exactly once. The symbolic origin/HEAD entry
-    // carries an arrow and is dropped.
-    const lines = (out: string): string[] =>
-      out
-        .split("\n")
-        .map((b) => b.trim())
-        .filter((b) => b !== "" && !b.includes("->"));
-    const local = lines(git(root, ["branch", "--list", glob, "--format=%(refname:short)"], "branch --list"));
-    const remote = lines(
-      git(root, ["branch", "--remotes", "--list", `*/${glob}`, "--format=%(refname:short)"], "branch --list --remotes"),
-    ).map((b) => b.slice(b.indexOf("/") + 1));
-    const branches = [...new Set([...local, ...remote])];
-    branchList.set(key, { stamp, branches });
-    return branches;
-  } catch (e) {
-    if (e instanceof Rejection) branchList.set(key, { stamp, failure: e });
-    throw e;
-  }
-}
+// THE BRANCH LISTING IS GONE, AND WITH IT ITS CACHE (i6).
+//
+// `listBranches` answered one question: which records exist? It read local and
+// pushed `it/*` and `exp/*` branches and merged them. i34 made a record a
+// FOLDER on trunk, so `itList` and `expList` read directories and the branch
+// listing had no caller left. It was still exported, still cached, still
+// stat'ing seven ref paths per pass.
+//
+// WHAT WENT WITH IT.
+//
+// - `branchList`, the stamp-keyed listing cache.
+// - `REF_STAMP` and `refStamp`/`refStampNow`, seven stats that existed only to
+//   key that cache.
+// - `bustBranchList`, whose own comment said the lane's seed and close both
+//   called it. Neither did, by then.
+//
+// THE EXPEDITION CACHE STAYS. `EXP_LIST` is keyed on the pass epoch and needs
+// no buster: a pass is one synchronous operation, and outside a pass the epoch
+// is 0 and nothing is cached at all.
+//
+// WHAT THIS UNBLOCKS: nothing in the engine reads `origin/it/*` any more, so
+// the twenty-six leftover branches on the remote can be deleted. That deletion
+// is the owner's own act — the agent never pushes.
+//
+// THE MEASUREMENT THE OLD CACHE WAS BUILT ON, kept because it is the reason
+// the cache existed rather than a reason to keep it: one render asked for four
+// listings, 4.9 seconds of a profiled session sat inside spawnSync under those
+// callers, and entering one record cost 1,580 stats.
 
 /** One existsSync per expedition, and the walk asks for the whole list over
  *  and over: 5,824 of them to enter one record. Inside a pass the answer is
- *  built once — a worktree cannot appear halfway through a synchronous
- *  operation, and the lane's own seed and close both call bustBranchList. */
+ *  built once — a folder cannot appear halfway through a synchronous
+ *  operation.
+ *
+ *  NO BUSTER, AND NONE IS MISSING (i6). `bustBranchList` used to clear this
+ *  and was deleted with the branch listing it was named for. Nothing called
+ *  it. The epoch does the work: outside a pass `passEpoch()` is 0 and nothing
+ *  is cached at all. */
 const EXP_LIST = new Map<string, { epoch: number; value: Expedition[] }>();
 
 /** EVERY EXPEDITION IS A FOLDER ON TRUNK, and OPEN comes from its own status
@@ -312,14 +230,18 @@ export function expList(root: string): Expedition[] {
   return out;
 }
 
-export function expNew(root: string, kind: string, goal: string): Expedition {
+export function expNew(root: string, kind: string, goal: string, dependsOn: string[] = []): Expedition {
   const KINDS = ["spike", "fix", "explore"];
   if (!KINDS.includes(kind)) {
     throw new Rejection({
       clause: CLAUSES.REQUIRED_ARGS,
       expected: `kind: ${KINDS.join(" | ")}`,
       got: JSON.stringify(kind),
-      remedy: { tool: "se_seed_expedition", args: { kind: "spike", goal }, note: "declare what kind of expedition this is" },
+      remedy: {
+        tool: "se_seed_expedition",
+        args: { kind: "spike", goal, depends_on: [] },
+        note: "declare what kind of expedition this is; depends_on: [] states that it waits for nothing",
+      },
       source: SRC,
     });
   }
@@ -343,6 +265,10 @@ export function expNew(root: string, kind: string, goal: string): Expedition {
       "status: open",
       `opened: ${new Date().toISOString()}`,
       `goal: ${JSON.stringify(goal)}`,
+      // THE SEED STATES ITS DEPENDENCY, AND AN EXPEDITION IS A SEED (i6). It
+      // waits less often than an iteration does, which is exactly why the
+      // silence used to pass unnoticed here.
+      ...dependsOnLines(dependsOn),
       "---",
       "",
       `# ${id}`,

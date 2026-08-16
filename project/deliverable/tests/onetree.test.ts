@@ -33,6 +33,7 @@ async function seed(server: Awaited<ReturnType<typeof bootedServer>>, n: number)
   const r = await call(server, "se_seed_iteration", {
     goal: `open iteration number ${n}`,
     vision: `seeded so i34's demands can be driven against a real container`,
+    depends_on: [],
   });
   const id = String((r.body as { seeded?: string }).seeded ?? "");
   assert.notEqual(id, "", `the seed answers with its id: ${JSON.stringify(r.body)}`);

@@ -22,7 +22,7 @@ evidence:
     template: refs
     of: story
     covers: value-prop
-    description: every story as a node reference, one per line — the deck lives in the node, this field never restates it
+    description: the stories THIS delta touched, one node reference per line — the corpus answers which exist, and only you know which this record moved
 major: full
 minor: tailored
 patch: none

@@ -10,6 +10,7 @@ implements:
   - fn-run-a-governed-walk
   - fn-run-a-governed-walk.serve-a-step
   - fn-run-a-governed-walk.judge-a-claim
+  - fn-run-a-governed-walk.guard-a-write
   - fn-run-a-governed-walk.help-find-a-capability
 source_refs:
   - cand-thin-worktree

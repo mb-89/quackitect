@@ -57,7 +57,7 @@ evidence:
     template: refs
     of: requirement
     covers: use-case
-    description: every requirement as a node reference, one per line — the node carries the demand, this field never restates it
+    description: the requirements THIS delta touched, one node reference per line — the corpus answers which exist, and only you know which this record moved
   - name: set_criteria
     template: per-item
     items:
