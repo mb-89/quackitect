@@ -83,7 +83,7 @@ test("the declared runtime floor is one the engine can actually run on", () => {
 test("the cloud runner's guidance exists and the entrypoint hands it over", () => {
   const card = join(DELIVERABLE, "..", "guidance", "method", "cloud-runner.md");
   const text = readFileSync(card, "utf8");
-  for (const owed of ["se_pull", "engines.node", "se_note", "claim"]) {
+  for (const owed of ["se_pull", "engines.node", "se_note"]) {
     assert.ok(text.includes(owed), `the cloud-runner card must tell an unattended agent about ${owed}`);
   }
   assert.ok(
@@ -97,13 +97,14 @@ test("the cloud runner's guidance exists and the entrypoint hands it over", () =
 //
 // IT NOW CHECKS BOTH DIRECTIONS. It asserted only that no die() named a
 // stranger, so deleting six of the seven steps kept it green.
-test("every entrypoint failure names exactly one of the seven steps", () => {
-  const steps = ["verify", "install", "start", "wait", "fetch", "adopt", "launch"];
+test("every entrypoint failure names exactly one of the six steps", () => {
+  // SIX SINCE i34: `adopt` went with the claim system it existed to call.
+  const steps = ["verify", "install", "start", "wait", "fetch", "launch"];
   const named = [...SOURCE.matchAll(/\bdie\("([a-z]+)"/g)].map((m) => m[1]);
   const strangers = named.filter((n) => !steps.includes(n));
-  assert.deepEqual(strangers, [], `every die() names one of the seven steps; these do not: ${strangers.join(", ")}`);
+  assert.deepEqual(strangers, [], `every die() names one of the six steps; these do not: ${strangers.join(", ")}`);
   const missing = steps.filter((s) => !named.includes(s));
-  assert.deepEqual(missing, [], `every one of the seven steps must have a way to fail loudly; these have none: ${missing.join(", ")}`);
+  assert.deepEqual(missing, [], `every one of the six steps must have a way to fail loudly; these have none: ${missing.join(", ")}`);
 });
 
 // A CALLER WHO FORGOT AN ARGUMENT IS NOT A FAILING STEP. It exited as
@@ -112,7 +113,7 @@ test("a usage error exits without wearing a step's name", () => {
   const r = spawnSync(process.execPath, [ENTRYPOINT], { encoding: "utf8" });
   assert.equal(r.status, 2, `a usage error exits 2, separating it from a step failure. It exited ${r.status}.`);
   assert.ok(r.stderr.includes("usage:"), `the usage line must be printed. Got: ${r.stderr.trim()}`);
-  for (const step of ["verify:", "install:", "start:", "wait:", "fetch:", "adopt:", "launch:"]) {
+  for (const step of ["verify:", "install:", "start:", "wait:", "fetch:", "launch:"]) {
     assert.ok(!r.stderr.startsWith(step), `a usage error must not present as ${step} — it points the reader at the wrong thing`);
   }
 });
@@ -128,16 +129,14 @@ test("verify refuses a checkout whose origin is not the repository asked for", (
   assert.ok(r.stderr.includes("not-this-one"), "the message names the repository that was asked for, so the reader can see the mismatch");
 });
 
-// ADOPT CLAIMS, and the claim is the whole reason the step exists. It stood
-// for one iteration running `git rev-parse` and printing "is present", which
-// claims nothing — two machines given the same id would both have walked it.
-test("adopt takes a real claim rather than looking for a branch", () => {
-  assert.ok(
-    SOURCE.includes("claimIteration"),
-    "the adopt step must call claimIteration — a branch that exists is not a claim, and two machines would both start walking",
-  );
-  assert.ok(/is held by machine/.test(SOURCE), "adopt must refuse an iteration another machine holds, naming the holder");
-});
+// THE ADOPT CASE IS DELETED (i34). It pinned that the adopt step took a real
+// claim rather than checking a branch existed, because two machines given the
+// same id would otherwise both have walked it.
+//
+// THE STEP ITSELF IS GONE with the claim system. A record is a folder on trunk
+// and a clone that has trunk has every record, so there is nothing to adopt.
+// What stops two agents sharing one record is now an assumption with a
+// trigger, raid-asm-only-one-agent-works-a-clone-at-a-time, rather than a lock.
 
 // LAUNCH STARTS AN AGENT. It stood for one iteration checking two files
 // existed and printing "ready", which produced no walking agent at all — the

@@ -394,3 +394,22 @@
 {"ts":"2026-08-16T08:29:28.420Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d430","brief":"the merge-conflict case becomes a clean-tree case"}
 {"ts":"2026-08-16T08:29:39.986Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d431","brief":"the archive fixture writes records rather than branches"}
 {"ts":"2026-08-16T08:29:54.290Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d432","brief":"the fixture's imports follow it"}
+{"ts":"2026-08-16T08:31:20.892Z","op":"defer","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d426","brief":"remove the artefacts","to":"remove-artefacts","hops":1,"trail":["iterations/i34/build-steps/delete-the-seam","remove-artefacts"]}
+{"ts":"2026-08-16T08:33:09.930Z","op":"plan","visit":"iterations/i34/build-steps/delete-the-seam@0","parent":null,"nodes":[{"id":"d433","brief":"delete the dead code"},{"id":"d434","brief":"delete the cases that test nothing"},{"id":"d435","brief":"delete the branches and the worktrees"}]}
+{"ts":"2026-08-16T08:33:15.441Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d436","brief":"reading the levelling machinery before cutting it"}
+{"ts":"2026-08-16T08:33:35.786Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d437","brief":"the levelling machinery is deleted"}
+{"ts":"2026-08-16T08:33:51.929Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d438","brief":"the fan-out and the tree list are deleted"}
+{"ts":"2026-08-16T08:34:29.107Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d439","brief":"entry binds and stamps, with no claim and no levelling"}
+{"ts":"2026-08-16T08:34:51.086Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d440","brief":"two claim call sites left"}
+{"ts":"2026-08-16T08:35:30.288Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d425","brief":"1319 of 1319 before this sweep began"}
+{"ts":"2026-08-16T08:35:34.861Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d441","brief":"the claim ledger is deleted"}
+{"ts":"2026-08-16T08:35:38.919Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d442","brief":"the claim lane's whole test file is deleted"}
+{"ts":"2026-08-16T08:35:45.030Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d443","brief":"the mirror hook is deleted from the write path"}
+{"ts":"2026-08-16T08:35:55.191Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d444","brief":"the interface's closing brace is back"}
+{"ts":"2026-08-16T08:36:07.868Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d433","brief":"the claim ledger, the mirror and the levelling machinery are deleted"}
+{"ts":"2026-08-16T08:36:18.792Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d445","brief":"the fan-out case is deleted rather than hollowed out"}
+{"ts":"2026-08-16T08:36:32.132Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d446","brief":"the branch-cache case is deleted too"}
+{"ts":"2026-08-16T08:36:45.782Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d434","brief":"the cases that tested a deleted mechanism are deleted"}
+{"ts":"2026-08-16T08:36:54.113Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d447","brief":"the last dangling imports"}
+{"ts":"2026-08-16T08:37:19.446Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d448","brief":"the confirming battery before the branches go"}
+{"ts":"2026-08-16T08:38:37.018Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d449","brief":"the entrypoint has six steps, and the adopt case is deleted"}

@@ -14,8 +14,6 @@
 // worktree. Without that, none of these assertions would mean anything.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
 import { describe, test } from "node:test";
 import { CLAUSES } from "../engine/errors.ts";
 import { Session } from "../engine/session.ts";
@@ -95,27 +93,10 @@ describe("the method guard", { concurrency: true }, () => {
     assert.notEqual(body.clause, "SE-C-134", "a bound walk exists to write the record's own content");
   });
 
-  // THE FAN-OUT CASE IS GONE (i34), and what it proved is now true by
-  // construction rather than by copying.
+  // THE FAN-OUT CASE IS DELETED (i34). It drove `session.fanOutMethod`: write
+  // a method file unbound, and assert it reached the record's worktree too —
+  // "otherwise a record keeps an old machine and nothing says so".
   //
-  // IT DROVE session.fanOutMethod: write a method file unbound, and assert it
-  // reached the record's worktree too — "otherwise a record keeps an old
-  // machine and nothing says so".
-  //
-  // THERE IS ONE TREE NOW, so a method file written anywhere is the file every
-  // reader opens. The claim it guarded cannot fail, because there is no second
-  // copy that could be stale.
-  test("a method write is visible immediately, because there is one copy", () => {
-    const root = gitRoot();
-    const binder = new Session(root);
-    assert.equal(binder.workRoot(), root, "the lane works in the one tree");
-
-    const rel = "project/guidance/fanned.md";
-    mkdirSync(join(root, "project", "guidance"), { recursive: true });
-    writeFileSync(join(root, rel), "shared method", "utf8");
-
-    assert.ok(existsSync(join(root, rel)), "the tree has it");
-    assert.equal(readFileSync(join(root, rel), "utf8"), "shared method");
-    assert.deepEqual(binder.fanOutMethod(rel, root), [], "there is nowhere else to fan to");
-  });
+  // THE MECHANISM IS GONE AND SO IS THE FAILURE. One tree, one copy. A case
+  // asserting that a deleted function returns an empty list tests nothing.
 });

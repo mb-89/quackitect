@@ -11,9 +11,7 @@
 // the next refused call's remedy re-boots the agent in one turn.
 import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
-import { claimEntry, completeClaim, machineId } from "./claims.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
-import { dirtyLines, git, gitLand, gitSync } from "./gitlane.ts";
 import { contentHash } from "./hash.ts";
 import {
   activeStates,
@@ -96,7 +94,7 @@ import {
 } from "./iterations.ts";
 import { RUN_MODES, type RunMode, readMode, storedMode, writeMode } from "./mode.ts";
 import { parseStateNote, readNode, section, withPass, writeNode } from "./notes.ts";
-import { METHOD_FILES, METHOD_PREFIXES, pathKind, recordOwnerOf, resolveInRoot, seDir } from "./paths.ts";
+import { pathKind, recordOwnerOf, resolveInRoot, seDir } from "./paths.ts";
 import { mintFlipLines } from "./pugh.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
@@ -806,7 +804,7 @@ export class Session {
     if (!(RUN_MODES as string[]).includes(mode)) {
       throw new Rejection({
         clause: CLAUSES.REQUIRED_ARGS,
-        expected: "one of " + RUN_MODES.join(", ") + " — where satellites run",
+        expected: `one of ${RUN_MODES.join(", ")} — where satellites run`,
         got: String(mode),
         remedy: { tool: "se_pull", args: {}, note: "the run mode is set from the mirror, or at launch with --mode" },
         source: "engine/session.ts run mode",
@@ -903,104 +901,21 @@ export class Session {
         source: "engine/session.ts reload",
       });
     }
-    const reconciled = { ...this.reconcileTrees(), method: this.backfillMethod() };
-    if (process.env.SE_RELOAD_DRY === "1") return { reload: "dry", note: "canary green — no exit (SE_RELOAD_DRY)", ...reconciled };
+    // NOTHING TO RECONCILE (i34). The reload used to commit both trees, land
+    // the branch on trunk and sync trunk back, so the engine came up carrying
+    // the change whichever tree it landed on. One tree, one copy, no drift.
+    if (process.env.SE_RELOAD_DRY === "1") return { reload: "dry", note: "canary green — no exit (SE_RELOAD_DRY)" };
     setTimeout(() => process.exit(42), 400);
     return {
       reload: "armed",
       note: "the engine restarts in under a second on the NEW sources — the walk reboots at start and walks back to your target, which survives the restart; tick when the lane answers",
-      ...reconciled,
     };
   }
 
-  /** RELOAD RECONCILES THE TWO TREES (owner ruling 2026-08-06).
-   *
-   *  A bound record has its own worktree, and the engine serves ONE tree.
-   *  Which one depends on whether a walk is bound at that instant, and the
-   *  walk moves. So an edit could land in the tree the person was not
-   *  looking at, and it read on screen as a broken feature rather than a
-   *  missing merge — four times in one morning.
-   *
-   *  The tell was always the same: NEW DATA drawn by OLD CODE. Markdown is
-   *  read live from whichever tree is served, so a template's raw {token}
-   *  would appear beside a description that had already updated.
-   *
-   *  Reload is the right seam because it is already the verb for "make what
-   *  I wrote take effect". It commits what is on disk, lands the branch on
-   *  trunk, and syncs trunk back — so whichever tree the engine comes up
-   *  on, it carries the change. Nothing here can lose work: a commit is
-   *  made before anything moves, and a conflicting merge aborts and says so.
-   *
-   *  Unbound, there is one tree and nothing to do. */
-  private reconcileTrees(): Record<string, unknown> {
-    const wt = this.bound?.path;
-    if (wt === undefined || wt === this.machineRoot()) return {};
-    try {
-      for (const tree of [wt, this.machineRoot()]) {
-        if (dirtyLines(git(tree, "status", "--porcelain").stdout).length === 0) continue;
-        git(tree, "add", "-A");
-        git(tree, "commit", "-m", "the machine commits what stood on disk at a reload");
-      }
-      const landed = gitLand(this.machineRoot(), wt);
-      const synced = gitSync(this.machineRoot(), wt);
-      return { trees: { landed: landed.commits ?? [], synced: synced.commits ?? [] } };
-    } catch (e) {
-      // A RECONCILE THAT FAILS NEVER BLOCKS THE RELOAD. The reload is still
-      // correct for the tree it comes up on; the person is told what stayed
-      // behind so they can see why a surface looks unchanged.
-      return { trees: { failed: e instanceof Error ? e.message : String(e) } };
-    }
-  }
-
-  /** THE BACKFILL: every METHOD file, trunk to every open worktree, at reload.
-   *
-   *  The write-time fan-out only catches files that are written. This catches
-   *  the rest, so a tree cannot sit half-updated — which is how a worktree
-   *  came to hold a new session.ts against an old paths.ts and stopped
-   *  compiling.
-   *
-   *  TRUNK IS THE SOURCE AND NEVER THE DESTINATION. A stale worktree must not
-   *  be able to push its old copy back. That direction is not a detail: an
-   *  edit made while a record was bound once fanned a stale tools.ts over
-   *  trunk and ate two lane verbs.
-   *
-   *  UNCHANGED FILES ARE NOT REWRITTEN, so this costs a read per file and
-   *  nothing else on a tree that is already level. */
-  private backfillMethod(): { trees: number; files: number } {
-    // ONE TREE, SO NOTHING TO BACKFILL (i34). `methodTrees()` answers with the
-    // machine root and nothing else, and the filter below always empties it.
-    // The call is kept so the reload's answer keeps its shape.
-    const trees = this.methodTrees().filter((t) => t !== this.machineRoot());
-    return { trees: trees.length, files: this.backfillInto(trees) };
-  }
-
-  /** The backfill's engine, over a chosen set of trees. Split out so ENTRY
-   *  can level one tree without reloading, which is the only way to make a
-   *  record's tree whole before an agent starts working in it. */
-  private backfillInto(trees: string[]): number {
-    if (trees.length === 0) return 0;
-    let files = 0;
-    for (const rel of METHOD_FILES) {
-      let bytes: string;
-      try {
-        bytes = readFileSync(join(this.machineRoot(), rel), "utf8");
-      } catch {
-        continue;
-      }
-      for (const tree of trees) {
-        const dst = join(tree, rel);
-        try {
-          if (existsSync(dst) && readFileSync(dst, "utf8") === bytes) continue;
-          mkdirSync(dirname(dst), { recursive: true });
-          writeFileSync(dst, bytes, "utf8");
-          files++;
-        } catch {
-          // one unreachable tree must never stop the others
-        }
-      }
-    }
-    return files;
-  }
+  // THE WHOLE LEVELLING MACHINERY IS DELETED (i34). `reconcileTrees`,
+  // `backfillMethod` and `backfillInto` existed because several trees held
+  // copies of one method file and had to be kept in step — at reload, at
+  // entry, and at every write. There is one tree, so nothing can fall behind.
 
   /** Where the LANE works. ONE TREE, so this is the root and nothing else
    *  (owner ruling 2026-08-16).
@@ -1125,43 +1040,12 @@ export class Session {
     }
   }
 
-  /** EVERY TREE THE METHOD LIVES IN: trunk, plus each OPEN record's worktree.
-   *
-   *  A closed record's tree is gone, and its branch is history. Only what is
-   *  open can be walked, so only what is open needs the method. */
-  methodTrees(): string[] {
-    const trees = new Set<string>([this.machineRoot()]);
-    try {
-      for (const it of itList(this.machineRoot())) if (it.open) trees.add(it.path);
-    } catch {
-      // no iterations yet — trunk is the whole story
-    }
-    try {
-      for (const e of expList(this.machineRoot())) if (e.open) trees.add(e.path);
-    } catch {
-      // likewise for expeditions
-    }
-    return [...trees];
-  }
-
-  /** A METHOD WRITE LANDS IN EVERY TREE, IN ONE ACT (owner ruling 2026-08-07).
-   *
-   *  THE FAILURE THIS ENDS, in the owner's words: you apply a change, you want
-   *  the state machine to behave differently, and it does not — because the
-   *  change went to a tree you are not standing in. Before this, the only
-   *  thing that reconciled the trees was reconcileTrees at RELOAD, which
-   *  reboots the walk and re-reads the whole of boot. So the cure cost more
-   *  than the disease and the divergence just accumulated.
-   *
-   *  A DELETE FANS OUT TOO. Half the drift was a file that existed in one tree
-   *  and not the other, which is what a one-way copy leaves behind.
-   *
-   *  RECORD CONTENT IS NOT COPIED, ever. An open record's evidence has exactly
-   *  one home, and laneRoot sends every read there. One copy cannot disagree
-   *  with itself. */
-  fanOutMethod(_rel: string, _from: string): string[] {
-    return [];
-  }
+  // `methodTrees` AND `fanOutMethod` ARE DELETED (i34). The first answered
+  // "every tree the method lives in"; the second copied a method write into
+  // all of them so a change took effect wherever the reader was standing.
+  //
+  // ONE TREE MAKES BOTH QUESTIONS EMPTY. A write is the file every reader
+  // opens, the instant it lands.
 
   expeditionNew(kind: string, goal: string): Record<string, unknown> {
     const e = expNew(this.machineRoot(), kind, goal);
@@ -1175,103 +1059,26 @@ export class Session {
     return { seeded: it.id, branch: it.branch, note: "it stands in the iterations container as its kickoff" };
   }
 
-  /** A RECORD'S TREE IS LEVEL AND COMMITTED BEFORE ANY WORK STARTS IN IT.
-   *
-   *  TWO FAULTS MEET HERE, and neither is fixable without the other.
-   *
-   *  THE MIRROR IS PARTIAL. The write-time fan-out copies a method file when
-   *  that file is WRITTEN, so anything edited while a tree was not open stays
-   *  behind. Only a RELOAD backfills the whole set. Measured 2026-08-13: a
-   *  seeded worktree held trunk's session.ts against its own older
-   *  stateform.ts and would not compile — the exact fault paths.ts warns
-   *  about, live in 24 trees at once. A PARTIAL SYNC IS WORSE THAN NONE: an
-   *  unsynced tree is merely old and self-consistent, a half-synced one is
-   *  broken, and it breaks at whatever moment somebody runs a check inside it.
-   *
-   *  THE MIRROR IS UNCOMMITTED. Only the BOUND tree is ever swept up, and only
-   *  at a reload, so every other open worktree accumulates it forever — 68 to
-   *  117 files in 24 of 28 trees. That costs three ways. A pre-commit hook
-   *  type-checks the tree it stands in, so it judges a hundred mirrored files
-   *  that have nothing to do with the commit, and FAILS on them. Any commit
-   *  that is not path-scoped sweeps the whole mirror onto the record's branch
-   *  by accident. And a peer that clones the branch gets NONE of it, so a
-   *  cloud machine walks the method as it stood at seed time — which is how
-   *  one feature was built twice, differently, on two branches.
-   *
-   *  SO ENTRY LEVELS THE TREE, THEN COMMITS IT. Levelling without committing
-   *  leaves the hook judging unstaged work; committing without levelling
-   *  commits something that does not compile. Both, in that order, or neither.
-   *
-   *  ENTRY IS THE RIGHT MOMENT, not the write. One commit per fanned-out file
-   *  per tree would make a 170-file sweep across twenty trees 3400 commits.
-   *  Entry happens once per record, and is exactly when the tree starts
-   *  mattering to somebody.
-   *
-   *  PATH-SCOPED, AND BEST-EFFORT. Only method paths are staged, so a record's
-   *  own content is never swept in behind the agent's back. A tree that
-   *  refuses to commit does not block entry: the walk is still correct, and it
-   *  is the tidiness that is lost rather than the work. */
-  private levelTree(tree: string): { levelled: number; committed: number } {
-    if (tree === this.machineRoot()) return { levelled: 0, committed: 0 };
-    const levelled = this.backfillInto([tree]);
-    let committed = 0;
-    try {
-      for (const p of [...METHOD_PREFIXES, ...METHOD_FILES]) git(tree, "add", "--", p);
-      const names = git(tree, "diff", "--cached", "--name-only").stdout;
-      if (names === "") return { levelled, committed: 0 };
-      committed = names.split("\n").filter((l) => l !== "").length;
-      // --no-verify because the hook type-checks the WHOLE tree, and this
-      // commit exists precisely to make that tree checkable. Running it
-      // against the state this call is fixing would refuse the fix.
-      git(tree, "commit", "--no-verify", "-m", `the machine levels this tree's method with trunk (${committed} files)`);
-    } catch {
-      // A tree that will not commit is untidy, never broken. Entry stands.
-    }
-    return { levelled, committed };
-  }
+  // `levelTree` IS DELETED (i34). Entry used to copy every method file into
+  // the record's tree and commit it there, because a record's worktree drifted
+  // from trunk the moment either was edited.
+  //
+  // ITS OWN COMMENT MEASURED THE COST: 68 to 117 mirrored files sitting
+  // uncommitted in 24 of 28 trees, a pre-commit hook type-checking a hundred
+  // files that had nothing to do with the commit, and a peer cloning the
+  // branch getting none of it — which is how one feature was built twice,
+  // differently, on two branches.
+  //
+  // ONE TREE ENDS ALL THREE.
 
+  /** ENTERING AN ITERATION BINDS IT AND STAMPS IT STARTED. That is all it does
+   *  now: no claim to take, and no tree to level. */
   iterationOpen(id: string): Record<string, unknown> {
     const it = itFind(this.machineRoot(), id);
-    // The record store opens a record only over a standing claim, and entry
-    // is what mints one. A product whose claims branch does not exist yet
-    // gets it created by this first entry, so nothing ever runs unclaimed
-    // for want of an opening act.
-    const mid = machineId(join(this.machineRoot(), ".se"));
-    const gate = claimEntry(this.machineRoot(), it.id, mid);
-    if (!gate.ok) {
-      // A SHIPPED RECORD AND A HELD ONE ARE DIFFERENT REFUSALS. Held is a
-      // wait: the holder may finish or a person may force-release it. Shipped
-      // is final, and telling the reader to wait for it would send them to
-      // stand at a door that is never opening again.
-      const shipped = gate.shipped === true;
-      throw new Rejection({
-        clause: CLAUSES.CONDITION_UNMET,
-        expected: `${it.id} unclaimed, or claimed by this machine (machine-${mid})`,
-        got: shipped
-          ? `${it.id} SHIPPED on ${gate.holder?.done ?? "?"} — a shipped iteration is never walked again`
-          : `claimed by machine-${gate.holder?.machine ?? "?"} since ${gate.holder?.at ?? "?"}`,
-        remedy: {
-          tool: "se_pull",
-          args: {},
-          note: shipped
-            ? "the work is done and its record lives on its branch — read it there, or pick unfinished work from the claimable listing"
-            : "pick another iteration from the claimable listing; a person may force-release a claim judged abandoned",
-        },
-        source: "engine/session.ts claim-gate",
-      });
-    }
-    const mirror = this.levelTree(it.path);
     this.bound = it;
     markStarted(this.machineRoot(), it);
-    this.decisions.setExtraSink(join(it.path, "project", "spec", "iterations", it.id, "decisions.jsonl"));
-    return {
-      bound: it.id,
-      note: "the lane now works in this iteration's worktree",
-      ...(mirror.committed > 0 ? { method_levelled: mirror.committed } : {}),
-      ...(gate.claimed_now === true
-        ? { claimed: `machine-${mid}${gate.offline === true ? " (recorded offline; announces at the next opportunity)" : ""}` }
-        : {}),
-    };
+    this.decisions.setExtraSink(join(this.machineRoot(), "project", "spec", "iterations", it.id, "decisions.jsonl"));
+    return { bound: it.id, note: "the walk now stands in this iteration" };
   }
 
   /** THE BLESS PINS (owner verdicts 2026-07-30): leaving an iteration
@@ -6829,17 +6636,9 @@ export class Session {
     }
     if (this.bound?.id === it.id) this.unbind();
     itCloseShipped(this.machineRoot(), it);
-    // THE CLAIM IS SPENT HERE, and this is the only place it can be. A claim
-    // was taken at entry and nothing ever ended it, so the ledger showed
-    // finished records as live holdings forever — i3 and i8 both stood that
-    // way on 2026-08-13, shipped and still reading as claimed. A peer asking
-    // the ledger what is free could not tell work in progress from work that
-    // is over.
-    //
-    // BEST-EFFORT ON PURPOSE. The record IS shipped, on disk and in git,
-    // whatever the ledger manages to record; a network that will not answer
-    // must not unship it. The stamp lands locally and announces later.
-    completeClaim(this.machineRoot(), it.id, machineId(join(this.machineRoot(), ".se")));
+    // THE CLAIM IS NOT SPENT HERE ANY MORE, because there is none. A claim was
+    // taken at entry and released here; the whole ledger is retired, and the
+    // record's own status is what says it shipped.
     appendNote(
       seDir(this.machineRoot()),
       `needs retro — iteration ${it.id} shipped and archived; the next kickoff's onboard-retro drains it.`,

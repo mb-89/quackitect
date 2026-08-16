@@ -372,8 +372,8 @@ export function reopenedAfterSigning(fm: Record<string, unknown>): boolean {
  *  `picks` as a scalar over a block list, every note stopped parsing, and the
  *  five drawn lines vanished off the chart with no error anywhere. */
 function keyBlock(key: string): RegExp {
-  const esc = key.replace(/[.*+?^{}()|[\]\\]/g, (c) => "\\" + c);
-  return new RegExp("^" + esc + ":.*(?:\\n[ \\t]+\\S.*)*", "m");
+  const esc = key.replace(/[.*+?^{}()|[\]\\]/g, (c) => `\\${c}`);
+  return new RegExp(`^${esc}:.*(?:\\n[ \\t]+\\S.*)*`, "m");
 }
 
 /** SET ONE FRONTMATTER KEY on any node, creating it if absent.
@@ -384,8 +384,8 @@ function keyBlock(key: string): RegExp {
  *  cleared answer and a never-answered one read the same to every check. */
 export function withFrontmatter(raw: string, key: string, value: string): string {
   const has = keyBlock(key);
-  if (value.trim() === "") return raw.replace(new RegExp(has.source + "\\n?", "m"), "");
-  const line = key + ": " + yamlValue(value);
+  if (value.trim() === "") return raw.replace(new RegExp(`${has.source}\\n?`, "m"), "");
+  const line = `${key}: ${yamlValue(value)}`;
   // A FUNCTION REPLACEMENT, NEVER A STRING. A value carrying a dollar sign
   // is data, and String.replace reads a dollar in the replacement as an
   // instruction — dollar-backtick alone splices the whole preceding text in.
@@ -399,7 +399,7 @@ export function withFrontmatter(raw: string, key: string, value: string): string
  *  match what the item card declares, and for a list that is a block. */
 export function withFrontmatterList(raw: string, key: string, values: string[]): string {
   if (values.length === 0) return withFrontmatter(raw, key, "");
-  const block = key + ":\n" + values.map((v) => "  - " + yamlValue(v)).join("\n");
+  const block = `${key}:\n${values.map((v) => `  - ${yamlValue(v)}`).join("\n")}`;
   const has = keyBlock(key);
   return has.test(raw) ? raw.replace(has, () => block) : afterAnchor(raw, block);
 }

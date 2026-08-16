@@ -79,9 +79,9 @@ for (const n of entries) {
     if (v === "") {
       problems.push(`${id}: ungraded — ${s.key} is missing`);
     } else if (stillAComment(v)) {
-      problems.push(id + ": ungraded — " + s.key + " still carries its mint comment, which is not an answer");
+      problems.push(`${id}: ungraded — ${s.key} still carries its mint comment, which is not an answer`);
     } else if (scale.length > 0 && !scale.includes(v.toLowerCase())) {
-      problems.push(id + ": OFF THE SCALE — " + s.key + ' says "' + v + '", and the scale offers ' + scale.join(", "));
+      problems.push(`${id}: OFF THE SCALE — ${s.key} says "${v}", and the scale offers ${scale.join(", ")}`);
     }
   }
 }

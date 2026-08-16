@@ -21,7 +21,7 @@ const HOOK = fileURLToPath(new URL("../engine/bin/se-hook-stop.ts", import.meta.
 function verdict(records: object[], payload: object): string {
   const root = mkdtempSync(join(tmpdir(), "se-stop-"));
   mkdirSync(join(root, ".se"), { recursive: true });
-  writeFileSync(join(root, ".se", "calls.jsonl"), records.map((r) => JSON.stringify(r)).join("\n") + "\n", "utf8");
+  writeFileSync(join(root, ".se", "calls.jsonl"), `${records.map((r) => JSON.stringify(r)).join("\n")}\n`, "utf8");
   const r = spawnSync(process.execPath, [HOOK], {
     input: JSON.stringify(payload),
     encoding: "utf8",
