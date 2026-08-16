@@ -1,5 +1,6 @@
 ---
 form: gate-kickoff
+amended: "2026-08-16T16:29:52.357Z by agent — ref \"main\" is reachable — verified 2026-08-16 via se_file_glob/se_file_read at ref:main after the operator fetched all refs; correcting the stale kill-criterion and follow-up text"
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-16T16:15:51.664Z
@@ -77,7 +78,7 @@ major — two new lane verbs (the query verb, the BM25 sibling) each owing an in
 ## round_2_red_team
 
 - the reader already exists, so is i15 just paperwork over shipped code => no: no MCP verb exists (verified by search), the debt fix and BM25 sibling are unbuilt, and the 26 v1 files are unharvested; kill criterion: a one-line MCP wrapper needing no subset extension makes this patch-sized, re-open the size then
-- the v1 ref could not be located, so is the harvest even reachable => the block is this state's tool list, not the repository; kill criterion: no ref anywhere in this repository's history holding spec/queries/*.base makes the harvest unreachable and forces a reopen to descope
+- the v1 ref could not be located, so is the harvest even reachable => RESOLVED 2026-08-16: ref "main" holds spec/queries/ (25 .base files, not 26) and adr-query-in-engine.md, confirmed by se_file_glob/se_file_read at ref:main once the operator fetched every ref. The block was this state's tool list, never the repository; kill criterion did not fire.
 - does the corpus-wide debt fix belong in i15 or is it scope creep => no, it is an explicit owner-swept rescheduling into i15 by name because the resolvers it needs are what i15 builds (raid-debt-delta-default-views.md, swept 2026-08-15)
 - major is a big commitment sight-unseen, could this be minor given so much prior art => proposed major because two lane verbs are minted and the debt fix has corpus-wide blast radius; the owner's bless decides, not this proposal
 
@@ -94,7 +95,7 @@ pass with overrides — two named register entries stand open (raid-asm-v1-ref-f
 
 On a passing bless, the machine below walks: locate the v1 ref and harvest the 26 .base files, extend the pinned subset test-first where needed, expose the reader as an MCP verb, fix raid-debt-delta-default-views, and build the BM25 sibling with its interface entry.
 
-Two backlog items ride along: raid-asm-v1-ref-for-spec-queries-is-reachable (resolve at the harvesting sub-step, where se_run or se_git is legal) and raid-risk-i15-ships-without-a-live-prior-art-scan (resolve at the next gate where a search tool is legal).
+One backlog item rides along: raid-risk-i15-ships-without-a-live-prior-art-scan (resolve at the next gate where a search tool is legal). raid-asm-v1-ref-for-spec-queries-is-reachable is closed — ref "main" resolves and the harvest source is confirmed (25 .base files, not 26, plus the ADR).
 
 note-5d892f5b1e18 stays parked for the next attended session.
 

@@ -73,3 +73,6 @@
 {"ts":"2026-08-16T16:25:06.227Z","op":"done","visit":"iterations/i15/frame-delta@0","node":"d69","brief":"value_props (none) was filled and submitted with frame-delta"}
 {"ts":"2026-08-16T16:25:21.935Z","op":"done","visit":"iterations/i15/frame-delta@0","node":"d70","brief":"business_case was filled and submitted with frame-delta"}
 {"ts":"2026-08-16T16:26:37.371Z","op":"update","visit":"iterations/i15/pressure-test@0","node":"d71","brief":"drafting and submitting pressure-test's hostile PR-FAQ"}
+{"ts":"2026-08-16T16:29:18.132Z","op":"plan","visit":"iterations/i15/gate-motivation@0","parent":null,"nodes":[{"id":"d72","brief":"correct raid-asm-v1-ref-for-spec-queries-is-reachable"},{"id":"d73","brief":"amend gate-kickoff"},{"id":"d74","brief":"amend log-risks / draft-vision"},{"id":"d75","brief":"amend frame-delta"},{"id":"d76","brief":"amend pressure-test"},{"id":"d77","brief":"amend define-actual"},{"id":"d78","brief":"note the 25 vs 26 file-count discrepancy"},{"id":"d79","brief":"resume the gate-motivation walk"}]}
+{"ts":"2026-08-16T16:29:52.313Z","op":"plan","visit":"iterations/i15/gate-motivation@0","parent":null,"nodes":[]}
+{"ts":"2026-08-16T16:30:01.061Z","op":"done","visit":"iterations/i15/gate-motivation@0","node":"d72","brief":"raid closed: ref main confirmed reachable, 25 files not 26"}
