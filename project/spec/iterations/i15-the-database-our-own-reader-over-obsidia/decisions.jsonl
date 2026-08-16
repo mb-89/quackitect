@@ -221,3 +221,6 @@
 {"ts":"2026-08-16T17:54:28.726Z","op":"update","visit":"iterations/i15/enumerate-space/find_by_transforming@0","node":"d209","brief":"SCAMPER/SIT run against cluster-the-disposition"}
 {"ts":"2026-08-16T17:54:32.967Z","op":"done","visit":"iterations/i15/enumerate-space/find_by_heuristic@0","node":"d197","brief":"SCAMPER/SIT sweep of cluster-the-disposition complete, 3 options minted"}
 {"ts":"2026-08-16T17:54:45.608Z","op":"done","visit":"iterations/i15/enumerate-space/find_by_transforming@0","node":"d205","brief":"find_by_transforming form filled and submitted"}
+{"ts":"2026-08-16T17:55:14.089Z","op":"plan","visit":"iterations/i15/enumerate-space/find_by_probing@0","parent":null,"nodes":[{"id":"d210","brief":"spike: is the filter-expression evaluator (type == \"x\") cheap to build"},{"id":"d211","brief":"record probe result as an option or dead end"},{"id":"d212","brief":"fill find_by_probing form"}]}
+{"ts":"2026-08-16T17:55:33.337Z","op":"done","visit":"iterations/i15/enumerate-space/find_by_probing@0","node":"d210","brief":"probe run and confirmed via se_run, minted the closed-grammar option"}
+{"ts":"2026-08-16T17:55:58.124Z","op":"done","visit":"iterations/i15/enumerate-space/find_by_probing@0","node":"d212","brief":"find_by_probing form filled and submitted"}
