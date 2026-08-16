@@ -65,3 +65,7 @@
 {"ts":"2026-08-16T16:19:40.877Z","op":"update","visit":"iterations/i15/log-risks@0","node":"d65","brief":"minted raid-risk-i15-query-toil-outweighs-savings"}
 {"ts":"2026-08-16T16:19:50.332Z","op":"update","visit":"iterations/i15/log-risks@0","node":"d66","brief":"minted raid-asm-i15-corpus-suits-lexical-matching"}
 {"ts":"2026-08-16T16:20:01.565Z","op":"done","visit":"iterations/i15/log-risks@0","node":"d62","brief":"log-risks form filled and submitted, five open raid entries referenced"}
+{"ts":"2026-08-16T16:22:10.306Z","op":"done","visit":"iterations/i15/log-risks@0","node":"d60","brief":"the four new/carried raid entries already cover draft-vision's named conflicts"}
+{"ts":"2026-08-16T16:22:13.730Z","op":"done","visit":"iterations/i15/log-risks@0","node":"d61","brief":"all five raid entries stand valid, debt entry's Repayment section fixed"}
+{"ts":"2026-08-16T16:24:00.672Z","op":"plan","visit":"iterations/i15/frame-delta@0","parent":null,"nodes":[{"id":"d67","brief":"[object Object]"},{"id":"d68","brief":"[object Object]"},{"id":"d69","brief":"[object Object]"},{"id":"d70","brief":"[object Object]"}]}
+{"ts":"2026-08-16T16:24:18.061Z","op":"done","visit":"iterations/i15/frame-delta@0","node":"d67","brief":"gap_claim was filled and submitted with frame-delta"}
