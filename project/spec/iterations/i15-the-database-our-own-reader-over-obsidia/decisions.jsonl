@@ -108,3 +108,4 @@
 {"ts":"2026-08-16T16:55:13.203Z","op":"done","visit":"iterations/i15/write-requirements@0","node":"d112","brief":"6 new requirements written, covering all 3 new use cases"}
 {"ts":"2026-08-16T16:55:54.294Z","op":"done","visit":"iterations/i15/write-requirements@0","node":"d111","brief":"7th requirement added for forced disposition"}
 {"ts":"2026-08-16T16:57:11.256Z","op":"done","visit":"iterations/i15/write-requirements@0","node":"d110","brief":"write-requirements signed with 7 new rows, full register coverage"}
+{"ts":"2026-08-16T16:57:27.801Z","op":"done","visit":"iterations/i15/write-requirements@0","node":"d109","brief":"identify-assumptions read credited, now at derive-functions read"}
