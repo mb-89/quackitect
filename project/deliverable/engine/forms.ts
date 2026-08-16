@@ -280,17 +280,23 @@ export function withBy(instanceRaw: string, by: string): string {
   return instanceRaw.replace(/^form:.*$/m, (s) => `${s}\nby: ${by}`);
 }
 
-/** Frontmatter holds ONE LINE PER KEY, so a reason folds onto one.
+/** Frontmatter holds ONE LINE PER KEY, so a value folds onto one.
  *
- *  CUT AT A WORD, never mid-word. A truncation that lands inside a word is
- *  not a length limit, it is a silent edit of somebody's sentence. */
-const oneLine = (s: string): string => {
-  const flat = s.replace(/\s+/g, " ").trim();
-  if (flat.length <= 200) return flat;
-  const cut = flat.slice(0, 200);
-  const space = cut.lastIndexOf(" ");
-  return `${(space > 120 ? cut.slice(0, space) : cut).trimEnd()}…`;
-};
+ *  IT IS NEVER SHORTENED (owner ruling 2026-08-16). This used to cut at 200
+ *  characters and add an ellipsis, and the cut is what made a form
+ *  unsubmittable: a probe result is prose, the node-table shows every
+ *  standing node's value, and the submit refuses a cell that trails off. So
+ *  answering three empty cells meant resending twenty-two that the writer had
+ *  already truncated, and no amount of retyping could fix them.
+ *
+ *  IT COST THIRTEEN STANDING PROBE RESULTS, cut mid-sentence on their own
+ *  nodes, plus two earlier incidents recorded as note-54c7a1cdfc4e and
+ *  note-567aef4660ba. Both of those hunted the wrong culprit, and one comment
+ *  in stateform.ts still claims no maxlength exists anywhere. It was here.
+ *
+ *  A QUOTED YAML SCALAR HAS NO LENGTH LIMIT, so folding is all that was ever
+ *  needed. Every value this writes is quoted unconditionally by yamlValue. */
+const oneLine = (s: string): string => s.replace(/\s+/g, " ").trim();
 
 /** EVERY WRITTEN VALUE IS QUOTED, unconditionally (found the hard way twice
  *  on 2026-08-07).

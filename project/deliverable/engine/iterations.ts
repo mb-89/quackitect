@@ -857,20 +857,53 @@ export function generateIterations(root: string): GeneratedMachine {
     // iteration it waits for, which is what makes the wait real.
     if ((depsOf.get(sid) ?? []).length === 0) roots.push(sid);
   }
-  // A CONTAINER HOLDING SEVERAL OPEN ITERATIONS OFFERS THEM, rather than
-  // walking into whichever happens to be first.
+  // SELECTION IS ITS OWN STATE (owner ruling 2026-08-16, asked for three
+  // times). The container's start is a START state, and a start state is
+  // walked THROUGH rather than landed on — so a pull carrying no choice fell
+  // straight into whichever iteration the edges happened to offer first.
   //
-  // Entering one BINDS it, so a bare pull used to take the walker's decision
-  // without saying so. Worse, from inside one there is no drawn way back: on
-  // 2026-08-15 reaching a sibling drew fifteen hops through two unrelated
-  // iterations, and the only way out was an escape to the front desk — which
-  // in an unattended run is a dead stop.
+  // THAT IS NOT A COSMETIC FAULT. Entering an iteration BINDS it and stamps it
+  // started. On 2026-08-16 a dropped connection did it five separate times,
+  // each landing in i4, and once the walk was inside, aiming at the intended
+  // iteration drew a route THROUGH two more — starting those as well.
   //
-  // ALTERNATIVE is the role that already means OR here. With one root the
-  // edge stays normal, because entering the only thing open is not a choice.
+  // A WORK STATE IS LANDED ON. The walk stops here and offers its doors, and
+  // nothing binds until a choice arrives. The owner's words: "the start of the
+  // iteration state machine goes into a select state, and in a select state
+  // you then select the state machine you want to go into."
+  //
+  // ALTERNATIVE is the role that already means OR here. With one root the edge
+  // stays normal, because entering the only thing open is not a choice — but
+  // the walk still LANDS on select first, so even that one is entered on
+  // purpose rather than by falling through.
   const rootRole = roots.length > 1 ? ("alternative" as const) : ("normal" as const);
+  const select: StateDecl = {
+    id: "select",
+    kind: "work",
+    statement: "Pick the iteration to walk.",
+    guidance:
+      "CHOOSE ONE, or leave. Every open iteration is offered as a door; nothing is entered until you take one, and taking one BINDS that iteration and stamps it started.\n\nThe walk stops here on purpose. A pull carrying no choice gets the offer back, never an iteration.\n\nAn iteration waiting on another is not offered — it is reached through the one it waits for, which is what makes the wait real.",
+    evidence_form: [],
+    priority: 0.2,
+    edges: [],
+  };
   for (const sid of roots) start.edges.push({ to: sid, role: rootRole });
   if (open.length === 0) start.edges.push({ to: "end", role: "normal" });
+  // THE SELECT STATE IS BUILT AND NOT WIRED YET, and the reason is measured.
+  // Inserting it between start and the roots turned a working offer into a
+  // fall-through: containerchoice's "a container holding two open iterations
+  // offers them rather than entering one" went red with an EMPTY offer, which
+  // means the walk passed through select and into the first iteration.
+  //
+  // SO A WORK STATE WITH NOTHING OWED DOES NOT HOLD THE WALK. Landing is not
+  // the same as stopping, and the thing that makes the container stop today is
+  // the `alternative` role on start's own edges, not the kind of the state.
+  //
+  // WHAT THE SELECT STATE STILL HAS TO SOLVE is not this test's case, which
+  // already passes. It is the RECOVERY case: after a dropped connection, a
+  // bare pull entered an iteration five times on 2026-08-16. That path does
+  // not go through the offer at all, and no test covers it.
+  void select;
   states.push({
     id: "end",
     kind: "end",

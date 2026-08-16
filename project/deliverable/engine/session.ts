@@ -4843,8 +4843,24 @@ export class Session {
         source: "engine/session.ts amend",
       });
     }
+    // AN AMEND RE-STAMPS THE SIGNATURE'S DATE (owner ruling 2026-08-16).
+    //
+    // WITHOUT THIS AN AMEND CANNOT DO THE ONE JOB THE REFUSAL NAMES IT FOR.
+    // A fallen_input tells the caller to amend, because the claim's own
+    // content still passes and only the corpus moved. But the guard compares
+    // the SIGNATURE against the corpus, so a signature stamped before the
+    // move still reads as older than it, whatever text the amend rewrote.
+    // Seven amends up a six-level chain cleared nothing on 2026-08-16.
+    //
+    // RE-STAMPING IS SAFE HERE AND NOWHERE ELSE. Every check has just re-run
+    // against the corpus as it now stands, and `broke` is empty — which is
+    // exactly the condition a submit proves before it signs. What stays
+    // untouched is WHO signed and the bless, so nothing downstream falls and
+    // no thumb is forged.
+    const stamped = next.replace(/^signed_off:.*$/m, () => `signed_off: ${new Date().toISOString().slice(0, 10)}`);
+    if (stamped !== next) writeFileSync(h.instanceAbs, stamped, "utf8");
     this.notifyChange();
-    return { amended: name, fields: Object.keys(fills), why: reason.trim(), by, signature_kept: true };
+    return { amended: name, fields: Object.keys(fills), why: reason.trim(), by, signature_kept: true, restamped: stamped !== next };
   }
 
   /** THE BLESS (owner design 2026-08-04, v1's thumbs reborn): a gate's
@@ -4950,8 +4966,30 @@ export class Session {
         const file = byId.get(id)?.file;
         if (file === undefined) continue;
         let raw = readFileSync(file, "utf8");
+        // ONLY A CELL THAT MOVED IS WRITTEN (owner ruling 2026-08-16, after
+        // probe-assumptions could not be submitted without round-tripping
+        // twenty-two probe results it was not asked to change).
+        //
+        // The table is a view over EVERY standing node, so a state answering
+        // three empty cells resends two dozen it never touched. Anything that
+        // shortens a large payload between the agent and the engine then lands
+        // on somebody else's evidence. Comparing before writing makes that
+        // whole class impossible: an unchanged cell cannot damage its node,
+        // whatever happened to it on the way here.
+        let moved = false;
         cols.forEach((c, i) => {
           const v = (cells[i + 1] ?? "").replace(/\\\|/g, "|");
+          const isListNow = nodeField(file, c) === "" && nodeList(file, c).length > 0;
+          const current = isListNow ? nodeList(file, c).join(" · ") : nodeField(file, c);
+          if (v === current) return;
+          // A CELL THAT TRAILS OFF NEVER LANDS. Something between the agent
+          // and the engine shortens a large table — the engine writes no
+          // ellipsis of its own, and the nodes on disk carry none — so a cell
+          // ending in one is a fragment of an answer rather than an answer.
+          // The submit refuses it separately and says so; this stop is what
+          // guarantees the node keeps its intact value meanwhile.
+          if (/(?:…|\.\.\.)\s*$/.test(v)) return;
+          moved = true;
           // A key that is a LIST on disk stays a list: the cell splits on
           // the · the read half joined with. The yaml writer quotes each
           // entry itself, so a colon in a test name cannot break the node.
@@ -4968,6 +5006,7 @@ export class Session {
                 )
               : withFrontmatter(raw, c, v);
         });
+        if (!moved) continue;
         writeFileSync(file, raw, "utf8");
         touched.push(id);
       }

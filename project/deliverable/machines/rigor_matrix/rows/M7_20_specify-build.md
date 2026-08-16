@@ -13,6 +13,7 @@ legal_tools:
   - se_file_read
   - se_file_write
   - se_file_patch
+  - se_file_delete
   - se_file_search
   - se_file_glob
   - se_file_list
