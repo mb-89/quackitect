@@ -247,3 +247,4 @@
 {"ts":"2026-08-16T18:04:49.111Z","op":"plan","visit":"iterations/i15/cut-criteria@0","parent":null,"nodes":[{"id":"d232","brief":"cut non-differentiating axes"},{"id":"d233","brief":"check/adjust the mechanical breaks_how_badly sort"},{"id":"d234","brief":"draw the vital-few threshold line"}]}
 {"ts":"2026-08-16T18:07:24.975Z","op":"done","visit":"iterations/i15/cut-criteria@0","node":"d232","brief":"cut 96 of 103 axes as non-differentiating, kept 7"}
 {"ts":"2026-08-16T18:16:39.613Z","op":"plan","visit":"iterations/i15/evaluate-set@0","parent":null,"nodes":[{"id":"d235","brief":"record subagent scores verbatim"},{"id":"d236","brief":"compute Pareto front mechanically"},{"id":"d237","brief":"write the reading section's three required judgments"}]}
+{"ts":"2026-08-16T18:17:17.128Z","op":"done","visit":"iterations/i15/evaluate-set@0","node":"d237","brief":"gate-candidates reviewed and blessed, front of 2 confirmed honest"}
