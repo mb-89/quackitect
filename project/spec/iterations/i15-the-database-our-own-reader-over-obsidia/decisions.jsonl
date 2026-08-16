@@ -237,3 +237,6 @@
 {"ts":"2026-08-16T18:03:30.602Z","op":"done","visit":"iterations/i15/run-candidates/cand-continue-v1s-shape@0","node":"d222","brief":"cand-continue-v1s-shape composed and submitted"}
 {"ts":"2026-08-16T18:03:34.288Z","op":"update","visit":"iterations/i15/run-candidates/cand-continue-v1s-shape@0","node":"d227","brief":"adding required current_situation/follow_up, resubmitting"}
 {"ts":"2026-08-16T18:03:47.165Z","op":"update","visit":"iterations/i15/run-candidates/cand-explicit-and-safe@0","node":"d228","brief":"wrote cand-explicit-and-safe's four sections"}
+{"ts":"2026-08-16T18:03:51.076Z","op":"done","visit":"iterations/i15/run-candidates/cand-continue-v1s-shape@0","node":"d223","brief":"cand-explicit-and-safe composed and submitted"}
+{"ts":"2026-08-16T18:04:03.284Z","op":"update","visit":"iterations/i15/run-candidates/cand-fast-path-plus-blocking@0","node":"d229","brief":"wrote cand-fast-path-plus-blocking's four sections"}
+{"ts":"2026-08-16T18:04:06.274Z","op":"done","visit":"iterations/i15/run-candidates/cand-continue-v1s-shape@0","node":"d224","brief":"cand-fast-path-plus-blocking composed and submitted"}
