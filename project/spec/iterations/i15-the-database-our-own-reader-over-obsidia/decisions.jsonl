@@ -206,3 +206,5 @@
 {"ts":"2026-08-16T17:50:08.595Z","op":"done","visit":"iterations/i15/enumerate-space/find_contradiction@0","node":"d190","brief":"find_contradiction form filled and submitted"}
 {"ts":"2026-08-16T17:50:52.965Z","op":"plan","visit":"iterations/i15/enumerate-space/find_analogy@0","parent":null,"nodes":[{"id":"d192","brief":"mint two analogy option nodes"},{"id":"d193","brief":"fill find_analogy form"}]}
 {"ts":"2026-08-16T17:51:05.930Z","op":"done","visit":"iterations/i15/enumerate-space/find_analogy@0","node":"d192","brief":"find_analogy form filled and submitted"}
+{"ts":"2026-08-16T17:51:36.167Z","op":"plan","visit":"iterations/i15/enumerate-space/find_without@0","parent":null,"nodes":[{"id":"d194","brief":"mint two without/trim option nodes"},{"id":"d195","brief":"fill find_without form"}]}
+{"ts":"2026-08-16T17:51:50.460Z","op":"done","visit":"iterations/i15/enumerate-space/find_without@0","node":"d195","brief":"find_without form filled and submitted"}
