@@ -1,6 +1,7 @@
 ---
 id: i34-one-tree-iterations-and-archives-live-on
-status: open
+status: shipped
+closed: 2026-08-16T10:27:44.749Z
 started: 2026-08-16T05:19:13.376Z
 opened: 2026-08-16T05:12:33.070Z
 goal: "One tree: iterations and archives live on disk on trunk, worktrees and record branches are gone, and the resolution seam that picks between trees is deleted rather than fixed."
