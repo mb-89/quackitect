@@ -23,6 +23,7 @@ satisfies:
   - req-setup-serves-shipped-method
   - req-method-reuse-is-vendoring
   - req-an-engine-change-applies-in-its-own-record
+  - req-a-method-change-reaches-every-tree
 inputs:
   - flow-method-sources
   - flow-overlay

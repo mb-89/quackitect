@@ -42,8 +42,8 @@ These paths are SHARED:
 - the tests
 
 A write to any of them resolves to the MACHINE ROOT, whatever tree is bound.
-It lands on the one copy. It cannot land in the record's worktree and fan out
-over trunk from there.
+It lands on the one copy. It cannot land in a record's own tree and fan out
+over trunk from there — and since i34 there is no other tree it could land in.
 
 THAT USED TO BE A REFUSAL. SE-C-134 blocked the write outright. The reason was
 real: on 2026-08-07 such a write pushed a record's copy over trunk and deleted

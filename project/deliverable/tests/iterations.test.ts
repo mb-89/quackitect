@@ -58,8 +58,19 @@ test("a seed stands in the container at once — its machine is M0", () => {
   // everything about the machine's mechanics, and it took the name of the job
   // it does: with records open it offers them and enters none. With none open
   // there is nothing to pick, and the single edge to `end` is all it carries.
+  //
+  // THE EXIT EDGE IS `alternative` RATHER THAN `normal`, and the reason is the
+  // one-open-iteration fix. The exit has to COUNT toward the choice, because
+  // `completeGuarded` holds the walk still only where more than one alternative
+  // stands. With the exit normal and a single root there was exactly one
+  // alternative, the guard stayed quiet, and the walk LEFT the container
+  // instead of offering the one door it had.
+  //
+  // WITH NOTHING OPEN THE ROLE CHANGES NOTHING THAT MATTERS, which is what this
+  // case pins. One alternative is not a choice, the guard stays quiet, and the
+  // walk still runs straight to end — right, because there is nothing to pick.
   const empty = generateIterations(freshRoot());
-  assert.deepEqual(empty.decl.states.find((s) => s.id === "select")?.edges, [{ to: "end", role: "normal" }]);
+  assert.deepEqual(empty.decl.states.find((s) => s.id === "select")?.edges, [{ to: "end", role: "alternative" }]);
   assert.equal(empty.decl.initial, "select", "the container starts on its selection state");
 });
 

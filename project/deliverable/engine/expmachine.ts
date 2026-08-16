@@ -96,6 +96,19 @@ export function generateContinueExpedition(root: string): GeneratedMachine {
   nodes.push(endNode);
   let rightmost = -740;
 
+  // LEAVING IS A DRAWN DOOR, AND IT COMES FIRST — the same correction the
+  // iterations container took, for the same defect (i34, found by the tester at
+  // verification). iterations.ts carries the full reasoning.
+  //
+  // THIS SIDE WAS WORSE. The exit was pushed ONLY when nothing stood open, so
+  // with any expedition open `start` had no edge out that did not pass through
+  // one — and a bare pull took the first authored edge, entering and BINDING an
+  // expedition nobody picked.
+  //
+  // BOTH DOORS ARE `alternative` so the choice guard can see them. It holds the
+  // walk still only above one alternative, so the exit has to count too, or a
+  // single open expedition offers nothing and the walk leaves instead.
+  start.edges.push({ to: "end", role: "alternative" });
   open.forEach((e, i) => {
     const sid = shortId(e.id);
     const fm = readRecord(root, e);
@@ -110,7 +123,7 @@ export function generateContinueExpedition(root: string): GeneratedMachine {
     // ALTERNATIVE into end — normal edges would AND-join: end would wait
     // for EVERY expedition, and one coming home is the whole point.
     states.push({ ...leaveTpl, id: leaveId, statement: "", edges: [{ to: "end", role: "alternative" }] });
-    start.edges.push({ to: workId, role: "normal" });
+    start.edges.push({ to: workId, role: "alternative" });
     const y = i * ROW_STEP;
     const workBox = nodeSize(workId, goal);
     const leaveBox = nodeSize(leaveId);
@@ -135,10 +148,8 @@ export function generateContinueExpedition(root: string): GeneratedMachine {
     edges.push({ id: `e-${leaveId}-end`, fromNode: `n-${leaveId}`, toNode: "n-end" });
   });
   endNode.x = rightmost + 260;
-  if (open.length === 0) {
-    start.edges.push({ to: "end", role: "normal" });
-    edges.push({ id: "e-start-end", fromNode: "n-start", toNode: "n-end" });
-  }
+  // The exit is drawn in every case now, because it EXISTS in every case.
+  edges.push({ id: "e-start-end", fromNode: "n-start", toNode: "n-end" });
   states.push(mechanical("end", "end"));
 
   const decl: MachineDecl = { id: "expeditions", reentry: "restart", initial: "start", states };

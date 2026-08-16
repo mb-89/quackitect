@@ -79,7 +79,8 @@ export class Satellite {
    *
    *  Level the tree first, and serve only if it came up level. A satellite
    *  that starts on an unlevelled tree serves a composition nobody assembled,
-   *  which is the mixture req-entry-levels-the-record-tree exists to prevent.
+   *  which is a tree that does not compile. req-entry-levels-the-record-tree
+   *  named that harm and was retired by i34 with the record trees.
    *
    *  NOTHING IS IN FLIGHT AT A START, so a partial one cannot be observed. */
   start(git: GitLane): SatelliteState {

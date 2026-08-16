@@ -42,5 +42,9 @@ so a lookup cannot be skipped by a verb that forgot about overrides.
 ## What it must not do
 
 Merge. A file is served from one store or the other. A
-composed file assembled from both is the mixture
-req-entry-levels-the-record-tree exists to prevent.
+composed file assembled from both is a mixture nobody
+assembled, and a walk beginning in it starts from a
+tree that does not compile. The requirement that named
+that harm, req-entry-levels-the-record-tree, was retired
+by i34 with the record trees. The harm is restated here
+because the rule outlived its citation.

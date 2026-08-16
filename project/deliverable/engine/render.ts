@@ -3846,9 +3846,14 @@ export function renderMirror(
   // every trace node off disk, and no other card wants them. Its three
   // filters arrive as query values, because each one REDRAWS the layout.
   const csv = (s: string | undefined): string[] => (s ?? "").split(",").filter((x) => x !== "");
-  // THE READER PICKS THE CORPUS. Trunk is what landed; an open record carries
-  // trunk plus its own work. Defaulting to the LAST open record shows the work
-  // in flight, which is what somebody looking at an open iteration means.
+  // ONE CORPUS, SO THERE IS NOTHING TO PICK. `corpora()` returns a single
+  // trunk entry since i34, and traceCard hides the selector below two.
+  //
+  // THE LOOKUP AND THE FALLBACK STAY. Both are cheap, both are correct at one
+  // entry, and the shape is what a second corpus would need again. The old
+  // comment claimed the LAST open record was the default because it showed the
+  // work in flight — with one entry that default is trunk, which is the only
+  // thing there is.
   const corpora = m.session.corpora();
   const pick = corpora.find((c) => c.id === traceCorpus) ?? corpora[corpora.length - 1] ?? corpora[0];
   const traceWidget = (): string => {

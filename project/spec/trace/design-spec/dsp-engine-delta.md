@@ -35,8 +35,12 @@ compositions and nothing says which is which.
 ## Behavior and constraints
 
 RECORD FIRST, TRUNK SECOND, NEVER BOTH. A file is served from one store or the
-other. A composed file assembled from both is the mixture
-[[req-entry-levels-the-record-tree]] exists to prevent.
+other. A composed file assembled from both is a mixture nobody
+assembled, and a walk beginning in it starts from a tree that does not compile.
+
+THE REQUIREMENT THAT CARRIED THIS RULE IS RETIRED. i34 deleted
+req-entry-levels-the-record-tree along with the record trees it levelled. The
+harm is restated above in full, because the rule outlived its citation.
 
 THE ORDER IS THE WHOLE RULE, and it lives under [[el-resolution-seam]] rather
 than beside it. A caller never asks the delta anything; every read reaches it

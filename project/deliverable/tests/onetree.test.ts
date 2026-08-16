@@ -13,10 +13,13 @@ import { itList } from "../engine/iterations.ts";
 import { itCloseShipped } from "../engine/worktree.ts";
 import { bootedServer, call, freshRoot, gitInit } from "./helpers.ts";
 
-// A second worktree needs a HEAD that points at something, so the fixture
-// commits once before any seed. Copied from containerchoice.test.ts, which
-// found this the hard way: without it the first seed succeeds and the second
-// refuses with "HEAD points to an invalid (or orphaned) reference".
+// SEEDING NEEDS A HEAD THAT POINTS AT SOMETHING, so the fixture commits once
+// before any seed. Copied from containerchoice.test.ts, which found it the hard
+// way: without the commit a seed refuses with "HEAD points to an invalid (or
+// orphaned) reference".
+//
+// The comment used to say this was about a second WORKTREE. i34 deleted the
+// worktrees and the reason survived them — the seed still writes through git.
 function committed(root: string): void {
   gitInit(root);
   spawnSync("git", ["add", "-A"], { cwd: root, encoding: "utf8" });
@@ -95,6 +98,45 @@ test("a bare pull at the container enters no iteration", async () => {
     if (!existsSync(abs)) continue;
     assert.doesNotMatch(readFileSync(abs, "utf8"), /^started: /m, `${rec.id} was stamped started by a choiceless pull`);
   }
+});
+
+// req-a-pull-carrying-no-choice-enters-no-iteration, WITH EXACTLY ONE OPEN.
+//
+// The requirement is unconditional, and so is the container's own guidance: "A
+// pull carrying no choice gets the offer back. It never gets an iteration."
+//
+// The first build met that with two or more open and failed quietly with one.
+// The root edge only became a CHOICE when there was more than one root to
+// choose between, so with a single open iteration the walk LEFT the container
+// instead of standing at the offer.
+//
+// The dangerous half held throughout: the exit door comes first in edge order,
+// so nothing was ever bound or stamped. The half that failed is the OFFER, and
+// a walk that silently leaves is how the person stops being asked at all.
+//
+// THIS IS THE LIVE CASE, not a corner. One open iteration is the ordinary state
+// of this project, and the case that existed seeded two.
+test("one open iteration is offered, never entered and never skipped past", async () => {
+  const root = freshRoot();
+  committed(root);
+  const server = await bootedServer(root);
+  const only = await seed(server, 1);
+  assert.equal(itList(root).filter((i) => i.open).length, 1, "exactly one iteration stands open");
+
+  const entered = (await call(server, "se_pull", { form: { choice: "iterations" } })).body as { where: string[] };
+  assert.deepEqual(entered.where, ["iterations/select"], "the choice lands on the selection state");
+
+  const bare = (await call(server, "se_pull", {})).body as { where: string[]; options?: { to: string }[] };
+
+  assert.deepEqual(bare.where, ["iterations/select"], `the walk left the selection state: ${JSON.stringify(bare.where)}`);
+  const offered = (bare.options ?? []).map((o) => o.to);
+  assert.ok(
+    offered.includes(`iterations/${only.match(/^(i\d+)-/)?.[1]}`),
+    `the only open iteration is on the offer: ${JSON.stringify(offered)}`,
+  );
+
+  const abs = join(root, `project/spec/iterations/${only}/record.md`);
+  assert.doesNotMatch(readFileSync(abs, "utf8"), /^started: /m, "the only open iteration was stamped started by a choiceless pull");
 });
 
 // req-a-records-own-status-decides-whether-it-is-open

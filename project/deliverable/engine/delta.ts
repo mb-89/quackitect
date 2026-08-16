@@ -27,8 +27,12 @@ export const deltaDirOf = (recordRel: string): string => join(recordRel, "delta"
 /** RECORD FIRST, TRUNK SECOND, NEVER BOTH.
  *
  *  A file is served from one store or the other. A composed file assembled
- *  from both is the mixture req-entry-levels-the-record-tree exists to
- *  prevent, so nothing here merges. */
+ *  from both is a mixture nobody assembled, and a walk beginning in it starts
+ *  from a tree that does not compile. So nothing here merges.
+ *
+ *  req-entry-levels-the-record-tree carried this rule and was retired by i34
+ *  with the record trees. The harm is stated here because the rule outlived
+ *  its citation. */
 export function composeForRecord(root: string, recordRel: string, rel: string): Served {
   const override = join(root, deltaDirOf(recordRel), rel);
   if (existsSync(override)) return { abs: override, from: "record" };

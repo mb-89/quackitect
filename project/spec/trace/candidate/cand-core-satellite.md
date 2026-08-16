@@ -282,9 +282,9 @@ carries.
 
 A DELTA THAT NO LONGER APPLIES STOPS THE RECORD AT ENTRY, with the conflict
 named, rather than composing a mixture nobody assembled. That is the harm
-req-entry-levels-the-record-tree exists to prevent, stated in its own words: a
+the retired req-entry-levels-the-record-tree named: a
 walk beginning in a tree that does not compile.
 
 SO A PARTIAL LEVELLING CANNOT BE OBSERVED HERE, which is the failure
-req-entry-levels-the-record-tree exists to prevent. The supervisor either
+that retired requirement named. The supervisor either
 brings the satellite up on a levelled tree or does not bring it up.

@@ -10,6 +10,7 @@ verifies:
   - "req-close-leaves-trunk-clean"
   - "req-land-demands-fresh-green"
   - "req-reject-names-the-redo"
+  - "req-trees-never-mix"
 files:
   - "tests/editsafety.test.ts"
   - "tests/gitlane.test.ts"
@@ -43,10 +44,22 @@ COMMITS the trunk's strays rather than refusing, and says which.
 
 ## What i34 removed from this spec
 
-THE STATEMENT CARRIED TWO CLAIMS THAT NO LONGER EXIST: landing "as one merge
-or none", and "the two trees never mixing". Both named a record's branch, and
-both requirements behind them are retired — req-land-is-one-piece and
-req-trees-never-mix.
+THE STATEMENT CARRIED TWO CLAIMS, AND ONLY ONE OF THEM WENT. Landing "as one
+merge or none" is gone with the record branches. "The two trees never mixing"
+is not, and telling them apart took a round trip.
+
+req-land-is-one-piece IS RETIRED. There is no landing act left to be atomic —
+work is written on trunk from the start.
+
+req-trees-never-mix STANDS AND IS STILL VERIFIED HERE. i34 retired it in error
+for half a day, then restored it. Its two trees are the VEHICLE OVERLAY and the
+ENGINE, never a record's branch and trunk, and i34 touched neither.
+
+THE APPROACH SECTION ABOVE HAD SAID SO ALL ALONG, which is how the error was
+caught the second time. It names "the no-writes-across-trees law of the overlay
+seam" as one of the four claims this spec defines. Dropping the row from
+`verifies:` left that sentence describing a claim the frontmatter no longer
+made — a spec disagreeing with itself, in two places a reader never compares.
 
 THERE IS NO LANDING ACT LEFT TO BE ATOMIC. Work is written on trunk from the
 first keystroke, so it is landed continuously rather than in one merge.

@@ -500,3 +500,62 @@
 {"ts":"2026-08-16T09:38:44.990Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d78","brief":"the value-prop measures follow the promise rather than the deleted mechanism"}
 {"ts":"2026-08-16T09:38:53.154Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d86","brief":"the last three carrying deleted mechanisms"}
 {"ts":"2026-08-16T09:39:10.914Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d79","brief":"the last spec prose describes what exists"}
+{"ts":"2026-08-16T09:41:14.912Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d87","brief":"tester: checking the three chooser deletions left no caller behind"}
+{"ts":"2026-08-16T09:41:25.733Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d88","brief":"tester: separating tombstones from live callers in the engine"}
+{"ts":"2026-08-16T09:41:37.327Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d89","brief":"tester: checking stateform.ts for a surviving recordRoot caller"}
+{"ts":"2026-08-16T09:41:47.103Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d90","brief":"tester: reading the new corpora body against its docstring"}
+{"ts":"2026-08-16T09:42:02.841Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d91","brief":"tester: reading my own battery verdict"}
+{"ts":"2026-08-16T09:44:08.420Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d80","brief":"re-verified every delta; two items still stand and are named in the report"}
+{"ts":"2026-08-16T09:45:03.576Z","op":"update","visit":"iterations/i34/trace-design@1","node":"d92","brief":"diagnosing why build-steps reads as an unsigned feeder"}
+{"ts":"2026-08-16T09:45:27.046Z","op":"plan","visit":"iterations/i34/trace-design@1","parent":null,"nodes":[{"id":"d93","brief":"resolve the one-open-iteration contradiction in the selection state"},{"id":"d94","brief":"fix two dangling wikilinks to the deleted requirement"},{"id":"d95","brief":"correct eight plain-text mentions of deleted ids"},{"id":"d96","brief":"correct four stale comments over changed code"},{"id":"d97","brief":"re-run the scoped battery and sign trace-design"}]}
+{"ts":"2026-08-16T09:46:59.433Z","op":"update","visit":"iterations/i34/trace-design@1","node":"d98","brief":"the failing case for one open iteration is written"}
+{"ts":"2026-08-16T09:47:12.334Z","op":"update","visit":"iterations/i34/trace-design@1","node":"d99","brief":"the failing case for one open iteration is written"}
+{"ts":"2026-08-16T09:48:13.088Z","op":"update","visit":"iterations/i34/trace-design@1","node":"d100","brief":"the exit door now counts toward the choice, so one open iteration still offers"}
+{"ts":"2026-08-16T09:49:53.188Z","op":"done","visit":"iterations/i34/trace-design@1","node":"d94","brief":"every dangling wikilink to a deleted requirement now states its harm directly"}
+{"ts":"2026-08-16T09:50:13.151Z","op":"done","visit":"iterations/i34/trace-design@1","node":"d95","brief":"the three code comments citing deleted requirements now state the harm"}
+{"ts":"2026-08-16T09:50:43.163Z","op":"update","visit":"iterations/i34/trace-design@1","node":"d101","brief":"the risk is re-pointed at the surviving requirement, grade re-check flagged"}
+{"ts":"2026-08-16T09:51:01.982Z","op":"update","visit":"iterations/i34/trace-design@1","node":"d102","brief":"the two session.ts docstrings now describe the code under them"}
+{"ts":"2026-08-16T09:51:11.279Z","op":"done","visit":"iterations/i34/trace-design@1","node":"d96","brief":"all four stale comments now describe the code beneath them"}
+{"ts":"2026-08-16T09:51:27.683Z","op":"update","visit":"iterations/i34/trace-design@1","node":"d103","brief":"unbracketed a link I had left pointing at a deleted node"}
+{"ts":"2026-08-16T09:51:38.968Z","op":"update","visit":"iterations/i34/trace-design@1","node":"d104","brief":"linting the corpus and the engine after the reference repairs"}
+{"ts":"2026-08-16T09:51:41.292Z","op":"update","visit":"iterations/i34/trace-design@1","node":"d105","brief":"linting the trace corpus after the reference repairs"}
+{"ts":"2026-08-16T09:52:43.631Z","op":"done","visit":"iterations/i34/trace-design@1","node":"d93","brief":"the exit door counts toward the choice, so one open iteration still gets the offer"}
+{"ts":"2026-08-16T09:54:14.664Z","op":"update","visit":"iterations/i34/trace-design@1","node":"d106","brief":"asking which build chunk the ripple knocked out of green"}
+{"ts":"2026-08-16T09:54:28.749Z","op":"fork","visit":"iterations/i34/trace-design@1","parent":"d97","node":"d107","brief":"tester round three re-verification","nodes":[]}
+{"ts":"2026-08-16T09:54:53.491Z","op":"update","visit":"iterations/i34/trace-design@1","node":"d108","brief":"checking whether the widened exit starves the container's end join"}
+{"ts":"2026-08-16T09:55:01.926Z","op":"update","visit":"iterations/i34/trace-design@1","node":"d109","brief":"finding where an AND-join decides it is satisfied"}
+{"ts":"2026-08-16T09:55:12.714Z","op":"update","visit":"iterations/i34/trace-design@1","node":"d110","brief":"reading the scoped run over the container and close paths"}
+{"ts":"2026-08-16T09:56:53.102Z","op":"done","visit":"iterations/i34/trace-design@1","node":"d107","brief":"round three verified: one red found in iterations.test.ts, item 3 challenged"}
+{"ts":"2026-08-16T09:59:23.628Z","op":"plan","visit":"iterations/i34/gate-implementation@0","parent":null,"nodes":[{"id":"d112","brief":"restore req-trees-never-mix and undo the bad re-pointing"},{"id":"d113","brief":"fix the stale iterations.test.ts assertion with its reason"},{"id":"d114","brief":"close the same hole in the expeditions container"},{"id":"d115","brief":"correct write-requirements' register and count"},{"id":"d116","brief":"re-run the battery"}]}
+{"ts":"2026-08-16T09:59:54.543Z","op":"done","visit":"iterations/i34/gate-implementation@0","node":"d113","brief":"the empty-container assertion now pins the role and says why"}
+{"ts":"2026-08-16T10:00:06.401Z","op":"done","visit":"iterations/i34/gate-implementation@0","node":"d112","brief":"the requirement is restored and the risk points where it always did"}
+{"ts":"2026-08-16T10:00:18.026Z","op":"update","visit":"iterations/i34/gate-implementation@0","node":"d117","brief":"the two prose files no longer claim the restored requirement is retired"}
+{"ts":"2026-08-16T10:01:25.951Z","op":"done","visit":"iterations/i34/gate-implementation@0","node":"d115","brief":"the register carries the restored row and the count is corrected"}
+{"ts":"2026-08-16T10:02:30.506Z","op":"done","visit":"iterations/i34/gate-implementation@0","node":"d114","brief":"the expeditions container offers an exit in every case, and the case pins it"}
+{"ts":"2026-08-16T10:03:02.851Z","op":"update","visit":"iterations/i34/gate-implementation@0","node":"d118","brief":"the expeditions container gets a driven bare-advance case, not only a shape check"}
+{"ts":"2026-08-16T10:03:58.421Z","op":"update","visit":"iterations/i34/gate-implementation@0","node":"d119","brief":"the expeditions case now drives the one-open branch, which is the hole"}
+{"ts":"2026-08-16T10:05:00.548Z","op":"update","visit":"iterations/i34/gate-implementation@0","node":"d120","brief":"the restored row is verified again, and the spec stops contradicting itself"}
+{"ts":"2026-08-16T10:06:17.185Z","op":"fork","visit":"iterations/i34/gate-implementation@0","parent":"d116","node":"d121","brief":"tester round four re-verification","nodes":[]}
+{"ts":"2026-08-16T10:06:35.659Z","op":"update","visit":"iterations/i34/gate-implementation@0","node":"d122","brief":"checking whether the restoration is committed or still in the working tree"}
+{"ts":"2026-08-16T10:06:54.932Z","op":"update","visit":"iterations/i34/gate-implementation@0","node":"d123","brief":"reading the two satisfied-by-construction rows at the ref where they still stood"}
+{"ts":"2026-08-16T10:08:20.683Z","op":"done","visit":"iterations/i34/gate-implementation@0","node":"d121","brief":"round four re-verification complete"}
+{"ts":"2026-08-16T10:08:28.888Z","op":"done","visit":"iterations/i34/gate-implementation@0","node":"d116","brief":"battery green at 1299 of 1299 across both container fixes"}
+{"ts":"2026-08-16T10:10:21.336Z","op":"done","visit":"iterations/i34/trace-design@1","node":"d97","brief":"trace-design signed and the contested restoration carries both readings"}
+{"ts":"2026-08-16T10:10:44.185Z","op":"plan","visit":"iterations/i34/gate-implementation@0","parent":null,"nodes":[{"id":"d124","brief":"record the isolation loss on the decision node"},{"id":"d125","brief":"submit the gate with round 0 and the verdict"}]}
+{"ts":"2026-08-16T10:11:41.375Z","op":"update","visit":"iterations/i34/gate-implementation@0","node":"d126","brief":"waiting on the gate's fresh full battery before the verdict"}
+{"ts":"2026-08-16T10:11:44.882Z","op":"done","visit":"iterations/i34/gate-implementation@0","node":"d124","brief":"the isolation loss is written on the decision node that made the trade"}
+{"ts":"2026-08-16T10:12:47.579Z","op":"update","visit":"iterations/i34/gate-implementation@0","node":"d127","brief":"one check, not a poll loop — then the gate goes in"}
+{"ts":"2026-08-16T10:14:32.137Z","op":"done","visit":"iterations/i34/gate-implementation@0","node":"d125","brief":"gate-implementation signed: pass with overrides, awaiting the owner's bless"}
+{"ts":"2026-08-16T10:15:03.542Z","op":"plan","visit":"iterations/i34/gate-implementation@0","parent":null,"nodes":[{"id":"d128","brief":"bless the implementation gate"},{"id":"d129","brief":"fill story evidence"},{"id":"d130","brief":"gate-validation and the consistency sweep"},{"id":"d131","brief":"package"},{"id":"d132","brief":"gate-release and ship"}]}
+{"ts":"2026-08-16T10:15:07.749Z","op":"plan","visit":"iterations/i34/gate-implementation@0","parent":null,"nodes":[]}
+{"ts":"2026-08-16T10:15:19.267Z","op":"done","visit":"iterations/i34/gate-implementation@0","node":"d128","brief":"the owner blessed the implementation gate"}
+{"ts":"2026-08-16T10:15:55.538Z","op":"update","visit":"iterations/i34/derive-functions@3","node":"d133","brief":"the two restored rows get the functions that already serve their families"}
+{"ts":"2026-08-16T10:16:44.688Z","op":"update","visit":"iterations/i34/author-tests@3","node":"d134","brief":"the restored row is verified again and the false clause leaves the statement"}
+{"ts":"2026-08-16T10:17:01.038Z","op":"done","visit":"iterations/i34/gate-implementation@0","node":"d129","brief":"story evidence stands; the walk reached the consistency sweep"}
+{"ts":"2026-08-16T10:17:38.721Z","op":"update","visit":"iterations/i34/sweep-consistency@0","node":"d135","brief":"four engine-served strings still taught worktrees; all corrected"}
+{"ts":"2026-08-16T10:19:00.481Z","op":"update","visit":"iterations/i34/sweep-consistency@0","node":"d136","brief":"the product declaration taught i34's work as a plan; now it states what runs"}
+{"ts":"2026-08-16T10:19:38.228Z","op":"done","visit":"iterations/i34/gate-implementation@0","node":"d130","brief":"six documents taught the superseded way; all fixed and the sweep signed"}
+{"ts":"2026-08-16T10:22:08.905Z","op":"update","visit":"iterations/i34/gate-validation@0","node":"d137","brief":"the orphaned must story gets a demonstration spec that names what it cannot show"}
+{"ts":"2026-08-16T10:22:50.834Z","op":"done","visit":"iterations/i34/gate-implementation@0","node":"d131","brief":"validation gate signed and blessed, with the orphaned story's spec on its record"}
+{"ts":"2026-08-16T10:24:56.063Z","op":"update","visit":"iterations/i34/package@0","node":"d138","brief":"4.1.0 shipped in i27 and was never bumped; now 4.2.0 with its entry"}
+{"ts":"2026-08-16T10:26:55.981Z","op":"update","visit":"iterations/i34/gate-release@0","node":"d139","brief":"package signed at 4.2.0, checked by installing and running the extraction"}

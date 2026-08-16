@@ -161,7 +161,7 @@ THAT CLOSES THE LEAN THIS RECORD ALREADY CARRIES - "a tree that has not caught
 up answers from stale method" - for the one case the fan cannot cover.
 
 A PARTIAL LEVELLING IS THE RISK, and it is the same risk the fan carries.
-req-a-method-change-reaches-every-tree states it directly - a partial fan is
+The retired req-a-method-change-reaches-every-tree stated it directly - a partial fan is
 worse than none, because an unsynced tree is old and self-consistent while a
 half-synced one does not compile. Entry either completes and commits, or the
 record does not open.

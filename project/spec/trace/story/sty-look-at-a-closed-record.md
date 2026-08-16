@@ -19,7 +19,7 @@ A closed record stands in i1 already: the expedition exp-trunk-read-cost, closed
 
 The engineer opens the archive. Every closed record stands in it, none of them live, none of them walkable.
 |||
-The archive suite tsp-archive is green in the battery; req-archive-releases-worktrees holds nothing live survives a close.
+The archive suite tsp-archive is green in the battery; req-a-closed-records-folder-stays-on-trunk holds the closed record readable from the tree.
 
 ---
 

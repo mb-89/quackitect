@@ -153,8 +153,9 @@ WHAT IT COSTS.
   a lookup per module per record rather than per call, so it is paid at load.
 - A DELTA CAN GO STALE AGAINST THE TRUNK MODULE IT OVERRIDES. Trunk moves,
   the override does not, and the composed engine is a mixture nobody
-  assembled. That is the same failure req-entry-levels-the-record-tree names
-  for method, and it wants the same answer at entry.
+  assembled. That is the same failure the retired
+  req-entry-levels-the-record-tree named for method, and it wants the same
+  answer at entry.
 - THE KEYING STILL HAS TO BE UNESCAPABLE, unchanged. One module reached
   outside it serves the wrong version and reports success.
 

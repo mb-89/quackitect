@@ -841,9 +841,43 @@ export function generateIterations(root: string): GeneratedMachine {
     // iteration it waits for, which is what makes the wait real.
     if ((depsOf.get(sid) ?? []).length === 0) roots.push(sid);
   }
-  // ALTERNATIVE is the role that already means OR here. With one root the edge
-  // stays normal, because entering the only thing open is not a choice.
-  const rootRole = roots.length > 1 ? ("alternative" as const) : ("normal" as const);
+  // LEAVING IS A DOOR LIKE ANY OTHER, so it carries the same role as the rest.
+  //
+  // ALTERNATIVE is the role that means OR. `completeGuarded` holds the walk
+  // still only where MORE THAN ONE alternative stands (session.ts: "one
+  // alternative is not a choice" — a lone one is how a return and a
+  // single-visit machine are drawn, and both must keep walking through).
+  //
+  // SO THE EXIT COUNTS TOWARD THE CHOICE, and that is the whole correction.
+  // With the exit normal and ONE root there was exactly one alternative, the
+  // guard stayed quiet, and the walk took the first authored edge — the exit.
+  // It left the container instead of standing at the offer.
+  //
+  // NOTHING WAS EVER BOUND BY THAT. The exit comes first in edge order, so the
+  // dangerous half held throughout. The half that failed is the OFFER, and a
+  // walk that silently leaves is how the person stops being asked at all.
+  //
+  // ONE OPEN ITERATION IS THE ORDINARY STATE OF THIS PROJECT, not a corner. The
+  // requirement is unconditional, the guidance above it is unconditional, and
+  // the old `roots.length > 1` made the code disagree with both. Counting both
+  // doors gives two alternatives with one root and three with two, so the offer
+  // stands wherever anything is open.
+  //
+  // WITH NOTHING OPEN the exit is the only alternative, the guard stays quiet,
+  // and the walk leaves — which is right, because there is nothing to choose.
+  //
+  // IT DOES A SECOND THING, AND THE SECOND ONE IS LOAD-BEARING. `INPUT_ROLES`
+  // is `normal` and `approval` (machine.ts), so an `alternative` edge is not
+  // join fuel: it activates its target directly, and a target of kind `end`
+  // closes the instance there and then. So this also takes `select → end` OUT
+  // of `end`'s input set and turns leaving into a direct close.
+  //
+  // THAT CANNOT STARVE THE JOIN, and it was checked rather than assumed. An
+  // AND-join needs `busbar === true` with two or more inbound (machine.ts), and
+  // this container's `end` carries no busbar — so it was never an AND-join and
+  // has nothing to starve. Every iteration state still feeds `end` as `normal`,
+  // so the inbound set is mixed by design, not by oversight.
+  const rootRole = "alternative" as const;
   // LEAVING IS A DRAWN DOOR, AND IT COMES FIRST. This is the whole defect.
   //
   // Before this, the container had NO exit that did not pass through an
@@ -861,7 +895,7 @@ export function generateIterations(root: string): GeneratedMachine {
   // and takes the first whose role is authored, so edge order IS the default
   // when nothing chose. The default must be to leave, never to take up work
   // nobody picked.
-  select.edges.push({ to: "end", role: "normal" });
+  select.edges.push({ to: "end", role: rootRole });
   for (const sid of roots) select.edges.push({ to: sid, role: rootRole });
   states.push({
     id: "end",

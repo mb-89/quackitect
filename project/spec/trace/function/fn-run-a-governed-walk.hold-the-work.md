@@ -57,8 +57,10 @@ function, and each has its own rationale.
 req-entry-binds-worktree was struck and its node deleted, on the owner's
 ruling of 2026-08-14. Both halves it carried are still here.
 
-- SOMEWHERE TO WORK is [[req-parallel-iterations-own-worktrees]], which states
-  the outcome rather than the mechanism.
+- SOMEWHERE TO WORK was req-parallel-iterations-own-worktrees, retired by
+  i34. There is one tree now and every iteration writes into it, so the
+  isolation that requirement demanded is gone on purpose. What remains is the
+  record's own folder, which no other record writes into.
 - STAMPED STARTED is [[req-record-status-comes-from-the-record]], which sits
   on the function that routes work rather than on this one.
 

@@ -31,4 +31,4 @@ partner mechanism for the overlap — which is what the merge queue is for.
 
 The seal earns its place anyway on a different axis. It makes a half-landed
 trunk impossible to reach by construction rather than by a refusal that has
-to be remembered, which is what req-land-is-one-piece asks for.
+to be remembered, which is what the retired req-land-is-one-piece asked for.

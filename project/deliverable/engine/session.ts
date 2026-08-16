@@ -955,14 +955,17 @@ export class Session {
     return this.root;
   }
 
-  /** THE CORPORA A READER MAY CHOOSE BETWEEN (owner ruling 2026-08-06).
+  /** THE CORPUS A READER SEES. One entry, because there is one tree.
    *
-   *  Trunk is what has landed. An OPEN record's worktree is a full checkout,
-   *  so it carries trunk's nodes AND everything that record has authored.
+   *  IT USED TO BE A CHOICE (owner ruling 2026-08-06). Trunk was what had
+   *  landed, an open record's worktree was a full checkout carrying trunk's
+   *  nodes AND that record's own, and a whole-corpus view belonged to no
+   *  single record — so the person picked which one they meant instead of the
+   *  engine guessing, which it had done three times, differently each time.
    *
-   *  A whole-corpus view belongs to no single record, so the person picks
-   *  which one they mean instead of the engine guessing — which it did three
-   *  times before this existed, differently each time. */
+   *  i34 GAVE THE QUESTION ONE ANSWER by deleting the second tree. The ruling
+   *  is not overturned: nobody guesses. There is simply nothing left to pick
+   *  between, so the picker is hidden rather than asked. */
   corpora(): { id: string; label: string; path: string }[] {
     // ONE CORPUS, BECAUSE THERE IS ONE TREE (i34, found by the tester at
     // verification). This offered trunk plus one entry per open iteration, so
@@ -979,7 +982,12 @@ export class Session {
    *  them there whatever branch this one happened to stand on. Resolving them
    *  into a worktree wrote them where nobody would ever look — silently.
    *
-   *  Everything else follows the walk into its worktree, as it always did. */
+   *  EVERYTHING ELSE RESOLVES TO THE ONE WORKING ROOT. It used to follow the
+   *  walk into the bound record's worktree; i34 deleted the worktrees, so the
+   *  classification below still runs and every branch of it now lands in the
+   *  same tree. The classification is kept because it still separates session
+   *  state and shared method from a record's own content, and those are
+   *  different things whatever the tree count. */
   laneRoot(rel?: string): string {
     if (rel === undefined) return this.workRoot();
     // RESOLVED BY WHAT THE PATH IS, never by where the walk stands (owner

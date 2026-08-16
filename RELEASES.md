@@ -2,6 +2,34 @@
 
 One entry per shipped version, newest first.
 
+## 4.2.0 — 2026-08-16
+
+Your work lives in one place again.
+
+- A job's files sit in an ordinary folder alongside everything else. Before
+  this, each open job got its own separate copy of the whole project, and the
+  system had to decide which copy you meant on every single action. It decided
+  wrongly often enough to be worth removing.
+- Finished jobs stay where you can read them. You no longer need any special
+  command to look at one — open the folder.
+- Picking a job to work on is now a question you answer. Opening the job list
+  shows you what is open and waits. Before this, coming back after a dropped
+  connection could start a job nobody chose, and mark it started.
+- The same is true of the shorter side-tasks. Their list now offers a way out
+  as well as a way in.
+
+### What this release takes away
+
+- SHARING WORK BETWEEN TWO MACHINES IS SWITCHED OFF. 4.0.0 let one machine
+  publish a job and another take it, and guaranteed two machines could never
+  hold the same one. That guarantee and the machinery behind it are gone.
+- IT NEVER RAN FOR REAL. The feature shipped and was never once used end to
+  end on a second machine. That is why it was switched off rather than kept.
+- IF YOU NEED IT BACK, nothing about this release blocks it. The conflict was
+  with keeping several copies on ONE machine, never with one copy per machine.
+- TWO JOBS OPEN AT ONCE NOW SHARE FILES. Separate copies used to keep them
+  apart. Nothing does now, so work one job at a time.
+
 ## 4.1.0 — 2026-08-14
 
 Fixing how you work no longer means stepping outside your work.

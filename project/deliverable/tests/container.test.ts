@@ -104,6 +104,51 @@ test("empty container: nothing open → start runs straight to end", async () =>
   assert.deepEqual(s.active(), ["expeditions/end"]);
 });
 
+// THE SAME DEMAND AS THE ITERATIONS CONTAINER'S, DRIVEN THE SAME WAY.
+//
+// req-a-pull-carrying-no-choice-enters-no-iteration says ITERATION, so this
+// container sits outside its letter. The harm is identical: entering BINDS the
+// record, so a choiceless advance took up work nobody picked.
+//
+// IT WAS WORSE HERE THAN THERE. The iterations container at least had an exit
+// edge; this one pushed `start → end` only when NOTHING stood open, so with any
+// expedition open there was no way out that did not pass through one.
+//
+// The shape assertion below pins the edges. This drives the walk, because a
+// shape that looks right is not a walk that stands still.
+test("a choiceless advance at the expeditions container enters no expedition", async () => {
+  const root = freshRoot();
+  gitSeed(root);
+  const s = new Session(root);
+  await bootHuman(s);
+
+  // ONE EXPEDITION, AND THE COUNT IS THE WHOLE POINT.
+  //
+  // With TWO or more open, `assertEdge` already refused an unnamed advance —
+  // `start` had several edges and it says so. That branch was never the hole.
+  //
+  // WITH ONE OPEN, `start` carried exactly ONE edge, because the exit was
+  // pushed only when nothing stood open. One edge is not "several", so the
+  // unnamed advance took it, entered the expedition and BOUND it.
+  const only = s.expeditionNew("spike", "First Thing") as { created: string };
+
+  await s.advance("expeditions");
+  assert.deepEqual(s.active(), ["expeditions/start"], "the choice lands on the container");
+  const gen = generateContinueExpedition(root);
+  assert.equal(gen.decl.states[0].edges.length, 2, "one open expedition still leaves two doors: leave, or take it");
+
+  // NO ARGUMENT. This is what a dropped connection produces.
+  await assert.rejects(
+    () => s.advance(),
+    (e) => (e as { clause?: string }).clause === "SE-C-110",
+    "a choiceless advance is refused where doors stand, rather than taking one",
+  );
+
+  // AND NOTHING WAS BOUND. Entering is what binds, so its absence is the
+  // mechanical proof that no expedition was taken up.
+  assert.notEqual(s.boundRecordId(), only.created, "a choiceless advance bound the only open expedition");
+});
+
 test("seeded container: expeditions are the states, entering BINDS, one ending completes, re-entry regenerates", async () => {
   const root = freshRoot();
   gitSeed(root);
@@ -119,9 +164,28 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
     ["start", sidA, `${sidA}-leave`, sidB, `${sidB}-leave`, "end"],
   );
   assert.equal(gen.decl.states.find((x) => x.id === sidA)?.statement, "First Thing", "the record's goal is the statement");
+  // THE EXIT DOOR IS ON THE LIST AT ALL ONLY SINCE i34, AND IT COMES FIRST.
+  //
+  // Before that, `start → end` was pushed ONLY when nothing stood open. With
+  // any expedition open there was no way out of the container that did not
+  // pass through one — and passing through BINDS it. The iterations container
+  // carried the same defect and took the same fix; iterations.ts has the full
+  // reasoning.
+  //
+  // ORDER IS NOT COSMETIC. `tryMove` takes the first authored edge, so first in
+  // the list IS the default when nothing chose. The default must be to leave,
+  // never to take up work nobody picked.
   assert.deepEqual(
     gen.decl.states[0].edges.map((e) => e.to),
-    [sidA, sidB],
+    ["end", sidA, sidB],
+  );
+  // BOTH DOORS CARRY `alternative`, because the choice guard holds the walk
+  // still only ABOVE one alternative. The exit has to count toward the choice,
+  // or a single open expedition offers nothing and the walk leaves instead.
+  assert.deepEqual(
+    [...new Set(gen.decl.states[0].edges.map((e) => e.role))],
+    ["alternative"],
+    "every door out of the container is a choice, the exit included",
   );
   // The leave gate rides the AUTHORED note into every instance.
   assert.deepEqual(gen.decl.states.find((x) => x.id === `${sidB}-leave`)?.entry?.evidence_form, ["expedition-leave"]);

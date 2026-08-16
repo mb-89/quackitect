@@ -2,13 +2,31 @@
 minted_in: i27
 id: tsp-bound-engine-and-method
 type: "[[test-spec]]"
-statement: An agent changes the engine or the method from inside their record, the change takes effect on their next call, and no other record is altered by it.
+statement: An agent changes the engine or the method from inside their record, and the change takes effect on their next call.
 method: "test"
 verifies:
   - "req-an-engine-change-applies-in-its-own-record"
+  - "req-a-method-change-reaches-every-tree"
 files:
   - tests/bound-engine.test.ts
 ---
+
+## What i34 changed here, 2026-08-16
+
+THE THIRD CLAUSE IS GONE FROM THE STATEMENT. It read "and no other record is
+altered by it", which one tree makes false rather than unproven. Every open
+record now writes into the same tree. That loss is recorded on
+raid-dec-one-tree-beats-a-record-travelling-between-machines, which is the
+decision that took it.
+
+req-a-method-change-reaches-every-tree IS BACK ON THE `verifies:` LIST. i34
+retired it by reading its id — which says reaches-every-tree — rather than its
+statement, which asks one thing: the change takes effect without the agent
+leaving the record. This spec's statement said the same in its own words the
+whole time, which is why the row belongs here and nowhere else.
+
+THE ROW'S RESTORATION IS CONTESTED and the adjudicator settles it. Both
+readings are written into the requirement node with their evidence.
 
 ## Scope
 
@@ -33,7 +51,10 @@ right answer.
   the conflict named.
 
 The fourth cell is the one that matters. A composed mixture nobody assembled
-is the harm [[req-entry-levels-the-record-tree]] exists to prevent.
+is the harm: a walk that begins in a tree which does not compile.
+
+req-entry-levels-the-record-tree carried that harm and was retired by i34 with
+the record trees themselves. The cell stays because the harm does.
 
 LEVEL: component for the resolution order, integration for the levelling.
 

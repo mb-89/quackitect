@@ -4,7 +4,8 @@
 // The decision table this walks has two axes: whether the record carries an
 // override, and whether trunk has moved under it. The fourth cell — override
 // plus moved trunk — is the one that matters, because a composed mixture
-// nobody assembled is what req-entry-levels-the-record-tree exists to prevent.
+// nobody assembled is a tree that does not compile. req-entry-levels-the-record-tree
+// named that harm and was retired by i34; the cell stays because the harm does.
 import { strict as assert } from "node:assert";
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";

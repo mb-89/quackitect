@@ -12,35 +12,43 @@ so any machine that clones this repo reads the same answer.
 
 Quackitect is SELF-HOSTING. It works on itself.
 
-The intent is that its records get NO worktree and walk on trunk. A change to
-the method then lands where the walk is standing, and applies to the walk that
-made it.
+Its records get NO worktree and walk on trunk. A change to the method lands
+where the walk is standing, and applies to the walk that made it.
+
+THIS WAS AN INTENT UNTIL 2026-08-16 and is now how the system runs. i34 removed
+the worktrees and the record branches, so every record is a folder on trunk.
 
 WHY THE EXCEPTION IS SAFE AND HAS EXACTLY ONE MEMBER. A product never works on
 Quackitect. Only Quackitect works on itself, and a vehicle working on itself
 is the one case where the machine under the walk and the machine being changed
 are the same machine.
 
-## THE ENGINE DOES NOT ACT ON THIS YET
+## THE ENGINE STILL DOES NOT ACT ON THIS, AND NO LONGER NEEDS TO
 
 Stated plainly, because a setting nothing reads is a trap.
 
 `self_hosting` is a DECLARATION of a decided property. No code branches on it
-today.
+today, and that is now correct rather than pending.
 
-WHAT HAS TO LAND FIRST. A record can only walk on trunk once its content IS on
-trunk. On 2026-08-14 i27's own content stood on its branch: nine evidence
-files, four design specs, and the record's machines. Switching the resolution
-first pointed the walk at a trunk that did not hold them, and four design
-specs went invisible in one call.
+WHAT WAS SUPPOSED TO HAPPEN. The plan was to build a git adapter, LEVEL each
+record's content onto trunk, then let this declaration steer `workRoot()`. The
+risk was real and was watched: on 2026-08-14 i27's own content stood on its
+branch — nine evidence files, four design specs and the record's machines — and
+pointing the walk at trunk first would have made them vanish.
 
-MOVING IT IS CALLED LEVELLING, and the engine already has the decision logic:
-`levelRecordTree` in `engine/supervisor.ts`. What it lacks is a real git
-adapter behind its `GitLane` interface, and that belongs to the process chunks
-that own a repository.
+WHAT HAPPENED INSTEAD, i34 on 2026-08-16. The content was merged to trunk once,
+by hand and checked before the branches were deleted, and then the RESOLUTION
+SEAM ITSELF WAS DELETED. There is no second tree to steer toward, so
+`workRoot()` needs no declaration to consult.
 
-SO THE ORDER IS: build the adapter, level the record onto trunk, then let this
-declaration steer `workRoot()`.
+THE DANGER THE PLAN NAMED WAS REAL AND NEARLY LANDED. Immediately before the
+branch deletion, trunk held one record folder and none of i34's own evidence.
+The check caught it and the merge brought 35 folders and 700 trace nodes
+across. That is why the order mattered, even though the destination changed.
+
+`levelRecordTree` in `engine/supervisor.ts` still exists and is still used — by
+the SATELLITE, which levels a tree before it serves. That is a different job
+from the record levelling this section once planned.
 
 ## What retired SE-C-134 instead
 

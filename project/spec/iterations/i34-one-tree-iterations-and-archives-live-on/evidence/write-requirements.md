@@ -1,8 +1,8 @@
 ---
 form: write-requirements
 by: agent
-signed_off: 2026-08-16T09:00:35.014Z
-amended: "2026-08-16T06:53:05.596Z by agent — The chain below this form was repaired: generalize-use-cases still named the deleted use case, which is where the fallen tree actually rooted. This form's register…"
+signed_off: 2026-08-16T09:56:51.297Z
+amended: "2026-08-16T10:01:26.048Z by agent — req-trees-never-mix was retired in error and is restored: its two trees are the overlay and the engine, which i34 never touched"
 authors: agent
 files:
 ---
@@ -75,7 +75,6 @@ THEY ARE FOUR AND NOT FIFTEEN ON PURPOSE. Each one is a pass line from the motiv
 - req-desk-offers-a-tour
 - req-desk-states-the-folder-rule
 - req-desk-takes-plain-words
-- req-diverged-trees-reported-never-merged
 - req-divergence-order-on-record
 - req-drain-one-home-with-payload
 - req-drained-note-leaves-count
@@ -86,7 +85,6 @@ THEY ARE FOUR AND NOT FIFTEEN ON PURPOSE. Each one is a pass line from the motiv
 - req-engine-folder-is-sealed
 - req-engine-port-fallback
 - req-entering-repairs-itself-or-names-the-remedy
-- req-entry-levels-the-record-tree
 - req-entry-speaks-plainly
 - req-every-artifact-is-readable-text
 - req-every-call-logged
@@ -118,7 +116,6 @@ THEY ARE FOUR AND NOT FIFTEEN ON PURPOSE. Each one is a pass line from the motiv
 - req-instruction-names-its-source
 - req-kickoff-refuses-pending-notes
 - req-land-demands-fresh-green
-- req-land-is-one-piece
 - req-land-target-routes-to-gate
 - req-landing-needs-no-close
 - req-lane-fixes-what-machines-fix
@@ -215,6 +212,7 @@ THEY ARE FOUR AND NOT FIFTEEN ON PURPOSE. Each one is a pass line from the motiv
 - req-tour-speaks-plainly
 - req-trace-source-never-mixes
 - req-trace-view-derived-from-files
+- req-trees-never-mix
 - req-two-options-beyond-the-obvious
 - req-unknown-drain-ref-refused
 - req-unshipped-dependency-refused
@@ -240,26 +238,39 @@ THEY ARE FOUR AND NOT FIFTEEN ON PURPOSE. Each one is a pass line from the motiv
 
 ## follow_up
 
-THE SUPERSESSION THIS FORM NAMED IS DONE. It said five standing requirements contradict i34 and must be superseded rather than left to rot beside it. Seven were retired in the end, and the two extra ones arrived from outside.
+THE SUPERSESSION THIS FORM NAMED IS DONE. It said five standing requirements contradict i34 and must be superseded rather than left to rot beside it. NINE were retired in the end. One tenth was retired and PUT BACK, and that one is the finding worth reading.
 
-THE FIVE THIS ITERATION FOUND.
+THE FOUR THIS ITERATION FOUND THAT HELD UP.
 
 - req-parallel-iterations-own-worktrees — head-on. There are no worktrees.
 - req-archive-releases-worktrees — there is no worktree to release at a close.
-- req-trees-never-mix — one tree, so nothing can mix. It would have passed forever while checking nothing, which is worse than failing.
 - req-a-method-change-reaches-every-tree — satisfied by construction, so it measures nothing.
 - req-shared-change-reaches-without-unlanded-work-reaching — same reason.
+
+THE FIFTH WAS WRONG AND IS RESTORED. req-trees-never-mix was retired with the reason "one tree, so nothing can mix". That reason is about RECORD WORKTREES. The row is about the VEHICLE OVERLAY and the ENGINE tree, which i34 never touched.
+
+TWO THINGS WERE BOTH CALLED "TREE" and the deletion swept the wrong one. i27's own acceptance line says what the row measures: "count engine writes inside the overlay tree and overlay content inside the engine tree". The overlay is still live — req-overlay-resolution, req-overlay-survives-update and req-overlay-drift-reported all stand.
+
+SO A DEMAND WAS DROPPED, NOT MADE VACUOUS, and that is the distinction the whole supersession rests on. A row that would pass forever while checking nothing is worth deleting. A row nobody is checking any more is a hole.
 
 TWO MORE CAME IN WITH i28, whose specification was merged back into the corpus during this iteration's rescue step.
 
 - req-a-worktree-exists-only-while-a-walk-is-bound — its whole behaviour model is the worktree lifecycle i34 deletes.
 - req-the-iteration-list-comes-from-git — half right and superseded by a better row. It wanted open state read from the record's status rather than from a directory, which is exactly req-a-records-own-status-decides-whether-it-is-open. What it got wrong is where the record lives: on git refs rather than on trunk.
 
-THIRTY-SIX REFERRING LINES WERE REPAIRED, across twenty-six files: five elements, three functions, one interface, one flow, six raid entries, five test-specs and five other requirements. Each landing was read back rather than counted.
+THREE MORE FELL WITH THE SEAM, and this register is where they were caught. It still named all three after they were deleted, so its own claim refused and every claim standing on it fell with it.
+
+- req-land-is-one-piece — there is no landing act left to be atomic. Work is written on trunk from the start, so there is no merge that could be one piece.
+- req-entry-levels-the-record-tree — there is no record tree to level at entry.
+- req-diverged-trees-reported-never-merged — one tree cannot diverge from itself.
+
+EVERY REFERENCE TO THE NINE WAS REPAIRED RATHER THAN LEFT DANGLING. Seventeen citations across fourteen files in the live corpus, and three more in the engine's own comments. Each one now states the HARM its requirement named, instead of pointing at a node that resolves to nothing.
+
+THIRTY-SIX REFERRING LINES WERE REPAIRED EARLIER, across twenty-six files: five elements, three functions, one interface, one flow, six raid entries, five test-specs and five other requirements. Each landing was read back rather than counted.
 
 THE USE CASE WAS REWRITTEN TOO. uc-start-an-unattended-machine described six steps ending in a claim; it now describes five ending in a walk, and says plainly what i34 took out of it.
 
-NEXT: the build states, whose code is written and green at 1299 of 1299.
+NEXT: the build states, whose code is written and green.
 
 ## anything_else
 

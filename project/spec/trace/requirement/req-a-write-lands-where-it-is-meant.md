@@ -69,6 +69,10 @@ req-trees-never-mix says the engine lands zero writes inside a vehicle's
 overlay tree and zero overlay content inside its own. That stands, and
 it does NOT forbid what this row permits.
 
+i34 RETIRED IT FOR HALF A DAY AND PUT IT BACK. The reason given was "one tree,
+so nothing can mix", which is about record worktrees. This row is about the
+vehicle overlay and the engine tree, and i34 never touched those.
+
 MIXING is content of one tree bleeding into another where nobody meant
 it to - the two ending up interleaved, and neither being what it says it
 is.

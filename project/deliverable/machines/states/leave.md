@@ -10,5 +10,5 @@ guidance: The gate out — entering leave demands the expedition-leave page (the
 # Leave
 
 The context-manager exit. The close carries the ruling — apply to trunk or
-dismiss to the archive; leaving it open keeps the worktree for
+dismiss to the archive; leaving it open keeps the record open for
 continue_expedition to find again.

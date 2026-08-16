@@ -9,6 +9,7 @@ satisfies:
   - req-version-control-resolves-like-every-call
   - req-a-write-lands-where-it-is-meant
   - req-a-read-comes-from-where-it-is-meant
+  - req-trees-never-mix
   - req-a-resolution-is-proven-by-read-back
 inputs:
   - flow-dispatched-call
