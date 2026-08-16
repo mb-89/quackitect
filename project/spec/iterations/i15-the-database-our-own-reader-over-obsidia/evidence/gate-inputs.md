@@ -1,5 +1,8 @@
 ---
 form: gate-inputs
+bless: blessed by agent
+by: agent
+signed_off: 2026-08-16T16:52:49.725Z
 authors: agent
 files:
 ---
@@ -8,6 +11,7 @@ files:
 
 ## current_situation
 
+write-stories and generalize-use-cases both stand signed. Three new stories carry the two roles map-stakeholders named — the agent and the engineer — through concrete passes over the query verb and the BM25 sibling, and three new use cases generalize them with full bidirectional coverage across the standing 31-story, 38-use-case set. This gate judges the user picture before any system-level writing starts.
 
 ## picture_judged
 
@@ -41,18 +45,18 @@ None narrates the pinned subset or the ranking math, per map-stakeholders' own i
 
 ## round_0_verify
 
-- write-stories: signed, stories field covers all 7 standing value props (computed, covers: value-prop)
-- generalize-use-cases: signed, use_cases field covers all 31 standing stories including the 3 new ones (computed, covers: story)
-- every new story and use case carries a priority (must/should/must) and a single actor
-- types/lint/tests: n/a, no code changed yet in this iteration — the build machine below runs it per milestone
+- evidence vs claims: pass — write-stories' stories field and generalize-use-cases' use_cases field both resolved and signed; every cited id in this form's own text (roles, value props, prior stories) checks out against its named source
+- types: n/a — no code changed yet in this iteration
+- lint: n/a — no code changed yet
+- tests: n/a — no fixtures written yet; conformance fixtures are pulled-in scope, not yet built
 
 ## round_1_validate
 
-- exercised against the M1 frame: pass — the two roles map-stakeholders named (agent, engineer) both got a concrete pass, and both facets frame-delta and draft-vision named (vp-the-ledger, vp-rigor-without-toil) are refined
+- exercised against the goal: pass — the two roles map-stakeholders named (agent, engineer) both got a concrete pass, and both facets frame-delta and draft-vision named (vp-the-ledger, vp-rigor-without-toil) are refined by at least one story
 - missing: none found beyond the raid entries already open
 - wrong: none found in this pass
 - out of scope: unchanged from scope-non-goals, still correctly excluded
-- prior art (user-picture level, e.g. does Obsidian's own Bases view already give an engineer the same click-to-rationale pass): NOT SCANNED. Native WebSearch was tried again at this gate and was declined at the permission layer, the same outcome gate-kickoff hit. raid-risk-i15-ships-without-a-live-prior-art-scan stays open and unchanged; no comparison is invented in its place.
+- prior art: NOT SCANNED at the user-picture level (does Obsidian's own Bases view already give an engineer the same click-to-rationale pass). Native WebSearch was tried again at this gate and was declined at the permission layer, the same outcome gate-kickoff hit. raid-risk-i15-ships-without-a-live-prior-art-scan stays open and unchanged; no comparison is invented in its place.
 
 ## round_2_red_team
 
@@ -61,7 +65,7 @@ None narrates the pinned subset or the ranking math, per map-stakeholders' own i
 
 ## raid_additions
 
-- project/spec/trace/raid/raid-risk-i15-ships-without-a-live-prior-art-scan.md — cited, not newly minted: this gate's own round_1 hit the identical permission decline gate-kickoff logged, so the same entry carries forward rather than a duplicate being opened.
+- project/spec/trace/raid/raid-risk-i15-ships-without-a-live-prior-art-scan.md
 
 ## verdict
 
@@ -69,6 +73,9 @@ pass with overrides — the user picture is sound: four roles re-checked, an exc
 
 ## follow_up
 
+On a passing bless: write-requirements is next, in m3. It should derive from uc-query-the-corpus-by-structure's extensions (the unknown-field refusal, the empty-result case), uc-get-a-trustworthy-answer's repeatable-query guarantee, and uc-dispose-of-a-candidate-coupling's forced-disposition step.
+
+raid-risk-i15-ships-without-a-live-prior-art-scan stays open, resolved at the next state where a search tool is actually permitted — unchanged from gate-kickoff's and gate-motivation's own plan.
 
 ## anything_else
 
