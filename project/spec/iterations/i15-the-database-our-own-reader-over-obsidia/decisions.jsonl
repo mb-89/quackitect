@@ -320,3 +320,4 @@
 {"ts":"2026-08-16T19:33:54.191Z","op":"update","visit":"iterations/i15/verification@2","node":"d302","brief":"se_why confirms fix-findings form complete but unsubmitted; submitting directly"}
 {"ts":"2026-08-16T19:35:59.975Z","op":"update","visit":"iterations/i15/verification@2","node":"d303","brief":"se_why shows both successors unblocked upstream; trying gate-implementation route"}
 {"ts":"2026-08-16T19:37:37.608Z","op":"plan","visit":"iterations/i15/verification@2","parent":"d298","nodes":[{"id":"d304","brief":"guard exhausted"},{"id":"d305","brief":"engine defect confirmed via se_why"},{"id":"d306","brief":"escaping to front_desk"}]}
+{"ts":"2026-08-16T19:43:40.505Z","op":"done","visit":"iterations/i15/verification@2","node":"d306","brief":"escape completed, resumed the walk"}
