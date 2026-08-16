@@ -259,3 +259,6 @@
 {"ts":"2026-08-16T18:20:45.982Z","op":"done","visit":"iterations/i15/reverse-sensitivity@0","node":"d245","brief":"ruled every swing cell, three credible flips found"}
 {"ts":"2026-08-16T18:21:03.779Z","op":"done","visit":"iterations/i15/converge-pugh@0","node":"d240","brief":"declared cand-explicit-and-safe the winner, comments carry the open risks"}
 {"ts":"2026-08-16T18:21:08.929Z","op":"done","visit":"iterations/i15/reverse-sensitivity@0","node":"d243","brief":"declare-winner form completed and submitted"}
+{"ts":"2026-08-16T18:21:35.937Z","op":"plan","visit":"iterations/i15/record-adrs@0","parent":null,"nodes":[{"id":"d246","brief":"write the query-side deciding ADR"},{"id":"d247","brief":"write the disposition-side deciding ADR"}]}
+{"ts":"2026-08-16T18:21:44.050Z","op":"done","visit":"iterations/i15/reverse-sensitivity@0","node":"d244","brief":"wrote both deciding ADRs as raid decision nodes"}
+{"ts":"2026-08-16T18:21:48.599Z","op":"done","visit":"iterations/i15/record-adrs@0","node":"d246","brief":"record-adrs form filled and submitted"}
