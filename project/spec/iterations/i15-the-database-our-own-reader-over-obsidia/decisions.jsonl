@@ -300,3 +300,7 @@
 {"ts":"2026-08-16T18:50:27.081Z","op":"done","visit":"iterations/i15/specify-build@0","node":"d280","brief":"dsp-coupling-disposer written"}
 {"ts":"2026-08-16T18:50:47.430Z","op":"done","visit":"iterations/i15/specify-build@0","node":"d281","brief":"promotions filled none, nothing promoted this iteration"}
 {"ts":"2026-08-16T18:53:50.513Z","op":"done","visit":"iterations/i15/gate-prototype@0","node":"d270","brief":"author-tests through observe-red complete, all reds confirmed honestly"}
+{"ts":"2026-08-16T18:56:00.065Z","op":"plan","visit":"iterations/i15/build-steps/build-query-evaluator@0","parent":null,"nodes":[{"id":"d283","brief":"implement answerStructuredQuery for real"},{"id":"d284","brief":"typecheck"},{"id":"d285","brief":"run tests/query.test.ts scoped"},{"id":"d286","brief":"submit built"}]}
+{"ts":"2026-08-16T18:56:04.467Z","op":"done","visit":"iterations/i15/build-steps/build-query-evaluator@0","node":"d283","brief":"real implementation written, reusing loadTrace/noteOf"}
+{"ts":"2026-08-16T18:56:08.076Z","op":"done","visit":"iterations/i15/build-steps/build-query-evaluator@0","node":"d284","brief":"typecheck run"}
+{"ts":"2026-08-16T18:56:12.603Z","op":"done","visit":"iterations/i15/build-steps/build-query-evaluator@0","node":"d285","brief":"tests/query.test.ts 4/4 green"}
