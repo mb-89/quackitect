@@ -86,3 +86,6 @@
 {"ts":"2026-08-16T16:31:44.125Z","op":"done","visit":"iterations/i15/gate-motivation@0","node":"d73","brief":"gate-kickoff amend confirmed complete (done earlier)"}
 {"ts":"2026-08-16T16:31:52.207Z","op":"done","visit":"iterations/i15/gate-motivation@0","node":"d75","brief":"frame-delta amend confirmed complete (done earlier)"}
 {"ts":"2026-08-16T16:34:32.040Z","op":"done","visit":"iterations/i15/gate-motivation@0","node":"d79","brief":"gate-motivation filled and submitted with the correction folded in"}
+{"ts":"2026-08-16T16:35:22.449Z","op":"update","visit":"iterations/i15/draw-context@0","node":"d85","brief":"raid file's own frontmatter closed now that se_file_patch is legal here"}
+{"ts":"2026-08-16T16:35:26.619Z","op":"done","visit":"iterations/i15/gate-motivation@0","node":"d76","brief":"pressure-test amend confirmed complete (done earlier)"}
+{"ts":"2026-08-16T16:35:33.289Z","op":"done","visit":"iterations/i15/gate-motivation@0","node":"d77","brief":"define-actual amend confirmed complete — correction pass fully closed out"}
