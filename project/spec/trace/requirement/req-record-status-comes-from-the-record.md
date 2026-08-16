@@ -11,7 +11,7 @@ refines:
   - uc-browse-the-archive
 source_refs:
   - uc-close-a-record
-  - uc-claim-an-iteration
+  - uc-open-an-iteration
   - "observed: a fresh clone showed all nineteen pushed records as archived, none ever started"
   - "owner ruling 2026-08-13: status comes from the record, the archive looks up through git, a finished record's worktree is deleted"
 priority: must

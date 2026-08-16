@@ -18,6 +18,7 @@ verifies:
   - "req-a-reopen-stands-where-it-can-work"
   - "req-land-target-routes-to-gate"
   - "req-instruction-names-its-source"
+  - "req-a-pull-carrying-no-choice-enters-no-iteration"
 files:
   - "tests/pull.test.ts"
   - "tests/pull-offer.test.ts"

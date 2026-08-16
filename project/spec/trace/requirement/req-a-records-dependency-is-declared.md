@@ -8,7 +8,7 @@ verify_method: test
 breaks_if_removed: A prerequisite written in prose binds nothing, so two agents are handed work that fights over the same files.
 breaks_how_badly: crippling
 refines:
-  - uc-claim-an-iteration
+  - uc-open-an-iteration
 source_refs:
   - uc-get-work-routed
   - "owner ruling 2026-08-12: the container is a DAG and this key is its only input"

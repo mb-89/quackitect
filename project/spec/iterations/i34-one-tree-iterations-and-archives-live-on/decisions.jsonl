@@ -1,0 +1,415 @@
+{"ts":"2026-08-16T05:19:44.688Z","op":"done","visit":"iterations/start@2","node":"d63","brief":"wrong diagnosis corrected in the record"}
+{"ts":"2026-08-16T05:19:47.766Z","op":"done","visit":"iterations/start@2","node":"d62","brief":"i34 entered and bound at iterations/i34/start"}
+{"ts":"2026-08-16T05:20:04.278Z","op":"done","visit":"iterations/start@2","node":"d61","brief":"cause found: the running engine had not reloaded onto the seeded iteration"}
+{"ts":"2026-08-16T05:21:00.939Z","op":"plan","visit":"iterations/i34/onboard-retro@0","parent":null,"nodes":[{"id":"d67","brief":"mark the retro window boundary"},{"id":"d68","brief":"mine the call log for clauses and tools"},{"id":"d69","brief":"drain the 32 pending notes"},{"id":"d70","brief":"check promotions and process staleness"},{"id":"d71","brief":"fill and submit onboard-retro"}]}
+{"ts":"2026-08-16T05:21:07.129Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d72","brief":"fetching the oldest record in the window"}
+{"ts":"2026-08-16T05:21:12.648Z","op":"done","visit":"iterations/i34/onboard-retro@0","node":"d67","brief":"window opens 2026-08-15T13:33:04.173Z"}
+{"ts":"2026-08-16T05:21:22.708Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d73","brief":"counting failures by tool across the window"}
+{"ts":"2026-08-16T05:22:03.604Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d74","brief":"draining the worktree cluster into i34"}
+{"ts":"2026-08-16T05:22:22.854Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d75","brief":"owner adds a selection state to i34's scope"}
+{"ts":"2026-08-16T05:22:27.002Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d76","brief":"selection-state ruling carried into i34"}
+{"ts":"2026-08-16T05:22:31.214Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d77","brief":"carrying the measurement bundle"}
+{"ts":"2026-08-16T05:22:41.559Z","op":"done","visit":"iterations/i34/onboard-retro@0","node":"d68","brief":"log mined across 2882 calls in the window"}
+{"ts":"2026-08-16T05:22:45.918Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d78","brief":"carrying the i27 trunk-only ruling"}
+{"ts":"2026-08-16T05:22:49.709Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d79","brief":"carrying the archive-on-disk ruling"}
+{"ts":"2026-08-16T05:22:54.091Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d80","brief":"carrying the change map"}
+{"ts":"2026-08-16T05:22:59.725Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d81","brief":"carrying i28's orphaned worktree"}
+{"ts":"2026-08-16T05:23:06.439Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d82","brief":"carrying the wrong-tree complaint"}
+{"ts":"2026-08-16T05:23:23.674Z","op":"done","visit":"iterations/i34/onboard-retro@0","node":"d69","brief":"eleven worktree-cluster notes carried into i34"}
+{"ts":"2026-08-16T05:23:29.723Z","op":"plan","visit":"iterations/i34/onboard-retro@0","parent":null,"nodes":[{"id":"d83","brief":"park the remaining notes with ready-whens"},{"id":"d84","brief":"fill onboard-retro and submit"}]}
+{"ts":"2026-08-16T05:23:35.748Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d85","brief":"carrying the seed-crash findings"}
+{"ts":"2026-08-16T05:23:42.431Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d86","brief":"carrying the correction beside what it corrects"}
+{"ts":"2026-08-16T05:24:03.763Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d87","brief":"the kill-the-old-path rule governs i34's step 4"}
+{"ts":"2026-08-16T05:24:10.736Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d88","brief":"parking the git-lane size gap"}
+{"ts":"2026-08-16T05:24:17.231Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d89","brief":"parking the trace-left-behind finding on the close"}
+{"ts":"2026-08-16T05:24:22.274Z","op":"done","visit":"iterations/i34/onboard-retro@0","node":"d70","brief":"no local change earned promotion this window"}
+{"ts":"2026-08-16T05:24:27.956Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d90","brief":"parking the strategic-gates ruling"}
+{"ts":"2026-08-16T05:24:33.178Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d91","brief":"parking the delete-rights rule i34 will meet"}
+{"ts":"2026-08-16T05:24:38.429Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d92","brief":"parking the node-table truncation"}
+{"ts":"2026-08-16T05:24:42.842Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d93","brief":"parking the probe-result ruling"}
+{"ts":"2026-08-16T05:24:49.096Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d94","brief":"parking the unchecked-assertion rule, which fired again today"}
+{"ts":"2026-08-16T05:24:54.519Z","op":"done","visit":"iterations/i34/onboard-retro@0","node":"d71","brief":"superseded by d84, which is the same item"}
+{"ts":"2026-08-16T05:24:59.008Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d95","brief":"parking the compare-card help"}
+{"ts":"2026-08-16T05:25:04.128Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d96","brief":"parking the engine code-review iteration"}
+{"ts":"2026-08-16T05:25:09.130Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d97","brief":"parking the recompute-on-change finding"}
+{"ts":"2026-08-16T05:25:14.587Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d98","brief":"parking the manual-steps count with three new cases"}
+{"ts":"2026-08-16T05:25:19.131Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d99","brief":"parking the source-text assertion break"}
+{"ts":"2026-08-16T05:25:28.586Z","op":"done","visit":"iterations/i34/onboard-retro@0","node":"d83","brief":"every pending note is drained"}
+{"ts":"2026-08-16T05:25:32.954Z","op":"update","visit":"iterations/i34/onboard-retro@0","node":"d100","brief":"inbox empty; composing the form"}
+{"ts":"2026-08-16T05:27:00.296Z","op":"done","visit":"iterations/i34/onboard-retro@0","node":"d84","brief":"onboard-retro filled and submitted"}
+{"ts":"2026-08-16T05:27:29.477Z","op":"plan","visit":"iterations/i34/gate-kickoff@0","parent":null,"nodes":[{"id":"d101","brief":"read the kickoff form"},{"id":"d102","brief":"propose the change size with reasoning"},{"id":"d103","brief":"present the size decision to the owner"}]}
+{"ts":"2026-08-16T05:27:37.543Z","op":"update","visit":"iterations/i34/gate-kickoff@0","node":"d104","brief":"extracting the kickoff field list"}
+{"ts":"2026-08-16T05:29:15.400Z","op":"done","visit":"iterations/i34/gate-kickoff@0","node":"d101","brief":"kickoff form read and filled"}
+{"ts":"2026-08-16T05:29:58.845Z","op":"done","visit":"iterations/i34/gate-kickoff@0","node":"d102","brief":"major proposed with no strikes, form saved unstamped"}
+{"ts":"2026-08-16T05:30:39.615Z","op":"done","visit":"iterations/i34/gate-kickoff@0","node":"d103","brief":"form is submit-ready and waiting on the size decision"}
+{"ts":"2026-08-16T05:30:45.837Z","op":"update","visit":"iterations/i34/gate-kickoff@0","node":"d105","brief":"last format fix on the kickoff form"}
+{"ts":"2026-08-16T05:33:30.945Z","op":"plan","visit":"iterations/i34/gate-kickoff@0","parent":null,"nodes":[{"id":"d106","brief":"record the se_run comparison correction"},{"id":"d107","brief":"read what the rigor matrix puts in major but not minor"},{"id":"d108","brief":"answer what going minor actually costs"}]}
+{"ts":"2026-08-16T05:33:47.181Z","op":"done","visit":"iterations/i34/gate-kickoff@0","node":"d106","brief":"correction recorded against the retro card"}
+{"ts":"2026-08-16T05:33:54.192Z","op":"update","visit":"iterations/i34/gate-kickoff@0","node":"d109","brief":"extracting every row's major and minor grade"}
+{"ts":"2026-08-16T05:34:54.237Z","op":"done","visit":"iterations/i34/gate-kickoff@0","node":"d107","brief":"minor drops 23 design-selection rows and keeps every build and verify row"}
+{"ts":"2026-08-16T05:35:03.247Z","op":"update","visit":"iterations/i34/gate-kickoff@0","node":"d110","brief":"draining the correction note so the form can stamp"}
+{"ts":"2026-08-16T05:35:23.650Z","op":"update","visit":"iterations/i34/gate-kickoff@0","node":"d111","brief":"cutting the stale-baseline comparison from the retro card"}
+{"ts":"2026-08-16T05:35:28.554Z","op":"update","visit":"iterations/i34/gate-kickoff@0","node":"d112","brief":"correction landed in the card and drained"}
+{"ts":"2026-08-16T05:35:56.610Z","op":"done","visit":"iterations/i34/gate-kickoff@0","node":"d108","brief":"minor's cost is answered from the matrix rows"}
+{"ts":"2026-08-16T05:36:17.718Z","op":"plan","visit":"iterations/i34/gate-kickoff@0","parent":null,"nodes":[{"id":"d113","brief":"bless the kickoff so the minor machine compiles"},{"id":"d114","brief":"walk toward the build where the selection state is built"}]}
+{"ts":"2026-08-16T05:36:34.013Z","op":"done","visit":"iterations/i34/gate-kickoff@0","node":"d113","brief":"kickoff blessed at minor"}
+{"ts":"2026-08-16T05:36:44.683Z","op":"update","visit":"iterations/i34/gate-kickoff@0","node":"d115","brief":"aiming the walk into i34 rather than out to the desk"}
+{"ts":"2026-08-16T05:36:48.004Z","op":"update","visit":"iterations/i34/gate-kickoff@0","node":"d116","brief":"taking the fully-qualified door"}
+{"ts":"2026-08-16T05:37:15.646Z","op":"update","visit":"iterations/i34/draft-vision@0","node":"d117","brief":"naming the travel-versus-one-tree goal conflict"}
+{"ts":"2026-08-16T05:37:28.797Z","op":"update","visit":"iterations/i34/draft-vision@0","node":"d118","brief":"completing draft-vision"}
+{"ts":"2026-08-16T05:37:37.046Z","op":"update","visit":"iterations/i34/draft-vision@0","node":"d119","brief":"stamping draft-vision"}
+{"ts":"2026-08-16T05:38:10.567Z","op":"done","visit":"iterations/i34/gate-kickoff@0","node":"d114","brief":"draft-vision stamped; the walk is reading toward log-risks"}
+{"ts":"2026-08-16T05:38:19.342Z","op":"plan","visit":"iterations/i34/draft-vision@0","parent":null,"nodes":[{"id":"d120","brief":"open the RAID register for i34"}]}
+{"ts":"2026-08-16T05:38:39.839Z","op":"update","visit":"iterations/i34/log-risks@0","node":"d121","brief":"reading the raid node shape"}
+{"ts":"2026-08-16T05:39:05.281Z","op":"update","visit":"iterations/i34/log-risks@0","node":"d122","brief":"writing the self-contained assumption"}
+{"ts":"2026-08-16T05:39:23.191Z","op":"update","visit":"iterations/i34/log-risks@0","node":"d123","brief":"writing the one-tree decision with its rejected options"}
+{"ts":"2026-08-16T05:39:41.890Z","op":"update","visit":"iterations/i34/log-risks@0","node":"d124","brief":"writing the deletion risk with its mitigation"}
+{"ts":"2026-08-16T05:39:56.670Z","op":"update","visit":"iterations/i34/log-risks@0","node":"d125","brief":"writing the transport-crash issue"}
+{"ts":"2026-08-16T05:40:12.031Z","op":"done","visit":"iterations/i34/draft-vision@0","node":"d120","brief":"four register entries written and referenced"}
+{"ts":"2026-08-16T05:40:33.021Z","op":"plan","visit":"iterations/i34/log-risks@0","parent":null,"nodes":[{"id":"d126","brief":"route the walk on from log-risks"},{"id":"d127","brief":"write the handover for the next session"}]}
+{"ts":"2026-08-16T05:40:41.454Z","op":"done","visit":"iterations/i34/log-risks@0","node":"d126","brief":"log-risks stamped; frame-delta is the owed branch"}
+{"ts":"2026-08-16T05:41:00.683Z","op":"update","visit":"iterations/i34/log-risks@0","node":"d128","brief":"aiming at the unwalked branch rather than the join"}
+{"ts":"2026-08-16T05:41:28.720Z","op":"update","visit":"iterations/i34/frame-delta@0","node":"d129","brief":"frame-delta filled, inheriting the frame"}
+{"ts":"2026-08-16T05:41:45.724Z","op":"update","visit":"iterations/i34/frame-delta@0","node":"d130","brief":"taking the last owed leg before the motivation gate"}
+{"ts":"2026-08-16T05:42:10.226Z","op":"update","visit":"iterations/i34/scope-non-goals@0","node":"d131","brief":"scope and non-goals drawn for the gate"}
+{"ts":"2026-08-16T05:43:03.124Z","op":"done","visit":"iterations/i34/log-risks@0","node":"d127","brief":"handover written for the next session"}
+{"ts":"2026-08-16T05:43:55.844Z","op":"plan","visit":"iterations/i34/gate-motivation@0","parent":null,"nodes":[{"id":"d132","brief":"prove the reading owed at gate-motivation"},{"id":"d133","brief":"fill and rule the motivation gate"}]}
+{"ts":"2026-08-16T05:44:00.423Z","op":"update","visit":"iterations/i34/gate-motivation@0","node":"d134","brief":"locating the probe anchors in the source"}
+{"ts":"2026-08-16T05:44:09.997Z","op":"update","visit":"iterations/i34/gate-motivation@0","node":"d135","brief":"reading the tail for the third probe"}
+{"ts":"2026-08-16T05:44:14.753Z","op":"done","visit":"iterations/i34/gate-motivation@0","node":"d132","brief":"requirement-authoring method read and proven"}
+{"ts":"2026-08-16T05:45:47.057Z","op":"done","visit":"iterations/i34/gate-motivation@0","node":"d133","brief":"motivation gate filled, ruled and blessed"}
+{"ts":"2026-08-16T05:46:06.554Z","op":"plan","visit":"iterations/i34/gate-motivation@0","parent":null,"nodes":[{"id":"d136","brief":"prove the story-slideshow reading"},{"id":"d137","brief":"walk M2's write-stories"}]}
+{"ts":"2026-08-16T05:46:11.641Z","op":"update","visit":"iterations/i34/gate-motivation@0","node":"d138","brief":"locating the probe anchors"}
+{"ts":"2026-08-16T05:46:18.397Z","op":"update","visit":"iterations/i34/gate-motivation@0","node":"d139","brief":"finding the third anchor"}
+{"ts":"2026-08-16T05:46:26.112Z","op":"update","visit":"iterations/i34/gate-motivation@0","node":"d140","brief":"the third anchor is in another card"}
+{"ts":"2026-08-16T05:46:36.536Z","op":"update","visit":"iterations/i34/gate-motivation@0","node":"d141","brief":"reading the prove block and its document together"}
+{"ts":"2026-08-16T05:46:44.602Z","op":"update","visit":"iterations/i34/gate-motivation@0","node":"d142","brief":"reading the card's tail where the third anchor must sit"}
+{"ts":"2026-08-16T05:46:51.969Z","op":"done","visit":"iterations/i34/gate-motivation@0","node":"d136","brief":"story-slideshow card read and proven"}
+{"ts":"2026-08-16T05:47:10.060Z","op":"plan","visit":"iterations/i34/write-requirements@0","parent":null,"nodes":[{"id":"d143","brief":"finish the reading owed at write-requirements"},{"id":"d144","brief":"write i34's requirements"}]}
+{"ts":"2026-08-16T05:47:21.182Z","op":"done","visit":"iterations/i34/gate-motivation@0","node":"d137","brief":"write-stories swept; the walk is at write-requirements"}
+{"ts":"2026-08-16T05:47:29.451Z","op":"update","visit":"iterations/i34/write-requirements@0","node":"d145","brief":"extracting the requirement frontmatter keys"}
+{"ts":"2026-08-16T05:47:34.415Z","op":"done","visit":"iterations/i34/write-requirements@0","node":"d143","brief":"requirement shape in hand"}
+{"ts":"2026-08-16T05:47:45.772Z","op":"update","visit":"iterations/i34/write-requirements@0","node":"d146","brief":"finding the use cases the requirements must refine"}
+{"ts":"2026-08-16T05:48:07.472Z","op":"update","visit":"iterations/i34/write-requirements@0","node":"d147","brief":"writing the one-tree requirement"}
+{"ts":"2026-08-16T05:48:22.165Z","op":"update","visit":"iterations/i34/write-requirements@0","node":"d148","brief":"writing the status-is-the-open-flag requirement"}
+{"ts":"2026-08-16T05:48:36.568Z","op":"update","visit":"iterations/i34/write-requirements@0","node":"d149","brief":"writing the archive-stays-on-disk requirement"}
+{"ts":"2026-08-16T05:48:50.858Z","op":"update","visit":"iterations/i34/write-requirements@0","node":"d150","brief":"writing the selection-state requirement"}
+{"ts":"2026-08-16T05:49:18.527Z","op":"done","visit":"iterations/i34/write-requirements@0","node":"d144","brief":"four requirements written and registered"}
+{"ts":"2026-08-16T05:49:31.789Z","op":"plan","visit":"iterations/i34/write-requirements@0","parent":null,"nodes":[{"id":"d151","brief":"list every standing requirement so the coverage law passes"}]}
+{"ts":"2026-08-16T05:50:34.488Z","op":"done","visit":"iterations/i34/write-requirements@0","node":"d151","brief":"register listed; five contradicting requirements found"}
+{"ts":"2026-08-16T05:52:03.356Z","op":"plan","visit":"iterations/i34/write-requirements@0","parent":null,"nodes":[{"id":"d152","brief":"capture the render observation"},{"id":"d153","brief":"read what derive-functions owes"},{"id":"d154","brief":"derive i34's function structure"}]}
+{"ts":"2026-08-16T05:52:10.289Z","op":"done","visit":"iterations/i34/write-requirements@0","node":"d152","brief":"render observation captured as note-f5b5d36a8502"}
+{"ts":"2026-08-16T05:52:16.834Z","op":"update","visit":"iterations/i34/write-requirements@0","node":"d155","brief":"locating the probe anchors"}
+{"ts":"2026-08-16T05:52:24.785Z","op":"update","visit":"iterations/i34/write-requirements@0","node":"d156","brief":"finding the line-break-spanning anchor"}
+{"ts":"2026-08-16T05:52:31.273Z","op":"done","visit":"iterations/i34/write-requirements@0","node":"d153","brief":"function-structures card read and proven"}
+{"ts":"2026-08-16T05:53:01.524Z","op":"update","visit":"iterations/i34/write-requirements@0","node":"d157","brief":"amending the rippled use-case claim"}
+{"ts":"2026-08-16T05:53:10.373Z","op":"update","visit":"iterations/i34/write-requirements@0","node":"d158","brief":"walking back to the state the sweep skipped"}
+{"ts":"2026-08-16T05:53:23.141Z","op":"update","visit":"iterations/i34/write-stories@0","node":"d159","brief":"listing the standing stories"}
+{"ts":"2026-08-16T05:53:44.586Z","op":"done","visit":"iterations/i34/write-requirements@0","node":"d154","brief":"write-stories filled, the state the sweep skipped"}
+{"ts":"2026-08-16T05:53:51.727Z","op":"plan","visit":"iterations/i34/write-stories@0","parent":null,"nodes":[{"id":"d160","brief":"prove the Cockburn reading"},{"id":"d161","brief":"fill generalize-use-cases"}]}
+{"ts":"2026-08-16T05:53:56.576Z","op":"update","visit":"iterations/i34/write-stories@0","node":"d162","brief":"locating the Cockburn probe anchors"}
+{"ts":"2026-08-16T05:54:02.576Z","op":"update","visit":"iterations/i34/write-stories@0","node":"d163","brief":"finding the line-break-spanning anchor"}
+{"ts":"2026-08-16T05:54:06.606Z","op":"done","visit":"iterations/i34/write-stories@0","node":"d160","brief":"Cockburn card read and proven"}
+{"ts":"2026-08-16T05:54:30.028Z","op":"done","visit":"iterations/i34/write-stories@0","node":"d161","brief":"generalize-use-cases filled and stamped"}
+{"ts":"2026-08-16T05:55:12.885Z","op":"plan","visit":"iterations/i34/derive-functions@0","parent":null,"nodes":[{"id":"d164","brief":"list the standing functions"},{"id":"d165","brief":"fill derive-functions"}]}
+{"ts":"2026-08-16T05:55:35.844Z","op":"done","visit":"iterations/i34/derive-functions@0","node":"d164","brief":"the standing function tree is listed"}
+{"ts":"2026-08-16T05:55:45.902Z","op":"update","visit":"iterations/i34/derive-functions@0","node":"d166","brief":"reading a function node's shape"}
+{"ts":"2026-08-16T05:55:58.342Z","op":"update","visit":"iterations/i34/derive-functions@0","node":"d167","brief":"wiring the four requirements to their functions"}
+{"ts":"2026-08-16T05:56:23.007Z","op":"done","visit":"iterations/i34/derive-functions@0","node":"d165","brief":"derive-functions filled with flows and neutrality"}
+{"ts":"2026-08-16T05:56:27.832Z","op":"update","visit":"iterations/i34/derive-functions@0","node":"d168","brief":"flows is a refs field — listing the flow nodes"}
+{"ts":"2026-08-16T05:56:39.567Z","op":"plan","visit":"iterations/i34/derive-functions@0","parent":null,"nodes":[{"id":"d169","brief":"stamp derive-functions with the flow set"}]}
+{"ts":"2026-08-16T05:57:25.073Z","op":"done","visit":"iterations/i34/derive-functions@0","node":"d169","brief":"derive-functions stamped with its flow set"}
+{"ts":"2026-08-16T05:57:56.413Z","op":"plan","visit":"iterations/i34/identify-assumptions@0","parent":null,"nodes":[{"id":"d170","brief":"write the one-agent-per-clone assumption"},{"id":"d171","brief":"sweep the six sources and stamp"}]}
+{"ts":"2026-08-16T05:58:21.409Z","op":"done","visit":"iterations/i34/identify-assumptions@0","node":"d170","brief":"the one-agent-per-clone assumption is on the register"}
+{"ts":"2026-08-16T05:58:37.234Z","op":"update","visit":"iterations/i34/identify-assumptions@0","node":"d172","brief":"reading toward probe-assumptions"}
+{"ts":"2026-08-16T05:58:41.972Z","op":"update","visit":"iterations/i34/identify-assumptions@0","node":"d173","brief":"locating the probing card's anchors"}
+{"ts":"2026-08-16T05:58:47.596Z","op":"update","visit":"iterations/i34/identify-assumptions@0","node":"d174","brief":"finding the line-break-spanning anchor"}
+{"ts":"2026-08-16T05:58:51.006Z","op":"done","visit":"iterations/i34/identify-assumptions@0","node":"d171","brief":"probing card read and proven"}
+{"ts":"2026-08-16T05:59:12.010Z","op":"plan","visit":"iterations/i34/probe-assumptions@0","parent":null,"nodes":[{"id":"d175","brief":"run the folder probe"},{"id":"d176","brief":"run the one-agent probe"},{"id":"d177","brief":"fill probe-assumptions"}]}
+{"ts":"2026-08-16T05:59:24.535Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d178","brief":"reading the one place that derives a record id from a tree path"}
+{"ts":"2026-08-16T06:00:37.070Z","op":"done","visit":"iterations/i34/probe-assumptions@0","node":"d175","brief":"folder probe came back false: minted_in reads the worktree name"}
+{"ts":"2026-08-16T06:01:10.363Z","op":"done","visit":"iterations/i34/probe-assumptions@0","node":"d177","brief":"probe-assumptions is blocked by the node-table cell limit"}
+{"ts":"2026-08-16T06:04:30.839Z","op":"fork","visit":"iterations/i34/probe-assumptions@0","parent":null,"node":"d179","brief":"the node-table cell limit blocks every iteration — fixing it","nodes":[]}
+{"ts":"2026-08-16T06:04:36.686Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d180","brief":"locating the guard that names the cut"}
+{"ts":"2026-08-16T06:04:47.073Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d181","brief":"hunting the prefill cut"}
+{"ts":"2026-08-16T06:04:55.582Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d182","brief":"reading the guard's pattern"}
+{"ts":"2026-08-16T06:05:17.210Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d183","brief":"checking whether the nodes on disk already trail off"}
+{"ts":"2026-08-16T06:05:52.574Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d184","brief":"the limit does not exist; the payload size is the cut"}
+{"ts":"2026-08-16T06:06:08.215Z","op":"defer","visit":"iterations/i34/probe-assumptions@0","node":"d176","brief":"run the one-agent probe","to":"iterations/i34/gate-requirements","hops":1,"trail":["iterations/i34/probe-assumptions","iterations/i34/gate-requirements"]}
+{"ts":"2026-08-16T06:06:39.546Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d185","brief":"an unchanged cell can no longer rewrite its node"}
+{"ts":"2026-08-16T06:06:56.272Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d186","brief":"scoped run over the node-table write path"}
+{"ts":"2026-08-16T06:07:08.116Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d187","brief":"reading the scoped verdict"}
+{"ts":"2026-08-16T06:07:16.244Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d188","brief":"finding the right test scope"}
+{"ts":"2026-08-16T06:07:25.079Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d189","brief":"scoped run over forms and node scoping"}
+{"ts":"2026-08-16T06:07:38.606Z","op":"done","visit":"iterations/i34/probe-assumptions@0","node":"d179","brief":"the write half now skips unchanged cells; verdict pending"}
+{"ts":"2026-08-16T06:07:42.958Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d190","brief":"waiting on the scoped verdict"}
+{"ts":"2026-08-16T06:08:08.703Z","op":"plan","visit":"iterations/i34/probe-assumptions@0","parent":null,"nodes":[{"id":"d191","brief":"make the node-table check read an omitted row from the node"}]}
+{"ts":"2026-08-16T06:08:36.342Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d192","brief":"locating the field save"}
+{"ts":"2026-08-16T06:08:48.660Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d193","brief":"reading the save order"}
+{"ts":"2026-08-16T06:09:14.658Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d194","brief":"a truncated cell can no longer reach a node"}
+{"ts":"2026-08-16T06:09:19.479Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d195","brief":"scoped run over the guarded write"}
+{"ts":"2026-08-16T06:09:23.451Z","op":"done","visit":"iterations/i34/probe-assumptions@0","node":"d191","brief":"the write half now refuses truncated cells and skips unchanged ones"}
+{"ts":"2026-08-16T06:09:27.677Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d196","brief":"reading the guarded-write verdict"}
+{"ts":"2026-08-16T06:09:30.996Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d197","brief":"reading the guarded-write verdict"}
+{"ts":"2026-08-16T06:09:34.516Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d198","brief":"reading the guarded-write verdict"}
+{"ts":"2026-08-16T06:09:55.428Z","op":"plan","visit":"iterations/i34/probe-assumptions@0","parent":null,"nodes":[{"id":"d199","brief":"test whether a partial node-table writes through"}]}
+{"ts":"2026-08-16T06:10:26.125Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d200","brief":"the stored copy is poisoned, not the nodes"}
+{"ts":"2026-08-16T06:10:40.540Z","op":"done","visit":"iterations/i34/probe-assumptions@0","node":"d199","brief":"partial tables do not write through; the stored copy is what the check reads"}
+{"ts":"2026-08-16T06:10:52.430Z","op":"plan","visit":"iterations/i34/probe-assumptions@0","parent":null,"nodes":[{"id":"d201","brief":"settle where the trailing ellipsis actually comes from"}]}
+{"ts":"2026-08-16T06:11:24.676Z","op":"done","visit":"iterations/i34/probe-assumptions@0","node":"d201","brief":"three hypotheses disproven; the write half is safe either way"}
+{"ts":"2026-08-16T06:14:20.433Z","op":"plan","visit":"iterations/i34/probe-assumptions@0","parent":null,"nodes":[{"id":"d202","brief":"find what truncates the node-table cell"}]}
+{"ts":"2026-08-16T06:14:26.448Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d203","brief":"reading the stored probes field"}
+{"ts":"2026-08-16T06:14:36.971Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d204","brief":"reading nodeField, the last unexamined link"}
+{"ts":"2026-08-16T06:14:40.678Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d205","brief":"reading nodeField's body"}
+{"ts":"2026-08-16T06:14:53.015Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d206","brief":"reading a flagged node's probe field"}
+{"ts":"2026-08-16T06:15:21.325Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d207","brief":"listing every truncated frontmatter value"}
+{"ts":"2026-08-16T06:15:39.580Z","op":"done","visit":"iterations/i34/probe-assumptions@0","node":"d202","brief":"13 values cut at ~200 chars; the limit is real"}
+{"ts":"2026-08-16T06:15:46.268Z","op":"plan","visit":"iterations/i34/probe-assumptions@0","parent":null,"nodes":[{"id":"d208","brief":"read the frontmatter writer's cut"},{"id":"d209","brief":"remove the cut"},{"id":"d210","brief":"restore the 13 damaged values"}]}
+{"ts":"2026-08-16T06:15:53.080Z","op":"done","visit":"iterations/i34/probe-assumptions@0","node":"d208","brief":"withFrontmatter delegates the value to yamlValue"}
+{"ts":"2026-08-16T06:15:57.582Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d211","brief":"reading yamlValue"}
+{"ts":"2026-08-16T06:16:04.748Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d212","brief":"reading oneLine"}
+{"ts":"2026-08-16T06:16:09.292Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d213","brief":"reading the fold"}
+{"ts":"2026-08-16T06:16:31.457Z","op":"done","visit":"iterations/i34/probe-assumptions@0","node":"d209","brief":"the 200-character cut is gone from forms.ts"}
+{"ts":"2026-08-16T06:16:36.659Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d214","brief":"testing the removed cut before restoring anything"}
+{"ts":"2026-08-16T06:16:40.696Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d215","brief":"reading the verdict"}
+{"ts":"2026-08-16T06:16:46.236Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d216","brief":"reading the verdict"}
+{"ts":"2026-08-16T06:16:50.909Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d217","brief":"reading the verdict"}
+{"ts":"2026-08-16T06:16:55.854Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d218","brief":"reading the verdict"}
+{"ts":"2026-08-16T06:17:47.097Z","op":"done","visit":"iterations/i34/probe-assumptions@0","node":"d210","brief":"three values restored; ten older ones need their form's copy"}
+{"ts":"2026-08-16T06:18:04.076Z","op":"plan","visit":"iterations/i34/probe-assumptions@0","parent":null,"nodes":[{"id":"d219","brief":"correct the false comment"},{"id":"d220","brief":"submit probe-assumptions"}]}
+{"ts":"2026-08-16T06:18:10.493Z","op":"done","visit":"iterations/i34/probe-assumptions@0","node":"d219","brief":"the false comment now warns instead of misdirecting"}
+{"ts":"2026-08-16T06:18:32.074Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d221","brief":"hunting the untruncated originals"}
+{"ts":"2026-08-16T06:18:41.362Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d222","brief":"reading the historical value whole"}
+{"ts":"2026-08-16T06:19:01.704Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d223","brief":"reading four originals at the ref"}
+{"ts":"2026-08-16T06:19:28.406Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d224","brief":"restoring five originals from the ref"}
+{"ts":"2026-08-16T06:19:36.092Z","op":"update","visit":"iterations/i34/probe-assumptions@0","node":"d225","brief":"reading the last four originals"}
+{"ts":"2026-08-16T06:20:13.141Z","op":"done","visit":"iterations/i34/probe-assumptions@0","node":"d220","brief":"all thirteen values restored; submitting"}
+{"ts":"2026-08-16T06:21:01.917Z","op":"defer_arrived","visit":"iterations/i34/gate-requirements@0","node":"d226","brief":"run the one-agent probe","hops":1,"trail":["iterations/i34/probe-assumptions","iterations/i34/gate-requirements"]}
+{"ts":"2026-08-16T06:21:01.919Z","op":"plan","visit":"iterations/i34/gate-requirements@0","parent":null,"nodes":[{"id":"d227","brief":"prove the reading owed at gate-requirements"},{"id":"d228","brief":"rule the supersession list at the gate"}]}
+{"ts":"2026-08-16T06:21:09.850Z","op":"update","visit":"iterations/i34/gate-requirements@0","node":"d229","brief":"locating the anchors"}
+{"ts":"2026-08-16T06:21:19.855Z","op":"update","visit":"iterations/i34/gate-requirements@0","node":"d230","brief":"reading the first anchor's tail"}
+{"ts":"2026-08-16T06:21:28.202Z","op":"update","visit":"iterations/i34/gate-requirements@0","node":"d231","brief":"finding the third anchor"}
+{"ts":"2026-08-16T06:21:35.189Z","op":"done","visit":"iterations/i34/gate-requirements@0","node":"d227","brief":"test-design card read and proven"}
+{"ts":"2026-08-16T06:21:46.909Z","op":"update","visit":"iterations/i34/gate-requirements@0","node":"d232","brief":"running the one-agent code probe"}
+{"ts":"2026-08-16T06:22:03.057Z","op":"done","visit":"iterations/i34/gate-requirements@0","node":"d226","brief":"the one-agent assumption holds on both halves"}
+{"ts":"2026-08-16T06:23:07.429Z","op":"update","visit":"iterations/i34/gate-requirements@0","node":"d233","brief":"filling the requirements gate with the supersession ruling"}
+{"ts":"2026-08-16T06:23:16.786Z","op":"done","visit":"iterations/i34/gate-requirements@0","node":"d228","brief":"the supersession list is ruled at the gate"}
+{"ts":"2026-08-16T06:23:49.026Z","op":"plan","visit":"iterations/i34/gate-requirements@0","parent":null,"nodes":[{"id":"d234","brief":"prove the software.md reading"},{"id":"d235","brief":"mark the five retired requirements superseded"}]}
+{"ts":"2026-08-16T06:23:57.337Z","op":"update","visit":"iterations/i34/gate-requirements@0","node":"d236","brief":"locating the anchors"}
+{"ts":"2026-08-16T06:24:07.627Z","op":"done","visit":"iterations/i34/gate-requirements@0","node":"d234","brief":"software.md read and proven"}
+{"ts":"2026-08-16T06:24:19.498Z","op":"update","visit":"iterations/i34/gate-requirements@0","node":"d237","brief":"correcting the third probe"}
+{"ts":"2026-08-16T06:24:41.159Z","op":"done","visit":"iterations/i34/gate-requirements@0","node":"d235","brief":"the walk reached M7 author-tests"}
+{"ts":"2026-08-16T06:27:14.802Z","op":"plan","visit":"iterations/i34/author-tests@0","parent":null,"nodes":[{"id":"d238","brief":"show the six rows and correct my use of the word claim"}]}
+{"ts":"2026-08-16T06:27:43.495Z","op":"update","visit":"iterations/i34/author-tests@0","node":"d239","brief":"answer recorded with the six statements"}
+{"ts":"2026-08-16T06:28:00.692Z","op":"done","visit":"iterations/i34/author-tests@0","node":"d238","brief":"the word collision is recorded with the cheaper half to rename"}
+{"ts":"2026-08-16T06:29:05.616Z","op":"plan","visit":"iterations/i34/author-tests@0","parent":null,"nodes":[{"id":"d240","brief":"wire the four requirements into their test-specs"},{"id":"d241","brief":"make the new checks fail before building"}]}
+{"ts":"2026-08-16T06:29:38.155Z","op":"plan","visit":"iterations/i34/author-tests@0","parent":null,"nodes":[{"id":"d242","brief":"retire the six on the owner's ruling"},{"id":"d243","brief":"handle the use case and story the same chain"}]}
+{"ts":"2026-08-16T06:30:13.342Z","op":"done","visit":"iterations/i34/author-tests@0","node":"d242","brief":"the retirement is recorded as a decision with its rejected options"}
+{"ts":"2026-08-16T06:30:28.536Z","op":"done","visit":"iterations/i34/author-tests@0","node":"d243","brief":"the whole chain is named; the mechanical gap is recorded"}
+{"ts":"2026-08-16T06:30:32.389Z","op":"update","visit":"iterations/i34/author-tests@0","node":"d244","brief":"checking whether author-tests stamped"}
+{"ts":"2026-08-16T06:30:52.067Z","op":"done","visit":"iterations/i34/author-tests@0","node":"d240","brief":"the four requirements are wired to their test-specs"}
+{"ts":"2026-08-16T06:31:03.542Z","op":"plan","visit":"iterations/i34/decompose-structure@0","parent":null,"nodes":[{"id":"d245","brief":"list the standing elements and fill decompose-structure"}]}
+{"ts":"2026-08-16T06:31:22.388Z","op":"update","visit":"iterations/i34/decompose-structure@0","node":"d246","brief":"filling decompose-structure at minor"}
+{"ts":"2026-08-16T06:31:32.447Z","op":"update","visit":"iterations/i34/decompose-structure@0","node":"d247","brief":"finding the allocation field's shape"}
+{"ts":"2026-08-16T06:31:36.887Z","op":"update","visit":"iterations/i34/decompose-structure@0","node":"d248","brief":"reading the element-matrix template"}
+{"ts":"2026-08-16T06:31:56.314Z","op":"done","visit":"iterations/i34/decompose-structure@0","node":"d245","brief":"the argued spread names two implementers emptying"}
+{"ts":"2026-08-16T06:38:05.998Z","op":"plan","visit":"iterations/i34/specify-build@0","parent":null,"nodes":[{"id":"d249","brief":"give the build states delete rights"},{"id":"d250","brief":"delete the eight retired artifacts"},{"id":"d251","brief":"continue the walk"}]}
+{"ts":"2026-08-16T06:38:16.546Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d252","brief":"adding the delete right to specify-build"}
+{"ts":"2026-08-16T06:38:22.231Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d253","brief":"checking which states already delete"}
+{"ts":"2026-08-16T06:38:30.209Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d254","brief":"reading build-steps and fix-findings"}
+{"ts":"2026-08-16T06:38:37.833Z","op":"done","visit":"iterations/i34/specify-build@0","node":"d249","brief":"specify-build, build-steps and fix-findings can now delete"}
+{"ts":"2026-08-16T06:38:52.681Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d255","brief":"counting referrers before deleting"}
+{"ts":"2026-08-16T06:39:18.189Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d256","brief":"finding every requirement orphaned by the use case"}
+{"ts":"2026-08-16T06:39:46.992Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d257","brief":"deleting the six locking requirements"}
+{"ts":"2026-08-16T06:39:55.211Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d258","brief":"two of six deleted"}
+{"ts":"2026-08-16T06:39:59.809Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d259","brief":"three of six deleted"}
+{"ts":"2026-08-16T06:40:04.058Z","op":"done","visit":"iterations/i34/author-tests@0","node":"d241","brief":"observe-red comes after specify-build, not before it"}
+{"ts":"2026-08-16T06:40:08.390Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d260","brief":"five of six deleted"}
+{"ts":"2026-08-16T06:40:12.994Z","op":"done","visit":"iterations/i34/specify-build@0","node":"d250","brief":"all six locking requirements deleted"}
+{"ts":"2026-08-16T06:40:21.530Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d261","brief":"reading the test-spec that verified them"}
+{"ts":"2026-08-16T06:40:54.652Z","op":"plan","visit":"iterations/i34/specify-build@0","parent":null,"nodes":[{"id":"d262","brief":"delete the whole claim ripple"},{"id":"d263","brief":"re-point the requirements that are not about claiming"},{"id":"d264","brief":"note the missing dangling-design signal"}]}
+{"ts":"2026-08-16T06:41:09.445Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d265","brief":"deleting the claim ripple, test-specs first"}
+{"ts":"2026-08-16T06:41:14.137Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d266","brief":"test-specs going"}
+{"ts":"2026-08-16T06:41:19.535Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d267","brief":"three test-specs gone"}
+{"ts":"2026-08-16T06:41:24.207Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d268","brief":"the remaining claim requirements"}
+{"ts":"2026-08-16T06:41:28.499Z","op":"done","visit":"iterations/i34/specify-build@0","node":"d251","brief":"the walk continues after the sweep"}
+{"ts":"2026-08-16T06:41:33.388Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d269","brief":"the push-scope requirements"}
+{"ts":"2026-08-16T06:41:38.516Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d270","brief":"requirements done, moving up the chain"}
+{"ts":"2026-08-16T06:41:45.564Z","op":"done","visit":"iterations/i34/specify-build@0","node":"d263","brief":"three live requirements re-pointed off the retired use case"}
+{"ts":"2026-08-16T06:41:50.532Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d271","brief":"the use case, now that nothing live refines it"}
+{"ts":"2026-08-16T06:41:55.873Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d272","brief":"the story behind it"}
+{"ts":"2026-08-16T06:42:00.837Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d273","brief":"the interface the ledger owed"}
+{"ts":"2026-08-16T06:42:05.405Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d274","brief":"the element"}
+{"ts":"2026-08-16T06:42:10.539Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d275","brief":"the function, which loses its only implementer"}
+{"ts":"2026-08-16T06:42:16.638Z","op":"done","visit":"iterations/i34/specify-build@0","node":"d262","brief":"the trace ripple is removed; the register entries follow"}
+{"ts":"2026-08-16T06:42:21.805Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d276","brief":"the register entries about the ledger"}
+{"ts":"2026-08-16T06:42:27.192Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d277","brief":"the assumption about remote serialization"}
+{"ts":"2026-08-16T06:42:33.455Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d278","brief":"the last register entry of the ripple"}
+{"ts":"2026-08-16T06:42:54.532Z","op":"done","visit":"iterations/i34/specify-build@0","node":"d264","brief":"the missing dangling-design query is recorded against i18"}
+{"ts":"2026-08-16T06:43:20.743Z","op":"plan","visit":"iterations/i34/specify-build@0","parent":null,"nodes":[{"id":"d279","brief":"author the design specs for the nine build steps"}]}
+{"ts":"2026-08-16T06:43:33.303Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d280","brief":"the design-spec ripple"}
+{"ts":"2026-08-16T06:43:40.715Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d281","brief":"the claim lane's design spec goes with its element"}
+{"ts":"2026-08-16T06:43:47.838Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d282","brief":"dropping the dead interface from the satellite spec"}
+{"ts":"2026-08-16T06:44:09.151Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d283","brief":"filling specify-build"}
+{"ts":"2026-08-16T06:44:55.299Z","op":"done","visit":"iterations/i34/specify-build@0","node":"d279","brief":"22 design specs stand; the claim lane's is gone"}
+{"ts":"2026-08-16T06:45:11.965Z","op":"plan","visit":"iterations/i34/specify-build@0","parent":null,"nodes":[{"id":"d284","brief":"reach observe-red and make the four checks fail"}]}
+{"ts":"2026-08-16T06:45:24.470Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d285","brief":"amending author-tests after the deletions"}
+{"ts":"2026-08-16T06:45:40.171Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d286","brief":"amending with the three deletions named"}
+{"ts":"2026-08-16T06:45:44.098Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d287","brief":"pulling on to observe-red"}
+{"ts":"2026-08-16T06:46:17.415Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d288","brief":"amending the checks table off the deleted specs"}
+{"ts":"2026-08-16T06:46:26.462Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d289","brief":"pulling on after the amend"}
+{"ts":"2026-08-16T06:47:19.635Z","op":"done","visit":"iterations/i34/specify-build@0","node":"d284","brief":"the gate's verdict now records the owner's overturn"}
+{"ts":"2026-08-16T06:47:38.439Z","op":"plan","visit":"iterations/i34/specify-build@0","parent":null,"nodes":[{"id":"d290","brief":"clear the fallen inputs up the chain"},{"id":"d291","brief":"reach observe-red"}]}
+{"ts":"2026-08-16T06:47:45.554Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d292","brief":"checking what still stands in the way"}
+{"ts":"2026-08-16T06:47:52.743Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d293","brief":"one level up again"}
+{"ts":"2026-08-16T06:48:01.026Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d294","brief":"walking the chain to its root"}
+{"ts":"2026-08-16T06:48:19.586Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d295","brief":"re-allocating the two orphaned requirements"}
+{"ts":"2026-08-16T06:48:40.171Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d296","brief":"derive-functions amended off the deleted function"}
+{"ts":"2026-08-16T06:48:51.065Z","op":"done","visit":"iterations/i34/specify-build@0","node":"d290","brief":"derive-functions repaired; checking what remains"}
+{"ts":"2026-08-16T06:49:08.258Z","op":"plan","visit":"iterations/i34/specify-build@0","parent":null,"nodes":[{"id":"d297","brief":"walk the fallen chain to its true root"}]}
+{"ts":"2026-08-16T06:49:54.873Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d298","brief":"amending the register off the ten deleted ids"}
+{"ts":"2026-08-16T06:50:34.890Z","op":"done","visit":"iterations/i34/specify-build@0","node":"d297","brief":"the register root is repaired"}
+{"ts":"2026-08-16T06:50:39.622Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d299","brief":"pulling after the root repair"}
+{"ts":"2026-08-16T06:51:00.643Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d300","brief":"re-checking the chain from the repaired root"}
+{"ts":"2026-08-16T06:51:08.960Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d301","brief":"checking the other fallen input of the gate"}
+{"ts":"2026-08-16T06:51:31.449Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d302","brief":"amending the assumption states from the root up"}
+{"ts":"2026-08-16T06:51:47.697Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d303","brief":"probe-assumptions amended"}
+{"ts":"2026-08-16T06:51:55.312Z","op":"done","visit":"iterations/i34/specify-build@0","node":"d291","brief":"assumption branch repaired; checking the gate"}
+{"ts":"2026-08-16T06:52:09.717Z","op":"plan","visit":"iterations/i34/specify-build@0","parent":null,"nodes":[{"id":"d304","brief":"find whether the root now stands"}]}
+{"ts":"2026-08-16T06:52:16.665Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d305","brief":"asking the root itself"}
+{"ts":"2026-08-16T06:52:32.217Z","op":"done","visit":"iterations/i34/specify-build@0","node":"d304","brief":"the true root is the deleted use case, now dropped"}
+{"ts":"2026-08-16T06:52:36.906Z","op":"plan","visit":"iterations/i34/specify-build@0","parent":null,"nodes":[{"id":"d306","brief":"confirm the chain cleared from the root"}]}
+{"ts":"2026-08-16T06:53:05.518Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d307","brief":"re-stamping write-requirements"}
+{"ts":"2026-08-16T06:53:12.001Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d308","brief":"does the root stand now"}
+{"ts":"2026-08-16T06:53:40.690Z","op":"done","visit":"iterations/i34/specify-build@0","node":"d306","brief":"amend cannot clear a fallen input; the remedy names the wrong verb"}
+{"ts":"2026-08-16T06:57:03.184Z","op":"plan","visit":"iterations/i34/specify-build@0","parent":null,"nodes":[{"id":"d309","brief":"make an amend re-stamp when its own checks pass"},{"id":"d310","brief":"clear the eight fallen forms"},{"id":"d311","brief":"reach observe-red"}]}
+{"ts":"2026-08-16T06:57:08.583Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d312","brief":"locating the amend body"}
+{"ts":"2026-08-16T06:57:13.514Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d313","brief":"finding the call site"}
+{"ts":"2026-08-16T06:57:17.846Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d314","brief":"reading the amend body"}
+{"ts":"2026-08-16T06:57:38.970Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d315","brief":"the amend now re-stamps after its checks pass"}
+{"ts":"2026-08-16T06:57:44.174Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d316","brief":"testing the re-stamp"}
+{"ts":"2026-08-16T06:57:48.423Z","op":"done","visit":"iterations/i34/specify-build@0","node":"d309","brief":"the re-stamp is in; reading the verdict"}
+{"ts":"2026-08-16T06:57:52.117Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d317","brief":"reading the verdict"}
+{"ts":"2026-08-16T06:57:56.035Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d318","brief":"reading the verdict"}
+{"ts":"2026-08-16T06:57:59.947Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d319","brief":"reading the verdict"}
+{"ts":"2026-08-16T06:58:03.950Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d320","brief":"reading the verdict"}
+{"ts":"2026-08-16T06:58:07.715Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d321","brief":"reading the verdict"}
+{"ts":"2026-08-16T06:58:12.354Z","op":"done","visit":"iterations/i34/specify-build@0","node":"d310","brief":"waiting on the verdict before clearing the forms"}
+{"ts":"2026-08-16T06:58:16.033Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d322","brief":"reading the verdict"}
+{"ts":"2026-08-16T06:58:19.764Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d323","brief":"reading the verdict"}
+{"ts":"2026-08-16T06:58:23.895Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d324","brief":"reading the verdict"}
+{"ts":"2026-08-16T06:58:27.477Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d325","brief":"reading the verdict"}
+{"ts":"2026-08-16T06:58:47.770Z","op":"update","visit":"iterations/i34/specify-build@0","node":"d326","brief":"testing whether the running engine has the fix"}
+{"ts":"2026-08-16T07:13:34.632Z","op":"update","visit":"iterations/i34/write-requirements@2","node":"d342","brief":"an amend needs a named field; finding the form"}
+{"ts":"2026-08-16T07:15:06.802Z","op":"update","visit":"iterations/i34/write-requirements@2","node":"d343","brief":"the re-stamp was not the cause; asking the engine which claim actually fell"}
+{"ts":"2026-08-16T07:15:48.243Z","op":"done","visit":"front_desk@5","node":"d341","brief":"root was one dangling story ref; re-stamp reverted as built on a wrong diagnosis"}
+{"ts":"2026-08-16T07:18:02.708Z","op":"plan","visit":"iterations/i34/author-tests@1","parent":null,"nodes":[{"id":"d344","brief":"grant delete to the states that own trace nodes"},{"id":"d345","brief":"delete the dangling claim-ledger interface"},{"id":"d346","brief":"amend decompose-structure's allocation"},{"id":"d347","brief":"reach observe-red"}]}
+{"ts":"2026-08-16T07:18:09.093Z","op":"done","visit":"iterations/i34/author-tests@1","node":"d344","brief":"delete granted to decompose-structure and author-tests rows"}
+{"ts":"2026-08-16T07:18:11.733Z","op":"done","visit":"iterations/i34/author-tests@1","node":"d345","brief":"the last claim-ledger interface is gone from the corpus"}
+{"ts":"2026-08-16T07:18:32.078Z","op":"done","visit":"iterations/i34/author-tests@1","node":"d346","brief":"allocation and follow_up now match the corpus"}
+{"ts":"2026-08-16T07:21:11.089Z","op":"update","visit":"iterations/i34/observe-red@0","node":"d348","brief":"three new checks written; running them to watch the red"}
+{"ts":"2026-08-16T07:23:22.021Z","op":"update","visit":"iterations/i34/observe-red@0","node":"d349","brief":"the submit refused every checklist item as unchecked; reading the matcher"}
+{"ts":"2026-08-16T07:25:52.727Z","op":"plan","visit":"iterations/i34/build-steps@0","parent":null,"nodes":[{"id":"d350","brief":"rescue-at-risk"},{"id":"d351","brief":"level-records"},{"id":"d352","brief":"status-is-the-open-flag"},{"id":"d353","brief":"selection-state"},{"id":"d354","brief":"collapse-record-read"},{"id":"d355","brief":"close-leaves-the-folder"},{"id":"d356","brief":"delete-the-seam"},{"id":"d357","brief":"cut-worktrees-from-seed"},{"id":"d358","brief":"remove-artefacts"}]}
+{"ts":"2026-08-16T07:28:49.303Z","op":"update","visit":"iterations/i34/build-steps/selection-state@0","node":"d359","brief":"wiring select between start and the roots"}
+{"ts":"2026-08-16T07:29:03.104Z","op":"update","visit":"iterations/i34/build-steps/selection-state@0","node":"d360","brief":"the guard is in; running the container tests"}
+{"ts":"2026-08-16T07:31:36.904Z","op":"update","visit":"iterations/i34/build-steps/selection-state@0","node":"d361","brief":"the router picks the hop, so the guard on completion never fires"}
+{"ts":"2026-08-16T07:31:56.996Z","op":"done","visit":"iterations/i34/author-tests@1","node":"d347","brief":"observe-red signed, three reds watched failing"}
+{"ts":"2026-08-16T07:33:26.815Z","op":"update","visit":"iterations/i34/build-steps/selection-state@0","node":"d362","brief":"the selection state becomes the container's initial state"}
+{"ts":"2026-08-16T07:34:17.572Z","op":"update","visit":"iterations/i34/build-steps/selection-state@0","node":"d363","brief":"the router crosses an unchosen fan; reading its search"}
+{"ts":"2026-08-16T07:36:15.464Z","op":"update","visit":"iterations/i34/build-steps/selection-state@0","node":"d364","brief":"the router may not route through a record when a plain door exists"}
+{"ts":"2026-08-16T07:37:30.480Z","op":"update","visit":"iterations/i34/build-steps/selection-state@0","node":"d365","brief":"an unchosen record is no longer an objective"}
+{"ts":"2026-08-16T07:38:39.217Z","op":"update","visit":"iterations/i34/build-steps/selection-state@0","node":"d366","brief":"reading the six sites that ask the disk whether a record is open"}
+{"ts":"2026-08-16T07:39:49.439Z","op":"done","visit":"iterations/i34/build-steps@0","node":"d353","brief":"selection state built; bare-pull check green in test-msvhslmn-17"}
+{"ts":"2026-08-16T07:39:57.002Z","op":"update","visit":"iterations/i34/build-steps/selection-state@0","node":"d367","brief":"fetching the battery's full failure list"}
+{"ts":"2026-08-16T07:40:58.177Z","op":"update","visit":"iterations/i34/build-steps/selection-state@0","node":"d368","brief":"battery re-running after the YAML fix; 201 of 1325 so far"}
+{"ts":"2026-08-16T07:41:47.189Z","op":"update","visit":"iterations/i34/build-steps/selection-state@0","node":"d369","brief":"battery 1320/1325; fixing the one failure that is mine"}
+{"ts":"2026-08-16T07:43:27.912Z","op":"update","visit":"iterations/i34/build-steps/selection-state@0","node":"d370","brief":"taking the rescue leg, which runs before anything touches a tree"}
+{"ts":"2026-08-16T07:47:56.747Z","op":"update","visit":"iterations/i34/build-steps/rescue-at-risk@0","node":"d371","brief":"33 stub records rescued onto the record's own tree; verifying"}
+{"ts":"2026-08-16T07:51:53.207Z","op":"done","visit":"iterations/i34/build-steps@0","node":"d350","brief":"33 records committed (336dfaf2) and i28 merged back; conflicts resolving now"}
+{"ts":"2026-08-16T07:52:04.235Z","op":"update","visit":"iterations/i34/build-steps/rescue-at-risk@0","node":"d372","brief":"eight raid-node conflicts left in the i28 merge"}
+{"ts":"2026-08-16T07:52:24.602Z","op":"update","visit":"iterations/i34/build-steps/rescue-at-risk@0","node":"d373","brief":"four raid conflicts resolved; one claim node retiring"}
+{"ts":"2026-08-16T07:52:28.711Z","op":"update","visit":"iterations/i34/build-steps/rescue-at-risk@0","node":"d374","brief":"reading the last four merge conflicts"}
+{"ts":"2026-08-16T07:52:46.799Z","op":"update","visit":"iterations/i34/build-steps/rescue-at-risk@0","node":"d375","brief":"all 23 conflicts resolved; the reload assumption takes i28's falsification"}
+{"ts":"2026-08-16T07:54:07.851Z","op":"update","visit":"iterations/i34/build-steps/rescue-at-risk@0","node":"d376","brief":"the merge carried claim nodes back; sweeping them out again"}
+{"ts":"2026-08-16T07:55:15.678Z","op":"done","visit":"iterations/i34/build-steps@0","node":"d351","brief":"all 33 record folders now stand in the tree, not only on branches"}
+{"ts":"2026-08-16T07:55:19.077Z","op":"update","visit":"iterations/i34/build-steps/rescue-at-risk@0","node":"d377","brief":"the two claim nodes the merge carried back are out again"}
+{"ts":"2026-08-16T07:55:30.598Z","op":"update","visit":"iterations/i34/build-steps/rescue-at-risk@0","node":"d378","brief":"the last two dangling claim references repaired"}
+{"ts":"2026-08-16T07:56:01.122Z","op":"update","visit":"iterations/i34/build-steps/rescue-at-risk@0","node":"d379","brief":"the node floor was fixed on i28 and rode the merge in"}
+{"ts":"2026-08-16T07:57:48.590Z","op":"update","visit":"iterations/i34/build-steps/level-records@0","node":"d380","brief":"level-records: itList must read folders rather than branches"}
+{"ts":"2026-08-16T07:58:34.023Z","op":"update","visit":"iterations/i34/build-steps/level-records@0","node":"d381","brief":"the list reads folders and open comes from status"}
+{"ts":"2026-08-16T07:58:54.160Z","op":"done","visit":"iterations/i34/build-steps@0","node":"d352","brief":"the open flag now comes from the record's own status"}
+{"ts":"2026-08-16T07:59:33.257Z","op":"update","visit":"iterations/i34/build-steps/level-records@0","node":"d382","brief":"the chunk boundary was drawn where the code has none; reading the seed"}
+{"ts":"2026-08-16T07:59:57.822Z","op":"update","visit":"iterations/i34/build-steps/level-records@0","node":"d383","brief":"the seed mints a folder on trunk and nothing else"}
+{"ts":"2026-08-16T08:00:33.132Z","op":"update","visit":"iterations/i34/build-steps/level-records@0","node":"d384","brief":"itAdopt cut; a clone with trunk has every record"}
+{"ts":"2026-08-16T08:01:19.961Z","op":"update","visit":"iterations/i34/build-steps/level-records@0","node":"d385","brief":"the cases follow the change: one path, not two"}
+{"ts":"2026-08-16T08:01:30.644Z","op":"update","visit":"iterations/i34/build-steps/level-records@0","node":"d386","brief":"two more cases repointed off the worktree path"}
+{"ts":"2026-08-16T08:01:50.457Z","op":"done","visit":"iterations/i34/build-steps@0","node":"d354","brief":"a record is read from one path and the git retrieval half is gone"}
+{"ts":"2026-08-16T08:02:23.383Z","op":"update","visit":"iterations/i34/build-steps/level-records@0","node":"d387","brief":"one case left: the pin"}
+{"ts":"2026-08-16T08:02:35.705Z","op":"update","visit":"iterations/i34/build-steps/level-records@0","node":"d388","brief":"the pin is read from the root like every other record file"}
+{"ts":"2026-08-16T08:06:12.982Z","op":"update","visit":"iterations/i34/build-steps/cut-worktrees-from-seed@0","node":"d389","brief":"minted_in is scraped from a worktree path and needs a new source"}
+{"ts":"2026-08-16T08:06:51.639Z","op":"update","visit":"iterations/i34/build-steps/cut-worktrees-from-seed@0","node":"d390","brief":"minted_in asks the walk which record is bound"}
+{"ts":"2026-08-16T08:06:59.047Z","op":"update","visit":"iterations/i34/build-steps/cut-worktrees-from-seed@0","node":"d391","brief":"the session answers which record is bound"}
+{"ts":"2026-08-16T08:07:02.978Z","op":"done","visit":"iterations/i34/build-steps@0","node":"d355","brief":"a close stamps the record and leaves its folder standing"}
+{"ts":"2026-08-16T08:07:31.398Z","op":"update","visit":"iterations/i34/build-steps/cut-worktrees-from-seed@0","node":"d392","brief":"the claim cases write evidence to the one tree"}
+{"ts":"2026-08-16T08:07:49.372Z","op":"update","visit":"iterations/i34/build-steps/cut-worktrees-from-seed@0","node":"d393","brief":"five cases repointed; the expedition ones keep their worktrees"}
+{"ts":"2026-08-16T08:09:01.138Z","op":"update","visit":"iterations/i34/build-steps/cut-worktrees-from-seed@0","node":"d394","brief":"taking the seam: six choosers must stop existing"}
+{"ts":"2026-08-16T08:09:33.251Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d395","brief":"storeFor has one answer and the bound root is gone"}
+{"ts":"2026-08-16T08:09:48.076Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d396","brief":"the fan-out and the two roots are what is left"}
+{"ts":"2026-08-16T08:10:36.827Z","op":"done","visit":"iterations/i34/build-steps@0","node":"d357","brief":"the seed mints a folder and minted_in asks the walk"}
+{"ts":"2026-08-16T08:10:47.332Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d397","brief":"the write lane no longer knows what a worktree is"}
+{"ts":"2026-08-16T08:11:10.208Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d398","brief":"the three path choosers are deleted"}
+{"ts":"2026-08-16T08:11:30.394Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d399","brief":"the imports that kept the choosers alive are cut"}
+{"ts":"2026-08-16T08:11:55.663Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d400","brief":"the cases assert the absence of a chooser rather than its correctness"}
+{"ts":"2026-08-16T08:12:15.306Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d401","brief":"the fan-out cases are replaced by what one tree makes true"}
+{"ts":"2026-08-16T08:12:47.146Z","op":"done","visit":"iterations/i34/build-steps@0","node":"d356","brief":"no call selects between trees; the six choosers are gone"}
+{"ts":"2026-08-16T08:13:51.866Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d402","brief":"battery running on the seam-free tree before the irreversible step"}
+{"ts":"2026-08-16T08:14:25.925Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d403","brief":"expeditions keep their trees, so workRoot keeps its one branch"}
+{"ts":"2026-08-16T08:15:15.431Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d404","brief":"seam reverted; confirming the tree is green before reporting"}
+{"ts":"2026-08-16T08:16:23.762Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d405","brief":"battery at 207 cases; waiting on the verdict"}
+{"ts":"2026-08-16T08:17:08.448Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d406","brief":"the last two cases follow the behaviour i34 reversed"}
+{"ts":"2026-08-16T08:18:51.144Z","op":"defer","visit":"iterations/i34/build-steps@0","node":"d358","brief":"remove-artefacts","to":"remove-artefacts","hops":1,"trail":["iterations/i34/build-steps","remove-artefacts"]}
+{"ts":"2026-08-16T08:19:18.714Z","op":"plan","visit":"iterations/i34/build-steps/delete-the-seam@0","parent":null,"nodes":[{"id":"d407","brief":"expeditions list from folders"},{"id":"d408","brief":"a seed mints a folder"},{"id":"d409","brief":"a close leaves the folder"},{"id":"d410","brief":"delete the seam whole"},{"id":"d411","brief":"the cases follow"}]}
+{"ts":"2026-08-16T08:19:32.928Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d407","brief":"expeditions list from folders with status as the open flag"}
+{"ts":"2026-08-16T08:19:51.563Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d408","brief":"an expedition seed mints a folder on trunk"}
+{"ts":"2026-08-16T08:20:09.081Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d412","brief":"the close stamps the record on the one tree"}
+{"ts":"2026-08-16T08:20:20.350Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d413","brief":"the report guard reads the one tree too"}
+{"ts":"2026-08-16T08:20:30.394Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d414","brief":"a literal escape from the replace is repaired"}
+{"ts":"2026-08-16T08:20:41.916Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d409","brief":"an expedition close stamps the record and leaves the folder"}
+{"ts":"2026-08-16T08:20:48.104Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d415","brief":"the branch-record cache goes with the branch read"}
+{"ts":"2026-08-16T08:21:03.971Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d416","brief":"the chooser is cut now that both record kinds share one tree"}
+{"ts":"2026-08-16T08:21:31.496Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d417","brief":"the read and the search disagree about resolve.ts — the seam itself"}
+{"ts":"2026-08-16T08:22:47.001Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d418","brief":"the three path choosers and the mirror hook are cut"}
+{"ts":"2026-08-16T08:23:20.954Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d410","brief":"no call selects between trees, for either record kind"}
+{"ts":"2026-08-16T08:23:34.672Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d419","brief":"battery on the seam-free tree"}
+{"ts":"2026-08-16T08:24:18.594Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d420","brief":"the branch-cache case asserts the absence instead"}
+{"ts":"2026-08-16T08:25:22.251Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d421","brief":"six expedition cases follow the one-tree change"}
+{"ts":"2026-08-16T08:26:08.009Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d422","brief":"the absence check reads the function alone"}
+{"ts":"2026-08-16T08:26:21.971Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d423","brief":"the archive case asserts the folder stays"}
+{"ts":"2026-08-16T08:26:47.943Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d411","brief":"every case that named a worktree now names the one tree"}
+{"ts":"2026-08-16T08:27:14.507Z","op":"plan","visit":"iterations/i34/build-steps/delete-the-seam@0","parent":null,"nodes":[{"id":"d424","brief":"the last worktree cases"},{"id":"d425","brief":"battery green"},{"id":"d426","brief":"remove the artefacts"}]}
+{"ts":"2026-08-16T08:27:36.068Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d427","brief":"the fan-out case becomes a one-tree case"}
+{"ts":"2026-08-16T08:27:47.713Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d424","brief":"every case that named a second tree now names the one"}
+{"ts":"2026-08-16T08:28:52.665Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d428","brief":"battery at 207 of 1319"}
+{"ts":"2026-08-16T08:29:07.621Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d429","brief":"1316 of 1319; three cases about a merge that no longer happens"}
+{"ts":"2026-08-16T08:29:28.420Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d430","brief":"the merge-conflict case becomes a clean-tree case"}
+{"ts":"2026-08-16T08:29:39.986Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d431","brief":"the archive fixture writes records rather than branches"}
+{"ts":"2026-08-16T08:29:54.290Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d432","brief":"the fixture's imports follow it"}
+{"ts":"2026-08-16T08:31:20.892Z","op":"defer","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d426","brief":"remove the artefacts","to":"remove-artefacts","hops":1,"trail":["iterations/i34/build-steps/delete-the-seam","remove-artefacts"]}
+{"ts":"2026-08-16T08:33:09.930Z","op":"plan","visit":"iterations/i34/build-steps/delete-the-seam@0","parent":null,"nodes":[{"id":"d433","brief":"delete the dead code"},{"id":"d434","brief":"delete the cases that test nothing"},{"id":"d435","brief":"delete the branches and the worktrees"}]}
+{"ts":"2026-08-16T08:33:15.441Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d436","brief":"reading the levelling machinery before cutting it"}
+{"ts":"2026-08-16T08:33:35.786Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d437","brief":"the levelling machinery is deleted"}
+{"ts":"2026-08-16T08:33:51.929Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d438","brief":"the fan-out and the tree list are deleted"}
+{"ts":"2026-08-16T08:34:29.107Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d439","brief":"entry binds and stamps, with no claim and no levelling"}
+{"ts":"2026-08-16T08:34:51.086Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d440","brief":"two claim call sites left"}
+{"ts":"2026-08-16T08:35:30.288Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d425","brief":"1319 of 1319 before this sweep began"}
+{"ts":"2026-08-16T08:35:34.861Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d441","brief":"the claim ledger is deleted"}
+{"ts":"2026-08-16T08:35:38.919Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d442","brief":"the claim lane's whole test file is deleted"}
+{"ts":"2026-08-16T08:35:45.030Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d443","brief":"the mirror hook is deleted from the write path"}
+{"ts":"2026-08-16T08:35:55.191Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d444","brief":"the interface's closing brace is back"}
+{"ts":"2026-08-16T08:36:07.868Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d433","brief":"the claim ledger, the mirror and the levelling machinery are deleted"}
+{"ts":"2026-08-16T08:36:18.792Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d445","brief":"the fan-out case is deleted rather than hollowed out"}
+{"ts":"2026-08-16T08:36:32.132Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d446","brief":"the branch-cache case is deleted too"}
+{"ts":"2026-08-16T08:36:45.782Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d434","brief":"the cases that tested a deleted mechanism are deleted"}
+{"ts":"2026-08-16T08:36:54.113Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d447","brief":"the last dangling imports"}
+{"ts":"2026-08-16T08:37:19.446Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d448","brief":"the confirming battery before the branches go"}
+{"ts":"2026-08-16T08:38:37.018Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d449","brief":"the entrypoint has six steps, and the adopt case is deleted"}

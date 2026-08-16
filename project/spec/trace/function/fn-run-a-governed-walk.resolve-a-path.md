@@ -5,6 +5,7 @@ type: "[[function]]"
 cluster: the-walk
 statement: decide which tree a call's path names, and say so
 satisfies:
+  - req-every-record-path-resolves-in-one-tree
   - req-version-control-resolves-like-every-call
   - req-a-write-lands-where-it-is-meant
   - req-a-read-comes-from-where-it-is-meant

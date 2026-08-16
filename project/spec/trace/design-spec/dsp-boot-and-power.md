@@ -10,6 +10,7 @@ files:
   - "project/deliverable/engine/bin/se-pty.ts"
   - "project/deliverable/engine/bin/se-hook-stop.ts"
   - "project/deliverable/engine/bin/package.ts"
+  - "project/deliverable/engine/version.ts"
 ---
 
 ## Responsibility

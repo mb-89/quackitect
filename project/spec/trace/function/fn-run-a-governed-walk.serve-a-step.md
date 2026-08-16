@@ -5,6 +5,7 @@ type: "[[function]]"
 cluster: the-walk
 statement: hand the driver one instruction carrying everything that step needs
 satisfies:
+  - req-a-pull-carrying-no-choice-enters-no-iteration
   - req-a-clear-jump-is-one-call
   - req-answer-pages-never-overflows
   - req-container-offers-its-records
@@ -28,6 +29,7 @@ satisfies:
   - req-shutdown-fires-only-idle-or-end
   - req-lane-fixes-what-machines-fix
   - req-walk-opens-at-retro
+  - req-entering-repairs-itself-or-names-the-remedy
   - req-instruction-names-its-source
   - req-fallen-condition-named
   - req-crash-lands-safe
