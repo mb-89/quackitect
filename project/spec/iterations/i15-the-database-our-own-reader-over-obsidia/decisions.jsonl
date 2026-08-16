@@ -92,3 +92,8 @@
 {"ts":"2026-08-16T16:37:11.509Z","op":"update","visit":"iterations/i15/draw-context@0","node":"d86","brief":"fixing a second YAML colon break in the same raid file"}
 {"ts":"2026-08-16T16:37:16.975Z","op":"update","visit":"iterations/i15/draw-context@0","node":"d87","brief":"fixing a third YAML colon break, same raid file"}
 {"ts":"2026-08-16T16:40:40.853Z","op":"update","visit":"iterations/i15/draw-context@0","node":"d88","brief":"restoring the required Probe section, found via se_why's real root cause"}
+{"ts":"2026-08-16T16:42:47.956Z","op":"fork","visit":"iterations/i15/write-stories@0","parent":null,"node":"d89","brief":"correct false v1-ref-unreachable claim before continuing i15 walk","nodes":[{"id":"d90","brief":"locate raid node + downstream forms"},{"id":"d91","brief":"correct raid node statement"},{"id":"d92","brief":"correct define-actual/frame-delta/pressure-test"},{"id":"d93","brief":"resume write-stories"}]}
+{"ts":"2026-08-16T16:45:25.992Z","op":"update","visit":"iterations/i15/write-stories@0","node":"d94","brief":"writing sty-answer-what-does-this-touch, refines vp-the-ledger"}
+{"ts":"2026-08-16T16:45:33.593Z","op":"update","visit":"iterations/i15/write-stories@0","node":"d95","brief":"writing sty-trust-a-repeatable-answer, refines vp-the-ledger"}
+{"ts":"2026-08-16T16:45:39.158Z","op":"update","visit":"iterations/i15/write-stories@0","node":"d96","brief":"writing sty-dispose-a-candidate-coupling, refines vp-rigor-without-toil"}
+{"ts":"2026-08-16T16:45:48.051Z","op":"done","visit":"iterations/i15/write-stories@0","node":"d93","brief":"write-stories filled and submitted — 3 stories, both value props covered"}
