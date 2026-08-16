@@ -352,3 +352,18 @@
 {"ts":"2026-08-16T08:07:02.978Z","op":"done","visit":"iterations/i34/build-steps@0","node":"d355","brief":"a close stamps the record and leaves its folder standing"}
 {"ts":"2026-08-16T08:07:31.398Z","op":"update","visit":"iterations/i34/build-steps/cut-worktrees-from-seed@0","node":"d392","brief":"the claim cases write evidence to the one tree"}
 {"ts":"2026-08-16T08:07:49.372Z","op":"update","visit":"iterations/i34/build-steps/cut-worktrees-from-seed@0","node":"d393","brief":"five cases repointed; the expedition ones keep their worktrees"}
+{"ts":"2026-08-16T08:09:01.138Z","op":"update","visit":"iterations/i34/build-steps/cut-worktrees-from-seed@0","node":"d394","brief":"taking the seam: six choosers must stop existing"}
+{"ts":"2026-08-16T08:09:33.251Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d395","brief":"storeFor has one answer and the bound root is gone"}
+{"ts":"2026-08-16T08:09:48.076Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d396","brief":"the fan-out and the two roots are what is left"}
+{"ts":"2026-08-16T08:10:36.827Z","op":"done","visit":"iterations/i34/build-steps@0","node":"d357","brief":"the seed mints a folder and minted_in asks the walk"}
+{"ts":"2026-08-16T08:10:47.332Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d397","brief":"the write lane no longer knows what a worktree is"}
+{"ts":"2026-08-16T08:11:10.208Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d398","brief":"the three path choosers are deleted"}
+{"ts":"2026-08-16T08:11:30.394Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d399","brief":"the imports that kept the choosers alive are cut"}
+{"ts":"2026-08-16T08:11:55.663Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d400","brief":"the cases assert the absence of a chooser rather than its correctness"}
+{"ts":"2026-08-16T08:12:15.306Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d401","brief":"the fan-out cases are replaced by what one tree makes true"}
+{"ts":"2026-08-16T08:12:47.146Z","op":"done","visit":"iterations/i34/build-steps@0","node":"d356","brief":"no call selects between trees; the six choosers are gone"}
+{"ts":"2026-08-16T08:13:51.866Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d402","brief":"battery running on the seam-free tree before the irreversible step"}
+{"ts":"2026-08-16T08:14:25.925Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d403","brief":"expeditions keep their trees, so workRoot keeps its one branch"}
+{"ts":"2026-08-16T08:15:15.431Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d404","brief":"seam reverted; confirming the tree is green before reporting"}
+{"ts":"2026-08-16T08:16:23.762Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d405","brief":"battery at 207 cases; waiting on the verdict"}
+{"ts":"2026-08-16T08:17:08.448Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d406","brief":"the last two cases follow the behaviour i34 reversed"}
