@@ -18,6 +18,7 @@ source_refs:
 priority: should
 weighs_against:
   - req-setup-floor-editor-shell >
+  - req-newcomer-leaves-able-to-ask > — crippling outranks abrasive on the damage scale
 ---
 
 ## Detail

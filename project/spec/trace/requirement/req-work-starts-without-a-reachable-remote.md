@@ -15,7 +15,8 @@ source_refs:
   - raid-no-iterations-are-visible-without-a-reachable-remote
   - raid-dec-one-tree-beats-a-record-travelling-between-machines
 priority: must
----
+weighs_with:
+  - req-the-lane-runs-without-a-console ! — one is listing/entering work offline, the other is the process surviving stdin close and port conflict; different failure modes under the same use case
 
 ## Detail
 

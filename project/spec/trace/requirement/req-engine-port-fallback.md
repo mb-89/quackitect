@@ -14,6 +14,7 @@ source_refs:
 priority: should
 weighs_against:
   - req-missing-provider-named >
+  - req-newcomer-leaves-able-to-ask > — crippling outranks abrasive on the damage scale
 ---
 
 ## Detail

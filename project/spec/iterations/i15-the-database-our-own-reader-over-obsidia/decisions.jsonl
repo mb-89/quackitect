@@ -150,3 +150,28 @@
 {"ts":"2026-08-16T17:14:36.148Z","op":"done","visit":"iterations/i15/gate-requirements@0","node":"d134","brief":"all four rounds written into gate-requirements form"}
 {"ts":"2026-08-16T17:16:35.011Z","op":"update","visit":"iterations/i15/derive-criteria@0","node":"d138","brief":"compounding pair 1/5 done, checking next pair"}
 {"ts":"2026-08-16T17:16:56.539Z","op":"update","visit":"iterations/i15/derive-criteria@0","node":"d139","brief":"trying answer on the should-side node instead of the must-side"}
+{"ts":"2026-08-16T17:18:25.019Z","op":"update","visit":"iterations/i15/derive-criteria@0","node":"d140","brief":"corrected compounding pair 1 to the list+! format"}
+{"ts":"2026-08-16T17:18:40.132Z","op":"update","visit":"iterations/i15/derive-criteria@0","node":"d141","brief":"compounding pair 2/8 recorded, different"}
+{"ts":"2026-08-16T17:18:53.567Z","op":"update","visit":"iterations/i15/derive-criteria@0","node":"d142","brief":"compounding pair 3/8, different"}
+{"ts":"2026-08-16T17:19:07.987Z","op":"update","visit":"iterations/i15/derive-criteria@0","node":"d143","brief":"compounding pair 4/7, different (siblings by design)"}
+{"ts":"2026-08-16T17:19:17.064Z","op":"done","visit":"iterations/i15/derive-criteria@0","node":"d135","brief":"pool is engine-derived from priority; nothing further needed"}
+{"ts":"2026-08-16T17:19:26.891Z","op":"update","visit":"iterations/i15/derive-criteria@0","node":"d144","brief":"compounding pair 7/7, different"}
+{"ts":"2026-08-16T17:19:29.849Z","op":"done","visit":"iterations/i15/derive-criteria@0","node":"d136","brief":"all compounding pairs resolved"}
+{"ts":"2026-08-16T17:19:55.501Z","op":"update","visit":"iterations/i15/derive-criteria@0","node":"d145","brief":"comparison pair 1/8, wrong-act > trace-source-mixes"}
+{"ts":"2026-08-16T17:20:15.024Z","op":"update","visit":"iterations/i15/derive-criteria@0","node":"d146","brief":"comparison pair 2/8, wrong-act > host-swap (fatal>crippling)"}
+{"ts":"2026-08-16T17:20:25.324Z","op":"update","visit":"iterations/i15/derive-criteria@0","node":"d147","brief":"comparison pair 3/8, fresh-machine > newcomer-asks (crippling>abrasive)"}
+{"ts":"2026-08-16T17:20:37.386Z","op":"update","visit":"iterations/i15/derive-criteria@0","node":"d148","brief":"comparison pair 4/8, acts-carry-role > fresh-machine (both crippling)"}
+{"ts":"2026-08-16T17:20:48.786Z","op":"update","visit":"iterations/i15/derive-criteria@0","node":"d149","brief":"comparison pair 5/8, overlay-survives > fresh-machine (recurring cost)"}
+{"ts":"2026-08-16T17:21:01.000Z","op":"update","visit":"iterations/i15/derive-criteria@0","node":"d150","brief":"comparison pair 6/8, reachable-capability > fresh-machine"}
+{"ts":"2026-08-16T17:21:10.752Z","op":"update","visit":"iterations/i15/derive-criteria@0","node":"d151","brief":"comparison pair 7/8, scaffold-from-template > newcomer-asks"}
+{"ts":"2026-08-16T17:21:19.826Z","op":"update","visit":"iterations/i15/derive-criteria@0","node":"d152","brief":"comparison pair 8/8, port-fallback > newcomer-asks"}
+{"ts":"2026-08-16T17:26:24.114Z","op":"update","visit":"iterations/i15/derive-functions@0","node":"d153","brief":"resubmitting derive-functions to clear ripple, then probe-assumptions"}
+{"ts":"2026-08-16T17:26:48.558Z","op":"update","visit":"iterations/i15/derive-functions@0","node":"d154","brief":"checking real defect: 3 requirements not resolving as artifacts"}
+{"ts":"2026-08-16T17:26:53.618Z","op":"done","visit":"iterations/i15/derive-criteria@0","node":"d137","brief":"comparisons walk complete: 102/102"}
+{"ts":"2026-08-16T17:27:53.110Z","op":"update","visit":"iterations/i15/write-requirements@2","node":"d155","brief":"checking write-requirements recheck for the 3-artifact defect"}
+{"ts":"2026-08-16T17:28:26.328Z","op":"update","visit":"iterations/i15/write-requirements@2","node":"d156","brief":"isolation test: remove weighs_with from one file"}
+{"ts":"2026-08-16T17:28:53.274Z","op":"update","visit":"iterations/i15/write-requirements@2","node":"d157","brief":"restoring weighs_with, isolation test disproved it as cause"}
+{"ts":"2026-08-16T17:31:08.828Z","op":"update","visit":"iterations/i15/write-requirements@2","node":"d158","brief":"diagnosis complete, checking final walk state before reporting"}
+{"ts":"2026-08-16T17:32:09.248Z","op":"update","visit":"iterations/i15/write-requirements@2","node":"d159","brief":"forcing fresh write on flagged file 1/3 to bust stale cache"}
+{"ts":"2026-08-16T17:35:38.670Z","op":"update","visit":"iterations/i15/write-requirements@2","node":"d160","brief":"rewrite req-the-lane-runs-without-a-console via se_file_write to bust cache"}
+{"ts":"2026-08-16T17:36:30.883Z","op":"update","visit":"iterations/i15/write-requirements@2","node":"d161","brief":"restored req-the-lane-runs-without-a-console after a fabricated overwrite"}

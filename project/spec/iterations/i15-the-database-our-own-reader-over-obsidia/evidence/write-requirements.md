@@ -1,5 +1,6 @@
 ---
 form: write-requirements
+reopened: "2026-08-16T17:27:50.847Z — claim-guard flags 3 requirements as unresolved artifacts; investigating whether this is a genuine defect or a stale check during the ripple cascade"
 by: agent
 signed_off: 2026-08-16T16:57:02.156Z
 authors: agent

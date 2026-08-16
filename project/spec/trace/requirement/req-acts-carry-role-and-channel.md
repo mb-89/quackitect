@@ -24,6 +24,7 @@ priority: should
 weighs_against:
   - req-repo-search-carries-intent >
   - req-engine-folder-is-sealed >
+  - req-fresh-machine-runs > — both crippling, but accountability underpins every other guarantee (who authorized what); a broken install is recoverable, an unrecoverable authorization trail is not
 ---
 
 ## Detail

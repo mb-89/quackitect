@@ -1,8 +1,10 @@
 ---
 form: gate-requirements
 bless: blessed by agent
+reopened: "2026-08-16T17:25:25.575Z — derive-criteria's weighs_with/weighs_against writes to the same requirement files postdate this gate's signed_off timestamp; two se_amend attempts recorded the ripple but did not clear the downstream claim-guard (signed_off itself is untouched by amend), so a fresh bless is needed to update it"
+amended: "2026-08-16T17:23:05.814Z by agent — derive-criteria added weighs_with/weighs_against frontmatter to the same requirement files this round already verified; re-affirming since the substantive claims (statement, kind, priority, breaks_how_badly) this round checked are untouched"
 by: agent
-signed_off: 2026-08-16T17:10:37.852Z
+signed_off: 2026-08-16T17:25:33.165Z
 authors: agent
 files:
 ---
@@ -15,7 +17,7 @@ Design input for i15 is complete: 3 use cases (uc-query-the-corpus-by-structure,
 
 ## round_0_verify
 
-- evidence vs claims: verified directly — read all 3 use cases, all 8 requirements, all 6 flows and all 3 functions; every claim in write-requirements' and derive-functions' set_criteria/neutrality sections checks out against the actual file content, including the trace edges (refines, satisfies, source_refs) each carries.
+- evidence vs claims: verified directly, re-affirmed 2026-08-16 after derive-criteria added weighs_with/weighs_against to the same requirement files (M4 pairwise fields only, not the statement/kind/priority/breaks_how_badly this check covers) — read all 3 use cases, all 8 requirements, all 6 flows and all 3 functions; every claim in write-requirements' and derive-functions' set_criteria/neutrality sections checks out against the actual file content, including the trace edges (refines, satisfies, source_refs) each carries.
 - types: not applicable this milestone — no application code exists yet (project/deliverable/engine has no bm25 or query-verb code); every trace file carries its own type's fixed frontmatter fields, confirmed by reading them.
 - lint: not run — se_lint is not on this gate's legal_tools list, and se_log_query shows zero se_lint calls this session. Spec frontmatter was checked by eye against each type's known field set instead.
 - tests: not run — no code exists yet to test. This gate's own guidance says design input ends here; everything after is solution space.
@@ -47,6 +49,8 @@ pass with overrides — Design input is coherent, traced both ways, and free of 
 ## follow_up
 
 Two doors are offered next: derive-criteria (pairwise judgment on the register) and partition-functions (the shared function DSM). Both are legal; the walk should ask which is offered rather than assume, per contract rule 9 on choices offered but not forced.
+
+AMENDED 2026-08-16: derive-criteria wrote weighs_with/weighs_against onto every should-priority requirement's own frontmatter, per that state's own mechanism. This is exactly the pairwise judgment this gate's follow_up named as next, not a change to the register's content this gate reviewed.
 
 Carried forward: raid-debt-delta-default-views (fix the resolver default, this iteration, per its own 2026-08-15 reschedule) and raid-risk-i15-ships-without-a-live-prior-art-scan (needs a state with a legal search tool).
 

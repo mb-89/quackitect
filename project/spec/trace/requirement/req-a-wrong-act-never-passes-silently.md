@@ -18,8 +18,12 @@ source_refs:
   - req-refusal-carries-remedy
   - raid-risk-a-write-lands-in-the-wrong-tree-silently
 priority: should
+weighs_with:
+  - req-a-resolution-is-proven-by-read-back ! — one is a runtime guarantee against silent failure, the other a test-authoring discipline (prove by read-back); different artifacts
 weighs_against:
   - req-call-answers-in-one-second > — it heads the standing chain and is graded corrosive; this row is fatal and makes every other guarantee checkable, so it takes the head and transitivity settles the rest
+  - req-trace-source-never-mixes > — both fatal, but this row makes every guarantee in the system checkable while the other guards one reading scenario; the broader guarantee outranks the narrower one
+  - req-walk-survives-host-swap > — fatal outranks crippling on the damage scale
 ---
 
 ## Scenario

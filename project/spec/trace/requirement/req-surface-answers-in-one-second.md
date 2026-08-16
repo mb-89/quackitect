@@ -16,6 +16,9 @@ source_refs:
   - req-call-answers-in-one-second
   - i12
 priority: should
+weighs_with:
+  - req-a-clear-jump-is-one-call ! — one measures a person's render latency at the mirror's HTTP boundary, the other measures call count for the walk; different boundaries
+  - req-call-answers-in-one-second ! — one times a person's surface render at the mirror's HTTP boundary, the other a driver's lane call at dispatch; different verify boundaries, per this row's own "sibling rather than a widening" section
 ---
 
 ## Scenario

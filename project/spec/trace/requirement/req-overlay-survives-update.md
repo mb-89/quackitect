@@ -17,6 +17,7 @@ source_refs:
 priority: should
 weighs_against:
   - req-overlay-drift-reported >
+  - req-fresh-machine-runs > — both crippling, but this recurs on every future update while the install bar is paid once per machine
 ---
 
 ## Scenario
