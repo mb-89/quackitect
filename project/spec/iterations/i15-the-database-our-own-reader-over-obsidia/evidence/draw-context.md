@@ -1,5 +1,6 @@
 ---
 form: draw-context
+amended: "2026-08-16T16:39:00.399Z by agent — re-stamping against gate-motivation's now-final hash, after repeated amends to gate-motivation kept invalidating draw-context's own snapshot of it"
 by: agent
 signed_off: 2026-08-16T16:37:40.506Z
 authors: agent
@@ -58,3 +59,5 @@ WHAT THE EXCLUDED LIST OWES DOWNSTREAM: the read-only line answers a question re
 ## anything_else
 
 This state's own guidance surfaced a defect while it was being worked: the raid file raid-asm-v1-ref-for-spec-queries-is-reachable.md, patched at gate-motivation to close it, carried three unquoted YAML colons that broke every se_pull afterward ("trigger:", "probe:" and "impact:" each embedded a bare "ref: \"main\"" or "source: ref" fragment). Fixed in this state, since se_file_patch is legal here — all three fields now quote correctly and the file parses.
+
+Each subsequent amend to gate-motivation shifted its own hash and re-broke this claim's snapshot of it. Re-stamped here, after gate-motivation, against its final content.

@@ -1,5 +1,6 @@
 ---
 form: gate-motivation
+amended: "2026-08-16T16:38:39.087Z by agent — draw-context's own claim rippled because gate-motivation's hash moved again after the prior amend; re-stamping once more with a real field change so the claim-guard clears"
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-16T16:34:32.367Z
@@ -47,7 +48,7 @@ THE REGISTER IS OPEN. Five raid entries stand for i15.
 
 - raid-risk-i15-query-toil-outweighs-savings — open
 - raid-asm-i15-corpus-suits-lexical-matching — open, trigger fires after ship, measured against real misses
-- raid-asm-v1-ref-for-spec-queries-is-reachable — resolved in substance this session; its own file still reads open pending a write-capable state
+- raid-asm-v1-ref-for-spec-queries-is-reachable — closed, fully: every evidence form and the raid file's own frontmatter now agree
 - raid-risk-i15-ships-without-a-live-prior-art-scan — open
 - raid-debt-delta-default-views — repayment section fixed at log-risks, rescheduled debt from i12
 
@@ -96,3 +97,5 @@ OWED AT write-requirements: the query-verb/BM25-sibling no-silent-case distincti
 ## anything_else
 
 Before this gate could be worked, a false claim was traced and killed at its root and in every form that repeated it: gate-kickoff, frame-delta, pressure-test, define-actual, log-risks, draft-vision, scope-non-goals. The ref does resolve; the file count is 25, not 26 — filed separately as note-4db90de22560 since the wrong count traces to record.md/version-planning.md, outside this walk's amend reach.
+
+The raid file's own frontmatter closed at draw-context, once se_file_patch became legal there. Two YAML-breaking colons the first patch introduced were fixed in the same state.

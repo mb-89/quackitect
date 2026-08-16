@@ -16,6 +16,16 @@ source_refs:
   - i15-the-database-our-own-reader-over-obsidia
 ---
 
+## Probe
+
+From a state where se_run or se_git is legal, run `git branch --all --list`
+and `git tag --list`. Whichever ref's tree contains
+`spec/queries/requirements.base` is the real name; confirm with
+`se_file_glob {glob: "spec/queries/*.base", ref: "<name>"}` and expect 25
+files back (not 26 — the original expectation, corrected below). If no ref
+anywhere in the history holds that path, the assumption is FALSE and the
+harvest half of i15's goal has no source.
+
 ## Resolved 2026-08-16
 
 se_file_glob {glob: "spec/queries/**", ref: "main"} returns 25 files (not

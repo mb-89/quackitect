@@ -91,3 +91,4 @@
 {"ts":"2026-08-16T16:35:33.289Z","op":"done","visit":"iterations/i15/gate-motivation@0","node":"d77","brief":"define-actual amend confirmed complete — correction pass fully closed out"}
 {"ts":"2026-08-16T16:37:11.509Z","op":"update","visit":"iterations/i15/draw-context@0","node":"d86","brief":"fixing a second YAML colon break in the same raid file"}
 {"ts":"2026-08-16T16:37:16.975Z","op":"update","visit":"iterations/i15/draw-context@0","node":"d87","brief":"fixing a third YAML colon break, same raid file"}
+{"ts":"2026-08-16T16:40:40.853Z","op":"update","visit":"iterations/i15/draw-context@0","node":"d88","brief":"restoring the required Probe section, found via se_why's real root cause"}
