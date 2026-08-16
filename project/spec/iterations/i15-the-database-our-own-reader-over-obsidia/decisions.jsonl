@@ -1,0 +1,29 @@
+{"ts":"2026-08-16T15:45:30.900Z","op":"plan","visit":"iterations/i15/onboard-retro@0","parent":null,"nodes":[{"id":"d2","brief":"read retro.md"},{"id":"d3","brief":"survey open state"},{"id":"d4","brief":"establish interval + mine call log"},{"id":"d5","brief":"fill onboard-retro form"},{"id":"d6","brief":"submit"}]}
+{"ts":"2026-08-16T15:45:31.447Z","op":"update","visit":"iterations/i15/onboard-retro@0","node":"d7","brief":"running se_survey for current situation box"}
+{"ts":"2026-08-16T15:45:31.917Z","op":"update","visit":"iterations/i15/onboard-retro@0","node":"d8","brief":"pulling call log since last retro"}
+{"ts":"2026-08-16T15:46:03.708Z","op":"update","visit":"iterations/i15/onboard-retro@0","node":"d9","brief":"checking cloud-runner guidance for field-feedback handling unattended"}
+{"ts":"2026-08-16T15:46:49.211Z","op":"update","visit":"iterations/i15/onboard-retro@0","node":"d10","brief":"captured field-feedback stray, filling onboard-retro form"}
+{"ts":"2026-08-16T15:46:51.896Z","op":"update","visit":"iterations/i15/onboard-retro@0","node":"d11","brief":"captured field-feedback stray, filling onboard-retro form"}
+{"ts":"2026-08-16T15:47:18.741Z","op":"done","visit":"iterations/i15/onboard-retro@0","node":"d2","brief":"retro.md read and applied — boundary set, field-feedback step handled per cloud-runner"}
+{"ts":"2026-08-16T15:47:28.889Z","op":"update","visit":"iterations/i15/onboard-retro@0","node":"d12","brief":"drained the self-captured field-feedback note as backlog, finishing remaining fields"}
+{"ts":"2026-08-16T15:47:36.843Z","op":"done","visit":"iterations/i15/onboard-retro@0","node":"d5","brief":"all onboard-retro fields filled, submitting"}
+{"ts":"2026-08-16T15:47:54.516Z","op":"done","visit":"iterations/i15/onboard-retro@0","node":"d3","brief":"survey done — captured in onboard-retro current_situation"}
+{"ts":"2026-08-16T15:47:54.821Z","op":"done","visit":"iterations/i15/onboard-retro@0","node":"d4","brief":"call log mined — captured in onboard-retro call_log_mined"}
+{"ts":"2026-08-16T15:48:04.322Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d13","brief":"gathering kickoff-gate inputs for i15"}
+{"ts":"2026-08-16T15:48:14.040Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d14","brief":"probing ref names for v1's spec/queries"}
+{"ts":"2026-08-16T15:48:26.662Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d15","brief":"checking whether v1's .base files already sit in this worktree"}
+{"ts":"2026-08-16T15:48:38.876Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d16","brief":"trying origin/main as the v1 ref"}
+{"ts":"2026-08-16T15:48:41.860Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d17","brief":"checking declared roots for a v1 source"}
+{"ts":"2026-08-16T15:48:50.584Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d18","brief":"searching spec for the real v1 ref name used elsewhere"}
+{"ts":"2026-08-16T15:49:00.206Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d19","brief":"checking call history for a previously working git ref"}
+{"ts":"2026-08-16T15:49:07.107Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d20","brief":"reading gate-review method to scope the kickoff rounds"}
+{"ts":"2026-08-16T15:49:30.355Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d21","brief":"locating version-planning.md section D1 for i15 sizing context"}
+{"ts":"2026-08-16T15:49:37.725Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d22","brief":"reading i15's dedicated section in version-planning.md"}
+{"ts":"2026-08-16T15:49:44.402Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d23","brief":"chasing the debt item rescheduled into i15's scope"}
+{"ts":"2026-08-16T15:49:55.768Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d24","brief":"reading the debt item rescheduled into i15"}
+{"ts":"2026-08-16T15:50:03.995Z","op":"done","visit":"iterations/i15/onboard-retro@0","node":"d6","brief":"onboard-retro submit already landed; starting a fresh checklist for kickoff"}
+{"ts":"2026-08-16T15:50:11.071Z","op":"plan","visit":"iterations/i15/gate-kickoff@0","parent":null,"nodes":[{"id":"d25","brief":"read i13/i14 sections for shared-file coordination"},{"id":"d26","brief":"check existing engine query/bases code"},{"id":"d27","brief":"check interfaces for existing/planned lane verbs"},{"id":"d28","brief":"draft pulled_in/left_out + change_size"},{"id":"d29","brief":"run verify/validate/red-team rounds"},{"id":"d30","brief":"fill and submit gate-kickoff form"}]}
+{"ts":"2026-08-16T15:50:15.720Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d31","brief":"reading existing engine/bases.ts"}
+{"ts":"2026-08-16T15:50:37.053Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d32","brief":"looking for the query-execution half beyond bases.ts's editor functions"}
+{"ts":"2026-08-16T15:50:40.494Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d33","brief":"reading engine/tables.ts, the query-execution engine"}
+{"ts":"2026-08-16T15:51:12.109Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d34","brief":"checking whether an agent-callable query lane verb already exists"}
