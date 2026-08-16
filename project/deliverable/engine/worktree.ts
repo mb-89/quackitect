@@ -491,23 +491,15 @@ export function itCloseShipped(
   rec: { id: string; branch: string; path: string },
 ): { closed: string; trunk_committed?: string[] } {
   const trunkCommitted = settleTrunk(root, rec.id);
-  const recAbs = join(rec.path, `project/spec/iterations/${rec.id}/record.md`);
+  const recAbs = join(root, `project/spec/iterations/${rec.id}/record.md`);
   const raw = readNode(recAbs);
   if (raw !== "" && !/^closed: /m.test(raw)) {
     writeNode(recAbs, raw.replace(/^status: .*$/m, `status: shipped\nclosed: ${new Date().toISOString()}`));
   }
-  if (git(rec.path, ["status", "--porcelain"], "status").trim() !== "") {
-    git(rec.path, ["add", "-A"], "add");
-    git(rec.path, ["commit", "-q", "-m", `iteration ${rec.id}: shipped`], "commit");
+  if (git(root, ["status", "--porcelain"], "status").trim() !== "") {
+    git(root, ["add", "-A"], "add");
+    git(root, ["commit", "-q", "-m", `iteration ${rec.id}: shipped`], "commit");
   }
-  mergeAndRetire(
-    root,
-    rec.branch,
-    `merge iteration ${rec.id}`,
-    `project/spec/iterations/${rec.id}`,
-    `iteration ${rec.id}: record retires to its branch`,
-  );
-  git(root, ["worktree", "remove", "--force", rec.path], "worktree remove");
   return { closed: rec.id, ...(trunkCommitted.length > 0 ? { trunk_committed: trunkCommitted } : {}) };
 }
 

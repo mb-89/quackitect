@@ -335,3 +335,14 @@
 {"ts":"2026-08-16T07:55:19.077Z","op":"update","visit":"iterations/i34/build-steps/rescue-at-risk@0","node":"d377","brief":"the two claim nodes the merge carried back are out again"}
 {"ts":"2026-08-16T07:55:30.598Z","op":"update","visit":"iterations/i34/build-steps/rescue-at-risk@0","node":"d378","brief":"the last two dangling claim references repaired"}
 {"ts":"2026-08-16T07:56:01.122Z","op":"update","visit":"iterations/i34/build-steps/rescue-at-risk@0","node":"d379","brief":"the node floor was fixed on i28 and rode the merge in"}
+{"ts":"2026-08-16T07:57:48.590Z","op":"update","visit":"iterations/i34/build-steps/level-records@0","node":"d380","brief":"level-records: itList must read folders rather than branches"}
+{"ts":"2026-08-16T07:58:34.023Z","op":"update","visit":"iterations/i34/build-steps/level-records@0","node":"d381","brief":"the list reads folders and open comes from status"}
+{"ts":"2026-08-16T07:58:54.160Z","op":"done","visit":"iterations/i34/build-steps@0","node":"d352","brief":"the open flag now comes from the record's own status"}
+{"ts":"2026-08-16T07:59:33.257Z","op":"update","visit":"iterations/i34/build-steps/level-records@0","node":"d382","brief":"the chunk boundary was drawn where the code has none; reading the seed"}
+{"ts":"2026-08-16T07:59:57.822Z","op":"update","visit":"iterations/i34/build-steps/level-records@0","node":"d383","brief":"the seed mints a folder on trunk and nothing else"}
+{"ts":"2026-08-16T08:00:33.132Z","op":"update","visit":"iterations/i34/build-steps/level-records@0","node":"d384","brief":"itAdopt cut; a clone with trunk has every record"}
+{"ts":"2026-08-16T08:01:19.961Z","op":"update","visit":"iterations/i34/build-steps/level-records@0","node":"d385","brief":"the cases follow the change: one path, not two"}
+{"ts":"2026-08-16T08:01:30.644Z","op":"update","visit":"iterations/i34/build-steps/level-records@0","node":"d386","brief":"two more cases repointed off the worktree path"}
+{"ts":"2026-08-16T08:01:50.457Z","op":"done","visit":"iterations/i34/build-steps@0","node":"d354","brief":"a record is read from one path and the git retrieval half is gone"}
+{"ts":"2026-08-16T08:02:23.383Z","op":"update","visit":"iterations/i34/build-steps/level-records@0","node":"d387","brief":"one case left: the pin"}
+{"ts":"2026-08-16T08:02:35.705Z","op":"update","visit":"iterations/i34/build-steps/level-records@0","node":"d388","brief":"the pin is read from the root like every other record file"}
