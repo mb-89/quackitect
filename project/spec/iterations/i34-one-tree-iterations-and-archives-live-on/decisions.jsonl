@@ -367,3 +367,30 @@
 {"ts":"2026-08-16T08:15:15.431Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d404","brief":"seam reverted; confirming the tree is green before reporting"}
 {"ts":"2026-08-16T08:16:23.762Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d405","brief":"battery at 207 cases; waiting on the verdict"}
 {"ts":"2026-08-16T08:17:08.448Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d406","brief":"the last two cases follow the behaviour i34 reversed"}
+{"ts":"2026-08-16T08:18:51.144Z","op":"defer","visit":"iterations/i34/build-steps@0","node":"d358","brief":"remove-artefacts","to":"remove-artefacts","hops":1,"trail":["iterations/i34/build-steps","remove-artefacts"]}
+{"ts":"2026-08-16T08:19:18.714Z","op":"plan","visit":"iterations/i34/build-steps/delete-the-seam@0","parent":null,"nodes":[{"id":"d407","brief":"expeditions list from folders"},{"id":"d408","brief":"a seed mints a folder"},{"id":"d409","brief":"a close leaves the folder"},{"id":"d410","brief":"delete the seam whole"},{"id":"d411","brief":"the cases follow"}]}
+{"ts":"2026-08-16T08:19:32.928Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d407","brief":"expeditions list from folders with status as the open flag"}
+{"ts":"2026-08-16T08:19:51.563Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d408","brief":"an expedition seed mints a folder on trunk"}
+{"ts":"2026-08-16T08:20:09.081Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d412","brief":"the close stamps the record on the one tree"}
+{"ts":"2026-08-16T08:20:20.350Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d413","brief":"the report guard reads the one tree too"}
+{"ts":"2026-08-16T08:20:30.394Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d414","brief":"a literal escape from the replace is repaired"}
+{"ts":"2026-08-16T08:20:41.916Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d409","brief":"an expedition close stamps the record and leaves the folder"}
+{"ts":"2026-08-16T08:20:48.104Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d415","brief":"the branch-record cache goes with the branch read"}
+{"ts":"2026-08-16T08:21:03.971Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d416","brief":"the chooser is cut now that both record kinds share one tree"}
+{"ts":"2026-08-16T08:21:31.496Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d417","brief":"the read and the search disagree about resolve.ts — the seam itself"}
+{"ts":"2026-08-16T08:22:47.001Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d418","brief":"the three path choosers and the mirror hook are cut"}
+{"ts":"2026-08-16T08:23:20.954Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d410","brief":"no call selects between trees, for either record kind"}
+{"ts":"2026-08-16T08:23:34.672Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d419","brief":"battery on the seam-free tree"}
+{"ts":"2026-08-16T08:24:18.594Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d420","brief":"the branch-cache case asserts the absence instead"}
+{"ts":"2026-08-16T08:25:22.251Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d421","brief":"six expedition cases follow the one-tree change"}
+{"ts":"2026-08-16T08:26:08.009Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d422","brief":"the absence check reads the function alone"}
+{"ts":"2026-08-16T08:26:21.971Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d423","brief":"the archive case asserts the folder stays"}
+{"ts":"2026-08-16T08:26:47.943Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d411","brief":"every case that named a worktree now names the one tree"}
+{"ts":"2026-08-16T08:27:14.507Z","op":"plan","visit":"iterations/i34/build-steps/delete-the-seam@0","parent":null,"nodes":[{"id":"d424","brief":"the last worktree cases"},{"id":"d425","brief":"battery green"},{"id":"d426","brief":"remove the artefacts"}]}
+{"ts":"2026-08-16T08:27:36.068Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d427","brief":"the fan-out case becomes a one-tree case"}
+{"ts":"2026-08-16T08:27:47.713Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d424","brief":"every case that named a second tree now names the one"}
+{"ts":"2026-08-16T08:28:52.665Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d428","brief":"battery at 207 of 1319"}
+{"ts":"2026-08-16T08:29:07.621Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d429","brief":"1316 of 1319; three cases about a merge that no longer happens"}
+{"ts":"2026-08-16T08:29:28.420Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d430","brief":"the merge-conflict case becomes a clean-tree case"}
+{"ts":"2026-08-16T08:29:39.986Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d431","brief":"the archive fixture writes records rather than branches"}
+{"ts":"2026-08-16T08:29:54.290Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d432","brief":"the fixture's imports follow it"}

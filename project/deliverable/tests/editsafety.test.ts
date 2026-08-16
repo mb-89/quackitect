@@ -252,7 +252,18 @@ test("escape before boot completes still refuses", async () => {
   assert.match(String(r.body.got), /before boot/);
 });
 
-test("the close is atomic: a conflicting merge aborts and refuses typed, the root stands clean", () => {
+// THE CLOSE CANNOT CONFLICT ANY MORE (i34), because it does not merge.
+//
+// WHAT THIS CASE PINNED: a close-merge that hit a conflict used to leave the
+// root mid-merge with markers inside main.canvas — the server died and the
+// relaunch refused on the red canvas. The fix was to abort and refuse typed.
+//
+// THERE IS ONE TREE NOW, so the work is already on trunk and the close only
+// stamps the record. There is no branch to merge and nothing to abort.
+//
+// WHAT REPLACES IT is the demand that the close leaves the tree clean, which
+// is what the old case really protected.
+test("the close leaves the root tree clean, because it merges nothing", () => {
   const root = freshRoot();
   const g = (...a: string[]): void => {
     const r = spawnSync("git", a, { cwd: root, encoding: "utf8", windowsHide: true });
@@ -264,23 +275,21 @@ test("the close is atomic: a conflicting merge aborts and refuses typed, the roo
   g("add", "-A");
   g("commit", "-q", "-m", "base");
   const e = expNew(root, "fix", "conflict probe");
-  // Trunk and branch add the same file with different content — a
-  // guaranteed conflict at close-merge.
+  // The very edit that used to guarantee a conflict: the same file written on
+  // both sides. With one tree there are no sides.
   writeFileSync(join(root, "clash.md"), "trunk side\n");
   g("add", "-A");
   g("commit", "-q", "-m", "trunk edit");
-  writeFileSync(join(e.path, "clash.md"), "branch side\n");
-  mkdirSync(join(e.path, "project", "spec", "expeditions", e.id), { recursive: true });
+  writeFileSync(join(root, "clash.md"), "branch side\n");
+  mkdirSync(join(root, "project", "spec", "expeditions", e.id), { recursive: true });
   writeFileSync(
-    join(e.path, "project", "spec", "expeditions", e.id, "report.md"),
+    join(root, "project", "spec", "expeditions", e.id, "report.md"),
     "---\nform: expedition-leave\nstatus: done\nby: human\n---\n\nprobe report\n",
   );
-  assert.throws(
-    () => expClose(root, e, true),
-    (err) => (err as { clause?: string }).clause === "SE-C-112" && /clash\.md/.test(String((err as { got?: string }).got)),
-  );
+  const out = expClose(root, e, true);
+  assert.equal(out.merged, true, "the close rules, and rules applied");
   const st = spawnSync("git", ["status"], { cwd: root, encoding: "utf8", windowsHide: true }).stdout;
-  assert.ok(!/Unmerged|MERGING|both added/.test(st), `the root tree stands clean after the refusal: ${st}`);
+  assert.ok(!/Unmerged|MERGING|both added/.test(st), `the root tree stands clean: ${st}`);
 });
 
 // A DIRTY TRUNK IS SETTLED, NOT REFUSED (owner ruling 2026-07-28). git will
@@ -304,10 +313,11 @@ test("closing on an unconfirmed report is refused, and the override is recorded"
   writeFileSync(join(root, ".gitignore"), ".worktrees/\n.se/\n");
   g("add", "-A");
   g("commit", "-q", "-m", "base");
+  // ONE TREE SINCE i34: the report stands under the root, like the record.
   const report = (e: { path: string; id: string }, by: string): void => {
-    mkdirSync(join(e.path, "project", "spec", "expeditions", e.id), { recursive: true });
+    mkdirSync(join(root, "project", "spec", "expeditions", e.id), { recursive: true });
     writeFileSync(
-      join(e.path, "project", "spec", "expeditions", e.id, "report.md"),
+      join(root, "project", "spec", "expeditions", e.id, "report.md"),
       `---\nform: expedition-leave\nstatus: done\nby: ${by}\n---\n\nprobe report\n`,
     );
   };
@@ -335,11 +345,8 @@ test("closing on an unconfirmed report is refused, and the override is recorded"
   const out = expClose(root, a, true, authority);
   assert.equal(out.merged, true, "the override lets the legitimate close through");
   assert.match(String(out.override), /run the whole expedition without me/);
-  const rec = spawnSync("git", ["show", `${a.branch}:project/spec/expeditions/${a.id}/record.md`], {
-    cwd: root,
-    encoding: "utf8",
-    windowsHide: true,
-  }).stdout;
+  // READ FROM THE TREE, not out of git — the close leaves the folder standing.
+  const rec = readFileSync(join(root, "project", "spec", "expeditions", a.id, "record.md"), "utf8");
   const fm = parseStateNote(rec).frontmatter;
   assert.equal(fm.report_override, authority, "the record PARSES, and gives the authority back verbatim");
   assert.equal(fm.status, "closed", "and the fields after it survived too");

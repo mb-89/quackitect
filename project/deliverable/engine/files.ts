@@ -326,9 +326,14 @@ export interface WriteResult {
  *  of the bug this fixes. */
 const methodMirrors = new Map<string, (rel: string, from: string) => void>();
 
-export function setMethodMirror(sessionRoot: string, fn: (rel: string, from: string) => void): void {
-  methodMirrors.set(sessionRoot, fn);
-}
+// `setMethodMirror` IS GONE (i34). The session used to register a callback
+// here so a method write could be copied into every other tree. With one tree
+// there is nothing to copy to, and no caller registers a mirror any more.
+//
+// THE MAP AND ITS LOOKUP STAY for now, empty, because `mirrorFor` is still
+// called on the write path and answering undefined is the correct, cheap
+// no-op. Deleting the call sites belongs with the wider dead-code sweep, not
+// with the seam.
 
 /** A worktree lives UNDER its session root, so the write's root is either a
  *  registered root itself or a child of one. The separator check stops

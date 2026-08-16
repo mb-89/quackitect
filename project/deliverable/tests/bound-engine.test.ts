@@ -31,9 +31,12 @@ function override(rel: string, body: string): void {
 
 // ------------------------------------- the ground the delta stands on today
 
-test("method files are shared by every tree", () => {
+// `fansOut` IS GONE (i34): one tree, so a method write reaches every tree by
+// existing. What still matters is that these paths are KIND method, because
+// routing sends method and session state to the core.
+test("method files are recognised as method", () => {
   for (const p of [GUIDE, "project/deliverable/machines/items/element.md", "project/deliverable/engine/session.ts"]) {
-    assert.equal(paths.fansOut(p), true, `${p} must reach every tree`);
+    assert.equal(paths.pathKind(p), "method", `${p} is method`);
   }
 });
 
@@ -42,10 +45,10 @@ test("the prompt layer counts as method though it lives under no method folder",
   assert.equal(paths.pathKind("project/AGENTS.md"), "method");
 });
 
-test("a record's own folder belongs to that record and fans out to nobody", () => {
+test("a record's own folder belongs to that record", () => {
   const p = "project/spec/iterations/i27-x/evidence/author-tests.md";
   assert.equal(paths.pathKind(p), "record");
-  assert.equal(paths.fansOut(p), false);
+  assert.deepEqual(paths.recordOwnerOf(p), { container: "iterations", id: "i27-x" });
 });
 
 test("session state belongs to the machine rather than to any branch", () => {

@@ -105,7 +105,8 @@ test("the graph is evidence: an open decision point blocks the leave form", () =
   s.expeditionOpen(minted.created);
   const sid = minted.created.match(/^(e\d+)-/)?.[1];
   // A filled, done form — but the graph still holds an open point.
-  const rel = join(root, ".worktrees", minted.created, "project", "spec", "expeditions", minted.created, "report.md");
+  // ONE TREE SINCE i34: an expedition's record stands under the root.
+  const rel = join(root, "project", "spec", "expeditions", minted.created, "report.md");
   const filled = [
     "---",
     "form: expedition-leave",

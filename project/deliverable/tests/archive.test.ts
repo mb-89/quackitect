@@ -27,17 +27,25 @@ test("the render fetches the expedition list once, not once per state", () => {
   assert.equal(calls.length, 1, "one expeditionList call for the whole render");
 });
 
-// A closed expedition's branch never moves, so its record is read once per
-// session. The MERGED copy is deliberately NOT cached — retro edits land
-// there and it has to stay truthful.
-test("a closed record is read from its branch once, then cached", () => {
+// THE BRANCH READ AND ITS CACHE ARE GONE (i34). A closed expedition's record
+// used to live on its branch — "history is git's, the tree carries only live
+// work" — so readRecord fell back to `git show <branch>:<rel>` and cached the
+// result, because a closed branch never moves.
+//
+// THE ARCHIVE LIVES ON DISK NOW. The folder stays through the close, so the
+// record is a file and the filesystem is the cache.
+//
+// WHAT THIS CASE ASSERTS INSTEAD is the absence, because that is the whole
+// demand: req-a-closed-records-folder-stays-on-trunk exists so that no path
+// reads a record out of git.
+test("a record is read from the tree, never out of git", () => {
   const src = readFileSync(new URL("../engine/worktree.ts", import.meta.url), "utf8");
-  assert.ok(/branchRecords/.test(src), "the branch fallback caches");
-  const fallback = src.slice(src.indexOf("export function readRecord"));
-  const cacheAt = fallback.indexOf("branchRecords.has");
-  const spawnAt = fallback.indexOf('spawnSync("git", ["show"');
-  assert.ok(cacheAt !== -1 && spawnAt !== -1, "both the cache check and the spawn are present");
-  assert.ok(cacheAt < spawnAt, "the cache is consulted BEFORE git is spawned");
-  const merged = fallback.indexOf("existsSync(merged)");
-  assert.ok(merged !== -1 && merged < cacheAt, "the merged copy is still read fresh, ahead of the cache");
+  // THE FUNCTION ALONE, not everything up to the next export — the branch
+  // LISTING sits between them and legitimately spawns git.
+  const from = src.indexOf("export function readRecord");
+  const readRecord = src.slice(from, src.indexOf("\n}", from));
+  assert.equal(/spawnSync/.test(readRecord), false, "reading a record spawns nothing");
+  assert.equal(/git show/.test(readRecord), false, "and never asks git for a blob");
+  assert.equal(/branchRecords/.test(readRecord), false, "so there is no branch read left to cache");
+  assert.ok(/existsSync\(abs\)/.test(readRecord), "it looks for one file, in the tree");
 });

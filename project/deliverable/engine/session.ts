@@ -52,7 +52,6 @@ import type { CanvasData } from "./canvas.ts";
 import { conditionNotePath } from "./conditions.ts";
 import { Decisions, replayFile } from "./decisions.ts";
 import { type GeneratedMachine, generateContinueExpedition, generateExpeditionArchive, shortId } from "./expmachine.ts";
-import { setMethodMirror } from "./files.ts";
 import {
   confirmPrefill,
   type FormLint,
@@ -97,7 +96,7 @@ import {
 } from "./iterations.ts";
 import { RUN_MODES, type RunMode, readMode, storedMode, writeMode } from "./mode.ts";
 import { parseStateNote, readNode, section, withPass, writeNode } from "./notes.ts";
-import { fansOut, METHOD_FILES, METHOD_PREFIXES, methodFilesIn, pathKind, recordOwnerOf, resolveInRoot, seDir } from "./paths.ts";
+import { METHOD_FILES, METHOD_PREFIXES, pathKind, recordOwnerOf, resolveInRoot, seDir } from "./paths.ts";
 import { mintFlipLines } from "./pugh.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
@@ -274,11 +273,9 @@ export class Session {
 
   constructor(root: string) {
     this.root = root;
-    // THE WRITE LANE LEARNS ABOUT TREES HERE, and only here. files.ts must not
-    // know what a worktree is, so the session hands it the mirror instead.
-    setMethodMirror(root, (rel, from) => {
-      this.fanOutMethod(rel, from);
-    });
+    // THE WRITE LANE NO LONGER LEARNS ABOUT TREES, because there are none to
+    // learn about (i34). This used to hand files.ts a mirror callback so a
+    // method write could be copied into every open worktree.
     // Fail fast at server start: a misdrawn machine must not silently serve
     // an ungated lane.
     this._machine = compileMachine(root, mainMachinePath(root));
@@ -970,6 +967,9 @@ export class Session {
    *  UNCHANGED FILES ARE NOT REWRITTEN, so this costs a read per file and
    *  nothing else on a tree that is already level. */
   private backfillMethod(): { trees: number; files: number } {
+    // ONE TREE, SO NOTHING TO BACKFILL (i34). `methodTrees()` answers with the
+    // machine root and nothing else, and the filter below always empties it.
+    // The call is kept so the reload's answer keeps its shape.
     const trees = this.methodTrees().filter((t) => t !== this.machineRoot());
     return { trees: trees.length, files: this.backfillInto(trees) };
   }
@@ -980,7 +980,7 @@ export class Session {
   private backfillInto(trees: string[]): number {
     if (trees.length === 0) return 0;
     let files = 0;
-    for (const rel of methodFilesIn(this.machineRoot())) {
+    for (const rel of METHOD_FILES) {
       let bytes: string;
       try {
         bytes = readFileSync(join(this.machineRoot(), rel), "utf8");
@@ -1002,13 +1002,20 @@ export class Session {
     return files;
   }
 
-  /** Where the LANE works: the bound expedition's worktree, else the root.
+  /** Where the LANE works. ONE TREE, so this is the root and nothing else
+   *  (owner ruling 2026-08-16).
    *
-   *  SHARED METHOD NO LONGER COMES THROUGH HERE. laneRoot sends it to the
-   *  machine root whatever tree is bound, which is what retired SE-C-134.
-   *  This answers for everything else, and a record keeps its own tree. */
+   *  IT USED TO READ `this.bound?.path ?? this.machineRoot()`, which is the
+   *  same chooser `storeFor` carried, one layer up. A bound record answered
+   *  with its own tree, so the same relative path named different files
+   *  depending on what was open.
+   *
+   *  A BOUND RECORD'S path IS THE ROOT NOW, so this could have been left as
+   *  it was and would have given the right answer. It is written out anyway:
+   *  a chooser that happens to have one branch is still a chooser, and the
+   *  requirement asks for the absence of one, not for the right answer. */
   workRoot(): string {
-    return this.bound?.path ?? this.machineRoot();
+    return this.machineRoot();
   }
 
   /** THE CHECKOUT THAT OWNS THE WORKTREES, and the machine's own state with
@@ -1152,29 +1159,8 @@ export class Session {
    *  RECORD CONTENT IS NOT COPIED, ever. An open record's evidence has exactly
    *  one home, and laneRoot sends every read there. One copy cannot disagree
    *  with itself. */
-  fanOutMethod(rel: string, from: string): string[] {
-    if (!fansOut(rel)) return [];
-    const src = join(from, rel);
-    const gone = !existsSync(src);
-    const bytes = gone ? "" : readFileSync(src, "utf8");
-    const reached: string[] = [];
-    for (const tree of this.methodTrees()) {
-      if (tree === from) continue;
-      const dst = join(tree, rel);
-      try {
-        if (gone) {
-          if (existsSync(dst)) unlinkSync(dst);
-        } else {
-          mkdirSync(dirname(dst), { recursive: true });
-          writeFileSync(dst, bytes, "utf8");
-        }
-        reached.push(tree);
-      } catch {
-        // One unreachable tree must not stop the others — partial is strictly
-        // better than none, and reconcileTrees still backstops at reload.
-      }
-    }
-    return reached;
+  fanOutMethod(_rel: string, _from: string): string[] {
+    return [];
   }
 
   expeditionNew(kind: string, goal: string): Record<string, unknown> {
