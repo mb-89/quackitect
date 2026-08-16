@@ -284,3 +284,4 @@
 {"ts":"2026-08-16T18:35:25.291Z","op":"update","visit":"iterations/i15/run-spikes/spike-query-latency-at-real-scale@0","node":"d267","brief":"running the real-corpus timing spike via se_run"}
 {"ts":"2026-08-16T18:36:20.320Z","op":"update","visit":"iterations/i15/run-spikes/spike-query-latency-at-real-scale@0","node":"d268","brief":"wrote exp-i15-query-latency-at-real-corpus-scale with the measured finding"}
 {"ts":"2026-08-16T18:36:28.384Z","op":"update","visit":"iterations/i15/run-spikes/spike-query-latency-at-real-scale@0","node":"d269","brief":"folded the spike's finding into the risk entry's body and status"}
+{"ts":"2026-08-16T18:37:32.266Z","op":"done","visit":"iterations/i15/run-spikes@0","node":"d266","brief":"fold-back submitted; folds_to/promote written on the exp node"}
