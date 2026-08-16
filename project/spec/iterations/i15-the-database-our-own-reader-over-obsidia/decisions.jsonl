@@ -98,3 +98,7 @@
 {"ts":"2026-08-16T16:45:39.158Z","op":"update","visit":"iterations/i15/write-stories@0","node":"d96","brief":"writing sty-dispose-a-candidate-coupling, refines vp-rigor-without-toil"}
 {"ts":"2026-08-16T16:45:48.051Z","op":"done","visit":"iterations/i15/write-stories@0","node":"d93","brief":"write-stories filled and submitted — 3 stories, both value props covered"}
 {"ts":"2026-08-16T16:46:30.656Z","op":"update","visit":"iterations/i15/write-stories@0","node":"d97","brief":"resubmitting write-stories with full standing story set for coverage"}
+{"ts":"2026-08-16T16:46:47.833Z","op":"plan","visit":"iterations/i15/write-stories@0","parent":null,"nodes":[{"id":"d98","brief":"read meth-cockburn-use-case"},{"id":"d99","brief":"fill generalize-use-cases"}]}
+{"ts":"2026-08-16T16:48:42.293Z","op":"plan","visit":"iterations/i15/generalize-use-cases@0","parent":null,"nodes":[{"id":"d100","brief":"write uc-query-the-corpus-by-structure"},{"id":"d101","brief":"write uc-get-a-trustworthy-answer"},{"id":"d102","brief":"write uc-dispose-of-a-candidate-coupling"},{"id":"d103","brief":"fill generalize-use-cases form"}]}
+{"ts":"2026-08-16T16:48:55.161Z","op":"done","visit":"iterations/i15/generalize-use-cases@0","node":"d102","brief":"3 use cases written, covering all 3 new stories"}
+{"ts":"2026-08-16T16:49:11.847Z","op":"done","visit":"iterations/i15/generalize-use-cases@0","node":"d103","brief":"generalize-use-cases filled and submitted with full standing coverage"}
