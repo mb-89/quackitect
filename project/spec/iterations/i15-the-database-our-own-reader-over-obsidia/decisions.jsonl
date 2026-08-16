@@ -262,3 +262,7 @@
 {"ts":"2026-08-16T18:21:35.937Z","op":"plan","visit":"iterations/i15/record-adrs@0","parent":null,"nodes":[{"id":"d246","brief":"write the query-side deciding ADR"},{"id":"d247","brief":"write the disposition-side deciding ADR"}]}
 {"ts":"2026-08-16T18:21:44.050Z","op":"done","visit":"iterations/i15/reverse-sensitivity@0","node":"d244","brief":"wrote both deciding ADRs as raid decision nodes"}
 {"ts":"2026-08-16T18:21:48.599Z","op":"done","visit":"iterations/i15/record-adrs@0","node":"d246","brief":"record-adrs form filled and submitted"}
+{"ts":"2026-08-16T18:22:51.416Z","op":"plan","visit":"iterations/i15/decompose-structure@0","parent":null,"nodes":[{"id":"d248","brief":"write el-query-evaluator"},{"id":"d249","brief":"write el-coupling-disposer"},{"id":"d250","brief":"fill decompose-structure elements+allocation"}]}
+{"ts":"2026-08-16T18:22:57.135Z","op":"update","visit":"iterations/i15/decompose-structure@0","node":"d251","brief":"wrote both new elements"}
+{"ts":"2026-08-16T18:23:03.595Z","op":"done","visit":"iterations/i15/decompose-structure@0","node":"d250","brief":"decompose-structure filled: 2 new elements, 3 functions allocated"}
+{"ts":"2026-08-16T18:23:11.097Z","op":"plan","visit":"iterations/i15/evaluate-architecture@0","parent":null,"nodes":[{"id":"d252","brief":"rule every quality scenario card"},{"id":"d253","brief":"flag fitness candidates for M7"}]}
