@@ -27,17 +27,9 @@ test("the render fetches the expedition list once, not once per state", () => {
   assert.equal(calls.length, 1, "one expeditionList call for the whole render");
 });
 
-// A closed expedition's branch never moves, so its record is read once per
-// session. The MERGED copy is deliberately NOT cached — retro edits land
-// there and it has to stay truthful.
-test("a closed record is read from its branch once, then cached", () => {
-  const src = readFileSync(new URL("../engine/worktree.ts", import.meta.url), "utf8");
-  assert.ok(/branchRecords/.test(src), "the branch fallback caches");
-  const fallback = src.slice(src.indexOf("export function readRecord"));
-  const cacheAt = fallback.indexOf("branchRecords.has");
-  const spawnAt = fallback.indexOf('spawnSync("git", ["show"');
-  assert.ok(cacheAt !== -1 && spawnAt !== -1, "both the cache check and the spawn are present");
-  assert.ok(cacheAt < spawnAt, "the cache is consulted BEFORE git is spawned");
-  const merged = fallback.indexOf("existsSync(merged)");
-  assert.ok(merged !== -1 && merged < cacheAt, "the merged copy is still read fresh, ahead of the cache");
-});
+// THE BRANCH-CACHE CASE IS DELETED (i34). It pinned that a closed record was
+// read out of `git show <branch>:<rel>` once and then cached, because the
+// close removed the folder and the branch was the only place left holding it.
+//
+// THE FOLDER STAYS NOW, so a record is a file and the filesystem is the cache.
+// There is no branch read, no fallback and no cache to assert about.

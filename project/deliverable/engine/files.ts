@@ -304,54 +304,11 @@ export interface WriteResult {
   lint_findings?: string;
 }
 
-/** THE METHOD MIRROR (owner ruling 2026-08-07).
- *
- *  A method file — guidance, machines, rows, templates, engine, prompt layer
- *  — belongs to every tree, not to whichever one the walk happens to be in.
- *  The session installs a mirror here, and the write lane calls it after the
- *  bytes land, so a change takes effect wherever the reader is standing.
- *
- *  IT HANGS OFF A HOOK RATHER THAN AN IMPORT because files.ts must not know
- *  what a worktree is. The lane writes; the session knows the trees.
- *
- *  CALLED AFTER THE LINT, never before — the linter's safe fixes rewrite the
- *  file, and a mirror of the pre-lint bytes would put different content in
- *  every other tree. That is the drift this exists to end, so it must not be
- *  the thing that causes it.
- *
- *  KEYED BY SESSION ROOT, never a single global. Several sessions share one
- *  process — the test suite runs dozens concurrently — and a lone global
- *  would hand every write to whichever session was built last. That would
- *  copy one root's files into another root's trees, which is a worse version
- *  of the bug this fixes. */
-const methodMirrors = new Map<string, (rel: string, from: string) => void>();
-
-export function setMethodMirror(sessionRoot: string, fn: (rel: string, from: string) => void): void {
-  methodMirrors.set(sessionRoot, fn);
-}
-
-/** A worktree lives UNDER its session root, so the write's root is either a
- *  registered root itself or a child of one. The separator check stops
- *  /tmp/root1 from claiming a write made in /tmp/root10. */
-function mirrorFor(from: string): ((rel: string, from: string) => void) | undefined {
-  const exact = methodMirrors.get(from);
-  if (exact !== undefined) return exact;
-  for (const [root, fn] of methodMirrors) {
-    if (from.startsWith(root + sep) || from.startsWith(`${root}/`)) return fn;
-  }
-  return undefined;
-}
-
-/** A MIRROR THAT FAILS NEVER FAILS THE WRITE THAT SUCCEEDED. The bytes are
- *  already on disk and the caller's result is already true. A tree that
- *  cannot be written is a reconcile problem, not a reason to refuse. */
-function mirrorMethod(rel: string, root: string): void {
-  try {
-    mirrorFor(root)?.(rel, root);
-  } catch {
-    // deliberately swallowed — see the note above
-  }
-}
+// THE METHOD MIRROR IS DELETED (i34). The session registered a callback here
+// so a method write could be copied into every other tree, and `mirrorMethod`
+// fired it after every successful write.
+//
+// ONE TREE MAKES IT EMPTY. A write is the file every reader opens.
 
 export function fileWrite(root: string, path: string, content: string, baseHash: string | null): WriteResult {
   const abs = resolveInRoot(root, path, SRC);
@@ -392,7 +349,6 @@ export function fileWrite(root: string, path: string, content: string, baseHash:
   writeNode(abs, nul.content);
   const lint = lintFix(root, [path]);
   const final = lint !== undefined && lint.fixed.length > 0 ? readFileSync(abs, "utf8") : nul.content;
-  mirrorMethod(path, root);
   return {
     path,
     hash: contentHash(final),
@@ -551,7 +507,6 @@ export function fileReplace(
   }
   const changed = staged.map((s) => {
     writeNode(s.abs, s.next);
-    mirrorMethod(s.path, root);
     return { path: s.path, hash: contentHash(s.next), replacements: s.replacements };
   });
   const findings = lintAfterWrite(root, changed, corrected);
@@ -879,7 +834,6 @@ function writeStaged(
   const applied = [...byFile.values()].map((f) => {
     const abs = resolveInRoot(root, f.path, SRC);
     writeNode(abs, f.next);
-    mirrorMethod(f.path, root);
     return { path: f.path, hash: contentHash(f.next), replacements: f.replacements };
   });
   const findings = lintAfterWrite(root, applied, corrected);
@@ -937,7 +891,6 @@ export function fileDelete(root: string, path: string, baseHash: string): { dele
   rmSync(abs);
   // The door may hold what was deleted; tell it rather than let the stat find out.
   forgetPath(abs);
-  mirrorMethod(path, root);
   return { deleted: path };
 }
 

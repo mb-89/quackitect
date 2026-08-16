@@ -68,5 +68,10 @@ test("a container holding two open iterations offers them rather than entering o
   // The walk stands at the container's OWN start. Entering a record would put
   // it three segments deep, at iterations/<id>/<state>, and would have bound
   // that record on the way in.
-  assert.deepEqual(answer.where, ["iterations/start"], "nothing was entered while the offer stands");
+  // THE OFFER NOW STANDS ON A STATE OF ITS OWN. i34 put a `select` state
+  // between the container's start and the records, because a START state is
+  // walked THROUGH and a pull carrying no choice fell into the first record.
+  // The demand this case makes is unchanged: nothing is entered while the
+  // offer stands. Only the name of the place it stands has moved.
+  assert.deepEqual(answer.where, ["iterations/select"], "nothing was entered while the offer stands");
 });

@@ -10,7 +10,7 @@
 // to hand-edit a dotfile they cannot be expected to understand. Roots are
 // READ surfaces, never write targets, machine-local on purpose (an absolute
 // path means nothing on anyone else's machine).
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 
@@ -204,10 +204,12 @@ export function pathKind(rel: string): PathKind {
   return "content";
 }
 
-/** A METHOD write must reach every tree. This says so in one place, so the
- *  write lane and the tests agree on the question rather than each deciding
- *  it. */
-export const fansOut = (rel: string): boolean => pathKind(rel) === "method";
+// `fansOut` IS GONE (i34). It answered whether a method write had to reach
+// every tree. There is one tree, so every write already reaches all of them.
+//
+// `pathKind` STAYS and still answers "method", because routing still sends
+// method and session state to the core. What is gone is the second question
+// that turned that answer into a COPY.
 
 /** WHO OWNS THIS PATH. Routing, which is NOT resolution.
  *
@@ -223,21 +225,14 @@ export const fansOut = (rel: string): boolean => pathKind(rel) === "method";
  *  THIS FUNCTION NEVER REFUSES. It answers who owns the path and stops. */
 export type Owner = { kind: "core" } | { kind: "record"; container: "iterations" | "expeditions"; id: string } | { kind: "bound" };
 
-/** THE MACHINE ROOT, derived from any root.
- *
- *  A record's worktree lives at <machine>/.worktrees/<id>, so the machine
- *  root is whatever stands before that. Derivable rather than passed, which
- *  is what makes the seam adoptable: a caller that knows ONE root can still
- *  send session state and shared method to the right place.
- *
- *  THIS IS THE 2026-08-14 DEFECT'S ROOT CAUSE. se_lint resolved
- *  `.se/HANDOVER.md` against a worktree while the file lane resolved it
- *  against the machine root. Both were correct against their own ambient
- *  root, and neither answer said which. */
-export function machineRootOf(root: string): string {
-  const m = /^(.*)[\\/]\.worktrees[\\/][^\\/]+$/.exec(root);
-  return m === null ? root : m[1];
-}
+// `machineRootOf` IS GONE (i34). Its whole job was stripping `.worktrees/<id>`
+// off a path to recover the machine root, and there are no worktrees to strip.
+//
+// ITS OWN COMMENT NAMED THE DEFECT IT CAUSED: se_lint resolved
+// `.se/HANDOVER.md` against a worktree while the file lane resolved it against
+// the machine root. Both were correct against their own ambient root, and
+// neither answer said which. One root is the only shape where that cannot
+// happen.
 
 export function routeToOwner(rel: string): Owner {
   const kind = pathKind(rel);
@@ -251,30 +246,10 @@ export function routeToOwner(rel: string): Owner {
   return { kind: "bound" };
 }
 
-/** EVERY METHOD FILE IN A TREE, root-relative.
- *
- *  THE FAN-OUT ALONE WAS NOT ENOUGH. It copies a method file when that file
- *  is WRITTEN, so every edit made before the mirror went live stayed in the
- *  tree it was written in. That gap shipped and then bit within the day: a
- *  worktree ended up holding a NEW session.ts against an OLD paths.ts and
- *  could not compile.
- *
- *  A PARTIAL SYNC IS WORSE THAN NONE. An unsynced tree is merely old and
- *  self-consistent. A half-synced one is broken, and it breaks at whatever
- *  moment somebody happens to run a check inside it.
- *
- *  So the reload backfills the whole set, and this is the set. */
-export function methodFilesIn(root: string): string[] {
-  const out: string[] = [];
-  for (const rel of METHOD_FILES) if (existsSync(join(root, rel))) out.push(rel);
-  for (const pre of METHOD_PREFIXES) {
-    const abs = join(root, pre);
-    if (!existsSync(abs)) continue;
-    for (const e of readdirSync(abs, { recursive: true, withFileTypes: true })) {
-      if (!e.isFile()) continue;
-      const dir = (e as { parentPath?: string; path?: string }).parentPath ?? (e as { path?: string }).path ?? abs;
-      out.push(relative(root, join(dir, e.name)).replace(/\\/g, "/"));
-    }
-  }
-  return out;
-}
+// `methodFilesIn` IS GONE (i34). It enumerated every method file in a tree so
+// the reload could copy the whole set into every other tree — the backfill
+// that caught what the write-time fan-out missed.
+//
+// BOTH EXISTED FOR THE SAME REASON: several trees held copies of one file. The
+// failure its comment recorded — a worktree holding a NEW session.ts against
+// an OLD paths.ts, unable to compile — cannot happen with one copy.

@@ -5,10 +5,10 @@
 // the record; the archive is git history (exp/* branches).
 
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { pushSeed } from "./claims.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
+import { RECORD_FINISHED } from "./iterations.ts";
 import { parseStateNote, passEpoch, readNode, writeNode } from "./notes.ts";
 
 /** Free prose as a YAML scalar. Backslashes first, then quotes — the other
@@ -63,10 +63,9 @@ export function recordRel(id: string): string {
   return `project/spec/expeditions/${id}/record.md`;
 }
 
-/** A CLOSED expedition's branch never moves, so its record is read once.
- *  Only the branch fallback caches — the merged copy is the truth and retro
- *  flips land there, so that one is re-read every time. */
-const branchRecords = new Map<string, Record<string, unknown> | undefined>();
+// THE BRANCH-RECORD CACHE IS GONE (i34). A closed expedition's branch never
+// moves, so its record was read once and kept. There is no branch read left to
+// cache: the record is a file in the tree, and the filesystem is the cache.
 
 /** A record that does not PARSE must not take the container down with it.
  *  One malformed record broke the expeditions machine, and with it the
@@ -81,32 +80,30 @@ export function frontmatterOf(raw: string, where: string): Record<string, unknow
   }
 }
 
-/** The record's frontmatter — from the worktree while open, from the
- *  branch once closed. Undefined for pre-record expeditions (e1–e3). */
+/** THE RECORD'S FRONTMATTER, from the one tree (owner ruling 2026-08-16).
+ *
+ *  IT USED TO COME FROM THREE PLACES: the worktree while open, a merged copy
+ *  on trunk, and failing both, `git show <branch>:<rel>`. Which one answered
+ *  depended on what happened to exist, and that is the retrieval path i34
+ *  deletes.
+ *
+ *  Undefined for pre-record expeditions (e1–e3). */
 export function readRecord(root: string, e: Expedition): Record<string, unknown> | undefined {
   const rel = recordRel(e.id);
-  if (e.open) {
-    const abs = join(e.path, rel);
+  {
+    const abs = join(root, rel);
     if (!existsSync(abs)) return undefined;
     return frontmatterOf(readFileSync(abs, "utf8"), rel);
   }
-  // Closed: the record lives ON ITS BRANCH (owner ruling 2026-07-28 —
-  // history is git's, the tree carries only live work). The close stamped
-  // the ruling; the leave review IS the adjudication. A legacy merged
-  // copy still reads.
-  const merged = join(root, rel);
-  if (existsSync(merged)) return frontmatterOf(readFileSync(merged, "utf8"), rel);
-  // THE SEPARATOR IS AN ESCAPE, NEVER A RAW BYTE. A literal NUL in the source
-  // makes ripgrep call the whole FILE binary, and se_file_search then returns
-  // nothing for it — silently, with no note that a file was skipped. This file
-  // was invisible to every search in the lane until 2026-07-29.
-  const key = `${root}\u0000${e.branch}`;
-  if (branchRecords.has(key)) return branchRecords.get(key);
-  const r = spawnSync("git", ["show", `${e.branch}:${rel}`], { cwd: root, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
-  const fm = r.status !== 0 ? undefined : frontmatterOf(r.stdout, `${e.branch}:${rel}`);
-  branchRecords.set(key, fm);
-  return fm;
 }
+
+// THE BRANCH READ IS GONE (i34). A closed expedition's record used to live on
+// its branch — "history is git's, the tree carries only live work", the ruling
+// of 2026-07-28 — so this fell back to `git show <branch>:<rel>` and cached
+// the result, because a closed branch never moves.
+//
+// THE ARCHIVE LIVES ON DISK NOW, so the folder is still there and there is
+// nothing to retrieve.
 
 /** THE BRANCH LISTING IS A SPAWNED PROCESS, AND ONE RENDER ASKS FOUR TIMES.
  *  The expeditions container, the expedition archive, the iterations
@@ -231,7 +228,13 @@ export function listBranches(root: string, glob: string): string[] {
  *  operation, and the lane's own seed and close both call bustBranchList. */
 const EXP_LIST = new Map<string, { epoch: number; value: Expedition[] }>();
 
-/** Open = the worktree exists. Closed (archive) = branch exp/* without one. */
+/** EVERY EXPEDITION IS A FOLDER ON TRUNK, and OPEN comes from its own status
+ *  — the same shape iterations took at i34 (owner ruling 2026-08-16: "do the
+ *  same for expeditions").
+ *
+ *  BEFORE THIS the list came from `exp/*` branches and open meant "a worktree
+ *  directory exists". Both halves asked the filesystem a question the record
+ *  already answers. */
 export function expList(root: string): Expedition[] {
   const era = passEpoch();
   const seen = EXP_LIST.get(root);
@@ -239,11 +242,18 @@ export function expList(root: string): Expedition[] {
   // mutates the stored one would otherwise poison every later reader.
   if (seen !== undefined && era !== 0 && seen.epoch === era) return seen.value.slice();
   const out: Expedition[] = [];
-  const branches = listBranches(root, "exp/*");
-  for (const branch of branches) {
-    const id = branch.slice("exp/".length);
-    const path = join(worktreesDir(root), id);
-    out.push({ id, branch, path, open: existsSync(path) });
+  const dir = join(root, "project", "spec", "expeditions");
+  if (existsSync(dir)) {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+      const id = entry.name;
+      // A FOLDER WITHOUT A RECORD IS NOT A RECORD. e1–e3 predate the record
+      // file and were never listed by id alone either.
+      const abs = join(dir, id, "record.md");
+      if (!existsSync(abs)) continue;
+      const status = String(frontmatterOf(readFileSync(abs, "utf8"), abs).status ?? "");
+      out.push({ id, branch: `exp/${id}`, path: root, open: !RECORD_FINISHED.has(status) });
+    }
   }
   // NUMERIC order — git lists branches alphabetically (e1, e10, e11, …,
   // e2), which reads as missing entries to a human scanning for e10.
@@ -269,23 +279,10 @@ export function expNew(root: string, kind: string, goal: string): Expedition {
       return m ? Math.max(max, Number(m[1])) : max;
     }, 0) + 1;
   const id = `e${n}-${kind}-${slug(goal)}`;
-  const path = join(worktreesDir(root), id);
-  mkdirSync(worktreesDir(root), { recursive: true });
-  git(root, ["worktree", "add", path, "-b", `exp/${id}`], "worktree add");
-  // AFTER the branch exists, never before. Busting first only refills the
-  // cache from the old listing, and the new expedition then stays invisible
-  // for the length of the window.
-  bustBranchList();
-  // The engine's npm deps (ripgrep) do not ride a fresh worktree — without
-  // them the lane's search and the selftests fail there.
-  const deliverable = join(path, "project", "deliverable");
-  if (existsSync(join(deliverable, "package.json")) && !existsSync(join(deliverable, "node_modules"))) {
-    spawnSync("npm", ["install", "--no-audit", "--no-fund"], { cwd: deliverable, stdio: "ignore", shell: process.platform === "win32" });
-  }
-  // Mint the record WITH the expedition — committed, so the branch carries
-  // it from the first moment. Frontmatter is the queryable surface; the
-  // body is the human's, free prose.
-  const recAbs = join(path, recordRel(id));
+  // THE SEED MINTS A FOLDER ON TRUNK AND NOTHING ELSE (i34). Gone with the
+  // worktree: the branch, the seed push that announced a stub to a peer, and
+  // the npm install that paid for a second tree's node_modules.
+  const recAbs = join(root, recordRel(id));
   mkdirSync(dirname(recAbs), { recursive: true });
   writeFileSync(
     recAbs,
@@ -305,13 +302,9 @@ export function expNew(root: string, kind: string, goal: string): Expedition {
     ].join("\n"),
     "utf8",
   );
-  git(path, ["add", "-A"], "add");
-  git(path, ["commit", "-q", "-m", `expedition ${id}: open`], "commit");
-  // The stub reaches the remote in the same act (owner ruling 2026-08-12:
-  // expeditions travel), so every peer machine lists it from its next
-  // fetch; no remote is a recorded seed, not a block.
-  const announced = pushSeed(path, `exp/${id}`).ok;
-  return { id, branch: `exp/${id}`, path, open: true, announced };
+  git(root, ["add", "--", recordRel(id)], "add");
+  git(root, ["commit", "-q", "-m", `expedition ${id}: open`, "--", recordRel(id)], "commit");
+  return { id, branch: `exp/${id}`, path: root, open: true };
 }
 
 export function expFind(root: string, id: string): Expedition {
@@ -365,13 +358,13 @@ function settleTrunk(root: string, expeditionId: string): string[] {
 /** The close ruling stamps the record: applied (merged) or dismissed
  *  (unmerged). Guards ride here: the report must exist, and an agent-finished
  *  report needs a recorded override. */
-function stampRecordClosed(e: Expedition, merge: boolean, override?: string): void {
-  const recAbs = join(e.path, recordRel(e.id));
+function stampRecordClosed(root: string, e: Expedition, merge: boolean, override?: string): void {
+  const recAbs = join(root, recordRel(e.id));
   if (!existsSync(recAbs)) return;
   // The expedition ends with a REPORT (owner ruling 2026-07-27); the
   // close ruling stamps it: applied (merged) or dismissed (unmerged).
   const repRel = `project/spec/expeditions/${e.id}/report.md`;
-  if (!existsSync(join(e.path, repRel))) {
+  if (!existsSync(join(root, repRel))) {
     throw new Rejection({
       clause: CLAUSES.CONDITION_UNMET,
       expected: `a report before closing: ${repRel} — what was built or found, for the retro to adjudicate`,
@@ -397,7 +390,7 @@ function stampRecordClosed(e: Expedition, merge: boolean, override?: string): vo
   //
   // The override is a lane act now, and it is stamped on the record. An
   // override is LOUDER than compliance, never quieter.
-  const finishedBy = /^by: *(\w+)/m.exec(readFileSync(join(e.path, repRel), "utf8"))?.[1];
+  const finishedBy = /^by: *(\w+)/m.exec(readFileSync(join(root, repRel), "utf8"))?.[1];
   if (finishedBy !== "human" && (override ?? "").trim() === "") {
     throw new Rejection({
       clause: CLAUSES.CONDITION_UNMET,
@@ -428,56 +421,17 @@ function stampRecordClosed(e: Expedition, merge: boolean, override?: string): vo
   );
 }
 
-/** Merge the branch to trunk and retire the record dir in the same breath.
- *  One core for both record kinds — an expedition and an iteration close
- *  the same way, differing only in their names and their record homes. */
-function mergeAndRetire(root: string, branch: string, mergeMsg: string, dirRel: string, retireMsg: string): void {
-  // ATOMIC (hit live 2026-07-28): a conflicting merge left the root
-  // mid-merge with markers inside main.canvas — the server died and the
-  // relaunch refused on the red canvas. The close now aborts the failed
-  // merge and refuses TYPED; the root tree is never left broken.
-  const m = spawnSync("git", ["merge", "--no-ff", branch, "-m", mergeMsg], {
-    cwd: root,
-    encoding: "utf8",
-    windowsHide: true,
-  });
-  if (m.status !== 0) {
-    const conflicts = (
-      spawnSync("git", ["diff", "--name-only", "--diff-filter=U"], { cwd: root, encoding: "utf8", windowsHide: true }).stdout ?? ""
-    )
-      .trim()
-      .replace(/\n/g, ", ");
-    const aborted = spawnSync("git", ["merge", "--abort"], { cwd: root, windowsHide: true }).status === 0;
-    throw new Rejection({
-      clause: CLAUSES.CONDITION_UNMET,
-      expected: `the trunk merge of ${branch} to succeed`,
-      got: `conflicts in: ${conflicts || "(unknown)"}${aborted ? " — the merge was aborted, the root tree stands clean" : " — and the abort failed too; run git merge --abort by hand"}`,
-      remedy: {
-        tool: "se_run",
-        args: { command: "git merge <trunk-branch> --no-edit" },
-        note: "absorb trunk INTO the branch first: merge it in the worktree, resolve the named files there, commit, then close again",
-      },
-      source: SRC,
-    });
-  }
-  // CLOSED RECORDS LIVE IN GIT (owner ruling 2026-07-28): history is
-  // git's; the tree carries only live work. The record rode the merge —
-  // retire its dir in the same breath; the branch keeps serving it.
-  git(root, ["rm", "-r", "-q", "--ignore-unmatch", dirRel], "rm record");
-  if (spawnSync("git", ["diff", "--cached", "--quiet", "--", dirRel], { cwd: root }).status === 1) {
-    git(root, ["commit", "-q", "-m", retireMsg, "--", dirRel], "commit");
-  }
-}
-
-function mergeToTrunk(root: string, e: Expedition): void {
-  mergeAndRetire(
-    root,
-    e.branch,
-    `merge expedition ${e.id}`,
-    `project/spec/expeditions/${e.id}`,
-    `expedition ${e.id}: record retires to its branch`,
-  );
-}
+// `mergeAndRetire` AND `mergeToTrunk` ARE GONE (i34). They merged a record's
+// branch to trunk and then ran `git rm -r` on the record's directory, under
+// the 2026-07-28 ruling that closed records live in git and the tree carries
+// only live work.
+//
+// THERE IS NOTHING TO MERGE, because a record's work is written on trunk from
+// the first keystroke, and NOTHING TO RETIRE, because the archive reads the
+// folder from disk.
+//
+// WHAT WENT WITH THEM: the conflict handling, the abort, and the typed refusal
+// that named the conflicting files. A merge that cannot happen cannot conflict.
 
 /** CLOSE THE SHIPPED ITERATION — fired by the walk itself as it leaves
  *  through the terminal (owner ruling 2026-08-11: after the last bless the
@@ -491,29 +445,29 @@ export function itCloseShipped(
   rec: { id: string; branch: string; path: string },
 ): { closed: string; trunk_committed?: string[] } {
   const trunkCommitted = settleTrunk(root, rec.id);
-  const recAbs = join(rec.path, `project/spec/iterations/${rec.id}/record.md`);
+  const recAbs = join(root, `project/spec/iterations/${rec.id}/record.md`);
   const raw = readNode(recAbs);
   if (raw !== "" && !/^closed: /m.test(raw)) {
     writeNode(recAbs, raw.replace(/^status: .*$/m, `status: shipped\nclosed: ${new Date().toISOString()}`));
   }
-  if (git(rec.path, ["status", "--porcelain"], "status").trim() !== "") {
-    git(rec.path, ["add", "-A"], "add");
-    git(rec.path, ["commit", "-q", "-m", `iteration ${rec.id}: shipped`], "commit");
+  if (git(root, ["status", "--porcelain"], "status").trim() !== "") {
+    git(root, ["add", "-A"], "add");
+    git(root, ["commit", "-q", "-m", `iteration ${rec.id}: shipped`], "commit");
   }
-  mergeAndRetire(
-    root,
-    rec.branch,
-    `merge iteration ${rec.id}`,
-    `project/spec/iterations/${rec.id}`,
-    `iteration ${rec.id}: record retires to its branch`,
-  );
-  git(root, ["worktree", "remove", "--force", rec.path], "worktree remove");
   return { closed: rec.id, ...(trunkCommitted.length > 0 ? { trunk_committed: trunkCommitted } : {}) };
 }
 
-/** Close IS the ruling: apply (merge=true) merges the changes to trunk;
- *  dismiss (merge=false) archives the branch unmerged. Leftovers are
- *  committed either way; the worktree is removed. */
+/** Close IS the ruling: apply (merge=true) or dismiss (merge=false). The
+ *  ruling is stamped on the record and leftovers are committed either way.
+ *
+ *  WHAT i34 TOOK OUT. The work already stands on trunk, because there is one
+ *  tree, so there is no branch to merge and no worktree to remove. `merge`
+ *  is now the RULING alone rather than a ruling that also moved bytes.
+ *
+ *  DISMISS NO LONGER DISCARDS ANYTHING, and that is a real change worth
+ *  naming: an unmerged branch used to keep a dismissed expedition's changes
+ *  off trunk. They are on trunk from the moment they are written now, so a
+ *  dismissal records a judgment and reverting the work is a separate act. */
 export function expClose(
   root: string,
   e: Expedition,
@@ -521,15 +475,13 @@ export function expClose(
   override?: string,
 ): { id: string; merged: boolean; trunk_committed?: string[]; override?: string } {
   const trunkCommitted = merge ? settleTrunk(root, e.id) : [];
-  stampRecordClosed(e, merge, override);
+  stampRecordClosed(root, e, merge, override);
   // Leftover changes are committed — a walk's work never silently vanishes.
-  const dirty = git(e.path, ["status", "--porcelain"], "status").trim() !== "";
+  const dirty = git(root, ["status", "--porcelain"], "status").trim() !== "";
   if (dirty) {
-    git(e.path, ["add", "-A"], "add");
-    git(e.path, ["commit", "-m", `expedition ${e.id}: close`], "commit");
+    git(root, ["add", "-A"], "add");
+    git(root, ["commit", "-m", `expedition ${e.id}: close`], "commit");
   }
-  if (merge) mergeToTrunk(root, e);
-  git(root, ["worktree", "remove", "--force", e.path], "worktree remove");
   // NEVER SILENT. Committing someone's uncommitted work on their behalf is a
   // kindness only if they are told it happened, and which files it took.
   return {

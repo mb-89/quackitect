@@ -7,16 +7,15 @@
 // never sub-machines; only seeded chunk machines dive.
 
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { type CanvasData, type CanvasEdge, type CanvasElement, nodeSize } from "./canvas.ts";
-import { pushSeed } from "./claims.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { buildArchive, type GeneratedMachine } from "./expmachine.ts";
 import { type EvidenceField, type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
 import { noteOf, parseStateNote, readNode } from "./notes.ts";
 import { CHANGE_COLUMNS, type ChangeColumn, compileColumn, compileM0, readRigorMatrix, rigorMatrixContentHash } from "./rigor-matrix.ts";
-import { bustBranchList, listBranches, slug, worktreesDir } from "./worktree.ts";
+import { slug } from "./worktree.ts";
 
 /** THE PIN'S PLACEHOLDER, verbatim. It is written when an iteration pins a
  *  column and read back when the walk tries to enter the drawing it stands
@@ -53,86 +52,76 @@ export function itRecordRel(id: string): string {
   return `project/spec/iterations/${id}/record.md`;
 }
 
+/** ONE TREE, ONE PATH (owner ruling 2026-08-16). A record is read from the
+ *  working tree and from nowhere else.
+ *
+ *  WHAT WENT: a branch read. This used to try the record's own worktree, then
+ *  trunk, then `git show <branch>:<rel>` — three places for one file, and the
+ *  answer depended on which of them happened to have it. That third path is
+ *  the retrieval the whole iteration exists to delete. */
 export function readItRecord(root: string, it: Iteration): Record<string, unknown> | undefined {
-  const rel = itRecordRel(it.id);
-  if (it.open) {
-    const abs = join(it.path, rel);
-    if (!existsSync(abs)) return undefined;
-    return noteOf(abs)?.frontmatter;
-  }
-  const merged = join(root, rel);
-  if (existsSync(merged)) return noteOf(merged)?.frontmatter;
-  const r = spawnSync("git", ["show", `${it.branch}:${rel}`], { cwd: root, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
-  if (r.status !== 0) return undefined;
-  return parseStateNote(r.stdout).frontmatter;
+  const abs = join(root, itRecordRel(it.id));
+  if (!existsSync(abs)) return undefined;
+  return noteOf(abs)?.frontmatter;
 }
 
-/** Open = the worktree exists. Closed = branch it/* without one. */
+/** THE STATUSES A RECORD CANNOT BE WALKED FROM. One definition, because two
+ *  readers disagreeing about what "open" means is the defect this replaces:
+ *  the survey read the status and the container read the filesystem, so i28
+ *  stood in one list and not the other on 2026-08-16. */
+export const RECORD_FINISHED: ReadonlySet<string> = new Set(["shipped", "closed"]);
+
+/** EVERY RECORD IS A FOLDER ON TRUNK, and OPEN comes from its own status.
+ *
+ *  BEFORE THIS the list came from `it/*` branches and open meant "a worktree
+ *  directory exists". Both halves were wrong for the same reason: they asked
+ *  the filesystem a question the record already answers.
+ *
+ *  THE BRANCH FIELD STAYS on the shape, spelled from the id, because callers
+ *  still name it and nothing yet reads it as a place to fetch from. It goes
+ *  when the branches do. */
 export function itList(root: string): Iteration[] {
+  const dir = join(root, "project", "spec", "iterations");
+  if (!existsSync(dir)) return [];
   const out: Iteration[] = [];
-  const branches = listBranches(root, "it/*");
-  for (const branch of branches) {
-    const id = branch.slice("it/".length);
-    const path = join(worktreesDir(root), id);
-    out.push({ id, branch, path, open: existsSync(path) });
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    if (!e.isDirectory()) continue;
+    const id = e.name;
+    // A FOLDER WITHOUT A RECORD IS NOT A RECORD. Evidence can be written
+    // before the record on a half-made seed, and a directory alone must never
+    // put an iteration on the container's offer.
+    const abs = join(dir, id, "record.md");
+    if (!existsSync(abs)) continue;
+    const status = String(noteOf(abs)?.frontmatter.status ?? "");
+    out.push({ id, branch: `it/${id}`, path: root, open: !RECORD_FINISHED.has(status) });
   }
   return out.sort((a, b) => Number(a.id.match(/^i(\d+)/)?.[1] ?? 0) - Number(b.id.match(/^i(\d+)/)?.[1] ?? 0));
 }
 
-/** ADOPT A PUSHED ITERATION — the second machine's half of the seed.
- *
- *  The seed mints a record, a branch and a worktree in one act, so on the
- *  box that seeded it the three always stand together. A PEER MACHINE
- *  CLONES AND GETS THE BRANCH ALONE: no worktree, therefore not open,
- *  therefore absent from the container and from the survey. The record sat
- *  on the remote the whole time and the machine sent to run it could not
- *  see it (first run on a second machine, 2026-08-12).
- *
- *  Adopting binds the missing half. The branch is checked out into the
- *  path the rest of the engine already expects, and from that moment the
- *  iteration is open exactly like a seeded one — no call site learns a new
- *  state, because the state it wants is the one that now exists.
- *
- *  IT MINTS NOTHING. No record is written, and no branch is created where
- *  the remote did not already carry one. Adopting an open iteration is a
- *  no-op, so a second call is safe. */
-export function itAdopt(root: string, id: string): Iteration {
-  const it = itList(root).find((x) => x.id === id);
-  if (it === undefined) {
-    throw new Rejection({
-      clause: CLAUSES.REQUIRED_ARGS,
-      expected: `an iteration branch it/${id} on this machine or its remote`,
-      got: "no such iteration in the listing",
-      remedy: { tool: "se_survey", args: {}, note: "list what actually stands, then adopt one of those ids" },
-      source: SRC,
-    });
-  }
-  // ALREADY BOUND IS ALREADY DONE. Re-adopting must never disturb a
-  // worktree that may be carrying uncommitted work.
-  if (it.open) return it;
-  mkdirSync(worktreesDir(root), { recursive: true });
-  const local = listBranches(root, `it/${id}`).length > 0 && existsSync(join(root, ".git", "refs", "heads", "it", id));
-  // A LOCAL BRANCH IS CHECKED OUT AS IT STANDS. A remote-only one gets a
-  // local branch tracking it, which is what makes the later push land back
-  // on the branch the peer is watching.
-  git(
-    root,
-    local ? ["worktree", "add", it.path, it.branch] : ["worktree", "add", it.path, "-b", it.branch, "--track", `origin/${it.branch}`],
-    "worktree add",
-  );
-  bustBranchList();
-  // The engine runs from the worktree's own copy, and a fresh checkout
-  // carries no node_modules — the same install the seed does.
-  const deliverable = join(it.path, "project", "deliverable");
-  if (existsSync(join(deliverable, "package.json")) && !existsSync(join(deliverable, "node_modules"))) {
-    spawnSync("npm", ["install", "--no-audit", "--no-fund"], { cwd: deliverable, stdio: "ignore", shell: process.platform === "win32" });
-  }
-  return { ...it, open: true };
-}
+// ADOPTING A PUSHED ITERATION IS GONE (i34). `itAdopt` was the second
+// machine's half of the seed: a peer cloned, got the branch alone, and had to
+// check it out into a worktree before the record could be seen at all.
+//
+// NOTHING IS MISSING ON A CLONE ANY MORE. A record is a folder on trunk, so a
+// clone that has trunk has every record by construction, and there is no half
+// left to bind.
 
 /** THE SEED: goal + rough vision, plus context inputs (an expedition id,
- *  retro note refs). Mints the record on its own branch and worktree —
- *  the iteration stands in the container at once. */
+ *  retro note refs). Mints the record's FOLDER ON TRUNK — the iteration
+ *  stands in the container at once, and there is nothing else to make.
+ *
+ *  WHAT THE SEED STOPPED DOING AT i34, and why it is all one change:
+ *
+ *  - NO WORKTREE. There is one tree, so there is nothing to add.
+ *  - NO BRANCH. The folder IS the record; a branch held nothing else.
+ *  - NO PUSH. The seed push existed to announce a stub to a peer that would
+ *    claim it, and the claim system is retired.
+ *  - NO npm install. That paid for a second tree's node_modules.
+ *
+ *  THE CHUNK BOUNDARY WAS DRAWN WHERE THE CODE HAS NONE. The plan separated
+ *  "records stand on trunk" from "the seed stops making worktrees", and the
+ *  first is simply false until the second lands: a list that reads folders
+ *  finds nothing while the seed writes into a worktree. Twelve tests said so. */
 export function itSeed(root: string, goal: string, vision: string, inputs: string[] = [], dependsOn: string[] = []): Iteration {
   if (goal.trim() === "" || vision.trim() === "") {
     throw new Rejection({
@@ -153,18 +142,7 @@ export function itSeed(root: string, goal: string, vision: string, inputs: strin
       return m ? Math.max(max, Number(m[1])) : max;
     }, 0) + 1;
   const id = `i${n}-${slug(goal)}`;
-  const path = join(worktreesDir(root), id);
-  mkdirSync(worktreesDir(root), { recursive: true });
-  git(root, ["worktree", "add", path, "-b", `it/${id}`], "worktree add");
-  // AFTER the branch exists, never before. Busting first only refills the
-  // cache from the old listing, and the new iteration then stays invisible
-  // for the length of the window.
-  bustBranchList();
-  const deliverable = join(path, "project", "deliverable");
-  if (existsSync(join(deliverable, "package.json")) && !existsSync(join(deliverable, "node_modules"))) {
-    spawnSync("npm", ["install", "--no-audit", "--no-fund"], { cwd: deliverable, stdio: "ignore", shell: process.platform === "win32" });
-  }
-  const recAbs = join(path, itRecordRel(id));
+  const recAbs = join(root, itRecordRel(id));
   mkdirSync(dirname(recAbs), { recursive: true });
   writeFileSync(
     recAbs,
@@ -199,12 +177,9 @@ export function itSeed(root: string, goal: string, vision: string, inputs: strin
     ].join("\n"),
     "utf8",
   );
-  git(path, ["add", "-A"], "add");
-  git(path, ["commit", "-q", "-m", `iteration ${id}: seed`], "commit");
-  // The stub reaches the remote in the same act, so every peer machine
-  // lists it from its next fetch; no remote is a recorded seed, not a block.
-  const announced = pushSeed(path, `it/${id}`).ok;
-  return { id, branch: `it/${id}`, path, open: true, announced };
+  git(root, ["add", "--", itRecordRel(id)], "add");
+  git(root, ["commit", "-q", "-m", `iteration ${id}: seed`, "--", itRecordRel(id)], "commit");
+  return { id, branch: `it/${id}`, path: root, open: true };
 }
 
 export function itFind(root: string, id: string): Iteration {
@@ -765,16 +740,25 @@ export function generateIterations(root: string): GeneratedMachine {
   } catch {
     open = [];
   }
-  const start: StateDecl = {
-    id: "start",
+  // THE CONTAINER'S FIRST STATE IS THE SELECTION (owner ruling 2026-08-16,
+  // asked for three times). It keeps the START kind, so nothing about the
+  // machine's mechanics changes, and it takes the name of the job it does.
+  //
+  // IT IS THE SAME STATE, RENAMED, RATHER THAN A NEW ONE IN FRONT. A separate
+  // select state one hop past start was built first and measured: the walk
+  // ARRIVES at a container by landing on its initial state, so the offer stood
+  // one hop ahead of where the walk stopped and came back empty.
+  const select: StateDecl = {
+    id: "select",
     kind: "start",
-    statement: "",
+    statement: "Pick the iteration to walk.",
     guidance:
-      "The seeded container: every open iteration stands as its own machine. PICK ONE way forward — with several open the pull OFFERS them rather than entering one for you. Entering binds its worktree and stamps it started.",
+      "CHOOSE ONE, or leave. Every open iteration is offered as a door, and nothing is entered until you take one — taking one BINDS that iteration and stamps it started.\n\nA pull carrying no choice gets the offer back. It never gets an iteration.\n\nAn iteration waiting on another is not offered here. It is reached through the one it waits for, which is what makes the wait real.",
     evidence_form: [],
     priority: 0.01,
     edges: [],
   };
+  const start = select;
   const states: StateDecl[] = [start];
   const expByState: Record<string, string> = {};
   const subGen: Record<string, () => GeneratedMachine> = {};
@@ -857,20 +841,28 @@ export function generateIterations(root: string): GeneratedMachine {
     // iteration it waits for, which is what makes the wait real.
     if ((depsOf.get(sid) ?? []).length === 0) roots.push(sid);
   }
-  // A CONTAINER HOLDING SEVERAL OPEN ITERATIONS OFFERS THEM, rather than
-  // walking into whichever happens to be first.
-  //
-  // Entering one BINDS it, so a bare pull used to take the walker's decision
-  // without saying so. Worse, from inside one there is no drawn way back: on
-  // 2026-08-15 reaching a sibling drew fifteen hops through two unrelated
-  // iterations, and the only way out was an escape to the front desk — which
-  // in an unattended run is a dead stop.
-  //
-  // ALTERNATIVE is the role that already means OR here. With one root the
-  // edge stays normal, because entering the only thing open is not a choice.
+  // ALTERNATIVE is the role that already means OR here. With one root the edge
+  // stays normal, because entering the only thing open is not a choice.
   const rootRole = roots.length > 1 ? ("alternative" as const) : ("normal" as const);
-  for (const sid of roots) start.edges.push({ to: sid, role: rootRole });
-  if (open.length === 0) start.edges.push({ to: "end", role: "normal" });
+  // LEAVING IS A DRAWN DOOR, AND IT COMES FIRST. This is the whole defect.
+  //
+  // Before this, the container had NO exit that did not pass through an
+  // iteration: its first state fanned to the open records, and each record's
+  // only edge ran to `end`. So a route to anywhere outside — the front desk,
+  // idle, a retro — could only be drawn THROUGH an iteration, and drawing it
+  // is what entered it.
+  //
+  // THAT IS THE FIVE ENTRIES INTO i4 ON 2026-08-16, and it explains why every
+  // one happened on a bare recovery pull. The standing target was the front
+  // desk. The only way the router could reach it was through the first record
+  // on the list, and entering BINDS that record and stamps it started.
+  //
+  // FIRST IN THE EDGE LIST IS NOT COSMETIC. `tryMove` walks the edges in order
+  // and takes the first whose role is authored, so edge order IS the default
+  // when nothing chose. The default must be to leave, never to take up work
+  // nobody picked.
+  select.edges.push({ to: "end", role: "normal" });
+  for (const sid of roots) select.edges.push({ to: sid, role: rootRole });
   states.push({
     id: "end",
     kind: "end",
@@ -880,7 +872,7 @@ export function generateIterations(root: string): GeneratedMachine {
     priority: 0.01,
     edges: [],
   });
-  const decl: MachineDecl = { id: "iterations", reentry: "restart", initial: "start", states };
+  const decl: MachineDecl = { id: "iterations", reentry: "restart", initial: "select", states };
   validateMachine(decl);
   // ONE LAYOUT FOR EVERY MACHINE. pinnedCanvas rows states by dependency depth
   // and puts independent ones side by side, which is exactly what the container

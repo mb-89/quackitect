@@ -1249,11 +1249,17 @@ const unanswered = (v: string): boolean => v.trim() === "" || /^<!--[\s\S]*-->$/
  *  with the clause that carried the meaning gone, and all four were rewritten
  *  by hand (note-324983b06229).
  *
- *  NOTHING IN THIS ENGINE WRITES AN ELLIPSIS. A search of the whole deliverable
- *  for the character as a string literal, and for any maxlength, returns
- *  nothing, and neither the read half nor the write half of the node-table
- *  shortens a cell. So the cut came from somewhere this code cannot see — a
- *  host, or the author's own abbreviation.
+ *  THIS COMMENT USED TO SAY THE ENGINE WROTE NO ELLIPSIS, and that was wrong
+ *  in both halves (found 2026-08-16). engine/forms.ts oneLine cut every
+ *  frontmatter value at 200 characters and appended one. The searches this
+ *  comment reported missed it because the ellipsis was a TEMPLATE literal
+ *  rather than a string literal, and the limit was a bare number rather than
+ *  a `maxlength`.
+ *
+ *  IT MISDIRECTED THREE HUNTS, note-54c7a1cdfc4e and note-567aef4660ba among
+ *  them, because a comment asserting the result of a search reads like
+ *  evidence and nobody re-runs it. The cut is removed; this stays as the
+ *  warning that a recorded search result is not a check.
  *
  *  THE GUARD DOES NOT NEED THE CULPRIT. Whatever cut it, a frontmatter value
  *  that trails off is not an answer, and the one outcome that must not stand

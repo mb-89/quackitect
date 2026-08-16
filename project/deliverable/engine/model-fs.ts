@@ -14,9 +14,11 @@ function publish(batch: { root: string; changes: VaultChange[] }): void {
 
 export class ModelFileSystem {
   private readonly rootOf: (rel?: string) => string;
+  private readonly boundRecord: () => string | undefined;
 
-  constructor(rootOf: (rel?: string) => string) {
+  constructor(rootOf: (rel?: string) => string, boundRecord: () => string | undefined = () => undefined) {
     this.rootOf = rootOf;
+    this.boundRecord = boundRecord;
   }
 
   read(path: string, opts: Parameters<typeof fileRead>[2] = {}) {
@@ -24,19 +26,27 @@ export class ModelFileSystem {
   }
 
   /** A trace node minted in a bound record carries its record id, so the
-   *  reference views can default to the iteration's own delta. The id is
-   *  the worktree's own name — the root the write resolves into. */
-  private static stamp(root: string, path: string, content: string): string {
+   *  reference views can default to the iteration's own delta.
+   *
+   *  THE ID COMES FROM THE WALK, NOT FROM A PATH (i34). It used to be read
+   *  off the write's root, as the `<id>` in `.worktrees/<id>`. That worked
+   *  only while a bound record HAD a tree of its own, and i34 removes them —
+   *  so with one tree the pattern would never match and every node minted
+   *  from then on would carry no minted_in at all, silently.
+   *
+   *  ASKING THE WALK IS ALSO MORE HONEST. What the field records is which
+   *  record was open when the node was written, and the walk is the thing
+   *  that knows that. The path only ever agreed with it by construction. */
+  private static stamp(bound: string | undefined, path: string, content: string): string {
+    if (bound === undefined || bound === "") return content;
     if (!/^project\/spec\/trace\/[^/]+\/[^/]+\.md$/.test(path.replace(/\\/g, "/"))) return content;
-    const m = root.replace(/\\/g, "/").match(/\/\.worktrees\/([^/]+)\/?$/);
-    if (m === null) return content;
     if (!content.startsWith("---\n") || /^minted_in:/m.test(content)) return content;
-    return content.replace(/^---\n/, `---\nminted_in: ${m[1]}\n`);
+    return content.replace(/^---\n/, `---\nminted_in: ${bound}\n`);
   }
 
   write(path: string, content: string, baseHash: string | null) {
     const root = this.rootOf(path);
-    const stamped = baseHash === null ? ModelFileSystem.stamp(root, path, content) : content;
+    const stamped = baseHash === null ? ModelFileSystem.stamp(this.boundRecord(), path, content) : content;
     const result = fileWrite(root, path, stamped, baseHash);
     publish({ root, changes: [{ kind: "refresh", path: result.path }] });
     return result;

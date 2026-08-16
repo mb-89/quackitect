@@ -78,7 +78,10 @@ test("a container state is reachable by explicit target - the agent's own path i
     await s.pull();
   }
   assert.deepEqual(s.active(), [`expeditions/${sid}`], "the explicit target walks in");
-  assert.ok(s.workRoot().includes(e.created), "and binds the worktree, exactly as the click does");
+  // ENTERING BINDS THE RECORD, and since i34 that no longer shows in the work
+  // root: there is one tree, so `workRoot()` is the same string bound or not.
+  // The session says which record is bound, and that is what the click did.
+  assert.equal(s.boundRecordId(), e.created, "and binds the record, exactly as the click does");
 });
 
 test("empty container: nothing open → start runs straight to end", async () => {
@@ -130,7 +133,7 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
   await s.advance("expeditions");
   await s.advance(sidB);
   assert.deepEqual(s.active(), [`expeditions/${sidB}`]);
-  assert.ok(s.workRoot().includes(b.created), "entering bound the worktree");
+  assert.equal(s.boundRecordId(), b.created, "entering bound the record");
   // ONE LANE, THREE KINDS (owner ruling 2026-07-28, refined 2026-08-14 when
   // SE-C-134 was retired). Each kind gets its own answer, and mixing any two
   // of them is a bug this line exists to catch.
@@ -233,7 +236,8 @@ test("the archive: start reaches every closed expedition, each runs to end, brow
   await bootHuman(s);
   const a = s.expeditionNew("spike", "Archived Thing") as { created: string };
   const sid = shortId(a.created);
-  const rep = join(root, ".worktrees", a.created, "project", "spec", "expeditions", a.created, "report.md");
+  // ONE TREE SINCE i34: an expedition's record stands under the root.
+  const rep = join(root, "project", "spec", "expeditions", a.created, "report.md");
   mkdirSync(dirname(rep), { recursive: true });
   writeFileSync(rep, "---\nform: expedition-leave\nstatus: done\nby: human\n---\n\ngoal · shipped · threads\n", "utf8");
   s.expeditionOpen(a.created);
@@ -262,13 +266,15 @@ test("the archive: start reaches every closed expedition, each runs to end, brow
     ["end"],
     "nothing closed: start runs straight to end",
   );
-  // CLOSED RECORDS LIVE IN GIT (owner ruling 2026-07-28): the close
-  // retires the record dir from the tree; the branch keeps serving it.
-  assert.ok(!existsSync(join(root, "project", "spec", "expeditions", a.created)), "no closed record on the tree");
+  // CLOSED RECORDS LIVE ON DISK (owner ruling 2026-08-16, reversing the one of
+  // 2026-07-28). The close used to retire the record dir from the tree and let
+  // the branch serve it; the folder stays now, and that is what removes the
+  // git retrieval path from the archive entirely.
+  assert.ok(existsSync(join(root, "project", "spec", "expeditions", a.created)), "the closed record's folder stands");
   assert.equal(
     generateExpeditionArchive(root).decl.states.find((x) => x.id === sid)?.statement,
     "Archived Thing",
-    "the branch serves the archive",
+    "the tree serves the archive",
   );
   // The close stamped the ruling on the branch — the list serves it.
   const listed = s.expeditionList() as { archive: { id: string; ruling?: string }[] };

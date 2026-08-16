@@ -11,9 +11,7 @@
 // the next refused call's remedy re-boots the agent in one turn.
 import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
-import { claimEntry, completeClaim, machineId } from "./claims.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
-import { dirtyLines, git, gitLand, gitSync } from "./gitlane.ts";
 import { contentHash } from "./hash.ts";
 import {
   activeStates,
@@ -52,7 +50,6 @@ import type { CanvasData } from "./canvas.ts";
 import { conditionNotePath } from "./conditions.ts";
 import { Decisions, replayFile } from "./decisions.ts";
 import { type GeneratedMachine, generateContinueExpedition, generateExpeditionArchive, shortId } from "./expmachine.ts";
-import { setMethodMirror } from "./files.ts";
 import {
   confirmPrefill,
   type FormLint,
@@ -97,7 +94,7 @@ import {
 } from "./iterations.ts";
 import { RUN_MODES, type RunMode, readMode, storedMode, writeMode } from "./mode.ts";
 import { parseStateNote, readNode, section, withPass, writeNode } from "./notes.ts";
-import { fansOut, METHOD_FILES, METHOD_PREFIXES, methodFilesIn, pathKind, recordOwnerOf, resolveInRoot, seDir } from "./paths.ts";
+import { pathKind, recordOwnerOf, resolveInRoot, seDir } from "./paths.ts";
 import { mintFlipLines } from "./pugh.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
@@ -274,11 +271,9 @@ export class Session {
 
   constructor(root: string) {
     this.root = root;
-    // THE WRITE LANE LEARNS ABOUT TREES HERE, and only here. files.ts must not
-    // know what a worktree is, so the session hands it the mirror instead.
-    setMethodMirror(root, (rel, from) => {
-      this.fanOutMethod(rel, from);
-    });
+    // THE WRITE LANE NO LONGER LEARNS ABOUT TREES, because there are none to
+    // learn about (i34). This used to hand files.ts a mirror callback so a
+    // method write could be copied into every open worktree.
     // Fail fast at server start: a misdrawn machine must not silently serve
     // an ungated lane.
     this._machine = compileMachine(root, mainMachinePath(root));
@@ -809,7 +804,7 @@ export class Session {
     if (!(RUN_MODES as string[]).includes(mode)) {
       throw new Rejection({
         clause: CLAUSES.REQUIRED_ARGS,
-        expected: "one of " + RUN_MODES.join(", ") + " — where satellites run",
+        expected: `one of ${RUN_MODES.join(", ")} — where satellites run`,
         got: String(mode),
         remedy: { tool: "se_pull", args: {}, note: "the run mode is set from the mirror, or at launch with --mode" },
         source: "engine/session.ts run mode",
@@ -906,109 +901,36 @@ export class Session {
         source: "engine/session.ts reload",
       });
     }
-    const reconciled = { ...this.reconcileTrees(), method: this.backfillMethod() };
-    if (process.env.SE_RELOAD_DRY === "1") return { reload: "dry", note: "canary green — no exit (SE_RELOAD_DRY)", ...reconciled };
+    // NOTHING TO RECONCILE (i34). The reload used to commit both trees, land
+    // the branch on trunk and sync trunk back, so the engine came up carrying
+    // the change whichever tree it landed on. One tree, one copy, no drift.
+    if (process.env.SE_RELOAD_DRY === "1") return { reload: "dry", note: "canary green — no exit (SE_RELOAD_DRY)" };
     setTimeout(() => process.exit(42), 400);
     return {
       reload: "armed",
       note: "the engine restarts in under a second on the NEW sources — the walk reboots at start and walks back to your target, which survives the restart; tick when the lane answers",
-      ...reconciled,
     };
   }
 
-  /** RELOAD RECONCILES THE TWO TREES (owner ruling 2026-08-06).
-   *
-   *  A bound record has its own worktree, and the engine serves ONE tree.
-   *  Which one depends on whether a walk is bound at that instant, and the
-   *  walk moves. So an edit could land in the tree the person was not
-   *  looking at, and it read on screen as a broken feature rather than a
-   *  missing merge — four times in one morning.
-   *
-   *  The tell was always the same: NEW DATA drawn by OLD CODE. Markdown is
-   *  read live from whichever tree is served, so a template's raw {token}
-   *  would appear beside a description that had already updated.
-   *
-   *  Reload is the right seam because it is already the verb for "make what
-   *  I wrote take effect". It commits what is on disk, lands the branch on
-   *  trunk, and syncs trunk back — so whichever tree the engine comes up
-   *  on, it carries the change. Nothing here can lose work: a commit is
-   *  made before anything moves, and a conflicting merge aborts and says so.
-   *
-   *  Unbound, there is one tree and nothing to do. */
-  private reconcileTrees(): Record<string, unknown> {
-    const wt = this.bound?.path;
-    if (wt === undefined || wt === this.machineRoot()) return {};
-    try {
-      for (const tree of [wt, this.machineRoot()]) {
-        if (dirtyLines(git(tree, "status", "--porcelain").stdout).length === 0) continue;
-        git(tree, "add", "-A");
-        git(tree, "commit", "-m", "the machine commits what stood on disk at a reload");
-      }
-      const landed = gitLand(this.machineRoot(), wt);
-      const synced = gitSync(this.machineRoot(), wt);
-      return { trees: { landed: landed.commits ?? [], synced: synced.commits ?? [] } };
-    } catch (e) {
-      // A RECONCILE THAT FAILS NEVER BLOCKS THE RELOAD. The reload is still
-      // correct for the tree it comes up on; the person is told what stayed
-      // behind so they can see why a surface looks unchanged.
-      return { trees: { failed: e instanceof Error ? e.message : String(e) } };
-    }
-  }
+  // THE WHOLE LEVELLING MACHINERY IS DELETED (i34). `reconcileTrees`,
+  // `backfillMethod` and `backfillInto` existed because several trees held
+  // copies of one method file and had to be kept in step — at reload, at
+  // entry, and at every write. There is one tree, so nothing can fall behind.
 
-  /** THE BACKFILL: every METHOD file, trunk to every open worktree, at reload.
+  /** Where the LANE works. ONE TREE, so this is the root and nothing else
+   *  (owner ruling 2026-08-16).
    *
-   *  The write-time fan-out only catches files that are written. This catches
-   *  the rest, so a tree cannot sit half-updated — which is how a worktree
-   *  came to hold a new session.ts against an old paths.ts and stopped
-   *  compiling.
+   *  IT USED TO READ `this.bound?.path ?? this.machineRoot()`, which is the
+   *  same chooser `storeFor` carried, one layer up. A bound record answered
+   *  with its own tree, so the same relative path named different files
+   *  depending on what was open.
    *
-   *  TRUNK IS THE SOURCE AND NEVER THE DESTINATION. A stale worktree must not
-   *  be able to push its old copy back. That direction is not a detail: an
-   *  edit made while a record was bound once fanned a stale tools.ts over
-   *  trunk and ate two lane verbs.
-   *
-   *  UNCHANGED FILES ARE NOT REWRITTEN, so this costs a read per file and
-   *  nothing else on a tree that is already level. */
-  private backfillMethod(): { trees: number; files: number } {
-    const trees = this.methodTrees().filter((t) => t !== this.machineRoot());
-    return { trees: trees.length, files: this.backfillInto(trees) };
-  }
-
-  /** The backfill's engine, over a chosen set of trees. Split out so ENTRY
-   *  can level one tree without reloading, which is the only way to make a
-   *  record's tree whole before an agent starts working in it. */
-  private backfillInto(trees: string[]): number {
-    if (trees.length === 0) return 0;
-    let files = 0;
-    for (const rel of methodFilesIn(this.machineRoot())) {
-      let bytes: string;
-      try {
-        bytes = readFileSync(join(this.machineRoot(), rel), "utf8");
-      } catch {
-        continue;
-      }
-      for (const tree of trees) {
-        const dst = join(tree, rel);
-        try {
-          if (existsSync(dst) && readFileSync(dst, "utf8") === bytes) continue;
-          mkdirSync(dirname(dst), { recursive: true });
-          writeFileSync(dst, bytes, "utf8");
-          files++;
-        } catch {
-          // one unreachable tree must never stop the others
-        }
-      }
-    }
-    return files;
-  }
-
-  /** Where the LANE works: the bound expedition's worktree, else the root.
-   *
-   *  SHARED METHOD NO LONGER COMES THROUGH HERE. laneRoot sends it to the
-   *  machine root whatever tree is bound, which is what retired SE-C-134.
-   *  This answers for everything else, and a record keeps its own tree. */
+   *  A BOUND RECORD'S path IS THE ROOT NOW, so this could have been left as
+   *  it was and would have given the right answer. It is written out anyway:
+   *  a chooser that happens to have one branch is still a chooser, and the
+   *  requirement asks for the absence of one, not for the right answer. */
   workRoot(): string {
-    return this.bound?.path ?? this.machineRoot();
+    return this.machineRoot();
   }
 
   /** THE CHECKOUT THAT OWNS THE WORKTREES, and the machine's own state with
@@ -1118,64 +1040,12 @@ export class Session {
     }
   }
 
-  /** EVERY TREE THE METHOD LIVES IN: trunk, plus each OPEN record's worktree.
-   *
-   *  A closed record's tree is gone, and its branch is history. Only what is
-   *  open can be walked, so only what is open needs the method. */
-  methodTrees(): string[] {
-    const trees = new Set<string>([this.machineRoot()]);
-    try {
-      for (const it of itList(this.machineRoot())) if (it.open) trees.add(it.path);
-    } catch {
-      // no iterations yet — trunk is the whole story
-    }
-    try {
-      for (const e of expList(this.machineRoot())) if (e.open) trees.add(e.path);
-    } catch {
-      // likewise for expeditions
-    }
-    return [...trees];
-  }
-
-  /** A METHOD WRITE LANDS IN EVERY TREE, IN ONE ACT (owner ruling 2026-08-07).
-   *
-   *  THE FAILURE THIS ENDS, in the owner's words: you apply a change, you want
-   *  the state machine to behave differently, and it does not — because the
-   *  change went to a tree you are not standing in. Before this, the only
-   *  thing that reconciled the trees was reconcileTrees at RELOAD, which
-   *  reboots the walk and re-reads the whole of boot. So the cure cost more
-   *  than the disease and the divergence just accumulated.
-   *
-   *  A DELETE FANS OUT TOO. Half the drift was a file that existed in one tree
-   *  and not the other, which is what a one-way copy leaves behind.
-   *
-   *  RECORD CONTENT IS NOT COPIED, ever. An open record's evidence has exactly
-   *  one home, and laneRoot sends every read there. One copy cannot disagree
-   *  with itself. */
-  fanOutMethod(rel: string, from: string): string[] {
-    if (!fansOut(rel)) return [];
-    const src = join(from, rel);
-    const gone = !existsSync(src);
-    const bytes = gone ? "" : readFileSync(src, "utf8");
-    const reached: string[] = [];
-    for (const tree of this.methodTrees()) {
-      if (tree === from) continue;
-      const dst = join(tree, rel);
-      try {
-        if (gone) {
-          if (existsSync(dst)) unlinkSync(dst);
-        } else {
-          mkdirSync(dirname(dst), { recursive: true });
-          writeFileSync(dst, bytes, "utf8");
-        }
-        reached.push(tree);
-      } catch {
-        // One unreachable tree must not stop the others — partial is strictly
-        // better than none, and reconcileTrees still backstops at reload.
-      }
-    }
-    return reached;
-  }
+  // `methodTrees` AND `fanOutMethod` ARE DELETED (i34). The first answered
+  // "every tree the method lives in"; the second copied a method write into
+  // all of them so a change took effect wherever the reader was standing.
+  //
+  // ONE TREE MAKES BOTH QUESTIONS EMPTY. A write is the file every reader
+  // opens, the instant it lands.
 
   expeditionNew(kind: string, goal: string): Record<string, unknown> {
     const e = expNew(this.machineRoot(), kind, goal);
@@ -1189,103 +1059,26 @@ export class Session {
     return { seeded: it.id, branch: it.branch, note: "it stands in the iterations container as its kickoff" };
   }
 
-  /** A RECORD'S TREE IS LEVEL AND COMMITTED BEFORE ANY WORK STARTS IN IT.
-   *
-   *  TWO FAULTS MEET HERE, and neither is fixable without the other.
-   *
-   *  THE MIRROR IS PARTIAL. The write-time fan-out copies a method file when
-   *  that file is WRITTEN, so anything edited while a tree was not open stays
-   *  behind. Only a RELOAD backfills the whole set. Measured 2026-08-13: a
-   *  seeded worktree held trunk's session.ts against its own older
-   *  stateform.ts and would not compile — the exact fault paths.ts warns
-   *  about, live in 24 trees at once. A PARTIAL SYNC IS WORSE THAN NONE: an
-   *  unsynced tree is merely old and self-consistent, a half-synced one is
-   *  broken, and it breaks at whatever moment somebody runs a check inside it.
-   *
-   *  THE MIRROR IS UNCOMMITTED. Only the BOUND tree is ever swept up, and only
-   *  at a reload, so every other open worktree accumulates it forever — 68 to
-   *  117 files in 24 of 28 trees. That costs three ways. A pre-commit hook
-   *  type-checks the tree it stands in, so it judges a hundred mirrored files
-   *  that have nothing to do with the commit, and FAILS on them. Any commit
-   *  that is not path-scoped sweeps the whole mirror onto the record's branch
-   *  by accident. And a peer that clones the branch gets NONE of it, so a
-   *  cloud machine walks the method as it stood at seed time — which is how
-   *  one feature was built twice, differently, on two branches.
-   *
-   *  SO ENTRY LEVELS THE TREE, THEN COMMITS IT. Levelling without committing
-   *  leaves the hook judging unstaged work; committing without levelling
-   *  commits something that does not compile. Both, in that order, or neither.
-   *
-   *  ENTRY IS THE RIGHT MOMENT, not the write. One commit per fanned-out file
-   *  per tree would make a 170-file sweep across twenty trees 3400 commits.
-   *  Entry happens once per record, and is exactly when the tree starts
-   *  mattering to somebody.
-   *
-   *  PATH-SCOPED, AND BEST-EFFORT. Only method paths are staged, so a record's
-   *  own content is never swept in behind the agent's back. A tree that
-   *  refuses to commit does not block entry: the walk is still correct, and it
-   *  is the tidiness that is lost rather than the work. */
-  private levelTree(tree: string): { levelled: number; committed: number } {
-    if (tree === this.machineRoot()) return { levelled: 0, committed: 0 };
-    const levelled = this.backfillInto([tree]);
-    let committed = 0;
-    try {
-      for (const p of [...METHOD_PREFIXES, ...METHOD_FILES]) git(tree, "add", "--", p);
-      const names = git(tree, "diff", "--cached", "--name-only").stdout;
-      if (names === "") return { levelled, committed: 0 };
-      committed = names.split("\n").filter((l) => l !== "").length;
-      // --no-verify because the hook type-checks the WHOLE tree, and this
-      // commit exists precisely to make that tree checkable. Running it
-      // against the state this call is fixing would refuse the fix.
-      git(tree, "commit", "--no-verify", "-m", `the machine levels this tree's method with trunk (${committed} files)`);
-    } catch {
-      // A tree that will not commit is untidy, never broken. Entry stands.
-    }
-    return { levelled, committed };
-  }
+  // `levelTree` IS DELETED (i34). Entry used to copy every method file into
+  // the record's tree and commit it there, because a record's worktree drifted
+  // from trunk the moment either was edited.
+  //
+  // ITS OWN COMMENT MEASURED THE COST: 68 to 117 mirrored files sitting
+  // uncommitted in 24 of 28 trees, a pre-commit hook type-checking a hundred
+  // files that had nothing to do with the commit, and a peer cloning the
+  // branch getting none of it — which is how one feature was built twice,
+  // differently, on two branches.
+  //
+  // ONE TREE ENDS ALL THREE.
 
+  /** ENTERING AN ITERATION BINDS IT AND STAMPS IT STARTED. That is all it does
+   *  now: no claim to take, and no tree to level. */
   iterationOpen(id: string): Record<string, unknown> {
     const it = itFind(this.machineRoot(), id);
-    // The record store opens a record only over a standing claim, and entry
-    // is what mints one. A product whose claims branch does not exist yet
-    // gets it created by this first entry, so nothing ever runs unclaimed
-    // for want of an opening act.
-    const mid = machineId(join(this.machineRoot(), ".se"));
-    const gate = claimEntry(this.machineRoot(), it.id, mid);
-    if (!gate.ok) {
-      // A SHIPPED RECORD AND A HELD ONE ARE DIFFERENT REFUSALS. Held is a
-      // wait: the holder may finish or a person may force-release it. Shipped
-      // is final, and telling the reader to wait for it would send them to
-      // stand at a door that is never opening again.
-      const shipped = gate.shipped === true;
-      throw new Rejection({
-        clause: CLAUSES.CONDITION_UNMET,
-        expected: `${it.id} unclaimed, or claimed by this machine (machine-${mid})`,
-        got: shipped
-          ? `${it.id} SHIPPED on ${gate.holder?.done ?? "?"} — a shipped iteration is never walked again`
-          : `claimed by machine-${gate.holder?.machine ?? "?"} since ${gate.holder?.at ?? "?"}`,
-        remedy: {
-          tool: "se_pull",
-          args: {},
-          note: shipped
-            ? "the work is done and its record lives on its branch — read it there, or pick unfinished work from the claimable listing"
-            : "pick another iteration from the claimable listing; a person may force-release a claim judged abandoned",
-        },
-        source: "engine/session.ts claim-gate",
-      });
-    }
-    const mirror = this.levelTree(it.path);
     this.bound = it;
     markStarted(this.machineRoot(), it);
-    this.decisions.setExtraSink(join(it.path, "project", "spec", "iterations", it.id, "decisions.jsonl"));
-    return {
-      bound: it.id,
-      note: "the lane now works in this iteration's worktree",
-      ...(mirror.committed > 0 ? { method_levelled: mirror.committed } : {}),
-      ...(gate.claimed_now === true
-        ? { claimed: `machine-${mid}${gate.offline === true ? " (recorded offline; announces at the next opportunity)" : ""}` }
-        : {}),
-    };
+    this.decisions.setExtraSink(join(this.machineRoot(), "project", "spec", "iterations", it.id, "decisions.jsonl"));
+    return { bound: it.id, note: "the walk now stands in this iteration" };
   }
 
   /** THE BLESS PINS (owner verdicts 2026-07-30): leaving an iteration
@@ -1664,6 +1457,30 @@ export class Session {
         source: "engine/session.ts claim-guard",
       });
     }
+    // A COMPLETION THAT WOULD OPEN SEVERAL ALTERNATIVES CHOOSES NONE OF THEM
+    // (owner ruling 2026-08-16, req-a-pull-carrying-no-choice-enters-no-iteration).
+    //
+    // WHAT WENT WRONG WITHOUT IT. completeState fires every alternative edge
+    // at once and then takes `inst.active[0]` as the new position. So a state
+    // with several open doors did not offer them — it walked through the first
+    // one, and "first" meant whatever order the edges were built in.
+    //
+    // IT COST FIVE ENTRIES INTO THE WRONG ITERATION ON ONE DAY. Each was a
+    // bare pull after a dropped connection. Entering BINDS the record and
+    // stamps it started, so a connection failure was starting work nobody
+    // chose, and nothing recorded that nobody chose it.
+    //
+    // `only` IS THE CHOICE. The choose path passes the named target through,
+    // so a chosen door completes exactly as before. What is refused is the
+    // completion that names none.
+    //
+    // STANDING STILL IS THE ANSWER, not a refusal. The walk stays where it is
+    // and the pull reports the doors, which is what an offer IS here — there
+    // is no `choose` instruction and there never was.
+    //
+    // ONE ALTERNATIVE IS NOT A CHOICE. A lone alternative edge is how a return
+    // and a single-visit machine are drawn, and both must keep walking through.
+    if (only === undefined && outcome === "filled" && decl.edges.filter((e) => e.role === "alternative").length > 1) return;
     const snap = {
       active: inst.active === undefined ? undefined : [...inst.active],
       fired: inst.fired === undefined ? undefined : [...inst.fired],
@@ -1805,7 +1622,7 @@ export class Session {
    *    own start, not on the state;
    *  - reaching a submachine's END and advancing pops back out and follows
    *    the parent state's edges. One tick, two moves. */
-  private expandNode(q: string): RouteNode | undefined {
+  private expandNode(q: string, objective?: string): RouteNode | undefined {
     const cut = q.lastIndexOf("/");
     const prefix = cut < 0 ? "" : q.slice(0, cut);
     const id = cut < 0 ? q : q.slice(cut + 1);
@@ -1819,9 +1636,40 @@ export class Session {
     // not, so popping out of one container landed ON the next container and
     // the route stepped straight over every state inside it. Five compose
     // states sat outside the search and the walk reported no path to them.
+    // A ROUTE NEVER PASSES THROUGH A RECORD WHEN A PLAIN DOOR EXISTS
+    // (owner report 2026-08-16, req-a-pull-carrying-no-choice-enters-no-iteration).
+    //
+    // WHY THIS IS THE ROOT AND THE EDGE ORDER WAS NOT. The container's own
+    // guidance promised an offer and the offer was real, but the ROUTER never
+    // reads an offer. It searches, and a record was just another node on the
+    // way. So a target OUTSIDE the container — the front desk, most often —
+    // drew its shortest path straight through whichever record came first,
+    // and walking that path ENTERED it, bound it, and stamped it started.
+    //
+    // THE OWNER SAW BOTH HALVES. Five entries into i4 after dropped sockets,
+    // and separately: aiming at the intended iteration "drew a route THROUGH
+    // two more — starting those as well".
+    //
+    // A RECORD IS WORK, NOT A CORRIDOR. Passing through one is never incidental
+    // to going somewhere else, because entering it takes it up.
+    //
+    // THE GUARD IS CONSERVATIVE ON PURPOSE. It only withholds a record when the
+    // same state also offers a door that is NOT a record, so no container can
+    // be stranded by it — where a record is the only way on, the route still
+    // goes through it. The iterations container gained exactly such a door in
+    // this iteration: its selection state carries an edge to `end`.
+    const recordsSkippable =
+      objective !== undefined &&
+      st.edges.some((e) => {
+        const t = decl.states.find((s) => s.id === e.to);
+        return t !== undefined && t.submachine === undefined;
+      });
     const land = (pfx: string, t: StateDecl, tick: RouteNode["nexts"][number]["tick"]): void => {
       const at = Session.qual(pfx, t.id);
       if (t.submachine !== undefined) {
+        // Only a GENERATED sub is a record. An authored sub-machine is part of
+        // the method's own drawing and is walked through as it always was.
+        if (recordsSkippable && t.submachine === "generated" && objective !== at && !objective.startsWith(`${at}/`)) return;
         const inner = this.declForPrefix(at);
         if (inner !== undefined) {
           nexts.push({ to: Session.qual(at, inner.initial), tick });
@@ -2058,15 +1906,35 @@ export class Session {
    *  claimful state found this way is the same one a person reading the
    *  drawing would name. A container met on the way is asked the same
    *  question before the walk moves past it. */
-  private deepOwed(prefix: string, decl: MachineDecl, pass: GreenPass): string | undefined {
+  private deepOwed(prefix: string, decl: MachineDecl, pass: GreenPass, here: string = this.active()[0] ?? ""): string | undefined {
     const done = new Set(this.recordDone(decl, new Set(), pass));
     for (const s of decl.states) {
       if (s.evidence_form.length > 0 && !done.has(s.id)) return Session.qual(prefix, s.id);
       if (s.submachine === undefined) continue;
       const subPrefix = Session.qual(prefix, s.id);
+      // A RECORD THE WALK IS NOT INSIDE OWES NOTHING (owner ruling 2026-08-16,
+      // req-a-pull-carrying-no-choice-enters-no-iteration).
+      //
+      // THIS IS THE OTHER HALF OF THE 2026-08-11 FIX, and that fix's own
+      // comment describes the same failure: "an aim at the desk descended into
+      // whatever record stood open: boot marched into i2". Restricting the
+      // upstream walk to INPUT edges closed one route in. This closes the
+      // other: subObjective deliberately adds the container the walk STANDS
+      // in, and from a container's own selection state that meant descending
+      // into whichever record came first and calling its work the objective.
+      //
+      // The router then drew the way there, and walking it ENTERED that
+      // record — binding it and stamping it started. Five times on 2026-08-16,
+      // every one on a bare pull after a dropped socket.
+      //
+      // A RECORD'S WORK BEGINS WHEN SOMEBODY CHOOSES IT. Until then it is not
+      // a prerequisite of anything, so it is not an objective. Standing INSIDE
+      // one, the walk still finds its owed legs, which is what the same day's
+      // fix bought and what this must not take away.
+      if (s.submachine === "generated" && here !== subPrefix && !here.startsWith(`${subPrefix}/`)) continue;
       const sub = this.declForPrefix(subPrefix);
       if (sub === undefined) continue;
-      const nested = this.deepOwed(subPrefix, sub, pass);
+      const nested = this.deepOwed(subPrefix, sub, pass, here);
       if (nested !== undefined) return nested;
     }
     return undefined;
@@ -2265,7 +2133,7 @@ export class Session {
     // (software.md, input-process-output).
     const pass = Session.newPass();
     const objective = this.nextObjective(aim, pass);
-    let r = computeRoute(from, objective, (q) => this.expandNode(q));
+    let r = computeRoute(from, objective, (q) => this.expandNode(q, objective));
     // NO WAY FORWARD IS NOT THE SAME AS NO WAY (owner design 2026-08-07).
     //
     // A fan hands out ONE leg. Walk it to the end and the drawing offers
@@ -3250,6 +3118,15 @@ export class Session {
         ? { to: e.to }
         : { to: e.to, ...(t.statement !== "" ? { statement: t.statement } : {}), kind: t.kind, priority: t.priority };
     });
+  }
+
+  /** WHICH RECORD IS OPEN, or nothing. The minted_in stamp asks this: a trace
+   *  node written while a record is bound carries that record's id.
+   *
+   *  IT USED TO BE READ OFF A PATH — the `<id>` in `.worktrees/<id>` — which
+   *  i34 removes. The walk has always known the answer; nothing was asking. */
+  boundRecordId(): string | undefined {
+    return this.bound?.id;
   }
 
   /** Where the walk is, machine-wise: ["main"] or ["main", "boot", …]. */
@@ -4843,6 +4720,32 @@ export class Session {
         source: "engine/session.ts amend",
       });
     }
+    // AN AMEND LEAVES THE SIGNATURE'S DATE ALONE, and the comment that once
+    // stood here argued the opposite from a wrong diagnosis. Both halves of
+    // that argument were false, and the correction is kept because the wrong
+    // reasoning is easy to reach again.
+    //
+    // IT CLAIMED THE GUARD COMPARES THE SIGNATURE AGAINST THE CORPUS. It does
+    // not. standingClaims reads three things and no timestamp among them: a
+    // signature is PRESENT, the form is not reopened after signing, and
+    // claimProblems comes back empty. A date plays no part.
+    //
+    // IT CLAIMED SEVEN AMENDS UP A SIX-LEVEL CHAIN CLEARED NOTHING. They
+    // cleared nothing because they were aimed at the wrong states. The chain
+    // had ONE root: write-stories listed sty-work-on-two-machines, which had
+    // been deleted, so its own content genuinely stopped passing. One amend
+    // at that root cleared all six levels at once.
+    //
+    // WHY THE ROOT WAS HARD TO SEE, which is the part worth keeping. A
+    // fallen_input names the FIRST fallen input of the state that refused,
+    // never the root of the chain, and it attaches fallenRemedy's verdict for
+    // THAT state. So the refusal recommended se_amend on a state whose own
+    // content was fine, and following it changed nothing. se_why walks one
+    // level per call and reaches the root; the refusal does not.
+    //
+    // AND RE-STAMPING WOULD HAVE BEEN A LIE. The panel shows the signing date
+    // to a person. Moving it on every amend destroys when the claim was
+    // actually signed, to satisfy a check that never reads it.
     this.notifyChange();
     return { amended: name, fields: Object.keys(fills), why: reason.trim(), by, signature_kept: true };
   }
@@ -4950,8 +4853,30 @@ export class Session {
         const file = byId.get(id)?.file;
         if (file === undefined) continue;
         let raw = readFileSync(file, "utf8");
+        // ONLY A CELL THAT MOVED IS WRITTEN (owner ruling 2026-08-16, after
+        // probe-assumptions could not be submitted without round-tripping
+        // twenty-two probe results it was not asked to change).
+        //
+        // The table is a view over EVERY standing node, so a state answering
+        // three empty cells resends two dozen it never touched. Anything that
+        // shortens a large payload between the agent and the engine then lands
+        // on somebody else's evidence. Comparing before writing makes that
+        // whole class impossible: an unchanged cell cannot damage its node,
+        // whatever happened to it on the way here.
+        let moved = false;
         cols.forEach((c, i) => {
           const v = (cells[i + 1] ?? "").replace(/\\\|/g, "|");
+          const isListNow = nodeField(file, c) === "" && nodeList(file, c).length > 0;
+          const current = isListNow ? nodeList(file, c).join(" · ") : nodeField(file, c);
+          if (v === current) return;
+          // A CELL THAT TRAILS OFF NEVER LANDS. Something between the agent
+          // and the engine shortens a large table — the engine writes no
+          // ellipsis of its own, and the nodes on disk carry none — so a cell
+          // ending in one is a fragment of an answer rather than an answer.
+          // The submit refuses it separately and says so; this stop is what
+          // guarantees the node keeps its intact value meanwhile.
+          if (/(?:…|\.\.\.)\s*$/.test(v)) return;
+          moved = true;
           // A key that is a LIST on disk stays a list: the cell splits on
           // the · the read half joined with. The yaml writer quotes each
           // entry itself, so a colon in a test name cannot break the node.
@@ -4968,6 +4893,7 @@ export class Session {
                 )
               : withFrontmatter(raw, c, v);
         });
+        if (!moved) continue;
         writeFileSync(file, raw, "utf8");
         touched.push(id);
       }
@@ -6710,17 +6636,9 @@ export class Session {
     }
     if (this.bound?.id === it.id) this.unbind();
     itCloseShipped(this.machineRoot(), it);
-    // THE CLAIM IS SPENT HERE, and this is the only place it can be. A claim
-    // was taken at entry and nothing ever ended it, so the ledger showed
-    // finished records as live holdings forever — i3 and i8 both stood that
-    // way on 2026-08-13, shipped and still reading as claimed. A peer asking
-    // the ledger what is free could not tell work in progress from work that
-    // is over.
-    //
-    // BEST-EFFORT ON PURPOSE. The record IS shipped, on disk and in git,
-    // whatever the ledger manages to record; a network that will not answer
-    // must not unship it. The stamp lands locally and announces later.
-    completeClaim(this.machineRoot(), it.id, machineId(join(this.machineRoot(), ".se")));
+    // THE CLAIM IS NOT SPENT HERE ANY MORE, because there is none. A claim was
+    // taken at entry and released here; the whole ledger is retired, and the
+    // record's own status is what says it shipped.
     appendNote(
       seDir(this.machineRoot()),
       `needs retro — iteration ${it.id} shipped and archived; the next kickoff's onboard-retro drains it.`,

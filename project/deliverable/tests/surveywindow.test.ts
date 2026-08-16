@@ -141,10 +141,11 @@ test("a shipped iteration leaves the open list, whatever its worktree says", asy
     `a seeded iteration stands open: ${JSON.stringify(opened.iterations)}`,
   );
 
-  // The close leaves the worktree behind, so the record's own status is the
-  // only thing that can say it is finished. While a record is open its record
-  // is read from ITS OWN TREE, which is where a close stamps the status.
-  const dir = join(root, ".worktrees", id, "project", "spec", "iterations", id);
+  // THE RECORD IS READ FROM ONE PLACE SINCE i34: its folder on trunk. The
+  // case used to stamp the status inside `.worktrees/<id>/`, because a record
+  // was read from its own tree while open and from trunk once closed. There is
+  // one tree now, so there is one path, and the status alone decides.
+  const dir = join(root, "project", "spec", "iterations", id);
   mkdirSync(dir, { recursive: true });
   const shipped = ["---", `id: ${id}`, "status: shipped", 'goal: "a record seeded only to be marked shipped"', "---", ""];
   writeFileSync(join(dir, "record.md"), shipped.join("\n"), "utf8");

@@ -8,7 +8,7 @@ delete process.env.SE_SCRIPT_SKIP;
 // more", state to-do lists, and the se_test tool.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync } from "node:fs";
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -120,11 +120,13 @@ async function bootHuman(s: Session): Promise<void> {
 test("nesting: the walk descends into an archive decade and climbs back out", async () => {
   const root = freshRoot();
   gitSeed(root);
-  // Twelve CLOSED expeditions, cheaply: a branch without a worktree is
-  // closed by definition — no worktree churn needed for the shape.
+  // TWELVE CLOSED EXPEDITIONS, cheaply. A branch without a worktree used to be
+  // closed by definition; since i34 a record is a FOLDER and its own status
+  // says whether it is closed, so the fixture writes twelve records.
   for (let i = 1; i <= 12; i++) {
-    const r = spawnSync("git", ["branch", `exp/e${i}-t`], { cwd: root, encoding: "utf8" });
-    assert.equal(r.status, 0, r.stderr);
+    const dir = join(root, "project", "spec", "expeditions", `e${i}-t`);
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "record.md"), `---\nid: e${i}-t\nkind: fix\nstatus: closed\ngoal: "probe ${i}"\n---\n`, "utf8");
   }
   const s = new Session(root);
   await bootHuman(s);

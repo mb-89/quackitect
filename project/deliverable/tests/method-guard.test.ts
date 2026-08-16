@@ -14,8 +14,6 @@
 // worktree. Without that, none of these assertions would mean anything.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
 import { describe, test } from "node:test";
 import { CLAUSES } from "../engine/errors.ts";
 import { Session } from "../engine/session.ts";
@@ -38,16 +36,15 @@ function gitRoot(): string {
 }
 
 describe("the method guard", { concurrency: true }, () => {
-  test("shared method resolves to the MACHINE ROOT from inside a bound record", () => {
+  test("every path resolves to the machine root from inside a bound record", () => {
     const root = gitRoot();
     const s = new Session(root);
     const minted = s.expeditionNew("spike", "Guard The Method") as { created: string };
     s.expeditionOpen(minted.created);
-    assert.ok(s.workRoot().includes(".worktrees"), "the record must actually be bound for this to mean anything");
 
     // THE CLAIM THAT RETIRED SE-C-134. A method path resolves to the machine
-    // root whatever tree is bound, so the write cannot land in a tree that
-    // does not own it. Refusing it was the old answer to the same danger.
+    // root whatever is bound, so the write cannot land in a tree that does not
+    // own it. Refusing it was the old answer to the same danger.
     for (const rel of [
       anyGuidanceDoc(),
       "project/deliverable/machines/items/element.md",
@@ -57,10 +54,14 @@ describe("the method guard", { concurrency: true }, () => {
       assert.equal(s.laneRoot(rel), root, `${rel} is shared method and belongs to the machine`);
     }
 
-    // AND THE TWO WERE NOT COLLAPSED INTO ONE ANSWER. A record's own content
-    // still rides its own tree, which is what a bound walk is for.
+    // AND SINCE i34 A RECORD'S OWN CONTENT RESOLVES THERE TOO. This case used
+    // to assert the opposite — that a record's work stays in the record's own
+    // tree — and that was the seam: two answers for one path string.
+    //
+    // THE DANGER IT GUARDED IS GONE RATHER THAN RE-ANSWERED. A write cannot
+    // land in the wrong tree when there is one tree.
     const own = `project/spec/expeditions/${minted.created}/evidence/scratch.md`;
-    assert.notEqual(s.laneRoot(own), root, "the record's own work stays in the record's tree");
+    assert.equal(s.laneRoot(own), root, "a record's own work resolves to the one tree, like everything else");
   });
 
   test("the retired clause is gone from the registry and its number is not reused", () => {
@@ -92,33 +93,10 @@ describe("the method guard", { concurrency: true }, () => {
     assert.notEqual(body.clause, "SE-C-134", "a bound walk exists to write the record's own content");
   });
 
-  test("a method write reaches every tree", () => {
-    const root = gitRoot();
-    const binder = new Session(root);
-    const minted = binder.expeditionNew("spike", "Fan It Out") as { created: string };
-    binder.expeditionOpen(minted.created);
-    const worktree = binder.workRoot();
-    assert.ok(worktree.includes(".worktrees"), "there must be a second tree for a fan-out to mean anything");
-
-    // THE FAN-OUT IS session.fanOutMethod, and this exercises it where it
-    // lives. Driving it through the lane would test the walk's legal-tool
-    // gate instead, which is a different claim and already has its own tests.
-    const rel = "project/guidance/fanned.md";
-    mkdirSync(join(root, "project", "guidance"), { recursive: true });
-    writeFileSync(join(root, rel), "shared method", "utf8");
-    const reached = binder.fanOutMethod(rel, root);
-
-    assert.ok(reached.includes(worktree), `the fan-out must name the tree it reached: ${JSON.stringify(reached)}`);
-    assert.ok(existsSync(join(root, rel)), "the main tree has it");
-    assert.equal(readFileSync(join(root, rel), "utf8"), "shared method");
-
-    // THE CLAIM UNDER TEST, from paths.ts: a METHOD write must reach every
-    // tree, so a change takes effect wherever the reader is standing.
-    const inWorktree = join(worktree, rel);
-    assert.ok(
-      existsSync(inWorktree),
-      "a method file written unbound must reach the record's tree too — otherwise a record keeps an old machine and nothing says so",
-    );
-    assert.equal(readFileSync(inWorktree, "utf8"), "shared method");
-  });
+  // THE FAN-OUT CASE IS DELETED (i34). It drove `session.fanOutMethod`: write
+  // a method file unbound, and assert it reached the record's worktree too —
+  // "otherwise a record keeps an old machine and nothing says so".
+  //
+  // THE MECHANISM IS GONE AND SO IS THE FAILURE. One tree, one copy. A case
+  // asserting that a deleted function returns an empty list tests nothing.
 });

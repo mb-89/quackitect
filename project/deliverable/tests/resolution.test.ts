@@ -65,71 +65,55 @@ test("a record path names the record that owns it", () => {
   });
 });
 
-test("a method path fans out to every tree and a record path does not", () => {
-  assert.equal(paths.fansOut("project/deliverable/engine/session.ts"), true);
-  assert.equal(paths.fansOut("project/spec/iterations/i27-x/evidence/a.md"), false);
-});
+// THE SEAM'S CHOOSING HALF IS GONE (i34), and the cases that proved it chose
+// correctly go with it. What replaces them is the demand that it CANNOT
+// choose: req-every-record-path-resolves-in-one-tree asks for the absence of a
+// chooser, so what these cases now assert is sameness.
+//
+// WHAT WAS HERE AND WHY IT IS NOT ANY MORE:
+//
+// - `fansOut` said a method path must reach every tree. One tree, so it does.
+// - `machineRootOf` derived the machine root by stripping `.worktrees/<id>`.
+//   There is nothing to strip.
+// - `Roots.bound` was the second store. There is no second store.
+//
+// THE DEFECT THEY GUARDED IS STILL GUARDED, and by a stronger check: two lanes
+// asking for one path cannot differ when there is only one place to look.
 
-test("the engine's own tests count as method, so a tree cannot keep old ones", () => {
-  assert.equal(paths.fansOut("project/deliverable/tests/resolution.test.ts"), true);
-});
-
-// ------------------------------ the machine root is derivable from a worktree
-
-test("the machine root is derived from a worktree path", () => {
+test("every path resolves to the one root, whatever kind it is", () => {
   const machine = join(ROOT, "repo");
-  const worktree = join(machine, ".worktrees", "i27-x");
-  assert.equal(paths.machineRootOf(worktree), machine);
+  const session = seam(machine, ".se/HANDOVER.md", "lint");
+  const method = seam(machine, GUIDE, "lint");
+  const content = seam(machine, "project/spec/trace/requirement/req-x.md", "lint");
+  assert.equal(session.store, machine, "session state resolves to the root");
+  assert.equal(method.store, machine, "shared method resolves to the root");
+  assert.equal(content.store, machine, "a record's content resolves to the root");
 });
 
-test("a root that is not a worktree is its own machine root", () => {
-  assert.equal(paths.machineRootOf(ROOT), ROOT);
-});
-
-test("a caller knowing only its worktree still sends session state to the machine", () => {
+test("no resolution can land inside a worktree, because none is consulted", () => {
   const machine = join(ROOT, "repo");
-  const worktree = join(machine, ".worktrees", "i27-x");
-  // This is se_lint's exact situation on 2026-08-14: one ambient root, and
-  // it was the worktree.
-  const r = seam(worktree, ".se/HANDOVER.md", "lint");
-  assert.equal(r.store, machine, "the handover is the machine's, whatever tree the caller stands in");
-  assert.equal(r.abs.includes(".worktrees"), false);
-});
-
-test("a caller knowing only its worktree still keeps content in that worktree", () => {
-  const machine = join(ROOT, "repo");
-  const worktree = join(machine, ".worktrees", "i27-x");
-  const r = seam(worktree, "project/spec/trace/requirement/req-x.md", "lint");
-  assert.equal(r.store, worktree, "a record's content stays its own");
-});
-
-// ------------------------------------ the store comes from the path's KIND
-
-test("session state resolves to the machine root even while a record is bound", () => {
-  const WORKTREE = join(ROOT, ".worktrees", "i27-x");
-  const r = seam({ machine: ROOT, bound: WORKTREE }, ".se/HANDOVER.md", "test");
-  assert.equal(r.store, ROOT, "the handover belongs to the machine, never to a branch");
-  assert.equal(r.abs.includes(".worktrees"), false);
-});
-
-test("shared method resolves to the machine root even while a record is bound", () => {
-  const WORKTREE = join(ROOT, ".worktrees", "i27-x");
-  const r = seam({ machine: ROOT, bound: WORKTREE }, GUIDE, "test");
-  assert.equal(r.store, ROOT);
-});
-
-test("content rides the bound tree, which is what makes a record's work its own", () => {
-  const WORKTREE = join(ROOT, ".worktrees", "i27-x");
-  const r = seam({ machine: ROOT, bound: WORKTREE }, "project/spec/trace/requirement/req-x.md", "test");
-  assert.equal(r.store, WORKTREE);
+  for (const p of [".se/HANDOVER.md", GUIDE, "project/spec/trace/requirement/req-x.md"]) {
+    assert.equal(seam(machine, p, "lint").abs.includes(".worktrees"), false, `${p} must not resolve into a worktree`);
+  }
 });
 
 test("two lanes asking for one path get one answer, which is the 2026-08-14 defect", () => {
-  const WORKTREE = join(ROOT, ".worktrees", "i27-x");
-  const asLint = seam({ machine: ROOT, bound: WORKTREE }, ".se/HANDOVER.md", "lint");
+  // se_lint resolved `.se/HANDOVER.md` against a worktree while the file lane
+  // resolved it against the machine root. Both were correct against their own
+  // ambient root, and neither answer said which.
+  const asLint = seam(ROOT, ".se/HANDOVER.md", "lint");
   const asFileLane = seam({ machine: ROOT }, ".se/HANDOVER.md", "files");
   assert.equal(asLint.abs, asFileLane.abs, "one path string must reach one tree");
   assert.equal(asLint.store, asFileLane.store);
+});
+
+test("a bare root and a Roots object are the same thing now", () => {
+  // A bare string used to mean "the tree I am standing in", with the machine
+  // root derived from it. It means the root, and the two forms agree.
+  const asString = seam(ROOT, "project/spec/trace/requirement/req-x.md", "test");
+  const asObject = seam({ machine: ROOT }, "project/spec/trace/requirement/req-x.md", "test");
+  assert.equal(asString.abs, asObject.abs);
+  assert.equal(asString.store, asObject.store);
 });
 
 // ------------------------------------------------ the seam says where it went

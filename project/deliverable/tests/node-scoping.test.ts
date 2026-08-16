@@ -14,17 +14,23 @@ import { ModelFileSystem } from "../engine/model-fs.ts";
 const BACKFILL = fileURLToPath(new URL("../engine/bin/backfill-minted.ts", import.meta.url));
 
 describe("the mint stamp", { concurrency: true }, () => {
-  test("a trace node created in a record's worktree carries minted_in", () => {
+  // THE STAMP ASKS THE WALK SINCE i34, not the path. It used to read the
+  // record id out of the write's root, as the `<id>` in `.worktrees/<id>` — a
+  // derivation that stops working the moment there are no worktrees, and would
+  // have stopped stamping silently.
+  test("a trace node written while a record is bound carries minted_in", () => {
     const lab = mkdtempSync(join(tmpdir(), "mint-"));
-    const wt = join(lab, ".worktrees", "i9-the-fixture-record");
-    mkdirSync(join(wt, "project", "spec", "trace", "requirement"), { recursive: true });
-    const model = new ModelFileSystem(() => wt);
+    mkdirSync(join(lab, "project", "spec", "trace", "requirement"), { recursive: true });
+    const model = new ModelFileSystem(
+      () => lab,
+      () => "i9-the-fixture-record",
+    );
     model.write("project/spec/trace/requirement/req-x.md", "---\nid: req-x\n---\n", null);
-    const written = readFileSync(join(wt, "project", "spec", "trace", "requirement", "req-x.md"), "utf8");
+    const written = readFileSync(join(lab, "project", "spec", "trace", "requirement", "req-x.md"), "utf8");
     assert.match(written, /^---\nminted_in: i9-the-fixture-record\n/, "the record id rides the node");
   });
 
-  test("outside a worktree, and outside the trace, nothing is stamped", () => {
+  test("with no record bound, and outside the trace, nothing is stamped", () => {
     const lab = mkdtempSync(join(tmpdir(), "mint-"));
     mkdirSync(join(lab, "project", "spec", "trace", "requirement"), { recursive: true });
     mkdirSync(join(lab, "project", "spec", "notes"), { recursive: true });

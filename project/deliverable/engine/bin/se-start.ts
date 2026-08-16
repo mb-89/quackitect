@@ -175,35 +175,13 @@ function fetchRefs(iteration: string): void {
   say("fetch", `refs up to date, ${branch} present`);
 }
 
-// ── adopt ───────────────────────────────────────────────────────────────────
-// IT CLAIMS, and a claim is the whole point of the step. It stood here for one
-// iteration reading `git rev-parse` and printing "is present", which claims
-// nothing — two machines given the same id would both have started walking.
-// Found at i28's verification.
+// ── adopt: DELETED (i34) ────────────────────────────────────────────────────
+// A cloned host used to CLAIM its iteration here, so two machines could not
+// walk one record. The claim system is retired: a record is a folder on trunk,
+// a clone that has trunk has every record, and one agent works one clone.
 //
-// IT NAMES THE HOLDER, or warns that the claim did not land. Work starts
-// without a reachable remote; the claim failing is a warning, never a stop.
-// A claim already HELD BY SOMEBODY ELSE is a stop, because the alternative is
-// two machines walking one iteration.
-//
-// THE ENGINE IS IMPORTED HERE AND NOT AT THE TOP. install runs before this
-// step, and a top-level import would need the engine's modules to load before
-// verify has said a word about the runtime.
-async function adopt(iteration: string): Promise<void> {
-  const { claimIteration, machineId } = await import("../claims.ts");
-  const machine = machineId(join(ROOT, ".se"));
-  const r = claimIteration(ROOT, iteration, machine);
-  if (r.taken !== undefined) die("adopt", `${iteration} is held by machine ${r.taken.machine} since ${r.taken.at}`);
-  if (r.offline) {
-    say("adopt", `${iteration} claimed locally by machine ${machine} — the remote did not answer, so nothing is announced`);
-    return;
-  }
-  if (!r.ok) {
-    say("adopt", `${iteration} recorded locally by machine ${machine} — the announce did not land`);
-    return;
-  }
-  say("adopt", `${iteration} claimed by machine ${machine}`);
-}
+// WHAT REPLACED THE GUARD is an assumption rather than a lock —
+// raid-asm-only-one-agent-works-a-clone-at-a-time, with its own trigger.
 
 // ── launch ──────────────────────────────────────────────────────────────────
 // IT STARTS THE AGENT. It stood here checking two files existed and printing
@@ -273,7 +251,6 @@ async function main(): Promise<void> {
   const pid = start(port);
   await wait(port);
   fetchRefs(iteration);
-  await adopt(iteration);
   launch(iteration, agent, pid);
   process.stdout.write(`started: lane pid ${pid}, iteration ${iteration}, agent ${agent}\n`);
 }

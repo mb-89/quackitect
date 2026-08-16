@@ -52,9 +52,15 @@ test("a seed stands in the container at once — its machine is M0", () => {
   const kick = walk.decl.states.find((s) => s.id === "gate-kickoff")!;
   assert.equal(kick.group, "M0", "milestones are groups on the states");
   assert.deepEqual(kick.tags, ["iteration-kickoff"]);
-  // Not a git repo → an empty container that runs start to end.
+  // Not a git repo → an empty container that runs straight to end.
+  //
+  // THE FIRST STATE IS NAMED `select` SINCE i34. It keeps the START kind and
+  // everything about the machine's mechanics, and it took the name of the job
+  // it does: with records open it offers them and enters none. With none open
+  // there is nothing to pick, and the single edge to `end` is all it carries.
   const empty = generateIterations(freshRoot());
-  assert.deepEqual(empty.decl.states.find((s) => s.id === "start")?.edges, [{ to: "end", role: "normal" }]);
+  assert.deepEqual(empty.decl.states.find((s) => s.id === "select")?.edges, [{ to: "end", role: "normal" }]);
+  assert.equal(empty.decl.initial, "select", "the container starts on its selection state");
 });
 
 test("any state's form is fetchable by its machine — the walk elsewhere", () => {
@@ -99,7 +105,8 @@ test("the graph is evidence: an open decision point blocks the leave form", () =
   s.expeditionOpen(minted.created);
   const sid = minted.created.match(/^(e\d+)-/)?.[1];
   // A filled, done form — but the graph still holds an open point.
-  const rel = join(root, ".worktrees", minted.created, "project", "spec", "expeditions", minted.created, "report.md");
+  // ONE TREE SINCE i34: an expedition's record stands under the root.
+  const rel = join(root, "project", "spec", "expeditions", minted.created, "report.md");
   const filled = [
     "---",
     "form: expedition-leave",
@@ -321,7 +328,9 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
     (e) => /SUBMITTED/.test(JSON.stringify(e)),
   );
   session.formDone("onboard-retro", "human");
-  const retroForm = readFileSync(join(root, ".worktrees", id, "project", "spec", "iterations", id, "evidence", "onboard-retro.md"), "utf8");
+  // ONE TREE SINCE i34, so the evidence stands under the root rather than
+  // inside `.worktrees/<id>/`.
+  const retroForm = readFileSync(join(root, "project", "spec", "iterations", id, "evidence", "onboard-retro.md"), "utf8");
   assert.match(retroForm, /^signed_off: /m, "the submit stamps the claim");
   assert.match(retroForm, /^authors: human$/m);
   await session.advance(); // onboard-retro → gate-kickoff — the exit is open now
@@ -371,16 +380,16 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
   // GROWS IN PLACE during that very call. Several ways forward stand in
   // the grown machine, so the UNNAMED advance refuses typed — and the
   // growth has already happened when it does.
-  const rec = join(root, ".worktrees", id, "project", "spec", "iterations", id, "record.md");
+  const rec = join(root, "project", "spec", "iterations", id, "record.md");
   await assert.rejects(
     () => session.advance(),
     (e) => /named way forward/.test(JSON.stringify(e)),
   );
-  assert.ok(existsSync(join(root, ".worktrees", id, itPinRel(id))), "the pin exists");
+  assert.ok(existsSync(join(root, itPinRel(id))), "the pin exists");
   assert.deepEqual(session.breadcrumb(), ["main", "iterations", sid], "the walk stands in the SAME machine");
   const grown = session.currentMachine();
   assert.equal(grown.id, sid, "the machine id is stable across the pin");
-  const pin = JSON.parse(readFileSync(join(root, ".worktrees", id, itPinRel(id)), "utf8")) as { change_size: ChangeColumn };
+  const pin = JSON.parse(readFileSync(join(root, itPinRel(id)), "utf8")) as { change_size: ChangeColumn };
   assert.equal(
     grown.states.length,
     compileColumn(readRigorMatrix(root), pin.change_size).states.length,
@@ -481,11 +490,9 @@ test("no gate holds the first start — entering binds, stamps started, and M0 s
   await session.advance(); // start → onboard-retro: the retro stands FIRST
   const active = (session.describe() as { submachine?: { active: string[] } }).submachine?.active;
   assert.deepEqual(active, ["onboard-retro"]);
-  // Entering bound the worktree and stamped `started:`.
-  const rec = readFileSync(
-    join(root, ".worktrees", String(seeded.seeded), "project", "spec", "iterations", String(seeded.seeded), "record.md"),
-    "utf8",
-  );
+  // Entering stamped `started:` on the record, which stands on trunk since
+  // i34 rather than inside a bound worktree.
+  const rec = readFileSync(join(root, "project", "spec", "iterations", String(seeded.seeded), "record.md"), "utf8");
   assert.match(rec, /^started: /m);
   assert.match(rec, /^status: open$/m);
 });

@@ -46,9 +46,13 @@ const GOAL_CAP = 200;
 const goalOf = (fm: Record<string, unknown> | undefined): string =>
   fm?.unreadable !== undefined ? `⚠ ${String(fm.unreadable)}` : headline(String(fm?.goal ?? ""), GOAL_CAP);
 
-/** The statuses a record cannot be walked from. Neither belongs in a list
- *  headed "what stands open", and the archive doors already hold both. */
-const FINISHED = new Set(["shipped", "closed"]);
+// THE FINISHED SET MOVED TO iterations.ts AT i34, as RECORD_FINISHED. It was
+// defined here and nowhere else, so the survey knew a shipped record was not
+// open and itList did not — and on 2026-08-16 i28 stood in the container's
+// list and not in the survey's, with nothing saying they disagreed.
+//
+// itList NOW APPLIES IT ITSELF, so this file no longer needs its own copy and
+// no longer needs to filter.
 
 export function survey(projectRoot: string, opts: SurveyOptions = {}): Survey {
   const exps = expList(projectRoot)
@@ -64,9 +68,7 @@ export function survey(projectRoot: string, opts: SurveyOptions = {}): Survey {
   // the same guard the day an expedition is seen doing this.
   const its = itList(projectRoot)
     .filter((i) => i.open)
-    .map((i) => ({ it: i, fm: readItRecord(projectRoot, i) }))
-    .filter(({ fm }) => !FINISHED.has(String(fm?.status ?? "")))
-    .map(({ it, fm }) => ({ id: it.id, goal: goalOf(fm) }));
+    .map((i) => ({ id: i.id, goal: goalOf(readItRecord(projectRoot, i)) }));
   const withText = opts.detail === "full";
   const allNotes = pendingNotes(seDir(projectRoot))
     .sort(byPriority)

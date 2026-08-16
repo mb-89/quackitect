@@ -19,14 +19,14 @@
 // Session state belongs to the machine, never to a branch. So it resolves to
 // the machine root whatever tree the caller happens to be bound to, and the
 // answer says so.
-import { machineRootOf, type Owner, resolveForRead, resolveInRoot, routeToOwner } from "./paths.ts";
+import { type Owner, resolveForRead, resolveInRoot, routeToOwner } from "./paths.ts";
 
-/** The stores a call can reach. `bound` is absent when no record is bound. */
+/** THE STORE A CALL CAN REACH, and there is exactly one (owner ruling
+ *  2026-08-16). A record is a folder on trunk, so no path has a second place
+ *  it could resolve to. */
 export interface Roots {
-  /** The project root. Session state and shared method live here. */
+  /** The project root. Everything lives here. */
   machine: string;
-  /** The bound record's tree, when one is bound. */
-  bound?: string;
 }
 
 export interface Resolved {
@@ -39,13 +39,25 @@ export interface Resolved {
   store: string;
 }
 
-/** Which store serves this path, decided by what the path IS. */
+/** Which store serves this path. ONE ANSWER, ALWAYS.
+ *
+ *  THIS FUNCTION WAS THE CHOOSER. It read `roots.bound ?? roots.machine` for
+ *  anything the core did not own, so the same relative path named different
+ *  files depending on what was bound — and a read and a write could disagree
+ *  about which copy was real.
+ *
+ *  WHAT IT COST, measured on 2026-08-16: a filesystem check run while bound to
+ *  i4 reported `.worktrees/i34-…` absent, because it resolved inside i4's
+ *  tree. The answer named no root, so the wrong answer was indistinguishable
+ *  from a right one.
+ *
+ *  IT IS KEPT AS A FUNCTION, not inlined, because `store` still rides every
+ *  answer and req-a-resolution-is-proven-by-read-back still wants a name to
+ *  compare against. The owner is still computed and still reported; what is
+ *  gone is any use of it to pick a tree. */
 export function storeFor(roots: Roots, owner: Owner): string {
-  // The core owns session state and shared method. One copy, on the machine.
-  if (owner.kind === "core") return roots.machine;
-  // Everything else rides the bound tree, and falls back to the machine root
-  // when nothing is bound.
-  return roots.bound ?? roots.machine;
+  void owner;
+  return roots.machine;
 }
 
 /** Resolve a caller's path and say where it landed.
@@ -53,11 +65,10 @@ export function storeFor(roots: Roots, owner: Owner): string {
  *  `forRead` opens the declared roots, which are READ surfaces only. The
  *  write lane refuses them, and that refusal lives in resolveInRoot. */
 export function resolve(roots: Roots | string, p: string, source: string, forRead = false): Resolved {
-  // ONE ROOT IS ENOUGH. A caller that knows only the tree it is standing in
-  // still resolves correctly, because the machine root is derivable from a
-  // worktree path. That is what makes this seam adoptable one verb at a time
-  // instead of all at once.
-  const r: Roots = typeof roots === "string" ? { machine: machineRootOf(roots), bound: roots } : roots;
+  // A BARE STRING IS THE ROOT. It used to be read as "the tree I am standing
+  // in", with the machine root derived from it by stripping `.worktrees/<id>`
+  // — which is the derivation this iteration deletes.
+  const r: Roots = typeof roots === "string" ? { machine: roots } : roots;
   const owner = routeToOwner(p);
   const store = storeFor(r, owner);
   const abs = forRead ? resolveForRead(store, p, source) : resolveInRoot(store, p, source);
