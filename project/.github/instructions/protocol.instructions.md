@@ -6,8 +6,8 @@ applyTo: '**'
 
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
      from project/guidance/contract.md e1c3f9810383
-     from project/guidance/walking.md 3e7d963ee5a6
-     from project/guidance/method/lane.md f5ea60fd4c3c
+     from project/guidance/walking.md b879e4877496
+     from project/guidance/method/lane.md 2b433ab77644
      from project/guidance/voice.md 0b6faf79ff32
 -->
 
@@ -311,9 +311,18 @@ wherever the walk stands, so the person's hand can never race you.
 
 ## The person's hand
 
-They AIM; they never walk. Their controls are the autonomy dial, the target and the
-checkboxes. Nothing they press moves the machine a state forward or back —
-the walk advances on the agent's pull and nothing else.
+They AIM; they never walk. Their controls are the autonomy dial, the STOP-AT
+dial, the target and the checkboxes. Nothing they press moves the machine a
+state forward or back — the walk advances on the agent's pull and nothing else.
+
+THE TWO DIALS ASK NEIGHBOURING QUESTIONS. Autonomy says what the agent may
+DECIDE alone. Stop-at says how far it may GO before handing back, and its four
+notches are machines/stopat.md: `state end`, `agent judgement` (the default),
+`bless`, `blockers only`.
+
+AT `state end` THE ENGINE HOLDS EVERY TRANSITION and the person releases them
+one at a time. That is still not them walking: the press stops the engine
+refusing, and the agent's pull is what moves.
 
 ## The reading
 
@@ -354,10 +363,18 @@ the rhythm; the log should tell the story without gaps.
   narration wearing progress's clothes. With nothing open, a bare update is
   right.
 - THE BRIEF IS ONE LINE, 90 characters. A brief that chains three or more
-  separator-joined parts wanted to be a plan, and the engine APPLIES it as
-  one — the parts become the items, and the result names the correction. A
-  RESOLUTION's chained brief still refuses (SE-C-120): which part resolved
-  the node is not the engine's to guess.
+  separator-joined parts is corrected rather than refused, and the result
+  names the correction. An `update` chain becomes the PLAN it wanted to be.
+  A `fork` chain STAYS a fork and its parts become that detour's items,
+  named by the first — a fork blocks the current item and a plan does not,
+  so rewriting the op would change what the call means. A RESOLUTION's
+  chained brief still refuses (SE-C-120): which part resolved the node is
+  not the engine's to guess.
+- THE STALL WARNS AT FIVE AND REFUSES AT TWELVE (SE-C-133), and the gap is
+  the grace. Both were five, so the warning bit one call later — which is a
+  two-stage refusal, not a warning. The counter measures updates since
+  anything CLOSED, and real work runs past six while reading its way to a
+  root cause.
 
 HOW OFTEN IS THE PERSON'S CONTROL, on the mirror's bar. Five notches, both
 clocks running — minutes and calls, whichever falls due first. A low notch is
@@ -386,8 +403,15 @@ the machine holding that job, not an obstacle to route around.
 ## Tests
 
 Test to answer a question — did THIS change break THAT — never to reassure.
-Scoped runs are the default and the battery is EARNED; the lane enforces
-both. A red is understood and fixed properly, then you move.
+A red is understood and fixed properly, then you move.
+
+A SCOPED RUN IS THE ONLY ONE YOU MAKE. It blocks and answers, so there is
+nothing to poll: no handle, no second call asking whether it finished.
+
+THE FULL BATTERY IS THE ENGINE'S. It runs once, at verification, fired by
+that state's own exit script — you never call it and there is no state where
+you may. Asking for one anywhere else is refused, and `force: true` is for a
+flake hunt.
 
 ## Conditions
 
@@ -452,7 +476,13 @@ WHEN A CALL IS REFUSED you get a typed rejection. It carries:
 Follow the remedy and recover in one turn. Never work around a refusal with
 another lane.
 
-A TRUNCATING PIPE CUTS BEFORE THE ENGINE SEES. What `Select-Object -First`
+A TRUNCATING PIPE IS REFUSED (SE-C-137), and a filter after a pipe counts:
+`Select-String`, `findstr` and `grep` drop the lines they do not match, which
+is where the totals live. The refusal names the lane verb that handles length
+instead — `se_test`, `se_file_search`, `se_file_read`, or a whole run paged
+back by ref. `no_tool_reason` runs it anyway and logs why.
+
+WHAT IT CUTS. What `Select-Object -First`
 dropped exists nowhere — not on the result, not in the log. Ends carry
 verdicts: exit codes, totals, units. Prefer structured results (`se_test`) and
 fetch full output by ref (`se_log_query`) over shaping it in the shell.

@@ -1,7 +1,7 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
      from project/guidance/contract.md e1c3f9810383
-     from project/guidance/walking.md 3e7d963ee5a6
-     from project/guidance/method/lane.md f5ea60fd4c3c
+     from project/guidance/walking.md b879e4877496
+     from project/guidance/method/lane.md 2b433ab77644
      from project/guidance/voice.md 0b6faf79ff32
 -->
 
@@ -470,16 +470,16 @@ WHEN A CALL IS REFUSED you get a typed rejection. It carries:
 Follow the remedy and recover in one turn. Never work around a refusal with
 another lane.
 
-A TRUNCATING PIPE IS REFUSED (SE-C-137). `Select-Object -First`, `head`,
-`tail`, `cut -c`, `Measure-Object`, and any of `Select-String`/`findstr`/`grep`
-AFTER a pipe cut before the engine sees, so what they drop exists nowhere —
-not on the result, not in the log, not under the ref. Ends carry verdicts:
-exit codes, totals, units.
+A TRUNCATING PIPE IS REFUSED (SE-C-137), and a filter after a pipe counts:
+`Select-String`, `findstr` and `grep` drop the lines they do not match, which
+is where the totals live. The refusal names the lane verb that handles length
+instead — `se_test`, `se_file_search`, `se_file_read`, or a whole run paged
+back by ref. `no_tool_reason` runs it anyway and logs why.
 
-THE REFUSAL NAMES THE VERB YOU WANTED, because the pipe is reached for when
-the output is long. A test run wants `se_test`, a search `se_file_search`, a
-file `se_file_read`. Anything else: run it whole and page it back with
-`se_log_query {ref}`. `no_tool_reason` runs it anyway and logs why.
+WHAT IT CUTS. What `Select-Object -First`
+dropped exists nowhere — not on the result, not in the log. Ends carry
+verdicts: exit codes, totals, units. Prefer structured results (`se_test`) and
+fetch full output by ref (`se_log_query`) over shaping it in the shell.
 
 A RESULT THE HOST MOVED TO DISK IS RE-FETCHED BY REF, never by reading the
 host's file. The lane logged the full response; `se_log_query` with the
