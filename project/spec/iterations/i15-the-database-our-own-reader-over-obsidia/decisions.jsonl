@@ -208,3 +208,8 @@
 {"ts":"2026-08-16T17:51:05.930Z","op":"done","visit":"iterations/i15/enumerate-space/find_analogy@0","node":"d192","brief":"find_analogy form filled and submitted"}
 {"ts":"2026-08-16T17:51:36.167Z","op":"plan","visit":"iterations/i15/enumerate-space/find_without@0","parent":null,"nodes":[{"id":"d194","brief":"mint two without/trim option nodes"},{"id":"d195","brief":"fill find_without form"}]}
 {"ts":"2026-08-16T17:51:50.460Z","op":"done","visit":"iterations/i15/enumerate-space/find_without@0","node":"d195","brief":"find_without form filled and submitted"}
+{"ts":"2026-08-16T17:52:34.281Z","op":"plan","visit":"iterations/i15/enumerate-space/find_by_heuristic@0","parent":null,"nodes":[{"id":"d196","brief":"run 8 heuristics against cluster-the-query"},{"id":"d197","brief":"run 8 heuristics against cluster-the-disposition"},{"id":"d198","brief":"mint options where a heuristic bites"},{"id":"d199","brief":"fill find_by_heuristic form"}]}
+{"ts":"2026-08-16T17:52:39.190Z","op":"update","visit":"iterations/i15/enumerate-space/find_by_heuristic@0","node":"d200","brief":"8 heuristics run against cluster-the-query, 2 bit"}
+{"ts":"2026-08-16T17:52:43.626Z","op":"update","visit":"iterations/i15/enumerate-space/find_by_heuristic@0","node":"d201","brief":"8 heuristics run against cluster-the-disposition, 2 bit"}
+{"ts":"2026-08-16T17:52:47.780Z","op":"done","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d170","brief":"heuristics catalogue run whole against both clusters"}
+{"ts":"2026-08-16T17:53:01.453Z","op":"done","visit":"iterations/i15/enumerate-space/find_by_heuristic@0","node":"d199","brief":"find_by_heuristic form filled and submitted"}
