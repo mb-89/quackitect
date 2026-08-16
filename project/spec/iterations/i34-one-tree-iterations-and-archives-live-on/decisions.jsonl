@@ -325,3 +325,13 @@
 {"ts":"2026-08-16T07:41:47.189Z","op":"update","visit":"iterations/i34/build-steps/selection-state@0","node":"d369","brief":"battery 1320/1325; fixing the one failure that is mine"}
 {"ts":"2026-08-16T07:43:27.912Z","op":"update","visit":"iterations/i34/build-steps/selection-state@0","node":"d370","brief":"taking the rescue leg, which runs before anything touches a tree"}
 {"ts":"2026-08-16T07:47:56.747Z","op":"update","visit":"iterations/i34/build-steps/rescue-at-risk@0","node":"d371","brief":"33 stub records rescued onto the record's own tree; verifying"}
+{"ts":"2026-08-16T07:51:53.207Z","op":"done","visit":"iterations/i34/build-steps@0","node":"d350","brief":"33 records committed (336dfaf2) and i28 merged back; conflicts resolving now"}
+{"ts":"2026-08-16T07:52:04.235Z","op":"update","visit":"iterations/i34/build-steps/rescue-at-risk@0","node":"d372","brief":"eight raid-node conflicts left in the i28 merge"}
+{"ts":"2026-08-16T07:52:24.602Z","op":"update","visit":"iterations/i34/build-steps/rescue-at-risk@0","node":"d373","brief":"four raid conflicts resolved; one claim node retiring"}
+{"ts":"2026-08-16T07:52:28.711Z","op":"update","visit":"iterations/i34/build-steps/rescue-at-risk@0","node":"d374","brief":"reading the last four merge conflicts"}
+{"ts":"2026-08-16T07:52:46.799Z","op":"update","visit":"iterations/i34/build-steps/rescue-at-risk@0","node":"d375","brief":"all 23 conflicts resolved; the reload assumption takes i28's falsification"}
+{"ts":"2026-08-16T07:54:07.851Z","op":"update","visit":"iterations/i34/build-steps/rescue-at-risk@0","node":"d376","brief":"the merge carried claim nodes back; sweeping them out again"}
+{"ts":"2026-08-16T07:55:15.678Z","op":"done","visit":"iterations/i34/build-steps@0","node":"d351","brief":"all 33 record folders now stand in the tree, not only on branches"}
+{"ts":"2026-08-16T07:55:19.077Z","op":"update","visit":"iterations/i34/build-steps/rescue-at-risk@0","node":"d377","brief":"the two claim nodes the merge carried back are out again"}
+{"ts":"2026-08-16T07:55:30.598Z","op":"update","visit":"iterations/i34/build-steps/rescue-at-risk@0","node":"d378","brief":"the last two dangling claim references repaired"}
+{"ts":"2026-08-16T07:56:01.122Z","op":"update","visit":"iterations/i34/build-steps/rescue-at-risk@0","node":"d379","brief":"the node floor was fixed on i28 and rode the merge in"}

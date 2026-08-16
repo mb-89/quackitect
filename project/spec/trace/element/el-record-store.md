@@ -34,11 +34,17 @@ THE LIST READS FROM TRUNK, never from each branch tip, and it reads in ONE
 batched call. Asking git once per iteration measured 1004 ms over 33 branches
 against 58.7 ms batched ([[raid-dec-git-is-the-list-of-iterations]]).
 
-## What moved away from it
+## What moved away from it, and then came back
 
-THE WORKTREE IS NO LONGER THIS ELEMENT'S TO BIND (2026-08-15). A tree hangs
-off a live claim and belongs to [[el-claim-ledger]]. A tree still holds ONLY
-the record's own folder ([[raid-dec-thin-tree]]).
+THE WORKTREE WAS TAKEN OFF THIS ELEMENT ON 2026-08-15, on the reasoning that a
+tree hangs off a live claim and so belonged to the claim ledger.
+
+THAT REASONING IS GONE WITH THE LEDGER (owner ruling 2026-08-16). i34 retires
+the machine-locking specification whole and removes worktrees with it, so
+there is no tree to hang off anything and no second element to own one.
+
+WHAT THIS ELEMENT OWNS NOW is the record's folder on trunk, from the seed that
+mints it to the close that leaves it standing.
 
 Boundary: the interfaces the element matrix mints for its flows.
 
