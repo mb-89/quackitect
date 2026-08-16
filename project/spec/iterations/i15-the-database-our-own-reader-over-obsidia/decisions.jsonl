@@ -272,3 +272,8 @@
 {"ts":"2026-08-16T18:25:48.050Z","op":"update","visit":"iterations/i15/evaluate-architecture@0","node":"d257","brief":"pulling to re-enter evaluate-architecture's fill state after reopen"}
 {"ts":"2026-08-16T18:26:01.934Z","op":"update","visit":"iterations/i15/evaluate-architecture@0","node":"d258","brief":"resubmitting walk with correct wiki-bracket syntax after reopen"}
 {"ts":"2026-08-16T18:26:25.534Z","op":"done","visit":"iterations/i15/evaluate-architecture@0","node":"d252","brief":"gate-architecture reviewed and blessed clean"}
+{"ts":"2026-08-16T18:27:35.032Z","op":"plan","visit":"iterations/i15/rank-unknowns@0","parent":null,"nodes":[{"id":"d259","brief":"mint the missing query-latency risk"},{"id":"d260","brief":"mint the two missing reverse-sensitivity tripwires"}]}
+{"ts":"2026-08-16T18:27:40.486Z","op":"update","visit":"iterations/i15/rank-unknowns@0","node":"d261","brief":"minted the query-latency risk and first tripwire"}
+{"ts":"2026-08-16T18:27:44.878Z","op":"done","visit":"iterations/i15/evaluate-architecture@0","node":"d253","brief":"all three missing RAID entries minted"}
+{"ts":"2026-08-16T18:28:01.899Z","op":"update","visit":"iterations/i15/rank-unknowns@0","node":"d262","brief":"recorded the button-fed-field-bypass engine gap as a note"}
+{"ts":"2026-08-16T18:28:11.031Z","op":"done","visit":"iterations/i15/rank-unknowns@0","node":"d260","brief":"rank-unknowns: one spike seeded, three filters explained"}
