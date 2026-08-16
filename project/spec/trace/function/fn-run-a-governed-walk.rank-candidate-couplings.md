@@ -2,6 +2,7 @@
 minted_in: i15-the-database-our-own-reader-over-obsidia
 id: fn-run-a-governed-walk.rank-candidate-couplings
 type: "[[function]]"
+cluster: the-disposition
 statement: rank candidate coupled nodes against a described change
 satisfies:
   - req-bm25-returns-ranked-candidates

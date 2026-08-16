@@ -2,6 +2,7 @@
 minted_in: i15-the-database-our-own-reader-over-obsidia
 id: fn-run-a-governed-walk.record-a-coupling-disposition
 type: "[[function]]"
+cluster: the-disposition
 statement: record a disposition for each candidate coupling
 satisfies:
   - req-bm25-candidates-need-disposition

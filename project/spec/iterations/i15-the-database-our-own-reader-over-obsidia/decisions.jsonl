@@ -178,3 +178,7 @@
 {"ts":"2026-08-16T17:39:20.943Z","op":"update","visit":"iterations/i15/write-requirements@2","node":"d162","brief":"fixed missing frontmatter close on req-work-starts-without-a-reachable-remote"}
 {"ts":"2026-08-16T17:39:23.136Z","op":"update","visit":"iterations/i15/write-requirements@2","node":"d163","brief":"retest write-requirements submit after frontmatter fix"}
 {"ts":"2026-08-16T17:40:20.650Z","op":"plan","visit":"iterations/i15/partition-functions@0","parent":null,"nodes":[{"id":"d164","brief":"build clusters DSM for 3 new i15 functions"},{"id":"d165","brief":"confirm/adjust proposed placement"},{"id":"d166","brief":"name & class cluster coupling"}]}
+{"ts":"2026-08-16T17:41:43.118Z","op":"update","visit":"iterations/i15/partition-functions@0","node":"d167","brief":"confirmed engine proposal, wrote cluster field on the 3 new functions"}
+{"ts":"2026-08-16T17:41:48.655Z","op":"update","visit":"iterations/i15/partition-functions@0","node":"d168","brief":"named cluster-the-query, classed same-external-interface"}
+{"ts":"2026-08-16T17:41:51.907Z","op":"update","visit":"iterations/i15/partition-functions@0","node":"d169","brief":"named cluster-the-disposition, classed sequence"}
+{"ts":"2026-08-16T17:42:03.831Z","op":"done","visit":"iterations/i15/partition-functions@0","node":"d164","brief":"clusters DSM built and submitted for the 3 new i15 functions"}

@@ -2,6 +2,7 @@
 minted_in: i15-the-database-our-own-reader-over-obsidia
 id: fn-run-a-governed-walk.answer-a-structured-query
 type: "[[function]]"
+cluster: the-query
 statement: answer a structured query over the corpus
 satisfies:
   - req-query-returns-named-fields
