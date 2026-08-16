@@ -295,3 +295,7 @@
 {"ts":"2026-08-16T18:49:10.790Z","op":"done","visit":"iterations/i15/author-tests@0","node":"d276","brief":"tsp-coupling-rank minted"}
 {"ts":"2026-08-16T18:49:23.075Z","op":"done","visit":"iterations/i15/author-tests@0","node":"d277","brief":"tsp-coupling-disposition minted with its checklist"}
 {"ts":"2026-08-16T18:49:27.055Z","op":"done","visit":"iterations/i15/author-tests@0","node":"d275","brief":"tsp-query-answers minted"}
+{"ts":"2026-08-16T18:49:50.674Z","op":"done","visit":"iterations/i15/author-tests@0","node":"d278","brief":"author-tests submitted and signed, all method/coverage laws green"}
+{"ts":"2026-08-16T18:50:13.734Z","op":"plan","visit":"iterations/i15/specify-build@0","parent":null,"nodes":[{"id":"d279","brief":"write dsp-query-evaluator"},{"id":"d280","brief":"write dsp-coupling-disposer"},{"id":"d281","brief":"fill promotions (none)"},{"id":"d282","brief":"submit specify-build"}]}
+{"ts":"2026-08-16T18:50:27.081Z","op":"done","visit":"iterations/i15/specify-build@0","node":"d280","brief":"dsp-coupling-disposer written"}
+{"ts":"2026-08-16T18:50:47.430Z","op":"done","visit":"iterations/i15/specify-build@0","node":"d281","brief":"promotions filled none, nothing promoted this iteration"}
