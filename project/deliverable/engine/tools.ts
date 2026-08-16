@@ -31,7 +31,7 @@ import {
 } from "./discipline.ts";
 import { CLAUSES, Rejection, type RejectionPayload } from "./errors.ts";
 import type { PatchOp } from "./files.ts";
-import { gitLand, gitLane, gitSync } from "./gitlane.ts";
+import { gitLane } from "./gitlane.ts";
 import { contentHash } from "./hash.ts";
 import { rankDemand, searchHelp } from "./help.ts";
 import { appendNote, drainNote, type Priority, readNotes } from "./inbox.ts";
@@ -359,7 +359,7 @@ export function expeditionTools(session: Session): ToolDef[] {
       name: "se_exp_close",
       title: "se.exp.close",
       description:
-        "Close the bound expedition — the close IS the ruling: apply (merge: true, default) merges the changes to trunk, then archives; dismiss (merge: false) archives the branch unmerged. Leftovers are committed either way; the worktree is removed. THE REPORT MUST BE CONFIRMED BY A PERSON, in the mirror. Closing on a report the agent finished itself is refused unless `override` says who authorised it — and the override is stamped on the record, so the archive shows which reports carry a person's judgement and which do not.",
+        "Close the bound expedition — the close IS the ruling: apply (merge: true, default) or dismiss (merge: false), stamped on the record. The work already stands on trunk, so nothing moves either way and DISMISS DOES NOT DISCARD ANYTHING — reverting is a separate act. Leftovers are committed, and the record's folder stays where it is. THE REPORT MUST BE CONFIRMED BY A PERSON, in the mirror. Closing on a report the agent finished itself is refused unless `override` says who authorised it — and the override is stamped on the record, so the archive shows which reports carry a person's judgement and which do not.",
       inputSchema: {
         type: "object",
         properties: {
@@ -1097,7 +1097,7 @@ export function coreTools(
       name: "se_git",
       title: "se.git",
       description:
-        "Git through the lane, allowlisted: status, log, diff, show, add, commit, fetch, branch, rev-parse, restore (--staged only), checkout (--ours/--theirs on a conflicted path, mid-merge only), merge (--abort to back out a conflict). No push — pushing is the user's act; no rebase — a diverged branch reconciles by merge, which only adds a revertable commit. Runs in the bound worktree when an expedition is open, else the root.",
+        "Git through the lane, allowlisted: status, log, diff, show, add, commit, fetch, branch, rev-parse, restore (--staged only), checkout (--ours/--theirs on a conflicted path, mid-merge only), merge (--abort to back out a conflict). No push — pushing is the user's act; no rebase — a diverged branch reconciles by merge, which only adds a revertable commit. Runs in the one tree, always.",
       inputSchema: {
         type: "object",
         properties: { args: { type: "array", items: { type: "string" }, description: 'git arguments, e.g. ["status", "--porcelain"]' } },
@@ -1105,22 +1105,19 @@ export function coreTools(
       },
       handler: (args) => gitLane(rootOf(), (args.args as unknown[]) ?? []),
     },
-    {
-      name: "se_git_land",
-      title: "se.git.land",
-      description:
-        "LAND the bound expedition's commits on trunk and LEAVE IT OPEN — an expedition is a day's bucket and does not close to ship. Fast-forwards where it can, merges where it cannot, and on conflict ABORTS and refuses typed, so nothing is half-done. Reports what went across.",
-      inputSchema: { type: "object", properties: {} },
-      handler: () => gitLand(projectRoot, rootOf()),
-    },
-    {
-      name: "se_git_sync",
-      title: "se.git.sync",
-      description:
-        "SYNC trunk INTO the bound expedition, so a worktree is never silently stale — its branch was cut when the expedition was SEEDED, which may be days before it was entered. On conflict it ABORTS and refuses typed. Reports what came in.",
-      inputSchema: { type: "object", properties: {} },
-      handler: () => gitSync(projectRoot, rootOf()),
-    },
+    // `se_git_land` AND `se_git_sync` ARE DELETED (i34, found by the tester at
+    // verification). Both reconciled a record's worktree with trunk: land put
+    // the work out without closing, sync brought trunk in so a worktree was
+    // never silently stale.
+    //
+    // THEY COULD NOT SUCCEED ANY MORE. `twoTrees` refuses when the two roots
+    // are equal, and since the worktrees went, `rootOf()` IS `projectRoot` on
+    // every call. Each verb refused every time while its description still
+    // promised the reconciliation.
+    //
+    // AND THERE IS NOTHING FOR THEM TO DO. Work is written on trunk from the
+    // first keystroke, so it is landed by construction and cannot be stale.
+
     {
       name: "se_web_fetch",
       title: "se.web.fetch",

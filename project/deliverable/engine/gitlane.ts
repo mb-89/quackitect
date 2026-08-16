@@ -5,7 +5,6 @@
 // the lane works on its own repo by design) and the commit window (a
 // ledger-era law; v3 is pre-ledger).
 import { spawnSync } from "node:child_process";
-import { resolve } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 
 export interface GitResult {
@@ -150,21 +149,6 @@ export function gitLane(cwd: string, rawArgs: unknown[]): Record<string, unknown
 // The pair is deliberate. SYNC brings trunk IN so a worktree is never silently
 // stale. LAND puts the work OUT without closing anything. Close stays the
 // third thing, and it is the only one that retires a record.
-function twoTrees(root: string, worktree: string, verb: string): { branch: string; trunk: string } {
-  if (resolve(root) === resolve(worktree)) {
-    throw new Rejection({
-      clause: CLAUSES.GIT_NOT_ALLOWLISTED,
-      expected: "a bound expedition — this reconciles a worktree WITH trunk",
-      got: `${verb} with nothing bound`,
-      remedy: { tool: "se_pull", args: {}, note: "enter an expedition first; at the root there are not two trees to reconcile" },
-      source: "engine/gitlane.ts",
-    });
-  }
-  return {
-    branch: git(worktree, "rev-parse", "--abbrev-ref", "HEAD").stdout,
-    trunk: git(root, "rev-parse", "--abbrev-ref", "HEAD").stdout,
-  };
-}
 
 /** THE ENGINE'S OWN TRAIL IS NOT SOMEBODY'S UNCOMMITTED WORK. A narrated call
  *  writes the record's decisions.jsonl into the bound worktree, so a walk can
@@ -191,7 +175,7 @@ export function dirtyLines(porcelain: string): string[] {
   );
 }
 
-function refuseDirty(where: string, tree: string, what: string): void {
+function _refuseDirty(where: string, tree: string, what: string): void {
   const dirty = dirtyLines(git(where, "status", "--porcelain").stdout);
   if (dirty.length === 0) return;
   throw new Rejection({
@@ -207,7 +191,7 @@ function refuseDirty(where: string, tree: string, what: string): void {
   });
 }
 
-function crossed(where: string, before: string): string[] {
+function _crossed(where: string, before: string): string[] {
   const after = git(where, "rev-parse", "HEAD").stdout;
   if (before === after) return [];
   return git(where, "log", "--oneline", `${before}..${after}`)
@@ -215,61 +199,14 @@ function crossed(where: string, before: string): string[] {
     .filter((l) => l !== "");
 }
 
-/** LAND the bound expedition's commits on trunk, and LEAVE IT OPEN. */
-export function gitLand(root: string, worktree: string): Record<string, unknown> {
-  const { branch, trunk } = twoTrees(root, worktree, "land");
-  refuseDirty(root, trunk, "land on");
-  const before = git(root, "rev-parse", "HEAD").stdout;
-  let how = "fast-forward";
-  if (!git(root, "merge", "--ff-only", branch).ok) {
-    how = "merge";
-    const m = git(root, "merge", "--no-edit", branch);
-    if (!m.ok) {
-      git(root, "merge", "--abort");
-      throw new Rejection({
-        clause: CLAUSES.GIT_NOT_ALLOWLISTED,
-        expected: `${branch} to land on ${trunk} cleanly`,
-        got: (m.stdout || m.stderr).split("\n").slice(0, 6).join(" · "),
-        remedy: {
-          tool: "se_git_sync",
-          args: {},
-          note: "the merge was ABORTED and nothing changed — sync trunk into the expedition, settle it there, then land again",
-        },
-        source: "engine/gitlane.ts",
-      });
-    }
-  }
-  const commits = crossed(root, before);
-  return {
-    landed: commits.length,
-    how: commits.length === 0 ? "already there" : how,
-    from: branch,
-    onto: trunk,
-    commits,
-    still_open: true,
-  };
-}
-
-/** SYNC trunk INTO the bound expedition, so the worktree is never stale. */
-export function gitSync(root: string, worktree: string): Record<string, unknown> {
-  const { branch, trunk } = twoTrees(root, worktree, "sync");
-  refuseDirty(worktree, branch, "sync into");
-  const before = git(worktree, "rev-parse", "HEAD").stdout;
-  const m = git(worktree, "merge", "--no-edit", trunk);
-  if (!m.ok) {
-    git(worktree, "merge", "--abort");
-    throw new Rejection({
-      clause: CLAUSES.GIT_NOT_ALLOWLISTED,
-      expected: `${trunk} to merge into ${branch} cleanly`,
-      got: (m.stdout || m.stderr).split("\n").slice(0, 6).join(" · "),
-      remedy: {
-        tool: "se_git",
-        args: { args: ["status"] },
-        note: "the merge was ABORTED and nothing changed — settle the overlap by hand, then sync again",
-      },
-      source: "engine/gitlane.ts",
-    });
-  }
-  const commits = crossed(worktree, before);
-  return { received: commits.length, from: trunk, into: branch, commits };
-}
+// `gitLand`, `gitSync` AND `twoTrees` ARE DELETED (i34). They reconciled a
+// record's worktree with trunk in both directions, and the pair was
+// deliberate: SYNC brought trunk in so a worktree was never silently stale,
+// LAND put the work out without closing anything.
+//
+// ONE TREE MAKES BOTH EMPTY. Work is written on trunk from the first
+// keystroke, so it is landed by construction and cannot go stale.
+//
+// `twoTrees` WAS THE GUARD THAT MADE THEM UNUSABLE. It refused when the two
+// roots were equal, which after i34 they always are — so both verbs refused
+// every call while their descriptions still promised a reconciliation.

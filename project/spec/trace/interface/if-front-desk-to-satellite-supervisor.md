@@ -10,7 +10,6 @@ carries:
 form: call
 source_refs:
   - decompose-structure, the element matrix's owed cell
-  - req-entry-levels-the-record-tree
 ---
 
 Entering a record is now a start. This is where that becomes visible to a

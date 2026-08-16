@@ -6,7 +6,7 @@ kind: assumption
 statement: A running engine can serve content from a store it does not itself live in, without losing the ground it stands on.
 owner: the driving agent
 trigger: at the first reload taken while a record is bound, once the lane root moves
-status: open
+status: closed
 probe: "Bind a record on a product that does NOT edit the engine, move the lane root, and take a reload. If the engine comes back serving the bound tree's content while running from trunk's sources, this holds. If the reload cannot resolve, the answer is the seed's other branch - an engine change stays invisible until the record lands, accepted rather than fixed."
 probed: "not yet - it cannot be probed from this repository. The probe needs a product that does not edit the engine, and Quackitect is the only product here and the exception itself. Reasoning cannot settle it: both branches are consistent with everything known today."
 impact: The whole binding rests on it. If the engine cannot serve from the bound tree, an engine change stays invisible until the record lands, and the iteration's own subject cannot be developed inside its own record.
@@ -61,3 +61,19 @@ A second product that edits Quackitect's
 engine. The ownership model says that cannot happen. If it ever does,
 the exception has more than one member and the reasoning behind it is
 gone.
+
+## Closed at i34, 2026-08-16 — the question cannot arise
+
+THE ASSUMPTION WAS THAT A RUNNING ENGINE CAN SERVE A STORE IT DOES NOT LIVE IN.
+It was graded fatal and it could not be probed from this repository, because the
+probe needs a product that does not edit the engine and Quackitect is the only
+product here.
+
+THERE IS ONE STORE NOW, and the engine lives in it. Nothing binds a second tree
+for it to serve from, so the question has no subject.
+
+ONE HALF OF IT WAS ANSWERED THE HARD WAY. "Without losing the ground it stands
+on" got a live demonstration on 2026-08-16: the engine was running from inside a
+record's worktree, that worktree was removed, and the process died because its
+own sources went with it. An engine does NOT survive losing the tree it lives
+in. That is why it now lives in the only tree there is.

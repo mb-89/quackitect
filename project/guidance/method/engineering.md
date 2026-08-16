@@ -178,32 +178,34 @@ from the engine (`/widget/controls`) — the VS Code sidebar included.
 - Adding a control therefore means: a row in controls.md, at most a new
   type in params.ts — and NO extension edit in the normal case.
 
-## A UI change lands in BOTH trees (owner ruling 2026-08-06)
+## A UI change is not done until the engine restarts on it (owner ruling 2026-08-06)
 
 THE OWNER MUST SEE A UI CHANGE ON THE NEXT LOOK. Anything less costs them a
 round of "I still do not see it", and it cost several in one morning.
 
-There are TWO working trees whenever a record is bound: the root tree on
-trunk, and the record's worktree on its own branch. The engine serves ONE of
-them, and WHICH ONE depends on whether a walk is bound right now. An edit
-that lands in the other tree is invisible, and it looks exactly like a
-broken feature.
-
 The failure has a TELL, and it is worth knowing by sight. The surface shows
 NEW DATA drawn by OLD CODE — a template's raw `{token}` on screen, a
 description that updated while the control beside it did not. Data is read
-live from markdown; code only changes when the engine restarts on a tree
-that has it.
+live from markdown; code only changes when the engine restarts.
 
 So, for any change a person will LOOK at:
 
-- Commit it on trunk.
-- Sync it into the bound worktree (`se_git_sync`) if a record is bound.
+- Commit it.
 - Reload (`se_reload`), so the engine restarts on the new sources.
 - Say which surface to look at, and that a webview may want re-opening.
 
 Never report a UI change as done from a green test alone. A test proves the
 function; only the reload proves the owner can see it.
+
+THIS RULE USED TO HAVE A SECOND HALF AND i34 REMOVED IT. It read: "There are
+TWO working trees whenever a record is bound... The engine serves ONE of them,
+and WHICH ONE depends on whether a walk is bound right now. An edit that lands
+in the other tree is invisible." The middle step was `se_git_sync` into the
+bound worktree.
+
+ONE TREE ENDS THAT WHOLE CLASS. There is no other tree for an edit to land in,
+and the sync verb is deleted. What survives is the reload, which was always the
+part that made the change visible.
 
 ## The engine checks a written file, and the agent never asks
 

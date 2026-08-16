@@ -6,7 +6,7 @@ kind: assumption
 statement: An iteration's status can be read from git cheaply enough to answer whether it is open, once per iteration, without a worktree on disk.
 owner: the driving agent
 trigger: the first change to the container's open test, or the first time the container takes longer than a second to draw
-status: probed
+status: closed
 impact: The whole lifecycle change rests on this. If reading status from git is slow or unreliable at the current iteration count, the folder on disk was a cache earning its keep, and the answer becomes an explicit cache with an invalidation rather than removal of the folder.
 breaks_how_badly: crippling
 how_likely: conceivable
@@ -84,3 +84,19 @@ condition that makes something an assumption rather than a worry.
 
 WHERE IT CAME FROM. Named as the kill-criterion at i28's kickoff gate, round
 2, on 2026-08-15.
+
+## Closed at i34, 2026-08-16, and the measurement it rested on is void
+
+THE QUESTION WAS HOW EXPENSIVE GIT IS. It compared three ways of asking whether
+an iteration is open: `existsSync` at 12.6 ms, a batched `git cat-file` at
+58.7 ms, and one `git show` per iteration at 1004.2 ms. It concluded the
+assumption holds AND THE READER BATCHES.
+
+GIT IS NOT ASKED ANY MORE. A record is a folder on trunk, so its status is a
+file in the working tree and reading it is the `existsSync` path's cost, not
+the batched one's. The batched `git cat-file` this entry recommended is
+deleted.
+
+SO THE CONDITION IT NAMED IS MOOT rather than met. Recording that distinction
+matters: nobody implemented the batching this entry asked for, and nobody
+needed to.

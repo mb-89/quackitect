@@ -94,7 +94,7 @@ import {
 } from "./iterations.ts";
 import { RUN_MODES, type RunMode, readMode, storedMode, writeMode } from "./mode.ts";
 import { parseStateNote, readNode, section, withPass, writeNode } from "./notes.ts";
-import { pathKind, recordOwnerOf, resolveInRoot, seDir } from "./paths.ts";
+import { pathKind, resolveInRoot, seDir } from "./paths.ts";
 import { mintFlipLines } from "./pugh.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
@@ -964,15 +964,12 @@ export class Session {
    *  which one they mean instead of the engine guessing — which it did three
    *  times before this existed, differently each time. */
   corpora(): { id: string; label: string; path: string }[] {
-    const out = [{ id: "trunk", label: "trunk", path: this.machineRoot() }];
-    try {
-      for (const it of itList(this.machineRoot()).filter((x) => x.open)) {
-        out.push({ id: it.id, label: it.id.split("-")[0] ?? it.id, path: it.path });
-      }
-    } catch {
-      // no iterations yet, so trunk is the whole story
-    }
-    return out;
+    // ONE CORPUS, BECAUSE THERE IS ONE TREE (i34, found by the tester at
+    // verification). This offered trunk plus one entry per open iteration, so
+    // the person could pick which tree they meant. Every entry's path is now
+    // the same root, so the picker asked a question with one answer twenty-two
+    // times over — and defaulted to the LAST open iteration rather than trunk.
+    return [{ id: "trunk", label: "trunk", path: this.machineRoot() }];
   }
 
   /** Where the lane resolves ONE path (owner ruling 2026-07-28).
@@ -1003,42 +1000,26 @@ export class Session {
     // Resolving the write is the better one: nothing is refused, and the file
     // cannot land in a tree that does not own it.
     if (kind === "method") return this.machineRoot();
-    // A RECORD'S OWN CONTENT IS READ FROM THE RECORD'S TREE, bound or not.
-    // The mirror painted i1's states out of trunk while i1's worktree held
-    // the fall that knocked them down, and both halves were working — they
-    // were simply looking at different files.
-    if (kind === "record") return this.recordRoot(rel) ?? this.workRoot();
+    // A RECORD'S OWN CONTENT IS IN THE SAME TREE AS EVERYTHING ELSE. This
+    // used to ask `recordRoot(rel)` which tree owned the record and fall back
+    // to the working root; both answers are now the same root, so the question
+    // is not asked.
+    void rel;
     return this.workRoot();
   }
 
-  /** WHERE ONE RECORD'S OWN CONTENT LIVES.
-   *
-   *  An OPEN record owns its worktree, so that is the only copy that counts.
-   *  A CLOSED one has landed and its tree is gone, so undefined here falls
-   *  back to the working root and finds the landed archive.
-   *
-   *  SELF-HOSTING WOULD CHANGE THIS, and it is NOT switched on here yet. A
-   *  record can only walk on trunk once its content IS on trunk, and i27's
-   *  content stands on its own branch. Levelling is what moves it, and that
-   *  is supervisor-level's act with a real git adapter behind it. Flipping
-   *  the answer before the levelling would point the walk at a trunk that
-   *  does not hold the record — measured on 2026-08-14, when it hid four
-   *  design specs. */
-  private recordRoot(rel: string): string | undefined {
-    const owner = recordOwnerOf(rel);
-    if (owner === undefined) return undefined;
-    try {
-      const found =
-        owner.container === "iterations"
-          ? itList(this.machineRoot()).find((x) => x.id === owner.id)
-          : expList(this.machineRoot()).find((x) => x.id === owner.id);
-      return found?.open === true ? found.path : undefined;
-    } catch {
-      // A record list that cannot be read must not take path resolution down
-      // with it — the working root is always a legal answer.
-      return undefined;
-    }
-  }
+  // `recordRoot` IS DELETED (i34, found by the tester at verification). It
+  // answered "which tree owns this record" — the open record's worktree, or
+  // undefined for a closed one so the caller fell back to the working root.
+  //
+  // A CHOOSER THAT HAPPENS TO HAVE ONE BRANCH IS STILL A CHOOSER. Both answers
+  // became the same root when the worktrees went, so it returned correctly and
+  // kept asking. The requirement demands the ABSENCE of the question, and this
+  // was on every lane call for a record path.
+  //
+  // ITS DOCSTRING WAS ALREADY FALSE, which is how the tester found it: "An
+  // OPEN record owns its worktree... A CLOSED one has landed and its tree is
+  // gone." Neither sentence describes anything that now exists.
 
   // `methodTrees` AND `fanOutMethod` ARE DELETED (i34). The first answered
   // "every tree the method lives in"; the second copied a method write into
@@ -2688,8 +2669,37 @@ export class Session {
     // the walk fell back to the front desk and went THERE while the
     // chosen door sat recorded and unwalked. Proven live 2026-08-05 —
     // choice "expeditions" at autonomy 0.2 answered `do` for front_desk.
-    const targetNow = (): string =>
-      this._target === "" && this.active()[0] !== undefined && this.active()[0] !== "front_desk" ? "front_desk" : this._target;
+    // A DEFAULT TARGET IS NOT AN AIM (i34, req-a-pull-carrying-no-choice-enters-no-iteration).
+    //
+    // With nothing aimed, the walk falls back to the front desk so an idle
+    // agent drifts home rather than standing nowhere. That fallback WALKED A
+    // CHOICE POINT: standing on the iterations container with two records
+    // open, a bare pull left through the container's exit and arrived at the
+    // desk, because the desk looked like somewhere it had been told to go.
+    //
+    // THE REQUIREMENT HAS TWO CONJUNCTS and this is the second: the engine
+    // "shall enter no iteration AND shall answer with the offer". Leaving
+    // satisfies the first and fails the second, which is exactly the half a
+    // tester with fresh eyes caught after the builder tested only the first.
+    //
+    // SO A CHOICE POINT HOLDS THE DEFAULT. Where the walk stands on a state
+    // offering more than one alternative and nobody has aimed anywhere, the
+    // target is HERE. A real aim still crosses it, because that is somebody
+    // saying where they want to be.
+    const choiceHere = (): boolean => {
+      const here = this.active()[0];
+      if (here === undefined) return false;
+      const { machine } = this.leaves();
+      const bare = here.slice(here.lastIndexOf("/") + 1);
+      const decl = machine.states.find((s) => s.id === bare);
+      return (decl?.edges.filter((e) => e.role === "alternative").length ?? 0) > 1;
+    };
+    const targetNow = (): string => {
+      if (this._target !== "") return this._target;
+      const here = this.active()[0];
+      if (here === undefined || here === "front_desk") return this._target;
+      return choiceHere() ? here : "front_desk";
+    };
     const head = (): Record<string, unknown> => ({
       where: this.active(),
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
@@ -2819,9 +2829,23 @@ export class Session {
       }
       const stalled = this.stalledClaim(r, head, extra);
       if (stalled !== undefined) return stalled;
+      // A WAIT AT A BRANCHING POINT SHOWS ITS DOORS (i34,
+      // req-a-pull-carrying-no-choice-enters-no-iteration).
+      //
+      // This branch answers "there is nowhere to go", which is the truth and
+      // not the whole of it. Standing on a state that offers several ways on,
+      // the walk is waiting FOR A CHOICE, and an answer that names none leaves
+      // the reader to guess a door and read the refusal.
+      //
+      // THE REQUIREMENT ASKS FOR EXACTLY THIS. A pull carrying no choice
+      // "shall enter no iteration AND shall answer with the offer", and the
+      // second half was missing while the first passed — which is the half a
+      // tester with fresh eyes caught.
+      const waitingOpts = this.pullOptions();
       return {
         pull: "wait",
         ...head(),
+        ...(waitingOpts.length > 1 ? { options: waitingOpts } : {}),
         waiting_for: "the person",
         why: r.found ? "the target is where the walk already stands, and it owes nothing" : (r.note ?? "no way there"),
         ...extra(),

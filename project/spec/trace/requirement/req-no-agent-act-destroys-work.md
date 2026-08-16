@@ -15,7 +15,6 @@ source_refs:
   - "guidance/refusals.md: SE-C-002 — no history rewrite"
   - "guidance/refusals.md: SE-C-003 — the agent never pushes"
   - req-archive-read-only
-  - req-land-is-one-piece
 priority: must
 ---
 

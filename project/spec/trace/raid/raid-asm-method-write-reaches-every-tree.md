@@ -6,9 +6,9 @@ kind: assumption
 statement: A shared method write reaches every tree, so a method fix made inside a bound record also stands on trunk.
 owner: the driving agent
 trigger: a shared method file differs between trunk and a record's worktree
-status: open
-probed: "2026-08-15"
-probe: "unprobed - the merge at close is still the check. product.md now states the method resolution is already live, which strengthens it without settling it."
+status: closed
+probed: "2026-08-16"
+probe: "SETTLED BY CONSTRUCTION at i34, and the mechanism it watched is deleted. There is one tree, so a method write reaches every tree by being the only copy. What this entry existed to catch — a shared file differing between trunk and a record's worktree — cannot happen, because the second tree does not exist. The fan-out that used to make it true (fanOutMethod, setMethodMirror) and the levelling that repaired it (backfillInto, levelTree) are all deleted."
 impact: i27 emitted the meth-consistency-sweep fix to this record's promotions. If the write stayed in the worktree alone, the promotion is not landed and the same emit repeats in the next record.
 breaks_how_badly: abrasive
 how_likely: conceivable

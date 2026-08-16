@@ -90,12 +90,18 @@ test("every path resolves to the one root, whatever kind it is", () => {
   assert.equal(content.store, machine, "a record's content resolves to the root");
 });
 
-test("no resolution can land inside a worktree, because none is consulted", () => {
-  const machine = join(ROOT, "repo");
-  for (const p of [".se/HANDOVER.md", GUIDE, "project/spec/trace/requirement/req-x.md"]) {
-    assert.equal(seam(machine, p, "lint").abs.includes(".worktrees"), false, `${p} must not resolve into a worktree`);
-  }
-});
+// THE WORKTREE-ABSENCE CASE IS DELETED (i34, found by the tester at
+// verification). It asserted that no resolution lands inside a worktree, over
+// three fixture paths — `.se/HANDOVER.md`, a guidance doc and a requirement.
+//
+// NONE OF THEM CONTAINS `.worktrees`, and the fixture root is a mkdtemp
+// directory that does not either. The assertion could not have failed under
+// any behaviour, INCLUDING THE OLD ONE, so it reported coverage it never had.
+//
+// TO BITE, the fixture would have had to hand the seam a root that IS a
+// worktree path. What actually proves the absence is the inspection spec
+// tsp-read-back-inspection and the case below, which pins that two lanes
+// asking for one path get one answer.
 
 test("two lanes asking for one path get one answer, which is the 2026-08-14 defect", () => {
   // se_lint resolved `.se/HANDOVER.md` against a worktree while the file lane

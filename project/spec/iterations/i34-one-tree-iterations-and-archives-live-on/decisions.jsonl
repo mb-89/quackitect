@@ -427,3 +427,76 @@
 {"ts":"2026-08-16T09:03:49.944Z","op":"update","visit":"iterations/i34/observe-red@0","node":"d13","brief":"the demonstration spec describes six steps and no adopt"}
 {"ts":"2026-08-16T09:04:51.324Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@0","node":"d14","brief":"delete-the-seam filled"}
 {"ts":"2026-08-16T09:07:28.173Z","op":"defer","visit":"iterations/i34/draft-vision@0","node":"d5","brief":"verification","to":"verification","hops":1,"trail":["iterations/i34/draft-vision","verification"]}
+{"ts":"2026-08-16T09:11:26.231Z","op":"update","visit":"iterations/i34/verification@0","node":"d15","brief":"tester: inspecting the container's option shape to judge test 2 for a false green"}
+{"ts":"2026-08-16T09:11:26.591Z","op":"update","visit":"iterations/i34/verification@0","node":"d16","brief":"the tester is verifying with fresh eyes; the claims field waits on its report"}
+{"ts":"2026-08-16T09:11:34.110Z","op":"update","visit":"iterations/i34/verification@0","node":"d17","brief":"tester: reading branch-option construction for the false-green check"}
+{"ts":"2026-08-16T09:11:38.171Z","op":"update","visit":"iterations/i34/verification@0","node":"d18","brief":"tester: reading pullOptions for the offered door's `to` format"}
+{"ts":"2026-08-16T09:11:41.696Z","op":"update","visit":"iterations/i34/verification@0","node":"d19","brief":"tester: reading doorOption/pullOptions body"}
+{"ts":"2026-08-16T09:11:45.991Z","op":"update","visit":"iterations/i34/verification@0","node":"d20","brief":"tester: reading the scoped onetree run's verdict"}
+{"ts":"2026-08-16T09:11:55.836Z","op":"update","visit":"iterations/i34/verification@0","node":"d21","brief":"tester: confirming option id prefixing"}
+{"ts":"2026-08-16T09:12:06.308Z","op":"update","visit":"iterations/i34/verification@0","node":"d22","brief":"tester: pinning qualHere's definition"}
+{"ts":"2026-08-16T09:12:18.459Z","op":"update","visit":"iterations/i34/verification@0","node":"d23","brief":"tester: reading qualHere definition and uses"}
+{"ts":"2026-08-16T09:12:36.407Z","op":"update","visit":"iterations/i34/verification@0","node":"d24","brief":"tester: checking the seeded status string that markStarted keys on"}
+{"ts":"2026-08-16T09:13:05.190Z","op":"update","visit":"iterations/i34/verification@0","node":"d25","brief":"tester: checking whether the land/sync pair is still a live two-tree chooser"}
+{"ts":"2026-08-16T09:13:11.266Z","op":"update","visit":"iterations/i34/verification@0","node":"d26","brief":"tester: resolving rootOf in the tool layer"}
+{"ts":"2026-08-16T09:13:17.827Z","op":"update","visit":"iterations/i34/verification@0","node":"d27","brief":"tester: reading recordRoot, the last candidate chooser on the lane path"}
+{"ts":"2026-08-16T09:13:31.313Z","op":"update","visit":"iterations/i34/verification@0","node":"d28","brief":"tester: checking whether se_git_land and se_git_sync can still succeed after i34"}
+{"ts":"2026-08-16T09:13:43.252Z","op":"update","visit":"iterations/i34/verification@0","node":"d29","brief":"tester: reading the gitlane cases for assertions on deleted behaviour"}
+{"ts":"2026-08-16T09:13:55.743Z","op":"update","visit":"iterations/i34/verification@0","node":"d30","brief":"tester: checking the claim ledger and worktreesDir for live callers"}
+{"ts":"2026-08-16T09:14:05.751Z","op":"update","visit":"iterations/i34/verification@0","node":"d31","brief":"tester: reading the non-test observation specs, batch one"}
+{"ts":"2026-08-16T09:14:12.220Z","op":"update","visit":"iterations/i34/verification@0","node":"d32","brief":"tester: reading the non-test observation specs, batch two"}
+{"ts":"2026-08-16T09:14:42.866Z","op":"update","visit":"iterations/i34/verification@0","node":"d33","brief":"tester: running the earned battery to catch tests asserting deleted i34 behaviour"}
+{"ts":"2026-08-16T09:14:47.034Z","op":"update","visit":"iterations/i34/verification@0","node":"d34","brief":"tester: applying the read-back checklist to bound-engine.test.ts"}
+{"ts":"2026-08-16T09:15:15.247Z","op":"update","visit":"iterations/i34/verification@0","node":"d35","brief":"tester: checking the battery"}
+{"ts":"2026-08-16T09:15:29.579Z","op":"update","visit":"iterations/i34/verification@0","node":"d36","brief":"tester: locating the mechanical trace-integrity check"}
+{"ts":"2026-08-16T09:15:48.786Z","op":"update","visit":"iterations/i34/verification@0","node":"d37","brief":"tester: sweeping the register for entries i34 falsified"}
+{"ts":"2026-08-16T09:16:12.204Z","op":"update","visit":"iterations/i34/verification@0","node":"d38","brief":"tester: battery status"}
+{"ts":"2026-08-16T09:16:27.491Z","op":"update","visit":"iterations/i34/verification@0","node":"d39","brief":"tester: confirming the two dangling requirement ids"}
+{"ts":"2026-08-16T09:16:37.247Z","op":"update","visit":"iterations/i34/verification@0","node":"d40","brief":"tester: checking requirement nodes i34 may have falsified"}
+{"ts":"2026-08-16T09:16:50.822Z","op":"update","visit":"iterations/i34/verification@0","node":"d41","brief":"tester: reading i34's declared scope to judge which leftovers were non-goals"}
+{"ts":"2026-08-16T09:17:00.574Z","op":"update","visit":"iterations/i34/verification@0","node":"d42","brief":"tester: checking the tree for surviving worktree and claim artefacts"}
+{"ts":"2026-08-16T09:17:11.103Z","op":"update","visit":"iterations/i34/verification@0","node":"d43","brief":"tester: last checks — selection-state coverage and the claimed-iteration measure"}
+{"ts":"2026-08-16T09:17:22.101Z","op":"update","visit":"iterations/i34/verification@0","node":"d44","brief":"tester: confirming land/sync always receive one and the same tree"}
+{"ts":"2026-08-16T09:17:35.878Z","op":"update","visit":"iterations/i34/verification@0","node":"d45","brief":"tester: final check on the land/sync arguments"}
+{"ts":"2026-08-16T09:17:39.955Z","op":"update","visit":"iterations/i34/verification@0","node":"d46","brief":"tester: locating the coreTools call site"}
+{"ts":"2026-08-16T09:17:43.867Z","op":"update","visit":"iterations/i34/verification@0","node":"d47","brief":"tester: locating coreTools call sites by file"}
+{"ts":"2026-08-16T09:17:47.872Z","op":"update","visit":"iterations/i34/verification@0","node":"d48","brief":"tester: reading the coreTools call site"}
+{"ts":"2026-08-16T09:18:03.892Z","op":"update","visit":"iterations/i34/verification@0","node":"d49","brief":"tester: checking whether the corpora chooser is still served"}
+{"ts":"2026-08-16T09:20:38.168Z","op":"plan","visit":"iterations/i34/verification@0","parent":null,"nodes":[{"id":"d50","brief":"the three surviving choosers"},{"id":"d51","brief":"the false green in resolution.test.ts"},{"id":"d52","brief":"the four falsified requirements"},{"id":"d53","brief":"the documents and tool descriptions"},{"id":"d54","brief":"the offer half of the bare-pull test"},{"id":"d55","brief":"re-verify with the same tester"}]}
+{"ts":"2026-08-16T09:21:18.714Z","op":"done","visit":"iterations/i34/verification@0","node":"d55","brief":"the tester reported; its findings are the fix-findings list"}
+{"ts":"2026-08-16T09:21:33.322Z","op":"update","visit":"iterations/i34/verification@0","node":"d56","brief":"finding the debts the unobservable specs are owed against"}
+{"ts":"2026-08-16T09:24:33.093Z","op":"update","visit":"iterations/i34/verification@0","node":"d57","brief":"reopening the chunk whose claim the findings disprove"}
+{"ts":"2026-08-16T09:24:54.715Z","op":"update","visit":"iterations/i34/verification@0","node":"d58","brief":"clearing the aim so the objective finds the reopened chunk"}
+{"ts":"2026-08-16T09:26:12.494Z","op":"update","visit":"iterations/i34/verification@0","node":"d59","brief":"trying the branch return to reach the reopened chunk"}
+{"ts":"2026-08-16T09:27:14.933Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d60","brief":"reading the three choosers the tester found"}
+{"ts":"2026-08-16T09:28:29.010Z","op":"done","visit":"iterations/i34/verification@0","node":"d50","brief":"the three surviving choosers are cut"}
+{"ts":"2026-08-16T09:28:38.588Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d61","brief":"clearing what the deletions orphaned"}
+{"ts":"2026-08-16T09:28:49.261Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d62","brief":"the land and sync imports go with their verbs"}
+{"ts":"2026-08-16T09:28:56.192Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d63","brief":"biome already fixed the imports; asking what the cuts broke"}
+{"ts":"2026-08-16T09:29:33.879Z","op":"done","visit":"iterations/i34/verification@0","node":"d51","brief":"the false green and the case testing deleted verbs are both deleted"}
+{"ts":"2026-08-16T09:29:42.665Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d64","brief":"reading the four before judging them"}
+{"ts":"2026-08-16T09:30:15.530Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d65","brief":"the shipped-record row keeps its demand and loses the ledger"}
+{"ts":"2026-08-16T09:30:23.303Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d66","brief":"stripping the three vacuous rows from every list"}
+{"ts":"2026-08-16T09:30:29.771Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d67","brief":"deleting the three vacuous rows"}
+{"ts":"2026-08-16T09:30:39.912Z","op":"done","visit":"iterations/i34/verification@0","node":"d52","brief":"one row rewritten and three vacuous ones deleted"}
+{"ts":"2026-08-16T09:30:45.787Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d68","brief":"reading the guidance that still describes two trees"}
+{"ts":"2026-08-16T09:30:58.176Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d69","brief":"the two-trees rule is rewritten to the reload that always mattered"}
+{"ts":"2026-08-16T09:31:18.531Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d70","brief":"the refusal page stops naming a deleted file as the engine's own right"}
+{"ts":"2026-08-16T09:31:38.045Z","op":"done","visit":"iterations/i34/verification@0","node":"d53","brief":"the guidance, the tool descriptions and the ledger constant tell the truth"}
+{"ts":"2026-08-16T09:31:46.741Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d71","brief":"the bare-pull case asserts no entry but never the offer"}
+{"ts":"2026-08-16T09:32:00.992Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d72","brief":"the case now asserts both conjuncts"}
+{"ts":"2026-08-16T09:32:52.339Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d73","brief":"an unset target reads as an aim at the desk, which walks the choice point"}
+{"ts":"2026-08-16T09:33:11.975Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d74","brief":"a choice point holds the default target"}
+{"ts":"2026-08-16T09:34:41.031Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d75","brief":"making the failure print the whole answer"}
+{"ts":"2026-08-16T09:35:33.559Z","op":"done","visit":"iterations/i34/verification@0","node":"d54","brief":"the wait branch now carries the offer the requirement demands"}
+{"ts":"2026-08-16T09:36:27.115Z","op":"plan","visit":"iterations/i34/build-steps/delete-the-seam@1","parent":null,"nodes":[{"id":"d76","brief":"the six stale register entries"},{"id":"d77","brief":"the dangling prose links and dead export"},{"id":"d78","brief":"the value-prop measures"},{"id":"d79","brief":"the now-false spec prose"},{"id":"d80","brief":"the same tester sees the deltas"}]}
+{"ts":"2026-08-16T09:36:40.603Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d81","brief":"the verb ratchet counted the two deleted git verbs"}
+{"ts":"2026-08-16T09:36:50.387Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d82","brief":"the ratchet moves to 34 with the reason recorded"}
+{"ts":"2026-08-16T09:37:11.291Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d77","brief":"the dangling prose links and the dead export are gone"}
+{"ts":"2026-08-16T09:37:18.922Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d83","brief":"reading the stale register entries"}
+{"ts":"2026-08-16T09:37:56.595Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d84","brief":"four register entries settled with their measurements kept"}
+{"ts":"2026-08-16T09:38:19.513Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d76","brief":"all six register entries carry a dated look"}
+{"ts":"2026-08-16T09:38:27.036Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d85","brief":"reading the measures that count claims"}
+{"ts":"2026-08-16T09:38:44.990Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d78","brief":"the value-prop measures follow the promise rather than the deleted mechanism"}
+{"ts":"2026-08-16T09:38:53.154Z","op":"update","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d86","brief":"the last three carrying deleted mechanisms"}
+{"ts":"2026-08-16T09:39:10.914Z","op":"done","visit":"iterations/i34/build-steps/delete-the-seam@1","node":"d79","brief":"the last spec prose describes what exists"}

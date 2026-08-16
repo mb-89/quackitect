@@ -1,5 +1,6 @@
 ---
 form: delete-the-seam
+reopened: "2026-08-16T09:24:33.118Z — a tester with fresh eyes found three tree-choosers still standing — Session.recordRoot, twoTrees in gitlane.ts, and Session.corpora() — so the claim that no call selects between trees does not pass its own content"
 by: agent
 signed_off: 2026-08-16T09:04:55.605Z
 authors: agent

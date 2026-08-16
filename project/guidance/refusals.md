@@ -46,11 +46,11 @@ forward with a new commit.
 ### SE-C-003 — the agent never pushes
 Pushing is the owner's act. Do not attempt it, and do not ask the shell to.
 
-THE ENGINE'S OWN RIGHT IS SEED STUBS AND THE CLAIM FILE (owner rulings
-2026-08-11 and 2026-08-12). The machinery itself pushes the iteration
-seed stub, the expedition seed stub and the claim file, as acts of the
-claim lane (engine/claims.ts) — never on an agent's request. Everything
-else keeps refusing here.
+NOTHING PUSHES ANY MORE, not even the engine (i34). The machinery used to push
+the iteration seed stub, the expedition seed stub and the claim file, as acts
+of the claim lane. A record is a folder on trunk now and the claim system is
+retired, so there is no stub to announce and no claim file to write. Every push
+refuses here, without exception.
 
 ### SE-C-004 — git beyond the allowlist
 `se_git` covers an allowlist of verbs. A job outside it belongs to the

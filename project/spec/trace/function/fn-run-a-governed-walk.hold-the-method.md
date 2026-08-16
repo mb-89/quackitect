@@ -16,7 +16,6 @@ satisfies:
   - req-reading-credit-survives-a-reload
   - req-reload-restarts-clean
   - req-guidance-edit-lands-where-it-compiles
-  - req-diverged-trees-reported-never-merged
   - req-overlay-resolution
   - req-overlay-survives-update
   - req-overlay-drift-reported
@@ -24,7 +23,6 @@ satisfies:
   - req-setup-serves-shipped-method
   - req-method-reuse-is-vendoring
   - req-an-engine-change-applies-in-its-own-record
-  - req-entry-levels-the-record-tree
 inputs:
   - flow-method-sources
   - flow-overlay

@@ -6,7 +6,7 @@ kind: assumption
 statement: Nothing outside a record's own folder addresses that record by its worktree path, so moving the folder to trunk moves everything that points at it.
 owner: the engine maintainer
 trigger: before the levelling step moves any record folder onto trunk
-status: open
+status: closed
 impact: If something outside the folder holds a worktree path, the levelling silently breaks that reader and the damage shows up as a record whose evidence reads as missing — the exact shape that took i12 four moves to undo.
 breaks_how_badly: crippling
 how_likely: plausible
@@ -40,3 +40,23 @@ folders. A wrong answer discovered afterwards means the move already happened,
 and the reader that broke is one nobody was watching.
 
 IT IS CHEAP. Three searches, and the whole engine is 26 files.
+
+## Closed at i34, 2026-08-16 — the one reader it caught was fixed
+
+THE PROBE FOUND EXACTLY ONE VIOLATION and it was repaired in the same
+iteration. `ModelFileSystem.stamp` matched the root against a
+`/.worktrees/(id)/` pattern to write `minted_in`, which is a reader outside
+every record folder taking a record's identity from a worktree path. Under one
+tree the pattern would never match and the stamp would silently stop.
+
+IT NOW ASKS THE WALK. The stamp takes the bound record's id from the session
+rather than parsing it out of a directory name, so it does not depend on where
+the folder sits.
+
+THE PROBE'S OTHER HALF HELD AND IS WHY THE MOVE WAS SAFE: every other record
+path is built from the id plus a relative path, so it follows the folder
+wherever it goes. All 35 record folders now stand on trunk and no reader broke.
+
+THE ENTRY IS KEPT RATHER THAN DELETED because its probe is the evidence that
+the levelling was safe, and a reader asking "how do you know nothing broke"
+should find the answer rather than an absence.

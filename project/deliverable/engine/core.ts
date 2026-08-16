@@ -17,7 +17,9 @@ import { type Owner, routeToOwner } from "./paths.ts";
  *
  *  Each is machine-wide and single. Two writers with no owner is
  *  raid-risk-many-writers-one-ledger. */
-export const CORE_LEDGERS = [".se/claims.jsonl", ".se/notes.jsonl", ".se/calls.jsonl"] as const;
+// `.se/claims.jsonl` WAS THE FIRST OF THESE AND i34 REMOVED IT with the
+// machine-locking specification. Nothing writes it and nothing reads it.
+export const CORE_LEDGERS = [".se/notes.jsonl", ".se/calls.jsonl"] as const;
 
 /** THE CALL LOG IS THE EXCEPTION, and it is deliberate.
  *

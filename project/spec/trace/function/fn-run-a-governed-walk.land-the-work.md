@@ -5,7 +5,6 @@ type: "[[function]]"
 cluster: the-record-life
 statement: put finished work on the trunk, whole or not at all
 satisfies:
-  - req-land-is-one-piece
   - req-no-agent-act-destroys-work
   - req-land-demands-fresh-green
   - req-land-target-routes-to-gate

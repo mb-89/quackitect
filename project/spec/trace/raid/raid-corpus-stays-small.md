@@ -14,6 +14,7 @@ probed: 2026-08-13
 impact: Green is recomputed from disk on every render. If that stops being cheap, the honest fix is a cache — and a cache is the thing this design just spent a day removing.
 source_refs:
   - engine/session.ts recordDone
+  - "i34 2026-08-16: methodFilesIn is deleted, so the whole-folder method scan this entry named is gone; the whole-corpus green recomputation it also names still stands"
   - engine/paths.ts methodFilesIn
   - req-call-answers-in-one-second
 ---

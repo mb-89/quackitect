@@ -73,16 +73,17 @@ that opens it to the landing that ends it.
 
 THE MERGE OF i28 BROUGHT THREE. [[req-entering-repairs-itself-or-names-the-remedy]]
 stands unchanged and is about entry doing its own repair.
+[[req-work-starts-without-a-reachable-remote]] stands with its statement
+rewritten: the demand that a machine off the network can still find work and
+start it survives one tree, and is satisfied by construction rather than by a
+fallback path.
 
-TWO ARE CONTRADICTED BY i34 AND ARE LISTED HERE ON PURPOSE, so that the
-supersession is visible rather than silent.
+THE THIRD PAIR WAS RETIRED, and both are gone from the corpus rather than
+linked from here. One said the list of records comes from git's branches; the
+record's own status is the answer now. The other said a worktree stands only
+for a bound walk; there are no worktrees.
 
-- [[req-the-iteration-list-comes-from-git]] says the list of records comes from
-  git's branches. i34 makes the record's own status the answer.
-- [[req-a-worktree-exists-only-while-a-walk-is-bound]] says a worktree stands
-  only for a bound walk. i34 removes worktrees entirely.
-
-THEY ARE NOT DELETED AT THE MERGE, because a merge records what the other side
-said. They are retired by the chunks that actually change the behaviour —
-`status-is-the-open-flag` and `cut-worktrees-from-seed` — and each takes its
-requirement node down with it.
+NAMING THEM AS LINKS WAS THE MISTAKE. This section listed both as `[[...]]`
+wikilinks so the supersession would be visible, and then the chunks deleted the
+nodes as promised — leaving two links pointing at nothing. The coverage check
+never saw it, because it reads frontmatter edges and these were prose.

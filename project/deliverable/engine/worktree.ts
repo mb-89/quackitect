@@ -52,9 +52,8 @@ export interface Expedition {
   open: boolean;
 }
 
-export function worktreesDir(root: string): string {
-  return join(root, ".worktrees");
-}
+// `worktreesDir` IS DELETED (i34). It answered where a record's checkout would
+// live. There are no worktrees, and nothing called it.
 
 /** The expedition's RECORD lives ON ITS BRANCH (owner ruling 2026-07-27:
  *  work state rides the worktree) at a spec path — so the merge lands

@@ -10,7 +10,6 @@ carries:
 form: append
 source_refs:
   - decompose-structure, the element matrix's owed cell
-  - req-diverged-trees-reported-never-merged
 ---
 
 ## Reported, never merged

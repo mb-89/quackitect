@@ -6,7 +6,6 @@ statement: An agent changes the engine or the method from inside their record, t
 method: "test"
 verifies:
   - "req-an-engine-change-applies-in-its-own-record"
-  - "req-entry-levels-the-record-tree"
 files:
   - tests/bound-engine.test.ts
 ---

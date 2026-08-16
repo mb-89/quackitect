@@ -9,7 +9,6 @@ group: the-walk
 implements:
   - fn-run-a-governed-walk.hold-the-work
 satisfies:
-  - req-entry-levels-the-record-tree
   - req-an-engine-change-applies-in-its-own-record
   - req-crash-lands-safe
 source_refs:

@@ -2,16 +2,14 @@
 minted_in: i1
 id: tsp-close-and-land
 type: "[[test-spec]]"
-statement: A close refuses loose ends, serves its findings, and lands as one merge or none, with the two trees never mixing, verified by test over the close and land paths.
+statement: A close refuses loose ends and serves its findings, verified by test over the close path.
 method: "test"
 verifies:
   - "req-close-refuses-loose-ends"
   - "req-close-serves-its-findings"
   - "req-close-leaves-trunk-clean"
-  - "req-land-is-one-piece"
   - "req-land-demands-fresh-green"
   - "req-reject-names-the-redo"
-  - "req-diverged-trees-reported-never-merged"
 files:
   - "tests/editsafety.test.ts"
   - "tests/gitlane.test.ts"
@@ -42,3 +40,16 @@ claim. The load-bearing steps: the close is atomic: a conflicting merge
 aborts and refuses typed, the root stands clean; closing on an
 unconfirmed report is refused, and the override is recorded; the close
 COMMITS the trunk's strays rather than refusing, and says which.
+
+## What i34 removed from this spec
+
+THE STATEMENT CARRIED TWO CLAIMS THAT NO LONGER EXIST: landing "as one merge
+or none", and "the two trees never mixing". Both named a record's branch, and
+both requirements behind them are retired — req-land-is-one-piece and
+req-trees-never-mix.
+
+THERE IS NO LANDING ACT LEFT TO BE ATOMIC. Work is written on trunk from the
+first keystroke, so it is landed continuously rather than in one merge.
+
+WHAT SURVIVES IS THE CLOSE, and it is the half that was always about judgment
+rather than plumbing: a close refuses loose ends, and it serves its findings.

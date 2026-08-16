@@ -45,18 +45,13 @@ test("the dirty gate excuses the engine's own trail, and nothing else", () => {
   assert.deepEqual(dirtyLines("?? new-idea.md\n M engine/run.ts"), [" M engine/run.ts"], "a tracked modification still does");
 });
 
-// LAND and SYNC reconcile a worktree WITH trunk, so both need two trees. At
-// the root there is only one, and a silent no-op there would be worse than a
-// refusal — the caller would believe their work had gone across.
-test("land and sync refuse when nothing is bound", async () => {
-  const server = await bootedServer(freshRoot());
-  for (const tool of ["se_git_land", "se_git_sync"]) {
-    const r = await call(server, tool, {});
-    assert.equal(r.isError, true, `${tool} must refuse at the root`);
-    assert.equal(r.body.clause, "SE-C-004");
-    assert.match(String(r.body.got), /with nothing bound/);
-  }
-});
+// THE LAND AND SYNC CASE IS DELETED (i34). It pinned that both verbs refuse at
+// the root, where there is only one tree, because a silent no-op would let the
+// caller believe their work had gone across.
+//
+// BOTH VERBS ARE GONE. There is only ever one tree now, so they refused every
+// call — and there is nothing for them to do: work is written on trunk from
+// the first keystroke, so it is landed by construction and cannot go stale.
 
 function gitInit(root: string): void {
   const g = (...a: string[]): void => {

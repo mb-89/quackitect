@@ -15,9 +15,21 @@ priority: must
 - Machines that are not systematic engineering run in production daily.
   Metric: distinct non-SE machines walked per week (boot, the desk, the retro, the expeditions today). Target: three or more.
 - Two machines ship two iterations concurrently without collisions.
-  Metric: double-claimed iterations. Target: zero.
-- A new machine joins with one install and one claim.
-  Metric: acts from clone to first claimed iteration. Target: two.
+  Metric: iterations walked by two machines at once. Target: zero.
+- A new machine joins with one install and one command.
+  Metric: acts from clone to a walking agent on a named record. Target: two.
+
+BOTH MEASURES USED TO COUNT CLAIMS, and i34 retired the claim system whole.
+The first read "double-claimed iterations" and the second "acts from clone to
+first claimed iteration". Neither counts anything now.
+
+THE PROMISES ARE UNCHANGED and the measures follow them rather than the
+mechanism. What was a lock is now a person saying who takes what, recorded as
+[[raid-asm-only-one-agent-works-a-clone-at-a-time]] with its own trigger.
+
+THE FIRST MEASURE IS HARDER TO TAKE THAN IT WAS. A ledger could be counted; a
+collision now shows only as two machines' commits on one record. That is a
+real loss of instrumentation, stated rather than glossed.
 
 ## Unlike
 

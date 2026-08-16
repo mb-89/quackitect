@@ -6,7 +6,8 @@ kind: decision
 statement: A worktree exists exactly while a live claim exists, so nothing creates one and nothing removes one as a separate act.
 owner: the owner
 trigger: superseded only, or the first time a person wants a folder to outlive its claim on purpose
-status: decided
+status: superseded
+superseded_by: raid-dec-one-tree-beats-a-record-travelling-between-machines
 breaks_how_badly: crippling
 how_likely: conceivable
 source_refs:
@@ -62,3 +63,18 @@ ONE OPTION IS NOT REJECTED AND IS NOT ADOPTED. [[opt-no-worktrees-at-all-every-r
 - A CLAIM NOW OWNS A DIRECTORY. It was a small text file, and that seam is where a failure would show first.
 - RELEASING A CLAIM DESTROYS UNCOMMITTED WORK unless something commits first. That guard becomes mandatory rather than advisory.
 - NOTHING RELEASES A CLAIM BUT A PERSON, so that destruction is always somebody's deliberate act ([[raid-dec-a-claim-ends-only-when-a-person-releases-it]]). No timer can take a tree away from a walk that merely paused.
+
+## Superseded at i34, 2026-08-16
+
+BOTH SIDES OF THIS DECISION ARE GONE. There are no worktrees and there are no
+claims, so "a worktree exists exactly while a live claim exists" binds nothing.
+
+IT IS SUPERSEDED RATHER THAN DELETED, because a decision can only ever be
+superseded — somebody chose this and relied on it, and the archive keeps that.
+What replaces it is
+[[raid-dec-one-tree-beats-a-record-travelling-between-machines]].
+
+WHAT IT GOT RIGHT AND IS WORTH CARRYING. It refused to let a folder be created
+or removed as a separate act, because a folder whose lifetime nobody owns means
+nothing. i34 answers the same worry differently: the folder is the record, it
+is created once at the seed, and nothing ever removes it.

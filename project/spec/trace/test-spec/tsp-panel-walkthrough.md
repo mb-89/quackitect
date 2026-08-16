@@ -34,8 +34,10 @@ change demonstrates the second.
   area, the machine drawn.
 - Click a trace node. Observe: statement and type shown, zero further
   navigation.
-- Stand two dependency-free iterations open. Observe: both open, each in
-  its own worktree.
+- Stand two dependency-free iterations open. Observe: both offered at the
+  container's selection state, and neither entered until one is chosen.
+  (Until i34 this step read "each in its own worktree", which is no longer
+  observable — there are no worktrees.)
 - Return after an absence. Observe: the panel says where everything
   stands; zero questions to another person.
 - Reopen the project under a different supported host. Observe: the walk

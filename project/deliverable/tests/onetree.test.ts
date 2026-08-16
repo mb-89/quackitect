@@ -66,12 +66,27 @@ test("a bare pull at the container enters no iteration", async () => {
     options?: { to: string }[];
   };
 
-  // THE DEMAND IS THAT NO ITERATION WAS ENTERED, which is what the node says
-  // breaks: "a dropped connection binds a record nobody chose and stamps it
-  // started". Standing on the selection state and leaving the container are
-  // both fine; being three segments deep inside a record is not.
+  // THE NODE STATES TWO CONJUNCTS and this case asserts both. It reads: the
+  // engine "shall enter no iteration AND shall answer with the offer". The
+  // first version tested only the first, which the tester caught — and it
+  // matters, because the fix works through EDGE ORDER, so a bare pull could
+  // just as easily have left the container as stood still.
+
+  // ONE: no iteration was entered.
   const inside = bare.where.filter((w) => /^iterations\/i\d+\//.test(w));
   assert.deepEqual(inside, [], `a pull carrying no choice entered an iteration: ${JSON.stringify(bare.where)}`);
+
+  // TWO: the offer came back, and the walk still stands where it can be taken.
+  assert.deepEqual(bare.where, ["iterations/select"], `the walk left the selection state: ${JSON.stringify(bare.where)}`);
+  const offered = (bare.options ?? []).map((o) => o.to);
+  assert.ok(
+    offered.includes(`iterations/${first.match(/^(i\d+)-/)?.[1]}`),
+    `the first iteration is still on the offer: ${JSON.stringify(offered)}`,
+  );
+  assert.ok(
+    offered.includes(`iterations/${second.match(/^(i\d+)-/)?.[1]}`),
+    `the second iteration is still on the offer: ${JSON.stringify(offered)}`,
+  );
 
   // AND NOTHING WAS BOUND OR STAMPED. Entering is what writes `started:`, so
   // its absence is the mechanical proof that no record was taken up.
