@@ -7,6 +7,8 @@ statement: this corpus's enforced, consistent method vocabulary (bound, tree, cl
 owner: the driving agent
 trigger: after the BM25 sibling ships, measured against couplings the register or a retro finds that BM25 missed
 status: open
+probed: "2026-08-16"
+probe: "scheduled. Its own Probe section needs the BM25 sibling built, then a sample of couplings the sibling missed compared against a retro/red-team's real finds. Not yet built this iteration — se_file_search of project/deliverable/engine for \"bm25\" returns no hits."
 breaks_how_badly: corrosive
 how_likely: conceivable
 impact: BM25 misses a real coupling stated in different words than the changed node, the cross-coupling check at i6's requirements gate never sees the candidate, and the gap surfaces only after the fact — the exact failure the sibling exists to prevent.

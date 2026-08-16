@@ -7,10 +7,11 @@ statement: the corpus stays small enough that the query verb answers a request w
 owner: the driving agent
 trigger: the corpus grows past the point where a scan measurably misses req-call-answers-in-one-second's bound
 status: open
+probed: "2026-08-16"
 impact: a query call starts missing the one-second budget, and the toil this iteration removes from hand-searching returns as toil spent waiting on the replacement.
 breaks_how_badly: abrasive
 how_likely: conceivable
-probe: unprobed
+probe: "scheduled. Its own Probe section needs the query verb built, then call latency measured against req-call-answers-in-one-second at the current corpus size (roughly 300 trace files) and again after growth. Not yet built this iteration."
 source_refs:
   - req-query-returns-named-fields
   - req-call-answers-in-one-second

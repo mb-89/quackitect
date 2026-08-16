@@ -116,3 +116,24 @@
 {"ts":"2026-08-16T17:00:43.666Z","op":"done","visit":"iterations/i15/identify-assumptions@0","node":"d124","brief":"3 new assumptions written with probes"}
 {"ts":"2026-08-16T17:00:56.189Z","op":"done","visit":"iterations/i15/identify-assumptions@0","node":"d125","brief":"identify-assumptions filled and submitted, 3 new assumptions"}
 {"ts":"2026-08-16T17:01:08.196Z","op":"done","visit":"iterations/i15/identify-assumptions@0","node":"d123","brief":"identify-assumptions signed, now reading probe-assumptions method"}
+{"ts":"2026-08-16T17:03:18.030Z","op":"update","visit":"iterations/i15/probe-assumptions@0","node":"d126","brief":"checking whether query/BM25 sibling already built before probing i15 assumptions"}
+{"ts":"2026-08-16T17:04:22.268Z","op":"done","visit":"iterations/i15/write-stories@0","node":"d91","brief":"raid statement + stale contradictory section corrected"}
+{"ts":"2026-08-16T17:04:37.331Z","op":"done","visit":"iterations/i15/write-stories@0","node":"d90","brief":"raid node + all downstream forms located, verified corrected"}
+{"ts":"2026-08-16T17:04:46.037Z","op":"done","visit":"iterations/i15/write-stories@0","node":"d92","brief":"define-actual/frame-delta/pressure-test all confirmed corrected"}
+{"ts":"2026-08-16T17:04:50.326Z","op":"done","visit":"iterations/i15/write-stories@0","node":"d89","brief":"false claim fully corrected across raid file + all downstream forms"}
+{"ts":"2026-08-16T17:04:57.407Z","op":"done","visit":"iterations/i15/write-stories@0","node":"d98","brief":"meth-cockburn-use-case read, applied to uc writes below"}
+{"ts":"2026-08-16T17:05:04.164Z","op":"done","visit":"iterations/i15/write-stories@0","node":"d99","brief":"generalize-use-cases filled and signed off"}
+{"ts":"2026-08-16T17:05:06.986Z","op":"done","visit":"iterations/i15/generalize-use-cases@0","node":"d100","brief":"uc-query-the-corpus-by-structure written, file confirmed on disk"}
+{"ts":"2026-08-16T17:05:09.788Z","op":"done","visit":"iterations/i15/generalize-use-cases@0","node":"d101","brief":"uc-get-a-trustworthy-answer written, file confirmed on disk"}
+{"ts":"2026-08-16T17:05:12.861Z","op":"done","visit":"iterations/i15/gate-inputs@0","node":"d104","brief":"gate-inputs reviewed per meth-gate-review, evidence file exists"}
+{"ts":"2026-08-16T17:05:15.289Z","op":"done","visit":"iterations/i15/write-requirements@0","node":"d106","brief":"req-query-returns-named-fields written, file confirmed"}
+{"ts":"2026-08-16T17:05:17.290Z","op":"done","visit":"iterations/i15/write-requirements@0","node":"d107","brief":"req-query-refuses-unknown-field written, file confirmed"}
+{"ts":"2026-08-16T17:05:19.321Z","op":"done","visit":"iterations/i15/write-requirements@0","node":"d108","brief":"req-query-empty-result-explicit written, file confirmed"}
+{"ts":"2026-08-16T17:05:21.182Z","op":"done","visit":"iterations/i15/derive-functions@0","node":"d113","brief":"flow-query-request written, file confirmed"}
+{"ts":"2026-08-16T17:05:22.996Z","op":"done","visit":"iterations/i15/derive-functions@0","node":"d114","brief":"flow-query-result written, file confirmed"}
+{"ts":"2026-08-16T17:05:25.140Z","op":"done","visit":"iterations/i15/derive-functions@0","node":"d115","brief":"flow-change-description written, file confirmed"}
+{"ts":"2026-08-16T17:05:27.455Z","op":"done","visit":"iterations/i15/derive-functions@0","node":"d116","brief":"flow-candidate-list written, file confirmed"}
+{"ts":"2026-08-16T17:05:29.480Z","op":"done","visit":"iterations/i15/derive-functions@0","node":"d117","brief":"flow-coupling-disposition written, file confirmed"}
+{"ts":"2026-08-16T17:05:31.333Z","op":"done","visit":"iterations/i15/derive-functions@0","node":"d118","brief":"fn answer-a-structured-query written, file confirmed"}
+{"ts":"2026-08-16T17:05:33.794Z","op":"done","visit":"iterations/i15/derive-functions@0","node":"d119","brief":"fn rank-candidate-couplings written, file confirmed"}
+{"ts":"2026-08-16T17:06:40.850Z","op":"plan","visit":"iterations/i15/gate-requirements@0","parent":null,"nodes":[{"id":"d127","brief":"read meth-gate-review"},{"id":"d128","brief":"round_0_verify"},{"id":"d129","brief":"round_1_validate"},{"id":"d130","brief":"round_2_red_team"},{"id":"d131","brief":"raid_additions"},{"id":"d132","brief":"verdict"}]}

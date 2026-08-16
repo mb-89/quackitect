@@ -43,19 +43,14 @@ gap at the time, never evidence the ref was missing from history.
 The 26-vs-25 discrepancy is filed separately as note-4db90de22560 — it
 traces to record.md/version-planning.md's own count, not to this raid.
 
-## Why this is open, not settled
+## History: why it took several tries
 
 Kickoff tried four ref names from iterations/i15/gate-kickoff, where the
 only legal tools are the se_file_* family: `main`, `trunk`, `v1`,
 `origin/main`. Each refused with SE-C-102, "not a valid object name".
 
 The remedy both times named `se_run` with `git branch --all --list`, but
-`se_run` is not on gate-kickoff's legal_tools list. This is a tool-scope
-gap for THIS state, not evidence the ref is missing from the repository.
-
-## What would settle it
-
-A state where `se_run` or `se_git` is legal runs `git branch --all --list`
-and `git tag --list`. Whichever ref actually holds
-`spec/queries/requirements.base` is the one `se_file_glob`/`se_file_read`
-should use with `ref: "<name>"` for the harvest.
+`se_run` is not on gate-kickoff's legal_tools list. That was a tool-scope
+gap for THAT state, never evidence the ref was missing from the repository.
+The operator fetched every ref before this walk, and the Resolved section
+above settled it.
