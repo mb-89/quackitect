@@ -1,0 +1,20 @@
+{"ts":"2026-08-16T15:24:32.934Z","op":"plan","visit":"iterations/i6/onboard-retro@0","parent":null,"nodes":[{"id":"d27","brief":"survey the inbox"},{"id":"d28","brief":"drain the two branch-audit notes into i6's scope"},{"id":"d29","brief":"fill the onboard-retro and submit"}]}
+{"ts":"2026-08-16T15:25:01.406Z","op":"done","visit":"iterations/i6/onboard-retro@0","node":"d28","brief":"both branch-audit notes carried into i6, inbox at zero"}
+{"ts":"2026-08-16T15:25:18.321Z","op":"done","visit":"iterations/i6/onboard-retro@0","node":"d27","brief":"the survey ran and the inbox is drained to zero"}
+{"ts":"2026-08-16T15:25:27.252Z","op":"update","visit":"iterations/i6/onboard-retro@0","node":"d30","brief":"mining the log delta since the desk retro finished its own mining"}
+{"ts":"2026-08-16T15:25:29.983Z","op":"update","visit":"iterations/i6/onboard-retro@0","node":"d31","brief":"reading the five rejections to name their clauses"}
+{"ts":"2026-08-16T15:25:43.796Z","op":"update","visit":"iterations/i6/onboard-retro@0","node":"d32","brief":"reading i11's emit_back for what wants promoting"}
+{"ts":"2026-08-16T15:26:30.699Z","op":"done","visit":"iterations/i6/onboard-retro@0","node":"d29","brief":"the onboard-retro is filled and submitted"}
+{"ts":"2026-08-16T15:27:04.442Z","op":"plan","visit":"iterations/i6/gate-kickoff@0","parent":null,"nodes":[{"id":"d33","brief":"sweep the backlog for notes touching conformance"},{"id":"d34","brief":"settle what i6 pulls in and what it leaves out"},{"id":"d35","brief":"propose the change size with its reasoning"},{"id":"d36","brief":"run the three gate rounds"},{"id":"d37","brief":"submit the kickoff brief and stop for the bless"}]}
+{"ts":"2026-08-16T15:27:37.655Z","op":"done","visit":"iterations/i6/gate-kickoff@0","node":"d33","brief":"the inbox is empty and the 72 parked items were triaged at the desk retro minutes ago"}
+{"ts":"2026-08-16T15:27:40.369Z","op":"update","visit":"iterations/i6/gate-kickoff@0","node":"d38","brief":"locating the rigor matrix so the column proposal names real strikes"}
+{"ts":"2026-08-16T15:27:47.650Z","op":"update","visit":"iterations/i6/gate-kickoff@0","node":"d39","brief":"reading two rows to learn how a column strikes a state"}
+{"ts":"2026-08-16T15:28:04.747Z","op":"update","visit":"iterations/i6/gate-kickoff@0","node":"d40","brief":"finding which rows the major column strikes or tailors"}
+{"ts":"2026-08-16T15:28:11.887Z","op":"done","visit":"iterations/i6/gate-kickoff@0","node":"d35","brief":"major strikes nothing and tailors four M1/M2 rows"}
+{"ts":"2026-08-16T15:28:32.155Z","op":"done","visit":"iterations/i6/gate-kickoff@0","node":"d34","brief":"scope settled: 14 items in, three waiting on i18 and i15 left out"}
+{"ts":"2026-08-16T15:28:58.667Z","op":"update","visit":"iterations/i6/gate-kickoff@0","node":"d41","brief":"reading a raid assumption node's shape before minting this gate's"}
+{"ts":"2026-08-16T15:29:14.775Z","op":"update","visit":"iterations/i6/gate-kickoff@0","node":"d42","brief":"copying the minted_in convention from a node i11 minted"}
+{"ts":"2026-08-16T15:29:36.576Z","op":"update","visit":"iterations/i6/gate-kickoff@0","node":"d43","brief":"minted the write-budget assumption this gate rests on"}
+{"ts":"2026-08-16T15:31:12.522Z","op":"done","visit":"iterations/i6/gate-kickoff@0","node":"d36","brief":"three rounds run, the red team found a live path to minor and it is stated"}
+{"ts":"2026-08-16T15:31:22.444Z","op":"done","visit":"iterations/i6/gate-kickoff@0","node":"d37","brief":"the kickoff brief is signed and stands waiting on the bless"}
+{"ts":"2026-08-16T15:34:45.435Z","op":"update","visit":"iterations/i6/gate-kickoff@0","node":"d44","brief":"owner chose minor and gave the go: blessing the kickoff and walking on"}
