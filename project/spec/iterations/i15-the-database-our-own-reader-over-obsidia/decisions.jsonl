@@ -240,3 +240,7 @@
 {"ts":"2026-08-16T18:03:51.076Z","op":"done","visit":"iterations/i15/run-candidates/cand-continue-v1s-shape@0","node":"d223","brief":"cand-explicit-and-safe composed and submitted"}
 {"ts":"2026-08-16T18:04:03.284Z","op":"update","visit":"iterations/i15/run-candidates/cand-fast-path-plus-blocking@0","node":"d229","brief":"wrote cand-fast-path-plus-blocking's four sections"}
 {"ts":"2026-08-16T18:04:06.274Z","op":"done","visit":"iterations/i15/run-candidates/cand-continue-v1s-shape@0","node":"d224","brief":"cand-fast-path-plus-blocking composed and submitted"}
+{"ts":"2026-08-16T18:04:19.436Z","op":"update","visit":"iterations/i15/run-candidates/cand-relational-plus-ensemble@0","node":"d230","brief":"wrote cand-relational-plus-ensemble's four sections"}
+{"ts":"2026-08-16T18:04:23.824Z","op":"done","visit":"iterations/i15/run-candidates/cand-continue-v1s-shape@0","node":"d225","brief":"cand-relational-plus-ensemble composed and submitted"}
+{"ts":"2026-08-16T18:04:37.788Z","op":"update","visit":"iterations/i15/run-candidates/cand-narrow-grammar-plus-explicit@0","node":"d231","brief":"wrote cand-narrow-grammar-plus-explicit's four sections"}
+{"ts":"2026-08-16T18:04:41.294Z","op":"done","visit":"iterations/i15/run-candidates/cand-continue-v1s-shape@0","node":"d226","brief":"cand-narrow-grammar-plus-explicit composed and submitted, all 5 candidates done"}
