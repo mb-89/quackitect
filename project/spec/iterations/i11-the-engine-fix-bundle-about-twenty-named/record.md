@@ -1,6 +1,7 @@
 ---
 id: i11-the-engine-fix-bundle-about-twenty-named
-status: open
+status: shipped
+closed: 2026-08-16T14:00:00.744Z
 started: 2026-08-16T10:57:55.322Z
 opened: 2026-08-12T19:40:52.415Z
 goal: "The engine-fix bundle: about twenty named defects, including a stale must-priority security row and a route that tells the reader a shut door is open."
