@@ -44,3 +44,6 @@
 {"ts":"2026-08-16T15:56:14.259Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d43","brief":"locating i15's compiled machine file to check gate-kickoff's priority"}
 {"ts":"2026-08-16T15:56:20.915Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d44","brief":"locating gate-kickoff's own state definition and authored priority"}
 {"ts":"2026-08-16T16:15:51.451Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d45","brief":"submitting gate-kickoff with pass-with-overrides bless"}
+{"ts":"2026-08-16T16:15:55.490Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d46","brief":"gate-kickoff blessed; following remedy to redraw route past stale end target"}
+{"ts":"2026-08-16T16:16:04.995Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d47","brief":"target stale at front_desk/end; taking gate-kickoff's only drawn edge to draft-vision"}
+{"ts":"2026-08-16T16:16:07.110Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d48","brief":"using fully-qualified door id per refusal remedy"}
