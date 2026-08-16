@@ -97,3 +97,4 @@
 {"ts":"2026-08-16T16:45:33.593Z","op":"update","visit":"iterations/i15/write-stories@0","node":"d95","brief":"writing sty-trust-a-repeatable-answer, refines vp-the-ledger"}
 {"ts":"2026-08-16T16:45:39.158Z","op":"update","visit":"iterations/i15/write-stories@0","node":"d96","brief":"writing sty-dispose-a-candidate-coupling, refines vp-rigor-without-toil"}
 {"ts":"2026-08-16T16:45:48.051Z","op":"done","visit":"iterations/i15/write-stories@0","node":"d93","brief":"write-stories filled and submitted — 3 stories, both value props covered"}
+{"ts":"2026-08-16T16:46:30.656Z","op":"update","visit":"iterations/i15/write-stories@0","node":"d97","brief":"resubmitting write-stories with full standing story set for coverage"}
