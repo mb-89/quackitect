@@ -4,11 +4,35 @@ id: tsp-bound-surface
 type: "[[test-spec]]"
 statement: A surface showing one record's work resolves its own links to that record, while the walk stands in another.
 method: "demonstration"
+status: dropped
 verifies:
   - "req-a-surface-resolves-to-what-it-shows"
 files:
   - none — the procedure is the whole definition, because the pass is a person opening a link and landing in the right place
 ---
+
+## DROPPED 2026-08-17 — owner ruling
+
+THE OWNER'S WORDS: "About the two records with an open satellite. We discussed
+it, we're not gonna do this anymore because the bound surface doesn't work. So
+you can kill that demo."
+
+THIS DEMONSTRATION IS NO LONGER OWED BY ANY RECORD. Its procedure required two
+records open at once with a satellite serving each, and that build is not being
+made. A demonstration whose setup will never exist cannot be performed, and
+carrying it forward made every iteration meet the same blank.
+
+ITS DEBT IS SETTLED: raid-debt-the-bound-surface-demo-leans-on-two-open-records
+is `decided` on this same ruling.
+
+WHAT THIS RULING DOES NOT DECIDE, and it is worth saying plainly. The
+requirement this demonstration verified, req-a-surface-resolves-to-what-it-
+shows, is NOT dropped here. Only the demonstration is. Whether that requirement
+still stands, and what verifies it now that this procedure is gone, has not
+been asked.
+
+THE BODY BELOW IS KEPT AS HISTORY. It is not a live procedure and no walk owes
+it.
 
 ## Scope
 

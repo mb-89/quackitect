@@ -8,6 +8,8 @@ inputs:
   - "project/spec/version-planning.md"
   - "guidance/method/retro.md step 3"
   - "spec/decisions/notes-pipeline.md at ref main"
+  - "note-622f174c9bed"
+  - "note-fad135af8190"
 ---
 
 # i17-the-options-pool-triage-a-raw-note-into-
@@ -63,3 +65,37 @@ AND THE 20 BACKFILLED REQUIREMENTS HAVE NO PAIRWISE JUDGMENTS (note-e0dcdfe20aee
 - project/spec/version-planning.md
 - guidance/method/retro.md step 3
 - spec/decisions/notes-pipeline.md at ref main
+
+## Owner ruling 2026-08-17 — this is what carries a cloud agent's notes
+
+THE OWNER'S WORDS: "Notes never travel. But the idea is that the cloud agent
+can put stuff in work tokens. We will have at some point the work token
+system, and then the cloud agent can put stuff in work tokens."
+
+WHAT PROMPTED IT. i15 ran unattended on a cloud box on 2026-08-16. The walk
+filed a debt note for the blocker that stopped it. That note is gone —
+searching the whole call log for its ref returns nothing, because
+`.se/notes.jsonl` is machine-local and never committed. A hand-written field
+report was the only thing that carried the findings back.
+
+SO THE LIMIT IS ACCEPTED, NOT A DEFECT TO FIX SEPARATELY. The retro is not to
+re-litigate it. This iteration is the answer.
+
+SETTLED 2026-08-17, BY THE OWNER: "Yes, the work token is i17's options pool."
+
+So the two names are one thing, and this record is its home. The question was
+worth asking because nothing in the repository contained the phrase "work
+token" — a search across the whole tree returned zero hits on 2026-08-17 — and
+building a second mechanism beside this one would have been the expensive
+mistake.
+
+USE ONE NAME FROM HERE. This record's own vision already argues for it, citing
+Anderson's Kanban Method: a mature system has no backlog, it has a POOL OF
+OPTIONS. "Work token" is the owner's spoken shorthand for the same thing and
+not a second concept.
+
+WHAT THE CLOUD CASE ADDS TO THE SCOPE ALREADY SEEDED HERE: the pool is not
+only for options a retro parks. An unattended walk needs to put a finding
+somewhere that survives the box being released, and today the only surviving
+channels are the record's own evidence forms and `decisions.jsonl`. Neither is
+shaped for a stray.

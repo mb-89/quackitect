@@ -9,6 +9,13 @@ inputs:
   - "note-5e2d3cae20e0"
   - "note-f9d6dd98f126"
   - "i12"
+  - "note-afb66f5e0dee"
+  - "note-5cebd22ef8f1"
+  - "note-ff8f4378deab"
+  - "note-801f54496c1f"
+  - "note-c8e5a398b943"
+  - "note-7941a76b7f0f"
+  - "note-e31d7d3a0e08"
 depends_on:
 ---
 
@@ -57,3 +64,108 @@ WHAT DONE LOOKS LIKE. Every modelled human-facing and agent-facing interface eit
 - note-5e2d3cae20e0
 - note-f9d6dd98f126
 - i12
+
+## Measured baseline, 2026-08-17
+
+Taken at this iteration's onboarding retro, from the call log. 8424 calls, and
+every one of them is AFTER i12 shipped on 2026-08-15.
+
+- 1834 calls miss the one-second rule.
+- se_pull: 730 calls, 318 over a second (44 percent), 184 over five seconds
+  (25 percent), 15 over thirty.
+- se_aim: 81 calls, 67 over a second (83 percent), 44 over five (54 percent).
+- The engine's own slow alarm fired 937 times, and mirror_profile 178 times.
+- Refusals are the smaller cost: 333 typed rejections in 8424 calls, 4 percent.
+
+THE PULL IS THE ONLY VERB THE WALK HAS, so every state of every iteration pays
+that latency several times over.
+
+i12 SHIPPED THE ONE-SECOND RULE TWO DAYS BEFORE THESE NUMBERS. Its goal was to
+hold the rule on the surfaces that break it. So this iteration is not repeating
+i12. It is answering why fixing instances did not hold the rule, which is what
+the modelling-first finding above already says.
+
+## Carried in at the retro's backlog walk, 2026-08-17
+
+Seven parked notes were pulled into this round rather than left parked. Each
+names a specific interface that misses the rule or misleads about it.
+
+- note-afb66f5e0dee — the pull REPLAYS a record instead of resuming it, and
+  re-evaluates green states that cannot have moved. A named cause of the pull
+  latency measured above.
+- note-5cebd22ef8f1 — the bless takes over a second on a path that does no
+  work, and carries a slow record at 13,156 ms on a single POST.
+- note-ff8f4378deab — the same fault from the other side, stated against
+  req-call-answers-in-one-second.
+- note-801f54496c1f — the prompt-layer placement takes about five seconds.
+- note-c8e5a398b943 — stream the walk the way a game streams a level: peek what
+  is needed now and collect the rest in the background. Its own text says it
+  belongs beside this iteration's boundary work.
+- note-7941a76b7f0f — the aim answer's reads list misleads and may not be
+  needed at all. Its own text says it belongs beside this iteration's
+  packet-size work.
+- note-e31d7d3a0e08 — se_log_query cannot serve a large response back, because
+  the log stores it CUT.
+
+THE LAST ONE IS THIS ITERATION'S SUBJECT TWICE OVER, and it was confirmed live
+on 2026-08-17. A survey result the host moved to disk was re-fetched by ref, as
+the lane's own rule instructs, and came back with 56,238 characters cut. So it
+is an interface that neither answers well nor says plainly that it will not —
+it reports a value it did not serve, and the guidance promises otherwise.
+
+## Reported live by the owner, 2026-08-17 — the stop-at control
+
+THEIR WORDS: "I also try to set the stop condition to blockers only, but it
+doesn't work. The button doesn't activate." And, correcting a first wrong
+reading within the minute: "I know I cannot jump to blockers only. That's fine.
+I already set it to bless. So when I set it to bless, blockers only should
+enable it. It doesn't."
+
+THE OWNER RULED IT IS FIXED DURING IMPLEMENTATION, not at the gate.
+
+## What was checked rather than assumed
+
+THE RUNG LOGIC IS CORRECT. `renderRung` in engine/params.ts computes
+`reachable = on || bank.at >= below`. For the fourth notch `below` is 3, so at
+a bank position of 3 that is `3 >= 3` and the button should be live, titled
+"click: blockers only".
+
+SO THE FAULT IS IN WHAT `bank.at` HOLDS, not in the rule applied to it.
+`stop_at` is typed `number`, and the bank takes `v.stop_at ?? 0`. An ABSENT
+value becomes 0, and at 0 only the first notch is reachable while the other
+three draw locked — a dead row that looks exactly like a control refusing the
+click.
+
+## The engine already names this failure class
+
+engine/mirror.ts, lines 756 to 762: "EVERY STATE THE PANEL CAN DRAW HAS TO BE
+HANDED IN. What is missing here does not fail loudly — renderPanel reads it as
+absent and draws the OFF state, so the control looks like it never took the
+click." It records two earlier victims: the emergency rung, and the shutdown
+row which could never show a pressed button at all.
+
+AND THE LINE ABOVE NAMES THE LIKELY SURFACE: "a host that drew its own drifted
+the moment the spec changed, and that is precisely what happened to the VS Code
+bar."
+
+## The check that settles it, and it is one read
+
+The mirror's own `/widget/controls` endpoint DOES hand in
+`stop_at: state.session.stopAtValue`, so the HTTP surface should be sound.
+
+THE OWNER IS ON VS CODE. So the question is whether
+project/deliverable/vscode/src/extension.ts draws the bar from its own values,
+and whether it hands in `stop_at`. If it does not, the row draws dead from any
+notch and the symptom is fully explained.
+
+A SECOND CANDIDATE IF THAT ONE FAILS: the panel does not repaint after a
+control post, so the bank keeps a stale position while the session already
+holds the new one. That is i4's subject in its own goal, "a bless repaints
+without a reload", and note-f7777e741479's from the other side.
+
+## Why it belongs here and not on a bug list
+
+A CONTROL THAT DECLINES AND REPORTS NOTHING is the exact half of this
+iteration's goal that says an interface must SAY PLAINLY that it will not do
+something. Whatever the cause turns out to be, the fix includes the button
+explaining itself.

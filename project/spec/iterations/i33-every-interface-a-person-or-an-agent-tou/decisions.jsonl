@@ -1,0 +1,57 @@
+{"ts":"2026-08-17T11:01:43.618Z","op":"done","visit":"front_desk@0","node":"d65","brief":"i33 entered, standing at its start"}
+{"ts":"2026-08-17T11:02:02.699Z","op":"plan","visit":"iterations/i33/onboard-retro@0","parent":null,"nodes":[{"id":"d67","brief":"mark the retro boundary"},{"id":"d68","brief":"ask the field-feedback question"},{"id":"d69","brief":"drain the notes inbox"},{"id":"d70","brief":"walk the backlog"},{"id":"d71","brief":"sweep the debts"},{"id":"d72","brief":"drain the assistant memory"},{"id":"d73","brief":"mine the call log"},{"id":"d74","brief":"walk the milestones"},{"id":"d75","brief":"check the contract"},{"id":"d76","brief":"emit the improvements"}]}
+{"ts":"2026-08-17T11:02:09.458Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d77","brief":"1788 records stand in the window"}
+{"ts":"2026-08-17T11:03:03.897Z","op":"done","visit":"iterations/i33/onboard-retro@0","node":"d67","brief":"window opens 2026-08-16T15:25:01Z"}
+{"ts":"2026-08-17T11:03:54.277Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d78","brief":"20 notes triaged; landing the carried ones first"}
+{"ts":"2026-08-17T11:03:58.421Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d79","brief":"reading i17 to land the travelling-notes ruling in it"}
+{"ts":"2026-08-17T11:04:26.433Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d80","brief":"ruling landed in i17, with the naming question named"}
+{"ts":"2026-08-17T11:04:52.913Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d81","brief":"four drained, the carried ones going to i35"}
+{"ts":"2026-08-17T11:05:23.314Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d82","brief":"ten drained, ten to go"}
+{"ts":"2026-08-17T11:06:36.806Z","op":"done","visit":"iterations/i33/onboard-retro@0","node":"d69","brief":"inbox drained to zero"}
+{"ts":"2026-08-17T11:09:01.452Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d83","brief":"reading the two debts a real cloud run may have repaid"}
+{"ts":"2026-08-17T11:09:27.214Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d84","brief":"reading the remaining six debt entries"}
+{"ts":"2026-08-17T11:10:07.241Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d85","brief":"is the stored run mode a flip away from inline, or the default?"}
+{"ts":"2026-08-17T11:10:53.282Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d86","brief":"all eight looked at and dated"}
+{"ts":"2026-08-17T11:11:24.316Z","op":"done","visit":"iterations/i33/onboard-retro@0","node":"d71","brief":"debt sweep complete, all eight dispositioned"}
+{"ts":"2026-08-17T11:13:39.178Z","op":"plan","visit":"iterations/i33/onboard-retro@0","parent":null,"nodes":[{"id":"d87","brief":"kill the bound-surface demo and close its debt"},{"id":"d88","brief":"record the field feedback"},{"id":"d89","brief":"build the milestone table"},{"id":"d90","brief":"emit and submit the form"}]}
+{"ts":"2026-08-17T11:13:48.432Z","op":"done","visit":"iterations/i33/onboard-retro@0","node":"d68","brief":"field feedback given: the bound-surface ruling, nothing further"}
+{"ts":"2026-08-17T11:13:52.217Z","op":"obsolete","visit":"iterations/i33/onboard-retro@0","node":"d88","brief":"duplicate of the field-feedback node already closed"}
+{"ts":"2026-08-17T11:14:27.715Z","op":"done","visit":"iterations/i33/onboard-retro@0","node":"d87","brief":"demo dropped and its debt decided, on the owner's ruling"}
+{"ts":"2026-08-17T11:14:39.327Z","op":"obsolete","visit":"iterations/i33/onboard-retro@0","node":"d89","brief":"duplicate of the milestone node already open"}
+{"ts":"2026-08-17T11:15:15.620Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d91","brief":"25 of 77 judged"}
+{"ts":"2026-08-17T11:15:36.975Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d92","brief":"51 of 77 judged"}
+{"ts":"2026-08-17T11:16:14.054Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d93","brief":"the backlog's fix-findings ruling carried into i35"}
+{"ts":"2026-08-17T11:16:27.228Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d94","brief":"i35 now carries every note it answers"}
+{"ts":"2026-08-17T11:16:32.446Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d95","brief":"reading i33 to carry the seven latency notes into it"}
+{"ts":"2026-08-17T11:17:16.997Z","op":"done","visit":"iterations/i33/onboard-retro@0","node":"d70","brief":"backlog walked and migrated"}
+{"ts":"2026-08-17T11:18:13.926Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d96","brief":"testing whether the lane can reach the memory at all"}
+{"ts":"2026-08-17T11:18:33.424Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d97","brief":"walking the shell calls to name the missing verbs"}
+{"ts":"2026-08-17T11:18:53.734Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d98","brief":"reading the last battery's summary for the timings step"}
+{"ts":"2026-08-17T11:19:26.105Z","op":"done","visit":"iterations/i33/onboard-retro@0","node":"d73","brief":"log mined for refusals, shell shapes and test timings"}
+{"ts":"2026-08-17T11:19:39.574Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d99","brief":"getting cost per state for the milestone table"}
+{"ts":"2026-08-17T11:20:17.988Z","op":"done","visit":"iterations/i33/onboard-retro@0","node":"d72","brief":"memory drain: lane refuses the path, and the method now says what to do"}
+{"ts":"2026-08-17T11:20:44.613Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d100","brief":"third always-legal case recorded in i35"}
+{"ts":"2026-08-17T11:20:55.733Z","op":"done","visit":"iterations/i33/onboard-retro@0","node":"d74","brief":"milestones walked, and the cost column's gap recorded in the method"}
+{"ts":"2026-08-17T11:21:12.826Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d101","brief":"reading i6's emit-back list before writing promotions"}
+{"ts":"2026-08-17T11:22:59.324Z","op":"done","visit":"iterations/i33/onboard-retro@0","node":"d76","brief":"improvements aimed at guidance and at i35"}
+{"ts":"2026-08-17T11:23:35.184Z","op":"done","visit":"iterations/i33/onboard-retro@0","node":"d75","brief":"contract walked: ten rules held, rule 5 broke twice"}
+{"ts":"2026-08-17T11:23:39.745Z","op":"done","visit":"iterations/i33/onboard-retro@0","node":"d90","brief":"onboard-retro filled and signed"}
+{"ts":"2026-08-17T11:24:12.269Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d102","brief":"asking the machine what routes from here"}
+{"ts":"2026-08-17T11:26:31.875Z","op":"plan","visit":"iterations/i33/onboard-retro@0","parent":null,"nodes":[{"id":"d103","brief":"note the stop-at control defect for i33"},{"id":"d104","brief":"walk the kickoff"},{"id":"d105","brief":"walk the iteration"}]}
+{"ts":"2026-08-17T11:26:43.276Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d106","brief":"reading the notch definitions the control loads"}
+{"ts":"2026-08-17T11:27:09.222Z","op":"done","visit":"iterations/i33/onboard-retro@0","node":"d103","brief":"stop-at defect noted with its likely cause and the check that settles it"}
+{"ts":"2026-08-17T11:27:19.542Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d107","brief":"work token settled as i17's options pool"}
+{"ts":"2026-08-17T11:27:30.351Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d108","brief":"answer recorded, walking on to the kickoff"}
+{"ts":"2026-08-17T11:27:33.535Z","op":"update","visit":"iterations/i33/onboard-retro@0","node":"d109","brief":"pulling into the kickoff on the raised dial"}
+{"ts":"2026-08-17T11:28:04.226Z","op":"update","visit":"iterations/i33/gate-kickoff@0","node":"d110","brief":"reading i33's vision and the gate-review method"}
+{"ts":"2026-08-17T11:28:17.473Z","op":"update","visit":"iterations/i33/gate-kickoff@0","node":"d111","brief":"the owner already set bless, so the ceiling logic is the suspect"}
+{"ts":"2026-08-17T11:28:40.852Z","op":"update","visit":"iterations/i33/gate-kickoff@0","node":"d112","brief":"checking whether bank.at is a number or a notch name"}
+{"ts":"2026-08-17T11:29:00.833Z","op":"update","visit":"iterations/i33/gate-kickoff@0","node":"d113","brief":"reading the dead-buttons comment in the panel values"}
+{"ts":"2026-08-17T11:29:19.549Z","op":"update","visit":"iterations/i33/gate-kickoff@0","node":"d114","brief":"withdrawing the wrong stop-at diagnosis"}
+{"ts":"2026-08-17T11:29:38.232Z","op":"update","visit":"iterations/i33/gate-kickoff@0","node":"d115","brief":"corrected diagnosis recorded with the one read that settles it"}
+{"ts":"2026-08-17T11:30:58.693Z","op":"update","visit":"iterations/i33/gate-kickoff@0","node":"d116","brief":"gate assumption minted with its probe"}
+{"ts":"2026-08-17T11:32:13.928Z","op":"done","visit":"iterations/i33/onboard-retro@0","node":"d104","brief":"kickoff filled, blessed at minor"}
+{"ts":"2026-08-17T11:32:38.241Z","op":"update","visit":"iterations/i33/gate-kickoff@0","node":"d117","brief":"inbox back to zero before the gate stamps"}
+{"ts":"2026-08-17T11:34:12.240Z","op":"update","visit":"iterations/i33/gate-kickoff@0","node":"d118","brief":"stop-at finding written into i33's record"}
+{"ts":"2026-08-17T11:34:20.210Z","op":"update","visit":"iterations/i33/gate-kickoff@0","node":"d119","brief":"note superseded by the record that now carries it"}
+{"ts":"2026-08-17T11:35:10.587Z","op":"update","visit":"iterations/i33/gate-kickoff@0","node":"d120","brief":"resubmitting the kickoff with the named fields fixed"}

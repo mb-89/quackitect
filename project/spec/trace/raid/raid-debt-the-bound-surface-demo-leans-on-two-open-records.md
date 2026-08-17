@@ -6,8 +6,8 @@ kind: debt
 statement: tsp-bound-surface cannot be observed, because its procedure needs two records open at once with satellites serving both, and that does not stand.
 owner: the owner
 trigger: the build that lets two records stand open with a satellite each, or any change to how a surface resolves its links
-status: open
-looked: 2026-08-16
+status: decided
+looked: 2026-08-17
 breaks_how_badly: abrasive
 how_likely: expected
 impact: Verification refuses while any claim box stands open, so a spec nobody can observe stops every iteration from closing. The spec's own text already says the procedure cannot run until the build stands, and nothing carried that, so each iteration met the same blank and had to work it out again.
@@ -50,3 +50,28 @@ outside it and got re-adjudicated anyway.
 THE DEBT CLOSES when the two-record build stands and a watcher runs the
 four steps. Closing it hands the claim back, and somebody answers the
 box again.
+
+## Settled 2026-08-17 — the demonstration is dropped
+
+THE OWNER RULED at this retro's debt sweep: "About the two records with an open
+satellite. We discussed it, we're not gonna do this anymore because the bound
+surface doesn't work. So you can kill that demo."
+
+SO THE DEBT IS NOT REPAID, IT IS DISCHARGED. The thing it was waiting for is
+cancelled. tsp-bound-surface now carries `status: dropped` and a block naming
+this ruling.
+
+WHY THIS IS THE RIGHT SHAPE RATHER THAN DELETION. The demonstration is cited
+148 times across the evidence forms of i6, i11 and i15. Deleting the file would
+break every one of those citations and rewrite what those records actually
+signed. The spec stays as history and stops being owed.
+
+STATUS IS `decided`, WHICH IS ONE OF THE THREE SETTLED VALUES ruled in
+raid-asm-an-entry-status-says-whether-it-is-open. It carries no claim, so the
+close no longer blocks on it and any owed line pointing here reads as
+dispositioned.
+
+ONE QUESTION IS LEFT OPEN DELIBERATELY: req-a-surface-resolves-to-what-it-shows
+was verified only by this demonstration. The ruling killed the demo, not the
+requirement, and nothing now verifies it. That is a question for whoever next
+touches surface resolution.

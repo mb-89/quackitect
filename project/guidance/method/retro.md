@@ -105,6 +105,19 @@ The trigger is a NOTE carrying "needs retro":
    INTO the repo (guidance, machines, prompts) and leaves the memory.
    Memory keeps only personal data and harness mechanics the repo cannot
    hold. The agent runs this sweep itself.
+
+   THE LANE CANNOT REACH THE MEMORY FILES, measured 2026-08-17. The
+   assistant's memory lives outside the project root, so se_file_read refuses
+   the path under SE-C-102 and the native readers are caged. Two ways through
+   are honest and a third is not.
+
+   - DRAIN WHAT THE HARNESS SURFACED. Memories handed to the agent in context
+     are readable and drainable, and that is the common case.
+   - A DECLARED ROOT reaches the rest. `.se/roots.json` makes a folder
+     available as `@name`, read-only. Ask the owner before declaring one; the
+     refusal's own remedy says so.
+   - WHAT IS NOT ALLOWED is ticking this step because nothing was surfaced.
+     Say what you could reach and what you could not.
 7. Hunt wasted effort. Rework, reversals, avoidable refactors,
    reinventing instead of reusing. Each one is a lead.
 8. Mine the record, using the timestamp step 1 stored — never the whole
@@ -201,6 +214,16 @@ The trigger is a NOTE carrying "needs retro":
      completed. A signed form is not an achievement.
    - WHAT COST is the round trips, the refusals, the rework, the
      re-reading. The log has the numbers and this column takes them.
+
+     PER-STEP COST IS NOT COMPUTABLE TODAY, measured 2026-08-17. The call log
+     cannot be grouped by state: the state a call was made in rides inside a
+     narration record's arguments, and se_log_query's group_by does not reach
+     it. Grouping by `visit` returns a single group holding everything.
+
+     So take this column from what IS available — the refusal clauses, the
+     slow calls, the shell shapes, the test timings — and SAY PLAINLY where a
+     number is a whole-window figure rather than that step's own. Never divide
+     a total by the step count and present the result as measurement.
    - MECHANIZABLE names the check, the refusal or the prefill that would
      have removed the cost. Empty is a legal answer and a common one.
 

@@ -7,6 +7,7 @@ statement: The core and satellite cluster is built and tested, and nothing the r
 owner: the driving agent
 trigger: when the run mode is first flipped away from inline, or at the code-review iteration
 status: open
+looked: 2026-08-17
 impact: A whole subsystem drifts from the engine it is meant to carry, and its green tests read as proof it works.
 breaks_how_badly: corrosive
 how_likely: expected
@@ -80,3 +81,28 @@ runs the three trace-design laws against trunk.
 RECOVERING IT IS NOT i28's WORK. i28 built the unattended entrypoint.
 The hand-written spec here is a floor that keeps the sweep honest, and
 it says so in its own Standing section.
+
+## The trigger cannot fire as worded — 2026-08-17
+
+THE TRIGGER SAYS: when the run mode is first flipped away from inline.
+
+IT WILL NEVER SAY THAT. The owner ruled on 2026-08-14, recorded at the top of
+engine/mode.ts, to make it multiprocess BY DEFAULT and flip from there. Inline
+is the measurement baseline, not the starting point.
+
+MEASURED TODAY: the aim result carries run mode `process`, stored `process`,
+and `chosen: false`. So the live mode is already process, nobody chose it, and
+no flip away from inline is pending or possible.
+
+A TRIGGER THAT CANNOT FIRE IS A DEBT NOBODY RE-READS, which is the exact thing
+the owner's 2026-08-12 ruling on the debt sweep exists to prevent. It survived
+two sweeps because the wording reads plausible.
+
+RE-AFFIRMED AS: the code-review iteration, or the first time a satellite is
+actually launched.
+
+AND THE SWEEP RAISED A SHARPER QUESTION THAN THE ROW ASKS. If the live run
+mode reads `process` while no file on the running path imports the cluster,
+then the mode setting may be inert — a control that reads back a value and
+changes nothing. That is worse than this row states and it is not yet checked.
+It is a lead for the code-review iteration, not a claim.
