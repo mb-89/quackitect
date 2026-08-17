@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "The increasing-scrutiny review a gate gets before it is blessed. Three rounds, over the gate's items and its whole input cone."
+statement: "The increasing-scrutiny review a gate gets before it is blessed. Four rounds, over the gate's items and its whole input cone."
 ---
 
 ## Situation
@@ -39,7 +39,39 @@ List what is missing, wrong or out of scope.
 WATCH FOR ASKS THAT NO CHECK COVERED. A requirement no acceptance item happens
 to test is exactly where a design drifts from its register.
 
-### 3. RED-TEAM — argue the opposing case before you endorse
+### 3. GOALS — does this milestone serve the kickoff
+
+The kickoff blessed a LIST of goals. This round lists them back, one row each,
+and asks what THIS milestone produced for each one.
+
+Name the artifacts by id. The stories, the requirements, the chunks, the
+commits.
+
+Three answers are legal, and only two of them pass:
+
+- NAMED ARTIFACTS. The goal is served, and the row says by what.
+- `nothing yet`, naming the milestone that owns it. A goal need not be served
+  everywhere.
+- `nothing, and nothing will`. This FAILS the gate. The walk has drifted off
+  its own kickoff.
+
+DO NOT ANSWER FROM THE SCOPE. The scope is what was promised. This round asks
+what was BUILT.
+
+WHY THIS ROUND EXISTS, and why round 2 does not cover it. Round 2 asks about
+the goal as PROSE, so a true sentence about the wrong subject passes it.
+Iteration 33 answered it "the scope answers both halves of the owner's
+framing" - true of the scope, and never a check on the register.
+
+EVERY OTHER COVERAGE CHECK IN THIS SYSTEM COMPARES A NODE TO ITS NEIGHBOUR.
+Story to value prop. Requirement to use case. Chunk to design spec. A chain
+that is perfectly linked and serves a quarter of the kickoff passes all of
+them, because not one of them looks UP.
+
+This is the only round that looks up, and it is per-item so it cannot be
+answered in general.
+
+### 4. RED-TEAM — argue the opposing case before you endorse
 
 Cite a rubric, not vibes. The rubric is the criteria, the register or the goal
 system.

@@ -41,6 +41,8 @@ async function standingClaim(): Promise<{
   field: string;
   ev: string;
   signedAt: string;
+  root: string;
+  id: string;
 }> {
   const root = freshRoot();
   gitInit(root);
@@ -77,7 +79,25 @@ async function standingClaim(): Promise<{
     "utf8",
   );
   assert.ok(session.recordDone(decl).includes(state.id), "green from the record before anything touches it");
-  return { session, decl, step: state.id, field, ev, signedAt };
+  return { session, decl, step: state.id, field, ev, signedAt, root, id };
+}
+
+/** THE WHOLE COLUMN SIGNED, and that is the point of it.
+ *
+ *  standingClaim signs exactly ONE state. Every test above it therefore
+ *  watches an amend act on a claim with nothing standing below — which is
+ *  precisely the blind spot a defect walked through. */
+function signEveryClaim(root: string, id: string, decl: ReturnType<Session["currentMachine"]>, at: string, skip?: string): void {
+  for (const s of decl.states) {
+    if (s.evidence_form.length === 0 || s.id === skip) continue;
+    const ev = join(root, "project", "spec", "iterations", id, "evidence", `${s.id}.md`);
+    mkdirSync(dirname(ev), { recursive: true });
+    // NO FIELD SECTIONS. A section that carries text is CHECKED, and generic
+    // prose fails a form that wants a table or a per-item round. An empty
+    // section is the required-check's business, not the claim check's, so a
+    // signed note with no sections is exactly a claim that stands.
+    writeFileSync(ev, `---\nsigned_off: ${at}\nby: agent\nauthors: human\n---\n\nthe claim, in full\n`, "utf8");
+  }
 }
 
 test("an amend rewrites a field and the signature does not move", async () => {
@@ -159,4 +179,52 @@ test("re-signing clears a reopen with nothing having to erase anything", async (
 test("a reopen with no reason is refused, because it throws away accepted work", async () => {
   const { session, step } = await standingClaim();
   assert.throws(() => session.reopenClaim(step, "  ", "agent"), /reason/);
+});
+
+// AN AMENDMENT DOES NOT RE-GREY. A REOPEN RE-GREYS (owner ruling 2026-08-17,
+// req-an-amend-leaves-the-tree-standing).
+//
+// THAT ONE IS IN drift.test.ts, NOT HERE, and the reason is worth writing
+// down. It needs a CHAIN: one claim standing on another, so an act on the
+// upper can be watched for what it does to the lower. standingClaim below
+// signs exactly one state, and several states in a fresh root carry laws that
+// sweep the whole corpus, so they can never go green there however they are
+// signed. A fixture that stands one claim cannot tell "leaves the tree
+// standing" from "has no tree" — which is exactly the blind spot the defect
+// walked through. drift.test.ts pins a column where the chain really stands.
+
+// THE EDGE BETWEEN THE TWO ACTS IS HELD BY THE MACHINE, not by judgement.
+//
+// An amend leaves everything below standing. That is right for a correction
+// and wrong for a changed QUESTION, and the kickoff's goals list is a changed
+// question: every gate below measures its work against it. Amending it would
+// leave all of them green against wording that is gone.
+test("a field other forms read cannot be amended, and the refusal names the reopen", async () => {
+  const { session, decl, root, id, step } = await standingClaim();
+  signEveryClaim(root, id, decl, "2026-08-07T10:00:00.000Z", step);
+  const kickoff = decl.states.find((s) => s.id.endsWith("gate-kickoff"));
+  assert.ok(kickoff !== undefined, "the column opens on a kickoff gate");
+
+  assert.throws(
+    () => session.amendClaim(kickoff.id, { goals: "- a goal nobody below has heard of" }, "a reason", "agent"),
+    /reopen/,
+    "the goals list feeds every gate below through $goals, so changing it is a reopen and the refusal has to say so",
+  );
+
+  // AND THE GUARD IS NARROW, WHICH NOTHING ASSERTED UNTIL NOW. A fresh-eyes
+  // tester pointed out that deleting the field clause from the guard would
+  // leave this suite green: every check here would still pass with the whole
+  // kickoff frozen, or with `goals` frozen on every state in the machine.
+  //
+  // SO THE PAIRING IS WHAT GETS ASSERTED. The guard is keyed on a STATE and a
+  // FIELD together. A field called `goals` on a state nobody reads it from is
+  // an ordinary field, and amending it must work.
+  const out = session.amendClaim(step, { goals: "- an ordinary field that happens to share a name" }, "a reason", "agent") as {
+    signature_kept?: boolean;
+  };
+  assert.equal(
+    out.signature_kept,
+    true,
+    "a field named goals on a state no form reads it from is an ordinary field — freezing it everywhere would make the guard a blanket rather than an edge",
+  );
 });

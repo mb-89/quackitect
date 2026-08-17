@@ -72,6 +72,10 @@ export interface PanelValues {
   choices?: Record<string, string>;
   /** Which independent toggles are on, by slug. */
   toggles?: Record<string, boolean>;
+  /** WORK STILL RUNNING PAST ITS BOUND, or absent when nothing is. A person
+   *  watching a still surface cannot tell a slow operation from a hung one,
+   *  and this is what the surface says instead of nothing. */
+  running?: { what: string; since_ms: number };
 }
 
 /** A toggle's key is its label, mechanically. The spec stays readable prose. */
@@ -94,8 +98,11 @@ const esc = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;"
 interface Bank {
   /** Which control this button belongs to — the click handler's routing. */
   id: "autonomy" | "stopat";
-  /** Where the bank stands now. */
-  at: number;
+  /** WHERE THE BANK STANDS, or undefined when nothing supplied a position.
+   *  Those are different facts, and a surface may not present one as the
+   *  other — an absent value drawn as a deliberate zero is what disarmed the
+   *  emergency rung and blanked the shutdown row. */
+  at: number | undefined;
   /** The lowest notch that may never be released. The stop-at bank has one:
    *  `state end` is the tightest setting, not an off switch, so releasing it
    *  would leave the control meaning nothing. */
@@ -104,9 +111,25 @@ interface Bank {
   hazard: boolean;
 }
 
-function renderRung(l: PanelValues["rungs"][number], below: number, v: PanelValues, bank: Bank): string {
-  const on = bank.at >= l.value;
-  const reachable = on || bank.at >= below;
+// THE RUNG BELOW ARRIVES WHOLE, not as its value. A locked rung has to NAME
+// what unlocks it, and the name is already in the levels the bank was handed —
+// taking it from there is what keeps this from becoming a second copy of the
+// list that drifts when machines/stopat.md is edited.
+/** The one line a rung says about itself. Lifted out of renderRung so the
+ *  unknown case is one branch among peers rather than another nested ternary. */
+function rungWhy(a: { armed: boolean; known: boolean; on: boolean; reachable: boolean; name: string; prev?: string }): string {
+  if (a.armed) return "emergency — every tool is legal in every state; lower the autonomy to end it";
+  if (!a.known) return "this control does not know where it stands — nothing supplied its position";
+  if (a.on) return "click: release this rung and every rung above it";
+  if (a.reachable) return `click: ${a.name}`;
+  return a.prev === undefined ? "unlock the rung below first" : `unlock ${a.prev} first`;
+}
+
+function renderRung(l: PanelValues["rungs"][number], prev: PanelValues["rungs"][number] | undefined, v: PanelValues, bank: Bank): string {
+  const below = prev?.value ?? 0;
+  const at = bank.at;
+  const on = at !== undefined && at >= l.value;
+  const reachable = on || (at !== undefined && at >= below);
   const target = on ? Math.max(below, bank.floor) : l.value;
   // Ideation is the one rung that delegates the CREATION of work, so it
   // is the one rung drawn as a hazard rather than as a setting.
@@ -116,14 +139,9 @@ function renderRung(l: PanelValues["rungs"][number], below: number, v: PanelValu
   // separate button: the top rung BECOMES it. Nothing names it while it
   // is off, which is the point — it is for repair, not for reaching for.
   const armed = top && v.emergency === true;
-  const cls = `rung${on ? " on" : ""}${reachable ? "" : " locked"}${danger}${armed ? " emergency" : ""}`;
-  const why = armed
-    ? "emergency — every tool is legal in every state; lower the autonomy to end it"
-    : on
-      ? "click: release this rung and every rung above it"
-      : reachable
-        ? `click: ${l.name}`
-        : "unlock the rung below first";
+  const unknown = at === undefined ? " unknown" : "";
+  const cls = `rung${on ? " on" : ""}${reachable ? "" : " locked"}${danger}${armed ? " emergency" : ""}${unknown}`;
+  const why = rungWhy({ armed, known: at !== undefined, on, reachable, name: l.name, prev: prev?.name });
   // data-level is where the CLICK LANDS; data-rung is the rung's OWN
   // value. They differ on a release, and the help has to follow the rung
   // that was pressed. Sending the landing position explained "blocked" to
@@ -146,9 +164,9 @@ function renderRungs(p: Param, v: PanelValues): string {
   // design. Stop-at has no off: not stopping at all is `blockers only`, which
   // is the TOP. So its lowest notch cannot be released.
   const bank: Bank = stop
-    ? { id: "stopat", at: v.stop_at ?? 0, floor: levels[0]?.value ?? 0, hazard: false }
+    ? { id: "stopat", at: v.stop_at, floor: levels[0]?.value ?? 0, hazard: false }
     : { id: "autonomy", at: v.autonomy, floor: 0, hazard: true };
-  const buttons = levels.map((l, i) => renderRung(l, i === 0 ? 0 : levels[i - 1].value, v, bank)).join("");
+  const buttons = levels.map((l, i) => renderRung(l, i === 0 ? undefined : levels[i - 1], v, bank)).join("");
   const live = stop ? "" : `<input id="thr" type="hidden" value="${v.autonomy}">`;
   return `<span class="rungs">${buttons}</span>${live}`;
 }
@@ -237,6 +255,26 @@ function rowLabel(p: Param): string {
   return `<span class="param-label${help}"${data}${title}>${esc(p.name)}</span>`;
 }
 
+/**
+ * WORK STILL RUNNING, RIDING BESIDE THE CONTROLS.
+ *
+ * It is a SIBLING of the control rows, never a cover and never a replacement.
+ * A signal that takes the surface over meets the letter of the demand and
+ * fails the framing, which asks for transparency and non-intrusiveness in one
+ * breath.
+ *
+ * WHAT IT SAYS IS DELIBERATELY NOT A COMPLETION ESTIMATE. A faithful
+ * percentage is the known way to fail the demand that a signal must leave a
+ * person no less willing to wait than silence would, and the wording is the
+ * owner's to settle rather than this renderer's.
+ */
+function renderRunning(v: PanelValues): string {
+  const r = v.running;
+  if (r === undefined) return "";
+  const secs = Math.round(r.since_ms / 1000);
+  return `<span class="running" title="${esc(r.what)} — still working, ${secs}s so far">${esc(r.what)} — working, ${secs}s</span>`;
+}
+
 export function renderPanel(params: Param[], v: PanelValues): string {
   const parts = params.map((p) => {
     switch (p.type) {
@@ -278,5 +316,5 @@ export function renderPanel(params: Param[], v: PanelValues): string {
     else rows[rows.length - 1].push(parts[i]);
   });
   const html = rows.map((r) => `<span class="param-row">${r.join("")}</span>`).join("");
-  return `<span class="threshold rungbar">${html}</span>`;
+  return `<span class="threshold rungbar">${html}</span>${renderRunning(v)}`;
 }

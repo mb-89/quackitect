@@ -2,7 +2,7 @@
 minted_in: i1
 id: dsp-quality-toolchain
 type: "[[design-spec]]"
-statement: the mechanical quality floor, carried by the battery scripts, the voice lint and the write-path fixer
+statement: the mechanical quality floor, carried by the battery scripts, the inspection runners, the voice lint and the write-path fixer
 realizes:
   - "el-test-runner"
   - "if-record-store-to-test-runner"
@@ -20,6 +20,8 @@ files:
   - "project/deliverable/engine/bin/red-observed.ts"
   - "project/deliverable/engine/bin/battery.ts"
   - "project/deliverable/engine/bin/test-timings.mjs"
+  - "project/deliverable/engine/bin/prose-inspect.ts"
+  - "project/deliverable/engine/bin/record-inspect.ts"
 ---
 
 ## Responsibility

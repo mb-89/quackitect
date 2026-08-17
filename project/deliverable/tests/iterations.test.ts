@@ -364,13 +364,14 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
   const kickFields: Record<string, string> = {
     current_situation: "M0 walked, inbox empty",
     retro_drained: "- none: nothing pended",
-    goal: "walk the pinned machine",
+    goals: "- walk the pinned machine",
     pulled_in: "- none",
     left_out: "- everything else",
     change_size: "patch — the smallest walk proves the seam",
     round_0_verify: "- evidence vs claims: read\n- types: green\n- lint: green\n- tests: green",
     round_1_validate:
       "- exercised against the goal: walked\n- missing: none\n- wrong: none\n- out of scope: none\n- prior art: none in this seam",
+    bound_breaches: "- if-agent-harness-to-entrypoint: none over its bound, the fresh root has no call log to read",
     round_2_red_team: "- none => the attack found nothing",
     raid_additions: "- none",
     verdict: "pass — the claims held",

@@ -38,6 +38,7 @@ satisfies:
   - req-a-fallback-fires-when-its-condition-fails
   - req-refusal-carries-remedy
   - req-call-answers-in-one-second
+  - req-one-operation-reads-its-input-once
 inputs:
   - flow-position
   - flow-compiled-machine
@@ -66,3 +67,8 @@ place and the reason for it in another.
 The one-second answer sits here rather than under a quality umbrella because
 it is a property of THIS function. Nothing else in the tree is on the
 driver's critical path.
+
+SO DOES THE RULE ABOUT HOW IT READS ITS INPUT. Serving a step reads the
+corpus, and it used to read it once per part rather than once per call. That
+is the same critical path and the same argument: a bound on the answer means
+nothing while the cost multiplies by how many times the work asks.

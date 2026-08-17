@@ -35,10 +35,25 @@ it.
   inside this function; only a person's later act may do that
   (raid-dec-i15-disposition-prepopulates-pending-rows).
 - the function signature takes the ranked list as its whole input, with
-  no side channel (a threshold constant, a config flag) that could drop
-  a candidate before the loop runs — pass: no such parameter or module-level
-  constant exists.
+  no side channel that could drop a candidate BEFORE THE WRITE LOOP —
+  pass: recordCouplingDisposition's only value-bearing parameter is the
+  candidate list, and no constant is read inside it. It also takes a root
+  path, which is unused and drops nothing.
 
-Not yet run — engine/disposition.ts is a throwing stub as of author-tests
-(i15 M7). The inspection is owed at verification, once build-steps lands
-the real writer.
+THE WORDING WAS TOO WIDE AND i33'S VERIFICATION CAUGHT IT. The old line
+said "no such parameter or module-level constant exists", and
+engine/disposition.ts does carry `const THRESHOLD = 0.01`. That constant
+filters in the RANKING half, which this spec's own Scope excludes, so the
+line failed on its own words while passing on its intent. It now names
+the write loop, which is what the guarantee is about.
+
+RUN 2026-08-17, at i33's verification, by a tester with fresh eyes.
+
+engine/disposition.ts IS NO LONGER A STUB, and this note said it was for
+long enough that the inspection read as impossible rather than as owed.
+recordCouplingDisposition at disposition.ts:86 returns one row per
+candidate stamped `pending`, with no branch setting any other status.
+
+BOTH REMAINING LINES PASS on a source read. The third was reworded in the
+same pass, because it failed on its own wording while passing on its
+intent.

@@ -26,8 +26,9 @@ evidence:
     template: per-item
     items:
       - $inbox
-  - name: goal
-    description: the confirmed one-line iteration goal
+  - name: goals
+    description: the iteration's goals, one line each - every gate below measures what it produced against these
+    template: list
   - name: pulled_in
     description: what this iteration absorbs, each item with its origin
     template: list
@@ -84,7 +85,7 @@ Review per [[meth-gate-review]].
 The kickoff handover is ONE brief carrying everything:
 
 - the drained retro
-- the iteration goal
+- the iteration GOALS, one line each
 - the scope, as pulled-in and left-out
 - the CHANGE SIZE, with its reasoning
 
@@ -114,3 +115,29 @@ outgrows it, never silently.
 THE BLESS SEEDS THE ITERATION. The engine compiles the blessed column into the
 iteration's state machine and pins it to the record, and that seeded machine
 is part of this gate's output.
+
+## The goals
+
+THE GOALS ARE A LIST. One line each, and they bind the whole walk.
+
+Every gate below carries a `goals_served` field. It lists these goals back and
+asks what that milestone produced for each one. A milestone with nothing for a
+goal, and nothing coming, is a walk that has drifted off its own kickoff.
+
+Three rules on the list itself:
+
+- ENGINE IMPROVEMENTS is a standing goal, always available. It is where the
+  iteration pulls in the machine's own repairs. It needs no argument.
+- MORE THAN HALF A DOZEN GOALS IS TOO BIG. Split the iteration.
+- THE COUNT INFORMS THE COLUMN. One goal has a patch's shape. Two or three
+  have a minor's. More than that argues for major.
+
+WHY THE GOALS LIVE HERE AND NOT IN THE TRACE (owner ruling 2026-08-17): a goal
+is not an artifact that anything refines. It is what every artifact is measured
+against. It travels with the iteration, like the change size and a probed
+assumption, and it never enters the trace graph.
+
+WHAT IT COST TO LEARN THIS. Iteration 33 signed a scope naming four
+milestones. It then wrote stories, use cases, requirements and build chunks
+for one of them. Seven coverage checks passed, because every one compares a
+node to its NEIGHBOUR and not one looks up at the goal.

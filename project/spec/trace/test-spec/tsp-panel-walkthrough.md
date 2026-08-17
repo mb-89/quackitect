@@ -42,3 +42,18 @@ change demonstrates the second.
   stands; zero questions to another person.
 - Reopen the project under a different supported host. Observe: the walk
   serves from the same recorded position; zero repair steps.
+
+## Why it is owed, said correctly (i33, 2026-08-17)
+
+IT NEEDS A PERSON AT THE PANEL, and nothing more. An agent cannot drive the
+editor's webview, so the layout observations here are a person's.
+
+THE REASON i33 FIRST GAVE WAS WRONG. It said this spec needs "a second host
+that does not exist". i33's own verification says a second host DOES exist and
+that a probe was signed which never opened it. The last step is owed because
+nobody has looked, not because there is nothing to look at.
+
+THAT DISTINCTION IS THE WHOLE POINT. "Blocked by a missing resource" retires a
+check quietly and forever. "Nobody has looked" is an hour of somebody's time,
+and it is carried as such in
+raid-debt-ten-checks-wait-on-a-person-or-a-second-machine.

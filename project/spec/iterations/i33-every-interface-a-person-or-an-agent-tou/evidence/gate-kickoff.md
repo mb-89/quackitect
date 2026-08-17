@@ -1,8 +1,9 @@
 ---
 form: gate-kickoff
+amended: "2026-08-17T17:16:49.105Z by agent — This gate claimed no engine code had been written and that the battery need not re-run, both false at its own last amendment. The identical sentence stood in three gates; two were corrected on the re-sign pass and this one was missed. A fresh-eyes tester found it."
 bless: blessed by agent
 by: agent
-signed_off: 2026-08-17T11:35:10.952Z
+signed_off: 2026-08-17T14:35:42.641Z
 authors: agent
 files:
 ---
@@ -12,6 +13,16 @@ files:
 ## current_situation
 
 i33 is entered and its onboarding retro is signed. The inbox stands at zero.
+
+THE GOALS ARE FIVE, and the field above holds them as a list because every gate below now measures what it produced against each one. The first four are the milestones, in a forced order. The fifth is the standing goal, and it is where the seven pulled notes and this morning's dead stop-at control live.
+
+RESTATED AS ONE SENTENCE: every interface a person or an agent touches answers inside a second, or says plainly that it will not - and the boundaries themselves get modelled first, because today none of them exist as nodes.
+
+THE OWNER'S FRAMING, 2026-08-15: "get the performance under one second for everything that is user facing, and everything that is over one second needs to be non-intrusive. Every interface that goes to a human or to an agent needs to be that fast. Either that fast, or very transparent about how slow it is."
+
+THE SECOND HALF IS NOT A CONSOLATION PRIZE. An interface that cannot be fast must be honest and non-intrusive, and must never leave a person guessing whether it is working. That is the half today's system fails hardest, and the stop-at control reported this morning is a live example of it.
+
+WHY THE GOAL BECAME A LIST (owner ruling 2026-08-17). This form carried ONE prose goal, and pulled_in carried thirteen equal bullets where the four milestones sat as peers of seven notes and a dead button. Nothing marked which were the goals, and the walk below served one of them. The goals list and the goals_served round at every gate are the fix.
 
 THE CHANGE SIZE REASONING IN FULL, because the field itself takes one line.
 
@@ -32,14 +43,24 @@ THE COLUMN IS A PREDICTION AND MAY BE WRONG IN PUBLIC. If milestone one finds an
 - the backlog: all 77 parked items walked, 10 pulled into scope and 67 kept parked with their conditions still unmet
 - the debts: all 8 swept and stamped looked 2026-08-17, with two triggers found already fired and one found unfireable as worded
 - the field-feedback question: asked and answered, and it produced the ruling that dropped the bound-surface demonstration
+- note-8c6983ee66a9 — A PROBE WHOSE INSTRUMENT GOES IN THE ENGINE CANN: carried — captured during i33's own walk, after this gate signed, so it belongs to the next retro's drain
+- note-f2bc2e1e2fb8 — THE PULL IS THE WORST BREACH OF THE ONE-SECOND R: carried — same, and it names the pull as the worst standing breach of the one-second rule
+- note-009a76da02aa — A THIRD AND STRONGER CANDIDATE FOR THE DEAD STOP: carried — same, a third candidate cause for the dead stop-at notch
+- note-908e2e3b0dfc — A STATE MACHINE SHOULD SHOW ITS OWN FULL TITLE A: carried — same, the owner's ask that a state machine show its own full title
+- note-b621c9986b74 — THE KICKOFF'S pulled_in FLATTENS MILESTONES AND : carried — same, and it is this gate's own finding about pulled_in flattening milestones and notes
+- note-5aeda2a86ceb — UNSTICKING A GREYED CHAIN IS HAND WORK, AND THE : carried — the owner asked for one act that re-freshens a whole chain, and it is engine work rather than this iteration's
+- note-29960c805dc0 — CONFORMANCE NEVER REACHES A NODE NO FORM POINTS : carried — proven this walk, and its blast radius is unmeasured, so turning it on is a scope call rather than a build step
+- note-360be74ad2e0 — THE BREACH WINDOW RESETS ON THE VERY SUBMIT IT I: carried — half fixed. The row no longer carries a moving count, so the field is answerable; the window itself still reads the gate's current signature rather than its previous one
+- note-2b1ccd564681 — OWNER RULING 2026-08-17: THE AGENT MAY SPAWN SUB: done — written into project/guidance/contract.md as rule 11 and projected to CLAUDE.md, AGENTS.md and the Copilot instructions
+- note-11fdc65a1d43 — FIX NEEDED: THE CONTRACT MUST CARRY THE SUBAGENT: carried — the contract half is done; the session prompt half is outside this repo and returns every session until it is reconfigured, so it stays open
 
-## goal
+## goals
 
-Every interface a person or an agent touches answers inside a second, or says plainly that it will not — and the boundaries themselves get modelled first, because today none of them exist as nodes.
-
-THE OWNER'S FRAMING, 2026-08-15: "get the performance under one second for everything that is user facing, and everything that is over one second needs to be non-intrusive. Every interface that goes to a human or to an agent needs to be that fast. Either that fast, or very transparent about how slow it is."
-
-THE SECOND HALF IS NOT A CONSOLATION PRIZE. An interface that cannot be fast must be honest and non-intrusive, and must never leave a person guessing whether it is working. That is the half today's system fails hardest, and the stop-at control reported this morning is a live example of it.
+- model the outside boundaries
+- bind the one-second demand to them
+- instrument every interface
+- fix what the numbers name
+- engine improvements
 
 ## pulled_in
 
@@ -74,9 +95,9 @@ minor — the trace already holds 40 interface nodes so the type exists and this
 ## round_0_verify
 
 - evidence vs claims: the retro's form is signed and every claim in it was checked against the survey rather than assumed — 0 notes, 0 expeditions, 77 backlog
-- types: not run and not affected — this iteration has written no engine code, and today's writes were guidance, records and one raid node
-- lint: not run, because se_lint is not legal at this gate; the corpus writes passed the lane's own frontmatter guard, which refuses a parse break before anything lands
-- tests: not re-run — the standing battery is 1385 tests with 0 failures from 2026-08-16T19:50:36Z, and nothing since has touched engine code
+- types: RUN AND GREEN, and this line said "not affected, this iteration has written no engine code" long after it had. engine/trace.ts and engine/elematrix.ts changed at the bind-the-bound chunk, and render.ts and session.ts at the fix-what-the-numbers-name chunk, both before this gate's last amendment
+- lint: se_lint is not legal at this gate, and the lints that matter ran anyway. The frontmatter guard refuses a parse break before anything lands, and biome ran clean over 274 files inside the battery below
+- tests: RE-RUN AND GREEN — 1401 tests, 134 suites, 0 failures. This line read "not re-run, and nothing since has touched engine code" against a figure of 1385 from 2026-08-16. THE SAME FALSE SENTENCE STOOD IN THREE GATES. Two were corrected on the re-sign pass and this one was missed, which is how a fresh-eyes tester earns its keep: a defect fixed twice and left standing once reads, from inside, exactly like a defect fixed
 - the latency baseline: measured fresh today rather than inherited — 8424 calls, 1834 over a second, all of them after i12 shipped the rule on 2026-08-15
 - the prediction: NOT verified, and it must not read as if it were — whether drawingSets and stateDetails hold over 90 percent is unmeasured and is now a minted assumption with its probe
 
@@ -123,3 +144,6 @@ WHAT NEEDS THE OWNER AND NOTHING ELSE: the checklist panel's owed state, whose t
 
 ## anything_else
 
+## bound_breaches
+
+- if-agent-harness-to-entrypoint: AT LEAST 181 calls over its one-second bound today. THE NUMBER IS A FLOOR, NOT A MEASUREMENT, and that was found after this line was first written: se_log_query drops records matching its filter and reports `older: 0` while doing it, so the real count can only be higher (raid-iss-the-call-log-query-omits-matching-records-and-says-it-did-not). The direction of every conclusion below is unaffected; the claim to have measured is not. As counted, and MILESTONE FOUR OWNS THEM. Broken down: mirror_slow 82, se_pull 63, se_test_verdict 20, se_aim 6, mirror_profile 4, se_run 2, se_file_search 2, se_git 1, se_seed_iteration 1. THE TWENTY TEST VERDICTS ARE HONEST RATHER THAN BREACHES — if-test-runner-to-toolchain declares a bound deliberately not one second, and a battery is a minute by design. The six aims are the per-hop route recompute, the detour that stops a moved ground being followed off a cliff. TWO FIXES LANDED TODAY against the rest: the duplicate green pass removed from the render, and the signature read folded into the pass that already happens. WHAT IS NOT FIXED AND IS NAMED RATHER THAN BURIED: twelve of the thirteen modelled boundaries have no calls attributed to them, so this row can only name the lane door until a logged call says which crossing it made.

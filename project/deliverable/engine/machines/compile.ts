@@ -42,7 +42,7 @@ export class MachineCompileError extends Error {
 
 // THE STANDARD REVIEW ROUNDS moved to machine.ts, where BOTH compilers can
 // reach one copy. Re-exported so existing importers keep working.
-import { STANDARD_ROUNDS } from "../machine.ts";
+import { roundsFor, STANDARD_ROUNDS } from "../machine.ts";
 
 export { STANDARD_ROUNDS };
 
@@ -605,7 +605,7 @@ export function stateFromNote(machineId: string, ref: string, notePath: string, 
   // so. Dropping the fields quietly would be the silent pass that
   // req-a-wrong-act-never-passes-silently forbids.
   const runsMachine = submachine !== undefined && submachine !== "";
-  const declared = [...evidenceForm(machineId, ref, x, note.body), ...(kind === "gate" ? STANDARD_ROUNDS : [])];
+  const declared = [...evidenceForm(machineId, ref, x, note.body), ...(kind === "gate" ? roundsFor(stateId) : [])];
   if (runsMachine && declared.length > 0) {
     process.stderr.write(
       `[compile] ${machineId}/${stateId} runs the ${String(submachine)} machine and declared ${declared.length} evidence field(s). ` +

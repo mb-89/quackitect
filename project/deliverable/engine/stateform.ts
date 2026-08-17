@@ -447,11 +447,94 @@ function cardWalk(f: EvidenceField, traceRoot: string, items: string[]): WalkRes
   return walk(items, js, kind, pairs);
 }
 
+/** THE MODELLED BOUNDARIES A GATE MUST READ THE INSTRUMENT FOR, one row each.
+ *
+ *  THE INSTRUMENT IS NOT THE DELIVERABLE. A READER WHO OWES AN ANSWER IS.
+ *  i12 shipped the one-second rule, the timings were recorded, and two days
+ *  later 1834 of 8424 calls were over it because nothing in the machine ever
+ *  put the number in front of anybody. This is the field that does.
+ *
+ *  ONE BOUNDARY IS COMPUTABLE TODAY, and that is stated rather than hidden.
+ *  Every lane call crosses if-agent-harness-to-entrypoint, so the log answers
+ *  for it directly. The other twelve need their crossings attributed in the
+ *  log before they can be counted, and until then a silent zero on them would
+ *  be a measured zero dressed as a clean bill. */
+export function breachItems(): string[] {
+  // THE LABEL IS STABLE AND THE COUNT IS THE ANSWER'S (i33, 2026-08-17).
+  //
+  // IT CARRIED THE COUNT FIRST, and that made the item a MOVING TARGET: a
+  // per-item field matches on the item text, the count changed between the
+  // serve and the check, and the field could not be answered reliably at all.
+  // One gate showed "9 call(s)", then "none", then "11 call(s)" inside a few
+  // minutes, each time refusing the answer written for the last one.
+  //
+  // SO THE ROW IS THE BOUNDARY, always, and how many crossed it slowly is what
+  // the reviewer writes down. A row that is always present also stops a clean
+  // window and an unasked question looking identical — the same defect as a
+  // control that declines in silence.
+  //
+  // ONE BOUNDARY IS MEASURABLE TODAY. Every lane call crosses
+  // if-agent-harness-to-entrypoint, so the log answers for it directly. The
+  // other twelve need their crossings attributed in the log first, and a
+  // silent zero on them would be a measured zero dressed as a clean bill.
+  return ["if-agent-harness-to-entrypoint"];
+}
+
+/** THE PLAIN TRACE TYPES, as a table rather than a branch each. They differ
+ *  only in the type name, so a chain of them is sixteen decisions where there
+ *  is really one lookup. */
+const TYPED_SOURCES: Record<string, string> = {
+  $experiments: "experiment",
+  $requirements: "requirement",
+  "$test-specs": "test-spec",
+  "$design-specs": "design-spec",
+  "$value-props": "value-prop",
+};
+
+/** THE CATALOGUES. A known set is never typed from memory and never hard
+ *  coded — it is read from the method card that holds it, so editing the card
+ *  edits the offer (owner ruling 2026-08-08). catalogs.ts says how. */
+const CATALOG_SOURCES: Record<string, string> = {
+  $iq_checklist: "iq_checklist",
+  $sweep_surfaces: "sweep_surfaces",
+  $heuristics: "heuristics",
+  $transform_operators: "transform_operators",
+  $triz_separations: "triz_separations",
+};
+
+/** THE ITERATION'S OWN GOALS, read off the kickoff's blessed form.
+ *
+ *  THEY TRAVEL WITH THE RECORD, NOT THE TRACE GRAPH (owner ruling
+ *  2026-08-17). A goal is not an artifact anything refines — it is what every
+ *  artifact is measured AGAINST. Same vehicle as the change size, which has
+ *  ridden this exact form since the pin was built.
+ *
+ *  EMPTY IS LEGAL and means the kickoff has not blessed any yet. The kickoff
+ *  is the one gate that runs before goals exist, so a per-item field over
+ *  nothing renders as nothing rather than refusing.
+ *
+ *  ONLY LIST LINES COUNT. The section carries the framing prose beside the
+ *  list, and a paragraph that became a phantom goal would put an unanswerable
+ *  row in every gate below. */
+export function goalItems(evidenceDir?: string): string[] {
+  if (evidenceDir === undefined) return [];
+  const note = noteOf(join(evidenceDir, "gate-kickoff.md"));
+  if (note === undefined) return [];
+  return section(note.body, "goals")
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .split("\n")
+    .filter((l) => /^\s*[-*]\s+/.test(l))
+    .map((l) => l.replace(/^\s*[-*]\s+/, "").trim())
+    .filter((l) => l !== "");
+}
+
 /** ONE SOURCE RESOLVER, so a `$name` means the same thing wherever it is
  *  written. Items and picks both come through here; a literal passes
  *  straight out, which is what makes a fixed list legal beside a live one. */
-function resolveSource(i: string, root: string, traceRoot: string, instanceRaw?: string): string[] {
+function resolveSource(i: string, root: string, traceRoot: string, instanceRaw?: string, evidenceDir?: string): string[] {
   if (i === "$inbox") return inboxItems(root, instanceRaw);
+  if (i === "$goals") return goalItems(evidenceDir);
+  if (i === "$breaches") return breachItems();
   if (i === "$assumptions") return assumptionItems(traceRoot);
   if (i === "$criterion_pool") return criterionPoolItems(traceRoot);
   if (i === "$compounding_suspects") return compoundingSuspectItems(traceRoot);
@@ -460,23 +543,14 @@ function resolveSource(i: string, root: string, traceRoot: string, instanceRaw?:
   if (i === "$clusters") return clusterItems(traceRoot);
   if (i === "$flows") return flowItems(traceRoot);
   if (i === "$options") return optionItems(traceRoot);
-  if (i === "$experiments") return typedItems(traceRoot, "experiment");
-  if (i === "$requirements") return typedItems(traceRoot, "requirement");
-  if (i === "$test-specs") return typedItems(traceRoot, "test-spec");
-  if (i === "$design-specs") return typedItems(traceRoot, "design-spec");
+  const typed = TYPED_SOURCES[i];
+  if (typed !== undefined) return typedItems(traceRoot, typed);
+  const catalog = CATALOG_SOURCES[i];
+  if (catalog !== undefined) return catalogItems(root, catalog);
   if (i === "$promotions") return promotionItems(traceRoot);
   if (i === "$claim-specs") return claimSpecItems(traceRoot);
-  if (i === "$iq_checklist") return catalogItems(root, "iq_checklist");
-  if (i === "$sweep_surfaces") return catalogItems(root, "sweep_surfaces");
-  if (i === "$value-props") return typedItems(traceRoot, "value-prop");
   if (i === "$must-stories") return mustStoryItems(traceRoot);
   if (i === "$candidates") return candidateItems(traceRoot);
-  // THE CATALOGUES. A known set is never typed from memory and never hard
-  // coded — it is read from the method card that holds it, so editing the card
-  // edits the offer (owner ruling 2026-08-08). catalogs.ts says how.
-  if (i === "$heuristics") return catalogItems(root, "heuristics");
-  if (i === "$transform_operators") return catalogItems(root, "transform_operators");
-  if (i === "$triz_separations") return catalogItems(root, "triz_separations");
   if (i === "$triz_parameters") return trizParameterItems(root);
   // A `$name` NOBODY RESOLVES IS A TYPO, and the silent version of this bug is
   // the worst kind: the field renders, the datalist is empty, and the form
@@ -1692,7 +1766,7 @@ export function stateFormFields(s: StateDecl): FormTemplate {
  *  trace. Extracted from stateFormModel because it grew past what one function
  *  should hold, and because the pick resolution below is worth reading alone. */
 export function fieldArgsFor(f: EvidenceField, root: string, traceRoot: string, instanceRaw?: string, evidenceDir?: string): FieldArgs {
-  const resolved = (f.items ?? []).flatMap((i) => resolveSource(i, root, traceRoot, instanceRaw));
+  const resolved = (f.items ?? []).flatMap((i) => resolveSource(i, root, traceRoot, instanceRaw, evidenceDir));
   return {
     of: f.of ?? "",
     covers: f.covers ?? "",
@@ -1707,7 +1781,7 @@ export function fieldArgsFor(f: EvidenceField, root: string, traceRoot: string, 
     picks: Object.fromEntries(
       Object.entries(f.picks ?? {}).map(([col, srcs]) => [
         col,
-        [...new Set(srcs.flatMap((src) => resolveSource(src, root, traceRoot, instanceRaw)))],
+        [...new Set(srcs.flatMap((src) => resolveSource(src, root, traceRoot, instanceRaw, evidenceDir)))],
       ]),
     ),
     pick_free: f.pick_free ?? [],

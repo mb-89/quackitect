@@ -23,8 +23,10 @@ import {
   repinColumn,
 } from "../engine/iterations.ts";
 import { claimFeeders, downstreamCone, type MachineDecl } from "../engine/machine.ts";
+import { doorStats } from "../engine/notes.ts";
 import { type ChangeColumn, compileColumn, readRigorMatrix } from "../engine/rigor-matrix.ts";
 import { Session } from "../engine/session.ts";
+import { corpusAsks } from "../engine/trace.ts";
 import { freshRoot } from "./helpers.ts";
 
 const SIZE: ChangeColumn = "minor";
@@ -199,6 +201,239 @@ test("a claim keeps its signature when an input falls, and the colour is compute
   assert.ok(!new Session(root).recordDone(decl).includes(gate.id), "but it is NOT green — it rests on ground that moved");
 });
 
+// A FEEDER RE-SIGNED IN THE SAME BREATH IS STILL GROUND THAT MOVED (owner
+// ruling 2026-08-17). The colour ripple above compares GREEN, and a form
+// resubmitted through the pull unsigns and re-signs inside ONE call — so the
+// feeder is green again before anything downstream ever looks at it.
+//
+// i33 hit this live. Its kickoff replaced one prose goal with a list of five,
+// and the walk ran straight through two signed gates that had never heard of
+// four of them. se_reopen would have rippled; se_amend deliberately does not;
+// the resubmit was a third path nobody had covered.
+//
+// THE BLESS FALLS WITH THE GREEN. The ripple is a graph walk and never touches
+// frontmatter, so the stale gate still carries its `bless:` line on disk.
+test("a claim signed before its feeder's signature is stale, and the bless falls with it", () => {
+  const { root, it } = pinned();
+  const decl = { ...compileColumn(readRigorMatrix(root), SIZE), id: itShortId(it.id) };
+  const gate = decl.states.find((s) => s.kind === "gate" && s.evidence_form.length > 0);
+  assert.ok(gate !== undefined);
+  const claimful = new Set(decl.states.filter((s) => s.evidence_form.length > 0).map((s) => s.id));
+  const feeders = claimFeeders(decl, gate.id, claimful);
+  assert.ok(feeders.length > 0, "the gate has at least one claim-bearing input");
+
+  const evOf = (id: string): string => join(it.path, "project", "spec", "iterations", it.id, "evidence", `${id}.md`);
+  const signAt = (id: string, when: string): void => {
+    mkdirSync(dirname(evOf(id)), { recursive: true });
+    writeFileSync(evOf(id), `---\nsigned_off: ${when}\nbless: blessed by the owner\n---\n\nthe claim, in full\n`, "utf8");
+  };
+  // Everything answers the same ground, so nothing is stale to begin with.
+  for (const id of claimful) signAt(id, "2026-08-17T10:00:00.000Z");
+  assert.ok(new Session(root).recordDone(decl).includes(gate.id), "green while every claim answers the same ground");
+  assert.ok(new Session(root).blessedGates(decl).includes(gate.id), "and its thumbs-up paints");
+
+  // THE FEEDER IS EDITED AND RE-SIGNED, never resting grey — green again the
+  // moment it lands, exactly like a resubmit through the pull.
+  signAt(feeders[0], "2026-08-17T11:00:00.000Z");
+  const after = readFileSync(evOf(gate.id), "utf8");
+  assert.match(after, /^signed_off: 2026-08-17T10:00:00\.000Z$/m, "the gate's own stamp is untouched");
+  assert.match(after, /^bless: blessed by the owner$/m, "and its bless is still on the file");
+  assert.ok(!new Session(root).recordDone(decl).includes(gate.id), "but it is NOT green — it answered older ground");
+  assert.ok(!new Session(root).blessedGates(decl).includes(gate.id), "and the thumbs-up falls with the green");
+
+  // AND AN AMEND DOES NOT CLEAR IT. THIS BLOCK ONCE ASSERTED THE OPPOSITE
+  // (owner ruling 2026-08-17, correcting what stood here the same day).
+  //
+  // It read "an amend re-freshens the claim against the ground as it now
+  // stands", which made every correction anywhere count as a fresh answer —
+  // and, through claimTime, grey every claim below it. The rule is the other
+  // way round: an amendment does not re-grey, a reopen re-greys.
+  //
+  // THE TWO ACTS ANSWER DIFFERENT QUESTIONS. The feeder above did not fix a
+  // word, it RE-SIGNED: it answered again, against ground that moved. A gate
+  // replying "I corrected a figure" has not answered that. It stays grey.
+  //
+  // NOTHING IS TRAPPED BY THIS, which is what the old block was afraid of. A
+  // typo upstream is an AMEND upstream, and an amend greys nothing at all. So
+  // the only claims that ever reach this position are the ones whose ground
+  // genuinely moved, and those are supposed to answer again.
+  writeFileSync(
+    evOf(gate.id),
+    `---\nsigned_off: 2026-08-17T10:00:00.000Z\namended: 2026-08-17T12:00:00.000Z by the owner — a figure in one sentence was wrong\nbless: blessed by the owner\n---\n\nthe claim, in full\n`,
+    "utf8",
+  );
+  assert.ok(
+    !new Session(root).recordDone(decl).includes(gate.id),
+    "an amend corrects wording — it does not answer ground that moved, so it cannot stand the claim back up",
+  );
+
+  // A FRESH SIGNATURE IS WHAT CLEARS IT, and that is the only thing that does.
+  signAt(gate.id, "2026-08-17T13:00:00.000Z");
+  assert.ok(new Session(root).recordDone(decl).includes(gate.id), "signing again against the new ground stands it up");
+  assert.ok(new Session(root).blessedGates(decl).includes(gate.id), "and the thumbs-up comes back with it");
+});
+
+// AN AMENDMENT DOES NOT RE-GREY. A REOPEN RE-GREYS (owner ruling 2026-08-17,
+// req-an-amend-leaves-the-tree-standing).
+//
+// THE TEST ABOVE WATCHES A CLAIM THAT IS ALREADY STALE. This one watches the
+// act that must never MAKE one. A correction anywhere used to grey the whole
+// chain under it, so each repair created more repairs and the walk stopped
+// converging — i33 spent an afternoon re-freshening a chain that nothing was
+// wrong with.
+//
+// WHY NOTHING SAW IT COMING. Every amend test signs exactly ONE state, and a
+// one-state fixture cannot tell "leaves the tree standing" from "has no tree".
+test("an amend on a feeder leaves the claims below it standing, and a re-sign drops them", () => {
+  const { root, it } = pinned();
+  const decl = { ...compileColumn(readRigorMatrix(root), SIZE), id: itShortId(it.id) };
+  const gate = decl.states.find((s) => s.kind === "gate" && s.evidence_form.length > 0);
+  assert.ok(gate !== undefined);
+  const claimful = new Set(decl.states.filter((s) => s.evidence_form.length > 0).map((s) => s.id));
+  const feeders = claimFeeders(decl, gate.id, claimful);
+  assert.ok(feeders.length > 0, "the gate has at least one claim-bearing input");
+
+  // THE BLESS RIDES ALONG because a GATE is not done for the route until it
+  // carries one. The paint is happy with a signature alone; the walk is not.
+  const evOf = (id: string): string => join(it.path, "project", "spec", "iterations", it.id, "evidence", `${id}.md`);
+  const signAt = (id: string, when: string): void => {
+    mkdirSync(dirname(evOf(id)), { recursive: true });
+    writeFileSync(evOf(id), `---\nsigned_off: ${when}\nbless: blessed by the owner\n---\n\nthe claim, in full\n`, "utf8");
+  };
+  for (const id of claimful) signAt(id, "2026-08-17T10:00:00.000Z");
+  assert.ok(new Session(root).recordDone(decl).includes(gate.id), "green while every claim answers the same ground");
+
+  // THE FEEDER IS CORRECTED, NOT RE-SIGNED. `amended:` moves and `signed_off:`
+  // does not, because the claim still attests to what it always did. Nothing
+  // below it was answering the corrected words.
+  writeFileSync(
+    evOf(feeders[0]),
+    `---\nsigned_off: 2026-08-17T10:00:00.000Z\namended: 2026-08-17T12:00:00.000Z by the owner — one figure was wrong\nbless: blessed by the owner\n---\n\nthe claim, in full\n`,
+    "utf8",
+  );
+  assert.ok(
+    new Session(root).recordDone(decl).includes(gate.id),
+    "a correction upstream leaves the claim below it standing — otherwise every repair creates more repairs",
+  );
+
+  // AND THE OTHER HALF, so this cannot be satisfied by a green that never moves.
+  signAt(feeders[0], "2026-08-17T13:00:00.000Z");
+  assert.ok(!new Session(root).recordDone(decl).includes(gate.id), "a RE-SIGNED feeder is ground that moved, and that does re-grey");
+});
+
+// A REOPEN DROPS THE CONE IT FEEDS, and nothing asserted that until now.
+//
+// The i33 fresh-eyes tester named this as the one thing it could not check:
+// claimops.test.ts covers the reopened state itself going grey and keeping its
+// signature, and nothing covered what stands ON it. The i33 walk exercised it
+// by hand about twenty times, which is evidence and not a test.
+//
+// WHY IT IS THE HALF THAT MATTERS. An amendment is cheap ONLY because a reopen
+// is available and does the greying properly. If this propagation regressed,
+// corrections would stay cheap while changed QUESTIONS quietly stopped
+// re-earning their answers below them — which is the i33 kickoff defect
+// returning by the other door, and invisible from inside.
+//
+// THE MARK IS WRITTEN RATHER THAN THE VERB CALLED, on purpose. reopenClaim's
+// own plumbing is claimops' subject. What is under test here is the RIPPLE:
+// green asks whether the reopen is newer than the signature, and this asserts
+// what that answer does to everything downstream.
+test("a reopen drops the claims the reopened state feeds, not only itself", () => {
+  const { root, it } = pinned();
+  const decl = { ...compileColumn(readRigorMatrix(root), SIZE), id: itShortId(it.id) };
+  const gate = decl.states.find((s) => s.kind === "gate" && s.evidence_form.length > 0);
+  assert.ok(gate !== undefined);
+  const claimful = new Set(decl.states.filter((s) => s.evidence_form.length > 0).map((s) => s.id));
+  const feeders = claimFeeders(decl, gate.id, claimful);
+  assert.ok(feeders.length > 0, "the gate has at least one claim-bearing input");
+
+  const evOf = (id: string): string => join(it.path, "project", "spec", "iterations", it.id, "evidence", `${id}.md`);
+  const signAt = (id: string, when: string): void => {
+    mkdirSync(dirname(evOf(id)), { recursive: true });
+    writeFileSync(evOf(id), `---\nsigned_off: ${when}\nbless: blessed by the owner\n---\n\nthe claim, in full\n`, "utf8");
+  };
+  for (const id of claimful) signAt(id, "2026-08-17T10:00:00.000Z");
+  assert.ok(new Session(root).recordDone(decl).includes(gate.id), "green while every claim stands");
+  assert.ok(new Session(root).blessedGates(decl).includes(gate.id), "and the gate's thumbs-up paints");
+
+  // THE FEEDER IS REOPENED. Its signature is untouched and the mark is newer
+  // than it, which is the one question green asks about a reopen.
+  writeFileSync(
+    evOf(feeders[0]),
+    `---\nsigned_off: 2026-08-17T10:00:00.000Z\nreopened: 2026-08-17T11:00:00.000Z — the question below it changed\nbless: blessed by the owner\n---\n\nthe claim, in full\n`,
+    "utf8",
+  );
+  const after = new Session(root).recordDone(decl);
+  assert.ok(!after.includes(feeders[0]), "the reopened claim is grey");
+  assert.ok(
+    !after.includes(gate.id),
+    "AND THE GATE STANDING ON IT FELL WITH IT. This is the assertion nothing carried: a reopen that greyed only itself would leave every claim below answering a question that has been withdrawn.",
+  );
+  assert.ok(!new Session(root).blessedGates(decl).includes(gate.id), "and the thumbs-up falls with the green rather than painting over it");
+
+  // THE FEEDER COMES BACK ON A FRESH SIGNATURE, not on the mark being swept
+  // away. Nothing edits the file to remove the reopen; a newer signature
+  // simply answers the question green asks.
+  signAt(feeders[0], "2026-08-17T12:00:00.000Z");
+  assert.match(readFileSync(evOf(feeders[0]), "utf8"), /^signed_off: 2026-08-17T12:00:00\.000Z$/m, "re-signed rather than un-marked");
+  assert.ok(new Session(root).recordDone(decl).includes(feeders[0]), "the reopened claim stands again on the newer signature alone");
+
+  // AND THE GATE DOES NOT COME BACK WITH IT, which is the assertion this test
+  // got wrong on its first run and is worth keeping for that reason.
+  //
+  // The feeder did not merely return to where it was. It ANSWERED AGAIN, at
+  // 12:00, against ground that had changed enough to warrant a reopen. The
+  // gate's own claim is still stamped 10:00, so it answered the older
+  // question and it is stale until it answers this one.
+  //
+  // A GATE THAT SPRANG BACK HERE WOULD BE THE i33 KICKOFF DEFECT EXACTLY: the
+  // question below changes, the state that owns it re-earns its answer, and
+  // everything standing on it sails through still holding the old one.
+  assert.ok(
+    !new Session(root).recordDone(decl).includes(gate.id),
+    "the gate stays grey — its input answered a NEW question at 12:00 and the gate's own claim is still stamped 10:00",
+  );
+
+  // IT COMES BACK WHEN IT ANSWERS, and only then.
+  signAt(gate.id, "2026-08-17T13:00:00.000Z");
+  assert.ok(new Session(root).recordDone(decl).includes(gate.id), "and it stands once it has answered the new question itself");
+  assert.ok(new Session(root).blessedGates(decl).includes(gate.id), "with its thumbs-up back, because the bless rides the standing claim");
+});
+
+// ONE OPERATION READS ITS INPUT ONCE (req-one-operation-reads-its-input-once).
+//
+// THE BOUND IS A SHAPE, NOT A NUMBER. Entering one record asked for the same
+// 328-node corpus sixty-six times, because each hop asked what was green and
+// each ask fetched its own inputs. Stamping took one ask from 312.9 ms to
+// 4.3 ms — a seventy-fold win on the wrong number, and the sixty-six stayed.
+// notes.ts says it in its own comment: a cache cannot fix a call count.
+//
+// SO THIS ASSERTS THE PASS IS HONOURED rather than a tuned constant. A tuned
+// constant drifts and gets raised; a second call costing zero is the property
+// the requirement actually names.
+test("one operation reads its input once — a second ask inside the same pass costs nothing", () => {
+  const { root, it } = pinned();
+  const decl = { ...compileColumn(readRigorMatrix(root), SIZE), id: itShortId(it.id) };
+  const evOf = (id: string): string => join(it.path, "project", "spec", "iterations", it.id, "evidence", `${id}.md`);
+  for (const s of decl.states.filter((x) => x.evidence_form.length > 0)) {
+    mkdirSync(dirname(evOf(s.id)), { recursive: true });
+    writeFileSync(evOf(s.id), `---\nsigned_off: 2026-08-17T10:00:00.000Z\n---\n\nthe claim, in full\n`, "utf8");
+  }
+  const session = new Session(root);
+  const pass = Session.newPass();
+
+  const before = doorStats();
+  session.recordDone(decl, new Set(), pass);
+  const afterFirst = doorStats();
+  const firstAsks = afterFirst.hits + afterFirst.misses - (before.hits + before.misses);
+  assert.ok(firstAsks > 0, "the first pass must actually read something, or this test proves nothing");
+
+  session.recordDone(decl, new Set(), pass);
+  const afterSecond = doorStats();
+  const secondAsks = afterSecond.hits + afterSecond.misses - (afterFirst.hits + afterFirst.misses);
+  assert.equal(secondAsks, 0, `the same question inside one pass asked the door ${secondAsks} more times — the pass is not being honoured`);
+});
+
 test("a weakened demand does not reopen — what was filed already covers it", () => {
   assert.deepEqual(movedDemands({ s: { applies: "full", evidence: "E" } }, { s: { applies: "tailored", evidence: "E" } }), []);
 });
@@ -266,22 +501,91 @@ test("a collection bar's prerequisites include every input, not just the nearest
 // A guard that cannot tell them apart guards nothing, so this one buys a
 // corpus big enough for the difference to show.
 //
-// The bound is deliberately loose. It is not measuring how fast this is; it is
-// there to go red if somebody puts a per-state corpus load back.
-test("green is computed inside a second against a corpus of two hundred nodes", () => {
+// THE CLOCK WAS THE PROXY, AND THE COUNT IS THE THING (i33, 2026-08-17).
+//
+// This guard asked for under a second, and its own comment said why: to go red
+// if somebody puts a per-state corpus load back. A wall clock is a poor
+// instrument for that. The honest cost of one cold green computation sits at
+// roughly 85-105% of a second on this machine, so the guard passed idle and
+// failed under load, three times in one afternoon. A check that answers
+// differently depending on what else the machine is doing has stopped
+// discriminating, and widening its budget would only have muted it.
+//
+// SO IT COUNTS INSTEAD OF TIMING, and it counts TWO things because the first
+// one alone did not catch what its own comment claimed (found by a fresh-eyes
+// tester, 2026-08-17, with line numbers).
+//
+// THE ASKS ARE THE LOAD-BEARING COUNT. corpusAsks() meters every call to
+// loadTrace, hit or miss. One operation collects its input once and hands it
+// down, so one recordDone is ONE ask. Put a load back inside the per-state
+// loop and it becomes one per claimful state — twenty-five where one belongs,
+// which no cache can hide.
+//
+// WHY THE DOOR COUNT COULD NOT DO THAT JOB, kept because the mistake is easy
+// to make again. loadTrace memoizes ABOVE the door: on a stamp hit it returns
+// the held nodes having called noteOf zero times. A per-state load therefore
+// costs about 210 statSync calls the door never sees and no door accesses at
+// all. The count stayed flat at 245 and the guard passed while the defect it
+// named sat there.
+//
+// THE DOOR COUNT STAYS ANYWAY, because it catches a different regression the
+// ask count cannot: something re-reading corpus FILES through noteOf per
+// state, without going through loadTrace at all. Two counters, two failure
+// shapes, neither standing in for the other.
+//
+// THE CLOCK STAYS AS A COARSE BACKSTOP, at a bound no healthy run approaches.
+// Hoisting the corpus load above the claimful test once measured 3683 ms here.
+// That class of regression is still worth a red, and 2500 ms catches it
+// without flaking on the honest cost.
+test("green reads the corpus once, and is computed against two hundred nodes", () => {
   const { root, it } = pinned();
   const decl = { ...compileColumn(readRigorMatrix(root), SIZE), id: itShortId(it.id) };
   const reqDir = join(it.path, "project", "spec", "trace", "requirement");
   mkdirSync(reqDir, { recursive: true });
-  for (let i = 0; i < 200; i++) {
+  const FILLERS = 200;
+  for (let i = 0; i < FILLERS; i++) {
     writeFileSync(join(reqDir, `req-filler-${i}.md`), `---\nid: req-filler-${i}\ntype: "[[requirement]]"\n---\n\nfiller\n`, "utf8");
   }
   const session = new Session(root);
+  const before = doorStats();
+  const asksBefore = corpusAsks();
   const started = Date.now();
   session.recordDone(decl);
   const took = Date.now() - started;
+  const after = doorStats();
+  const asks = corpusAsks() - asksBefore;
+  const accesses = after.hits + after.misses - (before.hits + before.misses);
+  const claimful = decl.states.filter((s) => s.evidence_form.length > 0).length;
+
+  // ONE OPERATION, ONE ASK. This is the assertion the requirement actually
+  // names, and the one a per-state load cannot get past.
+  assert.equal(
+    asks,
+    1,
+    `recordDone asked for the corpus ${asks} time(s) over ${claimful} claimful states. It collects its input ONCE and hands it down; ${claimful} asks would mean every state fetching its own, which is the defect this guards and which no cache hides.`,
+  );
+  // MEASURED, 2026-08-17: 245 accesses over 200 fillers and 25 claimful
+  // states. That is ONE sweep — the corpus, plus the root's own nodes, plus
+  // each state instance and its templates on top. A per-state sweep at 25
+  // states would be about five thousand.
+  //
+  // SO THE CEILING SITS BETWEEN THEM, with the margin written down rather than
+  // guessed: 3.3x above the honest cost, 6x below the regression. Neither
+  // number moves with machine load, which is the whole reason this replaced a
+  // clock.
+  const ceiling = FILLERS * 4;
   assert.ok(
-    took < 1000,
-    `recordDone took ${took} ms over 200 nodes. The requirement is one second per CALL, and one call paints more than once — so this budget is already generous.`,
+    accesses < ceiling,
+    `recordDone made ${accesses} door accesses over ${FILLERS} filler nodes and ${claimful} claimful states. The ceiling is ${ceiling}, against a measured 245. Above it, the corpus is being swept more than once — most likely once per state, which is the defect this guards.`,
+  );
+  // AND IT MUST ACTUALLY HAVE READ THE CORPUS. Without this line the guard
+  // passes triumphantly on a green that was computed over nothing at all.
+  assert.ok(
+    accesses > FILLERS,
+    `recordDone made only ${accesses} door accesses over ${FILLERS} filler nodes. It cannot have read the corpus it is meant to be judging — this guard would then be measuring an empty computation.`,
+  );
+  assert.ok(
+    took < 2500,
+    `recordDone took ${took} ms over ${FILLERS} nodes. This is the coarse backstop, not the bound — at this figure something is sweeping the corpus repeatedly, and the access count above says how often.`,
   );
 });

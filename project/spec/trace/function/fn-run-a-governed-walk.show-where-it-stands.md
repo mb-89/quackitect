@@ -21,6 +21,11 @@ satisfies:
   - req-a-reopen-stands-where-it-can-work
   - req-controls-draw-from-their-spec
   - req-a-surface-resolves-to-what-it-shows
+  - req-a-refused-act-says-why-and-what-next
+  - req-a-surface-shows-the-state-an-act-produced
+  - req-a-control-that-undoes-on-a-second-press-says-so-first
+  - req-work-past-its-bound-says-it-is-working
+  - req-a-slowness-signal-never-shortens-the-wait
 inputs:
   - flow-position
   - flow-trace-graph

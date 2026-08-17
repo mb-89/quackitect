@@ -304,6 +304,11 @@ export function sessionTools(session: Session): ToolDef[] {
           },
           reason: { type: "string", description: "what was wrong — one line, and the file keeps it" },
           machine: { type: "string", description: "which machine the state belongs to — needed from outside it, e.g. i1" },
+          chain: {
+            type: "boolean",
+            description:
+              "NOT IMPLEMENTED — accepted and ignored, and it is documented that way rather than removed so nobody rebuilds it from the same wrong premise. It was written when an amend re-greyed the chain below it, to re-freshen that chain in one act. The owner reversed that on 2026-08-17: an amendment does not re-grey, so there is normally nothing to re-freshen and this argument has no work to do. WHAT IS STILL WANTED, if anything, is a bulk RE-SIGN after a genuine reopen — a different act on a different trigger. See note-380d789f6f85 and note-fc18d2775583.",
+          },
         },
         required: ["state", "reason"],
       },
@@ -315,6 +320,7 @@ export function sessionTools(session: Session): ToolDef[] {
           "agent",
           args.machine === undefined ? undefined : String(args.machine),
           (args.ops ?? []) as AmendOp[],
+          args.chain === true,
         ),
     },
   ];
@@ -1247,14 +1253,21 @@ export function coreTools(
             entry.verdict = { job: id, running: false, ...value };
             persistTestJob(se, id, entry);
             try {
+              // THE RECORD CARRIES THE QUESTION IT ANSWERED (i33, 2026-08-17,
+              // tsp-record-inspection item 12). It did not until now: the
+              // question rode the call that STARTED the run and the verdict
+              // recorded only a job id, so the log held eight test runs and
+              // could not say what any of them was for.
               new CallLog(seDir(projectRoot)).append({
                 tool: "se_test_verdict",
-                args: { job: id, battery },
+                args: { job: id, battery, question: args.question },
                 ok: value.ok === true,
                 outcome: "result",
                 duration_ms: Date.now() - entry.started,
                 response: {
                   ok: value.ok,
+                  question: args.question,
+                  decided: { scope: decision.scope, why: decision.why },
                   ...(value.tests !== undefined ? { tests: value.tests } : {}),
                   ...(value.results !== undefined ? { results: value.results } : {}),
                 },
@@ -1269,11 +1282,11 @@ export function coreTools(
             try {
               new CallLog(seDir(projectRoot)).append({
                 tool: "se_test_verdict",
-                args: { job: id, battery },
+                args: { job: id, battery, question: args.question },
                 ok: false,
                 outcome: "rejected",
                 duration_ms: Date.now() - entry.started,
-                response: entry.verdict,
+                response: { question: args.question, decided: { scope: decision.scope, why: decision.why }, ...entry.verdict },
               });
             } catch {
               // bookkeeping never kills the engine

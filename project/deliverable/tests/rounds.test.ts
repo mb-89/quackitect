@@ -40,7 +40,15 @@ describe("the standard review rounds", () => {
     // raid_additions sits between the last round and the verdict: a review is
     // when a risk or assumption is most visible and least likely to be
     // recorded (owner ruling 2026-08-06).
-    assert.deepEqual(ROUND_NAMES, ["round_0_verify", "round_1_validate", "round_2_red_team", "raid_additions", "verdict"]);
+    assert.deepEqual(ROUND_NAMES, [
+      "round_0_verify",
+      "round_1_validate",
+      "goals_served",
+      "bound_breaches",
+      "round_2_red_team",
+      "raid_additions",
+      "verdict",
+    ]);
     for (const f of STANDARD_ROUNDS) {
       assert.equal(f.required, true, `${f.name} must be required — an optional round is a round that never happens`);
       assert.ok(f.description.trim().length > 40, `${f.name} needs a description that tells the filler what to do`);
@@ -55,6 +63,10 @@ describe("the standard review rounds", () => {
         for (const g of gates) {
           const names = g.evidence_form.map((f) => f.name);
           for (const r of ROUND_NAMES) {
+            // THE KICKOFF IS EXEMPT FROM goals_served, and from that alone.
+            // It is where the goals are written, so it has produced nothing
+            // to measure against them yet. roundsFor holds the rule.
+            if (r === "goals_served" && g.id === "gate-kickoff") continue;
             assert.ok(names.includes(r), `${column}/${g.id} is missing ${r} — the compiler must add it, not the row author`);
           }
         }

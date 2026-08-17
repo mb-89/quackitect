@@ -1033,6 +1033,17 @@ class Controls {
   .rung { flex: 1 1 auto; padding: 3px 4px; font: inherit; font-size: .85em; cursor: pointer; background: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground); border: 1px solid var(--vscode-panel-border); border-radius: 4px; }
   .rung:hover { background: var(--vscode-button-secondaryHoverBackground); }
   .rung.on { background: var(--vscode-button-background); color: var(--vscode-button-foreground); border-color: var(--vscode-focusBorder); }
+  /* A BANK HANDED NO POSITION. Not an error and not a setting: the control
+     genuinely does not know where it stands. Drawn as a row of ordinary
+     locked buttons it reads as a refusal, which is what disarmed the
+     emergency rung and blanked the shutdown row. Dashed and muted says
+     unknown without claiming anything is wrong. */
+  .rung.unknown { border-style: dashed; color: var(--vscode-descriptionForeground); }
+  /* WORK STILL RUNNING, beside the controls and never over them. Muted and
+     small, so it is findable without competing with the control it sits next
+     to — which is what non-intrusive means here. It is a sibling of the
+     control rows in the markup for the same reason. */
+  .running { display: block; margin-top: 4px; font-size: .8em; color: var(--vscode-descriptionForeground); }
   /* Ideation delegates the CREATION of work, so its rung is drawn as a
      hazard rather than as a setting. RED, not a bordered blue: it was
      wearing the host's ordinary button background with a warning outline,

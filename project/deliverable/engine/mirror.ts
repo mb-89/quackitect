@@ -22,6 +22,7 @@ import { beginPass, endPass } from "./notes.ts";
 import { loadPanel, renderPanel } from "./params.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { ENGINE_LIFE, feedRows, type MirrorState, renderMirror } from "./render.ts";
+import { runningJob } from "./run.ts";
 import { loadLevels, loadStopAt } from "./scale.ts";
 import type { Session } from "./session.ts";
 import { survey } from "./survey.ts";
@@ -770,6 +771,10 @@ export function startMirror(o: MirrorOptions): Server {
         // buttons, which is the hole the comment above this block records.
         stopat: loadStopAt(state.root),
         stop_at: state.session.stopAtValue,
+        // WORK STILL RUNNING, so a person watching a still surface can tell a
+        // slow operation from a hung one. Absent when nothing is running, which
+        // is the ordinary case and draws nothing.
+        running: runningJob(),
         emergency: state.session.emergency,
         ints: { narration_minutes: state.session.narrationMinutes, narration_calls: state.session.narrationCalls },
         toggles: { "block-auto-sleep": power.block_sleep, "shutdown-at-idle": power.shutdown_at_idle },

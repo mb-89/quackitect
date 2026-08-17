@@ -15,7 +15,7 @@ import {
   type EvidenceField,
   type EvidenceType,
   type MachineDecl,
-  STANDARD_ROUNDS,
+  roundsFor,
   type StateDecl,
   validateMachine,
 } from "./machine.ts";
@@ -547,7 +547,7 @@ function rowState(row: RigorMatrixRow, column?: ChangeColumn): Omit<StateDecl, "
     // rounds were doctrine since meth-gate-review was written, no evidence
     // form ever collected them, and consequently NOT ONE was filled in any
     // gate of any iteration.
-    evidence_form: row.state_kind === "gate" ? [...asked, ...STANDARD_ROUNDS] : asked,
+    evidence_form: row.state_kind === "gate" ? [...asked, ...roundsFor(row.name)] : asked,
     priority: priorityOf(row),
     // Absent stays minimal — the always-legal three and nothing else. The
     // kickoff sets each state's rights, so a row opens only what it declares.

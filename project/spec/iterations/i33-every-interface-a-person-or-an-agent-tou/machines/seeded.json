@@ -1,6 +1,6 @@
 {
   "change_size": "minor",
-  "rigor_matrix_hash": "2cfdfa8ecc28",
+  "rigor_matrix_hash": "7c9beb89a931",
   "pinned_at": "2026-08-17T11:35:11.863Z",
   "demands": {
     "onboard-retro": {
@@ -10,7 +10,7 @@
     },
     "gate-kickoff": {
       "applies": "full",
-      "evidence": "[[\"retro_drained\",true,\"\",[],\"per-item\",\"\",[],[\"$inbox\"],[]],[\"goal\",true,\"\",[],\"\",\"\",[],[],[]],[\"pulled_in\",true,\"\",[],\"list\",\"\",[],[],[]],[\"left_out\",true,\"\",[],\"list\",\"\",[],[],[]],[\"change_size\",true,\"\",[],\"choice-with-rationale\",\"\",[\"patch\",\"minor\",\"major\",\"product\"],[],[]]]",
+      "evidence": "[[\"retro_drained\",true,\"\",[],\"per-item\",\"\",[],[\"$inbox\"],[]],[\"goals\",true,\"\",[],\"list\",\"\",[],[],[]],[\"pulled_in\",true,\"\",[],\"list\",\"\",[],[],[]],[\"left_out\",true,\"\",[],\"list\",\"\",[],[],[]],[\"change_size\",true,\"\",[],\"choice-with-rationale\",\"\",[\"patch\",\"minor\",\"major\",\"product\"],[],[]]]",
       "shape": "[[\"onboard-retro\"],true,\"\",\"\"]"
     },
     "draft-vision": {

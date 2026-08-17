@@ -190,10 +190,71 @@ const MACHINERY: readonly string[] = ["se_pull", "se_file_read"];
  *  The corpus and its version are per trace root, because one walk can touch
  *  trunk and a record. `done` is the green answer per machine, so a container
  *  asked about twice in one route is computed once. */
+/** WHEN A CLAIM LAST ANSWERED THE GROUND. It is the SIGNATURE, and only the
+ *  signature.
+ *
+ *  AN AMEND DOES NOT RE-GREY. A REOPEN DOES (owner ruling 2026-08-17, given
+ *  twice, the second time to overturn what stood here).
+ *
+ *  WHAT STOOD HERE WAS THE OPPOSITE, and it is worth keeping the correction
+ *  rather than the code alone. It read "an amend counts as freshly as a
+ *  signature", and took the later of `amended:` and `signed_off:`. The effect
+ *  was that every correction anywhere greyed every claim below it. Fixing one
+ *  sentence in a kickoff sent ten signed states back to be re-freshened by
+ *  hand, and each of those amends greyed everything below IT in turn. The
+ *  walk stopped converging: i33 spent an afternoon re-freshening a chain that
+ *  nothing was wrong with.
+ *
+ *  THE TWO ACTS ARE DIFFERENT ACTS, and that is the whole distinction. An
+ *  AMEND corrects a claim that still stands — a wrong figure, a stale
+ *  sentence, a typo. The signature is kept because it still attests. Nothing
+ *  below it is disturbed, because nothing below it was answering the
+ *  corrected words. A REOPEN says the work is WRONG. The claim goes grey, its
+ *  form is owed again, and everything downstream falls with it. That is the
+ *  ripple, it already exists, and it is the act to reach for when the QUESTION
+ *  below has changed.
+ *
+ *  SO WHERE DOES THAT LEAVE THE i33 HOLE? A gate whose goals list is rewritten
+ *  DOES change what every gate below must answer, and an amend would slip that
+ *  past them. The answer is not to make amend behave like reopen. It is to
+ *  refuse the amend — see FEEDS_DOWNSTREAM below. A field that other forms
+ *  READ is not amendable, and the refusal names se_reopen. Both halves stay
+ *  true: a correction stays cheap, and a changed question re-earns its
+ *  answers. */
+export function claimTime(fm: Record<string, unknown>): string {
+  return typeof fm.signed_off === "string" ? fm.signed_off.trim() : "";
+}
+
+/** THE FIELDS OTHER FORMS READ, and the reason amend has a hard edge at all.
+ *
+ *  AMENDING ONE OF THESE CHANGES A DIFFERENT STATE'S QUESTION. An amend leaves
+ *  every claim below standing, on purpose — so a change here would slip past
+ *  every state that answers it, each still green against wording that is gone.
+ *  That is the exact hole i33 fell through: the kickoff's one prose goal became
+ *  a list of five, and ten signed states below never heard about four of them.
+ *
+ *  SO IT IS REFUSED, AND THE REFUSAL NAMES THE RIGHT ACT. A changed question is
+ *  a reopen. The states below re-earn their answers, which is what the person
+ *  wanted when they changed it.
+ *
+ *  THE LIST IS EXPLICIT AND SHORT BY CONSTRUCTION. A field crosses states only
+ *  where a form source resolver reads it out of another state's note, and
+ *  stateform.ts has exactly one such resolver today. Adding a second means
+ *  adding a row here — the pairing is the point, not the length. */
+const FEEDS_DOWNSTREAM: readonly { readonly state: string; readonly field: string; readonly reads: string }[] = [
+  { state: "gate-kickoff", field: "goals", reads: "the goals_served round of every gate below it, through $goals" },
+];
+
 export interface GreenPass {
   corpus?: Map<string, ReturnType<typeof loadTrace>>;
   version?: Map<string, string>;
   done: Map<string, string[]>;
+  /** WHEN EACH CLAIM WAS SIGNED, collected once for the whole operation. One
+   *  operation paints more than once, and reading every claim's signature per
+   *  call put recordDone at 1117 ms over 200 nodes against a 1000 ms budget —
+   *  req-one-operation-reads-its-input-once, caught by this iteration's own
+   *  rule on this iteration's own change. */
+  times?: Map<string, string>;
 }
 
 export function mainMachinePath(root: string): string {
@@ -2831,6 +2892,31 @@ export class Session {
     return ids.flatMap((id) => this.optionsAt(machine, id));
   }
 
+  /** Is the walk standing ON the state it is aimed at? Both spellings count:
+   *  a leaf id as the machine holds it, and the qualified form a target uses. */
+  private standingOn(target: string): boolean {
+    const here = this.leaves().ids;
+    return here.includes(target) || here.some((id) => this.qualHere(id) === target);
+  }
+
+  /** WHY A WAIT IS A WAIT, and it says which of two things is true.
+   *
+   *  Standing ON the target with nothing owed is one. Standing somewhere the
+   *  router cannot draw a route FROM is the other, and it used to borrow the
+   *  first one's sentence — which reads as "you have arrived" to an agent that
+   *  has not, and hides that a door is right there. */
+  private waitWhy(onTarget: boolean, hasDoors: boolean, target: string, note?: string): string {
+    if (onTarget) return "the target is where the walk already stands, and it owes nothing";
+    const doors = hasDoors ? " — the doors below are what this state offers" : "";
+    // THE SPECIFIC CAUSE OUTRANKS THE GENERIC ONE. A broken drawing, an unmet
+    // condition, a missing edge: the router's own note names WHICH, and the
+    // doors are extra rather than a replacement. Overwriting it cost the
+    // diagnostic that tells a broken canvas apart from a missing route.
+    if (note !== undefined && note !== "") return `${note}${doors}`;
+    if (hasDoors) return `nothing routes toward ${target} from here${doors}`;
+    return "no way there";
+  }
+
   /** The step the walk stands on, said small: id, statement, guidance,
    *  the legal tools, and WHAT IT WILL ASK by name and type — the detail
    *  (guidance documents, per-field help) rides the pull and the form
@@ -3066,12 +3152,27 @@ export class Session {
       // second half was missing while the first passed — which is the half a
       // tester with fresh eyes caught.
       const waitingOpts = this.pullOptions();
+      // EVERY DOOR IS SHOWN, INCLUDING A LONE ONE.
+      //
+      // This read `> 1`, on the reasoning that one way on is not a BRANCH. It
+      // is still the way FORWARD, and hiding it turns a signed state with a
+      // single outgoing edge into a dead end: no options, no remedy, and a
+      // sentence about geography.
+      //
+      // MEASURED AT i33's trace-design on 2026-08-17. The state was signed,
+      // verification stood one edge away, and the walk could not see it. The
+      // verb that would have re-aimed is not legal there either, so there was
+      // no move at all.
+      //
+      // A branching point is where several doors are worth WEIGHING. A wait is
+      // where the walk needs to know what exists. Those are different
+      // questions and only the first one wanted a threshold.
       return {
         pull: "wait",
         ...head(),
-        ...(waitingOpts.length > 1 ? { options: waitingOpts } : {}),
+        ...(waitingOpts.length > 0 ? { options: waitingOpts } : {}),
         waiting_for: "the person",
-        why: r.found ? "the target is where the walk already stands, and it owes nothing" : (r.note ?? "no way there"),
+        why: this.waitWhy(this.standingOn(pullTarget), waitingOpts.length > 0, pullTarget, r.note),
         ...extra(),
       };
     }
@@ -4555,6 +4656,20 @@ export class Session {
         if (note === undefined) continue;
         const fm = note.frontmatter;
         if (typeof fm.signed_off !== "string") continue;
+        // THE SIGNATURE TIME COMES OUT OF THIS READ (i33, 2026-08-17). The
+        // ripple's time half needs it for every claim, and fetching it in a
+        // second pass over the same files put recordDone at 1117 ms over 200
+        // nodes against a 1000 ms budget — this iteration's own one-second
+        // rule catching this iteration's own change, which is exactly what
+        // req-one-operation-reads-its-input-once says.
+        //
+        // THE TIME IS THE SIGNATURE AND ONLY THE SIGNATURE. An amend does not
+        // move it; a reopen followed by a fresh signature does (owner ruling
+        // 2026-08-17, given twice). THIS COMMENT SAID THE OPPOSITE for most of
+        // a day, four thousand lines from the correction on claimTime itself,
+        // and a reader of standingClaims met the wrong one first.
+        pass.times ??= new Map();
+        pass.times.set(s.id, claimTime(fm));
         // A REOPEN IS THE FOURTH WAY A CLAIM STOPS STANDING. The other three
         // are the claim's own doing; this one is somebody deciding it must be
         // re-earned. The downstream ripple is free — the fixed point below
@@ -4690,6 +4805,38 @@ export class Session {
     return { done: new Map() };
   }
 
+  /** THE FEEDERS THIS CLAIM IS OLDER THAN — the ripple's time half, seen from
+   *  one state rather than across the graph. Empty means nothing moved under
+   *  it, which is the ordinary answer. */
+  private staleFeeders(stateId: string): string[] {
+    const m = this.currentMachine();
+    const it = this.declIteration(m);
+    if (it === undefined) return [];
+    const claimful = new Set(m.states.filter((s) => s.evidence_form.length > 0).map((s) => s.id));
+    const feeders = claimFeeders(m, stateId, claimful);
+    if (feeders.length === 0) return [];
+    // ASKED ONCE, ABOUT ONE STATE. This is the diagnostic path rather than the
+    // walk's, so it reads only the two ends it compares.
+    const times = this.signedTimes(it, [stateId, ...feeders]);
+    const mine = times.get(stateId);
+    if (mine === undefined) return [];
+    return feeders.filter((f) => (times.get(f) ?? "") > mine);
+  }
+
+  /** WHEN EACH STANDING CLAIM WAS SIGNED, for the staleness half of the
+   *  ripple. ABSENT IS NOT ZERO: a state with no signature is left out of the
+   *  map rather than given an empty time, so it can never read as older than
+   *  everything. An unsigned claim is not in the green set to begin with. */
+  private signedTimes(it: Iteration, ids: Iterable<string>): Map<string, string> {
+    const out = new Map<string, string>();
+    for (const id of ids) {
+      const fm = noteOf(this.evidenceAbs(it, id))?.frontmatter;
+      const at = fm === undefined ? "" : claimTime(fm);
+      if (at !== "") out.set(id, at);
+    }
+    return out;
+  }
+
   recordDone(decl: MachineDecl, seen: Set<string> = new Set(), pass: GreenPass = Session.newPass(), paint = false): string[] {
     const memoKey = paint ? `${decl.id}\0paint` : decl.id;
     const memo = pass.done.get(memoKey);
@@ -4710,11 +4857,27 @@ export class Session {
     // and it is a graph walk rather than a mark on a file. A claim may be word
     // for word fine and still rest on ground that moved.
     //
+    // GROUND THAT MOVED AND CAME BACK GREEN COUNTS TOO (owner ruling
+    // 2026-08-17). Colour alone cannot see a feeder that was EDITED and
+    // re-signed in the same breath: it is green again before anything
+    // downstream looks, so the walk sails through claims that answered the
+    // OLD question. i33's kickoff replaced its one prose goal with a list of
+    // five, and ten signed states below it never noticed — the walk ran
+    // straight through two gates that had never heard of four of the goals.
+    //
+    // SO THE SECOND COMPARE IS TIME. A claim signed BEFORE its feeder's
+    // current signature answered older ground, and stale is not green.
+    //
     // Run to a FIXED POINT: knocking one out can knock out what stood on it.
+    // ALREADY COLLECTED, by the pass over these same files just above.
+    const signedAt = pass.times ?? new Map<string, string>();
     for (let changed = true; changed; ) {
       changed = false;
       for (const id of [...green]) {
-        if (claimFeeders(decl, id, claimful).every((f) => green.has(f))) continue;
+        const feeders = claimFeeders(decl, id, claimful);
+        const mine = signedAt.get(id);
+        const stale = mine !== undefined && feeders.some((f) => (signedAt.get(f) ?? "") > mine);
+        if (!stale && feeders.every((f) => green.has(f))) continue;
         green.delete(id);
         changed = true;
       }
@@ -4733,13 +4896,28 @@ export class Session {
     return this.recordDone(decl, new Set(), Session.newPass(), true);
   }
 
-  /** The gates whose claims carry a bless — the thumbs-up overlay's truth. */
-  blessedGates(decl: MachineDecl): string[] {
+  /** The gates whose claims carry a bless — the thumbs-up overlay's truth.
+   *
+   *  A BLESS ONLY COUNTS WHILE THE CLAIM STANDS (owner ruling 2026-08-17).
+   *  The thumb adjudicates ONE body of work. When the ground under it moves
+   *  the adjudication is about something that is no longer there, so the thumb
+   *  falls with the green and the person is asked again.
+   *
+   *  IT IS READ FROM THE GREEN SET, NOT FROM THE FILE. The ripple is a graph
+   *  walk and never touches frontmatter, so a stale gate still carries its
+   *  `bless:` line on disk — and used to keep painting a thumbs-up over work
+   *  that had fallen out from under it. */
+  blessedGates(decl: MachineDecl, painted?: Set<string>): string[] {
     const it = this.declIteration(decl);
     if (it === undefined) return [];
+    // THE CALLER USUALLY HAS THE SET ALREADY. render.ts computes recordPaint
+    // one line above this call, and recomputing it here would be a second
+    // full green pass over the same corpus in the same operation — the exact
+    // shape i33 exists to remove. Absent, it is computed once.
+    const standing = painted ?? new Set(this.recordPaint(decl));
     const out: string[] = [];
     for (const s of decl.states) {
-      if (s.kind !== "gate") continue;
+      if (s.kind !== "gate" || !standing.has(s.id)) continue;
       try {
         const fm = noteOf(this.evidenceAbs(it, s.id))?.frontmatter;
         if (fm !== undefined && typeof fm.signed_off === "string" && typeof fm.bless === "string" && fm.bless.startsWith("blessed"))
@@ -5030,6 +5208,7 @@ export class Session {
     by: string,
     machineId?: string,
     ops: AmendOp[] = [],
+    chain = false,
   ): Record<string, unknown> {
     this.forgetRoute();
     const m = this.formMachine(machineId);
@@ -5050,6 +5229,20 @@ export class Session {
     // the restore, the refusal that names se_reopen — covers both shapes
     // without knowing which was used.
     const fills = { ...this.amendOps(raw, ops, name), ...fillsIn };
+    const feeding = FEEDS_DOWNSTREAM.find((f) => name.endsWith(f.state) && fills[f.field] !== undefined);
+    if (feeding !== undefined) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `an amend to a field this state keeps to itself — ${feeding.field} is read by ${feeding.reads}`,
+        got: `an amend to ${feeding.field} — that is a reopen rather than a correction`,
+        remedy: {
+          tool: "se_reopen",
+          args: { state: name, reason: "<what the states below must now answer differently>" },
+          note: "an amend leaves every claim below standing, so a change here would slip past every state that answers it. A changed question is a reopen: those states go grey and earn their answers again.",
+        },
+        source: "engine/session.ts amend",
+      });
+    }
     if (reason.trim() === "" || Object.keys(fills).length === 0) {
       throw new Rejection({
         clause: CLAUSES.CONDITION_UNMET,
@@ -5118,10 +5311,21 @@ export class Session {
     // that argument were false, and the correction is kept because the wrong
     // reasoning is easy to reach again.
     //
-    // IT CLAIMED THE GUARD COMPARES THE SIGNATURE AGAINST THE CORPUS. It does
-    // not. standingClaims reads three things and no timestamp among them: a
-    // signature is PRESENT, the form is not reopened after signing, and
-    // claimProblems comes back empty. A date plays no part.
+    // A TIMESTAMP DOES NOW PLAY A PART, and this paragraph is kept with the
+    // correction on top (i33, 2026-08-17). It used to end "a date plays no
+    // part", which was true until the ripple gained its time half. A claim
+    // signed BEFORE its feeder's current claim time is stale, and claimTime
+    // counts an amend as freshly as a signature.
+    //
+    // SO AMENDING A STATE NOW GREYS EVERYTHING BELOW IT. That is the ripple
+    // working rather than a defect, and it is why `chain` exists: ten hand
+    // amends down one chain, three times in one afternoon, is what it costs
+    // without it.
+    //
+    // WHAT THE PARAGRAPH STILL GETS RIGHT: the guard does not compare the
+    // signature against the corpus. standingClaims reads that a signature is
+    // PRESENT, that the form is not reopened after signing, and that
+    // claimProblems comes back empty.
     //
     // IT CLAIMED SEVEN AMENDS UP A SIX-LEVEL CHAIN CLEARED NOTHING. They
     // cleared nothing because they were aimed at the wrong states. The chain
@@ -5139,8 +5343,66 @@ export class Session {
     // AND RE-STAMPING WOULD HAVE BEEN A LIE. The panel shows the signing date
     // to a person. Moving it on every amend destroys when the claim was
     // actually signed, to satisfy a check that never reads it.
+    const chained = chain ? this.refreshChain(name, m, reason, by) : {};
     this.notifyChange();
-    return { amended: name, fields: Object.keys(fills), why: reason.trim(), by, signature_kept: true };
+    return { amended: name, fields: Object.keys(fills), why: reason.trim(), by, signature_kept: true, ...chained };
+  }
+
+  /** RE-FRESHEN EVERYTHING BELOW A MENDED CLAIM, in one act (owner ask
+   *  2026-08-17: one act that re-freshens a whole chain).
+   *
+   *  WHY IT IS NEEDED. The ripple's time half greys every claim standing on a
+   *  state that was just amended. Each is usually fine and each needed a
+   *  hand-written amend of its own. i33 walked ten states that way, three
+   *  times in one afternoon, writing sentences whose only content was that
+   *  nothing had changed.
+   *
+   *  IT CANNOT WAVE A DEFECT THROUGH, and that is the whole design. A state is
+   *  re-freshened only where its OWN checks come back clean. One that does not
+   *  is left exactly as it stands and NAMED in the answer, so a real break
+   *  surfaces rather than being buried under a bulk stamp.
+   *
+   *  IT STAMPS `amended:` AND NEVER `signed_off:`, like every other amend. The
+   *  signing date is what a person reads off the panel. */
+  private refreshChain(from: string, m: MachineDecl, reason: string, by: string): Record<string, unknown> {
+    const refreshed: string[] = [];
+    const held: string[] = [];
+    const why = `carried down from ${from}: ${reason.trim()}`;
+    const when = new Date().toISOString();
+    for (const id of downstreamCone(m, [from])) {
+      const s = m.states.find((x) => x.id === id);
+      if (s === undefined || s.evidence_form.length === 0) continue;
+      const h = this.stateFormHome(id, m);
+      if (!existsSync(h.instanceAbs)) continue;
+      // THROUGH THE SHARED READER, never a direct read. readNode gives every
+      // other reader in this operation the same parse, and the door's own
+      // guard counts a bypass the day it appears.
+      const raw = readNode(h.instanceAbs);
+      if (raw === "" || typeof parseStateNote(raw).frontmatter.signed_off !== "string") continue;
+      let problems: string[];
+      try {
+        problems = (this.stateFormGet(id, m) as { problems?: string[] }).problems ?? [];
+      } catch {
+        held.push(`${id} could not be read`);
+        continue;
+      }
+      if (problems.length > 0) {
+        held.push(`${id}: ${problems.join(" · ")}`);
+        continue;
+      }
+      writeFileSync(h.instanceAbs, withAmended(raw, when, by, why), "utf8");
+      refreshed.push(id);
+    }
+    return {
+      chain: {
+        refreshed,
+        ...(held.length > 0 ? { held } : {}),
+        note:
+          held.length > 0
+            ? `${String(refreshed.length)} claim(s) re-freshened; ${String(held.length)} left standing because their own checks do not pass — those are defects rather than ripple`
+            : `${String(refreshed.length)} claim(s) re-freshened, every one of them clean on its own checks`,
+      },
+    };
   }
 
   /** THE BLESS (owner design 2026-08-04, v1's thumbs reborn): a gate's
@@ -5900,10 +6162,23 @@ export class Session {
     }
     const problems = this.ownClaimProblems(fallen, m);
     if (problems.length === 0) {
+      // NEITHER CASE IS AN AMEND, and this used to say it was (corrected
+      // 2026-08-17). An amend fixes WORDING and leaves the signature where it
+      // is — and the signature is what says a claim answers today's ground.
+      // A claim that is down with clean content is down for one of two
+      // reasons, and amending is the wrong act for both.
+      const stale = this.staleFeeders(fallen);
+      if (stale.length > 0) {
+        return {
+          tool: "se_reopen",
+          args: { state: fallen, reason: "<what the re-signed input above asks that it did not before>" },
+          note: `${fallen}'s own content still passes. It is down because ${stale.join(", ")} was RE-SIGNED after it, so it answered older ground. Re-earning it is cheaper than it sounds: the pull hands the form straight back with a recheck block, body and signature both still on the file. Read what is written, confirm this change did not move it, and submit. The submit is the re-sign.`,
+        };
+      }
       return {
-        tool: "se_amend",
-        args: { state: fallen, fills: {}, reason: "<what the upstream change touched>" },
-        note: `${fallen}'s own content still passes, so it lost its green to the ripple rather than to a defect. Amend the field the change touched and the tree stays standing. se_reopen would drop this claim, everything downstream, and any bless on it.`,
+        tool: "se_why",
+        args: { state: fallen },
+        note: `${fallen}'s own content still passes and nothing about it needs fixing. It is down because something ABOVE it is down. Ask it what holds it — fixing anything here changes nothing until that root stands.`,
       };
     }
     return {
@@ -6175,6 +6450,25 @@ export class Session {
       };
     }
     if (blockers.length === 0) {
+      // CONTENT PASSING IS NOT STANDING. The ripple's time half drops a claim
+      // whose own text is fine, and staleness is not a content problem — so
+      // this branch used to answer `stands, nothing holds it` for a claim the
+      // walk could not step off, and sent the reader looking at the route and
+      // the dial, neither of which was the reason.
+      //
+      // THE READER COULD ONLY FIND IT BY ASKING ABOUT THE STATE BELOW, whose
+      // fallen_input names this one as the root. That works exactly one hop
+      // from where they stand (owner, 2026-08-17, after ten states unstuck by
+      // hand).
+      const stale = this.staleFeeders(bare);
+      if (stale.length > 0) {
+        return {
+          state: at,
+          standing: false,
+          blockers,
+          says: `${bare}'s own content passes, and it is NOT standing. It was signed before ${stale.join(", ")} was RE-SIGNED, so it answered ground that has since moved. An amend will not clear this: an amend corrects wording and leaves the signature where it is, and a signature is what says a claim answers today's ground. The act is se_reopen. It is cheaper than it sounds — the pull hands the form straight back with a recheck block, the body and the signature both still on the file, and you read what is written, confirm this change did not move it, and submit. The submit is the re-sign.`,
+        };
+      }
       return {
         state: at,
         standing: true,

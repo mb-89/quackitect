@@ -18,7 +18,7 @@ verifies:
   - "req-upward-links-live-in-the-file"
   - "req-test-run-carries-its-question"
 files:
-  - "none — the checklist below is the definition; the inspected records are the evidence"
+  - "project/deliverable/engine/bin/record-inspect.ts"
 ---
 
 ## Scope
@@ -31,6 +31,30 @@ teeth; until then the inspection carries it.
 
 Inspection per record at its gate, and per corpus sweep at the retro.
 One checklist item per claim, each with its pass criterion.
+
+## TWO ITEMS NOW HAVE A RUNNER (i33, 2026-08-17)
+
+`engine/bin/record-inspect.ts` answers items 11 and 12, and it runs at the
+boot's exit beside the sweep.
+
+- ITEM 11 PASSES CLEAN across the whole corpus: every story, use case,
+  requirement, function, element, interface, design spec and test spec carries
+  its upward links in its own frontmatter, readable from the file alone.
+- ITEM 12 FOUND A REAL DEFECT. Every recorded test run carried a job id and
+  its results and NOT the question it answered - the question rode the call
+  that started the run and was dropped by the record of it. Eight runs sat in
+  the log unable to say what any of them was for. Fixed in engine/tools.ts the
+  same day; runs before that date cannot carry one, so the check judges the
+  LATEST run and counts the rest out loud.
+
+THE OTHER TEN NEED ACTS NOBODY HAS PERFORMED RECENTLY - a begun product, a
+seeded record, a desk recommendation, a divergence. They want those acts to
+have happened, not a cleverer sweep.
+
+HOW THE TWO WERE FOUND. i33's verification tester ran ONE of the twelve by
+hand and took the no-runner argument as the verdict for the other eleven,
+then said so itself: "I did not run them because the runner argument gave me a
+defensible verdict without the work." Two of the eleven turned out mechanical.
 
 ## Checklist
 

@@ -3576,7 +3576,7 @@ function drawingSets(
   // paint-mode green, where a signed gate stands before its bless and the
   // bless rides as the thumbs-up mark.
   const paint = new Set(m.session.recordPaint(decl));
-  const blessed = new Set(m.session.blessedGates(decl));
+  const blessed = new Set(m.session.blessedGates(decl, paint));
   // DRIFT IS COMPUTED ON THE WAY TO THE SCREEN (owner ruling 2026-08-05):
   // green must mean still green NOW, so the demand diff is recomputed on
   // every look rather than only when a pin is rewritten. It costs one hash
@@ -3717,9 +3717,14 @@ export function renderMirror(
   let crumbs = "";
   let states: ReturnType<typeof stateDetails> = {};
   let comment = "";
+  // THE MACHINE PHASE IS REPORTED WHOLE AND IN PARTS. The parts are new; the
+  // total keeps its old name and its old span, so a reader comparing across
+  // runs is not silently handed a different measurement.
+  const machineStarted = performance.now();
   if (widget !== "trace") {
     const { leafActive, done, paint, subIds, openIds, meta } = drawingSets(m, decl, info, viewingWalk);
     const marks = routeMarksFor(m, decl);
+    phase("machine.sets");
     const INPUT_ROLES = new Set(["normal", "approval"]);
     const busbars = decl.states
       .filter((gate) => gate.busbar === true)
@@ -3731,14 +3736,17 @@ export function renderMirror(
       }))
       .filter((bar) => bar.feeders.length >= 2);
     svg = machineSvg(canvas, leafActive, paint, subIds, openIds, meta, busbars, marks);
+    phase("machine.svg");
     crumbs = crumbsFor(m, decl);
     const archived = decl.states.some((state) => state.tags?.includes("archive-record"))
       ? (m.session.expeditionList() as { archive: { id: string }[] }).archive
       : [];
     states = stateDetails(m, decl, done, archived);
+    phase("machine.states");
     comment = (canvas.nodes ?? []).find((node) => node.type === "text")?.text ?? "";
   }
-  phase("machine");
+  phase("machine.rest");
+  onPhase?.("machine", performance.now() - machineStarted);
   const packet = widget === "trace" ? { legal_tools: [] } : m.session.packet();
   phase("packet");
   const checkedDocs = m.session.humanCheckedPaths();

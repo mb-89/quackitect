@@ -165,6 +165,43 @@ export const STANDARD_ROUNDS: EvidenceField[] = [
     template: "per-item",
     items: ["exercised against the goal", "missing", "wrong", "out of scope", "prior art"],
   },
+  // THE GOALS CHECK (owner ruling 2026-08-17). Round 1 already says "the
+  // RESULT against the goal" and it is not enough, because it asks about a
+  // goal that is PROSE — so the answer can be true about the wrong subject.
+  // i33 answered it "the scope answers both halves of the owner's framing",
+  // which was true of the SCOPE and never checked the register.
+  //
+  // EVERY OTHER COVERAGE CHECK IN THIS SYSTEM COMPARES A NODE TO ITS
+  // NEIGHBOUR — story to value prop, requirement to use case, chunk to spec.
+  // A chain that is perfectly linked and serves a quarter of the kickoff
+  // passes all of them, because not one looks UP. This is the only field
+  // that does, and it is per-item so it cannot be answered in general.
+  {
+    name: "goals_served",
+    description:
+      "GOALS: what THIS milestone produced, against each goal the kickoff blessed. Name the artifacts by id — the stories, requirements, chunks or commits that serve the goal. DO NOT ANSWER FROM THE SCOPE: the scope is what was promised, not what was built. `nothing yet — <the milestone that owns it>` is legal. `nothing, and nothing will` FAILS the gate: it means the walk has drifted off its own kickoff.",
+    required: true,
+    template: "per-item",
+    items: ["$goals"],
+  },
+  // THE INSTRUMENT IS NOT THE DELIVERABLE. A READER WHO OWES AN ANSWER IS
+  // (i33, 2026-08-17). i12 shipped the one-second rule and the timings were
+  // recorded from that day; two days later 1834 of 8424 calls were over it,
+  // because nothing in the machine ever obliged anybody to look.
+  //
+  // ITS OWN RED TEAM HAD WRITTEN THIS DOWN IN ADVANCE: a milestone three that
+  // ends with no state reading the instrument means the iteration repeated
+  // i12 and should be judged failed. This field is the state that reads it.
+  //
+  // EMPTY MEANS NONE BREACHED, and renders as nothing rather than refusing.
+  {
+    name: "bound_breaches",
+    description:
+      "BOUNDS: every modelled interface that answered slower than its bound since this gate last signed, and what is being done about it. Say the fix, the reason it is acceptable, or which milestone owns it — an acknowledgement with no disposition is the reading this field exists to replace. Empty means none breached, which is a result rather than a blank.",
+    required: true,
+    template: "per-item",
+    items: ["$breaches"],
+  },
   // A ROUND THAT ONLY EVER PASSES IS DECORATION. Round 1's `missing` and
   // round 2's kill-criterion are the two places a gate can actually die, and
   // both are worthless when filled with findings nobody would act on. A
@@ -201,6 +238,20 @@ export const STANDARD_ROUNDS: EvidenceField[] = [
     passing: ["pass", "pass with overrides"],
   },
 ];
+
+/** THE ROUNDS ONE GATE GETS. All of them, except at the kickoff.
+ *
+ *  THE KICKOFF DEFINES THE GOALS, so asking what it produced for each one is
+ *  circular: nothing has been produced yet, and the list itself is being
+ *  written in the same form. Every gate BELOW it answers.
+ *
+ *  IT LIVES HERE, beside the rounds, because there are TWO compilers and a
+ *  rule owned by one of them reaches only half the gates — which is the exact
+ *  failure the comment above this list records. */
+export function roundsFor(stateId: string): EvidenceField[] {
+  if (stateId !== "gate-kickoff") return STANDARD_ROUNDS;
+  return STANDARD_ROUNDS.filter((f) => f.name !== "goals_served");
+}
 
 export interface EdgeDecl {
   to: string;

@@ -5,6 +5,7 @@ type: "[[function]]"
 cluster: the-walk
 statement: build the form a step owes, check what comes back, and carry a person's verdict on it
 satisfies:
+  - req-a-breached-bound-is-put-in-front-of-a-reviewer
   - req-a-harmless-finding-is-carried-not-stopped-on
   - req-a-harmless-finding-names-an-open-entry
   - req-form-is-built-and-checked
@@ -21,6 +22,7 @@ satisfies:
   - req-bound-field-rebuilds-from-nodes
   - req-structure-verdicts-are-mechanical
   - req-a-ripple-names-its-root
+  - req-an-amend-leaves-the-tree-standing
 inputs:
   - flow-compiled-machine
   - flow-filled-claim

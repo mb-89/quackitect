@@ -8,6 +8,7 @@ owner: the driving agent
 trigger: any write that feels slow, any sweep past two seconds, or a corpus above three thousand nodes
 probe: "Run the sweep against a corpus grown to three thousand nodes and read the wall clock. Then time one guarded write. Two numbers settle it."
 status: open
+probed: 2026-08-17
 impact: the guard grows too slow for the write and moves to the sweep, which is a demotion the whole iteration was built to avoid.
 breaks_how_badly: annoying
 how_likely: likely

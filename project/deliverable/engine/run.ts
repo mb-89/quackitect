@@ -204,6 +204,20 @@ export function anyJobRunning(): boolean {
   return false;
 }
 
+/**
+ * The job somebody is WAITING ON, named rather than counted.
+ *
+ * anyJobRunning answers whether the machine may sleep. This answers what to
+ * tell a person looking at a still surface, which is a different question and
+ * needs a different shape: a boolean cannot be shown.
+ */
+export function runningJob(): { what: string; since_ms: number } | undefined {
+  for (const j of jobs.values()) {
+    if (j.running) return { what: j.command, since_ms: Date.now() - j.started };
+  }
+  return undefined;
+}
+
 export function runBackground(root: string, command: string, opts: { cwd?: string } = {}): JobView {
   return startJob(command, () => spawnShell(root, command, opts.cwd), root);
 }

@@ -226,6 +226,31 @@ holds that job elsewhere — it is never an obstacle to route around.
 Entry and exit conditions want their evidence. The pull tells you which one
 stands in the way and how to work it.
 
+TWO PATHS UNDER THIS CLAUSE SURPRISE PEOPLE, and both are about the two acts
+on a standing claim.
+
+AN AMEND DOES NOT RE-GREY. A REOPEN DOES (owner ruling 2026-08-17).
+
+- An AMEND corrects a claim that still stands: a wrong figure, a stale
+  sentence, a typo. The signature is kept, and nothing below it is disturbed.
+- A REOPEN says the work is WRONG. The claim goes grey, its form is owed
+  again, and everything downstream falls with it.
+
+SO A STALE CLAIM CANNOT BE AMENDED BACK. If a state is down because a feeder
+RE-SIGNED above it, that feeder answered again against ground that moved, and
+a correction of wording does not answer it. The act is se_reopen, and it is
+cheaper than it sounds: the pull hands the form straight back with a recheck
+block, body and signature both still on the file. Read it, decide only whether
+the change moved it, and submit. The submit is the re-sign.
+
+AND A FIELD ANOTHER FORM READS CANNOT BE AMENDED AT ALL. The refusal names
+what reads it. Changing such a field changes what a DIFFERENT state must
+answer, and an amend would leave every one of them standing against wording
+that is gone — which is exactly how a kickoff's goals list was rewritten under
+ten signed states that never heard about it. A changed question is a reopen.
+
+The rule is req-an-amend-leaves-the-tree-standing.
+
 ### SE-C-113 — the step outweighs the dial
 A step weighing more than the session autonomy is the person's. Present it,
 then stop. A message from them resumes the walk.

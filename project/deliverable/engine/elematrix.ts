@@ -101,6 +101,23 @@ export function elementMatrixView(
   const declaredAt = new Map<string, MatrixInterface[]>();
   const undemanded: { id: string; source: string; destination: string }[] = [];
   for (const i of interfaces) {
+    // AN OUTSIDE BOUNDARY IS NOT A MATRIX CELL (i33, 2026-08-17). This matrix
+    // is element-to-element by construction: it computes owed cells from where
+    // a FLOW crosses an element boundary, and a neighbour sits outside the
+    // element set entirely. An interface with `nbr-` at one end is the product
+    // meeting something it does not own, and it is demanded by the boundary
+    // model rather than by a crossing flow.
+    //
+    // IT USED TO READ AS A DEFECT, because the law was written when every
+    // interface was internal. The first thirteen outside boundaries all
+    // reported as naming an end no element carries, which is the law being
+    // narrow rather than the nodes being wrong.
+    //
+    // BOTH ENDS OUTSIDE IS STILL A DEFECT. Two neighbours talking to each
+    // other is not this product's interface to describe.
+    const ends = [i.source, i.destination];
+    const outside = ends.filter((e) => e.startsWith("nbr-"));
+    if (outside.length === 1 && ends.some((e) => known.has(e))) continue;
     if (!known.has(i.source) || !known.has(i.destination)) {
       problems.push(`${i.id} names an end no element carries: ${known.has(i.source) ? i.destination : i.source}`);
       continue;

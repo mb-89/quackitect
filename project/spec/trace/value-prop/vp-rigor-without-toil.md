@@ -24,6 +24,12 @@ priority: must
   Metric: lane calls spent recovering from a break a write-time check could have refused. Target: zero.
   Metric: corpus-shape rules enforced by a check rather than by prose, as a share of all of them. Target: rising, retro over retro.
   Added by i6. MEASURED LIVE 2026-08-16, at this iteration's own log-risks: one unquoted colon in a frontmatter value was accepted at the write, threw the next pull, and cost four calls to find and fix. The same corpus's submit-time check refused five failures at once, named every field, and cost one call to satisfy.
+- A SLOW INTERFACE SAYS SO, and a person is never left guessing whether it is working. Silence is not an acceptable answer from anything a person or an agent touches.
+  Metric: modelled interfaces that breach the one-second rule without telling the person they are working. Target: zero.
+  Metric: a control that declines a person's input and reports nothing about why. Target: zero.
+  Added by i33. THE OWNER'S FRAMING, 2026-08-15: "everything that is over one second needs to be non-intrusive... Either that fast, or very transparent about how slow it is." i12 added the speed half and not this one, so an interface could miss the rule silently and fail nothing.
+  MEASURED LIVE 2026-08-17: the stop-at control declined a press and said nothing, and the owner reported it as a broken button. engine/mirror.ts lines 756 to 762 record two earlier victims of the identical silence, the emergency rung and the shutdown row, which is the third sighting of one failure shape.
+  AND THE DENOMINATOR ARRIVES WITH IT. i12's criterion above asks for a SHARE of surface requests, and until interfaces are modelled as nodes there is no list to take that share over. Milestone one of i33 supplies it, so both criteria become checkable rather than only this one being new.
 
 ## Unlike
 

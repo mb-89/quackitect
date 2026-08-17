@@ -479,7 +479,33 @@ export function conformance(root: string, node: TraceNode): string[] {
   for (const c of tpl.checks) {
     out.push(...applyCheck(node.id, c, fieldValue(tpl, note.frontmatter, c.field), note.frontmatter, note.body, whole));
   }
+  out.push(...outsideBoundaryProblems(tpl, node, note.frontmatter));
   return out;
+}
+
+/** AN OUTSIDE BOUNDARY STATES ITS OWN BOUND (i33, 2026-08-17).
+ *
+ *  `bound` DEFAULTS to `inherited`, and that is honest for an in-process
+ *  crossing between two elements: it has no clock of its own and is paid for
+ *  by the outside call that reached it. Forty standing interfaces are exactly
+ *  that, and widening the template must not make them non-conforming
+ *  overnight.
+ *
+ *  IT IS NOT HONEST WHERE THE CROSSING *IS* THE OUTSIDE CALL. There the
+ *  default would quietly cover the one place a person or an agent actually
+ *  waits, which is a demand nothing enforces — the shape i12 already shipped
+ *  once, as guidance, before 1834 of 8424 calls went over it.
+ *
+ *  THE TELL IS THE NEIGHBOUR PREFIX, because a neighbour is by definition
+ *  something the product does not own. */
+function outsideBoundaryProblems(tpl: ItemTemplate, node: TraceNode, fm: Record<string, unknown>): string[] {
+  if (tpl.id_prefix !== "if-") return [];
+  const ends = [String(fm.source ?? ""), String(fm.destination ?? "")];
+  if (!ends.some((e) => e.startsWith("nbr-"))) return [];
+  if (String(fm.bound ?? "").trim() !== "") return [];
+  return [
+    `${node.id}: an outside boundary states its OWN bound — one second, an argued reason it cannot be, or none where nothing is served across it. It may not inherit.`,
+  ];
 }
 
 /** Every trace node the product declares. */
@@ -511,6 +537,27 @@ export function conformance(root: string, node: TraceNode): string[] {
  *  endpoint shares the event loop — so the transport gave up and the
  *  extension had to be restarted. */
 const CORPUS = new Map<string, { stamp: string; nodes: TraceNode[]; epoch: number }>();
+
+/** HOW MANY TIMES THE CORPUS WAS ASKED FOR. Every call to loadTrace, hit or
+ *  miss, because the ASK is what req-one-operation-reads-its-input-once is
+ *  about — an operation collects its input once and hands it down.
+ *
+ *  IT COUNTS ASKS AND NOT MISSES ON PURPOSE, and a test that got this wrong is
+ *  why the counter exists (i33, 2026-08-17). The green guard counted reads
+ *  through the file DOOR and claimed that caught a per-state corpus load. It
+ *  does not. loadTrace memoizes ABOVE the door: on a stamp hit it returns the
+ *  held nodes having called noteOf zero times, so putting a load back inside a
+ *  per-state loop costs about 210 statSync calls the door never sees and no
+ *  door accesses at all. The count stayed flat and the guard passed.
+ *
+ *  SO THE THING THE REQUIREMENT NAMES IS COUNTED DIRECTLY. One operation, one
+ *  ask. Twenty-five asks means twenty-five states each fetching their own. */
+let CORPUS_ASKS = 0;
+
+/** The corpus's own meter: how many times it has been asked for. */
+export function corpusAsks(): number {
+  return CORPUS_ASKS;
+}
 
 /** ONE FILE, READ ONCE UNTIL IT MOVES — the same rule as the corpus, one
  *  level down.
@@ -569,6 +616,7 @@ export function corpusVersion(root: string): string {
 }
 
 export function loadTrace(root: string): TraceNode[] {
+  CORPUS_ASKS += 1;
   const hit = CORPUS.get(root);
   // A COPY, NEVER THE STORED ARRAY. A caller that sorts what it was handed
   // would otherwise reorder every later caller's corpus, and the bug would

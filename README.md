@@ -1,8 +1,8 @@
 # quackitect v3
 
-A branch of quack — literally: this folder is a linked git worktree of the
-`quackitect` repo on the orphan branch `v3` (like v2 before it). `main`
-reaches v1, `v2` reaches v2; `se_file_search` with `ref:` searches either.
+A branch of quack — literally: this folder is the `quackitect` repo checked
+out on the orphan branch `v3` (like v2 before it). `main` reaches v1, `v2`
+reaches v2; `se_file_search` with `ref:` searches either.
 
 The agent is caged: its native tools are blocked, and its
 whole world is the `se` MCP server — every capability it has is one the
@@ -91,8 +91,8 @@ cd C:\path\to\empty
 
 **The pull** is the walk operation and `se_pull` the machinery's ONE
 verb, legal in every state: the agent says pull and the machine answers
-with an instruction — `read`, `fill`, `choose`, `do`, or `wait` — walking
-the happy path itself and offering options only where the road splits.
+with an instruction — `read`, `fill`, `do`, or `wait` — walking the happy
+path itself and offering options only where the road splits.
 The Mirror's buttons drive the same core by the person's hand.
 
 ## The cage (how it blocks)
@@ -113,7 +113,7 @@ generated copies are gitignored).
 installs ripgrep via npm (`@vscode/ripgrep`) and fails red without either —
 there is no fallback search engine.
 
-## The lane (11 tools, drop-in or better)
+## The lane (34 tools; the twelve below are the drop-in replacements)
 
 | native | se | better because |
 | --- | --- | --- |
@@ -130,12 +130,12 @@ there is no fallback search engine.
 | WebSearch | `se_web_search` | provider-backed (set `SE_BRAVE_API_KEY`); refuses honestly when unconfigured |
 | — | `se_log_query` | the agent's own trail is queryable |
 
-Dispatch laws (v2 scar tissue, active from day one): required args enforced
-(SE-C-046) and **unknown arg names refused** (SE-C-101) — a wrong argument
-name can never again silently coerce to `"undefined"` and answer confidently
-on garbage. Every refusal is a typed rejection: clause, expected, got, and
-an executable remedy. Every call — result, rejection, error — is appended
-raw to `.se/calls.jsonl`.
+Dispatch laws (v2 scar tissue, active from day one): a call missing a
+required argument is refused, and so is one carrying an argument name the
+tool does not know — a wrong argument name can never again silently coerce
+to `"undefined"` and answer confidently on garbage. Every refusal is a
+typed rejection: clause, expected, got, and an executable remedy. Every
+call — result, rejection, error — is appended raw to `.se/calls.jsonl`.
 
 ## Machines
 
@@ -144,9 +144,9 @@ the offending element named on any misparse. Engine-owned machines live in
 `project/deliverable/machines/`; owner-authored process machines will live
 in `project/spec/` later. **Authoring rules: `project/guidance/authoring/machines.md`** —
 notably: file refs are VAULT-relative (the Obsidian vault root is
-`project/`), agent-facing fields (`state`, `state_kind`, `legal_tools`,
-`guidance`) live in the state note's FRONTMATTER while the body is prose
-for humans, and start/terminal states are drawn as pills.
+`project/`), the fields an agent reads live in the state note's
+FRONTMATTER while the body is prose for humans, and start/terminal states
+are drawn as pills.
 
 **start and end are MECHANICAL** — every machine has exactly one of each,
 sharing the same two notes; the machinery walks out of start and the
@@ -156,25 +156,38 @@ sub-machine** (`boot.canvas`: `start → read_contract → prepare_idle → end`
 and future work states branch from idle. `se_pull` walks it — the whole
 happy path per call; the SessionStart hook makes the agent pull
 immediately and show the landing banner verbatim; THE STATE GATE makes
-the walk inevitable anyway — any pre-idle lane call is refused with
-`se_pull` as the remedy (SE-C-110). States carry `legal_tools` (enforced
-at dispatch) and SCXML-style enter/leave conditions (SE-C-112 when
-unmet), and the pull is never gated.
+the walk inevitable anyway — a call made before the walk has started is
+refused, and the refusal says to pull instead.
+
+Every state names the tools that are legal inside it, and that list is
+enforced when a call arrives rather than being advice. Every state also
+names what must be true to enter it and to leave it; a call that arrives
+before those are met is refused, and the refusal says what would make it
+possible. The pull itself is never blocked.
+
+Every refusal carries a code, and each code is explained in
+[the refusals guide](project/guidance/refusals.md).
 
 ## Status
 
-- [x] M1a — cage + lane + log: selftests green, live wire verified.
-- [x] M1b — the main machine: canvas compiler (v2 grammar, no
-      record-keeping layer, vault-relative refs), boot as a sub-machine with stepwise se_boot,
-      THE STATE GATE wired into dispatch (per-state `legal_tools`, enforced
-      not advisory), auto-boot SessionStart hook, banner, CANVAS-GUIDE.
-- [x] M2 (first cut) — the Mirror in manual mode: RUNME -Manual serves the
-      drawn machines as HTML (live position highlighted, the packet shown
-      verbatim — one source, two projections) with tick·info / tick·advance
-      buttons; manual ticks land in the call log.
-- [ ] Boot guidance — what the agent reads during read_contract (contract,
-      voice, stance) and what prepare_idle actually checks: to be designed
-      with the owner.
-- [ ] M3+ — work machines (se_next/se_submit against drawn process
-      machines), approval steps where a person signs off, minimal
-      record-keeping. Worktrees later.
+THIS BLOCK DESCRIBED THE SYSTEM AT AN EARLY STAGE UNTIL 2026-08-17, and named
+two commands that never existed. It is rewritten to what a reader can check.
+
+WHAT RUNS TODAY:
+
+- The cage and the single door. Every call goes through one server and is
+  logged in full. The tool list is enforced per step, not advised.
+- The whole process, start to finish. Work is driven one step at a time, each
+  step asking for the evidence it needs and refusing what does not pass.
+- The live view. A browser page shows where the work stands, updating as it
+  moves, with the same content the driver sees.
+- The record. Twenty-six pieces of work carry their own folders of evidence,
+  and the links between what was asked for and what was built are checked by
+  machine in both directions.
+- The test battery. It runs on its own at one point in the process, and
+  nothing else can call it.
+
+WHAT IS KNOWN TO BE MISSING is not listed here, because a list like that goes
+stale exactly the way this block did. It lives in the register under
+`project/spec/trace/raid/`, where every entry carries an owner and the
+condition that brings it back.
