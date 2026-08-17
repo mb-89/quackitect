@@ -73,11 +73,34 @@ const COPIED = [
   "project/guidance".replace("/", sep),
   join("project", "deliverable", "brand", "brand.json"),
   join("project", "deliverable", "brand", "palette.css"),
+  // THE FORMATTER IS CONFIGURED BY THIS FILE, and without it biome checks a
+  // DIFFERENT TREE than the product does. Its own includes list is the whole
+  // point: engine, tests and the vscode sources — never the copied machines
+  // and guidance a test root also carries.
+  //
+  // MEASURED 2026-08-17, in a root that had biome but not its config: 133 files
+  // checked instead of the product's set, 47 warnings, and --error-on-warnings
+  // turned that into a non-zero exit. se_test's battery returns early on a
+  // failed format step, so tests/nesting.test.ts saw 1 result where it expects 4.
+  join("project", "deliverable", "biome.json"),
 ];
 // A linked engine resolves its imports from where it REALLY lives, which
 // is the template — so the yaml package has to sit above it THERE. Copied
 // into the template once, instead of into every case.
 const YAML_REL = join("project", "deliverable", "node_modules", "yaml");
+// BIOME IS LINKED, NEVER COPIED, and the difference is 127 MB against the
+// template's 1.2 MB.
+//
+// WHY IT HAS TO BE HERE AT ALL. se_test's battery runs biome as its FIRST
+// script and returns early when it exits non-zero, so a root that cannot reach
+// biome reports one result where the case expects four. BIOME_BIN resolves
+// relative to tools.ts's own path, and the engine is BORROWED — node resolves
+// the link to its real path — so it looks inside this template and finds a
+// node_modules holding exactly one package.
+//
+// MEASURED 2026-08-17: tests/nesting.test.ts read 1 !== 4 for that reason, on
+// both platforms, since the link resolves the same way on each.
+const BIOME_REL = join("project", "deliverable", "node_modules", "@biomejs");
 
 function fingerprint(): string {
   const parts: string[] = [];
@@ -96,6 +119,8 @@ function fingerprint(): string {
   // the template rebuilds, without walking hundreds of files every run.
   const pkg = statSync(join(REPO_ROOT, YAML_REL, "package.json"));
   parts.push(`yaml:${pkg.size}:${pkg.mtimeMs}`);
+  const biome = statSync(join(REPO_ROOT, BIOME_REL, "biome", "package.json"));
+  parts.push(`biome:${biome.size}:${biome.mtimeMs}`);
   return contentHash(parts.join("\n")).slice(0, 16);
 }
 
@@ -132,6 +157,15 @@ function template(): string {
     const staging = mkdtempSync(join(home, "staging-"));
     for (const rel of [...BORROWED, YAML_REL]) cpSync(join(REPO_ROOT, rel), join(staging, rel), { recursive: true });
     freeze(staging);
+    // AFTER THE FREEZE, DELIBERATELY. freeze walks with readdirSync and chmods
+    // what it finds, and a directory link is walked THROUGH — so linking first
+    // would set the repository's own biome read-only.
+    try {
+      symlinkSync(join(REPO_ROOT, BIOME_REL), join(staging, BIOME_REL), "junction");
+    } catch {
+      // No link privilege on this host — correctness first, size second.
+      cpSync(join(REPO_ROOT, BIOME_REL), join(staging, BIOME_REL), { recursive: true });
+    }
     try {
       renameSync(staging, want);
     } catch {

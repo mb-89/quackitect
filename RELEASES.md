@@ -2,6 +2,38 @@
 
 One entry per shipped version, newest first.
 
+## 4.5.0 — 2026-08-17
+
+A machine nobody is watching starts working on its own.
+
+- Hand a fresh copy of the project to a computer in the cloud and it gets
+  itself ready. Before this, whoever arrived first spent close to an hour doing
+  the setup by hand, and did it again on the next machine, and the one after.
+- It happens by itself when the session opens. Nobody has to know the command,
+  which was the part that kept going wrong.
+- Running it twice is safe. It says what was already done and leaves it alone.
+- If any step fails, it says which one and the session carries on. A setup step
+  that could end your session would be worse than the work it saves.
+- Older versions of the project can be read again. A cloud copy arrives holding
+  one version and the rest were unreachable, so anything referring back to them
+  simply failed. Both halves of that are fixed, and the second half is the one
+  everybody missed.
+- Pictures of the interface can be taken on these machines at all. The browser
+  they carry was in a place we never looked, and it refuses to run for the kind
+  of user a container makes.
+- A broken file in the project's own records is now caught when the system
+  starts. One was sitting there, and the check said everything was fine.
+- Two long-standing test failures are gone. One was reading a setting that
+  happened to be lying around; the other was checking a copy of the project
+  that had been set up differently from the real one.
+
+### What this release does not change
+
+- HOW MUCH THE AGENT DOES ON ITS OWN IS STILL YOUR SETTING, and the default
+  still stops it early. On an unwatched machine that means it stops at the
+  first approval and waits for somebody who is not there. Nothing here decides
+  that for you; the setting can now be handed in when the machine starts.
+
 ## 4.2.0 — 2026-08-16
 
 Your work lives in one place again.

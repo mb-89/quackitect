@@ -226,3 +226,47 @@
 {"ts":"2026-08-17T12:17:45.389Z","op":"update","visit":"iterations/i35/verification@2","node":"d215","brief":"i35: where does it stand"}
 {"ts":"2026-08-17T12:18:46.665Z","op":"update","visit":"iterations/i35/verification@2","node":"d216","brief":"i35: leaving verification — does the engine fire the battery?"}
 {"ts":"2026-08-17T12:21:12.582Z","op":"update","visit":"iterations/i35/verification@2","node":"d217","brief":"i35: attempting the gate with the aim set"}
+{"ts":"2026-08-17T12:33:30.763Z","op":"update","visit":"iterations/i35/verification@2","node":"d218","brief":"i35: the battery is green — leaving verification"}
+{"ts":"2026-08-17T12:35:01.831Z","op":"update","visit":"iterations/i35/gate-implementation@0","node":"d219","brief":"i35: reading gate-implementation"}
+{"ts":"2026-08-17T12:36:00.965Z","op":"update","visit":"iterations/i35/gate-implementation@0","node":"d220","brief":"i35: the implementation gate"}
+{"ts":"2026-08-17T12:36:01.390Z","op":"update","visit":"iterations/i35/gate-implementation@0","node":"d221","brief":"i35: submitting and blessing gate-implementation"}
+{"ts":"2026-08-17T12:36:13.971Z","op":"update","visit":"iterations/i35/gate-implementation@0","node":"d222","brief":"i35: the implementation gate"}
+{"ts":"2026-08-17T12:36:14.354Z","op":"update","visit":"iterations/i35/gate-implementation@0","node":"d223","brief":"i35: submitting and blessing gate-implementation"}
+{"ts":"2026-08-17T12:36:31.733Z","op":"update","visit":"iterations/i35/trace-design@3","node":"d224","brief":"i35: on to validation"}
+{"ts":"2026-08-17T12:37:58.766Z","op":"update","visit":"iterations/i35/gate-implementation@0","node":"d225","brief":"i35: walking into validation"}
+{"ts":"2026-08-17T12:38:08.999Z","op":"update","visit":"iterations/i35/sweep-consistency@0","node":"d226","brief":"i35: reading sweep-consistency"}
+{"ts":"2026-08-17T12:38:37.347Z","op":"update","visit":"iterations/i35/sweep-consistency@0","node":"d227","brief":"i35 sweep: the README learns the cloud arrival"}
+{"ts":"2026-08-17T12:39:05.475Z","op":"update","visit":"iterations/i35/sweep-consistency@0","node":"d228","brief":"i35: sweeping the describing surfaces"}
+{"ts":"2026-08-17T12:39:05.863Z","op":"update","visit":"iterations/i35/sweep-consistency@0","node":"d229","brief":"i35: submitting sweep-consistency"}
+{"ts":"2026-08-17T12:39:16.213Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d230","brief":"i35: reading gate-validation"}
+{"ts":"2026-08-17T12:40:25.706Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d231","brief":"i35: the validation gate"}
+{"ts":"2026-08-17T12:40:26.082Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d232","brief":"i35: submitting and blessing gate-validation"}
+{"ts":"2026-08-17T12:40:37.805Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d233","brief":"i35: on to package"}
+{"ts":"2026-08-17T12:40:48.853Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d234","brief":"i35: toward package"}
+{"ts":"2026-08-17T12:42:29.820Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d235","brief":"i35: the unfinished decks get their evidence halves"}
+{"ts":"2026-08-17T12:42:29.957Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d236","brief":"i35: the unfinished decks get their evidence halves"}
+{"ts":"2026-08-17T12:42:30.090Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d237","brief":"i35: the unfinished decks get their evidence halves"}
+{"ts":"2026-08-17T12:42:42.124Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d238","brief":"i35: the unfinished decks get their evidence halves"}
+{"ts":"2026-08-17T12:42:42.369Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d239","brief":"i35: the unfinished decks get their evidence halves"}
+{"ts":"2026-08-17T12:42:42.614Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d240","brief":"i35: the unfinished decks get their evidence halves"}
+{"ts":"2026-08-17T12:43:16.140Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d241","brief":"i35: the uncovered must-stories get a demonstration spec"}
+{"ts":"2026-08-17T12:43:16.273Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d242","brief":"i35: the uncovered must-stories get a demonstration spec"}
+{"ts":"2026-08-17T12:43:27.109Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d243","brief":"i35: the validation gate"}
+{"ts":"2026-08-17T12:43:27.420Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d244","brief":"i35: re-blessing gate-validation"}
+{"ts":"2026-08-17T12:43:37.892Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d245","brief":"i35: where now"}
+{"ts":"2026-08-17T12:43:48.465Z","op":"update","visit":"iterations/i35/package@0","node":"d246","brief":"i35: reading package"}
+{"ts":"2026-08-17T12:44:24.998Z","op":"update","visit":"iterations/i35/package@0","node":"d247","brief":"i35: 4.5.0 — the cloud arrival ships"}
+{"ts":"2026-08-17T12:44:34.479Z","op":"update","visit":"iterations/i35/package@0","node":"d248","brief":"i35: assembling the 4.5.0 package"}
+{"ts":"2026-08-17T12:45:14.095Z","op":"update","visit":"iterations/i35/package@0","node":"d249","brief":"i35: the packaged product carries the wire that fires its arrival"}
+{"ts":"2026-08-17T12:45:14.292Z","op":"update","visit":"iterations/i35/package@0","node":"d250","brief":"i35: rebuilding with the wire"}
+{"ts":"2026-08-17T12:46:26.522Z","op":"update","visit":"iterations/i35/package@0","node":"d251","brief":"i35: the package is built and used"}
+{"ts":"2026-08-17T12:46:26.845Z","op":"update","visit":"iterations/i35/package@0","node":"d252","brief":"i35: submitting package"}
+{"ts":"2026-08-17T12:46:37.775Z","op":"update","visit":"iterations/i35/package@0","node":"d253","brief":"i35: the package is built and used"}
+{"ts":"2026-08-17T12:46:38.070Z","op":"update","visit":"iterations/i35/package@0","node":"d254","brief":"i35: submitting package"}
+{"ts":"2026-08-17T12:46:56.118Z","op":"update","visit":"iterations/i35/trace-design@4","node":"d255","brief":"i35: toward release"}
+{"ts":"2026-08-17T12:48:18.659Z","op":"update","visit":"iterations/i35/gate-implementation@1","node":"d256","brief":"i35: at the release gate"}
+{"ts":"2026-08-17T12:48:29.255Z","op":"update","visit":"iterations/i35/gate-release@0","node":"d257","brief":"i35: reading gate-release"}
+{"ts":"2026-08-17T12:49:22.461Z","op":"update","visit":"iterations/i35/gate-release@0","node":"d258","brief":"i35: the release gate"}
+{"ts":"2026-08-17T12:49:22.823Z","op":"update","visit":"iterations/i35/gate-release@0","node":"d259","brief":"i35: submitting and blessing gate-release"}
+{"ts":"2026-08-17T12:49:37.884Z","op":"update","visit":"iterations/i35/trace-design@5","node":"d260","brief":"i35: to shipped"}
+{"ts":"2026-08-17T12:51:05.870Z","op":"update","visit":"iterations/i35/gate-implementation@2","node":"d261","brief":"i35: reaching shipped"}

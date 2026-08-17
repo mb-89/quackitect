@@ -40,6 +40,23 @@ project/               THE FOLDER YOU OPEN. Everything being built lives here.
 After that, open `project/` in VS Code. The extension starts the server, places
 the attach configs and installs the engine's dependencies by itself.
 
+## On a machine nobody is watching
+
+A cloud box gets there in one command, and usually without being asked — the
+repository's own `.claude/settings.json` fires it when a session starts.
+
+```bash
+node project/deliverable/engine/bin/se-arrive.ts --autonomy 0.6
+```
+
+It fetches the branches the records cite, checks the runtime against the pin,
+installs, places the cage, starts the server, and writes `.se/se-call.mjs` so an
+agent with no tools of its own can still call it. Running it twice changes
+nothing. `SE_NO_ARRIVE=1` turns it off on a machine where the editor is in
+charge.
+
+The card for the agent that lands there is `project/guidance/method/cloud-runner.md`.
+
 ## What a change needs before you see it
 
 This used to cost an evening, because nobody could say which restart applied to
