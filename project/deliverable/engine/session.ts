@@ -1591,6 +1591,38 @@ export class Session {
     return s;
   }
 
+  /** DOES THIS STATE OWE A SIGNATURE? Fields are the usual answer and they are
+   *  not the question (owner, 2026-08-17: "If it's not submitted, then you're
+   *  not going to the next state").
+   *
+   *  THREE SHAPES, AND ONLY THE MIDDLE ONE WAS EVER HANDLED.
+   *
+   *  - A state with evidence FIELDS. Signs, and `evidence_form.length > 0`
+   *    finds it. Almost every state.
+   *  - A state with a FORM BUT NO FIELDS. Signs on a bare submit, because its
+   *    check is computed rather than typed — fill-story-evidence reads every
+   *    story deck and refuses on an empty slide. It has an instance and a
+   *    signature line and no fields at all.
+   *  - A state with NO FORM. Never signs. read_contract and prepare_idle are
+   *    reading and machinery, and asking them for a claim wedges the boot.
+   *
+   *  ASKING ABOUT `kind` WAS TRIED FIRST AND IS TOO WIDE: read_contract is a
+   *  `work` state too, and five tests said so within a minute of the change.
+   *  The instance on disk is what actually separates the middle from the last:
+   *  a state that has a form has a file, and a state that has no form has
+   *  none.
+   *
+   *  WHAT THE MIDDLE CASE COST while it read as machinery: the walk crossed
+   *  fill-story-evidence unsigned three times, two states signed under the
+   *  gap including a gate, the panel painted them green, the record was merged
+   *  to trunk as finished, and the only route back was twenty-five hops
+   *  forward through `shipped`. note-fa24138d389e. */
+  private owesASignature(s: StateDecl, it: Iteration): boolean {
+    if (s.evidence_form.length > 0) return true;
+    if (s.kind !== "work" && s.kind !== "gate") return false;
+    return existsSync(this.evidenceAbs(it, s.id));
+  }
+
   /** completeState with the WEDGE GUARD: a move that would leave an open
    *  machine with NO active state is refused with the starving join named —
    *  the walk stands instead of stranding. Found live 2026-07-28: plain
@@ -1618,7 +1650,30 @@ export class Session {
     // this condition put a full green recomputation on every mechanical hop and
     // took recordDone to 3683 ms over 200 nodes against a 1000 ms budget —
     // caught by drift.test.ts, three lines under the comment that warned of it.
-    const claimfulNow = outcome === "filled" && decl.evidence_form.length > 0;
+    // FIELDS ARE NOT WHAT MAKES A CLAIM (owner, 2026-08-17, in the plainest
+    // words this rule has had: "If it's not submitted, then you're not going
+    // to the next state").
+    //
+    // THIS ASKED `evidence_form.length > 0`, which is a PROXY. It holds for
+    // almost every state and it failed on the one where it does not:
+    // fill-story-evidence declares no fields on purpose, because its check is
+    // computed from the story decks rather than typed in. Its own guidance
+    // says signing is a bare submit. So claimfulNow read FALSE, this whole
+    // guard was skipped, and the walk completed a state that had never been
+    // signed.
+    //
+    // WHAT THAT COST, on 2026-08-17. The walk crossed it three times. Two
+    // states signed underneath the gap, one of them a gate. The panel painted
+    // them green, an agent read the record as finished and merged it to trunk,
+    // and the only route back to the crossed state was twenty-five hops
+    // forward through `shipped` and around the entire machine. The walk had to
+    // escape to the desk. See note-fa24138d389e.
+    //
+    // owesASignature ANSWERS IT, and it stays cheap: a state with no form has
+    // no file, so machinery never pays the corpus load the comment above is
+    // protecting.
+    const itNow = this.declIteration(m);
+    const claimfulNow = outcome === "filled" && itNow !== undefined && this.owesASignature(decl, itNow);
     const done = claimfulNow ? new Set(this.recordDone(m)) : new Set<string>();
     if (claimfulNow && !done.has(stateId)) {
       // NAME THE CLAIM THAT ACTUALLY FELL (i3, 2026-08-13).
@@ -4275,10 +4330,27 @@ export class Session {
   }
 
   /** The dispatch between the two form kinds: a state of the machine on
-   *  display with evidence fields, unshadowed by a named template. */
+   *  display, unshadowed by a named template.
+   *
+   *  IT ASKED FOR EVIDENCE FIELDS AND THAT WAS THE LAST OF SIX (2026-08-17).
+   *  A state form is a state's form. Whether the state declares FIELDS is a
+   *  fact about that form's shape, not about which system owns it, and using
+   *  it here sent fill-story-evidence down the generic path — where it looked
+   *  for machines/forms/fill-story-evidence.md, found nothing, and threw.
+   *
+   *  SO THE STATE COULD NEVER BE SERVED AND NEVER BE SIGNED. Its guidance says
+   *  signing is a bare submit, and there was no path by which a bare submit
+   *  could reach it. Every other symptom of that afternoon hung off this line:
+   *  the walk crossing it, two states signing under the gap, the panel painting
+   *  green over a hole, a record merged to trunk as finished, and a deadlock
+   *  whose only exit was the escape hatch.
+   *
+   *  A NAMED TEMPLATE STILL SHADOWS IT, which is the check above and is about
+   *  ownership rather than shape: if somebody authored machines/forms/<name>.md
+   *  then that template is what the name means. */
   private isStateForm(name: string, m: MachineDecl = this.currentMachine()): boolean {
     if (existsSync(join(this.machineRoot(), formTemplatePath(name)))) return false;
-    return m.states.some((s) => s.id === name && s.evidence_form.length > 0);
+    return m.states.some((s) => s.id === name && (s.kind === "work" || s.kind === "gate"));
   }
 
   /** Where the instance lives: the record whose machine carries the state
@@ -4846,7 +4918,29 @@ export class Session {
     // THE RIPPLE COVERS CONTAINERS TOO, so claimFeeders must not look THROUGH
     // one. A container carries no evidence of its own and used to read as a
     // waypoint, which is what let the objective skip a whole sub-machine.
-    const claimful = new Set(decl.states.filter((s) => s.evidence_form.length > 0).map((s) => s.id));
+    //
+    // AND IT COVERS A STATE WITH NO EVIDENCE FIELDS, which is the same hole in
+    // a third shape (owner, off the panel, 2026-08-17: "sweep consistency
+    // can't be green if fill story evidence is not green").
+    //
+    // THIS USED TO KEY ON `evidence_form.length > 0`, which is a PROXY for
+    // carrying a claim rather than the thing itself. For almost every state
+    // the two coincide. fill-story-evidence is the one where they part: its
+    // row declares no fields on purpose, because its check is COMPUTED from
+    // the story decks rather than typed into a form, and its own guidance says
+    // signing is a bare submit. It has a form, an instance and a signature
+    // line. What it has none of is fields.
+    //
+    // SO IT WAS NEVER CLAIMFUL, claimFeeders never named it as an input, and
+    // the fixed point below never asked whether it stood. Two states signed
+    // under an unsubmitted one — one of them a GATE — the panel painted them
+    // green, and an agent read that as a finished record and closed it.
+    //
+    // owesASignature ANSWERS IT: fields where there are fields, and otherwise
+    // whether the state has a form instance at all. A state with no form is
+    // machinery and is looked through, which is right — read_contract has no
+    // claim to make and putting it here wedges the boot.
+    const claimful = new Set(decl.states.filter((s) => this.owesASignature(s, it)).map((s) => s.id));
     const green = this.standingClaims(decl, it, claimful, pass, paint);
     for (const s of decl.states) {
       if (s.submachine === undefined) continue;
@@ -5900,7 +5994,25 @@ export class Session {
     if (!this.subs.some((s) => s.decl.id === "iterations")) return undefined;
     const { machine, ids } = this.leaves();
     const s = machine.states.find((x) => x.id === ids[0]);
-    if (s === undefined || s.evidence_form.length === 0) return undefined;
+    // THE FOURTH PLACE THIS PROXY LIVED (owner, 2026-08-17). Asking
+    // `evidence_form.length === 0` meant a state with a form but no FIELDS was
+    // never owed — so the pull never served it, so {submit: true} was refused
+    // with "nothing asked for one", so it could never be signed, so it could
+    // never be green. The owner's rule is that there is no middle: either the
+    // state is done and paints green, or it is not and everything below it is
+    // grey. This made the first half unreachable.
+    if (s === undefined) return undefined;
+    // MACHINERY OWES NOTHING, and that is the only test needed here. start,
+    // end, terminal and join never sign; asking them for a form throws from
+    // formForAgent on the pull's own path, OUTSIDE the try below, so seven
+    // tests went red when this guard was removed entirely.
+    //
+    // EVERYTHING ELSE IS ANSWERED BY THE LOOKUP. stateFormGet throws for a
+    // work state that has no form — read_contract reads and never signs — and
+    // the catch turns that into "owes nothing". So no test of FIELDS belongs
+    // here: a state with a form and no fields is owed like any other, which is
+    // what makes a bare submit reachable at all.
+    if (s.kind !== "work" && s.kind !== "gate") return undefined;
     try {
       // Owed until SUBMITTED and still COMPLETE — a live input growing back
       // (a new inbox item) re-opens a signed form instead of leaving it
@@ -6212,10 +6324,28 @@ export class Session {
   claimBlockers(stateId: string, machine?: MachineDecl): Blocker[] {
     const m = machine ?? this.currentMachine();
     const decl = m.states.find((s) => s.id === stateId);
-    if (decl === undefined || decl.evidence_form.length === 0) return [];
+    // THE SEVENTH PLACE (2026-08-17), and the one that made the other six
+    // hard to find. Returning [] for a fieldless state left BOTH readers mute:
+    // the completion guard fell through to "the claim is neither signed nor
+    // standing" with no reason attached, and se_why answered "stands — nothing
+    // holds it" about a state the guard was refusing.
+    //
+    // THAT BREAKS THE PROJECT'S OWN RULE, quoted from guidance/refusals.md:
+    // "THE MACHINE HOLDS THE VERDICT, SO THE MACHINE HANDS IT OVER. It is
+    // never the agent's job to ask why it was blocked." And its test: "could
+    // somebody act on it without asking a second question?" The engine had the
+    // failing list the whole time and dropped it on the floor.
+    if (decl === undefined) return [];
     const done = new Set(this.recordDone(m));
     if (done.has(stateId)) return [];
-    const expected = `${stateId}'s claim to stand before it completes — it declares ${decl.evidence_form.length} evidence field(s)`;
+    const fields = decl.evidence_form.length;
+    const expected =
+      fields > 0
+        ? `${stateId}'s claim to stand before it completes — it declares ${String(fields)} evidence field(s)`
+        : `${stateId}'s claim to stand before it completes — it declares no fields, so its check is COMPUTED and the failing list is below`;
+    // THE CONTENT CHECK BELOW ALREADY REPORTS THE FAILING LIST. It was simply
+    // never reached for a fieldless state, because the early return above cut
+    // the function off before it. Nothing new is needed here.
     // NAME THE CLAIM THAT ACTUALLY FELL (i3, 2026-08-13). recordDone runs a
     // RIPPLE: green stops at the first input that is not green, because a
     // claim may be word for word fine and still rest on ground that moved.

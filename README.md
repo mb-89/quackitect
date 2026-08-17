@@ -188,6 +188,6 @@ WHAT RUNS TODAY:
   nothing else can call it.
 
 WHAT IS KNOWN TO BE MISSING is not listed here, because a list like that goes
-stale exactly the way this block did. It lives in the register under
-`project/spec/trace/raid/`, where every entry carries an owner and the
-condition that brings it back.
+stale exactly the way this block did. It lives in the project's own register of
+open questions, where every entry carries an owner and the condition that
+brings it back.

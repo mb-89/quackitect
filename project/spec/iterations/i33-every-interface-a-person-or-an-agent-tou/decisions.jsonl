@@ -782,3 +782,156 @@
 {"ts":"2026-08-17T18:34:13.074Z","op":"update","visit":"iterations/i33/trace-design@4","node":"d42","brief":"finding the act that closes a walked-out iteration"}
 {"ts":"2026-08-17T18:34:18.886Z","op":"update","visit":"iterations/i33/trace-design@4","node":"d43","brief":"reading what the close verb does"}
 {"ts":"2026-08-17T18:34:43.015Z","op":"done","visit":"iterations/i33/gate-implementation@0","node":"d14","brief":"i33 walked to its end, both gates blessed"}
+{"ts":"2026-08-17T18:36:26.294Z","op":"update","visit":"iterations/i33/trace-design@5","node":"d46","brief":"checking the record's own status file"}
+{"ts":"2026-08-17T18:36:33.185Z","op":"update","visit":"iterations/i33/trace-design@5","node":"d47","brief":"listing the record to see what the close stamped"}
+{"ts":"2026-08-17T18:36:37.272Z","op":"update","visit":"iterations/i33/trace-design@5","node":"d48","brief":"reading what the close stamped on the record"}
+{"ts":"2026-08-17T18:36:57.656Z","op":"update","visit":"iterations/i33/trace-design@5","node":"d49","brief":"aiming at package, the state I never reached"}
+{"ts":"2026-08-17T18:37:19.815Z","op":"fork","visit":"iterations/i33/trace-design@5","parent":"d45","node":"d50","brief":"the close was legal mid-walk and reported an archive that never happened","nodes":[]}
+{"ts":"2026-08-17T18:37:32.999Z","op":"update","visit":"iterations/i33/trace-design@5","node":"d51","brief":"finding why the state gate did not fire"}
+{"ts":"2026-08-17T18:37:43.062Z","op":"update","visit":"iterations/i33/trace-design@5","node":"d52","brief":"reading the always-legal set that granted the close"}
+{"ts":"2026-08-17T18:38:05.769Z","op":"update","visit":"iterations/i33/trace-design@5","node":"d53","brief":"asking why fill-story-evidence paints grey"}
+{"ts":"2026-08-17T18:38:22.330Z","op":"update","visit":"iterations/i33/trace-design@5","node":"d54","brief":"checking whether sweep-consistency really stands over the hole"}
+{"ts":"2026-08-17T18:38:57.740Z","op":"update","visit":"iterations/i33/trace-design@5","node":"d55","brief":"noted the formless-state hole that let green paint over a gap"}
+{"ts":"2026-08-17T18:39:12.183Z","op":"update","visit":"iterations/i33/trace-design@5","node":"d56","brief":"finding the discriminator for a signable formless state"}
+{"ts":"2026-08-17T18:39:17.720Z","op":"update","visit":"iterations/i33/trace-design@5","node":"d57","brief":"reading the row that declares a formless signable state"}
+{"ts":"2026-08-17T18:39:32.897Z","op":"update","visit":"iterations/i33/trace-design@5","node":"d58","brief":"reading how standingClaims picks the states it judges"}
+{"ts":"2026-08-17T18:39:38.604Z","op":"done","visit":"iterations/i33/trace-design@4","node":"d44","brief":"the close merged 47 files and left status open; the record was never archived"}
+{"ts":"2026-08-17T18:39:59.928Z","op":"update","visit":"iterations/i33/trace-design@5","node":"d59","brief":"finding the declared kinds that separate a signing state from a waypoint"}
+{"ts":"2026-08-17T18:40:14.322Z","op":"update","visit":"iterations/i33/trace-design@5","node":"d60","brief":"checking whether the empty field list is designed or tailored away"}
+{"ts":"2026-08-17T18:40:38.002Z","op":"update","visit":"iterations/i33/trace-design@5","node":"d61","brief":"finding the kinds that declare a state signs"}
+{"ts":"2026-08-17T18:40:44.709Z","op":"update","visit":"iterations/i33/trace-design@5","node":"d62","brief":"confirming the work kind before widening claimful"}
+{"ts":"2026-08-17T18:41:07.659Z","op":"done","visit":"iterations/i33/trace-design@5","node":"d50","brief":"claimful now keys on the kind that carries a claim, not on having fields"}
+{"ts":"2026-08-17T18:41:13.187Z","op":"plan","visit":"iterations/i33/trace-design@5","parent":null,"nodes":[{"id":"d63","brief":"prove the widened claimful"},{"id":"d64","brief":"submit fill-story-evidence properly"},{"id":"d65","brief":"re-earn what signed over the gap"},{"id":"d66","brief":"walk package and gate-release"}]}
+{"ts":"2026-08-17T18:42:24.308Z","op":"done","visit":"iterations/i33/trace-design@5","node":"d63","brief":"1402 pass, 0 fail with claimful keyed on kind"}
+{"ts":"2026-08-17T18:43:21.215Z","op":"update","visit":"iterations/i33/author-tests@0","node":"d7","brief":"walking on toward the states that never ran"}
+{"ts":"2026-08-17T18:44:25.229Z","op":"update","visit":"iterations/i33/verification@0","node":"d8","brief":"the battery hop timed out again; recomputing"}
+{"ts":"2026-08-17T18:44:33.519Z","op":"update","visit":"iterations/i33/gate-implementation@0","node":"d9","brief":"recomputing after the interrupted battery hop"}
+{"ts":"2026-08-17T18:44:44.263Z","op":"update","visit":"iterations/i33/sweep-consistency@0","node":"d10","brief":"checking whether the walk crossed the gap again"}
+{"ts":"2026-08-17T18:44:57.293Z","op":"update","visit":"iterations/i33/sweep-consistency@0","node":"d11","brief":"aiming at the state the walk keeps hopping over"}
+{"ts":"2026-08-17T18:45:17.647Z","op":"update","visit":"iterations/i33/sweep-consistency@0","node":"d12","brief":"testing whether the widened ripple now greys the state over the gap"}
+{"ts":"2026-08-17T18:45:52.903Z","op":"update","visit":"iterations/i33/sweep-consistency@0","node":"d13","brief":"aiming at shipped to see whether the machine ships over the gap"}
+{"ts":"2026-08-17T18:45:56.199Z","op":"update","visit":"iterations/i33/sweep-consistency@0","node":"d14","brief":"walking toward shipped"}
+{"ts":"2026-08-17T18:46:06.626Z","op":"update","visit":"iterations/i33/sweep-consistency@0","node":"d15","brief":"aiming at package, one door at a time"}
+{"ts":"2026-08-17T18:46:12.479Z","op":"done","visit":"start@0","node":"d3","brief":"the ripple fix did not close it — se_why answers from blockers, not the ripple"}
+{"ts":"2026-08-17T18:46:29.513Z","op":"update","visit":"iterations/i33/sweep-consistency@0","node":"d16","brief":"routing back to the gap now the chain is honestly down"}
+{"ts":"2026-08-17T18:47:07.936Z","op":"update","visit":"iterations/i33/sweep-consistency@0","node":"d17","brief":"the walk is deadlocked: forward refuses, backward does not exist"}
+{"ts":"2026-08-17T18:47:28.013Z","op":"update","visit":"iterations/i33/sweep-consistency@0","node":"d18","brief":"escaping to re-enter and reach the owed state"}
+{"ts":"2026-08-17T18:54:16.704Z","op":"update","visit":"iterations/i33/build-steps/start@0","node":"d5","brief":"walking the phase-split probe chunk"}
+{"ts":"2026-08-17T18:54:23.591Z","op":"update","visit":"iterations/i33/build-steps/start@0","node":"d6","brief":"aiming at the first unwalked chunk"}
+{"ts":"2026-08-17T18:54:29.037Z","op":"update","visit":"iterations/i33/build-steps/start@0","node":"d7","brief":"entering the phase-split probe chunk"}
+{"ts":"2026-08-17T18:54:44.355Z","op":"update","visit":"iterations/i33/build-steps/phase-split-probe@0","node":"d8","brief":"phase-split-probe recorded"}
+{"ts":"2026-08-17T18:54:52.617Z","op":"update","visit":"iterations/i33/build-steps/phase-split-probe@0","node":"d9","brief":"pulling bare so the form is served before filling"}
+{"ts":"2026-08-17T18:55:14.971Z","op":"update","visit":"iterations/i33/trace-design@0","node":"d10","brief":"aiming forward at the state that owes its signature"}
+{"ts":"2026-08-17T18:55:18.848Z","op":"update","visit":"iterations/i33/trace-design@0","node":"d11","brief":"walking the three hops to the unsigned state"}
+{"ts":"2026-08-17T18:56:22.163Z","op":"update","visit":"iterations/i33/gate-implementation@0","node":"d12","brief":"recomputing after the battery hop"}
+{"ts":"2026-08-17T18:56:32.170Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d13","brief":"submitting the state that signs on a bare submit"}
+{"ts":"2026-08-17T18:56:55.846Z","op":"fork","visit":"iterations/i33/fill-story-evidence@0","parent":"d2","node":"d14","brief":"a state that signs on a bare submit cannot be submitted at all","nodes":[]}
+{"ts":"2026-08-17T18:57:01.929Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d15","brief":"reading what decides a form is owed"}
+{"ts":"2026-08-17T18:57:06.863Z","op":"done","visit":"front_desk@0","node":"d3","brief":"package cannot be reached until this state can sign"}
+{"ts":"2026-08-17T18:57:24.200Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d16","brief":"the pull now serves a form for a state that signs bare"}
+{"ts":"2026-08-17T18:57:28.790Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d17","brief":"battery on the fourth site"}
+{"ts":"2026-08-17T19:08:37.866Z","op":"done","visit":"iterations/i33/fill-story-evidence@0","node":"d14","brief":"1403 pass, 0 fail with the pull serving a fieldless form"}
+{"ts":"2026-08-17T19:09:17.979Z","op":"update","visit":"iterations/i33/derive-functions@0","node":"d5","brief":"continuing toward the state that owes its signature"}
+{"ts":"2026-08-17T19:10:21.886Z","op":"update","visit":"iterations/i33/verification@0","node":"d6","brief":"recomputing after a script hop timed out"}
+{"ts":"2026-08-17T19:10:34.920Z","op":"update","visit":"iterations/i33/gate-implementation@0","node":"d7","brief":"recomputing the route"}
+{"ts":"2026-08-17T19:10:47.734Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d8","brief":"reading the rest of the owed decision"}
+{"ts":"2026-08-17T19:11:10.937Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d9","brief":"the owed test now lets the form lookup answer for itself"}
+{"ts":"2026-08-17T19:11:15.674Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d10","brief":"battery on letting the form lookup decide"}
+{"ts":"2026-08-17T19:12:44.657Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d11","brief":"machinery excluded by kind; the lookup answers for the rest"}
+{"ts":"2026-08-17T19:12:49.268Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d12","brief":"battery on the kind-only guard"}
+{"ts":"2026-08-17T19:13:32.413Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d13","brief":"noted why every engine edit forces a full battery"}
+{"ts":"2026-08-17T19:14:08.648Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d14","brief":"reloading onto the corrected owed test"}
+{"ts":"2026-08-17T19:14:45.957Z","op":"update","visit":"iterations/i33/gate-requirements@0","node":"d4","brief":"continuing the sweep toward the owed state"}
+{"ts":"2026-08-17T19:16:07.072Z","op":"update","visit":"iterations/i33/gate-implementation@0","node":"d5","brief":"noted the owner's ruling on battery scope"}
+{"ts":"2026-08-17T19:16:14.844Z","op":"update","visit":"iterations/i33/gate-implementation@0","node":"d6","brief":"recomputing after the timeout and pressing on"}
+{"ts":"2026-08-17T19:16:20.185Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d7","brief":"submitting the state on its bare submit"}
+{"ts":"2026-08-17T19:16:32.061Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d8","brief":"the form template was never authored — listing what exists"}
+{"ts":"2026-08-17T19:16:51.725Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d9","brief":"reading how the pull picks between the two form systems"}
+{"ts":"2026-08-17T19:16:56.301Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d10","brief":"reading formGet's split between state and generic forms"}
+{"ts":"2026-08-17T19:17:00.941Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d11","brief":"reading the top of formGet where it chooses"}
+{"ts":"2026-08-17T19:17:08.845Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d12","brief":"locating isStateForm"}
+{"ts":"2026-08-17T19:17:13.904Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d13","brief":"reading isStateForm's test"}
+{"ts":"2026-08-17T19:17:28.344Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d14","brief":"the dispatch now asks which system owns the form, not its shape"}
+{"ts":"2026-08-17T19:17:33.184Z","op":"done","visit":"start@0","node":"d3","brief":"the render question resolves once this state can sign"}
+{"ts":"2026-08-17T19:21:02.135Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d15","brief":"reloading onto the form dispatch fix"}
+{"ts":"2026-08-17T19:21:40.505Z","op":"update","visit":"iterations/i33/gate-requirements@0","node":"d4","brief":"sweeping on toward the owed state"}
+{"ts":"2026-08-17T19:22:55.623Z","op":"update","visit":"iterations/i33/gate-implementation@0","node":"d5","brief":"checking the scope mapping rather than guessing at it"}
+{"ts":"2026-08-17T19:23:02.198Z","op":"update","visit":"iterations/i33/gate-implementation@0","node":"d6","brief":"reading the mapping itself"}
+{"ts":"2026-08-17T19:23:08.099Z","op":"update","visit":"iterations/i33/gate-implementation@0","node":"d7","brief":"reading the last lines of the mapping"}
+{"ts":"2026-08-17T19:23:29.624Z","op":"update","visit":"iterations/i33/gate-implementation@0","node":"d8","brief":"corrected the guess: the mapping is a filename lookup"}
+{"ts":"2026-08-17T19:23:34.804Z","op":"update","visit":"iterations/i33/gate-implementation@0","node":"d9","brief":"recomputing the route to the owed state"}
+{"ts":"2026-08-17T19:23:39.924Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d10","brief":"submitting on the bare submit the state was built for"}
+{"ts":"2026-08-17T19:23:59.833Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d11","brief":"filling the two required sections and submitting"}
+{"ts":"2026-08-17T19:24:21.601Z","op":"done","visit":"start@0","node":"d2","brief":"fill-story-evidence signed — the state can now be submitted at all"}
+{"ts":"2026-08-17T19:24:26.065Z","op":"update","visit":"iterations/i33/trace-design@1","node":"d12","brief":"walking toward shipped"}
+{"ts":"2026-08-17T19:25:30.567Z","op":"update","visit":"iterations/i33/gate-implementation@1","node":"d13","brief":"recomputing after the battery hop"}
+{"ts":"2026-08-17T19:25:48.221Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d14","brief":"checking whether the signature actually landed"}
+{"ts":"2026-08-17T19:25:53.945Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d15","brief":"retrying the hop now the claim stands"}
+{"ts":"2026-08-17T19:26:13.267Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d16","brief":"checking the feeder the ripple would be dropping it for"}
+{"ts":"2026-08-17T19:26:41.173Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d17","brief":"taking the offered door instead of the blocked hop"}
+{"ts":"2026-08-17T19:26:45.472Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d18","brief":"taking the sweep-consistency door"}
+{"ts":"2026-08-17T19:27:07.829Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d19","brief":"reading the signed file's own frontmatter"}
+{"ts":"2026-08-17T19:27:24.529Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d20","brief":"reading a story deck's evidence side"}
+{"ts":"2026-08-17T19:27:35.166Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d21","brief":"finding the non-must stories the law checks"}
+{"ts":"2026-08-17T19:27:40.503Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d22","brief":"listing story priorities"}
+{"ts":"2026-08-17T19:27:50.909Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d23","brief":"checking whether non-must decks are already filled"}
+{"ts":"2026-08-17T19:28:16.853Z","op":"defer","visit":"start@0","node":"d3","brief":"walk to shipped","to":"iterations/i33/gate-validation","hops":1,"trail":["start","iterations/i33/gate-validation"]}
+{"ts":"2026-08-17T19:28:31.120Z","op":"plan","visit":"iterations/i33/fill-story-evidence@0","parent":null,"nodes":[{"id":"d24","brief":"find the unfilled non-must slides"},{"id":"d25","brief":"fill them from the shipped system"},{"id":"d26","brief":"sign fill-story-evidence and walk to shipped"}]}
+{"ts":"2026-08-17T19:29:07.566Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d27","brief":"answered why this iteration surfaced what others did not"}
+{"ts":"2026-08-17T19:29:31.328Z","op":"done","visit":"iterations/i33/fill-story-evidence@0","node":"d24","brief":"the lesson is recorded: an unwalked state is untested code"}
+{"ts":"2026-08-17T19:29:38.173Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d28","brief":"asking the law to name the unfilled slides"}
+{"ts":"2026-08-17T19:29:43.069Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d29","brief":"pulling bare to be served the form"}
+{"ts":"2026-08-17T19:30:04.501Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d30","brief":"reopening so the submit names what fails"}
+{"ts":"2026-08-17T19:30:08.531Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d31","brief":"pulling the now-owed form"}
+{"ts":"2026-08-17T19:30:20.919Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d32","brief":"re-submitting so every check runs and reports"}
+{"ts":"2026-08-17T19:30:58.182Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d33","brief":"checking a could-priority deck for empty halves"}
+{"ts":"2026-08-17T19:31:12.203Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d34","brief":"reading the guard's refusal to make it name what fails"}
+{"ts":"2026-08-17T19:31:23.617Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d35","brief":"locating the shared blocker list"}
+{"ts":"2026-08-17T19:31:30.760Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d36","brief":"finding claimBlockers by its signature"}
+{"ts":"2026-08-17T19:31:47.282Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d37","brief":"the refusal will now name the failing check"}
+{"ts":"2026-08-17T19:32:00.841Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d38","brief":"the existing content check now gets reached"}
+{"ts":"2026-08-17T19:32:06.036Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d39","brief":"reading what my patch left behind"}
+{"ts":"2026-08-17T19:33:12.195Z","op":"update","visit":"iterations/i33/gate-requirements@0","node":"d5","brief":"continuing the sweep to the state"}
+{"ts":"2026-08-17T19:34:17.951Z","op":"update","visit":"iterations/i33/verification@0","node":"d6","brief":"recomputing after the battery hop"}
+{"ts":"2026-08-17T19:34:27.288Z","op":"update","visit":"iterations/i33/gate-implementation@0","node":"d7","brief":"recomputing the route"}
+{"ts":"2026-08-17T19:34:36.498Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d8","brief":"asking the engine to name the failing check"}
+{"ts":"2026-08-17T19:34:43.848Z","op":"done","visit":"start@0","node":"d1","brief":"the engine named it: sty-trust-a-repeatable-answer, six empty slides"}
+{"ts":"2026-08-17T19:34:59.479Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d9","brief":"checking whether the query verb shipped"}
+{"ts":"2026-08-17T19:35:31.864Z","op":"done","visit":"start@0","node":"d2","brief":"the deck's six halves filled honestly — the verb was never built"}
+{"ts":"2026-08-17T19:35:36.962Z","op":"update","visit":"iterations/i33/fill-story-evidence@0","node":"d10","brief":"pulling the owed form now the deck is filled"}
+{"ts":"2026-08-17T19:35:57.882Z","op":"update","visit":"iterations/i33/trace-design@1","node":"d11","brief":"aiming at shipped now the blocker is cleared"}
+{"ts":"2026-08-17T19:36:03.110Z","op":"update","visit":"iterations/i33/trace-design@1","node":"d12","brief":"walking through toward shipped"}
+{"ts":"2026-08-17T19:37:07.379Z","op":"update","visit":"iterations/i33/gate-implementation@1","node":"d13","brief":"recomputing after the battery hop"}
+{"ts":"2026-08-17T19:37:14.675Z","op":"update","visit":"iterations/i33/sweep-consistency@0","node":"d14","brief":"asking what sweep-consistency owes now"}
+{"ts":"2026-08-17T19:37:23.220Z","op":"update","visit":"iterations/i33/sweep-consistency@0","node":"d15","brief":"asking what blocks the route past the gate"}
+{"ts":"2026-08-17T19:37:32.929Z","op":"update","visit":"iterations/i33/sweep-consistency@0","node":"d16","brief":"reopening the sweep for its recheck"}
+{"ts":"2026-08-17T19:38:01.882Z","op":"update","visit":"iterations/i33/sweep-consistency@0","node":"d17","brief":"re-signing the sweep over an honest chain"}
+{"ts":"2026-08-17T19:38:12.958Z","op":"defer_arrived","visit":"iterations/i33/gate-validation@0","node":"d18","brief":"walk to shipped","hops":1,"trail":["start","iterations/i33/gate-validation"]}
+{"ts":"2026-08-17T19:38:12.959Z","op":"update","visit":"iterations/i33/gate-validation@0","node":"d19","brief":"reopening the validation gate to rule over an honest chain"}
+{"ts":"2026-08-17T19:39:15.508Z","op":"update","visit":"iterations/i33/gate-validation@0","node":"d20","brief":"filling the validation gate over the corrected chain"}
+{"ts":"2026-08-17T19:41:39.844Z","op":"update","visit":"iterations/i33/gate-validation@0","node":"d21","brief":"submitting and blessing the reopened validation gate"}
+{"ts":"2026-08-17T19:45:05.971Z","op":"fork","visit":"iterations/i33/gate-validation@0","parent":"d3","node":"d22","brief":"the gate's slide law names five must stories with no demo spec and empty decks","nodes":[{"id":"d23","brief":"read what shipped against each of the five stories"},{"id":"d24","brief":"write the demonstration specs the law wants"},{"id":"d25","brief":"fill the three i33 story decks"},{"id":"d26","brief":"fill the two i15 story decks"},{"id":"d27","brief":"re-submit and bless the gate"}]}
+{"ts":"2026-08-17T19:45:13.269Z","op":"done","visit":"iterations/i33/gate-validation@0","node":"d23","brief":"the control story's demands land in tests/legible-controls.test.ts"}
+{"ts":"2026-08-17T19:46:23.432Z","op":"update","visit":"iterations/i33/gate-validation@0","node":"d28","brief":"writing the demonstration spec for the control story"}
+{"ts":"2026-08-17T19:46:45.537Z","op":"update","visit":"iterations/i33/gate-validation@0","node":"d29","brief":"writing the demonstration spec for the slow-call story"}
+{"ts":"2026-08-17T19:47:06.719Z","op":"update","visit":"iterations/i33/gate-validation@0","node":"d30","brief":"writing the demonstration spec for the one-second story"}
+{"ts":"2026-08-17T19:48:34.303Z","op":"fork","visit":"iterations/i33/gate-validation@0","parent":"d24","node":"d31","brief":"the evidence I wrote at fill-story-evidence said never built, and the code is on disk","nodes":[{"id":"d32","brief":"correct sty-trust-a-repeatable-answer's six halves"},{"id":"d33","brief":"check whether the fill-story-evidence form repeats the false claim"}]}
+{"ts":"2026-08-17T19:48:37.985Z","op":"done","visit":"iterations/i33/gate-validation@0","node":"d32","brief":"six halves corrected: built but no door, not never built"}
+{"ts":"2026-08-17T19:49:05.847Z","op":"done","visit":"iterations/i33/gate-validation@0","node":"d33","brief":"the form does not repeat it — only the story deck did"}
+{"ts":"2026-08-17T19:50:01.012Z","op":"done","visit":"iterations/i33/gate-validation@0","node":"d31","brief":"the false claim was only in the story deck, and it is corrected"}
+{"ts":"2026-08-17T19:50:21.791Z","op":"done","visit":"iterations/i33/gate-validation@0","node":"d26","brief":"both i15 decks filled from what is on disk, not from the earlier guess"}
+{"ts":"2026-08-17T19:51:02.037Z","op":"update","visit":"iterations/i33/gate-validation@0","node":"d34","brief":"control story deck filled against what the battery now carries"}
+{"ts":"2026-08-17T19:51:24.411Z","op":"update","visit":"iterations/i33/gate-validation@0","node":"d35","brief":"slow-call deck filled, both cases still red by design"}
+{"ts":"2026-08-17T19:51:52.362Z","op":"done","visit":"iterations/i33/gate-validation@0","node":"d25","brief":"all three i33 decks filled from checked facts"}
+{"ts":"2026-08-17T19:53:40.062Z","op":"done","visit":"iterations/i33/gate-validation@0","node":"d24","brief":"five demonstration specs written, one per must story the gate named"}
+{"ts":"2026-08-17T19:55:10.661Z","op":"update","visit":"iterations/i33/gate-validation@0","node":"d36","brief":"re-signing the gate with the true count of five"}
+{"ts":"2026-08-17T19:55:18.977Z","op":"done","visit":"iterations/i33/gate-validation@0","node":"d27","brief":"gate signed and blessed at five, and the walk moved to package"}
+{"ts":"2026-08-17T19:55:23.238Z","op":"plan","visit":"iterations/i33/package@0","parent":null,"nodes":[{"id":"d37","brief":"bump the version to 4.5.0"},{"id":"d38","brief":"assemble the archive by script"},{"id":"d39","brief":"extract outside the repo and use it"},{"id":"d40","brief":"fill the package form"}]}
+{"ts":"2026-08-17T19:55:35.435Z","op":"done","visit":"iterations/i33/package@0","node":"d37","brief":"4.4.0 to 4.5.0, the minor bump this iteration earns"}
+{"ts":"2026-08-17T19:55:46.720Z","op":"update","visit":"iterations/i33/package@0","node":"d41","brief":"running the packager over the working tree"}
+{"ts":"2026-08-17T19:56:14.943Z","op":"done","visit":"iterations/i33/package@0","node":"d38","brief":"quackitect-4.5.0.zip assembled in 14.9s, exit 0"}
+{"ts":"2026-08-17T19:56:58.762Z","op":"update","visit":"iterations/i33/package@0","node":"d42","brief":"extracting into the declared scratch root so the lane can read it"}
+{"ts":"2026-08-17T19:57:17.481Z","op":"update","visit":"iterations/i33/package@0","node":"d43","brief":"running the packaged launcher from the extracted copy"}
+{"ts":"2026-08-17T19:57:32.163Z","op":"update","visit":"iterations/i33/package@0","node":"d44","brief":"reading the version the packaged engine announces"}
+{"ts":"2026-08-17T19:59:39.870Z","op":"done","visit":"iterations/i33/package@0","node":"d40","brief":"package form signed, archive checked from the extract"}
+{"ts":"2026-08-17T19:59:46.785Z","op":"done","visit":"iterations/i33/package@0","node":"d39","brief":"the extracted copy ran the launcher and announced 4.5.0"}

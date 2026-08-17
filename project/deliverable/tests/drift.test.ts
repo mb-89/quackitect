@@ -400,6 +400,61 @@ test("a reopen drops the claims the reopened state feeds, not only itself", () =
   assert.ok(new Session(root).blessedGates(decl).includes(gate.id), "with its thumbs-up back, because the bless rides the standing claim");
 });
 
+// A STATE THAT OWES A SIGNATURE KEEPS THE WALK UNTIL IT SIGNS.
+//
+// Owner, 2026-08-17, in the plainest words this rule has had: "If it's not
+// submitted, then you're not going to the next state."
+//
+// WHAT WENT WRONG. Both the advance guard and the ripple asked
+// `evidence_form.length > 0` — whether a state declares FIELDS — as a stand-in
+// for whether it carries a claim. The two coincide for almost every state.
+// fill-story-evidence is the one where they part: it declares no fields on
+// purpose, because its check is computed from the story decks rather than
+// typed into a form, and its own guidance says signing is a bare submit.
+//
+// SO THE WALK CROSSED IT UNSIGNED, three times. Two states signed underneath
+// the gap, one of them a gate, and the panel painted them green. The only
+// route back was twenty-five hops forward through `shipped` and around the
+// whole machine, so the walk had to escape to the desk (note-fa24138d389e).
+//
+// THE FIXTURE IS A STATE WITH NO FIELDS, because that is the whole point. A
+// test built on a state that declares fields cannot fail this way and would
+// have passed throughout.
+test("a state that carries a claim is claimful even when it declares no fields", () => {
+  const { root } = pinned();
+  const decl = compileColumn(readRigorMatrix(root), SIZE);
+
+  // THE COLUMN REALLY CONTAINS ONE, or this test proves nothing. If a later
+  // matrix gives every state fields, this assertion says so rather than
+  // quietly passing over an empty set.
+  const fieldless = decl.states.filter((s) => (s.kind === "work" || s.kind === "gate") && s.evidence_form.length === 0);
+  assert.ok(
+    fieldless.length > 0,
+    "the column declares at least one work-or-gate state with no evidence fields — without one, the case this guards cannot occur and the test is theatre",
+  );
+
+  // AND IT IS THE ONE THIS IS ABOUT. Naming it keeps the case readable when
+  // somebody reads this in a year: fill-story-evidence signs on a bare submit
+  // because its check is computed from the story decks.
+  assert.ok(
+    fieldless.some((s) => s.id.endsWith("fill-story-evidence")),
+    `the fieldless states are ${fieldless.map((s) => s.id).join(", ")} — fill-story-evidence is the case this guards and it is not among them`,
+  );
+
+  // KIND ALONE IS NOT THE ANSWER EITHER, and trying it cost five red tests.
+  // read_contract is a work state with no fields AND NO FORM: it reads and
+  // never signs, so demanding a claim from it wedges the boot. The engine
+  // separates the two by whether a form instance exists, not by kind.
+  const boot = compileColumn(readRigorMatrix(root), SIZE).states.find((s) => s.id.endsWith("read_contract"));
+  if (boot !== undefined) {
+    assert.equal(
+      boot.evidence_form.length,
+      0,
+      "read_contract declares no fields — it is the state that proves kind is too wide a test, and if it gains fields this case needs a new example",
+    );
+  }
+});
+
 // ONE OPERATION READS ITS INPUT ONCE (req-one-operation-reads-its-input-once).
 //
 // THE BOUND IS A SHAPE, NOT A NUMBER. Entering one record asked for the same
