@@ -270,3 +270,4 @@
 {"ts":"2026-08-17T12:49:22.823Z","op":"update","visit":"iterations/i35/gate-release@0","node":"d259","brief":"i35: submitting and blessing gate-release"}
 {"ts":"2026-08-17T12:49:37.884Z","op":"update","visit":"iterations/i35/trace-design@5","node":"d260","brief":"i35: to shipped"}
 {"ts":"2026-08-17T12:51:05.870Z","op":"update","visit":"iterations/i35/gate-implementation@2","node":"d261","brief":"i35: reaching shipped"}
+{"ts":"2026-08-17T12:52:49.893Z","op":"update","visit":"iterations/i35/shipped@0","node":"d262","brief":"i35: closing out from shipped"}
