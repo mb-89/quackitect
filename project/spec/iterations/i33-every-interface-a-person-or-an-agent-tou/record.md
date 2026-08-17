@@ -1,6 +1,23 @@
 ---
 id: i33-every-interface-a-person-or-an-agent-tou
-status: open
+status: shipped
+closed: 2026-08-17T19:59:53.081Z
+carried_count: 14
+carried:
+  - tsp-a-slow-signal-keeps-the-wait — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (verification.md)
+  - tsp-autonomy-tiers — raid-iss-the-autonomy-number-still-rides-every-answer (verification.md)
+  - tsp-bound-surface — raid-iss-whole-product-claims-reverified-by-every-record (verification.md)
+  - tsp-coupling-disposition — raid-iss-whole-product-claims-reverified-by-every-record (verification.md)
+  - tsp-derivation-analysis — raid-issue-the-corpus-wide-inspections-have-no-runner (verification.md)
+  - tsp-desk-and-gates — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (verification.md)
+  - tsp-first-run — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (verification.md)
+  - tsp-panel-walkthrough — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (verification.md)
+  - tsp-prose-inspection — raid-issue-the-corpus-wide-inspections-have-no-runner (verification.md)
+  - tsp-read-back-inspection — raid-issue-the-corpus-wide-inspections-have-no-runner (verification.md)
+  - tsp-record-inspection — raid-issue-the-corpus-wide-inspections-have-no-runner (verification.md)
+  - tsp-tour-run — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (verification.md)
+  - tsp-two-machines — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (verification.md)
+  - tsp-unattended-start — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (verification.md)
 started: 2026-08-17T11:01:32.755Z
 opened: 2026-08-15T13:26:51.317Z
 goal: "Every interface a person or an agent touches answers inside a second, or says plainly that it will not — and the boundaries themselves get modelled first, because today none of them exist as nodes."
