@@ -10,8 +10,8 @@ status: open
 impact: The entrypoint reports success and exits, the host reaps the lane with the session, and the walk stops with nothing having gone visibly wrong. It reads exactly like the server-is-not-there symptom this iteration exists to remove.
 breaks_how_badly: fatal
 how_likely: plausible
-probe: "scheduled. Our half is built: se-mcp.ts line 495 skips the stdin reader under --headless. The host half needs a real host."
-probed: "2026-08-15"
+probe: "holds on this host. i35 on 2026-08-17: the detached lane kept answering after the shell that started it exited. ONE FAILURE MODE FOUND AND IT IS NOT A REAP: a stdio lane exits on stdin EOF, which is correct. The headless lane has no such input to lose."
+probed: "2026-08-17"
 source_refs:
   - req-the-lane-runs-without-a-console
   - nbr-cloud-host

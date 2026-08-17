@@ -10,7 +10,7 @@ status: open
 impact: "A floor set above what the engine needs refuses hosts that would have run it. Measured: this box's default runtime is 22.22, the pin demands 24, and the engine's full battery passes on 22."
 breaks_how_badly: annoying
 how_likely: certain
-probe: "MEASURED FALSE AT THE EDGE, 2026-08-17. package.json declares >=24.0.0 and tests/unattended-start.test.ts hardcodes want >= 24, both on the recorded reason that unflagged TypeScript execution is not what node 22.6 buys. TRUE OF 22.6, FALSE OF 22.18+, which shipped type stripping unflagged. On node v22.22.2 the full battery runs 1391 tests, 1387 green — and the only extra failures against node 24 are the two assertions about the floor itself. The floor the evidence supports is >=22.18.0. NOT CHANGED: lowering a declared pin is the owner's act, and cloud-runner.md forbids editing engines.node to make verify pass."
+probe: "false at the edge. i35 on 2026-08-17: the engine declares >=24.0.0 and its full battery passes on v22.22.2 at 1391 tests, 1387 green. The only extra failures against node 24 are the two floor assertions themselves plus one known flake. The floor the evidence supports is >=22.18.0. NOT CHANGED: lowering a declared pin is the owner's act."
 probed: 2026-08-17
 source_refs:
   - i35-the-cloud-run-s-findings-land-the-fix-fi

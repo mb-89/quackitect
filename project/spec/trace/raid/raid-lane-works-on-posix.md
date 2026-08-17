@@ -9,8 +9,8 @@ trigger: the first run on macOS or Linux, and any new path-splitting code in the
 status: open
 breaks_how_badly: crippling
 how_likely: plausible
-probe: "holds on Linux — the first POSIX run (2026-08-13, a headless container). The full battery ran clean: 1104/1117, and none of the 13 failures touch path separators, worktrees or the method fan-out (2 in drawnsub, several in threshold, a missing-browser screenshot suite, one self-test assertion). 48 lane-tool calls (se_file_read, se_file_search, se_file_list, se_git, se_note, se_aim, se_update, se_pull) also ran clean against a Linux root, per the i8 field-report. Still unprobed: se_run, se_web_fetch and se_test were not exercised by a caged agent this run, and macOS remains untried."
-probed: "2026-08-13"
+probe: "holds. PROBED BY RUNNING IT, i35 on 2026-08-17: the whole engine ran on a Linux container end to end. The lane spawned detached and stayed up across the walk, the mirror answered on 7333, the battery ran three times and the arrival twice. This is the branch exp-the-posix-branches-have-never-run said had never been exercised."
+probed: "2026-08-17"
 impact: A separator difference makes a write land in the wrong tree silently — which is the exact failure class the method fan-out was built to end.
 source_refs:
   - engine/paths.ts
