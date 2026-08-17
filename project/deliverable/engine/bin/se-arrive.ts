@@ -73,7 +73,10 @@ function die(step: string, why: string): never {
 function refs(): void {
   const fetched = spawnSync("git", ["fetch", "--all", "--prune"], { cwd: ROOT, encoding: "utf8" });
   if (fetched.status !== 0) {
-    say("refs", `git fetch did not succeed (${(fetched.stderr ?? "").trim().split("\n").pop() ?? "no reason given"}) — ref: searches may not work`);
+    say(
+      "refs",
+      `git fetch did not succeed (${(fetched.stderr ?? "").trim().split("\n").pop() ?? "no reason given"}) — ref: searches may not work`,
+    );
     return;
   }
   const made: string[] = [];
@@ -159,11 +162,15 @@ async function lane(): Promise<void> {
     say("lane", `already answering on ${PORT} — reusing it`);
     return;
   }
-  const child = spawn(process.execPath, [join(HERE, "se-mcp.ts"), "--root", ROOT, "--headless", "--mirror-port", String(PORT), "--autonomy", AUTONOMY], {
-    cwd: join(ROOT, "project"),
-    detached: true,
-    stdio: ["ignore", "ignore", "ignore"],
-  });
+  const child = spawn(
+    process.execPath,
+    [join(HERE, "se-mcp.ts"), "--root", ROOT, "--headless", "--mirror-port", String(PORT), "--autonomy", AUTONOMY],
+    {
+      cwd: join(ROOT, "project"),
+      detached: true,
+      stdio: ["ignore", "ignore", "ignore"],
+    },
+  );
   child.unref();
   const until = Date.now() + 60_000;
   while (Date.now() < until) {

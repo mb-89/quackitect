@@ -35,6 +35,26 @@ DO NOT WALK THE MACHINE LIKE THIS. An uncaged agent editing the repository
 directly is the one thing the contract forbids, and nothing here will stop
 you, because the thing that would stop you is what is missing.
 
+## ONE COMMAND DOES ALL OF IT NOW
+
+    node project/deliverable/engine/bin/se-arrive.ts --autonomy 0.6
+
+THAT IS THE WHOLE ARRIVAL. It fetches the refs, checks the runtime against the
+pin, installs, places the cage, starts the lane headless, and writes
+`.se/se-call.mjs` so you can call the lane with no `se_` tools of your own. It
+is idempotent: run it twice and the second run reuses the lane already up.
+
+THE ROOT `.claude/settings.json` FIRES IT AT SESSION START, so on most cloud
+hosts it has already run before you read this. `SE_NO_ARRIVE=1` opts out;
+`SE_AUTONOMY` sets the dial the lane comes up on.
+
+AND THEN CALL THE LANE:
+
+    node .se/se-call.mjs se_pull
+
+THE FIVE ACTS BELOW ARE WHAT IT DOES, kept because a failed step has to be
+fixable by hand and because the reasons matter.
+
 YOUR JOB IS TO MAKE THE CAGED WALK POSSIBLE, then hand the walk over. Five
 acts, in order.
 

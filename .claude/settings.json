@@ -1,5 +1,17 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node project/deliverable/engine/bin/se-hook-arrive.ts",
+            "timeout": 300
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "matcher": "*",

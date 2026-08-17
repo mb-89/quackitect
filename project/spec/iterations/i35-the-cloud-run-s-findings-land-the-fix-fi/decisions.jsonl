@@ -12,3 +12,5 @@
 {"ts":"2026-08-17T11:20:48.748Z","op":"update","visit":"iterations/i35/gate-kickoff@0","node":"d1","brief":"i35 kickoff: the raid entries this gate adds"}
 {"ts":"2026-08-17T11:20:48.896Z","op":"update","visit":"iterations/i35/gate-kickoff@0","node":"d2","brief":"i35 kickoff: the raid entries this gate adds"}
 {"ts":"2026-08-17T11:20:49.033Z","op":"update","visit":"iterations/i35/gate-kickoff@0","node":"d3","brief":"i35 kickoff: the raid entries this gate adds"}
+{"ts":"2026-08-17T11:23:29.255Z","op":"update","visit":"iterations/i35/draft-vision@0","node":"d4","brief":"i35: cloud-runner leads with the one-command arrival"}
+{"ts":"2026-08-17T11:25:30.082Z","op":"update","visit":"iterations/i35/draft-vision@0","node":"d5","brief":"i35: the hook rule covers the root settings too"}
