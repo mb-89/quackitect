@@ -24,6 +24,14 @@ function rootWithShell(script: string): string {
   return root;
 }
 
+/** A root whose trace corpus holds exactly one note, with `raw` as its text. */
+function rootWithTraceNote(raw: string): string {
+  const root = mkdtempSync(join(tmpdir(), "se-preflight-fm-"));
+  const dir = join(root, "project", "spec", "trace", "element");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "note.md"), raw, "utf8");
+  return root;
+}
 /**
  * Run the preflight against a throwaway root and hand back everything it said.
  *
@@ -84,5 +92,38 @@ describe("preflight", { concurrency: true }, () => {
     // biome-ignore lint/suspicious/noTemplateCurlyInString: the test feeds a literal host-interpolation marker on purpose
     const out = preflightOutput(rootWithShell("const a = ${JSON.stringify(x)}; const b = a;"));
     assert.ok(!out.includes("webview script"), "an interpolated script is not a syntax error");
+  });
+
+  // THE CORPUS IS THE GROUND EVERY QUERY STANDS ON, and until 2026-08-17
+  // nothing checked that it was readable. SE-C-135 proves a write ARRIVED
+  // verbatim, never that it PARSED, and se_file_write replaces a whole file
+  // with no structural guard — so a trace note with a frontmatter block that
+  // was never terminated sat in the tree and preflight printed `preflight
+  // green` over it. Measured that day, on a real file, at 17:39 and 17:40.
+  test("an unterminated frontmatter block is caught, where a parse cannot see it", () => {
+    const sound = preflightOutput(rootWithTraceNote("---\nid: a-note\n---\n\n# body\n"));
+    assert.ok(!sound.includes("frontmatter"), "a well-formed note is not flagged");
+
+    // THIS IS THE CASE THE PARSER IS BLIND TO. splitNote answers
+    // `fenced: false` for an unterminated block, which reads exactly like a
+    // note with no frontmatter at all, so readKeys returns {} and never
+    // throws. The fence has to be counted before the parse is asked.
+    const open = preflightOutput(rootWithTraceNote('---\nid: a-note\nstatement: "unterminated\n\n# body\n'));
+    assert.match(open, /never terminates it/, "an unterminated block IS flagged");
+  });
+
+  // A block that terminates can still be rubbish inside. This half the
+  // parser CAN see, and preflight now asks it.
+  test("frontmatter that does not parse as YAML is caught", () => {
+    const out = preflightOutput(rootWithTraceNote("---\nid: a-note\n  bad: [unclosed\n---\n\n# body\n"));
+    assert.match(out, /does not parse/, "unparseable YAML IS flagged");
+  });
+
+  // A note carrying no frontmatter at all is the third shape, and it is the
+  // one that looks harmless: every reader takes it for an empty mapping and
+  // it contributes nothing to any query, silently.
+  test("a trace note with no frontmatter at all is caught", () => {
+    const out = preflightOutput(rootWithTraceNote("# just a heading\n"));
+    assert.match(out, /opens no frontmatter block/, "a bare note IS flagged");
   });
 });

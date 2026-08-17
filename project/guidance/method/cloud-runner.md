@@ -35,18 +35,36 @@ DO NOT WALK THE MACHINE LIKE THIS. An uncaged agent editing the repository
 directly is the one thing the contract forbids, and nothing here will stop
 you, because the thing that would stop you is what is missing.
 
-YOUR JOB IS TO MAKE THE CAGED WALK POSSIBLE, then hand the walk over. Four
+YOUR JOB IS TO MAKE THE CAGED WALK POSSIBLE, then hand the walk over. Five
 acts, in order.
 
-1. INSTALL. `npm install --no-audit --no-fund` in `project/deliverable`.
+1. FETCH THE REFS. A cloud clone carries ONE branch, and often a shallow
+   one, so every `ref:` search is dead on arrival until you fix that.
+
+       git fetch --all --prune
+       git branch main origin/main
+       git branch v2 origin/v2
+
+   BOTH LINES, AND THE SECOND IS THE ONE PEOPLE SKIP. The fetch brings
+   `origin/main`, and `git show main:...` still fails on it — a remote-tracking
+   ref is not a revision named `main`. MEASURED 2026-08-17 on a fresh cloud
+   clone: after the fetch alone, an `se_file_search` at `ref: main` still came
+   back `unknown revision`; after `git branch main origin/main` it returned
+   real matches. `main` reaches v1 and `v2` reaches v2.
+
+   WHAT SKIPPING IT COSTS, measured on the i15 run: four refused calls, one
+   wrongly-minted assumption, and a false claim that spread through six
+   evidence forms before anybody caught it.
+
+2. INSTALL. `npm install --no-audit --no-fund` in `project/deliverable`.
    `node_modules/` is gitignored, so a fresh clone has none and the server
    cannot start without it.
-2. CHECK THE RUNTIME. `node --version` against `engines.node` in
+3. CHECK THE RUNTIME. `node --version` against `engines.node` in
    `project/deliverable/package.json`. Below the pin, stop and say so.
-3. PLACE THE CAGE AND THE CONFIG, both from `project/deliverable/cage/`.
+4. PLACE THE CAGE AND THE CONFIG, both from `project/deliverable/cage/`.
    - `mcp.json` goes to `project/.mcp.json`
    - `claude-settings.json` goes to `project/.claude/settings.json`
-4. SPAWN A CAGED SUBAGENT and give it the walk. `project/deliverable/cage/kickoff.txt`
+5. SPAWN A CAGED SUBAGENT and give it the walk. `project/deliverable/cage/kickoff.txt`
    is its opening instruction. It runs with `project/` as its folder, which is
    what the placed config expects.
 

@@ -1,0 +1,14 @@
+{"ts":"2026-08-17T10:57:27.230Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d1","brief":"i35 finding 4: confirming the shoot.ts container fix"}
+{"ts":"2026-08-17T11:02:49.455Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d2","brief":"i35 finding 4: making ref: main reachable on a shallow cloud clone"}
+{"ts":"2026-08-17T11:03:22.594Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d3","brief":"i35 finding 4: the cloud clone fetch lands in Arrival A"}
+{"ts":"2026-08-17T11:03:33.199Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d4","brief":"i35 finding 4: the act count follows the added step"}
+{"ts":"2026-08-17T11:05:03.097Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d5","brief":"i35 finding 4: the act count follows the added step"}
+{"ts":"2026-08-17T11:06:04.036Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d6","brief":"i35 finding 4: the act count follows the added step"}
+{"ts":"2026-08-17T11:06:10.847Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d7","brief":"i35 finding 5: preflight learns to read the corpus frontmatter"}
+{"ts":"2026-08-17T11:06:58.700Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d8","brief":"i35 finding 5: the corpus-frontmatter cases are pinned"}
+{"ts":"2026-08-17T11:10:43.521Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d9","brief":"i35 finding 1: the fallback loop is pinned on the shipped matrix"}
+{"ts":"2026-08-17T11:11:10.415Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d10","brief":"i35: the confirm run over every change this iteration made"}
+{"ts":"2026-08-17T11:13:09.684Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d11","brief":"i35: the fence literal no longer reads as a CLI switch"}
+{"ts":"2026-08-17T11:20:48.748Z","op":"update","visit":"iterations/i35/gate-kickoff@0","node":"d1","brief":"i35 kickoff: the raid entries this gate adds"}
+{"ts":"2026-08-17T11:20:48.896Z","op":"update","visit":"iterations/i35/gate-kickoff@0","node":"d2","brief":"i35 kickoff: the raid entries this gate adds"}
+{"ts":"2026-08-17T11:20:49.033Z","op":"update","visit":"iterations/i35/gate-kickoff@0","node":"d3","brief":"i35 kickoff: the raid entries this gate adds"}
