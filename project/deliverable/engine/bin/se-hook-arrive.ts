@@ -23,7 +23,13 @@ import { fileURLToPath } from "node:url";
 const HERE = dirname(fileURLToPath(import.meta.url));
 // The hook is invoked from wherever the host sets cwd, so the root is derived
 // from this file's own location rather than trusted from the environment.
-const ROOT = resolve(HERE, "..", "..", "..", "..");
+// SE_ARRIVE_ROOT OVERRIDES IT, AND ONLY THE SUITE USES IT. Without an override
+// this hook is untestable in the one way that matters: its own tests would run
+// the arrival against the REAL repository, place a cage there and start a lane
+// beside the one the walk is using. That happened on 2026-08-17 — two lanes came
+// up on one clone and the walk reset — and the case still went green, because it
+// was checking the exit code of a run against the wrong tree.
+const ROOT = resolve(process.env.SE_ARRIVE_ROOT ?? join(HERE, "..", "..", "..", ".."));
 
 function say(line: string): void {
   process.stdout.write(`${line}\n`);
