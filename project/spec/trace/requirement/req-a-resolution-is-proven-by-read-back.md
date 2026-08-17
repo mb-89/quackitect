@@ -16,6 +16,8 @@ source_refs:
   - req-a-read-comes-from-where-it-is-meant
   - raid-risk-a-write-lands-in-the-wrong-tree-silently
 priority: must
+weighs_with:
+  - req-a-wrong-act-never-passes-silently ! — one is a test-authoring discipline (prove by read-back), the other a runtime guarantee against silent failure; different artifacts
 ---
 
 ## Scenario

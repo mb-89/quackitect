@@ -21,6 +21,9 @@ source_refs:
   - note-afb66f5e0dee
   - req-call-answers-in-one-second
 priority: must
+weighs_with:
+  - req-call-answers-in-one-second ! — one measures whether aim-plus-move fits in a single call, the other measures per-call response latency; different axes of performance-efficiency
+  - req-surface-answers-in-one-second ! — one measures call count for the walk, the other measures a person's render latency at the mirror's HTTP boundary; different boundaries
 ---
 
 ## Scenario

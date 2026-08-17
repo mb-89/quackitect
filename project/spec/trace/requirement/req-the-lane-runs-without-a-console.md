@@ -16,6 +16,8 @@ source_refs:
   - uc-start-an-unattended-machine ext 3b
   - nbr-cloud-host
 priority: must
+weighs_with:
+  - req-work-starts-without-a-reachable-remote ! — one is the process surviving stdin close and port conflict, the other is listing/entering work offline; different failure modes under the same use case
 ---
 
 ## Detail

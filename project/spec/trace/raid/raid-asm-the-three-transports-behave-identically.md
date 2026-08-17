@@ -6,12 +6,13 @@ kind: assumption
 statement: A walk cannot tell which transport carries it, because every crossing marshals - so the mode is a cost dial and never a behaviour switch.
 owner: the maintainer
 trigger: the first real walk served through a spawned satellite
-status: open
+status: deferred
+defer_until: the first real walk served through a spawned satellite — the same event the trigger field already named
 probed: "not yet, needs a replay harness"
 impact: The mode stops being one setting and becomes three products, which is what the owner ruled against on 2026-08-14.
 breaks_how_badly: fatal
 how_likely: conceivable
-probe: "Unprobed as of 2026-08-16. The check needs one identical walk replayed in process, in a thread and inline, with the answers diffed call for call, and no such harness exists. It is also not i34's question: that iteration changes where files live, not how a call is carried. Left standing rather than answered cheaply, because marking it holds to clear a form is the fabrication the gate rounds exist to catch."
+probe: "Unprobed as of 2026-08-16, and deferred rather than fabricated. The check needs one identical walk replayed in process, in a thread and inline, with the answers diffed call for call, and no such harness exists. It is also not i34's question: that iteration changes where files live, not how a call is carried. Marking it holds to clear a form is the fabrication the gate rounds exist to catch — deferring to its own named trigger is the honest alternative the register's own template offers."
 source_refs:
   - dsp-core-and-satellite
   - if-core-satellite

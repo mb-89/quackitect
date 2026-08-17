@@ -18,6 +18,7 @@ source_refs:
 priority: should
 weighs_against:
   - req-entry-speaks-plainly >
+  - req-fresh-machine-runs > — both crippling, but an untraced capability corrupts the whole register's trustworthiness for every future decision; a failed install is a one-time, recoverable event
 ---
 
 ## Scenario

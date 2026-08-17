@@ -9,7 +9,7 @@ trigger: any change to the stop hook, to the mirror's controls, or the first ses
 status: decided
 impact: without it the hook applies one rule to every situation, overriding a stop the contract requires as readily as an overcautious one — five times in one day.
 breaks_how_badly: crippling
-how_likely: certain
+how_likely: conceivable
 weighs_with: none
 weighs_against: none
 source_refs:

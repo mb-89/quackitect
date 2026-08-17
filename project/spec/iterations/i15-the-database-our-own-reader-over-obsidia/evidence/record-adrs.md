@@ -1,0 +1,25 @@
+---
+form: record-adrs
+by: agent
+signed_off: 2026-08-16T18:21:48.765Z
+authors: agent
+files:
+---
+
+# Evidence form / record-adrs
+
+## current_situation
+
+declare-winner closed: cand-explicit-and-safe is the winner. Two decisions cross the crippling-or-worse bar and need ADRs — the query evaluation shape and the disposition safety shape.
+
+## adrs
+
+- raid-dec-i15-query-answers-via-declarative-view-spec
+- raid-dec-i15-disposition-prepopulates-pending-rows
+
+## follow_up
+
+Both ADRs trace to their forcing requirements and record every rejected option with why. Next: decompose-structure turns the winner into elements, allocation and interfaces.
+
+## anything_else
+

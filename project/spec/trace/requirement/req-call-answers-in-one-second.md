@@ -24,6 +24,9 @@ source_refs:
   - uc-capture-a-stray step 3
   - uc-answer-a-question-with-tests ext 3a
 priority: should
+weighs_with:
+  - req-a-clear-jump-is-one-call ! — one measures per-call response latency, the other whether aim-plus-move fits in a single call; different axes of performance-efficiency
+  - req-surface-answers-in-one-second ! — one times a driver's lane call at dispatch, the other a person's surface render at the mirror's HTTP boundary; different verify boundaries, per that row's own "sibling rather than a widening" section
 weighs_against:
   - req-resume-needs-no-person >
 ---

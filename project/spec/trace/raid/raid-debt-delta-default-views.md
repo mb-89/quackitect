@@ -42,3 +42,14 @@ compatible files" — and the resolvers are what it builds. Fixing them
 elsewhere would mean touching the same code twice.
 
 The trigger stands unchanged.
+
+## Repayment
+
+THE $-ITEM RESOLVERS DEFAULT TO THE BOUND RECORD'S OWN minted_in DELTA. An
+explicit opt-in widens a table to the whole corpus. The coverage laws stay
+corpus-wide - this debt narrows what a resolver SHOWS by default, never what
+a coverage check COUNTS.
+
+CLOSED WHEN every $-item resolver reads that default and the opt-in exists,
+proven by a reference table in a fresh record showing only that record's own
+nodes until the opt-in is set.
