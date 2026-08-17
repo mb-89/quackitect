@@ -1,6 +1,35 @@
 ---
 id: i35-the-cloud-run-s-findings-land-the-fix-fi
-status: open
+status: shipped
+closed: 2026-08-17T12:52:53.875Z
+carried_count: 26
+carried:
+  - tsp-first-run — raid-debt-human-observed-demonstrations (observe-red.md)
+  - tsp-panel-walkthrough — raid-debt-human-observed-demonstrations (observe-red.md)
+  - tsp-tour-run — raid-debt-human-observed-demonstrations (observe-red.md)
+  - tsp-desk-and-gates — raid-debt-human-observed-demonstrations (observe-red.md)
+  - tsp-bound-surface — raid-debt-the-bound-surface-demo-leans-on-two-open-records (observe-red.md)
+  - tsp-autonomy-tiers — raid-debt-demonstration-reds-are-re-asked-every-iteration (observe-red.md)
+  - tsp-coupling-disposition — raid-debt-demonstration-reds-are-re-asked-every-iteration (observe-red.md)
+  - tsp-derivation-analysis — raid-debt-demonstration-reds-are-re-asked-every-iteration (observe-red.md)
+  - tsp-prose-inspection — raid-debt-demonstration-reds-are-re-asked-every-iteration (observe-red.md)
+  - tsp-read-back-inspection — raid-debt-demonstration-reds-are-re-asked-every-iteration (observe-red.md)
+  - tsp-record-inspection — raid-debt-demonstration-reds-are-re-asked-every-iteration (observe-red.md)
+  - tsp-two-machines — raid-debt-demonstration-reds-are-re-asked-every-iteration (observe-red.md)
+  - tsp-unattended-start — raid-debt-demonstration-reds-are-re-asked-every-iteration (observe-red.md)
+  - tsp-first-run — raid-debt-human-observed-demonstrations (verification.md)
+  - tsp-panel-walkthrough — raid-debt-human-observed-demonstrations (verification.md)
+  - tsp-tour-run — raid-debt-human-observed-demonstrations (verification.md)
+  - tsp-desk-and-gates — raid-debt-human-observed-demonstrations (verification.md)
+  - tsp-bound-surface — raid-debt-the-bound-surface-demo-leans-on-two-open-records (verification.md)
+  - tsp-autonomy-tiers — raid-debt-demonstration-reds-are-re-asked-every-iteration (verification.md)
+  - tsp-coupling-disposition — raid-debt-demonstration-reds-are-re-asked-every-iteration (verification.md)
+  - tsp-derivation-analysis — raid-debt-demonstration-reds-are-re-asked-every-iteration (verification.md)
+  - tsp-prose-inspection — raid-debt-demonstration-reds-are-re-asked-every-iteration (verification.md)
+  - tsp-read-back-inspection — raid-debt-demonstration-reds-are-re-asked-every-iteration (verification.md)
+  - tsp-record-inspection — raid-debt-demonstration-reds-are-re-asked-every-iteration (verification.md)
+  - tsp-two-machines — raid-debt-demonstration-reds-are-re-asked-every-iteration (verification.md)
+  - tsp-unattended-start — raid-debt-demonstration-reds-are-re-asked-every-iteration (verification.md)
 started: 2026-08-17T10:53:33.649Z
 opened: 2026-08-17T10:28:33.420Z
 goal: "The cloud run's findings land: the fix-findings fallback that stops every walk, the full battery that never fires at verification, the container blind spots a POSIX box keeps rediscovering, and the short-name rename that never finished."
