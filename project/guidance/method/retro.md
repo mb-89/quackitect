@@ -152,6 +152,21 @@ The trigger is a NOTE carrying "needs retro":
    A command that keeps failing or a refusal that keeps firing is a lead.
    The fix may be a tool, a refusal, or better guidance.
 
+   READ THE DEMAND LOG FIRST. `se_help {demands: true}` hands back every
+   se_help query that matched nothing, GROUPED BY SHAPE and ranked by
+   count, most demanded first, with up to three of the actual queries
+   beside each shape. An agent asked the lane for a capability in plain
+   words and the lane had none: that is a missing verb naming itself,
+   already counted, in the wording to build against. This is i8's half of
+   this step, and it costs one call.
+
+   IT DOES NOT REPLACE THE se_run WALK, and reading it as a replacement
+   loses the larger half. The demand log only sees what an agent thought
+   to ASK for. A shell command reached for without ever asking leaves no
+   miss behind, and most of them are that. So: demands first, because it
+   is ranked and free, then the walk below for everything nobody asked
+   about.
+
    THEN WALK THE se_run COMMANDS, AND KNOW WHAT THAT STEP IS FOR (owner
    ruling 2026-08-07). It is not a survey. THE POINT IS TO DRIVE THE se_run
    COUNT DOWN. Every shell command is a candidate sign of a MISSING lane
