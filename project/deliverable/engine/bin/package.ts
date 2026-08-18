@@ -55,7 +55,21 @@ cpSync(root, stage, {
     const rel = relative(root, src);
     if (rel === "" || rel.startsWith("..")) return rel === "";
     const parts = rel.split(sep);
-    if (parts.some((p) => EXCLUDE_DIRS.has(p))) return false;
+    // THE ROOT .claude IS THE ONE EXCEPTION, and it is the wire without which
+    // the arrival hook is dead weight (i35, 2026-08-17).
+    //
+    // .claude is excluded BY NAME wherever it appears, which is right for
+    // project/.claude — that one is GENERATED, placed by the arrival or the
+    // editor, and gitignored. The repository root carries a different file:
+    // it is committed, and it is the only thing a fresh clone reads at session
+    // start, so it is what fires se-hook-arrive.
+    //
+    // FOUND BY USING THE PACKAGE RATHER THAN BUILDING IT. The 4.5.0 archive
+    // carried both arrival scripts and nothing that called them, so a receiver
+    // would have shipped a product whose headline feature never fires.
+    if (rel === ".claude" || parts[0] === ".claude") {
+      // fall through — the root one travels
+    } else if (parts.some((p) => EXCLUDE_DIRS.has(p))) return false;
     if (EXCLUDE_FILES.has(parts[parts.length - 1])) return false;
     // The records stay home: they describe work the receiver never did.
     if (parts[0] === "project" && parts[1] === "spec") return false;

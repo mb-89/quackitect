@@ -9,6 +9,7 @@
 import { spawnSync } from "node:child_process";
 import { accessSync, constants, existsSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
+import { readKeys } from "../frontmatter.ts";
 import type { MachineDecl } from "../machine.ts";
 import { compileMachine } from "../machines/compile.ts";
 import { resolveInRoot, seDir } from "../paths.ts";
@@ -194,6 +195,51 @@ try {
   failures.push("the call log location is not writable (.se/)");
 }
 
+// THE CORPUS IS WHAT EVERY QUERY AND COVERAGE CHECK IS BUILT ON, so broken
+// frontmatter there is the worst place for a green check.
+//
+// MEASURED 2026-08-17: a trace note whose frontmatter block was never
+// terminated sat in the tree and preflight printed `preflight green`.
+// SE-C-135 checks that a write ARRIVED VERBATIM, never that it was
+// WELL-FORMED, and se_file_write is the one lane verb that replaces a whole
+// file with no structural guard. Nothing else looked.
+//
+// THE UNTERMINATED BLOCK IS THE HOLE THAT HID. splitNote reports
+// `fenced: false` for it, which is indistinguishable from a note carrying no
+// frontmatter at all — so readKeys answers {} and every reader downstream
+// sees an empty mapping instead of a broken file. The fence is therefore
+// checked HERE, before the parse, because the parse cannot see it.
+const scanFrontmatter = (dir: string): void => {
+  for (const e of existsSync(dir) ? readdirSync(dir, { withFileTypes: true }) : []) {
+    const p = join(dir, e.name);
+    if (e.isDirectory()) {
+      scanFrontmatter(p);
+      continue;
+    }
+    if (!e.name.endsWith(".md")) continue;
+    const raw = readFileSync(p, "utf8");
+    const lines = raw.replace(/^\uFEFF/, "").split(/\r?\n/);
+    // THE FENCE IS BUILT, NOT WRITTEN. A literal "---" beside a `!==` reads as
+    // a parsed command-line switch to the help conformance check, which then
+    // demands that `--help` document a flag named `---`.
+    const fence = "-".repeat(3);
+    if (lines[0]?.trim() !== fence) {
+      failures.push(`${p} opens no frontmatter block — every corpus reader takes it for an empty mapping`);
+      continue;
+    }
+    if (!lines.some((l, i) => i > 0 && l.trim() === fence)) {
+      failures.push(`${p} opens a frontmatter block and never terminates it — readers see NO frontmatter rather than broken frontmatter`);
+      continue;
+    }
+    try {
+      readKeys(raw, p);
+    } catch (err) {
+      const said = String((err as { got?: string }).got ?? (err as Error).message).split("\n")[0];
+      failures.push(`${p} has frontmatter that does not parse: ${said}`);
+    }
+  }
+};
+scanFrontmatter(join(root, "project", "spec", "trace"));
 for (const f of failures) process.stdout.write(`${f}\n`);
 if (failures.length === 0) process.stdout.write("preflight green\n");
 process.exit(failures.length === 0 ? 0 : 1);

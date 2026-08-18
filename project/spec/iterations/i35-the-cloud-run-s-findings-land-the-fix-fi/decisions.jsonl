@@ -1,0 +1,273 @@
+{"ts":"2026-08-17T10:57:27.230Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d1","brief":"i35 finding 4: confirming the shoot.ts container fix"}
+{"ts":"2026-08-17T11:02:49.455Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d2","brief":"i35 finding 4: making ref: main reachable on a shallow cloud clone"}
+{"ts":"2026-08-17T11:03:22.594Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d3","brief":"i35 finding 4: the cloud clone fetch lands in Arrival A"}
+{"ts":"2026-08-17T11:03:33.199Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d4","brief":"i35 finding 4: the act count follows the added step"}
+{"ts":"2026-08-17T11:05:03.097Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d5","brief":"i35 finding 4: the act count follows the added step"}
+{"ts":"2026-08-17T11:06:04.036Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d6","brief":"i35 finding 4: the act count follows the added step"}
+{"ts":"2026-08-17T11:06:10.847Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d7","brief":"i35 finding 5: preflight learns to read the corpus frontmatter"}
+{"ts":"2026-08-17T11:06:58.700Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d8","brief":"i35 finding 5: the corpus-frontmatter cases are pinned"}
+{"ts":"2026-08-17T11:10:43.521Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d9","brief":"i35 finding 1: the fallback loop is pinned on the shipped matrix"}
+{"ts":"2026-08-17T11:11:10.415Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d10","brief":"i35: the confirm run over every change this iteration made"}
+{"ts":"2026-08-17T11:13:09.684Z","op":"update","visit":"iterations/i35/onboard-retro@0","node":"d11","brief":"i35: the fence literal no longer reads as a CLI switch"}
+{"ts":"2026-08-17T11:20:48.748Z","op":"update","visit":"iterations/i35/gate-kickoff@0","node":"d1","brief":"i35 kickoff: the raid entries this gate adds"}
+{"ts":"2026-08-17T11:20:48.896Z","op":"update","visit":"iterations/i35/gate-kickoff@0","node":"d2","brief":"i35 kickoff: the raid entries this gate adds"}
+{"ts":"2026-08-17T11:20:49.033Z","op":"update","visit":"iterations/i35/gate-kickoff@0","node":"d3","brief":"i35 kickoff: the raid entries this gate adds"}
+{"ts":"2026-08-17T11:23:29.255Z","op":"update","visit":"iterations/i35/draft-vision@0","node":"d4","brief":"i35: cloud-runner leads with the one-command arrival"}
+{"ts":"2026-08-17T11:25:30.082Z","op":"update","visit":"iterations/i35/draft-vision@0","node":"d5","brief":"i35: the hook rule covers the root settings too"}
+{"ts":"2026-08-17T11:32:37.032Z","op":"update","visit":"iterations/i35/draft-vision@0","node":"d6","brief":"i35 M1: reading the raid method to finish draft-vision"}
+{"ts":"2026-08-17T11:33:38.991Z","op":"update","visit":"iterations/i35/log-risks@0","node":"d7","brief":"i35 M1: walking the motivation milestone"}
+{"ts":"2026-08-17T11:33:47.206Z","op":"update","visit":"iterations/i35/log-risks@0","node":"d8","brief":"i35: reading the log-risks form"}
+{"ts":"2026-08-17T11:34:11.438Z","op":"update","visit":"iterations/i35/log-risks@0","node":"d9","brief":"i35: the raid register opens with three entries"}
+{"ts":"2026-08-17T11:34:11.744Z","op":"update","visit":"iterations/i35/log-risks@0","node":"d10","brief":"i35: submitting log-risks"}
+{"ts":"2026-08-17T11:35:12.711Z","op":"update","visit":"iterations/i35/frame-delta@0","node":"d11","brief":"i35 M1: walking toward the motivation gate"}
+{"ts":"2026-08-17T11:35:21.467Z","op":"update","visit":"iterations/i35/frame-delta@0","node":"d12","brief":"i35: reading frame-delta"}
+{"ts":"2026-08-17T11:36:01.732Z","op":"update","visit":"iterations/i35/frame-delta@0","node":"d13","brief":"i35: the delta authors the unattended-arrival value prop"}
+{"ts":"2026-08-17T11:36:47.564Z","op":"update","visit":"iterations/i35/frame-delta@0","node":"d14","brief":"i35: framing the delta"}
+{"ts":"2026-08-17T11:36:47.870Z","op":"update","visit":"iterations/i35/frame-delta@0","node":"d15","brief":"i35: submitting frame-delta"}
+{"ts":"2026-08-17T11:37:05.861Z","op":"update","visit":"iterations/i35/frame-delta@0","node":"d16","brief":"i35: the value prop gains its Unlike"}
+{"ts":"2026-08-17T11:37:05.981Z","op":"update","visit":"iterations/i35/frame-delta@0","node":"d17","brief":"i35: resubmitting frame-delta"}
+{"ts":"2026-08-17T11:37:16.464Z","op":"update","visit":"iterations/i35/scope-non-goals@0","node":"d18","brief":"i35 M1: toward the motivation gate"}
+{"ts":"2026-08-17T11:37:16.694Z","op":"update","visit":"iterations/i35/scope-non-goals@0","node":"d19","brief":"i35: reading the next form"}
+{"ts":"2026-08-17T11:37:50.665Z","op":"update","visit":"iterations/i35/scope-non-goals@0","node":"d20","brief":"i35: scope and non-goals"}
+{"ts":"2026-08-17T11:37:50.952Z","op":"update","visit":"iterations/i35/scope-non-goals@0","node":"d21","brief":"i35: submitting scope-non-goals"}
+{"ts":"2026-08-17T11:37:51.860Z","op":"update","visit":"iterations/i35/gate-motivation@0","node":"d22","brief":"i35 M1: toward the motivation gate"}
+{"ts":"2026-08-17T11:38:23.678Z","op":"update","visit":"iterations/i35/gate-motivation@0","node":"d23","brief":"i35: reading gate-motivation"}
+{"ts":"2026-08-17T11:39:31.761Z","op":"update","visit":"iterations/i35/gate-motivation@0","node":"d24","brief":"i35: the motivation gate"}
+{"ts":"2026-08-17T11:39:32.248Z","op":"update","visit":"iterations/i35/gate-motivation@0","node":"d25","brief":"i35: submitting and blessing gate-motivation"}
+{"ts":"2026-08-17T11:39:43.780Z","op":"update","visit":"iterations/i35/gate-motivation@0","node":"d26","brief":"i35: clearing the gate reading"}
+{"ts":"2026-08-17T11:39:44.024Z","op":"update","visit":"iterations/i35/gate-motivation@0","node":"d27","brief":"i35: clearing the gate reading"}
+{"ts":"2026-08-17T11:39:44.279Z","op":"update","visit":"iterations/i35/gate-motivation@0","node":"d28","brief":"i35: clearing the gate reading"}
+{"ts":"2026-08-17T11:39:44.531Z","op":"update","visit":"iterations/i35/gate-motivation@0","node":"d29","brief":"i35: clearing the gate reading"}
+{"ts":"2026-08-17T11:39:45.009Z","op":"update","visit":"iterations/i35/write-stories@0","node":"d30","brief":"i35: clearing the gate reading"}
+{"ts":"2026-08-17T11:39:45.244Z","op":"update","visit":"iterations/i35/write-stories@0","node":"d31","brief":"i35: the motivation gate"}
+{"ts":"2026-08-17T11:39:45.532Z","op":"update","visit":"iterations/i35/write-stories@0","node":"d32","brief":"i35: submitting and blessing gate-motivation"}
+{"ts":"2026-08-17T11:39:58.037Z","op":"update","visit":"iterations/i35/write-stories@0","node":"d33","brief":"i35: reading write-stories"}
+{"ts":"2026-08-17T11:40:44.201Z","op":"update","visit":"iterations/i35/write-stories@0","node":"d34","brief":"i35: the delta authors the cloud-arrival story"}
+{"ts":"2026-08-17T11:41:03.799Z","op":"update","visit":"iterations/i35/write-stories@0","node":"d35","brief":"i35: the stories this delta moved"}
+{"ts":"2026-08-17T11:41:04.144Z","op":"update","visit":"iterations/i35/write-stories@0","node":"d36","brief":"i35: submitting write-stories"}
+{"ts":"2026-08-17T11:41:04.650Z","op":"update","visit":"iterations/i35/write-stories@0","node":"d37","brief":"i35 M2: toward the inputs gate"}
+{"ts":"2026-08-17T11:41:04.850Z","op":"update","visit":"iterations/i35/write-stories@0","node":"d38","brief":"i35 M2: toward the inputs gate"}
+{"ts":"2026-08-17T11:41:05.215Z","op":"update","visit":"iterations/i35/generalize-use-cases@0","node":"d39","brief":"i35 M2: toward the inputs gate"}
+{"ts":"2026-08-17T11:41:13.788Z","op":"update","visit":"iterations/i35/generalize-use-cases@0","node":"d40","brief":"i35: reading generalize-use-cases"}
+{"ts":"2026-08-17T11:41:52.592Z","op":"update","visit":"iterations/i35/generalize-use-cases@0","node":"d41","brief":"i35: the arrival use case"}
+{"ts":"2026-08-17T11:41:52.723Z","op":"update","visit":"iterations/i35/generalize-use-cases@0","node":"d42","brief":"i35: generalizing the arrival story"}
+{"ts":"2026-08-17T11:41:53.038Z","op":"update","visit":"iterations/i35/generalize-use-cases@0","node":"d43","brief":"i35: submitting generalize-use-cases"}
+{"ts":"2026-08-17T11:42:19.030Z","op":"update","visit":"iterations/i35/write-requirements@0","node":"d44","brief":"i35 M3: requirements"}
+{"ts":"2026-08-17T11:42:19.239Z","op":"update","visit":"iterations/i35/write-requirements@0","node":"d45","brief":"i35: reading write-requirements"}
+{"ts":"2026-08-17T11:43:05.123Z","op":"update","visit":"iterations/i35/write-requirements@0","node":"d46","brief":"i35: the arrival requirements"}
+{"ts":"2026-08-17T11:43:05.255Z","op":"update","visit":"iterations/i35/write-requirements@0","node":"d47","brief":"i35: the arrival requirements"}
+{"ts":"2026-08-17T11:43:05.377Z","op":"update","visit":"iterations/i35/write-requirements@0","node":"d48","brief":"i35: the arrival requirements"}
+{"ts":"2026-08-17T11:43:05.503Z","op":"update","visit":"iterations/i35/write-requirements@0","node":"d49","brief":"i35: the arrival requirements"}
+{"ts":"2026-08-17T11:43:05.626Z","op":"update","visit":"iterations/i35/write-requirements@0","node":"d50","brief":"i35: the arrival requirements"}
+{"ts":"2026-08-17T11:43:48.736Z","op":"update","visit":"iterations/i35/write-requirements@0","node":"d51","brief":"i35: the arrival requirements land"}
+{"ts":"2026-08-17T11:43:49.116Z","op":"update","visit":"iterations/i35/write-requirements@0","node":"d52","brief":"i35: submitting write-requirements"}
+{"ts":"2026-08-17T11:43:49.448Z","op":"update","visit":"iterations/i35/write-requirements@0","node":"d53","brief":"i35 M3: toward the requirements gate"}
+{"ts":"2026-08-17T11:44:07.389Z","op":"update","visit":"iterations/i35/write-requirements@0","node":"d54","brief":"i35: the weasel word leaves the requirement"}
+{"ts":"2026-08-17T11:44:07.523Z","op":"update","visit":"iterations/i35/write-requirements@0","node":"d55","brief":"i35: the arrival requirements land"}
+{"ts":"2026-08-17T11:44:07.858Z","op":"update","visit":"iterations/i35/write-requirements@0","node":"d56","brief":"i35: resubmitting write-requirements"}
+{"ts":"2026-08-17T11:44:18.134Z","op":"update","visit":"iterations/i35/write-requirements@0","node":"d57","brief":"i35 M3: clearing the reading"}
+{"ts":"2026-08-17T11:44:18.301Z","op":"update","visit":"iterations/i35/write-requirements@0","node":"d58","brief":"i35 M3: clearing the reading"}
+{"ts":"2026-08-17T11:44:18.464Z","op":"update","visit":"iterations/i35/write-requirements@0","node":"d59","brief":"i35 M3: clearing the reading"}
+{"ts":"2026-08-17T11:44:18.625Z","op":"update","visit":"iterations/i35/write-requirements@0","node":"d60","brief":"i35 M3: clearing the reading"}
+{"ts":"2026-08-17T11:44:19.009Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d61","brief":"i35 M3: clearing the reading"}
+{"ts":"2026-08-17T11:44:19.242Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d62","brief":"i35: the arrival requirements land"}
+{"ts":"2026-08-17T11:44:19.542Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d63","brief":"i35: submitting write-requirements"}
+{"ts":"2026-08-17T11:44:29.227Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d64","brief":"i35: reading derive-functions"}
+{"ts":"2026-08-17T11:45:02.501Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d65","brief":"i35: the arrival functions and flows"}
+{"ts":"2026-08-17T11:45:02.621Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d66","brief":"i35: the arrival functions and flows"}
+{"ts":"2026-08-17T11:45:02.750Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d67","brief":"i35: the arrival functions and flows"}
+{"ts":"2026-08-17T11:45:02.897Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d68","brief":"i35: the arrival functions and flows"}
+{"ts":"2026-08-17T11:45:03.043Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d69","brief":"i35: the arrival functions and flows"}
+{"ts":"2026-08-17T11:45:03.192Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d70","brief":"i35: the arrival functions and flows"}
+{"ts":"2026-08-17T11:45:03.343Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d71","brief":"i35: the arrival functions and flows"}
+{"ts":"2026-08-17T11:45:03.491Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d72","brief":"i35: the arrival functions and flows"}
+{"ts":"2026-08-17T11:45:03.608Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d73","brief":"i35: the arrival functions and flows"}
+{"ts":"2026-08-17T11:45:03.728Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d74","brief":"i35: the arrival functions and flows"}
+{"ts":"2026-08-17T11:45:03.849Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d75","brief":"i35: the arrival functions and flows"}
+{"ts":"2026-08-17T11:45:03.965Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d76","brief":"i35: the arrival functions and flows"}
+{"ts":"2026-08-17T11:45:04.095Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d77","brief":"i35: the arrival functions and flows"}
+{"ts":"2026-08-17T11:45:38.352Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d78","brief":"i35: functions and flows for the arrival"}
+{"ts":"2026-08-17T11:45:38.674Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d79","brief":"i35: submitting derive-functions"}
+{"ts":"2026-08-17T11:45:39.004Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d80","brief":"i35 M3: assumptions"}
+{"ts":"2026-08-17T11:46:34.936Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d81","brief":"i35: the functions gain their rationale"}
+{"ts":"2026-08-17T11:46:35.082Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d82","brief":"i35: the functions gain their rationale"}
+{"ts":"2026-08-17T11:46:35.207Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d83","brief":"i35: the functions gain their rationale"}
+{"ts":"2026-08-17T11:46:35.329Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d84","brief":"i35: the functions gain their rationale"}
+{"ts":"2026-08-17T11:46:35.460Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d85","brief":"i35: the functions gain their rationale"}
+{"ts":"2026-08-17T11:46:35.583Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d86","brief":"i35: the functions gain their rationale"}
+{"ts":"2026-08-17T11:46:35.716Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d87","brief":"i35: the functions gain their rationale"}
+{"ts":"2026-08-17T11:46:35.874Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d88","brief":"i35: functions and flows for the arrival"}
+{"ts":"2026-08-17T11:46:36.251Z","op":"update","visit":"iterations/i35/derive-functions@0","node":"d89","brief":"i35: resubmitting derive-functions"}
+{"ts":"2026-08-17T11:46:47.387Z","op":"update","visit":"iterations/i35/identify-assumptions@0","node":"d90","brief":"i35 M3: assumptions"}
+{"ts":"2026-08-17T11:46:47.684Z","op":"update","visit":"iterations/i35/identify-assumptions@0","node":"d91","brief":"i35: reading identify-assumptions"}
+{"ts":"2026-08-17T11:47:27.561Z","op":"update","visit":"iterations/i35/identify-assumptions@0","node":"d92","brief":"i35: the assumptions the requirements lean on"}
+{"ts":"2026-08-17T11:47:27.692Z","op":"update","visit":"iterations/i35/identify-assumptions@0","node":"d93","brief":"i35: the assumptions the requirements lean on"}
+{"ts":"2026-08-17T11:48:01.148Z","op":"update","visit":"iterations/i35/identify-assumptions@0","node":"d94","brief":"i35: sweeping the requirements for what they lean on"}
+{"ts":"2026-08-17T11:48:01.501Z","op":"update","visit":"iterations/i35/identify-assumptions@0","node":"d95","brief":"i35: submitting identify-assumptions"}
+{"ts":"2026-08-17T11:48:02.070Z","op":"update","visit":"iterations/i35/identify-assumptions@0","node":"d96","brief":"i35 M3: probing"}
+{"ts":"2026-08-17T11:48:02.234Z","op":"update","visit":"iterations/i35/identify-assumptions@0","node":"d97","brief":"i35 M3: probing"}
+{"ts":"2026-08-17T11:48:02.564Z","op":"update","visit":"iterations/i35/probe-assumptions@0","node":"d98","brief":"i35 M3: probing"}
+{"ts":"2026-08-17T11:48:12.598Z","op":"update","visit":"iterations/i35/probe-assumptions@0","node":"d99","brief":"i35: reading probe-assumptions"}
+{"ts":"2026-08-17T11:49:40.134Z","op":"update","visit":"iterations/i35/probe-assumptions@0","node":"d100","brief":"i35: probing the standing assumptions"}
+{"ts":"2026-08-17T11:49:40.481Z","op":"update","visit":"iterations/i35/probe-assumptions@0","node":"d101","brief":"i35: submitting probe-assumptions"}
+{"ts":"2026-08-17T11:50:16.721Z","op":"update","visit":"iterations/i35/probe-assumptions@0","node":"d102","brief":"i35: re-reading the probes table"}
+{"ts":"2026-08-17T11:51:38.340Z","op":"update","visit":"iterations/i35/probe-assumptions@0","node":"d103","brief":"i35: the probe table, eleven rows measured"}
+{"ts":"2026-08-17T11:51:38.780Z","op":"update","visit":"iterations/i35/probe-assumptions@0","node":"d104","brief":"i35: submitting probe-assumptions"}
+{"ts":"2026-08-17T11:52:16.924Z","op":"update","visit":"iterations/i35/gate-requirements@0","node":"d105","brief":"i35: the requirements gate"}
+{"ts":"2026-08-17T11:52:17.233Z","op":"update","visit":"iterations/i35/gate-requirements@0","node":"d106","brief":"i35: reading gate-requirements"}
+{"ts":"2026-08-17T11:53:08.383Z","op":"update","visit":"iterations/i35/gate-requirements@0","node":"d107","brief":"i35: the requirements gate"}
+{"ts":"2026-08-17T11:53:08.839Z","op":"update","visit":"iterations/i35/gate-requirements@0","node":"d108","brief":"i35: submitting and blessing gate-requirements"}
+{"ts":"2026-08-17T11:53:09.618Z","op":"update","visit":"iterations/i35/gate-requirements@0","node":"d109","brief":"i35 M4: candidates"}
+{"ts":"2026-08-17T11:53:09.856Z","op":"update","visit":"iterations/i35/gate-requirements@0","node":"d110","brief":"i35 M4: candidates"}
+{"ts":"2026-08-17T11:53:10.113Z","op":"update","visit":"iterations/i35/gate-requirements@0","node":"d111","brief":"i35 M4: candidates"}
+{"ts":"2026-08-17T11:53:10.352Z","op":"update","visit":"iterations/i35/gate-requirements@0","node":"d112","brief":"i35 M4: candidates"}
+{"ts":"2026-08-17T11:53:10.848Z","op":"update","visit":"iterations/i35/decompose-structure@0","node":"d113","brief":"i35 M4: candidates"}
+{"ts":"2026-08-17T11:53:23.949Z","op":"update","visit":"iterations/i35/decompose-structure@0","node":"d114","brief":"i35: reading decompose-structure"}
+{"ts":"2026-08-17T11:54:06.815Z","op":"update","visit":"iterations/i35/decompose-structure@0","node":"d115","brief":"i35: the arrival becomes an element"}
+{"ts":"2026-08-17T11:54:38.209Z","op":"update","visit":"iterations/i35/decompose-structure@0","node":"d116","brief":"i35: the structure decomposes into one element"}
+{"ts":"2026-08-17T11:54:38.598Z","op":"update","visit":"iterations/i35/decompose-structure@0","node":"d117","brief":"i35: submitting decompose-structure"}
+{"ts":"2026-08-17T11:54:39.360Z","op":"update","visit":"iterations/i35/author-tests@0","node":"d118","brief":"i35 M5: architecture"}
+{"ts":"2026-08-17T11:54:55.842Z","op":"update","visit":"iterations/i35/author-tests@0","node":"d119","brief":"i35: reading author-tests"}
+{"ts":"2026-08-17T11:57:56.222Z","op":"update","visit":"iterations/i35/author-tests@0","node":"d120","brief":"i35: back on the 0.8 lane after the stray"}
+{"ts":"2026-08-17T11:58:05.050Z","op":"update","visit":"iterations/i35/author-tests@0","node":"d121","brief":"i35: the arrival test spec"}
+{"ts":"2026-08-17T11:58:13.514Z","op":"update","visit":"iterations/i35/author-tests@0","node":"d122","brief":"i35: reading the checks table"}
+{"ts":"2026-08-17T11:58:36.844Z","op":"update","visit":"iterations/i35/author-tests@0","node":"d123","brief":"i35: the arrival tests are authored"}
+{"ts":"2026-08-17T11:58:37.341Z","op":"update","visit":"iterations/i35/author-tests@0","node":"d124","brief":"i35: submitting author-tests"}
+{"ts":"2026-08-17T11:58:53.801Z","op":"update","visit":"iterations/i35/author-tests@0","node":"d125","brief":"i35 M7: observe red"}
+{"ts":"2026-08-17T11:58:54.043Z","op":"update","visit":"iterations/i35/author-tests@0","node":"d126","brief":"i35 M7: observe red"}
+{"ts":"2026-08-17T12:00:10.966Z","op":"update","visit":"iterations/i35/author-tests@0","node":"d127","brief":"i35: the demonstration specs"}
+{"ts":"2026-08-17T12:00:11.091Z","op":"update","visit":"iterations/i35/author-tests@0","node":"d128","brief":"i35: the demonstration specs"}
+{"ts":"2026-08-17T12:00:11.244Z","op":"update","visit":"iterations/i35/author-tests@0","node":"d129","brief":"i35: the method mismatch leaves the spec"}
+{"ts":"2026-08-17T12:00:26.790Z","op":"update","visit":"iterations/i35/author-tests@0","node":"d130","brief":"i35: re-reading the checks table"}
+{"ts":"2026-08-17T12:00:27.199Z","op":"update","visit":"iterations/i35/author-tests@0","node":"d131","brief":"i35: the arrival tests are authored"}
+{"ts":"2026-08-17T12:00:27.370Z","op":"update","visit":"iterations/i35/author-tests@0","node":"d132","brief":"i35: submitting author-tests"}
+{"ts":"2026-08-17T12:00:37.326Z","op":"update","visit":"iterations/i35/author-tests@0","node":"d133","brief":"i35: clearing reading at author-tests"}
+{"ts":"2026-08-17T12:00:37.498Z","op":"update","visit":"iterations/i35/author-tests@0","node":"d134","brief":"i35: clearing reading at author-tests"}
+{"ts":"2026-08-17T12:00:37.942Z","op":"update","visit":"iterations/i35/specify-build@0","node":"d135","brief":"i35: clearing reading at author-tests"}
+{"ts":"2026-08-17T12:00:38.190Z","op":"update","visit":"iterations/i35/specify-build@0","node":"d136","brief":"i35: re-reading checks after the specs"}
+{"ts":"2026-08-17T12:00:47.912Z","op":"update","visit":"iterations/i35/specify-build@0","node":"d137","brief":"i35: reading specify-build"}
+{"ts":"2026-08-17T12:01:15.796Z","op":"update","visit":"iterations/i35/specify-build@0","node":"d138","brief":"i35: the arrival design spec"}
+{"ts":"2026-08-17T12:01:26.962Z","op":"update","visit":"iterations/i35/specify-build@0","node":"d139","brief":"i35: reading the design-spec table"}
+{"ts":"2026-08-17T12:01:45.130Z","op":"update","visit":"iterations/i35/specify-build@0","node":"d140","brief":"i35: the build is specified"}
+{"ts":"2026-08-17T12:01:45.521Z","op":"update","visit":"iterations/i35/specify-build@0","node":"d141","brief":"i35: submitting specify-build"}
+{"ts":"2026-08-17T12:01:57.415Z","op":"update","visit":"iterations/i35/observe-red@0","node":"d142","brief":"i35: observe red"}
+{"ts":"2026-08-17T12:01:57.636Z","op":"update","visit":"iterations/i35/observe-red@0","node":"d143","brief":"i35: reading observe-red"}
+{"ts":"2026-08-17T12:03:04.420Z","op":"update","visit":"iterations/i35/observe-red@0","node":"d144","brief":"i35: observing the red, late and honestly"}
+{"ts":"2026-08-17T12:03:04.701Z","op":"update","visit":"iterations/i35/observe-red@0","node":"d145","brief":"i35: submitting observe-red"}
+{"ts":"2026-08-17T12:04:04.929Z","op":"update","visit":"iterations/i35/observe-red@0","node":"d146","brief":"i35: the debt behind the re-asked demonstrations"}
+{"ts":"2026-08-17T12:04:27.341Z","op":"update","visit":"iterations/i35/observe-red@0","node":"d147","brief":"i35: observing the red, late and honestly"}
+{"ts":"2026-08-17T12:04:27.691Z","op":"update","visit":"iterations/i35/observe-red@0","node":"d148","brief":"i35: submitting observe-red"}
+{"ts":"2026-08-17T12:04:46.086Z","op":"update","visit":"iterations/i35/observe-red@0","node":"d149","brief":"i35: observing the red, late and honestly"}
+{"ts":"2026-08-17T12:04:46.445Z","op":"update","visit":"iterations/i35/observe-red@0","node":"d150","brief":"i35: submitting observe-red"}
+{"ts":"2026-08-17T12:04:57.570Z","op":"update","visit":"iterations/i35/observe-red@0","node":"d151","brief":"i35: clearing reading at observe-red"}
+{"ts":"2026-08-17T12:04:57.730Z","op":"update","visit":"iterations/i35/observe-red@0","node":"d152","brief":"i35: clearing reading at observe-red"}
+{"ts":"2026-08-17T12:04:58.327Z","op":"update","visit":"iterations/i35/build-steps@0","node":"d153","brief":"i35: clearing reading at observe-red"}
+{"ts":"2026-08-17T12:04:58.452Z","op":"update","visit":"iterations/i35/build-steps@0","node":"d154","brief":"i35: clearing reading at observe-red"}
+{"ts":"2026-08-17T12:04:58.626Z","op":"update","visit":"iterations/i35/build-steps@0","node":"d155","brief":"i35: observing the red, late and honestly"}
+{"ts":"2026-08-17T12:04:58.742Z","op":"update","visit":"iterations/i35/build-steps@0","node":"d156","brief":"i35: submitting observe-red"}
+{"ts":"2026-08-17T12:05:23.010Z","op":"update","visit":"iterations/i35/build-steps@0","node":"d157","brief":"i35: reading build-steps"}
+{"ts":"2026-08-17T12:05:46.800Z","op":"update","visit":"iterations/i35/build-steps@0","node":"d158","brief":"i35: submitting build-steps"}
+{"ts":"2026-08-17T12:05:46.998Z","op":"update","visit":"iterations/i35/build-steps@0","node":"d159","brief":"i35 M7: trace-design"}
+{"ts":"2026-08-17T12:05:47.132Z","op":"update","visit":"iterations/i35/build-steps@0","node":"d160","brief":"i35 M7: trace-design"}
+{"ts":"2026-08-17T12:05:56.973Z","op":"update","visit":"iterations/i35/build-steps@0","node":"d161","brief":"i35: what does build-steps want"}
+{"ts":"2026-08-17T12:06:58.461Z","op":"update","visit":"iterations/i35/build-steps@0","node":"d162","brief":"i35: the chunk drawing is authored"}
+{"ts":"2026-08-17T12:08:33.341Z","op":"update","visit":"iterations/i35/build-steps/container-blind-spots@0","node":"d163","brief":"i35: walking the build chunks"}
+{"ts":"2026-08-17T12:08:33.548Z","op":"update","visit":"iterations/i35/build-steps/container-blind-spots@0","node":"d164","brief":"i35: filling container-blind-spots"}
+{"ts":"2026-08-17T12:08:33.821Z","op":"update","visit":"iterations/i35/build-steps/container-blind-spots@0","node":"d165","brief":"i35: submitting container-blind-spots"}
+{"ts":"2026-08-17T12:08:34.325Z","op":"update","visit":"iterations/i35/build-steps/container-blind-spots@0","node":"d166","brief":"i35: walking the build chunks"}
+{"ts":"2026-08-17T12:08:52.959Z","op":"update","visit":"iterations/i35/build-steps/container-blind-spots@0","node":"d167","brief":"i35: looking for the doors"}
+{"ts":"2026-08-17T12:09:04.885Z","op":"update","visit":"iterations/i35/build-steps/container-blind-spots@0","node":"d168","brief":"i35: choosing the next chunk"}
+{"ts":"2026-08-17T12:09:32.629Z","op":"update","visit":"iterations/i35/build-steps/container-blind-spots@0","node":"d169","brief":"i35: walking the build chunks"}
+{"ts":"2026-08-17T12:09:33.034Z","op":"update","visit":"iterations/i35/build-steps/corpus-frontmatter-guard@0","node":"d170","brief":"i35: walking the build chunks"}
+{"ts":"2026-08-17T12:09:33.290Z","op":"update","visit":"iterations/i35/build-steps/corpus-frontmatter-guard@0","node":"d171","brief":"i35: filling corpus-frontmatter-guard"}
+{"ts":"2026-08-17T12:09:33.586Z","op":"update","visit":"iterations/i35/build-steps/corpus-frontmatter-guard@0","node":"d172","brief":"i35: submitting corpus-frontmatter-guard"}
+{"ts":"2026-08-17T12:09:34.243Z","op":"update","visit":"iterations/i35/build-steps/the-fallback-is-driven@0","node":"d173","brief":"i35: walking the build chunks"}
+{"ts":"2026-08-17T12:09:34.462Z","op":"update","visit":"iterations/i35/build-steps/the-fallback-is-driven@0","node":"d174","brief":"i35: filling the-fallback-is-driven"}
+{"ts":"2026-08-17T12:09:34.762Z","op":"update","visit":"iterations/i35/build-steps/the-fallback-is-driven@0","node":"d175","brief":"i35: submitting the-fallback-is-driven"}
+{"ts":"2026-08-17T12:09:35.496Z","op":"update","visit":"iterations/i35/build-steps/the-arrival@0","node":"d176","brief":"i35: walking the build chunks"}
+{"ts":"2026-08-17T12:09:35.736Z","op":"update","visit":"iterations/i35/build-steps/the-arrival@0","node":"d177","brief":"i35: filling the-arrival"}
+{"ts":"2026-08-17T12:09:36.039Z","op":"update","visit":"iterations/i35/build-steps/the-arrival@0","node":"d178","brief":"i35: submitting the-arrival"}
+{"ts":"2026-08-17T12:09:36.567Z","op":"update","visit":"iterations/i35/build-steps/the-arrival-hook@0","node":"d179","brief":"i35: walking the build chunks"}
+{"ts":"2026-08-17T12:09:36.818Z","op":"update","visit":"iterations/i35/build-steps/the-arrival-hook@0","node":"d180","brief":"i35: filling the-arrival-hook"}
+{"ts":"2026-08-17T12:09:37.119Z","op":"update","visit":"iterations/i35/build-steps/the-arrival-hook@0","node":"d181","brief":"i35: submitting the-arrival-hook"}
+{"ts":"2026-08-17T12:09:37.673Z","op":"update","visit":"iterations/i35/build-steps/the-arrival-guards@0","node":"d182","brief":"i35: walking the build chunks"}
+{"ts":"2026-08-17T12:09:37.907Z","op":"update","visit":"iterations/i35/build-steps/the-arrival-guards@0","node":"d183","brief":"i35: filling the-arrival-guards"}
+{"ts":"2026-08-17T12:09:38.195Z","op":"update","visit":"iterations/i35/build-steps/the-arrival-guards@0","node":"d184","brief":"i35: submitting the-arrival-guards"}
+{"ts":"2026-08-17T12:09:39.050Z","op":"update","visit":"iterations/i35/build-steps/the-guidance-follows@0","node":"d185","brief":"i35: walking the build chunks"}
+{"ts":"2026-08-17T12:09:39.273Z","op":"update","visit":"iterations/i35/build-steps/the-guidance-follows@0","node":"d186","brief":"i35: filling the-guidance-follows"}
+{"ts":"2026-08-17T12:09:39.553Z","op":"update","visit":"iterations/i35/build-steps/the-guidance-follows@0","node":"d187","brief":"i35: submitting the-guidance-follows"}
+{"ts":"2026-08-17T12:09:40.227Z","op":"update","visit":"iterations/i35/trace-design@0","node":"d188","brief":"i35: walking the build chunks"}
+{"ts":"2026-08-17T12:09:52.068Z","op":"update","visit":"iterations/i35/trace-design@0","node":"d189","brief":"i35: reading trace-design"}
+{"ts":"2026-08-17T12:10:09.107Z","op":"update","visit":"iterations/i35/trace-design@0","node":"d190","brief":"i35: tracing the design"}
+{"ts":"2026-08-17T12:10:09.487Z","op":"update","visit":"iterations/i35/trace-design@0","node":"d191","brief":"i35: submitting trace-design"}
+{"ts":"2026-08-17T12:10:28.444Z","op":"update","visit":"iterations/i35/trace-design@0","node":"d192","brief":"i35 M7: verification"}
+{"ts":"2026-08-17T12:10:28.617Z","op":"update","visit":"iterations/i35/trace-design@0","node":"d193","brief":"i35 M7: verification"}
+{"ts":"2026-08-17T12:10:28.984Z","op":"update","visit":"iterations/i35/verification@0","node":"d194","brief":"i35 M7: verification"}
+{"ts":"2026-08-17T12:10:43.126Z","op":"update","visit":"iterations/i35/verification@0","node":"d195","brief":"i35: reading verification"}
+{"ts":"2026-08-17T12:11:36.802Z","op":"update","visit":"iterations/i35/verification@0","node":"d196","brief":"i35 verification: the ref refusal becomes typed"}
+{"ts":"2026-08-17T12:12:09.001Z","op":"update","visit":"iterations/i35/verification@0","node":"d197","brief":"i35: taking the fallback to fix-findings"}
+{"ts":"2026-08-17T12:13:12.501Z","op":"update","visit":"iterations/i35/verification@0","node":"d198","brief":"i35: verification, with its finding"}
+{"ts":"2026-08-17T12:13:12.796Z","op":"update","visit":"iterations/i35/verification@0","node":"d199","brief":"i35: submitting verification"}
+{"ts":"2026-08-17T12:13:22.742Z","op":"update","visit":"iterations/i35/verification@0","node":"d200","brief":"i35: clearing verification reading"}
+{"ts":"2026-08-17T12:13:22.916Z","op":"update","visit":"iterations/i35/verification@0","node":"d201","brief":"i35: clearing verification reading"}
+{"ts":"2026-08-17T12:13:23.234Z","op":"update","visit":"iterations/i35/fix-findings@0","node":"d202","brief":"i35: clearing verification reading"}
+{"ts":"2026-08-17T12:13:27.749Z","op":"update","visit":"iterations/i35/trace-design@1","node":"d203","brief":"i35: clearing verification reading"}
+{"ts":"2026-08-17T12:13:28.003Z","op":"update","visit":"iterations/i35/trace-design@1","node":"d204","brief":"i35: clearing verification reading"}
+{"ts":"2026-08-17T12:13:28.252Z","op":"update","visit":"iterations/i35/trace-design@1","node":"d205","brief":"i35: verification, with its finding"}
+{"ts":"2026-08-17T12:13:28.411Z","op":"update","visit":"iterations/i35/trace-design@1","node":"d206","brief":"i35: submitting verification"}
+{"ts":"2026-08-17T12:13:39.868Z","op":"update","visit":"iterations/i35/trace-design@1","node":"d207","brief":"i35: where does the walk stand"}
+{"ts":"2026-08-17T12:13:54.852Z","op":"update","visit":"iterations/i35/trace-design@1","node":"d208","brief":"i35: into fix-findings"}
+{"ts":"2026-08-17T12:13:55.337Z","op":"update","visit":"iterations/i35/fix-findings@0","node":"d209","brief":"i35: into fix-findings"}
+{"ts":"2026-08-17T12:13:59.613Z","op":"update","visit":"iterations/i35/trace-design@2","node":"d210","brief":"i35: into fix-findings"}
+{"ts":"2026-08-17T12:13:59.875Z","op":"update","visit":"iterations/i35/trace-design@2","node":"d211","brief":"i35: at the repair door"}
+{"ts":"2026-08-17T12:14:19.459Z","op":"update","visit":"iterations/i35/trace-design@2","node":"d212","brief":"i35: toward the implementation gate"}
+{"ts":"2026-08-17T12:15:37.837Z","op":"update","visit":"iterations/i35/verification@2","node":"d213","brief":"i35: to the implementation gate"}
+{"ts":"2026-08-17T12:16:51.685Z","op":"update","visit":"iterations/i35/verification@2","node":"d214","brief":"i35: to the implementation gate"}
+{"ts":"2026-08-17T12:17:45.389Z","op":"update","visit":"iterations/i35/verification@2","node":"d215","brief":"i35: where does it stand"}
+{"ts":"2026-08-17T12:18:46.665Z","op":"update","visit":"iterations/i35/verification@2","node":"d216","brief":"i35: leaving verification — does the engine fire the battery?"}
+{"ts":"2026-08-17T12:21:12.582Z","op":"update","visit":"iterations/i35/verification@2","node":"d217","brief":"i35: attempting the gate with the aim set"}
+{"ts":"2026-08-17T12:33:30.763Z","op":"update","visit":"iterations/i35/verification@2","node":"d218","brief":"i35: the battery is green — leaving verification"}
+{"ts":"2026-08-17T12:35:01.831Z","op":"update","visit":"iterations/i35/gate-implementation@0","node":"d219","brief":"i35: reading gate-implementation"}
+{"ts":"2026-08-17T12:36:00.965Z","op":"update","visit":"iterations/i35/gate-implementation@0","node":"d220","brief":"i35: the implementation gate"}
+{"ts":"2026-08-17T12:36:01.390Z","op":"update","visit":"iterations/i35/gate-implementation@0","node":"d221","brief":"i35: submitting and blessing gate-implementation"}
+{"ts":"2026-08-17T12:36:13.971Z","op":"update","visit":"iterations/i35/gate-implementation@0","node":"d222","brief":"i35: the implementation gate"}
+{"ts":"2026-08-17T12:36:14.354Z","op":"update","visit":"iterations/i35/gate-implementation@0","node":"d223","brief":"i35: submitting and blessing gate-implementation"}
+{"ts":"2026-08-17T12:36:31.733Z","op":"update","visit":"iterations/i35/trace-design@3","node":"d224","brief":"i35: on to validation"}
+{"ts":"2026-08-17T12:37:58.766Z","op":"update","visit":"iterations/i35/gate-implementation@0","node":"d225","brief":"i35: walking into validation"}
+{"ts":"2026-08-17T12:38:08.999Z","op":"update","visit":"iterations/i35/sweep-consistency@0","node":"d226","brief":"i35: reading sweep-consistency"}
+{"ts":"2026-08-17T12:38:37.347Z","op":"update","visit":"iterations/i35/sweep-consistency@0","node":"d227","brief":"i35 sweep: the README learns the cloud arrival"}
+{"ts":"2026-08-17T12:39:05.475Z","op":"update","visit":"iterations/i35/sweep-consistency@0","node":"d228","brief":"i35: sweeping the describing surfaces"}
+{"ts":"2026-08-17T12:39:05.863Z","op":"update","visit":"iterations/i35/sweep-consistency@0","node":"d229","brief":"i35: submitting sweep-consistency"}
+{"ts":"2026-08-17T12:39:16.213Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d230","brief":"i35: reading gate-validation"}
+{"ts":"2026-08-17T12:40:25.706Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d231","brief":"i35: the validation gate"}
+{"ts":"2026-08-17T12:40:26.082Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d232","brief":"i35: submitting and blessing gate-validation"}
+{"ts":"2026-08-17T12:40:37.805Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d233","brief":"i35: on to package"}
+{"ts":"2026-08-17T12:40:48.853Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d234","brief":"i35: toward package"}
+{"ts":"2026-08-17T12:42:29.820Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d235","brief":"i35: the unfinished decks get their evidence halves"}
+{"ts":"2026-08-17T12:42:29.957Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d236","brief":"i35: the unfinished decks get their evidence halves"}
+{"ts":"2026-08-17T12:42:30.090Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d237","brief":"i35: the unfinished decks get their evidence halves"}
+{"ts":"2026-08-17T12:42:42.124Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d238","brief":"i35: the unfinished decks get their evidence halves"}
+{"ts":"2026-08-17T12:42:42.369Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d239","brief":"i35: the unfinished decks get their evidence halves"}
+{"ts":"2026-08-17T12:42:42.614Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d240","brief":"i35: the unfinished decks get their evidence halves"}
+{"ts":"2026-08-17T12:43:16.140Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d241","brief":"i35: the uncovered must-stories get a demonstration spec"}
+{"ts":"2026-08-17T12:43:16.273Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d242","brief":"i35: the uncovered must-stories get a demonstration spec"}
+{"ts":"2026-08-17T12:43:27.109Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d243","brief":"i35: the validation gate"}
+{"ts":"2026-08-17T12:43:27.420Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d244","brief":"i35: re-blessing gate-validation"}
+{"ts":"2026-08-17T12:43:37.892Z","op":"update","visit":"iterations/i35/gate-validation@0","node":"d245","brief":"i35: where now"}
+{"ts":"2026-08-17T12:43:48.465Z","op":"update","visit":"iterations/i35/package@0","node":"d246","brief":"i35: reading package"}
+{"ts":"2026-08-17T12:44:24.998Z","op":"update","visit":"iterations/i35/package@0","node":"d247","brief":"i35: 4.5.0 — the cloud arrival ships"}
+{"ts":"2026-08-17T12:44:34.479Z","op":"update","visit":"iterations/i35/package@0","node":"d248","brief":"i35: assembling the 4.5.0 package"}
+{"ts":"2026-08-17T12:45:14.095Z","op":"update","visit":"iterations/i35/package@0","node":"d249","brief":"i35: the packaged product carries the wire that fires its arrival"}
+{"ts":"2026-08-17T12:45:14.292Z","op":"update","visit":"iterations/i35/package@0","node":"d250","brief":"i35: rebuilding with the wire"}
+{"ts":"2026-08-17T12:46:26.522Z","op":"update","visit":"iterations/i35/package@0","node":"d251","brief":"i35: the package is built and used"}
+{"ts":"2026-08-17T12:46:26.845Z","op":"update","visit":"iterations/i35/package@0","node":"d252","brief":"i35: submitting package"}
+{"ts":"2026-08-17T12:46:37.775Z","op":"update","visit":"iterations/i35/package@0","node":"d253","brief":"i35: the package is built and used"}
+{"ts":"2026-08-17T12:46:38.070Z","op":"update","visit":"iterations/i35/package@0","node":"d254","brief":"i35: submitting package"}
+{"ts":"2026-08-17T12:46:56.118Z","op":"update","visit":"iterations/i35/trace-design@4","node":"d255","brief":"i35: toward release"}
+{"ts":"2026-08-17T12:48:18.659Z","op":"update","visit":"iterations/i35/gate-implementation@1","node":"d256","brief":"i35: at the release gate"}
+{"ts":"2026-08-17T12:48:29.255Z","op":"update","visit":"iterations/i35/gate-release@0","node":"d257","brief":"i35: reading gate-release"}
+{"ts":"2026-08-17T12:49:22.461Z","op":"update","visit":"iterations/i35/gate-release@0","node":"d258","brief":"i35: the release gate"}
+{"ts":"2026-08-17T12:49:22.823Z","op":"update","visit":"iterations/i35/gate-release@0","node":"d259","brief":"i35: submitting and blessing gate-release"}
+{"ts":"2026-08-17T12:49:37.884Z","op":"update","visit":"iterations/i35/trace-design@5","node":"d260","brief":"i35: to shipped"}
+{"ts":"2026-08-17T12:51:05.870Z","op":"update","visit":"iterations/i35/gate-implementation@2","node":"d261","brief":"i35: reaching shipped"}
+{"ts":"2026-08-17T12:52:49.893Z","op":"update","visit":"iterations/i35/shipped@0","node":"d262","brief":"i35: closing out from shipped"}

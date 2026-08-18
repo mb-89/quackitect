@@ -22,6 +22,16 @@ import { fileURLToPath } from "node:url";
 
 const REPO_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 const CAGE = join(REPO_ROOT, "project", "deliverable", "cage", "claude-settings.json");
+// THE SECOND PLACE A HOOK CAN BE WIRED, and it is not the cage (i35).
+//
+// The cage template is placed BY the arrival, so it cannot carry the hook that
+// PERFORMS the arrival — a cloud session reads its settings before the cage
+// exists. The repository root's own .claude/settings.json is committed, which
+// makes it the only file a fresh clone reads at session start.
+//
+// THE RULE IS UNCHANGED: a hook the host never loads is not a hook. What
+// widened is where "loaded" can honestly mean.
+const ROOT_SETTINGS = join(REPO_ROOT, ".claude", "settings.json");
 const BIN = join(REPO_ROOT, "project", "deliverable", "engine", "bin");
 
 /** The hook scripts the engine ships, derived from the folder rather than
@@ -33,14 +43,24 @@ function shippedHooks(): string[] {
 }
 
 describe("the shipped cage", { concurrency: true }, () => {
-  test("every hook script the engine ships is wired in the cage template", () => {
-    const cage = readFileSync(CAGE, "utf8");
-    const missing = shippedHooks().filter((h) => !cage.includes(h));
+  test("every hook script the engine ships is wired somewhere a host actually loads", () => {
+    const wired = readFileSync(CAGE, "utf8") + readFileSync(ROOT_SETTINGS, "utf8");
+    const missing = shippedHooks().filter((h) => !wired.includes(h));
     assert.deepEqual(
       missing,
       [],
-      "a hook the host never loads is not a hook — wire it in project/deliverable/cage/claude-settings.json, which RUNME places every run",
+      "a hook the host never loads is not a hook — wire it in project/deliverable/cage/claude-settings.json (placed by RUNME every run) or, for a hook that must fire BEFORE the cage exists, in the committed root .claude/settings.json",
     );
+  });
+
+  // THE ARRIVAL HOOK IS NAMED EXPLICITLY, for the same reason the Stop hook is:
+  // its absence is silent. Without it a cloud session starts uncaged with no
+  // lane, which looks exactly like a normal session until the agent reaches for
+  // a tool it does not have.
+  test("the arrival hook is wired in the ROOT settings, which is the file a fresh clone reads", () => {
+    const root = JSON.parse(readFileSync(ROOT_SETTINGS, "utf8")) as { hooks?: { SessionStart?: unknown[] } };
+    assert.equal(Array.isArray(root.hooks?.SessionStart), true, "the root settings must wire a SessionStart hook");
+    assert.match(JSON.stringify(root.hooks?.SessionStart), /se-hook-arrive\.ts/);
   });
 
   test("the cage template is the file RUNME places, and it parses", () => {

@@ -118,15 +118,55 @@ describe("it cannot outlive what granted it", () => {
 
   // An emergency that survives a restart is a gate quietly missing, and
   // nobody would know to look for it.
+  //
+  // THE SESSION STAMP IS SET HERE, and that is the whole point of the case.
+  // A RELOAD and a RESTART are the same code path with one difference: whether
+  // the settings on disk carry THIS session's stamp. restoreSettings reads
+  // SE_SESSION and restores nothing without a match, which is what makes
+  // emergency die with the session that granted it.
+  //
+  // SO A TEST THAT DOES NOT SET IT IS NOT TESTING THE RELOAD — it is testing
+  // the restart, and passing for the wrong reason. This case read the ambient
+  // environment instead: green when run through the lane, which spawns the
+  // engine with a stamp (engine/bin/se-mcp.ts), and red under a plain
+  // npm test. Measured 2026-08-17: 3 of 3 red standalone, green with a stamp.
   test("emergency survives the reload it was granted through — and a lowered dial revokes it for good", () => {
-    const r = root();
-    const a = new Session(r);
-    a.setAutonomy(1);
-    a.setEmergency(true);
-    assert.equal(new Session(r).emergency, true, "a reload mid-session keeps the granted delegation");
-    a.setAutonomy(0.6);
-    assert.equal(new Session(r).emergency, false, "lowering the dial revokes it now");
-    assert.equal(new Session(r).emergency, false, "and in the next life too");
+    const had = process.env.SE_SESSION;
+    process.env.SE_SESSION = "emergency-reload-case";
+    try {
+      const r = root();
+      const a = new Session(r);
+      a.setAutonomy(1);
+      a.setEmergency(true);
+      assert.equal(new Session(r).emergency, true, "a reload mid-session keeps the granted delegation");
+      a.setAutonomy(0.6);
+      assert.equal(new Session(r).emergency, false, "lowering the dial revokes it now");
+      assert.equal(new Session(r).emergency, false, "and in the next life too");
+    } finally {
+      if (had === undefined) delete process.env.SE_SESSION;
+      else process.env.SE_SESSION = had;
+    }
+  });
+
+  // THE OTHER HALF, and it is the half the file's own header promises: a
+  // RESTART is a different session, so the stamp does not match and the
+  // delegation does not come back. Without this case, setting the stamp above
+  // could hide exactly the gate this file exists to guard.
+  test("emergency does NOT survive a restart — a different session gets nothing back", () => {
+    const had = process.env.SE_SESSION;
+    process.env.SE_SESSION = "the-session-that-armed-it";
+    try {
+      const r = root();
+      const a = new Session(r);
+      a.setAutonomy(1);
+      a.setEmergency(true);
+      assert.equal(new Session(r).emergency, true, "still armed inside its own session");
+      process.env.SE_SESSION = "a-later-session";
+      assert.equal(new Session(r).emergency, false, "a restart is a new session, and it gets no delegation back");
+    } finally {
+      if (had === undefined) delete process.env.SE_SESSION;
+      else process.env.SE_SESSION = had;
+    }
   });
 });
 
