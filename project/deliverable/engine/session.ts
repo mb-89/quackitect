@@ -94,7 +94,6 @@ import {
   readItRecord,
   repinColumn,
 } from "./iterations.ts";
-import { RUN_MODES, type RunMode, readMode, storedMode, writeMode } from "./mode.ts";
 import { parseStateNote, readNode, section, withPass, writeNode } from "./notes.ts";
 import { pathKind, resolveInRoot, seDir } from "./paths.ts";
 import { mintFlipLines } from "./pugh.ts";
@@ -904,74 +903,6 @@ export class Session {
     // 2026-08-14). The person's control sends a number in; nothing sends one
     // back out.
     return { ...this.tierFor(value), was: this.tierFor(was).tier ?? "", ...(this._emergency ? { emergency: true } : {}) };
-  }
-
-  /** WHAT IS RUNNING RIGHT NOW, which is not always what is stored.
-   *
-   *  `--mode` decides THIS RUN and deliberately does not overwrite the stored
-   *  choice, so the two can differ. A packet reporting only the stored value
-   *  would then lie about the boundary the walk is actually crossing.
-   *
-   *  Null until the launch says. The stored value is the honest fallback. */
-  private _runningMode: RunMode | null = null;
-
-  /** Told by the launch which boundary this process actually got. */
-  noteRunningMode(mode: string): void {
-    this._runningMode = (RUN_MODES as string[]).includes(mode) ? (mode as RunMode) : null;
-  }
-
-  /** What is running now — the launch's answer, or the stored one. */
-  runningMode(): RunMode {
-    return this._runningMode ?? readMode(this.machineRoot());
-  }
-
-  /** THE PACKET'S MODE BLOCK, FROM ONE READ OF THE FILE.
-   *
-   *  packet() is on the hot path. recordDone paints green across the whole
-   *  corpus, so a second read per call is two hundred extra file hits over a
-   *  two-hundred-node corpus — which is exactly how it blew the drift
-   *  budget. */
-  private _storedMode: { mode: RunMode; chosen: boolean } | null = null;
-
-  private runBlock(): { mode: RunMode; stored: RunMode; chosen: boolean } {
-    // READ ONCE PER SESSION, never once per packet. recordDone paints green
-    // across the whole corpus, so one filesystem hit per call cost 100 ms over
-    // two hundred nodes and blew the drift budget — a cost that did not exist
-    // before this block did.
-    //
-    // A SESSION-LIFETIME CACHE CANNOT BE WRONG IN A WAY THAT MATTERS. The
-    // stored choice only takes effect at the NEXT launch. setRunMode refreshes
-    // it, so this process always reports its own writes.
-    this._storedMode ??= storedMode(this.machineRoot());
-    const { mode, chosen } = this._storedMode;
-    return { mode: this._runningMode ?? mode, stored: mode, chosen };
-  }
-
-  /** THE STORED RUN MODE — where satellites run from the NEXT launch on.
-   *
-   *  IT DOES NOT MOVE THIS RUN, and it does not pretend to. The boundary is
-   *  chosen once at start. A server cannot re-spawn its own satellites
-   *  underneath a walk in flight. The answer says which launch applies it.
-   *
-   *  IT EXISTS BECAUSE A HOST HAS NO COMMAND LINE. The VS Code extension
-   *  launches from a fixed .mcp.json, so `--mode` never reaches it. Without
-   *  this control that host could not flip the mode at all. */
-  setRunMode(mode: string): Record<string, unknown> {
-    if (!(RUN_MODES as string[]).includes(mode)) {
-      throw new Rejection({
-        clause: CLAUSES.REQUIRED_ARGS,
-        expected: `one of ${RUN_MODES.join(", ")} — where satellites run`,
-        got: String(mode),
-        remedy: { tool: "se_pull", args: {}, note: "the run mode is set from the mirror, or at launch with --mode" },
-        source: "engine/session.ts run mode",
-      });
-    }
-    const was = readMode(this.machineRoot());
-    writeMode(this.machineRoot(), mode as RunMode);
-    this._storedMode = { mode: mode as RunMode, chosen: true };
-    this.notifyChange();
-    const running = this.runningMode();
-    return { mode, was, running, applies: mode === running ? "already running" : "on the next launch" };
   }
 
   /** A STATE'S WEIGHT AS A WORD. The dial's own word comes from tierFor; this
@@ -7576,11 +7507,6 @@ export class Session {
       active: this.active(),
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
       status: this.instance.status,
-      // WHERE A SATELLITE RUNS, on every packet so neither hand has to ask.
-      // One architecture, three transports — process, thread, inline — and the
-      // person flips it. `chosen: false` means the default is answering, which
-      // reads differently from a choice somebody made.
-      run: this.runBlock(),
       // THE TIER IS THE ANSWER, AND THE NUMBER DOES NOT RIDE WITH IT (owner
       // ruling 2026-08-14: "the number leaves the answer").
       //

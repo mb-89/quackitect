@@ -15,8 +15,6 @@ realizes:
   - "if-account-to-obsidian"
   - "if-walk-engine-to-web"
   - "if-mirror-to-output-tools"
-  - "if-satellite-supervisor-to-cloud-host"
-  - "if-satellite-supervisor-to-peer-machine"
 files:
   - "project/deliverable/machines/items/interface.md"
   - "project/deliverable/engine/trace.ts"

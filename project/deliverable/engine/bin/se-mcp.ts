@@ -292,20 +292,7 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   // change what the person set from the mirror.
   //
   // A BAD VALUE STOPS THE LAUNCH, and that is deliberate: an unreadable stored
-  // setting falls back to the default quietly, but a person who typed a mode
-  // by hand is owed the news that it was not a mode.
-  const { modeForRun } = await import("../mode.ts");
-  let runMode: string;
-  try {
-    runMode = modeForRun(root, argValue("--mode") ?? process.env.SE_MODE);
-  } catch (e) {
-    process.stderr.write(`se-mcp: ${String((e as Error).message)}\n`);
-    process.exit(1);
-  }
-  process.stderr.write(`se-mcp: satellites run ${runMode}\n`);
-
   const session = new Session(root); // fails fast on a misdrawn machine
-  session.noteRunningMode(runMode); // the packet must report what RAN, not what is stored
   if (autonomyRaw !== undefined) session.setAutonomy(autonomyRaw); // a rung by name or a bare value; refuses either out of range
   // SESSION OVER — reaching end stops everything. The grace period lets the
   // closing tool response flush to stdout and the mirror serve its red page.

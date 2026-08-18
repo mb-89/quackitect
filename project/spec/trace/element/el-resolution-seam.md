@@ -9,6 +9,8 @@ group: the-walk
 implements:
   - fn-run-a-governed-walk.resolve-a-path
 satisfies:
+  - req-a-surface-resolves-to-what-it-shows
+  - req-version-control-resolves-like-every-call
   - req-a-read-comes-from-where-it-is-meant
   - req-a-write-lands-where-it-is-meant
   - req-a-wrong-act-never-passes-silently

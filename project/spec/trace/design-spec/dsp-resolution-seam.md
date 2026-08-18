@@ -5,9 +5,7 @@ type: "[[design-spec]]"
 statement: one resolver every verb calls, which decides the store, refuses what falls outside the record, and returns the store beside the path
 realizes:
   - "el-resolution-seam"
-  - "if-satellite-to-resolution-seam"
   - "if-walk-engine-to-resolution-seam"
-  - "if-satellite-supervisor-to-resolution-seam"
   - "if-resolution-seam-to-engine-delta"
   - "if-resolution-seam-to-method-compiler"
   - "if-record-store-to-resolution-seam"

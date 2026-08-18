@@ -9,7 +9,6 @@ realizes:
   - "if-engine-delta-to-mirror"
   - "if-engine-delta-to-walk-engine"
 files:
-  - "project/deliverable/engine/delta.ts"
   - "project/deliverable/engine/paths.ts"
   - "project/deliverable/engine/machines/compile.ts"
 ---
