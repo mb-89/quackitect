@@ -14,6 +14,12 @@ realizes:
 files:
   - "project/deliverable/engine/render.ts"
   - "project/deliverable/engine/renderclient.ts"
+  - "project/deliverable/engine/renderclient-detail.ts"
+  - "project/deliverable/engine/renderclient-walk.ts"
+  - "project/deliverable/engine/renderclient-form.ts"
+  - "project/deliverable/engine/renderclient-panel.ts"
+  - "project/deliverable/engine/renderclient-log.ts"
+  - "project/deliverable/engine/renderclient-live.ts"
   - "project/deliverable/engine/renderstyle.ts"
   - "project/deliverable/engine/mirror.ts"
   - "project/deliverable/engine/panel.ts"
@@ -692,3 +698,23 @@ refuses outright as uid 0 — "Running as root without --no-sandbox is not
 supported" — and a container runs as root, so the whole cloud path was
 shut. CONDITIONAL DELIBERATELY: passing it unconditionally would weaken
 a desktop run, which has a sandbox worth keeping.
+
+## The client script is served in parts
+
+THE MIRROR'S CLIENT IS ONE PROGRAM. It is two thousand lines of JavaScript
+that never runs in the engine, carried as a string and served with the page —
+no bundler, no build step, no nonce.
+
+IT IS WRITTEN IN SIX PARTS AND JOINED IN ORDER: the details pane and the DSM
+editor, the walk's own surfaces, the forms, the panes and cards, the log and
+decisions, and the live signals. Nothing else joins them.
+
+THE PARTS ARE NOT MODULES. A declaration in an earlier part is in scope for
+every later one, because the joined result is a single script with a single
+scope. Order is therefore load-bearing: reordering the parts would move a
+top-level statement past the thing it runs against. The split is where a
+reader looks, not a boundary the program can see.
+
+WHAT THIS MEANS FOR A GUARD. Anything reading the client's source must read
+all of the parts. mirrorSource() names them, which is why a guard survives a
+further split instead of quietly checking a fraction of the script.

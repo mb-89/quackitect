@@ -547,7 +547,17 @@ export async function pullTo(session: Session, state: string): Promise<void> {
  *  "does the page do X" wants the whole layer, not whichever third X landed
  *  in — so it asks here and survives the next split. */
 export function mirrorSources(): { rel: string; text: string }[] {
-  return ["render.ts", "renderclient.ts", "renderstyle.ts"].map((f) => ({
+  return [
+    "render.ts",
+    "renderclient.ts",
+    "renderclient-detail.ts",
+    "renderclient-walk.ts",
+    "renderclient-form.ts",
+    "renderclient-panel.ts",
+    "renderclient-log.ts",
+    "renderclient-live.ts",
+    "renderstyle.ts",
+  ].map((f) => ({
     rel: f,
     text: readFileSync(join(REPO_ROOT, "project", "deliverable", "engine", f), "utf8"),
   }));
