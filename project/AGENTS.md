@@ -1,5 +1,5 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from project/guidance/contract.md d76b4d3fd0ea
+     from project/guidance/contract.md b538e8ccc81e
      from project/guidance/walking.md b879e4877496
      from project/guidance/method/lane.md 2b433ab77644
      from project/guidance/voice.md 0b6faf79ff32
@@ -216,6 +216,33 @@ decisions.
 - Doubt is a note.
 - Disagreement is a note.
 - Reflection is the retro's.
+
+## 13. Recite the rules at the front desk
+
+BOOT ENDS AT THE FRONT DESK, and that is where you show the person that these
+rules loaded. Do exactly three things there, in order, and nothing else.
+
+- RECITE THESE RULES. Paraphrase their specifics back in your own words. Not
+  a copy, and not a list of headings — a recital, short, showing you hold
+  them.
+- PRINT THE DESK'S GREETING VERBATIM. Its wording lives in
+  `guidance/method/front-desk.md`. Nothing else prints: no list of doors, no
+  line about the dial, no account of the boot.
+- END YOUR TURN. The desk waits for the person's word.
+
+NO VISIBLE RECITAL MEANS THE RULES NEVER LOADED, and the person should stop
+you. That is the whole point of asking for one: this file reaches you through
+the prompt layer every turn, and the recital is the only evidence a person
+outside the machine can see.
+
+ONE RECITAL PER SESSION. A later visit to the desk sweeps, advises and
+executes as the method card says.
+
+WHY IT LIVES HERE AND NOT IN A HOOK (owner correction 2026-08-18). The rules
+are assembled into the prompt layer from this file, verbatim, with no model in
+the path. A hook that carried its own copy of them would be a second,
+hand-compressed source that drifts the day this file is edited. The command
+belongs with the rules it is about.
 
 # walking — how the machine is driven
 
