@@ -7329,6 +7329,8 @@ export class Session {
           String(args.disposition ?? ""),
           args.where === undefined ? undefined : String(args.where),
           true,
+          args.statement === undefined ? undefined : String(args.statement),
+          this.machineRoot(),
         );
       case "se_reload":
         return this.requestReload();

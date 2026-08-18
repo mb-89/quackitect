@@ -101,4 +101,5 @@ export const CLAUSES = {
   OUTPUT_SHAPED: "SE-C-137", // a truncating pipe would cut the output BEFORE the engine sees it — refused at the boundary, because what it drops exists nowhere
   CORPUS_UNREADABLE: "SE-C-138", // a write would leave a corpus node the engine's own reader cannot parse — refused before it lands, because the break surfaces later at a reader that cannot name it
   REF_UNRESOLVED: "SE-C-139", // a ref that git cannot resolve — typed rather than raw, because a raw git error reads as "the file is missing" when the BRANCH is missing
+  NOTE_TEXT_CARRIED: "SE-C-140", // a mint offered the raw note's own text as the option's statement — the rewrite IS the privacy boundary, so a paste is refused rather than corrected
 } as const;

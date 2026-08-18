@@ -6,9 +6,10 @@
 // so was reachable only by the agent, which made "what is open" a question
 // the owner had to route through someone else. One implementation, two
 // doors.
-import { backlogNotes, byPriority, headline, type Priority, pendingNotes, priorityOf, titleOf } from "./inbox.ts";
+import { byPriority, DEFAULT_PRIORITY, headline, type Priority, pendingNotes, priorityOf, titleOf } from "./inbox.ts";
 import { itList, readItRecord } from "./iterations.ts";
 import { seDir } from "./paths.ts";
+import { standingOptions } from "./pool.ts";
 import { expList, readRecord } from "./worktree.ts";
 
 export interface Survey {
@@ -76,15 +77,22 @@ export function survey(projectRoot: string, opts: SurveyOptions = {}): Survey {
   const offset = Math.max(0, opts.offset ?? 0);
   const windowed = opts.limit !== undefined || offset > 0;
   const notes = windowed ? allNotes.slice(offset, offset + (opts.limit ?? allNotes.length)) : allNotes;
-  const allBacklog = backlogNotes(seDir(projectRoot))
-    .sort(byPriority)
-    .map((n) => ({
-      ref: n.ref,
-      ready_when: n.drained?.where ?? "",
-      title: titleOf(n),
-      priority: priorityOf(n),
-      ...(withText ? { text: n.text } : {}),
-    }));
+  // THE POOL IS READ FROM THE REPOSITORY, NEVER FROM THE NOTE STORE (i17).
+  // It used to list `backlogNotes`, which live in `.se/` — machine-local and
+  // gitignored — so two clones disagreed about what the project was holding and
+  // neither was wrong. Measured 2026-08-18: a fresh clone reported 0 parked
+  // options while the machine that parked them reported 205.
+  //
+  // AN UNDRAINED CAPTURE IS NOT AN OPTION and deliberately never enters here.
+  // It has not been judged, and this list is what somebody may commit to. The
+  // pending count above stays the separate signal it always was.
+  const allBacklog = standingOptions(projectRoot).map((o) => ({
+    ref: o.id,
+    ready_when: o.ready_when,
+    title: headline(o.statement, GOAL_CAP),
+    priority: DEFAULT_PRIORITY,
+    ...(withText ? { text: o.statement } : {}),
+  }));
   const backlog = windowed ? allBacklog.slice(offset, offset + (opts.limit ?? allBacklog.length)) : allBacklog;
   return {
     counts: { expeditions: exps.length, iterations: its.length, notes: allNotes.length, backlog: allBacklog.length },

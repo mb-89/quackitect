@@ -44,9 +44,15 @@ test("draining splits: done and obsolete anywhere, carried and backlog only in t
   // which the pull serves through the reading loop.
   await pullTo(session, "retro");
   // Here, and ONLY here, the judgment dispositions work.
-  const parked = await call(server, "se_note_drain", { ref: ref2, disposition: "backlog", where: "ready when someone cares" });
+  const parked = await call(server, "se_note_drain", {
+    ref: ref2,
+    disposition: "backlog",
+    where: "ready when someone cares",
+    statement: "somebody should care about this eventually",
+  });
   assert.equal(parked.isError, false, JSON.stringify(parked.body));
   assert.equal(parked.body.inbox, 0, "both notes have now left the inbox");
+  assert.ok(typeof parked.body.minted === "string", "the backlog disposition no longer mints an option (i17)");
   // An unknown ref refuses with v2's carried clause.
   const missing = await call(server, "se_note_drain", { ref: "note-nope", disposition: "done" });
   assert.equal(missing.isError, true);
@@ -68,8 +74,19 @@ test("the backlog home (v1 port): backlog demands its ready-when, parks the note
   const bare = await call(server, "se_note_drain", { ref, disposition: "backlog" });
   assert.equal(bare.isError, true);
   assert.match(String(bare.body.expected), /ready when/);
-  // With the condition, the note parks: out of the inbox, on the backlog.
-  const parked = await call(server, "se_note_drain", { ref, disposition: "backlog", where: "ready when iterations exist" });
+  // AND SINCE i17 THE STATEMENT IS DEMANDED TOO. A condition says when the
+  // option comes back; it does not say what the option IS, and the pool is
+  // read by somebody who never saw the note.
+  const noStatement = await call(server, "se_note_drain", { ref, disposition: "backlog", where: "ready when iterations exist" });
+  assert.equal(noStatement.isError, true, "backlog without a statement was accepted");
+  assert.match(String(noStatement.body.expected), /statement/);
+  // With both, the note parks and an option is minted onto trunk.
+  const parked = await call(server, "se_note_drain", {
+    ref,
+    disposition: "backlog",
+    where: "ready when iterations exist",
+    statement: "later scope worth keeping, once there are iterations to put it in",
+  });
   assert.equal(parked.isError, false, JSON.stringify(parked.body));
   assert.equal(parked.body.inbox, 0);
   assert.equal(backlogNotes(seDir(root)).length, 1);

@@ -407,6 +407,33 @@ not close it either. A shell still writes wherever it is pointed.
 ### SE-C-073 — the note ref is unknown
 Draining takes an existing `note-...` ref, exactly as listed.
 
+### SE-C-140 — the mint would carry the note's own text
+An option's statement is AUTHORED. A statement sharing a run of six or more
+words with the raw note it came from is a copy, and it is refused before
+anything is written.
+
+WHY IT IS ITS OWN CLAUSE AND NOT A MISSING ARGUMENT. A field left empty and a
+field filled with the thing that must not travel are different mistakes with
+different remedies. One says fill this in; this one says you filled it in with
+the note.
+
+RAW NOTES NEVER ENTER VERSION CONTROL, and this is the only mechanical thing
+holding that line. A note is written mid-walk by whoever noticed something and
+may carry anything — a path, a name, a customer. An option lands on trunk,
+where SE-C-002 means it can never be taken off again.
+
+THE REFUSAL QUOTES THE OVERLAP BACK, so the fix is one edit rather than a
+guess at which sentence was recognised.
+
+WHAT IT DOES NOT CATCH, said here so nobody reads it as a guarantee: a
+REWORDED private sentence. The check makes the lazy path illegal; it does not
+make the honest path easier. That limit is
+raid-asm-a-verbatim-overlap-check-catches-the-paste-that-matters.
+
+CANNOT STATE IT CLEANLY? Say that, in the statement. The pool carries it as an
+open question, and an open question is a legal option. What is refused is
+silence and paste, never honesty.
+
 ### SE-C-125 — a wall of prose
 Long prose carries line breaks. Paragraphs are the author's job — no
 renderer can invent them.

@@ -9,6 +9,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } fr
 import { dirname, join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { stripBom } from "./jsonio.ts";
+import { mintOption } from "./pool.ts";
 
 /** MoSCoW, minus the fourth bucket. "Won't" already exists here as a drain
  *  disposition, so a note never needs to carry it. */
@@ -116,7 +117,9 @@ export function drainNote(
   disposition: string,
   where: string | undefined,
   judgmentAllowed: boolean,
-): { drained: string; disposition: string; inbox: number } {
+  statement?: string,
+  projectRoot?: string,
+): { drained: string; disposition: string; inbox: number; minted?: string } {
   if (!DISPOSITIONS.includes(disposition)) {
     throw new Rejection({
       clause: CLAUSES.REQUIRED_ARGS,
@@ -171,12 +174,47 @@ export function drainNote(
       source: "engine/inbox.ts drain",
     });
   }
+  // THE MINT COMES FIRST, AND THE ORDER IS THE GUARANTEE. A refused mint must
+  // leave the note exactly as it found it — pending, undrained, still in the
+  // count — or a rejected crossing would silently consume the note anyway.
+  let minted: string | undefined;
+  if (disposition === "backlog") {
+    if (projectRoot === undefined) {
+      throw new Rejection({
+        clause: CLAUSES.REQUIRED_ARGS,
+        expected: "a project root — the pool is a corpus node and lands in the repository",
+        got: "no root",
+        remedy: {
+          tool: "se_note_drain",
+          args: { ref, disposition: "backlog" },
+          note: "an internal wiring fault: the caller did not pass the root through",
+        },
+        source: "engine/inbox.ts drain",
+      });
+    }
+    minted = mintOption(projectRoot, {
+      statement: statement ?? "",
+      readyWhen: where ?? "",
+      source: ref,
+      noteText: hit.text,
+    }).id;
+  }
   hit.drained = { at: new Date().toISOString(), disposition, ...(where !== undefined && where !== "" ? { where } : {}) };
   writeFileSync(notesPath(seDirPath), `${all.map((n) => JSON.stringify(n)).join("\n")}\n`, "utf8");
-  return { drained: ref, disposition, inbox: all.filter((n) => n.drained === undefined).length };
+  return {
+    drained: ref,
+    disposition,
+    inbox: all.filter((n) => n.drained === undefined).length,
+    ...(minted !== undefined ? { minted } : {}),
+  };
 }
 
-/** BACKLOG = parked notes — the retro's migration step walks these. */
+/** THE NOTES THAT WERE DRAINED TO THE POOL — the local half of the crossing.
+ *
+ *  IT IS NOT THE POOL, and after i17 nothing reads it as one. The pool is
+ *  `standingOptions` in engine/pool.ts, on trunk, readable from any clone.
+ *  These are the local notes that produced one, kept so the two ends of a
+ *  crossing can still be found from each other. */
 export function backlogNotes(seDirPath: string): StrayNote[] {
   return readNotes(seDirPath).filter((n) => n.drained !== undefined && n.drained.disposition === "backlog");
 }

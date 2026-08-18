@@ -1528,13 +1528,18 @@ export function coreTools(
       name: "se_note_drain",
       title: "se.note.drain",
       description:
-        "Mark a note drained with its disposition. done | obsolete are MECHANICAL — superseded, already built, ruled on since — and drain wherever this tool is legal, the front desk included. carried | backlog are JUDGMENT and belong to the retro, which is the only place with the whole picture. backlog PARKS the note: where is REQUIRED as its 'ready when …' re-entry condition, and a later migration re-drains it. Drained notes leave the inbox count and the pending feed. An unknown ref is refused.",
+        "Mark a note drained with its disposition. done | obsolete are MECHANICAL — superseded, already built, ruled on since — and drain wherever this tool is legal, the front desk included. carried | backlog are JUDGMENT and belong to the retro, which is the only place with the whole picture. backlog MINTS AN OPTION INTO THE POOL, on trunk, where any clone can read it: where is REQUIRED as its 'ready when …' re-entry condition, and statement is REQUIRED as what the option IS, written for a reader who never saw the note. THE STATEMENT IS AUTHORED, NEVER PASTED — a raw note is a dump that may carry anything private, so a statement sharing a run of six or more words with it refuses SE-C-140. Cannot state it cleanly yet? Say that, and the pool carries it as an open question. The raw note stays local, unmoved, and is marked drained. Drained notes leave the inbox count and the pending feed. An unknown ref is refused.",
       inputSchema: {
         type: "object",
         properties: {
           ref: { type: "string", description: "the note's ref (note-…)" },
           disposition: { type: "string", description: "done | obsolete | carried | backlog" },
           where: { type: "string", description: "where it landed or lives on — backlog REQUIRES it: ready when …" },
+          statement: {
+            type: "string",
+            description:
+              "backlog REQUIRES it: what the option IS, in your own words, for somebody who never saw the note. It lands on trunk and a paste is refused — say 'this cannot be stated cleanly yet' rather than copying the note.",
+          },
         },
         required: ["ref", "disposition"],
       },
@@ -1545,6 +1550,8 @@ export function coreTools(
           String(args.disposition),
           args.where === undefined ? undefined : String(args.where),
           judgmentDrainAllowed(),
+          args.statement === undefined ? undefined : String(args.statement),
+          projectRoot,
         ),
     },
     {
