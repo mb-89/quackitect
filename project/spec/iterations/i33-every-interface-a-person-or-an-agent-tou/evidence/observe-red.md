@@ -2,10 +2,10 @@
 form: observe-red
 by: agent
 signed_off: 2026-08-17T16:59:04.733Z
-reopened: "2026-08-17T16:58:33.189Z — specify-build re-signed above it, and author-tests added a sixth spec. The red check reads every test-spec minted in this record, so it must run against the set as it now stands."
-amended: "2026-08-17T17:20:19.024Z by agent — This form said the build begins with four chunks, hours after eight were stamped, and it was re-signed carrying that sentence. The four are kept as the original plan because their ordering is the finding, and the current count is stated beside them."
+reopened: 2026-08-17T16:58:33.189Z — specify-build re-signed above it, and author-tests added a sixth spec. The red check reads every test-spec minted in this record, so it must run against the set as it now stands.
+amended: 2026-08-17T17:20:19.024Z by agent — This form said the build begins with four chunks, hours after eight were stamped, and it was re-signed carrying that sentence. The four are kept as the original plan because their ordering is the finding, and the current count is stated beside them.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / observe-red

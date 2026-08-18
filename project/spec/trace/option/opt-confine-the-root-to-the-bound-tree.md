@@ -6,7 +6,7 @@ statement: hold the bound tree as a capability and resolve every path beneath it
 cluster: cluster-the-walk
 question: which tree a path resolves to
 found_by: prior-art
-source: "capability-based confinement — openat2 RESOLVE_BENEATH (Linux 5.6+), openat(O_RESOLVE_BENEATH) (FreeBSD 13+), and cap-std's Dir handle; https://github.com/bytecodealliance/cap-std/blob/main/README.md"
+source: capability-based confinement — openat2 RESOLVE_BENEATH (Linux 5.6+), openat(O_RESOLVE_BENEATH) (FreeBSD 13+), and cap-std's Dir handle; https://github.com/bytecodealliance/cap-std/blob/main/README.md
 ---
 
 ## Mechanism

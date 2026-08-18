@@ -24,7 +24,7 @@ checks:
       - TBD
       - TBC
       - TBR
-      - "???"
+      - ???
     hint: an unnamed flow connects nothing
   - field: statement
     ban_phrases:

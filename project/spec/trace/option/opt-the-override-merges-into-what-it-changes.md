@@ -6,7 +6,7 @@ statement: an override states only the keys it changes, and the machine merges t
 cluster: the-walk
 question: how much of an artifact an override replaces
 found_by: prior-art
-source: "Kustomize strategic merge patches (kubectl.docs.kubernetes.io/references/kustomize/kustomization/patches/), Helm values precedence and null-deletes (helm.sh/docs/chart_template_guide/values_files/), Hugo theme components data and i18n merging (gohugo.io/hugo-modules/theme-components/), Jekyll _data merging (jekyllrb.com/docs/themes/)"
+source: Kustomize strategic merge patches (kubectl.docs.kubernetes.io/references/kustomize/kustomization/patches/), Helm values precedence and null-deletes (helm.sh/docs/chart_template_guide/values_files/), Hugo theme components data and i18n merging (gohugo.io/hugo-modules/theme-components/), Jekyll _data merging (jekyllrb.com/docs/themes/)
 ---
 
 ## Mechanism

@@ -3,7 +3,7 @@ minted_in: i35-the-cloud-run-s-findings-land-the-fix-fi
 id: fn-arrive-on-a-machine.supply-the-dependencies
 type: "[[function]]"
 cluster: the-arrival
-statement: "bring the project's dependencies to what it declares it needs"
+statement: bring the project's dependencies to what it declares it needs
 satisfies:
   - req-one-command-takes-a-fresh-clone-to-a-live-lane
   - req-arriving-twice-changes-nothing

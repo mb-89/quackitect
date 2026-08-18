@@ -3,7 +3,7 @@ minted_in: i35-the-cloud-run-s-findings-land-the-fix-fi
 id: fn-arrive-on-a-machine.account-for-the-arrival
 type: "[[function]]"
 cluster: the-arrival
-statement: "report what each step did, and which one failed, without ending the session"
+statement: report what each step did, and which one failed, without ending the session
 satisfies:
   - req-the-arrival-never-costs-the-session
 inputs:

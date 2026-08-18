@@ -3,13 +3,13 @@ minted_in: i1
 id: tsp-walk-window
 type: "[[test-spec]]"
 statement: The panel carries every update to the render, holds the reader's place, and keeps its colors and scripts honest, verified by test over the mirror's contract.
-method: "test"
+method: test
 verifies:
-  - "req-reader-keeps-their-place"
-  - "req-every-update-reaches-the-render"
-  - "req-colors-are-configuration"
-  - "req-narration-toll-is-collected"
-  - "req-decision-graph-reads-as-branches"
+  - req-reader-keeps-their-place
+  - req-every-update-reaches-the-render
+  - req-colors-are-configuration
+  - req-narration-toll-is-collected
+  - req-decision-graph-reads-as-branches
 files:
   - tests/mirror-contract.test.ts
   - tests/panel.test.ts

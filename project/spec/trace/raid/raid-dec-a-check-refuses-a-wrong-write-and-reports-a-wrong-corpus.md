@@ -7,7 +7,7 @@ statement: A bound check REFUSES where the write itself breaks the rule, and REP
 owner: the owner
 trigger: any new check, and the first complaint that a check refused something the author did not cause
 status: decided
-impact: "Without the seam every check is either too soft to matter or aims its refusal at whoever happened to edit next. The second is worse — it taxes an unrelated edit with somebody else's debt, which is exactly how a check becomes the thing everybody dreads."
+impact: Without the seam every check is either too soft to matter or aims its refusal at whoever happened to edit next. The second is worse — it taxes an unrelated edit with somebody else's debt, which is exactly how a check becomes the thing everybody dreads.
 breaks_how_badly: crippling
 how_likely: expected
 weighs_with: none

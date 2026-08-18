@@ -7,7 +7,7 @@ statement: A result the host moved to disk is re-fetched by ref exactly as the l
 owner: the driving agent
 trigger: any state that re-fetches a large result by ref, and the guidance edit that would withdraw the promise
 status: open
-impact: "The lane's own guidance tells every agent that a host-truncated result is recovered by ref rather than by reading the host's file. A reader who follows that instruction gets a silently shortened value and no sign that anything was removed. It is the shape of evidence with the evidence removed, and it is worse than an honest refusal because it looks like it worked."
+impact: The lane's own guidance tells every agent that a host-truncated result is recovered by ref rather than by reading the host's file. A reader who follows that instruction gets a silently shortened value and no sign that anything was removed. It is the shape of evidence with the evidence removed, and it is worse than an honest refusal because it looks like it worked.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:

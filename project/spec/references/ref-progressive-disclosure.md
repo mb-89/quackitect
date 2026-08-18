@@ -1,5 +1,5 @@
 ---
-title: "Progressive Disclosure (Nielsen Norman Group)"
+title: Progressive Disclosure (Nielsen Norman Group)
 url: https://www.nngroup.com/articles/progressive-disclosure/
 kind: informative
 version: "2006"

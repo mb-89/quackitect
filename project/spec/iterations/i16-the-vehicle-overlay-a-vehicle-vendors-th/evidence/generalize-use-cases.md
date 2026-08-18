@@ -2,9 +2,9 @@
 form: generalize-use-cases
 by: agent
 signed_off: 2026-08-18T11:01:24.624Z
-reopened: "2026-08-18T11:01:03.091Z — The ramp-up story needs a use case over it, and both use cases gained extensions for the affordance. uc-drive-a-foreign-product's step 2 was rewritten because the system coming up in a foreign tree happens on every pass rather than sometimes."
+reopened: 2026-08-18T11:01:03.091Z — The ramp-up story needs a use case over it, and both use cases gained extensions for the affordance. uc-drive-a-foreign-product's step 2 was rewritten because the system coming up in a foreign tree happens on every pass rather than sometimes.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / generalize-use-cases

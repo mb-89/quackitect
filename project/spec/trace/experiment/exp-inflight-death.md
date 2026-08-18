@@ -7,8 +7,8 @@ probes:
   - raid-ar-crash-lands-safe
 timebox: one hour
 form: script
-promote: "none — the deadline is one number for specify-build, and it must sit above the 94 ms a crash takes to reach the caller"
-folds_to: "raid-ar-crash-lands-safe is re-grounded, because the channel detects a dead satellite in under 100 ms"
+promote: none — the deadline is one number for specify-build, and it must sit above the 94 ms a crash takes to reach the caller
+folds_to: raid-ar-crash-lands-safe is re-grounded, because the channel detects a dead satellite in under 100 ms
 faked: a bare TCP channel rather than the real lane protocol, and a child that dies on receipt rather than mid-work; no satellite exists to kill
 fallback: if a caller cannot tell a dead server from a slow one, every call carries a deadline and the core answers for a satellite that misses it
 verdict: holds

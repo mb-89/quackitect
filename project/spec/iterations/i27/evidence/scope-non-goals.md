@@ -2,9 +2,9 @@
 form: scope-non-goals
 by: agent
 signed_off: 2026-08-13T19:02:56.460Z
-reopened: "2026-08-13T19:02:12.558Z — The fan-out was listed as a non-goal naming no receiving record, and eight drained notes put it here and nowhere else - so as written the work is lost rather than deferred."
+reopened: 2026-08-13T19:02:12.558Z — The fan-out was listed as a non-goal naming no receiving record, and eight drained notes put it here and nowhere else - so as written the work is lost rather than deferred.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / scope-non-goals

@@ -6,7 +6,7 @@ statement: split the one path string into two arguments, the tree and the path w
 cluster: cluster-the-walk
 question: how a path names its tree
 found_by: transform
-source: "SIT Division, applied to the incumbent — split a component and rearrange the parts"
+source: SIT Division, applied to the incumbent — split a component and rearrange the parts
 ---
 
 ## Mechanism

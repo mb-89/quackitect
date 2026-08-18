@@ -7,7 +7,7 @@ statement: A vehicle's owner reads what an arriving update did before keeping it
 owner: the adjudicator
 trigger: the first update taken by somebody who did not write the program
 status: deferred
-defer_until: "the update mechanism exists and one real update is taken by somebody who did not write the program. The probe on this node is a WATCH rather than a run, and nothing a program can assert stands in for whether a person read what they kept."
+defer_until: the update mechanism exists and one real update is taken by somebody who did not write the program. The probe on this node is a WATCH rather than a run, and nothing a program can assert stands in for whether a person read what they kept.
 impact: the winning design's entire safety story for a wrong migration is that the result is left unstaged in front of a person, so an owner who keeps without reading has no signal at all
 breaks_how_badly: crippling
 how_likely: expected

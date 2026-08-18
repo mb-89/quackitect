@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: fix one minimum evidence record per decision event, so every decision can be reconstructed from the record alone
 cluster: cluster-the-account
 found_by: prior-art
-source: "Decision Trace Schema for Governance Evidence in Real-Time Risk Systems, https://arxiv.org/pdf/2604.09296"
+source: Decision Trace Schema for Governance Evidence in Real-Time Risk Systems, https://arxiv.org/pdf/2604.09296
 ---
 
 ## Mechanism

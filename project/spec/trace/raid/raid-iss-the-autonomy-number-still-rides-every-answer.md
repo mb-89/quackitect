@@ -3,7 +3,7 @@ minted_in: i27
 id: raid-iss-the-autonomy-number-still-rides-every-answer
 type: "[[raid]]"
 kind: issue
-statement: "The lane's own answers still carry a numeric autonomy value, so tsp-autonomy-tiers cannot be observed green. Every se_pull result of 2026-08-14 carried an autonomy number beside the categorical tier."
+statement: The lane's own answers still carry a numeric autonomy value, so tsp-autonomy-tiers cannot be observed green. Every se_pull result of 2026-08-14 carried an autonomy number beside the categorical tier.
 owner: the maintainer
 trigger: the next sweep for numeric autonomy, or any iteration that touches the packet's header
 status: open

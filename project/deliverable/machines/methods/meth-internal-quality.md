@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "Internal quality is the quality of the engineering artifacts. Neglect shows up later as technical debt, so it is judged at every delivery."
+statement: Internal quality is the quality of the engineering artifacts. Neglect shows up later as technical debt, so it is judged at every delivery.
 catalog: iq_checklist
 catalog_sections: Checklist
 ---

@@ -1,11 +1,11 @@
 ---
 form: gate-implementation
 bless: blessed by human
-amended: "2026-08-14T19:11:21.014Z by agent — recording whose adjudication the bless carries, before it is applied"
+amended: 2026-08-14T19:11:21.014Z by agent — recording whose adjudication the bless carries, before it is applied
 by: agent
 signed_off: 2026-08-14T18:09:26.069Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-implementation

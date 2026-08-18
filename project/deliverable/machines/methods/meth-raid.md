@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "One register holds the risks, assumptions, issues and dependencies — and the decisions, whose high-graded members are the ADRs."
+statement: One register holds the risks, assumptions, issues and dependencies — and the decisions, whose high-graded members are the ADRs.
 ---
 
 ## Situation

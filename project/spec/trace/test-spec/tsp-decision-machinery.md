@@ -3,22 +3,22 @@ minted_in: i1
 id: tsp-decision-machinery
 type: "[[test-spec]]"
 statement: The choosing machinery stays closed until real alternatives stand, records the case against every loser, and treats none-chosen as a legal outcome, verified by test over the decision editors and laws.
-method: "test"
+method: test
 verifies:
-  - "req-two-options-beyond-the-obvious"
-  - "req-option-carries-cost-and-shed"
-  - "req-choice-records-case-against-losers"
-  - "req-choosing-none-is-legal"
-  - "req-single-option-recorded-as-finding"
-  - "req-problem-recorded-before-options"
-  - "req-ideation-opens-no-record"
+  - req-two-options-beyond-the-obvious
+  - req-option-carries-cost-and-shed
+  - req-choice-records-case-against-losers
+  - req-choosing-none-is-legal
+  - req-single-option-recorded-as-finding
+  - req-problem-recorded-before-options
+  - req-ideation-opens-no-record
 files:
-  - "tests/pugh.test.ts"
-  - "tests/pareto.test.ts"
-  - "tests/compare.test.ts"
-  - "tests/morphbox.test.ts"
-  - "tests/catalogs.test.ts"
-  - "tests/ideation.test.ts"
+  - tests/pugh.test.ts
+  - tests/pareto.test.ts
+  - tests/compare.test.ts
+  - tests/morphbox.test.ts
+  - tests/catalogs.test.ts
+  - tests/ideation.test.ts
 ---
 
 ## Scope

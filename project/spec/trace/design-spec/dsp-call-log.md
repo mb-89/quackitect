@@ -4,15 +4,15 @@ id: dsp-call-log
 type: "[[design-spec]]"
 statement: every call appended with role and channel, carried by one jsonl log and the views that count it
 realizes:
-  - "el-account"
-  - "if-walk-engine-to-account"
-  - "if-holding-pen-to-account"
-  - "if-method-compiler-to-account"
-  - "if-record-store-to-account"
+  - el-account
+  - if-walk-engine-to-account
+  - if-holding-pen-to-account
+  - if-method-compiler-to-account
+  - if-record-store-to-account
 files:
-  - "project/deliverable/engine/calllog.ts"
-  - "project/deliverable/engine/version.ts"
-  - "project/deliverable/engine/survey.ts"
+  - project/deliverable/engine/calllog.ts
+  - project/deliverable/engine/version.ts
+  - project/deliverable/engine/survey.ts
 ---
 
 ## Responsibility

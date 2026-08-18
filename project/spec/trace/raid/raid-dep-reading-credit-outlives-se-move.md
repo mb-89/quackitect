@@ -11,9 +11,9 @@ impact: A credit keyed to a path breaks silently when i9 relocates the folder. T
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:
-  - "project/spec/version-planning.md § i9 — .se and the corpus"
-  - "i3's kickoff gate, round 2 red team, 2026-08-13"
-  - "note-61b267004f20 and note-6fc953ffcdc8, which carry the credit's design"
+  - project/spec/version-planning.md § i9 — .se and the corpus
+  - i3's kickoff gate, round 2 red team, 2026-08-13
+  - note-61b267004f20 and note-6fc953ffcdc8, which carry the credit's design
 ---
 
 ## What is depended on

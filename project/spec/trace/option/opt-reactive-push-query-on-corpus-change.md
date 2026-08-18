@@ -6,7 +6,7 @@ statement: register a query once; the engine pushes fresh matching rows to the s
 cluster: cluster-the-query
 question: how does answer-a-structured-query evaluate a query against the corpus
 found_by: transform
-source: "SCAMPER Reverse, held against answer-a-structured-query's request direction; the shape Dataview auto-refresh already runs, per its own README"
+source: SCAMPER Reverse, held against answer-a-structured-query's request direction; the shape Dataview auto-refresh already runs, per its own README
 ---
 
 ## Mechanism

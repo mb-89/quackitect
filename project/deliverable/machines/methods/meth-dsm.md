@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "A DSM is one domain's elements as a square, directed dependency matrix. Row affects column, and every structure-analysis operation reads it."
+statement: A DSM is one domain's elements as a square, directed dependency matrix. Row affects column, and every structure-analysis operation reads it.
 source: ref-structural-complexity-management
 ---
 

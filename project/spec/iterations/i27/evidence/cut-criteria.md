@@ -2,9 +2,9 @@
 form: cut-criteria
 by: agent
 signed_off: 2026-08-14T09:58:04.805Z
-reopened: "2026-08-14T09:57:34.169Z — Its claim fell when write-requirements was reopened for the engine demand, and it was walked past rather than re-earned, so evaluate-set's claim is dropped behind it."
+reopened: 2026-08-14T09:57:34.169Z — Its claim fell when write-requirements was reopened for the engine demand, and it was walked past rather than re-earned, so evaluate-set's claim is dropped behind it.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / cut-criteria

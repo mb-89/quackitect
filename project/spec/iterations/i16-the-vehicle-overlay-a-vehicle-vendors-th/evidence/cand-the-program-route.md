@@ -2,10 +2,10 @@
 form: cand-the-program-route
 by: agent
 signed_off: 2026-08-18T14:33:27.346Z
-reopened: "2026-08-18T14:25:20.491Z — the candidate swapped its pick on how a driven tree finds its copy, so what this state composed is no longer what stands"
-amended: "2026-08-18T13:52:04.747Z by agent — the probe conflicted rather than failing to merge, and the program arm had no failure mode available"
+reopened: 2026-08-18T14:25:20.491Z — the candidate swapped its pick on how a driven tree finds its copy, so what this state composed is no longer what stands
+amended: 2026-08-18T13:52:04.747Z by agent — the probe conflicted rather than failing to merge, and the program arm had no failure mode available
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / cand-the-program-route

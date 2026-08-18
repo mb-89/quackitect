@@ -2,10 +2,10 @@
 form: identify-assumptions
 by: agent
 signed_off: 2026-08-17T16:53:18.507Z
-reopened: "2026-08-17T16:52:15.471Z — derive-functions re-signed above it, and write-requirements gained an eighth row. The sweep walks the requirements, so a new row means the sweep has a source it has not been asked about."
-amended: "2026-08-17T14:38:36.979Z by agent — the function state re-signed above it; the sweep opens nothing new"
+reopened: 2026-08-17T16:52:15.471Z — derive-functions re-signed above it, and write-requirements gained an eighth row. The sweep walks the requirements, so a new row means the sweep has a source it has not been asked about.
+amended: 2026-08-17T14:38:36.979Z by agent — the function state re-signed above it; the sweep opens nothing new
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / identify-assumptions

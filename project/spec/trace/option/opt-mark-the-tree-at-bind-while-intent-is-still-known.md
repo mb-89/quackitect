@@ -6,7 +6,7 @@ statement: stamp the target tree onto the record at the moment of binding, when 
 cluster: cluster-the-walk
 question: which tree a path resolves to
 found_by: analogy
-source: "the Universal Protocol for preventing wrong-site surgery — the site is marked by the operator with the patient awake, BEFORE anaesthesia removes their ability to confirm; https://www.ncbi.nlm.nih.gov/books/NBK2678/box/ch36.box2/"
+source: the Universal Protocol for preventing wrong-site surgery — the site is marked by the operator with the patient awake, BEFORE anaesthesia removes their ability to confirm; https://www.ncbi.nlm.nih.gov/books/NBK2678/box/ch36.box2/
 ---
 
 ## Mechanism

@@ -2,9 +2,9 @@
 form: write-stories
 by: agent
 signed_off: 2026-08-18T11:00:05.892Z
-reopened: "2026-08-18T10:59:39.979Z — The affordance in scope made a ramp-up story owed, and there was none. sty-press-create-vehicle-and-land-in-it is minted and sty-drive-somebody-elses-product is revised to go through the surface."
+reopened: 2026-08-18T10:59:39.979Z — The affordance in scope made a ramp-up story owed, and there was none. sty-press-create-vehicle-and-land-in-it is minted and sty-drive-somebody-elses-product is revised to go through the surface.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / write-stories

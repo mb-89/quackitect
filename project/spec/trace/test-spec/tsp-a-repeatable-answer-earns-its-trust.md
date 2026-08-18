@@ -2,13 +2,13 @@
 minted_in: i35-the-cloud-run-s-findings-land-the-fix-fi
 id: tsp-a-repeatable-answer-earns-its-trust
 type: "[[test-spec]]"
-statement: "An engineer re-runs the agent's own search and gets the same rows back, so the answer is trusted because it is repeatable rather than because the agent sounded sure — verified by demonstration."
-method: "demonstration"
+statement: An engineer re-runs the agent's own search and gets the same rows back, so the answer is trusted because it is repeatable rather than because the agent sounded sure — verified by demonstration.
+method: demonstration
 demonstrates:
-  - "sty-trust-a-repeatable-answer"
+  - sty-trust-a-repeatable-answer
 verifies: []
 files:
-  - "none — the procedure below is the definition; the observed run is the evidence"
+  - none — the procedure below is the definition; the observed run is the evidence
 ---
 
 ## Scope

@@ -2,10 +2,10 @@
 form: draft-vision
 by: agent
 signed_off: 2026-08-17T16:44:07.423Z
-reopened: "2026-08-17T16:43:39.353Z — The kickoff was RE-SIGNED at 14:35 when its one prose goal became a list of five. Every claim below it, this one first, answered the older question. Their bodies already address the five goals; their signatures do not, and a signature is what says a claim answers today's ground. This reopen puts the chain back on the walk so each state re-earns its stamp as a recheck."
+reopened: 2026-08-17T16:43:39.353Z — The kickoff was RE-SIGNED at 14:35 when its one prose goal became a list of five. Every claim below it, this one first, answered the older question. Their bodies already address the five goals; their signatures do not, and a signature is what says a claim answers today's ground. This reopen puts the chain back on the walk so each state re-earns its stamp as a recheck.
 amended: "2026-08-17T16:21:18.644Z by agent — The breach figure read as an exact count and it is a floor. The call log's own query omits matching records silently, so 181 is the least it can be rather than the number. The kickoff also re-signed after its breach row was corrected, and this state's three rulings are unmoved: they rule conflicts between STANDING PRODUCT goals."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / draft-vision

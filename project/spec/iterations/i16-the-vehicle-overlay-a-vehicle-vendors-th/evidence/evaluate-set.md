@@ -2,10 +2,10 @@
 form: evaluate-set
 by: agent
 signed_off: 2026-08-18T15:39:16.581Z
-reopened: "2026-08-18T15:39:12.884Z — cut-criteria was re-signed after the fitness flags landed, so this claim answered ground that has since moved"
-amended: "2026-08-18T14:19:01.513Z by agent — the rewrite dropped the exercised examples, which this state requires, and the earlier version carried two claims since disproved"
+reopened: 2026-08-18T15:39:12.884Z — cut-criteria was re-signed after the fitness flags landed, so this claim answered ground that has since moved
+amended: 2026-08-18T14:19:01.513Z by agent — the rewrite dropped the exercised examples, which this state requires, and the earlier version carried two claims since disproved
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / evaluate-set

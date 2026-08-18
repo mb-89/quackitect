@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "DSM clustering searches cluster assignments over a DSM. It maximises dependency inside a cluster and minimises it across clusters, exposing candidate modules."
+statement: DSM clustering searches cluster assignments over a DSM. It maximises dependency inside a cluster and minimises it across clusters, exposing candidate modules.
 source: ref-structural-complexity-management
 ---
 

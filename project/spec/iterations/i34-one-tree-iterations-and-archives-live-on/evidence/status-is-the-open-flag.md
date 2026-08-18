@@ -3,7 +3,7 @@ form: status-is-the-open-flag
 by: agent
 signed_off: 2026-08-16T08:04:37.163Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / status-is-the-open-flag

@@ -3,12 +3,12 @@ minted_in: i1
 id: tsp-derivation-analysis
 type: "[[test-spec]]"
 statement: Every trace view derives from the node files alone and every reachable capability is covered, verified by analysis over the derivation chain.
-method: "analysis"
+method: analysis
 verifies:
-  - "req-trace-view-derived-from-files"
-  - "req-reachable-capability-is-traced"
+  - req-trace-view-derived-from-files
+  - req-reachable-capability-is-traced
 files:
-  - "none — the model below is the definition; the recorded analysis is the evidence"
+  - none — the model below is the definition; the recorded analysis is the evidence
 ---
 
 ## Scope

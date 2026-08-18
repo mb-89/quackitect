@@ -7,8 +7,8 @@ statement: The surfaces read slow because rendering them is slow, rather than be
 owner: the driving agent
 trigger: a surface measured on an idle engine answers inside the bound
 status: open
-probed: "2026-08-15"
-probe: "scheduled - it needs a spike. The lane forbids calling its own mirror, because the run would block the server being measured."
+probed: 2026-08-15
+probe: scheduled - it needs a spike. The lane forbids calling its own mirror, because the run would block the server being measured.
 impact: Every slow reading in this record was taken while an agent walked. If the render is fast on an idle engine, the defect is single-threaded contention rather than render cost, and the fix aimed at rendering lands nowhere.
 breaks_how_badly: corrosive
 how_likely: plausible

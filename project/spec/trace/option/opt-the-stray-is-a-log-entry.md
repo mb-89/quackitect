@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: delete the note store and let a stray be a log entry of its own kind, with pending computed as a query rather than kept as a state
 cluster: cluster-the-holding-pen
 found_by: without
-source: "trimming per meth-trimming — the account absorbs the job"
+source: trimming per meth-trimming — the account absorbs the job
 ---
 
 ## Mechanism

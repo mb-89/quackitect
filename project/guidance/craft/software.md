@@ -1,6 +1,6 @@
 ---
 id: software
-statement: "How to write code and record work. These are the universal rules, and the project's own rulings live in `project/guidance/method/engineering.md`."
+statement: How to write code and record work. These are the universal rules, and the project's own rulings live in `project/guidance/method/engineering.md`.
 applies_to:
   - work
   - overhaul

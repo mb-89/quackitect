@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "What you cannot observe you cannot test. What you cannot control you cannot test either."
+statement: What you cannot observe you cannot test. What you cannot control you cannot test either.
 ---
 
 ## Situation

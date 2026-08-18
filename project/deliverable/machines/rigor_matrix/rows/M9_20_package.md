@@ -24,9 +24,13 @@ evidence:
   - name: works
     description: the package used for real - does it work? yes passes plainly, no owes its rationale
     template: choice-with-rationale
-    options: ["yes", "no"]
-    passing: ["yes"]
-    rationale_for: ["no"]
+    options:
+      - yes
+      - no
+    passing:
+      - yes
+    rationale_for:
+      - no
   - name: emit_back
     description: what this record learned about the SHARED method - a matrix row, a form, a method card, a refusal, a missing check - one line each naming the target and the change, or none-found stated plainly
     template: list

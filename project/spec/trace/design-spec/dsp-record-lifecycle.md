@@ -4,12 +4,12 @@ id: dsp-record-lifecycle
 type: "[[design-spec]]"
 statement: records seeded, bound, landed and archived as folders on trunk, with generated container machines
 realizes:
-  - "el-record-store"
-  - "if-front-desk-to-record-store"
+  - el-record-store
+  - if-front-desk-to-record-store
 files:
-  - "project/deliverable/engine/iterations.ts"
-  - "project/deliverable/engine/worktree.ts"
-  - "project/deliverable/engine/seed.ts"
+  - project/deliverable/engine/iterations.ts
+  - project/deliverable/engine/worktree.ts
+  - project/deliverable/engine/seed.ts
 ---
 
 ## Responsibility

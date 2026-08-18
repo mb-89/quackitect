@@ -15,7 +15,7 @@ weighs_against: none
 source_refs:
   - project/spec/iterations/i6-conformance-goes-mechanical-checks-bind-/record.md
   - raid-dec-a-check-refuses-a-wrong-write-and-reports-a-wrong-corpus
-  - "owner ruling 2026-08-13, at i6's seeding"
+  - owner ruling 2026-08-13, at i6's seeding
   - i6 draft-vision — conflict 4, required wins
 ---
 

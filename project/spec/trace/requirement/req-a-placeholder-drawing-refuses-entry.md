@@ -10,10 +10,10 @@ breaks_how_badly: fatal
 refines:
   - uc-take-a-step
 source_refs:
-  - "engine/iterations.ts SCAFFOLD_NONE, and the branch that marks the compiled machine"
-  - "engine/session.ts seedSubs, the entry refusal"
+  - engine/iterations.ts SCAFFOLD_NONE, and the branch that marks the compiled machine
+  - engine/session.ts seedSubs, the entry refusal
   - "observed live 2026-08-13: i3 passed specify-build, seeded nothing, and build-steps reported done"
-  - "note-524c23da2f26, ruling that the guard belongs at entry rather than at compile"
+  - note-524c23da2f26, ruling that the guard belongs at entry rather than at compile
 priority: must
 ---
 

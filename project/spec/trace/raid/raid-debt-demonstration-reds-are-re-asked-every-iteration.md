@@ -10,7 +10,7 @@ status: open
 looked: 2026-08-18
 breaks_how_badly: abrasive
 how_likely: expected
-impact: "observe-red refuses while any box stands open. i35 minted 2 demonstration specs and met a checklist of 15, so 13 belonged to other records and none of them had a red for THIS delta to observe. The alternative is ticking boxes on reds nobody watched, which is worse — so the walk stops until each one is either fabricated or owed."
+impact: observe-red refuses while any box stands open. i35 minted 2 demonstration specs and met a checklist of 15, so 13 belonged to other records and none of them had a red for THIS delta to observe. The alternative is ticking boxes on reds nobody watched, which is worse — so the walk stops until each one is either fabricated or owed.
 source_refs:
   - tsp-autonomy-tiers
   - tsp-coupling-disposition

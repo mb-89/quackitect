@@ -1,10 +1,10 @@
 ---
 form: specify-build
-amended: "2026-08-14T15:04:18.399Z by agent — the promotions table was empty and anything_else said the two standing promotions were not this record's to place; the law showed both wrong"
+amended: 2026-08-14T15:04:18.399Z by agent — the promotions table was empty and anything_else said the two standing promotions were not this record's to place; the law showed both wrong
 by: agent
 signed_off: 2026-08-14T14:59:06.338Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / specify-build

@@ -6,7 +6,7 @@ statement: level every open tree against trunk at entry and at reload rather tha
 cluster: cluster-the-walk
 question: how shared method reaches a tree
 found_by: contradiction
-source: "TRIZ separation IN TIME, on the contradiction that fanning method out removes the reason to leave and multiplies every method write by the number of open trees"
+source: TRIZ separation IN TIME, on the contradiction that fanning method out removes the reason to leave and multiplies every method write by the number of open trees
 ---
 
 ## Mechanism

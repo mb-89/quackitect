@@ -7,8 +7,8 @@ statement: Node's TAP reporter keeps emitting a per-case duration, so the engine
 owner: the driving agent
 trigger: a Node upgrade, or a scoped run whose parsed timings come back empty
 status: open
-probe: "holds on the installed Node - a failing case in this record's own scoped run came back carrying duration_ms 454.6437. Not checked against any other Node version."
-probed: "2026-08-15"
+probe: holds on the installed Node - a failing case in this record's own scoped run came back carrying duration_ms 454.6437. Not checked against any other Node version.
+probed: 2026-08-15
 impact: The cheap fix for req-scoped-run-records-its-timings reads durations out of the TAP stream. If Node stops emitting them, that fix silently records nothing and the measurement it enables goes quiet without failing.
 breaks_how_badly: abrasive
 how_likely: conceivable

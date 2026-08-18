@@ -11,7 +11,7 @@ impact: The entrypoint reports success and exits, the host reaps the lane with t
 breaks_how_badly: fatal
 how_likely: plausible
 probe: "holds on this host. i35 on 2026-08-17: the detached lane kept answering after the shell that started it exited. ONE FAILURE MODE FOUND AND IT IS NOT A REAP: a stdio lane exits on stdin EOF, which is correct. The headless lane has no such input to lose."
-probed: "2026-08-17"
+probed: 2026-08-17
 source_refs:
   - req-the-lane-runs-without-a-console
   - nbr-cloud-host

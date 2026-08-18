@@ -2,7 +2,7 @@
 kind: method
 catalog: damage_levels
 catalog_sections: THE FIVE LEVELS
-statement: "How badly a requirement breaks things when it is not met. Five levels, each with a test somebody can apply."
+statement: How badly a requirement breaks things when it is not met. Five levels, each with a test somebody can apply.
 ---
 
 # The damage scale — how badly, not how much

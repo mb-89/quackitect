@@ -1,10 +1,10 @@
 ---
 form: log-risks
-amended: "2026-08-16T16:31:18.683Z by agent — ref \"main\" resolves — verified 2026-08-16; one of the two carried-forward raid entries is now closed"
+amended: 2026-08-16T16:31:18.683Z by agent — ref "main" resolves — verified 2026-08-16; one of the two carried-forward raid entries is now closed
 by: agent
 signed_off: 2026-08-16T16:22:13.867Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / log-risks

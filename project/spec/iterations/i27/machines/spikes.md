@@ -1,19 +1,19 @@
 ---
 steps:
   - id: one-seam
-    statement: "probe raid-risk-a-write-lands-in-the-wrong-tree-silently - can every lane verb be routed through one resolution seam, shell included"
+    statement: probe raid-risk-a-write-lands-in-the-wrong-tree-silently - can every lane verb be routed through one resolution seam, shell included
     depends_on: []
     realization: probe
   - id: channel-cost
-    statement: "probe raid-asm-machine-wide-state-serves-over-a-local-channel - what one call-log append costs across a local channel against a direct write"
+    statement: probe raid-asm-machine-wide-state-serves-over-a-local-channel - what one call-log append costs across a local channel against a direct write
     depends_on: []
     realization: probe
   - id: satellite-start
-    statement: "probe raid-ar-call-answers-in-one-second - what a satellite costs to start with the engine module load INCLUDED"
+    statement: probe raid-ar-call-answers-in-one-second - what a satellite costs to start with the engine module load INCLUDED
     depends_on: []
     realization: probe
   - id: inflight-death
-    statement: "probe raid-ar-crash-lands-safe - what a caller sees when the process serving its call dies mid-answer"
+    statement: probe raid-ar-crash-lands-safe - what a caller sees when the process serving its call dies mid-answer
     depends_on: []
     realization: probe
 ---

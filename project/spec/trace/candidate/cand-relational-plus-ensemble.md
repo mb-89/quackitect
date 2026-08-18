@@ -2,7 +2,7 @@
 minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: cand-relational-plus-ensemble
 type: "[[candidate]]"
-name: "Relational plus ensemble"
+name: Relational plus ensemble
 statement: "heaviest build: a real relational store, two independent rankers required to agree before a candidate surfaces"
 picks:
   - "[[opt-embedded-relational-store-with-sql]]"

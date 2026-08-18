@@ -8,7 +8,7 @@ owner: the driving agent
 status: superseded
 breaks_how_badly: crippling
 how_likely: expected
-impact: "A copy sharing no commit with its source has no merge base, so no update can ever reach it by any mechanism that compares. That is the incumbent's shape and it is why the incumbent cannot reach step 6 of the use case at all."
+impact: A copy sharing no commit with its source has no merge base, so no update can ever reach it by any mechanism that compares. That is the incumbent's shape and it is why the incumbent cannot reach step 6 of the use case at all.
 source_refs:
   - req-one-command-produces-a-complete-copy
   - req-method-reuse-is-vendoring

@@ -3,18 +3,18 @@ minted_in: i1
 id: tsp-close-and-land
 type: "[[test-spec]]"
 statement: A close refuses loose ends and serves its findings, verified by test over the close path.
-method: "test"
+method: test
 verifies:
-  - "req-close-refuses-loose-ends"
-  - "req-close-serves-its-findings"
-  - "req-close-leaves-trunk-clean"
-  - "req-land-demands-fresh-green"
-  - "req-reject-names-the-redo"
-  - "req-trees-never-mix"
+  - req-close-refuses-loose-ends
+  - req-close-serves-its-findings
+  - req-close-leaves-trunk-clean
+  - req-land-demands-fresh-green
+  - req-reject-names-the-redo
+  - req-trees-never-mix
 files:
-  - "tests/editsafety.test.ts"
-  - "tests/gitlane.test.ts"
-  - "tests/worktree.test.ts"
+  - tests/editsafety.test.ts
+  - tests/gitlane.test.ts
+  - tests/worktree.test.ts
 ---
 
 ## Scope

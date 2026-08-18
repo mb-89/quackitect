@@ -3,22 +3,22 @@ minted_in: i1
 id: tsp-engine-lifecycle
 type: "[[test-spec]]"
 statement: The engine restarts clean, lands crashes safe, answers inside its latency line, and serves its own machine only, verified by test over the process lifecycle.
-method: "test"
+method: test
 verifies:
-  - "req-surface-answers-in-one-second"
-  - "req-crash-lands-safe"
-  - "req-reload-restarts-clean"
-  - "req-call-answers-in-one-second"
-  - "req-mirror-stays-on-the-machine"
-  - "req-engine-port-fallback"
-  - "req-the-lane-runs-without-a-console"
+  - req-surface-answers-in-one-second
+  - req-crash-lands-safe
+  - req-reload-restarts-clean
+  - req-call-answers-in-one-second
+  - req-mirror-stays-on-the-machine
+  - req-engine-port-fallback
+  - req-the-lane-runs-without-a-console
 files:
-  - "tests/ticks.test.ts"
-  - "tests/lifetime.test.ts"
-  - "tests/ptyend.test.ts"
-  - "tests/stophook.test.ts"
-  - "tests/mcp-http.test.ts"
-  - "tests/latency.test.ts"
+  - tests/ticks.test.ts
+  - tests/lifetime.test.ts
+  - tests/ptyend.test.ts
+  - tests/stophook.test.ts
+  - tests/mcp-http.test.ts
+  - tests/latency.test.ts
 ---
 
 ## Scope

@@ -3,13 +3,13 @@ minted_in: i34-one-tree-iterations-and-archives-live-on
 id: tsp-two-machines
 type: "[[test-spec]]"
 statement: Two machines each clone the repository and each walks a different iteration to a gate, verified by demonstration — and the collision case is named as undemonstrable rather than passed.
-method: "demonstration"
+method: demonstration
 demonstrates:
-  - "sty-work-on-two-machines"
+  - sty-work-on-two-machines
 verifies:
-  - "req-one-command-starts-an-unattended-machine"
+  - req-one-command-starts-an-unattended-machine
 files:
-  - "none — the procedure below is the definition; the observed sessions are the evidence"
+  - none — the procedure below is the definition; the observed sessions are the evidence
 ---
 
 ## Why this spec exists

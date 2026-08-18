@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "DSM partitioning reorders rows and columns to push dependencies to one side of the diagonal. It exposes a dependency layering or sequence."
+statement: DSM partitioning reorders rows and columns to push dependencies to one side of the diagonal. It exposes a dependency layering or sequence.
 source: ref-structural-complexity-management
 ---
 

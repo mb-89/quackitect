@@ -1,10 +1,10 @@
 ---
 form: record-adrs
-reopened: "2026-08-18T15:40:15.371Z — declare-winner was re-signed after the fitness flags landed, so this claim answered ground that has since moved"
+reopened: 2026-08-18T15:40:15.371Z — declare-winner was re-signed after the fitness flags landed, so this claim answered ground that has since moved
 by: agent
 signed_off: 2026-08-18T15:40:18.654Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / record-adrs

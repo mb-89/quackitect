@@ -6,7 +6,7 @@ statement: the claim lands locally the moment it is taken and pushes whenever th
 cluster: cluster-the-record-life
 question: when the claim announces
 found_by: contradiction
-source: "TRIZ separation IN TIME over 'improving peer visibility degrades offline capability'; the owner's own ruling of 2026-08-11 dissolved it before the matrix was needed"
+source: TRIZ separation IN TIME over 'improving peer visibility degrades offline capability'; the owner's own ruling of 2026-08-11 dissolved it before the matrix was needed
 ---
 
 ## Mechanism

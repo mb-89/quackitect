@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: make scaffolding repeatable on an existing tree, and report where the tree has drifted from the template rather than overwriting it
 cluster: cluster-the-bootstrap
 found_by: prior-art
-source: "scaffold-project skill, https://lobehub.com/skills/opsmachine-om-agency-scaffold-project"
+source: scaffold-project skill, https://lobehub.com/skills/opsmachine-om-agency-scaffold-project
 ---
 
 ## Mechanism

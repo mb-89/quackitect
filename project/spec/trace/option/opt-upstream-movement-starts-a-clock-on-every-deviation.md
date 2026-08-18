@@ -6,7 +6,7 @@ cluster: the-bootstrap
 question: how a stale override is caught
 statement: when the shared text changes, every departure touching what moved is put on a deadline with exactly two legal answers, and staying silent is a fault rather than a default
 found_by: analogy
-source: "Chicago Convention Article 38, notification of differences — reproduced at jus.uio.no/english/services/library/treaties/07/7-01/international-civil-aviation.html; the depositary text is ICAO Doc 7300, which the research lane could not fetch"
+source: Chicago Convention Article 38, notification of differences — reproduced at jus.uio.no/english/services/library/treaties/07/7-01/international-civil-aviation.html; the depositary text is ICAO Doc 7300, which the research lane could not fetch
 ---
 
 ## Mechanism

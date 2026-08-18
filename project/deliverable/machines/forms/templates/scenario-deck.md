@@ -3,7 +3,7 @@ id: template-scenario-deck
 statement: The ATAM walk dealt as cards — one quality scenario at a time, worst grade first, with its computed path and a three-way verdict.
 editor: scenario-deck
 line_pattern: ""
-line_help: "the verdict lines, button-fed — addressed names the decision, at risk and unaddressed mint their register entry"
+line_help: the verdict lines, button-fed — addressed names the decision, at risk and unaddressed mint their register entry
 ---
 
 # scenario-deck

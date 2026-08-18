@@ -3,11 +3,11 @@ minted_in: i33-every-interface-a-person-or-an-agent-tou
 id: tsp-one-operation-reads-its-input-once
 type: "[[test-spec]]"
 statement: One operation reads its corpus once and hands it down, verified by test over the door's own meter rather than by a stopwatch.
-method: "test"
+method: test
 verifies:
-  - "req-one-operation-reads-its-input-once"
+  - req-one-operation-reads-its-input-once
 files:
-  - "tests/drift.test.ts"
+  - tests/drift.test.ts
 ---
 
 ## Scope

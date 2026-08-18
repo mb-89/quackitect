@@ -10,8 +10,8 @@ status: open
 impact: The whole lifecycle rests on the folder meaning one thing. A crashed walk leaves a folder that means nothing, and the machine cannot tell it from a live one. On a cloud machine that is the expected ending rather than the exceptional one, because the container simply stops.
 breaks_how_badly: corrosive
 how_likely: expected
-probe: "scheduled. Kill a bound walk, look at disk and container. No M3 state grants se_run, so M6 carries it."
-probed: "2026-08-15"
+probe: scheduled. Kill a bound walk, look at disk and container. No M3 state grants se_run, so M6 carries it.
+probed: 2026-08-15
 source_refs:
   - i28-the-cloud-runs-from-its-seed-alone-a-fre
   - raid-sweeping-the-folders-early-hides-every-seeded-iteration

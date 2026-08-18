@@ -8,7 +8,7 @@ owner: the driving agent
 trigger: any new host, any host upgrade, and the first corpus break with no matching write in the call log
 status: open
 probe: "holds where it applies, and i35 found where it does not. ENFORCEMENT PROBED 2026-08-17: se_help refused SE-C-110 at onboard-retro with that state's exact tool list, shell git warned then refused SE-C-129, a truncating pipe refused SE-C-137. WHAT IT DOES NOT COVER: an ARRIVING agent is uncaged until the cage is placed, and raid-iss-two-entrypoints-place-the-cage-and-nothing-compares-them names how that goes wrong quietly."
-probed: "2026-08-17"
+probed: 2026-08-17
 impact: Every check this iteration builds is defeated by one uncaged write. The corpus breaks, no refusal fires, and the call log holds no record of who did it.
 breaks_how_badly: fatal
 how_likely: plausible

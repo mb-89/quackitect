@@ -6,7 +6,7 @@ statement: an override replaces a named part of an artifact and can invoke the v
 cluster: the-walk
 question: how much of an artifact an override replaces
 found_by: prior-art
-source: "XSLT 1.0 xsl:apply-imports (www.w3.org/TR/xslt-10 s5.6), Sphinx's ! template prefix (www.sphinx-doc.org/en/master/development/html_themes/templating.html), Nix overlays' prev argument (NixOS/nixpkgs doc/using/overlays.chapter.md), Yocto bbappend (docs.yoctoproject.org/dev-manual/layers.html)"
+source: XSLT 1.0 xsl:apply-imports (www.w3.org/TR/xslt-10 s5.6), Sphinx's ! template prefix (www.sphinx-doc.org/en/master/development/html_themes/templating.html), Nix overlays' prev argument (NixOS/nixpkgs doc/using/overlays.chapter.md), Yocto bbappend (docs.yoctoproject.org/dev-manual/layers.html)
 ---
 
 ## Mechanism

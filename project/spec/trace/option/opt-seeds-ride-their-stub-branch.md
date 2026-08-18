@@ -6,7 +6,7 @@ statement: a seed is visible because its iteration branch pushes at seeding - th
 cluster: cluster-the-record-life
 question: how a seed announces
 found_by: prior-art
-source: "the branch-per-change pattern every git forge runs; this product's own it/ branches, which already exist locally"
+source: the branch-per-change pattern every git forge runs; this product's own it/ branches, which already exist locally
 ---
 
 ## Mechanism

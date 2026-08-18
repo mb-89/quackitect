@@ -1,11 +1,11 @@
 ---
 form: gate-requirements
-amended: "2026-08-16T06:47:19.691Z by agent — The owner overturned this gate's ruling on the six machine-locking requirements the same day it was signed, and then widened it to the whole ripple. The verdict…"
+amended: 2026-08-16T06:47:19.691Z by agent — The owner overturned this gate's ruling on the six machine-locking requirements the same day it was signed, and then widened it to the whole ripple. The verdict…
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-16T06:23:17.248Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-requirements

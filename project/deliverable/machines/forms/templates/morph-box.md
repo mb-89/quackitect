@@ -3,8 +3,8 @@ id: template-morph-box
 statement: The morphological box — clusters down the side, their options across, and a curve through one option per cluster is one candidate.
 editor: morph-box
 resolves: artifact
-line_pattern: "^\\| .+ \\|"
-line_help: "one row per candidate; draw it on the chart rather than typing it"
+line_pattern: ^\| .+ \|
+line_help: one row per candidate; draw it on the chart rather than typing it
 ---
 
 # morph-box

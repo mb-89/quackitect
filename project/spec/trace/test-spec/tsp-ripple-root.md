@@ -3,11 +3,11 @@ minted_in: i6-conformance-goes-mechanical-checks-bind-
 id: tsp-ripple-root
 type: "[[test-spec]]"
 statement: The chain walk past a fallen claim reaches the state with no fallen input of its own, returns the path root first, and terminates on a cycle without naming one.
-method: "test"
+method: test
 verifies:
-  - "req-a-ripple-names-its-root"
+  - req-a-ripple-names-its-root
 files:
-  - "tests/ripple-root.test.ts"
+  - tests/ripple-root.test.ts
 ---
 
 ## Scope

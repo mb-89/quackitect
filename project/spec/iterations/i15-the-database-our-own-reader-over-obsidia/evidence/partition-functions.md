@@ -3,7 +3,7 @@ form: partition-functions
 by: agent
 signed_off: 2026-08-16T17:42:04.036Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / partition-functions

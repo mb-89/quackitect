@@ -6,7 +6,7 @@ statement: each override records the version of the thing it was written against
 cluster: the-bootstrap
 question: how a stale override is caught
 found_by: prior-art
-source: "AOSP repo manifest base-rev (github.com/GerritCodeReview/git-repo/blob/main/docs/manifest-format.md), patch-package version-stamped filenames (github.com/ds300/patch-package)"
+source: AOSP repo manifest base-rev (github.com/GerritCodeReview/git-repo/blob/main/docs/manifest-format.md), patch-package version-stamped filenames (github.com/ds300/patch-package)
 ---
 
 ## Mechanism

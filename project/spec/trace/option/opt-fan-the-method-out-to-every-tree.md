@@ -6,7 +6,7 @@ statement: land a method change in trunk and every open tree in one act, so no w
 cluster: cluster-the-walk
 question: how shared method reaches a tree
 found_by: prior-art
-source: "the retro ruling of 2026-08-06 — a method change lands in trunk and every open worktree at once, with the reconcile pass as the reload-time backstop; carried in note-76b47e277859"
+source: the retro ruling of 2026-08-06 — a method change lands in trunk and every open worktree at once, with the reconcile pass as the reload-time backstop; carried in note-76b47e277859
 ---
 
 ## Mechanism

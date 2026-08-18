@@ -2,7 +2,7 @@
 minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: cand-narrow-grammar-plus-explicit
 type: "[[candidate]]"
-name: "Narrow grammar plus explicit"
+name: Narrow grammar plus explicit
 statement: "narrowest scope on both rows: the probed regex grammar, and the judge-a-claim-shaped explicit review with no auto-classification"
 picks:
   - "[[opt-closed-regex-grammar-for-filter-expressions]]"

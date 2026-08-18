@@ -5,7 +5,7 @@ statement: references to FILES on disk — one root-relative path per line, and 
 editor: list
 resolves: file
 line_pattern: ^- [A-Za-z0-9 _./\\@-]+$|^- none\b
-line_help: "one root-relative file path per line"
+line_help: one root-relative file path per line
 placeholder: project/dist/name-1.0.0.zip
 description: one FILE PATH per line, root-relative — every named file must exist on disk, and `none` is a legal answer
 ---

@@ -10,11 +10,11 @@ status: probed
 impact: The credit is written under one identity and looked up under another. Every reload then re-owes the whole reading exactly as today, and the fix ships looking correct while changing nothing.
 breaks_how_badly: crippling
 how_likely: plausible
-probe: "FALLS. Two reloads ran mid-walk on 2026-08-15 and the decision graph's id space restarted both times. decisions.jsonl carries d241 at 17:19 and then d1 again at 18:54 and at 18:59 - one d1 per reload, each with a different brief. The FILE survived every reload; the IDENTITY did not, so one id now means three things."
-probed: "2026-08-15"
+probe: FALLS. Two reloads ran mid-walk on 2026-08-15 and the decision graph's id space restarted both times. decisions.jsonl carries d241 at 17:19 and then d1 again at 18:54 and at 18:59 - one d1 per reload, each with a different brief. The FILE survived every reload; the IDENTITY did not, so one id now means three things.
+probed: 2026-08-15
 source_refs:
   - req-reading-credit-survives-a-reload
-  - "note-6fc953ffcdc8, which names the SE_SESSION token as the intended key"
+  - note-6fc953ffcdc8, which names the SE_SESSION token as the intended key
 ---
 
 ## The probe that settled it, 2026-08-15

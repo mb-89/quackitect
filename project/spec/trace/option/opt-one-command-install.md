@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: collapse the whole install to a single command with no interactive wizard, so nothing stands between a bare machine and a running product
 cluster: cluster-the-bootstrap
 found_by: prior-art
-source: "Getting Started with @microsoft/spfx-cli, https://spknowledge.com/2026/05/12/getting-started-microsoft-spfx-cli-tutorial/"
+source: Getting Started with @microsoft/spfx-cli, https://spknowledge.com/2026/05/12/getting-started-microsoft-spfx-cli-tutorial/
 ---
 
 ## Mechanism

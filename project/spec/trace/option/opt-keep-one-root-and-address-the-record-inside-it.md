@@ -6,7 +6,7 @@ statement: hold the lane's root fixed at the repository for the whole session an
 cluster: cluster-the-walk
 question: which tree a path resolves to
 found_by: probe
-source: "probe 2026-08-14 — the lane's root ALREADY moves on binding, measured by listing the root at the desk and again inside the bound record"
+source: probe 2026-08-14 — the lane's root ALREADY moves on binding, measured by listing the root at the desk and again inside the bound record
 ---
 
 ## Mechanism

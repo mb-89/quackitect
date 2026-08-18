@@ -6,7 +6,7 @@ cluster: the-bootstrap
 question: how upstream's later work reaches a copy
 statement: the vendored source is one entry in the reference set the system already refreshes at the start of an iteration, and taking an update is a named pull from an engine the person names at the time
 found_by: heuristic
-source: "owner design input, 2026-08-18 — 'vendor code is also a reference', and 'I can pull an engine update, and I can name which engine I want to pull from'. Rests on the heuristic ONE SOURCE OF TRUTH; EVERYTHING ELSE DERIVES."
+source: owner design input, 2026-08-18 — 'vendor code is also a reference', and 'I can pull an engine update, and I can name which engine I want to pull from'. Rests on the heuristic ONE SOURCE OF TRUTH; EVERYTHING ELSE DERIVES.
 ---
 
 ## Mechanism

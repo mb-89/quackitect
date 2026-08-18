@@ -1,10 +1,10 @@
 ---
 form: draw-context
-amended: "2026-08-16T16:39:00.399Z by agent — re-stamping against gate-motivation's now-final hash, after repeated amends to gate-motivation kept invalidating draw-context's own snapshot of it"
+amended: 2026-08-16T16:39:00.399Z by agent — re-stamping against gate-motivation's now-final hash, after repeated amends to gate-motivation kept invalidating draw-context's own snapshot of it
 by: agent
 signed_off: 2026-08-16T16:37:40.506Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / draw-context

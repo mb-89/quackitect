@@ -3,7 +3,7 @@ form: one-read-per-operation
 by: agent
 signed_off: 2026-08-17T13:39:09.250Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / one-read-per-operation

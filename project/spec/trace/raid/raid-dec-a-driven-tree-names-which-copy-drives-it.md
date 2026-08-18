@@ -8,13 +8,13 @@ owner: the driving agent
 status: decided
 breaks_how_badly: crippling
 how_likely: plausible
-impact: "This is the demand that gated three of four candidates out. Without it the second of the two capabilities the owner asked for cannot exist, and with a location instead of an identity it fails by answering wrongly rather than absently."
+impact: This is the demand that gated three of four candidates out. Without it the second of the two capabilities the owner asked for cannot exist, and with a location instead of an identity it fails by answering wrongly rather than absently.
 source_refs:
   - req-the-system-runs-in-a-tree-that-is-not-its-own
   - opt-the-tree-names-what-not-where
   - raid-asm-the-pointer-survives-what-the-builder-does-to-the-tree
   - raid-iss-the-path-jail-has-one-write-target
-  - "product/engine-go/i18_red3.go at ref main"
+  - product/engine-go/i18_red3.go at ref main
 ---
 
 ## The choice, and it is two things

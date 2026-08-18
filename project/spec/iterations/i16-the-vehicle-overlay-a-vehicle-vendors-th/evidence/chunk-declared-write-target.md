@@ -3,7 +3,7 @@ form: chunk-declared-write-target
 by: agent
 signed_off: 2026-08-18T18:35:53.484Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / chunk-declared-write-target

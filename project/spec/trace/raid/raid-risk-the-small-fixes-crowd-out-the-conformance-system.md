@@ -10,7 +10,7 @@ status: open
 impact: The iteration ships a pile of hygiene and calls it conformance. The goal reads satisfied because fourteen items closed, and the one thing the goal names was the part that did not get built.
 breaks_how_badly: crippling
 how_likely: plausible
-mitigation: "The build order puts the conformance system first, and the write-budget probe first within it. A fix may land only after the check it neighbours, or in the sweep at the end. gate-implementation checks the order rather than the count."
+mitigation: The build order puts the conformance system first, and the write-budget probe first within it. A fix may land only after the check it neighbours, or in the sweep at the end. gate-implementation checks the order rather than the count.
 source_refs:
   - i6 gate-kickoff — round 2, the second attack on scope
   - i6 gate-kickoff — pulled_in, fourteen items

@@ -2,9 +2,9 @@
 form: write-requirements
 by: agent
 signed_off: 2026-08-18T11:06:40.724Z
-reopened: "2026-08-18T11:06:00.029Z — The affordance added four use-case extensions and a rewritten step, two of which had no row. req-the-system-runs-in-a-tree-that-is-not-its-own and req-an-act-writes-only-the-tree-it-produced are minted for them."
+reopened: 2026-08-18T11:06:00.029Z — The affordance added four use-case extensions and a rewritten step, two of which had no row. req-the-system-runs-in-a-tree-that-is-not-its-own and req-an-act-writes-only-the-tree-it-produced are minted for them.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / write-requirements

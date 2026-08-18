@@ -2,14 +2,14 @@
 minted_in: i35-the-cloud-run-s-findings-land-the-fix-fi
 id: tsp-the-cited-refs-resolve
 type: "[[test-spec]]"
-statement: "On a fresh cloud clone, every branch the corpus cites as a ref resolves after the arrival — verified by demonstration, because it needs a real remote and a real shallow clone."
-method: "demonstration"
+statement: On a fresh cloud clone, every branch the corpus cites as a ref resolves after the arrival — verified by demonstration, because it needs a real remote and a real shallow clone.
+method: demonstration
 demonstrates:
-  - "sty-send-an-agent-to-a-cloud-box"
+  - sty-send-an-agent-to-a-cloud-box
 verifies:
-  - "req-every-ref-the-corpus-cites-resolves-on-arrival"
+  - req-every-ref-the-corpus-cites-resolves-on-arrival
 files:
-  - "none — the procedure below is the definition; the observed run is the evidence"
+  - none — the procedure below is the definition; the observed run is the evidence
 ---
 
 ## Scope

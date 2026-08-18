@@ -3,9 +3,9 @@ minted_in: i2
 id: tsp-autonomy-tiers
 type: "[[test-spec]]"
 statement: No numeric autonomy value and no slider survives on any surface, state note or guidance page once the categorical tiers land — verified by inspection over the shipped tree.
-method: "inspection"
+method: inspection
 verifies:
-  - "req-autonomy-is-categorical"
+  - req-autonomy-is-categorical
 files:
   - none — the checklist below is the whole definition; the sweep is a read-only inspection of the shipped tree and needs no test file
 ---

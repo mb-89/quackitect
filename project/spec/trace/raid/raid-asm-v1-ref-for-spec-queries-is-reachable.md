@@ -5,13 +5,13 @@ type: "[[raid]]"
 kind: assumption
 statement: v1's spec/queries/ (25 .base files, not 26) and spec/decisions/adr-query-in-engine.md are reachable at ref "main" in this checkout, confirmed directly.
 owner: the driving agent
-trigger: "the harvesting sub-step of i15, using se_file_read/se_file_glob with ref set to main"
+trigger: the harvesting sub-step of i15, using se_file_read/se_file_glob with ref set to main
 status: closed
 breaks_how_badly: abrasive
 how_likely: conceivable
-probe: "holds, with one correction. se_file_glob (glob spec/queries/**, ref main) returns 25 files, not 26. se_file_read (path spec/decisions/adr-query-in-engine.md, ref main) returns the ADR. The operator fetched every ref before this walk; local main and v2 branches exist. The harvest source is confirmed reachable."
+probe: holds, with one correction. se_file_glob (glob spec/queries/**, ref main) returns 25 files, not 26. se_file_read (path spec/decisions/adr-query-in-engine.md, ref main) returns the ADR. The operator fetched every ref before this walk; local main and v2 branches exist. The harvest source is confirmed reachable.
 probed: 2026-08-16
-impact: "Closed. The harvest half of i15's goal has a confirmed source — ref main, 25 .base files plus the ADR."
+impact: Closed. The harvest half of i15's goal has a confirmed source — ref main, 25 .base files plus the ADR.
 source_refs:
   - i15-the-database-our-own-reader-over-obsidia
 ---

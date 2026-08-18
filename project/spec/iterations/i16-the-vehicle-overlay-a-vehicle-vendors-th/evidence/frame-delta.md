@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-18T09:59:41.887Z
 reopened: "2026-08-18T09:58:13.199Z — Its gap claim argues the gap is knowledge — that nobody has solved owning a copy and still receiving from it. git-subtree's manual disproves that. The gap is the RELATIONSHIP: our copy step throws it away at the moment of copying."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / frame-delta

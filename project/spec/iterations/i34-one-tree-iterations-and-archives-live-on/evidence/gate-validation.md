@@ -1,11 +1,11 @@
 ---
 form: gate-validation
-amended: "2026-08-16T10:22:50.904Z by agent — the story was orphaned by this iteration and tsp-two-machines now carries it; the field said switched off without saying what demonstrates it"
+amended: 2026-08-16T10:22:50.904Z by agent — the story was orphaned by this iteration and tsp-two-machines now carries it; the field said switched off without saying what demonstrates it
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-16T10:20:58.606Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-validation

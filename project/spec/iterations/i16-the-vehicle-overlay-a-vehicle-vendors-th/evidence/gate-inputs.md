@@ -3,9 +3,9 @@ form: gate-inputs
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-18T11:03:44.175Z
-reopened: "2026-08-18T11:01:52.681Z — The user picture gained a fourth story, four use-case extensions and a fifth intended use. The gate reviewed three stories and a surface that offered nothing productive."
+reopened: 2026-08-18T11:01:52.681Z — The user picture gained a fourth story, four use-case extensions and a fifth intended use. The gate reviewed three stories and a surface that offered nothing productive.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-inputs

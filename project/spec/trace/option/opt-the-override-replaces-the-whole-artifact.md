@@ -6,7 +6,7 @@ cluster: the-walk
 question: how much of an artifact an override replaces
 statement: an override is a whole file standing in for a whole file, and the copy owns every line of it from that moment on
 found_by: prior-art
-source: "the predecessor's resolver at product/engine-go/resolver.go ref main, and every path-keyed system in i16's twenty-system sweep except Sphinx"
+source: the predecessor's resolver at product/engine-go/resolver.go ref main, and every path-keyed system in i16's twenty-system sweep except Sphinx
 ---
 
 ## Mechanism

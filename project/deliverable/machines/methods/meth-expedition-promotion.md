@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "An expedition explores outside the product. What survives is promoted into it."
+statement: An expedition explores outside the product. What survives is promoted into it.
 ---
 
 ## Situation

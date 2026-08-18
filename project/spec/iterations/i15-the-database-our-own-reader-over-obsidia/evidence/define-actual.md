@@ -1,10 +1,10 @@
 ---
 form: define-actual
-amended: "2026-08-16T16:31:14.130Z by agent — ref \"main\" resolves — verified 2026-08-16; only the prior-art-scan question remains open"
+amended: 2026-08-16T16:31:14.130Z by agent — ref "main" resolves — verified 2026-08-16; only the prior-art-scan question remains open
 by: agent
 signed_off: 2026-08-16T16:18:42.505Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / define-actual

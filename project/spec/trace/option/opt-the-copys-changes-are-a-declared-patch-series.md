@@ -6,7 +6,7 @@ statement: the copy never edits what it received; every change it makes exists o
 cluster: the-bootstrap
 question: how a copy's own changes are represented
 found_by: prior-art
-source: "Debian source format 3.0 quilt (manpages.debian.org/unstable/dpkg-dev/dpkg-source.1.en.html), DEP-3 Patch Tagging Guidelines (dep-team.pages.debian.net/deps/dep3/), quilt(1) (man7.org/linux/man-pages/man1/quilt.1.html), pnpm patchedDependencies (pnpm.io/cli/patch)"
+source: Debian source format 3.0 quilt (manpages.debian.org/unstable/dpkg-dev/dpkg-source.1.en.html), DEP-3 Patch Tagging Guidelines (dep-team.pages.debian.net/deps/dep3/), quilt(1) (man7.org/linux/man-pages/man1/quilt.1.html), pnpm patchedDependencies (pnpm.io/cli/patch)
 ---
 
 ## Mechanism

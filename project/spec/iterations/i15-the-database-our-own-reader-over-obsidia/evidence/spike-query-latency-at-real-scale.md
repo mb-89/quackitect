@@ -3,7 +3,7 @@ form: spike-query-latency-at-real-scale
 by: agent
 signed_off: 2026-08-16T18:36:54.556Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / spike-query-latency-at-real-scale

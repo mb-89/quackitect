@@ -3,11 +3,11 @@ minted_in: i3
 id: tsp-placeholder-refuses-entry
 type: "[[test-spec]]"
 statement: A seeded sub-machine still carrying its placeholder may be drawn and routed through, and may not be walked into.
-method: "test"
+method: test
 verifies:
-  - "req-a-placeholder-drawing-refuses-entry"
+  - req-a-placeholder-drawing-refuses-entry
 files:
-  - "tests/scaffold-entry.test.ts"
+  - tests/scaffold-entry.test.ts
 ---
 
 ## Scope

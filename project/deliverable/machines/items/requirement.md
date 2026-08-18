@@ -95,7 +95,7 @@ checks:
       - TBD
       - TBC
       - TBR
-      - "???"
+      - ???
     hint: unfillable means deletion candidate, never a keeper with a TODO
   - field: priority
     one_of:

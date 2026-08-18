@@ -1,11 +1,11 @@
 ---
 form: gate-kickoff
-amended: "2026-08-17T17:16:49.105Z by agent — This gate claimed no engine code had been written and that the battery need not re-run, both false at its own last amendment. The identical sentence stood in three gates; two were corrected on the re-sign pass and this one was missed. A fresh-eyes tester found it."
+amended: 2026-08-17T17:16:49.105Z by agent — This gate claimed no engine code had been written and that the battery need not re-run, both false at its own last amendment. The identical sentence stood in three gates; two were corrected on the re-sign pass and this one was missed. A fresh-eyes tester found it.
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-17T14:35:42.641Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-kickoff

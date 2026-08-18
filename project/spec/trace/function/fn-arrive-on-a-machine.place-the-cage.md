@@ -3,7 +3,7 @@ minted_in: i35-the-cloud-run-s-findings-land-the-fix-fi
 id: fn-arrive-on-a-machine.place-the-cage
 type: "[[function]]"
 cluster: the-arrival
-statement: "put the deny list and the lane config where the host reads them"
+statement: put the deny list and the lane config where the host reads them
 satisfies:
   - req-one-command-takes-a-fresh-clone-to-a-live-lane
 inputs:

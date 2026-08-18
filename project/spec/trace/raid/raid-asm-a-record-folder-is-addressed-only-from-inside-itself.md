@@ -11,7 +11,7 @@ impact: If something outside the folder holds a worktree path, the levelling sil
 breaks_how_badly: crippling
 how_likely: plausible
 probe: "FALSE, probed 2026-08-16. ModelFileSystem.stamp at engine/model-fs.ts:29-35 matches the root against a /.worktrees/(id)/ pattern and writes minted_in from that directory name onto every newly created trace node. That is a reader outside every record folder taking a record's identity from a worktree path, and under one tree the pattern never matches, so the stamp silently stops. Verified live: fn-run-a-governed-walk.resolve-a-path.md carries minted_in i27. EVERYTHING ELSE HELD: every other record path is built as worktreesDir(root) plus the id plus a relative path, so it is derived from the id and follows the folder wherever it goes."
-probed: "2026-08-16"
+probed: 2026-08-16
 source_refs:
   - i34-one-tree-iterations-and-archives-live-on
   - note-f40b2052e59b

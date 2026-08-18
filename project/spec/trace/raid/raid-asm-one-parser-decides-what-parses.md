@@ -8,8 +8,8 @@ owner: the driving agent
 trigger: any parser or dependency upgrade, and the first reader that throws on a node the guard accepted
 status: probed
 probed_on: 2026-08-16
-probe: "Take the node that broke this walk, and any other malformed sample. Feed it to the guard and to every reader that loads corpus frontmatter. Confirm they agree, on each supported platform. Any disagreement falsifies this and names which reader is the odd one."
-probed: "2026-08-16, and it HOLDS on the parser while failing on the handling. Four import sites all take the same yaml package — bases.ts:22, frontmatter.ts:25, notes.ts:13, tables.ts:22 — so what parses is one answer. But TWO different functions are named frontmatterOf, at worktree.ts:125 and traceschema.ts:82, with different signatures, and they disagree about failure. One catches, noteOf returns undefined, and something in the chain threw hard enough to stop this walk."
+probe: Take the node that broke this walk, and any other malformed sample. Feed it to the guard and to every reader that loads corpus frontmatter. Confirm they agree, on each supported platform. Any disagreement falsifies this and names which reader is the odd one.
+probed: 2026-08-16, and it HOLDS on the parser while failing on the handling. Four import sites all take the same yaml package — bases.ts:22, frontmatter.ts:25, notes.ts:13, tables.ts:22 — so what parses is one answer. But TWO different functions are named frontmatterOf, at worktree.ts:125 and traceschema.ts:82, with different signatures, and they disagree about failure. One catches, noteOf returns undefined, and something in the chain threw hard enough to stop this walk.
 impact: A write passes the guard and a reader throws anyway. The refusal that was meant to keep the corpus sound becomes a false assurance, which is worse than no guard because it is trusted.
 breaks_how_badly: crippling
 how_likely: plausible

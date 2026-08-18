@@ -3,14 +3,14 @@ minted_in: i1
 id: tsp-tour-run
 type: "[[test-spec]]"
 statement: A tour derives its stops from the live machinery, shows live instances, highlights the named part, and ends at the desk, verified by demonstration of a full tour.
-method: "demonstration"
+method: demonstration
 verifies:
-  - "req-tour-ends-at-the-desk"
-  - "req-tour-highlights-the-named-part"
-  - "req-tour-reads-what-stands"
-  - "req-tour-shows-live-instances"
+  - req-tour-ends-at-the-desk
+  - req-tour-highlights-the-named-part
+  - req-tour-reads-what-stands
+  - req-tour-shows-live-instances
 files:
-  - "none — the procedure below is the definition; the observed tour is the evidence"
+  - none — the procedure below is the definition; the observed tour is the evidence
 ---
 
 ## Scope

@@ -6,7 +6,7 @@ statement: build nothing new; a person or agent keeps finding candidate coupling
 cluster: cluster-the-disposition
 question: how does a ranked candidate coupling get its disposition
 found_by: without
-source: "meth-trimming — the null option, checked against how this exact session found related nodes before any ranking function existed"
+source: meth-trimming — the null option, checked against how this exact session found related nodes before any ranking function existed
 ---
 
 ## Mechanism

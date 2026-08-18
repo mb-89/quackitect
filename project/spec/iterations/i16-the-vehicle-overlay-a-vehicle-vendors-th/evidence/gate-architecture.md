@@ -1,11 +1,11 @@
 ---
 form: gate-architecture
 bless: blessed by agent
-reopened: "2026-08-18T15:40:50.813Z — evaluate-architecture was re-signed after the fitness flags landed, so this claim answered ground that has since moved"
+reopened: 2026-08-18T15:40:50.813Z — evaluate-architecture was re-signed after the fitness flags landed, so this claim answered ground that has since moved
 by: agent
 signed_off: 2026-08-18T15:40:54.636Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-architecture

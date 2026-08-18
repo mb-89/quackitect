@@ -3,7 +3,7 @@ form: an-unbound-rule-is-named
 by: agent
 signed_off: 2026-08-16T17:23:29.594Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / an-unbound-rule-is-named

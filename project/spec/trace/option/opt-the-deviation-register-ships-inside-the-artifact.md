@@ -6,7 +6,7 @@ cluster: the-bootstrap
 question: how a copy's own changes are represented
 statement: the list of who has departed from the shared text, on which clause and why, is a section OF that text, carried by every copy without a second lookup
 found_by: analogy
-source: "CENELEC A-deviations, boss.cenelec.eu/homegrowndeliverables/en/pages/adev/ — the standards domain, where a national departure is published as an annex inside the European Standard itself"
+source: CENELEC A-deviations, boss.cenelec.eu/homegrowndeliverables/en/pages/adev/ — the standards domain, where a national departure is published as an annex inside the European Standard itself
 ---
 
 ## Mechanism

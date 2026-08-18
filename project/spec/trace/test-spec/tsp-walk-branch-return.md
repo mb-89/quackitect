@@ -3,11 +3,11 @@ minted_in: i2
 id: tsp-walk-branch-return
 type: "[[test-spec]]"
 statement: A completed leg under a waiting busbar returns the walk to its fork and offers the next owed leg without an escape, and the drawn route follows that same path — verified by test over the walker.
-method: "test"
+method: test
 verifies:
-  - "req-walk-branches-at-waypoint"
+  - req-walk-branches-at-waypoint
 files:
-  - "tests/branch-return.test.ts"
+  - tests/branch-return.test.ts
 ---
 
 ## Scope

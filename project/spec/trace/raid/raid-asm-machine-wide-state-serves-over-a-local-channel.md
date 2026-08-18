@@ -10,8 +10,8 @@ status: open
 impact: The core cannot own what must be one thing, and core-and-satellite loses the property it was chosen for.
 breaks_how_badly: fatal
 how_likely: conceivable
-probe: "holds — 144 microseconds per crossing against a one-second budget, for the call log (exp-channel-cost)"
-probed: "2026-08-14"
+probe: holds — 144 microseconds per crossing against a one-second budget, for the call log (exp-channel-cost)
+probed: 2026-08-14
 source_refs:
   - cand-core-satellite
   - el-core

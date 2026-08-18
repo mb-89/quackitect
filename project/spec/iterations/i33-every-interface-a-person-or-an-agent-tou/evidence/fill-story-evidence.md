@@ -1,10 +1,10 @@
 ---
 form: fill-story-evidence
-reopened: "2026-08-17T19:30:04.505Z — Its claim is signed but does not stand, and the guard blocks the walk without naming what fails. A reopen makes the form owed so the submit re-runs every check and reports the problems."
+reopened: 2026-08-17T19:30:04.505Z — Its claim is signed but does not stand, and the guard blocks the walk without naming what fails. A reopen makes the form owed so the submit re-runs every check and reports the problems.
 by: agent
 signed_off: 2026-08-17T19:30:21.194Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / fill-story-evidence

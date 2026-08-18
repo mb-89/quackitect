@@ -9,9 +9,9 @@ trigger: the folder rework, whenever it is scheduled, or any design that would h
 status: superseded
 breaks_how_badly: corrosive
 how_likely: expected
-impact: "Without it, the overlay depends on a repository-wide folder rework, and the owner has ruled that rework must not block this iteration. With it, the rework becomes an independent choice that can land later on its own merits."
+impact: Without it, the overlay depends on a repository-wide folder rework, and the owner has ruled that rework must not block this iteration. With it, the rework becomes an independent choice that can land later on its own merits.
 source_refs:
-  - "product/engine-go/resolver.go at ref main — EngineDir, read 2026-08-18"
+  - product/engine-go/resolver.go at ref main — EngineDir, read 2026-08-18
   - req-nothing-a-copy-does-reaches-its-source
   - raid-risk-the-overlay-location-is-unchosen
 ---

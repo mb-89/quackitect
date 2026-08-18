@@ -10,13 +10,13 @@ status: open
 impact: A question that mattered stops being asked, silently and for good. Unlike a struck state, which is visible as a gap in the walk, a dropped field leaves a form that looks complete.
 breaks_how_badly: corrosive
 how_likely: conceivable
-probe: "unprobed. Two rows carry an omit today and both were authored in the same hour as the mechanism, by the same hand, so they are not independent evidence."
-probed: "2026-08-13"
+probe: unprobed. Two rows carry an omit today and both were authored in the same hour as the mechanism, by the same hand, so they are not independent evidence.
+probed: 2026-08-13
 source_refs:
-  - "engine/machine.ts, EvidenceField.omit — absent means asked everywhere"
-  - "engine/rigor-matrix.ts rowState, the column filter"
-  - "machines/rigor_matrix/rows/M1_10_draft-vision.md, three fields omitted at minor"
-  - "machines/rigor_matrix/rows/M1_30_frame-delta.md, two fields omitted at minor"
+  - engine/machine.ts, EvidenceField.omit — absent means asked everywhere
+  - engine/rigor-matrix.ts rowState, the column filter
+  - machines/rigor_matrix/rows/M1_10_draft-vision.md, three fields omitted at minor
+  - machines/rigor_matrix/rows/M1_30_frame-delta.md, two fields omitted at minor
 ---
 
 ## The claim

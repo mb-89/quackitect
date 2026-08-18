@@ -3,22 +3,22 @@ minted_in: i1
 id: tsp-record-inspection
 type: "[[test-spec]]"
 statement: The records carry their provenance — purpose, reasoning, order, losers, sources and links — each readable from the file that owns it, verified by inspection of the stored records.
-method: "inspection"
+method: inspection
 verifies:
-  - "req-purpose-recorded-at-begin"
-  - "req-record-arrives-prefilled"
-  - "req-recommendation-is-derived"
-  - "req-routing-reasoning-recorded"
-  - "req-losers-stay-on-record"
-  - "req-divergence-order-on-record"
-  - "req-finding-keeps-its-sources"
-  - "req-finding-lands-as-reference"
-  - "req-finding-names-its-home"
-  - "req-story-links-its-proving-run"
-  - "req-upward-links-live-in-the-file"
-  - "req-test-run-carries-its-question"
+  - req-purpose-recorded-at-begin
+  - req-record-arrives-prefilled
+  - req-recommendation-is-derived
+  - req-routing-reasoning-recorded
+  - req-losers-stay-on-record
+  - req-divergence-order-on-record
+  - req-finding-keeps-its-sources
+  - req-finding-lands-as-reference
+  - req-finding-names-its-home
+  - req-story-links-its-proving-run
+  - req-upward-links-live-in-the-file
+  - req-test-run-carries-its-question
 files:
-  - "project/deliverable/engine/bin/record-inspect.ts"
+  - project/deliverable/engine/bin/record-inspect.ts
 ---
 
 ## Scope

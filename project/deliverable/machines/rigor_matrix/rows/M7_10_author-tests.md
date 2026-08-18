@@ -18,8 +18,6 @@ legal_tools:
   - se_log_query
   - se_answer
   - se_run
-  # Same rule as M5_30B: this state owns the test-spec nodes, so it can retire
-  # one. A removed requirement leaves its spec behind otherwise.
   - se_file_delete
 evidence:
   - name: checks
@@ -31,7 +29,7 @@ evidence:
       - method
       - verifies
     page_size: 25
-    description: "the test-spec register — one row per spec; the files live on the spec node, and the law checks coverage both ways and the method match"
+    description: the test-spec register — one row per spec; the files live on the spec node, and the law checks coverage both ways and the method match
 major: full
 minor: full
 patch: tailored

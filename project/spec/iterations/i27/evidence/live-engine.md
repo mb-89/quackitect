@@ -1,10 +1,10 @@
 ---
 form: live-engine
-reopened: "2026-08-14T09:59:52.925Z — Its evidence was written by hand from outside the walk, so the compose step has never been earned through its own form."
+reopened: 2026-08-14T09:59:52.925Z — Its evidence was written by hand from outside the walk, so the compose step has never been earned through its own form.
 by: agent
 signed_off: 2026-08-14T10:00:00.000Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / live-engine

@@ -6,7 +6,7 @@ statement: delete the resolution decision and make every path carry its tree, so
 cluster: cluster-the-walk
 question: which tree a path resolves to
 found_by: without
-source: "trimming — what if resolve-a-path does not exist, and who does its job then; the answer is THE USER"
+source: trimming — what if resolve-a-path does not exist, and who does its job then; the answer is THE USER
 ---
 
 ## Mechanism

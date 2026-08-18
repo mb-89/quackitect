@@ -10,12 +10,12 @@ status: open
 impact: Requirements get authored after their code. A row written afterwards describes what was built rather than what was needed, and the whole point of the milestone order is lost without anything going red.
 breaks_how_badly: corrosive
 how_likely: expected
-probe: "found by hand on 2026-08-13, by reading i3's register against what had actually been built. No mechanical check exists, and none was attempted."
+probe: found by hand on 2026-08-13, by reading i3's register against what had actually been built. No mechanical check exists, and none was attempted.
 probed: 2026-08-13
 source_refs:
-  - "spec/iterations/i3-the-walk-s-feedback-loop-the-reading-cre/evidence/write-requirements.md — three rows at first signing, seven after the reopen"
-  - "engine/session.ts driftReopen, which reopens on a MOVED DEMAND and nothing else"
-  - "engine/iterations.ts movedDemands, which compares the matrix, not the scope"
+  - spec/iterations/i3-the-walk-s-feedback-loop-the-reading-cre/evidence/write-requirements.md — three rows at first signing, seven after the reopen
+  - engine/session.ts driftReopen, which reopens on a MOVED DEMAND and nothing else
+  - engine/iterations.ts movedDemands, which compares the matrix, not the scope
 ---
 
 ## What happened

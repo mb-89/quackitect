@@ -3,17 +3,17 @@ minted_in: i1
 id: tsp-test-discipline
 type: "[[test-spec]]"
 statement: A test run answers a named question with a structured verdict, a first green needs its red, and a red is never carried, verified by test over the test lane.
-method: "test"
+method: test
 verifies:
-  - "req-scoped-run-records-its-timings"
-  - "req-test-scope-discipline"
-  - "req-test-result-is-structured"
-  - "req-first-green-needs-a-red"
-  - "req-red-is-never-carried"
+  - req-scoped-run-records-its-timings
+  - req-test-scope-discipline
+  - req-test-result-is-structured
+  - req-first-green-needs-a-red
+  - req-red-is-never-carried
 files:
-  - "tests/discipline.test.ts"
-  - "tests/verdictlog.test.ts"
-  - "tests/testlint.test.ts"
+  - tests/discipline.test.ts
+  - tests/verdictlog.test.ts
+  - tests/testlint.test.ts
 ---
 
 ## Scope

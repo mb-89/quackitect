@@ -11,7 +11,7 @@ probe: "holds, RUN TWICE on throwaway repositories outside the project root. RUN
 probed: 2026-08-18
 breaks_how_badly: crippling
 how_likely: plausible
-impact: "If it holds, the channel costs a configuration rather than a design, and M4 compares known options. If it does not, the iteration is back to building its own, which is the register's headline risk and the thing the owner ruled against."
+impact: If it holds, the channel costs a configuration rather than a design, and M4 compares known options. If it does not, the iteration is back to building its own, which is the register's headline risk and the thing the owner ruled against.
 source_refs:
   - raid-risk-ownership-and-receiving-pull-against-each-other
   - req-one-command-produces-a-complete-copy

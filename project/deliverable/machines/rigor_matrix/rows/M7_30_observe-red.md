@@ -23,7 +23,7 @@ evidence:
     template: checklist
     items:
       - $claim-specs
-    description: "one checkbox per non-test spec — the reds no run can show. The engine observes the test reds itself."
+    description: one checkbox per non-test spec — the reds no run can show. The engine observes the test reds itself.
 major: full
 minor: full
 patch: full

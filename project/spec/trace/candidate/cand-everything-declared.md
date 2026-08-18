@@ -2,8 +2,8 @@
 minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: cand-everything-declared
 type: "[[candidate]]"
-name: "Everything declared"
-statement: "no departure from what the source shipped exists without a filed reason, and an upstream change puts every affected departure on a deadline"
+name: Everything declared
+statement: no departure from what the source shipped exists without a filed reason, and an upstream change puts every affected departure on a deadline
 picks:
   - "[[opt-a-clone-that-keeps-its-history]]"
   - "[[opt-the-copys-changes-are-a-declared-patch-series]]"

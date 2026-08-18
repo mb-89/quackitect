@@ -6,7 +6,7 @@ statement: make the resolution rule a function of the path's declared kind, so m
 cluster: cluster-the-walk
 question: what the resolution rule covers
 found_by: transform
-source: "SIT Attribute Dependency, applied to the incumbent — make two attributes vary together that did not"
+source: SIT Attribute Dependency, applied to the incumbent — make two attributes vary together that did not
 ---
 
 ## Mechanism

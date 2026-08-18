@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "An MDM is a block matrix. Its diagonal blocks are DSMs and its off-diagonal blocks are DMMs."
+statement: An MDM is a block matrix. Its diagonal blocks are DSMs and its off-diagonal blocks are DMMs.
 source: ref-structural-complexity-management
 ---
 

@@ -2,10 +2,10 @@
 form: specify-build
 by: agent
 signed_off: 2026-08-17T16:58:16.113Z
-reopened: "2026-08-17T16:57:42.549Z — author-tests re-signed above it with a sixth spec. The design below the line grew today under goal five, so the design specs are read against what actually landed rather than against what was planned."
-amended: "2026-08-17T14:40:46.575Z by agent — author-tests re-signed above it; the chunks stand"
+reopened: 2026-08-17T16:57:42.549Z — author-tests re-signed above it with a sixth spec. The design below the line grew today under goal five, so the design specs are read against what actually landed rather than against what was planned.
+amended: 2026-08-17T14:40:46.575Z by agent — author-tests re-signed above it; the chunks stand
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / specify-build

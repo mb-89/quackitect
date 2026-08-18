@@ -13,7 +13,7 @@ measure: 0 successful requests from a non-loopback source address, over a run th
 refines:
   - uc-quality-security
 source_refs:
-  - "engine/mirror.ts: server.listen(o.port, \"127.0.0.1\") — the loopback host is passed explicitly"
+  - 'engine/mirror.ts: server.listen(o.port, "127.0.0.1") — the loopback host is passed explicitly'
   - "engine/mirror.ts: access-control-allow-origin is * on the alive endpoint"
   - "guidance/voice.md: people & privacy"
 priority: must

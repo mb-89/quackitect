@@ -6,7 +6,7 @@ cluster: the-walk
 question: how an override is matched to what it overrides
 statement: what a copy adds carries no way to run itself, and becomes live only by landing at a declared address the host owns, in an ordered array where position decides what is in force
 found_by: analogy
-source: "bacterial integrons and gene cassettes — Bhat et al., Frontiers in Microbiology 14 (2023), frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2023.1231938/full"
+source: bacterial integrons and gene cassettes — Bhat et al., Frontiers in Microbiology 14 (2023), frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2023.1231938/full
 ---
 
 ## Mechanism

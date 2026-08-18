@@ -9,13 +9,13 @@ trigger: the first migration that must understand a document's structure rather 
 status: open
 breaks_how_badly: crippling
 how_likely: plausible
-impact: "The seat changes hands. cand-the-program-route leads cand-everything-declared by exactly one point, entirely on req-overlay-survives-update, 4 against 3. Drop that cell to 3 and the deficit closes, the convergence inverts, and the design M5 is building is the wrong one."
+impact: The seat changes hands. cand-the-program-route leads cand-everything-declared by exactly one point, entirely on req-overlay-survives-update, 4 against 3. Drop that cell to 3 and the deficit closes, the convergence inverts, and the design M5 is building is the wrong one.
 source_refs:
   - cand-the-program-route
   - cand-everything-declared
   - req-overlay-survives-update
   - opt-the-update-arrives-as-a-program
-  - "iterations/i16 evidence reverse-sensitivity"
+  - iterations/i16 evidence reverse-sensitivity
 ---
 
 ## The flip, in one line

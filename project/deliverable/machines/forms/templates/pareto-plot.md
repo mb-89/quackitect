@@ -2,8 +2,8 @@
 id: template-pareto-plot
 statement: The Pareto front drawn from the scores — one axis per criterion, one line per candidate, with the utopia and nadir corners over them.
 editor: pareto-plot
-line_pattern: "^- \\[\\["
-line_help: "the front, written by the arithmetic — nothing here is typed"
+line_pattern: ^- \[\[
+line_help: the front, written by the arithmetic — nothing here is typed
 ---
 
 # pareto-plot

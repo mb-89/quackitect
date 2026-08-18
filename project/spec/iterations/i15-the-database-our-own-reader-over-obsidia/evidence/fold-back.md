@@ -1,10 +1,10 @@
 ---
 form: fold-back
-reopened: "2026-08-16T18:42:15.205Z — Regaining write access to fix two project-wide raid assumptions (raid-asm-an-entry-status-says-whether-it-is-open, raid-asm-the-three-transports-behave-identically) that block gate-prototype's route-leave check but cannot be edited from gate-prototype itself, which grants no file-write tool. fold-back's own claim is unchanged in substance and will be resubmitted as-is."
+reopened: 2026-08-16T18:42:15.205Z — Regaining write access to fix two project-wide raid assumptions (raid-asm-an-entry-status-says-whether-it-is-open, raid-asm-the-three-transports-behave-identically) that block gate-prototype's route-leave check but cannot be edited from gate-prototype itself, which grants no file-write tool. fold-back's own claim is unchanged in substance and will be resubmitted as-is.
 by: agent
 signed_off: 2026-08-16T18:42:53.447Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / fold-back

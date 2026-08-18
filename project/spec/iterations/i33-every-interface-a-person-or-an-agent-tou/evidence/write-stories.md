@@ -3,9 +3,9 @@ form: write-stories
 by: agent
 signed_off: 2026-08-17T16:48:23.093Z
 reopened: "2026-08-17T16:47:47.593Z — gate-motivation re-signed and re-blessed above it, carrying the kickoff's five goals down. This is also the state the original drift ran through: it wrote one story per new pass line, correctly by its own rule, and both new pass lines were the honesty half. Its story set is read against the five goals rather than waved through."
-amended: "2026-08-17T14:37:51.862Z by agent — gate-motivation re-signed with a real breach reading; the three stories stand"
+amended: 2026-08-17T14:37:51.862Z by agent — gate-motivation re-signed with a real breach reading; the three stories stand
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / write-stories

@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: keep one append-only store of what happened, and derive the log view, the trace view and the inbox count from it
 cluster: cluster-the-account
 found_by: heuristic
-source: "heuristic — one source of truth; everything else derives"
+source: heuristic — one source of truth; everything else derives
 ---
 
 ## Mechanism

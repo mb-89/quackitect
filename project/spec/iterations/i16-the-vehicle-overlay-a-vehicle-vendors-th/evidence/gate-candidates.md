@@ -3,10 +3,10 @@ form: gate-candidates
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-18T15:39:29.894Z
-reopened: "2026-08-18T15:39:26.174Z — evaluate-set was re-signed after the fitness flags landed, so this claim answered ground that has since moved"
-amended: "2026-08-18T14:37:16.330Z by agent — the v1 reader returned and its finding is sharper than the line that said it was still running"
+reopened: 2026-08-18T15:39:26.174Z — evaluate-set was re-signed after the fitness flags landed, so this claim answered ground that has since moved
+amended: 2026-08-18T14:37:16.330Z by agent — the v1 reader returned and its finding is sharper than the line that said it was still running
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-candidates

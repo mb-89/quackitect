@@ -13,7 +13,7 @@ breaks_how_badly: corrosive
 how_likely: expected
 source_refs:
   - note-fe9e091bfa4c
-  - "570cdc66 — the levelling commit that brought all twelve files into this tree"
+  - 570cdc66 — the levelling commit that brought all twelve files into this tree
 ---
 
 Eight files carry the core and satellite design. Six test files

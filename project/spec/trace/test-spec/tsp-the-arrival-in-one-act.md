@@ -2,15 +2,15 @@
 minted_in: i35-the-cloud-run-s-findings-land-the-fix-fi
 id: tsp-the-arrival-in-one-act
 type: "[[test-spec]]"
-statement: "A fresh clone with no lane becomes a caged agent on a live lane in one act, and a second act changes nothing — verified by demonstration on a real cloud box."
-method: "demonstration"
+statement: A fresh clone with no lane becomes a caged agent on a live lane in one act, and a second act changes nothing — verified by demonstration on a real cloud box.
+method: demonstration
 demonstrates:
-  - "sty-send-an-agent-to-a-cloud-box"
+  - sty-send-an-agent-to-a-cloud-box
 verifies:
-  - "req-one-command-takes-a-fresh-clone-to-a-live-lane"
-  - "req-arriving-twice-changes-nothing"
+  - req-one-command-takes-a-fresh-clone-to-a-live-lane
+  - req-arriving-twice-changes-nothing
 files:
-  - "none — the procedure below is the definition; the observed run is the evidence"
+  - none — the procedure below is the definition; the observed run is the evidence
 ---
 
 ## Scope

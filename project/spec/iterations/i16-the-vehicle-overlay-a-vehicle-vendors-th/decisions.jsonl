@@ -1172,3 +1172,14 @@
 {"ts":"2026-08-18T19:43:08.504Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1103","brief":"answering what the churn alarm is"}
 {"ts":"2026-08-18T19:43:22.605Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1104","brief":"reading the tree before a large mechanical change"}
 {"ts":"2026-08-18T19:43:38.644Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1105","brief":"staging i16 so the reformat lands as its own change"}
+{"ts":"2026-08-18T19:43:45.358Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1106","brief":"i16's build committed before the mechanical pass"}
+{"ts":"2026-08-18T19:43:59.752Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1107","brief":"the formatter runs over the vault"}
+{"ts":"2026-08-18T19:44:11.003Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1108","brief":"measuring the reformat before believing it"}
+{"ts":"2026-08-18T19:44:17.226Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1109","brief":"reading two files the formatter touched"}
+{"ts":"2026-08-18T19:44:24.441Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1110","brief":"reading a guidance file and an item template the formatter touched"}
+{"ts":"2026-08-18T19:44:45.284Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1111","brief":"the confirm run, which is this state's exit"}
+{"ts":"2026-08-18T19:45:53.664Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1112","brief":"confirming the reformat cleared the alarm and broke nothing"}
+{"ts":"2026-08-18T19:46:10.997Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1113","brief":"the reservation about unquoting, said with the work done"}
+{"ts":"2026-08-18T19:47:15.518Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1114","brief":"re-projecting the prompt layer the reformat made stale"}
+{"ts":"2026-08-18T19:47:22.386Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1115","brief":"the confirm run after the prompt layer was replaced"}
+{"ts":"2026-08-18T19:48:41.607Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1116","brief":"staging the mechanical pass on its own"}

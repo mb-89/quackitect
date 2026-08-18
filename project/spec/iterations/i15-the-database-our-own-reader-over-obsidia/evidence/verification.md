@@ -1,10 +1,10 @@
 ---
 form: verification
-reopened: "2026-08-16T19:09:01.002Z — Verification's claims form is signed correctly, but every subsequent pull refuses with SE-C-123 (wedge-guard/AND-join) trying to complete verification's failed exit_script outcome into fix-findings, identically across 5+ attempts with both qualified and unqualified choice values. se_why reports fix-findings itself has only one blocker (unsubmitted form, ready to fill) and nothing upstream waiting, contradicting se_pull's route computation. Reopening to reset internal fired/active bookkeeping that may be stuck from repeated failed completion attempts."
+reopened: 2026-08-16T19:09:01.002Z — Verification's claims form is signed correctly, but every subsequent pull refuses with SE-C-123 (wedge-guard/AND-join) trying to complete verification's failed exit_script outcome into fix-findings, identically across 5+ attempts with both qualified and unqualified choice values. se_why reports fix-findings itself has only one blocker (unsubmitted form, ready to fill) and nothing upstream waiting, contradicting se_pull's route computation. Reopening to reset internal fired/active bookkeeping that may be stuck from repeated failed completion attempts.
 by: agent
 signed_off: 2026-08-16T19:09:07.679Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / verification

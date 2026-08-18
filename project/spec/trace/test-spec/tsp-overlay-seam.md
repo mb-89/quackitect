@@ -3,16 +3,16 @@ minted_in: i1
 id: tsp-overlay-seam
 type: "[[test-spec]]"
 statement: The vendored engine and a builder overlay never mix trees, drift is reported by identity, and a walk-governing edit lands where it compiles, verified by test over the overlay seam.
-method: "test"
+method: test
 verifies:
-  - "req-overlay-resolution"
-  - "req-overlay-survives-update"
-  - "req-overlay-drift-reported"
-  - "req-guidance-edit-lands-where-it-compiles"
+  - req-overlay-resolution
+  - req-overlay-survives-update
+  - req-overlay-drift-reported
+  - req-guidance-edit-lands-where-it-compiles
 files:
-  - "tests/editsafety.test.ts"
-  - "tests/drift.test.ts"
-  - "tests/overlay.test.ts"
+  - tests/editsafety.test.ts
+  - tests/drift.test.ts
+  - tests/overlay.test.ts
 ---
 
 ## Scope

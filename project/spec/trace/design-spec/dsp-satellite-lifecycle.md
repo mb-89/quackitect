@@ -4,16 +4,16 @@ id: dsp-satellite-lifecycle
 type: "[[design-spec]]"
 statement: four all-or-nothing acts over a satellite's life, with a deadline on the call and a beat on the process, so a half-ready satellite never serves and a wedged one is found
 realizes:
-  - "el-satellite-supervisor"
-  - "if-satellite-supervisor-to-satellite"
-  - "if-satellite-supervisor-to-record-store"
-  - "if-satellite-supervisor-to-walk-engine"
-  - "if-satellite-supervisor-to-test-runner"
-  - "if-satellite-supervisor-to-mirror"
-  - "if-front-desk-to-satellite-supervisor"
+  - el-satellite-supervisor
+  - if-satellite-supervisor-to-satellite
+  - if-satellite-supervisor-to-record-store
+  - if-satellite-supervisor-to-walk-engine
+  - if-satellite-supervisor-to-test-runner
+  - if-satellite-supervisor-to-mirror
+  - if-front-desk-to-satellite-supervisor
 files:
-  - "project/deliverable/engine/supervisor.ts"
-  - "project/deliverable/engine/worktree.ts"
+  - project/deliverable/engine/supervisor.ts
+  - project/deliverable/engine/worktree.ts
 ---
 
 ## Responsibility

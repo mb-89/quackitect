@@ -6,7 +6,7 @@ statement: load the engine's code from the record's own tree rather than from tr
 cluster: cluster-the-walk
 question: how a change to the engine's own code takes effect
 found_by: contradiction
-source: "raid-asm-engine-serves-from-the-bound-tree asks whether an engine loaded from trunk can serve a bound tree — turning the question round asks whether it should be loaded from the bound tree instead"
+source: raid-asm-engine-serves-from-the-bound-tree asks whether an engine loaded from trunk can serve a bound tree — turning the question round asks whether it should be loaded from the bound tree instead
 ---
 
 ## Mechanism

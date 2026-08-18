@@ -4,7 +4,7 @@ statement: The register's exposure chart — damage against likelihood, every st
 editor: exposure-pick
 resolves: artifact
 line_pattern: ""
-line_help: "one register ref per line — the picked unknowns"
+line_help: one register ref per line — the picked unknowns
 ---
 
 # exposure-pick

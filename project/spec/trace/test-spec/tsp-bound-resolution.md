@@ -3,12 +3,12 @@ minted_in: i27
 id: tsp-bound-resolution
 type: "[[test-spec]]"
 statement: One seam resolves every path, refuses what falls outside its record, names the store it used, and routes a call naming a different owner.
-method: "test"
+method: test
 verifies:
-  - "req-a-read-comes-from-where-it-is-meant"
-  - "req-a-write-lands-where-it-is-meant"
-  - "req-a-wrong-act-never-passes-silently"
-  - "req-version-control-resolves-like-every-call"
+  - req-a-read-comes-from-where-it-is-meant
+  - req-a-write-lands-where-it-is-meant
+  - req-a-wrong-act-never-passes-silently
+  - req-version-control-resolves-like-every-call
 files:
   - tests/resolution.test.ts
 ---

@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: let the gate demand a verdict always, and let the session autonomy decide whose verdict it accepts
 cluster: cluster-the-walk
 found_by: contradiction
-source: "TRIZ separation IN RELATION, via meth-triz — the same demand, different observers"
+source: TRIZ separation IN RELATION, via meth-triz — the same demand, different observers
 ---
 
 ## Mechanism

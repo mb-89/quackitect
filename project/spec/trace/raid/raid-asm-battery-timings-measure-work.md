@@ -7,8 +7,8 @@ statement: A battery case's recorded duration measures its own work, so the batt
 owner: the driving agent
 trigger: a file measured alone differs from its battery figure by more than a factor of two
 status: open
-probed: "2026-08-15"
-probe: "scheduled - the instrument is broken on both paths, per raid-iss-a-bound-record-records-no-test-timings. Repairing it is this iteration's first build item."
+probed: 2026-08-15
+probe: scheduled - the instrument is broken on both paths, per raid-iss-a-bound-record-records-no-test-timings. Repairing it is this iteration's first build item.
 impact: Every performance fix in this iteration is aimed by the battery's ranking. If the durations are mostly queueing, the ranking points at the wrong file and the work lands where it changes nothing.
 breaks_how_badly: corrosive
 how_likely: plausible

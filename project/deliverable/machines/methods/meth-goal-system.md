@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "Goals form a system, not a list. Their conflicts and their priorities are part of it."
+statement: Goals form a system, not a list. Their conflicts and their priorities are part of it.
 ---
 
 ## Situation

@@ -6,7 +6,7 @@ statement: resolve an unqualified path into the bound record without ceremony an
 cluster: cluster-the-walk
 question: how a path names its tree
 found_by: heuristic
-source: "the heuristic catalogue — Make the common case cheap; make the rare case possible."
+source: the heuristic catalogue — Make the common case cheap; make the rare case possible.
 ---
 
 ## Mechanism

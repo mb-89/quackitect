@@ -9,7 +9,7 @@ trigger: any design that would let a host write under the engine folder to expre
 status: superseded
 breaks_how_badly: crippling
 how_likely: expected
-impact: "This is the ordering every later design decision inherits. Reversed, an update stops being a replacement and becomes a merge, which is the exact cost vp-vendoring exists to avoid, and the failure is silent until the next version arrives."
+impact: This is the ordering every later design decision inherits. Reversed, an update stops being a replacement and becomes a merge, which is the exact cost vp-vendoring exists to avoid, and the failure is silent until the next version arrives.
 source_refs:
   - req-nothing-a-copy-does-reaches-its-source
   - req-overlay-resolution

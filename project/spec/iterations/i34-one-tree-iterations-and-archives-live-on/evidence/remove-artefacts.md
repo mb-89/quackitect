@@ -3,7 +3,7 @@ form: remove-artefacts
 by: agent
 signed_off: 2026-08-16T09:05:28.632Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / remove-artefacts

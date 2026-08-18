@@ -3,13 +3,13 @@ minted_in: i1
 id: tsp-reading-proof-run
 type: "[[test-spec]]"
 statement: A fresh agent is handed the method one document at a time and cannot reach the work until it proves it read them - observed on a real session's reading loop.
-method: "demonstration"
+method: demonstration
 verifies:
   - "none — demonstrates: sty-the-agent-proves-it-read carries the edge; the mechanics are test-verified by tsp-reading-loop"
 demonstrates:
-  - "sty-the-agent-proves-it-read"
+  - sty-the-agent-proves-it-read
 files:
-  - "none — the procedure below is the definition; the observed session is the evidence"
+  - none — the procedure below is the definition; the observed session is the evidence
 ---
 
 ## Scope

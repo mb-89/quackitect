@@ -3,7 +3,7 @@ form: speaking-root
 by: agent
 signed_off: 2026-08-14T07:17:22.110Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / speaking-root

@@ -10,9 +10,9 @@ breaks_how_badly: corrosive
 refines:
   - uc-take-a-step
 source_refs:
-  - "note-936e7a2d67d5, the retro lead of 2026-08-11"
-  - "guidance/refusals.md, the law that anything which blocks owes a remedy"
-  - "project/spec/version-planning.md § i3, which says i3 absorbs the introspection-verb work"
+  - note-936e7a2d67d5, the retro lead of 2026-08-11
+  - guidance/refusals.md, the law that anything which blocks owes a remedy
+  - project/spec/version-planning.md § i3, which says i3 absorbs the introspection-verb work
 priority: must
 ---
 

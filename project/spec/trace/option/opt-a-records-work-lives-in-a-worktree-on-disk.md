@@ -6,7 +6,7 @@ statement: keep a record's working copy in an ordinary worktree on durable stora
 cluster: cluster-the-walk
 question: where a record's working files live while it is open
 found_by: heuristic
-source: "what stands today — one worktree per record under .worktrees, on the machine's own disk"
+source: what stands today — one worktree per record under .worktrees, on the machine's own disk
 ---
 
 ## Mechanism

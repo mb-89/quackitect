@@ -3,10 +3,10 @@ minted_in: i28-the-cloud-runs-from-its-seed-alone-a-fre
 id: tsp-unattended-start
 type: "[[test-spec]]"
 statement: One command takes a bare machine to a walking agent on a named iteration, or exits non-zero naming the single step that failed, observed end to end on a host nobody prepared.
-method: "demonstration"
+method: demonstration
 verifies:
-  - "req-one-command-starts-an-unattended-machine"
-files: "none — a demonstration is observed on a host, not run from a file in this repository"
+  - req-one-command-starts-an-unattended-machine
+files: none — a demonstration is observed on a host, not run from a file in this repository
 ---
 
 ## Scope

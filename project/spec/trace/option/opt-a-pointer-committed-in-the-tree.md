@@ -6,7 +6,7 @@ statement: the produced tree carries a committed file naming what it must follow
 cluster: the-walk
 question: how a tree carrying no method finds the copy that drives it
 found_by: prior-art
-source: "git's gitfile (git-scm.com/docs/gitrepository-layout) and its source dir.c and worktree.c; Yarn yarnPath (yarnpkg.com/configuration/yarnrc); pkg-config ${pcfiledir} (manpages.debian.org pkg-config.1)"
+source: git's gitfile (git-scm.com/docs/gitrepository-layout) and its source dir.c and worktree.c; Yarn yarnPath (yarnpkg.com/configuration/yarnrc); pkg-config ${pcfiledir} (manpages.debian.org pkg-config.1)
 ---
 
 ## Mechanism

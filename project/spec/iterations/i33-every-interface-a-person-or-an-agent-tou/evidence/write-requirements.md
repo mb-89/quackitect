@@ -3,9 +3,9 @@ form: write-requirements
 by: agent
 signed_off: 2026-08-17T16:50:30.606Z
 reopened: "2026-08-17T16:49:48.634Z — generalize-use-cases re-signed above it. This state also owes a new row: the owner ruled on 2026-08-17 that an amendment does not re-grey and a reopen does, and asked for it in the requirements."
-amended: "2026-08-17T14:38:13.854Z by agent — the use-case state re-signed above it; the seven rows stand"
+amended: 2026-08-17T14:38:13.854Z by agent — the use-case state re-signed above it; the seven rows stand
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / write-requirements

@@ -7,7 +7,7 @@ statement: A running engine can serve content from a store it does not itself li
 owner: the driving agent
 trigger: at the first reload taken while a record is bound, once the lane root moves
 status: closed
-probe: "Bind a record on a product that does NOT edit the engine, move the lane root, and take a reload. If the engine comes back serving the bound tree's content while running from trunk's sources, this holds. If the reload cannot resolve, the answer is the seed's other branch - an engine change stays invisible until the record lands, accepted rather than fixed."
+probe: Bind a record on a product that does NOT edit the engine, move the lane root, and take a reload. If the engine comes back serving the bound tree's content while running from trunk's sources, this holds. If the reload cannot resolve, the answer is the seed's other branch - an engine change stays invisible until the record lands, accepted rather than fixed.
 probed: "not yet - it cannot be probed from this repository. The probe needs a product that does not edit the engine, and Quackitect is the only product here and the exception itself. Reasoning cannot settle it: both branches are consistent with everything known today."
 impact: The whole binding rests on it. If the engine cannot serve from the bound tree, an engine change stays invisible until the record lands, and the iteration's own subject cannot be developed inside its own record.
 breaks_how_badly: fatal

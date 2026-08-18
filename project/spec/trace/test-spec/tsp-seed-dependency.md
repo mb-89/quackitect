@@ -3,11 +3,11 @@ minted_in: i6-conformance-goes-mechanical-checks-bind-
 id: tsp-seed-dependency
 type: "[[test-spec]]"
 statement: A seed without depends_on refuses with the call to make instead, an empty list lands as a stated decision, and a named dependency becomes an edge the container reads.
-method: "test"
+method: test
 verifies:
-  - "req-a-seed-states-its-dependency"
+  - req-a-seed-states-its-dependency
 files:
-  - "tests/seed-dependency.test.ts"
+  - tests/seed-dependency.test.ts
 ---
 
 ## Scope

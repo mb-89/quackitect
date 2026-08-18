@@ -7,12 +7,12 @@ statement: When an update meets a change a copy's owner made in the same place, 
 owner: the owner
 trigger: the first collision a real copy's owner meets, on the first update after their first substantial edit
 status: deferred
-defer_until: "a second update is taken after a first collision. This node's own probe field says the claim is about a person's patience over months, and that a document is not a probe and an argument is not a probe. The honest interim step is a conversation with somebody holding a vendored dependency today."
-probed: "not yet - it needs a person rather than a run"
+defer_until: a second update is taken after a first collision. This node's own probe field says the claim is about a person's patience over months, and that a document is not a probe and an argument is not a probe. The honest interim step is a conversation with somebody holding a vendored dependency today.
+probed: not yet - it needs a person rather than a run
 probe: "unprobed, and the reason is not an excuse: the claim is about a person's patience over months, and this method's own card says a document is not a probe and an argument is not a probe. WHAT RUN ONE DID NARROW is the SHAPE of the cost. One shared line changed on both sides produced ONE conflict in ONE file, with three other files untouched. This entry's own falsifier was a mechanism whose collision cost is paid in files rather than in lines, and the mechanism that was run is not that. Its honest probe is a conversation with somebody who holds a vendored dependency today; the conclusive one is a second update taken after a first collision."
 breaks_how_badly: crippling
 how_likely: plausible
-impact: "Everything this iteration builds after the copy exists is worth nothing if the channel stops being used. A copy whose owner has quietly stopped updating is a fork, and it looks identical to a working one from here - which is the whole reason this is an assumption rather than a risk we could watch."
+impact: Everything this iteration builds after the copy exists is worth nothing if the channel stops being used. A copy whose owner has quietly stopped updating is a fork, and it looks identical to a working one from here - which is the whole reason this is an assumption rather than a risk we could watch.
 source_refs:
   - raid-risk-ownership-and-receiving-pull-against-each-other
   - stk-vehicle-owner

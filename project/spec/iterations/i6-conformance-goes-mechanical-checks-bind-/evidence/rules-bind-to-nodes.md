@@ -3,7 +3,7 @@ form: rules-bind-to-nodes
 by: agent
 signed_off: 2026-08-16T17:21:26.236Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / rules-bind-to-nodes

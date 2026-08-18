@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "DSM banding groups mutually-independent elements at the same topological level into one band. It exposes within-layer parallelism."
+statement: DSM banding groups mutually-independent elements at the same topological level into one band. It exposes within-layer parallelism.
 source: ref-structural-complexity-management
 ---
 

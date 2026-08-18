@@ -3,7 +3,7 @@ form: goals-bind-the-walk
 by: agent
 signed_off: 2026-08-17T13:38:47.952Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / goals-bind-the-walk

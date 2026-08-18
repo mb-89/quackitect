@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: let a walker enter a section only while holding its token, and issue written tickets against a held token when several must follow one after another
 cluster: cluster-the-walk
 found_by: analogy
-source: "railway single-line working — token block, and the staff-and-ticket variant"
+source: railway single-line working — token block, and the staff-and-ticket variant
 ---
 
 ## Mechanism

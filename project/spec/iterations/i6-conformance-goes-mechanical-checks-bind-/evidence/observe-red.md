@@ -2,9 +2,9 @@
 form: observe-red
 by: agent
 signed_off: 2026-08-16T19:27:59.050Z
-reopened: "2026-08-16T19:27:27.131Z — the only drawn way back into build-steps, where a chunk I reopened for its write verbs is owed a re-submit"
+reopened: 2026-08-16T19:27:27.131Z — the only drawn way back into build-steps, where a chunk I reopened for its write verbs is owed a re-submit
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / observe-red

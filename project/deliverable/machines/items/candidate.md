@@ -13,21 +13,21 @@ checks:
       - TBD
       - TBC
       - TBR
-      - "???"
+      - ???
     hint: a candidate nobody can name is a line nobody can argue with
   - field: statement
     ban_markers:
       - TBD
       - TBC
       - TBR
-      - "???"
+      - ???
     hint: one line saying what this whole architecture is, not what one part does
   - field: picks
     ban_markers:
       - TBD
       - TBC
       - TBR
-      - "???"
+      - ???
     hint: the options it visits, one per cluster — an empty pick list is not a candidate
 sections:
   - Why this one

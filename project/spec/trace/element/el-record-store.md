@@ -11,7 +11,7 @@ implements:
   - fn-run-a-governed-walk.land-the-work
   - fn-run-a-governed-walk.close-a-record
   - fn-run-a-governed-walk.keep-the-archive
-satisfies:
+satisfies: null
 source_refs:
   - cand-thin-worktree
   - raid-dec-thin-tree

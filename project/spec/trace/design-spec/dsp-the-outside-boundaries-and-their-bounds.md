@@ -4,23 +4,23 @@ id: dsp-the-outside-boundaries-and-their-bounds
 type: "[[design-spec]]"
 statement: every crossing where the product meets something it does not own is a node carrying its own argued bound, and the matrix knows a neighbour is a legal end
 realizes:
-  - "if-agent-harness-to-entrypoint"
-  - "if-engineer-to-mirror"
-  - "if-vscode-to-mirror"
-  - "if-test-runner-to-toolchain"
-  - "if-bootstrap-to-toolchain"
-  - "if-account-to-git"
-  - "if-record-store-to-git"
-  - "if-record-store-to-origin-remote"
-  - "if-account-to-obsidian"
-  - "if-walk-engine-to-web"
-  - "if-mirror-to-output-tools"
-  - "if-satellite-supervisor-to-cloud-host"
-  - "if-satellite-supervisor-to-peer-machine"
+  - if-agent-harness-to-entrypoint
+  - if-engineer-to-mirror
+  - if-vscode-to-mirror
+  - if-test-runner-to-toolchain
+  - if-bootstrap-to-toolchain
+  - if-account-to-git
+  - if-record-store-to-git
+  - if-record-store-to-origin-remote
+  - if-account-to-obsidian
+  - if-walk-engine-to-web
+  - if-mirror-to-output-tools
+  - if-satellite-supervisor-to-cloud-host
+  - if-satellite-supervisor-to-peer-machine
 files:
-  - "project/deliverable/machines/items/interface.md"
-  - "project/deliverable/engine/trace.ts"
-  - "project/deliverable/engine/elematrix.ts"
+  - project/deliverable/machines/items/interface.md
+  - project/deliverable/engine/trace.ts
+  - project/deliverable/engine/elematrix.ts
 ---
 
 ## The concern

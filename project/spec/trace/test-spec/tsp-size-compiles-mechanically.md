@@ -3,13 +3,13 @@ minted_in: i3
 id: tsp-size-compiles-mechanically
 type: "[[test-spec]]"
 statement: The recorded change size decides the machine by computation, never by reading around a choice or by asking whoever walks to be brief.
-method: "test"
+method: test
 verifies:
-  - "req-the-size-is-read-by-one-extractor"
-  - "req-a-size-may-drop-a-question"
+  - req-the-size-is-read-by-one-extractor
+  - req-a-size-may-drop-a-question
 files:
-  - "tests/change-size.test.ts"
-  - "tests/field-omit.test.ts"
+  - tests/change-size.test.ts
+  - tests/field-omit.test.ts
 ---
 
 ## Scope

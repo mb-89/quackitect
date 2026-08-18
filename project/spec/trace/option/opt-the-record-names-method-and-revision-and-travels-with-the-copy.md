@@ -6,7 +6,7 @@ cluster: the-bootstrap
 question: how a copy's own changes are represented
 statement: the copy carries a record naming, per upstream change, which one it was, at which revision, by what method it was satisfied, and when the next action falls due
 found_by: analogy
-source: "14 CFR 91.417(a)(2)(v) and 91.417(b)(2), read at ecfr.gov — the aircraft maintenance record, which lives on the airframe and transfers with it on sale"
+source: 14 CFR 91.417(a)(2)(v) and 91.417(b)(2), read at ecfr.gov — the aircraft maintenance record, which lives on the airframe and transfers with it on sale
 ---
 
 ## Mechanism

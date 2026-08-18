@@ -9,7 +9,7 @@ trigger: the next requirement that reads badly and passed, and any change to the
 probe: "List the lint's implemented rules from machines/items/requirement.md against the INCOSE guide rules the method card cites — R1, R2, R7 to R9, R18 to R23 and R33. Name every cited rule with no check behind it. UNPROBED 2026-08-17: the comparison needs the guide itself, which is not in the corpus, and buying or fetching it is the owner's call rather than this iteration's."
 status: open
 probed: 2026-08-17
-impact: "A row can pass the submit and still be poor. The lint is the only mechanical gate on requirement quality, so what it does not check is checked by nobody, and the method card's citation of the INCOSE guide reads as coverage the code may not have."
+impact: A row can pass the submit and still be poor. The lint is the only mechanical gate on requirement quality, so what it does not check is checked by nobody, and the method card's citation of the INCOSE guide reads as coverage the code may not have.
 breaks_how_badly: abrasive
 how_likely: plausible
 source_refs:

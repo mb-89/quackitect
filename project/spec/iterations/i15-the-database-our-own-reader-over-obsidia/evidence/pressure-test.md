@@ -1,10 +1,10 @@
 ---
 form: pressure-test
-amended: "2026-08-16T16:31:08.736Z by agent — ref \"main\" resolves — verified 2026-08-16; the hostile question's premise no longer holds"
+amended: 2026-08-16T16:31:08.736Z by agent — ref "main" resolves — verified 2026-08-16; the hostile question's premise no longer holds
 by: agent
 signed_off: 2026-08-16T16:26:37.526Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / pressure-test

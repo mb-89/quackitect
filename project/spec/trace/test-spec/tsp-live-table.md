@@ -3,15 +3,15 @@ minted_in: i1
 id: tsp-live-table
 type: "[[test-spec]]"
 statement: The live table derives from the notes, lands every edit in its note, keeps its whole shape on the view file, and refuses what it cannot draw, verified by test over the table stack.
-method: "test"
+method: test
 verifies:
-  - "req-table-rows-derive-from-notes"
-  - "req-cell-edit-lands-in-the-note"
-  - "req-table-refuses-what-it-cannot-draw"
-  - "req-view-writes-round-trip"
-  - "req-query-is-the-file"
-  - "req-grouping-and-sorting-hold"
-  - "req-expressions-evaluate-per-reference"
+  - req-table-rows-derive-from-notes
+  - req-cell-edit-lands-in-the-note
+  - req-table-refuses-what-it-cannot-draw
+  - req-view-writes-round-trip
+  - req-query-is-the-file
+  - req-grouping-and-sorting-hold
+  - req-expressions-evaluate-per-reference
 files:
   - tests/tables.test.ts
   - tests/bases.test.ts

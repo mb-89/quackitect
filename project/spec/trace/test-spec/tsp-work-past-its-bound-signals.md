@@ -3,9 +3,9 @@ minted_in: i33-every-interface-a-person-or-an-agent-tou
 id: tsp-work-past-its-bound-signals
 type: "[[test-spec]]"
 statement: Work still running past the bound named for it says so on the surface, and says it without taking the surface over.
-method: "test"
+method: test
 verifies:
-  - "req-work-past-its-bound-says-it-is-working"
+  - req-work-past-its-bound-says-it-is-working
 files:
   - project/deliverable/tests/slow-work-signals.test.ts
 ---

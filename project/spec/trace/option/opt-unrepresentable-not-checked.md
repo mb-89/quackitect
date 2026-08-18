@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: make an illegal act impossible to express rather than refusing it when somebody expresses it
 cluster: cluster-the-walk
 found_by: heuristic
-source: "heuristic — make the illegal unrepresentable, not merely checked"
+source: heuristic — make the illegal unrepresentable, not merely checked
 ---
 
 ## Mechanism

@@ -3,11 +3,11 @@ minted_in: i33-every-interface-a-person-or-an-agent-tou
 id: tsp-a-breached-bound-reaches-a-reviewer
 type: "[[test-spec]]"
 statement: A gate review is shown the interfaces that breached their bound since the last review, verified by test over the gate's own form.
-method: "test"
+method: test
 verifies:
-  - "req-a-breached-bound-is-put-in-front-of-a-reviewer"
+  - req-a-breached-bound-is-put-in-front-of-a-reviewer
 files:
-  - "tests/rounds.test.ts"
+  - tests/rounds.test.ts
 ---
 
 ## Scope

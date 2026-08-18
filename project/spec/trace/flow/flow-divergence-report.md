@@ -4,5 +4,5 @@ id: flow-divergence-report
 type: "[[flow]]"
 statement: where two method trees disagree
 kind: signal
-source_refs:
+source_refs: null
 ---

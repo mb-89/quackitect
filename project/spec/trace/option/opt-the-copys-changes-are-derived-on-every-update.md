@@ -6,7 +6,7 @@ statement: the copy edits whatever it likes, and each update three-way merges th
 cluster: the-bootstrap
 question: how a copy's own changes are represented
 found_by: prior-art
-source: "Google Copybara core.workflow merge_import and autopatch_config (github.com/google/copybara/blob/master/docs/reference.md)"
+source: Google Copybara core.workflow merge_import and autopatch_config (github.com/google/copybara/blob/master/docs/reference.md)
 ---
 
 ## Mechanism

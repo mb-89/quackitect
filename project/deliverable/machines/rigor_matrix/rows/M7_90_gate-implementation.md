@@ -22,7 +22,7 @@ evidence:
     template: checklist
     items:
       - $iq_checklist
-    description: "the internal-quality checklist — the meth-internal-quality card holds the items and the debt rules. Checking each box is the claim."
+    description: the internal-quality checklist — the meth-internal-quality card holds the items and the debt rules. Checking each box is the claim.
   - name: debt_taken
     template: refs
     of: raid
@@ -32,7 +32,7 @@ evidence:
     options:
       - acceptable
       - not-acceptable
-    description: "the implementation risks added or regraded this iteration, judged — name the raid ids in the rationale, or say none moved"
+    description: the implementation risks added or regraded this iteration, judged — name the raid ids in the rationale, or say none moved
 major: full
 minor: full
 patch: tailored

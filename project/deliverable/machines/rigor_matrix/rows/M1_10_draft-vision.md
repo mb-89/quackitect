@@ -1,7 +1,7 @@
 ---
 kind: matrix-row
 name: draft-vision
-statement: "Draft the vision packet. It holds the big idea and the world it makes."
+statement: Draft the vision packet. It holds the big idea and the world it makes.
 state_kind: work
 filled_by: agent
 depends_on:

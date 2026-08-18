@@ -12,7 +12,7 @@ form: extension webview
 bound: 1 second
 source_refs:
   - "i33 model-the-boundaries: the outside edges the element matrix never drew"
-  - "raid-asm-every-host-hands-in-every-value-the-panel-can-draw, falsified 2026-08-17"
+  - raid-asm-every-host-hands-in-every-value-the-panel-can-draw, falsified 2026-08-17
 ---
 
 ## What crosses

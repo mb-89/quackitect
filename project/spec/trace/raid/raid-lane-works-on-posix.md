@@ -10,7 +10,7 @@ status: open
 breaks_how_badly: crippling
 how_likely: plausible
 probe: "holds. PROBED BY RUNNING IT, i35 on 2026-08-17: the whole engine ran on a Linux container end to end. The lane spawned detached and stayed up across the walk, the mirror answered on 7333, the battery ran three times and the arrival twice. This is the branch exp-the-posix-branches-have-never-run said had never been exercised."
-probed: "2026-08-17"
+probed: 2026-08-17
 impact: A separator difference makes a write land in the wrong tree silently — which is the exact failure class the method fan-out was built to end.
 source_refs:
   - engine/paths.ts

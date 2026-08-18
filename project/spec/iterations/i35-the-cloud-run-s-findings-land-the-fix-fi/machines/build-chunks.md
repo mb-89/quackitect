@@ -1,15 +1,15 @@
 ---
 steps:
   - id: container-blind-spots
-    statement: "shoot.ts finds the Chromium a container actually has, and passes --no-sandbox only as root — the browser path and the flag ship together or neither is testable"
+    statement: shoot.ts finds the Chromium a container actually has, and passes --no-sandbox only as root — the browser path and the flag ship together or neither is testable
     depends_on: []
     realization: code
   - id: corpus-frontmatter-guard
-    statement: "preflight refuses a trace note whose frontmatter is unterminated, unparseable or absent — the fence counted before the parse, because the parse cannot see it"
+    statement: preflight refuses a trace note whose frontmatter is unterminated, unparseable or absent — the fence counted before the parse, because the parse cannot see it
     depends_on: []
     realization: code
   - id: the-fallback-is-driven
-    statement: "the verification/fix-findings loop is driven on the shipped matrix at every column, and the dead guard counter is pinned so a half-fix fails loudly"
+    statement: the verification/fix-findings loop is driven on the shipped matrix at every column, and the dead guard counter is pinned so a half-fix fails loudly
     depends_on: []
     realization: code
   - id: the-arrival
@@ -17,16 +17,19 @@ steps:
     depends_on: []
     realization: code
   - id: the-arrival-hook
-    statement: "the committed root settings fire the arrival at session start, and the hook exits zero whatever happened — a hook that ends a session start is worse than the hand-work it replaces"
-    depends_on: [the-arrival]
+    statement: the committed root settings fire the arrival at session start, and the hook exits zero whatever happened — a hook that ends a session start is worse than the hand-work it replaces
+    depends_on:
+      - the-arrival
     realization: code
   - id: the-arrival-guards
-    statement: "tests/arrival.test.ts pins the runtime refusal, the untouched declaration, the cage that is never half-placed, the loud opt-out and the degrading fetch"
-    depends_on: [the-arrival-hook]
+    statement: tests/arrival.test.ts pins the runtime refusal, the untouched declaration, the cage that is never half-placed, the loud opt-out and the degrading fetch
+    depends_on:
+      - the-arrival-hook
     realization: code
   - id: the-guidance-follows
-    statement: "cloud-runner.md leads with the one command and keeps the five acts, and Arrival A carries the fetch with the measurement behind it"
-    depends_on: [the-arrival]
+    statement: cloud-runner.md leads with the one command and keeps the five acts, and Arrival A carries the fetch with the measurement behind it
+    depends_on:
+      - the-arrival
     realization: doc
 ---
 

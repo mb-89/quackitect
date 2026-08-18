@@ -2,10 +2,10 @@
 form: derive-functions
 by: agent
 signed_off: 2026-08-17T16:52:02.868Z
-reopened: "2026-08-17T16:50:45.668Z — write-requirements re-signed above it and gained an eighth row, req-an-amend-leaves-the-tree-standing. A new requirement must map to a function or the structure has a hole, so this is a real check rather than a formality."
-amended: "2026-08-17T14:38:24.498Z by agent — the register re-signed above it; the three functions stand"
+reopened: 2026-08-17T16:50:45.668Z — write-requirements re-signed above it and gained an eighth row, req-an-amend-leaves-the-tree-standing. A new requirement must map to a function or the structure has a hole, so this is a real check rather than a formality.
+amended: 2026-08-17T14:38:24.498Z by agent — the register re-signed above it; the three functions stand
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / derive-functions

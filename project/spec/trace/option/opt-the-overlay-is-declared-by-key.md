@@ -6,7 +6,7 @@ statement: the copy's own layer sits wherever a committed configuration key says
 cluster: the-bootstrap
 question: where a copy's own layer lives
 found_by: prior-art
-source: "v1's overlayLayers, product/engine-go/resolver.go at ref main — the overlay key in the workspace's spec/project.toml"
+source: v1's overlayLayers, product/engine-go/resolver.go at ref main — the overlay key in the workspace's spec/project.toml
 ---
 
 ## Mechanism

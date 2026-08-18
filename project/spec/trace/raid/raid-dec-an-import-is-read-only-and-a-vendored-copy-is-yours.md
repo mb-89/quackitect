@@ -11,7 +11,7 @@ breaks_how_badly: fatal
 how_likely: expected
 impact: "A tool can destroy the thing it imports. Witnessed 2026-07-25 in v2: package.json declared the kb module as an npm file: dependency, npm implemented that as a symlink into the sibling benjamin checkout, and a routine `git worktree remove --force` followed the link and deleted benjamin's working tree and its .git. Losing another repository's history is unrecoverable, which is why this is graded fatal rather than crippling."
 source_refs:
-  - "product/spec/ledger/se/law-imports-are-read-only.md at ref v2 — owner ruling 2026-07-25, read 2026-08-18"
+  - product/spec/ledger/se/law-imports-are-read-only.md at ref v2 — owner ruling 2026-07-25, read 2026-08-18
   - vp-vendoring
   - req-nothing-a-copy-does-reaches-its-source
 ---

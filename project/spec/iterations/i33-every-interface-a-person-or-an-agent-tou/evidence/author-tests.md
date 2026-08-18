@@ -2,10 +2,10 @@
 form: author-tests
 by: agent
 signed_off: 2026-08-17T16:57:27.624Z
-reopened: "2026-08-17T16:56:41.396Z — decompose-structure re-signed above it, and the register gained an eighth row whose verify_method is test. Every requirement must be verified by at least one spec, so this state owes a new test-spec rather than a recheck."
-amended: "2026-08-17T17:20:06.265Z by agent — The requirements-by-method count read five where the specs' own verifies lists cover seven by test. The spec count was updated on the last pass and the requirement count was not. Found by a fresh-eyes tester counting the lists rather than reading the sentence."
+reopened: 2026-08-17T16:56:41.396Z — decompose-structure re-signed above it, and the register gained an eighth row whose verify_method is test. Every requirement must be verified by at least one spec, so this state owes a new test-spec rather than a recheck.
+amended: 2026-08-17T17:20:06.265Z by agent — The requirements-by-method count read five where the specs' own verifies lists cover seven by test. The spec count was updated on the last pass and the requirement count was not. Found by a fresh-eyes tester counting the lists rather than reading the sentence.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / author-tests

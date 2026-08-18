@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: seal the work at its source into one unit that moves without being opened, and unseal it only at the destination
 cluster: cluster-the-record-life
 found_by: analogy
-source: "containerisation in freight — the box is sealed at the shipper and opened at the consignee"
+source: containerisation in freight — the box is sealed at the shipper and opened at the consignee
 ---
 
 ## Mechanism

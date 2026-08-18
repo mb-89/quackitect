@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: give the evidence form a second job as the node editor, so filling a field writes the standing artifact directly
 cluster: cluster-the-account
 found_by: transform
-source: "SIT Task Unification, applied to the evidence form"
+source: SIT Task Unification, applied to the evidence form
 ---
 
 ## Mechanism

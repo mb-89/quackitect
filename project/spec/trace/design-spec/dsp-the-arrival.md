@@ -4,11 +4,11 @@ id: dsp-the-arrival
 type: "[[design-spec]]"
 statement: the one-act cloud arrival — refs, runtime, install, cage, headless lane and a written client — fired by a session-start hook that can never cost the session
 realizes:
-  - "el-arrival"
+  - el-arrival
 files:
-  - "project/deliverable/engine/bin/se-arrive.ts"
-  - "project/deliverable/engine/bin/se-hook-arrive.ts"
-  - ".claude/settings.json"
+  - project/deliverable/engine/bin/se-arrive.ts
+  - project/deliverable/engine/bin/se-hook-arrive.ts
+  - .claude/settings.json
   - project/deliverable/engine/bin/se-hook-start.ts
   - project/deliverable/engine/pullnotice.ts
 ---

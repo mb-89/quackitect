@@ -3,11 +3,11 @@ minted_in: i2
 id: tsp-boot-bench
 type: "[[test-spec]]"
 statement: A session boot lands the walk at the front desk within 20 seconds of the first pull on the reference machine, serving boot's own reading only — verified by test with a measured clock.
-method: "test"
+method: test
 verifies:
-  - "req-boot-ends-at-front-desk"
+  - req-boot-ends-at-front-desk
 files:
-  - "tests/boot-bench.test.ts"
+  - tests/boot-bench.test.ts
 ---
 
 ## Scope

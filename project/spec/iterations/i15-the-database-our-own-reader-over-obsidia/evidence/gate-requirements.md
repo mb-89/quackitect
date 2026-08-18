@@ -1,12 +1,12 @@
 ---
 form: gate-requirements
 bless: blessed by agent
-reopened: "2026-08-16T17:25:25.575Z — derive-criteria's weighs_with/weighs_against writes to the same requirement files postdate this gate's signed_off timestamp; two se_amend attempts recorded the ripple but did not clear the downstream claim-guard (signed_off itself is untouched by amend), so a fresh bless is needed to update it"
-amended: "2026-08-16T17:23:05.814Z by agent — derive-criteria added weighs_with/weighs_against frontmatter to the same requirement files this round already verified; re-affirming since the substantive claims (statement, kind, priority, breaks_how_badly) this round checked are untouched"
+reopened: 2026-08-16T17:25:25.575Z — derive-criteria's weighs_with/weighs_against writes to the same requirement files postdate this gate's signed_off timestamp; two se_amend attempts recorded the ripple but did not clear the downstream claim-guard (signed_off itself is untouched by amend), so a fresh bless is needed to update it
+amended: 2026-08-16T17:23:05.814Z by agent — derive-criteria added weighs_with/weighs_against frontmatter to the same requirement files this round already verified; re-affirming since the substantive claims (statement, kind, priority, breaks_how_badly) this round checked are untouched
 by: agent
 signed_off: 2026-08-16T17:25:33.165Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-requirements

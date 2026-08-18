@@ -7,7 +7,7 @@ statement: Delivering the pull's packet in parts could let an agent act on an in
 owner: the driving agent
 trigger: the first design of a streamed or paged pull answer, and any change to what the pull ships on arrival
 status: open
-impact: "The pull's one-call completeness is why an agent can walk without asking questions. If a streamed packet lets the agent begin before the guidance, the form or the legal tools have arrived, the walk starts acting on a partial world. That is not a slow interface, it is a different machine, and the failure would look like an agent making poor choices rather than like a delivery bug."
+impact: The pull's one-call completeness is why an agent can walk without asking questions. If a streamed packet lets the agent begin before the guidance, the form or the legal tools have arrived, the walk starts acting on a partial world. That is not a slow interface, it is a different machine, and the failure would look like an agent making poor choices rather than like a delivery bug.
 breaks_how_badly: crippling
 how_likely: conceivable
 source_refs:

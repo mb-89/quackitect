@@ -7,7 +7,7 @@ statement: The twenty defects i11 was seeded with in August still stand, after i
 owner: the driving agent
 trigger: frame-delta, where each named defect is checked against the system as i34 left it
 status: open
-probe: "half. Ten of about twenty-four read against the system i34 left. One obsolete, one fixed, two half-fixed, six live and confirmed by walking into them. The pattern is the real result — items are partly done and the surviving half is not what the item says, and in one case the fix reintroduced the structural fault the item named. Fourteen remain."
+probe: half. Ten of about twenty-four read against the system i34 left. One obsolete, one fixed, two half-fixed, six live and confirmed by walking into them. The pattern is the real result — items are partly done and the surviving half is not what the item says, and in one case the fix reintroduced the structural fault the item named. Fourteen remain.
 probed: 2026-08-16
 impact: the iteration builds against a list nobody re-read, and spends its pass fixing what is already fixed while missing what i34 broke.
 breaks_how_badly: crippling

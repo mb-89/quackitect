@@ -5,7 +5,7 @@ by: agent
 signed_off: 2026-08-18T10:55:54.124Z
 reopened: "2026-08-18T10:54:37.504Z — Scope gained a seventh item: the extension affordance the owner asked for, which this record had excluded by name. The gate reviewed six."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-motivation

@@ -3,11 +3,11 @@ minted_in: i2
 id: tsp-seeded-scaffolds
 type: "[[test-spec]]"
 statement: The kickoff bless writes every seeded sub-machine's placeholder drawing in the same act, so no route refuses over a machine M4 has not authored yet — verified by test at the pin.
-method: "test"
+method: test
 verifies:
-  - "req-pin-writes-seeded-scaffolds"
+  - req-pin-writes-seeded-scaffolds
 files:
-  - "tests/seed-scaffolds.test.ts"
+  - tests/seed-scaffolds.test.ts
 ---
 
 ## Scope

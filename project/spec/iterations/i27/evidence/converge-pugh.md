@@ -2,9 +2,9 @@
 form: converge-pugh
 by: agent
 signed_off: 2026-08-14T12:45:09.480Z
-reopened: "2026-08-14T12:44:39.133Z — Its matrix ran over the scores that were taken before the records were completed, and a fresh blind scoring of all six now stands."
+reopened: 2026-08-14T12:44:39.133Z — Its matrix ran over the scores that were taken before the records were completed, and a fresh blind scoring of all six now stands.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / converge-pugh

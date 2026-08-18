@@ -3,11 +3,11 @@ minted_in: i6-conformance-goes-mechanical-checks-bind-
 id: tsp-coverage-computes-both-sides
 type: "[[test-spec]]"
 statement: A coverage check reads both its sets from the corpus, so its verdict cannot be moved by what the agent types, and the field it leaves behind asks only what the corpus cannot answer.
-method: "test"
+method: test
 verifies:
-  - "req-a-coverage-check-computes-both-sides"
+  - req-a-coverage-check-computes-both-sides
 files:
-  - "tests/coverage-both-sides.test.ts"
+  - tests/coverage-both-sides.test.ts
 ---
 
 ## Scope

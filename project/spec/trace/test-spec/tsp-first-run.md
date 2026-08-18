@@ -3,22 +3,22 @@ minted_in: i1
 id: tsp-first-run
 type: "[[test-spec]]"
 statement: A newcomer reaches the desk's greeting from a fresh machine with one command, and the boot stands without an agent, verified by demonstration on a real machine.
-method: "demonstration"
+method: demonstration
 demonstrates:
-  - "sty-ramp-up"
-  - "sty-start-a-new-product"
+  - sty-ramp-up
+  - sty-start-a-new-product
 verifies:
-  - "req-newcomer-one-command"
-  - "req-newcomer-orients-unaided"
-  - "req-newcomer-leaves-able-to-ask"
-  - "req-one-script-installs"
-  - "req-second-product-reuses-install"
-  - "req-setup-serves-shipped-method"
-  - "req-begin-says-own-window"
-  - "req-fresh-machine-runs"
-  - "req-boot-stands-agentless"
+  - req-newcomer-one-command
+  - req-newcomer-orients-unaided
+  - req-newcomer-leaves-able-to-ask
+  - req-one-script-installs
+  - req-second-product-reuses-install
+  - req-setup-serves-shipped-method
+  - req-begin-says-own-window
+  - req-fresh-machine-runs
+  - req-boot-stands-agentless
 files:
-  - "none — the procedure below is the definition; the observed run is the evidence"
+  - none — the procedure below is the definition; the observed run is the evidence
 ---
 
 ## Scope

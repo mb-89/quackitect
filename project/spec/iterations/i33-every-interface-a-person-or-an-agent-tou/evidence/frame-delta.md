@@ -2,10 +2,10 @@
 form: frame-delta
 by: agent
 signed_off: 2026-08-17T16:46:01.365Z
-reopened: "2026-08-17T16:45:35.117Z — draft-vision re-signed above it, carrying the kickoff's five goals down. This state is also where the iteration's original drift started, so its pass lines are read against the goals rather than waved through."
-amended: "2026-08-17T14:36:39.075Z by agent — the kickoff re-signed above it; no new prop is still right"
+reopened: 2026-08-17T16:45:35.117Z — draft-vision re-signed above it, carrying the kickoff's five goals down. This state is also where the iteration's original drift started, so its pass lines are read against the goals rather than waved through.
+amended: 2026-08-17T14:36:39.075Z by agent — the kickoff re-signed above it; no new prop is still right
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / frame-delta

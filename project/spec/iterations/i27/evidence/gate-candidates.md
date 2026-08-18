@@ -3,9 +3,9 @@ form: gate-candidates
 bless: blessed by human
 by: agent
 signed_off: 2026-08-14T09:27:29.900Z
-reopened: "2026-08-14T07:51:40.526Z — The gate blessed a front computed over an unfair comparison, and its red team found one real defect and stopped looking before reaching this one."
+reopened: 2026-08-14T07:51:40.526Z — The gate blessed a front computed over an unfair comparison, and its red team found one real defect and stopped looking before reaching this one.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-candidates

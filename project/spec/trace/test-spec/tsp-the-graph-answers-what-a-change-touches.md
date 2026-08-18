@@ -2,14 +2,14 @@
 minted_in: i35-the-cloud-run-s-findings-land-the-fix-fi
 id: tsp-the-graph-answers-what-a-change-touches
 type: "[[test-spec]]"
-statement: "An agent answers what a change touches by asking the corpus rather than by grepping it, and disposes of every candidate coupling the graph does not already name — verified by demonstration, because the claim is about what a person can TRUST rather than about a return value."
-method: "demonstration"
+statement: An agent answers what a change touches by asking the corpus rather than by grepping it, and disposes of every candidate coupling the graph does not already name — verified by demonstration, because the claim is about what a person can TRUST rather than about a return value.
+method: demonstration
 demonstrates:
-  - "sty-answer-what-does-this-touch"
-  - "sty-dispose-a-candidate-coupling"
+  - sty-answer-what-does-this-touch
+  - sty-dispose-a-candidate-coupling
 verifies: []
 files:
-  - "none — the procedure below is the definition; the observed run is the evidence"
+  - none — the procedure below is the definition; the observed run is the evidence
 ---
 
 ## Scope

@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: make every decision cite the earlier decisions it rests on, so the citation graph IS the trace and nobody maintains a second one
 cluster: cluster-the-account
 found_by: analogy
-source: "law reporting — the judgment carries its reasoning, and later judgments cite it by name"
+source: law reporting — the judgment carries its reasoning, and later judgments cite it by name
 ---
 
 ## Mechanism

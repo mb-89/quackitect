@@ -6,7 +6,7 @@ cluster: the-bootstrap
 question: what bounds an act that writes the tree it is producing
 statement: nothing bounds it, because producing a tree is not a lane call — a person runs a script, and the write jail never sees the act at all
 found_by: without
-source: "the incumbent, read off RUNME.ps1 — the export is a script a person invokes, so no lane rule applies to it"
+source: the incumbent, read off RUNME.ps1 — the export is a script a person invokes, so no lane rule applies to it
 ---
 
 ## Mechanism

@@ -1,10 +1,10 @@
 ---
 form: identify-assumptions
-amended: "2026-08-16T06:51:31.505Z by agent — Four register entries were deleted after this form signed, on the owner's ruling that the claim system goes everywhere it ripples. Neither assumption this state…"
+amended: 2026-08-16T06:51:31.505Z by agent — Four register entries were deleted after this form signed, on the owner's ruling that the claim system goes everywhere it ripples. Neither assumption this state…
 by: agent
 signed_off: 2026-08-16T05:58:21.679Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / identify-assumptions

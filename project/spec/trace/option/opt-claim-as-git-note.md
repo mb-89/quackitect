@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: the claim is a git note attached to the seed stub's own commit, in a pushed notes ref
 cluster: cluster-the-record-life
 found_by: prior-art
-source: "git notes - metadata attached to commits without touching them; used by Gerrit review-notes and kernel patch tracking"
+source: git notes - metadata attached to commits without touching them; used by Gerrit review-notes and kernel patch tracking
 ---
 
 ## Mechanism

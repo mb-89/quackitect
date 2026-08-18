@@ -6,7 +6,7 @@ statement: run two independent rankers over the same candidates and only surface
 cluster: cluster-the-disposition
 question: how does a ranked candidate coupling get its disposition
 found_by: transform
-source: "SIT Multiplication, held against the single ranking pass"
+source: SIT Multiplication, held against the single ranking pass
 ---
 
 ## Mechanism

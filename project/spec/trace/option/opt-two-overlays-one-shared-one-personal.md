@@ -6,7 +6,7 @@ cluster: the-bootstrap
 question: where a copy's own layer lives
 statement: the copy's own layer is two layers, one committed and shared by everybody who clones it, one machine-local and never committed, resolved in that order
 found_by: transform
-source: "SIT pattern MULTIPLICATION, applied to the overlay — copy the component and change the copy. Shipped by BMAD-METHOD, which splits its overrides into a committed team file and a gitignored personal one"
+source: SIT pattern MULTIPLICATION, applied to the overlay — copy the component and change the copy. Shipped by BMAD-METHOD, which splits its overrides into a committed team file and a gitignored personal one
 ---
 
 ## Mechanism

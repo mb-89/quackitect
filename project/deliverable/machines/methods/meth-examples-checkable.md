@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "An example hardens as it moves through the machine. It starts as intent and ends as an assertion."
+statement: An example hardens as it moves through the machine. It starts as intent and ends as an assertion.
 ---
 
 ## Situation

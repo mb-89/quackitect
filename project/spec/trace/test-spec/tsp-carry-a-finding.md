@@ -3,12 +3,12 @@ minted_in: i11-the-engine-fix-bundle-about-twenty-named
 id: tsp-carry-a-finding
 type: "[[test-spec]]"
 statement: An engineer meets a real defect that blocks nothing, records it as owed, walks on, and is stopped at the close until it is cleared — verified by demonstration.
-method: "demonstration"
+method: demonstration
 demonstrates:
-  - "sty-carry-a-finding-without-stopping"
+  - sty-carry-a-finding-without-stopping
 verifies: []
 files:
-  - "none — the procedure below is the definition; the observed session is the evidence"
+  - none — the procedure below is the definition; the observed session is the evidence
 ---
 
 ## Scope

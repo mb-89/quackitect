@@ -6,7 +6,7 @@ statement: hold a record's working copy inside the process serving it rather tha
 cluster: cluster-the-walk
 question: where a record's working files live while it is open
 found_by: transform
-source: "taking the RAM disk idea and asking what it is FOR — if the point is that the work lives in memory, a volume is one way to get there and the process's own heap is another"
+source: taking the RAM disk idea and asking what it is FOR — if the point is that the work lives in memory, a volume is one way to get there and the process's own heap is another
 ---
 
 ## Mechanism

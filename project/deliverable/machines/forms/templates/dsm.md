@@ -3,8 +3,8 @@ id: template-dsm
 statement: The matrix with the groups drawn on it — elements on both axes, a mark where one affects the other, and a box round every cluster.
 editor: dsm
 resolves: artifact
-line_pattern: "^\\| .+ \\|"
-line_help: "one row per element; the cells are the element and its cluster"
+line_pattern: ^\| .+ \|
+line_help: one row per element; the cells are the element and its cluster
 ---
 
 # dsm

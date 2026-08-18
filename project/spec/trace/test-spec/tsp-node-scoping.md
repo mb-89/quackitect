@@ -3,11 +3,11 @@ minted_in: i2
 id: tsp-node-scoping
 type: "[[test-spec]]"
 statement: Every trace node carries its minting iteration, reference views default to the current iteration's delta with an opt-in for the whole corpus, and the coverage laws keep reading everything — verified by test over the loader and the table views.
-method: "test"
+method: test
 verifies:
-  - "req-nodes-scoped-to-iteration"
+  - req-nodes-scoped-to-iteration
 files:
-  - "tests/node-scoping.test.ts"
+  - tests/node-scoping.test.ts
 ---
 
 ## Scope

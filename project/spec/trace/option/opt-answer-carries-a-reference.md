@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: write the whole record to disk and return a reference to it, so the answer stays small however large the thing it names
 cluster: cluster-the-account
 found_by: contradiction
-source: "TRIZ separation IN SPACE, via meth-triz — the record in one place, the answer in another"
+source: TRIZ separation IN SPACE, via meth-triz — the record in one place, the answer in another
 ---
 
 ## Mechanism

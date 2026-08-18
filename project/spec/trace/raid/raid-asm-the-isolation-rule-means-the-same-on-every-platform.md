@@ -10,7 +10,7 @@ status: open
 probed: 2026-08-18
 breaks_how_badly: fatal
 how_likely: expected
-impact: "A copy carrying a junction destroys data outside its own tree when an ordinary git command runs, with exit code 0 and no warning. The check that would have been written from the original incident report looks for the wrong structure on the platform this product actually runs on."
+impact: A copy carrying a junction destroys data outside its own tree when an ordinary git command runs, with exit code 0 and no warning. The check that would have been written from the original incident report looks for the wrong structure on the platform this product actually runs on.
 source_refs:
   - req-nothing-a-copy-does-reaches-its-source
   - raid-dec-an-import-is-read-only-and-a-vendored-copy-is-yours

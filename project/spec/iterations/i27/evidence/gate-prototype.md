@@ -3,9 +3,9 @@ form: gate-prototype
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-14T14:44:26.516Z
-reopened: "2026-08-14T14:37:56.590Z — the register moved under it at author-tests — two assumptions probed and req-entry-binds-worktree deleted — and the claim guard reports it not standing while se_why reports…"
+reopened: 2026-08-14T14:37:56.590Z — the register moved under it at author-tests — two assumptions probed and req-entry-binds-worktree deleted — and the claim guard reports it not standing while se_why reports…
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-prototype

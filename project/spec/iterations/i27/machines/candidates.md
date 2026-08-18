@@ -1,27 +1,27 @@
 ---
 steps:
   - id: speaking-root
-    statement: "compose cand-speaking-root - the seams, the rough costs, and what it leans on"
+    statement: compose cand-speaking-root - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
   - id: fixed-root
-    statement: "compose cand-fixed-root - the seams, the rough costs, and what it leans on"
+    statement: compose cand-fixed-root - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
   - id: judged-path
-    statement: "compose cand-judged-path - the seams, the rough costs, and what it leans on"
+    statement: compose cand-judged-path - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
   - id: os-rooted
-    statement: "compose cand-os-rooted - the seams, the rough costs, and what it leans on"
+    statement: compose cand-os-rooted - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
   - id: live-engine
-    statement: "compose cand-live-engine - the seams, the rough costs, and what it leans on"
+    statement: compose cand-live-engine - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
   - id: core-satellite
-    statement: "compose cand-core-satellite - the seams, the rough costs, and what it leans on"
+    statement: compose cand-core-satellite - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
 ---

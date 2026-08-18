@@ -4,17 +4,17 @@ id: dsp-lane-door
 type: "[[design-spec]]"
 statement: the typed tool lane, carried by one registry of verbs with schemas, clauses and remedies
 realizes:
-  - "el-walk-engine"
+  - el-walk-engine
 files:
-  - "project/deliverable/engine/tools.ts"
-  - "project/deliverable/engine/mcp.ts"
-  - "project/deliverable/engine/errors.ts"
-  - "project/deliverable/engine/discipline.ts"
-  - "project/deliverable/engine/promptlayer.ts"
-  - "project/deliverable/engine/params.ts"
-  - "project/deliverable/engine/bound.ts"
-  - "project/deliverable/engine/bin/se-mcp.ts"
-  - "project/deliverable/engine/bin/se-manual.ts"
+  - project/deliverable/engine/tools.ts
+  - project/deliverable/engine/mcp.ts
+  - project/deliverable/engine/errors.ts
+  - project/deliverable/engine/discipline.ts
+  - project/deliverable/engine/promptlayer.ts
+  - project/deliverable/engine/params.ts
+  - project/deliverable/engine/bound.ts
+  - project/deliverable/engine/bin/se-mcp.ts
+  - project/deliverable/engine/bin/se-manual.ts
 ---
 
 ## Responsibility

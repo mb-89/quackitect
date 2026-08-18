@@ -6,7 +6,7 @@ statement: instead of a ranked batch handed to a person, the person names one ca
 cluster: cluster-the-disposition
 question: how does a ranked candidate coupling get its disposition
 found_by: transform
-source: "SCAMPER Reverse, held against the rank-then-review direction"
+source: SCAMPER Reverse, held against the rank-then-review direction
 ---
 
 ## Mechanism

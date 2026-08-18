@@ -2,10 +2,10 @@
 form: trace-design
 by: agent
 signed_off: 2026-08-17T16:59:53.656Z
-reopened: "2026-08-17T16:59:21.789Z — observe-red re-signed above it and the build drawing completed. This state's sweep checks that every design spec's files exist and every deliverable file is claimed, and engine files changed today under goal five."
-amended: "2026-08-17T14:46:20.094Z by agent — the verification fixes touched the README and one guidance page, neither of which is deliverable code"
+reopened: 2026-08-17T16:59:21.789Z — observe-red re-signed above it and the build drawing completed. This state's sweep checks that every design spec's files exist and every deliverable file is claimed, and engine files changed today under goal five.
+amended: 2026-08-17T14:46:20.094Z by agent — the verification fixes touched the README and one guidance page, neither of which is deliverable code
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / trace-design

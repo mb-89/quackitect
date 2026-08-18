@@ -10,13 +10,13 @@ status: open
 impact: An under-sized iteration walks to the build before anybody notices. The cheap places to catch it are gone, so it is caught at the implementation gate or later, where the correction costs the whole build.
 breaks_how_badly: corrosive
 how_likely: plausible
-probe: "unprobed by construction — it needs a real minor that should have been a major, and none has been walked since the strike."
+probe: unprobed by construction — it needs a real minor that should have been a major, and none has been walked since the strike.
 probed: 2026-08-13
 source_refs:
-  - "machines/rigor_matrix/rows/M2_10A_draw-context.md, minor_note — the escalation rule that replaces the state"
-  - "machines/rigor_matrix/rows/M5_90_gate-architecture.md, minor_note"
-  - "tests/rigor-matrix.test.ts, the twelve struck rows named"
-  - "the owner's ruling 2026-08-13, taken milestone by milestone"
+  - machines/rigor_matrix/rows/M2_10A_draw-context.md, minor_note — the escalation rule that replaces the state
+  - machines/rigor_matrix/rows/M5_90_gate-architecture.md, minor_note
+  - tests/rigor-matrix.test.ts, the twelve struck rows named
+  - the owner's ruling 2026-08-13, taken milestone by milestone
 ---
 
 ## The claim

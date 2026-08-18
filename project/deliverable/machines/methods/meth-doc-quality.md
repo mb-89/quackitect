@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "Documents are for communication. Scrutinise them for what a reader can actually use."
+statement: Documents are for communication. Scrutinise them for what a reader can actually use.
 ---
 
 ## Situation

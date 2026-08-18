@@ -3,7 +3,7 @@ form: cut-worktrees-from-seed
 by: agent
 signed_off: 2026-08-16T08:08:43.561Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / cut-worktrees-from-seed

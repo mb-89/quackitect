@@ -7,8 +7,8 @@ probes:
   - raid-asm-machine-wide-state-serves-over-a-local-channel
 timebox: one hour
 form: script
-promote: "none — the build attacks the 124.7 microsecond direct-append floor first, by keeping a handle open"
-folds_to: "raid-asm-machine-wide-state-serves-over-a-local-channel is probed for the call log at 144 microseconds a crossing"
+promote: none — the build attacks the 124.7 microsecond direct-append floor first, by keeping a handle open
+folds_to: raid-asm-machine-wide-state-serves-over-a-local-channel is probed for the call log at 144 microseconds a crossing
 faked: one client only, and the claim ledger's git-remote cost was not touched
 fallback: if the hop costs a measurable share of the one-second budget, the call log stays with the satellite and the core owns only what can afford the crossing
 verdict: holds

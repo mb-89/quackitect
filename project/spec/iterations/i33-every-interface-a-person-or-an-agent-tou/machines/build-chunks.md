@@ -1,44 +1,49 @@
 ---
 steps:
   - id: phase-split-probe
-    statement: "the machine phase splits into its four parts and the split is read against two numbers — drawingSets and stateDetails over 90 percent, and the SVG under 50 ms — settling whether the DAG is the right instrument at all"
+    statement: the machine phase splits into its four parts and the split is read against two numbers — drawingSets and stateDetails over 90 percent, and the SVG under 50 ms — settling whether the DAG is the right instrument at all
     depends_on: []
     realization: code
   - id: locked-rung-names-its-unlock
-    statement: "a locked rung's help names the notch that unlocks it, composed from the levels already handed in rather than from a second copy of the list"
+    statement: a locked rung's help names the notch that unlocks it, composed from the levels already handed in rather than from a second copy of the list
     depends_on: []
     realization: code
   - id: absent-is-not-zero
-    statement: "a bank handed no position renders as not knowing where it stands, rather than as a deliberate zero drawn as a row of locked buttons"
+    statement: a bank handed no position renders as not knowing where it stands, rather than as a deliberate zero drawn as a row of locked buttons
     depends_on: []
     realization: code
   - id: running-work-rides-the-panel
-    statement: "work still running past its bound reaches the panel as a value and renders beside the controls rather than over them"
-    depends_on: [absent-is-not-zero]
+    statement: work still running past its bound reaches the panel as a value and renders beside the controls rather than over them
+    depends_on:
+      - absent-is-not-zero
     realization: code
   - id: goals-bind-the-walk
-    statement: "the kickoff carries a list of goals, every gate below measures what it produced against each, and an upstream edit greys what stands on it"
+    statement: the kickoff carries a list of goals, every gate below measures what it produced against each, and an upstream edit greys what stands on it
     depends_on: []
     realization: code
   - id: one-read-per-operation
-    statement: "an operation collects its corpus once and hands it down, measured at the door's own meter rather than with a stopwatch"
+    statement: an operation collects its corpus once and hands it down, measured at the door's own meter rather than with a stopwatch
     depends_on: []
     realization: code
   - id: model-the-boundaries
-    statement: "one interface node per element-to-neighbour pair that carries traffic, which is the denominator both pass lines need and which nothing downstream can enumerate without"
-    depends_on: [phase-split-probe]
+    statement: one interface node per element-to-neighbour pair that carries traffic, which is the denominator both pass lines need and which nothing downstream can enumerate without
+    depends_on:
+      - phase-split-probe
     realization: code
   - id: bind-the-bound-per-interface
-    statement: "each modelled interface carries its own bound and says whether it is fast or honest about not being"
-    depends_on: [model-the-boundaries]
+    statement: each modelled interface carries its own bound and says whether it is fast or honest about not being
+    depends_on:
+      - model-the-boundaries
     realization: code
   - id: breaches-reach-the-reviewer
-    statement: "a gate review is shown every instrumented interface that breached its bound since the last review, so reading the instrument is somebody's job rather than somebody's habit"
-    depends_on: [bind-the-bound-per-interface]
+    statement: a gate review is shown every instrumented interface that breached its bound since the last review, so reading the instrument is somebody's job rather than somebody's habit
+    depends_on:
+      - bind-the-bound-per-interface
     realization: code
   - id: fix-what-the-numbers-name
-    statement: "the breaches the instrument names are fixed, in the order the numbers put them rather than the order they were noticed"
-    depends_on: [breaches-reach-the-reviewer]
+    statement: the breaches the instrument names are fixed, in the order the numbers put them rather than the order they were noticed
+    depends_on:
+      - breaches-reach-the-reviewer
     realization: code
 ---
 

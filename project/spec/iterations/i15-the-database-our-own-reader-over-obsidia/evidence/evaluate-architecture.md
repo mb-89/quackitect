@@ -2,9 +2,9 @@
 form: evaluate-architecture
 by: agent
 signed_off: 2026-08-16T18:26:02.167Z
-reopened: "2026-08-16T18:25:45.238Z — the earlier walk fill did not use the required [[req-id]] bracket syntax deckLawProblems parses on, so all 25 scenarios registered unruled despite the claim signing"
+reopened: 2026-08-16T18:25:45.238Z — the earlier walk fill did not use the required [[req-id]] bracket syntax deckLawProblems parses on, so all 25 scenarios registered unruled despite the claim signing
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / evaluate-architecture

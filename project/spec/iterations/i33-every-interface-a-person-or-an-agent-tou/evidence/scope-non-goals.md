@@ -2,10 +2,10 @@
 form: scope-non-goals
 by: agent
 signed_off: 2026-08-17T16:46:43.309Z
-reopened: "2026-08-17T16:46:15.726Z — frame-delta re-signed above it, carrying the kickoff's five goals down. Scope is the state where a goal list most plausibly changes an answer, so it is read against the five rather than waved through."
-amended: "2026-08-17T14:36:52.691Z by agent — the kickoff re-signed above it; the four milestones stand and are all built"
+reopened: 2026-08-17T16:46:15.726Z — frame-delta re-signed above it, carrying the kickoff's five goals down. Scope is the state where a goal list most plausibly changes an answer, so it is read against the five rather than waved through.
+amended: 2026-08-17T14:36:52.691Z by agent — the kickoff re-signed above it; the four milestones stand and are all built
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / scope-non-goals

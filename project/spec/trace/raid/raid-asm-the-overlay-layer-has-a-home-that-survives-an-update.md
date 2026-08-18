@@ -11,12 +11,12 @@ probe: "holds, and it was answered off the same runs at no extra cost. An update
 probed: 2026-08-18
 breaks_how_badly: crippling
 how_likely: plausible
-impact: "If no such place exists inside the tree, the overlay either lives outside it - which the path jail refuses and the isolation rule forbids - or it lives where updates land, and every update becomes a negotiation with the builder's own method."
+impact: If no such place exists inside the tree, the overlay either lives outside it - which the path jail refuses and the isolation rule forbids - or it lives where updates land, and every update becomes a negotiation with the builder's own method.
 source_refs:
   - raid-risk-the-overlay-location-is-unchosen
   - req-overlay-resolution
   - req-overlay-survives-update
-  - "product/engine-go/resolver.go at ref main"
+  - product/engine-go/resolver.go at ref main
 ---
 
 ## Where the doubt comes from

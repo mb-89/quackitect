@@ -20,8 +20,8 @@ evidence:
   - name: buildable
     template: choice-with-rationale
     options:
-      - "yes"
-      - "no"
+      - yes
+      - no
     description: the one judgment this gate asks — is the design buildable as evidenced, and why
 major: full
 minor: none

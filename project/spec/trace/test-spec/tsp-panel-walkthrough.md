@@ -3,16 +3,16 @@ minted_in: i1
 id: tsp-panel-walkthrough
 type: "[[test-spec]]"
 statement: The panel shows the machine and its claims, a returning person orients from it alone, and the walk survives a host swap, verified by demonstration in the editor.
-method: "demonstration"
+method: demonstration
 demonstrates:
-  - "sty-hand-over-and-walk-away"
+  - sty-hand-over-and-walk-away
 verifies:
-  - "req-panel-shows-the-machine"
-  - "req-selected-node-shows-its-claim"
-  - "req-resume-needs-no-person"
-  - "req-walk-survives-host-swap"
+  - req-panel-shows-the-machine
+  - req-selected-node-shows-its-claim
+  - req-resume-needs-no-person
+  - req-walk-survives-host-swap
 files:
-  - "none — the procedure below is the definition; the observed sessions are the evidence"
+  - none — the procedure below is the definition; the observed sessions are the evidence
 ---
 
 ## Scope

@@ -11,8 +11,8 @@ faked: a bare TCP channel and a synthetic hang, with no satellite to wedge
 fallback: if a heartbeat catches nothing a deadline misses, the supervisor gets a deadline only and no periodic traffic
 verdict: holds
 measured: 2026-08-14 — a free-event-loop hang answered 8 of 8 beats and looked healthy, while a blocked loop answered 0 of 8
-folds_to: "raid-ar-crash-lands-safe narrows further, because a heartbeat covers one hang shape of two"
-promote: "none — the deadline and the beat interval are both numbers for specify-build"
+folds_to: raid-ar-crash-lands-safe narrows further, because a heartbeat covers one hang shape of two
+promote: none — the deadline and the beat interval are both numbers for specify-build
 source_refs:
   - the owner's question, 2026-08-14
   - el-satellite-supervisor

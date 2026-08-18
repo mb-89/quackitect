@@ -6,7 +6,7 @@ cluster: the-bootstrap
 question: how upstream's later work reaches a copy
 statement: having changed the thing does not excuse a copy from an upstream fix; where the change blocks the given instructions, the copy owes back a described alternative that reaches the same end
 found_by: analogy
-source: "14 CFR 39.15, 39.17, 39.19 and 39.21, read at ecfr.gov/current/title-14/chapter-I/subchapter-C/part-39 — aviation, where this has been law since the 1920s"
+source: 14 CFR 39.15, 39.17, 39.19 and 39.21, read at ecfr.gov/current/title-14/chapter-I/subchapter-C/part-39 — aviation, where this has been law since the 1920s
 ---
 
 ## Mechanism

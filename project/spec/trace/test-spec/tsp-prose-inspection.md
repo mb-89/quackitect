@@ -3,18 +3,18 @@ minted_in: i1
 id: tsp-prose-inspection
 type: "[[test-spec]]"
 statement: The published prose holds its laws — plain entry documents, roles over names, claims backed by kept sources — verified by inspection of the artifacts.
-method: "inspection"
+method: inspection
 verifies:
-  - "req-entry-speaks-plainly"
-  - "req-tour-speaks-plainly"
-  - "req-roles-never-usernames"
-  - "req-no-claim-without-evidence"
-  - "req-vendor-page-claim-only"
-  - "req-comparison-carries-both-sides"
-  - "req-one-note-per-settled-point"
-  - "req-desk-offers-a-tour"
+  - req-entry-speaks-plainly
+  - req-tour-speaks-plainly
+  - req-roles-never-usernames
+  - req-no-claim-without-evidence
+  - req-vendor-page-claim-only
+  - req-comparison-carries-both-sides
+  - req-one-note-per-settled-point
+  - req-desk-offers-a-tour
 files:
-  - "project/deliverable/engine/bin/prose-inspect.ts"
+  - project/deliverable/engine/bin/prose-inspect.ts
 ---
 
 ## Scope

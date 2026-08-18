@@ -8,7 +8,7 @@ owner: the driving agent
 status: decided
 breaks_how_badly: crippling
 how_likely: plausible
-impact: "The grain decides what a copy can change and what it silently stops receiving. Whole-file replacement means overriding one line costs the whole file forever, so every later upstream improvement to its untouched parts never arrives."
+impact: The grain decides what a copy can change and what it silently stops receiving. Whole-file replacement means overriding one line costs the whole file forever, so every later upstream improvement to its untouched parts never arrives.
 source_refs:
   - req-overlay-resolution
   - req-overlay-survives-update

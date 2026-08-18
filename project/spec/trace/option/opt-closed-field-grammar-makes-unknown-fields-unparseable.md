@@ -6,7 +6,7 @@ statement: define the legal field list per node kind as a closed grammar, so an 
 cluster: cluster-the-query
 question: how does answer-a-structured-query evaluate a query against the corpus
 found_by: heuristic
-source: "meth-heuristics-catalog: \"Make the illegal unrepresentable, not merely checked.\""
+source: 'meth-heuristics-catalog: "Make the illegal unrepresentable, not merely checked."'
 ---
 
 ## Mechanism

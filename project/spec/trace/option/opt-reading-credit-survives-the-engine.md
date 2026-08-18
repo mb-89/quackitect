@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: key the reading credit to the document's own hash so it survives a restart, and re-owe only what actually changed
 cluster: cluster-the-walk
 found_by: heuristic
-source: "heuristic — make the common case cheap; make the rare case possible"
+source: heuristic — make the common case cheap; make the rare case possible
 ---
 
 ## Mechanism

@@ -4,13 +4,13 @@ id: dsp-boot-and-power
 type: "[[design-spec]]"
 statement: the engine standing up and lying down, carried by the host bridge, the stop hook, the boot bench and the packager
 realizes:
-  - "el-bootstrap"
+  - el-bootstrap
 files:
-  - "project/deliverable/engine/bin/bench-boot.ts"
-  - "project/deliverable/engine/bin/se-pty.ts"
-  - "project/deliverable/engine/bin/se-hook-stop.ts"
-  - "project/deliverable/engine/bin/package.ts"
-  - "project/deliverable/engine/version.ts"
+  - project/deliverable/engine/bin/bench-boot.ts
+  - project/deliverable/engine/bin/se-pty.ts
+  - project/deliverable/engine/bin/se-hook-stop.ts
+  - project/deliverable/engine/bin/package.ts
+  - project/deliverable/engine/version.ts
 ---
 
 ## Responsibility

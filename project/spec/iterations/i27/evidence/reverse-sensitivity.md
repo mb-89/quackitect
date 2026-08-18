@@ -2,9 +2,9 @@
 form: reverse-sensitivity
 by: agent
 signed_off: 2026-08-14T12:46:16.078Z
-reopened: "2026-08-14T12:45:49.492Z — Its flip conditions are computed from the scores taken before the records were completed, and the leader has changed."
+reopened: 2026-08-14T12:45:49.492Z — Its flip conditions are computed from the scores taken before the records were completed, and the leader has changed.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / reverse-sensitivity

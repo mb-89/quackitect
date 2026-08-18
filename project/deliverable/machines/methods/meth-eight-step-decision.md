@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "The 8-step decision model runs from collecting criteria to selecting a winner. Every step is recorded."
+statement: The 8-step decision model runs from collecting criteria to selecting a winner. Every step is recorded.
 ---
 
 ## Situation

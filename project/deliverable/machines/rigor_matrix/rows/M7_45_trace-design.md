@@ -25,7 +25,7 @@ evidence:
       - files
     covers: element
     page_size: 25
-    description: "the spec register against the elements — coverage is checked, never claimed. The laws add file existence and the unclaimed sweep."
+    description: the spec register against the elements — coverage is checked, never claimed. The laws add file existence and the unclaimed sweep.
 major: full
 minor: full
 patch: full

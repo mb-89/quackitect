@@ -2,9 +2,9 @@
 form: derive-criteria
 by: agent
 signed_off: 2026-08-18T15:12:35.004Z
-reopened: "2026-08-18T15:12:06.056Z — signed before gate-requirements was re-signed, so it answered ground that has since moved"
+reopened: 2026-08-18T15:12:06.056Z — signed before gate-requirements was re-signed, so it answered ground that has since moved
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / derive-criteria

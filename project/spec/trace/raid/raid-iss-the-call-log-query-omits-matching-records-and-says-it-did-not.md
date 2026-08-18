@@ -13,8 +13,8 @@ how_likely: expected
 source_refs:
   - call-941bb905c033
   - call-c283d9ea33eb
-  - "engine/calllog.ts query"
-  - "engine/stateform.ts breachItems"
+  - engine/calllog.ts query
+  - engine/stateform.ts breachItems
 ---
 
 FOUND BY A VERIFICATION TESTER WITH FRESH EYES, 2026-08-17, while closing an

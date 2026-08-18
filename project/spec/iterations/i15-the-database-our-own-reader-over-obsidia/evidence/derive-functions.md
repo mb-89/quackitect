@@ -4,7 +4,7 @@ reopened: "2026-08-16T17:26:21.953Z — same ripple as gate-requirements: derive
 by: agent
 signed_off: 2026-08-16T17:26:27.526Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / derive-functions

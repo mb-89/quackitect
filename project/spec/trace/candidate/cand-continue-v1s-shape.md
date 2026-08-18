@@ -2,7 +2,7 @@
 minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: cand-continue-v1s-shape
 type: "[[candidate]]"
-name: "Continue v1's shape"
+name: Continue v1's shape
 statement: "cheapest: keep v1's YAML view-spec shape, add a threshold band so only borderline candidates reach a person"
 picks:
   - "[[opt-declarative-view-spec-evaluated-in-process]]"

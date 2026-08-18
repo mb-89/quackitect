@@ -8,7 +8,7 @@ owner: the owner
 status: open
 breaks_how_badly: crippling
 how_likely: expected
-impact: "The pass line of both headline requirements is a machine holding nothing of the source. Every green this iteration carries was observed inside the source's own tree, which is the one place that cannot establish it. A vehicle that works here and not on a clean machine looks identical from here."
+impact: The pass line of both headline requirements is a machine holding nothing of the source. Every green this iteration carries was observed inside the source's own tree, which is the one place that cannot establish it. A vehicle that works here and not on a clean machine looks identical from here.
 source_refs:
   - tsp-a-vehicle-is-made-and-then-drives-something-else
   - req-one-command-produces-a-complete-copy

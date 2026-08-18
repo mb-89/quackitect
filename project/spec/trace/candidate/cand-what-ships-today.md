@@ -2,7 +2,7 @@
 minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: cand-what-ships-today
 type: "[[candidate]]"
-name: "What ships today"
+name: What ships today
 statement: "the incumbent, unchanged: a fresh single-commit copy that owns everything, records nothing, and never takes an update"
 picks:
   - "[[opt-a-fresh-single-commit-repository]]"

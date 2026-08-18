@@ -6,7 +6,7 @@ statement: route every path through one resolver that no tool may bypass, so whi
 cluster: cluster-the-walk
 question: where resolution happens
 found_by: heuristic
-source: "the heuristic catalogue — Small interfaces between big parts beat the reverse."
+source: the heuristic catalogue — Small interfaces between big parts beat the reverse.
 ---
 
 ## Mechanism

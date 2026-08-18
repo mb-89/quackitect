@@ -2,10 +2,10 @@
 form: decompose-structure
 by: agent
 signed_off: 2026-08-17T16:56:27.677Z
-reopened: "2026-08-17T16:55:53.141Z — gate-requirements re-signed and re-blessed above it with an eighth requirement in the register. Every requirement must reach the structure by one path or the other, so a new row is a real check here rather than a formality."
-amended: "2026-08-17T14:39:37.878Z by agent — gate-requirements re-signed with a real breach reading; the structure stands"
+reopened: 2026-08-17T16:55:53.141Z — gate-requirements re-signed and re-blessed above it with an eighth requirement in the register. Every requirement must reach the structure by one path or the other, so a new row is a real check here rather than a formality.
+amended: 2026-08-17T14:39:37.878Z by agent — gate-requirements re-signed with a real breach reading; the structure stands
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / decompose-structure

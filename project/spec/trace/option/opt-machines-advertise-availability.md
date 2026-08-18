@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: reverse the direction - machines advertise that they are FREE, and assignment happens at the desk against the availability list instead of machines claiming work
 cluster: cluster-the-record-life
 found_by: transform
-source: "SCAMPER Reverse applied to the claim - the work stops being taken and starts being given"
+source: SCAMPER Reverse applied to the claim - the work stops being taken and starts being given
 ---
 
 ## Mechanism

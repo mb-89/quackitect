@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "Draw what is inside the system and what is outside it. Everything crossing the line is named."
+statement: Draw what is inside the system and what is outside it. Everything crossing the line is named.
 ---
 
 ## Situation

@@ -7,7 +7,7 @@ statement: Implementing say-plainly as a literally accurate progress reading cou
 owner: the owner
 trigger: the design of any progress or slowness signal, and the first review of what a slow surface actually shows
 status: open
-impact: "The transparency requirement would be met to the letter and the person would leave anyway. Worse, it would look like the requirement was wrong, when what was wrong is one reading of the word honest. A mechanical check can confirm the telling happened and can never see this."
+impact: The transparency requirement would be met to the letter and the person would leave anyway. Worse, it would look like the requirement was wrong, when what was wrong is one reading of the word honest. A mechanical check can confirm the telling happened and can never see this.
 breaks_how_badly: abrasive
 how_likely: plausible
 source_refs:

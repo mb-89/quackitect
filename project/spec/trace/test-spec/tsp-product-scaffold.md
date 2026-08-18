@@ -3,21 +3,21 @@ minted_in: i1
 id: tsp-product-scaffold
 type: "[[test-spec]]"
 statement: A product begins from the template without touching anything existing, owns its folder whole, and installs from one script that stops before partial, verified by test over the scaffold and setup paths.
-method: "test"
+method: test
 verifies:
-  - "req-begin-touches-nothing-existing"
-  - "req-fresh-product-starts-empty"
-  - "req-scaffold-from-template"
-  - "req-method-reuse-is-vendoring"
-  - "req-product-is-a-folder"
-  - "req-nothing-a-copy-does-reaches-its-source"
-  - "req-setup-floor-editor-shell"
-  - "req-setup-stops-before-partial"
-  - "req-extension-replaced-reported"
+  - req-begin-touches-nothing-existing
+  - req-fresh-product-starts-empty
+  - req-scaffold-from-template
+  - req-method-reuse-is-vendoring
+  - req-product-is-a-folder
+  - req-nothing-a-copy-does-reaches-its-source
+  - req-setup-floor-editor-shell
+  - req-setup-stops-before-partial
+  - req-extension-replaced-reported
 files:
-  - "tests/help.test.ts"
-  - "tests/scaffold.test.ts"
-  - "tests/setup.test.ts"
+  - tests/help.test.ts
+  - tests/scaffold.test.ts
+  - tests/setup.test.ts
 ---
 
 ## Scope

@@ -3,12 +3,12 @@ minted_in: i33-every-interface-a-person-or-an-agent-tou
 id: tsp-a-long-wait-is-never-a-guess
 type: "[[test-spec]]"
 statement: A person waiting on work that has passed its bound can tell from the surface alone that it is still working.
-method: "demonstration"
+method: demonstration
 demonstrates:
-  - "sty-the-slow-call-that-says-it-is-working"
+  - sty-the-slow-call-that-says-it-is-working
 verifies: "none — demonstrates: carries the edge; req-work-past-its-bound-says-it-is-working is verify_method: test and is carried by tsp-work-past-its-bound-signals"
 files:
-  - "none — the procedure below is the definition, because the pass is what a person perceives while waiting"
+  - none — the procedure below is the definition, because the pass is what a person perceives while waiting
 ---
 
 ## Scope

@@ -1,11 +1,11 @@
 ---
 form: gate-kickoff
-amended: "2026-08-16T16:29:52.357Z by agent — ref \"main\" is reachable — verified 2026-08-16 via se_file_glob/se_file_read at ref:main after the operator fetched all refs; correcting the stale kill-criterion and follow-up text"
+amended: 2026-08-16T16:29:52.357Z by agent — ref "main" is reachable — verified 2026-08-16 via se_file_glob/se_file_read at ref:main after the operator fetched all refs; correcting the stale kill-criterion and follow-up text
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-16T16:15:51.664Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-kickoff

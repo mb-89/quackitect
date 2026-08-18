@@ -1,10 +1,10 @@
 ---
 form: draft-vision
-amended: "2026-08-16T16:31:22.497Z by agent — ref \"main\" resolves — verified 2026-08-16; one of the two carried-forward raid entries is now closed"
+amended: 2026-08-16T16:31:22.497Z by agent — ref "main" resolves — verified 2026-08-16; one of the two carried-forward raid entries is now closed
 by: agent
 signed_off: 2026-08-16T16:17:49.166Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / draft-vision

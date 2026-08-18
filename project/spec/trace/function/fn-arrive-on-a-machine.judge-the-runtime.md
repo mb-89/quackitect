@@ -3,7 +3,7 @@ minted_in: i35-the-cloud-run-s-findings-land-the-fix-fi
 id: fn-arrive-on-a-machine.judge-the-runtime
 type: "[[function]]"
 cluster: the-arrival
-statement: "judge the running runtime against the floor the project declares"
+statement: judge the running runtime against the floor the project declares
 satisfies:
   - req-the-declared-runtime-floor-is-read-never-edited
 inputs:

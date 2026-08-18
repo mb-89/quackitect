@@ -11,7 +11,7 @@ impact: The author is gone by the time the break is found. The error names a lin
 breaks_how_badly: crippling
 how_likely: expected
 source_refs:
-  - "observed live 2026-08-16, at i6/log-risks"
+  - observed live 2026-08-16, at i6/log-risks
   - i6 record vision — conformance moves to the WRITE path
   - raid-dec-a-check-refuses-a-wrong-write-and-reports-a-wrong-corpus
 ---

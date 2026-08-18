@@ -3,15 +3,15 @@ minted_in: i6-conformance-goes-mechanical-checks-bind-
 id: tsp-write-guard
 type: "[[test-spec]]"
 statement: A write is checked before it lands — a break this write made refuses with its remedy, a break the corpus carried lands and reports, and neither costs the write its one-second budget.
-method: "test"
+method: test
 verifies:
-  - "req-a-write-that-breaks-the-corpus-refuses"
-  - "req-a-value-outside-its-vocabulary-refuses"
-  - "req-a-standing-break-reports-and-lands"
-  - "req-a-check-names-its-way-forward"
-  - "req-a-check-too-slow-for-the-write-moves-to-the-sweep"
+  - req-a-write-that-breaks-the-corpus-refuses
+  - req-a-value-outside-its-vocabulary-refuses
+  - req-a-standing-break-reports-and-lands
+  - req-a-check-names-its-way-forward
+  - req-a-check-too-slow-for-the-write-moves-to-the-sweep
 files:
-  - "tests/writeguard.test.ts"
+  - tests/writeguard.test.ts
 ---
 
 ## Scope

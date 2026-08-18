@@ -3,18 +3,18 @@ minted_in: i1
 id: tsp-reading-loop
 type: "[[test-spec]]"
 statement: The reading loop serves every owed document and credits only a proven read, verified by test over the pull's reading path.
-method: "test"
+method: test
 verifies:
-  - "req-reading-proof"
-  - "req-owed-reading-is-served"
-  - "req-compaction-reowes-the-reading"
-  - "req-missing-document-stops-the-walk"
+  - req-reading-proof
+  - req-owed-reading-is-served
+  - req-compaction-reowes-the-reading
+  - req-missing-document-stops-the-walk
 files:
-  - "tests/reading.test.ts"
-  - "tests/reads.test.ts"
-  - "tests/multiread.test.ts"
-  - "tests/routereads.test.ts"
-  - "tests/rowreads.test.ts"
+  - tests/reading.test.ts
+  - tests/reads.test.ts
+  - tests/multiread.test.ts
+  - tests/routereads.test.ts
+  - tests/rowreads.test.ts
 ---
 
 ## Scope

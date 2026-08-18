@@ -1,10 +1,10 @@
 ---
 id: template-rank-cut
-statement: "A settled ranking with a line drawn across it. One row is the last that still counts."
+statement: A settled ranking with a line drawn across it. One row is the last that still counts.
 editor: rank-cut
 resolves: artifact
-line_pattern: "^\\d+\\. \\[\\["
-line_help: "one numbered line per row, in rank order"
+line_pattern: ^\d+\. \[\[
+line_help: one numbered line per row, in rank order
 ---
 
 # rank-cut

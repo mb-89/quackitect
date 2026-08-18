@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: hold the walk in an explicit phase machine where a phase cannot start until the one before it recorded that it ended
 cluster: cluster-the-walk
 found_by: prior-art
-source: "A Deterministic Control Plane for LLM Coding Agents, https://arxiv.org/html/2606.26924v1"
+source: A Deterministic Control Plane for LLM Coding Agents, https://arxiv.org/html/2606.26924v1
 ---
 
 ## Mechanism

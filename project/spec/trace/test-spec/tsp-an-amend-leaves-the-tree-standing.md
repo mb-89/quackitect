@@ -3,12 +3,12 @@ minted_in: i33-every-interface-a-person-or-an-agent-tou
 id: tsp-an-amend-leaves-the-tree-standing
 type: "[[test-spec]]"
 statement: An amendment leaves every claim below it standing and a reopen drops them, verified by test over a whole signed chain rather than over one state.
-method: "test"
+method: test
 verifies:
-  - "req-an-amend-leaves-the-tree-standing"
+  - req-an-amend-leaves-the-tree-standing
 files:
-  - "tests/drift.test.ts"
-  - "tests/claimops.test.ts"
+  - tests/drift.test.ts
+  - tests/claimops.test.ts
 ---
 
 ## Scope

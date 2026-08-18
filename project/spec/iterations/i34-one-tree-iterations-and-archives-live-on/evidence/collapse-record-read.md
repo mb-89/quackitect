@@ -3,7 +3,7 @@ form: collapse-record-read
 by: agent
 signed_off: 2026-08-16T08:05:10.587Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / collapse-record-read

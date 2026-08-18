@@ -3,12 +3,12 @@ minted_in: i33-every-interface-a-person-or-an-agent-tou
 id: tsp-the-driving-calls-come-back-inside-a-second
 type: "[[test-spec]]"
 statement: The calls a person or an agent makes to drive the machine come back inside a second, across a list of interfaces that covers what they actually touch.
-method: "demonstration"
+method: demonstration
 demonstrates:
-  - "sty-the-call-that-comes-back-inside-a-second"
+  - sty-the-call-that-comes-back-inside-a-second
 verifies: "none — demonstrates: carries the edge; the one-second demand is verify_method: test and is carried by the bound checks on the modelled interfaces"
 files:
-  - "none — the clock answers half of this, and the half that needs a person is a judgment about the list rather than a program"
+  - none — the clock answers half of this, and the half that needs a person is a judgment about the list rather than a program
 ---
 
 ## Scope

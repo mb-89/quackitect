@@ -1,11 +1,11 @@
 ---
 form: run-candidates
-amended: "2026-08-14T10:02:43.664Z by agent — The join record was written by hand from outside the walk and needs the engine's own signature so the claim stands."
-reopened: "2026-08-14T10:01:37.263Z — Its form was written by hand from outside the walk, so the claim carries no signature the guard accepts and every state behind it is dropped."
+amended: 2026-08-14T10:02:43.664Z by agent — The join record was written by hand from outside the walk and needs the engine's own signature so the claim stands.
+reopened: 2026-08-14T10:01:37.263Z — Its form was written by hand from outside the walk, so the claim carries no signature the guard accepts and every state behind it is dropped.
 by: agent
 signed_off: 2026-08-14T10:02:00.000Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / run-candidates

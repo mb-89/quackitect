@@ -9,7 +9,7 @@ trigger: the first split of the machine phase into its four parts, which this it
 probe: "Split the machine phase into its four parts and read the split against two numbers — drawingSets and stateDetails holding over 90 percent of it, and the SVG under 50 ms. Spread evenly across states means the DAG is the right instrument. Concentrated in one call means a targeted fix is, and the modelling is aimed at nothing. SCHEDULED 2026-08-17 for M6: the probe is four lines of code rather than a reading, and a probe needing a change to the product is M6's work by this method's own rule."
 status: probed
 probed: 2026-08-17
-impact: "Spread evenly across states means the DAG is the right instrument and milestones three and four are aimed correctly. Concentrated in one call means a targeted fix is right and the DAG is the wrong instrument, so the modelling work would be aimed at the wrong thing. The iteration's own vision states both readings."
+impact: Spread evenly across states means the DAG is the right instrument and milestones three and four are aimed correctly. Concentrated in one call means a targeted fix is right and the DAG is the wrong instrument, so the modelling work would be aimed at the wrong thing. The iteration's own vision states both readings.
 breaks_how_badly: crippling
 how_likely: conceivable
 source_refs:

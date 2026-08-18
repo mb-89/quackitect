@@ -21,7 +21,7 @@ source_refs:
   - uc-drive-a-foreign-product step 1
   - uc-drive-a-foreign-product ext 1z
   - uc-drive-a-foreign-product ext 2y
-  - "product/engine-go/i18_red3.go at ref main"
+  - product/engine-go/i18_red3.go at ref main
 ---
 
 ## Rationale

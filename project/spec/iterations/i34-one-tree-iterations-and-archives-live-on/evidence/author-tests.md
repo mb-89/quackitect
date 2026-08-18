@@ -1,10 +1,10 @@
 ---
 form: author-tests
-amended: "2026-08-16T06:46:17.496Z by agent — The stored table still listed tsp-claim-lane, tsp-claim-guardrails and tsp-two-machines-run, which were deleted after this form signed. It now carries only the…"
+amended: 2026-08-16T06:46:17.496Z by agent — The stored table still listed tsp-claim-lane, tsp-claim-guardrails and tsp-two-machines-run, which were deleted after this form signed. It now carries only the…
 by: agent
 signed_off: 2026-08-16T06:29:05.979Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / author-tests

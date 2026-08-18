@@ -2,9 +2,9 @@
 form: map-stakeholders
 by: agent
 signed_off: 2026-08-18T10:58:18.988Z
-reopened: "2026-08-18T10:57:36.455Z — The context gained a fifth intended use and the scope a seventh item. The map owes an answer about whether reaching the capabilities from the surface adds a role, and it does not."
+reopened: 2026-08-18T10:57:36.455Z — The context gained a fifth intended use and the scope a seventh item. The map owes an answer about whether reaching the capabilities from the surface adds a role, and it does not.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / map-stakeholders

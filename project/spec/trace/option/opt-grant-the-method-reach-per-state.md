@@ -6,7 +6,7 @@ statement: confine every state to the bound tree by default and let a state's ow
 cluster: cluster-the-walk
 question: how shared method reaches a tree
 found_by: contradiction
-source: "TRIZ separation IN RELATION, on the contradiction that confining the tree stops a wrong write and stops the retro's own job"
+source: TRIZ separation IN RELATION, on the contradiction that confining the tree stops a wrong write and stops the retro's own job
 ---
 
 ## Mechanism

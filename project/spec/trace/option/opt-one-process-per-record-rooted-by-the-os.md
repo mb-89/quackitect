@@ -6,7 +6,7 @@ statement: run one engine process per bound record with its working directory se
 cluster: cluster-the-walk
 question: which tree a path resolves to
 found_by: without
-source: "trimming — what if resolve-a-path does not exist, and who does its job then; the answer is THE ENVIRONMENT"
+source: trimming — what if resolve-a-path does not exist, and who does its job then; the answer is THE ENVIRONMENT
 ---
 
 ## Mechanism

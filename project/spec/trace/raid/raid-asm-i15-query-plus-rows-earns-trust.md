@@ -7,11 +7,11 @@ statement: an engineer who is shown the query text and its returned rows trusts 
 owner: the driving agent
 trigger: an engineer asks to see the underlying corpus itself rather than accepting the query and its rows as sufficient proof
 status: open
-probed: "2026-08-16"
+probed: 2026-08-16
 impact: the trust property req-query-is-deterministic and sty-trust-a-repeatable-answer both rest on turns out not to be what actually earns the engineer's trust, and the repeatability guarantee buys less than this iteration's business case counted on.
 breaks_how_badly: abrasive
 how_likely: conceivable
-probe: "scheduled. Its own Probe section needs the query verb built and used a few times to answer a real engineer's why question, watching whether they accept the shown rows or ask to check the corpus by hand. Not yet built this iteration."
+probe: scheduled. Its own Probe section needs the query verb built and used a few times to answer a real engineer's why question, watching whether they accept the shown rows or ask to check the corpus by hand. Not yet built this iteration.
 source_refs:
   - req-query-is-deterministic
   - sty-trust-a-repeatable-answer

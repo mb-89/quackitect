@@ -2,8 +2,8 @@
 id: template-checklist
 statement: Check off a known list — every item, deliberately.
 editor: checklist
-line_pattern: '^- \[(x| |owed)\] .+'
-line_help: "every line is `- [x] <item>` checked, `- [ ] <item>` while it is not, or `- [owed] <item> — <ref>` addressed to an open raid entry"
+line_pattern: ^- \[(x| |owed)\] .+
+line_help: every line is `- [x] <item>` checked, `- [ ] <item>` while it is not, or `- [owed] <item> — <ref>` addressed to an open raid entry
 ---
 
 # checklist

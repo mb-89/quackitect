@@ -2,9 +2,9 @@
 form: test-verb
 by: agent
 signed_off: 2026-08-16T13:32:44.285Z
-reopened: "2026-08-16T13:24:46.633Z — the battery refusal points at verification, which does not grant se_test — so the full battery can now run nowhere"
+reopened: 2026-08-16T13:24:46.633Z — the battery refusal points at verification, which does not grant se_test — so the full battery can now run nowhere
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / test-verb

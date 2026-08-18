@@ -18,7 +18,7 @@ source_refs:
   - stk-newcomer
   - ".se/req-mine-sebots.md: the person's dial and the manual path (the checklist bar)"
 priority: could
-weighs_against:
+weighs_against: null
 ---
 
 ## Scenario

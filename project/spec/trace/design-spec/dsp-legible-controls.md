@@ -4,12 +4,12 @@ id: dsp-legible-controls
 type: "[[design-spec]]"
 statement: a control says what it did with an act, carried by a rung bank that names its unlocking notch, distinguishes an absent position from a deliberate one, and renders work still running beside itself
 realizes:
-  - "el-mirror"
+  - el-mirror
 files:
-  - "project/deliverable/engine/params.ts"
-  - "project/deliverable/engine/mirror.ts"
-  - "project/deliverable/engine/run.ts"
-  - "project/deliverable/vscode/src/extension.ts"
+  - project/deliverable/engine/params.ts
+  - project/deliverable/engine/mirror.ts
+  - project/deliverable/engine/run.ts
+  - project/deliverable/vscode/src/extension.ts
 ---
 
 ## Why this is its own spec

@@ -3,7 +3,7 @@ form: probe-assumptions
 by: agent
 signed_off: 2026-08-16T11:26:52.233Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / probe-assumptions

@@ -3,11 +3,11 @@ minted_in: i15-the-database-our-own-reader-over-obsidia
 id: tsp-coupling-disposition
 type: "[[test-spec]]"
 statement: Every candidate the BM25 sibling proposes carries a recorded disposition before the change is considered reviewed, verified by inspection over the disposition writer's construction.
-method: "inspection"
+method: inspection
 verifies:
-  - "req-bm25-candidates-need-disposition"
+  - req-bm25-candidates-need-disposition
 files:
-  - "none — the Checklist below is the whole definition"
+  - none — the Checklist below is the whole definition
 ---
 
 ## Scope

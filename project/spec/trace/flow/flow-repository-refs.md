@@ -2,7 +2,7 @@
 minted_in: i35-the-cloud-run-s-findings-land-the-fix-fi
 id: flow-repository-refs
 type: "[[flow]]"
-statement: "the branches the corpus cites, as local revisions"
+statement: the branches the corpus cites, as local revisions
 kind: material
 crosses: out
 source_refs:

@@ -1,10 +1,10 @@
 ---
 form: write-requirements
-amended: "2026-08-16T16:41:25.870Z by agent — req-a-value-outside-its-vocabulary-refuses was the row gate-requirements named as owed; it joins the register at author-tests"
+amended: 2026-08-16T16:41:25.870Z by agent — req-a-value-outside-its-vocabulary-refuses was the row gate-requirements named as owed; it joins the register at author-tests
 by: agent
 signed_off: 2026-08-16T16:16:39.295Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / write-requirements

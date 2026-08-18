@@ -6,7 +6,7 @@ statement: rank candidates by asking an agent to judge resemblance to the change
 cluster: cluster-the-disposition
 question: how does a ranked candidate coupling get its disposition
 found_by: transform
-source: "SCAMPER Substitute, held against \"what scores a candidate\""
+source: SCAMPER Substitute, held against "what scores a candidate"
 ---
 
 ## Mechanism

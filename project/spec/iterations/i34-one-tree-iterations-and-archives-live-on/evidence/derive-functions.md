@@ -1,10 +1,10 @@
 ---
 form: derive-functions
-amended: "2026-08-16T06:48:40.246Z by agent — fn-run-a-governed-walk.share-the-pool was deleted after this form signed, on the owner's ruling that the claim system goes everywhere it ripples. Deleting it left…"
+amended: 2026-08-16T06:48:40.246Z by agent — fn-run-a-governed-walk.share-the-pool was deleted after this form signed, on the owner's ruling that the claim system goes everywhere it ripples. Deleting it left…
 by: agent
 signed_off: 2026-08-16T05:56:39.841Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / derive-functions

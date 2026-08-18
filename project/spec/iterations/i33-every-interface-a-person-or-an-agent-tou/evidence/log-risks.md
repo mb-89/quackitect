@@ -2,10 +2,10 @@
 form: log-risks
 by: agent
 signed_off: 2026-08-17T16:45:15.762Z
-reopened: "2026-08-17T16:45:04.487Z — draft-vision re-signed above it, carrying the kickoff's five goals down. This register was already rechecked against them and nothing moved, so this is a recheck rather than new work."
+reopened: 2026-08-17T16:45:04.487Z — draft-vision re-signed above it, carrying the kickoff's five goals down. This register was already rechecked against them and nothing moved, so this is a recheck rather than new work.
 amended: "2026-08-17T16:24:12.075Z by agent — Three stacked RECHECKED paragraphs had become sediment and were unreadable as prose. They are consolidated into one. The fourth entry's assumption also gained its first measurement today, and it points against the guess: the green derivation reads its input once, so the cost is not repetition."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / log-risks

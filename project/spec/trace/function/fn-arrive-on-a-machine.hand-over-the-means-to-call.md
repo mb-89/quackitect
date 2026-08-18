@@ -3,7 +3,7 @@ minted_in: i35-the-cloud-run-s-findings-land-the-fix-fi
 id: fn-arrive-on-a-machine.hand-over-the-means-to-call
 type: "[[function]]"
 cluster: the-arrival
-statement: "give the agent a way to call the lane that needs nothing it does not already have"
+statement: give the agent a way to call the lane that needs nothing it does not already have
 satisfies:
   - req-one-command-takes-a-fresh-clone-to-a-live-lane
 inputs:

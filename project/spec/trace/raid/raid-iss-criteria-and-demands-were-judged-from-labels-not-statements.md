@@ -9,9 +9,9 @@ trigger: any state that hands a requirement to a scorer, a gate or a demand chec
 status: open
 breaks_how_badly: crippling
 how_likely: expected
-impact: "A criterion read from its title scores a property nobody asked for, and the arithmetic cannot see the substitution because every cell is filled and every id resolves. In i16 it produced a Pareto front that inverted when three of the eleven axes were read against their own text, and it let a must-priority demand pass unexamined through a whole milestone."
+impact: A criterion read from its title scores a property nobody asked for, and the arithmetic cannot see the substitution because every cell is filled and every id resolves. In i16 it produced a Pareto front that inverted when three of the eleven axes were read against their own text, and it let a must-priority demand pass unexamined through a whole milestone.
 source_refs:
-  - "iterations/i16 evidence gate-candidates, round_0_verify and round_2_red_team"
+  - iterations/i16 evidence gate-candidates, round_0_verify and round_2_red_team
   - req-the-system-runs-in-a-tree-that-is-not-its-own
   - req-method-reuse-is-vendoring
   - req-divergence-order-on-record

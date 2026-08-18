@@ -14,7 +14,7 @@ source_refs:
   - opt-the-update-arrives-as-a-program
   - cand-the-program-route
   - raid-tripwire-i16-a-structural-migration-cannot-be-written
-  - "iterations/i16 evidence find_by_probing"
+  - iterations/i16 evidence find_by_probing
 ---
 
 ## The choice

@@ -13,7 +13,7 @@ impact: "A home-made channel costs the time it takes to build and keeps costing 
 source_refs:
   - vp-vendoring
   - raid-dec-an-import-is-read-only-and-a-vendored-copy-is-yours
-  - "i16 define-actual as_is — the git-subtree witness"
+  - i16 define-actual as_is — the git-subtree witness
 ---
 
 ## What this entry used to say, and why it was wrong

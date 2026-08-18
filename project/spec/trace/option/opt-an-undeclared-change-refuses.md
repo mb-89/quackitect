@@ -6,7 +6,7 @@ statement: the machine compares what the copy holds against what it received, an
 cluster: the-bootstrap
 question: how a copy's own changes are represented
 found_by: prior-art
-source: "dpkg-source --abort-on-upstream-changes (manpages.debian.org/unstable/dpkg-dev/dpkg-source.1.en.html), yocto-check-layer common.test_patches_upstream_status (docs.yoctoproject.org/contributor-guide/recipe-style-guide.html)"
+source: dpkg-source --abort-on-upstream-changes (manpages.debian.org/unstable/dpkg-dev/dpkg-source.1.en.html), yocto-check-layer common.test_patches_upstream_status (docs.yoctoproject.org/contributor-guide/recipe-style-guide.html)
 ---
 
 ## Mechanism

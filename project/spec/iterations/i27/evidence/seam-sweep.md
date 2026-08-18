@@ -3,7 +3,7 @@ form: seam-sweep
 by: agent
 signed_off: 2026-08-14T15:52:30.821Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / seam-sweep

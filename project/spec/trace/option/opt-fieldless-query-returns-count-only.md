@@ -6,7 +6,7 @@ statement: a query naming no field list returns just a row count, never full row
 cluster: cluster-the-query
 question: how does answer-a-structured-query evaluate a query against the corpus
 found_by: transform
-source: "SCAMPER Modify (minify), held against answer-a-structured-query's response shape"
+source: SCAMPER Modify (minify), held against answer-a-structured-query's response shape
 ---
 
 ## Mechanism

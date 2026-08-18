@@ -3,12 +3,12 @@ minted_in: i1
 id: tsp-tour-resilience
 type: "[[test-spec]]"
 statement: A tour stop states an absence rather than inventing an example, and survives a missing highlight while recording the miss, verified by test over the tour machinery.
-method: "test"
+method: test
 verifies:
-  - "req-tour-admits-absence"
-  - "req-tour-outlives-a-missing-highlight"
+  - req-tour-admits-absence
+  - req-tour-outlives-a-missing-highlight
 files:
-  - "tests/tour.test.ts"
+  - tests/tour.test.ts
 ---
 
 ## Scope

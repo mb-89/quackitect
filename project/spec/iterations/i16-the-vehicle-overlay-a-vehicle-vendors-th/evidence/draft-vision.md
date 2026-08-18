@@ -2,9 +2,9 @@
 form: draft-vision
 by: agent
 signed_off: 2026-08-18T09:52:56.170Z
-reopened: "2026-08-18T09:51:47.457Z — The kickoff re-signed with six goals rather than five, and the new one — nothing a descendant does can reach its parent — appears nowhere in this packet's goal system. Removing the seal deleted a constraint pointing the wrong way and left the real one unwritten."
+reopened: 2026-08-18T09:51:47.457Z — The kickoff re-signed with six goals rather than five, and the new one — nothing a descendant does can reach its parent — appears nowhere in this packet's goal system. Removing the seal deleted a constraint pointing the wrong way and left the real one unwritten.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / draft-vision

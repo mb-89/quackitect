@@ -47,8 +47,6 @@ evidence:
       - the idea it produced, or `nothing`
     picks:
       operator: $transform_operators
-      # A transformation is applied to a cluster, to an option already on the
-      # table, or to whatever exists today.
       subject:
         - $clusters
         - $options

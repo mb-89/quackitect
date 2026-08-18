@@ -6,7 +6,7 @@ statement: index frontmatter and inline fields into an in-memory table per node 
 cluster: cluster-the-query
 question: how does answer-a-structured-query evaluate a query against the corpus
 found_by: prior-art
-source: "Obsidian Dataview, community plugin (github.com/blacksmithgu/obsidian-dataview README: DQL, \"a pipeline-based, vaguely SQL-looking expression language\")"
+source: 'Obsidian Dataview, community plugin (github.com/blacksmithgu/obsidian-dataview README: DQL, "a pipeline-based, vaguely SQL-looking expression language")'
 ---
 
 ## Mechanism

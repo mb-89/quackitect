@@ -2,7 +2,7 @@
 minted_in: i35-the-cloud-run-s-findings-land-the-fix-fi
 id: req-one-command-takes-a-fresh-clone-to-a-live-lane
 type: "[[requirement]]"
-statement: "When a session starts on a clone that has no lane, the system shall bring that clone to a caged agent standing on a live lane in one act, requiring no decision from the agent."
+statement: When a session starts on a clone that has no lane, the system shall bring that clone to a caged agent standing on a live lane in one act, requiring no decision from the agent.
 kind: functional
 verify_method: demonstration
 breaks_if_removed: "Every cloud run pays the arrival by hand again. Measured twice, on i15 and i35: most of an hour before the first se_pull, and none of it judgment."

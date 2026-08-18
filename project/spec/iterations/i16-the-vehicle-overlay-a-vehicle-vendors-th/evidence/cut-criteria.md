@@ -2,9 +2,9 @@
 form: cut-criteria
 by: agent
 signed_off: 2026-08-18T15:38:58.387Z
-reopened: "2026-08-18T15:38:54.403Z — seven requirement nodes gained a fitness flag at evaluate-architecture, so this claim answered a corpus that has since moved"
+reopened: 2026-08-18T15:38:54.403Z — seven requirement nodes gained a fitness flag at evaluate-architecture, so this claim answered a corpus that has since moved
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / cut-criteria

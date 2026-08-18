@@ -1,10 +1,10 @@
 ---
 form: decompose-structure
-reopened: "2026-08-18T15:40:28.059Z — record-adrs was re-signed after the fitness flags landed, so this claim answered ground that has since moved"
+reopened: 2026-08-18T15:40:28.059Z — record-adrs was re-signed after the fitness flags landed, so this claim answered ground that has since moved
 by: agent
 signed_off: 2026-08-18T15:40:31.272Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / decompose-structure

@@ -4,24 +4,24 @@ id: dsp-core-and-satellite
 type: "[[design-spec]]"
 statement: one core process owning what must be one thing, one satellite per agent owning one record, and a local channel between them that names the store on every answer
 realizes:
-  - "el-core"
-  - "el-satellite"
-  - "if-core-satellite"
-  - "if-core-to-mirror"
-  - "if-satellite-to-account"
-  - "if-record-store-to-satellite"
-  - "if-method-compiler-to-satellite"
-  - "if-engine-delta-to-satellite"
+  - el-core
+  - el-satellite
+  - if-core-satellite
+  - if-core-to-mirror
+  - if-satellite-to-account
+  - if-record-store-to-satellite
+  - if-method-compiler-to-satellite
+  - if-engine-delta-to-satellite
 files:
-  - "project/deliverable/engine/core.ts"
-  - "project/deliverable/engine/satellite.ts"
-  - "project/deliverable/engine/channel.ts"
-  - "project/deliverable/engine/transports.ts"
-  - "project/deliverable/engine/supervisor.ts"
-  - "project/deliverable/engine/delta.ts"
-  - "project/deliverable/engine/mode.ts"
-  - "project/deliverable/engine/bin/se-satellite.ts"
-  - "project/deliverable/engine/bin/se-mcp.ts"
+  - project/deliverable/engine/core.ts
+  - project/deliverable/engine/satellite.ts
+  - project/deliverable/engine/channel.ts
+  - project/deliverable/engine/transports.ts
+  - project/deliverable/engine/supervisor.ts
+  - project/deliverable/engine/delta.ts
+  - project/deliverable/engine/mode.ts
+  - project/deliverable/engine/bin/se-satellite.ts
+  - project/deliverable/engine/bin/se-mcp.ts
 ---
 
 ## Responsibility

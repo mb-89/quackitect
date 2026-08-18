@@ -1,10 +1,10 @@
 ---
 form: enumerate-space
-amended: "2026-08-14T10:48:57.412Z by agent — The join's form was written by hand because the walk never serves it, and it needs the engine's own stamp for the claim to stand."
+amended: 2026-08-14T10:48:57.412Z by agent — The join's form was written by hand because the walk never serves it, and it needs the engine's own stamp for the claim to stand.
 by: agent
 signed_off: 2026-08-14T10:52:00.000Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / enumerate-space

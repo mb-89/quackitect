@@ -3,33 +3,33 @@ minted_in: i1
 id: tsp-record-lifecycle
 type: "[[test-spec]]"
 statement: A record opens on the person's word, binds its own tree, walks from the retro, and grows only by adjudicated escalation, verified by test over the iteration machinery.
-method: "test"
+method: test
 verifies:
-  - "req-container-offers-its-records"
-  - "req-survey-counts-only-open-records"
-  - "req-record-opens-on-word"
-  - "req-record-status-comes-from-the-record"
-  - "req-walk-opens-at-retro"
-  - "req-unshipped-dependency-refused"
-  - "req-landing-needs-no-close"
-  - "req-size-choice-is-the-bless"
-  - "req-size-escalation-readjudicated"
-  - "req-size-proposal-names-strikes"
-  - "req-bless-outputs-ride-the-bless"
-  - "req-blessed-column-compiles-pinned"
-  - "req-a-shipped-record-is-never-reclaimed"
-  - "req-a-records-dependency-is-declared"
-  - "req-a-records-own-status-decides-whether-it-is-open"
-  - "req-entering-repairs-itself-or-names-the-remedy"
-  - "req-work-starts-without-a-reachable-remote"
+  - req-container-offers-its-records
+  - req-survey-counts-only-open-records
+  - req-record-opens-on-word
+  - req-record-status-comes-from-the-record
+  - req-walk-opens-at-retro
+  - req-unshipped-dependency-refused
+  - req-landing-needs-no-close
+  - req-size-choice-is-the-bless
+  - req-size-escalation-readjudicated
+  - req-size-proposal-names-strikes
+  - req-bless-outputs-ride-the-bless
+  - req-blessed-column-compiles-pinned
+  - req-a-shipped-record-is-never-reclaimed
+  - req-a-records-dependency-is-declared
+  - req-a-records-own-status-decides-whether-it-is-open
+  - req-entering-repairs-itself-or-names-the-remedy
+  - req-work-starts-without-a-reachable-remote
 files:
-  - "tests/iterations.test.ts"
-  - "tests/container.test.ts"
-  - "tests/worktree.test.ts"
-  - "tests/drift.test.ts"
-  - "tests/sizes.test.ts"
-  - "tests/floor.test.ts"
-  - "tests/rigor-matrix.test.ts"
+  - tests/iterations.test.ts
+  - tests/container.test.ts
+  - tests/worktree.test.ts
+  - tests/drift.test.ts
+  - tests/sizes.test.ts
+  - tests/floor.test.ts
+  - tests/rigor-matrix.test.ts
 ---
 
 ## Scope

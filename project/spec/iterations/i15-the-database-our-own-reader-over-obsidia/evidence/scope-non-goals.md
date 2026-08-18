@@ -1,10 +1,10 @@
 ---
 form: scope-non-goals
-amended: "2026-08-16T16:31:30.497Z by agent — ref \"main\" resolves — verified 2026-08-16; correcting the harvest scope line, the non-goal deferral, and the follow_up"
+amended: 2026-08-16T16:31:30.497Z by agent — ref "main" resolves — verified 2026-08-16; correcting the harvest scope line, the non-goal deferral, and the follow_up
 by: agent
 signed_off: 2026-08-16T16:25:22.079Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / scope-non-goals

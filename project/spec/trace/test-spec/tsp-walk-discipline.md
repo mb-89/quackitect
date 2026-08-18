@@ -3,33 +3,33 @@ minted_in: i1
 id: tsp-walk-discipline
 type: "[[test-spec]]"
 statement: The walk advances only on a pull, weighs the slider on every hop, and answers from the record, verified by test over the pull and route machinery.
-method: "test"
+method: test
 verifies:
-  - "req-a-clear-jump-is-one-call"
-  - "req-answer-pages-never-overflows"
-  - "req-autonomy-gates-every-hop"
-  - "req-autonomy-change-applies-forward"
-  - "req-controls-never-advance-walk"
-  - "req-gate-needs-a-persons-verdict"
-  - "req-pull-answers-from-record"
-  - "req-walk-resumes-from-repo"
-  - "req-state-opens-only-when-earned"
-  - "req-state-needs-all-its-inputs"
-  - "req-a-reopen-stands-where-it-can-work"
-  - "req-land-target-routes-to-gate"
-  - "req-instruction-names-its-source"
-  - "req-a-pull-carrying-no-choice-enters-no-iteration"
+  - req-a-clear-jump-is-one-call
+  - req-answer-pages-never-overflows
+  - req-autonomy-gates-every-hop
+  - req-autonomy-change-applies-forward
+  - req-controls-never-advance-walk
+  - req-gate-needs-a-persons-verdict
+  - req-pull-answers-from-record
+  - req-walk-resumes-from-repo
+  - req-state-opens-only-when-earned
+  - req-state-needs-all-its-inputs
+  - req-a-reopen-stands-where-it-can-work
+  - req-land-target-routes-to-gate
+  - req-instruction-names-its-source
+  - req-a-pull-carrying-no-choice-enters-no-iteration
 files:
-  - "tests/pull.test.ts"
-  - "tests/pull-offer.test.ts"
-  - "tests/pull-seam.test.ts"
-  - "tests/route.test.ts"
-  - "tests/threshold.test.ts"
-  - "tests/boot.test.ts"
-  - "tests/tokens.test.ts"
-  - "tests/branching.test.ts"
-  - "tests/feed.test.ts"
-  - "tests/gitlane.test.ts"
+  - tests/pull.test.ts
+  - tests/pull-offer.test.ts
+  - tests/pull-seam.test.ts
+  - tests/route.test.ts
+  - tests/threshold.test.ts
+  - tests/boot.test.ts
+  - tests/tokens.test.ts
+  - tests/branching.test.ts
+  - tests/feed.test.ts
+  - tests/gitlane.test.ts
 ---
 
 ## Scope

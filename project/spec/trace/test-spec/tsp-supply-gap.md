@@ -3,11 +3,11 @@ minted_in: i6-conformance-goes-mechanical-checks-bind-
 id: tsp-supply-gap
 type: "[[test-spec]]"
 statement: A state whose required evidence resolves against something it has no verb to make is reported as a gap and refuses the compile, and every live machine is checked to hold.
-method: "test"
+method: test
 verifies:
-  - "req-no-state-demands-what-it-cannot-supply"
+  - req-no-state-demands-what-it-cannot-supply
 files:
-  - "tests/supply-gap.test.ts"
+  - tests/supply-gap.test.ts
 ---
 
 ## Scope

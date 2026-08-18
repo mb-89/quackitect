@@ -2,7 +2,7 @@
 title: git bisect - binary search over history
 url: https://git-scm.com/docs/git-bisect
 kind: authoritative
-version: "current"
+version: current
 accessed: 2026-08-11
 tags:
   - evidence

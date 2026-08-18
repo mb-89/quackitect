@@ -6,7 +6,7 @@ statement: no runtime claiming at all - the person assigns each seeded iteration
 cluster: cluster-the-record-life
 question: what serializes a claim
 found_by: without
-source: "the trimming question - remove the claim cluster and the PERSON does its job at seeding time"
+source: the trimming question - remove the claim cluster and the PERSON does its job at seeding time
 ---
 
 ## Mechanism

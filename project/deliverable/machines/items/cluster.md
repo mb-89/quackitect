@@ -24,7 +24,7 @@ checks:
       - TBD
       - TBC
       - TBR
-      - "???"
+      - ???
     hint: a group nobody can name is a group nobody chose
 ---
 

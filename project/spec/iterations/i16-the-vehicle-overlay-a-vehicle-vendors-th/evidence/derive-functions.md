@@ -2,9 +2,9 @@
 form: derive-functions
 by: agent
 signed_off: 2026-08-18T15:01:36.825Z
-reopened: "2026-08-18T15:00:12.593Z — the winner's central act had no function and no flow, and the owner ruled the copy-versus-vehicle naming, so the function structure is short two functions, four flows and a rename"
+reopened: 2026-08-18T15:00:12.593Z — the winner's central act had no function and no flow, and the owner ruled the copy-versus-vehicle naming, so the function structure is short two functions, four flows and a rename
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / derive-functions

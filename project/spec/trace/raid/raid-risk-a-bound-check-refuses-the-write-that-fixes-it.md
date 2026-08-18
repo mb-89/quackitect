@@ -10,7 +10,7 @@ status: open
 impact: The walk stands in a state with no legal move. The only exit is out of the iteration, which the owner ruled a failure. Every check added after the first multiplies the surface.
 breaks_how_badly: crippling
 how_likely: expected
-mitigation: "Every check names its way forward as part of being written. A check with no named escape does not compile. The compile-time trap check this iteration builds is the mechanical half; the authoring rule is the other."
+mitigation: Every check names its way forward as part of being written. A check with no named escape does not compile. The compile-time trap check this iteration builds is the mechanical half; the authoring rule is the other.
 source_refs:
   - raid-dec-the-walk-never-reaches-a-state-it-cannot-leave
   - i6 draft-vision — conflict 2, the walk wins

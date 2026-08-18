@@ -5,7 +5,7 @@ amended: "2026-08-17T17:21:23.586Z by agent — The tester's remaining findings 
 by: agent
 signed_off: 2026-08-17T17:10:24.466Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-implementation

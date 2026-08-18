@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-18T10:57:20.483Z
 reopened: "2026-08-18T10:56:15.498Z — Scope gained the extension affordance, so the boundary owes a fifth intended use: both capabilities offered at the surface, with a new window opening in the produced tree. The extension is already a neighbour and its traffic changed."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / draw-context

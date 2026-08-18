@@ -4,16 +4,16 @@ id: dsp-write-guard
 type: "[[design-spec]]"
 statement: one pass over the content a write carries, answering refuse or land-with-findings, with the rules read from the corpus rather than compiled into the engine
 realizes:
-  - "el-walk-engine"
-  - "if-satellite-to-walk-engine"
+  - el-walk-engine
+  - if-satellite-to-walk-engine
 files:
-  - "project/deliverable/engine/guard.ts"
-  - "project/deliverable/engine/rules.ts"
-  - "project/deliverable/engine/vocabulary.ts"
-  - "project/deliverable/engine/sweep.ts"
-  - "project/deliverable/engine/bin/sweep.ts"
-  - "project/deliverable/engine/files.ts"
-  - "project/deliverable/engine/tools.ts"
+  - project/deliverable/engine/guard.ts
+  - project/deliverable/engine/rules.ts
+  - project/deliverable/engine/vocabulary.ts
+  - project/deliverable/engine/sweep.ts
+  - project/deliverable/engine/bin/sweep.ts
+  - project/deliverable/engine/files.ts
+  - project/deliverable/engine/tools.ts
 ---
 
 ## Responsibility

@@ -3,7 +3,7 @@ id: template-compare-card
 statement: One pair at a time — the engine asks, you answer, the answer lands on the node and the next pair comes up.
 editor: compare-card
 resolves: artifact
-line_pattern: "^\\| .+ \\|"
+line_pattern: ^\| .+ \|
 line_help: "THE ANSWER LANDS ON THE NODE, not in this table: write the verdict into the frontmatter key named by `writes` on the item it is about, e.g. `weighs_against:` with a line `- <other-id> >` meaning THIS item matters more. This table is the rendering, rebuilt from the nodes on every look, and its columns are `| a | verdict | b |` with the verdict BETWEEN the two items. Editing the table alone changes nothing."
 ---
 

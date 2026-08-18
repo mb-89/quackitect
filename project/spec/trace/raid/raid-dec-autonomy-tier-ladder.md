@@ -11,7 +11,7 @@ breaks_how_badly: corrosive
 how_likely: conceivable
 source_refs:
   - req-autonomy-is-categorical
-  - "the owner's cut-over ruling of 2026-08-12, given in session at the b6 build"
+  - the owner's cut-over ruling of 2026-08-12, given in session at the b6 build
 ---
 
 The ladder, low to high, as the owner ruled it at the cut-over:

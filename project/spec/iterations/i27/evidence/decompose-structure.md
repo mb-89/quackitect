@@ -1,11 +1,11 @@
 ---
 form: decompose-structure
-amended: "2026-08-14T13:47:01.005Z by agent — the section carried the computed matrix, which template-element-matrix says is never written down — reduced to the argued spread"
+amended: 2026-08-14T13:47:01.005Z by agent — the section carried the computed matrix, which template-element-matrix says is never written down — reduced to the argued spread
 by: agent
 signed_off: 2026-08-14T12:55:57.694Z
-reopened: "2026-08-14T12:54:57.270Z — Its evidence was written directly because the walk would not route to this branch, so the claim carries no signature and the join cannot see it."
+reopened: 2026-08-14T12:54:57.270Z — Its evidence was written directly because the walk would not route to this branch, so the claim carries no signature and the join cannot see it.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / decompose-structure

@@ -13,7 +13,7 @@ refines:
 source_refs:
   - "the owner's emergency ruling of 2026-08-11: a boot always ends at the front desk"
   - "req-walk-resumes-from-repo — the resume Detail this row tightens: the standing position is served, and the walk still parks at the desk"
-  - "the 2026-08-11 boot that walked into open i2 and served its route's 10 documents (call log, session 19:57)"
+  - the 2026-08-11 boot that walked into open i2 and served its route's 10 documents (call log, session 19:57)
 priority: must
 ---
 

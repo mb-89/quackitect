@@ -7,11 +7,11 @@ statement: The record telling a driven project which copy to follow back is stil
 owner: the owner
 trigger: the first time a driven project is opened by somebody other than the person who created it, or on a machine other than the one that created it
 status: open
-probed: "2026-08-18"
+probed: 2026-08-18
 probe: "scheduled, AND ONE OF THE FOUR CANDIDATE ANSWERS IS ALREADY DISPROVED BY INSPECTION. The full probe is three runs — produce a project and confirm the system comes up, move it and retry, clone it as a colleague would and retry — and it needs the producing act, which does not exist. M6 carries it. WHAT IS SETTLED WITHOUT A RUN: v1's answer puts the pointer in a MACHINE-LOCAL data home keyed by a hash of the workspace path, so it survives neither a move nor a clone by construction rather than by accident. That eliminates one of the four candidates `bring-forth-a-project` names, before M4 scores anything, and it narrows the space toward a pointer living inside the produced tree — which is also the one the path jail is friendliest to."
 breaks_how_badly: crippling
 how_likely: expected
-impact: "The system cannot come up in the project at all, and the failure looks like the product being broken rather than like a missing pointer. The second of the two capabilities stops working for exactly the people the affordance was built for - somebody who pressed a button and read nothing."
+impact: The system cannot come up in the project at all, and the failure looks like the product being broken rather than like a missing pointer. The second of the two capabilities stops working for exactly the people the affordance was built for - somebody who pressed a button and read nothing.
 source_refs:
   - req-the-system-runs-in-a-tree-that-is-not-its-own
   - fn-run-a-governed-walk.bring-forth-a-project

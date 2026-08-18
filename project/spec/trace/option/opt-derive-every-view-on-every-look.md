@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: store nothing derived and recompute every view from the corpus on every look, because the corpus is small enough to afford it
 cluster: cluster-the-account
 found_by: probe
-source: "probe run 2026-08-09 — loadTrace over the live corpus, timed"
+source: probe run 2026-08-09 — loadTrace over the live corpus, timed
 ---
 
 ## Mechanism

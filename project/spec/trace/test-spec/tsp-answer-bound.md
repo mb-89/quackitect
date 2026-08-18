@@ -3,9 +3,9 @@ minted_in: i27
 id: tsp-answer-bound
 type: "[[test-spec]]"
 statement: No lane answer exceeds a declared size, and an answer that would carries a reference to the rest instead.
-method: "test"
+method: test
 verifies:
-  - "req-the-answer-never-exceeds-its-bound"
+  - req-the-answer-never-exceeds-its-bound
 files:
   - tests/answer-bound.test.ts
 ---

@@ -30,7 +30,7 @@ checks:
       - TBD
       - TBC
       - TBR
-      - "???"
+      - ???
     hint: no TBD survives the milestone
   - field: statement
     ban_phrases:
@@ -48,21 +48,21 @@ checks:
       - TBD
       - TBC
       - TBR
-      - "???"
+      - ???
     hint: a function whose input is unknown has not been derived yet
   - field: outputs
     ban_markers:
       - TBD
       - TBC
       - TBR
-      - "???"
+      - ???
     hint: a function with no named output does nothing anybody can check
   - field: satisfies
     ban_markers:
       - TBD
       - TBC
       - TBR
-      - "???"
+      - ???
     hint: a function serving no requirement is work nobody asked for
 sections:
   - Rationale

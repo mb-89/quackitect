@@ -7,8 +7,8 @@ statement: A person who waits several seconds per look opens fewer artifacts, an
 owner: the adjudicator
 trigger: the surfaces answer inside a second and the number of artifacts opened per gate does not rise
 status: open
-probed: "2026-08-15"
-probe: "unprobed - nothing counts artifacts opened per adjudication. The count is derivable from the call log, and building it is not this iteration's work."
+probed: 2026-08-15
+probe: unprobed - nothing counts artifacts opened per adjudication. The count is derivable from the call log, and building it is not this iteration's work.
 impact: This is the cost the record is really buying down. If it is false, the work buys comfort rather than judgment quality, and the value prop's claim about where a person's time goes is overstated.
 breaks_how_badly: abrasive
 how_likely: plausible

@@ -3,10 +3,10 @@ minted_in: i35-the-cloud-run-s-findings-land-the-fix-fi
 id: tsp-the-arrival
 type: "[[test-spec]]"
 statement: An arrival that fails is reported and never mistaken for one that succeeded, the declared runtime floor is read and never edited, and the hook never costs the session.
-method: "test"
+method: test
 verifies:
-  - "req-the-arrival-never-costs-the-session"
-  - "req-the-declared-runtime-floor-is-read-never-edited"
+  - req-the-arrival-never-costs-the-session
+  - req-the-declared-runtime-floor-is-read-never-edited
 files:
   - tests/arrival.test.ts
 ---

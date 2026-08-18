@@ -10,8 +10,8 @@ status: closed
 impact: The whole lifecycle change rests on this. If reading status from git is slow or unreliable at the current iteration count, the folder on disk was a cache earning its keep, and the answer becomes an explicit cache with an invalidation rather than removal of the folder.
 breaks_how_badly: crippling
 how_likely: conceivable
-probe: "holds, WITH A NAMED CONDITION on the implementation. Measured 2026-08-15 over 33 iteration branches. Today's existsSync path costs 12.6 ms. One batched git cat-file over the same 33 costs 58.7 ms, which is 4.6x the disk test and comfortably inside the one-second budget. One git show per iteration costs 1004.2 ms, which is over the budget and would therefore have to run non-blocking with progress shown. Batching removes that need entirely, so the assumption holds and the reader batches."
-probed: "2026-08-15"
+probe: holds, WITH A NAMED CONDITION on the implementation. Measured 2026-08-15 over 33 iteration branches. Today's existsSync path costs 12.6 ms. One batched git cat-file over the same 33 costs 58.7 ms, which is 4.6x the disk test and comfortably inside the one-second budget. One git show per iteration costs 1004.2 ms, which is over the budget and would therefore have to run non-blocking with progress shown. Batching removes that need entirely, so the assumption holds and the reader batches.
+probed: 2026-08-15
 source_refs:
   - i28-the-cloud-runs-from-its-seed-alone-a-fre
   - req-call-answers-in-one-second

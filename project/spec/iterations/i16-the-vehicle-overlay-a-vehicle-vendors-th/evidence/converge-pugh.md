@@ -1,10 +1,10 @@
 ---
 form: converge-pugh
-reopened: "2026-08-18T15:39:37.711Z — gate-candidates was re-blessed after the fitness flags landed, so this claim answered ground that has since moved"
+reopened: 2026-08-18T15:39:37.711Z — gate-candidates was re-blessed after the fitness flags landed, so this claim answered ground that has since moved
 by: agent
 signed_off: 2026-08-18T15:39:41.135Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / converge-pugh

@@ -2,10 +2,10 @@
 form: build_chart
 by: agent
 signed_off: 2026-08-14T12:22:58.318Z
-amended: "2026-08-14T10:44:30.769Z by agent — The owner asked to keep the memory answer as a drawn candidate rather than an undrawn refinement, so a seventh line joins the chart."
-reopened: "2026-08-14T12:18:51.756Z — cand-memory-served is folded into cand-core-satellite on the owner's ruling, so the chart draws seven lines where six stand."
+amended: 2026-08-14T10:44:30.769Z by agent — The owner asked to keep the memory answer as a drawn candidate rather than an undrawn refinement, so a seventh line joins the chart.
+reopened: 2026-08-14T12:18:51.756Z — cand-memory-served is folded into cand-core-satellite on the owner's ruling, so the chart draws seven lines where six stand.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / build_chart

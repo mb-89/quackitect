@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "Know the build strategies and let them shape the order. They inform the plan; nothing enforces a pick."
+statement: Know the build strategies and let them shape the order. They inform the plan; nothing enforces a pick.
 ---
 
 ## Situation

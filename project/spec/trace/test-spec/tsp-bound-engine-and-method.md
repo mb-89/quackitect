@@ -3,10 +3,10 @@ minted_in: i27
 id: tsp-bound-engine-and-method
 type: "[[test-spec]]"
 statement: An agent changes the engine or the method from inside their record, and the change takes effect on their next call.
-method: "test"
+method: test
 verifies:
-  - "req-an-engine-change-applies-in-its-own-record"
-  - "req-a-method-change-reaches-every-tree"
+  - req-an-engine-change-applies-in-its-own-record
+  - req-a-method-change-reaches-every-tree
 files:
   - tests/bound-engine.test.ts
 ---

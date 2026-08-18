@@ -13,7 +13,7 @@ impact: "The whole iteration rests on one chain, and the chain's most-specific l
 source_refs:
   - req-overlay-resolution
   - req-nothing-a-copy-does-reaches-its-source
-  - "product/engine-go/resolver.go at ref main — overlayLayers, read 2026-08-18"
+  - product/engine-go/resolver.go at ref main — overlayLayers, read 2026-08-18
 ---
 
 ## Why this is a risk rather than a decision

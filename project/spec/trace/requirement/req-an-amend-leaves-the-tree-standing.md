@@ -12,7 +12,7 @@ refines:
 source_refs:
   - "owner ruling 2026-08-17: an amendment does not re-grey, a reopen re-greys"
   - "owner ruling 2026-08-17: a change that alters what a gate DOES is a reopen, not an amendment"
-  - "engine/session.ts claimTime, and the ripple's time half in recordDone"
+  - engine/session.ts claimTime, and the ripple's time half in recordDone
 priority: must
 ---
 

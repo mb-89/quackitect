@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: link stable ids to the authoritative text instead of duplicating it, and check mechanically for orphans and stale links
 cluster: cluster-the-account
 found_by: prior-art
-source: "Requirement traceability matrix, https://qajobfit.com/resources/requirement-traceability-matrix"
+source: Requirement traceability matrix, https://qajobfit.com/resources/requirement-traceability-matrix
 ---
 
 ## Mechanism

@@ -6,7 +6,7 @@ statement: resolve as today and return the tree that was resolved with every ans
 cluster: cluster-the-walk
 question: how a resolution is made visible
 found_by: prior-art
-source: "workspace root detection in monorepo tooling — findProjectRoot walks up for a workspace manager root and falls back to the git root; https://microsoft.github.io/workspace-tools/functions/findProjectRoot.html"
+source: workspace root detection in monorepo tooling — findProjectRoot walks up for a workspace manager root and falls back to the git root; https://microsoft.github.io/workspace-tools/functions/findProjectRoot.html
 ---
 
 ## Mechanism

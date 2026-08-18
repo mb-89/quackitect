@@ -1,10 +1,10 @@
 ---
 form: build_chart
-amended: "2026-08-18T14:01:37.552Z by agent — the chart has no row for where artifacts land while driving, which a must requires every candidate to answer"
+amended: 2026-08-18T14:01:37.552Z by agent — the chart has no row for where artifacts land while driving, which a must requires every candidate to answer
 by: agent
 signed_off: 2026-08-18T12:45:19.968Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / build_chart

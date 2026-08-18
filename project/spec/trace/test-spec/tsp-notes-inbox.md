@@ -3,23 +3,23 @@ minted_in: i1
 id: tsp-notes-inbox
 type: "[[test-spec]]"
 statement: A stray is captured in one call from anywhere, stays visible until dispositioned, and drains into exactly one home, verified by test over the notes machinery.
-method: "test"
+method: test
 verifies:
-  - "req-stray-captured-in-one-call"
-  - "req-capture-moves-nothing"
-  - "req-idea-lands-as-note"
-  - "req-duplicate-stray-still-captured"
-  - "req-open-notes-stay-visible"
-  - "req-drained-note-leaves-count"
-  - "req-drain-one-home-with-payload"
-  - "req-parked-note-re-drains"
-  - "req-unknown-drain-ref-refused"
-  - "req-retro-window-drains-whole"
-  - "req-kickoff-refuses-pending-notes"
+  - req-stray-captured-in-one-call
+  - req-capture-moves-nothing
+  - req-idea-lands-as-note
+  - req-duplicate-stray-still-captured
+  - req-open-notes-stay-visible
+  - req-drained-note-leaves-count
+  - req-drain-one-home-with-payload
+  - req-parked-note-re-drains
+  - req-unknown-drain-ref-refused
+  - req-retro-window-drains-whole
+  - req-kickoff-refuses-pending-notes
 files:
-  - "tests/feed.test.ts"
-  - "tests/retro.test.ts"
-  - "tests/surveywindow.test.ts"
+  - tests/feed.test.ts
+  - tests/retro.test.ts
+  - tests/surveywindow.test.ts
 ---
 
 ## Scope

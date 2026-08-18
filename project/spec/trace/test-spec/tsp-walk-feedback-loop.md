@@ -3,13 +3,13 @@ minted_in: i3
 id: tsp-walk-feedback-loop
 type: "[[test-spec]]"
 statement: The walk says what it knows — a reading credit survives a reload and dies with the words, a red objective serves its fill, and one verb names every condition holding a state grey.
-method: "test"
+method: test
 verifies:
-  - "req-reading-credit-survives-a-reload"
-  - "req-red-objective-serves-its-fill"
-  - "req-one-verb-says-why-a-state-is-grey"
+  - req-reading-credit-survives-a-reload
+  - req-red-objective-serves-its-fill
+  - req-one-verb-says-why-a-state-is-grey
 files:
-  - "tests/feedback-loop.test.ts"
+  - tests/feedback-loop.test.ts
 ---
 
 ## Scope

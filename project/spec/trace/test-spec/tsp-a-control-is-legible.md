@@ -3,11 +3,11 @@ minted_in: i33-every-interface-a-person-or-an-agent-tou
 id: tsp-a-control-is-legible
 type: "[[test-spec]]"
 statement: A control says what it did with an act — taken or refused — and a refusal names the act that unlocks it.
-method: "test"
+method: test
 verifies:
-  - "req-a-refused-act-says-why-and-what-next"
-  - "req-a-surface-shows-the-state-an-act-produced"
-  - "req-a-control-that-undoes-on-a-second-press-says-so-first"
+  - req-a-refused-act-says-why-and-what-next
+  - req-a-surface-shows-the-state-an-act-produced
+  - req-a-control-that-undoes-on-a-second-press-says-so-first
 files:
   - project/deliverable/tests/legible-controls.test.ts
 ---

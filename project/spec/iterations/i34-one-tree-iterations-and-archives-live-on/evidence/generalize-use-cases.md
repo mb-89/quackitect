@@ -2,9 +2,9 @@
 form: generalize-use-cases
 by: agent
 signed_off: 2026-08-16T08:57:13.801Z
-amended: "2026-08-16T07:13:49.366Z by agent — the follow_up held uc-claim-an-iteration open pending a gate ruling; the gate ruled, the owner widened it, and the node is deleted — the form must not read as…"
+amended: 2026-08-16T07:13:49.366Z by agent — the follow_up held uc-claim-an-iteration open pending a gate ruling; the gate ruled, the owner widened it, and the node is deleted — the form must not read as…
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / generalize-use-cases

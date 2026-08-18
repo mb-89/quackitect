@@ -3,9 +3,9 @@ form: gate-validation
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-17T19:55:11.036Z
-reopened: "2026-08-17T19:54:02.332Z — Its ruling counts three must stories and the law counts five. Two more were found by this gate's own slide law after it signed, and five demonstration specs plus five filled decks landed since the signature. The verdict text no longer describes what it is ruling on."
+reopened: 2026-08-17T19:54:02.332Z — Its ruling counts three must stories and the law counts five. Two more were found by this gate's own slide law after it signed, and five demonstration specs plus five filled decks landed since the signature. The verdict text no longer describes what it is ruling on.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-validation

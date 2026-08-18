@@ -21,7 +21,7 @@ checks:
       - TBD
       - TBC
       - TBR
-      - "???"
+      - ???
     hint: a weasel word cannot carry a responsibility
 ---
 

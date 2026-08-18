@@ -2,9 +2,9 @@
 form: pressure-test
 by: agent
 signed_off: 2026-08-18T10:02:17.973Z
-reopened: "2026-08-18T10:01:06.622Z — Its FAQ answers \"we do not know yet\" to what happens when an update lands on a file the descendant changed. That question has an ordinary answer, quoted from git-subtree's own manual, and a hostile reader would not accept the old one."
+reopened: 2026-08-18T10:01:06.622Z — Its FAQ answers "we do not know yet" to what happens when an update lands on a file the descendant changed. That question has an ordinary answer, quoted from git-subtree's own manual, and a hostile reader would not accept the old one.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / pressure-test

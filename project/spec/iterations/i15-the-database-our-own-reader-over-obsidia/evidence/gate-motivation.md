@@ -1,11 +1,11 @@
 ---
 form: gate-motivation
-amended: "2026-08-16T16:38:39.087Z by agent — draw-context's own claim rippled because gate-motivation's hash moved again after the prior amend; re-stamping once more with a real field change so the claim-guard clears"
+amended: 2026-08-16T16:38:39.087Z by agent — draw-context's own claim rippled because gate-motivation's hash moved again after the prior amend; re-stamping once more with a real field change so the claim-guard clears
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-16T16:34:32.367Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-motivation

@@ -2,7 +2,7 @@
 title: Zeller - delta debugging (ddmin, minimal reproduction)
 url: https://www.debuggingbook.org/html/DeltaDebugger.html
 kind: authoritative
-version: "1999-2021"
+version: 1999-2021
 accessed: 2026-08-11
 tags:
   - evidence

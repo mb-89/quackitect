@@ -4,24 +4,24 @@ id: dsp-quality-toolchain
 type: "[[design-spec]]"
 statement: the mechanical quality floor, carried by the battery scripts, the inspection runners, the voice lint and the write-path fixer
 realizes:
-  - "el-test-runner"
-  - "if-record-store-to-test-runner"
-  - "if-test-runner-to-record-store"
+  - el-test-runner
+  - if-record-store-to-test-runner
+  - if-test-runner-to-record-store
 files:
-  - "project/deliverable/engine/testreporters.ts"
-  - "project/deliverable/engine/tools.ts"
-  - "project/deliverable/engine/lint.ts"
-  - "project/deliverable/engine/bin/grades-complete.ts"
-  - "project/deliverable/engine/bin/backfill-minted.ts"
-  - "project/deliverable/engine/lintfix.ts"
-  - "project/deliverable/engine/bin/selftest.ts"
-  - "project/deliverable/engine/bin/smoketest.ts"
-  - "project/deliverable/engine/bin/preflight.ts"
-  - "project/deliverable/engine/bin/red-observed.ts"
-  - "project/deliverable/engine/bin/battery.ts"
-  - "project/deliverable/engine/bin/test-timings.mjs"
-  - "project/deliverable/engine/bin/prose-inspect.ts"
-  - "project/deliverable/engine/bin/record-inspect.ts"
+  - project/deliverable/engine/testreporters.ts
+  - project/deliverable/engine/tools.ts
+  - project/deliverable/engine/lint.ts
+  - project/deliverable/engine/bin/grades-complete.ts
+  - project/deliverable/engine/bin/backfill-minted.ts
+  - project/deliverable/engine/lintfix.ts
+  - project/deliverable/engine/bin/selftest.ts
+  - project/deliverable/engine/bin/smoketest.ts
+  - project/deliverable/engine/bin/preflight.ts
+  - project/deliverable/engine/bin/red-observed.ts
+  - project/deliverable/engine/bin/battery.ts
+  - project/deliverable/engine/bin/test-timings.mjs
+  - project/deliverable/engine/bin/prose-inspect.ts
+  - project/deliverable/engine/bin/record-inspect.ts
 ---
 
 ## Responsibility

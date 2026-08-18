@@ -6,7 +6,7 @@ statement: the copy is the working tree with the history and the session state s
 cluster: the-bootstrap
 question: how a copy is produced
 found_by: prior-art
-source: "this product's own RUNME.ps1 --export, read off the script — the mechanism it actually performs rather than what it is described as doing"
+source: this product's own RUNME.ps1 --export, read off the script — the mechanism it actually performs rather than what it is described as doing
 ---
 
 ## Mechanism

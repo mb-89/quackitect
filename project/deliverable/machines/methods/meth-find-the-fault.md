@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "Find the fault by shrinking the world around it. The method narrows the search; guessing widens it."
+statement: Find the fault by shrinking the world around it. The method narrows the search; guessing widens it.
 ---
 
 ## Situation

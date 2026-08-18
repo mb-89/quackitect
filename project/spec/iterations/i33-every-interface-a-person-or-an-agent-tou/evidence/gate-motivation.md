@@ -3,10 +3,10 @@ form: gate-motivation
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-17T16:47:28.953Z
-reopened: "2026-08-17T16:46:58.453Z — scope-non-goals re-signed above it, carrying the kickoff's five goals down and adding today's engine work under goal five. A gate measures what the milestone produced against each goal, so its goals_served round is answered against the scope as it now reads."
-amended: "2026-08-17T17:16:24.501Z by agent — This gate's goals_served said no boundary node existed three hours after thirteen were authored, which is answering from the plan rather than from what was built — the exact failure the field exists to catch, appearing in the field itself. The risk count is dated rather than corrected, because five was true when this gate ruled and the later entries belong to the gates that came after it."
+reopened: 2026-08-17T16:46:58.453Z — scope-non-goals re-signed above it, carrying the kickoff's five goals down and adding today's engine work under goal five. A gate measures what the milestone produced against each goal, so its goals_served round is answered against the scope as it now reads.
+amended: 2026-08-17T17:16:24.501Z by agent — This gate's goals_served said no boundary node existed three hours after thirteen were authored, which is answering from the plan rather than from what was built — the exact failure the field exists to catch, appearing in the field itself. The risk count is dated rather than corrected, because five was true when this gate ruled and the later entries belong to the gates that came after it.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-motivation

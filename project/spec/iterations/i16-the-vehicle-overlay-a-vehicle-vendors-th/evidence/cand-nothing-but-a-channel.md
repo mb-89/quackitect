@@ -1,10 +1,10 @@
 ---
 form: cand-nothing-but-a-channel
-amended: "2026-08-18T13:52:14.307Z by agent — the probe conflicted with both versions present rather than failing to merge"
+amended: 2026-08-18T13:52:14.307Z by agent — the probe conflicted with both versions present rather than failing to merge
 by: agent
 signed_off: 2026-08-18T12:51:47.839Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / cand-nothing-but-a-channel

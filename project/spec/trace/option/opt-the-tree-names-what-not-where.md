@@ -6,7 +6,7 @@ statement: the produced tree records WHICH copy drives it and at what version, n
 cluster: the-walk
 question: how a tree carrying no method finds the copy that drives it
 found_by: prior-art
-source: "Corepack packageManager (github.com/nodejs/corepack); Copier _src_path (copier.readthedocs.io/en/stable/configuring/); cruft .cruft.json (cruft.github.io/cruft/); Gradle wrapper distributionUrl (docs.gradle.org gradle_wrapper); Bazelisk .bazelversion (bazel.build/install/bazelisk)"
+source: Corepack packageManager (github.com/nodejs/corepack); Copier _src_path (copier.readthedocs.io/en/stable/configuring/); cruft .cruft.json (cruft.github.io/cruft/); Gradle wrapper distributionUrl (docs.gradle.org gradle_wrapper); Bazelisk .bazelversion (bazel.build/install/bazelisk)
 ---
 
 ## Mechanism

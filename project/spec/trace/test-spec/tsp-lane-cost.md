@@ -3,12 +3,12 @@ minted_in: i11-the-engine-fix-bundle-about-twenty-named
 id: tsp-lane-cost
 type: "[[test-spec]]"
 statement: The full battery runs only where the method says, a scoped run answers its caller once, and a deletion names what points at the node — including a mention in prose.
-method: "test"
+method: test
 verifies:
-  - "req-the-full-battery-runs-where-the-method-says"
-  - "req-a-deletion-names-what-points-at-the-node"
+  - req-the-full-battery-runs-where-the-method-says
+  - req-a-deletion-names-what-points-at-the-node
 files:
-  - "tests/lanecost.test.ts"
+  - tests/lanecost.test.ts
 ---
 
 ## Scope

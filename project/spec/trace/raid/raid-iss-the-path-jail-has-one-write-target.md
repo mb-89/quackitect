@@ -9,12 +9,12 @@ trigger: already true - it blocks uc-drive-a-foreign-product's step 5 today
 status: open
 breaks_how_badly: crippling
 how_likely: expected
-impact: "The second of the two capabilities the owner asked for cannot be built without changing the one mechanism that makes the first one safe. Every write the system makes on a driven product's behalf lands outside its own root, and the resolver refuses exactly that."
+impact: The second of the two capabilities the owner asked for cannot be built without changing the one mechanism that makes the first one safe. Every write the system makes on a driven product's behalf lands outside its own root, and the resolver refuses exactly that.
 source_refs:
   - req-where-each-artifact-lands-when-driving
   - uc-drive-a-foreign-product
   - fn-run-a-governed-walk.resolve-a-path
-  - "project/deliverable/engine/paths.ts lines 1-12"
+  - project/deliverable/engine/paths.ts lines 1-12
 ---
 
 ## What the code says, read this session

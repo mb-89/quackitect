@@ -3,9 +3,9 @@ form: gate-kickoff
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-18T09:49:52.911Z
-reopened: "2026-08-18T09:41:09.518Z — Two of its five goals contradict the owner's ruling — \"vendored and sealed\" and \"an update is a replacement, not a merge\". Every gate below measures goals_served against this list, so it cannot stand while it names a model that was withdrawn."
+reopened: 2026-08-18T09:41:09.518Z — Two of its five goals contradict the owner's ruling — "vendored and sealed" and "an update is a replacement, not a merge". Every gate below measures goals_served against this list, so it cannot stand while it names a model that was withdrawn.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-kickoff

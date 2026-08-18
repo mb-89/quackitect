@@ -3,7 +3,7 @@ form: raid-iss-the-path-jail-has-one-write-target
 by: agent
 signed_off: 2026-08-18T16:02:08.663Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / raid-iss-the-path-jail-has-one-write-target

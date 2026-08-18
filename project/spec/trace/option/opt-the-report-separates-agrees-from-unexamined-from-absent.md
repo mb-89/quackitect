@@ -6,7 +6,7 @@ cluster: the-bootstrap
 question: how a copy's own changes are represented
 statement: a report of what a copy changed names, for every artifact, whether it agrees, was never examined, or is not present at all, because silence cannot mean all three
 found_by: analogy
-source: "textual criticism, the positive versus negative apparatus criticus, and TEI P5 chapter 13's witStart, witEnd, lacunaStart and lacunaEnd — tei-c.org/release/doc/tei-p5-doc/en/html/TC.html"
+source: textual criticism, the positive versus negative apparatus criticus, and TEI P5 chapter 13's witStart, witEnd, lacunaStart and lacunaEnd — tei-c.org/release/doc/tei-p5-doc/en/html/TC.html
 ---
 
 ## Mechanism

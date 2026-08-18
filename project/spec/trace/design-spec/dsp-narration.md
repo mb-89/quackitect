@@ -4,11 +4,11 @@ id: dsp-narration
 type: "[[design-spec]]"
 statement: the decision graph riding every changing call, carried by typed ops with a toll that keeps the story gapless
 realizes:
-  - "el-walk-engine"
+  - el-walk-engine
 files:
-  - "project/deliverable/engine/decisions.ts"
-  - "project/deliverable/engine/toll.ts"
-  - "project/deliverable/engine/bin/render-decisions.ts"
+  - project/deliverable/engine/decisions.ts
+  - project/deliverable/engine/toll.ts
+  - project/deliverable/engine/bin/render-decisions.ts
 ---
 
 ## Responsibility

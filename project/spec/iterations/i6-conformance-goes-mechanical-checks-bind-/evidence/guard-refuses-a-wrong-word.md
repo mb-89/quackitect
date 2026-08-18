@@ -3,7 +3,7 @@ form: guard-refuses-a-wrong-word
 by: agent
 signed_off: 2026-08-16T16:59:38.093Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / guard-refuses-a-wrong-word

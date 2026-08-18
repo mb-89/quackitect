@@ -1,15 +1,15 @@
 ---
 steps:
   - id: sty-the-control-that-says-why-it-declined
-    statement: "a person presses a control that declines, and the surface says why and what would let it through — watched once, because the failure has three recorded sightings and no check noticed any of them"
+    statement: a person presses a control that declines, and the surface says why and what would let it through — watched once, because the failure has three recorded sightings and no check noticed any of them
     depends_on: []
     realization: demonstration
   - id: sty-the-slow-call-that-says-it-is-working
-    statement: "a person waits on work that is past its bound and is never left guessing whether it is working — watched, because the pass line is about what a person PERCEIVES and no instrument reads that"
+    statement: a person waits on work that is past its bound and is never left guessing whether it is working — watched, because the pass line is about what a person PERCEIVES and no instrument reads that
     depends_on: []
     realization: demonstration
   - id: sty-the-call-that-comes-back-inside-a-second
-    statement: "a driver's calls come back inside a second across the modelled boundaries — the clock answers this one, and what the demonstration adds is whether the list covers the interfaces anybody actually touches"
+    statement: a driver's calls come back inside a second across the modelled boundaries — the clock answers this one, and what the demonstration adds is whether the list covers the interfaces anybody actually touches
     depends_on: []
     realization: demonstration
 ---

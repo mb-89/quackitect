@@ -9,9 +9,6 @@ breaks_if_removed: A deletion orphans whatever pointed at it, and the orphan sur
 breaks_how_badly: crippling
 refines:
   - uc-take-a-step
-# allocated to fn-run-a-governed-walk.serve-a-step, not work-the-register:
-# the delete is an act through the lane, and the demand covers any trace node
-# rather than the RAID register alone.
 source_refs:
   - "measured in i34: four orphanings in one iteration, none warned at the delete"
   - raid-asm-the-bundles-defect-list-still-stands

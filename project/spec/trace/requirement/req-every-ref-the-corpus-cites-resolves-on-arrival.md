@@ -2,7 +2,7 @@
 minted_in: i35-the-cloud-run-s-findings-land-the-fix-fi
 id: req-every-ref-the-corpus-cites-resolves-on-arrival
 type: "[[requirement]]"
-statement: "When the arrival completes, the system shall make every branch the corpus cites as a `ref:` resolvable as a local revision, and shall name any branch it left unresolved."
+statement: When the arrival completes, the system shall make every branch the corpus cites as a `ref:` resolvable as a local revision, and shall name any branch it left unresolved.
 kind: functional
 verify_method: demonstration
 breaks_if_removed: "A cloud clone carries one branch, so every record citing `ref: main` is dead on arrival. Measured on i15: four refused calls, a wrongly-minted assumption, and a false claim that spread through six evidence forms."

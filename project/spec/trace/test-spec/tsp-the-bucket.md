@@ -3,14 +3,14 @@ minted_in: i11-the-engine-fix-bundle-about-twenty-named
 id: tsp-the-bucket
 type: "[[test-spec]]"
 statement: A finding that blocks nothing is carried as an owed item, an owed item naming no open entry is refused, and the close refuses while one stands.
-method: "test"
+method: test
 verifies:
-  - "req-a-harmless-finding-is-carried-not-stopped-on"
-  - "req-a-harmless-finding-names-an-open-entry"
-  - "req-close-refuses-loose-ends"
+  - req-a-harmless-finding-is-carried-not-stopped-on
+  - req-a-harmless-finding-names-an-open-entry
+  - req-close-refuses-loose-ends
 files:
-  - "tests/bucket.test.ts"
-  - "tests/owed-ref.test.ts"
+  - tests/bucket.test.ts
+  - tests/owed-ref.test.ts
 ---
 
 ## Scope

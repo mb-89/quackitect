@@ -3,7 +3,7 @@ form: delta-compose
 by: agent
 signed_off: 2026-08-14T16:28:52.894Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / delta-compose

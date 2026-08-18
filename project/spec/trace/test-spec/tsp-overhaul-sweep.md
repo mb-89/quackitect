@@ -3,14 +3,14 @@ minted_in: i1
 id: tsp-overhaul-sweep
 type: "[[test-spec]]"
 statement: An overhaul closes only on a fresh green battery and takes only unowned drift, and the sweep covers every drift class with a dated verdict, verified by test over the overhaul machinery.
-method: "test"
+method: test
 verifies:
-  - "req-overhaul-closes-green"
-  - "req-overhaul-takes-only-unowned-drift"
-  - "req-sweep-covers-every-drift-class"
-  - "req-clean-sweep-is-dated"
+  - req-overhaul-closes-green
+  - req-overhaul-takes-only-unowned-drift
+  - req-sweep-covers-every-drift-class
+  - req-clean-sweep-is-dated
 files:
-  - "tests/overhaul.test.ts"
+  - tests/overhaul.test.ts
 ---
 
 ## Scope

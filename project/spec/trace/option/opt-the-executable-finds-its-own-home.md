@@ -6,7 +6,7 @@ statement: the running program locates its own method by walking up from where i
 cluster: the-walk
 question: how a tree carrying no method finds the copy that drives it
 found_by: prior-art
-source: "v1's resolveEngineRoot at product/engine-go/engine.go, ref main — first step, the .quack ancestor of the executable"
+source: v1's resolveEngineRoot at product/engine-go/engine.go, ref main — first step, the .quack ancestor of the executable
 ---
 
 ## Mechanism

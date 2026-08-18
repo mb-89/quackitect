@@ -6,7 +6,7 @@ statement: upstream ships not new content but a transformation that runs on what
 cluster: the-bootstrap
 question: how upstream's later work reaches a copy
 found_by: prior-art
-source: "Nx migrate (nx.dev/docs/features/automate-updating-dependencies), Angular ng update and update schematics (angular.dev/cli/update, angular.dev/tools/cli/schematics)"
+source: Nx migrate (nx.dev/docs/features/automate-updating-dependencies), Angular ng update and update schematics (angular.dev/cli/update, angular.dev/tools/cli/schematics)
 ---
 
 ## Mechanism

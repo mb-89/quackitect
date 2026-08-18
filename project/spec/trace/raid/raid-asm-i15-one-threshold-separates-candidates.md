@@ -7,11 +7,11 @@ statement: a single fixed relevance threshold on the BM25 sibling correctly sepa
 owner: the driving agent
 trigger: the threshold is set once at build time and never revisited against measured misses or false positives
 status: open
-probed: "2026-08-16"
+probed: 2026-08-16
 impact: a threshold set too high silently drops real couplings before req-bm25-candidates-need-disposition ever gets a chance to force a look; set too low, it buries real candidates in noise and the forced-disposition step becomes a chore nobody trusts.
 breaks_how_badly: corrosive
 how_likely: conceivable
-probe: "scheduled. Its own Probe section needs the BM25 sibling built, then a sample of known couplings/non-couplings checked against the fixed threshold. Not yet built this iteration."
+probe: scheduled. Its own Probe section needs the BM25 sibling built, then a sample of known couplings/non-couplings checked against the fixed threshold. Not yet built this iteration.
 source_refs:
   - req-bm25-below-threshold-returns-empty
   - raid-asm-i15-corpus-suits-lexical-matching

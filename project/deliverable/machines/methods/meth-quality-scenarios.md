@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "A quality demand becomes measurable when it is written as a six-part scenario. The six parts are below."
+statement: A quality demand becomes measurable when it is written as a six-part scenario. The six parts are below.
 ---
 
 ## Situation

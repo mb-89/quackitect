@@ -3,7 +3,7 @@ form: corpus-frontmatter-guard
 by: agent
 signed_off: 2026-08-17T12:09:33.715Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / corpus-frontmatter-guard

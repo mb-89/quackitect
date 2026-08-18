@@ -10,9 +10,9 @@ breaks_how_badly: fatal
 refines:
   - uc-be-handed-the-method
 source_refs:
-  - "engine/stateform.ts chosenOption, built on the form's own choiceOf"
-  - "engine/session.ts kickoffSizeFromForm"
-  - "tests/change-size.test.ts, which pins the exact field that bit"
+  - engine/stateform.ts chosenOption, built on the form's own choiceOf
+  - engine/session.ts kickoffSizeFromForm
+  - tests/change-size.test.ts, which pins the exact field that bit
   - "observed live 2026-08-13: i3 recorded patch from a field whose choice was minor"
 priority: must
 ---

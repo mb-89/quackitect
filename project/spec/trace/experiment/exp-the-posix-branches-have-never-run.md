@@ -7,13 +7,13 @@ probes:
   - raid-lane-works-on-posix
 timebox: 45 minutes
 form: calculation
-chunk: "none — nothing was built"
+chunk: none — nothing was built
 faked: the Linux run itself. No POSIX host was available, so this counts what the source declares rather than observing what it does.
 fallback: if the POSIX branches exist but are unexercised, the first cloud run is treated as the test rather than as the deployment, and its failures are expected findings rather than surprises.
 verdict: unsettled
-measured: "2026-08-15. 69 platform-specific sites across engine source. Every one inspected is GUARDED by process.platform, with a POSIX alternative beside it — se-mcp.ts:53 and :73, se-pty.ts:243, :276 and :320, preflight.ts:139, package.ts:79, selftest.ts:123 and :158. None is an unguarded Windows assumption."
-folds_to: "Nothing structural moves. It re-frames the first spike rather than changing an element - the start step is platform-split by design, and only the Windows half has ever run. raid-lane-works-on-posix keeps its grade and gains the count."
-promote: "none"
+measured: 2026-08-15. 69 platform-specific sites across engine source. Every one inspected is GUARDED by process.platform, with a POSIX alternative beside it — se-mcp.ts:53 and :73, se-pty.ts:243, :276 and :320, preflight.ts:139, package.ts:79, selftest.ts:123 and :158. None is an unguarded Windows assumption.
+folds_to: Nothing structural moves. It re-frames the first spike rather than changing an element - the start step is platform-split by design, and only the Windows half has ever run. raid-lane-works-on-posix keeps its grade and gains the count.
+promote: none
 source_refs:
   - rank-unknowns, the seeded pick
   - req-one-command-starts-an-unattended-machine

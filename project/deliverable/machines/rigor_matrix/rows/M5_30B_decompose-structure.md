@@ -15,14 +15,6 @@ legal_tools:
   - se_file_list
   - se_log_query
   - se_answer
-  # A STATE THAT AUTHORS A CLASS OF TRACE NODE MUST BE ABLE TO RETIRE ONE
-  # (owner ruling 2026-08-16: "if you have to add the delete tool to the legal
-  # tools, then delete the requirements, and then continue").
-  #
-  # This state owns the elements and the interfaces. Before this, only the
-  # three build rows could delete a file, so removing a feature left its
-  # element and interface nodes standing and the corpus check failed on a
-  # dangling end. i34 hit exactly that with el-claim-ledger.
   - se_file_delete
 evidence:
   - name: elements

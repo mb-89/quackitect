@@ -3,11 +3,11 @@ minted_in: i6-conformance-goes-mechanical-checks-bind-
 id: tsp-fallback-outcome
 type: "[[test-spec]]"
 statement: A failed completion fires the fallback edge and not the forward one, and leaves the state out of the green set — while a filled completion does the opposite.
-method: "test"
+method: test
 verifies:
-  - "req-a-fallback-fires-when-its-condition-fails"
+  - req-a-fallback-fires-when-its-condition-fails
 files:
-  - "tests/fallback-outcome.test.ts"
+  - tests/fallback-outcome.test.ts
 ---
 
 ## Scope

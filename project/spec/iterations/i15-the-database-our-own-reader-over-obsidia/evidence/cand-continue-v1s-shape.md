@@ -3,7 +3,7 @@ form: cand-continue-v1s-shape
 by: agent
 signed_off: 2026-08-16T18:03:34.404Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / cand-continue-v1s-shape

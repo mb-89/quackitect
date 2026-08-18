@@ -3,7 +3,7 @@ form: absent-is-not-zero
 by: agent
 signed_off: 2026-08-17T12:16:22.738Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / absent-is-not-zero

@@ -6,7 +6,7 @@ statement: match each filter expression against one closed regex (field == "valu
 cluster: cluster-the-query
 question: how does answer-a-structured-query evaluate a query against the corpus
 found_by: probe
-source: "a throwaway node -e spike run this session (se_run, exit 0, 60ms wall time) — not committed anywhere, per the throwaway law"
+source: a throwaway node -e spike run this session (se_run, exit 0, 60ms wall time) — not committed anywhere, per the throwaway law
 ---
 
 ## Mechanism

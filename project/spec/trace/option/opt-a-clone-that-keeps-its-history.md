@@ -6,7 +6,7 @@ cluster: the-bootstrap
 question: how a copy is produced
 statement: the copy is an ordinary clone carrying the source's history, renamed and with this project's own records removed, so an update later has a commit to merge from
 found_by: contradiction
-source: "TRIZ separation IN LEVEL, on the contradiction that stripping the history so the copy runs standalone removes the merge base an update needs"
+source: TRIZ separation IN LEVEL, on the contradiction that stripping the history so the copy runs standalone removes the merge base an update needs
 ---
 
 ## Mechanism

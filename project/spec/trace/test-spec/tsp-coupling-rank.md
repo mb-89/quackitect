@@ -3,12 +3,12 @@ minted_in: i15-the-database-our-own-reader-over-obsidia
 id: tsp-coupling-rank
 type: "[[test-spec]]"
 statement: The BM25 sibling returns candidate nodes ranked by relevance for a described change, and returns an explicit empty result below its threshold, verified by test over the ranking half of el-coupling-disposer.
-method: "test"
+method: test
 verifies:
-  - "req-bm25-returns-ranked-candidates"
-  - "req-bm25-below-threshold-returns-empty"
+  - req-bm25-returns-ranked-candidates
+  - req-bm25-below-threshold-returns-empty
 files:
-  - "tests/coupling-rank.test.ts"
+  - tests/coupling-rank.test.ts
 ---
 
 ## Scope

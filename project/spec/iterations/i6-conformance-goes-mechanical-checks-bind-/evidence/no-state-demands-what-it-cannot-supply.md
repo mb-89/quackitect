@@ -3,7 +3,7 @@ form: no-state-demands-what-it-cannot-supply
 by: agent
 signed_off: 2026-08-16T18:00:02.106Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / no-state-demands-what-it-cannot-supply

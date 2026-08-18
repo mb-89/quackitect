@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "Author the test first and watch it fail. A green that never went red proves nothing."
+statement: Author the test first and watch it fail. A green that never went red proves nothing.
 ---
 
 ## Situation

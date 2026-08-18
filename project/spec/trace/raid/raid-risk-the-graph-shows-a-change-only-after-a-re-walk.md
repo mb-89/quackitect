@@ -7,11 +7,11 @@ statement: A change to the graph appears only after something walks over it, so 
 owner: the owner
 trigger: any state reported green that a later look drops, and any restart that has to re-walk to reach where it stood
 status: open
-impact: "A chain can stand green over an unfinished input for as long as nobody asks. Three quality scenarios sit on this one root - resuming from the repository, surviving a host swap, and a person orienting from the panel unaided."
+impact: A chain can stand green over an unfinished input for as long as nobody asks. Three quality scenarios sit on this one root - resuming from the repository, surviving a host swap, and a person orienting from the panel unaided.
 breaks_how_badly: crippling
 how_likely: expected
-probe: "observed 2026-08-15, three times in one session. Six states stamped over an unfinished input and stayed green until an amendment forced re-evaluation. A reload dropped the target and the decision graph. Re-standing a claim whose ground had moved needed a hand-written amend carrying no new information."
-probed: "2026-08-15"
+probe: observed 2026-08-15, three times in one session. Six states stamped over an unfinished input and stayed green until an amendment forced re-evaluation. A reload dropped the target and the decision graph. Re-standing a claim whose ground had moved needed a hand-written amend carrying no new information.
+probed: 2026-08-15
 source_refs:
   - req-walk-resumes-from-repo
   - req-walk-survives-host-swap

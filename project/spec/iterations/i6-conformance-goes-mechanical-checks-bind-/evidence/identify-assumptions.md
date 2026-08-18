@@ -1,10 +1,10 @@
 ---
 form: identify-assumptions
-amended: "2026-08-16T16:28:07.459Z by agent — the four nodes gained Probe sections and probe outcomes at probe-assumptions; the set identified here is unchanged"
+amended: 2026-08-16T16:28:07.459Z by agent — the four nodes gained Probe sections and probe outcomes at probe-assumptions; the set identified here is unchanged
 by: agent
 signed_off: 2026-08-16T16:23:32.610Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / identify-assumptions

@@ -10,9 +10,9 @@ breaks_how_badly: corrosive
 refines:
   - uc-take-a-step
 source_refs:
-  - "engine/machine.ts reopenStates, the token assignment"
+  - engine/machine.ts reopenStates, the token assignment
   - "the owner's report 2026-08-13: gate-kickoff and write-requirements live together"
-  - "tests/tokens.test.ts, the reopen token set"
+  - tests/tokens.test.ts, the reopen token set
 priority: must
 ---
 

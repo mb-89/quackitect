@@ -1,11 +1,11 @@
 ---
 form: verification
-amended: "2026-08-17T17:19:52.110Z by agent — This form's headline finding described the pre-fix world and was carried forward unchanged through a re-signing, so it contradicted three forms signed before it. The finding is kept as evidence and dated; the current state is stated beside it. Found by a fresh-eyes tester."
+amended: 2026-08-17T17:19:52.110Z by agent — This form's headline finding described the pre-fix world and was carried forward unchanged through a re-signing, so it contradicted three forms signed before it. The finding is kept as evidence and dated; the current state is stated beside it. Found by a fresh-eyes tester.
 by: agent
 signed_off: 2026-08-17T17:06:15.161Z
-reopened: "2026-08-17T17:05:45.856Z — trace-design re-signed above it after the dead-code sweep caught two unclaimed runners, and the whole chain above that re-signed today carrying the kickoff's five goals. The battery this state fires must run against the tree as it now stands rather than as it stood at 12:42."
+reopened: 2026-08-17T17:05:45.856Z — trace-design re-signed above it after the dead-code sweep caught two unclaimed runners, and the whole chain above that re-signed today carrying the kickoff's five goals. The battery this state fires must run against the tree as it now stands rather than as it stood at 12:42.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / verification

@@ -8,13 +8,13 @@ owner: the driving agent
 status: decided
 breaks_how_badly: crippling
 how_likely: plausible
-impact: "Wrong, a driven tree naming its vehicle resolves to whichever copy the machine finds first. That fails with a WRONG answer rather than an absent one, which is the worst of the three states the driven record exists to separate."
+impact: Wrong, a driven tree naming its vehicle resolves to whichever copy the machine finds first. That fails with a WRONG answer rather than an absent one, which is the worst of the three states the driven record exists to separate.
 source_refs:
   - raid-dec-a-driven-tree-names-which-copy-drives-it
   - el-project-producer
   - el-vehicle-producer
   - req-the-product-name-is-one-fact
-  - "product/engine-go/i18_red3.go at ref main"
+  - product/engine-go/i18_red3.go at ref main
 ---
 
 ## The question this answers, which was left open on purpose

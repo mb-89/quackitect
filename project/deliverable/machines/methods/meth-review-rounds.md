@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "The increasing-scrutiny review a gate gets before it is blessed. Four rounds, over the gate's items and its whole input cone."
+statement: The increasing-scrutiny review a gate gets before it is blessed. Four rounds, over the gate's items and its whole input cone.
 ---
 
 ## Situation

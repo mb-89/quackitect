@@ -3,7 +3,7 @@ form: cand-narrow-grammar-plus-explicit
 by: agent
 signed_off: 2026-08-16T18:04:41.410Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / cand-narrow-grammar-plus-explicit

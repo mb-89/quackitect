@@ -18,7 +18,7 @@ evidence:
     template: checklist
     items:
       - $claim-specs
-    description: "one checkbox per non-test spec — observed green by fresh eyes. The battery is the engine's and needs no field."
+    description: one checkbox per non-test spec — observed green by fresh eyes. The battery is the engine's and needs no field.
 major: full
 minor: full
 patch: full

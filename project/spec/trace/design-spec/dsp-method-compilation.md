@@ -4,15 +4,15 @@ id: dsp-method-compilation
 type: "[[design-spec]]"
 statement: authored method compiled into runnable machines, carried by the rigor matrix, drawn canvases and seeded drawings sharing one state shape
 realizes:
-  - "el-method-compiler"
+  - el-method-compiler
 files:
-  - "project/deliverable/engine/rigor-matrix.ts"
-  - "project/deliverable/engine/canvas.ts"
-  - "project/deliverable/engine/catalogs.ts"
-  - "project/deliverable/engine/machines/compile.ts"
-  - "project/deliverable/engine/expmachine.ts"
-  - "project/deliverable/engine/machines/supply.ts"
-  - "project/deliverable/engine/bin/supply-gaps.ts"
+  - project/deliverable/engine/rigor-matrix.ts
+  - project/deliverable/engine/canvas.ts
+  - project/deliverable/engine/catalogs.ts
+  - project/deliverable/engine/machines/compile.ts
+  - project/deliverable/engine/expmachine.ts
+  - project/deliverable/engine/machines/supply.ts
+  - project/deliverable/engine/bin/supply-gaps.ts
 ---
 
 ## Responsibility

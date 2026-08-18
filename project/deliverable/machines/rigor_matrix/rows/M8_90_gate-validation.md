@@ -30,7 +30,7 @@ evidence:
       - $must-stories
     description: "per must story: its demonstration report - performed for real, reference on file"
   - name: market_tier
-    description: "(market) the real-world checks green per meth-market-tier - required only when the iteration is declared to market"
+    description: (market) the real-world checks green per meth-market-tier - required only when the iteration is declared to market
     required: false
 major: full
 minor: tailored

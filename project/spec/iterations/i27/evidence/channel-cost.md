@@ -3,7 +3,7 @@ form: channel-cost
 by: agent
 signed_off: 2026-08-14T13:58:38.347Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / channel-cost

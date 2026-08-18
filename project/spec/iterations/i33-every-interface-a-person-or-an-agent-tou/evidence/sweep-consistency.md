@@ -2,9 +2,9 @@
 form: sweep-consistency
 by: agent
 signed_off: 2026-08-17T19:38:02.094Z
-reopened: "2026-08-17T19:37:32.932Z — fill-story-evidence re-signed above it after being genuinely walked for the first time. This sweep was signed before its own feeder stood, so it answered older ground."
+reopened: 2026-08-17T19:37:32.932Z — fill-story-evidence re-signed above it after being genuinely walked for the first time. This sweep was signed before its own feeder stood, so it answered older ground.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / sweep-consistency

@@ -3,14 +3,14 @@ minted_in: i8
 id: tsp-help-search
 type: "[[test-spec]]"
 statement: se_help ranks real tools and guidance by keyword match, logs every miss to a ranked demand log, and rides the standard call log, verified by test over engine/help.ts.
-method: "test"
+method: test
 verifies:
-  - "req-help-searches-tools-and-guidance"
-  - "req-help-miss-is-logged"
-  - "req-help-demand-ranked"
-  - "req-help-query-logged-with-result"
+  - req-help-searches-tools-and-guidance
+  - req-help-miss-is-logged
+  - req-help-demand-ranked
+  - req-help-query-logged-with-result
 files:
-  - "tests/sehelp.test.ts"
+  - tests/sehelp.test.ts
 ---
 
 ## Scope

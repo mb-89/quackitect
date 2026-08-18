@@ -6,7 +6,7 @@ statement: give the claim file a second job and let it say which tree holds each
 cluster: cluster-the-walk
 question: where a record's tree is recorded
 found_by: transform
-source: "SIT Task Unification, applied to the incumbent — give an existing component a second job"
+source: SIT Task Unification, applied to the incumbent — give an existing component a second job
 ---
 
 ## Mechanism

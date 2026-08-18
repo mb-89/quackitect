@@ -6,7 +6,7 @@ statement: an override names the artifact it replaces by that artifact's own sta
 cluster: the-walk
 question: how an override is matched to what it overrides
 found_by: prior-art
-source: "Kustomize patches (kubectl.docs.kubernetes.io/references/kustomize/kustomization/patches/), Nix overlays (NixOS/nixpkgs doc/using/overlays.chapter.md), XSLT 1.0 import precedence (www.w3.org/TR/xslt-10 s5.5-5.6), Android RRO (source.android.com/docs/core/runtime/rros), Cargo [patch] (doc.rust-lang.org/cargo/reference/overriding-dependencies.html), Go replace (go.dev/doc/modules/gomod-ref)"
+source: Kustomize patches (kubectl.docs.kubernetes.io/references/kustomize/kustomization/patches/), Nix overlays (NixOS/nixpkgs doc/using/overlays.chapter.md), XSLT 1.0 import precedence (www.w3.org/TR/xslt-10 s5.5-5.6), Android RRO (source.android.com/docs/core/runtime/rros), Cargo [patch] (doc.rust-lang.org/cargo/reference/overriding-dependencies.html), Go replace (go.dev/doc/modules/gomod-ref)
 ---
 
 ## Mechanism

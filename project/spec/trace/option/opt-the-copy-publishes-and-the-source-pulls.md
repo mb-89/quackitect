@@ -6,7 +6,7 @@ cluster: the-bootstrap
 question: how a copy's own changes are represented
 statement: the copy states what it changed as something a reader can take, and the source decides whether to adopt it, so the flow runs upward instead of downward
 found_by: transform
-source: "SCAMPER operator REVERSE, applied to the incumbent — invert the direction of the relationship between a copy and its source"
+source: SCAMPER operator REVERSE, applied to the incumbent — invert the direction of the relationship between a copy and its source
 ---
 
 ## Mechanism

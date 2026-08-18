@@ -3,12 +3,12 @@ minted_in: i33-every-interface-a-person-or-an-agent-tou
 id: tsp-candidate-couplings-are-disposed-one-by-one
 type: "[[test-spec]]"
 statement: An agent about to make a change gets a ranked list of couplings no edge names, and disposes of every one before the change ships.
-method: "demonstration"
+method: demonstration
 demonstrates:
-  - "sty-dispose-a-candidate-coupling"
+  - sty-dispose-a-candidate-coupling
 verifies: "none — demonstrates: carries the edge; the ranker's own mechanics are test-verified over tests/coupling-rank.test.ts"
 files:
-  - "none — the procedure below is the definition, because the pass is that every candidate was disposed of, which only a reader of the dispositions can say"
+  - none — the procedure below is the definition, because the pass is that every candidate was disposed of, which only a reader of the dispositions can say
 ---
 
 ## Why this spec is being written by i33 rather than by i15

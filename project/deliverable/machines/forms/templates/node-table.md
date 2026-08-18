@@ -3,8 +3,8 @@ id: template-node-table
 statement: A fillable table over standing nodes — the rows are the nodes, the columns are their frontmatter, and editing either side changes the same thing.
 editor: node-table
 resolves: artifact
-line_pattern: "^\\| .+ \\|"
-line_help: "one row per node; the first cell is the node, the rest are its frontmatter values"
+line_pattern: ^\| .+ \|
+line_help: one row per node; the first cell is the node, the rest are its frontmatter values
 ---
 
 # node-table

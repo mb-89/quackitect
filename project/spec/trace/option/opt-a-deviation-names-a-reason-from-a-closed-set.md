@@ -6,7 +6,7 @@ cluster: the-bootstrap
 question: how a copy's own changes are represented
 statement: a departure is void until its reason is filed from a fixed vocabulary, with the change and the reason each pointing at the other, and something with standing may reject it
 found_by: analogy
-source: "California Building Code § 1.8.6.2, local modification by ordinance or regulation, implementing California Health and Safety Code § 17958.7 — read at up.codes/s/local-modification-by-ordinance-or-regulation"
+source: California Building Code § 1.8.6.2, local modification by ordinance or regulation, implementing California Health and Safety Code § 17958.7 — read at up.codes/s/local-modification-by-ordinance-or-regulation
 ---
 
 ## Mechanism

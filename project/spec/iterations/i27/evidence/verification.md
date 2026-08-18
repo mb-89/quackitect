@@ -1,10 +1,10 @@
 ---
 form: verification
-amended: "2026-08-14T19:11:49.700Z by agent — the battery was rerun after the process split landed; the figure and the job ref moved"
+amended: 2026-08-14T19:11:49.700Z by agent — the battery was rerun after the process split landed; the figure and the job ref moved
 by: agent
 signed_off: 2026-08-14T18:06:53.500Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / verification

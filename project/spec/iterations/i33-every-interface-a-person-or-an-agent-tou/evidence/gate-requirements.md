@@ -3,10 +3,10 @@ form: gate-requirements
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-17T16:55:38.807Z
-reopened: "2026-08-17T16:54:50.652Z — probe-assumptions re-signed above it, and the register gained an eighth row since this gate last ruled. This is the end of design input, so the gate reads the register as it now stands rather than as it stood."
-amended: "2026-08-17T17:16:06.778Z by agent — Three corrections of false statements, all found by a fresh-eyes tester. The wrong-line cited probe-assumptions for two eliminations that state never made and that were later falsified. The requirement count read five in three places after the eighth row landed, so the red-team round argued about a set that no longer existed. And goals_served said no boundary node existed three hours after thirteen were authored."
+reopened: 2026-08-17T16:54:50.652Z — probe-assumptions re-signed above it, and the register gained an eighth row since this gate last ruled. This is the end of design input, so the gate reads the register as it now stands rather than as it stood.
+amended: 2026-08-17T17:16:06.778Z by agent — Three corrections of false statements, all found by a fresh-eyes tester. The wrong-line cited probe-assumptions for two eliminations that state never made and that were later falsified. The requirement count read five in three places after the eighth row landed, so the red-team round argued about a set that no longer existed. And goals_served said no boundary node existed three hours after thirteen were authored.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-requirements

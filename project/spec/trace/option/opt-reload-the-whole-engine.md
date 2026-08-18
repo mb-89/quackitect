@@ -6,7 +6,7 @@ statement: restart the one engine process when its code changes, so every record
 cluster: cluster-the-walk
 question: how a change to the engine's own code takes effect
 found_by: heuristic
-source: "what stands today — se_reload restarts the single server, and every walk on the machine restarts with it"
+source: what stands today — se_reload restarts the single server, and every walk on the machine restarts with it
 ---
 
 ## Mechanism

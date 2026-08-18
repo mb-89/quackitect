@@ -6,7 +6,7 @@ statement: a record kept in a machine-local data area, keyed to the working tree
 cluster: the-walk
 question: how a tree carrying no method finds the copy that drives it
 found_by: prior-art
-source: "v1's engineHomeRecordPath and dataHomeFor, product/engine-go/data.go at ref main"
+source: v1's engineHomeRecordPath and dataHomeFor, product/engine-go/data.go at ref main
 ---
 
 ## Mechanism

@@ -3,11 +3,11 @@ minted_in: i6-conformance-goes-mechanical-checks-bind-
 id: tsp-assertion-red
 type: "[[test-spec]]"
 statement: The TAP parser reads a failure's kind out of its diagnostic block, telling an assertion failure from a crash, and keeps the two apart across a mixed run and a subtest roll-up.
-method: "test"
+method: test
 verifies:
-  - "req-a-red-is-an-assertion-not-a-crash"
+  - req-a-red-is-an-assertion-not-a-crash
 files:
-  - "tests/assertion-red.test.ts"
+  - tests/assertion-red.test.ts
 ---
 
 ## Scope

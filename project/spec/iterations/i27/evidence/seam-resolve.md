@@ -3,7 +3,7 @@ form: seam-resolve
 by: agent
 signed_off: 2026-08-14T15:22:52.827Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / seam-resolve

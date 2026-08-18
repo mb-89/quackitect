@@ -1,10 +1,10 @@
 ---
 form: find_analogy
-amended: "2026-08-18T13:02:56.829Z by agent — Four options came from readings this state dispatched and landed after it signed; the options list named only the three that had arrived in time."
+amended: 2026-08-18T13:02:56.829Z by agent — Four options came from readings this state dispatched and landed after it signed; the options list named only the three that had arrived in time.
 by: agent
 signed_off: 2026-08-18T12:20:56.502Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / find_analogy

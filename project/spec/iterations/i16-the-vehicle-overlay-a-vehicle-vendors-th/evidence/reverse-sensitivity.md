@@ -1,10 +1,10 @@
 ---
 form: reverse-sensitivity
-reopened: "2026-08-18T15:39:48.304Z — converge-pugh was re-signed after the fitness flags landed, so this claim answered ground that has since moved"
+reopened: 2026-08-18T15:39:48.304Z — converge-pugh was re-signed after the fitness flags landed, so this claim answered ground that has since moved
 by: agent
 signed_off: 2026-08-18T15:39:56.192Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / reverse-sensitivity

@@ -3,17 +3,17 @@ minted_in: i1
 id: tsp-trace-integrity
 type: "[[test-spec]]"
 statement: The trace holds both ways with zero dangling edges, and every reader resolves against one chosen corpus, verified by test over the trace loaders and checks.
-method: "test"
+method: test
 verifies:
-  - "req-broken-trace-is-a-defect"
-  - "req-coverage-checked-both-ways"
-  - "req-trace-source-never-mixes"
+  - req-broken-trace-is-a-defect
+  - req-coverage-checked-both-ways
+  - req-trace-source-never-mixes
 files:
-  - "tests/trace-coverage.test.ts"
-  - "tests/refs.test.ts"
-  - "tests/traceschema.test.ts"
-  - "tests/frontmatter.test.ts"
-  - "tests/requirement-checks.test.ts"
+  - tests/trace-coverage.test.ts
+  - tests/refs.test.ts
+  - tests/traceschema.test.ts
+  - tests/frontmatter.test.ts
+  - tests/requirement-checks.test.ts
 ---
 
 ## Scope

@@ -6,7 +6,7 @@ cluster: the-bootstrap
 question: where a copy's own layer lives
 statement: there is no separate layer, because a copy owns every file it received and edits them where they sit
 found_by: without
-source: "trimming — what if the overlay does not exist, and who does its job then; the answer is THE COPY'S OWNER, with an ordinary editor. Homebrew ships the same choice as `inreplace` (docs.brew.sh/Formula-Cookbook)"
+source: trimming — what if the overlay does not exist, and who does its job then; the answer is THE COPY'S OWNER, with an ordinary editor. Homebrew ships the same choice as `inreplace` (docs.brew.sh/Formula-Cookbook)
 ---
 
 ## Mechanism

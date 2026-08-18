@@ -7,8 +7,8 @@ statement: A person editing the corpus in their own editor introduces breaks rar
 owner: the owner
 trigger: the first corpus break a person made by hand, and any change to how often the sweep runs
 status: open
-probe: "Introduce a malformed node by hand, outside the lane. Measure how many calls and how much wall-clock pass before anything names it. Compare against the four calls the same break cost inside the lane on 2026-08-16."
-probed: "not yet. The sweep this assumption relies on does not exist — raid-iss-se-lint-has-no-whole-repo-sweep."
+probe: Introduce a malformed node by hand, outside the lane. Measure how many calls and how much wall-clock pass before anything names it. Compare against the four calls the same break cost inside the lane on 2026-08-16.
+probed: not yet. The sweep this assumption relies on does not exist — raid-iss-se-lint-has-no-whole-repo-sweep.
 impact: If a hand break survives long, the corpus is only as sound as the last person to open it in an editor, and every write-time refusal is guarding a door beside an open window.
 breaks_how_badly: crippling
 how_likely: expected

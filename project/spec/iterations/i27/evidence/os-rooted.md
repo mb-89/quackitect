@@ -3,7 +3,7 @@ form: os-rooted
 by: agent
 signed_off: 2026-08-14T07:20:16.513Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / os-rooted

@@ -3,23 +3,23 @@ minted_in: i1
 id: tsp-call-log
 type: "[[test-spec]]"
 statement: Every dispatched call lands on the log with its outcome, refusals carry executable remedies, and recorded answers survive, verified by test over the MCP lane and the log.
-method: "test"
+method: test
 verifies:
-  - "req-every-call-logged"
-  - "req-refusal-carries-remedy"
-  - "req-acts-carry-role-and-channel"
-  - "req-answer-recorded-with-question"
-  - "req-audit-answers-from-log"
-  - "req-outbound-query-logged"
-  - "req-missing-provider-named"
+  - req-every-call-logged
+  - req-refusal-carries-remedy
+  - req-acts-carry-role-and-channel
+  - req-answer-recorded-with-question
+  - req-audit-answers-from-log
+  - req-outbound-query-logged
+  - req-missing-provider-named
 files:
-  - "tests/mcp.test.ts"
-  - "tests/mcp-http.test.ts"
-  - "tests/logquery.test.ts"
-  - "tests/nesting.test.ts"
-  - "tests/outward.test.ts"
-  - "tests/refusals.test.ts"
-  - "tests/remedies.test.ts"
+  - tests/mcp.test.ts
+  - tests/mcp-http.test.ts
+  - tests/logquery.test.ts
+  - tests/nesting.test.ts
+  - tests/outward.test.ts
+  - tests/refusals.test.ts
+  - tests/remedies.test.ts
 ---
 
 ## Scope

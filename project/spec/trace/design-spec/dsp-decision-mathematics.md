@@ -4,16 +4,16 @@ id: dsp-decision-mathematics
 type: "[[design-spec]]"
 statement: the M4 and M5 mechanics computed from nodes, carried by one module per method with nothing typed by hand
 realizes:
-  - "el-method-compiler"
+  - el-method-compiler
 files:
-  - "project/deliverable/engine/dsm.ts"
-  - "project/deliverable/engine/pugh.ts"
-  - "project/deliverable/engine/pareto.ts"
-  - "project/deliverable/engine/compare.ts"
-  - "project/deliverable/engine/elematrix.ts"
-  - "project/deliverable/engine/morphbox.ts"
-  - "project/deliverable/engine/bin/flow-closure.ts"
-  - "project/deliverable/engine/bin/grades-complete.ts"
+  - project/deliverable/engine/dsm.ts
+  - project/deliverable/engine/pugh.ts
+  - project/deliverable/engine/pareto.ts
+  - project/deliverable/engine/compare.ts
+  - project/deliverable/engine/elematrix.ts
+  - project/deliverable/engine/morphbox.ts
+  - project/deliverable/engine/bin/flow-closure.ts
+  - project/deliverable/engine/bin/grades-complete.ts
 ---
 
 ## Responsibility

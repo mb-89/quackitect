@@ -24,7 +24,7 @@ evidence:
     template: checklist
     items:
       - $sweep_surfaces
-    description: "the surface classes walked - the meth-consistency-sweep card holds the classes, and checking a box claims its documents teach the current behavior"
+    description: the surface classes walked - the meth-consistency-sweep card holds the classes, and checking a box claims its documents teach the current behavior
 major: full
 minor: full
 patch: full

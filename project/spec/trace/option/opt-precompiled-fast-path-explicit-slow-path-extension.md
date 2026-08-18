@@ -6,7 +6,7 @@ statement: keep the pinned-subset query shape cheap and precompiled, and make an
 cluster: cluster-the-query
 question: how does answer-a-structured-query evaluate a query against the corpus
 found_by: heuristic
-source: "meth-heuristics-catalog: \"Make the common case cheap; make the rare case possible.\" — generalises the shape adr-query-in-engine already commits to"
+source: 'meth-heuristics-catalog: "Make the common case cheap; make the rare case possible." — generalises the shape adr-query-in-engine already commits to'
 ---
 
 ## Mechanism

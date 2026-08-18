@@ -6,7 +6,7 @@ statement: delete the record lifecycle entirely and let a git branch be the reco
 cluster: cluster-the-record-life
 question: what the record is
 found_by: without
-source: "trimming the largest cluster, per meth-trimming — six functions removed and git asked to take over"
+source: trimming the largest cluster, per meth-trimming — six functions removed and git asked to take over
 ---
 
 ## Mechanism

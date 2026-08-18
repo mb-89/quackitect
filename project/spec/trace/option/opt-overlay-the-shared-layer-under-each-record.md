@@ -6,8 +6,8 @@ cluster: cluster-the-walk
 question: how shared method reaches a tree
 found_by: prior-art
 statement: mount shared method as one read-only lower layer under every record's own writable layer, so a change to the shared layer is visible everywhere at once and no record's writes touch it
-source: "OverlayFS — lowerdir read-only, upperdir writable, copy-on-write, native performance after open; https://docs.kernel.org/filesystems/overlayfs.html"
-pruned_because: "the repository lives on the Windows filesystem and WSL reaches it over 9p/drvfs, which overlayfs is documented to refuse for some lower filesystems; and requiring WSL breaks req-setup-floor-editor-shell"
+source: OverlayFS — lowerdir read-only, upperdir writable, copy-on-write, native performance after open; https://docs.kernel.org/filesystems/overlayfs.html
+pruned_because: the repository lives on the Windows filesystem and WSL reaches it over 9p/drvfs, which overlayfs is documented to refuse for some lower filesystems; and requiring WSL breaks req-setup-floor-editor-shell
 ---
 
 ## Mechanism

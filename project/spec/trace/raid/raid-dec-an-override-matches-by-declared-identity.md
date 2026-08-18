@@ -8,7 +8,7 @@ owner: the driving agent
 status: decided
 breaks_how_badly: crippling
 how_likely: plausible
-impact: "Resolution is the chain the whole overlay rests on. Keyed by path, a file that moves upstream silently stops being overridden and nothing can report it; keyed by identity, the same event is a match failure the machine can name."
+impact: Resolution is the chain the whole overlay rests on. Keyed by path, a file that moves upstream silently stops being overridden and nothing can report it; keyed by identity, the same event is a match failure the machine can name.
 source_refs:
   - req-overlay-resolution
   - req-overlay-drift-reported

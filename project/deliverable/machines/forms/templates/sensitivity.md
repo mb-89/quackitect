@@ -3,7 +3,7 @@ id: template-sensitivity
 statement: The winner's fragile ground drawn from the scores — per rival, the deficit and the cells a single one-point swing would move.
 editor: sensitivity
 line_pattern: ""
-line_help: "the flip conditions, written by the arithmetic — the rulings are typed in the tripwires field"
+line_help: the flip conditions, written by the arithmetic — the rulings are typed in the tripwires field
 ---
 
 # sensitivity

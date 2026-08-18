@@ -33,7 +33,13 @@ evidence:
     picks:
       candidate: $candidates
       axis: $criterion_axes
-      score: ["0", "1", "2", "3", "4", "5"]
+      score:
+        - "0"
+        - "1"
+        - "2"
+        - "3"
+        - "4"
+        - "5"
     description: every surviving candidate against every surviving axis, on the 0-5 anchors
     guidance: |
       Score against the anchors, not against effort or intent.

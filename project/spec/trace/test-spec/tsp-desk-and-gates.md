@@ -3,20 +3,20 @@ minted_in: i1
 id: tsp-desk-and-gates
 type: "[[test-spec]]"
 statement: The desk greets walkable, takes plain words, and routes small work into open records, and a gate shows its evidence whole, verified by demonstration at the live desk.
-method: "demonstration"
+method: demonstration
 demonstrates:
-  - "sty-review-a-gate"
+  - sty-review-a-gate
 verifies:
-  - "req-desk-greets-walkable"
-  - "req-desk-takes-plain-words"
-  - "req-desk-states-the-folder-rule"
-  - "req-small-fix-joins-open-record"
-  - "req-retro-asks-real-use"
-  - "req-gate-rounds-stay-readable"
-  - "req-gate-shows-the-evidence-form"
-  - "req-overhaul-opens-without-deliverable"
+  - req-desk-greets-walkable
+  - req-desk-takes-plain-words
+  - req-desk-states-the-folder-rule
+  - req-small-fix-joins-open-record
+  - req-retro-asks-real-use
+  - req-gate-rounds-stay-readable
+  - req-gate-shows-the-evidence-form
+  - req-overhaul-opens-without-deliverable
 files:
-  - "none — the procedure below is the definition; the observed sessions are the evidence"
+  - none — the procedure below is the definition; the observed sessions are the evidence
 ---
 
 ## Scope

@@ -7,8 +7,8 @@ statement: The battery's wall clock repeats closely enough on this machine that 
 owner: the driving agent
 trigger: two battery runs of an identical tree differ by more than a tenth
 status: open
-probed: "2026-08-15"
-probe: "unprobed, and the attempt is the finding. Two green batteries on one tree wrote no wall clock at all."
+probed: 2026-08-15
+probe: unprobed, and the attempt is the finding. Two green batteries on one tree wrote no wall clock at all.
 impact: Every before-and-after in this iteration is a wall-clock comparison. If the baseline wanders by more than the win, a real improvement and a quiet machine look identical, and the iteration cannot tell which one it bought.
 breaks_how_badly: corrosive
 how_likely: plausible

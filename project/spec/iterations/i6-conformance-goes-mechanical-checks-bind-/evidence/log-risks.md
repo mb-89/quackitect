@@ -1,10 +1,10 @@
 ---
 form: log-risks
-amended: "2026-08-16T16:29:15.774Z by agent — raid-asm-a-bound-check-runs-inside-the-write-budget moved to probed at probe-assumptions; the set opened here is unchanged"
+amended: 2026-08-16T16:29:15.774Z by agent — raid-asm-a-bound-check-runs-inside-the-write-budget moved to probed at probe-assumptions; the set opened here is unchanged
 by: agent
 signed_off: 2026-08-16T15:40:00.787Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / log-risks

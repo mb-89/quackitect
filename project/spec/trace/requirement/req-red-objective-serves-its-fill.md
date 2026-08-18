@@ -10,8 +10,8 @@ breaks_how_badly: crippling
 refines:
   - uc-take-a-step
 source_refs:
-  - "note-1f2cabfb9d0a, met live and recorded the same day"
-  - "guidance/refusals.md, the law that anything which blocks owes a remedy"
+  - note-1f2cabfb9d0a, met live and recorded the same day
+  - guidance/refusals.md, the law that anything which blocks owes a remedy
 priority: must
 ---
 

@@ -1,52 +1,56 @@
 ---
 steps:
   - id: the-bucket
-    statement: "a finding that blocks nothing is carried as an owed item naming an open entry, and the close refuses while one stands — all three pieces or none"
+    statement: a finding that blocks nothing is carried as an owed item naming an open entry, and the close refuses while one stands — all three pieces or none
     depends_on: []
     realization: code
   - id: test-verb
-    statement: "a scoped run answers its caller, and an agent-initiated full battery outside verification is refused — the pair ships together"
+    statement: a scoped run answers its caller, and an agent-initiated full battery outside verification is refused — the pair ships together
     depends_on: []
     realization: code
   - id: engine-runs-the-red
-    statement: "observe-red's submit fires the new checks itself, the way verification already fires the battery"
-    depends_on: [test-verb]
+    statement: observe-red's submit fires the new checks itself, the way verification already fires the battery
+    depends_on:
+      - test-verb
     realization: code
   - id: deletion-names-dependents
-    statement: "a delete names what points at the node, reading the frontmatter edges AND sweeping the text for the id"
+    statement: a delete names what points at the node, reading the frontmatter edges AND sweeping the text for the id
     depends_on: []
     realization: code
   - id: pull-payload
-    statement: "the pull sends field names, grammars and hints — not ten null argument slots per field, not the template prose, and not the form twice"
+    statement: the pull sends field names, grammars and hints — not ten null argument slots per field, not the template prose, and not the form twice
     depends_on: []
     realization: code
   - id: lane-shape
-    statement: "se_amend patches with old and new text, and the file verbs agree on what to call the thing they act on"
+    statement: se_amend patches with old and new text, and the file verbs agree on what to call the thing they act on
     depends_on: []
     realization: code
   - id: walk-repairs
-    statement: "the router stops aiming at a state that is no door, a re-entry stops discarding fired edges, and se_why names the ripple's root in one answer"
+    statement: the router stops aiming at a state that is no door, a re-entry stops discarding fired edges, and se_why names the ripple's root in one answer
     depends_on: []
     realization: code
   - id: narration-grace
-    statement: "the stall rule gives more room before demanding a resolving op, and a chained fork brief is corrected the way a chained update brief already is"
+    statement: the stall rule gives more room before demanding a resolving op, and a chained fork brief is corrected the way a chained update brief already is
     depends_on: []
     realization: code
   - id: mirror-buttons
-    statement: "the mirror carries a freeze that stops the agent moving any state, and a bless separate from it"
+    statement: the mirror carries a freeze that stops the agent moving any state, and a bless separate from it
     depends_on: []
     realization: code
   - id: promotions-are-own-record
-    statement: "the promotions check reads only experiments minted in the current record"
+    statement: the promotions check reads only experiments minted in the current record
     depends_on: []
     realization: code
   - id: pipe-refused
-    statement: "se_run refuses a truncating shape rather than annotating it afterwards, and says which lane verb was wanted"
+    statement: se_run refuses a truncating shape rather than annotating it afterwards, and says which lane verb was wanted
     depends_on: []
     realization: code
   - id: audit-the-twenty
-    statement: "the fourteen unchecked defects from the 2026-08-12 seed are read against the system i34 left, and each is struck with its evidence or recorded"
-    depends_on: [pull-payload, walk-repairs, lane-shape]
+    statement: the fourteen unchecked defects from the 2026-08-12 seed are read against the system i34 left, and each is struck with its evidence or recorded
+    depends_on:
+      - pull-payload
+      - walk-repairs
+      - lane-shape
     realization: code
 ---
 

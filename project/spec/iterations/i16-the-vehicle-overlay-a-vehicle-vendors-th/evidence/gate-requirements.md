@@ -3,9 +3,9 @@ form: gate-requirements
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-18T15:05:51.887Z
-reopened: "2026-08-18T15:03:00.432Z — derive-functions re-signed with two added functions, three added flows and one rename, so this gate blessed a function structure that has since changed"
+reopened: 2026-08-18T15:03:00.432Z — derive-functions re-signed with two added functions, three added flows and one rename, so this gate blessed a function structure that has since changed
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-requirements

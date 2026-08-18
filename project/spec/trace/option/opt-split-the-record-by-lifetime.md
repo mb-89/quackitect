@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: split the record into the part that outlives it and the part that dies with it, and give the two different homes
 cluster: cluster-the-record-life
 found_by: transform
-source: "SIT Division, applied to the record"
+source: SIT Division, applied to the record
 ---
 
 ## Mechanism

@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "A use case has one actor and one goal. Its main path runs 3 to 9 steps, with extensions beside it."
+statement: A use case has one actor and one goal. Its main path runs 3 to 9 steps, with extensions beside it.
 ---
 
 ## Situation

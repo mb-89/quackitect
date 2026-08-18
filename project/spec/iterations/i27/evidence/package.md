@@ -1,10 +1,10 @@
 ---
 form: package
-amended: "2026-08-14T19:52:25.474Z by agent — the archive was rebuilt over a version fix the release gate found; the cited path, the works verdict and the emit list are untouched, and the rebuilt banner reads…"
+amended: 2026-08-14T19:52:25.474Z by agent — the archive was rebuilt over a version fix the release gate found; the cited path, the works verdict and the emit list are untouched, and the rebuilt banner reads…
 by: agent
 signed_off: 2026-08-14T19:46:01.764Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / package

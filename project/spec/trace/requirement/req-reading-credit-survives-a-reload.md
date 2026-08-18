@@ -10,8 +10,8 @@ breaks_how_badly: corrosive
 refines:
   - uc-be-handed-the-method
 source_refs:
-  - "note-61b267004f20, which the 2026-08-11 retro called the day's whole toll"
-  - "note-6fc953ffcdc8, carrying the mechanism at session.ts readBuffer"
+  - note-61b267004f20, which the 2026-08-11 retro called the day's whole toll
+  - note-6fc953ffcdc8, carrying the mechanism at session.ts readBuffer
   - raid-dep-reading-credit-outlives-se-move
 priority: must
 ---

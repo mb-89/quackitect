@@ -6,7 +6,7 @@ cluster: the-bootstrap
 question: how upstream's later work reaches a copy
 statement: the copy records where it came from in exactly one committed place, the way it already records its own name in one place
 found_by: heuristic
-source: "the catalogue rule ONE SOURCE OF TRUTH; EVERYTHING ELSE DERIVES, held against cluster-the-bootstrap"
+source: the catalogue rule ONE SOURCE OF TRUTH; EVERYTHING ELSE DERIVES, held against cluster-the-bootstrap
 ---
 
 ## Mechanism

@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-18T10:54:22.889Z
 reopened: "2026-08-18T10:53:12.709Z — The owner asked for the extension affordance and v1's end-to-end chain, and this state excluded the affordance by name. Their words: a create-vehicle button, a start-a-project button, and the plugin runnable from projects a vehicle drives."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / scope-non-goals

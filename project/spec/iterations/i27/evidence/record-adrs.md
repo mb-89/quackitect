@@ -2,9 +2,9 @@
 form: record-adrs
 by: agent
 signed_off: 2026-08-14T12:49:47.215Z
-reopened: "2026-08-14T12:49:02.243Z — It records that no architecture was decided, and cand-core-satellite has since taken the seat on a re-audited demand table and a fresh blind scoring."
+reopened: 2026-08-14T12:49:02.243Z — It records that no architecture was decided, and cand-core-satellite has since taken the seat on a re-audited demand table and a fresh blind scoring.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / record-adrs

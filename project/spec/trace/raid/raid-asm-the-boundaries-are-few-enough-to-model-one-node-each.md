@@ -9,7 +9,7 @@ trigger: the first count of element-to-neighbour pairs, which is milestone one's
 probe: "Count the element-to-neighbour pairs that actually carry traffic, walking the element nodes against the four neighbour nodes. Under about thirty pairs the assumption holds and milestone one is the small thing the vision claims. Past that it is a corpus rather than a milestone, and the blessed minor column escalates visibly. UNPROBED 2026-08-17, deliberately: this probe IS milestone one's opening act, and running it here would do the work twice and call the second time a check."
 status: open
 probed: 2026-08-17
-impact: "Both new pass lines take a share or a count over the set of modelled interfaces. If that set turns out to be hundreds, milestone one stops being small and the iteration outgrows its blessed minor column — visibly, which is the right failure, but only if somebody counts before building."
+impact: Both new pass lines take a share or a count over the set of modelled interfaces. If that set turns out to be hundreds, milestone one stops being small and the iteration outgrows its blessed minor column — visibly, which is the right failure, but only if somebody counts before building.
 breaks_how_badly: crippling
 how_likely: conceivable
 source_refs:

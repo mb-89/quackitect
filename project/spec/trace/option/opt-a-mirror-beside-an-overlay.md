@@ -6,7 +6,7 @@ statement: what came from upstream lives in a mirror nobody hand-edits, the copy
 cluster: the-bootstrap
 question: how a copy's own changes are represented
 found_by: prior-art
-source: "v1's module import planner, product/engine-go/module.go at ref main — the go-module-import-plan design"
+source: v1's module import planner, product/engine-go/module.go at ref main — the go-module-import-plan design
 ---
 
 ## Mechanism

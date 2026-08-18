@@ -4,22 +4,22 @@ id: dsp-resolution-seam
 type: "[[design-spec]]"
 statement: one resolver every verb calls, which decides the store, refuses what falls outside the record, and returns the store beside the path
 realizes:
-  - "el-resolution-seam"
-  - "if-satellite-to-resolution-seam"
-  - "if-walk-engine-to-resolution-seam"
-  - "if-satellite-supervisor-to-resolution-seam"
-  - "if-resolution-seam-to-engine-delta"
-  - "if-resolution-seam-to-method-compiler"
-  - "if-record-store-to-resolution-seam"
-  - "if-resolution-seam-to-account"
+  - el-resolution-seam
+  - if-satellite-to-resolution-seam
+  - if-walk-engine-to-resolution-seam
+  - if-satellite-supervisor-to-resolution-seam
+  - if-resolution-seam-to-engine-delta
+  - if-resolution-seam-to-method-compiler
+  - if-record-store-to-resolution-seam
+  - if-resolution-seam-to-account
 files:
-  - "project/deliverable/engine/paths.ts"
-  - "project/deliverable/engine/resolve.ts"
-  - "project/deliverable/engine/actbound.ts"
-  - "project/deliverable/engine/files.ts"
-  - "project/deliverable/engine/run.ts"
-  - "project/deliverable/engine/lint.ts"
-  - "project/deliverable/engine/tools.ts"
+  - project/deliverable/engine/paths.ts
+  - project/deliverable/engine/resolve.ts
+  - project/deliverable/engine/actbound.ts
+  - project/deliverable/engine/files.ts
+  - project/deliverable/engine/run.ts
+  - project/deliverable/engine/lint.ts
+  - project/deliverable/engine/tools.ts
 ---
 
 ## Responsibility

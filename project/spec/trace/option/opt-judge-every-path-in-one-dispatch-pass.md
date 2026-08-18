@@ -6,7 +6,7 @@ statement: leave the root where it is and check every call's path against one ru
 cluster: cluster-the-walk
 question: which tree a path resolves to
 found_by: prior-art
-source: "raid-dec-two-layer-auth, minted i1, status decided — authorisation splits into which tools a step exposes and whether this call's path is allowed here"
+source: raid-dec-two-layer-auth, minted i1, status decided — authorisation splits into which tools a step exposes and whether this call's path is allowed here
 ---
 
 ## Mechanism

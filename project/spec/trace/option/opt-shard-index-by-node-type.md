@@ -6,7 +6,7 @@ statement: split the query index into one shard per node type, each with its own
 cluster: cluster-the-query
 question: how does answer-a-structured-query evaluate a query against the corpus
 found_by: analogy
-source: "library card catalogues — MARC's fixed tag/subfield vocabulary per bibliographic type, one drawer per subject"
+source: library card catalogues — MARC's fixed tag/subfield vocabulary per bibliographic type, one drawer per subject
 ---
 
 ## Mechanism

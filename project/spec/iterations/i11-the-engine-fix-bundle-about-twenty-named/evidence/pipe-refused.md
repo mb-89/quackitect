@@ -3,7 +3,7 @@ form: pipe-refused
 by: agent
 signed_off: 2026-08-16T13:05:21.788Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / pipe-refused

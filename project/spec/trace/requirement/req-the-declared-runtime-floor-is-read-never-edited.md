@@ -2,10 +2,10 @@
 minted_in: i35-the-cloud-run-s-findings-land-the-fix-fi
 id: req-the-declared-runtime-floor-is-read-never-edited
 type: "[[requirement]]"
-statement: "Where the running runtime is below the floor the project declares, the system shall stop and name both versions, and shall never alter the declaration to proceed."
+statement: Where the running runtime is below the floor the project declares, the system shall stop and name both versions, and shall never alter the declaration to proceed.
 kind: constraint
 verify_method: test
-breaks_if_removed: "Editing the pin to go green turns a loud failure into a silent one, and the next box runs an engine the project never claimed to support."
+breaks_if_removed: Editing the pin to go green turns a loud failure into a silent one, and the next box runs an engine the project never claimed to support.
 breaks_how_badly: fatal
 refines:
   - uc-arrive-on-an-unattended-machine

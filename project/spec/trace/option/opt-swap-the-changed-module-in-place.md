@@ -6,7 +6,7 @@ statement: keep one engine process and load its modules per record, so a changed
 cluster: cluster-the-walk
 question: how a change to the engine's own code takes effect
 found_by: prior-art
-source: "hot module replacement — the Vite and webpack dev servers, Erlang OTP code_change, and Node's own loader hooks all replace running code without stopping the process"
+source: hot module replacement — the Vite and webpack dev servers, Erlang OTP code_change, and Node's own loader hooks all replace running code without stopping the process
 ---
 
 ## Mechanism

@@ -2,7 +2,7 @@
 minted_in: i35-the-cloud-run-s-findings-land-the-fix-fi
 id: flow-arrival-request
 type: "[[flow]]"
-statement: "a session starting on a clone that has no lane"
+statement: a session starting on a clone that has no lane
 kind: signal
 crosses: in
 source_refs:

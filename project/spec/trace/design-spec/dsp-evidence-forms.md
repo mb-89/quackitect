@@ -4,10 +4,10 @@ id: dsp-evidence-forms
 type: "[[design-spec]]"
 statement: evidence forms built from state declarations and checked at every save, carried by one form model over markdown sections
 realizes:
-  - "el-walk-engine"
+  - el-walk-engine
 files:
-  - "project/deliverable/engine/stateform.ts"
-  - "project/deliverable/engine/forms.ts"
+  - project/deliverable/engine/stateform.ts
+  - project/deliverable/engine/forms.ts
 ---
 
 ## Responsibility

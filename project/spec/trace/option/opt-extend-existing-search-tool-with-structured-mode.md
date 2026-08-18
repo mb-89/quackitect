@@ -6,7 +6,7 @@ statement: give se_file_search a second job — a structured mode alongside its 
 cluster: cluster-the-query
 question: how does answer-a-structured-query evaluate a query against the corpus
 found_by: transform
-source: "SIT Task Unification, held against se_file_search, already shipped in this lane"
+source: SIT Task Unification, held against se_file_search, already shipped in this lane
 ---
 
 ## Mechanism

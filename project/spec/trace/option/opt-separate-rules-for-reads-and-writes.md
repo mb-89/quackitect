@@ -6,7 +6,7 @@ statement: resolve a read and a write by two different rules, so a write is conf
 cluster: cluster-the-walk
 question: what the resolution rule covers
 found_by: transform
-source: "SIT Multiplication, applied to the incumbent — copy the resolver and change the copy"
+source: SIT Multiplication, applied to the incumbent — copy the resolver and change the copy
 ---
 
 ## Mechanism

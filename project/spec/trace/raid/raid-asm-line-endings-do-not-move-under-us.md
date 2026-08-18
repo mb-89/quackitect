@@ -10,11 +10,11 @@ status: open
 impact: A credit dies for a change nobody made. The agent re-reads a document it still holds, which is the exact defect the requirement removes, arriving by a different door.
 breaks_how_badly: abrasive
 how_likely: plausible
-probe: "unprobed. The check means rewriting a file's line endings to see whether its hash moves, which mutates the tree to answer a design question. It belongs beside the storage design, inside this iteration, not before it."
-probed: "2026-08-13"
+probe: unprobed. The check means rewriting a file's line endings to see whether its hash moves, which mutates the tree to answer a design question. It belongs beside the storage design, inside this iteration, not before it.
+probed: 2026-08-13
 source_refs:
   - req-reading-credit-survives-a-reload
-  - "the lane's own CRLF/LF correction on se_file_patch, which is evidence both endings exist in the tree"
+  - the lane's own CRLF/LF correction on se_file_patch, which is evidence both endings exist in the tree
 ---
 
 ## What is being relied on

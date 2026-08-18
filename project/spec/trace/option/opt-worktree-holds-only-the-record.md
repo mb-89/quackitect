@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: give the isolated tree only the record's own folder, and read every shared file from trunk at the moment it is needed
 cluster: cluster-the-record-life
 found_by: contradiction
-source: "TRIZ separation IN LEVEL, via meth-triz — isolate at the part, share at the whole"
+source: TRIZ separation IN LEVEL, via meth-triz — isolate at the part, share at the whole
 ---
 
 ## Mechanism

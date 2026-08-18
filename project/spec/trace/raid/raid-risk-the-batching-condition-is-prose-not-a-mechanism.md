@@ -10,8 +10,8 @@ status: mitigated
 impact: The list read takes about a second per thirty branches instead of about sixty milliseconds for all of them. Every look at the iterations view pays it, which is the surface a person touches most.
 breaks_how_badly: corrosive
 how_likely: plausible
-probe: "measured 2026-08-15 over 33 branches; the batched read costs 58.7 ms against 1004 ms for the per-iteration one"
-probed: "2026-08-15"
+probe: measured 2026-08-15 over 33 branches; the batched read costs 58.7 ms against 1004 ms for the per-iteration one
+probed: 2026-08-15
 source_refs:
   - raid-dec-one-verb-answers-what-exists
   - req-call-answers-in-one-second

@@ -6,7 +6,7 @@ statement: the write jail bounds every act to a tree, and which tree is a proper
 cluster: the-bootstrap
 question: what bounds an act that writes the tree it is producing
 found_by: contradiction
-source: "TRIZ separation IN SPACE, against the contradiction that refusing every write outside the tree in hand makes producing a new tree impossible — raid-iss-the-path-jail-has-one-write-target"
+source: TRIZ separation IN SPACE, against the contradiction that refusing every write outside the tree in hand makes producing a new tree impossible — raid-iss-the-path-jail-has-one-write-target
 ---
 
 ## Mechanism

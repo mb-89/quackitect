@@ -11,7 +11,7 @@ impact: The entrypoint reports success, the lane starts, and the engine fails on
 breaks_how_badly: crippling
 how_likely: plausible
 probe: "RESOLVED 2026-08-18 by dropping the floor to the runtime a bare host already has: the pin is now >=22.18.0, the version at which Node 22 runs TypeScript unflagged. Nothing in the engine needs 24, measured across both runtimes. False on arrival, i35 on 2026-08-17. This box's default runtime was v22.22.2 against a declared floor of >=24.0.0, so the engine would not start. Resolved by installing a satisfying runtime, never by editing the declaration. The previously-open half — whether a bare host's default reaches the floor — now has one data point and it was no."
-probed: "2026-08-17"
+probed: 2026-08-17
 source_refs:
   - req-one-command-starts-an-unattended-machine
   - nbr-cloud-host

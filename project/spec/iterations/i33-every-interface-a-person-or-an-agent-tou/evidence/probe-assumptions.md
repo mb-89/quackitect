@@ -2,10 +2,10 @@
 form: probe-assumptions
 by: agent
 signed_off: 2026-08-17T16:54:34.249Z
-reopened: "2026-08-17T16:53:29.107Z — identify-assumptions re-signed above it, and one candidate was probed away there rather than minted. This state probes every standing assumption, so it records that result alongside the rest."
-amended: "2026-08-17T17:15:41.449Z by agent — This form recorded a probe as HOLDING that had been falsified, and said in as many words that nothing was falsified. Both are corrections of false statements rather than changes to the question the state answers, so the fallout is listed here and each affected form is corrected in its own right."
+reopened: 2026-08-17T16:53:29.107Z — identify-assumptions re-signed above it, and one candidate was probed away there rather than minted. This state probes every standing assumption, so it records that result alongside the rest.
+amended: 2026-08-17T17:15:41.449Z by agent — This form recorded a probe as HOLDING that had been falsified, and said in as many words that nothing was falsified. Both are corrections of false statements rather than changes to the question the state answers, so the fallout is listed here and each affected form is corrected in its own right.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / probe-assumptions

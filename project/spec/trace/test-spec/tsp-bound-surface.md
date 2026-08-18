@@ -3,10 +3,10 @@ minted_in: i27
 id: tsp-bound-surface
 type: "[[test-spec]]"
 statement: A surface showing one record's work resolves its own links to that record, while the walk stands in another.
-method: "demonstration"
+method: demonstration
 status: dropped
 verifies:
-  - "req-a-surface-resolves-to-what-it-shows"
+  - req-a-surface-resolves-to-what-it-shows
 files:
   - none — the procedure is the whole definition, because the pass is a person opening a link and landing in the right place
 ---

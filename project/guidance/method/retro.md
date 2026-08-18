@@ -1,6 +1,6 @@
 ---
 id: method-retro
-statement: "The retro. Look back and drain the inbox, then walk the backlog and emit durable improvements."
+statement: The retro. Look back and drain the inbox, then walk the backlog and emit durable improvements.
 ---
 
 # retro — the method

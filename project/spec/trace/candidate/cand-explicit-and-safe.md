@@ -2,8 +2,8 @@
 minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: cand-explicit-and-safe
 type: "[[candidate]]"
-name: "Explicit and safe"
-statement: "same query shape, but every candidate gets a disposition row up front, so no threshold silently disposes anything"
+name: Explicit and safe
+statement: same query shape, but every candidate gets a disposition row up front, so no threshold silently disposes anything
 picks:
   - "[[opt-declarative-view-spec-evaluated-in-process]]"
   - "[[opt-prepopulate-pending-disposition-rows]]"

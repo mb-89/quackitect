@@ -8,7 +8,7 @@ owner: the driving agent
 status: open
 breaks_how_badly: corrosive
 how_likely: expected
-impact: "The isolation law is graded fatal, and a log the engine can read is mechanically a registry — grepping it enumerates every vehicle this engine made. The claim that the engine keeps no record of what it produced is false as written, and it is a claim the product makes about its own safety."
+impact: The isolation law is graded fatal, and a log the engine can read is mechanically a registry — grepping it enumerates every vehicle this engine made. The claim that the engine keeps no record of what it produced is false as written, and it is a claim the product makes about its own safety.
 source_refs:
   - tsp-the-engine-keeps-no-record-of-what-it-produced
   - req-nothing-a-copy-does-reaches-its-source

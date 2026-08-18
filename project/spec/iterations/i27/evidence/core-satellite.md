@@ -3,7 +3,7 @@ form: core-satellite
 by: agent
 signed_off: 2026-08-14T10:45:00.000Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / core-satellite

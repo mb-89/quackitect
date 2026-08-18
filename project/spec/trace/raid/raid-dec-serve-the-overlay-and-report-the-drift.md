@@ -14,7 +14,7 @@ source_refs:
   - req-overlay-resolution
   - req-overlay-survives-update
   - req-overlay-drift-reported
-  - "uc-vendor-and-overlay extension 6a"
+  - uc-vendor-and-overlay extension 6a
 ---
 
 ## The conflict, already recorded

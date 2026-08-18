@@ -6,7 +6,7 @@ statement: a tree that carries the method inside itself is its own home, and onl
 cluster: the-walk
 question: how a tree carrying no method finds the copy that drives it
 found_by: prior-art
-source: "v1's hasEngineLayer and resolveEngineRoot step 2, product/engine-go/engine.go at ref main"
+source: v1's hasEngineLayer and resolveEngineRoot step 2, product/engine-go/engine.go at ref main
 ---
 
 ## Mechanism

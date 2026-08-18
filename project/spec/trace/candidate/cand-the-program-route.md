@@ -2,8 +2,8 @@
 minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: cand-the-program-route
 type: "[[candidate]]"
-name: "The program route"
-statement: "the copy owns every file outright, and upstream's later work arrives as a transformation that runs on whatever the copy now holds"
+name: The program route
+statement: the copy owns every file outright, and upstream's later work arrives as a transformation that runs on whatever the copy now holds
 picks:
   - "[[opt-a-clone-that-keeps-its-history]]"
   - "[[opt-the-copys-changes-are-derived-on-every-update]]"

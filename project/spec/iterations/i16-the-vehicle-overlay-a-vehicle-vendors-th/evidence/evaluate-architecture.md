@@ -1,10 +1,10 @@
 ---
 form: evaluate-architecture
-reopened: "2026-08-18T15:40:38.766Z — decompose-structure was re-signed after the fitness flags landed, so this claim answered ground that has since moved"
+reopened: 2026-08-18T15:40:38.766Z — decompose-structure was re-signed after the fitness flags landed, so this claim answered ground that has since moved
 by: agent
 signed_off: 2026-08-18T15:40:42.301Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / evaluate-architecture

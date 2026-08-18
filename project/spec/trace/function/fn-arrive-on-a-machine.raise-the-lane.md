@@ -3,7 +3,7 @@ minted_in: i35-the-cloud-run-s-findings-land-the-fix-fi
 id: fn-arrive-on-a-machine.raise-the-lane
 type: "[[function]]"
 cluster: the-arrival
-statement: "bring a lane up that an already-running agent can attach to, or reuse one standing"
+statement: bring a lane up that an already-running agent can attach to, or reuse one standing
 satisfies:
   - req-one-command-takes-a-fresh-clone-to-a-live-lane
   - req-arriving-twice-changes-nothing

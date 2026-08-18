@@ -1,6 +1,6 @@
 ---
 id: ref-archunit
-title: "ArchUnit — a Java architecture test library"
+title: ArchUnit — a Java architecture test library
 url: https://www.archunit.org/
 kind: tool
 version: not pinned — the project page carries no version on its front matter

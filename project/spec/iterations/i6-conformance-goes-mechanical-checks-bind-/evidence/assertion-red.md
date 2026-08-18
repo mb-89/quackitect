@@ -3,7 +3,7 @@ form: assertion-red
 by: agent
 signed_off: 2026-08-16T17:41:51.635Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / assertion-red

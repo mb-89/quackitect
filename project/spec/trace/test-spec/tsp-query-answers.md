@@ -3,14 +3,14 @@ minted_in: i15-the-database-our-own-reader-over-obsidia
 id: tsp-query-answers
 type: "[[test-spec]]"
 statement: The query verb returns exactly the requested fields on matching rows, refuses an unknown field by name, answers an empty match explicitly, and repeats identically on an unchanged corpus, verified by test over el-query-evaluator.
-method: "test"
+method: test
 verifies:
-  - "req-query-returns-named-fields"
-  - "req-query-refuses-unknown-field"
-  - "req-query-empty-result-explicit"
-  - "req-query-is-deterministic"
+  - req-query-returns-named-fields
+  - req-query-refuses-unknown-field
+  - req-query-empty-result-explicit
+  - req-query-is-deterministic
 files:
-  - "tests/query.test.ts"
+  - tests/query.test.ts
 ---
 
 ## Scope

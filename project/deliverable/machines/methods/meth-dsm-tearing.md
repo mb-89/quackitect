@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "Tearing breaks a cycle in a partitioned DSM. It proposes which feedback edge to assume, so the loop can be ordered."
+statement: Tearing breaks a cycle in a partitioned DSM. It proposes which feedback edge to assume, so the loop can be ordered.
 source: ref-structural-complexity-management
 ---
 

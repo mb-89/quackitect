@@ -7,8 +7,8 @@ statement: An agent's plain-words query shares enough vocabulary with a tool's o
 owner: the driving agent
 trigger: a demand-log entry whose query plainly describes an existing tool in different words than the tool's own description uses
 status: open
-probed: "not yet - needs real se_help usage"
-probe: "unprobed - no help-demand log exists yet, so there is no real usage to spot-check. Re-probe once query traffic accumulates."
+probed: not yet - needs real se_help usage
+probe: unprobed - no help-demand log exists yet, so there is no real usage to spot-check. Re-probe once query traffic accumulates.
 impact: A real match is scored zero and treated as a miss, so the demand log fills with phantom gaps for tools that already exist, misleading the retro that reads it.
 breaks_how_badly: corrosive
 how_likely: plausible

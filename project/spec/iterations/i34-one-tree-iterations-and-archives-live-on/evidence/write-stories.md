@@ -1,10 +1,10 @@
 ---
 form: write-stories
-amended: "2026-08-16T07:15:22.714Z by agent — sty-work-on-two-machines was deleted with the claim system, so the list named a node that no longer exists and the claim stopped passing its own check"
+amended: 2026-08-16T07:15:22.714Z by agent — sty-work-on-two-machines was deleted with the claim system, so the list named a node that no longer exists and the claim stopped passing its own check
 by: agent
 signed_off: 2026-08-16T05:53:44.834Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / write-stories

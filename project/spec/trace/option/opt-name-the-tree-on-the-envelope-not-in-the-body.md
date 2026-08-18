@@ -6,7 +6,7 @@ statement: carry the resolved tree on every answer's envelope rather than inside
 cluster: cluster-the-walk
 question: how a resolution is made visible
 found_by: contradiction
-source: "TRIZ separation IN LEVEL, on the contradiction that making a misroute visible costs bytes on every answer while the answer already exceeds its bound"
+source: TRIZ separation IN LEVEL, on the contradiction that making a misroute visible costs bytes on every answer while the answer already exceeds its bound
 ---
 
 ## Mechanism

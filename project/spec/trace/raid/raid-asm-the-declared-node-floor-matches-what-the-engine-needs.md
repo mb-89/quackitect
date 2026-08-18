@@ -3,9 +3,9 @@ minted_in: i35-the-cloud-run-s-findings-land-the-fix-fi
 id: raid-asm-the-declared-node-floor-matches-what-the-engine-needs
 type: "[[raid]]"
 kind: assumption
-statement: "The runtime floor the engine declares is the floor it actually needs, so the verify step's refusal is meaningful rather than arbitrary."
+statement: The runtime floor the engine declares is the floor it actually needs, so the verify step's refusal is meaningful rather than arbitrary.
 owner: the owner
-trigger: "already fired — measured false at the edge on 2026-08-17"
+trigger: already fired — measured false at the edge on 2026-08-17
 status: open
 impact: "A floor set above what the engine needs refuses hosts that would have run it. Measured: this box's default runtime is 22.22, the pin demands 24, and the engine's full battery passes on 22."
 breaks_how_badly: abrasive

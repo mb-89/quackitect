@@ -3,7 +3,7 @@ minted_in: i35-the-cloud-run-s-findings-land-the-fix-fi
 id: fn-arrive-on-a-machine.resolve-the-cited-refs
 type: "[[function]]"
 cluster: the-arrival
-statement: "make the branches the corpus cites resolvable, and name any left unresolved"
+statement: make the branches the corpus cites resolvable, and name any left unresolved
 satisfies:
   - req-every-ref-the-corpus-cites-resolves-on-arrival
 inputs:

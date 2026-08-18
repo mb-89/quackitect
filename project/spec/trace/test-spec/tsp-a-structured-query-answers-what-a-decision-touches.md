@@ -3,12 +3,12 @@ minted_in: i33-every-interface-a-person-or-an-agent-tou
 id: tsp-a-structured-query-answers-what-a-decision-touches
 type: "[[test-spec]]"
 statement: An agent answers what a decision touches with one structured query over the corpus, instead of a run of text searches it has to guess the words for.
-method: "demonstration"
+method: demonstration
 demonstrates:
-  - "sty-answer-what-does-this-touch"
+  - sty-answer-what-does-this-touch
 verifies: "none — demonstrates: carries the edge; the evaluator's own mechanics are test-verified by tsp-query-answers over tests/query.test.ts"
 files:
-  - "none — the procedure below is the definition, because the pass is what the agent can reach rather than what a function returns"
+  - none — the procedure below is the definition, because the pass is what the agent can reach rather than what a function returns
 ---
 
 ## Why this spec is being written by i33 rather than by i15

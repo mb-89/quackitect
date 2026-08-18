@@ -6,7 +6,7 @@ statement: close every write with a read from the tree the caller named, so the 
 cluster: cluster-the-walk
 question: how a resolution is made visible
 found_by: analogy
-source: "aviation readback-hearback, ICAO Annex 11 — the receiver repeats the clearance and the issuer checks it; https://skybrary.aero/articles/read-back-or-hear-back"
+source: aviation readback-hearback, ICAO Annex 11 — the receiver repeats the clearance and the issuer checks it; https://skybrary.aero/articles/read-back-or-hear-back
 ---
 
 ## Mechanism

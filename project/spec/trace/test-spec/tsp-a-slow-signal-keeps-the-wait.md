@@ -3,9 +3,9 @@ minted_in: i33-every-interface-a-person-or-an-agent-tou
 id: tsp-a-slow-signal-keeps-the-wait
 type: "[[test-spec]]"
 statement: Showing that an operation is slow leaves a person no less willing to wait than showing nothing would have.
-method: "demonstration"
+method: demonstration
 verifies:
-  - "req-a-slowness-signal-never-shortens-the-wait"
+  - req-a-slowness-signal-never-shortens-the-wait
 files:
   - none — the procedure is the whole definition, because the pass is what a person does rather than what a program returns
 ---

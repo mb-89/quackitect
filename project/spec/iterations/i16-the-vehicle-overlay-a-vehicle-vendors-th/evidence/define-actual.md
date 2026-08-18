@@ -2,9 +2,9 @@
 form: define-actual
 by: agent
 signed_off: 2026-08-18T09:55:53.588Z
-reopened: "2026-08-18T09:53:21.714Z — The vision re-signed with a sixth goal — nothing a descendant does can reach its parent. The as-is owes where we stand on that today, and the honest answer is a good rather than a pain."
+reopened: 2026-08-18T09:53:21.714Z — The vision re-signed with a sixth goal — nothing a descendant does can reach its parent. The as-is owes where we stand on that today, and the honest answer is a good rather than a pain.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / define-actual

@@ -3,10 +3,10 @@ minted_in: i27
 id: tsp-read-back-inspection
 type: "[[test-spec]]"
 statement: Every resolution test proves its landing by reading back from the store the caller named, and none asserts on the write's own return value.
-method: "inspection"
+method: inspection
 verifies:
-  - "req-a-resolution-is-proven-by-read-back"
-  - "req-every-record-path-resolves-in-one-tree"
+  - req-a-resolution-is-proven-by-read-back
+  - req-every-record-path-resolves-in-one-tree
 files:
   - none — the checklist is the whole definition, because the attribute examined is the shape of the other tests rather than the behaviour of the engine
 ---

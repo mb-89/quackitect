@@ -3,12 +3,12 @@ minted_in: i33-every-interface-a-person-or-an-agent-tou
 id: tsp-a-decline-is-legible-to-the-person
 type: "[[test-spec]]"
 statement: A person presses a control that declines, and the surface tells them why and what would let it through.
-method: "demonstration"
+method: demonstration
 demonstrates:
-  - "sty-the-control-that-says-why-it-declined"
+  - sty-the-control-that-says-why-it-declined
 verifies: "none — demonstrates: carries the edge; the three requirements behind this story are verify_method: test and are carried by tsp-a-control-is-legible"
 files:
-  - "none — the procedure below is the definition, because the pass is what a person can tell from the screen"
+  - none — the procedure below is the definition, because the pass is what a person can tell from the screen
 ---
 
 ## Scope

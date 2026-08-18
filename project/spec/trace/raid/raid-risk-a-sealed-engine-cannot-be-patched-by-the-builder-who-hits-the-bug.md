@@ -13,7 +13,7 @@ impact: "A blocked builder with no sanctioned repair does the unsanctioned one: 
 source_refs:
   - req-nothing-a-copy-does-reaches-its-source
   - raid-dec-the-seal-outranks-the-overlay
-  - "i16 pressure-test — the hostile FAQ question that had no clean answer"
+  - i16 pressure-test — the hostile FAQ question that had no clean answer
 ---
 
 ## Where it came from

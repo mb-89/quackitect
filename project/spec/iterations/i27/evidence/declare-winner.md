@@ -2,9 +2,9 @@
 form: declare-winner
 by: agent
 signed_off: 2026-08-14T12:47:26.141Z
-reopened: "2026-08-14T12:46:48.025Z — It declares no winner because the demand table was unsound; the table has since been re-audited blind and a fresh scoring stands, so a winner can now be named."
+reopened: 2026-08-14T12:46:48.025Z — It declares no winner because the demand table was unsound; the table has since been re-audited blind and a fresh scoring stands, so a winner can now be named.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / declare-winner

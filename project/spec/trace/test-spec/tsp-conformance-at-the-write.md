@@ -3,13 +3,13 @@ minted_in: i6-conformance-goes-mechanical-checks-bind-
 id: tsp-conformance-at-the-write
 type: "[[test-spec]]"
 statement: A maintainer writes a rule into the node it governs, and the next write that breaks it is refused at the write with the file, the line and the fix named — with no engine file changed to make either happen.
-method: "demonstration"
+method: demonstration
 demonstrates:
-  - "sty-a-check-binds-without-engine-code"
-  - "sty-the-write-refuses-the-break"
+  - sty-a-check-binds-without-engine-code
+  - sty-the-write-refuses-the-break
 verifies: "none — demonstrates: carries the edge; both requirements are verify_method: test and are carried by tsp-bound-rules and tsp-write-guard"
 files:
-  - "none — the procedure below is the definition, and the observed session is the evidence"
+  - none — the procedure below is the definition, and the observed session is the evidence
 ---
 
 ## Scope

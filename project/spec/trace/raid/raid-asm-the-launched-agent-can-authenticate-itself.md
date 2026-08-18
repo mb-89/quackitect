@@ -9,9 +9,9 @@ impact: The seven steps all report success, an agent process starts, and it does
 breaks_how_badly: crippling
 how_likely: plausible
 status: deferred
-defer_until: "the first cloud host exists — the probe is to run launch where the agent is installed and not logged in, and it rides the same machine raid-debt-cloud-validation-needs-a-machine-this-one-cannot-make waits on"
-probe: "unprobed. The launch step runs `<agent> --version` and treats exit 0 as proof the agent can be started. A version check answers whether the binary is there. It does not answer whether the binary can reach its provider."
-probed: "2026-08-16 — unprobed and now unprobeable. Still deferred on a cloud host that does not exist, and i34 switched off the machine-to-machine work this guards. It waits on a capability that is itself switched off; reviving one revives the other."
+defer_until: the first cloud host exists — the probe is to run launch where the agent is installed and not logged in, and it rides the same machine raid-debt-cloud-validation-needs-a-machine-this-one-cannot-make waits on
+probe: unprobed. The launch step runs `<agent> --version` and treats exit 0 as proof the agent can be started. A version check answers whether the binary is there. It does not answer whether the binary can reach its provider.
+probed: 2026-08-16 — unprobed and now unprobeable. Still deferred on a cloud host that does not exist, and i34 switched off the machine-to-machine work this guards. It waits on a capability that is itself switched off; reviving one revives the other.
 source_refs:
   - req-one-command-starts-an-unattended-machine
   - nbr-cloud-host

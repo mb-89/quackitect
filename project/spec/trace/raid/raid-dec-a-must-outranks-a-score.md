@@ -6,7 +6,7 @@ kind: decision
 statement: A demand graded `must` outranks every score. A candidate failing one is out, whatever it ranked.
 owner: the owner
 status: decided
-decided_via: "owner ruling 2026-08-14"
+decided_via: owner ruling 2026-08-14
 impact: It settles which of two answers decides a design milestone when the scoring and the demands disagree, and it makes the demand check a build rather than a convention.
 breaks_how_badly: fatal
 how_likely: conceivable

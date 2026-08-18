@@ -6,7 +6,7 @@ statement: the claim is a git ref under refs/claims/, taken by an atomic compare
 cluster: cluster-the-record-life
 question: what serializes a claim
 found_by: prior-art
-source: "Gerrit's refs/changes namespace; git update-ref atomicity; the git-lfs lock API's shape"
+source: Gerrit's refs/changes namespace; git update-ref atomicity; the git-lfs lock API's shape
 ---
 
 ## Mechanism

@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: delete the installer and make the product a repository template, so standing one up is a clone and a dependency install
 cluster: cluster-the-bootstrap
 found_by: without
-source: "trimming per meth-trimming — the environment already does it"
+source: trimming per meth-trimming — the environment already does it
 ---
 
 ## Mechanism

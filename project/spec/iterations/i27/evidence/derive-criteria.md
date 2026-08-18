@@ -2,9 +2,9 @@
 form: derive-criteria
 by: agent
 signed_off: 2026-08-14T08:17:43.468Z
-reopened: "2026-08-14T08:15:51.678Z — req-a-wrong-act-never-passes-silently was minted after this state signed, so the pool grew and its pairs are unjudged — the state's own green condition says every pair is…"
+reopened: 2026-08-14T08:15:51.678Z — req-a-wrong-act-never-passes-silently was minted after this state signed, so the pool grew and its pairs are unjudged — the state's own green condition says every pair is…
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / derive-criteria

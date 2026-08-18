@@ -8,11 +8,11 @@ probes:
 timebox: 15 lane calls, of which 9 were used
 form: script
 faked: "The NODES were synthetic rather than copied from the corpus, so file length was chosen rather than sampled. Everything else was real: two git repositories, real commits, a real three-way merge."
-fallback: "If a structural migration cannot be expressed as a program, the winner falls back to cand-everything-declared, which is one cell behind and errors out rather than producing a wrong result."
+fallback: If a structural migration cannot be expressed as a program, the winner falls back to cand-everything-declared, which is one cell behind and errors out rather than producing a wrong result.
 verdict: holds
 measured: "2026-08-18. A 20-line node with a 2-line upstream edit and a vehicle-added section: MERGE_EXIT=0, one file, both changes present. A 3-line node with a 2-line upstream edit: MERGE_EXIT=1, CONFLICT (modify/delete), both files left in the tree with the vehicle's copy still on the old id."
 folds_to: "Settles raid-tripwire-i16-a-structural-migration-cannot-be-written: it does NOT fire. A structural migration can be expressed as a program, so the winner's falsifier is not met and no score moves. What the evidence ADDS is a bound nobody had: the program route's advantage over a plain git merge exists only where a node is short enough that an upstream edit drops similarity below git's rename threshold, and the corpus sits on the safe side of that line. The bound is recorded on the tripwire rather than applied to the scores, because re-weighting an axis with the totals already visible is the poisoning cut-criteria's ordering exists to prevent."
-promote: "none — the two probe repositories are throwaway by the throwaway law, and the finding is the product. The one thing worth carrying is the bound itself, which belongs on the tripwire rather than in build code."
+promote: none — the two probe repositories are throwaway by the throwaway law, and the finding is the product. The one thing worth carrying is the bound itself, which belongs on the tripwire rather than in build code.
 source_refs:
   - rank-unknowns, the seeded pick
   - raid-dec-an-update-arrives-as-a-program

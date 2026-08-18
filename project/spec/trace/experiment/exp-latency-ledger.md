@@ -11,8 +11,8 @@ faked: none — the run aggregated the day's real recorded calls
 fallback: the async round's ticket desk — a handle back fast, the work in the background
 verdict: falls
 measured: 2026-08-10 — 12 of 118 pulls broke the one-second line, worst 15.2 seconds on a full 28-state record re-entry; median call 11 ms; no background handle came back in any breach
-folds_to: "raid-ar-call-answers-in-one-second re-grounded on the dated ledger and the stale 274 retired — the demand stands and is missed today"
-promote: "none — the fix is the async round's ticket desk, chartered in the backlog"
+folds_to: raid-ar-call-answers-in-one-second re-grounded on the dated ledger and the stale 274 retired — the demand stands and is missed today
+promote: none — the fix is the async round's ticket desk, chartered in the backlog
 source_refs:
   - rank-unknowns, the seeded pick
 ---

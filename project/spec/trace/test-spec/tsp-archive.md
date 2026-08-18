@@ -3,17 +3,17 @@ minted_in: i1
 id: tsp-archive
 type: "[[test-spec]]"
 statement: The archive lists every closed record, opens to a person only, shows each record as it closed, and holds nothing writable, verified by test over the archive machinery.
-method: "test"
+method: test
 verifies:
-  - "req-archive-lists-every-closed-record"
-  - "req-archive-opens-to-a-person-only"
-  - "req-archive-read-only"
-  - "req-archive-shows-it-as-it-closed"
-  - "req-a-closed-records-folder-stays-on-trunk"
+  - req-archive-lists-every-closed-record
+  - req-archive-opens-to-a-person-only
+  - req-archive-read-only
+  - req-archive-shows-it-as-it-closed
+  - req-a-closed-records-folder-stays-on-trunk
 files:
-  - "tests/archive.test.ts"
-  - "tests/container.test.ts"
-  - "tests/threshold.test.ts"
+  - tests/archive.test.ts
+  - tests/container.test.ts
+  - tests/threshold.test.ts
 ---
 
 ## Scope

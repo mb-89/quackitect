@@ -6,7 +6,7 @@ statement: score every candidate coupling, then sort automatically into match, n
 cluster: cluster-the-disposition
 question: how does a ranked candidate coupling get its disposition
 found_by: prior-art
-source: "Fellegi & Sunter, \"A Theory for Record Linkage,\" Journal of the American Statistical Association 64(328), 1969 (via en.wikipedia.org/wiki/Record_linkage) — the m/u weight model and its three-way match/non-match/possible-match classification"
+source: Fellegi & Sunter, "A Theory for Record Linkage," Journal of the American Statistical Association 64(328), 1969 (via en.wikipedia.org/wiki/Record_linkage) — the m/u weight model and its three-way match/non-match/possible-match classification
 ---
 
 ## Mechanism

@@ -6,7 +6,7 @@ cluster: the-bootstrap
 question: how a copy's own changes are represented
 statement: nothing records what a copy changed, because a copy that never takes an update never needs to know
 found_by: without
-source: "trimming — what if the whole authorship-accounting apparatus does not exist, and who does its job then; the answer is NOBODY, and this product already ships it"
+source: trimming — what if the whole authorship-accounting apparatus does not exist, and who does its job then; the answer is NOBODY, and this product already ships it
 ---
 
 ## Mechanism

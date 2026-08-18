@@ -4,10 +4,10 @@ id: dsp-unattended-entrypoint
 type: "[[design-spec]]"
 statement: one command from a repository address and an iteration id to a walking agent, seven steps that each fail by name, with the runtime pinned and the lane released
 realizes:
-  - "el-entrypoint"
+  - el-entrypoint
 files:
-  - "project/deliverable/engine/bin/se-start.ts"
-  - "project/deliverable/package.json"
+  - project/deliverable/engine/bin/se-start.ts
+  - project/deliverable/package.json
 ---
 
 ## Responsibility

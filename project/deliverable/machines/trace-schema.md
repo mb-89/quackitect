@@ -61,10 +61,15 @@ edges:
 subsegments:
   - id: design
     label: design
-    levels: [function, element, interface, design-spec]
+    levels:
+      - function
+      - element
+      - interface
+      - design-spec
   - id: test
     label: tests
-    levels: [test-spec]
+    levels:
+      - test-spec
 ---
 
 # The trace schema

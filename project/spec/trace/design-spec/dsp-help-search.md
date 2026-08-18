@@ -4,10 +4,10 @@ id: dsp-help-search
 type: "[[design-spec]]"
 statement: A plain-words keyword search over the lane's tools and guidance, with every miss appended to a durable ranked demand log, carried by engine/help.ts and registered onto el-walk-engine's dispatch table in engine/tools.ts.
 realizes:
-  - "el-walk-engine"
+  - el-walk-engine
 files:
-  - "project/deliverable/engine/help.ts"
-  - "project/deliverable/engine/tools.ts"
+  - project/deliverable/engine/help.ts
+  - project/deliverable/engine/tools.ts
 ---
 
 ## Responsibility

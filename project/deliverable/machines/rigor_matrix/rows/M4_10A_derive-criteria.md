@@ -27,8 +27,6 @@ evidence:
     reason: reason
     picks:
       weighs_with: $criterion_pool
-    # THE CELL HOLDS AN ID PLUS A REASON, so the offer is help rather than a
-    # constraint. Every other pick in the repo is closed.
     pick_free:
       - weighs_with
     page_size: 10
@@ -46,7 +44,6 @@ evidence:
     writes: weighs_against
     picks:
       weighs_against: $criterion_axes
-    # The cell holds the other axis PLUS the verdict, so it cannot be closed.
     pick_free:
       - weighs_against
     page_size: 10

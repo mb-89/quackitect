@@ -1,10 +1,10 @@
 ---
 form: frame-delta
-amended: "2026-08-16T16:31:02.257Z by agent — ref \"main\" resolves — verified 2026-08-16; correcting the stale \"does not yet resolve\" claim and its downstream follow_up"
+amended: 2026-08-16T16:31:02.257Z by agent — ref "main" resolves — verified 2026-08-16; correcting the stale "does not yet resolve" claim and its downstream follow_up
 by: agent
 signed_off: 2026-08-16T16:24:00.812Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / frame-delta

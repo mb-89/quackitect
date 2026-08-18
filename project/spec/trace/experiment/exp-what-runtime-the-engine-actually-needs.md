@@ -7,13 +7,13 @@ probes:
   - raid-asm-the-installed-runtime-is-one-the-engine-runs-on
 timebox: 20 minutes
 form: calculation
-chunk: "none — three declarations were read and nothing was written"
+chunk: none — three declarations were read and nothing was written
 faked: the host. No machine with a default install was available, so what a package manager gives a bare host is read from the declaration rather than observed.
 fallback: if the declared floor is below what the engine needs, the entrypoint pins an exact version rather than accepting whatever it finds, and the verify step compares against that pin instead of against a floor.
 verdict: falls
 measured: "2026-08-15. Declared floor: package.json line 8, node >=22.6. This machine: v24.16.0. The engine spawns its scripts as `node <file>.ts` with NO flag (session.ts spawnScript, tools.ts spawnNode). Unflagged TypeScript execution is not what >=22.6 buys."
-folds_to: "el-entrypoint's verify step compares against a PINNED version rather than a floor, and package.json line 8 is corrected. The assumption is answered for the local half and stays owed for what a default install gives a bare host."
-promote: "none"
+folds_to: el-entrypoint's verify step compares against a PINNED version rather than a floor, and package.json line 8 is corrected. The assumption is answered for the local half and stays owed for what a default install gives a bare host.
+promote: none
 source_refs:
   - rank-unknowns, the seeded pick
   - req-one-command-starts-an-unattended-machine

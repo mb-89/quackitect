@@ -3,7 +3,7 @@ form: container-blind-spots
 by: agent
 signed_off: 2026-08-17T12:08:34.011Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / container-blind-spots

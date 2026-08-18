@@ -6,7 +6,7 @@ statement: the claim is one small add-only file per iteration on a dedicated cla
 cluster: cluster-the-record-life
 question: what serializes a claim
 found_by: prior-art
-source: "Git's own push semantics - atomic ref update, non-fast-forward rejection; the lease-branch pattern CI fleets use for distributed locks"
+source: Git's own push semantics - atomic ref update, non-fast-forward rejection; the lease-branch pattern CI fleets use for distributed locks
 ---
 
 ## Mechanism

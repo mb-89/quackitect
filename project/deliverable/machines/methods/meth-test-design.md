@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "Pick the test design method from what the thing under test looks like. The method decides the cases, not taste."
+statement: Pick the test design method from what the thing under test looks like. The method decides the cases, not taste.
 ---
 
 ## Situation

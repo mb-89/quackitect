@@ -29,7 +29,7 @@ evidence:
       - realizes
       - files
     page_size: 25
-    description: "the design-spec register — one row per spec; the law checks element coverage and that every spec names its files"
+    description: the design-spec register — one row per spec; the law checks element coverage and that every spec names its files
   - name: promotions
     template: node-table
     of: experiment

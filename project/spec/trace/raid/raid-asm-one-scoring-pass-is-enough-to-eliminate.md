@@ -10,8 +10,8 @@ status: open
 impact: A candidate leaves the set on a score that a second reader would have put one band higher. Nothing downstream can recover it, because M5 composes from the front and never revisits the eliminated.
 breaks_how_badly: abrasive
 how_likely: expected
-probe: "FALSIFIED in i16 on 2026-08-18, on this entry's own stated terms. It held in i28, where the margin was two bands. i16's elimination turned on ONE band and the second pass reversed it."
-probed: "2026-08-18"
+probe: FALSIFIED in i16 on 2026-08-18, on this entry's own stated terms. It held in i28, where the margin was two bands. i16's elimination turned on ONE band and the second pass reversed it.
+probed: 2026-08-18
 source_refs:
   - meth-scoring-anchors
   - meth-set-based-pareto

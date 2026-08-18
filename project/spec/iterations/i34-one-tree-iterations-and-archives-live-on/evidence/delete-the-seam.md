@@ -2,9 +2,9 @@
 form: delete-the-seam
 by: agent
 signed_off: 2026-08-16T09:41:50.128Z
-reopened: "2026-08-16T09:24:33.118Z — a tester with fresh eyes found three tree-choosers still standing — Session.recordRoot, twoTrees in gitlane.ts, and Session.corpora() — so the claim that no call selects between trees does not pass its own content"
+reopened: 2026-08-16T09:24:33.118Z — a tester with fresh eyes found three tree-choosers still standing — Session.recordRoot, twoTrees in gitlane.ts, and Session.corpora() — so the claim that no call selects between trees does not pass its own content
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / delete-the-seam

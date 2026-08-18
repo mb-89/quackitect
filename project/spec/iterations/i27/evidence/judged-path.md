@@ -2,9 +2,9 @@
 form: judged-path
 by: agent
 signed_off: 2026-08-14T08:03:55.921Z
-reopened: "2026-08-14T07:51:55.569Z — Its composition described a candidate that governs writes only, and the redrawn line now carries two coverage rules, so the seams it wrote are no longer the seams it has."
+reopened: 2026-08-14T07:51:55.569Z — Its composition described a candidate that governs writes only, and the redrawn line now carries two coverage rules, so the seams it wrote are no longer the seams it has.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / judged-path

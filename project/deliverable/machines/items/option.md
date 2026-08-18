@@ -23,14 +23,14 @@ checks:
       - TBD
       - TBC
       - TBR
-      - "???"
+      - ???
     hint: an unnamed option fills no cell
   - field: source
     ban_markers:
       - TBD
       - TBC
       - TBR
-      - "???"
+      - ???
     hint: an idea with a source is checkable; one without is a rumour
 sections:
   - Mechanism

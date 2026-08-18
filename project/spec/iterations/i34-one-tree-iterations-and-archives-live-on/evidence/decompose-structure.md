@@ -1,10 +1,10 @@
 ---
 form: decompose-structure
-amended: "2026-08-16T07:18:32.154Z by agent — both claim-ledger interfaces are now deleted, and the form still claimed neither element was removed here — which is what left if-claim-ledger-to-record-store…"
+amended: 2026-08-16T07:18:32.154Z by agent — both claim-ledger interfaces are now deleted, and the form still claimed neither element was removed here — which is what left if-claim-ledger-to-record-store…
 by: agent
 signed_off: 2026-08-16T06:31:56.557Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / decompose-structure

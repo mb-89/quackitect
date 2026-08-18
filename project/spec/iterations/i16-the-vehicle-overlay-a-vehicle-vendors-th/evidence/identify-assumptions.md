@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-18T11:10:42.953Z
 reopened: "2026-08-18T11:10:12.345Z — The function work exposed an assumption the requirement pass leaned on: that the pointer a driven project follows back survives being moved, cloned or committed. It is graded expected, which no other entry here carries."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / identify-assumptions

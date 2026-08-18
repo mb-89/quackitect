@@ -6,7 +6,7 @@ statement: an override is treated as disposable rather than durable, cheap to re
 cluster: the-bootstrap
 question: how a stale override is caught
 found_by: contradiction
-source: "TRIZ contradiction matrix cell 37 against 27, principle 27 Cheap short-lived object — vendored grid at project/deliverable/vendor/triz/triz-matrix.json"
+source: TRIZ contradiction matrix cell 37 against 27, principle 27 Cheap short-lived object — vendored grid at project/deliverable/vendor/triz/triz-matrix.json
 ---
 
 ## Mechanism

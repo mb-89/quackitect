@@ -1,11 +1,11 @@
 ---
 form: the-seed-states-its-dependency
-reopened: "2026-08-16T18:40:33.657Z — its claim missed a third seed caller, and the battery found it — reopening also reaches the write verbs the red battery's other findings need"
-amended: "2026-08-16T19:25:54.271Z by agent — re-stamping the chunk I reopened only to reach a write verb; its content never changed"
+reopened: 2026-08-16T18:40:33.657Z — its claim missed a third seed caller, and the battery found it — reopening also reaches the write verbs the red battery's other findings need
+amended: 2026-08-16T19:25:54.271Z by agent — re-stamping the chunk I reopened only to reach a write verb; its content never changed
 by: agent
 signed_off: 2026-08-16T19:28:05.167Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-seed-states-its-dependency

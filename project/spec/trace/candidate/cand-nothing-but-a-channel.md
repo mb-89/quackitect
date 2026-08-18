@@ -2,7 +2,7 @@
 minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: cand-nothing-but-a-channel
 type: "[[candidate]]"
-name: "Nothing but a channel"
+name: Nothing but a channel
 statement: "keep the predecessor's shape entirely and change one thing: the copy carries history, so an update has something to merge from"
 picks:
   - "[[opt-a-clone-that-keeps-its-history]]"

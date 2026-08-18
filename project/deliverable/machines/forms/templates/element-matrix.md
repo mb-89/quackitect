@@ -3,7 +3,7 @@ id: template-element-matrix
 statement: The element matrix drawn from the nodes — allocation off implements, owed cells off flow crossings, interfaces named where the boundary demands them.
 editor: element-matrix
 line_pattern: ""
-line_help: "the matrix is computed — this section carries only the argued spread"
+line_help: the matrix is computed — this section carries only the argued spread
 ---
 
 # element-matrix

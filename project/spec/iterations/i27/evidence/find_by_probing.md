@@ -2,9 +2,9 @@
 form: find_by_probing
 by: agent
 signed_off: 2026-08-14T07:48:21.574Z
-reopened: "2026-08-14T07:47:07.136Z — The finder that BUILDS ran three read-only diagnostics and built nothing, then concluded nothing can be measured at M4 — which made an evidence asymmetry look unavoidable…"
+reopened: 2026-08-14T07:47:07.136Z — The finder that BUILDS ran three read-only diagnostics and built nothing, then concluded nothing can be measured at M4 — which made an evidence asymmetry look unavoidable…
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / find_by_probing

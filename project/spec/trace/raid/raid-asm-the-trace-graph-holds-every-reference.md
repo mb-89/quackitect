@@ -6,7 +6,7 @@ kind: assumption
 statement: The trace graph holds every reference to a node, so naming what points at a node before deleting it finds all of them.
 owner: the driving agent
 trigger: decompose-structure, where the deletion warning's source of truth is chosen
-probe: "false in part. The check is a count i34 already produced. The graph found the frontmatter orphans — two requirements from a deleted function, one must story from a deleted test-spec — and missed 17 prose citations plus 3 engine comments, because trace-coverage reads frontmatter edges rather than bodies. The graph sees roughly a fifth of what a deletion breaks, so the warning must read the graph AND a text sweep."
+probe: false in part. The check is a count i34 already produced. The graph found the frontmatter orphans — two requirements from a deleted function, one must story from a deleted test-spec — and missed 17 prose citations plus 3 engine comments, because trace-coverage reads frontmatter edges rather than bodies. The graph sees roughly a fifth of what a deletion breaks, so the warning must read the graph AND a text sweep.
 probed: 2026-08-16
 status: open
 impact: the deletion warning reports a clean list, the author deletes on it, and the prose citations orphan exactly as before — with a green check now saying they did not.

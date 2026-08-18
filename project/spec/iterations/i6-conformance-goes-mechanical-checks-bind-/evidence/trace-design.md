@@ -2,9 +2,9 @@
 form: trace-design
 by: agent
 signed_off: 2026-08-16T18:34:50.276Z
-reopened: "2026-08-16T18:31:20.351Z — the nearest passed state granting a write verb, so the owed-ref check can be fixed where verification cannot reach it"
+reopened: 2026-08-16T18:31:20.351Z — the nearest passed state granting a write verb, so the owed-ref check can be fixed where verification cannot reach it
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / trace-design

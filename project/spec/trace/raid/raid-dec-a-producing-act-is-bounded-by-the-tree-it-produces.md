@@ -8,7 +8,7 @@ owner: the driving agent
 status: decided
 breaks_how_badly: fatal
 how_likely: plausible
-impact: "This is what makes the isolation guarantee a property of the act rather than a rule somebody has to remember. Wrong, a producing act has no bound at all, which is the state the design is in today."
+impact: This is what makes the isolation guarantee a property of the act rather than a rule somebody has to remember. Wrong, a producing act has no bound at all, which is the state the design is in today.
 source_refs:
   - req-nothing-a-copy-does-reaches-its-source
   - req-an-act-writes-only-the-tree-it-produced

@@ -6,7 +6,7 @@ statement: build nothing new; a caller wanting corpus data keeps using se_file_s
 cluster: cluster-the-query
 question: how does answer-a-structured-query evaluate a query against the corpus
 found_by: without
-source: "meth-trimming — the null option, checked against se_file_search and se_file_glob, already shipped in this lane"
+source: meth-trimming — the null option, checked against se_file_search and se_file_glob, already shipped in this lane
 ---
 
 ## Mechanism

@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: invert the direction so the machine hands the next step to whoever is listening, instead of waiting to be asked for it
 cluster: cluster-the-walk
 found_by: transform
-source: "SCAMPER Reverse, applied to the pull"
+source: SCAMPER Reverse, applied to the pull
 ---
 
 ## Mechanism

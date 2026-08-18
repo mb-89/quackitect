@@ -6,7 +6,7 @@ cluster: cluster-the-walk
 question: what the resolution rule covers
 found_by: heuristic
 statement: govern every call by one rule, so a read and a write resolve by exactly the same mechanism and neither can be forgotten
-source: "the heuristic catalogue — One source of truth; everything else derives. Minted 2026-08-14 to fill the coverage row after the owner found that row conflated with the mechanism row."
+source: the heuristic catalogue — One source of truth; everything else derives. Minted 2026-08-14 to fill the coverage row after the owner found that row conflated with the mechanism row.
 ---
 
 ## Mechanism

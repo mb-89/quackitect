@@ -3,7 +3,7 @@ form: the-arrival-hook
 by: agent
 signed_off: 2026-08-17T12:09:37.297Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-arrival-hook

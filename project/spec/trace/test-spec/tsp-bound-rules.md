@@ -3,12 +3,12 @@ minted_in: i6-conformance-goes-mechanical-checks-bind-
 id: tsp-bound-rules
 type: "[[test-spec]]"
 statement: A rule written beside the thing it governs enforces itself with no engine file changed, and a rule that can never fire is reported as unbound rather than passing green.
-method: "test"
+method: test
 verifies:
-  - "req-a-check-binds-without-engine-code"
-  - "req-an-unbound-rule-is-reported"
+  - req-a-check-binds-without-engine-code
+  - req-an-unbound-rule-is-reported
 files:
-  - "tests/boundrules.test.ts"
+  - tests/boundrules.test.ts
 ---
 
 ## Scope

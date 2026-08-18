@@ -6,7 +6,7 @@ statement: refuse a path whose tree is not decidable rather than picking one, so
 cluster: cluster-the-walk
 question: how a resolution is made visible
 found_by: heuristic
-source: "the heuristic catalogue — The default should be the safe thing."
+source: the heuristic catalogue — The default should be the safe thing.
 ---
 
 ## Mechanism

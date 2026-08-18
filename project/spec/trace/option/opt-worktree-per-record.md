@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: give every unit of work its own working directory on its own branch, sharing one object database underneath
 cluster: cluster-the-record-life
 found_by: prior-art
-source: "Git Worktrees for Parallel AI Agent Execution, https://www.augmentcode.com/guides/git-worktrees-parallel-ai-agent-execution"
+source: Git Worktrees for Parallel AI Agent Execution, https://www.augmentcode.com/guides/git-worktrees-parallel-ai-agent-execution
 ---
 
 ## Mechanism

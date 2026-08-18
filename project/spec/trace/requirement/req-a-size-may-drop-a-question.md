@@ -10,8 +10,8 @@ breaks_how_badly: corrosive
 refines:
   - uc-be-handed-the-method
 source_refs:
-  - "engine/machine.ts EvidenceField.omit"
-  - "engine/rigor-matrix.ts rowState, the column filter"
+  - engine/machine.ts EvidenceField.omit
+  - engine/rigor-matrix.ts rowState, the column filter
   - "the owner's ruling 2026-08-13: the trim must be mechanical, marked in the row"
   - raid-asm-an-omit-is-authored-honestly
 priority: must

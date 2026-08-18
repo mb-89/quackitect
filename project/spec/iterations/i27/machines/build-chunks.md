@@ -1,56 +1,63 @@
 ---
 steps:
   - id: seam-resolve
-    statement: "the resolver answers with the store beside the path, so a caller can tell which tree replied"
+    statement: the resolver answers with the store beside the path, so a caller can tell which tree replied
     depends_on: []
     realization: code
   - id: seam-route
-    statement: "a call naming a different owner is routed rather than refused as an escape"
+    statement: a call naming a different owner is routed rather than refused as an escape
     depends_on: []
     realization: code
   - id: seam-sweep
-    statement: "route the modules that read the filesystem for themselves through the resolver, lint.ts first"
-    depends_on: [seam-resolve]
+    statement: route the modules that read the filesystem for themselves through the resolver, lint.ts first
+    depends_on:
+      - seam-resolve
     realization: code
   - id: answer-bound
-    statement: "declare a bound for an answer, return a small one whole, and serve the rest of a large one by reference"
+    statement: declare a bound for an answer, return a small one whole, and serve the rest of a large one by reference
     depends_on: []
     realization: code
   - id: refusal-remedies
-    statement: "a not-standing refusal names the verb that fixes it, a reopen says what it will drop, and a resubmit carries the bless"
+    statement: a not-standing refusal names the verb that fixes it, a reopen says what it will drop, and a resubmit carries the bless
     depends_on: []
     realization: code
   - id: form-checks
-    statement: "the voice lint runs at submit, a grade outside its catalogue refuses, and a node-table cell never truncates in silence"
+    statement: the voice lint runs at submit, a grade outside its catalogue refuses, and a node-table cell never truncates in silence
     depends_on: []
     realization: code
   - id: clear-jump
-    statement: "a jump to a state nothing is owed for lands in ONE call, and a jump that cannot finish leaves the walk exactly where it stood"
+    statement: a jump to a state nothing is owed for lands in ONE call, and a jump that cannot finish leaves the walk exactly where it stood
     depends_on: []
     realization: code
   - id: delta-compose
-    statement: "compose a record's machine from its own folder first and trunk second, and name every file that came from the record"
-    depends_on: [seam-resolve]
+    statement: compose a record's machine from its own folder first and trunk second, and name every file that came from the record
+    depends_on:
+      - seam-resolve
     realization: code
   - id: supervisor-level
-    statement: "entry levels the tree, rebases the delta and commits what it brought, or stops the record with the conflict named"
-    depends_on: [delta-compose]
+    statement: entry levels the tree, rebases the delta and commits what it brought, or stops the record with the conflict named
+    depends_on:
+      - delta-compose
     realization: code
   - id: supervisor-watch
-    statement: "a deadline on the call, a beat on the process, and a previous composition kept until the replacement has served"
-    depends_on: [supervisor-level]
+    statement: a deadline on the call, a beat on the process, and a previous composition kept until the replacement has served
+    depends_on:
+      - supervisor-level
     realization: code
   - id: core-process
-    statement: "one core process owning trunk, the ledgers, the routing table and the heavy-slot count"
-    depends_on: [supervisor-watch]
+    statement: one core process owning trunk, the ledgers, the routing table and the heavy-slot count
+    depends_on:
+      - supervisor-watch
     realization: code
   - id: satellite-process
-    statement: "one satellite per agent, rooted in its record's tree and running its composed machine"
-    depends_on: [core-process]
+    statement: one satellite per agent, rooted in its record's tree and running its composed machine
+    depends_on:
+      - core-process
     realization: code
   - id: channel
-    statement: "the local channel between core and satellite, carrying the lease and the beat and naming the store on every answer"
-    depends_on: [satellite-process]
+    statement: the local channel between core and satellite, carrying the lease and the beat and naming the store on every answer
+    depends_on:
+      - satellite-process
     realization: code
 ---
 

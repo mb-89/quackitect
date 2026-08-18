@@ -6,7 +6,7 @@ statement: nothing is recorded anywhere, and the caller names the tree on every 
 cluster: the-walk
 question: how a tree carrying no method finds the copy that drives it
 found_by: prior-art
-source: "v1's baseFromArgs, product/engine-go/engine.go at ref main — the --base and -C flags, modelled on git -C"
+source: v1's baseFromArgs, product/engine-go/engine.go at ref main — the --base and -C flags, modelled on git -C
 ---
 
 ## Mechanism

@@ -1,10 +1,10 @@
 ---
 form: evaluate-architecture
-amended: "2026-08-14T13:28:47.585Z by agent — the el-core citation quoted a sentence the voice-lint fix turned into a list — same fact, new shape"
+amended: 2026-08-14T13:28:47.585Z by agent — the el-core citation quoted a sentence the voice-lint fix turned into a list — same fact, new shape
 by: agent
 signed_off: 2026-08-14T13:19:45.004Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / evaluate-architecture

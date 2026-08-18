@@ -7,7 +7,7 @@ statement: Requiring every slow interface to say so could produce a stream of pr
 owner: the owner
 trigger: the first surface that adopts the transparency half, and any review of what the mirror shows during a slow call
 status: open
-impact: "The rule would be met by every interface and the person would still be guessing, because a signal that always fires carries no information. It would also be invisible to any mechanical check, since the check can only ask whether the telling happens and not whether anybody reads it."
+impact: The rule would be met by every interface and the person would still be guessing, because a signal that always fires carries no information. It would also be invisible to any mechanical check, since the check can only ask whether the telling happens and not whether anybody reads it.
 breaks_how_badly: abrasive
 how_likely: plausible
 source_refs:

@@ -6,7 +6,7 @@ statement: cap the number of candidates rank-candidate-couplings ever returns at
 cluster: cluster-the-disposition
 question: how does a ranked candidate coupling get its disposition
 found_by: heuristic
-source: "meth-heuristics-catalog: \"Make the common case cheap; make the rare case possible.\""
+source: 'meth-heuristics-catalog: "Make the common case cheap; make the rare case possible."'
 ---
 
 ## Mechanism

@@ -8,8 +8,8 @@ probes:
   - raid-asm-the-target-machine-is-many-throttled-cores
 timebox: one hour
 form: script
-promote: "none — the constraint enters specify-build as a property of the START act, and loading less eagerly is the lever it has"
-folds_to: "raid-ar-call-answers-in-one-second is re-grounded at 306.9 ms with the module load included"
+promote: none — the constraint enters specify-build as a property of the START act, and loading less eagerly is the lever it has
+folds_to: raid-ar-call-answers-in-one-second is re-grounded at 306.9 ms with the module load included
 faked: the process imported the engine and stopped, so the real start is this number plus the levelling
 fallback: if a start does not fit the budget, a satellite is not a process — the choice moves to a worker thread or a pre-warmed pool
 verdict: holds

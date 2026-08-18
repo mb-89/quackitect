@@ -39,8 +39,6 @@ evidence:
       - what stops working if it goes, in one line
     picks:
       cluster: $clusters
-      # COMPLETE WITHOUT BEING FREE. The job goes to another cluster or it
-      # leaves the system, and those are the only three places it can go.
       who_takes_over:
         - $clusters
         - the environment

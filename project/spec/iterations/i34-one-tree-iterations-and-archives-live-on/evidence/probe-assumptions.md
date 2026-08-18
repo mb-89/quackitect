@@ -1,10 +1,10 @@
 ---
 form: probe-assumptions
-amended: "2026-08-16T06:51:47.776Z by agent — Three of the assumptions this table covered were deleted after it signed, on the owner's ruling that the claim system goes everywhere it ripples. The two i34 owns…"
+amended: 2026-08-16T06:51:47.776Z by agent — Three of the assumptions this table covered were deleted after it signed, on the owner's ruling that the claim system goes everywhere it ripples. The two i34 owns…
 by: agent
 signed_off: 2026-08-16T06:20:13.475Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / probe-assumptions

@@ -2,9 +2,9 @@
 form: evaluate-set
 by: agent
 signed_off: 2026-08-14T12:40:14.179Z
-reopened: "2026-08-14T12:38:46.076Z — The scores were taken over records that have since been completed and one that changed shape, and a fresh blind scoring of all six now stands."
+reopened: 2026-08-14T12:38:46.076Z — The scores were taken over records that have since been completed and one that changed shape, and a fresh blind scoring of all six now stands.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / evaluate-set

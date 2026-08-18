@@ -6,7 +6,7 @@ statement: keep only the record's own folder in its tree and read shared content
 cluster: cluster-the-walk
 question: how shared method reaches a tree
 found_by: prior-art
-source: "raid-dec-thin-tree, minted i1, status decided; measured 2026-08-10 as exp-trunk-read-cost"
+source: raid-dec-thin-tree, minted i1, status decided; measured 2026-08-10 as exp-trunk-read-cost
 ---
 
 ## Mechanism

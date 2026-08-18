@@ -5,7 +5,7 @@ statement: a list of REFERENCES to standing artifacts — one id per line, and e
 editor: list
 resolves: artifact
 line_pattern: ^- \[?\[?[A-Za-z0-9_./\\-]+\]?\]?$|^- none\b
-line_help: "one {type} per line, named any way that resolves"
+line_help: one {type} per line, named any way that resolves
 placeholder: path from the project root, e.g. {folder}/{prefix}something.md
 description: one {type} REFERENCE per line — every one must resolve to a standing node of that type, and `none` is a legal answer
 ---

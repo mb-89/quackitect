@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "Verify with fresh eyes against the specs. The verifier is never the builder."
+statement: Verify with fresh eyes against the specs. The verifier is never the builder.
 ---
 
 ## Situation

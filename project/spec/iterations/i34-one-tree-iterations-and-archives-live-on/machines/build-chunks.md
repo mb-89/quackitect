@@ -1,40 +1,48 @@
 ---
 steps:
   - id: rescue-at-risk
-    statement: "every file that exists only inside a worktree is copied onto trunk, and the count is re-measured at the moment it runs"
+    statement: every file that exists only inside a worktree is copied onto trunk, and the count is re-measured at the moment it runs
     depends_on: []
     realization: code
   - id: level-records
-    statement: "every open record's folder stands on trunk, so no path has to reach into .worktrees to find one"
-    depends_on: [rescue-at-risk]
+    statement: every open record's folder stands on trunk, so no path has to reach into .worktrees to find one
+    depends_on:
+      - rescue-at-risk
     realization: code
   - id: status-is-the-open-flag
-    statement: "the six sites that ask the filesystem whether a record is open read the record's own status instead"
-    depends_on: [level-records]
+    statement: the six sites that ask the filesystem whether a record is open read the record's own status instead
+    depends_on:
+      - level-records
     realization: code
   - id: selection-state
-    statement: "a pull carrying no choice enters no iteration — the container answers with the offer and binds nothing"
+    statement: a pull carrying no choice enters no iteration — the container answers with the offer and binds nothing
     depends_on: []
     realization: code
   - id: collapse-record-read
-    statement: "a record is read from one path, and the git retrieval half of readItRecord goes"
-    depends_on: [status-is-the-open-flag]
+    statement: a record is read from one path, and the git retrieval half of readItRecord goes
+    depends_on:
+      - status-is-the-open-flag
     realization: code
   - id: close-leaves-the-folder
-    statement: "a close merges and stops there — the record's folder stays in the working tree and no worktree is removed"
-    depends_on: [collapse-record-read]
+    statement: a close merges and stops there — the record's folder stays in the working tree and no worktree is removed
+    depends_on:
+      - collapse-record-read
     realization: code
   - id: delete-the-seam
     statement: "no call selects between trees: Roots.bound, machineRootOf, fansOut, methodFilesIn, setMethodMirror and fanOutMethod are gone"
-    depends_on: [collapse-record-read]
+    depends_on:
+      - collapse-record-read
     realization: code
   - id: cut-worktrees-from-seed
-    statement: "a seed mints a record folder and nothing else, and minted_in takes a source that does not name a branch"
-    depends_on: [close-leaves-the-folder, delete-the-seam]
+    statement: a seed mints a record folder and nothing else, and minted_in takes a source that does not name a branch
+    depends_on:
+      - close-leaves-the-folder
+      - delete-the-seam
     realization: code
   - id: remove-artefacts
-    statement: "the it/* branches and the claims branch go, main and v2 stay, and the count is re-measured at the moment it runs"
-    depends_on: [cut-worktrees-from-seed]
+    statement: the it/* branches and the claims branch go, main and v2 stay, and the count is re-measured at the moment it runs
+    depends_on:
+      - cut-worktrees-from-seed
     realization: code
 ---
 

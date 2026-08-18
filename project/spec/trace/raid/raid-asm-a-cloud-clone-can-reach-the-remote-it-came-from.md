@@ -3,9 +3,9 @@ minted_in: i35-the-cloud-run-s-findings-land-the-fix-fi
 id: raid-asm-a-cloud-clone-can-reach-the-remote-it-came-from
 type: "[[raid]]"
 kind: assumption
-statement: "A cloud box can reach the git remote its clone came from, so the refs the corpus cites can be fetched after the session has started."
+statement: A cloud box can reach the git remote its clone came from, so the refs the corpus cites can be fetched after the session has started.
 owner: the owner
-trigger: "the first arrival on a box whose network reaches the agent host but not the git remote"
+trigger: the first arrival on a box whose network reaches the agent host but not the git remote
 status: open
 impact: "Every record citing ref: main or ref: v2 stays unreadable, and the arrival degrades to the state i15 ran in. The arrival is built to carry on rather than stop, so the failure is quiet by design and the account is the only thing that reports it."
 breaks_how_badly: abrasive

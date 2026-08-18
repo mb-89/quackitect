@@ -7,8 +7,8 @@ probes:
   - raid-risk-a-write-lands-in-the-wrong-tree-silently
 timebox: one hour
 form: script
-promote: "none — the work is routing the modules that read the filesystem for themselves through the resolver, and lint.ts is the worked example"
-folds_to: "raid-risk-a-write-lands-in-the-wrong-tree-silently moves from risk to issue on two dated instances"
+promote: none — the work is routing the modules that read the filesystem for themselves through the resolver, and lint.ts is the worked example
+folds_to: raid-risk-a-write-lands-in-the-wrong-tree-silently moves from risk to issue on two dated instances
 faked: no satellite exists, so the cross-process half is untested — the shell half ran against the real engine and the real PowerShell
 fallback: a guard per verb plus an audit, which is today's shape and the one the i8 field report records failing
 verdict: holds

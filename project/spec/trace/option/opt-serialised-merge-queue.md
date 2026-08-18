@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: land every branch through one first-in-first-out queue, with conflict resolution tiered by how much judgment it needs
 cluster: cluster-the-record-life
 found_by: prior-art
-source: "How to Run a Multi-Agent Coding Workspace, https://www.augmentcode.com/guides/how-to-run-a-multi-agent-coding-workspace"
+source: How to Run a Multi-Agent Coding Workspace, https://www.augmentcode.com/guides/how-to-run-a-multi-agent-coding-workspace
 ---
 
 ## Mechanism

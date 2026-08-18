@@ -4,13 +4,13 @@ id: dsp-the-goal-binds-the-walk
 type: "[[design-spec]]"
 statement: the iteration's goals travel on the kickoff's own form and every gate below measures its output against each, carried by one item source and one standard round
 realizes:
-  - "el-walk-engine"
+  - el-walk-engine
 files:
-  - "project/deliverable/engine/machine.ts"
-  - "project/deliverable/engine/stateform.ts"
-  - "project/deliverable/engine/rigor-matrix.ts"
-  - "project/deliverable/engine/machines/compile.ts"
-  - "project/deliverable/engine/session.ts"
+  - project/deliverable/engine/machine.ts
+  - project/deliverable/engine/stateform.ts
+  - project/deliverable/engine/rigor-matrix.ts
+  - project/deliverable/engine/machines/compile.ts
+  - project/deliverable/engine/session.ts
 ---
 
 ## The concern

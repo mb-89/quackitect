@@ -3,19 +3,19 @@ minted_in: i1
 id: tsp-lane-file-safety
 type: "[[test-spec]]"
 statement: No lane act destroys committed work and every artifact stays readable text, verified by test over the file and git lanes.
-method: "test"
+method: test
 verifies:
-  - "req-no-agent-act-destroys-work"
-  - "req-every-artifact-is-readable-text"
-  - "req-repo-search-carries-intent"
-  - "req-lane-fixes-what-machines-fix"
+  - req-no-agent-act-destroys-work
+  - req-every-artifact-is-readable-text
+  - req-repo-search-carries-intent
+  - req-lane-fixes-what-machines-fix
 files:
-  - "tests/files.test.ts"
-  - "tests/patchguard.test.ts"
-  - "tests/search.test.ts"
-  - "tests/roots.test.ts"
-  - "tests/gitlane.test.ts"
-  - "tests/lintfix.test.ts"
+  - tests/files.test.ts
+  - tests/patchguard.test.ts
+  - tests/search.test.ts
+  - tests/roots.test.ts
+  - tests/gitlane.test.ts
+  - tests/lintfix.test.ts
 ---
 
 ## Scope

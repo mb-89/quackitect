@@ -6,7 +6,7 @@ statement: resolve an artifact by joining its relative path onto each layer in t
 cluster: the-walk
 question: how an override is matched to what it overrides
 found_by: prior-art
-source: "v1's resolver at product/engine-go/resolver.go, ref main — Resolve() and overlayLayers()"
+source: v1's resolver at product/engine-go/resolver.go, ref main — Resolve() and overlayLayers()
 ---
 
 ## Mechanism

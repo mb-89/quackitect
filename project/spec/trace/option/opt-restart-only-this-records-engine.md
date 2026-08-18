@@ -6,7 +6,7 @@ statement: give each record its own engine process, so an engine change restarts
 cluster: cluster-the-walk
 question: how a change to the engine's own code takes effect
 found_by: transform
-source: "taking opt-one-process-per-record-rooted-by-the-os and asking what it does for a DIFFERENT row than the one it was found for"
+source: taking opt-one-process-per-record-rooted-by-the-os and asking what it does for a DIFFERENT row than the one it was found for
 ---
 
 ## Mechanism

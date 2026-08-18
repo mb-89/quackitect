@@ -2,10 +2,10 @@
 form: generalize-use-cases
 by: agent
 signed_off: 2026-08-17T16:49:33.346Z
-reopened: "2026-08-17T16:49:12.439Z — write-stories re-signed above it with its story count corrected from two to three. The third story is the speed half, so its use case is the one most likely to be missing rather than merely stale."
-amended: "2026-08-17T14:38:03.727Z by agent — the story state re-signed above it; the three use cases stand"
+reopened: 2026-08-17T16:49:12.439Z — write-stories re-signed above it with its story count corrected from two to three. The third story is the speed half, so its use case is the one most likely to be missing rather than merely stale.
+amended: 2026-08-17T14:38:03.727Z by agent — the story state re-signed above it; the three use cases stand
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / generalize-use-cases

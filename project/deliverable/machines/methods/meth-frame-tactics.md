@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "FRAME names five tactic groups for finding options. Each group is a different way to look."
+statement: FRAME names five tactic groups for finding options. Each group is a different way to look.
 ---
 
 ## Situation

@@ -3,7 +3,7 @@ minted_in: i27
 id: raid-iss-outward-search-runs-before-the-architecture-is-chosen
 type: "[[raid]]"
 kind: issue
-statement: "The outward prior-art search runs once at M4, before the architecture is chosen, so any shape decided at M5 or M6 reaches the build with no search of its own."
+statement: The outward prior-art search runs once at M4, before the architecture is chosen, so any shape decided at M5 or M6 reaches the build with no search of its own.
 owner: the owner
 trigger: the next record whose architecture names an element the enumerate-space search never asked about
 status: open

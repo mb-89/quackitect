@@ -3,7 +3,7 @@ form: selection-state
 by: agent
 signed_off: 2026-08-16T07:42:54.195Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / selection-state

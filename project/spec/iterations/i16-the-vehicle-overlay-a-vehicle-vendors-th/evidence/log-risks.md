@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-18T09:57:55.443Z
 reopened: "2026-08-18T09:57:17.088Z — Its headline risk framed taking an update onto a modified copy as unsolved, on a sentence with no evidence behind it. git-subtree's own manual disproves that, and the entry has been rewritten to name the real hazard: inventing a mechanism instead of choosing one."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / log-risks

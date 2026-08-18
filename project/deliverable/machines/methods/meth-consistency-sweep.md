@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "The consistency sweep re-documents everything this iteration changed, wherever it is described. A doc teaching the superseded way is a defect now, not a later surprise."
+statement: The consistency sweep re-documents everything this iteration changed, wherever it is described. A doc teaching the superseded way is a defect now, not a later surprise.
 catalog: sweep_surfaces
 catalog_sections: Surfaces
 ---

@@ -14,7 +14,7 @@ source_refs:
   - uc-drive-a-foreign-product ext 2y
   - sty-drive-somebody-elses-product
   - raid-iss-the-path-jail-has-one-write-target
-  - "product/engine-go/i18_red3.go at ref main"
+  - product/engine-go/i18_red3.go at ref main
 priority: must
 ---
 
