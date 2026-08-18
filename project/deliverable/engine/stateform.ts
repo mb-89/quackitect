@@ -1605,14 +1605,7 @@ export function fieldProblems(
   // It reached gate-candidates with zero candidates drawn and the only
   // complaint was "no references", which reads like a formatting slip rather
   // than the missing work it was.
-  // MORPH-BOX RETURNS WITHOUT `out`, and that is a standing defect rather
-  // than a decision — the template declares `resolves: artifact`, so its
-  // reference problems are computed and discarded exactly as node-table's
-  // were. Adding them turns a drawn chart grey wherever a row names an
-  // option the corpus does not carry, which is the right answer and a
-  // behaviour change. It wants its own ruling; node-table above is the half
-  // that is unambiguous.
-  if (meta.editor === "morph-box") return chartProblems(name, content, corpus);
+  if (meta.editor === "morph-box") return [...out, ...chartProblems(name, content, corpus)];
   const saysNone = /^-?\s*none\b/i.test(content.trim());
   if (saysNone) return out;
   if (meta.editor === "table" && args.columns.length > 0) out.push(...tableProblems(name, args, content));
