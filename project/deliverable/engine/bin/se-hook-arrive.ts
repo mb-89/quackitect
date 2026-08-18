@@ -19,6 +19,10 @@ import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+// THE GREETING IS SHARED WITH THE CAGED HOOK, se-hook-start. Both used to
+// carry their own copy of the pull instruction, which is two sources for one
+// text (2026-08-18).
+import { ARRIVED } from "../pullnotice.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 // The hook is invoked from wherever the host sets cwd, so the root is derived
@@ -65,8 +69,4 @@ if (r.error !== undefined || r.status !== 0) {
 }
 
 say(out);
-say(
-  "[se] THE LANE IS UP AND YOU ARE THE AGENT ON IT. Your FIRST action is se_pull with no payload — `node .se/se-call.mjs se_pull` if you have no se_ tools of your own.\n" +
-    "The machine answers with one instruction: read (the document rides along; prove names its last words — read it, then pull again with form:{read:...}), fill (return the form on the next pull as form:{...}, finish with {submit:true}), choose (answer as form:{choice:...}, and only where one was offered), do (do what the guidance asks, then pull), or wait (say plainly WHICH step waits and stop — the dial alone cannot wake you).\n" +
-    "You carry no hashes and choose nothing unasked. Pull, do, pull again. A pull that answers `do` and does not move wants an se_aim at where you are going. Show any banner to the user VERBATIM.",
-);
+say(ARRIVED);
