@@ -1,7 +1,7 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
      from project/guidance/contract.md b538e8ccc81e
      from project/guidance/walking.md 8d2cebb9bd5a
-     from project/guidance/method/lane.md af784ebc8796
+     from project/guidance/method/lane.md 3c8806c381ef
      from project/guidance/voice.md 0b6faf79ff32
 -->
 
@@ -559,22 +559,31 @@ applying one shape across a tree — these are programs, not readings. Reading
 the files one at a time to answer them costs a hundred calls and gets the
 count wrong.
 
-THE LOOP, and every step of it is already legal:
+THIS IS ENCOURAGED, NOT TOLERATED (owner ruling 2026-08-18). A shell command
+that runs a script is the shell doing what ONLY a shell does. It is not a
+missing lane verb, it is not a smell, and it does not count against you.
 
-1. `se_file_write` the script into `project/scratchpad/`. That folder is the
-   agent's workbench and is never committed, so nothing you put there has to
-   be good, finished, or explained.
-2. `se_run` it: `node project/scratchpad/<name>.mjs`.
-3. Read the answer, change the script, run it again.
+TWO SHAPES, AND BOTH ARE RIGHT.
+
+- INLINE, for a one-off. `node -e '...'` on any host, or a heredoc on POSIX:
+  `python3 - <<'PY' ... PY`. Nothing to clean up, and the whole program is in
+  the call log because the command is.
+- A FILE, for anything you will run twice. `se_file_write` it into
+  `project/scratchpad/` — the workbench, never committed — then `se_run`
+  `node project/scratchpad/<name>.mjs`. Change it and run it again.
+
+DEFAULT TO NODE. The engine runs on it, so it cannot be missing on any host
+the lane runs on. PowerShell is there on Windows and bash on POSIX. Python is
+usually there and is not guaranteed; reach for it when it earns the bet.
 
 THE SCRIPT PRINTS WHAT YOU NEED, so nothing has to be piped. A script that
-answers "how many and which" prints the count and the list itself; that is why
+answers "how many and which" prints the count and the list itself. That is why
 the truncating-pipe refusal never bites this loop.
 
-THE OWNER READS THESE. The write is logged with its full content and the run
-is logged with its full command, so a script that worked once can be found,
-repeated, and promoted into the engine if it earns it. That is the point of
-writing it through the lane rather than in your head.
+THE RETRO READS THESE. Every command is logged in full, so a script that
+worked once can be found, repeated, and promoted into the engine if it earns
+it. Writing it through the lane rather than in your head is what makes it
+survive the session.
 
 Pass this file's rule to every subagent you spawn.
 
