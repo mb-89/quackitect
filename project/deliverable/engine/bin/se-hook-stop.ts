@@ -166,7 +166,24 @@ process.stdin.on("end", () => {
     // the walk has somewhere to be, and "nothing to route" is false whatever
     // the desk answered.
     const target = typeof last.target === "string" ? last.target.trim() : "";
-    if (pull === "wait" && target === "") process.exit(0);
+    // THE DESK WITH NOTHING ROUTED IS THE MACHINE'S OWN STOP, whatever the
+    // pull happened to call it. The desk's own guidance says so in as many
+    // words: "Without a routed goal, stay at the desk and stop."
+    //
+    // IT ANSWERS `do` ON THE TURN THE WALK ARRIVES THERE, because the desk's
+    // guidance is itself work — read the method, sweep the inbox, listen to
+    // the person. Only the NEXT pull answers `wait`.
+    //
+    // SO THE TOOTH BIT A SANCTIONED STOP (owner, 2026-08-17), one call after
+    // an iteration shipped and the walk landed at the desk. The agent had
+    // already named which sanctioned stop applied and stopped anyway. The
+    // owner's words: "when you're on the front desk after an iteration, you
+    // just stop. You don't keep going."
+    //
+    // THE TARGET HALF STILL BINDS. A routed goal is a standing instruction,
+    // and the desk is not a hiding place from one.
+    const atDesk = at.split(",").some((w) => w.trim() === "front_desk");
+    if (target === "" && (pull === "wait" || atDesk)) process.exit(0);
     const where = at;
     const aimed = pull === "wait";
     // WHAT THE NOTCH IS ASKING FOR, said in the refusal rather than left for

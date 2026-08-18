@@ -54,6 +54,24 @@ test("the machine's own wait passes — idle, the desk, or a step above the slid
   assert.equal(verdict([pullRecord({ pull: "wait", where: ["front_desk"] })], {}), "");
 });
 
+// THE DESK ANSWERS `do` ON THE TURN THE WALK ARRIVES (owner, 2026-08-17,
+// one call after an iteration shipped): "when you're on the front desk after
+// an iteration, you just stop. You don't keep going."
+//
+// Only `wait` used to pass, and the desk answers `wait` only on the pull
+// AFTER arriving — because its own guidance is work. So the shape
+// "iteration ships -> lands at the desk -> stop" could not be expressed, and
+// the tooth bit a stop the agent had already named as sanctioned.
+
+test("the desk with nothing routed passes, whatever the pull called it", () => {
+  assert.equal(verdict([pullRecord({ pull: "do", where: ["front_desk"], target: "" })], {}), "");
+});
+
+test("the desk with a target set still blocks — a routed goal is a standing instruction", () => {
+  const out = verdict([pullRecord({ pull: "do", where: ["front_desk"], target: "iterations/i34/shipped" })], {});
+  assert.equal(JSON.parse(out).decision, "block", "the desk is not a hiding place from a goal the person routed");
+});
+
 // THE STOP-AT NOTCH DECIDES (owner design 2026-08-16, machines/stopat.md).
 //
 // One fixed rule was right about eight stops in a day and wrong about five,
