@@ -1,6 +1,26 @@
 ---
 id: i17-the-options-pool-triage-a-raw-note-into-
-status: open
+status: shipped
+closed: 2026-08-18T11:44:17.171Z
+carried_count: 17
+carried:
+  - tsp-one-door-into-the-pool — raid-asm-the-drain-is-the-only-door-into-the-pool (observe-red.md)
+  - tsp-desk-and-gates — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (observe-red.md)
+  - tsp-tour-run — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (observe-red.md)
+  - tsp-panel-walkthrough — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (observe-red.md)
+  - tsp-two-machines — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (observe-red.md)
+  - tsp-first-run — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (observe-red.md)
+  - tsp-a-slow-signal-keeps-the-wait — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (observe-red.md)
+  - tsp-record-inspection — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (observe-red.md)
+  - tsp-derivation-analysis — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (observe-red.md)
+  - tsp-desk-and-gates — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (verification.md)
+  - tsp-tour-run — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (verification.md)
+  - tsp-panel-walkthrough — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (verification.md)
+  - tsp-two-machines — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (verification.md)
+  - tsp-first-run — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (verification.md)
+  - tsp-a-slow-signal-keeps-the-wait — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (verification.md)
+  - tsp-record-inspection — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (verification.md)
+  - tsp-derivation-analysis — raid-debt-ten-checks-wait-on-a-person-or-a-second-machine (verification.md)
 started: 2026-08-18T08:50:21.611Z
 opened: 2026-08-12T19:44:00.806Z
 goal: "The options pool: triage a raw note into a committed, rewritten item that travels — so the pool survives a discarded experiment and every machine can see what it may pull from."
