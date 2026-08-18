@@ -1,4 +1,5 @@
 ---
+minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: cand-fast-path-plus-blocking
 type: "[[candidate]]"
 name: "Fast path plus blocking"

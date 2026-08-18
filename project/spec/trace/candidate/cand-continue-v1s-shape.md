@@ -1,4 +1,5 @@
 ---
+minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: cand-continue-v1s-shape
 type: "[[candidate]]"
 name: "Continue v1's shape"

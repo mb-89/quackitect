@@ -6,6 +6,7 @@ statement: When a call violates a rule the engine holds, the engine shall preven
 kind: quality
 characteristic: reliability
 verify_method: test
+fitness_candidate: true
 breaks_if_removed: A wrong act reports success, so every guarantee the lane makes becomes a claim nobody can check, and the failure is found at a merge or never.
 breaks_how_badly: fatal
 measure: 0 violating calls that complete reporting success, across the named classes, each class carrying its own test.

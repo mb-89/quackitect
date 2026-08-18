@@ -12,11 +12,12 @@ refines:
 source_refs:
   - uc-vendor-and-overlay ext 6a
   - ".se/req-mine-v1.md: refusals and honesty (a cache miss is labeled distinctly from a failure)"
-  - uc-vendor-and-overlay ext 1a
+  - uc-vendor-and-overlay ext 3a
   - ".se/req-mine-v2.md: dependencies and the ship review (divergence is mechanically detected; diverged never flips silently)"
 priority: should
 weighs_against:
   - req-open-notes-stay-visible >
+  - req-the-source-keeps-no-record-of-a-copy > — a silent fallback is the DEFAULT behaviour of any naive implementation, so it bites without anybody choosing it; a registry of copies requires somebody to build one first
 ---
 
 ## Detail
@@ -24,4 +25,5 @@ weighs_against:
 Each drift it names:
 
 - When an overlay entry names an identity the loaded engine version no longer provides, the pull shall report that identity as unresolved instead of serving the engine's default.
-- When the engine loads over a vendored folder whose content differs from the shipped snapshot, the engine shall report every diverged path.
+- When a copy's content differs from the version it was copied from, the system shall be able to report every differing path, AS A STATEMENT OF WHAT THIS COPY HAS CHANGED rather than as a fault. A copy's owner may change anything it carries, so divergence here is the ordinary case and not an alarm.
+- Where an update is about to land, that same report is what makes the update decidable: it is the only thing that can say which of the copy's own changes the update touches.

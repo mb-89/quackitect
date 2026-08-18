@@ -9,7 +9,7 @@ trigger: any agent-chosen test scope, or a verification serving a spec the recor
 status: decided
 impact: an agent choosing scope tests to reassure rather than to answer, and a verification that serves the whole product every record makes nine claims owed at a time until the owed list means nothing.
 breaks_how_badly: crippling
-how_likely: certain
+how_likely: expected
 weighs_with: none
 weighs_against: none
 source_refs:

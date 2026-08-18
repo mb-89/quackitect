@@ -9,7 +9,7 @@ trigger: any escape from inside a record, or any gate that is blessed and still 
 status: decided
 impact: without these the walk reaches states with no legal move, and the only exit unbinds the record to fix a two-line problem. Three escapes in one walk of i11, each costing an unbind and a four-call re-entry.
 breaks_how_badly: crippling
-how_likely: certain
+how_likely: expected
 weighs_with: none
 weighs_against: none
 source_refs:

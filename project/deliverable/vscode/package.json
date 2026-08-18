@@ -59,6 +59,16 @@
         "icon": "$(question)"
       },
       {
+        "command": "$PRODUCT_ID$.createVehicle",
+        "title": "$PRODUCT$: Make a Copy of This System",
+        "icon": "$(repo-clone)"
+      },
+      {
+        "command": "$PRODUCT_ID$.createProject",
+        "title": "$PRODUCT$: Start a Project This System Drives",
+        "icon": "$(new-folder)"
+      },
+      {
         "command": "$PRODUCT_ID$.help",
         "title": "$PRODUCT$: What This Is",
         "icon": "$(question)"

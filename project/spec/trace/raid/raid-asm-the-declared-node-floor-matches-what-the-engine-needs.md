@@ -8,8 +8,8 @@ owner: the owner
 trigger: "already fired — measured false at the edge on 2026-08-17"
 status: open
 impact: "A floor set above what the engine needs refuses hosts that would have run it. Measured: this box's default runtime is 22.22, the pin demands 24, and the engine's full battery passes on 22."
-breaks_how_badly: annoying
-how_likely: certain
+breaks_how_badly: abrasive
+how_likely: expected
 probe: "false at the edge. i35 on 2026-08-17: the engine declares >=24.0.0 and its full battery passes on v22.22.2 at 1391 tests, 1387 green. The only extra failures against node 24 are the two floor assertions themselves plus one known flake. The floor the evidence supports is >=22.18.0. NOT CHANGED: lowering a declared pin is the owner's act."
 probed: 2026-08-17
 source_refs:

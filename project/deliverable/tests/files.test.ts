@@ -92,7 +92,19 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   // read once per run to answer one question — did the bookkeeping land. The
   // read is the POINT: it is what makes a silent instrument failure visible,
   // and routing it through a note door would share a parse with nobody.
-  const CEILING = 105;
+  // 106 since 2026-08-18: paths.ts reads an identity file — brand.json for a
+  // tree's own id, upstream.json for the id it was produced from. Two tiny
+  // JSON objects, and the brand one is read in a FOREIGN tree that is not this
+  // vault at all, so no note door could serve it even in principle. What the
+  // read decides is whether a write target is the tree this system came from,
+  // which is the one law a vehicle may never breach.
+  // 110 since 2026-08-18: produce.ts reads four files direct — the brand fact
+  // of the tree it is producing from, the README template it renders, the
+  // brand fact again when it has to mint its own identity, and a driven
+  // record. None is a note. Two of them are read in trees that are not this
+  // vault at all, and the README template is a template rather than a node, so
+  // no door could share a parse with any of them.
+  const CEILING = 110;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {

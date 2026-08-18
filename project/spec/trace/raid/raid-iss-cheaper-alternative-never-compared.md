@@ -13,7 +13,7 @@ how_likely: expected
 source_refs:
   - raid-dec-two-layer-auth
   - cand-thin-worktree
-  - req-engine-folder-is-sealed
+  - req-nothing-a-copy-does-reaches-its-source
 ---
 
 ## What was already decided

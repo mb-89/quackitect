@@ -31,6 +31,7 @@ import { McpServer, requestContextAdapter, type ToolDef } from "./mcp.ts";
 import { ModelFileSystem } from "./model-fs.ts";
 import { openPanel } from "./panel.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
+import { produceProject, produceVehicle } from "./produce.ts";
 import { type MirrorState, renderMirror } from "./render.ts";
 import { resolve as resolveSeam } from "./resolve.ts";
 import { jobDone, jobList, jobStatus, jobStop, runBackground, runToCompletion, startJob } from "./run.ts";
@@ -204,6 +205,49 @@ export function sessionTools(session: Session): ToolDef[] {
           `node --experimental-strip-types project/deliverable/engine/bin/format-vault.ts${args.check === true ? " --check" : ""}`,
           {},
         ),
+    },
+    // THE TWO PRODUCING ACTS, AS LANE VERBS (dsp-the-producing-acts).
+    //
+    // THE SHIPPED EXPORT IS A SCRIPT THE JAIL NEVER SEES, and its guards are
+    // hand-written checks that nothing else inherits. Reaching the acts through
+    // the lane makes them logged, refused before they half-produce, and bounded
+    // by the tree they are producing — which is what a button can be built on.
+    {
+      name: "se_produce_vehicle",
+      title: "se.produce.vehicle",
+      description:
+        "MAKE A VEHICLE — a complete independent copy of this system under a new name, in a repository of its own. It copies the tree, leaves this tree's own records at home, writes the new name once, records the identity it came from, and makes one commit. IT REACHES THE ORIGINAL BY NO MECHANISM AT ALL: the upstream file names an identity and a version, never an address, so there is nothing to fetch from and nothing to push to. REFUSES BEFORE WRITING ANYTHING if the destination is not empty, or a name or abbreviation is missing — there is no fallback to this product's own name, because a forgotten argument would ship it to somebody else under ours.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          dest: { type: "string", description: "an EMPTY folder to produce into, or one that does not exist yet" },
+          name: { type: "string", description: "what to call it, e.g. 'Blue Heron'" },
+          abbr: { type: "string", description: "two or three letters, e.g. BH" },
+        },
+        required: ["dest", "name", "abbr"],
+      },
+      handler: async (args) =>
+        produceVehicle(
+          session.workRoot(),
+          { dest: String(args.dest), name: String(args.name), abbr: String(args.abbr) },
+          "se_produce_vehicle",
+        ),
+    },
+    {
+      name: "se_produce_project",
+      title: "se.produce.project",
+      description:
+        "MAKE A PROJECT THIS SYSTEM DRIVES — a tree for work that is not the system's own, carrying none of the method and one record saying which copy drives it. The record names an identity and a version, NEVER a path, so moving either tree changes nothing. A tree with no such record is not a driven project, and the system says so rather than guessing. REFUSES BEFORE WRITING ANYTHING if the destination is not empty or the name is missing.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          dest: { type: "string", description: "an EMPTY folder to produce into, or one that does not exist yet" },
+          name: { type: "string", description: "what to call the project" },
+        },
+        required: ["dest", "name"],
+      },
+      handler: async (args) =>
+        produceProject(session.workRoot(), { dest: String(args.dest), name: String(args.name) }, "se_produce_project"),
     },
     {
       name: "se_aim",

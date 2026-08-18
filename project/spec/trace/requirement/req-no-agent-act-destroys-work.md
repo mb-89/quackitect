@@ -6,6 +6,7 @@ statement: While an agent walks at any autonomy setting, the engine shall leave 
 kind: quality
 characteristic: safety
 verify_method: test
+fitness_candidate: true
 breaks_if_removed: An unattended night can end with committed work gone and no way back, which makes the unattended walk unsafe to leave.
 breaks_how_badly: crippling
 measure: 0 agent-reachable operations that make committed content unrecoverable from git, across the whole lane surface.

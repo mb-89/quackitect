@@ -256,6 +256,94 @@ async function api(pathname, init) {
 const post = (pathname, body) =>
   api(pathname, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
 
+/**
+ * THE TWO PRODUCING ACTS, AS BUTTONS.
+ *
+ * The owner's ruling of 2026-08-18: "One button to create a vehicle, one button
+ * to create a new project. These buttons need to ask for whatever they need,
+ * and they need to open whatever they created in a new window."
+ *
+ * NEITHER TAKES A PATH FROM A SETTINGS FILE. The person names the place at the
+ * moment they press it, which is what makes the act theirs rather than the
+ * configuration's.
+ */
+async function produceTree(kind, name, dest, abbr) {
+  // A TREE COPY TAKES LONGER THAN THE ORDINARY CALL BUDGET, so this call gets
+  // its own. And it shows progress from the first moment: silence reads as
+  // breakage, and this is the longest thing any button here does.
+  const answer = await vscode.window.withProgress(
+    { location: vscode.ProgressLocation.Notification, title: `Making ${name}…`, cancellable: false },
+    () =>
+      api("/produce", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ kind, dest, name, abbr }),
+        signal: AbortSignal.timeout(180000),
+      }),
+  );
+  if (answer === null) {
+    vscode.window.showErrorMessage(`${name} was not made — the engine did not answer. Is it running?`);
+    return;
+  }
+  if (answer.ok !== true) {
+    // A REFUSAL SAYS WHY, in the machine's own words. The engine hands back its
+    // typed rejection, so the button repeats it rather than inventing a softer
+    // sentence that tells the person nothing they can act on.
+    const why = answer.expected
+      ? `Expected ${answer.expected}, got ${answer.got}.`
+      : String(answer.error ?? "the engine refused and said nothing more");
+    vscode.window.showErrorMessage(`${name} was not made. ${why}`);
+    return;
+  }
+  // IT ENDS WITH THE BUILDER INSIDE THE RESULT, in a NEW window. The window
+  // they pressed it from is left exactly as they left it.
+  await vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(answer.result.dest), { forceNewWindow: true });
+}
+
+async function askForAnEmptyFolder(title) {
+  const picked = await vscode.window.showOpenDialog({
+    canSelectFolders: true,
+    canSelectFiles: false,
+    canSelectMany: false,
+    openLabel: "Make it here",
+    title,
+  });
+  return picked === undefined || picked.length === 0 ? null : picked[0].fsPath;
+}
+
+async function createVehicle() {
+  const dest = await askForAnEmptyFolder("An EMPTY folder for the new copy");
+  if (dest === null) return;
+  const name = await vscode.window.showInputBox({
+    title: "What is it called?",
+    prompt: "The whole system takes this name",
+    placeHolder: "Blue Heron",
+    ignoreFocusOut: true,
+  });
+  if (!name) return;
+  const abbr = await vscode.window.showInputBox({
+    title: "The short name",
+    prompt: "Two or three letters",
+    placeHolder: "BH",
+    ignoreFocusOut: true,
+    validateInput: (v) => (v.trim().length >= 2 && v.trim().length <= 3 ? null : "two or three letters"),
+  });
+  if (!abbr) return;
+  await produceTree("vehicle", name, dest, abbr);
+}
+
+async function createProject() {
+  const dest = await askForAnEmptyFolder("An EMPTY folder for the new project");
+  if (dest === null) return;
+  const name = await vscode.window.showInputBox({
+    title: "What is the project called?",
+    prompt: "The work goes in its own tree, and this system drives it",
+    ignoreFocusOut: true,
+  });
+  if (!name) return;
+  await produceTree("project", name, dest, "");
+}
+
 async function probeServer() {
   const body = await api("/api/alive");
   engineUp = body !== null;
@@ -1923,6 +2011,8 @@ function activate(context) {
     vscode.commands.registerCommand("$PRODUCT_ID$.help", () => void showHelp("$PRODUCT$", systemHelp(), true)),
     vscode.commands.registerCommand("$PRODUCT_ID$.startAgent", withHelp("$PRODUCT_ID$.startAgent", startAgent)),
     vscode.commands.registerCommand("$PRODUCT_ID$.howToAttach", showAttach),
+    vscode.commands.registerCommand("$PRODUCT_ID$.createVehicle", () => void createVehicle()),
+    vscode.commands.registerCommand("$PRODUCT_ID$.createProject", () => void createProject()),
     vscode.commands.registerCommand("$PRODUCT_ID$.expandDetails", () => void expandDetails()),
     vscode.window.onDidChangeActiveColorTheme(() => {
       strip.render();

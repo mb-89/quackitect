@@ -19,7 +19,6 @@ satisfies:
   - req-overlay-resolution
   - req-overlay-survives-update
   - req-overlay-drift-reported
-  - req-engine-folder-is-sealed
   - req-setup-serves-shipped-method
   - req-method-reuse-is-vendoring
   - req-an-engine-change-applies-in-its-own-record

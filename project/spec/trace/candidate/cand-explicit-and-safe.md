@@ -1,4 +1,5 @@
 ---
+minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: cand-explicit-and-safe
 type: "[[candidate]]"
 name: "Explicit and safe"

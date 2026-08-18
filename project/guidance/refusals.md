@@ -155,6 +155,61 @@ not apply is worse than none.
 `@name` reaches only roots the owner declared in `.se/roots.json`. Ask the
 owner before declaring one.
 
+### SE-C-140 — the write target is the tree this one came from
+A declared root may be made writable, and that is how this system drives a
+project that is not itself. What it may never reach is the tree it was
+produced from.
+
+THE CHECK IS ON IDENTITY, NOT ON A PATH. A vehicle records the identity of the
+engine it came from. Every tree states its own. The two are compared, so
+moving, copying or renaming either tree changes nothing.
+
+IT FAILS CLOSED. Where the identity file exists but cannot be read, the guard
+cannot prove the target is safe and refuses on the same clause. A guard going
+quiet looks exactly like a guard passing, and this is the one law a vehicle may
+never breach.
+
+THE ENGINE ITSELF IS NEVER AFFECTED. It was produced from nothing and has no
+upstream file, so the guard has nothing to say and returns at once.
+
+### SE-C-141 — the write left the tree this act is producing
+An act that produces a tree is bounded BY that tree while it runs. This is not
+SE-C-102 wearing a different number: a write that left the act's bound is a
+different fault from one that left the project, and the two are told apart so
+the mechanism can be debugged.
+
+THE BOUND BEATS THE ORDINARY ROUTING, for writes only. Method and session
+paths normally resolve to the machine root whatever is bound. During
+production that would write the ENGINE while the engine was being copied, so
+the act's bound wins.
+
+READS ARE NEVER BOUNDED. The act copies FROM the engine, so bounding its reads
+would leave it unable to read the thing it is reproducing.
+
+THE BOUND IS A PROPERTY OF THE ACT, never a mode. It is torn down when the act
+ends, including when the act throws, and a second act cannot open one while
+one is open — a nested bound silently narrows the outer act's guarantee.
+
+### SE-C-142 — the producing act stopped before writing anything
+Making a vehicle or a project refuses rather than half-producing. A half-made
+tree is worse than none, because the half looks finished.
+
+FOUR THINGS STOP IT, all before the first byte:
+
+- The destination is not empty. Name an empty folder, or an absent one.
+- The name is missing, or the abbreviation is not two or three letters.
+- The name has no letters or digits to make an id from.
+- The tree it is producing FROM cannot say what it is called.
+
+THERE IS NO FALLBACK TO THIS PRODUCT'S OWN NAME, on purpose. A forgotten
+argument would otherwise ship this product to somebody else under our name,
+which is the failure the shipped export learned from.
+
+IT ALSO FIRES ON A MALFORMED DRIVEN RECORD. A record nobody can read must
+never pass for a tree that has none — that would turn a broken file into the
+answer "this is not a driven project", which is a wrong answer rather than an
+absent one.
+
 ### SE-C-132 — a raw NUL byte in text
 A NUL makes the whole file unsearchable. In code, write the escape sequence.
 

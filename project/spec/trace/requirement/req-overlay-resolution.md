@@ -27,7 +27,7 @@ weighs_against:
 
 The layering, whole:
 
-- Where a builder declares an overlay folder in the host repository, the engine shall load guidance, method cards and rigor rows from that folder with zero changes to files under the engine's folder.
+- Where a copy declares an overlay location, the system shall load method artifacts from it with zero changes to the artifacts they override.
 - The engine shall serve zero method artifacts that an overlay file cannot replace.
 - The engine and the builder overlay shall resolve method artifacts through one shared identity scheme, where a card's identity alone decides which engine card it replaces.
 

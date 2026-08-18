@@ -193,3 +193,102 @@ test("a repo-root file reads back from the root", () => {
   assert.equal(readBack, "root body");
   assert.equal(store, ROOT);
 });
+
+// -------------------------------------------- the bound that travels
+
+// AN ACT THAT PRODUCES A TREE IS BOUNDED BY THE TREE IT IS PRODUCING, for the
+// duration of that act and no longer
+// (raid-dec-a-producing-act-is-bounded-by-the-tree-it-produces). The rule does
+// not change — every act writes inside one tree and nowhere else. What changes
+// is that WHICH tree is asked rather than assumed.
+//
+// RED UNTIL chunk-travelling-bound LANDS.
+
+test("a write during a producing act lands in the tree being produced", async () => {
+  const { withActBound } = await import("../engine/resolve.ts");
+  const produced = mkdtempSync(join(tmpdir(), "se-produced-"));
+  // A METHOD PATH ON PURPOSE. Method resolves to the machine root whatever is
+  // bound, which is correct during a walk and catastrophic during production:
+  // it would write the ENGINE while copying it. The act's bound has to beat
+  // the kind routing, and this case is where that is proved.
+  const landed = withActBound(produced, "test", () => seam(ROOT, GUIDE, "test").abs);
+  assert.ok(landed.startsWith(produced), `the act's bound must answer, and the write went to ${landed}`);
+});
+
+test("a write outside the act's bound is refused, naming the tree being produced", async () => {
+  const { withActBound } = await import("../engine/resolve.ts");
+  const produced = mkdtempSync(join(tmpdir(), "se-produced-"));
+  let said = "";
+  try {
+    withActBound(produced, "test", () => seam(ROOT, join(tmpdir(), "somewhere-else.md"), "test"));
+  } catch (e) {
+    const r = e as { expected?: string; got?: string };
+    said = `${r.expected ?? ""} ${r.got ?? ""} ${String((e as Error).message ?? "")}`;
+  }
+  // A WRITE THAT LEFT THE ACT'S BOUND IS A DIFFERENT FAULT from one that left
+  // the project, and telling them apart is what makes the mechanism
+  // debuggable. So the refusal has to name the tree the act is producing.
+  assert.ok(
+    said.includes(produced),
+    `the refusal must name the tree being produced — it said: ${said.trim() || "nothing, it did not refuse"}`,
+  );
+  assert.ok(
+    /produc/i.test(said),
+    `and it must say the bound came from a producing act — it said: ${said.trim() || "nothing, it did not refuse"}`,
+  );
+});
+
+test("a READ during a producing act still reaches the tree being copied", async () => {
+  const { withActBound } = await import("../engine/resolve.ts");
+  const produced = mkdtempSync(join(tmpdir(), "se-produced-"));
+  const read = withActBound(produced, "test", () => seam(ROOT, GUIDE, "test", true).abs);
+  assert.ok(read.startsWith(ROOT), `the act copies FROM the engine, so a read must not be bounded by what it produces — it read ${read}`);
+});
+
+test("the bound is torn down even when the act fails", async () => {
+  const { withActBound } = await import("../engine/resolve.ts");
+  const produced = mkdtempSync(join(tmpdir(), "se-produced-"));
+  assert.throws(
+    () =>
+      withActBound(produced, "test", () => {
+        throw new Error("the act failed");
+      }),
+    /the act failed/,
+  );
+  // AN ACT THAT OPENS A BOUND AND FAILS MUST LEAVE NOTHING BOUND BEHIND, or
+  // the bound stops being a property of the act and becomes a mode somebody
+  // left switched on.
+  const after = seam(ROOT, "project/spec/thing.md", "test").abs;
+  assert.ok(after.startsWith(ROOT), `an ordinary write after a failed act must be back on the project root, and it went to ${after}`);
+});
+
+test("a second act cannot open a bound while one is open", async () => {
+  const { withActBound } = await import("../engine/resolve.ts");
+  const a = mkdtempSync(join(tmpdir(), "se-produced-a-"));
+  const b = mkdtempSync(join(tmpdir(), "se-produced-b-"));
+  assert.throws(
+    () => withActBound(a, "test", () => withActBound(b, "test", () => 0)),
+    "one act names one tree; a nested bound is how a write lands in the wrong one",
+  );
+});
+
+// WHERE THE BOUND IS ENFORCED, which is not where it is most obvious.
+//
+// Measured 2026-08-18: the seam is imported by engine/tools.ts and by this
+// file, and tools.ts reaches it twice, both times for se_lint READS. Every
+// file WRITE verb calls resolveInRoot directly. A bound placed only at the
+// seam would therefore guard two reads and nothing else.
+
+test("the bound catches the jail every write verb calls, not only the seam", async () => {
+  const { withActBound } = await import("../engine/resolve.ts");
+  const produced = mkdtempSync(join(tmpdir(), "se-produced-"));
+  const landed = withActBound(produced, "test", () => paths.resolveInRoot(ROOT, "project/spec/thing.md", "test"));
+  assert.ok(landed.startsWith(produced), `resolveInRoot must honour the act's bound, and the write went to ${landed}`);
+});
+
+test("a read stays unbounded even though it shares the containment rule", async () => {
+  const { withActBound } = await import("../engine/resolve.ts");
+  const produced = mkdtempSync(join(tmpdir(), "se-produced-"));
+  const read = withActBound(produced, "test", () => paths.resolveForRead(ROOT, GUIDE, "test"));
+  assert.ok(read.startsWith(ROOT), `resolveForRead must stay on the project root during an act, and it read ${read}`);
+});

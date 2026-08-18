@@ -9,9 +9,9 @@ trigger: any M4 evaluate-set whose front is narrower than three, and any elimina
 status: open
 impact: A candidate leaves the set on a score that a second reader would have put one band higher. Nothing downstream can recover it, because M5 composes from the front and never revisits the eliminated.
 breaks_how_badly: abrasive
-how_likely: plausible
-probe: "probed for this iteration and it holds here. The eliminated candidate needs a two-band swing to re-enter, which is larger than the anchors' own ambiguity. Not probed for the general case."
-probed: "2026-08-15"
+how_likely: expected
+probe: "FALSIFIED in i16 on 2026-08-18, on this entry's own stated terms. It held in i28, where the margin was two bands. i16's elimination turned on ONE band and the second pass reversed it."
+probed: "2026-08-18"
 source_refs:
   - meth-scoring-anchors
   - meth-set-based-pareto
@@ -52,4 +52,56 @@ would not change an answer.
 THE MARGIN IS THE ANSWER, NOT THE COUNT. A wide gap needs one reader and a
 narrow one needs more, which is cheaper than a second pass every time.
 
-Nothing has gone wrong yet. This iteration's margin is wide.
+This entry was written in i28, whose margin was wide.
+
+## FALSIFIED IN i16, 2026-08-18
+
+THE NAMED FALSIFIER FIRED. This entry says it plainly: "an elimination that
+turns on a ONE-band gap. There the assumption gives no margin at all, and a
+second scorer is owed before the candidate is dropped."
+
+i16's ELIMINATION TURNED ON EXACTLY ONE BAND. The incumbent held 5 on whether
+method reuse is vendoring; its nearest rival held 4. Nothing could dominate it
+while that cell stood.
+
+A SECOND PASS MOVED THAT ONE CELL AND THE FRONT CHANGED. The first scorer had
+written 22 cells at 4 or 5 with no named comparison, which the anchors forbid
+outright. Sent back with the naming rule enforced, it brought nine cells down,
+including that 5 to a 4. The lead vanished and domination followed in the same
+pass.
+
+## What it got wrong, precisely
+
+THE FAILURE RAN THE OTHER WAY FROM THE ONE THIS ENTRY GUARDS. Its stated impact
+is a candidate leaving the set on a score a second reader would have raised. What
+happened is a candidate STAYING in the set on a score a second reader lowered.
+
+SO THE RISK IS SYMMETRIC AND THIS ENTRY SAW ONLY HALF OF IT. A single pass can
+wrongly keep as easily as it can wrongly drop, and wrongly keeping is worse
+here: M5 composes from the front, so a survivor that should not be there gets
+real work spent on it.
+
+## The margin is not the whole answer either
+
+THIS ENTRY'S OWN REMEDY IS "THE MARGIN IS THE ANSWER, NOT THE COUNT" — a wide
+gap needs one reader, a narrow one needs more.
+
+THAT IS STILL RIGHT AND IT IS NOT SUFFICIENT. The margin cannot be read until
+the scores exist, and the scores are what is in doubt. In i16 the apparent
+margin was one band on the incumbent and comfortable everywhere else, so a
+margin check would have called for a re-score of one row rather than the 22
+that actually needed it.
+
+WHAT ACTUALLY CAUGHT IT was a rule the anchors already carry and nothing
+enforced: no named comparison, no score above 3. Nine cells failed it.
+
+## What should happen
+
+- THE SUBMIT SHOULD REFUSE a score table carrying a 4 or a 5 with an empty
+  prior_art cell. The rule is written in the guidance and nothing checks it.
+  note-9c904fe90b17 carries this.
+- THE MARGIN CHECK STAYS, as this entry proposed, but it is the second line of
+  defence rather than the first.
+
+EVIDENCE: iterations/i16 evidence evaluate-set, the scores table and the
+elimination paragraph of the reading.

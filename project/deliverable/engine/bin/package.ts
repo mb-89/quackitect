@@ -1,15 +1,16 @@
 // Assemble the shippable package: the working tree, minus what stays home,
 // zipped under dist/ as <id>-<version>.zip.
 //
-// The exclusions mirror RUNME's --export: history, session state, records
+// The exclusions mirror the producing act's: history, session state, records
 // and installed dependencies stay home. The README inside is rendered from
-// brand/README.entry.md, the same template the export renders, so the two
+// brand/README.entry.md, the same template the act renders, so the two
 // front doors cannot drift apart.
 import { spawnSync } from "node:child_process";
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, relative, resolve, sep } from "node:path";
+import { join, resolve } from "node:path";
 import { loadBrand } from "../brand.ts";
+import { travels } from "../produce.ts";
 
 function arg(name: string): string | undefined {
   const i = process.argv.indexOf(name);
@@ -32,49 +33,19 @@ const brand = loadBrand(root);
 const version = String(JSON.parse(readFileSync(join(root, "project", "deliverable", "package.json"), "utf8")).version);
 const outDir = arg("--out") ?? join(root, "dist");
 
-// By NAME wherever it appears, the same list the export excludes.
-const EXCLUDE_DIRS = new Set([
-  ".git",
-  ".worktrees",
-  ".se",
-  "node_modules",
-  ".claude",
-  ".copilot",
-  "dist",
-  ".obsidian",
-  ".vscode",
-  ".github",
-  "scratchpad",
-]);
-const EXCLUDE_FILES = new Set([".git", ".mcp.json", "Thumbs.db", ".DS_Store"]);
+// THE LIST LIVES IN ONE PLACE NOW, engine/produce.ts, and both the packaging
+// script and the producing act call it.
+//
+// THE COMMENT HERE USED TO SAY "the same list the export excludes" while they
+// were in fact two lists, and the difference was 20.8 MB of release archives
+// travelling into every produced vehicle plus the one file below that must not
+// be dropped. A comment cannot make two lists agree; only calling one function
+// can. Found by the i16 tester, 2026-08-18.
 
 const stage = mkdtempSync(join(tmpdir(), "se-package-"));
 cpSync(root, stage, {
   recursive: true,
-  filter: (src) => {
-    const rel = relative(root, src);
-    if (rel === "" || rel.startsWith("..")) return rel === "";
-    const parts = rel.split(sep);
-    // THE ROOT .claude IS THE ONE EXCEPTION, and it is the wire without which
-    // the arrival hook is dead weight (i35, 2026-08-17).
-    //
-    // .claude is excluded BY NAME wherever it appears, which is right for
-    // project/.claude — that one is GENERATED, placed by the arrival or the
-    // editor, and gitignored. The repository root carries a different file:
-    // it is committed, and it is the only thing a fresh clone reads at session
-    // start, so it is what fires se-hook-arrive.
-    //
-    // FOUND BY USING THE PACKAGE RATHER THAN BUILDING IT. The 4.5.0 archive
-    // carried both arrival scripts and nothing that called them, so a receiver
-    // would have shipped a product whose headline feature never fires.
-    if (rel === ".claude" || parts[0] === ".claude") {
-      // fall through — the root one travels
-    } else if (parts.some((p) => EXCLUDE_DIRS.has(p))) return false;
-    if (EXCLUDE_FILES.has(parts[parts.length - 1])) return false;
-    // The records stay home: they describe work the receiver never did.
-    if (parts[0] === "project" && parts[1] === "spec") return false;
-    return true;
-  },
+  filter: (src) => travels(root, src),
 });
 // The machine writes its records here, so the home exists from the start.
 mkdirSync(join(stage, "project", "spec"), { recursive: true });

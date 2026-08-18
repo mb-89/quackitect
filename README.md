@@ -76,21 +76,30 @@ time; until that rendering moves to activation time, this row stands.
 
 ## Give it to someone else
 
-The export makes a fresh copy under a new name, carrying no history.
+Open the command palette and run **Make a Copy of This System**.
 
-```powershell
-.\RUNME.ps1 --export C:\path\to\empty "Blue Heron" BH
-```
+It asks for three things:
 
-All three arguments are required. There is no default, because a forgotten
-argument would ship this project's own name to somebody else.
+- An empty folder to make it in, or one that does not exist yet.
+- The name, which is what a person reads on every surface.
+- A short name of two or three letters, which becomes the button in the editor.
 
-- The folder must be empty, or not exist yet.
-- The name is what a person reads on every surface.
-- The abbreviation is two or three letters. It becomes the button in the editor.
+All three are required. There is no default, because a forgotten argument would
+ship this project's own name to somebody else.
 
-The copy carries the engine, the machines, the guidance and the workspace.
-It starts as a fresh git repository with one commit on `main`.
+The copy carries the engine, the machines, the guidance and the workspace. It
+starts as a fresh git repository with one commit on `main`, and it records the
+identity it came from. It can reach this repository by no mechanism at all.
+
+When it is made, it opens in a new window. This one is left as you left it.
+
+## Start a project it drives
+
+Open the command palette and run **Start a Project This System Drives**.
+
+The work lives in its own tree, carrying none of the method. One small file in
+it says which copy drives it, by identity rather than by location, so moving
+either tree changes nothing.
 
 Four things stay home:
 

@@ -6,7 +6,8 @@ kind: assumption
 statement: "A host fires its SessionStart hooks and waits for them before the agent's first turn, so an arrival wired there has completed by the time the agent acts."
 owner: the owner
 trigger: "the first host that runs SessionStart hooks concurrently with the first turn, or skips them on resume"
-status: open
+status: deferred
+defer_until: "the marker a first pull can read is built. This node's own probe field names that as the cheap probe and records that it does not exist, and req-arriving-twice-changes-nothing is the mitigation rather than the proof."
 impact: "The agent's first act would race the arrival: it would find no lane, follow the card, and perform the five acts by hand while the hook did the same thing underneath it. Two arrivals at once is the one case req-arriving-twice-changes-nothing was written for."
 breaks_how_badly: crippling
 how_likely: conceivable

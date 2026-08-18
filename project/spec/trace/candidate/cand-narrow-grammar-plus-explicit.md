@@ -1,4 +1,5 @@
 ---
+minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: cand-narrow-grammar-plus-explicit
 type: "[[candidate]]"
 name: "Narrow grammar plus explicit"

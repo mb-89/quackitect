@@ -32,7 +32,16 @@ Open the command palette and run "$PRODUCT$: How to Attach Your Agent".
 
 ## Give it to someone else
 
-    .\RUNME.ps1 --export C:\path\to\empty "Their Name" TN
+Open the command palette and run "$PRODUCT$: Make a Copy of This System".
 
-That makes a fresh copy under a new name, with its own empty git repo. Your
-history and your records stay here.
+It asks where to put it, what to call it, and a short name of two or three
+letters. It makes a fresh copy under that name, with its own empty git repo,
+and opens it in a new window. Your history and your records stay here.
+
+## Start a project this drives
+
+Open the command palette and run "$PRODUCT$: Start a Project This System
+Drives".
+
+The work lives in its own tree and carries none of the method. One small file
+in it says which copy drives it, so moving either tree changes nothing.

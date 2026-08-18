@@ -21,6 +21,7 @@ import { subscribeModelMutations } from "./model-fs.ts";
 import { beginPass, endPass } from "./notes.ts";
 import { loadPanel, renderPanel } from "./params.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
+import { produce } from "./produce.ts";
 import { ENGINE_LIFE, feedRows, type MirrorState, renderMirror } from "./render.ts";
 import { runningJob } from "./run.ts";
 import { loadLevels, loadStopAt } from "./scale.ts";
@@ -368,6 +369,41 @@ export function startMirror(o: MirrorOptions): Server {
   };
 
   const jsonPosts: Record<string, (req: Req, res: Res) => void> = {
+    // THE TWO PRODUCING ACTS, REACHED FROM THE EDITOR'S BUTTONS. They are lane
+    // verbs; this is the same acts over HTTP, so the extension does not have to
+    // speak the lane's protocol to press one.
+    //
+    // A REFUSAL COMES BACK AS ITS OWN JSON, which is what lets a button say WHY
+    // rather than only that nothing happened — the same lesson the target
+    // button learned when a redirect swallowed its own rejection.
+    "/produce": (req, res) =>
+      jsonPost(
+        req,
+        res,
+        "mirror_produce",
+        (body) => ({
+          args: {
+            kind: String(body.kind ?? ""),
+            dest: String(body.dest ?? ""),
+            name: String(body.name ?? ""),
+            abbr: String(body.abbr ?? ""),
+          },
+          run: () => {
+            const r = produce(
+              state.session.workRoot(),
+              {
+                kind: String(body.kind ?? ""),
+                dest: String(body.dest ?? ""),
+                name: String(body.name ?? ""),
+                abbr: String(body.abbr ?? ""),
+              },
+              "mirror/produce",
+            );
+            return { log: r, answer: { ok: true, result: r } };
+          },
+        }),
+        (e) => (e instanceof Rejection ? e.toJSON() : { error: whyOf(e) }),
+      ),
     // SET TARGET ANSWERS IN PLACE (owner report 2026-08-09: as a redirect
     // POST the button swallowed its own rejection — success and refusal
     // both 303ed and the clicking page read nothing). A refusal now comes

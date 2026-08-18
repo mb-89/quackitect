@@ -2,6 +2,10 @@
 minted_in: i33-every-interface-a-person-or-an-agent-tou
 id: req-work-past-its-bound-says-it-is-working
 type: "[[requirement]]"
+weighs_with:
+  - req-call-answers-in-one-second ! — one measures what happens WHEN the bound is exceeded, the other measures the bound itself; they are complements, and a design can meet either alone
+  - req-surface-answers-in-one-second ! — the same complement at the other boundary: a signal during slowness against a render latency
+  - req-a-clear-jump-is-one-call ! — one is a signal emitted during a long wait, the other is how many calls a jump costs; different quantities entirely
 statement: While an admitted call or a surface render is still running past the bound named for it, the product shall show that it is working, without taking the surface over.
 kind: quality
 characteristic: performance-efficiency

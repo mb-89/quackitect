@@ -5,6 +5,7 @@ type: "[[requirement]]"
 statement: While a vehicle runs the engine, the engine shall land zero writes inside the vehicle's overlay tree and zero overlay content inside its own tree.
 kind: quality
 verify_method: test
+fitness_candidate: true
 breaks_if_removed: The private overlay leaks into the open engine, and the customer's reason to use the product dies.
 breaks_how_badly: fatal
 refines:

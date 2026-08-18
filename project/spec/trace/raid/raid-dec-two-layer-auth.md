@@ -14,7 +14,7 @@ source_refs:
   - opt-two-layer-authorization
   - cand-thin-worktree
   - req-acts-carry-role-and-channel
-  - req-engine-folder-is-sealed
+  - req-nothing-a-copy-does-reaches-its-source
 ---
 
 The third seam, and where the thin tree pays off: with the record's tree

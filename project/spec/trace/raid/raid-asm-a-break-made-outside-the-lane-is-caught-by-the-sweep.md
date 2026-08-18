@@ -11,7 +11,7 @@ probe: "Introduce a malformed node by hand, outside the lane. Measure how many c
 probed: "not yet. The sweep this assumption relies on does not exist — raid-iss-se-lint-has-no-whole-repo-sweep."
 impact: If a hand break survives long, the corpus is only as sound as the last person to open it in an editor, and every write-time refusal is guarding a door beside an open window.
 breaks_how_badly: crippling
-how_likely: likely
+how_likely: expected
 source_refs:
   - raid-asm-the-cage-holds-so-every-write-passes-the-lane
   - raid-iss-se-lint-has-no-whole-repo-sweep

@@ -154,3 +154,1021 @@
 {"ts":"2026-08-18T08:57:39.362Z","op":"update","visit":"iterations/i16/gate-kickoff@1","node":"d164","brief":"accounting for the note captured after the retro closed"}
 {"ts":"2026-08-18T08:58:21.403Z","op":"update","visit":"iterations/i16/gate-kickoff@1","node":"d165","brief":"matching the item name the check asks for"}
 {"ts":"2026-08-18T08:58:28.421Z","op":"done","visit":"iterations/i16/gate-kickoff@0","node":"d156","brief":"the column is corrected to major and the gate re-signed"}
+{"ts":"2026-08-18T08:58:37.091Z","op":"update","visit":"iterations/i16/frame-delta@0","node":"d166","brief":"recovering position after a raw completeState error"}
+{"ts":"2026-08-18T08:58:56.020Z","op":"update","visit":"iterations/i16/frame-delta@0","node":"d167","brief":"checking draft-vision was not crossed unsigned"}
+{"ts":"2026-08-18T08:59:14.658Z","op":"fork","visit":"iterations/i16/frame-delta@0","parent":"d157","node":"d168","brief":"draft-vision was crossed unsigned when the machine recompiled","nodes":[]}
+{"ts":"2026-08-18T09:00:06.416Z","op":"done","visit":"iterations/i16/frame-delta@0","node":"d168","brief":"the crossed-state defect is noted for the build phase on the owner's ruling"}
+{"ts":"2026-08-18T09:01:26.088Z","op":"update","visit":"iterations/i16/frame-delta@0","node":"d169","brief":"framing the delta against the resident value prop"}
+{"ts":"2026-08-18T09:01:37.538Z","op":"update","visit":"iterations/i16/frame-delta@0","node":"d170","brief":"walking the unsigned feeder the guard named"}
+{"ts":"2026-08-18T09:02:02.759Z","op":"update","visit":"iterations/i16/frame-delta@0","node":"d171","brief":"escaping to re-enter, the only route back to a crossed state"}
+{"ts":"2026-08-18T09:02:26.368Z","op":"update","visit":"iterations/i16/start@1","node":"d174","brief":"walking forward to see where the recomputed position lands"}
+{"ts":"2026-08-18T09:03:04.676Z","op":"update","visit":"iterations/i16/draft-vision@0","node":"d175","brief":"finding the resident vision draft-vision inherits from"}
+{"ts":"2026-08-18T09:03:09.912Z","op":"update","visit":"iterations/i16/draft-vision@0","node":"d176","brief":"looking for the resident vision packet in an earlier record"}
+{"ts":"2026-08-18T09:03:15.420Z","op":"update","visit":"iterations/i16/draft-vision@0","node":"d177","brief":"reading i27's resident vision packet to inherit from it"}
+{"ts":"2026-08-18T09:04:21.768Z","op":"done","visit":"iterations/i16/gate-kickoff@0","node":"d157","brief":"the vision packet inherits vp-the-engine and vp-vendoring"}
+{"ts":"2026-08-18T09:05:20.411Z","op":"plan","visit":"iterations/i16/define-actual@0","parent":null,"nodes":[{"id":"d178","brief":"sign define-actual"},{"id":"d179","brief":"stamp frame-delta"},{"id":"d180","brief":"open the risk register"},{"id":"d181","brief":"walk the motivation gate"}]}
+{"ts":"2026-08-18T09:06:21.155Z","op":"update","visit":"iterations/i16/log-risks@0","node":"d182","brief":"minting the risk the column correction exposed"}
+{"ts":"2026-08-18T09:06:36.907Z","op":"update","visit":"iterations/i16/log-risks@0","node":"d183","brief":"recording the seal-over-overlay ordering as a decision node"}
+{"ts":"2026-08-18T09:06:52.300Z","op":"update","visit":"iterations/i16/log-risks@0","node":"d184","brief":"recording the drift-report decision"}
+{"ts":"2026-08-18T09:07:11.238Z","op":"update","visit":"iterations/i16/log-risks@0","node":"d185","brief":"recording the probe-do-not-move decision"}
+{"ts":"2026-08-18T09:07:27.773Z","op":"update","visit":"iterations/i16/log-risks@0","node":"d186","brief":"recording the grade inconsistency as a present-tense issue"}
+{"ts":"2026-08-18T09:07:44.752Z","op":"done","visit":"iterations/i16/define-actual@0","node":"d180","brief":"the register opens with five nodes"}
+{"ts":"2026-08-18T09:08:26.101Z","op":"update","visit":"iterations/i16/log-risks@0","node":"d187","brief":"the three decision nodes get their losers and their bindings"}
+{"ts":"2026-08-18T09:08:31.446Z","op":"done","visit":"iterations/i16/define-actual@0","node":"d178","brief":"define-actual is signed"}
+{"ts":"2026-08-18T09:09:06.966Z","op":"update","visit":"iterations/i16/frame-delta@1","node":"d188","brief":"recovering after a dropped socket"}
+{"ts":"2026-08-18T09:09:14.361Z","op":"done","visit":"iterations/i16/define-actual@0","node":"d179","brief":"frame-delta is stamped, the dropped socket had lost it"}
+{"ts":"2026-08-18T09:10:02.742Z","op":"update","visit":"iterations/i16/scope-non-goals@0","node":"d189","brief":"scoping the iteration at vision level, seven non-goals with destinations"}
+{"ts":"2026-08-18T09:11:03.443Z","op":"update","visit":"iterations/i16/pressure-test@0","node":"d190","brief":"minting the risk the hostile FAQ exposed"}
+{"ts":"2026-08-18T09:12:00.364Z","op":"update","visit":"iterations/i16/pressure-test@0","node":"d191","brief":"the PR-FAQ found four questions with no clean answer"}
+{"ts":"2026-08-18T09:12:29.376Z","op":"update","visit":"iterations/i16/gate-motivation@0","node":"d192","brief":"measuring the record's bound breaches for the gate"}
+{"ts":"2026-08-18T09:12:34.302Z","op":"update","visit":"iterations/i16/gate-motivation@0","node":"d193","brief":"separating the lane door's own breaches from the transport's"}
+{"ts":"2026-08-18T09:14:29.683Z","op":"done","visit":"iterations/i16/define-actual@0","node":"d181","brief":"the motivation gate passes with two recorded overrides"}
+{"ts":"2026-08-18T09:15:00.279Z","op":"update","visit":"iterations/i16/gate-motivation@0","node":"d194","brief":"answering the two per-item fields with their real item names"}
+{"ts":"2026-08-18T09:15:18.003Z","op":"plan","visit":"iterations/i16/gate-motivation@0","parent":null,"nodes":[{"id":"d195","brief":"map the stakeholders"},{"id":"d196","brief":"draw the context and its boundary"},{"id":"d197","brief":"write the stories"},{"id":"d198","brief":"walk the inputs gate"}]}
+{"ts":"2026-08-18T09:15:49.147Z","op":"update","visit":"iterations/i16/draw-context@0","node":"d199","brief":"listing the standing neighbours before redrawing the boundary"}
+{"ts":"2026-08-18T09:15:54.706Z","op":"update","visit":"iterations/i16/draw-context@0","node":"d200","brief":"reading a neighbour node's shape before minting the host repository"}
+{"ts":"2026-08-18T09:16:21.612Z","op":"update","visit":"iterations/i16/draw-context@0","node":"d201","brief":"the host repository joins the neighbours"}
+{"ts":"2026-08-18T09:17:11.081Z","op":"done","visit":"iterations/i16/gate-motivation@0","node":"d196","brief":"the boundary is redrawn and the host repository joins it"}
+{"ts":"2026-08-18T09:17:41.398Z","op":"update","visit":"iterations/i16/map-stakeholders@0","node":"d202","brief":"listing the standing stakeholder roles"}
+{"ts":"2026-08-18T09:17:46.312Z","op":"update","visit":"iterations/i16/map-stakeholders@0","node":"d203","brief":"reading the vehicle owner's node, the role this iteration serves"}
+{"ts":"2026-08-18T09:18:52.446Z","op":"done","visit":"iterations/i16/gate-motivation@0","node":"d195","brief":"the map is re-checked and a false override retracted"}
+{"ts":"2026-08-18T09:20:03.234Z","op":"fork","visit":"iterations/i16/write-stories@0","parent":null,"node":"d204","brief":"the vision carries a solution and the wrong vehicle model","nodes":[]}
+{"ts":"2026-08-18T09:20:14.394Z","op":"update","visit":"iterations/i16/write-stories@0","node":"d205","brief":"reopening the vision, seven states fall with it"}
+{"ts":"2026-08-18T09:20:25.522Z","op":"update","visit":"iterations/i16/draft-vision@3","node":"d206","brief":"seeing where the reopen leaves the walk"}
+{"ts":"2026-08-18T09:22:13.435Z","op":"update","visit":"iterations/i16/draft-vision@3","node":"d207","brief":"the vision is rewritten from the owner's model with no mechanism in it"}
+{"ts":"2026-08-18T09:22:24.261Z","op":"done","visit":"iterations/i16/write-stories@0","node":"d204","brief":"the vision is re-signed on the owner's model"}
+{"ts":"2026-08-18T09:25:38.169Z","op":"fork","visit":"iterations/i16/define-actual@1","parent":null,"node":"d208","brief":"the seal's real need is copy isolation, not a sealed folder","nodes":[]}
+{"ts":"2026-08-18T09:25:51.611Z","op":"update","visit":"iterations/i16/define-actual@1","node":"d209","brief":"searching v2 for the incident the owner recalls"}
+{"ts":"2026-08-18T09:25:58.186Z","op":"update","visit":"iterations/i16/define-actual@1","node":"d210","brief":"reading v2's own law, the source of the seal"}
+{"ts":"2026-08-18T09:26:33.732Z","op":"update","visit":"iterations/i16/define-actual@1","node":"d211","brief":"v2's law found and read, the v3 requirement garbled it"}
+{"ts":"2026-08-18T09:27:04.854Z","op":"done","visit":"iterations/i16/define-actual@1","node":"d208","brief":"v2's law is minted into v3 with its witness"}
+{"ts":"2026-08-18T09:27:55.134Z","op":"plan","visit":"iterations/i16/define-actual@1","parent":null,"nodes":[{"id":"d212","brief":"rebuild log-risks against the new vision"},{"id":"d213","brief":"amend vp-vendoring and rebuild frame-delta"},{"id":"d214","brief":"rebuild scope and the boundary"},{"id":"d215","brief":"re-walk the motivation gate"}]}
+{"ts":"2026-08-18T09:28:01.988Z","op":"plan","visit":"iterations/i16/define-actual@1","parent":null,"nodes":[]}
+{"ts":"2026-08-18T09:28:36.118Z","op":"update","visit":"iterations/i16/define-actual@1","node":"d216","brief":"taking the offered door to frame-delta"}
+{"ts":"2026-08-18T09:28:54.112Z","op":"update","visit":"iterations/i16/define-actual@1","node":"d217","brief":"the walk is stuck at define-actual, asking what holds it"}
+{"ts":"2026-08-18T09:29:06.790Z","op":"update","visit":"iterations/i16/define-actual@1","node":"d218","brief":"reopening the stale baseline to re-sign it"}
+{"ts":"2026-08-18T09:29:11.079Z","op":"update","visit":"iterations/i16/define-actual@1","node":"d219","brief":"collecting the recheck form for the baseline"}
+{"ts":"2026-08-18T09:30:00.238Z","op":"done","visit":"iterations/i16/define-actual@1","node":"d213","brief":"the baseline is re-signed and carries v2's law as its sharpest witness"}
+{"ts":"2026-08-18T09:30:33.697Z","op":"update","visit":"iterations/i16/frame-delta@3","node":"d220","brief":"vp-vendoring's outcome loses the mechanism and gains the real rule"}
+{"ts":"2026-08-18T09:31:43.405Z","op":"done","visit":"iterations/i16/define-actual@1","node":"d212","brief":"the delta is reframed as ownership against receiving, with isolation as the third side"}
+{"ts":"2026-08-18T09:31:59.720Z","op":"update","visit":"iterations/i16/frame-delta@3","node":"d221","brief":"reopening frame-delta so the rewrite can land"}
+{"ts":"2026-08-18T09:32:04.812Z","op":"update","visit":"iterations/i16/frame-delta@3","node":"d222","brief":"collecting the recheck form for the delta"}
+{"ts":"2026-08-18T09:32:54.006Z","op":"done","visit":"iterations/i16/define-actual@1","node":"d214","brief":"the delta is reframed as ownership against receiving, with isolation third"}
+{"ts":"2026-08-18T09:33:42.804Z","op":"plan","visit":"iterations/i16/log-risks@0","parent":null,"nodes":[{"id":"d223","brief":"supersede the seal-shaped register entries"},{"id":"d224","brief":"mint the ownership-against-receiving risk"},{"id":"d225","brief":"re-sign log-risks"},{"id":"d226","brief":"rebuild scope, the boundary and the gate"}]}
+{"ts":"2026-08-18T09:34:09.884Z","op":"done","visit":"iterations/i16/log-risks@0","node":"d224","brief":"the central conflict has a node so no design can make it vanish"}
+{"ts":"2026-08-18T09:34:35.785Z","op":"done","visit":"iterations/i16/log-risks@0","node":"d223","brief":"three seal-shaped entries are superseded or discharged with reasons"}
+{"ts":"2026-08-18T09:34:50.469Z","op":"update","visit":"iterations/i16/log-risks@0","node":"d227","brief":"reopening log-risks so the rebuilt register can land"}
+{"ts":"2026-08-18T09:34:55.011Z","op":"update","visit":"iterations/i16/log-risks@0","node":"d228","brief":"collecting the recheck form for the register"}
+{"ts":"2026-08-18T09:35:28.543Z","op":"update","visit":"iterations/i16/log-risks@0","node":"d229","brief":"the rebuilt register lands with the three killed entries visible"}
+{"ts":"2026-08-18T09:35:34.786Z","op":"done","visit":"iterations/i16/log-risks@0","node":"d225","brief":"the rebuilt register is signed"}
+{"ts":"2026-08-18T09:36:44.294Z","op":"update","visit":"iterations/i16/scope-non-goals@0","node":"d230","brief":"the scope is rebuilt and playback moves out on the owner's ruling"}
+{"ts":"2026-08-18T09:36:56.892Z","op":"update","visit":"iterations/i16/scope-non-goals@0","node":"d231","brief":"reopening the scope so the rebuild can land"}
+{"ts":"2026-08-18T09:37:02.071Z","op":"update","visit":"iterations/i16/scope-non-goals@0","node":"d232","brief":"collecting the recheck form for the scope"}
+{"ts":"2026-08-18T09:37:39.696Z","op":"done","visit":"iterations/i16/log-risks@0","node":"d226","brief":"the scope is rebuilt and playback moves out on the owner's ruling"}
+{"ts":"2026-08-18T09:38:27.244Z","op":"plan","visit":"iterations/i16/pressure-test@1","parent":null,"nodes":[{"id":"d233","brief":"rewrite the PR-FAQ against the descendant model"},{"id":"d234","brief":"rebuild the boundary at draw-context"},{"id":"d235","brief":"carry the stakeholder correction"},{"id":"d236","brief":"re-walk the motivation gate"}]}
+{"ts":"2026-08-18T09:39:39.374Z","op":"done","visit":"iterations/i16/pressure-test@1","node":"d233","brief":"the FAQ's hardest question is now what a fork does not give you"}
+{"ts":"2026-08-18T09:39:49.608Z","op":"update","visit":"iterations/i16/pressure-test@1","node":"d237","brief":"reopening pressure-test so the rewritten FAQ can land"}
+{"ts":"2026-08-18T09:39:53.735Z","op":"update","visit":"iterations/i16/pressure-test@1","node":"d238","brief":"collecting the recheck form for the pressure test"}
+{"ts":"2026-08-18T09:40:38.725Z","op":"done","visit":"iterations/i16/pressure-test@1","node":"d234","brief":"the FAQ's hardest question is now what a fork does not give you"}
+{"ts":"2026-08-18T09:41:09.516Z","op":"update","visit":"iterations/i16/gate-motivation@3","node":"d239","brief":"reopening the kickoff, its goals list is the sealed model"}
+{"ts":"2026-08-18T09:41:13.992Z","op":"update","visit":"iterations/i16/gate-kickoff@2","node":"d240","brief":"collecting the kickoff recheck to correct its goals"}
+{"ts":"2026-08-18T09:46:39.083Z","op":"done","visit":"iterations/i16/pressure-test@1","node":"d236","brief":"the kickoff's goals are rebuilt on the owner's model, six lines"}
+{"ts":"2026-08-18T09:47:32.466Z","op":"update","visit":"iterations/i16/gate-kickoff@2","node":"d241","brief":"the panel-render note joins the drain, pending with its ruling"}
+{"ts":"2026-08-18T09:49:57.200Z","op":"update","visit":"iterations/i16/gate-kickoff@2","node":"d242","brief":"the kickoff is blessed, the column compiles into the machine"}
+{"ts":"2026-08-18T09:51:39.610Z","op":"update","visit":"iterations/i16/draft-vision@6","node":"d243","brief":"the vision gains its missing goal: nothing may reach the source"}
+{"ts":"2026-08-18T09:51:47.455Z","op":"update","visit":"iterations/i16/draft-vision@6","node":"d244","brief":"reopening the vision, its goal system is one goal short"}
+{"ts":"2026-08-18T09:51:49.414Z","op":"update","visit":"iterations/i16/draft-vision@6","node":"d245","brief":"collecting the vision recheck"}
+{"ts":"2026-08-18T09:52:55.870Z","op":"done","visit":"iterations/i16/define-actual@1","node":"d215","brief":"the vision re-signs with six goals, isolation ranked second"}
+{"ts":"2026-08-18T09:53:21.712Z","op":"fork","visit":"iterations/i16/define-actual@3","parent":null,"node":"d246","brief":"re-walk the states that fell with the kickoff","nodes":[{"id":"d247","brief":"define-actual"},{"id":"d248","brief":"log-risks"},{"id":"d249","brief":"frame-delta"},{"id":"d250","brief":"scope-non-goals"},{"id":"d251","brief":"pressure-test"},{"id":"d252","brief":"gate-motivation"},{"id":"d253","brief":"draw-context"},{"id":"d254","brief":"map-stakeholders"}]}
+{"ts":"2026-08-18T09:54:02.547Z","op":"plan","visit":"iterations/i16/define-actual@3","parent":"d247","nodes":[{"id":"d255","brief":"vendoring is ordinary"},{"id":"d256","brief":"the framing is corrected"},{"id":"d257","brief":"not the column"}]}
+{"ts":"2026-08-18T09:54:09.814Z","op":"done","visit":"iterations/i16/define-actual@3","node":"d255","brief":"recorded as an answer, and the chain mis-parsed into three items"}
+{"ts":"2026-08-18T09:54:25.349Z","op":"done","visit":"iterations/i16/define-actual@3","node":"d256","brief":"finding a real witness that vendor-plus-update is standard practice"}
+{"ts":"2026-08-18T09:54:36.600Z","op":"update","visit":"iterations/i16/define-actual@3","node":"d258","brief":"no search key, fetching the primary doc for the canonical mechanism"}
+{"ts":"2026-08-18T09:54:45.147Z","op":"update","visit":"iterations/i16/define-actual@3","node":"d259","brief":"the git-scm page moved, going to the tool's own doc in git's tree"}
+{"ts":"2026-08-18T09:56:04.224Z","op":"done","visit":"iterations/i16/define-actual@3","node":"d257","brief":"a mis-parsed brief became an item; the column is unchanged"}
+{"ts":"2026-08-18T09:56:20.105Z","op":"update","visit":"iterations/i16/log-risks@0","node":"d260","brief":"the risk claims every tool picks one end, which git-subtree disproves"}
+{"ts":"2026-08-18T09:56:22.969Z","op":"update","visit":"iterations/i16/log-risks@0","node":"d261","brief":"the risk claims every tool picks one end, which git-subtree disproves"}
+{"ts":"2026-08-18T09:56:57.387Z","op":"update","visit":"iterations/i16/log-risks@0","node":"d262","brief":"the risk is rewritten: the hazard is inventing, not ignorance"}
+{"ts":"2026-08-18T09:57:00.627Z","op":"update","visit":"iterations/i16/log-risks@0","node":"d263","brief":"sweeping for likelihood grades outside the allowed words"}
+{"ts":"2026-08-18T09:57:17.085Z","op":"update","visit":"iterations/i16/log-risks@0","node":"d264","brief":"certain is the house word for a decided thing, used by 12 nodes"}
+{"ts":"2026-08-18T09:57:19.507Z","op":"done","visit":"iterations/i16/define-actual@3","node":"d247","brief":"define-actual signed with the ordinary-vendoring witness"}
+{"ts":"2026-08-18T09:57:55.150Z","op":"done","visit":"iterations/i16/define-actual@3","node":"d248","brief":"log-risks re-signs; the headline risk now names inventing as the hazard"}
+{"ts":"2026-08-18T09:58:13.196Z","op":"update","visit":"iterations/i16/frame-delta@5","node":"d265","brief":"reopening the delta, its gap claim rests on a knowledge gap that is not there"}
+{"ts":"2026-08-18T09:58:16.285Z","op":"update","visit":"iterations/i16/frame-delta@5","node":"d266","brief":"collecting the delta recheck"}
+{"ts":"2026-08-18T09:59:52.454Z","op":"done","visit":"iterations/i16/define-actual@3","node":"d249","brief":"the delta re-signs with the overlay named as the gap"}
+{"ts":"2026-08-18T10:00:01.839Z","op":"update","visit":"iterations/i16/scope-non-goals@0","node":"d267","brief":"collecting the scope recheck"}
+{"ts":"2026-08-18T10:00:54.342Z","op":"done","visit":"iterations/i16/define-actual@3","node":"d250","brief":"scope re-signs with the channel taken off the shelf rather than designed"}
+{"ts":"2026-08-18T10:01:06.620Z","op":"update","visit":"iterations/i16/pressure-test@2","node":"d268","brief":"reopening the pressure test, its hardest answer is now wrong"}
+{"ts":"2026-08-18T10:02:17.664Z","op":"done","visit":"iterations/i16/define-actual@3","node":"d251","brief":"the FAQ answers the collision question the ordinary way"}
+{"ts":"2026-08-18T10:02:32.526Z","op":"update","visit":"iterations/i16/gate-motivation@3","node":"d269","brief":"reopening the motivation gate on the rebuilt packet"}
+{"ts":"2026-08-18T10:02:35.178Z","op":"update","visit":"iterations/i16/gate-motivation@3","node":"d270","brief":"collecting the gate form and its goal items"}
+{"ts":"2026-08-18T10:05:22.795Z","op":"update","visit":"iterations/i16/gate-motivation@3","node":"d271","brief":"the gate re-signs on the rebuilt packet with two overrides"}
+{"ts":"2026-08-18T10:05:28.509Z","op":"done","visit":"iterations/i16/define-actual@3","node":"d252","brief":"the motivation gate is blessed and the vision is axiomatic from here"}
+{"ts":"2026-08-18T10:05:37.392Z","op":"update","visit":"iterations/i16/draw-context@0","node":"d272","brief":"listing the neighbours before redrawing the boundary"}
+{"ts":"2026-08-18T10:05:40.267Z","op":"update","visit":"iterations/i16/draw-context@0","node":"d273","brief":"reading the host-repository neighbour that the model correction invalidated"}
+{"ts":"2026-08-18T10:05:57.523Z","op":"update","visit":"iterations/i16/draw-context@0","node":"d274","brief":"checking whether driving a foreign project is inside this record"}
+{"ts":"2026-08-18T10:06:43.607Z","op":"update","visit":"iterations/i16/draw-context@0","node":"d275","brief":"v1 answered the mechanism with a mirror plus an overlay that never share a file"}
+{"ts":"2026-08-18T10:06:50.436Z","op":"update","visit":"iterations/i16/draw-context@0","node":"d276","brief":"v1 answered the mechanism with a mirror plus an overlay that never share a file"}
+{"ts":"2026-08-18T10:07:06.601Z","op":"update","visit":"iterations/i16/draw-context@0","node":"d277","brief":"scope is missing the foreign project the owner named"}
+{"ts":"2026-08-18T10:07:59.401Z","op":"update","visit":"iterations/i16/scope-non-goals@0","node":"d278","brief":"scope re-signs with the foreign project as item two"}
+{"ts":"2026-08-18T10:08:13.916Z","op":"done","visit":"iterations/i16/define-actual@3","node":"d253","brief":"the boundary work waits on the gate re-signing over six scope items"}
+{"ts":"2026-08-18T10:09:26.392Z","op":"update","visit":"iterations/i16/gate-motivation@4","node":"d279","brief":"the gate re-signs over six scope items against six goals"}
+{"ts":"2026-08-18T10:09:30.170Z","op":"update","visit":"iterations/i16/gate-motivation@4","node":"d280","brief":"blessing the motivation gate so the boundary work can open"}
+{"ts":"2026-08-18T10:09:50.542Z","op":"update","visit":"iterations/i16/draw-context@0","node":"d281","brief":"sweeping what points at the host neighbour before it goes"}
+{"ts":"2026-08-18T10:10:12.090Z","op":"update","visit":"iterations/i16/draw-context@0","node":"d282","brief":"the parent is a neighbour that only sends inward"}
+{"ts":"2026-08-18T10:10:28.523Z","op":"update","visit":"iterations/i16/draw-context@0","node":"d283","brief":"the descendant is a neighbour the parent cannot reach after spawning"}
+{"ts":"2026-08-18T10:10:48.135Z","op":"update","visit":"iterations/i16/draw-context@0","node":"d284","brief":"the driven project splits where method comes from and where work lives"}
+{"ts":"2026-08-18T10:10:53.280Z","op":"update","visit":"iterations/i16/draw-context@0","node":"d285","brief":"the host repository goes, nothing outside i16 pointed at it"}
+{"ts":"2026-08-18T10:10:56.420Z","op":"update","visit":"iterations/i16/draw-context@0","node":"d286","brief":"the host repository goes, nothing outside i16 pointed at it"}
+{"ts":"2026-08-18T10:11:16.129Z","op":"update","visit":"iterations/i16/draw-context@0","node":"d287","brief":"reopening the context to redraw it around three new neighbours"}
+{"ts":"2026-08-18T10:12:42.301Z","op":"update","visit":"iterations/i16/map-stakeholders@0","node":"d288","brief":"listing the stakeholder roles before adding the driven project's owner"}
+{"ts":"2026-08-18T10:12:46.384Z","op":"update","visit":"iterations/i16/map-stakeholders@0","node":"d289","brief":"reading the vehicle owner to shape the driven project's owner beside it"}
+{"ts":"2026-08-18T10:13:02.676Z","op":"update","visit":"iterations/i16/map-stakeholders@0","node":"d290","brief":"reopening the stakeholder map for the driven project question"}
+{"ts":"2026-08-18T10:13:48.354Z","op":"done","visit":"iterations/i16/define-actual@3","node":"d254","brief":"the map holds at four roles and the audience retraction is carried"}
+{"ts":"2026-08-18T10:13:53.823Z","op":"done","visit":"iterations/i16/pressure-test@1","node":"d235","brief":"the stakeholder correction is carried and the audience retraction stands"}
+{"ts":"2026-08-18T10:14:09.944Z","op":"update","visit":"iterations/i16/write-stories@0","node":"d291","brief":"reading the deck shape before authoring the stories"}
+{"ts":"2026-08-18T10:14:15.072Z","op":"update","visit":"iterations/i16/write-stories@0","node":"d292","brief":"reading the story node shape"}
+{"ts":"2026-08-18T10:14:17.842Z","op":"update","visit":"iterations/i16/write-stories@0","node":"d293","brief":"checking which stories already stand before writing new ones"}
+{"ts":"2026-08-18T10:14:22.248Z","op":"update","visit":"iterations/i16/write-stories@0","node":"d294","brief":"reading the standing vendoring story, whose title carries the host model"}
+{"ts":"2026-08-18T10:14:42.417Z","op":"update","visit":"iterations/i16/write-stories@0","node":"d295","brief":"the standing story tells the host model and must be revised"}
+{"ts":"2026-08-18T10:14:47.544Z","op":"update","visit":"iterations/i16/write-stories@0","node":"d296","brief":"checking the suite the story's evidence claims is green"}
+{"ts":"2026-08-18T10:15:32.814Z","op":"update","visit":"iterations/i16/write-stories@0","node":"d297","brief":"the vendoring story is revised off the sealed model"}
+{"ts":"2026-08-18T10:15:48.475Z","op":"update","visit":"iterations/i16/write-stories@0","node":"d298","brief":"the second capability gets the story it never had"}
+{"ts":"2026-08-18T10:16:05.792Z","op":"update","visit":"iterations/i16/write-stories@0","node":"d299","brief":"the isolation law gets a story so M8 can demonstrate it"}
+{"ts":"2026-08-18T10:16:50.518Z","op":"done","visit":"iterations/i16/gate-motivation@0","node":"d197","brief":"three stories stand at must, one revised and two new"}
+{"ts":"2026-08-18T10:17:07.034Z","op":"update","visit":"iterations/i16/generalize-use-cases@0","node":"d300","brief":"reading the standing use case before revising it"}
+{"ts":"2026-08-18T10:17:51.993Z","op":"update","visit":"iterations/i16/generalize-use-cases@0","node":"d301","brief":"the vendoring use case is revised off the sealed model"}
+{"ts":"2026-08-18T10:18:10.039Z","op":"update","visit":"iterations/i16/generalize-use-cases@0","node":"d302","brief":"the foreign product gets the use case the second capability needs"}
+{"ts":"2026-08-18T10:18:36.449Z","op":"update","visit":"iterations/i16/generalize-use-cases@0","node":"d303","brief":"two use cases carry three stories with the isolation as a guarantee"}
+{"ts":"2026-08-18T10:18:39.414Z","op":"update","visit":"iterations/i16/generalize-use-cases@0","node":"d304","brief":"stamping the use cases so the M2 gate can open"}
+{"ts":"2026-08-18T10:18:59.749Z","op":"update","visit":"iterations/i16/gate-inputs@0","node":"d305","brief":"enumerating the live lane verbs for the unspecified-capability walk"}
+{"ts":"2026-08-18T10:19:17.154Z","op":"update","visit":"iterations/i16/gate-inputs@0","node":"d306","brief":"checking which artifact classes the overlay actually covers"}
+{"ts":"2026-08-18T10:19:31.946Z","op":"update","visit":"iterations/i16/gate-inputs@0","node":"d307","brief":"the overlay step now matches the requirement's absolute clause"}
+{"ts":"2026-08-18T10:21:52.596Z","op":"update","visit":"iterations/i16/gate-inputs@0","node":"d308","brief":"the M2 gate passes with the step-3 hole closed"}
+{"ts":"2026-08-18T10:21:58.242Z","op":"done","visit":"iterations/i16/gate-motivation@0","node":"d198","brief":"the M2 gate is blessed and the user picture is settled"}
+{"ts":"2026-08-18T10:22:22.038Z","op":"plan","visit":"iterations/i16/write-requirements@0","parent":null,"nodes":[{"id":"d309","brief":"sweep and remove req-engine-folder-is-sealed"},{"id":"d310","brief":"revise req-overlay-resolution off the host model"},{"id":"d311","brief":"write the isolation requirements"},{"id":"d312","brief":"write the foreign-project requirements"},{"id":"d313","brief":"answer the seven set questions"}]}
+{"ts":"2026-08-18T10:22:41.848Z","op":"update","visit":"iterations/i16/write-requirements@0","node":"d314","brief":"reading the sealed requirement whole before it goes"}
+{"ts":"2026-08-18T10:23:33.648Z","op":"done","visit":"iterations/i16/write-requirements@0","node":"d309","brief":"the sweep found 12 live pointers and the isolation row replaces the seal"}
+{"ts":"2026-08-18T10:23:51.225Z","op":"done","visit":"iterations/i16/write-requirements@0","node":"d311","brief":"the mirror rule binds what the source may keep"}
+{"ts":"2026-08-18T10:24:11.032Z","op":"done","visit":"iterations/i16/write-requirements@0","node":"d312","brief":"one row covers the foreign product across four facets"}
+{"ts":"2026-08-18T10:24:28.997Z","op":"update","visit":"iterations/i16/write-requirements@0","node":"d315","brief":"the one-fact name becomes a countable row"}
+{"ts":"2026-08-18T10:25:09.901Z","op":"done","visit":"iterations/i16/write-requirements@0","node":"d310","brief":"twelve pointers move to the isolation row and the overlay clause loses the host"}
+{"ts":"2026-08-18T10:25:14.574Z","op":"update","visit":"iterations/i16/write-requirements@0","node":"d316","brief":"the sealed requirement goes on the owner's ruling"}
+{"ts":"2026-08-18T10:25:29.329Z","op":"update","visit":"iterations/i16/write-requirements@0","node":"d317","brief":"re-reading the standing rows the move touches"}
+{"ts":"2026-08-18T10:25:34.719Z","op":"update","visit":"iterations/i16/write-requirements@0","node":"d318","brief":"the survives-update row holds unchanged under the new model"}
+{"ts":"2026-08-18T10:25:48.764Z","op":"update","visit":"iterations/i16/write-requirements@0","node":"d319","brief":"drift becomes a statement of what changed rather than a fault"}
+{"ts":"2026-08-18T10:25:52.317Z","op":"update","visit":"iterations/i16/write-requirements@0","node":"d320","brief":"re-reading the install row against the corrected model"}
+{"ts":"2026-08-18T10:26:04.997Z","op":"update","visit":"iterations/i16/write-requirements@0","node":"d321","brief":"the install row serves beginning a product, not spawning a copy"}
+{"ts":"2026-08-18T10:26:26.234Z","op":"update","visit":"iterations/i16/write-requirements@0","node":"d322","brief":"step one had no row, and the sweep found it"}
+{"ts":"2026-08-18T10:26:32.720Z","op":"update","visit":"iterations/i16/write-requirements@0","node":"d323","brief":"the shipped-method row loses its host wording"}
+{"ts":"2026-08-18T10:27:39.609Z","op":"done","visit":"iterations/i16/write-requirements@0","node":"d313","brief":"the register carries nine rows with the seal removed and step one covered"}
+{"ts":"2026-08-18T10:28:09.501Z","op":"update","visit":"iterations/i16/write-requirements@0","node":"d324","brief":"the seven set questions land as one line each"}
+{"ts":"2026-08-18T10:28:13.362Z","op":"done","visit":"iterations/i16/define-actual@3","node":"d246","brief":"the whole re-walk is signed and M3 is under way"}
+{"ts":"2026-08-18T10:28:38.067Z","op":"plan","visit":"iterations/i16/derive-functions@0","parent":null,"nodes":[{"id":"d325","brief":"read the standing function cone"},{"id":"d326","brief":"derive the functions the new rows need"},{"id":"d327","brief":"write the flows"},{"id":"d328","brief":"argue neutrality"}]}
+{"ts":"2026-08-18T10:28:41.728Z","op":"update","visit":"iterations/i16/derive-functions@0","node":"d329","brief":"reading the function the overlay already hangs from"}
+{"ts":"2026-08-18T10:28:52.649Z","op":"update","visit":"iterations/i16/derive-functions@0","node":"d330","brief":"the isolation row landed on the compiler and belongs on the write guard"}
+{"ts":"2026-08-18T10:29:06.849Z","op":"update","visit":"iterations/i16/derive-functions@0","node":"d331","brief":"checking whether path resolution already carries the driven tree"}
+{"ts":"2026-08-18T10:29:17.765Z","op":"update","visit":"iterations/i16/derive-functions@0","node":"d332","brief":"resolve-a-path already asks which tree, which is the driven-tree row's home"}
+{"ts":"2026-08-18T10:29:31.760Z","op":"done","visit":"iterations/i16/derive-functions@0","node":"d325","brief":"resolve-a-path owns which tree, and the copy needs a function of its own"}
+{"ts":"2026-08-18T10:29:35.720Z","op":"update","visit":"iterations/i16/derive-functions@0","node":"d333","brief":"reading a flow node to copy its shape"}
+{"ts":"2026-08-18T10:29:42.506Z","op":"update","visit":"iterations/i16/derive-functions@0","node":"d334","brief":"the worktree flow is the closest analogue to a driven tree"}
+{"ts":"2026-08-18T10:29:55.576Z","op":"update","visit":"iterations/i16/derive-functions@0","node":"d335","brief":"the driven tree is a second tree the resolution must tell apart"}
+{"ts":"2026-08-18T10:30:03.696Z","op":"done","visit":"iterations/i16/derive-functions@0","node":"d327","brief":"two flows: a driven tree in and a copy out with nothing returning"}
+{"ts":"2026-08-18T10:30:26.610Z","op":"done","visit":"iterations/i16/derive-functions@0","node":"d326","brief":"one new function produces the copy and keeps nothing about it"}
+{"ts":"2026-08-18T10:30:41.752Z","op":"done","visit":"iterations/i16/derive-functions@0","node":"d328","brief":"the isolation row moves to the function that decides which tree"}
+{"ts":"2026-08-18T10:31:30.110Z","op":"update","visit":"iterations/i16/derive-functions@0","node":"d336","brief":"the function cone gains one node and loses one misplaced row"}
+{"ts":"2026-08-18T10:31:54.333Z","op":"update","visit":"iterations/i16/derive-functions@0","node":"d337","brief":"the flows land as references with the walk moved beside them"}
+{"ts":"2026-08-18T10:32:24.354Z","op":"plan","visit":"iterations/i16/identify-assumptions@0","parent":null,"nodes":[{"id":"d338","brief":"check the root resolution"},{"id":"d339","brief":"mint the assumption nodes"},{"id":"d340","brief":"answer the six-source sweep"}]}
+{"ts":"2026-08-18T10:32:28.620Z","op":"update","visit":"iterations/i16/identify-assumptions@0","node":"d341","brief":"no root symbol matched, reading the head of paths.ts instead"}
+{"ts":"2026-08-18T10:33:11.458Z","op":"done","visit":"iterations/i16/identify-assumptions@0","node":"d338","brief":"the jail already enforces isolation and already blocks the driven tree"}
+{"ts":"2026-08-18T10:33:31.553Z","op":"update","visit":"iterations/i16/identify-assumptions@0","node":"d342","brief":"the toolchain assumption is read but never run"}
+{"ts":"2026-08-18T10:33:55.196Z","op":"update","visit":"iterations/i16/identify-assumptions@0","node":"d343","brief":"the platform assumption is the one graded fatal"}
+{"ts":"2026-08-18T10:34:19.408Z","op":"update","visit":"iterations/i16/identify-assumptions@0","node":"d344","brief":"the people assumption is the one no code can settle"}
+{"ts":"2026-08-18T10:34:43.078Z","op":"done","visit":"iterations/i16/identify-assumptions@0","node":"d339","brief":"four assumptions and one issue, each with a probe somebody can run"}
+{"ts":"2026-08-18T10:35:27.912Z","op":"done","visit":"iterations/i16/identify-assumptions@0","node":"d340","brief":"the per-source sweep produced the iteration's only fatal assumption"}
+{"ts":"2026-08-18T10:35:32.838Z","op":"update","visit":"iterations/i16/identify-assumptions@0","node":"d345","brief":"stamping the assumptions so the probes can run"}
+{"ts":"2026-08-18T10:36:02.477Z","op":"plan","visit":"iterations/i16/probe-assumptions@0","parent":null,"nodes":[{"id":"d346","brief":"list every standing assumption"},{"id":"d347","brief":"run the vendoring probe on throwaway repositories"},{"id":"d348","brief":"run the platform probe on this machine"},{"id":"d349","brief":"read the overlay-home probe"},{"id":"d350","brief":"write back every outcome"}]}
+{"ts":"2026-08-18T10:36:45.711Z","op":"update","visit":"iterations/i16/probe-assumptions@0","node":"d351","brief":"running the whole-product update on throwaway repositories"}
+{"ts":"2026-08-18T10:36:57.611Z","op":"update","visit":"iterations/i16/probe-assumptions@0","node":"d352","brief":"running the whole-product update on throwaway repositories"}
+{"ts":"2026-08-18T10:37:11.459Z","op":"update","visit":"iterations/i16/probe-assumptions@0","node":"d353","brief":"running the whole-product update on throwaway repositories"}
+{"ts":"2026-08-18T10:37:42.827Z","op":"done","visit":"iterations/i16/probe-assumptions@0","node":"d347","brief":"the vendoring assumption holds: zero files lost, one honest conflict"}
+{"ts":"2026-08-18T10:38:08.746Z","op":"update","visit":"iterations/i16/probe-assumptions@0","node":"d354","brief":"running the incident's own command through a junction"}
+{"ts":"2026-08-18T10:38:42.145Z","op":"update","visit":"iterations/i16/probe-assumptions@0","node":"d355","brief":"isolating which structure carried the delete outward"}
+{"ts":"2026-08-18T10:39:22.156Z","op":"done","visit":"iterations/i16/probe-assumptions@0","node":"d348","brief":"the platform assumption is false and becomes an issue with its reproduction"}
+{"ts":"2026-08-18T10:39:44.268Z","op":"update","visit":"iterations/i16/probe-assumptions@0","node":"d356","brief":"links are the hazard being forbidden, not a mechanism being proposed"}
+{"ts":"2026-08-18T10:40:00.645Z","op":"update","visit":"iterations/i16/probe-assumptions@0","node":"d357","brief":"the forbidden list gains its platform split from the reproduction"}
+{"ts":"2026-08-18T10:40:15.204Z","op":"done","visit":"iterations/i16/probe-assumptions@0","node":"d349","brief":"the overlay home holds: a pull touches only paths the source ships"}
+{"ts":"2026-08-18T10:40:49.892Z","op":"done","visit":"iterations/i16/probe-assumptions@0","node":"d346","brief":"two assumptions stamped probed with their runs recorded"}
+{"ts":"2026-08-18T10:41:19.538Z","op":"update","visit":"iterations/i16/probe-assumptions@0","node":"d358","brief":"testing whether a vehicle keeps history with no link to the source"}
+{"ts":"2026-08-18T10:41:45.931Z","op":"update","visit":"iterations/i16/probe-assumptions@0","node":"d359","brief":"a link is a dependency and an address is not"}
+{"ts":"2026-08-18T10:42:16.073Z","op":"done","visit":"iterations/i16/probe-assumptions@0","node":"d350","brief":"both probes stamped with their runs written into the nodes"}
+{"ts":"2026-08-18T10:43:12.018Z","op":"plan","visit":"iterations/i16/probe-assumptions@0","parent":null,"nodes":[{"id":"d360","brief":"four runs: two hold"},{"id":"d361","brief":"one turns fatal"},{"id":"d362","brief":"one stays unprobed with its reason"}]}
+{"ts":"2026-08-18T10:44:56.109Z","op":"done","visit":"iterations/i16/probe-assumptions@0","node":"d360","brief":"the three empty cells are filled and the table is complete"}
+{"ts":"2026-08-18T10:46:42.980Z","op":"done","visit":"iterations/i16/probe-assumptions@0","node":"d361","brief":"design input closes with two overrides on the record"}
+{"ts":"2026-08-18T10:46:50.545Z","op":"done","visit":"iterations/i16/probe-assumptions@0","node":"d362","brief":"design input is blessed and M4 opens"}
+{"ts":"2026-08-18T10:47:51.217Z","op":"plan","visit":"iterations/i16/derive-criteria@0","parent":null,"nodes":[{"id":"d363","brief":"write the pairwise judgments into the frontmatter"},{"id":"d364","brief":"answer the compounding suspects"},{"id":"d365","brief":"record the chain and its reasons"}]}
+{"ts":"2026-08-18T10:48:47.151Z","op":"done","visit":"iterations/i16/derive-criteria@0","node":"d363","brief":"four comparisons settle ten pairs in one chain"}
+{"ts":"2026-08-18T10:48:59.107Z","op":"update","visit":"iterations/i16/derive-criteria@0","node":"d366","brief":"reading the paged answer for the pair table's expected rows"}
+{"ts":"2026-08-18T10:49:05.020Z","op":"update","visit":"iterations/i16/derive-criteria@0","node":"d367","brief":"locating the engine's own pair list"}
+{"ts":"2026-08-18T10:49:14.382Z","op":"update","visit":"iterations/i16/derive-criteria@0","node":"d368","brief":"reading the standing criteria pool"}
+{"ts":"2026-08-18T10:49:29.984Z","op":"update","visit":"iterations/i16/derive-criteria@0","node":"d369","brief":"finding how many pairs stand unjudged"}
+{"ts":"2026-08-18T10:51:33.060Z","op":"fork","visit":"iterations/i16/derive-criteria@0","parent":"d365","node":"d370","brief":"the extension buttons and the end-to-end test enter scope","nodes":[{"id":"d371","brief":"read v1's extension and its end-to-end test"},{"id":"d372","brief":"reopen scope and add the affordance"},{"id":"d373","brief":"carry it down to the stories and requirements"}]}
+{"ts":"2026-08-18T10:51:40.528Z","op":"update","visit":"iterations/i16/derive-criteria@0","node":"d374","brief":"no vscode hits at ref main, listing what is actually there"}
+{"ts":"2026-08-18T10:51:50.106Z","op":"update","visit":"iterations/i16/derive-criteria@0","node":"d375","brief":"v1 is a Go CLI with no extension, checking v2"}
+{"ts":"2026-08-18T10:52:04.248Z","op":"update","visit":"iterations/i16/derive-criteria@0","node":"d376","brief":"neither ancestor has an extension, so the shape is v1's selftest"}
+{"ts":"2026-08-18T10:52:18.968Z","op":"done","visit":"iterations/i16/derive-criteria@0","node":"d371","brief":"v1 calls it the vehicle-drives-stub chain and it is real code"}
+{"ts":"2026-08-18T10:53:12.706Z","op":"done","visit":"iterations/i16/derive-criteria@0","node":"d372","brief":"reopening scope to put the affordance in"}
+{"ts":"2026-08-18T10:54:17.976Z","op":"done","visit":"iterations/i16/derive-criteria@0","node":"d373","brief":"scope carries seven items with the affordance third"}
+{"ts":"2026-08-18T10:54:22.598Z","op":"done","visit":"iterations/i16/derive-criteria@0","node":"d370","brief":"scope signs with seven items and the affordance third"}
+{"ts":"2026-08-18T10:54:37.500Z","op":"update","visit":"iterations/i16/gate-motivation@7","node":"d377","brief":"the gate reviewed six scope items and there are now seven"}
+{"ts":"2026-08-18T10:55:53.467Z","op":"done","visit":"iterations/i16/derive-criteria@0","node":"d365","brief":"the gate re-signs over seven scope items"}
+{"ts":"2026-08-18T10:55:59.127Z","op":"done","visit":"iterations/i16/derive-criteria@0","node":"d364","brief":"the motivation gate is blessed over seven items"}
+{"ts":"2026-08-18T10:56:15.494Z","op":"plan","visit":"iterations/i16/draw-context@0","parent":null,"nodes":[{"id":"d378","brief":"add the affordance to the boundary"},{"id":"d379","brief":"write the ramp-up story"},{"id":"d380","brief":"extend both use cases"},{"id":"d381","brief":"write the runs-in-another-tree requirement"},{"id":"d382","brief":"re-sign the inputs and requirements gates"}]}
+{"ts":"2026-08-18T10:57:20.189Z","op":"done","visit":"iterations/i16/draw-context@0","node":"d378","brief":"the boundary gains a fifth use and two binding exclusions"}
+{"ts":"2026-08-18T10:57:36.452Z","op":"update","visit":"iterations/i16/map-stakeholders@0","node":"d383","brief":"re-signing the roles before the ramp-up story"}
+{"ts":"2026-08-18T10:58:18.679Z","op":"update","visit":"iterations/i16/map-stakeholders@0","node":"d384","brief":"the roster holds at four while the newcomer's stake rises"}
+{"ts":"2026-08-18T10:58:49.479Z","op":"done","visit":"iterations/i16/draw-context@0","node":"d379","brief":"the ramp-up story lands and it is where the iteration now starts"}
+{"ts":"2026-08-18T10:58:57.745Z","op":"update","visit":"iterations/i16/write-stories@1","node":"d385","brief":"the drive story now goes through the surface"}
+{"ts":"2026-08-18T10:59:31.158Z","op":"update","visit":"iterations/i16/write-stories@1","node":"d386","brief":"four stories stand with the ramp-up first"}
+{"ts":"2026-08-18T10:59:39.976Z","op":"update","visit":"iterations/i16/write-stories@1","node":"d387","brief":"reopening the stories to add the ramp-up"}
+{"ts":"2026-08-18T11:00:05.592Z","op":"done","visit":"iterations/i16/draw-context@0","node":"d380","brief":"four stories stand with the ramp-up first"}
+{"ts":"2026-08-18T11:00:28.424Z","op":"update","visit":"iterations/i16/generalize-use-cases@1","node":"d388","brief":"both use cases gain the surface extension and its write bound"}
+{"ts":"2026-08-18T11:00:54.052Z","op":"done","visit":"iterations/i16/draw-context@0","node":"d381","brief":"the affordance extends both use cases rather than adding one"}
+{"ts":"2026-08-18T11:01:03.089Z","op":"update","visit":"iterations/i16/generalize-use-cases@1","node":"d389","brief":"reopening the use cases for the extensions"}
+{"ts":"2026-08-18T11:01:24.325Z","op":"update","visit":"iterations/i16/generalize-use-cases@1","node":"d390","brief":"the use cases sign with four new extensions"}
+{"ts":"2026-08-18T11:01:37.774Z","op":"update","visit":"iterations/i16/gate-inputs@1","node":"d391","brief":"walking the extension's live surface for the gate"}
+{"ts":"2026-08-18T11:01:52.678Z","op":"update","visit":"iterations/i16/gate-inputs@1","node":"d392","brief":"reopening the inputs gate over the affordance"}
+{"ts":"2026-08-18T11:03:43.485Z","op":"update","visit":"iterations/i16/gate-inputs@1","node":"d393","brief":"the inputs gate signs with the arc complete for the first time"}
+{"ts":"2026-08-18T11:03:54.979Z","op":"update","visit":"iterations/i16/gate-inputs@1","node":"d394","brief":"the inputs gate is blessed and M3 reopens"}
+{"ts":"2026-08-18T11:04:29.841Z","op":"update","visit":"iterations/i16/write-requirements@2","node":"d395","brief":"the runs-in-another-tree row lands with v1 as its detail"}
+{"ts":"2026-08-18T11:04:55.440Z","op":"update","visit":"iterations/i16/write-requirements@2","node":"d396","brief":"the act that writes a folder gains its only bound"}
+{"ts":"2026-08-18T11:05:51.522Z","op":"done","visit":"iterations/i16/draw-context@0","node":"d382","brief":"eleven rows stand and five of them gate every candidate"}
+{"ts":"2026-08-18T11:06:00.026Z","op":"update","visit":"iterations/i16/write-requirements@2","node":"d397","brief":"reopening the register for the two new rows"}
+{"ts":"2026-08-18T11:06:40.410Z","op":"update","visit":"iterations/i16/write-requirements@2","node":"d398","brief":"eleven rows stand and five of them gate every candidate"}
+{"ts":"2026-08-18T11:07:16.886Z","op":"plan","visit":"iterations/i16/derive-functions@0","parent":null,"nodes":[{"id":"d399","brief":"mint the project-producing function"},{"id":"d400","brief":"allocate the two new rows"},{"id":"d401","brief":"re-sign the rest of M3"}]}
+{"ts":"2026-08-18T11:07:29.111Z","op":"done","visit":"iterations/i16/derive-functions@0","node":"d399","brief":"the project function is minted and both rows are allocated"}
+{"ts":"2026-08-18T11:08:10.167Z","op":"done","visit":"iterations/i16/derive-functions@0","node":"d400","brief":"one new function, and the fold was tested rather than assumed"}
+{"ts":"2026-08-18T11:08:18.638Z","op":"update","visit":"iterations/i16/derive-functions@0","node":"d402","brief":"reopening the functions for the two new rows"}
+{"ts":"2026-08-18T11:08:52.219Z","op":"done","visit":"iterations/i16/derive-functions@0","node":"d401","brief":"the function cone signs with the project act separate from the copy act"}
+{"ts":"2026-08-18T11:09:25.476Z","op":"plan","visit":"iterations/i16/identify-assumptions@1","parent":null,"nodes":[{"id":"d403","brief":"mint the pointer-survives assumption"},{"id":"d404","brief":"re-sign the assumptions and probes"},{"id":"d405","brief":"re-sign the requirements gate"}]}
+{"ts":"2026-08-18T11:10:04.321Z","op":"done","visit":"iterations/i16/identify-assumptions@1","node":"d403","brief":"the pointer assumption is the first graded expected"}
+{"ts":"2026-08-18T11:10:12.342Z","op":"update","visit":"iterations/i16/identify-assumptions@1","node":"d406","brief":"reopening the assumptions for the pointer entry"}
+{"ts":"2026-08-18T11:10:42.634Z","op":"done","visit":"iterations/i16/identify-assumptions@1","node":"d404","brief":"the pointer assumption is the first graded expected"}
+{"ts":"2026-08-18T11:12:26.377Z","op":"update","visit":"iterations/i16/probe-assumptions@1","node":"d407","brief":"the pointer probe is scheduled with one candidate already eliminated"}
+{"ts":"2026-08-18T11:12:38.966Z","op":"update","visit":"iterations/i16/gate-requirements@1","node":"d408","brief":"reopening the requirements gate over eleven rows"}
+{"ts":"2026-08-18T11:14:00.993Z","op":"update","visit":"iterations/i16/gate-requirements@1","node":"d409","brief":"design input closes a second time over eleven rows"}
+{"ts":"2026-08-18T11:14:07.542Z","op":"done","visit":"iterations/i16/identify-assumptions@1","node":"d405","brief":"design input is blessed over eleven rows and M4 opens"}
+{"ts":"2026-08-18T11:14:36.609Z","op":"plan","visit":"iterations/i16/derive-criteria@0","parent":null,"nodes":[{"id":"d410","brief":"read the eleven compounding suspects"},{"id":"d411","brief":"answer each with a merge or a reason"},{"id":"d412","brief":"check the comparison pairs the affordance added"}]}
+{"ts":"2026-08-18T11:14:49.483Z","op":"update","visit":"iterations/i16/derive-criteria@0","node":"d413","brief":"grouping the suspects by characteristic"}
+{"ts":"2026-08-18T11:15:20.375Z","op":"update","visit":"iterations/i16/derive-criteria@0","node":"d414","brief":"collecting the criteria form to see the exact pair shape"}
+{"ts":"2026-08-18T11:16:23.751Z","op":"update","visit":"iterations/i16/derive-criteria@0","node":"d415","brief":"finding the shape a recorded merge takes"}
+{"ts":"2026-08-18T11:16:51.861Z","op":"done","visit":"iterations/i16/derive-criteria@0","node":"d410","brief":"the missing reciprocals are written as splits with their reasons"}
+{"ts":"2026-08-18T11:16:58.747Z","op":"update","visit":"iterations/i16/derive-criteria@0","node":"d416","brief":"checking what the compounding walk still asks"}
+{"ts":"2026-08-18T11:24:31.503Z","op":"update","visit":"iterations/i16/derive-criteria@0","node":"d417","brief":"checking which iterations ran the criteria state at all"}
+{"ts":"2026-08-18T11:24:38.880Z","op":"update","visit":"iterations/i16/derive-criteria@0","node":"d418","brief":"reading what i27 faced at the same state"}
+{"ts":"2026-08-18T11:25:48.274Z","op":"done","visit":"iterations/i16/derive-criteria@0","node":"d411","brief":"the insertion cost two comparisons, not a hundred"}
+{"ts":"2026-08-18T11:29:30.699Z","op":"done","visit":"iterations/i16/derive-criteria@0","node":"d412","brief":"the affordance added only must rows, which are never scored"}
+{"ts":"2026-08-18T11:30:18.098Z","op":"plan","visit":"iterations/i16/partition-functions@0","parent":null,"nodes":[{"id":"d419","brief":"read the three functions this iteration touched"},{"id":"d420","brief":"settle whether bring-forth-a-copy is really edgeless"},{"id":"d421","brief":"confirm or move every placement"},{"id":"d422","brief":"name the clusters and class their coupling"},{"id":"d423","brief":"write the evidence"}]}
+{"ts":"2026-08-18T11:30:29.326Z","op":"update","visit":"iterations/i16/partition-functions@0","node":"d424","brief":"reading the bootstrap cluster's four functions"}
+{"ts":"2026-08-18T11:31:55.399Z","op":"done","visit":"iterations/i16/partition-functions@0","node":"d420","brief":"edgeless is correct — every flow crosses the boundary"}
+{"ts":"2026-08-18T11:32:33.858Z","op":"update","visit":"iterations/i16/partition-functions@0","node":"d425","brief":"the bootstrap node still calls itself a singleton"}
+{"ts":"2026-08-18T11:34:30.382Z","op":"update","visit":"iterations/i16/partition-functions@0","node":"d426","brief":"writing the arrival cluster i35 named but never wrote"}
+{"ts":"2026-08-18T11:35:17.641Z","op":"done","visit":"iterations/i16/partition-functions@0","node":"d422","brief":"eight clusters named, three nodes written"}
+{"ts":"2026-08-18T11:36:41.335Z","op":"done","visit":"iterations/i16/partition-functions@0","node":"d421","brief":"all 33 confirmed where the engine put them"}
+{"ts":"2026-08-18T11:37:04.526Z","op":"done","visit":"iterations/i16/partition-functions@0","node":"d419","brief":"the bootstrap trio and resolve-a-path read in full"}
+{"ts":"2026-08-18T11:37:11.668Z","op":"done","visit":"iterations/i16/partition-functions@0","node":"d423","brief":"partition-functions signed with eight clusters named"}
+{"ts":"2026-08-18T11:39:44.447Z","op":"plan","visit":"iterations/i16/enumerate-space/find_prior_art@0","parent":null,"nodes":[{"id":"d427","brief":"read v1's overlay resolver and module layout"},{"id":"d428","brief":"read v1's engine-home pointer mechanism"},{"id":"d429","brief":"take the three literature sweeps"},{"id":"d430","brief":"mint one option node per idea"},{"id":"d431","brief":"fill the five fields"}]}
+{"ts":"2026-08-18T11:40:03.182Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d427","brief":"v1 resolves by path search over three layers"}
+{"ts":"2026-08-18T11:40:31.731Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d428","brief":"v1 ships five pointer mechanisms, not one"}
+{"ts":"2026-08-18T11:41:26.052Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d432","brief":"minting the predecessor's options for the-walk"}
+{"ts":"2026-08-18T11:41:55.019Z","op":"plan","visit":"iterations/i16/enumerate-space/find_prior_art@0","parent":null,"nodes":[{"id":"d433","brief":"Bazel workspace markers and Bazelisk"},{"id":"d434","brief":"Maven .mvn base dir and wrapper"},{"id":"d435","brief":"Gradle settings file and wrapper"},{"id":"d436","brief":"CMake CMakeCache CMAKE_HOME_DIRECTORY"},{"id":"d437","brief":"Terraform .terraform and TF_DATA_DIR"},{"id":"d438","brief":"Node resolution npx npm link"},{"id":"d439","brief":"Yarn PnP zero-installs yarnPath"}]}
+{"ts":"2026-08-18T11:41:58.223Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d440","brief":"prior-art sweep: reading primary docs on downstream-edit tracking in vendored copies"}
+{"ts":"2026-08-18T11:42:02.722Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d441","brief":"three of the walk's five pointer options written"}
+{"ts":"2026-08-18T11:42:03.640Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d442","brief":"reading Gradle directories doc for GRADLE_USER_HOME"}
+{"ts":"2026-08-18T11:42:13.721Z","op":"plan","visit":"iterations/i16/enumerate-space/find_prior_art@0","parent":"d429","nodes":[{"id":"d443","brief":"sweep: Yocto patch Upstream-Status"},{"id":"d444","brief":"Dependabot vendoring"},{"id":"d445","brief":"Copybara"},{"id":"d446","brief":"cargo vendor"}]}
+{"ts":"2026-08-18T11:42:19.179Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d447","brief":"prior art: reading Rails engines guide on view path precedence"}
+{"ts":"2026-08-18T11:42:23.241Z","op":"plan","visit":"iterations/i16/enumerate-space/find_prior_art@0","parent":null,"nodes":[{"id":"d448","brief":"git gitfile and repository discovery"},{"id":"d449","brief":"pyvenv.cfg home key"},{"id":"d450","brief":"XDG base directory registry option"},{"id":"d451","brief":"synthesise comparison table"}]}
+{"ts":"2026-08-18T11:42:27.344Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d452","brief":"reading Bazel output base and repo boundary docs"}
+{"ts":"2026-08-18T11:42:34.990Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d453","brief":"prior art: paging to the Rails overriding-views section"}
+{"ts":"2026-08-18T11:42:37.711Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d454","brief":"the walk's five options stand, the bootstrap's two next"}
+{"ts":"2026-08-18T11:42:38.571Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d455","brief":"reading Copybara core.merge_import_config and autopatch_config sections"}
+{"ts":"2026-08-18T11:42:49.553Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d433","brief":"Bazel repo-boundary, output base hash and Bazelisk read"}
+{"ts":"2026-08-18T11:42:52.209Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d449","brief":"PEP 405 and venv docs read: home key names the base python's directory"}
+{"ts":"2026-08-18T11:42:53.450Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d446","brief":"cargo vendor read: vendored sources are read-only, no local-edit tracking"}
+{"ts":"2026-08-18T11:42:54.226Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d456","brief":"prior art: OSGi core spec fragment bundles section"}
+{"ts":"2026-08-18T11:42:54.615Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d457","brief":"checking whether the submodule gitfile pointer is relative or absolute"}
+{"ts":"2026-08-18T11:43:08.802Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d458","brief":"subagent: researching boundary markers and self-location prior art"}
+{"ts":"2026-08-18T11:43:09.778Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d430","brief":"seven options minted from the predecessor"}
+{"ts":"2026-08-18T11:43:14.803Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d459","brief":"confirming which Yarn files are committed vs gitignored"}
+{"ts":"2026-08-18T11:43:16.992Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d460","brief":"prior art: Android manifest merger match keys and node markers"}
+{"ts":"2026-08-18T11:43:19.803Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d444","brief":"Dependabot vendor option read: maintains vendored dirs, no local-edit inventory"}
+{"ts":"2026-08-18T11:43:20.326Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d461","brief":"prior art: checking VS Code contribution points for any override mechanism"}
+{"ts":"2026-08-18T11:43:27.830Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d462","brief":"reading git source for whether the submodule gitfile path is relative"}
+{"ts":"2026-08-18T11:43:37.426Z","op":"fork","visit":"iterations/i16/enumerate-space/find_prior_art@0","parent":"d448","node":"d463","brief":"boundary markers and self-location sweep","nodes":[{"id":"d464","brief":"EditorConfig upward walk and root=true"},{"id":"d465","brief":"LSP rootUri workspaceFolders root markers"},{"id":"d466","brief":"Perforce P4CONFIG upward walk"},{"id":"d467","brief":"Android repo .repo discovery"},{"id":"d468","brief":"depot_tools .gclient discovery"},{"id":"d469","brief":"pkg-config pcfiledir self-relative pointer"},{"id":"d470","brief":"proc/self/exe and POSIX gap"},{"id":"d471","brief":"Windows GetModuleFileName"},{"id":"d472","brief":"Go os.Executable"},{"id":"d473","brief":"Node __dirname execPath import.meta.url"},{"id":"d474","brief":"Python __file__ sys.executable importlib.resources"},{"id":"d475","brief":"Java JAVA_HOME and getCodeSource"},{"id":"d476","brief":".NET AppContext.BaseDirectory"}]}
+{"ts":"2026-08-18T11:43:40.799Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d477","brief":"checking how Gradle locates the settings file"}
+{"ts":"2026-08-18T11:43:42.577Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d478","brief":"fetching git submodule.c to read how the gitfile pointer is written"}
+{"ts":"2026-08-18T11:43:46.546Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d479","brief":"last check: Renovate known limitations on modified/vendored deps"}
+{"ts":"2026-08-18T11:43:51.244Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d480","brief":"prior art: Gradle conflict resolution keyed on module coordinates"}
+{"ts":"2026-08-18T11:43:53.447Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d481","brief":"prior art: XSLT import precedence and named-template overriding"}
+{"ts":"2026-08-18T11:43:57.795Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d464","brief":"EditorConfig: read spec 0.17.2 File Processing section, upward walk + root=true stop"}
+{"ts":"2026-08-18T11:44:00.712Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d466","brief":"P4CONFIG: read P4 CLI 2026.1 cmdref, PWD and parents searched for named file"}
+{"ts":"2026-08-18T11:44:05.003Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d482","brief":"prior art: Java class path search order, last item of the sweep"}
+{"ts":"2026-08-18T11:44:07.811Z","op":"plan","visit":"iterations/i16/enumerate-space/find_prior_art@0","parent":"d431","nodes":[{"id":"d483","brief":"the predecessor half saved"},{"id":"d484","brief":"unstamped"},{"id":"d485","brief":"while the sweeps run"}]}
+{"ts":"2026-08-18T11:44:09.916Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d445","brief":"Copybara read: merge_import + autopatch_config + consistency file carry downstream edits"}
+{"ts":"2026-08-18T11:44:12.976Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d443","brief":"Yocto read: Upstream-Status tag is mandated per patch and checked by yocto-check-layer"}
+{"ts":"2026-08-18T11:44:14.295Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d486","brief":"reading mvnw script for the .mvn upward walk"}
+{"ts":"2026-08-18T11:44:27.763Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d467","brief":"repo: AOSP cmdref confirms cwd must be .repo parent or a subdirectory of it"}
+{"ts":"2026-08-18T11:44:28.887Z","op":"obsolete","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d483","brief":"a chained brief split into three items that were never work"}
+{"ts":"2026-08-18T11:44:29.989Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d487","brief":"pkg-config: hunting a primary man page that documents pcfiledir"}
+{"ts":"2026-08-18T11:44:39.271Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d468","brief":"gclient: read gclient_paths.py FindGclientRoot, an explicit upward walk for .gclient"}
+{"ts":"2026-08-18T11:44:41.562Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d488","brief":"LSP: paging the 3.17 specification to the initialize request section"}
+{"ts":"2026-08-18T11:44:52.458Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d489","brief":"reading the EditorConfig spec for the root=true walk terminator"}
+{"ts":"2026-08-18T11:45:01.848Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d490","brief":"LSP: paging again, aiming at InitializeParams rootPath rootUri workspaceFolders"}
+{"ts":"2026-08-18T11:45:02.137Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d491","brief":"reading cmake(1) on loading source path from an existing build tree"}
+{"ts":"2026-08-18T11:45:03.839Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d492","brief":"pkg-config: pkgconf pc(5) omits pcfiledir, trying freedesktop pkg-config man page"}
+{"ts":"2026-08-18T11:45:08.819Z","op":"obsolete","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d484","brief":"a chain fragment, never a real item"}
+{"ts":"2026-08-18T11:45:17.393Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d469","brief":"pkg-config: pcfiledir confirmed in freedesktop man page, relocatable prefix example"}
+{"ts":"2026-08-18T11:45:19.238Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d465","brief":"LSP: InitializeParams read — rootPath and rootUri both deprecated, workspaceFolders wins"}
+{"ts":"2026-08-18T11:45:23.577Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d493","brief":"reading pre-commit: in-tree config naming versions, tool home in a machine cache"}
+{"ts":"2026-08-18T11:45:27.197Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d470","brief":"proc/self/exe: read proc_pid_exe(5), notes the (deleted) suffix and ptrace check"}
+{"ts":"2026-08-18T11:45:29.503Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d471","brief":"Windows: GetModuleFileNameW doc read, NULL hModule gives current process image path"}
+{"ts":"2026-08-18T11:45:40.501Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d494","brief":"confirming Terraform module dir and gitignore status"}
+{"ts":"2026-08-18T11:45:48.530Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d472","brief":"Go: os.Executable doc read — no guarantee path still correct, symlink caveat"}
+{"ts":"2026-08-18T11:45:49.242Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d495","brief":"confirming how CPython startup reads pyvenv.cfg, for the pointer-file crux"}
+{"ts":"2026-08-18T11:45:50.999Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d496","brief":"Python: reading sys.executable and the frozen caveat in the sys docs"}
+{"ts":"2026-08-18T11:45:53.573Z","op":"obsolete","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d485","brief":"the last chain fragment cleared"}
+{"ts":"2026-08-18T11:46:01.025Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d497","brief":"reading CPython path initialisation: exactly where pyvenv.cfg is looked for"}
+{"ts":"2026-08-18T11:46:04.241Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d498","brief":".NET: reading AppContext.BaseDirectory reference"}
+{"ts":"2026-08-18T11:46:07.894Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d499","brief":"Java: reading ProtectionDomain and CodeSource for jar self-location"}
+{"ts":"2026-08-18T11:46:26.672Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d500","brief":"hunting the Gradle doc sentence on walking up for settings.gradle"}
+{"ts":"2026-08-18T11:46:42.575Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d501","brief":"Java: reading CodeSource.getLocation javadoc for the jar URL"}
+{"ts":"2026-08-18T11:46:59.158Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d502","brief":"Python: reading the import system reference for __file__ semantics"}
+{"ts":"2026-08-18T11:47:03.557Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d439","brief":"yarnPath read from docs and Yarn's own source and rc file"}
+{"ts":"2026-08-18T11:47:07.136Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d503","brief":"reading Copier: answers file records _src_path and _commit inside the generated tree"}
+{"ts":"2026-08-18T11:47:54.024Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d504","brief":"the overlay sweep landed with 20 systems and 18 primary sources"}
+{"ts":"2026-08-18T11:47:58.462Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d505","brief":"Python: reading importlib.resources for package-data access without __file__"}
+{"ts":"2026-08-18T11:47:58.887Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d506","brief":"retrying Copier docs for the answers-file pointer contents"}
+{"ts":"2026-08-18T11:48:00.401Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d507","brief":"Java: retrying CodeSource javadoc on a different host"}
+{"ts":"2026-08-18T11:48:07.835Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d508","brief":"second attempt at the Copier configuring page for the _src_path key"}
+{"ts":"2026-08-18T11:48:11.336Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d476","brief":".NET: AppContext.BaseDirectory read — base directory, host dir for bundled apps"}
+{"ts":"2026-08-18T11:48:13.231Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d509","brief":"Node: paging process docs to reach process.execPath"}
+{"ts":"2026-08-18T11:48:20.076Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d450","brief":"XDG base directory spec read: machine-global registry archetype, absolute paths only"}
+{"ts":"2026-08-18T11:48:23.431Z","op":"plan","visit":"iterations/i16/enumerate-space/find_prior_art@0","parent":null,"nodes":[{"id":"d510","brief":"Claude Code plugins/marketplaces"},{"id":"d511","brief":"Codex CLI + AGENTS.md"},{"id":"d512","brief":"Cursor rules"},{"id":"d513","brief":"Aider conventions"},{"id":"d514","brief":"Windsurf rules/workflows"},{"id":"d515","brief":"Copilot custom instructions"}]}
+{"ts":"2026-08-18T11:48:26.179Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d474","brief":"Python: __file__, sys.executable and importlib.resources all read from the docs"}
+{"ts":"2026-08-18T11:48:28.180Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d516","brief":"Java: reading the OpenJDK launcher source for how it locates its own home"}
+{"ts":"2026-08-18T11:48:31.424Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d517","brief":"hunting the exact Copier key that records the template source path"}
+{"ts":"2026-08-18T11:48:43.293Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d518","brief":"reading Claude Code marketplace distribution docs"}
+{"ts":"2026-08-18T11:48:45.520Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d519","brief":"reading AGENTS.md guide on developers.openai.com"}
+{"ts":"2026-08-18T11:48:47.854Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d520","brief":"reading Cursor rules docs"}
+{"ts":"2026-08-18T11:48:48.545Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d521","brief":"the vendoring sweep names the field's gap precisely"}
+{"ts":"2026-08-18T11:48:50.040Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d522","brief":"reading aider conventions docs"}
+{"ts":"2026-08-18T11:48:53.023Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d475","brief":"Java: OpenJDK launcher reads /proc/self/exe and derives JDK root, no JAVA_HOME"}
+{"ts":"2026-08-18T11:48:55.274Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d523","brief":"LSP: root markers are client-side, checking one client's own primary docs"}
+{"ts":"2026-08-18T11:48:56.086Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d524","brief":"checking CMakeCache's back-pointer to the source tree as an absolute-pointer example"}
+{"ts":"2026-08-18T11:49:07.636Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d525","brief":"reading GitHub Copilot repository custom instructions docs"}
+{"ts":"2026-08-18T11:49:10.412Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d526","brief":"reading .aider.conf.yml search order"}
+{"ts":"2026-08-18T11:49:14.395Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d473","brief":"Node self-location APIs read from the official docs"}
+{"ts":"2026-08-18T11:49:17.362Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d527","brief":"confirming git's own glossary definition of gitfile before writing up"}
+{"ts":"2026-08-18T11:49:22.508Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d463","brief":"boundary-marker and self-location sweep complete, thirteen items with primary sources"}
+{"ts":"2026-08-18T11:49:28.363Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d528","brief":"derived and declared are the two halves nobody has joined"}
+{"ts":"2026-08-18T11:49:34.087Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d512","brief":"Cursor rules docs read in full"}
+{"ts":"2026-08-18T11:49:36.390Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d513","brief":"aider conventions and config search order read"}
+{"ts":"2026-08-18T11:49:48.827Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d529","brief":"reading P4CONFIG: env names the marker filename, tree supplies the values"}
+{"ts":"2026-08-18T11:49:57.461Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d514","brief":"Windsurf rules and workflows docs read"}
+{"ts":"2026-08-18T11:49:59.903Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d530","brief":"reading Copilot CLI plugin concept page"}
+{"ts":"2026-08-18T11:50:02.402Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d531","brief":"checking whether Codex packages skills for distribution"}
+{"ts":"2026-08-18T11:50:03.053Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d532","brief":"twelve options stand, two sweeps still out"}
+{"ts":"2026-08-18T11:50:12.344Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d533","brief":"looking for Codex skills packaging page"}
+{"ts":"2026-08-18T11:50:12.925Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d534","brief":"insurance read on Bazel workspace boundary markers while sweeps finish"}
+{"ts":"2026-08-18T11:50:14.778Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d535","brief":"reading Copilot organization-level instructions page"}
+{"ts":"2026-08-18T11:50:22.576Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d515","brief":"Copilot instructions, plugins and marketplace docs read"}
+{"ts":"2026-08-18T11:50:24.589Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d536","brief":"reading Codex plugin distribution page"}
+{"ts":"2026-08-18T11:50:41.061Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d510","brief":"Claude Code plugin and marketplace mechanism established from primary docs"}
+{"ts":"2026-08-18T11:50:43.107Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d511","brief":"Codex AGENTS.md discovery and skill locations established from primary docs"}
+{"ts":"2026-08-18T11:50:48.213Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d448","brief":"git side complete with primary quotes from spec and source"}
+{"ts":"2026-08-18T11:51:25.978Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d434","brief":"Maven .mvn upward walk and wrapper distributionUrl confirmed from Apache docs"}
+{"ts":"2026-08-18T11:51:37.546Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d537","brief":"literature and follow-up saved with two sweeps in hand"}
+{"ts":"2026-08-18T11:52:35.733Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d538","brief":"all fifteen options listed on the form"}
+{"ts":"2026-08-18T11:52:59.307Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d435","brief":"Gradle settings-file walk and wrapper distributionUrl confirmed from Gradle docs"}
+{"ts":"2026-08-18T11:53:33.092Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d436","brief":"CMakeCache CMAKE_HOME_DIRECTORY confirmed as the absolute back-pointer that breaks on move"}
+{"ts":"2026-08-18T11:53:41.965Z","op":"plan","visit":"iterations/i16/enumerate-space/find_prior_art@0","parent":"d429","nodes":[{"id":"d539","brief":"sweeping autonomous harnesses: SWE-agent"},{"id":"d540","brief":"OpenHands"},{"id":"d541","brief":"Cline"},{"id":"d542","brief":"Continue"},{"id":"d543","brief":"Q"},{"id":"d544","brief":"Devin"}]}
+{"ts":"2026-08-18T11:53:57.325Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d545","brief":"settling whether Terraform's .terraform directory survives a move or copy"}
+{"ts":"2026-08-18T11:54:04.687Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d431","brief":"seven fields filled and the finder signed"}
+{"ts":"2026-08-18T11:54:07.495Z","op":"update","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d546","brief":"reading OpenHands repository customization and CLI repo selection"}
+{"ts":"2026-08-18T11:54:20.760Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d539","brief":"SWE-agent established: env.repo.github_url/path plus --config yaml bundles"}
+{"ts":"2026-08-18T11:54:30.007Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d437","brief":"settled: .terraform holds symlinks into the plugin cache, so a copy does not survive"}
+{"ts":"2026-08-18T11:54:31.921Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d438","brief":"Node upward walk and npm link machine-global symlinks confirmed from npm docs"}
+{"ts":"2026-08-18T11:54:36.712Z","op":"plan","visit":"iterations/i16/enumerate-space/find_contradiction@0","parent":null,"nodes":[{"id":"d547","brief":"read the 39 parameters and their software equivalents"},{"id":"d548","brief":"state each contradiction as a move"},{"id":"d549","brief":"try the four separations"},{"id":"d550","brief":"look up the principles where a separation fails"},{"id":"d551","brief":"mint the options and fill the form"}]}
+{"ts":"2026-08-18T11:54:47.008Z","op":"update","visit":"iterations/i16/enumerate-space/find_contradiction@0","node":"d552","brief":"checking whether the Continue Hub is still live after the Cursor acquisition"}
+{"ts":"2026-08-18T11:54:52.419Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d451","brief":"comparison table built across all four sweeps, report going out this turn"}
+{"ts":"2026-08-18T11:55:02.650Z","op":"update","visit":"iterations/i16/enumerate-space/find_contradiction@0","node":"d553","brief":"checking whether the Continue Hub is still live"}
+{"ts":"2026-08-18T11:55:34.666Z","op":"update","visit":"iterations/i16/enumerate-space/find_contradiction@0","node":"d554","brief":"Amazon Q CLI repo declares itself unmaintained and superseded by Kiro CLI"}
+{"ts":"2026-08-18T11:55:44.972Z","op":"update","visit":"iterations/i16/enumerate-space/find_contradiction@0","node":"d555","brief":"checking the Continue repo archive flag from the GitHub API"}
+{"ts":"2026-08-18T11:55:56.438Z","op":"done","visit":"iterations/i16/enumerate-space/find_contradiction@0","node":"d547","brief":"39 parameters and their software equivalents read"}
+{"ts":"2026-08-18T11:56:03.984Z","op":"update","visit":"iterations/i16/enumerate-space/find_contradiction@0","node":"d556","brief":"confirming how the Devin CLI picks the repository it works on"}
+{"ts":"2026-08-18T11:56:33.739Z","op":"done","visit":"iterations/i16/enumerate-space/find_contradiction@0","node":"d550","brief":"one cell consulted, one principle transferred"}
+{"ts":"2026-08-18T11:58:27.521Z","op":"done","visit":"iterations/i16/enumerate-space/find_contradiction@0","node":"d548","brief":"five contradictions stated as moves"}
+{"ts":"2026-08-18T11:59:15.492Z","op":"done","visit":"iterations/i16/enumerate-space/find_contradiction@0","node":"d549","brief":"four separations tried against five contradictions"}
+{"ts":"2026-08-18T11:59:46.280Z","op":"update","visit":"iterations/i16/enumerate-space/find_contradiction@0","node":"d557","brief":"two pointer options minted, now the contradiction form"}
+{"ts":"2026-08-18T12:00:44.595Z","op":"done","visit":"iterations/i16/enumerate-space/find_contradiction@0","node":"d551","brief":"nineteen options stand across the two clusters"}
+{"ts":"2026-08-18T12:01:08.777Z","op":"fork","visit":"iterations/i16/enumerate-space/find_contradiction@0","parent":null,"node":"d558","brief":"store the research locally before it is lost","nodes":[]}
+{"ts":"2026-08-18T12:03:32.721Z","op":"update","visit":"iterations/i16/enumerate-space/find_contradiction@0","node":"d559","brief":"two of three research files written"}
+{"ts":"2026-08-18T12:06:25.036Z","op":"done","visit":"iterations/i16/enumerate-space/find_contradiction@0","node":"d558","brief":"three research files stored and a note points the retro at them"}
+{"ts":"2026-08-18T12:08:24.721Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d540","brief":"OpenHands read and recorded in the competitors file"}
+{"ts":"2026-08-18T12:08:44.591Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d541","brief":"Cline read and recorded in the competitors file"}
+{"ts":"2026-08-18T12:09:08.110Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d542","brief":"Continue read and recorded in the competitors file"}
+{"ts":"2026-08-18T12:10:03.369Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d543","brief":"Amazon Q read and recorded in the competitors file"}
+{"ts":"2026-08-18T12:10:19.488Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d544","brief":"Devin read and recorded in the competitors file"}
+{"ts":"2026-08-18T12:11:10.504Z","op":"done","visit":"iterations/i16/enumerate-space/find_prior_art@0","node":"d429","brief":"eight sweeps taken, and three more are out on analogy"}
+{"ts":"2026-08-18T12:11:34.038Z","op":"update","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d560","brief":"analogy holds on three readings; checking for a parallel finder"}
+{"ts":"2026-08-18T12:13:08.324Z","op":"plan","visit":"iterations/i16/enumerate-space/find_analogy@0","parent":null,"nodes":[{"id":"d561","brief":"web research: apparatus criticus"},{"id":"d562","brief":"stemmatics"},{"id":"d563","brief":"copy-text theory"},{"id":"d564","brief":"genetic criticism"}]}
+{"ts":"2026-08-18T12:14:28.157Z","op":"update","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d565","brief":"verifying Greg's own wording for substantives and accidentals"}
+{"ts":"2026-08-18T12:14:31.968Z","op":"fork","visit":"iterations/i16/enumerate-space/find_analogy@0","parent":"d563","node":"d566","brief":"cross-industry research: service bulletins","nodes":[{"id":"d567","brief":"cross-industry research: service bulletins"},{"id":"d568","brief":"ADs"},{"id":"d569","brief":"AMOCs"},{"id":"d570","brief":"recalls"},{"id":"d571","brief":"FSCAs"}]}
+{"ts":"2026-08-18T12:14:57.106Z","op":"plan","visit":"iterations/i16/enumerate-space/find_analogy@0","parent":null,"nodes":[{"id":"d572","brief":"integron anatomy and recombination mechanism"},{"id":"d573","brief":"integron expression gradient and silent reservoir"},{"id":"d574","brief":"transfer section: what breaks in translation"}]}
+{"ts":"2026-08-18T12:15:14.352Z","op":"update","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d575","brief":"reading an open-access integron review for attI/attC/intI/Pc anatomy"}
+{"ts":"2026-08-18T12:15:19.421Z","op":"done","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d571","brief":"EU MDR and FDA correction/removal rules captured in full"}
+{"ts":"2026-08-18T12:15:27.888Z","op":"update","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d576","brief":"reading measured fitness cost of carrying a class 1 integron"}
+{"ts":"2026-08-18T12:15:38.065Z","op":"done","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d567","brief":"SB structure gathered; exact ATA iSpec 2200 field list stays unread and is marked so"}
+{"ts":"2026-08-18T12:15:43.418Z","op":"done","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d568","brief":"14 CFR Part 39 read in full from two primary sources plus a live AD"}
+{"ts":"2026-08-18T12:15:48.002Z","op":"done","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d569","brief":"AMOC covered by 39.17/39.19 and a live AD; FAA Order 8110.103 unreachable"}
+{"ts":"2026-08-18T12:15:52.658Z","op":"done","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d570","brief":"49 CFR 573 and 577 read in full, plus 579.5 for service bulletins"}
+{"ts":"2026-08-18T12:15:56.886Z","op":"update","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d577","brief":"checking the 2024 finding that Pc distance effect is negligible"}
+{"ts":"2026-08-18T12:15:57.255Z","op":"done","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d566","brief":"all five legs of the cross-industry research closed"}
+{"ts":"2026-08-18T12:16:20.373Z","op":"update","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d578","brief":"reading PMC copy of the integron expression-model correction"}
+{"ts":"2026-08-18T12:16:28.432Z","op":"update","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d579","brief":"trying the preprint HTML for the integron expression-model correction"}
+{"ts":"2026-08-18T12:16:51.656Z","op":"update","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d580","brief":"reading NCBI Bookshelf chapter on restriction-modification as mobile epigenetic elements"}
+{"ts":"2026-08-18T12:17:37.402Z","op":"update","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d581","brief":"reading an open-access HGT review covering all three transfer mechanisms"}
+{"ts":"2026-08-18T12:18:08.953Z","op":"update","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d582","brief":"attempting a readable CRISPR adaptation review for the refusal side"}
+{"ts":"2026-08-18T12:18:28.255Z","op":"done","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d561","brief":"apparatus criticus sourced from the TEI module and real published editions"}
+{"ts":"2026-08-18T12:18:33.911Z","op":"done","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d562","brief":"stemmatics sourced from the Helsinki stemmatology reference and Maas terminology"}
+{"ts":"2026-08-18T12:18:36.342Z","op":"plan","visit":"iterations/i16/enumerate-space/find_analogy@0","parent":null,"nodes":[{"id":"d583","brief":"transfer the CENELEC deviation annex"},{"id":"d584","brief":"transfer ICAO's re-declaration clock"},{"id":"d585","brief":"transfer the closed reason vocabulary"},{"id":"d586","brief":"take the two remaining readings"},{"id":"d587","brief":"submit find_analogy"}]}
+{"ts":"2026-08-18T12:18:39.285Z","op":"done","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d563","brief":"copy-text theory sourced with Greg's own wording verified"}
+{"ts":"2026-08-18T12:18:46.196Z","op":"done","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d564","brief":"genetic criticism sourced from ITEM's dictionary and the TEI genetic-editing paper"}
+{"ts":"2026-08-18T12:18:52.187Z","op":"done","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d572","brief":"integron anatomy read from an open-access review plus the RM bookshelf chapter"}
+{"ts":"2026-08-18T12:18:58.258Z","op":"done","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d573","brief":"expression model checked and the 2024 correction to the distance rule recorded"}
+{"ts":"2026-08-18T12:19:03.240Z","op":"done","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d583","brief":"the annex-inside-the-artifact placement transferred"}
+{"ts":"2026-08-18T12:19:04.215Z","op":"done","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d574","brief":"transfer section written with the losses named"}
+{"ts":"2026-08-18T12:19:32.196Z","op":"done","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d584","brief":"the sixty-day re-declaration clock transferred"}
+{"ts":"2026-08-18T12:19:54.228Z","op":"done","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d585","brief":"the closed reason vocabulary transferred from building code"}
+{"ts":"2026-08-18T12:20:09.109Z","op":"update","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d588","brief":"law landed; aviation and textual scholarship still reading"}
+{"ts":"2026-08-18T12:20:56.246Z","op":"done","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d587","brief":"find_analogy signed with three law transfers"}
+{"ts":"2026-08-18T12:21:52.007Z","op":"update","visit":"iterations/i16/enumerate-space/find_without@0","node":"d589","brief":"aviation landed; textual scholarship still reading"}
+{"ts":"2026-08-18T12:23:07.284Z","op":"done","visit":"iterations/i16/enumerate-space/find_analogy@0","node":"d586","brief":"aviation and law taken; textual scholarship still out"}
+{"ts":"2026-08-18T12:23:38.617Z","op":"update","visit":"iterations/i16/enumerate-space/find_without@0","node":"d590","brief":"two null options minted, now the trims table"}
+{"ts":"2026-08-18T12:24:37.633Z","op":"plan","visit":"iterations/i16/enumerate-space/find_without@0","parent":null,"nodes":[{"id":"d591","brief":"ask every cluster whether it can go"},{"id":"d592","brief":"mint the two new nulls"},{"id":"d593","brief":"cite the four standing nulls"},{"id":"d594","brief":"submit find_without"}]}
+{"ts":"2026-08-18T12:25:34.623Z","op":"done","visit":"iterations/i16/enumerate-space/find_without@0","node":"d591","brief":"all eight clusters asked, four already trimmed"}
+{"ts":"2026-08-18T12:26:05.151Z","op":"done","visit":"iterations/i16/enumerate-space/find_without@0","node":"d592","brief":"both nulls minted before the state signed"}
+{"ts":"2026-08-18T12:26:19.048Z","op":"done","visit":"iterations/i16/enumerate-space/find_without@0","node":"d593","brief":"four standing nulls cited rather than duplicated"}
+{"ts":"2026-08-18T12:26:58.524Z","op":"done","visit":"iterations/i16/enumerate-space/find_without@0","node":"d594","brief":"find_without signed; owner design input captured as an option"}
+{"ts":"2026-08-18T12:27:52.487Z","op":"plan","visit":"iterations/i16/enumerate-space/find_by_heuristic@0","parent":null,"nodes":[{"id":"d595","brief":"sweep eight rules against eight clusters"},{"id":"d596","brief":"mint the options that bite"},{"id":"d597","brief":"submit find_by_heuristic"}]}
+{"ts":"2026-08-18T12:29:07.638Z","op":"done","visit":"iterations/i16/enumerate-space/find_by_heuristic@0","node":"d596","brief":"one rule bit something not already on the chart"}
+{"ts":"2026-08-18T12:30:42.824Z","op":"done","visit":"iterations/i16/enumerate-space/find_by_heuristic@0","node":"d597","brief":"the heuristic sweep is signed"}
+{"ts":"2026-08-18T12:30:57.726Z","op":"done","visit":"iterations/i16/enumerate-space/find_by_heuristic@0","node":"d595","brief":"the full catalogue was held against every cluster"}
+{"ts":"2026-08-18T12:31:52.575Z","op":"plan","visit":"iterations/i16/enumerate-space/find_by_transforming@0","parent":null,"nodes":[{"id":"d598","brief":"run twelve operators against the incumbent"},{"id":"d599","brief":"mint what the transform produced"},{"id":"d600","brief":"submit find_by_transforming"}]}
+{"ts":"2026-08-18T12:32:16.341Z","op":"done","visit":"iterations/i16/enumerate-space/find_by_transforming@0","node":"d599","brief":"two operators produced something the chart lacked"}
+{"ts":"2026-08-18T12:33:13.351Z","op":"done","visit":"iterations/i16/enumerate-space/find_by_transforming@0","node":"d598","brief":"both catalogues ran whole against the incumbent"}
+{"ts":"2026-08-18T12:34:08.896Z","op":"plan","visit":"iterations/i16/enumerate-space/find_by_probing@0","parent":null,"nodes":[{"id":"d601","brief":"build the cheapest thing that settles the migration question"},{"id":"d602","brief":"run it and record the verdict"},{"id":"d603","brief":"fill and submit find_by_probing"}]}
+{"ts":"2026-08-18T12:34:20.975Z","op":"done","visit":"iterations/i16/enumerate-space/find_by_probing@0","node":"d601","brief":"the probe is written with its question and its fallback"}
+{"ts":"2026-08-18T12:34:30.852Z","op":"done","visit":"iterations/i16/enumerate-space/find_by_transforming@0","node":"d600","brief":"the transform finder is signed"}
+{"ts":"2026-08-18T12:35:01.590Z","op":"update","visit":"iterations/i16/enumerate-space/find_by_probing@0","node":"d604","brief":"running the probe now that it parses"}
+{"ts":"2026-08-18T12:35:44.253Z","op":"update","visit":"iterations/i16/enumerate-space/find_by_probing@0","node":"d605","brief":"rerunning with a control that can actually fail"}
+{"ts":"2026-08-18T12:36:27.281Z","op":"update","visit":"iterations/i16/enumerate-space/find_by_probing@0","node":"d606","brief":"third run, this time with a real repo and a real diff"}
+{"ts":"2026-08-18T12:36:48.873Z","op":"update","visit":"iterations/i16/enumerate-space/find_by_probing@0","node":"d607","brief":"reading the patch to find why it applies but changes nothing"}
+{"ts":"2026-08-18T12:38:10.019Z","op":"update","visit":"iterations/i16/enumerate-space/find_by_probing@0","node":"d608","brief":"running the merge probe with both far and near copy edits"}
+{"ts":"2026-08-18T12:38:33.353Z","op":"done","visit":"iterations/i16/enumerate-space/find_by_probing@0","node":"d602","brief":"the probe ran and the verdict is decisive"}
+{"ts":"2026-08-18T12:38:52.526Z","op":"update","visit":"iterations/i16/enumerate-space/find_by_probing@0","node":"d609","brief":"the probed option now carries its measured result"}
+{"ts":"2026-08-18T12:40:06.290Z","op":"update","visit":"iterations/i16/enumerate-space/find_by_probing@0","node":"d610","brief":"filling the probe form before stamping"}
+{"ts":"2026-08-18T12:40:14.583Z","op":"done","visit":"iterations/i16/enumerate-space/find_by_probing@0","node":"d603","brief":"the last finder is signed"}
+{"ts":"2026-08-18T12:41:05.862Z","op":"plan","visit":"iterations/i16/enumerate-space/build_chart@0","parent":null,"nodes":[{"id":"d611","brief":"fill the one-occupant cell"},{"id":"d612","brief":"draw candidates across the chart"},{"id":"d613","brief":"say what the space holds that they do not"}]}
+{"ts":"2026-08-18T12:41:29.996Z","op":"done","visit":"iterations/i16/enumerate-space/build_chart@0","node":"d611","brief":"both one-occupant cells now hold a rival"}
+{"ts":"2026-08-18T12:41:37.964Z","op":"update","visit":"iterations/i16/enumerate-space/build_chart@0","node":"d614","brief":"reading what the chart form wants before drawing"}
+{"ts":"2026-08-18T12:42:34.610Z","op":"update","visit":"iterations/i16/enumerate-space/build_chart@0","node":"d615","brief":"the replace-whole-file cell was missing from its row"}
+{"ts":"2026-08-18T12:43:10.329Z","op":"update","visit":"iterations/i16/enumerate-space/build_chart@0","node":"d616","brief":"drawing the floor line first"}
+{"ts":"2026-08-18T12:44:03.436Z","op":"update","visit":"iterations/i16/enumerate-space/build_chart@0","node":"d617","brief":"third line drawn, the declared one"}
+{"ts":"2026-08-18T12:44:17.243Z","op":"done","visit":"iterations/i16/enumerate-space/build_chart@0","node":"d612","brief":"four lines drawn across the iteration's nine rows"}
+{"ts":"2026-08-18T12:45:19.031Z","op":"done","visit":"iterations/i16/enumerate-space/build_chart@0","node":"d613","brief":"the sample names what it does not vary"}
+{"ts":"2026-08-18T12:45:39.134Z","op":"update","visit":"iterations/i16/run-candidates@0","node":"d618","brief":"checking whether the chart table overwrote the candidate nodes"}
+{"ts":"2026-08-18T12:46:13.245Z","op":"fork","visit":"iterations/i16/run-candidates@0","parent":null,"node":"d619","brief":"restore the four candidate nodes the chart field overwrote","nodes":[]}
+{"ts":"2026-08-18T12:46:21.021Z","op":"update","visit":"iterations/i16/run-candidates@0","node":"d620","brief":"checking whether i15's candidate nodes survived"}
+{"ts":"2026-08-18T12:46:35.326Z","op":"update","visit":"iterations/i16/run-candidates@0","node":"d621","brief":"reading i15's five candidates back from the branch"}
+{"ts":"2026-08-18T12:46:55.236Z","op":"update","visit":"iterations/i16/run-candidates@0","node":"d622","brief":"restoring i15's five candidates, one of five"}
+{"ts":"2026-08-18T12:47:20.714Z","op":"update","visit":"iterations/i16/run-candidates@0","node":"d623","brief":"three of five restored"}
+{"ts":"2026-08-18T12:47:49.066Z","op":"done","visit":"iterations/i16/run-candidates@0","node":"d619","brief":"all nine candidate nodes stand correct again"}
+{"ts":"2026-08-18T12:48:45.367Z","op":"update","visit":"iterations/i16/run-candidates@0","node":"d624","brief":"filling the placeholder the candidate machine seeds from"}
+{"ts":"2026-08-18T12:48:51.575Z","op":"update","visit":"iterations/i16/run-candidates@0","node":"d625","brief":"stamping the candidate placeholder"}
+{"ts":"2026-08-18T12:49:04.317Z","op":"plan","visit":"iterations/i16/run-candidates@0","parent":null,"nodes":[{"id":"d626","brief":"author the candidate drawing"},{"id":"d627","brief":"compose the four candidates"}]}
+{"ts":"2026-08-18T12:49:24.904Z","op":"done","visit":"iterations/i16/run-candidates@0","node":"d626","brief":"four compose steps authored, one per line drawn"}
+{"ts":"2026-08-18T12:49:32.150Z","op":"update","visit":"iterations/i16/run-candidates@0","node":"d628","brief":"entering the compose machine"}
+{"ts":"2026-08-18T12:50:25.996Z","op":"update","visit":"iterations/i16/run-candidates/cand-what-ships-today@0","node":"d629","brief":"first candidate composed"}
+{"ts":"2026-08-18T12:50:44.326Z","op":"update","visit":"iterations/i16/run-candidates/cand-what-ships-today@0","node":"d630","brief":"one of four composed and stamped"}
+{"ts":"2026-08-18T12:51:00.125Z","op":"update","visit":"iterations/i16/run-candidates/cand-what-ships-today@0","node":"d631","brief":"resubmitting with every required field"}
+{"ts":"2026-08-18T12:51:33.122Z","op":"update","visit":"iterations/i16/run-candidates/cand-nothing-but-a-channel@0","node":"d632","brief":"composing the minimal-delta line"}
+{"ts":"2026-08-18T12:51:47.601Z","op":"update","visit":"iterations/i16/run-candidates/cand-nothing-but-a-channel@0","node":"d633","brief":"two of four composed"}
+{"ts":"2026-08-18T12:52:18.680Z","op":"update","visit":"iterations/i16/run-candidates/cand-the-program-route@0","node":"d634","brief":"composing the program route"}
+{"ts":"2026-08-18T12:52:33.625Z","op":"update","visit":"iterations/i16/run-candidates/cand-the-program-route@0","node":"d635","brief":"three of four composed"}
+{"ts":"2026-08-18T12:53:05.009Z","op":"update","visit":"iterations/i16/run-candidates/cand-everything-declared@0","node":"d636","brief":"composing the declared line"}
+{"ts":"2026-08-18T12:53:21.174Z","op":"done","visit":"iterations/i16/run-candidates@0","node":"d627","brief":"all four candidates composed and stamped"}
+{"ts":"2026-08-18T12:53:46.068Z","op":"update","visit":"iterations/i16/cut-criteria@0","node":"d637","brief":"reading what the mechanical sort already produced"}
+{"ts":"2026-08-18T12:57:25.705Z","op":"plan","visit":"iterations/i16/cut-criteria@0","parent":null,"nodes":[{"id":"d638","brief":"cut what does not differentiate"},{"id":"d639","brief":"check the mechanical sort"},{"id":"d640","brief":"draw the line on the scale"}]}
+{"ts":"2026-08-18T12:57:50.413Z","op":"done","visit":"iterations/i16/cut-criteria@0","node":"d638","brief":"ninety-nine axes struck as non-differentiating"}
+{"ts":"2026-08-18T12:59:04.955Z","op":"done","visit":"iterations/i16/cut-criteria@0","node":"d639","brief":"the cut is re-examined against the real test"}
+{"ts":"2026-08-18T12:59:23.202Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d641","brief":"sending the cut back to be re-earned"}
+{"ts":"2026-08-18T13:00:29.261Z","op":"done","visit":"iterations/i16/cut-criteria@0","node":"d640","brief":"the line now sits below corrosive"}
+{"ts":"2026-08-18T13:00:47.499Z","op":"plan","visit":"iterations/i16/cut-criteria@1","parent":null,"nodes":[{"id":"d642","brief":"spawn a clean-context scorer"},{"id":"d643","brief":"land the returned scores verbatim"},{"id":"d644","brief":"read the front and the corners"}]}
+{"ts":"2026-08-18T13:02:05.310Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d645","brief":"the scorer is out; draining what the cut settled"}
+{"ts":"2026-08-18T13:02:56.573Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d646","brief":"paying the amendment debt while the scorer reads"}
+{"ts":"2026-08-18T13:03:07.995Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d647","brief":"reading the examples to exercise through each candidate"}
+{"ts":"2026-08-18T13:03:18.782Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d648","brief":"locating the use cases"}
+{"ts":"2026-08-18T13:03:24.370Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d649","brief":"reading the two use cases this iteration owns"}
+{"ts":"2026-08-18T13:04:45.578Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d650","brief":"the exercise is written and saved unstamped"}
+{"ts":"2026-08-18T13:09:27.958Z","op":"done","visit":"iterations/i16/cut-criteria@1","node":"d642","brief":"the clean-context scorer returned all 44 cells"}
+{"ts":"2026-08-18T13:09:46.050Z","op":"fork","visit":"iterations/i16/evaluate-set@0","parent":"d644","node":"d651","brief":"22 cells at 4 or 5 carry no named comparison, so the scores cannot land","nodes":[]}
+{"ts":"2026-08-18T13:10:16.592Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d652","brief":"reading the plot template before the front is drawn"}
+{"ts":"2026-08-18T13:10:33.819Z","op":"plan","visit":"iterations/i16/evaluate-set@0","parent":null,"nodes":[{"id":"d653","brief":"git subtree behaviour + trailers"},{"id":"d654","brief":"git submodule recording"},{"id":"d655","brief":"Chromium third_party metadata + checks"},{"id":"d656","brief":"Gentoo overlay precedence + /etc/portage/patches"},{"id":"d657","brief":"OpenWrt/Buildroot patch stacks"}]}
+{"ts":"2026-08-18T13:10:44.026Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d658","brief":"fetching git-subtree man page from Debian manpages"}
+{"ts":"2026-08-18T13:10:56.419Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d659","brief":"sweeping pending notes touching the overlay decisions"}
+{"ts":"2026-08-18T13:10:59.903Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d660","brief":"reading git-subtree.sh source for the exact trailer names"}
+{"ts":"2026-08-18T13:11:14.391Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d661","brief":"reading the method the reading field is written against"}
+{"ts":"2026-08-18T13:11:39.415Z","op":"done","visit":"iterations/i16/evaluate-set@0","node":"d653","brief":"git-subtree trailers confirmed from git-subtree.sh source"}
+{"ts":"2026-08-18T13:11:41.562Z","op":"plan","visit":"iterations/i16/evaluate-set@0","parent":"d643","nodes":[{"id":"d662","brief":"holding for the naming round"},{"id":"d663","brief":"the front is the engine's arithmetic"},{"id":"d664","brief":"not mine"}]}
+{"ts":"2026-08-18T13:11:54.671Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d665","brief":"OpenWrt quilt page read; now getting Buildroot patch policy source"}
+{"ts":"2026-08-18T13:12:01.073Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d666","brief":"primary-doc research on quilt, DEP-3 and patch-package for the unnamed comparison cells"}
+{"ts":"2026-08-18T13:12:29.946Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d667","brief":"reading Gentoo repos.conf documentation for overlay precedence"}
+{"ts":"2026-08-18T13:12:40.954Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d668","brief":"the flat axis and the option-space ceiling are settled and landed"}
+{"ts":"2026-08-18T13:12:44.574Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d669","brief":"checking eapply failure behaviour in the Gentoo devmanual"}
+{"ts":"2026-08-18T13:12:52.762Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d670","brief":"confirming quilt push failure/fuzz behaviour from the quilt source"}
+{"ts":"2026-08-18T13:13:07.595Z","op":"obsolete","visit":"iterations/i16/evaluate-set@0","node":"d662","brief":"a chained brief split into three nodes; this is one of the strays"}
+{"ts":"2026-08-18T13:13:08.477Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d671","brief":"paging portage(5) to the /etc/portage/patches section"}
+{"ts":"2026-08-18T13:13:12.818Z","op":"obsolete","visit":"iterations/i16/evaluate-set@0","node":"d663","brief":"second stray from the same chained brief"}
+{"ts":"2026-08-18T13:13:17.272Z","op":"obsolete","visit":"iterations/i16/evaluate-set@0","node":"d664","brief":"third stray from the same chained brief; the checklist is clean again"}
+{"ts":"2026-08-18T13:13:24.484Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d672","brief":"narrowing portage(5) page window onto the user patches section"}
+{"ts":"2026-08-18T13:13:28.039Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d673","brief":"checking lintian DEP-3 tag severities to finish the enforcement answer"}
+{"ts":"2026-08-18T13:13:43.162Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d674","brief":"reading OpenWrt include/quilt.mk for patch-apply failure behaviour"}
+{"ts":"2026-08-18T13:13:45.797Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d675","brief":"last two checks: quilt .pc version file meaning, DEP-3 refresh status"}
+{"ts":"2026-08-18T13:13:51.358Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d676","brief":"confirming OpenWrt patch-kernel.sh aborts on a failed patch"}
+{"ts":"2026-08-18T13:14:05.580Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d677","brief":"looking for the presubmit check that validates README.chromium"}
+{"ts":"2026-08-18T13:14:26.939Z","op":"update","visit":"iterations/i16/evaluate-set@0","node":"d678","brief":"confirming the mandatory README.chromium fields in depot_tools metadata code"}
+{"ts":"2026-08-18T13:14:54.062Z","op":"done","visit":"iterations/i16/evaluate-set@0","node":"d657","brief":"OpenWrt and Buildroot patch-stack failure behaviour confirmed from primary sources"}
+{"ts":"2026-08-18T13:15:13.410Z","op":"done","visit":"iterations/i16/evaluate-set@0","node":"d654","brief":"submodule gitlink and .gitmodules confirmed from gitsubmodules(7) and gitmodules(5)"}
+{"ts":"2026-08-18T13:15:19.589Z","op":"done","visit":"iterations/i16/evaluate-set@0","node":"d655","brief":"README.chromium fields and the presubmit metadata check confirmed from source"}
+{"ts":"2026-08-18T13:15:24.401Z","op":"done","visit":"iterations/i16/evaluate-set@0","node":"d656","brief":"repos.conf priority and /etc/portage/patches matching confirmed from portage(5)"}
+{"ts":"2026-08-18T13:21:22.830Z","op":"done","visit":"iterations/i16/cut-criteria@1","node":"d643","brief":"all 44 cells landed verbatim, nine of them lowered by the naming round"}
+{"ts":"2026-08-18T13:22:42.041Z","op":"done","visit":"iterations/i16/evaluate-set@0","node":"d651","brief":"all 22 cells now carry a named comparison or a lowered score"}
+{"ts":"2026-08-18T13:23:58.086Z","op":"done","visit":"iterations/i16/cut-criteria@1","node":"d644","brief":"front and corners read; the engine's arithmetic matched the hand reading exactly"}
+{"ts":"2026-08-18T13:24:14.009Z","op":"plan","visit":"iterations/i16/cut-criteria@2","parent":null,"nodes":[{"id":"d679","brief":"fix the flat-axis claim in the signed reading"},{"id":"d680","brief":"walk cut-criteria, which the machine reopened"},{"id":"d681","brief":"decide the latency axis against the engine's flat list"}]}
+{"ts":"2026-08-18T13:24:20.483Z","op":"done","visit":"iterations/i16/cut-criteria@2","node":"d679","brief":"the flat-axis claim now matches the engine's arithmetic"}
+{"ts":"2026-08-18T13:24:48.968Z","op":"obsolete","visit":"iterations/i16/cut-criteria@2","node":"d680","brief":"cut-criteria was never reopened; the walk had simply stalled on its target"}
+{"ts":"2026-08-18T13:25:09.148Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d682","brief":"the latency axis is a gate question, not a cut-criteria one"}
+{"ts":"2026-08-18T13:26:28.249Z","op":"plan","visit":"iterations/i16/gate-candidates@0","parent":null,"nodes":[{"id":"d683","brief":"check the bound on the harness-to-entrypoint interface"},{"id":"d684","brief":"judge the cuts and the moves for reasons_hold"},{"id":"d685","brief":"answer the six kickoff goals"},{"id":"d686","brief":"validate the result against the goal and prior art"},{"id":"d687","brief":"land the red team and the evidence check"},{"id":"d688","brief":"rule the verdict and bless"}]}
+{"ts":"2026-08-18T13:26:34.577Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d689","brief":"narrowing the slow pulls to today, to see what this iteration actually cost"}
+{"ts":"2026-08-18T13:28:44.929Z","op":"done","visit":"iterations/i16/gate-candidates@0","node":"d683","brief":"the one-second bound is breached on the form-write path"}
+{"ts":"2026-08-18T13:28:46.721Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d690","brief":"red team: reading the scored requirement nodes against the score anchors"}
+{"ts":"2026-08-18T13:29:01.627Z","op":"done","visit":"iterations/i16/gate-candidates@0","node":"d685","brief":"all six kickoff goals answered against what M4 actually produced"}
+{"ts":"2026-08-18T13:29:14.787Z","op":"done","visit":"iterations/i16/gate-candidates@0","node":"d686","brief":"the validation round is written, prior art compared with primary sources"}
+{"ts":"2026-08-18T13:29:37.313Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d691","brief":"red team: checking the remaining six scored axes against their own statements"}
+{"ts":"2026-08-18T13:30:10.628Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d692","brief":"the one-pass assumption is falsified on its own stated terms"}
+{"ts":"2026-08-18T13:30:17.612Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d693","brief":"red team: checking the ranking rule against the recorded pairwise moves"}
+{"ts":"2026-08-18T13:30:47.989Z","op":"done","visit":"iterations/i16/cut-criteria@2","node":"d681","brief":"the flat axis stays on the table rather than being cut with scores visible"}
+{"ts":"2026-08-18T13:31:05.016Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d694","brief":"red team: checking the probe that the candidates cite as measured evidence"}
+{"ts":"2026-08-18T13:31:31.327Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d695","brief":"red team: tracing the reordering probe the candidates cite as measured"}
+{"ts":"2026-08-18T13:31:38.618Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d696","brief":"checking whether two criteria were scored on the wrong subject"}
+{"ts":"2026-08-18T13:31:38.827Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d697","brief":"red team: searching the whole repo for the reordering probe's own record"}
+{"ts":"2026-08-18T13:31:51.445Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d698","brief":"red team: checking the call log for the reordering probe run"}
+{"ts":"2026-08-18T13:32:18.463Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d699","brief":"red team: reading find_by_probing against the probe's actual console output"}
+{"ts":"2026-08-18T13:32:42.856Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d700","brief":"red team: reading the probe script to see whether the valid run reorders at all"}
+{"ts":"2026-08-18T13:32:47.589Z","op":"done","visit":"iterations/i16/gate-candidates@0","node":"d687","brief":"the evidence check landed and six defects went back for re-scoring"}
+{"ts":"2026-08-18T13:33:20.927Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d701","brief":"red team: checking the pointer requirement's priority against the picks"}
+{"ts":"2026-08-18T13:33:57.120Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d702","brief":"red team: testing the claim that the incumbent fails a must row"}
+{"ts":"2026-08-18T13:36:35.916Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d703","brief":"checking the register for duplicates before minting"}
+{"ts":"2026-08-18T13:38:48.708Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d704","brief":"verifying the two red-team findings that decide the verdict"}
+{"ts":"2026-08-18T13:39:30.526Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d705","brief":"fetching what the probe actually printed"}
+{"ts":"2026-08-18T13:40:24.222Z","op":"done","visit":"iterations/i16/gate-candidates@0","node":"d684","brief":"the sweep and the red team both landed, and the cuts do not hold"}
+{"ts":"2026-08-18T13:41:34.565Z","op":"done","visit":"iterations/i16/gate-candidates@0","node":"d688","brief":"the gate fails and the redo is named in order"}
+{"ts":"2026-08-18T13:42:19.224Z","op":"plan","visit":"iterations/i16/gate-candidates@0","parent":null,"nodes":[{"id":"d706","brief":"reopen cut-criteria and fix the criteria set"},{"id":"d707","brief":"re-score the three mis-read axes"},{"id":"d708","brief":"run the demand check over all four candidates"},{"id":"d709","brief":"correct the probe and self-location claims"},{"id":"d710","brief":"recompute the front and re-rule the gate"}]}
+{"ts":"2026-08-18T13:42:33.811Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d711","brief":"sending the criteria set back to be re-earned"}
+{"ts":"2026-08-18T13:43:55.547Z","op":"update","visit":"iterations/i16/cut-criteria@3","node":"d712","brief":"restoring the two wrongly-struck rows and giving the tail its act-one reasons"}
+{"ts":"2026-08-18T13:45:29.351Z","op":"update","visit":"iterations/i16/cut-criteria@3","node":"d713","brief":"locating every copy of the two false claims"}
+{"ts":"2026-08-18T13:45:57.700Z","op":"update","visit":"iterations/i16/cut-criteria@3","node":"d714","brief":"correcting the probe claim in the two candidate nodes"}
+{"ts":"2026-08-18T13:46:03.903Z","op":"update","visit":"iterations/i16/cut-criteria@3","node":"d715","brief":"the channel node phrases the probe result differently"}
+{"ts":"2026-08-18T13:46:24.648Z","op":"done","visit":"iterations/i16/gate-candidates@0","node":"d709","brief":"both candidate nodes now say what the run printed"}
+{"ts":"2026-08-18T13:46:39.222Z","op":"update","visit":"iterations/i16/cut-criteria@3","node":"d716","brief":"locating the probe evidence's fields before amending"}
+{"ts":"2026-08-18T13:48:13.437Z","op":"done","visit":"iterations/i16/gate-candidates@0","node":"d706","brief":"ten criteria stand, every one checked against its own statement"}
+{"ts":"2026-08-18T13:48:57.725Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d717","brief":"checking whether the run carrying the verdict had a control arm"}
+{"ts":"2026-08-18T13:49:34.782Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d718","brief":"the probe evidence now matches what the script does"}
+{"ts":"2026-08-18T13:49:53.194Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d719","brief":"the probe evidence now matches what the script does"}
+{"ts":"2026-08-18T13:50:00.899Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d720","brief":"reading the form header to get the state's real name"}
+{"ts":"2026-08-18T13:50:23.991Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d721","brief":"amending the probe evidence through the enumerate-space machine"}
+{"ts":"2026-08-18T13:50:42.335Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d722","brief":"confirming which candidates pick self-location"}
+{"ts":"2026-08-18T13:51:00.043Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d723","brief":"reading the field headers around the false claim"}
+{"ts":"2026-08-18T13:51:25.307Z","op":"done","visit":"iterations/i16/gate-candidates@0","node":"d707","brief":"all three mis-read axes are resolved and cut"}
+{"ts":"2026-08-18T13:51:41.637Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d724","brief":"correcting the last copy of the self-location claim"}
+{"ts":"2026-08-18T13:52:04.633Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d725","brief":"correcting the probe claim in the program route's compose form"}
+{"ts":"2026-08-18T13:52:14.199Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d726","brief":"every copy of the probe claim now matches the run"}
+{"ts":"2026-08-18T13:52:44.281Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d727","brief":"the missing precedence axis is filed for the retro"}
+{"ts":"2026-08-18T13:53:25.505Z","op":"done","visit":"iterations/i16/gate-candidates@0","node":"d708","brief":"the demand check is done and the eligible set is one"}
+{"ts":"2026-08-18T13:55:09.806Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d728","brief":"the tie verdicts and the function heuristic are parked until the demand decision"}
+{"ts":"2026-08-18T13:58:58.936Z","op":"plan","visit":"iterations/i16/evaluate-set@1","parent":null,"nodes":[{"id":"d729","brief":"record the owner's ruling"},{"id":"d730","brief":"what would make each failing candidate pass"},{"id":"d731","brief":"where the survivor is worse and what it can learn"},{"id":"d732","brief":"fold the result into the record and re-rule the gate"}]}
+{"ts":"2026-08-18T13:59:16.651Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d733","brief":"an option node calls a should a demand and eliminates itself on it"}
+{"ts":"2026-08-18T13:59:26.168Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d734","brief":"reading the exact claim before correcting it"}
+{"ts":"2026-08-18T13:59:38.979Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d735","brief":"the option is out on the owner ruling, not on a should"}
+{"ts":"2026-08-18T13:59:54.366Z","op":"done","visit":"iterations/i16/evaluate-set@1","node":"d729","brief":"the ruling is in the log as an answered question"}
+{"ts":"2026-08-18T14:00:19.688Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d736","brief":"checking whether the jail's root can be re-pointed per run"}
+{"ts":"2026-08-18T14:00:47.319Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d737","brief":"reading the constraint derive-criteria says every candidate must answer"}
+{"ts":"2026-08-18T14:01:37.415Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d738","brief":"the missing driving row is recorded where a reader will find it"}
+{"ts":"2026-08-18T14:02:09.521Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d739","brief":"the owner's inversion ruling is captured"}
+{"ts":"2026-08-18T14:04:02.648Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d740","brief":"the forty cells land on the corrected ten criteria"}
+{"ts":"2026-08-18T14:04:08.067Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d741","brief":"asking the machine what it wants before filling"}
+{"ts":"2026-08-18T14:04:27.324Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d742","brief":"the table must be rewritten against the corrected criteria"}
+{"ts":"2026-08-18T14:04:34.885Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d743","brief":"picking the form up again"}
+{"ts":"2026-08-18T14:05:34.788Z","op":"update","visit":"iterations/i16/evaluate-set@1","node":"d744","brief":"forty cells over the corrected ten criteria"}
+{"ts":"2026-08-18T14:07:31.956Z","op":"done","visit":"iterations/i16/gate-candidates@0","node":"d710","brief":"the front is one candidate and it is not the eligible one"}
+{"ts":"2026-08-18T14:08:31.744Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d745","brief":"picking the gate form up on the new situation"}
+{"ts":"2026-08-18T14:09:38.542Z","op":"done","visit":"iterations/i16/evaluate-set@1","node":"d730","brief":"the repair check is folded into the gate"}
+{"ts":"2026-08-18T14:12:09.922Z","op":"done","visit":"iterations/i16/evaluate-set@1","node":"d731","brief":"the survivor's weaknesses and adoptions are folded into the gate"}
+{"ts":"2026-08-18T14:13:10.605Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d746","brief":"the jail cannot serve driving with one write target"}
+{"ts":"2026-08-18T14:13:15.759Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d747","brief":"reading the jail issue before recording the resolution"}
+{"ts":"2026-08-18T14:13:49.041Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d748","brief":"the jail ruling is recorded and it puts v1's option back in play"}
+{"ts":"2026-08-18T14:13:59.962Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d749","brief":"reading the option whose exclusion the ruling voids"}
+{"ts":"2026-08-18T14:14:18.570Z","op":"done","visit":"iterations/i16/evaluate-set@1","node":"d732","brief":"the jail ruling is worked into the register and the option"}
+{"ts":"2026-08-18T14:15:04.612Z","op":"plan","visit":"iterations/i16/gate-candidates@0","parent":null,"nodes":[{"id":"d750","brief":"land the v1 study when it returns"},{"id":"d751","brief":"rule the gate once the repair decision lands"}]}
+{"ts":"2026-08-18T14:15:49.021Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d752","brief":"the survivor now states what happens when the pointer is absent"}
+{"ts":"2026-08-18T14:16:33.541Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d753","brief":"the obsolete-requirement check is filed for the retro"}
+{"ts":"2026-08-18T14:17:18.591Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d754","brief":"the inversion research is answered and recorded"}
+{"ts":"2026-08-18T14:18:01.674Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d755","brief":"the AI-echo hazard in web research is filed"}
+{"ts":"2026-08-18T14:19:01.374Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d756","brief":"the exercised examples are back in the reading, corrected"}
+{"ts":"2026-08-18T14:19:27.739Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d757","brief":"checking whether the obsolete sealed-folder requirement still stands"}
+{"ts":"2026-08-18T14:19:35.833Z","op":"done","visit":"iterations/i16/gate-candidates@0","node":"d750","brief":"the obsolete sealed-folder requirement is already gone"}
+{"ts":"2026-08-18T14:19:52.219Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d758","brief":"one live document still lists the removed requirement as standing"}
+{"ts":"2026-08-18T14:20:07.913Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d759","brief":"the planning document no longer lists a removed requirement"}
+{"ts":"2026-08-18T14:21:01.797Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d760","brief":"the must no longer claims v1 did what v1 asserts the opposite of"}
+{"ts":"2026-08-18T14:21:33.685Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d761","brief":"reading v1 shrank the jail change from three cases to one"}
+{"ts":"2026-08-18T14:22:06.421Z","op":"done","visit":"iterations/i16/gate-candidates@0","node":"d751","brief":"the v1 study is landed across the requirement, the register and a note"}
+{"ts":"2026-08-18T14:24:22.049Z","op":"plan","visit":"iterations/i16/gate-candidates@0","parent":null,"nodes":[{"id":"d762","brief":"swap the pick and rewrite the candidate node"},{"id":"d763","brief":"reopen the compose state and redo its evidence"},{"id":"d764","brief":"have the scorer check whether any cell moves"},{"id":"d765","brief":"recompute the front and rule the gate"}]}
+{"ts":"2026-08-18T14:24:50.409Z","op":"done","visit":"iterations/i16/gate-candidates@0","node":"d762","brief":"the program route now records a pointer and refuses a tree without one"}
+{"ts":"2026-08-18T14:25:20.453Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d766","brief":"sending the composed candidate back to match what now stands"}
+{"ts":"2026-08-18T14:25:32.207Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d767","brief":"walking back to recompose the repaired candidate"}
+{"ts":"2026-08-18T14:25:51.657Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d768","brief":"asking the machine where the reopened compose state sits"}
+{"ts":"2026-08-18T14:26:27.612Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d769","brief":"asking what holds the reopened compose state"}
+{"ts":"2026-08-18T14:27:00.158Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d770","brief":"the unreachable-reopen defect is filed with its live case"}
+{"ts":"2026-08-18T14:27:07.048Z","op":"update","visit":"iterations/i16/gate-candidates@0","node":"d771","brief":"escaping to the desk to aim back at the compose state"}
+{"ts":"2026-08-18T14:31:16.649Z","op":"update","visit":"iterations/i16/gate-inputs@2","node":"d774","brief":"sweeping on toward the compose state"}
+{"ts":"2026-08-18T14:31:36.481Z","op":"fork","visit":"iterations/i16/derive-functions@0","parent":"d763","node":"d775","brief":"flow closure is red and it blocks the route back","nodes":[]}
+{"ts":"2026-08-18T14:31:52.978Z","op":"update","visit":"iterations/i16/derive-functions@0","node":"d776","brief":"finding which functions name the two open flows"}
+{"ts":"2026-08-18T14:32:16.043Z","op":"update","visit":"iterations/i16/derive-functions@0","node":"d777","brief":"looking for the function that reads at a ref"}
+{"ts":"2026-08-18T14:32:45.499Z","op":"done","visit":"iterations/i16/derive-functions@0","node":"d775","brief":"both open flows now say they cross the system's edge"}
+{"ts":"2026-08-18T14:32:52.690Z","op":"update","visit":"iterations/i16/derive-functions@0","node":"d778","brief":"sweeping on now the flow closure is green"}
+{"ts":"2026-08-18T14:33:27.117Z","op":"done","visit":"iterations/i16/gate-candidates@0","node":"d763","brief":"the repaired candidate is recomposed and signed"}
+{"ts":"2026-08-18T14:34:03.883Z","op":"update","visit":"iterations/i16/cut-criteria@4","node":"d779","brief":"the criteria set holds against the changed candidate"}
+{"ts":"2026-08-18T14:34:39.011Z","op":"update","visit":"iterations/i16/cut-criteria@4","node":"d780","brief":"the V drawing's two sides are captured"}
+{"ts":"2026-08-18T14:34:42.185Z","op":"update","visit":"iterations/i16/cut-criteria@4","node":"d781","brief":"asking cut-criteria for its form"}
+{"ts":"2026-08-18T14:34:53.409Z","op":"update","visit":"iterations/i16/cut-criteria@4","node":"d782","brief":"walking forward to the gate with the repaired candidate in hand"}
+{"ts":"2026-08-18T14:36:00.602Z","op":"done","visit":"iterations/i16/gate-candidates@0","node":"d764","brief":"the re-score landed and every cell held"}
+{"ts":"2026-08-18T14:36:57.157Z","op":"done","visit":"iterations/i16/gate-candidates@0","node":"d765","brief":"the gate passes with six overrides logged"}
+{"ts":"2026-08-18T14:37:16.254Z","op":"plan","visit":"iterations/i16/converge-pugh@0","parent":null,"nodes":[{"id":"d783","brief":"converge over the front at M5"},{"id":"d784","brief":"declare the winner"},{"id":"d785","brief":"record the ADRs"}]}
+{"ts":"2026-08-18T14:37:33.950Z","op":"update","visit":"iterations/i16/converge-pugh@0","node":"d786","brief":"picking up the convergence form"}
+{"ts":"2026-08-18T14:38:28.795Z","op":"done","visit":"iterations/i16/converge-pugh@0","node":"d783","brief":"the convergence is stable and the winner holds as datum"}
+{"ts":"2026-08-18T14:38:34.803Z","op":"update","visit":"iterations/i16/converge-pugh@0","node":"d787","brief":"stamping the convergence"}
+{"ts":"2026-08-18T14:38:48.210Z","op":"update","visit":"iterations/i16/reverse-sensitivity@0","node":"d788","brief":"hunting the world where the winner loses"}
+{"ts":"2026-08-18T14:39:30.493Z","op":"update","visit":"iterations/i16/reverse-sensitivity@0","node":"d789","brief":"the one credible flip has its tripwire and fallback"}
+{"ts":"2026-08-18T14:39:50.896Z","op":"done","visit":"iterations/i16/converge-pugh@0","node":"d784","brief":"one credible flip ruled, two left visibly unruled"}
+{"ts":"2026-08-18T14:40:00.298Z","op":"update","visit":"iterations/i16/declare-winner@0","node":"d790","brief":"picking up the declaration"}
+{"ts":"2026-08-18T14:40:34.528Z","op":"done","visit":"iterations/i16/converge-pugh@0","node":"d785","brief":"the winner is declared on the record"}
+{"ts":"2026-08-18T14:41:13.921Z","op":"plan","visit":"iterations/i16/cut-criteria@5","parent":null,"nodes":[{"id":"d791","brief":"record the deciding ADRs"},{"id":"d792","brief":"decompose the winner into structure"}]}
+{"ts":"2026-08-18T14:42:20.233Z","op":"update","visit":"iterations/i16/record-adrs@0","node":"d793","brief":"the defining decision is recorded with its rejected options"}
+{"ts":"2026-08-18T14:42:41.030Z","op":"update","visit":"iterations/i16/record-adrs@0","node":"d794","brief":"the resolution decision is recorded with its one honest loss"}
+{"ts":"2026-08-18T14:43:10.332Z","op":"update","visit":"iterations/i16/record-adrs@0","node":"d795","brief":"the decision the whole gate turned on is recorded"}
+{"ts":"2026-08-18T14:43:33.320Z","op":"update","visit":"iterations/i16/record-adrs@0","node":"d796","brief":"the isolation decision is recorded, graded fatal"}
+{"ts":"2026-08-18T14:43:55.065Z","op":"update","visit":"iterations/i16/record-adrs@0","node":"d797","brief":"the production decision is recorded"}
+{"ts":"2026-08-18T14:44:16.516Z","op":"update","visit":"iterations/i16/record-adrs@0","node":"d798","brief":"the override grain decision is recorded with the fallback it owes"}
+{"ts":"2026-08-18T14:44:37.146Z","op":"done","visit":"iterations/i16/cut-criteria@5","node":"d791","brief":"six deciding ADRs recorded, each with its losers as history"}
+{"ts":"2026-08-18T14:44:43.686Z","op":"update","visit":"iterations/i16/record-adrs@0","node":"d799","brief":"stamping the decisions"}
+{"ts":"2026-08-18T14:45:14.893Z","op":"update","visit":"iterations/i16/cut-criteria@6","node":"d800","brief":"walking on to the structure and the architecture evaluation"}
+{"ts":"2026-08-18T14:46:06.956Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d801","brief":"reading the decomposition method before deriving elements"}
+{"ts":"2026-08-18T14:46:16.330Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d802","brief":"reading the element and interface node shapes"}
+{"ts":"2026-08-18T14:51:26.263Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d803","brief":"the copy producer is the first of two elements this iteration owes"}
+{"ts":"2026-08-18T14:51:31.496Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d804","brief":"surveying whether any function or flow carries taking an update into a copy"}
+{"ts":"2026-08-18T14:51:48.323Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d805","brief":"locating the overlay and vendoring requirement nodes and the vendor use case"}
+{"ts":"2026-08-18T14:51:52.566Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d806","brief":"the project producer is written and it owes one interface"}
+{"ts":"2026-08-18T14:51:53.889Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d807","brief":"locating overlay requirements and the vendor use case by id"}
+{"ts":"2026-08-18T14:51:57.845Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d808","brief":"reading the vendor use case and four overlay requirements for the update-taking step"}
+{"ts":"2026-08-18T14:52:07.813Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d809","brief":"confirming which functions claim the four overlay and vendoring requirements"}
+{"ts":"2026-08-18T14:52:13.786Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d810","brief":"reading the two decisions that record how an update arrives and where drift is reported"}
+{"ts":"2026-08-18T14:53:00.439Z","op":"done","visit":"iterations/i16/cut-criteria@5","node":"d792","brief":"two elements and the one cross-cluster interface are written"}
+{"ts":"2026-08-18T14:53:51.843Z","op":"plan","visit":"iterations/i16/decompose-structure@0","parent":null,"nodes":[{"id":"d811","brief":"record the missing update function and the vocabulary ruling"},{"id":"d812","brief":"reopen derive-functions and fix both"},{"id":"d813","brief":"walk forward and re-sign what falls"},{"id":"d814","brief":"finish the decomposition"}]}
+{"ts":"2026-08-18T14:54:30.127Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d815","brief":"the missing update function is recorded with its evidence"}
+{"ts":"2026-08-18T14:54:49.285Z","op":"done","visit":"iterations/i16/decompose-structure@0","node":"d811","brief":"both findings are recorded with their reach"}
+{"ts":"2026-08-18T14:56:28.723Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d816","brief":"reading the nodes the rename and the new function must match"}
+{"ts":"2026-08-18T14:57:01.567Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d817","brief":"the function is renamed and says vehicle throughout"}
+{"ts":"2026-08-18T14:57:16.923Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d818","brief":"the flow is renamed and its hidden hole is named"}
+{"ts":"2026-08-18T14:57:30.561Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d819","brief":"the update program is a flow now instead of a sentence"}
+{"ts":"2026-08-18T14:57:46.319Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d820","brief":"the vehicle inventory is separated from the divergence report"}
+{"ts":"2026-08-18T14:58:00.885Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d821","brief":"the unstaged diff is a flow, which keeps the weakness visible"}
+{"ts":"2026-08-18T14:58:34.483Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d822","brief":"the act the architecture rests on is a function now"}
+{"ts":"2026-08-18T14:59:11.704Z","op":"done","visit":"iterations/i16/decompose-structure@0","node":"d812","brief":"the new function structure is written and the old ids come out now"}
+{"ts":"2026-08-18T14:59:21.730Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d823","brief":"clearing the old flow id and collecting who cited it"}
+{"ts":"2026-08-18T14:59:53.448Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d824","brief":"patching every citer of the two renamed ids"}
+{"ts":"2026-08-18T15:00:12.590Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d825","brief":"sending the function structure back to take both fixes"}
+{"ts":"2026-08-18T15:00:20.140Z","op":"update","visit":"iterations/i16/derive-functions@1","node":"d826","brief":"asking where the walk stands after the reopen"}
+{"ts":"2026-08-18T15:01:14.216Z","op":"update","visit":"iterations/i16/derive-functions@1","node":"d827","brief":"the corrected function structure goes in"}
+{"ts":"2026-08-18T15:01:32.598Z","op":"update","visit":"iterations/i16/derive-functions@1","node":"d828","brief":"both new functions now carry the rationale the template demands"}
+{"ts":"2026-08-18T15:01:36.517Z","op":"done","visit":"iterations/i16/decompose-structure@0","node":"d813","brief":"the function structure is corrected and stamped"}
+{"ts":"2026-08-18T15:01:56.947Z","op":"update","visit":"iterations/i16/gate-requirements@7","node":"d829","brief":"reading the requirements gate before re-ruling it"}
+{"ts":"2026-08-18T15:02:07.188Z","op":"update","visit":"iterations/i16/gate-requirements@7","node":"d830","brief":"taking the partition door, where the two new functions land"}
+{"ts":"2026-08-18T15:02:15.640Z","op":"update","visit":"iterations/i16/gate-requirements@7","node":"d831","brief":"aiming at the function partition"}
+{"ts":"2026-08-18T15:02:27.538Z","op":"update","visit":"iterations/i16/gate-requirements@7","node":"d832","brief":"asking what the requirements gate still wants"}
+{"ts":"2026-08-18T15:02:48.527Z","op":"update","visit":"iterations/i16/gate-requirements@7","node":"d833","brief":"asking what holds the partition state"}
+{"ts":"2026-08-18T15:03:00.429Z","op":"update","visit":"iterations/i16/gate-requirements@7","node":"d834","brief":"re-earning the requirements gate over the changed structure"}
+{"ts":"2026-08-18T15:03:13.546Z","op":"update","visit":"iterations/i16/gate-requirements@7","node":"d835","brief":"reading what the gate already claimed before adding the delta"}
+{"ts":"2026-08-18T15:05:51.310Z","op":"plan","visit":"iterations/i16/gate-requirements@7","parent":null,"nodes":[{"id":"d836","brief":"re-earn gate-requirements after the function change"},{"id":"d837","brief":"fix partition-functions, which cites a deleted function"},{"id":"d838","brief":"re-sign the M4 chain that fell behind derive-functions"},{"id":"d839","brief":"finish decompose-structure for the four unimplemented functions"},{"id":"d840","brief":"evaluate-architecture and gate-architecture"}]}
+{"ts":"2026-08-18T15:06:04.623Z","op":"done","visit":"iterations/i16/gate-requirements@7","node":"d836","brief":"gate-requirements re-signed and blessed; the register never moved"}
+{"ts":"2026-08-18T15:06:20.358Z","op":"update","visit":"iterations/i16/partition-functions@1","node":"d841","brief":"reading the three functions to learn their clusters and edges"}
+{"ts":"2026-08-18T15:06:34.734Z","op":"update","visit":"iterations/i16/partition-functions@1","node":"d842","brief":"mapping the bootstrap cluster's edges before rewriting its coupling"}
+{"ts":"2026-08-18T15:07:00.470Z","op":"update","visit":"iterations/i16/partition-functions@1","node":"d843","brief":"checking whether the cluster node still says the bootstrap shares no flow"}
+{"ts":"2026-08-18T15:08:28.979Z","op":"update","visit":"iterations/i16/partition-functions@1","node":"d844","brief":"the bootstrap cluster widens to five members and gains its first internal flow"}
+{"ts":"2026-08-18T15:09:28.783Z","op":"update","visit":"iterations/i16/partition-functions@1","node":"d845","brief":"re-signing the partition over thirty-five functions"}
+{"ts":"2026-08-18T15:09:50.642Z","op":"done","visit":"iterations/i16/gate-requirements@7","node":"d837","brief":"partition re-signed over 35 functions; the cluster node widened to five"}
+{"ts":"2026-08-18T15:10:05.574Z","op":"update","visit":"iterations/i16/derive-criteria@4","node":"d846","brief":"derive-criteria held; aiming the walk at enumerate-space to find what actually fell"}
+{"ts":"2026-08-18T15:10:40.424Z","op":"update","visit":"iterations/i16/derive-criteria@4","node":"d847","brief":"checking both new rows are must before confirming the criterion pool held"}
+{"ts":"2026-08-18T15:10:59.523Z","op":"update","visit":"iterations/i16/derive-criteria@4","node":"d848","brief":"reading the moscow grades straight off the requirement nodes"}
+{"ts":"2026-08-18T15:11:08.908Z","op":"update","visit":"iterations/i16/derive-criteria@4","node":"d849","brief":"tracing the moscow grade to its source in the requirement item template"}
+{"ts":"2026-08-18T15:11:14.699Z","op":"update","visit":"iterations/i16/derive-criteria@4","node":"d850","brief":"reading priority off the four rows i16 wrote"}
+{"ts":"2026-08-18T15:11:24.059Z","op":"update","visit":"iterations/i16/derive-criteria@4","node":"d851","brief":"re-signing derive-criteria; both new rows are must so no axis moved"}
+{"ts":"2026-08-18T15:11:41.584Z","op":"update","visit":"iterations/i16/derive-criteria@4","node":"d852","brief":"asking the engine what actually holds derive-criteria down"}
+{"ts":"2026-08-18T15:11:58.370Z","op":"obsolete","visit":"iterations/i16/decompose-structure@0","node":"d814","brief":"replaced by the explicit checklist; d839 carries the decomposition"}
+{"ts":"2026-08-18T15:12:34.199Z","op":"plan","visit":"iterations/i16/derive-criteria@4","parent":"d838","nodes":[{"id":"d853","brief":"derive-criteria re-signed"},{"id":"d854","brief":"pool unmoved"},{"id":"d855","brief":"both new rows read as must at source"}]}
+{"ts":"2026-08-18T15:12:56.444Z","op":"done","visit":"iterations/i16/derive-criteria@4","node":"d853","brief":"derive-criteria signed at 15:14"}
+{"ts":"2026-08-18T15:13:51.577Z","op":"done","visit":"iterations/i16/derive-criteria@4","node":"d854","brief":"criterion pool confirmed unmoved at derive-criteria"}
+{"ts":"2026-08-18T15:14:40.335Z","op":"done","visit":"iterations/i16/derive-criteria@4","node":"d855","brief":"both new rows read priority must straight off their own frontmatter"}
+{"ts":"2026-08-18T15:15:03.243Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d856","brief":"el-update-runner written; both unimplemented functions now have elements"}
+{"ts":"2026-08-18T15:15:25.147Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d857","brief":"the one interface the two new elements demand is written at both ends"}
+{"ts":"2026-08-18T15:15:41.596Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d858","brief":"checking whether el-arrival's group is a stated judgment or stale"}
+{"ts":"2026-08-18T15:16:00.678Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d859","brief":"a global rename had eaten the old flow name in its own explanation"}
+{"ts":"2026-08-18T15:17:03.444Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d860","brief":"submitting the decomposition over 22 elements and 41 interfaces"}
+{"ts":"2026-08-18T15:17:58.914Z","op":"done","visit":"iterations/i16/gate-requirements@7","node":"d839","brief":"decompose-structure signed over two missing elements and one new interface"}
+{"ts":"2026-08-18T15:18:11.319Z","op":"update","visit":"iterations/i16/cut-criteria@8","node":"d861","brief":"re-signing cut-criteria unchanged; neither feeder moved an axis"}
+{"ts":"2026-08-18T15:18:20.500Z","op":"update","visit":"iterations/i16/cut-criteria@8","node":"d862","brief":"cut-criteria re-signed; aiming at the gate to find the next grey state"}
+{"ts":"2026-08-18T15:18:42.874Z","op":"update","visit":"iterations/i16/evaluate-set@6","node":"d863","brief":"evaluate-set is next in the chain and its axes are byte-identical"}
+{"ts":"2026-08-18T15:18:46.357Z","op":"update","visit":"iterations/i16/evaluate-set@6","node":"d864","brief":"re-signing evaluate-set; cut-criteria came back byte-identical"}
+{"ts":"2026-08-18T15:19:05.179Z","op":"update","visit":"iterations/i16/gate-candidates@5","node":"d865","brief":"gate-candidates carries a bless, so its content gets read before re-signing"}
+{"ts":"2026-08-18T15:19:15.386Z","op":"update","visit":"iterations/i16/gate-candidates@5","node":"d866","brief":"reading what gate-candidates blessed before deciding whether the change moved it"}
+{"ts":"2026-08-18T15:19:49.080Z","op":"plan","visit":"iterations/i16/gate-candidates@5","parent":"d838","nodes":[{"id":"d867","brief":"gate-candidates re-blessed"},{"id":"d868","brief":"the front never moved"},{"id":"d869","brief":"and the found hole is recorded on it"}]}
+{"ts":"2026-08-18T15:20:04.573Z","op":"done","visit":"iterations/i16/gate-candidates@5","node":"d867","brief":"gate-candidates re-blessed at 15:20"}
+{"ts":"2026-08-18T15:20:07.603Z","op":"done","visit":"iterations/i16/gate-candidates@5","node":"d868","brief":"the front came back byte-identical from the re-check"}
+{"ts":"2026-08-18T15:20:15.822Z","op":"done","visit":"iterations/i16/gate-candidates@5","node":"d869","brief":"the missing-function hole is written into gate-candidates"}
+{"ts":"2026-08-18T15:20:19.569Z","op":"update","visit":"iterations/i16/reverse-sensitivity@4","node":"d870","brief":"re-signing reverse-sensitivity over an unchanged score table"}
+{"ts":"2026-08-18T15:20:29.341Z","op":"update","visit":"iterations/i16/declare-winner@3","node":"d871","brief":"reverse-sensitivity re-signed with the same one-cell deficit"}
+{"ts":"2026-08-18T15:20:33.313Z","op":"update","visit":"iterations/i16/declare-winner@3","node":"d872","brief":"re-signing declare-winner on the same computed seat"}
+{"ts":"2026-08-18T15:20:45.465Z","op":"update","visit":"iterations/i16/record-adrs@0","node":"d873","brief":"declare-winner re-signed on the same computed seat"}
+{"ts":"2026-08-18T15:20:48.557Z","op":"update","visit":"iterations/i16/record-adrs@0","node":"d874","brief":"re-signing record-adrs over the same six decisions"}
+{"ts":"2026-08-18T15:21:00.447Z","op":"update","visit":"iterations/i16/decompose-structure@0","node":"d875","brief":"record-adrs re-signed over the same six decisions"}
+{"ts":"2026-08-18T15:21:03.425Z","op":"done","visit":"iterations/i16/gate-requirements@7","node":"d838","brief":"the whole M4 chain now stands green behind the re-signed gate"}
+{"ts":"2026-08-18T15:21:20.764Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d876","brief":"opening the ATAM deck to see what the quality scenarios ask"}
+{"ts":"2026-08-18T15:22:24.234Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d877","brief":"reading the deck template for the verdict line shape"}
+{"ts":"2026-08-18T15:22:32.245Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d878","brief":"finding an earlier ATAM walk to copy the verdict-line shape from"}
+{"ts":"2026-08-18T15:22:36.249Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d879","brief":"reading i27's walk to match its verdict-line shape"}
+{"ts":"2026-08-18T15:22:49.049Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d880","brief":"listing the at-risk and unaddressed nodes i27's walk already minted"}
+{"ts":"2026-08-18T15:22:55.832Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d881","brief":"checking whether i27's cited risk nodes exist as files at all"}
+{"ts":"2026-08-18T15:23:24.302Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d882","brief":"reading every standing hinge before ruling any card"}
+{"ts":"2026-08-18T15:24:38.722Z","op":"plan","visit":"iterations/i16/evaluate-architecture@0","parent":"d840","nodes":[{"id":"d883","brief":"read every standing hinge in the register"},{"id":"d884","brief":"rule the 19 cards this iteration did not touch"},{"id":"d885","brief":"fold in the two clean-context readers verdicts"},{"id":"d886","brief":"mint the register entries the new rulings need"},{"id":"d887","brief":"submit evaluate-architecture"},{"id":"d888","brief":"earn gate-architecture"}]}
+{"ts":"2026-08-18T15:25:30.793Z","op":"done","visit":"iterations/i16/evaluate-architecture@0","node":"d883","brief":"all 13 standing hinges read off the register"}
+{"ts":"2026-08-18T15:26:38.978Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d889","brief":"checking which requirement nodes carry the fitness flag today"}
+{"ts":"2026-08-18T15:27:12.040Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d890","brief":"reading the path jail to learn the resolver name before counting its call sites"}
+{"ts":"2026-08-18T15:27:17.308Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d891","brief":"listing the jail's exported resolvers"}
+{"ts":"2026-08-18T15:27:26.417Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d892","brief":"counting resolver call sites across the engine"}
+{"ts":"2026-08-18T15:27:34.788Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d893","brief":"counting bare joins, the other half of the disputed figure"}
+{"ts":"2026-08-18T15:28:17.250Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d894","brief":"recording the fresh bypass-surface count on both nodes that carried stale figures"}
+{"ts":"2026-08-18T15:28:49.752Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d895","brief":"flagging the seven fitness candidates whose nodes never carried the flag"}
+{"ts":"2026-08-18T15:29:05.967Z","op":"done","visit":"iterations/i16/evaluate-architecture@0","node":"d884","brief":"all 19 carried cards ruled with their evidence in hand"}
+{"ts":"2026-08-18T15:29:17.197Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d896","brief":"checking whether any method-overlay code exists in serving code at all"}
+{"ts":"2026-08-18T15:30:06.563Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d897","brief":"checking whether the four new acts are reachable verbs yet"}
+{"ts":"2026-08-18T15:30:40.939Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d898","brief":"saving the count-independent half of the form unstamped"}
+{"ts":"2026-08-18T15:31:08.893Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d899","brief":"filing fourteen fitness candidates, seven of them newly flagged"}
+{"ts":"2026-08-18T15:31:40.703Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d900","brief":"filing follow-up with the owed ADR the decisions state did not write"}
+{"ts":"2026-08-18T15:32:16.300Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d901","brief":"minting the clear-jump risk from the second reader's verdict"}
+{"ts":"2026-08-18T15:32:35.460Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d902","brief":"minting the read-once risk with its named uncovered surface"}
+{"ts":"2026-08-18T15:32:55.489Z","op":"done","visit":"iterations/i16/evaluate-architecture@0","node":"d885","brief":"both readers verdicts are in hand and being acted on"}
+{"ts":"2026-08-18T15:33:14.624Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d903","brief":"minting the surface-latency issue, unaddressed with no owning element"}
+{"ts":"2026-08-18T15:33:35.285Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d904","brief":"minting the abandonment issue, which no program can ever check"}
+{"ts":"2026-08-18T15:34:25.593Z","op":"done","visit":"iterations/i16/evaluate-architecture@0","node":"d886","brief":"five register entries minted for the new rulings"}
+{"ts":"2026-08-18T15:35:09.987Z","op":"done","visit":"iterations/i16/evaluate-architecture@0","node":"d887","brief":"evaluate-architecture signed with 28 cards ruled"}
+{"ts":"2026-08-18T15:37:10.722Z","op":"update","visit":"iterations/i16/gate-architecture@0","node":"d905","brief":"submitting the matrix review with five dissents logged"}
+{"ts":"2026-08-18T15:37:28.266Z","op":"update","visit":"iterations/i16/gate-architecture@0","node":"d906","brief":"the assumption owes a probe and now carries one"}
+{"ts":"2026-08-18T15:38:14.068Z","op":"done","visit":"iterations/i16/evaluate-architecture@0","node":"d888","brief":"gate-architecture earned with five dissents logged"}
+{"ts":"2026-08-18T15:38:54.400Z","op":"done","visit":"iterations/i16/gate-requirements@7","node":"d840","brief":"gate-architecture blessed and M5 closed"}
+{"ts":"2026-08-18T15:38:57.715Z","op":"plan","visit":"iterations/i16/cut-criteria@9","parent":null,"nodes":[{"id":"d907","brief":"re-earn the chain that fell behind the fitness flags"},{"id":"d908","brief":"confirm the whole iteration stands green"}]}
+{"ts":"2026-08-18T15:39:05.839Z","op":"update","visit":"iterations/i16/cut-criteria@9","node":"d909","brief":"cut-criteria re-signed, aiming at the gate to find the next grey"}
+{"ts":"2026-08-18T15:39:12.877Z","op":"update","visit":"iterations/i16/evaluate-set@7","node":"d910","brief":"evaluate-set is next in the fallen chain"}
+{"ts":"2026-08-18T15:39:16.051Z","op":"update","visit":"iterations/i16/evaluate-set@7","node":"d911","brief":"re-signing evaluate-set on an unchanged score table"}
+{"ts":"2026-08-18T15:39:26.168Z","op":"update","visit":"iterations/i16/gate-candidates@6","node":"d912","brief":"gate-candidates next, its content already re-checked once today"}
+{"ts":"2026-08-18T15:39:29.377Z","op":"update","visit":"iterations/i16/gate-candidates@6","node":"d913","brief":"re-blessing gate-candidates on an unmoved front"}
+{"ts":"2026-08-18T15:39:37.708Z","op":"update","visit":"iterations/i16/converge-pugh@5","node":"d914","brief":"converge-pugh next, its runs computed from unchanged scores"}
+{"ts":"2026-08-18T15:39:40.817Z","op":"update","visit":"iterations/i16/converge-pugh@5","node":"d915","brief":"re-signing converge-pugh with the seat unmoved"}
+{"ts":"2026-08-18T15:39:48.301Z","op":"update","visit":"iterations/i16/reverse-sensitivity@5","node":"d916","brief":"reverse-sensitivity next, the deficit unchanged at one cell"}
+{"ts":"2026-08-18T15:39:55.870Z","op":"plan","visit":"iterations/i16/reverse-sensitivity@5","parent":"d907","nodes":[{"id":"d917","brief":"reverse-sensitivity"},{"id":"d918","brief":"declare-winner"},{"id":"d919","brief":"record-adrs"},{"id":"d920","brief":"decompose-structure"},{"id":"d921","brief":"evaluate-architecture"},{"id":"d922","brief":"gate-architecture"}]}
+{"ts":"2026-08-18T15:40:03.444Z","op":"done","visit":"iterations/i16/reverse-sensitivity@5","node":"d917","brief":"reverse-sensitivity re-signed"}
+{"ts":"2026-08-18T15:40:06.474Z","op":"update","visit":"iterations/i16/declare-winner@5","node":"d923","brief":"re-signing declare-winner on the computed seat"}
+{"ts":"2026-08-18T15:40:15.369Z","op":"done","visit":"iterations/i16/reverse-sensitivity@5","node":"d918","brief":"declare-winner re-signed"}
+{"ts":"2026-08-18T15:40:18.335Z","op":"update","visit":"iterations/i16/record-adrs@0","node":"d924","brief":"re-signing record-adrs over the same six decisions"}
+{"ts":"2026-08-18T15:40:28.054Z","op":"done","visit":"iterations/i16/reverse-sensitivity@5","node":"d919","brief":"record-adrs re-signed"}
+{"ts":"2026-08-18T15:40:30.947Z","op":"update","visit":"iterations/i16/decompose-structure@1","node":"d925","brief":"re-signing the decomposition over an unchanged matrix"}
+{"ts":"2026-08-18T15:40:38.761Z","op":"done","visit":"iterations/i16/reverse-sensitivity@5","node":"d920","brief":"decompose-structure re-signed"}
+{"ts":"2026-08-18T15:40:41.849Z","op":"update","visit":"iterations/i16/evaluate-architecture@1","node":"d926","brief":"re-signing the ATAM walk over the same 28 rulings"}
+{"ts":"2026-08-18T15:40:50.807Z","op":"done","visit":"iterations/i16/reverse-sensitivity@5","node":"d921","brief":"evaluate-architecture re-signed"}
+{"ts":"2026-08-18T15:40:54.196Z","op":"done","visit":"iterations/i16/reverse-sensitivity@5","node":"d922","brief":"gate-architecture re-blessed on an unmoved structure"}
+{"ts":"2026-08-18T15:41:30.974Z","op":"update","visit":"iterations/i16/cut-criteria@10","node":"d927","brief":"asking why cut-criteria fell a second time"}
+{"ts":"2026-08-18T15:41:43.605Z","op":"done","visit":"iterations/i16/cut-criteria@9","node":"d907","brief":"every state from cut-criteria to the gate re-earned"}
+{"ts":"2026-08-18T15:41:54.509Z","op":"done","visit":"iterations/i16/cut-criteria@9","node":"d908","brief":"33 states green, both endpoints confirmed by the engine"}
+{"ts":"2026-08-18T15:42:15.573Z","op":"update","visit":"iterations/i16/gate-architecture@0","node":"d928","brief":"M5 closed, testing whether M6 opens at this dial"}
+{"ts":"2026-08-18T15:42:42.802Z","op":"update","visit":"iterations/i16/cut-criteria@11","node":"d929","brief":"aiming at rank-unknowns to open M6"}
+{"ts":"2026-08-18T15:43:27.109Z","op":"update","visit":"iterations/i16/rank-unknowns@0","node":"d930","brief":"opening the exposure chart the state computed"}
+{"ts":"2026-08-18T15:43:34.825Z","op":"update","visit":"iterations/i16/rank-unknowns@0","node":"d931","brief":"locating the exposure chart in the served form"}
+{"ts":"2026-08-18T15:43:39.123Z","op":"update","visit":"iterations/i16/rank-unknowns@0","node":"d932","brief":"reading the exposure chart rows"}
+{"ts":"2026-08-18T15:43:53.815Z","op":"update","visit":"iterations/i16/rank-unknowns@0","node":"d933","brief":"reading this iteration's entries off the chart"}
+{"ts":"2026-08-18T15:44:23.610Z","op":"update","visit":"iterations/i16/rank-unknowns@0","node":"d934","brief":"finding every entry missing a grade before the exit demands them"}
+{"ts":"2026-08-18T15:49:14.886Z","op":"plan","visit":"iterations/i16/rank-unknowns@0","parent":null,"nodes":[{"id":"d935","brief":"record the steer that updates need not be mechanical"},{"id":"d936","brief":"seed the three spikes"},{"id":"d937","brief":"run the spikes"},{"id":"d938","brief":"clear the grades the exit demands"}]}
+{"ts":"2026-08-18T15:49:28.171Z","op":"update","visit":"iterations/i16/rank-unknowns@0","node":"d939","brief":"checking which two trees the wrong-tree risk actually means"}
+{"ts":"2026-08-18T15:50:06.673Z","op":"update","visit":"iterations/i16/rank-unknowns@0","node":"d940","brief":"answered which two trees the risk is about"}
+{"ts":"2026-08-18T15:50:25.589Z","op":"done","visit":"iterations/i16/rank-unknowns@0","node":"d935","brief":"the steer is recorded with what it repriced"}
+{"ts":"2026-08-18T15:52:12.131Z","op":"fork","visit":"iterations/i16/rank-unknowns@0","parent":null,"node":"d941","brief":"did worktrees get built back into the system","nodes":[]}
+{"ts":"2026-08-18T15:52:28.186Z","op":"update","visit":"iterations/i16/rank-unknowns@0","node":"d942","brief":"counting the worktree references in the trace corpus"}
+{"ts":"2026-08-18T15:52:39.215Z","op":"update","visit":"iterations/i16/rank-unknowns@0","node":"d943","brief":"reading the decision that retired worktrees, to date it"}
+{"ts":"2026-08-18T15:53:09.825Z","op":"done","visit":"iterations/i16/rank-unknowns@0","node":"d941","brief":"i16 added no worktrees; the retired pair predates it and survives corpus-wide"}
+{"ts":"2026-08-18T15:54:09.502Z","op":"done","visit":"iterations/i16/rank-unknowns@0","node":"d936","brief":"two spikes seeded, the third dropped as obsolete"}
+{"ts":"2026-08-18T15:54:41.258Z","op":"update","visit":"iterations/i16/rank-unknowns@0","node":"d944","brief":"reading every worktree mention inside i16's own design"}
+{"ts":"2026-08-18T15:55:16.428Z","op":"update","visit":"iterations/i16/rank-unknowns@0","node":"d945","brief":"taking the document the spike states demand"}
+{"ts":"2026-08-18T15:55:22.001Z","op":"update","visit":"iterations/i16/rank-unknowns@0","node":"d946","brief":"entering the spike machine"}
+{"ts":"2026-08-18T15:55:46.270Z","op":"update","visit":"iterations/i16/cut-criteria@12","node":"d947","brief":"aiming at run-spikes"}
+{"ts":"2026-08-18T15:56:25.831Z","op":"update","visit":"iterations/i16/rank-unknowns@0","node":"d948","brief":"reading both scales before mapping any off-scale grade"}
+{"ts":"2026-08-18T15:57:44.031Z","op":"update","visit":"iterations/i16/rank-unknowns@0","node":"d949","brief":"migrating nineteen off-scale grades to the vocabulary the scale offers"}
+{"ts":"2026-08-18T15:57:53.190Z","op":"update","visit":"iterations/i16/rank-unknowns@0","node":"d950","brief":"reading the four ambiguous entries before grading them"}
+{"ts":"2026-08-18T15:58:11.842Z","op":"done","visit":"iterations/i16/rank-unknowns@0","node":"d938","brief":"all 23 off-scale grades now use the vocabulary the scale offers"}
+{"ts":"2026-08-18T15:58:20.327Z","op":"update","visit":"iterations/i16/rank-unknowns@0","node":"d951","brief":"retrying the exit now the grades are on the scale"}
+{"ts":"2026-08-18T15:58:38.032Z","op":"update","visit":"iterations/i16/run-spikes@0","node":"d952","brief":"finding the spike drawing and a reference machine to match"}
+{"ts":"2026-08-18T15:58:41.810Z","op":"update","visit":"iterations/i16/run-spikes@0","node":"d953","brief":"reading the placeholder beside a drawing that already works"}
+{"ts":"2026-08-18T15:59:01.127Z","op":"update","visit":"iterations/i16/run-spikes@0","node":"d954","brief":"two parallel spikes drawn, each with its timebox in its statement"}
+{"ts":"2026-08-18T15:59:09.329Z","op":"update","visit":"iterations/i16/run-spikes@0","node":"d955","brief":"entering the spike machine now the drawing stands"}
+{"ts":"2026-08-18T15:59:20.449Z","op":"plan","visit":"iterations/i16/run-spikes/start@0","parent":"d937","nodes":[{"id":"d956","brief":"spike the second write target"},{"id":"d957","brief":"spike whether a migration can be a program"}]}
+{"ts":"2026-08-18T15:59:25.006Z","op":"plan","visit":"iterations/i16/run-spikes/start@0","parent":"d937","nodes":[]}
+{"ts":"2026-08-18T15:59:36.238Z","op":"update","visit":"iterations/i16/run-spikes/raid-iss-the-path-jail-has-one-write-target@0","node":"d958","brief":"reading what actually makes a declared root read-only"}
+{"ts":"2026-08-18T16:00:13.804Z","op":"update","visit":"iterations/i16/run-spikes/raid-iss-the-path-jail-has-one-write-target@0","node":"d959","brief":"finding the tests that already exercise declared roots"}
+{"ts":"2026-08-18T16:00:27.474Z","op":"update","visit":"iterations/i16/run-spikes/raid-iss-the-path-jail-has-one-write-target@0","node":"d960","brief":"probing the declared-root guard rather than trusting the read"}
+{"ts":"2026-08-18T16:00:40.104Z","op":"update","visit":"iterations/i16/run-spikes/raid-iss-the-path-jail-has-one-write-target@0","node":"d961","brief":"reading what the declared-root cases actually assert"}
+{"ts":"2026-08-18T16:01:21.766Z","op":"done","visit":"iterations/i16/run-spikes/start@0","node":"d956","brief":"the second write target is one branch and its guard is untested"}
+{"ts":"2026-08-18T16:02:08.407Z","op":"update","visit":"iterations/i16/run-spikes/raid-iss-the-path-jail-has-one-write-target@0","node":"d962","brief":"stamping the path-jail spike"}
+{"ts":"2026-08-18T16:02:48.217Z","op":"update","visit":"iterations/i16/run-spikes/raid-iss-the-path-jail-has-one-write-target@0","node":"d963","brief":"taking the migration spike, timeboxed to 15 calls"}
+{"ts":"2026-08-18T16:02:56.093Z","op":"update","visit":"iterations/i16/run-spikes/raid-iss-the-path-jail-has-one-write-target@0","node":"d964","brief":"aiming at the migration spike from inside the first"}
+{"ts":"2026-08-18T16:03:57.201Z","op":"update","visit":"iterations/i16/run-spikes/raid-tripwire-i16-a-structural-migration-cannot-be-written@0","node":"d965","brief":"probing git against an upstream rename plus a vehicle restructure"}
+{"ts":"2026-08-18T16:04:27.531Z","op":"update","visit":"iterations/i16/run-spikes/raid-tripwire-i16-a-structural-migration-cannot-be-written@0","node":"d966","brief":"bounding the finding with a realistic node length"}
+{"ts":"2026-08-18T16:05:11.074Z","op":"update","visit":"iterations/i16/run-spikes/raid-tripwire-i16-a-structural-migration-cannot-be-written@0","node":"d967","brief":"writing the experiment node with both runs"}
+{"ts":"2026-08-18T16:05:38.964Z","op":"done","visit":"iterations/i16/run-spikes/start@0","node":"d957","brief":"git answers the realistic case and the winner's margin is narrower than scored"}
+{"ts":"2026-08-18T16:05:46.839Z","op":"update","visit":"iterations/i16/run-spikes/raid-tripwire-i16-a-structural-migration-cannot-be-written@0","node":"d968","brief":"reading what an experiment node must carry"}
+{"ts":"2026-08-18T16:06:13.170Z","op":"update","visit":"iterations/i16/run-spikes/raid-tripwire-i16-a-structural-migration-cannot-be-written@0","node":"d969","brief":"giving the experiment node the five fields its template demands"}
+{"ts":"2026-08-18T16:06:17.198Z","op":"update","visit":"iterations/i16/run-spikes/raid-tripwire-i16-a-structural-migration-cannot-be-written@0","node":"d970","brief":"stamping the migration spike"}
+{"ts":"2026-08-18T16:07:02.346Z","op":"done","visit":"iterations/i16/rank-unknowns@0","node":"d937","brief":"both spikes signed with their evidence"}
+{"ts":"2026-08-18T16:07:58.328Z","op":"plan","visit":"iterations/i16/fold-back@0","parent":null,"nodes":[{"id":"d971","brief":"fold the experiment back onto its node"},{"id":"d972","brief":"record the bound on the tripwire"},{"id":"d973","brief":"submit fold-back"}]}
+{"ts":"2026-08-18T16:08:23.561Z","op":"done","visit":"iterations/i16/fold-back@0","node":"d971","brief":"the experiment carries its folds_to and promote"}
+{"ts":"2026-08-18T16:08:30.167Z","op":"done","visit":"iterations/i16/fold-back@0","node":"d972","brief":"the bound is on the tripwire with both merge exits"}
+{"ts":"2026-08-18T16:09:08.183Z","op":"update","visit":"iterations/i16/fold-back@0","node":"d974","brief":"filling fold-back with why nothing reopens"}
+{"ts":"2026-08-18T16:09:45.473Z","op":"done","visit":"iterations/i16/fold-back@0","node":"d973","brief":"fold-back signed with all fourteen experiments folded"}
+{"ts":"2026-08-18T16:10:20.843Z","op":"plan","visit":"iterations/i16/cut-criteria@14","parent":null,"nodes":[{"id":"d975","brief":"earn gate-prototype"}]}
+{"ts":"2026-08-18T16:12:12.234Z","op":"update","visit":"iterations/i16/gate-prototype@0","node":"d976","brief":"filling the prototype gate with its one judgment"}
+{"ts":"2026-08-18T16:12:46.462Z","op":"done","visit":"iterations/i16/cut-criteria@14","node":"d975","brief":"gate-prototype blessed with buildable yes"}
+{"ts":"2026-08-18T16:15:40.586Z","op":"update","visit":"iterations/i16/cut-criteria@15","node":"d977","brief":"testing whether M7 opens at this dial"}
+{"ts":"2026-08-18T16:16:26.361Z","op":"plan","visit":"iterations/i16/gate-prototype@0","parent":null,"nodes":[{"id":"d978","brief":"dispose the three unprobed crippling assumptions"},{"id":"d979","brief":"re-earn gate-prototype"}]}
+{"ts":"2026-08-18T16:16:42.552Z","op":"update","visit":"iterations/i16/gate-prototype@0","node":"d980","brief":"reading the disposition vocabulary rather than guessing it"}
+{"ts":"2026-08-18T16:18:19.280Z","op":"update","visit":"iterations/i16/gate-prototype@0","node":"d981","brief":"finding a standing deferred entry to copy its shape"}
+{"ts":"2026-08-18T16:19:47.814Z","op":"done","visit":"iterations/i16/gate-prototype@0","node":"d978","brief":"three crippling assumptions deferred with what would make each ready"}
+{"ts":"2026-08-18T16:20:02.731Z","op":"update","visit":"iterations/i16/gate-prototype@0","node":"d982","brief":"re-testing the route now the assumptions carry dispositions"}
+{"ts":"2026-08-18T16:20:19.399Z","op":"done","visit":"iterations/i16/gate-prototype@0","node":"d979","brief":"the route opened and M7 is live"}
+{"ts":"2026-08-18T16:20:38.246Z","op":"plan","visit":"iterations/i16/author-tests@0","parent":null,"nodes":[{"id":"d983","brief":"find the uncovered requirements"},{"id":"d984","brief":"author a test-spec for each"},{"id":"d985","brief":"submit author-tests"}]}
+{"ts":"2026-08-18T16:20:51.493Z","op":"done","visit":"iterations/i16/author-tests@0","node":"d983","brief":"all six of this iteration's requirements are uncovered"}
+{"ts":"2026-08-18T16:21:02.627Z","op":"update","visit":"iterations/i16/author-tests@0","node":"d986","brief":"reading the test-spec shape before writing three"}
+{"ts":"2026-08-18T16:22:37.921Z","op":"update","visit":"iterations/i16/author-tests@0","node":"d987","brief":"the test-method spec covering three rows and the two untested guards"}
+{"ts":"2026-08-18T17:47:25.503Z","op":"update","visit":"iterations/i16/author-tests@0","node":"d988","brief":"checking the register for a decision that retired the reading file"}
+{"ts":"2026-08-18T17:47:48.929Z","op":"update","visit":"iterations/i16/author-tests@0","node":"d989","brief":"answered the reading-file question from four primary sources"}
+{"ts":"2026-08-18T17:48:17.163Z","op":"update","visit":"iterations/i16/author-tests@0","node":"d990","brief":"the demonstration spec covering both capabilities end to end"}
+{"ts":"2026-08-18T17:48:46.325Z","op":"done","visit":"iterations/i16/author-tests@0","node":"d984","brief":"three specs written covering all six uncovered rows"}
+{"ts":"2026-08-18T17:49:02.751Z","op":"update","visit":"iterations/i16/author-tests@0","node":"d991","brief":"refreshing the spec table before stamping"}
+{"ts":"2026-08-18T17:49:19.778Z","op":"update","visit":"iterations/i16/author-tests@0","node":"d992","brief":"comparing my spec frontmatter against a standing one"}
+{"ts":"2026-08-18T17:49:33.486Z","op":"update","visit":"iterations/i16/author-tests@0","node":"d993","brief":"giving the three specs the identity keys the engine registers them by"}
+{"ts":"2026-08-18T17:49:45.634Z","op":"update","visit":"iterations/i16/author-tests@0","node":"d994","brief":"anchoring on statement to dodge the line-ending mismatch"}
+{"ts":"2026-08-18T17:51:33.347Z","op":"done","visit":"iterations/i16/author-tests@0","node":"d985","brief":"author-tests signed with 82 specs and six rows newly covered"}
+{"ts":"2026-08-18T17:52:39.304Z","op":"update","visit":"iterations/i16/cut-criteria@16","node":"d995","brief":"reaching specify-build to frame the chunk plan"}
+{"ts":"2026-08-18T17:56:30.533Z","op":"update","visit":"iterations/i16/specify-build@0","node":"d996","brief":"answering the five questions blocking the build plan"}
+{"ts":"2026-08-18T18:00:54.538Z","op":"plan","visit":"iterations/i16/specify-build@0","parent":null,"nodes":[{"id":"d997","brief":"find where the upstream file belongs"},{"id":"d998","brief":"supersede the clone decision"},{"id":"d999","brief":"rewrite the vehicle producer as a copy"},{"id":"d1000","brief":"qualify the merge finding"}]}
+{"ts":"2026-08-18T18:01:04.114Z","op":"update","visit":"iterations/i16/specify-build@0","node":"d1001","brief":"looking at the vendor folder the owner suggested"}
+{"ts":"2026-08-18T18:01:20.103Z","op":"update","visit":"iterations/i16/specify-build@0","node":"d1002","brief":"reading the shape an existing vendored thing records"}
+{"ts":"2026-08-18T18:01:25.982Z","op":"update","visit":"iterations/i16/specify-build@0","node":"d1003","brief":"reading the vendor README to copy its fields"}
+{"ts":"2026-08-18T18:02:14.208Z","op":"done","visit":"iterations/i16/specify-build@0","node":"d997","brief":"the upstream file matches the vendor folder's existing shape"}
+{"ts":"2026-08-18T18:02:26.644Z","op":"update","visit":"iterations/i16/specify-build@0","node":"d1004","brief":"finding how the corpus retires a decision"}
+{"ts":"2026-08-18T18:02:47.101Z","op":"done","visit":"iterations/i16/specify-build@0","node":"d998","brief":"the clone decision is superseded with what replaced it"}
+{"ts":"2026-08-18T18:03:14.004Z","op":"update","visit":"iterations/i16/specify-build@0","node":"d1005","brief":"reading the producer fresh before rewriting it"}
+{"ts":"2026-08-18T18:03:44.787Z","op":"done","visit":"iterations/i16/specify-build@0","node":"d999","brief":"the producer is a copy with a one-way upstream file"}
+{"ts":"2026-08-18T18:04:06.259Z","op":"done","visit":"iterations/i16/specify-build@0","node":"d1000","brief":"the merge measurement is scoped to the clone shape that was dropped"}
+{"ts":"2026-08-18T18:04:23.889Z","op":"plan","visit":"iterations/i16/specify-build@0","parent":null,"nodes":[{"id":"d1006","brief":"present the revised build plan"}]}
+{"ts":"2026-08-18T18:06:41.538Z","op":"plan","visit":"iterations/i16/specify-build@0","parent":"d1006","nodes":[{"id":"d1007","brief":"author the design specs"},{"id":"d1008","brief":"seed the four build chunks"},{"id":"d1009","brief":"submit specify-build"}]}
+{"ts":"2026-08-18T18:07:08.503Z","op":"update","visit":"iterations/i16/specify-build@0","node":"d1010","brief":"reading the design-spec shape before writing two"}
+{"ts":"2026-08-18T18:07:39.237Z","op":"update","visit":"iterations/i16/specify-build@0","node":"d1011","brief":"the producing acts spec, covering both producers and their seam"}
+{"ts":"2026-08-18T18:07:54.186Z","op":"update","visit":"iterations/i16/specify-build@0","node":"d1012","brief":"reading the story that specifies the buttons"}
+{"ts":"2026-08-18T18:09:12.734Z","op":"update","visit":"iterations/i16/specify-build@0","node":"d1013","brief":"the buttons and the RUNME deletion are part of the producing design"}
+{"ts":"2026-08-18T18:09:45.251Z","op":"done","visit":"iterations/i16/specify-build@0","node":"d1007","brief":"two design specs cover the four uncovered elements"}
+{"ts":"2026-08-18T18:10:12.620Z","op":"update","visit":"iterations/i16/specify-build@0","node":"d1014","brief":"checking the chunk drawing before seeding it"}
+{"ts":"2026-08-18T18:10:28.738Z","op":"done","visit":"iterations/i16/specify-build@0","node":"d1008","brief":"six chunks seeded with two running in parallel"}
+{"ts":"2026-08-18T18:11:52.812Z","op":"done","visit":"iterations/i16/specify-build@0","node":"d1009","brief":"specify-build submitted with two specs and six chunks"}
+{"ts":"2026-08-18T18:12:28.695Z","op":"done","visit":"iterations/i16/specify-build@0","node":"d1006","brief":"the plan is built into two specs and six chunks"}
+{"ts":"2026-08-18T18:13:04.789Z","op":"update","visit":"iterations/i16/gate-prototype@2","node":"d1015","brief":"resuming the sweep toward observe-red"}
+{"ts":"2026-08-18T18:14:02.773Z","op":"plan","visit":"iterations/i16/observe-red@0","parent":null,"nodes":[{"id":"d1016","brief":"write the four guard cases"},{"id":"d1017","brief":"check the two new ones are red"},{"id":"d1018","brief":"submit observe-red"}]}
+{"ts":"2026-08-18T18:14:24.616Z","op":"done","visit":"iterations/i16/observe-red@0","node":"d1016","brief":"four cases written, two red on purpose"}
+{"ts":"2026-08-18T18:14:34.415Z","op":"update","visit":"iterations/i16/observe-red@0","node":"d1019","brief":"getting the checklist the non-test specs owe"}
+{"ts":"2026-08-18T18:15:19.061Z","op":"done","visit":"iterations/i16/observe-red@0","node":"d1017","brief":"eighteen non-test specs ruled, two of them red today"}
+{"ts":"2026-08-18T18:15:47.341Z","op":"update","visit":"iterations/i16/observe-red@0","node":"d1020","brief":"clean checkboxes with the reasoning moved beside them"}
+{"ts":"2026-08-18T18:19:34.747Z","op":"done","visit":"iterations/i16/observe-red@0","node":"d1018","brief":"observe-red signed — clean checkbox lines were the whole fix"}
+{"ts":"2026-08-18T18:20:43.939Z","op":"plan","visit":"iterations/i16/build-steps/chunk-guard-tests@0","parent":null,"nodes":[{"id":"d1021","brief":"chunk-guard-tests"},{"id":"d1022","brief":"chunk-travelling-bound"},{"id":"d1023","brief":"chunk-declared-write-target"},{"id":"d1024","brief":"chunk-producing-acts"},{"id":"d1025","brief":"chunk-the-two-buttons"},{"id":"d1026","brief":"chunk-runme-drops-the-export"}]}
+{"ts":"2026-08-18T18:22:01.481Z","op":"update","visit":"iterations/i16/build-steps/chunk-guard-tests@0","node":"d1027","brief":"the spec carried minted_in twice"}
+{"ts":"2026-08-18T18:22:44.674Z","op":"update","visit":"iterations/i16/build-steps/chunk-guard-tests@0","node":"d1028","brief":"guards proved real; case 4 was matching a JSON key name"}
+{"ts":"2026-08-18T18:23:04.573Z","op":"update","visit":"iterations/i16/build-steps/chunk-guard-tests@0","node":"d1029","brief":"noting the false-green shape for guidance rather than editing it here"}
+{"ts":"2026-08-18T18:25:00.756Z","op":"update","visit":"iterations/i16/build-steps/chunk-guard-tests@0","node":"d1030","brief":"owner asked for a poll verb with time estimates — noted"}
+{"ts":"2026-08-18T18:25:56.416Z","op":"update","visit":"iterations/i16/build-steps/chunk-guard-tests@0","node":"d1031","brief":"churn alarm is corpus-wide and predates i16 — noted, not swept"}
+{"ts":"2026-08-18T18:26:31.290Z","op":"done","visit":"iterations/i16/build-steps/chunk-guard-tests@0","node":"d1021","brief":"both guards proved real; two false greens and three unparseable specs fixed"}
+{"ts":"2026-08-18T18:28:33.029Z","op":"update","visit":"iterations/i16/build-steps/chunk-declared-write-target@0","node":"d1032","brief":"identity is brand.json id; upstream record goes in vendor/upstream"}
+{"ts":"2026-08-18T18:31:06.492Z","op":"plan","visit":"iterations/i16/build-steps/chunk-declared-write-target@0","parent":"d1023","nodes":[{"id":"d1033","brief":"writable flag"},{"id":"d1034","brief":"the routing"},{"id":"d1035","brief":"and the source guard land in paths.ts"}]}
+{"ts":"2026-08-18T18:31:22.999Z","op":"done","visit":"iterations/i16/build-steps/chunk-declared-write-target@0","node":"d1033","brief":"declaredRoots now carries a writable flag"}
+{"ts":"2026-08-18T18:31:57.530Z","op":"done","visit":"iterations/i16/build-steps/chunk-declared-write-target@0","node":"d1034","brief":"resolveInRoot routes a writable root-ref into the declared-root resolver"}
+{"ts":"2026-08-18T18:32:03.210Z","op":"done","visit":"iterations/i16/build-steps/chunk-declared-write-target@0","node":"d1035","brief":"the source guard refuses on identity and fails closed"}
+{"ts":"2026-08-18T18:33:02.892Z","op":"update","visit":"iterations/i16/build-steps/chunk-declared-write-target@0","node":"d1036","brief":"the demonstration still described a clone rather than a copy"}
+{"ts":"2026-08-18T18:33:37.922Z","op":"update","visit":"iterations/i16/build-steps/chunk-declared-write-target@0","node":"d1037","brief":"the identity read is one-shot and raises the ceiling with its reason"}
+{"ts":"2026-08-18T18:34:48.708Z","op":"update","visit":"iterations/i16/build-steps/chunk-declared-write-target@0","node":"d1038","brief":"v1 has five tests and none is end-to-end — answer recorded"}
+{"ts":"2026-08-18T18:35:21.287Z","op":"update","visit":"iterations/i16/build-steps/chunk-declared-write-target@0","node":"d1039","brief":"the design spec now says where both identity files sit"}
+{"ts":"2026-08-18T18:35:53.163Z","op":"done","visit":"iterations/i16/build-steps/chunk-guard-tests@0","node":"d1023","brief":"writable roots resolve, and the source guard refuses on identity"}
+{"ts":"2026-08-18T18:36:19.109Z","op":"update","visit":"iterations/i16/build-steps/chunk-declared-write-target@0","node":"d1040","brief":"the join at end still owes this branch"}
+{"ts":"2026-08-18T18:37:17.009Z","op":"update","visit":"iterations/i16/build-steps/chunk-travelling-bound@0","node":"d1041","brief":"a forbidden word surfaced in a served refusal string"}
+{"ts":"2026-08-18T18:38:29.591Z","op":"update","visit":"iterations/i16/build-steps/chunk-travelling-bound@0","node":"d1042","brief":"five bound cases written before the bound exists"}
+{"ts":"2026-08-18T18:39:33.959Z","op":"update","visit":"iterations/i16/build-steps/chunk-travelling-bound@0","node":"d1043","brief":"withActBound sets the bound and a finally tears it down"}
+{"ts":"2026-08-18T18:41:32.697Z","op":"update","visit":"iterations/i16/build-steps/chunk-travelling-bound@0","node":"d1044","brief":"the bound state moves to its own module to keep imports acyclic"}
+{"ts":"2026-08-18T18:42:26.777Z","op":"done","visit":"iterations/i16/build-steps/chunk-guard-tests@0","node":"d1022","brief":"the bound moves into the jail, where every write verb passes"}
+{"ts":"2026-08-18T18:42:37.588Z","op":"update","visit":"iterations/i16/build-steps/chunk-travelling-bound@0","node":"d1045","brief":"the seam names the bound as the store it answered from"}
+{"ts":"2026-08-18T18:43:43.992Z","op":"update","visit":"iterations/i16/build-steps/chunk-travelling-bound@0","node":"d1046","brief":"v1's e2e is i18_red3.go — my earlier answer was wrong"}
+{"ts":"2026-08-18T18:44:34.651Z","op":"update","visit":"iterations/i16/build-steps/chunk-travelling-bound@0","node":"d1047","brief":"filling the travelling-bound evidence before its submit"}
+{"ts":"2026-08-18T18:47:29.816Z","op":"update","visit":"iterations/i16/build-steps/chunk-producing-acts@0","node":"d1048","brief":"the end-to-end test, modelled on v1's hermetic walk"}
+{"ts":"2026-08-18T18:49:30.165Z","op":"plan","visit":"iterations/i16/build-steps/chunk-producing-acts@0","parent":"d1024","nodes":[{"id":"d1049","brief":"both producers"},{"id":"d1050","brief":"bounded"},{"id":"d1051","brief":"refusing before the first byte"}]}
+{"ts":"2026-08-18T18:49:54.164Z","op":"done","visit":"iterations/i16/build-steps/chunk-producing-acts@0","node":"d1049","brief":"both producers exist as functions"}
+{"ts":"2026-08-18T18:50:49.560Z","op":"done","visit":"iterations/i16/build-steps/chunk-producing-acts@0","node":"d1050","brief":"the act runs inside its own bound"}
+{"ts":"2026-08-18T18:50:55.951Z","op":"done","visit":"iterations/i16/build-steps/chunk-producing-acts@0","node":"d1051","brief":"four things stop the act before the first byte"}
+{"ts":"2026-08-18T18:51:03.299Z","op":"update","visit":"iterations/i16/build-steps/chunk-producing-acts@0","node":"d1052","brief":"the element said two folders where the whole spec stays home"}
+{"ts":"2026-08-18T18:51:42.517Z","op":"update","visit":"iterations/i16/build-steps/chunk-producing-acts@0","node":"d1053","brief":"the identity decision recorded where it was minted"}
+{"ts":"2026-08-18T18:53:12.857Z","op":"update","visit":"iterations/i16/build-steps/chunk-producing-acts@0","node":"d1054","brief":"both acts wired as lane verbs with a test on the wiring"}
+{"ts":"2026-08-18T18:55:34.620Z","op":"update","visit":"iterations/i16/build-steps/chunk-producing-acts@0","node":"d1055","brief":"both verbs traced and named in the use case that uses them"}
+{"ts":"2026-08-18T18:57:37.281Z","op":"update","visit":"iterations/i16/build-steps/chunk-producing-acts@0","node":"d1056","brief":"filling the producing-acts evidence before its submit"}
+{"ts":"2026-08-18T18:57:41.965Z","op":"done","visit":"iterations/i16/build-steps/chunk-guard-tests@0","node":"d1024","brief":"a vehicle is made and it makes a project"}
+{"ts":"2026-08-18T18:59:26.648Z","op":"update","visit":"iterations/i16/build-steps/chunk-the-two-buttons@0","node":"d1057","brief":"the acts reachable over http for a button to press"}
+{"ts":"2026-08-18T19:00:01.100Z","op":"update","visit":"iterations/i16/build-steps/chunk-the-two-buttons@0","node":"d1058","brief":"two commands that ask then open a new window"}
+{"ts":"2026-08-18T19:00:23.838Z","op":"update","visit":"iterations/i16/build-steps/chunk-the-two-buttons@0","node":"d1059","brief":"every leg of the button wire has a check"}
+{"ts":"2026-08-18T19:02:15.021Z","op":"done","visit":"iterations/i16/build-steps/chunk-guard-tests@0","node":"d1025","brief":"both buttons wired on every leg of the wire"}
+{"ts":"2026-08-18T19:03:23.196Z","op":"update","visit":"iterations/i16/build-steps/chunk-runme-drops-the-export@0","node":"d1060","brief":"the export leaves all five places that named it"}
+{"ts":"2026-08-18T19:05:22.601Z","op":"done","visit":"iterations/i16/build-steps/chunk-guard-tests@0","node":"d1026","brief":"the export is gone from every place that offered it"}
+{"ts":"2026-08-18T19:06:06.006Z","op":"plan","visit":"iterations/i16/cut-criteria@19","parent":null,"nodes":[{"id":"d1061","brief":"verification"},{"id":"d1062","brief":"gate-implementation"},{"id":"d1063","brief":"fill-story-evidence"},{"id":"d1064","brief":"sweep-consistency"},{"id":"d1065","brief":"gate-validation"},{"id":"d1066","brief":"package"},{"id":"d1067","brief":"gate-release"}]}
+{"ts":"2026-08-18T19:07:51.164Z","op":"update","visit":"iterations/i16/trace-design@0","node":"d1068","brief":"the bound joins the seam it is checked at"}
+{"ts":"2026-08-18T19:08:04.072Z","op":"update","visit":"iterations/i16/trace-design@0","node":"d1069","brief":"the update channel says why no code answers it yet"}
+{"ts":"2026-08-18T19:08:25.790Z","op":"update","visit":"iterations/i16/trace-design@0","node":"d1070","brief":"submitting the design trace"}
+{"ts":"2026-08-18T19:09:24.991Z","op":"update","visit":"iterations/i16/trace-design@0","node":"d1071","brief":"the design trace table sent explicitly"}
+{"ts":"2026-08-18T19:10:12.119Z","op":"update","visit":"iterations/i16/trace-design@0","node":"d1072","brief":"a planned name is what a design spec owes"}
+{"ts":"2026-08-18T19:10:33.460Z","op":"update","visit":"iterations/i16/trace-design@0","node":"d1073","brief":"the build machine owes its own form"}
+{"ts":"2026-08-18T19:11:14.143Z","op":"update","visit":"iterations/i16/trace-design@0","node":"d1074","brief":"correcting what the update-channel resolution actually was"}
+{"ts":"2026-08-18T19:12:46.313Z","op":"update","visit":"iterations/i16/trace-design@0","node":"d1075","brief":"three unclaimed files find their real owners"}
+{"ts":"2026-08-18T19:12:59.134Z","op":"update","visit":"iterations/i16/trace-design@0","node":"d1076","brief":"the schema defect recorded where it was found"}
+{"ts":"2026-08-18T19:15:07.534Z","op":"update","visit":"iterations/i16/trace-design@0","node":"d1077","brief":"the change reporter derives what a vehicle made its own"}
+{"ts":"2026-08-18T19:15:45.988Z","op":"update","visit":"iterations/i16/trace-design@0","node":"d1078","brief":"the element declared itself impossible under the chosen design"}
+{"ts":"2026-08-18T19:16:13.221Z","op":"update","visit":"iterations/i16/trace-design@0","node":"d1079","brief":"the element declared itself impossible under the chosen design"}
+{"ts":"2026-08-18T19:16:58.785Z","op":"obsolete","visit":"iterations/i16/cut-criteria@19","node":"d1067","brief":"the machine's own state list already tracks the states ahead"}
+{"ts":"2026-08-18T19:17:02.492Z","op":"obsolete","visit":"iterations/i16/cut-criteria@19","node":"d1066","brief":"the machine's own state list already tracks the states ahead"}
+{"ts":"2026-08-18T19:17:07.008Z","op":"obsolete","visit":"iterations/i16/cut-criteria@19","node":"d1065","brief":"the machine's own state list already tracks the states ahead"}
+{"ts":"2026-08-18T19:17:11.115Z","op":"obsolete","visit":"iterations/i16/cut-criteria@19","node":"d1064","brief":"the machine's own state list already tracks the states ahead"}
+{"ts":"2026-08-18T19:17:15.226Z","op":"obsolete","visit":"iterations/i16/cut-criteria@19","node":"d1063","brief":"the machine's own state list already tracks the states ahead"}
+{"ts":"2026-08-18T19:17:20.867Z","op":"obsolete","visit":"iterations/i16/cut-criteria@19","node":"d1062","brief":"the machine's own state list already tracks the states ahead"}
+{"ts":"2026-08-18T19:18:24.453Z","op":"done","visit":"iterations/i16/cut-criteria@19","node":"d1061","brief":"the design trace stands and the reporter is realized"}
+{"ts":"2026-08-18T19:22:50.550Z","op":"update","visit":"iterations/i16/verification@0","node":"d1080","brief":"tester: verifying i16 specs against produce/paths/update code, read-only"}
+{"ts":"2026-08-18T19:30:17.426Z","op":"update","visit":"iterations/i16/verification@0","node":"d1081","brief":"the two exclusion lists become one, with the arrival's exception"}
+{"ts":"2026-08-18T19:30:31.155Z","op":"update","visit":"iterations/i16/verification@0","node":"d1082","brief":"closing the cleanup wrapper around the vehicle act"}
+{"ts":"2026-08-18T19:30:55.648Z","op":"update","visit":"iterations/i16/verification@0","node":"d1083","brief":"the project act stops writing the tree it was launched from"}
+{"ts":"2026-08-18T19:31:26.958Z","op":"update","visit":"iterations/i16/verification@0","node":"d1084","brief":"the packaging script calls the one list rather than keeping a copy"}
+{"ts":"2026-08-18T19:32:13.010Z","op":"update","visit":"iterations/i16/verification@0","node":"d1085","brief":"the tester's five code findings answered in test and code"}
+{"ts":"2026-08-18T19:32:28.406Z","op":"update","visit":"iterations/i16/verification@0","node":"d1086","brief":"the launcher's brand file is proved untouched by a refusal"}
+{"ts":"2026-08-18T19:32:35.930Z","op":"update","visit":"iterations/i16/verification@0","node":"d1087","brief":"package.ts still needs resolve"}
+{"ts":"2026-08-18T19:32:41.786Z","op":"update","visit":"iterations/i16/verification@0","node":"d1088","brief":"running the battery against the tester's fixes"}
+{"ts":"2026-08-18T19:33:21.941Z","op":"update","visit":"iterations/i16/verification@0","node":"d1089","brief":"the log-vs-registry disagreement recorded for fix-findings"}
+{"ts":"2026-08-18T19:33:38.976Z","op":"update","visit":"iterations/i16/verification@0","node":"d1090","brief":"two working functions nothing can call, recorded"}
+{"ts":"2026-08-18T19:34:14.256Z","op":"update","visit":"iterations/i16/verification@0","node":"d1091","brief":"cleanup returns the destination to whichever state it was in"}
+{"ts":"2026-08-18T19:34:20.730Z","op":"update","visit":"iterations/i16/verification@0","node":"d1092","brief":"confirming the last of the tester's code findings"}
+{"ts":"2026-08-18T19:34:39.421Z","op":"update","visit":"iterations/i16/verification@0","node":"d1093","brief":"the half guard recorded with what would make it whole"}
+{"ts":"2026-08-18T19:34:54.709Z","op":"update","visit":"iterations/i16/verification@0","node":"d1094","brief":"the inventory's blind spot is the state people ask from"}
+{"ts":"2026-08-18T19:35:14.805Z","op":"update","visit":"iterations/i16/verification@0","node":"d1095","brief":"a missing test hiding a live failure, with the count"}
+{"ts":"2026-08-18T19:36:33.756Z","op":"update","visit":"iterations/i16/verification@0","node":"d1096","brief":"verification submitted with what fresh eyes actually observed"}
+{"ts":"2026-08-18T19:37:04.980Z","op":"update","visit":"iterations/i16/verification@0","node":"d1097","brief":"the log-vs-registry disagreement becomes a register entry"}
+{"ts":"2026-08-18T19:37:27.656Z","op":"update","visit":"iterations/i16/verification@0","node":"d1098","brief":"the unperformed demonstration becomes a register entry the owner owns"}
+{"ts":"2026-08-18T19:37:37.651Z","op":"update","visit":"iterations/i16/verification@0","node":"d1099","brief":"the two claims that do not stand are addressed to their entries"}
+{"ts":"2026-08-18T19:41:54.105Z","op":"update","visit":"iterations/i16/verification@0","node":"d1100","brief":"the battery's one finding is the churn alarm"}
+{"ts":"2026-08-18T19:42:06.502Z","op":"update","visit":"iterations/i16/verification@0","node":"d1101","brief":"taking the fallback the battery opened"}
+{"ts":"2026-08-18T19:42:44.824Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1102","brief":"the blocking exit script recorded on the owner's ruling"}
+{"ts":"2026-08-18T19:43:08.504Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1103","brief":"answering what the churn alarm is"}
+{"ts":"2026-08-18T19:43:22.605Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1104","brief":"reading the tree before a large mechanical change"}
+{"ts":"2026-08-18T19:43:38.644Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1105","brief":"staging i16 so the reformat lands as its own change"}

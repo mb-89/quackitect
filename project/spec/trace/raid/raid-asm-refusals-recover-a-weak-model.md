@@ -10,7 +10,7 @@ status: open
 impact: The refusal contract is doctrine without a check. A clause whose remedy does not actually work costs every agent that meets it a wasted turn, and nobody finds out.
 breaks_how_badly: corrosive
 how_likely: plausible
-probe: "one-sided evidence, i35 on 2026-08-17, and the model was not weak. Every typed refusal hit recovered in one turn: SE-C-040, 105, 110, 112, 120, 125, 129, 137. TWO DID NOT RECOVER CLEANLY: a per-item refusal printed truncated item strings its own matcher would not accept, and a `do` instruction repeated indefinitely carrying no remedy at all."
+probe: "one-sided evidence, i35 on 2026-08-17, and the model was not weak. Every typed refusal hit recovered in one turn: SE-C-040, 105, 110, 112, 120, 125, 129, 137. TWO DID NOT RECOVER CLEANLY: a per-item refusal printed truncated item strings its own matcher would not accept, and a do instruction repeated indefinitely carrying no remedy at all."
 probed: "2026-08-17"
 source_refs:
   - "engine/errors.ts lines 2-3, where the contract is written"

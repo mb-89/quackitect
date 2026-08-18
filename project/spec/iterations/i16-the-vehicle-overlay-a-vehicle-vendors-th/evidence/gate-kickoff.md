@@ -2,8 +2,8 @@
 form: gate-kickoff
 bless: blessed by agent
 by: agent
-signed_off: 2026-08-18T08:58:28.819Z
-reopened: "2026-08-18T08:55:35.984Z — The column is wrong. flow-overlay crosses IN and no interface carries it, so this iteration mints one for certain — decompose-structure's escalate tell fires, and minor was proposed knowing it probably would."
+signed_off: 2026-08-18T09:49:52.911Z
+reopened: "2026-08-18T09:41:09.518Z — Two of its five goals contradict the owner's ruling — \"vendored and sealed\" and \"an update is a replacement, not a merge\". Every gate below measures goals_served against this list, so it cannot stand while it names a model that was withdrawn."
 authors: agent
 files:
 ---
@@ -12,17 +12,19 @@ files:
 
 ## current_situation
 
-i16 stands at its kickoff gate, having walked M0's onboarding retro.
+i16 stands at its kickoff gate, REOPENED after the owner corrected the model the whole iteration was built on.
 
-WHAT THE RETRO LEFT. The notes inbox went from 30 to 0: 5 done, 3 obsolete, 31 parked. All 91 previously parked items were walked and none was ripe. All ten raid debt rows carry a dated look, and one of them had never been swept since i33 minted it. Two method changes landed and one engine fix, on the owner's instruction.
+WHAT THE CORRECTION WAS, in their words: "At no point is there any sealing." A vehicle spawned from the engine is SELF-SUFFICIENT and holds everything. It carries all the files, it has an override layer, and it may modify its own content. Colleagues will have it installed with nothing of the parent's beside it.
 
-WHAT THE RETRO GOT WRONG, because it shapes how this gate reads its own evidence. Two of its four headline findings were false and the owner caught both from memory. Both failed the same way: a downstream symptom was measured carefully while the document governing the mechanism went unread.
+WHY THAT REACHED THIS GATE. Two of the five goals signed here named the withdrawn model: "vendored and sealed" and "an update is a replacement, not a merge". Every gate below measures what it produced against this list, so the list could not stand.
 
-WHAT THE ITERATION IS. A vehicle vendors the engine in a folder of its own, overlays its own guidance and method through one resolution chain, and never writes under the engine.
+AND ONE STANDING REQUIREMENT GOES WITH THEM. req-engine-folder-is-sealed is removed on the owner's ruling of 2026-08-18: "It's a standing requirement, but it's old... It might have to do with the worktree stuff we had. Remove it." The removal happens at write-requirements, after sweeping what points at it.
+
+WHAT SURVIVED THE CORRECTION UNTOUCHED, and it is most of the gate. The resolution chain, the column, the scope, the bounds reading and every citation. The correction moved the MODEL of what a vehicle is; it did not move what the mechanism has to do.
+
+WHAT THE ITERATION IS NOW. The engine brings a DESCENDANT into being: a complete independent copy under its own name, owned entirely by whoever holds it, laying its own guidance over what it carries, still able to receive improvements from where it came from — and unable to reach that source at all.
 
 WHY NOW, in the owner's words: get to a state where we can work, and start with the vehicle and the foreign project tomorrow.
-
-WHAT MOVED TO MAKE IT REACHABLE. The `depends_on` edge on i10 was cut on the owner's ruling of 2026-08-18, and the rulings are written into the record.
 
 WHAT IS ALREADY PROVEN, BEFORE ANY CODE. v1 built this chain and it was READ THIS SESSION at ref main rather than cited. `product/engine-go/resolver.go` carries the whole mechanism: `overlayLayers()` returns three layers most-specific first, `Resolve()` walks them and takes the first hit in ten lines, `ResolveGuides()` walks engine-first so the vehicle overwrites, and `selftestSplit()` asserts the three properties that matter.
 
@@ -70,42 +72,46 @@ AND IT ANSWERS THE FOLDER QUESTION BETTER THAN EXPECTED. `EngineDir()` PROBES tw
 - note-814c6d46f2ac — THE TOOL AN AGENT REACHES FOR WHEN STUCK IS REFUSED: backlog, owner accepted, not understood
 - note-168e7a7fe477 — A FORM SAVED ANOTHER STATE'S FIELDS: backlog, belongs with i29
 - note-cf187793f9f1 — TWO ENGINE-SIDE SOURCES DISAGREE ABOUT WHO BLESS: pending for the next retro, and deliberately so. It was captured at THIS gate, after the retro closed, when the kickoff row's guidance and the stop hook gave opposite answers about whose bless the column is. It is neither done nor obsolete, and carried and backlog are the retro's judgment, so no disposition this state grants fits it.
+- note-8a5e4959bbba — GREY STATES SIT ABOVE AN ACTIVE ONE, and the wal: pending for the next retro, with its destination already ruled by the owner. They read the panel, called an active state below a grey one illegal, and said to take it as a note and fix it in the build phase. So it is neither done nor obsolete, and its judgment is not this gate's to make. IT MATTERS TO THIS GATE IN PARTICULAR: what skipped those two states was a kickoff re-submit carrying submit and bless in one call, which is the sequence about to run again. This gate submits first and blesses separately because of it.
 
 ## goals
 
-- VENDORED AND SEALED. The engine sits in a folder of its own inside a host repository, resolves every resource it serves from inside that folder, and writes zero files into it. (req-engine-folder-is-sealed)
-- THE OVERLAY WINS BY IDENTITY. Where a host carries a card for an identity the engine also ships, the host's card is served at every point that identity resolves, and an un-overridden resource is inherited. (req-overlay-resolution)
+- A DESCENDANT IS A COMPLETE INDEPENDENT COPY. It comes up on a machine with nothing of the parent's beside it, and everything in it is its owner's to change in place, including the parts the parent wrote. (vp-vendoring, amended 2026-08-18. Its requirement is OWED at write-requirements — req-engine-folder-is-sealed said the opposite and is removed there on the owner's ruling.)
+- NOTHING A DESCENDANT DOES CAN REACH ITS PARENT. No write, no link, no mount, no install step that writes to the source. The rule names the DIRECTION OF WRITES rather than any mechanism. (raid-dec-an-import-is-read-only-and-a-vendored-copy-is-yours, minted from v2's law with its witness: a symlink and a routine cleanup deleted a repository on 2026-07-25.)
+- THE OVERLAY WINS BY IDENTITY. Where a descendant carries a card for an identity the engine also ships, the descendant's card is served at every point that identity resolves, and an un-overridden resource is inherited. (req-overlay-resolution)
 - IT WORKS WITH NO OVERLAY AT ALL. With none present, the product comes up on the engine's shipped method and zero builder-authored configuration files. (req-setup-serves-shipped-method)
-- AN UPDATE IS A REPLACEMENT, NOT A MERGE. A new engine version replaces the vendored folder whole, with zero merge operations and zero edits to builder-owned files, and whatever no longer resolves is REPORTED rather than silently defaulted. (req-overlay-survives-update, req-overlay-drift-reported)
-- ONE COMMAND MAKES A VEHICLE. The export produces a host repository with the engine vendored, an empty overlay ready to write into, and no second install of anything. (req-second-product-reuses-install)
+- AN UPDATE REACHES A DESCENDANT WITHOUT TAKING ITS CHANGES AWAY. What no longer resolves is REPORTED rather than silently defaulted. HOW is the open design question of this iteration and it is not answered here. (req-overlay-survives-update, req-overlay-drift-reported, raid-risk-ownership-and-receiving-pull-against-each-other)
+- ONE COMMAND MAKES A DESCENDANT. The export produces a complete named copy with an empty overlay ready to write into, and no second install of anything. (req-second-product-reuses-install)
 
 ## pulled_in
 
 - THE RESOLUTION CHAIN, ported from v1's `product/engine-go/resolver.go` at ref main. Origin: the record's own inputs, and the file was READ this session rather than cited. `overlayLayers()` plus `Resolve()` is about twenty-five lines.
-- THE SEAL. The engine resolves from inside its own folder and writes nothing into it. Origin: req-engine-folder-is-sealed, minted i1, graded crippling.
-- THE HOST'S OVERLAY LAYER, above the engine's, owned by the host and never touched by an update. Origin: req-overlay-resolution's eight clauses.
+- THE ISOLATION LAW, in the direction that matters. A descendant may read what it came from and may never write to it, by any mechanism. Origin: v2's law-imports-are-read-only, read at ref v2 and minted into v3 this session with its witness.
+- THE DESCENDANT'S OWN OVERLAY LAYER, above the engine's, owned by whoever holds the copy. Origin: req-overlay-resolution's eight clauses.
 - THE DRIFT REPORT. What an engine update renamed that an overlay still points at is named, rather than the engine's default being served quietly. Origin: req-overlay-drift-reported and uc-vendor-and-overlay extension 6a.
-- THE EXPORT PATH BECOMES A VENDORING. `RUNME.ps1 --export` today copies the whole tree, renames the brand and makes a fresh repository with one commit — a FORK. It must instead produce a host repository with the engine vendored and an empty overlay. Origin: the owner's goal, and req-second-product-reuses-install.
+- THE EXPORT PATH BECOMES A SPAWN. `RUNME.ps1 --export` today copies the whole tree, renames the brand and makes a fresh repository with one commit — a FORK, with no channel back. It must instead produce a descendant that can still receive. Origin: the owner's goal, and req-second-product-reuses-install.
 - A PROBE ON THE ENGINE FOLDER'S LOCATION. Origin: owner instruction 2026-08-18 that the folder decision is the agent's, settled by spike. v1 answers it by PROBING two locations rather than by moving anything, so the probe is cheap and its likely answer is already visible.
 - THE OVERLAY SEAM'S TESTS. tsp-overlay-seam names tests/overlay.test.ts as the planned home and says three of its four claims are defined ahead of their cases. This iteration writes them.
+- AND ONE REMOVAL, which is work rather than a deletion. req-engine-folder-is-sealed comes out at write-requirements, after sweeping what points at it. i34 deleted ten requirements without that sweep and had to restore two.
 
 ## left_out
 
+- SENDING A DESCENDANT'S IMPROVEMENTS BACK UP. Where it went: out, on the owner's own ruling — "that's not that important right now". When it comes it is a process that ANALYSES changes and offers them as notes or design input, never anything that writes into the source.
 - THE FOLDER REWORK ITSELF — removing the wrapper repository root. Where it went: the owner ruled it may land later in its own iteration and must not block the overlay. Their words: "We can do the folder rework later. That's also... that's fine." v1's probing `EngineDir()` is the evidence that it is not needed here.
 - MODULE-QUALIFIED IDS, and the whole of i10. Where it went: the owner ruled them later, accepting more total work. "The modules, we can do it later. That's not that important. Even if that means more work overall." The `depends_on` edge is cut and the argument is on the record.
 - THE 121 BROKEN CITATIONS. Where it went: i10, and they cannot be repaired anywhere else — their sources are `.se/req-mine-v1.md` and `.se/req-mine-v2.md`, and `.gitignore` line 2 means they travel to no clone.
-- THE FULL BEGIN-A-PRODUCT SCAFFOLD beyond what the export already does — req-scaffold-from-template, req-begin-touches-nothing-existing, req-fresh-product-starts-empty and the rest of tsp-product-scaffold. Where it went: unassigned, and it stays unassigned. This iteration makes ONE command produce a vehicle; it does not build the desk affordance around it.
+- THE FULL BEGIN-A-PRODUCT SCAFFOLD beyond what the export already does — req-scaffold-from-template, req-begin-touches-nothing-existing, req-fresh-product-starts-empty and the rest of tsp-product-scaffold. Where it went: unassigned, and it stays unassigned. This iteration makes ONE command produce a descendant; it does not build the desk affordance around it.
 - THE BRAND LAYER'S RENDER-TIME SUBSTITUTION. Explicitly out: v1 rejected rewriting text the ledger hashes, and the record carries that ruling. Identity surfaces come from the brand layer instead.
 - THE PARALLEL-COORDINATES WORK the record pulled in from the pool on 2026-08-13. Where it went: it belongs to whichever record next touches the front card, and the owner has separately ruled that card has not earned its keep.
 - EVERY ITEM IN THE POOL. 99 stand parked, each with its own ready-when. None blocks this iteration and none is blocked by it.
 
 ## change_size
 
-major — CORRECTED FROM minor after the owner challenged it, and the check they prompted settles it against my first answer.
+major — CORRECTED FROM minor after the owner challenged it, and REINFORCED by the model correction that reopened this gate.
 
 THEIR THREE QUESTIONS, ANSWERED BY READING RATHER THAN ARGUING.
 
-A NEW VALUE PROP? NO. vp-vendoring stands, graded MUST, and its outcome line is this iteration verbatim: a vehicle vendors the engine and overlays its own guidance, methods and behaviour through one resolution chain, and never writes under the engine. The vision is inherited and nothing here moves it.
+A NEW VALUE PROP? NO, BUT vp-vendoring WAS AMENDED, and that matters more than a clean no. Its outcome line now reads: a vehicle is a complete independent copy of the engine that its owner may change entirely, lays its own guidance over what it carries, and can still take improvements from where it came from — while nothing it does can reach that source. Its four success criteria were rebuilt with it. A major gate ADJUDICATES an amendment to the resident vision; that is exactly what gate-motivation is for, and a minor column does not put it in front of one.
 
 A NEW ELEMENT? NO. el-method-compiler already implements fn-run-a-governed-walk.hold-the-method, which takes flow-overlay as an input, and its own realization line reads "the standing compiler and the overlay machinery". The element exists and already claims this work.
 
@@ -113,21 +119,23 @@ A NEW INTERFACE? YES, AND CERTAINLY. flow-overlay carries `crosses: in` and NO I
 
 SO decompose-structure's ESCALATE TELL FIRES WITH CERTAINTY, not probability. Its minor_note escalates on a new element OR INTERFACE. My earlier answer said the tell would "probably" fire and then argued to start at minor anyway. If the tell is certain, proposing minor IS proposing to escalate — which is major with a re-sign of every state in between, and note-fc18d2775583 measures what that costs.
 
-AND THE OWNER'S ARCHITECTURE QUESTION EXPOSED A SECOND HOLE, which is the one that actually changes the answer. My own round_1 recorded that v1's most-specific layer is a per-workspace DATA HOME and v3 has none — and then treated it as a detail for decompose-structure. It is not a detail. WHERE THE HOST'S OVERLAY LIVES IS AN OPEN CHOICE with at least three candidates:
+AND THE OWNER'S ARCHITECTURE QUESTION EXPOSED A SECOND HOLE, which is the one that actually changes the answer. My own round_1 recorded that v1's most-specific layer is a per-workspace DATA HOME and v3 has none — and then treated it as a detail for decompose-structure. It is not a detail. WHERE THE DESCENDANT'S OVERLAY LIVES IS AN OPEN CHOICE with at least three candidates:
 
-- the host's own product folder, beside what it builds
+- the descendant's own product folder, beside what it builds
 - a folder named by a key in the engine's committed config, which is v1's actual answer
 - a data home, which v3 would have to invent
 
-Each carries different consequences for the seal, for what an update replaces, and for what a colleague cloning the vehicle gets. That is precisely M4 and M5's question, and MINOR DROPS BOTH LANES ENTIRELY.
+Each carries different consequences for what an update replaces, for what a colleague cloning the descendant gets, and for which files an update may legally touch. That is precisely M4 and M5's question, and MINOR DROPS BOTH LANES ENTIRELY.
 
-SO MY minor ARGUMENT RESTED ON AN EMPTY CANDIDATE SPACE THAT IS NOT EMPTY. I wrote "there is one design" because v1 has one implementation. Having one implementation of a chain is not the same as having one answer to where the layers live in a product shaped differently.
+AND A THIRD DESIGN QUESTION ARRIVED WITH THE CORRECTION, larger than the other two. Under the withdrawn model an update REPLACED the vendored folder whole, because nothing inside it was ever edited. Under the owner's model everything inside it may be edited. So an update and an owner's own changes can now collide on the same file, and nothing today records what a descendant changed. That is held as raid-risk-ownership-and-receiving-pull-against-each-other, graded crippling, and it is unanswerable inside a minor column.
+
+SO MY minor ARGUMENT RESTED ON AN EMPTY CANDIDATE SPACE THAT IS NOT EMPTY. I wrote "there is one design" because v1 has one implementation. Having one implementation of a chain is not the same as having one answer to where the layers live, nor to what happens when two owners edit one file.
 
 WHAT major BUYS, and it is not ceremony here. The M4 candidate lane enumerates and cuts the overlay-location options against criteria. The M5 architecture lane picks one, records the ADR, and evaluates it. decompose-structure at full mints the interface flow-overlay has been waiting for since i1.
 
 NO STRIKES PROPOSED. The one row I would have argued to strike is record-adrs, and it is the row this decision most needs.
 
-WHAT IT COSTS AGAINST THE DEADLINE, said plainly rather than hidden: major is more states and it will not finish today. The owner's constraint was to start the vehicle and the foreign project tomorrow, and the honest trade is that a wrong overlay location discovered after the build costs more than the M4 and M5 rows cost now.
+WHAT IT COSTS AGAINST THE DEADLINE, said plainly rather than hidden: major is more states and it will not finish today. The owner's constraint was to start the vehicle and the foreign project tomorrow, and the honest trade is that a wrong answer to "whose change wins" discovered after the build costs more than the M4 and M5 rows cost now.
 
 ## round_0_verify
 
@@ -141,12 +149,13 @@ WHAT IT COSTS AGAINST THE DEADLINE, said plainly rather than hidden: major is mo
 
 ## round_1_validate
 
-- exercised against the goal: The goal is that somebody can build software with this system and keep their own guidance. It was exercised against the current product this session and FAILED, which is the argument for the iteration. `RUNME.ps1 --export <folder> <name> <abbr>` copies the whole tree, renames the brand and commits once — the receiver gets our guidance and the engine as one lump, with no seam. An upstream update would be a merge.
-- missing: THE OVERLAY'S LOCATION IS AN OPEN CHOICE, and this is the finding that moved the column. v1's most-specific layer is `dataDirFor("overlay")`, a per-workspace data directory, and v3 has no data home. At least three candidates stand: the host's own product folder, a folder named by a key in the engine's committed config (v1's real answer), or a data home v3 would have to invent. Each changes what the seal means and what an update replaces. I first wrote this as a detail for decompose-structure; the owner's challenge is what made me price it as the design question it is.
-- and also missing: the overlay mechanism's own proof. tsp-overlay-seam says three of its four claims are DEFINED AHEAD OF THEIR CASES because the mechanism is not built, and tests/overlay.test.ts does not exist. Nothing here has been shown to work; it has been shown to have worked in v1, in another language.
-- wrong: TWO THINGS, and both were mine. FIRST, my reading of the i10 dependency: I reported that i16 waits on i10 because req-overlay-resolution demands one shared identity scheme, without checking what the overlay actually resolves. Method artifacts resolve by hardcoded PATH today and already carry an `id:`, and i10 renames the SPEC corpus the chain never touches. The owner cut the edge. SECOND, my first column: minor, argued from an empty candidate space that is not empty, and from a tell I called probable when it is certain.
-- out of scope: the folder rework, module-qualified ids, the 121 citations, the full scaffold family, and the brand substitution. All five are named in left_out with where they went or why they are out.
-- prior art: OURS IS THE CLOSEST AND IT IS READ RATHER THAN CITED. v1's resolver.go implements exactly this: a layer list most-specific first, first-hit resolution in ten lines, guides walked engine-first so the vehicle overwrites, and a selftest asserting the three properties — an engine default resolves to the engine, an overlay wins, and inheritance returns when the override is removed. Its `EngineDir()` probes `tools/vendor/quackitect` and falls back to `product/quackitect`, so one binary serves a vehicle and the dogfood repository without either moving. WHAT IT DOES NOT SETTLE, and what I first read it as settling: where the host's own layer lives. v1 answers that with a data home this product does not have. NOT COMPARED against any external tool, and saying so beats inventing one: the only implementation whose tradeoffs we can actually evidence is our own.
+- exercised against the goal: The goal is that somebody can build software with this system, keep their own guidance, and still receive what the parent fixes later. It was exercised against the current product this session and FAILED, which is the argument for the iteration. `RUNME.ps1 --export <folder> <name> <abbr>` copies the whole tree, renames the brand and commits once — a FORK. The receiver owns everything, which the corrected model wants, and has no channel back at all, which it does not.
+- missing: THE OVERLAY'S LOCATION IS AN OPEN CHOICE, and this is the finding that moved the column. v1's most-specific layer is `dataDirFor("overlay")`, a per-workspace data directory, and v3 has no data home. At least three candidates stand: the descendant's own product folder, a folder named by a key in the engine's committed config (v1's real answer), or a data home v3 would have to invent. Each changes what an update may touch. I first wrote this as a detail for decompose-structure; the owner's challenge is what made me price it as the design question it is.
+- and MISSING LARGER, arriving with the model correction: nothing records what a descendant CHANGED. Under the withdrawn sealed model that did not matter, because nothing inside the vendored folder was ever edited. Under the owner's model everything may be edited, so an update and an owner's own edits collide and nobody — not the owner, not the parent, not the machine — can say where. raid-risk-ownership-and-receiving-pull-against-each-other holds it, graded crippling.
+- and also missing: the overlay mechanism's own proof. tsp-overlay-seam says three of its four claims are DEFINED AHEAD OF THEIR CASES because the mechanism is not built, and tests/overlay.test.ts does not exist. Nothing here has been shown to work; it has been shown to have worked in v1, in another language, under a model where the copy was never edited.
+- wrong: THREE THINGS, and all three were mine. FIRST, my reading of the i10 dependency: I reported that i16 waits on i10 because req-overlay-resolution demands one shared identity scheme, without checking what the overlay actually resolves. Method artifacts resolve by hardcoded PATH today and already carry an `id:`, and i10 renames the SPEC corpus the chain never touches. The owner cut the edge. SECOND, my first column: minor, argued from an empty candidate space that is not empty, and from a tell I called probable when it is certain. THIRD, and largest: the whole vision was built on a SEAL nobody asked for. The owner's words — "At no point is there any sealing. But again, make sure that you're not already thinking about solutions. Sealing sounds like a solution." A mechanism had been ranked as goal 1 at a state whose entire job is to say WHY.
+- out of scope: playing changes back upstream, the folder rework, module-qualified ids, the 121 citations, the full scaffold family, and the brand substitution. All six are named in left_out with where they went or why they are out.
+- prior art: OURS IS THE CLOSEST AND IT IS READ RATHER THAN CITED. v1's resolver.go implements exactly this: a layer list most-specific first, first-hit resolution in ten lines, guides walked engine-first so the vehicle overwrites, and a selftest asserting the three properties — an engine default resolves to the engine, an overlay wins, and inheritance returns when the override is removed. Its `EngineDir()` probes `tools/vendor/quackitect` and falls back to `product/quackitect`, so one binary serves a vehicle and the dogfood repository without either moving. WHAT IT DOES NOT SETTLE, and what I first read it as settling: where the descendant's own layer lives, and what happens when both owners edit one file. NOT COMPARED against any external tool, and saying so beats inventing one: the only implementation whose tradeoffs we can actually evidence is our own. The outside scan is owed at enumerate-space and gate-motivation passes on that condition.
 
 ## bound_breaches
 
@@ -158,47 +167,49 @@ WHAT IT COSTS AGAINST THE DEADLINE, said plainly rather than hidden: major is mo
 ## round_2_red_team
 
 - STEELMAN: this gate should FAIL, because the agent proposing a column is the agent that wants to finish tomorrow, and the deadline is doing the arguing => IT WAS RIGHT, and the first version of this gate proved it. minor was proposed with the deadline named in its own reasoning, and the deadline was carrying more weight than the argument. The correction to major is what the steelman asked for, and it arrived because the owner asked the question rather than because this round caught it.
-- KILL-CRITERION: this is the wrong call if the overlay needs a NEW element or interface, because decompose-structure's minor_note escalates exactly there => THE CRITERION FIRED. Checked rather than reasoned: flow-overlay carries `crosses: in` and appears in only two files, its own node and the function consuming it. No interface carries it. el-method-compiler's boundary line says the interfaces are minted for its flows, so this iteration mints one. The first version of this gate called that "probable" and proceeded; probable was wrong and certain is the answer.
+- KILL-CRITERION: this is the wrong call if the overlay needs a NEW element or interface, because decompose-structure's minor_note escalates exactly there => THE CRITERION FIRED. Checked rather than reasoned: flow-overlay carries `crosses: in` and appears in only two files, its own node and the function consuming it. No interface carries it. The first version of this gate called that "probable" and proceeded; probable was wrong and certain is the answer.
 - AND THE ROUND THAT WAS SUPPOSED TO CATCH IT DID NOT => Worth recording plainly. This same red team, one version ago, named the kill-criterion correctly and then declined to look for it, on the grounds that escalation is cheap. Naming a criterion and not running it is the shape contract rule 5 warns about: the defect gets named accurately, in the right place, and the work continues past it as though naming were fixing.
-- THE AGENT HAS NOW RETRACTED THREE THINGS TODAY — two retro findings and a column => True, and all three share one cause: something checkable was reasoned about instead of checked. The retro's two rested on an absent file and an absent string; this one rested on "there is one design" without asking what the design has to decide. The pattern is stable enough to be worth a rule rather than an apology.
-- MAJOR COULD BE OVERCORRECTION, BOUGHT TO LOOK RIGOROUS AFTER BEING CAUGHT => The honest test is whether the M4 and M5 rows have work to do, and they do: three candidate locations for the host's overlay, each with different consequences for the seal and for what an update replaces. If that list were genuinely one item, major would be ceremony and minor would stand. It is not one item.
-- vp-vendoring IS GRADED must AND THE WORK IS GRADED could => Checked, and it is a real inconsistency in the corpus rather than a rhetorical point. uc-vendor-and-overlay is `priority: could`, req-overlay-resolution and req-engine-folder-is-sealed are `should`, req-setup-serves-shipped-method and req-second-product-reuses-install are `could`. The value prop they refine is a MUST whose recorded reason is that quackitect goes open source while company guidance stays inside the company. A must served only by coulds is a gap somebody should rule on; it is raised here and not resolved here.
+- THE BIGGEST FAILURE OF THIS GATE WAS NOT CAUGHT BY ANY ROUND => The gate signed a goals list whose first line was a MECHANISM the owner had never asked for, at a milestone whose whole job is to say why. Three rounds passed over "VENDORED AND SEALED" without one asking who wanted it sealed. The answer is nobody: it was inherited from req-engine-folder-is-sealed, a standing requirement the owner has now removed as probably worktree-era. AN INHERITED REQUIREMENT READ AS A GIVEN, and a given is never red-teamed.
+- THE AGENT HAS NOW RETRACTED FOUR THINGS TODAY — two retro findings, a column, and the model itself => True, and all four share one cause: something checkable was reasoned about instead of checked. The retro's two rested on an absent file and an absent string. The column rested on "there is one design" without asking what the design has to decide. The model rested on a requirement nobody had asked whether the owner still wanted.
+- MAJOR COULD BE OVERCORRECTION, BOUGHT TO LOOK RIGOROUS AFTER BEING CAUGHT => The honest test is whether the M4 and M5 rows have work to do, and they now have MORE than when the column was set: three candidate locations for the overlay, and an unanswered question about whose change wins when an update lands on an edited file. If those were genuinely settled, major would be ceremony. They are not.
+- vp-vendoring IS GRADED must AND THE WORK IS GRADED could => Checked, and it is a real inconsistency in the corpus rather than a rhetorical point. uc-vendor-and-overlay is `priority: could`, req-overlay-resolution is `should`, req-setup-serves-shipped-method and req-second-product-reuses-install are `could`. The value prop they refine is a MUST whose recorded reason is that quackitect goes open source while company guidance stays inside the company. Held as raid-iss-a-must-value-prop-is-served-only-by-coulds; it is the owner's to rule.
 
 ## raid_additions
 
-- NONE MINTED AT THIS GATE, deliberately. note-6c9321309b45 records what happens when a gate authors the nodes it then judges, and contract rule 5 forbids judging text written into a thing in the same pass.
-- ONE ASSUMPTION IS OWED and is named so identify-assumptions cannot miss it: the engine folder can be FOUND BY PROBING rather than by fixing a path, so a vehicle and the dogfood repository share one binary without either moving its layout. Its probe is v1's own `EngineDir()`, and it gates whether the folder rework is needed at all.
-- ONE MORE IS OWED at the same state: v1's most-specific overlay layer is a per-workspace DATA HOME, and v3 has no data home. Whether that layer has an equivalent here, or collapses into the host's own folder, is unanswered.
-- AND ONE ISSUE IS RAISED RATHER THAN MINTED, because it is the owner's to rule: vp-vendoring is a MUST and every node refining it is graded should or could.
+- raid-dec-an-import-is-read-only-and-a-vendored-copy-is-yours
+- raid-risk-ownership-and-receiving-pull-against-each-other
+- raid-risk-the-overlay-location-is-unchosen
+- raid-dec-serve-the-overlay-and-report-the-drift
+- raid-iss-a-must-value-prop-is-served-only-by-coulds
 
 ## verdict
 
-pass — at change size MAJOR, corrected from my own minor proposal after the owner challenged it.
+pass — at change size MAJOR, and on the OWNER'S model rather than the sealed one this gate first signed.
 
-WHAT CHANGED THE ANSWER, and it is one check rather than an argument. flow-overlay carries `crosses: in` and no interface carries it — it appears in exactly two files in the corpus. So this iteration mints an interface for certain, and decompose-structure's escalate tell fires rather than probably firing.
+WHAT CHANGED SINCE THE FIRST PASS. Two of the five goals named a seal nobody had asked for. The owner withdrew it: "At no point is there any sealing." A vehicle is a complete independent copy, its owner may change everything in it, and the one absolute is that nothing it does can reach the source. The goals are rebuilt on that and one new goal carries the isolation law explicitly.
 
-AND ONE HOLE THE CHALLENGE EXPOSED. My own round_1 had already recorded that v1's most-specific overlay layer is a per-workspace data home and that v3 has none, then filed it as a detail. It is the design question: where the host's overlay lives has at least three candidate answers, each changing what the seal means and what an update replaces. minor drops both lanes that exist to settle that.
+WHAT THE CORRECTION DID TO THE COLUMN. It reinforced it. Under the sealed model an update replaced the vendored folder whole, because nothing inside was ever edited. Under this model everything may be edited, so an update and an owner's own changes can collide on one file and nothing records what changed. That is a crippling risk on the register and it is unanswerable inside a minor column.
 
-WHAT THE PASS RESTS ON, unchanged by the correction. The goals are five requirement-backed lines. The scope is seven items in and seven out with origins and destinations. Every file and line cited was opened this session, and v1's resolver was read whole at ref main.
+WHAT THE PASS STILL RESTS ON, unchanged. flow-overlay carries `crosses: in` and no interface carries it, so decompose-structure's escalate tell fires with certainty. The scope is eight items in and eight out with origins and destinations. Every file and line cited was opened this session, and v1's resolver was read whole at ref main.
 
-WHAT IS NOT CLAIMED. That major is free. It is more states and it will not finish today, against an owner constraint of starting the vehicle tomorrow. The trade is stated rather than hidden: a wrong overlay location found after the build costs more than M4 and M5 cost now.
+WHAT IS NOT CLAIMED. That major is free. It is more states and it will not finish today, against an owner constraint of starting the vehicle tomorrow. The trade is stated rather than hidden: a wrong answer to "whose change wins" found after the build costs more than M4 and M5 cost now.
 
 THE ONE THING LEFT UNCONFIRMED. The battery went red on one case during the retro, the cause was a stale test asserting behaviour the window fix removes, it is repaired, and se_test is not legal at this gate. The confirm run is owed at verification.
 
-WHAT THIS GATE OWES ITS OWN PROCESS. The red team named this kill-criterion one version ago and did not run it. The owner ran it by asking. That is a defect in the round rather than in the answer, and it is recorded in round_2 rather than smoothed over.
+WHAT THIS GATE OWES ITS OWN PROCESS, and it is now two things. The red team named its kill-criterion one version ago and did not run it. And no round asked who wanted the engine sealed — an inherited requirement read as a given, and a given is never attacked. Both are recorded in round_2 rather than smoothed over.
 
 ## follow_up
 
-IMMEDIATELY, on the bless: the engine compiles the blessed column into i16's state machine and pins it, and the walk moves to M1.
+IMMEDIATELY, on the bless: the engine compiles the blessed column into i16's state machine and pins it, and the walk moves to M1. Every M1 state below already carries content rebuilt on the corrected model and falls only to be re-signed against these goals.
 
 THE FIRST REAL WORK, in the order the machine will ask for it.
 
-1. draft-vision and scope — the goals above become the record's, and the five conflicts worth ruling get ruled.
-2. identify-assumptions — the two owed assumptions are already named in raid_additions.
-3. probe-assumptions — the folder probe runs here, not as a prototype. v1's EngineDir gives it its shape.
-4. write-requirements — the five requirements exist and are unbuilt, so this is mostly binding them rather than authoring.
-5. author-tests, then observe-red — tests/overlay.test.ts is the planned home tsp-overlay-seam already names, and three of its four claims are waiting for it.
-6. specify-build and the chunks — the resolution chain, the seal, the drift report, and the export becoming a vendoring.
+1. M1 re-signs — draft-vision through gate-motivation, whose content is already corrected. gate-motivation adjudicates the AMENDED vp-vendoring rather than the resident one.
+2. draw-context needs REBUILDING rather than re-signing. Its boundary puts the engine inside and a host outside. Under the corrected model a descendant CONTAINS everything, there is no host, and what sits outside is the PARENT.
+3. enumerate-space — the outside prior-art scan is owed here, and gate-motivation passes on that condition.
+4. identify-assumptions — two are owed and already named: the engine folder can be found by PROBING, and v1's data-home layer may have no equivalent here.
+5. write-requirements — four things land: req-engine-folder-is-sealed comes OUT after sweeping what points at it; the spawning mechanism is constrained (no symlink, junction, hardlink, mount or install step writing to the source); the parent's inability to reach a descendant becomes a clause; and the one-fact product name becomes a constraint to PRESERVE.
+6. author-tests, then observe-red — tests/overlay.test.ts is the planned home tsp-overlay-seam already names.
 
 WHAT THE CLOUD AGENT DOES IN PARALLEL, on the owner's routing: i17, the options pool. Its file set is the note drain and a new committed pool folder, and it touches none of the engine files above.
 

@@ -6,6 +6,7 @@ statement: While the mirror serves, the engine shall accept connections from the
 kind: quality
 characteristic: security
 verify_method: test
+fitness_candidate: true
 breaks_if_removed: Everything the product knows — every call, every form, every decision — is readable by anyone sharing the network.
 breaks_how_badly: fatal
 measure: 0 successful requests from a non-loopback source address, over a run that attempts at least one.

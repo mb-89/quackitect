@@ -10,8 +10,8 @@ probe: "unprobed by i35, and the empty date is filled rather than the verdict in
 status: open
 probed: "2026-08-17"
 impact: the guard grows too slow for the write and moves to the sweep, which is a demotion the whole iteration was built to avoid.
-breaks_how_badly: annoying
-how_likely: likely
+breaks_how_badly: abrasive
+how_likely: plausible
 source_refs:
   - req-a-check-too-slow-for-the-write-moves-to-the-sweep
   - req-a-write-that-breaks-the-corpus-refuses

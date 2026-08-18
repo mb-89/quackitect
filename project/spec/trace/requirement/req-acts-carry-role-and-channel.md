@@ -5,6 +5,7 @@ type: "[[requirement]]"
 statement: The engine shall stamp every recorded act with the acting role and the arrival channel, and with zero personal identifiers.
 kind: quality
 verify_method: test
+fitness_candidate: true
 breaks_if_removed: Nobody can say who authorized what, and the authorization strength of every grant is unknowable.
 breaks_how_badly: crippling
 refines:
@@ -23,7 +24,7 @@ source_refs:
 priority: should
 weighs_against:
   - req-repo-search-carries-intent >
-  - req-engine-folder-is-sealed >
+  - req-nothing-a-copy-does-reaches-its-source >
   - req-fresh-machine-runs > — both crippling, but accountability underpins every other guarantee (who authorized what); a broken install is recoverable, an unrecoverable authorization trail is not
 ---
 

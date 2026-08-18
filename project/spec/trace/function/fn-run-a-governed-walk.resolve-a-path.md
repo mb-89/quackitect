@@ -11,14 +11,19 @@ satisfies:
   - req-a-read-comes-from-where-it-is-meant
   - req-trees-never-mix
   - req-a-resolution-is-proven-by-read-back
+  - req-nothing-a-copy-does-reaches-its-source
+  - req-where-each-artifact-lands-when-driving
+  - req-the-system-runs-in-a-tree-that-is-not-its-own
 inputs:
   - flow-dispatched-call
   - flow-worktree
+  - flow-driven-tree
 outputs:
   - flow-resolved-target
 controls:
   - which record is bound
   - the path's own kind - method, record content, session state, repository root
+  - which trees are legal targets at all - the one the system runs from, and the one it was pointed at
 source_refs:
   - uc-take-a-step
   - uc-change-the-method-mid-walk
@@ -51,6 +56,42 @@ silent.
 
 THIS FUNCTION DOES NOT CHOOSE. It says the decision must be made and
 stated, which is what leaves M4 a real space to enumerate.
+
+## What i16 added, and why it belongs here rather than anywhere else
+
+TWO ROWS ARRIVED AT THIS FUNCTION and both are the same question this function
+already asks - which tree - with a new answer available.
+
+`req-nothing-a-copy-does-reaches-its-source` says an operation may resolve into
+the tree the system runs from or the tree it was pointed at, and NOWHERE ELSE.
+That is not a check on what a write carries, which is `guard-a-write`'s
+subject. It is a check on where the path lands, which is this one's.
+
+`req-where-each-artifact-lands-when-driving` says which KIND of artifact
+resolves to which tree: work to the driven product, method to the system's own
+tree with the copy's overlay above it. The function's own controls already name
+"the path's own kind", so this widens an existing control rather than adding a
+notion.
+
+AND THE SPAWN FACET IS NOT HERE. Producing a tree that contains no outward link
+is `bring-forth-a-copy`'s, because that function makes the tree and this one
+runs on every call afterwards.
+
+## And one more row arrived with the affordance
+
+`req-the-system-runs-in-a-tree-that-is-not-its-own` is this function's for the
+same reason as the other two: it is a question about WHICH TREE, asked at the
+moment the system starts somewhere it has never been.
+
+WHAT IT ADDS THAT THE OTHERS DO NOT: the answer is not in the tree being asked
+about. A driven project carries none of the system's method, so resolving there
+means following a pointer recorded when the tree was made. That is a third
+source of truth for this function to consult, beside the bound record and the
+path's own kind.
+
+AND THE POINTER ITSELF IS NOT THIS FUNCTION'S TO WRITE.
+`bring-forth-a-project` records it at the moment it produces the tree. This
+function only follows it.
 
 ## AND SAY SO is half the function
 

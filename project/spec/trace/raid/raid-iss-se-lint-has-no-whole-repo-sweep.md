@@ -9,7 +9,7 @@ trigger: the first check whose subject is the corpus rather than one file
 status: open
 impact: Half this iteration's named checks are corpus-wide by nature. The register against its folder, the capability coverage, the stories against their proving runs — none of them fits in a per-file call, so without a sweep they have no runner and become prose again.
 breaks_how_badly: crippling
-how_likely: certain
+how_likely: expected
 source_refs:
   - note-d7a26094f592
   - raid-dec-a-check-refuses-a-wrong-write-and-reports-a-wrong-corpus

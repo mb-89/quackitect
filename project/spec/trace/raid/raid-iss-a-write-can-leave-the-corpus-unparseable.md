@@ -9,7 +9,7 @@ trigger: it has already fired; revisit when the first bound check ships
 status: open
 impact: The author is gone by the time the break is found. The error names a line and a column in a file nobody is currently editing, and every corpus reader is down until somebody works out which write caused it.
 breaks_how_badly: crippling
-how_likely: certain
+how_likely: expected
 source_refs:
   - "observed live 2026-08-16, at i6/log-risks"
   - i6 record vision — conformance moves to the WRITE path

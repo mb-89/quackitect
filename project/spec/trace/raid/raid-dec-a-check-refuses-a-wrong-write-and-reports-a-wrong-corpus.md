@@ -9,7 +9,7 @@ trigger: any new check, and the first complaint that a check refused something t
 status: decided
 impact: "Without the seam every check is either too soft to matter or aims its refusal at whoever happened to edit next. The second is worse — it taxes an unrelated edit with somebody else's debt, which is exactly how a check becomes the thing everybody dreads."
 breaks_how_badly: crippling
-how_likely: certain
+how_likely: expected
 weighs_with: none
 weighs_against: none
 source_refs:

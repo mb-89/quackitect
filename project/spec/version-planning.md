@@ -727,16 +727,27 @@ WAITS ON i10, because `req-overlay-resolution` demands one shared identity
 scheme and module-qualified ids ARE that scheme.
 
 FULLY SPECIFIED AND ENTIRELY UNBUILT. `uc-vendor-and-overlay`,
-`req-overlay-resolution` with eight clauses, `req-engine-folder-is-sealed`,
-`req-overlay-survives-update`, `req-overlay-drift-reported`,
-`req-second-product-reuses-install`. The engine contains 16 occurrences of the
-word overlay and 11 are SVG layering.
+`req-overlay-resolution` with eight clauses, `req-overlay-survives-update`,
+`req-overlay-drift-reported`, `req-second-product-reuses-install`. The engine
+contains 16 occurrences of the word overlay and 11 are SVG layering.
 
-IT IS SMALLER THAN IT LOOKS. v1's `product/engine-go/resolver.go` at ref main is
-the whole chain in about thirty lines: a layer list, most-specific first. The
-most-specific wins, un-overridden resources inherit from the engine, and the
-engine layer is READ-ONLY — a vehicle overrides by placing a file in its
-overlay, never by editing the engine.
+`req-engine-folder-is-sealed` WAS ON THAT LIST AND IS REMOVED, on the owner's
+ruling of 2026-08-18 that nothing is sealed. A vehicle is a complete
+independent copy and owns everything in it, including what the parent wrote.
+[[raid-dec-an-import-is-read-only-and-a-vendored-copy-is-yours]] replaces it,
+and it carries the law the sealed requirement had garbled: the rule is the
+DIRECTION of writes, never a folder.
+
+IT IS SMALLER THAN IT LOOKS, AND THAT SENTENCE NEEDS ONE QUALIFICATION. v1's
+`product/engine-go/resolver.go` at ref main is the chain in about thirty lines:
+a layer list, most-specific first, un-overridden resources inheriting, and a
+vehicle overriding by placing a file rather than by editing.
+
+BUT THE CHAIN PORTS AND ITS TOP LAYER DOES NOT. v1's most-specific layer is a
+per-workspace DATA HOME and this product has no data home at all, which
+[[raid-risk-the-overlay-location-is-unchosen]] records. i16 found this by
+reading the resolver rather than by assuming the port, and it is the reason the
+iteration needed an M4 lane instead of a build.
 
 V1'S VEHICLE IN ONE LINE: a vehicle is built EMPTY, imports quackitect as `se`,
 and owns local doc modules. That is why the module is called `se`.

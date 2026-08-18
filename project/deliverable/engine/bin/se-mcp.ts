@@ -121,20 +121,13 @@ LAUNCH — read by RUNME.ps1 before the server starts.
   --classic      the OLD way in: the agent on a terminal and the Mirror in
                  your browser, with no VS Code. It still works exactly as it
                  did. It is simply no longer what you get by default.
-  --export <dir> <Name> <ABBR>
-                 copy the WORKING TREE into <dir> as a fresh single-commit
-                 repository under a NEW NAME, then exit. History stays home:
-                 .git, .worktrees, .se, node_modules and the generated cage
-                 files are left behind, and the target must be empty.
-                 <Name>  what a reader sees — window titles, the activity
-                         bar, every notification.
-                 <ABBR>  two or three letters, drawn as the activity-bar
-                         icon.
-                 BOTH ARE REQUIRED. There is no fallback to this project's
-                 own name: a forgotten argument would ship it to somebody
-                 else. The new repo carries a local commit identity, so it
-                 runs anywhere:
-                 cd <dir>; .\\RUNME.ps1
+  (no --export)  making a copy is a BUTTON now. Open the command palette and
+                 run "Make a Copy of This System", or "Start a Project This
+                 System Drives". Each asks for what it needs and opens what it
+                 made in a new window.
+                 THE FLAG IS GONE ON PURPOSE. A second way to do it, in the
+                 document a newcomer reads first, is exactly the problem the
+                 button was built to remove.
 
 ENGINE — read by the server (this file is where they are defined).
 

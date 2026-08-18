@@ -127,10 +127,12 @@ describe("the live offer against the trace", () => {
   test("the verb list and the trace are actually being read", () => {
     // 35 at i3, 36 when se_help merged in from the other machine, 34 at i34
     // when se_git_land and se_git_sync went with the second tree they
-    // reconciled. The exact count is the point: a verb arriving or leaving
-    // SHOULD break this line once, so somebody confirms the enumerator still
-    // sees every one before moving it.
-    assert.equal(registeredVerbs().length, 34, "the lane's verb count moved — confirm the enumerator still sees every one");
+    // reconciled, and 36 at i16 when the two producing acts became lane verbs.
+    // The exact count is the point: a verb arriving or leaving SHOULD break
+    // this line once, so somebody confirms the enumerator still sees every one
+    // before moving it. Confirmed on 2026-08-18 — the enumerator saw both new
+    // verbs and reported them as untraced, which is the check working.
+    assert.equal(registeredVerbs().length, 36, "the lane's verb count moved — confirm the enumerator still sees every one");
     assert.ok(traceText().length > 10000, "the trace read as good as empty — the path or the walk is wrong");
     assert.ok(traceText("use-case").length > 10000, "the use-case layer read as good as empty");
   });

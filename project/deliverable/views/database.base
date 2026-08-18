@@ -4,10 +4,5 @@ views:
     order:
       - file.path
       - description
-    groupBy:
-      - property: type
-        direction: ASC
-      - property: sections
-        direction: ASC
     columnSize:
       file.path: 362

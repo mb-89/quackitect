@@ -51,111 +51,26 @@ if ($forwarded | Where-Object { $_ -in @("--help", "-h", "-?", "-Help") }) {
   exit 0
 }
 
-# THE EXPORT. The system must run on another machine WITHOUT this repo's
-# history (owner requirement 2026-07-30): copy the working tree, minus the
-# history and the session state, into a fresh single-commit repository.
-# Runs before preflight and exits - exporting must never wait on npm.
-$exportIx = [array]::IndexOf($forwarded, "--export")
-if ($exportIx -ge 0) {
-  # THE EXPORT RENAMES. Folder, name and abbreviation are all required -
-  # there is no fallback to this project's own name, because a forgotten
-  # argument would ship it to somebody else.
-  $dest    = if ($exportIx + 1 -lt $forwarded.Count) { $forwarded[$exportIx + 1] } else { $null }
-  $newName = if ($exportIx + 2 -lt $forwarded.Count) { $forwarded[$exportIx + 2] } else { $null }
-  $newAbbr = if ($exportIx + 3 -lt $forwarded.Count) { $forwarded[$exportIx + 3] } else { $null }
-  if ([string]::IsNullOrWhiteSpace($dest) -or [string]::IsNullOrWhiteSpace($newName) -or [string]::IsNullOrWhiteSpace($newAbbr)) {
-    Write-Host "--export needs a folder, a name and an abbreviation:" -ForegroundColor Red
-    Write-Host "  .\RUNME.ps1 --export C:\path\to\empty 'Blue Heron' BH" -ForegroundColor Yellow
-    exit 1
-  }
-  if ($newAbbr.Length -lt 2 -or $newAbbr.Length -gt 3) {
-    Write-Host "the abbreviation is two or three letters - got '$newAbbr'" -ForegroundColor Red
-    exit 1
-  }
-  # The id has to survive being a folder name, an npm name and a VS Code
-  # command id, so it is reduced to what all three accept.
-  $newId = ($newName.ToLower() -replace '[^a-z0-9]+', '-').Trim('-')
-  if ([string]::IsNullOrWhiteSpace($newId)) {
-    Write-Host "'$newName' has no letters or digits to make an id from" -ForegroundColor Red
-    exit 1
-  }
-  if ((Test-Path $dest) -and (@(Get-ChildItem $dest -Force).Count -gt 0)) {
-    Write-Host "--export target must be EMPTY - refusing to write over $dest" -ForegroundColor Red
-    exit 1
-  }
-  if ($null -eq (Get-Command git -ErrorAction SilentlyContinue)) {
-    Write-Host "git not found - the export creates a fresh repo. winget install Git.Git and re-run." -ForegroundColor Red
-    exit 1
-  }
-  Write-Host "$P - exporting as '$newName' ($($newAbbr.ToUpper())) - history stays home" -ForegroundColor Cyan
-  New-Item -ItemType Directory -Force -Path $dest | Out-Null
-  # ABSOLUTE FROM HERE. Push-Location below moves the working directory into
-  # the destination, so a RELATIVE $dest would resolve against the destination
-  # itself from that point on - brand.json and the README were written to
-  # <dest>\<dest>\... and the write failed with a path not found.
-  $dest = (Resolve-Path -LiteralPath $dest).Path
-  # /XD excludes by NAME wherever it appears: the repo history, every
-  # worktree, the session state, node_modules and the generated cage dirs.
-  # /XF drops the generated MCP config; the cage templates travel (their
-  # file is mcp.json, a different name) and RUNME regenerates on launch.
-  # .git rides BOTH lists: in a normal checkout it is a directory (/XD), in
-  # a git WORKTREE the root carries a .git FILE (/XF) — missing that file
-  # made an export re-use the live repository (found in the smoke test).
-  # THE RECORDS STAY HOME TOO. project/spec is this project's own expedition
-  # and iteration history. It is noise to whoever receives the copy, and
-  # confusing noise, because it describes work they never did.
-  $specDir = Join-Path $root "project\spec"
-  robocopy $root $dest /E /NFL /NDL /NJH /NJS /NP /XD .git .worktrees .se node_modules .claude .copilot $specDir /XF .git .mcp.json | Out-Null
-  if ($LASTEXITCODE -ge 8) {
-    Write-Host "copy FAILED (robocopy $LASTEXITCODE)" -ForegroundColor Red
-    exit 1
-  }
-  # The machine writes its records here, so the home exists from the start.
-  New-Item -ItemType Directory -Force -Path (Join-Path $dest "project\spec") | Out-Null
-  if (Test-Path (Join-Path $dest ".git")) {
-    Write-Host "a .git survived the copy - refusing to init over live history" -ForegroundColor Red
-    exit 1
-  }
-  Push-Location $dest
-  try {
-    # git WARNS on stderr - line endings, for one - and a Stop preference
-    # turns any such warning into a terminating error mid-export. The exit
-    # codes are what decide here, not the chatter.
-    $prevEap = $ErrorActionPreference
-    $ErrorActionPreference = "Continue"
-    git init -q -b main
-    # A LOCAL identity rides .git/config, so the engine's own commits work
-    # on a machine that never configured git.
-    # ONE FILE RENAMES THE WHOLE SYSTEM. Every branded surface renders from
-    # this at launch, so nothing else in the tree had to be rewritten.
-    # WRITTEN WITHOUT A BOM. Set-Content -Encoding utf8 emits one on Windows
-    # PowerShell, and JSON.parse refuses the file it produces.
-    $utf8NoBom = New-Object System.Text.UTF8Encoding $false
-    $brandJson = @{ name = $newName; id = $newId; abbr = $newAbbr.ToUpper() } | ConvertTo-Json
-    [System.IO.File]::WriteAllText((Join-Path $dest "project\deliverable\brand\brand.json"), $brandJson, $utf8NoBom)
-    # A FRESH FRONT DOOR. This repo's README is about THIS repo - its branch
-    # layout, its history - which is noise to whoever receives the copy. The
-    # text lives ONCE, in brand\README.entry.md - the packager renders the
-    # same template, so the two front doors cannot drift apart.
-    $readme = [System.IO.File]::ReadAllText((Join-Path $root "project\deliverable\brand\README.entry.md"))
-    $readme = $readme.Replace('$PRODUCT$', $newName).Replace('$PRODUCT_ABBR$', $newAbbr.ToUpper())
-    [System.IO.File]::WriteAllText((Join-Path $dest "README.md"), $readme, $utf8NoBom)
-    git config user.name "$newName"
-    git config user.email "export@$newId.local"
-    git add -A
-    git commit -q -m "$newName - a fresh start, history stays home"
-    if ($LASTEXITCODE -ne 0) {
-      Write-Host "the fresh repository could not be committed - see above" -ForegroundColor Red
-      exit 1
-    }
-    $ErrorActionPreference = $prevEap
-  } finally {
-    Pop-Location
-  }
-  Write-Host "  exported to $dest as '$newName' - a fresh repo, one commit, no history" -ForegroundColor Green
-  Write-Host "  next: cd $dest ; .\RUNME.ps1" -ForegroundColor Cyan
-  exit 0
-}
+# THE EXPORT IS GONE, AND THE ACT IS A BUTTON NOW (owner ruling 2026-08-18):
+# "One button to create a vehicle, one button to create a new project. These
+# buttons need to ask for whatever they need, and they need to open whatever
+# they created in a new window. This will supersede some of the stuff in
+# RUNME, so you can delete it from there."
+#
+# WHY THE DELETION IS PART OF THE DESIGN rather than tidying afterwards. The
+# story this replaces opens on somebody who cannot find the export and does
+# not know it exists. A second way to do it, in the document a newcomer reads
+# first, keeps exactly the problem the button was built to remove.
+#
+# BOTH OF THIS SCRIPT'S HARD-WON GUARDS TRAVELLED WITH IT, and they are
+# recorded on el-vehicle-producer so the deletion could not take them:
+#   - all three arguments required, with no fallback to this product's own
+#     name, because a forgotten argument would ship it to somebody else;
+#   - .git excluded as a FILE as well as a directory, because a worktree
+#     checkout carries it as a file and missing that made an export re-use
+#     the live repository.
+# The act now runs inside the lane, so it is logged, it refuses before it
+# half-produces, and it is bounded by the tree it is producing.
 
 # THE KILL. A stale server still holding the Mirror's port stops the next
 # launch dead, and the terminal host is started DETACHED so it outlives the

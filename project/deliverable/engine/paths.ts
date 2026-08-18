@@ -12,6 +12,7 @@
 // path means nothing on anyone else's machine).
 import { existsSync, readFileSync } from "node:fs";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
+import { actBoundTree } from "./actbound.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 
 /** Directories the lane never serves or lists. */
@@ -20,13 +21,86 @@ export const EXCLUDED_DIRS = new Set([".git", "node_modules", ".se", ".venv", "_
 /** True for a path addressing a declared root, e.g. "@desktop/sketch.png". */
 export const isRootRef = (p: string): boolean => p.startsWith("@");
 
+/** A declared root: where it is, and whether a WRITE lane may reach it.
+ *
+ *  TWO SHAPES ARE LEGAL IN .se/roots.json and the short one is unchanged. A
+ *  bare string declares a read-only root exactly as it always did. An object
+ *  declares one a write lane may reach, and it has to say so out loud:
+ *
+ *      {"books": "C:\\books"}                        read-only
+ *      {"site": {"path": "C:\\site", "writable": true}}   writable
+ *
+ *  WRITABLE IS OPT-IN AND NEVER INFERRED. The old shape keeps its old meaning,
+ *  so no declaration anybody already wrote becomes writable by upgrading. */
+export type DeclaredRoot = { path: string; writable: boolean };
+
+/** The two files that carry a tree's IDENTITY, as root-relative paths.
+ *
+ *  IDENTITY, NEVER AN ADDRESS. A vehicle records the identity of the engine it
+ *  came from, and every tree states its own. Comparing identities survives
+ *  either tree being moved, copied or renamed, which comparing paths does not. */
+const BRAND_FILE = ["project", "deliverable", "brand", "brand.json"] as const;
+const UPSTREAM_FILE = ["project", "deliverable", "vendor", "upstream", "upstream.json"] as const;
+
+/** Read an `id` out of one of those files. Absent is a real answer; unreadable
+ *  is NOT.
+ *
+ *  A FILE THAT CANNOT BE READ MUST NEVER PASS FOR AN ABSENT ONE. That is the
+ *  lesson `declaredRoots` learned the hard way on 2026-07-29, and it is worse
+ *  here: a swallowed parse error would silently switch the source guard off,
+ *  and the guard going quiet looks exactly like the guard passing. */
+function identityIn(dir: string, parts: readonly string[], source: string): string | undefined {
+  const p = join(dir, ...parts);
+  if (!existsSync(p)) return undefined;
+  let parsed: { id?: unknown };
+  try {
+    parsed = JSON.parse(readFileSync(p, "utf8").replace(/^\uFEFF/, "")) as { id?: unknown };
+  } catch (e) {
+    throw new Rejection({
+      clause: CLAUSES.WRITE_TARGET_IS_SOURCE,
+      expected: 'an identity file that parses, e.g. {"id": "quackitect"}',
+      got: `${p} does not parse: ${(e as Error).message}`,
+      remedy: {
+        tool: "se_file_read",
+        args: { path: p },
+        note: "fix the JSON by hand — the guard that keeps a vehicle out of the tree it came from cannot decide without this file, so it refuses rather than waving the write through",
+      },
+      source,
+    });
+  }
+  return typeof parsed.id === "string" ? parsed.id : undefined;
+}
+
+/** THE SOURCE GUARD. A vehicle may never write into the tree it was produced
+ *  from — [[req-nothing-a-copy-does-reaches-its-source]], graded fatal.
+ *
+ *  IT ONLY HAS ANYTHING TO SAY IN A VEHICLE. The engine itself was produced
+ *  from nothing, has no upstream file, and this returns at the first line. */
+function refuseIfTargetIsSource(root: string, name: string, declared: DeclaredRoot, p: string, source: string): void {
+  const cameFrom = identityIn(root, UPSTREAM_FILE, source);
+  if (cameFrom === undefined) return;
+  const targetIs = identityIn(resolve(declared.path), BRAND_FILE, source);
+  if (targetIs !== cameFrom) return;
+  throw new Rejection({
+    clause: CLAUSES.WRITE_TARGET_IS_SOURCE,
+    expected: "a writable target that is not the tree this system came from",
+    got: `${p} — @${name} is "${targetIs}", which is the identity this tree records as its own upstream`,
+    remedy: {
+      tool: "se_file_read",
+      args: { path: p },
+      note: "read it if you must; nothing this tree does may change the tree it was produced from, and making the root writable does not lift that",
+    },
+    source,
+  });
+}
+
 /** The owner's declared roots, read LIVE so an edit binds the very next call.
  *
  *  A DECLARATION THAT CANNOT BE READ MUST NEVER READ AS "NONE DECLARED" (found
  *  live 2026-07-29): PowerShell wrote this file with a UTF-8 BOM, JSON.parse
  *  refused it, and a swallowing catch reported the owner's root as undeclared.
  *  The BOM is stripped, and a broken file is now a LOUD refusal. */
-export function declaredRoots(root: string, source = "engine/paths.ts"): Record<string, string> {
+export function declaredRoots(root: string, source = "engine/paths.ts"): Record<string, DeclaredRoot> {
   const p = join(root, ".se", "roots.json");
   if (!existsSync(p)) return {};
   const raw = readFileSync(p, "utf8").replace(/^\uFEFF/, "");
@@ -47,8 +121,14 @@ export function declaredRoots(root: string, source = "engine/paths.ts"): Record<
     });
   }
   const map = (typeof parsed.roots === "object" && parsed.roots !== null ? parsed.roots : parsed) as Record<string, unknown>;
-  const out: Record<string, string> = {};
-  for (const [k, v] of Object.entries(map)) if (typeof v === "string") out[k] = v;
+  const out: Record<string, DeclaredRoot> = {};
+  for (const [k, v] of Object.entries(map)) {
+    if (typeof v === "string") out[k] = { path: v, writable: false };
+    else if (typeof v === "object" && v !== null) {
+      const o = v as { path?: unknown; writable?: unknown };
+      if (typeof o.path === "string") out[k] = { path: o.path, writable: o.writable === true };
+    }
+  }
   return out;
 }
 
@@ -56,8 +136,8 @@ export function declaredRoots(root: string, source = "engine/paths.ts"): Record<
 export function resolveDeclaredRoot(root: string, p: string, source: string): string {
   const [name, ...rest] = p.slice(1).split(/[\\/]+/);
   const roots = declaredRoots(root, source);
-  const target = roots[name];
-  if (target === undefined) {
+  const declared = roots[name];
+  if (declared === undefined) {
     throw new Rejection({
       clause: CLAUSES.UNDECLARED_ROOT,
       expected: `a declared root (${Object.keys(roots).join(", ") || "none declared"})`,
@@ -70,7 +150,7 @@ export function resolveDeclaredRoot(root: string, p: string, source: string): st
       source,
     });
   }
-  const base = resolve(target);
+  const base = resolve(declared.path);
   const abs = resolve(base, rest.join("/"));
   if (abs !== base && !abs.startsWith(base + sep)) {
     throw new Rejection({
@@ -84,25 +164,58 @@ export function resolveDeclaredRoot(root: string, p: string, source: string): st
   return abs;
 }
 
-/** Read lanes resolve here: the project root, OR a declared root. */
+/** Read lanes resolve here: the project root, OR a declared root.
+ *
+ *  IT CALLS THE CONTAINMENT RULE DIRECTLY rather than going through
+ *  resolveInRoot, because that function now also applies a producing act's
+ *  bound. A READ MUST NEVER BE BOUNDED: the act copies FROM the tree it is
+ *  reading, so bounding its reads would leave it unable to read the thing it
+ *  is reproducing. The rule itself is the same rule either way. */
 export function resolveForRead(root: string, p: string, source: string): string {
-  return isRootRef(p) ? resolveDeclaredRoot(root, p, source) : resolveInRoot(root, p, source);
+  return isRootRef(p) ? resolveDeclaredRoot(root, p, source) : containedIn(root, p, source);
 }
 
 export function resolveInRoot(root: string, p: string, source: string): string {
+  // THE ACT'S BOUND IS CHECKED HERE, not only at the seam.
+  //
+  // THIS IS THE FUNCTION EVERY WRITE VERB ACTUALLY CALLS. The seam is reached
+  // by se_lint's two reads and nothing else today, so a bound placed only
+  // there would guard almost no write in the product. The jail is where the
+  // rule has to live for the guarantee to be real.
+  const bound = actBoundTree();
+  if (bound !== undefined) return resolveInActBound(bound, p, source);
   if (isRootRef(p)) {
+    // A ROOT DECLARED WRITABLE IS THE ONE WAY OUT, and it goes through the
+    // resolver that already contains a declared root rather than a second one
+    // written here. The containment rule is therefore the same rule, proved
+    // once — which is what stops this door widening as it is used.
+    const name = p.slice(1).split(/[\\/]+/)[0];
+    const declared = declaredRoots(root, source)[name];
+    if (declared?.writable === true) {
+      refuseIfTargetIsSource(root, name, declared, p, source);
+      return resolveDeclaredRoot(root, p, source);
+    }
     throw new Rejection({
       clause: CLAUSES.PATH_ESCAPE,
-      expected: "a path inside the project root — a declared root is READ-ONLY",
+      expected: "a path inside the project root — a declared root is READ-ONLY unless it says otherwise",
       got: p,
       remedy: {
         tool: "se_file_read",
         args: { path: p },
-        note: "copy what you need into the product; foreign folders are never written from here",
+        note: 'copy what you need into the product. A root meant to be written declares itself so: {"name": {"path": "<absolute path>", "writable": true}} in .se/roots.json — ask the owner first.',
       },
       source,
     });
   }
+  return containedIn(root, p, source);
+}
+
+/** THE CONTAINMENT RULE ITSELF: inside this root, or refused.
+ *
+ *  ONE RULE, PROVED ONCE. Both lanes reach it — the write lane through
+ *  resolveInRoot, the read lane directly — so widening the jail to admit a
+ *  second write target could never fork the rule into two versions that drift. */
+function containedIn(root: string, p: string, source: string): string {
   const abs = isAbsolute(p) ? p : resolve(root, p);
   const rel = relative(resolve(root), abs);
   if (rel === "" || (!rel.startsWith("..") && !isAbsolute(rel))) return abs;
@@ -117,6 +230,44 @@ export function resolveInRoot(root: string, p: string, source: string): string {
       tool: "se_file_list",
       args: { dir: "." },
       note: "two doors lead outside, and neither is a path. PAST VERSIONS of this repo are read at a committed ref: se_file_read / se_file_search / se_file_glob all take ref (main reaches v1, v2 reaches v2). ANOTHER FOLDER entirely belongs in .se/roots.json as a declared, read-only root, reachable as @name/rest — ask the owner before declaring one.",
+    },
+    source,
+  });
+}
+
+/** Resolve inside the tree an ACT is producing.
+ *
+ *  THE RULE IS THE SAME RULE. Every act writes inside one tree and nowhere
+ *  else. What differs is WHICH tree, and that the refusal says which — a write
+ *  that left the act's bound is a different fault from one that left the
+ *  project, and telling them apart is what makes the mechanism debuggable
+ *  (opt-the-bound-travels-with-the-act). */
+export function resolveInActBound(bound: string, p: string, source: string): string {
+  const base = resolve(bound);
+  if (isRootRef(p)) {
+    throw new Rejection({
+      clause: CLAUSES.OUTSIDE_ACT_BOUND,
+      expected: `a path inside the tree this act is producing (${base})`,
+      got: `${p} — a declared root is somebody else's folder, and a producing act writes one tree`,
+      remedy: {
+        tool: "se_file_read",
+        args: { path: p },
+        note: "read from a declared root if you need what is in it; a producing act writes only the tree it is producing",
+      },
+      source,
+    });
+  }
+  const abs = isAbsolute(p) ? p : resolve(base, p);
+  const rel = relative(base, abs);
+  if (rel === "" || (!rel.startsWith("..") && !isAbsolute(rel))) return abs;
+  throw new Rejection({
+    clause: CLAUSES.OUTSIDE_ACT_BOUND,
+    expected: `a path inside the tree this act is producing (${base})`,
+    got: `${p} resolves to ${abs}, which is outside it`,
+    remedy: {
+      tool: "se_file_list",
+      args: { dir: "." },
+      note: "the bound belongs to the act and is torn down with it. A path outside the tree being produced is not this act's to write, whatever the project root would have allowed.",
     },
     source,
   });

@@ -10,7 +10,7 @@ verifies:
   - "req-scaffold-from-template"
   - "req-method-reuse-is-vendoring"
   - "req-product-is-a-folder"
-  - "req-engine-folder-is-sealed"
+  - "req-nothing-a-copy-does-reaches-its-source"
   - "req-setup-floor-editor-shell"
   - "req-setup-stops-before-partial"
   - "req-extension-replaced-reported"

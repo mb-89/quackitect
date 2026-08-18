@@ -9,6 +9,8 @@ files:
   - "project/deliverable/engine/bin/se-arrive.ts"
   - "project/deliverable/engine/bin/se-hook-arrive.ts"
   - ".claude/settings.json"
+  - project/deliverable/engine/bin/se-hook-start.ts
+  - project/deliverable/engine/pullnotice.ts
 ---
 
 ## The shape
