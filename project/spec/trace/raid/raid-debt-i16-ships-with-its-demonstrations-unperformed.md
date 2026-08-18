@@ -1,0 +1,72 @@
+---
+minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
+id: raid-debt-i16-ships-with-its-demonstrations-unperformed
+type: "[[raid]]"
+kind: debt
+statement: The four demonstrations this iteration authored are drawn and none of them has been performed, so the iteration ships with every claim that needs a person watching standing on a drawing rather than on an observation.
+owner: the owner
+status: open
+breaks_how_badly: crippling
+how_likely: expected
+impact: "Both headline capabilities are proved only inside this repository. The pass line of the two must requirements is a machine holding nothing of the source, and nothing has ever been run on one. A vehicle that works here and fails there looks identical from here."
+source_refs:
+  - raid-iss-the-vehicle-demonstration-has-never-been-performed
+  - tsp-a-vehicle-is-made-and-then-drives-something-else
+  - req-one-command-produces-a-complete-copy
+  - req-the-system-runs-in-a-tree-that-is-not-its-own
+---
+
+## What was taken, and by whom
+
+THE OWNER AUTHORISED THE CLOSE, 2026-08-18, leaving for the night: "end this
+iteration completely by yourself... Everything that isn't clear, make a
+decision and put it as technical debt."
+
+A DEMONSTRATION NEEDS A PERSON WATCHING. That is its definition, and it is the
+one form of evidence an agent cannot produce alone. With the owner gone, the
+choice was between shipping the iteration with the demonstrations undone and
+not shipping it. They chose the first, in advance, in general terms.
+
+## What is owed
+
+FOUR STEPS, drawn in the record's `machines/demos.md`:
+
+- press the button, name the copy, and end up working inside it
+- point the copy at a tree carrying none of its method
+- try to reach the tree it came from, and be refused by construction
+- take it to a machine holding nothing of the engine and bring it up
+
+ONE SITTING COVERS ALL FOUR. They share a produced vehicle, so the cost is one
+act and four observations rather than four runs.
+
+## What is NOT owed, so the debt is not overstated
+
+THE HERMETIC CHAIN IS PROVED. Eleven cases produce a vehicle into a temporary
+directory, produce a project from that vehicle, and assert the project carries
+none of the method and one record naming its vehicle by identity. That is real
+evidence and it is not what this debt is about.
+
+WHAT IS MISSING IS EVERY STEP THAT LEAVES THIS MACHINE. Two of those are
+already known to fail: the copy needs a network install before it runs, and
+nothing reads the driven record at startup.
+
+## Repayment
+
+ONE SITTING WITH A PERSON AT THE MACHINE, walking the four steps above against
+a single produced vehicle, and minting the report each step owes.
+
+- `reports/rpt-press-create-vehicle-and-land-in-it.md`
+- `reports/rpt-drive-somebody-elses-product.md`
+- `reports/rpt-nothing-i-do-reaches-what-it-came-from.md`
+- `reports/rpt-vendor-it-into-my-product.md`
+
+THE SECOND STEP IS EXPECTED TO FAIL as things stand, and the report says so
+rather than the debt being deemed repaid. Two causes are already known: the
+copy excludes node_modules and needs a network install, and nothing reads the
+driven record at startup. Repayment therefore means the reports EXIST and say
+what happened, not that all four pass.
+
+## How it comes due
+
+THE FIRST TIME SOMEBODY HANDS A VEHICLE TO ANOTHER PERSON. Until then the debt
+costs nothing and hides everything.

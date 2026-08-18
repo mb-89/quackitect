@@ -1,6 +1,11 @@
 ---
 id: i16-the-vehicle-overlay-a-vehicle-vendors-th
-status: open
+status: shipped
+closed: 2026-08-18T21:25:09.336Z
+carried_count: 2
+carried:
+  - tsp-a-vehicle-is-made-and-then-drives-something-else — raid-iss-the-vehicle-demonstration-has-never-been-performed (verification.md)
+  - tsp-the-engine-keeps-no-record-of-what-it-produced — raid-iss-the-call-log-names-every-vehicle-the-engine-produced (verification.md)
 started: 2026-08-18T08:08:41.605Z
 opened: 2026-08-12T19:43:29.197Z
 goal: "The vehicle overlay: a vehicle vendors the engine, overlays its own guidance and method through one resolution chain, and never writes under the engine."
