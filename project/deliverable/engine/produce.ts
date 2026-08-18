@@ -50,6 +50,10 @@ const EXCLUDE_DIRS = new Set([
 ]);
 const EXCLUDE_FILES = new Set([".git", ".mcp.json", "Thumbs.db", ".DS_Store"]);
 
+/** The one path under an excluded `.github` that a produced tree cannot do
+ *  without. It is the Copilot host's whole prompt layer. */
+const PROMPT_LAYER_IN_GITHUB = join("project", ".github", "instructions", "protocol.instructions.md");
+
 /** WHAT TRAVELS INTO A PRODUCED TREE.
  *
  *  ONE LIST, BECAUSE TWO LISTS DRIFT. package.ts's own comment said "the same
@@ -74,6 +78,19 @@ export function travels(root: string, src: string): boolean {
   const rel = relative(root, src);
   if (rel === "" || rel.startsWith("..")) return rel === "";
   const parts = rel.split(sep);
+  // THE PROMPT LAYER'S COPILOT HALF LIVES UNDER A `.github`, and `.github` is
+  // excluded by name. It is a declared METHOD FILE — paths.ts calls the prompt
+  // layer "method that does not live under a method folder... every tree needs
+  // it and no tree owns it" — so a tree without it has lost one host's whole
+  // prompt layer while the other two hosts keep theirs.
+  //
+  // THE DIRECTORIES ON ITS PATH TRAVEL WITH IT, because a filter that refuses a
+  // directory is never asked about its children.
+  //
+  // FOUND BY THE i16 TESTER, 2026-08-18, in the very fix that shared this list.
+  // Adopting the packaging script's exclusions wholesale is what dropped it —
+  // the cost of merging two lists rather than deciding which one was wrong.
+  if (rel === PROMPT_LAYER_IN_GITHUB || PROMPT_LAYER_IN_GITHUB.startsWith(rel + sep)) return true;
   if (rel === ".claude" || parts[0] === ".claude") {
     // fall through — the root one travels
   } else if (parts.some((p) => EXCLUDE_DIRS.has(p))) return false;
@@ -194,8 +211,18 @@ function cleanUpAfter<T>(dest: string, act: () => T): T {
   try {
     return act();
   } catch (e) {
-    rmSync(dest, { recursive: true, force: true });
-    if (existed) mkdirSync(dest, { recursive: true });
+    // THE CLEANUP MUST NOT REPLACE THE ORIGINAL FAILURE. `gitInit` creates a
+    // live repository immediately before the last places this can throw, and on
+    // Windows a held handle turns "the README template is missing" into a
+    // lock-file permission error — the wrong error in the reader's hands,
+    // pointing at the wrong thing entirely.
+    try {
+      rmSync(dest, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
+      if (existed) mkdirSync(dest, { recursive: true });
+    } catch {
+      // The original is what the caller needs. A destination left behind is a
+      // worse outcome than a clean one; a misreported cause is worse than both.
+    }
     throw e;
   }
 }

@@ -112,7 +112,14 @@ describe("producing a vehicle", () => {
     // NOTHING GENERATED TRAVELS, and this is the assertion that sentence used
     // to claim while checking only node_modules. `dist` alone held six release
     // archives totalling 20.8 MB, copied into every vehicle.
-    for (const generated of ["dist", join("project", "scratchpad"), ".obsidian", ".vscode", ".github"]) {
+    // EVERY PATH HERE IS ONE THE SOURCE ACTUALLY HAS, and the first assertion
+    // enforces that. Two of them named `.obsidian` and `.vscode` at the ROOT,
+    // where neither exists — both live one level down. Those two were checking
+    // paths the source never had, so they passed against an engine with no
+    // exclusion list at all. Fourth wrong-reason pass in this iteration, same
+    // shape as the other three.
+    for (const generated of ["dist", join("project", "scratchpad"), join("project", ".obsidian"), join("project", ".vscode")]) {
+      assert.ok(existsSync(join(REPO, generated)), `${generated} must exist in the source, or this case is checking nothing`);
       assert.ok(!existsSync(join(made.dest, generated)), `${generated} is generated or local, and must not travel`);
     }
   });
@@ -127,6 +134,15 @@ describe("producing a vehicle", () => {
     assert.ok(existsSync(join(made.dest, ".claude", "settings.json")), "the root .claude is the one exception and must travel");
     // AND project/.claude IS GENERATED, placed by the arrival or the editor.
     assert.ok(!existsSync(join(made.dest, "project", ".claude")), "the generated one must not");
+    // AND THE COPILOT HALF OF THE PROMPT LAYER, which lives under a `.github`
+    // that is otherwise excluded by name. It is a declared method file, so a
+    // vehicle without it has lost one host's whole prompt layer while the other
+    // two keep theirs — the quietest way to ship a broken copy.
+    assert.ok(
+      existsSync(join(made.dest, "project", ".github", "instructions", "protocol.instructions.md")),
+      "the Copilot host's prompt layer must travel, even though .github does not",
+    );
+    assert.ok(!existsSync(join(made.dest, ".github")), "and the repository's own workflows do not");
   });
 
   test("a failure past the copy leaves nothing behind", () => {
