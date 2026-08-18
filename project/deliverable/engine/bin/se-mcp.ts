@@ -2,7 +2,7 @@
 // Node ≥22 runs this directly (native type stripping); no build step. The
 // workspace's .mcp.json points here.
 //
-//   node engine/bin/se-mcp.ts --root <project root> [--autonomy 0.4] [--mirror-port 7333]
+//   node engine/bin/se-mcp.ts --root <project root> [--autonomy tactical] [--mirror-port 7333]
 //
 // --root is the PROJECT root (the folder holding project/ and
 // workspace/) — the file lane serves that whole tree, the call log lives in
@@ -94,7 +94,9 @@ if (argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
   process.stdout.write(`se — ONE help for the whole system.
 
   .\\RUNME.ps1 [launch flags] [engine flags...]      — the normal way in
-  node engine/bin/se-mcp.ts --root <root> [--autonomy 0.4]   — the server alone
+  node engine/bin/se-mcp.ts --root <root> [--autonomy <rung>]  — the server alone
+                            rungs by NAME: blocked, mechanical, operational,
+                            tactical (the default), strategic, ideation.
 
 LAUNCH — read by RUNME.ps1 before the server starts.
 

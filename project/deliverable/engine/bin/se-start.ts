@@ -60,9 +60,19 @@ function verify(repo: string): void {
   if (!existsSync(pkg)) die("verify", `no package.json at ${pkg}`);
   const declared = (JSON.parse(readFileSync(pkg, "utf8")) as { engines?: { node?: string } }).engines?.node;
   if (declared === undefined) die("verify", "package.json declares no engines.node, so there is nothing to check against");
-  const want = Number(/(\d+)/.exec(declared)?.[1] ?? "0");
-  const have = Number(/v(\d+)/.exec(process.version)?.[1] ?? "0");
-  if (have < want) die("verify", `this engine needs node ${declared} and found ${process.version}`);
+  // MAJOR AND MINOR BOTH. The floor now sits INSIDE a major — unflagged
+  // TypeScript execution landed in Node 22 at 22.18 — so a major-only compare
+  // would accept 22.6 and die in the first spawned script, which is exactly
+  // the failure the comment above records.
+  const ver = (s: string): [number, number] => {
+    const m = /(\d+)\.(\d+)/.exec(s);
+    return m === null ? [Number(/(\d+)/.exec(s)?.[1] ?? "0"), 0] : [Number(m[1]), Number(m[2])];
+  };
+  const want = ver(declared);
+  const have = ver(process.version);
+  if (have[0] < want[0] || (have[0] === want[0] && have[1] < want[1])) {
+    die("verify", `this engine needs node ${declared} and found ${process.version}`);
+  }
   // THE CHECKOUT IS THE ONE THE CALLER MEANT. A machine walking the wrong
   // repository looks healthy the whole way and ships to the wrong place.
   const origin = spawnSync("git", ["remote", "get-url", "origin"], { cwd: ROOT, encoding: "utf8" });

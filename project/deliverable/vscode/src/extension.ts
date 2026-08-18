@@ -335,7 +335,7 @@ async function ensureServer() {
   }
   const runner = nodeRunner();
   if (runner === null) {
-    void vscode.window.showErrorMessage("$PRODUCT$ needs Node 24 or newer — install it, then retry: winget install OpenJS.NodeJS.LTS");
+    void vscode.window.showErrorMessage("$PRODUCT$ needs Node 22.18 or newer — install it, then retry: winget install OpenJS.NodeJS.LTS");
     return false;
   }
   if (!(await ensureDeps(root))) {

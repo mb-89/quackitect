@@ -53,12 +53,16 @@ if (!existsSync(arrive)) {
   process.exit(0);
 }
 
-// THE DIAL IS THE OWNER'S, AND AN UNATTENDED BOX IS THE CASE WHERE THE
-// DEFAULT IS WRONG. At 0.4 a tactical gate answers `wait` for a human who is
-// not there, which is how the i15 run and the first half of the i35 run both
-// stopped. SE_AUTONOMY is how the owner sets it for a cloud environment, and
-// the default stays where it is for everybody else.
-const autonomy = process.env.SE_AUTONOMY ?? "0.4";
+// THE DIAL IS THE OWNER'S, AND THE DEFAULT IS NOW TACTICAL EVERYWHERE (owner
+// ruling 2026-08-18). It used to rest at operational, and operational cannot
+// enter a gate — gate-kickoff is the first gate of every iteration, so an
+// unattended run stopped at the first milestone every time. That is how the
+// i15 run and the first half of the i35 run both stopped.
+//
+// TACTICAL IS EXACTLY ENOUGH AND NO MORE. A gate is the heaviest state inside
+// an iteration; retros, overhauls and seeding are strategic and stay with the
+// person. SE_AUTONOMY overrides it, by NAME.
+const autonomy = process.env.SE_AUTONOMY ?? "tactical";
 const r = spawnSync(process.execPath, [arrive, "--root", ROOT, "--autonomy", autonomy], { encoding: "utf8", cwd: ROOT });
 const out = `${r.stdout ?? ""}${r.stderr ?? ""}`.trim();
 

@@ -16,6 +16,7 @@ import { Decisions, parseUpdate } from "../engine/decisions.ts";
 import { type ArchiveEntry, buildArchive } from "../engine/expmachine.ts";
 import { compileMachine } from "../engine/machines/compile.ts";
 import { renderMirror } from "../engine/render.ts";
+import { DEFAULT_TIER } from "../engine/scale.ts";
 import { mainMachinePath, Session } from "../engine/session.ts";
 import { bootedServer, call, checkDocs, freshRoot, waitForTestJob } from "./helpers.ts";
 
@@ -224,13 +225,16 @@ test("settings do NOT survive the session: a fresh start takes the defaults", ()
     // A new session mints a new token, so last session's store does not apply.
     process.env.SE_SESSION = "a-brand-new-session";
     const b = new Session(root);
-    assert.equal(b.autonomy, 0.4, "autonomy is back to its default");
+    // THE DEFAULT IS ASSERTED BY NAME, never as a value (owner ruling
+    // 2026-08-18). A case that pins the number goes red every time the ladder
+    // is re-spaced, and says nothing about which rung was meant.
+    assert.equal(b.tier, DEFAULT_TIER, "autonomy is back to its default rung");
     assert.equal(b.power.block_sleep, false, "the power flags are back to their default");
     // It fails SAFE: no token at all restores nothing either, so a crash or a
     // power cut cannot leave the last session's sliders standing.
     delete process.env.SE_SESSION;
     const c = new Session(root);
-    assert.equal(c.autonomy, 0.4);
+    assert.equal(c.tier, DEFAULT_TIER);
     assert.equal(c.power.block_sleep, false);
   } finally {
     if (was === undefined) delete process.env.SE_SESSION;

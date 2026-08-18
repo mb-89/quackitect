@@ -37,7 +37,7 @@ you, because the thing that would stop you is what is missing.
 
 ## ONE COMMAND DOES ALL OF IT NOW
 
-    node project/deliverable/engine/bin/se-arrive.ts --autonomy 0.6
+    node project/deliverable/engine/bin/se-arrive.ts --autonomy tactical
 
 THAT IS THE WHOLE ARRIVAL. It fetches the refs, checks the runtime against the
 pin, installs, places the cage, starts the lane headless, and writes

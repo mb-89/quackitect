@@ -391,7 +391,12 @@ test("the unified feed derives src, type and brief — and the mirror carries th
   // and the shutdown control is gone — it was a preference for something
   // that should never have been one.
   assert.ok(withLog.includes('class="rung'));
-  assert.ok(withLog.includes('data-level="0.6"'), "the strategic rung is drawn");
+  // BY ABBREVIATION, NEVER BY VALUE. `data-level` is where a click LANDS, so
+  // it changes with the dial's own position — asserting a number here made
+  // the case a hostage of the default. The rung's letter is what a reader
+  // sees and what scale.md authors.
+  assert.ok(withLog.includes(">T<"), "the tactical rung is drawn");
+  assert.ok(withLog.includes(">S<"), "the strategic rung is drawn");
   // The ids come from the panel spec's keys, not from this file's memory.
   assert.ok(withLog.includes('id="narration-minutes"') && withLog.includes('id="narration-calls"'), "the cadence is two line edits");
   assert.ok(withLog.includes('data-post="/narration-now"'), "NOW forces an update");

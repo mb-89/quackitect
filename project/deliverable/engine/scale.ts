@@ -1,8 +1,23 @@
 // The autonomy scale — an Obsidian-editable markdown TRUTH
-// (machines/scale.md): the engine reads it fresh, never defines it. Same
-// field-line grammar the forms use: "- value | abbr | name" under
-// "## Levels". A malformed line fails loudly — a silently misparsed scale
-// would draw confident wrong notches.
+// (machines/scale.md): the engine reads it fresh, never defines it.
+//
+// THE RUNGS CARRY NO NUMBERS, AND THE ORDER IS THE SCALE (owner ruling
+// 2026-08-18: "it is a terrible idea to have scales for things that are not
+// numeric... I never see them, and nobody ever has to wonder about these
+// numbers").
+//
+// The grammar is "- abbr | name — description" under a heading, and a rung's
+// place in that list is its rank. The engine still compares numbers, because
+// a gate is a `>` and always was; it DERIVES them from position instead of
+// reading them off the page. Nothing that reaches a person carries one.
+//
+// THE DERIVED VALUES ARE THE ONES THAT WERE AUTHORED. Six rungs spread across
+// nought to one give 0, .2, .4, .6, .8, 1 — the exact ladder that used to be
+// typed in by hand. So this removes the numbers without moving a single
+// threshold.
+//
+// A malformed line fails loudly — a silently misparsed scale would draw
+// confident wrong notches.
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseStateNote, section } from "./notes.ts";
@@ -72,24 +87,69 @@ export function valueFor(levels: AutonomyLevel[], word: string): number | undefi
 
 /** One rungs file, parsed. Both banks share the grammar on purpose: a reader
  *  who has understood one control has understood the other. */
-function loadRungs(path: string, heading: string, what: string): AutonomyLevel[] {
+function loadRungs(path: string, heading: string, what: string, valueAt: (i: number, n: number) => number): AutonomyLevel[] {
   const note = parseStateNote(readFileSync(path, "utf8"));
   const rows = section(note.body, heading)
     .split("\n")
     .filter((l) => l.trim() !== "");
-  const levels = rows.map((line) => {
-    const m = line.trim().match(/^- ([0-9.]+) \| (.+?) \| (.+)$/);
-    if (!m) throw new Error(`${what}: malformed level line ${JSON.stringify(line.trim())} (want "- value | abbr | name")`);
-    return { value: Number(m[1]), abbr: m[2], name: m[3] };
+  const levels = rows.map((line, i) => {
+    const m = line.trim().match(/^- (.+?) \| (.+)$/);
+    if (!m) throw new Error(`${what}: malformed level line ${JSON.stringify(line.trim())} (want "- abbr | name — description")`);
+    // A NUMBER IN THE ABBREVIATION IS THE OLD GRAMMAR, and it is refused by
+    // name rather than parsed as a two-letter code. Silently accepting it
+    // would put the ladder back one edit at a time.
+    if (/^[0-9.]+$/.test(m[1].trim())) {
+      throw new Error(
+        `${what}: the rungs carry no numbers any more — the order of the lines IS the scale. Drop the leading "${m[1].trim()} | " from ${JSON.stringify(line.trim())}`,
+      );
+    }
+    return { value: valueAt(i, rows.length), abbr: m[1].trim(), name: m[2].trim() };
   });
   if (levels.length === 0) throw new Error(`${what}: no level lines under ## ${heading}`);
   return levels;
 }
 
+/** THE AUTONOMY LADDER SPREADS ACROSS NOUGHT TO ONE. Blocked is the first
+ *  line and lands on 0, which is what makes a full block possible; the top
+ *  line lands on 1. Rounded to two places so the arithmetic cannot drift a
+ *  threshold by a float's last bit. */
+const spread = (i: number, n: number): number => (n < 2 ? 0 : Math.round((i / (n - 1)) * 100) / 100);
+
+/** THE STOP-AT NOTCHES COUNT FROM ONE, because the tightest notch is a real
+ *  setting rather than an off switch. There is no stop-at equivalent of
+ *  blocked. */
+const counted = (i: number): number => i + 1;
+
 export function loadLevels(root: string): AutonomyLevel[] {
-  return loadRungs(scalePath(root), "Levels", "scale.md");
+  return loadRungs(scalePath(root), "Levels", "scale.md", spread);
 }
 
 export function loadStopAt(root: string): AutonomyLevel[] {
-  return loadRungs(stopAtPath(root), "The notches", "stopat.md");
+  return loadRungs(stopAtPath(root), "The notches", "stopat.md", counted);
+}
+
+/** THE DEFAULT RUNG, BY NAME. Nothing in the engine writes the dial's
+ *  starting value as a number: it is looked up from the scale like every
+ *  other rung.
+ *
+ *  TACTICAL IS THE DEFAULT EVERYWHERE (owner ruling 2026-08-18). Measured:
+ *  the heaviest state inside an iteration is a gate, and a gate weighs
+ *  tactical. Everything else is lighter. So tactical runs a whole iteration
+ *  end to end and nothing beyond one — retros, overhauls and seeding stay
+ *  strategic, and stay with the person.
+ *
+ *  IT WAS OPERATIONAL, AND THAT COULD NOT WALK ANY ITERATION. gate-kickoff is
+ *  the first gate of every iteration and it is tactical, so an unattended run
+ *  stopped at the first milestone every time. Measured on the i15 and i35
+ *  cloud runs. */
+export const DEFAULT_TIER = "tactical";
+
+/** The default dial position, resolved against the live scale. Falls back to
+ *  the top of the ladder only if the scale cannot be read at all. */
+export function defaultAutonomy(root: string): number {
+  try {
+    return valueFor(loadLevels(root), DEFAULT_TIER) ?? 0;
+  } catch {
+    return 0;
+  }
 }

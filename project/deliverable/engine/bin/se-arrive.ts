@@ -22,7 +22,7 @@
 // because a step that exits the process is the wrong shape for the one that
 // has to report back.
 //
-//   node project/deliverable/engine/bin/se-arrive.ts [--root <dir>] [--autonomy 0.6]
+//   node project/deliverable/engine/bin/se-arrive.ts [--root <dir>] [--autonomy tactical]
 //
 // It is IDEMPOTENT. Run it twice and the second run re-uses the lane that is
 // already answering rather than starting a second one.
@@ -40,12 +40,14 @@ function argValue(flag: string): string | undefined {
 if (process.argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
   process.stdout.write(`se-arrive — Arrival A in one command: fetch, install, cage, lane
 
-  node engine/bin/se-arrive.ts [--root <dir>] [--autonomy <0..1>] [--mirror-port <n>]
+  node engine/bin/se-arrive.ts [--root <dir>] [--autonomy <rung>] [--mirror-port <n>]
 
   --root         the project root (the folder holding project/). Default: cwd.
-  --autonomy     0..1 — which states the agent enters by itself. Default 0.4.
-                 AN UNATTENDED BOX USUALLY NEEDS MORE THAN THE DEFAULT: at 0.4
-                 a tactical gate answers 'wait' for a human who is not there.
+  --autonomy     which rung the agent works at by itself, BY NAME:
+                 blocked, mechanical, operational, tactical, strategic, ideation.
+                 Default tactical, which is what running an iteration takes:
+                 a gate is the heaviest step in one, and a gate is tactical.
+                 The rungs and what each means are machines/scale.md.
   --mirror-port  the lane's HTTP port. Default 7333.
   --help         this text (-h, -?)
 `);
@@ -54,7 +56,10 @@ if (process.argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
 
 const ROOT = resolve(argValue("--root") ?? process.cwd());
 const PORT = Number(argValue("--mirror-port") ?? process.env.SE_MIRROR_PORT ?? 7333);
-const AUTONOMY = argValue("--autonomy") ?? process.env.SE_AUTONOMY ?? "0.4";
+// THE RUNG TRAVELS AS A WORD, never as a number (owner ruling 2026-08-18).
+// The engine resolves it against machines/scale.md, so a caller never has to
+// know what range the ladder runs over.
+const AUTONOMY = argValue("--autonomy") ?? process.env.SE_AUTONOMY ?? "tactical";
 
 /** Every step says its name and what happened, in se-start's own shape. */
 function say(step: string, what: string): void {
@@ -94,14 +99,25 @@ function refs(): void {
 // THE PIN IS READ, NEVER COPIED. A runtime below it is reported with the fix
 // rather than worked around — editing engines.node to go green turns a loud
 // failure into a silent one.
+/** A version as [major, minor]. Reads a bare range like ">=22.18.0" and a
+ *  process version like "v22.22.2" alike. */
+function version(s: string): [number, number] {
+  const m = /(\d+)\.(\d+)/.exec(s);
+  return m === null ? [Number(/(\d+)/.exec(s)?.[1] ?? "0"), 0] : [Number(m[1]), Number(m[2])];
+}
+
 function runtime(): void {
   const pkg = join(ROOT, "project", "deliverable", "package.json");
   if (!existsSync(pkg)) die("runtime", `no package.json at ${pkg} — is --root the folder holding project/?`);
   const declared = (JSON.parse(readFileSync(pkg, "utf8")) as { engines?: { node?: string } }).engines?.node;
   if (declared === undefined) die("runtime", "package.json declares no engines.node");
-  const want = Number(/(\d+)/.exec(declared)?.[1] ?? "0");
-  const have = Number(/v(\d+)/.exec(process.version)?.[1] ?? "0");
-  if (have < want) {
+  // MAJOR AND MINOR BOTH, because the floor now sits INSIDE a major. Node 22
+  // gained unflagged TypeScript execution at 22.18; 22.6 does not have it. A
+  // major-only comparison would wave 22.6 straight through and the engine
+  // would fail on the first spawned script with a syntax error.
+  const want = version(declared);
+  const have = version(process.version);
+  if (have[0] < want[0] || (have[0] === want[0] && have[1] < want[1])) {
     die(
       "runtime",
       `this box runs ${process.version} and the engine declares ${declared}. Install a node that satisfies it and re-run — do NOT edit engines.node.`,

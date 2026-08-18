@@ -11,6 +11,7 @@
 // and the mirror are unchanged — they were never gated.
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
+import { DEFAULT_TIER } from "../engine/scale.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { call, checkDocs, freshRoot, readEverything, sessionAtIdle } from "./helpers.ts";
@@ -145,7 +146,7 @@ test("the autonomy refuses garbage: out-of-range values are typed rejections", (
     () => session.setAutonomy(Number("nope")),
     (e) => (e as { clause?: string }).clause === "SE-C-046",
   );
-  assert.equal(session.autonomy, 0.4, "a refused set leaves the autonomy untouched");
+  assert.equal(session.tier, DEFAULT_TIER, "a refused set leaves the autonomy on its default rung");
 });
 
 test("reaching end fires onClosed once and the closing packet says session over", async () => {

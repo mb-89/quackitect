@@ -171,10 +171,16 @@ test("compileColumn: the verification loop compiles as fallback and recovery", (
     assert.ok(verification?.command, `${col}: verification carries no command`);
     const fb = verification?.edges.find((e) => e.to === "fix-findings");
     assert.equal(fb?.role, "fallback");
-    assert.equal(fb?.guard, "verification_attempts < 3");
     const fix = decl.states.find((s) => s.id === "fix-findings");
     const rec = fix?.edges.find((e) => e.to === "verification");
     assert.equal(rec?.role, "recovery");
+    // WHAT HOLDS THE REPAIR STATE, and it is the whole point of it existing.
+    // fix-findings has no evidence form on purpose, so before 2026-08-18
+    // nothing held it: entering it completed it and the walk fell straight
+    // back out having repaired nothing. The confirm run is the hold — a red
+    // battery leaves the exit unmet and the walk stays here with its write
+    // verbs.
+    assert.ok(fix?.exit?.script, `${col}: fix-findings has nothing holding it, so it cannot repair anything`);
   }
 });
 

@@ -33,12 +33,16 @@ ONE LINE PER NOTCH BELOW, and the parser means it. Everything under the
 heading is read as a notch, so a wrapped line or a stray sentence is a
 malformed level line and the whole file refuses — the same rule scale.md keeps.
 
+THE NOTCHES CARRY NO NUMBERS, AND THE ORDER OF THE LINES IS THE SCALE (owner
+ruling 2026-08-18). Tightest first, loosest last. Moving a line moves the
+notch; adding one between two others puts it between them.
+
 ## The notches
 
-- 1 | SE | state end — the engine blocks every transition; the person releases each one
-- 2 | AJ | agent judgement — the agent decides when to hand back; today's behaviour
-- 3 | BL | bless — the agent does not stop until a bless is owed
-- 4 | BO | blockers only — the agent stops only when it cannot continue at all
+- SE | state end — the engine blocks every transition; the person releases each one
+- AJ | agent judgement — the agent decides when to hand back; today's behaviour
+- BL | bless — the agent does not stop until a bless is owed
+- BO | blockers only — the agent stops only when it cannot continue at all
 
 ## What each one is for
 

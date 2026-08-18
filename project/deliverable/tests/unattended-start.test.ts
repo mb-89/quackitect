@@ -67,15 +67,30 @@ test("the start step's spawn releases its caller before the child ends", () => {
 test("the declared runtime floor is one the engine can actually run on", () => {
   const declared = (JSON.parse(readFileSync(join(DELIVERABLE, "package.json"), "utf8")) as { engines?: { node?: string } }).engines?.node;
   assert.ok(declared !== undefined, "package.json must declare engines.node — the verify step has nothing to check against otherwise");
-  const want = Number(/(\d+)/.exec(declared)?.[1] ?? "0");
-  const have = Number(/v(\d+)/.exec(process.version)?.[1] ?? "0");
-  // THE FLOOR TRACKS THE PIN. It asserted >= 23 against a pin of >= 24, so the
-  // pin could be dropped a whole major and this stayed green.
+  const ver = (s: string): [number, number] => {
+    const m = /(\d+)\.(\d+)/.exec(s);
+    return m === null ? [Number(/(\d+)/.exec(s)?.[1] ?? "0"), 0] : [Number(m[1]), Number(m[2])];
+  };
+  const want = ver(declared);
+  const have = ver(process.version);
+  // THE FLOOR TRACKS THE PIN, MAJOR AND MINOR. It used to assert a bare major,
+  // which was enough while the floor sat at a major boundary. It no longer
+  // does: unflagged TypeScript execution landed in Node 22 at 22.18, so the
+  // floor is INSIDE a major and 22.6 must still be refused.
+  //
+  // WHY 22 AND NOT 24 (owner ruling 2026-08-18): a cloud box gets 22 by
+  // default, so pinning above it means installing a runtime on every arrival.
+  // Measured on the i35 run — nothing in the engine needs 24, and the only
+  // failures under 22 were these floor assertions failing BECAUSE the runtime
+  // was 22.
   assert.ok(
-    want >= 24,
-    `the engine spawns its scripts as \`node <file>.ts\` with no flag, so the floor must be a version where that is the default. It declares ${declared}.`,
+    want[0] > 22 || (want[0] === 22 && want[1] >= 18),
+    `the engine spawns its scripts as \`node <file>.ts\` with no flag, so the floor must be a version where that is the default — 22.18 or newer. It declares ${declared}.`,
   );
-  assert.ok(have >= want, `this machine runs ${process.version} and the declaration demands ${declared}`);
+  assert.ok(
+    have[0] > want[0] || (have[0] === want[0] && have[1] >= want[1]),
+    `this machine runs ${process.version} and the declaration demands ${declared}`,
+  );
 });
 
 // AN UNATTENDED AGENT STARTS WITH WHATEVER IT WAS HANDED. Nobody is beside it

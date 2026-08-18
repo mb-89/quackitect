@@ -102,7 +102,7 @@ import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { probesMissed, readingProbes } from "./readproof.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { anyJobRunning } from "./run.ts";
-import { levelName, loadLevels, loadStopAt, notchName, tierOf, weightName } from "./scale.ts";
+import { defaultAutonomy, levelName, loadLevels, loadStopAt, notchName, tierOf, weightName } from "./scale.ts";
 import { requiredDependsOn } from "./seed.ts";
 import {
   buildPortableForm,
@@ -335,11 +335,16 @@ export class Session {
   /** Evidence store: "<machine>/<state>" → what was submitted. */
   private readonly evidence = new Map<string, Record<string, unknown>>();
   /** THE AUTONOMY (renamed from "threshold", owner ruling 2026-07-27) —
-   *  which states the AGENT may enter by itself: only those with
-   *  priority <= autonomy. 0 hands every step to the human (manual mode);
-   *  1 is fully autonomous. Content work inside a state is never gated —
-   *  only ENTERING is. Live-adjustable (the mirror's slider). */
-  private _autonomy = 0.4;
+   *  which states the AGENT may enter by itself: only those weighing no more
+   *  than the dial. `blocked` hands every step to the person; `ideation` is
+   *  fully autonomous. Content work inside a state is never gated — only
+   *  ENTERING is. Live-adjustable (the mirror's rungs).
+   *
+   *  IT STARTS AT TACTICAL, RESOLVED BY NAME from machines/scale.md rather
+   *  than written here as a value (owner ruling 2026-08-18). The constructor
+   *  sets it, because the scale is read from the root and there is no root
+   *  yet at field-initialiser time. */
+  private _autonomy = 0;
   /** THE TARGET — where the walk is headed, and the blue line the mirror
    *  draws. Every engine start aims at the front desk (owner ruling
    *  2026-07-29): the desk is where a person says what they want, so it is
@@ -376,6 +381,11 @@ export class Session {
     this._machine = compileMachine(root, mainMachinePath(root));
     this.instance = newInstance(this._machine);
     this.decisions = new Decisions(seDir(root));
+    // THE DIAL STARTS AT A NAMED RUNG, looked up in machines/scale.md like
+    // any other rung. It is set here rather than at the field because the
+    // scale is read from the root, and there is no root at initialiser time.
+    // restoreSettings below may overwrite it with what the person last set.
+    this._autonomy = defaultAutonomy(root);
     // SETTINGS SURVIVE THE ENGINE, NOT THE SESSION (owner rulings 2026-07-28).
     // The mirror's sliders restore across a RELOAD like the decision graph —
     // ONE store, restored wholesale, ready for settings still to come. But a
@@ -532,6 +542,14 @@ export class Session {
 
   get autonomy(): number {
     return this._autonomy;
+  }
+
+  /** WHERE THE DIAL STANDS, AS A WORD. The number above runs the comparison
+   *  and nothing else should ever ask for it — a caller that wants to know
+   *  the rung wants this (owner ruling 2026-08-18: nobody has to wonder what
+   *  the numbers mean). Empty only when the scale itself cannot be read. */
+  get tier(): string {
+    return this.tierFor(this._autonomy).tier ?? "";
   }
 
   /**

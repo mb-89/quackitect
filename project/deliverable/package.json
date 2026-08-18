@@ -5,7 +5,7 @@
   "type": "module",
   "description": "The se MCP server: caged-agent tool lane, call log, state machine kernel.",
   "engines": {
-    "node": ">=24.0.0"
+    "node": ">=22.18.0"
   },
   "scripts": {
     "test": "node --test \"tests/*.test.ts\"",

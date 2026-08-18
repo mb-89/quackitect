@@ -172,7 +172,7 @@ function stateFromElement(machineId: string, root: string, canvasPath: string, e
       throw new MachineCompileError(
         machineId,
         `canvas node ${el.id}`,
-        `${subId}.canvas declares no priority in its frontmatter — every state has one (0.01 mechanical .. 0.8 milestone; 1 ideation; above 1 human-only)`,
+        `${subId}.canvas declares no priority in its frontmatter — every state has one, named as a rung from machines/scale.md: mechanical, operational, tactical, strategic, ideation. blocked means the person only.`,
       );
     }
     // A sub-canvas may carry conditions in its frontmatter (flat keys,
