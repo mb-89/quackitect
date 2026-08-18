@@ -822,3 +822,198 @@ verb's word and says what it read as what — `query` against `glob` against
 `dir` against `path`. Those verbs are already near-siblings arguing about one
 argument's name. A discriminated `op` makes that explicit instead of repairing
 it after the fact.
+
+## Part 15 — the word "record" goes, and why it keeps coming back
+
+THE OWNER'S OBJECTION, and it is correct: an iteration is not a record. A
+record is a passive account of something that already happened. An iteration is
+the work itself, in progress, mounted on a machine and being walked. The word
+describes the archive it eventually becomes, not the thing it is while it
+matters.
+
+### Why it keeps coming back, mechanically
+
+IT IS NOT THAT AGENTS REMEMBER IT. It is that the system TEACHES IT, every
+turn, from several places at once. Counted 2026-08-18:
+
+| surface | hits | when the agent meets it |
+| --- | --- | --- |
+| the trace corpus, 443 files | 1,944 | whenever the trace is read |
+| the machines | 204 | in the state guidance riding EVERY pull |
+| guidance, all of it | 72 | when a document is served |
+| the prompt layer's four sources | 14 | EVERY TURN, verbatim |
+| tool descriptions | 8 | at every `tools/list` |
+
+SO NO AMOUNT OF TELLING AN AGENT TO STOP WILL WORK. It reads the word in the
+prompt layer before it reads anything else, then again in the guidance the pull
+serves it, then again in the state's own text. Asking it not to use a word the
+machine uses at it is asking it to disagree with the machine.
+
+THE RENAME IS THE ONLY FIX, and the order matters: the machines and the prompt
+layer first, because those are the two that re-teach on every turn. The trace
+corpus is the biggest number and the LEAST urgent — it is read occasionally,
+not injected constantly.
+
+### What it should be called
+
+RECOMMENDED: **workpiece**. In a shop the workpiece is the thing mounted on the
+machine and worked, which is exactly what this is — the system's whole
+vocabulary is already machines, states, walks, doors and lanes. It has **zero**
+existing occurrences anywhere in the tree, so the rename is mechanically
+checkable: when the old word is gone, grep proves it.
+
+NOT "vehicle", THOUGH THE DESK ALREADY USES IT. `front-desk.md` says "SIZE
+FIRST, THEN VEHICLE" and means precisely this category. But the word is already
+carrying two jobs — i16 is "the vehicle overlay: a vehicle vendors the engine",
+where a vehicle is a downstream product embedding the engine. 77 existing hits,
+two meanings. Taking it as a third would make the confusion permanent.
+
+SECOND BEST: **undertaking**, also zero hits. It says the right thing about
+scope and intent. It is longer, and it does not join the machine metaphor.
+
+### What is NOT renamed, so the sweep does not overreach
+
+- TypeScript's own `Record<K, V>` — **466 of the engine's 796 hits**. Untouched.
+- `CallRecord`, `DemandRecord`, `testRecord` — 28 hits, and these are correct.
+  A logged call IS a record: it is a passive account of something that
+  happened. That is the word doing its real job.
+
+SO THE ENGINE'S REAL EXPOSURE IS ABOUT 300 HITS, not 796. Say so in the
+milestone, because a sweep sized at 796 will either be refused as too big or
+will damage the type annotations.
+
+## Part 16 — two corrections to Part 14
+
+### se_house was a bad bundle, not just a bad name
+
+THE OWNER DID NOT UNDERSTAND IT, and the reason is that it was wrong on the
+merits. It put three verbs together that do two different jobs.
+
+- `se_reload` makes the RUNNING ENGINE take up changed sources.
+- `se_prompt_place` makes the PROMPT LAYER take up changed guidance.
+- `se_panel` opens the mirror, or points a yellow highlight at a named surface
+  for a person to look at.
+
+THE FIRST TWO ARE ONE JOB: the live system picks up what changed on disk. The
+third is the human-facing pointer and belongs nowhere near them.
+
+REPLACED BY TWO HONEST BUNDLES:
+
+- **`se_refresh {what: engine | prompt}`** — reload · prompt.place.
+- **`se_mirror {op: open | point | shoot}`** — panel · shoot. Both are the
+  mirror, and `se_shoot` was standing alone only because nothing else was.
+
+The verb count is unchanged at **19**. The grouping now says what it means.
+
+### The 2 KB cap: the owner is right, and bundling makes it WORSE
+
+BUNDLING AND THE CAP ARE TWO DIFFERENT PROBLEMS AND THIS REPORT RAN THEM
+TOGETHER. Stated properly:
+
+- **The cap is PER TOOL.** Merging five verbs into one ADDS their descriptions
+  together. Bundling does not reduce description bytes by a single character —
+  the total stays at 19,538 whether there are 34 tools or 19. It moves the
+  bytes into fewer, bigger buckets, and buckets are what the cap measures.
+- **So bundling buys COUNT and costs CAP HEADROOM.** It answers Cursor's 40
+  tools across all servers. It makes Claude Code's 2 KB truncation harder to
+  satisfy, not easier. `se_file_edit` at 2,454 bytes is that cost arriving.
+- **Shortening descriptions is the independent fix**, and it is the one that
+  helps everywhere: the cap, the context cost at every `tools/list`, and every
+  host's tool budget at once.
+
+### And there is a principled way to shorten, not just "write less"
+
+THE SAME RULES ARE DELIVERED TWICE TODAY. The prompt layer projects 43,008
+bytes of contract, walking, lane and voice into `CLAUDE.md` every turn. The
+tool descriptions carry 19,538 bytes more. `se_pull`'s 2,425-byte description
+re-teaches the whole loop — the five answers, the submit flag, the bless thumb,
+what `wait` means. `walking.md` and `lane.md` already teach all of it, counted
+across the two:
+
+- `read` 10 hits
+- `submit` 7
+- `bless` 4
+- `fill` 3
+- `choose` 2
+- `wait` 2
+
+SO THE SPLIT IS AVAILABLE AND IT IS NOT A JUDGEMENT CALL:
+
+- THE TOOL DESCRIPTION says what the arguments are, what the answers are
+  called, and what a wrong call gets. It is a schema note.
+- THE PROMPT LAYER says how the loop works and why. It is not capped, it is
+  not truncated on the home harness, and it already carries this material.
+
+Cutting `se_pull` to a schema note takes it under 2 KB without losing one rule,
+because the rules are already somewhere the agent reads every turn. The same
+argument covers `se_run` at 1,354, `se_test` at 1,146 and `se_file_read` at
+1,095 — between them, over half the description budget.
+
+MEASURE IT AFTERWARDS, ON BOTH AXES. The number that matters is not "shorter";
+it is every tool under 2,048 bytes, and the total down enough to be worth the
+edit.
+
+## Part 17 — the hooks, answered per surface
+
+TWO QUESTIONS FROM THE OWNER, and the first needs its premise corrected before
+it can be answered.
+
+### The model behind the harness does not decide which files are read
+
+RUNNING CLAUDE AS THE MODEL INSIDE COPILOT CHANGES NOTHING ABOUT CONFIG.
+Copilot's model picker offers Claude Opus and Sonnet alongside GPT and Gemini,
+and the model is what reasons. **The HARNESS is what reads files, spawns hooks
+and applies a cage.** Pick Claude inside Copilot and Copilot still reads
+Copilot's files, still runs Copilot's hooks, and still ignores what Copilot
+ignores.
+
+SO "DOES CLAUDE READ THE CLAUDE SETTINGS" IS NEVER THE QUESTION. The question
+is always: which HARNESS is this, and what does it read.
+
+### Question 1 — Copilot CLI and `.claude/settings.json`
+
+**YES, AND THIS ALREADY WORKS TODAY.** Copilot CLI reads
+`.claude/settings.json` and `.claude/settings.local.json` for a documented
+cross-tool subset, and `hooks` is in that subset. It also accepts PascalCase
+event names with Claude's own snake_case payload shape — an explicit Claude
+compatibility mode.
+
+`se-hook-stop.ts` already relies on it, and its own comment says so.
+
+### Question 2 — VS Code and `.github/hooks`
+
+**YES, BY DEFAULT.** `chat.useHooks` defaults to **true**, and
+`chat.hookFilesLocations` ships with `".github/hooks": true`. So
+`.github/hooks/*.json` executes in VS Code with nothing turned on.
+
+THE PREVIEW FLAG IS ONLY FOR THE CLAUDE-FORMAT FILES. `chat.useClaudeHooks`
+defaults false and gates `.claude/settings.json` only. Those files are
+DISCOVERED either way — VS Code even shows a one-time notice saying Claude
+hooks are available — but they do not RUN until it is on.
+
+### So the picture is better than Part 9 implied
+
+| hook source | Claude Code | Copilot CLI | VS Code | Copilot cloud |
+| --- | --- | --- | --- | --- |
+| `.claude/settings.json` | **runs** | **runs** (cross-tool subset) | discovered, needs the preview flag | not read |
+| `.github/hooks/*.json` | not read | **runs** | **runs by default** | **runs — the only source it has** |
+
+PART 9 SAID HOOKS DO NOT PORT. That was too strong and it is corrected here.
+The honest statement is narrower: **no single hook file reaches all four
+surfaces, but two files reach all four between them**, and both are committable.
+
+### The rule that follows
+
+WRITE THE HOOKS ONCE AND GENERATE BOTH FILES. `.claude/settings.json` for
+Claude Code, `.github/hooks/*.json` for the whole Copilot family. That is
+exactly the install-time generation the owner ruled on, applied to hooks.
+
+AND MAKE EVERY HOOK SCRIPT IDEMPOTENT, because Copilot CLI reads BOTH and will
+fire the same script twice. This is not a risk to design around later — it is
+happening now, and `se-hook-stop.ts`'s own comment describes it. It survives
+only because that script carries a bites-once valve keyed on `stop_hook_active`.
+`se-hook-start.ts` and `se-hook-websearch.ts` carry no such valve.
+
+DO NOT RELY ON MATCHERS IN THE GENERATED FILES. VS Code ignores them, so each
+script reads its own trigger from its payload. Part 12 already says this; it is
+the same fix, and it is what makes one script safe on four surfaces.
