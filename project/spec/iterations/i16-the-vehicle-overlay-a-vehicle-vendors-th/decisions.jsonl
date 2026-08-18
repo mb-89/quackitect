@@ -141,3 +141,16 @@
 {"ts":"2026-08-18T08:50:56.262Z","op":"done","visit":"iterations/i16/gate-kickoff@0","node":"d143","brief":"the kickoff is signed with minor proposed and the bless owed"}
 {"ts":"2026-08-18T08:51:44.129Z","op":"update","visit":"iterations/i16/gate-kickoff@0","node":"d152","brief":"noting the kickoff bless conflict, then blessing and walking on"}
 {"ts":"2026-08-18T08:51:52.559Z","op":"update","visit":"iterations/i16/gate-kickoff@0","node":"d153","brief":"blessing the kickoff at minor, the dial stands at ideation"}
+{"ts":"2026-08-18T08:52:05.566Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d131","brief":"the kickoff is blessed and the machine compiles at minor"}
+{"ts":"2026-08-18T08:52:50.322Z","op":"plan","visit":"iterations/i16/gate-kickoff@0","parent":null,"nodes":[{"id":"d154","brief":"aim past the stuck route into M1"},{"id":"d155","brief":"draft the vision and rule its conflicts"},{"id":"d156","brief":"scope the non-goals"},{"id":"d157","brief":"walk the motivation gate"}]}
+{"ts":"2026-08-18T08:53:15.641Z","op":"done","visit":"iterations/i16/gate-kickoff@0","node":"d154","brief":"the aim cleared the stuck route and landed on draft-vision"}
+{"ts":"2026-08-18T08:53:57.987Z","op":"update","visit":"iterations/i16/draft-vision@0","node":"d158","brief":"the goal system inherits vp-vendoring and rules five conflicts"}
+{"ts":"2026-08-18T08:54:29.143Z","op":"update","visit":"iterations/i16/draft-vision@0","node":"d159","brief":"the owner challenged the column, checking the interface question"}
+{"ts":"2026-08-18T08:54:41.553Z","op":"update","visit":"iterations/i16/draft-vision@0","node":"d160","brief":"no interface carries flow-overlay, checking the elements"}
+{"ts":"2026-08-18T08:54:49.767Z","op":"update","visit":"iterations/i16/draft-vision@0","node":"d161","brief":"reading the element that would have to own the resolver"}
+{"ts":"2026-08-18T08:55:35.979Z","op":"update","visit":"iterations/i16/draft-vision@0","node":"d162","brief":"reopening the kickoff to correct the column to major"}
+{"ts":"2026-08-18T08:55:48.055Z","op":"update","visit":"iterations/i16/gate-kickoff@1","node":"d163","brief":"pulling to see where the reopen leaves the walk"}
+{"ts":"2026-08-18T08:56:55.126Z","op":"done","visit":"iterations/i16/gate-kickoff@0","node":"d155","brief":"the column is corrected to major and the gate re-signed"}
+{"ts":"2026-08-18T08:57:39.362Z","op":"update","visit":"iterations/i16/gate-kickoff@1","node":"d164","brief":"accounting for the note captured after the retro closed"}
+{"ts":"2026-08-18T08:58:21.403Z","op":"update","visit":"iterations/i16/gate-kickoff@1","node":"d165","brief":"matching the item name the check asks for"}
+{"ts":"2026-08-18T08:58:28.421Z","op":"done","visit":"iterations/i16/gate-kickoff@0","node":"d156","brief":"the column is corrected to major and the gate re-signed"}

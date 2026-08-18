@@ -2,7 +2,8 @@
 form: gate-kickoff
 bless: blessed by agent
 by: agent
-signed_off: 2026-08-18T08:50:28.525Z
+signed_off: 2026-08-18T08:58:28.819Z
+reopened: "2026-08-18T08:55:35.984Z — The column is wrong. flow-overlay crosses IN and no interface carries it, so this iteration mints one for certain — decompose-structure's escalate tell fires, and minor was proposed knowing it probably would."
 authors: agent
 files:
 ---
@@ -68,6 +69,7 @@ AND IT ANSWERS THE FOLDER QUESTION BETTER THAN EXPECTED. `EngineDir()` PROBES tw
 - note-c14bc8712a54 — THE SHELL REPLACED A LANE VERB: backlog, two of its three parts cost nothing
 - note-814c6d46f2ac — THE TOOL AN AGENT REACHES FOR WHEN STUCK IS REFUSED: backlog, owner accepted, not understood
 - note-168e7a7fe477 — A FORM SAVED ANOTHER STATE'S FIELDS: backlog, belongs with i29
+- note-cf187793f9f1 — TWO ENGINE-SIDE SOURCES DISAGREE ABOUT WHO BLESS: pending for the next retro, and deliberately so. It was captured at THIS gate, after the retro closed, when the kickoff row's guidance and the stop hook gave opposite answers about whose bless the column is. It is neither done nor obsolete, and carried and backlog are the retro's judgment, so no disposition this state grants fits it.
 
 ## goals
 
@@ -99,21 +101,33 @@ AND IT ANSWERS THE FOLDER QUESTION BETTER THAN EXPECTED. `EngineDir()` PROBES tw
 
 ## change_size
 
-minor — and the reasoning follows i34's correction rather than my own instinct, because that correction is the sharpest thing in the archive about this field.
+major — CORRECTED FROM minor after the owner challenged it, and the check they prompted settles it against my first answer.
 
-THE COLUMN PRICES DESIGN INPUT OWED, NOT CODE TOUCHED. i34's gate records the agent getting this exactly wrong: "I priced the change by how much CODE it touches. The column prices how much DESIGN INPUT is owed, and this change owes almost none." i16 touches a lot of code and owes very little design.
+THEIR THREE QUESTIONS, ANSWERED BY READING RATHER THAN ARGUING.
 
-WHAT MINOR DROPS TO none, and why each has nothing to do here. The M4 candidate lane — enumerate-space, derive-criteria, cut-criteria, evaluate-set, run-candidates, partition-functions, gate-candidates. The M5 architecture lane — converge-pugh, reverse-sensitivity, declare-winner, record-adrs, evaluate-architecture, gate-architecture. The M6 prototype lane — rank-unknowns, run-spikes, fold-back, gate-prototype. That is seventeen rows of CHOOSING BETWEEN DESIGNS, and there is one design: v1's layer chain, which I read at ref main this session.
+A NEW VALUE PROP? NO. vp-vendoring stands, graded MUST, and its outcome line is this iteration verbatim: a vehicle vendors the engine and overlays its own guidance, methods and behaviour through one resolution chain, and never writes under the engine. The vision is inherited and nothing here moves it.
 
-WHAT MINOR KEEPS AT full, which is the part that matters: write-requirements, author-tests, observe-red, specify-build, build-steps, verification, trace-design, fix-findings, sweep-consistency, package, and all three of gate-requirements, gate-implementation and gate-release. Tests first, red observed, build, verify, sweep, ship.
+A NEW ELEMENT? NO. el-method-compiler already implements fn-run-a-governed-walk.hold-the-method, which takes flow-overlay as an input, and its own realization line reads "the standing compiler and the overlay machinery". The element exists and already claims this work.
 
-WHERE THE FOLDER PROBE GOES ONCE run-spikes DROPS. To probe-assumptions at M3, which minor keeps at full and which i34 used for its own gating probe. That is the right home anyway: the folder question is an ASSUMPTION with a cheap probe, not a prototype of a competing design.
+A NEW INTERFACE? YES, AND CERTAINLY. flow-overlay carries `crosses: in` and NO INTERFACE CARRIES IT. It appears in exactly two files in the whole corpus — its own node, and the function that consumes it. el-method-compiler's own boundary line says "the interfaces the element matrix mints for its flows", so the boundary this flow crosses is unmodelled and this iteration mints it.
 
-THE ESCALATION TELL IS EXPECTED TO FIRE, AND I AM NAMING IT RATHER THAN HOPING. decompose-structure's minor_note says escalate when the work wants a NEW element or interface. i16 ADDS a resolution mechanism where none exists, so it probably wants one. i34 could say the tell would not fire because it only removed things; I cannot say that.
+SO decompose-structure's ESCALATE TELL FIRES WITH CERTAINTY, not probability. Its minor_note escalates on a new element OR INTERFACE. My earlier answer said the tell would "probably" fire and then argued to start at minor anyway. If the tell is certain, proposing minor IS proposing to escalate — which is major with a re-sign of every state in between, and note-fc18d2775583 measures what that costs.
 
-WHY I STILL PROPOSE minor RATHER THAN major. Escalation is designed to be VISIBLE and cheap — the walk says so at decompose-structure and the column moves. Starting at major buys seventeen rows of selecting among candidates that do not exist, and the owner's stated constraint is to have a vehicle working tomorrow. If the tell fires, the walk escalates in the open and nothing is lost but the rows we would have skipped anyway.
+AND THE OWNER'S ARCHITECTURE QUESTION EXPOSED A SECOND HOLE, which is the one that actually changes the answer. My own round_1 recorded that v1's most-specific layer is a per-workspace DATA HOME and v3 has none — and then treated it as a detail for decompose-structure. It is not a detail. WHERE THE HOST'S OVERLAY LIVES IS AN OPEN CHOICE with at least three candidates:
 
-NO STRIKES PROPOSED. Every row minor keeps is one I want.
+- the host's own product folder, beside what it builds
+- a folder named by a key in the engine's committed config, which is v1's actual answer
+- a data home, which v3 would have to invent
+
+Each carries different consequences for the seal, for what an update replaces, and for what a colleague cloning the vehicle gets. That is precisely M4 and M5's question, and MINOR DROPS BOTH LANES ENTIRELY.
+
+SO MY minor ARGUMENT RESTED ON AN EMPTY CANDIDATE SPACE THAT IS NOT EMPTY. I wrote "there is one design" because v1 has one implementation. Having one implementation of a chain is not the same as having one answer to where the layers live in a product shaped differently.
+
+WHAT major BUYS, and it is not ceremony here. The M4 candidate lane enumerates and cuts the overlay-location options against criteria. The M5 architecture lane picks one, records the ADR, and evaluates it. decompose-structure at full mints the interface flow-overlay has been waiting for since i1.
+
+NO STRIKES PROPOSED. The one row I would have argued to strike is record-adrs, and it is the row this decision most needs.
+
+WHAT IT COSTS AGAINST THE DEADLINE, said plainly rather than hidden: major is more states and it will not finish today. The owner's constraint was to start the vehicle and the foreign project tomorrow, and the honest trade is that a wrong overlay location discovered after the build costs more than the M4 and M5 rows cost now.
 
 ## round_0_verify
 
@@ -128,11 +142,11 @@ NO STRIKES PROPOSED. Every row minor keeps is one I want.
 ## round_1_validate
 
 - exercised against the goal: The goal is that somebody can build software with this system and keep their own guidance. It was exercised against the current product this session and FAILED, which is the argument for the iteration. `RUNME.ps1 --export <folder> <name> <abbr>` copies the whole tree, renames the brand and commits once — the receiver gets our guidance and the engine as one lump, with no seam. An upstream update would be a merge.
-- missing: The overlay mechanism's own proof. tsp-overlay-seam says three of its four claims are DEFINED AHEAD OF THEIR CASES because the mechanism is not built, and tests/overlay.test.ts does not exist. Nothing here has been shown to work; it has been shown to have worked in v1, in another language.
-- and one thing is missing that this gate cannot supply: whether v1's data-home overlay layer translates to this product at all. v1's most-specific layer is `dataDirFor("overlay")`, a per-workspace data directory. v3 has no data home. Where that layer goes is a real design question and it belongs at decompose-structure, not here.
-- wrong: My first reading of this iteration's dependency. I reported that i16 waits on i10 because req-overlay-resolution demands one shared identity scheme. The demand is real; the inference that i10 supplies it was not checked against what the overlay actually resolves. Method artifacts resolve by hardcoded PATH today and already carry an `id:`, and i10 renames the SPEC corpus the chain never touches. The owner cut the edge and the argument is on the record.
+- missing: THE OVERLAY'S LOCATION IS AN OPEN CHOICE, and this is the finding that moved the column. v1's most-specific layer is `dataDirFor("overlay")`, a per-workspace data directory, and v3 has no data home. At least three candidates stand: the host's own product folder, a folder named by a key in the engine's committed config (v1's real answer), or a data home v3 would have to invent. Each changes what the seal means and what an update replaces. I first wrote this as a detail for decompose-structure; the owner's challenge is what made me price it as the design question it is.
+- and also missing: the overlay mechanism's own proof. tsp-overlay-seam says three of its four claims are DEFINED AHEAD OF THEIR CASES because the mechanism is not built, and tests/overlay.test.ts does not exist. Nothing here has been shown to work; it has been shown to have worked in v1, in another language.
+- wrong: TWO THINGS, and both were mine. FIRST, my reading of the i10 dependency: I reported that i16 waits on i10 because req-overlay-resolution demands one shared identity scheme, without checking what the overlay actually resolves. Method artifacts resolve by hardcoded PATH today and already carry an `id:`, and i10 renames the SPEC corpus the chain never touches. The owner cut the edge. SECOND, my first column: minor, argued from an empty candidate space that is not empty, and from a tell I called probable when it is certain.
 - out of scope: the folder rework, module-qualified ids, the 121 citations, the full scaffold family, and the brand substitution. All five are named in left_out with where they went or why they are out.
-- prior art: OURS IS THE CLOSEST AND IT IS READ RATHER THAN CITED. v1's resolver.go implements exactly this: a layer list most-specific first, first-hit resolution in ten lines, guides walked engine-first so the vehicle overwrites, and a selftest asserting the three properties — an engine default resolves to the engine, an overlay wins, and inheritance returns when the override is removed. Its `EngineDir()` probes `tools/vendor/quackitect` and falls back to `product/quackitect`, so one binary serves a vehicle and the dogfood repository without either moving. NOT COMPARED against any external tool, and saying so beats inventing one: the mechanism is a filesystem layer chain, and the only implementation whose tradeoffs we can actually evidence is our own.
+- prior art: OURS IS THE CLOSEST AND IT IS READ RATHER THAN CITED. v1's resolver.go implements exactly this: a layer list most-specific first, first-hit resolution in ten lines, guides walked engine-first so the vehicle overwrites, and a selftest asserting the three properties — an engine default resolves to the engine, an overlay wins, and inheritance returns when the override is removed. Its `EngineDir()` probes `tools/vendor/quackitect` and falls back to `product/quackitect`, so one binary serves a vehicle and the dogfood repository without either moving. WHAT IT DOES NOT SETTLE, and what I first read it as settling: where the host's own layer lives. v1 answers that with a data home this product does not have. NOT COMPARED against any external tool, and saying so beats inventing one: the only implementation whose tradeoffs we can actually evidence is our own.
 
 ## bound_breaches
 
@@ -143,10 +157,11 @@ NO STRIKES PROPOSED. Every row minor keeps is one I want.
 
 ## round_2_red_team
 
-- STEELMAN: this gate should FAIL, because the agent proposing minor is the agent that wants to finish tomorrow, and the deadline is doing the arguing => Partly right and worth stating plainly. The deadline IS in the reasoning, named rather than hidden. What answers it is that the size argument stands without the deadline: seventeen dropped rows are all design-SELECTION rows, and there is one design, read at ref main today. Remove the deadline and minor is still the honest column. What the deadline changes is only the tolerance for escalating later rather than starting high.
-- KILL-CRITERION: this is the wrong call if the overlay needs a NEW element, because decompose-structure's minor_note says escalate exactly there => It probably does need one, and I said so in the size field rather than waiting to be caught. This is the difference between i34's case and mine: i34 could show the tell would not fire, and I cannot. The mitigation is that escalation is visible and cheap by design; the risk is that it arrives four states in and costs a re-sign of everything above it, which is real and is note-fc18d2775583's subject.
-- THE AGENT RETRACTED TWO FINDINGS TODAY AND IS NOW PROPOSING A COLUMN => Both retractions have the same cause and it is worth carrying into this gate: a symptom was measured while the governing document went unread. So this gate's central claim rests on the governing documents themselves — the four requirements, the use case, the rigor rows, and v1's resolver read whole at ref main. No claim here rests on the absence of something.
-- THE FOLDER QUESTION IS BEING ANSWERED BEFORE ITS PROBE RUNS => True, and the honest form is that the probe's likely answer is now visible rather than settled. v1 probes two locations rather than moving anything, which is evidence that the wrapper root need not go. It is not proof for THIS product, and the probe still runs at probe-assumptions.
+- STEELMAN: this gate should FAIL, because the agent proposing a column is the agent that wants to finish tomorrow, and the deadline is doing the arguing => IT WAS RIGHT, and the first version of this gate proved it. minor was proposed with the deadline named in its own reasoning, and the deadline was carrying more weight than the argument. The correction to major is what the steelman asked for, and it arrived because the owner asked the question rather than because this round caught it.
+- KILL-CRITERION: this is the wrong call if the overlay needs a NEW element or interface, because decompose-structure's minor_note escalates exactly there => THE CRITERION FIRED. Checked rather than reasoned: flow-overlay carries `crosses: in` and appears in only two files, its own node and the function consuming it. No interface carries it. el-method-compiler's boundary line says the interfaces are minted for its flows, so this iteration mints one. The first version of this gate called that "probable" and proceeded; probable was wrong and certain is the answer.
+- AND THE ROUND THAT WAS SUPPOSED TO CATCH IT DID NOT => Worth recording plainly. This same red team, one version ago, named the kill-criterion correctly and then declined to look for it, on the grounds that escalation is cheap. Naming a criterion and not running it is the shape contract rule 5 warns about: the defect gets named accurately, in the right place, and the work continues past it as though naming were fixing.
+- THE AGENT HAS NOW RETRACTED THREE THINGS TODAY — two retro findings and a column => True, and all three share one cause: something checkable was reasoned about instead of checked. The retro's two rested on an absent file and an absent string; this one rested on "there is one design" without asking what the design has to decide. The pattern is stable enough to be worth a rule rather than an apology.
+- MAJOR COULD BE OVERCORRECTION, BOUGHT TO LOOK RIGOROUS AFTER BEING CAUGHT => The honest test is whether the M4 and M5 rows have work to do, and they do: three candidate locations for the host's overlay, each with different consequences for the seal and for what an update replaces. If that list were genuinely one item, major would be ceremony and minor would stand. It is not one item.
 - vp-vendoring IS GRADED must AND THE WORK IS GRADED could => Checked, and it is a real inconsistency in the corpus rather than a rhetorical point. uc-vendor-and-overlay is `priority: could`, req-overlay-resolution and req-engine-folder-is-sealed are `should`, req-setup-serves-shipped-method and req-second-product-reuses-install are `could`. The value prop they refine is a MUST whose recorded reason is that quackitect goes open source while company guidance stays inside the company. A must served only by coulds is a gap somebody should rule on; it is raised here and not resolved here.
 
 ## raid_additions
@@ -158,17 +173,19 @@ NO STRIKES PROPOSED. Every row minor keeps is one I want.
 
 ## verdict
 
-pass — at change size minor, with the escalation tell named in advance rather than discovered later.
+pass — at change size MAJOR, corrected from my own minor proposal after the owner challenged it.
 
-WHAT THE PASS RESTS ON. The goals are five requirement-backed lines, each naming the row it serves. The scope is seven items in and seven out, each with its origin or its destination. Every file and line cited was opened this session. The central design input, v1's resolver.go, was read whole at ref main rather than quoted from the record's summary of it — and reading it changed the argument, because `EngineDir()` probes two locations and so the wrapper root need not move.
+WHAT CHANGED THE ANSWER, and it is one check rather than an argument. flow-overlay carries `crosses: in` and no interface carries it — it appears in exactly two files in the corpus. So this iteration mints an interface for certain, and decompose-structure's escalate tell fires rather than probably firing.
 
-WHY minor IS HONEST HERE. It drops seventeen rows of choosing between designs, and there is one design. It keeps every row that guards a build: tests first, red observed, verification, trace-design, sweep-consistency, and three gates.
+AND ONE HOLE THE CHALLENGE EXPOSED. My own round_1 had already recorded that v1's most-specific overlay layer is a per-workspace data home and that v3 has none, then filed it as a detail. It is the design question: where the host's overlay lives has at least three candidate answers, each changing what the seal means and what an update replaces. minor drops both lanes that exist to settle that.
 
-WHAT THE PASS DOES NOT CLAIM. That the tell will not fire at decompose-structure. It probably will, because this iteration ADDS a mechanism, and the cost of escalating late is a re-sign of everything above it.
+WHAT THE PASS RESTS ON, unchanged by the correction. The goals are five requirement-backed lines. The scope is seven items in and seven out with origins and destinations. Every file and line cited was opened this session, and v1's resolver was read whole at ref main.
 
-THE ONE THING LEFT UNCONFIRMED, stated rather than waved: the battery went red on one case during the retro, the cause was a stale test asserting behaviour the window fix removes, it is repaired, and se_test is not legal at this gate. The confirm run is owed at verification.
+WHAT IS NOT CLAIMED. That major is free. It is more states and it will not finish today, against an owner constraint of starting the vehicle tomorrow. The trade is stated rather than hidden: a wrong overlay location found after the build costs more than M4 and M5 cost now.
 
-THE COLUMN IS A PROPOSAL AND THE BLESS IS THE OWNER'S. The method reserves this decision to the person and nothing below this gate assumes an answer.
+THE ONE THING LEFT UNCONFIRMED. The battery went red on one case during the retro, the cause was a stale test asserting behaviour the window fix removes, it is repaired, and se_test is not legal at this gate. The confirm run is owed at verification.
+
+WHAT THIS GATE OWES ITS OWN PROCESS. The red team named this kill-criterion one version ago and did not run it. The owner ran it by asking. That is a defect in the round rather than in the answer, and it is recorded in round_2 rather than smoothed over.
 
 ## follow_up
 
