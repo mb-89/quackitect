@@ -1017,3 +1017,125 @@ only because that script carries a bites-once valve keyed on `stop_hook_active`.
 DO NOT RELY ON MATCHERS IN THE GENERATED FILES. VS Code ignores them, so each
 script reads its own trigger from its payload. Part 12 already says this; it is
 the same fix, and it is what makes one script safe on four surfaces.
+
+## Part 18 — the token bill, and what caching can and cannot do about it
+
+### First, correct the number this report gave
+
+THIS REPORT SAID 43,008 BYTES AND THE OWNER HEARD 40,000 TOKENS. Bytes are not
+tokens. Measured on the wire, 2026-08-18:
+
+| what | bytes | ~tokens | when it is paid |
+| --- | ---: | ---: | --- |
+| `tools/list` | 68,244 | ~18,000 | position 0, every session |
+| the prompt layer | 43,008 | ~11,300 | every turn |
+| **the standing prefix** | **111,252** | **~29,300** | |
+| boot's four documents | 36,911 | ~9,700 | once per session, and again after every compaction |
+
+SO THE INSTINCT WAS RIGHT AND THE ORDER OF MAGNITUDE IS REAL. It is about
+29,000 tokens standing, not 40,000, and not per call — see below.
+
+EVERY TOKEN FIGURE HERE IS AN ESTIMATE at 3.8 bytes per token. The correct
+instrument is the API's own `count_tokens`, never a byte ratio and never a
+third-party tokenizer. **Step one of this milestone is to replace every number
+in this table with a measured one.**
+
+### The good news: it is not paid on every call
+
+PROMPT CACHING IS A PREFIX MATCH over `tools` → `system` → `messages`, and a
+cache read costs about **0.1×** base input against a write at 1.25×. So a
+stable 29,000-token prefix is paid once at 1.25× and then at a tenth of price
+for the rest of the session.
+
+AND THE DOCUMENTS ARE ALREADY IN IT. What the pull serves arrives as tool
+results inside `messages`. Once served, a document is part of the conversation
+prefix and is cached with the rest of the history. So the owner's question —
+can the stuff we read be cached too — is answered YES, and it is already true
+in principle.
+
+THE QUESTION IS THEREFORE NOT HOW TO CACHE IT. It is what keeps breaking the
+prefix, because a broken prefix means all 29,000 tokens are re-processed at
+full price.
+
+### The uncomfortable half: the lever is not ours
+
+WE DO NOT CONTROL `cache_control`. The harness owns the API call and this
+system is an MCP server behind it. We cannot place a breakpoint, cannot choose
+a 5-minute against a 1-hour TTL, and cannot read `usage.cache_read_input_tokens`
+back to see whether any of it worked.
+
+SO THE ONLY LEVER IS SHAPE: make the bytes stable, deterministic and few, and
+let the harness's own caching do the rest. Everything below follows from that.
+
+### The single biggest item, and it is 44% of position zero
+
+THE SAME `update` DESCRIPTION IS SHIPPED 34 TIMES. Every verb carries the
+narration `update` argument, and its description is 888 bytes of identical
+prose repeated once per tool:
+
+- 30,192 bytes of the 46,101 bytes of schema — **65% of all schema**
+- **44% of the entire 68,244-byte `tools/list` payload**
+- roughly **8,000 tokens**, at position 0, in every session
+
+NOTHING IS GAINED BY THE REPETITION. It is the same paragraph 34 times, and it
+renders before anything else in the prompt. Shortening that one string to a
+pointer is the cheapest large win in this whole report, and it is bigger than
+the entire bundling exercise in Part 14.
+
+### Four things break the prefix, and three of them are ours
+
+1. **THE 20-BLOCK LOOKBACK, and this system is the worst case.** A breakpoint
+   walks back at most 20 content blocks looking for a prior entry. A turn that
+   adds more than 20 tool_use/tool_result pairs silently misses, and the whole
+   history is re-processed. THIS SYSTEM'S LOOP IS pull, do, pull again — one
+   turn of the session that wrote this report ran **605 lane calls** between
+   two narration updates. Every turn past 20 blocks pays full price for
+   everything.
+2. **THE TOOL LIST IS DETERMINISTIC BY ACCIDENT, NOT BY TEST.** `tools/list`
+   renders at position 0, and a change there invalidates tools, system AND
+   messages — the only change that costs everything. Ours is served in Map
+   insertion order: stable across runs today, pinned by nothing. A refactor
+   that reorders two registrations silently invalidates every session for
+   everybody. The 2026-07-28 spec says servers SHOULD return tools in
+   deterministic order for exactly this reason. One test closes it.
+3. **THE PROMPT LAYER IS HASH-STAMPED AT THE TOP.** Its generated header
+   carries the content hash of each of the four sources, so editing any
+   guidance file changes bytes at the very front of the projection. That is
+   correct behaviour and worth keeping — but it means every guidance edit costs
+   one full re-prime for every session afterwards, and that cost should be
+   known rather than discovered.
+4. **COMPACTION, and this one is not ours.** It rewrites history, so the prefix
+   is gone. `boot.md` then re-serves the reading, which is another 36,911 bytes.
+
+### What is already right, and must not be "optimised"
+
+- **`tools/list` DOES NOT VARY BY STATE.** States grant tools at dispatch
+  (SE-C-110) and the served list stays whole. Filtering the list per state
+  would look like a saving and would invalidate the entire cache at every
+  transition. Leave it alone.
+- **REFUSALS ARE RESULTS, NOT PROTOCOL ERRORS**, so a refusal costs one block
+  rather than restarting anything.
+- **`engine/bound.ts`** keeps any single answer under a threshold, so no one
+  document floods the window.
+
+### The milestone
+
+1. **MEASURE.** Replace every estimate above using `count_tokens`. Nothing else
+   in this section should be acted on before that.
+2. **CUT POSITION ZERO.** The repeated `update` description first — 44% of the
+   payload, one string. Then the rest of the schema, which is the larger half
+   of `tools/list` and which nobody has looked at.
+3. **PIN THE TOOL ORDER** with a test, so cache invalidation cannot arrive as a
+   side effect of a refactor.
+4. **COUNT BLOCKS PER TURN** against the 20-block window. If the loop routinely
+   exceeds it — and the 605-call turn says it does — the fix is fewer, larger
+   calls, which is the same direction Part 14 already points.
+5. **ASK WHETHER THE READING MUST BE RE-SERVED AFTER A COMPACTION**, or whether
+   the credit can survive one. This is the only item here that trades against
+   correctness, so it is a question rather than a task.
+
+AND ONE STANDING CAUTION. Every number above is about the Claude API's caching
+model. Copilot and the other harnesses cache too, and none of them publish the
+same mechanics. So the honest scope of this milestone is: make the bytes stable
+and few, which helps under every caching scheme, and do not tune for one
+vendor's breakpoints when we cannot even set them.
