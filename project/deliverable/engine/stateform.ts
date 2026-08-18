@@ -1295,35 +1295,7 @@ function refProblems(name: string, meta: TemplateMeta, args: FieldArgs, content:
   return out;
 }
 
-/** COVERAGE IS MUTUAL (owner ruling 2026-08-06) AND BOTH SIDES ARE COMPUTED
- *  (owner ruling 2026-08-16). `covers: value-prop` on a reference field means
- *  two things at once, and neither is a judgment call.
- *
- *  Every referenced node must refine one of the covered type. A story serving
- *  no proposition is work nobody asked for.
- *
- *  And every standing node of that type must be refined by SOMETHING IN THE
- *  CORPUS. A proposition no story serves is a promise nothing shows.
- *
- *  THE SECOND HALF USED TO READ THE AGENT'S LISTING, and that was the defect.
- *  The covered side came from disk and the covering side came from whatever
- *  the agent typed, so the check could be satisfied by naming nodes without
- *  examining any of them.
- *
- *  MEASURED FOUR TIMES ON i6's OWN WALK, 2026-08-16. write-stories cost five
- *  typed names, generalize-use-cases twenty-two, write-requirements
- *  thirty-three, and derive-functions a fifty-five-row table echoed back at
- *  the engine. Nothing was examined on any of them, and the cost of passing
- *  grew with the corpus while the value stayed at zero.
- *
- *  BOTH SETS ARE ON DISK. The nodes are files and every `refines` edge is in
- *  frontmatter, so the engine can enumerate the covering side exactly as it
- *  already enumerates the covered one.
- *
- *  WHAT THE FIELD STILL CARRIES is the one thing the corpus cannot answer:
- *  which nodes THIS delta touched. That is judgment, and it stays.
- *
- *  req-a-coverage-check-computes-both-sides */
+/** see dsp-evidence-forms.md#coverage-is-mutual-and-both-sides-are-computed — req-a-coverage-check-computes-both-sides */
 function coverProblems(name: string, covers: string, refs: string[], byId: Map<string, TraceNode>, corpus: TraceNode[]): string[] {
   if (covers === "" || covers === undefined) return [];
   const out: string[] = [];
@@ -1363,29 +1335,7 @@ const rowId = (cells: string[]): string => (cells[0] ?? "").replace(/^\[\[|\]\]$
  *  minted prompt pass as a claim. */
 const unanswered = (v: string): boolean => v.trim() === "" || /^<!--[\s\S]*-->$/.test(v.trim());
 
-/** A CELL THAT LOST ITS TAIL, recognised by the mark a cut leaves.
- *
- *  A node-table cell lands verbatim on the node's frontmatter. On 2026-08-14
- *  four of this record's experiments reached their nodes ENDING IN AN ELLIPSIS
- *  with the clause that carried the meaning gone, and all four were rewritten
- *  by hand (note-324983b06229).
- *
- *  THIS COMMENT USED TO SAY THE ENGINE WROTE NO ELLIPSIS, and that was wrong
- *  in both halves (found 2026-08-16). engine/forms.ts oneLine cut every
- *  frontmatter value at 200 characters and appended one. The searches this
- *  comment reported missed it because the ellipsis was a TEMPLATE literal
- *  rather than a string literal, and the limit was a bare number rather than
- *  a `maxlength`.
- *
- *  IT MISDIRECTED THREE HUNTS, note-54c7a1cdfc4e and note-567aef4660ba among
- *  them, because a comment asserting the result of a search reads like
- *  evidence and nobody re-runs it. The cut is removed; this stays as the
- *  warning that a recorded search result is not a check.
- *
- *  THE GUARD DOES NOT NEED THE CULPRIT. Whatever cut it, a frontmatter value
- *  that trails off is not an answer, and the one outcome that must not stand
- *  is the SILENT one: the form shows the whole text, the node carries a
- *  fragment, and the ellipsis reads as style rather than as loss. */
+/** see dsp-evidence-forms.md#a-cell-that-lost-its-tail */
 const LOST_ITS_TAIL = /(?:…|\.\.\.)\s*$/;
 
 /** THE VOICE LINT AT SUBMIT, and the card decides which of its rules BITE.
@@ -1621,20 +1571,7 @@ export function fieldProblems(
     const missing = args.items.filter((i) => !new RegExp(`^- ${escapeRe(i)}: .+`, "m").test(content));
     if (missing.length > 0) out.push(`${name}: unanswered — ${missing.join(" · ")}`);
   }
-  // CHECKING IS THE CLAIM (owner ruling 2026-08-11): a checklist refuses
-  // while any named item stands unchecked. There is no text to write — the
-  // deliberate click is the record, and an unchecked box is work still owed.
-  //
-  // A THIRD STATE, FOR WHAT CANNOT BE HONESTLY OBSERVED (owner ruling
-  // 2026-08-13). The `none` door below solves the same shape of problem for
-  // an empty set: rather than fabricate a row, write an honest claim of a
-  // different shape. `- [owed] <item> — <ref>` does the same for one claim
-  // an unattended agent cannot check — <ref> MUST resolve to an OPEN entry
-  // in the raid register, so the debt is addressed to someone with a
-  // trigger, not merely declared. It never counts as checked; a missing or
-  // unresolved ref refuses exactly like an unchecked box, because today the
-  // only honest alternative to an owed box is a stall — and this is
-  // strictly more information than a tick.
+  // see dsp-evidence-forms.md#checking-is-the-claim-and-owed-is-the-third-state
   if (meta.editor === "checklist" && args.items.length > 0) {
     const lines = new Set(content.split("\n").map((l) => l.trim()));
     const unmet = args.items.flatMap((i) => {
@@ -2253,27 +2190,7 @@ export function compoundingSuspectPairs(traceRoot: string): [string, string][] {
  *  that fails the demand buy that failure back elsewhere. */
 export function criterionAxisItems(traceRoot: string): string[] {
   const pool = poolNodes(traceRoot).filter((n) => nodeField(n.file as string, "priority") !== "must");
-  // THE HINT ORDER, and it is the difference between 149 questions and 873.
-  // Taken most-important-first, every item is PREDICTED to be the new bottom
-  // of the chain, so the walk's one probe is the question most likely to be
-  // confirmed. A wrong hint costs one question, never a wrong answer.
-  //
-  // DAMAGE LEADS IT (owner report 2026-08-08). Ordered from MoSCoW alone, a
-  // response-time requirement came out above the foundations of the system —
-  // and no amount of pairwise comparison discovers that, because the
-  // comparison never reads what breaks. Every requirement already carries that
-  // line; `breaks_how_badly` grades it, and the grade leads the sort.
-  //
-  // IT IS A HINT, NOT THE ANSWER. The walk still settles the order and a
-  // person still overrules any pair. This only decides where it starts.
-  //
-  // AN UNGRADED ROW SORTS IN THE MIDDLE. Not last, or every row written before
-  // the scale existed would sink beneath rows nobody has thought about; not
-  // first, or leaving it blank would be the way to the top.
-  //
-  // THE LEVELS ARE READ FROM THE CARD, never listed here. meth-damage-scale is
-  // their only home and the order in it IS the severity order — the catalogue
-  // guard refuses a copy in the engine, and it caught this one.
+  // see dsp-evidence-forms.md#the-hint-order
   const damageLevels = catalogItems(traceRoot, "damage_levels");
   const middle = Math.floor(damageLevels.length / 2);
   const pull = registerPull(traceRoot);

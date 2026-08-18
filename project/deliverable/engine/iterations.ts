@@ -285,25 +285,7 @@ export function generateSeeded(_root: string, it: Iteration, machineId: string, 
     };
   });
   if (chunks.length === 0) {
-    // THE SCAFFOLD USED TO READ AS AN AUTHORED NONE, and a whole build was
-    // skipped that way, in silence, on 2026-08-13. The pin writes
-    // `none: "<SCAFFOLD_NONE>"` so the ROUTE stays drawable before the
-    // authoring state has run, and this branch then served the run state as a
-    // bare start-to-end pill that walked through without a word.
-    //
-    // REFUSING HERE IS STILL THE WRONG SEAM. drawnsub.test.ts pins that the
-    // placeholder must RESOLVE, because the machine view has to draw a route
-    // through a sub-machine nobody has authored yet. Two tests refused that
-    // refusal, and they were right to.
-    //
-    // SO THE DECL IS MARKED INSTEAD, and session.ts seedSubs refuses to WALK
-    // INTO a marked one. Drawing and routing stay legal; entering does not.
-    // That is the seam the earlier note prescribed.
-    //
-    // AN EXPLICIT NONE passes the run state without ceremony — zero spikes
-    // is a normal outcome when the drawing says WHY (the explicit-absence law).
-    // Only the scaffold's own literal is marked, so an authored none is
-    // untouched.
+    // see dsp-record-lifecycle.md#an-unauthored-sub-machine-may-be-drawn-never-entered
     if (typeof fm.none === "string" && fm.none.trim() !== "") {
       const decl: MachineDecl = {
         id: machineId,
@@ -447,13 +429,7 @@ export function generateSeeded(_root: string, it: Iteration, machineId: string, 
  *  drift apart. */
 const SIZE_ORDER = CHANGE_COLUMNS as readonly string[];
 
-/** THE PIN (owner verdicts 2026-07-30): the kickoff bless compiles the
- *  blessed change size from the LIVE rigor matrix and pins the machine into
- *  the record with its content hash. Rigor matrix edits reach the NEXT
- *  kickoff, never a running walk; drift stays silent until asked.
- *  Escalation = re-pinning with a LARGER size — monotonicity guarantees
- *  every filled state survives. De-escalation is refused: a prediction
- *  that proved too big is finished at its size. */
+/** see dsp-record-lifecycle.md#the-pin-and-what-reopens-under-it */
 export function pinIteration(root: string, it: Iteration, changeSize: string): Record<string, unknown> {
   if (!(CHANGE_COLUMNS as readonly string[]).includes(changeSize)) {
     throw new Rejection({
@@ -603,21 +579,7 @@ function structural(evidence: string): string {
   return evidence;
 }
 
-/** REOPEN (owner verdict 2026-07-30): a filled step survives only while its
- *  demand stands. applies stepped UP, or the evidence spec changed — the step
- *  reopens and its evidence is re-earned. Guidance-only wording never reopens,
- *  and a WEAKENED demand never does either: what was filed already covers it.
- *
- *  Only steps the previous ledger knew are compared. A step that did not exist
- *  then is not in the pinned machine, so there is nothing there to reopen, and
- *  an escalation must reopen exactly what GREW rather than everything the
- *  bigger column added.
- *
- *  THE STEP'S SHAPE COUNTS AS WELL AS ITS DEMAND (owner ruling 2026-08-13). A
- *  row that gains a dependency changes where the walk may go, and a pin taken
- *  before that change would keep walking past a state the column now requires.
- *  Seen live: build-steps was given its dependency on the state that seeds its
- *  drawing, and i3 walked straight past it because no demand had moved. */
+/** see dsp-record-lifecycle.md#the-pin-and-what-reopens-under-it */
 export function movedDemands(prev: Record<string, StepDemand>, now: Record<string, StepDemand>): string[] {
   return Object.keys(prev)
     .filter((id) => {
@@ -740,14 +702,7 @@ export function generateIterations(root: string): GeneratedMachine {
   } catch {
     open = [];
   }
-  // THE CONTAINER'S FIRST STATE IS THE SELECTION (owner ruling 2026-08-16,
-  // asked for three times). It keeps the START kind, so nothing about the
-  // machine's mechanics changes, and it takes the name of the job it does.
-  //
-  // IT IS THE SAME STATE, RENAMED, RATHER THAN A NEW ONE IN FRONT. A separate
-  // select state one hop past start was built first and measured: the walk
-  // ARRIVES at a container by landing on its initial state, so the offer stood
-  // one hop ahead of where the walk stopped and came back empty.
+  // see dsp-record-lifecycle.md#the-containers-first-state-is-the-selection
   const select: StateDecl = {
     id: "select",
     kind: "start",
@@ -763,25 +718,7 @@ export function generateIterations(root: string): GeneratedMachine {
   const expByState: Record<string, string> = {};
   const subGen: Record<string, () => GeneratedMachine> = {};
 
-  // THE CONTAINER IS A DAG, NEVER A STACK (owner ruling 2026-08-12, from a
-  // screenshot of twenty-four iterations drawn as one vertical chain).
-  //
-  // The chain was a LAYOUT artifact, not a declaration one: the decl already
-  // fanned start to every iteration and every iteration to end, and the canvas
-  // was then hand-built by stacking boxes down one axis. So the drawing said
-  // "series" while the machine meant "parallel", which is the worst pairing —
-  // the reader believes the picture.
-  //
-  // Now `depends_on` in the record drives the edges, and pinnedCanvas lays the
-  // result out. That buys BOTH halves at once:
-  //   - INDEPENDENT ITERATIONS SIT SIDE BY SIDE, because the layout rows states
-  //     by dependency depth.
-  //   - AN ITERATION WHOSE DEPENDENCY IS UNMET CANNOT BE ENTERED, because the
-  //     walk never enters a state whose inbound edges have not fired. No new
-  //     guard, no second rule to keep in step with the drawing.
-  //
-  // A SHIPPED DEPENDENCY STOPS CONSTRAINING. Only OPEN iterations are wired, so
-  // closing one frees everything waiting on it on the next paint.
+  // see dsp-record-lifecycle.md#the-container-is-a-dag-never-a-stack
   const openIds = new Set(open.map((it) => itShortId(it.id)));
   const declared = new Map<string, string[]>();
   for (const it of open) {
@@ -878,23 +815,7 @@ export function generateIterations(root: string): GeneratedMachine {
   // has nothing to starve. Every iteration state still feeds `end` as `normal`,
   // so the inbound set is mixed by design, not by oversight.
   const rootRole = "alternative" as const;
-  // LEAVING IS A DRAWN DOOR, AND IT COMES FIRST. This is the whole defect.
-  //
-  // Before this, the container had NO exit that did not pass through an
-  // iteration: its first state fanned to the open records, and each record's
-  // only edge ran to `end`. So a route to anywhere outside — the front desk,
-  // idle, a retro — could only be drawn THROUGH an iteration, and drawing it
-  // is what entered it.
-  //
-  // THAT IS THE FIVE ENTRIES INTO i4 ON 2026-08-16, and it explains why every
-  // one happened on a bare recovery pull. The standing target was the front
-  // desk. The only way the router could reach it was through the first record
-  // on the list, and entering BINDS that record and stamps it started.
-  //
-  // FIRST IN THE EDGE LIST IS NOT COSMETIC. `tryMove` walks the edges in order
-  // and takes the first whose role is authored, so edge order IS the default
-  // when nothing chose. The default must be to leave, never to take up work
-  // nobody picked.
+  // Edge order is the default. see dsp-record-lifecycle.md#leaving-is-a-drawn-door-and-it-comes-first
   select.edges.push({ to: "end", role: rootRole });
   for (const sid of roots) select.edges.push({ to: sid, role: rootRole });
   states.push({
@@ -1045,22 +966,7 @@ interface LayoutCtx {
   els: Map<string, CanvasElement>;
 }
 
-/** A STATE SITS UNDER ITS INPUTS (owner ruling 2026-08-06).
- *
- *  Every row used to be centred on the axis, whatever fed it. A row of three
- *  above a row of one put the lone dependant under the MIDDLE of the three —
- *  whoever that happened to be — and drew its real parent's arrow straight
- *  past it. A reader cannot tell that picture from a join, which is the exact
- *  confusion the busbar exists to remove.
- *
- *  It bit generalize-use-cases in M2: one input, write-stories, and it drew
- *  under map-stakeholders with write-stories' arrow running through.
- *
- *  So each node WANTS the mean centre of its already-placed inputs, and one
- *  input means it lands squarely under that input. Wants collide, so the row
- *  is laid out in want order with the gap enforced, then shifted so its own
- *  centre lands where the wants averaged. A row whose inputs are not placed
- *  yet — the start pill, the first row of a group — keeps the old centring. */
+/** see dsp-record-lifecycle.md#a-state-sits-under-its-inputs */
 function placeRow(ctx: LayoutCtx, row: StateDecl[], atY: number, inputsOf?: Map<string, string[]>): number {
   const sized = row.map((s) => ({
     s,

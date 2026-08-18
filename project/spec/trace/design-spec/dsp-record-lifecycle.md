@@ -93,3 +93,110 @@ merge, which aborts cleanly and says so.
 KEEPING TRUNK CLEAN IS WHAT KEEPS THE READ-PROOF HONEST. A dirty trunk is
 exactly when the tree the lane serves and the tree the proof hashes drift
 apart.
+
+## The pin, and what reopens under it
+
+THE KICKOFF BLESS COMPILES the blessed change size from the LIVE rigor matrix
+and pins that machine into the record with its content hash. Matrix edits reach
+the NEXT kickoff, never a running walk, and drift stays silent until asked.
+
+ESCALATION IS RE-PINNING WITH A LARGER SIZE. Monotonicity guarantees every
+filled state survives. DE-ESCALATION IS REFUSED: a prediction that proved too
+big is finished at its size.
+
+A FILLED STEP SURVIVES ONLY WHILE ITS DEMAND STANDS. If the applies stepped up
+or the evidence spec changed, the step reopens and its evidence is re-earned.
+Guidance-only wording never reopens, and a WEAKENED demand never does either —
+what was filed already covers it.
+
+ONLY STEPS THE PREVIOUS LEDGER KNEW ARE COMPARED. A step that did not exist
+then is not in the pinned machine, so there is nothing there to reopen, and an
+escalation must reopen exactly what GREW rather than everything the bigger
+column added.
+
+THE STEP'S SHAPE COUNTS AS WELL AS ITS DEMAND. A row that gains a dependency
+changes where the walk may go, and a pin taken before that change would keep
+walking past a state the column now requires. Seen live: build-steps was given
+its dependency on the state that seeds its drawing, and a walk went straight
+past it because no demand had moved.
+
+## The container is a DAG, never a stack
+
+FOUND IN A SCREENSHOT of twenty-four iterations drawn as one vertical chain.
+
+THE CHAIN WAS A LAYOUT ARTIFACT, NOT A DECLARATION ONE. The declaration
+already fanned start to every iteration and every iteration to end; the canvas
+was hand-built by stacking boxes down one axis. So the drawing said "series"
+while the machine meant "parallel", which is the worst pairing — the reader
+believes the picture.
+
+`depends_on` NOW DRIVES THE EDGES and the layout follows. That buys both
+halves at once:
+
+- INDEPENDENT ITERATIONS SIT SIDE BY SIDE, because the layout rows states by
+  dependency depth.
+- AN ITERATION WHOSE DEPENDENCY IS UNMET CANNOT BE ENTERED, because the walk
+  never enters a state whose inbound edges have not fired. No new guard, and no
+  second rule to keep in step with the drawing.
+
+A SHIPPED DEPENDENCY STOPS CONSTRAINING. Only open iterations are wired, so
+closing one frees everything waiting on it on the next paint.
+
+## Leaving is a drawn door, and it comes first
+
+BEFORE THIS THE CONTAINER HAD NO EXIT that did not pass through an iteration.
+Its first state fanned to the open records, and each record's only edge ran to
+the end. So a route to anywhere outside — the front desk, idle, a retro — could
+only be drawn THROUGH an iteration, and drawing it is what entered it.
+
+THAT IS FIVE UNINTENDED ENTRIES INTO ONE RECORD IN A DAY, and it explains why
+every one happened on a bare recovery pull. The standing target was the front
+desk; the only way the router could reach it was through the first record on
+the list, and entering BINDS that record and stamps it started.
+
+FIRST IN THE EDGE LIST IS NOT COSMETIC. The mover walks the edges in order and
+takes the first whose role is authored, so edge order IS the default when
+nothing chose. The default must be to leave, never to take up work nobody
+picked.
+
+## The container's first state is the selection
+
+IT KEEPS THE START KIND, so nothing about the machine's mechanics changes, and
+it takes the name of the job it does.
+
+IT IS THE SAME STATE RENAMED, rather than a new one in front. A separate select
+state one hop past start was built first and measured: the walk ARRIVES at a
+container by landing on its initial state, so the offer stood one hop ahead of
+where the walk stopped and came back empty.
+
+## A state sits under its inputs
+
+EVERY ROW USED TO BE CENTRED ON THE AXIS, whatever fed it. A row of three above
+a row of one put the lone dependant under the MIDDLE of the three — whoever
+that happened to be — and drew its real parent's arrow straight past it. A
+reader cannot tell that picture from a join, which is the exact confusion the
+busbar exists to remove.
+
+SO EACH NODE WANTS THE MEAN CENTRE of its already-placed inputs, and one input
+means it lands squarely under that input. Wants collide, so the row is laid out
+in want order with the gap enforced, then shifted so its own centre lands where
+the wants averaged. A row whose inputs are not placed yet keeps the old
+centring.
+
+## An unauthored sub-machine may be drawn, never entered
+
+THE SCAFFOLD USED TO READ AS AN AUTHORED NONE, and a whole build was skipped
+that way, in silence. The pin writes a placeholder so the ROUTE stays drawable
+before the authoring state has run, and the run state was then served as a bare
+start-to-end pill that walked through without a word.
+
+REFUSING AT THE DRAWING IS THE WRONG SEAM. The placeholder must RESOLVE,
+because the machine view has to draw a route through a sub-machine nobody has
+authored yet. Two tests refused that refusal and were right to.
+
+SO THE DECLARATION IS MARKED INSTEAD, and the walk refuses to enter a marked
+one. Drawing and routing stay legal; entering does not.
+
+AN EXPLICIT NONE PASSES WITHOUT CEREMONY. Zero spikes is a normal outcome when
+the drawing says why. Only the scaffold's own literal is marked, so an authored
+none is untouched.

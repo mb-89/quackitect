@@ -2503,17 +2503,7 @@ if (svg) {
   window.addEventListener("mouseup", () => { if (panning) saveVb(); panning = null; svg.classList.remove("panning"); });
 }
 
-// A PANE THE READER SIZED KEEPS THAT SIZE (owner ruling 2026-07-28).
-//
-// Walking into a sub-state is a full page load, and a width set by dragging
-// is an inline style, which no page load survives. So every entry into a
-// sub-machine snapped the whole layout back to its defaults — the machine
-// drawing included, because it takes whatever the two columns leave it.
-//
-// A pane size is a PREFERENCE, not a view of something: it is about how the
-// reader likes to work, not about which machine is on screen. So it outlives
-// the tab in localStorage, while the per-machine viewBox stays in
-// sessionStorage, where a view of one drawing belongs.
+// see dsp-mirror-render.md#the-reader-keeps-their-pane
 const PANE_KEY = "se-pane-";
 function savePaneSize(pane, axis, px) {
   try { localStorage.setItem(PANE_KEY + pane.id + "-" + axis, String(Math.round(px))); } catch (e) { /* storage full — the pane just re-defaults */ }
@@ -2856,15 +2846,7 @@ async function showUpdateDetail(rec) {
   }
   showDetails("update · " + rows.op + (a.node ? " " + a.node : ""), html);
 }
-// FEEDBACK WITHIN A SECOND (owner law 2026-07-28): anything that can take
-// longer shows loading feedback at once.
-//
-// THE BAR OWNS ITS LIFETIME (owner ruling 2026-07-28). It used to rely on
-// the navigation that followed to replace the whole page. Morphing then
-// replaced navigation, and a bar nobody hid simply stayed up. A bar that
-// outlives its load is worse than none: the reader learns to ignore it, and
-// it can no longer warn them when something really is slow. So every load
-// carries a token, settles exactly once, and cannot outlive its deadline.
+// see dsp-mirror-render.md#the-loading-bar-owns-its-lifetime
 let loadToken = 0;
 let loadTimer = null;
 // A HOST DRAWS ITS OWN PROGRESS. Framed inside an editor, the host already
@@ -3159,17 +3141,7 @@ function sessionOver(why) {
 }
 if (D.describe.status === "closed") sessionOver("the machine reached end — the walk is complete");
 
-// THE MIRROR IS PUSHED, NOT POLLED (owner ruling 2026-07-28). The walk
-// wakes every held hand, and /events forwards that wake here — so a change
-// lands at once instead of up to a poll late. EventSource reconnects by
-// itself; a reconnect after silence is how an engine swap arrives without
-// an F5, and a silence that never ends is death.
-// THE PING (owner, 2026-07-30): the agent points, the surface lights yellow
-// and STAYS lit while the guide talks about it. Pointing somewhere else puts
-// the old one out, so exactly ONE surface is lit at a time.
-// Lookup order: a card id, the widget a card shows, a raw element id, a
-// drawn state node. The widget name is accepted because a card's id is its
-// slugged TITLE, and the two rarely match.
+// see dsp-mirror-render.md#pushed-never-polled
 let lastPingSeq = 0;
 let litTarget = null;
 function findPingEl(target) {
@@ -3362,25 +3334,7 @@ async function bootTerminal() {
     m.remove();
     return { w: r.width / 100, h: r.height };
   };
-  // THE FLICKER IS A 2-CYCLE (owner report 2026-07-28, second round). The
-  // first fix refused a resize that changed NOTHING, which only ever catches
-  // a fixed point. The real loop alternated between two sizes, so every step
-  // differed from the one before it and the guard never fired.
-  //
-  // What drove it: clientWidth INCLUDES the pane's padding, so the grid was
-  // computed about three columns too wide. xterm laid out wider than its
-  // content box, the pane grew a scrollbar, clientWidth shrank, the grid
-  // narrowed, the scrollbar went away, and it started again.
-  //
-  // Three guards, each killing one link. The pane no longer scrolls (CSS),
-  // so a child can no longer change the parent's client box. The grid is
-  // measured against the CONTENT box, so xterm fits what it was given. And
-  // after our own resize the observer is ignored until the relayout has
-  // landed, with one trailing look so a drag that ends inside that window
-  // is not lost.
-  //
-  // Subtracting the padding is also what restores the 80 columns the left
-  // column is sized for — 650px minus 20px still measures 80 cells at 13px.
+  // see dsp-mirror-render.md#the-terminal-flicker-was-a-2-cycle
   const inner = () => {
     const s = getComputedStyle(pane);
     return {
@@ -3434,24 +3388,7 @@ function widgetHead(title: string, widgetId: string, url: string): string {
   return `<div class="widget-head"><span>${esc(title)}</span><button class="expand" data-widget="${widgetId}" data-url="${esc(url)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></div>`;
 }
 
-/** THE NATIVE SKIN (owner ruling 2026-07-30). Docked inside a host, this is
- *  not our own window any more, so it stops looking like one: square
- *  corners, the host's fonts, the host's palette. Our own look belongs to
- *  the standalone mirror. Semantic colours stay ours everywhere.
- *
- *  A SOLO card drops its head and its frame — the host already draws a
- *  titled, bordered pane around it, and two frames read as a bug.
- *
- *  THE HOST OWNS THE WALK'S CONTROLS when embedded (owner ruling 2026-07-30).
- *  The sliders and escape steer the whole walk and a card may be closed, so
- *  they belong to the host's sidebar rather than to any one card.
- *
- *  THE CRUMBS ARE NOT CONTROLS. They navigate the DRAWING — which machine is
- *  on screen — so they stay with the drawing.
- *
- *  ESCAPE STAYS TOO (owner ruling 2026-07-30), and lives ONLY here: it acts
- *  on the walk the drawing shows, and repeating it in the host's sidebar
- *  would be the same control in two places. */
+/** see dsp-mirror-render.md#the-native-skin */
 const NATIVE = `
   body { font-family: var(--vscode-font-family, ui-monospace, Consolas, monospace); }
   /* THE HOST ALREADY NAMES THESE MEANINGS, so they are taken from its theme
@@ -3593,16 +3530,7 @@ function drawingSets(
   // until its authoring state has run, and asking the resolver is the only way
   // to know — the declaration alone says nothing about whether it exists.
   const openIds = new Set([...subIds].filter((id) => m.session.viewFor(id) !== undefined));
-  // A WALKED SUB-MACHINE MUST NOT LOOK UNSTARTED (owner report 2026-08-09:
-  // from trunk, i1 read "not done" though every claim under its last gate
-  // stood signed). A container and an end carry no claim of their own, and
-  // the live run that used to colour them dies with the engine — so their
-  // green is DERIVED via recordComplete, below.
-  // A CONTAINER'S GREEN IS THE SESSION'S, NOT THE RENDERER'S (owner ruling
-  // 2026-08-09). recordDone already answers for it, and it answers with the
-  // ripple applied — so a container whose own inputs are grey stays grey.
-  // Painting it here from its interior alone was the second rule, and it drew
-  // enumerate-space green above a grey derive-criteria.
+  // see dsp-mirror-render.md#a-walked-sub-machine-must-not-look-unstarted
   const rc = new Map<string, boolean>();
   if (decl.states.some((s) => s.kind === "end") && recordComplete(m, decl, rc, paint)) {
     for (const s of decl.states) if (s.kind === "end") paint.add(s.id);
