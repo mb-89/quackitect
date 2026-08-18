@@ -9,8 +9,8 @@
 //
 // State is in-memory: a server restart mid-session drops back to start, and
 // the next refused call's remedy re-boots the agent in one turn.
-import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
-import { dirname, join, relative, sep } from "node:path";
+import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
 import {
@@ -27,7 +27,6 @@ import {
   type StateDecl,
 } from "./machine.ts";
 import { bumpDrawingEpoch, compileMachine, compileMachineCached, resolveRef } from "./machines/compile.ts";
-import { chartPlan } from "./morphbox.ts";
 import { computeRoute, type RouteNode, type RouteResult, type RouteStep, routeWraps } from "./route.ts";
 
 /** see dsp-walk-machine.md#the-state-a-recorded-visit-names */
@@ -37,7 +36,6 @@ export function visitState(visit: string): string {
 
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { mintScenarioLines } from "./atamwalk.ts";
 import { CallLog } from "./calllog.ts";
 import type { CanvasData } from "./canvas.ts";
 import { conditionNotePath } from "./conditions.ts";
@@ -88,13 +86,13 @@ import {
 } from "./iterations.ts";
 import { parseStateNote, readNode, section, withPass, writeNode } from "./notes.ts";
 import { pathKind, resolveInRoot, seDir } from "./paths.ts";
-import { mintFlipLines } from "./pugh.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { probesMissed, readingProbes } from "./readproof.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { anyJobRunning } from "./run.ts";
 import { defaultAutonomy, levelName, loadLevels, loadStopAt, notchName, tierOf, valueFor, weightName } from "./scale.ts";
 import { requiredDependsOn } from "./seed.ts";
+import { bindChart, bindView, mintFlipTripwires, mintScenarioEntries, refFacts, refPaths } from "./sessionforms.ts";
 import {
   buildPortableForm,
   chosenOption,
@@ -3529,43 +3527,10 @@ export class Session {
   }
 
   /** see dsp-walk-machine.md#every-trace-nodes-id-against-the-path-that-holds */
-  private traceRoot(it?: Iteration): string {
+  /** INTERNAL to the session pair. sessionforms.ts takes these paths as an
+   *  argument, and a private member cannot satisfy a structural interface. */
+  traceRoot(it?: Iteration): string {
     return it?.path ?? this.workRoot();
-  }
-
-  private refPaths(it?: Iteration): Record<string, string> {
-    const out: Record<string, string> = {};
-    const root = this.traceRoot(it);
-    try {
-      // THE PATH IS WRITTEN FROM THE PROJECT ROOT, because the HOST opens it
-      // from there. A node living in a record's worktree comes out under
-      // .worktrees/, which opens. The record-relative path LOOKED right and
-      // pointed into the wrong tree, so every link on an open record's form
-      // reported a file that is not there.
-      for (const n of loadTrace(root)) {
-        if (n.file !== undefined) out[n.id] = relative(this.machineRoot(), n.file).split(sep).join("/");
-      }
-    } catch {
-      // no corpus, no links — the ids still read
-    }
-    // THE METHOD CARDS TOO, so a [[link]] in guidance is a link. A pointer
-    // the reader cannot follow is decoration: it costs a line, teaches the
-    // name of a file, and leaves them to find it by hand.
-    for (const dir of ["methods", "items", "forms/templates", "lint"]) {
-      const abs = join(this.machineRoot(), "project", "deliverable", "machines", ...dir.split("/"));
-      try {
-        for (const e of readdirSync(abs)) {
-          if (!e.endsWith(".md")) continue;
-          const id = e.replace(/\.md$/, "");
-          // A TRACE NODE WINS. Its path is the record's own copy, and that is
-          // the one the reader means when both exist.
-          if (out[id] === undefined) out[id] = `project/deliverable/machines/${dir}/${e}`;
-        }
-      } catch {
-        // a folder that is not there contributes nothing
-      }
-    }
-    return out;
   }
 
   /** see dsp-walk-machine.md#the-idpath-map-for-a-documents-own-record */
@@ -3578,64 +3543,10 @@ export class Session {
           : itList(this.machineRoot())
               .filter((x) => x.open)
               .find((x) => x.id === m[1]);
-      return this.refPaths(own);
+      return refPaths(this, own);
     } catch {
       return {};
     }
-  }
-
-  /** WHAT A CARD NEEDS TO JUDGE BY, per node. The statement is what the row
-   *  demands; breaks_if_removed is what losing it costs. Those two carry the
-   *  judgment, and everything else is one click away behind the link. */
-  private refFacts(it?: Iteration): Record<string, { statement: string; breaks_if_removed: string; name: string; coupling: string }> {
-    const out: Record<string, { statement: string; breaks_if_removed: string; name: string; coupling: string }> = {};
-    try {
-      for (const n of loadTrace(this.traceRoot(it))) {
-        if (n.file === undefined) continue;
-        out[n.id] = {
-          statement: n.statement,
-          breaks_if_removed: nodeField(n.file, "breaks_if_removed"),
-          name: nodeField(n.file, "name"),
-          coupling: nodeField(n.file, "coupling"),
-        };
-      }
-    } catch {
-      // no corpus, no facts — the card still renders its ids
-    }
-    return out;
-  }
-
-  /** The READ half of a bound field: one line per listed node, carrying that
-   *  node's own frontmatter value. Empty where the node has none, which is
-   *  precisely what makes the per-item check refuse the submit. */
-  private bindView(
-    s: StateDecl,
-    model: { field_args: Record<string, { items: string[]; columns: string[] }> },
-    m: MachineDecl,
-  ): Record<string, string> {
-    const bound = s.evidence_form.filter((f) => f.template === "node-table");
-    if (bound.length === 0) return {};
-    const byId = new Map(loadTrace(this.traceRoot(this.declIteration(m))).map((n) => [n.id, n]));
-    const out: Record<string, string> = {};
-    for (const f of bound) {
-      const cols = model.field_args[f.name]?.columns ?? [];
-      const head = [`| ${f.of ?? "node"} | ${cols.join(" | ")} |`, `| ${["---", ...cols.map(() => "---")].join(" | ")} |`];
-      const rows = (model.field_args[f.name]?.items ?? []).map((id) => {
-        const file = byId.get(id)?.file;
-        // A LIST-VALUED KEY reads empty through the scalar reader, so the
-        // list reader answers where the scalar one has nothing — joined
-        // with · for the one-line cell, split on it by the write half.
-        const cells = cols.map((c) => {
-          if (file === undefined) return "";
-          const scalar = nodeField(file, c);
-          const v = scalar !== "" ? scalar : nodeList(file, c).join(" · ");
-          return v.replace(/\|/g, "\\|");
-        });
-        return `| [[${id}]] | ${cells.join(" | ")} |`;
-      });
-      out[f.name] = [...head, ...rows].join("\n");
-    }
-    return out;
   }
 
   stateFormGet(name: string, m: MachineDecl = this.currentMachine()): Record<string, unknown> {
@@ -3676,7 +3587,7 @@ export class Session {
     // and the lines now come from the register — so the state stands exactly
     // while every standing node carries its frontmatter, which is the claim
     // the state was making all along.
-    const boundFills = this.bindView(s, model, m);
+    const boundFills = bindView(this, s, model, m);
     Object.assign(fills, boundFills);
     // THE FORM'S OWN RECORD, not the session's binding. The mirror renders an
     // iteration's form from the desk with nothing bound, so resolving against
@@ -3693,11 +3604,11 @@ export class Session {
       // A REFERENCE IS AN ADDRESS, so the surface can open it. Without the
       // path the reader sees an id and has to go hunting for the file it
       // names, which is the whole reason references were hard to review.
-      ref_paths: this.refPaths(forIt),
+      ref_paths: refPaths(this, forIt),
       // AND THE FACTS BEHIND THEM. A card asking which of two rows matters
       // more cannot be answered from two ids, and opening both notes for
       // every question is how a sixty-pair pass becomes a two-hour errand.
-      ref_facts: this.refFacts(forIt),
+      ref_facts: refFacts(this, forIt),
       machine: m.id,
       checked: this.stateFormChecked(raw),
       active: this.stateFormActive(name, m),
@@ -3977,7 +3888,8 @@ export class Session {
   }
 
   /** see dsp-walk-machine.md#the-iteration-this-machine-belongs-to */
-  private declIteration(decl: MachineDecl): Iteration | undefined {
+  /** INTERNAL to the session pair — see traceRoot above. */
+  declIteration(decl: MachineDecl): Iteration | undefined {
     if (decl.id === this.machine.id) return undefined;
     try {
       const open = itList(this.machineRoot()).filter((x) => x.open);
@@ -4426,7 +4338,7 @@ export class Session {
     // away (owner ruling 2026-08-08).
     const charted: string[] = [];
     for (const f of s.evidence_form.filter((x) => x.template === "morph-box" && fields[x.name] !== undefined)) {
-      charted.push(...this.bindChart(String(fields[f.name]), m));
+      charted.push(...bindChart(this, String(fields[f.name]), m));
     }
     const bound = s.evidence_form.filter((f) => f.template === "node-table" && fields[f.name] !== undefined);
     if (bound.length === 0) return charted;
@@ -4479,54 +4391,6 @@ export class Session {
       }
     }
     return touched.concat(charted);
-  }
-
-  /** see dsp-walk-machine.md#the-charts-lines-are-notes */
-  private bindChart(content: string, m: MachineDecl): string[] {
-    const nodes = loadTrace(this.traceRoot(this.declIteration(m)));
-    const byId = new Map(nodes.map((n) => [n.id, n]));
-    const plan = chartPlan(
-      content,
-      nodes.filter((n) => n.type === "candidate").map((n) => n.id),
-    );
-    // THE FOLDER IS DERIVED FROM A SIBLING, never guessed. A record owns its
-    // trace in its own worktree, so the only reliable answer is where the
-    // options already sit.
-    const sibling = nodes.find((n) => n.type === "option" && n.file !== undefined)?.file;
-    const folder = sibling === undefined ? undefined : join(dirname(dirname(sibling)), "candidate");
-    const touched: string[] = [];
-    for (const w of plan.write) {
-      const file = byId.get(w.id)?.file ?? (folder === undefined ? undefined : join(folder, `${w.id}.md`));
-      if (file === undefined) continue;
-      let raw = existsSync(file)
-        ? readFileSync(file, "utf8")
-        : ["---", `id: ${w.id}`, 'type: "[[candidate]]"', "name:", "statement:", "picks:", "---", "", "## Why this one", "", ""].join("\n");
-      raw = withFrontmatter(raw, "name", w.name);
-      raw = withFrontmatter(raw, "statement", w.statement);
-      // PICKS IS A LIST, SO IT IS WRITTEN AS ONE. The item card declares a
-      // block, and a comma-joined scalar reads back as a single pick.
-      raw = withFrontmatterList(
-        raw,
-        "picks",
-        w.picks.map((p) => `[[${p}]]`),
-      );
-      mkdirSync(dirname(file), { recursive: true });
-      writeFileSync(file, raw, "utf8");
-      touched.push(w.id);
-    }
-    for (const id of plan.remove) {
-      const file = byId.get(id)?.file;
-      if (file === undefined) continue;
-      unlinkSync(file);
-      touched.push(id);
-    }
-    for (const p of plan.prune) {
-      const file = byId.get(p.id)?.file;
-      if (file === undefined) continue;
-      writeFileSync(file, withFrontmatter(readFileSync(file, "utf8"), "pruned_because", p.why), "utf8");
-      touched.push(p.id);
-    }
-    return touched;
   }
 
   /** see dsp-walk-machine.md#one-owed-cell */
@@ -4623,123 +4487,6 @@ export class Session {
     return this.stateFormSave(name, { [field]: current === "" ? line : `${current}\n${line}` }, by, m);
   }
 
-  /** see dsp-the-goal-binds-the-walk.md#the-scenario-walks-at-risk-and-unaddressed-verdicts-become-register */
-  private mintScenarioEntries(fields: Record<string, string>, m: MachineDecl, by: string): void {
-    const traceRoot = this.traceRoot(this.declIteration(m));
-    const gradeOf = (req: string): string => {
-      const fm = noteOf(join(traceDir(traceRoot), "requirement", `${req}.md`))?.frontmatter;
-      return typeof fm?.breaks_how_badly === "string" ? fm.breaks_how_badly : "";
-    };
-    for (const [f, content] of Object.entries(fields)) {
-      fields[f] = mintScenarioLines(String(content), ({ kind, requirement, hinge, note }) => {
-        const slug = requirement.replace(/^req-/, "");
-        const id = kind === "at-risk" ? `raid-ar-${slug}` : `raid-un-${slug}`;
-        const abs = join(traceDir(traceRoot), "raid", `${id}.md`);
-        if (!existsSync(abs)) {
-          mkdirSync(dirname(abs), { recursive: true });
-          const grade = gradeOf(requirement);
-          const gradeLine =
-            grade === ""
-              ? "breaks_how_badly: <!-- the damage grade — the words live in meth-damage-scale -->"
-              : `breaks_how_badly: ${grade}`;
-          writeNode(
-            abs,
-            kind === "at-risk"
-              ? [
-                  "---",
-                  `id: ${id}`,
-                  'type: "[[raid]]"',
-                  "kind: risk",
-                  `statement: The architecture leaves ${requirement} at risk — the response hinges on ${hinge}.`,
-                  "owner: the adjudicator",
-                  `trigger: any change to ${hinge}, or to the scenario on ${requirement}`,
-                  "status: open",
-                  `impact: ${note === "" ? "The scenario misses its measure when the hinge moves." : note}`,
-                  gradeLine,
-                  "how_likely: <!-- the likelihood grade — the words live in meth-likelihood-scale, graded at the register review -->",
-                  "source_refs:",
-                  "  - evaluate-architecture, the scenario walk's verdict",
-                  `  - ${requirement}`,
-                  `  - ${hinge}`,
-                  "---",
-                  "",
-                  `Walked at evaluate-architecture by ${by}. The scenario's response forms`,
-                  `at ${hinge}; the tradeoff on the verdict line is what a wrong turn there`,
-                  "costs. The damage grade inherits from the requirement it protects.",
-                ].join("\n")
-              : [
-                  "---",
-                  `id: ${id}`,
-                  'type: "[[raid]]"',
-                  "kind: issue",
-                  `statement: The structure does not address ${requirement} — nothing carries its scenario.`,
-                  "owner: the adjudicator",
-                  `trigger: any change to the element set, or to ${requirement}`,
-                  "status: open",
-                  "impact: The quality goes unprotected into the build.",
-                  gradeLine,
-                  "how_likely: expected",
-                  "source_refs:",
-                  "  - evaluate-architecture, the scenario walk's verdict",
-                  `  - ${requirement}`,
-                  "---",
-                  "",
-                  `Found unaddressed at evaluate-architecture by ${by}. Either the`,
-                  "structure grows a carrier for this scenario, or the requirement moves —",
-                  "the gate adjudicates which.",
-                ].join("\n"),
-          );
-        }
-        return id;
-      });
-    }
-  }
-
-  /** see dsp-walk-machine.md#the-sensitivity-cards-credible-rulings-become-raid-tripwires-at */
-  private mintFlipTripwires(fields: Record<string, string>, m: MachineDecl, by: string): void {
-    const traceRoot = this.traceRoot(this.declIteration(m));
-    const shortId = (id: string): string => id.replace(/^cand-/, "").replace(/^req-/, "");
-    for (const [f, content] of Object.entries(fields)) {
-      fields[f] = mintFlipLines(String(content), ({ rival, winner, axis }) => {
-        const id = `raid-flip-${shortId(rival)}-on-${shortId(axis)}`;
-        const abs = join(traceDir(traceRoot), "raid", `${id}.md`);
-        if (!existsSync(abs)) {
-          mkdirSync(dirname(abs), { recursive: true });
-          writeNode(
-            abs,
-            [
-              "---",
-              `id: ${id}`,
-              'type: "[[raid]]"',
-              "kind: risk",
-              `statement: The convergence flips — ${rival} passes ${winner} if ${axis} moves by one point, and that story was ruled credible.`,
-              "owner: the adjudicator",
-              `trigger: any change to the scores on ${axis}, or new evidence on either candidate`,
-              "status: open",
-              "impact: The winner of the convergence changes, and everything downstream of it re-earns.",
-              "source_refs:",
-              "  - reverse-sensitivity, the sensitivity card's ruling",
-              `  - ${rival}`,
-              `  - ${winner}`,
-              `  - ${axis}`,
-              "---",
-              "",
-              `Ruled credible by ${by} at reverse-sensitivity. The cell stands one`,
-              "point from flipping the convergence; the fallback is the run that",
-              "re-converges after the flip, with the losers still on record.",
-              "",
-              "## Probe",
-              "",
-              `Re-run the convergence with ${axis} moved one point toward ${rival}.`,
-              "The trigger above brings this entry back the moment the ground moves.",
-            ].join("\n"),
-          );
-        }
-        return id;
-      });
-    }
-  }
-
   stateFormSave(name: string, fields: Record<string, string>, by: string, m: MachineDecl = this.currentMachine()): Record<string, unknown> {
     const t = stateFormFields(this.stateFormState(name, m));
     const h = this.stateFormHome(name, m);
@@ -4748,9 +4495,9 @@ export class Session {
     // (the page's boxes, the agent's fill) send it through this one door.
     const { inputs_checked, ...rest } = fields;
     // see dsp-the-goal-binds-the-walk.md#a-credible-ruling-mints-its-tripwire-on-save
-    this.mintFlipTripwires(rest, m, by);
+    mintFlipTripwires(this, rest, m, by);
     // The scenario walk's verdicts mint the same way — see mintScenarioEntries.
-    this.mintScenarioEntries(rest, m, by);
+    mintScenarioEntries(this, rest, m, by);
     // BOUND FIELDS LAND ON THE NODES FIRST. The section is written too, so a
     // reader of the file still sees what was answered — but the NODES are
     // what the check reads and what the next look rebuilds the section from.
@@ -5272,7 +5019,7 @@ export class Session {
     // and the lines now come from the register — so the state stands exactly
     // while every standing node carries its frontmatter, which is the claim
     // the state was making all along.
-    Object.assign(fills, this.bindView(s, model, m));
+    Object.assign(fills, bindView(this, s, model, m));
     const docs: EmbeddedDoc[] = [];
     for (const i of model.inputs) {
       if (i.path === undefined) continue;

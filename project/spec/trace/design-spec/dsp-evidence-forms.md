@@ -8,6 +8,7 @@ realizes:
 files:
   - "project/deliverable/engine/stateform.ts"
   - "project/deliverable/engine/forms.ts"
+  - "project/deliverable/engine/sessionforms.ts"
 ---
 
 ## Responsibility
@@ -673,3 +674,17 @@ GUIDANCE IS PARAGRAPHS AND LISTS, and it has to RENDER as them (owner
  TWO SHAPES ONLY, deliberately: paragraphs and bullets. This is form help,
  not a document, and a full markdown renderer here would invite headings and
  tables into a box three lines tall.
+
+## The form is bound to the corpus
+
+A FORM IS NOT A TEXT BOX. Its fields resolve against the trace: a reference
+becomes a link the reader can follow, a node-table row carries the node's own
+frontmatter, and a chart's cells are the option nodes themselves.
+
+THE BINDING NEEDS PATHS AND NOTHING ELSE — which record's corpus, and where
+the method cards live. It never asks where the walk stands or what the dial
+says, which is why it is a set of functions rather than part of the session.
+
+WHAT MINTING ADDS. Some forms do not only read the corpus, they WRITE it: a
+scenario's at-risk verdicts become register entries, and a sensitivity card's
+credible rulings become tripwires. Those run at submit, from the same paths.

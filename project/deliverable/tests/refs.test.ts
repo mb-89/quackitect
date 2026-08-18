@@ -2,7 +2,7 @@
 // it accepts, and the check refuses anything else. General: any field, any
 // item type. Concurrent: every case builds its own root.
 import { strict as assert } from "node:assert";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -116,7 +116,17 @@ describe("typed references", { concurrency: true }, () => {
       assert.match(call[0], /pick\?\.path/, `the trace graph reads the chosen corpus, not a root of its own: ${call[0]}`);
     }
     const src = readFileSync(fileURLToPath(new URL("../engine/session.ts", import.meta.url)), "utf8");
-    assert.match(src, /private traceRoot\(it\?: Iteration\): string/, "one accessor owns which root the corpus is read from");
+    assert.match(src, /^ {2}traceRoot\(it\?: Iteration\): string/m, "one accessor owns which root the corpus is read from");
+    // IT STOPPED BEING `private` WHEN THE FORM BINDING LEFT THE CLASS, so the
+    // guarantee is now stated where it actually holds: only the session pair
+    // may ask. That is a wider check than the keyword was, because the keyword
+    // said nothing about a second file reaching for a root of its own.
+    const PAIR = new Set(["session.ts", "sessionforms.ts"]);
+    for (const f of readdirSync(fileURLToPath(new URL("../engine/", import.meta.url)))) {
+      if (!f.endsWith(".ts") || PAIR.has(f)) continue;
+      const other = readFileSync(fileURLToPath(new URL(`../engine/${f}`, import.meta.url)), "utf8");
+      assert.doesNotMatch(other, /\.traceRoot\(/, `${f} reaches for a corpus root of its own`);
+    }
     // AND IT TAKES THE RECORD. The green light runs for an iteration from the
     // desk, with nothing bound, so a corpus root read off the session's
     // binding made the same claim green inside the record and grey outside.
