@@ -99,6 +99,7 @@ import { parseStateNote, readNode, section, withPass, writeNode } from "./notes.
 import { pathKind, resolveInRoot, seDir } from "./paths.ts";
 import { mintFlipLines } from "./pugh.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
+import { probesMissed, readingProbes } from "./readproof.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { anyJobRunning } from "./run.ts";
 import { levelName, loadLevels, loadStopAt, notchName, tierOf, weightName } from "./scale.ts";
@@ -2695,7 +2696,7 @@ export class Session {
         unreadable.push(rel);
         continue;
       }
-      const probes = this.readingProbes(body);
+      const probes = readingProbes(body);
       this.pendingRead = { path: rel, hash: contentHash(body), expect: probes.expect };
       return {
         document: { path: rel, content: body },
@@ -2713,22 +2714,9 @@ export class Session {
     return null;
   }
 
-  private readingProbes(body: string): { ask: string[]; expect: string[] } {
-    const w = body.split(/\s+/).filter((x) => x !== "");
-    if (w.length < 16) return { ask: ["the whole document, verbatim"], expect: [w.join(" ")] };
-    const ask: string[] = [];
-    const expect: string[] = [];
-    for (const at of [0.3, 0.6, 0.92]) {
-      const i = Math.min(Math.floor(w.length * at), w.length - 8);
-      ask.push(`the 4 words that FOLLOW "${w.slice(i, i + 4).join(" ")}"`);
-      expect.push(w.slice(i + 4, i + 8).join(" "));
-    }
-    return { ask, expect };
-  }
-
-  private normWords(s: string): string {
-    return s.trim().replace(/\s+/g, " ").toLowerCase();
-  }
+  // THE PROBE MATHS LIVES IN engine/readproof.ts, and nothing here keeps a
+  // copy of it (owner, 2026-08-18). The test suite answers the probes from
+  // that same module, so the two cannot drift.
 
   /** HOW LONG A SWEEP MAY RUN BEFORE IT ANSWERS.
    *
@@ -3278,7 +3266,14 @@ export class Session {
         pull: "read",
         ...head(),
         ...served,
-        ...(readProof === "wrong" ? { note: "that did not answer every probe — here is the document again" } : {}),
+        ...(readProof === "wrong"
+          ? {
+              // pendingRead survives a wrong answer — only a correct one clears it.
+              note: `${this.readMissed.length} of ${this.pendingRead?.expect.length ?? 0} probe(s) were not answered — here is the document again`,
+              missed: this.readMissed,
+              hint: "quote the words VERBATIM, punctuation and all. Whitespace and case are flattened before comparing, so a line break inside an answer is fine.",
+            }
+          : {}),
         do: 'read the WHOLE document, then pull again answering every probe in `prove` as form: {"read": "<the answers, in one string>"}',
         ...extra(),
       };
@@ -3308,8 +3303,11 @@ export class Session {
   private takeReadProof(form: Record<string, unknown> | undefined): "ok" | "wrong" | null {
     if (form?.read === undefined || this.pendingRead === null) return null;
     const pending = this.pendingRead;
-    const given = this.normWords(String(form.read));
-    if (pending.expect.every((e) => given.includes(this.normWords(e)))) {
+    // WHICH PROBE MISSED, not merely that one did. "That did not answer every
+    // probe" over three probes is a one-in-three guess, and the field report
+    // of 2026-08-17 names it as friction that cost a round trip each time.
+    this.readMissed = probesMissed(pending.expect, String(form.read));
+    if (this.readMissed.length === 0) {
       this.readBuffer.set(pending.path, pending.hash);
       this.persistSettings();
       this.pendingRead = null;
@@ -3317,6 +3315,9 @@ export class Session {
     }
     return "wrong";
   }
+
+  /** The probes the last read answer missed, so the retry can name them. */
+  private readMissed: string[] = [];
 
   /** THE PAYLOAD IS THE SUBMIT THAT HAS NO VERB — the filled form the
    *  LAST pull handed over. WHICH form is never the agent's call:

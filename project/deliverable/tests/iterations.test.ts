@@ -13,7 +13,7 @@ import { type MachineDecl, type StateDecl, validateMachine } from "../engine/mac
 import { type ChangeColumn, compileColumn, readRigorMatrix } from "../engine/rigor-matrix.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, checkDocs, freshRoot, GUIDANCE } from "./helpers.ts";
+import { call, checkDocs, freshRoot, GUIDANCE, proofFor } from "./helpers.ts";
 
 function gitInit(root: string): void {
   for (const a of [
@@ -526,23 +526,13 @@ test("a choice while a form is owed refuses and names the reopen", async () => {
   await session.advance("iterations");
   await session.advance(sid);
   session.setTarget(`iterations/${sid}/onboard-retro`);
-  // Serve the reading until the walk owes a FILL.
-  // The probes sit at fixed fractions of the served document; the answers
-  // are the four words after each anchor — computed here exactly as the
-  // engine computes them, which is what an honest reader would quote.
-  const answers = (body: string): string => {
-    const w = body.split(/\s+/).filter((x) => x !== "");
-    if (w.length < 16) return w.join(" ");
-    return [0.3, 0.6, 0.92]
-      .map((at) => {
-        const i = Math.min(Math.floor(w.length * at), w.length - 8);
-        return w.slice(i + 4, i + 8).join(" ");
-      })
-      .join(" · ");
-  };
+  // Serve the reading until the walk owes a FILL. proofFor is the ONE mirror
+  // of the engine's probes — this test used to inline its own copy, and the
+  // copy went stale the day the engine stopped counting markdown list markers
+  // as words (2026-08-18).
   let r = (await session.pull({}, "agent")) as { pull: string; document?: { content?: string } };
   for (let hops = 0; (r.pull === "read" || r.pull === "do") && hops < 40; hops++) {
-    const payload = r.pull === "read" ? { form: { read: answers(r.document?.content ?? "") } } : {};
+    const payload = r.pull === "read" ? { form: { read: proofFor(r.document?.content ?? "") } } : {};
     r = (await session.pull(payload, "agent")) as { pull: string; document?: { content?: string } };
   }
   assert.equal(r.pull, "fill", `the fixture reaches an owed form — stuck at ${r.pull} with keys ${JSON.stringify(Object.keys(r))}`);
@@ -572,19 +562,10 @@ test("completing a claimful state without its claim refuses, and the walk stands
   await session.advance(sid);
   // Walk to the first owed FILL, so a claimful state is the active one.
   session.setTarget(`iterations/${sid}/onboard-retro`);
-  const answers = (body: string): string => {
-    const w = body.split(/\s+/).filter((x) => x !== "");
-    if (w.length < 16) return w.join(" ");
-    return [0.3, 0.6, 0.92]
-      .map((at) => {
-        const i = Math.min(Math.floor(w.length * at), w.length - 8);
-        return w.slice(i + 4, i + 8).join(" ");
-      })
-      .join(" · ");
-  };
+  // proofFor is the ONE mirror of the engine's probes. See the note above.
   let r = (await session.pull({}, "agent")) as { pull: string; document?: { content?: string } };
   for (let hops = 0; (r.pull === "read" || r.pull === "do") && hops < 40; hops++) {
-    const payload = r.pull === "read" ? { form: { read: answers(r.document?.content ?? "") } } : {};
+    const payload = r.pull === "read" ? { form: { read: proofFor(r.document?.content ?? "") } } : {};
     r = (await session.pull(payload, "agent")) as { pull: string; document?: { content?: string } };
   }
   assert.equal(r.pull, "fill", `the walk stands at an owed form — got ${r.pull}`);

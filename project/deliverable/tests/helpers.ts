@@ -9,6 +9,7 @@ import { tmpdir } from "node:os";
 import { join, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { contentHash } from "../engine/hash.ts";
+import { proofFor } from "../engine/readproof.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 
@@ -403,17 +404,12 @@ export function gitInit(root: string): void {
   cpSync(join(gitTemplate, ".git"), join(root, ".git"), { recursive: true });
 }
 
-/** The engine's own proof, mirrored: engine/session.ts readingProbes. */
-export function proofFor(body: string): string {
-  const w = body.split(/\s+/).filter((x) => x !== "");
-  if (w.length < 16) return w.join(" ");
-  return [0.3, 0.6, 0.92]
-    .map((at) => {
-      const i = Math.min(Math.floor(w.length * at), w.length - 8);
-      return w.slice(i + 4, i + 8).join(" ");
-    })
-    .join(" ... ");
-}
+// proofFor IS RE-EXPORTED, NEVER MIRRORED (owner, 2026-08-18). It used to be a
+// hand-kept copy of the engine's probe maths with a comment saying so, and the
+// comment did not stop it going stale. engine/readproof.ts is the one source.
+// It is imported at the top of this file and re-exported here, because callers
+// inside this file use it too.
+export { proofFor };
 
 /** Serve ONE document through the pull and prove it, handing back what the
  *  pull answered with. */
