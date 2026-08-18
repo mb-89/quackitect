@@ -53,23 +53,14 @@ export function itRecordRel(id: string): string {
   return `project/spec/iterations/${id}/record.md`;
 }
 
-/** ONE TREE, ONE PATH (owner ruling 2026-08-16). A record is read from the
- *  working tree and from nowhere else.
- *
- *  WHAT WENT: a branch read. This used to try the record's own worktree, then
- *  trunk, then `git show <branch>:<rel>` — three places for one file, and the
- *  answer depended on which of them happened to have it. That third path is
- *  the retrieval the whole iteration exists to delete. */
+/** see dsp-record-lifecycle.md#one-tree-one-path */
 export function readItRecord(root: string, it: Iteration): Record<string, unknown> | undefined {
   const abs = join(root, itRecordRel(it.id));
   if (!existsSync(abs)) return undefined;
   return noteOf(abs)?.frontmatter;
 }
 
-/** THE STATUSES A RECORD CANNOT BE WALKED FROM. One definition, because two
- *  readers disagreeing about what "open" means is the defect this replaces:
- *  the survey read the status and the container read the filesystem, so i28
- *  stood in one list and not the other on 2026-08-16. */
+/** see dsp-record-lifecycle.md#the-statuses-a-record-cannot-be-walked-from */
 export const RECORD_FINISHED: ReadonlySet<string> = new Set(["shipped", "closed"]);
 
 /** EVERY RECORD IS A FOLDER ON TRUNK, and OPEN comes from its own status.
@@ -156,10 +147,7 @@ export function itSeed(root: string, goal: string, vision: string, inputs: strin
       `vision: ${JSON.stringify(vision)}`,
       "inputs:",
       ...inputs.map((i) => `  - ${JSON.stringify(i)}`),
-      // THE CONTAINER IS A DAG, AND THIS KEY IS ITS ONLY INPUT (owner ruling
-      // 2026-08-12). An iteration naming another here cannot be entered until
-      // that one leaves the open set, because the drawn edge runs dep -> this
-      // and the walk never enters a state whose inbound edges have not fired.
+      // see dsp-record-lifecycle.md#the-container-is-a-dag
       ...dependsOnLines(dependsOn),
       "---",
       "",
@@ -223,14 +211,7 @@ export function itSeededRel(id: string, kind: string): string {
   return `project/spec/iterations/${id}/machines/${kind}.md`;
 }
 
-/** THE SEEDED MACHINE (owner design 2026-07-30): an authoring state writes
- *  the drawing as markdown data in the record (machines/<kind>.md), and the
- *  matching runs-state descends into its compilation — build-chunks, spikes
- *  and candidates all share this one shape. Each step's realization kind
- *  becomes a TAG on its state, so the existing tag-pull serves each builder
- *  its discipline's guidance. An absent or empty drawing is a TYPED
- *  REFUSAL, never a plain serve — unless it carries an explicit none with
- *  its reason, which passes the run state without ceremony. */
+/** see dsp-record-lifecycle.md#the-seeded-machine */
 function chunkList(v: unknown): string[] {
   if (Array.isArray(v)) return v.map(String);
   if (typeof v === "string" && v.trim() !== "") return v.split(",").map((s) => s.trim());
@@ -402,14 +383,7 @@ export function generateSeeded(_root: string, it: Iteration, machineId: string, 
       ],
     });
   }
-  // THE BAR SITS ON THE END, AND THERE IS NO JOIN PILL (owner ruling
-  // 2026-08-09). A build is done when EVERY leaf step is, so plain fan-in
-  // would be an OR — but the bar is a FIELD, not a state, so the end pill
-  // carries it directly.
-  //
-  // THE SEPARATE JOIN WAS CEREMONY. It held no evidence, asked nothing and
-  // did no work; it merged, which the bar already does. A pill a reader
-  // cannot act on is a pill that teaches them to click past pills.
+  // see dsp-record-lifecycle.md#the-bar-sits-on-the-end
   states.push({
     id: "end",
     kind: "end",
@@ -550,15 +524,7 @@ export function demandOf(fields: EvidenceField[]): string {
   );
 }
 
-/** THE STEP'S TOPOLOGY, digested. What a step ASKS FOR and where it SITS are
- *  different facts, and only the first was ever compared.
- *
- *  So a row could gain a dependency and no standing iteration would notice.
- *  That happened on 2026-08-13: build-steps was given a dependency on the
- *  state that seeds its drawing, and i3's pinned machine kept walking straight
- *  past it, because no demand had moved.
- *
- *  Sorted, so re-ordering a list is not a change. */
+/** see dsp-record-lifecycle.md#the-steps-topology */
 function shapeOf(row: { depends_on?: string[]; busbar?: boolean; seeds?: string; runs?: string }): string {
   return JSON.stringify([[...(row.depends_on ?? [])].sort(), row.busbar === true, row.seeds ?? "", row.runs ?? ""]);
 }
@@ -651,16 +617,7 @@ export function iterationDrift(root: string, it: Iteration): string[] {
   return movedDemands(pin.demands, demandsFor(readRigorMatrix(root), pin.change_size as ChangeColumn));
 }
 
-/** DID THE MATRIX MOVE UNDER THIS PIN — and nothing about which steps care.
- *
- *  TWO QUESTIONS USED TO SHARE ONE ANSWER. `iterationDrift` returns an empty
- *  list both when the matrix is unchanged and when it changed in a way no
- *  step's demand noticed, and the walk read the second as the first.
- *
- *  So a matrix edit that reshaped the MACHINE — a new dependency, a state the
- *  column regained — never refreshed the pin, and the record went on walking a
- *  snapshot taken before the fix. Seen live on 2026-08-13: build-steps was
- *  given its dependency on specify-build and i3 kept skipping it. */
+/** see dsp-record-lifecycle.md#did-the-matrix-move-under-this-pin */
 export function pinIsStale(root: string, it: Iteration): boolean {
   const pin = readPin(it);
   if (pin?.change_size === undefined) return false;
@@ -690,11 +647,7 @@ export function itShortId(itId: string): string {
   return m ? m[1] : itId;
 }
 
-/** THE ITERATIONS CONTAINER, generated: every open iteration is ONE node
- *  whose machine is the iteration's own walk — M0 alone until the
- *  kickoff's bless pins a column, the full pinned machine after. The walk
- *  shows FLAT: milestones are groups on the states, never sub-machines
- *  (owner ruling 2026-08-04). Nothing open: start runs to end. */
+/** see dsp-record-lifecycle.md#the-iterations-container */
 export function generateIterations(root: string): GeneratedMachine {
   let open: Iteration[] = [];
   try {
@@ -866,23 +819,7 @@ function sidedEdge(els: Map<string, CanvasElement>, fromId: string, toId: string
   return { id: id ?? `e-${fromId}-${toId}`, fromNode: fromId, toNode: toId, ...sides };
 }
 
-/** The iteration's machine, COMPILED LIVE at call time from the pinned
- *  COLUMN. The pin records WHICH column this iteration walks; the shape of
- *  that column and every form in it are derived from the matrix, so a row
- *  edited a moment ago shows on the next render — from anywhere, with nobody
- *  standing in the machine.
- *
- *  THE MACHINE IS NOT STORED (owner ruling 2026-08-05). A frozen copy made
- *  the walk hand back the OLD question after the drift had already reopened
- *  the step for asking a new one, and a reader looking at the state saw a
- *  form the matrix had stopped asking for.
- *
- *  WHAT THE ITERATION WAS JUDGED AGAINST is the pin's DEMANDS LEDGER, which
- *  is a different record and the one the drift check reads. Freezing the
- *  machine never served that job; the ledger always did.
- *
- *  The machine id is the iteration's short id either way, so evidence keys
- *  and history survive. */
+/** see dsp-record-lifecycle.md#the-iterations-machine-compiled-live-at-call-time-from */
 function generateIterationWalk(root: string, it: Iteration, sid: string): GeneratedMachine {
   let size: string | undefined;
   try {
@@ -899,17 +836,7 @@ function generateIterationWalk(root: string, it: Iteration, sid: string): Genera
     decl: m,
     canvas: pinnedCanvas(m),
     expByState: {},
-    // TWO KINDS OF SUB-MACHINE, told apart by the name (owner ruling
-    // 2026-08-08). A SEEDED one is authored per iteration and lives in the
-    // record, so it is generated here: build-chunks, spikes, candidates.
-    // A STATIC one is method — the same five finders every time — and its
-    // drawing is a .canvas under machines/. Naming a file is what says so.
-    //
-    // A static name is left OUT of subGen on purpose. Session.seedSubs and
-    // Session.declForPrefix both fall back to compiling the ref when no
-    // generator answers, which is exactly the right path for a drawing.
-    // Registering it here instead sent the walk looking for a seeded file
-    // in the record and refused with "a run without visible steps".
+    // see dsp-record-lifecycle.md#two-kinds-of-sub-machine
     subGen: Object.fromEntries(
       m.states
         .filter((s) => s.submachine !== undefined && !s.submachine.endsWith(".canvas"))
@@ -922,10 +849,7 @@ function generateIterationWalk(root: string, it: Iteration, sid: string): Genera
  *  in-group predecessor; independent states share the row. */
 function groupLayers(m: MachineDecl, groupOf: (s: StateDecl) => string): Map<string, number> {
   const byId = new Map(m.states.map((s) => [s.id, s]));
-  // A RECOVERY EDGE IS THE LOOP'S BACK HALF, never a dependency. Counted, it
-  // made every fallback pair a cycle; the cycle guard cut the walk mid-way and
-  // the half-computed layer got MEMOIZED — fix-findings drew at the top of its
-  // group, rows away from the verification it serves (owner report 2026-08-11).
+  // see dsp-record-lifecycle.md#a-recovery-edge-is-the-loops-back-half
   const preds = new Map<string, { id: string; role: string }[]>();
   for (const s of m.states) {
     for (const e of s.edges) {
@@ -1078,15 +1002,7 @@ function placeGroup(
   return boxBottom + LAYOUT.groupGap;
 }
 
-/** A drawn view of ANY machine, top to bottom like the walk reads: the
- *  shared start and end pills, each milestone a labelled group box, states
- *  inside layered by dependency — independent ones side by side — and every
- *  edge declaring its sides.
- *
- *  EXPORTED, AND NOT ONLY FOR GENERATED MACHINES (owner ruling 2026-08-08).
- *  A hand-drawn sub-machine served its authored x and y, so it read left to
- *  right while every compiled machine read top to bottom, and a fan's AND bar
- *  did not look like a bar. Same layout, whatever built the states. */
+/** see dsp-record-lifecycle.md#a-drawn-view-of-any-machine-top-to-bottom */
 export function pinnedCanvas(m: MachineDecl): CanvasData {
   // A HAND-DRAWN MACHINE HAS NO MILESTONES, and that is not a defect. Its
   // states lay out in the same dependency rows, without a labelled box

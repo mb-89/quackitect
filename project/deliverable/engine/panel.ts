@@ -5,17 +5,7 @@ import { spawn } from "node:child_process";
 export function openPanel(url: string): void {
   if (process.env.SE_PANEL_DISABLE === "1") return;
   try {
-    // A FAILED SPAWN ARRIVES AS AN EVENT, NOT AS A THROW. The try/catch
-    // below it only ever caught synchronous failures, and ENOENT is not
-    // one: node reports a missing binary by emitting "error" on the child
-    // on a later tick, so with no listener it surfaced as an UNCAUGHT
-    // exception and took the engine down with it.
-    //
-    // That is what a headless Linux box does every time — it has no
-    // xdg-open — so the server died on startup, respawned on the next
-    // request, and died again (first run on a second machine,
-    // 2026-08-12). The file's own promise is that the lane never dies over
-    // a window; this is that promise actually kept.
+    // see dsp-mirror-render.md#a-failed-spawn-arrives-as-an-event
     const fire = (cmd: string, args: string[], extra: object = {}) =>
       spawn(cmd, args, { stdio: "ignore", detached: true, ...extra })
         .on("error", () => {})

@@ -171,15 +171,7 @@ export function sessionTools(session: Session): ToolDef[] {
       inputSchema: { type: "object", properties: {} },
       handler: () => session.requestReload(),
     },
-    // TWO SCRIPTS THAT WERE ONLY EVER REACHABLE THROUGH THE SHELL (owner
-    // ruling 2026-08-07). Measured over one 15-hour window: 8 of 23 se_run
-    // calls were these two, four runs each, every one carrying a
-    // no_tool_reason that said the same thing — the lane has no verb for it.
-    //
-    // One of those eight died MODULE_NOT_FOUND because the shell's working
-    // directory was trunk while the script it wanted lived in a worktree.
-    // These resolve the tree the way every other lane call does, so that
-    // failure stops being possible rather than stopping by luck.
+    // see dsp-write-guard.md#two-scripts-that-were-only-ever-reachable-through-the
     {
       name: "se_prompt_place",
       title: "se.prompt.place",
@@ -411,16 +403,7 @@ export function expeditionTools(session: Session): ToolDef[] {
   ];
 }
 
-// rootOf takes the path because ONE lane serves two trees: `.se/` is session
-// state at the project root, everything else follows the walk into its bound
-// worktree (Session.laneRoot, owner ruling 2026-07-28). Callers that act on no
-// single path — search, glob, run, git — pass nothing and get the work root.
-// judgmentDrainAllowed answers ONE question for se_note_drain: may this
-// caller park a note or carry it, or only record the mechanical verdicts.
-// It is a thunk because the walk moves under a built tool list.
-// THE PEEK RETIRED WITH THE TICK: an agent choosing among doors gets them
-// from the pull's own offer, statements and weights riding along. The
-// mirror still reads any state through stateInfo.
+// see dsp-lane-door.md#rootof-takes-the-path-because-one-lane-serves-two
 
 /** A cheap multi-read makes it easy to pull documents nobody needed, which
  *  wastes context quietly. Twenty is far above any real reading list — boot's
@@ -599,19 +582,7 @@ function annotateRun(res: unknown, laneWarning: unknown): unknown {
   return { ...(res as unknown as Record<string, unknown>), lane_warning: laneWarning };
 }
 
-/** A SHAPE THAT CUTS BEFORE THE ENGINE SEES. Select-Object -First, head, tail,
- *  cut -c, Measure-Object: each one drops output between the command and the
- *  capture, so what it removed exists NOWHERE — not on the result, not in the
- *  log, not under the ref.
- *
- *  A FILTER AFTER A PIPE IS THE SAME THING, and it was the one actually doing
- *  the damage. `| Select-String fail` keeps the matching lines and throws away
- *  the TAP summary — which is where the counts live. That is how a run came
- *  back as exit 1 with empty output on 2026-08-16, inside the iteration
- *  building this refusal.
- *
- *  BEFORE a pipe they are a different offence: reaching for the shell's
- *  searcher instead of the lane's, which SE-C-129 already covers. */
+/** see dsp-lane-door.md#a-shape-that-cuts-before-the-engine-sees */
 const SHAPED =
   /select-object\s+-(first|last|skip)|(^|[;|&(\s])(head|tail)\s+-|\bcut\s+-c|\bmeasure-object\b|\|\s*(select-string|sls|findstr|grep|rg)\b/i;
 
@@ -1027,18 +998,7 @@ export function coreTools(
             source: "engine/tools.ts se_run",
           });
         }
-        // THE DISCIPLINE LADDER (engine/discipline.ts): a command doing a lane
-        // tool's job runs once with a warning, then refuses. Judged BEFORE the
-        // spawn, so a blocked category costs nothing to block.
-        // REFUSED AT THE BOUNDARY, NOT ANNOTATED AFTER (owner ruling
-        // 2026-08-16). The lane already warned about this and the warning did
-        // not work: an agent shaped output through Select-String IN THIS
-        // ITERATION, while building the fix for it, and got exit 1 with empty
-        // stdout. A warning that has failed twice is evidence about warnings.
-        //
-        // WHY IT HAPPENS SO OFTEN is the part worth answering, and the remedy
-        // answers it: the pipe is reached for when the raw output is expected
-        // to be long, so the refusal names the verb that handles length.
+        // see dsp-lane-door.md#the-discipline-ladder
         if (SHAPED.test(String(args.command)) && args.no_tool_reason === undefined) {
           const remedy = shapedRemedy(String(args.command));
           throw new Rejection({
@@ -1087,10 +1047,7 @@ export function coreTools(
         const se = seDir(projectRoot);
         const force = args.force === true;
         if (args.job !== undefined) return testJobArm(args, se);
-        // A TEST RUN NEVER OUTLIVES ITS SESSION (found 2026-08-02: two
-        // orphaned workers held a folder lock for four hours). Children run
-        // in the job registry — whole-tree killed on timeout, reaped at
-        // shutdown, visible to se_run {jobs: true}.
+        // see dsp-lane-door.md#a-test-run-never-outlives-its-session
         const spawnNode = async (
           argv: string[],
           cwd = root,
@@ -1154,17 +1111,7 @@ export function coreTools(
             ...(tap.total === 0 ? { output: capMiddle(r.out.trim(), 4000) } : {}),
           };
         };
-        // The battery: EARNED, not habitual. The gate computes the scoped
-        // remedy from the diff since the last green battery.
-        // THE SWEEP RIDES THE DECISION, NEVER A VERB (owner ruling 2026-08-16).
-        // A verb an agent can call is a verb an agent will call, and the whole
-        // reason this check left the write is that it costs too much to run per
-        // write. `decideScope` already reads the diff; when that diff is mostly
-        // DOCUMENTS it says so, and the sweep runs with the tests.
-        //
-        // IT REPORTS AND NEVER DECIDES THE VERDICT HERE. The sweep BLOCKS at
-        // sweep-consistency's own exit, which is the state whose job is
-        // clearing it. Riding a test run, it is news.
+        // see dsp-lane-door.md#the-battery
         const runSweep = async (): Promise<{ script: string; ok: boolean; exit: number | null; output: string }> => {
           const abs = resolveInRoot(root, "project/deliverable/engine/bin/sweep.ts", "engine/tools.ts se_test");
           const r = await spawnNode([abs, "--root", root], root);
@@ -1199,27 +1146,7 @@ export function coreTools(
           testRecord(se, root, ok);
           return { ok, question: BATTERY_QUESTION, decided: { scope: "battery", files: [], why, sweep }, results };
         };
-        // THE QUESTION IS CHECKED BEFORE THE HANDOFF, on purpose. A refusal
-        // raised inside the async body becomes the JOB's verdict, so a call
-        // that could never run would still answer with a handle and fail
-        // quietly a second later (found by verdictlog.test.ts, 2026-08-13).
-        // THE ENGINE DECIDES WHAT RUNS (owner ruling 2026-08-16). The agent
-        // asked a question; this reads what changed and picks the scope.
-        //
-        // WHAT THIS REPLACED. Two refusals guarded the scope from opposite
-        // sides — one refused the battery toward a scoped run, the other
-        // refused scoped runs toward the battery — and on 2026-08-16 they
-        // closed on each other at i6's sixth build chunk. Each remedy was the
-        // other refusal, and no test call was legal at all.
-        //
-        // THE CAUSE WAS THE AGENT CHOOSING AND THE ENGINE GRADING THE CHOICE.
-        // Two graders with different subjects eventually disagree, and the
-        // agent standing between them has no move. One decider has nothing to
-        // disagree with.
-        //
-        // DECIDED BEFORE THE HANDOFF, because a refusal raised inside the
-        // async body becomes the JOB's verdict — the call would answer with a
-        // handle and fail quietly a second later.
+        // see dsp-lane-door.md#the-question-is-checked-before-the-handoff
         const decision = decideScope(se, root, force);
         // NOTHING IS AN ANSWER, NOT A REFUSAL. An unchanged tree keeps its
         // last verdict, and saying so plainly beats SE-C-130's old refusal:
@@ -1253,11 +1180,7 @@ export function coreTools(
             entry.verdict = { job: id, running: false, ...value };
             persistTestJob(se, id, entry);
             try {
-              // THE RECORD CARRIES THE QUESTION IT ANSWERED (i33, 2026-08-17,
-              // tsp-record-inspection item 12). It did not until now: the
-              // question rode the call that STARTED the run and the verdict
-              // recorded only a job id, so the log held eight test runs and
-              // could not say what any of them was for.
+              // see dsp-lane-door.md#the-record-carries-the-question-it-answered
               new CallLog(seDir(projectRoot)).append({
                 tool: "se_test_verdict",
                 args: { job: id, battery, question: args.question },
@@ -1412,12 +1335,7 @@ export function coreTools(
         },
       },
       handler: (args) => {
-        // THE ROOT-PICKER TAKES A PATH, and se_lint called it with none.
-        // That is the whole of the 2026-08-14 defect: laneRoot(rel) already
-        // chose the right tree per path kind, and this handler asked for the
-        // default instead, so `.se/...` resolved into whatever worktree was
-        // bound. The per-path calls are below; this one is only for lintProse,
-        // which reads configuration rather than the file under test.
+        // see dsp-write-guard.md#the-root-picker-takes-a-path
         const root = rootOf(LINT_CONFIG);
         // THE SWEEP. Linting one file at a time is why nothing was ever
         // linted: the tool could only be pointed at prose somebody already
@@ -1625,12 +1543,7 @@ export function coreTools(
   ];
 }
 
-/** Build the server: session machine + tools + guards + the raw call log.
- *  Guard order: arg shape → THE STATE GATE → handler. Pass a Session to
- *  share it with another hand (the embedded mirror drives the SAME walk). */
-/** THE PROSE-WALL LINT (owner law 2026-07-28): every HTML surface keeps
- *  line breaks — so long prose MUST carry them. An authored wall is refused
- *  at the tool boundary, mechanically. */
+/** see dsp-lane-door.md#build-the-server */
 function refuseProseWall(tool: string, field: string, text: string): void {
   if (text.length <= 300 || text.includes("\n")) return;
   throw new Rejection({
@@ -1646,13 +1559,7 @@ function refuseProseWall(tool: string, field: string, text: string): void {
   });
 }
 
-// se_test's handed-off runs: the verdict outlives the CALL — recorded here,
-// served by se_test {job}, whatever the client's timeout did.
-// THE ON-CHANGE TYPECHECK (owner ruling 2026-08-03): a lane edit touching a
-// .ts file kicks an incremental compile in the background, and while the
-// tree is red every result carries typecheck_error. The EDIT itself is
-// never refused — a two-file fix passes through a red middle; the
-// pre-commit hook is where red blocks. Nothing here may throw.
+// see dsp-lane-door.md#setests-handed-off-runs
 const TYPECHECK: { running: boolean; dirty: boolean; report: string } = { running: false, dirty: false, report: "" };
 function kickTypecheck(root: string): void {
   if (TYPECHECK.running) {
@@ -1735,10 +1642,7 @@ function recoverTestJob(se: string, id: string): TestJobEntry | undefined {
   return undefined;
 }
 
-/** THE VERDICT OUTLIVES THE CALL (found 2026-08-02: the battery outran
- *  the MCP client's timeout and the counts were lost). Past the
- *  handoff budget the caller gets a handle; the run carries on, the
- *  verdict is recorded, and {job} serves it. */
+/** see dsp-lane-door.md#the-verdict-outlives-the-call */
 function testJobArm(args: Record<string, unknown>, se: string): Record<string, unknown> {
   const id = String(args.job);
   const t = testVerdicts.get(id) ?? recoverTestJob(se, id);
@@ -1771,10 +1675,7 @@ function testJobArm(args: Record<string, unknown>, se: string): Record<string, u
   };
 }
 
-// `scopedFiles` IS GONE (owner ruling 2026-08-16). It turned the agent's
-// `files` argument into a scope, and there is no such argument any more — the
-// engine reads what changed and decides. `decideScope` in discipline.ts names
-// the files, and they are already full paths.
+// see dsp-write-guard.md#scopedfiles-is-gone
 
 /** THE QUESTION A SCOPED RUN ANSWERS (req-test-run-carries-its-question).
  *  The scope already says which tests ran. Only this says why, and without
@@ -1895,18 +1796,7 @@ export function buildServer(
 
   // The update rides first and is stripped before the handler. see dsp-lane-door.md#a-bad-update-never-destroys-its-call
   const WRITE_TOOLS = new Set(["se_file_write", "se_file_patch", "se_file_replace", "se_file_delete", "se_file_move"]);
-  // ANY WRITE CLEARS THE ROUTE MEMO. Which claims stand depends on the
-  // evidence AND on the trace nodes that evidence references, so a node
-  // repaired through the file lane can change the objective without any form
-  // being touched.
-  //
-  // It wedged the walk on 2026-08-07: a broken node was fixed, the state went
-  // green, and the router kept handing back the route to the state the walk
-  // already stood in. Re-aiming could not shift it, because the key had not
-  // changed either.
-  //
-  // Clearing here costs one recomputation after a write, which is precisely
-  // when the answer may have moved.
+  // see dsp-lane-door.md#any-write-clears-the-route-memo
   server.addGuard((tool) => {
     if (WRITE_TOOLS.has(tool)) session.forgetRoute();
   });
@@ -1916,10 +1806,7 @@ export function buildServer(
   let updateRejection: Rejection | undefined;
   let updateResult: Record<string, unknown> | undefined;
   server.addGuard((tool, args) => {
-    // EVERY EXTERNAL CALL IS A NEW DRAWING EPOCH — "the next call" is the
-    // read-it-live law's unit, and pull alone was not enough: a gate check
-    // on any other tool trusted a stamp from the previous call and went
-    // stale for up to a second (caught by the battery, 2026-08-02).
+    // see dsp-lane-door.md#every-external-call-is-a-new-drawing-epoch
     bumpDrawingEpoch();
     updateComplaint = undefined;
     updateRejection = undefined;
@@ -1978,14 +1865,7 @@ export function buildServer(
     return { ...(result as Record<string, unknown>), typecheck_error: TYPECHECK.report };
   });
 
-  // AND SO DOES THE ACCEPTED ONE (note-792c32b5425e item 5; the hole it
-  // left was found live on 2026-07-29). The update's answer went only to
-  // the LOG. So the node ids needed to resolve anything were invisible
-  // unless you deliberately named a node that does not exist and read the
-  // refusal — and the checklist nudge fired TEN times into a void, seen by
-  // nobody, including the agent it was nudging.
-  //
-  // A guard nobody can hear is not a guard. It rides the result now.
+  // see dsp-write-guard.md#and-so-does-the-accepted-one
   server.addDecorator((_tool, result) => {
     const u = updateResult;
     updateResult = undefined;

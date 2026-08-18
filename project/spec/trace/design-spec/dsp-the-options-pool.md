@@ -93,3 +93,78 @@ inventing a second convention.
 - NO DELETE. An option leaves the pool by being committed to, and that path is
   not built here either.
 - NO SURFACE. i23 owns those.
+
+## The options pool
+
+THE OPTIONS POOL — where a stray stops being machine-local.
+
+A CAPTURE IS A DUMP AND A WORK TOKEN IS AN ARTIFACT, and the whole module
+exists to keep those two things apart. `.se/notes.jsonl` is written mid-walk
+by whoever noticed something, may carry anything, and is never committed. A
+work token is authored, states what it is and when it comes back, and lands
+on trunk where any clone can read it.
+
+THE THING IS A WORK TOKEN AND THE COLLECTION IS THE POOL (owner ruling
+2026-08-18). `option` was taken: it is the morphological chart's cell, 95
+nodes deep, declared by machines/items/option.md with its own folder and its
+own schema. This module first wrote into that folder, and the survey began
+offering every design alternative the project had ever enumerated as work
+somebody could commit to. The owner: "You can't have two notes that are both
+named options and mean different things."
+
+NOTHING CROSSES BY BEING COPIED. The statement is written by the person or
+the agent doing the drain, and `mintToken` refuses one that carries the
+note's own text. That refusal is the only mechanical defence the privacy
+line has, and `guardNoSecondDoor` is what stops anything else writing here.
+
+WHY IT IS NOT PART OF inbox.ts. The pool is read by things that have nothing
+to do with notes — the survey today, the desk tomorrow — and importing the
+note store to read a list of tokens would tie two lifetimes together that
+the design keeps apart.
+
+## What a secret looks like when it is one
+
+WHAT A SECRET LOOKS LIKE WHEN IT IS ONE WORD.
+
+ THE RUN CHECK CANNOT REACH THESE AND NEVER COULD. An address, a path or a
+ password is a SINGLE token, so no run of six words contains it — and it is
+ the ordinary shape of a leak, not an adversarial one. An author who writes
+ "reach out to maria@example.com" has copied nothing and leaked everything.
+
+ Found by i17's own verification, 2026-08-18, which minted three tokens
+ carrying a third party's address, home directory and password past a check
+ that was working exactly as designed.
+
+## What stands open
+
+WHAT STANDS OPEN — one mechanical answer: open expeditions, open
+iterations, pending notes, and the standing WORK TOKENS in the pool with
+their ready-when — read from the repository, never from a machine-local store.
+
+BOTH HANDS ASK IT (owner ruling 2026-07-28). The agent calls se_survey;
+the person clicks it in the mirror. It lived inside the tool handler and
+so was reachable only by the agent, which made "what is open" a question
+the owner had to route through someone else. One implementation, two
+doors.
+
+## The finished set moved to iterations
+
+THE FINISHED SET MOVED TO iterations.ts AT i34, as RECORD_FINISHED. It was
+defined here and nowhere else, so the survey knew a shipped record was not
+open and itList did not — and on 2026-08-16 i28 stood in the container's
+list and not in the survey's, with nothing saying they disagreed.
+
+itList NOW APPLIES IT ITSELF, so this file no longer needs its own copy and
+no longer needs to filter.
+
+## The pool is read from the repository
+
+THE POOL IS READ FROM THE REPOSITORY, NEVER FROM THE NOTE STORE (i17).
+It used to list `backlogNotes`, which live in `.se/` — machine-local and
+gitignored — so two clones disagreed about what the project was holding and
+neither was wrong. Measured 2026-08-18: a fresh clone reported 0 parked
+options while the machine that parked them reported 205.
+
+AN UNDRAINED CAPTURE IS NOT AN OPTION and deliberately never enters here.
+It has not been judged, and this list is what somebody may commit to. The
+pending count above stays the separate signal it always was.

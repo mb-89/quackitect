@@ -1,28 +1,4 @@
-// THE OPTIONS POOL — where a stray stops being machine-local.
-//
-// A CAPTURE IS A DUMP AND A WORK TOKEN IS AN ARTIFACT, and the whole module
-// exists to keep those two things apart. `.se/notes.jsonl` is written mid-walk
-// by whoever noticed something, may carry anything, and is never committed. A
-// work token is authored, states what it is and when it comes back, and lands
-// on trunk where any clone can read it.
-//
-// THE THING IS A WORK TOKEN AND THE COLLECTION IS THE POOL (owner ruling
-// 2026-08-18). `option` was taken: it is the morphological chart's cell, 95
-// nodes deep, declared by machines/items/option.md with its own folder and its
-// own schema. This module first wrote into that folder, and the survey began
-// offering every design alternative the project had ever enumerated as work
-// somebody could commit to. The owner: "You can't have two notes that are both
-// named options and mean different things."
-//
-// NOTHING CROSSES BY BEING COPIED. The statement is written by the person or
-// the agent doing the drain, and `mintToken` refuses one that carries the
-// note's own text. That refusal is the only mechanical defence the privacy
-// line has, and `guardNoSecondDoor` is what stops anything else writing here.
-//
-// WHY IT IS NOT PART OF inbox.ts. The pool is read by things that have nothing
-// to do with notes — the survey today, the desk tomorrow — and importing the
-// note store to read a list of tokens would tie two lifetimes together that
-// the design keeps apart.
+// see dsp-the-options-pool.md#the-options-pool
 import { existsSync, mkdirSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
@@ -55,16 +31,7 @@ export const POOL_PREFIX = "project/spec/trace/work-token";
  *  run of real data can move it without archaeology. */
 const COPY_RUN = 6;
 
-/** WHAT A SECRET LOOKS LIKE WHEN IT IS ONE WORD.
- *
- *  THE RUN CHECK CANNOT REACH THESE AND NEVER COULD. An address, a path or a
- *  password is a SINGLE token, so no run of six words contains it — and it is
- *  the ordinary shape of a leak, not an adversarial one. An author who writes
- *  "reach out to maria@example.com" has copied nothing and leaked everything.
- *
- *  Found by i17's own verification, 2026-08-18, which minted three tokens
- *  carrying a third party's address, home directory and password past a check
- *  that was working exactly as designed. */
+/** see dsp-the-options-pool.md#what-a-secret-looks-like-when-it-is-one */
 const HAS_SEPARATOR = /[@/\\]/;
 /** A TOKEN THIS LONG WITH NO SEPARATOR IN IT IS AN IDENTIFIER, not a word —
  *  a password, a hash, a key. Below twelve, ordinary long words collide by

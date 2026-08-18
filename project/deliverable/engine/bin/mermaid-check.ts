@@ -1,19 +1,4 @@
-// SEE YOUR OWN DIAGRAM. Mermaid fails at RENDER time, not at write time, so
-// a diagram can pass every test we own and still show a parse error in the
-// pane. That happened twice: a branch name with a space, and a config change
-// that made the graph worse in ways no assertion could describe.
-//
-// This wraps every mermaid fence in a markdown file into a page that renders
-// them and REPORTS FAILURES IN THE TITLE, so a screenshot answers both
-// questions at once — did it parse, and is it readable.
-//
-// SELF-CONTAINED, BY RULE (owner ruling 2026-08-09). This page used to load
-// its renderer from a CDN on every open — a standing dependency on someone
-// else's server to run our own tooling, which the dependency rule forbids:
-// pull an asset once, never lean on a server running our work. The renderer
-// is vendored (vendor/mermaid) and INLINED, so the page works offline,
-// forever, as generated. A missing vendor file refuses at GENERATION time
-// with the pull that fixes it — there is no online fallback on purpose.
+// see dsp-mirror-render.md#see-your-own-diagram
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";

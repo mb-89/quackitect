@@ -30,11 +30,7 @@ const BROWSERS = [
   "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
   "/usr/bin/chromium",
   "/usr/bin/google-chrome",
-  // A CONTAINER PUTS ONE HERE. Every Playwright image lands its Chromium
-  // under PLAYWRIGHT_BROWSERS_PATH, and /opt/pw-browsers is that path on
-  // the cloud runner. Measured 2026-08-17: the box had a working Chromium
-  // this list could not see, so three tests went red on a machine that had
-  // exactly what they asked for.
+  // see dsp-mirror-render.md#a-container-puts-one-here
   "/opt/pw-browsers/chromium",
   "/opt/pw-browsers/chromium/chrome-linux/chrome",
   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
@@ -79,11 +75,7 @@ export function shoot(root: string, html: string, opts: { width?: number; height
   const png = join(dir, `${name}.png`);
   writeFileSync(page, html, "utf8");
 
-  // ROOT NEEDS --no-sandbox, AND ONLY ROOT (measured 2026-08-17). Chromium
-  // refuses outright as uid 0 — "Running as root without --no-sandbox is not
-  // supported" — and a container runs as root, so the whole cloud path was
-  // shut. CONDITIONAL DELIBERATELY: passing it unconditionally would weaken
-  // a desktop run, which has a sandbox worth keeping.
+  // see dsp-mirror-render.md#root-needs---no-sandbox-and-only-root
   const asRoot = process.getuid?.() === 0;
   const r = spawnSync(
     findBrowser(),

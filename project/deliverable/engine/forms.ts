@@ -1,13 +1,4 @@
-// Evidence forms — A3-shaped one-pagers (owner design 2026-07-27): a
-// TEMPLATE (machines/forms/<name>.md) declares the fields; an INSTANCE in
-// the expedition's record is the filled page. The check is a MECHANICAL
-// LINT — required sections carry visible content, listed files exist,
-// status is done. Quality is reviewed where the walk reviews, never here.
-//
-// THE PREFILL LAW: an HTML comment is INVISIBLE content. Agent prefills
-// are written commented out and count as EMPTY until a human confirms
-// each one (uncomment, or the mirror's confirm) — a form can never pass
-// on unconfirmed prefills.
+// see dsp-evidence-forms.md#evidence-forms
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { parseStateNote, section } from "./notes.ts";
@@ -134,13 +125,7 @@ export function scaffoldInstance(t: FormTemplate, title: string): string {
   ].join("\n");
 }
 
-/** A HEADING INSIDE A FIELD STAYS INSIDE THE FIELD (seen four times on
- *  2026-08-09). Sections are `## <field>`, so a `#` or `##` line in a body
- *  would END the section and strand the rest under a made-up sibling —
- *  invisibly, because the required-check still sees the first paragraph.
- *  The voice rules ASK for small headings in long prose, so the author's
- *  heading is meant: it demotes to `###` on write, lossless, never refused.
- *  Fenced code is left alone. */
+/** see dsp-evidence-forms.md#a-heading-inside-a-field-stays-inside-the-field */
 function demoteHeadings(content: string): string {
   let fenced = false;
   return content
@@ -215,13 +200,7 @@ export function confirmPrefill(instanceRaw: string, field: string, index: number
 
 /** Flip the frontmatter status; stamp whose hand finished. */
 export function withStatus(instanceRaw: string, status: string, by: string): string {
-  // NO SPACE IS DEMANDED AFTER THE COLON, anywhere in this file (owner
-  // ruling, 2026-08-06). `key:` and `key: value` are one line to a reader and
-  // must be one line to the engine. A regex that wants the space matches
-  // nothing on an empty key, and a replace that matches nothing returns the
-  // string UNCHANGED — so the caller writes the file, sees no error, and the
-  // change is simply absent. Nothing fails, which is why it took four
-  // attempts to see it.
+  // see dsp-evidence-forms.md#no-space-is-demanded-after-the-colon
   let out = instanceRaw.replace(/^status:.*$/m, `status: ${status}`);
   if (/^by:/m.test(out)) out = out.replace(/^by:.*$/m, `by: ${by}`);
   else out = out.replace(/^status:.*$/m, (m) => `${m}\nby: ${by}`);
@@ -259,30 +238,12 @@ export function withAuthor(instanceRaw: string, author: string): string {
 export function withSignedOff(instanceRaw: string, when: string): string {
   // Signing off IS the re-attestation, so it clears any suspect mark.
   const raw = stripSuspect(instanceRaw);
-  // THE KEY MAY BE PRESENT AND EMPTY, and it usually is: a hand-written or
-  // template-minted form carries `signed_off:` with nothing after it. Matching
-  // on "signed_off: " — colon SPACE — missed exactly that case, so neither
-  // branch fired the replace and the anchor appended a SECOND key. The parser
-  // then read the first one, which was the empty one, and the stamp vanished
-  // while the file plainly contained it (found live 2026-08-06).
+  // see dsp-evidence-forms.md#the-key-may-be-present-and-empty
   if (/^signed_off:/m.test(raw)) return raw.replace(/^signed_off:.*$/m, `signed_off: ${when}`);
   return afterAnchor(raw, `signed_off: ${when}`);
 }
 
-/** NOTHING WRITES A SUSPECT MARK ANY MORE (owner ruling 2026-08-06, built
- *  2026-08-07). There was a `withSuspect` here that stamped a reason onto a
- *  claim, and it STRIPPED the signature, the author and the bless to do it.
- *
- *  Two faults in one function. It stored a derived value, which then went
- *  stale between the passes that wrote it. And it destroyed a person's act to
- *  record a machine's opinion — a checker may refuse to paint a claim green,
- *  but it may never erase what somebody signed.
- *
- *  Green is computed now, on every look, in Session.recordDone. The reason a
- *  claim fell is in the log, which had it all along.
- *
- *  THE STRIPPER STAYS, for the claims the old code already marked: reading one
- *  still has to ignore a leftover line. */
+/** see dsp-evidence-forms.md#nothing-writes-a-suspect-mark-any-more */
 export function stripSuspect(instanceRaw: string): string {
   return instanceRaw.replace(/^suspect:.*\n?/m, "");
 }
@@ -301,52 +262,13 @@ export function withBy(instanceRaw: string, by: string): string {
   return instanceRaw.replace(/^form:.*$/m, (s) => `${s}\nby: ${by}`);
 }
 
-/** Frontmatter holds ONE LINE PER KEY, so a value folds onto one.
- *
- *  IT IS NEVER SHORTENED (owner ruling 2026-08-16). This used to cut at 200
- *  characters and add an ellipsis, and the cut is what made a form
- *  unsubmittable: a probe result is prose, the node-table shows every
- *  standing node's value, and the submit refuses a cell that trails off. So
- *  answering three empty cells meant resending twenty-two that the writer had
- *  already truncated, and no amount of retyping could fix them.
- *
- *  IT COST THIRTEEN STANDING PROBE RESULTS, cut mid-sentence on their own
- *  nodes, plus two earlier incidents recorded as note-54c7a1cdfc4e and
- *  note-567aef4660ba. Both of those hunted the wrong culprit, and one comment
- *  in stateform.ts still claims no maxlength exists anywhere. It was here.
- *
- *  A QUOTED YAML SCALAR HAS NO LENGTH LIMIT, so folding is all that was ever
- *  needed. Every value this writes is quoted unconditionally by yamlValue. */
+/** see dsp-evidence-forms.md#frontmatter-holds-one-line-per-key-so-a-value */
 const oneLine = (s: string): string => s.replace(/\s+/g, " ").trim();
 
-/** EVERY WRITTEN VALUE IS QUOTED, unconditionally (found the hard way twice
- *  on 2026-08-07).
- *
- *  A bare scalar containing ": " is a YAML syntax error. The parse then
- *  throws, the node leaves the corpus, and the symptom lands somewhere else
- *  entirely — first a raid entry reported as a missing artifact two states
- *  away, then a gate whose own frontmatter stopped reading.
- *
- *  QUOTE ALWAYS RATHER THAN SNIFFING for dangerous characters. A sniff is a
- *  list somebody has to keep complete, and colon-space was already missed
- *  once by exactly that reasoning. */
+/** see dsp-evidence-forms.md#every-written-value-is-quoted */
 const yamlValue = (s: string): string => `"${oneLine(s).replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
 
-/** THE REOPEN MARK — A COMPARISON, NEVER AN ERASURE.
- *
- *  A reopen used to strip the signature and stamp a reason in its place. That
- *  destroyed the one fact that genuinely had to be stored: who signed, and
- *  when (owner ruling 2026-08-06). So the signature STAYS and a date lands
- *  beside it.
- *
- *  Green then asks one question — is the reopen newer than the signature? —
- *  and re-submitting stamps a newer signature, which clears the mark with
- *  nothing having to erase anything. This is v1's adr-evidence-hash shape: a
- *  comparison made at look time, never a written verdict.
- *
- *  WHY THE FILE AND NOT THE HISTORY. The machine instance lives in memory and
- *  is rebuilt from the repo each boot, so a reopen recorded only in its
- *  history dies at the next restart. The repo is the memory. */
+/** see dsp-evidence-forms.md#the-reopen-mark */
 export function withReopened(instanceRaw: string, when: string, why: string): string {
   const line = `reopened: ${yamlValue(`${when} — ${why}`)}`;
   // The reason is somebody's prose, and prose is DATA. A string replacement
@@ -384,14 +306,7 @@ export function reopenedAfterSigning(fm: Record<string, unknown>): boolean {
   return signed !== "" && at > signed;
 }
 
-/** A KEY OWNS ITS BLOCK: the key line, plus every indented line under it.
- *
- *  That is what a YAML block list is, and replacing only the key line leaves
- *  the old items dangling beneath a scalar. The result is not YAML at all.
- *
- *  IT COST FIVE CANDIDATE NOTES THEIR PICKS on 2026-08-09. The chart wrote
- *  `picks` as a scalar over a block list, every note stopped parsing, and the
- *  five drawn lines vanished off the chart with no error anywhere. */
+/** see dsp-evidence-forms.md#a-key-owns-its-block */
 function keyBlock(key: string): RegExp {
   const esc = key.replace(/[.*+?^{}()|[\]\\]/g, (c) => `\\${c}`);
   return new RegExp(`^${esc}:.*(?:\\n[ \\t]+\\S.*)*`, "m");

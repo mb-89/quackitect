@@ -1,16 +1,4 @@
-// THE SCENARIO DECK — ATAM's walk dealt one card at a time (owner ruling
-// 2026-08-10). A card shows the SCENARIO (the quality requirement and its
-// six-part section), the PATH (the elements and interfaces that carry it) and
-// the VERDICT: three parts separated by OR, each with its explainer FIRST.
-// A verdict posts at once; at-risk and unaddressed mint their register entry
-// before the page redraws. The fitness flag is not a verdict — it lands on
-// the requirement node as fitness_candidate: true.
-//
-// The structure numbers render beneath the deck, INFORMATION ONLY — nothing
-// about them is typed (owner ruling 2026-08-10).
-//
-// The panels and styles ride in from card-parts.ts — one copy, shared with
-// the compare card and the flip deck. No backtick in any body.
+// see dsp-form-editors.md#the-scenario-deck
 import { CARD_PARTS } from "../card-parts.ts";
 import type { EditorKind } from "./kinds.ts";
 

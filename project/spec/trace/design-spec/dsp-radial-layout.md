@@ -191,3 +191,147 @@ slices all take the level as given, so all of it survives unchanged.
 WHAT SURVIVES A RE-ORIGIN IS THE TYPE ORDER. A requirement still sits inside a
 function, because that order is what the trace MEANS. What moves is where the
 counting starts.
+
+## One clickable piece of the pie
+
+ONE CLICKABLE PIECE OF THE PIE — a section at one ring, or one slice of
+ that (owner ruling 2026-08-07).
+
+ "THE LEDGER'S REQUIREMENTS" IS A PLACE. Naming a section was not enough:
+ a reader who wants one ring of one section needs somewhere to aim, and the
+ label arc was the only target there was.
+
+## A typed node names its own template
+
+A TYPED NODE NAMES ITS OWN TEMPLATE (owner, 2026-08-05). `type:
+ "[[value-prop]]"` points at the item template that says what a value prop
+ must carry, so a reader is one hop from the rules and Obsidian draws the
+ edge. A bare `value-prop` means exactly the same thing — the link is the
+ readable form, never a second syntax to support.
+
+## Mechanical checks the template declares
+
+MECHANICAL CHECKS THE TEMPLATE DECLARES (owner order 2026-08-06): the
+ rules ride the template's own frontmatter, generic engine code applies
+ them, and they fire for EVERY hand — the agent's submit and a person's
+ panel edit run the same conformance.
+
+## The upward edge has one slot and several names
+
+THE UPWARD EDGE HAS ONE SLOT AND SEVERAL NAMES (owner ruling
+2026-08-07, machines/trace-schema.md): refines, satisfies,
+implements, verifies — the relation differs, so the word does.
+
+The MODEL keeps one slot on purpose. Everything downstream — the
+wedge walk, the coverage checks, the drawing — asks the same
+question of every node: what does this serve? Splitting the slot
+would fork that question per type for no gain.
+
+EVERY SCHEMA KEY FOLDS, or its whole level goes invisible: the
+elements, the interfaces and the test-specs each shipped with their
+key missing here, and none of them drew until somebody looked.
+
+## Every wedge a node belongs to
+
+EVERY wedge a node belongs to. A node whose ancestry reaches two value
+ props is DRAWN IN BOTH (owner, 2026-08-06) — one node in the data, two
+ places in the picture.
+
+ The alternative was one placement plus an edge crossing the whole circle to
+ reach its other parent, and those lines are what made the drawing
+ unreadable. Sharing WITHIN one prop is fine and stays: those lines are
+ short and local.
+
+## The center-distance floor
+
+THE CENTER-DISTANCE FLOOR (owner, 2026-08-06): no two node centers sit
+ closer than two thirds of the inner ring — a fixed value, and radii GROW
+ where it would be undercut. It also subsumes the card-overlap rule: at
+ this distance a 260×60 card clears its neighbour at every angle.
+
+## The band straddles its ring
+
+THE BAND STRADDLES ITS RING (owner sketch, 2026-08-06): one card pushed
+ OUT and one pulled IN, rather than every sub-orbit growing outward. The
+ ring keeps its own radius as the band's middle, so the band costs half as
+ much clearance on each side and the next ring starts nearer.
+
+## One written reference
+
+ONE WRITTEN REFERENCE, REDUCED TO THE ID IT MEANS.
+
+ THE MACHINE IS GENEROUS HERE ON PURPOSE (owner, 2026-08-06). A person
+ writing a reference has a file in front of them, and there are four honest
+ ways to name it. Refusing three of them teaches nothing — it just makes the
+ form feel broken.
+
+ All of these mean the same node:
+
+ - `nbr-obsidian` — the bare id
+ - `[[nbr-obsidian]]` — a wiki link, which is what Obsidian pastes
+ - `project/spec/trace/neighbour/nbr-obsidian.md` — the path from the root
+ - `project\spec\trace\neighbour\nbr-obsidian.md` — the same, Windows-shaped
+ - `nbr-obsidian.md` — just the file name
+
+ A path reduces to its LAST SEGMENT with `.md` dropped, because the file
+ name IS the id everywhere in the trace. So a unique file name resolves
+ whether or not the folders above it were typed correctly.
+
+ What stays strict is the ID ITSELF. It must look like an id, and it must
+ resolve to a standing node — those checks are the point of a reference.
+
+## A list line is dash-led or numbered
+
+A LIST LINE IS DASH-LED OR NUMBERED (2026-08-09). The rank-cut template
+numbers its rows, because the numbers ARE the order, and reading only
+dash-led lines found nothing in one — so cut-criteria refused as empty
+while its own line check passed. Fifth time that pair has disagreed.
+
+## The references a table row carries
+
+THE REFERENCES A TABLE ROW CARRIES — the compare-card's answer shape.
+
+ A card records one answered pair per row: the two items and the verdict.
+ refsIn above reads a LIST, one dash-led id per line, so it found nothing in
+ a row and the field refused as empty while its own line check passed. No
+ content could satisfy both, which is a field nobody can ever fill.
+
+ Only the first two cells are items. The third is the verdict, and a
+ verdict is not an artifact.
+
+ HOW MANY CELLS ARE ITEMS DEPENDS ON THE ROW (2026-08-09). A card answers
+ with two items and a verdict. A dsm answers with ONE element and the value
+ written onto it, so reading two cells there offered the cluster name as an
+ artifact and the type check refused it. The caller knows which shape it
+ has; it says so.
+
+## Ring k must hold the worst wedges count at
+
+Ring k must hold the WORST wedge's count at that level, because the radius
+ is GLOBAL and a ring is one circle for everybody.
+
+ EACH RING CARRIES ITS OWN LOAD (owner, 2026-08-06). The shared gap made
+ the crowded outer ring blow every inner ring up with it, and the drawing
+ wasted its middle. Now a ring grows only as far as ITS worst wedge needs
+ at full stagger, and the floor chain keeps it clear of the previous
+ ring's outermost sub-orbit. Inner rings collapse; the spacing does not.
+
+## The ring answers to its hungriest section and n
+
+The ring answers to its HUNGRIEST section, and n items need n-1 gaps.
+
+THE ARC IS THE ONE THIS LEVEL MAY ACTUALLY USE (owner ruling
+2026-08-07). Below the split that is half a section, so the ring has to
+grow to hold the same rows in half the angle. Sizing against the whole
+section instead left the cards overlapping, and the pass that prises
+them apart smeared the requirements over five layers.
+
+## The text must fit the arc it rides
+
+THE TEXT MUST FIT THE ARC IT RIDES (owner ruling 2026-08-07). A textPath
+ draws only what fits and silently drops the rest, which is how "vendoring"
+ arrived on screen as "ndorin".
+
+ So the size comes DOWN until the whole word fits. A glyph is about 0.58 of
+ its font size wide in this face, which is close enough — the answer only
+ has to be small enough, not exact.

@@ -1,11 +1,4 @@
-// The rigor matrix — reader and column compiler (owner design 2026-07-29).
-//
-// The folder (machines/rigor_matrix) is the single source: rows are the
-// full-battery steps, cells tailor each step per change size. This module
-// reads it LIVE (seed-from-source: no baked copy exists to drift) and
-// compiles a change-size column into an iteration machine the kernel can
-// run. Struck states (applies: none) vanish; their dependencies CONTRACT
-// through them, so the seeded machine stays connected.
+// see dsp-method-compilation.md#the-rigor-matrix
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -123,12 +116,7 @@ export function parseEvidence(fm: Record<string, unknown>, file: string, body: s
   return raw.map((entry, i) => evidenceField(file, entry, i));
 }
 
-/** `picks` maps a column to the sources its cells are constrained to. ONE
- *  source or SEVERAL, and a literal is legal beside a live one — a column
- *  offering `[$clusters, nobody]` is complete without being free.
- *
- *  Anything else refuses. A pick pointing at nothing offers nothing, and an
- *  empty offer looks exactly like a text box (owner report 2026-08-08). */
+/** see dsp-method-compilation.md#picks-maps-a-column-to-the-sources-its-cells */
 function picksOf(file: string, f: Record<string, unknown>): Record<string, string[]> {
   const raw = f.picks;
   if (raw === undefined) return {};
@@ -167,13 +155,7 @@ function refuseBadShapes(file: string, f: Record<string, unknown>): void {
 /** THE THREE WAYS A ROW CAN BE WRONG ABOUT ITS OWN SHAPE. Each is a rule a
  *  reader would otherwise have to know, and each cost a real defect. */
 function refuseBadRow(row: RigorMatrixRow): void {
-  // A DRAWN SUB-MACHINE IS A CANVAS, SO IT TAKES THE CANVAS'S NAME (owner
-  // ruling 2026-08-08). `boot` is the shape: the node's file is boot.canvas
-  // and the state's id is boot. One name.
-  //
-  // Two names for one node is what a reader hits when they click a state and
-  // land somewhere called something else, and no amount of breadcrumb work
-  // fixes it.
+  // see dsp-method-compilation.md#a-drawn-sub-machine-is-a-canvas
   if (row.runs?.endsWith(".canvas")) {
     const drawing = (row.runs.split("/").pop() ?? row.runs).replace(/\.canvas$/, "");
     if (drawing !== row.name) {
@@ -401,12 +383,7 @@ function parseMatrixRow(
     // a row could only inherit one through same_as, so a step whose method is
     // not common knowledge had no way to make it a condition of entry.
     entry: fm.entry_read === undefined ? undefined : { read: asList(fm.entry_read) },
-    // A ROW MAY DEMAND A MACHINE-OBSERVED CHECK ON THE WAY OUT, for the same
-    // reason it may demand its method on the way in. A form field can only
-    // check the shape of what was written; a script can check the world.
-    // derive-functions is the first: its flows field promised a both-ways
-    // closure that no form vocabulary could express (owner ruling
-    // 2026-08-08).
+    // see dsp-method-compilation.md#a-row-may-demand-a-machine-observed-check-on-the
     exit: fm.exit_script === undefined ? undefined : { script: asList(fm.exit_script) },
   };
   refuseBadRow(row);
@@ -496,12 +473,7 @@ function priorityOf(row: RigorMatrixRow): number {
  *  source, sub-machine descent and edges. Both compilers spread this, so
  *  the gate rounds and the kickoff tag cannot drift apart. */
 function rowState(row: RigorMatrixRow, column?: ChangeColumn): Omit<StateDecl, "guidance" | "edges"> {
-  // THE TRIM IS MECHANICAL, NOT A JUDGMENT (owner ruling 2026-08-13). A field
-  // naming this size in its `omit` is not asked here — the state stays, its
-  // form is shorter, and no agent decides how brief to be.
-  //
-  // WITHOUT A COLUMN NOTHING IS DROPPED: the whole-matrix view shows every
-  // question a row can ask, which is what somebody reading the matrix wants.
+  // see dsp-method-compilation.md#the-trim-is-mechanical
   const asked = column === undefined ? row.evidence_form : row.evidence_form.filter((f) => !(f.omit ?? []).includes(column));
   return {
     id: row.name,
@@ -660,12 +632,7 @@ export function compileColumn(matrix: RigorMatrix, column: ChangeColumn): Machin
   return decl;
 }
 
-/** THE SEED MACHINE (owner ruling 2026-08-04): every iteration stands in
- *  M0 from the moment it is seeded — the retro onboards, then the kickoff
- *  sizes. No column exists yet, so only the M0 rows compile, on their own
- *  guidance. The kickoff's bless pins the full column and the machine
- *  grows IN PLACE: the machine id and the state ids are stable, so filled
- *  M0 states and their evidence carry over. */
+/** see dsp-method-compilation.md#the-seed-machine */
 export function compileM0(matrix: RigorMatrix, id: string): MachineDecl {
   const rows = matrix.rows.filter((r) => r.milestone === "M0");
   const inSet = (name: string) => rows.some((r) => r.name === name);

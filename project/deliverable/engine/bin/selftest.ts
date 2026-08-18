@@ -46,14 +46,7 @@ if (process.env.SE_SELFTEST_SKIP === "1") {
 
 const root = resolve(argValue("--root") ?? process.cwd());
 const dir = join(root, "project", "deliverable");
-// THE RECORDS GO WHERE THE LANE READS THEM, which is not always beside the
-// tree being tested. While an iteration is bound, `root` is that iteration's
-// WORKTREE, so a run records into a .se nothing ever opens: two green
-// batteries on 2026-08-15 wrote 1301 rows each into a directory the lane does
-// not resolve, and their output said nothing about it.
-//
-// The spawner passes the lane's own .se. The local one is the fallback for a
-// hand-run that sets nothing.
+// see dsp-quality-toolchain.md#the-records-go-where-the-lane-reads-them
 const seHome =
   process.env[TIMINGS_DIR_ENV] !== undefined && process.env[TIMINGS_DIR_ENV] !== ""
     ? String(process.env[TIMINGS_DIR_ENV])
@@ -73,10 +66,7 @@ const files = readdirSync(testsDir)
 // engine/testreporters.ts, shared with the scoped path so the two cannot drift
 // apart again — the scoped one carried no timing reporter at all until i12.
 const REPORTERS = testReporterArgs("spec");
-// THE CAP OUTGREW ITS SUITE ONCE (2026-08-02): the pull-lane tests pay a
-// real boot walk each, the wall clock crossed the old 110s, and spawnSync
-// KILLED the run mid-stream — truncated output, no summary, an exit code
-// that read as ordinary failure. A cap that is hit must SAY so.
+// see dsp-quality-toolchain.md#the-cap-outgrew-its-suite-once
 const CAP_MS = 300_000;
 // The cap kills the WHOLE TREE — spawnSync killed only the runner and left
 // its per-file workers orphaned (two held a folder lock for four hours,

@@ -813,17 +813,7 @@ global("file", (_r, a, ctx) =>
 
 // --- any ------------------------------------------------------------------
 
-// AN ABSENT FIELD DOES NOT CONTAIN ANYTHING — it is not an error to ask.
-//
-// WHY THIS EXISTS (owner report 2026-08-08). "Give me every note linked to X"
-// is the query the whole register is for, and it is one expression:
-// refines.contains("uc-take-a-step"). It THREW, on the first note that has no
-// refines — which over a vault of 480 notes holding method cards, states and
-// templates is immediately. So the one query that matters could not be run at
-// all, and nothing said why.
-//
-// FALSE IS THE RIGHT ANSWER, not a refusal. A note with no links is not linked
-// to X, and a filter that cannot survive a heterogeneous vault is not a filter.
+// see dsp-live-register.md#an-absent-field-does-not-contain-anything
 for (const name of ["contains", "containsAll", "containsAny", "startsWith", "endsWith"]) {
   method(["null"], name, () => false);
 }

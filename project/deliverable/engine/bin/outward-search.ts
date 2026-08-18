@@ -1,33 +1,8 @@
-// THE OUTWARD SEARCH ACTUALLY HAPPENED — the check behind the three finders
-// that face outside (owner ruling 2026-08-08).
-//
-// Three of the five finders exist to stop the design space collapsing to our
-// own ideas: prior art, what shipped, and analogy. Each one already REQUIRES
-// option nodes and refuses an empty submit. None of that proved anybody
-// looked outside — a person could type five options from memory, cite a
-// vendor name, and every check would pass.
-//
-// So this reads two things and compares them.
-//
-//   - The option nodes. Each one found by an outward finder carries a source.
-//   - The call log. It records every outward query: the lane's se_web_search
-//     and se_web_fetch, and the native WebSearch/WebFetch the contract allows
-//     when the lane's provider is unconfigured — a hook records those under
-//     the host tool's own name.
-//
-// An outward option with no outward query behind it is the failure mode this
-// exists to name.
-//
-//   node engine/bin/outward-search.ts --root <project root>
+// see dsp-file-lane.md#the-outward-search-actually-happened
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-/** The finders that face outside. contradiction and without reason over our
- *  own clusters, so neither owes a query.
- *
- *  `shipped` was a third until 2026-08-08. A shipped product IS prior art, so
- *  it folded into that finder and the two angles became required fields on
- *  one form. */
+/** see dsp-file-lane.md#the-finders-that-face-outside */
 const OUTWARD = new Set(["prior-art", "analogy"]);
 
 function argValue(flag: string): string | undefined {

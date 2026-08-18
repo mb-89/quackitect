@@ -1,27 +1,4 @@
-// THE FRONTMATTER WRITER — an auto-formatter, not a splice.
-//
-// OWNER RULING 2026-08-01, and it is the whole design: take the frontmatter
-// you have, require it to be valid, and print a properly formatted result.
-// If the result loses the idiosyncratic spacing or list style somebody typed,
-// that does not matter — it is the same contract as pressing ctrl-s in a
-// programming language.
-//
-// WHY THIS BEATS THE OBVIOUS ALTERNATIVE. The cheap way to write one key is a
-// SPLICE: find the line `state: draft`, swap that line, touch nothing else.
-// It preserves everything by construction and it cannot do lists, because a
-// list is not one line. Measured on this repo: 150 of 1,219 real key edits
-// refuse under a splice, and those 150 are 100% of `depends_on` and 100% of
-// `evidence` — exactly the two fields a matrix editor exists to change.
-//
-// A canonical rewrite has no such class. Every key writes the same way.
-//
-// WHAT IT COSTS HERE: nothing measurable. A plain re-serialize drops YAML
-// comments, and this vault has 147 frontmatter blocks with zero comment lines
-// in them (counted 2026-08-01). If that ever stops being true, yaml's Document
-// API keeps comments and this is where that swap goes.
-//
-// THE BODY IS NEVER TOUCHED. Only the block between the fences is reprinted;
-// everything after the closing fence is carried across byte for byte.
+// see dsp-trace-corpus.md#the-frontmatter-writer
 import { parse, stringify } from "yaml";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { stripBom } from "./jsonio.ts";

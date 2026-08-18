@@ -1,18 +1,4 @@
-// THE BOOT SMOKE TEST — proves the engine LOADS and ANSWERS, and nothing
-// more (owner ruling, 2026-07-30). Budget: under ten seconds.
-//
-// The full battery used to gate boot. On a machine held at its base clock
-// that cost the best part of a minute before the first useful word, and a
-// battery at boot is wrong even where it is fast: boot asks "can this
-// engine run", not "is every behaviour correct". The second question
-// belongs to validation — se_test, and the end of an expedition.
-//
-// IT REPORTS ITS PROGRESS. Every step prints
-//   ##progress <done> <total> <label>
-// which the engine turns into a real wait bar. A bar that measures nothing
-// is an animation, and an animation is not information.
-//
-//   node engine/bin/smoketest.ts --root <project root>
+// see dsp-quality-toolchain.md#the-boot-smoke-test
 import { existsSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 

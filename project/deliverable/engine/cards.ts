@@ -1,17 +1,4 @@
-// THE CARDS THE MIRROR SHOWS — one big card beside a two-wide grid.
-//
-// The list is PER PRODUCT, not per engine (owner ruling 2026-07-29). v3 is
-// meant to work on other products, and another product wants other cards. So
-// the truth is project/deliverable/views/cards.md, edited in Obsidian.
-//
-// NESTED FRONTMATTER, by the owner's call. Obsidian's own Properties panel
-// collapses nested YAML into a blob, but the Nested Properties community
-// plugin renders it as a tree — and this vault already requires Advanced
-// Canvas to draw machines, so the plugin bar was paid long ago.
-//
-// ENTRY ORDER IS THE NUMBERING. A card that is not built yet keeps its entry
-// and its number — dropping it would renumber every card after it, and the
-// numbers are muscle memory.
+// see dsp-mirror-render.md#the-cards-the-mirror-shows
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseStateNote } from "./notes.ts";

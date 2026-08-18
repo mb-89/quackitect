@@ -1,17 +1,9 @@
-// The VOICE LINT — mechanical checks over PROSE, on demand (se_lint) and
-// later swept by the overhaul. Catches FORM, never meaning. The rules' LOGIC
-// lives here; the rules' PARAMETERS are DATA (owner ruling 2026-07-28,
-// guidance/method/engineering.md): machines/lint/voice-lint.md — edit a
-// threshold there and the next call uses it, no recompile, no reload.
+// see dsp-quality-toolchain.md#the-voice-lint
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseStateNote } from "./notes.ts";
 
-/** A LIST MARKER IS NOT A SENTENCE (owner report 2026-08-08). "1." ends in a
- *  full stop, so an unguarded split counted a numbered item's own marker as a
- *  sentence. A three-sentence item measured four and fired. The same marker
- *  also has to make the line an ITEM: a numbered step is a list item exactly
- *  as a dashed one is, and only the dash was recognised. */
+/** see dsp-quality-toolchain.md#a-list-marker-is-not-a-sentence */
 const MARKER = /^\s*(?:[-*+]|\d+[.)])\s+/;
 
 const sentencesOf = (t: string): string[] =>
@@ -20,11 +12,7 @@ const sentencesOf = (t: string): string[] =>
     .split(/(?<=[.!?])\s+/)
     .filter((x) => x.trim() !== "");
 
-/** A PIPE ROW IS CELLS, NOT ONE STREAM OF SENTENCES (owner report 2026-08-08).
- *  A form field is written `- name | help | required`, and the trailing
- *  `required` was counted as a sentence of the help text. Every field line
- *  measured one sentence more than it had. Lint the LONGEST cell: on a field
- *  row that is the help, and on a table row it is the prose cell. */
+/** see dsp-quality-toolchain.md#a-pipe-row-is-cells */
 const proseOf = (l: string): string => {
   const body = l.replace(MARKER, "");
   if (!body.includes("|")) return body;
@@ -253,24 +241,10 @@ export function lintProse(root: string, text: string, rel?: string): LintFinding
       // list this rule exists to catch.
       const isLiteral = (part: string): boolean =>
         /^`[^`]*`$/.test(part.trim()) || /^"[^"]*"$/.test(part.trim()) || /^'[^']*'$/.test(part.trim());
-      // EVERY SEPARATOR, not the two somebody thought of first. The rule was
-      // commas and semicolons, so writing the same buried list with middots
-      // or slashes walked straight past it (owner, 2026-08-07).
-      //
-      // A SPAN IS ONE THING, WHATEVER IS INSIDE IT (owner report 2026-08-08).
-      // Adding the slash meant `project/spec/trace/raid/` split into five
-      // "items", so every card saying where its node lives fired the chain
-      // rule on a path. The literal test could not save them: it runs AFTER
-      // the split, and by then the span is in pieces. Mask each span to one
-      // token first, and the test does what it was written to do.
+      // see dsp-resolution-seam.md#every-separator
       const masked = s.replace(/`[^`]*`/g, "`x`").replace(/"[^"]*"/g, '"x"');
       const items = masked.split(/[,;·•/]|\s→\s/).filter((part) => part.trim() !== "" && !isLiteral(part));
-      // A PART MUST CARRY SUBSTANCE TO COUNT (e28, 2026-08-01 — rebuilt on
-      // trunk 2026-08-09 after the worktree fix never landed): the rule
-      // separates an enumeration of THOUGHTS from an enumeration of NAMES.
-      // "alpha, beta, gamma, delta" is reference; nobody wants `pill` on
-      // its own bullet. Fourteen of thirty-seven findings in one sweep
-      // were this miscount.
+      // see dsp-resolution-seam.md#a-part-must-carry-substance-to-count
       const weighty = items.filter((part) => part.trim().split(/\s+/).length >= cfg.comma_chain_min_item_words);
       if (weighty.length > cfg.comma_chain_items) {
         findings.push({

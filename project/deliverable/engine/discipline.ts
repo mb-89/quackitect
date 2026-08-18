@@ -1,24 +1,4 @@
-// THE DISCIPLINE LANE — rule-based, no second model (owner ruling 2026-08-02).
-//
-// Harvested from 2,589 logged se_run calls: 46% were improvised text tools —
-// Select-String standing in for the searcher, Get-Content for the reader,
-// Set-/Add-Content for the writer — every one uninstrumented, un-CAS'd, and
-// invisible to the guards the lane exists to provide. The lane now covers
-// those jobs, so doing them through the shell stops being a gap and starts
-// being a choice.
-//
-// The ladder: first classified run GOES THROUGH, carrying a named warning —
-// that warning is the feed-forward for the second attempt. From then on the
-// category refuses (SE-C-129), remedy naming the lane tool. The valve:
-// no_tool_reason runs it once and LOGS THE REASON — when the classifier is
-// wrong or a verb is truly missing, the agent documents the gap at the moment
-// it hits it, and the reasons pile up where the retro reads. A frequent
-// reason IS the next verb.
-//
-// ONE TABLE, THREE OUTPUTS. The rules below drive (a) the classifier, (b)
-// the warning/refusal text, and (c) the se_run description (laneSummary) —
-// feed-forward and feedback generated from the same source, so they cannot
-// drift apart.
+// see dsp-lane-door.md#the-discipline-lane
 import { spawnSync } from "node:child_process";
 import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -290,15 +270,7 @@ function saveTestState(seDir: string, s: TestState): void {
   writeFileSync(testStatePath(seDir), JSON.stringify(s, null, 1), "utf8");
 }
 
-// `testGate` IS DELETED (owner ruling 2026-08-16), with SE-C-130 and SE-C-131.
-//
-// It refused a re-run over an identical tree. `decideScope` answers the same
-// question without refusing anything: scope "nothing", with the standing
-// verdict quoted back. An unchanged tree is news, not an obstacle.
-//
-// NOTHING IN THE LANE EVER CALLED IT after the rewrite. Its own tests were the
-// only callers left, so the refusal it threw could not be seen by anybody — and
-// a clause nobody can reach is a documented promise the engine does not keep.
+// see dsp-lane-door.md#testgate-is-deleted
 
 export function testRecord(
   seDir: string,
@@ -341,14 +313,7 @@ export function streakNudge(streak: number): string | undefined {
   return `${streak} green runs of this scope in a row. In ~95% of cases the change you just made broke nothing — run a test to answer a QUESTION (did THIS change break THAT), not to reassure. The unchanged-tree gate would have refused the truly redundant ones; the rest is judgment.`;
 }
 
-// ── the scope economy ──────────────────────────────────────────────────────
-// THE BATTERY IS THE EXCEPTION, NOT THE HABIT (owner ruling 2026-08-02).
-// Measured live: one session ran the full battery ~60 times in two hours,
-// mostly to answer single-test questions — then grepped a temp file for the
-// one failure it cared about. The rules below make the scoped run the cheap
-// default and the battery the call you EARN — and they make gaming the rule
-// unprofitable, because piecemeal coverage past a threshold GRANTS the
-// battery instead of policing it.
+// see dsp-lane-door.md#the-scope-economy
 
 /** Every test file the suite holds, root-relative. */
 export function suiteFiles(root: string): string[] {
@@ -425,14 +390,7 @@ export interface ScopeDecision {
   files: string[];
   /** One line the agent shows the reader. The engine's reasoning, not a hint. */
   why: string;
-  /** WHETHER THIS DIFF WANTS THE CONFORMANCE SWEEP TOO (owner ruling
-   *  2026-08-16). A change made of DOCUMENTS is exactly the change a test
-   *  battery says nothing about and the sweep says everything about.
-   *
-   *  IT RIDES THE TEST DECISION BECAUSE THE SWEEP HAS NO VERB. The engine
-   *  already reads the diff here to size the run; asking one more question of
-   *  the same diff costs nothing and gives the sweep a third mechanically
-   *  clear moment, beside the boot and sweep-consistency's exit. */
+  /** see dsp-lane-door.md#whether-this-diff-wants-the-conformance-sweep-too */
   sweep: boolean;
 }
 
@@ -452,29 +410,7 @@ function mostlyDocuments(changed: string[]): boolean {
   return docs >= 3 && docs * 2 >= changed.length;
 }
 
-/** THE ENGINE DECIDES WHAT GETS TESTED, AND THE AGENT NEVER DOES (owner
- *  ruling 2026-08-16).
- *
- *  THE AGENT ASKS FOR A TEST AND SAYS WHAT IT WANTS TO KNOW. This function
- *  reads what actually changed, picks the scope, and the result SAYS what it
- *  picked. There is no argument the agent can pass to widen or narrow it.
- *
- *  WHAT IT REPLACED, and why the replacement is structural rather than a
- *  threshold tweak. Two refusals used to guard this from opposite sides:
- *  batteryGate refused the battery while every change mapped to a scoped run,
- *  and scopedGate refused scoped runs once the piecemeal odometer crossed the
- *  flip. Each refusal's remedy was the OTHER refusal.
- *
- *  ON 2026-08-16 THEY CLOSED ON EACH OTHER. At i6's sixth build chunk the
- *  odometer stood at 42 and the battery was illegal outside verification, so
- *  no test call was legal at all — with four milestones still to walk before
- *  the state that fires the battery. Narrowing to one file changed nothing,
- *  because the flip counts the odometer rather than the call.
- *
- *  THE CAUSE WAS NOT THE THRESHOLD. It was that the agent chose the scope and
- *  the engine graded the choice. Two graders with different subjects will
- *  eventually disagree, and an agent standing between them has no move. Now
- *  there is one decider and nothing to disagree with. */
+/** see dsp-lane-door.md#the-engine-decides-what-gets-tested */
 export function decideScope(seDir: string, root: string, force: boolean): ScopeDecision {
   const state = loadTestState(seDir);
   const seen = state.scoped_since_battery ?? [];
@@ -611,17 +547,7 @@ export function parseTap(out: string): TapResult {
       if (counts[1] === "fail") res.fail = Number(counts[2]);
       continue;
     }
-    // EVERY DEPTH, NOT ONLY THE TOP (i11, from the 2026-08-12 seed).
-    //
-    // This matched `^not ok` with no leading space, so a failure inside a
-    // describe() block was invisible: TAP indents the child and reports the
-    // PARENT at the top level with `1 subtest failed` and the suite's
-    // location. The one line that says WHAT failed — the assertion's message
-    // and diff — was dropped, every time.
-    //
-    // MEASURED 2026-08-16: three separate failures had to be re-run through
-    // the shell with a different reporter to be read at all, each one a
-    // logged escape from the lane the lane exists to replace.
+    // see dsp-lane-door.md#every-depth
     const notOk = line.match(/^(\s*)not ok \d+ - (.*)$/);
     if (notOk === null) continue;
     if (res.failures.length >= 10) continue;

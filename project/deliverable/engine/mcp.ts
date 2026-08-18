@@ -156,11 +156,7 @@ export class McpServer {
           });
         case "ping":
           return this.ok(id, {});
-        // THE ONE EXIT THE BOUND CANNOT COVER (i27, 2026-08-14). A tools list
-        // must arrive as a tools ARRAY the client can parse, so paging it
-        // into a text page would leave the agent with no tools at all. It is
-        // kept small by keeping DESCRIPTIONS short, which is authorship
-        // rather than mechanism, and this comment is the only guard there is.
+        // see dsp-lane-door.md#the-one-exit-the-bound-cannot-cover
         case "tools/list":
           return this.ok(id, {
             tools: [...this.tools.values()].map((t) => ({

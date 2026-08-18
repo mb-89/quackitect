@@ -592,11 +592,7 @@ export const TABLE_STYLE = `
 .pivot.wide td{padding:3px 2px;min-width:18px}
 `;
 
-// WRITING BACK — one cell, one key, one note.
-//
-// COMMIT ON ENTER, DISCARD ON ESCAPE (owner ruling 2026-08-01). Nothing is
-// written while somebody is typing, which is the Qt delegate contract and the
-// reason this needs no debouncing, no dirty tracking and no conflict window.
+// see dsp-live-register.md#writing-back
 
 export interface CellEdit {
   /** Vault-relative path of the note, as the row's own file.path gave it. */

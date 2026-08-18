@@ -130,3 +130,41 @@ IT PERSISTS WITH ITS RUNG, reversing an earlier no-persist law. Engine reloads
 are routine mid-session, and each one silently revoked the very delegation the
 fixes were granted under. It restores only beside a persisted top-rung
 autonomy, and lowering the dial still revokes it — in this life and the next.
+
+## Set target answers in place
+
+SET TARGET ANSWERS IN PLACE (owner report 2026-08-09: as a redirect
+POST the button swallowed its own rejection — success and refusal
+both 303ed and the clicking page read nothing). A refusal now comes
+back as its own JSON and the client toasts it.
+
+## A reference in prose is a link not dead
+
+A [[REFERENCE]] IN PROSE IS A LINK, NOT DEAD TEXT (owner report
+2026-08-09). Where the id resolves in the document's own record, it
+becomes the same doclink every structured editor emits; where it
+does not resolve it stays text — an unresolved link is a finding.
+
+## The host reads the cards from here
+
+THE HOST READS THE CARDS FROM HERE (owner design 2026-07-30). A host
+that draws one button per card must not keep its own copy of the
+list — project/deliverable/views/cards.md stays the single truth, and a card added
+there appears in VS Code without touching the extension.
+
+## The persons surfaces get the same clock as the
+
+THE PERSON'S SURFACES GET THE SAME CLOCK AS THE LANE (owner, 2026-08-09:
+"every time something takes long, I have to tell you"). Every request is
+timed at this one door, and a breach lands in the SAME log the retro
+already mines — tool mirror_slow, with the path and the wait. Fast
+requests stay out: the alive poll runs constantly, and a log of
+heartbeats would bury what this exists to surface. The line is the
+one-second rule, shared with the lane (calllog.SLOW_MS).
+
+## Kill the whole tree
+
+KILL THE WHOLE TREE, never just the child (found 2026-07-30: a run the
+client gave up on kept a test runner and four descendants alive for
+minutes, competing with everything measured after it). The shell we spawn
+is a parent; killing it leaves its children parented to init and running.

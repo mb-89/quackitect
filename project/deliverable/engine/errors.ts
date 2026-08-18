@@ -82,18 +82,7 @@ export const CLAUSES = {
   UNDECLARED_ROOT: "SE-C-127", // @name addresses a root the owner has not declared — declared, never arbitrary
   JOB_UNKNOWN: "SE-C-128", // a background job ref this session never started
   RUN_LANE_JOB: "SE-C-129", // se_run asked to do a lane tool's job — the lane covers it; the ladder blocks after one warned run
-  // SE-C-130 AND SE-C-131 ARE RETIRED (owner ruling 2026-08-16). One refused a
-  // re-run over an unchanged tree; the other refused the wrong test scope. On
-  // 2026-08-16 they closed on each other — each remedy was the other refusal,
-  // and no test call was legal at all for four milestones.
-  //
-  // THE CAUSE WAS THE AGENT CHOOSING AND THE ENGINE GRADING THE CHOICE. Now
-  // `decideScope` reads what changed and decides, so there is nothing to grade:
-  // an unchanged tree is answered with scope "nothing", and a scope the agent
-  // cannot name is a scope the agent cannot get wrong.
-  // SE-C-134 IS RETIRED (owner ruling 2026-08-14). Shared method resolves to
-  // the machine root whatever tree is bound, so a method write can no longer
-  // land in a tree that does not own it. The number is not reused.
+  // see dsp-lane-door.md#se-c-130-and-se-c-131-are-retired
   NARRATION_STALLED: "SE-C-133", // updates keep coming while the checklist never moves — warned once, then refused
   RAW_NUL: "SE-C-132", // a raw NUL byte in text — it makes the whole file unsearchable; in code it is corrected to the escape, elsewhere the intent is not knowable
   WRITE_TRANSFORMED: "SE-C-135", // the applied text does not contain the payload — something transformed it on the way in; refused rather than silently corrupted

@@ -63,10 +63,7 @@ function cap(s: string): string {
     : `${s.slice(0, FINDINGS_CAP)}\n… (${s.length - FINDINGS_CAP} more chars — the commit hook prints the full list)`;
 }
 
-/** Run the linter's SAFE fixes over freshly-written files, in place.
- *  Undefined when nothing is covered or the tooling is absent. Never
- *  --unsafe: the unsafe tier rewrote working code once (2026-08-03) and
- *  is banned in engineering.md. */
+/** see dsp-quality-toolchain.md#run-the-linters-safe-fixes-over-freshly-written-files-in */
 export function lintFix(root: string, rels: string[]): LintFixResult | undefined {
   const targets = covered(root, rels);
   if (targets.length === 0) return undefined;

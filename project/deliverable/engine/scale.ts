@@ -1,23 +1,4 @@
-// The autonomy scale — an Obsidian-editable markdown TRUTH
-// (machines/scale.md): the engine reads it fresh, never defines it.
-//
-// THE RUNGS CARRY NO NUMBERS, AND THE ORDER IS THE SCALE (owner ruling
-// 2026-08-18: "it is a terrible idea to have scales for things that are not
-// numeric... I never see them, and nobody ever has to wonder about these
-// numbers").
-//
-// The grammar is "- abbr | name — description" under a heading, and a rung's
-// place in that list is its rank. The engine still compares numbers, because
-// a gate is a `>` and always was; it DERIVES them from position instead of
-// reading them off the page. Nothing that reaches a person carries one.
-//
-// THE DERIVED VALUES ARE THE ONES THAT WERE AUTHORED. Six rungs spread across
-// nought to one give 0, .2, .4, .6, .8, 1 — the exact ladder that used to be
-// typed in by hand. So this removes the numbers without moving a single
-// threshold.
-//
-// A malformed line fails loudly — a silently misparsed scale would draw
-// confident wrong notches.
+// see dsp-walk-machine.md#the-autonomy-scale
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseStateNote, section } from "./notes.ts";
@@ -54,18 +35,7 @@ export function levelName(levels: AutonomyLevel[], priority: number): string {
   return (rungs.find((l) => l.value >= priority) ?? rungs[rungs.length - 1]).name.split(" — ")[0];
 }
 
-/** A STATE'S WEIGHT, said as a word — the least rung that admits it.
- *
- *  NOT tierOf, WHICH IS THE DIAL'S FUNCTION. tierOf answers "which rung does
- *  this SETTING reach", so it looks DOWNWARD and a value below the lowest rung
- *  reaches nothing — "blocked". Applied to a state that is exactly backwards:
- *  a terminal at 0.01 is the lightest step there is, and it read as the
- *  heaviest. Seen live 2026-08-16 the moment the doors started serving words:
- *  `iterations/end` came back as `weight: "blocked"`.
- *
- *  ABOVE THE TOP RUNG IS GENUINELY BLOCKED, and that is the one case where the
- *  word is right: nothing admits it, so the agent never may. The archives are
- *  drawn that way on purpose. */
+/** see dsp-walk-machine.md#a-states-weight */
 export function weightName(levels: AutonomyLevel[], priority: number): string {
   const rungs = levels.filter((l) => l.value > 0).sort((a, b) => a.value - b.value);
   return (rungs.find((l) => l.value >= priority)?.name ?? "blocked").split(" — ")[0];
@@ -128,35 +98,7 @@ export function loadStopAt(root: string): AutonomyLevel[] {
   return loadRungs(stopAtPath(root), "The notches", "stopat.md", counted);
 }
 
-/** THE DEFAULT RUNG, BY NAME. Nothing in the engine writes the dial's
- *  starting value as a number: it is looked up from the scale like every
- *  other rung.
- *
- *  TACTICAL IS THE DEFAULT EVERYWHERE (owner ruling 2026-08-18). Measured:
- *  the heaviest state inside an iteration is a gate, and a gate weighs
- *  tactical. Everything else is lighter, so tactical ENTERS every state an
- *  iteration has — retros, overhauls and seeding stay strategic, and stay
- *  with the person.
- *
- *  IT WAS OPERATIONAL, AND THAT COULD NOT ENTER A GATE AT ALL. gate-kickoff is
- *  the first gate of every iteration and it is tactical, so an unattended run
- *  stopped at the first milestone every time. Measured on the i15 and i35
- *  cloud runs.
- *
- *  IT DOES NOT WALK AN ITERATION END TO END, AND THIS COMMENT SAID IT DID
- *  (found at i17's gate-kickoff, 2026-08-18, on an unattended box). ENTERING a
- *  state refuses on `priority > autonomy`, so a hand AT the weight is admitted.
- *  BLESSING refuses on `autonomy <= priority`, so it wants a hand strictly
- *  ABOVE — that is the 2026-08-04 design, where a gate is reviewed from one
- *  rung above the work it reviews, and it is deliberate.
- *
- *  SO THE TWO COMPARISONS ARE BOTH RIGHT AND THE CLAIM BETWEEN THEM WAS WRONG.
- *  tactical fills a gate and cannot sign it. An unattended run that must sign
- *  its own gates is launched at strategic, which is the person's call to make
- *  (se-arrive says so in its own help), and this default is not it.
- *
- *  raid-iss-tactical-is-documented-as-enough-to-walk-an-iteration-and-is-not
- *  carries the measurement. */
+/** see dsp-walk-machine.md#the-default-rung */
 export const DEFAULT_TIER = "tactical";
 
 /** The default dial position, resolved against the live scale. Falls back to

@@ -1,12 +1,4 @@
-// The decision graph — the agent's thought process as a per-state tree
-// (owner design, first captured 2026-07-25 in v2's i9 notes; built here).
-// Every task started is a NODE. Every node started gets RESOLVED: done,
-// obsolete, or reverted — abandoning is legal, abandoning silently is not.
-// Depth of forking IS the measure of drift; the retro reads the file.
-//
-// Ops arrive as the `update` field riding any lane call. The live graph is
-// in-memory (session-scoped, like the walk); every op also appends to
-// .se/decisions.jsonl — replayable, and the retro's raw material.
+// see dsp-narration.md#the-decision-graph
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
@@ -298,13 +290,7 @@ function chainOf(text: string): string[] | null {
   return parts.length >= 2 ? parts : null;
 }
 
-// THE CHAIN IS CORRECTED, NOT REFUSED (owner ruling 2026-08-02: correct
-// the mechanical, announce it, refuse only the ambiguous). This was the
-// lane's most-hit refusal — 174 of one window's 505 failures — and the
-// refusal already computed the split it then threw away. Narration that
-// chains is APPLIED as the plan it wanted to be; a chained item becomes
-// the items it listed. A RESOLUTION's brief still refuses: which part
-// resolved the node is not the engine's to guess.
+// see dsp-narration.md#the-chain-is-corrected
 function correctChains(
   op: string,
   brief: string | undefined,
@@ -472,11 +458,7 @@ export class Decisions {
   }
 
   private readonly parked: { state: string; brief: string; hops?: number; trail?: string[] }[] = [];
-  /** Updates landed since anything last CLOSED. The checklist is a progress
-   *  view, so a run of narration over a checklist that never moves is the
-   *  thing worth saying out loud (owner 2026-07-29). Prose said this
-   *  already and prose lost, which is the case for a mechanical nudge.
-   *  High enough that ordinary narration passes untouched. */
+  /** see dsp-narration.md#updates-landed-since-anything-last-closed */
   private sinceResolve = 0;
   /** WARN HERE. The nudge rides the result and costs nothing. */
   private static readonly NUDGE_AFTER = 5;
@@ -621,11 +603,7 @@ export class Decisions {
     const op = u.op as "done" | "obsolete" | "revert";
     const already = this.nodes.get(u.node!);
     if (already !== undefined && already.status === CLOSES[op]) return;
-    // A NODE FROM AN EARLIER SESSION'S VISIT. The live graph replays
-    // only this session's trail, but the RECORD keeps every visit — and
-    // the leave gate counts the record. A resolution must reach what the
-    // gate counts, or a record whose walk spanned sessions can never
-    // close (found live 2026-08-02, closing e31).
+    // see dsp-narration.md#a-node-from-an-earlier-sessions-visit
     if (already === undefined && this.extraPath !== undefined && this.resolveInRecord(op, u)) return;
     const n = this.openNode(u.node!);
     if (op === "done") {
@@ -724,16 +702,7 @@ export class Decisions {
     this.record({ op: "update", visit, node: point.id, brief: u.brief });
   }
 
-  /** THE NODE AN UPDATE ATTACHES TO. A node that is CLOSED or unknown is
-   *  not an AMBIGUOUS one (software.md: correct what is mechanical,
-   *  announce it, refuse only the ambiguous). Narrating on the item just
-   *  resolved is the commonest slip there is — the largest single refusal
-   *  class in the 2026-08-02 to 08-05 window, 43 of 128 failures.
-   *
-   *  So it lands on the closed item's still-open ancestor, or bare when
-   *  nothing above it is open, and the result says which happened. Only
-   *  `update` is corrected. A RESOLUTION naming a closed node still
-   *  refuses, because re-resolving is a real disagreement. */
+  /** see dsp-narration.md#the-node-an-update-attaches-to */
   private attachTo(id: string): string | undefined {
     const named = this.nodes.get(id);
     if (named?.status === "open") return named.id;

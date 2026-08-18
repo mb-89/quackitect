@@ -1,15 +1,4 @@
-// THE ELEMENT MATRIX, DRAWN — the numbered-cell sketch made live (owner
-// design 2026-08-10). Source elements down, destination elements across.
-// A cell shows what stands: the owed crossings and the interfaces naming
-// them. An owed cell with no interface carries a NAME button; the click
-// mints the interface skeleton server-side with the crossing flows already
-// in `carries`, and the redraw shows the link where the button was.
-//
-// EVERYTHING DRAWN IS COMPUTED — allocation off the elements' implements,
-// crossings off the functions' flows, the declared side off the interface
-// nodes. This editor stores nothing; the section is for the argued spread.
-//
-// NO BACKTICK IN ANY BODY. Each is one template literal.
+// see dsp-form-editors.md#the-element-matrix
 import type { EditorKind } from "./kinds.ts";
 
 export const ELEMENT_MATRIX_EDITOR: EditorKind = {

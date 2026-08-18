@@ -83,12 +83,7 @@ export interface TraceBand {
   to: number;
 }
 
-/** ONE CLICKABLE PIECE OF THE PIE — a section at one ring, or one slice of
- *  that (owner ruling 2026-08-07).
- *
- *  "THE LEDGER'S REQUIREMENTS" IS A PLACE. Naming a section was not enough:
- *  a reader who wants one ring of one section needs somewhere to aim, and the
- *  label arc was the only target there was. */
+/** see dsp-radial-layout.md#one-clickable-piece-of-the-pie */
 export interface TraceSector {
   /** The types on this ring — what the piece holds. */
   label: string;
@@ -184,11 +179,7 @@ export function traceWriteTrail(): { id: string; at: number }[] {
   return out.sort((a, b) => a.at - b.at);
 }
 
-/** A TYPED NODE NAMES ITS OWN TEMPLATE (owner, 2026-08-05). `type:
- *  "[[value-prop]]"` points at the item template that says what a value prop
- *  must carry, so a reader is one hop from the rules and Obsidian draws the
- *  edge. A bare `value-prop` means exactly the same thing — the link is the
- *  readable form, never a second syntax to support. */
+/** see dsp-radial-layout.md#a-typed-node-names-its-own-template */
 export function typeName(v: unknown): string {
   return typeof v === "string" ? v.replace(/^\[\[/, "").replace(/\]\]$/, "").trim() : "";
 }
@@ -214,10 +205,7 @@ export interface ItemTemplate {
   sections: string[];
   /** Where nodes of this type live, root-relative. Empty if unstated. */
   folder: string;
-  /** MECHANICAL CHECKS THE TEMPLATE DECLARES (owner order 2026-08-06): the
-   *  rules ride the template's own frontmatter, generic engine code applies
-   *  them, and they fire for EVERY hand — the agent's submit and a person's
-   *  panel edit run the same conformance. */
+  /** see dsp-radial-layout.md#mechanical-checks-the-template-declares */
   checks: TemplateCheck[];
 }
 
@@ -397,23 +385,7 @@ function applyCheck(id: string, c: TemplateCheck, value: string, fm: Record<stri
   return out;
 }
 
-/** DOES THIS NODE KEEP ITS TYPE'S PROMISES.
- *
- *  A reference resolving to a file that does not answer its own template is
- *  worse than a dangling one: the gate follows it, finds something, and
- *  reviews a hole.
- *
- *  A TODO LEFT IN PLACE COUNTS AS UNANSWERED. The mint writes TODOs on
- *  purpose, so treating them as filled would let a skeleton pass as work.
- *
- *  A FIELD THE NODE OMITS TAKES THE TEMPLATE'S DEFAULT (owner ruling
- *  2026-08-06). Widening a template must not make the whole standing corpus
- *  non-conforming overnight: the default is what the template asserts is true
- *  until a node says otherwise, and migration only visits the nodes where it
- *  is wrong. A field with no honest default carries a TODO instead, and that
- *  field is introduced together with its migration. */
-/** What a node ANSWERS for a field: its own value, or the template's default
- *  where it carries none. One function, so every reader resolves it alike. */
+/** see dsp-the-outside-boundaries-and-their-bounds.md#does-this-node-keep-its-types-promises */
 export function fieldValue(tpl: ItemTemplate, fm: Record<string, unknown>, key: string): string {
   const v = fm[key];
   if (v === undefined) return tpl.defaults[key] ?? "";
@@ -447,21 +419,7 @@ export function conformance(root: string, node: TraceNode): string[] {
   return out;
 }
 
-/** AN OUTSIDE BOUNDARY STATES ITS OWN BOUND (i33, 2026-08-17).
- *
- *  `bound` DEFAULTS to `inherited`, and that is honest for an in-process
- *  crossing between two elements: it has no clock of its own and is paid for
- *  by the outside call that reached it. Forty standing interfaces are exactly
- *  that, and widening the template must not make them non-conforming
- *  overnight.
- *
- *  IT IS NOT HONEST WHERE THE CROSSING *IS* THE OUTSIDE CALL. There the
- *  default would quietly cover the one place a person or an agent actually
- *  waits, which is a demand nothing enforces — the shape i12 already shipped
- *  once, as guidance, before 1834 of 8424 calls went over it.
- *
- *  THE TELL IS THE NEIGHBOUR PREFIX, because a neighbour is by definition
- *  something the product does not own. */
+/** see dsp-the-outside-boundaries-and-their-bounds.md#an-outside-boundary-states-its-own-bound */
 function outsideBoundaryProblems(tpl: ItemTemplate, node: TraceNode, fm: Record<string, unknown>): string[] {
   if (tpl.id_prefix !== "if-") return [];
   const ends = [String(fm.source ?? ""), String(fm.destination ?? "")];
@@ -472,50 +430,10 @@ function outsideBoundaryProblems(tpl: ItemTemplate, node: TraceNode, fm: Record<
   ];
 }
 
-/** Every trace node the product declares. */
-/** THE CORPUS IS RE-READ ONLY WHEN IT CHANGED (owner ruling 2026-08-09).
- *
- *  This is v1's adr-verdict-cache reapplied, and its two rules are the whole
- *  design: key a computed answer to a HASH OF ITS INPUT plus the build
- *  identity, and keep the cache OUT OF THE REPO, because "a cache is never
- *  truth and the repo must stay cache-free".
- *
- *  WHY IT IS NOT A SECOND SOURCE OF TRUTH, which is the rule this must not
- *  break. Nothing is stored that cannot be recomputed. Nothing is written
- *  anywhere. A stale entry cannot survive an edit, because the edit moves the
- *  mtime and the stamp stops matching. The files remain the only truth; this
- *  only remembers that it already read them.
- *
- *  THE STAMP IS STAT, NEVER CONTENT. Hashing 328 files means READING 328
- *  files, which is exactly the cost being avoided. Size and mtime answer the
- *  same question for one syscall each, and the directory walk that lists them
- *  is paid either way.
- *
- *  BUILD IDENTITY COMES FREE HERE. v1 needed it because its cache lived on
- *  disk and outlived the engine. This one is in memory, so a reload cannot
- *  reach a cache built by the code it replaced.
- *
- *  WHAT IT COST TO NOT HAVE IT: one se_pull took 274,270 ms entering an
- *  iteration, because every hop of the walk reloaded the whole corpus for
- *  every machine. The server answers nothing while that runs — the MCP
- *  endpoint shares the event loop — so the transport gave up and the
- *  extension had to be restarted. */
+/** see dsp-trace-corpus.md#every-trace-node-the-product-declares */
 const CORPUS = new Map<string, { stamp: string; nodes: TraceNode[]; epoch: number }>();
 
-/** HOW MANY TIMES THE CORPUS WAS ASKED FOR. Every call to loadTrace, hit or
- *  miss, because the ASK is what req-one-operation-reads-its-input-once is
- *  about — an operation collects its input once and hands it down.
- *
- *  IT COUNTS ASKS AND NOT MISSES ON PURPOSE, and a test that got this wrong is
- *  why the counter exists (i33, 2026-08-17). The green guard counted reads
- *  through the file DOOR and claimed that caught a per-state corpus load. It
- *  does not. loadTrace memoizes ABOVE the door: on a stamp hit it returns the
- *  held nodes having called noteOf zero times, so putting a load back inside a
- *  per-state loop costs about 210 statSync calls the door never sees and no
- *  door accesses at all. The count stayed flat and the guard passed.
- *
- *  SO THE THING THE REQUIREMENT NAMES IS COUNTED DIRECTLY. One operation, one
- *  ask. Twenty-five asks means twenty-five states each fetching their own. */
+/** see dsp-the-outside-boundaries-and-their-bounds.md#how-many-times-the-corpus-was-asked-for */
 let CORPUS_ASKS = 0;
 
 /** The corpus's own meter: how many times it has been asked for. */
@@ -540,17 +458,7 @@ export function corpusAsks(): number {
  *  the readers that already import from trace keep one import. */
 export { nodeLines, noteOf, readNode };
 
-/** THE CORPUS'S VERSION, from the files themselves.
- *
- *  IT IS EXPENSIVE AND IT IS CORRECT, in that order of importance. Keying it on
- *  the model's watcher generation was tried on 2026-08-09 and the suite refused
- *  it: a corpus that misses an external edit reports a fallen claim as green,
- *  and that is the one thing this must never do.
- *
- *  SO THE COST IS NOT FIXED HERE. It is 328 stats per call and it was called
- *  sixty-six times to enter one record. The sixty-six is the defect; the 328 is
- *  the price of an honest answer. Collect it ONCE per operation and pass it
- *  down (software.md, input-process-output). */
+/** see dsp-trace-corpus.md#the-corpuss-version */
 function corpusStamp(files: string[]): string {
   const parts: string[] = [];
   for (const f of files) {
@@ -619,18 +527,7 @@ export function loadTrace(root: string): TraceNode[] {
       id,
       type,
       statement: typeof fm.statement === "string" ? fm.statement : "",
-      // THE UPWARD EDGE HAS ONE SLOT AND SEVERAL NAMES (owner ruling
-      // 2026-08-07, machines/trace-schema.md): refines, satisfies,
-      // implements, verifies — the relation differs, so the word does.
-      //
-      // The MODEL keeps one slot on purpose. Everything downstream — the
-      // wedge walk, the coverage checks, the drawing — asks the same
-      // question of every node: what does this serve? Splitting the slot
-      // would fork that question per type for no gain.
-      //
-      // EVERY SCHEMA KEY FOLDS, or its whole level goes invisible: the
-      // elements, the interfaces and the test-specs each shipped with their
-      // key missing here, and none of them drew until somebody looked.
+      // see dsp-radial-layout.md#the-upward-edge-has-one-slot-and-several-names
       refines: [...asList(fm.refines), ...asList(fm.satisfies), ...asList(fm.implements), ...asList(fm.verifies), ...asList(fm.realizes)],
       hay: pairs,
       file,
@@ -640,10 +537,7 @@ export function loadTrace(root: string): TraceNode[] {
   return out.slice();
 }
 
-/** THE VISION HAS NO NODE OF ITS OWN YET (owner, 2026-08-05). Until the spec
- *  and the book exist, the motivation gate's report IS the vision, so the
- *  centre falls back to it rather than opening empty. An iteration keeps its
- *  evidence inside its bound worktree, which is why this looks there. */
+/** see dsp-the-outside-boundaries-and-their-bounds.md#the-vision-has-no-node-of-its-own-yet */
 export function visionText(root: string): string {
   const roots = [join(root, "project", "spec", "iterations"), join(root, ".worktrees")];
   const found: string[] = [];
@@ -709,15 +603,7 @@ export function rootsOf(nodes: TraceNode[]): Map<string, string> {
   return root;
 }
 
-/** EVERY wedge a node belongs to. A node whose ancestry reaches two value
- *  props is DRAWN IN BOTH (owner, 2026-08-06) — one node in the data, two
- *  places in the picture.
- *
- *  The alternative was one placement plus an edge crossing the whole circle to
- *  reach its other parent, and those lines are what made the drawing
- *  unreadable. Sharing WITHIN one prop is fine and stays: those lines are
- *  short and local.
- */
+/** see dsp-radial-layout.md#every-wedge-a-node-belongs-to */
 export function rootsAllOf(
   nodes: TraceNode[],
   isRoot: (n: TraceNode) => boolean = (n) => n.type === TRACE_LEVELS[0],
@@ -775,10 +661,7 @@ const MAX_CHARS = 14;
  *  root two. So r must beat CARD_W times root two; the rest is margin. */
 const FIRST_RING = CARD_W * 1.55;
 
-/** THE CENTER-DISTANCE FLOOR (owner, 2026-08-06): no two node centers sit
- *  closer than two thirds of the inner ring — a fixed value, and radii GROW
- *  where it would be undercut. It also subsumes the card-overlap rule: at
- *  this distance a 260×60 card clears its neighbour at every angle. */
+/** see dsp-radial-layout.md#the-center-distance-floor */
 const MIN_DIST = Math.round((FIRST_RING * 2) / 3);
 
 /** How much of a section's angle its cards may use. The rest is left EMPTY,
@@ -826,10 +709,7 @@ function sections(shown: string[], perWedge: Map<string, string[][]>): Map<strin
  *  three items apart — still owe the full distance in arc. */
 const STAGGER = 3;
 const STAGGER_STEP = MIN_DIST;
-/** THE BAND STRADDLES ITS RING (owner sketch, 2026-08-06): one card pushed
- *  OUT and one pulled IN, rather than every sub-orbit growing outward. The
- *  ring keeps its own radius as the band's middle, so the band costs half as
- *  much clearance on each side and the next ring starts nearer. */
+/** see dsp-radial-layout.md#the-band-straddles-its-ring */
 function orbitOffset(i: number, orbits: number): number {
   return ((i % orbits) - (orbits - 1) / 2) * STAGGER_STEP;
 }
@@ -881,27 +761,7 @@ export function duplicateIds(nodes: TraceNode[]): { id: string; count: number }[
     .sort((a, b) => a.id.localeCompare(b.id));
 }
 
-/** ONE WRITTEN REFERENCE, REDUCED TO THE ID IT MEANS.
- *
- *  THE MACHINE IS GENEROUS HERE ON PURPOSE (owner, 2026-08-06). A person
- *  writing a reference has a file in front of them, and there are four honest
- *  ways to name it. Refusing three of them teaches nothing — it just makes the
- *  form feel broken.
- *
- *  All of these mean the same node:
- *
- *  - `nbr-obsidian` — the bare id
- *  - `[[nbr-obsidian]]` — a wiki link, which is what Obsidian pastes
- *  - `project/spec/trace/neighbour/nbr-obsidian.md` — the path from the root
- *  - `project\spec\trace\neighbour\nbr-obsidian.md` — the same, Windows-shaped
- *  - `nbr-obsidian.md` — just the file name
- *
- *  A path reduces to its LAST SEGMENT with `.md` dropped, because the file
- *  name IS the id everywhere in the trace. So a unique file name resolves
- *  whether or not the folders above it were typed correctly.
- *
- *  What stays strict is the ID ITSELF. It must look like an id, and it must
- *  resolve to a standing node — those checks are the point of a reference. */
+/** see dsp-radial-layout.md#one-written-reference */
 export function refId(written: string): string {
   const bare = written.trim().replace(/^\[\[/, "").replace(/\]\]$/, "").trim();
   // A wiki link may carry a display half: [[id|what it says]].
@@ -910,19 +770,7 @@ export function refId(written: string): string {
   return last.replace(/\.md$/i, "").trim();
 }
 
-/** Does this reduce to something SHAPED like a trace id. */
-/** DOTS ARE LEGAL INSIDE AN ID, and that is how the function tree carries its
- *  shape (owner ruling 2026-08-07). `fn-a.b` sits under `fn-a`; a node's
- *  parent is its id with the last segment removed.
- *
- *  WHAT IT COST TO MISS. The character class had no dot, so every dotted id
- *  failed this test and was DROPPED by refsIn before anything looked at it.
- *  Not refused, not reported — dropped. The coverage check then said no
- *  function covered any requirement, which pointed at the tree rather than at
- *  the extractor, and the tree was correct.
- *
- *  A FILTER THAT DISCARDS SILENTLY IS THE WORST SHAPE for this. It cannot be
- *  distinguished from an author who wrote nothing. */
+/** see dsp-the-outside-boundaries-and-their-bounds.md#does-this-reduce-to-something-shaped-like-a-trace */
 export function looksLikeId(id: string): boolean {
   return /^[a-z][a-z0-9]*-[a-z0-9.-]+$/i.test(id);
 }
@@ -933,10 +781,7 @@ export function looksLikeId(id: string): boolean {
 export function refsIn(text: string): string[] {
   const out: string[] = [];
   for (const line of text.split(/\r?\n/)) {
-    // A LIST LINE IS DASH-LED OR NUMBERED (2026-08-09). The rank-cut template
-    // numbers its rows, because the numbers ARE the order, and reading only
-    // dash-led lines found nothing in one — so cut-criteria refused as empty
-    // while its own line check passed. Fifth time that pair has disagreed.
+    // see dsp-radial-layout.md#a-list-line-is-dash-led-or-numbered
     const m = line.match(/^\s*(?:[-*]|\d+[.)])\s*(.+?)\s*$/);
     if (m === null) continue;
     // A ROW MAY CARRY A MARK AFTER ITS ID — [cutoff], [cut: why], [moved: why].
@@ -950,21 +795,7 @@ export function refsIn(text: string): string[] {
   return out;
 }
 
-/** THE REFERENCES A TABLE ROW CARRIES — the compare-card's answer shape.
- *
- *  A card records one answered pair per row: the two items and the verdict.
- *  refsIn above reads a LIST, one dash-led id per line, so it found nothing in
- *  a row and the field refused as empty while its own line check passed. No
- *  content could satisfy both, which is a field nobody can ever fill.
- *
- *  Only the first two cells are items. The third is the verdict, and a
- *  verdict is not an artifact.
- *
- *  HOW MANY CELLS ARE ITEMS DEPENDS ON THE ROW (2026-08-09). A card answers
- *  with two items and a verdict. A dsm answers with ONE element and the value
- *  written onto it, so reading two cells there offered the cluster name as an
- *  artifact and the type check refused it. The caller knows which shape it
- *  has; it says so. */
+/** see dsp-radial-layout.md#the-references-a-table-row-carries */
 export function refsInRows(text: string, columns = 2): string[] {
   const out: string[] = [];
   for (const line of text.split(/\r?\n/)) {
@@ -998,25 +829,12 @@ function keepFor(all: TraceNode[], q: string): Set<string> {
   return keep;
 }
 
-/** Ring k must hold the WORST wedge's count at that level, because the radius
- *  is GLOBAL and a ring is one circle for everybody.
- *
- *  EACH RING CARRIES ITS OWN LOAD (owner, 2026-08-06). The shared gap made
- *  the crowded outer ring blow every inner ring up with it, and the drawing
- *  wasted its middle. Now a ring grows only as far as ITS worst wedge needs
- *  at full stagger, and the floor chain keeps it clear of the previous
- *  ring's outermost sub-orbit. Inner rings collapse; the spacing does not. */
+/** see dsp-radial-layout.md#ring-k-must-hold-the-worst-wedges-count-at */
 function ringRadii(wedges: { lanes: string[][]; arcs: number[] }[], count: number): { r: number; orbits: number }[] {
   const rings: { r: number; orbits: number }[] = [];
   let floor = FIRST_RING;
   for (let k = 0; k < count; k++) {
-    // The ring answers to its HUNGRIEST section, and n items need n-1 gaps.
-    //
-    // THE ARC IS THE ONE THIS LEVEL MAY ACTUALLY USE (owner ruling
-    // 2026-08-07). Below the split that is half a section, so the ring has to
-    // grow to hold the same rows in half the angle. Sizing against the whole
-    // section instead left the cards overlapping, and the pass that prises
-    // them apart smeared the requirements over five layers.
+    // see dsp-radial-layout.md#the-ring-answers-to-its-hungriest-section-and-n
     const lanes = wedges.map((w) => ({ gaps: Math.max(0, (w.lanes[k]?.length ?? 0) - 1), arc: w.arcs[k] ?? 0 })).filter((l) => l.gaps > 0);
     const pick = bestOrbits(lanes, floor);
     rings.push(pick);
@@ -1196,14 +1014,7 @@ export function layoutTrace(
     for (let k = 0; k < levels.length; k++) {
       const lane = lanes[k] ?? [];
       if (lane.length === 0) continue;
-      // OUTWARD MEANS OUTWARD (owner, 2026-08-06). A child WANTS its parent's
-      // own angle, so the line between them runs straight away from the
-      // centre rather than sideways. Only a collision moves it, and only far
-      // enough to clear its neighbour.
-      //
-      // It used to spread every item evenly across the row's own span, which
-      // put a lone child beside its parent instead of outside it, and turned
-      // a wedge of four into a fan.
+      // see dsp-radial-layout.md#outward-means-outward
       const target = wants(lane, parentsOf, (id) => place.get(at(prop, id)), centre);
       const ordered = [...lane].sort((a, b) => (target.get(a) ?? 0) - (target.get(b) ?? 0));
       // HOW MANY SUB-ORBITS THIS LANE NEEDS. A sparse lane stays on one
@@ -1350,12 +1161,7 @@ function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-/** A SECTION'S NAME, WRITTEN OUT (owner ruling 2026-08-07). The short label
- *  truncates, and truncation is what turned "vendoring" into "ndorin" on the
- *  arc. There is room for the whole thing, so the whole thing is drawn.
- *
- *  The type prefix goes and the dashes become spaces, because the arc is read
- *  by a person rather than matched by a machine. */
+/** see dsp-the-outside-boundaries-and-their-bounds.md#a-sections-name */
 function propLabel(id: string): string {
   return id.replace(/^[a-z]+-/, "").replace(/-/g, " ");
 }
@@ -1375,13 +1181,7 @@ function sectorPath(r0: number, r1: number, from: number, to: number): string {
   );
 }
 
-/** THE TEXT MUST FIT THE ARC IT RIDES (owner ruling 2026-08-07). A textPath
- *  draws only what fits and silently drops the rest, which is how "vendoring"
- *  arrived on screen as "ndorin".
- *
- *  So the size comes DOWN until the whole word fits. A glyph is about 0.58 of
- *  its font size wide in this face, which is close enough — the answer only
- *  has to be small enough, not exact. */
+/** see dsp-radial-layout.md#the-text-must-fit-the-arc-it-rides */
 function fitted(label: string, r: number, sweep: number, want: number): number {
   const arc = Math.abs(r * sweep);
   const need = Math.max(1, label.length) * 0.58;

@@ -1,24 +1,4 @@
-/** THE SEED STATES ITS DEPENDENCY OR REFUSES (owner ruling 2026-08-13).
- *
- *  TWO ANSWERS USED TO LOOK IDENTICAL ON DISK: I FORGOT, and I DECIDED NONE.
- *  Only one of them is a decision, and the empty list is what makes it
- *  expressible. Without it the key cannot tell a silence from a statement,
- *  and that is the whole defect rather than a nicety.
- *
- *  THE GUIDANCE ALREADY EXISTED AND DID NOT HOLD. The rule stood in the seed
- *  tool's own argument description, in the argument list, unmissable.
- *  Measured 2026-08-13: twenty-seven iterations seeded and the key set on
- *  seven. Three stated a wait in their own vision prose and carried no edge
- *  for it — the UI sitting after the panel round, the comment system after
- *  the machine format, and the cloud iteration after the lane binding.
- *
- *  A RULE BROKEN THAT WAY WANTS A REFUSAL, NOT ANOTHER SENTENCE.
- *
- *  ONE MODULE, TWO DOORS. The agent's seed verbs and the mirror's seed form
- *  both land here, so a person and an agent are held to the same demand and
- *  read the same remedy.
- *
- *  req-a-seed-states-its-dependency */
+/** see dsp-record-lifecycle.md#the-seed-states-its-dependency-or-refuses */
 import { CLAUSES, Rejection } from "./errors.ts";
 
 const SRC = "engine/seed.ts";

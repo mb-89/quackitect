@@ -81,11 +81,7 @@ function borderPoint(el: CanvasElement, toward: [number, number]): [number, numb
 
 const centerOf = (el: CanvasElement): [number, number] => [el.x + el.width / 2, el.y + el.height / 2];
 
-/** A LONG EDGE ROUTES AROUND THE BAND (owner rule 2026-08-04): when other
- *  nodes stand vertically between the two, the line detours through up to
- *  two OUTSIDE waypoints — beside the source, then straight down beside
- *  the target — at 100px past the widest in-between node on the chosen
- *  side. A waypoint that would land inside its own endpoint is skipped. */
+/** see dsp-mirror-render.md#a-long-edge-routes-around-the-band */
 function edgeWaypoints(a: CanvasElement, b: CanvasElement, nodes: CanvasElement[]): [number, number][] {
   const [acx, acy] = centerOf(a);
   const [bcx, bcy] = centerOf(b);
@@ -147,32 +143,7 @@ export interface StateMeta {
   subtitle?: string;
 }
 
-/** THE DRAWING IS THE TRUTH, SIZE INCLUDED (owner ruling 2026-07-28).
- *
- *  The render used to compute its own box sizes, because a label needs less
- *  room than a note and the drawing scales to fit its pane. That made the
- *  render and Obsidian look nothing alike, and it meant a size the owner
- *  fixed in Obsidian was overruled on the way to the screen.
- *
- *  So the render now takes the geometry VERBATIM — position and size both.
- *  Fix it in Obsidian and it is fixed here. A node is instead born at the
- *  size of its label (canvas.nodeSize), which is a starting point a person
- *  adjusts, not a size anything re-imposes later.
- */
-/** THE ROUTE, REDUCED TO ONE DRAWING (owner design 2026-07-29). The walk's
- *  route is a list of qualified hops; a canvas shows one machine. So each
- *  hop is projected onto the machine being VIEWED, giving the ORDERED stops
- *  the line runs through:
- *
- *  - both ends land on different states here — both are stops on the way;
- *  - both ends land on the SAME state here — the route is running around
- *    INSIDE it, so that state is a WAYPOINT. Navigation systems put a point
- *    on the line for somewhere you pass through, and a submachine entered
- *    and left again is exactly that. Click it to zoom in.
- *  - neither end is here — the hop belongs to another drawing.
- *
- *  A stop that is not a waypoint carries NO mark. The line runs through its
- *  anchor all the same, which is what the owner called an invisible waypoint. */
+/** see dsp-mirror-render.md#the-drawing-is-the-truth */
 export function routeOverlay(
   steps: { from: string; to: string }[],
   /** The view's QUALIFIED chain below main ("" is main). A nested machine
@@ -313,15 +284,7 @@ function svgStateNode(
   const sid = stateIdOf(n);
   if (sid === undefined) return parts;
   const isSub = subIds.has(sid);
-  // TWO DIFFERENT FACTS, and conflating them threw the reader back to main
-  // (owner report 2026-08-08). A state IS a sub-machine — that is the double
-  // border, and it is true whether or not the drawing exists yet. A state can
-  // be ENTERED only when its drawing resolves; a seeded one has none until the
-  // authoring state has run.
-  //
-  // Double-clicking an unseeded one now does NOTHING, which is the honest
-  // answer. It used to navigate to a view that could not be found, and the
-  // resolver quietly served the main machine instead.
+  // see dsp-mirror-render.md#two-different-facts
   const canEnter = openIds.has(sid);
   const pill = (n as { styleAttributes?: { shape?: string } }).styleAttributes?.shape === "pill";
   const cls = stateClass(sid, activeIds, doneIds, meta);
@@ -368,13 +331,7 @@ function svgFanLegs(route: RouteMarks | undefined, nodeOfState: Map<string, CNod
   return parts;
 }
 
-// THE ROUTE IS DRAWN OVER THE NODES (owner ruling 2026-07-29), reversing
-// the along-the-edges ruling of the same day. Riding the edges read as the
-// graph highlighting itself; a navigation system lays its line ON the map.
-// It is pushed LAST so it covers the boxes, exactly as a route does.
-//
-// ARRIVED MEANS CLEAR: with fewer than two stops there is no way left to
-// show, so neither line nor arrow is drawn.
+// see dsp-mirror-render.md#the-route-is-drawn-over-the-nodes
 function svgRoute(route: RouteMarks | undefined, nodeOfState: Map<string, CNode>): string[] {
   const parts: string[] = [];
   const stops: { id: string; cx: number; cy: number }[] = [];
@@ -385,11 +342,7 @@ function svgRoute(route: RouteMarks | undefined, nodeOfState: Map<string, CNode>
     if (n !== undefined) stops.push({ id, cx: n.x + n.width / 2, cy: n.y + n.height / 4 });
   }
   if (stops.length < 2) return parts;
-  // A ROAD CLOSURE (owner ruling 2026-07-29). The route already knows the hop
-  // the walk cannot pass — usually a state sitting above the autonomy dial.
-  // Drawn as one unbroken line the map says the whole way is open, which is
-  // the one moment it lies. So the line runs normally up to the closure and
-  // FADES past it: the way exists, it is shut.
+  // see dsp-mirror-render.md#a-road-closure
   parts.push(...svgFanLegs(route, nodeOfState));
   const xy = (s: { cx: number; cy: number }): [number, number] => [s.cx, s.cy];
   const shut = route?.blocked === undefined ? -1 : stops.findIndex((s) => s.id === route.blocked?.at);
@@ -436,10 +389,7 @@ function svgRoute(route: RouteMarks | undefined, nodeOfState: Map<string, CNode>
   return parts;
 }
 
-// THE BUSBAR IS STRUCTURE, NOT ROUTE (owner ruling 2026-08-04): a state
-// collects ALL its inputs, so every multi-feeder state draws its feeders as
-// taps into a collection bar wearing the AND icon — one line drops from
-// the bar into the state, and the individual feeder arrows disappear.
+// see dsp-mirror-render.md#the-busbar-is-structure
 function svgBusbars(busbars: { into: string; feeders: string[] }[], nodeOfState: Map<string, CNode>): string[] {
   const parts: string[] = [];
   for (const b of busbars) {
@@ -542,10 +492,7 @@ const BRIEFS: Record<string, (a: Record<string, unknown>) => string> = {
   se_pull: briefPull,
   mirror_tick: (a) => (a.back !== undefined ? `back → ${a.back}` : a.to !== undefined ? `tick → ${a.to}` : "tick advance"),
   mirror_check: (a) => `check ${a.path}`,
-  // THE WORD IS THE WHOLE TRUTH, and the number never reaches a reader
-  // (owner ruling 2026-08-18). A record written before the cut-over carries
-  // no word and says so, rather than falling back to the number
-  // (req-autonomy-is-categorical).
+  // see dsp-mirror-render.md#the-word-is-the-whole-truth
   mirror_autonomy: (a) => (typeof a.tier === "string" ? `autonomy → ${a.tier}` : "autonomy → (tier not recorded)"),
   // The boundary is chosen at launch, so the feed says WHEN it takes effect
   // rather than implying the walk just changed transport underfoot.
@@ -590,21 +537,7 @@ function briefFor(rec: CallRecord): string {
   return f !== undefined ? f(rec.args as Record<string, unknown>) : rec.tool;
 }
 
-/** The unified feed: this session's acts, capped at the newest 500 rows —
- *  the cap is declared in the result, never silent. Pending strays from
- *  EARLIER sessions ride on top (type "note"), so the inbox never falls
- *  out of sight; this session's notes already ride as se_note calls. */
-/** A FEED ROW IS ONE LINE, ALWAYS (owner ruling 2026-07-31). Note text is
- *  free prose with paragraphs and list items, and slicing it without
- *  flattening let every newline through - one note could stand a dozen rows
- *  tall and push the rest of the feed off the screen.
- *
- *  ONE RULE, NOT ONE PER KIND. briefFor returns whatever each tool's line
- *  should say and NOTHING else: no flattening, no truncating, no per-case
- *  cleverness. Every row leaves through here, so a new tool cannot forget
- *  the rule and se_run no longer carries its own private version of it.
- *  Change FEED_BRIEF_CHARS to change the width; it is the only place the
- *  number lives. */
+/** see dsp-mirror-render.md#the-unified-feed */
 const FEED_BRIEF_CHARS = 90;
 
 function oneLine(s: string): string {
@@ -612,19 +545,7 @@ function oneLine(s: string): string {
   return flat.length > FEED_BRIEF_CHARS ? `${flat.slice(0, FEED_BRIEF_CHARS - 1)}…` : flat;
 }
 
-/** THE SERVER ACTING ON ITS OWN BEHALF, not a person acting through it.
- *
- *  `mirror_slow` is the mirror timing its own request. `mirror_narration_now`
- *  is a poll asking whether narration is due. Nobody clicked either one, and
- *  labelling them "human" put fifty-two acts in the feed that the owner never
- *  performed (owner, 2026-08-09: "they are not triggered by me… don't call it
- *  human").
- *
- *  THE NAME IS A WEAK PLACE TO DECIDE THIS, and this list is the weakness: a
- *  new server-side mirror tool defaults to "human" until somebody adds it here.
- *  The sound fix is to stamp the actor where the call is MADE — mirror.ts knows
- *  perfectly well which handler a body arrived on — and carry it on the log
- *  record. See the note filed with this change. */
+/** see dsp-mirror-render.md#the-server-acting-on-its-own-behalf */
 const SELF_SERVED = new Set(["mirror_slow", "mirror_narration_now", "mirror_profile"]);
 
 function srcOf(tool: string): string {
@@ -705,21 +626,7 @@ function viewedMachine(m: MirrorState, view: string | undefined): { decl: Machin
 // rather than a webview asset URI — no bundler and no build step.
 const ELEMENTS = '<script type="module" src="/vendor/vscode-elements.js"></script>';
 
-// THE PALETTE IS CONFIGURATION, NEVER CODE (owner ruling 2026-07-30). Every
-// colour the product chooses lives in project/deliverable/brand/palette.css, beside the other
-// product configuration, where a person edits it without touching code. It is
-// read on EVERY render, so an edit shows on the next page load and the engine
-// never restarts for a colour.
-//
-// THE FALLBACK IS A LEGIBILITY FLOOR, NOT A SECOND PALETTE. It carries only
-// what keeps a page readable when the file is gone — something to draw on,
-// something to draw with. Copying all fifteen values here would put every
-// colour in two places, and the copy would go stale the first time somebody
-// edited the real one.
-//
-// Nothing renders from this in a working install: preflight refuses to go
-// green without project/deliverable/brand/palette.css, so a tree reaching here is already
-// known-broken and only has to stay readable enough to say so.
+// see dsp-mirror-render.md#the-palette-is-configuration
 const PALETTE_FALLBACK = ":root{--se-bg:#14171a;--se-fg:#d8dde2}";
 
 export function palette(root: string): string {
@@ -730,16 +637,7 @@ export function palette(root: string): string {
   }
 }
 
-/** THE LOOK FILES — configuration, not code (owner ruling 2026-08-07). Read on
- *  every render, so an edit shows on the next paint and nothing restarts.
- *
- *  WHY A CSS FILE AND NOT A CONFIG FORMAT: the values ARE css. The drawing
- *  reads them back with getComputedStyle, so one file drives both what the
- *  browser paints and what the client script computes. A json file would have
- *  needed a second road into the page and a second name for every value.
- *
- *  A MISSING FILE IS NOT AN ERROR. Every value it sets has a default in the
- *  stylesheet it overrides, so the drawing stands without it. */
+/** see dsp-mirror-render.md#the-look-files */
 const LOOK_FILES = ["palette.css", "trace.css"];
 
 export function look(root: string): string {
@@ -764,20 +662,10 @@ const STYLE = `
   /* 465px is the width the owner settled the sidebar at by dragging it, and
      a default nobody re-drags is the only evidence a default is right. */
   aside { width: 465px; min-width: 320px; max-width: 80vw; display: flex; flex-direction: column; background: var(--se-bg-side); }
-  /* THE LEFT COLUMN: the feed on top, the agent's terminal beneath it.
-     SIZED FOR AN 80-COLUMN TERMINAL (owner ruling 2026-07-28). 820px was
-     too wide; narrowing it without sizing the terminal would just have made
-     the agent wrap early. 80 columns x 8px + 10px for the scrollbar = 650.
-     8px is the UPPER bound for a 13px monospace cell, so 80 is a floor here,
-     never a target. The divider moves it, and the size the reader lands on
-     is stored and reused from then on. */
+  /** see dsp-mirror-render.md#the-left-column */
   #left { width: 650px; min-width: 360px; }
 
-  /* THE TERMINAL FILLS ITS CARD (owner 2026-07-29), superseding the half-a-
-     column rule the old left column needed. It once sat tiny because flex:none
-     with no height sizes to CONTENT; in the grid the card decides the box and
-     the terminal takes all of it. Still no max — promoted, it gets the big
-     slot, which is far more room than the splitter ever gave it. */
+  /** see dsp-mirror-render.md#the-terminal-fills-its-card */
   #w-terminal { min-height: 140px; }
   /* NEVER SCROLLS. xterm scrolls itself; a scrollbar here would steal from
      clientWidth mid-measure and start the flicker over. */
@@ -825,13 +713,7 @@ const STYLE = `
   .widget { display: flex; flex-direction: column; border: 1px solid var(--se-border); border-radius: 10px; background: var(--se-bg-side); min-height: 0; }
   .widget-head { display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; border-bottom: 1px solid var(--se-border); color: var(--se-muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
   .widget-body { flex: 1; min-height: 0; overflow: auto; }
-  /* THE FORM EDITORS read as quiet tables: bordered row groups, borderless
-     inputs on the theme's own surface — never a white browser box. */
-  /* SAVE AND REVERT ARE THE TWO ACTS AN EDITOR OFFERS, so they look like acts
-     (owner, 2026-08-09). Drawn transparent on a dark panel they read as
-     decoration, and the owner could not find them. Save carries the accent
-     filled; revert carries the same accent as an outline, because undoing is
-     not the thing you are being invited to do. */
+  /** see dsp-mirror-render.md#the-form-editors-read-as-quiet-tables */
   .sfact { font: inherit; font-size: 11px; line-height: 18px; padding: 1px 10px; border-radius: 3px; cursor: pointer; }
   .sfact.save { background: var(--se-accent); border: 1px solid var(--se-accent); color: var(--se-bg); font-weight: 600; }
   .sfact.revert { background: transparent; border: 1px solid var(--se-accent); color: var(--se-accent); }
@@ -842,12 +724,7 @@ const STYLE = `
   .sfrow input:focus { background: var(--se-hover); border-radius: 3px; }
   .sfrow select { flex: 0 0 auto; background: var(--se-bg); color: var(--se-fg); border: 1px solid var(--se-border); border-radius: 3px; font: inherit; font-size: 12.5px; padding: 3px 4px; }
   .sfrow .sfitem { flex: 0 0 44%; font-size: 12.5px; color: var(--se-muted); }
-  /* THE NODE TABLE draws its structure on the ELEMENTS (ux.md), because a
-     stylesheet only aligns what it reaches. What is left here is cosmetic:
-     nothing below decides where anything sits. */
-  /* A PICKER'S LIST IS DRAWN BY THE BROWSER, and left alone it comes back
-     white on a dark panel (owner, 2026-08-09). The face is styled where it is
-     built; the OPTIONS can only be reached from here. */
+  /** see dsp-mirror-render.md#the-node-table-draws-its-structure-on-the-elements */
   .sfpick option { background: var(--se-raised); color: var(--se-fg); }
   .sfnodetable { border: 1px solid var(--se-border); border-radius: 4px; margin: 4px 0; }
   .sfnodetable a.reflink:hover { text-decoration: underline; }
@@ -865,10 +742,7 @@ const STYLE = `
   button.primary:disabled { opacity: .45; cursor: default; }
   .expand { background: none; border: 1px solid var(--se-border-strong); color: var(--se-muted); border-radius: 6px; cursor: pointer; font: inherit; padding: 2px 8px; }
   .expand:hover { color: var(--se-accent); border-color: var(--se-accent); }
-  /* THE CARD MATRIX (owner design 2026-07-29). One BIG card beside a two-wide
-     grid of the rest. It is ONE grid across the whole viewport, so promoting a
-     card is a class change and nothing ever moves in the DOM — a moved widget
-     is a recreated widget, and a recreated terminal loses its scrollback. */
+  /** see dsp-mirror-render.md#the-card-matrix */
   .cards { display: grid; height: 100vh; box-sizing: border-box; gap: 8px; padding: 8px; grid-template-columns: var(--main-w, 58%) 6px 1fr 1fr; }
   .card { position: relative; display: flex; min-width: 0; min-height: 0; grid-column: var(--col); grid-row: var(--row); }
   .card > .widget { flex: 1; min-width: 0; }
@@ -887,22 +761,14 @@ const STYLE = `
   svg { width: 100%; height: 100%; cursor: grab; }
   svg.panning { cursor: grabbing; }
   .state { fill: var(--se-raised); stroke: var(--se-border-strong); stroke-width: 2; }
-  /* DONE IS GREEN where a RECORD stands behind it (owner ruling 2026-08-04,
-     reversing the no-done-colour rule of 2026-07-31): a signed — and, for a
-     gate, blessed — stored claim paints its state. States without records
-     never enter the done set, so they stay uncoloured as before. */
+  /** see dsp-mirror-render.md#done-is-green-where-a-record-stands-behind-it */
   .state.done { fill: color-mix(in srgb, var(--se-ok) 16%, var(--se-bg)); stroke: var(--se-ok); }
   /* THE CURRENT STATES BLINK YELLOW (owner ruling 2026-08-04, v1's pulse
      reborn) — half the emergency pace, so alarm still outranks attention. */
   .state.active { fill: color-mix(in srgb, var(--se-warn, #d7a72a) 16%, var(--se-bg)); stroke: var(--se-warn, #d7a72a); stroke-width: 3.5; animation: se-current 2.2s ease-in-out infinite; }
   @keyframes se-current { 0%, 100% { stroke-opacity: 1; } 50% { stroke-opacity: 0.35; } }
   @media (prefers-reduced-motion: reduce) { .state.active { animation: none; } }
-  /* SUSPECT HAS NO RULE OF ITS OWN, and that is the ruling (owner,
-     2026-08-05). No verdict looks like no verdict. Whether a step was never
-     walked or was passed against a question that has since changed does not
-     matter to the reader — either way there is nothing to trust yet, so the
-     colour simply goes and the plain state card is what remains. The class
-     stays because the details panel and the tooltip still say WHY. */
+  /** see dsp-mirror-render.md#suspect-has-no-rule-of-its-own */
   .state.inner { fill: none; }
   .clickable { cursor: pointer; }
   .clickable:hover .state, .clickable:hover .comment { stroke: var(--se-fg); }
@@ -917,15 +783,7 @@ const STYLE = `
   .route-line { fill: none; stroke: var(--se-walk); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
   /* A fan leg is owed, not chosen: same blue, dashed and lighter. */
   .route-line.fan { stroke-dasharray: 10 9; opacity: .65; stroke-width: 4; }
-  /* PAST A BRANCHING POINT THE LINE MEANS TWO DIFFERENT THINGS (owner design
-     2026-08-07), and drawing them the same was a lie.
-
-     AND — every leg must be walked, so every leg is drawn SOLID. The route
-     does not choose between them; it owes all of them.
-
-     OR — one leg is the answer, so the legs behind the decision are DASHED.
-     A dashed line reads as a way that exists and was not taken, which is
-     exactly what it is. */
+  /** see dsp-mirror-render.md#past-a-branching-point-the-line-means-two-different */
   .route-line.leg-or { stroke-dasharray: 10 8; }
   /* The branching point itself is marked, so a reader can see WHERE the way
      divides rather than inferring it from the lines. */
@@ -1136,10 +994,7 @@ async function loadRecDecisions() {
     }
   }
 }
-// THE VISIT TO-DOS (owner design 2026-07-27): clicking a state shows,
-// below its details, one collapsed fold per visit; every item names its
-// ORIGIN (planned here | deferred from X | fork). Parked points that have
-// not arrived yet get their own fold.
+// see dsp-mirror-render.md#the-visit-to-dos
 async function loadStateTodos() {
   for (const el of document.querySelectorAll(".statetodos[data-state]:not([data-loaded])")) {
     el.dataset.loaded = "1";
@@ -1440,11 +1295,7 @@ const HUMAN_TOOLS = {
   se_seed_expedition: [{ name: "kind", hint: "spike | fix | explore" }, { name: "goal", hint: "what this expedition is after", long: true }, { name: "depends_on", hint: "ids this waits for, comma-separated — leave EMPTY to state that it waits for nothing", always: true }],
   se_seed_iteration: [{ name: "goal", hint: "what this iteration is after", long: true }, { name: "vision", hint: "roughly how — what done looks like", long: true }, { name: "inputs", hint: "context refs, comma-separated: an expedition id, note refs" }, { name: "depends_on", hint: "ids this waits for, comma-separated — leave EMPTY to state that it waits for nothing; the container orders the work from this", always: true }],
   se_reload: [],
-  // No arguments — it just answers. It lives HERE and nowhere else (owner
-  // ruling 2026-07-28): human-runnable lane tools are offered through the
-  // legal-tools links, per state. None of them earns bespoke chrome. It had
-  // its own header button, which the owner never found among the crumbs, the
-  // slider and the escape control sharing that row.
+  // see dsp-mirror-render.md#no-arguments
   se_survey: [],
   se_exp_close: [{ name: "merge", hint: "true = apply: merge to trunk (default); false = dismiss: archive unmerged" }],
   se_note_drain: [
@@ -1500,11 +1351,7 @@ document.addEventListener("click", async (ev) => {
     return;
   }
 });
-// THE WALK STANDS IN SEVERAL STATES AT ONCE, and has since the first fan
-// shipped (owner ruling 2026-08-08). The active field is a LIST, so every
-// standing-here test reads the WHOLE list. standingAt() below is the one way
-// to ask, and reading the first entry would highlight one leg of a fan and
-// look completely normal doing it.
+// see dsp-mirror-render.md#the-walk-stands-in-several-states-at-once
 let CURRENTS = (D.describe.active || []).map(function (a) { return a.split("/").pop(); });
 // The details panel opens on ONE state, because a panel shows one thing.
 // That is a default, never a claim that the other legs are not standing.
@@ -1536,11 +1383,7 @@ function nextTable(id, s) {
       + "</div>";
   }).join("");
 }
-// THE CHECK IS THE READER'S PROOF, AND IT IS PER VERSION — an edited doc
-// unchecks itself. A doc named by a CONDITION is not always in that state's
-// own pulled list, and looking it up only there left the box permanently
-// unchecked however often it was clicked (found live 2026-07-30). The
-// session's checked list is the truth, and it is already version-scoped.
+// see dsp-mirror-render.md#the-check-is-the-readers-proof
 function docChecked(p) {
   return p.checked === true || (D.checkedDocs || []).indexOf(p.path) >= 0;
 }
@@ -1641,14 +1484,7 @@ function stateDetail(id) {
   }
   return html;
 }
-// THE PAGE UPDATES IN PLACE (owner ruling 2026-07-28). A full reload cost
-// the reader their scroll, their selection and whatever they were typing.
-// The old workaround carried the view, the open pane and the open folds
-// through the URL and still lost the rest. Now an unchanged node is never
-// replaced, so there is nothing left to restore.
-//
-// Subtrees the CLIENT fills carry data-morph-ignore. The server sends them
-// empty, so morphing into them would wipe what the client just rendered.
+// see dsp-mirror-render.md#the-page-updates-in-place
 function sameNode(a, b) {
   if (a.nodeType !== b.nodeType) return false;
   if (a.nodeType !== 1) return true;
@@ -1695,28 +1531,7 @@ let refreshInFlight = false;
 // and wakes /events, so the outgoing page used to fetch itself again on its
 // way out — the archive visibly loaded twice. Once we are leaving, we leave.
 let navigatingAway = false;
-// THE READER KEEPS THEIR PLACE (owner ruling 2026-07-28, extended 2026-07-29).
-// Changing WHICH MACHINE is on screen says nothing about what they had open
-// beside it, nor about which card they had promoted. A view URL carrying only
-// the view throws both away.
-//
-// The card half was missed because the card matrix landed after this rule did: the
-// detail param was carried, the card param did not exist yet, and nobody came
-// back. Entering a sub-state demoted the machine out of the main slot under
-// the reader's hand.
-//
-// EVERY pinned place goes through here, so the next one added is carried by
-// construction rather than by somebody remembering.
-// THE READER'S PLACE, DECLARED ONCE. Every surface the reader can put
-// somewhere gets ONE entry here. The card bug happened because this list
-// lived in people's heads and in three separate hand-written copies: detail
-// was carried, card arrived a month later, and the two never met.
-//
-// Add a param here and every navigation carries it by construction. A test
-// refuses any param the client pins that is not registered.
-// Embedded in a host (the VS Code webview): the flag arrives on the iframe
-// URL and rides every navigation, so the server keeps serving the embedded
-// card set instead of resetting to the standalone one.
+// see dsp-mirror-render.md#the-reader-keeps-their-place
 const EMBED_Q = new URLSearchParams(location.search).has("embed");
 const PLACE = [
   ["detail", () => CURRENT_DETAIL],
@@ -1743,18 +1558,7 @@ function pinPlace(q) {
     if (v) q.set(p[0], v); else q.delete(p[0]);
   }
 }
-// A POPPED-OUT CARD IS A SNAPSHOT (owner ruling 2026-07-29). Two things
-// were wrong with the pop-out, and they are separate.
-//
-// It carried NOTHING. The button holds a URL baked in when the page was
-// drawn, so the new tab asked for "the details card" with no subject named
-// and the server answered with its own default. Meanwhile the live card was
-// showing whatever the reader last clicked, which lives only in this
-// browser. A reader looking at an answered question got a state.
-//
-// And it must not follow the walk. The reader pops several out to compare
-// them side by side, so each one holds what it was opened on. Frozen means
-// no event stream and no refresh, ever.
+// see dsp-mirror-render.md#a-popped-out-card-is-a-snapshot
 const FROZEN = new URLSearchParams(location.search).has("frozen");
 function frozenUrl(url) {
   const u = new URL(withPlace(url), location.href);
@@ -1811,11 +1615,7 @@ async function refresh(detail) {
   try {
     const r = await fetch(url);
     const doc = new DOMParser().parseFromString(await r.text(), "text/html");
-    // THE STYLESHEET MORPHS TOO (found live 2026-07-29). It lives in <head>,
-    // which the morph never touched, so a tab open since before a CSS change
-    // kept the OLD sheet for as long as it stayed open. Anything shipped after
-    // that matched no rule at all — and an unstyled SVG path fills black.
-    // The reader saw it; the agent, on a fresh tab, could not reproduce it.
+    // see dsp-mirror-render.md#the-stylesheet-morphs-too
     const freshCss = doc.querySelector("head style");
     const liveCss = document.querySelector("head style");
     if (freshCss && liveCss && liveCss.textContent !== freshCss.textContent) liveCss.textContent = freshCss.textContent;
@@ -1986,23 +1786,7 @@ function presentForm(name, into, title, html, machine) {
   if (into === "details") { CURRENT_DETAIL = "form:" + name + (machine ? "@" + machine : ""); showDetails("", html); return; }
   openModal(title, html);
 }
-// THE STATE FORM'S SHEET (owner rulings 2026-08-04): boxes from the A3
-// shape, fields with their template chips, the existing save/confirm/done
-// buttons, plus the portable copy's export and ingest.
-// A [[LINK]] IS A LINK, NOT A SPELLING. Escaped prose with double brackets
-// left in it teaches the reader a filename and makes them go find it, which
-// is exactly the work a pointer exists to save.
-//
-// UNRESOLVED STAYS PLAIN. A name with no path is written without brackets
-// rather than as a dead link, because a link that does nothing is worse than
-// a word: it invites a click and spends it.
-// NO REGEX HERE, and the first cut of this function is why. It was written
-// as a split on /([[[^]]+]])/ and ARRIVED at the page as /([[[^]]+]])/ —
-// every backslash eaten in transit, leaving a matcher that matches nothing.
-// The brackets rendered literally and no link ever appeared.
-//
-// The warning was already in this file, twenty lines down, from the last time
-// it happened. Two string searches cannot be eaten.
+// see dsp-mirror-render.md#the-state-forms-sheet
 function wikiText(text, paths) {
   const s = String(text || "");
   let out = "";
@@ -2055,10 +1839,7 @@ function sfOne(f, fl) {
   s += sfEditor(fl, tm, args, f.ref_paths || {}, hint, f.ref_facts || {}) + "</div>";
   return s;
 }
-// THE EDITOR IS THE TEMPLATE'S SHAPE (owner ruling 2026-08-04): a list
-// edits as rows, known items as labelled rows, a choice as its dropdown
-// with the rationale beside it, findings as answered pairs. Free text
-// stays a textarea. Stored forms stay markdown lines either way.
+// see dsp-mirror-render.md#the-editor-is-the-templates-shape
 function sfDash(c) {
   return (c || "").split("\\n").map(function (l) { return l.trim(); }).filter(function (l) { return l.indexOf("- ") === 0; }).map(function (l) { return l.slice(2); });
 }
@@ -2323,10 +2104,7 @@ document.addEventListener("click", async (ev) => {
   }
   const ofo = ev.target.closest ? ev.target.closest(".openfolder") : null;
   if (ofo) { await formPost("/form/folder", { name: ofo.dataset.form }); return; }
-  // THE ARTIFACT OPENS IN THE EDITOR, AND ONLY THERE (owner, 2026-08-05).
-  // Rendering it in details as well cost the reader the pane they were
-  // reviewing from — two surfaces answering one click, and the one they
-  // still needed was the one that got replaced.
+  // see dsp-mirror-render.md#the-artifact-opens-in-the-editor
   const orf = ev.target.closest ? ev.target.closest(".reflink") : null;
   if (orf) {
     if (window.parent !== window) window.parent.postMessage({ se: "open", path: orf.dataset.path }, "*");
@@ -2370,10 +2148,7 @@ function detailFor(key) {
     return ["machine: " + D.viewed.id, '<div class="comment-detail">' + txt + "</div>" + jsonTable(D.viewed)];
   }
   if (key.startsWith("state:")) {
-    // THE MACHINE RIDES INSIDE THE KEY, exactly as form keys carry it
-    // (owner report 2026-08-09: a popped-out details window has its own
-    // view — usually the walk's — so a bare state id re-resolved THERE and
-    // build_chart's details opened as gate-candidates).
+    // see dsp-mirror-render.md#the-machine-rides-inside-the-key
     const at = key.slice(6).split("@");
     const id = at[0];
     const mac = at[1] || "";
@@ -2678,17 +2453,7 @@ if (FROZEN) {
 }
 // Open folds need no carrying now: the morph never replaces them.
 
-// THE UNIFIED FEED (owner ruling, v2 i9 notes; built in v3): every hand's
-// act, one line each — time | src | brief | result. Updates bold, notes
-// italic, refusals red. Click a line: the full record (request first, then
-// response, one combined object) in details; an update line: the decision
-// graph of its state visit.
-// THE QUOTE IS THE ONE THAT MATTERS, because almost every use of this is an
-// ATTRIBUTE (owner, 2026-08-09). A value carrying a double quote closed the
-// attribute early and the rest became stray markup: a candidate whose name
-// read "Derived house" rendered value=""Derived house"", so the browser saw an
-// EMPTY value and drew the placeholder. The box looked unfilled and the note
-// was fine all along.
+// see dsp-mirror-render.md#the-unified-feed
 function escText(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); }
 const logPanel = document.getElementById("log-rows");
 let LOG_ROWS = [];
@@ -3103,23 +2868,9 @@ document.addEventListener("click", (ev) => {
   if (h) levelHelp(null);
 });
 
-// WHAT STANDS OPEN, for the person's own hand, now rides the LEGAL TOOLS
-// links like every other human-runnable tool (owner ruling 2026-07-28). It
-// had a button of its own in the machine header; the owner never found it
-// there, sharing a row with the crumbs, the slider and the escape control.
-// /api/survey stays — the mirror's own surfaces still ask it directly.
+// see dsp-mirror-render.md#what-stands-open
 
-// SESSION OVER — anybody reaching end stops the whole session. The mirror
-// tries to close its window; where that is not allowed, the big red
-// message stands (owner ruling 2026-07-26).
-// THE WINDOW STAYS OPEN, AND IT SAYS SO (owner ruling 2026-07-28). This used
-// to try to close its own tab, which is exactly why the end was never seen:
-// quitting at the console left a page that either vanished or sat there
-// looking perfectly alive. Nothing closes itself now. The page reports.
-//
-// Losing the link is not the same as reaching end, and the two no longer
-// share one sentence. A dropped connection says so AT ONCE, because silence
-// reads as breakage; only a silence that outlasts an engine reload is death.
+// see dsp-mirror-render.md#session-over
 function linkLost(on) {
   const had = document.getElementById("link-lost");
   if (!on) { if (had) had.remove(); return; }
@@ -3511,19 +3262,10 @@ function drawingSets(
   const done = new Set(run.done.map((s) => s.split("/").pop()!));
   // An end state is never "filled" — it turns green when its machine completed.
   if (run.completed) for (const s of decl.states) if (s.kind === "end") done.add(s.id);
-  // ONLY record-backed states PAINT (owner ruling 2026-08-04): the green
-  // set is the record's standing claims, which outlive the engine life.
-  // Session-walked states elsewhere stay uncoloured, as ruled 2026-07-31.
-  // GREEN MEANS SUBMITTED (owner ruling 2026-08-11): the paint uses the
-  // paint-mode green, where a signed gate stands before its bless and the
-  // bless rides as the thumbs-up mark.
+  // see dsp-mirror-render.md#only-record-backed-states-paint
   const paint = new Set(m.session.recordPaint(decl));
   const blessed = new Set(m.session.blessedGates(decl, paint));
-  // DRIFT IS COMPUTED ON THE WAY TO THE SCREEN (owner ruling 2026-08-05):
-  // green must mean still green NOW, so the demand diff is recomputed on
-  // every look rather than only when a pin is rewritten. It costs one hash
-  // of the matrix (~3ms) against a render measured in hundreds. A view
-  // never writes — the reopen is the walk's, in Session.driftReopen.
+  // see dsp-mirror-render.md#drift-is-computed-on-the-way-to-the-screen
   const suspect = new Set(m.session.suspectStates(decl));
   const subIds = new Set(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id));
   // WHICH OF THEM CAN ACTUALLY BE OPENED. A seeded sub-machine has no drawing
@@ -3720,12 +3462,7 @@ export function renderMirror(
   // THE NOTE ROW IS ITS OWN PANEL, drawn right after the controls. Both
   // surfaces read the same two specs, so neither can drift from the other.
   const slider = renderPanel(loadPanel(m.root, "controls"), panelValues) + renderPanel(loadPanel(m.root, "note-entry"), panelValues);
-  // THE SHUTDOWN CONTROL IS GONE (owner sketch, 2026-08-01). It was redundant:
-  // the only setting anyone wanted is "do not shut down while work is running",
-  // and that is not a preference. The MACHINE decides it, from whether the walk
-  // is idle at the front desk — not the agent, and not a slider.
-  // THE UPDATE CADENCE — how often the agent OWES a line about what it is
-  // doing. Same grammar as the other two bars; the top notch owes nothing.
+  // see dsp-mirror-render.md#the-shutdown-control-is-gone
 
   const nrBar = "";
   // Escape has a hand-side affordance too (parity law): only while a
@@ -3736,12 +3473,7 @@ export function renderMirror(
   // the row under the reader's hand. Not applicable is DISABLED, not absent.
   const canEscape = crumbTrail.length > 1 && crumbTrail[1] !== "boot";
   const escapeBtn = `<button class="ghost" id="escape-btn"${canEscape ? "" : " disabled"} title="${canEscape ? "escape to idle — the machine is left standing, the reason is recorded" : "nothing to escape — the walk is not inside a sub-machine"}">⤴ escape</button>`;
-  // The way home when the view holds still elsewhere: the header names
-  // the walk's position; clicking it jumps the view there.
-  //
-  // ONE BUTTON PER STANDING STATE (owner ruling 2026-08-08). A fan puts the
-  // walk in several states at once, and naming the first of them would read
-  // exactly like standing in one. Five buttons is what five legs looks like.
+  // see dsp-mirror-render.md#the-way-home-when-the-view-holds-still-elsewhere
   const curBtn = info.active
     .map((qualified) => qualified.split("/").pop() ?? "")
     .filter((leaf) => leaf !== "")
@@ -3764,27 +3496,13 @@ export function renderMirror(
       : `<div class="widget" id="w-log">${widgetHead("log", "w-log", "/widget/log")}
     <div class="panel log-panel" id="log-rows" data-morph-ignore><div class="meta">loading…</div></div>
   </div>`;
-  // THE AGENT'S TERMINAL. The whole widget is morph-ignored: a morph that
-  // reached into a live terminal would wipe its scrollback and its focus.
-  // The pty host is a SIBLING process started by RUNME — the mirror only
-  // renders a client for it, because this page's process is the agent's
-  // grandchild and a grandchild cannot own its grandparent's terminal.
-  //
-  // THE PANE FOLLOWS THE HOST, NOT THE LAUNCH (owner ruling 2026-07-28). It
-  // ships hidden and the client reveals it when the host answers. Manual mode
-  // starts none, and --own-terminal leaves the agent in its own window, so
-  // both simply never reveal it — one rule instead of a flag for each case.
-  // On its OWN page the pane stays visible, so a direct visit can say why it
-  // is empty rather than showing a blank tab.
+  // see dsp-mirror-render.md#the-agents-terminal
   const termWidget = (
     standalone: boolean,
   ) => `<div class="widget${standalone ? "" : " no-host"}" id="w-terminal" data-morph-ignore>${widgetHead("terminal", "w-terminal", "/widget/terminal")}
     <div class="panel term-panel" id="term-body"><div class="meta" style="padding:10px 12px">no agent connected — the card keeps its slot, so no number ever shifts</div></div>
   </div>`;
-  // THE CHAT CARD KEEPS ITS SLOT (owner 2026-07-29), superseding the older
-  // rule that the pane ships hidden until a host answers. An agent can connect
-  // or drop MID-SESSION, and a card that vanishes renumbers every card after
-  // it — under the reader's hand, while they are using the numbers.
+  // see dsp-mirror-render.md#the-chat-card-keeps-its-slot
   const terminalWidget = termWidget(true);
   // THE TABLE (owner ask 2026-08-01) — every view every .base in the vault
   // declares, drawn here so Obsidian is not the only thing that can read
@@ -3871,12 +3589,7 @@ export function renderMirror(
   );
 }
 
-// THE CARD MATRIX (owner design 2026-07-29). The card list and its ORDER are
-// the product's, in project/deliverable/views/cards.md — v3 exists to work on other products,
-// and another product wants other cards.
-// EMBEDDED, the console card leaves (owner ruling 2026-07-30): the host's
-// integrated terminal is where the agent lives, and a second picture of it
-// beside the editor is an echo. The grid closes over the gap.
+// see dsp-mirror-render.md#the-card-matrix
 function cardMatrixPage(
   m: MirrorState,
   card: string | undefined,

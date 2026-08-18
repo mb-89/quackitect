@@ -103,16 +103,7 @@ const DISPOSITIONS = ["done", "obsolete", "carried", "backlog"];
  *  the code, ruled on since it was parked. */
 const JUDGMENT: ReadonlySet<string> = new Set(["carried", "backlog"]);
 
-/** The retro's mechanical half (v2's req-retro-drain): disposition a note;
- *  drained notes leave the inbox count. An unknown ref is refused.
- *  Re-draining is legal, EXCEPT a second drain to backlog: the first one
- *  already minted a work token, and a second would mint a duplicate.
- *
- *  judgmentAllowed SPLITS IT (owner discussion 2026-07-29). The drain was
- *  retro-only, so the front desk could ADD to the inbox and never take
- *  anything out — and the desk's own method opens by weighing an inbox it
- *  was not allowed to correct. The ceremony is worth keeping where a
- *  judgment is actually made, and nowhere else. */
+/** see dsp-note-pen.md#the-retros-mechanical-half */
 export function drainNote(
   seDirPath: string,
   ref: string,

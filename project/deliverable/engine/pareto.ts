@@ -1,20 +1,4 @@
-// THE PARETO FRONT, COMPUTED. Nobody types it.
-//
-// Domination is one line of arithmetic — a candidate is dominated when another
-// is at least as good on every axis and better on one — so the front and every
-// elimination are a FUNCTION of the score table.
-//
-// WHY THIS EXISTS (owner report 2026-08-08). evaluate-set asked a person to
-// TYPE the non-dominated set and the eliminations, both free text. That asks
-// somebody to hand-compute an answer the scores already contain, and it lets
-// the typed answer disagree with the scores in the same form, silently. The
-// owner read the form and asked who eliminates. Nobody does; arithmetic does.
-//
-// WHAT A PERSON STILL OWES is the judgment arithmetic cannot make: whether an
-// elimination is accepted, and anything the numbers do not capture.
-//
-// NOTHING HERE KNOWS ABOUT THIS REPOSITORY. Candidates, axes and scores are
-// the whole vocabulary, so the same code would rank anything.
+// see dsp-decision-mathematics.md#the-pareto-front
 
 /** One candidate's score on every axis. A missing axis is UNSCORED, not zero —
  *  see below, because the difference decides whether a front is trustworthy. */

@@ -3,12 +3,7 @@ export function stripBom(s: string): string {
   return s.charCodeAt(0) === 0xfeff ? s.slice(1) : s;
 }
 
-/** CUT THE MIDDLE, NEVER THE END (owner law 2026-08-02). The end of an
- *  output is where verdicts live — exit codes, error totals, closing
- *  units. A head-only cap once turned "(425.501917ms)" into "(425.501",
- *  and a confident wrong diagnosis was built on the missing "ms". So a
- *  cap keeps BOTH ends, backs off to whitespace so no token is ever
- *  split, and the marker states exactly what was dropped. */
+/** see dsp-file-lane.md#cut-the-middle */
 export function capMiddle(s: string, max: number): string {
   if (s.length <= max) return s;
   const headBudget = Math.floor(max * 0.8);

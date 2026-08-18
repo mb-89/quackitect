@@ -1,18 +1,4 @@
-// THE ELEMENT MATRIX, COMPUTED. Nobody types an owed cell.
-//
-// The crossings fall out of what already stands: a function node carries its
-// flows as inputs and outputs, an element names the functions it implements,
-// an interface names its source, destination and carried flows. A flow whose
-// producing function and consuming function are implemented in different
-// elements CROSSES a boundary, and each crossing pair owes an interface.
-//
-// The person's work is the judgment the arithmetic cannot make: naming each
-// owed cell's contract and choosing its concrete form. Same law as the
-// pareto front and the Pugh runs — the computable part computed, the
-// judgment typed (owner design 2026-08-10, the numbered-cell sketch).
-//
-// NOTHING HERE KNOWS ABOUT THIS REPOSITORY. Elements, functions, flows and
-// interfaces are the whole vocabulary.
+// see dsp-the-outside-boundaries-and-their-bounds.md#the-element-matrix
 
 export interface MatrixElement {
   id: string;
@@ -101,20 +87,7 @@ export function elementMatrixView(
   const declaredAt = new Map<string, MatrixInterface[]>();
   const undemanded: { id: string; source: string; destination: string }[] = [];
   for (const i of interfaces) {
-    // AN OUTSIDE BOUNDARY IS NOT A MATRIX CELL (i33, 2026-08-17). This matrix
-    // is element-to-element by construction: it computes owed cells from where
-    // a FLOW crosses an element boundary, and a neighbour sits outside the
-    // element set entirely. An interface with `nbr-` at one end is the product
-    // meeting something it does not own, and it is demanded by the boundary
-    // model rather than by a crossing flow.
-    //
-    // IT USED TO READ AS A DEFECT, because the law was written when every
-    // interface was internal. The first thirteen outside boundaries all
-    // reported as naming an end no element carries, which is the law being
-    // narrow rather than the nodes being wrong.
-    //
-    // BOTH ENDS OUTSIDE IS STILL A DEFECT. Two neighbours talking to each
-    // other is not this product's interface to describe.
+    // see dsp-the-outside-boundaries-and-their-bounds.md#an-outside-boundary-is-not-a-matrix-cell
     const ends = [i.source, i.destination];
     const outside = ends.filter((e) => e.startsWith("nbr-"));
     if (outside.length === 1 && ends.some((e) => known.has(e))) continue;

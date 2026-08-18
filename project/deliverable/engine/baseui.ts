@@ -282,15 +282,7 @@ function codePanel(root: string, rel: string): string {
 }
 
 export function basesCard(root: string, head: string, selected?: string, rowsIn?: Row[]): string {
-  // THE WARM MODEL, not a fresh read. The index is built once, kept current
-  // by the watcher and the lane's tells, and every view reads the same rows
-  // the filters do.
-  //
-  // AND A RENDER NEVER BUILDS IT (2026-08-10). The synchronous build on this
-  // chain froze every surface at once; now the card reads the rows that are
-  // ready, and where none are it KICKS the async build and says so. The
-  // mirror re-renders on its next poll, and a late table is a repaint —
-  // exactly the cost a render is allowed to pay.
+  // see dsp-live-register.md#the-warm-model
   const rows = rowsIn ?? warmRows(root);
   if (rows === undefined) {
     void warmVault(root);

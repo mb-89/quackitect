@@ -1,20 +1,4 @@
-// THE DECISION GRAPH IS NOT A TREE, and drawing it as one loses the only
-// interesting part. walking.md defines a fork as "a BLOCKING detour: the
-// current item cannot continue until this is fixed; resolve it and RETURN".
-//
-// So the graph emits as a Mermaid gitGraph. VS Code renders Mermaid in its
-// built-in Markdown preview since 1.121, so nothing here needs a renderer.
-//
-// THE SHAPE (owner design, 2026-07-31):
-//
-// - The trunk is the checklist. One commit per point, top to bottom.
-// - The updates on a point become a BRANCH off it, and that branch does not
-//   come back. Work reported on a point is not a detour that returns; it is
-//   the story of that point, and merging it would draw a return that never
-//   happened.
-// - The LAST update is the one that settled the point, so it carries the
-//   closing mark. The trunk bubble carries it too, so the checklist reads
-//   straight down without following every branch.
+// see dsp-mirror-render.md#the-decision-graph-is-not-a-tree
 import type { DecisionNode } from "./decisions.ts";
 
 /** How long a point's line may be. The graph reads as a checklist, and a

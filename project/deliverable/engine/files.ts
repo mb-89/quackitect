@@ -744,14 +744,7 @@ function applyRangeOp(w: OpWork): { next: string; replacements: number } {
   return { next: lines.join("\n"), replacements: 1 };
 }
 
-// THE ENGINE CORRECTS WHAT IS MECHANICAL AND SAYS SO (owner ruling
-// 2026-08-02). The commonest 0-match cause is INVISIBLE: a CRLF file
-// against an old_string written with LF. The old behaviour diagnosed it
-// and refused anyway — one round-trip spent re-copying text that differs
-// in nothing a model can see. Now: when the strings match under the
-// file's own line endings, the patch is applied in those endings and the
-// correction is NAMED on the result. Whitespace near-misses still refuse
-// — collapsed indentation is a real difference, not an encoding one.
+// see dsp-write-guard.md#the-engine-corrects-what-is-mechanical-and-says-so
 function applyExactOp(w: OpWork): { next: string; replacements: number } {
   let oldStr = (w.op.old_string as string).replace(/^﻿/, "");
   let newStr = w.op.new_string as string;
@@ -795,27 +788,9 @@ function applyExactOp(w: OpWork): { next: string; replacements: number } {
       source: SRC,
     });
   }
-  // A FUNCTION REPLACEMENT, NEVER A STRING (found 2026-08-07, the hard way).
-  // String.replace reads dollar sequences in a STRING replacement as
-  // instructions:   const next = w.op.replace_all === true ? w.current.split(oldStr).join(newStr) : w.current.replace(oldStr, newStr); is the match, $1 a group, and dollar-backtick is
-  // everything BEFORE the match. new_string is DATA — code, prose, a regex
-  // someone is editing — and it must never be read as an instruction.
-  //
-  // What it did: two engine files were spliced full-length into themselves
-  // by patches whose new_string happened to contain a regex ending in
-  // dollar-backtick. Both doubled in size, both still "applied" cleanly, and
-  // the only signal was a parse error hundreds of lines away.
-  //
-  // split().join() was already safe; join takes its argument literally. Only
-  // the single-replacement path was exposed, which is why replace_all never
-  // showed it.
+  // see dsp-write-guard.md#a-function-replacement
   const next = w.op.replace_all === true ? w.current.split(oldStr).join(newStr) : w.current.replace(oldStr, () => newStr);
-  // THE ROUND-TRIP VERIFY (owner ask 2026-08-07: escaping kept eating
-  // writes, and every instance was silent). new_string is DATA and must
-  // land verbatim. If the applied buffer does not contain it, something
-  // between the tool boundary and the buffer transformed it — refuse
-  // rather than report a success that is not one. This catches the CLASS,
-  // including whatever eats the next one.
+  // see dsp-write-guard.md#the-round-trip-verify
   if (newStr !== "" && !next.includes(newStr)) {
     throw new Rejection({
       clause: CLAUSES.WRITE_TRANSFORMED,

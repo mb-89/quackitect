@@ -79,11 +79,7 @@ export const PARETO_PLOT_EDITOR: EditorKind = {
       parts.push('<polyline class="sfppline" data-cand="' + esc(c.id) + '" points="' + pts.join(" ") + '" fill="none" stroke="' + colour + '" stroke-width="' + (kept ? 2.5 : 1) + '" opacity="' + (kept ? 1 : 0.35) + '"><title>' + esc(c.id) + (kept ? " (on the front)" : " (eliminated)") + "</title></polyline>");
     };
     cands.forEach(line);
-    // READABLE AT ANY AXIS COUNT (owner report 2026-08-09: thirty-five axes
-    // squeezed into a fixed card were unreadable, and nothing could grow it).
-    // The svg fills the box's HEIGHT and keeps its shape, so the native
-    // resize handle grows the whole drawing; what overflows the card scrolls
-    // sideways instead of being squeezed into it.
+    // see dsp-form-editors.md#readable-at-any-axis-count
     const svg = '<div class="sfppbox" style="resize:vertical;overflow:auto;height:280px;max-width:100%;">'
       + '<svg class="sfpp" viewBox="0 0 ' + W + " " + H + '" style="height:100%;width:auto;overflow:visible;display:block;">' + parts.join("") + "</svg></div>";
     // THE LEGEND IS THE FRONT, in the same colours as its lines.
@@ -113,16 +109,6 @@ export const PARETO_PLOT_EDITOR: EditorKind = {
       warnHtml +
       (kills !== "" ? '<details style="margin:4px 0;"><summary style="' + meta + 'cursor:pointer;">' + r.eliminated.length + " eliminated</summary><ul style=\\"" + meta + 'margin:0;padding-left:18px;">' + kills + "</ul></details>" : "");
   `,
-  // NOTHING IS COLLECTED, AND THAT IS THE POINT (owner ruling 2026-08-08:
-  // "if it's derived, then it doesn't need to be in the notes").
-  //
-  // The first cut wrote the front into the field so the gate could read it
-  // without recomputing. That is exactly the second copy this design exists to
-  // avoid — argued against one hour earlier, in this same file's own header,
-  // and then built anyway. A stored front drifts from the scores the moment a
-  // single number changes, and nothing would report the disagreement.
-  //
-  // The gate recomputes. It costs a pass over a table of at most a few dozen
-  // rows, and it cannot be wrong.
+  // see dsp-form-editors.md#nothing-is-collected
   collect: "",
 };

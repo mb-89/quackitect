@@ -1,29 +1,4 @@
-// THE PROSE INSPECTION, as much of it as a command can answer (i33, 2026-08-17).
-//
-//   node project/deliverable/engine/bin/prose-inspect.ts [--root <project root>]
-//
-// tsp-prose-inspection has EIGHT checklist items and has had NO RUNNER since
-// i28. It was hand-judged or skipped at verification after verification, and
-// i33's own tester found four factual errors sitting in the README while the
-// spec was marked owed. The register entry is
-// raid-issue-the-corpus-wide-inspections-have-no-runner, and its stated
-// repayment is "a command per spec that answers it, or a spec rewritten to
-// demand what a command can answer". This is the first half, for the three
-// items that are mechanically answerable.
-//
-// WHAT IT ANSWERS, and it says which:
-//
-//   item 1 — entry documents carry zero BARE method terms
-//   item 3 — stored records carry zero usernames or hostnames
-//   item 8 — the desk's offer list includes a tour
-//
-// WHAT IT DOES NOT, and never claims to: items 2, 4, 5, 6 and 7 are judgments
-// about whether a source supports a claim, whether a comparison carries both
-// sides, and whether notes were consolidated. No command answers those, and a
-// runner that pretended to would be worse than none.
-//
-// EXIT 1 ON FINDINGS, because a check that only ever passes teaches the reader
-// to skim.
+// see dsp-quality-toolchain.md#the-prose-inspection
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
@@ -177,18 +152,7 @@ function recordsNameRolesOnly(): void {
       skipped.push(`${what} collides with the product's own name, so a text search cannot tell them apart`);
       return;
     }
-    // A BARE WORD THE CORPUS ALREADY SPEAKS IS THE SAME COLLISION, one step
-    // out (measured on the i17 cloud run, 2026-08-18). The product-name guard
-    // above caught the case where the needle is what the product is called;
-    // this catches the case where it is what the AGENT is called. A cloud host
-    // sets `git config user.name` to the agent's own name, and the records
-    // discuss that agent by name on nearly every page — 64 findings, every one
-    // of them false, and boot could not finish because the check never went
-    // green.
-    //
-    // ONLY A BARE WORD IS EVER MUTED. A home directory, an email address and a
-    // machine path all carry a separator, so the shapes that actually leak an
-    // identity stay searchable no matter how often they appear.
+    // see dsp-quality-toolchain.md#a-bare-word-the-corpus-already-speaks-is-the
     if (!/[\s/\\@.:-]/.test(v)) {
       const n = filesCarrying(v);
       if (n > VOCABULARY_FLOOR) {

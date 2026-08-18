@@ -1,15 +1,4 @@
-// The search lane — drop-in replacement for Grep.
-//
-// ripgrep and git are HARD dependencies (owner ruling 2026-07-26): there is
-// no fallback engine. ripgrep ships via @vscode/ripgrep (npm install in the
-// RUNME); PATH rg is accepted too. Missing both is a red preflight, not a
-// degraded search — v2's lesson: a weaker lane silently teaches the agent
-// to distrust the lane.
-//
-// ref search (v2 parity): pass ref to search a committed state instead of
-// the tree — git grep against any branch or tag (v3 is a branch of quack,
-// so `main` reaches v1, `v2` reaches v2).
-// Results are LOCATIONS; the remedy for "show me more" is a range read.
+// see dsp-file-lane.md#the-search-lane
 import { spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { relative, resolve, sep } from "node:path";
@@ -128,14 +117,7 @@ export function search(root: string, query: string, opts: SearchOpts = {}): Sear
     matches: matches.slice(0, limit),
     total: matches.length,
     truncated: matches.length > limit,
-    // A FILE THAT CANNOT BE SEARCHED SAYS SO (found live 2026-07-29).
-    // engine/worktree.ts carried one raw NUL byte as a cache-key separator.
-    // ripgrep called the whole file binary and reported it on a line this
-    // parser did not understand, so the line was dropped and the search
-    // returned an empty, confident "no matches".
-    //
-    // The file was invisible to every search in the lane, and nothing ever
-    // said so. An empty result and an unreadable file must never look alike.
+    // see dsp-file-lane.md#a-file-that-cannot-be-searched-says-so
     ...(unreadable.length > 0 ? { unreadable } : {}),
   };
 }
@@ -270,15 +252,7 @@ function rgSearch(root: string, query: string, opts: SearchOpts, unreadable: str
     query,
     scope,
   ];
-  // THE EXCLUSION GLOBS ARE RELATIVE TO THE WORKING DIRECTORY, never to the
-  // search target. Without a cwd of its own, ripgrep resolved them against
-  // the SERVER's cwd — and a bound expedition worktree lives under
-  // .worktrees, so `!.worktrees/**` excluded every file of the very tree the
-  // search was pointed at. Every directory search in an open expedition
-  // returned a confident, empty "no matches" (found live 2026-07-30).
-  // A single named FILE survived it, because ripgrep never applies these
-  // filters to a target it was handed explicitly — which is what made the
-  // failure look like a parser bug rather than a scoping one.
+  // see dsp-file-lane.md#the-exclusion-globs-are-relative-to-the-working-directory
   return parsePlainLines(runRg(base, args), show, unreadable);
 }
 
@@ -291,20 +265,7 @@ function gitPathspec(opts: { path?: string; include?: string }): string[] {
   return ["--", opts.path === undefined ? `:(glob)${inc}` : `:(glob)${opts.path.replace(/\/+$/, "")}/${inc}`];
 }
 
-/** A GIT FAILURE AT A REF, TYPED.
- *
- *  THE ONE PLACE THE LANE'S OWN LAW DID NOT HOLD (i35 field report,
- *  2026-08-17). Every other refusal names a clause, what was expected, what
- *  arrived, and a remedy that runs. This threw raw git text, and raw git text
- *  reads as "the file is missing" when what is missing is the BRANCH.
- *
- *  IT COST A FALSE CLAIM THROUGH SIX EVIDENCE FORMS. The i15 run read an
- *  unresolvable ref as an empty result, minted an assumption on it, and carried
- *  the conclusion forward.
- *
- *  A SHALLOW CLONE IS THE ORDINARY CAUSE. A cloud box clones one branch, so
- *  `main` and `v2` do not exist locally, and a fetch alone does not create
- *  them — the remedy below is the pair that does, measured on that run. */
+/** see dsp-file-lane.md#a-git-failure-at-a-ref */
 function gitFailed(r: { status: number | null; stderr?: string }, ref: string): never {
   const stderr = (r.stderr ?? "").trim();
   // ONLY THE REF CASE IS TYPED, because only it is the caller's to fix. A

@@ -200,3 +200,214 @@ one. Drawing and routing stay legal; entering does not.
 AN EXPLICIT NONE PASSES WITHOUT CEREMONY. Zero spikes is a normal outcome when
 the drawing says why. Only the scaffold's own literal is marked, so an authored
 none is untouched.
+
+## One tree one path
+
+ONE TREE, ONE PATH (owner ruling 2026-08-16). A record is read from the
+ working tree and from nowhere else.
+
+ WHAT WENT: a branch read. This used to try the record's own worktree, then
+ trunk, then `git show <branch>:<rel>` — three places for one file, and the
+ answer depended on which of them happened to have it. That third path is
+ the retrieval the whole iteration exists to delete.
+
+## The statuses a record cannot be walked from
+
+THE STATUSES A RECORD CANNOT BE WALKED FROM. One definition, because two
+ readers disagreeing about what "open" means is the defect this replaces:
+ the survey read the status and the container read the filesystem, so i28
+ stood in one list and not the other on 2026-08-16.
+
+## The container is a dag
+
+THE CONTAINER IS A DAG, AND THIS KEY IS ITS ONLY INPUT (owner ruling
+2026-08-12). An iteration naming another here cannot be entered until
+that one leaves the open set, because the drawn edge runs dep -> this
+and the walk never enters a state whose inbound edges have not fired.
+
+## The seeded machine
+
+THE SEEDED MACHINE (owner design 2026-07-30): an authoring state writes
+ the drawing as markdown data in the record (machines/<kind>.md), and the
+ matching runs-state descends into its compilation — build-chunks, spikes
+ and candidates all share this one shape. Each step's realization kind
+ becomes a TAG on its state, so the existing tag-pull serves each builder
+ its discipline's guidance. An absent or empty drawing is a TYPED
+ REFUSAL, never a plain serve — unless it carries an explicit none with
+ its reason, which passes the run state without ceremony.
+
+## The bar sits on the end
+
+THE BAR SITS ON THE END, AND THERE IS NO JOIN PILL (owner ruling
+2026-08-09). A build is done when EVERY leaf step is, so plain fan-in
+would be an OR — but the bar is a FIELD, not a state, so the end pill
+carries it directly.
+
+THE SEPARATE JOIN WAS CEREMONY. It held no evidence, asked nothing and
+did no work; it merged, which the bar already does. A pill a reader
+cannot act on is a pill that teaches them to click past pills.
+
+## The steps topology
+
+THE STEP'S TOPOLOGY, digested. What a step ASKS FOR and where it SITS are
+ different facts, and only the first was ever compared.
+
+ So a row could gain a dependency and no standing iteration would notice.
+ That happened on 2026-08-13: build-steps was given a dependency on the
+ state that seeds its drawing, and i3's pinned machine kept walking straight
+ past it, because no demand had moved.
+
+ Sorted, so re-ordering a list is not a change.
+
+## Did the matrix move under this pin
+
+DID THE MATRIX MOVE UNDER THIS PIN — and nothing about which steps care.
+
+ TWO QUESTIONS USED TO SHARE ONE ANSWER. `iterationDrift` returns an empty
+ list both when the matrix is unchanged and when it changed in a way no
+ step's demand noticed, and the walk read the second as the first.
+
+ So a matrix edit that reshaped the MACHINE — a new dependency, a state the
+ column regained — never refreshed the pin, and the record went on walking a
+ snapshot taken before the fix. Seen live on 2026-08-13: build-steps was
+ given its dependency on specify-build and i3 kept skipping it.
+
+## The iterations container
+
+THE ITERATIONS CONTAINER, generated: every open iteration is ONE node
+ whose machine is the iteration's own walk — M0 alone until the
+ kickoff's bless pins a column, the full pinned machine after. The walk
+ shows FLAT: milestones are groups on the states, never sub-machines
+ (owner ruling 2026-08-04). Nothing open: start runs to end.
+
+## The iterations machine compiled live at call time from
+
+The iteration's machine, COMPILED LIVE at call time from the pinned
+ COLUMN. The pin records WHICH column this iteration walks; the shape of
+ that column and every form in it are derived from the matrix, so a row
+ edited a moment ago shows on the next render — from anywhere, with nobody
+ standing in the machine.
+
+ THE MACHINE IS NOT STORED (owner ruling 2026-08-05). A frozen copy made
+ the walk hand back the OLD question after the drift had already reopened
+ the step for asking a new one, and a reader looking at the state saw a
+ form the matrix had stopped asking for.
+
+ WHAT THE ITERATION WAS JUDGED AGAINST is the pin's DEMANDS LEDGER, which
+ is a different record and the one the drift check reads. Freezing the
+ machine never served that job; the ledger always did.
+
+ The machine id is the iteration's short id either way, so evidence keys
+ and history survive.
+
+## Two kinds of sub-machine
+
+TWO KINDS OF SUB-MACHINE, told apart by the name (owner ruling
+2026-08-08). A SEEDED one is authored per iteration and lives in the
+record, so it is generated here: build-chunks, spikes, candidates.
+A STATIC one is method — the same five finders every time — and its
+drawing is a .canvas under machines/. Naming a file is what says so.
+
+A static name is left OUT of subGen on purpose. Session.seedSubs and
+Session.declForPrefix both fall back to compiling the ref when no
+generator answers, which is exactly the right path for a drawing.
+Registering it here instead sent the walk looking for a seeded file
+in the record and refused with "a run without visible steps".
+
+## A recovery edge is the loops back half
+
+A RECOVERY EDGE IS THE LOOP'S BACK HALF, never a dependency. Counted, it
+made every fallback pair a cycle; the cycle guard cut the walk mid-way and
+the half-computed layer got MEMOIZED — fix-findings drew at the top of its
+group, rows away from the verification it serves (owner report 2026-08-11).
+
+## A drawn view of any machine top to bottom
+
+A drawn view of ANY machine, top to bottom like the walk reads: the
+ shared start and end pills, each milestone a labelled group box, states
+ inside layered by dependency — independent ones side by side — and every
+ edge declaring its sides.
+
+ EXPORTED, AND NOT ONLY FOR GENERATED MACHINES (owner ruling 2026-08-08).
+ A hand-drawn sub-machine served its authored x and y, so it read left to
+ right while every compiled machine read top to bottom, and a fan's AND bar
+ did not look like a bar. Same layout, whatever built the states.
+
+## The seed states its dependency or refuses
+
+THE SEED STATES ITS DEPENDENCY OR REFUSES (owner ruling 2026-08-13).
+
+ TWO ANSWERS USED TO LOOK IDENTICAL ON DISK: I FORGOT, and I DECIDED NONE.
+ Only one of them is a decision, and the empty list is what makes it
+ expressible. Without it the key cannot tell a silence from a statement,
+ and that is the whole defect rather than a nicety.
+
+ THE GUIDANCE ALREADY EXISTED AND DID NOT HOLD. The rule stood in the seed
+ tool's own argument description, in the argument list, unmissable.
+ Measured 2026-08-13: twenty-seven iterations seeded and the key set on
+ seven. Three stated a wait in their own vision prose and carried no edge
+ for it — the UI sitting after the panel round, the comment system after
+ the machine format, and the cloud iteration after the lane binding.
+
+ A RULE BROKEN THAT WAY WANTS A REFUSAL, NOT ANOTHER SENTENCE.
+
+ ONE MODULE, TWO DOORS. The agent's seed verbs and the mirror's seed form
+ both land here, so a person and an agent are held to the same demand and
+ read the same remedy.
+
+ req-a-seed-states-its-dependency
+
+## Quoted because the writer controls the field and not
+
+QUOTED, because the writer controls the field and NOT its content.
+An override is free prose from a person, so it carries colons, quotes
+and line breaks. Unquoted, "in chat, 2026-07-29: after reading" is a
+nested mapping and the WHOLE record stops parsing. That happened for
+real on e22 and took the record down with it.
+
+## The close hands over
+
+THE CLOSE HANDS OVER, IT DOES NOT REFUSE (owner ruling 2026-08-16).
+
+ IT REFUSED UNTIL TODAY, and the refusal was the wrong shape. Disposing an
+ owed item means fixing the thing or RULING its register entry, and a ruling
+ is usually the person's. So the refusal put a person-blocking step at the
+ very end of every record — at the one moment the only thing left to do is
+ ship, which is when the pressure to wave it through is highest.
+
+ AND IT TRAPPED THE WALK. A close that will not pass leaves the walk standing
+ in the last state with no legal move, which is the failure the owner named
+ after it happened three times in one day.
+
+ CARRYING IS STILL A DISPOSITION. "Carried to the next record, on the record"
+ is an agreed outcome, which is what NASA NPR 7123.1 means by a review
+ completing on dispositions rather than on every finding being fixed.
+
+ THE STOP MOVES TO THE SEED. The count rides the closed record, so the next
+ record can read it, surface it and — above a threshold — be a pruning
+ record rather than a new one. That half is not built here; this is the end
+ that stops the trap.
+
+## Mergeandretire and mergetotrunk are gone
+
+`mergeAndRetire` AND `mergeToTrunk` ARE GONE (i34). They merged a record's
+branch to trunk and then ran `git rm -r` on the record's directory, under
+the 2026-07-28 ruling that closed records live in git and the tree carries
+only live work.
+
+THERE IS NOTHING TO MERGE, because a record's work is written on trunk from
+the first keystroke, and NOTHING TO RETIRE, because the archive reads the
+folder from disk.
+
+WHAT WENT WITH THEM: the conflict handling, the abort, and the typed refusal
+that named the conflicting files. A merge that cannot happen cannot conflict.
+
+## Close the shipped iteration
+
+CLOSE THE SHIPPED ITERATION — fired by the walk itself as it leaves
+ through the terminal (owner ruling 2026-08-11: after the last bless the
+ iteration archives itself, exactly like an expedition). The blessed
+ release gate was the human ruling, so this close carries no second
+ judgment and no report guard. Trunk strays settle, leftovers commit,
+ the branch merges, the record dir retires to its branch, the worktree
+ goes — the iteration archive lists it from then on.

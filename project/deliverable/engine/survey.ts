@@ -1,12 +1,4 @@
-// WHAT STANDS OPEN — one mechanical answer: open expeditions, open
-// iterations, pending notes, and the standing WORK TOKENS in the pool with
-// their ready-when — read from the repository, never from a machine-local store.
-//
-// BOTH HANDS ASK IT (owner ruling 2026-07-28). The agent calls se_survey;
-// the person clicks it in the mirror. It lived inside the tool handler and
-// so was reachable only by the agent, which made "what is open" a question
-// the owner had to route through someone else. One implementation, two
-// doors.
+// see dsp-the-options-pool.md#what-stands-open
 import { byPriority, DEFAULT_PRIORITY, headline, type Priority, pendingNotes, priorityOf, titleOf } from "./inbox.ts";
 import { itList, readItRecord } from "./iterations.ts";
 import { seDir } from "./paths.ts";
@@ -48,13 +40,7 @@ const GOAL_CAP = 200;
 const goalOf = (fm: Record<string, unknown> | undefined): string =>
   fm?.unreadable !== undefined ? `⚠ ${String(fm.unreadable)}` : headline(String(fm?.goal ?? ""), GOAL_CAP);
 
-// THE FINISHED SET MOVED TO iterations.ts AT i34, as RECORD_FINISHED. It was
-// defined here and nowhere else, so the survey knew a shipped record was not
-// open and itList did not — and on 2026-08-16 i28 stood in the container's
-// list and not in the survey's, with nothing saying they disagreed.
-//
-// itList NOW APPLIES IT ITSELF, so this file no longer needs its own copy and
-// no longer needs to filter.
+// see dsp-the-options-pool.md#the-finished-set-moved-to-iterations
 
 export function survey(projectRoot: string, opts: SurveyOptions = {}): Survey {
   const exps = expList(projectRoot)
@@ -78,15 +64,7 @@ export function survey(projectRoot: string, opts: SurveyOptions = {}): Survey {
   const offset = Math.max(0, opts.offset ?? 0);
   const windowed = opts.limit !== undefined || offset > 0;
   const notes = windowed ? allNotes.slice(offset, offset + (opts.limit ?? allNotes.length)) : allNotes;
-  // THE POOL IS READ FROM THE REPOSITORY, NEVER FROM THE NOTE STORE (i17).
-  // It used to list `backlogNotes`, which live in `.se/` — machine-local and
-  // gitignored — so two clones disagreed about what the project was holding and
-  // neither was wrong. Measured 2026-08-18: a fresh clone reported 0 parked
-  // options while the machine that parked them reported 205.
-  //
-  // AN UNDRAINED CAPTURE IS NOT AN OPTION and deliberately never enters here.
-  // It has not been judged, and this list is what somebody may commit to. The
-  // pending count above stays the separate signal it always was.
+  // see dsp-the-options-pool.md#the-pool-is-read-from-the-repository
   const allBacklog = standingTokens(projectRoot).map((o) => ({
     ref: o.id,
     ready_when: o.ready_when,

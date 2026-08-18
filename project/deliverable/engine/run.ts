@@ -19,10 +19,7 @@ export interface RunResult {
 }
 
 const OUT_CAP = 30_000;
-// KILL THE WHOLE TREE, never just the child (found 2026-07-30: a run the
-// client gave up on kept a test runner and four descendants alive for
-// minutes, competing with everything measured after it). The shell we spawn
-// is a parent; killing it leaves its children parented to init and running.
+// see dsp-legible-controls.md#kill-the-whole-tree
 export function killTree(pid: number | undefined): void {
   if (pid === undefined) return;
   if (process.platform === "win32") {

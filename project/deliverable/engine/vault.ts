@@ -724,19 +724,7 @@ export function warmRows(root: string): Row[] | undefined {
   return v?.ready() === true ? v.all() : undefined;
 }
 
-/** THE ONE ENTRY, so a large vault never blocks the process that draws. The
- *  synchronous twin (vaultFor) retired 2026-08-10: its one render caller
- *  moved to warmRows, and a builder nothing calls is the zero-caller disease
- *  this file was caught by twice already.
- *
- *  AND THE VAULT IS KEPT CURRENT FROM HERE ON. live() existed with zero
- *  callers until 2026-08-09: the vault was built on the first render and
- *  never touched again, and an edited note showed its old row until restart.
- *
- *  A WATCHER IS SOUND HERE AND IS NOT SOUND FOR THE DOOR. The vault feeds a
- *  RENDER, and a repaint arriving a few milliseconds late costs nobody
- *  anything. A claim's green cannot tolerate the same gap, which is why
- *  engine/notes.ts stats instead. Different guarantee, different mechanism. */
+/** see dsp-live-register.md#the-one-entry */
 export async function warmVault(root: string, onProgress?: (p: BuildProgress) => void): Promise<Vault> {
   let v = WARM.get(root);
   if (v === undefined) {

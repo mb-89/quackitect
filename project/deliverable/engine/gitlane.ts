@@ -22,16 +22,7 @@ export function git(cwd: string, ...args: string[]): GitResult {
   return { ok: r.status === 0, code: r.status ?? -1, stdout: (r.stdout ?? "").trim(), stderr: (r.stderr ?? "").trim() };
 }
 
-// MERGE IS ALLOWED, REBASE IS NOT (owner ruling 2026-07-29). The asymmetry
-// is history: a rebase rewrites it, a merge only adds a commit that can be
-// reverted. The rebase refusal below already named merge as its remedy while
-// the allowlist forbade it, so the lane pointed at a door it had locked.
-// TAKING ONE SIDE OF A CONFLICT (gap hit live 2026-07-30, e26). Merging was
-// allowed but RESOLVING it was not, so seventeen conflict blocks across four
-// files had to be hand-edited through the agent's context. checkout joins the
-// list in ONE form: --ours or --theirs, on a named path, while a merge is
-// actually in progress. That rewrites a file the merge has already broken,
-// and nothing else.
+// see dsp-file-lane.md#merge-is-allowed
 const ALLOWED = new Set(["status", "log", "diff", "show", "add", "commit", "fetch", "branch", "rev-parse", "restore", "merge", "checkout"]);
 
 export function gitLane(cwd: string, rawArgs: unknown[]): Record<string, unknown> {
@@ -136,14 +127,7 @@ export function gitLane(cwd: string, rawArgs: unknown[]): Record<string, unknown
 // stale. LAND puts the work OUT without closing anything. Close stays the
 // third thing, and it is the only one that retires a record.
 
-/** THE ENGINE'S OWN TRAIL IS NOT SOMEBODY'S UNCOMMITTED WORK. A narrated call
- *  writes the record's decisions.jsonl into the bound worktree, so a walk can
- *  never present a clean tree while it is narrating — and a sync is wanted
- *  exactly when an expedition is entered, which is when narration is heaviest.
- *  The two mechanisms refused each other: riding an update on the sync dirtied
- *  the tree before it checked, so it refused itself (found live 2026-08-02).
- *
- *  Only the trail is excused. A reconcile must still never bury real work. */
+/** see dsp-file-lane.md#the-engines-own-trail-is-not-somebodys-uncommitted-work */
 const ENGINE_TRAIL = /project\/spec\/(?:expeditions|iterations)\/[^/]+\/decisions\.jsonl$/;
 
 export function dirtyLines(porcelain: string): string[] {
@@ -151,11 +135,7 @@ export function dirtyLines(porcelain: string): string[] {
     porcelain
       .split("\n")
       .filter((l) => l !== "")
-      // UNTRACKED FILES DO NOT BLOCK A RECONCILE. A merge cannot silently
-      // bury one — git itself aborts when an incoming file would overwrite
-      // it, and that abort already refuses typed. Counting them deadlocked
-      // once: the ignore rule for four generated files sat on the very
-      // branch the gate was refusing to land (found live 2026-08-02, e31).
+      // see dsp-file-lane.md#untracked-files-do-not-block-a-reconcile
       .filter((l) => !l.startsWith("??"))
       .filter((l) => !ENGINE_TRAIL.test(l.slice(2).trim().replace(/\\/g, "/").replace(/^"|"$/g, "")))
   );

@@ -1,19 +1,4 @@
-// THE MORPHOLOGICAL BOX — rows are function clusters, cells are the options
-// serving them, and a line across the box is one candidate architecture.
-//
-// IT IS DERIVED, NEVER STORED. The grid is a view over the option nodes the
-// seven finders minted: each option already carries the cluster it serves, its
-// statement, which finder found it and whether it was pruned. Before
-// 2026-08-08 the state kept a flat table repeating all of that, which is a
-// second copy of the truth and the exact thing node-table exists to prevent.
-//
-// NOTHING HERE KNOWS ABOUT THIS REPOSITORY, on purpose. No file reading, no
-// trace, no node types — rows, cells and lines are the whole vocabulary. The
-// owner wants this tool lifted out and used elsewhere one day, and that only
-// stays possible if the boundary is drawn now rather than retrofitted.
-//
-// So the READING lives in stateform.ts beside the other field derivations, and
-// what crosses into here is already plain data.
+// see dsp-decision-mathematics.md#the-morphological-box
 
 /** One option: a cell in its cluster's row. */
 export interface MorphCell {
@@ -49,13 +34,7 @@ export interface MorphBox {
   lines: MorphLine[];
 }
 
-/** A wiki link, a path or a bare id all name one node.
- *
- *  THE YAML QUOTES COME OFF FIRST (owner, 2026-08-09). A block list writes
- *  its items quoted, so a pick reads back as the seven characters "[[opt-a]]"
- *  WITH the quotes. The bracket strip then matches nothing, the id keeps its
- *  quotes, and it equals no cell on the chart — so every line drew with zero
- *  waypoints and reported itself unfinished. */
+/** see dsp-decision-mathematics.md#a-wiki-link-a-path-or-a-bare-id */
 export function bare(v: string): string {
   const unquoted = v.trim().replace(/^["']/, "").replace(/["']$/, "");
   const t = unquoted.trim().replace(/^\[\[/, "").replace(/\]\]$/, "").trim();
@@ -97,12 +76,7 @@ export function orderLines(cands: MorphLine[], order: string[]): MorphLine[] {
   return out;
 }
 
-/** Which rows a line has not visited yet. Empty means complete.
- *
- *  A LINE IS A CANDIDATE ONLY WHEN IT IS COMPLETE (owner ruling 2026-08-08).
- *  It is still KEPT while unfinished — a person part-way through a thought is
- *  the normal case — so this reports rather than refuses, and the editor draws
- *  an unfinished line dashed with a count of the rows still to go. */
+/** see dsp-decision-mathematics.md#which-rows-a-line-has-not-visited-yet */
 export function unvisited(box: MorphBox, line: MorphLine): string[] {
   const picked = new Set(line.picks);
   return box.rows.filter((r) => r.id !== "" && !r.cells.some((c) => picked.has(c.id))).map((r) => r.id);

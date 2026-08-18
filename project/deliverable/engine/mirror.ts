@@ -359,10 +359,7 @@ export function startMirror(o: MirrorOptions): Server {
   };
 
   const jsonPosts: Record<string, (req: Req, res: Res) => void> = {
-    // SET TARGET ANSWERS IN PLACE (owner report 2026-08-09: as a redirect
-    // POST the button swallowed its own rejection — success and refusal
-    // both 303ed and the clicking page read nothing). A refusal now comes
-    // back as its own JSON and the client toasts it.
+    // see dsp-legible-controls.md#set-target-answers-in-place
     "/target": (req, res) =>
       jsonPost(
         req,
@@ -441,10 +438,7 @@ export function startMirror(o: MirrorOptions): Server {
         }),
         (e) => (e instanceof Rejection ? e.toJSON() : { error: String(e) }),
       ),
-    // THE PERSON'S PULL (owner design 2026-08-04): the same five
-    // instructions the agent gets, on the human channel — no slider gate,
-    // no reading loop; checkboxes are the person's proof. The answer is
-    // logged, and last_pull points every surface at it.
+    // see dsp-mirror-render.md#the-persons-pull
     "/pull": (req, res) =>
       jsonPost(
         req,
@@ -587,10 +581,7 @@ export function startMirror(o: MirrorOptions): Server {
       }
       raw = raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, ""); // frontmatter is machine-facing
       let html = p.endsWith(".md") ? (marked.parse(raw) as string) : `<pre>${raw.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>`;
-      // A [[REFERENCE]] IN PROSE IS A LINK, NOT DEAD TEXT (owner report
-      // 2026-08-09). Where the id resolves in the document's own record, it
-      // becomes the same doclink every structured editor emits; where it
-      // does not resolve it stays text — an unresolved link is a finding.
+      // see dsp-legible-controls.md#a-reference-in-prose-is-a-link-not-dead
       if (p.endsWith(".md")) {
         const links = state.session.docRefPaths(p);
         const escAttr = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
@@ -698,10 +689,7 @@ export function startMirror(o: MirrorOptions): Server {
         }),
       );
     },
-    // THE HOST READS THE CARDS FROM HERE (owner design 2026-07-30). A host
-    // that draws one button per card must not keep its own copy of the
-    // list — project/deliverable/views/cards.md stays the single truth, and a card added
-    // there appears in VS Code without touching the extension.
+    // see dsp-legible-controls.md#the-host-reads-the-cards-from-here
     "/api/cards": (_url, _req, res) => {
       res.writeHead(200, { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" });
       res.end(JSON.stringify({ cards: loadCards(o.root) }));
@@ -711,10 +699,7 @@ export function startMirror(o: MirrorOptions): Server {
     "/api/survey": (_url, _req, res) => {
       json(res, survey(o.root));
     },
-    // THE MIRROR IS PUSHED, NOT POLLED (owner ruling 2026-07-28). The
-    // walk already wakes every held hand; this forwards that wake to
-    // the page. The wait's timeout doubles as the re-check for things
-    // that grow without moving the walk, like the log.
+    // see dsp-mirror-render.md#the-mirror-is-pushed
     "/events": (_url, req, res) => {
       res.writeHead(200, {
         "content-type": "text/event-stream; charset=utf-8",
@@ -858,13 +843,7 @@ export function startMirror(o: MirrorOptions): Server {
     return false;
   };
 
-  // THE PERSON'S SURFACES GET THE SAME CLOCK AS THE LANE (owner, 2026-08-09:
-  // "every time something takes long, I have to tell you"). Every request is
-  // timed at this one door, and a breach lands in the SAME log the retro
-  // already mines — tool mirror_slow, with the path and the wait. Fast
-  // requests stay out: the alive poll runs constantly, and a log of
-  // heartbeats would bury what this exists to surface. The line is the
-  // one-second rule, shared with the lane (calllog.SLOW_MS).
+  // see dsp-legible-controls.md#the-persons-surfaces-get-the-same-clock-as-the
   const server = createServer((req, res) => {
     // Every request is a new drawing epoch — see machines/compile.ts.
     bumpDrawingEpoch();
@@ -952,18 +931,7 @@ export function startMirror(o: MirrorOptions): Server {
     }
   });
 
-  // LOOPBACK ONLY, AND SAID EXPLICITLY (req-mirror-stays-on-the-machine).
-  //
-  // `listen(port)` with no host binds EVERY interface, which is not what the
-  // comment on the alive endpoint claimed and not what anybody intended. The
-  // mirror serves the whole record — the call log, every evidence form, every
-  // decision, the terminal — with no authentication anywhere, because the
-  // design assumed one machine. On a shared network it was readable by anyone
-  // on it.
-  //
-  // FOUND BY THE ISO 25010 CHECKLIST, not by a review. Security had no quality
-  // row because nobody thought this product had one; asking all nine
-  // characteristics in full is what turned it up (owner design 2026-08-07).
+  // see dsp-mirror-render.md#loopback-only
   server.listen(o.port, "127.0.0.1");
   return server;
 }

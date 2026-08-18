@@ -1,10 +1,4 @@
-// THE CARD'S SHARED PIECES — one panel builder, one button style, used by
-// every one-question-at-a-time editor. compare-card drew these first; the
-// sensitivity deck reuses them by interpolation instead of rewriting them
-// (owner ruling 2026-08-10: rework the existing editor, never a second copy).
-//
-// This is CLIENT SOURCE, interpolated into a render string. In scope where
-// it lands: escText, paths, facts. No backtick inside.
+// see dsp-mirror-render.md#the-cards-shared-pieces
 export const CARD_PARTS = `
     const cardCel = "padding:10px 12px;border:1px solid var(--se-border);border-radius:6px;font-size:13px;color:var(--se-fg);";
     const cardBtn = "padding:6px 14px;border:1px solid var(--se-border);border-radius:5px;background:transparent;color:var(--se-fg);font:inherit;font-size:12px;cursor:pointer;";

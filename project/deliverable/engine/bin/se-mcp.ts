@@ -184,32 +184,7 @@ if (!existsSync(root)) {
 const mirrorPort = Number(argValue("--mirror-port") ?? process.env.SE_MIRROR_PORT ?? 7333);
 
 if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
-  // ── THE POSTMORTEM (owner ruling 2026-08-07, after three silent deaths).
-  //
-  //    The engine died three times in one afternoon and left NOTHING to read.
-  //    The call log writes on completion, so a call that never returns is
-  //    never logged; stderr goes to whatever launched us, which in the VS Code
-  //    host is an output channel nobody can grep. The last death showed four
-  //    lines and ended "engine exited (1)" with no trace at all.
-  //
-  //    THREE HANDLERS, BECAUSE THEY TRIANGULATE. Between them they tell three
-  //    endings apart, and each wants a different fix:
-  //
-  //    - a crash record, then an exit record  → it THREW; the trace names where
-  //    - an exit record with no crash record  → somebody called exit(1)
-  //    - neither, and the log just stops      → it was KILLED from outside,
-  //      or the loop wedged and never got to exit at all
-  //
-  //    IT STILL EXITS. Node already ends the process on an unhandled
-  //    rejection; catching one and carrying on would leave a server running in
-  //    a state nobody reasoned about, which is worse than dying. These record
-  //    and then do exactly what would have happened anyway.
-  //
-  //    SYNCHRONOUS WRITES ONLY. A dying process never flushes an async one.
-  //
-  //    IT DOES NOT CATCH EVERYTHING. A hard kill and an out-of-memory run no
-  //    handler, so silence here is not proof the engine did not crash — only
-  //    proof it did not crash in a way JavaScript could see.
+  // see dsp-lane-door.md#the-postmortem
   const deathLog = join(root, ".se", "engine.log");
   const record = (what: string): void => {
     try {
@@ -269,10 +244,7 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   const { buildServer } = await import("../tools.ts");
   const { jobStopAll } = await import("../run.ts");
 
-  // CHILDREN NEVER OUTLIVE THE ENGINE (found 2026-08-02: two orphaned test
-  // workers held a folder lock for four hours after their session died).
-  // Every deliberate exit reaps the job registry — the registry is where
-  // every spawned child now lives.
+  // see dsp-lane-door.md#children-never-outlive-the-engine
   for (const sig of ["SIGTERM", "SIGINT"] as const) {
     process.on(sig, () => {
       try {
@@ -298,10 +270,7 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   // closing tool response flush to stdout and the mirror serve its red page.
   session.onClosed = () => {
     process.stderr.write("se-mcp: the machine reached end — session over, shutting down\n");
-    // THE SESSION CLEANS UP AFTER ITSELF (owner, 2026-07-30): tell the
-    // terminal host to end the agent — politely, then by force — so end
-    // leaves no strays holding the ports. No host answering is fine:
-    // own-terminal and manual runs have nothing to clean.
+    // see dsp-lane-door.md#the-session-cleans-up-after-itself
     const ptyPort = Number(process.env.SE_PTY_PORT ?? 7334);
     void fetch(`http://localhost:${ptyPort}/pty/end`, {
       method: "POST",

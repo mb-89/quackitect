@@ -322,11 +322,7 @@ function stampRecordClosed(root: string, e: Expedition, merge: boolean, override
       source: SRC,
     });
   }
-  // QUOTED, because the writer controls the field and NOT its content.
-  // An override is free prose from a person, so it carries colons, quotes
-  // and line breaks. Unquoted, "in chat, 2026-07-29: after reading" is a
-  // nested mapping and the WHOLE record stops parsing. That happened for
-  // real on e22 and took the record down with it.
+  // see dsp-record-lifecycle.md#quoted-because-the-writer-controls-the-field-and-not
   const stamped = (override ?? "").trim();
   const raw = readFileSync(recAbs, "utf8");
   writeFileSync(
@@ -339,26 +335,7 @@ function stampRecordClosed(root: string, e: Expedition, merge: boolean, override
   );
 }
 
-/** THE CLOSE HANDS OVER, IT DOES NOT REFUSE (owner ruling 2026-08-16).
- *
- *  IT REFUSED UNTIL TODAY, and the refusal was the wrong shape. Disposing an
- *  owed item means fixing the thing or RULING its register entry, and a ruling
- *  is usually the person's. So the refusal put a person-blocking step at the
- *  very end of every record — at the one moment the only thing left to do is
- *  ship, which is when the pressure to wave it through is highest.
- *
- *  AND IT TRAPPED THE WALK. A close that will not pass leaves the walk standing
- *  in the last state with no legal move, which is the failure the owner named
- *  after it happened three times in one day.
- *
- *  CARRYING IS STILL A DISPOSITION. "Carried to the next record, on the record"
- *  is an agreed outcome, which is what NASA NPR 7123.1 means by a review
- *  completing on dispositions rather than on every finding being fixed.
- *
- *  THE STOP MOVES TO THE SEED. The count rides the closed record, so the next
- *  record can read it, surface it and — above a threshold — be a pruning
- *  record rather than a new one. That half is not built here; this is the end
- *  that stops the trap. */
+/** see dsp-record-lifecycle.md#the-close-hands-over */
 function carriedStamp(standing: { item: string; ref: string; where: string }[]): string {
   if (standing.length === 0) return "";
   // ON THE RECORD, NOT IN A SIDE FILE. A carried list nobody counts is the
@@ -367,25 +344,9 @@ function carriedStamp(standing: { item: string; ref: string; where: string }[]):
   return `\ncarried_count: ${String(standing.length)}\ncarried:\n${lines}`;
 }
 
-// `mergeAndRetire` AND `mergeToTrunk` ARE GONE (i34). They merged a record's
-// branch to trunk and then ran `git rm -r` on the record's directory, under
-// the 2026-07-28 ruling that closed records live in git and the tree carries
-// only live work.
-//
-// THERE IS NOTHING TO MERGE, because a record's work is written on trunk from
-// the first keystroke, and NOTHING TO RETIRE, because the archive reads the
-// folder from disk.
-//
-// WHAT WENT WITH THEM: the conflict handling, the abort, and the typed refusal
-// that named the conflicting files. A merge that cannot happen cannot conflict.
+// see dsp-record-lifecycle.md#mergeandretire-and-mergetotrunk-are-gone
 
-/** CLOSE THE SHIPPED ITERATION — fired by the walk itself as it leaves
- *  through the terminal (owner ruling 2026-08-11: after the last bless the
- *  iteration archives itself, exactly like an expedition). The blessed
- *  release gate was the human ruling, so this close carries no second
- *  judgment and no report guard. Trunk strays settle, leftovers commit,
- *  the branch merges, the record dir retires to its branch, the worktree
- *  goes — the iteration archive lists it from then on. */
+/** see dsp-record-lifecycle.md#close-the-shipped-iteration */
 export function itCloseShipped(
   root: string,
   rec: { id: string; branch: string; path: string },

@@ -1,34 +1,4 @@
-// THE TYPED TABLE. Columns, their help and their pick sources are the FIELD's
-// arguments; the grid, the row buttons and the storage format are the
-// template's mechanics.
-//
-// IT DID NOT EXIST UNTIL 2026-08-08. stateform.ts had a `table` branch that
-// counts cells against the declared columns and refuses prose, and the
-// renderer had none — so the field fell through to the generic textarea and a
-// person typed markdown by hand.
-//
-// IT REUSES THE SURFACE RATHER THAN REBUILDING IT (ux.md, and the owner's
-// correction the same day). The first build invented its own borders, three
-// type sizes and a dead minus button with no plus. Now:
-//
-//   - the table wears `sfnodetable`, the class the node table already uses,
-//     so it inherits the host theme instead of naming colours;
-//   - each row wears `sfrow` and carries sfRowBtns(), so + and − are the SAME
-//     controls with the SAME handlers as a list.
-//
-// A PICKED COLUMN IS A CHOOSER, NOT A HINT (owner ruling 2026-08-08: "this
-// should just show me all the clusters, and I can only choose clusters"). A
-// column with a pick source draws a select. `pick_free` names the exceptions,
-// where the offer is help and typing past it is legal.
-//
-// AN EMPTY OFFER SAYS SO. `$clusters` before partition-functions has run
-// resolves to nothing, and a chooser with nothing in it looks exactly like a
-// text box — which is how these columns got reported as free text after they
-// were already wired up. The select names what it is waiting for.
-//
-// ONE THING HERE HAS NO PRECEDENT, and the claim is made out loud: the
-// per-column help line under each heading. No other editor carries guidance
-// per column, and a header of single words leaves the filler guessing.
+// see dsp-form-editors.md#the-typed-table
 import type { EditorKind } from "./kinds.ts";
 
 export const TABLE_EDITOR: EditorKind = {
@@ -99,14 +69,7 @@ export const TABLE_EDITOR: EditorKind = {
     // and the delete handler already refuses to remove the last one.
     const rows = body.length > 0 ? body : [cols.map(function () { return ""; })];
     const flat = datalists + '<table class="sfnodetable sftable" style="width:100%;border-collapse:collapse;table-layout:fixed;">' + head + "<tbody>" + rows.map(rowHtml).join("") + "</tbody></table>";
-    // THE GRID READ VIEW (owner, 2026-08-09: "the rows are the candidates,
-    // the columns are the axes, the points in the cells"). A pairwise table
-    // — two closed-pick key columns and a value — cannot be READ as a flat
-    // list: comparing two rows means finding them thirty-five lines apart.
-    // So it also renders as a MATRIX: first key down, second across, the
-    // value in the cell, the remaining columns behind a cell click. The
-    // stored shape does not change, and the flat rows stay the editor,
-    // folded underneath.
+    // see dsp-form-editors.md#the-grid-read-view
     let grid = "";
     if (cols.length >= 3 && picks[cols[0]] && picks[cols[1]] && !isFree(cols[0]) && !isFree(cols[1]) && body.length > 0) {
       const rk = []; const ck = []; const cellAt = {};

@@ -1,15 +1,4 @@
-// THE EDITOR REGISTRY. One file per editor, assembled into the client script
-// here, so adding one is adding a file rather than finding a wiring.
-//
-// WHAT THIS REPLACED. Every editor lived inside render.ts's client-script
-// template literal, and its SERIALISER lived in sfCollect four hundred lines
-// away. Adding an editor meant finding a wiring that nothing pointed at — and
-// `table` was simply never added, so the checker judged the field and the
-// mirror abandoned it to a textarea (owner ruling 2026-08-08).
-//
-// THE ORDER IS THE DISPATCH ORDER. An editor whose render source returns only
-// inside a guard falls through to the next branch, and finally to the plain
-// textarea at the end of sfEditor. per-item relies on that.
+// see dsp-form-editors.md#the-editor-registry
 
 import { CHECKLIST_EDITOR } from "./checklist.ts";
 import { CHOICE_RATIONALE_EDITOR } from "./choice-rationale.ts";

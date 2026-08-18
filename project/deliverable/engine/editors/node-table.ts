@@ -34,18 +34,7 @@ export const NODE_TABLE_EDITOR: EditorKind = {
     // because the form is redrawn whole on every look.
     const grip = '<span class="sfntgrip" style="position:absolute;right:0;top:0;bottom:0;width:6px;cursor:col-resize;"></span>';
     const head = "<thead><tr>" + [args.of || "node"].concat(cols).map(function (c) { return '<th style="' + hed + '" data-field="' + name + '" data-col="' + escText(c) + '">' + escText(c) + grip + "</th>"; }).join("") + "</tr></thead>";
-    // A CONSTRAINED COLUMN OFFERS ITS SOURCE, and HOW it offers it is the
-    // field's own declaration (owner ruling 2026-08-08).
-    //
-    // CLOSED IS THE DEFAULT, because a known set means the cell holds a member
-    // of it. pick_free names the exceptions, and the comparison cards are why
-    // the exception exists: their cells hold an id PLUS something else — an
-    // operator, or the reason two rows measure one thing — and a closed
-    // chooser would forbid both.
-    //
-    // NO BACKTICK MAY APPEAR BELOW, not even inside a comment. This whole body
-    // is one template literal, and a backtick ENDS it — everything after would
-    // become real TypeScript. It happened here on 2026-08-08.
+    // see dsp-form-editors.md#a-constrained-column-offers-its-source
     const picks = args.picks || {};
     const free = args.pick_free || [];
     const sources = args.pick_sources || {};
@@ -62,13 +51,7 @@ export const NODE_TABLE_EDITOR: EditorKind = {
     // next render, and nothing would report the loss.
     const chooser = function (c, id, v, dim) {
       const offer = picks[c] || [];
-      // A DROPDOWN WEARS THE THEME, INCLUDING ITS LIST (owner, 2026-08-09). A
-      // transparent select looks right closed and opens an OS-default list:
-      // white on a dark panel, which is the one thing ux.md forbids.
-      //
-      // THE OPTIONS ARE PAINTED BY THE STYLESHEET, not here. Forty inline
-      // styles would say the same thing forty times, and the markup is what
-      // the script tests read.
+      // see dsp-form-editors.md#a-dropdown-wears-the-theme
       const hint = offer.length === 0 ? '<option value="" disabled>— no ' + escText(waitingFor(c)) + " yet —</option>" : '<option value=""></option>';
       const opts = offer.map(function (o) { return '<option value="' + escText(o) + '"' + (o === v ? " selected" : "") + ">" + escText(o) + "</option>"; }).join("");
       const stray = v !== "" && offer.indexOf(v) < 0 ? '<option value="' + escText(v) + '" selected>' + escText(v) + " — no longer offered</option>" : "";
@@ -122,17 +105,7 @@ export const NODE_TABLE_EDITOR: EditorKind = {
     ids.forEach(function (id, i) { rowAt[id] = i; });
     const per = args.page_size || 0;
     if (per <= 0 || ids.length <= per) return datalists + table(ids);
-    // ONE PAGE AT A TIME, with previous and next (owner ruling 2026-08-08).
-    //
-    // WHAT THIS REPLACED. Stacked details groups, ten rows each, every group
-    // on the page at once. That is the whole list with folds in it, not
-    // pagination, and over ninety criteria it was unreadable. The owner named
-    // the shape they meant: click left and right through pages, and choose how
-    // big a page is.
-    //
-    // EVERY ROW STAYS IN THE DOM, on the page or not, so whatever collects
-    // them on save is untouched. A pager that removed rows would silently drop
-    // the answers on every page but the one showing.
+    // see dsp-form-editors.md#one-page-at-a-time
     const sizes = [10, 25, 50, 0];
     const opts = sizes.map(function (s) {
       return '<option value="' + s + '"' + (s === per ? " selected" : "") + ">" + (s === 0 ? "all" : s + " a page") + "</option>";

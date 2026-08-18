@@ -1,37 +1,4 @@
-// THE RANKED LIST WITH A CUTOFF. One row is the last that still counts;
-// anything can be struck with a reason; anything can be moved, and a move owes
-// a rationale.
-//
-// IT REPLACED FOUR COLUMNS (owner ruling 2026-08-08). cut-criteria asked
-// cut_proposed, cut_verdict, cut_reason and criterion_band of every row — over
-// ninety rows that is the same question asked ninety times, and the answers
-// were free to disagree with each other.
-//
-// THE ORDER IS COMPUTED, NOT STORED (owner ruling 2026-08-09). It arrives in
-// args.items already sorted worst-breakage first, and that sort is the answer
-// rather than a starting point.
-//
-// A STORED POSITION USED TO WIN, AND THAT WAS THE DEFECT. Once a numbered list
-// was saved, its numbers beat the computed order forever, so a corrected sort
-// could never reach the page. Measured in iteration one: a corrosive row sat
-// first of seventy-two, above every fatal one, because an earlier pass had
-// written it there.
-//
-// THREE MARKS, AND THEY MEAN DIFFERENT THINGS:
-//
-//   - THE CUTOFF. Exactly one row carries it: the last row that is still a
-//     criterion. Everything below is out, by position alone, and needs no
-//     reason of its own — the reason is the cutoff.
-//   - A CUT. One row struck on its own merits, with a reason. It STAYS on
-//     display, struck through, because an option that vanishes gets
-//     re-proposed by somebody who never knew it was considered.
-//   - A MOVE. Up or down, one place at a time. A moved row is marked and owes
-//     a rationale, because moving a row past another jumps an ordering that
-//     was made blind, and that is the one edit that can be aimed at a
-//     favourite.
-//
-// NO BACKTICK IN EITHER BODY, not even in a comment. Each is one template
-// literal and a backtick ends it.
+// see dsp-form-editors.md#the-ranked-list-with-a-cutoff
 import type { EditorKind } from "./kinds.ts";
 
 export const RANK_CUT_EDITOR: EditorKind = {
@@ -97,10 +64,7 @@ export const RANK_CUT_EDITOR: EditorKind = {
       '<th style="' + hed + '">cut, with the reason</th>' +
       '<th style="' + hed + '">why it moved</th>' +
       "</tr></thead>";
-    // WHAT IT LOOKED LIKE AT THE LAST SAVE, carried on the table so revert has
-    // somewhere to go back to (owner report 2026-08-08: a move could not be
-    // undone). It is the SAVED state, not the previous DOM — revert means back
-    // to the last save, not back one step.
+    // see dsp-form-editors.md#what-it-looked-like-at-the-last-save
     const pristine = rows.map(function (id, i) {
       const s = stored[id] || { cutoff: false, cut: "", moved: "" };
       return [String(i + 1), id, s.cutoff ? "1" : "", s.cut, s.moved].join("");

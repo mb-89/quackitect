@@ -1,21 +1,4 @@
-// CATALOGUES — a known set of answers, read from where it is WRITTEN.
-//
-// Owner ruling 2026-08-08: "if you have catalogs, just make them selectables.
-// And then if I change the catalog in the markdown, I want the selectables to
-// reflect that, so don't hard code it. That goes for everything."
-//
-// So nothing here names a heuristic, an operator or a parameter. The method
-// card declares that it HOLDS a catalogue, and this reads it back:
-//
-//   catalog: transform_operators
-//   catalog_sections: SCAMPER, SIT
-//
-// A new catalogue is a new card with two frontmatter lines. It is never an
-// edit to this file, and that is the whole point of the indirection.
-//
-// WHY THE CARD AND NOT A DATA FILE: the catalogue and the method that runs it
-// must never drift. A person editing the SCAMPER card is editing the offer the
-// form makes, in the same breath, without knowing this file exists.
+// see dsp-method-compilation.md#catalogues
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
