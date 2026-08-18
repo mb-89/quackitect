@@ -7,6 +7,7 @@ statement: Ten verification checks and two boundary timings cannot be answered b
 owner: the owner
 trigger: when the work-token system can carry a task to a person; or at the first verification after 2026-10-01, whichever comes first
 status: open
+looked: 2026-08-18
 impact: A check nobody can run is marked owed every iteration and eventually stops being read, which is how four factual errors sat in the README while its own inspection was marked owed.
 breaks_how_badly: annoying
 how_likely: expected
@@ -112,3 +113,18 @@ A TRIGGER THAT FIRES EVERY TIME SINGLES OUT NOTHING. The nearest precedent is
 raid-debt-human-observed-demonstrations: swept 2026-08-15, re-accepted, and
 heavier afterwards - four specs became eight. This one names the work-token
 system OR a date, so it cannot quietly become furniture.
+
+## Swept 2026-08-18, and this row had never carried a look date
+
+RE-ACCEPTED, UNCHANGED. Nothing about it moved, and the trigger it names — the
+work-token system, or the first verification after 2026-10-01 — has not fired.
+
+WHAT DID MOVE IS THE SECOND-MACHINE GROUP'S OWN INSTRUCTION. This row says that
+group repays by CHECKING FIRST whether the cloud runs already satisfy it, and
+that the check is cheap and comes before any new machine is stood up. Two cloud
+runs have happened since it was written and nobody has run that check. It is
+still cheap, and it is still not done.
+
+THE MISSING DATE IS ITSELF THE FINDING. Every other debt in the register
+carries `looked`, this one did not, and the retro's debt sweep is what is meant
+to put it there. A row with no look date cannot be told from a row nobody read.

@@ -102,7 +102,7 @@ import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { probesMissed, readingProbes } from "./readproof.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { anyJobRunning } from "./run.ts";
-import { defaultAutonomy, levelName, loadLevels, loadStopAt, notchName, tierOf, weightName } from "./scale.ts";
+import { defaultAutonomy, levelName, loadLevels, loadStopAt, notchName, tierOf, valueFor, weightName } from "./scale.ts";
 import { requiredDependsOn } from "./seed.ts";
 import {
   buildPortableForm,
@@ -859,7 +859,31 @@ export class Session {
     return { emergency: on, was };
   }
 
-  setAutonomy(value: number): Record<string, unknown> {
+  setAutonomy(input: number | string): Record<string, unknown> {
+    // THE RUNG ARRIVES AS A WORD FROM EVERY LAUNCH PATH (owner ruling
+    // 2026-08-18). se-arrive hands the lane `--autonomy tactical`, and until
+    // this resolved it the boot died on `Number("tactical")` before the first
+    // call — measured on the i17 cloud arrival, where the lane never answered.
+    // The numeric form stays because the mirror's control and the tests still
+    // send one, and because the scale is still compared as numbers.
+    let value: number;
+    if (typeof input === "string" && !/^-?[0-9]*\.?[0-9]+$/.test(input.trim())) {
+      const resolved = valueFor(loadLevels(this.machineRoot()), input);
+      if (resolved === undefined) {
+        throw new Rejection({
+          clause: CLAUSES.REQUIRED_ARGS,
+          expected: `one of the rungs in machines/scale.md: ${loadLevels(this.machineRoot())
+            .map((l) => l.name.split(" — ")[0])
+            .join(", ")}`,
+          got: String(input),
+          remedy: { tool: "se_pull", args: {}, note: "the autonomy is set from the mirror's rungs or at launch (--autonomy <rung>)" },
+          source: "engine/session.ts autonomy",
+        });
+      }
+      value = resolved;
+    } else {
+      value = Number(input);
+    }
     if (typeof value !== "number" || Number.isNaN(value) || value < 0 || value > 1) {
       throw new Rejection({
         clause: CLAUSES.REQUIRED_ARGS,

@@ -14,7 +14,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { parseStateNote } from "../engine/notes.ts";
 import { renderMirror } from "../engine/render.ts";
-import { loadLevels, loadStopAt, notchName, tierOf, valueFor, weightName } from "../engine/scale.ts";
+import { DEFAULT_TIER, loadLevels, loadStopAt, notchName, tierOf, valueFor, weightName } from "../engine/scale.ts";
 import { Session } from "../engine/session.ts";
 import { freshRoot } from "./helpers.ts";
 
@@ -170,4 +170,62 @@ test("no state is authored at priority zero, or the block would not block", () =
     const p = typeof raw === "number" || !Number.isNaN(Number(raw)) ? Number(raw) : (valueFor(levels, String(raw)) ?? Number.NaN);
     assert.ok(p > 0, `${f} is authored at priority ${String(raw)} (resolves ${p}); autonomy 0 would still admit it`);
   }
+});
+
+// THE RUNG TRAVELS AS A WORD, AND THE DIAL HAS TO SPEAK IT — i17, 2026-08-18.
+//
+// The 2026-08-18 ruling took the numbers off the rungs, and se-arrive was moved
+// with it: it launches the lane with `--autonomy tactical`. se-mcp was NOT, and
+// still did `Number(autonomyRaw)`. NaN, SE-C-046, and the lane exited before it
+// answered its first call — on a cloud box where nothing was watching, so the
+// only evidence was one line in engine.log.
+//
+// THE NUMERIC FORM STAYS. The mirror's control posts a value, and the scale is
+// still COMPARED as numbers; what changed is that a word is now a legal way in.
+test("the dial takes a rung by its name, which is how every launch spells it", () => {
+  const root = freshRoot();
+  const s = new Session(root);
+  const levels = loadLevels(root);
+  for (const word of ["tactical", "Tactical", " strategic ", "mechanical"]) {
+    const bare = word.trim().toLowerCase();
+    s.setAutonomy(word);
+    assert.equal(s.autonomy, valueFor(levels, bare), `the dial did not land on ${bare}`);
+  }
+});
+
+test("the dial still takes a bare value, from the control and from the tests", () => {
+  const root = freshRoot();
+  const s = new Session(root);
+  s.setAutonomy(0.4);
+  assert.equal(s.autonomy, 0.4, "a number no longer sets the dial");
+  s.setAutonomy("0.6");
+  assert.equal(s.autonomy, 0.6, "a numeric string no longer sets the dial");
+});
+
+test("a word that is not a rung refuses by name, and lists the rungs", () => {
+  const root = freshRoot();
+  const s = new Session(root);
+  const before = s.autonomy;
+  assert.throws(
+    () => s.setAutonomy("audacious"),
+    (e: Error) => /audacious/.test(String(e.message)) && /tactical/.test(String(e.message)),
+    "the refusal does not name what was sent and what was available",
+  );
+  assert.equal(s.autonomy, before, "a refused word moved the dial anyway");
+});
+
+// THE SEAM THAT ACTUALLY BROKE. Two files decide what the dial is set to at
+// launch and neither reads the other: se-arrive.ts picks the word, se-mcp.ts
+// hands it to the dial. Nothing bound them, so the ruling moved one and left
+// the other, and the lane died on arrival. This binds them without raising a
+// lane: whatever se-arrive would send, the dial must accept.
+test("whatever the arrival would launch with, the dial accepts", () => {
+  const arrive = readFileSync(fileURLToPath(new URL("../engine/bin/se-arrive.ts", import.meta.url)), "utf8");
+  const m = arrive.match(/SE_AUTONOMY\s*\?\?\s*"([^"]+)"/);
+  assert.ok(m !== null, "se-arrive no longer names a default rung this test can read");
+  const root = freshRoot();
+  const s = new Session(root);
+  s.setAutonomy(m[1]);
+  assert.equal(s.autonomy, valueFor(loadLevels(root), m[1]), `the arrival's default rung ${m[1]} does not resolve`);
+  assert.equal(m[1], DEFAULT_TIER, "the arrival's default and the engine's default have drifted apart");
 });

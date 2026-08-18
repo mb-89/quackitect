@@ -74,9 +74,24 @@ export function readingProbes(body: string): { ask: string[]; expect: string[] }
 
 /** THE COMPARISON RULE, beside the probe rule because they are one decision.
  *  Whitespace and case are flattened, so an answer whose words crossed a line
- *  break in the source still matches. */
+ *  break in the source still matches.
+ *
+ *  AND THE ANSWER IS COUNTED THE WAY THE PROBE WAS CUT. WORDY drops the tokens
+ *  a reader would not count when the probe is built; until 2026-08-18 nothing
+ *  dropped them again when the answer came back, so a reader who did what the
+ *  hint says — quote it VERBATIM, punctuation and all — failed on any window
+ *  holding a standalone em dash.
+ *
+ *  MEASURED AT THE i17 BOOT. front-desk.md reads "and NO vocabulary on purpose
+ *  —\nthose must come from the sweep". The probe asked for the 4 words that
+ *  FOLLOW "and NO vocabulary on". The verbatim answer carried the dash and was
+ *  refused; only the answer with the dash REMOVED was accepted. Two calls, on a
+ *  document that had been read.
+ *
+ *  ONE FILTER ON BOTH SIDES IS THE FIX, and it is strictly more permissive:
+ *  every answer that passed before still passes. */
 export function normWords(s: string): string {
-  return s.trim().replace(/\s+/g, " ").toLowerCase();
+  return readingWords(s).join(" ").toLowerCase();
 }
 
 /** Which probes an answer did NOT satisfy. Empty means the reading is proven. */

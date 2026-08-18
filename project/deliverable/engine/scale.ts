@@ -134,14 +134,29 @@ export function loadStopAt(root: string): AutonomyLevel[] {
  *
  *  TACTICAL IS THE DEFAULT EVERYWHERE (owner ruling 2026-08-18). Measured:
  *  the heaviest state inside an iteration is a gate, and a gate weighs
- *  tactical. Everything else is lighter. So tactical runs a whole iteration
- *  end to end and nothing beyond one — retros, overhauls and seeding stay
- *  strategic, and stay with the person.
+ *  tactical. Everything else is lighter, so tactical ENTERS every state an
+ *  iteration has — retros, overhauls and seeding stay strategic, and stay
+ *  with the person.
  *
- *  IT WAS OPERATIONAL, AND THAT COULD NOT WALK ANY ITERATION. gate-kickoff is
+ *  IT WAS OPERATIONAL, AND THAT COULD NOT ENTER A GATE AT ALL. gate-kickoff is
  *  the first gate of every iteration and it is tactical, so an unattended run
  *  stopped at the first milestone every time. Measured on the i15 and i35
- *  cloud runs. */
+ *  cloud runs.
+ *
+ *  IT DOES NOT WALK AN ITERATION END TO END, AND THIS COMMENT SAID IT DID
+ *  (found at i17's gate-kickoff, 2026-08-18, on an unattended box). ENTERING a
+ *  state refuses on `priority > autonomy`, so a hand AT the weight is admitted.
+ *  BLESSING refuses on `autonomy <= priority`, so it wants a hand strictly
+ *  ABOVE — that is the 2026-08-04 design, where a gate is reviewed from one
+ *  rung above the work it reviews, and it is deliberate.
+ *
+ *  SO THE TWO COMPARISONS ARE BOTH RIGHT AND THE CLAIM BETWEEN THEM WAS WRONG.
+ *  tactical fills a gate and cannot sign it. An unattended run that must sign
+ *  its own gates is launched at strategic, which is the person's call to make
+ *  (se-arrive says so in its own help), and this default is not it.
+ *
+ *  raid-iss-tactical-is-documented-as-enough-to-walk-an-iteration-and-is-not
+ *  carries the measurement. */
 export const DEFAULT_TIER = "tactical";
 
 /** The default dial position, resolved against the live scale. Falls back to

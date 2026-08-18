@@ -306,7 +306,7 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
 
   const session = new Session(root); // fails fast on a misdrawn machine
   session.noteRunningMode(runMode); // the packet must report what RAN, not what is stored
-  if (autonomyRaw !== undefined) session.setAutonomy(Number(autonomyRaw)); // refuses out-of-range
+  if (autonomyRaw !== undefined) session.setAutonomy(autonomyRaw); // a rung by name or a bare value; refuses either out of range
   // SESSION OVER — reaching end stops everything. The grace period lets the
   // closing tool response flush to stdout and the mirror serve its red page.
   session.onClosed = () => {

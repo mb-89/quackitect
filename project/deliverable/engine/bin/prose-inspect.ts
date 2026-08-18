@@ -101,6 +101,39 @@ function entryDocsAreePlain(): void {
   }
 }
 
+/** DOES THIS LINE CARRY THE NEEDLE AS ITS OWN WORD?
+ *
+ *  A PLAIN SUBSTRING TEST READS A LEAK INTO EVERY LONGER WORD. Measured on the
+ *  i17 cloud run: the box's home directory is `/root`, so the path
+ *  `tests/roots.test.ts` came back as a leaked home directory. The needle ends
+ *  in a word character and the text carries on with another one — that is a
+ *  longer word, never the needle.
+ *
+ *  THE BOUNDARY IS ONLY ENFORCED WHERE THE NEEDLE'S OWN EDGE IS A WORD
+ *  CHARACTER, so a needle that starts with a slash still matches mid-path. */
+function carriesWord(line: string, needle: string): boolean {
+  const hay = line.toLowerCase();
+  const nee = needle.toLowerCase();
+  const wordChar = /[a-z0-9_]/;
+  const headBound = wordChar.test(nee[0]);
+  const tailBound = wordChar.test(nee[nee.length - 1]);
+  let at = hay.indexOf(nee);
+  while (at !== -1) {
+    const before = at > 0 ? hay[at - 1] : "";
+    const after = hay[at + nee.length] ?? "";
+    const headOk = !headBound || before === "" || !wordChar.test(before);
+    const tailOk = !tailBound || after === "" || !wordChar.test(after);
+    if (headOk && tailOk) return true;
+    at = hay.indexOf(nee, at + 1);
+  }
+  return false;
+}
+
+/** ABOVE THIS MANY FILES, A BARE WORD IS THE CORPUS'S OWN VOCABULARY. Three
+ *  is deliberate: a leak lands in the record that leaked it and the odd one
+ *  that quotes it, while a word the project actually speaks is everywhere. */
+const VOCABULARY_FLOOR = 3;
+
 /** ITEM 3 — stored records name roles, never people or machines.
  *
  *  THE NEEDLES ARE READ AT RUNTIME AND NEVER WRITTEN DOWN. The check knows
@@ -120,12 +153,50 @@ function recordsNameRolesOnly(): void {
   for (const part of repoName.toLowerCase().split(/[^a-z0-9]+/)) if (part.length >= 3) productNames.add(part);
   const needles: { what: string; value: string }[] = [];
   const skipped: string[] = [];
+  const specRoot = join(root, "project", "spec");
+
+  /** HOW MANY RECORDS ALREADY USE THIS WORD AS ORDINARY VOCABULARY.
+   *
+   *  Counted over files rather than lines: one record quoting a leaked path
+   *  ten times is one file, and a word the corpus genuinely speaks is spread
+   *  across many. */
+  const filesCarrying = (value: string): number => {
+    if (!existsSync(specRoot)) return 0;
+    let n = 0;
+    for (const abs of walk(specRoot)) {
+      if (carriesWord(readFileSync(abs, "utf8"), value)) n++;
+      if (n > VOCABULARY_FLOOR) return n;
+    }
+    return n;
+  };
+
   const add = (what: string, value: string | undefined): void => {
     const v = (value ?? "").trim();
     if (v.length < 3) return;
     if (productNames.has(v.toLowerCase())) {
       skipped.push(`${what} collides with the product's own name, so a text search cannot tell them apart`);
       return;
+    }
+    // A BARE WORD THE CORPUS ALREADY SPEAKS IS THE SAME COLLISION, one step
+    // out (measured on the i17 cloud run, 2026-08-18). The product-name guard
+    // above caught the case where the needle is what the product is called;
+    // this catches the case where it is what the AGENT is called. A cloud host
+    // sets `git config user.name` to the agent's own name, and the records
+    // discuss that agent by name on nearly every page — 64 findings, every one
+    // of them false, and boot could not finish because the check never went
+    // green.
+    //
+    // ONLY A BARE WORD IS EVER MUTED. A home directory, an email address and a
+    // machine path all carry a separator, so the shapes that actually leak an
+    // identity stay searchable no matter how often they appear.
+    if (!/[\s/\\@.:-]/.test(v)) {
+      const n = filesCarrying(v);
+      if (n > VOCABULARY_FLOOR) {
+        skipped.push(
+          `${what} is a bare word the records already use in ${String(n)}+ files, so a text search cannot tell a leak from the vocabulary`,
+        );
+        return;
+      }
     }
     needles.push({ what, value: v });
   };
@@ -151,7 +222,7 @@ function recordsNameRolesOnly(): void {
     const lines = readFileSync(abs, "utf8").split("\n");
     lines.forEach((line, i) => {
       for (const n of needles) {
-        if (!line.toLowerCase().includes(n.value.toLowerCase())) continue;
+        if (!carriesWord(line, n.value)) continue;
         findings.push(`item 3 · ${relative(root, abs)}:${String(i + 1)} — carries ${n.what}; stored records name ROLES`);
       }
     });
