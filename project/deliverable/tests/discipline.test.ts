@@ -14,7 +14,7 @@ import { Rejection } from "../engine/errors.ts";
 import { filePatch, fileRead } from "../engine/files.ts";
 import { contentHash } from "../engine/hash.ts";
 import { search } from "../engine/search.ts";
-import { anyGuidanceDoc, bootedServer, call, freshRoot } from "./helpers.ts";
+import { anyGuidanceDoc, bootedServer, call, freshRoot, laneSource } from "./helpers.ts";
 
 function fresh(): string {
   return mkdtempSync(join(tmpdir(), "se-v3-disc-"));
@@ -25,7 +25,7 @@ function fresh(): string {
 // and the boot flag, nowhere else. This guard refuses the verb before it
 // can exist.
 test("no lane verb reaches the autonomy dial", () => {
-  const tools = readFileSync(new URL("../engine/tools.ts", import.meta.url), "utf8");
+  const tools = laneSource();
   assert.ok(!tools.includes("setAutonomy"), "a lane verb touches the dial — the slider is the person's alone (owner ruling 2026-08-10)");
 });
 
@@ -689,7 +689,7 @@ test("capMiddle backs off to whitespace — no token is ever split", () => {
 });
 
 test("the full battery formats before preflight and stops on format failure", () => {
-  const src = readFileSync(new URL("../engine/tools.ts", import.meta.url), "utf8");
+  const src = laneSource();
   const battery = src.slice(src.indexOf("const runBattery"), src.indexOf("const work ="));
   const formatAt = battery.indexOf('spawnNode([BIOME_BIN, "check", "--write", "--error-on-warnings", "."]');
   const preflightAt = battery.indexOf('"project/deliverable/engine/bin/preflight.ts"');

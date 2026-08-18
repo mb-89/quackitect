@@ -7,6 +7,9 @@ realizes:
   - "el-walk-engine"
 files:
   - "project/deliverable/engine/tools.ts"
+  - "project/deliverable/engine/tools-file.ts"
+  - "project/deliverable/engine/tools-run.ts"
+  - "project/deliverable/engine/tools-desk.ts"
   - "project/deliverable/engine/mcp.ts"
   - "project/deliverable/engine/errors.ts"
   - "project/deliverable/engine/discipline.ts"
@@ -488,3 +491,22 @@ EVERY EXTERNAL CALL IS A NEW DRAWING EPOCH — "the next call" is the
 read-it-live law's unit, and pull alone was not enough: a gate check
 on any other tool trusted a stamp from the previous call and went
 stale for up to a second (caught by the battery, 2026-08-02).
+
+## The verbs are grouped by what they touch
+
+THE REGISTRY IS ONE LIST and it always was; what changed is where the entries
+are written. Three groups fall out of the lane on their own:
+
+- THE FILE VERBS go through the model file system, so the write rules hold
+  whoever asked. Read, write, patch, replace, move, delete, list, glob and
+  search, plus the reading service that credits a document as it serves it.
+- THE SHELL VERBS start something outside this process — a screenshot, a
+  shell run, the battery, git. Each is a child with a job id, and the job
+  store is what lets a verdict outlive the call that asked for it.
+- THE DESK VERBS carry words: the web, the notes, the prose lint, the answer,
+  the survey and the call log.
+
+WHAT THE GROUPING DOES NOT CHANGE. The lane still assembles one array and
+dispatches from one table, so a verb's clause, remedy and log line are the
+same whichever file its entry is written in. The split is about where a
+reader looks, never about how a call is served.
