@@ -29,8 +29,8 @@ TWO WAYS IT WENT WRONG ON ONE MACHINE, 2026-08-18:
 
 - The host sets `git config user.name` to the AGENT's own name, and the records
   name that agent on nearly every page. 64 findings, every one false.
-- `HOME` is `/root` in a container, and the match was a plain substring, so
-  `tests/roots.test.ts` read as a leaked home directory.
+- `HOME` is the container's own root-owned directory, and the match was a
+  plain substring, so a test fixture path read as a leaked home directory.
 
 BOTH ARE FIXED. The rule they break is not.
 

@@ -830,7 +830,7 @@ export const TRACE_SCRIPT = `
 
   if(typeof cytoscape!=='undefined'){ boot(); }
   else {
-    var s=document.createElement('script'); s.src='https://unpkg.com/cytoscape/dist/cytoscape.min.js';
+    var s=document.createElement('script'); s.src='/vendor/cytoscape.min.js';
     s.onload=boot; document.head.appendChild(s);
   }
 })();

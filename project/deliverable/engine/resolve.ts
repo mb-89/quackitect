@@ -74,12 +74,3 @@ export function resolve(roots: Roots | string, p: string, source: string, forRea
   const abs = forRead ? resolveForRead(store, p, source) : resolveInRoot(store, p, source);
   return { abs, owner, store };
 }
-
-/** Did a write land where the caller meant? Answered by READING BACK from
- *  the store the answer named, never by the write's own verdict.
- *
- *  req-a-resolution-is-proven-by-read-back wants this shape, and
- *  tsp-read-back-inspection checks that the tests use it. */
-export function landedIn(resolved: Resolved, root: string): boolean {
-  return resolved.store === root;
-}

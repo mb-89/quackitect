@@ -22,20 +22,6 @@ export function git(cwd: string, ...args: string[]): GitResult {
   return { ok: r.status === 0, code: r.status ?? -1, stdout: (r.stdout ?? "").trim(), stderr: (r.stderr ?? "").trim() };
 }
 
-/** git with an environment overlay and optional stdin — the plumbing
- *  callers (a temp index, a piped blob) need both. */
-export function gitIO(cwd: string, args: string[], opts: { env?: Record<string, string>; input?: string } = {}): GitResult {
-  const r = spawnSync("git", args, {
-    cwd,
-    encoding: "utf8",
-    windowsHide: true,
-    env: opts.env === undefined ? process.env : { ...process.env, ...opts.env },
-    input: opts.input,
-  });
-  if (r.error) return { ok: false, code: -1, stdout: "", stderr: String(r.error) };
-  return { ok: r.status === 0, code: r.status ?? -1, stdout: (r.stdout ?? "").trim(), stderr: (r.stderr ?? "").trim() };
-}
-
 // MERGE IS ALLOWED, REBASE IS NOT (owner ruling 2026-07-29). The asymmetry
 // is history: a rebase rewrites it, a merge only adds a commit that can be
 // reverted. The rebase refusal below already named merge as its remedy while

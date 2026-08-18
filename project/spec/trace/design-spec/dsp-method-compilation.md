@@ -12,7 +12,6 @@ files:
   - "project/deliverable/engine/machines/compile.ts"
   - "project/deliverable/engine/expmachine.ts"
   - "project/deliverable/engine/machines/supply.ts"
-  - "project/deliverable/engine/bin/supply-gaps.ts"
 ---
 
 ## Responsibility

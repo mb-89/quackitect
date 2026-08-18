@@ -1596,7 +1596,7 @@ export function fieldProblems(
   // cell is a standing node nobody answered for — which is exactly the state
   // this field exists to refuse. "No check exists yet" is a legal answer and
   // has to be typed; blank is not an answer.
-  if (meta.editor === "node-table") return nodeTableProblems(name, args, content);
+  if (meta.editor === "node-table") return [...out, ...nodeTableProblems(name, args, content)];
   // A MOVE OWES A RATIONALE (owner ruling 2026-08-08). The order was settled
   // BLIND, before any candidate existed, and that is what keeps it honest.
   // Moving a row past another jumps that ordering, so it is the one edit that
@@ -1668,6 +1668,13 @@ export function fieldProblems(
   // It reached gate-candidates with zero candidates drawn and the only
   // complaint was "no references", which reads like a formatting slip rather
   // than the missing work it was.
+  // MORPH-BOX RETURNS WITHOUT `out`, and that is a standing defect rather
+  // than a decision — the template declares `resolves: artifact`, so its
+  // reference problems are computed and discarded exactly as node-table's
+  // were. Adding them turns a drawn chart grey wherever a row names an
+  // option the corpus does not carry, which is the right answer and a
+  // behaviour change. It wants its own ruling; node-table above is the half
+  // that is unambiguous.
   if (meta.editor === "morph-box") return chartProblems(name, content, corpus);
   const saysNone = /^-?\s*none\b/i.test(content.trim());
   if (saysNone) return out;

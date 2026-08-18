@@ -221,6 +221,20 @@ test("a finished sub-machine does NOT paint its container while the container's 
   const view = session.viewFor("enumerate-space");
   assert.ok(view !== undefined);
 
+  // THE CHART'S REFS HAVE TO RESOLVE. A morph-box field declares
+  // `resolves: artifact`, so the two options the fixture draws must be real
+  // nodes. They were invented ids for a long time and passed only because the
+  // reference problems were computed and thrown away.
+  for (const opt of ["opt-a", "opt-b"]) {
+    const f = join(root, "project", "spec", "trace", "option", `${opt}.md`);
+    mkdirSync(dirname(f), { recursive: true });
+    writeFileSync(
+      f,
+      `---\nid: ${opt}\ntype: "[[option]]"\nstatement: one option drawn for the container-paint test\ncluster: the-test\n---\n`,
+      "utf8",
+    );
+  }
+
   // Leave every claimful state signed on disk, the way a finished walk does.
   for (const s of view.decl.states.filter((x) => x.evidence_form.length > 0)) {
     // ONE TREE SINCE i34: a record's evidence stands under the root.

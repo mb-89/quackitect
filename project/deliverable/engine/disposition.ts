@@ -79,10 +79,3 @@ export interface DispositionRow {
   candidate: string;
   status: DispositionStatus;
 }
-
-// raid-dec-i15-disposition-prepopulates-pending-rows: no threshold, no
-// auto-classified band. Every candidate handed in gets exactly one row,
-// stamped pending — tsp-coupling-disposition's checklist inspects this.
-export function recordCouplingDisposition(_root: string, candidates: RankedCandidate[]): DispositionRow[] {
-  return candidates.map((c) => ({ candidate: c.id, status: "pending" }));
-}

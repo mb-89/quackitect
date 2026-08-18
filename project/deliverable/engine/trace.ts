@@ -67,12 +67,6 @@ export function traceRings(sub: Subsegments = TRACE_SUBSEGMENTS): string[][] {
   return [...TRACE_SPINE.map((t) => [t]), ...past];
 }
 
-/** Which subsegment a type belongs to. A spine type belongs to none, and that
- *  is what "it owns the whole wedge" means. */
-export function subsegmentOf(type: string, sub: Subsegments = TRACE_SUBSEGMENTS): string | undefined {
-  return sub.of.find((s) => s.levels.includes(type))?.id;
-}
-
 /** Every level in ring order, flattened. The type filter and the pills read
  *  this; the layout works from the rings. */
 export const TRACE_LEVELS = traceRings().flat();
@@ -1009,11 +1003,6 @@ export function duplicateIds(nodes: TraceNode[]): { id: string; count: number }[
     .filter(([, count]) => count > 1)
     .map(([id, count]) => ({ id, count }))
     .sort((a, b) => a.id.localeCompare(b.id));
-}
-
-/** Which trace ids exist, so a reference can be checked before it is stored. */
-export function traceIds(root: string): Set<string> {
-  return new Set(loadTrace(root).map((n) => n.id));
 }
 
 /** ONE WRITTEN REFERENCE, REDUCED TO THE ID IT MEANS.

@@ -18,7 +18,7 @@
 // properly formatted result. Idiosyncratic spacing does not survive, and that
 // is the accepted cost of never producing a file that does not parse.
 import { readFileSync, writeFileSync } from "node:fs";
-import { isAbsolute, join, resolve } from "node:path";
+import { isAbsolute, resolve } from "node:path";
 import { parse, stringify } from "yaml";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { type Node, parseExpr } from "./expr.ts";
@@ -515,10 +515,6 @@ export function createBase(root: string, rel: string, view = "Table"): string {
   }
   writeFileSync(abs, stringify({ views: [{ type: "table", name: view, order: ["file.name"] }] }, { indent: 2, lineWidth: 0 }));
   return readFileSync(abs, "utf8");
-}
-
-export function basePath(root: string, rel: string): string {
-  return join(vaultDir(root), rel);
 }
 
 /** The query, as text. What the controls write and what a person may rewrite. */

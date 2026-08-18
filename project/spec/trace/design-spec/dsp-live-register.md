@@ -12,7 +12,6 @@ files:
   - "project/deliverable/engine/tables.ts"
   - "project/deliverable/engine/vault.ts"
   - "project/deliverable/engine/expr.ts"
-  - "project/deliverable/engine/bin/bench-vault.ts"
   - "project/deliverable/engine/bin/format-vault.ts"
   - "project/deliverable/engine/signals.ts"
 ---

@@ -92,7 +92,11 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   // read once per run to answer one question — did the bookkeeping land. The
   // read is the POINT: it is what makes a silent instrument failure visible,
   // and routing it through a note door would share a parse with nobody.
-  const CEILING = 105;
+  // 106: mirror.ts serves the vendored graph renderer at
+  // /vendor/cytoscape.min.js. A one-shot read of a static asset outside the
+  // note system, the same shape as every increment above it — and the read
+  // exists because the alternative was fetching it from unpkg on every open.
+  const CEILING = 106;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {

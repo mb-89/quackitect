@@ -748,8 +748,3 @@ export async function warmVault(root: string, onProgress?: (p: BuildProgress) =>
   }
   return v;
 }
-
-export function forgetVault(root: string): void {
-  void WARM.get(root)?.stop();
-  WARM.delete(root);
-}

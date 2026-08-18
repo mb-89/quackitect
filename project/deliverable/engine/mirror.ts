@@ -6,6 +6,7 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { createServer, type Server } from "node:http";
 import { createRequire } from "node:module";
+import { join } from "node:path";
 import { marked } from "marked";
 import { applyBaseOp, type BaseOp } from "./bases.ts";
 import { helpFor } from "./baseui.ts";
@@ -637,6 +638,22 @@ export function startMirror(o: MirrorOptions): Server {
       }
       res.writeHead(200, { "content-type": "text/javascript; charset=utf-8" });
       res.end(readFileSync(bundle));
+    },
+    // THE GRAPH RENDERER, vendored rather than fetched. It used to arrive
+    // from unpkg on every open of the trace widget, which is a run-time
+    // dependency on somebody else's server and is forbidden. Offline the
+    // widget drew nothing while looking like it was loading.
+    "/vendor/cytoscape.min.js": (_url, _req, res) => {
+      const vendored = join(o.root, "project", "deliverable", "vendor", "cytoscape", "cytoscape.min.js");
+      if (!existsSync(vendored)) {
+        // Name the pull that fixes it. An online fallback is the dependency
+        // wearing a disguise.
+        res.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
+        res.end("cytoscape is not vendored — see project/deliverable/vendor/cytoscape/README.md");
+        return;
+      }
+      res.writeHead(200, { "content-type": "text/javascript; charset=utf-8" });
+      res.end(readFileSync(vendored));
     },
     // One evidence form, lint state included — the details pane's fill
     // surface. Errors (unbound, missing template) render as data.
