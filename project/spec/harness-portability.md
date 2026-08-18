@@ -195,7 +195,7 @@ those do not port at all — they vary by model and they fail silently.
 The entry is not wrong about what was proven. It is wrong about what that
 proof covers. Correcting it is part of this iteration's work, not a separate
 errand.
-## Part 6 — three breaks found by arithmetic, not by opinion
+## Part 6 — five breaks found by arithmetic, not by opinion
 
 ### BREAK 1 — boot's fourth document does not survive Copilot CLI
 
@@ -283,6 +283,55 @@ lane, available beside the lane, unlogged.
 RE-VERIFY RATHER THAN PATCH BLIND. `copilot-cage.json` carries the exact probe
 command for this. Run it, diff the output, and edit the list from what a live
 CLI actually shows — that is how the last three wrong assumptions were caught.
+
+### BREAK 4 — se_pull's own description is truncated by Claude Code
+
+Claude Code truncates **tool descriptions and server instructions at 2 KB
+each**, and its docs say plainly: keep them concise to avoid truncation, and
+put critical details near the start.
+
+`se_pull`'s description is **2,425 bytes. It is 377 bytes over, today, on the
+harness this system is built for.**
+
+IT IS THE ONE VERB EVERYTHING DEPENDS ON. The description is where `read`,
+`fill`, `choose`, `do` and `wait` are explained, and the last 377 bytes of that
+explanation have never reached the model on any host. Nothing reported it,
+because a silent truncation looks exactly like a description that ends there.
+
+Every other verb is under. `se_run` is next at 1,354.
+
+THIS ONE IS NOT A COPILOT PROBLEM AT ALL, which is why it matters here: the
+audit went looking for what breaks on other harnesses and found something
+broken on the home one. The limits are per host and nobody was checking any of
+them.
+
+### BREAK 5 — AGENTS.md is a third larger than Codex will read
+
+Codex assembles its AGENTS.md chain up to **`project_doc_max_bytes`, default
+32 KiB**, and stops once the combined size hits it.
+
+The prompt layer projects **43,008 bytes** into `AGENTS.md`. That is **10,240
+bytes over — 31 percent past the cap** — before any nested file is added.
+
+Claude Code has no such cap and reads `CLAUDE.md` whole, though its own docs
+warn that files over 200 lines reduce adherence. So the same projection is
+complete on one host, cut by a third on another, and neither host says which.
+
+### What these five have in common
+
+NOT ONE OF THEM IS A DESIGN DISAGREEMENT. Every one is a number this
+repository already produces, measured against a threshold the host already
+documents, and in every case nothing in the tree was comparing the two.
+
+- 2,425 against 2,048
+- 21,675 against 20,480
+- 27,130 against 20,480
+- 43,008 against 32,768
+- five tool names against a documented built-in list
+
+THE MISSING MECHANISM IS ONE PREFLIGHT CHECK, not five fixes. Host limits are
+data. Put them in a file, measure the tree against them on every run, and fail
+loudly. Preflight already exists and already runs in the battery.
 
 ## Part 7 — the structural mismatch, which is bigger than any of the breaks
 
