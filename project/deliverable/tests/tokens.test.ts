@@ -261,7 +261,7 @@ describe("the token set", { concurrency: true }, () => {
     const source = readFileSync(fileURLToPath(new URL("../engine/session.ts", import.meta.url)), "utf8");
     assert.match(
       source,
-      /completeState\(m,\s*inst,\s*stateId,\s*outcome,\s*now,\s*only,\s*\(\)\s*=>\s*new Set\(this\.recordDone\(m\)\)\)/,
+      /completeState\(m,\s*inst,\s*stateId,\s*outcome,\s*now,\s*only,\s*\(\)\s*=>\s*new Set\(this\.claims\.recordDone\(m\)\)\)/,
       "the guard must pass recordDone as a thunk — without it a bar only sees this instance's history",
     );
     const kernel = readFileSync(fileURLToPath(new URL("../engine/machine.ts", import.meta.url)), "utf8");
