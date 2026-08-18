@@ -7,7 +7,7 @@ statement: observe-red asks every non-test spec in the corpus for a red observat
 owner: the owner
 trigger: the next iteration that reaches observe-red, which is every iteration
 status: open
-looked: 2026-08-17
+looked: 2026-08-18
 breaks_how_badly: abrasive
 how_likely: certain
 impact: "observe-red refuses while any box stands open. i35 minted 2 demonstration specs and met a checklist of 15, so 13 belonged to other records and none of them had a red for THIS delta to observe. The alternative is ticking boxes on reds nobody watched, which is worse — so the walk stops until each one is either fabricated or owed."
@@ -53,3 +53,15 @@ actually moved.
 IT IS MECHANICAL. The record id is a frontmatter field, the delta is a file list
 the engine already computes, and matching one against the other is a set
 operation — the same one the verification ruling already describes.
+
+## Swept 2026-08-18, at i16's onboard-retro: RE-AFFIRMED, and it fires this iteration
+
+THE TRIGGER IS "the next iteration that reaches observe-red, which is every
+iteration". i16 is walking now and will reach it, so this is not a hypothetical
+re-affirmation — the same 13 boxes will arrive blank again.
+
+NOTHING WAS BUILT SINCE THE LAST LOOK. The repayment is a set operation the
+engine already computes for the CLAIMS checklist one milestone later, and it
+still has no second call site at observe-red.
+
+The trigger stands unchanged.

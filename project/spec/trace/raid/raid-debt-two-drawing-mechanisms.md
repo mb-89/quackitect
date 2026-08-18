@@ -7,7 +7,7 @@ statement: A seeded machine's steps are frontmatter rows in one drawing file, wh
 owner: the maintainer
 trigger: the picture-in-picture to-do machine design discussion, or the next change to the seeded-machine compiler
 status: open
-looked: 2026-08-17
+looked: 2026-08-18
 impact: Every feature the drawn machines gain must be built twice or the seeded ones fall behind; the owner has ruled the split wrong.
 breaks_how_badly: corrosive
 how_likely: expected
@@ -48,5 +48,13 @@ other side: moving the machine render to Cytoscape would NOT help performance.
 The render consumes a canvas that already exists and reads no disk; the four
 seconds sit in the greenness derivation behind it. So i13's case rests on
 maintainability alone, and should not borrow a speed argument it does not have.
+
+The trigger stands unchanged.
+
+## Swept 2026-08-18, at i16's onboard-retro: RE-ACCEPTED
+
+i13 IS STILL SEEDED AND UNWALKED. Neither original trigger fired either: the
+picture-in-picture design discussion is still parked, and the seeded-machine
+compiler was not touched by i33, i34 or i35.
 
 The trigger stands unchanged.

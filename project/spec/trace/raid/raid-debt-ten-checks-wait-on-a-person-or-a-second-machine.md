@@ -7,6 +7,7 @@ statement: Ten verification checks and two boundary timings cannot be answered b
 owner: the owner
 trigger: when the work-token system can carry a task to a person; or at the first verification after 2026-10-01, whichever comes first
 status: open
+looked: 2026-08-18
 impact: A check nobody can run is marked owed every iteration and eventually stops being read, which is how four factual errors sat in the README while its own inspection was marked owed.
 breaks_how_badly: annoying
 how_likely: expected
@@ -112,3 +113,23 @@ A TRIGGER THAT FIRES EVERY TIME SINGLES OUT NOTHING. The nearest precedent is
 raid-debt-human-observed-demonstrations: swept 2026-08-15, re-accepted, and
 heavier afterwards - four specs became eight. This one names the work-token
 system OR a date, so it cannot quietly become furniture.
+
+## Swept 2026-08-18, at i16's onboard-retro: FIRST LOOK, and it had no `looked` field
+
+THIS ROW WAS MINTED AT i33 AND NEVER SWEPT. It carried no `looked` field at all,
+while the other nine debt rows all carried 2026-08-17. One is added here.
+
+THAT IS ITSELF THE THING THE SWEEP EXISTS TO CATCH — a row nobody re-reads —
+and it went unread for one day because a newly minted row does not announce
+itself to the sweep that runs the day after.
+
+THE CHEAP CHECK THIS ROW NAMES IS STILL UNRUN, and it is the one that could
+shrink the list. Its own repayment section says the second-machine group repays
+by checking FIRST whether the cloud runs already satisfy it. Two cloud runs are
+on record — i15 walked on a cloud box on 2026-08-16, and i35 shipped from that
+run's findings on 2026-08-17 — so the evidence to answer with now exists.
+Nobody has asked whether either run exercised tsp-unattended-start,
+tsp-two-machines or tsp-carry-a-finding.
+
+RE-AFFIRMED unchanged: the work-token system, or the first verification after
+2026-10-01, whichever comes first.

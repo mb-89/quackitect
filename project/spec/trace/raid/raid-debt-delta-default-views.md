@@ -7,7 +7,7 @@ statement: The reference views still list the whole corpus - the minted_in stamp
 owner: the driving agent
 trigger: the next form opened in a record whose table lists another record's nodes, or the owner's next reiteration of the delta demand
 status: open
-looked: 2026-08-17
+looked: 2026-08-18
 breaks_how_badly: abrasive
 how_likely: expected
 impact: Every reference table in a record lists the standing corpus beside the delta - 38 test-specs where 7 are the iteration's own - and the reader wades through history, exactly what the owner has flagged three times.
@@ -53,3 +53,12 @@ a coverage check COUNTS.
 CLOSED WHEN every $-item resolver reads that default and the opt-in exists,
 proven by a reference table in a fresh record showing only that record's own
 nodes until the opt-in is set.
+
+## Swept 2026-08-18, at i16's onboard-retro: RE-ACCEPTED
+
+THE DESTINATION IS UNCHANGED AND UNREACHED. i15 still reads `status: open`,
+walked as far as verification, and the resolvers it would build are unbuilt —
+neither `answerStructuredQuery` nor `rankCandidateCouplings` has a lane door
+(note-8a7a3030c5e9, re-checked the same day).
+
+The trigger stands unchanged.

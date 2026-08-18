@@ -7,7 +7,7 @@ statement: This iteration ships its bootstrap without validating it on a genuine
 owner: the owner
 trigger: the first cloud run after this iteration ships
 status: accepted
-looked: 2026-08-17
+looked: 2026-08-18
 impact: The acceptance criterion is that a fresh machine, a seed id and one command produce a walking agent. Everything else can be verified here; the freshness cannot. So the criterion is proven in parts and not end to end, and a step that only fails on a clean host stays undetected until somebody uses one.
 breaks_how_badly: corrosive
 how_likely: expected
@@ -74,3 +74,21 @@ backgrounding syntax the host refuses.
 THE WORK THAT MAKES IT REPAYABLE IS i35. Its blocks 4 and 6 hold the container
 fixes and the guidance corrections. Until those land, another cloud run repeats
 the same seven discoveries.
+
+## Swept 2026-08-18, at i16's onboard-retro: THE BLOCKER IS GONE
+
+THIS ROW'S LAST LINE SAID THE WORK THAT MAKES IT REPAYABLE IS i35, naming its
+blocks 4 and 6. i35 SHIPPED on 2026-08-17 and stands `status: shipped`.
+
+SO THE REPAYMENT IS NOW POSSIBLE for the first time. Nothing else stands
+between this row and a clean run: the container fixes and the guidance
+corrections landed, and the seven hand-typed steps the last run needed are the
+things i35 was for.
+
+WHAT REPAYMENT STILL DEMANDS IS UNCHANGED, and it is the part that failed last
+time: the entrypoint has to RUN. A cloud session that hands an agent a branch
+and lets it type the steps by hand is Arrival A, and this row already excludes
+it in as many words.
+
+RE-AFFIRMED AS: the next cloud run, which is now a real test rather than a
+repeat of the same seven discoveries.

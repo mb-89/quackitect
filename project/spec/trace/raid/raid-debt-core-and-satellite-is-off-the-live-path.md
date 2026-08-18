@@ -7,7 +7,7 @@ statement: The core and satellite cluster is built and tested, and nothing the r
 owner: the driving agent
 trigger: when the run mode is first flipped away from inline, or at the code-review iteration
 status: open
-looked: 2026-08-17
+looked: 2026-08-18
 impact: A whole subsystem drifts from the engine it is meant to carry, and its green tests read as proof it works.
 breaks_how_badly: corrosive
 how_likely: expected
@@ -106,3 +106,15 @@ mode reads `process` while no file on the running path imports the cluster,
 then the mode setting may be inert — a control that reads back a value and
 changes nothing. That is worse than this row states and it is not yet checked.
 It is a lead for the code-review iteration, not a claim.
+
+## Swept 2026-08-18, at i16's onboard-retro: RE-ACCEPTED, trigger unfired
+
+THE RE-AFFIRMED TRIGGER IS "the code-review iteration, or the first time a
+satellite is actually launched". Neither happened. The code-review iteration is
+still only a parked note (note-fe9e091bfa4c) with no record seeded for it, so
+half this trigger depends on work nobody has scheduled.
+
+THE SHARPER QUESTION FROM THE LAST SWEEP IS STILL UNASKED: whether the run-mode
+setting is inert. It was recorded as a lead rather than a claim and remains one.
+
+The trigger stands unchanged.

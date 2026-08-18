@@ -90,9 +90,20 @@ test("since last_retro: the log query scopes to the period after the newest drai
   const before = log.query({ filter: { since: "last_retro" } }).total;
   assert.ok(before > 0, "boot calls are on the log");
   // Run a drain (the retro marker) …
+  //
+  // IT MUST BE A JUDGMENT DISPOSITION. This case used `done` until 2026-08-18
+  // and passed for the wrong reason: `done` is a check any walk makes, and
+  // taking it as the retro's mark is the defect that hid 2736 of 2804 records
+  // at i16's onboard-retro. Its own sibling in mcp.test.ts already asserted
+  // the opposite — "last_retro means the previous RETRO, not the last desk
+  // drain" — so the suite held two cases that could not both be right.
   const minted = await call(server, "se_note", { text: "marker" });
   await pullTo(session, "retro");
-  await call(server, "se_note_drain", { ref: String(minted.body.captured), disposition: "done", where: "test" });
+  await call(server, "se_note_drain", {
+    ref: String(minted.body.captured),
+    disposition: "backlog",
+    where: "ready when this case runs again",
+  });
   // … then act once more: the scoped query sees only the tail.
   await call(server, "se_file_read", { path: anyGuidanceDoc(), offset: 1, limit: 1 });
   const scoped = log.query({ filter: { since: "last_retro" } });

@@ -7,7 +7,7 @@ statement: Four demonstration specs went unobserved at i3's verification - each 
 owner: the owner
 trigger: the consolidation pass that collects everything needing a person, or any iteration whose delta actually touches one of the four specs
 status: open
-looked: 2026-08-17
+looked: 2026-08-18
 breaks_how_badly: abrasive
 how_likely: expected
 impact: Verification refuses while any claim box stands open, so four specs nobody at a terminal can observe stop every iteration from closing. The alternative is checking boxes on unobserved claims, which is worse.
@@ -94,3 +94,20 @@ is the re-adjudication: this entry's own impact line already said so, and
 nothing read it. That half is now fixed — M7_50_verification carries a rule
 that a spec named here arrives PRE-FILLED as owed, so the debt carries the
 claim instead of every iteration answering it again.
+
+## Swept 2026-08-18, at i16's onboard-retro: RE-ACCEPTED
+
+THE OWNER'S RE-ACCEPTANCE OF 2026-08-15 STILL GOVERNS, in their own words:
+validations will not be performed every iteration, the red team may note this
+every time, and it is accepted every time.
+
+THE CONSOLIDATION PASS THE TRIGGER NAMES HAS NOT HAPPENED. What has changed is
+that a SECOND row now carries the same shape at a larger size —
+raid-debt-ten-checks-wait-on-a-person-or-a-second-machine, minted at i33, lists
+ten checks and two boundary timings with what each one needs. The consolidation
+this row waits for is now most of that row's content.
+
+WHOEVER RUNS THE CONSOLIDATION SHOULD MERGE THE TWO rather than repay them
+separately. They are one backlog seen from two dates.
+
+The trigger stands unchanged.

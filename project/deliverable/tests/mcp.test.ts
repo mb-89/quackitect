@@ -253,6 +253,41 @@ test("last_retro means the previous RETRO, not the last desk drain", async () =>
   assert.equal(log.query({ filter: { since: "last_retro" } }).total, 4);
 });
 
+// WITH NO RETRO IN THE LIVE FILE the mark used to fall back to the newest
+// drain of ANY disposition, which is a check every walk makes. Measured at
+// i16's onboard-retro on 2026-08-18: 2804 records held, 68 returned, 2736
+// hidden — the whole session the retro exists to mine. It failed silently,
+// so the retro read as finished over an almost empty window.
+test("with no retro drain the window opens at the live log's start, not at a done drain", async () => {
+  const { CallLog } = await import("../engine/calllog.ts");
+  const root = fresh();
+  const log = new CallLog(join(root, ".se"));
+
+  log.append({ tool: "se_pull", args: {}, ok: true, outcome: "result", duration_ms: 1 });
+  log.append({ tool: "se_file_read", args: {}, ok: true, outcome: "result", duration_ms: 1 });
+  // A `done` drain is a check anyone can run. It must not mark a retro.
+  log.append({ tool: "se_note_drain", args: { disposition: "done" }, ok: true, outcome: "result", duration_ms: 1 });
+  log.append({ tool: "se_run", args: {}, ok: true, outcome: "result", duration_ms: 1 });
+
+  // All four. The old fallback answered 1, counting only what followed the done.
+  assert.equal(log.query({ filter: { since: "last_retro" } }).total, 4);
+});
+
+// A REFUSED `carried` DRAIN IS NOT A RETRO, and this is the exact shape that
+// hid the window: the one carried call in the live log had been refused under
+// SE-C-110 for draining outside the retro, so no judged mark existed at all.
+test("a refused carried drain does not mark a retro", async () => {
+  const { CallLog } = await import("../engine/calllog.ts");
+  const root = fresh();
+  const log = new CallLog(join(root, ".se"));
+
+  log.append({ tool: "se_pull", args: {}, ok: true, outcome: "result", duration_ms: 1 });
+  log.append({ tool: "se_note_drain", args: { disposition: "carried" }, ok: false, outcome: "rejected", duration_ms: 1 });
+  log.append({ tool: "se_file_read", args: {}, ok: true, outcome: "result", duration_ms: 1 });
+
+  assert.equal(log.query({ filter: { since: "last_retro" } }).total, 3);
+});
+
 test("unconfigured web search refuses with setup instructions, never fakes", async () => {
   const prev = process.env.SE_BRAVE_API_KEY;
   delete process.env.SE_BRAVE_API_KEY;

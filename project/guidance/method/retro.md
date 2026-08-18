@@ -44,8 +44,23 @@ The trigger is a NOTE carrying "needs retro":
 
    The engine settles this now: "last_retro" means the newest CARRIED or
    BACKLOG drain, and those are judgment dispositions the desk is
-   refused, so only a retro can set the mark (engine/calllog.ts). Any
-   drain is still the fallback for logs written before the fix.
+   refused, so only a retro can set the mark (engine/calllog.ts).
+
+   WITH NO SUCH DRAIN IN THE LIVE LOG, the window opens at the log file's
+   FIRST record. Never at another drain (fixed 2026-08-18 on the owner's
+   instruction). A `done` or `obsolete` drain is a check any walk makes, so
+   falling back to the newest drain of any kind put the mark wherever the
+   last walk happened to tidy up.
+
+   WHAT THAT COST, MEASURED at i16's onboard-retro the morning it was fixed:
+   68 records returned where 2804 stood, hiding every call of the session
+   the retro existed to mine. It failed SILENTLY, so the retro read as
+   finished over an almost empty window.
+
+   THE SHAPE THAT CAUSED IT is worth knowing, because it will recur: the
+   live log held one `carried` drain and it had been REFUSED under SE-C-110
+   for draining outside a retro. A refused record is skipped, so no judged
+   mark existed at all.
 
    Take the timestamp and use it. Checking it by hand is no longer work
    this step owes.
@@ -106,16 +121,26 @@ The trigger is a NOTE carrying "needs retro":
    Memory keeps only personal data and harness mechanics the repo cannot
    hold. The agent runs this sweep itself.
 
-   THE LANE CANNOT REACH THE MEMORY FILES, measured 2026-08-17. The
-   assistant's memory lives outside the project root, so se_file_read refuses
-   the path under SE-C-102 and the native readers are caged. Two ways through
-   are honest and a third is not.
+   THE LANE REACHES THE MEMORY FILES ALREADY, corrected 2026-08-18. An earlier
+   measurement said it could not, because the memory lives outside the project
+   root and a bare path refuses under SE-C-102. That is true of a bare path and
+   not of the lane: `.se/roots.json` already declares `sessions` as
+   `C:\Users\ichbi\.claude\projects`, and the memory sits under it, so
+   `@sessions/<project-slug>/memory/` reads. MEASURED at i16's onboard-retro,
+   where that path answered `exists: false` for MEMORY.md rather than refusing
+   — a real answer about a real folder.
 
+   SO CHECK THE DECLARED ROOTS BEFORE CONCLUDING ANYTHING. Three ways through
+   are honest and a fourth is not.
+
+   - READ THE FOLDER THROUGH THE DECLARED ROOT. This is the first move, not
+     the fallback. Read `.se/roots.json`, find the root that covers the
+     harness's memory path, and glob or read under it.
    - DRAIN WHAT THE HARNESS SURFACED. Memories handed to the agent in context
-     are readable and drainable, and that is the common case.
-   - A DECLARED ROOT reaches the rest. `.se/roots.json` makes a folder
-     available as `@name`, read-only. Ask the owner before declaring one; the
-     refusal's own remedy says so.
+     are readable and drainable too.
+   - DECLARE A ROOT for a folder no existing one covers. `.se/roots.json`
+     makes a folder available as `@name`, read-only. Ask the owner before
+     declaring one; the refusal's own remedy says so.
    - WHAT IS NOT ALLOWED is ticking this step because nothing was surfaced.
      Say what you could reach and what you could not.
 7. Hunt wasted effort. Rework, reversals, avoidable refactors,

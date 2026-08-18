@@ -7,7 +7,7 @@ statement: tsp-bound-surface cannot be observed, because its procedure needs two
 owner: the owner
 trigger: the build that lets two records stand open with a satellite each, or any change to how a surface resolves its links
 status: decided
-looked: 2026-08-17
+looked: 2026-08-18
 breaks_how_badly: abrasive
 how_likely: expected
 impact: Verification refuses while any claim box stands open, so a spec nobody can observe stops every iteration from closing. The spec's own text already says the procedure cannot run until the build stands, and nothing carried that, so each iteration met the same blank and had to work it out again.
@@ -75,3 +75,13 @@ ONE QUESTION IS LEFT OPEN DELIBERATELY: req-a-surface-resolves-to-what-it-shows
 was verified only by this demonstration. The ruling killed the demo, not the
 requirement, and nothing now verifies it. That is a question for whoever next
 touches surface resolution.
+
+## Swept 2026-08-18, at i16's onboard-retro: SETTLED, and the look is recorded for completeness
+
+NOTHING TO RE-ACCEPT. The owner discharged this on 2026-08-17 and the status is
+`decided`, so it carries no claim and blocks no close.
+
+THE ONE OPEN THREAD IS UNCHANGED AND STILL OWED TO SOMEBODY ELSE:
+req-a-surface-resolves-to-what-it-shows was verified only by the dropped
+demonstration, and nothing verifies it now. That is the next surface-resolution
+work's question, not this row's.

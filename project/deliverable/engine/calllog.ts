@@ -202,25 +202,48 @@ export class CallLog {
   /** WHERE THE PREVIOUS RETRO ENDED, from drain lines alone. Only lines
    *  that could hold a drain are parsed — the same substring trade find()
    *  makes. carried and backlog are judgment dispositions the desk is
-   *  refused, so the newest of those marks a retro; any drain is the
-   *  fallback for logs written before that rule. */
+   *  refused, so the newest of those marks a retro.
+   *
+   *  THE FALLBACK IS THE LIVE FILE'S START, NEVER ANOTHER DRAIN (owner
+   *  instruction 2026-08-18). A `done` or `obsolete` drain is a check anyone
+   *  can run and every walk makes them, so taking the newest drain of ANY
+   *  disposition puts the mark wherever the last walk happened to tidy up.
+   *
+   *  MEASURED at i16's onboard-retro, the morning it was fixed: the live log
+   *  held 2804 records back to the previous afternoon and no judged drain,
+   *  because the one `carried` call had been REFUSED under SE-C-110 and a
+   *  refused record is skipped. The old fallback took a `done` drain from an
+   *  hour earlier and answered 68 records, hiding 2736 — every call of the
+   *  session the retro exists to mine.
+   *
+   *  IT FAILED SILENTLY, which is why it is worth this many lines. A
+   *  truncated mining window reports almost nothing and reads as finished,
+   *  and retro.md step 1 already promised the behaviour this now has.
+   *
+   *  A drain older than the live file is a retro that ended before the
+   *  rotation, and the live file's start is the honest answer rather than a
+   *  scan of every archive. */
   private lastRetroMark(): string | undefined {
     let judged: string | undefined;
-    let any: string | undefined;
-    // No `since` to hand it: a drain older than the live file is a retro that
-    // ended before the rotation, and the window opening at the live file's
-    // start is the honest answer rather than a scan of every archive.
+    let first: string | undefined;
     for (const line of this.lines()) {
+      // The first parseable record dates the live file. Only this one line is
+      // parsed speculatively — the whole-log parse is what killed the server
+      // in 2026-08-09, and the substring guard below still holds for the rest.
+      if (first === undefined) {
+        try {
+          first = (JSON.parse(line) as CallRecord).ts;
+        } catch {}
+      }
       if (!line.includes('"se_note_drain"')) continue;
       try {
         const rec = JSON.parse(line) as CallRecord;
         if (rec.tool !== "se_note_drain" || !rec.ok) continue;
-        any = rec.ts;
         const d = String((rec.args as { disposition?: unknown }).disposition ?? "");
         if (d === "carried" || d === "backlog") judged = rec.ts;
       } catch {}
     }
-    return judged ?? any;
+    return judged ?? first;
   }
 
   /** THE WHOLE-LOG PARSE WAS THE SERVER KILLER (2026-08-09). query() parsed

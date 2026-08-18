@@ -1,0 +1,143 @@
+{"ts":"2026-08-18T08:09:21.640Z","op":"plan","visit":"iterations/i16/onboard-retro@0","parent":null,"nodes":[{"id":"d17","brief":"mark the retro window boundary"},{"id":"d18","brief":"drain the 29 pending notes"},{"id":"d19","brief":"walk the parked backlog"},{"id":"d20","brief":"sweep the register for debts"},{"id":"d21","brief":"drain the assistant memory"},{"id":"d22","brief":"mine the call log"},{"id":"d23","brief":"walk the shipped iterations' milestones"},{"id":"d24","brief":"check the contract against the trail"},{"id":"d25","brief":"fill and submit the onboard-retro form"}]}
+{"ts":"2026-08-18T08:09:26.767Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d26","brief":"fetching the oldest record in the window to take its timestamp"}
+{"ts":"2026-08-18T08:09:41.945Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d27","brief":"the window looks like this session only — checking the real last drain"}
+{"ts":"2026-08-18T08:09:54.275Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d28","brief":"sizing the whole log to see how far back it reaches"}
+{"ts":"2026-08-18T08:09:58.282Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d29","brief":"reading the log's oldest record to fix the true window"}
+{"ts":"2026-08-18T08:10:08.645Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d30","brief":"checking the engine's own last_retro rule against what the window returned"}
+{"ts":"2026-08-18T08:10:13.348Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d31","brief":"reading lastRetroMark to name the boundary defect exactly"}
+{"ts":"2026-08-18T08:10:16.898Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d32","brief":"reading lastRetroMark in full"}
+{"ts":"2026-08-18T08:10:39.301Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d17","brief":"boundary taken by hand at 2026-08-17T14:28:20.828Z; the engine's mark is broken"}
+{"ts":"2026-08-18T08:10:54.008Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d33","brief":"paging the pending notes with their bodies, six at a time"}
+{"ts":"2026-08-18T08:11:06.556Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d34","brief":"trying a direct read of the notes file, the survey's full detail is too costly"}
+{"ts":"2026-08-18T08:11:15.854Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d35","brief":"reading the tail of the notes file for the pending set"}
+{"ts":"2026-08-18T08:11:51.515Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d36","brief":"reading pending note bodies in batches of five"}
+{"ts":"2026-08-18T08:12:00.989Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d37","brief":"reading notes lines 911-916"}
+{"ts":"2026-08-18T08:12:07.901Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d38","brief":"reading notes lines 917-924"}
+{"ts":"2026-08-18T08:12:16.648Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d39","brief":"checking the contract for the subagent permission"}
+{"ts":"2026-08-18T08:12:31.604Z","op":"done","visit":"front_desk@0","node":"d12","brief":"cloud job picked: i17 the options pool, runner-up i31"}
+{"ts":"2026-08-18T08:12:39.125Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d40","brief":"the contract half of the subagent ruling landed; the outside half recurred today"}
+{"ts":"2026-08-18T08:12:56.840Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d41","brief":"capturing the real recurrence note and correcting the invented ref"}
+{"ts":"2026-08-18T08:13:24.597Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d42","brief":"checking three note claims against the code before disposing them"}
+{"ts":"2026-08-18T08:13:35.949Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d43","brief":"checking the claimful definition for the ripple-hole note"}
+{"ts":"2026-08-18T08:13:43.431Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d44","brief":"reading the claimful comment block to settle the ripple-hole note"}
+{"ts":"2026-08-18T08:13:54.639Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d45","brief":"the ripple hole is closed in owesASignature"}
+{"ts":"2026-08-18T08:13:59.180Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d46","brief":"the crossed-unsubmitted-state note is closed by the same fix"}
+{"ts":"2026-08-18T08:14:13.219Z","op":"fork","visit":"iterations/i16/onboard-retro@0","parent":"d18","node":"d47","brief":"the drain runs in three passes by priority","nodes":[{"id":"d48","brief":"drain the must notes"},{"id":"d49","brief":"drain the should notes"},{"id":"d50","brief":"drain the could notes"}]}
+{"ts":"2026-08-18T08:14:21.517Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d51","brief":"checking whether the optimistic paint hold got a way out"}
+{"ts":"2026-08-18T08:14:26.488Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d52","brief":"reading applyBar to see whether the hold still has no exit"}
+{"ts":"2026-08-18T08:14:42.807Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d53","brief":"the bar hold is now per-bank and still has no exit"}
+{"ts":"2026-08-18T08:14:48.464Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d54","brief":"parking the retro-window defect for the state that owns the mark"}
+{"ts":"2026-08-18T08:15:00.272Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d48","brief":"the four must notes are drained"}
+{"ts":"2026-08-18T08:15:09.393Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d55","brief":"listing the test files to check the vscode coverage claim"}
+{"ts":"2026-08-18T08:15:15.064Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d56","brief":"checking whether any test reaches the extension's click handler"}
+{"ts":"2026-08-18T08:15:22.446Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d57","brief":"zero tests reach the extension click path, confirmed"}
+{"ts":"2026-08-18T08:15:27.076Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d58","brief":"checking whether the drawing shows the record's title now"}
+{"ts":"2026-08-18T08:15:37.183Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d59","brief":"reading the two goal uses in the renderer"}
+{"ts":"2026-08-18T08:15:49.641Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d60","brief":"the drawing still carries no record title, confirmed"}
+{"ts":"2026-08-18T08:15:55.469Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d49","brief":"the three should notes are drained"}
+{"ts":"2026-08-18T08:17:00.398Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d61","brief":"reading the remaining could-note bodies"}
+{"ts":"2026-08-18T08:17:13.951Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d62","brief":"checking whether the test-scope mapping is still a filename lookup"}
+{"ts":"2026-08-18T08:17:33.927Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d63","brief":"the wrong-diagnosis note goes, its correction stays"}
+{"ts":"2026-08-18T08:17:40.501Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d64","brief":"the battery-scope ruling is ready now, i33 has closed"}
+{"ts":"2026-08-18T08:17:45.867Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d65","brief":"the mechanism note parks beside the ruling"}
+{"ts":"2026-08-18T08:17:52.291Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d66","brief":"the unwalked-state question parks with the measurable-walk work"}
+{"ts":"2026-08-18T08:17:53.540Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d67","brief":"reading i33 motivation-milestone evidence forms"}
+{"ts":"2026-08-18T08:17:57.356Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d68","brief":"checking whether i15's query and coupling parts got a door"}
+{"ts":"2026-08-18T08:18:02.011Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d69","brief":"i33 gate-motivation through use-cases"}
+{"ts":"2026-08-18T08:18:04.135Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d70","brief":"i15's two engine parts still have no lane door, confirmed"}
+{"ts":"2026-08-18T08:18:16.830Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d50","brief":"the first pass of could notes is drained"}
+{"ts":"2026-08-18T08:18:18.513Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d71","brief":"i33 M3 gate and M5/M7 design evidence"}
+{"ts":"2026-08-18T08:18:28.659Z","op":"fork","visit":"iterations/i16/onboard-retro@0","parent":"d23","node":"d72","brief":"second pass over the remaining thirteen notes","nodes":[{"id":"d73","brief":"read the last six bodies"},{"id":"d74","brief":"drain the walk-mechanics notes"},{"id":"d75","brief":"drain the lane-friction notes"}]}
+{"ts":"2026-08-18T08:18:29.424Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d76","brief":"i33 verification and implementation gate"}
+{"ts":"2026-08-18T08:18:41.543Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d73","brief":"the last six note bodies are read"}
+{"ts":"2026-08-18T08:18:43.746Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d77","brief":"starting i34's milestone chain"}
+{"ts":"2026-08-18T08:18:58.311Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d78","brief":"i34 motivation gate through requirements"}
+{"ts":"2026-08-18T08:19:08.225Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d79","brief":"checking the close guard before draining its note"}
+{"ts":"2026-08-18T08:19:12.604Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d80","brief":"i34 design and build-plan evidence"}
+{"ts":"2026-08-18T08:19:16.949Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d81","brief":"reading expClose to see what guards it"}
+{"ts":"2026-08-18T08:19:26.539Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d82","brief":"the close is still unguarded, confirmed at worktree.ts 489"}
+{"ts":"2026-08-18T08:19:26.834Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d83","brief":"i34 validation and release evidence"}
+{"ts":"2026-08-18T08:19:34.803Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d84","brief":"the walked-past explanation is closed by owesASignature"}
+{"ts":"2026-08-18T08:19:41.205Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d74","brief":"the walk-mechanics notes are drained"}
+{"ts":"2026-08-18T08:19:42.477Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d85","brief":"i35 motivation milestone evidence"}
+{"ts":"2026-08-18T08:19:49.653Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d86","brief":"half of the inbox-read friction is disproved by direct file reads"}
+{"ts":"2026-08-18T08:19:56.781Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d87","brief":"the unverified-claim check needs git, which this state does not grant"}
+{"ts":"2026-08-18T08:19:57.915Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d88","brief":"i35 assumptions through structure"}
+{"ts":"2026-08-18T08:20:02.829Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d89","brief":"the cross-record gate question is the owner's to rule"}
+{"ts":"2026-08-18T08:20:09.147Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d75","brief":"the lane-friction notes are drained"}
+{"ts":"2026-08-18T08:20:10.549Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d90","brief":"i35 verification and implementation gate"}
+{"ts":"2026-08-18T08:20:16.789Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d91","brief":"draining the last six notes"}
+{"ts":"2026-08-18T08:20:30.987Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d92","brief":"the greyed-chain note parks with its two siblings"}
+{"ts":"2026-08-18T08:20:37.369Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d93","brief":"the dead chain argument parks with the same cluster"}
+{"ts":"2026-08-18T08:20:42.716Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d94","brief":"the re-sign cost question parks with its measurement named"}
+{"ts":"2026-08-18T08:20:48.560Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d95","brief":"the conformance hole parks with its blast radius unmeasured"}
+{"ts":"2026-08-18T08:20:53.870Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d72","brief":"the inbox is at zero"}
+{"ts":"2026-08-18T08:21:27.694Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d47","brief":"the three drain passes are finished"}
+{"ts":"2026-08-18T08:21:29.229Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d96","brief":"sampling the build chunks for the build-steps row"}
+{"ts":"2026-08-18T08:21:41.196Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d97","brief":"checking three parked notes against i34's one-tree change"}
+{"ts":"2026-08-18T08:21:45.478Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d98","brief":"reading recordDirFor to see if the worktree fallback survives"}
+{"ts":"2026-08-18T08:22:05.999Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d99","brief":"one parked note kept with a sharper condition after a code check"}
+{"ts":"2026-08-18T08:22:09.172Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d100","brief":"reading the last window of parked items to finish the walk"}
+{"ts":"2026-08-18T08:22:53.907Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d19","brief":"all 91 parked items walked, and none is ripe for this round"}
+{"ts":"2026-08-18T08:22:59.038Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d18","brief":"the note drain is finished and the inbox reads zero"}
+{"ts":"2026-08-18T08:23:08.501Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d101","brief":"reading the first five debt entries for the sweep"}
+{"ts":"2026-08-18T08:23:21.584Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d102","brief":"reading the last five debt entries"}
+{"ts":"2026-08-18T08:23:45.992Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d103","brief":"checking whether a verdict editor exists, which one debt names as its first question"}
+{"ts":"2026-08-18T08:23:49.424Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d104","brief":"globbing the editors instead, the list verb is not legal here"}
+{"ts":"2026-08-18T08:24:47.115Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d20","brief":"all ten debt rows carry a dated look"}
+{"ts":"2026-08-18T08:24:55.730Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d105","brief":"checking the declared roots for a path to the assistant memory"}
+{"ts":"2026-08-18T08:25:02.189Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d106","brief":"the sessions root reaches the memory folder"}
+{"ts":"2026-08-18T08:25:05.554Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d107","brief":"widening the glob to find any memory files at all"}
+{"ts":"2026-08-18T08:25:10.462Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d108","brief":"reading the memory index directly through the declared root"}
+{"ts":"2026-08-18T08:25:33.320Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d21","brief":"the memory is empty, and the guidance that said it was unreachable is corrected"}
+{"ts":"2026-08-18T08:26:16.002Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d109","brief":"the contract check found one breach, a fabricated ref in a stored field"}
+{"ts":"2026-08-18T08:26:21.206Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d24","brief":"the contract walk is finished, rule by rule"}
+{"ts":"2026-08-18T08:26:35.276Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d110","brief":"finding i35's package evidence for the emit-back list"}
+{"ts":"2026-08-18T08:26:41.586Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d111","brief":"reading i35's emit-back list"}
+{"ts":"2026-08-18T08:27:09.448Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d22","brief":"the call log is mined and its findings are being recorded"}
+{"ts":"2026-08-18T08:27:26.484Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d112","brief":"recording the pull-latency correction from the mining"}
+{"ts":"2026-08-18T08:27:45.671Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d113","brief":"recording the shell-shape findings from the mining"}
+{"ts":"2026-08-18T08:27:54.088Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d114","brief":"parking the test-polling measurement with its cluster"}
+{"ts":"2026-08-18T08:28:01.461Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d115","brief":"parking the latency-floor correction with the pull note"}
+{"ts":"2026-08-18T08:28:07.893Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d116","brief":"parking the shell-shape findings"}
+{"ts":"2026-08-18T08:28:15.368Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d117","brief":"reading i35's emit-back list in full for the promotions field"}
+{"ts":"2026-08-18T08:28:28.207Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d118","brief":"checking the verification_attempts counter for the promotions field"}
+{"ts":"2026-08-18T08:30:29.459Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d119","brief":"saving the retro form with every field but the owner's own answer"}
+{"ts":"2026-08-18T08:31:03.459Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d23","brief":"the milestone walk over i33, i34 and i35 is done"}
+{"ts":"2026-08-18T08:31:17.916Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d120","brief":"recording the always-legal tool set finding"}
+{"ts":"2026-08-18T08:31:30.670Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d121","brief":"recording the form-bleed finding"}
+{"ts":"2026-08-18T08:31:37.929Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d122","brief":"parking the fix-findings finding"}
+{"ts":"2026-08-18T08:31:44.295Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d123","brief":"parking the always-legal tool set finding"}
+{"ts":"2026-08-18T08:31:50.496Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d124","brief":"parking the form-bleed finding"}
+{"ts":"2026-08-18T08:34:20.372Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d125","brief":"refilling the form in the templates it asked for"}
+{"ts":"2026-08-18T08:34:41.160Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d126","brief":"getting the handover's hash before replacing the stale one"}
+{"ts":"2026-08-18T08:35:06.257Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d25","brief":"the retro form is filled but for the owner's own field"}
+{"ts":"2026-08-18T08:39:07.273Z","op":"plan","visit":"iterations/i16/onboard-retro@0","parent":null,"nodes":[{"id":"d127","brief":"correct the fix-findings finding"},{"id":"d128","brief":"record the se_test design ruling"},{"id":"d129","brief":"fix the retro window mark"},{"id":"d130","brief":"record the field feedback and submit"},{"id":"d131","brief":"walk i16 onward"}]}
+{"ts":"2026-08-18T08:39:11.721Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d132","brief":"finding where fix-findings actually appears"}
+{"ts":"2026-08-18T08:39:21.413Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d133","brief":"reading the fix-findings row to see whether it carries a form at all"}
+{"ts":"2026-08-18T08:39:46.469Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d127","brief":"the fix-findings finding is retracted with the row quoted"}
+{"ts":"2026-08-18T08:39:58.784Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d128","brief":"the test-polling note is closed by the owner's piggyback ruling"}
+{"ts":"2026-08-18T08:40:24.601Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d134","brief":"reading the header comment above the window mark"}
+{"ts":"2026-08-18T08:40:41.816Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d135","brief":"the window mark now falls back to the live file's start"}
+{"ts":"2026-08-18T08:40:47.236Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d136","brief":"finding the existing window-mark test"}
+{"ts":"2026-08-18T08:40:51.912Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d137","brief":"reading the existing boundary test to write the new case beside it"}
+{"ts":"2026-08-18T08:41:06.636Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d138","brief":"two cases pin the new fallback and the refused-drain case"}
+{"ts":"2026-08-18T08:41:15.311Z","op":"update","visit":"iterations/i16/onboard-retro@0","node":"d139","brief":"running the scoped check on the window-mark change"}
+{"ts":"2026-08-18T08:42:33.842Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d130","brief":"the field feedback is recorded and the retro is submitted"}
+{"ts":"2026-08-18T08:43:38.728Z","op":"done","visit":"iterations/i16/onboard-retro@0","node":"d129","brief":"the window mark is fixed, tested and its guidance corrected"}
+{"ts":"2026-08-18T08:43:45.223Z","op":"plan","visit":"iterations/i16/gate-kickoff@0","parent":null,"nodes":[{"id":"d140","brief":"read the change-size definitions"},{"id":"d141","brief":"draft i16's goals and scope"},{"id":"d142","brief":"run the four gate rounds"},{"id":"d143","brief":"submit the kickoff with a proposed size"}]}
+{"ts":"2026-08-18T08:43:50.562Z","op":"update","visit":"iterations/i16/gate-kickoff@0","node":"d144","brief":"locating the sizing law"}
+{"ts":"2026-08-18T08:43:58.387Z","op":"update","visit":"iterations/i16/gate-kickoff@0","node":"d145","brief":"reading how the last three iterations argued their size"}
+{"ts":"2026-08-18T08:44:02.614Z","op":"done","visit":"iterations/i16/gate-kickoff@0","node":"d140","brief":"reading i34's kickoff, where the owner corrected the size"}
+{"ts":"2026-08-18T08:44:33.999Z","op":"update","visit":"iterations/i16/gate-kickoff@0","node":"d146","brief":"measuring this session's own bound breaches for the gate"}
+{"ts":"2026-08-18T08:45:03.068Z","op":"fork","visit":"iterations/i16/gate-kickoff@0","parent":"d142","node":"d147","brief":"a red I caused: an existing test asserts the old window behaviour","nodes":[]}
+{"ts":"2026-08-18T08:45:32.944Z","op":"done","visit":"iterations/i16/gate-kickoff@0","node":"d147","brief":"the stale case now drains a judgment disposition"}
+{"ts":"2026-08-18T08:45:56.336Z","op":"update","visit":"iterations/i16/gate-kickoff@0","node":"d148","brief":"re-running after the test correction"}
+{"ts":"2026-08-18T08:46:35.287Z","op":"update","visit":"iterations/i16/gate-kickoff@0","node":"d149","brief":"opening v1's resolver, the design input this iteration rests on"}
+{"ts":"2026-08-18T08:49:37.621Z","op":"done","visit":"iterations/i16/gate-kickoff@0","node":"d141","brief":"the goals and scope are drafted from the requirements and v1's resolver"}
+{"ts":"2026-08-18T08:49:47.702Z","op":"update","visit":"iterations/i16/gate-kickoff@0","node":"d150","brief":"reading the boundary the gate asks about"}
+{"ts":"2026-08-18T08:50:02.974Z","op":"update","visit":"iterations/i16/gate-kickoff@0","node":"d151","brief":"answering the boundary field in its own per-item shape"}
+{"ts":"2026-08-18T08:50:28.131Z","op":"done","visit":"iterations/i16/gate-kickoff@0","node":"d142","brief":"the four gate rounds are filled and the claim is stamped"}
+{"ts":"2026-08-18T08:50:56.262Z","op":"done","visit":"iterations/i16/gate-kickoff@0","node":"d143","brief":"the kickoff is signed with minor proposed and the bless owed"}
+{"ts":"2026-08-18T08:51:44.129Z","op":"update","visit":"iterations/i16/gate-kickoff@0","node":"d152","brief":"noting the kickoff bless conflict, then blessing and walking on"}
+{"ts":"2026-08-18T08:51:52.559Z","op":"update","visit":"iterations/i16/gate-kickoff@0","node":"d153","brief":"blessing the kickoff at minor, the dial stands at ideation"}
