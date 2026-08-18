@@ -1139,3 +1139,121 @@ model. Copilot and the other harnesses cache too, and none of them publish the
 same mechanics. So the honest scope of this milestone is: make the bytes stable
 and few, which helps under every caching scheme, and do not tune for one
 vendor's breakpoints when we cannot even set them.
+
+## Part 19 — the skills proposal, evaluated
+
+THE OWNER'S IDEA: package the guidance as skills. The pull stops shipping the
+text and instead names the skill to load. The read-proof still runs afterwards.
+The tool arguments carry skill references rather than prose.
+
+IT IS THE RIGHT SHAPE, and for a reason beyond tokens. But "cached" is not
+quite the mechanism, and the listing is a cost that moves rather than
+disappears.
+
+### First, what is already true
+
+WE BUILT PROGRESSIVE DISCLOSURE BY HAND AND CALLED IT `read`. The pull serves
+one method document when the walk reaches the state that needs it, proves it,
+and serves the next. That IS load-on-demand. The proposal is not a new idea for
+this system — it is the harness-native version of a mechanism already here.
+
+AND SKILLS ARE ALSO THE PORTABILITY ANSWER, which is the part that makes this
+worth doing even if the token maths were neutral. `SKILL.md` is the one artifact
+roughly twenty platforms parse identically. Both install-time generators the
+outward scan looked at — spec-kit and BMAD — converged on emitting skills as
+their delivery format. So this lines up exactly with the installer already
+ruled on in Part 13.
+
+### What "cached" means here, precisely
+
+A SKILL BODY IS NOT A SEPARATE CACHE TIER. When a skill loads, its text becomes
+content in the conversation. From then on it is part of the prefix and is cached
+exactly like any other history — the same way the documents the pull serves
+already are.
+
+SO THE GAIN IS NOT FREE RE-READS. Within a session, a document is served once
+either way, because the reading credit already stops it being served twice.
+**The gain is that an unused document is never sent at all.**
+
+AND IT DIES IN A COMPACTION LIKE EVERYTHING ELSE. Whether a harness re-surfaces
+a skill more cheaply than our re-read is UNKNOWN and must be measured, not
+assumed.
+
+### The cost it moves rather than removes
+
+EVERY SKILL'S NAME AND DESCRIPTION SITS IN CONTEXT FROM SESSION START. That is
+the whole trick — the listing is always present so the model knows what it can
+reach for. A very big skill list is a very big always-present listing.
+
+CLAUDE CODE BUDGETS IT EXPLICITLY: the combined `description` and `when_to_use`
+are truncated at **1,536 characters per skill**, with `skillListingMaxDescChars`
+and a `skillListingBudgetFraction` over the whole listing.
+
+SO THE DESIGN CONSTRAINT INVERTS. Today the problem is long documents. Under
+this proposal the problem becomes long DESCRIPTIONS, and there would be
+eighteen of them, permanently resident. Each must be one trigger-shaped line —
+enough for the model to know when it needs the thing, and nothing more.
+
+### The split it forces, and this is the genuinely useful part
+
+NOT EVERYTHING CAN BE A SKILL, and the line is sharp:
+
+- **THE ALWAYS-TRUE RULES CANNOT BE.** `contract.md`, `walking.md`,
+  `method/lane.md`, `voice.md` — 43,008 bytes — bind BEFORE the agent knows
+  what it is doing. A rule that loads on demand is a rule that can be skipped
+  by not demanding it. These stay in the prompt layer, and the only lever on
+  them is Part 18's: make them shorter.
+- **THE SITUATIONAL METHOD IS A PERFECT SKILL.** front-desk, retro,
+  cloud-runner, overhaul, tour, machine-authoring, engineering, software, ux.
+  Each is read when the walk reaches the state that wants it.
+
+AND THAT SEAM ALREADY EXISTS IN THE CODE. `promptlayer.ts` names exactly four
+`PROMPT_SOURCES` as always-on, and everything else is served per state. The
+proposal does not introduce the split — it moves the second half onto a
+mechanism the harness manages instead of one we hand-roll.
+
+### The read-proof survives, and it is what makes this enforceable
+
+THE SERVER CANNOT MAKE AN AGENT LOAD A SKILL. Naming one in a pull is a
+request, and a request is tier C.
+
+BUT THE PROOF DOES NOT CARE HOW THE TEXT ARRIVED. The pull asks for the words
+that follow a phrase, and the walk does not advance until they come back
+correct. That converts "please load the skill" into "prove you loaded it",
+which is the same enforcement standing today.
+
+SO THE MECHANISM SURVIVES THE MOVE INTACT. That is the strongest argument for
+the proposal: it changes the delivery and keeps the check.
+
+### What it does NOT fix
+
+**THE 68,244-BYTE `tools/list` IS UNTOUCHED.** Skills carry guidance, not tool
+definitions. That half needs the two things Part 18 already named — the
+`update` description that is 44% of the payload, and tool search, which Claude
+Code already applies by default to defer schemas and which appends rather than
+swaps, so it preserves the cache.
+
+DO NOT LET THE SKILLS IDEA CROWD OUT THE SCHEMA WORK. The schema half is
+bigger, cheaper and needs no new mechanism.
+
+### Two hard constraints before anyone builds it
+
+1. **SKILLS-OVER-MCP IS NOT SHIPPED.** SEP-2640 is in review on the extensions
+   track. Today a lane cannot SERVE a skill: skills are files on disk that the
+   harness discovers. So they must be emitted by the installer, which is
+   exactly what Part 13 already rules.
+2. **THE PATHS DIFFER PER HARNESS.** Claude Code reads `.claude/skills/` and
+   NOT `.agents/skills/`. Copilot reads `.github/skills/`, `.claude/skills/`
+   and `.agents/skills/`. JetBrains reads none. So the installer emits to
+   several paths, and the same fan-out rule applies as everywhere else.
+
+### The recommendation
+
+TRY IT ON ONE DOCUMENT, NOT EIGHTEEN. `front-desk.md` is the natural first: it
+is self-contained, purely situational, and the desk already knows exactly when
+it is wanted. Convert it, measure the listing cost against the saved body cost
+with `count_tokens`, and only then decide about the rest.
+
+MEASURE BEFORE CONVERTING, because the honest summary of this section is that
+the proposal trades a large occasional cost for a small permanent one, and
+whether that trade wins depends on numbers nobody has yet.
