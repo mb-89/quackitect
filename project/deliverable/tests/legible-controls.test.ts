@@ -81,3 +81,51 @@ test("a bank handed no position is distinguishable from one sitting at zero", ()
   const atZero = barAt(0);
   assert.notEqual(absent, atZero, "an absent position renders identically to a deliberate zero");
 });
+
+// ── THE TWO BANKS ARE TOLD APART, 2026-08-18 ────────────────────────────
+//
+// THE OWNER REPORTED IT TWICE: pressing an autonomy rung moved the stop-at
+// row, and `blockers only` never unlocked however often `bless` was pressed.
+// One cause, and it was in the VS Code handler rather than here — every rung
+// posted to /autonomy, because the handler never read the mark this renderer
+// has always written.
+//
+// WHAT THESE TWO CASES GUARD is the CONTRACT the fixed handler depends on:
+// the markup must say which control a button belongs to, and each bank must
+// carry its own position. They do NOT exercise the handler. That code is
+// bundled browser JS with no DOM in the suite, so the click path is still
+// covered by hand only.
+
+const BOTH = `## Parameters
+
+- autonomy | rungs | scale | what the agent may decide alone
+- stop @ | rungs | stopat | how far the agent walks before handing back
+`;
+
+const TIERS = [
+  { value: 0.2, abbr: "M", name: "mechanical" },
+  { value: 1, abbr: "I", name: "ideation" },
+];
+
+function bothBanks(): string {
+  return renderPanel(parsePanel(BOTH), { rungs: TIERS, autonomy: 0.2, stopat: NOTCHES, stop_at: 3, ints: {} });
+}
+
+test("every rung says which bank it belongs to", () => {
+  const html = bothBanks();
+  const marks = html.match(/data-bank="(autonomy|stopat)"/g) ?? [];
+  const buttons = html.match(/<button[^>]*class="rung/g) ?? [];
+  assert.equal(marks.length >= buttons.length, true, "a rung without data-bank cannot be routed by a handler");
+  assert.match(html, /data-bank="autonomy"/, "the autonomy bank is unmarked");
+  assert.match(html, /data-bank="stopat"/, "the stop-at bank is unmarked");
+});
+
+test("each bank carries its own position, so one can be reconciled without the other", () => {
+  const html = bothBanks();
+  const autonomy = html.match(/<input[^>]*class="bank-at"[^>]*data-bank="autonomy"[^>]*>/);
+  const stopat = html.match(/<input[^>]*class="bank-at"[^>]*data-bank="stopat"[^>]*>/);
+  assert.notEqual(autonomy, null, "the autonomy bank has no position input");
+  assert.notEqual(stopat, null, "the stop-at bank has no position input — a surface can only track one");
+  assert.match(String(stopat?.[0]), /value="3"/, "the stop-at input does not carry its own value");
+  assert.match(String(autonomy?.[0]), /value="0.2"/, "the autonomy input does not carry its own value");
+});
