@@ -13,6 +13,8 @@ realizes:
   - "if-walk-engine-to-mirror"
 files:
   - "project/deliverable/engine/render.ts"
+  - "project/deliverable/engine/renderclient.ts"
+  - "project/deliverable/engine/renderstyle.ts"
   - "project/deliverable/engine/mirror.ts"
   - "project/deliverable/engine/panel.ts"
   - "project/deliverable/engine/brand.ts"

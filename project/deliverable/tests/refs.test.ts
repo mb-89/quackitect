@@ -8,7 +8,7 @@ import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { expandHint, fieldHint, type StateFormModel, templateMeta, templateProblems } from "../engine/stateform.ts";
 import { itemTemplate } from "../engine/trace.ts";
-import { freshRoot } from "./helpers.ts";
+import { freshRoot, mirrorSource } from "./helpers.ts";
 
 /** A form asking for one reference field, with the type it demands. */
 function asking(of: string): StateFormModel {
@@ -111,7 +111,7 @@ describe("typed references", { concurrency: true }, () => {
     // the walk wrote to a worktree, which hid every node the record authored.
     // It now reads the CHOSEN corpus — trunk, or an open record — so the rule
     // is that its root comes from the pick, never straight from the session.
-    const ui = readFileSync(fileURLToPath(new URL("../engine/render.ts", import.meta.url)), "utf8");
+    const ui = mirrorSource();
     for (const call of [...ui.matchAll(/traceCard\([^,]*/g)]) {
       assert.match(call[0], /pick\?\.path/, `the trace graph reads the chosen corpus, not a root of its own: ${call[0]}`);
     }
@@ -227,7 +227,7 @@ describe("typed references", { concurrency: true }, () => {
   // payload must CARRY the hint, and the surface must DRAW it. This exact
   // wire shipped half-done and the owner saw a raw {token} on screen.
   test("the mirror's own source reads field_hints and draws the template link", () => {
-    const src = readFileSync(fileURLToPath(new URL("../engine/render.ts", import.meta.url)), "utf8");
+    const src = mirrorSource();
     assert.match(src, /field_hints/, "the surface reads the resolved hints");
     assert.match(src, /hint\.placeholder/, "the empty row shows the RESOLVED placeholder, never the raw token");
     assert.match(src, /hint\.of_template/, "and the item template is reachable from the field");

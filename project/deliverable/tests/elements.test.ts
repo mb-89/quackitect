@@ -3,17 +3,16 @@
 // a webview asset, so the library is one script tag and one route — and the
 // project's no-build-step rule survives.
 import { strict as assert } from "node:assert";
-import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { CallLog } from "../engine/calllog.ts";
 import { startMirror } from "../engine/mirror.ts";
 import { Session } from "../engine/session.ts";
-import { freshRoot } from "./helpers.ts";
+import { freshRoot, mirrorSource } from "./helpers.ts";
 
-const engineDir = join(fileURLToPath(new URL(".", import.meta.url)), "..", "engine");
-const renderSrc = (): string => readFileSync(join(engineDir, "render.ts"), "utf8");
+const _engineDir = join(fileURLToPath(new URL(".", import.meta.url)), "..", "engine");
+const renderSrc = (): string => mirrorSource();
 
 // A port of its own, so this never fights a live mirror on 7333.
 const PORT = 7519;
