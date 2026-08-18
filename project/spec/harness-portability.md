@@ -426,3 +426,181 @@ TWO NEIGHBOURING RECORDS TOUCH THIS AND NEITHER CLAIMS IT.
   and method. A per-host projection of the prompt layer is the same shape of
   problem, and building both without reading either is how two resolution
   chains end up in one product.
+
+## Part 9 — can one config format serve everything?
+
+THE OWNER ASKED IT DIRECTLY, and the honest answer is PARTLY, split cleanly
+down one line.
+
+### Yes, and it already works with no setting to turn on
+
+VS Code's Copilot chat reads these BY DEFAULT today, in its local agent
+harness. No preview flag, no opt-in:
+
+| artifact | setting | default |
+| --- | --- | --- |
+| `CLAUDE.md` at root, in `.claude/`, in `~/.claude/` | `chat.useClaudeMdFile` | **true** |
+| `.claude/rules/*.md`, honouring Claude's `paths:` frontmatter | `chat.instructionsFilesLocations` | **on** |
+| `.claude/agents/*.md` | `chat.agentFilesLocations` | **on** |
+| `.claude/skills/` | `chat.agentSkillsLocations` | **on** |
+| `.mcp.json`, Claude's own project MCP file | — | **on since VS Code 1.118** |
+
+`.mcp.json` IS THE ONE GENUINELY SHARED FILE. Claude Code wrote the format;
+VS Code adopted it at 1.118 and Copilot CLI reads it as `.mcp.json` or
+`.github/mcp.json`. So the answer for the server entry is yes, and this
+repository is already most of the way there — `cage/mcp.json` and
+`cage/copilot-mcp-config.json` are BYTE-IDENTICAL DUPLICATES today, and
+neither declares a `type`. Add `"type": "stdio"`, keep one file, delete the
+other.
+
+### No, for hooks, and that is the half that matters here
+
+`chat.useClaudeHooks` exists. It is **preview, and it defaults to false**.
+Turning it on makes VS Code execute the `hooks` block from
+`.claude/settings.json`. Then four things bite:
+
+1. **IT CANNOT BE COMMITTED.** The setting is declared
+   `disallowConfigurationDefault: true` and `restricted: true`, so it cannot
+   be shipped as a workspace default and it requires workspace trust. Every
+   person turns it on by hand, or it is off.
+2. **MATCHERS ARE SILENTLY IGNORED.** VS Code's own documentation says so:
+   hook matchers are parsed and not applied, so every hook runs on every
+   event. Measured against this repository's own cage, that is not academic:
+   - `PostToolUse` with matcher `WebSearch` fires `se-hook-websearch.ts`
+     **after every tool call**, writing a web-search record to the feed for
+     calls that were not searches. The log stops being true.
+   - The two `SessionStart` entries, matched `startup|resume|clear` and
+     `compact|clear`, BOTH fire on every start — so `se-hook-start.ts` runs
+     twice and the second one says `--compacted` on a session that was not.
+3. **EIGHT EVENTS OF ABOUT THIRTY-ONE.** VS Code maps `SessionStart`,
+   `UserPromptSubmit`, `PreToolUse`, `PostToolUse`, `PreCompact`,
+   `SubagentStart`, `SubagentStop` and `Stop`. An unrecognised event key is
+   dropped with no warning and no diagnostic.
+4. **DUPLICATE FIRING IS A WON'T-FIX.** A hook defined in both
+   `.github/hooks/` and `.claude/settings.json` runs twice; VS Code closed
+   that as not planned. THIS REPOSITORY HAS EXACTLY THAT SHAPE — `Stop` is
+   declared in both. It survives only because `se-hook-stop.ts` carries a
+   bites-once valve keyed on `stop_hook_active`. That was written for a
+   different reason and it happens to cover this. Nothing else would be so
+   lucky.
+
+### And no, for the rest of the cage
+
+`.claude/settings.json`'s NON-HOOK KEYS ARE NOT READ BY VS CODE AT ALL —
+`permissions`, `env`, `model`, `outputStyle`, everything. So the deny list
+that IS the cage does not apply there, which confirms in GitHub's own code
+what `cage/vscode-mcp.json` already suspected from observation: a chat panel
+opened by hand is not caged.
+
+`.claude/commands/` and output styles have no cross-tool story at all.
+
+### The rule this settles
+
+ONE FORMAT FOR WHAT IS DECLARATIVE. Instructions, rules, agents, skills and
+the MCP server entry are all already shared, and the duplicates in `cage/`
+can go.
+
+PER-HOST SHIMS FOR WHAT EXECUTES. Hooks are not portable by a setting. They
+need a per-harness adapter, which is the same conclusion the outward scan
+reached from the other direction: the one project closest to this design
+also ended up with a thin per-harness shim, and there is no way around it.
+
+## Part 10 — the work, in order
+
+EIGHT MILESTONES. The first two are the ones that make everything after them
+provable, so they go first even though neither fixes a symptom.
+
+### M1 — the lane learns who is calling it
+
+Read `clientInfo` from `initialize`, carry it on the session, and stamp it on
+every call-log record beside `se_version`.
+
+DUAL-ERA FROM THE START. The 2026-07-28 spec removed the handshake and moves
+client identity into `_meta` on every request, and no tracked client
+implements that yet. Read both, prefer whichever arrives.
+
+DONE WHEN: `se_log_query` can group by client, and the harness shows up in the
+record. Everything below can then be argued with evidence instead of feel.
+
+### M2 — host limits become data, and preflight checks them
+
+One file of documented per-host thresholds, each with its source and the date
+it was read. Preflight measures the tree against the TIGHTEST and fails loudly.
+
+WHAT IT MEASURES: every tool description; every guidance document as it goes on
+the wire; the prompt-layer projection per target; the tool count.
+
+DONE WHEN: a document that grows past a host's limit fails the battery on the
+commit that grew it, naming the host and the number.
+
+WHY IT IS SECOND AND NOT LAST. Five breaks were found by hand today. A sixth
+will arrive the week after this iteration ships, and the only difference that
+matters is whether it arrives as a red build or as a bad session nobody can
+explain.
+
+### M3 — close the five
+
+- `se_pull`'s description under 2,048 bytes, load-bearing detail first.
+- `refusals.md` (21,675) and `craft/software.md` (27,130) split so no document
+  crosses 20 KiB on the wire. `retro.md` at 19,460 is the warning.
+- The `AGENTS.md` projection under Codex's 32 KiB, or projected per host.
+- The Copilot cage re-verified against a live CLI and the blacklist closed.
+  `bash` and `rg` are the two that matter. Use the probe command already in
+  `copilot-cage.json` and edit from what it prints, never from this document.
+- The stop hook's eight-block ceiling on Copilot CLI made known to the engine.
+
+### M4 — one config format for what is declarative
+
+Collapse `cage/mcp.json` and `cage/copilot-mcp-config.json` — they are
+byte-identical today. Add `"type": "stdio"`, which is the spelling both
+ecosystems accept. Check whether `cage/vscode-mcp.json` is still needed now
+that VS Code reads `.mcp.json` natively from 1.118.
+
+DO NOT REACH FOR `chat.useClaudeHooks`. Part 9 says why: it cannot be
+committed, it ignores matchers, and this repository's matchers are load-bearing.
+
+### M5 — the matcher hazard is removed rather than documented
+
+Two of this repository's four hook entries do the wrong thing on a host that
+ignores matchers, and one of them corrupts the feed. Make each hook script
+verify its own trigger from its payload rather than trusting that the matcher
+filtered it. A script that checks the tool name itself is correct on every
+host, and the matcher becomes an optimisation rather than a guarantee.
+
+### M6 — the conformance statement lands on the interface
+
+Extend `if-agent-harness-to-entrypoint` with what a host must provide. Its
+`form` already says `MCP over stdio` and the lane also serves HTTP; its source
+already claims both hosts; nothing checks either.
+
+STATE THREE THINGS: which transports are legal, what an answer may weigh, and
+what a host must provide for the walk to be ENFORCED rather than ADVISED. The
+third is the tier model from Part 1, and it is the honest version of what
+`raid-obsidian-and-harness` currently claims.
+
+### M7 — decide what the cloud agent is for
+
+The cloud agent caps a session at 59 minutes and one pull request, over one
+repository, on a filesystem it destroys at the end. An iteration is ruled at
+roughly a day.
+
+THIS IS A DECISION, NOT A BUILD. Expedition host, single-milestone host, or not
+a walk host at all. Record which, and stop.
+
+### M8 — put the architecture question to the owner
+
+THE UNCOMFORTABLE FINDING, and this iteration surfaces it rather than settling
+it. The two highest-adoption agent-agnostic workflow systems, spec-kit and
+BMAD, are install-time GENERATORS from a neutral source into each harness's own
+files, and neither is an MCP server. This system is an MCP server with 34 verbs
+and a projected prompt layer — which is half of that pattern already.
+
+WHAT IS GENUINELY RIGHT HERE, so the question is asked fairly: refusals travel
+as `isError` results carrying clause and remedy, which the scan names as the
+one portable enforcement primitive; and `se_pull` is the single-tool loop the
+scan names as the strongest enforcement shape available. Neither needs
+defending.
+
+THE QUESTION IS THE OTHER 33 VERBS, against Cursor's 40-tool ceiling across all
+servers and Claude Code's deferred schema loading. Ask it; do not answer it
+here.
