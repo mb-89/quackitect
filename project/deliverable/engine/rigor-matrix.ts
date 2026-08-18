@@ -112,20 +112,7 @@ function parseDoInputs(v: unknown): { label: string; description: string }[] | u
   return out.length > 0 ? out : undefined;
 }
 
-// Evidence lives in FRONTMATTER (owner ruling 2026-07-30): a nested YAML
-// list the form machinery consumes directly. A body "## Evidence form"
-// section is refused — one truth, no echo.
-//
-// EXPORTED, BECAUSE A DRAWN STATE SPEAKS THE SAME LANGUAGE (owner ruling
-// 2026-08-08). The canvas compiler had its own evidence shape — one line per
-// field, carrying a name, a description and required-or-optional, and nothing
-// else. No template, no item type, no guidance. So a hand-drawn state could
-// never ask for what a matrix row asks for every day, and the first drawn
-// state that wanted a real form found the key it wrote was read by nobody.
-//
-// After seeding there is no mechanical difference between a state the matrix
-// compiled and a state somebody drew. This is where that stops being two
-// things.
+// Evidence lives in frontmatter. see dsp-method-compilation.md#a-drawn-state-speaks-the-matrixs-language
 export function parseEvidence(fm: Record<string, unknown>, file: string, body: string): EvidenceField[] {
   if (section(body, "Evidence form")) {
     throw new Error(`${file} carries a body evidence section — the frontmatter evidence block is the single truth`);
@@ -205,22 +192,7 @@ function refuseBadRow(row: RigorMatrixRow): void {
       `matrix row ${row.name} runs a sub-machine AND declares evidence — the walk descends past this state and completes it on the way out, so its form is never served; move the fields into the sub-machine's own states`,
     );
   }
-  // A GATE MAY DECLARE NOTHING, because the compiler gives it the four
-  // standard rounds and those are evidence. A gate whose own fields all
-  // reduced to mechanical checks SHOULD end up empty — re-asking a check
-  // that can only pass is what teaches a reader to skim (owner, 2026-08-07).
-  //
-  // A SUB-MACHINE STATE IS EXEMPT FOR THE OPPOSITE REASON: not that its
-  // evidence reduced to nothing, but that it lives one level down.
-  //
-  // A FALLBACK STATE IS EXEMPT TOO (owner ruling 2026-08-11): its proof is
-  // the state it recovers re-passing. fix-findings' findings ARE the red
-  // verifications, generated — a form here would re-ask what the confirm
-  // run answers.
-  // A LAW-PROVEN STATE IS EXEMPT TOO (owner ruling 2026-08-11): its proof
-  // is computed. fill-story-evidence's claim — every slide's evidence half
-  // non-empty — is a law over the story nodes, and a field here would
-  // re-ask what the law answers.
+  // see dsp-method-compilation.md#when-a-state-may-declare-no-evidence
   if (
     row.state_kind !== "terminal" &&
     row.state_kind !== "gate" &&
@@ -442,11 +414,7 @@ function parseMatrixRow(
   return { row, fm };
 }
 
-/** A MIRROR IS A REFERENCE, NEVER A COPY (owner law 2026-08-04). A row
- *  carrying `same_as: <state>` IS that state, standing in the walk: how it
- *  WORKS — its tools, its guidance, its entry reading — comes from the ONE
- *  note in machines/states/, read here so an edit there reaches both. The
- *  row keeps only its seam: statement, evidence, dependencies, cells. */
+/** see dsp-method-compilation.md#a-mirror-is-a-reference-never-a-copy */
 function mergeSameAs(dir: string, row: RigorMatrixRow, fm: Record<string, unknown>): void {
   if (typeof fm.same_as !== "string" || fm.same_as === "") return;
   const note = parseStateNote(readFileSync(join(dir, "..", "states", `${fm.same_as}.md`), "utf8"));

@@ -1295,19 +1295,7 @@ export function coreTools(
         );
         testVerdicts.set(id, entry);
         persistTestJob(se, id, entry);
-        // A SCOPED RUN ANSWERS THE CALLER THAT ASKED (i11 2026-08-16).
-        //
-        // MEASURED THE DAY BEFORE THIS LANDED: 494 se_test calls produced 66
-        // verdicts. About 428 asked only whether a job had finished, and a
-        // fifty-second battery cost ten calls to watch.
-        //
-        // THE JOB MACHINERY STAYS UNDER IT. The verdict is still persisted and
-        // still logged, so `{job}` keeps working and nothing that reads a job
-        // by id has to change — the caller simply stops having to.
-        //
-        // THE BATTERY STILL HANDS OFF, and that is not an oversight. It is the
-        // engine's to fire at verification, where nobody is waiting on the
-        // answer, and blocking a caller for fifty seconds buys nothing.
+        // see dsp-lane-door.md#a-scoped-run-answers-the-caller-that-asked
         if (decision.scope === "scoped") {
           await entry.done;
           return entry.verdict ?? { job: id, running: false };
@@ -1905,32 +1893,7 @@ export function buildServer(
     return result;
   });
 
-  // THE UPDATE RIDES FIRST — applied before any other verdict (the
-  // narration stands even when the call itself is then refused), logged as
-  // its own record, paying the toll. Stripped so handlers never see it.
-  //
-  // BUT A BAD UPDATE NEVER DESTROYS ITS CALL (owner ruling 2026-07-28).
-  // Narration is commentary, and commentary that vetoes the act it comments
-  // on has the causality backwards. A brief with one semicolon too many used
-  // to reject the whole call and take the payload with it — a four-thousand
-  // word answer, a four-file atomic patch, a finished note — all discarded
-  // over the punctuation of a label riding alongside. Measured at the retro:
-  // this mechanism caused 18 of 25 sampled refusals.
-  //
-  // The work lands. The complaint rides back on the result. And the toll goes
-  // UNPAID, so the rule keeps its teeth — it just bites the narration now,
-  // instead of the work.
-  // METHOD CANNOT BE CHANGED FROM INSIDE A RECORD (owner ruling 2026-08-07).
-  //
-  // While a record is bound, laneRoot sends a METHOD write into that record's
-  // worktree, and the fan-out pushes it from there to trunk. So editing
-  // guidance or the engine while bound publishes the RECORD's copy over the
-  // shared one. It happened twice in one afternoon, and the first time it ate
-  // two lane verbs out of trunk's tool list.
-  //
-  // GUARDED AT DISPATCH, before the handler runs, so the whole call refuses
-  // and nothing is half-written. A guard at the write sites would refuse
-  // partway through a multi-file patch.
+  // The update rides first and is stripped before the handler. see dsp-lane-door.md#a-bad-update-never-destroys-its-call
   const WRITE_TOOLS = new Set(["se_file_write", "se_file_patch", "se_file_replace", "se_file_delete", "se_file_move"]);
   // ANY WRITE CLEARS THE ROUTE MEMO. Which claims stand depends on the
   // evidence AND on the trace nodes that evidence references, so a node
@@ -1947,22 +1910,7 @@ export function buildServer(
   server.addGuard((tool) => {
     if (WRITE_TOOLS.has(tool)) session.forgetRoute();
   });
-  // SE-C-134 STOOD HERE, and it is retired (owner ruling 2026-08-14).
-  //
-  // It refused a method write made from inside a record, because such a write
-  // landed in the record's own worktree and then fanned out over trunk at the
-  // merge. That really happened on 2026-08-07: it overwrote trunk's tool list
-  // and deleted two lane verbs.
-  //
-  // THE REFUSAL IS REPLACED BY A RESOLUTION, never merely dropped. Shared
-  // method now resolves to the MACHINE ROOT whatever tree is bound, in
-  // session.laneRoot, which is what resolve.ts already said in storeFor. A
-  // method write cannot land in a tree that does not own it, so there is
-  // nothing left to refuse.
-  //
-  // WHAT IT COST WHILE IT STOOD: escape to the desk, edit, aim back, and a
-  // 44-hop replay that timed out twice on the way in. Six times in one
-  // session on 2026-08-14, and twice more the day it was removed.
+  // see dsp-lane-door.md#method-cannot-be-changed-from-inside-a-record
 
   let updateComplaint: RejectionPayload | undefined;
   let updateRejection: Rejection | undefined;

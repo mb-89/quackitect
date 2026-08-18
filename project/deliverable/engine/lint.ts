@@ -34,24 +34,7 @@ const proseOf = (l: string): string => {
     .reduce((a, b) => (b.length > a.length ? b : a), "");
 };
 
-/** THE FULL-STOP EVASION (owner ruling 2026-08-07).
- *
- *  The chain rules count separators INSIDE one sentence, so the way around
- *  them is a full stop. "Open it. Read it. Fill both cells." Three steps,
- *  three sentences, not one separator anywhere, and nothing fired.
- *
- *  That was the actual evasion, three times in one afternoon, each time after
- *  being told. A rule an author walks around by changing punctuation is an
- *  advisory, and an advisory is not a rule.
- *
- *  TWO SHAPES, one per surface:
- *
- *  - A PROSE LINE of several short sentences is a list nobody rendered.
- *    SHORT is the discriminator: ordinary prose runs long and varied, while a
- *    buried list runs short and parallel because each sentence is one item.
- *  - A LIST ITEM of several sentences is the same thing one level down.
- *    Rendering the list is half the discipline; one thought per item is the
- *    other half. Items were not linted at all before this. */
+/** see dsp-quality-toolchain.md#the-full-stop-evasion */
 function buriedList(l: string, i: number, cfg: Cfg): LintFinding[] {
   const parts = sentencesOf(proseOf(l));
   const item = MARKER.test(l);
@@ -151,25 +134,7 @@ function loadCfg(root: string): Cfg {
   }
 }
 
-/** THE PROSE IN FRONTMATTER IS STILL PROSE (owner report 2026-08-08).
- *
- *  The lint used to drop the whole frontmatter block, which meant it never
- *  read a single `guidance:` or `description:` — the exact text a person sees
- *  in an evidence form. voice.md binds those in as many words: "Embedded prose
- *  fields follow the same rules. State guidance, tool descriptions, form help
- *  — short sentences, paragraphs, lists." The one surface the rule names was
- *  the one surface the rule could not see.
- *
- *  It surfaced when a six-line anchor list, written as prose inside a field's
- *  guidance, came back clean.
- *
- *  MASK, NEVER STRIP. The structural half of each line is blanked and the
- *  prose half stays where it is, so every finding keeps its real line number
- *  and a person can go straight to it.
- *
- *  A VALUE THAT IS NOT PROSE IS NOT LINTED. An id, a number, a boolean, a
- *  path, a single word — none of them is a sentence, and complaining about
- *  them would teach people to switch the lint off. */
+/** see dsp-quality-toolchain.md#prose-in-frontmatter-is-still-prose */
 function maskFrontmatter(text: string): { text: string; keyOf: string[] } {
   const lines = text.split(/\r?\n/);
   const keyOf: string[] = lines.map(() => "body");
@@ -202,20 +167,7 @@ function maskFrontmatter(text: string): { text: string; keyOf: string[] } {
       out[i] = "";
       continue;
     }
-    // PROSE IS A SENTENCE, not a token and not a list of tokens.
-    //
-    // A LINT THAT CRIES WOLF GETS SWITCHED OFF. `legal_tools: se_file_read,
-    // se_file_write, se_file_patch` is a YAML list written inline — it trips
-    // the comma-chain rule and there is nothing to fix, because a list of tool
-    // names is not an unrendered sentence. Same for a citation with a
-    // semicolon in it.
-    //
-    // A ONE-LINE FIELD IS NOT EXEMPT (owner ruling 2026-08-08). A `statement`
-    // that trips the chain rule is a statement carrying too much, and the fix
-    // is TWO SHORT SENTENCES rather than an exemption — the readers are not
-    // native English speakers, and a nested one-liner is the hardest thing to
-    // read there is. An exemption here would have made the lint agree with the
-    // text instead of the text agree with the rule.
+    // see dsp-quality-toolchain.md#a-lint-that-cries-wolf-gets-switched-off
     const words = value.replace(/^["']|["']$/g, "").trim();
     const parts = words
       .split(/[,;]/)

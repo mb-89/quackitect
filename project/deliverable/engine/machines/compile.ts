@@ -76,16 +76,7 @@ export function resolveRef(root: string, canvasPath: string, ref: string): strin
   return join(resolve(root), ref);
 }
 
-// THE DRAWING IS DATA, AND DATA IS LIVE (owner ruling 2026-07-29). Editing a
-// state note used to do nothing until se_reload, which contradicts the law
-// that the markdown is the single truth: the file said one thing and the
-// running lane enforced another.
-//
-// Compiling on every gate would re-read a canvas and a dozen notes per call,
-// so the result is cached against the SOURCES it was built from. Anything
-// the compile touched is watched; a changed size or mtime rebuilds. The
-// canvas is always among them, so a state ADDED to the drawing invalidates
-// too — which a watch on the notes alone would miss.
+// see dsp-method-compilation.md#the-drawing-is-data-and-data-is-live
 const CACHE = new Map<string, { decl: MachineDecl; sources: string[]; stamp: string; epoch: number }>();
 
 // ONE VALIDATION PER CALL. The stamp stays CONTENT (the law above), but one
@@ -267,15 +258,7 @@ function drawnEdgesOf(machineId: string, canvas: LoadedCanvas, byElement: Map<st
       declared,
       id: edge.id,
     });
-    // ONE ARROW, BOTH WAYS (owner ruling 2026-07-28). Drawing a forward edge
-    // and a return edge as two separate arrows is what Obsidian makes
-    // tedious; a DOUBLE-HEADED arrow is what a person naturally draws
-    // instead, and Obsidian offers it in its own editor. So it means exactly
-    // that pair.
-    //
-    // The return half is left UNDECLARED on purpose, so the depth rule below
-    // names it: forward is whichever end lies deeper from start, and the
-    // other way round is the return. Nothing new decides anything.
+    // see dsp-method-compilation.md#one-arrow-both-ways
     if ((edge as { fromEnd?: string }).fromEnd === "arrow" && ((edge as { toEnd?: string }).toEnd ?? "arrow") === "arrow") {
       drawn.push({
         from: to,
@@ -574,15 +557,7 @@ export function stateFromNote(machineId: string, ref: string, notePath: string, 
   const exit = conditionDict(machineId, ref, root, "exit", x);
   const tags = asList(x.tags);
   const submachine = asString(x.submachine);
-  // THE BAR IS AUTHORED IN A DRAWING TOO, exactly as it is in a matrix row.
-  // Without this a drawn fan could never fold: branchKind looks for a busbar
-  // above the legs before it calls the branch an AND, and a canvas had no way
-  // to say so. Found writing the finders fan (owner ruling 2026-08-08).
-  //
-  // A DRAWN `state_kind: join` IS A BUSBAR, and nothing else. It stays in the
-  // drawing vocabulary because a person drawing a machine reaches for the
-  // word, and it compiles to the one field the kernel, the submit check and
-  // the layout all read.
+  // see dsp-method-compilation.md#the-bar-is-authored-in-a-drawing-too
   const busbar = x.busbar === true || kind === "join";
   // A STATE THAT RUNS A MACHINE CARRIES NO EVIDENCE OF ITS OWN (owner ruling
   // 2026-08-14). Evidence belongs to a state, and a sub-machine is not a

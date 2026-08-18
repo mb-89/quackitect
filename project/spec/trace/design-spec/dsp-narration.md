@@ -78,3 +78,33 @@ carrying evidence beside the proof pays like any other work.
 HAND-TYPED CLOCK TIMES MEASURED UNCALIBRATABLE — a median ratio of 0.01 between
 what was promised and what was spent. Durations come from the engine's own
 timestamps instead, where nobody can guess.
+
+## The nudge grew teeth
+
+IT STAYED ADVICE FOR A GOOD REASON: refusing work over its commentary is a
+mistake this mechanism already made once. Advice lost anyway. In one
+fifteen-hour window the nudge fired five times and was ignored five times, once
+at nineteen updates with nothing closed.
+
+SO IT TAKES THE TOLL'S OWN SHAPE, which is already trusted: one warning, then
+the next offending call refuses. The counter clears on any resolve, so a walk
+with a moving checklist never sees it.
+
+WHAT KEEPS IT FROM BEING THE OLD MISTAKE: a resolving op is never refused. The
+remedy is always reachable in one call, and the open node map rides the
+refusal, so the id needed to obey it is already in hand.
+
+## An update names the item it is about
+
+AN UPDATE THAT MOVES NOTHING ON THE CHECKLIST IS NARRATION WEARING PROGRESS'S
+CLOTHES. The shape that produced this rule was a board of thirteen yellow items
+collecting a pile of checked leaves underneath.
+
+SO WHEN A CHECKLIST STANDS, an update says which item it is about. With none
+open there is nothing to attach to and a bare update is exactly right. It is
+only affordable because the open node map rides home on every call, so naming
+one costs a glance.
+
+IT IS SCOPED TO THIS VISIT. Another state's open checklist is not this state's
+business, and a walk that had moved on would be refused over items it can no
+longer reach.

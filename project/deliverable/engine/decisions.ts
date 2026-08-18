@@ -498,20 +498,7 @@ export class Decisions {
   /** What attachTo corrected on THIS call — read once by apply(). */
   private lastCorrection: string | undefined;
 
-  /** THE NUDGE GREW TEETH (owner ruling 2026-08-07).
-   *
-   *  It stayed advice for good reason, recorded below: refusing work over its
-   *  commentary is a mistake this field already made once. Advice lost anyway.
-   *  In one 15-hour window the nudge fired five times and was ignored five
-   *  times, once at nineteen updates with nothing closed.
-   *
-   *  So it takes the TOLL'S OWN SHAPE, which the owner already trusts: one
-   *  warning, then the next offending call refuses. The counter clears on any
-   *  resolve, so a walk with a moving checklist never sees this.
-   *
-   *  WHAT KEEPS IT FROM BEING THE OLD MISTAKE: a resolving op is never
-   *  refused. The remedy is always reachable in one call, and the open node
-   *  map rides the refusal, so the id needed to obey it is already in hand. */
+  /** see dsp-narration.md#the-nudge-grew-teeth */
   private refuseIfStalled(u: DecisionOp): void {
     if (u.op === "done" || u.op === "obsolete" || u.op === "revert" || u.op === "defer") return;
     if (this.sinceResolve < Decisions.REFUSE_AFTER) return;
@@ -714,17 +701,7 @@ export class Decisions {
   }
 
   private applyUpdate(visit: string, u: DecisionOp): void {
-    // AN UPDATE THAT MOVES NOTHING ON THE CHECKLIST IS NARRATION WEARING
-    // progress's clothes (owner, 2026-07-29, watching a board of thirteen
-    // yellow items collect a pile of checked leaves underneath).
-    //
-    // So when a checklist STANDS, an update says which item it is about.
-    // With none open there is nothing to attach to and a bare update is
-    // exactly right. This is only affordable because the open node map
-    // now rides home on every call - naming one costs a glance.
-    // SCOPED TO THIS VISIT. Another state's open checklist is not this
-    // state's business, and a walk that had moved on would be refused
-    // over items it can no longer reach.
+    // see dsp-narration.md#an-update-names-the-item-it-is-about
     if (u.node === undefined && [...this.nodes.values()].some((n) => n.visit === visit && n.status === "open")) {
       throw new Rejection({
         clause: CLAUSES.DECISION_NODE,
