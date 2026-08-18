@@ -3493,21 +3493,45 @@ export class Session {
     // own start with nothing to answer WITH, and the only way to learn the
     // doors was to guess one and read the refusal.
     const branchOpts = this.pullOptions();
+    // A `do` THAT CANNOT MOVE MUST SAY SO, AND SAY WHAT WOULD MOVE IT.
+    //
+    // MEASURED ON THE i35 CLOUD RUN, five times: at a blessed kickoff gate,
+    // after every build chunk, and at verification. The pull answered `do`
+    // with "the stopped step says what it wants" while no step had said
+    // anything, and repeated indefinitely. `se_why` often held the whole
+    // answer. The cure was an se_aim at a downstream state, and nothing said
+    // so.
+    //
+    // STUCK IS THREE FACTS AT ONCE: no hop was walked, nothing arrived, and
+    // no step refused. Any one of those alone is ordinary.
+    const hops = Array.isArray(swept.swept) ? swept.swept.length : 0;
+    const stuck = hops === 0 && swept.arrived !== true && swept.refusal === undefined;
+    // THE DOORS WERE ALWAYS COMPUTED AND WITHHELD AT A BRANCH OF ONE. That
+    // withholding is the whole of the silence: one door is exactly the case
+    // where the walker cannot guess.
     return {
       pull: "do",
       ...head(),
       walked: swept.swept ?? [],
       arrived: swept.arrived === true,
-      ...(branchOpts.length > 1 ? { options: branchOpts } : {}),
+      ...(branchOpts.length > 1 || (stuck && branchOpts.length > 0) ? { options: branchOpts } : {}),
       here: this.pullHere(),
       ...(swept.banners !== undefined ? { banners: swept.banners } : {}),
       ...(swept.refusal !== undefined ? { stopped_at: swept.stopped_at, refusal: swept.refusal } : {}),
-      do:
-        swept.refusal !== undefined
-          ? "the stopped step says what it wants — do that, then pull again"
-          : "do what the guidance asks, then pull again",
+      do: this.doAdvice(swept.refusal !== undefined, stuck, branchOpts.length > 0),
       ...extra(),
     };
+  }
+
+  /** WHAT A `do` TELLS THE WALKER TO DO. Lifted out of pullAfterSweep so the
+   *  stuck case can say something useful without pushing that function past
+   *  its complexity bound. */
+  private doAdvice(refused: boolean, stuck: boolean, hasDoors: boolean): string {
+    if (refused) return "the stopped step says what it wants — do that, then pull again";
+    if (!stuck) return "do what the guidance asks, then pull again";
+    const why = this._target === "" ? ", because no target is set" : ` toward ${this._target}`;
+    const doors = hasDoors ? " — the doors from here are in `options`" : "";
+    return `nothing is owed here and the walk did not move${why}. Aim at where you are going with se_aim${doors}, then pull. se_why names what holds any state grey.`;
   }
 
   /** THE DOORS — idle's edges of the main machine, with statement, kind
