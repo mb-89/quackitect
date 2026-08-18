@@ -9,7 +9,7 @@
 //
 // State is in-memory: a server restart mid-session drops back to start, and
 // the next refused call's remedy re-boots the agent in one turn.
-import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
@@ -40,12 +40,11 @@ import { CallLog } from "./calllog.ts";
 import type { CanvasData } from "./canvas.ts";
 import { conditionNotePath } from "./conditions.ts";
 import { Decisions, replayFile } from "./decisions.ts";
-import { type GeneratedMachine, generateContinueExpedition, generateExpeditionArchive, shortId } from "./expmachine.ts";
+import { type GeneratedMachine, shortId } from "./expmachine.ts";
 import {
   confirmPrefill,
   type FormLint,
   type FormTemplate,
-  fieldContent,
   formTemplatePath,
   lintForm,
   parseFormTemplate,
@@ -67,8 +66,6 @@ import {
 } from "./forms.ts";
 import { appendNote, drainNote, pendingNotes } from "./inbox.ts";
 import {
-  generateIterationArchive,
-  generateIterations,
   type Iteration,
   iterationDrift,
   itFind,
@@ -80,7 +77,6 @@ import {
   markStarted,
   pinIsStale,
   pinIteration,
-  pinnedCanvas,
   readItRecord,
   repinColumn,
 } from "./iterations.ts";
@@ -89,25 +85,29 @@ import { pathKind, resolveInRoot, seDir } from "./paths.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { probesMissed, readingProbes } from "./readproof.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
-import { anyJobRunning } from "./run.ts";
 import { defaultAutonomy, levelName, loadLevels, loadStopAt, notchName, tierOf, valueFor, weightName } from "./scale.ts";
 import { requiredDependsOn } from "./seed.ts";
-import { bindChart, bindView, mintFlipTripwires, mintScenarioEntries, refFacts, refPaths } from "./sessionforms.ts";
 import {
-  buildPortableForm,
-  chosenOption,
-  claimProblems,
-  type EmbeddedDoc,
-  elementMatrixArgs,
-  nodeField,
-  nodeList,
-  parseIsland,
-  stateFormFields,
-  stateFormModel,
-  tableRow,
-  templateOwed,
-  templateProblems,
-} from "./stateform.ts";
+  agentCopy,
+  amendOps,
+  bindChart,
+  bindView,
+  evidenceKey,
+  kickoffSizeFromForm,
+  mintFlipTripwires,
+  mintScenarioEntries,
+  refFacts,
+  refPaths,
+  stateFormChecked,
+  stateFormScaffold,
+} from "./sessionforms.ts";
+import { Liveness } from "./sessionlive.ts";
+import { ReadGate } from "./sessionreads.ts";
+import { Scripts } from "./sessionscript.ts";
+import { Views } from "./sessionviews.ts";
+import { elementMatrixArgs, nodeField, nodeList, stateFormFields, stateFormModel, tableRow } from "./stateform.ts";
+import { claimProblems, templateOwed, templateProblems } from "./stateform-problems.ts";
+import { buildPortableForm, type EmbeddedDoc, parseIsland } from "./stateform-sheet.ts";
 import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
 import { corpusVersion, loadTrace, noteOf, traceDir } from "./trace.ts";
 import { type Expedition, expClose, expFind, expList, expNew, itCloseShipped, readRecord } from "./worktree.ts";
@@ -188,7 +188,7 @@ function newInstance(m: MachineDecl): MachineInstance {
   };
 }
 
-interface SubRun {
+export interface SubRun {
   decl: MachineDecl;
   instance: MachineInstance;
   /** The PARENT machine's state this sub fills — one level up the stack. */
@@ -242,12 +242,16 @@ export class Session {
    *  cannot be had. Read through `machine`, never directly. */
   private _machine: MachineDecl;
   readonly instance: MachineInstance;
-  private subs: SubRun[] = [];
+  /** Not private because a private member cannot satisfy a structural
+   *  interface, and the drawings read this through ViewHost. */
+  subs: SubRun[] = [];
   private bannerShown = false;
   /** The bound expedition — while set, the lane works in its worktree. */
   private bound?: Expedition;
   /** Evidence store: "<machine>/<state>" → what was submitted. */
-  private readonly evidence = new Map<string, Record<string, unknown>>();
+  /** Not private because a private member cannot satisfy a structural
+   *  interface, and Scripts reads this through its host. */
+  readonly evidence = new Map<string, Record<string, unknown>>();
   /** Which states the agent may enter alone. see dsp-legible-controls.md#the-autonomy-dial */
   private _autonomy = 0;
   /** see dsp-walk-machine.md#the-target */
@@ -272,6 +276,111 @@ export class Session {
   /** The decision graph — the lane writes it (ops ride the update field),
    *  the mirror reads it (the details pane renders the tree). */
   readonly decisions: Decisions;
+  /** see dsp-walk-machine.md#the-read-proof */
+  /** see dsp-boot-and-power.md#what-survives-a-reload-and-what-does-not */
+  /** see dsp-walk-machine.md#a-static-sub-machine-is-a-drawing */
+  private readonly views = new Views(this);
+  /** see dsp-walk-machine.md#the-suites-spawn-skip */
+  private readonly scripts = new Scripts(this);
+
+  /** The script surface the outside asks for. */
+  scriptRun(stateId: string): Promise<Record<string, unknown>> {
+    return this.scripts.scriptRun(stateId);
+  }
+
+  busy(): boolean {
+    return this.scripts.busy();
+  }
+
+  progress(): { done: number; total: number; label: string } | undefined {
+    return this.scripts.progress();
+  }
+
+  scriptStatus(m: MachineDecl, s: StateDecl): { ran: boolean; ok: boolean; output: string; running: boolean } {
+    return this.scripts.scriptStatus(m, s);
+  }
+
+  /** The drawings the outside asks for. */
+  generatedView(id: string): { decl: MachineDecl; canvas: CanvasData } | undefined {
+    return this.views.generatedView(id);
+  }
+
+  viewChain(id: string): string[] {
+    return this.views.viewChain(id);
+  }
+
+  viewFor(id: string): { decl: MachineDecl; canvas: CanvasData } | undefined {
+    return this.views.viewFor(id);
+  }
+
+  viewRun(declId: string): { done: string[]; completed: boolean } {
+    return this.views.viewRun(declId);
+  }
+
+  private readonly live = new Liveness({
+    persist: () => this.persistSettings(),
+    describe: () => this.describe(),
+  });
+
+  /** The liveness surface the outside reaches for. */
+  get power(): { block_sleep: boolean; shutdown_at_idle: boolean } {
+    return this.live.power;
+  }
+
+  get ping(): { target: string; note?: string; seq: number } | undefined {
+    return this.live.ping;
+  }
+
+  get serverGone(): boolean {
+    return this.live.serverGone;
+  }
+
+  setPower(key: string, on: boolean): Record<string, unknown> {
+    return this.live.setPower(key, on);
+  }
+
+  pingSurface(target: string, note?: string): Record<string, unknown> {
+    return this.live.pingSurface(target, note);
+  }
+
+  idleFor(ms: number): boolean {
+    return this.live.idleFor(ms);
+  }
+
+  markServerGone(): void {
+    this.live.markServerGone();
+  }
+
+  waitForChange(timeoutMs: number): Promise<boolean> {
+    return this.live.waitForChange(timeoutMs);
+  }
+
+  /** Wake every held wait — called on every successful change of the walk.
+   *  Not private because a private member cannot satisfy a structural
+   *  interface, and Scripts reads this through its host. */
+  notifyChange(): void {
+    this.live.notifyChange();
+  }
+
+  private readonly reads = new ReadGate({
+    laneRoot: (rel?: string) => this.laneRoot(rel),
+    machineRoot: () => this.machineRoot(),
+    persist: () => this.persistSettings(),
+    notify: () => this.notifyChange(),
+  });
+
+  /** The three doors the outside opens on the read gate. */
+  rememberRead(path: string, hash: string, ref?: string): void {
+    this.reads.rememberRead(path, hash, ref);
+  }
+
+  humanCheck(path: string): Record<string, unknown> {
+    return this.reads.humanCheck(path);
+  }
+
+  humanCheckedPaths(): string[] {
+    return this.reads.humanCheckedPaths();
+  }
 
   constructor(root: string) {
     this.root = root;
@@ -290,8 +399,7 @@ export class Session {
     this._autonomy = defaultAutonomy(root);
     // see dsp-boot-and-power.md#what-survives-a-reload-and-what-does-not
     this.restoreSettings();
-    this.syncKeepAwake();
-    this.armIdleTimer();
+    this.live.sync();
   }
 
   /** THE LAST ENGINE'S SETTINGS, restored only under the same session stamp.
@@ -317,8 +425,7 @@ export class Session {
         if (typeof s.autonomy === "number" && s.autonomy >= 0 && s.autonomy <= 1) this._autonomy = s.autonomy;
         // Emergency rides its rung: restored only beside a top-rung autonomy.
         if (s.emergency === true && this._autonomy >= 1) this._emergency = true;
-        if (typeof s.block_sleep === "boolean") this._blockSleep = s.block_sleep;
-        if (typeof s.shutdown_at_idle === "boolean") this._shutdownAtIdle = s.shutdown_at_idle;
+        this.live.restore(s.block_sleep, s.shutdown_at_idle);
         if (typeof s.narration_minutes === "number" && Number.isInteger(s.narration_minutes) && s.narration_minutes >= 0)
           this._narrationMinutes = s.narration_minutes;
         if (typeof s.narration_calls === "number" && Number.isInteger(s.narration_calls) && s.narration_calls >= 0)
@@ -352,7 +459,7 @@ export class Session {
   private restoreReadCredit(reads: Record<string, string> | undefined, pid: number | undefined): void {
     if (pid === undefined || pid === process.pid) return;
     for (const [p, h] of Object.entries(reads ?? {})) {
-      if (typeof h === "string" && h !== "") this.readBuffer.set(p, h);
+      if (typeof h === "string" && h !== "") this.reads.credit(p, h);
     }
   }
 
@@ -365,11 +472,10 @@ export class Session {
           session: process.env.SE_SESSION ?? null,
           autonomy: this._autonomy,
           emergency: this._emergency,
-          block_sleep: this._blockSleep,
-          shutdown_at_idle: this._shutdownAtIdle,
+          ...this.live.power,
           narration_minutes: this._narrationMinutes,
           narration_calls: this._narrationCalls,
-          reads: Object.fromEntries(this.readBuffer),
+          reads: this.reads.buffered(),
           reads_pid: process.pid,
           target: this._target,
           stop_at: this._stopAt,
@@ -401,116 +507,6 @@ export class Session {
   /** see dsp-walk-machine.md#where-the-dial-stands */
   get tier(): string {
     return this.tierFor(this._autonomy).tier ?? "";
-  }
-
-  /**
-   * THE POWER CONTROL — two independent flags, neither implying the other.
-   *
-   * It was five notches on a slider, which said the settings were a scale.
-   * They are not: holding the computer awake and shutting it down when work
-   * stops are separate wants, and wanting both at once is the normal case.
-   *
-   * THE ENGINE IS THIS SERVER. THE MACHINE IS THE COMPUTER. Both flags act on
-   * the machine; the engine is only what watches.
-   *
-   * BLOCK AUTO-SLEEP holds the machine awake, so it does not sleep under a
-   * running walk.
-   *
-   * SHUTDOWN AT IDLE holds it awake while anything is happening, then shuts
-   * the machine down once nothing is. The use it exists for: tell the agent
-   * to do its work and return to the front desk, flip this, and leave.
-   *
-   * Neither set means nothing is done about power at all, which is the
-   * resting state and where a fresh session starts.
-   *
-   * THE MACHINE OWNS THE TIMER. The agent neither decides this nor triggers
-   * it, and it could not: an agent that has stopped is precisely what idle
-   * means, so a shutdown waiting for one to notice would never fire.
-   */
-  private _blockSleep = false;
-  private _shutdownAtIdle = false;
-  private keepAwake?: ReturnType<typeof spawn>;
-  private idleTimer?: ReturnType<typeof setInterval>;
-  /** Any act at all, by any hand. The idle clock measures from here. */
-  private lastActivity = Date.now();
-
-  /** How long nothing may happen before an armed idle shutdown fires. */
-  static IDLE_MINUTES = 5;
-
-  get power(): { block_sleep: boolean; shutdown_at_idle: boolean } {
-    return { block_sleep: this._blockSleep, shutdown_at_idle: this._shutdownAtIdle };
-  }
-
-  setPower(key: string, on: boolean): Record<string, unknown> {
-    if (key === "block-auto-sleep") this._blockSleep = on;
-    else if (key === "shutdown-at-idle") this._shutdownAtIdle = on;
-    else {
-      throw new Rejection({
-        clause: CLAUSES.REQUIRED_ARGS,
-        expected: "a power toggle: block-auto-sleep or shutdown-at-idle",
-        got: key,
-        remedy: {
-          tool: "se_file_read",
-          args: { path: "project/deliverable/machines/panels/controls.md" },
-          note: "the shutdown row names both",
-        },
-        source: "engine/session.ts power",
-      });
-    }
-    this.persistSettings();
-    this.syncKeepAwake();
-    this.armIdleTimer();
-    this.notifyChange();
-    return this.power;
-  }
-
-  /**
-   * RESTING PLACES. The walk standing at either of these means the agent has
-   * finished and parked, which is what the person means by "when you're done".
-   * A walk standing anywhere else is work in progress, and shutting the
-   * machine down under it would strand that work.
-   */
-  private static readonly RESTING = new Set(["idle", "front_desk"]);
-
-  /** All three must hold: parked, quiet, and nothing of ours still running. */
-  idleFor(ms: number): boolean {
-    if (Date.now() - this.lastActivity < ms) return false;
-    if (anyJobRunning()) return false;
-    const active = this.describe().active as string[];
-    return active.length > 0 && active.every((a) => Session.RESTING.has(a.split("/").pop()!));
-  }
-
-  /**
-   * The timer only exists while the flag is set, so an unarmed machine has no
-   * clock running at all and cannot power anything off by accident.
-   */
-  private armIdleTimer(): void {
-    if (this._shutdownAtIdle && this.idleTimer === undefined) {
-      this.idleTimer = setInterval(() => this.checkIdle(), 30_000);
-      this.idleTimer.unref?.();
-    } else if (!this._shutdownAtIdle && this.idleTimer !== undefined) {
-      clearInterval(this.idleTimer);
-      this.idleTimer = undefined;
-    }
-  }
-
-  private checkIdle(): void {
-    if (!this._shutdownAtIdle) return;
-    if (!this.idleFor(Session.IDLE_MINUTES * 60_000)) {
-      // Something is still happening, so hold the computer awake for it.
-      this.syncKeepAwake();
-      return;
-    }
-    if (process.platform !== "win32" || process.env.SE_POWEROFF_DISABLE === "1") return;
-    // Disarm before firing, so a shutdown that the person cancels at the
-    // warning does not immediately arm another one behind them.
-    this._shutdownAtIdle = false;
-    this.armIdleTimer();
-    spawn("shutdown.exe", ["/s", "/t", "60", "/c", "se: idle for five minutes"], {
-      stdio: "ignore",
-      windowsHide: true,
-      detached: true,
-    }).unref();
   }
 
   /** The mirror's URL when one is listening — the panel se_panel opens. */
@@ -562,94 +558,6 @@ export class Session {
     this.persistSettings();
     this.notifyChange();
     return { minutes, calls, was: { minutes: wasMinutes, calls: wasCalls } };
-  }
-
-  /** THE PING (owner, 2026-07-30): the agent points at a mirror surface and
-   *  it pulses YELLOW in every open window — the tour's pointing finger,
-   *  and "look HERE" for refusals and diffs. Targets: a card id (machine,
-   *  log, details, terminal, chat), a drawn state id, or an element id.
-   *  Pointing is advisory — an unknown target pulses nothing and fails
-   *  nothing. */
-  ping?: { target: string; note?: string; seq: number };
-  private pingSeq = 0;
-  pingSurface(target: string, note?: string): Record<string, unknown> {
-    const t = target.trim();
-    if (t === "") {
-      throw new Rejection({
-        clause: CLAUSES.REQUIRED_ARGS,
-        expected:
-          "a surface to ping: a card id (its slugged title from project/deliverable/views/cards.md), the widget a card shows, a drawn state id, or an element id",
-        got: "an empty target",
-        remedy: { tool: "se_panel", args: { ping: "log" }, note: "name what the reader should look at" },
-        source: "engine/session.ts ping",
-      });
-    }
-    this.ping = { target: t, ...(note === undefined || note.trim() === "" ? {} : { note: note.trim() }), seq: ++this.pingSeq };
-    this.notifyChange();
-    return { pinged: t, note: "the surface is lit yellow in every open mirror window, and stays lit until the next ping" };
-  }
-
-  private syncKeepAwake(): void {
-    // Either flag wants the computer awake. Shutdown-at-idle wants it awake
-    // while work is happening; once it is not, powering off is the point.
-    const want = (this._blockSleep || this._shutdownAtIdle) && process.platform === "win32" && process.env.SE_KEEPAWAKE_DISABLE !== "1";
-    if (want && this.keepAwake === undefined) {
-      const src =
-        "Add-Type -TypeDefinition 'using System.Runtime.InteropServices; public class KA { [DllImport(\"kernel32.dll\")] public static extern uint SetThreadExecutionState(uint f); }'; while ($true) { [KA]::SetThreadExecutionState(2147483651) | Out-Null; Start-Sleep -Seconds 30 }";
-      this.keepAwake = spawn("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", src], { stdio: "ignore", windowsHide: true });
-      // The keepawake must never hold its OWNER open: an un-unref'd child
-      // handle kept a test worker's event loop alive forever, wedged the
-      // whole battery at its cap four times in one day, and took three
-      // instrumented kills to name.
-      this.keepAwake.unref();
-    } else if (!want && this.keepAwake !== undefined) {
-      this.keepAwake.kill();
-      this.keepAwake = undefined;
-    }
-  }
-
-  // ── THE WAIT — how the machine reaches a holding agent. MCP cannot push;
-  //    the mirror's long-poll blocks server-side until the human's hand moves
-  //    something (slider, tick, evidence) and returns the fresh packet — the
-  //    nearest thing to "the machine sends an update to the agent". ────────
-  private waiters: Array<() => void> = [];
-
-  // THE CONSOLE QUIT — distinct from reaching end. The walk is unfinished, so
-  // the machine's own status stays open and honest; what ended is the SERVER.
-  // Conflating the two would record an abandoned walk as a completed one.
-  serverGone = false;
-
-  /** Announce the server's departure and wake every held hand at once, so an
-   *  open mirror hears it instead of waiting out the death timeout. */
-  markServerGone(): void {
-    this.serverGone = true;
-    this.notifyChange();
-  }
-
-  /** Wake every held wait — called on every successful change of the walk. */
-  private notifyChange(): void {
-    // EVERY HAND RESETS THE IDLE CLOCK. A tick, a mirror click, a note, an
-    // evidence write — they all pass through here, so the clock measures
-    // silence rather than only the agent's silence.
-    this.lastActivity = Date.now();
-    const held = this.waiters;
-    this.waiters = [];
-    for (const wake of held) wake();
-  }
-
-  /** Resolve true when something changes, false on timeout (call again). */
-  waitForChange(timeoutMs: number): Promise<boolean> {
-    return new Promise((resolve) => {
-      const wake = (): void => {
-        clearTimeout(timer);
-        resolve(true);
-      };
-      const timer = setTimeout(() => {
-        this.waiters = this.waiters.filter((w) => w !== wake);
-        resolve(false);
-      }, timeoutMs);
-      this.waiters.push(wake);
-    });
   }
 
   /** The tool gate lifted, everywhere. see dsp-legible-controls.md#emergency-lifts-the-tool-gate */
@@ -999,7 +907,7 @@ export class Session {
     if (fullId === undefined) return;
     const it = itFind(this.machineRoot(), fullId);
     const rec = readItRecord(this.machineRoot(), it);
-    const size = typeof rec?.change_size === "string" ? rec.change_size : this.kickoffSizeFromForm(it);
+    const size = typeof rec?.change_size === "string" ? rec.change_size : kickoffSizeFromForm(it);
     const pinAbs = join(it.path, itPinRel(it.id));
     if (size === undefined) {
       if (existsSync(pinAbs)) return; // blessed in an earlier pass — walk on
@@ -1274,7 +1182,9 @@ export class Session {
     };
   }
 
-  private state(m: MachineDecl, id: string): StateDecl {
+  /** Not private because a private member cannot satisfy a structural
+   *  interface, and Scripts reads this through its host. */
+  state(m: MachineDecl, id: string): StateDecl {
     const s = m.states.find((st) => st.id === id);
     if (s === undefined) throw new Error(`undeclared state ${id}`);
     return s;
@@ -1372,7 +1282,9 @@ export class Session {
   }
 
   /** The machine+states whose legal_tools govern right now. */
-  private leaves(): { machine: MachineDecl; ids: string[] } {
+  /** Not private because a private member cannot satisfy a structural
+   *  interface, and Scripts reads this through its host. */
+  leaves(): { machine: MachineDecl; ids: string[] } {
     const top = this.top();
     if (top !== undefined) return { machine: top.decl, ids: activeStates(top.instance) };
     return { machine: this.machine, ids: activeStates(this.instance) };
@@ -1425,7 +1337,7 @@ export class Session {
     for (const seg of prefix.split("/")) {
       const st = decl.states.find((s) => s.id === seg);
       if (st?.submachine === undefined) return undefined;
-      const g = gen?.subGen?.[seg]?.() ?? this.genFor(seg);
+      const g = gen?.subGen?.[seg]?.() ?? this.views.genFor(seg);
       if (g !== undefined) {
         decl = g.decl;
         gen = g;
@@ -1768,7 +1680,7 @@ export class Session {
       for (const d of this.pulled(decl, st)) reads.add(d.path);
       // A consumed document is read like any other. Only one that is really
       // there joins the list — the handover usually is not.
-      for (const p of this.consumeDemand(st)) reads.add(p);
+      for (const p of this.reads.consumeDemand(st)) reads.add(p);
     }
     return [...reads].sort();
   }
@@ -1910,15 +1822,15 @@ export class Session {
     for (const id of ids) {
       const s = this.state(machine, id);
       for (const d of this.pulled(machine, s)) add(d.path);
-      for (const p of this.lookaheadRequirements(machine, s)) add(p);
+      for (const p of this.reads.lookaheadRequirements(machine, s)) add(p);
     }
     // THE HANDOVER RULE JOINS THE LOOP. When the slider rises mid-walk,
     // the agent's advances must prove the reading the human checked — even
     // past transitions the human already walked. The gate has always
     // demanded it; the loop must therefore SERVE it, or the pull would
     // say "read" for a list that cannot satisfy the walk it feeds.
-    for (const p of this.humanCheckedPaths()) add(p);
-    return want.filter((p) => !this.bufferedCurrent(p));
+    for (const p of this.reads.humanCheckedPaths()) add(p);
+    return want.filter((p) => !this.reads.bufferedCurrent(p));
   }
 
   /** Write the reading, and remember which lines came from which document. */
@@ -1971,8 +1883,8 @@ export class Session {
     const credited: string[] = [];
     for (const p of this.readingParts) {
       if (p.from < offset || p.to > last) continue;
-      if (this.diskHash(p.path) !== p.hash) continue;
-      this.readBuffer.set(p.path, p.hash);
+      if (this.reads.diskHash(p.path) !== p.hash) continue;
+      this.reads.credit(p.path, p.hash);
       credited.push(p.path);
     }
     if (credited.length > 0) this.persistSettings();
@@ -2011,7 +1923,7 @@ export class Session {
         continue;
       }
       const probes = readingProbes(body);
-      this.pendingRead = { path: rel, hash: contentHash(body), expect: probes.expect };
+      this.reads.serve(rel, contentHash(body), probes.expect);
       return {
         document: { path: rel, content: body },
         remaining: paths.length - unreadable.length - 1,
@@ -2340,7 +2252,7 @@ export class Session {
       // the corpus and this one did not, so a submit answered with the whole
       // record's facts plus the text the agent had just written — 290KB where
       // a receipt was wanted.
-      ...(saved !== undefined ? { form_saved: this.agentCopy(saved as Record<string, unknown>, true) } : {}),
+      ...(saved !== undefined ? { form_saved: agentCopy(saved as Record<string, unknown>, true) } : {}),
       ...(fanOut.length > 0
         ? { not_walked: fanOut, note: "one agent is walking, so only the first choice was taken — the others are yours to hand out" }
         : {}),
@@ -2497,7 +2409,7 @@ export class Session {
         ...(readProof === "wrong"
           ? {
               // pendingRead survives a wrong answer — only a correct one clears it.
-              note: `${this.readMissed.length} of ${this.pendingRead?.expect.length ?? 0} probe(s) were not answered — here is the document again`,
+              note: `${this.readMissed.length} of ${this.reads.serving()?.expect.length ?? 0} probe(s) were not answered — here is the document again`,
               missed: this.readMissed,
               hint: "quote the words VERBATIM, punctuation and all. Whitespace and case are flattened before comparing, so a line break inside an answer is fine.",
             }
@@ -2529,16 +2441,16 @@ export class Session {
    *  ever this, so it never competes with evidence or a choice. A wrong
    *  answer credits nothing and the same document is served again. */
   private takeReadProof(form: Record<string, unknown> | undefined): "ok" | "wrong" | null {
-    if (form?.read === undefined || this.pendingRead === null) return null;
-    const pending = this.pendingRead;
+    const pending = this.reads.serving();
+    if (form?.read === undefined || pending === null) return null;
     // WHICH PROBE MISSED, not merely that one did. "That did not answer every
     // probe" over three probes is a one-in-three guess, and the field report
     // of 2026-08-17 names it as friction that cost a round trip each time.
     this.readMissed = probesMissed(pending.expect, String(form.read));
     if (this.readMissed.length === 0) {
-      this.readBuffer.set(pending.path, pending.hash);
+      this.reads.credit(pending.path, pending.hash);
       this.persistSettings();
-      this.pendingRead = null;
+      this.reads.answered();
       return "ok";
     }
     return "wrong";
@@ -2794,174 +2706,6 @@ export class Session {
     }
   }
 
-  /** The mirror's view of a GENERATED machine: the walk's own instance
-   *  while standing in it, a fresh generation for browsing. */
-  generatedView(id: string): { decl: MachineDecl; canvas: CanvasData } | undefined {
-    for (const sub of this.subs) {
-      if (sub.decl.id === id && sub.gen !== undefined) return { decl: sub.gen.decl, canvas: sub.gen.canvas };
-    }
-    const gen = this.genFor(id);
-    return gen === undefined ? undefined : { decl: gen.decl, canvas: gen.canvas };
-  }
-
-  private genFor(id: string): GeneratedMachine | undefined {
-    if (id === "expeditions") return generateContinueExpedition(this.machineRoot());
-    if (id === "iterations") return generateIterations(this.machineRoot());
-    if (id === "expedition_archive") return generateExpeditionArchive(this.machineRoot());
-    if (id === "iteration_archive") return generateIterationArchive(this.machineRoot());
-    return undefined;
-  }
-
-  /** The PARENT CHAIN of a viewable machine, main first — the mirror's
-   *  breadcrumbs render it, so a nested decade reads
-   *  main › expedition_archive › e1-e10 (owner ruling 2026-07-28). */
-  viewChain(id: string): string[] {
-    if (id === this.machine.id) return [this.machine.id];
-    const idx = this.subs.findIndex((s) => s.decl.id === id);
-    if (idx >= 0) return [this.machine.id, ...this.subs.slice(0, idx + 1).map((s) => s.decl.id)];
-    if (this.machine.states.some((s) => s.submachine !== undefined && s.id === id)) return [this.machine.id, id];
-    for (const sub of this.subs) {
-      if (sub.gen?.subGen?.[id] !== undefined) return [...this.viewChain(sub.decl.id), id];
-    }
-    for (const cid of Session.NESTING_CONTAINERS) {
-      if (this.genFor(cid)?.subGen?.[id] !== undefined) return [this.machine.id, cid, id];
-    }
-    // A drawn sub-machine reads as a child of whatever hangs it, so the
-    // breadcrumbs say main > iterations > i1 > enumerate-space rather than
-    // dropping the middle two.
-    const found = this.drawnHost(id);
-    if (found !== undefined && found.host.id !== this.machine.id) return [...this.viewChain(found.host.id), id];
-    return [this.machine.id, id];
-  }
-
-  /** Every container whose generated machine nests further generated ones.
-   *  The list once held only the archives, so BROWSING into an iteration
-   *  (the reader's click, walk elsewhere) fell back to the main drawing. */
-  private static readonly NESTING_CONTAINERS = ["iterations", "expeditions", "expedition_archive", "iteration_archive"] as const;
-
-  /** Resolve ANY machine id to a viewable drawing: the walked stack
-   *  first, then the top-level containers, then their nested generated
-   *  sub-machines (archive decades). */
-  viewFor(id: string): { decl: MachineDecl; canvas: CanvasData } | undefined {
-    const direct = this.generatedView(id);
-    if (direct !== undefined) return direct;
-    // see dsp-walk-machine.md#a-static-sub-machine-is-a-drawing
-    const drawn = this.drawnSubmachine(id);
-    if (drawn !== undefined) return drawn;
-    for (const sub of this.subs) {
-      const nested = sub.gen?.subGen?.[id];
-      if (nested !== undefined) {
-        const g = nested();
-        return { decl: g.decl, canvas: g.canvas };
-      }
-    }
-    for (const cid of Session.NESTING_CONTAINERS) {
-      const nested = this.genFor(cid)?.subGen?.[id];
-      if (nested !== undefined) {
-        const g = nested();
-        return { decl: g.decl, canvas: g.canvas };
-      }
-    }
-    // see dsp-walk-machine.md#a-seeded-container-inside-an-open-record-resolves-without
-    for (const cid of Session.NESTING_CONTAINERS) {
-      let gen: GeneratedMachine | undefined;
-      try {
-        gen = this.genFor(cid);
-      } catch {
-        continue;
-      }
-      for (const make of Object.values(gen?.subGen ?? {})) {
-        try {
-          const nested = make().subGen?.[id];
-          if (nested !== undefined) {
-            const g = nested();
-            return { decl: g.decl, canvas: g.canvas };
-          }
-        } catch {
-          // an ungenerable child colours nothing
-        }
-      }
-    }
-    return undefined;
-  }
-
-  /** EVERY MACHINE THE MIRROR CAN REACH, main first. The walked stack, then
-   *  the containers, then each container's generated children — an
-   *  iteration's own machine is one of those, and that is where a matrix row
-   *  carrying a drawn sub-machine lives. */
-  private reachableMachines(): MachineDecl[] {
-    const out: MachineDecl[] = [this.machine, ...this.subs.map((s) => s.decl)];
-    for (const cid of Session.NESTING_CONTAINERS) {
-      let gen: GeneratedMachine | undefined;
-      try {
-        gen = this.genFor(cid);
-      } catch {
-        continue; // a container that will not generate is not a view
-      }
-      if (gen === undefined) continue;
-      out.push(gen.decl);
-      for (const make of Object.values(gen.subGen ?? {})) {
-        try {
-          out.push(make().decl);
-        } catch {
-          // A child that refuses to generate is not viewable. Not an error
-          // here: the walk reports it properly when somebody enters it.
-        }
-      }
-    }
-    return out;
-  }
-
-  /** The state carrying a drawn sub-machine of this id, and the machine that
-   *  owns that state.
-   *
-   *  ONE NAME ANSWERS FOR BOTH. A drawn sub-machine takes its canvas's name,
-   *  so the state's id and the compiled machine's id are the same string —
-   *  the rigor matrix refuses a row where they differ. This looked up two
-   *  names for a while, which is what tolerating the mismatch costs. */
-  private drawnHost(id: string): { host: MachineDecl; ref: string } | undefined {
-    for (const m of this.reachableMachines()) {
-      for (const s of m.states) {
-        const ref = s.submachine;
-        if (ref === undefined || !ref.endsWith(".canvas")) continue;
-        if (s.id === id) return { host: m, ref };
-      }
-    }
-    return undefined;
-  }
-
-  /** see dsp-walk-machine.md#a-drawn-sub-machine-compiled-and-served-as-its-own */
-  private drawnSubmachine(id: string): { decl: MachineDecl; canvas: CanvasData } | undefined {
-    const found = this.drawnHost(id);
-    if (found === undefined) return undefined;
-    try {
-      const path = resolveRef(this.machineRoot(), mainMachinePath(this.machineRoot()), found.ref);
-      const decl = compileMachineCached(this.machineRoot(), path);
-      return { decl, canvas: pinnedCanvas(decl) };
-    } catch {
-      return undefined;
-    }
-  }
-
-  /** see dsp-walk-machine.md#the-live-run-for-a-machine-view */
-  viewRun(declId: string): { done: string[]; completed: boolean } {
-    if (declId === this.machine.id) {
-      return {
-        done: this.instance.history.filter((h) => h.outcome === "filled" && !h.state.includes("/")).map((h) => h.state),
-        completed: this.instance.status === "closed",
-      };
-    }
-    for (const sub of this.subs) {
-      if (sub.decl.id === declId) {
-        return {
-          done: sub.instance.history.filter((h) => h.outcome === "filled").map((h) => h.state),
-          completed: sub.instance.status === "closed",
-        };
-      }
-    }
-    return { done: [], completed: false };
-  }
-
   legal(): { all: boolean; tools: Set<string> } {
     const { machine, ids } = this.leaves();
     const tools = new Set<string>();
@@ -2973,7 +2717,7 @@ export class Session {
       // REPAIR MODE (owner ruling 2026-07-27): while the state's exit
       // script stands RED, its repair tools are legal — the remedy "fix
       // what the output names" must be dischargeable from inside.
-      const ev = this.evidence.get(this.evidenceKey(machine, id));
+      const ev = this.evidence.get(evidenceKey(machine, id));
       if ((ev?.script_result as { ok?: boolean } | undefined)?.ok === false) for (const t of s.repair_tools ?? []) tools.add(t);
       for (const t of s.legal_tools ?? []) {
         if (t === "all") all = true;
@@ -3020,10 +2764,6 @@ export class Session {
   //    transition's cond — leave_when of the source AND enter_when of the
   //    target must hold) ──────────────────────────────────────────────────
 
-  private evidenceKey(m: MachineDecl, stateId: string): string {
-    return `${m.id}/${stateId}`;
-  }
-
   /** One condition key of a state's entry/exit dictionary. For `read` a
    *  doc counts on EITHER ledger: the human's checks, or hashes the agent
    *  presented on a passing tick — so the mirror's pill turns green from
@@ -3037,10 +2777,12 @@ export class Session {
       // in pull-world the reading is earned before any step is taken, and
       // a pill that stayed gray until the walk moved would show the agent
       // as unread while it was reading.
-      return docs.every((p) => this.readProven("human", p, {}) || this.agentProven(p) || this.bufferedCurrent(p));
+      return docs.every((p) => this.reads.readProven("human", p, {}) || this.reads.agentProven(p) || this.reads.bufferedCurrent(p));
     }
     if (key === "read_consume") {
-      return this.consumeDemand(s).every((p) => this.readProven("human", p, {}) || this.agentProven(p) || this.bufferedCurrent(p));
+      return this.reads
+        .consumeDemand(s)
+        .every((p) => this.reads.readProven("human", p, {}) || this.reads.agentProven(p) || this.reads.bufferedCurrent(p));
     }
     if (key === "evidence_form") {
       const names = (which === "leave" ? s.exit : s.entry)?.evidence_form ?? [];
@@ -3050,7 +2792,7 @@ export class Session {
       const markers = (which === "leave" ? s.exit : s.entry)?.no_pending_note ?? [];
       return this.blockingNotes(markers).length === 0;
     }
-    const ev = this.evidence.get(this.evidenceKey(m, s.id));
+    const ev = this.evidence.get(evidenceKey(m, s.id));
     if (key === "script") return (ev?.script_result as { ok?: boolean } | undefined)?.ok === true;
     return false;
   }
@@ -3231,78 +2973,7 @@ export class Session {
 
   /** see dsp-walk-machine.md#what-the-form-refuses */
   private formForAgent(name: string): Record<string, unknown> {
-    return this.agentCopy(this.formGet(name) as Record<string, unknown>, false);
-  }
-
-  /** EMPTY IS NOT INFORMATION. A key whose value is "", 0, [], {} or null says
-   *  nothing the key's absence does not, and it costs a line either way.
-   *  `false` is excluded on purpose — it is an answer, not a blank. */
-  private static blank(v: unknown): boolean {
-    if (v === null || v === undefined) return true;
-    if (typeof v === "string") return v === "";
-    if (typeof v === "number") return v === 0;
-    if (typeof v === "boolean") return false;
-    if (Array.isArray(v)) return v.length === 0;
-    return Object.keys(v as object).length === 0;
-  }
-
-  /** One dictionary with every blank pruned, recursively. Returns undefined
-   *  when nothing survives, so the caller can drop the key entirely. */
-  private static pruned(rec: unknown): Record<string, unknown> | undefined {
-    if (rec === null || typeof rec !== "object" || Array.isArray(rec)) return undefined;
-    const out: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(rec as Record<string, unknown>)) {
-      const kept = v !== null && typeof v === "object" && !Array.isArray(v) ? Session.pruned(v) : Session.blank(v) ? undefined : v;
-      if (kept !== undefined) out[k] = kept;
-    }
-    return Object.keys(out).length === 0 ? undefined : out;
-  }
-
-  /** WHAT THE AGENT CAN ACTUALLY USE, and nothing else. Measured on i11's own
-   *  walk: one ordinary pull answered 290,280 bytes, of which 5,080 lines out
-   *  of 5,311 were things no agent reads.
-   *
-   *  FOUR THINGS COME OFF, and each is a different kind of waste.
-   *
-   *  - `ref_paths` and `ref_facts`, the whole record's corpus. The MIRROR needs
-   *    them to render a card from two ids; the agent opens the file instead.
-   *  - Blank argument slots. A free-form field shipped 27 keys, every one "",
-   *    [] or null, because the model carries a slot for every editor there is.
-   *  - `template.fields`, which restates `fields` name for name.
-   *  - On an ECHO, the field bodies. The agent wrote them one call ago.
-   *
-   *  THE ECHO IS THE ONLY PLACE BODIES GO. A form that is OWED keeps its
-   *  content, because a half-filled form coming back must show what already
-   *  stands — that is exactly what stops a recheck being answered from
-   *  scratch. What is dropped is the copy handed straight back to whoever
-   *  just sent it. */
-  private agentCopy(form: Record<string, unknown>, echo: boolean): Record<string, unknown> {
-    const { ref_paths: _paths, ref_facts: _facts, field_args, field_hints, template_meta, template, fields, ...rest } = form;
-    const out: Record<string, unknown> = { ...rest };
-    for (const [key, value] of [
-      ["field_args", field_args],
-      ["field_hints", field_hints],
-      ["template_meta", template_meta],
-    ] as const) {
-      const kept = Session.pruned(value);
-      if (kept !== undefined) out[key] = kept;
-    }
-    if (template !== null && typeof template === "object") {
-      const { fields: _dup, ...restTemplate } = template as Record<string, unknown>;
-      const kept = Session.pruned(restTemplate);
-      if (kept !== undefined) out.template = kept;
-    }
-    if (Array.isArray(fields)) {
-      out.fields = fields.map((f) => {
-        const field = f as Record<string, unknown>;
-        if (!echo) return field;
-        const { content, prefills: _pre, ...head } = field;
-        // THE LENGTH STANDS IN FOR THE BODY. It proves the text landed whole,
-        // which is the one thing the sender cannot check for itself.
-        return { ...head, chars: typeof content === "string" ? content.length : 0 };
-      });
-    }
-    return out;
+    return agentCopy(this.formGet(name) as Record<string, unknown>, false);
   }
 
   refusedBlock(names: string[]): Record<string, unknown> {
@@ -3459,7 +3130,7 @@ export class Session {
    *  display resolves the name; the walk's machine is the default. */
   private formMachine(machineId?: string): MachineDecl {
     if (machineId === undefined || machineId === "" || machineId === this.currentMachine().id) return this.currentMachine();
-    return this.viewFor(machineId)?.decl ?? this.currentMachine();
+    return this.views.viewFor(machineId)?.decl ?? this.currentMachine();
   }
 
   /** see dsp-walk-machine.md#the-dispatch-between-the-two-form-kinds */
@@ -3610,7 +3281,7 @@ export class Session {
       // every question is how a sixty-pair pass becomes a two-hour errand.
       ref_facts: refFacts(this, forIt),
       machine: m.id,
-      checked: this.stateFormChecked(raw),
+      checked: stateFormChecked(raw),
       active: this.stateFormActive(name, m),
       gate: s.kind === "gate",
       // A present-but-EMPTY signed_off is unsigned. Reading the key's mere
@@ -3772,7 +3443,7 @@ export class Session {
     // down with it.
     let sub: MachineDecl | undefined;
     try {
-      sub = this.viewFor(id)?.decl;
+      sub = this.views.viewFor(id)?.decl;
     } catch {
       return false;
     }
@@ -3901,7 +3572,7 @@ export class Session {
       const bound = boundId === undefined ? undefined : open.find((x) => x.id === boundId);
       if (bound !== undefined) return bound;
       // see dsp-the-goal-binds-the-walk.md#from-the-desk-nothing-is-bound
-      const all = this.reachableMachines();
+      const all = this.views.reachableMachines();
       let at = decl.id;
       for (let hop = 0; hop < 8; hop++) {
         const host = all.find((h) => h.states.some((s) => s.submachine !== undefined && s.id === at));
@@ -4065,59 +3736,6 @@ export class Session {
     return [...standing].filter((s) => s !== name && claimful.has(s) && claimFeeders(m, s, claimful).includes(name));
   }
 
-  /** THE PATCH HALF OF AN AMEND. `fills` rewrites a field WHOLE, which for a
-   *  renamed reference or a typo means resending two thousand characters to
-   *  change eleven — and every resend is a chance to lose a paragraph nobody
-   *  meant to touch.
-   *
-   *  SO AN OP IS old_string → new_string, matched against the field as it
-   *  stands. It must match EXACTLY ONCE, or the caller says `all: true` and
-   *  means every occurrence. Zero matches and an ambiguous match both refuse,
-   *  for the reason se_file_patch refuses them: a patch that lands somewhere
-   *  other than where its author looked is worse than no patch.
-   *
-   *  OPS AND FILLS COMPOSE. Several ops against one field chain, each seeing
-   *  the last one's result; a `fills` entry for the same field wins, because
-   *  a whole rewrite is unambiguous. */
-  private amendOps(raw: string, ops: AmendOp[], name: string): Record<string, string> {
-    const out: Record<string, string> = {};
-    for (const op of ops) {
-      const field = String(op.field ?? "");
-      const body = out[field] ?? fieldContent(raw, field);
-      const refuse = (expected: string, got: string): never => {
-        throw new Rejection({
-          clause: CLAUSES.CONDITION_UNMET,
-          expected,
-          got,
-          remedy: {
-            tool: "se_amend",
-            args: {
-              state: name,
-              ops: [{ field, old_string: "<text as it stands>", new_string: "<what it becomes>" }],
-              reason: "<what was wrong>",
-            },
-            note: "read the field on the pull first — old_string must be the text exactly as the form carries it",
-          },
-          source: "engine/session.ts amend",
-        });
-      };
-      if (body === undefined) refuse(`a section called ${field} on ${name}`, "no such section in the form");
-      const old = String(op.old_string ?? "");
-      if (old === "") refuse("old_string — the text being replaced", "an empty old_string");
-      const hits = (body as string).split(old).length - 1;
-      if (hits === 0) refuse(`old_string to appear in ${field}`, "it does not appear — nothing was changed");
-      if (hits > 1 && op.all !== true) {
-        refuse(
-          `old_string to appear once in ${field}`,
-          `it appears ${String(hits)} times — say all: true to replace every one, or give more surrounding text`,
-        );
-      }
-      const next = String(op.new_string ?? "");
-      out[field] = op.all === true ? (body as string).split(old).join(next) : (body as string).replace(old, next);
-    }
-    return out;
-  }
-
   amendClaim(
     name: string,
     fillsIn: Record<string, string>,
@@ -4145,7 +3763,7 @@ export class Session {
     // here down there is one path, so every guard below — the check re-run,
     // the restore, the refusal that names se_reopen — covers both shapes
     // without knowing which was used.
-    const fills = { ...this.amendOps(raw, ops, name), ...fillsIn };
+    const fills = { ...amendOps(raw, ops, name), ...fillsIn };
     const feeding = FEEDS_DOWNSTREAM.find((f) => name.endsWith(f.state) && fills[f.field] !== undefined);
     if (feeding !== undefined) {
       throw new Rejection({
@@ -4303,31 +3921,6 @@ export class Session {
     writeFileSync(h.instanceAbs, withBless(braw, `${ok ? "blessed" : "dismissed"} by ${by}`), "utf8");
     this.notifyChange();
     return this.stateFormGet(name, m);
-  }
-
-  private stateFormChecked(raw: string | undefined): string[] {
-    if (raw === undefined) return [];
-    const v = parseStateNote(raw).frontmatter.checked;
-    return typeof v === "string"
-      ? v
-          .split(",")
-          .map((x) => x.trim())
-          .filter((x) => x !== "")
-      : [];
-  }
-
-  private stateFormScaffold(name: string, t: FormTemplate): string {
-    return [
-      "---",
-      `form: ${name}`,
-      "authors:",
-      "files:",
-      "---",
-      "",
-      `# Evidence form / ${name}`,
-      "",
-      ...t.fields.flatMap((f) => [`## ${f.name}`, "", ""]),
-    ].join("\n");
   }
 
   /** see dsp-walk-machine.md#one-or-many-fields-into-the-stored-instance */
@@ -4490,7 +4083,7 @@ export class Session {
   stateFormSave(name: string, fields: Record<string, string>, by: string, m: MachineDecl = this.currentMachine()): Record<string, unknown> {
     const t = stateFormFields(this.stateFormState(name, m));
     const h = this.stateFormHome(name, m);
-    let raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : this.stateFormScaffold(name, t);
+    let raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : stateFormScaffold(name, t);
     // inputs_checked is the checkbox column, not a section — both hands
     // (the page's boxes, the agent's fill) send it through this one door.
     const { inputs_checked, ...rest } = fields;
@@ -4981,14 +4574,6 @@ export class Session {
     };
   }
 
-  /** The blessed size may live in the kickoff's own stored form. */
-  private kickoffSizeFromForm(it: Iteration): string | undefined {
-    const abs = join(it.path, `project/spec/iterations/${it.id}/evidence/gate-kickoff.md`);
-    if (!existsSync(abs)) return undefined;
-    const txt = stripComments(section(parseStateNote(readFileSync(abs, "utf8")).body, "change_size")).toLowerCase();
-    return chosenOption(txt, CHANGE_COLUMNS);
-  }
-
   /** ONE self-contained HTML: the sheet, the fills, the reading and the
    *  templates baked in — the island is what travels back. */
   stateFormExport(name: string, machineId?: string): string {
@@ -5029,7 +4614,7 @@ export class Session {
         docs.push({ path: i.path, content: "(unreadable at export time)" });
       }
     }
-    return buildPortableForm(model, fills, docs, this.stateFormChecked(raw));
+    return buildPortableForm(model, fills, docs, stateFormChecked(raw));
   }
 
   /** The returned copy's island lands as fills, marked imported — a
@@ -5051,171 +4636,6 @@ export class Session {
     return { ingested: name, author, ...this.stateFormSave(name, fields, author, m) };
   }
 
-  /** One script, ASYNC — spawnSync would freeze the whole server (and the
-   *  mirror with it) for the run's duration; found when the suite's eight
-   *  seconds read as a crashed browser window. */
-  private spawnScript(abs: string): Promise<{ status: number | null; out: string }> {
-    return new Promise((resolve) => {
-      // A CONDITION JUDGES THE TREE THE LANE WRITES TO, never the repo root.
-      // It ran with the machine root, so a state's check read trunk while every file
-      // verb wrote to the bound worktree. The agent was asked to satisfy a
-      // check it had no write path to: i28's rank-unknowns refused on a
-      // register node that does not exist in its tree, and no lane verb could
-      // reach the file being complained about.
-      // TWO ROOTS, BECAUSE A SCRIPT NEEDS BOTH. The corpus it judges is the
-      // bound record's, and `.se/` is session state that belongs to the
-      // machine — the same split laneRoot already enforces for every path.
-      // Handing over only the work tree broke the outward-search check, which
-      // reads the call log to prove a search actually ran.
-      const where = this.workRoot();
-      const child = spawn("node", [abs, "--root", where], {
-        cwd: where,
-        env: { ...process.env, SE_HOME: seDir(this.machineRoot()) },
-      });
-      let out = "";
-      let pending = "";
-      // A SCRIPT REPORTS ITS OWN PROGRESS on stdout, as
-      //   ##progress <done> <total> <label>
-      // The lines drive the mirror's bar and never reach the evidence: the
-      // reader wants the verdict, not the ticker. A script that says
-      // nothing still works — the bar just falls back to indeterminate.
-      const eat = (chunk: string): string => {
-        pending += chunk;
-        const lines = pending.split(/\r?\n/);
-        pending = lines.pop() ?? "";
-        const keep: string[] = [];
-        for (const l of lines) {
-          const m = /^##progress\s+(\d+)\s+(\d+)\s*(.*)$/.exec(l);
-          if (m === null) {
-            keep.push(l);
-            continue;
-          }
-          this.setProgress(Number(m[1]), Number(m[2]), (m[3] ?? "").trim());
-        }
-        return keep.length === 0 ? "" : `${keep.join("\n")}\n`;
-      };
-      child.stdout.on("data", (d: Buffer) => {
-        out += eat(String(d));
-      });
-      child.stderr.on("data", (d: Buffer) => {
-        out += d;
-      });
-      // A CONDITION SCRIPT MAY LEGITIMATELY BE LONG. 120 seconds was sized for
-      // a check that reads the corpus; verification's script runs the whole
-      // battery, which tools.ts already records as "long BY DESIGN now that
-      // boot walks read real guidance — 150s killed it mid-run". A cap that
-      // kills the battery reads as a red that never happened.
-      const timer = setTimeout(() => child.kill(), 600_000);
-      child.on("error", (e) => {
-        clearTimeout(timer);
-        this.clearProgress();
-        resolve({ status: null, out: String(e) });
-      });
-      child.on("close", (code) => {
-        clearTimeout(timer);
-        this.clearProgress();
-        resolve({ status: code, out: out + pending });
-      });
-    });
-  }
-
-  /** In-flight runs, keyed by state — a second hand (or a second click)
-   *  while one runs JOINS it instead of spawning the suite again. Found
-   *  when repeated clicks on an unresponsive button queued whole extra
-   *  suite runs behind the first. */
-  private readonly scriptRuns = new Map<string, Promise<Record<string, unknown>>>();
-
-  /** RUN a state's condition script — legal only while standing in it.
-   *  The result is engine-observed evidence; nobody can claim it. */
-  async scriptRun(stateId: string): Promise<Record<string, unknown>> {
-    this.assertStanding(stateId);
-    const { machine } = this.leaves();
-    const s = this.state(machine, stateId);
-    const scripts = [...(s.exit?.script ?? []), ...(s.entry?.script ?? [])];
-    if (scripts.length === 0) {
-      throw new Rejection({
-        clause: CLAUSES.CONDITION_UNMET,
-        expected: `a script condition on ${stateId}`,
-        got: "none declared",
-        remedy: { tool: "se_pull", args: {}, note: "the pull's answer carries the step's demands" },
-        source: "engine/session.ts script",
-      });
-    }
-    const key = this.evidenceKey(machine, s.id);
-    const inFlight = this.scriptRuns.get(key);
-    if (inFlight !== undefined) return inFlight;
-    const run = (async () => {
-      // see dsp-walk-machine.md#the-suites-spawn-skip
-      if (process.env.SE_SCRIPT_SKIP === "1") {
-        const result = {
-          ok: true,
-          output: scripts.map((rel) => `${rel} → skipped (SE_SCRIPT_SKIP)`).join("\n"),
-          at: new Date().toISOString(),
-        };
-        this.evidence.set(key, { ...(this.evidence.get(key) ?? {}), script_result: result });
-        this.notifyChange();
-        return { state: `${machine.id}/${s.id}`, script_result: result };
-      }
-      const outputs: string[] = [];
-      let ok = true;
-      for (const rel of scripts) {
-        const abs = resolveInRoot(this.machineRoot(), rel, "engine/session.ts script");
-        const r = await this.spawnScript(abs);
-        // THE TAIL, BECAUSE ENDS CARRY VERDICTS. A head slice keeps the run's
-        // opening banner and drops the failing tests block, which is the only
-        // part of a red anybody needs. Seen on this state's own first red:
-        // 4000 characters of passing cases and not one failure.
-        const whole = r.out.trim();
-        const out = whole.length <= 4000 ? whole : `…[${String(whole.length - 4000)} earlier chars]\n${whole.slice(-4000)}`;
-        outputs.push(`${rel} → exit ${r.status}${out === "" ? "" : `\n${out}`}`);
-        if (r.status !== 0) ok = false;
-      }
-      const result = { ok, output: outputs.join("\n"), at: new Date().toISOString() };
-      this.evidence.set(key, { ...(this.evidence.get(key) ?? {}), script_result: result });
-      this.notifyChange();
-      return { state: `${machine.id}/${s.id}`, script_result: result };
-    })().finally(() => this.scriptRuns.delete(key));
-    this.scriptRuns.set(key, run);
-    this.notifyChange(); // the mirror learns a run started
-    return run;
-  }
-
-  /** Any condition script currently running — the mirror's follow signal. */
-  busy(): boolean {
-    return this.scriptRuns.size > 0;
-  }
-
-  /** THE WAIT BAR MEASURES SOMETHING (owner ruling, 2026-07-30). A running
-   *  script reports its own steps; indeterminate is the FALLBACK, for work
-   *  that genuinely cannot count itself, never the default. */
-  private progressAt: { done: number; total: number; label: string } | undefined;
-
-  private setProgress(done: number, total: number, label: string): void {
-    if (total <= 0) return;
-    this.progressAt = { done, total, label };
-    this.notifyChange();
-  }
-
-  private clearProgress(): void {
-    if (this.progressAt === undefined) return;
-    this.progressAt = undefined;
-    this.notifyChange();
-  }
-
-  progress(): { done: number; total: number; label: string } | undefined {
-    return this.progressAt;
-  }
-
-  scriptStatus(m: MachineDecl, s: StateDecl): { ran: boolean; ok: boolean; output: string; running: boolean } {
-    const r = this.evidence.get(this.evidenceKey(m, s.id))?.script_result as { ok?: boolean; output?: string } | undefined;
-    return {
-      ran: r !== undefined,
-      ok: r?.ok === true,
-      output: r?.output ?? "",
-      running: this.scriptRuns.has(this.evidenceKey(m, s.id)),
-    };
-  }
-
   /** All keys of the dictionary must hold. Absent dictionary = always. */
   conditionMet(m: MachineDecl, s: StateDecl, which: "enter" | "leave"): boolean {
     const dict = which === "leave" ? s.exit : s.entry;
@@ -5233,267 +4653,20 @@ export class Session {
     if (dict === undefined) return undefined;
     const out: Record<string, { args: string[]; met: boolean; note: string }> = {};
     for (const [k, args] of Object.entries(dict)) {
-      const shown = k === "read_consume" ? this.consumeDemand(s) : args;
+      const shown = k === "read_consume" ? this.reads.consumeDemand(s) : args;
       out[k] = { args: shown, met: this.conditionKeyMet(m, s, k, which), note: conditionNotePath(k) };
     }
     return out;
   }
 
-  // see dsp-walk-machine.md#the-read-proof
-  private readonly humanChecks = new Map<string, Set<string>>();
-
-  /** The agent's standing ledger: hashes it PRESENTED on a tick that
-   *  passed the read gate — per version, like the human's checks. Feeds
-   *  the condition status (the mirror's pill) only; never the gate, and
-   *  never the checkboxes (those stay the human's alone). */
-  private readonly agentReads = new Map<string, Set<string>>();
-  /** Session-local read buffer: latest lane hash per path, auto-filled by
-   *  se_file_read and re-used for later ticks unless stale. */
-  private readonly readBuffer = new Map<string, string>();
-  /** The document the last pull served, waiting on its probes. */
-  private pendingRead: { path: string; hash: string; expect: string[] } | null = null;
-
-  rememberRead(path: string, hash: string, ref?: string): void {
-    if (ref !== undefined || path.trim() === "" || hash.trim() === "" || path.startsWith("@")) return;
-    const lane = this.diskHash(path);
-    if (lane !== "" && lane === hash) {
-      this.readBuffer.set(path, hash);
-      this.persistSettings();
-    }
-  }
-
-  clearReadBuffer(): void {
-    this.readBuffer.clear();
-    this.persistSettings();
-  }
-
   /** Whether the walk has passed through boot once already. */
   private bootEntered = false;
-
-  /** The agent's proofs, ALL earned by reading: se_file_read credits as it
-   *  serves, and the pull credits once the document's tail comes back. Stale
-   *  entries are swept here, so an edited doc always asks to be read again. */
-  private readProofs(channel: Channel): Record<string, string> {
-    if (channel !== "agent") return {};
-    const merged: Record<string, string> = {};
-    for (const [p, h] of this.readBuffer.entries()) merged[p] = h;
-    for (const [p, h] of Object.entries(merged)) {
-      const lane = this.diskHash(p);
-      if (lane !== "" && h === lane) {
-        this.readBuffer.set(p, h);
-      } else {
-        delete merged[p];
-        this.readBuffer.delete(p);
-      }
-    }
-    return merged;
-  }
-
-  private agentProven(path: string): boolean {
-    const hash = this.diskHash(path);
-    return hash !== "" && (this.agentReads.get(path)?.has(hash) ?? false);
-  }
-
-  // see dsp-walk-machine.md#the-proof-hashes-the-doc-the-lane-served
-  private diskHash(rel: string): string {
-    try {
-      const abs = resolveInRoot(this.laneRoot(rel), rel, "engine/session.ts reads");
-      return contentHash(readFileSync(abs));
-    } catch {
-      return "";
-    }
-  }
-
-  /** The copy the MIRROR serves — always the project root, because that is
-   *  where the human's checkboxes are made, bound expedition or not. */
-  private rootDiskHash(rel: string): string {
-    try {
-      return contentHash(readFileSync(resolveInRoot(this.machineRoot(), rel, "engine/session.ts reads")));
-    } catch {
-      return "";
-    }
-  }
-
-  /** The mirror's checkbox: pin the doc AS IT STANDS as read-by-human. */
-  humanCheck(path: string): Record<string, unknown> {
-    const hash = this.diskHash(path);
-    if (hash === "") {
-      throw new Rejection({
-        clause: CLAUSES.REQUIRED_ARGS,
-        expected: "a readable project document",
-        got: path,
-        remedy: { tool: "se_pull", args: {}, note: "the pulled list names the checkable documents" },
-        source: "engine/session.ts reads",
-      });
-    }
-    const set = this.humanChecks.get(path) ?? new Set<string>();
-    set.add(hash);
-    this.humanChecks.set(path, set);
-    this.notifyChange();
-    return { path, hash, checked: true };
-  }
-
-  humanChecked(path: string, hash: string): boolean {
-    return hash !== "" && (this.humanChecks.get(path)?.has(hash) ?? false);
-  }
-
-  /** Every doc the human has checked AT ITS CURRENT VERSION — the session's
-   *  reading list. Checks of edited (stale) versions drop out. */
-  humanCheckedPaths(): string[] {
-    return [...this.humanChecks.entries()]
-      .filter(([p, set]) => set.has(this.diskHash(p)) || set.has(this.rootDiskHash(p)))
-      .map(([p]) => p)
-      .sort();
-  }
-
-  /** see dsp-the-goal-binds-the-walk.md#one-doc-one-channel-one-verdict */
-  private readProven(channel: Channel, path: string, supplied: Record<string, string>): boolean {
-    const lane = this.diskHash(path);
-    if (channel === "agent") return lane !== "" && supplied[path] === lane;
-    const set = this.humanChecks.get(path);
-    if (set === undefined) return false;
-    const root = this.rootDiskHash(path);
-    return (lane !== "" && set.has(lane)) || (root !== "" && set.has(root));
-  }
-
-  /** Boot is exempt from the pull gate — it is where the first reads
-   *  happen; gating entry on them would deadlock the session at start. */
-  private pullGateExempt(m: MachineDecl, t: StateDecl): boolean {
-    if (t.kind === "start" || t.kind === "end") return true;
-    if (m.id === "boot") return true;
-    if (t.submachine?.includes("boot")) return true;
-    return false;
-  }
-
-  /** see dsp-walk-machine.md#the-consume-list */
-  private consumeDemand(s: StateDecl): string[] {
-    return (s.exit?.read_consume ?? []).filter((rel) => existsSync(this.consumeAbs(rel)));
-  }
-
-  private consumeAbs(rel: string): string {
-    return join(this.laneRoot(rel), rel);
-  }
-
-  /** Leaving the state destroys what it consumed. A briefing that cannot
-   *  survive its own reading cannot go stale and cannot be believed twice. */
-  private consumeDocs(s: StateDecl): void {
-    for (const rel of this.consumeDemand(s)) unlinkSync(this.consumeAbs(rel));
-  }
-
-  /** see dsp-walk-machine.md#the-written-handover-is-gone */
-
-  /** see dsp-walk-machine.md#one-reading-list */
-  private reading(m: MachineDecl, s: StateDecl, which: "enter" | "leave"): string[] {
-    if (which === "leave") return [...(s.exit?.read ?? []), ...this.consumeDemand(s)];
-    return this.entryRequirements(m, s);
-  }
-
-  /** The enter half: the state's own entry list plus everything bound to it —
-   *  minus its exit list, which is the state's assignment, read INSIDE it
-   *  rather than before it. */
-  private entryRequirements(m: MachineDecl, t: StateDecl): string[] {
-    const req = new Set<string>(t.entry?.read ?? []);
-    if (!this.pullGateExempt(m, t)) {
-      for (const d of pulledFor(this.machineRoot(), scanGuidance(this.machineRoot()), m, t)) req.add(d.path);
-    }
-    for (const p of t.exit?.read ?? []) req.delete(p);
-    return [...req];
-  }
-
-  private bufferedCurrent(path: string): boolean {
-    const lane = this.diskHash(path);
-    return lane !== "" && this.readBuffer.get(path) === lane;
-  }
-
-  /** One neighbor state's entry requirements, minus docs already present in
-   *  the current read buffer at their latest hash. */
-  private unreadEntryRequirements(m: MachineDecl, t: StateDecl): string[] {
-    return this.entryRequirements(m, t)
-      .filter((p) => !this.bufferedCurrent(p))
-      .sort();
-  }
-
-  /** The docs worth pre-reading from HERE: every immediate neighbor state's
-   *  unread entry requirements, deduplicated and sorted for stable packets. */
-  private lookaheadRequirements(m: MachineDecl, from: StateDecl): string[] {
-    const req = new Set<string>();
-    for (const e of from.edges) {
-      const t = m.states.find((s) => s.id === e.to);
-      if (t === undefined) continue;
-      for (const p of this.unreadEntryRequirements(m, t)) req.add(p);
-    }
-    return [...req].sort();
-  }
-
-  private refuseReads(which: "exit" | "entry", stateId: string, missing: string[], channel: Channel): never {
-    throw new Rejection({
-      clause: CLAUSES.CONDITION_UNMET,
-      expected: `${which === "exit" ? "leaving" : "entering"} ${stateId} demands proven reading of: ${missing.join(", ")}`,
-      got:
-        channel === "agent" ? `not read at its current version: ${missing.join(", ")}` : `not checked in the mirror: ${missing.join(", ")}`,
-      remedy:
-        channel === "agent"
-          ? {
-              tool: "se_pull",
-              args: {},
-              note: "pull — it serves each document and names the last words to hand back, one document at a time. Reading through se_file_read credits too.",
-            }
-          : {
-              tool: "se_pull",
-              args: {},
-              note: "check each listed document in the mirror — one check per version; an edited doc asks again",
-            },
-      source: "engine/session.ts reads",
-    });
-  }
-
-  /** THE READ GATE, both directions: the current state's exit read list,
-   *  and the target's entry requirements (explicit reads + the pull). */
-  private assertReads(m: MachineDecl, from: StateDecl, targetIds: string[], channel: Channel, supplied: Record<string, string>): void {
-    const exitReads = this.reading(m, from, "leave");
-    const missingExit = exitReads.filter((p) => !this.readProven(channel, p, supplied));
-    if (missingExit.length > 0) this.refuseReads("exit", from.id, missingExit, channel);
-    for (const id of targetIds) {
-      const t = m.states.find((s) => s.id === id);
-      if (t === undefined) continue;
-      const missing = this.reading(m, t, "enter").filter((p) => !this.readProven(channel, p, supplied));
-      if (missing.length > 0) this.refuseReads("entry", t.id, missing, channel);
-    }
-    // see dsp-walk-machine.md#the-handover-rule
-    this.assertHandover(channel, supplied);
-    if (channel === "agent") {
-      for (const [p, h] of Object.entries(supplied)) {
-        if (h !== "" && h === this.diskHash(p)) {
-          const set = this.agentReads.get(p) ?? new Set<string>();
-          set.add(h);
-          this.agentReads.set(p, set);
-        }
-      }
-    }
-  }
-
-  private assertHandover(channel: Channel, supplied: Record<string, string>): void {
-    if (channel !== "agent") return;
-    const owed = this.humanCheckedPaths().filter((p) => !this.readProven("agent", p, supplied));
-    if (owed.length === 0) return;
-    throw new Rejection({
-      clause: CLAUSES.CONDITION_UNMET,
-      expected: `your reading to match the human's checked list: ${owed.join(", ")}`,
-      got: `no current hash supplied for: ${owed.join(", ")}`,
-      remedy: {
-        tool: "se_file_read",
-        args: { path: owed[0] },
-        note: "the human checked these as read while driving — your head must hold them too. Read each through the lane, then repeat the tick with their hashes in read_hashes.",
-      },
-      source: "engine/session.ts reads",
-    });
-  }
 
   /** The mirror's ▶ lock: is entering `t` fully proven on the human's
    *  channel (explicit entry conditions AND the pull)? */
   entryReadyHuman(m: MachineDecl, t: StateDecl): boolean {
     if (!this.conditionMet(m, t, "enter")) return false;
-    return this.entryRequirements(m, t).every((p) => this.readProven("human", p, {}));
+    return this.reads.entryRequirements(m, t).every((p) => this.reads.readProven("human", p, {}));
   }
 
   /** WHAT still blocks the human's entry into `t` — the locked button's
@@ -5503,8 +4676,8 @@ export class Session {
     for (const [k, st] of Object.entries(this.conditionStatus(m, t, "enter") ?? {})) {
       if (!st.met && k !== "read") out.push(`condition ${k}`);
     }
-    for (const p of this.entryRequirements(m, t)) {
-      if (!this.readProven("human", p, {})) out.push(`read ${p}`);
+    for (const p of this.reads.entryRequirements(m, t)) {
+      if (!this.reads.readProven("human", p, {})) out.push(`read ${p}`);
     }
     return out;
   }
@@ -5569,19 +4742,21 @@ export class Session {
    *  stale check could pass forever. `checked` is the human's ledger. */
   pulled(m: MachineDecl, s: StateDecl): (PulledDoc & { checked: boolean })[] {
     const out = pulledFor(this.machineRoot(), scanGuidance(this.machineRoot()), m, s).map((d) => {
-      const hash = d.hash !== "" ? d.hash : this.diskHash(d.path);
-      return { ...d, hash, checked: this.humanChecked(d.path, hash) };
+      const hash = d.hash !== "" ? d.hash : this.reads.diskHash(d.path);
+      return { ...d, hash, checked: this.reads.humanChecked(d.path, hash) };
     });
     // A CONSUMED document rides the reading room like the authored list —
     // it is demanded the same way and its checkbox lives here too.
-    for (const rel of this.consumeDemand(s)) {
-      const hash = this.diskHash(rel);
-      out.push({ path: rel, sources: ["consume"], hash, checked: this.humanChecked(rel, hash) });
+    for (const rel of this.reads.consumeDemand(s)) {
+      const hash = this.reads.diskHash(rel);
+      out.push({ path: rel, sources: ["consume"], hash, checked: this.reads.humanChecked(rel, hash) });
     }
     return out;
   }
 
-  private assertStanding(stateId: string): void {
+  /** Not private because a private member cannot satisfy a structural
+   *  interface, and Scripts reads this through its host. */
+  assertStanding(stateId: string): void {
     const { ids } = this.leaves();
     if (ids.includes(stateId)) return;
     throw new Rejection({
@@ -5599,7 +4774,7 @@ export class Session {
     this.assertStanding(stateId);
     const { machine } = this.leaves();
     const s = this.state(machine, stateId);
-    const key = this.evidenceKey(machine, s.id);
+    const key = evidenceKey(machine, s.id);
     const record = { ...(this.evidence.get(key) ?? {}), ...data, at: new Date().toISOString() };
     this.evidence.set(key, record);
     // THE STORED FORM IS THE DURABLE COPY (owner rulings 2026-08-04): a
@@ -5621,7 +4796,7 @@ export class Session {
     const stateId = s.id;
     const note = conditionNotePath(key);
     if (key === "script") {
-      const st = this.scriptStatus(m, s);
+      const st = this.scripts.scriptStatus(m, s);
       throw new Rejection({
         clause: CLAUSES.CONDITION_UNMET,
         expected: `${which} condition 'script' of ${stateId} — ${args.join(", ")} exits 0 (see ${note})`,
@@ -5686,14 +4861,14 @@ export class Session {
   ): Promise<void> {
     // see dsp-walk-machine.md#a-fallback-is-the-drawn-path-for-the-condition
     const escaping = to !== undefined && from.edges.some((e) => e.to === to && (e.role === "fallback" || e.role === "error"));
-    if (from.exit?.script !== undefined && !escaping) await this.scriptRun(from.id); // a tick attempt runs the script
+    if (from.exit?.script !== undefined && !escaping) await this.scripts.scriptRun(from.id); // a tick attempt runs the script
     for (const [key, args] of Object.entries(from.exit ?? {})) {
       if (key === "read" || key === "read_consume") continue; // channel-proven below, not evidence
       if (escaping) continue;
       if (!this.conditionKeyMet(m, from, key, "leave")) this.refuseCondition(m, from, "exit", key, args);
     }
     const targetId = to ?? (from.edges.length === 1 ? from.edges[0].to : undefined);
-    this.assertReads(m, from, targetId === undefined ? [] : [targetId], channel, supplied);
+    this.reads.assertReads(m, from, targetId === undefined ? [] : [targetId], channel, supplied);
     // Leaving through the main machine's end is where the next handover is
     // owed. Sub-machines have their own end and owe nothing.
     if (targetId === undefined) return;
@@ -5739,7 +4914,7 @@ export class Session {
         pulled: this.pulled(machine, s).map((p) => ({ path: p.path, sources: p.sources })),
         // Pre-read map from where you stand: every immediate neighbor's
         // entry requirements, so the head can read once before moving.
-        lookahead_read: this.lookaheadRequirements(machine, s),
+        lookahead_read: this.reads.lookaheadRequirements(machine, s),
         // Enough to CHOOSE among several ways forward: what the target is,
         // not just its name (the agent has no other way to peek).
         next: s.edges.map((e) => {
@@ -5750,7 +4925,7 @@ export class Session {
             ...(e.guard !== undefined ? { guard: e.guard } : {}),
             ...(t !== undefined ? { kind: t.kind, ...(t.statement !== "" ? { statement: t.statement } : {}), priority: t.priority } : {}),
             ...(t?.entry !== undefined ? { entry: this.conditionStatus(machine, t, "enter") } : {}),
-            ...(t !== undefined ? { entry_read: this.unreadEntryRequirements(machine, t) } : {}),
+            ...(t !== undefined ? { entry_read: this.reads.unreadEntryRequirements(machine, t) } : {}),
             enter_met: t === undefined ? true : this.conditionMet(machine, t, "enter"),
           };
         }),
@@ -5803,7 +4978,7 @@ export class Session {
       // The session's reading list: what the human checked while driving.
       // Your advances must prove the same docs (paths only — the hashes
       // are earned by reading).
-      human_checked: this.humanCheckedPaths(),
+      human_checked: this.reads.humanCheckedPaths(),
       legal_tools: all ? "all" : [...ALWAYS_LEGAL, ...tools],
       states,
     };
@@ -5821,7 +4996,7 @@ export class Session {
       parent.edges.map((e) => e.to),
       channel,
     );
-    this.assertReads(
+    this.reads.assertReads(
       pm,
       parent,
       parent.edges.map((e) => e.to),
@@ -5897,7 +5072,7 @@ export class Session {
     const outcome = this.outcomeFor(top.decl, cur, to);
     this.completeGuarded(top.decl, top.instance, cur, outcome, now, to);
     // Leaving the state is what destroys what it consumed.
-    this.consumeDocs(this.state(top.decl, cur));
+    this.reads.consumeDocs(this.state(top.decl, cur));
     top.instance.history.push({ state: cur, outcome, at: now });
     const prefix = this.subs.map((s) => s.decl.id).join("/");
     this.instance.history.push({ state: `${prefix}/${cur}`, outcome, at: now });
@@ -5923,14 +5098,14 @@ export class Session {
     // start, which is exactly where the packet hands over the reading and
     // asks for them — wiping those made the one-document reading pointless.
     if (this.machine.id === "main" && cur === this.machine.initial && target === "boot") {
-      if (this.bootEntered) this.clearReadBuffer();
+      if (this.bootEntered) this.reads.clearReadBuffer();
       this.bootEntered = true;
     }
     if (target !== undefined) this.gatePriority(this.machine, [target], channel);
     await this.assertConditions(this.machine, this.state(this.machine, cur), to, channel, supplied);
     const outcome = this.outcomeFor(this.machine, cur, to);
     this.completeGuarded(this.machine, this.instance, cur, outcome, now, to);
-    this.consumeDocs(this.state(this.machine, cur));
+    this.reads.consumeDocs(this.state(this.machine, cur));
     this.instance.history.push({ state: cur, outcome, at: now });
     this.seedSubs();
     return this.landing();
@@ -5945,7 +5120,7 @@ export class Session {
   async advance(to?: string, channel: Channel = "human"): Promise<Record<string, unknown>> {
     bumpDrawingEpoch();
     const now = new Date().toISOString();
-    const supplied = this.readProofs(channel);
+    const supplied = this.reads.readProofs(channel);
     if (this.instance.status === "closed") {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
@@ -6000,7 +5175,7 @@ export class Session {
       exit_met: this.conditionMet(home, s, "leave"),
       ...(s.evidence_form.length > 0 ? { evidence_form: s.evidence_form.filter((f) => f.type !== "derived") } : {}),
       pulled: this.pulled(home, s).map((p) => ({ path: p.path, sources: p.sources })),
-      lookahead_read: this.lookaheadRequirements(home, s),
+      lookahead_read: this.reads.lookaheadRequirements(home, s),
       ...(s.submachine !== undefined ? { submachine: s.submachine } : {}),
       next: s.edges.map((e) => {
         const t = home.states.find((st) => st.id === e.to);
@@ -6009,7 +5184,7 @@ export class Session {
           role: e.role,
           ...(e.guard !== undefined ? { guard: e.guard } : {}),
           ...(t !== undefined ? { kind: t.kind, statement: t.statement, priority: t.priority } : {}),
-          ...(t !== undefined ? { entry_read: this.unreadEntryRequirements(home, t) } : {}),
+          ...(t !== undefined ? { entry_read: this.reads.unreadEntryRequirements(home, t) } : {}),
         };
       }),
     };
@@ -6043,8 +5218,7 @@ export class Session {
       // REACHING END IS NOT IDLE. Powering off here would fire the moment a
       // walk completed, with the person still at the keyboard. The idle timer
       // owns that decision and it measures silence, not completion.
-      this.keepAwake?.kill();
-      this.keepAwake = undefined;
+      this.live.releaseKeepAwake();
       const info = this.packet();
       this.onClosed?.();
       return {
@@ -6109,7 +5283,7 @@ export class Session {
     // The containers are GENERATED from the records — their drawn canvases
     // are stubs (owner design 2026-07-27). A generated machine's own sub
     // states (archive decades) come from its parent's subGen.
-    const gen = this.top()?.gen?.subGen?.[subState.id]?.() ?? this.genFor(subState.id);
+    const gen = this.top()?.gen?.subGen?.[subState.id]?.() ?? this.views.genFor(subState.id);
     let decl: MachineDecl;
     if (gen !== undefined) {
       decl = gen.decl;

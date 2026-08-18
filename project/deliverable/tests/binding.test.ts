@@ -16,7 +16,8 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { withFrontmatter, withFrontmatterList } from "../engine/forms.ts";
 import { parseStateNote } from "../engine/notes.ts";
-import { assumptionItems, claimProblems, criterionAxisItems, nodeField, tableRow } from "../engine/stateform.ts";
+import { assumptionItems, criterionAxisItems, nodeField, tableRow } from "../engine/stateform.ts";
+import { claimProblems } from "../engine/stateform-problems.ts";
 import { freshRoot } from "./helpers.ts";
 
 /** A register with three entries: two standing assumptions, one closed. */

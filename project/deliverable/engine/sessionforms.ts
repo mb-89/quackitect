@@ -16,12 +16,14 @@ export function visitState(visit: string): string {
 }
 
 import { mintScenarioLines } from "./atamwalk.ts";
-import { withFrontmatter, withFrontmatterList } from "./forms.ts";
+import { CLAUSES, Rejection } from "./errors.ts";
+import { type FormTemplate, fieldContent, stripComments, withFrontmatter, withFrontmatterList } from "./forms.ts";
 import type { Iteration } from "./iterations.ts";
-import { writeNode } from "./notes.ts";
+import { parseStateNote, section, writeNode } from "./notes.ts";
 import { mintFlipLines } from "./pugh.ts";
-import type { Session } from "./session.ts";
-import { nodeField, nodeList } from "./stateform.ts";
+import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
+import type { AmendOp, Session } from "./session.ts";
+import { chosenOption, nodeField, nodeList } from "./stateform.ts";
 import { loadTrace, noteOf, traceDir } from "./trace.ts";
 
 /** What these functions need from a session: where things live, and which
@@ -282,4 +284,165 @@ export function mintFlipTripwires(paths: SessionPaths, fields: Record<string, st
       return id;
     });
   }
+}
+
+export function evidenceKey(m: MachineDecl, stateId: string): string {
+  return `${m.id}/${stateId}`;
+}
+
+/** EMPTY IS NOT INFORMATION. A key whose value is "", 0, [], {} or null says
+ *  nothing the key's absence does not, and it costs a line either way.
+ *  `false` is excluded on purpose — it is an answer, not a blank. */
+function blank(v: unknown): boolean {
+  if (v === null || v === undefined) return true;
+  if (typeof v === "string") return v === "";
+  if (typeof v === "number") return v === 0;
+  if (typeof v === "boolean") return false;
+  if (Array.isArray(v)) return v.length === 0;
+  return Object.keys(v as object).length === 0;
+}
+
+/** One dictionary with every blank pruned, recursively. Returns undefined
+ *  when nothing survives, so the caller can drop the key entirely. */
+function pruned(rec: unknown): Record<string, unknown> | undefined {
+  if (rec === null || typeof rec !== "object" || Array.isArray(rec)) return undefined;
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(rec as Record<string, unknown>)) {
+    const kept = v !== null && typeof v === "object" && !Array.isArray(v) ? pruned(v) : blank(v) ? undefined : v;
+    if (kept !== undefined) out[k] = kept;
+  }
+  return Object.keys(out).length === 0 ? undefined : out;
+}
+
+/** WHAT THE AGENT CAN ACTUALLY USE, and nothing else. Measured on i11's own
+ *  walk: one ordinary pull answered 290,280 bytes, of which 5,080 lines out
+ *  of 5,311 were things no agent reads.
+ *
+ *  FOUR THINGS COME OFF, and each is a different kind of waste.
+ *
+ *  - `ref_paths` and `ref_facts`, the whole record's corpus. The MIRROR needs
+ *    them to render a card from two ids; the agent opens the file instead.
+ *  - Blank argument slots. A free-form field shipped 27 keys, every one "",
+ *    [] or null, because the model carries a slot for every editor there is.
+ *  - `template.fields`, which restates `fields` name for name.
+ *  - On an ECHO, the field bodies. The agent wrote them one call ago.
+ *
+ *  THE ECHO IS THE ONLY PLACE BODIES GO. A form that is OWED keeps its
+ *  content, because a half-filled form coming back must show what already
+ *  stands — that is exactly what stops a recheck being answered from
+ *  scratch. What is dropped is the copy handed straight back to whoever
+ *  just sent it. */
+export function agentCopy(form: Record<string, unknown>, echo: boolean): Record<string, unknown> {
+  const { ref_paths: _paths, ref_facts: _facts, field_args, field_hints, template_meta, template, fields, ...rest } = form;
+  const out: Record<string, unknown> = { ...rest };
+  for (const [key, value] of [
+    ["field_args", field_args],
+    ["field_hints", field_hints],
+    ["template_meta", template_meta],
+  ] as const) {
+    const kept = pruned(value);
+    if (kept !== undefined) out[key] = kept;
+  }
+  if (template !== null && typeof template === "object") {
+    const { fields: _dup, ...restTemplate } = template as Record<string, unknown>;
+    const kept = pruned(restTemplate);
+    if (kept !== undefined) out.template = kept;
+  }
+  if (Array.isArray(fields)) {
+    out.fields = fields.map((f) => {
+      const field = f as Record<string, unknown>;
+      if (!echo) return field;
+      const { content, prefills: _pre, ...head } = field;
+      // THE LENGTH STANDS IN FOR THE BODY. It proves the text landed whole,
+      // which is the one thing the sender cannot check for itself.
+      return { ...head, chars: typeof content === "string" ? content.length : 0 };
+    });
+  }
+  return out;
+}
+
+/** THE PATCH HALF OF AN AMEND. `fills` rewrites a field WHOLE, which for a
+ *  renamed reference or a typo means resending two thousand characters to
+ *  change eleven — and every resend is a chance to lose a paragraph nobody
+ *  meant to touch.
+ *
+ *  SO AN OP IS old_string → new_string, matched against the field as it
+ *  stands. It must match EXACTLY ONCE, or the caller says `all: true` and
+ *  means every occurrence. Zero matches and an ambiguous match both refuse,
+ *  for the reason se_file_patch refuses them: a patch that lands somewhere
+ *  other than where its author looked is worse than no patch.
+ *
+ *  OPS AND FILLS COMPOSE. Several ops against one field chain, each seeing
+ *  the last one's result; a `fills` entry for the same field wins, because
+ *  a whole rewrite is unambiguous. */
+export function amendOps(raw: string, ops: AmendOp[], name: string): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const op of ops) {
+    const field = String(op.field ?? "");
+    const body = out[field] ?? fieldContent(raw, field);
+    const refuse = (expected: string, got: string): never => {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected,
+        got,
+        remedy: {
+          tool: "se_amend",
+          args: {
+            state: name,
+            ops: [{ field, old_string: "<text as it stands>", new_string: "<what it becomes>" }],
+            reason: "<what was wrong>",
+          },
+          note: "read the field on the pull first — old_string must be the text exactly as the form carries it",
+        },
+        source: "engine/session.ts amend",
+      });
+    };
+    if (body === undefined) refuse(`a section called ${field} on ${name}`, "no such section in the form");
+    const old = String(op.old_string ?? "");
+    if (old === "") refuse("old_string — the text being replaced", "an empty old_string");
+    const hits = (body as string).split(old).length - 1;
+    if (hits === 0) refuse(`old_string to appear in ${field}`, "it does not appear — nothing was changed");
+    if (hits > 1 && op.all !== true) {
+      refuse(
+        `old_string to appear once in ${field}`,
+        `it appears ${String(hits)} times — say all: true to replace every one, or give more surrounding text`,
+      );
+    }
+    const next = String(op.new_string ?? "");
+    out[field] = op.all === true ? (body as string).split(old).join(next) : (body as string).replace(old, next);
+  }
+  return out;
+}
+
+export function stateFormChecked(raw: string | undefined): string[] {
+  if (raw === undefined) return [];
+  const v = parseStateNote(raw).frontmatter.checked;
+  return typeof v === "string"
+    ? v
+        .split(",")
+        .map((x) => x.trim())
+        .filter((x) => x !== "")
+    : [];
+}
+
+export function stateFormScaffold(name: string, t: FormTemplate): string {
+  return [
+    "---",
+    `form: ${name}`,
+    "authors:",
+    "files:",
+    "---",
+    "",
+    `# Evidence form / ${name}`,
+    "",
+    ...t.fields.flatMap((f) => [`## ${f.name}`, "", ""]),
+  ].join("\n");
+}
+
+/** The blessed size may live in the kickoff's own stored form. */
+export function kickoffSizeFromForm(it: Iteration): string | undefined {
+  const abs = join(it.path, `project/spec/iterations/${it.id}/evidence/gate-kickoff.md`);
+  if (!existsSync(abs)) return undefined;
+  const txt = stripComments(section(parseStateNote(readFileSync(abs, "utf8")).body, "change_size")).toLowerCase();
+  return chosenOption(txt, CHANGE_COLUMNS);
 }

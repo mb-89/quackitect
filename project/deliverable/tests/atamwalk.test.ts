@@ -8,7 +8,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { exposureView, mintScenarioLines, scenarioDeckView, structureMetrics } from "../engine/atamwalk.ts";
 import { elementMatrixView } from "../engine/elematrix.ts";
-import { assumptionLawProblems, authorTestsLawProblems, deckLawProblems, structureLawProblems } from "../engine/stateform.ts";
+import { assumptionLawProblems, authorTestsLawProblems, deckLawProblems, structureLawProblems } from "../engine/stateform-problems.ts";
 import { conformance, type TraceNode } from "../engine/trace.ts";
 
 const REQS = [

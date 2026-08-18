@@ -14,6 +14,7 @@ import { describe, test } from "node:test";
 import { Rejection } from "../engine/errors.ts";
 import { loadPanel, type PanelValues, parsePanel, renderPanel, toggleKey } from "../engine/params.ts";
 import { Session } from "../engine/session.ts";
+import { Liveness } from "../engine/sessionlive.ts";
 import { freshRoot } from "./helpers.ts";
 
 const VALUES: PanelValues = { rungs: [], autonomy: 0, ints: {} };
@@ -145,7 +146,7 @@ describe("the idle clock", () => {
   });
 
   test("the window is five minutes, and it is named rather than buried", () => {
-    assert.equal(Session.IDLE_MINUTES, 5);
+    assert.equal(Liveness.IDLE_MINUTES, 5);
   });
 });
 
@@ -154,7 +155,7 @@ describe("the shutdown is armed, never automatic", () => {
   // so the guard is that it CANNOT happen unless somebody pressed the button.
   test("exactly one place shuts the machine down, and it is inside checkIdle", async () => {
     const { readFileSync } = await import("node:fs");
-    const src = readFileSync(new URL("../engine/session.ts", import.meta.url), "utf8");
+    const src = readFileSync(new URL("../engine/sessionlive.ts", import.meta.url), "utf8");
     const calls = [...src.matchAll(/spawn\("shutdown\.exe"/g)];
     assert.equal(calls.length, 1);
     const before = src.slice(0, calls[0].index);
@@ -163,7 +164,7 @@ describe("the shutdown is armed, never automatic", () => {
 
   test("checkIdle returns early unless the flag is set", async () => {
     const { readFileSync } = await import("node:fs");
-    const src = readFileSync(new URL("../engine/session.ts", import.meta.url), "utf8");
+    const src = readFileSync(new URL("../engine/sessionlive.ts", import.meta.url), "utf8");
     const body = src.slice(src.indexOf("private checkIdle"));
     assert.match(body.slice(0, 200), /if \(!this\._shutdownAtIdle\) return;/);
   });

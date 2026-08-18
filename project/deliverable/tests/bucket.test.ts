@@ -18,7 +18,7 @@ import { strict as assert } from "node:assert";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { checklistOwed } from "../engine/stateform.ts";
+import { checklistOwed } from "../engine/stateform-problems.ts";
 import { loadTrace } from "../engine/trace.ts";
 import { owedStanding } from "../engine/worktree.ts";
 import { freshRoot } from "./helpers.ts";

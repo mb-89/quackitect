@@ -9,6 +9,8 @@ files:
   - "project/deliverable/engine/stateform.ts"
   - "project/deliverable/engine/forms.ts"
   - "project/deliverable/engine/sessionforms.ts"
+  - "project/deliverable/engine/stateform-problems.ts"
+  - "project/deliverable/engine/stateform-sheet.ts"
 ---
 
 ## Responsibility
@@ -688,3 +690,29 @@ says, which is why it is a set of functions rather than part of the session.
 WHAT MINTING ADDS. Some forms do not only read the corpus, they WRITE it: a
 scenario's at-risk verdicts become register entries, and a sensitivity card's
 credible rulings become tripwires. Those run at submit, from the same paths.
+
+## The portable copy
+
+A FORM TRAVELS AS ONE FILE. The sheet is a whole HTML document with its own
+styles, its own script and the documents it references embedded in it, so the
+person filling it in needs nothing but a browser and no network at all.
+
+WHAT COMES BACK IS THE ISLAND, never the page. The returned file carries a
+single JSON block naming the form, the author, the field bodies and the input
+labels ticked on the sheet; the ingest reads that and ignores the rest. A page
+edited by hand outside the island changes nothing, which is what makes the
+round trip safe to accept from anywhere.
+
+IT IS A LEAF. Nothing in the form model reaches down into the sheet — the
+sheet borrows the model's shapes and renders them, and that one-way edge is
+why it is its own file.
+
+## What a form still owes
+
+THE CHECKS ARE THEIR OWN THING. Reading the corpus and returning lines of
+prose about what is missing shares no state with building the model, so the
+laws, the field checks and the per-editor checks live apart from it.
+
+THEY RENDER NOTHING AND WRITE NOTHING. A check answers with the sentence a
+person reads and stops there — the caller decides whether that sentence blocks
+a save, greys a claim, or only shows in the panel.

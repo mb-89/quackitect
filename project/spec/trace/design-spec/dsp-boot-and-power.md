@@ -12,6 +12,7 @@ files:
   - project/deliverable/engine/pullnotice.ts
   - project/deliverable/engine/bin/package.ts
   - project/deliverable/engine/version.ts
+  - project/deliverable/engine/sessionlive.ts
 ---
 
 ## Responsibility

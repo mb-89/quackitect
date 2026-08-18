@@ -6,7 +6,8 @@ import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { expandHint, fieldHint, type StateFormModel, templateMeta, templateProblems } from "../engine/stateform.ts";
+import { expandHint, fieldHint, type StateFormModel, templateMeta } from "../engine/stateform.ts";
+import { templateProblems } from "../engine/stateform-problems.ts";
 import { itemTemplate } from "../engine/trace.ts";
 import { freshRoot, mirrorSource } from "./helpers.ts";
 

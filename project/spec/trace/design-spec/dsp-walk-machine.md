@@ -16,6 +16,9 @@ files:
   - project/deliverable/engine/conditions.ts
   - project/deliverable/engine/scale.ts
   - project/deliverable/engine/readproof.ts
+  - project/deliverable/engine/sessionreads.ts
+  - project/deliverable/engine/sessionviews.ts
+  - project/deliverable/engine/sessionscript.ts
 ---
 
 ## Responsibility
