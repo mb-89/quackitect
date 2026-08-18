@@ -67,7 +67,7 @@ NOT REACHABLE, because the four slides above it are not built. Nothing here is b
 
 They ran their own method on their own product, with the method and the work in two different trees, and neither leaked into the other.
 |||
-THE NO-LEAK HALF IS PROVED AND THE RUNNING HALF IS NOT. SE-C-140 refuses a write to the tree a copy came from, comparing recorded identities rather than paths, and it fails closed when it cannot decide. SE-C-141 bounds a producing act to what it is producing, for writes only. NOT covered: the engine's own internal writes, measured at 116 bare joins across 49 files, and the symlink and platform facets, which have no check at all. The rest of this deck is not built, so nothing has run that could leak.
+THE NO-LEAK HALF IS PROVED AND THE RUNNING HALF IS NOT. SE-C-143 refuses a write to the tree a copy came from, comparing recorded identities rather than paths, and it fails closed when it cannot decide. SE-C-141 bounds a producing act to what it is producing, for writes only. NOT covered: the engine's own internal writes, measured at 116 bare joins across 49 files, and the symlink and platform facets, which have no check at all. The rest of this deck is not built, so nothing has run that could leak.
 
 <!-- WHY THIS STORY IS NEW at i16. The owner named two capabilities on
 2026-08-18: "the engine creates a vehicle from itself" and "the engine can work

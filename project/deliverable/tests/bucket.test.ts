@@ -18,9 +18,9 @@ import { strict as assert } from "node:assert";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { checklistOwed } from "../engine/stateform.ts";
+import { owedStanding } from "../engine/records.ts";
+import { checklistOwed } from "../engine/stateform-problems.ts";
 import { loadTrace } from "../engine/trace.ts";
-import { owedStanding } from "../engine/worktree.ts";
 import { freshRoot } from "./helpers.ts";
 
 function entry(root: string, id: string, status: string): void {
@@ -89,7 +89,7 @@ test("an owed item naming nothing is not counted as a carried finding", () => {
 // autonomy dial. A behavioural case would need a git tree; the defect is one
 // hardcoded path, and a reader with a pattern catches it.
 test("the iteration close reads the ITERATION's owed items, not the expeditions folder", () => {
-  const src = readFileSync(new URL("../engine/worktree.ts", import.meta.url), "utf8");
+  const src = readFileSync(new URL("../engine/records.ts", import.meta.url), "utf8");
   const at = src.indexOf("export function itCloseShipped");
   assert.ok(at > 0, "the iteration close is gone");
   const body = src.slice(at, src.indexOf("\n}\n", at));

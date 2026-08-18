@@ -1,38 +1,4 @@
-// THE MORPHOLOGICAL BOX. Rows are function clusters, cells are the options
-// serving them, and a curve across the box is one candidate architecture.
-//
-// THE GRID IS DERIVED AND UNEDITABLE HERE. It comes from the option nodes the
-// seven finders minted, so there is nothing to type into a cell — an option is
-// changed in its own note. What a person DOES here is draw lines.
-//
-// THE LINES JOIN DOTS, NOT CELLS (owner design 2026-08-08, and it replaced a
-// first cut that ran the curve through cell centres). One cell can belong to
-// several candidates, so a cell cannot carry a colour. Instead every cell holds
-// a fixed row of dot SLOTS — one per candidate — and a candidate's dot always
-// sits in its own slot, wherever it goes. The curve joins those dots.
-//
-// Two things fall out of that, and both are the reason for it:
-//   - A cell on four lines shows four dots, side by side, in a stable order.
-//   - A line keeps a consistent offset down the chart, so two lines through
-//     the same cells stay readable instead of overlapping exactly.
-// The slots WRAP inside the cell, so a chart with two dozen candidates gets a
-// second and third row of dots rather than a cell that grows sideways.
-//
-// HOW A LINE IS DRAWN. Hold shift and click cells; each click adds a waypoint,
-// and clicking a second cell in a row you already visited MOVES the waypoint.
-// Release shift to keep it. Escape abandons it. A drawn dot can also be
-// DRAGGED to another cell in its own row.
-//
-// A LINE IS A CANDIDATE ONLY WHEN IT IS COMPLETE — one option per cluster
-// (owner ruling). An unfinished line is kept and drawn dashed rather than
-// thrown away, because a person mid-thought is the normal case, and the state's
-// own check names it at submit.
-//
-// COLOUR IS A FUNCTION OF POSITION, never stored. See sfmbPen below.
-//
-// NO BACKTICK MAY APPEAR IN ANY BODY BELOW, not even inside a comment. Each
-// body is one template literal and a backtick ENDS it — everything after would
-// become real TypeScript. It has happened twice.
+// see dsp-form-editors.md#the-morphological-box
 import type { EditorKind } from "./kinds.ts";
 
 export const MORPH_BOX_EDITOR: EditorKind = {
@@ -42,15 +8,9 @@ export const MORPH_BOX_EDITOR: EditorKind = {
     if (box.rows.length === 0) {
       return '<div class="sfempty" style="color:var(--se-muted);font-style:italic;padding:6px 0;">No clusters yet, so there is no chart to draw on. partition-functions names the rows, and the seven finders fill the cells.</div>';
     }
-    // EVERY COLUMN WRAPS, AND THE ROW HEADER WRAPS TOO (owner, 2026-08-09).
-    // The header carried white-space:nowrap, so a cluster name held the whole
-    // chart open and pushed the cells off the side. A chart nobody can see
-    // across is a chart nobody draws on.
+    // see dsp-form-editors.md#every-column-wraps
     const cel = "padding:5px 8px;border-top:1px solid var(--se-border);vertical-align:top;font-size:12.5px;min-width:140px;max-width:240px;white-space:normal;overflow-wrap:anywhere;";
-    // A MIN-WIDTH IS WHAT MAKES IT WRAP (owner, 2026-08-09). Wrapping alone
-    // let the table squeeze the header to one character per line, because
-    // overflow-wrap:anywhere permits a break between any two letters. The
-    // floor gives the column a width to wrap INSIDE.
+    // see dsp-form-editors.md#a-min-width-is-what-makes-it-wrap
     const hed = "padding:5px 8px;text-align:left;font-weight:normal;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--se-muted);vertical-align:top;white-space:normal;overflow-wrap:break-word;min-width:150px;max-width:200px;";
     // THE CONTROLS WEAR THE THEME, never the browser's default (ux.md). A bare
     // button renders white on a dark panel, which is what the owner saw.
@@ -59,12 +19,7 @@ export const MORPH_BOX_EDITOR: EditorKind = {
       const cells = r.cells.map(function (c) {
         const struck = c.pruned !== "" ? "text-decoration:line-through;color:var(--se-muted);" : "";
         const why = c.pruned !== "" ? "pruned: " + c.pruned : (c.found_by !== "" ? "found by " + c.found_by : "");
-        // THE SLOTS ARE FILLED BY THE CLIENT, never here. The count follows the
-        // number of lines, which changes as a person draws, so rendering them
-        // server-side would put two sources in charge of one thing.
-        // EVERY CELL IS AN OPTION, SO EVERY CELL LINKS TO ITS NOTE (owner,
-        // 2026-08-09). It opens in the EDITOR rather than the details pane,
-        // because the pane is already holding the matrix you are reading.
+        // see dsp-form-editors.md#the-slots-are-filled-by-the-client
         const p = paths ? paths[c.id] : null;
         const idLink = p
           ? '<a class="doclink" data-path="' + escText(p) + '" title="open ' + escText(p) + ' in the editor" style="color:var(--se-accent);font-size:10.5px;cursor:pointer;">' + escText(c.id) + "</a>"

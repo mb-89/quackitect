@@ -6,13 +6,12 @@ kind: assumption
 statement: A host fires its SessionStart hooks and waits for them before the agent's first turn, so an arrival wired there has completed by the time the agent acts.
 owner: the owner
 trigger: the first host that runs SessionStart hooks concurrently with the first turn, or skips them on resume
-status: deferred
-defer_until: the marker a first pull can read is built. This node's own probe field names that as the cheap probe and records that it does not exist, and req-arriving-twice-changes-nothing is the mitigation rather than the proof.
+status: open
 impact: "The agent's first act would race the arrival: it would find no lane, follow the card, and perform the five acts by hand while the hook did the same thing underneath it. Two arrivals at once is the one case req-arriving-twice-changes-nothing was written for."
 breaks_how_badly: crippling
 how_likely: conceivable
-probe: unprobed, deliberately. i35 opened it on 2026-08-17. The hook was invoked and its output observed, but nothing establishes ORDERING against the first turn. req-arriving-twice-changes-nothing is the mitigation, not the proof. The cheap probe is a marker the first pull can read, and it is not built.
-probed: 2026-08-17
+probe: "HOLDS ON THIS HOST, probed 2026-08-18 on the i17 arrival, and the ordering evidence i35 could not get is now in hand. The hook fired on a real cloud session and its seven step lines were sitting ABOVE the agent first turn, in the transcript, before anything was read. That is the ordering the entry asked for: the agent could not have raced it, because the output was already there to read. WHAT IS STILL NOT ESTABLISHED is the resume case named in the trigger - this was a startup, not a resume."
+probed: 2026-08-18
 source_refs:
   - uc-arrive-on-an-unattended-machine
   - i35-the-cloud-run-s-findings-land-the-fix-fi

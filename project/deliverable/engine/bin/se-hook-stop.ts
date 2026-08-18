@@ -98,13 +98,7 @@ function lastPull(): LastPull | undefined {
       try {
         return { ...(JSON.parse(rec.response) as LastPull), ok: !refused };
       } catch {
-        // A LONG RESPONSE IS STORED TRUNCATED, so parsing the whole of it
-        // throws and the tooth silently loses its bite. Found live on
-        // 2026-08-14: the hook passed a mid-work stop twice, because every
-        // recent pull's response was too long to store whole.
-        //
-        // Only three fields decide the verdict and all three sit near the
-        // FRONT of the answer, so they survive the cut. Read them directly.
+        // see dsp-boot-and-power.md#a-long-response-is-stored-truncated
         const pull = /"pull"\s*:\s*"([a-z]+)"/.exec(rec.response)?.[1];
         if (pull === undefined) continue;
         const target = /"target"\s*:\s*"([^"]*)"/.exec(rec.response)?.[1];
@@ -141,14 +135,7 @@ process.stdin.on("end", () => {
     const last = lastPull() ?? {};
     const pull = last.pull;
     if (pull === undefined) process.exit(0);
-    // THE NOTCH DECIDES, NOT THIS FILE (owner design 2026-08-16). One fixed
-    // rule was right about eight stops in a day and wrong about five, and no
-    // amount of tuning lets it see the difference — the reason a stop happened
-    // is not in the walk's position. The person can see it, so the notch is
-    // theirs. machines/stopat.md holds what each one means.
-    //
-    // AN UNREADABLE OR ABSENT NOTCH IS `agent judgement`, the default, which
-    // is the behaviour every line below this already described.
+    // see dsp-boot-and-power.md#the-notch-decides
     const notch = typeof last.stop_at === "string" ? last.stop_at.trim().toLowerCase() : "";
     // STATE END: the ENGINE holds every transition and refuses to move. The
     // agent stopping is then not a failure of nerve, it is the machine's own
@@ -166,22 +153,7 @@ process.stdin.on("end", () => {
     // the walk has somewhere to be, and "nothing to route" is false whatever
     // the desk answered.
     const target = typeof last.target === "string" ? last.target.trim() : "";
-    // THE DESK WITH NOTHING ROUTED IS THE MACHINE'S OWN STOP, whatever the
-    // pull happened to call it. The desk's own guidance says so in as many
-    // words: "Without a routed goal, stay at the desk and stop."
-    //
-    // IT ANSWERS `do` ON THE TURN THE WALK ARRIVES THERE, because the desk's
-    // guidance is itself work — read the method, sweep the inbox, listen to
-    // the person. Only the NEXT pull answers `wait`.
-    //
-    // SO THE TOOTH BIT A SANCTIONED STOP (owner, 2026-08-17), one call after
-    // an iteration shipped and the walk landed at the desk. The agent had
-    // already named which sanctioned stop applied and stopped anyway. The
-    // owner's words: "when you're on the front desk after an iteration, you
-    // just stop. You don't keep going."
-    //
-    // THE TARGET HALF STILL BINDS. A routed goal is a standing instruction,
-    // and the desk is not a hiding place from one.
+    // see dsp-boot-and-power.md#the-desk-with-nothing-routed-is-the-machines-own
     const atDesk = at.split(",").some((w) => w.trim() === "front_desk");
     if (target === "" && (pull === "wait" || atDesk)) process.exit(0);
     const where = at;
@@ -193,23 +165,7 @@ process.stdin.on("end", () => {
       "blockers only": "[se] stop @ blockers only: you stop only when the walk CANNOT go on, and the last pull was not refused. ",
     };
     const prefix = NOTCHED[notch] ?? "";
-    // THE ONLY STOPS THAT ARE SANCTIONED, named rather than implied (owner
-    // ruling 2026-08-14: "you don't need to stop working unless I explicitly
-    // told you to or you need a decision from me").
-    //
-    // The old wording said only "a question that BLOCKS", and that was read as
-    // covering any question the agent felt uncertain about. It is narrower
-    // than that: the walk stops where a PERSON is genuinely required, or where
-    // it cannot go on.
-    // A FOURTH JOINED THEM ON 2026-08-14, on the owner's word: "in the last few
-    // retros, you never asked me for field feedback. So you don't stop. You just
-    // continue with your stuff... asking me for field feedback is a reason to
-    // stop."
-    //
-    // It fits (2) on its face and was never read that way, because the agent
-    // could always find more retro to do and kept walking past the question.
-    // Only the FIRST retro step that needs a person gets named here; the rest
-    // of the retro proceeds while the answer is owed.
+    // see dsp-boot-and-power.md#the-only-stops-that-are-sanctioned
     const SANCTIONED =
       "FOUR STOPS ARE SANCTIONED AND NOTHING ELSE IS. " +
       "(1) A GATE THE PERSON OWNS — gate-implementation is theirs to bless; the rest are yours at this dial. " +

@@ -9,10 +9,10 @@
 // The values are read from project/deliverable/brand/palette.css, so this lints the FILE a
 // person edits rather than a copy of it in the source.
 import { strict as assert } from "node:assert";
-import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { FEED_ROLES, feedColours, RESERVED_ROLES, renderMirror, reservedColours } from "../engine/render.ts";
+import { mirrorSource } from "./helpers.ts";
 
 const REPO_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 
@@ -51,7 +51,7 @@ test("no feed role steals a colour the voice already spent", () => {
 // A COLOUR WRITTEN AT THE PLACE IT IS USED IS A DEFECT (ux.md). The rule was
 // prose, it was broken repeatedly, and prose that keeps breaking wants a lint.
 test("no six-digit hex is written into the renderer", () => {
-  const source = readFileSync(new URL("../engine/render.ts", import.meta.url), "utf8");
+  const source = mirrorSource();
   const offenders: string[] = [];
   for (const [i, line] of source.split("\n").entries()) {
     const hit = line.match(/#[0-9a-f]{6}\b/i);
@@ -69,7 +69,7 @@ test("no six-digit hex is written into the renderer", () => {
 // so window.open inside the editor silently does nothing. Every call must
 // therefore be guarded by the embed flag, or a modifier key becomes a dead key.
 test("no window.open runs inside the editor, where the sandbox kills it", () => {
-  const source = readFileSync(new URL("../engine/render.ts", import.meta.url), "utf8");
+  const source = mirrorSource();
   const offenders: string[] = [];
   for (const [i, line] of source.split("\n").entries()) {
     if (!line.includes("window.open(")) continue;
@@ -89,7 +89,7 @@ test("every feed colour actually reaches the page", () => {
   // A palette entry nothing asks for is dead configuration, and a role the
   // page never draws is a colour nobody sees. Both are the same bug.
   assert.equal(typeof renderMirror, "function");
-  const source = readFileSync(new URL("../engine/render.ts", import.meta.url), "utf8");
+  const source = mirrorSource();
   for (const role of FEED_ROLES) {
     assert.ok(source.includes(`var(--se-feed-${role})`), `${role} is declared but never drawn`);
   }

@@ -197,15 +197,9 @@ So, for any change a person will LOOK at:
 Never report a UI change as done from a green test alone. A test proves the
 function; only the reload proves the owner can see it.
 
-THIS RULE USED TO HAVE A SECOND HALF AND i34 REMOVED IT. It read: "There are
-TWO working trees whenever a record is bound... The engine serves ONE of them,
-and WHICH ONE depends on whether a walk is bound right now. An edit that lands
-in the other tree is invisible." The middle step was `se_git_sync` into the
-bound worktree.
-
-ONE TREE ENDS THAT WHOLE CLASS. There is no other tree for an edit to land in,
-and the sync verb is deleted. What survives is the reload, which was always the
-part that made the change visible.
+ONE TREE IS WHY THE RULE IS THIS SHORT. There is no second tree for an edit to
+land in and disappear, so the reload is the whole of it — and the reload was
+always the part that made a change visible.
 
 ## The engine checks a written file, and the agent never asks
 

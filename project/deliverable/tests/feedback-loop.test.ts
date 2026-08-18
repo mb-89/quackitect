@@ -181,14 +181,17 @@ test("one verb names every condition holding a state, and the walk refuses with 
 // explain a state by rules the walk no longer judges it by. That is worse than
 // no verb, because it is confidently wrong.
 test("the verb and the walk read ONE blocker list, not two copies", () => {
-  const src = readFileSync(join(import.meta.dirname, "..", "engine", "session.ts"), "utf8");
+  // THE CLAIMS LEFT THE CLASS but the rule did not: the collector and both
+  // readers must still be one list, and they are all in the claims now. The
+  // session keeps a one-line wrapper, which is not a second copy.
+  const src = readFileSync(join(import.meta.dirname, "..", "engine", "sessionclaims.ts"), "utf8");
 
   const collector = src.indexOf("stateBlockers(stateId: string): Blocker[]");
   assert.ok(collector > 0, "the collector exists and is the one place the conditions are computed");
 
   // The walk's assert must DELEGATE. If it grows its own checks again, this
   // goes red and says why.
-  const asserter = src.indexOf("private assertStateFormMet(");
+  const asserter = src.indexOf("assertStateFormMet(stateId: string): void");
   assert.ok(asserter > 0, "the walk still asserts");
   const body = src.slice(asserter, asserter + 500);
   assert.match(body, /this\.stateBlockers\(stateId\)\[0\]/, "the walk throws the FIRST blocker rather than recomputing one");

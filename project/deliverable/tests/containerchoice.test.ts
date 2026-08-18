@@ -10,7 +10,7 @@ import { spawnSync } from "node:child_process";
 import { test } from "node:test";
 import { bootedServer, call, freshRoot, gitInit } from "./helpers.ts";
 
-// A SECOND worktree needs a HEAD that points at something. gitInit leaves the
+// A SECOND seed needs a HEAD that points at something. gitInit leaves the
 // default branch unborn, so the first seed succeeds and the second refuses
 // with "HEAD points to an invalid (or orphaned) reference".
 function committed(root: string): void {

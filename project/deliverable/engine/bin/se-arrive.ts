@@ -45,8 +45,12 @@ if (process.argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
   --root         the project root (the folder holding project/). Default: cwd.
   --autonomy     which rung the agent works at by itself, BY NAME:
                  blocked, mechanical, operational, tactical, strategic, ideation.
-                 Default tactical, which is what running an iteration takes:
+                 Default tactical, which ENTERS every state an iteration has:
                  a gate is the heaviest step in one, and a gate is tactical.
+                 IT DOES NOT SIGN THEM. A bless wants a hand strictly ABOVE the
+                 gate's weight, so at tactical an unattended walk fills the gate
+                 and then stops for the person. A run that must sign its own
+                 gates is launched at strategic, and that is the owner's call.
                  The rungs and what each means are machines/scale.md.
   --mirror-port  the lane's HTTP port. Default 7333.
   --help         this text (-h, -?)

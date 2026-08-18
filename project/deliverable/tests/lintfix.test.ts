@@ -10,7 +10,8 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { filePatch, fileWrite } from "../engine/files.ts";
+import { fileWrite } from "../engine/files.ts";
+import { filePatch } from "../engine/files-patch.ts";
 import { contentHash } from "../engine/hash.ts";
 import { freshRoot } from "./helpers.ts";
 

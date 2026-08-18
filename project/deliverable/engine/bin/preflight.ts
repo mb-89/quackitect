@@ -139,15 +139,7 @@ if (existsSync(join(root, "project", "deliverable", "hooks", "pre-commit"))) {
   // "Filename too long" (raid-issue-windows-longpaths).
   if (process.platform === "win32") spawnSync("git", ["config", "core.longpaths", "true"], { cwd: root, stdio: "ignore" });
 }
-// THE SHELL IS NOT COVERED BY THE SUITE. Nothing imports extension.js, so a
-// syntax error in it ships GREEN and VS Code then loads no extension at all,
-// silently. That happened on 2026-07-30: a backtick inside a comment ended
-// the template literal the webview's script lives in.
-//
-// Parsing the file is only HALF the guard. The webview's own scripts live
-// inside template literals, so to the outer parser they are just text: a
-// syntax error in one ships green, the pane renders, its script throws, and
-// the pane is silently dead. Each script body is therefore parsed on its own.
+// see dsp-quality-toolchain.md#the-shell-is-not-covered-by-the-suite
 const shell = join(root, "project", "deliverable", "vscode", "extension.js");
 if (existsSync(shell)) {
   const parsed = spawnSync(process.execPath, ["--check", shell], { encoding: "utf8" });
@@ -195,20 +187,7 @@ try {
   failures.push("the call log location is not writable (.se/)");
 }
 
-// THE CORPUS IS WHAT EVERY QUERY AND COVERAGE CHECK IS BUILT ON, so broken
-// frontmatter there is the worst place for a green check.
-//
-// MEASURED 2026-08-17: a trace note whose frontmatter block was never
-// terminated sat in the tree and preflight printed `preflight green`.
-// SE-C-135 checks that a write ARRIVED VERBATIM, never that it was
-// WELL-FORMED, and se_file_write is the one lane verb that replaces a whole
-// file with no structural guard. Nothing else looked.
-//
-// THE UNTERMINATED BLOCK IS THE HOLE THAT HID. splitNote reports
-// `fenced: false` for it, which is indistinguishable from a note carrying no
-// frontmatter at all — so readKeys answers {} and every reader downstream
-// sees an empty mapping instead of a broken file. The fence is therefore
-// checked HERE, before the parse, because the parse cannot see it.
+// see dsp-quality-toolchain.md#the-corpus-is-what-every-query-and-coverage-check
 const scanFrontmatter = (dir: string): void => {
   for (const e of existsSync(dir) ? readdirSync(dir, { withFileTypes: true }) : []) {
     const p = join(dir, e.name);

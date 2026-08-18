@@ -25,11 +25,11 @@ import { dirname, join } from "node:path";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { parseStateNote } from "../engine/notes.ts";
+import { laneSource } from "./helpers.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
 // tests/ sits in project/deliverable/, the trace in project/spec/trace/.
 const TRACE = join(here, "..", "..", "spec", "trace");
-const TOOLS = join(here, "..", "engine", "tools.ts");
 
 interface Node {
   id: string;
@@ -99,7 +99,7 @@ test("every refines edge lands on a node that exists", () => {
 // all, and named in the use-case layer. The third — at least one requirement
 // demanding it — is not checked here, and stays analysis.
 function registeredVerbs(): string[] {
-  const src = readFileSync(TOOLS, "utf8");
+  const src = laneSource();
   return [...new Set([...src.matchAll(/^\s+name: "(se_[a-z_]+)",$/gm)].map((m) => m[1]))].sort();
 }
 

@@ -41,7 +41,7 @@ It asks them the three things the export asks: where to put it, what to call it,
 
 A complete copy appears at the place they named. Nothing else on the machine changed, and the window they were in is exactly as they left it.
 |||
-THE FIRST HALF IS PROVED AND THE SECOND CANNOT BE PROVED FROM HERE. Eleven cases in `tests/produce.test.ts` produce a vehicle into a temporary directory and compare the engine's own tree before and after. A producing act is bounded to the tree it is making (SE-C-141) and may never write back to the tree it came from (SE-C-140), both with negative controls. The WINDOW half rests on `forceNewWindow: true` asserted in the extension's source, which proves the intent rather than the result.
+THE FIRST HALF IS PROVED AND THE SECOND CANNOT BE PROVED FROM HERE. Eleven cases in `tests/produce.test.ts` produce a vehicle into a temporary directory and compare the engine's own tree before and after. A producing act is bounded to the tree it is making (SE-C-141) and may never write back to the tree it came from (SE-C-143), both with negative controls. The WINDOW half rests on `forceNewWindow: true` asserted in the extension's source, which proves the intent rather than the result.
 
 ---
 

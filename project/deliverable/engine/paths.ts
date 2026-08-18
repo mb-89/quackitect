@@ -1,20 +1,4 @@
-// The path jail. Every lane path is root-relative; anything resolving outside
-// the project root is refused. The jail is checked at the resolver — no tool
-// implements its own path handling.
-//
-// DECLARED ROOTS (ported from v2's req-search-roots; owner rulings 2026-07-29
-// and 2026-07-30). A read may address a declared root as "@name/rest". The
-// rule the fence protects is DECLARED, NEVER ARBITRARY: every reachable
-// folder stands in .se/roots.json, and every read stays logged. The AGENT
-// writes the declaration itself, through the lane — a person is never asked
-// to hand-edit a dotfile they cannot be expected to understand. Roots are
-// machine-local on purpose (an absolute path means nothing on anyone else's
-// machine).
-//
-// A ROOT IS READ-ONLY UNLESS ITS DECLARATION SAYS `writable: true` (i16).
-// That writable door is how this engine drives a project that is not itself.
-// The one target it may never reach is the tree it was produced from, and
-// SE-C-140 compares recorded identities rather than paths to say so.
+// see dsp-resolution-seam.md#the-path-jail
 import { existsSync, readFileSync } from "node:fs";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { actBoundTree } from "./actbound.ts";
@@ -99,12 +83,7 @@ function refuseIfTargetIsSource(root: string, name: string, declared: DeclaredRo
   });
 }
 
-/** The owner's declared roots, read LIVE so an edit binds the very next call.
- *
- *  A DECLARATION THAT CANNOT BE READ MUST NEVER READ AS "NONE DECLARED" (found
- *  live 2026-07-29): PowerShell wrote this file with a UTF-8 BOM, JSON.parse
- *  refused it, and a swallowing catch reported the owner's root as undeclared.
- *  The BOM is stripped, and a broken file is now a LOUD refusal. */
+/** see dsp-resolution-seam.md#the-owners-declared-roots-read-live-so-an-edit */
 export function declaredRoots(root: string, source = "engine/paths.ts"): Record<string, DeclaredRoot> {
   const p = join(root, ".se", "roots.json");
   if (!existsSync(p)) return {};
@@ -291,45 +270,10 @@ export function seDir(root: string): string {
   return join(root, ".se");
 }
 
-/** WHAT KIND OF THING A PATH IS (owner ruling 2026-08-07).
- *
- *  THE FAILURE THIS ENDS. The engine served ONE tree, chosen by whether a
- *  walk happened to be bound at that instant. So the same path meant
- *  different files at different moments, and two failures followed it
- *  everywhere:
- *
- *  - A method change applied in one tree and the machine kept its old
- *    behaviour in the other. The person edits a row, the state machine does
- *    not change, and nothing says why.
- *  - A record's state was read from whichever tree was in hand. The mirror
- *    painted i1's states green out of trunk while i1's own worktree held the
- *    fall that knocked them down.
- *
- *  THE RULE. A path is resolved by WHAT IT IS, never by where the walk
- *  stands. Three kinds, and each has exactly one home:
- *
- *  - SESSION — `.se/` and the declared roots. Always the project root. The
- *    handover, the notes and the call log belong to the person's machine,
- *    not to a branch.
- *  - METHOD — guidance, machines, matrix rows, templates, the engine and the
- *    prompt layer. SHARED by every tree. A write fans out to all of them in
- *    one act, so a change takes effect wherever the reader is standing.
- *  - RECORD — one iteration's or expedition's own evidence and decisions.
- *    Owned by that record, and read from ITS tree whether or not it is
- *    bound. There is only ever one copy that counts, so nothing can drift.
- *
- *  CONTENT is everything else and behaves as it always did: it rides the
- *  tree the walk is working in. */
+/** see dsp-resolution-seam.md#what-kind-of-thing-a-path-is */
 export type PathKind = "session" | "method" | "record" | "content";
 
-/** The method surfaces, as root-relative prefixes. A change to any of these
- *  changes how the MACHINE behaves, which is why they cannot belong to one
- *  tree. Kept as a list rather than a clever rule: the set is small, it is
- *  read by people, and a wrong guess here is the bug this exists to kill. */
-// THE TESTS ARE METHOD TOO. They are the engine's own proof, they belong to no
-// record, and leaving them out produced exactly the fault this list exists to
-// prevent: a worktree took the new engine and kept its old tests, so the suite
-// failed on laws that had already been changed (found live 2026-08-07).
+/** see dsp-resolution-seam.md#the-method-surfaces-as-root-relative-prefixes */
 export const METHOD_PREFIXES = [
   "project/guidance/",
   "project/deliverable/machines/",
@@ -386,31 +330,12 @@ export function pathKind(rel: string): PathKind {
  *  THIS FUNCTION NEVER REFUSES. It answers who owns the path and stops. */
 export type Owner = { kind: "core" } | { kind: "record"; container: "iterations" | "expeditions"; id: string } | { kind: "bound" };
 
-// `machineRootOf` IS GONE (i34). Its whole job was stripping `.worktrees/<id>`
-// off a path to recover the machine root, and there are no worktrees to strip.
-//
-// ITS OWN COMMENT NAMED THE DEFECT IT CAUSED: se_lint resolved
-// `.se/HANDOVER.md` against a worktree while the file lane resolved it against
-// the machine root. Both were correct against their own ambient root, and
-// neither answer said which. One root is the only shape where that cannot
-// happen.
-
 export function routeToOwner(rel: string): Owner {
   const kind = pathKind(rel);
-  // Session state and method are machine-wide. One copy, served by the core —
-  // which is what lets a method change reach every tree without the caller
-  // stepping out of anything.
+  // Session state and method are machine-wide. One copy, served by the core.
   if (kind === "session" || kind === "method") return { kind: "core" };
   const owner = recordOwnerOf(rel);
   if (owner !== undefined) return { kind: "record", container: owner.container, id: owner.id };
-  // Everything else rides the tree the walk is working in.
+  // Everything else rides the record the walk is working in.
   return { kind: "bound" };
 }
-
-// `methodFilesIn` IS GONE (i34). It enumerated every method file in a tree so
-// the reload could copy the whole set into every other tree — the backfill
-// that caught what the write-time fan-out missed.
-//
-// BOTH EXISTED FOR THE SAME REASON: several trees held copies of one file. The
-// failure its comment recorded — a worktree holding a NEW session.ts against
-// an OLD paths.ts, unable to compile — cannot happen with one copy.

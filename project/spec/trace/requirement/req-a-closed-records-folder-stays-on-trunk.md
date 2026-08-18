@@ -18,14 +18,14 @@ priority: must
 
 ## Detail
 
-WHAT CHANGES. `mergeAndRetire` at engine/worktree.ts:466 runs
+WHAT CHANGES. `mergeAndRetire` at engine/records.ts runs
 `git rm -r -q --ignore-unmatch <dirRel>` on the record directory, commented
 "CLOSED RECORDS LIVE IN GIT... the tree carries only live work." That line
 goes.
 
 WHAT STOPS BEING NEEDED once it does:
 
-- `git show <branch>:<rel>` at engine/worktree.ts:105.
+- `git show <branch>:<rel>` at engine/records.ts.
 - The batched `git cat-file --batch` at engine/expmachine.ts:195.
 - Any manifest of closed id to commit hash. It was designed in full earlier
   the same day and is not needed at all under this rule.

@@ -82,18 +82,7 @@ export const CLAUSES = {
   UNDECLARED_ROOT: "SE-C-127", // @name addresses a root the owner has not declared — declared, never arbitrary
   JOB_UNKNOWN: "SE-C-128", // a background job ref this session never started
   RUN_LANE_JOB: "SE-C-129", // se_run asked to do a lane tool's job — the lane covers it; the ladder blocks after one warned run
-  // SE-C-130 AND SE-C-131 ARE RETIRED (owner ruling 2026-08-16). One refused a
-  // re-run over an unchanged tree; the other refused the wrong test scope. On
-  // 2026-08-16 they closed on each other — each remedy was the other refusal,
-  // and no test call was legal at all for four milestones.
-  //
-  // THE CAUSE WAS THE AGENT CHOOSING AND THE ENGINE GRADING THE CHOICE. Now
-  // `decideScope` reads what changed and decides, so there is nothing to grade:
-  // an unchanged tree is answered with scope "nothing", and a scope the agent
-  // cannot name is a scope the agent cannot get wrong.
-  // SE-C-134 IS RETIRED (owner ruling 2026-08-14). Shared method resolves to
-  // the machine root whatever tree is bound, so a method write can no longer
-  // land in a tree that does not own it. The number is not reused.
+  // see dsp-lane-door.md#se-c-130-and-se-c-131-are-retired
   NARRATION_STALLED: "SE-C-133", // updates keep coming while the checklist never moves — warned once, then refused
   RAW_NUL: "SE-C-132", // a raw NUL byte in text — it makes the whole file unsearchable; in code it is corrected to the escape, elsewhere the intent is not knowable
   WRITE_TRANSFORMED: "SE-C-135", // the applied text does not contain the payload — something transformed it on the way in; refused rather than silently corrupted
@@ -101,7 +90,10 @@ export const CLAUSES = {
   OUTPUT_SHAPED: "SE-C-137", // a truncating pipe would cut the output BEFORE the engine sees it — refused at the boundary, because what it drops exists nowhere
   CORPUS_UNREADABLE: "SE-C-138", // a write would leave a corpus node the engine's own reader cannot parse — refused before it lands, because the break surfaces later at a reader that cannot name it
   REF_UNRESOLVED: "SE-C-139", // a ref that git cannot resolve — typed rather than raw, because a raw git error reads as "the file is missing" when the BRANCH is missing
-  PRODUCE_REFUSED: "SE-C-142", // a producing act stopped BEFORE writing anything — an occupied destination, a missing name, or a tree it cannot read its own identity from
+  NOTE_TEXT_CARRIED: "SE-C-140", // a mint offered the raw note's own text as the option's statement — the rewrite IS the privacy boundary, so a paste is refused rather than corrected
   OUTSIDE_ACT_BOUND: "SE-C-141", // a write left the tree the running act is producing — a DIFFERENT fault from leaving the project root, and told apart on purpose so the mechanism can be debugged
-  WRITE_TARGET_IS_SOURCE: "SE-C-140", // a writable declared root is the tree this system was produced from — or the guard cannot prove it is not; it fails CLOSED, because the isolation law is the one thing a vehicle may never breach
+  PRODUCE_REFUSED: "SE-C-142", // a producing act stopped BEFORE writing anything — an occupied destination, a missing name, or a tree it cannot read its own identity from
+  // SE-C-143 was minted as SE-C-140 on the i16 branch and renumbered at the merge:
+  // i17 shipped SE-C-140 first, and a number in a shipped log is never reused.
+  WRITE_TARGET_IS_SOURCE: "SE-C-143", // a writable declared root is the tree this system was produced from — or the guard cannot prove it is not; it fails CLOSED, because the isolation law is the one thing a vehicle may never breach
 } as const;

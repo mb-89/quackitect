@@ -19,7 +19,9 @@ import { readFile } from "node:fs/promises";
 import { availableParallelism } from "node:os";
 import { basename, dirname, join, relative, sep } from "node:path";
 import parcelWatcher from "@parcel/watcher";
-import { type Ctx, DATEISH, evaluate, isTruthy, parseExpr, toDate } from "./expr.ts";
+import { type Ctx, evaluate } from "./expr.ts";
+import { parseExpr } from "./expr-parse.ts";
+import { DATEISH, isTruthy, toDate } from "./expr-value.ts";
 import { parseStateNote } from "./notes.ts";
 import { emitModelMutations } from "./signals.ts";
 
@@ -32,7 +34,7 @@ interface VaultWatchConfig {
 
 const DEFAULT_WATCH_CONFIG: VaultWatchConfig = {
   extensions: [".md"],
-  excludeDirectories: ["node_modules", ".git", ".obsidian", ".se", ".worktrees", "tests"],
+  excludeDirectories: ["node_modules", ".git", ".obsidian", ".se", "tests"],
 };
 
 function loadWatchConfig(root: string): VaultWatchConfig {
@@ -724,19 +726,7 @@ export function warmRows(root: string): Row[] | undefined {
   return v?.ready() === true ? v.all() : undefined;
 }
 
-/** THE ONE ENTRY, so a large vault never blocks the process that draws. The
- *  synchronous twin (vaultFor) retired 2026-08-10: its one render caller
- *  moved to warmRows, and a builder nothing calls is the zero-caller disease
- *  this file was caught by twice already.
- *
- *  AND THE VAULT IS KEPT CURRENT FROM HERE ON. live() existed with zero
- *  callers until 2026-08-09: the vault was built on the first render and
- *  never touched again, and an edited note showed its old row until restart.
- *
- *  A WATCHER IS SOUND HERE AND IS NOT SOUND FOR THE DOOR. The vault feeds a
- *  RENDER, and a repaint arriving a few milliseconds late costs nobody
- *  anything. A claim's green cannot tolerate the same gap, which is why
- *  engine/notes.ts stats instead. Different guarantee, different mechanism. */
+/** see dsp-live-register.md#one-entry-so-a-large-vault-never-blocks-the-draw */
 export async function warmVault(root: string, onProgress?: (p: BuildProgress) => void): Promise<Vault> {
   let v = WARM.get(root);
   if (v === undefined) {
@@ -747,9 +737,4 @@ export async function warmVault(root: string, onProgress?: (p: BuildProgress) =>
     if (process.env.NODE_TEST_CONTEXT === undefined) void v.live();
   }
   return v;
-}
-
-export function forgetVault(root: string): void {
-  void WARM.get(root)?.stop();
-  WARM.delete(root);
 }

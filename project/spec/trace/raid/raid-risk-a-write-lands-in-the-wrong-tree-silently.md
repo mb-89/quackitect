@@ -6,7 +6,7 @@ kind: issue
 statement: A wrong resolution reports success, so a read or a write reaches the wrong store and nothing says so.
 owner: the driving agent
 trigger: at the first write of each path KIND after any resolution rule changes - method, record content, session state and repository-root files each resolve by a different rule
-status: open
+status: closed
 impact: The work appears to land. It is found at a merge, or never. Two branches then hold two answers to one question, which is the failure this iteration exists to end, reappearing from the other side.
 breaks_how_badly: fatal
 how_likely: expected
@@ -73,30 +73,14 @@ The bypass surface is counted: 40 resolver call sites against 88 paths built
 with a direct join. The dispatch layer is nearly clean at 7 against 1, and the
 leaks are modules that read the filesystem for themselves.
 
-## Re-measured 2026-08-18 at evaluate-architecture
+## Closed
 
-THE FIGURE ON THIS NODE DISAGREES WITH THE ONE ON
-[[raid-iss-the-path-jail-has-one-write-target]]. This entry says 40 resolver
-call sites against 88 direct joins. That entry says 44 against 116 across 49
-files. Neither records the pattern or the folder scope behind its number.
+THERE IS NO SECOND STORE TO REACH. The risk was a resolution picking the wrong
+tree and reporting success, and both its named outcomes — a merge that
+surprises somebody, two branches holding two answers — need two stores to
+happen in.
 
-A FRESH COUNT SETTLES THE DIRECTION WITHOUT SETTLING THE HISTORY. Scope
-`project/deliverable/engine`, whole tree including `bin/`.
-
-- 28 resolver call sites, from 31 hits for
-  `\b(resolveInRoot|resolveForRead|resolveDeclaredRoot)\(` across 10 files, less
-  the three definitions in `engine/paths.ts`.
-- 277 bare joins, from `(^|[^\w.])join\(` across 69 files. The pattern excludes
-  `path.join(` and array `.join(`.
-
-SO THE BYPASS SURFACE IS ABOUT TEN TIMES THE GUARDED ONE, not twice it. The
-mitigation this node describes is narrower against the real surface than the
-recorded figure suggested.
-
-WHAT IS STILL UNKNOWN. How many of the 277 are writes rather than reads, and
-how many address a tree at all rather than building a constant. The count is an
-UPPER BOUND on the bypass surface, not a defect count, and reading it as a
-defect count would overstate the risk in the other direction.
-
-THE TWO OLD FIGURES ARE LEFT WHERE THEY STAND. Overwriting them would destroy
-the evidence that the register carried two answers, which is itself the finding.
+WHAT REPLACED THE GUARD. The resolution seam still NAMES the store it answered
+from, which is the part worth keeping: it is what makes a wrong answer visible
+rather than silent, and it now guards against a different mistake — session
+state and corpus content being confused for each other.

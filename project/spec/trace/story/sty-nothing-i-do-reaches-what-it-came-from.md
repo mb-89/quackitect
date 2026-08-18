@@ -13,7 +13,7 @@ priority: must
 
 A builder is asked to install a system that copies itself. They have repositories on that machine they cannot afford to lose, and nothing tells them what the copy can touch.
 |||
-THREE THINGS NOW TELL THEM, and each is a refusal rather than a promise. SE-C-140 refuses a write target that is the tree this one came from. SE-C-141 refuses a write that left the tree the running act is producing. SE-C-142 refuses a producing act before it writes a byte. Each carries its rule in `guidance/refusals.md` ahead of ever firing, at lines 158, 175 and 193.
+THREE THINGS NOW TELL THEM, and each is a refusal rather than a promise. SE-C-143 refuses a write target that is the tree this one came from. SE-C-141 refuses a write that left the tree the running act is producing. SE-C-142 refuses a producing act before it writes a byte. Each carries its rule in `guidance/refusals.md` ahead of ever firing, at lines 158, 175 and 193.
 
 ---
 

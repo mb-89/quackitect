@@ -1,19 +1,4 @@
-// THE PROMPT LAYER — the always-true tier, assembled from its sources.
-//
-// THREE TIERS, ONE CRITERION (owner-approved, 2026-08-02).
-//   always-true    → the prompt layer. Present every turn, survives a
-//                    compaction, costs no round trip.
-//   here-true      → the packet. The pull serves state guidance, unchanged.
-//   sometimes-true → the read layer. Pulled by the states that bind it.
-// Only the constant tier leaves the wire. The other two do not change.
-//
-// NO LLM STANDS IN THIS PATH. The sources are AUTHORED TERSE and assembled
-// verbatim, so one rule cannot come out compressed differently on different
-// days. Compression is a retro judgment, never a boot step.
-//
-// The read-proof disappears for what is promoted, by design: text present on
-// every turn is a stronger guarantee than a hash of a read that a compaction
-// erases. Read-proofs remain for everything the pull still serves.
+// see dsp-lane-door.md#the-prompt-layer
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { contentHash } from "./hash.ts";

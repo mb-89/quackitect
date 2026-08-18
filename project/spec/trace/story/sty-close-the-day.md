@@ -37,7 +37,7 @@ exp-trunk-read-cost closed with its finding promoted: `promote:` names it, `chun
 
 The record closes. Its strays are committed so the trunk is clean, which is what lets the next iteration start from something honest.
 |||
-The record closes on trunk by requirement: req-a-closed-records-folder-stays-on-trunk; engine/worktree.ts carries the close.
+The record closes on trunk by requirement: req-a-closed-records-folder-stays-on-trunk; engine/records.ts carries the close.
 
 ---
 

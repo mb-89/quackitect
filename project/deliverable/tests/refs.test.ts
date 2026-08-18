@@ -2,13 +2,14 @@
 // it accepts, and the check refuses anything else. General: any field, any
 // item type. Concurrent: every case builds its own root.
 import { strict as assert } from "node:assert";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { expandHint, fieldHint, type StateFormModel, templateMeta, templateProblems } from "../engine/stateform.ts";
+import { expandHint, fieldHint, type StateFormModel, templateMeta } from "../engine/stateform.ts";
+import { templateProblems } from "../engine/stateform-problems.ts";
 import { itemTemplate } from "../engine/trace.ts";
-import { freshRoot } from "./helpers.ts";
+import { freshRoot, mirrorSource } from "./helpers.ts";
 
 /** A form asking for one reference field, with the type it demands. */
 function asking(of: string): StateFormModel {
@@ -108,20 +109,32 @@ describe("typed references", { concurrency: true }, () => {
   // defect, whichever answer is right.
   test("every trace read goes through the one accessor, so the readers cannot drift", () => {
     // THE SURFACE IS A READER TOO. The trace graph read the project root while
-    // the walk wrote to a worktree, which hid every node the record authored.
+    // the walk wrote elsewhere, which hid every node the record authored.
     // It now reads the CHOSEN corpus — trunk, or an open record — so the rule
     // is that its root comes from the pick, never straight from the session.
-    const ui = readFileSync(fileURLToPath(new URL("../engine/render.ts", import.meta.url)), "utf8");
+    const ui = mirrorSource();
     for (const call of [...ui.matchAll(/traceCard\([^,]*/g)]) {
       assert.match(call[0], /pick\?\.path/, `the trace graph reads the chosen corpus, not a root of its own: ${call[0]}`);
     }
     const src = readFileSync(fileURLToPath(new URL("../engine/session.ts", import.meta.url)), "utf8");
-    assert.match(src, /private traceRoot\(it\?: Iteration\): string/, "one accessor owns which root the corpus is read from");
+    assert.match(src, /^ {2}traceRoot\(it\?: Iteration\): string/m, "one accessor owns which root the corpus is read from");
+    // IT STOPPED BEING `private` WHEN THE FORM BINDING LEFT THE CLASS, so the
+    // guarantee is now stated where it actually holds: only the session's own
+    // files may ask, and each of them asks the SAME accessor through its host.
+    // That is a wider check than the keyword was, because the keyword said
+    // nothing about a second file reaching for a root of its own.
+    const PAIR = new Set(["session.ts", "sessionforms.ts", "sessionclaims.ts"]);
+    for (const f of readdirSync(fileURLToPath(new URL("../engine/", import.meta.url)))) {
+      if (!f.endsWith(".ts") || PAIR.has(f)) continue;
+      const other = readFileSync(fileURLToPath(new URL(`../engine/${f}`, import.meta.url)), "utf8");
+      assert.doesNotMatch(other, /\.traceRoot\(/, `${f} reaches for a corpus root of its own`);
+    }
     // AND IT TAKES THE RECORD. The green light runs for an iteration from the
     // desk, with nothing bound, so a corpus root read off the session's
     // binding made the same claim green inside the record and grey outside.
-    for (const call of [...src.matchAll(/claimProblems\([^,]*/g)]) {
-      assert.match(call[0], /this\.traceRoot\(it\)/, `a claim check must resolve against ITS OWN record: ${call[0]}`);
+    const claims = readFileSync(fileURLToPath(new URL("../engine/sessionclaims.ts", import.meta.url)), "utf8");
+    for (const call of [...`${src}\n${claims}`.matchAll(/claimProblems\([^,]*/g)]) {
+      assert.match(call[0], /this\.(host\.)?traceRoot\(it\)/, `a claim check must resolve against ITS OWN record: ${call[0]}`);
     }
     for (const reader of [/claimProblems\(/g, /templateProblems\(/g, /loadTrace\(/g]) {
       for (const call of src.match(reader) === null ? [] : [...src.matchAll(new RegExp(`${reader.source}[^)]*`, "g"))]) {
@@ -227,7 +240,7 @@ describe("typed references", { concurrency: true }, () => {
   // payload must CARRY the hint, and the surface must DRAW it. This exact
   // wire shipped half-done and the owner saw a raw {token} on screen.
   test("the mirror's own source reads field_hints and draws the template link", () => {
-    const src = readFileSync(fileURLToPath(new URL("../engine/render.ts", import.meta.url)), "utf8");
+    const src = mirrorSource();
     assert.match(src, /field_hints/, "the surface reads the resolved hints");
     assert.match(src, /hint\.placeholder/, "the empty row shows the RESOLVED placeholder, never the raw token");
     assert.match(src, /hint\.of_template/, "and the item template is reachable from the field");

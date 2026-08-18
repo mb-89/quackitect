@@ -101,11 +101,28 @@ The trigger is a NOTE carrying "needs retro":
      never re-litigated.
    - carried — adopt NOW into a durable home (a guidance edit, a machine
      change, the next expedition's goal); name the home. Rare.
-   - backlog — future scope. where is REQUIRED: "ready when …" names the
-     re-entry condition.
+   - backlog — future scope, and it MINTS A WORK TOKEN onto trunk.
+     - `where` is required: the "ready when …" re-entry condition.
+     - `statement` is required: what the token IS, for a reader who never
+       saw the note.
+
+     THE STATEMENT IS AUTHORED, NEVER PASTED. A raw note is a dump and may
+     carry anything private.
+
+     - A statement carrying the note's own words refuses SE-C-140.
+     - Cannot state it cleanly yet? Say so, and the pool carries it as an
+       open question.
+     - What is refused is silence and paste, never honesty.
+
+     THE RAW NOTE STAYS LOCAL, unmoved and marked drained. The token is a
+     new node.
+
+     - The two are different objects with different lifetimes.
+     - The token is the truth from the mint onward.
    Nothing stays pending after a retro.
-4. Walk the backlog (migration). Every parked note (disposition backlog
-   in .se/notes.jsonl): keep it (condition still unmet), pull it
+4. Walk the backlog (migration). Every standing WORK TOKEN in the pool
+   (project/spec/trace/work-token/, on trunk, readable from any clone):
+   keep it (condition still unmet), pull it
    (re-drain as carried, into this round's scope), or drop it (re-drain
    as obsolete, reason recorded). Re-draining IS the migration mechanism.
 5. Sweep the register for DEBTS (owner ruling 2026-08-12). List every
@@ -162,6 +179,21 @@ The trigger is a NOTE carrying "needs retro":
 
    A command that keeps failing or a refusal that keeps firing is a lead.
    The fix may be a tool, a refusal, or better guidance.
+
+   READ THE DEMAND LOG FIRST. `se_help {demands: true}` hands back every
+   se_help query that matched nothing, GROUPED BY SHAPE and ranked by
+   count, most demanded first, with up to three of the actual queries
+   beside each shape. An agent asked the lane for a capability in plain
+   words and the lane had none: that is a missing verb naming itself,
+   already counted, in the wording to build against. This is i8's half of
+   this step, and it costs one call.
+
+   IT DOES NOT REPLACE THE se_run WALK, and reading it as a replacement
+   loses the larger half. The demand log only sees what an agent thought
+   to ASK for. A shell command reached for without ever asking leaves no
+   miss behind, and most of them are that. So: demands first, because it
+   is ranked and free, then the walk below for everything nobody asked
+   about.
 
    THEN WALK THE se_run COMMANDS, AND KNOW WHAT THAT STEP IS FOR (owner
    ruling 2026-08-07). It is not a survey. THE POINT IS TO DRIVE THE se_run
@@ -317,8 +349,15 @@ method (`machines/methods/meth-state-of-the-art.md`).
   leave the inbox count and the pending feed. Draining is legal only in
   the retro's drain state — entering it is free from idle, so "drain
   whenever" is one pull away, inside the machine's discipline.
-- backlog notes stay on file (.se/notes.jsonl, disposition backlog) —
-  the migration step re-drains them when their "ready when" comes true.
+- a drained note's LOCAL half stays on file (.se/notes.jsonl, disposition
+  backlog) so the two ends of a crossing can be found from each other. It
+  is not the pool. THE POOL IS project/spec/trace/work-token/, on trunk,
+  and the migration step re-drains a token when its "ready when" comes
+  true.
+- A SECOND DRAIN OF ONE NOTE TO THE POOL IS REFUSED. The token already
+  stands, and minting another splits one finding into two standing items
+  whose conditions then disagree. To pull a parked item into scope,
+  re-drain it as `carried`.
 - Expedition reports are ruled AT CLOSE (applied | dismissed), not here —
   the retro is out of the expedition loop (owner ruling 2026-07-27).
 - se_log_query is the query lane. Never an ad-hoc script.

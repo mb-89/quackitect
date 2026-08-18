@@ -1,17 +1,10 @@
-// continue_expedition is GENERATED, not drawn (owner design 2026-07-27):
-// its states ARE the open expeditions, read from their records at entry.
-// The standard expedition machine stays AUTHORED — states/work.md and
-// states/leave.md are the single source; the generator instantiates them
-// once per open expedition (id, statement and edges overridden). The
-// human clicks the expedition to enter; ONE reaching end completes the
-// machine, the others stay parked. Nothing open: start runs to end.
-// The drawn continue_expedition.canvas is a stub saying exactly this.
+// see dsp-method-compilation.md#continueexpedition-is-generated-not-drawn
 import { join } from "node:path";
 import { type CanvasData, type CanvasEdge, type CanvasElement, nodeSize } from "./canvas.ts";
 import { type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
 import { stateFromNote } from "./machines/compile.ts";
 import { readNode } from "./notes.ts";
-import { type Expedition, expList, frontmatterOf, readRecord, recordRel } from "./worktree.ts";
+import { type Expedition, expList, frontmatterOf, readRecord, recordRel } from "./records.ts";
 
 export interface GeneratedMachine {
   decl: MachineDecl;
@@ -34,7 +27,7 @@ function mechanical(id: string, kind: "start" | "end"): StateDecl {
     statement: "",
     guidance:
       kind === "start"
-        ? "The seeded container: every open expedition stands as its own states. Pick ONE way forward — entering an expedition binds its worktree."
+        ? "The seeded container: every open expedition stands as its own states. Pick ONE way forward — entering an expedition binds it."
         : "One expedition came home (or nothing was open) — the machine is complete here. The others stay parked for the next entry.",
     evidence_form: [],
     priority: 0.01,
@@ -160,25 +153,7 @@ export function generateContinueExpedition(root: string): GeneratedMachine {
   return { decl, canvas, expByState };
 }
 
-/** THE ARCHIVE, generated (owner design 2026-07-27): every CLOSED
- *  expedition stands as its own read-only state — a gallery of dead
- *  machines, all in parallel. Start reaches each one; each runs to end
- *  (alternative — one visit completes the machine). Nothing closed:
- *  start runs straight to end. Clicking one shows what the expedition
- *  did. */
-/** THE ARCHIVE READS FOLDERS, AND THAT IS THE WHOLE READ (i6).
- *
- *  A closed expedition's record used to live on its branch, so a record not
- *  found on disk was fetched with `git cat-file --batch` over `<branch>:<rel>`
- *  — batched because a spawn per record made the archive take seconds to open,
- *  and cached because a closed branch never moves.
- *
- *  i34 PUT THE ARCHIVE ON DISK. The folder stays where it is when a record
- *  closes, so a record that is not on disk is not anywhere. The fallback read
- *  branches the seed no longer creates, and it went with them.
- *
- *  A MISSING RECORD NOW READS AS MISSING, which is the honest answer and the
- *  one the callers already handle. */
+/** see dsp-method-compilation.md#every-closed-expedition-stands-as-its-own-dead-machine */
 function closedRecords(root: string, closed: Expedition[]): Map<string, Record<string, unknown> | undefined> {
   const out = new Map<string, Record<string, unknown> | undefined>();
   for (const e of closed) {
@@ -334,10 +309,7 @@ function buildDecades(machineId: string, entries: ArchiveEntry[], kindWord: stri
   };
 }
 
-/** ONE archive shape for both record kinds (owner ruling 2026-07-27, both
- *  archives). Ten or fewer: every record its own state. More: DECADE
- *  SUB-MACHINES — ten records per group, each group a state you CLICK
- *  INTO; hundreds nest the same way. */
+/** see dsp-method-compilation.md#one-archive-shape-for-both-record-kinds */
 export function buildArchive(machineId: string, entries: ArchiveEntry[], kindWord: string): GeneratedMachine {
   return entries.length > 10 ? buildDecades(machineId, entries, kindWord) : buildRecordColumn(machineId, entries, kindWord);
 }

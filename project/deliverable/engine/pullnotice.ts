@@ -1,24 +1,4 @@
-// THE PULL NOTICE — written once, printed by every hook that greets an agent.
-//
-// WHY IT IS A MODULE AND NOT A STRING IN EACH HOOK. Two SessionStart hooks
-// exist, and they fire for different arrivals:
-//
-// - `.claude/settings.json` at the REPOSITORY ROOT is committed, so it is the
-//   only hook a fresh cloud clone can fire. It runs se-hook-arrive, which
-//   performs the arrival and then greets the agent.
-// - `project/.claude/settings.json` is PLACED by the arrival or by the editor,
-//   so it only ever fires for a session that is already caged. It runs
-//   se-hook-start.
-//
-// Both must tell the agent the same thing about the pull. Until 2026-08-18
-// each carried its own hand-written copy, which is two sources for one text
-// and the drift that follows.
-//
-// WHAT DOES NOT BELONG HERE: rules. The rules reach an agent through the
-// prompt layer, assembled verbatim from project/guidance/ by promptlayer.ts.
-// A hook that restated a rule would be a third source for it. This module
-// carries the ONE thing the prompt layer cannot: what to do first, in a
-// session that may not have read anything yet.
+// see dsp-boot-and-power.md#the-pull-notice
 
 /** The five answers, and the three habits. Every greeting ends with this. */
 export const PULL_NOTICE = [

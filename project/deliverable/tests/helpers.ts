@@ -3,7 +3,19 @@
 // drawing the shipped server does.
 
 import { spawnSync } from "node:child_process";
-import { chmodSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, renameSync, rmSync, statSync, symlinkSync } from "node:fs";
+import {
+  chmodSync,
+  cpSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  renameSync,
+  rmSync,
+  statSync,
+  symlinkSync,
+} from "node:fs";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join, sep } from "node:path";
@@ -527,4 +539,49 @@ export async function pullTo(session: Session, state: string): Promise<void> {
     throw new Error(`the pull did not walk: ${JSON.stringify(r)}`);
   }
   throw new Error("the reading never drained");
+}
+
+/** THE MIRROR'S SOURCE, which is no longer one file. render.ts was split into
+ *  the server-side HTML, the stylesheet and the browser application, because
+ *  one file holding all three read as one job and was three. A test asking
+ *  "does the page do X" wants the whole layer, not whichever third X landed
+ *  in — so it asks here and survives the next split. */
+export function mirrorSources(): { rel: string; text: string }[] {
+  return [
+    "render.ts",
+    "renderclient.ts",
+    "renderclient-detail.ts",
+    "renderclient-walk.ts",
+    "renderclient-form.ts",
+    "renderclient-panel.ts",
+    "renderclient-log.ts",
+    "renderclient-live.ts",
+    "renderstyle.ts",
+  ].map((f) => ({
+    rel: f,
+    text: readFileSync(join(REPO_ROOT, "project", "deliverable", "engine", f), "utf8"),
+  }));
+}
+
+/** The same, as one string, for a test that only greps. */
+export function mirrorSource(): string {
+  return mirrorSources()
+    .map((s) => s.text)
+    .join("\n");
+}
+
+/** THE WHOLE LANE, wherever its verbs live. tools.ts assembles the registry
+ *  and the three verb groups declare their own entries — a guard that reads
+ *  the lane's source must see all four or it is reading a third of it. */
+export function laneSources(): { rel: string; text: string }[] {
+  return ["tools.ts", "tools-file.ts", "tools-run.ts", "tools-desk.ts"].map((f) => ({
+    rel: f,
+    text: readFileSync(join(REPO_ROOT, "project", "deliverable", "engine", f), "utf8"),
+  }));
+}
+
+export function laneSource(): string {
+  return laneSources()
+    .map((s) => s.text)
+    .join("\n");
 }

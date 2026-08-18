@@ -24,7 +24,7 @@ THE SIX SITES that decide it today, each by asking the filesystem:
 - `itFind`, engine/iterations.ts:212 — refuses a record it reads as not open.
 - `generateIterations`, engine/iterations.ts:764 — the container's filter.
 - `generateIterationArchive`, engine/iterations.ts:1208 — the archive's filter.
-- `expList`, engine/worktree.ts:246 — the same for expeditions.
+- `expList`, engine/records.ts — the same for expeditions.
 - `survey`, engine/survey.ts:65-68 — already reads status AND the directory,
   so it keeps the right half and drops the wrong one.
 

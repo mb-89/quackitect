@@ -1,15 +1,9 @@
-// WHAT STANDS OPEN — one mechanical answer: open expeditions, open
-// iterations, pending notes, and parked backlog items with their ready-when.
-//
-// BOTH HANDS ASK IT (owner ruling 2026-07-28). The agent calls se_survey;
-// the person clicks it in the mirror. It lived inside the tool handler and
-// so was reachable only by the agent, which made "what is open" a question
-// the owner had to route through someone else. One implementation, two
-// doors.
-import { backlogNotes, byPriority, headline, type Priority, pendingNotes, priorityOf, titleOf } from "./inbox.ts";
+// see dsp-the-options-pool.md#what-stands-open
+import { byPriority, DEFAULT_PRIORITY, headline, type Priority, pendingNotes, priorityOf, titleOf } from "./inbox.ts";
 import { itList, readItRecord } from "./iterations.ts";
 import { seDir } from "./paths.ts";
-import { expList, readRecord } from "./worktree.ts";
+import { standingTokens } from "./pool.ts";
+import { expList, readRecord } from "./records.ts";
 
 export interface Survey {
   counts: { expeditions: number; iterations: number; notes: number; backlog: number };
@@ -46,22 +40,16 @@ const GOAL_CAP = 200;
 const goalOf = (fm: Record<string, unknown> | undefined): string =>
   fm?.unreadable !== undefined ? `⚠ ${String(fm.unreadable)}` : headline(String(fm?.goal ?? ""), GOAL_CAP);
 
-// THE FINISHED SET MOVED TO iterations.ts AT i34, as RECORD_FINISHED. It was
-// defined here and nowhere else, so the survey knew a shipped record was not
-// open and itList did not — and on 2026-08-16 i28 stood in the container's
-// list and not in the survey's, with nothing saying they disagreed.
-//
-// itList NOW APPLIES IT ITSELF, so this file no longer needs its own copy and
-// no longer needs to filter.
+// see dsp-the-options-pool.md#the-finished-set-moved-to-iterations
 
 export function survey(projectRoot: string, opts: SurveyOptions = {}): Survey {
   const exps = expList(projectRoot)
     .filter((e) => e.open)
     .map((e) => ({ id: e.id, goal: goalOf(readRecord(projectRoot, e)) }));
-  // A SHIPPED RECORD IS NOT OPEN, whatever its worktree says. itList calls a
-  // record open when its worktree directory EXISTS, and a close leaves that
-  // directory behind — so i27 stood in the open list the day after it shipped
-  // and the desk advised from a count one too high.
+  // A SHIPPED RECORD IS NOT OPEN, whatever its folder says. itList calls a
+  // record open when its directory EXISTS, and a close leaves that directory
+  // behind — so a shipped record stood in the open list the day after and the
+  // desk advised from a count one too high.
   //
   // The record's own status is the truth, and the goal read below already
   // fetches it, so the filter costs nothing. The expedition list above wants
@@ -76,22 +64,34 @@ export function survey(projectRoot: string, opts: SurveyOptions = {}): Survey {
   const offset = Math.max(0, opts.offset ?? 0);
   const windowed = opts.limit !== undefined || offset > 0;
   const notes = windowed ? allNotes.slice(offset, offset + (opts.limit ?? allNotes.length)) : allNotes;
-  const allBacklog = backlogNotes(seDir(projectRoot))
-    .sort(byPriority)
-    .map((n) => ({
-      ref: n.ref,
-      ready_when: n.drained?.where ?? "",
-      title: titleOf(n),
-      priority: priorityOf(n),
-      ...(withText ? { text: n.text } : {}),
-    }));
+  // see dsp-the-options-pool.md#the-pool-is-read-from-the-repository
+  const allBacklog = standingTokens(projectRoot).map((o) => ({
+    ref: o.id,
+    ready_when: o.ready_when,
+    title: headline(o.statement, GOAL_CAP),
+    priority: DEFAULT_PRIORITY,
+    ...(withText ? { text: o.statement } : {}),
+  }));
   const backlog = windowed ? allBacklog.slice(offset, offset + (opts.limit ?? allBacklog.length)) : allBacklog;
   return {
     counts: { expeditions: exps.length, iterations: its.length, notes: allNotes.length, backlog: allBacklog.length },
     ...(windowed
       ? {
-          notes_window: { offset, shown: notes.length, remaining: Math.max(0, allNotes.length - offset - notes.length) },
-          backlog_window: { offset, shown: backlog.length, remaining: Math.max(0, allBacklog.length - offset - backlog.length) },
+          // PAST THE END, `remaining` MUST NOT READ AS "you have seen it all".
+          // With seven standing and an offset of nine it answered shown 0,
+          // remaining 0 — which is what a reader gets at the end of a list they
+          // have actually walked. Clamping the OFFSET rather than the result
+          // keeps the arithmetic honest in both directions.
+          notes_window: {
+            offset,
+            shown: notes.length,
+            remaining: Math.max(0, allNotes.length - Math.min(offset, allNotes.length) - notes.length),
+          },
+          backlog_window: {
+            offset,
+            shown: backlog.length,
+            remaining: Math.max(0, allBacklog.length - Math.min(offset, allBacklog.length) - backlog.length),
+          },
         }
       : {}),
     expeditions: exps,

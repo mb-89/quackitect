@@ -164,7 +164,11 @@ not apply is worse than none.
 `@name` reaches only roots the owner declared in `.se/roots.json`. Ask the
 owner before declaring one.
 
-### SE-C-140 — the write target is the tree this one came from
+### SE-C-143 — the write target is the tree this one came from
+IT WAS MINTED AS SE-C-140 ON THE i16 BRANCH and renumbered when that branch
+merged, 2026-08-18. i17 shipped SE-C-140 first, and a clause number that has
+reached a log can never be reused. The number moved; nothing else did.
+
 A declared root may be made writable, and that is how this system drives a
 project that is not itself. What it may never reach is the tree it was
 produced from.
@@ -439,14 +443,13 @@ RETIRED by owner ruling, 2026-08-14. It refused a method write made from
 inside a record. The number is retired and is not reused, and no section here
 claims it: this is history, not a rule you can trip.
 
-WHAT IT WAS FOR. A method write from inside a record used to land in that
-record's own worktree, and fan out over trunk at the merge. On 2026-08-07 that
-overwrote trunk's tool list and deleted two lane verbs.
+WHAT IT WAS FOR. Back when a record was its own checkout, a method write made
+inside one landed there and fanned out at the merge. On 2026-08-07 that
+overwrote the shared tool list and deleted two lane verbs.
 
 WHY IT IS GONE. The refusal was REPLACED BY A RESOLUTION, never merely
-dropped. Shared method resolves to the MACHINE ROOT whatever tree is bound, so
-a method write cannot land in a tree that does not own it. There is nothing
-left to refuse.
+dropped. Shared method resolves to the MACHINE ROOT whichever record is bound,
+so there is nothing left to refuse.
 
 SHARED MEANS THESE:
 
@@ -470,6 +473,33 @@ not close it either. A shell still writes wherever it is pointed.
 
 ### SE-C-073 — the note ref is unknown
 Draining takes an existing `note-...` ref, exactly as listed.
+
+### SE-C-140 — the mint would carry the note's own text
+An option's statement is AUTHORED. A statement sharing a run of six or more
+words with the raw note it came from is a copy, and it is refused before
+anything is written.
+
+WHY IT IS ITS OWN CLAUSE AND NOT A MISSING ARGUMENT. A field left empty and a
+field filled with the thing that must not travel are different mistakes with
+different remedies. One says fill this in; this one says you filled it in with
+the note.
+
+RAW NOTES NEVER ENTER VERSION CONTROL, and this is the only mechanical thing
+holding that line. A note is written mid-walk by whoever noticed something and
+may carry anything — a path, a name, a customer. An option lands on trunk,
+where SE-C-002 means it can never be taken off again.
+
+THE REFUSAL QUOTES THE OVERLAP BACK, so the fix is one edit rather than a
+guess at which sentence was recognised.
+
+WHAT IT DOES NOT CATCH, said here so nobody reads it as a guarantee: a
+REWORDED private sentence. The check makes the lazy path illegal; it does not
+make the honest path easier. That limit is
+raid-asm-a-verbatim-overlap-check-catches-the-paste-that-matters.
+
+CANNOT STATE IT CLEANLY? Say that, in the statement. The pool carries it as an
+open question, and an open question is a legal option. What is refused is
+silence and paste, never honesty.
 
 ### SE-C-125 — a wall of prose
 Long prose carries line breaks. Paragraphs are the author's job — no

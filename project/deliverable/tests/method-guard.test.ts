@@ -10,8 +10,6 @@
 // danger is the same one either way — a record's copy of the engine fanning
 // out over trunk at a merge, which really happened on 2026-08-07.
 //
-// A TEST ROOT IS NEVER SELF-HOSTING, so a bound record here really does get a
-// worktree. Without that, none of these assertions would mean anything.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
 import { describe, test } from "node:test";
@@ -20,7 +18,7 @@ import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { anyGuidanceDoc, call, freshRoot } from "./helpers.ts";
 
-/** A fresh root that is a real git repo, the way worktree.test.ts does it. */
+/** A fresh root that is a real git repo, the way records.test.ts does it. */
 function gitRoot(): string {
   const root = freshRoot();
   const g = (...a: string[]): void => {
@@ -93,10 +91,7 @@ describe("the method guard", { concurrency: true }, () => {
     assert.notEqual(body.clause, "SE-C-134", "a bound walk exists to write the record's own content");
   });
 
-  // THE FAN-OUT CASE IS DELETED (i34). It drove `session.fanOutMethod`: write
-  // a method file unbound, and assert it reached the record's worktree too —
-  // "otherwise a record keeps an old machine and nothing says so".
-  //
-  // THE MECHANISM IS GONE AND SO IS THE FAILURE. One tree, one copy. A case
+  // ONE TREE, ONE COPY, so a method write reaches every reader by
+  // construction and there is no fan-out to drive. A case
   // asserting that a deleted function returns an empty list tests nothing.
 });

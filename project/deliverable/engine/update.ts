@@ -13,7 +13,7 @@
 // THE BASE IS THE VEHICLE'S OWN ROOT COMMIT, and that is the whole reason the
 // reporter is cheap.
 //
-// el-change-reporter said the opposite until 2026-08-18: "the winning design
+// el-change-reporter said the opposite until it was corrected: "the winning design
 // makes a vehicle a clone that keeps the engine's commits... under a vehicle
 // sharing no commit with its engine this element could not run at all." That
 // was written against a clone. The owner replaced it with a COPY, and the

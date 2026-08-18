@@ -1,12 +1,4 @@
-// THE EXPOSURE CHART — damage against likelihood, every standing register
-// entry a dot (owner design 2026-08-10). Dots are coloured by KIND from the
-// palette's register section, with the legend beneath; a picked entry — one
-// standing in the list below — wears a red ring. Hover names the entry; a
-// click opens it in the editor. The pick list decides; the chart informs.
-//
-// The rows reuse the list editor's classes on purpose: .sfli rows are
-// collected by the list's own collect branch, so this editor stores nothing
-// of its own.
+// see dsp-form-editors.md#the-exposure-chart
 import type { EditorKind } from "./kinds.ts";
 
 export const EXPOSURE_PICK_EDITOR: EditorKind = {

@@ -259,20 +259,58 @@ the request path. Anything that scans thousands of things belongs where
 
 ## Comments and provenance
 
-- Write comments the way people write them: only where a reader would be surprised.
-- A comment states a constraint the artifact cannot show itself. Nothing else.
-- Never comment that a rule was followed, who ruled it, or when.
+### The rule: a comment is almost always the wrong home
+
+REASONING ABOUT DESIGN BELONGS IN THE DESIGN DOCUMENT. Not in the source.
+This is close to a ban, and it is meant to be.
+
+- A comment may state a CONSTRAINT the artifact cannot show itself.
+- A comment may POINT at where the reasoning lives.
+- A comment may not BE the reasoning.
+
+WHY A REFERENCE BEATS A COPY. The design document is where a reader looks
+for a design. A comment restating it has forked the truth, and only one
+fork ever gets updated.
+
+### What a pointer looks like
+
+    // see dsp-mirror-render.md#the-vendored-renderer
+
+ONE LINE. The section, not just the file. A whole-file reference sends the
+reader hunting, which is most of the way back to no reference at all.
+
+THE POINTER IS ALSO A TRACE. A per-section reference says which part of
+which design this code realises, so the link runs both ways: the design
+finds its code, and the code finds its design. Making that mechanical —
+so the trace is derived from the references rather than maintained beside
+them — is its own iteration and is not built yet. Write the references in
+this shape now, and that iteration inherits a corpus already in it.
+
+### What is forbidden outright
+
+- NEVER comment that a rule was followed, who ruled it, or when.
   - No dates.
   - No step numbers.
   - No law citations at application sites.
-- The why lives ONCE, in its designated home: an ADR, a `decided_via`, an evidence doc, a note, the ledger. Everywhere else, the artifact just IS the consequence.
-- A deliberate choice that must survive future edits gets a TEST or a LINT, not a comment. A comment is the weakest guard.
-- PREFER DELETING A COMMENT TO WRITING ONE (owner ruling 2026-08-02). Nobody maintains them.
-  - An unmaintained comment goes stale. A stale comment does not merely age, it lies, and nothing in the build catches it.
-  - More of this project's staleness has come from comments than from any other source.
-- REFERENCE, NEVER COPY. Point at the one place the fact lives: a path, a condition note, a guidance file.
-  - A comment that restates what another file says has FORKED the truth, and only one fork ever gets updated.
-- The test of a comment is whether it can go stale. If the code changing would make it wrong, and nothing would fail, delete it or turn it into a check.
+- NEVER narrate a change in the source. A comment saying what a thing USED
+  to do, or that something was deleted, is a ledger entry filed in the
+  wrong drawer. The history is in git and the reasoning is in the design.
+- NEVER restate what another file says. Point at it instead.
+
+### Why this is strict
+
+AN UNMAINTAINED COMMENT DOES NOT MERELY AGE, IT LIES, and nothing in the
+build catches it. More of this project's staleness has come from comments
+than from any other source.
+
+PREFER DELETING A COMMENT TO WRITING ONE. Nobody maintains them.
+
+THE TEST OF A COMMENT is whether it can go stale. If the code changing
+would make the comment wrong, and nothing would fail, then delete it or
+turn it into a check.
+
+A DELIBERATE CHOICE THAT MUST SURVIVE FUTURE EDITS GETS A TEST OR A LINT,
+never a comment. A comment is the weakest guard there is.
 
 ## Guards that teach
 
@@ -460,4 +498,4 @@ level that shows twenty things has stopped helping them choose.
 - EVERY WORK ITEM HAS EXACTLY ONE HOLDER, at every moment (owner ruling 2026-08-14). The holder is the pool, a retro, an iteration, or the archive.
   - An item held by nothing is the failure this rule exists to stop.
   - It happened on 2026-08-13. Eight notes were drained to a record, the record's scope disowned them, and for ten minutes they were nowhere.
-  - The machinery belongs to i17, the options pool. Until it lands, the rule holds by authorship.
+  - The machinery landed in i17. Draining a note to `backlog` mints a WORK TOKEN under `project/spec/trace/work-token/`, which is the pool holding it until a seeding pulls it in.

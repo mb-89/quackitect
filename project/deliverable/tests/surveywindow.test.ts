@@ -117,13 +117,13 @@ test("se_log_query answers for a note ref, so a reference can be followed", asyn
 });
 
 // req-survey-counts-only-open-records: itList calls a record open when its
-// WORKTREE DIRECTORY exists, and a close leaves that directory behind. So a
+// RECORD DIRECTORY exists, and a close leaves that directory behind. So a
 // shipped record stayed in the list headed "what stands open", and the desk
 // advises from that list.
 //
 // Seen on 2026-08-15: i27 read as open the day after it shipped, and the count
 // it inflated was the one the front desk had just used to recommend.
-test("a shipped iteration leaves the open list, whatever its worktree says", async () => {
+test("a shipped iteration leaves the open list, whatever stands on disk", async () => {
   const root = freshRoot();
   gitInit(root);
   const server = await bootedServer(root);
@@ -142,10 +142,8 @@ test("a shipped iteration leaves the open list, whatever its worktree says", asy
     `a seeded iteration stands open: ${JSON.stringify(opened.iterations)}`,
   );
 
-  // THE RECORD IS READ FROM ONE PLACE SINCE i34: its folder on trunk. The
-  // case used to stamp the status inside `.worktrees/<id>/`, because a record
-  // was read from its own tree while open and from trunk once closed. There is
-  // one tree now, so there is one path, and the status alone decides.
+  // THE RECORD IS READ FROM ONE PLACE: its folder. One tree means one path,
+  // and the status alone decides.
   const dir = join(root, "project", "spec", "iterations", id);
   mkdirSync(dir, { recursive: true });
   const shipped = ["---", `id: ${id}`, "status: shipped", 'goal: "a record seeded only to be marked shipped"', "---", ""];

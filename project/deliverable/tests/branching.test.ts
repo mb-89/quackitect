@@ -173,7 +173,8 @@ test("the trace runs past the requirements, to functions and tests", async () =>
 // EDGE rather than centre to centre — a centre gap says nothing once a band
 // straddles its ring, which is exactly when the drawing gets tight.
 test("consecutive rings are parted by at least the vision's own gap", async () => {
-  const { layoutTrace, loadTrace } = await import("../engine/trace.ts");
+  const { loadTrace } = await import("../engine/trace.ts");
+  const { layoutTrace } = await import("../engine/trace-layout.ts");
   // THE REAL ROOT, not the literal "project" (found 2026-08-08): a wrong
   // root loads an empty corpus, rings.length stays under two, and the test
   // passed while checking nothing.

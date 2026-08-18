@@ -38,9 +38,9 @@ const outDir = arg("--out") ?? join(root, "dist");
 //
 // THE COMMENT HERE USED TO SAY "the same list the export excludes" while they
 // were in fact two lists, and the difference was 20.8 MB of release archives
-// travelling into every produced vehicle plus the one file below that must not
-// be dropped. A comment cannot make two lists agree; only calling one function
-// can. Found by the i16 tester, 2026-08-18.
+// travelling into every produced vehicle plus the one file that must not be
+// dropped. A comment cannot make two lists agree; only calling one function
+// can.
 
 const stage = mkdtempSync(join(tmpdir(), "se-package-"));
 cpSync(root, stage, {

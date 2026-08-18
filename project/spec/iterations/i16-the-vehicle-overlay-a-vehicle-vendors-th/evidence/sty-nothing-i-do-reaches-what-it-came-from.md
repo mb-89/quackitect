@@ -26,7 +26,7 @@ WHAT STANDS AS MECHANICAL EVIDENCE, and it is real:
 
 - `roots.test.ts` — a writable root whose identity is the recorded upstream is refused, saying why; a writable root that is a different tree resolves.
 - `resolution.test.ts` — seven cases on the act's bound, including a read staying unbounded and a failed act leaving nothing bound.
-- SE-C-140 and SE-C-141, each with its rule written in guidance/refusals.md ahead of the refusal.
+- SE-C-143 and SE-C-141, each with its rule written in guidance/refusals.md ahead of the refusal.
 
 WHAT IS HONESTLY NOT COVERED, from the gate's own reading:
 

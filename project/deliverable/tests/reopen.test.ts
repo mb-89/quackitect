@@ -130,7 +130,8 @@ test("a reopened claim's packet says it is a RECHECK, and a fresh one says nothi
   // AND THE INSTRUCTION SHIPS. The packet must carry words the agent can act
   // on, not just the boolean it has always had.
   assert.ok(session !== undefined);
-  const src = readFileSync(join(import.meta.dirname, "..", "engine", "session.ts"), "utf8");
+  // The state form's reader left the class with the rest of the claims.
+  const src = readFileSync(join(import.meta.dirname, "..", "engine", "sessionclaims.ts"), "utf8");
   const at = src.indexOf("recheck: reopenedAfterSigning(");
   assert.ok(at > 0, "the packet carries a recheck block");
   const block = src.slice(at, at + 700);

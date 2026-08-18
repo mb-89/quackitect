@@ -116,7 +116,7 @@ export function loadBase(path: string): BaseSpec {
 // `tests` holds fixture bases and fixture notes. They are inputs to the suite,
 // not vault content, and a fixture showing up as a view somebody can open is
 // the surface lying about what the vault contains.
-const SKIP_DIRS = new Set(["node_modules", ".git", ".obsidian", ".se", ".worktrees", "tests"]);
+const SKIP_DIRS = new Set(["node_modules", ".git", ".obsidian", ".se", "tests"]);
 
 export function vaultDir(root: string): string {
   return join(root, "project");
@@ -147,7 +147,7 @@ export function listBases(root: string): string[] {
  * does not carry one.
  *
  * A note whose YAML does not parse comes back MARKED rather than dropped —
- * the same rule worktree.ts follows for a broken record. It will fail every
+ * the same rule records.ts follows for a broken record. It will fail every
  * filter, so it shows nowhere by accident, and `unreadableRows` counts it so
  * a surface can say the vault has damage in it.
  */
@@ -459,7 +459,7 @@ function guardPivotView(view: BaseView): { rowProp: string; colProp: string; agg
 
 /** NESTED MAPS, NOT A JOINED KEY. The first draft of this joined the two
  *  dimensions with a separator byte, which is how a raw NUL got written into
- *  this file — the exact fault worktree.ts carries a warning about, where
+ *  this file — the exact fault records.ts carries a warning about, where
  *  ripgrep calls the whole source binary and every search over it comes back
  *  confidently empty. A nested map needs no separator, so it cannot happen. */
 function fillPivotCells(
@@ -592,11 +592,7 @@ export const TABLE_STYLE = `
 .pivot.wide td{padding:3px 2px;min-width:18px}
 `;
 
-// WRITING BACK — one cell, one key, one note.
-//
-// COMMIT ON ENTER, DISCARD ON ESCAPE (owner ruling 2026-08-01). Nothing is
-// written while somebody is typing, which is the Qt delegate contract and the
-// reason this needs no debouncing, no dirty tracking and no conflict window.
+// see dsp-live-register.md#commit-on-enter-discard-on-escape
 
 export interface CellEdit {
   /** Vault-relative path of the note, as the row's own file.path gave it. */

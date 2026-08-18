@@ -37,6 +37,19 @@ function gitInit(root: string): void {
 async function rootWithMajorIteration(): Promise<{ session: Session; root: string; id: string }> {
   const root = freshRoot();
   gitInit(root);
+  // THE CHART'S OPTIONS EXIST BEFORE THE SESSION DOES. A morph-box field
+  // declares `resolves: artifact`, so the two options the fixture draws must be
+  // real nodes — and the corpus is stamped, so writing them after the session
+  // has loaded it is a race the test would lose.
+  for (const opt of ["opt-a", "opt-b"]) {
+    const f = join(root, "project", "spec", "trace", "option", `${opt}.md`);
+    mkdirSync(dirname(f), { recursive: true });
+    writeFileSync(
+      f,
+      `---\nid: ${opt}\ntype: "[[option]]"\nstatement: one mechanism drawn for the container-paint test\ncluster: the-test\nfound_by: prior-art\nsource: the test fixture\n---\n\n## Mechanism\n\nIt stands so the chart has a cell to point at.\n`,
+      "utf8",
+    );
+  }
   const session = new Session(root);
   for (let i = 0; i < 2; i++) await session.advance();
   checkDocs(session);

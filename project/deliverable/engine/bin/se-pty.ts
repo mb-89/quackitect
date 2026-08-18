@@ -157,11 +157,7 @@ function startServer(): void {
       req.on("close", () => listeners.delete(res));
       return;
     }
-    // THE SESSION CLEANS UP AFTER ITSELF (owner, 2026-07-30): when the
-    // machine reaches end, the server posts here. The host waits for the
-    // agent's output to settle (its goodbye must not be cut), asks it to
-    // leave with /exit, and only an agent that will not leave gets its
-    // tree killed. The host itself exits with the agent, as it always did.
+    // see dsp-boot-and-power.md#the-session-cleans-up-after-itself
     if (url.pathname === "/pty/end" && req.method === "POST") {
       void body(req).then((b) => {
         res.writeHead(200, { "content-type": "application/json", "access-control-allow-origin": "*" });

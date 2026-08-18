@@ -12,8 +12,9 @@ import { RANK_CUT_EDITOR } from "../engine/editors/rank-cut.ts";
 import { TABLE_EDITOR } from "../engine/editors/table.ts";
 import { renderMirror } from "../engine/render.ts";
 import { Session } from "../engine/session.ts";
-import { fieldProblems, NO_ARGS } from "../engine/stateform.ts";
-import { freshRoot } from "./helpers.ts";
+import { NO_ARGS } from "../engine/stateform.ts";
+import { fieldProblems } from "../engine/stateform-problems.ts";
+import { freshRoot, mirrorSource } from "./helpers.ts";
 
 function scriptsOf(html: string): string[] {
   const out: string[] = [];
@@ -41,11 +42,20 @@ function clientSource(): string {
   const moved = readdirSync(dir)
     .filter((f) => f.endsWith(".ts"))
     .map((f) => readFileSync(dir + f, "utf8"));
-  return [readFileSync(fileURLToPath(new URL("../engine/render.ts", import.meta.url)), "utf8"), ...moved].join("\n");
+  return [mirrorSource(), ...moved].join("\n");
+}
+
+/** THE WHOLE CHECKER, wherever its pieces live. The per-editor branches moved
+ *  into stateform-problems.ts when the file was split; the pairing guarded
+ *  below is between checker and renderer, not between two file names. */
+function checkerSource(): string {
+  return ["stateform.ts", "stateform-problems.ts"]
+    .map((f) => readFileSync(fileURLToPath(new URL(`../engine/${f}`, import.meta.url)), "utf8"))
+    .join("\n");
 }
 
 test("every editor the checker dispatches on has a branch in the renderer", () => {
-  const checker = readFileSync(fileURLToPath(new URL("../engine/stateform.ts", import.meta.url)), "utf8");
+  const checker = checkerSource();
   const client = clientSource();
   const known = new Set<string>();
   for (const m of checker.matchAll(/meta\.editor === "([a-z-]+)"/g)) known.add(m[1]);

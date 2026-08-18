@@ -8,7 +8,8 @@
 // find and centre all now work client-side — no server round-trip except
 // when the corpus changes, because that changes the data set itself.
 import { relative, sep } from "node:path";
-import { layoutTrace, loadTrace, rootsOf, TRACE_LEVELS, visionText } from "./trace.ts";
+import { loadTrace, rootsOf, TRACE_LEVELS, visionText } from "./trace.ts";
+import { layoutTrace } from "./trace-layout.ts";
 import { traceSubsegments } from "./traceschema.ts";
 
 function esc(s: string): string {
@@ -830,7 +831,7 @@ export const TRACE_SCRIPT = `
 
   if(typeof cytoscape!=='undefined'){ boot(); }
   else {
-    var s=document.createElement('script'); s.src='https://unpkg.com/cytoscape/dist/cytoscape.min.js';
+    var s=document.createElement('script'); s.src='/vendor/cytoscape.min.js';
     s.onload=boot; document.head.appendChild(s);
   }
 })();

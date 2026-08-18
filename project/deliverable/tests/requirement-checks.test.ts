@@ -14,7 +14,7 @@ import {
   claimProblems,
   specifyBuildLawProblems,
   traceDesignLawProblems,
-} from "../engine/stateform.ts";
+} from "../engine/stateform-problems.ts";
 import { conformance, earsShapeOK, itemTemplate, loadTrace } from "../engine/trace.ts";
 import { freshRoot } from "./helpers.ts";
 

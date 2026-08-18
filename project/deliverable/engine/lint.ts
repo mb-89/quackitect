@@ -1,17 +1,9 @@
-// The VOICE LINT — mechanical checks over PROSE, on demand (se_lint) and
-// later swept by the overhaul. Catches FORM, never meaning. The rules' LOGIC
-// lives here; the rules' PARAMETERS are DATA (owner ruling 2026-07-28,
-// guidance/method/engineering.md): machines/lint/voice-lint.md — edit a
-// threshold there and the next call uses it, no recompile, no reload.
+// see dsp-quality-toolchain.md#the-voice-lint
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseStateNote } from "./notes.ts";
 
-/** A LIST MARKER IS NOT A SENTENCE (owner report 2026-08-08). "1." ends in a
- *  full stop, so an unguarded split counted a numbered item's own marker as a
- *  sentence. A three-sentence item measured four and fired. The same marker
- *  also has to make the line an ITEM: a numbered step is a list item exactly
- *  as a dashed one is, and only the dash was recognised. */
+/** see dsp-quality-toolchain.md#a-list-marker-is-not-a-sentence */
 const MARKER = /^\s*(?:[-*+]|\d+[.)])\s+/;
 
 const sentencesOf = (t: string): string[] =>
@@ -20,11 +12,7 @@ const sentencesOf = (t: string): string[] =>
     .split(/(?<=[.!?])\s+/)
     .filter((x) => x.trim() !== "");
 
-/** A PIPE ROW IS CELLS, NOT ONE STREAM OF SENTENCES (owner report 2026-08-08).
- *  A form field is written `- name | help | required`, and the trailing
- *  `required` was counted as a sentence of the help text. Every field line
- *  measured one sentence more than it had. Lint the LONGEST cell: on a field
- *  row that is the help, and on a table row it is the prose cell. */
+/** see dsp-quality-toolchain.md#a-pipe-row-is-cells */
 const proseOf = (l: string): string => {
   const body = l.replace(MARKER, "");
   if (!body.includes("|")) return body;
@@ -34,24 +22,7 @@ const proseOf = (l: string): string => {
     .reduce((a, b) => (b.length > a.length ? b : a), "");
 };
 
-/** THE FULL-STOP EVASION (owner ruling 2026-08-07).
- *
- *  The chain rules count separators INSIDE one sentence, so the way around
- *  them is a full stop. "Open it. Read it. Fill both cells." Three steps,
- *  three sentences, not one separator anywhere, and nothing fired.
- *
- *  That was the actual evasion, three times in one afternoon, each time after
- *  being told. A rule an author walks around by changing punctuation is an
- *  advisory, and an advisory is not a rule.
- *
- *  TWO SHAPES, one per surface:
- *
- *  - A PROSE LINE of several short sentences is a list nobody rendered.
- *    SHORT is the discriminator: ordinary prose runs long and varied, while a
- *    buried list runs short and parallel because each sentence is one item.
- *  - A LIST ITEM of several sentences is the same thing one level down.
- *    Rendering the list is half the discipline; one thought per item is the
- *    other half. Items were not linted at all before this. */
+/** see dsp-quality-toolchain.md#the-full-stop-evasion */
 function buriedList(l: string, i: number, cfg: Cfg): LintFinding[] {
   const parts = sentencesOf(proseOf(l));
   const item = MARKER.test(l);
@@ -151,25 +122,7 @@ function loadCfg(root: string): Cfg {
   }
 }
 
-/** THE PROSE IN FRONTMATTER IS STILL PROSE (owner report 2026-08-08).
- *
- *  The lint used to drop the whole frontmatter block, which meant it never
- *  read a single `guidance:` or `description:` — the exact text a person sees
- *  in an evidence form. voice.md binds those in as many words: "Embedded prose
- *  fields follow the same rules. State guidance, tool descriptions, form help
- *  — short sentences, paragraphs, lists." The one surface the rule names was
- *  the one surface the rule could not see.
- *
- *  It surfaced when a six-line anchor list, written as prose inside a field's
- *  guidance, came back clean.
- *
- *  MASK, NEVER STRIP. The structural half of each line is blanked and the
- *  prose half stays where it is, so every finding keeps its real line number
- *  and a person can go straight to it.
- *
- *  A VALUE THAT IS NOT PROSE IS NOT LINTED. An id, a number, a boolean, a
- *  path, a single word — none of them is a sentence, and complaining about
- *  them would teach people to switch the lint off. */
+/** see dsp-quality-toolchain.md#prose-in-frontmatter-is-still-prose */
 function maskFrontmatter(text: string): { text: string; keyOf: string[] } {
   const lines = text.split(/\r?\n/);
   const keyOf: string[] = lines.map(() => "body");
@@ -202,20 +155,7 @@ function maskFrontmatter(text: string): { text: string; keyOf: string[] } {
       out[i] = "";
       continue;
     }
-    // PROSE IS A SENTENCE, not a token and not a list of tokens.
-    //
-    // A LINT THAT CRIES WOLF GETS SWITCHED OFF. `legal_tools: se_file_read,
-    // se_file_write, se_file_patch` is a YAML list written inline — it trips
-    // the comma-chain rule and there is nothing to fix, because a list of tool
-    // names is not an unrendered sentence. Same for a citation with a
-    // semicolon in it.
-    //
-    // A ONE-LINE FIELD IS NOT EXEMPT (owner ruling 2026-08-08). A `statement`
-    // that trips the chain rule is a statement carrying too much, and the fix
-    // is TWO SHORT SENTENCES rather than an exemption — the readers are not
-    // native English speakers, and a nested one-liner is the hardest thing to
-    // read there is. An exemption here would have made the lint agree with the
-    // text instead of the text agree with the rule.
+    // see dsp-quality-toolchain.md#a-lint-that-cries-wolf-gets-switched-off
     const words = value.replace(/^["']|["']$/g, "").trim();
     const parts = words
       .split(/[,;]/)
@@ -301,24 +241,10 @@ export function lintProse(root: string, text: string, rel?: string): LintFinding
       // list this rule exists to catch.
       const isLiteral = (part: string): boolean =>
         /^`[^`]*`$/.test(part.trim()) || /^"[^"]*"$/.test(part.trim()) || /^'[^']*'$/.test(part.trim());
-      // EVERY SEPARATOR, not the two somebody thought of first. The rule was
-      // commas and semicolons, so writing the same buried list with middots
-      // or slashes walked straight past it (owner, 2026-08-07).
-      //
-      // A SPAN IS ONE THING, WHATEVER IS INSIDE IT (owner report 2026-08-08).
-      // Adding the slash meant `project/spec/trace/raid/` split into five
-      // "items", so every card saying where its node lives fired the chain
-      // rule on a path. The literal test could not save them: it runs AFTER
-      // the split, and by then the span is in pieces. Mask each span to one
-      // token first, and the test does what it was written to do.
+      // see dsp-resolution-seam.md#every-separator-not-the-two-somebody-thought-of-first
       const masked = s.replace(/`[^`]*`/g, "`x`").replace(/"[^"]*"/g, '"x"');
       const items = masked.split(/[,;·•/]|\s→\s/).filter((part) => part.trim() !== "" && !isLiteral(part));
-      // A PART MUST CARRY SUBSTANCE TO COUNT (e28, 2026-08-01 — rebuilt on
-      // trunk 2026-08-09 after the worktree fix never landed): the rule
-      // separates an enumeration of THOUGHTS from an enumeration of NAMES.
-      // "alpha, beta, gamma, delta" is reference; nobody wants `pill` on
-      // its own bullet. Fourteen of thirty-seven findings in one sweep
-      // were this miscount.
+      // see dsp-resolution-seam.md#a-part-must-carry-substance-to-count
       const weighty = items.filter((part) => part.trim().split(/\s+/).length >= cfg.comma_chain_min_item_words);
       if (weighty.length > cfg.comma_chain_items) {
         findings.push({

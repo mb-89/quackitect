@@ -108,7 +108,7 @@ model that was overturned before i16 shipped.
 
 WHAT i16 ACTUALLY BUILT is the producing act and its guards. A vehicle records
 the identity of the tree it came from and may never write back to it
-(SE-C-140). The overlay resolution chain is still unbuilt, and so is drift
+(SE-C-143). The overlay resolution chain is still unbuilt, and so is drift
 reporting.
 
 SO NOTHING SENDS A CHANGE UPSTREAM. That is a separate demand and it does not

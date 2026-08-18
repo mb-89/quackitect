@@ -1,28 +1,4 @@
-// EVERY REGISTER ENTRY CARRIES ITS GRADES, AND EVERY GRADE IS ON THE SCALE —
-// the check behind rank-unknowns.
-//
-// The exposure ranking is damage times likelihood, computed off
-// `breaks_how_badly` and `how_likely` on every open entry. An ungraded entry
-// cannot rank, so it silently falls out of the chart the pick reads — a
-// register row nobody weighs is a risk nobody sees (owner ruling 2026-08-11:
-// the state may not pass while any entry stands ungraded, whoever wrote it).
-//
-// TWO CHECKS USED TO DISAGREE, AND THE WEAKER ONE GUARDED THE STATE.
-// This script asked only that the key was NON-EMPTY, and a mint comment is
-// non-empty. The exposure chart asked that the VALUE was on the scale, and
-// gave anything else likelihood -1, which never places a dot.
-//
-// WHAT THAT COST, measured 2026-08-14 (note-3465043278d3): nine entries still
-// carried the mint comment and twenty-two more carried words nobody put on the
-// scale — certain, near-certain, likely, possible, unlikely, rare. Thirty-two
-// entries invisible to the pick, with this script green.
-//
-// SO IT READS THE CATALOGUE NOW, and the catalogue is read from the card that
-// declares it rather than repeated here. meth-damage-scale carries
-// `catalog: damage_levels` and meth-likelihood-scale its sibling. Editing a
-// card changes what this accepts, in the same breath.
-//
-//   node engine/bin/grades-complete.ts --root <project root>
+// see dsp-decision-mathematics.md#every-register-entry-carries-its-grades
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { catalogItems } from "../catalogs.ts";

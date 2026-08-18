@@ -44,15 +44,7 @@ ${CARD_PARTS}
     const why = args.reason
       ? '<input class="sfcmpwhy" style="flex:1;min-width:110px;box-sizing:border-box;background:transparent;border:1px solid var(--se-border);border-radius:5px;color:var(--se-fg);font:inherit;font-size:12px;padding:6px 8px;" data-field="' + name + '" placeholder="why (optional)">'
       : "";
-    // HOW MANY THERE ARE, AND HOW MANY ARE DONE (owner ruling 2026-08-08).
-    //
-    // It used to read answered out of answered-plus-ESTIMATE, and the estimate
-    // could rise without bound — ninety criteria once showed about five
-    // thousand, more than the entire cross product. A denominator that grows
-    // while you work reads as the sort having failed.
-    //
-    // Both numbers here are settled facts. An ordering walk counts the items
-    // placed; an equivalence walk counts the pairs answered.
+    // see dsp-form-editors.md#how-many-there-are
     const done = Number(st.done || 0);
     const total = Number(st.total || 0);
     const answered = Number(st.answered || 0);

@@ -75,20 +75,43 @@ THE WORK THAT MAKES IT REPAYABLE IS i35. Its blocks 4 and 6 hold the container
 fixes and the guidance corrections. Until those land, another cloud run repeats
 the same seven discoveries.
 
-## Swept 2026-08-18, at i16's onboard-retro: THE BLOCKER IS GONE
+## The trigger fired a second time, and the repayment moved but did not land — 2026-08-18
 
-THIS ROW'S LAST LINE SAID THE WORK THAT MAKES IT REPAYABLE IS i35, naming its
-blocks 4 and 6. i35 SHIPPED on 2026-08-17 and stands `status: shipped`.
+THE SECOND CLOUD RUN WAS THE i17 ARRIVAL. It was Arrival A again — a cloud
+session handed the agent a branch and nobody typed the entrypoint — but this
+time the arrival RAN BY ITSELF. The root `.claude/settings.json` SessionStart
+hook fired `se-arrive`, which is exactly what i35 built, and five of its six
+steps came back green before the agent read a line: refs fetched, runtime
+checked against the pin, dependencies installed, cage placed, client written.
 
-SO THE REPAYMENT IS NOW POSSIBLE for the first time. Nothing else stands
-between this row and a clean run: the container fixes and the guidance
-corrections landed, and the seven hand-typed steps the last run needed are the
-things i35 was for.
+NONE OF THE SEVEN CLOUD-ONLY DISCOVERIES RECURRED. The node pin, the missing
+dependencies, the missing cage and lane, the one-branch clone — every one of
+them was handled by the arrival with nothing typed by hand. That is the i35
+work landing, measured.
 
-WHAT REPAYMENT STILL DEMANDS IS UNCHANGED, and it is the part that failed last
-time: the entrypoint has to RUN. A cloud session that hands an agent a branch
-and lets it type the steps by hand is Arrival A, and this row already excludes
-it in as many words.
+THE DEBT IS STILL NOT REPAID, and by its own criteria.
 
-RE-AFFIRMED AS: the next cloud run, which is now a real test rather than a
-repeat of the same seven discoveries.
+- `lane: FAILED — the lane did not answer on 7333 within 60s`. The entrypoint
+  named what failed in one sentence, which this row asks for, and then the
+  session carried on regardless.
+- THE AGENT DID NOT REACH ITS FIRST PULL WITHOUT EDITING ANYTHING. Three engine
+  files were edited with native tools before the lane would answer at all.
+- Nothing required reading a handover, which is the one criterion met outright.
+
+WHAT ACTUALLY STOPPED IT WAS NOT CLOUDNESS. Both blockers were ordinary engine
+defects that a laptop would have hit too, and that is the finding worth keeping:
+
+- `se-mcp.ts` still did `Number()` on the autonomy argument after the
+  2026-08-18 ruling moved the rungs to words and moved `se-arrive` with it. The
+  lane died on `NaN` before its first call.
+- `prose-inspect.ts`, an exit script of `boot/prepare_idle`, returned 64 false
+  findings because the host sets `git config user.name` to the agent's own
+  name and matched it as a plain substring.
+
+SO THE CLOUD-SPECIFIC RISK THIS ROW PREDICTED IS DOWN, AND A DIFFERENT ONE IS
+NAMED IN ITS PLACE: an environment-sensitive CHECK, not an environment-
+sensitive step. `prose-inspect` reads the environment at runtime, so it is
+green on the machine that wrote it and red on every machine that is not it.
+
+RESCHEDULED, TRIGGER RE-AFFIRMED. The next cloud run is still the trigger, and
+the bar is unchanged: no step typed by hand.

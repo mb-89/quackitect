@@ -40,7 +40,7 @@ A FIFTH CASE WAS ADDED for the half that was missing: a writable target carrying
 
 ### engine/errors.ts and guidance/refusals.md
 
-SE-C-140 IS NEW, and it covers both halves of one rule: the target is the source, or the guard cannot prove it is not. Its rule stands in refusals.md the way every clause's does.
+SE-C-143 IS NEW, and it covers both halves of one rule: the target is the source, or the guard cannot prove it is not. Its rule stands in refusals.md the way every clause's does.
 
 ### tests/roots.test.ts
 

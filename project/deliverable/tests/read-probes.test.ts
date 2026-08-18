@@ -82,3 +82,54 @@ test("the pull hands back which probes were missed, not only that one was", asyn
   assert.ok((wrong.missed as string[]).length > 0, "the miss list is empty on a wrong answer");
   assert.match(String(wrong.note), /probe\(s\) were not answered/, "the note does not count the misses");
 });
+
+// THE ANSWER IS COUNTED THE WAY THE PROBE WAS CUT (i17 boot, 2026-08-18).
+//
+// WORDY drops a standalone em dash when the probe is BUILT, and until this fix
+// nothing dropped it again when the answer came BACK. So a reader who obeyed
+// the hint — "quote the words VERBATIM, punctuation and all" — was refused, and
+// only the answer with the dash REMOVED was accepted. Two calls at boot, on a
+// document that had been read.
+const DASHED = `# the desk carries no vocabulary
+
+Some opening prose so this document clears the sixteen-word floor and the
+probes are placed by fraction rather than served whole, exactly as a real
+guidance card is written by somebody who meant it.
+
+This document carries NO list of doors and NO vocabulary on purpose \u2014
+those must come from the sweep, so the desk stays current when the lanes
+land or they change under it, and nothing written here goes stale behind.
+`;
+
+// THE FIXTURE IS TUNED so the middle probe lands exactly where the live one
+// did: it asks for the 4 words that FOLLOW "and NO vocabulary on", and the
+// document answers "purpose \u2014 those must come". The dash is not one of the
+// four, because the probe never counted it.
+test("the probe that cost the calls is the probe this fixture serves", () => {
+  const { ask, expect } = readingProbes(DASHED);
+  assert.ok(
+    ask.some((a) => a.includes('FOLLOW "and NO vocabulary on"')),
+    `the fixture drifted off the shape it pins: ${ask.join(" / ")}`,
+  );
+  assert.ok(expect.includes("purpose those must come"), `the expected answer is no longer the dashless run: ${expect.join(" / ")}`);
+});
+
+test("a verbatim answer is accepted when a standalone dash falls inside it", () => {
+  const { expect } = readingProbes(DASHED);
+  // What a reader who obeyed the hint would send: the source as written, dash
+  // and all. Before 2026-08-18 this was refused and only the dashless form
+  // passed, which is the opposite of what the hint promises.
+  const verbatim = ["as a real guidance", "purpose \u2014 those must come", "here goes stale behind."].join("; ");
+  assert.deepEqual(probesMissed(expect, verbatim), [], "a verbatim answer was refused over punctuation the probe itself dropped");
+});
+
+test("punctuation the probe never counted cannot fail an answer", () => {
+  const { expect } = readingProbes(DASHED);
+  const peppered = expect.map((e) => e.split(" ").join(" \u2014 ")).join("\n\n");
+  assert.deepEqual(probesMissed(expect, peppered), [], "standalone punctuation between the right words was read as a wrong answer");
+});
+
+test("a genuinely wrong answer is still refused after the filter loosens", () => {
+  const { expect } = readingProbes(DASHED);
+  assert.equal(probesMissed(expect, "— — — ...").length, expect.length, "punctuation alone passed for an answer");
+});

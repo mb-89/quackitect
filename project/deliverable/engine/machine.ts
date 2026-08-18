@@ -36,14 +36,7 @@ export interface EvidenceField {
   type?: EvidenceType;
   /** One or two lines telling whoever fills it what belongs in it. */
   guidance?: string;
-  /** THE COLUMNS. For `table`, plain headings. For `node-table`, the
-   *  FRONTMATTER KEYS on the listed nodes — each becomes an editable cell,
-   *  read from the node and written back to it (owner ruling 2026-08-07).
-   *
-   *  WHY THE NODE AND NOT THE FORM. A probe result belongs to the assumption,
-   *  not to whichever iteration happened to run it. Written in both places it
-   *  is two copies of one fact, and one of them goes stale. The register's
-   *  own law already says this: the nodes are the truth, the table is a view. */
+  /** see dsp-the-goal-binds-the-walk.md#a-node-table-cell-is-written-back-to-the-node */
   columns?: string[];
   /** COVERAGE IS MUTUAL. Naming an item type here makes two things checkable
    *  at once: every reference in this field refines one of that type, and
@@ -83,14 +76,7 @@ export interface EvidenceField {
    *  something outside the pool compares an axis against a non-axis, and the
    *  weight computed from it is arithmetic over a typo. */
   picks?: Record<string, string[]>;
-  /** WHICH PICKED COLUMNS STILL TAKE SOMETHING ELSE (owner ruling
-   *  2026-08-08: "this should just show me all the clusters, and I can only
-   *  choose clusters").
-   *
-   *  A PICK IS CLOSED BY DEFAULT, because that is what a known set means. A
-   *  column named here is the exception: the offer is help, and typing past
-   *  it is legal. The comparison cards need it — their cells hold an id PLUS
-   *  a reason, and a closed chooser would forbid the reason. */
+  /** see dsp-walk-machine.md#which-picked-columns-still-take-something-else */
   pick_free?: string[];
   /** HOW MANY ROWS A PAGE SHOWS. A field over a live register is as long as
    *  the register, and a table nobody can page through is a table nobody
@@ -100,20 +86,7 @@ export interface EvidenceField {
    *  (`file :: case`) links its file, joined to this base. Absent means no
    *  link. */
   link_base?: string;
-  /** THE CHANGE SIZES THAT DO NOT ASK THIS QUESTION (owner ruling 2026-08-13).
-   *
-   *  A rigor cell could only ever do two things: keep the state or strike it,
-   *  and swap its guidance prose. So "keep the step but ask less at this size"
-   *  had no mechanical form, and the note asked the agent to be brief — a
-   *  judgment, made afresh every time, by whoever happened to be walking.
-   *
-   *  Naming the sizes here makes the trim MECHANICAL. The column compiler
-   *  drops the field; nothing at that size can ask for it, and nothing at any
-   *  other size loses it.
-   *
-   *  ABSENT MEANS ASKED EVERYWHERE, on purpose. A key nobody wrote must never
-   *  silently delete a question — the safe direction for a typo is to ask too
-   *  much. */
+  /** see dsp-walk-machine.md#the-change-sizes-that-do-not-ask-this-question */
   omit?: string[];
   /** WHICH RELATION A COMPARISON CARD WALKS — `order` or `equivalence`. It
    *  decides what may be inferred from an answer, and that decides how many
@@ -121,12 +94,7 @@ export interface EvidenceField {
   relation?: string;
   /** THE FRONTMATTER KEY a card's answers land in, on the node itself. */
   writes?: string;
-  /** ANOTHER FIELD IN THIS STATE THAT THIS ONE IS DERIVED FROM.
-   *
-   *  A derived field asks for nothing. It reads the named field, computes,
-   *  and shows the answer — so the answer cannot disagree with what it was
-   *  computed from, which is what a second typed copy always eventually does
-   *  (owner report 2026-08-08, on a Pareto front typed beside its scores). */
+  /** see dsp-walk-machine.md#another-field-in-this-state-that-this-one-is */
   reads?: string;
   /** An optional second key, where the card also wants a sentence. */
   reason?: string;
@@ -165,17 +133,7 @@ export const STANDARD_ROUNDS: EvidenceField[] = [
     template: "per-item",
     items: ["exercised against the goal", "missing", "wrong", "out of scope", "prior art"],
   },
-  // THE GOALS CHECK (owner ruling 2026-08-17). Round 1 already says "the
-  // RESULT against the goal" and it is not enough, because it asks about a
-  // goal that is PROSE — so the answer can be true about the wrong subject.
-  // i33 answered it "the scope answers both halves of the owner's framing",
-  // which was true of the SCOPE and never checked the register.
-  //
-  // EVERY OTHER COVERAGE CHECK IN THIS SYSTEM COMPARES A NODE TO ITS
-  // NEIGHBOUR — story to value prop, requirement to use case, chunk to spec.
-  // A chain that is perfectly linked and serves a quarter of the kickoff
-  // passes all of them, because not one looks UP. This is the only field
-  // that does, and it is per-item so it cannot be answered in general.
+  // see dsp-the-goal-binds-the-walk.md#the-goals-check
   {
     name: "goals_served",
     description:
@@ -184,16 +142,7 @@ export const STANDARD_ROUNDS: EvidenceField[] = [
     template: "per-item",
     items: ["$goals"],
   },
-  // THE INSTRUMENT IS NOT THE DELIVERABLE. A READER WHO OWES AN ANSWER IS
-  // (i33, 2026-08-17). i12 shipped the one-second rule and the timings were
-  // recorded from that day; two days later 1834 of 8424 calls were over it,
-  // because nothing in the machine ever obliged anybody to look.
-  //
-  // ITS OWN RED TEAM HAD WRITTEN THIS DOWN IN ADVANCE: a milestone three that
-  // ends with no state reading the instrument means the iteration repeated
-  // i12 and should be judged failed. This field is the state that reads it.
-  //
-  // EMPTY MEANS NONE BREACHED, and renders as nothing rather than refusing.
+  // see dsp-walk-machine.md#the-instrument-is-not-the-deliverable
   {
     name: "bound_breaches",
     description:
@@ -202,12 +151,7 @@ export const STANDARD_ROUNDS: EvidenceField[] = [
     template: "per-item",
     items: ["$breaches"],
   },
-  // A ROUND THAT ONLY EVER PASSES IS DECORATION. Round 1's `missing` and
-  // round 2's kill-criterion are the two places a gate can actually die, and
-  // both are worthless when filled with findings nobody would act on. A
-  // finding padded in to make the list look longer is worse than a short
-  // list: it teaches the reader to skim (owner, 2026-08-06, striking
-  // "fourteen stories is an arbitrary number" from a live gate).
+  // see dsp-the-goal-binds-the-walk.md#a-round-that-only-ever-passes-is-decoration
   {
     name: "round_2_red_team",
     description:
@@ -215,13 +159,7 @@ export const STANDARD_ROUNDS: EvidenceField[] = [
     required: true,
     template: "findings",
   },
-  // ASKED AT EVERY GATE, SO NOTHING IS DROPPED (owner ruling 2026-08-06).
-  // A review is where somebody has just looked hard at the work, which is the
-  // moment a risk or an assumption is most visible and least likely to be
-  // written down. Waiting for the state that owns the register is how an
-  // entry is lost. NONE IS A LEGAL ANSWER and most gates will give it; the
-  // cost of asking is one line, and the cost of not asking is an assumption
-  // nobody records until it breaks.
+  // see dsp-walk-machine.md#asked-at-every-gate
   {
     name: "raid_additions",
     description:
@@ -266,33 +204,11 @@ export interface StateDecl {
    *  the machinery enters (auto-advanced), end closes the machine (terminal).
    *  Nothing machine-specific belongs in them. */
   kind: "work" | "gate" | "terminal" | "start" | "end" | "join";
-  /** THE BUSBAR (owner ruling 2026-08-06): this state's inputs meet at an
-   *  AND bar. The bar is passed only when EVERY state feeding it is done,
-   *  and the state cannot submit before then.
-   *
-   *  IT IS THE ONLY AND-MECHANISM (owner ruling 2026-08-08). The kernel's
-   *  activation rule, the submit check and the drawing all read THIS field.
-   *  `state_kind: join` is drawing vocabulary the compiler turns into a bar.
-   *  There is no second word and no second place it is enforced.
-   *
-   *  THE BAR IS AUTHORED, NOT INFERRED. It is an element of the state
-   *  machine, drawn by whoever writes the row. The engine never decides
-   *  where one belongs.
-   *
-   *  ITS ABSENCE IS THE OR, and that is the default. A state with several
-   *  inputs and no bar above it moves on the first input that arrives. No
-   *  vocabulary says this — the missing bar already does.
-   *
-   *  NOT A GATE THING. A gate is one state that happens to carry a bar.
-   *  Work states carry them too. The engine used to key the whole rule off
-   *  kind === "gate", which gave every work state an accidental OR. */
+  /** The AND bar over this state's inputs. see dsp-walk-machine.md#the-busbar-is-the-only-and */
   busbar?: boolean;
   /** Diagram grouping, e.g. "boot" — presentation metadata, no run-time meaning. */
   group?: string;
-  /** AUTHORED meaning, or empty (owner ruling 2026-07-28): a statement
-   *  exists only when it says something the id does not ("In doubt, go
-   *  here."). The mirror renders it small under the node's name; filler
-   *  like "The retro machine." is struck, never generated. */
+  /** see dsp-walk-machine.md#authored-meaning-or-empty */
   statement: string;
   /** Optional: a human might fill a state too (owner ruling — v3 drops the requirement). */
   filled_by?: "agent" | "engine";
@@ -304,10 +220,7 @@ export interface StateDecl {
   evidence_form: EvidenceField[];
   /** A nested machine: a ledger machine id, or "iteration" — the iteration may provide its own. */
   submachine?: string;
-  /** SCXML-style state contract (owner ruling 2026-07-26): authored on the
-   *  NOTE, evaluated as the transition's cond. Each is a DICTIONARY:
-   *  key = a condition TYPE (defined by its note in machines/conditions/),
-   *  value = the type's arguments. All keys must hold. Absent = always. */
+  /** see dsp-the-goal-binds-the-walk.md#scxml-style-state-contract */
   entry?: Record<string, string[]>;
   exit?: Record<string, string[]>;
   /** Tags join states to guidance (the pull system's tag rule). */
@@ -318,10 +231,7 @@ export interface StateDecl {
   inputs?: { label: string; description: string }[];
   /** The concrete slash-name of the form's Follow-up box. */
   follow_up_label?: string;
-  /** HUMAN INVOLVEMENT (owner ruling 2026-07-26): the weight of the
-   *  decision to ENTER this state, 0.01 (mechanical) .. 1 (milestone). The
-   *  agent may enter only when priority <= the session threshold; the
-   *  human always may. Required on every state. */
+  /** see dsp-walk-machine.md#every-state-carries-the-weight-of-entering-it */
   priority: number;
   /** v3 — THE STATE GATE: the LEGAL TOOLS while this state is active
    *  (legal STATES are the machine's edges — this is only about tools).
@@ -362,11 +272,7 @@ export interface MachineInstance {
   pending_run?: { state: string; ref: string };
   /** Extended state: counters as variables. */
   counters: Record<string, number>;
-  // "superseded" and "reopened" (i12): a reopen must be representable IN the
-  // record, not by deleting it. A superseded fill happened and did not survive
-  // review; erasing it would make a reopen indistinguishable from work that was
-  // never done, which is exactly the history a reader needs most.
-  // "paused" writes no more (one escape since 2026-08-02) — old records keep it
+  // see dsp-walk-machine.md#superseded-and-reopened
   history: {
     state: string;
     outcome: "filled" | "failed" | "escaped" | "paused" | "abandoned" | "superseded" | "reopened";
@@ -452,16 +358,7 @@ export type StepOutcome = "filled" | "failed";
  *  reading a bar is reading a promise the engine has to keep. */
 export const INPUT_ROLES = new Set(["normal", "approval"]);
 
-/** THE CLAIM-BEARING FEEDERS of a state, looking THROUGH states that carry no
- *  claim of their own (owner ruling 2026-08-07).
- *
- *  This is the ripple, computed instead of written. Green stops at the first
- *  input that is not green, and a mark on a file is not needed to say so.
- *
- *  TRANSPARENT STATES ARE LOOKED THROUGH, never gated on. `start` and plain
- *  waypoints carry no evidence form, so they can never be green — gating on
- *  them would grey the entire machine. The question is the first input that
- *  COULD be green and is not. */
+/** The claim-bearing feeders. see dsp-walk-machine.md#feeders-are-looked-through-never-gated-on */
 export function claimFeeders(m: MachineDecl, id: string, claimful: Set<string>): string[] {
   const out = new Set<string>();
   const walked = new Set<string>([id]);
@@ -483,27 +380,7 @@ export function claimFeeders(m: MachineDecl, id: string, claimful: Set<string>):
   return [...out];
 }
 
-/** THE RIPPLE NAMES ITS ROOT, NOT ITS FIRST HOP (i6).
- *
- *  A fallen claim usually fell because ITS input fell, and that one because its
- *  own did. The refusal named the first hop, so a reader amended a state that
- *  was merely waiting, watched nothing change, and asked again.
- *
- *  LIVED 2026-08-16: a value outside its vocabulary trapped a walk for ELEVEN
- *  calls, four states later. Three amends were aimed at states that were fine.
- *  se_why found it in two, because se_why already walked the chain and the
- *  refusal did not.
- *
- *  A ROOT IS A FALLEN CLAIM WITH NO FALLEN INPUT OF ITS OWN. That is where work
- *  has to happen; everything between it and here is waiting.
- *
- *  THE PATH COMES BACK WITH IT, root first, so a reader can see how a state
- *  four hops away is the reason this one will not go.
- *
- *  A CYCLE RETURNS NO ROOT. The caller falls back to naming the first hop,
- *  which is still better than silence.
- *
- *  req-a-ripple-names-its-root */
+/** see dsp-walk-machine.md#the-ripple-names-its-root — req-a-ripple-names-its-root */
 export function fallenChain(m: MachineDecl, id: string, done: Set<string>, claimful: Set<string>): { roots: string[]; path: string[] } {
   const fell = (at: string): string[] => claimFeeders(m, at, claimful).filter((f) => !done.has(f));
   // WHICH FALLEN STATE EACH ONE FEEDS, so the path can be read back out.
@@ -590,14 +467,7 @@ function rearmJoinsInto(m: MachineDecl, inst: MachineInstance, cone: Set<string>
   }
 }
 
-/** A BRANCHING POINT is a state with more than one way out (owner design
- *  2026-08-07). The owner calls it a waypoint; this file already uses that
- *  word for a claim-less transparent state, so the new idea takes the plainer
- *  name and the two stay distinguishable.
- *
- *  It matters because a fan hands out ONE leg. Whoever walks it reaches the
- *  end and the drawing offers nothing: the other legs are behind them, and
- *  the join above wants them all. */
+/** see dsp-the-goal-binds-the-walk.md#a-branching-point */
 export function branchingPoints(m: MachineDecl): string[] {
   return m.states.filter((s) => s.edges.filter((e) => INPUT_ROLES.has(e.role ?? "normal")).length > 1).map((s) => s.id);
 }
@@ -616,18 +486,7 @@ export function branchKind(m: MachineDecl, id: string): "and" | "or" {
   if (s === undefined) return "or";
   const legs = s.edges.filter((e) => INPUT_ROLES.has(e.role ?? "normal")).map((e) => e.to);
   if (legs.length < 2) return "or";
-  // Reachable from EVERY leg, and a busbar OVER SEVERAL INPUTS. That is the
-  // join that wants them all, and its existence is what makes the branch an
-  // AND.
-  //
-  // THE INPUT COUNT IS LOAD-BEARING (found 2026-08-08, putting the bar on the
-  // shared end note). Reachability alone says nothing: a machine's END is
-  // downstream of every leg BY CONSTRUCTION, so any bar on it would turn
-  // every branch in every machine into an AND — including idle's doors, where
-  // taking one is a decision and the others are never walked.
-  //
-  // A bar over ONE input synchronises nothing. It is a bar over TWO that says
-  // the legs below it are all required.
+  // see dsp-walk-machine.md#what-makes-a-branch-an-and
   const inbound = (id: string): number =>
     m.states.filter((p) => p.edges.some((e) => e.to === id && INPUT_ROLES.has(e.role ?? "normal"))).length;
   const cones = legs.map((l) => downstreamCone(m, [l]));
@@ -683,22 +542,7 @@ export function reopenStates(
 
   inst.history.push({ state: stateIds.join(","), outcome: "reopened", evidence: reason.slice(0, 300), at: now });
 
-  // TOKENS GO ON THE FRONTIER, NOT ON EVERY REOPENED STATE (owner, 2026-08-13).
-  //
-  // A re-pin reopened eight scattered steps and this line put a token on all
-  // eight. The walk then stood in M0's kickoff gate and M3's requirements at
-  // once — two steps on ONE sequential chain, which no legal marking holds.
-  // The mirror painted eight live states, the pull offered eight, and the
-  // input check refused the later ones on arrival. Enforcement held; the
-  // POSITION was a lie.
-  //
-  // A reopened state below another reopened state is re-reached by walking:
-  // its inbound fuel was just dropped above, so it re-arms and fires again
-  // once its feeders sign. Only the roots need placing by hand.
-  //
-  // A GENUINE FORK KEEPS ITS SEVERAL TOKENS. The frontier of a real AND branch
-  // is several states, none downstream of another, and this filter leaves
-  // every one of them standing.
+  // see dsp-walk-machine.md#tokens-go-on-the-frontier
   const frontier = stateIds.filter((id) => !stateIds.some((other) => other !== id && downstreamCone(m, [other]).has(id)));
   inst.active = [...frontier];
   inst.current = frontier[0];
@@ -766,13 +610,7 @@ function activatePowered(
   // trigger during activity never re-runs it later.
   inst.fired = inst.fired!.filter((k) => !active.includes(k.split("->")[1]));
   const settled = settledStates(inst);
-  // GREEN IS GREEN, WHOEVER WALKED IT (owner ruling 2026-08-09). A state whose
-  // evidence stands owes nothing. Nothing records this instance having walked
-  // over it, and nothing needs to.
-  //
-  // Two sources, and the second is the one that survives. History says THIS
-  // instance filled it, which a reload or a re-entry wipes. The evidence says
-  // it stands at all, which outlives every one of those.
+  // see dsp-walk-machine.md#green-is-green
   let byEvidence: Set<string> | undefined;
   const standsGreen = (id: string): boolean => {
     if (settled.has(id)) return true;
@@ -781,26 +619,7 @@ function activatePowered(
   };
   for (const s of m.states) {
     if (active.includes(s.id) || activated.includes(s.id)) continue;
-    // Inbound counted: normal and approval edges (alternatives activate
-    // directly above). FAN-IN IS OR (owner ruling 2026-07-28): any fired
-    // inbound activates a plain state — what a person naturally draws.
-    //
-    // THE BUSBAR IS THE ONLY SYNCHRONISER (owner ruling 2026-08-08). It waits
-    // for EVERY inbound edge — the drawn AND of the formalisms: the UML join
-    // bar, the BPMN parallel gateway, the Petri transition.
-    //
-    // IT USED TO READ kind === "join" HERE while the rigor matrix read
-    // `busbar`, so a drawn machine and a compiled one meant one thing in two
-    // words and enforced it in two places. A matrix row's bar was checked at
-    // SUBMIT and never at activation; a drawn join was checked at activation
-    // and had no submit rule. Same idea, two mechanisms, nothing making them
-    // agree.
-    //
-    // `state_kind: join` survives as DRAWING vocabulary: the compiler turns it
-    // into a busbar, and nothing at run time reads it.
-    //
-    // DEDUPED, because two edges from one source to one state are ONE
-    // inbound. Counted twice, a busbar could never reach its own total.
+    // Inbound: normal and approval edges, deduped. see dsp-walk-machine.md#the-busbar-is-the-only-and
     const inbound = [
       ...new Set(
         m.states.flatMap((src) =>
@@ -814,19 +633,7 @@ function activatePowered(
     // one of its inbound edges. This is also what stops the green rule below
     // from re-activating a done join every time anything, anywhere, completes.
     if (fired.length === 0) continue;
-    // A GREEN BRANCH SATISFIES ITS EDGE (owner ruling 2026-08-09). A busbar
-    // waits for every inbound edge. An edge whose source already stands filled
-    // has nothing left to deliver — the work is done, and its fuel was
-    // consumed the last time the join ran.
-    //
-    // WITHOUT THIS A THREE-WAY JOIN IS UNREACHABLE by a single token. Walking
-    // one branch fires one edge; reaching a sibling routes BACK through the
-    // fork, which re-walks the branch and clears the fuel. Measured in
-    // iteration one on 2026-08-09: all three branches walked, gate still shut,
-    // and stepping out to re-enter reset the count to zero.
-    //
-    // rearmJoinsInto solves the same problem for a reopen, by putting fuel
-    // back. This solves it for a plain walk, by not demanding it.
+    // see dsp-walk-machine.md#a-green-branch-satisfies-its-edge
     if (s.busbar === true && inbound.some((k) => !fired.includes(k) && !standsGreen(k.split("->")[0]))) continue;
     inst.fired = inst.fired?.filter((k) => !inbound.includes(k)); // consume
     activated.push(s.id);

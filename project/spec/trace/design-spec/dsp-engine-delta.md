@@ -4,14 +4,13 @@ id: dsp-engine-delta
 type: "[[design-spec]]"
 statement: two-level resolution for every engine and method file, the record's own folder first and trunk second, so a record holds only what it changed
 realizes:
-  - el-engine-delta
-  - if-engine-delta-to-account
-  - if-engine-delta-to-mirror
-  - if-engine-delta-to-walk-engine
+  - "el-engine-delta"
+  - "if-engine-delta-to-account"
+  - "if-engine-delta-to-mirror"
+  - "if-engine-delta-to-walk-engine"
 files:
-  - project/deliverable/engine/delta.ts
-  - project/deliverable/engine/paths.ts
-  - project/deliverable/engine/machines/compile.ts
+  - "project/deliverable/engine/paths.ts"
+  - "project/deliverable/engine/machines/compile.ts"
 ---
 
 ## Responsibility

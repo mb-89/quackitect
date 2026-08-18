@@ -16,7 +16,8 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { withFrontmatter, withFrontmatterList } from "../engine/forms.ts";
 import { parseStateNote } from "../engine/notes.ts";
-import { assumptionItems, claimProblems, criterionAxisItems, nodeField, tableRow } from "../engine/stateform.ts";
+import { assumptionItems, criterionAxisItems, nodeField, tableRow } from "../engine/stateform.ts";
+import { claimProblems } from "../engine/stateform-problems.ts";
 import { freshRoot } from "./helpers.ts";
 
 /** A register with three entries: two standing assumptions, one closed. */
@@ -211,7 +212,11 @@ test("a cell still carrying its comment is unanswered, exactly like an empty one
   } as unknown as Parameters<typeof claimProblems>[1];
 
   const body = (cell: string): string => `## probes\n\n| raid | probe |\n| --- | --- |\n| [[raid-a-holds]] | ${cell} |\n`;
-  const corpus: never[] = [];
+  // THE REF HAS TO RESOLVE, because a node-table field declares
+  // `resolves: artifact` and the check now runs the reference half as well as
+  // the cell half. An empty corpus used to pass only because the reference
+  // problems were computed and discarded.
+  const corpus = [{ id: "raid-a-holds", type: "raid", statement: "a standing assumption", refines: [] }];
 
   // A MINTED PROMPT IS NOT A CLAIM. The node ships with the comment sitting
   // where the answer will sit, so the check has to tell the two apart —

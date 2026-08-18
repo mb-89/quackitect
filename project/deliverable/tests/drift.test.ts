@@ -12,7 +12,6 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import {
   demandsFor,
-  generateIterations,
   type Iteration,
   iterationDrift,
   itPinRel,
@@ -22,10 +21,12 @@ import {
   pinIteration,
   repinColumn,
 } from "../engine/iterations.ts";
+import { generateIterations } from "../engine/iterations-draw.ts";
 import { claimFeeders, downstreamCone, type MachineDecl } from "../engine/machine.ts";
 import { doorStats } from "../engine/notes.ts";
 import { type ChangeColumn, compileColumn, readRigorMatrix } from "../engine/rigor-matrix.ts";
 import { Session } from "../engine/session.ts";
+import { Claims } from "../engine/sessionclaims.ts";
 import { corpusAsks } from "../engine/trace.ts";
 import { freshRoot } from "./helpers.ts";
 
@@ -475,7 +476,7 @@ test("one operation reads its input once — a second ask inside the same pass c
     writeFileSync(evOf(s.id), `---\nsigned_off: 2026-08-17T10:00:00.000Z\n---\n\nthe claim, in full\n`, "utf8");
   }
   const session = new Session(root);
-  const pass = Session.newPass();
+  const pass = Claims.newPass();
 
   const before = doorStats();
   session.recordDone(decl, new Set(), pass);

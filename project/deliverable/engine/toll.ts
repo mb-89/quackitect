@@ -1,30 +1,8 @@
-// The toll — rebuilt from v2 for v3 (owner rulings 2026-07-26). Work IS
-// tool calls, so an agent physically cannot keep working un-narrated: the
-// server timestamps the last update; when the window lapses, the next call
-// carries ONE grace warning on its result, and the call after an ignored
-// warning is refused with the exact resend inline. Payment is any decision-
-// graph op riding the `update` field of any call — a volunteered update is
-// never stopped, and always resets the window.
+// The toll — the narration floor. see dsp-narration.md#the-toll
 //
-// TIME IS NOT THE ONLY MEASURE (owner ruling 2026-07-31). A minute of a fast
-// harness is fifteen calls; a minute of a slow one is two. Whichever comes
-// first is what falls due, so the reader gets the same rhythm on either.
-//
-// HOW OFTEN IS THE READER'S CHOICE, not the engine's. They watch from a
-// different surface on every host, so the cadence is a control they hold, on
-// the same bar as the autonomy and the shutdown level. Turned off, nothing is
-// ever owed and a volunteered update still lands.
-//
-// No ETA field, deliberately: hand-typed clock times measured uncalibratable
-// in v2 (median ratio 0.01); durations come from the engine's timestamps.
-// Armed only after boot — the reading room pays no toll.
 import { CLAUSES, Rejection } from "./errors.ts";
 
-/** THE UPDATE CADENCE, as TWO NUMBERS the reader types (owner sketch,
- *  2026-08-01): an update every n minutes at least, or every n calls at
- *  least, whichever falls due first since the last one.
- *
- *  Zero stops that clock. Both zero owes nothing. */
+/** see dsp-narration.md#the-cadence-is-the-readers-control */
 export const NARRATION_DEFAULT_MINUTES = 5;
 export const NARRATION_DEFAULT_CALLS = 20;
 
@@ -56,28 +34,8 @@ export class Toll {
     return { ms: c.minutes * 60_000, calls: c.calls };
   }
 
-  /** A HOP THE MACHINE FORCED, not a decision the agent made.
-   *
-   *  THE READING LOOP IS MECHANICAL. The pull answers `read`, hands over one
-   *  document, and the only legal next move is to read it and pull back with
-   *  the proof. No judgment happens on that hop, so there is nothing honest to
-   *  narrate — and the toll exists to catch un-narrated JUDGMENT.
-   *
-   *  MEASURED: crediting the reading is about fifteen calls in a row against a
-   *  budget of twenty, so the toll fell due inside the loop and was paid with
-   *  filler. The test helpers had already grown a workaround, attaching a
-   *  dummy update to every read call, with a comment explaining why.
-   *
-   *  OWNER RULING 2026-08-18: "repeated pulls don't need to count down the
-   *  total counter."
-   *
-   *  THE CLOCK STILL RUNS. Only the call counter is spared, because that is
-   *  what a burst of forced hops inflates. An agent genuinely silent for the
-   *  whole window still owes, whatever it was reading.
-   *
-   *  IT CANNOT BE GAMED. A read proof is only accepted while the engine is
-   *  holding a document it chose to serve, so the agent cannot manufacture
-   *  these hops. */
+  /** A hop the machine forced, which pays no call.
+   *  see dsp-narration.md#the-reading-loop-pays-nothing */
   private static isReadingHop(tool: string, args: Record<string, unknown>): boolean {
     if (tool !== "se_pull") return false;
     const form = args.form as Record<string, unknown> | undefined;

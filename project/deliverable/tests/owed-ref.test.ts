@@ -16,7 +16,7 @@ import { strict as assert } from "node:assert";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { fieldProblems } from "../engine/stateform.ts";
+import { fieldProblems } from "../engine/stateform-problems.ts";
 import type { TraceNode } from "../engine/trace.ts";
 import { freshRoot } from "./helpers.ts";
 

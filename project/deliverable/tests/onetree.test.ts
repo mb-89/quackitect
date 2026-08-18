@@ -10,7 +10,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { itList } from "../engine/iterations.ts";
-import { itCloseShipped } from "../engine/worktree.ts";
+import { itCloseShipped } from "../engine/records.ts";
 import { bootedServer, call, freshRoot, gitInit } from "./helpers.ts";
 
 // SEEDING NEEDS A HEAD THAT POINTS AT SOMETHING, so the fixture commits once
@@ -18,8 +18,8 @@ import { bootedServer, call, freshRoot, gitInit } from "./helpers.ts";
 // way: without the commit a seed refuses with "HEAD points to an invalid (or
 // orphaned) reference".
 //
-// The comment used to say this was about a second WORKTREE. i34 deleted the
-// worktrees and the reason survived them — the seed still writes through git.
+// The seed writes through git, so the fixture needs a real commit to write
+// against.
 function committed(root: string): void {
   gitInit(root);
   spawnSync("git", ["add", "-A"], { cwd: root, encoding: "utf8" });
@@ -146,7 +146,7 @@ test("one open iteration is offered, never entered and never skipped past", asyn
 // whether a directory exists. The record's own status field is ignored.
 //
 // The proof it is already broken, observed 2026-08-16: i28 carried
-// `status: shipped` and a `closed:` stamp while its worktree still stood. The
+// `status: shipped` and a `closed:` stamp while its folder still stood. The
 // survey left it out; the container kept it in. Two readers, one record,
 // opposite answers, and nothing said they disagreed.
 test("a record stamped shipped leaves the container, whatever stands on disk", async () => {

@@ -95,3 +95,76 @@ the rendering by probe, and what remains of it is either the POST or
 THE AGENT HALF of req-a-refused-act-says-why-and-what-next. An agent's reason
 arrives on a typed refusal, which the lane already builds and which is not
 params.ts.
+
+## The autonomy dial
+
+THE DIAL SAYS WHICH STATES THE AGENT MAY ENTER BY ITSELF: only those weighing
+no more than it. `blocked` hands every step to the person; `ideation` is
+fully autonomous.
+
+CONTENT WORK INSIDE A STATE IS NEVER GATED. Only ENTERING is.
+
+IT IS LIVE-ADJUSTABLE, and it starts at tactical — resolved BY NAME from the
+scale rather than written as a value anywhere. The rung arrives as a word from
+every launch path.
+
+## Emergency lifts the tool gate
+
+THE GATE EXISTS so a state holds the tools its work needs and no more. That is
+right while the machine is sound, and exactly wrong in two cases:
+
+- REPAIR. When the engine is broken, the gate stands between you and the fix.
+  The guard becomes the fault.
+- BUILDING THE LANE WHILE WALKING IT. The first product iteration writes the
+  machinery it is walking through, in states whose tool lists were authored
+  before that machinery existed.
+
+IT ARMS ONLY FROM THE TOP RUNG and drops the moment the rung does. That is the
+whole safety story: emergency cannot outlive the delegation it was granted
+under, and lowering the autonomy is the same gesture as revoking it.
+
+IT IS NOT ADVERTISED. It rides the packet only when it is ON, so nothing about
+the resting state hints that it exists.
+
+IT PERSISTS WITH ITS RUNG, reversing an earlier no-persist law. Engine reloads
+are routine mid-session, and each one silently revoked the very delegation the
+fixes were granted under. It restores only beside a persisted top-rung
+autonomy, and lowering the dial still revokes it — in this life and the next.
+
+## Set target answers in place
+
+SET TARGET ANSWERS IN PLACE (owner report 2026-08-09: as a redirect
+POST the button swallowed its own rejection — success and refusal
+both 303ed and the clicking page read nothing). A refusal now comes
+back as its own JSON and the client toasts it.
+
+## A reference in prose is a link not dead
+
+A [[REFERENCE]] IN PROSE IS A LINK, NOT DEAD TEXT (owner report
+2026-08-09). Where the id resolves in the document's own record, it
+becomes the same doclink every structured editor emits; where it
+does not resolve it stays text — an unresolved link is a finding.
+
+## The host reads the cards from here
+
+THE HOST READS THE CARDS FROM HERE (owner design 2026-07-30). A host
+that draws one button per card must not keep its own copy of the
+list — project/deliverable/views/cards.md stays the single truth, and a card added
+there appears in VS Code without touching the extension.
+
+## The persons surfaces get the same clock as the
+
+THE PERSON'S SURFACES GET THE SAME CLOCK AS THE LANE (owner, 2026-08-09:
+"every time something takes long, I have to tell you"). Every request is
+timed at this one door, and a breach lands in the SAME log the retro
+already mines — tool mirror_slow, with the path and the wait. Fast
+requests stay out: the alive poll runs constantly, and a log of
+heartbeats would bury what this exists to surface. The line is the
+one-second rule, shared with the lane (calllog.SLOW_MS).
+
+## Kill the whole tree
+
+KILL THE WHOLE TREE, never just the child (found 2026-07-30: a run the
+client gave up on kept a test runner and four descendants alive for
+minutes, competing with everything measured after it). The shell we spawn
+is a parent; killing it leaves its children parented to init and running.

@@ -24,11 +24,10 @@ import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { completeState, type MachineDecl, type MachineInstance, reopenStates } from "../engine/machine.ts";
 import { compileMachine } from "../engine/machines/compile.ts";
-import { freshRoot } from "./helpers.ts";
+import { freshRoot, mirrorSource, mirrorSources } from "./helpers.ts";
 
 const MACHINES = fileURLToPath(new URL("../machines/", import.meta.url));
 const ROWS = fileURLToPath(new URL("../machines/rigor_matrix/rows/", import.meta.url));
-const RENDER = fileURLToPath(new URL("../engine/render.ts", import.meta.url));
 
 /** Every drawn state note, by name. */
 function stateNotes(): string[] {
@@ -75,20 +74,21 @@ describe("the token set", { concurrency: true }, () => {
   // one does. It is whether anything decides "is the walk here" from one
   // token. standingAt() reads the whole list; nothing else may ask.
   test("nothing answers standing-here from the first token alone", () => {
-    const source = readFileSync(RENDER, "utf8");
     const bad: string[] = [];
-    for (const [i, line] of source.split("\n").entries()) {
-      if (/\bactive\[0\]/.test(line)) bad.push(`render.ts:${i + 1}`);
-      // The shape the fix replaced. It compares one state id against one
-      // remembered leaf, which is the collapse wearing different clothes.
-      if (/===\s*CURRENT\b/.test(line) || /CURRENT\s*===/.test(line)) bad.push(`render.ts:${i + 1}`);
+    for (const { rel, text } of mirrorSources()) {
+      for (const [i, line] of text.split("\n").entries()) {
+        if (/\bactive\[0\]/.test(line)) bad.push(`${rel}:${i + 1}`);
+        // The shape the fix replaced. It compares one state id against one
+        // remembered leaf, which is the collapse wearing different clothes.
+        if (/===\s*CURRENT\b/.test(line) || /CURRENT\s*===/.test(line)) bad.push(`${rel}:${i + 1}`);
+      }
     }
     assert.deepEqual(bad, [], `these show one state out of several: ${bad.join(", ")}`);
   });
 
   // The membership test exists, and it is the one every caller uses.
   test("standingAt reads the whole token list", () => {
-    const source = readFileSync(RENDER, "utf8");
+    const source = mirrorSource();
     assert.match(source, /function standingAt\(id\)\s*\{\s*return WALK_HERE && CURRENTS\.indexOf\(id\) >= 0;/);
   });
 
@@ -111,7 +111,7 @@ describe("the token set", { concurrency: true }, () => {
 
   // The half that already worked, pinned so a refactor cannot quietly undo it.
   test("the drawing already fills every active box, not just the first", () => {
-    const source = readFileSync(RENDER, "utf8");
+    const source = mirrorSource();
     assert.match(source, /new Set\(\s*info\.active/, "the box fill builds a set from the whole list");
   });
 
@@ -261,7 +261,7 @@ describe("the token set", { concurrency: true }, () => {
     const source = readFileSync(fileURLToPath(new URL("../engine/session.ts", import.meta.url)), "utf8");
     assert.match(
       source,
-      /completeState\(m,\s*inst,\s*stateId,\s*outcome,\s*now,\s*only,\s*\(\)\s*=>\s*new Set\(this\.recordDone\(m\)\)\)/,
+      /completeState\(m,\s*inst,\s*stateId,\s*outcome,\s*now,\s*only,\s*\(\)\s*=>\s*new Set\(this\.claims\.recordDone\(m\)\)\)/,
       "the guard must pass recordDone as a thunk — without it a bar only sees this instance's history",
     );
     const kernel = readFileSync(fileURLToPath(new URL("../engine/machine.ts", import.meta.url)), "utf8");
@@ -271,7 +271,7 @@ describe("the token set", { concurrency: true }, () => {
 
   // The header names every standing state, one button each.
   test("the header draws a position button per standing state", () => {
-    const source = readFileSync(RENDER, "utf8");
+    const source = mirrorSource();
     assert.match(source, /const curBtn = info\.active\s*\n\s*\.map\(/, "curBtn maps over the whole list");
     assert.match(source, /closest\("\.cur-state"\)/, "several buttons cannot share one id");
   });

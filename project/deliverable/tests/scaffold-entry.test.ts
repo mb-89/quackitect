@@ -13,7 +13,8 @@ import { strict as assert } from "node:assert";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { generateSeeded, itSeededRel, SCAFFOLD_NONE } from "../engine/iterations.ts";
+import { itSeededRel, SCAFFOLD_NONE } from "../engine/iterations.ts";
+import { generateSeeded } from "../engine/iterations-draw.ts";
 import { freshRoot } from "./helpers.ts";
 
 const ID = "i99-scaffold-entry";

@@ -1,35 +1,4 @@
-// THE ENGINE OBSERVES THE RED, NOT THE AGENT — the check behind observe-red
-// (owner ruling 2026-08-16, raid-dec-the-engine-runs-the-red-and-owns-its-own-promotions).
-//
-// observe-red DOES NOT GRANT se_test. Its legal tools are the file verbs and
-// se_run, so the state whose whole job is watching new checks fail could not
-// use the test verb, and the agent reached for the shell instead.
-//
-// THE OWNER'S ANSWER WAS NOT TO GRANT THE VERB: "How about the engine fires the
-// tests and observes red? When you submit observe-red, the engine runs the
-// test." That is the shape verification's row already claims for itself, one
-// milestone earlier.
-//
-// WHAT IT READS. A test-spec node carries `minted_in`, `method` and `files`.
-// The specs minted in the open record with `method: test` name exactly the
-// checks this record is adding, and their files are the checks themselves.
-//
-// WHAT IT DEMANDS. At least one case in that set FAILS. A check that is green
-// before its design is realized is not a check — it is a sentence that happens
-// to be true, and green-from-birth is the one thing test-first exists to catch.
-//
-// AND THE FAILURE IS AN ASSERTION, NOT A CRASH (i6,
-// req-a-red-is-an-assertion-not-a-crash). A check that crashes from birth
-// proves as little as one that is green from birth: it never reached its
-// expectation, so nothing about the design was measured. The counts cannot
-// tell the two apart — `# fail 4` is the same four either way — but the TAP
-// diagnostic can, and parseTap now carries the kind.
-//
-// A CRASH ALONGSIDE AN ASSERTION IS REPORTED, NOT REFUSED. Some checks
-// legitimately throw before the build exists. The refusal is for a red made of
-// crashes ALONE.
-//
-//   node engine/bin/red-observed.ts --root <project root>
+// see dsp-quality-toolchain.md#the-engine-observes-the-red
 import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";

@@ -9,6 +9,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } fr
 import { dirname, join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { stripBom } from "./jsonio.ts";
+import { mintToken } from "./pool.ts";
 
 /** MoSCoW, minus the fourth bucket. "Won't" already exists here as a drain
  *  disposition, so a note never needs to carry it. */
@@ -33,7 +34,8 @@ export interface StrayNote {
   /** Whose hand captured it — agent | human (absent on old notes = agent). */
   by?: string;
   /** Set by a retro's disposition — a drained note leaves the inbox.
-   *  backlog PARKS it: a later migration re-drains it. */
+   *  backlog MINTS a work token on trunk and the raw note stays here,
+   *  local and unmoved. The token is what a later iteration pulls in. */
   drained?: { at: string; disposition: string; where?: string };
 }
 
@@ -101,22 +103,17 @@ const DISPOSITIONS = ["done", "obsolete", "carried", "backlog"];
  *  the code, ruled on since it was parked. */
 const JUDGMENT: ReadonlySet<string> = new Set(["carried", "backlog"]);
 
-/** The retro's mechanical half (v2's req-retro-drain): disposition a note;
- *  drained notes leave the inbox count. An unknown ref is refused.
- *  Re-draining is legal — that IS the backlog migration mechanism.
- *
- *  judgmentAllowed SPLITS IT (owner discussion 2026-07-29). The drain was
- *  retro-only, so the front desk could ADD to the inbox and never take
- *  anything out — and the desk's own method opens by weighing an inbox it
- *  was not allowed to correct. The ceremony is worth keeping where a
- *  judgment is actually made, and nowhere else. */
+/** see dsp-note-pen.md#the-retros-mechanical-half */
 export function drainNote(
   seDirPath: string,
   ref: string,
   disposition: string,
   where: string | undefined,
   judgmentAllowed: boolean,
-): { drained: string; disposition: string; inbox: number } {
+  statement?: string,
+  projectRoot?: string,
+  mintedIn?: string,
+): { drained: string; disposition: string; inbox: number; minted?: string } {
   if (!DISPOSITIONS.includes(disposition)) {
     throw new Rejection({
       clause: CLAUSES.REQUIRED_ARGS,
@@ -125,7 +122,7 @@ export function drainNote(
       remedy: {
         tool: "se_note_drain",
         args: { ref, disposition: "done" },
-        note: "backlog parks the note for a later migration — where: 'ready when …' is then required",
+        note: "backlog mints a work token on trunk — where: 'ready when …' and statement: '<what it is>' are then both required",
       },
       source: "engine/inbox.ts drain",
     });
@@ -171,12 +168,65 @@ export function drainNote(
       source: "engine/inbox.ts drain",
     });
   }
+  // THE MINT COMES FIRST, AND THE ORDER IS THE GUARANTEE. A refused mint must
+  // leave the note exactly as it found it — pending, undrained, still in the
+  // count — or a rejected crossing would silently consume the note anyway.
+  let minted: string | undefined;
+  if (disposition === "backlog") {
+    if (projectRoot === undefined) {
+      throw new Rejection({
+        clause: CLAUSES.REQUIRED_ARGS,
+        expected: "a project root — the pool is a corpus node and lands in the repository",
+        got: "no root",
+        remedy: {
+          tool: "se_note_drain",
+          args: { ref, disposition: "backlog" },
+          note: "an internal wiring fault: the caller did not pass the root through",
+        },
+        source: "engine/inbox.ts drain",
+      });
+    }
+    // A NOTE ALREADY IN THE POOL DOES NOT MINT A SECOND TOKEN. Re-draining is
+    // the migration mechanism and stays legal for every other disposition;
+    // what is refused is minting one finding twice, which is the failure
+    // req-the-raw-note-stays-local-and-is-marked-drained names by name.
+    if (hit.drained?.disposition === "backlog") {
+      throw new Rejection({
+        clause: CLAUSES.NOTE_UNKNOWN,
+        expected: "a note that is not already in the pool",
+        got: `${ref} was drained to the pool at ${hit.drained.at}`,
+        remedy: {
+          tool: "se_note_drain",
+          args: { ref, disposition: "carried", where: "this round" },
+          note: "to pull a parked item into scope, re-drain it as carried — the token already stands and minting a second one splits the finding in two",
+        },
+        source: "engine/inbox.ts drain",
+      });
+    }
+    minted = mintToken(projectRoot, {
+      statement: statement ?? "",
+      readyWhen: where ?? "",
+      source: ref,
+      noteText: hit.text,
+      ...(mintedIn !== undefined && mintedIn !== "" ? { mintedIn } : {}),
+    }).id;
+  }
   hit.drained = { at: new Date().toISOString(), disposition, ...(where !== undefined && where !== "" ? { where } : {}) };
   writeFileSync(notesPath(seDirPath), `${all.map((n) => JSON.stringify(n)).join("\n")}\n`, "utf8");
-  return { drained: ref, disposition, inbox: all.filter((n) => n.drained === undefined).length };
+  return {
+    drained: ref,
+    disposition,
+    inbox: all.filter((n) => n.drained === undefined).length,
+    ...(minted !== undefined ? { minted } : {}),
+  };
 }
 
-/** BACKLOG = parked notes — the retro's migration step walks these. */
+/** THE NOTES THAT WERE DRAINED TO THE POOL — the local half of the crossing.
+ *
+ *  IT IS NOT THE POOL, and after i17 nothing reads it as one. The pool is
+ *  `standingOptions` in engine/pool.ts, on trunk, readable from any clone.
+ *  These are the local notes that produced one, kept so the two ends of a
+ *  crossing can still be found from each other. */
 export function backlogNotes(seDirPath: string): StrayNote[] {
   return readNotes(seDirPath).filter((n) => n.drained !== undefined && n.drained.disposition === "backlog");
 }

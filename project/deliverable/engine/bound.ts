@@ -1,26 +1,4 @@
-// THE ANSWER'S BOUND (tsp-answer-bound, req-the-answer-never-exceeds-its-bound).
-//
-// THE FLOOR, NOT THE WHOLE FIX. The owner's design is both halves: split the
-// sources into chunks small enough to be pulled whole, AND keep a mechanism
-// that guarantees no answer can ever overflow whatever the sources look like.
-// This file is the second half.
-//
-// WHY IT IS URGENT. Three overflows landed in i27's M0 alone, at 281 KB and
-// 277 KB. Every pull in the session of 2026-08-14 returned between 280 and
-// 350 KB and could not be read, and two fills were misdirected as a direct
-// result. When a SUBMIT is refused, the reason sits inside a payload nobody
-// can read, and no cheap question answers it.
-//
-// A POINTER ALONE RECURSES, and the owner caught it: an answer of 350 KB
-// whose pointer says "fetch the whole from the log" produces another 350 KB
-// answer, which is cut again, forever. So the bound PAGES.
-//
-//   - The FIRST PAGE rides inline, so the caller always sees content.
-//   - The whole answer spills to .se/answers/<tool>.json, machine-local and
-//     never committed.
-//   - The cursor names se_file_read with offset and limit, which is the
-//     lane's own paging verb and is itself bounded by its limit. No recursion
-//     is possible, because each page is small by construction.
+// see dsp-lane-door.md#the-answers-bound
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 

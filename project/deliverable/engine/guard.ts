@@ -1,18 +1,4 @@
-// THE WRITE GUARD. One pass over the content a write carries, before anything
-// lands. It answers refuse or land, and the refusal names the file, the line,
-// the value and the fix.
-//
-// WHY IT READS THE CONTENT AND NOT THE FILE. A check that runs after the write
-// has prevented nothing — the corpus was broken for however long the complaint
-// took to arrive, and every reader in between saw it.
-//
-// THE COST IS THE WHOLE DESIGN RISK, and it is measured rather than assumed.
-// raid-asm-a-bound-check-runs-inside-the-write-budget: twelve consecutive
-// se_file_write calls of 2251 to 3086 bytes ran in 4 to 12 ms against a 1000 ms
-// budget on 2026-08-16. This pass parses the incoming string and reads nothing
-// else, so it is the cheapest check there can be.
-//
-// req-a-write-that-breaks-the-corpus-refuses
+// see dsp-write-guard.md#the-write-guard
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";

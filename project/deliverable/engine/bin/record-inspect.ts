@@ -1,28 +1,4 @@
-// THE RECORD INSPECTION, the two items a command can answer (i33, 2026-08-17).
-//
-//   node project/deliverable/engine/bin/record-inspect.ts [--root <project root>]
-//
-// tsp-record-inspection has TWELVE checklist items and had no runner. i33's
-// verification tester ran exactly ONE of them by hand and took the
-// no-runner argument as the verdict for the other eleven - while citing the
-// register entry that warns against precisely that. Two of the eleven turned
-// out to be as mechanical as the one that ran.
-//
-// WHAT IT ANSWERS:
-//
-//   item 11 — every trace node carries its upward links in its OWN file
-//   item 12 — every recorded test run carries the question and scope it answered
-//
-// WHAT IT DOES NOT: the other ten are about records produced by acts nobody
-// has performed recently - a begun product, a seeded record, a desk
-// recommendation, a divergence. They need those acts to have happened, not a
-// cleverer sweep.
-//
-// IT READS THE RAW LOG, NEVER se_log_query. That query drops records matching
-// its filter and reports `older: 0` while doing it
-// (raid-iss-the-call-log-query-omits-matching-records-and-says-it-did-not), so
-// a check built on it would inherit the defect it is meant to be independent
-// of.
+// see dsp-quality-toolchain.md#the-record-inspection
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 
@@ -79,13 +55,7 @@ function testRunsCarryTheirQuestion(): void {
     caveats.push("no call log on this machine, so item 12 saw nothing");
     return;
   }
-  // THE LATEST RUN IS THE LIVE BEHAVIOUR, and it is what this item judges.
-  //
-  // OLD RECORDS CANNOT BE RETRO-FITTED. The verdict did not carry its question
-  // until i33 fixed it on 2026-08-17, so every run before that is missing one
-  // permanently. Going red on history would make this check permanently red,
-  // and a permanently red check gets muted — which is worse than one that
-  // judges what can still be changed and COUNTS the rest out loud.
+  // see dsp-quality-toolchain.md#the-latest-run-is-the-live-behaviour
   let seen = 0;
   let stale = 0;
   let latest: { q: boolean; s: boolean } | undefined;

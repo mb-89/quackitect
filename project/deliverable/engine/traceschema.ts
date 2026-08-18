@@ -1,10 +1,4 @@
-// THE LEGAL EDGES, read from machines/trace-schema.md (owner ruling
-// 2026-08-07). One file says what may point at what. An edge it does not
-// list is a defect, and this is what says so.
-//
-// WHY A FILE AND NOT A CONSTANT. The spine is method, not engine. A product
-// that vendors this and adds a level edits its own schema; nothing here
-// knows how many types there are or what they are called.
+// see dsp-trace-corpus.md#one-file-says-what-may-point-at-what
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { noteOf, type Subsegments, TRACE_SUBSEGMENTS, type TraceNode } from "./trace.ts";
@@ -112,13 +106,7 @@ export function edgeProblems(
   const legal = schema.filter((e) => e.from === n.type);
   if (legal.length === 0) return [];
   const out: string[] = [];
-  // NO EDGE CROSSES BETWEEN SLICES (owner design 2026-08-07). A slice is its
-  // own chain from the requirement outward: design one way, testing the
-  // other. A function pointing at a test definition would tie them back
-  // together, and the drawing could not keep them apart.
-  //
-  // THE SPINE IS EXEMPT because it is what both slices see. A function
-  // pointing at a requirement is the division itself, not a crossing.
+  // see dsp-trace-corpus.md#no-edge-crosses-between-slices
   const mySlice = sliceFor(sub, n.type);
   if (mySlice !== undefined) {
     const crossed = n.refines.filter((p) => {

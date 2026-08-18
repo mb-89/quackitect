@@ -121,9 +121,8 @@ async function bootHuman(s: Session): Promise<void> {
 test("nesting: the walk descends into an archive decade and climbs back out", async () => {
   const root = freshRoot();
   gitSeed(root);
-  // TWELVE CLOSED EXPEDITIONS, cheaply. A branch without a worktree used to be
-  // closed by definition; since i34 a record is a FOLDER and its own status
-  // says whether it is closed, so the fixture writes twelve records.
+  // TWELVE CLOSED EXPEDITIONS, cheaply. A record is a FOLDER and its own
+  // status says whether it is closed, so the fixture writes twelve records.
   for (let i = 1; i <= 12; i++) {
     const dir = join(root, "project", "spec", "expeditions", `e${i}-t`);
     mkdirSync(dir, { recursive: true });

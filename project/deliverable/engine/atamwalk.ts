@@ -1,10 +1,4 @@
-// THE SCENARIO WALK — ATAM's qualitative half, dealt as a deck (owner ruling
-// 2026-08-10). The corpus splits design review into a computed half and a
-// judged half; this module computes the READINGS for both. The judgments stay
-// button-fed lines in the evidence form, exactly like the flip deck's rulings.
-//
-// Pure over its inputs. The args assembly in stateform.ts does the reading,
-// so the tests need no filesystem.
+// see dsp-walk-machine.md#the-scenario-walk
 import type { ElementMatrixView } from "./elematrix.ts";
 
 /** One quality requirement, as the deck needs it. */

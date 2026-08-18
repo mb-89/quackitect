@@ -50,7 +50,7 @@ reachable as `@name/rest`. Ask the owner before declaring one.
 A DECLARED ROOT IS READ-ONLY BY DEFAULT. Declaring one writable is how this
 system drives a project that is not itself. The one thing it may never reach
 is the tree it was produced from. That guard compares recorded identities and
-not paths, so moving or renaming either tree changes nothing (SE-C-140).
+not paths, so moving or renaming either tree changes nothing (SE-C-143).
 
 WHEN A CALL IS REFUSED you get a typed rejection. It carries:
 
@@ -77,5 +77,37 @@ A RESULT THE HOST MOVED TO DISK IS RE-FETCHED BY REF, never by reading the
 host's file. The lane logged the full response; `se_log_query` with the
 call's ref serves it back. Retro finding 2026-08-10: several shell reads of
 host-persisted files stood where one log query belonged.
+
+WRITE A SCRIPT WHEN THE QUESTION IS ABOUT MANY THINGS. Counting what a rule
+touches, routing four hundred blocks, measuring which methods need what,
+applying one shape across a tree — these are programs, not readings. Reading
+the files one at a time to answer them costs a hundred calls and gets the
+count wrong.
+
+THIS IS ENCOURAGED, NOT TOLERATED (owner ruling 2026-08-18). A shell command
+that runs a script is the shell doing what ONLY a shell does. It is not a
+missing lane verb, it is not a smell, and it does not count against you.
+
+TWO SHAPES, AND BOTH ARE RIGHT.
+
+- INLINE, for a one-off. `node -e '...'` on any host, or a heredoc on POSIX:
+  `python3 - <<'PY' ... PY`. Nothing to clean up, and the whole program is in
+  the call log because the command is.
+- A FILE, for anything you will run twice. `se_file_write` it into
+  `project/scratchpad/` — the workbench, never committed — then `se_run`
+  `node project/scratchpad/<name>.mjs`. Change it and run it again.
+
+DEFAULT TO NODE. The engine runs on it, so it cannot be missing on any host
+the lane runs on. PowerShell is there on Windows and bash on POSIX. Python is
+usually there and is not guaranteed; reach for it when it earns the bet.
+
+THE SCRIPT PRINTS WHAT YOU NEED, so nothing has to be piped. A script that
+answers "how many and which" prints the count and the list itself. That is why
+the truncating-pipe refusal never bites this loop.
+
+THE RETRO READS THESE. Every command is logged in full, so a script that
+worked once can be found, repeated, and promoted into the engine if it earns
+it. Writing it through the lane rather than in your head is what makes it
+survive the session.
 
 Pass this file's rule to every subagent you spawn.

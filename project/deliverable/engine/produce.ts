@@ -9,9 +9,8 @@
 //   A VEHICLE gets an upstream file naming the engine it came from.
 //   A DRIVEN PROJECT gets a record naming which vehicle drives it.
 //
-// COPY, NEVER CLONE (raid-dec-a-vehicle-is-a-copy-with-a-one-way-upstream-link,
-// on the owner's ruling of 2026-08-18: "You can still git init it and make an
-// initial commit. That's okay. But it shouldn't point back to the original.").
+// COPY, NEVER CLONE (raid-dec-a-vehicle-is-a-copy-with-a-one-way-upstream-link).
+// A produced tree is git-init'd with one commit of its own and points at nothing.
 // A clone had to be filtered — the history came along and the remote had to be
 // considered. A copy starts empty and nothing has to be stripped.
 //
@@ -59,8 +58,7 @@ const PROMPT_LAYER_IN_GITHUB = join("project", ".github", "instructions", "proto
  *  ONE LIST, BECAUSE TWO LISTS DRIFT. package.ts's own comment said "the same
  *  list the export excludes" while they were in fact two, and the difference
  *  was 20.8 MB of the engine's own release archives travelling into every
- *  vehicle, plus the one file below that must NOT be dropped. Found by the i16
- *  tester on 2026-08-18, reading both lists side by side.
+ *  vehicle, plus the one file below that must NOT be dropped.
  *
  *  THE ROOT `.claude` IS THE ONE EXCEPTION, and it is the wire without which
  *  the arrival hook is dead weight (i35, 2026-08-17). `.claude` is excluded by
@@ -87,7 +85,6 @@ export function travels(root: string, src: string): boolean {
   // THE DIRECTORIES ON ITS PATH TRAVEL WITH IT, because a filter that refuses a
   // directory is never asked about its children.
   //
-  // FOUND BY THE i16 TESTER, 2026-08-18, in the very fix that shared this list.
   // Adopting the packaging script's exclusions wholesale is what dropped it —
   // the cost of merging two lists rather than deciding which one was wrong.
   if (rel === PROMPT_LAYER_IN_GITHUB || PROMPT_LAYER_IN_GITHUB.startsWith(rel + sep)) return true;

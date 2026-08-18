@@ -1,46 +1,6 @@
-// THE READING PROOF — the probe maths, in ONE place.
-//
-// WHY THIS FILE EXISTS (owner, 2026-08-18: "why don't you have three copies of
-// the same math? Export it, put it in one place, call it from everywhere").
-//
-// There were three. The engine's own `readingProbes`, a mirror called
-// `proofFor` in the test helpers, and two more copies inlined inside
-// tests/iterations.test.ts. On 2026-08-18 the engine stopped counting markdown
-// list markers as words; the helper was moved with it and the two inlined
-// copies were not, so two cases went red on a change that was correct.
-//
-// A MIRROR IS A COPY WITH A COMMENT ON IT. The helper's own comment said "the
-// engine's own proof, mirrored" and named the function it mirrored, and it
-// still went stale — because a comment cannot make two functions change
-// together. Only calling one function can.
-//
-// SO: the engine builds probes from here, the tests answer them from here, and
-// tests/one-probe-maths.test.ts fails if a fourth copy appears.
+// see dsp-walk-machine.md#the-reading-proof
 
-/** THE WORDS A READER WOULD COUNT.
- *
- *  A markdown document is full of tokens that are not words: a list dash, a
- *  heading's hashes, a table pipe, a horizontal rule. Splitting on whitespace
- *  counts every one of them, so "the 4 words that FOLLOW" could ask for `-`
- *  and then refuse every answer a person would actually give.
- *
- *  MEASURED 2026-08-18. Boot cost four round trips on
- *  guidance/method/cloud-runner.md. The expected answer was
- *  `remedy; follow it. -` and the document reads:
- *
- *      ... Every refusal carries a
- *        remedy; follow it.
- *      - DO NOT PUSH.
- *
- *  Three attempts gave the three words a reader sees. Only quoting the list
- *  marker of the NEXT bullet was accepted.
- *
- *  THE i35 FIELD REPORT READ THE SAME SYMPTOM AS LINE-BREAK SENSITIVITY. It is
- *  not that: normWords flattens whitespace on both sides, so an anchor
- *  crossing a newline compares fine. The tokens were the fault, not the
- *  breaks.
- *
- *  A token counts when it carries a letter or a digit. */
+/** see dsp-walk-machine.md#the-words-a-reader-would-count */
 const WORDY = /[\p{L}\p{N}]/u;
 
 /** THE FRACTIONS THE PROBES SIT AT, and the only place they are written.
@@ -72,11 +32,9 @@ export function readingProbes(body: string): { ask: string[]; expect: string[] }
   return { ask, expect };
 }
 
-/** THE COMPARISON RULE, beside the probe rule because they are one decision.
- *  Whitespace and case are flattened, so an answer whose words crossed a line
- *  break in the source still matches. */
+/** see dsp-walk-machine.md#the-comparison-rule */
 export function normWords(s: string): string {
-  return s.trim().replace(/\s+/g, " ").toLowerCase();
+  return readingWords(s).join(" ").toLowerCase();
 }
 
 /** Which probes an answer did NOT satisfy. Empty means the reading is proven. */

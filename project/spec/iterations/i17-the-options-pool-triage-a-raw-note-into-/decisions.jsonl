@@ -1,0 +1,49 @@
+{"ts":"2026-08-18T11:06:29.722Z","op":"update","visit":"iterations/i17/derive-functions@0","node":"d72","brief":"Closing two flows i35 minted without their crossing"}
+{"ts":"2026-08-18T11:07:18.254Z","op":"plan","visit":"iterations/i17/verification@1","parent":null,"nodes":[{"id":"d73","brief":"Signing verification: eleven findings fixed"},{"id":"d74","brief":"the loop repaired"},{"id":"d75","brief":"the battery green"}]}
+{"ts":"2026-08-18T11:10:15.835Z","op":"update","visit":"iterations/i17/gate-implementation@0","node":"d76","brief":"Submitting and blessing the implementation gate"}
+{"ts":"2026-08-18T11:10:24.231Z","op":"update","visit":"iterations/i17/gate-implementation@0","node":"d77","brief":"Submitting and blessing the implementation gate"}
+{"ts":"2026-08-18T11:16:09.080Z","op":"done","visit":"iterations/i17/verification@1","node":"d73","brief":"Verification signed with all eleven findings fixed"}
+{"ts":"2026-08-18T11:18:54.812Z","op":"done","visit":"iterations/i17/verification@1","node":"d74","brief":"The repair loop stands and its predicate test is green"}
+{"ts":"2026-08-18T11:18:54.862Z","op":"done","visit":"iterations/i17/verification@1","node":"d75","brief":"The battery ran green over 1475 cases before the sweep"}
+{"ts":"2026-08-18T11:19:03.202Z","op":"done","visit":"iterations/i17/specify-build@0","node":"d47","brief":"The design spec for the pool is signed and its build is behind us"}
+{"ts":"2026-08-18T11:19:03.261Z","op":"done","visit":"iterations/i17/specify-build@0","node":"d48","brief":"The four build chunks are all filled"}
+{"ts":"2026-08-18T11:19:16.471Z","op":"plan","visit":"iterations/i17/sweep-consistency@0","parent":null,"nodes":[{"id":"d78","brief":"Sweep the drain contract onto walking.md and the engine strings"},{"id":"d79","brief":"Sweep the panel hint and the spec that named the pool"},{"id":"d80","brief":"Fill and submit the sweep-consistency form"}]}
+{"ts":"2026-08-18T11:19:26.238Z","op":"update","visit":"iterations/i17/sweep-consistency@0","node":"d81","brief":"Reading the surfaces that still name the old parked backlog"}
+{"ts":"2026-08-18T11:20:02.889Z","op":"update","visit":"iterations/i17/sweep-consistency@0","node":"d82","brief":"Re-teaching the drain contract on every surface that describes it"}
+{"ts":"2026-08-18T11:20:09.974Z","op":"update","visit":"iterations/i17/sweep-consistency@0","node":"d83","brief":"Re-teaching the drain contract on every surface that describes it"}
+{"ts":"2026-08-18T11:20:28.783Z","op":"update","visit":"iterations/i17/sweep-consistency@0","node":"d84","brief":"Naming the built thing in the spec that proposed it"}
+{"ts":"2026-08-18T11:20:37.009Z","op":"update","visit":"iterations/i17/sweep-consistency@0","node":"d85","brief":"Walking the book, the README and the matrix rows for the same teaching"}
+{"ts":"2026-08-18T11:20:58.109Z","op":"update","visit":"iterations/i17/sweep-consistency@0","node":"d86","brief":"Checking the craft chapter that mentions the drain"}
+{"ts":"2026-08-18T11:21:08.648Z","op":"update","visit":"iterations/i17/sweep-consistency@0","node":"d87","brief":"Closing the last two surfaces: the desk card and the craft chapter"}
+{"ts":"2026-08-18T11:21:16.505Z","op":"update","visit":"iterations/i17/sweep-consistency@0","node":"d88","brief":"Taking the struck word out of the diagnostics a person reads"}
+{"ts":"2026-08-18T11:21:22.594Z","op":"update","visit":"iterations/i17/sweep-consistency@0","node":"d89","brief":"Taking the struck word out of the diagnostics a person reads"}
+{"ts":"2026-08-18T11:21:58.456Z","op":"update","visit":"iterations/i17/sweep-consistency@0","node":"d90","brief":"Taking the struck word out of the diagnostics a person reads"}
+{"ts":"2026-08-18T11:22:05.313Z","op":"update","visit":"iterations/i17/sweep-consistency@0","node":"d91","brief":"Checking whether the front door teaches the drain"}
+{"ts":"2026-08-18T11:22:21.507Z","op":"update","visit":"iterations/i17/sweep-consistency@0","node":"d92","brief":"Reading the corpus back after the sweep"}
+{"ts":"2026-08-18T11:23:52.720Z","op":"obsolete","visit":"iterations/i17/probe-assumptions@0","node":"d44","brief":"a phantom item the comma-chaining split out of one brief"}
+{"ts":"2026-08-18T11:24:00.066Z","op":"obsolete","visit":"iterations/i17/specify-build@0","node":"d49","brief":"a phantom item the comma-chaining split out of one brief"}
+{"ts":"2026-08-18T11:24:00.119Z","op":"obsolete","visit":"iterations/i17/build-steps@0","node":"d57","brief":"a phantom item the comma-chaining split out of one brief"}
+{"ts":"2026-08-18T11:24:00.159Z","op":"obsolete","visit":"iterations/i17/build-steps@0","node":"d58","brief":"a phantom item the comma-chaining split out of one brief"}
+{"ts":"2026-08-18T11:24:00.196Z","op":"obsolete","visit":"iterations/i17/build-steps@0","node":"d59","brief":"a phantom item the comma-chaining split out of one brief"}
+{"ts":"2026-08-18T11:25:00.383Z","op":"done","visit":"iterations/i17/sweep-consistency@0","node":"d78","brief":"Nine surface classes swept and the corpus reads back clean"}
+{"ts":"2026-08-18T11:25:48.762Z","op":"plan","visit":"iterations/i17/gate-validation@0","parent":null,"nodes":[{"id":"d93","brief":"Confirm the sweep broke nothing"},{"id":"d94","brief":"Fill and bless gate-validation"}]}
+{"ts":"2026-08-18T11:25:54.967Z","op":"plan","visit":"iterations/i17/gate-validation@0","parent":null,"nodes":[]}
+{"ts":"2026-08-18T11:26:19.565Z","op":"update","visit":"iterations/i17/gate-validation@0","node":"d95","brief":"Reading the battery verdict after the sweep"}
+{"ts":"2026-08-18T11:27:31.541Z","op":"update","visit":"iterations/i17/gate-validation@0","node":"d96","brief":"Re-projecting the prompt layer the sweep made stale"}
+{"ts":"2026-08-18T11:27:57.800Z","op":"fork","visit":"iterations/i17/gate-validation@0","parent":"d93","node":"d97","brief":"The sweep can edit guidance and neither state can re-project it","nodes":[]}
+{"ts":"2026-08-18T11:31:14.369Z","op":"update","visit":"iterations/i17/gate-validation@0","node":"d98","brief":"Filling gate-validation from what this walk actually ran"}
+{"ts":"2026-08-18T11:31:31.551Z","op":"done","visit":"iterations/i17/gate-validation@0","node":"d97","brief":"Gate validation signed: pass with one override, and the dissent written"}
+{"ts":"2026-08-18T11:34:20.420Z","op":"update","visit":"iterations/i17/gate-validation@0","node":"d99","brief":"The two new must stories owed a demonstration spec"}
+{"ts":"2026-08-18T11:34:25.779Z","op":"done","visit":"iterations/i17/gate-validation@0","node":"d93","brief":"The battery is green and the demonstration spec closes the coverage law"}
+{"ts":"2026-08-18T11:35:09.797Z","op":"plan","visit":"iterations/i17/package@0","parent":null,"nodes":[{"id":"d100","brief":"Build the versioned package and use it"}]}
+{"ts":"2026-08-18T11:35:17.613Z","op":"update","visit":"iterations/i17/package@0","node":"d101","brief":"Finding where the version is declared"}
+{"ts":"2026-08-18T11:35:44.144Z","op":"update","visit":"iterations/i17/package@0","node":"d102","brief":"The 4.6.0 entry, written for somebody who does not build this"}
+{"ts":"2026-08-18T11:36:11.634Z","op":"update","visit":"iterations/i17/package@0","node":"d103","brief":"The lockfile carries the version too"}
+{"ts":"2026-08-18T11:36:18.015Z","op":"update","visit":"iterations/i17/package@0","node":"d104","brief":"Assembling the 4.6.0 archive by script"}
+{"ts":"2026-08-18T11:37:01.690Z","op":"update","visit":"iterations/i17/package@0","node":"d105","brief":"Checking the package by unpacking and driving it outside the repository"}
+{"ts":"2026-08-18T11:39:48.655Z","op":"update","visit":"iterations/i17/package@0","node":"d106","brief":"Doing by hand what the Windows installer does, since this box is Linux"}
+{"ts":"2026-08-18T11:40:13.572Z","op":"update","visit":"iterations/i17/package@0","node":"d107","brief":"Running the shipped tree own battery from outside the repository"}
+{"ts":"2026-08-18T11:42:16.627Z","op":"update","visit":"iterations/i17/package@0","node":"d108","brief":"Filing what using the package actually found"}
+{"ts":"2026-08-18T11:43:14.045Z","op":"plan","visit":"iterations/i17/gate-release@0","parent":null,"nodes":[{"id":"d109","brief":"Fill and bless gate-release"}]}
+{"ts":"2026-08-18T11:43:19.886Z","op":"plan","visit":"iterations/i17/gate-release@0","parent":null,"nodes":[]}
+{"ts":"2026-08-18T11:44:13.654Z","op":"update","visit":"iterations/i17/gate-release@0","node":"d110","brief":"Filling the release gate from the archive that was actually driven"}

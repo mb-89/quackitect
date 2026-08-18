@@ -46,16 +46,7 @@ import { roundsFor, STANDARD_ROUNDS } from "../machine.ts";
 
 export { STANDARD_ROUNDS };
 
-// A DRAWN STATE'S EVIDENCE IS THE MATRIX'S EVIDENCE (owner ruling
-// 2026-08-08). The one parser lives in rigor-matrix.ts and both compilers
-// call it, so a state note declares `evidence:` in frontmatter with the same
-// templates, item types, columns, picks and guidance a row declares.
-//
-// WHAT THIS REPLACED: a second evidence language, one line per field, that
-// could say a name, a description, and required-or-optional. Nothing else.
-// It was never used by a single state note in the repository, and the first
-// drawn state that wanted a real form wrote frontmatter — the shape anybody
-// would reach for — which was read by nobody and compiled to an empty form.
+// see dsp-method-compilation.md#a-drawn-states-evidence-is-the-matrixs-evidence
 function evidenceForm(machineId: string, noteName: string, fm: Record<string, unknown>, body: string): EvidenceField[] {
   try {
     return parseEvidence(fm, noteName, body);
@@ -76,37 +67,10 @@ export function resolveRef(root: string, canvasPath: string, ref: string): strin
   return join(resolve(root), ref);
 }
 
-// THE DRAWING IS DATA, AND DATA IS LIVE (owner ruling 2026-07-29). Editing a
-// state note used to do nothing until se_reload, which contradicts the law
-// that the markdown is the single truth: the file said one thing and the
-// running lane enforced another.
-//
-// Compiling on every gate would re-read a canvas and a dozen notes per call,
-// so the result is cached against the SOURCES it was built from. Anything
-// the compile touched is watched; a changed size or mtime rebuilds. The
-// canvas is always among them, so a state ADDED to the drawing invalidates
-// too — which a watch on the notes alone would miss.
+// see dsp-method-compilation.md#the-drawing-is-data-and-data-is-live
 const CACHE = new Map<string, { decl: MachineDecl; sources: string[]; stamp: string; epoch: number }>();
 
-// ONE VALIDATION PER CALL. The stamp stays CONTENT (the law above), but one
-// pull validates the same machine dozens of times while routing, and
-// re-hashing a dozen notes each time was ~1.5s of every booted walk (profiled
-// 2026-08-02).
-//
-// THE CALL IS THE BOUNDARY, and it is the read-it-live law's own unit: "a
-// state note edited on disk binds the NEXT call". A guard bumps this on EVERY
-// tool call (engine/tools.ts) and every mirror request (engine/mirror.ts), so
-// nothing here can outlive one call.
-//
-// THERE WAS A ONE-SECOND CLOCK HERE TOO, ANDed onto the epoch (owner question,
-// 2026-08-09). It was the backstop from before every tool bumped the epoch —
-// pull alone used to, and a gate check on any other tool went stale for up to
-// a second. Once the guard landed the clock guarded nothing: it could only cut
-// trust SHORTER, inside a call running over a second.
-//
-// It was harmless and it is gone anyway. A reader had to prove it harmless
-// before they could trust this file, and that proof cost more than the line
-// saved.
+// see dsp-method-compilation.md#one-validation-per-call
 let EPOCH = 1;
 export function bumpDrawingEpoch(): void {
   EPOCH++;
@@ -267,15 +231,7 @@ function drawnEdgesOf(machineId: string, canvas: LoadedCanvas, byElement: Map<st
       declared,
       id: edge.id,
     });
-    // ONE ARROW, BOTH WAYS (owner ruling 2026-07-28). Drawing a forward edge
-    // and a return edge as two separate arrows is what Obsidian makes
-    // tedious; a DOUBLE-HEADED arrow is what a person naturally draws
-    // instead, and Obsidian offers it in its own editor. So it means exactly
-    // that pair.
-    //
-    // The return half is left UNDECLARED on purpose, so the depth rule below
-    // names it: forward is whichever end lies deeper from start, and the
-    // other way round is the return. Nothing new decides anything.
+    // see dsp-method-compilation.md#one-arrow-both-ways
     if ((edge as { fromEnd?: string }).fromEnd === "arrow" && ((edge as { toEnd?: string }).toEnd ?? "arrow") === "arrow") {
       drawn.push({
         from: to,
@@ -437,12 +393,7 @@ function markReturnEdges(machineId: string, kept: DrawnEdge[], depth: Map<string
   }
 }
 
-/** THE MACHINES-ARE-DRAWN LAW (owner ruling 2026-07-28): the engine accepts
- *  what a person naturally draws in Obsidian — no invisible metadata.
- *  - The same pair drawn twice collapses to one edge; an authored role wins.
- *  - An undeclared edge running OPPOSITE a forward edge is a RETURN and
- *    compiles as alternative. Forward is the edge whose target lies deeper
- *    from start; equal depth is ambiguous and refuses with the edge named. */
+/** see dsp-method-compilation.md#the-machines-are-drawn-law */
 function normalizeDrawnEdges(machineId: string, drawn: DrawnEdge[], initial: string): DrawnEdge[] {
   const kept = collapseDuplicatePairs(machineId, drawn);
   markReturnEdges(machineId, kept, edgeDepths(kept, initial));
@@ -485,13 +436,7 @@ function asPriority(v: unknown, root: string): number | undefined {
   if (typeof v === "string" && v.trim() !== "" && Number.isNaN(Number(v))) {
     try {
       const resolved = valueFor(loadLevels(root), v);
-      // MATCH THE RESULT, NEVER THE SPELLING. The ladder resolves a word,
-      // its abbreviation and any case alike, so `blocked`, `Blocked`, `B`
-      // and `b` all arrive here as 0. An exact string match let three of
-      // those through (found by the i3 tester, 2026-08-13), and 0 is the
-      // one value that breaks the block: the gate refuses on
-      // `priority > autonomy`, and 0 > 0 is false. Matching the resolved
-      // number also survives the level being renamed in scale.md.
+      // see dsp-method-compilation.md#match-the-result
       return resolved === 0 ? BLOCKED_PRIORITY : resolved;
     } catch {
       return undefined;
@@ -552,10 +497,7 @@ export function stateFromNote(machineId: string, ref: string, notePath: string, 
   if (kind === null) {
     throw new MachineCompileError(machineId, ref, `state_kind must be one of ${KINDS.join(" | ")} (got ${JSON.stringify(x.state_kind)})`);
   }
-  // AGENT-FACING lives in FRONTMATTER; the body is prose for humans (owner
-  // ruling 2026-07-26). guidance is a frontmatter field — short by design,
-  // and NEVER empty: a state with nothing to say is a state that leaves the
-  // agent guessing (owner ruling, same day).
+  // see dsp-method-compilation.md#agent-facing-lives-in-frontmatter-the-body-is-prose-for
   const guidance = asString(x.guidance);
   if (guidance === undefined || guidance.trim() === "") {
     throw new MachineCompileError(machineId, ref, "every state carries guidance (frontmatter `guidance:`)");
@@ -574,36 +516,9 @@ export function stateFromNote(machineId: string, ref: string, notePath: string, 
   const exit = conditionDict(machineId, ref, root, "exit", x);
   const tags = asList(x.tags);
   const submachine = asString(x.submachine);
-  // THE BAR IS AUTHORED IN A DRAWING TOO, exactly as it is in a matrix row.
-  // Without this a drawn fan could never fold: branchKind looks for a busbar
-  // above the legs before it calls the branch an AND, and a canvas had no way
-  // to say so. Found writing the finders fan (owner ruling 2026-08-08).
-  //
-  // A DRAWN `state_kind: join` IS A BUSBAR, and nothing else. It stays in the
-  // drawing vocabulary because a person drawing a machine reaches for the
-  // word, and it compiles to the one field the kernel, the submit check and
-  // the layout all read.
+  // see dsp-method-compilation.md#the-bar-is-authored-in-a-drawing-too
   const busbar = x.busbar === true || kind === "join";
-  // A STATE THAT RUNS A MACHINE CARRIES NO EVIDENCE OF ITS OWN (owner ruling
-  // 2026-08-14). Evidence belongs to a state, and a sub-machine is not a
-  // state doing work — it is a machine. Where a summary is wanted at the end
-  // of one, it goes in a state INSIDE that machine.
-  //
-  // WHY THIS IS A RULE AND NOT A STYLE. The walk enters a sub-machine at its
-  // start, runs it, leaves at its end, and moves on. It never lands on the
-  // parent, so the parent's form is never served. A form that cannot be
-  // served cannot be filled, and the claim guard then drops every state
-  // downstream for an input that can never be earned.
-  //
-  // MEASURED 2026-08-14 IN i27: enumerate-space and run-candidates both
-  // declared forms nothing could serve. The record deadlocked at
-  // cut-criteria with no legal move left, and the only exit was the escape
-  // hatch. Recorded as note-bb725251735e.
-  //
-  // THE CORRECTION IS NAMED RATHER THAN SILENT, per the failure-mode
-  // ordering: prevent by construction where you can, else correct and say
-  // so. Dropping the fields quietly would be the silent pass that
-  // req-a-wrong-act-never-passes-silently forbids.
+  // see dsp-method-compilation.md#a-state-that-runs-a-machine-carries-no-evidence
   const runsMachine = submachine !== undefined && submachine !== "";
   const declared = [...evidenceForm(machineId, ref, x, note.body), ...(kind === "gate" ? roundsFor(stateId) : [])];
   if (runsMachine && declared.length > 0) {

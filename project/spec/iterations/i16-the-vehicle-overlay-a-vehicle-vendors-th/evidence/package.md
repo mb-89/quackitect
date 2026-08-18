@@ -45,7 +45,7 @@ AND ONE THING THE METHOD ASKS FOR DOES NOT EXIST. A house ruling says a package 
 ## emit_back
 
 - M8_20A_sweep-consistency: `depends_on` moves from fill-story-evidence to run-demos, with a section saying why. A fan whose leg is a SUBMACHINE cannot be walked by one agent, and the sweep now chains after the demonstrations.
-- guidance/refusals.md: SE-C-140, SE-C-141 and SE-C-142 added whole, each with its rule ahead of the refusal.
+- guidance/refusals.md: SE-C-143, SE-C-141 and SE-C-142 added whole, each with its rule ahead of the refusal.
 - guidance/refusals.md: SE-C-102 rewritten twice — once because a declared root may now be writable, once because it claimed there is no third door outside the root while a producing act writes into one.
 - guidance/method/lane.md: a declared root is READ-ONLY BY DEFAULT, and the writable door is how this system drives a project that is not itself.
 - guidance/method/retro.md: the same correction, plus a wall of text split and a machine username removed from stored guidance.

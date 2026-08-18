@@ -39,24 +39,7 @@ export interface WalkResult {
   ask: Ask | null;
   /** Pairs actually asked and answered. */
   answered: number;
-  /** HOW MANY THERE ARE TO SETTLE, and how many are settled (owner ruling
-   *  2026-08-08: "don't show the remainders — show how many overall we have
-   *  and how many we've already done").
-   *
-   *  An ordering walk counts ITEMS PLACED against items to place. An
-   *  equivalence walk counts PAIRS ANSWERED against pairs to answer.
-   *
-   *  WHAT THIS REPLACED, and why. The old field was an ESTIMATE of pairs
-   *  still to ask: items left times the answers-per-item observed so far. It
-   *  could rise, and its own comment defended that as honest. It was worse
-   *  than dishonest — it was unbounded. Ninety criteria with a run of probe
-   *  misses reported about five thousand questions outstanding, which is more
-   *  than the entire cross product would have been, and the owner reasonably
-   *  read it as the sort having failed.
-   *
-   *  BOTH OF THESE ARE MONOTONIC AND TRUE. done never falls, total moves only
-   *  when the register does, and neither is a prediction about answers nobody
-   *  has given yet. */
+  /** see dsp-decision-mathematics.md#how-many-there-are-to-settle */
   done: number;
   total: number;
   /** Contradictions among the pairs that were ASKED. Inference cannot

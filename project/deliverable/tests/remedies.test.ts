@@ -19,6 +19,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { laneSource } from "./helpers.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const ENGINE = join(here, "..", "engine");
@@ -75,7 +76,7 @@ function engineSources(): { file: string; src: string }[] {
 
 /** Every tool the surface declares, with the arguments it accepts. */
 function toolArgs(): Map<string, Set<string>> {
-  const src = readFileSync(join(ENGINE, "tools.ts"), "utf8");
+  const src = laneSource();
   const tools = new Map<string, Set<string>>();
   const nameRe = /name:\s*"(se_[a-z_]+)"/g;
   let m: RegExpExecArray | null = nameRe.exec(src);

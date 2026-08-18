@@ -10,7 +10,6 @@ import {
   fileDelete,
   fileGlob,
   fileList,
-  filePatch,
   fileRead,
   fileReplace,
   fileWrite,
@@ -18,6 +17,7 @@ import {
   IMAGE_BUDGET,
   READ_BUDGET,
 } from "../engine/files.ts";
+import { filePatch } from "../engine/files-patch.ts";
 import { contentHash } from "../engine/hash.ts";
 import { doorStats } from "../engine/notes.ts";
 import { runToCompletion } from "../engine/run.ts";
@@ -42,7 +42,7 @@ test("no binary file lives under project/ — an unreadable figure is not an art
   //
   // The rule was always about what the product OWNS. Reaching into the
   // workbench made it refuse inputs, which is not what it is for.
-  const skip = new Set(["node_modules", ".git", ".obsidian", ".worktrees", "scratchpad"]);
+  const skip = new Set(["node_modules", ".git", ".obsidian", "scratchpad"]);
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {
     for (const e of readdirSync(dir, { withFileTypes: true })) {
@@ -92,19 +92,25 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   // read once per run to answer one question — did the bookkeeping land. The
   // read is the POINT: it is what makes a silent instrument failure visible,
   // and routing it through a note door would share a parse with nobody.
-  // 106 since 2026-08-18: paths.ts reads an identity file — brand.json for a
+  // 106: mirror.ts serves the vendored graph renderer at
+  // /vendor/cytoscape.min.js. A one-shot read of a static asset outside the
+  // note system, the same shape as every increment above it — and the read
+  // exists because the alternative was fetching it from unpkg on every open.
+  // 107 since 2026-08-18: paths.ts reads an identity file — brand.json for a
   // tree's own id, upstream.json for the id it was produced from. Two tiny
   // JSON objects, and the brand one is read in a FOREIGN tree that is not this
   // vault at all, so no note door could serve it even in principle. What the
   // read decides is whether a write target is the tree this system came from,
   // which is the one law a vehicle may never breach.
-  // 110 since 2026-08-18: produce.ts reads four files direct — the brand fact
+  // 111 since 2026-08-18: produce.ts reads four files direct — the brand fact
   // of the tree it is producing from, the README template it renders, the
   // brand fact again when it has to mint its own identity, and a driven
   // record. None is a note. Two of them are read in trees that are not this
   // vault at all, and the README template is a template rather than a node, so
   // no door could share a parse with any of them.
-  const CEILING = 110;
+  // THE TWO INCREMENTS ARE INDEPENDENT and the merge kept both, 2026-08-18.
+  // i17 took 105 to 106 and i16 took 105 to 110, so the merged ceiling is 111.
+  const CEILING = 111;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {
@@ -177,7 +183,7 @@ test("no new file write bypasses the door — the count may fall, never rise", (
 });
 
 // AN EMPTY RESULT AND AN UNREADABLE FILE MUST NEVER LOOK ALIKE (found live
-// 2026-07-29). engine/worktree.ts carried ONE raw NUL byte, used as a
+// 2026-07-29). engine/records.ts carried ONE raw NUL byte, used as a
 // cache-key separator. ripgrep called the whole file binary and said so on a
 // line the parser did not understand, so it was dropped and every search over
 // that file returned a confident "no matches".
@@ -207,7 +213,7 @@ test("a file too binary to search is REPORTED, never silently empty", () => {
 // moment it is still cheap.
 //
 // It has been written twice by two authors, both times as a hash separator:
-// worktree.ts in 2026-07-29, discipline.ts in a patch that arrived today. A
+// records.ts in 2026-07-29, discipline.ts in a patch that arrived today. A
 // third time is a matter of when, so the guard sits on every door that
 // writes bytes rather than on the one that happened to be used.
 //

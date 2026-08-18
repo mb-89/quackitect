@@ -1,15 +1,4 @@
-// THE FLIP DECK — one card per fragile cell, ruled one at a time (owner
-// ruling 2026-08-10: the same binary-card shape as the compare card, three
-// panels instead of two). A card shows the CELL (the requirement), the
-// WINNER and the RIVAL; the one verdict is "rival wins — credible", and
-// "next" moves on without ruling. Ruling posts at once — no save step —
-// and the engine mints the RAID tripwire before the page redraws.
-//
-// ONLY A REACHABLE FLIP IS DEALT: a rival needing more than three swings is
-// named on one line and not asked about. Nothing is silently dropped.
-//
-// The panels and styles ride in from card-parts.ts — one copy, shared with
-// the compare card. No backtick in any body.
+// see dsp-form-editors.md#the-flip-deck
 import { CARD_PARTS } from "../card-parts.ts";
 import type { EditorKind } from "./kinds.ts";
 
