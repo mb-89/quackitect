@@ -52,14 +52,14 @@ test("draining splits: done and obsolete anywhere, carried and backlog only in t
   });
   assert.equal(parked.isError, false, JSON.stringify(parked.body));
   assert.equal(parked.body.inbox, 0, "both notes have now left the inbox");
-  assert.ok(typeof parked.body.minted === "string", "the backlog disposition no longer mints an option (i17)");
+  assert.ok(typeof parked.body.minted === "string", "the backlog disposition no longer mints a work token (i17)");
   // An unknown ref refuses with v2's carried clause.
   const missing = await call(server, "se_note_drain", { ref: "note-nope", disposition: "done" });
   assert.equal(missing.isError, true);
   assert.equal(missing.body.clause, "SE-C-073");
 });
 
-test("the backlog home (v1 port): backlog demands its ready-when, parks the note, and migration re-drains it", async () => {
+test("the backlog home (v1 port): backlog demands its ready-when, mints a work token, and migration re-drains it", async () => {
   const root = freshRoot();
   const session = new Session(root);
   session.setAutonomy(1); // the retro weighs 1.0 - lift the slider clear
@@ -75,12 +75,12 @@ test("the backlog home (v1 port): backlog demands its ready-when, parks the note
   assert.equal(bare.isError, true);
   assert.match(String(bare.body.expected), /ready when/);
   // AND SINCE i17 THE STATEMENT IS DEMANDED TOO. A condition says when the
-  // option comes back; it does not say what the option IS, and the pool is
+  // token comes back; it does not say what the token IS, and the pool is
   // read by somebody who never saw the note.
   const noStatement = await call(server, "se_note_drain", { ref, disposition: "backlog", where: "ready when iterations exist" });
   assert.equal(noStatement.isError, true, "backlog without a statement was accepted");
   assert.match(String(noStatement.body.expected), /statement/);
-  // With both, the note parks and an option is minted onto trunk.
+  // With both, the note parks and a work token is minted onto trunk.
   const parked = await call(server, "se_note_drain", {
     ref,
     disposition: "backlog",

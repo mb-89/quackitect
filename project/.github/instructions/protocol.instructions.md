@@ -6,7 +6,7 @@ applyTo: '**'
 
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
      from project/guidance/contract.md b538e8ccc81e
-     from project/guidance/walking.md 7bedbf023cb2
+     from project/guidance/walking.md 8d2cebb9bd5a
      from project/guidance/method/lane.md 2b433ab77644
      from project/guidance/voice.md 0b6faf79ff32
 -->
@@ -444,6 +444,16 @@ runs, and a pull carrying evidence beside the proof pays like any other work.
   are CHECKS ANYONE CAN RUN — look, and if the code carries it, drain it,
   saying `where:`. `carried` and `backlog` are the RETRO's judgment and the
   engine refuses them elsewhere.
+- `backlog` MINTS A WORK TOKEN into the pool on trunk, where every clone reads
+  the same answer. It takes two more arguments and refuses without them.
+  - `where` is the re-entry condition: `ready when …`.
+  - `statement` is what the token IS, for a reader who never saw the note.
+- THE STATEMENT IS AUTHORED, NEVER PASTED. A raw note is a dump and may carry
+  anything private, so a statement sharing a six-word run with it refuses
+  (SE-C-140). Cannot state it cleanly yet? Say that, and the token carries the
+  open question.
+- A note already drained to `backlog` refuses a second mint. Re-judging one is
+  `carried`, and the token it already minted is the thing that moves.
 - Drain as you go: a note you have just disproved makes every later survey
   lie.
 - In live discussion, write ONE consolidated note when the point settles.

@@ -27,7 +27,9 @@ Fix everything currently fixable, in whatever order the machinery offers.
 - Open expeditions get worked, and closed when their goal is met.
 - Pending notes mean a retro is due, so run one.
 
-Continue until the backlog is zero and there is genuinely nothing left.
+Continue until the pending inbox is zero and there is genuinely nothing left.
+The standing work tokens are not a queue to empty. They are what is OFFERED,
+and a run ends with them still standing.
 
 ## Phase 2 — overhaul
 

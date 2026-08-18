@@ -34,7 +34,8 @@ export interface StrayNote {
   /** Whose hand captured it — agent | human (absent on old notes = agent). */
   by?: string;
   /** Set by a retro's disposition — a drained note leaves the inbox.
-   *  backlog PARKS it: a later migration re-drains it. */
+   *  backlog MINTS a work token on trunk and the raw note stays here,
+   *  local and unmoved. The token is what a later iteration pulls in. */
   drained?: { at: string; disposition: string; where?: string };
 }
 
@@ -104,7 +105,8 @@ const JUDGMENT: ReadonlySet<string> = new Set(["carried", "backlog"]);
 
 /** The retro's mechanical half (v2's req-retro-drain): disposition a note;
  *  drained notes leave the inbox count. An unknown ref is refused.
- *  Re-draining is legal — that IS the backlog migration mechanism.
+ *  Re-draining is legal, EXCEPT a second drain to backlog: the first one
+ *  already minted a work token, and a second would mint a duplicate.
  *
  *  judgmentAllowed SPLITS IT (owner discussion 2026-07-29). The drain was
  *  retro-only, so the front desk could ADD to the inbox and never take
@@ -129,7 +131,7 @@ export function drainNote(
       remedy: {
         tool: "se_note_drain",
         args: { ref, disposition: "done" },
-        note: "backlog parks the note for a later migration — where: 'ready when …' is then required",
+        note: "backlog mints a work token on trunk — where: 'ready when …' and statement: '<what it is>' are then both required",
       },
       source: "engine/inbox.ts drain",
     });

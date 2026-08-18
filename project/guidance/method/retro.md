@@ -86,11 +86,28 @@ The trigger is a NOTE carrying "needs retro":
      never re-litigated.
    - carried — adopt NOW into a durable home (a guidance edit, a machine
      change, the next expedition's goal); name the home. Rare.
-   - backlog — future scope. where is REQUIRED: "ready when …" names the
-     re-entry condition.
+   - backlog — future scope, and it MINTS A WORK TOKEN onto trunk.
+     - `where` is required: the "ready when …" re-entry condition.
+     - `statement` is required: what the token IS, for a reader who never
+       saw the note.
+
+     THE STATEMENT IS AUTHORED, NEVER PASTED. A raw note is a dump and may
+     carry anything private.
+
+     - A statement carrying the note's own words refuses SE-C-140.
+     - Cannot state it cleanly yet? Say so, and the pool carries it as an
+       open question.
+     - What is refused is silence and paste, never honesty.
+
+     THE RAW NOTE STAYS LOCAL, unmoved and marked drained. The token is a
+     new node.
+
+     - The two are different objects with different lifetimes.
+     - The token is the truth from the mint onward.
    Nothing stays pending after a retro.
-4. Walk the backlog (migration). Every parked note (disposition backlog
-   in .se/notes.jsonl): keep it (condition still unmet), pull it
+4. Walk the backlog (migration). Every standing WORK TOKEN in the pool
+   (project/spec/trace/work-token/, on trunk, readable from any clone):
+   keep it (condition still unmet), pull it
    (re-drain as carried, into this round's scope), or drop it (re-drain
    as obsolete, reason recorded). Re-draining IS the migration mechanism.
 5. Sweep the register for DEBTS (owner ruling 2026-08-12). List every
@@ -289,8 +306,15 @@ method (`machines/methods/meth-state-of-the-art.md`).
   leave the inbox count and the pending feed. Draining is legal only in
   the retro's drain state — entering it is free from idle, so "drain
   whenever" is one pull away, inside the machine's discipline.
-- backlog notes stay on file (.se/notes.jsonl, disposition backlog) —
-  the migration step re-drains them when their "ready when" comes true.
+- a drained note's LOCAL half stays on file (.se/notes.jsonl, disposition
+  backlog) so the two ends of a crossing can be found from each other. It
+  is not the pool. THE POOL IS project/spec/trace/work-token/, on trunk,
+  and the migration step re-drains a token when its "ready when" comes
+  true.
+- A SECOND DRAIN OF ONE NOTE TO THE POOL IS REFUSED. The token already
+  stands, and minting another splits one finding into two standing items
+  whose conditions then disagree. To pull a parked item into scope,
+  re-drain it as `carried`.
 - Expedition reports are ruled AT CLOSE (applied | dismissed), not here —
   the retro is out of the expedition loop (owner ruling 2026-07-27).
 - se_log_query is the query lane. Never an ad-hoc script.

@@ -17,7 +17,7 @@ guidance: |
 
   KEEP THE INBOX HONEST. Some open notes are already answered - a later note
   superseded them, or the code already carries them. Drain those here and now
-  with se_note_drain. Parking a note and carrying one are the retro's
+  with se_note_drain. Minting a work token and carrying a note are the retro's
   judgment, and the desk is refused them.
 
   THEN THREE THINGS, in order.

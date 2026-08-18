@@ -318,8 +318,13 @@ The vendors do not help. Jira and Azure DevOps offer a Backlog list and a New
 state, with triage as a convention rather than a named stage.
 
 OUR THREE STAGES MAP ONE TO ONE: raw capture is upstream of everything, the
-retro's drain is the triage, what survives is the options pool, and seeding an
-option into an iteration is the commitment point.
+retro's drain is the triage, what survives is the options pool, and seeding a
+survivor into an iteration is the commitment point.
+
+THE POOL IS ANDERSON'S; THE NODE IS OURS, AND THEY DO NOT SHARE A NAME (owner
+ruling 2026-08-18). What stands in the pool is a WORK TOKEN, never an "option".
+The corpus already spends `option` on the morphological chart's design choices,
+and two node kinds cannot answer to one word.
 
 WE ALREADY HAVE THE TRIAGE. `se_note_drain` carries four dispositions, and
 draining to `backlog` already REQUIRES a `where` naming the re-entry condition.
@@ -329,14 +334,20 @@ disposition stamped on it, so it still carries whatever the capture carried; and
 `.se/` is gitignored, so all 205 options are machine-local and no other machine
 can see the pool it is meant to pull from.
 
-THE FIX: draining to `backlog` MINTS A NEW ITEM in the repo — rewritten, stating
-the option and its ready-when, carrying no private data. The raw note stays
-local and is marked drained.
+THE FIX, BUILT IN i17: draining to `backlog` MINTS A WORK TOKEN in the repo —
+rewritten, stating what stands and its ready-when, carrying no private data.
+The raw note stays local and is marked drained. The tokens live under
+`project/spec/trace/work-token/`, and the survey reads them from there.
 
-THE REWRITE IS THE PRIVACY BOUNDARY. It is also the value boundary: an option
-nobody can state cleanly for another machine was never an option.
+THE REWRITE IS THE PRIVACY BOUNDARY. It is also the value boundary: something
+nobody can state cleanly for another machine was never worth standing.
 
-V1 ADDS A SECOND REASON, as a killer requirement: the backlog lives ABOVE
+THE BOUNDARY IS ENFORCED, NOT ASKED FOR. A statement sharing a six-word run
+with its note refuses (SE-C-140), and so does one sharing an identifier — a
+path, an address, an opaque token. `se_file_write` cannot open a second door
+into the pool folder; only the mint writes there.
+
+V1 ADDS A SECOND REASON, as a killer requirement: the pool lives ABOVE
 iterations, on trunk, SO NOTES SURVIVE A DISCARDED EXPERIMENT.
 
 ## The `.se` folder
@@ -753,9 +764,9 @@ brand-neutral where it speaks about itself.
 
 ### i17 — the options pool
 
-Draining a note to `backlog` mints an item in the repo, rewritten and carrying
-no private data. The pool lives above iterations so it survives a discarded
-experiment and so every machine can see it.
+Draining a note to `backlog` mints a WORK TOKEN in the repo, rewritten and
+carrying no private data. The pool lives above iterations so it survives a
+discarded experiment and so every machine can see it.
 
 THIS FILE DISSOLVES INTO IT.
 

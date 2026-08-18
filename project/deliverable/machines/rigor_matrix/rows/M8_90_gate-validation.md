@@ -18,6 +18,10 @@ legal_tools:
   - se_log_query
   - se_answer
   - se_test
+  # THE GATE RUNS THE BATTERY, so it owns the one failure the battery can
+  # raise that no code change fixes: a stale prompt layer. Without this the
+  # gate can SEE the red and has no verb to clear it (i17).
+  - se_prompt_place
 evidence:
   - name: meets_need
     template: per-item

@@ -35,17 +35,17 @@ function mint(root: string, ref: string, statement: string, where: string): Retu
 }
 
 describe("the mint writes what travels", { concurrency: true }, () => {
-  test("a drain to the pool writes an option carrying the statement, the condition and its note", () => {
+  test("a drain to the pool writes a work token carrying the statement, the condition and its note", () => {
     const { root, ref } = rootWithNote(PRIVATE);
     mint(root, ref, "a repeated run of the box stalls, and nobody knows why", "ready when the box is reproducible");
     const opts = standingTokens(root);
-    assert.equal(opts.length, 1, "the pool holds one option after one mint");
-    assert.match(opts[0].statement, /repeated run of the box stalls/, "the option does not carry the authored statement");
-    assert.match(opts[0].ready_when, /reproducible/, "the option does not carry its re-entry condition");
-    assert.equal(opts[0].source, ref, "the option does not name the note it was authored from");
+    assert.equal(opts.length, 1, "the pool holds one work token after one mint");
+    assert.match(opts[0].statement, /repeated run of the box stalls/, "the work token does not carry the authored statement");
+    assert.match(opts[0].ready_when, /reproducible/, "the work token does not carry its re-entry condition");
+    assert.equal(opts[0].source, ref, "the work token does not name the note it was authored from");
   });
 
-  test("the option is a file under the pool, readable without the note store", () => {
+  test("the work token is a file under the pool, readable without the note store", () => {
     const { root, ref } = rootWithNote(PRIVATE);
     const res = mint(root, ref, "a repeated run stalls the box", "ready when it reproduces");
     assert.ok(typeof res.minted === "string" && res.minted !== "", "the drain does not say what it minted");
@@ -137,7 +137,7 @@ describe("the mint refuses what would carry the note across", { concurrency: tru
     } catch {
       /* the point of the case is what is on disk afterwards */
     }
-    assert.equal(standingTokens(root).length, 0, "a refused mint left an option behind");
+    assert.equal(standingTokens(root).length, 0, "a refused mint left a work token behind");
     assert.equal(readNotes(seDir(root)).find((n) => n.ref === ref)?.drained, undefined, "a refused mint drained the note anyway");
   });
 
@@ -162,7 +162,7 @@ describe("the mint accepts what an honest author writes", { concurrency: true },
     assert.equal(standingTokens(root).length, 1, "a statement that merely shares words was refused as a copy");
   });
 
-  test("saying the option cannot be stated cleanly yet is itself a statement", () => {
+  test("saying the work token cannot be stated cleanly yet is itself a statement", () => {
     const { root, ref } = rootWithNote(PRIVATE);
     mint(root, ref, "this cannot be stated cleanly yet — it needs the owner", "ready when the owner has looked");
     const opts = standingTokens(root);

@@ -1,5 +1,6 @@
 // WHAT STANDS OPEN — one mechanical answer: open expeditions, open
-// iterations, pending notes, and parked backlog items with their ready-when.
+// iterations, pending notes, and the standing WORK TOKENS in the pool with
+// their ready-when — read from the repository, never from a machine-local store.
 //
 // BOTH HANDS ASK IT (owner ruling 2026-07-28). The agent calls se_survey;
 // the person clicks it in the mirror. It lived inside the tool handler and

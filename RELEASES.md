@@ -2,6 +2,40 @@
 
 One entry per shipped version, newest first.
 
+## 4.6.0 — 2026-08-18
+
+A finding made on one machine can be picked up on another.
+
+- Notes you park during a look-back now become real items in the project
+  itself, instead of a line in a file only your own computer can see. Anybody
+  who copies the project sees the same list of what could be done next.
+- You write what the item IS in your own words. The raw note stays on your
+  machine and never travels, because a note is a scribble and can contain
+  anything — a password, an address, somebody's name.
+- Pasting the note instead of writing the item is refused. The system compares
+  the two and says no if they share a long run of words or any address, path or
+  key. It will tell you plainly what overlapped.
+- Cannot say cleanly what an item is yet? Say exactly that. An open question is
+  a legal item and the system keeps it as one.
+- There is exactly one way to add to the list, so nothing can slip in without
+  those checks. Writing the file directly is refused.
+- Parking the same note twice is refused, because the first time already made
+  the item. What you want then is to pull it into the work.
+- The list is called a POOL and what stands in it is a WORK TOKEN. It is not a
+  backlog. A backlog is a queue you are behind on; a pool is a set of things
+  you may choose from, and the difference is the point.
+
+### What this release does not change
+
+- What is already parked on your own machine stays there. Moving it into the
+  pool is a separate job, and it will report what did not fit rather than
+  converting anything quietly.
+- Nothing on screen shows the pool yet. Today it is answered when you ask what
+  stands open.
+- The check that refuses a paste cannot catch a single bare name. That is a
+  limit of comparing text, not an oversight, and it is written down where the
+  limit is decided.
+
 ## 4.5.0 — 2026-08-17
 
 A machine nobody is watching starts working on its own.

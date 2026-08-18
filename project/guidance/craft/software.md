@@ -460,4 +460,4 @@ level that shows twenty things has stopped helping them choose.
 - EVERY WORK ITEM HAS EXACTLY ONE HOLDER, at every moment (owner ruling 2026-08-14). The holder is the pool, a retro, an iteration, or the archive.
   - An item held by nothing is the failure this rule exists to stop.
   - It happened on 2026-08-13. Eight notes were drained to a record, the record's scope disowned them, and for ten minutes they were nowhere.
-  - The machinery belongs to i17, the options pool. Until it lands, the rule holds by authorship.
+  - The machinery landed in i17. Draining a note to `backlog` mints a WORK TOKEN under `project/spec/trace/work-token/`, which is the pool holding it until a seeding pulls it in.

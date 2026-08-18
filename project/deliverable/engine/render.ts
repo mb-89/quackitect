@@ -1448,7 +1448,12 @@ const HUMAN_TOOLS = {
   // slider and the escape control sharing that row.
   se_survey: [],
   se_exp_close: [{ name: "merge", hint: "true = apply: merge to trunk (default); false = dismiss: archive unmerged" }],
-  se_note_drain: [{ name: "ref", hint: "the note's ref (note-…) — the feed shows it" }, { name: "disposition", hint: "done | obsolete | carried | backlog" }, { name: "where", hint: "where it landed or lives on — backlog REQUIRES it: ready when …" }],
+  se_note_drain: [
+    { name: "ref", hint: "the note's ref (note-…) — the feed shows it" },
+    { name: "disposition", hint: "done | obsolete | carried | backlog" },
+    { name: "where", hint: "where it landed or lives on — backlog REQUIRES it: ready when …" },
+    { name: "statement", hint: "backlog REQUIRES it: what the work token IS, in your own words — a paste of the note refuses" },
+  ],
 };
 function toolModal(name) {
   const fields = HUMAN_TOOLS[name] || [];
