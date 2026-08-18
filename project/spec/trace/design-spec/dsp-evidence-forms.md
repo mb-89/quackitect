@@ -130,3 +130,53 @@ still overrules any pair. This only decides where it starts.
 AN UNGRADED ROW SORTS IN THE MIDDLE. Not last, or every row written before the
 scale existed would sink beneath rows nobody has thought about; not first, or
 leaving it blank would be the way to the top.
+
+## Fields are not what makes a claim
+
+IN THE PLAINEST WORDS THE RULE HAS HAD: if it is not submitted, you are not
+going to the next state.
+
+THE CHECK ASKED WHETHER THE STATE DECLARED FIELDS, which is a PROXY. It holds
+for almost every state and it failed on the one where it does not: a
+law-proven state declares no fields on purpose, because its check is computed
+rather than typed. Its own guidance says signing is a bare submit. So the state
+read as claimless, the guard was skipped, and the walk completed a state that
+had never been signed.
+
+WHAT THAT COST: the walk crossed it three times. Two states were signed
+underneath the gap, one of them a gate. The panel painted them green, an agent
+read the record as finished and merged it to trunk, and the only route back to
+the crossed state was twenty-five hops forward and around the entire machine.
+The walk had to escape to the desk.
+
+ASKING WHETHER THE STATE OWES A SIGNATURE ANSWERS IT, and it stays cheap: a
+state with no form has no file, so machinery never pays the corpus load.
+
+THE CORPUS LOAD IS PAID ONLY BY A CLAIMFUL COMPLETION. Hoisting it above that
+condition put a full green recomputation on every mechanical hop and took the
+green pass to 3683 ms over 200 nodes against a 1000 ms budget.
+
+## An amend does not re-grey; a reopen does
+
+WHAT STOOD HERE WAS THE OPPOSITE, and the correction is worth keeping rather
+than the code alone. The rule read "an amend counts as freshly as a signature".
+The effect was that every correction anywhere greyed every claim below it.
+Fixing one sentence in a kickoff sent ten signed states back to be re-freshened
+by hand, and each of those amends greyed everything below IT in turn. The walk
+stopped converging.
+
+THE TWO ACTS ARE DIFFERENT ACTS, and that is the whole distinction.
+
+- An AMEND corrects a claim that still stands — a wrong figure, a stale
+  sentence, a typo. The signature is kept because it still attests. Nothing
+  below it is disturbed, because nothing below it was answering the corrected
+  words.
+- A REOPEN says the work is WRONG. The claim goes grey, its form is owed
+  again, and everything downstream falls with it. That is the ripple, and it is
+  the act to reach for when the QUESTION below has changed.
+
+SO WHAT ABOUT A GATE WHOSE GOALS LIST IS REWRITTEN? That does change what every
+gate below must answer, and an amend would slip it past them. The answer is not
+to make amend behave like reopen. It is to REFUSE THE AMEND: a field that other
+forms READ is not amendable, and the refusal names the reopen. Both halves stay
+true — a correction stays cheap, and a changed question re-earns its answers.

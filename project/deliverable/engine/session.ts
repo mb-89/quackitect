@@ -162,42 +162,7 @@ const ALWAYS_LEGAL: ReadonlySet<string> = new Set([
 const RESTRICTED: ReadonlySet<string> = new Set<string>();
 const MACHINERY: readonly string[] = ["se_pull", "se_file_read"];
 
-/** ONE OPERATION'S COLLECTED INPUT, handed down instead of re-fetched.
- *
- *  The corpus and its version are per trace root, because one walk can touch
- *  trunk and a record. `done` is the green answer per machine, so a container
- *  asked about twice in one route is computed once. */
-/** WHEN A CLAIM LAST ANSWERED THE GROUND. It is the SIGNATURE, and only the
- *  signature.
- *
- *  AN AMEND DOES NOT RE-GREY. A REOPEN DOES (owner ruling 2026-08-17, given
- *  twice, the second time to overturn what stood here).
- *
- *  WHAT STOOD HERE WAS THE OPPOSITE, and it is worth keeping the correction
- *  rather than the code alone. It read "an amend counts as freshly as a
- *  signature", and took the later of `amended:` and `signed_off:`. The effect
- *  was that every correction anywhere greyed every claim below it. Fixing one
- *  sentence in a kickoff sent ten signed states back to be re-freshened by
- *  hand, and each of those amends greyed everything below IT in turn. The
- *  walk stopped converging: i33 spent an afternoon re-freshening a chain that
- *  nothing was wrong with.
- *
- *  THE TWO ACTS ARE DIFFERENT ACTS, and that is the whole distinction. An
- *  AMEND corrects a claim that still stands — a wrong figure, a stale
- *  sentence, a typo. The signature is kept because it still attests. Nothing
- *  below it is disturbed, because nothing below it was answering the
- *  corrected words. A REOPEN says the work is WRONG. The claim goes grey, its
- *  form is owed again, and everything downstream falls with it. That is the
- *  ripple, it already exists, and it is the act to reach for when the QUESTION
- *  below has changed.
- *
- *  SO WHERE DOES THAT LEAVE THE i33 HOLE? A gate whose goals list is rewritten
- *  DOES change what every gate below must answer, and an amend would slip that
- *  past them. The answer is not to make amend behave like reopen. It is to
- *  refuse the amend — see FEEDS_DOWNSTREAM below. A field that other forms
- *  READ is not amendable, and the refusal names se_reopen. Both halves stay
- *  true: a correction stays cheap, and a changed question re-earns its
- *  answers. */
+/** When a claim last answered the ground. see dsp-evidence-forms.md#an-amend-does-not-re-grey-a-reopen-does */
 export function claimTime(fm: Record<string, unknown>): string {
   return typeof fm.signed_off === "string" ? fm.signed_off.trim() : "";
 }
@@ -1344,24 +1309,7 @@ export class Session {
     this.decisions.setExtraSink(undefined);
   }
 
-  /** ESCAPE (owner ruling 2026-08-02): ONE hatch, and it lands at the
-   *  FRONT DESK — where the person is. Every kind of stepping out is this
-   *  same move, told apart only by its reason: the person said stop, the
-   *  walk is mechanically stuck, earlier work no longer stands. (pause
-   *  and the agent-side back retired with this ruling; the person's back
-   *  button remains the invalidating hand.) The walk that was left is
-   *  LEFT STANDING; a later walk re-enters it, fast-forwarding on stored
-   *  evidence. Boot is the one exception — it must complete.
-   *
-   *  A QUESTION IS NOT AN ESCAPE (owner, same day): an agent waiting on
-   *  an answer stays in its state, asks, and stops — the state holds and
-   *  the reply resumes it there. Escaping is for when NO answer could
-   *  let the walk continue from here.
-   *
-   *  THE HATCH IS NEVER GATED: no slider weighing, no read demand. Going
-   *  to the desk IS going to ask the person — the andon cord — and a cord
-   *  that can refuse to be pulled is no cord. What the desk demands
-   *  arrives on the next pull, as `read`. */
+  /** see dsp-lane-door.md#escape-is-one-hatch */
   escape(reason: string, _channel: Channel = "agent"): Record<string, unknown> {
     if (reason.trim() === "") {
       throw new Rejection({
@@ -1504,32 +1452,7 @@ export class Session {
     // Claimful completions only — mechanical hops stay free of the corpus
     // load this check costs.
     const decl = this.state(m, stateId);
-    // THE CORPUS LOAD IS PAID ONLY BY A CLAIMFUL COMPLETION. Hoisting it above
-    // this condition put a full green recomputation on every mechanical hop and
-    // took recordDone to 3683 ms over 200 nodes against a 1000 ms budget —
-    // caught by drift.test.ts, three lines under the comment that warned of it.
-    // FIELDS ARE NOT WHAT MAKES A CLAIM (owner, 2026-08-17, in the plainest
-    // words this rule has had: "If it's not submitted, then you're not going
-    // to the next state").
-    //
-    // THIS ASKED `evidence_form.length > 0`, which is a PROXY. It holds for
-    // almost every state and it failed on the one where it does not:
-    // fill-story-evidence declares no fields on purpose, because its check is
-    // computed from the story decks rather than typed in. Its own guidance
-    // says signing is a bare submit. So claimfulNow read FALSE, this whole
-    // guard was skipped, and the walk completed a state that had never been
-    // signed.
-    //
-    // WHAT THAT COST, on 2026-08-17. The walk crossed it three times. Two
-    // states signed underneath the gap, one of them a gate. The panel painted
-    // them green, an agent read the record as finished and merged it to trunk,
-    // and the only route back to the crossed state was twenty-five hops
-    // forward through `shipped` and around the entire machine. The walk had to
-    // escape to the desk. See note-fa24138d389e.
-    //
-    // owesASignature ANSWERS IT, and it stays cheap: a state with no form has
-    // no file, so machinery never pays the corpus load the comment above is
-    // protecting.
+    // see dsp-evidence-forms.md#fields-are-not-what-makes-a-claim
     const itNow = this.declIteration(m);
     const claimfulNow = outcome === "filled" && itNow !== undefined && this.owesASignature(decl, itNow);
     const done = claimfulNow ? new Set(this.recordDone(m)) : new Set<string>();
@@ -1767,34 +1690,7 @@ export class Session {
     const st = decl?.states.find((s) => s.id === id);
     if (decl === undefined || st === undefined) return undefined;
     const nexts: RouteNode["nexts"] = [];
-    // ONE RULE FOR LANDING, WHICHEVER MOVE BROUGHT YOU (owner, 2026-08-09).
-    // A state that carries a sub-machine is never a position: the position is
-    // that machine's own start. The normal edge knew this and the POP did
-    // not, so popping out of one container landed ON the next container and
-    // the route stepped straight over every state inside it. Five compose
-    // states sat outside the search and the walk reported no path to them.
-    // A ROUTE NEVER PASSES THROUGH A RECORD WHEN A PLAIN DOOR EXISTS
-    // (owner report 2026-08-16, req-a-pull-carrying-no-choice-enters-no-iteration).
-    //
-    // WHY THIS IS THE ROOT AND THE EDGE ORDER WAS NOT. The container's own
-    // guidance promised an offer and the offer was real, but the ROUTER never
-    // reads an offer. It searches, and a record was just another node on the
-    // way. So a target OUTSIDE the container — the front desk, most often —
-    // drew its shortest path straight through whichever record came first,
-    // and walking that path ENTERED it, bound it, and stamped it started.
-    //
-    // THE OWNER SAW BOTH HALVES. Five entries into i4 after dropped sockets,
-    // and separately: aiming at the intended iteration "drew a route THROUGH
-    // two more — starting those as well".
-    //
-    // A RECORD IS WORK, NOT A CORRIDOR. Passing through one is never incidental
-    // to going somewhere else, because entering it takes it up.
-    //
-    // THE GUARD IS CONSERVATIVE ON PURPOSE. It only withholds a record when the
-    // same state also offers a door that is NOT a record, so no container can
-    // be stranded by it — where a record is the only way on, the route still
-    // goes through it. The iterations container gained exactly such a door in
-    // this iteration: its selection state carries an edge to `end`.
+    // see dsp-walk-machine.md#one-rule-for-landing-whichever-move-brought-you
     const recordsSkippable =
       objective !== undefined &&
       st.edges.some((e) => {
@@ -1953,29 +1849,7 @@ export class Session {
     return decl?.submachine !== undefined ? Session.qual(target, this.declForPrefix(target)?.initial ?? "start") : target;
   }
 
-  /** THE ROUTE COMPUTES WHAT IS NEEDED, NOT WHAT IS NEAREST (owner design
-   *  2026-08-04 in note-bb6d1cb6b75d, built 2026-08-07).
-   *
-   *  route.ts says the frame is `make` — name a target, compute what is
-   *  needed, run it. It was breadth-first shortest path instead, which is a
-   *  different question with a different answer. Two things followed:
-   *
-   *  - IT WAS BLIND TO GREEN. A state already standing was routed through
-   *    exactly like one that still owed work.
-   *  - IT WAS BLIND TO THE AND. From one state it found ONE way to a gate.
-   *    But a gate collects EVERY input, so a branch the path never mentioned
-   *    is still owed — and the walk marched to a gate that then refused,
-   *    naming a feeder nobody had been sent to.
-   *
-   *  DEFAULT IS AND, which is the settled ruling: in most machines every
-   *  branch must be covered. So the objective is the first prerequisite that
-   *  does NOT yet stand, and the target itself only once they all do.
-   *
-   *  Transparent states are looked through by claimFeeders, so a waypoint
-   *  carrying no claim never becomes an objective.
-   *
-   *  IT RE-ASKS ON EVERY PULL. Finishing one objective simply makes the next
-   *  one the answer, so no plan is stored and none can go stale. */
+  /** see dsp-walk-machine.md#the-route-computes-what-is-needed-not-what-is-nearest */
   private nextObjective(aim: string, pass: GreenPass = Session.newPass()): string {
     const cut = aim.lastIndexOf("/");
     const prefix = cut < 0 ? "" : aim.slice(0, cut);
@@ -2075,25 +1949,7 @@ export class Session {
       if (s.evidence_form.length > 0 && !done.has(s.id)) return Session.qual(prefix, s.id);
       if (s.submachine === undefined) continue;
       const subPrefix = Session.qual(prefix, s.id);
-      // A RECORD THE WALK IS NOT INSIDE OWES NOTHING (owner ruling 2026-08-16,
-      // req-a-pull-carrying-no-choice-enters-no-iteration).
-      //
-      // THIS IS THE OTHER HALF OF THE 2026-08-11 FIX, and that fix's own
-      // comment describes the same failure: "an aim at the desk descended into
-      // whatever record stood open: boot marched into i2". Restricting the
-      // upstream walk to INPUT edges closed one route in. This closes the
-      // other: subObjective deliberately adds the container the walk STANDS
-      // in, and from a container's own selection state that meant descending
-      // into whichever record came first and calling its work the objective.
-      //
-      // The router then drew the way there, and walking it ENTERED that
-      // record — binding it and stamping it started. Five times on 2026-08-16,
-      // every one on a bare pull after a dropped socket.
-      //
-      // A RECORD'S WORK BEGINS WHEN SOMEBODY CHOOSES IT. Until then it is not
-      // a prerequisite of anything, so it is not an objective. Standing INSIDE
-      // one, the walk still finds its owed legs, which is what the same day's
-      // fix bought and what this must not take away.
+      // see dsp-walk-machine.md#a-record-is-work-not-a-corridor
       if (s.submachine === "generated" && here !== subPrefix && !here.startsWith(`${subPrefix}/`)) continue;
       const sub = this.declForPrefix(subPrefix);
       if (sub === undefined) continue;

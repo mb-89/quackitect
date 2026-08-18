@@ -116,3 +116,21 @@ change. The caller simply stops having to.
 THE BATTERY STILL HANDS OFF, and that is not an oversight. It is the engine's
 to fire at verification, where nobody is waiting on the answer, and blocking a
 caller for fifty seconds buys nothing.
+
+## Escape is one hatch
+
+ONE HATCH, AND IT LANDS AT THE FRONT DESK — where the person is. Every kind of
+stepping out is this same move, told apart only by its reason: the person said
+stop, the walk is mechanically stuck, earlier work no longer stands.
+
+THE WALK THAT WAS LEFT IS LEFT STANDING. A later walk re-enters it,
+fast-forwarding on stored evidence. Boot is the one exception, because it must
+complete.
+
+A QUESTION IS NOT AN ESCAPE. An agent waiting on an answer stays in its state,
+asks, and stops — the state holds and the reply resumes it there. Escaping is
+for when NO answer could let the walk continue from here.
+
+THE HATCH IS NEVER GATED: no weighing against the dial, no read demand. Going
+to the desk IS going to ask the person — the andon cord — and a cord that can
+refuse to be pulled is no cord. What the desk demands arrives on the next pull.

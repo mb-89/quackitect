@@ -36,7 +36,7 @@ const ATTRIBUTION = /\bowner (ruling|law|design|report|correction|verdict|discus
  *  Lowering this number is the point. Raising it means a comment carrying a
  *  date or an attribution was added, and the fix is to move the reasoning
  *  into the design document and leave a `see <doc>.md#<section>` pointer. */
-const CEILING = 681;
+const CEILING = 670;
 
 function tsFilesUnder(dir: string): string[] {
   const out: string[] = [];

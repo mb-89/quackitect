@@ -146,3 +146,59 @@ the roots need placing by hand.
 A GENUINE FORK KEEPS ITS SEVERAL TOKENS. The frontier of a real AND branch is
 several states, none downstream of another, and the filter leaves every one of
 them standing.
+
+## The route computes what is needed, not what is nearest
+
+THE FRAME IS `make`: name a target, compute what is needed, run it. It was a
+breadth-first shortest path instead, which is a different question with a
+different answer. Two things followed:
+
+- IT WAS BLIND TO GREEN. A state already standing was routed through exactly
+  like one that still owed work.
+- IT WAS BLIND TO THE AND. From one state it found ONE way to a gate. But a
+  gate collects EVERY input, so a branch the path never mentioned is still
+  owed — and the walk marched to a gate that then refused, naming a feeder
+  nobody had been sent to.
+
+DEFAULT IS AND. In most machines every branch must be covered, so the objective
+is the first prerequisite that does NOT yet stand, and the target itself only
+once they all do.
+
+IT RE-ASKS ON EVERY PULL. Finishing one objective simply makes the next one the
+answer, so no plan is stored and none can go stale.
+
+## A record is work, not a corridor
+
+A ROUTE NEVER PASSES THROUGH A RECORD WHEN A PLAIN DOOR EXISTS.
+
+WHY THE ROUTER IS THE ROOT AND EDGE ORDER WAS NOT. The container's own guidance
+promised an offer and the offer was real, but the ROUTER never reads an offer.
+It searches, and a record was just another node on the way. So a target OUTSIDE
+the container — the front desk, most often — drew its shortest path straight
+through whichever record came first, and walking that path ENTERED it, bound it
+and stamped it started.
+
+BOTH HALVES WERE SEEN: five entries into one record after dropped connections,
+and separately, aiming at an intended iteration drawing a route THROUGH two
+more and starting those as well.
+
+PASSING THROUGH A RECORD IS NEVER INCIDENTAL to going somewhere else, because
+entering it takes it up.
+
+THE GUARD IS CONSERVATIVE ON PURPOSE. It only withholds a record when the same
+state also offers a door that is NOT a record, so no container can be stranded
+by it. Where a record is the only way on, the route still goes through it.
+
+A RECORD THE WALK IS NOT INSIDE OWES NOTHING, which is the other half of the
+same fix. Restricting the upstream walk to INPUT edges closed one route in;
+this closes the other.
+
+## One rule for landing, whichever move brought you
+
+A STATE THAT CARRIES A SUB-MACHINE IS NEVER A POSITION. The position is that
+machine's own start.
+
+The normal edge knew this and the POP did not, so popping out of one container
+landed ON the next container and the route stepped straight over every state
+inside it. Five states sat outside the search and the walk reported no path to
+them.
