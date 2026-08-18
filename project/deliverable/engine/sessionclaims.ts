@@ -1018,7 +1018,7 @@ export class Claims {
     return touched.concat(charted);
   }
 
-  /** see dsp-walk-machine.md#one-owed-cell */
+  /** see dsp-walk-machine.md#a-named-cell-mints-one-skeleton */
   mintInterfaceCell(name: string, source: string, destination: string, machineId?: string): Record<string, unknown> {
     const m = this.formMachine(machineId);
     const traceRoot = this.host.traceRoot(this.host.declIteration(m));

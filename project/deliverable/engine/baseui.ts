@@ -283,7 +283,7 @@ function codePanel(root: string, rel: string): string {
 }
 
 export function basesCard(root: string, head: string, selected?: string, rowsIn?: Row[]): string {
-  // see dsp-live-register.md#the-warm-model
+  // see dsp-live-register.md#the-index-is-warm-and-a-render-never-builds-it
   const rows = rowsIn ?? warmRows(root);
   if (rows === undefined) {
     void warmVault(root);

@@ -157,7 +157,7 @@ wider than this is unreadable on any screen the drawing is meant to fit.
 IT IS NOT A CLAMP. A width the owner sets in Obsidian is theirs, and the
 render never re-imposes this one.
 
-## Catalogues
+## A catalogue is read from where it is written
 
 CATALOGUES — a known set of answers, read from where it is WRITTEN.
 
@@ -189,7 +189,7 @@ human clicks the expedition to enter; ONE reaching end completes the
 machine, the others stay parked. Nothing open: start runs to end.
 The drawn continue_expedition.canvas is a stub saying exactly this.
 
-## The archive
+## Every closed expedition stands as its own dead machine
 
 THE ARCHIVE, generated (owner design 2026-07-27): every CLOSED
  expedition stands as its own read-only state — a gallery of dead

@@ -14,7 +14,7 @@ export const STYLE = `
   /* 465px is the width the owner settled the sidebar at by dragging it, and
      a default nobody re-drags is the only evidence a default is right. */
   aside { width: 465px; min-width: 320px; max-width: 80vw; display: flex; flex-direction: column; background: var(--se-bg-side); }
-  /** see dsp-mirror-render.md#the-left-column */
+  /** see dsp-mirror-render.md#the-left-column-is-sized-for-an-eighty-column-terminal */
   #left { width: 650px; min-width: 360px; }
 
   /** see dsp-mirror-render.md#the-terminal-fills-its-card */

@@ -207,7 +207,7 @@ walk already wakes every held hand; this forwards that wake to
 the page. The wait's timeout doubles as the re-check for things
 that grow without moving the walk, like the log.
 
-## Loopback only
+## The mirror binds loopback and says so
 
 LOOPBACK ONLY, AND SAID EXPLICITLY (req-mirror-stays-on-the-machine).
 
@@ -381,7 +381,7 @@ Nothing renders from this in a working install: preflight refuses to go
 green without project/deliverable/brand/palette.css, so a tree reaching here is already
 known-broken and only has to stay readable enough to say so.
 
-## The look files
+## The look files are configuration, not code
 
 THE LOOK FILES — configuration, not code (owner ruling 2026-08-07). Read on
  every render, so an edit shows on the next paint and nothing restarts.
@@ -394,7 +394,7 @@ THE LOOK FILES — configuration, not code (owner ruling 2026-08-07). Read on
  A MISSING FILE IS NOT AN ERROR. Every value it sets has a default in the
  stylesheet it overrides, so the drawing stands without it.
 
-## The left column
+## The left column is sized for an eighty-column terminal
 
 THE LEFT COLUMN: the feed on top, the agent's terminal beneath it.
      SIZED FOR AN 80-COLUMN TERMINAL (owner ruling 2026-07-28). 820px was
@@ -480,7 +480,7 @@ below its details, one collapsed fold per visit; every item names its
 ORIGIN (planned here | deferred from X | fork). Parked points that have
 not arrived yet get their own fold.
 
-## No arguments
+## A lane tool is offered per state, never as chrome
 
 No arguments — it just answers. It lives HERE and nowhere else (owner
 ruling 2026-07-28): human-runnable lane tools are offered through the
@@ -612,7 +612,7 @@ had a button of its own in the machine header; the owner never found it
 there, sharing a row with the crumbs, the slider and the escape control.
 /api/survey stays — the mirror's own surfaces still ask it directly.
 
-## Session over
+## Reaching end stops the session, and the window says so
 
 SESSION OVER — anybody reaching end stops the whole session. The mirror
 tries to close its window; where that is not allowed, the big red

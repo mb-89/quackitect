@@ -226,7 +226,7 @@ export class Session {
   readonly evidence = new Map<string, Record<string, unknown>>();
   /** Which states the agent may enter alone. see dsp-legible-controls.md#the-autonomy-dial */
   private _autonomy = 0;
-  /** see dsp-walk-machine.md#the-target */
+  /** see dsp-walk-machine.md#every-engine-start-aims-at-the-front-desk */
   private _target = "front_desk";
   /** THE STOP-AT NOTCH — how far the agent walks before handing back. The
    *  autonomy dial's neighbour: autonomy says what it may DECIDE alone, this
@@ -954,7 +954,7 @@ export class Session {
     return { bound: it.id, note: "the walk now stands in this iteration" };
   }
 
-  /** see dsp-the-goal-binds-the-walk.md#the-bless-pins */
+  /** see dsp-the-goal-binds-the-walk.md#leaving-a-kickoff-pins-the-blessed-change-size */
   private pinKickoff(fullId: string | undefined): void {
     if (fullId === undefined) return;
     const it = itFind(this.machineRoot(), fullId);
@@ -1745,7 +1745,7 @@ export class Session {
     return [...reads].sort();
   }
 
-  /** see dsp-the-goal-binds-the-walk.md#the-blue-line */
+  /** see dsp-the-goal-binds-the-walk.md#the-route-collects-every-judgment-up-front-and-moves-nothing */
   route(target: string): RouteResult & {
     from: string;
     /** The tier WORD. No number rides an answer (owner ruling 2026-08-14). */
@@ -1864,7 +1864,7 @@ export class Session {
     }
   }
 
-  // see dsp-walk-machine.md#the-reading
+  // see dsp-walk-machine.md#one-document-not-a-list-of-them
   static readonly READING_PATH = ".se/reading.md";
 
   private readingParts: ReadonlyArray<{ path: string; hash: string; from: number; to: number }> = [];
@@ -2858,7 +2858,7 @@ export class Session {
     return false;
   }
 
-  // see dsp-walk-machine.md#evidence-forms
+  // see dsp-walk-machine.md#both-hands-fill-the-same-evidence-form
 
   private loadFormTemplate(name: string): FormTemplate {
     const tplAbs = join(this.workRoot(), ...formTemplatePath(name).split("/"));

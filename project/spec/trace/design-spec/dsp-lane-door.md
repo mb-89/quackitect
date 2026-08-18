@@ -138,7 +138,7 @@ THE HATCH IS NEVER GATED: no weighing against the dial, no read demand. Going
 to the desk IS going to ask the person — the andon cord — and a cord that can
 refuse to be pulled is no cord. What the desk demands arrives on the next pull.
 
-## The postmortem
+## A call that never returns still leaves something to read
 
 ── THE POSTMORTEM (owner ruling 2026-08-07, after three silent deaths).
 
@@ -291,7 +291,7 @@ THE ENGINE DECIDES WHAT GETS TESTED, AND THE AGENT NEVER DOES (owner
  eventually disagree, and an agent standing between them has no move. Now
  there is one decider and nothing to disagree with.
 
-## Every depth
+## A failure inside a describe block is still a failure
 
 EVERY DEPTH, NOT ONLY THE TOP (i11, from the 2026-08-12 seed).
 
@@ -398,7 +398,7 @@ orphaned workers held a folder lock for four hours). Children run
 in the job registry — whole-tree killed on timeout, reaped at
 shutdown, visible to se_run {jobs: true}.
 
-## The battery
+## The battery is earned, never habitual
 
 The battery: EARNED, not habitual. The gate computes the scoped
 remedy from the diff since the last green battery.

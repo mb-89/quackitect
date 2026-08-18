@@ -726,7 +726,7 @@ export function warmRows(root: string): Row[] | undefined {
   return v?.ready() === true ? v.all() : undefined;
 }
 
-/** see dsp-live-register.md#the-one-entry */
+/** see dsp-live-register.md#one-entry-so-a-large-vault-never-blocks-the-draw */
 export async function warmVault(root: string, onProgress?: (p: BuildProgress) => void): Promise<Vault> {
   let v = WARM.get(root);
   if (v === undefined) {

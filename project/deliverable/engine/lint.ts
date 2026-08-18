@@ -241,7 +241,7 @@ export function lintProse(root: string, text: string, rel?: string): LintFinding
       // list this rule exists to catch.
       const isLiteral = (part: string): boolean =>
         /^`[^`]*`$/.test(part.trim()) || /^"[^"]*"$/.test(part.trim()) || /^'[^']*'$/.test(part.trim());
-      // see dsp-resolution-seam.md#every-separator
+      // see dsp-resolution-seam.md#every-separator-not-the-two-somebody-thought-of-first
       const masked = s.replace(/`[^`]*`/g, "`x`").replace(/"[^"]*"/g, '"x"');
       const items = masked.split(/[,;·•/]|\s→\s/).filter((part) => part.trim() !== "" && !isLiteral(part));
       // see dsp-resolution-seam.md#a-part-must-carry-substance-to-count

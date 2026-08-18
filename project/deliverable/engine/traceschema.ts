@@ -1,4 +1,4 @@
-// see dsp-trace-corpus.md#the-legal-edges
+// see dsp-trace-corpus.md#one-file-says-what-may-point-at-what
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { noteOf, type Subsegments, TRACE_SUBSEGMENTS, type TraceNode } from "./trace.ts";

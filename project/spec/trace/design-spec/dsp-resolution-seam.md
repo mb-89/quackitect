@@ -97,7 +97,7 @@ tree and fanned out over trunk at the merge. Refusing the write was the old
 answer. RESOLVING the write is the better one: nothing is refused, and the file
 cannot land in a tree that does not own it.
 
-## Every separator
+## Every separator, not the two somebody thought of first
 
 EVERY SEPARATOR, not the two somebody thought of first. The rule was
 commas and semicolons, so writing the same buried list with middots

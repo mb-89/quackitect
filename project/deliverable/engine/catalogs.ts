@@ -1,4 +1,4 @@
-// see dsp-method-compilation.md#catalogues
+// see dsp-method-compilation.md#a-catalogue-is-read-from-where-it-is-written
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 

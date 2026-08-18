@@ -36,7 +36,7 @@ export interface EvidenceField {
   type?: EvidenceType;
   /** One or two lines telling whoever fills it what belongs in it. */
   guidance?: string;
-  /** see dsp-the-goal-binds-the-walk.md#the-columns */
+  /** see dsp-the-goal-binds-the-walk.md#a-node-table-cell-is-written-back-to-the-node */
   columns?: string[];
   /** COVERAGE IS MUTUAL. Naming an item type here makes two things checkable
    *  at once: every reference in this field refines one of that type, and
@@ -231,7 +231,7 @@ export interface StateDecl {
   inputs?: { label: string; description: string }[];
   /** The concrete slash-name of the form's Follow-up box. */
   follow_up_label?: string;
-  /** see dsp-walk-machine.md#human-involvement */
+  /** see dsp-walk-machine.md#every-state-carries-the-weight-of-entering-it */
   priority: number;
   /** v3 — THE STATE GATE: the LEGAL TOOLS while this state is active
    *  (legal STATES are the machine's edges — this is only about tools).

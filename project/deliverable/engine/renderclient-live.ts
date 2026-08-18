@@ -214,7 +214,7 @@ document.addEventListener("click", (ev) => {
 
 // see dsp-mirror-render.md#what-stands-open
 
-// see dsp-mirror-render.md#session-over
+// see dsp-mirror-render.md#reaching-end-stops-the-session-and-the-window-says-so
 function linkLost(on) {
   const had = document.getElementById("link-lost");
   if (!on) { if (had) had.remove(); return; }

@@ -11,7 +11,7 @@ const HUMAN_TOOLS = {
   se_seed_expedition: [{ name: "kind", hint: "spike | fix | explore" }, { name: "goal", hint: "what this expedition is after", long: true }, { name: "depends_on", hint: "ids this waits for, comma-separated — leave EMPTY to state that it waits for nothing", always: true }],
   se_seed_iteration: [{ name: "goal", hint: "what this iteration is after", long: true }, { name: "vision", hint: "roughly how — what done looks like", long: true }, { name: "inputs", hint: "context refs, comma-separated: an expedition id, note refs" }, { name: "depends_on", hint: "ids this waits for, comma-separated — leave EMPTY to state that it waits for nothing; the container orders the work from this", always: true }],
   se_reload: [],
-  // see dsp-mirror-render.md#no-arguments
+  // see dsp-mirror-render.md#a-lane-tool-is-offered-per-state-never-as-chrome
   se_survey: [],
   se_exp_close: [{ name: "merge", hint: "true = apply: merge to trunk (default); false = dismiss: archive unmerged" }],
   se_note_drain: [

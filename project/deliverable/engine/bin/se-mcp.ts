@@ -184,7 +184,7 @@ if (!existsSync(root)) {
 const mirrorPort = Number(argValue("--mirror-port") ?? process.env.SE_MIRROR_PORT ?? 7333);
 
 if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
-  // see dsp-lane-door.md#the-postmortem
+  // see dsp-lane-door.md#a-call-that-never-returns-still-leaves-something-to-read
   const deathLog = join(root, ".se", "engine.log");
   const record = (what: string): void => {
     try {

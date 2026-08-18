@@ -32,7 +32,7 @@ This is the work-the-register function made concrete — the design the
 iteration set out to prove: a bases-equivalent live table over plain
 markdown.
 
-## The warm model
+## The index is warm and a render never builds it
 
 THE WARM MODEL, not a fresh read. The index is built once, kept current
 by the watcher and the lane's tells, and every view reads the same rows
@@ -58,7 +58,7 @@ all, and nothing said why.
 FALSE IS THE RIGHT ANSWER, not a refusal. A note with no links is not linked
 to X, and a filter that cannot survive a heterogeneous vault is not a filter.
 
-## Writing back
+## Commit on enter, discard on escape
 
 WRITING BACK — one cell, one key, one note.
 
@@ -66,7 +66,7 @@ COMMIT ON ENTER, DISCARD ON ESCAPE (owner ruling 2026-08-01). Nothing is
 written while somebody is typing, which is the Qt delegate contract and the
 reason this needs no debouncing, no dirty tracking and no conflict window.
 
-## The one entry
+## One entry, so a large vault never blocks the draw
 
 THE ONE ENTRY, so a large vault never blocks the process that draws. The
  synchronous twin (vaultFor) retired 2026-08-10: its one render caller

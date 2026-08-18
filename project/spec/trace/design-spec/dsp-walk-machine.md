@@ -283,7 +283,7 @@ AUTHORED meaning, or empty (owner ruling 2026-07-28): a statement
  here."). The mirror renders it small under the node's name; filler
  like "The retro machine." is struck, never generated.
 
-## Human involvement
+## Every state carries the weight of entering it
 
 HUMAN INVOLVEMENT (owner ruling 2026-07-26): the weight of the
  decision to ENTER this state, 0.01 (mechanical) .. 1 (milestone). The
@@ -494,7 +494,7 @@ se_reopen and se_amend join them because A CLAIM IS FIXED FROM OUTSIDE IT
  IT CHANGES NOTHING. It reads the conditions the walk was about to compute
  anyway and returns them. There is no state to corrupt by asking.
 
-## The target
+## Every engine start aims at the front desk
 
 THE TARGET — where the walk is headed, and the blue line the mirror
  draws. Every engine start aims at the front desk (owner ruling
@@ -870,7 +870,7 @@ the autonomy, and req-autonomy-is-categorical says so. The cut-over
 that raid-risk-autonomy-rework-breaks-walking asked for came first and
 is complete; this is the removal it said would follow.
 
-## The reading
+## One document, not a list of them
 
 ── THE READING (owner design 2026-07-31) ──────────────────────────
 
@@ -1108,7 +1108,7 @@ The LIVE run for a machine view (owner ruling 2026-07-27: re-entry
  only. A machine not being walked shows gray; past passes live in the
  main record, not on the drawing.
 
-## Evidence forms
+## Both hands fill the same evidence form
 
 ── EVIDENCE FORMS (owner design 2026-07-27) — A3-shaped one-pagers in
    the bound record; the condition is a MECHANICAL LINT over them.
@@ -1605,7 +1605,7 @@ THE CHART'S LINES ARE NOTES (owner ruling 2026-08-08).
  is drawn would otherwise wipe every candidate, which is a destructive act
  nobody asked for.
 
-## One owed cell
+## A named cell mints one skeleton
 
 ONE OWED CELL, ONE SKELETON (owner design 2026-08-10). The element
  matrix's NAME button posts a cell; the interface node mints with the

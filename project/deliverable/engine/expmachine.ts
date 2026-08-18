@@ -153,7 +153,7 @@ export function generateContinueExpedition(root: string): GeneratedMachine {
   return { decl, canvas, expByState };
 }
 
-/** see dsp-method-compilation.md#the-archive */
+/** see dsp-method-compilation.md#every-closed-expedition-stands-as-its-own-dead-machine */
 function closedRecords(root: string, closed: Expedition[]): Map<string, Record<string, unknown> | undefined> {
   const out = new Map<string, Record<string, unknown> | undefined>();
   for (const e of closed) {

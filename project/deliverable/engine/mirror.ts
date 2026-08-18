@@ -931,7 +931,7 @@ export function startMirror(o: MirrorOptions): Server {
     }
   });
 
-  // see dsp-mirror-render.md#loopback-only
+  // see dsp-mirror-render.md#the-mirror-binds-loopback-and-says-so
   server.listen(o.port, "127.0.0.1");
   return server;
 }

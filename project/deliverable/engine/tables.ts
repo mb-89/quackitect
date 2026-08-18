@@ -592,7 +592,7 @@ export const TABLE_STYLE = `
 .pivot.wide td{padding:3px 2px;min-width:18px}
 `;
 
-// see dsp-live-register.md#writing-back
+// see dsp-live-register.md#commit-on-enter-discard-on-escape
 
 export interface CellEdit {
   /** Vault-relative path of the note, as the row's own file.path gave it. */

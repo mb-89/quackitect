@@ -65,7 +65,7 @@ session.ts:
 - se_why names the newer feeder, instead of answering that a fallen claim
   stands
 
-## The columns
+## A node-table cell is written back to the node
 
 THE COLUMNS. For `table`, plain headings. For `node-table`, the
  FRONTMATTER KEYS on the listed nodes — each becomes an editable cell,
@@ -126,7 +126,7 @@ call — measured on the i17 cloud arrival, where the lane never answered.
 The numeric form stays because the mirror's control and the tests still
 send one, and because the scale is still compared as numbers.
 
-## The bless pins
+## Leaving a kickoff pins the blessed change size
 
 THE BLESS PINS (owner verdicts 2026-07-30): leaving an iteration
  kickoff compiles the record's blessed change_size from the LIVE rigor matrix
@@ -180,7 +180,7 @@ THE DOOR'S OWN WEIGHT, NOT THE ROOM'S (i11's audit of the 2026-08-12
  ONLY THE INITIAL STATE PAYS IT. Once inside, the door has been paid, and
  charging every state within would shut a container from the inside.
 
-## The blue line
+## The route collects every judgment up front and moves nothing
 
 THE BLUE LINE. Where the walk stands, where it is headed, and every
  hop between — with what each will ask for. It MOVES NOTHING.

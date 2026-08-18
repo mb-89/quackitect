@@ -423,7 +423,7 @@ export function runTools(
             ...(tap.total === 0 ? { output: capMiddle(r.out.trim(), 4000) } : {}),
           };
         };
-        // see dsp-lane-door.md#the-battery
+        // see dsp-lane-door.md#the-battery-is-earned-never-habitual
         const runSweep = async (): Promise<{ script: string; ok: boolean; exit: number | null; output: string }> => {
           const abs = resolveInRoot(root, "project/deliverable/engine/bin/sweep.ts", "engine/tools.ts se_test");
           const r = await spawnNode([abs, "--root", root], root);

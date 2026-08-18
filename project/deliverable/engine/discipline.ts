@@ -547,7 +547,7 @@ export function parseTap(out: string): TapResult {
       if (counts[1] === "fail") res.fail = Number(counts[2]);
       continue;
     }
-    // see dsp-lane-door.md#every-depth
+    // see dsp-lane-door.md#a-failure-inside-a-describe-block-is-still-a-failure
     const notOk = line.match(/^(\s*)not ok \d+ - (.*)$/);
     if (notOk === null) continue;
     if (res.failures.length >= 10) continue;

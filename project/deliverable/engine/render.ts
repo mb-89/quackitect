@@ -638,7 +638,7 @@ export function palette(root: string): string {
   }
 }
 
-/** see dsp-mirror-render.md#the-look-files */
+/** see dsp-mirror-render.md#the-look-files-are-configuration-not-code */
 const LOOK_FILES = ["palette.css", "trace.css"];
 
 export function look(root: string): string {

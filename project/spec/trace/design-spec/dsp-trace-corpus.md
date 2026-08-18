@@ -98,7 +98,7 @@ THE CORPUS'S VERSION, from the files themselves.
  the price of an honest answer. Collect it ONCE per operation and pass it
  down (software.md, input-process-output).
 
-## The legal edges
+## One file says what may point at what
 
 THE LEGAL EDGES, read from machines/trace-schema.md (owner ruling
 2026-08-07). One file says what may point at what. An edge it does not
