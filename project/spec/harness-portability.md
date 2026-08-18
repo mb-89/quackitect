@@ -510,6 +510,16 @@ also ended up with a thin per-harness shim, and there is no way around it.
 EIGHT MILESTONES. The first two are the ones that make everything after them
 provable, so they go first even though neither fixes a symptom.
 
+TWO LATER PARTS CHANGED THIS LIST AND IT IS LEFT STANDING RATHER THAN
+REWRITTEN, so the change is visible.
+
+- PART 11 PUTS A NEW MILESTONE AT THE FRONT, ahead of M1. The VS Code cage is
+  inert, which means rule 1 has been advisory on a host in real use. That is a
+  standing assumption failing, not a portability improvement, and it goes
+  first.
+- PART 13 TURNS M8 FROM A QUESTION INTO A BUILD. The owner ruled on it the
+  same day.
+
 ### M1 — the lane learns who is calling it
 
 Read `clientInfo` from `initialize`, carry it on the session, and stamp it on
@@ -587,20 +597,228 @@ roughly a day.
 THIS IS A DECISION, NOT A BUILD. Expedition host, single-milestone host, or not
 a walk host at all. Record which, and stop.
 
-### M8 — put the architecture question to the owner
+### M8 — build the installer, because the owner ruled on it
 
-THE UNCOMFORTABLE FINDING, and this iteration surfaces it rather than settling
-it. The two highest-adoption agent-agnostic workflow systems, spec-kit and
-BMAD, are install-time GENERATORS from a neutral source into each harness's own
-files, and neither is an MCP server. This system is an MCP server with 34 verbs
-and a projected prompt layer — which is half of that pattern already.
+RULED 2026-08-18, and Part 13 carries the words. Install-time generation is
+adopted, RUNME carries it, and the pattern is copied from spec-kit or BMAD.
 
-WHAT IS GENUINELY RIGHT HERE, so the question is asked fairly: refusals travel
-as `isError` results carrying clause and remedy, which the scan names as the
-one portable enforcement primitive; and `se_pull` is the single-tool loop the
-scan names as the strongest enforcement shape available. Neither needs
-defending.
+SO THIS IS A BUILD. The agent-agnostic source stays in `project/guidance/`, and
+an installer emits each harness's own files from it: the prompt-layer
+projection, the MCP entry, the cage in three vocabularies, and the hooks.
+`placeProtocol` is already that shape for three targets, so the work is
+widening it and moving the trigger into RUNME.
 
-THE QUESTION IS THE OTHER 33 VERBS, against Cursor's 40-tool ceiling across all
-servers and Claude Code's deferred schema loading. Ask it; do not answer it
-here.
+WHAT IS NOT IN QUESTION, and was not even before the ruling: refusals travel as
+`isError` results carrying clause and remedy, and `se_pull` is the single-tool
+loop. The scan names both as best practice. Adopting an installer changes
+neither.
+
+THE VERB COUNT IS RULED TOO, and Part 14 has the arithmetic: eight bundles take
+34 to 19.
+
+## Part 11 — the cage question, settled from the code
+
+THE OWNER REMEMBERS A COPILOT RUN THAT WAS NOT CAGED. That memory is right,
+and it is worse than the tree admits.
+
+### The CLI is caged. VS Code is not, on either path.
+
+`vscode/extension.js` builds the Copilot CLI command from `copilot-cage.json`
+and passes `--excluded-tools` with the CLI's own tool names. THAT PATH IS
+CORRECT and the 2026-07-30 probe verified it.
+
+THE CHAT PATH HANDS VS CODE THE WRONG VOCABULARY. `openCopilotInChat` calls
+`parseExcludedToolsFromCage(cage)` and passes the result as `toolsExclude` to
+`workbench.action.chat.open`. Run for real against the committed cage, that
+function returns the **Copilot CLI's** names:
+
+```
+powershell read_powershell stop_powershell list_powershell view create edit
+grep glob web_fetch sql session_store_sql skill task read_agent list_agents
+write_agent fetch_copilot_cli_documentation
+```
+
+VS CODE AGENT MODE DOES NOT CALL ITS TOOLS THOSE THINGS. GitHub's own hooks
+documentation makes the point in the neighbouring context: Claude Code uses
+`Write` and `Edit`, VS Code uses `create_file` and `replace_string_in_file`.
+An exclusion list of names a host does not have excludes nothing.
+
+SO BOTH VS CODE PATHS ARE OPEN. Opened by hand, nothing is passed at all —
+`vscode-mcp.json` already says so. Opened by the play button, a list is passed
+and it matches nothing.
+
+### And the play button prefers the uncaged path
+
+`startAgent` tries `openCopilotInChat` FIRST when the host is Copilot, and only
+falls back to the terminal CLI if chat is unavailable. So the DEFAULT Copilot
+experience is the one with no cage, and the correctly-caged CLI is the
+fallback nobody reaches.
+
+### What the tree currently claims
+
+`cage/vscode-mcp.json` says: "STARTED BY THE PLAY BUTTON - CAGED. The extension
+calls workbench.action.chat.open with toolsExclude, built from
+copilot-cage.json's exclude_args. Tools are excluded BY NAME, as on the CLI."
+
+THE LAST FIVE WORDS ARE THE BUG. Excluded by name, yes — by the CLI's names, on
+a host with different ones. The file then says what to do about it, and it is
+still the right instruction:
+
+> VERIFY BEFORE TRUSTING IT … open a session EACH WAY and ask it to list the
+> exact names of every tool it can see. Anything that is not an se_ tool is a
+> hole.
+
+THAT PROBE HAS NEVER BEEN RUN FOR VS CODE. It was run for the CLI, it caught
+three wrong assumptions, and the same class of assumption was then written for
+VS Code without running it again.
+
+### Why this outranks everything else in the report
+
+`raid-asm-the-cage-holds-so-every-write-passes-the-lane` is an ASSUMPTION the
+whole contract rests on: rule 1 says the lane is the only door. On the host the
+owner actually used, the door has been open the whole time, and every native
+write and shell command taken there is absent from `.se/calls.jsonl`.
+
+THE CAGE IS ADVISORY ON VS CODE TODAY. That is not a portability nicety. It is
+the load-bearing assumption failing on a host in real use, and it moves to the
+front of the work.
+
+## Part 12 — the setup, concretely, for Claude and Copilot together
+
+WHAT FOLLOWS IS THE TARGET, not a description of today. Every row says which
+it is.
+
+### One file per job, and the job decides who reads it
+
+| what | file | Claude Code | Copilot CLI | VS Code | today |
+| --- | --- | --- | --- | --- | --- |
+| the server entry | `.mcp.json` at the opened root | reads it | reads it | reads it since 1.118 | **two byte-identical copies, neither declaring `type`** |
+| the rules | `CLAUDE.md` at root | reads it | reads it | reads it by default | projected, and 31% over Codex's cap |
+| scoped rules | `.claude/rules/*.md` with `paths:` | reads it | no | reads it by default | not used |
+| the cage | per host, see below | `.claude/settings.json` | `--excluded-tools` | `toolsExclude` | **VS Code's is inert** |
+| hooks | per host, see below | `.claude/settings.json` | `.github/hooks/*.json` | not portable | Stop works on both |
+
+`.mcp.json` IS THE ONE GENUINELY SHARED FILE and it is the easy win. Write it
+once at the opened root with `"type": "stdio"`, delete
+`cage/copilot-mcp-config.json`, and check whether `cage/vscode-mcp.json` is
+still needed at all.
+
+### The cage needs three vocabularies, and that is the whole fix
+
+ONE LIST OF WHAT MUST BE BLOCKED, expressed three ways. Today there is one list
+in the Copilot CLI's vocabulary, used verbatim in all three places.
+
+- **Claude Code** — bare tool names in `permissions.deny`. Works today.
+- **Copilot CLI** — `--excluded-tools` with CLI names. Works today, and is
+  missing `bash` and `rg`.
+- **VS Code** — `toolsExclude` with VS CODE's names, which nobody has
+  collected. `create_file`, `replace_string_in_file`, `run_in_terminal` and
+  the rest.
+
+SO `copilot-cage.json` GROWS A COLUMN rather than being replaced. The blocked
+capability is the row; each host's spelling is a cell. That also makes the
+"a tool added later is not blocked automatically" rule checkable per host
+instead of per file.
+
+AND THE PROBE IS PART OF THE DELIVERABLE, not an afterthought. Each host gets
+one: open a session, ask for the exact names of every visible tool, and diff
+against the expected set. Anything that is not an `se_` tool is a hole. That
+probe is what caught three wrong assumptions on the CLI and what was never run
+for VS Code.
+
+### Hooks: Claude-native, with a generated Copilot copy
+
+DO NOT REACH FOR `chat.useClaudeHooks`. Part 9 says why.
+
+WRITE THE HOOKS ONCE IN CLAUDE'S SHAPE, because Copilot CLI already reads
+`.claude/settings.json` for the cross-tool subset and honours PascalCase event
+names with Claude's payload shape. Generate `.github/hooks/*.json` from the
+same source for the surfaces that need it, and be aware that a hook present in
+both fires twice — so generate one or the other per host, never both, unless
+the script is idempotent the way `se-hook-stop.ts` already is.
+
+AND MAKE EVERY HOOK SCRIPT CHECK ITS OWN TRIGGER. A script that reads the tool
+name from its payload is correct on a host that ignores matchers and on one
+that honours them. That single change removes the whole matcher hazard and is
+smaller than documenting it.
+
+### What the play button should do
+
+TERMINAL CLI FIRST, CHAT SECOND — the reverse of today. The CLI path is the
+caged one. Until VS Code's `toolsExclude` is built from VS Code's own
+vocabulary and probed, chat is the uncaged path and should not be the default.
+
+## Part 13 — the owner's rulings, 2026-08-18
+
+### RULING 1 — install-time generation is adopted
+
+THE OWNER'S WORDS: fine with install-time generators; RUNME installs the
+extension and the generated documents; if RUNME installs the shims depending
+on what it finds, and the pattern is copied from spec-kit or BMAD, that is
+acceptable.
+
+SO PART 10'S MILESTONE EIGHT IS NO LONGER A QUESTION TO ASK. It is a build.
+
+WHAT THAT SETTLES, and it settles it the way the evidence pointed: the
+agent-agnostic source of truth stays in `project/guidance/`, and an installer
+emits each harness's own files from it — the prompt layer projection, the MCP
+entry, the cage in three vocabularies, and the hooks. `place-prompt-layer.ts`
+and `placeProtocol` are already that shape for three targets. The work is
+widening them and moving the trigger into RUNME rather than inventing a
+mechanism.
+
+READ HOW THE OTHERS DO IT BEFORE WRITING IT. spec-kit keeps neutral content in
+`.specify/` and writes into each agent's directory at install time. BMAD
+generates from `_bmad/_config/` and moved to installing whole skill
+directories verbatim. Neither is an MCP server, and this system does not have
+to stop being one to adopt their installer.
+
+### RULING 2 — the verb count comes down
+
+THE OWNER'S WORDS: we should probably reduce the number of verbs; can we bundle
+some of them.
+
+YES, AND THE ARITHMETIC IS IN PART 14.
+
+## Part 14 — bundling the verbs, measured
+
+TODAY: **34 verbs**, 19,538 bytes of description, 46,101 bytes of schema.
+Cursor's ceiling is 40 across ALL servers, so today one other MCP server with
+seven tools puts the agent over it.
+
+EIGHT BUNDLES TAKE 34 TO 19.
+
+| bundle | from | descriptions | note |
+| --- | --- | --- | --- |
+| `se_file_edit` | write · patch · replace · move · delete | 2,454 B | **406 B over the 2 KB cap — must be trimmed or split** |
+| `se_file_find` | list · glob · search | 1,010 B | |
+| `se_record` | seed expedition · seed iteration · close expedition | 1,936 B | close to the cap |
+| `se_note` | capture · drain · answer | 1,631 B | |
+| `se_state` | amend · reopen | 1,307 B | |
+| `se_house` | panel · reload · prompt.place | 976 B | |
+| `se_prose` | format · lint | 640 B | |
+| `se_web` | fetch · search | 227 B | |
+
+KEPT AS THEY ARE, ELEVEN: `se_pull`, `se_aim`, `se_why`, `se_file_read`,
+`se_shoot`, `se_run`, `se_test`, `se_git`, `se_survey`, `se_log_query`,
+`se_help`.
+
+RESULT: **19 verbs.** Headroom under Cursor's ceiling goes from 6 to 21.
+
+### Three things to hold on to while doing it
+
+THE CAP IS PER TOOL, SO BUNDLING TRADES COUNT FOR LENGTH. `se_file_edit` is
+over the 2 KB description cap the moment it is merged, and `se_record` is
+close. The bundle is not free and the report should not pretend it is: either
+those two get trimmed, or `se_file_edit` splits again along the line that
+matters, which is probably whole-file writes against in-place edits.
+
+`se_pull` STAYS ALONE. It is the single-tool loop the outward scan names as
+the strongest enforcement shape available, and folding routing or
+introspection into it would blur exactly the thing that works.
+
+THE ARGUMENT REPAIR ALREADY PROVES THE SHAPE. The lane repairs a sibling
+verb's word and says what it read as what — `query` against `glob` against
+`dir` against `path`. Those verbs are already near-siblings arguing about one
+argument's name. A discriminated `op` makes that explicit instead of repairing
+it after the fact.
