@@ -121,14 +121,17 @@ The trigger is a NOTE carrying "needs retro":
    Memory keeps only personal data and harness mechanics the repo cannot
    hold. The agent runs this sweep itself.
 
-   THE LANE REACHES THE MEMORY FILES ALREADY, corrected 2026-08-18. An earlier
-   measurement said it could not, because the memory lives outside the project
-   root and a bare path refuses under SE-C-102. That is true of a bare path and
-   not of the lane: `.se/roots.json` already declares `sessions` as
-   `C:\Users\ichbi\.claude\projects`, and the memory sits under it, so
-   `@sessions/<project-slug>/memory/` reads. MEASURED at i16's onboard-retro,
-   where that path answered `exists: false` for MEMORY.md rather than refusing
-   — a real answer about a real folder.
+   THE LANE REACHES THE MEMORY FILES ALREADY, corrected 2026-08-18.
+
+   An earlier measurement said it could not. The memory lives outside the
+   project root, and a bare path to it refuses under SE-C-102.
+
+   That is true of a bare path and not of the lane. `.se/roots.json` already
+   declares `sessions` as the harness's projects folder, and the memory sits
+   under it. So `@sessions/<project-slug>/memory/` reads.
+
+   MEASURED at i16's onboard-retro. That path answered `exists: false` for
+   MEMORY.md rather than refusing — a real answer about a real folder.
 
    SO CHECK THE DECLARED ROOTS BEFORE CONCLUDING ANYTHING. Three ways through
    are honest and a fourth is not.
@@ -139,8 +142,8 @@ The trigger is a NOTE carrying "needs retro":
    - DRAIN WHAT THE HARNESS SURFACED. Memories handed to the agent in context
      are readable and drainable too.
    - DECLARE A ROOT for a folder no existing one covers. `.se/roots.json`
-     makes a folder available as `@name`, read-only. Ask the owner before
-     declaring one; the refusal's own remedy says so.
+     makes a folder available as `@name`, read-only by default. Ask the
+     owner before declaring one; the refusal's own remedy says so.
    - WHAT IS NOT ALLOWED is ticking this step because nothing was surfaced.
      Say what you could reach and what you could not.
 7. Hunt wasted effort. Rework, reversals, avoidable refactors,

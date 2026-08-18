@@ -8,8 +8,13 @@
 // folder stands in .se/roots.json, and every read stays logged. The AGENT
 // writes the declaration itself, through the lane — a person is never asked
 // to hand-edit a dotfile they cannot be expected to understand. Roots are
-// READ surfaces, never write targets, machine-local on purpose (an absolute
-// path means nothing on anyone else's machine).
+// machine-local on purpose (an absolute path means nothing on anyone else's
+// machine).
+//
+// A ROOT IS READ-ONLY UNLESS ITS DECLARATION SAYS `writable: true` (i16).
+// That writable door is how this engine drives a project that is not itself.
+// The one target it may never reach is the tree it was produced from, and
+// SE-C-140 compares recorded identities rather than paths to say so.
 import { existsSync, readFileSync } from "node:fs";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { actBoundTree } from "./actbound.ts";
@@ -132,7 +137,12 @@ export function declaredRoots(root: string, source = "engine/paths.ts"): Record<
   return out;
 }
 
-/** Resolve "@name/rest" against the declared roots. Read lanes only. */
+/** Resolve "@name/rest" against the declared roots.
+ *
+ *  THE WRITE LANE CALLS THIS TOO, for a root whose declaration says writable.
+ *  resolveInRoot is where a root that does not say so is refused, so this
+ *  function answers the same way for both lanes and the policy lives in one
+ *  place. */
 export function resolveDeclaredRoot(root: string, p: string, source: string): string {
   const [name, ...rest] = p.slice(1).split(/[\\/]+/);
   const roots = declaredRoots(root, source);
@@ -229,7 +239,7 @@ function containedIn(root: string, p: string, source: string): string {
     remedy: {
       tool: "se_file_list",
       args: { dir: "." },
-      note: "two doors lead outside, and neither is a path. PAST VERSIONS of this repo are read at a committed ref: se_file_read / se_file_search / se_file_glob all take ref (main reaches v1, v2 reaches v2). ANOTHER FOLDER entirely belongs in .se/roots.json as a declared, read-only root, reachable as @name/rest — ask the owner before declaring one.",
+      note: "two doors lead outside, and neither is a path. PAST VERSIONS of this repo are read at a committed ref: se_file_read / se_file_search / se_file_glob all take ref (main reaches v1, v2 reaches v2). ANOTHER FOLDER entirely belongs in .se/roots.json as a declared root, reachable as @name/rest — read-only unless the declaration says writable. Ask the owner before declaring one.",
     },
     source,
   });

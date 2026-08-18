@@ -98,11 +98,21 @@ When the rendering system lands, this becomes mechanical: the emit produces
 a diff against the template rather than a line of prose, and the promotion
 is reviewed rather than retyped.
 
-EMITTING BACK TO IMPORTED MODULES IS NOT BUILT AND NOT SPECIFIED. The
-overlay work (i16) specifies import as one-way — a vehicle overrides by
-placing a file in its overlay, and import never touches it. Drift is
-REPORTED by `req-overlay-drift-reported`; nothing sends a change upstream.
-That is a separate demand and it does not exist yet.
+EMITTING BACK TO A PARENT TREE IS NOT BUILT AND NOT SPECIFIED.
+
+A VEHICLE IS A WHOLE-TREE COPY THAT OWNS EVERYTHING IT CARRIES (owner ruling
+2026-08-18, `raid-dec-an-import-is-read-only-and-a-vendored-copy-is-yours`).
+Nothing in it is sealed. The earlier reading here — that a vehicle overrides
+by placing a file in an overlay the import never touches — described a module
+model that was overturned before i16 shipped.
+
+WHAT i16 ACTUALLY BUILT is the producing act and its guards. A vehicle records
+the identity of the tree it came from and may never write back to it
+(SE-C-140). The overlay resolution chain is still unbuilt, and so is drift
+reporting.
+
+SO NOTHING SENDS A CHANGE UPSTREAM. That is a separate demand and it does not
+exist yet.
 
 ## Sources
 

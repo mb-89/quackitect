@@ -108,12 +108,11 @@ Four things stay home:
 - the session state in `.se/`
 - everything the ignore file already excludes
 
-Then, on the other machine:
+A DRIVEN PROJECT CARRIES NO INSTALLER. It is a plain work tree. The copy that
+drives it is where the method and the machinery live, and that is the tree you
+run `RUNME.ps1` in.
 
-```powershell
-cd C:\path\to\empty
-.\RUNME.ps1
-```
+## The pull
 
 **The pull** is the walk operation and `se_pull` the machinery's ONE
 verb, legal in every state: the agent says pull and the machine answers

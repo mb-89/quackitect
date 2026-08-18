@@ -7,7 +7,7 @@ applyTo: '**'
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
      from project/guidance/contract.md b538e8ccc81e
      from project/guidance/walking.md 7bedbf023cb2
-     from project/guidance/method/lane.md 2b433ab77644
+     from project/guidance/method/lane.md c1579badcbd4
      from project/guidance/voice.md 0b6faf79ff32
 -->
 
@@ -520,8 +520,13 @@ TWO DOORS LEAD OUTSIDE THE ROOT, and neither is a path. A past version of this
 repo is read at a committed ref — `se_file_read`, `se_file_search` and
 `se_file_glob` all take `ref`.
 
-Another folder entirely belongs in `.se/roots.json`, as a declared read-only
-root. It is reachable as `@name/rest`. Ask the owner before declaring one.
+Another folder entirely belongs in `.se/roots.json`, as a declared root. It is
+reachable as `@name/rest`. Ask the owner before declaring one.
+
+A DECLARED ROOT IS READ-ONLY BY DEFAULT. Declaring one writable is how this
+system drives a project that is not itself. The one thing it may never reach
+is the tree it was produced from. That guard compares recorded identities and
+not paths, so moving or renaming either tree changes nothing (SE-C-140).
 
 WHEN A CALL IS REFUSED you get a typed rejection. It carries:
 

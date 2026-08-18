@@ -723,8 +723,14 @@ subset extends TEST-FIRST.
 
 ### i16 — the vehicle overlay
 
-WAITS ON i10, because `req-overlay-resolution` demands one shared identity
-scheme and module-qualified ids ARE that scheme.
+THE i10 EDGE IS CUT, on the owner's ruling of 2026-08-18. It used to wait on
+i10, because `req-overlay-resolution` demands one shared identity scheme and
+module-qualified ids ARE that scheme.
+
+WHAT SHIPPED INSTEAD NEEDED NO SUCH SCHEME. A vehicle mints its own 12-hex
+`instance` and records the identity of the tree it came from, so two copies
+are told apart without module-qualified ids. The overlay resolution chain is
+still unbuilt, and it is what still wants i10.
 
 FULLY SPECIFIED AND ENTIRELY UNBUILT. `uc-vendor-and-overlay`,
 `req-overlay-resolution` with eight clauses, `req-overlay-survives-update`,

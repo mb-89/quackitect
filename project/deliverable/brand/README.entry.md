@@ -24,6 +24,7 @@ You do not run RUNME.ps1 again. It is the installer, not the way in.
 - project/spec - where your own records get written.
 - project/ - the folder you open. Everything being built lives here.
 - project/deliverable/brand/brand.json - the product name. Change it, and every surface follows.
+  - Leave `instance` alone. It is this copy's identity, not a name.
 - project/deliverable/brand/palette.css - every colour. Edit it. No code change, no restart.
 
 ## Attaching an agent

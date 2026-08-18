@@ -2,6 +2,38 @@
 
 One entry per shipped version, newest first.
 
+## 5.0.0 — 2026-08-18
+
+You can make your own copy of this system, and point it at your own work.
+
+- Make a copy of the whole system under your own name, from a menu entry. It
+  arrives as its own project with its own history, and a new window opens on
+  it. Nothing outside the folder you named changes.
+- Everything in your copy is yours to change, including the parts we wrote.
+  Nothing in it is locked.
+- Your copy can never write back to the one it came from. It knows which one
+  that was by an identity rather than by a folder name, so moving or renaming
+  either of them changes nothing.
+- Start a project the system drives. That work lives in its own folder and
+  carries none of the method. One small file in it says which copy drives it.
+- Your copy can say what you made your own. It compares itself against the day
+  it was made, and lists what you wrote, changed and removed.
+- The old way of exporting a copy is gone. It was a flag on the install script,
+  in the document a newcomer reads first, and it sent people to a command line
+  for something that is now a menu entry.
+
+### What this release does not change
+
+- TAKING AN UPDATE FROM THE COPY YOU CAME FROM IS NOT BUILT. Your copy can tell
+  you what you changed. Nothing yet brings our later changes to you. Until that
+  exists, a copy is a fork that knows what it changed.
+- LAYERING YOUR OWN METHOD OVER OURS IS NOT BUILT EITHER. You can edit anything
+  in your copy, which covers most of what people want. What is missing is
+  keeping your version and ours side by side.
+- NOTHING HAS BEEN TRIED ON A SECOND MACHINE. Everything above was checked
+  where it was built. A copy also needs a one-time install of its dependencies
+  before it runs.
+
 ## 4.5.0 — 2026-08-17
 
 A machine nobody is watching starts working on its own.

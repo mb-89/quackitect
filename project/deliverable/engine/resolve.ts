@@ -69,8 +69,9 @@ export function storeFor(roots: Roots, owner: Owner): string {
 
 /** Resolve a caller's path and say where it landed.
  *
- *  `forRead` opens the declared roots, which are READ surfaces only. The
- *  write lane refuses them, and that refusal lives in resolveInRoot. */
+ *  `forRead` opens EVERY declared root. The write lane opens only the ones
+ *  whose declaration says `writable: true`, and refuses the rest — that
+ *  refusal lives in resolveInRoot. */
 export function resolve(roots: Roots | string, p: string, source: string, forRead = false): Resolved {
   // A BARE STRING IS THE ROOT. It used to be read as "the tree I am standing
   // in", with the machine root derived from it by stripping `.worktrees/<id>`

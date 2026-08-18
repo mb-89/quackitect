@@ -1,6 +1,6 @@
 {
   "change_size": "major",
-  "rigor_matrix_hash": "12392a6bae3b",
+  "rigor_matrix_hash": "717b2c03d982",
   "pinned_at": "2026-08-18T08:58:29.917Z",
   "reopened": [
     "decompose-structure",
@@ -255,7 +255,7 @@
     "sweep-consistency": {
       "applies": "full",
       "evidence": "[[\"swept\",true,\"\",[],\"checklist\",\"\",[],[\"$sweep_surfaces\"],[]]]",
-      "shape": "[[\"fill-story-evidence\"],false,\"\",\"\"]"
+      "shape": "[[\"run-demos\"],false,\"\",\"\"]"
     },
     "gate-validation": {
       "applies": "full",

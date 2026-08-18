@@ -109,7 +109,16 @@ to find and fix. One refusal here costs none.
 ### SE-C-102 — the path escapes the root
 Paths are root-relative to the project root. Outside the root there are two
 doors only: a committed `ref` for the past, a declared `@name` root for
-another folder. There is no third.
+another folder. There is no third door for a path you pass.
+
+A PRODUCING ACT IS NOT A THIRD DOOR. It writes into the tree it is making,
+and that destination is the act's own bound rather than a path anybody
+passed. SE-C-141 governs it, and the bound is torn down when the act ends.
+
+THIS CLAUSE ALSO REFUSES A WRITE TO A ROOT THAT IS NOT WRITABLE. A declared
+root is read-only unless its declaration says `writable: true`, and only a
+writable one is a legal write target. The refusal's own remedy carries the
+shape to declare.
 
 ### SE-C-103 — the read is oversize
 A big file is read in parts: `offset` and `limit`. Nothing is ever silently

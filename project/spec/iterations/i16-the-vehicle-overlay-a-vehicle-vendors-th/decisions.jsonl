@@ -1192,3 +1192,133 @@
 {"ts":"2026-08-18T19:56:11.752Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1123","brief":"the regression, the masked error and the fourth false green"}
 {"ts":"2026-08-18T19:56:16.635Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1124","brief":"confirming the gatekeeper's three findings"}
 {"ts":"2026-08-18T19:57:35.823Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1125","brief":"staging the gatekeeper's round"}
+{"ts":"2026-08-18T19:57:41.105Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1126","brief":"the gatekeeper's round committed"}
+{"ts":"2026-08-18T19:57:48.766Z","op":"update","visit":"iterations/i16/fix-findings@0","node":"d1127","brief":"leaving the repair state on a green confirm run"}
+{"ts":"2026-08-18T19:58:15.654Z","op":"update","visit":"iterations/i16/cut-criteria@21","node":"d1128","brief":"walking to the gate that is yours"}
+{"ts":"2026-08-18T20:02:14.288Z","op":"update","visit":"iterations/i16/gate-implementation@0","node":"d1129","brief":"the implementation gate filled and submitted for the owner"}
+{"ts":"2026-08-18T20:03:00.916Z","op":"update","visit":"iterations/i16/gate-implementation@0","node":"d1130","brief":"the verdict records who actually decided the bless"}
+{"ts":"2026-08-18T20:03:12.323Z","op":"update","visit":"iterations/i16/gate-implementation@0","node":"d1131","brief":"blessing the implementation gate on the owner's word"}
+{"ts":"2026-08-18T20:03:53.638Z","op":"update","visit":"iterations/i16/cut-criteria@22","node":"d1132","brief":"walking the close on the owner's standing word"}
+{"ts":"2026-08-18T20:09:11.807Z","op":"update","visit":"iterations/i16/fill-story-evidence@0","node":"d1133","brief":"asking the law which story slides are unfilled"}
+{"ts":"2026-08-18T20:09:22.566Z","op":"update","visit":"iterations/i16/fill-story-evidence@0","node":"d1134","brief":"finding which stories are must"}
+{"ts":"2026-08-18T20:09:33.315Z","op":"update","visit":"iterations/i16/fill-story-evidence@0","node":"d1135","brief":"reading a demo drawing's shape from the last iteration"}
+{"ts":"2026-08-18T20:09:48.834Z","op":"update","visit":"iterations/i16/fill-story-evidence@0","node":"d1136","brief":"checking whether the demo drawing exists yet"}
+{"ts":"2026-08-18T20:09:58.673Z","op":"update","visit":"iterations/i16/fill-story-evidence@0","node":"d1137","brief":"the demo drawing, one step per must story this iteration touched"}
+{"ts":"2026-08-18T20:10:19.210Z","op":"update","visit":"iterations/i16/fill-story-evidence@0","node":"d1138","brief":"the unperformed demonstrations taken as debt on the owner's word"}
+{"ts":"2026-08-18T20:10:39.216Z","op":"update","visit":"iterations/i16/fill-story-evidence@0","node":"d1139","brief":"the story evidence state filled with the debt named"}
+{"ts":"2026-08-18T20:10:47.839Z","op":"update","visit":"iterations/i16/fill-story-evidence@0","node":"d1140","brief":"stamping the story evidence"}
+{"ts":"2026-08-18T20:11:30.591Z","op":"update","visit":"iterations/i16/enumerate-space/build_chart@21","node":"d1141","brief":"into the demo machine"}
+{"ts":"2026-08-18T20:16:26.136Z","op":"update","visit":"iterations/i16/run-demos/start@0","node":"d1142","brief":"into the first demo step"}
+{"ts":"2026-08-18T20:17:01.302Z","op":"update","visit":"iterations/i16/run-demos/sty-press-create-vehicle-and-land-in-it@0","node":"d1143","brief":"the first demo recorded as unperformed rather than invented"}
+{"ts":"2026-08-18T20:17:33.497Z","op":"update","visit":"iterations/i16/run-demos/sty-drive-somebody-elses-product@0","node":"d1144","brief":"the second demo would fail, and the record says why"}
+{"ts":"2026-08-18T20:17:55.763Z","op":"update","visit":"iterations/i16/run-demos/sty-drive-somebody-elses-product@0","node":"d1145","brief":"the third demo branch the join still owes"}
+{"ts":"2026-08-18T20:18:13.662Z","op":"update","visit":"iterations/i16/run-demos/sty-drive-somebody-elses-product@0","node":"d1146","brief":"asking which demo branch is reachable"}
+{"ts":"2026-08-18T20:18:37.092Z","op":"update","visit":"iterations/i16/run-demos/sty-drive-somebody-elses-product@0","node":"d1147","brief":"the demos become a chain, which is how they are performed"}
+{"ts":"2026-08-18T20:18:41.364Z","op":"update","visit":"iterations/i16/run-demos/sty-drive-somebody-elses-product@0","node":"d1148","brief":"the redrawn chain, walking on"}
+{"ts":"2026-08-18T20:19:25.404Z","op":"update","visit":"iterations/i16/run-demos/sty-drive-somebody-elses-product@0","node":"d1149","brief":"clearing the aim onto the join the drawing offers"}
+{"ts":"2026-08-18T20:20:06.841Z","op":"update","visit":"iterations/i16/run-demos/sty-drive-somebody-elses-product@0","node":"d1150","brief":"the drawing matches what the machine will walk, and says why"}
+{"ts":"2026-08-18T20:20:22.773Z","op":"update","visit":"iterations/i16/run-demos/sty-drive-somebody-elses-product@0","node":"d1151","brief":"the half-applied redraw recorded for the retro"}
+{"ts":"2026-08-18T20:20:29.569Z","op":"update","visit":"iterations/i16/run-demos/sty-drive-somebody-elses-product@0","node":"d1152","brief":"out of the demo machine toward validation"}
+{"ts":"2026-08-18T20:21:07.024Z","op":"update","visit":"iterations/i16/run-demos/sty-drive-somebody-elses-product@0","node":"d1153","brief":"the chain restored before the recompile"}
+{"ts":"2026-08-18T20:22:40.991Z","op":"update","visit":"iterations/i16/gate-motivation@11","node":"d1155","brief":"sweeping the re-walk toward the demos"}
+{"ts":"2026-08-18T20:25:51.267Z","op":"update","visit":"iterations/i16/run-demos/start@1","node":"d1156","brief":"into the recompiled demo chain"}
+{"ts":"2026-08-18T20:26:26.734Z","op":"update","visit":"iterations/i16/run-demos/sty-nothing-i-do-reaches-what-it-came-from@0","node":"d1157","brief":"the third demo, with what stands mechanically beside it"}
+{"ts":"2026-08-18T20:26:52.686Z","op":"update","visit":"iterations/i16/run-demos/sty-vendor-it-into-my-product@0","node":"d1158","brief":"the fourth demo, the one the iteration rests on"}
+{"ts":"2026-08-18T20:26:59.784Z","op":"update","visit":"iterations/i16/run-demos/sty-vendor-it-into-my-product@0","node":"d1159","brief":"the fourth demo stamped, and the chain closes"}
+{"ts":"2026-08-18T20:27:17.521Z","op":"update","visit":"iterations/i16/run-demos/end@0","node":"d1160","brief":"the other leg of the validation join"}
+{"ts":"2026-08-18T20:33:04.758Z","op":"fork","visit":"iterations/i16/run-demos/end@0","parent":null,"node":"d1161","brief":"a fan leg that is a submachine cannot be picked up again","nodes":[]}
+{"ts":"2026-08-18T20:35:48.473Z","op":"update","visit":"iterations/i16/gate-kickoff@0","node":"d2","brief":"sweeping the signed states back to where the work is"}
+{"ts":"2026-08-18T20:36:20.181Z","op":"update","visit":"iterations/i16/gate-inputs@0","node":"d3","brief":"sweep 3 of the re-walk"}
+{"ts":"2026-08-18T20:36:47.252Z","op":"update","visit":"iterations/i16/enumerate-space/start@0","node":"d4","brief":"sweep 4 of the re-walk"}
+{"ts":"2026-08-18T20:37:13.446Z","op":"update","visit":"iterations/i16/cut-criteria@0","node":"d5","brief":"sweep 5 of the re-walk"}
+{"ts":"2026-08-18T20:37:38.936Z","op":"update","visit":"iterations/i16/evaluate-architecture@0","node":"d6","brief":"sweep 6 of the re-walk"}
+{"ts":"2026-08-18T20:38:07.417Z","op":"update","visit":"iterations/i16/specify-build@0","node":"d7","brief":"sweep 7 — crossing verification, the battery fires here"}
+{"ts":"2026-08-18T20:39:41.026Z","op":"plan","visit":"iterations/i16/sweep-consistency@0","parent":null,"nodes":[{"id":"d8","brief":"list what i16 changed"},{"id":"d9","brief":"walk each surface class"},{"id":"d10","brief":"fix what teaches the superseded way"},{"id":"d11","brief":"submit the sweep"}]}
+{"ts":"2026-08-18T20:41:18.551Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d12","brief":"the roots documentation still says read-only in four places"}
+{"ts":"2026-08-18T20:41:27.861Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d13","brief":"the lane chapter learns that a declared root can be writable"}
+{"ts":"2026-08-18T20:41:35.308Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d14","brief":"the retro chapter says read-only by default"}
+{"ts":"2026-08-18T20:41:43.707Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d15","brief":"walking the entry documents for the RUNME export"}
+{"ts":"2026-08-18T20:41:52.424Z","op":"done","visit":"iterations/i16/sweep-consistency@0","node":"d9","brief":"nine surface classes walked, four stale passages found"}
+{"ts":"2026-08-18T20:41:59.022Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d16","brief":"re-projecting the contract after the lane chapter moved"}
+{"ts":"2026-08-18T20:42:24.351Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d17","brief":"checking the design-spec template's recorded contradiction"}
+{"ts":"2026-08-18T20:42:41.661Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d18","brief":"checking the corpus reads back clean"}
+{"ts":"2026-08-18T20:42:43.906Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d19","brief":"linting the guidance chapters i just edited"}
+{"ts":"2026-08-18T20:43:07.971Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d20","brief":"the retro wall splits, and a username leaves the guidance"}
+{"ts":"2026-08-18T20:43:14.437Z","op":"done","visit":"iterations/i16/sweep-consistency@0","node":"d10","brief":"four stale passages fixed and the prompt layer re-projected"}
+{"ts":"2026-08-18T20:43:22.650Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d21","brief":"checking the drawing change against the matrix tests"}
+{"ts":"2026-08-18T20:43:25.488Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d22","brief":"checking the drawing change against the matrix tests"}
+{"ts":"2026-08-18T20:43:33.369Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d23","brief":"reading the scoped run's verdict"}
+{"ts":"2026-08-18T20:43:40.043Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d24","brief":"reading the run's verdict"}
+{"ts":"2026-08-18T20:43:54.040Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d25","brief":"reading the run's verdict"}
+{"ts":"2026-08-18T20:44:00.570Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d26","brief":"checking whether a book surface exists to sweep"}
+{"ts":"2026-08-18T20:44:11.500Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d27","brief":"reading the run's verdict"}
+{"ts":"2026-08-18T20:44:18.704Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d28","brief":"reading the run's verdict"}
+{"ts":"2026-08-18T20:44:20.904Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d29","brief":"reading the run's verdict"}
+{"ts":"2026-08-18T20:44:32.573Z","op":"fork","visit":"iterations/i16/sweep-consistency@0","parent":"d11","node":"d30","brief":"the engine still teaches a declared root as read-only in six places","nodes":[]}
+{"ts":"2026-08-18T20:44:50.803Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d31","brief":"the path jail stops teaching roots as read-only surfaces"}
+{"ts":"2026-08-18T20:44:57.377Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d32","brief":"the resolver comment matches what the write lane now does"}
+{"ts":"2026-08-18T20:45:15.144Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d33","brief":"the three file tools name the writable-root door"}
+{"ts":"2026-08-18T20:45:22.691Z","op":"done","visit":"iterations/i16/sweep-consistency@0","node":"d30","brief":"six engine surfaces and the SE-C-102 rule now name the writable root"}
+{"ts":"2026-08-18T20:45:28.249Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d34","brief":"reading the run that answers the drawing change"}
+{"ts":"2026-08-18T20:45:51.462Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d35","brief":"re-running the battery over the sweep's corrections"}
+{"ts":"2026-08-18T20:45:57.222Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d36","brief":"reading the re-run"}
+{"ts":"2026-08-18T20:46:00.309Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d37","brief":"reading the re-run"}
+{"ts":"2026-08-18T20:46:09.456Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d38","brief":"reading the re-run"}
+{"ts":"2026-08-18T20:46:11.747Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d39","brief":"reading the re-run"}
+{"ts":"2026-08-18T20:46:33.513Z","op":"fork","visit":"iterations/i16/sweep-consistency@0","parent":"d11","node":"d40","brief":"the README still tells a driven project to run the installer","nodes":[]}
+{"ts":"2026-08-18T20:46:41.826Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d41","brief":"the driven-project section drops an installer it never had"}
+{"ts":"2026-08-18T20:46:49.366Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d42","brief":"the copy owner is warned that instance is not a name"}
+{"ts":"2026-08-18T20:46:57.591Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d43","brief":"the plan stops saying i16 waits on an edge that was cut"}
+{"ts":"2026-08-18T20:47:09.144Z","op":"done","visit":"iterations/i16/sweep-consistency@0","node":"d40","brief":"four stale passages corrected across README, plan and the emit-back card"}
+{"ts":"2026-08-18T20:47:27.045Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d44","brief":"the path rule and the producing act stop contradicting each other"}
+{"ts":"2026-08-18T20:47:30.569Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d45","brief":"reading the re-run"}
+{"ts":"2026-08-18T20:47:36.509Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d46","brief":"linting the cards and rows the sweep rewrote"}
+{"ts":"2026-08-18T20:47:39.349Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d47","brief":"linting the row the drawing change rewrote"}
+{"ts":"2026-08-18T20:47:54.367Z","op":"update","visit":"iterations/i16/sweep-consistency@0","node":"d48","brief":"the row's own prose meets the voice lint"}
+{"ts":"2026-08-18T20:48:50.061Z","op":"done","visit":"iterations/i16/sweep-consistency@0","node":"d11","brief":"the sweep is signed with nine classes walked"}
+{"ts":"2026-08-18T20:49:59.383Z","op":"done","visit":"iterations/i16/sweep-consistency@0","node":"d8","brief":"the sweep is signed and the walk turns toward the gate"}
+{"ts":"2026-08-18T20:50:31.358Z","op":"update","visit":"iterations/i16/cut-criteria@1","node":"d49","brief":"sweeping toward the validation gate"}
+{"ts":"2026-08-18T20:50:56.938Z","op":"update","visit":"iterations/i16/evaluate-architecture@1","node":"d50","brief":"sweeping toward the validation gate"}
+{"ts":"2026-08-18T20:51:26.024Z","op":"update","visit":"iterations/i16/observe-red@1","node":"d51","brief":"sweeping through the build steps toward verification"}
+{"ts":"2026-08-18T20:54:03.516Z","op":"plan","visit":"iterations/i16/gate-validation@0","parent":null,"nodes":[{"id":"d52","brief":"compile the per-item evidence"},{"id":"d53","brief":"write the three review rounds"},{"id":"d54","brief":"rule the verdict and bless"}]}
+{"ts":"2026-08-18T20:54:23.801Z","op":"update","visit":"iterations/i16/gate-validation@0","node":"d55","brief":"reading the raid shape to mint tonight's debt"}
+{"ts":"2026-08-18T20:54:59.363Z","op":"update","visit":"iterations/i16/gate-validation@0","node":"d56","brief":"the walker defect is minted as debt, as the owner asked"}
+{"ts":"2026-08-18T20:55:13.287Z","op":"update","visit":"iterations/i16/gate-validation@0","node":"d57","brief":"reading the stale handover"}
+{"ts":"2026-08-18T20:55:45.203Z","op":"update","visit":"iterations/i16/gate-validation@0","node":"d58","brief":"a fresh battery for this gate's round 0"}
+{"ts":"2026-08-18T20:55:48.122Z","op":"update","visit":"iterations/i16/gate-validation@0","node":"d59","brief":"reading the gate's battery"}
+{"ts":"2026-08-18T20:55:58.904Z","op":"update","visit":"iterations/i16/gate-validation@0","node":"d60","brief":"reading the gate's battery"}
+{"ts":"2026-08-18T20:56:02.195Z","op":"update","visit":"iterations/i16/gate-validation@0","node":"d61","brief":"reading the gate's battery"}
+{"ts":"2026-08-18T20:56:05.259Z","op":"update","visit":"iterations/i16/gate-validation@0","node":"d62","brief":"reading the gate's battery"}
+{"ts":"2026-08-18T20:57:07.498Z","op":"update","visit":"iterations/i16/gate-validation@0","node":"d63","brief":"confirming the four i16 demo reports say not performed"}
+{"ts":"2026-08-18T20:59:19.358Z","op":"done","visit":"iterations/i16/gate-validation@0","node":"d52","brief":"the per-item evidence is compiled with citations"}
+{"ts":"2026-08-18T20:59:42.362Z","op":"update","visit":"iterations/i16/gate-validation@0","node":"d64","brief":"both debts declare what repaying them consists of"}
+{"ts":"2026-08-18T21:00:21.189Z","op":"update","visit":"iterations/i16/gate-validation@0","node":"d65","brief":"the register stops citing three reports that never existed"}
+{"ts":"2026-08-18T21:02:21.746Z","op":"done","visit":"iterations/i16/gate-validation@0","node":"d53","brief":"three rounds written, every claim carrying its citation"}
+{"ts":"2026-08-18T21:02:40.134Z","op":"done","visit":"iterations/i16/gate-validation@0","node":"d54","brief":"the gate is ruled pass with overrides and blessed on the owner's word"}
+{"ts":"2026-08-18T21:03:19.918Z","op":"update","visit":"iterations/i16/cut-criteria@2","node":"d66","brief":"the validation gate is blessed, so the walk turns to package"}
+{"ts":"2026-08-18T21:03:53.170Z","op":"update","visit":"iterations/i16/gate-architecture@2","node":"d67","brief":"sweeping toward package"}
+{"ts":"2026-08-18T21:04:21.453Z","op":"update","visit":"iterations/i16/build-steps/start@2","node":"d68","brief":"sweeping through verification toward package"}
+{"ts":"2026-08-18T21:05:53.892Z","op":"plan","visit":"iterations/i16/gate-validation@0","parent":null,"nodes":[{"id":"d69","brief":"fill the evidence half on four story decks"},{"id":"d70","brief":"name the two stories a demonstration must carry"},{"id":"d71","brief":"re-submit the gate"}]}
+{"ts":"2026-08-18T21:06:53.206Z","op":"update","visit":"iterations/i16/gate-validation@0","node":"d72","brief":"the create-vehicle deck carries its evidence, honest where nobody watched"}
+{"ts":"2026-08-18T21:07:42.620Z","op":"update","visit":"iterations/i16/gate-validation@0","node":"d73","brief":"the drive-somebody-elses-product deck says which slide fails today"}
+{"ts":"2026-08-18T21:08:21.867Z","op":"update","visit":"iterations/i16/gate-validation@0","node":"d74","brief":"the isolation deck names the emptiest slide in the iteration"}
+{"ts":"2026-08-18T21:09:03.086Z","op":"done","visit":"iterations/i16/gate-validation@0","node":"d69","brief":"all four decks carry their evidence half, 32 slides"}
+{"ts":"2026-08-18T21:09:58.011Z","op":"update","visit":"iterations/i16/gate-validation@0","node":"d75","brief":"the isolation story gets the demonstration that names the destroying command"}
+{"ts":"2026-08-18T21:10:21.731Z","op":"done","visit":"iterations/i16/gate-validation@0","node":"d70","brief":"both uncarried stories now have a demonstration naming them"}
+{"ts":"2026-08-18T21:10:30.560Z","op":"update","visit":"iterations/i16/gate-validation@0","node":"d76","brief":"re-stamping the gate against the corrected corpus"}
+{"ts":"2026-08-18T21:11:11.265Z","op":"update","visit":"iterations/i16/author-tests@3","node":"d77","brief":"the spec's verifies line stops parsing as two ids"}
+{"ts":"2026-08-18T21:12:53.267Z","op":"plan","visit":"iterations/i16/package@0","parent":null,"nodes":[{"id":"d78","brief":"bump the version"},{"id":"d79","brief":"assemble the artifact by script"},{"id":"d80","brief":"check the package by opening it"},{"id":"d81","brief":"fill and submit"}]}
+{"ts":"2026-08-18T21:13:40.965Z","op":"done","visit":"iterations/i16/package@0","node":"d78","brief":"5.0.0, because a documented interface was removed"}
+{"ts":"2026-08-18T21:13:48.642Z","op":"done","visit":"iterations/i16/gate-validation@0","node":"d71","brief":"the validation gate re-stamped and the route opened"}
+{"ts":"2026-08-18T21:14:16.399Z","op":"done","visit":"iterations/i16/package@0","node":"d79","brief":"the artifact assembles by script at 5.0.0"}
+{"ts":"2026-08-18T21:14:57.810Z","op":"update","visit":"iterations/i16/package@0","node":"d82","brief":"asking the packaged entrypoint for its version"}
+{"ts":"2026-08-18T21:16:15.260Z","op":"update","visit":"iterations/i16/package@0","node":"d83","brief":"running the packaged entrypoint's help to prove it loads"}
+{"ts":"2026-08-18T21:17:20.821Z","op":"done","visit":"iterations/i16/package@0","node":"d80","brief":"the package is opened and its entrypoint answers at exit 0"}
+{"ts":"2026-08-18T21:17:26.189Z","op":"done","visit":"iterations/i16/package@0","node":"d81","brief":"the package state is signed at 5.0.0"}
+{"ts":"2026-08-18T21:17:52.740Z","op":"update","visit":"iterations/i16/cut-criteria@3","node":"d84","brief":"package is signed, so the walk turns to the release gate"}
+{"ts":"2026-08-18T21:18:24.617Z","op":"update","visit":"iterations/i16/evaluate-architecture@4","node":"d85","brief":"sweeping toward the release gate"}
+{"ts":"2026-08-18T21:18:52.776Z","op":"update","visit":"iterations/i16/specify-build@4","node":"d86","brief":"sweeping through verification to the release gate"}
+{"ts":"2026-08-18T21:21:50.650Z","op":"update","visit":"iterations/i16/gate-release@0","node":"d87","brief":"the release gate is filled and ruled"}
+{"ts":"2026-08-18T21:22:18.050Z","op":"update","visit":"iterations/i16/cut-criteria@4","node":"d88","brief":"the release gate is blessed, so the walk turns to shipped"}
+{"ts":"2026-08-18T21:22:55.115Z","op":"update","visit":"iterations/i16/evaluate-architecture@5","node":"d89","brief":"sweeping to shipped"}
+{"ts":"2026-08-18T21:23:22.985Z","op":"update","visit":"iterations/i16/specify-build@5","node":"d90","brief":"sweeping through verification to shipped"}

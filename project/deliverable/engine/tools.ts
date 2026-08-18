@@ -719,7 +719,7 @@ export function coreTools(
       name: "se_file_read",
       title: "se.file.read",
       description:
-        "Read a project file (root-relative path) — TEXT OR IMAGE. Returns the CAS hash writes will demand. Text comes back as numbered lines; pass offset (1-based line) / limit to read a large file in PARTS — an oversize whole-file read is refused with the remedy, never silently truncated. An IMAGE (png, jpg, gif, webp) comes back as the picture itself, so a sketch can be LOOKED AT rather than described to you. Any other binary is refused. A DECLARED ROOT is reachable as '@name/rest' (the owner declares roots in .se/roots.json; they are read-only). Pass ref to read AT A COMMITTED REF ('main' reaches v1, 'v2' reaches v2) — pair with se_file_search/se_file_glob at the same ref. Pass optional: true for a file that is ALLOWED to be missing (the handover): absence answers exists: false rather than refusing. THE READING (.se/reading.md) is the one path the ENGINE writes: it holds every document the way ahead still demands, concatenated, and reading it CREDITS them all — one call instead of one per document, and no read_hashes to carry afterwards. The packet names it whenever anything is owed.",
+        "Read a project file (root-relative path) — TEXT OR IMAGE. Returns the CAS hash writes will demand. Text comes back as numbered lines; pass offset (1-based line) / limit to read a large file in PARTS — an oversize whole-file read is refused with the remedy, never silently truncated. An IMAGE (png, jpg, gif, webp) comes back as the picture itself, so a sketch can be LOOKED AT rather than described to you. Any other binary is refused. A DECLARED ROOT is reachable as '@name/rest' (the owner declares roots in .se/roots.json; read-only unless the declaration says writable). Pass ref to read AT A COMMITTED REF ('main' reaches v1, 'v2' reaches v2) — pair with se_file_search/se_file_glob at the same ref. Pass optional: true for a file that is ALLOWED to be missing (the handover): absence answers exists: false rather than refusing. THE READING (.se/reading.md) is the one path the ENGINE writes: it holds every document the way ahead still demands, concatenated, and reading it CREDITS them all — one call instead of one per document, and no read_hashes to carry afterwards. The packet names it whenever anything is owed.",
       inputSchema: {
         type: "object",
         properties: {
@@ -767,7 +767,7 @@ export function coreTools(
       name: "se_file_write",
       title: "se.file.write",
       description:
-        "Whole-file write. base_hash: null CREATES; otherwise base_hash must match disk (CAS) — read first, write with the hash you read.",
+        "Whole-file write. base_hash: null CREATES; otherwise base_hash must match disk (CAS) — read first, write with the hash you read. A DECLARED ROOT ('@name/rest') is a legal target ONLY where its declaration in .se/roots.json says writable: true — that is how this system drives a project that is not itself. A root that does not say so is refused, with the remedy showing the shape.",
       inputSchema: {
         type: "object",
         properties: {
@@ -789,7 +789,7 @@ export function coreTools(
       name: "se_file_patch",
       title: "se.file.patch",
       description:
-        "EDIT FILES — five verbs, one atomic batch. Each op is ONE of: {path, old_string, new_string} exact match (unique, or replace_all) · {path, pattern, replacement, flags?, expect_count?} regex substitution, always global, count reported · {path, append: true, new_string} append (prepend: true likewise) — never rebuild a file to add to its end · {path, at: {from_line, to_line}, new_string, base_hash} replace a line range from a read you hold. MANY edits, MANY files, ONE call — every guard checked before anything is written. TRIVIAL MISMATCHES ARE CORRECTED, NOT REFUSED: a CRLF/LF difference is applied in the file's own endings and named on the result (`corrected`).",
+        "EDIT FILES — five verbs, one atomic batch. Each op is ONE of: {path, old_string, new_string} exact match (unique, or replace_all) · {path, pattern, replacement, flags?, expect_count?} regex substitution, always global, count reported · {path, append: true, new_string} append (prepend: true likewise) — never rebuild a file to add to its end · {path, at: {from_line, to_line}, new_string, base_hash} replace a line range from a read you hold. MANY edits, MANY files, ONE call — every guard checked before anything is written. TRIVIAL MISMATCHES ARE CORRECTED, NOT REFUSED: a CRLF/LF difference is applied in the file's own endings and named on the result (`corrected`). A DECLARED ROOT ('@name/rest') is a legal target only where its declaration says writable: true.",
       inputSchema: {
         type: "object",
         properties: {

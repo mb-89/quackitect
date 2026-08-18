@@ -5,7 +5,7 @@ statement: "Sweep the describing surfaces: everything this iteration changed is 
 state_kind: work
 filled_by: agent
 depends_on:
-  - fill-story-evidence
+  - run-demos
 exit_script:
   - project/deliverable/engine/bin/sweep.ts
 floor: true
@@ -55,9 +55,22 @@ Per [[meth-consistency-sweep]]. A doc that still teaches the superseded way is a
 
 LIST WHAT THE ITERATION CHANGED first - the evidence trail has it. Then walk the surface classes on the card, and for each class find every document teaching a changed behavior and fix it. Checking the box is the claim, per class.
 
+## It runs AFTER the demonstrations, not beside them
+
+THE SWEEP DOCUMENTS WHAT THE DEMONSTRATIONS PRODUCED. Their reports are documents like any other, so sweeping before they are performed sweeps an unfinished corpus.
+
+IT USED TO FAN FROM fill-story-evidence, in parallel with run-demos. That drawing cannot be walked by one agent (2026-08-18). A fan hands out one leg and reports the rest as not walked, and run-demos is a SUBMACHINE, so walking it leaves the walk at that submachine's `end`. The engine's escape for an unwalked leg asks whether the state it stands on owes a form. An `end` owes none. So the offer is never made, and the validation busbar starves for good.
+
+The chain costs nothing here. Both legs are walked by the same agent either way, and this order is the one that makes sense.
+
 ## The mechanical half runs on the way out
 
-THE CONFORMANCE SWEEP IS THIS ROW'S EXIT SCRIPT, and it is the engine's rather than the agent's. It reads every node under `project/spec` and reports four kinds: a node that will not parse, a value outside its key's vocabulary, a rule with no way forward, and a rule bound to a node the corpus does not hold.
+THE CONFORMANCE SWEEP IS THIS ROW'S EXIT SCRIPT, and it is the engine's rather than the agent's. It reads every node under `project/spec` and reports four kinds:
+
+- a node that will not parse
+- a value outside its key's vocabulary
+- a rule with no way forward
+- a rule bound to a node the corpus does not hold
 
 THE CHECKED BOXES ARE THE JUDGMENT AND THE SWEEP IS THE ARITHMETIC. A person decides whether a document still teaches the current behaviour. Nobody has to decide whether a frontmatter word is in its own list, so nobody is asked.
 
