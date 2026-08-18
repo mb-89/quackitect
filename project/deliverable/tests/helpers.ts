@@ -339,11 +339,11 @@ export async function creditReading(
   //
   // READING A DOCUMENT CREDITS IT, which the engine's own remedy says: "Reading
   // through se_file_read credits too."
-  // EACH READ PAYS ITS OWN TOLL. The narration toll refuses the next lane call
-  // once twenty have passed without an update, and crediting the reading is
-  // fifteen calls in a row. Without this the toll fires on whatever the test
-  // does NEXT — which cost a case that then reported `arrived: undefined` and
-  // looked like a routing defect.
+  // EACH READ STILL PAYS ITS OWN TOLL, and these are se_file_read calls rather
+  // than pull hops. The pull's READING LOOP is exempt now (owner ruling
+  // 2026-08-18) because the machine forces those hops and no judgment happens
+  // on them. A direct read is a choice, so it pays like anything else — and
+  // crediting the whole guidance root is fifteen of them in a row.
   const paying = { op: "update", brief: "reading guidance to credit the walk" };
   for (const p of guidanceDocs()) {
     await call(server as never, "se_file_read", { path: p, update: paying });

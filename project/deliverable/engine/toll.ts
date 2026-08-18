@@ -56,6 +56,37 @@ export class Toll {
     return { ms: c.minutes * 60_000, calls: c.calls };
   }
 
+  /** A HOP THE MACHINE FORCED, not a decision the agent made.
+   *
+   *  THE READING LOOP IS MECHANICAL. The pull answers `read`, hands over one
+   *  document, and the only legal next move is to read it and pull back with
+   *  the proof. No judgment happens on that hop, so there is nothing honest to
+   *  narrate — and the toll exists to catch un-narrated JUDGMENT.
+   *
+   *  MEASURED: crediting the reading is about fifteen calls in a row against a
+   *  budget of twenty, so the toll fell due inside the loop and was paid with
+   *  filler. The test helpers had already grown a workaround, attaching a
+   *  dummy update to every read call, with a comment explaining why.
+   *
+   *  OWNER RULING 2026-08-18: "repeated pulls don't need to count down the
+   *  total counter."
+   *
+   *  THE CLOCK STILL RUNS. Only the call counter is spared, because that is
+   *  what a burst of forced hops inflates. An agent genuinely silent for the
+   *  whole window still owes, whatever it was reading.
+   *
+   *  IT CANNOT BE GAMED. A read proof is only accepted while the engine is
+   *  holding a document it chose to serve, so the agent cannot manufacture
+   *  these hops. */
+  private static isReadingHop(tool: string, args: Record<string, unknown>): boolean {
+    if (tool !== "se_pull") return false;
+    const form = args.form as Record<string, unknown> | undefined;
+    if (form === undefined || form.read === undefined) return false;
+    // ONLY a proof. A pull carrying evidence or a choice beside it is doing
+    // real work and pays like anything else.
+    return Object.keys(form).length === 1;
+  }
+
   /** The dispatch guard. Arms itself on the first call after boot. */
   check(booted: boolean, tool: string, args: Record<string, unknown>): void {
     if (!this.armed) {
@@ -66,6 +97,7 @@ export class Toll {
       }
       return;
     }
+    if (Toll.isReadingHop(tool, args)) return;
     this.calls += 1;
     const budget = this.budget();
     if (budget.ms === 0) return; // the control is off — nothing is ever owed

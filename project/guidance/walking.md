@@ -183,6 +183,12 @@ HOW OFTEN IS THE PERSON'S CONTROL, on the mirror's bar. Five notches, both
 clocks running — minutes and calls, whichever falls due first. A low notch is
 them asking to see the work, not a tax to pay with filler.
 
+THE READING LOOP PAYS NOTHING (owner ruling 2026-08-18). A pull carrying only
+a read proof does not spend a call. The machine forced that hop and no
+judgment happened on it, so there is nothing to narrate — and a toll falling
+due mid-loop could only ever be paid with filler. The minutes clock still
+runs, and a pull carrying evidence beside the proof pays like any other work.
+
 ## Notes
 
 - `se_note {text}` captures a stray anywhere; keep walking.

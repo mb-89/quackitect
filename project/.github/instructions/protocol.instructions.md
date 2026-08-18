@@ -6,7 +6,7 @@ applyTo: '**'
 
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
      from project/guidance/contract.md b538e8ccc81e
-     from project/guidance/walking.md b879e4877496
+     from project/guidance/walking.md 7bedbf023cb2
      from project/guidance/method/lane.md 2b433ab77644
      from project/guidance/voice.md 0b6faf79ff32
 -->
@@ -430,6 +430,12 @@ the rhythm; the log should tell the story without gaps.
 HOW OFTEN IS THE PERSON'S CONTROL, on the mirror's bar. Five notches, both
 clocks running — minutes and calls, whichever falls due first. A low notch is
 them asking to see the work, not a tax to pay with filler.
+
+THE READING LOOP PAYS NOTHING (owner ruling 2026-08-18). A pull carrying only
+a read proof does not spend a call. The machine forced that hop and no
+judgment happened on it, so there is nothing to narrate — and a toll falling
+due mid-loop could only ever be paid with filler. The minutes clock still
+runs, and a pull carrying evidence beside the proof pays like any other work.
 
 ## Notes
 
