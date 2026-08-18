@@ -1257,3 +1257,131 @@ with `count_tokens`, and only then decide about the rest.
 MEASURE BEFORE CONVERTING, because the honest summary of this section is that
 the proposal trades a large occasional cost for a small permanent one, and
 whether that trade wins depends on numbers nobody has yet.
+
+## Part 20 — the three-tier design, and the one rule that decides where it pays
+
+THE OWNER SHARPENED THE PROPOSAL INTO THREE LEVELS: the tool description
+shrinks to a reference, the skill listing stays tiny, the skill body is itself
+short and points at a method file, and the read-proof lands on the method file.
+Nothing loads until it is wanted.
+
+THE DESIGN IS SOUND. What it needs is one rule about where to apply it,
+because applied everywhere it makes things worse in one specific place.
+
+### The rule
+
+**A HOP PAYS WHEN IT MOVES CONTENT FROM ALWAYS-ON TO ON-DEMAND. IT COSTS WHEN
+THE CONTENT WAS ALREADY ON-DEMAND.**
+
+That is the whole thing, and everything below is that rule applied.
+
+### First, what is actually paid, and when
+
+| content | bytes | ~tokens | paid |
+| --- | ---: | ---: | --- |
+| the prompt layer, four files | 43,008 | ~11,300 | **every turn** |
+| `tools/list` | 68,244 | ~18,000 | once, position 0 |
+| — of which the `update` description, 34 identical copies | 30,192 | ~7,900 | once, position 0 |
+| boot's four documents | 36,911 | ~9,700 | once, **already on demand** |
+| the other fourteen guidance documents | ~130,000 | ~34,200 | **only if the walk needs them** |
+
+AND ONE THING THAT CHANGES THE WHOLE QUESTION: with an intact prefix, none of
+this is RESENT at full price. It is paid once at about 1.25x and then read at
+about 0.1x for the rest of the session. So the worry about re-sending is
+already mostly answered by caching — provided nothing breaks the prefix, which
+is Part 18's list.
+
+WHAT REMAINS IS THE OTHER HALF OF THE WORRY, and it is the real one: **sending
+things that are never needed at all.** That is what this design fixes.
+
+### Where the design pays, in order of size
+
+**ONE — THE `update` DESCRIPTION. This is the owner's idea applied exactly.**
+The same 888-byte paragraph rides 34 tools. Replace each copy with a one-line
+pointer and put the full narration rules once, elsewhere. Roughly 30,192 bytes
+become roughly 2,700. **About 7,200 tokens saved at position 0**, no new
+mechanism, no extra hop, and the pointer is the reference the owner described.
+
+**TWO — THE PROMPT LAYER, AND THIS IS THE ONLY EVERY-TURN COST.** 43,008 bytes
+of contract, walking, lane and voice, in the prefix of every single turn. The
+question the design asks is exactly the right one: how much of this binds
+BEFORE the agent knows what it is doing?
+
+Reading contract.md's thirteen rules against that test, they do not all answer
+the same way:
+
+- ALWAYS-TRUE, and they must stay: the lane is the only door; walk the state in
+  your hand; autonomy is the person's dial; finish it before you judge it;
+  disagree and commit; walk, do not ruminate.
+- SITUATIONAL, and they bind only when you are about to do the thing: never
+  open a record unasked; never look at the screen unasked; subagents and
+  research are yours; recite the rules at the front desk.
+
+AND `voice.md` IS THE SINGLE BIGGEST FILE AT 16,034 BYTES — 37% of the every-turn
+cost — and it is about HOW TO WRITE. It binds when prose is being produced,
+which is not every turn.
+
+SO THIS IS WHERE THE SKILLS MECHANISM EARNS ITS KEEP. Content moving from
+always-on to on-demand is the case the rule says pays, and it pays on every
+turn rather than once.
+
+**THREE — THE LONG TOOL DESCRIPTIONS**, and here the design needs one
+amendment.
+
+### The amendment: descriptions become schema notes, not skill references
+
+A TOOL DESCRIPTION HAS TWO JOBS MIXED TOGETHER, and only one of them can move.
+
+- WHAT THE ARGUMENTS ARE AND WHAT A WRONG CALL GETS. This must stay inline.
+
+  If `se_file_read`'s description became "see skill se-file-read", the agent
+  would have to load a skill BEFORE calling a verb it needs right now, and it
+  could not even know what to pass. That is a hop in front of every unfamiliar
+  verb, and it is the case the rule says COSTS.
+
+- THE METHODOLOGY PROSE. `se_pull` spends 2,425 bytes teaching the whole loop —
+  the five answers, the submit flag, the bless thumb. That is guidance wearing
+  a schema's clothes, it is already taught in the prompt layer, and it moves.
+
+SO THE CUT IS BY KIND, NOT BY LENGTH. Keep the schema note; move the teaching.
+
+### And the amendment to the skill body
+
+THE OWNER PROPOSED A SKILL BODY THAT IS ITSELF A POINTER — "do what is in the
+method file" — with the proof on the method file. That is right for content
+coming OUT of the prompt layer, because there the hop buys an always-on cost
+removed.
+
+IT IS WRONG FOR THE METHOD FILES THE PULL ALREADY SERVES. Those are already
+on-demand: `front-desk.md` reaches the agent only when the walk arrives at the
+desk. Wrapping it in a skill that points back at it adds a listing entry, a
+skill body and a tool call, and removes nothing. That is the rule's second half
+firing.
+
+SO THE HONEST SHAPE IS SMALLER THAN THE PROPOSAL: skills are the door for the
+ALWAYS-ON half. The on-demand half already has a door, and it is the pull.
+
+### What the whole thing is worth, estimated
+
+| change | saves | where |
+| --- | ---: | --- |
+| `update` description to a pointer | ~7,200 tokens | position 0, once |
+| four long descriptions to schema notes | ~1,050 tokens | position 0, once |
+| the situational half of the prompt layer to skills | ~5,000 tokens | **every turn's prefix** |
+
+ESTIMATES, AT 3.8 BYTES PER TOKEN. Nothing here is worth building before
+`count_tokens` has replaced these numbers with measured ones — that remains
+step one.
+
+### The order to do it in
+
+1. THE `update` POINTER. Biggest, cheapest, no new mechanism, no hop.
+2. THE DESCRIPTION SPLIT by kind — schema note stays, teaching moves.
+3. THE PROMPT LAYER TRIAGE — rule by rule, file by file, marking each
+   always-true or situational. This is judgment work and it is the owner's, not
+   an agent's: getting it wrong means a rule that should bind does not.
+4. ONLY THEN the skills mechanism, on the situational half, one document first.
+
+STEPS 1 AND 2 NEED NO SKILLS AT ALL and are most of the position-zero win. Step
+4 is the one that pays every turn, and it is also the one that can weaken a
+rule by making it optional. That is why it goes last.
