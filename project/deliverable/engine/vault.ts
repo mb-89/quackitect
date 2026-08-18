@@ -19,7 +19,9 @@ import { readFile } from "node:fs/promises";
 import { availableParallelism } from "node:os";
 import { basename, dirname, join, relative, sep } from "node:path";
 import parcelWatcher from "@parcel/watcher";
-import { type Ctx, DATEISH, evaluate, isTruthy, parseExpr, toDate } from "./expr.ts";
+import { type Ctx, evaluate } from "./expr.ts";
+import { parseExpr } from "./expr-parse.ts";
+import { DATEISH, isTruthy, toDate } from "./expr-value.ts";
 import { parseStateNote } from "./notes.ts";
 import { emitModelMutations } from "./signals.ts";
 

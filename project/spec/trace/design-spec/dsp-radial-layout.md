@@ -7,6 +7,7 @@ realizes:
   - "el-mirror"
 files:
   - "project/deliverable/engine/trace.ts"
+  - "project/deliverable/engine/trace-layout.ts"
 ---
 
 ## Responsibility

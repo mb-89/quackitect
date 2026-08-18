@@ -1,4 +1,5 @@
-import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileReplace, fileWrite, type PatchOp } from "./files.ts";
+import { fileDelete, fileGlob, fileList, fileRead, fileReplace, fileWrite, type PatchOp } from "./files.ts";
+import { filePatch } from "./files-patch.ts";
 import { fileMove } from "./move.ts";
 import { search } from "./search.ts";
 import { emitModelMutations } from "./signals.ts";

@@ -12,7 +12,6 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import {
   demandsFor,
-  generateIterations,
   type Iteration,
   iterationDrift,
   itPinRel,
@@ -22,6 +21,7 @@ import {
   pinIteration,
   repinColumn,
 } from "../engine/iterations.ts";
+import { generateIterations } from "../engine/iterations-draw.ts";
 import { claimFeeders, downstreamCone, type MachineDecl } from "../engine/machine.ts";
 import { doorStats } from "../engine/notes.ts";
 import { type ChangeColumn, compileColumn, readRigorMatrix } from "../engine/rigor-matrix.ts";

@@ -3,7 +3,8 @@
 // touches no global.
 import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
-import { duplicateIds, layoutTrace, refsIn, shortLabel, TRACE_LEVELS, type TraceNode, traceRings, traceSvg } from "../engine/trace.ts";
+import { duplicateIds, refsIn, TRACE_LEVELS, type TraceNode, traceRings } from "../engine/trace.ts";
+import { layoutTrace, shortLabel, traceSvg } from "../engine/trace-layout.ts";
 
 function prop(id: string): TraceNode {
   return { id, type: "value-prop", statement: `${id} statement`, refines: [] };

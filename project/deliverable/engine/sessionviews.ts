@@ -8,7 +8,7 @@
 // see dsp-walk-machine.md#a-static-sub-machine-is-a-drawing
 import type { CanvasData } from "./canvas.ts";
 import { type GeneratedMachine, generateContinueExpedition, generateExpeditionArchive } from "./expmachine.ts";
-import { generateIterationArchive, generateIterations, pinnedCanvas } from "./iterations.ts";
+import { generateIterationArchive, generateIterations, pinnedCanvas } from "./iterations-draw.ts";
 import type { MachineDecl, MachineInstance } from "./machine.ts";
 import { compileMachineCached, resolveRef } from "./machines/compile.ts";
 import { mainMachinePath, type SubRun } from "./session.ts";

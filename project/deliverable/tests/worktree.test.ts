@@ -175,7 +175,8 @@ describe("worktree", { concurrency: true }, () => {
     s.expeditionOpen(minted.created);
     assert.equal(s.workRoot(), root, "one tree, bound or not");
 
-    const { fileDelete, filePatch, fileReplace, fileWrite } = await import("../engine/files.ts");
+    const { fileDelete, fileReplace, fileWrite } = await import("../engine/files.ts");
+    const { filePatch } = await import("../engine/files-patch.ts");
     const rule = "project/guidance/fanout-probe.md";
     // READ BACK FROM THE ROOT, never against a literal. The linter's safe
     // fixes run on the way in, so the only honest assertion is on what the

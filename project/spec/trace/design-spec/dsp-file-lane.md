@@ -7,6 +7,7 @@ realizes:
   - "el-walk-engine"
 files:
   - "project/deliverable/engine/files.ts"
+  - "project/deliverable/engine/files-patch.ts"
   - "project/deliverable/engine/signals.ts"
   - "project/deliverable/engine/paths.ts"
   - "project/deliverable/engine/resolve.ts"
@@ -163,3 +164,17 @@ A GIT FAILURE AT A REF, TYPED.
  A SHALLOW CLONE IS THE ORDINARY CAUSE. A cloud box clones one branch, so
  `main` and `v2` do not exist locally, and a fetch alone does not create
  them — the remedy below is the pair that does, measured on that run.
+
+## A patch names where it goes
+
+A WRITE DOES NOT HAVE TO RESEND THE FILE. A patch carries the ops instead:
+each names a place — by regex, by an edge it sits against, by a line range, or
+by the exact text it expects to find — and what to put there.
+
+EVERY OP IS GUARDED BEFORE ANY OF THEM APPLIES, and they apply against a
+staged copy. A patch that would half-land lands not at all, so a file is never
+left in the state between two ops.
+
+WHY IT IS ITS OWN FILE. Reading, writing and deleting need a path and its
+content. Placing an edit inside content needs none of that — it needs the ops
+and the text. The seam is where the second stops needing the first.

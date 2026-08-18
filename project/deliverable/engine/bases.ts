@@ -21,7 +21,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { isAbsolute, resolve } from "node:path";
 import { parse, stringify } from "yaml";
 import { CLAUSES, Rejection } from "./errors.ts";
-import { type Node, parseExpr } from "./expr.ts";
+import { type Node, parseExpr } from "./expr-parse.ts";
 import { vaultDir } from "./tables.ts";
 
 const SRC = "engine/bases.ts";

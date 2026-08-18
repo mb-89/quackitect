@@ -8,6 +8,7 @@ realizes:
   - "if-front-desk-to-record-store"
 files:
   - "project/deliverable/engine/iterations.ts"
+  - "project/deliverable/engine/iterations-draw.ts"
   - "project/deliverable/engine/worktree.ts"
   - "project/deliverable/engine/seed.ts"
 ---
@@ -411,3 +412,18 @@ CLOSE THE SHIPPED ITERATION — fired by the walk itself as it leaves
  judgment and no report guard. Trunk strays settle, leftovers commit,
  the branch merges, the record dir retires to its branch, the worktree
  goes — the iteration archive lists it from then on.
+
+## A generated machine is drawn from the record
+
+A RECORD IS A DOCUMENT AND THE WALK NEEDS A MACHINE, so one is generated from
+the other: the seeded steps become states, the pin becomes their order, and
+the whole thing gets a canvas laid out by dependency depth.
+
+READING A RECORD AND DRAWING ONE ARE DIFFERENT JOBS. The reading half answers
+what the record says; the drawing half takes records already read and answers
+with a machine and its canvas. Nothing in the drawing half is asked for while
+a record is being read, which is why the dependency runs one way.
+
+THE BROWSABLE LISTS ARE DRAWINGS TOO — the iteration list, the archive decades
+— generated the same way from the same records, which is why they live beside
+the walk's own machine rather than beside the reading.

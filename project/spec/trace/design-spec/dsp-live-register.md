@@ -12,6 +12,8 @@ files:
   - "project/deliverable/engine/tables.ts"
   - "project/deliverable/engine/vault.ts"
   - "project/deliverable/engine/expr.ts"
+  - "project/deliverable/engine/expr-parse.ts"
+  - "project/deliverable/engine/expr-value.ts"
   - "project/deliverable/engine/bin/format-vault.ts"
   - "project/deliverable/engine/signals.ts"
 ---
@@ -79,3 +81,21 @@ THE ONE ENTRY, so a large vault never blocks the process that draws. The
  RENDER, and a repaint arriving a few milliseconds late costs nobody
  anything. A claim's green cannot tolerate the same gap, which is why
  engine/notes.ts stats instead. Different guarantee, different mechanism.
+
+## The expression language is three things
+
+A QUERY IS TEXT AND THE ANSWER IS A VALUE, and between them sit three jobs
+that share nothing but the tree they hand along:
+
+- LEXING AND PARSING turns source into a syntax tree. It knows the operators
+  and the precedence and nothing at all about what a value means.
+- THE VALUES are what the language can hold: a duration, a link, a date, a
+  number, text. What a thing IS, when two are equal, how they order, how each
+  reads back. The evaluator leans on all of it and none of it leans back.
+- EVALUATION walks the tree against a context and calls the registered
+  globals and methods.
+
+WHY THE SPLIT IS SAFE. The dependency runs one way at every step — parse
+knows nothing of values, values know nothing of evaluation — so nothing here
+needs a cycle to work, and a file that imports the wrong half will not
+compile.

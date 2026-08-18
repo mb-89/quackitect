@@ -10,7 +10,8 @@
 import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
 import { Rejection } from "../engine/errors.ts";
-import { type Ctx, type Duration, evalExpr, Link, parseDuration, passes, registerGlobal, toText, typeOf } from "../engine/expr.ts";
+import { type Ctx, evalExpr, passes, registerGlobal } from "../engine/expr.ts";
+import { type Duration, Link, parseDuration, toText, typeOf } from "../engine/expr-value.ts";
 
 const row = (over: Record<string, unknown> = {}): Ctx["row"] => ({
   status: "open",

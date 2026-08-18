@@ -18,7 +18,8 @@
 // describe a function the evaluator would refuse.
 import { join } from "node:path";
 import { baseSource, LAYOUTS } from "./bases.ts";
-import { GLOBALS, METHODS, type TypeName, typeOf } from "./expr.ts";
+import { GLOBALS, METHODS } from "./expr.ts";
+import { type TypeName, typeOf } from "./expr-value.ts";
 import { type BaseSpec, type BaseView, listBases, loadBase, type Row, renderView, selectRows, unreadableRows, vaultDir } from "./tables.ts";
 import { warmRows, warmVault } from "./vault.ts";
 

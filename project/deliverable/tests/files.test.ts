@@ -10,7 +10,6 @@ import {
   fileDelete,
   fileGlob,
   fileList,
-  filePatch,
   fileRead,
   fileReplace,
   fileWrite,
@@ -18,6 +17,7 @@ import {
   IMAGE_BUDGET,
   READ_BUDGET,
 } from "../engine/files.ts";
+import { filePatch } from "../engine/files-patch.ts";
 import { contentHash } from "../engine/hash.ts";
 import { doorStats } from "../engine/notes.ts";
 import { runToCompletion } from "../engine/run.ts";
