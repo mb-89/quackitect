@@ -1,8 +1,4 @@
-// Expeditions — ad hoc work as git worktrees (the context-manager model):
-// entering creates a worktree on its own branch, continuing binds the lane
-// to it, and the CLOSE IS THE RULING (owner 2026-07-27): apply merges the
-// changes to trunk, dismiss archives the branch unmerged. The worktree IS
-// the record; the archive is git history (exp/* branches).
+// Expeditions: the record is a folder on trunk. see dsp-record-lifecycle.md#the-close-is-the-ruling
 
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -20,23 +16,7 @@ function yamlScalar(s: string): string {
 
 const SRC = "engine/worktree.ts";
 
-// A DISPOSITION IS AGREED, NOT ASSERTED, and these are the register statuses
-// that count as agreed (i11, 2026-08-16). Everything else still HOLDS the close.
-//
-// THE RULE FOR TELLING THEM APART: has somebody ruled on this entry, or is it
-// still waiting for one? `open` and `probed` are waiting — an assumption that
-// has been probed is still live, because the probe told you something rather
-// than disposing of it.
-//
-// `accepted` AND `deferred` LOOK WRONG HERE AND ARE NOT. They are exactly
-// where a carried finding drifts, and both are real rulings: accepted means
-// somebody chose to live with it, deferred means somebody chose to move it.
-// Treating either as unresolved would make the close refuse work already ruled
-// on, which is what teaches people to stop using the bucket.
-//
-// raid-asm-an-entry-status-says-whether-it-is-open ASKED THIS AND COULD NOT
-// ANSWER IT, because there was no close-side reader to compare against. This is
-// that reader, so the ruling lands with it.
+// The register statuses that count as agreed. see dsp-record-lifecycle.md#a-disposition-is-agreed-never-asserted
 const DISPOSED: ReadonlySet<string> = new Set(["closed", "superseded", "mitigated", "decided", "accepted", "deferred"]);
 
 /** THE OWED ITEMS STILL STANDING IN A RECORD (req-close-refuses-loose-ends).
@@ -131,14 +111,7 @@ export function frontmatterOf(raw: string, where: string): Record<string, unknow
   }
 }
 
-/** THE RECORD'S FRONTMATTER, from the one tree (owner ruling 2026-08-16).
- *
- *  IT USED TO COME FROM THREE PLACES: the worktree while open, a merged copy
- *  on trunk, and failing both, `git show <branch>:<rel>`. Which one answered
- *  depended on what happened to exist, and that is the retrieval path i34
- *  deletes.
- *
- *  Undefined for pre-record expeditions (e1–e3). */
+/** Undefined for pre-record expeditions. see dsp-record-lifecycle.md#the-close-is-the-ruling */
 export function readRecord(root: string, e: Expedition): Record<string, unknown> | undefined {
   const rel = recordRel(e.id);
   {
@@ -148,13 +121,7 @@ export function readRecord(root: string, e: Expedition): Record<string, unknown>
   }
 }
 
-// THE BRANCH READ IS GONE (i34). A closed expedition's record used to live on
-// its branch — "history is git's, the tree carries only live work", the ruling
-// of 2026-07-28 — so this fell back to `git show <branch>:<rel>` and cached
-// the result, because a closed branch never moves.
-//
-// THE ARCHIVE LIVES ON DISK NOW, so the folder is still there and there is
-// nothing to retrieve.
+// see dsp-record-lifecycle.md#the-close-is-the-ruling
 
 // THE BRANCH LISTING IS GONE, AND WITH IT ITS CACHE (i6).
 //
@@ -196,13 +163,7 @@ export function readRecord(root: string, e: Expedition): Record<string, unknown>
  *  is cached at all. */
 const EXP_LIST = new Map<string, { epoch: number; value: Expedition[] }>();
 
-/** EVERY EXPEDITION IS A FOLDER ON TRUNK, and OPEN comes from its own status
- *  — the same shape iterations took at i34 (owner ruling 2026-08-16: "do the
- *  same for expeditions").
- *
- *  BEFORE THIS the list came from `exp/*` branches and open meant "a worktree
- *  directory exists". Both halves asked the filesystem a question the record
- *  already answers. */
+/** see dsp-record-lifecycle.md#the-close-is-the-ruling */
 export function expList(root: string): Expedition[] {
   const era = passEpoch();
   const seen = EXP_LIST.get(root);
@@ -300,26 +261,7 @@ export function expFind(root: string, id: string): Expedition {
   return e;
 }
 
-/** A DIRTY TRUNK IS SETTLED FIRST (found live 2026-07-28, closing e18).
- *  git merge refuses to overwrite uncommitted local changes, so the merge
- *  below failed — and the abort that follows it failed too, because no merge
- *  had started. The record was already stamped closed by then, leaving an
- *  expedition marked shut, unmerged, with its worktree still standing.
- *
- *  The close COMMITS the root's strays rather than refusing (owner ruling
- *  2026-07-28). It already does exactly this on the other side of the merge,
- *  on the principle that a walk's work never silently vanishes; the root
- *  deserves the same. Not a stash: a stash pop can conflict AFTER the merge
- *  has started, which strands uncommitted work halfway through a close.
- *
- *  TRACKED changes only, via commit -a. Untracked files are left alone, so
- *  .worktrees and every scratch file stay out of it. An untracked file the
- *  incoming branch also creates still fails the merge below, which aborts
- *  cleanly and says so.
- *
- *  Keeping trunk clean is also what keeps the READ-PROOF honest: a worktree
- *  branches from the last commit, so a dirty trunk is exactly when the tree
- *  the lane serves and the tree the proof hashes drift apart. */
+/** see dsp-record-lifecycle.md#a-dirty-trunk-is-settled-first */
 function settleTrunk(root: string, expeditionId: string): string[] {
   const strays = git(root, ["status", "--porcelain", "--untracked-files=no"], "status")
     .split("\n")

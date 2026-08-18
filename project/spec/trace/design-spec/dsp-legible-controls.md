@@ -95,3 +95,38 @@ the rendering by probe, and what remains of it is either the POST or
 THE AGENT HALF of req-a-refused-act-says-why-and-what-next. An agent's reason
 arrives on a typed refusal, which the lane already builds and which is not
 params.ts.
+
+## The autonomy dial
+
+THE DIAL SAYS WHICH STATES THE AGENT MAY ENTER BY ITSELF: only those weighing
+no more than it. `blocked` hands every step to the person; `ideation` is
+fully autonomous.
+
+CONTENT WORK INSIDE A STATE IS NEVER GATED. Only ENTERING is.
+
+IT IS LIVE-ADJUSTABLE, and it starts at tactical — resolved BY NAME from the
+scale rather than written as a value anywhere. The rung arrives as a word from
+every launch path.
+
+## Emergency lifts the tool gate
+
+THE GATE EXISTS so a state holds the tools its work needs and no more. That is
+right while the machine is sound, and exactly wrong in two cases:
+
+- REPAIR. When the engine is broken, the gate stands between you and the fix.
+  The guard becomes the fault.
+- BUILDING THE LANE WHILE WALKING IT. The first product iteration writes the
+  machinery it is walking through, in states whose tool lists were authored
+  before that machinery existed.
+
+IT ARMS ONLY FROM THE TOP RUNG and drops the moment the rung does. That is the
+whole safety story: emergency cannot outlive the delegation it was granted
+under, and lowering the autonomy is the same gesture as revoking it.
+
+IT IS NOT ADVERTISED. It rides the packet only when it is ON, so nothing about
+the resting state hints that it exists.
+
+IT PERSISTS WITH ITS RUNG, reversing an earlier no-persist law. Engine reloads
+are routine mid-session, and each one silently revoked the very delegation the
+fixes were granted under. It restores only beside a persisted top-rung
+autonomy, and lowering the dial still revokes it — in this life and the next.

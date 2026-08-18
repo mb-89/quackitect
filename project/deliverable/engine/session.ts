@@ -122,21 +122,7 @@ import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
 import { corpusVersion, loadTrace, noteOf, traceDir } from "./trace.ts";
 import { type Expedition, expClose, expFind, expList, expNew, itCloseShipped, readRecord } from "./worktree.ts";
 
-/** THE PULL is the machinery — one verb, legal in EVERY state: the agent
- *  says pull and the machine says what to do. se_note is legal everywhere
- *  too: a stray is captured where it strikes, never chased (contract rule
- *  4). se_note_drain joins them by the same logic: an inbox you may only add
- *  to is not an inbox.
- *
- *  se_aim joins them because AIMING IS NOT WORK (owner ruling 2026-08-07).
- *  The engine is born aimed at front_desk by a field initializer, and the
- *  mirror has had a setter since 2026-08-04 — so the capability existed and
- *  simply was not reachable from the lane. An agent that cannot aim can only
- *  take the next offered door, which means it wanders one hop at a time and
- *  no route is ever drawn. That is not a walk; it is guessing with extra
- *  steps. */
-/** One old→new patch against a submitted form's field. `all` replaces every
- *  occurrence; without it an ambiguous match refuses rather than guessing. */
+/** Legal in every state. see dsp-lane-door.md#always-legal-whatever-the-state */
 export interface AmendOp {
   field: string;
   old_string: string;
@@ -172,16 +158,7 @@ const ALWAYS_LEGAL: ReadonlySet<string> = new Set([
   "se_amend",
   "se_why",
 ]);
-/** RESTRICTED tools: "all" does NOT grant these — a state must name them.
- *  Nothing is restricted today.
- *
- *  se_note_drain used to be, so that only the desk and the retro could take
- *  anything OUT of the inbox. The owner struck that (2026-08-01): an obsolete
- *  note is deleted where it is found, and does not wait for a ceremony.
- *
- *  The half that mattered was never here anyway. carried and backlog decide
- *  what work MEANS and when it returns, and engine/inbox.ts still refuses
- *  those outside the retro. done and obsolete are checks anyone can run. */
+/** Nothing is restricted today. see dsp-lane-door.md#nothing-is-restricted-today */
 const RESTRICTED: ReadonlySet<string> = new Set<string>();
 const MACHINERY: readonly string[] = ["se_pull", "se_file_read"];
 
@@ -333,16 +310,7 @@ export class Session {
   private bound?: Expedition;
   /** Evidence store: "<machine>/<state>" → what was submitted. */
   private readonly evidence = new Map<string, Record<string, unknown>>();
-  /** THE AUTONOMY (renamed from "threshold", owner ruling 2026-07-27) —
-   *  which states the AGENT may enter by itself: only those weighing no more
-   *  than the dial. `blocked` hands every step to the person; `ideation` is
-   *  fully autonomous. Content work inside a state is never gated — only
-   *  ENTERING is. Live-adjustable (the mirror's rungs).
-   *
-   *  IT STARTS AT TACTICAL, RESOLVED BY NAME from machines/scale.md rather
-   *  than written here as a value (owner ruling 2026-08-18). The constructor
-   *  sets it, because the scale is read from the root and there is no root
-   *  yet at field-initialiser time. */
+  /** Which states the agent may enter alone. see dsp-legible-controls.md#the-autonomy-dial */
   private _autonomy = 0;
   /** THE TARGET — where the walk is headed, and the blue line the mirror
    *  draws. Every engine start aims at the front desk (owner ruling
@@ -385,17 +353,7 @@ export class Session {
     // scale is read from the root, and there is no root at initialiser time.
     // restoreSettings below may overwrite it with what the person last set.
     this._autonomy = defaultAutonomy(root);
-    // SETTINGS SURVIVE THE ENGINE, NOT THE SESSION (owner rulings 2026-07-28).
-    // The mirror's sliders restore across a RELOAD like the decision graph —
-    // ONE store, restored wholesale, ready for settings still to come. But a
-    // session that ended and started again is a NEW session, and takes the
-    // defaults.
-    //
-    // The shim's life is the session, so it stamps each child with a token.
-    // Matching it is what tells the two apart, and it fails safe: an absent
-    // or unfamiliar stamp simply does not restore. There is no cleanup step
-    // to forget, so a crash or a power cut cannot leave the last session's
-    // sliders standing either.
+    // see dsp-boot-and-power.md#what-survives-a-reload-and-what-does-not
     this.restoreSettings();
     this.syncKeepAwake();
     this.armIdleTimer();
@@ -442,36 +400,7 @@ export class Session {
     }
   }
 
-  /** THE READING CREDIT SURVIVES AN ENGINE RELOAD (owner ruling 2026-08-13).
-   *  The agent read the words. Replacing the process did not unread them.
-   *
-   *  TWO CONDITIONS, AND THE SECOND IS THE ONE THAT WAS MISSING. The session
-   *  stamp says this is the same session, so a compaction still re-owes the
-   *  whole reading. The PROCESS ID says the engine actually restarted —
-   *  without it a second Session built inside one process would inherit a
-   *  credit it never earned, which is what reads.test.ts exists to forbid.
-   *
-   *  Freshness is decided nowhere near here. Every entry is re-checked against
-   *  disk wherever it is used, so a document whose words moved is owed again
-   *  by construction rather than by a second mechanism that could disagree. */
-  /** THE TARGET SURVIVES AN ENGINE RELOAD (owner ruling 2026-08-15): "the point
-   *  of boot is to boot the agent, not the machine".
-   *
-   *  IT DOES NOT CONTRADICT THE DESK RULE. Every engine START still aims at the
-   *  front desk (2026-07-29), because a start has no matching session stamp to
-   *  restore from. Only a RELOAD restores, on the same two conditions the
-   *  reading credit uses: the stamp says this is the same session, and the
-   *  process id says the engine actually restarted.
-   *
-   *  THE POSITION IS STILL NOT REMEMBERED, and req-reload-restarts-clean is
-   *  right to forbid it. Evidence gives the position, the target gives the
-   *  direction, and the recompute walks back on its own. Before this, a reload
-   *  mid-record landed at the desk with nothing aimed, so the agent paid an
-   *  aim and a sweep to stand where it already stood.
-   *
-   *  AN UNREACHABLE RESTORED TARGET IS SAFE. The route simply cannot be drawn
-   *  and the pull answers wait, which is the same answer a stale aim has always
-   *  produced. */
+  /** see dsp-boot-and-power.md#the-target-survives-a-reload-the-position-does-not */
   private restoreTarget(target: string | undefined, pid: number | undefined): void {
     if (pid === undefined || pid === process.pid) return;
     // AN EMPTY TARGET IS A DELIBERATE CLEAR, NOT A MISSING ONE. `aimAt("")` is
@@ -494,6 +423,7 @@ export class Session {
     this.persistSettings();
   }
 
+  /** see dsp-boot-and-power.md#the-reading-credit-survives-a-reload */
   private restoreReadCredit(reads: Record<string, string> | undefined, pid: number | undefined): void {
     if (pid === undefined || pid === process.pid) return;
     for (const [p, h] of Object.entries(reads ?? {})) {
@@ -806,33 +736,7 @@ export class Session {
     });
   }
 
-  /**
-   * EMERGENCY — the tool gate lifted, everywhere.
-   *
-   * The gate exists so a state holds the tools its work needs and no more.
-   * That is right while the machine is sound, and exactly wrong in the two
-   * cases this is for:
-   *
-   * - REPAIR. When the engine is broken, the gate stands between you and the
-   *   fix. The guard becomes the fault.
-   * - BUILDING THE LANE WHILE WALKING IT. The first product iteration writes
-   *   the machinery it is walking through, in states whose tool lists were
-   *   authored before that machinery existed.
-   *
-   * IT ARMS ONLY FROM THE TOP RUNG, and it drops the moment the rung does.
-   * That is the whole safety story: emergency cannot outlive the delegation
-   * it was granted under, and the person lowering the autonomy is the same
-   * gesture as revoking it.
-   *
-   * IT IS NOT ADVERTISED. It rides the packet only when it is ON, so nothing
-   * about the resting state hints that it exists.
-   *
-   * IT PERSISTS WITH ITS RUNG (owner ruling 2026-08-04, reversing the
-   * earlier no-persist law): engine reloads are routine mid-session, and
-   * each one silently revoked the very delegation the fixes were granted
-   * under. It restores only beside a persisted TOP-RUNG autonomy, and
-   * lowering the dial still revokes it — in this life and the next.
-   */
+  /** The tool gate lifted, everywhere. see dsp-legible-controls.md#emergency-lifts-the-tool-gate */
   private _emergency = false;
 
   get emergency(): boolean {
@@ -1160,19 +1064,7 @@ export class Session {
     return [{ id: "trunk", label: "trunk", path: this.machineRoot() }];
   }
 
-  /** Where the lane resolves ONE path (owner ruling 2026-07-28).
-   *
-   *  `.se/` is SESSION state, never branch content. The handover, the notes
-   *  and the call log belong to the project root, and the NEXT session reads
-   *  them there whatever branch this one happened to stand on. Resolving them
-   *  into a worktree wrote them where nobody would ever look — silently.
-   *
-   *  EVERYTHING ELSE RESOLVES TO THE ONE WORKING ROOT. It used to follow the
-   *  walk into the bound record's worktree; i34 deleted the worktrees, so the
-   *  classification below still runs and every branch of it now lands in the
-   *  same tree. The classification is kept because it still separates session
-   *  state and shared method from a record's own content, and those are
-   *  different things whatever the tree count. */
+  /** Where the lane resolves one path. see dsp-resolution-seam.md#session-state-is-never-branch-content */
   laneRoot(rel?: string): string {
     if (rel === undefined) return this.workRoot();
     // RESOLVED BY WHAT THE PATH IS, never by where the walk stands (owner
@@ -1183,15 +1075,7 @@ export class Session {
     // never make the owner's roots read as undeclared (found live 2026-07-30).
     const kind = pathKind(rel);
     if (kind === "session") return this.machineRoot();
-    // SHARED METHOD BELONGS TO THE MACHINE, never to a branch. resolve.ts says
-    // the same thing in storeFor: the core owns session state and shared
-    // method, so both resolve to the machine root whatever tree is bound.
-    //
-    // Before this, a method write from inside a record landed in the record's
-    // own worktree and fanned out over trunk at the merge. That is the
-    // 2026-08-07 accident, and refusing the write was the old answer to it.
-    // Resolving the write is the better one: nothing is refused, and the file
-    // cannot land in a tree that does not own it.
+    // see dsp-resolution-seam.md#shared-method-belongs-to-the-machine
     if (kind === "method") return this.machineRoot();
     // A RECORD'S OWN CONTENT IS IN THE SAME TREE AS EVERYTHING ELSE. This
     // used to ask `recordRoot(rel)` which tree owned the record and fall back

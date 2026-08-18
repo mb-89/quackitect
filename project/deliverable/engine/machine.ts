@@ -266,26 +266,7 @@ export interface StateDecl {
    *  the machinery enters (auto-advanced), end closes the machine (terminal).
    *  Nothing machine-specific belongs in them. */
   kind: "work" | "gate" | "terminal" | "start" | "end" | "join";
-  /** THE BUSBAR (owner ruling 2026-08-06): this state's inputs meet at an
-   *  AND bar. The bar is passed only when EVERY state feeding it is done,
-   *  and the state cannot submit before then.
-   *
-   *  IT IS THE ONLY AND-MECHANISM (owner ruling 2026-08-08). The kernel's
-   *  activation rule, the submit check and the drawing all read THIS field.
-   *  `state_kind: join` is drawing vocabulary the compiler turns into a bar.
-   *  There is no second word and no second place it is enforced.
-   *
-   *  THE BAR IS AUTHORED, NOT INFERRED. It is an element of the state
-   *  machine, drawn by whoever writes the row. The engine never decides
-   *  where one belongs.
-   *
-   *  ITS ABSENCE IS THE OR, and that is the default. A state with several
-   *  inputs and no bar above it moves on the first input that arrives. No
-   *  vocabulary says this — the missing bar already does.
-   *
-   *  NOT A GATE THING. A gate is one state that happens to carry a bar.
-   *  Work states carry them too. The engine used to key the whole rule off
-   *  kind === "gate", which gave every work state an accidental OR. */
+  /** The AND bar over this state's inputs. see dsp-walk-machine.md#the-busbar-is-the-only-and */
   busbar?: boolean;
   /** Diagram grouping, e.g. "boot" — presentation metadata, no run-time meaning. */
   group?: string;
@@ -452,16 +433,7 @@ export type StepOutcome = "filled" | "failed";
  *  reading a bar is reading a promise the engine has to keep. */
 export const INPUT_ROLES = new Set(["normal", "approval"]);
 
-/** THE CLAIM-BEARING FEEDERS of a state, looking THROUGH states that carry no
- *  claim of their own (owner ruling 2026-08-07).
- *
- *  This is the ripple, computed instead of written. Green stops at the first
- *  input that is not green, and a mark on a file is not needed to say so.
- *
- *  TRANSPARENT STATES ARE LOOKED THROUGH, never gated on. `start` and plain
- *  waypoints carry no evidence form, so they can never be green — gating on
- *  them would grey the entire machine. The question is the first input that
- *  COULD be green and is not. */
+/** The claim-bearing feeders. see dsp-walk-machine.md#feeders-are-looked-through-never-gated-on */
 export function claimFeeders(m: MachineDecl, id: string, claimful: Set<string>): string[] {
   const out = new Set<string>();
   const walked = new Set<string>([id]);
@@ -483,27 +455,7 @@ export function claimFeeders(m: MachineDecl, id: string, claimful: Set<string>):
   return [...out];
 }
 
-/** THE RIPPLE NAMES ITS ROOT, NOT ITS FIRST HOP (i6).
- *
- *  A fallen claim usually fell because ITS input fell, and that one because its
- *  own did. The refusal named the first hop, so a reader amended a state that
- *  was merely waiting, watched nothing change, and asked again.
- *
- *  LIVED 2026-08-16: a value outside its vocabulary trapped a walk for ELEVEN
- *  calls, four states later. Three amends were aimed at states that were fine.
- *  se_why found it in two, because se_why already walked the chain and the
- *  refusal did not.
- *
- *  A ROOT IS A FALLEN CLAIM WITH NO FALLEN INPUT OF ITS OWN. That is where work
- *  has to happen; everything between it and here is waiting.
- *
- *  THE PATH COMES BACK WITH IT, root first, so a reader can see how a state
- *  four hops away is the reason this one will not go.
- *
- *  A CYCLE RETURNS NO ROOT. The caller falls back to naming the first hop,
- *  which is still better than silence.
- *
- *  req-a-ripple-names-its-root */
+/** see dsp-walk-machine.md#the-ripple-names-its-root — req-a-ripple-names-its-root */
 export function fallenChain(m: MachineDecl, id: string, done: Set<string>, claimful: Set<string>): { roots: string[]; path: string[] } {
   const fell = (at: string): string[] => claimFeeders(m, at, claimful).filter((f) => !done.has(f));
   // WHICH FALLEN STATE EACH ONE FEEDS, so the path can be read back out.
@@ -616,18 +568,7 @@ export function branchKind(m: MachineDecl, id: string): "and" | "or" {
   if (s === undefined) return "or";
   const legs = s.edges.filter((e) => INPUT_ROLES.has(e.role ?? "normal")).map((e) => e.to);
   if (legs.length < 2) return "or";
-  // Reachable from EVERY leg, and a busbar OVER SEVERAL INPUTS. That is the
-  // join that wants them all, and its existence is what makes the branch an
-  // AND.
-  //
-  // THE INPUT COUNT IS LOAD-BEARING (found 2026-08-08, putting the bar on the
-  // shared end note). Reachability alone says nothing: a machine's END is
-  // downstream of every leg BY CONSTRUCTION, so any bar on it would turn
-  // every branch in every machine into an AND — including idle's doors, where
-  // taking one is a decision and the others are never walked.
-  //
-  // A bar over ONE input synchronises nothing. It is a bar over TWO that says
-  // the legs below it are all required.
+  // see dsp-walk-machine.md#what-makes-a-branch-an-and
   const inbound = (id: string): number =>
     m.states.filter((p) => p.edges.some((e) => e.to === id && INPUT_ROLES.has(e.role ?? "normal"))).length;
   const cones = legs.map((l) => downstreamCone(m, [l]));
@@ -683,22 +624,7 @@ export function reopenStates(
 
   inst.history.push({ state: stateIds.join(","), outcome: "reopened", evidence: reason.slice(0, 300), at: now });
 
-  // TOKENS GO ON THE FRONTIER, NOT ON EVERY REOPENED STATE (owner, 2026-08-13).
-  //
-  // A re-pin reopened eight scattered steps and this line put a token on all
-  // eight. The walk then stood in M0's kickoff gate and M3's requirements at
-  // once — two steps on ONE sequential chain, which no legal marking holds.
-  // The mirror painted eight live states, the pull offered eight, and the
-  // input check refused the later ones on arrival. Enforcement held; the
-  // POSITION was a lie.
-  //
-  // A reopened state below another reopened state is re-reached by walking:
-  // its inbound fuel was just dropped above, so it re-arms and fires again
-  // once its feeders sign. Only the roots need placing by hand.
-  //
-  // A GENUINE FORK KEEPS ITS SEVERAL TOKENS. The frontier of a real AND branch
-  // is several states, none downstream of another, and this filter leaves
-  // every one of them standing.
+  // see dsp-walk-machine.md#tokens-go-on-the-frontier
   const frontier = stateIds.filter((id) => !stateIds.some((other) => other !== id && downstreamCone(m, [other]).has(id)));
   inst.active = [...frontier];
   inst.current = frontier[0];
@@ -781,26 +707,7 @@ function activatePowered(
   };
   for (const s of m.states) {
     if (active.includes(s.id) || activated.includes(s.id)) continue;
-    // Inbound counted: normal and approval edges (alternatives activate
-    // directly above). FAN-IN IS OR (owner ruling 2026-07-28): any fired
-    // inbound activates a plain state — what a person naturally draws.
-    //
-    // THE BUSBAR IS THE ONLY SYNCHRONISER (owner ruling 2026-08-08). It waits
-    // for EVERY inbound edge — the drawn AND of the formalisms: the UML join
-    // bar, the BPMN parallel gateway, the Petri transition.
-    //
-    // IT USED TO READ kind === "join" HERE while the rigor matrix read
-    // `busbar`, so a drawn machine and a compiled one meant one thing in two
-    // words and enforced it in two places. A matrix row's bar was checked at
-    // SUBMIT and never at activation; a drawn join was checked at activation
-    // and had no submit rule. Same idea, two mechanisms, nothing making them
-    // agree.
-    //
-    // `state_kind: join` survives as DRAWING vocabulary: the compiler turns it
-    // into a busbar, and nothing at run time reads it.
-    //
-    // DEDUPED, because two edges from one source to one state are ONE
-    // inbound. Counted twice, a busbar could never reach its own total.
+    // Inbound: normal and approval edges, deduped. see dsp-walk-machine.md#the-busbar-is-the-only-and
     const inbound = [
       ...new Set(
         m.states.flatMap((src) =>
@@ -814,19 +721,7 @@ function activatePowered(
     // one of its inbound edges. This is also what stops the green rule below
     // from re-activating a done join every time anything, anywhere, completes.
     if (fired.length === 0) continue;
-    // A GREEN BRANCH SATISFIES ITS EDGE (owner ruling 2026-08-09). A busbar
-    // waits for every inbound edge. An edge whose source already stands filled
-    // has nothing left to deliver — the work is done, and its fuel was
-    // consumed the last time the join ran.
-    //
-    // WITHOUT THIS A THREE-WAY JOIN IS UNREACHABLE by a single token. Walking
-    // one branch fires one edge; reaching a sibling routes BACK through the
-    // fork, which re-walks the branch and clears the fuel. Measured in
-    // iteration one on 2026-08-09: all three branches walked, gate still shut,
-    // and stepping out to re-enter reset the count to zero.
-    //
-    // rearmJoinsInto solves the same problem for a reopen, by putting fuel
-    // back. This solves it for a plain walk, by not demanding it.
+    // see dsp-walk-machine.md#a-green-branch-satisfies-its-edge
     if (s.busbar === true && inbound.some((k) => !fired.includes(k) && !standsGreen(k.split("->")[0]))) continue;
     inst.fired = inst.fired?.filter((k) => !inbound.includes(k)); // consume
     activated.push(s.id);

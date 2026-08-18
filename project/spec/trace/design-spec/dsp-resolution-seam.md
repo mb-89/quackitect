@@ -73,3 +73,26 @@ is what a rule per tool decays into.
 THE STORE ON THE ANSWER is what [[raid-risk-a-write-lands-in-the-wrong-tree-silently]]
 asks for. That entry is an ISSUE rather than a risk: it happened twice on one
 day, with the paths recorded.
+
+## Session state is never branch content
+
+`.se/` IS SESSION STATE. The handover, the notes and the call log belong to
+the project root, and the NEXT session reads them there whatever branch this
+one happened to stand on. Resolving them into a record's own tree wrote them
+where nobody would ever look, silently.
+
+EVERYTHING ELSE RESOLVES TO THE ONE WORKING ROOT. The classification survives
+the worktrees being deleted because it still separates session state and shared
+method from a record's own content, and those are different things whatever the
+tree count.
+
+## Shared method belongs to the machine
+
+SHARED METHOD BELONGS TO THE MACHINE, never to a branch. The core owns session
+state and shared method, so both resolve to the machine root whatever tree is
+bound.
+
+BEFORE THIS, a method write from inside a record landed in that record's own
+tree and fanned out over trunk at the merge. Refusing the write was the old
+answer. RESOLVING the write is the better one: nothing is refused, and the file
+cannot land in a tree that does not own it.
