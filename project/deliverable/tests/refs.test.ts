@@ -109,7 +109,7 @@ describe("typed references", { concurrency: true }, () => {
   // defect, whichever answer is right.
   test("every trace read goes through the one accessor, so the readers cannot drift", () => {
     // THE SURFACE IS A READER TOO. The trace graph read the project root while
-    // the walk wrote to a worktree, which hid every node the record authored.
+    // the walk wrote elsewhere, which hid every node the record authored.
     // It now reads the CHOSEN corpus — trunk, or an open record — so the rule
     // is that its root comes from the pick, never straight from the session.
     const ui = mirrorSource();

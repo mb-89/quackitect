@@ -35,7 +35,6 @@ const outDir = arg("--out") ?? join(root, "dist");
 // By NAME wherever it appears, the same list the export excludes.
 const EXCLUDE_DIRS = new Set([
   ".git",
-  ".worktrees",
   ".se",
   "node_modules",
   ".claude",

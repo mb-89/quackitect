@@ -1,7 +1,6 @@
-// Iterations — planned work, SEEDED AS A FUNCTION (owner design
-// 2026-07-27; reshaped 2026-08-04): a seed mints the record and its
-// worktree, and the iteration stands VISIBLE in the iterations container
-// from that moment — standing in M0: the retro onboards, the kickoff
+// Iterations — planned work, SEEDED AS A FUNCTION: a seed mints the
+// record's folder, and the iteration stands VISIBLE in the iterations
+// container from that moment — standing in M0: the retro onboards, the kickoff
 // sizes. The kickoff's bless pins the blessed column and the machine
 // grows IN PLACE. The walk is FLAT: milestones are groups on the states,
 // never sub-machines; only seeded chunk machines dive.
@@ -12,9 +11,9 @@ import { dirname, join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import type { EvidenceField } from "./machine.ts";
 import { noteOf } from "./notes.ts";
+import { slug } from "./records.ts";
 import { CHANGE_COLUMNS, type ChangeColumn, compileColumn, readRigorMatrix, rigorMatrixContentHash } from "./rigor-matrix.ts";
 import { dependsOnLines } from "./seed.ts";
-import { slug } from "./worktree.ts";
 
 /** THE PIN'S PLACEHOLDER, verbatim. It is written when an iteration pins a
  *  column and read back when the walk tries to enter the drawing it stands
@@ -61,11 +60,10 @@ export function readItRecord(root: string, it: Iteration): Record<string, unknow
 /** see dsp-record-lifecycle.md#the-statuses-a-record-cannot-be-walked-from */
 export const RECORD_FINISHED: ReadonlySet<string> = new Set(["shipped", "closed"]);
 
-/** EVERY RECORD IS A FOLDER ON TRUNK, and OPEN comes from its own status.
+/** EVERY RECORD IS A FOLDER, and OPEN comes from its own status.
  *
- *  BEFORE THIS the list came from `it/*` branches and open meant "a worktree
- *  directory exists". Both halves were wrong for the same reason: they asked
- *  the filesystem a question the record already answers.
+ *  A LIST READ OFF THE FILESYSTEM ASKS A QUESTION THE RECORD ALREADY
+ *  ANSWERS, and the two can disagree.
  *
  *  THE BRANCH FIELD STAYS on the shape, spelled from the id, because callers
  *  still name it and nothing yet reads it as a place to fetch from. It goes
@@ -88,12 +86,8 @@ export function itList(root: string): Iteration[] {
   return out.sort((a, b) => Number(a.id.match(/^i(\d+)/)?.[1] ?? 0) - Number(b.id.match(/^i(\d+)/)?.[1] ?? 0));
 }
 
-// ADOPTING A PUSHED ITERATION IS GONE (i34). `itAdopt` was the second
-// machine's half of the seed: a peer cloned, got the branch alone, and had to
-// check it out into a worktree before the record could be seen at all.
-//
-// NOTHING IS MISSING ON A CLONE ANY MORE. A record is a folder on trunk, so a
-// clone that has trunk has every record by construction, and there is no half
+// NOTHING IS MISSING ON A CLONE. A record is a folder, so a clone has every
+// record by construction, and there is no half
 // left to bind.
 
 /** THE SEED: goal + rough vision, plus context inputs (an expedition id,
@@ -102,16 +96,14 @@ export function itList(root: string): Iteration[] {
  *
  *  WHAT THE SEED STOPPED DOING AT i34, and why it is all one change:
  *
- *  - NO WORKTREE. There is one tree, so there is nothing to add.
+ *  - NO SECOND CHECKOUT. There is one tree, so there is nothing to add.
  *  - NO BRANCH. The folder IS the record; a branch held nothing else.
  *  - NO PUSH. The seed push existed to announce a stub to a peer that would
  *    claim it, and the claim system is retired.
  *  - NO npm install. That paid for a second tree's node_modules.
  *
- *  THE CHUNK BOUNDARY WAS DRAWN WHERE THE CODE HAS NONE. The plan separated
- *  "records stand on trunk" from "the seed stops making worktrees", and the
- *  first is simply false until the second lands: a list that reads folders
- *  finds nothing while the seed writes into a worktree. Twelve tests said so. */
+ *  A LIST THAT READS FOLDERS AND A SEED THAT WRITES SOMEWHERE ELSE ARE ONE
+ *  CHANGE, never two: the first is simply false until the second lands. */
 export function itSeed(root: string, goal: string, vision: string, inputs: string[] = [], dependsOn: string[] = []): Iteration {
   if (goal.trim() === "" || vision.trim() === "") {
     throw new Rejection({
@@ -268,9 +260,8 @@ export function pinIteration(root: string, it: Iteration, changeSize: string): R
   }
   git(it.path, ["add", "-A"], "add");
   // BOOKKEEPING, NOT AUTHORED WORK: this commit lands a generated file. It
-  // skips the hook because a fresh worktree carries no node_modules, so the
-  // hook's typechecker dies and the pin refuses before the walk has had any
-  // chance to install one.
+  // skips the hook because a checkout without node_modules kills the hook's
+  // typechecker, and the pin would refuse before anybody could install one.
   git(it.path, ["commit", "-q", "--no-verify", "-m", `iteration ${it.id}: pin ${changeSize}`], "commit");
   return {
     pinned: changeSize,

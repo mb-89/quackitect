@@ -782,8 +782,8 @@ export function stateFormModel(
   s: StateDecl,
   header: Record<string, string>,
   instanceRaw?: string,
-  /** Where the RECORD's trace lives — a record owns its nodes in its own
-   *  worktree, so a live item list has to be told, never guessed.
+  /** Where the RECORD's trace lives — a record owns its own nodes, so a live
+   *  item list has to be told, never guessed.
    *
    *  IT DEFAULTS TO `root`, NEVER TO "". An empty root sends every live
    *  source at the process's working directory, which is a guess about who

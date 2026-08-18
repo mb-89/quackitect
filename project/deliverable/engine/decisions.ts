@@ -358,9 +358,8 @@ export class Decisions {
     this.parked.push(...replayFile(this.path).parked);
   }
 
-  /** A second sink while a persistent record is bound (an expedition's
-   *  worktree): the reasoning is part of the record, reviewable after the
-   *  fact, parts per visit. */
+  /** A second sink while a persistent record is bound: the reasoning is part
+   *  of the record, reviewable after the fact, parts per visit. */
   private extraPath?: string;
 
   setExtraSink(path?: string): void {

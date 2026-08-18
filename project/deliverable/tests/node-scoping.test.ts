@@ -1,6 +1,6 @@
 // The mint stamp and the backfill — the mechanical halves of
 // tsp-node-scoping (req-nodes-scoped-to-iteration). A node minted in a
-// bound record's worktree carries minted_in; the backfill stamps the
+// bound record carries minted_in; the backfill stamps the
 // standing corpus. The delta-default view rides these stamps.
 import { strict as assert } from "node:assert";
 import { execFileSync } from "node:child_process";
@@ -14,10 +14,9 @@ import { ModelFileSystem } from "../engine/model-fs.ts";
 const BACKFILL = fileURLToPath(new URL("../engine/bin/backfill-minted.ts", import.meta.url));
 
 describe("the mint stamp", { concurrency: true }, () => {
-  // THE STAMP ASKS THE WALK SINCE i34, not the path. It used to read the
-  // record id out of the write's root, as the `<id>` in `.worktrees/<id>` — a
-  // derivation that stops working the moment there are no worktrees, and would
-  // have stopped stamping silently.
+  // THE STAMP ASKS THE WALK, never the path. A path cannot say which record
+  // is bound, and a derivation that cannot fail loudly stops stamping in
+  // silence.
   test("a trace node written while a record is bound carries minted_in", () => {
     const lab = mkdtempSync(join(tmpdir(), "mint-"));
     mkdirSync(join(lab, "project", "spec", "trace", "requirement"), { recursive: true });

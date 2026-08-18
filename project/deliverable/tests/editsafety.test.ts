@@ -15,9 +15,9 @@ import { generateContinueExpedition } from "../engine/expmachine.ts";
 import { activeStates, completeState, type EdgeDecl, type MachineDecl, type MachineInstance, type StateDecl } from "../engine/machine.ts";
 import { compileMachine } from "../engine/machines/compile.ts";
 import { parseStateNote } from "../engine/notes.ts";
+import { expClose, expNew, readRecord } from "../engine/records.ts";
 import { mainMachinePath, Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { expClose, expNew, readRecord } from "../engine/worktree.ts";
 import { call, checkDocs, freshRoot, pullBoot, sessionAtIdle } from "./helpers.ts";
 
 interface RawEdge {
@@ -296,7 +296,7 @@ test("the close leaves the root tree clean, because it merges nothing", () => {
 // not overwrite uncommitted local changes, so e18's close-merge failed - and
 // the abort after it failed too, because no merge had started. Refusing was
 // the first fix; the owner ruled it too blunt. The close already commits the
-// WORKTREE's leftovers on the principle that a walk's work never silently
+// RECORD's leftovers on the principle that a walk's work never silently
 // AN OVERRIDE IS LOUDER THAN COMPLIANCE (owner ruling 2026-07-29, option 1).
 // The report stamps whose hand finished it, and for two expeditions nothing
 // read that stamp: e20 and e21 were closed on reports the agent wrote and
@@ -310,10 +310,10 @@ test("closing on an unconfirmed report is refused, and the override is recorded"
   g("init");
   g("config", "user.email", "se@test.local");
   g("config", "user.name", "se test");
-  writeFileSync(join(root, ".gitignore"), ".worktrees/\n.se/\n");
+  writeFileSync(join(root, ".gitignore"), ".se/\n");
   g("add", "-A");
   g("commit", "-q", "-m", "base");
-  // ONE TREE SINCE i34: the report stands under the root, like the record.
+  // ONE TREE: the report stands under the root, like the record.
   const report = (e: { path: string; id: string }, by: string): void => {
     mkdirSync(join(root, "project", "spec", "expeditions", e.id), { recursive: true });
     writeFileSync(
@@ -367,7 +367,7 @@ test("a record that will not parse is marked, and the container still stands", (
   g("init");
   g("config", "user.email", "se@test.local");
   g("config", "user.name", "se test");
-  writeFileSync(join(root, ".gitignore"), ".worktrees/\n.se/\n");
+  writeFileSync(join(root, ".gitignore"), ".se/\n");
   g("add", "-A");
   g("commit", "-q", "-m", "base");
   const good = expNew(root, "fix", "a readable one");
@@ -405,10 +405,10 @@ test("the close COMMITS the trunk's strays rather than refusing, and says which"
   g("config", "user.name", "se test");
   g("add", "-A");
   g("commit", "-q", "-m", "base");
-  // The real repo ignores .worktrees/ and .se/. The fixture must too, or the
-  // worktree itself reads as tracked content and its removal shows up as a
-  // change - which is a property of the fixture, never of the close.
-  writeFileSync(join(root, ".gitignore"), ".worktrees/\n.se/\n");
+  // The real repo ignores .se/. The fixture must too, or machine-local state
+  // reads as tracked content and its motion shows up as a change - which is a
+  // property of the fixture, never of the close.
+  writeFileSync(join(root, ".gitignore"), ".se/\n");
   g("add", "-A");
   g("commit", "-q", "-m", "ignore machine-local paths");
   const e = expNew(root, "fix", "dirty trunk probe");
@@ -425,9 +425,9 @@ test("the close COMMITS the trunk's strays rather than refusing, and says which"
   const out = expClose(root, e, true);
   assert.equal(out.merged, true, "the close went through instead of refusing");
   assert.deepEqual(out.trunk_committed, ["README.md"], "and it names the strays it took — never silent");
-  // Trunk stands CLEAN afterwards. That is not tidiness: a worktree branches
-  // from the last commit, so a dirty trunk is exactly when the tree the lane
-  // serves and the tree the read-proof hashes drift apart.
+  // The tree stands CLEAN afterwards. That is not tidiness: a dirty tree is
+  // exactly when what the lane serves and what the read-proof hashes drift
+  // apart.
   const left = spawnSync("git", ["status", "--porcelain", "--untracked-files=no"], {
     cwd: root,
     encoding: "utf8",

@@ -1,7 +1,7 @@
-// A BOUND WORKTREE MUST NOT SWALLOW THE OWNER'S DECLARED ROOTS.
+// A BOUND RECORD MUST NOT SWALLOW THE OWNER'S DECLARED ROOTS.
 //
-// Found live 2026-08-01, and it cost the owner two messages. Inside an
-// expedition's worktree, se_file_read resolved "@ai/..." perfectly while
+// Found live 2026-08-01, and it cost the owner two messages. Inside a bound
+// expedition, se_file_read resolved "@ai/..." perfectly while
 // se_file_glob and se_file_search refused the SAME name with SE-C-127,
 // "none declared" — and handed over a remedy telling the caller to declare a
 // root that was already declared. Following that remedy would have
@@ -10,7 +10,7 @@
 // The cause was not the roots registry. laneRoot() had always routed an
 // "@" address to the project root, where .se/roots.json lives. The two tools
 // simply never SHOWED it the address: they called rootOf() with no argument,
-// so the worktree answered, and a worktree has no .se/roots.json.
+// so the ambient root answered, and it has no .se/roots.json.
 //
 // So there are two things to hold: the routing rule, and the wiring that
 // feeds it. The wiring is the half that broke.
@@ -24,7 +24,7 @@ import { anyGuidanceDoc, freshRoot } from "./helpers.ts";
 
 describe("declared roots", { concurrency: true }, () => {
   // THE ROUTING RULE. An "@" address is session state exactly like .se/, so it
-  // is answered by the PROJECT root however deep in a worktree the walk is.
+  // is answered by the PROJECT root however deep in a record the walk is.
   // A FIXTURE ROOT, NEVER THE REAL ONE: a Session on the real root reads the
   // owner's live settings, and block_sleep=true made every worker here spawn
   // an immortal keepawake — the battery's four-kill wedge of 2026-08-03.
@@ -37,7 +37,7 @@ describe("declared roots", { concurrency: true }, () => {
   });
 
   // ...and the other side of it, so a fix here never quietly redirects
-  // ordinary work out of the worktree it belongs in.
+  // ordinary work out of the root it belongs in.
   test("everything else still answers from the work root", () => {
     const s = new Session(freshRoot());
     assert.equal(s.laneRoot(), s.workRoot(), "no address at all");

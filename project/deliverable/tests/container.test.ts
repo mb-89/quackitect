@@ -1,5 +1,5 @@
-// The generated expeditions container (owner design 2026-07-27):
-// its states ARE the open expeditions; entering one binds its worktree;
+// The generated expeditions container: its states ARE the open
+// expeditions; entering one binds it;
 // one coming home completes the machine; empty runs start → end.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
@@ -32,11 +32,10 @@ function gitSeed(root: string): void {
   g("config", "user.email", "t@t");
 }
 
-// ROOTS ARE SESSION STATE (found live 2026-07-30): the declaration lives in
-// the project root's .se/roots.json, and a bound worktree carries no .se —
-// resolving @refs against the worktree made every declared root read as
-// undeclared the moment an expedition was entered.
-test("a declared root survives a bound worktree", async () => {
+// ROOTS ARE SESSION STATE: the declaration lives in the project root's
+// .se/roots.json, so a @ref resolved against anything else reads as
+// undeclared the moment an expedition is entered.
+test("a declared root survives a bound record", async () => {
   const root = freshRoot();
   gitSeed(root);
   const outside = mkdtempSync(join(tmpdir(), "se-root-"));
@@ -47,7 +46,7 @@ test("a declared root survives a bound worktree", async () => {
   await bootHuman(s);
   const e = s.expeditionNew("spike", "roots survive binding") as { created: string };
   s.expeditionOpen(e.created);
-  assert.equal(s.laneRoot("@out/a.md"), root, "a @ref resolves against the project root, never the worktree");
+  assert.equal(s.laneRoot("@out/a.md"), root, "a @ref resolves against the project root, never the record");
   const { fileRead } = await import("../engine/files.ts");
   assert.ok(fileRead(s.laneRoot("@out/a.md"), "@out/a.md").content.includes("from beyond the fence"));
   rmSync(outside, { recursive: true, force: true });
@@ -192,8 +191,8 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
   // The drawing carries one group per expedition, labeled with its id.
   assert.ok(gen.canvas.nodes?.some((n) => n.type === "group" && n.label === b.created));
 
-  // Walk: enter the container, choose B — the click IS the pick, the
-  // worktree binds on entry.
+  // Walk: enter the container, choose B — the click IS the pick, and the
+  // record binds on entry.
   await s.advance("expeditions");
   await s.advance(sidB);
   assert.deepEqual(s.active(), [`expeditions/${sidB}`]);
@@ -207,9 +206,9 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
   //   cannot land in a tree that does not own it and fan out at the merge.
   //   That danger is real: on 2026-08-07 it deleted two lane verbs.
   //
-  //   SESSION state stays at the project root. The handover used to resolve
-  //   into the worktree, which has no .se — so it was written where the next
-  //   session never looks, and failed silently.
+  //   SESSION state stays at the project root. Resolved anywhere else the
+  //   handover is written where the next session never looks, and fails
+  //   silently.
   //
   //   THE RECORD'S OWN CONTENT rides the branch. That is what binding is for.
   assert.equal(s.laneRoot(anyGuidanceDoc()), root, "shared method belongs to the machine, never to a branch");

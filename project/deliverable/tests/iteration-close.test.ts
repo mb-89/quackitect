@@ -2,12 +2,7 @@
 // last bless the walk leaves through the terminal and the close runs. This
 // pins the mechanics; the walk's trigger rides advanceOutOfSub.
 //
-// WHAT i34 REVERSED, and this case with it. The close used to merge the
-// record's branch to trunk, run `git rm -r` on the record's directory and
-// remove the worktree — under the 2026-07-28 ruling that closed records live
-// in git and the tree carries only live work.
-//
-// THE ARCHIVE LIVES ON DISK NOW, so the folder stays and there is nothing to
+// THE ARCHIVE LIVES ON DISK, so the folder stays and there is nothing to
 // merge or remove. What the close does is stamp the record.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
@@ -15,7 +10,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { itList, itSeed, readItRecord } from "../engine/iterations.ts";
-import { itCloseShipped } from "../engine/worktree.ts";
+import { itCloseShipped } from "../engine/records.ts";
 import { freshRoot } from "./helpers.ts";
 
 test("closing a shipped iteration stamps the record and leaves its folder standing", () => {

@@ -264,7 +264,7 @@ export function expeditionTools(session: Session): ToolDef[] {
       name: "se_seed_expedition",
       title: "se.seed.expedition",
       description:
-        "Seed an expedition: kind (spike | fix | explore), goal, and depends_on — the ids it WAITS FOR, which is the container's DAG and the only thing stopping two agents being handed the same files. An empty list is legal and states that it waits for nothing; omitting the key refuses, because a silence and a decision must not be the same bytes on disk. The seed mints a record folder on trunk and nothing else (i34): no branch, no worktree, no push. It stands in the expeditions container at once — entering there binds it.",
+        "Seed an expedition: kind (spike | fix | explore), goal, and depends_on — the ids it WAITS FOR, which is the container's DAG and the only thing stopping two agents being handed the same files. An empty list is legal and states that it waits for nothing; omitting the key refuses, because a silence and a decision must not be the same bytes on disk. The seed mints a record folder on trunk and nothing else (i34): no branch and no push. It stands in the expeditions container at once — entering there binds it.",
       inputSchema: {
         type: "object",
         properties: {
@@ -296,7 +296,7 @@ export function expeditionTools(session: Session): ToolDef[] {
       name: "se_seed_iteration",
       title: "se.seed.iteration",
       description:
-        "Seed an iteration: goal, rough vision, input refs, and depends_on — the ids it WAITS FOR, which is the container's DAG and the only thing stopping two agents being handed the same files. An empty list is legal and states that it waits for nothing; omitting the key refuses, because a silence and a decision must not be the same bytes on disk. Naming another open iteration draws the edge dep -> this, so the drawing shows the real shape (independent ones side by side, dependent ones in series) AND the walk refuses to enter this one until that dependency leaves the open set. The seed mints a record folder on trunk and nothing else (i34): no branch, no worktree, no push. It stands in the iterations container in M0 — the retro onboards, the kickoff proposes a size, and the bless pins the rest. No size is asked at the seed.",
+        "Seed an iteration: goal, rough vision, input refs, and depends_on — the ids it WAITS FOR, which is the container's DAG and the only thing stopping two agents being handed the same files. An empty list is legal and states that it waits for nothing; omitting the key refuses, because a silence and a decision must not be the same bytes on disk. Naming another open iteration draws the edge dep -> this, so the drawing shows the real shape (independent ones side by side, dependent ones in series) AND the walk refuses to enter this one until that dependency leaves the open set. The seed mints a record folder on trunk and nothing else (i34): no branch and no push. It stands in the iterations container in M0 — the retro onboards, the kickoff proposes a size, and the bless pins the rest. No size is asked at the seed.",
       inputSchema: {
         type: "object",
         properties: {
@@ -415,10 +415,8 @@ export function coreTools(
   reading?: ReadingHook,
   doors: () => Record<string, unknown>[] = () => [],
   mirror?: () => MirrorState,
-  /** WHICH RECORD IS BOUND, for the minted_in stamp. It used to be scraped
-   *  off the write's root as a `.worktrees/<id>` segment, and i34 removes
-   *  worktrees — so the stamp had to be asked of the walk rather than of a
-   *  path. Defaults to nothing, which stamps nothing, exactly as writing
+  /** WHICH RECORD IS BOUND, for the minted_in stamp. The walk is asked, never
+   *  a path. Defaults to nothing, which stamps nothing, exactly as writing
    *  outside a record always did. */
   boundRecord: () => string | undefined = () => undefined,
   // `whereNow` IS DELETED (i6). It existed for one caller: the battery refusal

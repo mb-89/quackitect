@@ -1,4 +1,4 @@
-// expedition worktrees, escape and pause — the git-heavy cases
+// expedition records, escape and pause — the git-heavy cases
 //
 // SMALL FILES ON PURPOSE (owner ruling, 2026-07-30). A test file is the
 // only unit that reaches a second core, so themes get their own file and
@@ -8,8 +8,8 @@ import { describe, test } from "node:test";
 import { call, freshRoot, pullBoot, pullTo } from "./helpers.ts";
 
 // Concurrent: every case builds its own root and touches no global.
-describe("worktree", { concurrency: true }, () => {
-  test("expeditions: worktree lifecycle — new, bind, work lands in the worktree, close merges", async () => {
+describe("records", { concurrency: true }, () => {
+  test("expeditions: the record lifecycle — new, bind, work lands, close merges", async () => {
     const { Session } = await import("../engine/session.ts");
     const { spawnSync } = await import("node:child_process");
     const { readFileSync, existsSync } = await import("node:fs");
@@ -36,18 +36,14 @@ describe("worktree", { concurrency: true }, () => {
     assert.equal(open1[0].goal, "Try The Thing!");
     assert.equal(open1[0].status, "open");
 
-    // bind: the lane's working root switches to the worktree
+    // bind: the record the session reports changes, and the work root does not
     s.expeditionOpen(minted.created);
-    // ONE TREE SINCE i34. Binding an expedition no longer moves the work root,
-    // and the record it binds is what the session reports.
     assert.equal(s.workRoot(), root, "the work root is the one tree, bound or not");
     assert.equal(s.boundRecordId(), minted.created, "and the expedition is bound");
     const { fileWrite } = await import("../engine/files.ts");
     fileWrite(s.workRoot(), "scratch.md", "expedition work", null);
     assert.ok(existsSync(join(s.workRoot(), "scratch.md")));
-    // THE MAIN TREE IS THE ONLY TREE SINCE i34, so a write made while bound
-    // lands there — which is the point. It used to land in the worktree and
-    // leave the main tree untouched, and that was the seam.
+    // ONE TREE, so a write made while bound lands where every reader looks.
 
     // While bound, decision ops land in the RECORD too (parts per visit).
     s.decisions.apply("continue_expedition/work@0", { op: "update", brief: "working in the record" });
@@ -81,7 +77,7 @@ describe("worktree", { concurrency: true }, () => {
     s.formDone("expedition-leave", "human");
     assert.equal(s.conditionKeyMet(gen.decl, leave, "evidence_form", "enter"), true, "confirmed + done passes the lint");
 
-    // close: leftovers committed, merged back, worktree gone, lane unbound
+    // close: leftovers committed, merged back, lane unbound
     const closed = s.expeditionClose(true) as { merged: boolean };
     assert.equal(closed.merged, true);
     assert.equal(s.workRoot(), root);

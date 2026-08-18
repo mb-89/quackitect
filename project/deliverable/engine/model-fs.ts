@@ -29,10 +29,8 @@ export class ModelFileSystem {
   /** A trace node minted in a bound record carries its record id, so the
    *  reference views can default to the iteration's own delta.
    *
-   *  THE ID COMES FROM THE WALK, NOT FROM A PATH (i34). It used to be read
-   *  off the write's root, as the `<id>` in `.worktrees/<id>`. That worked
-   *  only while a bound record HAD a tree of its own, and i34 removes them —
-   *  so with one tree the pattern would never match and every node minted
+   *  THE ID COMES FROM THE WALK, NOT FROM A PATH. A path cannot say which
+   *  record is bound — there is one tree, so every node minted
    *  from then on would carry no minted_in at all, silently.
    *
    *  ASKING THE WALK IS ALSO MORE HONEST. What the field records is which

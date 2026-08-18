@@ -30,9 +30,7 @@ export function storeFor(roots: Roots, owner: Owner): string {
  *  `forRead` opens the declared roots, which are READ surfaces only. The
  *  write lane refuses them, and that refusal lives in resolveInRoot. */
 export function resolve(roots: Roots | string, p: string, source: string, forRead = false): Resolved {
-  // A BARE STRING IS THE ROOT. It used to be read as "the tree I am standing
-  // in", with the machine root derived from it by stripping `.worktrees/<id>`
-  // — which is the derivation this iteration deletes.
+  // A BARE STRING IS THE ROOT, never a tree to derive another root from.
   const r: Roots = typeof roots === "string" ? { machine: roots } : roots;
   const owner = routeToOwner(p);
   const store = storeFor(r, owner);

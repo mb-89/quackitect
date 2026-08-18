@@ -143,11 +143,9 @@ export function deskTools(
             // AGAIN as separate strings — two passes, duplicate findings, and
             // only the two keys somebody remembered to list. lintProse reads
             // every prose key now and tags each finding with its own.
-            // THROUGH THE SEAM (i27 seam-sweep, 2026-08-14). This used to
-            // call resolveInRoot with se_lint's own ambient root, so a lint
-            // run inside a record resolved `.se/...` into the worktree while
-            // the file lane served the same path from the machine root.
-            // Neither answer said which. resolve() picks the store from what
+            // THROUGH THE SEAM. An ambient root cannot say which store it
+            // means: a lint and a file read of the same path can answer from
+            // two of them and neither says which. resolve() picks from what
             // the path IS, so both lanes now reach one tree.
             const at = resolveSeam(rootOf(p), p, "engine/tools.ts se_lint");
             const raw = readFileSync(at.abs, "utf8");
@@ -177,9 +175,9 @@ export function deskTools(
               source: "engine/tools.ts se_lint",
             });
           }
-          // THROUGH THE SEAM, and the answer NAMES ITS STORE. This is the
-          // exact call that answered ENOENT against a worktree on 2026-08-14
-          // while se_file_read served the same path from the machine root.
+          // THROUGH THE SEAM, and the answer NAMES ITS STORE. This call once
+          // answered ENOENT from one store while se_file_read served the same
+          // path from another.
           const at = resolveSeam(rootOf(p), p, "engine/tools.ts se_lint");
           const findings = lintProse(root, readFileSync(at.abs, "utf8"), p);
           return { path: p, store: at.store, findings, count: findings.length, config: LINT_CONFIG };

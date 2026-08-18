@@ -1,10 +1,9 @@
-// SEARCH MUST NOT GO BLIND INSIDE A BOUND WORKTREE. ripgrep resolves its
+// SEARCH MUST NOT GO BLIND INSIDE AN EXCLUDED DIRECTORY. ripgrep resolves its
 // exclusion globs against the WORKING DIRECTORY, never against the target it
-// was pointed at. An expedition worktree lives under .worktrees, which the
-// exclusion list names — so the tree excluded itself, and every directory
-// search in an open expedition answered a confident, empty "no matches"
-// (found live 2026-07-30, while the search that found it had to be run by
-// hand to prove the lane was lying).
+// was pointed at. Point it at a root that sits under a name the exclusion list
+// carries and the root excludes itself, so every directory search there
+// answers a confident, empty "no matches" — a lane that lies rather than
+// refuses.
 //
 // A single named FILE always survived, because ripgrep never applies these
 // filters to a target handed to it explicitly. That asymmetry is what made
@@ -20,17 +19,17 @@ import { search } from "../engine/search.ts";
 // Every case builds its own root and touches no process-global state, so this
 // file runs concurrently.
 
-test("a search root living under .worktrees still finds its own files", () => {
+test("a search root living under an excluded name still finds its own files", () => {
   const tmp = mkdtempSync(join(tmpdir(), "se-search-"));
   try {
     // The shape that broke it: the root being searched sits INSIDE a
     // directory the exclusion list names.
-    const bound = join(tmp, ".worktrees", "e1-some-expedition");
+    const bound = join(tmp, ".se", "e1-some-expedition");
     mkdirSync(bound, { recursive: true });
     writeFileSync(join(bound, "record.md"), "the needle is here\n", "utf8");
 
     const r = search(bound, "needle");
-    assert.equal(r.total, 1, "search went blind inside the bound worktree");
+    assert.equal(r.total, 1, "search went blind inside the excluded parent");
     assert.equal(r.matches[0].path, "record.md");
   } finally {
     rmSync(tmp, { recursive: true, force: true });
@@ -41,10 +40,10 @@ test("the exclusion list still holds for directories below the search root", () 
   const tmp = mkdtempSync(join(tmpdir(), "se-search-"));
   try {
     mkdirSync(join(tmp, "node_modules"), { recursive: true });
-    mkdirSync(join(tmp, ".worktrees"), { recursive: true });
+    mkdirSync(join(tmp, ".se"), { recursive: true });
     writeFileSync(join(tmp, "kept.md"), "the needle is here\n", "utf8");
     writeFileSync(join(tmp, "node_modules", "dep.md"), "the needle is here\n", "utf8");
-    writeFileSync(join(tmp, ".worktrees", "wt.md"), "the needle is here\n", "utf8");
+    writeFileSync(join(tmp, ".se", "wt.md"), "the needle is here\n", "utf8");
 
     // Anchoring the globs must not disarm them. Deleting the exclusion list
     // would make the case above pass just as well, and this one fail.
@@ -61,7 +60,7 @@ test("the exclusion list still holds for directories below the search root", () 
 test("a single named file is searchable wherever it lives", () => {
   const tmp = mkdtempSync(join(tmpdir(), "se-search-"));
   try {
-    const bound = join(tmp, ".worktrees", "e1-some-expedition");
+    const bound = join(tmp, ".se", "e1-some-expedition");
     mkdirSync(bound, { recursive: true });
     writeFileSync(join(bound, "record.md"), "the needle is here\n", "utf8");
 

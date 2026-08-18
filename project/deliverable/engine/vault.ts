@@ -34,7 +34,7 @@ interface VaultWatchConfig {
 
 const DEFAULT_WATCH_CONFIG: VaultWatchConfig = {
   extensions: [".md"],
-  excludeDirectories: ["node_modules", ".git", ".obsidian", ".se", ".worktrees", "tests"],
+  excludeDirectories: ["node_modules", ".git", ".obsidian", ".se", "tests"],
 };
 
 function loadWatchConfig(root: string): VaultWatchConfig {

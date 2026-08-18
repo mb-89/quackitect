@@ -6,7 +6,7 @@ kind: risk
 statement: The deletion of 27 worktrees and 33 branches takes work the rescue step did not find, and nothing can bring it back.
 owner: the engine maintainer
 trigger: immediately before the deletion step runs, and again if the rescue step's file count differs from 14
-status: open
+status: closed
 impact: Permanent loss of iteration goals and visions written since 2026-07-26. Twelve records carry uncommitted edits between 1 and 182 lines, and two decision logs were never committed at all.
 breaks_how_badly: crippling
 how_likely: plausible
@@ -46,3 +46,12 @@ stood where a merge wanted to land.
   step.
 - main AND v2 ARE NAMED AS SURVIVORS in the deletion step, because they appear
   in the same unmerged list as the iteration branches.
+
+## Closed
+
+THE DELETION RAN AND THE WORK IS HERE. Nothing is left to lose: there are no
+worktrees on this machine and every record stands as a folder in the one tree.
+
+A RISK ABOUT PERFORMING AN ACT CLOSES WHEN THE ACT IS DONE. It said nothing
+about the state after, and the state after is what every later entry is
+about.

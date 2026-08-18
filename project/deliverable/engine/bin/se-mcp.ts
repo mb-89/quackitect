@@ -124,7 +124,7 @@ LAUNCH — read by RUNME.ps1 before the server starts.
   --export <dir> <Name> <ABBR>
                  copy the WORKING TREE into <dir> as a fresh single-commit
                  repository under a NEW NAME, then exit. History stays home:
-                 .git, .worktrees, .se, node_modules and the generated cage
+                 .git, .se, node_modules and the generated cage
                  files are left behind, and the target must be empty.
                  <Name>  what a reader sees — window titles, the activity
                          bar, every notification.
@@ -298,7 +298,7 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
     let retriedMirrorStart = false;
     const bootMirror = (): void => {
       const mirror = startMirror({ session, root, port: mirrorPort, log, mode: "agent", mcp: mcpServer });
-      // A second agent on the same machine (worktree concurrency) must not die
+      // A second agent on the same machine must not die
       // over the mirror port — the MCP lane matters more than the window.
       mirror.on("error", (e) => {
         const code = (e as NodeJS.ErrnoException).code ?? "";

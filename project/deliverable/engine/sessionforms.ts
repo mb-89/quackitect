@@ -35,10 +35,9 @@ export function refPaths(paths: SessionPaths, it?: Iteration): Record<string, st
   const root = paths.traceRoot(it);
   try {
     // THE PATH IS WRITTEN FROM THE PROJECT ROOT, because the HOST opens it
-    // from there. A node living in a record's worktree comes out under
-    // .worktrees/, which opens. The record-relative path LOOKED right and
-    // pointed into the wrong tree, so every link on an open record's form
-    // reported a file that is not there.
+    // from there. A record-relative path LOOKS right and points at nothing
+    // the host can open, so every link on an open record's form reported a
+    // file that is not there.
     for (const n of loadTrace(root)) {
       if (n.file !== undefined) out[n.id] = relative(paths.machineRoot(), n.file).split(sep).join("/");
     }
@@ -132,8 +131,8 @@ export function bindChart(paths: SessionPaths, content: string, m: MachineDecl):
     nodes.filter((n) => n.type === "candidate").map((n) => n.id),
   );
   // THE FOLDER IS DERIVED FROM A SIBLING, never guessed. A record owns its
-  // trace in its own worktree, so the only reliable answer is where the
-  // options already sit.
+  // own trace nodes, so the only reliable answer is where the options
+  // already sit.
   const sibling = nodes.find((n) => n.type === "option" && n.file !== undefined)?.file;
   const folder = sibling === undefined ? undefined : join(dirname(dirname(sibling)), "candidate");
   const touched: string[] = [];

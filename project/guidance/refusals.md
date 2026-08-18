@@ -375,14 +375,13 @@ RETIRED by owner ruling, 2026-08-14. It refused a method write made from
 inside a record. The number is retired and is not reused, and no section here
 claims it: this is history, not a rule you can trip.
 
-WHAT IT WAS FOR. A method write from inside a record used to land in that
-record's own worktree, and fan out over trunk at the merge. On 2026-08-07 that
-overwrote trunk's tool list and deleted two lane verbs.
+WHAT IT WAS FOR. Back when a record was its own checkout, a method write made
+inside one landed there and fanned out at the merge. On 2026-08-07 that
+overwrote the shared tool list and deleted two lane verbs.
 
 WHY IT IS GONE. The refusal was REPLACED BY A RESOLUTION, never merely
-dropped. Shared method resolves to the MACHINE ROOT whatever tree is bound, so
-a method write cannot land in a tree that does not own it. There is nothing
-left to refuse.
+dropped. Shared method resolves to the MACHINE ROOT whichever record is bound,
+so there is nothing left to refuse.
 
 SHARED MEANS THESE:
 

@@ -6,7 +6,7 @@ kind: issue
 statement: A wrong resolution reports success, so a read or a write reaches the wrong store and nothing says so.
 owner: the driving agent
 trigger: at the first write of each path KIND after any resolution rule changes - method, record content, session state and repository-root files each resolve by a different rule
-status: open
+status: closed
 impact: The work appears to land. It is found at a merge, or never. Two branches then hold two answers to one question, which is the failure this iteration exists to end, reappearing from the other side.
 breaks_how_badly: fatal
 how_likely: expected
@@ -72,3 +72,15 @@ required rather than a nicety.
 The bypass surface is counted: 40 resolver call sites against 88 paths built
 with a direct join. The dispatch layer is nearly clean at 7 against 1, and the
 leaks are modules that read the filesystem for themselves.
+
+## Closed
+
+THERE IS NO SECOND STORE TO REACH. The risk was a resolution picking the wrong
+tree and reporting success, and both its named outcomes — a merge that
+surprises somebody, two branches holding two answers — need two stores to
+happen in.
+
+WHAT REPLACED THE GUARD. The resolution seam still NAMES the store it answered
+from, which is the part worth keeping: it is what makes a wrong answer visible
+rather than silent, and it now guards against a different mistake — session
+state and corpus content being confused for each other.

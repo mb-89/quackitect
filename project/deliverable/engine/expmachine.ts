@@ -4,7 +4,7 @@ import { type CanvasData, type CanvasEdge, type CanvasElement, nodeSize } from "
 import { type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
 import { stateFromNote } from "./machines/compile.ts";
 import { readNode } from "./notes.ts";
-import { type Expedition, expList, frontmatterOf, readRecord, recordRel } from "./worktree.ts";
+import { type Expedition, expList, frontmatterOf, readRecord, recordRel } from "./records.ts";
 
 export interface GeneratedMachine {
   decl: MachineDecl;
@@ -27,7 +27,7 @@ function mechanical(id: string, kind: "start" | "end"): StateDecl {
     statement: "",
     guidance:
       kind === "start"
-        ? "The seeded container: every open expedition stands as its own states. Pick ONE way forward — entering an expedition binds its worktree."
+        ? "The seeded container: every open expedition stands as its own states. Pick ONE way forward — entering an expedition binds it."
         : "One expedition came home (or nothing was open) — the machine is complete here. The others stay parked for the next entry.",
     evidence_form: [],
     priority: 0.01,

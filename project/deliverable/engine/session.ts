@@ -69,6 +69,7 @@ import { withPass } from "./notes.ts";
 import { pathKind, resolveInRoot, seDir } from "./paths.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { probesMissed, readingProbes } from "./readproof.ts";
+import { type Expedition, expClose, expFind, expList, expNew, itCloseShipped, readRecord } from "./records.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { defaultAutonomy, loadLevels, loadStopAt, notchName, tierOf, valueFor, weightName } from "./scale.ts";
 import { requiredDependsOn } from "./seed.ts";
@@ -80,7 +81,6 @@ import { Scripts } from "./sessionscript.ts";
 import { Views } from "./sessionviews.ts";
 import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
 import type { loadTrace } from "./trace.ts";
-import { type Expedition, expClose, expFind, expList, expNew, itCloseShipped, readRecord } from "./worktree.ts";
 
 /** Legal in every state. see dsp-lane-door.md#always-legal-whatever-the-state */
 export interface AmendOp {
@@ -216,7 +216,7 @@ export class Session {
    *  interface, and the drawings read this through ViewHost. */
   subs: SubRun[] = [];
   private bannerShown = false;
-  /** The bound expedition — while set, the lane works in its worktree. */
+  /** The bound expedition — while set, the lane works inside its folder. */
   /** Not private because a private member cannot satisfy a structural
    *  interface, and Claims reads this through ClaimsHost. */
   bound?: Expedition;
@@ -434,9 +434,6 @@ export class Session {
 
   constructor(root: string) {
     this.root = root;
-    // THE WRITE LANE NO LONGER LEARNS ABOUT TREES, because there are none to
-    // learn about (i34). This used to hand files.ts a mirror callback so a
-    // method write could be copied into every open worktree.
     // Fail fast at server start: a misdrawn machine must not silently serve
     // an ungated lane.
     this._machine = compileMachine(root, mainMachinePath(root));
@@ -869,7 +866,7 @@ export class Session {
     return this.machineRoot();
   }
 
-  /** see dsp-walk-machine.md#the-checkout-that-owns-the-worktrees */
+  /** see dsp-walk-machine.md#one-checkout-owns-every-record */
   machineRoot(): string {
     return this.root;
   }
@@ -900,25 +897,7 @@ export class Session {
     return this.workRoot();
   }
 
-  // `recordRoot` IS DELETED (i34, found by the tester at verification). It
-  // answered "which tree owns this record" — the open record's worktree, or
-  // undefined for a closed one so the caller fell back to the working root.
-  //
-  // A CHOOSER THAT HAPPENS TO HAVE ONE BRANCH IS STILL A CHOOSER. Both answers
-  // became the same root when the worktrees went, so it returned correctly and
-  // kept asking. The requirement demands the ABSENCE of the question, and this
-  // was on every lane call for a record path.
-  //
-  // ITS DOCSTRING WAS ALREADY FALSE, which is how the tester found it: "An
-  // OPEN record owns its worktree... A CLOSED one has landed and its tree is
-  // gone." Neither sentence describes anything that now exists.
-
-  // `methodTrees` AND `fanOutMethod` ARE DELETED (i34). The first answered
-  // "every tree the method lives in"; the second copied a method write into
-  // all of them so a change took effect wherever the reader was standing.
-  //
-  // ONE TREE MAKES BOTH QUESTIONS EMPTY. A write is the file every reader
-  // opens, the instant it lands.
+  // see dsp-walk-machine.md#one-checkout-owns-every-record
 
   expeditionNew(kind: string, goal: string, dependsOn: string[] = []): Record<string, unknown> {
     const e = expNew(this.machineRoot(), kind, goal, dependsOn);
@@ -932,20 +911,8 @@ export class Session {
     return { seeded: it.id, branch: it.branch, note: "it stands in the iterations container as its kickoff" };
   }
 
-  // `levelTree` IS DELETED (i34). Entry used to copy every method file into
-  // the record's tree and commit it there, because a record's worktree drifted
-  // from trunk the moment either was edited.
-  //
-  // ITS OWN COMMENT MEASURED THE COST: 68 to 117 mirrored files sitting
-  // uncommitted in 24 of 28 trees, a pre-commit hook type-checking a hundred
-  // files that had nothing to do with the commit, and a peer cloning the
-  // branch getting none of it — which is how one feature was built twice,
-  // differently, on two branches.
-  //
-  // ONE TREE ENDS ALL THREE.
-
-  /** ENTERING AN ITERATION BINDS IT AND STAMPS IT STARTED. That is all it does
-   *  now: no claim to take, and no tree to level. */
+  /** ENTERING AN ITERATION BINDS IT AND STAMPS IT STARTED. That is all it
+   *  does: there is no claim to take. */
   iterationOpen(id: string): Record<string, unknown> {
     const it = itFind(this.machineRoot(), id);
     this.bound = it;
@@ -1075,7 +1042,7 @@ export class Session {
     // While bound, decision ops ALSO land in the record: the reasoning is
     // part of the persistent walk (owner ruling 2026-07-27), parts per visit.
     this.decisions.setExtraSink(join(this.bound.path, "project", "spec", "expeditions", this.bound.id, "decisions.jsonl"));
-    return { bound: this.bound.id, note: "the lane now works in this expedition's worktree" };
+    return { bound: this.bound.id, note: "the lane now works inside this expedition's folder" };
   }
 
   expeditionClose(merge: boolean, override?: string): Record<string, unknown> {
@@ -1498,7 +1465,7 @@ export class Session {
   /** ARRIVAL IS A COMPARISON, NEVER A SEARCH. This once asked route() whether
    *  the way here was empty, and route() expands the drawing — which for a
    *  generated container means WRITING it, against the project root, on every
-   *  packet the engine builds. A bound worktree then walked a container that
+   *  packet the engine builds. A bound record then walked a container that
    *  was being regenerated underneath it. Reading where you stand must never
    *  change where you stand. */
   private clearTargetIfArrived(): void {
@@ -1512,8 +1479,8 @@ export class Session {
   }
 
   /** What the route search can see, beyond file content. Bumped wherever the
-   *  walk's shape changes for a reason no drawing records: a record seeded, a
-   *  worktree bound or released. */
+   *  walk's shape changes for a reason no drawing records: a record seeded,
+   *  bound or released. */
   private generation = 0;
   private routeMemo?: { key: string; machine: MachineDecl; value: ReturnType<Session["route"]> };
 
@@ -2733,8 +2700,7 @@ export class Session {
   /** WHICH RECORD IS OPEN, or nothing. The minted_in stamp asks this: a trace
    *  node written while a record is bound carries that record's id.
    *
-   *  IT USED TO BE READ OFF A PATH — the `<id>` in `.worktrees/<id>` — which
-   *  i34 removes. The walk has always known the answer; nothing was asking. */
+   *  THE WALK IS ASKED, NEVER A PATH. It has always known the answer. */
   boundRecordId(): string | undefined {
     return this.bound?.id;
   }
@@ -3496,7 +3462,7 @@ export class Session {
     if (pi !== this.instance) pi.history.push({ state: top.parentState, outcome: "filled", at: now });
     const prefix = this.subs.map((s) => s.decl.id).join("/");
     this.instance.history.push({ state: prefix === "" ? top.parentState : `${prefix}/${top.parentState}`, outcome: "filled", at: now });
-    if (!this.inSub()) this.unbind(); // leaving the outermost sub leaves the context (worktree stays)
+    if (!this.inSub()) this.unbind(); // leaving the outermost sub leaves the context
     // THE SHIPPED ITERATION ARCHIVES ITSELF (owner ruling 2026-08-11): the
     // walk leaving through the terminal is the trigger; the blessed release
     // gate was the ruling, and the route cannot pass an unblessed gate.
@@ -3506,8 +3472,8 @@ export class Session {
   }
 
   /** Close and archive the iteration whose machine the walk just left —
-   *  merge, retire the record dir to its branch, drop the worktree, and
-   *  seed the needs-retro note the shipped row promises. Already-closed
+   *  merge, retire the record dir to its branch, and seed the needs-retro
+   *  note the shipped row promises. Already-closed
    *  or unknown records pass silently: the walk stands either way. */
   private closeShippedIteration(state: string): void {
     const full = this.top()?.gen?.expByState[state];

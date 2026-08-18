@@ -1,5 +1,4 @@
-// Seeding is a FUNCTION (owner design 2026-07-27; reshaped 2026-08-04):
-// a seed mints the record and its worktree, and the iteration stands
+// Seeding is a FUNCTION: a seed mints the record's folder, and it stands
 // VISIBLE in the iterations container from that moment — as its OWN
 // machine, standing in M0. The kickoff's bless pins the column and the
 // machine grows in place; no gate holds the first start.
@@ -88,7 +87,7 @@ test("any state's form is fetchable by its machine — the walk elsewhere", () =
   // A save from the browse lands in the RECORD's evidence, on its branch.
   s.formSave("onboard-retro", { current_situation: "seen from the desk" }, "human", "i1");
   const inst = join(it.path, "project", "spec", "iterations", it.id, "evidence", "onboard-retro.md");
-  assert.ok(existsSync(inst), "the instance lives in the record's worktree");
+  assert.ok(existsSync(inst), "the instance lives in the record's folder");
   assert.match(readFileSync(inst, "utf8"), /seen from the desk/);
   // A browse-save is never stamped and a browse-submit refuses — questions
   // are answered in order, in the state (owner ruling 2026-08-04).
@@ -340,8 +339,7 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
     (e) => /SUBMITTED/.test(JSON.stringify(e)),
   );
   session.formDone("onboard-retro", "human");
-  // ONE TREE SINCE i34, so the evidence stands under the root rather than
-  // inside `.worktrees/<id>/`.
+  // ONE TREE, so the evidence stands under the root.
   const retroForm = readFileSync(join(root, "project", "spec", "iterations", id, "evidence", "onboard-retro.md"), "utf8");
   assert.match(retroForm, /^signed_off: /m, "the submit stamps the claim");
   assert.match(retroForm, /^authors: human$/m);
@@ -503,8 +501,7 @@ test("no gate holds the first start — entering binds, stamps started, and M0 s
   await session.advance(); // start → onboard-retro: the retro stands FIRST
   const active = (session.describe() as { submachine?: { active: string[] } }).submachine?.active;
   assert.deepEqual(active, ["onboard-retro"]);
-  // Entering stamped `started:` on the record, which stands on trunk since
-  // i34 rather than inside a bound worktree.
+  // Entering stamped `started:` on the record, which stands in the one tree.
   const rec = readFileSync(join(root, "project", "spec", "iterations", String(seeded.seeded), "record.md"), "utf8");
   assert.match(rec, /^started: /m);
   assert.match(rec, /^status: open$/m);

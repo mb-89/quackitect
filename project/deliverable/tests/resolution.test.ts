@@ -73,8 +73,6 @@ test("a record path names the record that owns it", () => {
 // WHAT WAS HERE AND WHY IT IS NOT ANY MORE:
 //
 // - `fansOut` said a method path must reach every tree. One tree, so it does.
-// - `machineRootOf` derived the machine root by stripping `.worktrees/<id>`.
-//   There is nothing to strip.
 // - `Roots.bound` was the second store. There is no second store.
 //
 // THE DEFECT THEY GUARDED IS STILL GUARDED, and by a stronger check: two lanes
@@ -90,22 +88,13 @@ test("every path resolves to the one root, whatever kind it is", () => {
   assert.equal(content.store, machine, "a record's content resolves to the root");
 });
 
-// THE WORKTREE-ABSENCE CASE IS DELETED (i34, found by the tester at
-// verification). It asserted that no resolution lands inside a worktree, over
-// three fixture paths — `.se/HANDOVER.md`, a guidance doc and a requirement.
-//
-// NONE OF THEM CONTAINS `.worktrees`, and the fixture root is a mkdtemp
-// directory that does not either. The assertion could not have failed under
-// any behaviour, INCLUDING THE OLD ONE, so it reported coverage it never had.
-//
-// TO BITE, the fixture would have had to hand the seam a root that IS a
-// worktree path. What actually proves the absence is the inspection spec
-// tsp-read-back-inspection and the case below, which pins that two lanes
-// asking for one path get one answer.
+// AN ASSERTION THAT CANNOT FAIL REPORTS COVERAGE IT NEVER HAD. What proves
+// one store answers is the inspection spec tsp-read-back-inspection and the
+// case below, which pins that two lanes asking for one path get one answer.
 
 test("two lanes asking for one path get one answer, which is the 2026-08-14 defect", () => {
-  // se_lint resolved `.se/HANDOVER.md` against a worktree while the file lane
-  // resolved it against the machine root. Both were correct against their own
+  // se_lint once resolved `.se/HANDOVER.md` against one store while the file
+  // lane resolved it against another. Both were correct against their own
   // ambient root, and neither answer said which.
   const asLint = seam(ROOT, ".se/HANDOVER.md", "lint");
   const asFileLane = seam({ machine: ROOT }, ".se/HANDOVER.md", "files");
@@ -182,7 +171,7 @@ test("a record write reads back from that record's store", () => {
   assert.equal(store, ROOT);
 });
 
-test("a session write reads back from the project root and never from a worktree", () => {
+test("a session write reads back from the project root and nowhere else", () => {
   const { readBack, store } = writeThenReadBack(".se/probe.md", "session body");
   assert.equal(readBack, "session body");
   assert.equal(store, ROOT);

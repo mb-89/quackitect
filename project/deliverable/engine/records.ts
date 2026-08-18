@@ -14,7 +14,7 @@ function yamlScalar(s: string): string {
   return `"${s.replace(/\r?\n/g, " ").replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
 }
 
-const SRC = "engine/worktree.ts";
+const SRC = "engine/records.ts";
 
 // The register statuses that count as agreed. see dsp-record-lifecycle.md#a-disposition-is-agreed-never-asserted
 const DISPOSED: ReadonlySet<string> = new Set(["closed", "superseded", "mitigated", "decided", "accepted", "deferred"]);
@@ -84,12 +84,8 @@ export interface Expedition {
   open: boolean;
 }
 
-// `worktreesDir` IS DELETED (i34). It answered where a record's checkout would
-// live. There are no worktrees, and nothing called it.
-
-/** The expedition's RECORD lives ON ITS BRANCH (owner ruling 2026-07-27:
- *  work state rides the worktree) at a spec path — so the merge lands
- *  closed records on the main tree as the browsable archive. */
+/** The expedition's RECORD lives at a spec path, so the archive is browsable
+ *  from the same tree everything else is read from. */
 export function recordRel(id: string): string {
   return `project/spec/expeditions/${id}/record.md`;
 }
@@ -212,9 +208,7 @@ export function expNew(root: string, kind: string, goal: string, dependsOn: stri
       return m ? Math.max(max, Number(m[1])) : max;
     }, 0) + 1;
   const id = `e${n}-${kind}-${slug(goal)}`;
-  // THE SEED MINTS A FOLDER ON TRUNK AND NOTHING ELSE (i34). Gone with the
-  // worktree: the branch, the seed push that announced a stub to a peer, and
-  // the npm install that paid for a second tree's node_modules.
+  // THE SEED MINTS A FOLDER AND NOTHING ELSE: no branch, no push, no install.
   const recAbs = join(root, recordRel(id));
   mkdirSync(dirname(recAbs), { recursive: true });
   writeFileSync(
@@ -381,9 +375,9 @@ export function itCloseShipped(
 /** Close IS the ruling: apply (merge=true) or dismiss (merge=false). The
  *  ruling is stamped on the record and leftovers are committed either way.
  *
- *  WHAT i34 TOOK OUT. The work already stands on trunk, because there is one
- *  tree, so there is no branch to merge and no worktree to remove. `merge`
- *  is now the RULING alone rather than a ruling that also moved bytes.
+ *  THE WORK ALREADY STANDS, because there is one tree — so there is no branch
+ *  to merge and no checkout to remove. `merge` is the RULING alone rather than
+ *  a ruling that also moves bytes.
  *
  *  DISMISS NO LONGER DISCARDS ANYTHING, and that is a real change worth
  *  naming: an unmerged branch used to keep a dismissed expedition's changes

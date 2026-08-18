@@ -85,7 +85,7 @@ export const LANE_RULES: LaneRule[] = [
     id: "run-git",
     category: "git",
     tool: "se_git",
-    hint: "se_git runs the allowlisted set in the right tree (the bound worktree when one is open) — shell git silently works on whatever the cwd happens to be",
+    hint: "se_git runs the allowlisted set in the right tree (the one tree) — shell git silently works on whatever the cwd happens to be",
     threshold: 1,
     rx: /(^|[;|&(\s])git(\.exe)?\s/i,
   },
@@ -199,10 +199,9 @@ export function testFingerprint(root: string): string {
     // SESSION STATE IS NOT THE TREE UNDER TEST. .se moves on every call —
     // the call log grows with the very se_test invocation being judged — so
     // counting it would mean no two moments ever fingerprint alike and the
-    // gate never fires. Same for .worktrees: a sibling expedition's motion
-    // is not a change to THIS tree.
+    // gate never fires.
     const rel = line.slice(3).replace(/^"|"$/g, "");
-    if (rel.startsWith(".se") || rel.startsWith(".worktrees")) continue;
+    if (rel.startsWith(".se")) continue;
     parts.push(line);
     try {
       const s = statSync(join(root, rel));
@@ -350,12 +349,12 @@ export function changedSinceBattery(root: string, seDir: string): string[] | und
   const out = new Set<string>();
   for (const line of committed.stdout.split("\n")) {
     const rel = line.trim();
-    if (rel !== "" && !rel.startsWith(".se") && !rel.startsWith(".worktrees")) out.add(rel);
+    if (rel !== "" && !rel.startsWith(".se")) out.add(rel);
   }
   for (const line of status.stdout.split("\n")) {
     if (line.trim() === "") continue;
     const rel = line.slice(3).replace(/^"|"$/g, "");
-    if (!rel.startsWith(".se") && !rel.startsWith(".worktrees")) out.add(rel);
+    if (!rel.startsWith(".se")) out.add(rel);
   }
   return [...out].sort();
 }

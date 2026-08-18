@@ -42,7 +42,7 @@ test("no binary file lives under project/ — an unreadable figure is not an art
   //
   // The rule was always about what the product OWNS. Reaching into the
   // workbench made it refuse inputs, which is not what it is for.
-  const skip = new Set(["node_modules", ".git", ".obsidian", ".worktrees", "scratchpad"]);
+  const skip = new Set(["node_modules", ".git", ".obsidian", "scratchpad"]);
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {
     for (const e of readdirSync(dir, { withFileTypes: true })) {
@@ -169,7 +169,7 @@ test("no new file write bypasses the door — the count may fall, never rise", (
 });
 
 // AN EMPTY RESULT AND AN UNREADABLE FILE MUST NEVER LOOK ALIKE (found live
-// 2026-07-29). engine/worktree.ts carried ONE raw NUL byte, used as a
+// 2026-07-29). engine/records.ts carried ONE raw NUL byte, used as a
 // cache-key separator. ripgrep called the whole file binary and said so on a
 // line the parser did not understand, so it was dropped and every search over
 // that file returned a confident "no matches".
@@ -199,7 +199,7 @@ test("a file too binary to search is REPORTED, never silently empty", () => {
 // moment it is still cheap.
 //
 // It has been written twice by two authors, both times as a hash separator:
-// worktree.ts in 2026-07-29, discipline.ts in a patch that arrived today. A
+// records.ts in 2026-07-29, discipline.ts in a patch that arrived today. A
 // third time is a matter of when, so the guard sits on every door that
 // writes bytes rather than on the one that happened to be used.
 //

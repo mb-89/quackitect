@@ -266,7 +266,7 @@ export function runTools(
         // surface itself rather than a second drawing of it.
         const html = renderMirror(mirror(), w, args.view === undefined ? undefined : String(args.view));
         // .se IS SESSION STATE, so a shot belongs to the PROJECT root however
-        // deep in a worktree the walk stands — exactly as the handover, the
+        // deep in a record the walk stands — exactly as the handover, the
         // notes and the call log do. Passing rootOf() with no address would
         // write the shot where the reader never looks.
         return shoot(rootOf(".se"), html, {
@@ -279,7 +279,7 @@ export function runTools(
     {
       name: "se_run",
       title: "se.run",
-      description: `Run a shell command from the project root (bash on POSIX, PowerShell on Windows) — for what ONLY a shell does: node, npm, builds, processes. THE LANE'S JOBS ARE REFUSED HERE: ${laneSummary()}. A first offence per category runs once with a warning; after that the category refuses (SE-C-129) with the lane call as the remedy. If the lane truly cannot do the job, pass no_tool_reason — the command runs once and your reason is logged for the retro.\n\nOutput is engine-captured and logged IN FULL under the returned call ref. Foreground waits for process completion. Background returns a job immediately. Use {job} for status or {job, stop: true} to cancel. {jobs: true} lists this session's jobs.\n\nNEVER call this session's own mirror over HTTP from here — the run blocks the server's event loop, so the mirror cannot answer itself.`,
+      description: `Run a shell command from the project root (bash on POSIX, PowerShell on Windows) — for what ONLY a shell does: node, npm, builds, processes. WRITE A SCRIPT WHEN THE QUESTION IS ABOUT MANY THINGS: se_file_write it into project/scratchpad/ (the workbench, never committed), run it here, read the answer, change it, run it again. Counting, routing, measuring and applying one shape across a tree are programs, not readings. Have the script PRINT what you need and nothing has to be piped. THE LANE'S JOBS ARE REFUSED HERE: ${laneSummary()}. A first offence per category runs once with a warning; after that the category refuses (SE-C-129) with the lane call as the remedy. If the lane truly cannot do the job, pass no_tool_reason — the command runs once and your reason is logged for the retro.\n\nOutput is engine-captured and logged IN FULL under the returned call ref. Foreground waits for process completion. Background returns a job immediately. Use {job} for status or {job, stop: true} to cancel. {jobs: true} lists this session's jobs.\n\nNEVER call this session's own mirror over HTTP from here — the run blocks the server's event loop, so the mirror cannot answer itself.`,
       inputSchema: {
         type: "object",
         properties: {
@@ -554,15 +554,6 @@ export function runTools(
       },
       handler: (args) => gitLane(rootOf(), (args.args as unknown[]) ?? []),
     },
-    // `se_git_land` AND `se_git_sync` ARE DELETED (i34, found by the tester at
-    // verification). Both reconciled a record's worktree with trunk: land put
-    // the work out without closing, sync brought trunk in so a worktree was
-    // never silently stale.
-    //
-    // THEY COULD NOT SUCCEED ANY MORE. `twoTrees` refuses when the two roots
-    // are equal, and since the worktrees went, `rootOf()` IS `projectRoot` on
-    // every call. Each verb refused every time while its description still
-    // promised the reconciliation.
     //
     // AND THERE IS NOTHING FOR THEM TO DO. Work is written on trunk from the
     // first keystroke, so it is landed by construction and cannot be stale.

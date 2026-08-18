@@ -140,7 +140,7 @@ function rgScope(root: string, opts: { path?: string }): { scope: string; base: 
 
 function rgCommonArgs(opts: SearchOpts): string[] {
   const args: string[] = [];
-  for (const d of [".se", "node_modules", ".worktrees"]) args.push("--glob", `!${d}/**`);
+  for (const d of [".se", "node_modules"]) args.push("--glob", `!${d}/**`);
   if (opts.include !== undefined) args.push("--glob", opts.include);
   if (opts.ignore_case === true) args.push("--ignore-case");
   return args;

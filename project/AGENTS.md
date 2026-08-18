@@ -1,7 +1,7 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
      from project/guidance/contract.md b538e8ccc81e
      from project/guidance/walking.md 8d2cebb9bd5a
-     from project/guidance/method/lane.md 2b433ab77644
+     from project/guidance/method/lane.md af784ebc8796
      from project/guidance/voice.md 0b6faf79ff32
 -->
 
@@ -552,6 +552,29 @@ A RESULT THE HOST MOVED TO DISK IS RE-FETCHED BY REF, never by reading the
 host's file. The lane logged the full response; `se_log_query` with the
 call's ref serves it back. Retro finding 2026-08-10: several shell reads of
 host-persisted files stood where one log query belonged.
+
+WRITE A SCRIPT WHEN THE QUESTION IS ABOUT MANY THINGS. Counting what a rule
+touches, routing four hundred blocks, measuring which methods need what,
+applying one shape across a tree — these are programs, not readings. Reading
+the files one at a time to answer them costs a hundred calls and gets the
+count wrong.
+
+THE LOOP, and every step of it is already legal:
+
+1. `se_file_write` the script into `project/scratchpad/`. That folder is the
+   agent's workbench and is never committed, so nothing you put there has to
+   be good, finished, or explained.
+2. `se_run` it: `node project/scratchpad/<name>.mjs`.
+3. Read the answer, change the script, run it again.
+
+THE SCRIPT PRINTS WHAT YOU NEED, so nothing has to be piped. A script that
+answers "how many and which" prints the count and the list itself; that is why
+the truncating-pipe refusal never bites this loop.
+
+THE OWNER READS THESE. The write is logged with its full content and the run
+is logged with its full command, so a script that worked once can be found,
+repeated, and promoted into the engine if it earns it. That is the point of
+writing it through the lane rather than in your head.
 
 Pass this file's rule to every subagent you spawn.
 

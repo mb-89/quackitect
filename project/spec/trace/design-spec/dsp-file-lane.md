@@ -128,7 +128,7 @@ Results are LOCATIONS; the remedy for "show me more" is a range read.
 ## A file that cannot be searched says so
 
 A FILE THAT CANNOT BE SEARCHED SAYS SO (found live 2026-07-29).
-engine/worktree.ts carried one raw NUL byte as a cache-key separator.
+engine/records.ts carried one raw NUL byte as a cache-key separator.
 ripgrep called the whole file binary and reported it on a line this
 parser did not understand, so the line was dropped and the search
 returned an empty, confident "no matches".
@@ -178,3 +178,17 @@ left in the state between two ops.
 WHY IT IS ITS OWN FILE. Reading, writing and deleting need a path and its
 content. Placing an edit inside content needs none of that — it needs the ops
 and the text. The seam is where the second stops needing the first.
+
+## One tree needs no reconciliation
+
+THERE IS ONE WORKING TREE AND A RECORD IS A FOLDER IN IT. Work is written
+where every reader already looks, from the first keystroke.
+
+SO THERE IS NOTHING TO RECONCILE. A verb that brought shared work in, and a
+verb that put a record's work out, both answered a question that only exists
+when two stores hold two answers to one thing. With one store the question is
+empty, and an empty question is deleted rather than answered.
+
+WHAT STAYS. Close is still its own act: it retires a record, and that is a
+ruling about the record's life, not a reconciliation between stores.
+

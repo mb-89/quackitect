@@ -288,7 +288,7 @@ export class Claims {
   /** see dsp-walk-machine.md#the-idpath-map-for-a-documents-own-record */
   docRefPaths(p: string): Record<string, string> {
     try {
-      const m = /(?:^|[\\/])iterations[\\/]([^\\/]+)[\\/]/.exec(p) ?? /(?:^|[\\/])\.worktrees[\\/]([^\\/]+)[\\/]/.exec(p);
+      const m = /(?:^|[\\/])iterations[\\/]([^\\/]+)[\\/]/.exec(p);
       const own =
         m === null
           ? undefined

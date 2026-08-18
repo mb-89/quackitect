@@ -37,12 +37,10 @@ export class Scripts {
    *  seconds read as a crashed browser window. */
   spawnScript(abs: string): Promise<{ status: number | null; out: string }> {
     return new Promise((resolve) => {
-      // A CONDITION JUDGES THE TREE THE LANE WRITES TO, never the repo root.
-      // It ran with the machine root, so a state's check read trunk while every file
-      // verb wrote to the bound worktree. The agent was asked to satisfy a
-      // check it had no write path to: i28's rank-unknowns refused on a
-      // register node that does not exist in its tree, and no lane verb could
-      // reach the file being complained about.
+      // A CONDITION JUDGES THE CORPUS THE LANE WRITES TO, never the repo
+      // root. Judged against the wrong one, the agent is asked to satisfy a
+      // check it has no write path to, and no lane verb can reach the file
+      // being complained about.
       // TWO ROOTS, BECAUSE A SCRIPT NEEDS BOTH. The corpus it judges is the
       // bound record's, and `.se/` is session state that belongs to the
       // machine — the same split laneRoot already enforces for every path.

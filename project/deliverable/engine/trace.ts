@@ -539,7 +539,7 @@ export function loadTrace(root: string): TraceNode[] {
 
 /** see dsp-the-outside-boundaries-and-their-bounds.md#the-vision-has-no-node-of-its-own-yet */
 export function visionText(root: string): string {
-  const roots = [join(root, "project", "spec", "iterations"), join(root, ".worktrees")];
+  const roots = [join(root, "project", "spec", "iterations")];
   const found: string[] = [];
   const hunt = (dir: string, depth: number): void => {
     if (depth > 6 || found.length > 0) return;

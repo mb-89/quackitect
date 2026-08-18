@@ -345,10 +345,10 @@ export function fileTools(rootOf: (rel?: string) => string, model: ModelFileSyst
         },
         required: ["glob"],
       },
-      // The GLOB carries the root selector, so it decides which tree answers.
-      // Called with no argument, a bound worktree answered instead — and the
-      // worktree has no .se/roots.json, so every declared root read as
-      // undeclared while the READER resolved the same name fine.
+      // The GLOB carries the root selector, so it decides which store
+      // answers. Called with no argument, the ambient root answered instead,
+      // and a declared root read as undeclared while the READER resolved the
+      // same name fine.
       handler: (args) => model.glob(String(args.glob), { ...(args.ref !== undefined ? { ref: String(args.ref) } : {}) }),
     },
     {

@@ -174,31 +174,12 @@ export function pathKind(rel: string): PathKind {
  *  THIS FUNCTION NEVER REFUSES. It answers who owns the path and stops. */
 export type Owner = { kind: "core" } | { kind: "record"; container: "iterations" | "expeditions"; id: string } | { kind: "bound" };
 
-// `machineRootOf` IS GONE (i34). Its whole job was stripping `.worktrees/<id>`
-// off a path to recover the machine root, and there are no worktrees to strip.
-//
-// ITS OWN COMMENT NAMED THE DEFECT IT CAUSED: se_lint resolved
-// `.se/HANDOVER.md` against a worktree while the file lane resolved it against
-// the machine root. Both were correct against their own ambient root, and
-// neither answer said which. One root is the only shape where that cannot
-// happen.
-
 export function routeToOwner(rel: string): Owner {
   const kind = pathKind(rel);
-  // Session state and method are machine-wide. One copy, served by the core —
-  // which is what lets a method change reach every tree without the caller
-  // stepping out of anything.
+  // Session state and method are machine-wide. One copy, served by the core.
   if (kind === "session" || kind === "method") return { kind: "core" };
   const owner = recordOwnerOf(rel);
   if (owner !== undefined) return { kind: "record", container: owner.container, id: owner.id };
-  // Everything else rides the tree the walk is working in.
+  // Everything else rides the record the walk is working in.
   return { kind: "bound" };
 }
-
-// `methodFilesIn` IS GONE (i34). It enumerated every method file in a tree so
-// the reload could copy the whole set into every other tree — the backfill
-// that caught what the write-time fan-out missed.
-//
-// BOTH EXISTED FOR THE SAME REASON: several trees held copies of one file. The
-// failure its comment recorded — a worktree holding a NEW session.ts against
-// an OLD paths.ts, unable to compile — cannot happen with one copy.

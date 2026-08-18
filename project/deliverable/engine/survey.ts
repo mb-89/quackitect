@@ -3,7 +3,7 @@ import { byPriority, DEFAULT_PRIORITY, headline, type Priority, pendingNotes, pr
 import { itList, readItRecord } from "./iterations.ts";
 import { seDir } from "./paths.ts";
 import { standingTokens } from "./pool.ts";
-import { expList, readRecord } from "./worktree.ts";
+import { expList, readRecord } from "./records.ts";
 
 export interface Survey {
   counts: { expeditions: number; iterations: number; notes: number; backlog: number };
@@ -46,10 +46,10 @@ export function survey(projectRoot: string, opts: SurveyOptions = {}): Survey {
   const exps = expList(projectRoot)
     .filter((e) => e.open)
     .map((e) => ({ id: e.id, goal: goalOf(readRecord(projectRoot, e)) }));
-  // A SHIPPED RECORD IS NOT OPEN, whatever its worktree says. itList calls a
-  // record open when its worktree directory EXISTS, and a close leaves that
-  // directory behind — so i27 stood in the open list the day after it shipped
-  // and the desk advised from a count one too high.
+  // A SHIPPED RECORD IS NOT OPEN, whatever its folder says. itList calls a
+  // record open when its directory EXISTS, and a close leaves that directory
+  // behind — so a shipped record stood in the open list the day after and the
+  // desk advised from a count one too high.
   //
   // The record's own status is the truth, and the goal read below already
   // fetches it, so the filter costs nothing. The expedition list above wants

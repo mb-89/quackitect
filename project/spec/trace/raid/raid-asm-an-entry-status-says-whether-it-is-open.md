@@ -6,7 +6,7 @@ kind: assumption
 statement: A register entry's status field says whether it is open, so the owed-item guard and the close can both read it and agree.
 owner: the driving agent
 trigger: decompose-structure, or any close that passes with an owed item pointing at an entry somebody considers closed
-probe: "SETTLED 2026-08-17, both halves, when the merge of the cloud walk forced two contradictory probe results together. FORM SIDE (i6): the guard read status === open while its own comment named three dead statuses, so it refused accepted, probed, mitigated and deferred — every one an entry with an owner and a trigger. The eight values are ruled: closed, decided and superseded are settled and carry nothing; open, probed, mitigated, accepted and deferred are live and carry a claim. engine/stateform.ts implements that list and tests/owed-ref.test.ts drives all eight. CLOSE SIDE: the reader DOES exist, and has since i11 — engine/worktree.ts line 40, DISPOSED = closed, superseded, mitigated, decided, accepted, deferred, with the close blocking while a ref is not in that set. i6 recorded that no such reader existed; that half was a bad search, and the code stood on the branch at 64b365b5 throughout. THE COMPARISON THIS ROW WAS WRITTEN TO MAKE: the two lists differ and compose safely — every ref the form lets an owed line point at (status open) is also a ref the close blocks on, so no owed item can be filed against something the close would then silently treat as resolved. ONE NARROW ASYMMETRY: status probed blocks the close but cannot be the target of a NEW owed line at submit, which fails toward over-strictness rather than toward the silent pass this entry was written to catch."
+probe: "SETTLED 2026-08-17, both halves, when the merge of the cloud walk forced two contradictory probe results together. FORM SIDE (i6): the guard read status === open while its own comment named three dead statuses, so it refused accepted, probed, mitigated and deferred — every one an entry with an owner and a trigger. The eight values are ruled: closed, decided and superseded are settled and carry nothing; open, probed, mitigated, accepted and deferred are live and carry a claim. engine/stateform.ts implements that list and tests/owed-ref.test.ts drives all eight. CLOSE SIDE: the reader DOES exist, and has since i11 — engine/records.ts line 40, DISPOSED = closed, superseded, mitigated, decided, accepted, deferred, with the close blocking while a ref is not in that set. i6 recorded that no such reader existed; that half was a bad search, and the code stood on the branch at 64b365b5 throughout. THE COMPARISON THIS ROW WAS WRITTEN TO MAKE: the two lists differ and compose safely — every ref the form lets an owed line point at (status open) is also a ref the close blocks on, so no owed item can be filed against something the close would then silently treat as resolved. ONE NARROW ASYMMETRY: status probed blocks the close but cannot be the target of a NEW owed line at submit, which fails toward over-strictness rather than toward the silent pass this entry was written to catch."
 probed: 2026-08-16
 status: open
 impact: an owed item points at an entry the guard reads as open and a reader reads as done, so the close passes on a defect nobody accepted.
@@ -91,7 +91,7 @@ choice between a fabricated tick and a stall.
 ## The correction, 2026-08-17
 
 i6's PROBE RESULT SAID THE CLOSE-SIDE READER DID NOT EXIST. It did, and it
-had since i11 — `engine/worktree.ts` line 40. The search that came back empty
+had since i11 — `engine/records.ts` line 40. The search that came back empty
 was the defect, not the engine. The cloud walk's probe found the reader, and
 merging the two branches put the contradiction where somebody had to settle
 it.
@@ -99,7 +99,7 @@ it.
 ## What still stands
 
 THE COMPARISON IS MADE. Both readers exist: the form-side guard in
-`engine/stateform.ts`, the close-side reader in `engine/worktree.ts`. They
+`engine/stateform.ts`, the close-side reader in `engine/records.ts`. They
 compose safely, so the silent pass this row was written to catch cannot
 happen through them.
 

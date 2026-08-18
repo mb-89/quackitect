@@ -6,7 +6,7 @@ kind: issue
 statement: Entering a record levels its tree's method and engine with trunk, but leaves the spec corpus at the seed.
 owner: the driving agent
 trigger: a scoped run inside a record fails a case that passes on trunk
-status: open
+status: closed
 impact: The walk reads the red as its own and starts debugging work it never did. Worse, every measurement taken inside a record is taken against a tree that matches neither trunk nor the seed.
 breaks_how_badly: corrosive
 how_likely: expected
@@ -70,3 +70,14 @@ Either half would do.
 The first is the smaller change and it carries a hazard the second does
 not: a record's own spec edits must not fan out over trunk, which is the
 failure i27 was built to stop.
+
+## Closed
+
+ENTRY LEVELS NOTHING, because there is nothing to level. The issue was that
+entering a record copied method and engine into that record's own tree while
+leaving its spec corpus at the seed, so a measurement inside a record matched
+neither trunk nor the seed.
+
+ONE TREE MAKES THE THREE THINGS ONE THING. Method, engine and corpus are the
+same files whoever is standing where, so a scoped run inside a record judges
+exactly what a run outside it judges.

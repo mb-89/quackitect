@@ -568,36 +568,33 @@ Where the LANE works. ONE TREE, so this is the root and nothing else
  a chooser that happens to have one branch is still a chooser, and the
  requirement asks for the absence of one, not for the right answer.
 
-## The checkout that owns the worktrees
+## One checkout owns every record
 
-THE CHECKOUT THAT OWNS THE WORKTREES, and the machine's own state with
- them (owner ruling 2026-08-15).
+THERE IS ONE WORKING TREE. A record is a folder inside it, never a
+checkout of its own, so nothing selects between trees and no call can pick
+the wrong one.
 
- THREE THINGS BELONG TO THE MACHINE AND NEVER TO A BRANCH.
+TWO THINGS BELONG TO THE MACHINE AND NEVER TO A RECORD.
 
- - Worktree management itself: listing, seeding, finding, landing,
-   syncing. A tree cannot be asked to enumerate the trees.
- - `.se/` session state: the call log, the notes, the handover, settings,
-   the mode and the autonomy levels. One per machine, not one per record.
- - The claim ledger and the machine id, which say WHICH machine this is.
+- `.se/` session state: the call log, the notes, the handover, settings,
+  the mode and the autonomy levels. One per machine, not one per record.
+- The claim ledger and the machine id, which say WHICH machine this is.
 
- WHY IT IS A METHOD AND NOT THE RAW FIELD. Eighty-seven callers reached
- past `workRoot` straight to the field, and most of them were right to
- want the repo. One of them was not, and nothing distinguished it: a
- state's script condition ran against the repo while every file verb
- wrote to the bound worktree, so the check judged a corpus the agent had
- no write path to. Naming the intention is what makes the odd one out
- visible.
+WHY IT IS A METHOD AND NOT THE RAW FIELD. Eighty-seven callers reached
+past `workRoot` straight to the field, and most of them were right to want
+the repo. One of them was not, and nothing distinguished it: a state's
+script condition ran against one root while every file verb wrote to
+another, so the check judged a corpus the agent had no write path to.
+Naming the intention is what makes the odd one out visible.
 
 ## The corpus a reader sees
 
 THE CORPUS A READER SEES. One entry, because there is one tree.
 
- IT USED TO BE A CHOICE (owner ruling 2026-08-06). Trunk was what had
- landed, an open record's worktree was a full checkout carrying trunk's
- nodes AND that record's own, and a whole-corpus view belonged to no
- single record — so the person picked which one they meant instead of the
- engine guessing, which it had done three times, differently each time.
+ IT USED TO BE A CHOICE (owner ruling 2026-08-06), back when a record was
+ its own checkout and a whole-corpus view belonged to no single one of
+ them. The person picked which they meant instead of the engine guessing,
+ which it had done three times, differently each time.
 
  i34 GAVE THE QUESTION ONE ANSWER by deleting the second tree. The ruling
  is not overturned: nobody guesses. There is simply nothing left to pick

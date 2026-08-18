@@ -26,7 +26,7 @@ test("a recorded visit yields its state, however deep the container", () => {
 
 import { anyGuidanceDoc, bootedServer, call, freshRoot } from "./helpers.ts";
 
-// A narrated call writes the record's decision trail INTO the bound worktree,
+// A narrated call writes the record's decision trail INTO the record,
 // so a walk that is narrating can never present a clean tree. A sync is wanted
 // exactly when an expedition is entered, which is when narration is heaviest,
 // and the two refused each other: riding an update on the sync dirtied the

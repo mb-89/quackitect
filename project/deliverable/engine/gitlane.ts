@@ -75,7 +75,7 @@ export function gitLane(cwd: string, rawArgs: unknown[]): Record<string, unknown
       remedy: {
         tool: "se_git",
         args: { args: ["restore", "--staged", "<path>"] },
-        note: "worktree restores discard human edits; only unstaging is lane-legal",
+        note: "a restore discards human edits; only unstaging is lane-legal",
       },
       source: "engine/gitlane.ts",
     });
@@ -116,17 +116,6 @@ export function gitLane(cwd: string, rawArgs: unknown[]): Record<string, unknown
   return { ok: r.ok, code: r.code, stdout: r.stdout.slice(-20_000), stderr: r.stderr.slice(-20_000) };
 }
 
-// THE TWO TREES DRIFT, AND THE LANE COULD NOT CLOSE THE GAP. An expedition's
-// branch is cut when it is SEEDED, so a worktree is behind before it is ever
-// entered. An expedition that stays open on purpose still has to get its work
-// onto trunk. Both directions were done with `git -C <absolute root>` through
-// se_run, which is a shell command doing a lane tool's job and a hole straight
-// through contract rule 1. Hit at e20, at e21, and four times in one day.
-//
-// The pair is deliberate. SYNC brings trunk IN so a worktree is never silently
-// stale. LAND puts the work OUT without closing anything. Close stays the
-// third thing, and it is the only one that retires a record.
-
 /** see dsp-file-lane.md#the-engines-own-trail-is-not-somebodys-uncommitted-work */
 const ENGINE_TRAIL = /project\/spec\/(?:expeditions|iterations)\/[^/]+\/decisions\.jsonl$/;
 
@@ -165,14 +154,4 @@ function _crossed(where: string, before: string): string[] {
     .filter((l) => l !== "");
 }
 
-// `gitLand`, `gitSync` AND `twoTrees` ARE DELETED (i34). They reconciled a
-// record's worktree with trunk in both directions, and the pair was
-// deliberate: SYNC brought trunk in so a worktree was never silently stale,
-// LAND put the work out without closing anything.
-//
-// ONE TREE MAKES BOTH EMPTY. Work is written on trunk from the first
-// keystroke, so it is landed by construction and cannot go stale.
-//
-// `twoTrees` WAS THE GUARD THAT MADE THEM UNUSABLE. It refused when the two
-// roots were equal, which after i34 they always are — so both verbs refused
-// every call while their descriptions still promised a reconciliation.
+// see dsp-file-lane.md#one-tree-needs-no-reconciliation
