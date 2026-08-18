@@ -126,6 +126,31 @@ say `replace_all` and mean it.
 ### SE-C-126 — unreadable bytes
 Images travel as pictures. Arbitrary binary does not travel at all.
 
+### SE-C-139 — the ref does not resolve here
+A `ref` this clone cannot resolve. The refusal names the ref, quotes what git
+said, and hands back the pair of calls that fixes it.
+
+A SHALLOW CLONE IS THE ORDINARY CAUSE. A cloud box clones one branch, so `main`
+and `v2` do not exist locally at all.
+
+A FETCH ALONE IS NOT ENOUGH, and that is the part that surprises people.
+Measured on the i35 cloud run, 2026-08-17: after `git fetch --all --prune`,
+`ref: main` still failed with `unknown revision`. The local branch has to be
+created from the remote-tracking one.
+
+- `se_git {args: ["fetch", "--all", "--prune"]}`
+- `se_git {args: ["branch", "main", "origin/main"]}`
+
+WHY IT IS TYPED NOW. It was the ONE place in the lane where the typed-rejection
+law did not hold: the search threw raw git text with no clause and no remedy.
+Raw git text reads as "the file is missing" when what is missing is the BRANCH,
+and that misreading cost the i15 run a wrongly-minted assumption carried through
+six evidence forms.
+
+A GIT FAILURE THAT IS NOT ABOUT THE REF STAYS AN ERROR. A broken pattern is an
+internal fault rather than something the caller can fix, and a remedy that does
+not apply is worse than none.
+
 ### SE-C-127 — the root is not declared
 `@name` reaches only roots the owner declared in `.se/roots.json`. Ask the
 owner before declaring one.

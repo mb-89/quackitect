@@ -13,6 +13,7 @@
 import { spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { relative, resolve, sep } from "node:path";
+import { CLAUSES, Rejection } from "./errors.ts";
 import { isRootRef, resolveDeclaredRoot, resolveForRead } from "./paths.ts";
 
 export interface Match {
@@ -290,13 +291,48 @@ function gitPathspec(opts: { path?: string; include?: string }): string[] {
   return ["--", opts.path === undefined ? `:(glob)${inc}` : `:(glob)${opts.path.replace(/\/+$/, "")}/${inc}`];
 }
 
+/** A GIT FAILURE AT A REF, TYPED.
+ *
+ *  THE ONE PLACE THE LANE'S OWN LAW DID NOT HOLD (i35 field report,
+ *  2026-08-17). Every other refusal names a clause, what was expected, what
+ *  arrived, and a remedy that runs. This threw raw git text, and raw git text
+ *  reads as "the file is missing" when what is missing is the BRANCH.
+ *
+ *  IT COST A FALSE CLAIM THROUGH SIX EVIDENCE FORMS. The i15 run read an
+ *  unresolvable ref as an empty result, minted an assumption on it, and carried
+ *  the conclusion forward.
+ *
+ *  A SHALLOW CLONE IS THE ORDINARY CAUSE. A cloud box clones one branch, so
+ *  `main` and `v2` do not exist locally, and a fetch alone does not create
+ *  them — the remedy below is the pair that does, measured on that run. */
+function gitFailed(r: { status: number | null; stderr?: string }, ref: string): never {
+  const stderr = (r.stderr ?? "").trim();
+  // ONLY THE REF CASE IS TYPED, because only it is the caller's to fix. A
+  // broken pattern or a git that will not run is an internal fault, and
+  // dressing it as a refusal would offer a remedy that does not apply.
+  if (!/unknown revision|not a valid object name|bad revision|ambiguous argument/i.test(stderr)) {
+    throw new Error(`git grep failed: ${stderr || `exit ${r.status}`}`);
+  }
+  throw new Rejection({
+    clause: CLAUSES.REF_UNRESOLVED,
+    expected: "a ref this clone can resolve — a branch, a tag or a commit that exists locally",
+    got: `${ref} does not resolve here: ${stderr}`,
+    remedy: {
+      tool: "se_git",
+      args: { args: ["fetch", "--all", "--prune"] },
+      note: `then create the local branch, because a fetch alone does not: se_git {args: ["branch", "${ref}", "origin/${ref}"]}. Measured on the i35 cloud run — after the fetch alone, ref: ${ref} still failed with this same error.`,
+    },
+    source: "engine/search.ts gitGrep",
+  });
+}
+
 /** count_only at a ref: git grep -c. */
 function gitGrepCount(root: string, query: string, ref: string, opts: SearchOpts): { path: string; count: number }[] {
   const args = ["grep", "-c", "-I", "-E"];
   if (opts.ignore_case === true) args.push("-i");
   args.push(query, ref, ...gitPathspec(opts));
   const r = spawnSync("git", args, { cwd: root, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
-  if (r.status !== 0 && r.status !== 1) throw new Error(`git grep failed: ${(r.stderr ?? "").trim() || `exit ${r.status}`}`);
+  if (r.status !== 0 && r.status !== 1) gitFailed(r, ref);
   const out: { path: string; count: number }[] = [];
   for (const line of (r.stdout ?? "").split("\n")) {
     const m = line.match(/^(.+?):(.+?):(\d+)$/);
@@ -315,7 +351,7 @@ function gitGrepSearch(root: string, query: string, ref: string, opts: SearchOpt
   if (opts.ignore_case === true) args.push("-i");
   args.push(query, ref, ...gitPathspec(opts));
   const r = spawnSync("git", args, { cwd: root, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
-  if (r.status !== 0 && r.status !== 1) throw new Error(`git grep failed: ${(r.stderr ?? "").trim() || `exit ${r.status}`}`);
+  if (r.status !== 0 && r.status !== 1) gitFailed(r, ref);
   const out: Match[] = [];
   for (const line of (r.stdout ?? "").split("\n")) {
     if (line.trim() === "" || line === "--") continue;

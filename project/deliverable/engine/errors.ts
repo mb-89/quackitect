@@ -100,4 +100,5 @@ export const CLAUSES = {
   TEST_NO_QUESTION: "SE-C-136", // a scoped run with no question — the scope says which tests ran, only the question says why
   OUTPUT_SHAPED: "SE-C-137", // a truncating pipe would cut the output BEFORE the engine sees it — refused at the boundary, because what it drops exists nowhere
   CORPUS_UNREADABLE: "SE-C-138", // a write would leave a corpus node the engine's own reader cannot parse — refused before it lands, because the break surfaces later at a reader that cannot name it
+  REF_UNRESOLVED: "SE-C-139", // a ref that git cannot resolve — typed rather than raw, because a raw git error reads as "the file is missing" when the BRANCH is missing
 } as const;
