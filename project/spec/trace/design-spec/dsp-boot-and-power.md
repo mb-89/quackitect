@@ -9,6 +9,8 @@ files:
   - "project/deliverable/engine/bin/bench-boot.ts"
   - "project/deliverable/engine/bin/se-pty.ts"
   - "project/deliverable/engine/bin/se-hook-stop.ts"
+  - "project/deliverable/engine/bin/se-hook-start.ts"
+  - "project/deliverable/engine/pullnotice.ts"
   - "project/deliverable/engine/bin/package.ts"
   - "project/deliverable/engine/version.ts"
 ---

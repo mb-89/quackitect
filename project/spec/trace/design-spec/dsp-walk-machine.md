@@ -15,11 +15,18 @@ files:
   - "project/deliverable/engine/atamwalk.ts"
   - "project/deliverable/engine/conditions.ts"
   - "project/deliverable/engine/scale.ts"
+  - "project/deliverable/engine/readproof.ts"
 ---
 
 ## Responsibility
 
 One pull answers with one instruction: read, fill, choose, do or wait.
+
+THE READING PROOF IS PART OF THAT ANSWER, which is why engine/readproof.ts sits
+here rather than beside the lane door. A `read` instruction is not complete
+until the walk can tell whether the document arrived, and the probe maths is
+what decides it. It was minted on trunk on 2026-08-18 and claimed by nothing
+until i17 reached this check.
 The session recomputes position from the repository on every call,
 weighs each hop against the autonomy slider, serves the owed reading
 with its proof, and never trusts a client-held position.
