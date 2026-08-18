@@ -6571,6 +6571,21 @@ export class Session {
     return out;
   }
 
+  /** IS THIS HOP THE DRAWN PATH FOR THE STATE FAILING?
+   *
+   *  A `fallback` or `error` edge exists for exactly one reason: the thing
+   *  went wrong and the drawing has somewhere to put it. Walking one is not
+   *  leaving with the work done, and the claim gate must not read it as such.
+   *
+   *  IT MUST BE UNAMBIGUOUS. Where `to` also has a normal edge from here, the
+   *  hop is a forward move that happens to share a target, and the gate stands.
+   *  Only a target reachable ONLY by a repair edge is a repair. */
+  private takesRepairEdge(m: MachineDecl, cur: string, to: string | undefined): boolean {
+    if (to === undefined) return false;
+    const edges = this.state(m, cur).edges.filter((e) => e.to === to);
+    return edges.length > 0 && edges.every((e) => e.role === "fallback" || e.role === "error");
+  }
+
   private assertStateFormMet(stateId: string): void {
     // THE FIRST BLOCKER IS THE REFUSAL, unchanged. The walk refuses exactly
     // where it refused before, with the same clause and the same remedy.
@@ -7705,7 +7720,33 @@ export class Session {
     // THE EXIT IS THE HARD GATE (owner ruling 2026-08-04): a state with
     // evidence fields leaves only on a COMPLETE stored form — the claim
     // stands in the record before the walk moves.
-    if (inIteration && this.state(top.decl, cur).evidence_form.length > 0) this.assertStateFormMet(cur);
+    //
+    // EXCEPT ALONG A FALLBACK, AND THAT EXCEPTION IS THE WHOLE REPAIR LOOP
+    // (owner instruction 2026-08-18: "you do the verification, you fail, you go
+    // to fix-findings, you go back to verification, you try again... I don't
+    // know why every agent keeps messing that up").
+    //
+    // THEY WERE NOT MESSING IT UP. A fallback edge IS the drawn path for this
+    // state failing, and this line demanded a GREEN CLAIM before it could be
+    // walked — which is demanding that the failure not have happened. So a
+    // verification that found a real defect had no legal move at all: the
+    // forward door wanted every claim green, the repair door wanted the same
+    // green claim, and the state grants read verbs only.
+    //
+    // MEASURED AT i17's VERIFICATION, 2026-08-18. A tester returned three
+    // blocking findings with the battery green — two of them inspection
+    // findings that no test can turn red. The walk had to escape to the desk.
+    // raid-iss-a-verification-finding-that-is-not-a-test-failure-has-no-route
+    // carries the measurement.
+    //
+    // NOTHING IS SKIPPED BY TAKING IT. `outcomeFor` returns "failed" for a
+    // fallback or error edge, `completeGuarded`'s claim guard applies only to
+    // a "filled" completion, and `settledStates` counts a state green only
+    // where its LATEST outcome is "filled". So this route DEMOTES the state
+    // and can never advance one: the walk must come back and sign it green.
+    if (inIteration && this.state(top.decl, cur).evidence_form.length > 0 && !this.takesRepairEdge(top.decl, cur, to)) {
+      this.assertStateFormMet(cur);
+    }
     const outcome = this.outcomeFor(top.decl, cur, to);
     this.completeGuarded(top.decl, top.instance, cur, outcome, now, to);
     // Leaving the state is what destroys what it consumed.

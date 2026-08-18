@@ -3,11 +3,11 @@ minted_in: i17-the-options-pool-triage-a-raw-note-into-
 id: raid-asm-a-verbatim-overlap-check-catches-the-paste-that-matters
 type: "[[raid]]"
 kind: assumption
-statement: "A verbatim-overlap check between the offered statement and the raw note catches the copies that actually happen, because the copy that happens is a paste rather than a paraphrase."
+statement: A verbatim-overlap check between the offered statement and the raw note catches the copies that actually happen, because the copy that happens is a paste rather than a paraphrase.
 owner: the driving agent
-trigger: "the first mint refused by the check, or the first leak found in the pool by the corpus sweep"
+trigger: the first mint refused by the check, or the first leak found in the pool by the corpus sweep
 status: open
-impact: "req-a-minted-option-is-authored-never-the-note-s-own-text is the only FATAL row in the delta and this is the only mechanical thing standing behind it. If the copies that happen are paraphrases, the check is theatre and the hard line has nothing enforcing it."
+impact: req-a-minted-option-is-authored-never-the-note-s-own-text is the only FATAL row in the delta and this is the only mechanical thing standing behind it. If the copies that happen are paraphrases, the check is theatre and the hard line has nothing enforcing it.
 breaks_how_badly: fatal
 how_likely: plausible
 probe: "UNPROBED, because the thing it is about does not exist yet: the check is not built and the pool has no content, so there is no distribution to measure. The probe is on the body - the longest verbatim run shared between each minted option and its source note - and it is owed to the migration. Its FATAL grading is the argument for running it early rather than at fifty mints."

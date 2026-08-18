@@ -10,8 +10,8 @@ status: open
 impact: The entrypoint reports success and exits, the host reaps the lane with the session, and the walk stops with nothing having gone visibly wrong. It reads exactly like the server-is-not-there symptom this iteration exists to remove.
 breaks_how_badly: fatal
 how_likely: plausible
-probe: "HOLDS, AND THE POSIX BRANCH IS NO LONGER UNEXERCISED. Re-probed 2026-08-18 on the i17 cloud run, a Linux container - which is the host cloud-runner.md named as the branch that had never run. se-arrive spawned the lane detached, returned, and the lane answered every call for the whole session across dozens of separate shell invocations. Nothing reaped it. The trigger named a host whose process supervision differs, and this was one. i35 measured the same behaviour on Windows; this is the other family."
-probed: "2026-08-18"
+probe: HOLDS, AND THE POSIX BRANCH IS NO LONGER UNEXERCISED. Re-probed 2026-08-18 on the i17 cloud run, a Linux container - which is the host cloud-runner.md named as the branch that had never run. se-arrive spawned the lane detached, returned, and the lane answered every call for the whole session across dozens of separate shell invocations. Nothing reaped it. The trigger named a host whose process supervision differs, and this was one. i35 measured the same behaviour on Windows; this is the other family.
+probed: 2026-08-18
 source_refs:
   - req-the-lane-runs-without-a-console
   - nbr-cloud-host

@@ -8,7 +8,7 @@ owner: the driving agent
 trigger: any new host, any host upgrade, and the first corpus break with no matching write in the call log
 status: open
 probe: "RE-PROBED 2026-08-18 AND THE ENFORCEMENT HALF STILL HOLDS: se_help refused SE-C-110 at onboard-retro with that state's exact tool list, se_web_search refused SE-C-106 for want of a provider, and every form check refused SE-C-112 naming its field. BUT THE GAP THIS ENTRY ALREADY NAMED WAS WALKED THROUGH, AND IT COST REAL WRITES. On the i17 arrival the lane failed to start, so boot never completed, and boot/prepare_idle grants no tools while its own guidance promises repair tools. Three engine files were edited with native tools to make the lane answer at all. THE CAGE DID NOT FAIL - IT WAS NEVER BINDING, because a settings file placed after a session starts does not bind that session. THE UNCAGED WINDOW IS THEREFORE NOT ONLY THE ARRIVAL: it is the whole of any session whose boot cannot complete, and that is raid-iss-boot-grants-no-tools-while-promising-repair."
-probed: "2026-08-18"
+probed: 2026-08-18
 impact: Every check this iteration builds is defeated by one uncaged write. The corpus breaks, no refusal fires, and the call log holds no record of who did it.
 breaks_how_badly: fatal
 how_likely: plausible

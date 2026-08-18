@@ -3,7 +3,7 @@ form: the-paste-refusal
 by: agent
 signed_off: 2026-08-18T10:01:34.625Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-paste-refusal

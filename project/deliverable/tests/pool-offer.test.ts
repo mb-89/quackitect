@@ -12,7 +12,7 @@ import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
 import { appendNote, drainNote } from "../engine/inbox.ts";
 import { seDir } from "../engine/paths.ts";
-import { standingOptions } from "../engine/pool.ts";
+import { standingTokens } from "../engine/pool.ts";
 import { survey } from "../engine/survey.ts";
 import { freshRoot } from "./helpers.ts";
 
@@ -35,7 +35,7 @@ describe("what stands open is read from the repository", { concurrency: true }, 
     const ids = s.backlog.map((b) => b.ref).sort();
     assert.deepEqual(
       ids,
-      standingOptions(root)
+      standingTokens(root)
         .map((o: { id: string }) => o.id)
         .sort(),
       "the offer names different things than the pool holds",
@@ -88,7 +88,7 @@ describe("one source, two readers", { concurrency: true }, () => {
     const fromSurvey = survey(root)
       .backlog.map((b) => b.ref)
       .sort();
-    const fromPool = standingOptions(root)
+    const fromPool = standingTokens(root)
       .map((o: { id: string }) => o.id)
       .sort();
     assert.deepEqual(fromSurvey, fromPool, "the two readers of one pool named different options");

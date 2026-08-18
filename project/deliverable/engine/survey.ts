@@ -9,7 +9,7 @@
 import { byPriority, DEFAULT_PRIORITY, headline, type Priority, pendingNotes, priorityOf, titleOf } from "./inbox.ts";
 import { itList, readItRecord } from "./iterations.ts";
 import { seDir } from "./paths.ts";
-import { standingOptions } from "./pool.ts";
+import { standingTokens } from "./pool.ts";
 import { expList, readRecord } from "./worktree.ts";
 
 export interface Survey {
@@ -86,7 +86,7 @@ export function survey(projectRoot: string, opts: SurveyOptions = {}): Survey {
   // AN UNDRAINED CAPTURE IS NOT AN OPTION and deliberately never enters here.
   // It has not been judged, and this list is what somebody may commit to. The
   // pending count above stays the separate signal it always was.
-  const allBacklog = standingOptions(projectRoot).map((o) => ({
+  const allBacklog = standingTokens(projectRoot).map((o) => ({
     ref: o.id,
     ready_when: o.ready_when,
     title: headline(o.statement, GOAL_CAP),
@@ -98,8 +98,21 @@ export function survey(projectRoot: string, opts: SurveyOptions = {}): Survey {
     counts: { expeditions: exps.length, iterations: its.length, notes: allNotes.length, backlog: allBacklog.length },
     ...(windowed
       ? {
-          notes_window: { offset, shown: notes.length, remaining: Math.max(0, allNotes.length - offset - notes.length) },
-          backlog_window: { offset, shown: backlog.length, remaining: Math.max(0, allBacklog.length - offset - backlog.length) },
+          // PAST THE END, `remaining` MUST NOT READ AS "you have seen it all".
+          // With seven standing and an offset of nine it answered shown 0,
+          // remaining 0 — which is what a reader gets at the end of a list they
+          // have actually walked. Clamping the OFFSET rather than the result
+          // keeps the arithmetic honest in both directions.
+          notes_window: {
+            offset,
+            shown: notes.length,
+            remaining: Math.max(0, allNotes.length - Math.min(offset, allNotes.length) - notes.length),
+          },
+          backlog_window: {
+            offset,
+            shown: backlog.length,
+            remaining: Math.max(0, allBacklog.length - Math.min(offset, allBacklog.length) - backlog.length),
+          },
         }
       : {}),
     expeditions: exps,

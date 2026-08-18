@@ -3,9 +3,9 @@ minted_in: i17-the-options-pool-triage-a-raw-note-into-
 id: raid-iss-tactical-is-documented-as-enough-to-walk-an-iteration-and-is-not
 type: "[[raid]]"
 kind: issue
-statement: "scale.ts stated that tactical runs a whole iteration end to end; a bless wants a hand strictly ABOVE the gate's weight, so tactical fills a gate and cannot sign it, and an unattended run at the default rung stops at the first gate."
+statement: scale.ts stated that tactical runs a whole iteration end to end; a bless wants a hand strictly ABOVE the gate's weight, so tactical fills a gate and cannot sign it, and an unattended run at the default rung stops at the first gate.
 owner: the owner
-trigger: "already live - hit at i17's gate-kickoff, 2026-08-18, on an unattended box"
+trigger: already live - hit at i17's gate-kickoff, 2026-08-18, on an unattended box
 status: open
 impact: "The default rung moved from operational to tactical on 2026-08-18 for a stated reason: an unattended run stopped at the first milestone every time. It still stops there. The stop moved from the gate's ENTRY to the gate's BLESS, one call later and the same outcome - and the comment recording the fix read as if the problem were solved, so the next unattended run would have rediscovered it."
 breaks_how_badly: crippling

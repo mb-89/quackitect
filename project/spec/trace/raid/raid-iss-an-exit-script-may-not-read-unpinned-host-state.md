@@ -3,11 +3,11 @@ minted_in: i17-the-options-pool-triage-a-raw-note-into-
 id: raid-iss-an-exit-script-may-not-read-unpinned-host-state
 type: "[[raid]]"
 kind: issue
-statement: "An exit script that reads unpinned host state decides a gate on a property of the machine, so it is green where it was written and red everywhere else."
+statement: An exit script that reads unpinned host state decides a gate on a property of the machine, so it is green where it was written and red everywhere else.
 owner: the owner
-trigger: "already live - prose-inspect returned 64 false findings on the first foreign machine to run it, 2026-08-18"
+trigger: already live - prose-inspect returned 64 false findings on the first foreign machine to run it, 2026-08-18
 status: open
-impact: "A condition is supposed to say whether the WORK is ready. One that reads the environment says whether the HOST is familiar, and the two are indistinguishable from the refusal. The failure lands at boot, where the agent has the least room to diagnose it."
+impact: A condition is supposed to say whether the WORK is ready. One that reads the environment says whether the HOST is familiar, and the two are indistinguishable from the refusal. The failure lands at boot, where the agent has the least room to diagnose it.
 breaks_how_badly: corrosive
 how_likely: expected
 probe: "PARTLY CLOSED. prose-inspect's own two causes are fixed and pinned by tests/identity-collision.test.ts, which stands in for a foreign host. What is NOT closed is the rule: nothing stops the next exit script reading a path, a hostname or a locale."

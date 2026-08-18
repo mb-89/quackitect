@@ -2,10 +2,10 @@
 minted_in: i17-the-options-pool-triage-a-raw-note-into-
 id: req-draining-to-the-pool-mints-an-option-on-trunk
 type: "[[requirement]]"
-statement: "When a pending note is drained to the pool, the system shall write an option node into the repository, carrying the author's statement, the re-entry condition and a reference to the note it came from."
+statement: When a pending note is drained to the pool, the system shall write an option node into the repository, carrying the author's statement, the re-entry condition and a reference to the note it came from.
 kind: functional
 verify_method: test
-breaks_if_removed: "Nothing produced by a drain leaves the machine. Every parked option stays in .se/notes.jsonl, which .gitignore excludes, so no other clone can read it and a released box takes it with it. That is the present state, and it is what uc-put-a-finding-where-it-outlives-the-machine and uc-see-the-whole-pool-from-any-clone both fail on."
+breaks_if_removed: Nothing produced by a drain leaves the machine. Every parked option stays in .se/notes.jsonl, which .gitignore excludes, so no other clone can read it and a released box takes it with it. That is the present state, and it is what uc-put-a-finding-where-it-outlives-the-machine and uc-see-the-whole-pool-from-any-clone both fail on.
 breaks_how_badly: crippling
 refines:
   - uc-put-a-finding-where-it-outlives-the-machine

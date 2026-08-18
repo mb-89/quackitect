@@ -2,10 +2,10 @@
 minted_in: i17-the-options-pool-triage-a-raw-note-into-
 id: req-a-minted-option-says-what-it-is-and-when-it-comes-back
 type: "[[requirement]]"
-statement: "The system shall refuse a mint whose statement is empty or whose re-entry condition is empty, and shall accept an explicit statement that the option cannot be stated cleanly yet."
+statement: The system shall refuse a mint whose statement is empty or whose re-entry condition is empty, and shall accept an explicit statement that the option cannot be stated cleanly yet.
 kind: functional
 verify_method: test
-breaks_if_removed: "The pool fills with items nobody can act on. An option with no statement is a stray that got promoted; an option with no condition never comes back, which is what makes a backlog a graveyard. And without the third line an author facing a genuinely unstatable stray has only two moves left — guess, or drop it — and both lose the finding."
+breaks_if_removed: The pool fills with items nobody can act on. An option with no statement is a stray that got promoted; an option with no condition never comes back, which is what makes a backlog a graveyard. And without the third line an author facing a genuinely unstatable stray has only two moves left — guess, or drop it — and both lose the finding.
 breaks_how_badly: crippling
 refines:
   - uc-put-a-finding-where-it-outlives-the-machine

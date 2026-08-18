@@ -3,11 +3,11 @@ minted_in: i17-the-options-pool-triage-a-raw-note-into-
 id: raid-asm-the-corpus-sweep-already-covers-a-minted-option
 type: "[[raid]]"
 kind: assumption
-statement: "prose-inspect's identity sweep already walks anything under project/spec, so a minted option is swept for leaked names and paths on the day the pool exists, with no new check written."
+statement: prose-inspect's identity sweep already walks anything under project/spec, so a minted option is swept for leaked names and paths on the day the pool exists, with no new check written.
 owner: the driving agent
-trigger: "the first mint, or any change to where the pool is stored"
+trigger: the first mint, or any change to where the pool is stored
 status: open
-impact: "It is free coverage the design is counting on. If the pool lands anywhere the sweep does not walk, the second success criterion of vp-what-is-learned-outlives-the-machine - zero identity needles in minted options - has nothing measuring it, and nobody would notice the gap because the criterion would keep reading as met."
+impact: It is free coverage the design is counting on. If the pool lands anywhere the sweep does not walk, the second success criterion of vp-what-is-learned-outlives-the-machine - zero identity needles in minted options - has nothing measuring it, and nobody would notice the gap because the criterion would keep reading as met.
 breaks_how_badly: crippling
 how_likely: conceivable
 probe: "HOLDS. Run 2026-08-18 against a throwaway root carrying one minted option under project/spec/trace/option/, with a git identity and a HOME belonging to nobody real and the option body carrying both. prose-inspect came back RED with two findings, naming the file and the line for the username and for the home directory, exit 1. It does NOT settle the inherited blind spot: a leaked name that is also common project vocabulary is muted here as everywhere."

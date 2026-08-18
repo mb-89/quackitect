@@ -3,11 +3,11 @@ minted_in: i17-the-options-pool-triage-a-raw-note-into-
 id: raid-risk-the-rewrite-carries-the-private-sentence-across
 type: "[[raid]]"
 kind: risk
-statement: "The rewrite is the privacy boundary, and a rewrite that copies the note's own sentence carries whatever was private in it straight onto trunk."
+statement: The rewrite is the privacy boundary, and a rewrite that copies the note's own sentence carries whatever was private in it straight onto trunk.
 owner: the owner
-trigger: "the first mint, and every mint after it"
+trigger: the first mint, and every mint after it
 status: open
-impact: "The whole hard line rests on one act performed by whoever is draining. A rewrite that is really a copy passes every check the mechanism has, because the mechanism cannot read intent. And a leak on trunk cannot be undone - history keeps it, and SE-C-002 forbids rewriting history."
+impact: The whole hard line rests on one act performed by whoever is draining. A rewrite that is really a copy passes every check the mechanism has, because the mechanism cannot read intent. And a leak on trunk cannot be undone - history keeps it, and SE-C-002 forbids rewriting history.
 breaks_how_badly: crippling
 how_likely: plausible
 source_refs:

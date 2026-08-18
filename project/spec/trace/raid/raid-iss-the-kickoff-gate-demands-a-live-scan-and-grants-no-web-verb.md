@@ -3,14 +3,14 @@ minted_in: i17-the-options-pool-triage-a-raw-note-into-
 id: raid-iss-the-kickoff-gate-demands-a-live-scan-and-grants-no-web-verb
 type: "[[raid]]"
 kind: issue
-statement: "meth-gate-review demands a live prior-art scan AT the gate, and gate-kickoff's legal tools carry neither se_web_search nor se_web_fetch."
+statement: meth-gate-review demands a live prior-art scan AT the gate, and gate-kickoff's legal tools carry neither se_web_search nor se_web_fetch.
 owner: the owner
-trigger: "every kickoff gate - live since the method demanded a scan"
+trigger: every kickoff gate - live since the method demanded a scan
 status: open
 impact: "The gate asks a question it gives no way to answer. The three available outcomes are all bad: skip the round, route around the lane, or write a name from memory - and the method names the third as exactly what a scan is not. The honest answer, a recorded gap, weakens every kickoff that gives it."
 breaks_how_badly: corrosive
 how_likely: expected
-probe: "OPEN. The nearest precedent is raid-risk-i15-ships-without-a-live-prior-art-scan, which recorded the same absence one iteration earlier and read it as a choice rather than as a missing tool."
+probe: OPEN. The nearest precedent is raid-risk-i15-ships-without-a-live-prior-art-scan, which recorded the same absence one iteration earlier and read it as a choice rather than as a missing tool.
 source_refs:
   - i17-the-options-pool-triage-a-raw-note-into-
   - raid-risk-i15-ships-without-a-live-prior-art-scan

@@ -3,13 +3,13 @@ minted_in: i17-the-options-pool-triage-a-raw-note-into-
 id: tsp-the-pool-is-what-is-offered
 type: "[[test-spec]]"
 statement: What stands open is answered from the repository, completely and identically to both readers, verified by test over the survey.
-method: "test"
+method: test
 verifies:
-  - "req-open-work-is-answered-from-the-repository-not-a-local-store"
-  - "req-a-windowed-pool-answer-says-that-it-was-windowed"
-  - "req-the-pool-answers-a-person-and-an-agent-from-one-source"
+  - req-open-work-is-answered-from-the-repository-not-a-local-store
+  - req-a-windowed-pool-answer-says-that-it-was-windowed
+  - req-the-pool-answers-a-person-and-an-agent-from-one-source
 files:
-  - "tests/pool-offer.test.ts"
+  - tests/pool-offer.test.ts
 ---
 
 ## Scope

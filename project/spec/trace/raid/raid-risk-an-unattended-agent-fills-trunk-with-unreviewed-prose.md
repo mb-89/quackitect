@@ -3,11 +3,11 @@ minted_in: i17-the-options-pool-triage-a-raw-note-into-
 id: raid-risk-an-unattended-agent-fills-trunk-with-unreviewed-prose
 type: "[[raid]]"
 kind: risk
-statement: "Filing into the pool has to be cheap enough that an unattended agent actually does it, and every cheap filing lands on trunk with no person having read it."
+statement: Filing into the pool has to be cheap enough that an unattended agent actually does it, and every cheap filing lands on trunk with no person having read it.
 owner: the owner
-trigger: "the first cloud run that files an option, or the first retro that finds the pool grew without anybody reading it"
+trigger: the first cloud run that files an option, or the first retro that finds the pool grew without anybody reading it
 status: open
-impact: "The cloud case is why the pool exists - a finding must survive the box being released. The same property means a walk nobody watches writes to the shared store. A pool nobody trusts is read like an inbox, which is what this iteration is trying to stop being."
+impact: The cloud case is why the pool exists - a finding must survive the box being released. The same property means a walk nobody watches writes to the shared store. A pool nobody trusts is read like an inbox, which is what this iteration is trying to stop being.
 breaks_how_badly: corrosive
 how_likely: likely
 source_refs:

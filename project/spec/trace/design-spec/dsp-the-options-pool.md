@@ -4,15 +4,15 @@ id: dsp-the-options-pool
 type: "[[design-spec]]"
 statement: the crossing from a machine-local capture to a durable option — one module that mints and reads, one argument added to the drain, and one reader pointed at the corpus instead of the note store
 realizes:
-  - "el-holding-pen"
-  - "el-front-desk"
+  - el-holding-pen
+  - el-front-desk
 files:
-  - "project/deliverable/engine/pool.ts"
-  - "project/deliverable/engine/inbox.ts"
-  - "project/deliverable/engine/survey.ts"
-  - "project/deliverable/engine/tools.ts"
-  - "project/deliverable/engine/errors.ts"
-  - "project/guidance/refusals.md"
+  - project/deliverable/engine/pool.ts
+  - project/deliverable/engine/inbox.ts
+  - project/deliverable/engine/survey.ts
+  - project/deliverable/engine/tools.ts
+  - project/deliverable/engine/errors.ts
+  - project/guidance/refusals.md
 ---
 
 ## The shape

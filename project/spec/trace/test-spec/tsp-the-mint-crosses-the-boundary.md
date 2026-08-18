@@ -3,14 +3,14 @@ minted_in: i17-the-options-pool-triage-a-raw-note-into-
 id: tsp-the-mint-crosses-the-boundary
 type: "[[test-spec]]"
 statement: A drain to the pool authors a durable option and leaves the raw note where it is, verified by test over the mint's four demands.
-method: "test"
+method: test
 verifies:
-  - "req-draining-to-the-pool-mints-an-option-on-trunk"
-  - "req-a-minted-option-is-authored-never-the-note-s-own-text"
-  - "req-a-minted-option-says-what-it-is-and-when-it-comes-back"
-  - "req-the-raw-note-stays-local-and-is-marked-drained"
+  - req-draining-to-the-pool-mints-an-option-on-trunk
+  - req-a-minted-option-is-authored-never-the-note-s-own-text
+  - req-a-minted-option-says-what-it-is-and-when-it-comes-back
+  - req-the-raw-note-stays-local-and-is-marked-drained
 files:
-  - "tests/pool-mint.test.ts"
+  - tests/pool-mint.test.ts
 ---
 
 ## Scope

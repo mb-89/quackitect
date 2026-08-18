@@ -2,7 +2,7 @@
 minted_in: i17-the-options-pool-triage-a-raw-note-into-
 id: req-a-windowed-pool-answer-says-that-it-was-windowed
 type: "[[requirement]]"
-statement: "When the pool is larger than an answer can carry, the system shall window it and shall state that it was windowed."
+statement: When the pool is larger than an answer can carry, the system shall window it and shall state that it was windowed.
 kind: quality
 verify_method: test
 breaks_if_removed: "A silently cut list reads as a complete one. The failure is invisible by construction: the reader sees options, believes they are all of them, and commits against a boundary nobody drew. The same shape is already on the register from the call log serving results back cut."

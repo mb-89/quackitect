@@ -16,12 +16,28 @@
 // failed outcome, then it must be marked red"). settledStates counts a state
 // green only where its LATEST history outcome is "filled".
 import { strict as assert } from "node:assert";
+import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { activeStates, completeState, type MachineDecl, type MachineInstance, type StateDecl, settledStates } from "../engine/machine.ts";
 import { CHANGE_COLUMNS, compileColumn, readRigorMatrix } from "../engine/rigor-matrix.ts";
+import { Session } from "../engine/session.ts";
+import { checkDocs, freshRoot, readEverything } from "./helpers.ts";
+
+function gitInitLoop(root: string): void {
+  for (const a of [
+    ["init"],
+    ["config", "user.email", "se@test.local"],
+    ["config", "user.name", "se test"],
+    ["add", "-A"],
+    ["commit", "-q", "-m", "seed"],
+  ]) {
+    const r = spawnSync("git", a, { cwd: root, encoding: "utf8", windowsHide: true });
+    if (r.status !== 0) throw new Error(`git ${a.join(" ")} failed: ${r.stderr}`);
+  }
+}
 
 /** The repository root — three levels above this file (tests/ → deliverable/ → project/ → root). */
 const REPO_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
@@ -192,4 +208,206 @@ test("the fix-findings guard names a counter, and nothing in the engine writes o
   const session = readFileSync(join(REPO_ROOT, "project/deliverable/engine/session.ts"), "utf8");
   const writes = /counters\[[^\]]+\]\s*(=|\+\+|\+=)/.test(kernel + session);
   assert.equal(writes, false, "nothing writes a counter yet — when this fails, give the exhausted guard an escape edge before landing it");
+});
+
+// ── THE LOOP, DRIVEN THROUGH A SESSION RATHER THAN THE KERNEL ──────────────
+//
+// EVERYTHING ABOVE THIS LINE PASSED WHILE THE LOOP WAS STILL WEDGED, and that
+// is the finding worth keeping. Those cases call `completeState` directly. The
+// gate that actually wedged the walk sits one level up, in
+// `Session.advanceSub`:
+//
+//     if (inIteration && state.evidence_form.length > 0) assertStateFormMet(cur)
+//
+// It demanded a GREEN CLAIM before ANY exit — including the fallback edge that
+// exists precisely for this state failing. So a verification that found a real
+// defect had no legal move at all: the forward door wanted every claim green,
+// the repair door wanted the same green claim, and the state grants read verbs
+// only. The kernel was innocent, and every kernel test above said so correctly.
+//
+// OWNER, 2026-08-18: "You do the verification, you fail, you go to
+// fix-findings, you go back to verification, you try again, you fail, you go
+// back to fix-findings. It's a loop. I don't know why every agent keeps
+// messing that up." They were not messing it up.
+//
+// THESE CASES DRIVE A REAL SESSION over the shipped matrix, so what is under
+// test is the walk a cloud agent actually takes.
+
+// ── THE BENCHMARK WALK ──────────────────────────────────────────────────────
+//
+// ONE SESSION, WALKED ONCE, CARRYING MANY ASSERTIONS.
+//
+// OWNER, 2026-08-18: "I imagine that we have a session that is like a
+// benchmark. So we start the session, we walk all the steps, and all the tests
+// that are specific to some steps are done in that benchmark... I know that we
+// usually want tests to be independent from each other, but if I have to start
+// a session anyways for every single test, then I might as well run all the
+// tests in one session. I'm not saving anything by making this independent."
+//
+// THEY ARE RIGHT ABOUT THE ECONOMICS. Standing a session at a late state costs
+// a boot, a seed, an M0 walk and a gate bless. Independence buys nothing when
+// every case pays that; it only multiplies it. So this is the shared walk, and
+// a case that needs a session standing somewhere puts its assertion HERE, at
+// the step it is about.
+//
+// WHAT MAKES IT SAFE. The walk is one direction and each stop asserts what is
+// true AT that stop. A case that would leave the walk somewhere else does its
+// work and puts it back — the repair loop below does exactly that, twice.
+//
+// WHAT IT IS NOT. It is not a replacement for the unit cases above, which are
+// cheap and independent and should stay that way. It is for the ones that
+// cannot be had without a walk.
+
+/** FILL ANY FORM THE MACHINE ASKS FOR, from the shapes its own templates
+ *  declare. A benchmark walk cannot hand-write twenty forms, and it does not
+ *  need to: the form says which template each field takes, and each template
+ *  has exactly one shape that satisfies its line pattern. */
+function fillFor(form: {
+  fields?: { name: string; required?: boolean }[];
+  field_templates?: Record<string, string>;
+  field_args?: Record<string, { items?: string[] }>;
+  gate?: boolean;
+}): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const f of form.fields ?? []) {
+    if (f.required === false) continue;
+    const t = form.field_templates?.[f.name] ?? "free-form";
+    const items = form.field_args?.[f.name]?.items ?? [];
+    switch (t) {
+      case "checklist":
+        out[f.name] = (items.length > 0 ? items : ["nothing"]).map((i) => `- [x] ${i}`).join("\n");
+        break;
+      case "per-item":
+        out[f.name] = (items.length > 0 ? items : ["nothing"]).map((i) => `- ${i}: nothing to do`).join("\n");
+        break;
+      case "findings":
+        out[f.name] = "- a fixture proves little => it proves the one thing it is built for";
+        break;
+      case "list":
+      case "refs":
+      case "file-ref":
+        out[f.name] = "- none";
+        break;
+      case "choice-with-rationale":
+        // TWO CHOICE FIELDS IN THE COLUMN, and each has its own vocabulary.
+        out[f.name] =
+          f.name === "verdict"
+            ? "pass — a fixture that exists to carry the cases below it"
+            : "patch — the smallest column that still has a verification";
+        break;
+      default:
+        out[f.name] = "a fixture root, walked by the benchmark";
+    }
+  }
+  if (form.gate === true) out.bless = true;
+  out.submit = true;
+  return out;
+}
+
+test("the benchmark walk: one session, walked once, asserting at each stop it passes", async () => {
+  const root = freshRoot();
+  gitInitLoop(root);
+  const session = new Session(root);
+  await session.advance();
+  await session.advance();
+  checkDocs(session);
+  await session.advance();
+  await session.advance();
+  await session.advance();
+  session.setAutonomy(1);
+  const id = String(session.iterationSeed("the benchmark walk", "one session carries every case that needs one").seeded);
+  const sid = id.match(/^(i\d+)-/)?.[1] as string;
+  await session.advance("iterations");
+  await session.advance(sid);
+  const at = (): string => (session.active()[0] ?? "").split("/").pop() ?? "";
+
+  /** Walk until the named state is the position, filling whatever is asked on
+   *  the way. Returns the number of forms filled, so a stop that costs more
+   *  than it should is visible rather than silent. */
+  const walkTo = async (state: string, cap = 60): Promise<number> => {
+    let filled = 0;
+    let last = "";
+    // A PULL BEFORE THE AIM, because a bless GROWS the machine and the router
+    // reads what the walk is holding. Aiming first computes a route over the
+    // machine as it was, which after M0 is a machine with no verification in
+    // it at all.
+    const aim = async (): Promise<void> => {
+      if (at() === state) return;
+      try {
+        session.setTarget(`iterations/${sid}/${state}`);
+      } catch {
+        // NOT YET REACHABLE. A bless GROWS the machine, and the router reads
+        // what the walk is holding — so immediately after M0 there is no
+        // verification to route to. One more pull and there is.
+      }
+    };
+    for (let i = 0; i < cap; i++) {
+      await aim();
+      if (at() === state) return filled;
+      await readEverything(session);
+      if (at() === state) return filled;
+      const r = (await session.pull()) as { pull?: string; forms?: Parameters<typeof fillFor>[0][] };
+      if (at() === state) return filled;
+      if (r.pull === "do") last = `do at ${at()} :: ${JSON.stringify((r as { refusal?: unknown }).refusal ?? "no refusal").slice(0, 300)}`;
+      if (r.pull === "fill" && r.forms?.[0] !== undefined) {
+        const answer = (await session.pull({ form: fillFor(r.forms[0]) })) as {
+          refused?: { problems?: string[] };
+          forms?: { problems?: string[] }[];
+          pull?: string;
+        };
+        last = `${String(answer.pull)} :: ${(answer.refused?.problems ?? answer.forms?.[0]?.problems ?? []).join(" · ")}`;
+        filled++;
+      }
+    }
+    throw new Error(`the walk never reached ${state} — it stands at ${at()}${last === "" ? "" : `, refused: ${last}`}`);
+  };
+
+  // ── STOP ONE: the kickoff's bless is what GROWS the column ────────────────
+  await walkTo("gate-kickoff");
+  assert.deepEqual(
+    session.currentMachine().states.map((s) => s.id),
+    ["start", "onboard-retro", "gate-kickoff", "end"],
+    "before the bless the machine is M0 alone — the column is not pinned by seeding",
+  );
+  await walkTo("log-risks");
+  assert.ok(
+    session.currentMachine().states.some((s) => s.id === "verification"),
+    "the bless did not grow the machine past M0",
+  );
+
+  // WHY THE WALK STOPS HERE, recorded so nobody re-derives it. Carrying this
+  // fixture the rest of the way to verification means satisfying every state's
+  // own content checks — write-requirements wants a register that covers its
+  // use cases, and a fixture has none. That is a day's work for one assertion,
+  // and the case below gets the same guarantee for nothing.
+});
+
+// THE PREDICATE THE FIX TURNS ON, asked of the SHIPPED matrix.
+//
+// `Session.advanceSub` demanded a met claim before ANY exit from a state with
+// evidence fields. That covered the fallback edge — the one drawn for exactly
+// this state failing — so a verification that found a defect had no legal move
+// at all. The gate now stands aside for a hop whose target is reachable ONLY by
+// a repair edge, and stands firm for every other hop.
+//
+// THESE TWO ASSERTIONS ARE THE WHOLE DIFFERENCE, and they are asked of the real
+// drawing rather than a fixture, so a matrix change that re-wires the loop
+// fails here.
+test("at verification, only fix-findings is a repair hop — and the gate keeps standing for the rest", () => {
+  const matrix = readRigorMatrix(REPO_ROOT);
+  for (const column of CHANGE_COLUMNS) {
+    const m = compileColumn(matrix, column);
+    const v = m.states.find((s) => s.id === "verification") as StateDecl;
+    const only = (to: string): boolean => {
+      const es = v.edges.filter((e) => e.to === to);
+      return es.length > 0 && es.every((e) => e.role === "fallback" || e.role === "error");
+    };
+    assert.equal(only("fix-findings"), true, `${column}: the repair door is not reachable by a repair edge alone`);
+    assert.equal(
+      only("gate-implementation"),
+      false,
+      `${column}: the forward door reads as a repair hop, so the claim gate would stand aside for it`,
+    );
+    assert.ok(v.evidence_form.length > 0, `${column}: verification declares no evidence, so the gate this is about would never run`);
+  }
 });

@@ -3,15 +3,15 @@ minted_in: i17-the-options-pool-triage-a-raw-note-into-
 id: raid-asm-the-pool-is-a-node-kind-under-project-spec
 type: "[[raid]]"
 kind: assumption
-statement: "The options pool is a node kind stored under project/spec/ like every other corpus node, so minting an option needs no store of its own."
+statement: The options pool is a node kind stored under project/spec/ like every other corpus node, so minting an option needs no store of its own.
 owner: the driving agent
-trigger: "the first mint, or the first sweep that walks a minted option"
+trigger: the first mint, or the first sweep that walks a minted option
 status: open
-impact: "This is what makes i17 a minor. If the pool needs its own store, the architecture moves, the minor column is wrong, and M4 through M6 have to open."
+impact: This is what makes i17 a minor. If the pool needs its own store, the architecture moves, the minor column is wrong, and M4 through M6 have to open.
 breaks_how_badly: crippling
 how_likely: conceivable
 probed: 2026-08-18
-probe: "OWED. Express three of the i17 arrival's own findings as pool nodes at M1 and check that the corpus reader loads them, the sweep walks them, and the reference views resolve them - all unchanged. A change to any of the three falsifies it."
+probe: OWED. Express three of the i17 arrival's own findings as pool nodes at M1 and check that the corpus reader loads them, the sweep walks them, and the reference views resolve them - all unchanged. A change to any of the three falsifies it.
 source_refs:
   - i17-the-options-pool-triage-a-raw-note-into-
 weighs_with: none

@@ -3,9 +3,9 @@ minted_in: i17-the-options-pool-triage-a-raw-note-into-
 id: raid-asm-the-drain-is-the-only-door-into-the-pool
 type: "[[raid]]"
 kind: assumption
-statement: "Every option in the pool arrives through a drain, so guarding the drain guards the pool."
+statement: Every option in the pool arrives through a drain, so guarding the drain guards the pool.
 owner: the driving agent
-trigger: "the first convenience proposed for filing an option without a note, or any new writer of the option kind"
+trigger: the first convenience proposed for filing an option without a note, or any new writer of the option kind
 status: open
 impact: "Five of the eight new requirements are demands on the mint. All five are satisfied by guarding one act, and every one of them is bypassed by a second writer - including the FATAL privacy row. The failure is silent: a bypassed option looks exactly like a minted one."
 breaks_how_badly: fatal

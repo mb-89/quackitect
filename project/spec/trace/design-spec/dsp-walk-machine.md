@@ -4,18 +4,18 @@ id: dsp-walk-machine
 type: "[[design-spec]]"
 statement: the pull-driven walk over compiled machines, carried by one session that recomputes position on every call
 realizes:
-  - "el-walk-engine"
-  - "if-method-compiler-to-walk-engine"
-  - "if-record-store-to-walk-engine"
+  - el-walk-engine
+  - if-method-compiler-to-walk-engine
+  - if-record-store-to-walk-engine
 files:
-  - "project/deliverable/engine/session.ts"
-  - "project/deliverable/engine/machine.ts"
-  - "project/deliverable/engine/pull.ts"
-  - "project/deliverable/engine/route.ts"
-  - "project/deliverable/engine/atamwalk.ts"
-  - "project/deliverable/engine/conditions.ts"
-  - "project/deliverable/engine/scale.ts"
-  - "project/deliverable/engine/readproof.ts"
+  - project/deliverable/engine/session.ts
+  - project/deliverable/engine/machine.ts
+  - project/deliverable/engine/pull.ts
+  - project/deliverable/engine/route.ts
+  - project/deliverable/engine/atamwalk.ts
+  - project/deliverable/engine/conditions.ts
+  - project/deliverable/engine/scale.ts
+  - project/deliverable/engine/readproof.ts
 ---
 
 ## Responsibility

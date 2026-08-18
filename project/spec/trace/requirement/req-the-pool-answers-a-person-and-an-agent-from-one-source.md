@@ -2,7 +2,7 @@
 minted_in: i17-the-options-pool-triage-a-raw-note-into-
 id: req-the-pool-answers-a-person-and-an-agent-from-one-source
 type: "[[requirement]]"
-statement: "The system shall serve the standing options to a rendered surface and to a lane caller from the same source, so the two answers cannot disagree."
+statement: The system shall serve the standing options to a rendered surface and to a lane caller from the same source, so the two answers cannot disagree.
 kind: interface
 verify_method: test
 breaks_if_removed: "Two readers of one pool drift, and the drift is silent: a person reading a panel and an agent filling a record scope both believe they have the list. Whichever is stale, the disagreement surfaces as a decision made against work that was already taken or already dropped."

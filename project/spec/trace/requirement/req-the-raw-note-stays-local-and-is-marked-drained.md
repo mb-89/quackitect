@@ -2,10 +2,10 @@
 minted_in: i17-the-options-pool-triage-a-raw-note-into-
 id: req-the-raw-note-stays-local-and-is-marked-drained
 type: "[[requirement]]"
-statement: "When an option is minted, the system shall mark the source note drained and shall leave the note where it is, neither moving it, copying it into the repository, nor deleting it."
+statement: When an option is minted, the system shall mark the source note drained and shall leave the note where it is, neither moving it, copying it into the repository, nor deleting it.
 kind: constraint
 verify_method: test
-breaks_if_removed: "Two of the three wrong endings are silent. Copying the note into the repository is the leak the whole boundary exists to stop. Deleting it destroys the only record of what was actually captured, and SE-C-002 means it cannot be recovered. Leaving it undrained puts it back in the next retro inbox, which is how one finding gets minted twice."
+breaks_if_removed: Two of the three wrong endings are silent. Copying the note into the repository is the leak the whole boundary exists to stop. Deleting it destroys the only record of what was actually captured, and SE-C-002 means it cannot be recovered. Leaving it undrained puts it back in the next retro inbox, which is how one finding gets minted twice.
 breaks_how_badly: crippling
 refines:
   - uc-put-a-finding-where-it-outlives-the-machine

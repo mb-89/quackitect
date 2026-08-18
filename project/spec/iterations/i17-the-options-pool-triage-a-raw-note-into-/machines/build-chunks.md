@@ -1,20 +1,25 @@
 ---
 steps:
   - id: the-pool-module
-    statement: "engine/pool.ts owns everything about an option — where it lives, how one is authored and landed, and how the standing set is read back from the repository"
+    statement: engine/pool.ts owns everything about an option — where it lives, how one is authored and landed, and how the standing set is read back from the repository
     depends_on: []
     realization: code
   - id: the-paste-refusal
-    statement: "SE-C-140 refuses a statement that shares a run of six or more words with the raw note, quotes the overlap back in the author's own case, and carries its feed-forward section in refusals.md"
-    depends_on: [the-pool-module]
+    statement: SE-C-140 refuses a statement that shares a run of six or more words with the raw note, quotes the overlap back in the author's own case, and carries its feed-forward section in refusals.md
+    depends_on:
+      - the-pool-module
     realization: code
   - id: the-drain-mints
-    statement: "a backlog disposition MINTS FIRST and marks the note drained second, so a refused crossing leaves the note pending — and se_note_drain carries the statement on both the agent's door and the person's"
-    depends_on: [the-pool-module, the-paste-refusal]
+    statement: a backlog disposition MINTS FIRST and marks the note drained second, so a refused crossing leaves the note pending — and se_note_drain carries the statement on both the agent's door and the person's
+    depends_on:
+      - the-pool-module
+      - the-paste-refusal
     realization: code
   - id: the-offer-reads-the-pool
-    statement: "the survey lists standing options from the repository instead of parked notes from the machine-local store, and an undrained capture never enters that list"
-    depends_on: [the-pool-module, the-drain-mints]
+    statement: the survey lists standing options from the repository instead of parked notes from the machine-local store, and an undrained capture never enters that list
+    depends_on:
+      - the-pool-module
+      - the-drain-mints
     realization: code
 ---
 

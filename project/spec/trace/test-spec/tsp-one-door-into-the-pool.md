@@ -3,9 +3,9 @@ minted_in: i17-the-options-pool-triage-a-raw-note-into-
 id: tsp-one-door-into-the-pool
 type: "[[test-spec]]"
 statement: There is exactly one path that writes an option, and it applies the same demands whoever walks it, verified by inspection of every writer.
-method: "inspection"
+method: inspection
 verifies:
-  - "req-the-crossing-is-the-same-act-for-a-person-and-an-agent"
+  - req-the-crossing-is-the-same-act-for-a-person-and-an-agent
 ---
 
 ## Scope

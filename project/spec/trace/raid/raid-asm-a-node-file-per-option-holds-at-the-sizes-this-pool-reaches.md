@@ -3,14 +3,14 @@ minted_in: i17-the-options-pool-triage-a-raw-note-into-
 id: raid-asm-a-node-file-per-option-holds-at-the-sizes-this-pool-reaches
 type: "[[raid]]"
 kind: assumption
-statement: "One file per option is a workable store at the scale a single product's pool reaches, so nothing more than the corpus is needed."
+statement: One file per option is a workable store at the scale a single product's pool reaches, so nothing more than the corpus is needed.
 owner: the driving agent
-trigger: "the migration, or the first time a pool answer has to be windowed"
+trigger: the migration, or the first time a pool answer has to be windowed
 status: open
-impact: "It is the storage half of the minor column. If it fails the pool needs an index or a database, M4 has to open, and the change size this iteration was blessed at was wrong."
+impact: It is the storage half of the minor column. If it fails the pool needs an index or a database, M4 has to open, and the change size this iteration was blessed at was wrong.
 breaks_how_badly: crippling
 how_likely: conceivable
-probe: "UNPROBED, and not probeable from this machine. The 205 parked options are machine-local on the owner's laptop and this clone holds three notes. The probe is the migration's own before-and-after timing of the sweep, the conformance pass and one reference view, and it answers raid-asm-a-migrated-pool-does-not-drown-the-corpus with the same measurement - one run, deliberately, not two."
+probe: UNPROBED, and not probeable from this machine. The 205 parked options are machine-local on the owner's laptop and this clone holds three notes. The probe is the migration's own before-and-after timing of the sweep, the conformance pass and one reference view, and it answers raid-asm-a-migrated-pool-does-not-drown-the-corpus with the same measurement - one run, deliberately, not two.
 probed: 2026-08-18
 source_refs:
   - raid-asm-the-pool-is-a-node-kind-under-project-spec

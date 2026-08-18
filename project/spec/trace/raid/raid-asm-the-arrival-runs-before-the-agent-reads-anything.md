@@ -3,9 +3,9 @@ minted_in: i35-the-cloud-run-s-findings-land-the-fix-fi
 id: raid-asm-the-arrival-runs-before-the-agent-reads-anything
 type: "[[raid]]"
 kind: assumption
-statement: "A host fires its SessionStart hooks and waits for them before the agent's first turn, so an arrival wired there has completed by the time the agent acts."
+statement: A host fires its SessionStart hooks and waits for them before the agent's first turn, so an arrival wired there has completed by the time the agent acts.
 owner: the owner
-trigger: "the first host that runs SessionStart hooks concurrently with the first turn, or skips them on resume"
+trigger: the first host that runs SessionStart hooks concurrently with the first turn, or skips them on resume
 status: open
 impact: "The agent's first act would race the arrival: it would find no lane, follow the card, and perform the five acts by hand while the hook did the same thing underneath it. Two arrivals at once is the one case req-arriving-twice-changes-nothing was written for."
 breaks_how_badly: crippling

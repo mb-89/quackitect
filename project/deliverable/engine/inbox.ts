@@ -9,7 +9,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } fr
 import { dirname, join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { stripBom } from "./jsonio.ts";
-import { mintOption } from "./pool.ts";
+import { mintToken } from "./pool.ts";
 
 /** MoSCoW, minus the fourth bucket. "Won't" already exists here as a drain
  *  disposition, so a note never needs to carry it. */
@@ -119,6 +119,7 @@ export function drainNote(
   judgmentAllowed: boolean,
   statement?: string,
   projectRoot?: string,
+  mintedIn?: string,
 ): { drained: string; disposition: string; inbox: number; minted?: string } {
   if (!DISPOSITIONS.includes(disposition)) {
     throw new Rejection({
@@ -192,11 +193,29 @@ export function drainNote(
         source: "engine/inbox.ts drain",
       });
     }
-    minted = mintOption(projectRoot, {
+    // A NOTE ALREADY IN THE POOL DOES NOT MINT A SECOND TOKEN. Re-draining is
+    // the migration mechanism and stays legal for every other disposition;
+    // what is refused is minting one finding twice, which is the failure
+    // req-the-raw-note-stays-local-and-is-marked-drained names by name.
+    if (hit.drained?.disposition === "backlog") {
+      throw new Rejection({
+        clause: CLAUSES.NOTE_UNKNOWN,
+        expected: "a note that is not already in the pool",
+        got: `${ref} was drained to the pool at ${hit.drained.at}`,
+        remedy: {
+          tool: "se_note_drain",
+          args: { ref, disposition: "carried", where: "this round" },
+          note: "to pull a parked item into scope, re-drain it as carried — the token already stands and minting a second one splits the finding in two",
+        },
+        source: "engine/inbox.ts drain",
+      });
+    }
+    minted = mintToken(projectRoot, {
       statement: statement ?? "",
       readyWhen: where ?? "",
       source: ref,
       noteText: hit.text,
+      ...(mintedIn !== undefined && mintedIn !== "" ? { mintedIn } : {}),
     }).id;
   }
   hit.drained = { at: new Date().toISOString(), disposition, ...(where !== undefined && where !== "" ? { where } : {}) };

@@ -3,11 +3,11 @@ minted_in: i17-the-options-pool-triage-a-raw-note-into-
 id: raid-risk-the-pool-accumulates-duplicates-with-no-way-to-merge
 type: "[[raid]]"
 kind: risk
-statement: "The drain has four dispositions and none of them says this note is that note, so a second capture of one idea becomes a second option."
+statement: The drain has four dispositions and none of them says this note is that note, so a second capture of one idea becomes a second option.
 owner: the driving agent
-trigger: "the migration of the parked options, where duplicates arrive in bulk"
+trigger: the migration of the parked options, where duplicates arrive in bulk
 status: open
-impact: "A pool with three statements of one option is worse than a backlog, because each carries its own ready-when and each is separately believable. Linear's triage has a duplicate action that MERGES and moves attachments to the canonical issue; ours has nothing."
+impact: A pool with three statements of one option is worse than a backlog, because each carries its own ready-when and each is separately believable. Linear's triage has a duplicate action that MERGES and moves attachments to the canonical issue; ours has nothing.
 breaks_how_badly: annoying
 how_likely: expected
 source_refs:

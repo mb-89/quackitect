@@ -16,6 +16,7 @@ import { contentHash } from "./hash.ts";
 import { lintFix } from "./lintfix.ts";
 import { forgetPath, parseStateNote, readNodeBytes, writeNode } from "./notes.ts";
 import { isExcluded, isRootRef, resolveDeclaredRoot, resolveForRead, resolveInRoot } from "./paths.ts";
+import { guardNoSecondDoor } from "./pool.ts";
 import { search } from "./search.ts";
 
 /** Whole-file read budget (chars). Beyond this, offset/limit is required. */
@@ -348,6 +349,11 @@ export function fileWrite(root: string, path: string, content: string, baseHash:
     }
   }
   guardMachineNote(path, content);
+  // THE POOL HAS ONE DOOR, and this is what makes that true rather than said.
+  // i17 verification landed a fabricated work token carrying a third party's
+  // name through this very function, in one call, skipping every demand the
+  // mint makes — which is the whole privacy boundary gone round.
+  guardNoSecondDoor(path, SRC);
   // THE WRITE GUARD STANDS HERE, with the other two, because this is the last
   // point before anything lands (req-a-write-that-breaks-the-corpus-refuses).
   // THE GUARD ANSWERS TWICE. It THROWS on a break this write made, and RETURNS

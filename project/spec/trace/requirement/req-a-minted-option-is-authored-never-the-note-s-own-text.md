@@ -2,7 +2,7 @@
 minted_in: i17-the-options-pool-triage-a-raw-note-into-
 id: req-a-minted-option-is-authored-never-the-note-s-own-text
 type: "[[requirement]]"
-statement: "When a drain offers a statement that appears verbatim in the raw note, the system shall refuse the mint and name the text it recognised."
+statement: When a drain offers a statement that appears verbatim in the raw note, the system shall refuse the mint and name the text it recognised.
 kind: constraint
 verify_method: test
 breaks_if_removed: "The hard line has no mechanical defence at all. A rewrite that is really a paste passes every other check, because no other check can tell authoring from copying — and a raw note may carry anything an agent dumped into it. A leak on trunk cannot be undone: SE-C-002 forbids rewriting history, so superseded content stays."
