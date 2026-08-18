@@ -1,13 +1,4 @@
-// THE TRACE GRAPH, drawn radially. The vision sits at the centre; every
-// selected value prop takes an equal wedge of the 360 degrees, and the trace
-// levels are concentric rings outward from it (owner design, 2026-08-05).
-//
-// NO LAYOUT LIBRARY. The arrangement is deterministic geometry — an angle per
-// wedge and a radius per ring — so there is nothing to solve at run time and
-// nothing to load. What a library WOULD have given us is crossing
-// minimisation, and that is one named rule — a child sits on its parent's own
-// angle and moves only to clear a neighbour — rather than a dependency the
-// always-on mirror would carry forever.
+// The trace graph, drawn radially. see dsp-radial-layout.md#no-layout-library
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { contentHash } from "./hash.ts";
@@ -32,22 +23,7 @@ export interface Subsegment {
   levels: string[];
 }
 
-/** THE SUBSEGMENTS (owner design 2026-08-07).
- *
- *  A wedge runs whole while the spine lasts. At the spine's END it divides
- *  into two, three or four slices, and each goes its own way outward.
- *
- *  THE DIVISION HAPPENS ONCE. A node on the LAST spine level may point into
- *  several slices — that is the one place an item belongs to more than one.
- *  Past it there is no cross-coupling: a node in one slice never points at a
- *  node in another, and no edge is drawn between them.
- *
- *  WHY IT EXISTS: design and testing answer the same requirement and answer
- *  it differently. Design goes one way, testing the other, and a reader can
- *  tell which is which by where it sits rather than by reading it.
- *
- *  AN EMPTY SLICE STILL HOLDS ITS ARC. The test levels do not exist yet; the
- *  space is reserved so they land without moving anything. */
+/** see dsp-radial-layout.md#the-subsegments */
 export interface Subsegments {
   of: Subsegment[];
 }
@@ -96,13 +72,7 @@ export interface Placed extends TraceNode {
   y: number;
 }
 
-/** ONE LABELLED ARC — a whole section, or one slice of one (owner design
- *  2026-08-07). What a reader sees when the drawing is too small for cards.
- *
- *  IT IS THE MAP AT ALTITUDE. Zoomed out, the cards are specks and the arcs
- *  carry the meaning: this wedge is that value proposition, and past the
- *  requirements it divides into design and tests. Zoomed in, the arcs fade
- *  and the cards take over. */
+/** One labelled arc per section or slice. see dsp-radial-layout.md#arcs-and-sectors */
 export interface TraceBand {
   label: string;
   /** The value prop this arc belongs to — a click target for a zoom-to. */
@@ -700,29 +670,9 @@ export function visionText(root: string): string {
   }
 }
 
-/** CROSSING MINIMISATION, the barycentre sweep from the Sugiyama framework —
- *  the piece a layout library would have supplied. Each level is ordered by
- *  the mean position of a node's parents in the level inside it, so an edge
- *  travels as straight outward as it can. A node with no parent keeps its
- *  place, which is what stops the sweep shuffling roots around.
- *
- *  SUPERSEDED 2026-08-06, and the code is gone. Ordering alone still left a
- *  child anywhere along its row. It now TAKES its parent's angle and `spread`
- *  moves it only far enough to clear a neighbour, which does everything the
- *  ordering was for and fixes what it could not. */
+/** see dsp-radial-layout.md#no-layout-library */
 
-/** RE-ORIGIN (owner design 2026-08-07). Any node can be made the centre. Its
- *  own descendants become the drawing, and everything else falls away.
- *
- *  A LEVEL IS A DISTANCE, NOT A TYPE. From the vision the first ring is the
- *  value props, because that is what the vision's children are. From a use
- *  case the first ring is its requirements. The rings, the wedges, the bands,
- *  the slices — all of it takes the level as given, so all of it survives
- *  unchanged.
- *
- *  WHAT SURVIVES A RE-ORIGIN is the type order. A requirement still sits
- *  inside a function, because that order is what the trace MEANS. What moves
- *  is where the counting starts. */
+/** see dsp-radial-layout.md#re-origin */
 export function descendantsOf(nodes: TraceNode[], origin: string): TraceNode[] {
   const kids = new Map<string, TraceNode[]>();
   for (const n of nodes) for (const p of n.refines) kids.set(p, [...(kids.get(p) ?? []), n]);
@@ -792,23 +742,7 @@ export function rootsAllOf(
   return cache;
 }
 
-/** Push apart only as much as needed. Each item starts on the angle its parent
- *  already has, the sweep moves it the minimum that clears its neighbour, and
- *  the block is re-centred on where the items wanted to be.
- *
- *  THE BAND IS A WALL (owner ruling 2026-08-07). Nothing may leave it, ever.
- *
- *  IT USED TO LEAK, and this is how: the sweep only ever pushes items APART,
- *  never together. A function WANTS its requirement's angle, and requirements
- *  own the whole section while functions own half of it. So a function under a
- *  requirement on the far side of the section started outside the design slice
- *  and nothing brought it back — it was drawn in the neighbouring section,
- *  belonging visibly to nothing.
- *
- *  So the wants are clamped BEFORE the sweep, and the result is clamped after.
- *  A card that cannot have its parent's exact angle gets the nearest angle it
- *  is allowed, which is what "outward means outward" degrades to once a band
- *  narrower than its parent's exists at all. */
+/** Push apart only as much as needed, and clamp twice. see dsp-radial-layout.md#outward-means-outward */
 function spread(targets: number[], want: number, centre: number, half: number): number[] {
   const n = targets.length;
   if (n === 0) return [];
@@ -830,19 +764,7 @@ function spread(targets: number[], want: number, centre: number, half: number): 
   return out;
 }
 
-/** LABELS NEVER ROTATE (owner, 2026-08-05). A radial arrangement tempts you
- *  to turn the text with the angle, and then half of it reads upside down.
- *  So a label keeps its own width, and that width is what the ring spacing
- *  has to clear. */
-/** EVERY NODE IS A CARD, uniformly sized (owner, 2026-08-05). A dot with a
- *  label beside it is a pixel-wide click target; the card is the whole thing,
- *  and it is the same size for every node so the rings read as rings. The
- *  width fits the longest label the owner named; anything longer ellipses.
- *  Neither the card nor its text ever rotates. */
-/** The label is the machine view's, at 26px monospace — so a character costs
- *  about 15.6 units and fourteen of them plus padding need 250. The card is
- *  260, and the cap is what that width can actually hold. `autonomy-range` is
- *  the yardstick the owner set: exactly fourteen, and it fits whole. */
+/** see dsp-radial-layout.md#cards-and-labels */
 const CARD_W = 260;
 const CARD_H = 60;
 const MAX_CHARS = 14;
@@ -870,18 +792,7 @@ const SECTION_SLACK = 0.86;
  *  boundaries, it is deliberately not drawn. */
 const SPLIT_GAP = 0.14;
 
-/** EVERY SECTION TAKES THE ANGLE IT NEEDS (owner, 2026-08-06). Equal wedges
- *  are the circle's real waste: one value prop carrying sixty rows and
- *  another carrying thirteen each got a sixth of the turn, so the crowded
- *  one set the radius for everybody while the sparse one drew empty arc.
- *
- *  Each section's share is its own LOAD over the total — so the outer ring
- *  is sized by what the whole circle holds, not by six times its worst
- *  wedge. Closing one gap lets its neighbour round up against it, and the
- *  whole drawing collapses inward.
- *
- *  IT IS COMPUTED, NEVER STORED. The loads come from whatever is in scope at
- *  this layout, so a filter or a selection re-cuts every section. */
+/** see dsp-radial-layout.md#every-section-takes-the-angle-it-needs */
 function sections(shown: string[], perWedge: Map<string, string[][]>): Map<string, { centre: number; span: number }> {
   // A SECTION'S LOAD IS ITS WORST RING, counted in GAPS. Counting only the
   // outer ring starved the inner ones: a section whose stories outnumbered
@@ -928,45 +839,10 @@ function bandHalf(orbits: number): number {
   return ((orbits - 1) / 2) * STAGGER_STEP;
 }
 
-/** THE RING GAP IS THE VISION'S OWN GAP (owner ruling 2026-08-07).
- *
- *  The distance from the vision to the value props is FIRST_RING, and that is
- *  the drawing's unit of separation. Every later ring gets at least the same,
- *  measured EDGE TO EDGE: the outermost card of one ring to the innermost
- *  card of the next.
- *
- *  IT USED TO BE MIN_DIST, which is two thirds of that. Enough while the
- *  rings were sparse. Once the crowded ones started staggering, their bands
- *  ate most of the gap and consecutive rings read as one smear. Adding the
- *  functions made it plain: requirements and functions ran together with
- *  nothing between them.
- *
- *  EDGE TO EDGE IS THE WHOLE POINT. A gap between ring CENTRES says nothing
- *  once a band straddles the ring, which is exactly the case where the
- *  drawing gets tight. The floor below already adds the band's outer half,
- *  so this constant is the clear air between cards. */
+/** see dsp-radial-layout.md#the-ring-gap-is-the-visions-own-gap */
 const RING_GAP = FIRST_RING;
 
-/** How many sub-orbits a lane needs for the arc it has. A sparse lane stays
- *  on one orbit — staggering it would be noise and a thicker band.
- *
- *  AND A STAGGER MUST PAY FOR ITSELF (owner, 2026-08-06). The test is NOT
- *  the absolute radius — that only counts the rings nested inside, and says
- *  nothing about this ring's own room. It is whether the BAND the stagger
- *  adds costs less than the ARC it saves, on this ring alone. On a sparse
- *  inner ring the arc is already ample, so a band buys nothing and the ring
- *  stays a single circle; on a crowded outer one the band is small beside
- *  what it saves. Nothing is thresholded; the cheaper answer wins.
- *
- *  THE RADIUS AND THE STAGGER ARE ONE DECISION, taken for the whole ring
- *  (owner ruling 2026-08-07). Every section shares a ring, so both numbers
- *  must suit the HUNGRIEST of them.
- *
- *  IT USED TO PICK THEM APART: each section proposed a pair, and the ring took
- *  the largest RADIUS with whatever stagger came attached. A section that
- *  needed three orbits to fit could be handed a bigger radius and one orbit,
- *  which is a third of the room it asked for. Its cards then spread past their
- *  own arc into the next section. */
+/** How many sub-orbits a lane needs. see dsp-radial-layout.md#staggering-must-pay-for-itself */
 function bestOrbits(lanes: { gaps: number; arc: number }[], floor: number): { r: number; orbits: number } {
   let best = { r: floor, orbits: 1 };
   let cost = Number.POSITIVE_INFINITY;
@@ -1150,22 +1026,7 @@ function ringRadii(wedges: { lanes: string[][]; arcs: number[] }[], count: numbe
   return rings;
 }
 
-/** THE RELAX PASS (owner order 2026-08-06: collapse, but never until cards
- *  touch). The stagger is angle-blind and the cards are axis-aligned, so at
- *  some angles the radial step and the arc offset cancel on one axis. Any
- *  pair still overlapping pushes its outer card further OUTWARD along its
- *  own angle — the parent line keeps its direction — until the axis-aligned
- *  clearance holds by check rather than by formula.
- *
- *  THE BAND IS A HARD CEILING (owner ruling 2026-08-07). A card sits on its
- *  ring, one step out or one step in. Never further. The push stops at the
- *  band's outer edge and the card stays where the stagger put it.
- *
- *  IT USED TO BE UNBOUNDED, and that is what the owner saw: the requirements
- *  climbing five steps out of their ring, until the ring was no longer a ring
- *  and the drawing read as one smear. The push is a last resort for a clash
- *  the arc could not foresee. Where a whole lane does not fit, the answer is
- *  a BIGGER RADIUS, chosen once in ringRadii, not sixty passes of shoving. */
+/** see dsp-radial-layout.md#the-relax-pass */
 function pushApart(a: Placed | undefined, b: Placed | undefined, ceiling: number[]): boolean {
   if (a === undefined || b === undefined) return false;
   const d = Math.hypot(a.x - b.x, a.y - b.y);
@@ -1330,21 +1191,7 @@ export function layoutTrace(
     // below the vision rather than sitting at an arbitrary angle.
     const centre = cut.get(prop)?.centre ?? Math.PI / 2;
     const half = wedgeArc(prop) / 2;
-    // THE SECTION DIVIDES PAST THE SPINE (owner design 2026-08-07).
-    //
-    // Everything derived FROM the requirements — the functions, and later the
-    // architecture and the design elements — takes one slice. What verifies
-    // them takes another: test definitions and test results. Two answers to
-    // one requirement, going two ways.
-    //
-    // A SLICE IS HELD, not merely marked. A thin separator was the first
-    // attempt and it was worth nothing: at 7% of a wedge nobody could see it,
-    // so it signalled nothing to a reader and reserved nothing for the tests.
-    // A reservation that cannot be seen is not a reservation.
-    //
-    // WHAT IT COSTS is paid in RADIUS, not in crowding. A divided ring is
-    // sized against the slice it may use, so it simply sits further out — and
-    // arc is radius times angle, so the push pays for part of itself.
+    // see dsp-radial-layout.md#the-subsegments
     const sliceHalf = sliceArc(prop) / 2;
     for (let k = 0; k < levels.length; k++) {
       const lane = lanes[k] ?? [];
@@ -1444,33 +1291,14 @@ export function layoutTrace(
     );
     return [seg, ...cuts];
   });
-  // THE SECTORS — the clickable pie of the drawing (owner ruling 2026-08-07).
-  //
-  // ONE PER SECTION PER RING, so "the ledger's requirements" is a thing a
-  // pointer can hit. The label arcs alone were not enough: they named the
-  // whole section, and a reader who wants one ring of it had nowhere to aim.
-  //
-  // A SECTOR SPANS ITS RING'S BAND, from halfway in to the previous ring to
-  // halfway out to the next — so the sectors tile the circle with no gaps and
-  // no overlaps, and every point belongs to exactly one.
+  // The clickable pie. see dsp-radial-layout.md#arcs-and-sectors
   const edgesOf = (k: number): [number, number] => {
     const r = rings[k] ?? 0;
     const inner = k === 0 ? 0 : ((rings[k - 1] ?? 0) + r) / 2;
     const outer = k === rings.length - 1 ? reach + RING_GAP * 0.15 : (r + (rings[k + 1] ?? r)) / 2;
     return [inner, outer];
   };
-  // THE SECTOR RUNS SEPARATOR TO SEPARATOR (owner ruling 2026-08-07). It takes
-  // the section's WHOLE angle, not the 86% the cards are allowed.
-  //
-  // THE 14% IS A MARGIN, NOT A GAP. Cards keep off it so a section does not
-  // read as crowded against its neighbour. The sector still owns it, because
-  // a reader aiming near a section's edge is aiming at THAT section, and
-  // nothing else is there to claim the click.
-  //
-  // IT ALSO FIXES CARDS LANDING OUTSIDE. A card is 260 wide, so one near the
-  // edge overhung a sector that stopped at 86% — and read as a node belonging
-  // to nothing. Sector edges and separator lines are now the SAME angles, so
-  // what a reader sees is what a click hits.
+  // see dsp-radial-layout.md#arcs-and-sectors
   const edgeAt = (prop: string, i: number, n: number): number => {
     const c = cut.get(prop)?.centre ?? Math.PI / 2;
     const span = cut.get(prop)?.span ?? 0;
