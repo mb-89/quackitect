@@ -18,6 +18,11 @@ IT IS TEMPORARY. Planning does not belong in version control (owner, 2026-08-12)
 This file exists until the options pool lands — see i17 — and then it dissolves
 into that.
 
+i17 SHIPPED ON 2026-08-18, so the condition this file set for its own end has
+come true. The pool stands at project/spec/trace/work-token/. Dissolving this
+file into it is not done and is nobody's task yet; until somebody rules on it,
+the sweep above keeps the file honest rather than pretending it is current.
+
 ## The mining rule
 
 V1 AND V2 ARE MINED. Their planning content is here. Do not re-open either
@@ -558,23 +563,28 @@ Format: id, whether it needs the owner, what it waits on, and what it is.
 
 These can run on any machine, in parallel, subject only to the named ordering.
 
-### i3 — the walk's feedback loop  (ALREADY SEEDED)
+EACH HEADING CARRIES ITS STATUS, and the record is what it was read from.
+project/spec/iterations/<id>/record.md holds the only authoritative status;
+this file is a copy and a copy goes stale. When the two disagree, the record
+is right.
+
+### i3 — the walk's feedback loop  (SHIPPED 2026-08-13)
 
 Reading credit survives a reload, a red objective serves its fill, one verb
 answers why a state is grey. Absorbs the introspection-verb work.
 
-### i4 — the panel round  (ALREADY SEEDED)
+### i4 — the panel round  (OPEN — started, not shipped)
 
 The archived iteration browses like the live one, a bless repaints without a
 reload, a grey state says why.
 
-### i5 — engine hygiene  (ALREADY SEEDED)
+### i5 — engine hygiene  (SEEDED)
 
 One version source, every refusal anchored to its guidance, the sync sweeps
 duplicates, the slow test file splits, the paint rules get their pin. Absorbs
 the tests cluster and the pre-push battery gate.
 
-### i6 — conformance goes mechanical  (ALREADY SEEDED)
+### i6 — conformance goes mechanical  (SHIPPED 2026-08-16)
 
 Checks bind to the named elements and run at the write, not at a review.
 
@@ -582,7 +592,7 @@ V1 BUILT THIS FOR STATE MACHINES. Its extractor checked the CODE'S TRANSITION
 SET against the model graph and flagged unreachable states. See
 `guide-model-syntax.md` at ref main.
 
-### i7 — the trace sharpens  (ALREADY SEEDED)
+### i7 — the trace sharpens  (SEEDED)
 
 Finer grain than files, and the dead-code sweep widens past the engine.
 
@@ -595,7 +605,7 @@ The join is a code marker. Every v1 Go file opens with
 region is an honest planned hole; a region no model allocates is the sky-fall
 lint — no device falls from the sky.
 
-### i8 — se.help
+### i8 — se.help  (SHIPPED 2026-08-13)
 
 THE VERB, plus the demand log that records every miss as a ranked missing-tool
 signal, plus the missing-capability enumeration.
@@ -618,7 +628,7 @@ keyword search over tools and guidance. Same shape, built neither time.
 THIS IS THE CLOUD-ITERATION CANDIDATE. Additive, self-contained, clear done
 condition, and an unwatched failure costs one new verb.
 
-### i9 — .se and the corpus
+### i9 — .se and the corpus  (SEEDED)
 
 The move into the product folder, the committed marker, the exclusion split by
 file, `.quack-watch.json` moved inside, method fan-out to every open worktree,
@@ -632,7 +642,7 @@ ruling of 2026-08-07 already pins `.se` to one root by path KIND, and `seDir` is
 three lines. Add one test asserting it resolves to one place while a record is
 bound, so the guarantee stays pinned rather than trusted.
 
-### i10 — the big sweep
+### i10 — the big sweep  (SEEDED)
 
 ONE PASS OVER ONE KEY. Module-prefix lint, then module-qualified ids, the
 reference glossary, the `source_refs` migration, the 121 broken citations, and
@@ -655,7 +665,7 @@ WHAT MAKES IT SURVIVABLE: `raid-dec-stable-ids` is a decided ruling that ids are
 contracts, a renamed node owes a migration, and the orphan check runs at every
 submit. A missed id shows up as an orphan rather than as silent rot.
 
-### i11 — the engine-fix bundle
+### i11 — the engine-fix bundle  (SHIPPED 2026-08-16)
 
 About twenty named defects that i3 and i5 do not claim. Among them: a
 sub-machine can be skipped whole; `build_chart` writes candidate notes but not
@@ -678,7 +688,7 @@ And: the map lies. At autonomy 0.2 the pull refuses to enter `expeditions`,
 while `route("expeditions")` reports no closure at all, because the route weighs
 the start state it lands on rather than the container door.
 
-### i12 — performance
+### i12 — performance  (SHIPPED 2026-08-15)
 
 The one-second rule on the machine page and on opening a form, pull pagination,
 the survey window, and the O(n cubed) comparison walk.
@@ -688,7 +698,7 @@ INSIDE the guarded write path, as a bounded worker pool whose results flow
 through the SAME verdict-write guard — one serialization point, no second write
 path. Caps at spare cores, order-independent tests only.
 
-### i13 — the machine format migration
+### i13 — the machine format migration  (SEEDED)
 
 Canvases become PlantUML. The Cytoscape renderer for machines. Edges move off
 the canvas.
@@ -710,14 +720,14 @@ MINT THE OBSIDIAN-COMPATIBILITY REQUIREMENT here.
 
 MUST NOT RACE i14 — same files.
 
-### i14 — the ladder, engine half
+### i14 — the ladder, engine half  (SEEDED)
 
 Comparison logic from numeric to rung order, `machines/scale.md`,
 `guidance/authoring/machines.md`, and the three test files pinned on 2026-08-12.
 
 PAIRS WITH i13. Do not race it over the same files.
 
-### i15 — the database
+### i15 — the database  (OPEN — started, not shipped)
 
 Our own database reading Bases-compatible files, with the graceful-extension
 rule.
@@ -732,7 +742,7 @@ chosen fields and REFUSING AN UNKNOWN FIELD WITH THE FIELD LIST, with the MCP
 surface serving it read-only. CONFORMANCE FIXTURES GUARD SUBSET DRIFT and the
 subset extends TEST-FIRST.
 
-### i16 — the vehicle overlay
+### i16 — the vehicle overlay  (SEEDED)
 
 WAITS ON i10, because `req-overlay-resolution` demands one shared identity
 scheme and module-qualified ids ARE that scheme.
@@ -762,7 +772,7 @@ text the ledger hashes would hide content from the trust chain. The renderer
 takes identity surfaces from the brand layer, and method prose is written
 brand-neutral where it speaks about itself.
 
-### i17 — the options pool
+### i17 — the options pool  (SHIPPED 2026-08-18)
 
 Draining a note to `backlog` mints a WORK TOKEN in the repo, rewritten and
 carrying no private data. The pool lives above iterations so it survives a
@@ -770,13 +780,26 @@ discarded experiment and so every machine can see it.
 
 THIS FILE DISSOLVES INTO IT.
 
-### i18 — the blast radius
+### i18 — the blast radius  (SEEDED)
 
 The downstream cone, computed, with v1's two-way split: needs re-ruling versus
 still-holds candidate. Read `product/engine-go/triage.go` at ref main before
 designing.
 
 ## Judgment — the owner sits with these
+
+EVERY J BELOW IS A SEEDED RECORD NOW, and the mapping is one to one. Each
+carries the JUDGMENT prefix in its own goal. The J numbers are kept here
+because Part 3 and the ordering rules cite them.
+
+- J1 is i19
+- J2 is i20
+- J3 is i21
+- J4 is i22
+- J5 is i23
+- J6 is i24
+- J7 is i25
+- J8 is i26
 
 ### J1 — emit.report
 
@@ -906,25 +929,52 @@ The vision above. After the book proves the anchoring model.
 
 The owner's decisions, in the order that unblocks the most work.
 
+THIS SECTION WAS WRITTEN ON 2026-08-12 AND SWEPT ON 2026-08-18. What follows
+is what stands on the sweep date. The record files are the authority; this is
+a reading of them.
+
 DONE — D1 the machine format, and D2 the autonomy ladder. Between them they
 unblocked i13, i14 and i15 and settled about twenty-five parked backlog notes.
 
-RUNNING NOW, needing nothing further: i3, i4, i5, i6, i7, i8, i9, i11, i12.
-Nine iterations.
+SHIPPED, THIRTEEN OF THEM: i1, i2, i3, i6, i8, i11, i12, i17, i27, i28, i33,
+i34, i35. The last five are records this file never planned — they were seeded
+after it was written, and the section below names them.
 
-STARTABLE IMMEDIATELY on today's rulings: i13, i14, i15.
+OPEN, MEANING STARTED AND NOT SHIPPED: i4 and i15.
 
-CHAINED: i9 then i10, then i16, J4 and i18.
+SEEDED AND WAITING: i5, i7, i9, i10, i13, i14, i16, i18, i29, i30, i31, i32,
+and the eight judgment records i19 to i26.
 
-THE OWNER'S REMAINING QUEUE, any order: J1 emit.report, J2 emit.book, J3
-Benjamin, J5 the UI sitting, J7 the voice. J4 waits for i10. J6 and J8 sit
-behind J5 and J2 respectively.
+CHAINED: i9 then i10, then i16, i22 (was J4) and i18.
+
+THE OWNER'S REMAINING QUEUE, any order: i19 emit.report, i20 emit.book, i21
+Benjamin, i23 the UI sitting, i25 the voice. i22 waits for i10. i24 and i26
+sit behind i23 and i20 respectively.
+
+### The records this file never planned
+
+Seeded after 2026-08-12, listed so the plan is not read as the whole set.
+
+- i27 — the lane binds to the record. SHIPPED 2026-08-14.
+- i28 — the cloud runs from its seed alone. SHIPPED 2026-08-15.
+- i29 — frontmatter is typed and the engine writes it. Seeded.
+- i30 — reverse engineering: recover the trace work never had. Seeded.
+- i31 — the process becomes measurable: a walk replays from events. Seeded.
+- i32 — the agent's thinking is measured, and states rank by drag. Seeded.
+- i33 — every interface answers inside a second, or says why not. SHIPPED
+  2026-08-17.
+- i34 — one tree: iterations and archives live on trunk, record branches and
+  worktrees go. SHIPPED 2026-08-16.
+- i35 — the cloud run's findings land. SHIPPED 2026-08-17.
 
 ## The ordering rules that actually bind
 
 ### The run order, set by the owner 2026-08-13
 
 THE ENABLERS RUN FIRST, IN THIS ORDER: i27, i28, i11, i12. Then i9.
+
+ALL FOUR ENABLERS HAVE SHIPPED, and i9 has not been started. The ordering
+argument below is kept because it is the owner's reasoning, not a status.
 
 THEY ARE NOT A CHAIN. Only i28 waits on i27 mechanically. The rest is
 PRIORITY, not prerequisite, so they may run at once where there are machines
