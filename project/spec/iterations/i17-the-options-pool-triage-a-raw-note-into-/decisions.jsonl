@@ -45,3 +45,5 @@
 {"ts":"2026-08-18T11:40:13.572Z","op":"update","visit":"iterations/i17/package@0","node":"d107","brief":"Running the shipped tree own battery from outside the repository"}
 {"ts":"2026-08-18T11:42:16.627Z","op":"update","visit":"iterations/i17/package@0","node":"d108","brief":"Filing what using the package actually found"}
 {"ts":"2026-08-18T11:43:14.045Z","op":"plan","visit":"iterations/i17/gate-release@0","parent":null,"nodes":[{"id":"d109","brief":"Fill and bless gate-release"}]}
+{"ts":"2026-08-18T11:43:19.886Z","op":"plan","visit":"iterations/i17/gate-release@0","parent":null,"nodes":[]}
+{"ts":"2026-08-18T11:44:13.654Z","op":"update","visit":"iterations/i17/gate-release@0","node":"d110","brief":"Filling the release gate from the archive that was actually driven"}
