@@ -15,20 +15,24 @@ state of the system — never this document alone.
 The FIRST time a session enters the desk, do NOT survey and do NOT list
 open points. A newcomer must never be met by a backlog.
 
-THE OPENING IS FIXED. Print it VERBATIM — this file is where its wording
-lives, so the owner edits it here and it always looks the same:
+FIRST, RECITE THE RULES. The session prompt carries them and carries the
+command; this is only where the recital lands. Paraphrase the contract's
+specifics back in your own words, so the person SEES that they loaded. A
+visible recital is the proof — no recital means the rules never reached
+you, and the person should stop you.
+
+THEN THE OPENING, AND NOTHING AFTER IT. Print it VERBATIM — this file is
+where its wording lives, so the owner edits it here and it always looks
+the same:
 
 > Welcome to the front desk. Tell me what you need — in your own words.
 >
 > New here? I can give you a tour of the whole system. Just say "tour".
 
-THE LIST UNDER IT IS GENERATED, never copied from here. The tour is
-always its FIRST item; the rest names what is actually SHIPPED and
-walkable this minute — peek the doors and the machinery, pick a handful,
-one plain line each. A new feature joins the list by existing, never by
-an edit to this file. Then close with the fixed line:
-
-> The autonomy dial next to the drawing sets how much I do on my own.
+NOTHING FOLLOWS IT (owner ruling 2026-08-18). A generated list of doors
+and a closing line about the autonomy dial used to print underneath.
+Both are gone. The recital and those two lines are the whole first
+visit.
 
 Then stop and wait. Every LATER visit in the same session works as the
 sections below say — sweep, advise, execute.

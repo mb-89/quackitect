@@ -167,7 +167,11 @@ function renderRungs(p: Param, v: PanelValues): string {
     ? { id: "stopat", at: v.stop_at, floor: levels[0]?.value ?? 0, hazard: false }
     : { id: "autonomy", at: v.autonomy, floor: 0, hazard: true };
   const buttons = levels.map((l, i) => renderRung(l, i === 0 ? undefined : levels[i - 1], v, bank)).join("");
-  const live = stop ? "" : `<input id="thr" type="hidden" value="${v.autonomy}">`;
+  // EACH BANK CARRIES ITS OWN POSITION. One shared input meant a surface
+  // could only reconcile one control, so a click on either repainted both.
+  const live = stop
+    ? `<input class="bank-at" data-bank="stopat" type="hidden" value="${bank.at ?? ""}">`
+    : `<input id="thr" class="bank-at" data-bank="autonomy" type="hidden" value="${v.autonomy}">`;
   return `<span class="rungs">${buttons}</span>${live}`;
 }
 

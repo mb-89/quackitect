@@ -683,6 +683,9 @@ export function startMirror(o: MirrorOptions): Server {
       res.end(
         JSON.stringify({
           autonomy: loadLevels(state.root),
+          // THE SECOND BANK'S SCALE, for the same reason as the first. Without
+          // it a host drawing stop-at's help had an empty table to draw from.
+          stopat: loadStopAt(state.root),
           power: state.session.power,
           narration: { minutes: state.session.narrationMinutes, calls: state.session.narrationCalls },
           // The run modes ride the same answer, for the same reason: a host

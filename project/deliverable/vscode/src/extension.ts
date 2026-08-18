@@ -917,6 +917,10 @@ const SCALE_HELP = {
     title: "the shutdown row",
     lead: "<p>Two buttons, either or both. Block auto-sleep holds the machine awake. Shutdown at idle shuts the machine down once the walk is parked and nothing has happened for five minutes.</p>",
   },
+  stopat: {
+    title: "the stop-at scale",
+    lead: "<p>How far the agent walks before it hands back. This is the autonomy dial's neighbour, and it is a different question: autonomy says what the agent may DECIDE alone, stop-at says how far it may GO.</p><p>It has no off. The tightest setting is state end, and not stopping at all is blockers only.</p>",
+  },
   narration: {
     title: "the update cadence",
     lead: "<p>How often the agent owes a line about what it is doing. Whichever falls due first counts, minutes or calls. A volunteered update always pays, and always resets both.</p>",
@@ -929,7 +933,10 @@ async function showScaleHelp(which, level) {
   const rows = list
     .map((l) => {
       const here = level !== undefined && Number(l.value) === Number(level);
-      return `<tr${here ? ' style="font-weight:600"' : ""}><td>${escapeHtml(l.abbr)} · ${escapeHtml(String(l.value))}</td><td>${escapeHtml(l.name)}</td></tr>`;
+      // THE ABBREVIATION ONLY. The scale is categorical, and the number
+      // behind it is machinery a reader cannot act on (owner ruling
+      // 2026-08-18).
+      return `<tr${here ? ' style="font-weight:600"' : ""}><td>${escapeHtml(l.abbr)}</td><td>${escapeHtml(l.name)}</td></tr>`;
     })
     .join("");
   const h = SCALE_HELP[which] ?? SCALE_HELP.autonomy;
@@ -1107,17 +1114,25 @@ class Controls {
     // button flip back and then forward again — which is the "sometimes fast,
     // sometimes three seconds" the reader was seeing. The painted position
     // is held until the engine's own html agrees with it.
-    if (pendingLevel === null) return;
-    const hidden = el.querySelector("#thr");
-    if (hidden !== null && Number(hidden.value) === pendingLevel) pendingLevel = null;
-    else paintRungs(pendingLevel);
+    // EACH BANK RECONCILES AGAINST ITS OWN POSITION. One shared slot could
+    // only track one control, so the other was repainted from a value that
+    // was never its own.
+    for (const bank of ["autonomy", "stopat"]) {
+      if (pending[bank] === null) continue;
+      const hidden = el.querySelector('.bank-at[data-bank="' + bank + '"]');
+      if (hidden !== null && Number(hidden.value) === pending[bank]) pending[bank] = null;
+      else paintRungs(bank, pending[bank]);
+    }
   }
 
   // THE CLICK PAINTS ITSELF, THEN TELLS THE ENGINE. The round trip is a POST
   // plus a full re-render of the bar, and on this poll that is seconds. A
   // button that waits for it reads as broken, so the bank is repainted from
   // the click and the next poll only confirms what is already on screen.
-  let pendingLevel = null;
+  // ONE PENDING POSITION PER BANK. The autonomy dial and the stop-at dial
+  // ask different questions and share nothing. A single slot is what made a
+  // click on one of them move the other on screen.
+  const pending = { autonomy: null, stopat: null };
   // The drumroll's memory outlives the bar, which is replaced wholesale on
   // every poll — anything stored on the button itself dies with it.
   let topPresses = 0;
@@ -1134,13 +1149,16 @@ class Controls {
   // finish.
   let armedAt = 0;
   const ARM_DEAF_MS = 2000;
-  function paintRungs(level) {
+  function paintRungs(bank, level) {
     const el = $("bar");
     if (el === null) return;
-    for (const b of el.querySelectorAll("button.rung[data-rung]")) {
+    // SCOPED TO ONE BANK. Unscoped, this lit and dimmed the stop-at row on
+    // every autonomy click, and the reverse — which is what made two
+    // unrelated controls look wired together.
+    for (const b of el.querySelectorAll('button.rung[data-rung][data-bank="' + bank + '"]')) {
       b.classList.toggle("on", Number(b.dataset.rung) <= level);
     }
-    const hidden = el.querySelector("#thr");
+    const hidden = el.querySelector('.bank-at[data-bank="' + bank + '"]');
     if (hidden !== null) hidden.value = String(level);
   }
 
@@ -1151,6 +1169,11 @@ class Controls {
     if (!t || !t.closest) return;
     const rung = t.closest("button.rung[data-level]");
     if (rung !== null) {
+      // WHICH CONTROL WAS PRESSED. The markup has always said so in
+      // data-bank, and this handler ignored it — so every rung, including
+      // every stop-at rung, posted to /autonomy. That is why pressing one
+      // control moved the other, and why stop-at never moved at all.
+      const bank = rung.dataset.bank === "stopat" ? "stopat" : "autonomy";
       // THE HIDDEN RUNG, COUNTED BEFORE EVERY GUARD. The contract, in the
       // owner's words: five clicks on the top rung in a row go to emergency,
       // whatever rung the autonomy sits at, and it does not matter whether
@@ -1159,7 +1182,11 @@ class Controls {
       // Nothing may stand in front of this. The locked check below returns
       // silently, so from mechanical every click died there and no number of
       // presses could ever arm it.
-      if (Number(rung.dataset.rung) >= 1) {
+      //
+      // ONLY THE AUTONOMY BANK ARMS IT. Stop-at's notches are numbered 1 to
+      // 4, so an unscoped test counted ordinary stop-at clicks as a drumroll
+      // on the hazard rung.
+      if (bank === "autonomy" && Number(rung.dataset.rung) >= 1) {
         const now = Date.now();
         // Deaf for two seconds after arming, so the tail of the drumroll
         // cannot undo it.
@@ -1177,21 +1204,23 @@ class Controls {
           rung.classList.remove("locked");
           rung.classList.add("emergency");
           rung.textContent = "E";
-          paintRungs(1);
-          pendingLevel = 1;
+          paintRungs("autonomy", 1);
+          pending.autonomy = 1;
           vsapi.postMessage({ se: "emergency" });
           return;
         }
       }
       if (rung.classList.contains("locked")) return;
       const level = Number(rung.dataset.level);
-      pendingLevel = level;
-      paintRungs(level);
-      vsapi.postMessage({ se: "autonomy", value: level });
+      pending[bank] = level;
+      paintRungs(bank, level);
+      // EACH BANK POSTS ITS OWN ROUTE. /autonomy and /stop-at set different
+      // things, and sharing one is what made the wrong dial move.
+      vsapi.postMessage({ se: bank === "stopat" ? "stop-at" : "autonomy", value: level });
       // THE HELP FOLLOWS THE RUNG PRESSED, never where the walk lands.
       // Releasing the lowest rung lands on 0, and explaining "blocked" to
       // someone who just clicked the mechanical rung is the wrong mapping.
-      vsapi.postMessage({ se: "scale-help", which: "autonomy", level: Number(rung.dataset.rung) });
+      vsapi.postMessage({ se: "scale-help", which: bank, level: Number(rung.dataset.rung) });
       return;
     }
     // THE SHUTDOWN ROW. Independent on/off buttons, any combination lit at
@@ -1292,6 +1321,11 @@ class Controls {
       }
       if (await handleBarHelp(m)) return;
       if (m.se === "autonomy") await post("/autonomy", { value: m.value });
+      // THE SECOND BANK'S OWN ROUTE. Until this branch existed, every
+      // stop-at press landed on /autonomy and the stop-at value never moved
+      // — which is why blockers only stayed locked however often bless was
+      // pressed.
+      else if (m.se === "stop-at") await post("/stop-at", { value: m.value });
       // THE DRUMROLL ARMED. Climb to the top rung first: the engine refuses
       // emergency below it, and the presses may have started anywhere.
       else if (m.se === "emergency") {
