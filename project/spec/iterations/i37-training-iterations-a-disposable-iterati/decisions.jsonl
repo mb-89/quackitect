@@ -68,3 +68,4 @@
 {"ts":"2026-08-19T17:48:47.363Z","op":"update","visit":"iterations/i37/enumerate-space/find_without@0","node":"d72","brief":"trimming the cluster function by function"}
 {"ts":"2026-08-19T17:50:01.150Z","op":"update","visit":"iterations/i37/enumerate-space/find_by_heuristic@0","node":"d73","brief":"reading the heuristics catalogue"}
 {"ts":"2026-08-19T17:50:33.288Z","op":"update","visit":"iterations/i37/enumerate-space/find_by_heuristic@0","node":"d74","brief":"sweeping the heuristics catalogue against the cluster"}
+{"ts":"2026-08-19T17:52:56.730Z","op":"update","visit":"iterations/i37/enumerate-space/find_by_transforming@0","node":"d75","brief":"twelve transformations swept; the prove-the-guard idea is the best of the sub-machine"}
