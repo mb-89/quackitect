@@ -162,3 +162,5 @@
 {"ts":"2026-08-19T19:45:38.015Z","op":"done","visit":"iterations/i37/run-spikes/spike-the-truncated-history@0","node":"d11","brief":"spike four holds on a hybrid; the whole-tree rewind fails to compile"}
 {"ts":"2026-08-19T19:46:00.905Z","op":"update","visit":"iterations/i37/run-spikes/spike-the-log-attribution@0","node":"d21","brief":"moving to the exclusion-reach spike"}
 {"ts":"2026-08-19T19:47:22.167Z","op":"done","visit":"iterations/i37/run-spikes/spike-the-truncated-history@0","node":"d12","brief":"spike five falls — four exclusion lists and read has none"}
+{"ts":"2026-08-19T19:50:44.272Z","op":"plan","visit":"iterations/i37/run-spikes/spike-the-exclusion-reach@0","parent":null,"nodes":[{"id":"d22","brief":"fold the spikes back"},{"id":"d23","brief":"correct the decisions the spikes moved"},{"id":"d24","brief":"close M6 at gate-prototype"}]}
+{"ts":"2026-08-19T19:51:53.491Z","op":"update","visit":"iterations/i37/run-spikes/spike-the-ancestry-bound@0","node":"d25","brief":"the millisecond bound was mine and is replaced by a derived one"}

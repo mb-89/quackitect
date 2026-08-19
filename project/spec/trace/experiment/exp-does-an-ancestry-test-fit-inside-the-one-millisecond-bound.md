@@ -72,3 +72,32 @@ Whether the walk resolves commits often enough for 4.2 milliseconds to matter
 in aggregate. Nothing has counted resolutions per state. The bound was
 declared per crossing, so it is breached whatever the frequency, but the total
 cost is unmeasured.
+
+## The threshold was invented, and this verdict is re-read
+
+CORRECTED 2026-08-19, after the owner asked where the one millisecond bound
+came from.
+
+IT CAME FROM THE AGENT, at decompose-structure, on nobody's authority. It was
+the only millisecond bound in the corpus; every other interface declares one
+second or says one second does not apply.
+
+SO `falls` IS A VERDICT AGAINST AN INVENTED THRESHOLD. The measurement stands
+and the judgment does not.
+
+WHAT STANDS: `git merge-base --is-ancestor` costs **4229 microseconds** per
+call, the cost is the process spawn, and no git subcommand is meaningfully
+cheaper.
+
+WHAT FALLS AWAY: the claim that a checked ceiling "breaches its bound
+fourfold". Against the product's actual convention — one second for an answer
+to a caller — 4.2 milliseconds per resolution is only a problem if a lane call
+resolves many commits, and nobody has counted.
+
+WHAT SURVIVES INTACT, and it is the part the fold-back rests on: a structural
+ceiling costs NOTHING per resolution, because there is no test to run. That
+comparison needs no threshold at all. 4229 microseconds against zero is an
+argument; 4229 microseconds against a number the agent picked is not.
+
+THE REAL UNKNOWN IS NOW NAMED: resolutions per lane call, unmeasured, and it is
+what any future bound on this crossing has to be derived from.
