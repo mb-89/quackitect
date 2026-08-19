@@ -1,6 +1,16 @@
 ---
 id: i5-engine-hygiene-one-version-source-every-
-status: open
+status: shipped
+closed: 2026-08-19T14:04:21.369Z
+carried_count: 7
+carried:
+  - tsp-a-vehicle-is-made-and-then-drives-something-else — raid-debt-human-observed-demonstrations (verification.md)
+  - tsp-bound-surface — raid-debt-human-observed-demonstrations (verification.md)
+  - tsp-first-run — raid-debt-human-observed-demonstrations (verification.md)
+  - tsp-panel-walkthrough — raid-debt-human-observed-demonstrations (verification.md)
+  - tsp-the-arrival-in-one-act — raid-debt-human-observed-demonstrations (verification.md)
+  - tsp-unattended-start — raid-debt-human-observed-demonstrations (verification.md)
+  - tsp-derivation-analysis — raid-iss-a-cut-subsystem-left-its-interface-node-behind (verification.md)
 started: 2026-08-19T10:44:05.205Z
 opened: 2026-08-11T15:23:30.930Z
 goal: "Engine hygiene: one version source, every refusal anchored to its guidance, the sync sweeps duplicates, the slow test file splits, and the paint rules get their pin."
