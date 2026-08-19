@@ -345,3 +345,27 @@
 {"ts":"2026-08-19T15:46:13.442Z","op":"defer","visit":"iterations/i15/gate-kickoff@0","node":"d6","brief":"submit gate, stop for bless","to":"the owner — bless owed on i15/gate-kickoff, stop-at=bless","hops":1,"trail":["iterations/i15/gate-kickoff","the owner — bless owed on i15/gate-kickoff, stop-at=bless"]}
 {"ts":"2026-08-19T15:56:05.695Z","op":"done","visit":"front_desk@0","node":"d1","brief":"entered i15 at iterations/i15/start"}
 {"ts":"2026-08-19T15:57:17.542Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d3","brief":"checking gate-kickoff state: evidence already signed 2026-08-19"}
+{"ts":"2026-08-19T16:12:15.345Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d4","brief":"verified the harvest counts at ref main before the kickoff bless"}
+{"ts":"2026-08-19T16:17:17.862Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d5","brief":"drained the classifier note into cloud-runner.md"}
+{"ts":"2026-08-19T16:37:05.389Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d6","brief":"correcting the query-file count from 26 to the verified 25"}
+{"ts":"2026-08-19T16:38:28.998Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d7","brief":"same correction in the follow-up field, so the form agrees with itself"}
+{"ts":"2026-08-19T16:39:25.228Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d8","brief":"blessing the kickoff at major, on checks run rather than on the form"}
+{"ts":"2026-08-19T16:57:48.519Z","op":"done","visit":"start@0","node":"d2","brief":"gate-kickoff already filled; reviewed and blessed"}
+{"ts":"2026-08-19T17:03:35.756Z","op":"update","visit":"iterations/i15/draft-vision@0","node":"d5","brief":"diagnosing why draft-vision cannot route forward to define-actual"}
+{"ts":"2026-08-19T17:09:20.401Z","op":"update","visit":"iterations/i15/draft-vision@0","node":"d6","brief":"escaping stuck draft-vision routing to reset session target"}
+{"ts":"2026-08-19T17:11:33.424Z","op":"update","visit":"iterations/i15/draft-vision@1","node":"d7","brief":"diagnosing why the offered define-actual door does not open"}
+{"ts":"2026-08-19T17:14:18.398Z","op":"update","visit":"iterations/i15/draft-vision@1","node":"d8","brief":"resubmitting draft-vision recheck to re-earn done status this session"}
+{"ts":"2026-08-19T17:15:16.282Z","op":"update","visit":"iterations/i15/define-actual@0","node":"d9","brief":"resubmitting define-actual recheck to re-earn done status"}
+{"ts":"2026-08-19T17:16:04.808Z","op":"done","visit":"start@0","node":"d3","brief":"kickoff evidence read and blessed; now walking milestones"}
+{"ts":"2026-08-19T17:18:11.026Z","op":"update","visit":"iterations/i15/frame-delta@0","node":"d10","brief":"reopen+resubmit cycle to unstick already-signed M0/M1 states"}
+{"ts":"2026-08-19T17:18:29.001Z","op":"update","visit":"iterations/i15/scope-non-goals@0","node":"d11","brief":"cascading reopen+resubmit through M1"}
+{"ts":"2026-08-19T17:18:36.956Z","op":"update","visit":"iterations/i15/pressure-test@0","node":"d12","brief":"cascading reopen+resubmit through M1"}
+{"ts":"2026-08-19T17:20:22.504Z","op":"update","visit":"iterations/i15/gate-motivation@0","node":"d13","brief":"filled new goals_served/bound_breaches fields on gate-motivation"}
+{"ts":"2026-08-19T17:21:01.897Z","op":"update","visit":"iterations/i15/gate-motivation@0","node":"d14","brief":"goals_served per-item using exact kickoff goal text"}
+{"ts":"2026-08-19T17:21:13.104Z","op":"update","visit":"iterations/i15/gate-motivation@0","node":"d15","brief":"reviewed and blessed gate-motivation"}
+{"ts":"2026-08-19T17:21:51.104Z","op":"update","visit":"iterations/i15/draw-context@0","node":"d16","brief":"cascading reopen+resubmit through M2 fan"}
+{"ts":"2026-08-19T17:22:01.441Z","op":"update","visit":"iterations/i15/map-stakeholders@0","node":"d17","brief":"cascading reopen+resubmit through M2 fan"}
+{"ts":"2026-08-19T17:22:20.716Z","op":"update","visit":"iterations/i15/write-stories@0","node":"d18","brief":"cascading reopen+resubmit through M2"}
+{"ts":"2026-08-19T17:22:37.444Z","op":"update","visit":"iterations/i15/generalize-use-cases@0","node":"d19","brief":"cascading reopen+resubmit through M2"}
+{"ts":"2026-08-19T17:23:03.344Z","op":"update","visit":"iterations/i15/gate-inputs@0","node":"d20","brief":"goals_served/bound_breaches for gate-inputs"}
+{"ts":"2026-08-19T17:23:15.327Z","op":"update","visit":"iterations/i15/gate-inputs@0","node":"d21","brief":"reviewed and blessed gate-inputs"}

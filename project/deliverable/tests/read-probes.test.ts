@@ -134,7 +134,7 @@ test("a genuinely wrong answer is still refused after the filter loosens", () =>
   assert.equal(probesMissed(expect, "— — — ...").length, expect.length, "punctuation alone passed for an answer");
 });
 
-// AN ANCHOR THAT APPEARS TWICE HAS TWO RIGHT ANSWERS (i15 walk, 2026-08-19).
+// AN ANCHOR THAT APPEARS TWICE HAS TWO RIGHT ANSWERS (the i15 walk).
 //
 // front-desk.md carried "at the end of the" twice — "closes at the end of the
 // day, not at the end of the fix". The probe quoted it, the reader answered

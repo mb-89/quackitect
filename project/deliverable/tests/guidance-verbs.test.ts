@@ -1,6 +1,6 @@
 // GUIDANCE THAT NAMES A VERB NOBODY BUILT COSTS THE READER THEIR CALLS.
 //
-// Measured twice on 2026-08-19, on a walk driven by a smaller model. The
+// Measured twice on one walk driven by a smaller model. The
 // method card carried a heading reading "se_package builds the artifact" for
 // a verb that has never existed, and the prompt layer taught a reading proof
 // the engine had already replaced. A capable model reads around both. A

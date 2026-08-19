@@ -33,7 +33,7 @@ function occurrences(w: string[], from: number, to: number): number {
  *
  *  "The 4 words that FOLLOW x" has two right answers when x sits in the
  *  document twice, and the reader cannot know which one is wanted. Measured
- *  2026-08-19: front-desk.md carries "at the end of the" twice, the reader
+ *  on the i15 walk: front-desk.md carries "at the end of the" twice, the reader
  *  anchored on the first, and the whole document was served again.
  *
  *  GROW THE ANCHOR BACKWARDS, never forwards. The words that FOLLOW it are

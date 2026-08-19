@@ -1,8 +1,9 @@
 ---
 form: log-risks
+reopened: "2026-08-19T17:15:46.647Z — same claims-registration gap: route() treats log-risks as an unmet feeder of gate-motivation despite the file being signed"
 amended: 2026-08-16T16:31:18.683Z by agent — ref "main" resolves — verified 2026-08-16; one of the two carried-forward raid entries is now closed
 by: agent
-signed_off: 2026-08-16T16:22:13.867Z
+signed_off: 2026-08-19T17:16:04.989Z
 authors: agent
 files: null
 ---

@@ -2386,16 +2386,7 @@ export class Session {
       // "shall enter no iteration AND shall answer with the offer", and the
       // second half was missing while the first passed — which is the half a
       // tester with fresh eyes caught.
-      const waitingOpts = this.pullOptions();
-      // see dsp-walk-machine.md#every-door-is-shown
-      return {
-        pull: "wait",
-        ...head(),
-        ...(waitingOpts.length > 0 ? { options: waitingOpts } : {}),
-        waiting_for: "the person",
-        why: this.waitWhy(this.standingOn(pullTarget), waitingOpts.length > 0, pullTarget, r.note),
-        ...extra(),
-      };
+      return { ...this.waitUnroutable(pullTarget, r.note), ...head(), ...extra() };
     }
 
     // 2. THE GATES ON THE FIRST STEP: the slider, the reading, the form.
@@ -2911,6 +2902,54 @@ export class Session {
     return agentCopy(this.formGet(name) as Record<string, unknown>, false);
   }
 
+  /** WHAT A `wait` TELLS THE WALKER, when the route to the target could not be
+   *  drawn. Lifted out of pull for the same reason doAdvice was lifted out of
+   *  pullAfterSweep: the branch has three cases to say well, and saying them
+   *  inline pushes the caller past its complexity bound.
+   *
+   *  A BRANCH POINT SHOWS ITS DOORS (i34,
+   *  req-a-pull-carrying-no-choice-enters-no-iteration). "There is nowhere to
+   *  go" is the truth and not the whole of it: standing where several ways
+   *  lead on, the walk is waiting FOR A CHOICE, and an answer naming none
+   *  leaves the reader to guess a door and read the refusal.
+   *
+   *  AND THE ENGINE ALREADY KNOWS WHY THE ROUTE FAILED. "nothing routes toward
+   *  X from here" is true and useless. The claim guard holds which upstream
+   *  claim fell, the chain it starts at, and the call that re-earns it.
+   *  Measured on the i15 walk: a re-signed gate-kickoff dropped draft-vision
+   *  beneath it, the wait said only that no route existed, and the walk spent
+   *  twenty-five calls trying six phrasings of the same offered door before
+   *  escaping. `se_why` held all of it.
+   *
+   *  SO THE BLOCKERS RIDE THE ANSWER rather than being pointed at. A stop is
+   *  the one place a second call cannot be assumed: nobody may be there.
+   *
+   *  A `wait` CARRYING DOORS IS NOT A STOP, and said nothing about it either.
+   *  The contract defines `wait` as "stop and name the step that waits", so an
+   *  agent obeying it stops while a door stands open beside the answer. The
+   *  doors are the agent's ONLY where the routed goal is behind one — rule 9's
+   *  line, not this branch's to move — so the advice names both halves rather
+   *  than telling anyone to walk.
+   *  see dsp-walk-machine.md#every-door-is-shown */
+  private waitUnroutable(pullTarget: string, note?: string): Record<string, unknown> {
+    const waitingOpts = this.pullOptions();
+    const stuckWhy = this.standingOn(pullTarget) ? undefined : this.whyGrey(pullTarget);
+    const stuckBlockers = Array.isArray(stuckWhy?.blockers) ? (stuckWhy?.blockers as Record<string, unknown>[]) : [];
+    const blocked = stuckBlockers.length > 0;
+    return {
+      pull: "wait",
+      ...(waitingOpts.length > 0 ? { options: waitingOpts } : {}),
+      waiting_for: blocked ? "the work the blocker names" : waitingOpts.length > 0 ? "a choice, or the person" : "the person",
+      why: this.waitWhy(this.standingOn(pullTarget), waitingOpts.length > 0, pullTarget, note),
+      ...(blocked ? { blocked_by: stuckBlockers, blocked_says: stuckWhy?.says } : {}),
+      do: blocked
+        ? `${pullTarget} is not reachable because something it rests on is not standing, and \`blocked_by\` names it with the exact call that fixes it. Do that first — no door gets past it, and the doors offered here lead elsewhere.`
+        : waitingOpts.length > 0
+          ? 'THIS IS NOT NECESSARILY A STOP — the doors in `options` are open from here. Where the goal you were routed to lies behind one, take it with form: {"choice": "<to>"} and the walk aims at it. Where none of them serves that goal, name what waits and STOP: taking a door just because it was offered is choosing unasked.'
+          : "nothing is owed here and no door leads on — name what waits plainly and STOP, because the dial alone cannot wake you",
+    };
+  }
+
   /** WHAT A `fill` ACTUALLY WANTS, and the reason this is not one sentence.
    *
    *  A form comes back for three different reasons and they used to read
@@ -2918,7 +2957,7 @@ export class Session {
    *  stamped, or everything stands and signed and the BLESS is what is owed.
    *  Only the first is the agent's typing. Told to "fill every required
    *  section" while every section is full, an agent either loops or invents
-   *  a stop — measured on the i15 walk of 2026-08-19, where a signed gate
+   *  a stop — measured on the i15 walk, where a signed gate
    *  answered `fill` forever and said nothing about the thumb.
    *
    *  A GATE IS NOT DONE UNTIL IT IS BLESSED, and the pull is the bless's only
