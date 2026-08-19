@@ -31,6 +31,30 @@ names which of four you got.
   THREE KEYS ARE ACTS, NOT SECTIONS. Everything else in the form is a field
   and gets saved.
 
+  EACH FIELD SAYS WHICH OF TWO ACTS IT WANTS, on its hint, as `act`. They are
+  not the same work and the wrong one wastes the state.
+
+  - `author` — the page is yours. Nothing computed it and nothing will. Write
+    it.
+  - `rule` — THE ENGINE ALREADY DREW IT, from what stands elsewhere in the
+    record. Read the drawing, then accept it, reject it or pick among what it
+    offers. Your judgment is the answer; prose is not.
+
+  A DRAWN FIELD IS NOT AN EMPTY PAGE, and it used to arrive looking like one.
+  23 of the 86 evidence fields in the rigor matrix are drawn — the Pugh matrix,
+  the flip conditions, the clustered DSM, the Pareto front, every checklist over
+  a live source. Nothing on the form said so.
+
+  SO THE SAME FORM INVITED TWO OPPOSITE MISTAKES. Take a drawing for an empty
+  page and you type prose over a computation. Take an empty page for a drawing
+  and you stamp it without reading. Both were walked on i15.
+
+  WHAT A RULE FIELD ASKS FOR, concretely: the engine says the flips are these
+  three; you say which are credible. It says the clusters are these; you move
+  the rows it got wrong. It says the winner is this; you say whether the seat
+  holds. Re-deriving the computation by hand is the waste, and typing an essay
+  where a pick was wanted is the other one.
+
   - `submit: true` — stamp it. Runs every check, then signs.
   - `bless: true` or `bless: false` — the gate's thumb, up or down.
   - a bare fill with neither — SAVED and NOT stamped, on purpose. Fill half a

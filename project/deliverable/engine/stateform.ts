@@ -220,8 +220,33 @@ export interface FieldHint {
   /** Root-relative path to the item template `of:` names, so the reader is
    *  one click from the rules for what they must type. Empty without `of:`. */
   of_template: string;
-  /** The type itself, for the link's label. */
+  /** The type itself, for the link’s label. */
   of: string;
+  /** WHAT THE AGENT'S ACT ON THIS FIELD IS, and the two are not the same
+   *  work. `rule` means the ENGINE DREW IT from what already stands - the
+   *  agent reads the drawing and accepts, rejects or picks. `author` means
+   *  the page is the agent's own to write.
+   *
+   *  MEASURED ON THE RIGOR MATRIX: 23 of its 86 evidence fields are drawn,
+   *  and nothing on the served form said which. A reader cannot tell a
+   *  computed view from an empty page, so the same form invites two opposite
+   *  mistakes - typing prose over a drawing, or stamping one unread. */
+  act: "rule" | "author";
+}
+
+/** Which act a field asks for - see FieldHint.act.
+ *
+ *  FOUR DECLARATIONS MAKE A FIELD DRAWN, and every one of them names a place
+ *  the answer comes FROM: `reads` another field’s output, `writes` a key back
+ *  onto the nodes, `picks` from a live pool, or lists items from a live
+ *  $-source. A field declaring none of them has no source but the agent,
+ *  which is exactly what authoring means. */
+export function fieldAct(f: { reads?: string; writes?: string; picks?: Record<string, string[]>; items?: string[] }): "rule" | "author" {
+  if ((f.reads ?? "") !== "") return "rule";
+  if ((f.writes ?? "") !== "") return "rule";
+  if (Object.keys(f.picks ?? {}).length > 0) return "rule";
+  if ((f.items ?? []).some((i) => i.trimStart().startsWith("$"))) return "rule";
+  return "author";
 }
 
 /** see dsp-evidence-forms.md#type-prefix-and-folder-filled-from-the-fields-declared */
@@ -234,12 +259,13 @@ export function expandHint(root: string, text: string, of: string): string {
     .replace(/\{folder\}/g, tpl?.folder === undefined || tpl.folder === "" ? "project/spec/trace" : tpl.folder);
 }
 
-export function fieldHint(root: string, meta: TemplateMeta | undefined, of: string): FieldHint {
+export function fieldHint(root: string, meta: TemplateMeta | undefined, of: string, act: "rule" | "author" = "author"): FieldHint {
   return {
     placeholder: expandHint(root, meta?.placeholder ?? "", of),
     description: expandHint(root, meta?.description ?? "", of),
     of_template: of === "" || itemTemplate(root, of) === undefined ? "" : itemTemplateRel(of),
     of,
+    act,
   };
 }
 
@@ -836,7 +862,7 @@ export function stateFormModel(
     fieldArgs[f.name] = fieldArgsFor(f, root, traceRoot, instanceRaw, instanceAbs === undefined ? undefined : dirname(instanceAbs));
   const fieldHints: Record<string, FieldHint> = {};
   for (const f of s.evidence_form) {
-    fieldHints[f.name] = fieldHint(root, templateMetas[f.template ?? "free-form"], f.of ?? "");
+    fieldHints[f.name] = fieldHint(root, templateMetas[f.template ?? "free-form"], f.of ?? "", fieldAct(f));
   }
   for (const d of s.inputs ?? []) inputs.push({ label: d.label, description: d.description, entry: false });
   return {
