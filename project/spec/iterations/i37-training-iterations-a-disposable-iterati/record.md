@@ -230,3 +230,38 @@ THE BRANCH IS claude/training-iterations-research-9kq6g2. The owner offered
 v3 or a dedicated branch and left the choice open. The designated branch is
 the dedicated one and the work stays there.
 
+
+## Owner rulings, 2026-08-19 — the sixth round, on two supposed gaps
+
+NEITHER IS A GAP. Both were raised by this walk as open items and both are
+closed by ruling.
+
+NOTHING NEEDS TO SCHEDULE A BENCHMARK. The owner: "I am gonna tell you if I
+wanna run a benchmark. There does not need to be a scheduler. The owner will
+tell you."
+
+So a run is triggered by a person, always. Cycling still decides WHICH
+iteration a run takes when none is named; it never decides WHEN. Scheduling
+joins the non-goals rather than waiting as an unwritten requirement.
+
+COMPARING TWO DIFFERENT ITERATIONS IS NOT A USE CASE. The owner: "I am not
+sure that there is ever gonna be a use for comparing two different iterations
+against each other."
+
+So the ratio-against-a-canonical-reference option is ruled out rather than
+held open. Its only advantage over the paired delta was cross-iteration
+comparison, and that advantage is not wanted.
+
+THE MATRIX FILLS OVER TIME, AND SLOWLY IS FINE. The owner: "if we cycle
+through, we will at some point come back to the same iteration again, but not
+instantly. And then we have comparisons on the same iteration. It will just
+take a moment. That is okay."
+
+WHAT THAT SETTLES, and it is the part worth writing down. Cycling was
+defended earlier on the grounds that it buys the same confidence as repeating
+for the same money. The owner's reason is different and better: every run
+yields a learning whether or not it completes a pair, and the pairs arrive on
+their own as the cycle comes round. Coverage first, pairing later.
+
+SO A SINGLE UNPAIRED RUN IS NOT A HALF-RESULT. It is a full result of a
+different kind — the design audit — plus a number waiting for its partner.

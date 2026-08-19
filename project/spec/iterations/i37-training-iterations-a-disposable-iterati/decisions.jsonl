@@ -63,3 +63,5 @@
 {"ts":"2026-08-19T17:41:43.868Z","op":"update","visit":"iterations/i37/enumerate-space/find_prior_art@0","node":"d65","brief":"six prior-art options minted; the owner s own failed attempt is the load-bearing one"}
 {"ts":"2026-08-19T17:42:25.037Z","op":"update","visit":"iterations/i37/enumerate-space/find_prior_art@0","node":"d66","brief":"adding the mechanism section every option owes"}
 {"ts":"2026-08-19T17:44:42.235Z","op":"plan","visit":"iterations/i37/enumerate-space/find_contradiction@0","parent":null,"nodes":[{"id":"d67","brief":"mint contradiction-breaking options"},{"id":"d68","brief":"fill find_contradiction"},{"id":"d69","brief":"continue the finders"}]}
+{"ts":"2026-08-19T17:46:17.732Z","op":"update","visit":"iterations/i37/enumerate-space/find_analogy@0","node":"d70","brief":"the calibration analogy is the strongest transfer in this state"}
+{"ts":"2026-08-19T17:46:53.890Z","op":"update","visit":"iterations/i37/enumerate-space/find_analogy@0","node":"d71","brief":"recording the sixth round of rulings"}

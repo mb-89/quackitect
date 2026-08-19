@@ -26,3 +26,16 @@ idea.
 ## Mechanism
 
 A scripted transaction is pushed through the live system at fixed intervals by a scheduler. Its output is discarded on completion; its timing is appended to a series that a threshold watches.
+
+## Ruled out by the owner, 2026-08-19
+
+THE SCHEDULE HALF IS NOT TAKEN. The owner: "There does not need to be a
+scheduler. The owner will tell you."
+
+A benchmark run is triggered by a person, always. What survives from this
+option is the rest of it — fake work through the real system, output
+discarded, timing kept — which the whole iteration already rests on.
+
+SO THE GAP THIS OPTION SURFACED IS CLOSED BY RULING rather than by a
+requirement. Cycling decides WHICH iteration a run takes when none is named.
+Nothing decides WHEN, and nothing should.
