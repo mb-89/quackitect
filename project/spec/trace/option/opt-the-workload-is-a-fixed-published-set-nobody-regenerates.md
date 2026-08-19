@@ -18,3 +18,7 @@ The archive grows, so the set moves whether or not anybody regenerates it. This
 option survives only in the weakened form the owner already ruled: the POOL may
 grow, and comparison is per-iteration so growth adds pairs rather than moving
 them.
+
+## Mechanism
+
+A named set of work items is stored, versioned and published. A run selects from that set and never generates. Comparability comes from the set being byte-identical between two readings.

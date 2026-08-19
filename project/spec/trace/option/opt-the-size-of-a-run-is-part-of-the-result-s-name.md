@@ -16,3 +16,7 @@ It makes an incomparable comparison impossible to state by accident.
 The change-size column is the scale factor and already exists. A benchmark
 report carries it, and req-a-benchmark-report-carries-the-conditions-of-its-run
 refuses a report without it.
+
+## Mechanism
+
+The scale is an input to the run and a field on the result. A reader cannot obtain a number without also obtaining the scale it was taken at, because they are written together.

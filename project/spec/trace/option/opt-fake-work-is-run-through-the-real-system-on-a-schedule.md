@@ -22,3 +22,7 @@ version cheaper than the tradition it comes from.
 Nothing in this iteration runs a benchmark on a SCHEDULE. Cycling decides WHICH
 iteration runs; nothing decides WHEN. That is a live gap rather than a rejected
 idea.
+
+## Mechanism
+
+A scripted transaction is pushed through the live system at fixed intervals by a scheduler. Its output is discarded on completion; its timing is appended to a series that a threshold watches.

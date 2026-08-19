@@ -17,3 +17,7 @@ The owner ruled that runs CYCLE rather than repeat, so the repetition is across
 iterations rather than within one. The sample is a cycle and the unit is the
 paired delta, which buys the same protection while covering more shapes of
 work.
+
+## Mechanism
+
+The same work is run k times under identical conditions. What is reported is a function over all k outcomes rather than any single one, so a lucky pass cannot be quoted alone.

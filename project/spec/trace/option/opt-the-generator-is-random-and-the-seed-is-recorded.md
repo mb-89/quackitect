@@ -16,3 +16,7 @@ Random and fixed stop being two features. One lever does both.
 Reduced to its smallest useful form. The only randomness left is WHICH archived
 iteration a run draws when none is named, and flow-chosen-iteration carries the
 seed so the draw repeats.
+
+## Mechanism
+
+A pseudo-random generator produces the work from a seed. The seed is written into the result. Re-running with a stored seed reproduces the draw exactly; running without one draws fresh and records what it drew.

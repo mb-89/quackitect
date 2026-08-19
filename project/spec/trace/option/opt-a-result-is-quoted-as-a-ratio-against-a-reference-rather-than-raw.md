@@ -21,3 +21,7 @@ everything, quoted as a ratio.
 
 IT IS NOT DEAD. A canonical baseline would let two different iterations be
 compared, which the paired delta explicitly cannot do.
+
+## Mechanism
+
+One run on a named reference configuration is measured once and kept. Every later result is divided by it and published as the ratio, so the units cancel and the host drops out.
