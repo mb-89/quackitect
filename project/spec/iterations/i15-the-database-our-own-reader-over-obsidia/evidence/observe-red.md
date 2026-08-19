@@ -1,7 +1,8 @@
 ---
 form: observe-red
+reopened: "2026-08-19T17:55:25.949Z — same claims-registration gap, cascading fix through M7"
 by: agent
-signed_off: 2026-08-16T18:53:50.740Z
+signed_off: 2026-08-19T17:57:07.661Z
 authors: agent
 files: null
 ---
@@ -27,6 +28,12 @@ specify-build signed: two design specs, two independent build chunks seeded. obs
 - [x] tsp-tour-run
 - [x] tsp-two-machines
 - [x] tsp-unattended-start
+- [x] tsp-a-slow-signal-keeps-the-wait
+- [x] tsp-a-vehicle-is-made-and-then-drives-something-else
+- [x] tsp-one-door-into-the-pool
+- [x] tsp-the-arrival-in-one-act
+- [x] tsp-the-cited-refs-resolve
+- [x] tsp-the-engine-keeps-no-record-of-what-it-produced
 
 ## follow_up
 
@@ -39,6 +46,8 @@ TSP-UNATTENDED-START'S RED IS OBSERVED AND OLDER THAN i15. The demonstration has
 TSP-COUPLING-DISPOSITION IS THE ONE GENUINE NEW RED. engine/disposition.ts's recordCouplingDisposition throws (not yet built), so none of its three checklist criteria can be inspected as passing yet — exactly the state build-steps is about to change.
 
 THE TEST REDS ARE THE ENGINE'S TO CONFIRM ON THIS SUBMIT (tests/query.test.ts's four cases, tests/coupling-rank.test.ts's two), per raid-dec-the-engine-runs-the-red-and-owns-its-own-promotions.
+
+SIX MORE SPECS JOINED THE STANDING SET SINCE THIS STATE FIRST SIGNED (i33, i16, i17, i35 minted, none touched by i15): tsp-a-slow-signal-keeps-the-wait, tsp-a-vehicle-is-made-and-then-drives-something-else, tsp-one-door-into-the-pool, tsp-the-arrival-in-one-act, tsp-the-cited-refs-resolve, tsp-the-engine-keeps-no-record-of-what-it-produced. All six are demonstration or inspection specs i15 adds no requirement to; boxes checked on the same i34 convention the twelve above already follow.
 
 Next is build-steps.
 

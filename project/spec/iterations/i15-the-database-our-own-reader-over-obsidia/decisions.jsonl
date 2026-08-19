@@ -409,3 +409,14 @@
 {"ts":"2026-08-19T17:47:04.500Z","op":"update","visit":"iterations/i15/gate-prototype@0","node":"d59","brief":"goals_served/bound_breaches for gate-prototype"}
 {"ts":"2026-08-19T17:47:11.577Z","op":"update","visit":"iterations/i15/gate-prototype@0","node":"d60","brief":"reviewed and blessed gate-prototype"}
 {"ts":"2026-08-19T17:47:38.728Z","op":"update","visit":"iterations/i15/gate-prototype@0","node":"d61","brief":"reading unprobed crippling/fatal assumptions blocking gate-prototype"}
+{"ts":"2026-08-19T17:49:10.706Z","op":"done","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d36","brief":"M4-M8 milestones cascade largely complete; now at M7 author-tests"}
+{"ts":"2026-08-19T17:50:18.772Z","op":"update","visit":"iterations/i15/author-tests@0","node":"d62","brief":"cascading reopen+resubmit through M7"}
+{"ts":"2026-08-19T17:54:12.666Z","op":"update","visit":"iterations/i15/author-tests@0","node":"d63","brief":"reading author-tests to add the two new test-spec references"}
+{"ts":"2026-08-19T17:54:21.863Z","op":"update","visit":"iterations/i15/author-tests@0","node":"d64","brief":"adding the two new test-specs to author-tests checks"}
+{"ts":"2026-08-19T17:54:42.029Z","op":"update","visit":"iterations/i15/author-tests@0","node":"d65","brief":"resubmitting author-tests with the two new test-specs"}
+{"ts":"2026-08-19T17:55:12.183Z","op":"update","visit":"iterations/i15/specify-build@0","node":"d66","brief":"cascading reopen+resubmit through M7"}
+{"ts":"2026-08-19T17:55:26.186Z","op":"update","visit":"iterations/i15/observe-red@0","node":"d67","brief":"cascading reopen+resubmit through M7, observe-red will run the mechanical check"}
+{"ts":"2026-08-19T17:55:57.425Z","op":"update","visit":"iterations/i15/observe-red@0","node":"d68","brief":"reading observe-red to see current red_observed checklist content"}
+{"ts":"2026-08-19T17:56:42.056Z","op":"update","visit":"iterations/i15/observe-red@0","node":"d69","brief":"adding 6 corpus-drift non-test specs to observe-red checklist"}
+{"ts":"2026-08-19T17:56:56.832Z","op":"update","visit":"iterations/i15/observe-red@0","node":"d70","brief":"resubmitting observe-red after adding 6 non-test specs"}
+{"ts":"2026-08-19T17:57:07.487Z","op":"update","visit":"iterations/i15/observe-red@0","node":"d71","brief":"resubmitting observe-red after adding 6 non-test specs"}

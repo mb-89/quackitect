@@ -1,7 +1,8 @@
 ---
 form: author-tests
+reopened: "2026-08-19T17:50:18.541Z — same claims-registration gap, cascading fix through M7"
 by: agent
-signed_off: 2026-08-16T18:49:32.902Z
+signed_off: 2026-08-19T17:50:18.960Z
 authors: agent
 files: null
 ---
@@ -22,6 +23,8 @@ gate-prototype cleared; M7 build begins. i15 mints 7 functional requirements (4 
 - tsp-derivation-analysis
 - tsp-record-lifecycle
 - tsp-engine-lifecycle
+- tsp-served-instructions-name-their-act
+- tsp-guidance-names-only-what-exists
 
 ## follow_up
 

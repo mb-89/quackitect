@@ -411,6 +411,17 @@ const ARG_SYNONYMS: readonly (readonly string[])[] = [
  *  names the tool actually declares, and only ones the caller did not already
  *  send — so a call carrying both `path` and `dir` never has one rewritten
  *  over the other. */
+/** Every field an array argument's items declare, mapped to the argument that
+ *  holds them — so an unknown top-level key can be told where it does belong. */
+function nestedFields(properties: Record<string, unknown> | undefined): Map<string, string> {
+  const out = new Map<string, string>();
+  for (const [arg, spec] of Object.entries(properties ?? {})) {
+    const items = (spec as { items?: { properties?: Record<string, unknown> } }).items;
+    for (const field of Object.keys(items?.properties ?? {})) if (!out.has(field)) out.set(field, arg);
+  }
+  return out;
+}
+
 function candidateArgs(wrong: string, args: Record<string, unknown>, known: string[]): string[] {
   const out = new Set<string>();
   for (const group of ARG_SYNONYMS) {
@@ -730,6 +741,14 @@ export function buildServer(
       {
         required: (t.inputSchema.required as string[] | undefined) ?? [],
         known: Object.keys((t.inputSchema.properties as Record<string, unknown>) ?? {}),
+        // WHERE A KEY BELONGS, when it does not belong at the top. An array
+        // argument's items declare their own fields, and a caller carrying a
+        // habit from a sibling verb puts one of those beside the array
+        // instead of inside it. Measured on the i15 walk: se_file_patch was
+        // called with a top-level `path`, which is exactly right for
+        // se_file_read and se_file_write and wrong here. The refusal named
+        // the key and not the place, so the fix was still a guess.
+        nested: nestedFields(t.inputSchema.properties as Record<string, unknown> | undefined),
       },
     ]),
   );
@@ -763,6 +782,8 @@ export function buildServer(
           args: {},
           note: unknown
             .map((k) => {
+              const inside = shape.nested.get(k);
+              if (inside !== undefined) return `${k} belongs INSIDE each ${inside}, not beside it — send ${inside}: [{ ${k}: ..., ... }]`;
               const could = candidateArgs(k, args, shape.known);
               return could.length === 0 ? k : `${k} — did you mean ${could.join(" or ")}?`;
             })
