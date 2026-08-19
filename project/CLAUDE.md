@@ -1,7 +1,7 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
      from project/guidance/contract.md b538e8ccc81e
      from project/guidance/walking.md 8d2cebb9bd5a
-     from project/guidance/method/lane.md 1b2be4c7ea58
+     from project/guidance/method/lane.md b68c5bf364c7
      from project/guidance/voice.md 0b6faf79ff32
 -->
 
@@ -510,7 +510,7 @@ or better.
 | Grep | `se_file_search` (state your intent — it is logged) |
 | ls | `se_file_list` |
 | Bash | `se_run` (output captured in full under the returned ref) |
-| git (via Bash) | `se_git` (allowlisted; push stays with the user) |
+| git (via Bash) | `se_git` (allowlisted; push stays with the user, EXCEPT on a cloud run — see cloud-runner.md) |
 | WebFetch | `se_web_fetch` |
 | WebSearch | ALLOWED natively — it runs on the provider's backend and cannot be self-hosted keylessly. Every query reaches the feed mechanically, through a hook. |
 | your own history | `se_log_query` |
