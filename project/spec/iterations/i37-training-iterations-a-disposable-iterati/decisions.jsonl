@@ -58,3 +58,6 @@
 {"ts":"2026-08-19T17:38:16.110Z","op":"update","visit":"iterations/i37/derive-criteria@0","node":"d58","brief":"the compare fields take table lines only; prose moved to anything_else"}
 {"ts":"2026-08-19T17:38:48.964Z","op":"update","visit":"iterations/i37/partition-functions@0","node":"d59","brief":"reading the dsm template format"}
 {"ts":"2026-08-19T17:39:32.180Z","op":"update","visit":"iterations/i37/partition-functions@0","node":"d60","brief":"one cluster defended and the thin link named"}
+{"ts":"2026-08-19T17:40:25.178Z","op":"update","visit":"iterations/i37/enumerate-space/find_prior_art@0","node":"d61","brief":"reading the option template before minting candidates"}
+{"ts":"2026-08-19T17:41:00.664Z","op":"plan","visit":"iterations/i37/enumerate-space/find_prior_art@0","parent":null,"nodes":[{"id":"d62","brief":"mint prior-art options"},{"id":"d63","brief":"fill find_prior_art"},{"id":"d64","brief":"continue the enumerate-space finders"}]}
+{"ts":"2026-08-19T17:41:43.868Z","op":"update","visit":"iterations/i37/enumerate-space/find_prior_art@0","node":"d65","brief":"six prior-art options minted; the owner s own failed attempt is the load-bearing one"}

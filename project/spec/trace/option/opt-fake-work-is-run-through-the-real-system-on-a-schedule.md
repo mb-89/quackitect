@@ -1,0 +1,24 @@
+---
+minted_in: i37-training-iterations-a-disposable-iterati
+id: opt-fake-work-is-run-through-the-real-system-on-a-schedule
+type: "[[option]]"
+found_by: prior-art
+statement: "Scripted work is pushed through the live system at intervals, its output discarded and its timing kept, so a regression shows up before a person notices it."
+source: "ref-agent-benchmark-harnesses-2026 \u2014 synthetic monitoring in application performance tooling; RECALLED rather than fetched"
+---
+
+## What it buys
+
+Regression detection without anyone asking for it.
+
+## What it sheds here
+
+The fakeness. A synthetic transaction is invented because no real one can be
+replayed. A finished iteration can be, which is what makes this project's
+version cheaper than the tradition it comes from.
+
+## The part not yet taken
+
+Nothing in this iteration runs a benchmark on a SCHEDULE. Cycling decides WHICH
+iteration runs; nothing decides WHEN. That is a live gap rather than a rejected
+idea.
