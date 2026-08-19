@@ -13,6 +13,7 @@ how_likely: expected
 weighs_with: none
 weighs_against: none
 source_refs:
+  - raid-asm-a-throwaway-tree-at-an-old-commit-can-run-the-engine
   - "owner ruling 2026-08-19: the engine that works of a rewound tree is the current engine"
   - "probe 2026-08-19: git archive of project/spec at 5f85977f^ produced 1149 files, 0 mentioning i33"
   - "raid-asm-a-throwaway-tree-at-an-old-commit-can-run-the-engine"

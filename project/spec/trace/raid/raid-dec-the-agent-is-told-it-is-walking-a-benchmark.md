@@ -13,6 +13,7 @@ how_likely: expected
 weighs_with: none
 weighs_against: none
 source_refs:
+  - req-the-benchmark-history-is-unreadable-while-a-run-is-bound
   - "owner ruling 2026-08-19: open, not blind"
   - "i37 find_analogy: blinding domains show the honest alternative is to state what an unblinded measurement supports"
   - "ref-agent-benchmark-harnesses-2026"

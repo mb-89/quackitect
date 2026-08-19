@@ -13,6 +13,7 @@ how_likely: expected
 weighs_with: none
 weighs_against: none
 source_refs:
+  - req-a-bound-run-resolves-no-commit-newer-than-its-rewind-point
   - "i37 evaluate-set: the refusing run scores 5 on req-fallen-condition-named against the thin run's 2"
   - "heuristic: the default should be the safe thing"
   - "raid-dec-the-ceiling-is-an-ancestry-test-not-a-path-mask"

@@ -13,6 +13,8 @@ how_likely: expected
 weighs_with: none
 weighs_against: none
 source_refs:
+  - req-a-bound-run-resolves-no-commit-newer-than-its-rewind-point
+  - cand-the-refusing-run-with-recorded-conditions
   - "probe 2026-08-19: git merge-base --is-ancestor answers 0 forward and 1 reversed"
   - "measured 2026-08-19: 282 trace files mention i15 or i34"
   - "owner ruling 2026-08-19: do not design against a malicious agent"

@@ -118,3 +118,4 @@
 {"ts":"2026-08-19T18:54:44.855Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d23","brief":"aiming at record-adrs"}
 {"ts":"2026-08-19T18:55:02.451Z","op":"update","visit":"iterations/i37/record-adrs@0","node":"d24","brief":"reading a decision node shape before minting five"}
 {"ts":"2026-08-19T18:57:02.136Z","op":"update","visit":"iterations/i37/record-adrs@0","node":"d25","brief":"adding the rejected options and consequences each decision owes"}
+{"ts":"2026-08-19T18:57:43.201Z","op":"done","visit":"iterations/i37/cut-criteria@0","node":"d13","brief":"every decision now names a traceable ref"}

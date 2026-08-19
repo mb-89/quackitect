@@ -13,6 +13,8 @@ how_likely: expected
 weighs_with: none
 weighs_against: none
 source_refs:
+  - req-a-benchmark-report-carries-the-conditions-of-its-run
+  - cand-the-refusing-run-with-recorded-conditions
   - "heuristic: if it must be remembered, it must be recorded"
   - "i37 evaluate-set: the refusing run scores 1 on req-walk-survives-host-swap by deriving them from a log that does not hold them"
   - "i36 \u2014 the harness is not Claude"
