@@ -42,3 +42,7 @@
 {"ts":"2026-08-19T17:16:51.942Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d41","brief":"probing the rewind assumption with a ref search in one call"}
 {"ts":"2026-08-19T17:17:18.661Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d42","brief":"control check so the zero is a real zero"}
 {"ts":"2026-08-19T17:17:46.667Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d43","brief":"recording the probe result on the assumption"}
+{"ts":"2026-08-19T17:18:26.587Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d44","brief":"reading a function node to match its shape"}
+{"ts":"2026-08-19T17:19:57.230Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d45","brief":"minting the last two flows for derive-functions"}
+{"ts":"2026-08-19T17:19:57.382Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d46","brief":"the report flow is the only thing crossing out"}
+{"ts":"2026-08-19T17:20:37.149Z","op":"done","visit":"iterations/i37/map-stakeholders@0","node":"d30","brief":"eight functions and seven flows in one cluster"}
