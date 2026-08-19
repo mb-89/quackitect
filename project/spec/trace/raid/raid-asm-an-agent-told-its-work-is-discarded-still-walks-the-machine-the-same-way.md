@@ -11,6 +11,7 @@ impact: "If it is false, every benchmark number understates what a real iteratio
 breaks_how_badly: corrosive
 how_likely: plausible
 probe: "unprobed — it cannot be probed until a real iteration and a benchmark run exist at the same size and model."
+probed: 2026-08-19
 source_refs:
   - training-iterations
   - i37-training-iterations-a-disposable-iterati

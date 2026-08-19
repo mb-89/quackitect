@@ -11,6 +11,7 @@ impact: "If the assumption is false, the rewind is not a mask and the whole desi
 breaks_how_badly: fatal
 how_likely: conceivable
 probe: "HOLDS, both halves probed 2026-08-19. THE INPUT HALF — the i33 record at 5f85977f^ stands with status seeded, carrying goal, vision and inputs and no pin. THE OUTPUT HALF — a search of project/spec/trace at that same ref for i33 returns 0 files, against 60 today. CONTROL — the same search for i15 at the same ref returns 123 matches across 10 files, so the zero is a real zero rather than a search that did not run."
+probed: 2026-08-19
 source_refs:
   - training-iterations
   - i37-training-iterations-a-disposable-iterati

@@ -1,5 +1,7 @@
 ---
 form: probe-assumptions
+by: agent
+signed_off: 2026-08-19T17:25:01.698Z
 authors: agent
 files:
 ---

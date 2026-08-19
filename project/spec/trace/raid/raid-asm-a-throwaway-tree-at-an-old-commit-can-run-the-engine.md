@@ -11,6 +11,7 @@ impact: "The run cannot start, and the failure looks like a broken benchmark rat
 breaks_how_badly: fatal
 how_likely: plausible
 probe: "unprobed \u2014 nothing has yet stood a tree at a rewind commit and tried to boot it."
+probed: 2026-08-19
 source_refs:
   - fn-the-benchmark-run.stand-a-throwaway-tree-and-bind-the-run
   - raid-dec-an-archived-iteration-is-the-benchmark-and-nothing-is-authored

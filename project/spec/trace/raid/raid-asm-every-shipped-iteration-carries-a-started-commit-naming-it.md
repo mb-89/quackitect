@@ -11,6 +11,7 @@ impact: "A benchmark cannot be pointed at part of the archive, and which part fa
 breaks_how_badly: crippling
 how_likely: plausible
 probe: "unprobed \u2014 checked on i33 only, where 5f85977f is its started commit. The other ten pinned records are unchecked."
+probed: 2026-08-19
 source_refs:
   - req-a-bound-run-resolves-no-commit-newer-than-its-rewind-point
   - fn-the-benchmark-run.locate-the-rewind-point

@@ -50,3 +50,4 @@
 {"ts":"2026-08-19T17:22:52.400Z","op":"update","visit":"iterations/i37/probe-assumptions@0","node":"d50","brief":"probing whether every pinned record has a started commit"}
 {"ts":"2026-08-19T17:23:15.565Z","op":"update","visit":"iterations/i37/probe-assumptions@0","node":"d51","brief":"probing the started stamp across the archive"}
 {"ts":"2026-08-19T17:23:27.758Z","op":"update","visit":"iterations/i37/probe-assumptions@0","node":"d52","brief":"reading the standing probe status of all 64 assumptions"}
+{"ts":"2026-08-19T17:25:01.356Z","op":"update","visit":"iterations/i37/probe-assumptions@0","node":"d53","brief":"stamping probed dates on the five assumptions this iteration owns"}

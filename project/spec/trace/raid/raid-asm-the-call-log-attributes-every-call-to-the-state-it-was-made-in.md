@@ -11,6 +11,7 @@ impact: "Only a total is derivable. The ranked per-state view that makes a bench
 breaks_how_badly: corrosive
 how_likely: plausible
 probe: "unprobed \u2014 engine/calllog.ts records ref, ts, tool, args, ok, outcome, duration_ms, actor and se_version. No state field was seen in the CallRecord shape."
+probed: 2026-08-19
 source_refs:
   - fn-the-benchmark-run.derive-what-the-walk-cost
   - req-a-benchmark-report-carries-the-conditions-of-its-run
