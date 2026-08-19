@@ -143,3 +143,4 @@
 {"ts":"2026-08-19T19:27:02.164Z","op":"plan","visit":"iterations/i37/cut-criteria@1","parent":null,"nodes":[{"id":"d1","brief":"rank the unknowns"},{"id":"d2","brief":"run the spikes"},{"id":"d3","brief":"fold back and close M6"}]}
 {"ts":"2026-08-19T19:28:02.084Z","op":"update","visit":"iterations/i37/rank-unknowns@0","node":"d4","brief":"reading the exposure-pick line format"}
 {"ts":"2026-08-19T19:28:46.397Z","op":"done","visit":"iterations/i37/cut-criteria@1","node":"d1","brief":"five unknowns picked off the exposure chart"}
+{"ts":"2026-08-19T19:29:47.007Z","op":"update","visit":"iterations/i37/rank-unknowns@0","node":"d5","brief":"the picks need wiki-links, not bare ids"}

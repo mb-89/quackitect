@@ -1,5 +1,7 @@
 ---
 form: rank-unknowns
+by: agent
+signed_off: 2026-08-19T19:29:47.186Z
 authors: agent
 files:
 ---
@@ -16,11 +18,11 @@ Five register entries are picked. Every one is answerable by running something r
 
 ## seeded
 
-raid-risk-the-git-ceiling-fails-open-and-a-run-reads-the-answers
-raid-ar-a-bound-run-resolves-no-commit-newer-than-its-rewind-point
-raid-ar-call-answers-in-one-second
-raid-asm-the-call-log-attributes-every-call-to-the-state-it-was-made-in
-raid-iss-the-reading-verb-consults-no-exclusion-list-at-all
+- [[raid-risk-the-git-ceiling-fails-open-and-a-run-reads-the-answers]]
+- [[raid-ar-a-bound-run-resolves-no-commit-newer-than-its-rewind-point]]
+- [[raid-ar-call-answers-in-one-second]]
+- [[raid-asm-the-call-log-attributes-every-call-to-the-state-it-was-made-in]]
+- [[raid-iss-the-reading-verb-consults-no-exclusion-list-at-all]]
 
 ## follow_up
 
