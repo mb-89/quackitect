@@ -114,7 +114,7 @@ A suite is designed, never accumulated. Five properties:
   and stubs them, and NAMES what it stubbed.
 - ASSERT THE WORK RAN. A guard that turns the tool into a no-op is
   invisible to a test that only reads output — the house lesson, in
-  guidance/craft/software.md.
+  project/guidance/craft/software.md.
 
 ## TACTICS — how the campaign is organized, in and beyond software
 

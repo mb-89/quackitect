@@ -89,7 +89,7 @@ Steps for test, Procedure for demonstration, Checklist for inspection,
 Model for analysis. The conformance check demands the matching section.
 
 HOW TO WRITE A GOOD TEST — the house rules live in
-guidance/craft/software.md, under writing tests. What this state adds:
+project/guidance/craft/software.md, under writing tests. What this state adds:
 
 - THE NAME STATES THE CLAIM, like a register title: readable as the
   requirement's voice, and arguable.

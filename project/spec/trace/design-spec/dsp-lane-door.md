@@ -5,6 +5,8 @@ type: "[[design-spec]]"
 statement: the typed tool lane, carried by one registry of verbs with schemas, clauses and remedies
 realizes:
   - "el-walk-engine"
+  - "if-walk-engine-to-query-evaluator"
+  - "if-walk-engine-to-coupling-disposer"
 files:
   - "project/deliverable/engine/tools.ts"
   - "project/deliverable/engine/tools-file.ts"

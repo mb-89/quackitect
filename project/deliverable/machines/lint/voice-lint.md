@@ -12,9 +12,9 @@ blocking:
 # Voice lint — the rule parameters
 
 DATA, not code (owner ruling 2026-07-28 — the rule lives in
-guidance/method/engineering.md). Edit a threshold here and the next
+project/guidance/method/engineering.md). Edit a threshold here and the next
 se_lint call uses it — no recompile, no reload. The rules' LOGIC lives
-in engine/lint.ts; only parameters belong here.
+in project/deliverable/engine/lint.ts; only parameters belong here.
 
 - `long_sentence_words` — a sentence past this many words is flagged.
 - `wall_paragraph_lines` — this many consecutive unbroken prose lines

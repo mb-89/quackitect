@@ -53,4 +53,4 @@ THE CHECK IS COMPUTED, so this state carries no form. The law reads every story 
 
 THE MUST STORIES ARE THE EXCEPTION here: their evidence is the demonstration report, and run-demos mints those next. The law skips them at this state and catches them at the gate.
 
-AUTHOR THE DEMO DRAWING before leaving: machines/demos.md in the record, one step per must story, the step id being the story id. run-demos runs it.
+AUTHOR THE DEMO DRAWING before leaving: `<record>/machines/demos.md`, in the record’s own folder, one step per must story, the step id being the story id. run-demos runs it.

@@ -63,7 +63,7 @@ and the change.
 
     matrix M3_10 — set question for behaviour models, after the claim gap
     meth-ears — the exempt clause needs an example
-    guidance/refusals.md — a clause fired without naming its remedy
+    project/guidance/refusals.md — a clause fired without naming its remedy
 
 State `none-found` plainly where there is nothing. A blank reads as done and
 is worth less than a named gap.

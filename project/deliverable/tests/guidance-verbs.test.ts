@@ -34,16 +34,36 @@ const NOT_A_VERB: Record<string, string> = {
   se_update: "the narration op's internal tool name on the log line, never called directly",
 };
 
-/** Every page an agent is served as guidance: the method layer, and the state
- *  notes the walk hands over one at a time. DERIVED, never named. */
+/** Every page an agent is served as guidance. The method layer, the state
+ *  notes the walk hands over one at a time, and everything under machines/
+ *  that a state, a form or a method card puts in front of a reader.
+ *
+ *  THE MACHINES TREE WAS THE HOLE. This check swept `guidance/` and the state
+ *  notes and stopped there, while 172 further pages — the rigor-matrix rows a
+ *  walk reads at every milestone, the method cards, the form templates —
+ *  went unswept. Six dead paths and a retired clause were sitting in them.
+ *
+ *  DERIVED, never named. */
 function guidancePages(): string[] {
-  const states = join(ROOT, "project/deliverable/machines/states");
-  return [
-    ...guidanceDocs(),
-    ...readdirSync(states)
-      .filter((n) => n.endsWith(".md"))
-      .map((n) => `project/deliverable/machines/states/${n}`),
-  ];
+  const out = [...guidanceDocs()];
+  const walk = (rel: string): void => {
+    for (const e of readdirSync(join(ROOT, rel), { withFileTypes: true })) {
+      if (e.isDirectory()) walk(`${rel}/${e.name}`);
+      else if (e.name.endsWith(".md")) out.push(`${rel}/${e.name}`);
+    }
+  };
+  walk("project/deliverable/machines");
+  return out;
+}
+
+/** A REFERENCE INTO ANOTHER TREE IS NOT A DEAD PATH. The corpus cites v1 at
+ *  `ref main` in a dozen places, and those files are real where they live. A
+ *  line naming a ref is saying so, and is left alone. */
+function reachesAnotherTree(text: string, at: number): boolean {
+  const from = text.lastIndexOf("\n", at) + 1;
+  const to = text.indexOf("\n", at);
+  const line = text.slice(from, to === -1 ? text.length : to);
+  return /\bref[: ]\s*(main|v2)\b|\bat ref\b|\bv[12]'s\b/.test(line);
 }
 
 /** THE ONE WAY TO NAME A VERB THAT IS NOT THERE: mark its section. The
@@ -101,7 +121,7 @@ test("every file path the guidance names resolves from the project root", () => 
     for (const m of text.matchAll(PATH_LIKE)) {
       const ref = m[1];
       if (RUNTIME.test(ref) || existsSync(join(ROOT, ref))) continue;
-      if (marked(text, m.index)) continue;
+      if (marked(text, m.index) || reachesAnotherTree(text, m.index)) continue;
       const near = ["project", "project/deliverable", "project/guidance", "project/deliverable/machines"].find((pre) =>
         existsSync(join(ROOT, pre, ref)),
       );
