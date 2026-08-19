@@ -150,3 +150,5 @@
 {"ts":"2026-08-19T19:35:02.473Z","op":"plan","visit":"iterations/i37/run-spikes/spike-the-truncated-history@0","parent":null,"nodes":[{"id":"d11","brief":"run spike one on the truncated history"},{"id":"d12","brief":"write its experiment node"}]}
 {"ts":"2026-08-19T19:35:22.044Z","op":"update","visit":"iterations/i37/run-spikes/spike-the-truncated-history@0","node":"d13","brief":"second route for the truncated history spike"}
 {"ts":"2026-08-19T19:36:27.309Z","op":"done","visit":"iterations/i37/run-spikes@0","node":"d8","brief":"spike one holds — the structural ceiling is buildable in two commands"}
+{"ts":"2026-08-19T19:36:44.945Z","op":"update","visit":"iterations/i37/run-spikes/spike-the-truncated-history@0","node":"d14","brief":"timing the ancestry primitive against the 1ms bound"}
+{"ts":"2026-08-19T19:37:54.371Z","op":"done","visit":"iterations/i37/run-spikes@0","node":"d9","brief":"spike two falls — the checked ceiling breaches its bound fourfold"}
