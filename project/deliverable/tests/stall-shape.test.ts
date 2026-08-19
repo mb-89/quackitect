@@ -17,7 +17,7 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { Decisions, parseUpdate } from "../engine/decisions.ts";
+import { cutToFit, Decisions, parseUpdate } from "../engine/decisions.ts";
 
 function fresh(): Decisions {
   return new Decisions(mkdtempSync(join(tmpdir(), "se-stall-")));
@@ -87,4 +87,47 @@ test("a checklist that keeps closing items is never called the wrong shape", () 
     d.apply("s@0", parseUpdate({ op: "done", node, brief: `item ${i + 1} landed` }));
   }
   assert.ok(true, "eight updates per item, resolved each time, and nothing refused");
+});
+
+// A BRIEF THAT IS FIVE CHARACTERS TOO LONG GETS ONE BACK THAT FITS.
+//
+// MEASURED ON THE i15 WALK: ten refusals for length, every one between 91 and
+// 112 characters. Not one was a rambling brief. Each was an ordinary sentence
+// a handful of characters over the cap, and each cost a round trip plus
+// whatever the model spent rewording it.
+//
+// "101 chars, the cap is 90" is accurate and leaves the reader composing a
+// second sentence for a line nobody reads twice.
+test("an over-long brief is refused with a version that fits", () => {
+  const d = fresh();
+  const long = "isolated the NotEqual case in the filter evaluator and confirmed it against the harvested fixtures";
+  assert.ok(long.length > 90, "the fixture brief is not actually over the cap");
+  try {
+    d.apply("s@0", parseUpdate({ op: "plan", items: [long] }));
+    assert.fail("an over-long brief was accepted");
+  } catch (e) {
+    const note = String((e as { got?: string; expected?: string }).got ?? JSON.stringify(e));
+    assert.match(note, /cut to fit/, `the refusal reports the length and offers nothing usable: "${note}"`);
+  }
+});
+
+test("the cut version actually fits, and stops at a word", () => {
+  const long = "isolated the NotEqual case in the filter evaluator and confirmed it against the harvested fixtures";
+  const cut = cutToFit(long);
+  assert.ok(cut.length <= 90, `the cut brief is still ${cut.length} chars`);
+  assert.ok(cut.endsWith("…"), "the cut brief does not show that it was cut");
+  assert.ok(long.startsWith(cut.slice(0, -1)), "the cut brief is not a prefix of what the author wrote");
+  assert.doesNotMatch(cut.slice(0, -1), /\s$/, "the cut brief ends in whitespace before its ellipsis");
+});
+
+test("a brief already within the cap is handed back untouched", () => {
+  assert.equal(cutToFit("short enough"), "short enough");
+});
+
+test("an unbroken run with no word boundary is still cut to fit", () => {
+  // A path or a hash has no space to cut at. Returning something over the cap
+  // would be worse than cutting mid-token.
+  const run = "a".repeat(140);
+  const cut = cutToFit(run);
+  assert.ok(cut.length <= 90, `an unbroken run came back at ${cut.length} chars`);
 });

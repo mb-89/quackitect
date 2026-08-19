@@ -332,11 +332,36 @@ function correctChains(
   return { opOut, briefOut, itemsOut, corrected };
 }
 
+/** THE SAME BRIEF, CUT AT A WORD BOUNDARY SO IT FITS.
+ *
+ *  "101 chars, the cap is 90" is accurate and leaves the reader to compose a
+ *  second sentence for a line nobody will read twice.
+ *
+ *  MEASURED ON THE i15 WALK: ten refusals for length, every one between 91 and
+ *  112 characters. Not one was a rambling brief — each was an ordinary sentence
+ *  a handful of characters over, and each cost a round trip plus whatever the
+ *  model spent rewording it.
+ *
+ *  SO THE ANSWER HANDS BACK A VERSION THAT FITS. The author still chooses:
+ *  nothing is written, and a cut sentence is a suggestion, not a correction.
+ *  What it removes is the re-composition, not the judgment. */
+export function cutToFit(text: string, cap = 90): string {
+  if (text.length <= cap) return text;
+  const room = cap - 1; // the ellipsis takes one
+  const space = text.lastIndexOf(" ", room);
+  // A SINGLE UNBROKEN RUN HAS NO WORD BOUNDARY TO CUT AT — a path, a hash, a
+  // long identifier. Cutting mid-token beats returning something over the cap.
+  return `${text.slice(0, space > cap / 2 ? space : room).trimEnd()}…`;
+}
+
 // THE RENDER LINT (owner ruling 2026-07-27): the lane refuses what would
 // render weird — mechanically, at the boundary.
 function lintUpdateLine(text: string, what: string): void {
   if (/[\r\n]/.test(text)) throw malformed(`${what} carries line breaks — one line only. Got ${JSON.stringify(text)}`);
-  if (text.length > 90) throw malformed(`${what} is ${text.length} chars — the feed renders 90; tighten it. Got ${JSON.stringify(text)}`);
+  if (text.length > 90)
+    throw malformed(
+      `${what} is ${text.length} chars — the feed renders 90; tighten it. Got ${JSON.stringify(text)} — cut to fit: ${JSON.stringify(cutToFit(text))}`,
+    );
   const parts = chainOf(text);
   if (parts !== null) {
     throw malformed(
