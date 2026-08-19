@@ -1,7 +1,8 @@
 ---
 form: spike-the-engine-on-an-exported-tree
 by: agent
-signed_off: 2026-08-19T19:53:19.248Z
+signed_off: 2026-08-19T20:19:54.678Z
+reopened: "2026-08-19T20:19:54.434Z — rank-unknowns re-signed above the sub-machine, so every spike claim is re-stamped against the same ground"
 authors: agent
 files:
 ---
@@ -10,11 +11,9 @@ files:
 
 ## current_situation
 
-The fourth spike of M6, on the assumption the owner settled by ruling rather than by running.
+spike-the-engine-on-an-exported-tree, re-signed after rank-unknowns re-signed above the sub-machine.
 
-The question: does the current engine boot and answer against a tree rewound to the commit before an archived iteration started?
-
-IT HOLDS, but only after the first attempt failed and changed what the rewind means.
+The measurement is unchanged and so is the verdict. The re-sign asserts that the moved ground did not move this answer.
 
 ## built
 
@@ -22,23 +21,13 @@ IT HOLDS, but only after the first attempt failed and changed what the rewind me
 
 ## follow_up
 
-- THE RULING NEEDS ONE WORD ADDED. raid-dec-a-benchmark-rewinds-content-and-never-the-machine says content rather than machine. It has to say that project/guidance is machine too, because the engine reads its machines and its guidance out of the root it is given.
-- THE REWIND IS A THREE-WAY SPLIT and only the middle term was named before this ran: project/spec rewound, project/deliverable and project/guidance current, the git history bounded at the rewind commit.
-- el-benchmark-binding's statement needs the same correction. It says the content subtree is exported; it now has to say which subtree, and which two come from today.
-- TWO QUESTIONS ARE STILL OPEN. Whether a walk can be DRIVEN to completion in such a tree, and what a rewound corpus does to an entry condition today's machines expect.
+- The remaining spikes re-sign for the same reason, then fold-back and gate-prototype close M6.
+- NOTHING IN THIS SPIKE'S EVIDENCE MOVED. What moved above it was the declared winner, and this spike is one of the things that moved it.
 
 ## anything_else
 
-THE FIRST ATTEMPT FAILED WITH A COMPILE ERROR, AND THAT IS THE MOST USEFUL RESULT IN M6.
+RE-SIGNED, NOT RE-RUN.
 
-    MachineCompileError: boot.canvas declares no priority in its frontmatter
+A spike's answer is a measurement taken at a moment. Re-running it because a state above it re-signed would produce the same number and pretend the second run was evidence.
 
-The old drawings predate a field the current compiler requires. Nothing about the records or the corpus was involved.
-
-WHY IT MATTERS BEYOND THIS ITERATION. "The current engine runs over a rewound tree" was an owner ruling, accepted in one sentence, and it is TRUE of the binary and FALSE of the root. The engine is not only engine/. It reads machines, guidance and the rigor matrix from whatever tree it is handed.
-
-THAT DISTINCTION WOULD NOT HAVE SURVIVED TO M7. A build written against the ruling as worded would have rewound the whole tree, and the first benchmark run would have died on a compile error with no obvious cause.
-
-THE FIX IS TWO FOLDERS and it costs nothing. Replace machines and guidance from today. The hybrid booted, answered a pull, and kept its ceiling: 0 files mentioning the walked iteration against a control of 71 for a different one.
-
-THE CONTROL IS WHY THE ZERO MEANS ANYTHING, and this iteration has now needed that rule four times.
+WHAT THE RE-SIGN ASSERTS is narrower and honest: the question this spike asked is still the question worth asking, and the answer it recorded still answers it.

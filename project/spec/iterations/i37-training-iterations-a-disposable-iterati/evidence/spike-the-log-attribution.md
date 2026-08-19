@@ -1,7 +1,8 @@
 ---
 form: spike-the-log-attribution
 by: agent
-signed_off: 2026-08-19T19:39:54.325Z
+signed_off: 2026-08-19T20:19:50.563Z
+reopened: "2026-08-19T20:19:50.160Z — rank-unknowns re-signed above the sub-machine, so every spike claim is re-stamped against the same ground"
 authors: agent
 files:
 ---
@@ -10,11 +11,9 @@ files:
 
 ## current_situation
 
-The third spike of M6, on the unknown ranked fourth by damage and named at rank-unknowns as the one that worried the agent most.
+spike-the-log-attribution, re-signed after rank-unknowns re-signed above the sub-machine.
 
-The question: can the call log say which state each call was made in?
-
-IT HOLDS, by a route the assumption did not name, and one measurement inside it was wrong before it was right.
+The measurement is unchanged and so is the verdict. The re-sign asserts that the moved ground did not move this answer.
 
 ## built
 
@@ -22,23 +21,13 @@ IT HOLDS, by a route the assumption did not name, and one measurement inside it 
 
 ## follow_up
 
-- NOTHING NEW HAS TO BE CAPTURED. el-benchmark-report derives cost per state from the log as designed, with one added rule: walk forward and carry each se_pull's `where` until the next one.
-- HALF THE ASSUMPTION IS FALSE AND SHOULD BE CORRECTED ON ITS NODE. No call record carries a state field; 0 of 1282. The position is recoverable only because se_pull logs its whole response.
-- A STATE FIELD WOULD STILL BE BETTER and is worth a work token rather than a design change. It removes the carry-forward, survives a log that starts mid-session, and costs one field the session already knows at dispatch.
-- THE 99% IS A BOUNDARY, NOT A GAP. The one unattributable call precedes the session's first pull.
+- The remaining spikes re-sign for the same reason, then fold-back and gate-prototype close M6.
+- NOTHING IN THIS SPIKE'S EVIDENCE MOVED. What moved above it was the declared winner, and this spike is one of the things that moved it.
 
 ## anything_else
 
-THE SPIKE'S FIRST ANSWER WAS WRONG AND SAID THE DESIGN WAS BROKEN.
+RE-SIGNED, NOT RE-RUN.
 
-The first pass reported 0 of 359 pull responses retaining their position. Read cold that means cost per state is not derivable, el-benchmark-report needs a different input, and a design change lands after two blessed gates.
+A spike's answer is a measurement taken at a moment. Re-running it because a state above it re-signed would produce the same number and pretend the second run was evidence.
 
-IT WAS THE AGENT'S BUG. The response is stored as a STRING, and searching it with a pattern that works against an object finds nothing, because the quotes inside a JSON string are escaped. The truth is 338 of 359.
-
-THIRD TIME IN THIS ITERATION. An empty search read as no-rows-match, a probe read as falsifying the central premise, and now a zero read as a broken design. Every one was an absence that was really a measurement fault.
-
-THE RULE EXISTS AND WAS UNDER-APPLIED. find_analogy's transfer says an absence-shaped measurement runs a paired positive control, and an absence without one is not recorded as a finding. Here the control was skipped because the number looked decisive.
-
-A NUMBER THAT WOULD OVERTURN A DESIGN IS EXACTLY THE ONE THAT NEEDS ITS CONTROL, and the instinct runs the other way: a result that confirms gets checked, a result that contradicts gets believed.
-
-THAT IS THE SHARPEST THING THIS ITERATION HAS LEARNED ABOUT ITSELF, and it belongs in the fold-back rather than only here.
+WHAT THE RE-SIGN ASSERTS is narrower and honest: the question this spike asked is still the question worth asking, and the answer it recorded still answers it.

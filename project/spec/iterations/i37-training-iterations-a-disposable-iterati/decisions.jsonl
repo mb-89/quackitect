@@ -180,3 +180,15 @@
 {"ts":"2026-08-19T20:10:11.763Z","op":"update","visit":"iterations/i37/decompose-structure@0","node":"d42","brief":"decompose-structure re-signed against the moved ground"}
 {"ts":"2026-08-19T20:10:46.994Z","op":"update","visit":"iterations/i37/evaluate-architecture@2","node":"d43","brief":"evaluate-architecture re-signed; three risks discharged"}
 {"ts":"2026-08-19T20:11:58.405Z","op":"update","visit":"iterations/i37/gate-architecture@1","node":"d44","brief":"gate-architecture re-blessed on measured ground"}
+{"ts":"2026-08-19T20:13:10.360Z","op":"update","visit":"iterations/i37/rank-unknowns@1","node":"d45","brief":"rank-unknowns re-signed"}
+{"ts":"2026-08-19T20:13:58.438Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d46","brief":"rank-unknowns re-signed"}
+{"ts":"2026-08-19T20:15:00.049Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d47","brief":"closing M6"}
+{"ts":"2026-08-19T20:15:50.414Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d48","brief":"leaving the spike sub-machine"}
+{"ts":"2026-08-19T20:15:50.674Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d49","brief":"leaving the spike sub-machine"}
+{"ts":"2026-08-19T20:15:50.943Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d50","brief":"leaving the spike sub-machine"}
+{"ts":"2026-08-19T20:15:51.223Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d51","brief":"leaving the spike sub-machine"}
+{"ts":"2026-08-19T20:17:23.618Z","op":"update","visit":"iterations/i37/run-spikes/spike-the-exclusion-reach@0","node":"d52","brief":"the exclusion spike re-signed; its finding is now a build plan"}
+{"ts":"2026-08-19T20:19:11.191Z","op":"update","visit":"iterations/i37/run-spikes/end@1","node":"d53","brief":"trying the full path to reopen the placeholder"}
+{"ts":"2026-08-19T20:19:42.370Z","op":"update","visit":"iterations/i37/run-spikes/spike-the-truncated-history@2","node":"d54","brief":"re-signing spike-the-truncated-history"}
+{"ts":"2026-08-19T20:19:46.344Z","op":"update","visit":"iterations/i37/run-spikes/spike-the-ancestry-bound@0","node":"d55","brief":"re-signing spike-the-ancestry-bound"}
+{"ts":"2026-08-19T20:19:50.444Z","op":"update","visit":"iterations/i37/run-spikes/spike-the-log-attribution@0","node":"d56","brief":"re-signing spike-the-log-attribution"}

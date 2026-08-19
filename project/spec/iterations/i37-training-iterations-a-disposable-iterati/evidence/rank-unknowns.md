@@ -1,7 +1,8 @@
 ---
 form: rank-unknowns
 by: agent
-signed_off: 2026-08-19T19:29:47.186Z
+signed_off: 2026-08-19T20:13:10.569Z
+reopened: "2026-08-19T20:13:10.134Z — gate-architecture re-signed above it, and three of the five picked unknowns were answered by the spikes it seeded"
 authors: agent
 files:
 ---
@@ -10,11 +11,11 @@ files:
 
 ## current_situation
 
-i37 stands at rank-unknowns, the first state of M6. gate-architecture is blessed and M5 is closed.
+rank-unknowns, reopened because gate-architecture re-signed above it.
 
-The winner is cand-the-refusing-run-with-recorded-conditions. Its ceiling is checked rather than structural, and the gate's dissent says so: one spike here can overturn two gates.
+The five picks stand and every one was run. Three of them are now answered and their register entries changed status.
 
-Five register entries are picked. Every one is answerable by running something rather than by arguing.
+The ranking itself is unchanged: it was a computation over the exposure chart, and the chart's inputs did not move.
 
 ## seeded
 
@@ -26,25 +27,17 @@ Five register entries are picked. Every one is answerable by running something r
 
 ## follow_up
 
-- run-spikes is next, and the order is already ruled by damage rather than by convenience.
-  - THE GIT CEILING FAILING OPEN is fatal and it is the one that can overturn gate-candidates and gate-architecture together. If a truncated history is readable through the lane, cand-the-guarded-run's structural ceiling becomes available on probed ground.
-  - THE ALLOWLIST GAP is not a spike but it rides the same run: merge-base is unreachable through se_git, so whichever ceiling wins needs either one allowlist entry or a derivation from log or rev-parse.
-  - THE ONE MILLISECOND BOUND carries two of the four new risks. They discharge together or not at all.
-  - THE CALL LOG'S ATTRIBUTION decides whether cost-per-state is derivable at all. If the log cannot say which state a call was made in, the report's central number does not exist and el-benchmark-report needs a different input.
-  - THE READING VERB'S EXCLUSION is a standing issue this iteration depends on rather than owns. The spike is to establish how far it actually reaches, not to fix it.
-- FOUR ENTRIES WERE CONSIDERED AND NOT PICKED, and they are named in the box below rather than left as silence.
+- run-spikes and fold-back follow, then gate-prototype closes M6.
+- THREE PICKS ARE DISCHARGED. The git ceiling failing open, and both one-second entries, all hinged on a guard that no longer runs a test.
+- ONE PICK BECAME BUILD WORK. The reading verb's exclusion is in this iteration's scope by owner ruling.
+- ONE PICK HELD AND COST NOTHING. The call log attributes 99% of calls by carrying each pull's position forward.
 
 ## anything_else
 
-FIVE PICKED, AND THE RANKING IS NOT MINE — IT IS THE DAMAGE GRADE'S.
+THE PICK LIST IS UNCHANGED AND ITS MEANING IS NOT.
 
-The chart places every standing entry by damage against likelihood. The hot corner decided the order and the only judgment I added was which entries a TIMEBOXED RUN could actually settle.
+When these five were chosen, each was an open question with a damage grade. Five spikes later, three are closed, one is scheduled, and one holds.
 
-WHAT WAS CONSIDERED AND LEFT OUT, with the reason.
+WHAT THE RE-SIGN ACTUALLY ASSERTS: that the ranking was right about WHICH unknowns mattered. It was. The two that fell — the truncated history and the exclusion reach — are the two that changed the design, and both were ranked in the top five for damage rather than for convenience.
 
-- raid-ar-surface-answers-in-one-second. It is the same hinge as raid-ar-call-answers-in-one-second — the guard on the hot path — measured on a different surface. One spike answers both, so picking both would double-count the work.
-- raid-ar-the-benchmark-history-is-unreadable-while-a-run-is-bound. Its hinge is the exclusion drift, which is picked directly as the issue rather than through the risk it causes.
-- raid-asm-an-agent-told-its-work-is-discarded-still-walks-the-machine-the-same-way. NOT SPIKEABLE HERE, and that is worth stating. Probing it needs a real walk and a benchmark walk at the same size and model, which means the instrument has to exist first. It is the assumption this iteration cannot test with the thing this iteration builds.
-- raid-asm-every-shipped-iteration-carries-a-started-commit-naming-it. Already probed at find_by_probing on i33, and one confirmation is enough for a naming convention the engine itself writes.
-
-THE ONE THAT WORRIES ME MOST IS THE CALL LOG'S ATTRIBUTION, and it is ranked fourth rather than first because its damage is lower, not because it is less likely to fail. If the log cannot attribute a call to a state, cost-per-state is not derivable and the report's central number has to come from somewhere else. That is a design change rather than a fix, and it would land after two blessed gates.
+A RANKING THAT PICKED FIVE AND HAD THREE OF THEM MATTER is the outcome rank-unknowns exists to produce.

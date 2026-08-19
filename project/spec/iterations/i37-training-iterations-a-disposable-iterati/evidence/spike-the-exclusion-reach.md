@@ -1,7 +1,8 @@
 ---
 form: spike-the-exclusion-reach
 by: agent
-signed_off: 2026-08-19T19:47:22.292Z
+signed_off: 2026-08-19T20:17:25.653Z
+reopened: "2026-08-19T20:17:04.960Z — rank-unknowns re-signed above the sub-machine, so its completion has to be re-stamped"
 authors: agent
 files:
 ---
@@ -10,11 +11,9 @@ files:
 
 ## current_situation
 
-The fifth and last spike of M6, on the standing issue this iteration depends on rather than owns.
+spike-the-exclusion-reach, re-signed after rank-unknowns re-signed above the sub-machine.
 
-The question: which lane verbs honour which exclusion list, so the conditional concealment has one rule to attach to?
-
-IT FALLS. There are four lists, not three, and the fourth is empty.
+The measurement is unchanged and so is the verdict. What changed is what happens next: the owner has ruled the visibility rule into this iteration's scope, so this spike's finding is build work rather than a dependency.
 
 ## built
 
@@ -22,21 +21,16 @@ IT FALLS. There are four lists, not three, and the fourth is empty.
 
 ## follow_up
 
-- THE WORK TOKEN IS A HARD DEPENDENCY. wt-three-separate-lists-decide-which-paths-a-lane-verb-may-see- has to land before the concealment can be built, and it understates the problem: four lists, and read consults none.
-- ONE SHAPE NOBODY HAD NAMED came out of this. The exclusion governs the WALK rather than the TARGET: listing the root hides .se, and listing project/.obsidian directly returns its seven entries. A concealment that hides a folder from a parent walk but serves it when named is not a concealment.
-- raid-iss-the-reading-verb-consults-no-exclusion-list-at-all should be widened. It names read; the measurement says the lists also disagree with each other, and that produce.ts holds a third list that governs packaging alone.
-- THE FOLD-BACK OWES A DECISION on whether i37 can ship the concealment at all, or whether req-the-benchmark-history-is-unreadable-while-a-run-is-bound waits on the token.
+- M7 BUILDS THE RULE. One predicate over a path and the current binding, honoured by read, search, glob and list alike. Four call sites across three files.
+- THE MEASURED SHAPE IS THE SPECIFICATION. paths.ts holds five names and binds list and glob. search.ts holds two of its own. produce.ts holds eleven and binds packaging alone. se_file_read holds none.
+- ONE BEHAVIOUR MUST NOT SURVIVE THE REWRITE. Today the exclusion governs the WALK rather than the TARGET: listing the root hides .se, and listing project/.obsidian directly returns its seven entries. A concealment with that property is not a concealment.
 
 ## anything_else
 
-THE FOURTH LIST IS THE ONE THAT MATTERS AND IT IS EMPTY.
+THE VERDICT STAYS `falls` AND ITS CONSEQUENCE CHANGED.
 
-paths.ts holds five names and binds list and glob. search.ts holds two of its own. produce.ts holds eleven and binds packaging alone. `se_file_read` holds none, and a lane read of `.se/reading.md` returns the file and its hash.
+When this spike ran, the finding was a blocker: the concealment could not be built because there was nothing coherent to attach it to, and the fix belonged to a work token nobody was assigned.
 
-SO THE PRODUCT HAS THREE OPINIONS ABOUT WHAT IS HIDDEN AND ONE VERB WITH NO OPINION AT ALL.
+THE OWNER RULED IT INTO SCOPE. So the same measurement is now a specification: four lists to collapse into one predicate, four call sites to route through it, and one behaviour — walk-scoped rather than target-scoped exclusion — to remove while doing it.
 
-THE MEASURED CONSEQUENCE, and it is not theoretical: `project/.obsidian` is invisible to nothing. It lists, it globs, and a search returns 9214 matches inside it. `.se` is invisible to three verbs and readable by the fourth.
-
-WHY THIS IS THE RIGHT SPIKE TO HAVE RUN LAST. The four earlier spikes each answered a question about the benchmark. This one answers a question about the lane, and the answer is that a piece of this iteration cannot be built until something outside it changes.
-
-THAT IS A BETTER OUTCOME THAN DISCOVERING IT AT M7, which is where a design that had not run this would have found out.
+A SPIKE WHOSE VERDICT IS `falls` AND WHOSE OUTPUT IS A BUILD PLAN is the best case for this state. It found the wall before anything was built against it, and the wall turned out to be four call sites thick.
