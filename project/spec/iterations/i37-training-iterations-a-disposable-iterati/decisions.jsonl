@@ -98,3 +98,5 @@
 {"ts":"2026-08-19T18:00:13.445Z","op":"plan","visit":"iterations/i37/enumerate-space/build_chart@0","parent":null,"nodes":[{"id":"d94","brief":"draw three candidates across the box"},{"id":"d95","brief":"converge and leave enumerate-space"}]}
 {"ts":"2026-08-19T18:00:45.702Z","op":"update","visit":"iterations/i37/enumerate-space/build_chart@0","node":"d96","brief":"reading the candidate node shape"}
 {"ts":"2026-08-19T18:04:06.755Z","op":"update","visit":"iterations/i37/enumerate-space/build_chart@0","node":"d97","brief":"finding why the candidates are not counted as drawn"}
+{"ts":"2026-08-19T18:40:28.972Z","op":"update","visit":"iterations/i37/start@0","node":"d5","brief":"aiming back at run-candidates after the restart"}
+{"ts":"2026-08-19T18:41:34.543Z","op":"done","visit":"front_desk@0","node":"d2","brief":"three candidates are composed on their nodes; no sub-machine seeded"}
