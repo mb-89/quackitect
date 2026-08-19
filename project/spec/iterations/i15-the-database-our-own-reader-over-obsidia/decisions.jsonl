@@ -509,3 +509,26 @@
 {"ts":"2026-08-19T19:17:59.473Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d157","brief":"reading EvidenceField's full definition in machine.ts"}
 {"ts":"2026-08-19T19:18:58.605Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d158","brief":"reading the full TYPED_SOURCES map before scoping the fix"}
 {"ts":"2026-08-19T19:19:24.798Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d159","brief":"finding fieldArgsFor's call site to learn traceRoot's real value"}
+{"ts":"2026-08-19T19:24:38.746Z","op":"defer","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d38","brief":"build the actual verbs and fixes","to":"gate-implementation, once all 5 chunks and interface entries land","hops":1,"trail":["iterations/i15/enumerate-space/find_prior_art","gate-implementation, once all 5 chunks and interface entries land"]}
+{"ts":"2026-08-19T19:25:21.968Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d160","brief":"adding fieldArgsFor import to node-scoping.test.ts"}
+{"ts":"2026-08-19T19:25:22.154Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d161","brief":"test-first: wrote the delta-default resolver tests before implementing"}
+{"ts":"2026-08-19T19:25:40.472Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d162","brief":"scoped test: confirm RED before implementing the delta-default fix"}
+{"ts":"2026-08-19T19:26:07.533Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d163","brief":"checking stateform.ts's existing imports for basename/dirname"}
+{"ts":"2026-08-19T19:26:17.987Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d164","brief":"implementing boundOwner/scopedToOwner and threading them through typedItems"}
+{"ts":"2026-08-19T19:26:41.739Z","op":"plan","visit":"iterations/i15/build-steps/conformance-fixtures@0","parent":"d77","nodes":[{"id":"d165","brief":"threaded owner/all through claimSpecItems"},{"id":"d166","brief":"mustStoryItems"},{"id":"d167","brief":"fixed promotionItems's owner bug"}]}
+{"ts":"2026-08-19T19:27:00.223Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d168","brief":"checking TraceNode's real frontmatter field name"}
+{"ts":"2026-08-19T19:27:14.830Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d169","brief":"reading TraceNode's full field list"}
+{"ts":"2026-08-19T19:27:25.221Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d170","brief":"checking traceFolder's return type"}
+{"ts":"2026-08-19T19:27:38.583Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d171","brief":"reading the rest of loadTrace's body for minted_in access"}
+{"ts":"2026-08-19T19:27:59.406Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d172","brief":"exposed minted_in as a structured TraceNode field instead of parsing it out of hay"}
+{"ts":"2026-08-19T19:28:24.186Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d173","brief":"made scopedToOwner generic via a mintedInOf callback instead of a shared .fm shape"}
+{"ts":"2026-08-19T19:28:36.259Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d174","brief":"checking current stateform.ts around lines 993-1020"}
+{"ts":"2026-08-19T19:29:31.950Z","op":"done","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d165","brief":"resolver wiring landed for the delta-default fix"}
+{"ts":"2026-08-19T19:29:44.253Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d175","brief":"checking the RED confirmation job for delta-default tests"}
+{"ts":"2026-08-19T19:30:00.062Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d176","brief":"polling the GREEN confirmation job for the delta-default fix"}
+{"ts":"2026-08-19T19:30:43.325Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d177","brief":"polling job 4, the query.test.ts conformance fixtures"}
+{"ts":"2026-08-19T19:30:55.408Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d178","brief":"polling the delta-default GREEN confirmation job again"}
+{"ts":"2026-08-19T19:31:17.233Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d179","brief":"waiting for the delta-default job to finish for full failure detail"}
+{"ts":"2026-08-19T19:33:31.329Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d180","brief":"found the real bug: my test's traceRoot double-joined project/spec/trace"}
+{"ts":"2026-08-19T19:33:43.290Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d181","brief":"locating the promotion test that regressed"}
+{"ts":"2026-08-19T19:33:52.742Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d182","brief":"reading promotions-stay-home.test.ts's full content"}
