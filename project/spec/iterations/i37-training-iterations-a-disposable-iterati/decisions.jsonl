@@ -35,3 +35,5 @@
 {"ts":"2026-08-19T17:08:24.882Z","op":"done","visit":"iterations/i37/frame-delta@0","node":"d21","brief":"two stories minted, one per role the delta changes"}
 {"ts":"2026-08-19T17:09:00.645Z","op":"update","visit":"iterations/i37/generalize-use-cases@0","node":"d35","brief":"reading the use-case skeleton"}
 {"ts":"2026-08-19T17:11:36.220Z","op":"update","visit":"iterations/i37/gate-inputs@0","node":"d36","brief":"gate-inputs blessed with the unprobed premise named again"}
+{"ts":"2026-08-19T17:12:38.010Z","op":"update","visit":"iterations/i37/write-requirements@0","node":"d37","brief":"reading a requirement node to match its shape"}
+{"ts":"2026-08-19T17:14:37.085Z","op":"update","visit":"iterations/i37/write-requirements@0","node":"d38","brief":"two statements rewritten into EARS shapes"}
