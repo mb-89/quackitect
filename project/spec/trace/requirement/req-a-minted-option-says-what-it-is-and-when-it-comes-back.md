@@ -10,7 +10,7 @@ breaks_how_badly: crippling
 refines:
   - uc-put-a-finding-where-it-outlives-the-machine
 source_refs:
-  - vp-what-is-learned-outlives-the-machine
+  - vp-the-ledger
   - ref-triage-and-option-pools-2026
   - project/deliverable/engine/inbox.ts "backlog parks the note for a later migration — where: ready when … is then required"
 priority: must

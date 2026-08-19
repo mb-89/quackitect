@@ -1,0 +1,44 @@
+// The harness registry (tsp-supported-harness-serves-one-lane-contract).
+//
+// SMALL FILES ON PURPOSE (owner ruling, 2026-07-30). See guidance/craft/software.md.
+import { strict as assert } from "node:assert";
+import { describe, test } from "node:test";
+import { HARNESSES, harnessFor, smallestInlineOutputBytes } from "../engine/harness.ts";
+
+describe("the harness registry", () => {
+  test("every supported harness is named in one place, and that list is what callers iterate", () => {
+    assert.ok(HARNESSES.length >= 3, "Claude Code, Copilot CLI and VS Code are all supported today");
+    const ids = HARNESSES.map((h) => h.id);
+    assert.deepEqual([...new Set(ids)], ids, "two entries sharing an id would make the lookup ambiguous");
+    for (const h of HARNESSES) {
+      assert.ok(h.clientNames.length > 0, `${h.id} answers to no client name, so it can never be identified`);
+      assert.ok(h.measured.trim() !== "", `${h.id} carries no provenance, so its numbers cannot be checked`);
+    }
+  });
+
+  test("a host names itself and is found, whatever case it uses", () => {
+    assert.equal(harnessFor("Claude Code")?.id, "claude-code");
+    assert.equal(harnessFor("copilot-cli")?.id, "copilot-cli");
+    assert.equal(harnessFor("Visual Studio Code")?.id, "vscode-copilot");
+  });
+
+  test("an unmeasured host reads as unknown rather than as the nearest guess", () => {
+    assert.equal(harnessFor("some-other-agent"), undefined);
+    assert.equal(harnessFor(undefined), undefined);
+    assert.equal(harnessFor("   "), undefined);
+  });
+
+  test("the smallest measured inline limit is the Copilot CLI offload threshold", () => {
+    // 20 KiB, per harness-portability break 1. If a tighter host is ever
+    // measured this must move with it, which is the point of computing it.
+    assert.equal(smallestInlineOutputBytes(), 20_480);
+  });
+
+  test("an unmeasured limit is absent, never zero and never a pretend ceiling", () => {
+    const claude = HARNESSES.find((h) => h.id === "claude-code");
+    assert.ok(claude !== undefined);
+    assert.equal(claude.limits.inlineOutputBytes, undefined, "absent means nobody measured it");
+    const cli = HARNESSES.find((h) => h.id === "copilot-cli");
+    assert.equal(cli?.limits.stopBlockCeiling, 8, "the CLI overrides the stop hook after eight blocks");
+  });
+});

@@ -72,7 +72,7 @@ THE COMPARISON NOT MADE, and it is named rather than left blank: whether any age
 
 ## success_measurable
 
-EVERY NEED CARRIES ITS PASS LINES, in vp-the-unattended-arrival.
+EVERY NEED CARRIES ITS PASS LINES, in vp-qualities.
 
 - Agent-minutes from session start to first pull. Target under one. BEFORE: most of an hour, measured this run. AFTER: not yet measured, and said so.
 - Acts required on a second run. Target none. MET: se-arrive is idempotent and reuses a lane already answering.

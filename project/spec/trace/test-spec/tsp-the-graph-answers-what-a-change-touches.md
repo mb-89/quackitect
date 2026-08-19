@@ -7,7 +7,8 @@ method: "demonstration"
 demonstrates:
   - "sty-answer-what-does-this-touch"
   - "sty-dispose-a-candidate-coupling"
-verifies: []
+verifies:
+  - "none — demonstrates: sty-answer-what-does-this-touch carries the edge; the requirement id this once named is retired and no requirement carries it"
 files:
   - "none — the procedure below is the definition; the observed run is the evidence"
 ---

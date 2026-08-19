@@ -10,6 +10,7 @@ realizes:
   - "if-method-compiler-to-account"
   - "if-record-store-to-account"
 files:
+  - "project/deliverable/engine/failure-shapes.ts"
   - "project/deliverable/engine/calllog.ts"
   - "project/deliverable/engine/version.ts"
   - "project/deliverable/engine/survey.ts"

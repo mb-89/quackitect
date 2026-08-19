@@ -9,7 +9,7 @@ trigger: "already live — both entrypoints ship"
 status: open
 impact: "A drift between the two places an agent in a cage that is not the cage anybody reviewed. Because the failure is a MISSING deny rather than a broken one, it produces no error: the agent simply has tools it should not have, and every call it makes looks legal."
 breaks_how_badly: crippling
-how_likely: likely
+how_likely: plausible
 probe: "OPEN, and named by the iteration that created the second entrypoint. The duplication is four functions — refs, runtime, install, cage. The fix is one shared module plus a test asserting both entrypoints place byte-identical files from the same templates. i35 filed it rather than fixing it, because folding se-start into a shared module is a change to the unattended path that deserves its own verification."
 probed: 2026-08-17
 source_refs:

@@ -8,7 +8,7 @@ owner: the owner
 trigger: "the first agent harness that offers a live MCP attach to a running session"
 status: open
 impact: "The whole of Arrival A rests on this. If it is false, se-arrive's HTTP client half is a workaround for a solved problem, the caged-subagent pattern is unnecessary, and Arrival A collapses into Arrival B."
-breaks_how_badly: annoying
+breaks_how_badly: cosmetic
 how_likely: conceivable
 probe: "holds on this harness only. i35 on 2026-08-17: the session began with no se_ tools, placing project/.mcp.json mid-session added none, and the lane became reachable only over HTTP. One host is not a law; the trigger is any harness offering a live attach."
 probed: 2026-08-17

@@ -8,7 +8,7 @@ owner: the owner
 trigger: already live - found at i17's package state, 2026-08-18, by running the shipped battery from an unpacked archive outside the repository
 status: open
 impact: "A stranger who runs the shipped battery sees 1460 pass and 15 fail and concludes the product is broken. It is not: every one of the fifteen is an ENOENT on project/spec/trace, which the package excludes on purpose because that folder is where the reader's OWN records go. The suite says nothing about the reader's install and reads as if it did."
-breaks_how_badly: annoying
+breaks_how_badly: cosmetic
 how_likely: expected
 probe: "RUN. The 4.6.0 archive was unpacked to a bare directory outside the repository, its dependencies installed, and its own selftest run: 1475 tests, 1460 pass, 15 fail. Every failure is a missing corpus path - project/spec/trace/value-prop, /story, /use-case, /requirement, /experiment - or a corpus-derived assertion that reports the corpus did not load."
 probed: 2026-08-18

@@ -6,6 +6,8 @@ statement: There is exactly one path that writes an option, and it applies the s
 method: inspection
 verifies:
   - req-the-crossing-is-the-same-act-for-a-person-and-an-agent
+files:
+  - "none — inspection checklist in this spec is the definition"
 ---
 
 ## Scope
@@ -17,7 +19,7 @@ exercised.
 
 A TEST PROVES A PATH BEHAVES. ONLY READING PROVES THERE IS ONE PATH. No test
 can assert that a shortcut does not exist somewhere else in the tree, because a
-test can only exercise the doors it knows about â€” and the whole risk is a door
+test can only exercise the doors it knows about — and the whole risk is a door
 nobody remembered.
 
 THIS IS THE CHEAPEST METHOD THAT WOULD CATCH THE ROW FAILING, which is the rule

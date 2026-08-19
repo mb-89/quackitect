@@ -9,7 +9,7 @@ trigger: at probe-assumptions, which is the one remaining state on this walk tha
 status: open
 impact: Every downstream claim about what ArchUnit does, or what our shape sheds against it, rests on one sentence in a note from 2026-07-28 with no URL and no version. That is the shape of evidence with the evidence removed, and the owner ruled against exactly it on 2026-08-06.
 breaks_how_badly: crippling
-how_likely: certain
+how_likely: expected
 source_refs:
   - note-d7a26094f592
   - project/spec/references/

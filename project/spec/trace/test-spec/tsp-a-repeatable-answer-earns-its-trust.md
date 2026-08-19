@@ -6,7 +6,8 @@ statement: "An engineer re-runs the agent's own search and gets the same rows ba
 method: "demonstration"
 demonstrates:
   - "sty-trust-a-repeatable-answer"
-verifies: []
+verifies:
+  - "none — demonstrates: sty-trust-a-repeatable-answer carries the edge; the requirement id this once named is retired and no requirement carries it"
 files:
   - "none — the procedure below is the definition; the observed run is the evidence"
 ---

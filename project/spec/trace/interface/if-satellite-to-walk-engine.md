@@ -2,8 +2,8 @@
 minted_in: i6-conformance-goes-mechanical-checks-bind-
 id: if-satellite-to-walk-engine
 type: "[[interface]]"
-statement: A write a satellite serves reaches the walk engine's guard before it lands, carrying the content as it would be written.
-source: el-satellite
+statement: A write the shared mirror serves reaches the walk engine's guard before it lands, carrying the content as it would be written.
+source: el-mirror
 destination: el-walk-engine
 carries:
   - flow-dispatched-call
@@ -15,8 +15,8 @@ source_refs:
   - "owner ruling 2026-08-16: write the interface, stay at minor"
 ---
 
-The crossing the write guard demands. A satellite serves the write; the
-guard that decides whether it may land lives in the walk engine.
+The crossing the write guard demands. The shared mirror serves the write;
+the guard that decides whether it may land lives in the walk engine.
 
 ## What crosses
 
@@ -26,7 +26,7 @@ lands, so the bytes travel rather than a path to read afterwards.
 
 ## Why it is synchronous where the account crossing is append
 
-`if-satellite-to-account` appends and does not wait. This one waits,
+`if-mirror-to-account` appends and does not wait. This one waits,
 because the answer decides whether the write happens at all.
 
 THAT IS THE COST OF CONFORMANCE AT THE WRITE, and it is the thing

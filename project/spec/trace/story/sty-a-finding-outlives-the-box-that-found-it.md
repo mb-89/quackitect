@@ -5,7 +5,7 @@ type: "[[story]]"
 statement: An agent on a machine nobody is watching finds something real, states it once, and the finding is still readable after the box is gone.
 actor: stk-agent
 refines:
-  - vp-what-is-learned-outlives-the-machine
+  - vp-the-ledger
 priority: must
 ---
 

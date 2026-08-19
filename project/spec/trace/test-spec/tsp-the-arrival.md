@@ -37,3 +37,12 @@ So the cases here are weighted toward the quiet direction. Two of the six check
 that something is SAID: the hook announcing a failed arrival, and the opt-out
 announcing a skip. Both would pass trivially if the code simply did nothing, and
 both are written to fail in exactly that case.
+
+
+## Steps
+
+1. Load the declared runtime floor from the harness metadata source.
+2. Validate arrival inputs and branch to success or typed refusal.
+3. Preserve non-zero arrival results in reported outcome shape.
+4. Ensure hook completion never mutates arrival verdict.
+5. Report opt-out explicitly when arrival is intentionally skipped.

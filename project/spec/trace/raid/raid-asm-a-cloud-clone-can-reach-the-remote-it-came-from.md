@@ -8,7 +8,7 @@ owner: the owner
 trigger: "the first arrival on a box whose network reaches the agent host but not the git remote"
 status: open
 impact: "Every record citing ref: main or ref: v2 stays unreadable, and the arrival degrades to the state i15 ran in. The arrival is built to carry on rather than stop, so the failure is quiet by design and the account is the only thing that reports it."
-breaks_how_badly: annoying
+breaks_how_badly: cosmetic
 how_likely: conceivable
 probe: "holds here. i35 on 2026-08-17: git fetch --all --prune brought main, v2 and 26 it/* branches. The clone was shallow with one branch, so it had been deliberately narrowed rather than network-limited."
 probed: 2026-08-17

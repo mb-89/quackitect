@@ -19,6 +19,10 @@ source_refs:
   - req-call-answers-in-one-second
 ---
 
+## Probe
+
+Run the same scoped call on the throttled laptop and on a normal desktop and compare wall-clock. The laptop's figure is the one the one-second rule must be met on.
+
 ## Why this is recorded as evidence rather than as a guess
 
 THE OWNER REPORTED IT DIRECTLY AND SAID TO TAKE THEIR WORD. A stakeholder's

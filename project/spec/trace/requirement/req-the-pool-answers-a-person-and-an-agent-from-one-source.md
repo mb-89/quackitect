@@ -10,7 +10,7 @@ breaks_how_badly: corrosive
 refines:
   - uc-see-the-whole-pool-from-any-clone
 source_refs:
-  - vp-what-is-learned-outlives-the-machine
+  - vp-the-ledger
   - req-open-work-is-answered-from-the-repository-not-a-local-store
 priority: must
 ---

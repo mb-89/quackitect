@@ -39,9 +39,12 @@ satisfies:
   - req-refusal-carries-remedy
   - req-call-answers-in-one-second
   - req-one-operation-reads-its-input-once
+  - req-oversized-results-remain-recoverable-through-the-lane
 inputs:
   - flow-position
   - flow-compiled-machine
+  - flow-harness-profile
+  - flow-test-check-result
 outputs:
   - flow-instruction
   - flow-refusal

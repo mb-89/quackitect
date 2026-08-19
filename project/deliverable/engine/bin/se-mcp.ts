@@ -197,9 +197,22 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   const fatal = (kind: string, e: unknown): void => {
     const detail = e instanceof Error ? `${e.message}\n${e.stack ?? ""}` : String(e);
     record(`${kind} ${detail.replace(/\n/g, "\n    ")}`);
-    process.stderr.write(`se-mcp: ${kind} — ${detail}\n`);
+    try {
+      if (!process.stderr.destroyed) process.stderr.write(`se-mcp: ${kind} — ${detail}\n`);
+    } catch {
+      // The durable engine log already holds the failure.
+    }
     process.exit(1);
   };
+  const streamError = (stream: string, e: Error): void => {
+    if ((e as NodeJS.ErrnoException).code === "EPIPE") {
+      record(`${stream} EPIPE ${e.message}`);
+      return;
+    }
+    fatal(`${stream}-ERROR`, e);
+  };
+  process.stdout.on("error", (e) => streamError("STDOUT", e));
+  process.stderr.on("error", (e) => streamError("STDERR", e));
   process.on("uncaughtException", (e) => fatal("UNCAUGHT", e));
   process.on("unhandledRejection", (e) => fatal("UNHANDLED-REJECTION", e));
   process.on("exit", (code) => record(`exit ${code}`));
@@ -217,7 +230,9 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   // Only a host that CLAIMS a parent gets this. The classic launcher detaches
   // its terminal host on purpose and must go on outliving its window.
   const parentPid = Number(process.env.SE_PARENT_PID ?? 0);
-  if (Number.isInteger(parentPid) && parentPid > 0) {
+  // A headless lane is shared by agent sessions. Its lifetime is managed by
+  // the explicit launcher, not by a transient extension-host process.
+  if (!argv.includes("--headless") && Number.isInteger(parentPid) && parentPid > 0) {
     // Signal 0 delivers nothing; it only asks whether the process is there.
     const watch = setInterval(async () => {
       try {

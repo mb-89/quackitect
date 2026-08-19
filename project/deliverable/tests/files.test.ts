@@ -96,7 +96,12 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   // /vendor/cytoscape.min.js. A one-shot read of a static asset outside the
   // note system, the same shape as every increment above it — and the read
   // exists because the alternative was fetching it from unpkg on every open.
-  const CEILING = 106;
+  // 107 since 2026-08-19: stopping-layer.ts reads .se/engine.log to say which
+  // layer ended an interrupted call. A plain append-only text file outside the
+  // note system, with no frontmatter to parse, read once to answer one
+  // question. Routing it through a note door would share a parse with nobody,
+  // and the door would have to parse a log as a node to do it.
+  const CEILING = 107;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {
@@ -332,6 +337,17 @@ test("oversize whole-file read is REFUSED with offset/limit remedy — never sil
   // and the range read works
   const r = fileRead(root, "big.md", { offset: 1, limit: 1 });
   assert.ok(r.content.includes("[line truncated"));
+});
+
+test("character range reads preserve exact text inside one oversized line", () => {
+  const root = fresh();
+  const raw = JSON.stringify({ body: "x".repeat(READ_BUDGET + 1) });
+  writeFileSync(join(root, "answer.json"), raw);
+  const first = fileRead(root, "answer.json", { charOffset: 0, charLimit: 3_000 });
+  assert.equal(first.content, raw.slice(0, 3_000));
+  assert.deepEqual(first.char_range, { offset: 0, limit: 3_000, to: 3_000, of: raw.length });
+  const second = fileRead(root, "answer.json", { charOffset: first.char_range?.to, charLimit: 3_000 });
+  assert.equal(first.content + second.content, raw.slice(0, 6_000));
 });
 
 test("path escape is refused", () => {

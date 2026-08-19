@@ -704,8 +704,29 @@ export function refsIn(text: string): string[] {
 /** see dsp-radial-layout.md#the-references-a-table-row-carries */
 export function refsInRows(text: string, columns = 2): string[] {
   const out: string[] = [];
-  for (const line of text.split(/\r?\n/)) {
+  const lines = text.split(/\r?\n/);
+  const isSep = (line: string): boolean => {
+    if (!/^\s*\|/.test(line)) return false;
+    const cells = line
+      .split("|")
+      .slice(1, -1)
+      .map((c) => c.trim());
+    return cells.length > 0 && cells.every((c) => /^:?-{3,}:?$/.test(c));
+  };
+
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i] ?? "";
     if (!/^\s*\|/.test(line)) continue;
+
+    // Markdown table header row: skip it when immediately followed by a separator row.
+    if (isSep(lines[i + 1] ?? "")) {
+      i += 1;
+      continue;
+    }
+
+    // Separator rows never carry references.
+    if (isSep(line)) continue;
+
     const cells = line.split("|").slice(1, -1);
     for (const cell of cells.slice(0, columns)) {
       const id = refId(cell.trim());

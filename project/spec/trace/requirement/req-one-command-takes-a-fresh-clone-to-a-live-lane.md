@@ -12,7 +12,7 @@ refines:
 source_refs:
   - uc-arrive-on-an-unattended-machine main scenario
   - sty-send-an-agent-to-a-cloud-box
-  - vp-the-unattended-arrival success criteria
+  - vp-qualities success criteria
 priority: must
 ---
 

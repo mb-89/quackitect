@@ -62,7 +62,7 @@ export function deskTools(
       name: "se_web_search",
       title: "se.web.search",
       description:
-        "Web search (provider-backed; needs SE_BRAVE_API_KEY on the server — refuses with setup instructions when unconfigured).",
+        "Web search through one lane verb. Uses Brave when configured, then a keyless provider, then points to native WebSearch only if server-side discovery is unavailable.",
       inputSchema: {
         type: "object",
         properties: {

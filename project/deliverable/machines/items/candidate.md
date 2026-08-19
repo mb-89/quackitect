@@ -97,6 +97,14 @@ writes the other three. Nothing else ever creates a candidate.
 - AT run-candidates, composing it: **How it works**, **What it costs**, **What
   it leans on**. Same note, three more sections.
 
+THE MECHANICAL CHECK AT build-chart ALREADY DEMANDS ALL SEVEN FIELDS
+(measured 2026-08-19). A candidate carrying only the four build-chart
+sections refuses with "missing section" naming the other three. So a line
+drawn at build-chart is written whole in practice: draft honest placeholders
+for How it works / What it costs / What it leans on when the line is drawn,
+and run-candidates REPLACES them with the composed versions rather than
+filling a blank for the first time.
+
 THERE IS NO SECOND ARTIFACT. run-candidates does not mint a one-pager beside
 the candidate; it fills the candidate in. A composed record living somewhere
 else would be a second copy of the same thing, and the two would disagree the

@@ -396,7 +396,7 @@ describe("the edit route", () => {
     await new Promise((r) => server.on("listening", r));
     const port = (server.address() as { port: number }).port;
     const edit = async (key: string, text: string): Promise<{ ok: boolean; display?: string; error?: string }> => {
-      const r = await fetch(`http://localhost:${port}/table/edit`, {
+      const r = await fetch(`http://127.0.0.1:${port}/table/edit`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ path: "rows/one.md", key, text }),

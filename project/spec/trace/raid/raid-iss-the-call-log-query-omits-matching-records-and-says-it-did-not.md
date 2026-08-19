@@ -9,7 +9,7 @@ trigger: fired 2026-08-17 at i33's verification; open until a test pins the pagi
 status: open
 impact: Every number this product has quoted about its own latency is a floor of unknown depth, including the one-second rule's own evidence and the bound_breaches round built this iteration.
 breaks_how_badly: corrosive
-how_likely: certain
+how_likely: expected
 source_refs:
   - call-941bb905c033
   - call-c283d9ea33eb

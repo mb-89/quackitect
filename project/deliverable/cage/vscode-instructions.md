@@ -67,8 +67,9 @@ changes nothing about what you may DO.
 
 - Never read, write or search the project with a native tool. Use the `se`
   lane, every time.
-- A native tool being available is not permission. The rule above is the
-  rule.
+- Native web search is the explicit exception. Use it for internet discovery
+  when the host exposes it, especially when `se_web_search` has no provider.
+- A native tool being available is not permission unless it is web search.
 - If you catch yourself reaching for one, that is the signal you have left
   the lane. Stop and pull.
 

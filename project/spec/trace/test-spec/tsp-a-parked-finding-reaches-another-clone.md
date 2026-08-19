@@ -5,8 +5,9 @@ type: "[[test-spec]]"
 statement: A finding parked on one machine is offered to an engineer on a clone that never held it, verified by demonstration across two clones of one origin.
 method: "demonstration"
 demonstrates:
-  - "sty-a-finding-outlives-the-box-that-found-it"
   - "sty-see-what-the-other-machine-may-pull-from"
+verifies:
+  - "none — demonstrates: sty-see-what-the-other-machine-may-pull-from carries the edge; the requirement id this once named is retired and no requirement carries it"
 files:
   - "none — the procedure below is the definition; the observed sessions are the evidence"
 ---

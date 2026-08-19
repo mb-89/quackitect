@@ -7,6 +7,7 @@ realizes:
   - "el-test-runner"
   - "if-record-store-to-test-runner"
   - "if-test-runner-to-record-store"
+  - "if-test-runner-to-walk-engine"
 files:
   - "project/deliverable/engine/testreporters.ts"
   - "project/deliverable/engine/tools.ts"

@@ -14,6 +14,7 @@ implements:
   - fn-arrive-on-a-machine.raise-the-lane
   - fn-arrive-on-a-machine.hand-over-the-means-to-call
   - fn-arrive-on-a-machine.account-for-the-arrival
+  - fn-arrive-on-a-machine.identify-the-harness
 source_refs:
   - uc-arrive-on-an-unattended-machine
   - req-one-command-takes-a-fresh-clone-to-a-live-lane

@@ -13,7 +13,7 @@ import { readKeys } from "../frontmatter.ts";
 import type { MachineDecl } from "../machine.ts";
 import { compileMachine } from "../machines/compile.ts";
 import { resolveInRoot, seDir } from "../paths.ts";
-import { assembleProtocol, protocolTargets, textFor } from "../promptlayer.ts";
+import { assembleProtocol, protocolTargets, SKILL_SOURCES, skillTargets, textFor } from "../promptlayer.ts";
 import { rgPath } from "../search.ts";
 
 function argValue(flag: string): string | undefined {
@@ -88,6 +88,16 @@ try {
     }
     if (readFileSync(t.path, "utf8") !== textFor(t, projection)) {
       failures.push(`${t.path} is STALE — it is not the projection of project/guidance/. Run engine/bin/place-prompt-layer.ts.`);
+    }
+  }
+  for (const skill of SKILL_SOURCES) {
+    const expected = readFileSync(join(root, skill.path), "utf8");
+    for (const target of skillTargets(join(root, "project"), skill.name)) {
+      if (!existsSync(target)) {
+        failures.push(`${target} is MISSING — the ${skill.name} skill was not placed. Run engine/bin/place-prompt-layer.ts.`);
+      } else if (readFileSync(target, "utf8") !== expected) {
+        failures.push(`${target} is STALE — it differs from ${skill.path}. Run engine/bin/place-prompt-layer.ts.`);
+      }
     }
   }
 } catch (e) {

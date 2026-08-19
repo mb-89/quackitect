@@ -9,27 +9,32 @@ precondition: none
 guarantee: the answer is recorded against its question, its sources are in the reference corpus, and no claim stands without evidence
 refines:
   - sty-ask-and-record-the-answer
+  - sty-run-deep-research-across-harnesses
 priority: should
 ---
 
 ## Main scenario
 
 1. The question is stated, and it is established that nothing in the repo answers it.
-2. The search runs through the lane, so the query itself is logged alongside what came back.
-3. The results are read and their sources kept.
-4. What survives becomes a reference node, so the next person starts from the finding rather than searching again.
-5. The answer is recorded against the question as two fields, in one place.
-6. Anything the sources do not actually support is left out.
+2. A coverage matrix names standards, harnesses, failures, limits and local measurements.
+3. `se_web_search` selects an available provider and logs the query.
+4. Focused search rounds discover primary sources for each coverage row.
+5. The sources are fetched and kept with what each one actually proves.
+6. Search continues until two consecutive focused rounds add no capability, contradiction or source class.
+7. What survives becomes a reference node with its query and source ledger.
+8. The answer is recorded against the question, and unsupported claims stay out.
 
 ## Lane doors
 
-- `se_web_search` and `se_web_fetch` reach outside the repository. Every query is logged like any other call.
-- `se_answer` records the question and the answer as one entry, so the answer outlives the session that gave it.
+- `se_web_search` owns provider selection behind one lane verb.
+- `se_web_fetch` reads known primary URLs.
+- `se_answer` records the question and answer together.
 
 ## Extensions
 
-- 2a. No search provider is configured. A specific URL can still be fetched, and the gap is named rather than worked around.
-- 3a. A source is a vendor's own page. It is evidence that a feature is CLAIMED and nothing more; it never becomes a quality judgment.
-- 6a. A COMPARATIVE claim is wanted — theirs against ours. It needs evidence on BOTH sides, and where our side does not exist yet the comparison is impossible rather than merely weak. Writing it anyway is fabrication, and a fabricated judgment routes real work.
-- 6b. The comparison was not made. "Not compared, and here is why" is the honest form; a blank reads as done and is worth less than a named gap.
-- 5a. The answer is only chatted, never recorded. Chat can be lost mid-turn, so the recorded copy is the durable one and the chat repeats it verbatim rather than restating it.
+- 3a. No server-side provider answers: use native web search when exposed, or name discovery as incomplete.
+- 4a. A source is a vendor page: treat it as evidence of a vendor claim, not quality.
+- 6a. A comparative claim is wanted: require evidence on both sides.
+- 6b. One side does not exist: state that comparison is impossible.
+- 7a. A source is unreachable: keep the gap and a follow-up probe in the ledger.
+- 8a. The answer exists only in chat: record it before the turn ends.

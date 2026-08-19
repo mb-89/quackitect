@@ -73,6 +73,18 @@ host's file. The lane logged the full response; `se_log_query` with the
 call's ref serves it back. Retro finding 2026-08-10: several shell reads of
 host-persisted files stood where one log query belonged.
 
+A RESULT WITH `bounded: true` WAS CUT BY THE LANE BEFORE THE HOST COULD CUT IT.
+The first page and a `next` call ride in the result. Make that exact call.
+For an answer spill, continue `se_file_read` at `char_range.to` until it reaches
+`char_range.of`, then parse the concatenated text as the original JSON result.
+Do not use line paging for an answer spill. Escaped JSON may be one long line.
+
+FOLLOWING THAT CURSOR IS ALWAYS LEGAL. An `se_file_read` under `.se/answers/`
+is exempt from the state gate and from the narration toll, in every state,
+including ones that allow no tools at all. The lane handed you the call, so
+the lane does not then refuse it. Before i36 both guards bit, and a state that
+served a bounded answer could make its own answer unreadable.
+
 WRITE A SCRIPT WHEN THE QUESTION IS ABOUT MANY THINGS. Counting what a rule
 touches, routing four hundred blocks, measuring which methods need what,
 applying one shape across a tree — these are programs, not readings. Reading

@@ -116,7 +116,7 @@ export function sessionTools(session: Session): ToolDef[] {
       name: "se_prompt_place",
       title: "se.prompt.place",
       description:
-        "Re-project the PROMPT LAYER — AGENTS.md, CLAUDE.md and the Copilot instructions — from project/guidance/ into the tree the lane is working in. Preflight names this script as its own remedy when what was placed has gone stale, so this is the verb behind that remedy. It resolves the tree itself, so the projection cannot land in the one you are not standing in.",
+        "Re-project the prompt layer and project-owned skills from project/guidance/ into every supported harness path. Preflight names this script as its remedy when a projection is stale.",
       inputSchema: { type: "object", properties: {} },
       handler: async () =>
         runToCompletion(session.workRoot(), "node --experimental-strip-types project/deliverable/engine/bin/place-prompt-layer.ts"),
@@ -544,6 +544,7 @@ export function buildServer(
     tools,
     requestContextAdapter({ workspaceId: `workspace-${contentHash(root)}` }),
   );
+  server.setAnswerSpillDir(seDir(root));
   const log = new CallLog(seDir(root));
   const toll = new Toll({ ...tollOpts, cadence: () => ({ minutes: session.narrationMinutes, calls: session.narrationCalls }) });
 
@@ -723,7 +724,7 @@ export function buildServer(
   // THE STATE GATE — what is legal now is decided by the machine, not the
   // model. Runs after the shape guard so a malformed call is named as
   // malformed, not as illegal-in-state.
-  server.addGuard((tool) => session.gate(tool));
+  server.addGuard((tool, args) => session.gate(tool, args));
 
   // §9 — the single call path logs everything. se_run keeps its full output.
   server.addObserver((rec) => {

@@ -9,7 +9,7 @@ trigger: any change to the seed verbs, or the first seed that states an empty li
 status: decided
 impact: The container is a DAG and this key is its only input. An unset key is a missing EDGE, not a missing note, so two agents can be handed work that fights over the same files.
 breaks_how_badly: crippling
-how_likely: certain
+how_likely: expected
 weighs_with: none
 weighs_against: none
 source_refs:

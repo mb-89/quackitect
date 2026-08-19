@@ -253,15 +253,45 @@ test("last_retro means the previous RETRO, not the last desk drain", async () =>
   assert.equal(log.query({ filter: { since: "last_retro" } }).total, 4);
 });
 
-test("unconfigured web search refuses with setup instructions, never fakes", async () => {
-  const prev = process.env.SE_BRAVE_API_KEY;
+test("unconfigured web search uses the keyless provider behind the same verb", async () => {
+  const prevKey = process.env.SE_BRAVE_API_KEY;
+  const prevFetch = globalThis.fetch;
   delete process.env.SE_BRAVE_API_KEY;
+  globalThis.fetch = async () =>
+    new Response(
+      '<a class="result__a" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fexample.com">Example</a><a class="result__snippet">Primary result</a>',
+      { status: 200, headers: { "content-type": "text/html" } },
+    );
+  try {
+    const server = await bootedServer(fresh());
+    const r = await call(server, "se_web_search", { query: "anything" });
+    assert.equal(r.isError, false);
+    assert.equal(r.body.provider, "duckduckgo");
+    assert.deepEqual(r.body.hits, [{ title: "Example", url: "https://example.com", snippet: "Primary result" }]);
+  } finally {
+    globalThis.fetch = prevFetch;
+    if (prevKey !== undefined) process.env.SE_BRAVE_API_KEY = prevKey;
+  }
+});
+
+test("failed server-side search points to native search and direct fetch", async () => {
+  const prevKey = process.env.SE_BRAVE_API_KEY;
+  const prevFetch = globalThis.fetch;
+  delete process.env.SE_BRAVE_API_KEY;
+  globalThis.fetch = async () => {
+    throw new Error("offline");
+  };
   try {
     const server = await bootedServer(fresh());
     const r = await call(server, "se_web_search", { query: "anything" });
     assert.equal(r.isError, true);
     assert.equal(r.body.clause, "SE-C-106");
+    const remedy = r.body.remedy as { tool: string; args: Record<string, unknown>; note: string };
+    assert.equal(remedy.tool, "WebSearch");
+    assert.deepEqual(remedy.args, { query: "anything" });
+    assert.match(remedy.note, /se_web_fetch/);
   } finally {
-    if (prev !== undefined) process.env.SE_BRAVE_API_KEY = prev;
+    globalThis.fetch = prevFetch;
+    if (prevKey !== undefined) process.env.SE_BRAVE_API_KEY = prevKey;
   }
 });

@@ -15,6 +15,7 @@ import { loadCards } from "./cards.ts";
 import { replayVisitsText } from "./decisions.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { appendNote, pendingNotes, readNotes } from "./inbox.ts";
+import { recordClientFailures, recordLifecycle } from "./lifecycle.ts";
 import { bumpDrawingEpoch } from "./machines/compile.ts";
 import { handleHttp, type McpServer } from "./mcp.ts";
 import { subscribeModelMutations } from "./model-fs.ts";
@@ -932,6 +933,13 @@ export function startMirror(o: MirrorOptions): Server {
   });
 
   // see dsp-mirror-render.md#the-mirror-binds-loopback-and-says-so
-  server.listen(o.port, "127.0.0.1");
+  // VS Code Copilot reuses its localhost MCP connection. Node's short default
+  // keep-alive window can reset that reused socket between tool calls.
+  server.keepAliveTimeout = 120_000;
+  server.headersTimeout = 125_000;
+  // A reset is the CLIENT's socket dying, and it now leaves a line. Before
+  // this, telling it from a server exit meant checking a PID by hand.
+  recordClientFailures(o.root, server);
+  server.listen(o.port, "127.0.0.1", () => recordLifecycle(o.root, "listening", `port=${String(o.port)}`));
   return server;
 }

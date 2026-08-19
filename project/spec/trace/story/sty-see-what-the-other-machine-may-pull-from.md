@@ -5,7 +5,7 @@ type: "[[story]]"
 statement: An engineer on a fresh clone asks what the project could do next, and is offered options that were parked on a machine they have never touched.
 actor: stk-engineer-driving-agents
 refines:
-  - vp-what-is-learned-outlives-the-machine
+  - vp-the-ledger
 priority: must
 ---
 

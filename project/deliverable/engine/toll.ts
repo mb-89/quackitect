@@ -37,6 +37,14 @@ export class Toll {
   /** A hop the machine forced, which pays no call.
    *  see dsp-narration.md#the-reading-loop-pays-nothing */
   private static isReadingHop(tool: string, args: Record<string, unknown>): boolean {
+    // FOLLOWING THE LANE'S OWN CURSOR IS THE SAME CASE. A bounded answer hands
+    // back a page and the exact call that fetches the rest; making that call
+    // is the engine's instruction being obeyed, not work to narrate. Charging
+    // for it refuses the only route to a result the lane itself withheld.
+    if (tool === "se_file_read") {
+      const path = String(args.path ?? "").replace(/\\/g, "/");
+      return path.startsWith(".se/answers/");
+    }
     if (tool !== "se_pull") return false;
     const form = args.form as Record<string, unknown> | undefined;
     if (form === undefined || form.read === undefined) return false;
