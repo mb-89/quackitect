@@ -14,6 +14,9 @@ source_refs:
   - uc-measure-a-machine-change-against-a-finished-iteration step 6
   - vp-rigor-without-toil, the third metric of the criterion added by i37
   - i36-the-harness-is-not-claude-measure-what-e
+weighs_with: none
+weighs_against:
+  - req-the-benchmark-history-is-unreadable-while-a-run-is-bound >
 priority: must
 ---
 

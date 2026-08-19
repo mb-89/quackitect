@@ -15,6 +15,11 @@ source_refs:
   - uc-walk-an-iteration-from-a-tree-that-cannot-see-its-future ext 4a
   - raid-risk-the-git-ceiling-fails-open-and-a-run-reads-the-answers
   - engine/gitlane.ts allowlist read 2026-08-19
+weighs_with:
+  - req-a-wrong-act-never-passes-silently — both grade a wrong act passing with no signal. This one is the same failure inside a bound run, where the wrong act is a read that should not have resolved.
+weighs_against:
+  - req-a-benchmark-report-carries-the-conditions-of-its-run >
+  - req-the-benchmark-history-is-unreadable-while-a-run-is-bound >
 priority: must
 ---
 

@@ -10,7 +10,7 @@ status: open
 impact: "The run cannot start, and the failure looks like a broken benchmark rather than an incompatible checkout."
 breaks_how_badly: fatal
 how_likely: plausible
-probe: "unprobed \u2014 nothing has yet stood a tree at a rewind commit and tried to boot it."
+probe: "HOLDS BY OWNER RULING 2026-08-19 — the CURRENT engine runs over a rewound tree. The owner: \"The engine that works of a rewound tree is the current engine. I think it is clear.\" So the rewind is CONTENT only, and the deliverable is never checked out at an old commit."
 probed: 2026-08-19
 source_refs:
   - fn-the-benchmark-run.stand-a-throwaway-tree-and-bind-the-run
@@ -40,3 +40,22 @@ nobody is improving.
 HOW TO CHECK IT. Stand a tree at a rewind commit and try to boot. `node_modules`
 is gitignored, `engines.node` may differ, and the machines folder is content
 that moved. One spike answers it.
+
+## Ruled rather than spiked, 2026-08-19
+
+THE OWNER SETTLED IT DIRECTLY. The current engine runs over a rewound tree.
+
+WHAT THAT CHANGES, and it makes the mechanism smaller.
+
+- THE REWIND IS A CONTENT OPERATION. Records, corpus and trace go back. The
+  deliverable does not.
+- NO OLD `node_modules`, NO OLD `engines.node`. The environment question that
+  came with this assumption dissolves with it.
+- THE MACHINE MEASURED IS THE ONE BEING IMPROVED, which is what the whole
+  iteration is for.
+
+WHAT STILL NEEDS CARE, and it is a new seam rather than a leftover. The
+current engine reads a rigor matrix, and the matrix is method rather than
+content. A rewound run therefore walks TODAY's column over YESTERDAY's work.
+That is intended — the machine is the axis — and it is why a benchmark report
+stamps the matrix hash.

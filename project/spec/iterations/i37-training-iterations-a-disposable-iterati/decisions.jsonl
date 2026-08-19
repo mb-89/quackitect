@@ -51,3 +51,8 @@
 {"ts":"2026-08-19T17:23:15.565Z","op":"update","visit":"iterations/i37/probe-assumptions@0","node":"d51","brief":"probing the started stamp across the archive"}
 {"ts":"2026-08-19T17:23:27.758Z","op":"update","visit":"iterations/i37/probe-assumptions@0","node":"d52","brief":"reading the standing probe status of all 64 assumptions"}
 {"ts":"2026-08-19T17:25:01.356Z","op":"update","visit":"iterations/i37/probe-assumptions@0","node":"d53","brief":"stamping probed dates on the five assumptions this iteration owns"}
+{"ts":"2026-08-19T17:28:59.758Z","op":"update","visit":"iterations/i37/derive-criteria@0","node":"d54","brief":"reading the compare-card format before judging the pairs"}
+{"ts":"2026-08-19T17:35:19.567Z","op":"plan","visit":"iterations/i37/derive-criteria@0","parent":null,"nodes":[{"id":"d55","brief":"record the engine ruling"},{"id":"d56","brief":"note the compare-card confusion"},{"id":"d57","brief":"weigh my own criteria and fill derive-criteria"}]}
+{"ts":"2026-08-19T17:35:41.756Z","op":"done","visit":"iterations/i37/derive-criteria@0","node":"d55","brief":"the engine ruling is on the assumption"}
+{"ts":"2026-08-19T17:36:53.052Z","op":"done","visit":"iterations/i37/derive-criteria@0","node":"d56","brief":"weighed this iteration s three candidates and left the standing set alone"}
+{"ts":"2026-08-19T17:38:16.110Z","op":"update","visit":"iterations/i37/derive-criteria@0","node":"d58","brief":"the compare fields take table lines only; prose moved to anything_else"}
