@@ -96,7 +96,9 @@ const SHAPES_BASE = `views:
     order:
       - id
     filters:
-      referenced != false
+      and:
+        - 'probe == "notequals"'
+        - referenced != false
   - type: table
     name: HasTag
     order:
@@ -131,9 +133,9 @@ function shapesRoot(): string {
   writeFileSync(join(dir, "shapes.base"), SHAPES_BASE);
   writeFileSync(join(dir, "raid-one.md"), "---\nid: r1\ntype: raid\nkind: assumption\n---\n\n# one\n");
   writeFileSync(join(dir, "raid-two.md"), "---\nid: r2\ntype: raid\nkind: risk\n---\n\n# two\n");
-  writeFileSync(join(dir, "ref-true.md"), "---\nid: f1\nreferenced: true\n---\n\n# ref-true\n");
-  writeFileSync(join(dir, "ref-false.md"), "---\nid: f2\nreferenced: false\n---\n\n# ref-false\n");
-  writeFileSync(join(dir, "ref-unset.md"), "---\nid: f3\n---\n\n# ref-unset\n");
+  writeFileSync(join(dir, "ref-true.md"), "---\nid: f1\nprobe: notequals\nreferenced: true\n---\n\n# ref-true\n");
+  writeFileSync(join(dir, "ref-false.md"), "---\nid: f2\nprobe: notequals\nreferenced: false\n---\n\n# ref-false\n");
+  writeFileSync(join(dir, "ref-unset.md"), "---\nid: f3\nprobe: notequals\n---\n\n# ref-unset\n");
   writeFileSync(join(dir, "tagged.md"), "---\nid: t1\ntags:\n  - strategy\n---\n\n# tagged\n");
   writeFileSync(join(dir, "untagged.md"), "---\nid: t2\n---\n\n# untagged\n");
   mkdirSync(join(dir, "docs"), { recursive: true });

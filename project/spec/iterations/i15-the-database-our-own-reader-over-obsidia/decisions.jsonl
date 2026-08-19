@@ -532,3 +532,18 @@
 {"ts":"2026-08-19T19:33:31.329Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d180","brief":"found the real bug: my test's traceRoot double-joined project/spec/trace"}
 {"ts":"2026-08-19T19:33:43.290Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d181","brief":"locating the promotion test that regressed"}
 {"ts":"2026-08-19T19:33:52.742Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d182","brief":"reading promotions-stay-home.test.ts's full content"}
+{"ts":"2026-08-19T19:34:47.925Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d183","brief":"updated promotions-stay-home.test.ts's white-box check for the improved owner source"}
+{"ts":"2026-08-19T19:35:16.430Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d184","brief":"re-reading query.test.ts's exact fixture-note lines after the linter's reformat"}
+{"ts":"2026-08-19T19:35:29.624Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d185","brief":"reading query.test.ts's fixture-note-writing section"}
+{"ts":"2026-08-19T19:35:56.038Z","op":"done","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d166","brief":"mustStoryItems threading confirmed done via earlier resolveSource patch"}
+{"ts":"2026-08-19T19:36:16.883Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d186","brief":"checking whether d1/d4 are still open per the coordinator's note"}
+{"ts":"2026-08-19T19:36:37.570Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d187","brief":"filed the se_file_move/se_file_delete legal-tools note the coordinator asked for"}
+{"ts":"2026-08-19T19:36:49.233Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d188","brief":"polling the final green-check job for the three fixed tests"}
+{"ts":"2026-08-19T19:37:51.771Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d189","brief":"actually patching the SHAPES_BASE NotEquals filter this time"}
+{"ts":"2026-08-19T19:38:02.516Z","op":"done","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d167","brief":"promotionItems owner fix + regression test update landed"}
+{"ts":"2026-08-19T19:38:24.047Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d190","brief":"polling the whole-battery confirmation job"}
+{"ts":"2026-08-19T19:38:40.281Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d191","brief":"re-reading raid-debt-delta-default-views before adding the repayment sweep"}
+{"ts":"2026-08-19T19:39:05.592Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d192","brief":"documented the delta-default repayment honestly: 8 of 15 fixed, 7 deferred with rationale"}
+{"ts":"2026-08-19T19:39:21.139Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d193","brief":"polling the whole-battery confirmation job again"}
+{"ts":"2026-08-19T19:39:32.934Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d194","brief":"final poll of the whole-battery confirmation job"}
+{"ts":"2026-08-19T19:40:35.925Z","op":"update","visit":"iterations/i15/build-steps/fix-delta-default-resolvers@0","node":"d195","brief":"fix-delta-default-resolvers signed; built ahead of schedule under conformance work"}
