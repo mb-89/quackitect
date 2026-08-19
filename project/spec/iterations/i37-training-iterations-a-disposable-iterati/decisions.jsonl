@@ -115,3 +115,5 @@
 {"ts":"2026-08-19T18:51:48.418Z","op":"plan","visit":"iterations/i37/cut-criteria@2","parent":null,"nodes":[{"id":"d18","brief":"walk converge-pugh"},{"id":"d19","brief":"reach declare-winner"},{"id":"d20","brief":"record the ADRs"}]}
 {"ts":"2026-08-19T18:52:59.186Z","op":"update","visit":"iterations/i37/cut-criteria@3","node":"d21","brief":"aiming at reverse-sensitivity"}
 {"ts":"2026-08-19T18:53:43.832Z","op":"update","visit":"iterations/i37/cut-criteria@4","node":"d22","brief":"aiming at declare-winner"}
+{"ts":"2026-08-19T18:54:44.855Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d23","brief":"aiming at record-adrs"}
+{"ts":"2026-08-19T18:55:02.451Z","op":"update","visit":"iterations/i37/record-adrs@0","node":"d24","brief":"reading a decision node shape before minting five"}
