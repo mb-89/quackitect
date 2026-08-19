@@ -74,9 +74,29 @@ FULL CONTEXT: project/spec/version-planning.md, section i9.
 
 ## Standing instruction for this iteration
 
-THE OWNER BLESSES EVERY GATE HERE, and the agent blesses none of them (owner
+THE OWNER DECIDES EVERY GATE HERE, and no gate passes without their word (owner
 instruction 2026-08-19). Their words on giving the go: they will look at what
 the agent is doing at the gates, so nothing is blessed without them.
+
+HOW THE DECISION GETS RECORDED, since the two are not the same act. The owner
+may press the bless themselves on the mirror, or give it in words and have the
+agent stamp what they said. Either way the DECISION is theirs.
+
+WHERE THE WORD CAME IN CHAT, THE STAMP CARRIES THE AGENT'S HAND. The ledger
+counts stamps rather than decisions, so a gate decided by the owner and stamped
+by the agent reads as an agent bless in the metric. That is a known gap between
+what the number measures and what happened, and the form's own verdict says
+whose call it was.
+
+THE AGENT NEVER DECIDES ONE HERE. It may only record a decision already made.
+
+WHAT ACTUALLY HAPPENED AT THE FIRST GATE, recorded because the agent read it
+wrong once. The owner pressed the bless on the mirror themselves, and the form
+carries `blessed by human`. The agent had read the form a moment earlier, seen
+no bless, and concluded the decision would have to be stamped for them.
+
+SO THE LEDGER READS TRUE HERE, and the paragraph above describes a fallback
+that was not needed. Check the form before assuming which of the two happened.
 
 THIS OVERRIDES THE AUTONOMY DIAL for this iteration. At high autonomy an agent
 may normally stamp its own gate. Not here, whatever the dial reads.

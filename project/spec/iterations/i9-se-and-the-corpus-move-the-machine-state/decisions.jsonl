@@ -117,3 +117,19 @@
 {"ts":"2026-08-19T11:12:56.054Z","op":"done","visit":"iterations/i9/onboard-retro@0","node":"d14","brief":"every improvement is landed in a durable home and the form is signed"}
 {"ts":"2026-08-19T11:18:41.274Z","op":"update","visit":"iterations/i9/gate-kickoff@0","node":"d116","brief":"submitting the kickoff gate with the choice and its reason on one line"}
 {"ts":"2026-08-19T11:22:52.634Z","op":"update","visit":"iterations/i9/gate-kickoff@0","node":"d117","brief":"kickoff blessed at minor, walking on into the design milestone"}
+{"ts":"2026-08-19T11:23:32.104Z","op":"update","visit":"iterations/i9/gate-kickoff@0","node":"d118","brief":"recording how an owner decision reaches the machine when it arrives in chat"}
+{"ts":"2026-08-19T11:26:58.142Z","op":"update","visit":"iterations/i9/log-risks@0","node":"d119","brief":"the assumption node owes a probe section, which the engine caught"}
+{"ts":"2026-08-19T11:27:53.576Z","op":"update","visit":"iterations/i9/frame-delta@0","node":"d120","brief":"frame-delta stamped with no new proposition, on the owner's ruling"}
+{"ts":"2026-08-19T11:30:00.967Z","op":"update","visit":"iterations/i9/gate-motivation@0","node":"d121","brief":"the goals field wants one answer per goal, corrected"}
+{"ts":"2026-08-19T11:30:30.164Z","op":"update","visit":"iterations/i9/gate-motivation@0","node":"d122","brief":"the owner pressed the first bless themselves, so the record should say so"}
+{"ts":"2026-08-19T11:43:04.404Z","op":"update","visit":"iterations/i9/gate-motivation@0","node":"d123","brief":"the installer ask moves from non-goal to scope on the owner's ruling"}
+{"ts":"2026-08-19T11:44:39.094Z","op":"update","visit":"iterations/i9/gate-motivation@0","node":"d124","brief":"the new scope needs a goal, so the blessed kickoff is sent back"}
+{"ts":"2026-08-19T11:46:25.232Z","op":"update","visit":"iterations/i9/gate-kickoff@1","node":"d125","brief":"the installer note is handled by the scope change, so it drains"}
+{"ts":"2026-08-19T11:46:55.127Z","op":"plan","visit":"iterations/i9/gate-kickoff@1","parent":null,"nodes":[{"id":"d126","brief":"the marker issue is superseded"},{"id":"d127","brief":"not solved"},{"id":"d128","brief":"and the entry says which"}]}
+{"ts":"2026-08-19T11:47:12.870Z","op":"obsolete","visit":"iterations/i9/gate-kickoff@1","node":"d128","brief":"never an item — the engine split my chained brief"}
+{"ts":"2026-08-19T11:47:36.942Z","op":"obsolete","visit":"iterations/i9/gate-kickoff@1","node":"d127","brief":"never an item, the engine split my chained brief"}
+{"ts":"2026-08-19T11:48:05.579Z","op":"done","visit":"iterations/i9/gate-kickoff@1","node":"d126","brief":"the superseded entry is written and closed"}
+{"ts":"2026-08-19T11:48:48.341Z","op":"update","visit":"iterations/i9/gate-kickoff@1","node":"d129","brief":"recording the auto-seeding retraction where the next reader meets it"}
+{"ts":"2026-08-19T11:50:12.212Z","op":"update","visit":"iterations/i9/gate-kickoff@1","node":"d130","brief":"the collapse moves from left-out into the goal it always belonged to"}
+{"ts":"2026-08-19T11:53:12.885Z","op":"update","visit":"iterations/i9/gate-kickoff@1","node":"d131","brief":"the size goes to major and the cleanup becomes a step that waits"}
+{"ts":"2026-08-19T11:54:50.548Z","op":"update","visit":"iterations/i9/gate-kickoff@1","node":"d132","brief":"the owner blessed major in chat, so the stamp records their decision"}

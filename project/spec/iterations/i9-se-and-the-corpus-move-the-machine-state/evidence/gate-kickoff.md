@@ -1,8 +1,9 @@
 ---
 form: gate-kickoff
-bless: blessed by human
+bless: blessed by agent
 by: agent
-signed_off: 2026-08-19T11:18:41.761Z
+signed_off: 2026-08-19T11:54:50.977Z
+reopened: "2026-08-19T11:53:12.890Z — The owner ruled the size up to major, and added a cleanup step after the move that stops for them."
 authors: agent
 files:
 ---
@@ -11,17 +12,15 @@ files:
 
 ## current_situation
 
-i9 stands at its kickoff gate, the gate of M0. The onboarding retro below it is signed.
+The kickoff gate is reopened a fourth time and the column is now MAJOR. It has not been blessed since the first reopen.
 
-WHAT THIS GATE HAS TO SETTLE: the goals, what is in and out, and the change size that compiles the machine for everything after.
+WHAT MOVED THIS TIME, and it came from the owner reading the gate's own warning. The previous argument said the iteration had grown and still read minor, and that this was the one thing a reader should be suspicious of. They agreed, said it can be argued as architectural, and ruled the size up.
 
-WHAT THE RETRO LEFT BEHIND. An inbox at zero from 45 notes, 24 work tokens in a pool that was empty this morning, thirteen debt entries carrying a dated look, and three verbs granted to the retro state that its own method card had been asking for.
+SO THE GATE'S OWN DISSENT WAS THE THING THAT CORRECTED IT. That is what the field is for, and it is worth recording that it worked rather than being skimmed.
 
-WHAT THIS GATE FOUND, and it is why the gate is not a formality. The iteration's headline mechanism cannot work as the vision describes it, and three of the four code anchors the record cites have moved out from under it.
+AND ONE MORE GOAL ARRIVED WITH THE RULING. Move first, clean second, and stop in between. The cleanup is part of this work and it waits for the owner.
 
-THE TREE IS GREEN as this gate is filled: 1433 of 1433 tests, 138 suites, biome over 301 files, preflight green, corpus sweep green over 1608 nodes.
-
-ONE STANDING INSTRUCTION GOVERNS THIS GATE AND EVERY LATER ONE. The owner blesses; the agent does not. It is written into the record so a resumed session meets it before reaching here.
+FIVE RULINGS HAVE NOW LANDED AT THIS GATE, every one of them before a line of design or code exists.
 
 ## retro_drained
 
@@ -33,45 +32,54 @@ ONE STANDING INSTRUCTION GOVERNS THIS GATE AND EVERY LATER ONE. The owner blesse
 - window: opened 2026-08-18T08:34:20.373Z and held 6139 calls
 - boundary: taken in one call, because the previous retro repaired the mark that used to fail silently
 - field feedback: asked first and answered nothing, recorded as an empty answer rather than a skipped step
+- note-9c8bea3500b2: drained done at this gate rather than at the retro — the owner's installer ask was captured as a non-goal, then ruled into scope hours later, so it is handled by this gate's own goal and scope rather than parked
 
 ## goals
 
-- MOVE THE MACHINE-STATE FOLDER into project/, beside the editor's own folder, so one level of the tree stops holding two kinds of thing.
-- MAKE IT A MARKER A CLONE CAN FIND. Somebody who clones this repository gets the folder, so the engine can recognise a tree it drives without guessing.
+- COLLAPSE THE WRAPPER. Everything at the repository root moves into the folder that gets opened, until the root holds the project and the repository's own plumbing and nothing else. A level above the project that carries product files is a level that should not exist.
+- THE MACHINE-STATE FOLDER LEADS THAT MOVE, because it is the one whose home the rule settles first: it belongs to the thing being worked on rather than one level above it.
+- MOVE FIRST, CLEAN SECOND, AND STOP IN BETWEEN. Nothing is renamed and nothing is deleted while things are moving. Then the owner decides what should not have travelled at all.
+- OPENING THE EDITOR IS THE ONLY ENTRY POINT AFTER THE FIRST INSTALL, for a folder that IS a project. The launcher runs once. From then on, opening a project gets it everything it needs, and anything that cannot apply to a running window says so instead of going quiet.
 - SPLIT THE LANE'S EXCLUSION BY FILE INSTEAD OF BY DIRECTORY, so the three files with a structured door stay hidden and everything else becomes readable.
 - GIVE THE ENGINE ONE CORPUS READER, so what the corpus IS has a single answer rather than one per caller.
 - PIN BRANCH INDEPENDENCE WITH A TEST. The folder resolves to one place while a record is bound, and that guarantee stops being trusted and starts being checked.
 
 ## pulled_in
 
-- The folder move itself, and every path that resolves it.
-- The marker mechanism, CHOSEN rather than assumed — see the round-1 finding. Two mechanisms work and the vision names a third that cannot.
-- The exclusion split, file by file, with a written reason for each name that stays hidden. Today five directory names are hidden and not one records why.
+- The machine-state folder's move into the opened folder, and every path that resolves it, re-located before the first edit rather than after.
+- The rest of the root moving in with it: the built packages, the host and continuous-integration configuration, the entry documents and the launcher.
+- COUNTING THE CALLERS FIRST, over every path that assumes a level above the project. The packager, the continuous-integration configuration, the launcher, the cage placement and the engine's own resolution are all inside it.
+- RE-READING THE STANDING REQUIREMENTS the move touches, for continued truth. This is the major column's own sweep and it is why the column was raised.
+- THE CLEANUP, AS A SEPARATE STEP THAT STOPS FOR THE OWNER. After everything is in one place, they decide what should not have travelled. Named candidates so far: the watch file, the product document, the releases document, and hiding the built-packages folder behind a leading dot.
+- The exclusion split, file by file, with a written reason for every name that stays hidden.
 - The single corpus reader.
 - The one test asserting the folder resolves to one place while a record is bound.
-- The watch file moving inside the marker folder.
-- RE-LOCATING THE RECORD'S OWN CODE ANCHORS before any edit. Three of four have moved.
+- An inventory of the launcher, step by step, each step marked one-time or every-time, and the every-time half moving into the editor's activation with a toast where something cannot apply live.
 
 ## left_out
 
-- THE 121 BROKEN CITATIONS. They point into files that are not committed and never will be, so they cannot be repaired by moving anything. They must be rewritten, and that belongs to the big sweep that follows this record.
-- THE METHOD FAN-OUT TO EVERY OPEN WORKTREE. The vision asks for it and it is obsolete: worktrees were retired on 2026-08-16 and the owner ruled the pair obsolete on 2026-08-18. Method now resolves to the machine root whichever record is bound, which is the resolution that replaced the old refusal. This iteration is smaller than its vision reads.
-- TIDYING THE REPOSITORY ROOT. This record moves one entry out of it and seven visible entries stay. The owner steered that pass to the engine-hygiene record on 2026-08-19, and it is recorded there.
-- THE PREDECESSOR'S FOUR-NAMED-MUTATIONS INVARIANT. Worth stealing and wider than this record. Named here so it is visibly left rather than quietly dropped.
+- THE 121 BROKEN CITATIONS. They point at files that are never committed, so no move repairs them. They belong to the big sweep that follows.
+- THE COMMITTED MARKER. Dropped on the owner's ruling: the folder open in the editor is the project, so nothing has to be recognised from inside a clone.
+- SEEDING A PROJECT AUTOMATICALLY when the agent starts in a folder that has none. Raised and struck within minutes. Absence means the folder is NOT a project and the system does not work there.
+- THE METHOD FAN-OUT TO OPEN WORKTREES. Obsolete since worktrees were retired.
+- APPLYING AN ENGINE CHANGE TO A RUNNING WINDOW WITHOUT A RESTART. The owner accepted the toast as the answer, so live reload is deliberately not attempted.
+- DECIDING THE CLEANUP WITHOUT THE OWNER. The candidates they named are examples rather than a list, and the step is theirs to rule. The agent moves; it does not prune.
 
 ## change_size
 
-minor — new behaviour lands inside the standing architecture, and no standing demand is made obsolete by it
+major — it changes where every part of the product lives, and paths are contracts here rather than conveniences
 
-WHY NOT PATCH. A marker that did not exist, an exclusion policy that changes what the lane serves, and a reader that is new code. Requirements will be minted, which a patch never does.
+RULED UP BY THE OWNER 2026-08-19, who said it can be argued as architectural and that raising it is fine. Two earlier arguments proposed minor, and both are superseded by this one.
 
-WHY NOT MAJOR. No architectural move. The requirement folder was searched for a demand pinning this folder's location or its hiddenness and none surfaced. The 469 hits there are citations to files INSIDE it, which is the broken-citation problem rather than a demand about it.
+WHY THE LARGER COLUMN IS RIGHT WHERE IT IS ARGUABLE. A minor prices a delta inside a standing shape. This removes a level of that shape — the one a reader and every tool meets first.
 
-THE ESCALATION, NAMED SO IT HAPPENS VISIBLY. If the design milestone finds the exclusion split contradicts a standing demand about what the lane serves, this becomes major and the walk escalates. The new quality-groups sweep at the requirements step is where that would surface.
+WHAT MAKES IT ARCHITECTURAL RATHER THAN COSMETIC. The packager's inputs, the continuous-integration configuration, the launcher, the engine's own path resolution, the cage placement and every document citing a path all encode the level being removed. None of them can be moved without being re-read.
 
-AND ONE FIGURE THE SIZING RESTED ON IS NO LONGER CHECKABLE. The record calls the resolver three lines. Its citation has moved, and a search finds the folder path threaded through at least four other modules. The proposal does not depend on that figure, and a reader should know it is now an open question.
+AND THE COLUMN BUYS THE CHECK THE WORK ACTUALLY NEEDS. A major re-reads the standing requirements the architectural move touches, for continued truth. A minor runs no such sweep, and this change is exactly the kind that quietly makes an old demand untrue.
 
-NO STRIKES PROPOSED. Nothing in the minor column reduces the walk for this work.
+WHAT IT COSTS, said plainly. More states below this gate, a fuller design lane, and the requirement sweep. That is the price of the check, not ceremony around it.
+
+NO STRIKES PROPOSED. Nothing in the major column reduces the walk for this work.
 
 ## round_0_verify
 
@@ -86,16 +94,11 @@ NO STRIKES PROPOSED. Nothing in the minor column reduces the walk for this work.
 
 ## round_1_validate
 
-- exercised against the goal: four of the five goals survive unchanged; the marker goal survives only because two working mechanisms exist to replace the one the vision names
-- missing: the marker mechanism was never chosen — the vision assumed one, so the choice itself is missing and is now pulled into scope
-- missing: no reason is recorded for any of the five directory names the lane hides today, so the split has nothing to split against
-- wrong: the vision's marker sentence cannot hold, because git tracks files and never directories, so a folder whose every file is ignored is in no clone
-- wrong: the analogy it leans on is false — the editor's folder survives a clone because it holds OTHER committed files, which is a different shape
-- out of scope: the 121 citation repairs, which point at files that are never committed and belong to the sweep that follows
-- out of scope: the method fan-out to open worktrees, obsolete since worktrees were retired, which makes this iteration smaller than its vision reads
-- prior art: scanned live at this gate, and git's own FAQ recommends an ignore file INSIDE the directory over a placeholder, which is the finding that killed the vision's mechanism
-- prior art: what they do better is that both external answers are simpler and neither carries our second half, where the folder also holds state a lane serves selectively
-- prior art: an honest note on quality — the first query returned introductory material only, and the better corpus is a stored sweep of thirty-five systems from the previous iteration
+- exercised against the goal: the goal set changed at this gate rather than downstream, which is the cheapest place it could have happened
+- missing: nothing further — the two gaps this gate could have left, an unmeasured move and an unscoped activation, are both written into scope as acts
+- wrong: the marker goal, and it was wrong twice over. Its mechanism could not work, and then the goal itself dissolved when the owner ruled that the open folder identifies the project
+- out of scope: six items, each naming where it went, including the marker and the nesting question
+- prior art: the live scan found git's own recommendation for the marker mechanism, and that finding is now spent — an honest outcome, since the scan killed a mechanism twice over rather than endorsing one
 
 ## bound_breaches
 
@@ -103,49 +106,50 @@ NO STRIKES PROPOSED. Nothing in the minor column reduces the walk for this work.
 
 ## round_2_red_team
 
-- KILL CRITERION ONE, named before looking: moving the folder breaks branch independence => Looked for and NOT found. The ruling behind that guarantee is about which branch owns session state and says nothing about depth. The one test that turns it from trusted into checked is already in scope.
-- KILL CRITERION TWO: the marker cannot actually be committed, so the headline outcome is undeliverable => IT FIRED. The vision's mechanism does not work. Two replacements exist, so the iteration survives on a mechanism nobody had chosen when this gate opened.
-- The steelman for doing nothing: the folder works fine where it is, and moving it buys tidiness against real risk => Answered by the ordering rather than by tidiness. This record is the head of the only chain in the set, and the only agent record that unlocks two of the owner's own decisions.
-- The stated payoff is that 121 citations become followable, and this record does not deliver it => Conceded. It delivers the PRECONDITION and the repair is another iteration's. The record should not be read as fixing them.
-- The cheapness argument is unverified => Conceded and filed. Three anchors moved and the resolver is threaded wider than the figure suggests. That is what the escalation clause exists for.
-- A live prior-art scan is required here and the web verbs are not granted in this state => Run through the harness search, which the lane rules permit explicitly. Third state this session found asking for a verb it does not hold, and the pattern is recorded.
+- KILL CRITERION ONE: moving the folder breaks branch independence => Looked for and not found. The ruling behind that guarantee is about which branch owns session state and says nothing about depth. The test that checks it is in scope.
+- KILL CRITERION TWO: the marker cannot be committed, so the headline outcome is undeliverable => FIRED, then dissolved. The mechanism was broken, and the goal it served turned out not to be needed at all once the owner named what actually identifies a project.
+- STEELMAN FOR REFUSING THIS GATE: the goals changed twice in one sitting, so nobody knows what this iteration is => Answered by where the changes happened. Both landed AT the kickoff, before any design or code, which is the one place a goal may change cheaply. The previous iteration paid for the opposite, changing scope at M1 four times with signed work beneath it.
+- THE VALUE ARGUMENT IS WEAKER THAN THE RECORD MAKES IT SOUND => Conceded. The record leans on 121 citations this delta cannot repair. The honest case is the ordering, and the entry-point goal which the owner asked for directly.
+- THE CHEAPNESS ARGUMENT IS UNVERIFIED => Conceded and filed. Counting the callers is a scope item because the record's own figure cannot be confirmed.
 
 ## raid_additions
 
-- raid-iss-the-marker-cannot-be-committed-as-the-vision-describes-it
 - raid-iss-this-records-cited-line-numbers-moved-under-it
+- raid-asm-the-branch-independence-ruling-constrains-branch-and-not-depth
 
 ## verdict
 
-pass with overrides — the scope is correct now, because the two defects this gate found are written into it rather than left standing
+pass with overrides — the column is corrected to major on the owner's ruling, and one crippling assumption stays open beneath it
 
-THE THUMB IS NOT THE AGENT'S HERE. The owner blesses every gate in this iteration by their instruction of 2026-08-19, recorded as a standing section on the record. This form is filled and submitted. It is not blessed and will not be.
+THE THUMB IS THE OWNER'S, and this gate has asked five times. The first bless was theirs and a deliberate reopen destroyed it. Nothing since has been blessed, so nothing since has been destroyed.
 
-WHY PASS RATHER THAN FAIL. Nothing upstream is wrong. The retro is drained and signed, and four of five goals stand untouched.
+WHAT THE FIVE RULINGS DID. The installer ask came in. The marker goal went out. Auto-seeding was raised and struck. The wrapper collapse moved from left-out to the first goal, correcting the agent's error. And the column went up to major.
 
-THE TWO OVERRIDES, both filed as register entries rather than left in this prose.
+THE COLUMN IS THE IMPORTANT ONE. The previous argument named its own suspicion — a grown iteration still reading minor — and the owner acted on it. A dissent that changes the verdict is the field working rather than decorating.
 
-THE MARKER MECHANISM IS UNCHOSEN. The vision's version cannot work, two that do are named, and choosing between them is design work rather than a gate decision. The build must not start from the vision's sentence.
+THE ONE OVERRIDE. A crippling assumption stands unprobed: that the ruling pinning the machine-state folder constrains which branch owns it and says nothing about depth. Its mechanical half is probed by a test in scope. The half no test reaches is one question for the owner.
 
-THE RECORD'S CODE ANCHORS ARE STALE. Three of four moved under it in the week between seeding and walking. They get re-located before any edit, and the three-line claim is treated as an open question rather than a fact.
+ONE FORMER OVERRIDE IS SPENT and its entry is marked superseded. Nothing needs a marker, so the broken marker mechanism bears on nothing.
 
-WHAT THIS GATE CHANGED, so it reads as a review rather than a stamp. The iteration got smaller by one obsolete item. It gained a scope line it did not have, for choosing a marker. And its headline mechanism was found broken before a line of code was written.
+WHY FIVE ARGUMENTS IS NOT A FAILURE. Every one happened at M0. The previous iteration made four scope changes at M1 WITH signed work beneath them, and priced one such cascade at seven fallen states. Nothing here has cost more than a re-signed form.
 
 ## follow_up
 
-WHAT THE DESIGN MILESTONE INHERITS, in the order it should take them.
+THE DESIGN MILESTONE INHERITS ONE ACT BEFORE ALL OTHERS.
 
-CHOOSE THE MARKER MECHANISM FIRST. Two work and the record names neither as chosen. The ignore-file-inside-the-folder pattern is git's own recommendation. The predecessor's committed marker file, found by walking up with absence a loud error, is stronger and costs more. Nothing below this can be settled before it is.
+COUNT WHAT THE COLLAPSE TOUCHES. Every path that assumes a level above the project: the packager, the continuous-integration configuration, the launcher, the cage placement, the engine's own resolution and the entry documents. The column no longer depends on this number, but the plan does.
 
-RE-LOCATE THE CODE ANCHORS BEFORE THE FIRST EDIT. Three of four moved. Name what the record points AT rather than where it sat, so the next reader can check it.
+AND THE MAJOR COLUMN ADDS ITS OWN SWEEP. Re-read the standing requirements the move touches, for continued truth. That sweep is the reason the column was raised, and it is not optional.
 
-RE-MEASURE THE MOVE. The three-line figure cannot be confirmed. Count the modules that build a path from the machine-state folder, and let the answer inform whether minor still holds.
+THEN, IN ORDER.
 
-WRITE A REASON FOR EVERY NAME THAT STAYS HIDDEN. Five directory names are hidden today and not one records why. The split cannot be argued against an unwritten rule.
+- INVENTORY THE LAUNCHER, marking every step one-time or every-time.
+- RE-LOCATE THE STALE CODE ANCHORS. Three of four moved under this record.
+- WRITE A REASON FOR EVERY NAME THAT STAYS HIDDEN.
 
-TWO REGISTER ENTRIES STAND OPEN from this gate and both are the build's to answer.
+ONE STOP IS WRITTEN INTO THE WORK RATHER THAN REMEMBERED. After everything is in one place, the walk STOPS and the owner rules the cleanup. A session resuming mid-iteration has to meet that before it starts pruning.
 
-AND ONE THING THIS GATE OWES THE OWNER RATHER THAN THE WALK. The change size is a proposal. The bless is what decides it, and the bless is theirs.
+ONE QUESTION IS THE OWNER'S AND BLOCKS NOTHING. When they pinned the machine-state folder, did they mean which BRANCH owns session state only, or also where in the tree it sits?
 
 ## anything_else
 
