@@ -2,7 +2,7 @@
 minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-asm-a-fresh-clone-s-empty-inbox-means-no-local-state
 type: "[[raid]]"
-kind: assumption
+kind: issue
 statement: "An empty notes inbox means the retro is already done, and that reading holds on a fresh cloud clone as well as on a laptop."
 owner: the owner
 trigger: the first onboard-retro or desk retro that runs on a container created after the last one ended
@@ -18,6 +18,25 @@ source_refs:
 weighs_with: none
 weighs_against: none
 ---
+
+## What changed the kind
+
+IT WAS WRITTEN AS AN ASSUMPTION AND PROBED FALSE IN THE SAME RECORD, at i5's
+probe-assumptions on 2026-08-19. The id is kept, the kind moved, and this
+section says what broke.
+
+WHAT BROKE. The reading "an empty inbox means the retro is already done" does
+not hold on a cloud clone. It held on a laptop, where the same `.se` folder
+survives between sessions, and nobody had checked the other case.
+
+WHAT NOW RESTS ON NOTHING. The empty-inbox skip rule reads a count, and a
+count cannot tell a drained inbox from an absent one. On this container it
+still produced the right ACT, because there was genuinely nothing to drain —
+but for the wrong reason, which is the definition of a check that will
+eventually be wrong.
+
+WHAT DOES NOT FOLLOW. The skip rule itself is sound and is not withdrawn. What
+is unproven is the signal it reads.
 
 ## Probe
 

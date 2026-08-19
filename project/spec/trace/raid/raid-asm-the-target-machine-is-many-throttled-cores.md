@@ -47,6 +47,21 @@ Storage speed, caching and RAM disks are IO fixes. They address a bottleneck
 this machine has not been shown to have, and on a machine whose named problem
 is clock speed they may buy nothing at all.
 
+## Probe
+
+RUN THE SAME SCOPED CALL ON BOTH MACHINES and compare wall clock: the
+throttled laptop, and a normal desktop. The laptop's figure is the one the
+one-second rule has to be met on.
+
+NOTHING RAN FROM THIS PROJECT. The account is the owner's own report of
+2026-08-14, accepted on their word, and the machine is elsewhere. That is
+evidence about the operating environment rather than a measurement, and the
+two are not the same thing.
+
+WHAT IS ACCEPTED AND WHAT IS NOT. The SHAPE of the machine is accepted: many
+cores, each weak, held down by heat. The NUMBERS are not. Nobody has profiled
+a slow call on it, so where the time goes is still unknown.
+
 ## What would falsify it
 
 A PROFILE SHOWING THE TIME GOES TO IO rather than to computation. Then the

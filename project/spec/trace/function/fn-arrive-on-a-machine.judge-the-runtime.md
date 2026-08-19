@@ -6,6 +6,7 @@ cluster: the-arrival
 statement: judge the running runtime against the floor the project declares
 satisfies:
   - req-the-declared-runtime-floor-is-read-never-edited
+  - req-a-preflight-check-asks-the-reader-where-it-looked
 inputs:
   - flow-arrival-request
 outputs:

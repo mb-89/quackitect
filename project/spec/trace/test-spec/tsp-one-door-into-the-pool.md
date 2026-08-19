@@ -6,6 +6,8 @@ statement: There is exactly one path that writes an option, and it applies the s
 method: inspection
 verifies:
   - req-the-crossing-is-the-same-act-for-a-person-and-an-agent
+files:
+  - none — a checklist, read rather than run, because only reading proves a second door does not exist
 ---
 
 ## Scope

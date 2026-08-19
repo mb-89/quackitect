@@ -24,6 +24,21 @@ files:
   - project/deliverable/engine/bin/record-inspect.ts
 ---
 
+## A check asks the reader where it looked
+
+req-a-preflight-check-asks-the-reader-where-it-looked.
+
+The palette and the brand file are read live and fall back SILENTLY on
+purpose, and that stays: a missing colour must not take every surface down.
+Preflight is where the same absence is said out loud at boot.
+
+WHAT CHANGES IS WHERE THE PATH COMES FROM. Preflight joined its own path from
+the root, so the check and the reader held two copies and went stale together.
+The reader now exports the path it uses and preflight asks for it.
+
+ONE OCCURRENCE PER CONFIGURATION FILE, and a test holds the count as a ratchet
+that may fall and cannot rise.
+
 ## Responsibility
 
 What a machine can check, a machine checks. Scoped runs by file with

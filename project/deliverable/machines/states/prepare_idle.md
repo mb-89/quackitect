@@ -31,10 +31,16 @@ and the sweep finds the ones already inside.
 
 The checks before idle. The ENGINE evaluates them — the agent cannot claim
 a green engine, only trigger the run. Three scripts, all fast: the
-sub-second preflight (canvases compile, hard deps answer, .se writable —
-RUNME runs the same one at launch so starting stays instant) and the SMOKE
-test (every engine module imports, the machines compile, the cards and the
-rigor matrix read).
+sub-second preflight (canvases compile, hard deps answer, .se writable, and
+the files the readers are told to read are THERE — RUNME runs the same one at
+launch so starting stays instant) and the SMOKE test (every engine module
+imports, the machines compile, the cards and the rigor matrix read).
+
+A CONFIGURATION FILE IS CHECKED WHERE ITS READER LOOKS, never at a path the
+check spells for itself. The brand file and the palette are asked for by the
+module that owns them, so a moved file fails the check by the same path that
+would have failed the product — and the failure says what it costs, not just
+that something is absent.
 
 THE FULL BATTERY IS NOT HERE (owner ruling, 2026-07-30). Boot asks whether
 this engine can run, not whether every behaviour is correct. The battery

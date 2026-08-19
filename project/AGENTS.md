@@ -1,7 +1,7 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
      from project/guidance/contract.md b538e8ccc81e
      from project/guidance/walking.md 8d2cebb9bd5a
-     from project/guidance/method/lane.md ce95ebe5aacb
+     from project/guidance/method/lane.md 1b2be4c7ea58
      from project/guidance/voice.md 0b6faf79ff32
 -->
 
@@ -519,6 +519,12 @@ PATHS ARE ROOT-RELATIVE TO THE PROJECT ROOT, which is the parent of the folder
 you have open. You open `project/`; a path you pass starts `project/`.
 
 Every call is logged raw to `.se/calls.jsonl`.
+
+THE RECORD CARRIES WHO ACTED. The acting role — a person, an agent, the
+surface itself — is stamped on the record where the call is SERVED, by the
+code that knows. Nothing downstream infers it from the tool name: a reader
+guessing the actor from which verb was called gets it wrong the moment one
+verb serves two callers, and it did.
 
 TWO DOORS LEAD OUTSIDE THE ROOT, and neither is a path. A past version of this
 repo is read at a committed ref — `se_file_read`, `se_file_search` and

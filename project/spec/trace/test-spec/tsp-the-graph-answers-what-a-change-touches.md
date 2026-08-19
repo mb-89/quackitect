@@ -7,7 +7,8 @@ method: demonstration
 demonstrates:
   - sty-answer-what-does-this-touch
   - sty-dispose-a-candidate-coupling
-verifies: []
+verifies:
+  - none — this spec demonstrates a story end to end; no requirement is verified through it
 files:
   - none — the procedure below is the definition; the observed run is the evidence
 ---

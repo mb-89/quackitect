@@ -15,6 +15,23 @@ files:
   - project/deliverable/engine/survey.ts
 ---
 
+## The acting role is stamped where the call is served
+
+req-acts-carry-role-and-channel, and its reader half
+req-the-actor-is-recorded-where-the-call-is-served.
+
+A record carries `actor`, written by the handler that served the call — the
+mirror's own POST table for a person's press, the dispatcher for a lane call,
+and the server itself for a poll it made on its own behalf.
+
+THE READER STOPS GUESSING. The feed drew the role from the tool's NAME prefix,
+which was wrong for 52 records in one measured window and is wrong by
+construction for every new server-side tool.
+
+THE PREFIX RULE SURVIVES AS THE FALLBACK, for records written before the stamp
+existed and for nothing else. History cannot be restamped, and a fix that
+dropped the fallback would rewrite what it cannot know.
+
 ## Responsibility
 
 The append-only account: every lane call lands raw with its actor role

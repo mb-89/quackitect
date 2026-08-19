@@ -260,6 +260,10 @@ export class Session {
     return this.claims.recordDone(decl, seen, pass, paint);
   }
 
+  lawProvenStates(decl: MachineDecl): string[] {
+    return this.claims.lawProvenStates(decl);
+  }
+
   recordPaint(decl: MachineDecl): string[] {
     return this.claims.recordPaint(decl);
   }

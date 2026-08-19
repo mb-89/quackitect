@@ -578,11 +578,31 @@ answers why a state is grey. Absorbs the introspection-verb work.
 The archived iteration browses like the live one, a bless repaints without a
 reload, a grey state says why.
 
-### i5 — engine hygiene  (SEEDED)
+### i5 — engine hygiene  (OPEN — built and verified, at validation)
 
-One version source, every refusal anchored to its guidance, the sync sweeps
-duplicates, the slow test file splits, the paint rules get their pin. Absorbs
-the tests cluster and the pre-push battery gate.
+THE SEEDED BUNDLE WAS SIX DAYS OLD AND WAS AUDITED AT THE KICKOFF, not carried
+in whole. Thirteen items went in; three were struck against the code, which had
+already absorbed them, and two went back to the pool as work with no measured
+cost yet. What was built is the measured remainder, five requirements:
+
+- the entrypoint answers `--version` before it resolves a root, so a package
+  proves itself with one command on a checkout too broken to start
+- the acting role is stamped on the call-log record where the call is SERVED,
+  and no reader infers it from the tool name any more
+- the brand folder is named ONCE in code, and preflight asks the readers where
+  they looked instead of spelling the paths a second time
+- a live source that resolves to nothing SAYS SO on the form, so an empty table
+  and a broken one stop looking alike
+- one function decides how a state is painted, and the third green — done with
+  its law proven — is told apart by stroke, not by a second shade
+
+FIVE ENGINE AND CORPUS DEFECTS were found blocking the walk and repaired on the
+record rather than folded in silently. A tester with fresh context returned
+twelve findings, eleven fixed and one recorded.
+
+Absorbed and NOT built: the refusal-to-guidance anchoring sweep, the duplicate
+sync sweep, the slow test-file split, the tests cluster and the pre-push battery
+gate. Those were the items with no measured cost, and they are in the pool.
 
 ### i6 — conformance goes mechanical  (SHIPPED 2026-08-16)
 

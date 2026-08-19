@@ -10,6 +10,19 @@ files:
   - "project/deliverable/engine/trace-layout.ts"
 ---
 
+## A table's header names columns, never nodes
+
+The reference extractor reads the leading cells of every row that starts with a
+pipe, and a bound table's header carries the row TYPE in its first cell. A type
+name with a dash in it is shaped exactly like an id, so a table over
+`test-spec` reported its own header as a reference resolving to nothing.
+
+THE RULE ROW UNDERNEATH IS WHAT TELLS A HEADER FROM A DATA ROW. It is the only
+signal a markdown table offers, and it is the same one a reader uses.
+
+WHY IT STOOD SO LONG: the field beside it is bound the same way over `raid`,
+which has no dash and passes straight through. The two differ by a hyphen.
+
 ## Responsibility
 
 The trace graph, drawn radially. The vision sits at the centre. Every

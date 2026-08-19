@@ -47,6 +47,24 @@ correct, because the claim the state makes stopped being true.
 answered the notes pending when it walked. A register is answered as it
 stands.)
 
+## An empty source is an answer, and it says so
+
+A LIVE SOURCE THAT RESOLVES TO NOTHING LEAVES AN EMPTY TABLE, and an empty
+table is a COMPLETE answer. There is nothing to fill, so the state stands.
+No `none` line is owed here — that is the `refs` template's convention, where
+the writer chooses the list. Here the source chose it, and demanding a line
+would make the writer restate what the engine already knows.
+
+BUT AN EMPTY TABLE MUST NOT LOOK LIKE A BROKEN ONE. A field showing no rows
+and saying nothing reads as a form that failed to load, and the reader's next
+act is to go looking for the bug. So the field NAMES the source that came back
+empty, in its own line under the table: `no items — the live source
+$assumptions resolves to none`.
+
+The difference matters because both cases are silent otherwise. A source
+spelled wrong and a source with nothing in it render identically, and only one
+of them is fine.
+
 ## Every cell is required, and the prompt lives in the cell
 
 A node is minted with its columns carrying a MARKDOWN COMMENT saying what

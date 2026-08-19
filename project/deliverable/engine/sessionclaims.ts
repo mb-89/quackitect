@@ -11,6 +11,7 @@
 // see dsp-evidence-forms.md#does-a-standing-claim-still-pass-its-own-form
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { brandPath } from "./brand.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
 import { claimFeeders, downstreamCone, fallenChain, type MachineDecl, reopenStates, type StateDecl } from "./machine.ts";
@@ -261,7 +262,7 @@ export class Claims {
 
   brandName(): string {
     try {
-      const b = JSON.parse(readFileSync(join(this.host.machineRoot(), "project", "deliverable", "brand", "brand.json"), "utf8")) as {
+      const b = JSON.parse(readFileSync(brandPath(this.host.machineRoot()), "utf8")) as {
         name?: string;
       };
       return typeof b.name === "string" ? b.name : "se";
@@ -594,6 +595,18 @@ export class Claims {
    *  rides as the thumbs-up. The route never reads this. */
   recordPaint(decl: MachineDecl): string[] {
     return this.recordDone(decl, new Set(), Claims.newPass(), true);
+  }
+
+  /** THE THIRD KIND OF GREEN, for the drawing — see
+   *  dsp-mirror-render.md#one-decider-says-which-kind-of-green-it-is. A
+   *  law-proven state signed nothing: its claim IS its law, and a reader who
+   *  cannot tell it from a stamped one is reading the weaker of the two. */
+  lawProvenStates(decl: MachineDecl): string[] {
+    const it = this.host.declIteration(decl);
+    if (it === undefined) return [];
+    const traceRoot = this.host.traceRoot(it);
+    const corpus = loadTrace(traceRoot);
+    return [...this.lawProvenClaims(decl, it, corpus, corpusVersion(traceRoot), traceRoot)];
   }
 
   /** see dsp-walk-machine.md#the-gates-whose-claims-carry-a-bless */

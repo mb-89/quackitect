@@ -13,6 +13,19 @@ files:
   - "project/deliverable/engine/stateform-sheet.ts"
 ---
 
+## A live source that resolves to nothing says so
+
+req-an-empty-live-source-names-itself.
+
+A `$name` NOBODY RESOLVES already throws, and that is the typo case. The
+dangerous one is the source that resolves CORRECTLY and returns nothing: the
+field renders as a plain control with no offer, which reads exactly like a
+field somebody forgot to wire up.
+
+THE FIELD'S RESOLVED ARGUMENTS NOW CARRY WHICH DECLARED SOURCES CAME BACK
+EMPTY. A literal is not a live source, and a field declaring no source says
+nothing — silence about a source nobody declared is correct silence.
+
 ## Responsibility
 
 The form a state owes is derived from its declaration: fields, live

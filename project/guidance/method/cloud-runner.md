@@ -182,6 +182,18 @@ THE PIN IS IN `package.json` under `engines.node`, and the verify step reads
 it rather than carrying a copy. A syntax error deep in a spawned script almost
 always means the runtime is below the pin.
 
+### You do not know which build you are on
+
+ASK THE ENTRYPOINT AND IT ANSWERS:
+
+    node project/deliverable/engine/bin/se-mcp.ts --version
+
+IT PRINTS THE VERSION AND EXITS 0, and it does that before it resolves a root,
+so it answers on a checkout too broken to start. Pass a root that does not
+exist and it still answers. On an unattended machine this is the first fact
+worth having, because every later report is about SOME build and a report that
+does not say which one is hearsay.
+
 ### Another machine may be walking the same record
 
 NOTHING STOPS IT, AND NOTHING IS MEANT TO. There is no claim, no lock and no

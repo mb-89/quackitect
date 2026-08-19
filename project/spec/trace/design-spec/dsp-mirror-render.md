@@ -34,6 +34,24 @@ files:
   - "project/deliverable/engine/bin/place-prompt-layer.ts"
 ---
 
+## One decider says which kind of green it is
+
+req-the-panel-s-paint-says-which-kind-of-green-it-is.
+
+THREE RULES DECIDE WHAT A GREEN MEANS, and they were enforced by scattered
+cases in three test files, so nobody could say which of them were covered.
+
+- Green means SUBMITTED: a claim was stamped by whoever filled it.
+- Green plus the thumb means BLESSED: somebody ruled on it.
+- A LAW-PROVEN green is neither. No form was signed; a law passed.
+
+THE THIRD DID NOT PAINT AT ALL. A check that RAN and a claim somebody stamped
+were the same colour, which is the one distinction a reader most needs.
+
+SO THE PAINT BECOMES ONE FUNCTION of what is known about a state, returning a
+class and its marks. Suspect still beats every green, because a colour
+standing on moved ground is no longer earned.
+
 ## Responsibility
 
 The mirror serves what the engine holds — the machine drawing, the

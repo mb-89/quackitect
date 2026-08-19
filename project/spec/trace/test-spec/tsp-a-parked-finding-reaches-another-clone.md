@@ -7,6 +7,8 @@ method: "demonstration"
 demonstrates:
   - "sty-a-finding-outlives-the-box-that-found-it"
   - "sty-see-what-the-other-machine-may-pull-from"
+verifies:
+  - none — this spec demonstrates a story end to end; no requirement is verified through it
 files:
   - "none — the procedure below is the definition; the observed sessions are the evidence"
 ---

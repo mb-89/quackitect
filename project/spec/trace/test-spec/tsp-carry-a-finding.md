@@ -6,7 +6,8 @@ statement: An engineer meets a real defect that blocks nothing, records it as ow
 method: demonstration
 demonstrates:
   - sty-carry-a-finding-without-stopping
-verifies: []
+verifies:
+  - none — this spec demonstrates a story end to end; no requirement is verified through it
 files:
   - none — the procedure below is the definition; the observed session is the evidence
 ---

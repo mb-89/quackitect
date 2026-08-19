@@ -40,6 +40,12 @@ you have open. You open `project/`; a path you pass starts `project/`.
 
 Every call is logged raw to `.se/calls.jsonl`.
 
+THE RECORD CARRIES WHO ACTED. The acting role — a person, an agent, the
+surface itself — is stamped on the record where the call is SERVED, by the
+code that knows. Nothing downstream infers it from the tool name: a reader
+guessing the actor from which verb was called gets it wrong the moment one
+verb serves two callers, and it did.
+
 TWO DOORS LEAD OUTSIDE THE ROOT, and neither is a path. A past version of this
 repo is read at a committed ref — `se_file_read`, `se_file_search` and
 `se_file_glob` all take `ref`.

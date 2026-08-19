@@ -93,6 +93,22 @@ reads the switches each entry point parses out of its source, runs it with
 `--help`, and demands every one of them in the output:
 `project/deliverable/tests/help.test.ts`.
 
+## An installed program answers what it is, before it answers anything else
+
+`--version` PRINTS THE VERSION AND EXITS 0, and it does so BEFORE the program
+resolves a root, reads a config or opens a port. Everything a program needs in
+order to run is a thing that can be broken, and the question "which build is
+this" is exactly the question a person asks WHEN it is broken. A version flag
+that needs a working install answers only when nobody needed it.
+
+The flag comes first in the argument handling, ahead of `--help`, for the same
+reason: it is the cheapest possible answer and nothing may stand in front of
+it. It is listed in `--help` like every other switch.
+
+A DEMONSTRATION IS ONE COMMAND. That is the point of the rule — anybody with
+the checkout can run it, on a machine nobody is watching, and get back a fact
+rather than a promise.
+
 ## The linter law (P5, field-proven twice)
 
 Prose rules do not change agent behavior; refusals and tool-boundary

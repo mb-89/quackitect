@@ -100,6 +100,8 @@ export interface FieldArgs {
    *  every standing one is refined by a reference. Empty means no such duty. */
   covers: string;
   items: string[];
+  /** see dsp-evidence-forms.md#a-live-source-that-resolves-to-nothing-says-so */
+  empty_sources: string[];
   passing: string[];
   /** For `node-table`, the FRONTMATTER KEYS that become the editable columns.
    *  For `table`, the plain column headings. */
@@ -248,6 +250,7 @@ export const NO_ARGS: FieldArgs = {
   covers: "",
   options: [],
   items: [],
+  empty_sources: [],
   passing: [],
   columns: [],
   picks: {},
@@ -599,8 +602,14 @@ export function stateFormFields(s: StateDecl): FormTemplate {
  *  trace. Extracted from stateFormModel because it grew past what one function
  *  should hold, and because the pick resolution below is worth reading alone. */
 export function fieldArgsFor(f: EvidenceField, root: string, traceRoot: string, instanceRaw?: string, evidenceDir?: string): FieldArgs {
-  const resolved = (f.items ?? []).flatMap((i) => resolveSource(i, root, traceRoot, instanceRaw, evidenceDir));
+  // EACH SOURCE IS RESOLVED ON ITS OWN, so a source that came back with nothing
+  // can be named. Flattening first loses which of several was the empty one.
+  const perSource = (f.items ?? []).map((i) => [i, resolveSource(i, root, traceRoot, instanceRaw, evidenceDir)] as const);
+  const resolved = perSource.flatMap(([, got]) => got);
   return {
+    // A LITERAL IS NOT A LIVE SOURCE. `$` is reserved for the ones the corpus
+    // answers, so only those can be empty in the sense this field means.
+    empty_sources: perSource.filter(([i, got]) => i.startsWith("$") && got.length === 0).map(([i]) => i),
     of: f.of ?? "",
     covers: f.covers ?? "",
     options: f.options ?? [],

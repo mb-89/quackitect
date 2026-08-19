@@ -20,6 +20,21 @@ files:
   - "project/deliverable/engine/bin/se-manual.ts"
 ---
 
+## The entrypoint answers what it is, before it answers anything else
+
+req-the-entrypoint-answers-its-version-without-starting.
+
+`--version` prints `SE_VERSION` and exits, and it is answered BEFORE the root
+is resolved. The order is the design: a package is asked what it is on a
+machine where nothing is configured yet, so a check that needed a valid root
+would fail for a reason that has nothing to do with the question.
+
+ONE LINE, AND NOTHING ELSE ON IT. A release check compares a line. The version
+comes from the manifest through the one reader that already resolves it, so
+there is no second place for a stamp to drift.
+
+THE FLAG IS LISTED IN `--help`, because a proof nobody can find is not a proof.
+
 ## Responsibility
 
 Every agent act enters through one door. The door validates arguments

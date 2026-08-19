@@ -132,6 +132,8 @@ export function claimProblems(root: string, s: StateDecl, body: string, corpus: 
       of: f.of ?? "",
       covers: f.covers ?? "",
       options: f.options ?? [],
+      // A RE-CHECK RESOLVES NO LIVE SOURCE, so it can name none as empty.
+      empty_sources: [],
       rationale_for: f.rationale_for ?? [],
       column_help: f.column_help ?? [],
       // A LIVE-RESOLVING ARGUMENT CANNOT BE RE-CHECKED. `$inbox` expands to the
@@ -564,8 +566,17 @@ function refProblems(name: string, meta: TemplateMeta, args: FieldArgs, content:
   // dsm row is one element and its cluster, where a card's row is two items
   // and a verdict. `writes` is the tell, and a written value is not an
   // artifact to resolve.
-  const refs = answersInRows ? refsInRows(content, args.writes === "" ? 2 : 1) : refsIn(content);
+  // A NODE-TABLE'S ROW IS ONE NODE. Every cell after the first is that node's
+  // own frontmatter, written back rather than resolved — so a register whose
+  // columns hold ids (a design spec's elements) had them read as references of
+  // the wrong type.
+  const nodeTable = meta.editor === "node-table";
+  const refs = answersInRows ? refsInRows(content, nodeTable ? 1 : args.writes === "" ? 2 : 1) : refsIn(content);
   if (refs.length === 0) {
+    // AN EMPTY REGISTER IS AN ANSWER. The rows come from a live source, so a
+    // table with none is the source saying there are none — the field's author
+    // has no line to write and nothing to say `none` about.
+    if (nodeTable && args.items.length === 0) return [];
     return /^\s*-\s*none\b/im.test(content) ? [] : [`${name}: no references — one artifact id per line, or one line saying none`];
   }
   const byId = new Map(corpus.map((n) => [n.id, n]));

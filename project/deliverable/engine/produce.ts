@@ -23,6 +23,7 @@ import { randomBytes } from "node:crypto";
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, relative, resolve, sep } from "node:path";
 import { withActBound } from "./actbound.ts";
+import { BRAND_PARTS } from "./brand.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { SE_VERSION } from "./version.ts";
 
@@ -34,7 +35,7 @@ import { SE_VERSION } from "./version.ts";
  *  its own repository from scratch now, so the guard is belt and braces rather
  *  than load-bearing — it stays because the failure it prevents is silent and
  *  the check is one line. */
-const EXCLUDE_DIRS = new Set([
+export const EXCLUDE_DIRS = new Set([
   ".git",
   ".worktrees",
   ".se",
@@ -99,7 +100,7 @@ export function travels(root: string, src: string): boolean {
   return true;
 }
 
-const BRAND = join("project", "deliverable", "brand", "brand.json");
+const BRAND = join(...BRAND_PARTS);
 const README_TEMPLATE = join("project", "deliverable", "brand", "README.entry.md");
 const UPSTREAM = join("project", "deliverable", "vendor", "upstream", "upstream.json");
 const SPEC = join("project", "spec");

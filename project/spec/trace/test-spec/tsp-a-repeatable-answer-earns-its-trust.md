@@ -6,7 +6,8 @@ statement: An engineer re-runs the agent's own search and gets the same rows bac
 method: demonstration
 demonstrates:
   - sty-trust-a-repeatable-answer
-verifies: []
+verifies:
+  - none — this spec demonstrates a story end to end; no requirement is verified through it
 files:
   - none — the procedure below is the definition; the observed run is the evidence
 ---

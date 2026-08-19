@@ -4,6 +4,7 @@ id: dsp-the-outside-boundaries-and-their-bounds
 type: "[[design-spec]]"
 statement: every crossing where the product meets something it does not own is a node carrying its own argued bound, and the matrix knows a neighbour is a legal end
 realizes:
+  - "el-walk-engine"
   - "if-agent-harness-to-entrypoint"
   - "if-engineer-to-mirror"
   - "if-vscode-to-mirror"
@@ -20,6 +21,20 @@ files:
   - "project/deliverable/engine/trace.ts"
   - "project/deliverable/engine/elematrix.ts"
 ---
+
+## The element this design lands in
+
+IT REALIZED ONLY INTERFACES, and the design-spec register refuses a spec that
+names no element — every spec has to say which box its design lives in.
+
+THE ANSWER IS THE WALK ENGINE, and the spec's own `files` already said so
+before this edge did. `elematrix.ts` computes the matrix, and the matrix is
+checked when an evidence form is submitted. That check runs in the walk engine
+and nowhere else.
+
+WHAT THE EDGE DOES NOT CLAIM. The interface NODES are corpus, not code, and
+the item template beside them is method. Naming the walk engine says where the
+knowledge is USED, which is what a realizes edge has always meant.
 
 ## The concern
 

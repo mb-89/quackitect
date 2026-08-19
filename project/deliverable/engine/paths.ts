@@ -2,6 +2,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { actBoundTree } from "./actbound.ts";
+import { BRAND_PARTS } from "./brand.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 
 /** Directories the lane never serves or lists. */
@@ -28,7 +29,7 @@ export type DeclaredRoot = { path: string; writable: boolean };
  *  IDENTITY, NEVER AN ADDRESS. A vehicle records the identity of the engine it
  *  came from, and every tree states its own. Comparing identities survives
  *  either tree being moved, copied or renamed, which comparing paths does not. */
-const BRAND_FILE = ["project", "deliverable", "brand", "brand.json"] as const;
+const BRAND_FILE = BRAND_PARTS;
 const UPSTREAM_FILE = ["project", "deliverable", "vendor", "upstream", "upstream.json"] as const;
 
 /** Read an `id` out of one of those files. Absent is a real answer; unreadable

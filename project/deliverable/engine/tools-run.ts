@@ -496,6 +496,7 @@ export function runTools(
               new CallLog(seDir(projectRoot)).append({
                 tool: "se_test_verdict",
                 args: { job: id, battery, question: args.question },
+                actor: "ui",
                 ok: value.ok === true,
                 outcome: "result",
                 duration_ms: Date.now() - entry.started,
@@ -518,6 +519,7 @@ export function runTools(
               new CallLog(seDir(projectRoot)).append({
                 tool: "se_test_verdict",
                 args: { job: id, battery, question: args.question },
+                actor: "ui",
                 ok: false,
                 outcome: "rejected",
                 duration_ms: Date.now() - entry.started,

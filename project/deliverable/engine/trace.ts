@@ -704,8 +704,15 @@ export function refsIn(text: string): string[] {
 /** see dsp-radial-layout.md#the-references-a-table-row-carries */
 export function refsInRows(text: string, columns = 2): string[] {
   const out: string[] = [];
-  for (const line of text.split(/\r?\n/)) {
+  const lines = text.split(/\r?\n/);
+  // A HEADER ROW NAMES COLUMNS, NEVER NODES. Its first cell is the row's TYPE,
+  // and a type name carrying a dash is shaped exactly like an id — so a bound
+  // table over `test-spec` reported its own header as a reference resolving to
+  // nothing. The rule row underneath is what tells a header from a data row.
+  const isRule = (l: string | undefined): boolean => l !== undefined && /^\s*\|(?:\s*:?-{3,}:?\s*\|)+\s*$/.test(l);
+  for (const [i, line] of lines.entries()) {
     if (!/^\s*\|/.test(line)) continue;
+    if (isRule(lines[i + 1])) continue;
     const cells = line.split("|").slice(1, -1);
     for (const cell of cells.slice(0, columns)) {
       const id = refId(cell.trim());
