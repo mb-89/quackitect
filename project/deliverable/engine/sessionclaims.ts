@@ -1317,6 +1317,43 @@ export class Claims {
     }
   }
 
+  /** WHY A SIGNED FEEDER IS STILL NOT AN INPUT — the root, with its own reason.
+   *
+   *  MEASURED ON THE i15 WALK: sweep-consistency refused with "unsigned
+   *  feeders: run-demos" while run-demos was signed, complete and correct. The
+   *  break was FOUR STATES UPSTREAM at trace-design, whose coverage claim had
+   *  stopped standing the moment an engine file was added with no design-spec.
+   *  The engine already knew that, in those words, and computed it on the same
+   *  pass.
+   *
+   *  THE ANSWER NAMED THE NEAREST LINK AND WAS USELESS. A reader sent to a
+   *  state that is signed, complete and correct concludes the check is broken -
+   *  which is what happened, and it cost the walk its endgame plus a note
+   *  filed against a defect that does not exist.
+   *
+   *  SO THE REFUSAL WALKS BACK. A feeder that is itself signed and complete is
+   *  never the fault; something it depends on is, and the walk back ends at the
+   *  first state that can say why. */
+  feederFault(fm: MachineDecl, state: StateDecl): { state: string; why: string[] } | undefined {
+    return walkBackToFault(
+      state.id,
+      (id) => {
+        const st = fm.states.find((x) => x.id === id);
+        return st === undefined ? [] : this.feedersUnsigned(fm, st);
+      },
+      (id) => {
+        try {
+          const f = this.stateFormGet(id, fm) as { signed?: boolean; met?: boolean; problems?: string[] };
+          return { ok: f.signed === true && f.met === true, why: f.problems ?? [] };
+        } catch {
+          // A state with no form of its own cannot say it is fine, so the walk
+          // back stops on it — which is right: it is as far as anything can see.
+          return { ok: false, why: [] };
+        }
+      },
+    );
+  }
+
   feedersUnsigned(fm: MachineDecl, state: StateDecl): string[] {
     const REQUIRED = new Set(["normal", "approval"]);
     // see dsp-walk-machine.md#a-placeholder-that-runs-a-submachine-is-an-input
@@ -1520,14 +1557,29 @@ export class Claims {
       const m = this.host.currentMachine();
       const gs = m.states.find((x) => x.id === stateId);
       const feeders = gs === undefined ? [] : this.feedersUnsigned(m, gs);
-      if (feeders.length > 0) {
+      if (feeders.length > 0 && gs !== undefined) {
+        // A SIGNED FEEDER IS NOT THE FAULT — see feederFault. The walk back is
+        // computed only where a refusal is already being built, so it costs
+        // nothing on the passing path.
+        const root = this.feederFault(m, gs);
+        const upstream =
+          root === undefined
+            ? ""
+            : ` — the break is upstream at ${root.state}${root.why.length > 0 ? `: ${root.why.join(" · ")}` : ", whose form is not signed"}`;
         out.push({
           kind: "unsigned_feeder",
           states: feeders,
           clause: CLAUSES.CONDITION_UNMET,
           expected: `a state requires ALL its inputs — every feeder form signed before ${stateId} passes`,
-          got: `unsigned feeders: ${feeders.join(", ")}`,
-          remedy: { tool: "se_pull", args: {}, note: "walk the named states and submit their forms; this one passes after" },
+          got: `unsigned feeders: ${feeders.join(", ")}${upstream}`,
+          remedy: {
+            tool: "se_pull",
+            args: {},
+            note:
+              root === undefined
+                ? "walk the named states and submit their forms; this one passes after"
+                : `go to ${root.state} and fix what it names — the feeder above it is already signed, so re-signing it changes nothing`,
+          },
           source: "engine/session.ts stateform",
         });
       }
@@ -1742,4 +1794,36 @@ export class Claims {
     const fields = { ...island.fields, inputs_checked: island.checked.join("\n") };
     return { ingested: name, author, ...this.stateFormSave(name, fields, author, m) };
   }
+}
+
+/** THE WALK BACK ALONG UNSIGNED INPUTS, to the first state that can say why.
+ *
+ *  Kept free of the machine so it can be driven over a chain several hops
+ *  long. The engine binding sits on Claims.feederFault; the shape it guards
+ *  cannot be built out of a freshly seeded fixture, where every chain is one
+ *  hop and the nearest link IS the root.
+ *
+ *  @param start        the state that refused
+ *  @param feedersOf    its unsigned inputs, and theirs
+ *  @param soundnessOf  whether a state can say it is fine, and why not
+ */
+export function walkBackToFault(
+  start: string,
+  feedersOf: (id: string) => string[],
+  soundnessOf: (id: string) => { ok: boolean; why: string[] },
+  seen: Set<string> = new Set(),
+): { state: string; why: string[] } | undefined {
+  if (seen.has(start)) return undefined; // a cycle in the drawing says nothing
+  seen.add(start);
+  for (const id of feedersOf(start)) {
+    const s = soundnessOf(id);
+    // NOT SOUND MEANS THIS IS AS FAR BACK AS ANYTHING CAN SEE. Its own reason
+    // is the answer the reader came for.
+    if (!s.ok) return { state: id, why: s.why };
+    // SOUND MEANS IT IS NOT THE FAULT. Something it depends on is, and naming
+    // it instead sends the reader to a state with nothing wrong with it.
+    const deeper = walkBackToFault(id, feedersOf, soundnessOf, seen);
+    if (deeper !== undefined) return deeper;
+  }
+  return undefined;
 }

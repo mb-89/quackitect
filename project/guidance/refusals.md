@@ -514,3 +514,39 @@ silence and paste, never honesty.
 ### SE-C-125 — a wall of prose
 Long prose carries line breaks. Paragraphs are the author's job — no
 renderer can invent them.
+
+## The same refusal, three times over
+
+A refusal carries a clause, what was expected, what it got, and an executable
+remedy. That is enough to recover in one turn WHEN THE READER TAKES IT.
+
+A reader who does not take it gets the identical answer again. From inside,
+the third identical answer looks exactly like the first, so nothing about the
+answer itself says a loop has started.
+
+SO THE ANSWER NOW COUNTS ITSELF. From the third identical refusal on — same
+tool, same clause, nothing that succeeded in between — the refusal carries a
+`repeated` block naming the count and saying the remedy is not landing.
+
+- AT THREE it points you past the remedy line to the CLAUSE. The clause says
+  what the engine wanted; the gap between that and what you sent is the thing
+  to change.
+- AT FIVE it stops advising another attempt. Say plainly what you were trying
+  to do and what stands in the way. No answer could unblock you? That is an
+  escape. An answer would? Ask where you stand and wait.
+
+A CALL THAT GETS THROUGH CLEARS IT. The memory is one slot deep on purpose:
+what matters is a refusal repeating BACK TO BACK, and a clause hit twice an
+hour apart is not a loop.
+
+A STATE GATE IS THE COMMON CASE, and it never opens by retrying. The tool is
+not legal where you stand, no argument to it changes that, and the state holds
+that job deliberately. Do the work the state names, or capture it with
+`se_note` and keep walking.
+
+MEASURED ON THE i15 WALK: `se_file_move` was refused 27 times with SE-C-110,
+the whole burst inside NINE SECONDS. The two guards that exist measure
+something else — the toll counts silence, the stall guard counts updates since
+anything closed — and both were satisfied throughout. The walk was narrating
+and the walk was busy. It was busy asking one question that had already been
+answered.

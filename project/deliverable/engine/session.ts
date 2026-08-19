@@ -3183,13 +3183,29 @@ export class Session {
           source: "engine/session.ts stateform",
         });
       }
-      const feeders = this.claims.feedersUnsigned(fm, this.claims.stateFormState(name, fm));
+      const hereState = this.claims.stateFormState(name, fm);
+      const feeders = this.claims.feedersUnsigned(fm, hereState);
       if (feeders.length > 0) {
+        // A SIGNED FEEDER IS NOT THE FAULT — see Claims.feederFault. Named
+        // alone, a feeder that is signed, complete and correct sends the
+        // reader to a state with nothing wrong with it.
+        const root = this.claims.feederFault(fm, hereState);
+        const upstream =
+          root === undefined
+            ? ""
+            : ` — the break is upstream at ${root.state}${root.why.length > 0 ? `: ${root.why.join(" · ")}` : ", whose form is not signed"}`;
         throw new Rejection({
           clause: CLAUSES.CONDITION_UNMET,
           expected: `a state requires ALL its inputs — every feeder form signed before ${name} may stamp`,
-          got: `unsigned feeders: ${feeders.join(", ")}`,
-          remedy: { tool: "se_pull", args: {}, note: "walk the named states and submit their forms; this one stamps after" },
+          got: `unsigned feeders: ${feeders.join(", ")}${upstream}`,
+          remedy: {
+            tool: "se_pull",
+            args: {},
+            note:
+              root === undefined
+                ? "walk the named states and submit their forms; this one stamps after"
+                : `go to ${root.state} and fix what it names — the feeder above it is already signed, so re-signing it changes nothing`,
+          },
           source: "engine/session.ts stateform",
         });
       }
