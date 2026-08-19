@@ -229,3 +229,4 @@ the slider is the person alone.
 THE BRANCH IS claude/training-iterations-research-9kq6g2. The owner offered
 v3 or a dedicated branch and left the choice open. The designated branch is
 the dedicated one and the work stays there.
+

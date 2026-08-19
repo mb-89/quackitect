@@ -31,6 +31,13 @@ priority: must
   MEASURED LIVE 2026-08-17: the stop-at control declined a press and said nothing, and the owner reported it as a broken button. engine/mirror.ts lines 756 to 762 record two earlier victims of the identical silence, the emergency rung and the shutdown row, which is the third sighting of one failure shape.
   AND THE DENOMINATOR ARRIVES WITH IT. i12's criterion above asks for a SHARE of surface requests, and until interfaces are modelled as nodes there is no list to take that share over. Milestone one of i33 supplies it, so both criteria become checkable rather than only this one being new.
 
+- THE MACHINE CARRIES MORE OF THE WEIGHT OVER TIME, and that is a claim anyone can now fail. A weaker model on a newer machine reaches a result that used to need a stronger one.
+  Metric: the paired delta in lane calls for one archived iteration re-walked across two machine versions, at the same model and effort. Target: falling, machine version over machine version.
+  Metric: the weakest model that completes a re-walk of a given archived iteration without a refusal loop. Target: weakening, machine version over machine version.
+  Metric: benchmark runs whose report omits its conditions — the iteration, the rewind commit, the matrix hash, the se version, the model, the effort. Target: zero.
+  Added by i37. Every criterion above this one measures a thing that should FALL toward zero. This one measures whether the falling is real, because until now nothing compared two machine versions on the same work. THE OWNER'S FRAMING, 2026-08-19: "does a weak model with an improved machine work similarly to an old model with the old machine? If we improve the system, can we use weaker and weaker models to do the same work?"
+  WHAT IT DELIBERATELY DOES NOT CLAIM. A benchmark measures process overhead and never production behaviour, because the agent is told the output is discarded. That limit is carried by raid-asm-an-agent-told-its-work-is-discarded-still-walks-the-machine-the-same-way rather than left to be discovered.
+
 ## Unlike
 
 Requirements-management suites, which hold the input-quality corner for human authors and expect the human to do the writing. The difference is that the method is carried by the agent, and the person is left the one job a person is better at.

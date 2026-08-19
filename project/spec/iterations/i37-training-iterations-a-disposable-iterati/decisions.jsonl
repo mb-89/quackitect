@@ -4,3 +4,29 @@
 {"ts":"2026-08-19T16:42:19.061Z","op":"done","visit":"iterations/i37/onboard-retro@0","node":"d3","brief":"onboard-retro filled from the survey and the call log"}
 {"ts":"2026-08-19T16:43:58.693Z","op":"update","visit":"iterations/i37/gate-kickoff@0","node":"d6","brief":"reading the major column cell by cell before proposing the size"}
 {"ts":"2026-08-19T16:45:21.407Z","op":"done","visit":"iterations/i37/onboard-retro@0","node":"d4","brief":"kickoff proposes major with nothing struck and blesses under the grant"}
+{"ts":"2026-08-19T16:45:49.313Z","op":"plan","visit":"iterations/i37/gate-kickoff@0","parent":null,"nodes":[{"id":"d7","brief":"aim at draft-vision and walk M1"},{"id":"d8","brief":"commit and push the kickoff"}]}
+{"ts":"2026-08-19T16:46:00.215Z","op":"update","visit":"iterations/i37/draft-vision@0","node":"d9","brief":"committing the kickoff bless and the pin"}
+{"ts":"2026-08-19T16:47:01.082Z","op":"update","visit":"iterations/i37/draft-vision@0","node":"d10","brief":"reading the resident vision so draft-vision can inherit rather than re-derive"}
+{"ts":"2026-08-19T16:47:14.404Z","op":"update","visit":"iterations/i37/draft-vision@0","node":"d11","brief":"locating the resident vision packet to inherit from"}
+{"ts":"2026-08-19T16:47:24.143Z","op":"update","visit":"iterations/i37/draft-vision@0","node":"d12","brief":"reading the most recent resident vision to inherit its shape"}
+{"ts":"2026-08-19T16:48:26.202Z","op":"done","visit":"iterations/i37/gate-kickoff@0","node":"d7","brief":"draft-vision inherits the resident idea and rules four conflicts"}
+{"ts":"2026-08-19T16:50:16.329Z","op":"plan","visit":"iterations/i37/define-actual@0","parent":null,"nodes":[{"id":"d13","brief":"fill define-actual with measured witnesses"},{"id":"d14","brief":"walk log-risks and frame-delta"},{"id":"d15","brief":"reach gate-motivation"}]}
+{"ts":"2026-08-19T16:50:47.065Z","op":"update","visit":"iterations/i37/log-risks@0","node":"d16","brief":"reading the raid template before minting register entries"}
+{"ts":"2026-08-19T16:51:08.227Z","op":"update","visit":"iterations/i37/log-risks@0","node":"d17","brief":"reading an existing raid node to match its exact shape"}
+{"ts":"2026-08-19T16:51:35.430Z","op":"update","visit":"iterations/i37/log-risks@0","node":"d18","brief":"reading the damage scale vocabulary"}
+{"ts":"2026-08-19T16:54:21.369Z","op":"plan","visit":"iterations/i37/frame-delta@0","parent":null,"nodes":[{"id":"d19","brief":"author the new success criterion on vp-rigor-without-toil"},{"id":"d20","brief":"fill frame-delta"},{"id":"d21","brief":"walk scope-non-goals and pressure-test to gate-motivation"}]}
+{"ts":"2026-08-19T16:54:39.741Z","op":"update","visit":"iterations/i37/frame-delta@0","node":"d22","brief":"authoring the new criterion on rigor-without-toil"}
+{"ts":"2026-08-19T16:55:21.930Z","op":"done","visit":"iterations/i37/define-actual@0","node":"d13","brief":"frame-delta positions the gap against the scanned field"}
+{"ts":"2026-08-19T16:56:21.964Z","op":"update","visit":"iterations/i37/scope-non-goals@0","node":"d23","brief":"scope drawn as five pieces with twelve non-goals"}
+{"ts":"2026-08-19T16:57:32.772Z","op":"done","visit":"iterations/i37/define-actual@0","node":"d14","brief":"pressure-test held the framing and folded three findings"}
+{"ts":"2026-08-19T16:57:55.447Z","op":"update","visit":"iterations/i37/gate-motivation@0","node":"d24","brief":"folding the bias direction into the honesty assumption"}
+{"ts":"2026-08-19T16:59:34.525Z","op":"done","visit":"iterations/i37/define-actual@0","node":"d15","brief":"gate-motivation blessed with the fatal assumption named as dissent"}
+{"ts":"2026-08-19T17:00:25.424Z","op":"update","visit":"iterations/i37/gate-motivation@0","node":"d25","brief":"resubmitting goals_served with the item strings matched exactly"}
+{"ts":"2026-08-19T17:01:25.613Z","op":"update","visit":"iterations/i37/gate-motivation@0","node":"d26","brief":"the read proof is not crediting; reading how it matches"}
+{"ts":"2026-08-19T17:02:48.365Z","op":"update","visit":"iterations/i37/draw-context@0","node":"d27","brief":"capturing the read-proof word-count mismatch as a drag finding"}
+{"ts":"2026-08-19T17:03:02.227Z","op":"update","visit":"iterations/i37/draw-context@0","node":"d28","brief":"listing existing neighbour nodes before minting"}
+{"ts":"2026-08-19T17:03:50.191Z","op":"done","visit":"iterations/i37/frame-delta@0","node":"d19","brief":"draw-context claims the boundary does not move"}
+{"ts":"2026-08-19T17:04:18.205Z","op":"plan","visit":"iterations/i37/map-stakeholders@0","parent":null,"nodes":[{"id":"d29","brief":"carry the weak-model goal into the story and the use case"},{"id":"d30","brief":"walk map-stakeholders and write-stories"},{"id":"d31","brief":"reach gate-inputs"}]}
+{"ts":"2026-08-19T17:04:39.425Z","op":"obsolete","visit":"iterations/i37/map-stakeholders@0","node":"d29","brief":"the weak-model input was sent to another agent; removing it from the record"}
+{"ts":"2026-08-19T17:05:37.506Z","op":"update","visit":"iterations/i37/map-stakeholders@0","node":"d32","brief":"listing the resident stakeholder set for the tailored map"}
+{"ts":"2026-08-19T17:06:19.582Z","op":"done","visit":"iterations/i37/frame-delta@0","node":"d20","brief":"the stakeholder set is unchanged and the argument is recorded"}
