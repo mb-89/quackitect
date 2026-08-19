@@ -69,3 +69,30 @@
 {"ts":"2026-08-19T17:50:01.150Z","op":"update","visit":"iterations/i37/enumerate-space/find_by_heuristic@0","node":"d73","brief":"reading the heuristics catalogue"}
 {"ts":"2026-08-19T17:50:33.288Z","op":"update","visit":"iterations/i37/enumerate-space/find_by_heuristic@0","node":"d74","brief":"sweeping the heuristics catalogue against the cluster"}
 {"ts":"2026-08-19T17:52:56.730Z","op":"update","visit":"iterations/i37/enumerate-space/find_by_transforming@0","node":"d75","brief":"twelve transformations swept; the prove-the-guard idea is the best of the sub-machine"}
+{"ts":"2026-08-19T17:58:26.262Z","op":"done","visit":"iterations/i37/gate-kickoff@0","node":"d8","brief":"the machine and host git both commit; the kickoff landed long ago"}
+{"ts":"2026-08-19T17:58:26.442Z","op":"done","visit":"iterations/i37/map-stakeholders@0","node":"d31","brief":"gate-inputs was reached and blessed"}
+{"ts":"2026-08-19T17:58:26.626Z","op":"done","visit":"iterations/i37/identify-assumptions@0","node":"d47","brief":"three environment assumptions were opened"}
+{"ts":"2026-08-19T17:58:26.789Z","op":"done","visit":"iterations/i37/identify-assumptions@0","node":"d48","brief":"all six sources were swept"}
+{"ts":"2026-08-19T17:58:26.963Z","op":"done","visit":"iterations/i37/identify-assumptions@0","node":"d49","brief":"two probes ran and the rest are recorded"}
+{"ts":"2026-08-19T17:58:27.115Z","op":"done","visit":"iterations/i37/derive-criteria@0","node":"d57","brief":"derive-criteria is signed"}
+{"ts":"2026-08-19T17:58:27.287Z","op":"done","visit":"iterations/i37/enumerate-space/find_prior_art@0","node":"d62","brief":"six prior-art options are minted"}
+{"ts":"2026-08-19T17:58:51.336Z","op":"plan","visit":"iterations/i37/enumerate-space/build_chart@0","parent":null,"nodes":[{"id":"d76","brief":"place option 1"},{"id":"d77","brief":"place option 2"},{"id":"d78","brief":"place option 3"},{"id":"d79","brief":"place option 4"},{"id":"d80","brief":"place option 5"},{"id":"d81","brief":"place option 6"},{"id":"d82","brief":"place option 7"},{"id":"d83","brief":"place option 8"},{"id":"d84","brief":"place option 9"},{"id":"d85","brief":"place option 10"},{"id":"d86","brief":"place option 11"},{"id":"d87","brief":"place option 12"},{"id":"d88","brief":"place option 13"},{"id":"d89","brief":"place option 14"},{"id":"d90","brief":"place option 15"},{"id":"d91","brief":"place option 16"},{"id":"d92","brief":"place option 17"},{"id":"d93","brief":"place option 18"}]}
+{"ts":"2026-08-19T17:58:51.491Z","op":"done","visit":"iterations/i37/enumerate-space/find_prior_art@0","node":"d63","brief":"placed into the row: how the past state is made to stand up"}
+{"ts":"2026-08-19T17:58:51.638Z","op":"done","visit":"iterations/i37/enumerate-space/find_prior_art@0","node":"d64","brief":"placed into the row: how the past state is made to stand up"}
+{"ts":"2026-08-19T17:58:51.805Z","op":"done","visit":"iterations/i37/enumerate-space/find_contradiction@0","node":"d67","brief":"placed into the row: how earlier results are kept from anchoring a run"}
+{"ts":"2026-08-19T17:58:51.946Z","op":"done","visit":"iterations/i37/enumerate-space/find_contradiction@0","node":"d68","brief":"placed into the row: how earlier results are kept from anchoring a run"}
+{"ts":"2026-08-19T17:58:52.118Z","op":"done","visit":"iterations/i37/enumerate-space/find_contradiction@0","node":"d69","brief":"placed into the row: how a run decides which iteration to walk"}
+{"ts":"2026-08-19T17:58:52.277Z","op":"done","visit":"iterations/i37/enumerate-space/build_chart@0","node":"d76","brief":"placed into the row: how a run decides which iteration to walk"}
+{"ts":"2026-08-19T17:58:52.424Z","op":"done","visit":"iterations/i37/enumerate-space/build_chart@0","node":"d77","brief":"placed into the row: how a run decides which iteration to walk"}
+{"ts":"2026-08-19T17:58:52.574Z","op":"done","visit":"iterations/i37/enumerate-space/build_chart@0","node":"d78","brief":"placed into the row: how an incomplete run is treated"}
+{"ts":"2026-08-19T17:58:52.721Z","op":"done","visit":"iterations/i37/enumerate-space/build_chart@0","node":"d79","brief":"placed into the row: how an incomplete run is treated"}
+{"ts":"2026-08-19T17:58:52.877Z","op":"done","visit":"iterations/i37/enumerate-space/build_chart@0","node":"d80","brief":"placed into the row: how a result carries the conditions it was taken u"}
+{"ts":"2026-08-19T17:58:53.020Z","op":"done","visit":"iterations/i37/enumerate-space/build_chart@0","node":"d81","brief":"placed into the row: how a result carries the conditions it was taken u"}
+{"ts":"2026-08-19T17:58:53.169Z","op":"done","visit":"iterations/i37/enumerate-space/build_chart@0","node":"d82","brief":"placed into the row: how a result carries the conditions it was taken u"}
+{"ts":"2026-08-19T17:58:53.316Z","op":"done","visit":"iterations/i37/enumerate-space/build_chart@0","node":"d83","brief":"placed into the row: how two results are made comparable"}
+{"ts":"2026-08-19T17:58:53.460Z","op":"done","visit":"iterations/i37/enumerate-space/build_chart@0","node":"d84","brief":"placed into the row: how two results are made comparable"}
+{"ts":"2026-08-19T17:58:53.603Z","op":"done","visit":"iterations/i37/enumerate-space/build_chart@0","node":"d85","brief":"placed into the row: how two results are made comparable"}
+{"ts":"2026-08-19T17:58:53.746Z","op":"done","visit":"iterations/i37/enumerate-space/build_chart@0","node":"d86","brief":"placed into the row: how the observer effect is handled"}
+{"ts":"2026-08-19T17:58:53.893Z","op":"done","visit":"iterations/i37/enumerate-space/build_chart@0","node":"d87","brief":"placed into the row: how a run is triggered"}
+{"ts":"2026-08-19T17:58:54.032Z","op":"done","visit":"iterations/i37/enumerate-space/build_chart@0","node":"d88","brief":"placed into the row: how the measuring apparatus relates to an ordinary"}
+{"ts":"2026-08-19T18:00:13.445Z","op":"plan","visit":"iterations/i37/enumerate-space/build_chart@0","parent":null,"nodes":[{"id":"d94","brief":"draw three candidates across the box"},{"id":"d95","brief":"converge and leave enumerate-space"}]}

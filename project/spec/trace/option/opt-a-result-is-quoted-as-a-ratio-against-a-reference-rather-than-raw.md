@@ -2,6 +2,8 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: opt-a-result-is-quoted-as-a-ratio-against-a-reference-rather-than-raw
 type: "[[option]]"
+cluster: cluster-the-benchmark-run
+question: how two results are made comparable
 found_by: prior-art
 statement: "Numbers are published relative to a named reference run rather than in absolute units, so results survive being taken on different machines."
 source: "ref-agent-benchmark-harnesses-2026 \u2014 SPEC CPU reference machine and ratios; RECALLED rather than fetched"

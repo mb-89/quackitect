@@ -2,6 +2,8 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: opt-the-agent-is-told-and-the-claim-is-narrowed-to-match
 type: "[[option]]"
+cluster: cluster-the-benchmark-run
+question: how the observer effect is handled
 found_by: contradiction
 statement: "Rather than hiding the nature of a measurement from the thing being measured, the measurement states plainly what it can and cannot support."
 source: "separation in SYSTEM LEVEL \u2014 the contradiction moves off the mechanism and onto the claim the result makes"

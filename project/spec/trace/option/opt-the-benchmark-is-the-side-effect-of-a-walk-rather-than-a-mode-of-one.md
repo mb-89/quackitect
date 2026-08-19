@@ -2,6 +2,8 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: opt-the-benchmark-is-the-side-effect-of-a-walk-rather-than-a-mode-of-one
 type: "[[option]]"
+cluster: cluster-the-benchmark-run
+question: how the measuring apparatus relates to an ordinary walk
 found_by: transform
 statement: "Any walk can be told it is being measured, and the measuring apparatus is the same for a benchmark and for real work, so nothing is a special mode."
 source: "SIT \u2014 Unification, applied to the whole cluster: give the existing walk the new job rather than building a second kind of walk"

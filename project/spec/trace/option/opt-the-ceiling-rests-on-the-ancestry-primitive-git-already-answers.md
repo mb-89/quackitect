@@ -2,6 +2,8 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: opt-the-ceiling-rests-on-the-ancestry-primitive-git-already-answers
 type: "[[option]]"
+cluster: cluster-the-benchmark-run
+question: how the walked iteration's future is put out of reach
 found_by: probe
 statement: "The boundary test is delegated to the version control system's own ancestry answer rather than reimplemented, so it is exact by construction."
 source: "PROBE run 2026-08-19 \u2014 git merge-base --is-ancestor against the i33 rewind point, both directions"

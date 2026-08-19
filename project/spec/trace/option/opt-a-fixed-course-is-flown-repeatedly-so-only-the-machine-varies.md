@@ -2,6 +2,8 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: opt-a-fixed-course-is-flown-repeatedly-so-only-the-machine-varies
 type: "[[option]]"
+cluster: cluster-the-benchmark-run
+question: how two results are made comparable
 found_by: analogy
 statement: "The same course is run again and again with everything held constant except the thing under test, so a difference in the result can only come from that thing."
 source: "ANALOGY \u2014 a test track or a standard flight profile, where the route is fixed precisely so vehicles can be compared"

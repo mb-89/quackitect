@@ -2,6 +2,8 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: opt-a-run-carries-a-deliberately-broken-guard-to-prove-the-guard-is-watching
 type: "[[option]]"
+cluster: cluster-the-benchmark-run
+question: how a run proves its own guard held
 found_by: transform
 statement: "One request that must be refused is issued on purpose during every run, and a run whose forbidden request succeeded is discarded rather than reported."
 source: "SCAMPER \u2014 Reverse, applied to the ceiling: instead of asking whether the guard held, make the run prove it by trying something that must fail"

@@ -2,6 +2,8 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: opt-the-report-is-written-as-the-walk-goes-rather-than-at-the-end
 type: "[[option]]"
+cluster: cluster-the-benchmark-run
+question: how an incomplete run is treated
 found_by: transform
 statement: "Each state's cost is recorded as that state completes, so a run that never reaches its end still leaves everything it measured."
 source: "SCAMPER \u2014 Rearrange, applied to filling the report: move the writing from after the walk to during it"

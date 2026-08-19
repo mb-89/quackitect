@@ -2,6 +2,8 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: opt-a-run-that-cannot-establish-its-own-ceiling-refuses-to-start
 type: "[[option]]"
+cluster: cluster-the-benchmark-run
+question: how the walked iteration's future is put out of reach
 found_by: heuristic
 statement: "The safe outcome is the default at every point where the guard cannot answer, including before the run begins rather than only during it."
 source: "HEURISTIC \u2014 the default should be the safe thing"

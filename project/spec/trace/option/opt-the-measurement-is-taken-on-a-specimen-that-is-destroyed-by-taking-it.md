@@ -2,6 +2,8 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: opt-the-measurement-is-taken-on-a-specimen-that-is-destroyed-by-taking-it
 type: "[[option]]"
+cluster: cluster-the-benchmark-run
+question: how the past state is made to stand up
 found_by: analogy
 statement: "The thing measured is consumed by the measurement, so it is always a copy and never the original, and the copy is made from a specification rather than kept in stock."
 source: "ANALOGY \u2014 destructive materials testing, where a coupon is machined from the same batch and broken to learn about the batch"
