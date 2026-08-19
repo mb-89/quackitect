@@ -106,3 +106,47 @@ which reach a masked path through git itself.
 TWO THINGS ARE STILL OWED. How a training iteration is NAMED is parked for a
 conversation of its own. Whether the results ledger is committed is the one
 place the not-committed ruling needs a word.
+
+## Owner rulings, 2026-08-19 — the second round
+
+THE RIGOR MATRIX MOVING IS NOT A COST. The machine is a VARIABLE in this
+experiment, not a constant. The question is whether a weaker model on an
+improved machine does the same work as a stronger model on the old machine.
+So the measurement is a GRID whose axes are the model, the machine version,
+the size and the scenario. Comparing across matrix versions is the point.
+
+TWO CONSTRAINTS FALL OUT, and both bind the scenario pool.
+
+- A scenario never encodes the machine's shape. No expected form answers, no
+  step lists, no state names. A subject, a delta, a size range and a sandbox.
+  Anything else lets a matrix edit invalidate the pool, and the pool is the
+  one thing that has to survive.
+- The sandbox's red-to-green is matrix-independent too. The tests belong to
+  the fake package, never to the walk.
+
+THE RESULTS LEDGER IS REPLACED BY A REPORT TEMPLATE. No raw measurement dump
+in version control. A benchmark run fills a template like the rest of the
+corpus, and the filled report is committed.
+
+THE MACHINERY COSTS NO ENGINE CHANGE. engine/vocabulary.ts scans
+machines/items/ with readdirSync, so a new item template is discovered by
+being written. Its own comment states the rule, citing
+req-a-check-binds-without-engine-code.
+
+THE PRECEDENT IS THE EXPERIMENT NODE. machines/items/experiment.md already
+says of a spike that the run is throwaway and the record is not. A benchmark
+run is the same shape.
+
+SO ADD ONE ITEM TEMPLATE, benchmark-run, at project/spec/benchmarks with the
+bench- prefix. One report is one cell of the grid, over at least three runs.
+
+THE REPORT IS HIDDEN FROM THE AGENT DURING A TRAINING WALK, or the agent
+reads the last run's numbers and works toward them.
+
+SO THE MASK IS CONDITIONAL, NOT STATIC. EXCLUDED_DIRS hides a folder always.
+This one hides the benchmarks folder only while a training walk is bound. A
+normal iteration must still read its own benchmark history. One mask, two
+customers: the scenario source and the reports.
+
+ONE THING IS STILL OWED. How a training iteration is NAMED is parked for a
+conversation of its own.

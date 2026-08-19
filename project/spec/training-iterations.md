@@ -184,11 +184,11 @@ corpus as well would blind the walk to the machine it runs on.
   way to keep a scenario's answers out of reach.
 - AN ARCHIVED ITERATION IS A SILHOUETTE, NOT A SCRIPT. Take its size, its
   step count and its evidence-field profile. Author the subject fresh.
-- TWO COSTS REMAIN EVEN WITH A PERFECT MASK, and neither is about trust.
-  - The rigor matrix moved. An archived iteration answered a column that no
-    longer compiles the same way, so today's forms ask different questions.
-  - The code half. A real iteration edited the real engine. A training walk
-    must not, so the sandbox package is needed either way.
+- ONE COST REMAINS EVEN WITH A PERFECT MASK, and it is not about trust. A
+  real iteration edited the real engine. A training walk must not, so the
+  sandbox package is needed either way.
+- THE RIGOR MATRIX MOVING IS NOT A COST (owner ruling 2026-08-19). The
+  machine is a variable here, not a constant. See "the grid" below.
 - ONCE THE CONTENT IS MASKED AND THE CODE IS SANDBOXED, what is left of the
   archived iteration IS a scenario. The two designs meet.
 
@@ -213,21 +213,80 @@ that same folder. Sharing it would eat iteration numbers and inflate every
 count the front desk reads. The separation is what makes "does not count"
 true rather than merely claimed.
 
-## The results ledger
+## The grid
 
-THE RECORD IS DISPOSABLE. THE MEASUREMENT IS NOT.
+THE QUESTION IS NOT "HOW FAST" (owner ruling 2026-08-19). It is this:
 
-ONE LINE PER RUN. `.se/` is machine-local and a cloud box is reclaimed, so a
-result living only in the call log did not happen.
+> Does a weaker model on an improved machine do the same work as a stronger
+> model on the old machine?
 
-THIS IS THE ONE PLACE THE NOT-COMMITTED RULING NEEDS THE OWNER'S WORD. A
-ledger line carries no iteration content — only a seed, a size, a scenario
-name and numbers. Committing it is what lets two boxes be compared next
-month. Not committing it means every result dies with its box.
+SO THE MEASUREMENT IS A GRID, never a stopwatch. Each cell is one
+combination.
 
-EVERY LINE STAMPS ITS CONDITIONS.
+- the MODEL, and its reasoning effort
+- the MACHINE version, which is the rigor matrix hash plus the se version
+- the SIZE, which is the change-size column
+- the SCENARIO, and the pool version
+
+THE MACHINE IS AN AXIS, NOT NOISE. A moved rigor matrix is a new column in
+the grid. Comparing ACROSS matrix versions is the experiment, not a threat
+to it.
+
+TWO CONSTRAINTS FALL OUT OF THAT, and both bind the pool.
+
+- A SCENARIO NEVER ENCODES THE MACHINE'S SHAPE. No expected form answers, no
+  step lists, no state names. A subject, a delta, a size range and a sandbox.
+  Anything else makes a matrix edit invalidate the pool, and the pool is the
+  one thing that has to survive.
+- THE SANDBOX'S RED-TO-GREEN IS MATRIX-INDEPENDENT TOO. The tests belong to
+  the fake package, never to the walk.
+
+THE GOAL IS A DIRECTION, not a number. A machine improvement is real when a
+weaker model reaches a cell the older machine needed a stronger model for.
+
+## The benchmark report
+
+OWNER RULING, 2026-08-19: no raw measurement dump in version control. A
+benchmark run fills a TEMPLATE, exactly as the rest of the corpus does, and
+the filled report is what is committed.
+
+THE MACHINERY IS ALREADY THERE AND COSTS NO ENGINE CHANGE. `engine/vocabulary.ts`
+scans `project/deliverable/machines/items/` with `readdirSync`, so a new item
+template is discovered by being written. Its own comment states the rule:
+"A vocabulary declared in `machines/items/<type>.md` costs one edit to that
+file and no engine change, which is the whole point."
+(`req-a-check-binds-without-engine-code`.)
+
+THE PRECEDENT IS THE EXPERIMENT NODE. `machines/items/experiment.md` says of
+a spike: "A STANDING ARTIFACT: the run is throwaway, the record is not." A
+benchmark run is the same shape. The walk is thrown away. The report is not.
+
+SO A NEW ITEM TEMPLATE, `benchmark-run`.
+
+- `folder: project/spec/benchmarks`
+- `id_prefix: bench-`
+- `checks` carry the vocabularies: the size column, the verdict, the harness.
+- A skeleton with fill comments, like every other item.
+
+ONE REPORT IS ONE CELL OF THE GRID, over at least three runs.
+
+THE REPORT IS HIDDEN FROM THE AGENT DURING A TRAINING WALK. Otherwise the
+agent reads the last run's numbers and works toward them, which is the
+Goodhart failure with a concrete leak and a concrete fix.
+
+THE MASK IS THEREFORE CONDITIONAL, not static. `EXCLUDED_DIRS` hides a folder
+always. This one hides `project/spec/benchmarks/` only while a training walk
+is bound, and shows it everywhere else — a normal iteration must be able to
+read its own benchmark history.
+
+ONE MASK, TWO CUSTOMERS. The scenario source and the benchmark reports want
+the same mechanism. That is the argument for building it properly rather than
+as a special case.
+
+EVERY REPORT STAMPS ITS CONDITIONS.
 
 - the training id, the seed, the size, the scenario, the pool version
+- the model and its reasoning effort
 - the rigor matrix hash and the se version
 - the harness, the model and the reasoning effort
 - wall clock, total and per state
@@ -282,4 +341,3 @@ would measure a machine nobody runs.
 - THE NAMED TRAINING ITERATION. The owner has parked this for a conversation
   of its own. How a training iteration is named, and whether a name can be
   handed to another machine, is not settled here.
-- THE LEDGER'S COMMIT STATUS. See the ledger section above.
