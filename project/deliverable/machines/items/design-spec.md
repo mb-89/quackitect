@@ -49,7 +49,7 @@ THE FILES ARE REALIZATION, NOT TRACE. `files:` names the code this
 design lands in, root-relative. The engine's sweep checks the seam
 mechanically and OUTSIDE the graph, at trace-design:
 
-- every design spec names files that exist
+- every design spec names files that exist BY THE END OF THE RECORD THAT AUTHORED IT. A planned name is legal while the spec is being written, which is test-first's sibling and what the engine actually enforces (`planned names included`). What a name may not do is survive the record unrealised. This sentence read "names files that exist" flatly until 2026-08-19 and contradicted the paragraph below it.
 - every deliverable code file is claimed by at least one spec — the
   unclaimed list is the dead-code view
 

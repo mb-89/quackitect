@@ -7,7 +7,7 @@ statement: Four demonstration specs went unobserved at i3's verification - each 
 owner: the owner
 trigger: the consolidation pass that collects everything needing a person, or any iteration whose delta actually touches one of the four specs
 status: open
-looked: 2026-08-18
+looked: 2026-08-19
 breaks_how_badly: abrasive
 how_likely: expected
 impact: Verification refuses while any claim box stands open, so four specs nobody at a terminal can observe stop every iteration from closing. The alternative is checking boxes on unobserved claims, which is worse.
@@ -111,3 +111,18 @@ WHOEVER RUNS THE CONSOLIDATION SHOULD MERGE THE TWO rather than repay them
 separately. They are one backlog seen from two dates.
 
 The trigger stands unchanged.
+
+## Swept 2026-08-19, at i9's onboard-retro: RESCHEDULED, TRIGGER HALF-FIRED
+
+THE CARRIER IT WAS WAITING FOR NOW EXISTS. The trigger names a consolidation
+pass collecting everything that needs a person. The work-token pool is built
+and person-facing: `engine/pool.ts` line 255 serves standing tokens, and
+`engine/survey.ts` line 68 reads them into the survey a person sees.
+
+STILL UNOBSERVED, and the owner's re-acceptance of 2026-08-15 still governs.
+
+THE POOL WAS EMPTY UNTIL TODAY. This retro minted its first tokens, so the
+consolidation is now possible rather than merely imagined.
+
+TRIGGER RE-AFFIRMED for its other half: any iteration whose delta touches one
+of the four specs.

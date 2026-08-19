@@ -489,6 +489,24 @@ holding that line. A note is written mid-walk by whoever noticed something and
 may carry anything — a path, a name, a customer. An option lands on trunk,
 where SE-C-002 means it can never be taken off again.
 
+THERE IS A SECOND BRANCH AND THE SIX-WORD RULE DOES NOT DESCRIBE IT (added
+2026-08-19, after it fired three times unexpectedly in one retro). A DISTINCTIVE
+SINGLE WORD carried over is refused on its own, because an address, a path or a
+name is one word and one word is enough to leak.
+
+THREE THAT FIRED, each alone and each with no run around it: `reachability`,
+`implementation`, `documentation`. None is secret and that is the point — the
+guard cannot tell a rare technical word from a rare private one, so it refuses
+both and asks you to say it differently.
+
+WHAT THIS MEANS WHEN YOU WRITE ONE. Do not paraphrase the note sentence by
+sentence. Put the note down, say what the thing IS in your own vocabulary, and
+expect an unusual word you kept to bounce.
+
+AND TELL A SUBAGENT THIS IF IT DRAFTS ONE FOR YOU. A reader that has just read
+the note writes in the note's words without meaning to. Eight statements were
+refused and rewritten in one retro for exactly that.
+
 THE REFUSAL QUOTES THE OVERLAP BACK, so the fix is one edit rather than a
 guess at which sentence was recognised.
 

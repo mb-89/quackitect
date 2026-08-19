@@ -101,6 +101,14 @@ DEFAULT TO NODE. The engine runs on it, so it cannot be missing on any host
 the lane runs on. PowerShell is there on Windows and bash on POSIX. Python is
 usually there and is not guaranteed; reach for it when it earns the bet.
 
+WHERE PYTHON EARNS IT, RUN IT THROUGH `uv`. On this machine a bare `python`
+is not the interpreter you want; `uv run python ...` is. That applies to the
+heredoc above as much as to a script file.
+
+THIS IS MACHINE-SPECIFIC AND IT IS WRITTEN DOWN ANYWAY. It lived in an
+assistant memory until 2026-08-19, where the next session could not see it,
+and the repo is the memory.
+
 THE SCRIPT PRINTS WHAT YOU NEED, so nothing has to be piped. A script that
 answers "how many and which" prints the count and the list itself. That is why
 the truncating-pipe refusal never bites this loop.

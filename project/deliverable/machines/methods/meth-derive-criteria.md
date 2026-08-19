@@ -7,6 +7,15 @@ statement: "Deriving the decision criteria: the criteria list is never typed. It
 
 Guidance for M4 derive-criteria. This is the one card the step draws from.
 
+AN AGENT MAY WRITE THE ORDER DIRECTLY (owner ruling 2026-08-18). The pairwise
+feed exists because a person cannot hold twenty rows in their head at once. An
+agent can, and walking pairs to reach an order it already holds is a tax rather
+than a method.
+
+EVERY POSITION STILL CARRIES ITS REASON. What is dropped is the pairwise WALK,
+never the argument behind each place. An order with no reasons is a preference
+wearing a method's clothes.
+
 The step runs after gate-requirements and before any candidate exists. That
 order is deliberate. Weights fixed before the options are known cannot be
 tuned to make a favourite win.

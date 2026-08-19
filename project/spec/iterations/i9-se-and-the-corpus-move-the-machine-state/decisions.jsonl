@@ -1,0 +1,119 @@
+{"ts":"2026-08-19T10:39:36.223Z","op":"plan","visit":"iterations/i9/onboard-retro@0","parent":null,"nodes":[{"id":"d3","brief":"mark the log window boundary"},{"id":"d4","brief":"ask the owner for field feedback"},{"id":"d5","brief":"drain the 45 pending notes to zero"},{"id":"d6","brief":"walk the backlog work tokens"},{"id":"d7","brief":"sweep the register for debts"},{"id":"d8","brief":"drain the assistant memory"},{"id":"d9","brief":"hunt wasted effort"},{"id":"d10","brief":"mine the call log and test timings"},{"id":"d11","brief":"tabulate i16's milestone steps"},{"id":"d12","brief":"tally the last retro's improvements"},{"id":"d13","brief":"check the contract rule by rule"},{"id":"d14","brief":"emit improvements to durable homes"}]}
+{"ts":"2026-08-19T10:39:59.411Z","op":"done","visit":"iterations/i9/onboard-retro@0","node":"d3","brief":"window opens 2026-08-18T08:34:20.373Z, 5608 calls in it"}
+{"ts":"2026-08-19T10:41:37.598Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d15","brief":"reader subagent: reading nine inbox notes before checking each against the code"}
+{"ts":"2026-08-19T10:41:42.363Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d16","brief":"reading the nine assigned inbox notes in full"}
+{"ts":"2026-08-19T10:41:46.271Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d17","brief":"reading the nine inbox notes to propose dispositions"}
+{"ts":"2026-08-19T10:41:46.570Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d18","brief":"reading the remaining five assigned notes"}
+{"ts":"2026-08-19T10:41:47.499Z","op":"done","visit":"iterations/i9/onboard-retro@0","node":"d4","brief":"owner reports no field feedback for this window"}
+{"ts":"2026-08-19T10:41:50.012Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d19","brief":"reader checking nine pending notes against the code before disposition"}
+{"ts":"2026-08-19T10:41:50.623Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d20","brief":"reading note bodies for the nine-note batch"}
+{"ts":"2026-08-19T10:41:50.915Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d21","brief":"reading the last two assigned notes, then checking each claim against the code"}
+{"ts":"2026-08-19T10:41:54.877Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d22","brief":"reading the last four notes in the batch"}
+{"ts":"2026-08-19T10:41:55.167Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d23","brief":"checking note-07e04fe7fc28: is a typed morph-box refused now"}
+{"ts":"2026-08-19T10:41:55.235Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d24","brief":"checking the nine inbox notes against the code before proposing dispositions"}
+{"ts":"2026-08-19T10:42:03.663Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d25","brief":"note-761dbf2a236c: checking whether the copy-to-vehicle rename landed"}
+{"ts":"2026-08-19T10:42:04.628Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d26","brief":"checking each note's claim against the current code"}
+{"ts":"2026-08-19T10:42:05.183Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d27","brief":"note-7432b8a852f6: recounting worktree references in engine and corpus"}
+{"ts":"2026-08-19T10:42:05.799Z","op":"done","visit":"iterations/i9/onboard-retro@0","node":"d6","brief":"the work-token pool is empty, nothing to migrate"}
+{"ts":"2026-08-19T10:42:07.539Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d28","brief":"hunting the typed-morph-box guard in the engine"}
+{"ts":"2026-08-19T10:42:11.586Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d29","brief":"checking each note's claim against the repo"}
+{"ts":"2026-08-19T10:42:13.927Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d30","brief":"checking whether the battery exit script now backgrounds"}
+{"ts":"2026-08-19T10:42:16.523Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d31","brief":"note-761dbf2a236c: isolating the old ids from the new ones"}
+{"ts":"2026-08-19T10:42:18.413Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d32","brief":"note-7432b8a852f6: scoping the worktree count to the engine tree"}
+{"ts":"2026-08-19T10:42:20.077Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d33","brief":"reading the drawing epoch bump sites for the redraw note"}
+{"ts":"2026-08-19T10:42:23.699Z","op":"plan","visit":"iterations/i9/onboard-retro@0","parent":"d5","nodes":[{"id":"d34","brief":"targeted checks: inversion card"},{"id":"d35","brief":"prior-art back-check"},{"id":"d36","brief":"test-assertion rule"}]}
+{"ts":"2026-08-19T10:42:28.834Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d37","brief":"reading chartPlan to see if an omitted row still deletes a node"}
+{"ts":"2026-08-19T10:42:32.861Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d38","brief":"note-761dbf2a236c: reading the surviving old-id lines"}
+{"ts":"2026-08-19T10:42:33.426Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d39","brief":"note-7432b8a852f6: checking whether engine/worktree.ts still exists"}
+{"ts":"2026-08-19T10:42:34.324Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d40","brief":"reading compile cache stamping and the kickoff row's bless clause"}
+{"ts":"2026-08-19T10:42:37.885Z","op":"done","visit":"iterations/i9/onboard-retro@0","node":"d34","brief":"no inversion method card exists; only TRIZ principle 13 and SCAMPER's reverse"}
+{"ts":"2026-08-19T10:42:38.422Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d41","brief":"chartPlan still deletes omitted rows; checking for a typed-input guard"}
+{"ts":"2026-08-19T10:42:40.615Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d42","brief":"checking evaluate-set for a mechanical prior-art source"}
+{"ts":"2026-08-19T10:42:44.972Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d43","brief":"reading record-adrs row for a back-end prior-art study step"}
+{"ts":"2026-08-19T10:42:46.034Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d44","brief":"reading chartProblems for a picks-resolve check"}
+{"ts":"2026-08-19T10:42:49.599Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d45","brief":"reading chartProblems in full"}
+{"ts":"2026-08-19T10:42:49.733Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d46","brief":"checking for an engine-side enforcement of the 4/5 prior-art rule"}
+{"ts":"2026-08-19T10:42:52.059Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d47","brief":"note-aef5ec741f2b: reading the design-spec item template for the contradiction"}
+{"ts":"2026-08-19T10:42:52.805Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d48","brief":"reading the writing-tests section for the refusal-assertion rule"}
+{"ts":"2026-08-19T10:42:54.005Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d49","brief":"note-c1c3a1142cb1: looking for callers of drivenBy and inventory"}
+{"ts":"2026-08-19T10:42:54.814Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d50","brief":"listing milestone rows to check for a requirement-obsolescence step"}
+{"ts":"2026-08-19T10:42:57.966Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d51","brief":"checking morph box scoping and derive-criteria's pairwise guidance"}
+{"ts":"2026-08-19T10:43:03.239Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d52","brief":"checking write-requirements for a standing-requirement sweep field"}
+{"ts":"2026-08-19T10:43:04.901Z","op":"done","visit":"iterations/i9/onboard-retro@0","node":"d35","brief":"record-adrs row carries no back-end prior-art study; the note's ask is unbuilt"}
+{"ts":"2026-08-19T10:43:06.243Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d53","brief":"checking derive-criteria for an agent-direct-sort clause"}
+{"ts":"2026-08-19T10:43:06.498Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d54","brief":"note-db6817fd0aa0: looking for redaction in the call-log path"}
+{"ts":"2026-08-19T10:43:07.953Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d55","brief":"note-8aae512f9e01: hunting the product-name count test"}
+{"ts":"2026-08-19T10:43:11.189Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d56","brief":"reading sessionscript.ts to see whether the exit script blocks the pull"}
+{"ts":"2026-08-19T10:43:13.704Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d57","brief":"checking whether i16 added a function for an arriving update"}
+{"ts":"2026-08-19T10:43:13.855Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d58","brief":"owner wants ISO 25010 groups as a requirements checklist at the gate"}
+{"ts":"2026-08-19T10:43:16.309Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d59","brief":"note-db6817fd0aa0 and 06447fed3f9a: reading the register issue and the churn test"}
+{"ts":"2026-08-19T10:43:16.788Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d60","brief":"confirming the roots test fix versus the missing guidance rule"}
+{"ts":"2026-08-19T10:43:17.181Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d61","brief":"confirming the pull awaits the condition script"}
+{"ts":"2026-08-19T10:43:17.897Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d62","brief":"note-8aae512f9e01: finding citers of the one-fact product-name requirement"}
+{"ts":"2026-08-19T10:43:21.649Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d63","brief":"confirming take-an-update exists and covers the note's gap"}
+{"ts":"2026-08-19T10:43:25.938Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d64","brief":"locating the morph box row derivation for the corpus-scope note"}
+{"ts":"2026-08-19T10:43:36.596Z","op":"done","visit":"iterations/i9/onboard-retro@0","node":"d36","brief":"roots test fixed at tests/roots.test.ts:155-171; the guidance rule is absent"}
+{"ts":"2026-08-19T10:43:37.120Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d65","brief":"reading fieldBox to confirm the chart is corpus-wide, not iteration-scoped"}
+{"ts":"2026-08-19T10:43:44.556Z","op":"fork","visit":"iterations/i9/onboard-retro@0","parent":"d5","node":"d66","brief":"check nine pending notes against the code before they are dispositioned","nodes":[]}
+{"ts":"2026-08-19T10:43:46.160Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d67","brief":"checking whether the duplicate option pair was pruned at i16"}
+{"ts":"2026-08-19T10:43:46.962Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d68","brief":"checking the backlog pool and act-one home for the last three notes"}
+{"ts":"2026-08-19T10:43:50.755Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d69","brief":"note-8a5e4959bbba: hunting a guard against skipping a claimful state"}
+{"ts":"2026-08-19T10:43:54.629Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d70","brief":"reading cut-criteria's act-one guidance for the function-tie filter"}
+{"ts":"2026-08-19T10:43:57.555Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d71","brief":"note-8a5e4959bbba: locating the raw completeState error"}
+{"ts":"2026-08-19T10:43:58.521Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d72","brief":"checking se_run's shell pick and any probe/scratch-repo affordance"}
+{"ts":"2026-08-19T10:44:01.750Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d73","brief":"cut-criteria has no function-based tie filter; checking the backlog pool next"}
+{"ts":"2026-08-19T10:44:06.108Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d74","brief":"reading the nine quality nodes to author the lookup list"}
+{"ts":"2026-08-19T10:44:07.086Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d75","brief":"surveying open records and tokens for the three research-capture notes"}
+{"ts":"2026-08-19T10:44:11.562Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d76","brief":"reading i17's record to see whether it already owns the options-pool note"}
+{"ts":"2026-08-19T10:44:15.685Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d77","brief":"final checks: the AI-echo source rule and the PDF fetch refusal"}
+{"ts":"2026-08-19T10:44:24.650Z","op":"done","visit":"iterations/i9/onboard-retro@0","node":"d66","brief":"all nine notes checked against the repo; dispositions ready to report"}
+{"ts":"2026-08-19T10:44:24.667Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d78","brief":"tracing how the tick gets its compiled machine, for the redraw note"}
+{"ts":"2026-08-19T10:44:32.765Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d79","brief":"reading leaves() to close the router-vs-tick question"}
+{"ts":"2026-08-19T10:44:39.987Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d80","brief":"confirming the sub-machine decl is frozen at entry"}
+{"ts":"2026-08-19T10:44:40.542Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d81","brief":"confirming whether a references system stands, for the research-graph note"}
+{"ts":"2026-08-19T10:44:44.552Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d82","brief":"locating where the sub-machine stack is pushed"}
+{"ts":"2026-08-19T10:45:01.780Z","op":"fork","visit":"iterations/i9/onboard-retro@0","parent":"d5","node":"d83","brief":"the ISO 25010 checklist the owner asked for at the requirements gate","nodes":[{"id":"d84","brief":"list the nine groups in the quality story"},{"id":"d85","brief":"add the ISO sweep as a set question at write-requirements"},{"id":"d86","brief":"make the requirements gate adjudicate the sweep"}]}
+{"ts":"2026-08-19T10:45:17.911Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d87","brief":"checking the quality-scenarios method card before I write the list"}
+{"ts":"2026-08-19T10:45:21.927Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d88","brief":"final check: is any checker reading the prior_art column"}
+{"ts":"2026-08-19T10:45:26.308Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d89","brief":"citing the voice guidance line the README lint now contradicts"}
+{"ts":"2026-08-19T10:45:34.482Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d90","brief":"last check: did the inversion research land as a reference note"}
+{"ts":"2026-08-19T10:46:14.819Z","op":"done","visit":"iterations/i9/onboard-retro@0","node":"d84","brief":"the nine groups now stand in full on the story's third slide"}
+{"ts":"2026-08-19T10:46:26.008Z","op":"done","visit":"iterations/i9/onboard-retro@0","node":"d85","brief":"quality_groups_swept is the eighth set question at write-requirements"}
+{"ts":"2026-08-19T10:47:02.318Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d91","brief":"landing the carried edits before the drain records them as carried"}
+{"ts":"2026-08-19T10:48:54.778Z","op":"done","visit":"iterations/i9/onboard-retro@0","node":"d86","brief":"the requirements gate now adjudicates the sweep rather than re-asking it"}
+{"ts":"2026-08-19T10:49:32.877Z","op":"done","visit":"iterations/i9/onboard-retro@0","node":"d83","brief":"the ISO sweep now lands at write-requirements and is ruled on at the gate"}
+{"ts":"2026-08-19T10:50:28.981Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d92","brief":"landing the two memory entries that belong in the repo"}
+{"ts":"2026-08-19T10:51:05.303Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d93","brief":"recording the owner's gate instruction where a resumed session will read it"}
+{"ts":"2026-08-19T10:51:34.105Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d94","brief":"the inversion card the owner ruled for, grounded in the case that produced it"}
+{"ts":"2026-08-19T10:51:46.191Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d95","brief":"resolving the design-spec contradiction about whether a named file must exist"}
+{"ts":"2026-08-19T10:52:08.401Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d96","brief":"the design-spec contradiction is resolved to keep both halves true"}
+{"ts":"2026-08-19T10:52:48.231Z","op":"done","visit":"iterations/i9/onboard-retro@0","node":"d8","brief":"memory judged, and the two entries that belonged in the repo have landed"}
+{"ts":"2026-08-19T10:53:57.933Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d97","brief":"fifteen notes drained, thirty to go"}
+{"ts":"2026-08-19T10:54:06.948Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d98","brief":"mining the five kept research files for unused mechanisms"}
+{"ts":"2026-08-19T10:55:51.381Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d99","brief":"checking the repo for each mined mechanism before reporting it"}
+{"ts":"2026-08-19T10:56:28.075Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d100","brief":"thirty-two notes drained, thirteen left in the inbox"}
+{"ts":"2026-08-19T10:57:19.831Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d101","brief":"rewriting three statements the pool refused for echoing their notes"}
+{"ts":"2026-08-19T10:58:36.700Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d102","brief":"writing the dated look onto the ten debts that carry a looked field"}
+{"ts":"2026-08-19T10:59:11.446Z","op":"done","visit":"iterations/i9/onboard-retro@0","node":"d7","brief":"all thirteen debts carry a dated look, one repaid and one repaid by cutting"}
+{"ts":"2026-08-19T10:59:22.475Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d103","brief":"counting the window by tool, by refusal and by failure"}
+{"ts":"2026-08-19T10:59:41.886Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d104","brief":"which verbs the 248 failures landed on"}
+{"ts":"2026-08-19T11:00:22.101Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d105","brief":"sweeping the forbidden words out of the strings the engine serves"}
+{"ts":"2026-08-19T11:01:29.755Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d106","brief":"the mining result written down so the second reading is not lost either"}
+{"ts":"2026-08-19T11:01:40.456Z","op":"done","visit":"iterations/i9/onboard-retro@0","node":"d5","brief":"the inbox stands at zero, forty-five notes dispositioned"}
+{"ts":"2026-08-19T11:01:45.616Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d107","brief":"reading what the previous retro promised, to tally it"}
+{"ts":"2026-08-19T11:04:25.219Z","op":"done","visit":"iterations/i9/onboard-retro@0","node":"d12","brief":"the previous retro's three fixes all hold, and one of its claims does not"}
+{"ts":"2026-08-19T11:04:52.919Z","op":"done","visit":"iterations/i9/onboard-retro@0","node":"d13","brief":"the contract walked rule by rule, and rule eight's breach now has a mechanical check"}
+{"ts":"2026-08-19T11:05:00.931Z","op":"done","visit":"iterations/i9/onboard-retro@0","node":"d9","brief":"five waste leads recorded, the largest being subagent narration on the parent checklist"}
+{"ts":"2026-08-19T11:05:21.294Z","op":"done","visit":"iterations/i9/onboard-retro@0","node":"d10","brief":"the window is mined and its numbers are in the form"}
+{"ts":"2026-08-19T11:05:42.486Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d108","brief":"documenting the refusal branch that fired unexpectedly three times"}
+{"ts":"2026-08-19T11:06:52.233Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d109","brief":"re-projecting the prompt layer after six guidance edits"}
+{"ts":"2026-08-19T11:07:01.008Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d110","brief":"re-projecting the prompt layer after six guidance edits"}
+{"ts":"2026-08-19T11:07:29.950Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d111","brief":"granting the retro the verb that repairs what only the retro breaks"}
+{"ts":"2026-08-19T11:08:15.026Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d112","brief":"pointing the contract at the subagents card so somebody finds it"}
+{"ts":"2026-08-19T11:08:31.153Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d113","brief":"final battery over the last two edits"}
+{"ts":"2026-08-19T11:09:15.590Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d114","brief":"granting the retro the three verbs its own method card asks for"}
+{"ts":"2026-08-19T11:10:41.601Z","op":"update","visit":"iterations/i9/onboard-retro@0","node":"d115","brief":"the last field written, holding what the other boxes had no room for"}
+{"ts":"2026-08-19T11:12:19.991Z","op":"done","visit":"iterations/i9/onboard-retro@0","node":"d11","brief":"the fifty-two step table is written into the form whole rather than summarised"}
+{"ts":"2026-08-19T11:12:56.054Z","op":"done","visit":"iterations/i9/onboard-retro@0","node":"d14","brief":"every improvement is landed in a durable home and the form is signed"}
+{"ts":"2026-08-19T11:18:41.274Z","op":"update","visit":"iterations/i9/gate-kickoff@0","node":"d116","brief":"submitting the kickoff gate with the choice and its reason on one line"}
+{"ts":"2026-08-19T11:22:52.634Z","op":"update","visit":"iterations/i9/gate-kickoff@0","node":"d117","brief":"kickoff blessed at minor, walking on into the design milestone"}

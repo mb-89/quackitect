@@ -7,7 +7,7 @@ statement: observe-red asks every non-test spec in the corpus for a red observat
 owner: the owner
 trigger: the next iteration that reaches observe-red, which is every iteration
 status: open
-looked: 2026-08-18
+looked: 2026-08-19
 breaks_how_badly: abrasive
 how_likely: expected
 impact: observe-red refuses while any box stands open. i35 minted 2 demonstration specs and met a checklist of 15, so 13 belonged to other records and none of them had a red for THIS delta to observe. The alternative is ticking boxes on reds nobody watched, which is worse — so the walk stops until each one is either fabricated or owed.
@@ -65,3 +65,16 @@ engine already computes for the CLAIMS checklist one milestone later, and it
 still has no second call site at observe-red.
 
 The trigger stands unchanged.
+
+## Swept 2026-08-19, at i9's onboard-retro: RESCHEDULED
+
+NOTHING BUILT. `machines/rigor_matrix/rows/M7_30_observe-red.md` lines 22 to 26
+still declare their items with no owed rule, and the guidance section has none.
+The resolver behind them lists the whole corpus, unfiltered.
+
+THE SIBLING RULE EXISTS ONE MILESTONE LATER, at `M7_50_verification.md` lines
+78 to 92. So the mechanism this repayment calls "already computed" has exactly
+one call site, and it is not this one.
+
+TRIGGER RE-AFFIRMED, and it fires on the next iteration that reaches the step,
+which is every iteration.

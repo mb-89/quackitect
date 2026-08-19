@@ -1,8 +1,8 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from project/guidance/contract.md b538e8ccc81e
+     from project/guidance/contract.md 7987f2f45156
      from project/guidance/walking.md 8d2cebb9bd5a
-     from project/guidance/method/lane.md ce95ebe5aacb
-     from project/guidance/voice.md 0b6faf79ff32
+     from project/guidance/method/lane.md b31fd8a4ed68
+     from project/guidance/voice.md 5d2f97858f4b
 -->
 
 # contract — the binding rules of the session
@@ -207,6 +207,14 @@ and the conflict surfaced only because a walk hit the state.
 
 THE CONTRACT OVERRIDES DEFAULTS — the first line of this file says so. This
 rule is where that override is written down for subagents and for research.
+
+HOW TO SPAWN ONE WELL is `guidance/method/subagents.md`. It carries three
+things this rule does not: which model each subagent gets, what an interrupt
+does to one running in the background, and what its narration costs you.
+
+PASS THE LANE RULE TO EVERY SUBAGENT YOU SPAWN. One that does not know about
+the cage reaches for its native tools, finds them blocked, and reports that it
+could not read anything.
 
 ## 12. Walk, do not ruminate
 
@@ -581,6 +589,14 @@ DEFAULT TO NODE. The engine runs on it, so it cannot be missing on any host
 the lane runs on. PowerShell is there on Windows and bash on POSIX. Python is
 usually there and is not guaranteed; reach for it when it earns the bet.
 
+WHERE PYTHON EARNS IT, RUN IT THROUGH `uv`. On this machine a bare `python`
+is not the interpreter you want; `uv run python ...` is. That applies to the
+heredoc above as much as to a script file.
+
+THIS IS MACHINE-SPECIFIC AND IT IS WRITTEN DOWN ANYWAY. It lived in an
+assistant memory until 2026-08-19, where the next session could not see it,
+and the repo is the memory.
+
 THE SCRIPT PRINTS WHAT YOU NEED, so nothing has to be piped. A script that
 answers "how many and which" prints the count and the list itself. That is why
 the truncating-pipe refusal never bites this loop.
@@ -772,6 +788,13 @@ So the list is the rule's memory: the specific words that got through. A rule wi
 - WHERE THE ORIGINAL IS OUT OF REACH, say so in the citation. "Reported by X,
   primary not seen" is honest and useful. A second-hand citation dressed as a
   primary one is not.
+- A PAGE THAT NAMES NO PRIMARY OF ITS OWN IS A LEAD, NEVER EVIDENCE. The chain
+  has to end somewhere a person wrote from knowledge. Where it simply stops, a
+  reader cannot tell an unreached primary from an absent one.
+- PREFER THE PUBLISHER TO THE SUMMARISER. A standards body, a journal, or a
+  vendor's own documentation for its own product. Web research can return prose
+  echoing our own house style, and generated prose is confident and sourceless
+  in exactly the shape a summary takes.
 - AN ASSERTION ABOUT THE SYSTEM IS CHECKABLE, so check it rather than citing
   it. A remedy naming a tool argument, a link to a file, a claim that a state
   exists — the repo answers in milliseconds. Where the check is cheap, run it.
@@ -829,4 +852,5 @@ So the list is the rule's memory: the specific words that got through. A rule wi
   - The README and anything a stranger reads FIRST use plain language only.
   - A method term (suspect, bless, cone, gate) may appear where its definition is one click away, in the book's termrefs. Never bare in the front door.
   - The i17 red-team and the i19 cold-read both caught exactly this.
-  - The terms lint cannot see the README, so the rule holds by authorship.
+  - THE TERMS LINT DOES SEE THE README. `engine/bin/prose-inspect.ts` line 40 sets its entry-document list to README.md, and its first item flags a bare method term on any line carrying no link.
+  - This line said the opposite until 2026-08-19. It was corrected after the predecessor version was found to have had the same check all along, tested and green.

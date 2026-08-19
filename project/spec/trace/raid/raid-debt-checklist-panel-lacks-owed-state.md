@@ -7,7 +7,7 @@ statement: The checklist editor's panel UI (engine/editors/checklist.ts) has no 
 owner: the owner
 trigger: the owner reviews the panel's checklist rendering and decides the visual state and the ref-entry affordance
 status: open
-looked: 2026-08-18
+looked: 2026-08-19
 impact: A returning person reading a checklist field in the panel cannot tell an owed item from an unchecked one by looking - the distinction only shows in the raw markdown. The mechanism (engine/stateform.ts checklistItemStatus, the "- [owed] <item> - <ref>" line form) is fully functional for an agent writing it directly through a form fill; only the panel's own render/collect JS was not extended.
 breaks_how_badly: abrasive
 how_likely: expected
@@ -61,3 +61,23 @@ each verdict as its own act from a button. So the affordance exists and the
 question is whether the checklist reuses it, not whether it has to be invented.
 
 The trigger stands unchanged.
+
+## Swept 2026-08-19, at i9's onboard-retro: RESCHEDULED
+
+TWO OF THE THREE CLAUSES ARE NOW FALSE. `engine/editors/checklist.ts` lines 25
+to 28 and line 34 render an owed line as a disabled box with its ref as muted
+tail text, and it survives a collect. So it no longer reads as an unchecked
+box, and clicking can no longer discard the ref.
+
+WHAT REMAINS is the ref-ENTRY affordance. A person still cannot set an owed
+state from the panel.
+
+THE CHANGE ARRIVED WITH THE i17 MERGE, after the last look. The same file at
+ref 13cb0538 has neither behaviour.
+
+THIS ENTRY'S `statement` NOW MISDESCRIBES THE CODE and wants rewriting rather
+than only a dated look. Recorded here rather than rewritten, because the
+remaining clause is the owner's to scope.
+
+TRIGGER RE-AFFIRMED: the owner reviews the panel's checklist rendering. It has
+not fired.

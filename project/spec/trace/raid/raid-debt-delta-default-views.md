@@ -7,7 +7,7 @@ statement: The reference views still list the whole corpus - the minted_in stamp
 owner: the driving agent
 trigger: the next form opened in a record whose table lists another record's nodes, or the owner's next reiteration of the delta demand
 status: open
-looked: 2026-08-18
+looked: 2026-08-19
 breaks_how_badly: abrasive
 how_likely: expected
 impact: Every reference table in a record lists the standing corpus beside the delta - 38 test-specs where 7 are the iteration's own - and the reader wades through history, exactly what the owner has flagged three times.
@@ -62,3 +62,17 @@ neither `answerStructuredQuery` nor `rankCandidateCouplings` has a lane door
 (note-8a7a3030c5e9, re-checked the same day).
 
 The trigger stands unchanged.
+
+## Swept 2026-08-19, at i9's onboard-retro: RESCHEDULED
+
+UNMOVED. `engine/stateform.ts` line 928 and line 943 still list the whole
+corpus with no delta filter. Only the promotion resolver filters on the bound
+record, at lines 951 to 958. No opt-in exists.
+
+THE DESTINATION IS STILL OPEN. i15 reads `status: open`.
+
+ONE FACT FROM THE LAST LOOK HAS CHANGED. The structured query and the coupling
+ranker are now built, at `engine/query.ts` line 45 and `engine/disposition.ts`
+line 70. Neither is the resolver this debt is about.
+
+TRIGGER RE-AFFIRMED and still fires on any form listing another record's nodes.

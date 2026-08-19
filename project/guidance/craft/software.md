@@ -394,6 +394,18 @@ project owns and the one whose slowness is felt every day.
 
 ## Writing tests
 
+### Asserting on a refusal
+
+ASSERT AGAINST THE PROSE A READER WOULD SEE. A typed rejection carries an `expected`, a `remedy.note` and a `message`. Those are the words a person acts on, so those are what a test pins.
+
+NEVER ASSERT AGAINST THE SERIALISED ERROR OBJECT. A rejection also carries a field called `source`, and a check that stringifies the whole object matches the KEY NAME rather than the message. It passes while saying nothing.
+
+NEVER ASSERT AGAINST A TOKEN THE INPUT SUPPLIED. A refusal usually echoes back the path or the name it was given. A test that searches the output for its own input matches its own echo and passes for the wrong reason.
+
+BOTH FALSE GREENS HAVE HAPPENED HERE, in one file, and both are written up where they occurred.
+
+### Suite speed
+
 A suite has THREE speeds, and choosing between them is the whole craft.
 
 - ACROSS FILES is real parallelism. The runner gives each file its own

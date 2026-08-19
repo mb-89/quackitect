@@ -102,7 +102,16 @@ The agent bakes scope and a PROPOSED column into the brief. There are no
 separate confirmation rounds before the gate.
 
 THE COLUMN IS A PROPOSAL, NEVER A DECISION. The agent names one with its
-reasoning, the person chooses, and the bless IS that choice.
+reasoning, and the bless IS that choice.
+
+WHO BLESSES IS THE DIAL'S ANSWER, exactly as at every other weighted step
+(corrected 2026-08-19). Below the dial the choice is the person's. Above it the
+agent may stamp its own. This line read "the person chooses" flatly, which
+disagreed with the engine standing beside it and left two sources of truth.
+
+AND THE PERSON OVERRIDES THE DIAL BY SAYING SO. An instruction to hold every
+gate in one iteration outranks the setting, and it is recorded on that
+iteration's record so a later session reads it before the first gate.
 
 Seeding never asked for a size. Nothing was decided before this state, and
 nothing should be assumed here.

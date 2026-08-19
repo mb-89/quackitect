@@ -7,7 +7,7 @@ statement: The core and satellite cluster is built and tested, and nothing the r
 owner: the driving agent
 trigger: when the run mode is first flipped away from inline, or at the code-review iteration
 status: open
-looked: 2026-08-18
+looked: 2026-08-19
 impact: A whole subsystem drifts from the engine it is meant to carry, and its green tests read as proof it works.
 breaks_how_badly: corrosive
 how_likely: expected
@@ -118,3 +118,24 @@ THE SHARPER QUESTION FROM THE LAST SWEEP IS STILL UNASKED: whether the run-mode
 setting is inert. It was recorded as a lead rather than a claim and remains one.
 
 The trigger stands unchanged.
+
+## Swept 2026-08-19, at i9's onboard-retro: REPAID BY CUTTING, WITH TWO GAPS
+
+THE SUBJECT IS GONE. At ref 570cdc66 the cluster was eight engine files and
+six test files. At HEAD a glob for any of them returns zero, and one search for
+the cluster's name across every TypeScript file hits only `bin/se-mcp.ts`. They
+were already absent at ref 13cb0538, so the cut predates i16's ship.
+
+SO THE STATE THIS ENTRY FORBIDS CANNOT EXIST ANY MORE. Green tests over
+unreachable code need both, and neither survives.
+
+TWO THINGS IT ASKED FOR DID NOT HAPPEN, and they are recorded rather than
+quietly dropped.
+
+- THE TRACE RECOVERY IT DEMANDED BEFORE EITHER OUTCOME was never done. The two
+  design-spec nodes went with the code.
+- NO EVIDENCE FILE RECORDS THE OWNER'S WORD ON THE CUT. The cut looks right and
+  its authorisation is not written down anywhere this sweep could find.
+
+THAT SECOND GAP IS THE ONE WORTH A DECISION. A cut nobody can point to an
+authorisation for is indistinguishable from a cut nobody authorised.

@@ -7,7 +7,7 @@ statement: This iteration ships its bootstrap without validating it on a genuine
 owner: the owner
 trigger: the first cloud run after this iteration ships
 status: accepted
-looked: 2026-08-18
+looked: 2026-08-19
 impact: The acceptance criterion is that a fresh machine, a seed id and one command produce a walking agent. Everything else can be verified here; the freshness cannot. So the criterion is proven in parts and not end to end, and a step that only fails on a clean host stays undetected until somebody uses one.
 breaks_how_badly: corrosive
 how_likely: expected
@@ -115,3 +115,17 @@ green on the machine that wrote it and red on every machine that is not it.
 
 RESCHEDULED, TRIGGER RE-AFFIRMED. The next cloud run is still the trigger, and
 the bar is unchanged: no step typed by hand.
+
+## Swept 2026-08-19, at i9's onboard-retro: RE-ACCEPTED
+
+STILL OWED AND KNOWINGLY CARRIED. Nothing in the tree records a cloud run after
+2026-08-18 meeting this entry's own bar.
+
+WHAT MAKES IT ACCEPTABLE IS UNCHANGED: the owner ruled on 2026-08-15 that
+nothing in the walk stops for it.
+
+ITS RESIDUAL RISK HAS SHRUNK TWICE AND BEEN RENAMED. Cloud-only steps are
+handled by the arrival script now. What is live is an environment-sensitive
+CHECK rather than a missing step.
+
+TRIGGER RE-AFFIRMED: the next cloud run.

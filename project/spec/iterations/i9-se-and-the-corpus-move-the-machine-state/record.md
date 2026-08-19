@@ -71,3 +71,30 @@ FULL CONTEXT: project/spec/version-planning.md, section i9.
 - project/spec/version-planning.md
 - engine/paths.ts lines 18 and 133-161
 - product/engine-go/truth.go at ref main
+
+## Standing instruction for this iteration
+
+THE OWNER BLESSES EVERY GATE HERE, and the agent blesses none of them (owner
+instruction 2026-08-19). Their words on giving the go: they will look at what
+the agent is doing at the gates, so nothing is blessed without them.
+
+THIS OVERRIDES THE AUTONOMY DIAL for this iteration. At high autonomy an agent
+may normally stamp its own gate. Not here, whatever the dial reads.
+
+WHY IT IS WRITTEN DOWN RATHER THAN REMEMBERED. It was said in chat, and chat
+does not survive a compaction. `vp-the-ledger` targets zero agent blesses, and
+three of i16's gates carry one against that target.
+
+EVERYTHING ELSE IN THIS ITERATION IS THE AGENT'S. The same instruction said to
+work through the rest alone.
+
+## One scope item is stale
+
+THE WORKTREE FAN-OUT IS OBSOLETE. The vision above asks that a method write
+reach trunk and every open worktree in one act. i34 shipped on 2026-08-16 and
+retired worktrees entirely, and the owner ruled the worktree-and-trunk pair
+obsolete on 2026-08-18.
+
+SO THAT ITEM DROPS and this iteration is smaller than its vision reads. Method
+now resolves to the machine root whichever record is bound, which is the
+resolution that replaced the old refusal.

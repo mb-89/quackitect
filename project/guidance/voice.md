@@ -178,6 +178,13 @@ So the list is the rule's memory: the specific words that got through. A rule wi
 - WHERE THE ORIGINAL IS OUT OF REACH, say so in the citation. "Reported by X,
   primary not seen" is honest and useful. A second-hand citation dressed as a
   primary one is not.
+- A PAGE THAT NAMES NO PRIMARY OF ITS OWN IS A LEAD, NEVER EVIDENCE. The chain
+  has to end somewhere a person wrote from knowledge. Where it simply stops, a
+  reader cannot tell an unreached primary from an absent one.
+- PREFER THE PUBLISHER TO THE SUMMARISER. A standards body, a journal, or a
+  vendor's own documentation for its own product. Web research can return prose
+  echoing our own house style, and generated prose is confident and sourceless
+  in exactly the shape a summary takes.
 - AN ASSERTION ABOUT THE SYSTEM IS CHECKABLE, so check it rather than citing
   it. A remedy naming a tool argument, a link to a file, a claim that a state
   exists — the repo answers in milliseconds. Where the check is cheap, run it.
@@ -235,4 +242,5 @@ So the list is the rule's memory: the specific words that got through. A rule wi
   - The README and anything a stranger reads FIRST use plain language only.
   - A method term (suspect, bless, cone, gate) may appear where its definition is one click away, in the book's termrefs. Never bare in the front door.
   - The i17 red-team and the i19 cold-read both caught exactly this.
-  - The terms lint cannot see the README, so the rule holds by authorship.
+  - THE TERMS LINT DOES SEE THE README. `engine/bin/prose-inspect.ts` line 40 sets its entry-document list to README.md, and its first item flags a bare method term on any line carrying no link.
+  - This line said the opposite until 2026-08-19. It was corrected after the predecessor version was found to have had the same check all along, tested and green.

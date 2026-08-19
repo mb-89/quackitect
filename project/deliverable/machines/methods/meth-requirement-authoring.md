@@ -160,6 +160,13 @@ single-source — and it held across every review round they ran.)
   MEASURE is the pass line. Write scenarios only for qualities that
   matter — walking the whole ISO 25010 tree into scenarios produces
   confusion, not coverage.
+
+  WALKING THE TREE AND WRITING SCENARIOS ARE DIFFERENT ACTS, and only the
+  second is discouraged here (owner instruction 2026-08-19). The nine
+  characteristics are SWEPT at write-requirements as a checklist, one line
+  each, under the `quality_groups_swept` set question. A characteristic
+  nothing touches is answered and left alone. It never becomes a scenario
+  for the sweep's sake.
 - constraint — imposed from outside; `source_refs` names the binding norm
   clause.
 - interface — a boundary both sides must honor. Name BOTH sides and who

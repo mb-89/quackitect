@@ -5,6 +5,7 @@ type: "[[raid]]"
 kind: debt
 statement: The four demonstrations this iteration authored are drawn and none of them has been performed, so the iteration ships with every claim that needs a person watching standing on a drawing rather than on an observation.
 owner: the owner
+looked: 2026-08-19
 status: open
 breaks_how_badly: crippling
 how_likely: expected
@@ -70,3 +71,20 @@ what happened, not that all four pass.
 
 THE FIRST TIME SOMEBODY HANDS A VEHICLE TO ANOTHER PERSON. Until then the debt
 costs nothing and hides everything.
+
+## Swept 2026-08-19, at i9's onboard-retro: RESCHEDULED, AND IT IS WORSE THAN STATED
+
+NOTHING PERFORMED. A glob for report files across the whole repository returns
+ZERO. None of the four named reports exists. The four steps still stand drawn
+in this iteration's own demonstration machine.
+
+IT IS WIDER THAN THIS ENTRY SAYS. Not one of the twenty-one must stories has a
+demonstration report, in the whole history of the product. These four are part
+of a total of zero, so the gap is a convention nobody has ever run rather than
+one iteration's omission.
+
+THAT WIDER FACT IS NOT THIS ENTRY'S TO CARRY. It is recorded here so the next
+sweep meets it rather than rediscovering it.
+
+TRIGGER: this entry carries no field, and its prose says it comes due the first
+time a vehicle is handed to another person. That has not happened.

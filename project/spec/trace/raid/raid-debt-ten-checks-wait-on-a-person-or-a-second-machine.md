@@ -7,7 +7,7 @@ statement: Ten verification checks and two boundary timings cannot be answered b
 owner: the owner
 trigger: when the work-token system can carry a task to a person; or at the first verification after 2026-10-01, whichever comes first
 status: open
-looked: 2026-08-18
+looked: 2026-08-19
 impact: A check nobody can run is marked owed every iteration and eventually stops being read, which is how four factual errors sat in the README while its own inspection was marked owed.
 breaks_how_badly: annoying
 how_likely: expected
@@ -128,3 +128,18 @@ still cheap, and it is still not done.
 THE MISSING DATE IS ITSELF THE FINDING. Every other debt in the register
 carries `looked`, this one did not, and the retro's debt sweep is what is meant
 to put it there. A row with no look date cannot be told from a row nobody read.
+
+## Swept 2026-08-19, at i9's onboard-retro: DUE, NOT WAITING
+
+THE FIRST HALF OF THE TRIGGER HAS FIRED. This entry repays when the work is
+ROUTABLE rather than finished, and the work-token pool now carries a task to a
+person — `engine/pool.ts` line 255 into `engine/survey.ts` line 68.
+
+SO IT IS DUE. That is a change of state from the last look, not a re-park.
+
+ONE THING BLOCKS THE ROUTING ANYWAY. The token shape carries an id, a
+statement, a ready-when and a source, and NO assignee. A token cannot say "this
+one needs a person", which is exactly what these ten checks have to say.
+
+AND THE CHEAP CHECK THIS ENTRY ASKS FOR FIRST HAS STILL NOT BEEN RUN: whether
+the cloud runs already satisfy the second-machine group.

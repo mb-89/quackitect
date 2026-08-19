@@ -73,3 +73,26 @@ Each decision carries:
 
 The register view shows the decisions beside the risks ([[meth-raid]]). One
 surface to read, files apart underneath.
+
+## The prior-art back-check
+
+A CHOSEN DESIGN THAT RE-DERIVES EXISTING PRIOR ART OWES A STUDY OF THE
+ORIGINAL (owner ruling 2026-08-18). It runs here, and it is the back end of
+[[meth-prior-art]], which is the front end.
+
+WHY HERE AND NOT AT THE SEARCH. At the search there is no winner yet, so there
+is nothing to compare the original against. By this state the choice is made
+and the comparison has both sides.
+
+THREE QUESTIONS, ANSWERED IN THE DECISION'S OWN `## Consequences` SECTION when
+the winner has a published ancestor:
+
+- What does the original do BETTER than what we chose?
+- What cost did it pay that we have not paid yet?
+- What did it learn that our version has not had the chance to learn?
+
+A COMPARATIVE CLAIM NEEDS EVIDENCE ON BOTH SIDES. Where the original cannot be
+read, say so in the decision rather than guessing at it.
+
+NO ANCESTOR MEANS NO BACK-CHECK, and that is a complete answer. Say it and
+move on.

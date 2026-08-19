@@ -5,6 +5,7 @@ type: "[[raid]]"
 kind: debt
 statement: The owner authorised a push out loud and the lane refuses every push without exception, so i16 and its merge with i17 stand committed on the local v3 and reach nobody until a person runs one command.
 owner: the owner
+looked: 2026-08-19
 status: open
 breaks_how_badly: corrosive
 how_likely: certain
@@ -64,3 +65,22 @@ here rather than decided by an agent that wanted the door open.
 
 IMMEDIATELY, AND IT IS ALREADY DUE. Every hour this stands is an hour where
 the only copy of i16 is one working tree on one machine.
+
+## Swept 2026-08-19, at i9's onboard-retro: REPAID
+
+THE OWNER PUSHED, and it is corroborated rather than taken on trust. Reading
+this very file at ref `origin/v3` succeeds and returns the same content hash as
+the working tree. The same path at ref 8253bfd9, the merge commit, is refused:
+it did not exist yet.
+
+SO origin/v3 HAS ADVANCED PAST THE MERGE TO THE TIP. A remote-tracking ref
+moves only on a successful push or fetch, and the lane cannot push.
+
+WHAT COULD NOT BE REACHED, said plainly. `git log`, `git rev-parse`, any
+ahead-behind count, and any query against the remote itself. Git is not legal
+in this state, so this is proved from ref reads alone.
+
+THE DECISION THIS ENTRY LEAVES OPEN IS UNTOUCHED. SE-C-003 still reads that the
+agent never pushes, without exception. Repaying one push does not settle
+whether that should stay absolute, and this entry is the only place the
+question is written down.
