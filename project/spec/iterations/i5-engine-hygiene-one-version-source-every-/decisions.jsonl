@@ -1,0 +1,6 @@
+{"ts":"2026-08-19T10:44:39.753Z","op":"plan","visit":"iterations/i5/onboard-retro@0","parent":null,"nodes":[{"id":"d1","brief":"M0: onboard retro and kickoff"},{"id":"d2","brief":"walk i5 milestones to ship"}]}
+{"ts":"2026-08-19T10:47:27.064Z","op":"update","visit":"iterations/i5/onboard-retro@0","node":"d3","brief":"onboard-retro: inbox empty, emit_back checked against the tree"}
+{"ts":"2026-08-19T10:50:44.167Z","op":"update","visit":"iterations/i5/gate-kickoff@0","node":"d4","brief":"kickoff: auditing i5's thirteen items against the tree"}
+{"ts":"2026-08-19T10:51:29.991Z","op":"update","visit":"iterations/i5/gate-kickoff@0","node":"d5","brief":"kickoff: minted the fresh-clone inbox assumption"}
+{"ts":"2026-08-19T10:52:59.730Z","op":"plan","visit":"iterations/i5/gate-kickoff@0","parent":"d1","nodes":[{"id":"d6","brief":"kickoff: scope audited"},{"id":"d7","brief":"size proposed minor"},{"id":"d8","brief":"gate blessed"}]}
+{"ts":"2026-08-19T10:54:09.447Z","op":"update","visit":"iterations/i5/gate-kickoff@0","node":"d9","brief":"kickoff: bound breaches measured, resubmitting"}
