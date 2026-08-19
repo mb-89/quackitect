@@ -140,3 +140,6 @@
 {"ts":"2026-08-19T19:22:51.901Z","op":"update","visit":"iterations/i37/gate-architecture@0","node":"d9","brief":"M5 closed; opening M6"}
 {"ts":"2026-08-19T19:23:16.022Z","op":"update","visit":"iterations/i37/gate-architecture@0","node":"d10","brief":"the gate is signed; giving it the thumb"}
 {"ts":"2026-08-19T19:23:57.612Z","op":"update","visit":"iterations/i37/gate-architecture@0","node":"d11","brief":"submitting and blessing in one pull"}
+{"ts":"2026-08-19T19:27:02.164Z","op":"plan","visit":"iterations/i37/cut-criteria@1","parent":null,"nodes":[{"id":"d1","brief":"rank the unknowns"},{"id":"d2","brief":"run the spikes"},{"id":"d3","brief":"fold back and close M6"}]}
+{"ts":"2026-08-19T19:28:02.084Z","op":"update","visit":"iterations/i37/rank-unknowns@0","node":"d4","brief":"reading the exposure-pick line format"}
+{"ts":"2026-08-19T19:28:46.397Z","op":"done","visit":"iterations/i37/cut-criteria@1","node":"d1","brief":"five unknowns picked off the exposure chart"}
