@@ -109,3 +109,4 @@
 {"ts":"2026-08-19T18:44:44.192Z","op":"update","visit":"iterations/i37/cut-criteria@0","node":"d12","brief":"reading the rank-cut format"}
 {"ts":"2026-08-19T18:46:01.882Z","op":"done","visit":"front_desk@0","node":"d3","brief":"cut 106 of 109 rows; three standing criteria survive"}
 {"ts":"2026-08-19T18:46:18.340Z","op":"plan","visit":"iterations/i37/cut-criteria@0","parent":null,"nodes":[{"id":"d13","brief":"mark the cutoff correctly"},{"id":"d14","brief":"reach evaluate-set"}]}
+{"ts":"2026-08-19T18:46:49.706Z","op":"update","visit":"iterations/i37/cut-criteria@0","node":"d15","brief":"aiming at evaluate-set"}
