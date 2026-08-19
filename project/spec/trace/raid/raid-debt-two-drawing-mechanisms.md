@@ -61,4 +61,4 @@ The trigger stands unchanged.
 
 ## Sweep 2026-08-19, at i5's retro
 
-RE-ACCEPTED. Neither trigger fired. i5 compiled a seeded machine from the rigor matrix and read its steps as frontmatter rows throughout, so the split is still doing exactly what this entry says it does.
+RE-ACCEPTED. Neither trigger fired. i5 compiled a seeded machine from the rigor matrix and read its steps as frontmatter rows throughout. The split is still doing exactly what this entry says it does.

@@ -131,4 +131,4 @@ to put it there. A row with no look date cannot be told from a row nobody read.
 
 ## Sweep 2026-08-19, at i5's retro
 
-RE-ACCEPTED consciously. Neither trigger has fired: the work-token system still cannot carry a task to a person, and the date is not reached. i5's retro found the pool EMPTY and the door into it shut on a fresh clone, so the trigger this debt waits on is further away than it looked ([[raid-iss-the-one-door-into-the-pool-is-shut-on-a-fresh-clone]]).
+RE-ACCEPTED consciously. Neither trigger has fired: the work-token system still cannot carry a task to a person, and the date is not reached. i5's retro found the pool EMPTY and the door into it shut on a fresh clone. The trigger this debt waits on is further away than it looked ([[raid-iss-the-one-door-into-the-pool-is-shut-on-a-fresh-clone]]).

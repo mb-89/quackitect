@@ -3,7 +3,7 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-iss-an-ephemeral-box-loses-the-whole-record-of-a-session
 type: "[[raid]]"
 kind: issue
-statement: "On a box that is reclaimed, `.se/` dies with it, so the handover, the notes and the call log all go — and the design that retired the written handover assumed a machine that persists."
+statement: "The call log, the notes and the handover all live in `.se/`, which git ignores. Nothing a session learns can reach the next clone by that route, and the design that retired the written handover assumed a machine that persists."
 owner: the maintainer
 trigger: every cloud run, and the first retro after one
 status: open

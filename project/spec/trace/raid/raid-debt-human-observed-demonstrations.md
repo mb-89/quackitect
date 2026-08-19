@@ -114,4 +114,4 @@ The trigger stands unchanged.
 
 ## Sweep 2026-08-19, at i5's retro
 
-RE-ACCEPTED. Neither trigger fired: no consolidation pass ran and i5's delta touched none of the four specs. What changed is evidence that the class is not uniformly blocked — i5's own demonstration ran unattended end to end, so the four should be re-read for which steps genuinely need a watcher.
+RE-ACCEPTED. Neither trigger fired: no consolidation pass ran and i5's delta touched none of the four specs. What changed is evidence that the class is not uniformly blocked. i5's own demonstration ran unattended, end to end. The four should be re-read for which steps genuinely need a watcher.
