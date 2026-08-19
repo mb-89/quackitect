@@ -61,6 +61,23 @@ same way ideation is dangerous on the autonomy dial: nothing brings the person
 back until the machine cannot continue. It is the setting an overnight run
 wants and cannot have today.
 
+## The notch and the dial answer different questions
+
+THE STOP-AT NOTCH NEVER DECIDES WHO MAY BLESS. It decides how far the agent
+walks before handing back. The AUTONOMY DIAL decides whether the agent's own
+thumb counts, and that one is mechanical: a bless from the agent is refused
+with `SE-C-113` when the dial sits at or below the gate's weight, naming the
+rung the gate wants and the rung the agent stands on.
+
+SO THERE IS NOTHING TO TRIANGULATE, and an agent that reads three files to
+work this out has spent calls on a question the engine answers. Send the
+bless. Either it lands, or the refusal tells you it is the person's — and the
+refusal is the authority, not a reading of the contract.
+
+WHAT THE NOTCH BINDS instead is the agent's own discipline. Only `state end`
+is held by the engine; at `bless` and above nothing stops a pull, and the
+agent stopping where the notch says is the whole mechanism.
+
 ## The press grants permission and never advances
 
 req-controls-never-advance-walk STANDS UNCHANGED. Under `state end` the engine

@@ -15,7 +15,7 @@ Your native tools are blocked here, tool by tool, by an explicit list:
 
 Which file holds that list depends on the host. Claude Code reads
 `.claude/settings.json`, and GitHub Copilot CLI takes the same list on its
-command line from `deliverable/cage/copilot-cage.json`.
+command line from `project/deliverable/cage/copilot-cage.json`.
 
 The effect is the one rule: the `se` lane replaces every native tool, as good
 or better.

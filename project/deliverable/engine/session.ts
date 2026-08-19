@@ -2301,7 +2301,10 @@ export class Session {
         ...this.refusedBlock([standingForm]),
         for: standingForm,
         forms: [this.formForAgent(standingForm)],
-        do: 'work the state, then return fills on the next pull as form: {"<section>": "<text>"} - multi-pass is fine; finish with {"submit": true}: the submit checks the fields and stamps the claim',
+        do: this.fillAdvice(
+          [standingForm],
+          'work the state, then return fills on the next pull as form: {"<section>": "<text>"} - multi-pass is fine; finish with {"submit": true}: the submit checks the fields and stamps the claim',
+        ),
         ...extra(),
       };
     }
@@ -2362,7 +2365,10 @@ export class Session {
           ...this.refusedBlock(owed),
           for: pullTarget,
           forms: owed.map((n) => this.formForAgent(n)),
-          do: 'fill every required section, then return it on the next pull as form: {"<section>": "<text>"} — there is no submit verb, and pulling without it hands back this same form',
+          do: this.fillAdvice(
+            owed,
+            'fill every required section, then return it on the next pull as form: {"<section>": "<text>", "submit": true} — there is no submit verb, and a pull without the submit FLAG hands back this same form',
+          ),
           ...extra(),
         };
       }
@@ -2443,7 +2449,7 @@ export class Session {
               // pendingRead survives a wrong answer — only a correct one clears it.
               note: `${this.readMissed.length} of ${this.reads.serving()?.expect.length ?? 0} probe(s) were not answered — here is the document again`,
               missed: this.readMissed,
-              hint: "quote the words VERBATIM, punctuation and all. Whitespace and case are flattened before comparing, so a line break inside an answer is fine.",
+              hint: "QUOTE MORE, NOT LESS. The check asks whether your answer CONTAINS each expected run, never whether it matches exactly, so pasting the whole sentence around the anchor always passes. Punctuation is not a word: a dash or a bullet between two words is skipped when the engine counts, which is the usual reason a careful four-word answer misses. Case and line breaks are flattened before comparing.",
             }
           : {}),
         do: 'read the WHOLE document, then pull again answering every probe in `prove` as form: {"read": "<the answers, in one string>"}',
@@ -2460,7 +2466,10 @@ export class Session {
         ...this.refusedBlock(unmet),
         for: first.to,
         forms: unmet.map((n) => this.formForAgent(n)),
-        do: 'fill every required section, then return it on the next pull as form: {"<section>": "<text>"} — there is no submit verb, and pulling without it hands back this same form',
+        do: this.fillAdvice(
+          unmet,
+          'fill every required section, then return it on the next pull as form: {"<section>": "<text>", "submit": true} — there is no submit verb, and a pull without the submit FLAG hands back this same form',
+        ),
         ...extra(),
       };
     }
@@ -2613,7 +2622,7 @@ export class Session {
           walked: swept.swept ?? [],
           ...servedNow,
           ...(swept.banners !== undefined ? { banners: swept.banners } : {}),
-          do: 'read the document, then pull again returning its proof as form: {"read": "<the last words>"}',
+          do: 'read the document, then pull again answering every probe in `prove` as form: {"read": "<the answers, in one string>"}',
           ...extra(),
         };
       }
@@ -2627,7 +2636,10 @@ export class Session {
           for: swept.stopped_at,
           forms: formsNow.map((n) => this.formForAgent(n)),
           ...(swept.banners !== undefined ? { banners: swept.banners } : {}),
-          do: 'fill every required section, then return it on the next pull as form: {"<section>": "<text>"} — there is no submit verb, and pulling without it hands back this same form',
+          do: this.fillAdvice(
+            formsNow,
+            'fill every required section, then return it on the next pull as form: {"<section>": "<text>", "submit": true} — there is no submit verb, and a pull without the submit FLAG hands back this same form',
+          ),
           ...extra(),
         };
       }
@@ -2897,6 +2909,39 @@ export class Session {
   /** see dsp-walk-machine.md#what-the-form-refuses */
   private formForAgent(name: string): Record<string, unknown> {
     return agentCopy(this.formGet(name) as Record<string, unknown>, false);
+  }
+
+  /** WHAT A `fill` ACTUALLY WANTS, and the reason this is not one sentence.
+   *
+   *  A form comes back for three different reasons and they used to read
+   *  identically: sections are still empty, the fields stand but nothing was
+   *  stamped, or everything stands and signed and the BLESS is what is owed.
+   *  Only the first is the agent's typing. Told to "fill every required
+   *  section" while every section is full, an agent either loops or invents
+   *  a stop — measured on the i15 walk of 2026-08-19, where a signed gate
+   *  answered `fill` forever and said nothing about the thumb.
+   *
+   *  A GATE IS NOT DONE UNTIL IT IS BLESSED, and the pull is the bless's only
+   *  carrier, so the pull has to say so. */
+  private fillAdvice(names: string[], fallback: string): string {
+    for (const n of names) {
+      let f: { gate?: boolean; signed?: boolean; bless?: string; problems?: string[] };
+      try {
+        f = this.formGet(n) as typeof f;
+      } catch {
+        continue;
+      }
+      if ((f.problems ?? []).length > 0) continue; // the agent's own work stands out front
+      if (f.gate === true && (f.bless ?? "") === "") {
+        return f.signed === true
+          ? `${n} STANDS SIGNED AND EVERY SECTION IS FULL. Nothing you type moves it — what is owed is the BLESS, the thumb on this gate. Where the dial puts that thumb in your hand, send it as form: {"bless": true} or {"bless": false} with a verdict. Where it does not, name this gate as the step that waits and STOP: the dial alone cannot wake you.`
+          : `${n} is a GATE and its sections stand. Stamp it with form: {"submit": true}, then the BLESS is what remains — form: {"bless": true} where the dial allows it, otherwise name this gate as the step that waits and stop.`;
+      }
+      if (f.signed !== true) {
+        return `${n}: every required section is filled and NOTHING IS STAMPED. Send form: {"submit": true} — the submit runs every check and signs. Without it this same form comes back looking untouched.`;
+      }
+    }
+    return fallback;
   }
 
   refusedBlock(names: string[]): Record<string, unknown> {
@@ -3429,7 +3474,7 @@ export class Session {
               tool: "se_pull",
               path: Session.READING_PATH,
               documents: reading.length,
-              note: "pull. It hands you one document and names its last words; return those on the next pull and the following document arrives. No paths to name.",
+              note: "pull. It hands you one document and asks three fill-in-the-blank questions about it; answer them on the next pull and the following document arrives. No paths to name.",
             },
           }
         : {}),

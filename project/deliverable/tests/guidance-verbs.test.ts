@@ -1,0 +1,112 @@
+// GUIDANCE THAT NAMES A VERB NOBODY BUILT COSTS THE READER THEIR CALLS.
+//
+// Measured twice on 2026-08-19, on a walk driven by a smaller model. The
+// method card carried a heading reading "se_package builds the artifact" for
+// a verb that has never existed, and the prompt layer taught a reading proof
+// the engine had already replaced. A capable model reads around both. A
+// smaller one calls what the page says and is stuck, because a verb that is
+// not registered has no typed refusal and therefore no remedy.
+//
+// THIS IS THE CHEAP HALF OF THAT PROBLEM. Whether a sentence is true is a
+// judgment; whether the verb it names exists is a set membership test.
+import assert from "node:assert/strict";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import test from "node:test";
+import { fileURLToPath } from "node:url";
+import { guidanceDocs } from "./helpers.ts";
+
+const ROOT = fileURLToPath(new URL("../../..", import.meta.url));
+
+/** Every `se_` name the tool surface actually registers. */
+function registered(): Set<string> {
+  const dir = join(ROOT, "project/deliverable/engine");
+  const out = new Set<string>();
+  for (const f of readdirSync(dir).filter((n) => n.startsWith("tools") && n.endsWith(".ts"))) {
+    for (const m of readFileSync(join(dir, f), "utf8").matchAll(/name:\s*"(se_[a-z_]+)"/g)) out.add(m[1]);
+  }
+  return out;
+}
+
+/** Names that LOOK like verbs and are not, each with why it is exempt. */
+const NOT_A_VERB: Record<string, string> = {
+  se_test_verdict: "a call-log record kind, written by the battery when it ends",
+  se_update: "the narration op's internal tool name on the log line, never called directly",
+};
+
+/** Every page an agent is served as guidance: the method layer, and the state
+ *  notes the walk hands over one at a time. DERIVED, never named. */
+function guidancePages(): string[] {
+  const states = join(ROOT, "project/deliverable/machines/states");
+  return [
+    ...guidanceDocs(),
+    ...readdirSync(states)
+      .filter((n) => n.endsWith(".md"))
+      .map((n) => `project/deliverable/machines/states/${n}`),
+  ];
+}
+
+/** THE ONE WAY TO NAME A VERB THAT IS NOT THERE: mark its section. The
+ *  marker is the reader's warning and this check's exemption at once, so a
+ *  section cannot carry one without carrying the other. */
+const MARKER = "NOT BUILT YET";
+
+function marked(text: string, at: number): boolean {
+  const before = text.slice(0, at);
+  const start = Math.max(before.lastIndexOf("\n#"), 0);
+  const after = text.indexOf("\n#", at);
+  return text.slice(start, after === -1 ? text.length : after).includes(MARKER);
+}
+
+test("every lane verb the guidance names is a verb the lane registers", () => {
+  const real = registered();
+  assert.ok(real.size > 20, "the tool surface did not parse — the check would pass vacuously");
+  const bad: string[] = [];
+  for (const p of guidancePages()) {
+    const text = readFileSync(join(ROOT, p), "utf8");
+    for (const m of text.matchAll(/\bse_[a-z_]+/g)) {
+      const v = m[0];
+      if (real.has(v) || NOT_A_VERB[v] !== undefined) continue;
+      if (marked(text, m.index)) continue;
+      bad.push(`${p} names ${v}`);
+    }
+  }
+  assert.deepEqual(
+    [...new Set(bad)],
+    [],
+    "guidance names a lane verb that does not exist — build it, rename it, or mark the section NOT BUILT YET and say what to do instead",
+  );
+});
+
+// A PATH THAT DOES NOT RESOLVE AS WRITTEN COSTS THE SAME CALLS.
+//
+// The lane's one path rule is that everything is root-relative, and the
+// guidance broke it 22 times. Measured on the same walk: the contract named
+// "machines/stopat.md", the reader passed it to se_file_read verbatim, and
+// two refusals and a glob went by before the file was found at
+// project/deliverable/machines/stopat.md.
+//
+// THE SHAPE THAT BITES IS THE ONE THAT ALMOST WORKS. A path resolving under
+// some other prefix reads as correct to a writer standing in that folder, and
+// is unusable to a reader who only has the root.
+const PATH_LIKE = /(?:^|[\s`([])([A-Za-z0-9_][A-Za-z0-9_./-]*\/[A-Za-z0-9_./-]*\.(?:md|ts|mjs|json|canvas|jsonl|base))/g;
+
+/** Written by the machinery at run time, so absence proves nothing. */
+const RUNTIME = /^(\.se\/|node_modules\/)/;
+
+test("every file path the guidance names resolves from the project root", () => {
+  const bad: string[] = [];
+  for (const p of guidancePages()) {
+    const text = readFileSync(join(ROOT, p), "utf8");
+    for (const m of text.matchAll(PATH_LIKE)) {
+      const ref = m[1];
+      if (RUNTIME.test(ref) || existsSync(join(ROOT, ref))) continue;
+      if (marked(text, m.index)) continue;
+      const near = ["project", "project/deliverable", "project/guidance", "project/deliverable/machines"].find((pre) =>
+        existsSync(join(ROOT, pre, ref)),
+      );
+      bad.push(near === undefined ? `${p} names ${ref}, which is nowhere` : `${p} names ${ref} — write ${near}/${ref}`);
+    }
+  }
+  assert.deepEqual([...new Set(bad)], [], "the lane resolves every path from the project root, and these do not");
+});

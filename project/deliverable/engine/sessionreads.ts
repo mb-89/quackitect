@@ -252,7 +252,7 @@ export class ReadGate {
           ? {
               tool: "se_pull",
               args: {},
-              note: "pull — it serves each document and names the last words to hand back, one document at a time. Reading through se_file_read credits too.",
+              note: "pull — it serves each document and asks three fill-in-the-blank questions about it, one document at a time. Reading through se_file_read credits too.",
             }
           : {
               tool: "se_pull",

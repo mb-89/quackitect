@@ -88,6 +88,6 @@ guide.
   purpose; the typed remedy is the system's manners.
 - The human is never decoration: a gate weighs more than the ordinary
   step, and below that setting every bless is theirs. The anchor column
-  in machines/scale.md is the one place the weights are written down.
+  in project/deliverable/machines/scale.md is the one place the weights are written down.
 - Evidence over claims, everywhere: read-proof hashes, evidence forms,
   the decision graph. Nothing counts as done by assertion.

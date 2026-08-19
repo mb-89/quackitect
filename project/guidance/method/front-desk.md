@@ -37,6 +37,18 @@ visit.
 Then stop and wait. Every LATER visit in the same session works as the
 sections below say — sweep, advise, execute.
 
+UNLESS THE WORD ALREADY ARRIVED. An unattended run carries its goal in
+before the session starts: the kickoff names it, the entrypoint was given
+it, or the opening message says it. That IS the person's word, and the desk
+does not ask for it twice.
+
+- Recite the rules and print the greeting, exactly as above.
+- Then take the routed door, in the same turn.
+- Say which door you took and why, so the record shows the routing.
+
+WAITING FOR A WORD YOU ARE HOLDING IS A STALL. On an unattended machine
+nothing arrives to end it, and the run is spent.
+
 ## 1. Sweep before advising
 
 Read the LIVE machinery, in this order. Never answer from memory.

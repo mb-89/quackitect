@@ -44,7 +44,7 @@ The trigger is a NOTE carrying "needs retro":
 
    The engine settles this now: "last_retro" means the newest CARRIED or
    BACKLOG drain, and those are judgment dispositions the desk is
-   refused, so only a retro can set the mark (engine/calllog.ts).
+   refused, so only a retro can set the mark (project/deliverable/engine/calllog.ts).
 
    WITH NO SUCH DRAIN IN THE LIVE LOG, the window opens at the log file's
    FIRST record. Never at another drain (fixed 2026-08-18 on the owner's
@@ -341,7 +341,7 @@ chain? Not built yet, and it joins this list when it is.
 
 Has the way of working fallen behind current practice? Name what you
 compared it against. That is the process dimension of the state-of-the-art
-method (`machines/methods/meth-state-of-the-art.md`).
+method (`project/deliverable/machines/methods/meth-state-of-the-art.md`).
 
 ## The mechanical half
 

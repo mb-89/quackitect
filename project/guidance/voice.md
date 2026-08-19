@@ -197,6 +197,15 @@ So the list is the rule's memory: the specific words that got through. A rule wi
 - ASK WHERE A QUESTION IS OWED. A judgment asserted about somebody's own domain cannot be caught by them, which is exactly when it does the most damage.
 - Owner ruling 2026-08-06, after a gate carried a fabricated comparison about a tool nobody here had run.
 
+### A ruling that is not built yet says so, in its first line
+
+- MARK IT WITH THE WORDS `NOT BUILT YET`, in the heading or the opening sentence. A test reads that marker: a guidance page may name a lane verb the engine does not register only inside a section carrying it. A decision to build a thing and the thing existing read identically otherwise, and the reader cannot tell them apart.
+- SAY WHAT TO DO INSTEAD, in the same breath. A reader who came for the capability needs the way that works today, not only the news that the good way is coming.
+- Write the ruling in the FUTURE where it is unbuilt. "The verb wraps X" says it exists. "When it is built, the verb will wrap X" does not.
+- THIS BINDS HARDEST ON NAMES. A heading reading "se_package builds the artifact" teaches a lane verb into existence, and the reader spends their calls discovering it does not answer. That heading stood for four days.
+- The same holds for a state, a field, a flag or a file. Naming it in the present tense is a claim that it is there.
+- WHY IT IS A WRITING RULE AND NOT A LINT. The two readings are grammatically identical, so nothing mechanical separates them. Only the author knows which one they meant.
+
 ### The sycophancy guard (applies to every assessment)
 - Praise is a signal, not a nicety. Endorse only what survives the disconfirming question.
 - If ours is genuinely better, say so plainly.
@@ -224,7 +233,7 @@ So the list is the rule's memory: the specific words that got through. A rule wi
   - Then deepening detail.
   - The fully detailed discussion sits at the bottom.
   - A single paragraph needs none of this.
-  - The method card holds the depth: `machines/methods/progressive-disclosure.md`.
+  - The method card holds the depth: `project/deliverable/machines/methods/progressive-disclosure.md`.
 - Diátaxis (diataxis.fr) for docs. Keep the four modes apart: tutorial, how-to, reference, explanation.
   - Do not blend them in one place.
 - Keep internals out of prose. The general reader does not care how the system works inside.

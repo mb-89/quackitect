@@ -1,9 +1,8 @@
 ---
 form: gate-kickoff
-amended: 2026-08-16T16:29:52.357Z by agent — ref "main" is reachable — verified 2026-08-16 via se_file_glob/se_file_read at ref:main after the operator fetched all refs; correcting the stale kill-criterion and follow-up text
-bless: blessed by agent
 by: agent
-signed_off: 2026-08-16T16:15:51.664Z
+signed_off: 2026-08-19T15:30:09.602Z
+amended: 2026-08-16T16:29:52.357Z by agent — ref "main" is reachable — verified 2026-08-16 via se_file_glob/se_file_read at ref:main after the operator fetched all refs; correcting the stale kill-criterion and follow-up text
 authors: agent
 files: null
 ---
@@ -101,3 +100,16 @@ note-5d892f5b1e18 stays parked for the next attended session.
 
 ## anything_else
 
+## goals
+
+- Ship a read-only MCP lane verb that reads nodes, edges, states and notes from .base files, returns filtered rows with chosen fields, and refuses an unknown field by naming the field list.
+- Harvest v1's 26 working .base query files from spec/queries/ at ref main, plus the reader ADR at spec/decisions/adr-query-in-engine.md.
+- Extend the pinned Bases subset only where a harvested query needs it, test-first, reopening the decision rather than smuggling in a silent extension.
+- Add conformance fixtures that pin the subset against drift.
+- Fix raid-debt-delta-default-views so $-item resolvers default to the bound record's minted_in delta, with opt-in to widen to the corpus.
+- Build the BM25 retrieval sibling as its own lane verb over the same corpus, forcing per-candidate disposition rather than raw retrieval, skipping what the graph already encodes structurally.
+- Mint the interface entries both new lane verbs owe.
+
+## bound_breaches
+
+- if-agent-harness-to-entrypoint: not breached — no calls against this interface have run since this gate last signed; kickoff has not exercised any modelled interface yet.

@@ -20,8 +20,9 @@ proof, the position.
 One call, one optional payload. It answers with an INSTRUCTION, and `pull`
 names which of four you got.
 
-- `read` — a document rides in `document`; `prove` names its last words. Read
-  it, pull again with `form: {"read": "<those words>"}`. Keep going until no
+- `read` — a document rides in `document`, and `prove` asks THREE
+  FILL-IN-THE-BLANK QUESTIONS about it. Answer all three, in one string, and
+  pull again with `form: {"read": "<the answers>"}`. Keep going until no
   `read` comes back — then you hold everything, by construction.
 - `fill` — the machine BUILT the form and handed it over. Fill it, return it
   as `form` on the next pull. There is no submit VERB; the pull is the only
@@ -44,6 +45,13 @@ names which of four you got.
   form, and at high autonomy the agent uses both (owner ruling 2026-08-09).
   Blessing your own gate is normal here when the person has said so. Below the
   dial it is theirs, exactly like every other step.
+
+  WHICH ONE APPLIES IS THE ENGINE'S ANSWER, NEVER YOURS TO DERIVE. Every gate
+  carries a weight, and a bless from the agent is refused when the dial sits
+  at or below it — the refusal names both rungs. SO SEND THE BLESS AND READ
+  THE ANSWER. Reading the contract, the autonomy scale and the stop-at scale
+  to work out whether you are allowed costs three documents and settles
+  nothing the one call would not.
 
   BOTH IN ONE PULL IS LEGAL: `form: {"verdict": "pass — why", "submit": true,
   "bless": true}` fills, stamps and blesses in a single call.
@@ -88,7 +96,7 @@ BLOCKING IS AN INSTRUCTION, NOT AN ERROR. A threshold, an unmet condition, an
 undrawn route: the pull says so instead of throwing. What stays a refusal is
 what is genuinely ILLEGAL — a choice outside the offer, a form nothing asked
 for. A refusal is typed and carries an executable remedy. Every clause's
-rule stands ahead of time in guidance/refusals.md. Follow the remedy;
+rule stands ahead of time in project/guidance/refusals.md. Follow the remedy;
 recover in one turn. A result carrying a `banner` is shown VERBATIM.
 
 A PULL MAY MOVE THE WALK. There is no passive position query: "where am I" is
@@ -120,7 +128,7 @@ state forward or back — the walk advances on the agent's pull and nothing else
 
 THE TWO DIALS ASK NEIGHBOURING QUESTIONS. Autonomy says what the agent may
 DECIDE alone. Stop-at says how far it may GO before handing back, and its four
-notches are machines/stopat.md: `state end`, `agent judgement` (the default),
+notches are project/deliverable/machines/stopat.md: `state end`, `agent judgement` (the default),
 `bless`, `blockers only`.
 
 AT `state end` THE ENGINE HOLDS EVERY TRANSITION and the person releases them
@@ -130,14 +138,27 @@ refusing, and the agent's pull is what moves.
 ## The reading
 
 - Whenever anything is owed, the pull answers `read` and the document rides
-  along. `prove` names its LAST WORDS.
+  along. `prove` carries the questions.
+- THREE PROBES, SPREAD THROUGH THE DOCUMENT. Each quotes a short run of words
+  and asks for the FOUR WORDS THAT FOLLOW it. They sit near the 30%, 60% and
+  92% marks, so all of it has to be in hand.
+- ANSWER ALL THREE IN ONE STRING, as `form: {"read": "..."}`. Join them any
+  way you like. Order does not matter and separators do not matter.
+- QUOTE GENEROUSLY. The check asks whether your answer CONTAINS the words it
+  wants, never whether it matches them exactly. A longer quote around the
+  anchor passes; a clipped one misses. Unsure? Paste the whole sentence.
+- PUNCTUATION IS NOT A WORD. Only tokens carrying a letter or a digit count,
+  so a dash, a bullet or a bare quote mark sitting between two words is
+  skipped. Counting four words by eye and including one costs you the probe.
+  Quoting generously makes this stop mattering.
+- CASE AND SPACING ARE IGNORED, so there is nothing to normalise by hand.
+- A wrong answer credits nothing and the same document comes again. It names
+  which probes missed, so read those two answers again rather than the file.
+- WHY PROBES AND NOT A HASH: you cannot compute one, and one the engine handed
+  you would prove only that a message arrived. Spread probes are the cheapest
+  thing that a host which truncated the text cannot answer.
 - ONE DOCUMENT AT A TIME, on purpose: a host that moves a large result to disk
   hands you a preview, and a single document cannot be eaten.
-- WHY THE TAIL: truncation drops the END, so the end is exactly what a host
-  that ate the text cannot give back. It is also the only proof you can
-  produce — you cannot compute a hash, and one the engine handed you would
-  prove only that a message arrived.
-- A wrong answer credits nothing and the same document comes again.
 - You never name a path and never work out what you owe.
 - `.se/reading.md` is the same thing as a file, for a person to open.
 
@@ -151,6 +172,15 @@ detected.
 `update: {...}` on ANY lane call carries a decision-graph op. Ride one on
 every call that changes something. The toll is the enforcement floor, never
 the rhythm; the log should tell the story without gaps.
+
+YOUR FIRST ONE IS A PLAN, and it rides the pull that starts the work:
+
+    se_pull  update: {op: "plan", items: ["read the record", "fill the gate", "submit"]}
+
+NOBODY WILL ASK YOU FOR IT. The toll only bites after minutes or calls have
+run out, so a short state can be walked start to finish with the log holding
+nothing but pulls. That is a silent walk, and on an unattended machine the log
+is the only witness there is.
 
 - `plan {items}` starts the checklist, BEFORE the first edit of any
   multi-step work. Check items off with `done` AS each lands. The checklist is

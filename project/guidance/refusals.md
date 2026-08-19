@@ -8,7 +8,7 @@ statement: Every refusal clause, stated as feed-forward — know the rule before
 A refusal is typed. It carries the clause and the remedy — the feedback
 side. This page is the FEED-FORWARD side (owner ruling 2026-08-06):
 every clause in the registry has a section here, so the rule can be known
-before it fires. The registry lives in `deliverable/engine/errors.ts`.
+before it fires. The registry lives in `project/deliverable/engine/errors.ts`.
 
 The pairing rule: a new clause is not done until its section stands here.
 The mechanical enforcement of that rule is parked for the engine iterations;

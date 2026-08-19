@@ -339,3 +339,7 @@
 {"ts":"2026-08-16T19:57:59.565Z","op":"update","visit":"iterations/i15/verification@5","node":"d335","brief":"confirming valueFor/asPriority sanctioned carrier functions exist"}
 {"ts":"2026-08-16T19:58:09.275Z","op":"update","visit":"iterations/i15/verification@5","node":"d336","brief":"checking whether two-records-open-at-once build stands post i34"}
 {"ts":"2026-08-16T19:58:09.905Z","op":"update","visit":"iterations/i15/verification@5","node":"d337","brief":"reading the requirement tsp-bound-surface verifies"}
+{"ts":"2026-08-19T15:45:34.189Z","op":"plan","visit":"iterations/i15/gate-kickoff@0","parent":null,"nodes":[{"id":"d4","brief":"read spec/vision for i15"},{"id":"d5","brief":"fill gate-kickoff form"},{"id":"d6","brief":"submit gate, stop for bless"}]}
+{"ts":"2026-08-19T15:46:03.156Z","op":"done","visit":"iterations/i15/gate-kickoff@0","node":"d4","brief":"kickoff evidence was already read and filled by a prior walk"}
+{"ts":"2026-08-19T15:46:13.126Z","op":"done","visit":"iterations/i15/gate-kickoff@0","node":"d5","brief":"gate-kickoff form already stands signed, all 13 fields full"}
+{"ts":"2026-08-19T15:46:13.442Z","op":"defer","visit":"iterations/i15/gate-kickoff@0","node":"d6","brief":"submit gate, stop for bless","to":"the owner — bless owed on i15/gate-kickoff, stop-at=bless","hops":1,"trail":["iterations/i15/gate-kickoff","the owner — bless owed on i15/gate-kickoff, stop-at=bless"]}

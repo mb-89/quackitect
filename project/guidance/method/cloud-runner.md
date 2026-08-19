@@ -245,6 +245,11 @@ SO PUSHING IS PART OF THE RUN, not something that follows it.
   report.
 - WHAT DOES NOT CHANGE: no force, no history rewrite, and no push to a branch
   you were not given. SE-C-002 stands untouched.
+- A SESSION TOLD NOT TO PUSH DOES NOT PUSH. This ruling is about the DEFAULT
+  on an unattended box, not a duty that outranks the person who started the
+  run. Where the session's own instructions forbid a push, they win: say in
+  the report that the work is committed and unpushed, and that the box takes
+  it when it is reclaimed. Never push to prove a card right.
 
 THE GUIDANCE AND THE ENGINE NOW DISAGREE, deliberately and temporarily. The
 engine is the half that is wrong, and closing the gap is an iteration's work:
@@ -260,6 +265,12 @@ the whole account.
 - RECORD EVERY ANSWER with `se_answer`, even when the question came from
   yourself.
 
-WRITE THE HANDOVER BEFORE YOU RUN OUT. `.se/HANDOVER.md` is what the next
-session reads, and on an unattended machine it is the only thing that carries
-context across.
+WRITE IT DOWN AS YOU GO, BECAUSE THERE IS NO HANDOVER TO WRITE AT THE END
+(owner ruling 2026-08-07). This card used to send the next session's context
+to `.se/HANDOVER.md`. That file is gone, and boot now describes the last
+session from the call log instead.
+
+THAT MAKES THE THREE LINES ABOVE THE WHOLE ACCOUNT. An update nobody rode, a
+stray nobody captured and an answer nobody recorded are lost when the box is
+reclaimed. Anything that must outlive the run goes into guidance, a note or
+the record, at the moment you think of it.
