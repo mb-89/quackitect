@@ -2956,7 +2956,15 @@ export class Session {
    *  leaves the reader to guess a door and read the refusal.
    *
    *  AND THE ENGINE ALREADY KNOWS WHY THE ROUTE FAILED. "nothing routes toward
-   *  X from here" is true and useless. The claim guard holds which upstream
+   *  X from here" is true and useless.
+   *
+   *  THE SHAPE, NAMED PRECISELY, because the walk that hit it read it as a
+   *  routing bug and it is not one. nextObjective redirects the objective to
+   *  the first unmet feeder of the aim. Where that feeder is THE STATE THE
+   *  WALK IS STANDING ON — stale because something above it was re-signed —
+   *  the objective collapses to the current position, computeRoute is handed
+   *  start === target, and an empty route comes back. Nothing is broken. The
+   *  work is simply HERE, and the answer never said so. The claim guard holds which upstream
    *  claim fell, the chain it starts at, and the call that re-earns it.
    *  Measured on the i15 walk: a re-signed gate-kickoff dropped draft-vision
    *  beneath it, the wait said only that no route existed, and the walk spent
