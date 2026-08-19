@@ -30,6 +30,8 @@ The agent describes the change in plain words and asks the BM25 sibling for cand
 CANNOT BE ASKED. The function exists and no lane verb reaches it, so the actor this story names has no way to make this call mid-change. The gap is one hop, the same hop the query evaluator waits on.
 
 NOT YET AVAILABLE. The BM25 sibling belongs to i15, which stands `status: open`, so there is no verb to ask. i35 found its coupling by drawing the element and reading the matrix — which works, and only after the code is written.
+
+DEMONSTRATED 2026-08-19, i15 run-demos. `se_couplings` is wired and reachable. Asked with a real, plain-words change description; the call returned a scored candidate list. Report: rpt-dispose-a-candidate-coupling.md in i15 own reports folder.
 ---
 
 The sibling ranks the corpus by relevance to that description and returns a scored list of candidates, not a single guess.
@@ -37,6 +39,8 @@ The sibling ranks the corpus by relevance to that description and returns a scor
 BUILT AND TEST-VERIFIED. The ranker returns scored candidates and filters anything at or below its threshold, so a weak overlap is not proposed at all — `engine/disposition.ts:14` and the cases in `tests/coupling-rank.test.ts`. This half of the story is done.
 
 UNMEASURED. No ranked candidate list has been produced by this system yet, because the sibling does not exist.
+
+MEASURED 2026-08-19, i15 run-demos. 706 candidates scored above threshold for a real change description; a separate deliberately unrelated description returned 314, not zero, on genuine term overlap with the corpus own common vocabulary rather than a false pass. Report: rpt-dispose-a-candidate-coupling.md.
 ---
 
 The agent goes through every candidate and disposes of it — real coupling, or not — rather than picking the top hit and moving on.
@@ -44,6 +48,8 @@ The agent goes through every candidate and disposes of it — real coupling, or 
 NOT DELIVERED, and this is the slide with the deeper gap. `recordCouplingDisposition` at `engine/disposition.ts:86` stamps every candidate handed to it as one `pending` row, with no threshold band and no auto-classification, per raid-dec-i15-disposition-prepopulates-pending-rows. NOTHING CALLS IT — not a verb, not the engine, not a test. It is a function waiting for the walk that uses it, so no disposition rows exist for a reader to check.
 
 THE FORCED DISPOSITION IS PROVEN, THOUGH NOT BY BM25. i35 met the same mechanism twice this run: `probe-assumptions` handed back 42 rows and refused until each was answered, and `observe-red` handed back 15 and refused until each was checked or owed. The pattern that makes this story valuable is live; only the candidate SOURCE is missing.
+
+PARTIALLY DEMONSTRATED 2026-08-19, i15 run-demos. All 706 candidates got exactly one pending row, nothing silently dropped. The top 15 by score were read and disposed for real, one at a time (3 accepted as real couplings, 12 rejected), with reasoning on file. The remaining 691 were not individually read this run — the pass line of EVERY candidate disposed is not met at full scale, named plainly rather than absorbed. Report: rpt-dispose-a-candidate-coupling.md.
 ---
 
 A candidate turns out to be a real, previously unnamed coupling. The agent handles it before the change ships, instead of a red team or an incident finding it later.

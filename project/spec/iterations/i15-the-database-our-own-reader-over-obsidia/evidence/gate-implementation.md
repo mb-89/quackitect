@@ -1,5 +1,8 @@
 ---
 form: gate-implementation
+bless: blessed by agent
+by: agent
+signed_off: 2026-08-19T19:48:37.414Z
 authors: agent
 files:
 ---
@@ -12,18 +15,17 @@ All 7 kickoff goals are now built and tested, following the coordinator's two di
 
 ## quality_ok
 
-- [x] Dependencies stay layered — engine/query.ts reuses engine/tables.ts's loadBase/selectRows/readVault rather than a parallel grammar; engine/tools-query.ts imports only query.ts and disposition.ts; no new cross-layer edge.
-- [x] Every new element carries one stated responsibility — query.ts executes a .base view, disposition.ts ranks and records couplings, tools-query.ts wires both to the lane surface, cleanly split.
-- [x] The linter and the complexity ceiling are clean, with no new suppression — biome check --write --error-on-warnings passed clean across all 314 files in the latest battery run, no warnings.
-- [x] Every new behavior carries its check, and the battery is green at rest — 1492/1492 pass, 0 fail, confirmed this session (job test-mt0huobd-12).
-- [x] Nothing speculative shipped — file.inFolder and the file.tags wiring were built because two and three of the 25 harvested queries respectively could not run without them, not speculatively; every other addition traces to a named kickoff goal.
-- [x] What changed is findable — engine/tools-query.ts, engine/expr.ts's inFolder method, engine/tables.ts's tags wiring, engine/stateform.ts's resolver scoping, engine/trace.ts's minted_in field, the 26 harvested files, two interface entries, and the test files proving each.
-- [x] Every quick-and-dirty taken stands as a visible raid debt entry — raid-debt-delta-default-views (seven pool resolvers deliberately left corpus-wide, reasoned in its own Repayment-landed section); no other debt was taken this pass.
+- [x] Dependencies stay layered
+- [x] Every new element carries one stated responsibility
+- [x] The linter and the complexity ceiling are clean, with no new suppression
+- [x] Every new behavior carries its check, and the battery is green at rest
+- [x] Nothing speculative shipped
+- [x] What changed is findable
+- [x] Every quick-and-dirty taken stands as a visible raid debt entry
 
 ## debt_taken
 
-- raid-debt-delta-default-views (partial repayment: 8 of 15 $-item sources fixed, covering the debt's own worked example; 7 pool/comparison-machine resolvers deliberately deferred with rationale — stays open on its own terms)
-- raid-debt-i15-gate-implementation-reached-with-five-goals-unbuilt (closed this pass — see its own Closed 2026-08-19 section)
+- raid-debt-delta-default-views
 
 ## risks_acceptable
 
@@ -47,7 +49,7 @@ acceptable — the one open debt (raid-debt-delta-default-views) narrows what a 
 ## goals_served
 
 - Ship a read-only lane verb that reads nodes, edges, states and notes from .base files, returns filtered rows with chosen fields, and refuses an unknown field by naming the field list.: SERVED — se_query, wired to answerStructuredQuery, executes a harvested .base file's own view against the real vault; SE-C-144 refuses an unrequested field by name with the legal list.
-- Harvest v1's 25 working .base query files from spec/queries/ at ref main, plus the reader ADR at spec/decisions/adr-query-in-engine.md.: SERVED — all 26 files harvested, hash-verified against the ref-main read, at project/spec/queries/ and project/spec/decisions/adr-query-in-engine.md.
+- Harvest v1's 25 working .base query files from `spec/queries/` at ref `main`, plus the reader ADR at `spec/decisions/adr-query-in-engine.md`.: SERVED — all 26 files harvested, hash-verified against the ref-main read, at project/spec/queries/ and project/spec/decisions/adr-query-in-engine.md.
 - Extend the pinned Bases subset only where a harvested query needs it, test-first, reopening the decision rather than smuggling in a silent extension.: SERVED — file.inFolder added test-first (3 of 25 harvested files needed it, a hard crash without it); readVault's file.hasTag wiring fixed test-first (2 of 25 harvested files needed it, a silent always-empty result without it). Both are named, reasoned extensions, not silent ones.
 - Add conformance fixtures that pin the subset against drift.: SERVED — 5 new tests in query.test.ts, each mirroring a filter/sort shape copied verbatim from a harvested file; tables.test.ts's pre-existing 'every declared view in the vault draws' / 'no view is beyond the renderer' tests now cover the harvest too, since listBases walks the real vault.
 - Fix raid-debt-delta-default-views so the $-item resolvers default to the bound record's minted_in delta, with an opt-in to widen to the corpus.: SERVED, PARTIALLY — 8 of 15 $-item sources fixed and proven test-first (covering the debt's own worked example, test-specs); 7 pool/comparison-machine sources deliberately deferred with rationale, documented in the raid entry itself.
@@ -66,7 +68,7 @@ acceptable — the one open debt (raid-debt-delta-default-views) narrows what a 
 
 ## raid_additions
 
-none new this pass — raid-debt-delta-default-views was amended (repayment recorded, stays open); raid-debt-i15-gate-implementation-reached-with-five-goals-unbuilt was closed.
+- none — no new raid entry was minted this pass; raid-debt-delta-default-views was amended in place (repayment recorded, stays open) and raid-debt-i15-gate-implementation-reached-with-five-goals-unbuilt was closed, neither is a new entry.
 
 ## verdict
 

@@ -2558,6 +2558,38 @@ export class Session {
     if (this._target === "" && form.choice !== undefined) {
       return { fanOut: this.pullPickChoice(form.choice) };
     }
+    // A CHOICE IS AN AIM, AND SAYING "NOTHING WANTS A FORM" ANSWERS A DIFFERENT
+    // QUESTION. The reader was trying to GO somewhere; the answer described the
+    // engine’s state and never said where it could go instead.
+    //
+    // MEASURED ON THE i15 WALK: ten of these, and three in a row were the same
+    // door sent three ways — as a list, as a short name, as a long name with a
+    // submit flag. Each got the identical generic sentence. The doors were
+    // computed on the same pass and withheld.
+    if (form.choice !== undefined) {
+      const doors = this.pullOptions().map((o) => String(o.to));
+      throw new Rejection({
+        clause: CLAUSES.NOT_LEGAL_IN_STATE,
+        expected:
+          doors.length > 0
+            ? `one of the doors offered from here: ${doors.join(", ")}`
+            : "a branching point, where a choice is what the pull is asking for",
+        got: `a choice of ${JSON.stringify(form.choice)}, where the walk is not at a branching point`,
+        remedy:
+          doors.length > 0
+            ? {
+                tool: "se_pull",
+                args: { form: { choice: doors[0] } },
+                note: `these are the doors from here: ${doors.join(", ")}. To aim at somewhere further off, se_aim names the target and the walk routes to it.`,
+              }
+            : {
+                tool: "se_aim",
+                args: { target: "<the state you want to reach>" },
+                note: "no door is offered from where you stand, so no choice can be taken. se_aim sets a target and the walk routes toward it; a bare pull says what is owed here first.",
+              },
+        source: "engine/session.ts pull",
+      });
+    }
     throw new Rejection({
       clause: CLAUSES.NOT_LEGAL_IN_STATE,
       expected: "a step that asked for a form",

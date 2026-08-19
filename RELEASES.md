@@ -2,6 +2,20 @@
 
 One entry per shipped version, newest first.
 
+## 6.0.0 — 2026-08-19
+
+An agent can now ask the database a structured question instead of grepping for it, and can ask it which of a change's ripples actually matter instead of reading every one by hand.
+
+- A new question the agent can ask: read nodes, edges, states and notes with filters and chosen fields, the same way the reader you already had for browsing does — and if you ask for something it does not carry, it tells you by name instead of answering wrong.
+- 26 working questions from an earlier version were carried over rather than reinvented, and five small extensions were added only where one of them actually needed it, each proven with a test first.
+- A second new question: when a change touches many other things, the agent can ask which of them actually matter, and has to decide on each one rather than skim a raw list.
+- Both real runs found and fixed real bugs along the way — one silently dropped a filter, the other showed that keyword matching alone cannot always tell what is related from what is not.
+
+### What this release does not change
+
+- Some of what the database can show a resolver by default still shows everything in the project rather than just the current piece of work; most of it now defaults narrower, a few cases are left for a later pass.
+- Nobody has checked yet whether this duplicates something Obsidian's own database view already does better.
+
 ## 5.0.0 — 2026-08-18
 
 You can make your own copy of this system, and point it at your own work.

@@ -558,3 +558,94 @@
 {"ts":"2026-08-19T19:45:58.497Z","op":"update","visit":"iterations/i15/gate-implementation@0","node":"d202","brief":"re-reading gate-kickoff.md's goals section verbatim for goals_served"}
 {"ts":"2026-08-19T19:46:21.390Z","op":"update","visit":"iterations/i15/gate-implementation@0","node":"d203","brief":"finding the canonical quality checklist card"}
 {"ts":"2026-08-19T19:46:52.556Z","op":"update","visit":"iterations/i15/gate-implementation@0","node":"d204","brief":"reading the canonical quality_ok checklist card in full"}
+{"ts":"2026-08-19T19:52:18.157Z","op":"update","visit":"iterations/i15/gate-implementation@0","node":"d205","brief":"blessing gate-implementation on checks run against the code, not the form"}
+{"ts":"2026-08-19T20:03:34.833Z","op":"plan","visit":"iterations/i15/run-demos@0","parent":null,"nodes":[{"id":"d206","brief":"pull to see current state at run-demos"},{"id":"d207","brief":"do the run-demos work as handed"}]}
+{"ts":"2026-08-19T20:06:55.338Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d208","brief":"found fill-story-evidence undone: demos.md still placeholder, must author it"}
+{"ts":"2026-08-19T20:07:02.886Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d209","brief":"checking sibling iterations for an authored demos.md example"}
+{"ts":"2026-08-19T20:11:00.789Z","op":"plan","visit":"iterations/i15/run-demos@0","parent":null,"nodes":[{"id":"d210","brief":"author demos.md drawing for the 2 must stories i15 unblocked"},{"id":"d211","brief":"perform demo 1: structured query over decisions-architecture.base"},{"id":"d212","brief":"perform demo 2: BM25 coupling disposition end to end"},{"id":"d213","brief":"write rpt-answer-what-does-this-touch.md report"},{"id":"d214","brief":"write rpt-dispose-a-candidate-coupling.md report"},{"id":"d215","brief":"fill both stories evidence slides with report references"},{"id":"d216","brief":"fill+submit run-demos front-desk form"}]}
+{"ts":"2026-08-19T20:12:21.593Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d217","brief":"wrote demo1 script exercising the real answerStructuredQuery function"}
+{"ts":"2026-08-19T20:12:27.356Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d218","brief":"executing demo1 script for real against the built engine"}
+{"ts":"2026-08-19T20:13:03.332Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d219","brief":"checking test fixtures for filters shape vs real harvested files"}
+{"ts":"2026-08-19T20:13:20.634Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d220","brief":"confirmed real bug: top-level filters in .base files are never applied"}
+{"ts":"2026-08-19T20:13:35.671Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d211","brief":"demo1 performed for real; surfaced a real bug: top-level .base filters are dropped"}
+{"ts":"2026-08-19T20:13:43.587Z","op":"plan","visit":"iterations/i15/run-demos@0","parent":null,"nodes":[{"id":"d221","brief":"patch parseBase in tables.ts to honor top-level filters"},{"id":"d222","brief":"add regression test pinning the harvested top-level-filters shape"},{"id":"d223","brief":"run tests to confirm green"},{"id":"d224","brief":"re-run demo1 to confirm the fix"}]}
+{"ts":"2026-08-19T20:13:53.515Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d225","brief":"scanning harvested files to confirm fix shape before patching"}
+{"ts":"2026-08-19T20:14:41.926Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d226","brief":"reverted a native-tool slip; redoing the patch through se_file_patch"}
+{"ts":"2026-08-19T20:15:02.635Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d227","brief":"applied the top-level-filters fallback fix via se_file_patch"}
+{"ts":"2026-08-19T20:15:16.966Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d228","brief":"applied the top-level-filters fallback fix via se_file_patch"}
+{"ts":"2026-08-19T20:15:26.624Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d229","brief":"reading rest of query.test.ts to place the new regression case"}
+{"ts":"2026-08-19T20:15:37.797Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d230","brief":"reading exact tail of query.test.ts before inserting the new case"}
+{"ts":"2026-08-19T20:16:17.359Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d231","brief":"added two regression tests pinning top-level filters and view override"}
+{"ts":"2026-08-19T20:16:24.555Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d221","brief":"parseBase fix landed: top-level filters now fall back correctly"}
+{"ts":"2026-08-19T20:16:54.952Z","op":"fork","visit":"iterations/i15/run-demos@0","parent":"d222","node":"d232","brief":"unrelated pre-existing typecheck error surfaced on pull; triaging before continuing","nodes":[]}
+{"ts":"2026-08-19T20:17:10.312Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d233","brief":"kicking off scoped test run for the parseBase fix"}
+{"ts":"2026-08-19T20:17:34.829Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d234","brief":"authoring the demos.md drawing for the two new must stories"}
+{"ts":"2026-08-19T20:18:08.577Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d210","brief":"authored demos.md with the two must-story steps, scoped and reasoned"}
+{"ts":"2026-08-19T20:18:30.173Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d235","brief":"executing demo2 script for real against the built engine"}
+{"ts":"2026-08-19T20:19:28.638Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d223","brief":"battery green 1501/1501 after the fix"}
+{"ts":"2026-08-19T20:19:39.630Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d236","brief":"printing all matched rows to see why adr-query-in-engine is missing"}
+{"ts":"2026-08-19T20:19:51.259Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d237","brief":"re-running demo1 with row names printed"}
+{"ts":"2026-08-19T20:20:46.663Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d238","brief":"reading statements of top-15 candidates to dispose each for real"}
+{"ts":"2026-08-19T20:20:55.334Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d239","brief":"reading statements of the top-15 candidates to dispose each for real"}
+{"ts":"2026-08-19T20:21:20.486Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d240","brief":"reading top-15 candidate statements to dispose each for real"}
+{"ts":"2026-08-19T20:22:01.126Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d212","brief":"demo2 performed for real with top-15 candidates disposed"}
+{"ts":"2026-08-19T20:22:13.157Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d232","brief":"stale cached field; fresh battery run showed no typecheck errors"}
+{"ts":"2026-08-19T20:22:17.989Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d222","brief":"regression tests confirmed green in the full battery"}
+{"ts":"2026-08-19T20:22:23.307Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d224","brief":"demo1 re-run confirmed the fix: 1907 rows dropped to 1 correctly filtered row"}
+{"ts":"2026-08-19T20:23:55.734Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d213","brief":"demo1 report written and honestly documented"}
+{"ts":"2026-08-19T20:24:01.404Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d214","brief":"demo2 report written with honest partial disposition and BM25 finding"}
+{"ts":"2026-08-19T20:24:08.524Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d241","brief":"reading sty-answer-what-does-this-touch.md to fill its evidence slides"}
+{"ts":"2026-08-19T20:24:37.043Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d242","brief":"filled sty-answer-what-does-this-touch evidence slides"}
+{"ts":"2026-08-19T20:24:57.981Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d243","brief":"filled sty-dispose-a-candidate-coupling evidence slides"}
+{"ts":"2026-08-19T20:25:03.960Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d215","brief":"both story decks filled with demonstrated evidence and report refs"}
+{"ts":"2026-08-19T20:25:17.877Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d244","brief":"filling and submitting the run-demos front-desk form"}
+{"ts":"2026-08-19T20:25:31.198Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d216","brief":"run-demos front-desk form signed; walked into the demos sub-machine"}
+{"ts":"2026-08-19T20:25:50.743Z","op":"plan","visit":"iterations/i15/run-demos/sty-answer-what-does-this-touch@0","parent":null,"nodes":[{"id":"d245","brief":"fill and submit sty-answer-what-does-this-touch evidence form"}]}
+{"ts":"2026-08-19T20:26:02.234Z","op":"done","visit":"iterations/i15/run-demos/sty-answer-what-does-this-touch@0","node":"d245","brief":"sty-answer-what-does-this-touch evidence form signed"}
+{"ts":"2026-08-19T20:26:21.331Z","op":"plan","visit":"iterations/i15/sweep-consistency@0","parent":null,"nodes":[{"id":"d246","brief":"read meth-consistency-sweep card"},{"id":"d247","brief":"list what i15 changed from the evidence trail"},{"id":"d248","brief":"sweep command and tool docs"},{"id":"d249","brief":"sweep engine-served strings"},{"id":"d250","brief":"sweep method cards"},{"id":"d251","brief":"sweep matrix rows"},{"id":"d252","brief":"sweep templates and skeletons"},{"id":"d253","brief":"sweep guidance chapters"},{"id":"d254","brief":"sweep book chapters"},{"id":"d255","brief":"sweep README and entry docs"},{"id":"d256","brief":"sweep panels and form help"},{"id":"d257","brief":"fill and submit sweep-consistency form"}]}
+{"ts":"2026-08-19T20:26:29.830Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d206","brief":"stale leftover from an earlier state; resolving now"}
+{"ts":"2026-08-19T20:26:37.173Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d207","brief":"stale leftover from run-demos; that work is complete"}
+{"ts":"2026-08-19T20:26:47.790Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d246","brief":"read the sweep method card; procedure and surface list understood"}
+{"ts":"2026-08-19T20:27:13.297Z","op":"update","visit":"iterations/i15/sweep-consistency@0","node":"d258","brief":"searching for a canonical tool-reference doc surface"}
+{"ts":"2026-08-19T20:27:56.612Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d248","brief":"no static tool-reference doc found; nothing stale to sweep"}
+{"ts":"2026-08-19T20:28:10.379Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d247","brief":"changes are se_query/se_couplings wiring plus the tables.ts filter fix"}
+{"ts":"2026-08-19T20:28:19.635Z","op":"update","visit":"iterations/i15/sweep-consistency@0","node":"d259","brief":"checking README tool count against the pinned test assertion"}
+{"ts":"2026-08-19T20:28:33.492Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d255","brief":"README tool count was stale (34); fixed to the pinned 38"}
+{"ts":"2026-08-19T20:28:41.256Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d249","brief":"tools-query.ts own description strings checked and accurate"}
+{"ts":"2026-08-19T20:28:46.501Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d250","brief":"meth-validation-container and the two matrix rows read; both accurate"}
+{"ts":"2026-08-19T20:28:55.479Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d251","brief":"M8_10 and M8_15 matrix rows already read; both accurate"}
+{"ts":"2026-08-19T20:29:00.757Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d252","brief":"no template or skeleton teaches query/coupling behavior; nothing to sweep"}
+{"ts":"2026-08-19T20:29:06.993Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d253","brief":"refusals.md SE-C-144 already correct; no other guidance touched"}
+{"ts":"2026-08-19T20:29:15.840Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d254","brief":"no book folder exists in this project yet; class not applicable"}
+{"ts":"2026-08-19T20:29:21.438Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d256","brief":"no panel or form help text describes query/coupling behavior yet"}
+{"ts":"2026-08-19T20:29:36.998Z","op":"update","visit":"iterations/i15/sweep-consistency@0","node":"d260","brief":"filling and submitting the sweep-consistency form"}
+{"ts":"2026-08-19T20:29:45.393Z","op":"update","visit":"iterations/i15/sweep-consistency@0","node":"d261","brief":"checking why run-demos shows as an unsigned feeder"}
+{"ts":"2026-08-19T20:29:52.432Z","op":"update","visit":"iterations/i15/sweep-consistency@0","node":"d262","brief":"submitting the sweep-consistency form now that fields are saved"}
+{"ts":"2026-08-19T20:29:58.933Z","op":"update","visit":"iterations/i15/sweep-consistency@0","node":"d263","brief":"reading run-demos.md directly to check its signed status"}
+{"ts":"2026-08-19T20:30:10.932Z","op":"update","visit":"iterations/i15/sweep-consistency@0","node":"d264","brief":"bare pull per the remedy note to see what run-demos still owes"}
+{"ts":"2026-08-19T20:30:50.346Z","op":"update","visit":"iterations/i15/sweep-consistency@0","node":"d265","brief":"retrying submit after a bare pull refresh"}
+{"ts":"2026-08-19T20:31:15.770Z","op":"update","visit":"iterations/i15/sweep-consistency@0","node":"d266","brief":"escaping to front desk to force a reload after the stuck feeder check"}
+{"ts":"2026-08-19T20:46:43.676Z","op":"done","visit":"iterations/select@2","node":"d269","brief":"entered i15, auto-walked to enumerate-space/start"}
+{"ts":"2026-08-19T20:49:17.364Z","op":"done","visit":"iterations/select@2","node":"d270","brief":"sweep-consistency submitted, now at gate-validation"}
+{"ts":"2026-08-19T20:51:49.757Z","op":"update","visit":"iterations/i15/gate-validation@0","node":"d275","brief":"gathering evidence to fill gate-validation form"}
+{"ts":"2026-08-19T20:56:51.165Z","op":"update","visit":"iterations/i15/gate-validation@0","node":"d276","brief":"minting the missing demonstration test-spec for sty-a-smaller-model-walks-a-record"}
+{"ts":"2026-08-19T20:56:56.893Z","op":"update","visit":"iterations/i15/gate-validation@0","node":"d277","brief":"minting the missing demonstration test-spec for sty-a-smaller-model-walks-a-record"}
+{"ts":"2026-08-19T20:57:02.623Z","op":"update","visit":"iterations/i15/gate-validation@0","node":"d278","brief":"minting the missing demonstration test-spec for sty-a-smaller-model-walks-a-record"}
+{"ts":"2026-08-19T20:57:07.937Z","op":"update","visit":"iterations/i15/gate-validation@0","node":"d279","brief":"minting the raid issue that names why the demo is owed"}
+{"ts":"2026-08-19T20:57:31.073Z","op":"update","visit":"iterations/i15/gate-validation@0","node":"d280","brief":"minting the raid issue that names why the demo is owed"}
+{"ts":"2026-08-19T20:57:47.927Z","op":"update","visit":"iterations/i15/gate-validation@0","node":"d281","brief":"resubmitting gate-validation now that the missing test-spec and raid entry exist"}
+{"ts":"2026-08-19T20:58:33.609Z","op":"done","visit":"iterations/select@2","node":"d271","brief":"gate-validation blessed; walked into M9 package"}
+{"ts":"2026-08-19T20:59:33.139Z","op":"plan","visit":"iterations/i15/package@0","parent":null,"nodes":[{"id":"d282","brief":"bump version to 6.0.0"},{"id":"d283","brief":"assemble the package by script"},{"id":"d284","brief":"check it works by using it"},{"id":"d285","brief":"fill and submit package form"}]}
+{"ts":"2026-08-19T20:59:40.073Z","op":"plan","visit":"iterations/i15/package@0","parent":null,"nodes":[]}
+{"ts":"2026-08-19T20:59:58.114Z","op":"update","visit":"iterations/i15/package@0","node":"d286","brief":"running the packaging script to assemble 6.0.0"}
+{"ts":"2026-08-19T21:00:12.353Z","op":"update","visit":"iterations/i15/package@0","node":"d287","brief":"running the packaging script from the true repo root"}
+{"ts":"2026-08-19T21:00:37.519Z","op":"update","visit":"iterations/i15/package@0","node":"d288","brief":"expanding the archive to check it"}
+{"ts":"2026-08-19T21:00:43.943Z","op":"update","visit":"iterations/i15/package@0","node":"d289","brief":"expanding the archive to check it"}
+{"ts":"2026-08-19T21:01:18.484Z","op":"update","visit":"iterations/i15/package@0","node":"d290","brief":"starting the entrypoint from inside the extracted artifact"}
+{"ts":"2026-08-19T21:01:25.214Z","op":"done","visit":"iterations/i15/package@0","node":"d284","brief":"entrypoint runs from inside the extracted artifact, exit 0"}
+{"ts":"2026-08-19T21:01:30.411Z","op":"done","visit":"iterations/i15/package@0","node":"d282","brief":"version bumped to 6.0.0 in package.json"}
+{"ts":"2026-08-19T21:02:08.252Z","op":"done","visit":"iterations/i15/package@0","node":"d283","brief":"6.0.0 zip built and checked; release notes entry added"}
+{"ts":"2026-08-19T21:02:15.832Z","op":"update","visit":"iterations/i15/package@0","node":"d291","brief":"rebuilding the archive so it carries the release notes entry too"}
+{"ts":"2026-08-19T21:02:30.717Z","op":"update","visit":"iterations/i15/package@0","node":"d292","brief":"re-checking the rebuilt archive works"}
+{"ts":"2026-08-19T21:03:17.971Z","op":"done","visit":"iterations/i15/package@0","node":"d285","brief":"package form filled and submitted"}
+{"ts":"2026-08-19T21:04:19.102Z","op":"update","visit":"iterations/i15/gate-release@0","node":"d293","brief":"filling and submitting gate-release"}

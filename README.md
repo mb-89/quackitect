@@ -138,7 +138,7 @@ generated copies are gitignored).
 installs ripgrep via npm (`@vscode/ripgrep`) and fails red without either —
 there is no fallback search engine.
 
-## The lane (34 tools; the twelve below are the drop-in replacements)
+## The lane (38 tools; the twelve below are the drop-in replacements)
 
 | native | se | better because |
 | --- | --- | --- |

@@ -179,3 +179,65 @@ test("a declared sort orders the rows, mirroring ifus.base's sort by file.name",
     "manifest-a.md sorts before manifest-b.md",
   );
 });
+
+// TOP-LEVEL filters -- the shape every one of the 26 harvested files under
+// project/spec/queries/ actually writes (see decisions-architecture.base,
+// requirements.base, raid.base: filters: sits ABOVE views:, once, shared by
+// every view). Every fixture above nests filters INSIDE the view instead,
+// which is legal but is not what a harvested file does -- so none of them
+// caught parseBase silently dropping a document-level filters: and matching
+// the whole vault. Found by i15 own run-demos demonstration against
+// decisions-architecture.base: 1907 rows back with no type == adr filter
+// applied at all.
+const TOP_LEVEL_FILTERS_BASE = `filters:
+  and:
+    - type == "raid"
+    - kind == "assumption"
+views:
+  - type: table
+    name: Assumptions
+    order:
+      - id
+`;
+
+function topLevelFiltersRoot(): string {
+  const root = mkdtempSync(join(tmpdir(), "se-query-toplevel-"));
+  const dir = join(root, "project");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "top.base"), TOP_LEVEL_FILTERS_BASE);
+  writeFileSync(join(dir, "raid-one.md"), "---\nid: r1\ntype: raid\nkind: assumption\n---\n\n# one\n");
+  writeFileSync(join(dir, "raid-two.md"), "---\nid: r2\ntype: raid\nkind: risk\n---\n\n# two\n");
+  writeFileSync(join(dir, "other.md"), "---\nid: o1\ntype: manifest\n---\n\n# other\n");
+  return root;
+}
+
+test("top-level filters, above views and shared by them, narrow the rows, mirroring every harvested file", () => {
+  const result = answerStructuredQuery(topLevelFiltersRoot(), { base: "top.base", view: "Assumptions" });
+  assert.deepEqual(
+    result.rows,
+    [{ id: "r1" }],
+    "only the raid+assumption note matches, not the raid+risk note, not the manifest, and not all three",
+  );
+});
+
+test("a view own filters still win over the base top-level ones when both are present", () => {
+  const overriding = `filters:
+  and:
+    - type == "raid"
+views:
+  - type: table
+    name: OnlyRisk
+    order:
+      - id
+    filters:
+      kind == "risk"
+`;
+  const root = mkdtempSync(join(tmpdir(), "se-query-override-"));
+  const dir = join(root, "project");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "o.base"), overriding);
+  writeFileSync(join(dir, "a.md"), "---\nid: a1\ntype: raid\nkind: assumption\n---\n\n# a\n");
+  writeFileSync(join(dir, "b.md"), "---\nid: a2\ntype: raid\nkind: risk\n---\n\n# b\n");
+  const result = answerStructuredQuery(root, { base: "o.base", view: "OnlyRisk" });
+  assert.deepEqual(result.rows, [{ id: "a2" }], "the view own kind==risk filter applies, not the base broader type==raid alone");
+});
