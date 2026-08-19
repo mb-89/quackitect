@@ -476,3 +476,36 @@
 {"ts":"2026-08-19T19:06:08.241Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d126","brief":"scanning harvested filters batch 1"}
 {"ts":"2026-08-19T19:06:17.578Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d127","brief":"scanning harvested filters batch 2"}
 {"ts":"2026-08-19T19:06:32.819Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d128","brief":"listing tests dir to find expr.ts's test file"}
+{"ts":"2026-08-19T19:06:41.734Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d129","brief":"reading expr.test.ts to see hasTag test pattern"}
+{"ts":"2026-08-19T19:07:37.361Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d130","brief":"searching corpus for hasTag usage against readVault"}
+{"ts":"2026-08-19T19:08:01.435Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d131","brief":"reading tables.test.ts for readVault/fixture patterns"}
+{"ts":"2026-08-19T19:08:37.264Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d132","brief":"checking bases-syntax.md's inFolder spec"}
+{"ts":"2026-08-19T19:09:08.032Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d133","brief":"test-first: added file.inFolder cases to expr.test.ts before implementing"}
+{"ts":"2026-08-19T19:09:18.190Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d134","brief":"scoped test: confirm RED before implementing file.inFolder"}
+{"ts":"2026-08-19T19:09:29.549Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d135","brief":"fixing a typecheck error in the new file.inFolder test (Ctx.row.file, not Ctx.file)"}
+{"ts":"2026-08-19T19:10:07.623Z","op":"defer","visit":"iterations/i15/gate-implementation@0","node":"d78","brief":"fix raid-debt-delta-default-views resolvers","to":"after conformance-fixtures lands (this call is still mid-conformance-fixtures work)","hops":1,"trail":["iterations/i15/gate-implementation","after conformance-fixtures lands (this call is still mid-conformance-fixtures work)"]}
+{"ts":"2026-08-19T19:10:19.571Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d136","brief":"re-reading expr.test.ts to confirm the patch landed"}
+{"ts":"2026-08-19T19:10:31.640Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d137","brief":"scoped test 2: confirm RED before implementing file.inFolder"}
+{"ts":"2026-08-19T19:10:43.152Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d138","brief":"reading readVault precisely to patch file.tags wiring"}
+{"ts":"2026-08-19T19:11:00.643Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d139","brief":"reading helpers.ts's freshRoot before writing the file.tags test"}
+{"ts":"2026-08-19T19:11:30.041Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d140","brief":"test-first: added a real-vault file.hasTag test to tables.test.ts before wiring file.tags"}
+{"ts":"2026-08-19T19:11:39.221Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d141","brief":"checking inFolder RED job status"}
+{"ts":"2026-08-19T19:11:53.996Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d142","brief":"adding file.inFolder to expr.ts, needed by 3 of the 25 harvested queries"}
+{"ts":"2026-08-19T19:12:16.252Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d143","brief":"wired file.tags onto readVault"}
+{"ts":"2026-08-19T19:12:30.585Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d144","brief":"reading query.ts to design conformance fixtures against harvested shapes"}
+{"ts":"2026-08-19T19:13:06.256Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d145","brief":"reading query.test.ts's current fixture pattern"}
+{"ts":"2026-08-19T19:13:51.875Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d146","brief":"checking green status for file.inFolder and file.tags fixes"}
+{"ts":"2026-08-19T19:14:12.932Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d147","brief":"scoped test: new query.test.ts conformance fixtures"}
+{"ts":"2026-08-19T19:15:15.389Z","op":"defer","visit":"iterations/i15/gate-implementation@0","node":"d80","brief":"re-walk build-steps/trace-design/verification to gate-implementation","to":"after conformance-fixtures and fix-delta-default-resolvers land","hops":1,"trail":["iterations/i15/gate-implementation","after conformance-fixtures and fix-delta-default-resolvers land"]}
+{"ts":"2026-08-19T19:15:26.360Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d148","brief":"locating the $-item resolver code for the delta-default fix"}
+{"ts":"2026-08-19T19:15:39.832Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d149","brief":"searching for the reference-table renderer code"}
+{"ts":"2026-08-19T19:15:51.136Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d150","brief":"searching engine code for minted_in usage"}
+{"ts":"2026-08-19T19:16:08.099Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d151","brief":"reading stateform.ts around the minted_in owner check"}
+{"ts":"2026-08-19T19:16:26.635Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d152","brief":"enumerating all $-item resolver functions"}
+{"ts":"2026-08-19T19:16:39.520Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d153","brief":"reading the $-item dispatcher function's own signature"}
+{"ts":"2026-08-19T19:17:01.518Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d154","brief":"finding resolveSource call sites"}
+{"ts":"2026-08-19T19:17:13.571Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d155","brief":"reading the function around resolveSource's two call sites"}
+{"ts":"2026-08-19T19:17:45.866Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d156","brief":"reading EvidenceField's type definition"}
+{"ts":"2026-08-19T19:17:59.473Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d157","brief":"reading EvidenceField's full definition in machine.ts"}
+{"ts":"2026-08-19T19:18:58.605Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d158","brief":"reading the full TYPED_SOURCES map before scoping the fix"}
+{"ts":"2026-08-19T19:19:24.798Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d159","brief":"finding fieldArgsFor's call site to learn traceRoot's real value"}

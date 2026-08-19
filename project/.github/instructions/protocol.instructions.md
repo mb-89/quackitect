@@ -7,7 +7,7 @@ applyTo: '**'
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
      from project/guidance/contract.md 2c1c1de5650a
      from project/guidance/walking.md c7d668a001e2
-     from project/guidance/method/lane.md 67a72e8a89d4
+     from project/guidance/method/lane.md 0446e75f834e
      from project/guidance/voice.md 888a21b1a538
 -->
 
@@ -604,6 +604,19 @@ or better.
 
 PATHS ARE ROOT-RELATIVE TO THE PROJECT ROOT, which is the parent of the folder
 you have open. You open `project/`; a path you pass starts `project/`.
+
+DROPPING THAT ONE WORD IS LEGAL AND SILENT. A path beginning `spec/` where it
+should begin `project/spec/` resolves, the write succeeds, and the file lands
+beside `project/` where nothing reads it. Nothing refuses it, because the root
+is a real place and its own files live there.
+
+MEASURED ON THE i15 WALK: a harvest wrote 25 query files and an ADR to a
+top-level `spec/`, noticed only afterwards, and cleaned up with an `rm -rf` at
+the repository root through the `no_tool_reason` hatch — because delete and
+move were both illegal where the walk stood.
+
+SO CHECK THE PREFIX ON THE FIRST WRITE OF A BATCH, not the twenty-sixth. A
+path that names a folder the product does not have is the tell.
 
 Every call is logged raw to `.se/calls.jsonl`.
 

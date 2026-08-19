@@ -76,3 +76,104 @@ test("the same request run twice against an unchanged corpus returns identical r
   const second = answerStructuredQuery(root, request);
   assert.deepEqual(first, second, "no write landed between the two calls, so the rows must match exactly");
 });
+
+// CONFORMANCE FIXTURES — the shapes the 25 harvested .base files actually
+// use, pinned here so a change to the pinned Bases subset shows as a red
+// case instead of a silent drift. Each filter clause below is copied
+// verbatim from a harvested file (see project/spec/queries/*.base).
+
+const SHAPES_BASE = `views:
+  - type: table
+    name: AndNesting
+    order:
+      - id
+    filters:
+      and:
+        - 'type == "raid"'
+        - 'kind == "assumption"'
+  - type: table
+    name: NotEquals
+    order:
+      - id
+    filters:
+      referenced != false
+  - type: table
+    name: HasTag
+    order:
+      - id
+    filters:
+      file.hasTag("strategy")
+  - type: table
+    name: InFolderExact
+    order:
+      - id
+    filters:
+      file.inFolder("docs")
+  - type: table
+    name: SortedByFileName
+    order:
+      - id
+    filters:
+      type == "manifest"
+    sort:
+      - property: file.name
+        direction: ASC
+`;
+
+/** A fixture whose filter shapes mirror assumptions.base (and-nesting),
+ *  fundamentals.base (!=), decisions-strategy.base (file.hasTag),
+ *  fundamentals.base/methods.base (file.inFolder, exact and sub-folder),
+ *  and ifus.base (sort by file.name). */
+function shapesRoot(): string {
+  const root = mkdtempSync(join(tmpdir(), "se-query-shapes-"));
+  const dir = join(root, "project");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "shapes.base"), SHAPES_BASE);
+  writeFileSync(join(dir, "raid-one.md"), "---\nid: r1\ntype: raid\nkind: assumption\n---\n\n# one\n");
+  writeFileSync(join(dir, "raid-two.md"), "---\nid: r2\ntype: raid\nkind: risk\n---\n\n# two\n");
+  writeFileSync(join(dir, "ref-true.md"), "---\nid: f1\nreferenced: true\n---\n\n# ref-true\n");
+  writeFileSync(join(dir, "ref-false.md"), "---\nid: f2\nreferenced: false\n---\n\n# ref-false\n");
+  writeFileSync(join(dir, "ref-unset.md"), "---\nid: f3\n---\n\n# ref-unset\n");
+  writeFileSync(join(dir, "tagged.md"), "---\nid: t1\ntags:\n  - strategy\n---\n\n# tagged\n");
+  writeFileSync(join(dir, "untagged.md"), "---\nid: t2\n---\n\n# untagged\n");
+  mkdirSync(join(dir, "docs"), { recursive: true });
+  mkdirSync(join(dir, "docs", "sub"), { recursive: true });
+  mkdirSync(join(dir, "elsewhere"), { recursive: true });
+  writeFileSync(join(dir, "docs", "in-docs.md"), "---\nid: d1\n---\n\n# in-docs\n");
+  writeFileSync(join(dir, "docs", "sub", "in-sub.md"), "---\nid: d2\n---\n\n# in-sub\n");
+  writeFileSync(join(dir, "elsewhere", "outside.md"), "---\nid: d3\n---\n\n# outside\n");
+  writeFileSync(join(dir, "manifest-b.md"), "---\nid: m1\ntype: manifest\n---\n\n# manifest-b\n");
+  writeFileSync(join(dir, "manifest-a.md"), "---\nid: m2\ntype: manifest\n---\n\n# manifest-a\n");
+  return root;
+}
+
+test("and-nesting: both clauses must hold, mirroring assumptions.base", () => {
+  const result = answerStructuredQuery(shapesRoot(), { base: "shapes.base", view: "AndNesting" });
+  assert.deepEqual(result.rows, [{ id: "r1" }], "only the raid+assumption note matches, not the raid+risk one");
+});
+
+test("!= treats an unset property as not-equal, mirroring fundamentals.base", () => {
+  const result = answerStructuredQuery(shapesRoot(), { base: "shapes.base", view: "NotEquals" });
+  const ids = result.rows.map((r) => r.id).sort();
+  assert.deepEqual(ids, ["f1", "f3"], "referenced: true and the unset note both pass referenced != false");
+});
+
+test("file.hasTag matches a real vault note's own frontmatter tags, mirroring decisions-strategy.base", () => {
+  const result = answerStructuredQuery(shapesRoot(), { base: "shapes.base", view: "HasTag" });
+  assert.deepEqual(result.rows, [{ id: "t1" }], "only the tagged note matches");
+});
+
+test("file.inFolder matches the exact folder and its sub-folders, mirroring fundamentals.base/methods.base", () => {
+  const result = answerStructuredQuery(shapesRoot(), { base: "shapes.base", view: "InFolderExact" });
+  const ids = result.rows.map((r) => r.id).sort();
+  assert.deepEqual(ids, ["d1", "d2"], "docs/in-docs.md and docs/sub/in-sub.md both count as inFolder(docs); elsewhere/outside.md does not");
+});
+
+test("a declared sort orders the rows, mirroring ifus.base's sort by file.name", () => {
+  const result = answerStructuredQuery(shapesRoot(), { base: "shapes.base", view: "SortedByFileName" });
+  assert.deepEqual(
+    result.rows.map((r) => r.id),
+    ["m2", "m1"],
+    "manifest-a.md sorts before manifest-b.md",
+  );
+});

@@ -172,7 +172,11 @@ export function readVault(root: string): Row[] {
     }
     try {
       const note = parseStateNote(raw);
-      return { statement: note.statement, ...note.frontmatter, file };
+      // file.hasTag reads r.tags off the FILE object a method receives (see
+      // expr.ts). Obsidian synthesises file.tags from the note's own tags;
+      // this is that synthesis for a real vault row.
+      const fileWithTags = { ...file, tags: note.frontmatter.tags ?? [] };
+      return { statement: note.statement, ...note.frontmatter, file: fileWithTags };
     } catch (err) {
       return { file, unreadable: `${rel} does not parse — ${String((err as Error).message).split("\n")[0]}` };
     }
