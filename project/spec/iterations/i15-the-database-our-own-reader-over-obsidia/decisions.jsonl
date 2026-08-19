@@ -343,3 +343,5 @@
 {"ts":"2026-08-19T15:46:03.156Z","op":"done","visit":"iterations/i15/gate-kickoff@0","node":"d4","brief":"kickoff evidence was already read and filled by a prior walk"}
 {"ts":"2026-08-19T15:46:13.126Z","op":"done","visit":"iterations/i15/gate-kickoff@0","node":"d5","brief":"gate-kickoff form already stands signed, all 13 fields full"}
 {"ts":"2026-08-19T15:46:13.442Z","op":"defer","visit":"iterations/i15/gate-kickoff@0","node":"d6","brief":"submit gate, stop for bless","to":"the owner — bless owed on i15/gate-kickoff, stop-at=bless","hops":1,"trail":["iterations/i15/gate-kickoff","the owner — bless owed on i15/gate-kickoff, stop-at=bless"]}
+{"ts":"2026-08-19T15:56:05.695Z","op":"done","visit":"front_desk@0","node":"d1","brief":"entered i15 at iterations/i15/start"}
+{"ts":"2026-08-19T15:57:17.542Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d3","brief":"checking gate-kickoff state: evidence already signed 2026-08-19"}

@@ -1,6 +1,6 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
      from project/guidance/contract.md 2c1c1de5650a
-     from project/guidance/walking.md 4a01ef2108ca
+     from project/guidance/walking.md 0c0b2a829a2f
      from project/guidance/method/lane.md 018c04798b6b
      from project/guidance/voice.md 888a21b1a538
 -->
@@ -442,18 +442,24 @@ run out, so a short state can be walked start to finish with the log holding
 nothing but pulls. That is a silent walk, and on an unattended machine the log
 is the only witness there is.
 
-- `plan {items}` starts the checklist, BEFORE the first edit of any
+EVERY OP CARRIES `op`, AND THE SHORTHAND BELOW IS NOT THE PAYLOAD. `{node,
+brief}` alone is refused with SE-C-120 saying `op: undefined`; the call is
+`{op: "done", node, brief}`. The op names the line you are reading, never the
+whole object.
+
+- `{op: "plan", items}` starts the checklist, BEFORE the first edit of any
   multi-step work. Check items off with `done` AS each lands. The checklist is
   a PROGRESS view, not a completion record — fourteen items ticked in the last
   minute tell a reader nothing the commit would not.
-- `fork {brief, items?}` opens a BLOCKING detour: the current item cannot
-  continue until it is fixed. Scope growth is another `plan`, not a fork.
-- `done | obsolete | revert {node, brief}` resolves a node. Everything started
-  gets resolved; abandoning silently is illegal.
-- `defer {node, to}` parks a point for the state that can do it.
-- `update {node, brief}` says what you are doing ON an item. The node is
-  required while a checklist stands — an update floating free of every item is
-  narration wearing progress's clothes. With nothing open, a bare update is
+- `{op: "fork", brief, items?}` opens a BLOCKING detour: the current item
+  cannot continue until it is fixed. Scope growth is another `plan`, not a
+  fork.
+- `{op: "done" | "obsolete" | "revert", node, brief}` resolves a node.
+  Everything started gets resolved; abandoning silently is illegal.
+- `{op: "defer", node, to}` parks a point for the state that can do it.
+- `{op: "update", node, brief}` says what you are doing ON an item. The node
+  is required while a checklist stands — an update floating free of every item
+  is narration wearing progress's clothes. With nothing open, a bare update is
   right.
 - THE BRIEF IS ONE LINE, 90 characters. A brief that chains three or more
   separator-joined parts is corrected rather than refused, and the result
@@ -482,6 +488,9 @@ runs, and a pull carrying evidence beside the proof pays like any other work.
 ## Notes
 
 - `se_note {text}` captures a stray anywhere; keep walking.
+- A NOTE IS PROSE AND THE WALL GUARD BINDS IT. One paragraph of six hundred
+  characters is refused with SE-C-125, the same as any other text the lane
+  takes. Break it into paragraphs as you write it.
 - `se_note_drain {ref, disposition}` takes one back out. `done` and `obsolete`
   are CHECKS ANYONE CAN RUN — look, and if the code carries it, drain it,
   saying `where:`. `carried` and `backlog` are the RETRO's judgment and the

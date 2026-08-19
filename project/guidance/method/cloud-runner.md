@@ -235,6 +235,10 @@ not delivered — you have thrown away.
 
 SO PUSHING IS PART OF THE RUN, not something that follows it.
 
+UNLESS THIS SESSION WAS TOLD NOT TO, and then it wins. This is the DEFAULT for
+an unattended box, never a duty outranking the person who started the run. The
+detail is in the last bullet below.
+
 - PUSH WHAT YOU COMMITTED, to the branch you were given. If you were given
   none, push the branch you are on.
 - PUSH BEFORE YOU REPORT, and push again after any later commit. A report

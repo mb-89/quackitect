@@ -14,7 +14,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { guidanceDocs } from "./helpers.ts";
+import { GUIDANCE, guidanceDocs } from "./helpers.ts";
 
 const ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 
@@ -109,4 +109,36 @@ test("every file path the guidance names resolves from the project root", () => 
     }
   }
   assert.deepEqual([...new Set(bad)], [], "the lane resolves every path from the project root, and these do not");
+});
+
+// A REFUSAL POINTS AT ITS OWN SECTION, so a clause the page does not carry is
+// a dead pointer handed over at the exact moment the reader is stuck. Every
+// typed rejection ships the refusals page and the clause number in `guidance`,
+// and following it is the documented way to recover in one turn.
+//
+// THE OTHER DIRECTION IS THE SAME BUG MIRRORED: a page describing a refusal
+// the engine cannot raise teaches a rule nobody can trip. Both are exempt only
+// by saying RETIRED, the same shape the NOT BUILT YET marker uses.
+test("every refusal clause is documented, and every documented clause exists", () => {
+  const engine = new Set(
+    [...readFileSync(join(ROOT, "project/deliverable/engine/errors.ts"), "utf8").matchAll(/"(SE-C-\d+)"/g)].map((m) => m[1]),
+  );
+  assert.ok(engine.size > 20, "errors.ts did not parse — the check would pass vacuously");
+  const page = readFileSync(join(ROOT, GUIDANCE.refusalsPage), "utf8");
+  const documented = new Map<string, number>();
+  for (const m of page.matchAll(/SE-C-\d+/g)) if (!documented.has(m[0])) documented.set(m[0], m.index);
+
+  const undocumented = [...engine].filter((c) => !documented.has(c)).sort();
+  assert.deepEqual(undocumented, [], "the engine raises a clause the refusals page does not carry, and its own remedy points there");
+
+  const retired = (at: number): boolean => {
+    const start = Math.max(page.lastIndexOf("\n#", at), 0);
+    const after = page.indexOf("\n#", at);
+    return page.slice(start, after === -1 ? page.length : after).includes("RETIRED");
+  };
+  const phantom = [...documented]
+    .filter(([c, at]) => !engine.has(c) && !retired(at))
+    .map(([c]) => c)
+    .sort();
+  assert.deepEqual(phantom, [], "the refusals page describes a clause the engine cannot raise — delete it, or mark the section RETIRED");
 });

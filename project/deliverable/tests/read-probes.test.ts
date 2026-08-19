@@ -14,7 +14,7 @@
 // tests/one-probe-maths.test.ts is what keeps that true.
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { probesMissed, readingProbes } from "../engine/readproof.ts";
+import { probesMissed, proofFor, readingProbes, readingWords } from "../engine/readproof.ts";
 import { Session } from "../engine/session.ts";
 import { freshRoot, gitInit } from "./helpers.ts";
 
@@ -132,4 +132,53 @@ test("punctuation the probe never counted cannot fail an answer", () => {
 test("a genuinely wrong answer is still refused after the filter loosens", () => {
   const { expect } = readingProbes(DASHED);
   assert.equal(probesMissed(expect, "— — — ...").length, expect.length, "punctuation alone passed for an answer");
+});
+
+// AN ANCHOR THAT APPEARS TWICE HAS TWO RIGHT ANSWERS (i15 walk, 2026-08-19).
+//
+// front-desk.md carried "at the end of the" twice — "closes at the end of the
+// day, not at the end of the fix". The probe quoted it, the reader answered
+// past the FIRST occurrence, and the whole document came back. Nothing about
+// that answer was careless; the question had not decided which one it meant.
+//
+// THE FIXTURE IS BUILT, NOT WRITTEN, because the probe sits at a FRACTION of
+// the document. Hand-writing prose whose 30% mark lands on a repeated phrase
+// is guesswork that stops reproducing the moment a word is added.
+
+/** A document whose 30% probe anchor is a run planted earlier as well. */
+function withRepeatedAnchor(): string {
+  const n = 120;
+  const w = Array.from({ length: n }, (_, k) => `word${k}`);
+  const phrase = ["at", "the", "end", "of"];
+  const at30 = Math.floor(n * 0.3);
+  const earlier = Math.floor(n * 0.1);
+  for (let k = 0; k < phrase.length; k++) {
+    w[at30 + k] = phrase[k];
+    w[earlier + k] = phrase[k];
+  }
+  return w.join(" ");
+}
+
+/** How many times the run a probe quoted appears in the document. */
+function anchorHits(doc: string, ask: string): number {
+  const quoted = /FOLLOW "([^"]*)"/.exec(ask)?.[1];
+  assert.ok(quoted !== undefined, `a probe asked without quoting an anchor: ${ask}`);
+  const words = readingWords(doc).map((x) => x.toLowerCase());
+  const seq = readingWords(quoted).map((x) => x.toLowerCase());
+  let hits = 0;
+  for (let i = 0; i + seq.length <= words.length; i++) if (seq.every((s, k) => words[i + k] === s)) hits++;
+  return hits;
+}
+
+test("a probe never quotes a run the document carries twice", () => {
+  const doc = withRepeatedAnchor();
+  for (const ask of readingProbes(doc).ask) {
+    assert.equal(anchorHits(doc, ask), 1, `the anchor in "${ask}" is not unique — the question has more than one right answer`);
+  }
+});
+
+test("the honest reader's answer still satisfies every probe when an anchor grew", () => {
+  const doc = withRepeatedAnchor();
+  const { expect } = readingProbes(doc);
+  assert.deepEqual(probesMissed(expect, proofFor(doc)), [], "growing the anchor moved what the answer must contain");
 });
