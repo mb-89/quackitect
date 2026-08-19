@@ -167,3 +167,4 @@
 {"ts":"2026-08-19T19:52:58.857Z","op":"update","visit":"iterations/i37/run-spikes/spike-the-engine-on-an-exported-tree@0","node":"d26","brief":"aiming at fold-back"}
 {"ts":"2026-08-19T19:53:53.512Z","op":"update","visit":"iterations/i37/fold-back@0","node":"d27","brief":"reading the node-table shape for the fold-back"}
 {"ts":"2026-08-19T19:55:06.440Z","op":"update","visit":"iterations/i37/fold-back@0","node":"d28","brief":"folding the spike evidence back into the decisions it moved"}
+{"ts":"2026-08-19T19:56:07.554Z","op":"update","visit":"iterations/i37/cut-criteria@2","node":"d29","brief":"reopening declare-winner on the trigger the gates wrote"}

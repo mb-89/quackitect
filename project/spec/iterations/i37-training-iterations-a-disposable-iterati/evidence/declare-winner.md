@@ -1,7 +1,8 @@
 ---
 form: declare-winner
 by: agent
-signed_off: 2026-08-19T18:54:16.061Z
+signed_off: 2026-08-19T19:57:34.907Z
+reopened: "2026-08-19T19:56:07.556Z — the M6 spike proved the structural ceiling on probed ground, which is the trigger both blessed gates wrote in advance against the evidence-grade override"
 authors: agent
 files:
 ---
@@ -10,49 +11,61 @@ files:
 
 ## current_situation
 
-i37 stands at declare-winner. converge-pugh and reverse-sensitivity are signed.
+declare-winner, reopened 2026-08-19 on the trigger both blessed gates wrote in advance.
 
-The computed seat is held by cand-the-guarded-run, which leads the fatal axis.
+The first declaration named cand-the-refusing-run-with-recorded-conditions and overrode the computed seat on evidence grade: cand-the-guarded-run scored higher and its central mechanism had never been run.
 
-THE DECLARED WINNER IS NOT THE COMPUTED ONE. It is cand-the-refusing-run-with-recorded-conditions, and the reason is recorded below and was already recorded at gate-candidates.
+M6 RAN IT. The override's only ground is gone.
 
 ## winner
 
 
 ## comments
 
-THE WINNER IS cand-the-refusing-run-with-recorded-conditions.
+THE WINNER IS cand-the-guarded-run, and it is the candidate the arithmetic named all along.
 
-WHAT IT IS. A benchmark run that exports the content subtree at the rewind commit, exercises its own ancestry test before anything binds and refuses to bind if that test cannot be run, carries one deliberately forbidden request per run to prove the guard is still watching, conceals the benchmark history for the length of the binding, and writes at bind time the three conditions no log holds — the model, the reasoning effort and the harness.
+WHAT CHANGED IS NOT THE SCORE. It was 12 to 9 at evaluate-set and it is 12 to 9 now. What changed is that its winning cell stopped being a claim.
 
-WHY IT BEATS THE COMPUTED SEAT. cand-the-guarded-run leads because it makes a wrong read unexpressible rather than refused. That is the better mechanism and nobody has run it. The export was probed. The ancestry primitive was probed. Reading through this lane from a history that genuinely ends at a commit has not been.
+### What the spikes proved, cell by cell
 
-A 5 ON AN UNPROBED MECHANISM AND A 5 ON A MEASURED ONE SCORE IDENTICALLY, and the scoring form has no column for the difference. The override is that column, written out.
+- THE STRUCTURAL CEILING HOLDS. Two commands stand a tree whose history ends at the rewind commit. Measured on i33: 1723 files, depth 1, and `git rev-parse` on i33's own start commit does not resolve — the object is absent rather than refused. Control: 0 files mentioning i33 in the trace against 71 for a different iteration.
+- IT COSTS NOTHING PER RESOLUTION. A checked ceiling costs 4229 microseconds per call and the cost is the process spawn, so no subcommand is cheaper. A structural ceiling has no test to run at all. That comparison needs no threshold, which matters because the threshold this iteration had invented turned out to be the agent's own.
 
-WHAT THE WINNER GIVES UP. Its ceiling is checked rather than structural, so between bind and stop it can still error. The forbidden request bounds that per run, at the moment the numbers are taken. It also inherits the visibility drift rather than fixing it, because concealment rides the binding over three exclusion lists that already disagree.
+### Three of its cells are NOT supported by evidence, and are inherited rather than endorsed
 
-THE ONE THING THAT REOPENS THIS. The M6 spike: can the lane read from a history that ends at the rewind commit? If yes, the guarded run's ceiling is available on probed ground and this declaration should be revisited at its own escalation. If no, the checked ceiling plus the forbidden-request proof is the answer and this stands.
+- ITS SINGLE VISIBILITY RULE. Spike five found four exclusion lists, one of them empty, so the concealment is a dependency on `wt-three-separate-lists-decide-which-paths-a-lane-verb-may-see-` for EVERY candidate. Taking this one does not make that worse; it was already true.
+- ITS INCREMENTAL REPORT. Untested. It remains the right shape for the reason find_by_transforming gave — a run that dies is the interesting one — and nothing has run it.
+- ITS SEEDED DRAW. The owner ruled a person triggers every run, so the draw survives only for the unnamed case and the seed does one small job.
 
-HOW THE FOURTH CURVE CAME TO EXIST, said plainly because it matters to whether this declaration is honest. cand-the-refusing-run's own compose state named the swap before evaluate-set wrote a single score: the candidate loses one axis on one cell, and that cell is the thin run's. The scores then confirmed it — a 1 where a probed alternative scores 4. The curve was drawn at gate-candidates and is on the register.
+### Two corrections ride with this declaration
+
+- THE TREE IS FETCHED, NOT EXPORTED. `git archive` leaves no `.git`, so every git verb is dead inside it. A depth-1 fetch gives the working tree AND a bounded history. A bare object id cannot be fetched without a server config change, so the rewind commit is named as a ref first.
+- THE REWIND IS THREE-WAY. `project/spec` rewound, `project/deliverable` and `project/guidance` current, history bounded. The whole-tree rewind fails to compile, and the engine said so itself.
+
+### What I am not doing, and why
+
+I AM NOT MINTING A FOURTH-AND-A-HALF CANDIDATE. The composite the fold-back described — the guarded ceiling with the refusing run's cheap cells — is a real design and this state cannot write a node. The differences are recorded on the fold-back and on `el-benchmark-binding`, which M7 builds from.
+
+DECLARING THE COMPOSITE WITHOUT A NODE would put a winner on the record that nothing in the register describes.
 
 ## follow_up
 
-- record-adrs is next, then decompose-structure and evaluate-architecture.
-- THE ADRs THIS DECLARATION OWES, and they are the decisions a later reader will ask about.
-  - Why the content subtree is exported rather than the repository checked out.
-  - Why the ceiling is an ancestry test rather than a path mask.
-  - Why a run refuses to bind rather than refusing per request.
-  - Why the agent is told it is walking a benchmark.
-  - Why conditions are written at bind time rather than derived.
-- ONE REQUIREMENT IS STILL OWED and this is the last state before the architecture would invent it silently: how a run is reached — lane verb, desk door, or neither. Deferred at gate-inputs, at gate-requirements and at gate-candidates.
-- ONE VERB IS OWED TO THE GIT LANE. merge-base is not on se_git's allowlist, and the winner's ceiling rests on it.
+- gate-prototype closes M6 and carries this reopen.
+- M7 BUILDS FROM el-benchmark-binding AND el-benchmark-guard as corrected, not from the candidate note alone. Both now carry the fetch recipe, the three-way split and the structural ceiling.
+- ONE REQUIREMENT CANNOT SHIP on today's evidence: the concealment waits on a work token this iteration does not own. gate-prototype has to rule whether i37 defers it or blocks.
+- THE ONE-SECOND PAIR STAY OPEN. They do not discharge and they do not fail, because nobody has counted resolutions per lane call — a new unknown this milestone created.
+- THE INCREMENTAL REPORT IS THE ONE UNTESTED CELL now carried into the build. It deserves the first test M7 writes.
 
 ## anything_else
 
-THE DECLARATION OVERRIDES THE ARITHMETIC AND THE ARITHMETIC IS KEPT, unedited, in the matrix above.
+THE OVERRIDE WAS RIGHT WHEN IT WAS MADE AND WRONG NOW, AND BOTH HALVES MATTER.
 
-That is deliberate. A convergence run that had been quietly re-weighted until it produced the answer would look exactly like a clean win, and nothing would show that a judgment had been made.
+At declare-winner the guarded run scored 12 to 9 and had never been run. Choosing it then would have been choosing a design on the strength of an unprobed claim, which is what M6 exists to prevent. The override was the correct act on the evidence available.
 
-SO THE RECORD CARRIES BOTH: the seat the numbers gave, and the reason a person or a later agent might disagree with taking it away.
+M6 IS WHERE THAT EVIDENCE ARRIVES. The spike ran, the mechanism held, and the reason for the override evaporated.
 
-IF THE OVERRIDE IS WRONG, the evidence for that is already written down — it is the M6 spike, and it is ranked first.
+THE RECORD PROVES THIS IS LEARNING RATHER THAN REWRITING. gate-candidates and gate-architecture each wrote the trigger BEFORE the spike: if the M6 spike shows the lane can read from a truncated history, the guarded run's ceiling becomes available on probed ground and the ruling should be revisited at its own escalation.
+
+A DESIGN THAT WROTE ITS OWN FALSIFICATION CONDITION AND THEN MET IT is doing what the process is for. A design that quietly swapped its winner after the numbers came in would look identical in the final spec and be worth nothing.
+
+THAT DISTINCTION IS ONLY VISIBLE BECAUSE THE TRIGGER WAS WRITTEN DOWN IN ADVANCE, which is the argument for the whole gate mechanism made by an iteration that spent two gates arguing against its own eventual answer.
