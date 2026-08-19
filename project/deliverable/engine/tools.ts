@@ -32,6 +32,7 @@ import { Toll } from "./toll.ts";
 import { deskTools } from "./tools-desk.ts";
 import type { ReadingHook } from "./tools-file.ts";
 import { fileTools } from "./tools-file.ts";
+import { queryTools } from "./tools-query.ts";
 import { runTools } from "./tools-run.ts";
 import { SE_VERSION } from "./version.ts";
 
@@ -485,6 +486,7 @@ export function coreTools(
     ...fileTools(rootOf, model, reading),
     ...runTools(rootOf, projectRoot, reading, mirror),
     ...deskTools(rootOf, projectRoot, model, judgmentDrainAllowed, reading, doors, mirror),
+    ...queryTools(rootOf),
   ];
 }
 

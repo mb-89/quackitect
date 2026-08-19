@@ -1,8 +1,8 @@
 ---
 form: observe-red
-reopened: "2026-08-19T17:55:25.949Z — same claims-registration gap, cascading fix through M7"
+reopened: "2026-08-19T18:33:57.645Z — specify-build was re-signed after observe-red first signed; re-earning the claim per se_why"
 by: agent
-signed_off: 2026-08-19T17:57:07.661Z
+signed_off: 2026-08-19T18:34:18.680Z
 authors: agent
 files: null
 ---

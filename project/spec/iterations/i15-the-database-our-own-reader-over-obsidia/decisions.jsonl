@@ -427,3 +427,7 @@
 {"ts":"2026-08-19T18:21:17.974Z","op":"update","visit":"iterations/i15/specify-build@1","node":"d81","brief":"studying tool registration pattern to wire the query and disposition verbs"}
 {"ts":"2026-08-19T18:24:14.878Z","op":"update","visit":"iterations/i15/specify-build@1","node":"d82","brief":"adding tools-query.ts to dsp-lane-door design spec files"}
 {"ts":"2026-08-19T18:25:05.411Z","op":"update","visit":"iterations/i15/specify-build@1","node":"d83","brief":"registered tools-query.ts as part of dsp-lane-door"}
+{"ts":"2026-08-19T18:29:29.529Z","op":"update","visit":"iterations/i15/specify-build@1","node":"d84","brief":"adding queryTools import to tools.ts"}
+{"ts":"2026-08-19T18:29:39.797Z","op":"update","visit":"iterations/i15/specify-build@1","node":"d85","brief":"checking typecheck status after import fix"}
+{"ts":"2026-08-19T18:29:53.838Z","op":"update","visit":"iterations/i15/specify-build@1","node":"d86","brief":"reading build-chunks.md before seeding 5 new chunks"}
+{"ts":"2026-08-19T18:34:18.445Z","op":"update","visit":"iterations/i15/observe-red@1","node":"d87","brief":"resigning observe-red after specify-build reopen"}

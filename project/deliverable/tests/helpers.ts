@@ -571,10 +571,10 @@ export function mirrorSource(): string {
 }
 
 /** THE WHOLE LANE, wherever its verbs live. tools.ts assembles the registry
- *  and the three verb groups declare their own entries — a guard that reads
- *  the lane's source must see all four or it is reading a third of it. */
+ *  and the four verb groups declare their own entries — a guard that reads
+ *  the lane's source must see all five or it is reading a fraction of it. */
 export function laneSources(): { rel: string; text: string }[] {
-  return ["tools.ts", "tools-file.ts", "tools-run.ts", "tools-desk.ts"].map((f) => ({
+  return ["tools.ts", "tools-file.ts", "tools-run.ts", "tools-desk.ts", "tools-query.ts"].map((f) => ({
     rel: f,
     text: readFileSync(join(REPO_ROOT, "project", "deliverable", "engine", f), "utf8"),
   }));

@@ -469,6 +469,16 @@ watch `se_run`'s shell commands, which are handed no path to judge. That is
 `raid-iss-the-shell-writes-method-with-no-path-to-judge`, and resolution does
 not close it either. A shell still writes wherever it is pointed.
 
+### SE-C-144 — a structured query names a field the matched kind does not carry
+`se_query` refuses by name rather than returning an empty column. The
+refusal lists the fields the matched kind actually carries, so the next
+call can ask correctly without a second guess.
+
+A KIND FILTERS WHICH FIELDS EXIST. `id`, `type` and `statement` are always
+legal; everything else comes from that kind's own frontmatter, so two
+kinds rarely carry the same field list. Asking a raid entry for a
+requirement's `verify_method` is this clause, not a bug in the corpus.
+
 ## Notes and prose
 
 ### SE-C-073 — the note ref is unknown
