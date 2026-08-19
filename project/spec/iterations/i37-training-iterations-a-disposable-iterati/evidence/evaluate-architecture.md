@@ -1,7 +1,8 @@
 ---
 form: evaluate-architecture
 by: agent
-signed_off: 2026-08-19T19:04:38.143Z
+signed_off: 2026-08-19T19:19:26.933Z
+reopened: "2026-08-19T19:19:05.729Z — the walk verdicts were written in prose rather than in the deck grammar, so all 37 scenarios read as unruled"
 authors: agent
 files:
 ---
@@ -18,43 +19,43 @@ Every at-risk ruling names a hinge that is a fact rather than an opinion.
 
 ## walk
 
-- req-a-bound-run-resolves-no-commit-newer-than-its-rewind-point: at risk — the hinge is one allowlist entry — the ceiling rests on git merge-base and se_git does not offer it, so the exact primitive is unreachable through the lane; the tradeoff is deriving ancestry from log or rev-parse, which is more code for a weaker answer
-- req-a-ceiling-that-cannot-prove-ancestry-refuses: addressed — [[raid-dec-a-run-that-cannot-establish-its-guard-never-binds]]
-- req-a-wrong-act-never-passes-silently: addressed — [[raid-dec-the-ceiling-is-an-ancestry-test-not-a-path-mask]]
-- req-every-artifact-is-readable-text: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-every-call-logged: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-mirror-stays-on-the-machine: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-trees-never-mix: addressed — [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
-- req-walk-resumes-from-repo: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-a-benchmark-report-carries-the-conditions-of-its-run: addressed — [[raid-dec-the-conditions-a-log-cannot-recover-are-written-when-a-run-binds]]
-- req-a-resolution-is-proven-by-read-back: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-a-run-that-stopped-early-says-where-it-stopped: addressed — [[raid-dec-the-conditions-a-log-cannot-recover-are-written-when-a-run-binds]]
-- req-acts-carry-role-and-channel: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-crash-lands-safe: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-fresh-machine-runs: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-no-agent-act-destroys-work: addressed — [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
-- req-overlay-survives-update: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-reachable-capability-is-traced: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-resume-needs-no-person: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-the-answer-never-exceeds-its-bound: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-walk-survives-host-swap: addressed — [[raid-dec-the-conditions-a-log-cannot-recover-are-written-when-a-run-binds]]
-- req-a-clear-jump-is-one-call: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-a-preflight-check-asks-the-reader-where-it-looked: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-a-windowed-pool-answer-says-that-it-was-windowed: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-call-answers-in-one-second: at risk — the hinge is that the guard sits under every resolved commit, ref and path for the length of a run; the tradeoff is a correctness check on the hot path of the walk it is measuring
-- req-entry-speaks-plainly: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-one-operation-reads-its-input-once: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-query-is-deterministic: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-surface-answers-in-one-second: at risk — the hinge is the same guard reaching the mirror's own reads while a run is bound; the tradeoff is the same one, paid on a surface a person is watching
-- req-the-actor-is-recorded-where-the-call-is-served: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-the-benchmark-history-is-unreadable-while-a-run-is-bound: at risk — the hinge is the visibility drift — three exclusion lists decide what a lane verb may see, they disagree, and se_file_read consults none of them; the tradeoff is fixing one rule for four verbs before this concealment can be trusted
-- req-the-panel-s-paint-says-which-kind-of-green-it-is: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-work-past-its-bound-says-it-is-working: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-a-slowness-signal-never-shortens-the-wait: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-audit-answers-from-log: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-newcomer-leaves-able-to-ask: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-newcomer-one-command: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
-- req-newcomer-orients-unaided: addressed — the path stands unchanged; this iteration adds three elements inside one binding and touches nothing this scenario walks
+- [[raid-ar-a-bound-run-resolves-no-commit-newer-than-its-rewind-point]] — at risk: [[req-a-bound-run-resolves-no-commit-newer-than-its-rewind-point]] hinges on [[el-benchmark-guard]] — the ceiling rests on git merge-base and se_git does not offer it, so the exact primitive is unreachable through the lane; the fallback is deriving ancestry from log or rev-parse, which is more code for a weaker answer
+- [[req-a-ceiling-that-cannot-prove-ancestry-refuses]] — addressed by [[raid-dec-a-run-that-cannot-establish-its-guard-never-binds]]
+- [[req-a-wrong-act-never-passes-silently]] — addressed by [[raid-dec-the-ceiling-is-an-ancestry-test-not-a-path-mask]]
+- [[req-every-artifact-is-readable-text]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-every-call-logged]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-mirror-stays-on-the-machine]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-trees-never-mix]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-walk-resumes-from-repo]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-a-benchmark-report-carries-the-conditions-of-its-run]] — addressed by [[raid-dec-the-conditions-a-log-cannot-recover-are-written-when-a-run-binds]]
+- [[req-a-resolution-is-proven-by-read-back]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-a-run-that-stopped-early-says-where-it-stopped]] — addressed by [[raid-dec-the-conditions-a-log-cannot-recover-are-written-when-a-run-binds]]
+- [[req-acts-carry-role-and-channel]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-crash-lands-safe]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-fresh-machine-runs]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-no-agent-act-destroys-work]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-overlay-survives-update]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-reachable-capability-is-traced]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-resume-needs-no-person]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-the-answer-never-exceeds-its-bound]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-walk-survives-host-swap]] — addressed by [[raid-dec-the-conditions-a-log-cannot-recover-are-written-when-a-run-binds]]
+- [[req-a-clear-jump-is-one-call]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-a-preflight-check-asks-the-reader-where-it-looked]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-a-windowed-pool-answer-says-that-it-was-windowed]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[raid-ar-call-answers-in-one-second]] — at risk: [[req-call-answers-in-one-second]] hinges on [[el-benchmark-guard]] — the guard sits under every resolved commit, ref and path for the length of a run, so a correctness check lands on the hot path of the walk it is measuring
+- [[req-entry-speaks-plainly]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-one-operation-reads-its-input-once]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-query-is-deterministic]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[raid-ar-surface-answers-in-one-second]] — at risk: [[req-surface-answers-in-one-second]] hinges on [[el-benchmark-guard]] — the same guard reaches the mirror's own reads while a run is bound, and the cost is paid on a surface a person is watching
+- [[req-the-actor-is-recorded-where-the-call-is-served]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[raid-ar-the-benchmark-history-is-unreadable-while-a-run-is-bound]] — at risk: [[req-the-benchmark-history-is-unreadable-while-a-run-is-bound]] hinges on [[el-benchmark-guard]] — three exclusion lists decide what a lane verb may see, they disagree, and se_file_read consults none of them; one rule has to bind four verbs before this concealment can be trusted
+- [[req-the-panel-s-paint-says-which-kind-of-green-it-is]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-work-past-its-bound-says-it-is-working]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-a-slowness-signal-never-shortens-the-wait]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-audit-answers-from-log]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-newcomer-leaves-able-to-ask]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-newcomer-one-command]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
+- [[req-newcomer-orients-unaided]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
 
 ## fitness_candidates
 
