@@ -100,3 +100,9 @@
 {"ts":"2026-08-19T18:04:06.755Z","op":"update","visit":"iterations/i37/enumerate-space/build_chart@0","node":"d97","brief":"finding why the candidates are not counted as drawn"}
 {"ts":"2026-08-19T18:40:28.972Z","op":"update","visit":"iterations/i37/start@0","node":"d5","brief":"aiming back at run-candidates after the restart"}
 {"ts":"2026-08-19T18:41:34.543Z","op":"done","visit":"front_desk@0","node":"d2","brief":"three candidates are composed on their nodes; no sub-machine seeded"}
+{"ts":"2026-08-19T18:42:06.666Z","op":"update","visit":"iterations/i37/run-candidates@0","node":"d6","brief":"aiming at cut-criteria"}
+{"ts":"2026-08-19T18:42:32.260Z","op":"update","visit":"iterations/i37/run-candidates@0","node":"d7","brief":"reading an authored candidates drawing for its shape"}
+{"ts":"2026-08-19T18:42:45.171Z","op":"update","visit":"iterations/i37/run-candidates@0","node":"d8","brief":"authoring the candidates drawing the placeholder demands"}
+{"ts":"2026-08-19T18:44:16.454Z","op":"update","visit":"iterations/i37/run-candidates/cand-the-thin-run@0","node":"d9","brief":"composing cand-the-thin-run"}
+{"ts":"2026-08-19T18:44:17.526Z","op":"update","visit":"iterations/i37/run-candidates/cand-the-guarded-run@0","node":"d10","brief":"composing cand-the-guarded-run"}
+{"ts":"2026-08-19T18:44:18.570Z","op":"update","visit":"iterations/i37/run-candidates/cand-the-refusing-run@0","node":"d11","brief":"composing cand-the-refusing-run"}
