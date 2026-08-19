@@ -421,3 +421,5 @@
 {"ts":"2026-08-19T17:56:56.832Z","op":"update","visit":"iterations/i15/observe-red@0","node":"d70","brief":"resubmitting observe-red after adding 6 non-test specs"}
 {"ts":"2026-08-19T17:57:07.487Z","op":"update","visit":"iterations/i15/observe-red@0","node":"d71","brief":"resubmitting observe-red after adding 6 non-test specs"}
 {"ts":"2026-08-19T18:00:25.732Z","op":"update","visit":"iterations/i15/verification@0","node":"d72","brief":"adding 6 corpus-drift non-test specs to verification checklist"}
+{"ts":"2026-08-19T18:06:57.967Z","op":"update","visit":"iterations/i15/gate-implementation@0","node":"d73","brief":"filling gate-implementation honestly: fail, 5 of 7 goals unbuilt"}
+{"ts":"2026-08-19T18:09:18.289Z","op":"done","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d37","brief":"gate-implementation filled honestly with fail verdict, awaiting the person"}

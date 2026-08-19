@@ -2496,7 +2496,12 @@ export class Session {
     // WHICH PROBE MISSED, not merely that one did. "That did not answer every
     // probe" over three probes is a one-in-three guess, and the field report
     // of 2026-08-17 names it as friction that cost a round trip each time.
-    this.readMissed = probesMissed(pending.expect, String(form.read));
+    // JUDGE THE REPLY AGAINST WHAT IS STILL OWED, never against all three.
+    // The answer names which probes missed, so an agent sends those — and
+    // judging that reply against the whole set fails it for the ones it had
+    // already got right, which is a loop with no way out of it. Measured on
+    // the i15 walk, which worked the rule out the expensive way.
+    this.readMissed = this.reads.bankProbes(probesMissed(pending.outstanding, String(form.read)));
     if (this.readMissed.length === 0) {
       this.reads.credit(pending.path, pending.hash);
       this.persistSettings();

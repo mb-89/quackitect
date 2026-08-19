@@ -156,8 +156,12 @@ refusing, and the agent's pull is what moves.
   skipped. Counting four words by eye and including one costs you the probe.
   Quoting generously makes this stop mattering.
 - CASE AND SPACING ARE IGNORED, so there is nothing to normalise by hand.
-- A wrong answer credits nothing and the same document comes again. It names
-  which probes missed, so read those two answers again rather than the file.
+- A WRONG ANSWER NAMES EXACTLY WHICH PROBES MISSED, and the ones you got right
+  are BANKED. Send only the named ones on the retry — there is no need to
+  resend what already landed, and no penalty if you do.
+- The same document comes again with each wrong answer. Read the probes it
+  names rather than the whole file: the answer is in the text you already
+  hold.
 - WHY PROBES AND NOT A HASH: you cannot compute one, and one the engine handed
   you would prove only that a message arrived. Spread probes are the cheapest
   thing that a host which truncated the text cannot answer.

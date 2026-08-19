@@ -210,3 +210,32 @@ the reader cannot tell which half was the ruling.
     assert.ok(!anchor.includes(close), `the anchor contains its own closing delimiter, so its end is a guess: ${ask}`);
   }
 });
+
+// A PROBE ANSWERED ONCE STAYS ANSWERED.
+//
+// The answer names WHICH probes missed, so a reader sends those. Judging that
+// reply against all three failed it for the ones it had already got right, and
+// the only way out was to notice the rule and resend everything every time.
+// The i15 walk worked that out the expensive way and wrote it into its field
+// report as a thing nothing had told it.
+test("answering only the probes that missed is enough, because the rest are banked", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  const s = new Session(root);
+  const first = (await s.pull()) as { pull?: string; document?: { content: string; path: string } };
+  if (first.pull !== "read" || first.document === undefined) return;
+  const [a, b, c] = readingProbes(first.document.content).expect;
+
+  // One right, two wrong — the ordinary partial answer.
+  const partial = (await s.pull({ form: { read: a } })) as { pull?: string; missed?: string[] };
+  assert.equal(partial.pull, "read", "a partial answer credited the whole document");
+  assert.deepEqual(partial.missed, [b, c], `the answer does not name exactly what is still owed: ${JSON.stringify(partial.missed)}`);
+
+  // Now send ONLY what was named as missing. The first probe is not resent.
+  const rest = (await s.pull({ form: { read: `${b} ... ${c}` } })) as { pull?: string; document?: { path: string } };
+  assert.notEqual(
+    rest.document?.path,
+    first.document.path,
+    "answering the named probes served the same document again — the earlier probe was not banked",
+  );
+});
