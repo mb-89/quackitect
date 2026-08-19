@@ -6,7 +6,8 @@ kind: assumption
 statement: Every option in the pool arrives through a drain, so guarding the drain guards the pool.
 owner: the driving agent
 trigger: the first convenience proposed for filing an option without a note, or any new writer of the option kind
-status: open
+status: deferred
+defer_until: a second writer of the option kind is proposed, or the first convenience for filing an option without a note is proposed
 impact: "Five of the eight new requirements are demands on the mint. All five are satisfied by guarding one act, and every one of them is bypassed by a second writer - including the FATAL privacy row. The failure is silent: a bypassed option looks exactly like a minted one."
 breaks_how_badly: fatal
 how_likely: plausible

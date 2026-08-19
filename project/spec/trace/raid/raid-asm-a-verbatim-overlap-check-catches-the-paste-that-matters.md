@@ -6,7 +6,8 @@ kind: assumption
 statement: A verbatim-overlap check between the offered statement and the raw note catches the copies that actually happen, because the copy that happens is a paste rather than a paraphrase.
 owner: the driving agent
 trigger: the first mint refused by the check, or the first leak found in the pool by the corpus sweep
-status: open
+status: deferred
+defer_until: the migration runs, so the longest verbatim run shared between each minted option and its source note can be measured
 impact: req-a-minted-option-is-authored-never-the-note-s-own-text is the only FATAL row in the delta and this is the only mechanical thing standing behind it. If the copies that happen are paraphrases, the check is theatre and the hard line has nothing enforcing it.
 breaks_how_badly: fatal
 how_likely: plausible
