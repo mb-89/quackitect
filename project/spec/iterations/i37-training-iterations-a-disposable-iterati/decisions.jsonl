@@ -46,3 +46,7 @@
 {"ts":"2026-08-19T17:19:57.230Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d45","brief":"minting the last two flows for derive-functions"}
 {"ts":"2026-08-19T17:19:57.382Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d46","brief":"the report flow is the only thing crossing out"}
 {"ts":"2026-08-19T17:20:37.149Z","op":"done","visit":"iterations/i37/map-stakeholders@0","node":"d30","brief":"eight functions and seven flows in one cluster"}
+{"ts":"2026-08-19T17:21:42.290Z","op":"plan","visit":"iterations/i37/identify-assumptions@0","parent":null,"nodes":[{"id":"d47","brief":"open the environment assumptions"},{"id":"d48","brief":"sweep the six sources"},{"id":"d49","brief":"probe what is cheap and record the rest"}]}
+{"ts":"2026-08-19T17:22:52.400Z","op":"update","visit":"iterations/i37/probe-assumptions@0","node":"d50","brief":"probing whether every pinned record has a started commit"}
+{"ts":"2026-08-19T17:23:15.565Z","op":"update","visit":"iterations/i37/probe-assumptions@0","node":"d51","brief":"probing the started stamp across the archive"}
+{"ts":"2026-08-19T17:23:27.758Z","op":"update","visit":"iterations/i37/probe-assumptions@0","node":"d52","brief":"reading the standing probe status of all 64 assumptions"}
