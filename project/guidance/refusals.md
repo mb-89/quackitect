@@ -565,3 +565,21 @@ something else — the toll counts silence, the stall guard counts updates since
 anything closed — and both were satisfied throughout. The walk was narrating
 and the walk was busy. It was busy asking one question that had already been
 answered.
+
+### SE-C-145 — the search pattern is not a regex
+
+`se_file_search` runs a regular expression, and an ordinary source fragment is
+a regular expression with an unclosed group in it. `function route(` opens a
+group that never closes. `catch (e)` does the same.
+
+THE ESCAPED PATTERN RIDES THE REFUSAL. Escaping is mechanical, so the answer
+carries the version that would have worked, ready to send. Deciding whether a
+literal was meant is not mechanical, so it is offered rather than substituted —
+send it, or write a real pattern.
+
+WHY IT IS A CLAUSE AND NOT AN ERROR. This came back as raw ripgrep stderr with
+no clause, no remedy and nothing executable, which is the one thing every other
+refusal in this lane is not.
+
+MEASURED ON THE i15 WALK: three searches within a few minutes, all the same
+mistake, each one a thing the reader plainly meant literally.
