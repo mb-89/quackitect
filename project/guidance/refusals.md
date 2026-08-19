@@ -425,6 +425,21 @@ hand. Nothing genuinely finished? Say what is actually blocking the item with
 `defer`, or close it `obsolete`. A checklist standing open for hours is the
 thing this stops.
 
+AN ITEM THAT SURVIVES TWO REFUSALS IS THE WRONG SHAPE, and the answer now says
+so by name. Surviving one refusal makes an item suspect; surviving two makes it
+wrong.
+
+THE FIX IS NOT ANOTHER RESOLVING OP. Such an item cannot close from where you
+stand, so there is no work to finish and no `done` to send. Drop it with
+`obsolete`, then send a FRESH PLAN whose items will close in THIS state.
+
+MEASURED ON THE i15 WALK: 59 refusals, every one SE-C-133, every one carrying
+the same two items — "walk boot reading loop", still open hours after boot
+ended, and "work milestones as served", which cannot close until the iteration
+does. The work was real and the narration was honest. The checklist was the
+wrong shape, and naming what was open sent the reader hunting for work to
+finish that did not exist.
+
 ### SE-C-135 — the write did not land as asked
 
 A write verb's payload is DATA. It must land in the file verbatim.
