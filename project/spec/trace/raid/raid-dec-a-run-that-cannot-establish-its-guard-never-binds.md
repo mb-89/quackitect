@@ -27,3 +27,15 @@ Where the safe default sits. At the binding, not at the request.
 The ceiling can still error between bind and stop. That is bounded per run by
 the forbidden request, which proves the guard was watching at the moment the
 numbers were taken.
+
+## Rejected options
+
+- REFUSE PER REQUEST ONLY. Rejected: a run that starts and then refuses everything produces a report full of refusals that reads as a machine failure rather than as one cause.
+- WARN AND CONTINUE. Rejected outright: a guard going quiet looks exactly like a guard passing, and this is the failure the whole iteration exists to catch.
+- TEST THE GUARD IN THE SUITE ONLY. Rejected: a test written months earlier says nothing about whether the guard was watching when these numbers were taken.
+
+## Consequences
+
+- Binding is an act that can fail, and its failure is one typed refusal naming one cause.
+- Every run carries one deliberately forbidden request. A run whose forbidden request SUCCEEDED is discarded rather than reported.
+- A report without its guard-proof field is not a result.

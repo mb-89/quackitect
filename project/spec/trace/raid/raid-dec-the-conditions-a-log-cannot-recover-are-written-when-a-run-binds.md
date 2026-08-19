@@ -30,3 +30,15 @@ Which half of a report's conditions is collected and which is derived.
 
 It is the one cell that separates cand-the-refusing-run from the curve that was
 declared. Everything else about them is identical.
+
+## Rejected options
+
+- DERIVE EVERYTHING FROM THE CALL LOG. Rejected on a fact: the log stamps `se_version` and nothing else about the session. The model, the reasoning effort and the harness appear in no record.
+- WRITE EVERYTHING AT BIND TIME. Rejected: the matrix hash, the se version and the rewind commit are all derivable, and a second copy of a derivable fact is a copy that goes stale.
+- LEAVE THE UNRECOVERABLE THREE BLANK. Rejected: a result that cannot say what it was taken on cannot be paired, which is the whole product.
+
+## Consequences
+
+- Binding writes three fields and no more.
+- A run that cannot obtain the model, the effort or the harness refuses rather than writing a blank.
+- Adding a condition to the report means deciding which of the two halves it belongs to.

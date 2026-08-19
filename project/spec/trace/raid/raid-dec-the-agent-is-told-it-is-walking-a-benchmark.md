@@ -31,3 +31,14 @@ limit is written into the report rather than left to be discovered.
 
 The same bias sits on both sides of a pair, so a comparison between two machine
 versions is unaffected by a bias that is constant across them.
+
+## Rejected options
+
+- BLIND THE AGENT, dressing the run as ordinary work. Rejected by the owner: it buys transferability and costs the honesty rules the whole system runs on.
+- SAY NOTHING EITHER WAY. Rejected: silence is blinding without the courage to call it that, and it makes the bias unmeasurable.
+
+## Consequences
+
+- Every benchmark report states that it measures process overhead and not production behaviour.
+- The number is a FLOOR rather than an estimate.
+- A paired delta between two machine versions stays valid, because the same bias sits on both sides of the pair.

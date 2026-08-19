@@ -33,3 +33,15 @@ which is more code for a worse answer.
 
 The benchmark history. That is a separate concealment, keyed on the binding
 rather than on time, and it rides three exclusion lists that already disagree.
+
+## Rejected options
+
+- MASK THE ITERATION'S FOLDER. Rejected on a measurement: 282 files under `project/spec/trace` mention i15 or i34, and an iteration writes its requirements, RAID nodes and experiments outside its own folder.
+- MASK THE TRACE CORPUS TOO. Rejected: it blinds the walk to the machine it runs on, which is most of what an agent legitimately reads.
+- FILTER THE GIT LANE'S OUTPUT. Rejected: parsing `log` and `show` output to remove commits is more code than a boundary test and fails in ways nobody can enumerate.
+
+## Consequences
+
+- Every verb that resolves a commit or a ref consults the boundary while a run is bound. A new such verb inherits the obligation.
+- `se_git`'s allowlist owes one entry, or the ancestry answer is derived from `log` or `rev-parse`.
+- The benchmark history is NOT covered by this decision. It needs a separate rule keyed on the binding.

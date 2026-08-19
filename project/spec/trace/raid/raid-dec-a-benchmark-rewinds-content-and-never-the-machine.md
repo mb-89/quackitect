@@ -39,3 +39,15 @@ engines.node pin, no second install.
 The current engine reads TODAY's rigor matrix, so a rewound run walks today's
 column over yesterday's work. That is intended, and it is why a benchmark
 report stamps the matrix hash.
+
+## Rejected options
+
+- CHECK THE WHOLE REPOSITORY OUT at the rewind commit. Rejected: it measures the machine as it was, which inverts the experiment. It also drags an old `engines.node` pin and an absent `node_modules`.
+- REWIND NOTHING and let the agent re-walk against today's tree. Rejected: the answers are all present, so the run measures search-and-paste rather than walking.
+- PIN AN OLD RIGOR MATRIX with the current engine. Rejected: it makes the machine a constant when the machine is the axis.
+
+## Consequences
+
+- The rewind operates on `project/spec` and the corpus. Never on `project/deliverable`.
+- No benchmark result is ever comparable to one taken under a different engine unless both stamp the se version, which the report requirement already demands.
+- A rewound run walks TODAY's rigor column over yesterday's work. Anyone reading a report must read the matrix hash beside it.
