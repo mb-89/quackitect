@@ -136,3 +136,4 @@
 {"ts":"2026-08-19T19:19:26.622Z","op":"done","visit":"start@0","node":"d1","brief":"37 verdicts re-answered in the deck grammar"}
 {"ts":"2026-08-19T19:21:25.002Z","op":"done","visit":"start@0","node":"d2","brief":"gate-architecture blessed and M5 closed"}
 {"ts":"2026-08-19T19:21:52.341Z","op":"update","visit":"iterations/i37/gate-architecture@0","node":"d7","brief":"bound_breaches and raid_additions rewritten in their line shapes"}
+{"ts":"2026-08-19T19:22:21.185Z","op":"update","visit":"iterations/i37/gate-architecture@0","node":"d8","brief":"stamping and blessing gate-architecture"}
