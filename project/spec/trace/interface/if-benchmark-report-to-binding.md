@@ -6,7 +6,7 @@ statement: "The reports folder tells the binding which iteration was benchmarked
 source: el-benchmark-report
 destination: el-benchmark-binding
 carries:
-  - flow-benchmark-history
+  - flow-benchmark-report
 form: file read
 bound: 1 second
 source_refs:

@@ -6,6 +6,7 @@ statement: "The binding hands the report the three conditions no log holds and t
 source: el-benchmark-binding
 destination: el-benchmark-report
 carries:
+  - flow-bound-run
   - flow-run-conditions
 form: in-process call
 bound: 1 second

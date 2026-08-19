@@ -6,6 +6,7 @@ statement: "The guard hands the report the outcome of the run's deliberately for
 source: el-benchmark-guard
 destination: el-benchmark-report
 carries:
+  - flow-bound-run
   - flow-guard-proof
 form: in-process call
 bound: 1 second
