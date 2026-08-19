@@ -1,7 +1,7 @@
 ---
 id: training-iterations
 kind: brief
-statement: A training iteration is a disposable iteration, seeded by command, walked by an agent for time, and discarded without ever reaching the archive.
+statement: A training iteration is a disposable iteration, seeded by command, walked by an agent for time, never committed, and discarded without ever reaching the archive.
 written: 2026-08-19
 ---
 
@@ -48,7 +48,8 @@ point: the agent walks the real machine, not a mock of it.
 
 - IT IS NOT A REPLAY. i31 owns that word. A replay feeds recorded results
   back and never re-invokes the agent. A training iteration re-invokes the
-  agent every time.
+  agent every time. An archived iteration may still be a SOURCE for a
+  training scenario — see the mask section below.
 - IT IS NOT A TEST. The test suite already walks the machine with the forms
   filled by a function. Here the AGENT fills them, because the agent is what
   is being timed.
@@ -68,8 +69,10 @@ from property-based testing is that this is one question, not two.
 - NO SIZE — a change-size column is drawn.
 - A SIZE — that column is pinned.
 
-THE SEED IS PART OF THE RESULT'S NAME. A number quoted without its seed and
-its size cannot be re-tested.
+THE SEED IS THE PORTABLE ARTIFACT. Nothing about a training iteration is
+committed, so a second machine does not FETCH one. It REGENERATES one from
+the seed, the size, the scenario name and the pool version. Those four values
+are the whole handover.
 
 ## Size is the scale factor
 
@@ -88,6 +91,9 @@ setting.
 ## The scenario pool
 
 THE POOL IS AUTHORED, SMALL AND COMMITTED. Three to five scenarios to start.
+The pool is the one part of this system that IS committed, because it is the
+specification of the workload and a workload nobody wrote down cannot be
+compared with itself later.
 
 EACH SCENARIO CARRIES FOUR THINGS.
 
@@ -116,14 +122,90 @@ SO EACH SCENARIO SHIPS A TINY PACKAGE inside the training folder.
 THIS IS THE BIGGEST BUILD ITEM, and it is what makes the M7 half of the walk
 honest. Without it the training iteration measures the paperwork only.
 
-## The lifecycle, and why the archive is skipped
+## The mask, and what an archived iteration can be
+
+THE OWNER'S RULING, 2026-08-19. Do not design against a malicious agent. The
+agent reads through the lane, the lane can hide what it likes, and a
+workaround shows up in the call log afterwards. That is sufficient.
+
+THE RULING IS ACCEPTED AND THE OBJECTION IS WITHDRAWN. The earlier reason for
+rejecting an archived iteration as a training source was framed as trust. It
+is not a trust problem. It is a COVERAGE problem, and coverage is arithmetic.
+
+### The mechanism the owner described already exists, for shell commands
+
+`engine/discipline.ts` classifies every `se_run` command against a rule
+table: tests, file edits, file writes, text searches, file reads, listing,
+waiting and git. Each category allows ONE warned run and then refuses with
+SE-C-129. A `no_tool_reason` valve runs it anyway and files the reason for
+the retro. The counters persist in `.se/` ACROSS sessions.
+
+SO THE SHELL HALF IS DONE. Nothing new is needed there.
+
+### The lane's own hiding is in three places and covers less than it looks
+
+MEASURED 2026-08-19, on this build.
+
+- `paths.ts` exports `EXCLUDED_DIRS` — `.git`, `node_modules`, `.se`,
+  `.venv`, `__pycache__`. Only `se_file_list` and `se_file_glob` call it.
+- `search.ts` carries its OWN list, two entries, as ripgrep globs: `.se` and
+  `node_modules`. It never reads `EXCLUDED_DIRS`.
+- `se_file_read` applies NO exclusion at all. A lane read of `.se/reading.md`
+  returned the file and its hash on this build.
+
+SO "INVISIBLE IN THE LANE" IS NOT A FLAG THAT EXISTS. Building it means one
+path mask honoured by read, search, glob and list alike. That also closes the
+three-way drift i9 already carries.
+
+### Two doors stay open after the mask
+
+- `se_git` ALLOWS `show`, `log` and `diff`. They go straight to git, so a
+  masked path is still readable at any commit unless the git lane filters its
+  own output too. That is a second mask, and it is the harder one.
+- READS AT A `ref:` reach committed history through the file lane. They need
+  the same mask as a working-tree read.
+
+### The number that decides it
+
+AN ITERATION'S OUTPUT DOES NOT STAY IN ITS FOLDER. Requirements, RAID nodes,
+experiments and stories land in `project/spec/trace/`, and some carry the
+iteration's id in their own filename.
+
+MEASURED: 282 files under `project/spec/trace/` mention `i15` or `i34`.
+
+SO MASKING ONE ITERATION FOLDER HIDES THE RECORD AND NOT THE ANSWERS. The
+requirements a replayed walk is supposed to derive are sitting in the trace
+corpus, which the agent must read to do ordinary work. Masking the trace
+corpus as well would blind the walk to the machine it runs on.
+
+### The verdict
+
+- BUILD THE MASK. It is cheap, it fixes the i9 drift, and it is the honest
+  way to keep a scenario's answers out of reach.
+- AN ARCHIVED ITERATION IS A SILHOUETTE, NOT A SCRIPT. Take its size, its
+  step count and its evidence-field profile. Author the subject fresh.
+- TWO COSTS REMAIN EVEN WITH A PERFECT MASK, and neither is about trust.
+  - The rigor matrix moved. An archived iteration answered a column that no
+    longer compiles the same way, so today's forms ask different questions.
+  - The code half. A real iteration edited the real engine. A training walk
+    must not, so the sandbox package is needed either way.
+- ONCE THE CONTENT IS MASKED AND THE CODE IS SANDBOXED, what is left of the
+  archived iteration IS a scenario. The two designs meet.
+
+## The lifecycle, and why nothing is committed
+
+OWNER RULING, 2026-08-19: nothing about a training iteration is committed.
 
 SEEDED, WALKED, MEASURED, DISCARDED. There is no ship and no close.
 
-THE FOLDER IS THROWN AWAY. What survives is one line in a results ledger.
+THE FOLDER LIVES IN THE TREE AND IS IGNORED BY GIT. `project/spec/training/`
+carries a gitignore entry. The training seed WRITES; it does not commit.
 
-THE ID NAMESPACE IS SEPARATE. Training iterations are `t1`, `t2` and so on,
-and they live at `project/spec/training/<id>/`, not with the real ones.
+THAT IS A REAL DIFFERENCE FROM `itSeed`, which commits its record as part of
+the seed. The training seed must not, or the ruling is broken by the first
+call.
+
+THE ID NAMESPACE IS SEPARATE. Training iterations take `t<n>` ids.
 
 WHY THE SEPARATE FOLDER IS NOT COSMETIC. `itSeed` numbers a new iteration
 from the highest `i<n>` in `project/spec/iterations/`, and `se_survey` counts
@@ -135,12 +217,17 @@ true rather than merely claimed.
 
 THE RECORD IS DISPOSABLE. THE MEASUREMENT IS NOT.
 
-ONE LINE PER RUN, COMMITTED. `.se/` is machine-local and a cloud box is
-reclaimed, so a result that lives only in the call log did not happen.
+ONE LINE PER RUN. `.se/` is machine-local and a cloud box is reclaimed, so a
+result living only in the call log did not happen.
+
+THIS IS THE ONE PLACE THE NOT-COMMITTED RULING NEEDS THE OWNER'S WORD. A
+ledger line carries no iteration content — only a seed, a size, a scenario
+name and numbers. Committing it is what lets two boxes be compared next
+month. Not committing it means every result dies with its box.
 
 EVERY LINE STAMPS ITS CONDITIONS.
 
-- the training id, the seed, the size, the scenario
+- the training id, the seed, the size, the scenario, the pool version
 - the rigor matrix hash and the se version
 - the harness, the model and the reasoning effort
 - wall clock, total and per state
@@ -167,32 +254,32 @@ a bad one, because there is no real subject to decide about.
 
 ## The honesty ruling
 
-THE AGENT IS TOLD IT IS WALKING A TRAINING ITERATION. It is not blinded.
+OWNER RULING, 2026-08-19: open, not blind. The agent is TOLD it is walking a
+training iteration.
 
 THE COST IS REAL AND IS ACCEPTED. An agent that knows the output is thrown
 away works differently from one that does not. The number therefore describes
-PROCESS OVERHEAD and not production behaviour.
+PROCESS OVERHEAD and not production behaviour. Write that limit into the
+record rather than leaving it to be discovered.
 
-THE ALTERNATIVE WAS REJECTED FOR NOW. A blind training iteration, dressed as
-a real one, would measure production behaviour honestly and would require the
-machine to lie to the agent. That trade is the owner's to make, and it is
-listed as an open question below.
+## The toll
+
+OWNER RULING, 2026-08-19: the training walk pays the full toll. The narration
+toll and the reading proof are part of what is being measured. Exempting them
+would measure a machine nobody runs.
 
 ## Comparing runs
 
-- NEVER COMPARE TWO SINGLE RUNS. Tau-bench measured agents scoring `pass^8`
-  below 25% against single-trial scores under 50%. Runs vary that much.
+- NEVER COMPARE TWO SINGLE RUNS. Tau-bench measured function-calling agents
+  scoring `pass^8` below 25% against single-trial scores under 50%. Runs vary
+  that much.
 - REPORT A MEDIAN OVER AT LEAST THREE RUNS, with the spread beside it.
 - COMPARE ONLY WITHIN ONE SET OF CONDITIONS. Same host, same model, same
   size, same seed or same scenario.
 
-## Open questions for the owner
+## Still owed
 
-- BLIND OR OPEN. The recommendation is open, and the claim is narrowed to
-  match. Blinding buys fidelity and costs the honesty rules.
-- TRUNK OR MACHINE-LOCAL. The recommendation is a folder on trunk, so a cloud
-  box can be pointed at a named training iteration. The results ledger is
-  committed either way.
-- DOES THE TRAINING WALK PAY THE FULL TOLL. The recommendation is yes. The
-  narration toll and the reading proof ARE part of what is being measured, so
-  exempting them would measure a machine nobody runs.
+- THE NAMED TRAINING ITERATION. The owner has parked this for a conversation
+  of its own. How a training iteration is named, and whether a name can be
+  handed to another machine, is not settled here.
+- THE LEDGER'S COMMIT STATUS. See the ledger section above.

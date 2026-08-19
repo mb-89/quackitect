@@ -74,3 +74,35 @@ ONE STRAY FOUND WHILE RESEARCHING: se_web_search refuses with SE-C-106 because n
 - project/spec/iterations/i31-the-process-becomes-measurable-a-walk-re/record.md
 - project/spec/iterations/i32-the-agent-s-thinking-is-measured-capture/record.md
 - project/spec/iterations/i36-the-harness-is-not-claude-measure-what-e/record.md
+
+## Owner rulings, 2026-08-19
+
+The three open questions in the vision above are answered. The brief at
+project/spec/training-iterations.md carries them in full.
+
+- OPEN, NOT BLIND. The agent is told it is walking a training iteration.
+- NOTHING IS COMMITTED. The training folder lives in the tree and is ignored
+  by git. The training seed writes; it does not commit. That is a real
+  difference from itSeed, which commits its record as part of the seed.
+- THE FULL TOLL IS PAID. The narration toll and the reading proof are part of
+  what is being measured.
+
+A FOURTH RULING REPLACED THE REPLAY VERDICT. Do not design against a
+malicious agent. The agent reads through the lane, the lane can hide what it
+likes, and a workaround shows up in the call log afterwards.
+
+WHAT THAT CHANGES. The objection to reusing an archived iteration was framed
+as trust and was withdrawn. The remaining objection is coverage, and it is
+arithmetic: 282 files under project/spec/trace mention i15 or i34, so masking
+one iteration folder hides the record and not the answers. Build the mask
+anyway. Take an archived iteration as a silhouette, never as a script.
+
+WHAT THE MASK COSTS TO BUILD, measured on this build. Lane hiding stands in
+three places with three different lists. paths.ts EXCLUDED_DIRS is called by
+list and glob only. search.ts carries its own two-entry ripgrep list.
+se_file_read applies no exclusion at all. se_git allows show, log and diff,
+which reach a masked path through git itself.
+
+TWO THINGS ARE STILL OWED. How a training iteration is NAMED is parked for a
+conversation of its own. Whether the results ledger is committed is the one
+place the not-committed ruling needs a word.
