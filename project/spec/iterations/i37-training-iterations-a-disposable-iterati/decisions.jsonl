@@ -126,3 +126,4 @@
 {"ts":"2026-08-19T19:00:37.040Z","op":"update","visit":"iterations/i37/decompose-structure@0","node":"d29","brief":"reading the interface node shape"}
 {"ts":"2026-08-19T19:01:22.618Z","op":"update","visit":"iterations/i37/decompose-structure@0","node":"d30","brief":"four interfaces minted; every crossing named"}
 {"ts":"2026-08-19T19:02:54.557Z","op":"update","visit":"iterations/i37/decompose-structure@0","node":"d31","brief":"the interfaces now carry the flows that actually cross"}
+{"ts":"2026-08-19T19:03:35.874Z","op":"update","visit":"iterations/i37/evaluate-architecture@0","node":"d32","brief":"reading the scenario-deck format"}
