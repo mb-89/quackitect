@@ -3014,13 +3014,32 @@ export class Session {
    *  carrier, so the pull has to say so. */
   private fillAdvice(names: string[], fallback: string): string {
     for (const n of names) {
-      let f: { gate?: boolean; signed?: boolean; bless?: string; problems?: string[] };
+      let f: {
+        gate?: boolean;
+        signed?: boolean;
+        bless?: string;
+        problems?: string[];
+        exists?: boolean;
+        fields?: { name: string; required?: boolean; filled?: boolean }[];
+      };
       try {
         f = this.formGet(n) as typeof f;
       } catch {
         continue;
       }
       if ((f.problems ?? []).length > 0) continue; // the agent's own work stands out front
+      // A FORM THAT WAS NEVER OPENED HAS NO PROBLEMS EITHER, and that is the
+      // hole this reads. The linter answers `problems: []` for a missing
+      // instance, so an advice keyed on problems alone told a walker standing
+      // on an empty form that "every required section is filled" — measured
+      // live at iterations/i15/run-demos, whose own `fields` line in the same
+      // answer read `current_situation*=N follow_up*=N`.
+      //
+      // SO ASK THE FIELDS, WHICH CANNOT LIE ABOUT IT. Every advice below says
+      // some version of "the writing is done"; none of them is true until the
+      // required sections carry content.
+      const unfilled = (f.fields ?? []).filter((x) => x.required === true && x.filled !== true);
+      if (f.exists !== true || unfilled.length > 0) continue;
       if (f.gate === true && (f.bless ?? "") === "") {
         return f.signed === true
           ? `${n} STANDS SIGNED AND EVERY SECTION IS FULL. Nothing you type moves it — what is owed is the BLESS, the thumb on this gate. Where the dial puts that thumb in your hand, send it as form: {"bless": true} or {"bless": false} with a verdict. Where it does not, name this gate as the step that waits and STOP: the dial alone cannot wake you.`
