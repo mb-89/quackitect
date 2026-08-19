@@ -37,3 +37,8 @@
 {"ts":"2026-08-19T17:11:36.220Z","op":"update","visit":"iterations/i37/gate-inputs@0","node":"d36","brief":"gate-inputs blessed with the unprobed premise named again"}
 {"ts":"2026-08-19T17:12:38.010Z","op":"update","visit":"iterations/i37/write-requirements@0","node":"d37","brief":"reading a requirement node to match its shape"}
 {"ts":"2026-08-19T17:14:37.085Z","op":"update","visit":"iterations/i37/write-requirements@0","node":"d38","brief":"two statements rewritten into EARS shapes"}
+{"ts":"2026-08-19T17:15:30.081Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d39","brief":"probing the fatal rewind assumption ahead of its state"}
+{"ts":"2026-08-19T17:16:37.168Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d40","brief":"redoing the probe in one call after the toll poisoned the first attempt"}
+{"ts":"2026-08-19T17:16:51.942Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d41","brief":"probing the rewind assumption with a ref search in one call"}
+{"ts":"2026-08-19T17:17:18.661Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d42","brief":"control check so the zero is a real zero"}
+{"ts":"2026-08-19T17:17:46.667Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d43","brief":"recording the probe result on the assumption"}

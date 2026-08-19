@@ -10,7 +10,7 @@ status: open
 impact: "If the assumption is false, the rewind is not a mask and the whole design rests on a filter that was struck. Every number taken before the discovery is contaminated and cannot be re-derived."
 breaks_how_badly: fatal
 how_likely: conceivable
-probe: "unprobed — the read at 5f85977f^ establishes that the SEEDED record stands there, which is the input side. The output side is not yet checked."
+probe: "HOLDS, both halves probed 2026-08-19. THE INPUT HALF — the i33 record at 5f85977f^ stands with status seeded, carrying goal, vision and inputs and no pin. THE OUTPUT HALF — a search of project/spec/trace at that same ref for i33 returns 0 files, against 60 today. CONTROL — the same search for i15 at the same ref returns 123 matches across 10 files, so the zero is a real zero rather than a search that did not run."
 source_refs:
   - training-iterations
   - i37-training-iterations-a-disposable-iterati
@@ -43,3 +43,30 @@ commit.
 
 WHAT FALSIFIES IT OUTRIGHT. Any trace node the re-walk must derive that
 resolves at the rewind commit.
+
+
+## Probe result, 2026-08-19
+
+BOTH HALVES HOLD, and the output half is the one that mattered.
+
+- INPUT: the i33 record at `5f85977f^` carries goal, vision and inputs, with
+  status seeded and no pin.
+- OUTPUT: `project/spec/trace` at `5f85977f^` contains ZERO files naming i33.
+  Today it contains 60.
+- CONTROL: the same search for `i15` at the same ref returns 123 matches
+  across 10 files.
+
+WHY THE CONTROL IS PART OF THE RESULT. The first attempt at this probe read
+each of the 60 files individually at the ref, and every read came back as an
+SE-C-040 toll refusal that the classifier counted as "file present". It
+reported 60 of 60 present, which is the exact opposite of the truth, and it
+looked like a clean falsification.
+
+A SILENT EMPTY OR REFUSED RESULT READS AS DATA. That is the second time in one
+session, and it is why the control was run rather than assumed.
+
+WHAT WOULD STILL FALSIFY THIS. An iteration seeded long before it is walked,
+with another iteration writing into its territory in between. The archive
+already interleaves — 20abd831, the rewind point for i33, is i35's seed
+commit. The probe is per-iteration and belongs in the run rather than being
+answered once for all of them.
