@@ -35,6 +35,9 @@ const outDir = arg("--out") ?? join(root, "dist");
 // By NAME wherever it appears, the same list the export excludes.
 const EXCLUDE_DIRS = new Set([
   ".git",
+  // Every past iteration's worktree, each carrying its own copy of the records
+  // that `project/spec` is excluded to keep home.
+  ".worktrees",
   ".se",
   "node_modules",
   ".claude",
@@ -88,11 +91,17 @@ writeFileSync(join(stage, "README.md"), readme, "utf8");
 mkdirSync(outDir, { recursive: true });
 const zipPath = resolve(join(outDir, `${brand.id}-${version}.zip`));
 rmSync(zipPath, { force: true });
+// Compress-Archive walks and compresses file by file, which cost minutes on
+// this tree; the .NET call does the whole directory in one pass.
 const r =
   process.platform === "win32"
     ? spawnSync(
         "powershell",
-        ["-NoProfile", "-Command", `Compress-Archive -Path '${stage}\\*' -DestinationPath '${zipPath}' -CompressionLevel Optimal`],
+        [
+          "-NoProfile",
+          "-Command",
+          `Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::CreateFromDirectory('${stage}', '${zipPath}', [System.IO.Compression.CompressionLevel]::Optimal, $false)`,
+        ],
         { stdio: ["ignore", "inherit", "inherit"] },
       )
     : spawnSync("zip", ["-r", "-X", zipPath, "."], { cwd: stage, stdio: ["ignore", "inherit", "inherit"] });
