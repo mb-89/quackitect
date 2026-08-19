@@ -8,7 +8,7 @@ trigger: any change to el-benchmark-guard, or to the scenario on req-the-benchma
 status: open
 impact: three exclusion lists decide what a lane verb may see, they disagree, and se_file_read consults none of them; one rule has to bind four verbs before this concealment can be trusted
 breaks_how_badly: corrosive
-how_likely: <!-- the likelihood grade — the words live in meth-likelihood-scale, graded at the register review -->
+how_likely: expected
 source_refs:
   - evaluate-architecture, the scenario walk's verdict
   - req-the-benchmark-history-is-unreadable-while-a-run-is-bound

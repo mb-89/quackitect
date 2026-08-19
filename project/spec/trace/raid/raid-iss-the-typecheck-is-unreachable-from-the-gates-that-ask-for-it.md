@@ -8,8 +8,8 @@ owner: the maintainer
 trigger: every gate-validation and gate-release, in every record
 status: open
 impact: "A gate that asks for a measurement it cannot take teaches the honest answer to look like the dishonest one. Restating a stale number reads identically to re-taking it, and only the writer knows which happened."
-breaks_how_badly: serious
-how_likely: certain
+breaks_how_badly: crippling
+how_likely: expected
 source_refs:
   - i5-engine-hygiene-one-version-source-every-
 weighs_with: none

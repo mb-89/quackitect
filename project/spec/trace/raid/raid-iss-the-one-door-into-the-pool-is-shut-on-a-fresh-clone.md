@@ -8,8 +8,8 @@ owner: the maintainer
 trigger: every cloud run that wants to park work for later
 status: open
 impact: "The pool stands at zero tokens today. Work a cloud session defers has nowhere mechanical to go, so it becomes prose in an evidence form that nothing queries."
-breaks_how_badly: serious
-how_likely: certain
+breaks_how_badly: crippling
+how_likely: expected
 source_refs:
   - raid-iss-an-ephemeral-box-loses-the-whole-record-of-a-session
   - raid-asm-a-fresh-clone-s-empty-inbox-means-no-local-state

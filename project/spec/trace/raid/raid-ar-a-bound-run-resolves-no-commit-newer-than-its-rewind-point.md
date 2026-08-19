@@ -8,7 +8,7 @@ trigger: any change to el-benchmark-guard, or to the scenario on req-a-bound-run
 status: open
 impact: the ceiling rests on git merge-base and se_git does not offer it, so the exact primitive is unreachable through the lane; the fallback is deriving ancestry from log or rev-parse, which is more code for a weaker answer
 breaks_how_badly: fatal
-how_likely: <!-- the likelihood grade — the words live in meth-likelihood-scale, graded at the register review -->
+how_likely: expected
 source_refs:
   - evaluate-architecture, the scenario walk's verdict
   - req-a-bound-run-resolves-no-commit-newer-than-its-rewind-point

@@ -9,7 +9,7 @@ trigger: every cloud run, from the next one on
 status: open
 impact: "A cloud run's push is unlogged, unrefusable and unguarded. Nothing checks the branch and nothing stops a force. The call log is what the method calls the only witness on an unattended box, and it holds no record of the act that delivered the work."
 breaks_how_badly: crippling
-how_likely: certain
+how_likely: expected
 source_refs:
   - raid-debt-the-merge-is-committed-and-cannot-be-pushed
   - raid-iss-an-ephemeral-box-loses-the-whole-record-of-a-session

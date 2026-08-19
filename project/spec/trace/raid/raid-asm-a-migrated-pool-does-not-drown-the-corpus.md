@@ -8,7 +8,7 @@ owner: the driving agent
 trigger: the migration, wherever it runs
 status: open
 impact: 205 options against 1304 existing nodes is a sixth of the corpus arriving in one act. If the passes slow past their bounds, the pool becomes the reason every walk is slow, and the fix is a store rather than a tuning.
-breaks_how_badly: annoying
+breaks_how_badly: abrasive
 how_likely: plausible
 probed: 2026-08-18
 probe: OWED, and it cannot be probed on this machine - the 205 are machine-local on the owner's laptop and this clone holds three notes. The probe is to mint them and time the sweep, the conformance pass and one reference view before and after.

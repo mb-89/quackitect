@@ -8,7 +8,7 @@ trigger: any change to el-benchmark-guard, or to the scenario on req-surface-ans
 status: open
 impact: the same guard reaches the mirror's own reads while a run is bound, and the cost is paid on a surface a person is watching
 breaks_how_badly: corrosive
-how_likely: <!-- the likelihood grade — the words live in meth-likelihood-scale, graded at the register review -->
+how_likely: plausible
 source_refs:
   - evaluate-architecture, the scenario walk's verdict
   - req-surface-answers-in-one-second

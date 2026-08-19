@@ -8,7 +8,7 @@ owner: the maintainer
 trigger: the next record that reaches the package state, and any change to what the archive excludes
 status: open
 impact: "A release gate reads a story about a check instead of a result. A packaging change that drops a needed file is caught only if the next agent happens to run the same five commands in the same order, and nothing tells them which five."
-breaks_how_badly: serious
+breaks_how_badly: crippling
 how_likely: expected
 source_refs:
   - i5-engine-hygiene-one-version-source-every-
