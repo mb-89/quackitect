@@ -369,3 +369,16 @@
 {"ts":"2026-08-19T17:22:37.444Z","op":"update","visit":"iterations/i15/generalize-use-cases@0","node":"d19","brief":"cascading reopen+resubmit through M2"}
 {"ts":"2026-08-19T17:23:03.344Z","op":"update","visit":"iterations/i15/gate-inputs@0","node":"d20","brief":"goals_served/bound_breaches for gate-inputs"}
 {"ts":"2026-08-19T17:23:15.327Z","op":"update","visit":"iterations/i15/gate-inputs@0","node":"d21","brief":"reviewed and blessed gate-inputs"}
+{"ts":"2026-08-19T17:27:51.554Z","op":"done","visit":"start@0","node":"d1","brief":"boot/reading loop completed long ago, gate-kickoff onward walked"}
+{"ts":"2026-08-19T17:28:10.213Z","op":"update","visit":"iterations/i15/derive-functions@0","node":"d22","brief":"reading derive-functions to add coverage for two corpus-drift requirements"}
+{"ts":"2026-08-19T17:28:21.573Z","op":"update","visit":"iterations/i15/derive-functions@0","node":"d23","brief":"checking if serve-a-step already covers the two drifted requirements"}
+{"ts":"2026-08-19T17:28:33.485Z","op":"update","visit":"iterations/i15/derive-functions@0","node":"d24","brief":"checking hold-the-method fit for the guidance-paths requirement"}
+{"ts":"2026-08-19T17:28:44.375Z","op":"update","visit":"iterations/i15/derive-functions@0","node":"d25","brief":"added coverage edges for two corpus-drift requirements onto existing functions"}
+{"ts":"2026-08-19T17:29:14.855Z","op":"update","visit":"iterations/i15/derive-functions@0","node":"d26","brief":"resubmitting derive-functions after corpus coverage fix"}
+{"ts":"2026-08-19T17:29:24.958Z","op":"update","visit":"iterations/i15/identify-assumptions@0","node":"d27","brief":"cascading reopen+resubmit through M3"}
+{"ts":"2026-08-19T17:30:04.741Z","op":"update","visit":"iterations/i15/probe-assumptions@0","node":"d28","brief":"cascading reopen+resubmit through M3"}
+{"ts":"2026-08-19T17:30:27.783Z","op":"update","visit":"iterations/i15/gate-requirements@0","node":"d29","brief":"goals_served/bound_breaches for gate-requirements"}
+{"ts":"2026-08-19T17:30:40.323Z","op":"update","visit":"iterations/i15/gate-requirements@0","node":"d30","brief":"reviewed and blessed gate-requirements"}
+{"ts":"2026-08-19T17:30:53.001Z","op":"update","visit":"iterations/i15/gate-requirements@0","node":"d31","brief":"reading meth-derive-criteria for M4"}
+{"ts":"2026-08-19T17:31:11.090Z","op":"update","visit":"iterations/i15/derive-criteria@0","node":"d32","brief":"cascading reopen+resubmit through M4"}
+{"ts":"2026-08-19T17:31:24.444Z","op":"update","visit":"iterations/i15/partition-functions@0","node":"d33","brief":"cascading reopen+resubmit through M4"}

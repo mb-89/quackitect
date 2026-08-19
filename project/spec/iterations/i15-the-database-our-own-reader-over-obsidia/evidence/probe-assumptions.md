@@ -1,7 +1,8 @@
 ---
 form: probe-assumptions
+reopened: "2026-08-19T17:30:04.485Z — same claims-registration gap, cascading fix through M3"
 by: agent
-signed_off: 2026-08-16T17:06:34.254Z
+signed_off: 2026-08-19T17:30:04.952Z
 authors: agent
 files: null
 ---

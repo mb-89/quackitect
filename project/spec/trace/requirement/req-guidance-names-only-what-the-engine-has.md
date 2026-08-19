@@ -1,4 +1,5 @@
 ---
+minted_in: i15-the-database-our-own-reader-over-obsidia
 id: req-guidance-names-only-what-the-engine-has
 type: "[[requirement]]"
 statement: The guidance shall name only lane verbs the engine registers, file paths that resolve from the project root, and refusal clauses the engine can raise.

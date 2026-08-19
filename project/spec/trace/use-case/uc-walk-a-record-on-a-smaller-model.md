@@ -1,4 +1,5 @@
 ---
+minted_in: i15-the-database-our-own-reader-over-obsidia
 id: uc-walk-a-record-on-a-smaller-model
 type: "[[use-case]]"
 kind: interaction

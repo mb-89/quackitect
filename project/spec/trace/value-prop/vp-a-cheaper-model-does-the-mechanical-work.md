@@ -1,4 +1,5 @@
 ---
+minted_in: i15-the-database-our-own-reader-over-obsidia
 id: vp-a-cheaper-model-does-the-mechanical-work
 type: "[[value-prop]]"
 statement: As an engineer, I need the mechanical work to run on a cheaper model, because what limits how much work I can send is the token bill and not the hours.
