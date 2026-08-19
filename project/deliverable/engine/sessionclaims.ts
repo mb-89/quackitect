@@ -1160,7 +1160,35 @@ export class Claims {
     // The dead fields migrate out as legacy instances are touched.
     raw = raw.replace(/^status: .*\n?/m, "").replace(/^opened: .*\n?/m, "");
     // A changed claim is neither the submitted nor the blessed claim.
-    if (Object.keys(fields).length > 0) raw = stripSignedOff(withBless(raw, undefined));
+    //
+    // AND THE ACCIDENTAL DOOR SAYS SO NOW. se_reopen does exactly this on
+    // purpose, and it refuses without confirmation, naming how many states
+    // fall. A field save does it in this one line and said nothing at all, so
+    // the guarded door was the deliberate one and the unguarded door was the
+    // one nobody meant to walk through.
+    //
+    // MEASURED ON THE i15 WALK: correcting a single wrong number on a signed
+    // kickoff gate — 26 query files where there are 25 — dropped 28 claims
+    // beneath it and cost a whole session re-earning states that were right.
+    // se_amend fixes a field and LEAVES THE TREE STANDING, and its name lived
+    // only on se_reopen's description, a verb that call never touched.
+    let cleared: Record<string, unknown> | undefined;
+    if (Object.keys(fields).length > 0) {
+      if (typeof parseStateNote(raw).frontmatter.signed_off === "string") {
+        const falls = this.wouldFall(name, m);
+        cleared = {
+          state: name,
+          falls: falls.length,
+          states: falls,
+          why: "a changed claim is not the claim that was signed, so the signature and any bless are gone",
+          instead:
+            falls.length > 0
+              ? `se_amend fixes a field and leaves these ${String(falls.length)} standing — use it where the claim's own content still passes, and re-submit only when the work is genuinely wrong`
+              : "se_amend fixes a field without clearing the signature, where the claim's own content still passes",
+        };
+      }
+      raw = stripSignedOff(withBless(raw, undefined));
+    }
     if (inputs_checked !== undefined) {
       raw = withChecked(
         raw,
@@ -1174,7 +1202,7 @@ export class Claims {
     mkdirSync(dirname(h.instanceAbs), { recursive: true });
     writeFileSync(h.instanceAbs, raw, "utf8");
     this.host.notifyChange();
-    return this.stateFormGet(name, m);
+    return { ...this.stateFormGet(name, m), ...(cleared === undefined ? {} : { signature_cleared: cleared }) };
   }
 
   /** see dsp-walk-machine.md#the-state-form-the-walk-itself-owes */
