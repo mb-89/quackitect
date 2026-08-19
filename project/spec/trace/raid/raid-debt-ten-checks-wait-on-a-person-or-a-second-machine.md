@@ -7,7 +7,7 @@ statement: Ten verification checks and two boundary timings cannot be answered b
 owner: the owner
 trigger: when the work-token system can carry a task to a person; or at the first verification after 2026-10-01, whichever comes first
 status: open
-looked: 2026-08-18
+looked: 2026-08-19
 impact: A check nobody can run is marked owed every iteration and eventually stops being read, which is how four factual errors sat in the README while its own inspection was marked owed.
 breaks_how_badly: annoying
 how_likely: expected
@@ -128,3 +128,7 @@ still cheap, and it is still not done.
 THE MISSING DATE IS ITSELF THE FINDING. Every other debt in the register
 carries `looked`, this one did not, and the retro's debt sweep is what is meant
 to put it there. A row with no look date cannot be told from a row nobody read.
+
+## Sweep 2026-08-19, at i5's retro
+
+RE-ACCEPTED consciously. Neither trigger has fired: the work-token system still cannot carry a task to a person, and the date is not reached. i5's retro found the pool EMPTY and the door into it shut on a fresh clone, so the trigger this debt waits on is further away than it looked ([[raid-iss-the-one-door-into-the-pool-is-shut-on-a-fresh-clone]]).

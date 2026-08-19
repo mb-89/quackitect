@@ -7,7 +7,7 @@ statement: A seeded machine's steps are frontmatter rows in one drawing file, wh
 owner: the maintainer
 trigger: the picture-in-picture to-do machine design discussion, or the next change to the seeded-machine compiler
 status: open
-looked: 2026-08-18
+looked: 2026-08-19
 impact: Every feature the drawn machines gain must be built twice or the seeded ones fall behind; the owner has ruled the split wrong.
 breaks_how_badly: corrosive
 how_likely: expected
@@ -58,3 +58,7 @@ picture-in-picture design discussion is still parked, and the seeded-machine
 compiler was not touched by i33, i34 or i35.
 
 The trigger stands unchanged.
+
+## Sweep 2026-08-19, at i5's retro
+
+RE-ACCEPTED. Neither trigger fired. i5 compiled a seeded machine from the rigor matrix and read its steps as frontmatter rows throughout, so the split is still doing exactly what this entry says it does.

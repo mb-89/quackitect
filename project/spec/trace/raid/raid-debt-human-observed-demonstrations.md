@@ -7,7 +7,7 @@ statement: Four demonstration specs went unobserved at i3's verification - each 
 owner: the owner
 trigger: the consolidation pass that collects everything needing a person, or any iteration whose delta actually touches one of the four specs
 status: open
-looked: 2026-08-18
+looked: 2026-08-19
 breaks_how_badly: abrasive
 how_likely: expected
 impact: Verification refuses while any claim box stands open, so four specs nobody at a terminal can observe stop every iteration from closing. The alternative is checking boxes on unobserved claims, which is worse.
@@ -111,3 +111,7 @@ WHOEVER RUNS THE CONSOLIDATION SHOULD MERGE THE TWO rather than repay them
 separately. They are one backlog seen from two dates.
 
 The trigger stands unchanged.
+
+## Sweep 2026-08-19, at i5's retro
+
+RE-ACCEPTED. Neither trigger fired: no consolidation pass ran and i5's delta touched none of the four specs. What changed is evidence that the class is not uniformly blocked — i5's own demonstration ran unattended end to end, so the four should be re-read for which steps genuinely need a watcher.

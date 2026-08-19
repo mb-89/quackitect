@@ -7,7 +7,7 @@ statement: The reference views still list the whole corpus - the minted_in stamp
 owner: the driving agent
 trigger: the next form opened in a record whose table lists another record's nodes, or the owner's next reiteration of the delta demand
 status: open
-looked: 2026-08-18
+looked: 2026-08-19
 breaks_how_badly: abrasive
 how_likely: expected
 impact: Every reference table in a record lists the standing corpus beside the delta - 38 test-specs where 7 are the iteration's own - and the reader wades through history, exactly what the owner has flagged three times.
@@ -62,3 +62,7 @@ neither `answerStructuredQuery` nor `rankCandidateCouplings` has a lane door
 (note-8a7a3030c5e9, re-checked the same day).
 
 The trigger stands unchanged.
+
+## Sweep 2026-08-19, at i5's retro
+
+RE-ACCEPTED, and the trigger fired twice in one record. i5's validation gate served 24 must stories and 9 value props for a delta of five requirements, and observe-red served the whole non-test corpus. Both are this debt's exact cost. i5 minted [[raid-iss-a-gate-form-asks-the-standing-set-where-its-guidance-says-the-delta]] from the gate half before finding this entry; the two describe one repair and it should be built once.

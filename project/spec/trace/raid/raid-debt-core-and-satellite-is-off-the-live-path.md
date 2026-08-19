@@ -7,7 +7,7 @@ statement: The core and satellite cluster is built and tested, and nothing the r
 owner: the driving agent
 trigger: when the run mode is first flipped away from inline, or at the code-review iteration
 status: open
-looked: 2026-08-18
+looked: 2026-08-19
 impact: A whole subsystem drifts from the engine it is meant to carry, and its green tests read as proof it works.
 breaks_how_badly: corrosive
 how_likely: expected
@@ -118,3 +118,7 @@ THE SHARPER QUESTION FROM THE LAST SWEEP IS STILL UNASKED: whether the run-mode
 setting is inert. It was recorded as a lead rather than a claim and remains one.
 
 The trigger stands unchanged.
+
+## Sweep 2026-08-19, at i5's retro
+
+RE-ACCEPTED. Neither trigger fired — the run mode is unchanged and the code-review iteration has not run. i5's own trace-design sweep touched the same seam from the other side: it found an interface node naming an element of a subsystem that had been cut wholesale ([[raid-iss-a-cut-subsystem-left-its-interface-node-behind]]). A subsystem off the live path leaves debris in the corpus as well as in the code.

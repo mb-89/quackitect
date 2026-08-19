@@ -7,7 +7,7 @@ statement: tsp-bound-surface cannot be observed, because its procedure needs two
 owner: the owner
 trigger: the build that lets two records stand open with a satellite each, or any change to how a surface resolves its links
 status: decided
-looked: 2026-08-18
+looked: 2026-08-19
 breaks_how_badly: abrasive
 how_likely: expected
 impact: Verification refuses while any claim box stands open, so a spec nobody can observe stops every iteration from closing. The spec's own text already says the procedure cannot run until the build stands, and nothing carried that, so each iteration met the same blank and had to work it out again.
@@ -85,3 +85,7 @@ THE ONE OPEN THREAD IS UNCHANGED AND STILL OWED TO SOMEBODY ELSE:
 req-a-surface-resolves-to-what-it-shows was verified only by the dropped
 demonstration, and nothing verifies it now. That is the next surface-resolution
 work's question, not this row's.
+
+## Sweep 2026-08-19, at i5's retro
+
+RE-ACCEPTED. The build it waits on has not landed and no surface-resolution change happened in i5.

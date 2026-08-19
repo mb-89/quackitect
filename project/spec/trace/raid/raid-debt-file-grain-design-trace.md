@@ -7,7 +7,7 @@ statement: The design-to-code sweep runs at file grain, so dead code inside a cl
 owner: the driving agent
 trigger: when the file-grain sweep stops finding anything new, or when a region-marker mechanism lands
 status: open
-looked: 2026-08-18
+looked: 2026-08-19
 impact: A dead function inside a live file never surfaces as an unclaimed finding, and only a reachability probe or a reader catches it.
 breaks_how_badly: corrosive
 how_likely: plausible
@@ -45,3 +45,7 @@ i7 IS STILL SEEDED AND UNWALKED, so the destination recorded at the last two
 sweeps is unchanged and unreached.
 
 The trigger stands unchanged.
+
+## Sweep 2026-08-19, at i5's retro
+
+RESCHEDULED, trigger re-affirmed. The coarse sweep has NOT gone quiet: i5's trace-design pass found a live finding at file grain this iteration. i7 remains the seeded iteration that repays it.

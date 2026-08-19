@@ -7,7 +7,7 @@ statement: The checklist editor's panel UI (engine/editors/checklist.ts) has no 
 owner: the owner
 trigger: the owner reviews the panel's checklist rendering and decides the visual state and the ref-entry affordance
 status: open
-looked: 2026-08-18
+looked: 2026-08-19
 impact: A returning person reading a checklist field in the panel cannot tell an owed item from an unchecked one by looking - the distinction only shows in the raw markdown. The mechanism (engine/stateform.ts checklistItemStatus, the "- [owed] <item> - <ref>" line form) is fully functional for an agent writing it directly through a form fill; only the panel's own render/collect JS was not extended.
 breaks_how_badly: abrasive
 how_likely: expected
@@ -61,3 +61,7 @@ each verdict as its own act from a button. So the affordance exists and the
 question is whether the checklist reuses it, not whether it has to be invented.
 
 The trigger stands unchanged.
+
+## Sweep 2026-08-19, at i5's retro
+
+RE-ACCEPTED. The trigger is the owner's own review of the panel and it has not happened. i5 wrote seven checklist fields through forms and never needed the owed state, which is consistent with the entry's own reading: the mechanism works for an agent and the gap is the panel's render.
