@@ -142,6 +142,10 @@ refusing, and the agent's pull is what moves.
 - THREE PROBES, SPREAD THROUGH THE DOCUMENT. Each quotes a short run of words
   and asks for the FOUR WORDS THAT FOLLOW it. They sit near the 30%, 60% and
   92% marks, so all of it has to be in hand.
+- THE ANCHOR SITS BETWEEN `«` AND `»`. Those marks are the delimiters and are
+  never part of the anchor. Plain quotes are used only where the anchor itself
+  carries a guillemet, so the delimiter is always a character the anchor does
+  not hold — an anchor ending in a quote mark used to hide its own end.
 - ANSWER ALL THREE IN ONE STRING, as `form: {"read": "..."}`. Join them any
   way you like. Order does not matter and separators do not matter.
 - QUOTE GENEROUSLY. The check asks whether your answer CONTAINS the words it

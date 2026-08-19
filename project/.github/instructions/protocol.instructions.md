@@ -6,7 +6,7 @@ applyTo: '**'
 
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
      from project/guidance/contract.md 2c1c1de5650a
-     from project/guidance/walking.md 0c0b2a829a2f
+     from project/guidance/walking.md 89438599d339
      from project/guidance/method/lane.md 018c04798b6b
      from project/guidance/voice.md 888a21b1a538
 -->
@@ -408,6 +408,10 @@ refusing, and the agent's pull is what moves.
 - THREE PROBES, SPREAD THROUGH THE DOCUMENT. Each quotes a short run of words
   and asks for the FOUR WORDS THAT FOLLOW it. They sit near the 30%, 60% and
   92% marks, so all of it has to be in hand.
+- THE ANCHOR SITS BETWEEN `«` AND `»`. Those marks are the delimiters and are
+  never part of the anchor. Plain quotes are used only where the anchor itself
+  carries a guillemet, so the delimiter is always a character the anchor does
+  not hold — an anchor ending in a quote mark used to hide its own end.
 - ANSWER ALL THREE IN ONE STRING, as `form: {"read": "..."}`. Join them any
   way you like. Order does not matter and separators do not matter.
 - QUOTE GENEROUSLY. The check asks whether your answer CONTAINS the words it

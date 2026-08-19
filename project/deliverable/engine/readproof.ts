@@ -45,6 +45,21 @@ function anchorStart(w: string[], i: number): number {
   return start;
 }
 
+/** WRAP THE ANCHOR SO ITS END IS UNAMBIGUOUS.
+ *
+ *  The ask used to wrap it in plain double quotes, and 13 of the corpus's 687
+ *  probes quote an anchor that CONTAINS one — `@ai/sya_kb chapter 01, "using`
+ *  came out as `FOLLOW "@ai/sya_kb chapter 01, "using"`, where nothing says
+ *  which quote closes the anchor. Measured on the i15 walk: that probe took
+ *  three attempts.
+ *
+ *  GUILLEMETS FIRST, because prose here does not use them, and plain quotes
+ *  only where the anchor already carries a guillemet — so the delimiter is
+ *  always a character the anchor does not hold. */
+function delimit(anchor: string): string {
+  return anchor.includes("«") || anchor.includes("»") ? `"${anchor}"` : `«${anchor}»`;
+}
+
 /** WHAT THE PULL ASKS, AND WHAT IT WILL ACCEPT.
  *  `ask` is shown to the reader; `expect` is what the answer must contain. */
 export function readingProbes(body: string): { ask: string[]; expect: string[] } {
@@ -54,7 +69,7 @@ export function readingProbes(body: string): { ask: string[]; expect: string[] }
   const expect: string[] = [];
   for (const at of AT) {
     const i = Math.min(Math.floor(w.length * at), w.length - RUN * 2);
-    ask.push(`the ${RUN} words that FOLLOW "${w.slice(anchorStart(w, i), i + RUN).join(" ")}"`);
+    ask.push(`the ${RUN} words that FOLLOW ${delimit(w.slice(anchorStart(w, i), i + RUN).join(" "))}`);
     expect.push(w.slice(i + RUN, i + RUN * 2).join(" "));
   }
   return { ask, expect };

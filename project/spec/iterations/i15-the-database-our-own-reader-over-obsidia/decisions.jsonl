@@ -382,3 +382,9 @@
 {"ts":"2026-08-19T17:30:53.001Z","op":"update","visit":"iterations/i15/gate-requirements@0","node":"d31","brief":"reading meth-derive-criteria for M4"}
 {"ts":"2026-08-19T17:31:11.090Z","op":"update","visit":"iterations/i15/derive-criteria@0","node":"d32","brief":"cascading reopen+resubmit through M4"}
 {"ts":"2026-08-19T17:31:24.444Z","op":"update","visit":"iterations/i15/partition-functions@0","node":"d33","brief":"cascading reopen+resubmit through M4"}
+{"ts":"2026-08-19T17:34:41.220Z","op":"done","visit":"start@0","node":"d4","brief":"reached the live-search gate; running real outward searches next"}
+{"ts":"2026-08-19T17:36:15.838Z","op":"update","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d34","brief":"verifying the live-search patch landed"}
+{"ts":"2026-08-19T17:36:30.312Z","op":"plan","visit":"iterations/i15/enumerate-space/find_prior_art@0","parent":null,"nodes":[{"id":"d35","brief":"satisfy find_prior_art outward-search condition"},{"id":"d36","brief":"complete M4-M8 milestones"},{"id":"d37","brief":"reach and pass gate-implementation prep"},{"id":"d38","brief":"build the actual verbs and fixes"}]}
+{"ts":"2026-08-19T17:36:47.745Z","op":"update","visit":"iterations/i15/cut-criteria@0","node":"d39","brief":"cascading reopen+resubmit through M4"}
+{"ts":"2026-08-19T17:37:04.594Z","op":"update","visit":"iterations/i15/cut-criteria@0","node":"d40","brief":"reading cut-criteria to fix the dead requirement reference"}
+{"ts":"2026-08-19T17:37:15.505Z","op":"update","visit":"iterations/i15/cut-criteria@0","node":"d41","brief":"removing dead req-engine-folder-is-sealed reference from cut-criteria"}

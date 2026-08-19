@@ -108,7 +108,7 @@ land or they change under it, and nothing written here goes stale behind.
 test("the probe that cost the calls is the probe this fixture serves", () => {
   const { ask, expect } = readingProbes(DASHED);
   assert.ok(
-    ask.some((a) => a.includes('FOLLOW "and NO vocabulary on"')),
+    ask.some((a) => a.includes("FOLLOW «and NO vocabulary on»")),
     `the fixture drifted off the shape it pins: ${ask.join(" / ")}`,
   );
   assert.ok(expect.includes("purpose those must come"), `the expected answer is no longer the dashless run: ${expect.join(" / ")}`);
@@ -161,7 +161,7 @@ function withRepeatedAnchor(): string {
 
 /** How many times the run a probe quoted appears in the document. */
 function anchorHits(doc: string, ask: string): number {
-  const quoted = /FOLLOW "([^"]*)"/.exec(ask)?.[1];
+  const quoted = /FOLLOW [«"](.*)[»"]$/.exec(ask)?.[1];
   assert.ok(quoted !== undefined, `a probe asked without quoting an anchor: ${ask}`);
   const words = readingWords(doc).map((x) => x.toLowerCase());
   const seq = readingWords(quoted).map((x) => x.toLowerCase());
@@ -181,4 +181,32 @@ test("the honest reader's answer still satisfies every probe when an anchor grew
   const doc = withRepeatedAnchor();
   const { expect } = readingProbes(doc);
   assert.deepEqual(probesMissed(expect, proofFor(doc)), [], "growing the anchor moved what the answer must contain");
+});
+
+// AN ANCHOR THAT CARRIES A QUOTE MARK USED TO HIDE ITS OWN END.
+//
+// Measured on the i15 walk: the ask read `FOLLOW "@ai/sya_kb chapter 01, "using"`
+// and nothing said which quote closed the anchor. That probe took three
+// attempts. 13 of the corpus's 687 probes quote an anchor containing a double
+// quote — about one boot in four serves one.
+test("the ask delimits its anchor with a character the anchor does not contain", () => {
+  const carriesAQuote = `# a card that quotes somebody
+
+Some opening prose so this document clears the sixteen-word floor and the
+probes land by fraction rather than serving the whole of it, exactly as a
+real guidance card written by somebody who meant every line reads.
+
+The verdict field wants a line like "rival wins credible" and nothing longer,
+because a verdict that runs on is a paragraph wearing a verdict's clothes and
+the reader cannot tell which half was the ruling.
+`;
+  for (const ask of readingProbes(carriesAQuote).ask) {
+    const opened = /FOLLOW («|")/.exec(ask);
+    assert.ok(opened !== null, `the ask does not delimit its anchor at all: ${ask}`);
+    const open = opened[1];
+    const close = open === "«" ? "»" : '"';
+    const anchor = ask.slice(ask.indexOf(open) + 1, ask.lastIndexOf(close));
+    assert.ok(anchor.length > 0, `the anchor came out empty: ${ask}`);
+    assert.ok(!anchor.includes(close), `the anchor contains its own closing delimiter, so its end is a guess: ${ask}`);
+  }
 });
