@@ -96,3 +96,4 @@
 {"ts":"2026-08-19T17:58:53.893Z","op":"done","visit":"iterations/i37/enumerate-space/build_chart@0","node":"d87","brief":"placed into the row: how a run is triggered"}
 {"ts":"2026-08-19T17:58:54.032Z","op":"done","visit":"iterations/i37/enumerate-space/build_chart@0","node":"d88","brief":"placed into the row: how the measuring apparatus relates to an ordinary"}
 {"ts":"2026-08-19T18:00:13.445Z","op":"plan","visit":"iterations/i37/enumerate-space/build_chart@0","parent":null,"nodes":[{"id":"d94","brief":"draw three candidates across the box"},{"id":"d95","brief":"converge and leave enumerate-space"}]}
+{"ts":"2026-08-19T18:00:45.702Z","op":"update","visit":"iterations/i37/enumerate-space/build_chart@0","node":"d96","brief":"reading the candidate node shape"}
