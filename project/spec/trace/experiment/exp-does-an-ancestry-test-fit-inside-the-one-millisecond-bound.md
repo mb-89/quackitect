@@ -10,6 +10,8 @@ timebox: "minutes — 200 iterations of three candidate primitives"
 form: calculation
 faked: "the lane. The primitives were timed as bare subprocesses rather than through se_git, so the number EXCLUDES the lane's own dispatch, logging and toll. The real figure is higher than this one, never lower."
 fallback: "pre-agreed before the run: if the primitive fits inside a millisecond, the checked ceiling keeps its bound and the two one-second risks discharge as addressed."
+folds_to: "if-benchmark-binding-to-guard — the millisecond was the agent's own and is replaced by a derived bound"
+promote: "none — the checked ceiling it measured is no longer the design"
 verdict: falls
 source_refs:
   - if-benchmark-binding-to-guard

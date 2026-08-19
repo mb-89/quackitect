@@ -2,7 +2,7 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: el-benchmark-binding
 type: "[[element]]"
-statement: "Opens and holds a benchmark run: takes the iteration a person named or the least recently walked one, finds the commit before that iteration started, exports the content subtree there, and proves its own ancestry test before anything else runs."
+statement: "Opens and holds a benchmark run: takes the iteration a person named or the least recently walked one, finds the commit before that iteration started, stands a tree whose history ENDS there with today's method laid over yesterday's records, and writes the conditions no log can recover."
 kind: new
 realization: make
 group: the-benchmark-run
@@ -48,3 +48,42 @@ deferrals. The alternatives were a desk door and nothing at all.
 
 So `se_benchmark {iteration?, stop_at?}` opens a run and `se_benchmark {stop:
 true}` ends one. It is one verb because a run has one lifetime.
+
+## Corrected by the M6 spikes, 2026-08-19
+
+TWO THINGS IN THIS ELEMENT'S FIRST STATEMENT WERE WRONG, and both were found by
+running rather than by review.
+
+### The tree is fetched, not exported
+
+`git archive` gives content with no `.git` at all, so every git verb is dead
+inside the tree — including the ones an agent legitimately uses to read the
+past.
+
+A DEPTH-1 FETCH GIVES BOTH: the working tree and a history that simply ENDS at
+the rewind point. Measured on i33: 1723 files, depth 1, and `git rev-parse` on
+i33's own start commit does not resolve because the object is absent.
+
+TWO COMMANDS, and the first is not optional:
+
+    git update-ref refs/bench/<id> <rewind-commit>
+    git fetch --depth 1 <source> refs/bench/<id>:refs/heads/bench
+
+A BARE OBJECT ID CANNOT BE FETCHED without `uploadpack.allowAnySHA1InWant`.
+The rewind commit has to be named as a ref first.
+
+### The rewind covers records, never method
+
+`project/deliverable` and `project/guidance` come from TODAY. A whole-tree
+rewind fails to compile
+([[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]).
+
+### And the guard it proves is no longer a test
+
+The ceiling was a checked ancestry test when this element was written. The
+structural ceiling now stands on probed ground, so there is nothing per-request
+to prove: the object a run must not reach is not in the tree.
+
+WHAT SURVIVES OF THE PROOF. One deliberately forbidden request per run, recorded
+on the report — not to show a guard held, but to show the tree was truncated as
+intended.

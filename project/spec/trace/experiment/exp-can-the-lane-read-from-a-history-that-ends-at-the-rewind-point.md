@@ -10,6 +10,8 @@ timebox: "minutes — two git commands, abandon if it needs a server config chan
 form: script
 faked: "the lane itself. The tree was built and interrogated with git directly; no se_ verb was pointed at it, because reaching another tree needs a declared root and that is the owner's act."
 fallback: "pre-agreed before the run: if a truncated history could not be built without changing server configuration, the checked ceiling stands and the declaration at declare-winner needs no revisiting."
+folds_to: "declare-winner — the structural ceiling is available on probed ground and the override falls"
+promote: "name the rewind commit as a ref, then fetch it at depth 1"
 verdict: holds
 source_refs:
   - cand-the-guarded-run

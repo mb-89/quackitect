@@ -52,3 +52,29 @@ report stamps the matrix hash.
 - The rewind operates on `project/spec` and the corpus. Never on `project/deliverable`.
 - No benchmark result is ever comparable to one taken under a different engine unless both stamp the se version, which the report requirement already demands.
 - A rewound run walks TODAY's rigor column over yesterday's work. Anyone reading a report must read the matrix hash beside it.
+
+## Corrected by measurement, 2026-08-19
+
+THE RULING SAID CONTENT RATHER THAN MACHINE and did not say where the line
+falls. `exp-does-the-current-engine-run-against-a-rewound-tree` found it by
+failing.
+
+A WHOLE-TREE REWIND DOES NOT BOOT:
+
+    MachineCompileError: main: canvas node n-boot: boot.canvas declares no
+    priority in its frontmatter
+
+The engine reads `machines/`, `guidance/` and the rigor matrix out of the ROOT
+it is handed, not out of its own folder. Old drawings predate a field the
+current compiler requires.
+
+SO THE REWIND IS A THREE-WAY SPLIT, and only the middle term was named before
+the spike ran.
+
+- REWOUND: `project/spec`. The records, the corpus, the trace. The work.
+- CURRENT: `project/deliverable` AND `project/guidance`. The method.
+- BOUNDED: the git history, which ends at the rewind commit.
+
+`project/guidance` IS MACHINE. That is the word this decision was missing, and
+a build written against the original wording would have died on a compile
+error at the first benchmark run.

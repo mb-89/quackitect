@@ -10,6 +10,8 @@ timebox: "minutes — boot it and call se_pull once"
 form: skeleton
 faked: "no walk was driven. The lane was booted and asked for one pull; nothing was filled and no state was signed."
 fallback: "pre-agreed before the run: if the engine cannot run against a rewound tree, the whole rewind mechanism needs a different shape and M4 reopens."
+folds_to: "raid-dec-a-benchmark-rewinds-content-and-never-the-machine and el-benchmark-binding — the rewind is a three-way split"
+promote: "rewound project/spec, today's machines and guidance, history bounded"
 verdict: holds
 source_refs:
   - el-benchmark-binding

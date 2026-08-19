@@ -10,6 +10,8 @@ timebox: "minutes — one probe per verb per list"
 form: script
 faked: "nothing. Every row is a real lane call against this tree."
 fallback: "pre-agreed before the run: if one list already binds every verb, the concealment attaches to it and the standing work token is not this iteration's dependency."
+folds_to: "req-the-benchmark-history-is-unreadable-while-a-run-is-bound — it waits on a work token this iteration does not own"
+promote: "none — a blocker rather than a mechanism"
 verdict: falls
 source_refs:
   - el-benchmark-guard

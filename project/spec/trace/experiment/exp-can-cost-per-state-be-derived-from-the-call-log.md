@@ -9,6 +9,8 @@ timebox: "minutes — a pass over this session's own log"
 form: calculation
 faked: "nothing. The measurement ran over the real log of this walk, 1282 calls."
 fallback: "pre-agreed before the run: if attribution is not derivable, el-benchmark-report needs a different input and the design change lands after two blessed gates."
+folds_to: "raid-asm-the-call-log-attributes-every-call-to-the-state-it-was-made-in — half false, half true by another route"
+promote: "the carry-forward rule: walk the log and carry each se_pull's where until the next"
 verdict: holds
 source_refs:
   - el-benchmark-report
