@@ -122,3 +122,6 @@
 {"ts":"2026-08-19T18:58:06.501Z","op":"update","visit":"iterations/i37/cut-criteria@6","node":"d26","brief":"aiming at decompose-structure"}
 {"ts":"2026-08-19T18:58:25.390Z","op":"update","visit":"iterations/i37/decompose-structure@0","node":"d27","brief":"reading the element node shape"}
 {"ts":"2026-08-19T18:59:45.121Z","op":"done","visit":"iterations/i37/cut-criteria@0","node":"d14","brief":"three elements by lifetime; the lane verb settles how a run is reached"}
+{"ts":"2026-08-19T19:00:10.523Z","op":"update","visit":"iterations/i37/cut-criteria@7","node":"d28","brief":"aiming at evaluate-architecture"}
+{"ts":"2026-08-19T19:00:37.040Z","op":"update","visit":"iterations/i37/decompose-structure@0","node":"d29","brief":"reading the interface node shape"}
+{"ts":"2026-08-19T19:01:22.618Z","op":"update","visit":"iterations/i37/decompose-structure@0","node":"d30","brief":"four interfaces minted; every crossing named"}
