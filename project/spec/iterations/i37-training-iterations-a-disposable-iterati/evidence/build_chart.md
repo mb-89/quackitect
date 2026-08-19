@@ -1,5 +1,7 @@
 ---
 form: build_chart
+by: agent
+signed_off: 2026-08-19T18:04:34.187Z
 authors: agent
 files:
 ---
@@ -16,9 +18,9 @@ Three candidates are drawn.
 
 ## chart
 
-| cand-the-thin-run | export the content subtree | ceiling on git's ancestry primitive | calibrate against a known specimen | hide by the binding | the person chooses | a stopped run reports where it stopped | record what cannot be recovered | one fixed course, machine varies | the agent is told | measuring rides an ordinary walk |
-| cand-the-guarded-run | export the content subtree | make a future commit unrepresentable | carry a deliberately broken guard | one visibility rule, every verb derives | draw with a recorded seed | write the report as the walk goes | record what cannot be recovered | reliability over repeated trials | the agent is told | measuring rides an ordinary walk |
-| cand-the-refusing-run | export the content subtree | refuse to bind when ancestry cannot be established | carry a deliberately broken guard | hide by the binding | the person chooses | a stopped run reports where it stopped | take the conditions from the log | one fixed course, machine varies | the agent is told | measuring rides an ordinary walk |
+| [[cand-the-thin-run]] | The thin run | A benchmark run built almost entirely out of what git and the corpus already do, with a checked ceiling and a control beside every measurement. | [[opt-the-content-subtree-is-exported-at-a-commit-rather-than-the-repository-checked-out]] · [[opt-the-ceiling-rests-on-the-ancestry-primitive-git-already-answers]] · [[opt-the-instrument-is-calibrated-against-a-known-specimen-before-it-is-trusted]] · [[opt-the-instrument-s-own-history-is-hidden-by-the-binding-not-by-the-folder]] · [[opt-the-choosing-is-done-by-the-person-and-no-chooser-is-built]] · [[opt-a-stopped-run-reports-where-it-stopped-instead-of-being-discarded]] · [[opt-the-conditions-are-recorded-because-they-cannot-be-recovered]] · [[opt-a-fixed-course-is-flown-repeatedly-so-only-the-machine-varies]] · [[opt-the-agent-is-told-and-the-claim-is-narrowed-to-match]] · [[opt-the-benchmark-is-the-side-effect-of-a-walk-rather-than-a-mode-of-one]] |
+| [[cand-the-guarded-run]] | The guarded run | A benchmark run where nothing can fail quietly: the future is unrepresentable rather than refused, one rule decides all visibility, and every run proves its own guard. | [[opt-the-content-subtree-is-exported-at-a-commit-rather-than-the-repository-checked-out]] · [[opt-a-reachable-future-commit-is-made-unrepresentable-rather-than-checked]] · [[opt-a-run-carries-a-deliberately-broken-guard-to-prove-the-guard-is-watching]] · [[opt-one-visibility-rule-is-the-single-source-and-every-verb-derives-from-it]] · [[opt-the-generator-is-random-and-the-seed-is-recorded]] · [[opt-the-report-is-written-as-the-walk-goes-rather-than-at-the-end]] · [[opt-the-conditions-are-recorded-because-they-cannot-be-recovered]] · [[opt-reliability-is-reported-over-repeated-trials-not-one]] · [[opt-the-agent-is-told-and-the-claim-is-narrowed-to-match]] · [[opt-the-benchmark-is-the-side-effect-of-a-walk-rather-than-a-mode-of-one]] |
+| [[cand-the-refusing-run]] | The refusing run | A benchmark run that keeps the cheap ceiling but moves the safe default earlier: a run that cannot establish its own guard never begins. | [[opt-the-content-subtree-is-exported-at-a-commit-rather-than-the-repository-checked-out]] · [[opt-a-run-that-cannot-establish-its-own-ceiling-refuses-to-start]] · [[opt-a-run-carries-a-deliberately-broken-guard-to-prove-the-guard-is-watching]] · [[opt-the-instrument-s-own-history-is-hidden-by-the-binding-not-by-the-folder]] · [[opt-the-choosing-is-done-by-the-person-and-no-chooser-is-built]] · [[opt-a-stopped-run-reports-where-it-stopped-instead-of-being-discarded]] · [[opt-the-conditions-are-taken-from-the-log-rather-than-stated-separately]] · [[opt-a-fixed-course-is-flown-repeatedly-so-only-the-machine-varies]] · [[opt-the-agent-is-told-and-the-claim-is-narrowed-to-match]] · [[opt-the-benchmark-is-the-side-effect-of-a-walk-rather-than-a-mode-of-one]] |
 
 ## why_these
 
