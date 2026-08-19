@@ -1,6 +1,7 @@
 ---
 id: i5-engine-hygiene-one-version-source-every-
-status: seeded
+status: open
+started: 2026-08-19T10:44:05.205Z
 opened: 2026-08-11T15:23:30.930Z
 goal: "Engine hygiene: one version source, every refusal anchored to its guidance, the sync sweeps duplicates, the slow test file splits, and the paint rules get their pin."
 vision: |-
