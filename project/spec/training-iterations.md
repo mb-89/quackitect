@@ -1,7 +1,7 @@
 ---
 id: training-iterations
 kind: brief
-statement: A training iteration is a disposable iteration, seeded by command, walked by an agent for time, never committed, and discarded without ever reaching the archive.
+statement: A benchmark run re-walks an archived iteration from the commit before it started, so the design input costs nothing to author and the walk itself can be timed.
 written: 2026-08-19
 ---
 
@@ -9,249 +9,170 @@ written: 2026-08-19
 
 FOR THE AGENT THAT BUILDS THIS. The outward scan is
 [[ref-agent-benchmark-harnesses-2026]]. Read it first. It carries the
-sources, the four ways this benchmark can lie, and what the
-synthetic-workload tradition already settled.
+sources and the four ways this benchmark can lie.
+
+THE OWNER RULED ON 2026-08-19: an archived iteration IS the benchmark.
+Nothing is authored. Two earlier designs — a scenario pool and a sandbox
+package — are struck, and the reason is in the next section.
 
 ## Why it exists
 
-RUNNING AN ITERATION IS TOO SLOW, and nothing measures it. The owner's
-complaint has stood since 2026-08-14 without a number behind it.
+RUNNING AN ITERATION IS TOO SLOW, and nothing measures it. The complaint has
+stood since 2026-08-14 without a number behind it.
 
-TWO SEEDED ITERATIONS ALREADY WANT THIS FIXTURE.
-
-- i31 records a walk so a guidance change can be A/B tested.
-- i32 ranks states by drag, and its record says "one run per setting proves
-  nothing".
-
-NEITHER CAN RUN WITHOUT A REPEATABLE WORKLOAD. A real iteration is walked
-once, and the next one is a different job. Two real walks differ in a hundred
-ways, so the numbers measure the job rather than the machine.
-
-A TRAINING ITERATION IS THE REPEATABLE WORKLOAD. It is the same job, walked
-as often as needed, by any agent, on any host.
-
-## What it is
-
-A DISPOSABLE ITERATION. Five properties, all stated by the owner.
-
-- It is seeded by one command.
-- Its size is chosen, or drawn at random.
-- Its steps carry work that produces correctly shaped data.
-- It never enters the archive.
-- Several stand open at once, and none counts as a normal iteration.
-
-THE DATA IS WORTHLESS AND THE SHAPE IS NOT. Evidence written in a training
-iteration passes the same form checks a real one passes. That is the whole
-point: the agent walks the real machine, not a mock of it.
-
-## What it is not
-
-- IT IS NOT A REPLAY. i31 owns that word. A replay feeds recorded results
-  back and never re-invokes the agent. A training iteration re-invokes the
-  agent every time. An archived iteration may still be a SOURCE for a
-  training scenario — see the mask section below.
-- IT IS NOT A TEST. The test suite already walks the machine with the forms
-  filled by a function. Here the AGENT fills them, because the agent is what
-  is being timed.
-- IT IS NOT A QUALITY MEASURE. See "the honesty ruling" below.
-
-## The generator: one lever, not two modes
-
-THE OWNER ASKED WHETHER THE WORK SHOULD BE RANDOM OR PREPARED. The answer
-from property-based testing is that this is one question, not two.
-
-    se_seed_training {size?, seed?, scenario?}
-
-- NO SEED — one is minted, printed, and written into the record. The draw is
-  random and reproducible afterwards.
-- A SEED — the same draw comes back exactly. This is the "prepared" mode, and
-  it costs no second mechanism.
-- NO SIZE — a change-size column is drawn.
-- A SIZE — that column is pinned.
-
-THE SEED IS THE PORTABLE ARTIFACT. Nothing about a training iteration is
-committed, so a second machine does not FETCH one. It REGENERATES one from
-the seed, the size, the scenario name and the pool version. Those four values
-are the whole handover.
-
-## Size is the scale factor
-
-THE CHANGE-SIZE COLUMN ALREADY DECIDES HOW BIG THE WALK IS. `patch`, `minor`,
-`major`, `product` and `specification` compile different numbers of states
-out of the same rigor matrix.
-
-SO SIZE NEEDS NO NEW MECHANISM. The training seed pins a column exactly as a
-real kickoff does. A `patch` run is the short benchmark. A `product` run is
-the long one.
-
-THIS MATCHES THE SYNTHETIC-DATABASE TRADITION. TPC-H results are always
-quoted with their scale factor. Size is part of the result, never a hidden
-setting.
-
-## The scenario pool
-
-THE POOL IS AUTHORED, SMALL AND COMMITTED. Three to five scenarios to start.
-The pool is the one part of this system that IS committed, because it is the
-specification of the workload and a workload nobody wrote down cannot be
-compared with itself later.
-
-EACH SCENARIO CARRIES FOUR THINGS.
-
-- A fake subject. A coherent pretend feature, stated once.
-- A fake delta. What this iteration is supposed to change about it.
-- A size range. Which columns this scenario is honest at.
-- A sandbox package. Real code with real tests, described below.
-
-WHY SCENARIOS AND NOT RANDOM FIELDS. Random per-field text contradicts itself
-between states. The agent then spends its time being confused, and confusion
-reads as machine drag. The generator draws a SCENARIO and a size. It does not
-draw sentences.
-
-## The sandbox package
-
-THE BUILD STEPS DEMAND REAL CODE. `build-steps` runs a seeded chunk machine.
-`observe-red` demands a failing test. `verification` runs the battery.
-
-SO EACH SCENARIO SHIPS A TINY PACKAGE inside the training folder.
-
-- It has its own tests.
-- The tests really go red before the build.
-- They really go green after it.
-- Nothing outside the training folder is ever touched.
-
-THIS IS THE BIGGEST BUILD ITEM, and it is what makes the M7 half of the walk
-honest. Without it the training iteration measures the paperwork only.
-
-## The mask, and what an archived iteration can be
-
-THE OWNER'S RULING, 2026-08-19. Do not design against a malicious agent. The
-agent reads through the lane, the lane can hide what it likes, and a
-workaround shows up in the call log afterwards. That is sufficient.
-
-THE RULING IS ACCEPTED AND THE OBJECTION IS WITHDRAWN. The earlier reason for
-rejecting an archived iteration as a training source was framed as trust. It
-is not a trust problem. It is a COVERAGE problem, and coverage is arithmetic.
-
-### The mechanism the owner described already exists, for shell commands
-
-`engine/discipline.ts` classifies every `se_run` command against a rule
-table: tests, file edits, file writes, text searches, file reads, listing,
-waiting and git. Each category allows ONE warned run and then refuses with
-SE-C-129. A `no_tool_reason` valve runs it anyway and files the reason for
-the retro. The counters persist in `.se/` ACROSS sessions.
-
-SO THE SHELL HALF IS DONE. Nothing new is needed there.
-
-### The lane's own hiding is in three places and covers less than it looks
-
-MEASURED 2026-08-19, on this build.
-
-- `paths.ts` exports `EXCLUDED_DIRS` — `.git`, `node_modules`, `.se`,
-  `.venv`, `__pycache__`. Only `se_file_list` and `se_file_glob` call it.
-- `search.ts` carries its OWN list, two entries, as ripgrep globs: `.se` and
-  `node_modules`. It never reads `EXCLUDED_DIRS`.
-- `se_file_read` applies NO exclusion at all. A lane read of `.se/reading.md`
-  returned the file and its hash on this build.
-
-SO "INVISIBLE IN THE LANE" IS NOT A FLAG THAT EXISTS. Building it means one
-path mask honoured by read, search, glob and list alike. That also closes the
-three-way drift i9 already carries.
-
-### Two doors stay open after the mask
-
-- `se_git` ALLOWS `show`, `log` and `diff`. They go straight to git, so a
-  masked path is still readable at any commit unless the git lane filters its
-  own output too. That is a second mask, and it is the harder one.
-- READS AT A `ref:` reach committed history through the file lane. They need
-  the same mask as a working-tree read.
-
-### The number that decides it
-
-AN ITERATION'S OUTPUT DOES NOT STAY IN ITS FOLDER. Requirements, RAID nodes,
-experiments and stories land in `project/spec/trace/`, and some carry the
-iteration's id in their own filename.
-
-MEASURED: 282 files under `project/spec/trace/` mention `i15` or `i34`.
-
-SO MASKING ONE ITERATION FOLDER HIDES THE RECORD AND NOT THE ANSWERS. The
-requirements a replayed walk is supposed to derive are sitting in the trace
-corpus, which the agent must read to do ordinary work. Masking the trace
-corpus as well would blind the walk to the machine it runs on.
-
-### The verdict
-
-- BUILD THE MASK. It is cheap, it fixes the i9 drift, and it is the honest
-  way to keep a scenario's answers out of reach.
-- AN ARCHIVED ITERATION IS A SILHOUETTE, NOT A SCRIPT. Take its size, its
-  step count and its evidence-field profile. Author the subject fresh.
-- ONE COST REMAINS EVEN WITH A PERFECT MASK, and it is not about trust. A
-  real iteration edited the real engine. A training walk must not, so the
-  sandbox package is needed either way.
-- THE RIGOR MATRIX MOVING IS NOT A COST (owner ruling 2026-08-19). The
-  machine is a variable here, not a constant. See "the grid" below.
-- ONCE THE CONTENT IS MASKED AND THE CODE IS SANDBOXED, what is left of the
-  archived iteration IS a scenario. The two designs meet.
-
-## The lifecycle, and why nothing is committed
-
-OWNER RULING, 2026-08-19: nothing about a training iteration is committed.
-
-SEEDED, WALKED, MEASURED, DISCARDED. There is no ship and no close.
-
-THE FOLDER LIVES IN THE TREE AND IS IGNORED BY GIT. `project/spec/training/`
-carries a gitignore entry. The training seed WRITES; it does not commit.
-
-THAT IS A REAL DIFFERENCE FROM `itSeed`, which commits its record as part of
-the seed. The training seed must not, or the ruling is broken by the first
-call.
-
-THE ID NAMESPACE IS SEPARATE. Training iterations take `t<n>` ids.
-
-WHY THE SEPARATE FOLDER IS NOT COSMETIC. `itSeed` numbers a new iteration
-from the highest `i<n>` in `project/spec/iterations/`, and `se_survey` counts
-that same folder. Sharing it would eat iteration numbers and inflate every
-count the front desk reads. The separation is what makes "does not count"
-true rather than merely claimed.
-
-## The grid
-
-THE QUESTION IS NOT "HOW FAST" (owner ruling 2026-08-19). It is this:
+THE QUESTION IS NOT "HOW FAST". It is this:
 
 > Does a weaker model on an improved machine do the same work as a stronger
 > model on the old machine?
 
-SO THE MEASUREMENT IS A GRID, never a stopwatch. Each cell is one
-combination.
+IF THE ANSWER IS YES, the machine is carrying weight the model used to carry.
+That is the whole programme.
 
+## Why nothing is authored
+
+A BENCHMARK NEEDS A DESIGN INPUT — a goal, a vision, the context. Writing
+those is the expensive part, and the owner has paid it before on an earlier
+system. It is the cost this design refuses.
+
+THE ARCHIVE ALREADY HOLDS THEM. Measured 2026-08-19 on `i33`: at the commit
+before it started, `project/spec/iterations/i33-.../record.md` stands with
+`status: seeded`, carrying its goal, its vision and its inputs, and carrying
+no pin.
+
+THAT IS EXACTLY THE STATE A REAL WALK BEGINS FROM. So the design input costs
+nothing. It was written once, by whoever seeded the iteration, for real.
+
+## The rewind
+
+A BENCHMARK RUN PUTS THE TREE BACK to the commit before the iteration
+started, and lets an agent walk it again.
+
+FINDING THE TWO ENDS IS MECHANICAL. Every record's lifecycle commit carries
+its id in the message.
+
+- `iteration <id>: seed`
+- `iteration <id>: started` — the rewind point is this commit's PARENT
+- `iteration <id>: pin <size>`
+- `iteration <id>: shipped` — the far end
+
+MEASURED ON i33: `5f85977f` is its `started` commit, and `5f85977f^` is
+`20abd831`. Reading the record at that ref returns the seeded record.
+
+ITERATIONS INTERLEAVE ON TRUNK, and the rewind keeps that. `20abd831` is
+i35's seed commit, so the tree at the rewind point carries other in-flight
+work. That is the real state of the world at that moment, which is what a
+comparable run wants.
+
+## The mask is a clock, not a filter
+
+THE EARLIER DESIGN MASKED PATHS. It was struck because the rewind does the
+job better and by construction.
+
+AT THE REWIND COMMIT, THE ANSWERS DO NOT EXIST YET. The requirements, the
+RAID nodes and the experiments the iteration wrote are in its own later
+commits. The 282 trace files that mention `i15` or `i34` are not a problem
+here, because at the rewind point most of them are unwritten.
+
+ONE RULE IS STILL NEEDED, and it is one rule. A clone's `.git` holds every
+commit, including the future ones, and `se_git` allows `show`, `log` and
+`diff`.
+
+> THE GIT LANE TAKES A CEILING. While a benchmark run is bound, a commit that
+> is not an ancestor of the training tree's HEAD does not resolve.
+
+THE SAME CEILING BINDS `ref:` READS through the file lane. One rule, two
+doors, and both are checkable.
+
+THE SHELL HALF IS ALREADY BUILT. `engine/discipline.ts` classifies every
+`se_run` command into eight categories, allows one warned run per category,
+then refuses with SE-C-129. `no_tool_reason` runs it anyway and files the
+reason. The counters persist across sessions.
+
+DO NOT DESIGN AGAINST A MALICIOUS AGENT (owner ruling 2026-08-19). The lane
+hides what it likes and a workaround shows up in the call log afterwards.
+
+## Why the sandbox package is struck
+
+THE BUILD STEPS DEMAND REAL CODE, and a re-walked iteration has real code to
+write. `author-tests` writes the tests. `observe-red` watches them fail.
+`build-steps` makes them pass. All of it against the tree as it stood.
+
+SO RED-TO-GREEN IS GENUINE AND FREE. No fake package, no synthetic tests,
+nothing authored. The agent does the work the original did.
+
+THE ORIGINAL'S CODE IS IN THE FUTURE and the ceiling hides it. The run
+produces its own answer, and the answer is thrown away.
+
+## Choosing the benchmark
+
+TWO WAYS IN, and both name a real iteration.
+
+- BY ID. Re-walk `i33`.
+- BY SIZE. Draw an archived iteration pinned at `minor` or at `major`.
+
+A DRAW RECORDS ITS SEED, so it can be repeated. That is the only job the seed
+has left.
+
+THE NAME IS THE ITERATION'S OWN (owner ruling 2026-08-19). "Iteration 33 got
+ten percent smaller" is a readable sentence. No second naming vocabulary is
+minted.
+
+THE COLUMNS THAT MATTER ARE `minor` AND `major`. Measured: 15 shipped
+iterations, 11 pinned — 8 minor, 3 major, and none at patch, product or
+specification. Those three are not gaps.
+
+- PATCH work is done ad hoc and is rarely worth an iteration.
+- PRODUCT happens once, as a product's first iteration.
+- SPECIFICATION is derived from the iterations that already ran.
+
+## Cycling through the archive
+
+A RUN DOES NOT REPEAT THE LAST ONE (owner ruling 2026-08-19). It looks at
+what has been benchmarked already and takes the iteration that is least
+recently walked.
+
+THE REPORTS ARE THE SCHEDULER'S STATE. `project/spec/benchmarks/` says which
+iteration each run covered and when. Cycling is a query over that folder, so
+no second ledger is needed.
+
+WHY CYCLING BEATS REPEATING, and it revises the earlier advice on this page.
+Three runs of one iteration buy a median against that iteration's variance.
+One run each of eight iterations buys the same confidence for the same money
+AND covers eight different shapes of work. The second is the better
+experiment.
+
+IT CHANGES HOW RESULTS ARE AGGREGATED. See "comparing runs" below.
+
+## The pool grows, and that is an upside
+
+THE POOL MOVES EVERY TIME AN ITERATION SHIPS, and it does not matter (owner
+ruling 2026-08-19). Old results are kept, so nothing is invalidated by a new
+candidate arriving.
+
+A RESULT IS COMPARED WITHIN ONE ITERATION. `i33` against `i33`. The library
+filling up adds cells; it never disturbs the ones already measured.
+
+## The grid
+
+EACH CELL IS ONE COMBINATION.
+
+- the ITERATION being re-walked
 - the MODEL, and its reasoning effort
-- the MACHINE version, which is the rigor matrix hash plus the se version
-- the SIZE, which is the change-size column
-- the SCENARIO, and the pool version
+- the MACHINE version — the rigor matrix hash plus the se version
 
-THE MACHINE IS AN AXIS, NOT NOISE. A moved rigor matrix is a new column in
-the grid. Comparing ACROSS matrix versions is the experiment, not a threat
-to it.
-
-TWO CONSTRAINTS FALL OUT OF THAT, and both bind the pool.
-
-- A SCENARIO NEVER ENCODES THE MACHINE'S SHAPE. No expected form answers, no
-  step lists, no state names. A subject, a delta, a size range and a sandbox.
-  Anything else makes a matrix edit invalidate the pool, and the pool is the
-  one thing that has to survive.
-- THE SANDBOX'S RED-TO-GREEN IS MATRIX-INDEPENDENT TOO. The tests belong to
-  the fake package, never to the walk.
+THE MACHINE IS AN AXIS, NOT NOISE. A moved rigor matrix is a new column.
+Comparing across matrix versions is the experiment, not a threat to it.
 
 THE GOAL IS A DIRECTION, not a number. A machine improvement is real when a
-weaker model reaches a cell the older machine needed a stronger model for.
+weaker model reaches a cell that used to need a stronger one.
 
 ## The benchmark report
 
-OWNER RULING, 2026-08-19: no raw measurement dump in version control. A
-benchmark run fills a TEMPLATE, exactly as the rest of the corpus does, and
-the filled report is what is committed.
+NO RAW MEASUREMENT DUMP IN VERSION CONTROL (owner ruling 2026-08-19). A run
+fills a TEMPLATE, and the filled report is what is committed.
 
-THE MACHINERY IS ALREADY THERE AND COSTS NO ENGINE CHANGE. `engine/vocabulary.ts`
-scans `project/deliverable/machines/items/` with `readdirSync`, so a new item
+THE MACHINERY COSTS NO ENGINE CHANGE. `engine/vocabulary.ts` scans
+`project/deliverable/machines/items/` with `readdirSync`, so a new item
 template is discovered by being written. Its own comment states the rule:
 "A vocabulary declared in `machines/items/<type>.md` costs one edit to that
 file and no engine change, which is the whole point."
@@ -259,34 +180,19 @@ file and no engine change, which is the whole point."
 
 THE PRECEDENT IS THE EXPERIMENT NODE. `machines/items/experiment.md` says of
 a spike: "A STANDING ARTIFACT: the run is throwaway, the record is not." A
-benchmark run is the same shape. The walk is thrown away. The report is not.
+benchmark run is the same shape.
 
 SO A NEW ITEM TEMPLATE, `benchmark-run`.
 
 - `folder: project/spec/benchmarks`
 - `id_prefix: bench-`
+- The id carries the iteration: `bench-i33-<run>`.
 - `checks` carry the vocabularies: the size column, the verdict, the harness.
-- A skeleton with fill comments, like every other item.
-
-ONE REPORT IS ONE CELL OF THE GRID, over at least three runs.
-
-THE REPORT IS HIDDEN FROM THE AGENT DURING A TRAINING WALK. Otherwise the
-agent reads the last run's numbers and works toward them, which is the
-Goodhart failure with a concrete leak and a concrete fix.
-
-THE MASK IS THEREFORE CONDITIONAL, not static. `EXCLUDED_DIRS` hides a folder
-always. This one hides `project/spec/benchmarks/` only while a training walk
-is bound, and shows it everywhere else — a normal iteration must be able to
-read its own benchmark history.
-
-ONE MASK, TWO CUSTOMERS. The scenario source and the benchmark reports want
-the same mechanism. That is the argument for building it properly rather than
-as a special case.
 
 EVERY REPORT STAMPS ITS CONDITIONS.
 
-- the training id, the seed, the size, the scenario, the pool version
-- the model and its reasoning effort
+- the iteration re-walked, and the rewind commit
+- the size it was pinned at
 - the rigor matrix hash and the se version
 - the harness, the model and the reasoning effort
 - wall clock, total and per state
@@ -295,8 +201,27 @@ EVERY REPORT STAMPS ITS CONDITIONS.
 - refusals counted by clause
 - states visited, and states re-entered
 
-WITHOUT THE CONDITIONS IT IS NOT A RESULT. i36 is the whole argument: the
-harness is not Claude, and two hosts give the lane different things.
+WITHOUT THE CONDITIONS IT IS NOT A RESULT. i36 is the argument: the harness
+is not Claude, and two hosts give the lane different things.
+
+THE REPORTS ARE HIDDEN DURING A RUN. Otherwise the agent reads the last run's
+numbers and works toward them.
+
+SO THAT MASK IS CONDITIONAL, NOT STATIC. `project/spec/benchmarks/` is hidden
+while a benchmark run is bound and visible everywhere else. A normal
+iteration must be able to read its own benchmark history.
+
+## The working tree is never committed
+
+OWNER RULING, 2026-08-19: nothing about the run itself is committed. Only the
+report is.
+
+THE RUN HAPPENS IN A THROWAWAY TREE at the rewind commit. It is discarded
+when the run ends.
+
+IT NEVER TOUCHES THE REAL RECORD. `i33` is shipped and stays shipped. A
+benchmark run does not reopen it, does not renumber anything, and does not
+appear in `se_survey`.
 
 ## What is measured, and what is not
 
@@ -308,36 +233,75 @@ MEASURED — the machine's drag.
   executable.
 - Reading cost. The boot loop and every in-state read.
 
-NOT MEASURED — quality. A training iteration cannot tell a good decision from
-a bad one, because there is no real subject to decide about.
+QUALITY IS COMPARABLE, NOT SCORED. This corrects an earlier line on this
+page, which said quality could not be measured at all. That was true of an
+authored scenario and is too strong here: the original walk's evidence is a
+REFERENCE the re-walk can be read against.
+
+THE ORIGINAL IS NOT A CORRECT ANSWER. It is what was decided once, and it may
+have been wrong. So the comparison is a reading, done by a person or by an
+agent, never a score the engine computes.
+
+## The second output: what the re-walk finds
+
+A BENCHMARK RUN IS ALSO A DESIGN AUDIT (owner ruling 2026-08-19). Walking an
+old design again, with the arguments re-litigated, surfaces better ideas.
+
+SO A RUN HAS TWO OUTPUTS.
+
+- The numbers, which go in the report.
+- The findings, which are about the original decision or about the machine.
+
+THE FINDINGS NEED A HOME. A field on the report holds the short ones. A
+finding worth acting on becomes a note, and the retro judges whether it mints
+a work token.
+
+THIS CHANGES THE ECONOMICS. A benchmark run is not pure overhead. It buys a
+timing number AND a second look at a design nobody has questioned since it
+shipped.
+
+IT ALSO BEARS ON WHERE A RUN STOPS. The design half of the walk is where the
+re-litigation happens, so a run cut short before the design gates buys the
+timing and loses the audit.
 
 ## The honesty ruling
 
-OWNER RULING, 2026-08-19: open, not blind. The agent is TOLD it is walking a
-training iteration.
+OWNER RULING, 2026-08-19: open, not blind. The agent is told it is walking a
+benchmark.
 
-THE COST IS REAL AND IS ACCEPTED. An agent that knows the output is thrown
-away works differently from one that does not. The number therefore describes
-PROCESS OVERHEAD and not production behaviour. Write that limit into the
-record rather than leaving it to be discovered.
+THE COST IS ACCEPTED. An agent that knows the output is thrown away works
+differently. The number describes PROCESS OVERHEAD, not production
+behaviour.
 
 ## The toll
 
-OWNER RULING, 2026-08-19: the training walk pays the full toll. The narration
-toll and the reading proof are part of what is being measured. Exempting them
-would measure a machine nobody runs.
+OWNER RULING, 2026-08-19: the run pays the full toll. The narration toll and
+the reading proof are part of what is measured.
 
 ## Comparing runs
 
-- NEVER COMPARE TWO SINGLE RUNS. Tau-bench measured function-calling agents
-  scoring `pass^8` below 25% against single-trial scores under 50%. Runs vary
-  that much.
-- REPORT A MEDIAN OVER AT LEAST THREE RUNS, with the spread beside it.
-- COMPARE ONLY WITHIN ONE SET OF CONDITIONS. Same host, same model, same
-  size, same seed or same scenario.
+PAIR FIRST, THEN AGGREGATE. A comparison is `i33` on the old machine against
+`i33` on the new one. The unit is the DELTA of that pair.
+
+AGGREGATE THE DELTAS, NEVER THE ABSOLUTES. Iterations differ enormously in
+size, so a mean of raw times says more about which iterations happened to be
+in the set than about the machine.
+
+THAT IS WHY THE GROWING POOL COSTS NOTHING. A new iteration entering the
+library adds a pair. It cannot move a delta that was already measured.
+
+- NEVER COMPARE TWO SINGLE RUNS OF DIFFERENT ITERATIONS. Tau-bench measured
+  function-calling agents scoring `pass^8` below 25% against single-trial
+  scores under 50%. Runs vary that much.
+- A CYCLE IS THE SAMPLE. Report the median delta across the cycle's pairs,
+  with the spread beside it.
+- HOLD THE CONDITIONS FIXED WITHIN A PAIR. Same model, same effort, same
+  size. Only the machine version moves.
 
 ## Still owed
 
-- THE NAMED TRAINING ITERATION. The owner has parked this for a conversation
-  of its own. How a training iteration is named, and whether a name can be
-  handed to another machine, is not settled here.
+- WHERE A RUN STOPS. A major iteration is roughly a day of agent work, so a
+  full re-walk is expensive. A named checkpoint would cost an hour. The
+  design-audit ruling narrows the choice rather than settling it: a stop
+  before the design gates keeps the timing and loses the second output.
+  Not ruled.

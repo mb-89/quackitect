@@ -150,3 +150,58 @@ customers: the scenario source and the reports.
 
 ONE THING IS STILL OWED. How a training iteration is NAMED is parked for a
 conversation of its own.
+
+## Owner rulings, 2026-08-19 — the third round, and the design is settled
+
+AN ARCHIVED ITERATION IS THE BENCHMARK. Nothing is authored. Two earlier
+designs are STRUCK: the scenario pool and the sandbox package. The reason is
+the cost they existed to pay, and the archive already paid it.
+
+MEASURED, and it is what makes the ruling work. At 5f85977f^ — the commit
+before i33 started — its record stands with status seeded, carrying goal,
+vision and inputs, and carrying no pin. That is exactly the state a real walk
+begins from. The design input costs nothing because it was written once, for
+real, by whoever seeded it.
+
+THE REWIND REPLACES THE PATH MASK. A run puts a throwaway tree back to that
+commit. At that point the requirements, RAID nodes and experiments the
+iteration wrote do not exist yet, so the answers are hidden by construction
+rather than by a filter. The 282-file objection does not apply.
+
+ONE RULE IS STILL OWED. A clone holds every commit and se_git allows show,
+log and diff. So while a run is bound, a commit that is not an ancestor of
+the training tree HEAD does not resolve. The same ceiling binds ref: reads.
+
+RED-TO-GREEN IS GENUINE AND FREE. author-tests writes the tests, observe-red
+watches them fail, build-steps makes them pass, all against the tree as it
+stood. The original code is in the future and the ceiling hides it.
+
+THE NAME IS THE ITERATION'S OWN. "Iteration 33 got ten percent smaller" is
+readable. No second naming vocabulary is minted.
+
+MINOR AND MAJOR ARE THE COLUMNS. Patch is done ad hoc. Product happens once
+as a product first iteration. Specification is derived from the iterations
+that already ran. None of the three is a gap.
+
+THE POOL GROWS AND THAT IS AN UPSIDE. Old results are kept, comparison is
+per-iteration, and a new candidate cannot disturb a measured pair.
+
+RUNS CYCLE THROUGH THE ARCHIVE. A run takes the least recently walked
+iteration rather than repeating the last one. The reports folder is the
+scheduler state, so no second ledger exists.
+
+SO THE AGGREGATION CHANGES. Pair an iteration against itself across machine
+versions, take the DELTA of the pair, and aggregate deltas rather than raw
+times. Iterations differ enormously in size, so a mean of absolutes measures
+the sample rather than the machine.
+
+QUALITY IS COMPARABLE AFTER ALL, and an earlier line said it was not. The
+original walk evidence is a REFERENCE the re-walk can be read against. It is
+not a correct answer, so the comparison is a reading rather than a score.
+
+A RUN HAS A SECOND OUTPUT. Re-litigating an old design surfaces better ideas,
+about the original decision and about the machine. Short findings ride a
+field on the report. A finding worth acting on becomes a note for the retro.
+
+THAT BEARS ON THE ONE THING STILL OWED. A run cut short before the design
+gates keeps the timing and loses the audit. Where a run stops is not ruled.
