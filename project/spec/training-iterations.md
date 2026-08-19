@@ -298,10 +298,36 @@ library adds a pair. It cannot move a delta that was already measured.
 - HOLD THE CONDITIONS FIXED WITHIN A PAIR. Same model, same effort, same
   size. Only the machine version moves.
 
+## Where a run stops
+
+IT IS CONFIGURABLE (owner ruling 2026-08-19). The default is the whole walk.
+A run may be told to stop at a named gate instead.
+
+THE TRADE IS STATED, NOT HIDDEN. A stop before the design gates keeps the
+timing and loses the design audit. The person choosing the stop is choosing
+which of the two outputs they are paying for.
+
+## Where this sits in the value
+
+NO DEDICATED VALUE PROPOSITION (owner ruling 2026-08-19). A value proposition
+is customer-facing and this is not that.
+
+IT BELONGS TO [[vp-rigor-without-toil]] — "As an engineer, I need the rigor
+without the paperwork." That proposition already measures the machine's own
+overhead rather than a feature, and its criteria already carry directional
+targets read retro over retro.
+
+- "WAITING IS TOIL TOO." Added by i12.
+- "A BROKEN RULE COSTS ONE REFUSAL, NOT A HUNT." Added by i6.
+- se_run calls as a share of all lane calls. Target: falling.
+
+SO THIS ITERATION ADDS ONE CRITERION THERE, in the same shape. The claim is
+that the machine carries more of the weight over time, and the measure is a
+weaker model reaching a result a stronger model used to be needed for.
+
+THE WALK WRITES IT, not this brief. The state that derives value is where a
+criterion is authored.
+
 ## Still owed
 
-- WHERE A RUN STOPS. A major iteration is roughly a day of agent work, so a
-  full re-walk is expensive. A named checkpoint would cost an hour. The
-  design-audit ruling narrows the choice rather than settling it: a stop
-  before the design gates keeps the timing and loses the second output.
-  Not ruled.
+Nothing. The design is settled.

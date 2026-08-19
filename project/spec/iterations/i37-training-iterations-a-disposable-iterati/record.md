@@ -205,3 +205,26 @@ field on the report. A finding worth acting on becomes a note for the retro.
 
 THAT BEARS ON THE ONE THING STILL OWED. A run cut short before the design
 gates keeps the timing and loses the audit. Where a run stops is not ruled.
+
+## Owner rulings, 2026-08-19 — the fourth round
+
+WHERE A RUN STOPS IS CONFIGURABLE. The default is the whole walk. A run may
+be told to stop at a named gate instead. The trade is stated rather than
+hidden: a stop before the design gates keeps the timing and loses the design
+audit.
+
+NO DEDICATED VALUE PROPOSITION. A value proposition is customer-facing and
+this is not that. This belongs to vp-rigor-without-toil, which already
+measures the machine own overhead rather than a feature, and whose criteria
+already carry directional targets read retro over retro. The walk authors the
+new criterion at the state that derives value.
+
+FULL AUTONOMY GRANTED for this walk. Gates may be blessed by the agent. Web
+research is allowed. The dial was raised to ideation by restarting the lane
+with SE_AUTONOMY, which is the mechanism the guidance names as the owner
+call. There is no lane verb for it on purpose — discipline.test.ts asserts
+the slider is the person alone.
+
+THE BRANCH IS claude/training-iterations-research-9kq6g2. The owner offered
+v3 or a dedicated branch and left the choice open. The designated branch is
+the dedicated one and the work stays there.
