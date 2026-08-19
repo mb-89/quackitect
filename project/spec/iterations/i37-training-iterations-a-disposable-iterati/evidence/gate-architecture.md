@@ -1,5 +1,7 @@
 ---
 form: gate-architecture
+by: agent
+signed_off: 2026-08-19T19:21:52.552Z
 authors: agent
 files:
 ---
@@ -42,9 +44,7 @@ Three elements, four interfaces, five decisions, four new risks. Thirty-seven qu
 
 ## bound_breaches
 
-- if-agent-harness-to-entrypoint: one, already recorded at gate-candidates and still the only one. The lane restarted mid-milestone and silently dropped the owner's full-autonomy grant, coming back at tactical. The record's position survived; the grant did not. note-ef85e0c86b5e. Remedy applied: restart with SE_AUTONOMY and re-earn the boot reading.
-
-NO NEW BOUND WAS BREACHED, and one was DECLARED: if-benchmark-binding-to-guard carries a 1 millisecond bound, the tightest in this iteration. Nothing has measured against it yet, which is why two of the four new risks hinge on it.
+- if-agent-harness-to-entrypoint: one breach, already recorded at gate-candidates and still the only one. The lane restarted mid-milestone and silently dropped the owner's full-autonomy grant, coming back at tactical; the record's position survived and the grant did not. Captured as note-ef85e0c86b5e, remedied by restarting with SE_AUTONOMY and re-earning the boot reading. No new breach this milestone, and one new bound was DECLARED rather than breached: if-benchmark-binding-to-guard carries 1 millisecond, the tightest in this iteration, and nothing has measured against it yet.
 
 ## round_2_red_team
 
@@ -61,8 +61,6 @@ NO NEW BOUND WAS BREACHED, and one was DECLARED: if-benchmark-binding-to-guard c
 - [[raid-ar-the-benchmark-history-is-unreadable-while-a-run-is-bound]]
 - [[raid-ar-call-answers-in-one-second]]
 - [[raid-ar-surface-answers-in-one-second]]
-
-FOUR RISKS, ALL MINTED BY THE SCENARIO WALK RATHER THAN TYPED. Each carries the hinge element and inherits its requirement's damage grade. Every one hinges on el-benchmark-guard, which is the honest summary of where this architecture is thin.
 
 ## verdict
 
