@@ -1,0 +1,9 @@
+# Constraints - externally imposed requirements, each linking its normative reference.
+filters:
+  and:
+    - 'type == "requirement"'
+    - 'kind == "constraint"'
+views:
+  - type: table
+    name: Constraints
+    order: [name, statement]

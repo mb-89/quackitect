@@ -6,7 +6,7 @@ applyTo: '**'
 
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
      from project/guidance/contract.md 2c1c1de5650a
-     from project/guidance/walking.md 287a77d45ed4
+     from project/guidance/walking.md c7d668a001e2
      from project/guidance/method/lane.md 67a72e8a89d4
      from project/guidance/voice.md 888a21b1a538
 -->
@@ -537,8 +537,24 @@ the machine holding that job, not an obstacle to route around.
 Test to answer a question — did THIS change break THAT — never to reassure.
 A red is understood and fixed properly, then you move.
 
-A SCOPED RUN IS THE ONLY ONE YOU MAKE. It blocks and answers, so there is
-nothing to poll: no handle, no second call asking whether it finished.
+A SCOPED RUN IS THE ONLY ONE YOU MAKE. Ask it as a QUESTION — `se_test
+{question: "did X break Y"}` — and the engine decides what to run.
+
+IT DOES NOT BLOCK. The answer comes back `handed_off: true` with a job handle
+and says so: the run is in the background, and `se_test {job: "..."}` reads
+its status. This page used to claim the opposite — that a run blocks and there
+is nothing to poll — while the engine has always handed a handle back.
+
+POLLING PAYS NO CALL. The narration toll skips a poll, for the reason it skips
+the reading loop: the machine forced the hop, no judgment happened on it, and
+a toll falling due there could only be paid with filler. Measured before the
+skip existed: 25 of a session's 40 `se_test` calls were refused by the toll,
+and every one of them was a poll.
+
+SO DO OTHER WORK WHILE IT RUNS, and read the verdict when it lands. The answer
+names how long the last battery took, so you know what scale of wait to
+expect. What you never do is sit polling in a tight loop — that is the
+minutes clock's business, not the call clock's.
 
 THE FULL BATTERY IS THE ENGINE'S. It runs once, at verification, fired by
 that state's own exit script — you never call it and there is no state where

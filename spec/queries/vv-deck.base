@@ -1,0 +1,10 @@
+# The deck's trust slide: one row per test (no groupBy - it fans a
+# multi-requirement test into duplicate rows).
+filters:
+  and:
+    - 'type == "test"'
+views:
+  - type: table
+    name: Verification matrix
+    order: [name, verifies]
+    limit: 12

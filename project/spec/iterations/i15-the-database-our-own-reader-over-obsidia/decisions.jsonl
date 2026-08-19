@@ -445,3 +445,19 @@
 {"ts":"2026-08-19T18:50:10.075Z","op":"update","visit":"iterations/i15/build-steps/wire-lane-tools@0","node":"d98","brief":"checking the coupling use case for verb name mention"}
 {"ts":"2026-08-19T18:51:30.700Z","op":"update","visit":"iterations/i15/build-steps/wire-lane-tools@0","node":"d99","brief":"linking the two new interfaces to dsp-lane-door realizes"}
 {"ts":"2026-08-19T18:52:21.111Z","op":"done","visit":"iterations/i15/gate-implementation@0","node":"d79","brief":"interface entries and use-case edits minted; verbs reachable and named"}
+{"ts":"2026-08-19T18:57:44.499Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d100","brief":"harvesting v1 query files at ref main, batch 1"}
+{"ts":"2026-08-19T18:58:03.739Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d101","brief":"harvesting v1 query files at ref main, batch 1"}
+{"ts":"2026-08-19T18:58:10.224Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d102","brief":"harvesting v1 query files at ref main, batch 2"}
+{"ts":"2026-08-19T18:59:08.804Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d103","brief":"harvest write 1/26: spec/queries/assumptions.base"}
+{"ts":"2026-08-19T18:59:08.816Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d104","brief":"harvest write 2/26: spec/queries/constraints.base"}
+{"ts":"2026-08-19T18:59:08.819Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d105","brief":"harvest write 3/26: spec/queries/criteria.base"}
+{"ts":"2026-08-19T18:59:08.824Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d106","brief":"harvest write 4/26: spec/queries/decisions-architecture.base"}
+{"ts":"2026-08-19T18:59:08.827Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d107","brief":"harvest write 5/26: spec/queries/decisions-project.base"}
+{"ts":"2026-08-19T18:59:08.829Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d108","brief":"harvest write 6/26: spec/queries/decisions-strategy.base"}
+{"ts":"2026-08-19T18:59:08.832Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d109","brief":"harvest write 7/26: spec/queries/decisions-waiver.base"}
+{"ts":"2026-08-19T18:59:08.835Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d110","brief":"harvest write 8/26: spec/queries/force-rationales.base"}
+{"ts":"2026-08-19T18:59:08.838Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d111","brief":"harvest write 9/26: spec/queries/fundamentals.base"}
+{"ts":"2026-08-19T18:59:23.872Z","op":"done","visit":"iterations/i15/gate-implementation@0","node":"d76","brief":"26 files harvested at ref main: 25 .base queries + adr-query-in-engine, hashes verified"}
+{"ts":"2026-08-19T18:59:38.027Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d112","brief":"harvest chunk signed; conformance-fixtures next"}
+{"ts":"2026-08-19T18:59:44.308Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d113","brief":"reading engine/tables.ts and existing fixtures before writing conformance tests"}
+{"ts":"2026-08-19T18:59:50.667Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d114","brief":"reading tables.ts + query.test.ts for the pinned subset"}

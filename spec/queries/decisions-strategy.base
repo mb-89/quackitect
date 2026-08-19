@@ -1,0 +1,9 @@
+# Strategic choices: decisions tagged strategy - the approach style and each driver answer.
+filters:
+  and:
+    - 'type == "adr"'
+    - 'file.hasTag("strategy")'
+views:
+  - type: table
+    name: Strategy decisions
+    order: [name, statement, addresses]

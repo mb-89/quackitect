@@ -1,0 +1,12 @@
+# Success criteria - each need carries its own pass lines (no standalone criterion
+# nodes). One row per need, through the deterministic table law:
+# a homogeneous set of typed nodes renders as a TABLE, never as
+# prose sections. The expand carries what the row does not show - the need's rationale and
+# its `## Success criteria` pass lines.
+filters:
+  and:
+    - 'type == "need"'
+views:
+  - type: table
+    name: Success criteria
+    order: [name, statement]
