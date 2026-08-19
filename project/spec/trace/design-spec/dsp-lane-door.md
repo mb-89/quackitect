@@ -18,6 +18,7 @@ files:
   - "project/deliverable/engine/bound.ts"
   - "project/deliverable/engine/bin/se-mcp.ts"
   - "project/deliverable/engine/bin/se-manual.ts"
+  - "project/deliverable/engine/tools-query.ts"
 ---
 
 ## The entrypoint answers what it is, before it answers anything else

@@ -1,6 +1,6 @@
 ---
 form: specify-build
-reopened: "2026-08-19T17:55:11.936Z — same claims-registration gap, cascading fix through M7"
+reopened: "2026-08-19T18:20:24.130Z — seeding the five missing build chunks and interface entries named in gate-implementation's fail verdict follow_up, per coordinator instruction"
 by: agent
 signed_off: 2026-08-19T17:55:12.386Z
 authors: agent

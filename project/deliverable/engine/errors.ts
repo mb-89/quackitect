@@ -96,4 +96,5 @@ export const CLAUSES = {
   // SE-C-143 was minted as SE-C-140 on the i16 branch and renumbered at the merge:
   // i17 shipped SE-C-140 first, and a number in a shipped log is never reused.
   WRITE_TARGET_IS_SOURCE: "SE-C-143", // a writable declared root is the tree this system was produced from — or the guard cannot prove it is not; it fails CLOSED, because the isolation law is the one thing a vehicle may never breach
+  QUERY_UNKNOWN_FIELD: "SE-C-144", // a structured query names a field the matched kind does not carry — refused by name, listing the fields that ARE legal, rather than silently returning an empty column
 } as const;

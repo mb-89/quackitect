@@ -89,6 +89,21 @@ export type ClaimsHost = Pick<
   | "autonomy"
 >;
 
+/** THE ONE EXCEPTION TO "REWRITE ONLY WHAT CHANGED", named where the rule is.
+ *
+ *  A section added to the form AFTER a claim signed was never written, so it
+ *  is not a field the change touched and the recheck advice says to leave it.
+ *  The submit then refuses, naming it empty. Measured on the i15 walk, which
+ *  met it twice at a gate that had grown goals_served and bound_breaches since
+ *  its first signature.
+ *
+ *  Empty when nothing is outstanding, so the ordinary recheck reads exactly as
+ *  it always did. */
+function grownSections(problems: string[]): string {
+  if (problems.length === 0) return "";
+  return ` ONE EXCEPTION APPLIES HERE: ${String(problems.length)} section(s) are empty or failing, and some may be NEW since you signed — those were never written, so write them. \`problems\` names each.`;
+}
+
 export class Claims {
   /** Claim verdicts, keyed to their inputs. Static on purpose: it is a pure
    *  function of (corpus, body, form), so two sessions on one root reach the
@@ -379,7 +394,7 @@ export class Claims {
         ? {
             was_signed: typeof fmData.signed_off === "string" ? fmData.signed_off : "",
             why: typeof fmData.reopened === "string" ? fmData.reopened : "",
-            do: "THIS CLAIM STOOD BEFORE. Read what is already written, decide only whether the change above moved it, and submit if it still holds. Rewrite ONLY the fields the change actually touched. Submitting re-runs every check and re-signs.",
+            do: `THIS CLAIM STOOD BEFORE. Read what is already written, decide only whether the change above moved it, and submit if it still holds. Rewrite ONLY the fields the change actually touched.${grownSections([...lint.problems, ...tp])} Submitting re-runs every check and re-signs.`,
           }
         : undefined,
       amended: typeof fmData.amended === "string" ? fmData.amended : "",
