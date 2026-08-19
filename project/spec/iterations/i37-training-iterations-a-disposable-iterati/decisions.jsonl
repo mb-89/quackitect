@@ -168,3 +168,14 @@
 {"ts":"2026-08-19T19:53:53.512Z","op":"update","visit":"iterations/i37/fold-back@0","node":"d27","brief":"reading the node-table shape for the fold-back"}
 {"ts":"2026-08-19T19:55:06.440Z","op":"update","visit":"iterations/i37/fold-back@0","node":"d28","brief":"folding the spike evidence back into the decisions it moved"}
 {"ts":"2026-08-19T19:56:07.554Z","op":"update","visit":"iterations/i37/cut-criteria@2","node":"d29","brief":"reopening declare-winner on the trigger the gates wrote"}
+{"ts":"2026-08-19T20:04:00.561Z","op":"plan","visit":"iterations/i37/cut-criteria@2","parent":null,"nodes":[{"id":"d30","brief":"close M6 at gate-prototype"},{"id":"d31","brief":"merge trunk before author-tests"},{"id":"d32","brief":"walk M7 to gate-implementation"},{"id":"d33","brief":"write the field report outside git"}]}
+{"ts":"2026-08-19T20:04:35.240Z","op":"update","visit":"iterations/i37/record-adrs@2","node":"d34","brief":"every gate is the agent s by direct grant"}
+{"ts":"2026-08-19T20:05:03.899Z","op":"update","visit":"iterations/i37/record-adrs@2","node":"d35","brief":"the ceiling decision is amended to the structural mechanism"}
+{"ts":"2026-08-19T20:05:15.930Z","op":"update","visit":"iterations/i37/record-adrs@2","node":"d36","brief":"taking the only door the walk offers"}
+{"ts":"2026-08-19T20:06:55.513Z","op":"update","visit":"iterations/i37/record-adrs@2","node":"d37","brief":"escaping to recompute the walk position"}
+{"ts":"2026-08-19T20:07:39.171Z","op":"update","visit":"iterations/i37/cut-criteria@3","node":"d38","brief":"aiming at gate-prototype from cut-criteria"}
+{"ts":"2026-08-19T20:08:23.083Z","op":"update","visit":"iterations/i37/record-adrs@3","node":"d39","brief":"walking the M5 chain forward again"}
+{"ts":"2026-08-19T20:09:12.259Z","op":"update","visit":"iterations/i37/record-adrs@3","node":"d40","brief":"reopening record-adrs because its feeder re-signed"}
+{"ts":"2026-08-19T20:09:34.817Z","op":"update","visit":"iterations/i37/record-adrs@3","node":"d41","brief":"record-adrs re-signed against the moved ground"}
+{"ts":"2026-08-19T20:10:11.763Z","op":"update","visit":"iterations/i37/decompose-structure@0","node":"d42","brief":"decompose-structure re-signed against the moved ground"}
+{"ts":"2026-08-19T20:10:46.994Z","op":"update","visit":"iterations/i37/evaluate-architecture@2","node":"d43","brief":"evaluate-architecture re-signed; three risks discharged"}

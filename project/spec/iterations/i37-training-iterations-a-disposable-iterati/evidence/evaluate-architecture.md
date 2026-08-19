@@ -1,8 +1,8 @@
 ---
 form: evaluate-architecture
 by: agent
-signed_off: 2026-08-19T19:19:26.933Z
-reopened: "2026-08-19T19:19:05.729Z — the walk verdicts were written in prose rather than in the deck grammar, so all 37 scenarios read as unruled"
+signed_off: 2026-08-19T20:10:47.288Z
+reopened: "2026-08-19T20:10:46.712Z — decompose-structure re-signed above it, and three of its at-risk rulings hinged on a guard that no longer runs a test"
 authors: agent
 files:
 ---
@@ -11,15 +11,13 @@ files:
 
 ## current_situation
 
-i37 stands at evaluate-architecture, the last work state of M5. decompose-structure is signed with three elements and four interfaces.
+evaluate-architecture, reopened 2026-08-19 because decompose-structure re-signed above it and three of its rulings hinged on a mechanism that changed.
 
-Thirty-seven quality scenarios are dealt, worst grade first. Four are ruled at risk and the rest addressed.
-
-Every at-risk ruling names a hinge that is a fact rather than an opinion.
+Thirty-seven scenarios, dealt again. THREE MOVE FROM AT RISK TO ADDRESSED, and all three for the same reason.
 
 ## walk
 
-- [[raid-ar-a-bound-run-resolves-no-commit-newer-than-its-rewind-point]] — at risk: [[req-a-bound-run-resolves-no-commit-newer-than-its-rewind-point]] hinges on [[el-benchmark-guard]] — the ceiling rests on git merge-base and se_git does not offer it, so the exact primitive is unreachable through the lane; the fallback is deriving ancestry from log or rev-parse, which is more code for a weaker answer
+- [[req-a-bound-run-resolves-no-commit-newer-than-its-rewind-point]] — addressed by [[raid-dec-the-ceiling-is-an-ancestry-test-not-a-path-mask]]
 - [[req-a-ceiling-that-cannot-prove-ancestry-refuses]] — addressed by [[raid-dec-a-run-that-cannot-establish-its-guard-never-binds]]
 - [[req-a-wrong-act-never-passes-silently]] — addressed by [[raid-dec-the-ceiling-is-an-ancestry-test-not-a-path-mask]]
 - [[req-every-artifact-is-readable-text]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
@@ -42,11 +40,11 @@ Every at-risk ruling names a hinge that is a fact rather than an opinion.
 - [[req-a-clear-jump-is-one-call]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
 - [[req-a-preflight-check-asks-the-reader-where-it-looked]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
 - [[req-a-windowed-pool-answer-says-that-it-was-windowed]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
-- [[raid-ar-call-answers-in-one-second]] — at risk: [[req-call-answers-in-one-second]] hinges on [[el-benchmark-guard]] — the guard sits under every resolved commit, ref and path for the length of a run, so a correctness check lands on the hot path of the walk it is measuring
+- [[req-call-answers-in-one-second]] — addressed by [[raid-dec-the-ceiling-is-an-ancestry-test-not-a-path-mask]]
 - [[req-entry-speaks-plainly]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
 - [[req-one-operation-reads-its-input-once]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
 - [[req-query-is-deterministic]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
-- [[raid-ar-surface-answers-in-one-second]] — at risk: [[req-surface-answers-in-one-second]] hinges on [[el-benchmark-guard]] — the same guard reaches the mirror's own reads while a run is bound, and the cost is paid on a surface a person is watching
+- [[req-surface-answers-in-one-second]] — addressed by [[raid-dec-the-ceiling-is-an-ancestry-test-not-a-path-mask]]
 - [[req-the-actor-is-recorded-where-the-call-is-served]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
 - [[raid-ar-the-benchmark-history-is-unreadable-while-a-run-is-bound]] — at risk: [[req-the-benchmark-history-is-unreadable-while-a-run-is-bound]] hinges on [[el-benchmark-guard]] — three exclusion lists decide what a lane verb may see, they disagree, and se_file_read consults none of them; one rule has to bind four verbs before this concealment can be trusted
 - [[req-the-panel-s-paint-says-which-kind-of-green-it-is]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]]
@@ -67,21 +65,20 @@ Every at-risk ruling names a hinge that is a fact rather than an opinion.
 
 ## follow_up
 
-- gate-architecture closes M5 next.
-- FOUR RISKS ARE MINTED HERE and two of them are the same one wearing different clothes: the guard sits on the hot path, so both one-second scenarios hinge on it. M6 should price that before M7 builds it.
-- FIVE FITNESS CANDIDATES ARE FLAGGED, all of them this iteration's own. Each is measurable at M7 without a person reading anything: a forbidden request that must refuse, a report that must carry its conditions, a stop point that must be recorded, a history that must be unreadable while bound, and a commit past the rewind point that must not resolve.
-- THE CEILING'S RISK IS DISCHARGED BY ONE ALLOWLIST ENTRY. It is build work with a named shape rather than a design question.
+- gate-architecture follows and needs the same re-sign, then M6's chain.
+- THREE RISKS ARE DISCHARGED BY THE STRUCTURAL CEILING and their register entries should be closed at the next review: raid-ar-a-bound-run-resolves-no-commit-newer-than-its-rewind-point, raid-ar-call-answers-in-one-second and raid-ar-surface-answers-in-one-second.
+- ONE RISK STANDS AND IS NOW IN SCOPE. raid-ar-the-benchmark-history-is-unreadable-while-a-run-is-bound hinges on the visibility drift, which the owner has ruled this iteration builds.
+- THE NEW UNKNOWN CREATED BY M6 — resolutions per lane call — dissolves with the checked ceiling. There is no per-resolution cost left to bound.
 
 ## anything_else
 
-TWO OF THE FOUR RISKS ARE THE SAME RISK, and saying so is more useful than listing them twice.
+THREE AT-RISK RULINGS BECAME ADDRESSED WITHOUT ANYONE ARGUING THEM AWAY.
 
-`req-call-answers-in-one-second` and `req-surface-answers-in-one-second` both hinge on the guard sitting under every resolved commit, ref and path for the length of a run.
+All three hinged on el-benchmark-guard running a test under every resolution. The structural ceiling removes the test: the object a run must not reach is not in the tree.
 
-THE MEASUREMENT PROBLEM THAT CREATES. A benchmark that slowed the walk it was measuring would measure itself. Every number taken under a slow guard is inflated by the instrument, and nothing in the report would say so.
+- THE CEILING RISK is gone because there is no check to fail open. An absent object cannot be fetched.
+- BOTH ONE-SECOND RISKS are gone because there is no per-call cost. 4229 microseconds became zero.
 
-THE BOUND IS ALREADY DECLARED at one millisecond on `if-benchmark-binding-to-guard`, which is the tightest bound in this iteration and was set for exactly this reason. What has not happened is anyone checking that an ancestry test can be answered inside it.
+THAT IS WHAT A PROTOTYPE MILESTONE IS FOR, and it is worth naming plainly: three crippling-or-worse risks were discharged by evidence rather than by a re-reading of the same evidence.
 
-SO THE RISK IS REAL AND ITS DISCHARGE IS CHEAP: time the ancestry primitive at M6, beside the spike that is already ranked there.
-
-THE FOURTH RISK IS THE ONE THIS ITERATION CANNOT CLOSE ALONE. The concealment rides three exclusion lists that disagree, and the reading verb consults none of them. That is a standing work token, and it is why the token is this iteration's dependency rather than its neighbour.
+ONE RISK SURVIVES AND CHANGED STATUS RATHER THAN GRADE. The concealment still hinges on four disagreeing exclusion lists. It was a dependency on somebody else's work an hour ago; the owner has ruled it into this iteration's scope, so it becomes build work with a measured cost of four call sites across three files.

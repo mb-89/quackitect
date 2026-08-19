@@ -265,3 +265,39 @@ their own as the cycle comes round. Coverage first, pairing later.
 
 SO A SINGLE UNPAIRED RUN IS NOT A HALF-RESULT. It is a full result of a
 different kind — the design audit — plus a number waiting for its partner.
+
+## Owner rulings, 2026-08-19 — the seventh round, and the last before the unattended run
+
+I37 BUILDS THE VISIBILITY RULE. The owner: "we built it. Of course. Mean to
+build it."
+
+So req-the-benchmark-history-is-unreadable-while-a-run-is-bound ships in this
+iteration rather than waiting on the pool. The measured cost is four call
+sites across three files: one predicate in paths.ts, the hardcoded two-entry
+loop in search.ts, and se_file_read in files.ts which consults nothing today.
+Two call sites already call isExcluded.
+
+wt-three-separate-lists-decide-which-paths-a-lane-verb-may-see- is therefore
+satisfied by this iteration rather than parked.
+
+TRUNK IS MERGED BEFORE author-tests. The owner: trunk carries things this
+build needs, and the merge belongs before the tests are written rather than
+after.
+
+THE WALK RUNS UNATTENDED TO gate-implementation. That gate is the person's to
+bless. Anything else that blocks stops the walk and is reported.
+
+THE FIELD REPORT IS PRIVATE DATA and never enters git. It is written outside
+the repository and handed to the person directly.
+
+## Owner ruling, 2026-08-19 — the eighth round: bless every gate
+
+THE OWNER: "Don't stop at gate implementation. Walk as far as you can. If you
+can ship, ship, don't wait for me. This is me telling you that you can bless
+all the gates."
+
+SO THE ONE STOP THIS WALK EXPECTED IS REMOVED. gate-implementation, gate-validation
+and gate-release are the agent's at this dial, for this iteration, by direct
+grant.
+
+WHAT STILL STOPS THE WALK: a blocker with no remedy. Nothing else.

@@ -1,7 +1,8 @@
 ---
 form: record-adrs
 by: agent
-signed_off: 2026-08-19T18:57:43.367Z
+signed_off: 2026-08-19T20:09:35.051Z
+reopened: "2026-08-19T20:09:12.260Z — declare-winner re-signed above it, so this claim answers a question that moved: the ceiling decision now describes a structural boundary rather than an ancestry test"
 authors: agent
 files:
 ---
@@ -10,11 +11,11 @@ files:
 
 ## current_situation
 
-i37 stands at record-adrs. declare-winner is signed and the winner is cand-the-refusing-run-with-recorded-conditions.
+record-adrs, reopened 2026-08-19 because declare-winner re-signed above it.
 
-Five decisions are entered in the register, one per architectural choice a later reader will ask about.
+The five decisions still stand and the register still holds them. One of them changed its mechanism while keeping its subject: raid-dec-the-ceiling-is-an-ancestry-test-not-a-path-mask is amended on its own node.
 
-Each carries its trigger, so a decision that stops being true says so rather than quietly rotting.
+Nothing was added or removed. The set is the same five.
 
 ## adrs
 
@@ -26,20 +27,17 @@ Each carries its trigger, so a decision that stops being true says so rather tha
 
 ## follow_up
 
-- decompose-structure is next, then evaluate-architecture and gate-architecture.
-- ONE DECISION CARRIES A BLOCKER RATHER THAN A RISK. raid-dec-the-ceiling-is-an-ancestry-test-not-a-path-mask rests on merge-base, which is not on se_git's allowlist. The fallback is named on the node.
-- THE ONE THING NOT DECIDED HERE is how a run is reached — lane verb, desk door, or neither. It has been deferred at gate-inputs, gate-requirements and gate-candidates, and decompose-structure is the last state that can take it without inventing it silently.
-- EVERY TRIGGER IS WRITTEN AND NONE IS A DATE. Each names a change that would put the decision back in question.
+- decompose-structure and evaluate-architecture follow, and both need the same re-sign for the same reason.
+- THE CEILING DECISION'S TITLE NOW UNDERSTATES IT. The boundary is still temporal rather than spatial — that is what the 282-file measurement settled and it is unchanged. What moved is that the boundary is enforced by the object's ABSENCE rather than by a test on every resolution.
+- THE ALLOWLIST GAP FALLS AWAY WITH IT. merge-base is still missing from se_git and the winning design no longer needs it.
+- The other four decisions are untouched by the winner change.
 
 ## anything_else
 
-FIVE DECISIONS, AND FOUR OF THEM ARE ABOUT ONE THING: what happens when something fails without saying so.
+RE-SIGNED RATHER THAN REWRITTEN, and the difference is worth stating because this is the second reopen in the iteration.
 
-- The rewind is content-only, so the machine measured is never silently the wrong one.
-- The ceiling removes rather than conceals, so nothing is hidden that could be found another way.
-- A run refuses to bind rather than starting and failing per request, so one refusal names one cause.
-- The conditions no log holds are written at bind time, so a result can never quietly forget what it was taken on.
+The claim stood before. What the M6 spikes moved is one decision's MECHANISM, and that correction lives on the node where a reader will find it rather than in this form.
 
-THAT IS NOT A THEME CHOSEN IN ADVANCE. It is where the seven finders, the criteria ranking and the scoring all independently pointed, and it is the axis on which the four candidates actually differed.
+WHAT DID NOT MOVE: the subject of every decision, the set of five, and the reasoning that put each one on the register.
 
-THE FIFTH DECISION IS THE ODD ONE and it is the owner's: the agent is told. It costs the number its transferability and is recorded with that cost stated, because a decision whose price is hidden is the same failure mode as the other four.
+WHY THE REOPEN WAS RIGHT AND AN AMEND WAS NOT. declare-winner re-signed above this state. An amend leaves the tree standing, and a feeder that answered again against moved ground is not answered by correcting wording downstream. The rule is in refusals.md under SE-C-112 and this is the case it describes exactly.

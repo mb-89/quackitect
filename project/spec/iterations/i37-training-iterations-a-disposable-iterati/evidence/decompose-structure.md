@@ -1,7 +1,8 @@
 ---
 form: decompose-structure
 by: agent
-signed_off: 2026-08-19T18:59:45.309Z
+signed_off: 2026-08-19T20:10:11.968Z
+reopened: "2026-08-19T20:10:11.530Z — record-adrs re-signed above it, and the ceiling decision it implements changed mechanism from a checked ancestry test to a truncated history"
 authors: agent
 files:
 ---
@@ -10,11 +11,14 @@ files:
 
 ## current_situation
 
-i37 stands at decompose-structure. record-adrs is signed with five decisions.
+decompose-structure, reopened 2026-08-19 because record-adrs re-signed above it.
 
-Three elements carry the winner's eight functions. The split follows lifetime rather than subject: the binding is the run's whole life, the guard exists only while it stands, and the report is what survives it.
+The three elements and four interfaces still stand. Two of them carry corrections from the M6 spikes, made on their own nodes rather than here.
 
-ONE QUESTION DEFERRED THREE TIMES IS SETTLED HERE, because this is the last state that could take it without the architecture inventing it silently: how a run is reached.
+- el-benchmark-binding: the tree is FETCHED at depth 1 rather than exported, and the rewind is a three-way split — project/spec rewound, project/deliverable and project/guidance current, history bounded.
+- if-benchmark-binding-to-guard: the millisecond bound was the agent's own invention and is replaced by one derived from the standing one-second convention, with the divisor named as unmeasured.
+
+The allocation is unchanged. Eight functions, three elements, every crossing named.
 
 ## elements
 
@@ -35,28 +39,17 @@ ONE QUESTION DEFERRED THREE TIMES IS SETTLED HERE, because this is the last stat
 
 ## follow_up
 
-- evaluate-architecture is next, then gate-architecture closes M5.
-- TWO CROSSINGS NEED INTERFACE NODES and neither exists yet: binding to guard, and binding to report. evaluate-architecture is where their bounds are stated.
-- EL-BENCHMARK-GUARD CARRIES BOTH OPEN DEPENDENCIES. `merge-base` is not on `se_git`'s allowlist, and the visibility drift is a standing work token. Neither is a design question now; both are build work with a named shape.
-- NOTHING IS ALLOCATED TWICE and nothing is unallocated. Eight functions, three elements, and every boundary-crossing cell names its interface.
+- evaluate-architecture follows and needs the same re-sign.
+- THE GUARD ELEMENT DOES LESS WORK NOW. Its ceiling is the absence of the object rather than a test on every resolution, so the 4229-microsecond per-call cost is gone and the merge-base allowlist gap stops being a blocker.
+- ONE CROSSING KEPT ITS PURPOSE AND CHANGED ITS REASON. if-benchmark-guard-to-report still carries the forbidden request, not to prove a guard held but to prove the tree was truncated as intended.
+- THE VISIBILITY RULE IS NOW IN SCOPE by owner ruling, so el-benchmark-guard's concealment is built here rather than deferred.
 
 ## anything_else
 
-HOW A RUN IS REACHED IS SETTLED: A LANE VERB.
+RE-SIGNED, AND THE STRUCTURE IS UNCHANGED.
 
-It was named at gate-inputs, again at gate-requirements, and again at gate-candidates, and deferred each time. Deferring it past here would have meant the architecture answered it by accident.
+Three elements split by lifetime, four interfaces, eight functions allocated with no double-allocation and no orphan. The M6 spikes moved two nodes' CONTENT and no boundary.
 
-THE TWO ALTERNATIVES AND WHY THEY LOST.
+THAT IS THE TEST THIS RE-SIGN ACTUALLY APPLIES: did the evidence move a seam, or did it move what sits inside one? It moved what sits inside two, and the seams held.
 
-- A DESK DOOR. Rejected because the desk recommends a vehicle for work and a benchmark run is not one. It would sit in the same list as expeditions and iterations and invite the question of which one to open, which is exactly the confusion the front-desk method warns about.
-- NOTHING AT ALL, with a run implied by entering a rewound tree. Rejected because binding is an act that can REFUSE — the guard is exercised before the run opens — and a refusal needs a caller it can reach.
-
-SO `se_benchmark {iteration?, stop_at?}` OPENS A RUN and `se_benchmark {stop: true}` ENDS ONE. One verb, because a run has one lifetime.
-
-THE SPLIT INTO THREE ELEMENTS IS BY LIFETIME AND NOT BY SUBJECT, which is worth saying because a subject split would have looked more natural.
-
-- The binding IS the lifetime.
-- The guard exists only inside it and its two refusals are both properties of that lifetime rather than of any path.
-- The report is the only thing that outlives it.
-
-A SUBJECT SPLIT would have put the ceiling with the rewind — both are about git — and the concealment with the report — both are about the benchmarks folder. That would have cut the guard in half and given two elements a shared failure mode across a boundary, which is the seam partition-functions already argued against.
+A decomposition that survives its own prototype milestone without a boundary moving is the outcome decompose-structure is for.
