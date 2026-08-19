@@ -461,3 +461,18 @@
 {"ts":"2026-08-19T18:59:38.027Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d112","brief":"harvest chunk signed; conformance-fixtures next"}
 {"ts":"2026-08-19T18:59:44.308Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d113","brief":"reading engine/tables.ts and existing fixtures before writing conformance tests"}
 {"ts":"2026-08-19T18:59:50.667Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d114","brief":"reading tables.ts + query.test.ts for the pinned subset"}
+{"ts":"2026-08-19T19:00:36.981Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d115","brief":"checking project/spec root before fixing harvest path"}
+{"ts":"2026-08-19T19:01:01.950Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d116","brief":"moving harvested files into project/ 6/26"}
+{"ts":"2026-08-19T19:01:01.964Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d117","brief":"moving harvested files into project/ 12/26"}
+{"ts":"2026-08-19T19:01:01.973Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d118","brief":"moving harvested files into project/ 18/26"}
+{"ts":"2026-08-19T19:01:01.982Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d119","brief":"moving harvested files into project/ 24/26"}
+{"ts":"2026-08-19T19:01:01.985Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d120","brief":"moving harvested files into project/ 26/26"}
+{"ts":"2026-08-19T19:01:56.674Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d121","brief":"wrote all 26 harvested files under project/ root (fixing wrong-root mistake)"}
+{"ts":"2026-08-19T19:02:50.287Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d122","brief":"retry harvest write 1/6: project/spec/queries/rules.base"}
+{"ts":"2026-08-19T19:02:50.298Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d123","brief":"retry harvest write 2/6: project/spec/queries/stakeholder-matrix.base"}
+{"ts":"2026-08-19T19:05:05.547Z","op":"done","visit":"iterations/i15/build-steps/build-query-evaluator@1","node":"d88","brief":"query.ts already executes harvested .base files via tables.ts; seam resolved"}
+{"ts":"2026-08-19T19:05:14.927Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d124","brief":"reading tables.ts for the pinned Bases subset"}
+{"ts":"2026-08-19T19:05:41.451Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d125","brief":"reading expr.ts for the supported filter operators"}
+{"ts":"2026-08-19T19:06:08.241Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d126","brief":"scanning harvested filters batch 1"}
+{"ts":"2026-08-19T19:06:17.578Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d127","brief":"scanning harvested filters batch 2"}
+{"ts":"2026-08-19T19:06:32.819Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d128","brief":"listing tests dir to find expr.ts's test file"}
