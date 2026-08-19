@@ -1,0 +1,6 @@
+{"ts":"2026-08-19T16:41:12.293Z","op":"plan","visit":"iterations/i37/onboard-retro@0","parent":null,"nodes":[{"id":"d2","brief":"drain the three pending notes"},{"id":"d3","brief":"fill the onboard-retro form"},{"id":"d4","brief":"propose the change size at the kickoff and bless it"}]}
+{"ts":"2026-08-19T16:41:24.876Z","op":"update","visit":"iterations/i37/onboard-retro@0","node":"d5","brief":"minting a token for the missing search provider"}
+{"ts":"2026-08-19T16:41:37.029Z","op":"done","visit":"iterations/i37/onboard-retro@0","node":"d2","brief":"three notes drained: one obsolete, two minted as tokens"}
+{"ts":"2026-08-19T16:42:19.061Z","op":"done","visit":"iterations/i37/onboard-retro@0","node":"d3","brief":"onboard-retro filled from the survey and the call log"}
+{"ts":"2026-08-19T16:43:58.693Z","op":"update","visit":"iterations/i37/gate-kickoff@0","node":"d6","brief":"reading the major column cell by cell before proposing the size"}
+{"ts":"2026-08-19T16:45:21.407Z","op":"done","visit":"iterations/i37/onboard-retro@0","node":"d4","brief":"kickoff proposes major with nothing struck and blesses under the grant"}
