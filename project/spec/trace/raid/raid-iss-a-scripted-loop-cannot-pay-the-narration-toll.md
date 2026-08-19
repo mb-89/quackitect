@@ -8,7 +8,7 @@ owner: the maintainer
 trigger: any state whose work is a query loop — the retro's log mining most of all
 status: open
 impact: "Twenty-five refusals this session, nineteen per cent of the window. Worse than the count: a paged query loop returns PARTIAL results and the caller cannot tell, because a refused page reads as an empty page."
-breaks_how_badly: serious
+breaks_how_badly: crippling
 how_likely: expected
 source_refs:
   - raid-iss-the-call-log-query-omits-matching-records-and-says-it-did-not

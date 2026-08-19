@@ -2,7 +2,7 @@
 form: gate-prototype
 bless: blessed by agent
 by: agent
-signed_off: 2026-08-16T18:37:52.268Z
+signed_off: 2026-08-19T17:47:11.814Z
 authors: agent
 files: null
 ---
@@ -43,7 +43,7 @@ yes — the seeded spike holds with a 32x margin under the one-second bound; not
 
 ## verdict
 
-pass — the one seeded spike holds with a 32x margin, and no assumption stands unprobed that a spike could have settled
+pass — buildable, per the gate's own struck mechanics: the seeded spike (query latency at real corpus scale) left its experiment node and fold-back's submit already refused until every fold key was answered, so results-recorded is satisfied by construction. Assumptions-validated is read as data per this gate's own note that its shape is still under owner discussion.
 
 ## follow_up
 
@@ -51,3 +51,16 @@ none — proceeds to M7 build (specify-build).
 
 ## anything_else
 
+## goals_served
+
+- Ship a read-only lane verb that reads nodes, edges, states and notes from .base files, returns filtered rows with chosen fields, and refuses an unknown field by naming the field list.: nothing yet — m7 owns the build; m6 spiked the riskiest unknown (query latency at real corpus scale) and fold-back promoted its finding into the design rather than leaving it standing on a 4-node probe.
+- Harvest v1's 25 working .base query files from `spec/queries/` at ref `main`, plus the reader ADR at `spec/decisions/adr-query-in-engine.md`.: nothing yet — still owed at the harvesting sub-step, first state where se_run/se_git are legal.
+- Extend the pinned Bases subset only where a harvested query needs it, test-first, reopening the decision rather than smuggling in a silent extension.: nothing yet — m6/m7 own it.
+- Add conformance fixtures that pin the subset against drift.: nothing yet — m7 (author-tests) owns it.
+- Fix raid-debt-delta-default-views so the $-item resolvers default to the bound record's minted_in delta, with an opt-in to widen to the corpus.: nothing yet — m7 owns the resolver-default rewrite.
+- Build the BM25 retrieval sibling as its own lane verb over the same corpus, forcing per-candidate disposition rather than raw retrieval, and skipping what the graph already encodes structurally.: nothing yet — m7 owns the build.
+- Mint the interface entries both new lane verbs owe.: nothing yet — owed once the verbs exist.
+
+## bound_breaches
+
+- if-agent-harness-to-entrypoint: not breached — no calls against this interface have run since gate-kickoff last signed; M6 states used file/read/write/search/run tools.

@@ -388,3 +388,23 @@
 {"ts":"2026-08-19T17:36:47.745Z","op":"update","visit":"iterations/i15/cut-criteria@0","node":"d39","brief":"cascading reopen+resubmit through M4"}
 {"ts":"2026-08-19T17:37:04.594Z","op":"update","visit":"iterations/i15/cut-criteria@0","node":"d40","brief":"reading cut-criteria to fix the dead requirement reference"}
 {"ts":"2026-08-19T17:37:15.505Z","op":"update","visit":"iterations/i15/cut-criteria@0","node":"d41","brief":"removing dead req-engine-folder-is-sealed reference from cut-criteria"}
+{"ts":"2026-08-19T17:37:35.296Z","op":"update","visit":"iterations/i15/evaluate-set@0","node":"d42","brief":"cascading reopen+resubmit through M4"}
+{"ts":"2026-08-19T17:38:10.815Z","op":"update","visit":"iterations/i15/gate-candidates@0","node":"d43","brief":"goals_served/bound_breaches for gate-candidates"}
+{"ts":"2026-08-19T17:38:20.241Z","op":"update","visit":"iterations/i15/gate-candidates@0","node":"d44","brief":"reviewed and blessed gate-candidates"}
+{"ts":"2026-08-19T17:38:28.809Z","op":"update","visit":"iterations/i15/converge-pugh@0","node":"d45","brief":"cascading reopen+resubmit through M5"}
+{"ts":"2026-08-19T17:38:43.267Z","op":"update","visit":"iterations/i15/reverse-sensitivity@0","node":"d46","brief":"cascading reopen+resubmit through M5"}
+{"ts":"2026-08-19T17:38:52.116Z","op":"update","visit":"iterations/i15/declare-winner@0","node":"d47","brief":"cascading reopen+resubmit through M5"}
+{"ts":"2026-08-19T17:39:01.981Z","op":"update","visit":"iterations/i15/record-adrs@0","node":"d48","brief":"cascading reopen+resubmit through M5"}
+{"ts":"2026-08-19T17:39:11.128Z","op":"update","visit":"iterations/i15/decompose-structure@0","node":"d49","brief":"cascading reopen+resubmit through M5"}
+{"ts":"2026-08-19T17:40:59.918Z","op":"done","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d35","brief":"ruled 7 corpus-drift quality scenarios in evaluate-architecture, all verified addressed"}
+{"ts":"2026-08-19T17:41:30.461Z","op":"update","visit":"iterations/i15/evaluate-architecture@0","node":"d50","brief":"resubmitting evaluate-architecture after ruling 7 corpus-drift scenarios"}
+{"ts":"2026-08-19T17:42:11.264Z","op":"update","visit":"iterations/i15/gate-architecture@0","node":"d51","brief":"goals_served/bound_breaches for gate-architecture"}
+{"ts":"2026-08-19T17:42:21.740Z","op":"update","visit":"iterations/i15/gate-architecture@0","node":"d52","brief":"reviewed and blessed gate-architecture"}
+{"ts":"2026-08-19T17:42:29.721Z","op":"update","visit":"iterations/i15/rank-unknowns@0","node":"d53","brief":"cascading reopen+resubmit through M6"}
+{"ts":"2026-08-19T17:42:40.083Z","op":"update","visit":"iterations/i15/rank-unknowns@0","node":"d54","brief":"reading paginated software.md read gate"}
+{"ts":"2026-08-19T17:42:47.840Z","op":"update","visit":"iterations/i15/rank-unknowns@0","node":"d55","brief":"reading full software.md guidance for the M6 read gate"}
+{"ts":"2026-08-19T17:45:22.365Z","op":"update","visit":"iterations/i15/rank-unknowns@0","node":"d56","brief":"reading remaining raid entries for grade-scale mapping"}
+{"ts":"2026-08-19T17:45:57.884Z","op":"update","visit":"iterations/i15/rank-unknowns@0","node":"d57","brief":"mapping 13 raid entries' off-scale grades to the fixed damage/likelihood vocabulary"}
+{"ts":"2026-08-19T17:46:31.317Z","op":"update","visit":"iterations/i15/rank-unknowns@0","node":"d58","brief":"resubmitting rank-unknowns after fixing 13 raid grade entries"}
+{"ts":"2026-08-19T17:47:04.500Z","op":"update","visit":"iterations/i15/gate-prototype@0","node":"d59","brief":"goals_served/bound_breaches for gate-prototype"}
+{"ts":"2026-08-19T17:47:11.577Z","op":"update","visit":"iterations/i15/gate-prototype@0","node":"d60","brief":"reviewed and blessed gate-prototype"}

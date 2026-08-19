@@ -715,8 +715,19 @@ export class Claims {
     });
   }
 
+  /** A QUALIFIED ID NAMES ITS OWN MACHINE, and every form lookup takes the
+   *  bare name — the same normalisation whyGrey does, arrived at the same way.
+   *  A walk reads `iterations/i15/draft-vision` in its own answers, so that is
+   *  what it passes back, and the refusal then names a form-less state rather
+   *  than the prefix it should have dropped. Measured on the i15 walk: one
+   *  call spent, at the moment the walk was already stuck. */
+  private bareState(name: string): string {
+    return name.slice(name.lastIndexOf("/") + 1);
+  }
+
   /** see dsp-walk-machine.md#two-operations-on-a-standing-claim */
-  reopenClaim(name: string, reason: string, by: string, machineId?: string, confirm?: boolean): Record<string, unknown> {
+  reopenClaim(rawName: string, reason: string, by: string, machineId?: string, confirm?: boolean): Record<string, unknown> {
+    const name = this.bareState(rawName);
     this.host.forgetRoute();
     const m = this.formMachine(machineId);
     this.stateFormState(name, m); // refuses an undeclared or form-less state

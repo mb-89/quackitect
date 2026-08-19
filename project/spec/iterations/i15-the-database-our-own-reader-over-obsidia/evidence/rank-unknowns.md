@@ -1,7 +1,8 @@
 ---
 form: rank-unknowns
+reopened: "2026-08-19T17:42:29.474Z — same claims-registration gap, cascading fix through M6"
 by: agent
-signed_off: 2026-08-16T18:28:11.202Z
+signed_off: 2026-08-19T17:42:29.880Z
 authors: agent
 files: null
 ---

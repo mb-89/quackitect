@@ -1,7 +1,8 @@
 ---
 form: decompose-structure
+reopened: "2026-08-19T17:39:10.916Z — same claims-registration gap, cascading fix through M5"
 by: agent
-signed_off: 2026-08-16T18:23:03.762Z
+signed_off: 2026-08-19T17:39:11.254Z
 authors: agent
 files: null
 ---

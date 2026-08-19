@@ -1507,6 +1507,24 @@ export class Session {
     }
     const r = this.route(wanted);
     if (!r.found && wanted !== this.active()[0]) {
+      // THE SHORT NAME IS THE NAME. Try it against what is actually reachable
+      // before refusing: aiming at `define-actual` from inside i15 means the
+      // same thing as aiming at `iterations/i15/define-actual`, and only one
+      // of the two used to work.
+      const near = this.resolveShort(
+        wanted,
+        this.pullOptions().map((o) => String(o.to)),
+      );
+      if (near !== wanted) {
+        const alt = this.route(near);
+        if (alt.found) {
+          this.aimAt(near);
+          this.clearTargetIfArrived();
+          return { ...alt, target: this._target };
+        }
+      }
+    }
+    if (!r.found && wanted !== this.active()[0]) {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "a state the drawing can reach from here",
@@ -2542,10 +2560,29 @@ export class Session {
     });
   }
 
+  /** THE SHORT NAME IS THE NAME (owner ruling). A state is called what its
+   *  drawing calls it, and the machine path in front of it is the engine's
+   *  bookkeeping rather than the reader's vocabulary.
+   *
+   *  So anything naming a state takes the short form, and a qualified one is
+   *  accepted rather than refused — a walk reads long ids in its own answers
+   *  today, and refusing what we just handed it is the worst of both.
+   *
+   *  AMBIGUITY IS NOT RESOLVED SILENTLY. Where a short name matches two of the
+   *  things on offer, nothing is picked and the refusal names both. */
+  private resolveShort(pick: string, among: string[]): string {
+    if (among.includes(pick)) return pick;
+    const hits = among.filter((o) => o.slice(o.lastIndexOf("/") + 1) === pick);
+    return hits.length === 1 ? hits[0] : pick;
+  }
+
   /** see dsp-walk-machine.md#a-list-is-legal-on-purpose */
   private pullPickChoice(choice: unknown): string[] {
     const offered = this.pullOptions().map((o) => String(o.to));
-    const picks = (Array.isArray(choice) ? choice : [choice]).map(String).filter((x) => x !== "");
+    const picks = (Array.isArray(choice) ? choice : [choice])
+      .map(String)
+      .filter((x) => x !== "")
+      .map((x) => this.resolveShort(x, offered));
     if (picks.length === 0) {
       throw new Rejection({
         clause: CLAUSES.REQUIRED_ARGS,
