@@ -1,6 +1,7 @@
 ---
 id: i9-se-and-the-corpus-move-the-machine-state
-status: seeded
+status: open
+started: 2026-08-19T10:38:56.618Z
 opened: 2026-08-12T19:39:42.160Z
 goal: ".se and the corpus: move the machine-state folder into the product, make it a committed marker, split the lane's exclusion by file instead of by directory, and give the engine one corpus reader."
 vision: |-
