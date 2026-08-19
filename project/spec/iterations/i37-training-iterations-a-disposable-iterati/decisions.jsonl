@@ -112,3 +112,4 @@
 {"ts":"2026-08-19T18:46:49.706Z","op":"update","visit":"iterations/i37/cut-criteria@0","node":"d15","brief":"aiming at evaluate-set"}
 {"ts":"2026-08-19T18:48:41.101Z","op":"update","visit":"iterations/i37/cut-criteria@1","node":"d16","brief":"aiming at gate-candidates"}
 {"ts":"2026-08-19T18:49:34.402Z","op":"update","visit":"iterations/i37/gate-candidates@0","node":"d17","brief":"drawing the fourth curve the scores pointed at"}
+{"ts":"2026-08-19T18:51:48.418Z","op":"plan","visit":"iterations/i37/cut-criteria@2","parent":null,"nodes":[{"id":"d18","brief":"walk converge-pugh"},{"id":"d19","brief":"reach declare-winner"},{"id":"d20","brief":"record the ADRs"}]}
