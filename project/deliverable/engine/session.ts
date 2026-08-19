@@ -2319,10 +2319,11 @@ export class Session {
         ...this.refusedBlock([standingForm]),
         for: standingForm,
         forms: [this.formForAgent(standingForm)],
-        do: this.fillAdvice(
-          [standingForm],
-          'work the state, then return fills on the next pull as form: {"<section>": "<text>"} - multi-pass is fine; finish with {"submit": true}: the submit checks the fields and stamps the claim',
-        ),
+        do:
+          this.fillAdvice(
+            [standingForm],
+            'work the state, then return fills on the next pull as form: {"<section>": "<text>"} - multi-pass is fine; finish with {"submit": true}: the submit checks the fields and stamps the claim',
+          ) + this.drawnNote([standingForm]),
         ...extra(),
       };
     }
@@ -2383,10 +2384,11 @@ export class Session {
           ...this.refusedBlock(owed),
           for: pullTarget,
           forms: owed.map((n) => this.formForAgent(n)),
-          do: this.fillAdvice(
-            owed,
-            'fill every required section, then return it on the next pull as form: {"<section>": "<text>", "submit": true} — there is no submit verb, and a pull without the submit FLAG hands back this same form',
-          ),
+          do:
+            this.fillAdvice(
+              owed,
+              'fill every required section, then return it on the next pull as form: {"<section>": "<text>", "submit": true} — there is no submit verb, and a pull without the submit FLAG hands back this same form',
+            ) + this.drawnNote(owed),
           ...extra(),
         };
       }
@@ -3012,6 +3014,29 @@ export class Session {
    *
    *  A GATE IS NOT DONE UNTIL IT IS BLESSED, and the pull is the bless's only
    *  carrier, so the pull has to say so. */
+  /** WHICH SECTIONS THE ENGINE ALREADY DREW, as one sentence for the fill
+   *  instruction. A drawn field arrives looking exactly like an empty one, so
+   *  the reader cannot tell a computed view from a blank page unless the
+   *  instruction says which is which.
+   *
+   *  MEASURED: 23 of the 86 evidence fields in the rigor matrix are drawn.
+   *  The mark rides on each field’s hint already; this puts it where the
+   *  walker is actually reading. */
+  private drawnNote(names: string[]): string {
+    const drawn: string[] = [];
+    for (const nm of names) {
+      let f: { field_hints?: Record<string, { act?: string }> };
+      try {
+        f = this.formGet(nm) as typeof f;
+      } catch {
+        continue;
+      }
+      for (const [field, hint] of Object.entries(f.field_hints ?? {})) if (hint.act === "rule") drawn.push(field);
+    }
+    if (drawn.length === 0) return "";
+    return ` DRAWN ALREADY, do not write prose into them: ${drawn.join(", ")} — the engine computed each one from what stands elsewhere. Read the drawing, then accept it, reject it or pick among what it offers.`;
+  }
+
   private fillAdvice(names: string[], fallback: string): string {
     for (const n of names) {
       let f: {
