@@ -119,3 +119,6 @@
 {"ts":"2026-08-19T18:55:02.451Z","op":"update","visit":"iterations/i37/record-adrs@0","node":"d24","brief":"reading a decision node shape before minting five"}
 {"ts":"2026-08-19T18:57:02.136Z","op":"update","visit":"iterations/i37/record-adrs@0","node":"d25","brief":"adding the rejected options and consequences each decision owes"}
 {"ts":"2026-08-19T18:57:43.201Z","op":"done","visit":"iterations/i37/cut-criteria@0","node":"d13","brief":"every decision now names a traceable ref"}
+{"ts":"2026-08-19T18:58:06.501Z","op":"update","visit":"iterations/i37/cut-criteria@6","node":"d26","brief":"aiming at decompose-structure"}
+{"ts":"2026-08-19T18:58:25.390Z","op":"update","visit":"iterations/i37/decompose-structure@0","node":"d27","brief":"reading the element node shape"}
+{"ts":"2026-08-19T18:59:45.121Z","op":"done","visit":"iterations/i37/cut-criteria@0","node":"d14","brief":"three elements by lifetime; the lane verb settles how a run is reached"}
