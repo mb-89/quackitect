@@ -10,61 +10,75 @@
 //
 // Every word of that is true and none of it is about what the reader wanted,
 // which was to GO somewhere. The doors from that position were computed on the
-// same pass and withheld, so the only way forward was to guess again.
+// same pass and withheld, so the only way forward was to guess again — and the
+// walk guessed three times before giving up on the door entirely.
 //
-// WHY ONE HALF IS A SOURCE-SHAPE TEST.
-//
-// A pull carrying a choice meets two different refusals. Where a form is
-// OWED, a separate branch already answers well — it names the owed form and
-// how to move in either direction, and a walking fixture reaches it. The
-// branch this fix is about is the other one: a target is set, nothing is
-// owed, and the choice matches no door. A freshly seeded root always owes its
-// first form, so the walk cannot stand there.
-//
-// The precedent is stuck-wait.test.ts, which records the same limitation for
-// the same reason, and the same warning: a walking fixture that cannot reach
-// its branch passes without the fix, which is worse than no test.
+// THE OTHER BRANCH WAS ALREADY RIGHT. Where a form is OWED, a choice is met by
+// a separate refusal that names the owed form and how to move in either
+// direction. Both branches are exercised here, because the fix must not make
+// the good one worse.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
+import { Rejection } from "../engine/errors.ts";
 import { Session } from "../engine/session.ts";
 import { bootedServer, call, freshRoot, gitInit, readEverything } from "./helpers.ts";
 
-const SRC = readFileSync(fileURLToPath(new URL("../engine/session.ts", import.meta.url)), "utf8");
-
-/** The branch that answers a choice when no step wanted a form. Found by the
- *  sentence it is the only place to build. */
-function unwantedFormBranch(): string {
-  const at = SRC.indexOf("a filled form, but nothing on the way wants one");
-  assert.ok(at > 0, "the refusal this guards has been reworded — find it and re-anchor this test");
-  // Everything from the choice check above it down to that sentence.
-  const start = SRC.lastIndexOf("if (form.choice !== undefined) {", at);
-  assert.ok(start > 0 && start < at, "the choice-aware branch no longer sits above the form refusal");
-  return SRC.slice(start, at);
+async function refusal(fn: () => Promise<unknown>): Promise<Rejection> {
+  try {
+    await fn();
+  } catch (e) {
+    if (e instanceof Rejection) return e;
+    throw e;
+  }
+  throw new Error("expected a refusal, got a value");
 }
 
-test("a choice with no door is answered about the choice, not about a form", () => {
-  const branch = unwantedFormBranch();
-  assert.match(branch, /a choice of/, "the refusal still describes a filled form nobody asked for");
-  assert.doesNotMatch(branch.split("throw new Rejection")[1] ?? "", /a filled form/, "the choice branch reuses the form wording");
+test("a choice where the road has not split is answered as a choice, not as a form", async () => {
+  // A fresh session aims at the desk, so the road has not split and no choice
+  // was offered — which is exactly the position the i15 walk kept sending
+  // doors from.
+  const s = new Session(freshRoot());
+  const r = await refusal(() => s.pull({ form: { choice: "front_desk" } }));
+  assert.match(r.got, /a choice of/, `the refusal still describes a form nobody asked for: "${r.got}"`);
+  assert.doesNotMatch(r.got, /a filled form/, "a choice is still reported as a filled form");
+  assert.match(r.got, /branching point/, "the refusal never says why a choice is not readable here");
 });
 
-test("it hands over the doors it computed rather than withholding them", () => {
-  const branch = unwantedFormBranch();
-  assert.match(branch, /this\.pullOptions\(\)/, "the branch does not look up the doors it could offer");
-  assert.match(branch, /doors from here/, "the doors are computed and never said");
+test("it hands over the doors it computed, or the verb that aims when there are none", async () => {
+  const s = new Session(freshRoot());
+  const r = await refusal(() => s.pull({ form: { choice: "front_desk" } }));
+  const said = `${r.remedy?.tool} ${r.remedy?.note}`;
+  assert.match(said, /se_aim|doors from here/, `the refusal names no way to move at all: "${said}"`);
+  // The remedy tool is se_pull where doors exist — sending one IS a pull — so
+  // what must be true is that the NOTE carries something to act on, never that
+  // the tool changed.
+  assert.doesNotMatch(
+    String(r.remedy?.note ?? ""),
+    /says what it wants before you fill anything/,
+    "the remedy is still the generic pull-empty line",
+  );
 });
 
-test("with no door at all it names the verb that aims", () => {
-  const branch = unwantedFormBranch();
-  assert.match(branch, /se_aim/, "a reader with no door offered is left with no way to move");
+test("the same door sent three ways gets three answers about the door", async () => {
+  // The exact i15 sequence: a list, a short name, a long name with a submit
+  // flag beside it. None of them may come back as an unwanted-form refusal.
+  for (const shape of [["front_desk"], "front_desk", "main/front_desk"]) {
+    const s = new Session(freshRoot());
+    const r = await refusal(() => s.pull({ form: { choice: shape } as Record<string, unknown> }));
+    assert.doesNotMatch(r.got, /a filled form, but nothing/, `a choice shaped as ${JSON.stringify(shape)} is answered as an unwanted form`);
+  }
 });
 
-// AND THE HALF A WALK CAN REACH. Where a form is owed, a choice must still be
-// answered as a choice — this branch was already right, and it must stay right.
-test("a choice while a form is owed says so, and says how to move either way", async () => {
+test("a payload with no choice in it still gets the form refusal", async () => {
+  // The other branch must not regress. A section nobody asked for is not an
+  // aim, and the old wording is the right answer for it.
+  const s = new Session(freshRoot());
+  const r = await refusal(() => s.pull({ form: { some_section_nobody_asked_for: "text" } }));
+  assert.match(r.got, /filled form/, `a non-choice payload is now answered as a choice: "${r.got}"`);
+});
+
+test("a choice while a form is owed says so, and names the ways forward and back", async () => {
   const root = freshRoot();
   gitInit(root);
   spawnSync("git", ["add", "-A"], { cwd: root, encoding: "utf8" });
@@ -84,13 +98,8 @@ test("a choice while a form is owed says so, and says how to move either way", a
   await s.pull({ form: { choice: door } });
   await readEverything(s);
 
-  try {
-    await s.pull({ form: { choice: "there-is-no-such-state-here" } });
-    assert.fail("a choice matching no door was accepted");
-  } catch (e) {
-    const r = e as { got?: string; remedy?: { note?: string } };
-    assert.match(String(r.got), /a choice/, `the refusal does not mention the choice: "${r.got}"`);
-    assert.match(String(r.got), /nothing was saved/, "the refusal does not say the payload was dropped");
-    assert.match(String(r.remedy?.note ?? ""), /go FORWARD|se_reopen/, "the refusal names no way to move");
-  }
+  const r = await refusal(() => s.pull({ form: { choice: "there-is-no-such-state-here" } }));
+  assert.match(r.got, /a choice/, `the refusal does not mention the choice: "${r.got}"`);
+  assert.match(r.got, /nothing was saved/, "the refusal does not say the payload was dropped");
+  assert.match(String(r.remedy?.note ?? ""), /go FORWARD|se_reopen/, "the refusal names no way to move");
 });
