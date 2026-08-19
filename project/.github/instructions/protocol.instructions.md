@@ -6,7 +6,7 @@ applyTo: '**'
 
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
      from project/guidance/contract.md 2c1c1de5650a
-     from project/guidance/walking.md c7d668a001e2
+     from project/guidance/walking.md fceee128e99b
      from project/guidance/method/lane.md 0446e75f834e
      from project/guidance/voice.md 888a21b1a538
 -->
@@ -465,6 +465,24 @@ whole object.
   multi-step work. Check items off with `done` AS each lands. The checklist is
   a PROGRESS view, not a completion record — fourteen items ticked in the last
   minute tell a reader nothing the commit would not.
+
+  SIZE AN ITEM SO IT CAN CLOSE WHERE YOU STAND. An item is a thing that will
+  be DONE while you are still in this state, and the stall guard is what
+  measures that: it counts updates since anything closed, so an item that
+  cannot close makes every later update look like a stall.
+
+  MEASURED ON THE i15 WALK: 57 refusals, all SE-C-133, all with the same two
+  items open — "walk boot reading loop", still open hours after boot ended,
+  and "work milestones as served", which cannot close until the iteration
+  does. The work was real and the narration was honest. The checklist was the
+  wrong shape, and nothing said how to shape one.
+
+  SO AN ITEM NAMING A WHOLE MILESTONE IS NOT AN ITEM. It is the state you are
+  in. Plan the steps inside it, and plan again when you reach the next one —
+  a second `plan` is free and is what scope growth wants anyway.
+
+  AND CLOSE IT THE MOMENT IT LANDS. An item finished twenty calls ago and
+  still open is what turns the guard from a nudge into a toll.
 - `{op: "fork", brief, items?}` opens a BLOCKING detour: the current item
   cannot continue until it is fixed. Scope growth is another `plan`, not a
   fork.
