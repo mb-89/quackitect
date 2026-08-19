@@ -194,6 +194,32 @@ exist and it still answers. On an unattended machine this is the first fact
 worth having, because every later report is about SOME build and a report that
 does not say which one is hearsay.
 
+### The host refused it before the lane ever saw it
+
+A REFUSAL WITH NO CLAUSE AND NO REMEDY IS NOT THE LANE'S. Every lane refusal
+is typed: a clause, what was expected, what it got, and the exact call to make
+instead. A denial carrying none of those came from the HOST's own permission
+layer, above the lane, and the engine never heard the call at all.
+
+HOW TO TELL, and it takes one call. Pull again. The lane's own refusals leave
+the walk exactly where it was and say why; a host denial leaves the walk
+untouched and the pull answers as though nothing was tried, because nothing
+was.
+
+THERE IS NO REMEDY TO FOLLOW, so do not hunt for one. Nothing in
+`project/guidance/refusals.md` covers it, and re-sending the same call reaches
+the same layer.
+
+WHAT TO DO: say plainly which call was denied and by what, capture it with
+`se_note`, and treat it as a stop of the third kind — something broke and no
+remedy gets you past it. On an attended machine the person can widen the
+permission. On an unattended one the note is the whole record.
+
+MEASURED 2026-08-19: a walk at `tactical` reached a kickoff gate whose bless
+was its to give, sent `form: {"bless": true}`, and the host denied it. The
+agent read the denial as the engine's and reported the gate as the owner's.
+It was not; nobody had refused it.
+
 ### Another machine may be walking the same record
 
 NOTHING STOPS IT, AND NOTHING IS MEANT TO. There is no claim, no lock and no
