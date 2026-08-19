@@ -154,3 +154,9 @@
 {"ts":"2026-08-19T19:37:54.371Z","op":"done","visit":"iterations/i37/run-spikes@0","node":"d9","brief":"spike two falls — the checked ceiling breaches its bound fourfold"}
 {"ts":"2026-08-19T19:38:21.606Z","op":"update","visit":"iterations/i37/run-spikes/spike-the-truncated-history@0","node":"d15","brief":"moving to the log attribution spike"}
 {"ts":"2026-08-19T19:39:54.181Z","op":"done","visit":"iterations/i37/run-spikes@0","node":"d10","brief":"spike three holds — 99% attributable by carrying the pull position"}
+{"ts":"2026-08-19T19:40:41.944Z","op":"update","visit":"iterations/i37/run-spikes/spike-the-log-attribution@0","node":"d16","brief":"moving to the engine-on-a-rewound-tree spike"}
+{"ts":"2026-08-19T19:40:42.691Z","op":"update","visit":"iterations/i37/run-spikes/spike-the-log-attribution@0","node":"d17","brief":"standing a rewound tree and pointing the current engine at it"}
+{"ts":"2026-08-19T19:40:58.858Z","op":"update","visit":"iterations/i37/run-spikes/spike-the-log-attribution@0","node":"d18","brief":"booting the current engine against the rewound tree"}
+{"ts":"2026-08-19T19:42:23.118Z","op":"update","visit":"iterations/i37/run-spikes/spike-the-log-attribution@0","node":"d19","brief":"testing the hybrid: old records, current method"}
+{"ts":"2026-08-19T19:42:57.229Z","op":"update","visit":"iterations/i37/run-spikes/spike-the-log-attribution@0","node":"d20","brief":"building the hybrid: old records, current method"}
+{"ts":"2026-08-19T19:45:38.015Z","op":"done","visit":"iterations/i37/run-spikes/spike-the-truncated-history@0","node":"d11","brief":"spike four holds on a hybrid; the whole-tree rewind fails to compile"}
