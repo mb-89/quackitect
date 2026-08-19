@@ -1,5 +1,7 @@
 ---
 form: fix-delta-default-resolvers
+by: agent
+signed_off: 2026-08-19T19:41:02.501Z
 authors: agent
 files:
 ---
@@ -8,6 +10,7 @@ files:
 
 ## current_situation
 
+conformance-fixtures just signed, having found and fixed the same underlying pattern this chunk targets (promotionItems's broken owner check) as a side effect of proving the new file.inFolder/file.hasTag subset extensions. The $-item resolver default fix itself -- the whole point of this chunk -- landed alongside it, test-first, and is already proven green.
 
 ## built
 
@@ -15,6 +18,7 @@ Rewrote the $-item resolvers in engine/stateform.ts to default to the bound reco
 
 ## follow_up
 
+raid-debt-delta-default-views stays open: seven pool/comparison-machine sources are deliberately still corpus-wide, with rationale recorded in the raid entry's own new Repayment section. mint-interface-entries and a re-walk of trace-design/verification/gate-implementation remain for this iteration.
 
 ## anything_else
 

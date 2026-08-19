@@ -547,3 +547,6 @@
 {"ts":"2026-08-19T19:39:21.139Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d193","brief":"polling the whole-battery confirmation job again"}
 {"ts":"2026-08-19T19:39:32.934Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d194","brief":"final poll of the whole-battery confirmation job"}
 {"ts":"2026-08-19T19:40:35.925Z","op":"update","visit":"iterations/i15/build-steps/fix-delta-default-resolvers@0","node":"d195","brief":"fix-delta-default-resolvers signed; built ahead of schedule under conformance work"}
+{"ts":"2026-08-19T19:41:02.397Z","op":"update","visit":"iterations/i15/build-steps/fix-delta-default-resolvers@0","node":"d196","brief":"fix-delta-default-resolvers signed; built ahead of schedule under conformance work"}
+{"ts":"2026-08-19T19:41:17.624Z","op":"update","visit":"iterations/i15/build-steps/mint-interface-entries@0","node":"d197","brief":"verifying the two interface entries still exist before signing this chunk"}
+{"ts":"2026-08-19T19:41:31.784Z","op":"done","visit":"iterations/i15/gate-implementation@0","node":"d74","brief":"all 5 build chunks + interface entries now signed"}
