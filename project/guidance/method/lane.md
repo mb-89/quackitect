@@ -79,10 +79,22 @@ dropped exists nowhere — not on the result, not in the log. Ends carry
 verdicts: exit codes, totals, units. Prefer structured results (`se_test`) and
 fetch full output by ref (`se_log_query`) over shaping it in the shell.
 
-A RESULT THE HOST MOVED TO DISK IS RE-FETCHED BY REF, never by reading the
-host's file. The lane logged the full response; `se_log_query` with the
-call's ref serves it back. Retro finding 2026-08-10: several shell reads of
-host-persisted files stood where one log query belonged.
+A RESULT THE HOST MOVED TO DISK IS NOT READ BACK FROM THE HOST'S FILE. Retro
+finding 2026-08-10: several shell reads of host-persisted files stood where a
+lane call belonged.
+
+WHAT THE LOG ACTUALLY KEEPS, because this used to promise more than it holds.
+The call log is a TRAIL, not an archive.
+
+- `se_run` OUTPUT IS KEPT WHOLE, and `se_log_query {ref}` serves it back. That
+  is the one a caller comes back for, and it is the one that is there.
+- EVERY OTHER RESPONSE IS CAPPED IN THE LOG, middle cut, about five hundred
+  characters. A big form or a big pull is NOT recoverable from it.
+
+SO A HOST-TRUNCATED ANSWER IS ASKED FOR AGAIN, SMALLER. Page a read with
+`offset`/`limit`, narrow a search, or pull again — the machine recomputes from
+where the walk stands, so nothing is lost by asking twice. Hunting the log for
+a payload it never held costs a call and answers nothing.
 
 WRITE A SCRIPT WHEN THE QUESTION IS ABOUT MANY THINGS. Counting what a rule
 touches, routing four hundred blocks, measuring which methods need what,

@@ -431,3 +431,9 @@
 {"ts":"2026-08-19T18:29:39.797Z","op":"update","visit":"iterations/i15/specify-build@1","node":"d85","brief":"checking typecheck status after import fix"}
 {"ts":"2026-08-19T18:29:53.838Z","op":"update","visit":"iterations/i15/specify-build@1","node":"d86","brief":"reading build-chunks.md before seeding 5 new chunks"}
 {"ts":"2026-08-19T18:34:18.445Z","op":"update","visit":"iterations/i15/observe-red@1","node":"d87","brief":"resigning observe-red after specify-build reopen"}
+{"ts":"2026-08-19T18:40:05.137Z","op":"fork","visit":"iterations/i15/build-steps/build-query-evaluator@1","parent":"d38","node":"d88","brief":"resolving the query-vs-Bases-format seam the coordinator flagged, before continuing build","nodes":[]}
+{"ts":"2026-08-19T18:40:51.415Z","op":"update","visit":"iterations/i15/build-steps/build-query-evaluator@1","node":"d89","brief":"reading tables.ts BaseSpec/BaseView types and parse function"}
+{"ts":"2026-08-19T18:41:13.593Z","op":"update","visit":"iterations/i15/build-steps/build-query-evaluator@1","node":"d90","brief":"finding the vault-rows reader function"}
+{"ts":"2026-08-19T18:41:40.283Z","op":"update","visit":"iterations/i15/build-steps/build-query-evaluator@1","node":"d91","brief":"checking basesCard for how it obtains rows without a pre-warmed cache"}
+{"ts":"2026-08-19T18:43:40.923Z","op":"update","visit":"iterations/i15/build-steps/build-query-evaluator@1","node":"d92","brief":"reading tables.ts vaultDir/listBases and selectRows implementation"}
+{"ts":"2026-08-19T18:44:07.300Z","op":"update","visit":"iterations/i15/build-steps/build-query-evaluator@1","node":"d93","brief":"reading baseui.test.ts fixture helper pattern for the new query.test.ts"}

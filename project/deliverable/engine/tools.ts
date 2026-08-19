@@ -810,7 +810,18 @@ export function buildServer(
       ok: rec.ok,
       outcome: rec.outcome,
       duration_ms: rec.duration_ms,
-      response: rec.tool === "se_run" ? rec.response : capJson(rec.response),
+      // THE LOG IS A TRAIL, NOT AN ARCHIVE. Only se_run keeps its output whole,
+      // because that is the one a caller comes back for. Everything else is
+      // capped here — so the cut says so, rather than sending a reader to the
+      // very file they are already reading.
+      response:
+        rec.tool === "se_run"
+          ? rec.response
+          : capJson(
+              rec.response,
+              500,
+              "cut from the LOG's copy — the caller received this answer whole, and only se_run's output is kept in full",
+            ),
     });
     if (rec.ok && EDIT_TOOLS.has(rec.tool) && JSON.stringify(rec.args ?? {}).includes(".ts")) kickTypecheck(root);
   });
