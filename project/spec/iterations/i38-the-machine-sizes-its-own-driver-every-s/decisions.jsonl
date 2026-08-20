@@ -165,3 +165,20 @@
 {"ts":"2026-08-20T11:03:22.421Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d58","brief":"derive-functions: five functions, three flows"}
 {"ts":"2026-08-20T11:03:36.371Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d59","brief":"derive-functions signed"}
 {"ts":"2026-08-20T11:05:15.815Z","op":"update","visit":"iterations/i38/identify-assumptions@0","node":"d60","brief":"minting the per-column difficulty assumption"}
+{"ts":"2026-08-20T11:08:12.413Z","op":"done","visit":"iterations/i38/write-requirements@0","node":"d44","brief":"eight requirements minted and signed"}
+{"ts":"2026-08-20T11:08:12.873Z","op":"done","visit":"iterations/i38/write-requirements@0","node":"d45","brief":"five functions and three flows signed"}
+{"ts":"2026-08-20T11:08:13.315Z","op":"done","visit":"iterations/i38/write-requirements@0","node":"d46","brief":"two assumptions minted and the sweep done"}
+{"ts":"2026-08-20T11:08:14.201Z","op":"done","visit":"iterations/i38/scope-non-goals@0","node":"d82","brief":"the motivation gate was re-ruled and blessed"}
+{"ts":"2026-08-20T11:08:14.646Z","op":"update","visit":"iterations/i38/probe-assumptions@0","node":"d61","brief":"the per-column probe came back negative"}
+{"ts":"2026-08-20T11:08:32.278Z","op":"update","visit":"iterations/i38/probe-assumptions@0","node":"d62","brief":"reopening write-requirements on the falsified premise"}
+{"ts":"2026-08-20T11:08:32.553Z","op":"update","visit":"iterations/i38/write-requirements@2","node":"d63","brief":"the complexity requirement becomes per-column"}
+{"ts":"2026-08-20T11:08:53.539Z","op":"update","visit":"iterations/i38/write-requirements@2","node":"d64","brief":"write-requirements re-signed on the per-column shape"}
+{"ts":"2026-08-20T11:09:16.267Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d65","brief":"re-earning functions against the per-column shape"}
+{"ts":"2026-08-20T11:09:16.521Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d66","brief":"flow and function keyed to the column"}
+{"ts":"2026-08-20T11:09:17.028Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d67","brief":"functions re-earned; only the difficulty flow moved"}
+{"ts":"2026-08-20T11:09:36.410Z","op":"update","visit":"iterations/i38/identify-assumptions@1","node":"d68","brief":"re-earning identify-assumptions after the falsification"}
+{"ts":"2026-08-20T11:09:37.005Z","op":"update","visit":"iterations/i38/identify-assumptions@1","node":"d69","brief":"identify-assumptions re-earned; one of its two died"}
+{"ts":"2026-08-20T11:09:50.927Z","op":"update","visit":"iterations/i38/probe-assumptions@0","node":"d70","brief":"probe-assumptions: reading the form"}
+{"ts":"2026-08-20T11:11:00.965Z","op":"update","visit":"iterations/i38/probe-assumptions@0","node":"d71","brief":"two standing assumptions re-probed on this session's evidence"}
+{"ts":"2026-08-20T11:11:25.423Z","op":"update","visit":"iterations/i38/probe-assumptions@0","node":"d72","brief":"probe table accepted as drawn, with three rows re-probed"}
+{"ts":"2026-08-20T11:11:40.019Z","op":"done","visit":"iterations/i38/write-requirements@0","node":"d47","brief":"probe-assumptions signed; one assumption falsified and three artifacts changed"}

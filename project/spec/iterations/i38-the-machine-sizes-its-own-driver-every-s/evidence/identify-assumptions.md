@@ -1,7 +1,8 @@
 ---
 form: identify-assumptions
 by: agent
-signed_off: 2026-08-20T11:06:18.230Z
+signed_off: 2026-08-20T11:09:37.296Z
+reopened: "2026-08-20T11:09:36.411Z — its upstream was re-signed and one of the two assumptions it opened has since been falsified and changed kind to issue"
 authors: agent
 files:
 ---
@@ -39,6 +40,12 @@ THE SWEEP WAS ACTUALLY PERFORMED THIS TIME, which needs saying: this iteration h
 - BOTH NEW ASSUMPTIONS COMPOUND WITH THE STANDING DRIFT RISK rather than sitting beside it. A rating that is wrong for three of four columns will never be contradicted, because nothing compares a declared rung against what the work turned out to need. probe-assumptions inherits all three as one cluster.
 
 - THE STANDING WEAK-MODEL ENTRIES WERE RE-READ AND NOT RE-MINTED. raid-the-read-proof-locks-weaker-models-out-of-the-system and raid-asm-refusals-recover-a-weak-model both stand open and both are already named by this iteration's dependency entry. Naming them again here would have counted one finding twice.
+
+- RE-EARNED AFTER ITS OWN PROBE RAN. raid-asm-a-state-is-equally-hard-at-every-change-size was FALSIFIED at the next state and is now kind `issue`, id kept, per the register's own rule that a falsified assumption has already happened and is not a risk.
+
+- THE ENTRY WAS WORTH MINTING PRECISELY BECAUSE IT DIED. It carried its own probe, the probe was one row's work, and running it changed a requirement, a flow and a function before fifty-three ratings were authored against the wrong schema. An assumption that survives tells you little; one that falsifies inside a milestone has paid for itself.
+
+- THE SECOND ASSUMPTION STANDS UNPROBED AND SAYS SO. raid-asm-the-model-ladder-is-a-total-order cannot be tested until a list exists, and its probe is written and cheap for whoever gets there first.
 
 ## anything_else
 

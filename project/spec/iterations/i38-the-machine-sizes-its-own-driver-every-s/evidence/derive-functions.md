@@ -1,7 +1,8 @@
 ---
 form: derive-functions
 by: agent
-signed_off: 2026-08-20T11:03:36.597Z
+signed_off: 2026-08-20T11:09:17.345Z
+reopened: "2026-08-20T11:09:16.268Z — write-requirements was re-signed after it: the complexity value is now per column, and flow-step-difficulty and the obtain function describe a per-row value"
 authors: agent
 files:
 ---
@@ -56,6 +57,10 @@ THE TEST I APPLIED: could a completely different implementation satisfy these fi
 - fn-...publish-the-driver-outward TAKES flow-instruction AS ITS OUTPUT, which is the existing flow for what a pull hands back. That is reuse rather than a new channel, and it is the right answer only for as long as the pull is where a receiver looks. se-pty's keystroke channel is the standing alternative and it is not modelled here.
 
 - NO FUNCTION COVERS MAINTAINING THE MAPPING, for the same reason no use case does: the actor has no node. The function layer inherits the hole rather than papering over it with a function nobody performs.
+
+- RE-EARNED AFTER THE PER-COLUMN PROBE. Two nodes changed and the function set did not: flow-step-difficulty and fn-...obtain-a-step-s-difficulty are now keyed to the change size being walked rather than to the row. The other four functions are unaffected, because a reduction, a lookup, a publication and a stamp do not care where the number came from.
+
+- THAT IS THE NEUTRALITY CHECK PAYING OFF RATHER THAN AN ACCIDENT. The impurity this form admitted was that flow-step-difficulty encoded "declared" into the flow layer. The correction landed on exactly that flow and on the one function that reads it, and nothing else in the layer moved.
 
 ## anything_else
 

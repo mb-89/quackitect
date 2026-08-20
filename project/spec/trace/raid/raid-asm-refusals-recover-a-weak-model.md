@@ -11,12 +11,34 @@ impact: The refusal contract is doctrine without a check. A clause whose remedy 
 breaks_how_badly: corrosive
 how_likely: plausible
 probe: "one-sided evidence, i35 on 2026-08-17, and the model was not weak. Every typed refusal hit recovered in one turn: SE-C-040, 105, 110, 112, 120, 125, 129, 137. TWO DID NOT RECOVER CLEANLY: a per-item refusal printed truncated item strings its own matcher would not accept, and a do instruction repeated indefinitely carrying no remedy at all."
-probed: 2026-08-17
+probed: 2026-08-20
 source_refs:
   - engine/errors.ts lines 2-3, where the contract is written
   - guidance/refusals.md, the feed-forward side of every clause
   - "the owner's ruling 2026-08-12: hand validation, never automation"
 ---
+
+## A SECOND ONE-SIDED DATA POINT, i38 on 2026-08-20
+
+STILL NOT A WEAK MODEL, so this narrows nothing that matters. Recorded because
+the sample is now two sessions rather than one, and because one clause behaved
+differently from the rest.
+
+FORTY-FIVE REFUSALS OVER FIVE HUNDRED CALLS. Every typed clause hit —
+SE-C-046, SE-C-101, SE-C-110, SE-C-112, SE-C-120, SE-C-125, SE-C-133, SE-C-138
+and the EARS check — recovered in one turn from the payload, with one exception
+below.
+
+THE EXCEPTION IS WORTH THE ENTRY. SE-C-121 fired sixteen times and SE-C-133
+twenty, and both are NARRATION clauses. The 121s were node ids guessed rather
+than read, and the open node map rides every result — the remedy was already in
+hand and was not taken. THAT IS THE FAILURE MODE THIS ASSUMPTION IS ABOUT,
+arriving in a capable model: a remedy that is present, correct, and not used
+because the answer looked obvious.
+
+SO THE CLAIM TO TEST IS NARROWER THAN "does the remedy work". It is whether the
+remedy is placed where a reader who thinks they already know the answer will
+still see it. On this evidence, for the narration clauses, it is not.
 
 ## The claim
 
