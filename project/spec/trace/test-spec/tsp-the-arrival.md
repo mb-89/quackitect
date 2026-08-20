@@ -27,6 +27,25 @@ wait, and paying it per case on every battery run buys a branch that
 nesting.test.ts and the live walk already exercise. The arrival's idempotent
 path is demonstrated rather than tested, and write-requirements says so.
 
+## Steps
+
+Every case in the referenced file is one step, and the case name states its
+claim.
+
+1. `a runtime below the declared floor stops the arrival, and the declaration
+   is left alone` — the judge-never-adjust half of the runtime row.
+2. `an arrival that stops at the runtime places no cage` — a stopped arrival
+   leaves nothing half-placed.
+3. `the hook survives an arrival that fails, and says so` — the quiet
+   direction, pinned: exiting zero over a failure is the silent failure the
+   scope names.
+4. `SE_NO_ARRIVE skips the hook, and says that it skipped` — an opt-out that
+   announces itself rather than looking like a success.
+5. `every step accounts for itself in the same shape` — one shape, so a
+   failure names its own step instead of reading as "the server is not there".
+6. `an unreachable remote degrades the refs step and stops nothing` — the
+   arrival carries on and the account is what reports it.
+
 ## Why the failing direction is the one pinned hardest
 
 A CAGE THAT DENIES TOO MUCH FAILS LOUDLY: the agent hits a refusal and says so.

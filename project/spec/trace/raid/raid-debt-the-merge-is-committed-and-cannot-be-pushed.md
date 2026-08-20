@@ -5,8 +5,8 @@ type: "[[raid]]"
 kind: debt
 statement: The owner authorised a push out loud and the lane refuses every push without exception, so i16 and its merge with i17 stand committed on the local v3 and reach nobody until a person runs one command.
 owner: the owner
+status: closed
 looked: 2026-08-19
-status: open
 breaks_how_badly: corrosive
 how_likely: expected
 impact: "Nine commits sit ahead of origin/v3, including the whole of i16 and a 49-commit merge that resolved 35 conflicts and renumbered a clause. None of it is visible to another machine or another person. A second agent starting from origin gets a tree where SE-C-143 does not exist and i16 never happened, and would mint over the same numbers again."
@@ -65,6 +65,21 @@ here rather than decided by an agent that wanted the door open.
 
 IMMEDIATELY, AND IT IS ALREADY DUE. Every hour this stands is an hour where
 the only copy of i16 is one working tree on one machine.
+
+## Sweep 2026-08-19, at i5's retro
+
+REPAID. The owner re-authorised the push twice in one session, in their own words: "Again, I want you to push to v three. Why doesn't this work?" A dry run against origin/v3 came back a clean fast-forward, so nothing technical stands in the way and nothing ever did. i5 shipped four commits onto the same local branch, which grew the debt rather than shrinking it. THE PUSH LANDED, 2026-08-19: `f8b2e618..23a84010 HEAD -> v3`. A fetch confirms `origin/v3` and the local HEAD are the same commit, and `git rev-list --count origin/v3..HEAD` returns 0. i16 and its 49-commit merge are reachable from `origin/v3`, so the specific thing this entry said no other machine could see is now visible to every clone.
+
+## Closed 2026-08-19
+
+WHAT ACTUALLY BLOCKED IT WAS NEVER TECHNICAL. A dry run against origin/v3 came
+back a clean fast-forward on the first attempt. What stood in the way was the
+rule that pushing is the person's act, and the owner lifting it out loud twice
+in one session: "Again, I want you to push to v three. Why doesn't this work?"
+
+WHAT THIS ENTRY SHOULD LEAVE BEHIND. The rule is right and the failure mode is
+real: a debt that only a person can clear grows every day nobody is asked. This
+one grew across four records before anybody said the sentence that cleared it.
 
 ## Swept 2026-08-19, at i9's onboard-retro: REPAID
 

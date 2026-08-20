@@ -8,7 +8,8 @@
 
 import { spawnSync } from "node:child_process";
 import { accessSync, constants, existsSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve, sep } from "node:path";
+import { brandPath, palettePath } from "../brand.ts";
 import { readKeys } from "../frontmatter.ts";
 import type { MachineDecl } from "../machine.ts";
 import { compileMachine } from "../machines/compile.ts";
@@ -174,12 +175,14 @@ if (existsSync(shell)) {
 // Silent is right at render time and wrong at boot. A product running under
 // the fallback name in fallback colours is a broken install, not a choice,
 // and preflight is where that gets said out loud.
-if (!existsSync(join(root, "project", "deliverable", "brand", "brand.json"))) {
-  failures.push("project/deliverable/brand/brand.json is missing — the product would run unnamed, under the lane's own fallback");
-}
-if (!existsSync(join(root, "project", "deliverable", "brand", "palette.css"))) {
-  failures.push("project/deliverable/brand/palette.css is missing — every surface would render from the baked fallback palette");
-}
+// THE READER SAYS WHERE IT LOOKS. Joining a second copy of each path here is
+// what let a moved file pass its own check — see
+// dsp-quality-toolchain.md#a-check-asks-the-reader-where-it-looked.
+const missingConfig = (p: string, cost: string): void => {
+  if (!existsSync(p)) failures.push(`${relative(root, p).split(sep).join("/")} is missing — ${cost}`);
+};
+missingConfig(brandPath(root), "the product would run unnamed, under the lane's own fallback");
+missingConfig(palettePath(root), "every surface would render from the baked fallback palette");
 try {
   mkdirSync(seDir(root), { recursive: true });
   accessSync(dirname(join(seDir(root), "calls.jsonl")), constants.W_OK);

@@ -704,11 +704,18 @@ export function refsIn(text: string): string[] {
 /** see dsp-radial-layout.md#the-references-a-table-row-carries */
 export function refsInRows(text: string, columns = 2): string[] {
   const out: string[] = [];
-  const rows = text.split(/\r?\n/).filter((line) => /^\s*\|/.test(line));
-  // A HEADER IS NOT A ROW: its first cell is a column name, and a hyphenated
-  // column name survives the id filter and then resolves to nothing.
-  const sep = rows.findIndex((line) => /^\s*\|[\s:|-]+\|\s*$/.test(line));
-  for (const line of sep === -1 ? rows : rows.slice(sep + 1)) {
+  const lines = text.split(/\r?\n/);
+  // A HEADER ROW NAMES COLUMNS, NEVER NODES. Its first cell is the row's TYPE,
+  // and a type name carrying a dash is shaped exactly like an id — so a bound
+  // table over `test-spec` reported its own header as a reference resolving to
+  // nothing. The rule row underneath is what tells a header from a data row.
+  // THIS SKIPS EVERY TABLE'S HEADER, not only the first document's. The version
+  // it replaced cut everything above the first rule row, so a second table in
+  // the same text leaked its header back in.
+  const isRule = (l: string | undefined): boolean => l !== undefined && /^\s*\|(?:\s*:?-{3,}:?\s*\|)+\s*$/.test(l);
+  for (const [i, line] of lines.entries()) {
+    if (!/^\s*\|/.test(line)) continue;
+    if (isRule(lines[i + 1])) continue;
     const cells = line.split("|").slice(1, -1);
     for (const cell of cells.slice(0, columns)) {
       const id = refId(cell.trim());

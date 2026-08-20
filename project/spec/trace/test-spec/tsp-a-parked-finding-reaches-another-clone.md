@@ -7,7 +7,8 @@ method: "demonstration"
 demonstrates:
   - "sty-a-finding-outlives-the-box-that-found-it"
   - "sty-see-what-the-other-machine-may-pull-from"
-verifies: "none — the demonstrates edge above carries this spec's trace; the one requirement mentioning either story is req-open-work-is-answered-from-the-repository-not-a-local-store and its verify method is test; every requirement was checked for a mention of either story"
+verifies:
+  - "none — this spec demonstrates a story end to end, so the demonstrates edge above carries its trace; the one requirement mentioning either story is req-open-work-is-answered-from-the-repository-not-a-local-store and its verify method is test; every requirement was checked for a mention of either story"
 files:
   - "none — the procedure below is the definition; the observed sessions are the evidence"
 ---

@@ -1,0 +1,179 @@
+{"ts":"2026-08-19T10:44:39.753Z","op":"plan","visit":"iterations/i5/onboard-retro@0","parent":null,"nodes":[{"id":"d1","brief":"M0: onboard retro and kickoff"},{"id":"d2","brief":"walk i5 milestones to ship"}]}
+{"ts":"2026-08-19T10:47:27.064Z","op":"update","visit":"iterations/i5/onboard-retro@0","node":"d3","brief":"onboard-retro: inbox empty, emit_back checked against the tree"}
+{"ts":"2026-08-19T10:50:44.167Z","op":"update","visit":"iterations/i5/gate-kickoff@0","node":"d4","brief":"kickoff: auditing i5's thirteen items against the tree"}
+{"ts":"2026-08-19T10:51:29.991Z","op":"update","visit":"iterations/i5/gate-kickoff@0","node":"d5","brief":"kickoff: minted the fresh-clone inbox assumption"}
+{"ts":"2026-08-19T10:52:59.730Z","op":"plan","visit":"iterations/i5/gate-kickoff@0","parent":"d1","nodes":[{"id":"d6","brief":"kickoff: scope audited"},{"id":"d7","brief":"size proposed minor"},{"id":"d8","brief":"gate blessed"}]}
+{"ts":"2026-08-19T10:54:09.447Z","op":"update","visit":"iterations/i5/gate-kickoff@0","node":"d9","brief":"kickoff: bound breaches measured, resubmitting"}
+{"ts":"2026-08-19T10:55:15.389Z","op":"done","visit":"iterations/i5/gate-kickoff@0","node":"d6","brief":"landed at the kickoff gate"}
+{"ts":"2026-08-19T10:55:15.860Z","op":"done","visit":"iterations/i5/gate-kickoff@0","node":"d7","brief":"landed at the kickoff gate"}
+{"ts":"2026-08-19T10:55:16.124Z","op":"done","visit":"iterations/i5/gate-kickoff@0","node":"d8","brief":"landed at the kickoff gate"}
+{"ts":"2026-08-19T10:55:16.398Z","op":"done","visit":"iterations/i5/onboard-retro@0","node":"d1","brief":"landed at the kickoff gate"}
+{"ts":"2026-08-19T10:55:59.564Z","op":"plan","visit":"iterations/i5/draft-vision@0","parent":null,"nodes":[{"id":"d10","brief":"M1 frame and scope"},{"id":"d11","brief":"M2 stories and requirements"},{"id":"d12","brief":"M3 structure and tests"},{"id":"d13","brief":"M4 build and verify"},{"id":"d14","brief":"M5 validate and ship"}]}
+{"ts":"2026-08-19T10:57:51.135Z","op":"update","visit":"iterations/i5/log-risks@0","node":"d15","brief":"log-risks: minting the register entries"}
+{"ts":"2026-08-19T11:01:20.925Z","op":"update","visit":"iterations/i5/scope-non-goals@0","node":"d16","brief":"scope set: six items in, two back to the pool"}
+{"ts":"2026-08-19T11:02:57.858Z","op":"update","visit":"iterations/i5/gate-motivation@0","node":"d17","brief":"gate-motivation: six items argued, gate blessed"}
+{"ts":"2026-08-19T11:03:06.200Z","op":"update","visit":"iterations/i5/gate-motivation@0","node":"d18","brief":"gate-motivation: six items argued, gate blessed"}
+{"ts":"2026-08-19T11:03:24.215Z","op":"update","visit":"iterations/i5/gate-motivation@0","node":"d19","brief":"gate-motivation: per-item fields answered by their real item names"}
+{"ts":"2026-08-19T11:04:49.708Z","op":"update","visit":"iterations/i5/write-stories@0","node":"d20","brief":"write-stories: one new deck for the package version pass"}
+{"ts":"2026-08-19T11:05:15.521Z","op":"update","visit":"iterations/i5/write-stories@0","node":"d21","brief":"write-stories: one deck in, five items honestly storyless"}
+{"ts":"2026-08-19T11:06:06.085Z","op":"update","visit":"iterations/i5/generalize-use-cases@0","node":"d22","brief":"generalize-use-cases: one new case over the package story"}
+{"ts":"2026-08-19T11:06:23.128Z","op":"update","visit":"iterations/i5/generalize-use-cases@0","node":"d23","brief":"generalize-use-cases: one case in, coverage both ways"}
+{"ts":"2026-08-19T11:08:12.973Z","op":"update","visit":"iterations/i5/write-requirements@0","node":"d24","brief":"write-requirements: five rows for the six scope items"}
+{"ts":"2026-08-19T11:08:46.746Z","op":"update","visit":"iterations/i5/write-requirements@0","node":"d25","brief":"write-requirements: five rows, set criteria argued"}
+{"ts":"2026-08-19T11:08:53.863Z","op":"update","visit":"iterations/i5/write-requirements@0","node":"d26","brief":"write-requirements: five rows, set criteria argued"}
+{"ts":"2026-08-19T11:09:04.903Z","op":"update","visit":"iterations/i5/write-requirements@0","node":"d27","brief":"write-requirements: the two named set questions answered"}
+{"ts":"2026-08-19T11:12:19.452Z","op":"done","visit":"iterations/i5/onboard-retro@0","node":"d2","brief":"M1 through M3 requirements are signed"}
+{"ts":"2026-08-19T11:12:39.096Z","op":"done","visit":"iterations/i5/draft-vision@0","node":"d10","brief":"M1 signed: register open, scope cut to six items"}
+{"ts":"2026-08-19T11:12:39.449Z","op":"update","visit":"iterations/i5/derive-functions@0","node":"d28","brief":"minted the issue against the standing role-stamp row"}
+{"ts":"2026-08-19T11:13:05.285Z","op":"update","visit":"iterations/i5/derive-functions@0","node":"d29","brief":"derive-functions: three resident functions take the new rows"}
+{"ts":"2026-08-19T11:13:29.696Z","op":"update","visit":"iterations/i5/derive-functions@0","node":"d30","brief":"derive-functions: one leaf added, three allocations made"}
+{"ts":"2026-08-19T11:15:14.968Z","op":"update","visit":"iterations/i5/derive-functions@0","node":"d31","brief":"derive-functions: resubmitting with the escalate tell answered"}
+{"ts":"2026-08-19T11:15:21.549Z","op":"update","visit":"iterations/i5/derive-functions@0","node":"d32","brief":"derive-functions: resubmitting with the escalate tell answered"}
+{"ts":"2026-08-19T11:15:42.734Z","op":"update","visit":"iterations/i5/derive-functions@0","node":"d33","brief":"the reader row is a quality and owed its six-part scenario"}
+{"ts":"2026-08-19T11:16:06.495Z","op":"update","visit":"iterations/i5/write-requirements@1","node":"d34","brief":"write-requirements re-signed after the row split"}
+{"ts":"2026-08-19T11:16:15.735Z","op":"done","visit":"iterations/i5/draft-vision@0","node":"d11","brief":"M2 and M3 requirements signed, function structure extended"}
+{"ts":"2026-08-19T11:16:57.710Z","op":"update","visit":"iterations/i5/derive-functions@0","node":"d35","brief":"derive-functions re-signed against the moved register"}
+{"ts":"2026-08-19T11:17:51.710Z","op":"update","visit":"iterations/i5/identify-assumptions@0","node":"d36","brief":"identify-assumptions: three assumptions swept out of the five rows"}
+{"ts":"2026-08-19T11:18:21.805Z","op":"update","visit":"iterations/i5/identify-assumptions@0","node":"d37","brief":"identify-assumptions: six sources swept, three entries opened"}
+{"ts":"2026-08-19T11:19:51.435Z","op":"plan","visit":"iterations/i5/probe-assumptions@0","parent":"d12","nodes":[{"id":"d38","brief":"probe-assumptions: two probed"},{"id":"d39","brief":"one scheduled"},{"id":"d40","brief":"one unprobed with its reason"}]}
+{"ts":"2026-08-19T11:20:10.924Z","op":"update","visit":"iterations/i5/probe-assumptions@0","node":"d41","brief":"the empty-inbox entry probed false and becomes an issue"}
+{"ts":"2026-08-19T11:21:36.775Z","op":"update","visit":"iterations/i5/probe-assumptions@0","node":"d42","brief":"two standing assumptions were structurally incomplete and blocked the state"}
+{"ts":"2026-08-19T11:21:55.776Z","op":"done","visit":"iterations/i5/probe-assumptions@0","node":"d38","brief":"probes recorded on every standing assumption"}
+{"ts":"2026-08-19T11:24:20.925Z","op":"update","visit":"iterations/i5/probe-assumptions@0","node":"d43","brief":"probes ride the node table, not a second copy in the form"}
+{"ts":"2026-08-19T11:24:26.113Z","op":"update","visit":"iterations/i5/probe-assumptions@0","node":"d44","brief":"probes ride the node table, not a second copy in the form"}
+{"ts":"2026-08-19T11:29:11.153Z","op":"update","visit":"iterations/i5/probe-assumptions@0","node":"d45","brief":"probes answered as the node table the field asks for"}
+{"ts":"2026-08-19T11:30:31.979Z","op":"update","visit":"iterations/i5/probe-assumptions@0","node":"d46","brief":"the probes table is written back exactly as the register serves it"}
+{"ts":"2026-08-19T11:32:07.559Z","op":"update","visit":"iterations/i5/decompose-structure@0","node":"d47","brief":"decompose-structure: the new function allocates into the arrival element"}
+{"ts":"2026-08-19T11:33:06.222Z","op":"update","visit":"iterations/i5/decompose-structure@0","node":"d48","brief":"decompose-structure: one allocation, no new element or interface"}
+{"ts":"2026-08-19T11:36:47.271Z","op":"fork","visit":"iterations/i5/decompose-structure@0","parent":"d13","node":"d49","brief":"a cut subsystem left an orphan interface and it blocks the matrix","nodes":[]}
+{"ts":"2026-08-19T11:37:13.352Z","op":"update","visit":"iterations/i5/decompose-structure@0","node":"d50","brief":"decompose-structure: resubmitting with the orphan cleared"}
+{"ts":"2026-08-19T11:37:20.634Z","op":"update","visit":"iterations/i5/decompose-structure@0","node":"d51","brief":"decompose-structure: resubmitting with the orphan cleared"}
+{"ts":"2026-08-19T11:40:47.426Z","op":"update","visit":"iterations/i5/author-tests@0","node":"d52","brief":"author-tests: reading the shared test fixture helpers"}
+{"ts":"2026-08-19T11:44:35.210Z","op":"update","visit":"iterations/i5/author-tests@0","node":"d53","brief":"author-tests: five specs and five files, test-first"}
+{"ts":"2026-08-19T11:44:58.708Z","op":"update","visit":"iterations/i5/author-tests@0","node":"d54","brief":"author-tests: fourteen cases, nine red on purpose"}
+{"ts":"2026-08-19T11:45:07.735Z","op":"update","visit":"iterations/i5/author-tests@0","node":"d55","brief":"author-tests: fourteen cases, nine red on purpose"}
+{"ts":"2026-08-19T11:48:51.037Z","op":"done","visit":"iterations/i5/decompose-structure@0","node":"d49","brief":"the orphan interface was removed and the finding is on the register"}
+{"ts":"2026-08-19T11:48:51.440Z","op":"update","visit":"iterations/i5/author-tests@0","node":"d56","brief":"author-tests: repairing the standing specs this state refuses on"}
+{"ts":"2026-08-19T11:49:34.753Z","op":"update","visit":"iterations/i5/author-tests@0","node":"d57","brief":"author-tests: six standing specs answered so the state can read them"}
+{"ts":"2026-08-19T11:49:54.686Z","op":"fork","visit":"iterations/i5/author-tests@0","parent":"d13","node":"d58","brief":"a bound tables header reads as a reference and blocks author-tests","nodes":[]}
+{"ts":"2026-08-19T11:50:24.100Z","op":"done","visit":"iterations/i5/author-tests@0","node":"d58","brief":"the header skip landed and the finding is on the register"}
+{"ts":"2026-08-19T11:50:24.706Z","op":"update","visit":"iterations/i5/author-tests@0","node":"d59","brief":"author-tests: resubmitting with the header fix in"}
+{"ts":"2026-08-19T11:50:33.128Z","op":"update","visit":"iterations/i5/author-tests@0","node":"d60","brief":"author-tests: resubmitting with the header fix in"}
+{"ts":"2026-08-19T11:50:51.410Z","op":"update","visit":"iterations/i5/author-tests@0","node":"d61","brief":"author-tests: the running lane still holds the old engine sources"}
+{"ts":"2026-08-19T11:52:46.166Z","op":"update","visit":"iterations/i5/author-tests@0","node":"d1","brief":"author-tests: resubmitting on the reloaded engine"}
+{"ts":"2026-08-19T11:53:26.717Z","op":"update","visit":"iterations/i5/specify-build@0","node":"d2","brief":"author-tests: the config spec is a test, matching its requirement"}
+{"ts":"2026-08-19T11:55:59.822Z","op":"update","visit":"iterations/i5/specify-build@0","node":"d3","brief":"specify-build: the design of each change lands in the spec that owns its files"}
+{"ts":"2026-08-19T11:56:28.176Z","op":"update","visit":"iterations/i5/specify-build@0","node":"d4","brief":"specify-build: the paint and the header fix get their design sections"}
+{"ts":"2026-08-19T11:57:14.536Z","op":"update","visit":"iterations/i5/specify-build@0","node":"d5","brief":"specify-build: five chunks drawn, six specs carry the design"}
+{"ts":"2026-08-19T11:57:29.257Z","op":"update","visit":"iterations/i5/specify-build@0","node":"d6","brief":"specify-build: five chunks drawn, six specs carry the design"}
+{"ts":"2026-08-19T11:57:57.444Z","op":"fork","visit":"iterations/i5/specify-build@0","parent":null,"node":"d7","brief":"the refs check reads a node-tables written cells as references","nodes":[]}
+{"ts":"2026-08-19T11:59:39.262Z","op":"update","visit":"iterations/i5/specify-build@0","node":"d1","brief":"specify-build: resubmitting on the reloaded engine"}
+{"ts":"2026-08-19T11:59:57.583Z","op":"update","visit":"iterations/i5/observe-red@0","node":"d2","brief":"observe-red: running the five new files before any build"}
+{"ts":"2026-08-19T12:00:09.488Z","op":"update","visit":"iterations/i5/observe-red@0","node":"d3","brief":"observe-red: running the five new files before any build"}
+{"ts":"2026-08-19T12:00:20.543Z","op":"update","visit":"iterations/i5/observe-red@0","node":"d4","brief":"observe-red: collecting the case verdicts"}
+{"ts":"2026-08-19T12:00:48.954Z","op":"update","visit":"iterations/i5/observe-red@0","node":"d5","brief":"observe-red: collecting the case verdicts"}
+{"ts":"2026-08-19T12:01:31.686Z","op":"update","visit":"iterations/i5/observe-red@0","node":"d6","brief":"observe-red: the specs record the counts the run found, not the ones planned"}
+{"ts":"2026-08-19T12:02:36.485Z","op":"update","visit":"iterations/i5/observe-red@0","node":"d7","brief":"observe-red: the non-test checklist answered, nineteen standing specs"}
+{"ts":"2026-08-19T12:02:53.634Z","op":"update","visit":"iterations/i5/build-steps/the-version-flag@0","node":"d8","brief":"build: the entrypoint answers --version before it resolves a root"}
+{"ts":"2026-08-19T12:03:01.393Z","op":"update","visit":"iterations/i5/build-steps/the-version-flag@0","node":"d9","brief":"build: proving the version flag"}
+{"ts":"2026-08-19T12:03:08.572Z","op":"update","visit":"iterations/i5/build-steps/the-version-flag@0","node":"d10","brief":"build: proving the version flag"}
+{"ts":"2026-08-19T12:03:53.526Z","op":"plan","visit":"iterations/i5/build-steps/the-version-flag@0","parent":null,"nodes":[{"id":"d11","brief":"the-version-flag"},{"id":"d12","brief":"an-empty-source-says-so"},{"id":"d13","brief":"the-actor-is-stamped"},{"id":"d14","brief":"preflight-asks-the-reader"},{"id":"d15","brief":"the-paint-has-one-decider"}]}
+{"ts":"2026-08-19T12:04:32.554Z","op":"update","visit":"iterations/i5/build-steps/an-empty-source-says-so@0","node":"d16","brief":"build: a fields arguments name the live sources that came back empty"}
+{"ts":"2026-08-19T12:04:45.872Z","op":"update","visit":"iterations/i5/build-steps/an-empty-source-says-so@0","node":"d17","brief":"build: proving the empty-source cases"}
+{"ts":"2026-08-19T12:06:06.244Z","op":"update","visit":"iterations/i5/build-steps/the-actor-is-stamped@0","node":"d18","brief":"build: the actor is stamped where the call is served and read from the record"}
+{"ts":"2026-08-19T12:06:16.696Z","op":"update","visit":"iterations/i5/build-steps/the-actor-is-stamped@0","node":"d19","brief":"build: proving the actor stamp and the feed contract"}
+{"ts":"2026-08-19T12:07:50.502Z","op":"update","visit":"iterations/i5/build-steps/preflight-asks-the-reader@0","node":"d20","brief":"build: the readers export their paths and preflight asks for them"}
+{"ts":"2026-08-19T12:08:02.259Z","op":"update","visit":"iterations/i5/build-steps/preflight-asks-the-reader@0","node":"d21","brief":"build: proving the one-config-path change"}
+{"ts":"2026-08-19T12:09:40.245Z","op":"update","visit":"iterations/i5/build-steps/the-paint-has-one-decider@0","node":"d22","brief":"build: one function decides the paint and a law-proven green says so"}
+{"ts":"2026-08-19T12:10:15.136Z","op":"update","visit":"iterations/i5/build-steps/the-paint-has-one-decider@0","node":"d23","brief":"build: the law-proven green gets a paint of its own"}
+{"ts":"2026-08-19T12:10:15.386Z","op":"update","visit":"iterations/i5/build-steps/the-paint-has-one-decider@0","node":"d24","brief":"build: proving the paint decider against the standing paint cases"}
+{"ts":"2026-08-19T12:11:22.659Z","op":"update","visit":"iterations/i5/trace-design@0","node":"d25","brief":"trace-design: every changed file is claimed by a standing spec"}
+{"ts":"2026-08-19T12:11:31.694Z","op":"update","visit":"iterations/i5/trace-design@0","node":"d26","brief":"trace-design: every changed file is claimed by a standing spec"}
+{"ts":"2026-08-19T12:12:28.898Z","op":"update","visit":"iterations/i5/trace-design@0","node":"d27","brief":"trace-design: a spec naming only interfaces gets the element it lands in"}
+{"ts":"2026-08-19T12:12:29.492Z","op":"update","visit":"iterations/i5/trace-design@0","node":"d28","brief":"trace-design: resubmitting with the spec's element edge in"}
+{"ts":"2026-08-19T12:13:07.125Z","op":"update","visit":"iterations/i5/trace-design@0","node":"d29","brief":"trace-design: two unclaimed engine files get the spec that owns them"}
+{"ts":"2026-08-19T12:13:21.548Z","op":"update","visit":"iterations/i5/verification@0","node":"d30","brief":"trace-design: resubmitting with the sweep clean"}
+{"ts":"2026-08-19T12:13:50.292Z","op":"update","visit":"iterations/i5/verification@0","node":"d31","brief":"verification: firing the battery over the finished build"}
+{"ts":"2026-08-19T12:17:43.839Z","op":"update","visit":"iterations/i5/verification@0","node":"d32","brief":"verification: the form's prose stands while the tester finishes"}
+{"ts":"2026-08-19T12:33:19.659Z","op":"fork","visit":"iterations/i5/verification@0","parent":null,"node":"d33","brief":"the tester found two blockers and the claims cannot be ticked yet","nodes":[]}
+{"ts":"2026-08-19T12:37:31.195Z","op":"update","visit":"iterations/i5/verification@0","node":"d34","brief":"verification signed; the battery is red and the fallback owes fix-findings"}
+{"ts":"2026-08-19T12:40:27.371Z","op":"plan","visit":"iterations/i5/fix-findings@0","parent":null,"nodes":[{"id":"d35","brief":"F1 the typecheck"},{"id":"d36","brief":"F2 preflight's import graph"},{"id":"d37","brief":"F3 the empty-source renderer"},{"id":"d38","brief":"F4-F5 two hollow cases"},{"id":"d39","brief":"F6 the path count"},{"id":"d40","brief":"F7 pins for the engine repairs"},{"id":"d41","brief":"F8 the contaminated template"},{"id":"d42","brief":"F9-F10 the two latent couplings"}]}
+{"ts":"2026-08-19T12:41:06.101Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d43","brief":"fix: the brand module is the one place, and its callers import it"}
+{"ts":"2026-08-19T12:41:23.602Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d44","brief":"fix: proving preflight boots without the render graph"}
+{"ts":"2026-08-19T12:41:30.832Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d45","brief":"fix: proving preflight boots without the render graph"}
+{"ts":"2026-08-19T12:46:12.799Z","op":"done","visit":"iterations/i5/fix-findings@0","node":"d35","brief":"the typecheck is green: the third FieldArgs site fills empty_sources"}
+{"ts":"2026-08-19T12:46:13.494Z","op":"done","visit":"iterations/i5/fix-findings@0","node":"d37","brief":"the field draws a line naming an empty live source, with a seam case"}
+{"ts":"2026-08-19T12:46:13.831Z","op":"done","visit":"iterations/i5/fix-findings@0","node":"d38","brief":"the two hollow cases now bite: no casts, and the guard is anchored"}
+{"ts":"2026-08-19T12:46:14.175Z","op":"done","visit":"iterations/i5/fix-findings@0","node":"d39","brief":"one place builds each configuration path, counted across the engine"}
+{"ts":"2026-08-19T12:46:14.535Z","op":"done","visit":"iterations/i5/fix-findings@0","node":"d40","brief":"the three engine repairs have a pin file of their own"}
+{"ts":"2026-08-19T12:46:14.863Z","op":"done","visit":"iterations/i5/build-steps/the-version-flag@0","node":"d11","brief":"built and proved in its own chunk"}
+{"ts":"2026-08-19T12:46:15.184Z","op":"done","visit":"iterations/i5/build-steps/the-version-flag@0","node":"d12","brief":"built and proved in its own chunk"}
+{"ts":"2026-08-19T12:46:15.502Z","op":"done","visit":"iterations/i5/build-steps/the-version-flag@0","node":"d13","brief":"built and proved in its own chunk"}
+{"ts":"2026-08-19T12:46:15.858Z","op":"done","visit":"iterations/i5/build-steps/the-version-flag@0","node":"d14","brief":"built and proved in its own chunk"}
+{"ts":"2026-08-19T12:46:16.208Z","op":"done","visit":"iterations/i5/build-steps/the-version-flag@0","node":"d15","brief":"built and proved in its own chunk"}
+{"ts":"2026-08-19T12:46:16.548Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d46","brief":"fix: checking the contaminated test-template cache"}
+{"ts":"2026-08-19T12:46:25.751Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d47","brief":"fix: checking the test-template cache the tester contaminated"}
+{"ts":"2026-08-19T12:46:39.386Z","op":"done","visit":"iterations/i5/fix-findings@0","node":"d41","brief":"the contaminated template is gone; helpers rebuilds it from the fingerprint"}
+{"ts":"2026-08-19T12:47:03.350Z","op":"done","visit":"iterations/i5/fix-findings@0","node":"d42","brief":"the two class assertions no longer break on a third kind of green"}
+{"ts":"2026-08-19T12:47:17.517Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d48","brief":"fix: scoped confirm over every file the findings touched"}
+{"ts":"2026-08-19T12:47:37.166Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d49","brief":"fix: reading what the path count still finds"}
+{"ts":"2026-08-19T12:48:12.868Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d50","brief":"fix: the last two namings build from the one place instead of spelling it"}
+{"ts":"2026-08-19T12:48:13.213Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d51","brief":"fix: confirming the path count reads one"}
+{"ts":"2026-08-19T12:48:28.750Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d52","brief":"fix: linting the whole tree before the confirm run"}
+{"ts":"2026-08-19T12:48:38.084Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d53","brief":"fix: the code linter over the whole tree"}
+{"ts":"2026-08-19T12:48:52.440Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d54","brief":"fix: the join import went with the paths that moved to the brand module"}
+{"ts":"2026-08-19T12:48:52.749Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d55","brief":"fix: the code linter over the whole tree"}
+{"ts":"2026-08-19T12:49:37.655Z","op":"done","visit":"iterations/i5/verification@0","node":"d33","brief":"eleven findings dispositioned in one pass"}
+{"ts":"2026-08-19T12:51:31.410Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d56","brief":"fix-findings: firing the confirm run"}
+{"ts":"2026-08-19T12:53:30.836Z","op":"fork","visit":"iterations/i5/fix-findings@0","parent":null,"node":"d57","brief":"the confirm run is still red and its failures are not in the refusal","nodes":[]}
+{"ts":"2026-08-19T12:56:42.613Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d58","brief":"fix: a case guarded a release output as if it were a fact of the source"}
+{"ts":"2026-08-19T12:57:00.648Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d59","brief":"fix: confirming the repaired produce case"}
+{"ts":"2026-08-19T12:57:19.864Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d60","brief":"fix: reading the produce case that still fails"}
+{"ts":"2026-08-19T12:57:47.351Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d61","brief":"fix: which of the four the source really has"}
+{"ts":"2026-08-19T12:58:14.575Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d62","brief":"fix: the source-side guard holds only for what the repository tracks"}
+{"ts":"2026-08-19T12:58:14.852Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d63","brief":"fix: confirming the repaired produce case"}
+{"ts":"2026-08-19T12:58:51.056Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d64","brief":"fix: the produce guard finding goes on the register"}
+{"ts":"2026-08-19T12:59:12.826Z","op":"update","visit":"iterations/i5/fix-findings@0","node":"d65","brief":"fix-findings: twelve dispositioned, battery 1461 green"}
+{"ts":"2026-08-19T13:01:21.324Z","op":"update","visit":"iterations/i5/verification@1","node":"d66","brief":"the confirm run is green and the walk is back at verification"}
+{"ts":"2026-08-19T13:05:21.266Z","op":"update","visit":"iterations/i5/gate-implementation@0","node":"d67","brief":"gate-implementation: the checklist items by their own names"}
+{"ts":"2026-08-19T13:44:02.073Z","op":"update","visit":"iterations/i5/sweep-consistency@0","node":"d1","brief":"ux.md: teach the two paint rules i5 established"}
+{"ts":"2026-08-19T13:44:10.471Z","op":"update","visit":"iterations/i5/sweep-consistency@0","node":"d2","brief":"ux.md: teach the two paint rules i5 established"}
+{"ts":"2026-08-19T13:44:18.128Z","op":"update","visit":"iterations/i5/sweep-consistency@0","node":"d3","brief":"ux.md: teach the two paint rules i5 established"}
+{"ts":"2026-08-19T13:44:26.477Z","op":"update","visit":"iterations/i5/sweep-consistency@0","node":"d4","brief":"node-table card: find where the live source is taught"}
+{"ts":"2026-08-19T13:44:46.143Z","op":"update","visit":"iterations/i5/sweep-consistency@0","node":"d5","brief":"node-table card: teach the empty live source"}
+{"ts":"2026-08-19T13:45:04.172Z","op":"update","visit":"iterations/i5/sweep-consistency@0","node":"d6","brief":"lane.md: the log record carries the acting role"}
+{"ts":"2026-08-19T13:45:34.350Z","op":"update","visit":"iterations/i5/sweep-consistency@0","node":"d7","brief":"engineering.md: the version flag answers before the install has to work"}
+{"ts":"2026-08-19T13:46:10.989Z","op":"update","visit":"iterations/i5/sweep-consistency@0","node":"d8","brief":"cloud-runner.md: how to ask the checkout which build it is"}
+{"ts":"2026-08-19T13:46:54.502Z","op":"update","visit":"iterations/i5/sweep-consistency@0","node":"d9","brief":"prepare_idle card: preflight now asks the readers where they look"}
+{"ts":"2026-08-19T13:47:38.158Z","op":"update","visit":"iterations/i5/sweep-consistency@0","node":"d10","brief":"version-planning: i5's entry said the stale seeded bundle"}
+{"ts":"2026-08-19T13:48:30.470Z","op":"update","visit":"iterations/i5/sweep-consistency@0","node":"d11","brief":"re-project the prompt layer after the guidance edits"}
+{"ts":"2026-08-19T13:48:38.466Z","op":"update","visit":"iterations/i5/sweep-consistency@0","node":"d12","brief":"lint the edited surfaces so the corpus reads back clean"}
+{"ts":"2026-08-19T13:49:12.093Z","op":"update","visit":"iterations/i5/sweep-consistency@0","node":"d13","brief":"ux.md: split the two new items, the voice lint asked"}
+{"ts":"2026-08-19T13:49:17.975Z","op":"update","visit":"iterations/i5/sweep-consistency@0","node":"d14","brief":"re-project after the ux.md split"}
+{"ts":"2026-08-19T13:49:35.200Z","op":"update","visit":"iterations/i5/sweep-consistency@0","node":"d15","brief":"fill the consistency sweep"}
+{"ts":"2026-08-19T13:49:59.907Z","op":"update","visit":"iterations/i5/gate-validation@0","node":"d16","brief":"open the validation gate form to see its items"}
+{"ts":"2026-08-19T13:50:24.649Z","op":"update","visit":"iterations/i5/gate-validation@0","node":"d17","brief":"validation gate: take the battery at rest"}
+{"ts":"2026-08-19T13:53:21.059Z","op":"update","visit":"iterations/i5/gate-validation@0","node":"d18","brief":"fill the validation gate"}
+{"ts":"2026-08-19T13:53:46.331Z","op":"update","visit":"iterations/i5/gate-validation@0","node":"d19","brief":"validation gate: measure the busy boundary against its bound"}
+{"ts":"2026-08-19T13:54:15.181Z","op":"update","visit":"iterations/i5/gate-validation@0","node":"d20","brief":"validation gate: the bound answered per interface"}
+{"ts":"2026-08-19T13:54:22.391Z","op":"update","visit":"iterations/i5/gate-validation@0","node":"d21","brief":"bless the validation gate on the owner's standing instruction"}
+{"ts":"2026-08-19T13:55:08.022Z","op":"update","visit":"iterations/i5/gate-validation@0","node":"d22","brief":"reopen fill-story-evidence to fill the deck and mint its demonstration"}
+{"ts":"2026-08-19T13:56:07.209Z","op":"update","visit":"iterations/i5/gate-validation@0","node":"d23","brief":"fill the must story's evidence halves at M8"}
+{"ts":"2026-08-19T13:56:18.020Z","op":"update","visit":"iterations/i5/gate-validation@0","node":"d24","brief":"fill the must story's evidence halves at M8"}
+{"ts":"2026-08-19T13:56:51.726Z","op":"update","visit":"iterations/i5/gate-validation@0","node":"d25","brief":"mint the demonstration spec the must story owes"}
+{"ts":"2026-08-19T13:56:59.367Z","op":"update","visit":"iterations/i5/gate-validation@0","node":"d26","brief":"mint the demonstration spec the must story owes"}
+{"ts":"2026-08-19T13:57:45.808Z","op":"update","visit":"iterations/i5/gate-validation@0","node":"d27","brief":"amend the gate: the must story now has its demonstration"}
+{"ts":"2026-08-19T13:58:46.112Z","op":"update","visit":"iterations/i5/package@0","node":"d28","brief":"package: assemble the shippable archive"}
+{"ts":"2026-08-19T13:58:56.980Z","op":"update","visit":"iterations/i5/package@0","node":"d29","brief":"package: find the archive that landed"}
+{"ts":"2026-08-19T13:59:08.213Z","op":"update","visit":"iterations/i5/package@0","node":"d30","brief":"package: run --version from the extracted archive"}
+{"ts":"2026-08-19T13:59:27.911Z","op":"update","visit":"iterations/i5/package@0","node":"d31","brief":"package: install the extracted copy from its own manifest"}
+{"ts":"2026-08-19T14:00:43.824Z","op":"update","visit":"iterations/i5/package@0","node":"d32","brief":"story slide 5: the extracted archive answered, gap closed"}
+{"ts":"2026-08-19T14:01:03.101Z","op":"update","visit":"iterations/i5/package@0","node":"d33","brief":"demonstration spec: add the extracted-archive run"}
+{"ts":"2026-08-19T14:01:27.288Z","op":"update","visit":"iterations/i5/package@0","node":"d34","brief":"fill the package form"}
+{"ts":"2026-08-19T14:01:37.802Z","op":"update","visit":"iterations/i5/package@0","node":"d35","brief":"package field as a file-ref line"}
+{"ts":"2026-08-19T14:01:46.591Z","op":"update","visit":"iterations/i5/package@0","node":"d36","brief":"submit the package form"}
+{"ts":"2026-08-19T14:02:08.278Z","op":"update","visit":"iterations/i5/gate-release@0","node":"d37","brief":"release gate: see what the record will commit"}
+{"ts":"2026-08-19T14:02:57.869Z","op":"update","visit":"iterations/i5/gate-release@0","node":"d38","brief":"release gate: record the hand-run package proof as an issue"}
+{"ts":"2026-08-19T14:03:51.552Z","op":"update","visit":"iterations/i5/gate-release@0","node":"d39","brief":"fill the release gate"}
+{"ts":"2026-08-19T14:04:08.388Z","op":"update","visit":"iterations/i5/gate-release@0","node":"d40","brief":"release gate: round 0 as the five named items"}
+{"ts":"2026-08-19T14:04:17.814Z","op":"update","visit":"iterations/i5/gate-release@0","node":"d41","brief":"bless the release gate on the owner's standing instruction"}

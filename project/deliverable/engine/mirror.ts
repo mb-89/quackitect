@@ -122,7 +122,15 @@ export function startMirror(o: MirrorOptions): Server {
           const r = handle(body);
           args = r.args;
           state.lastPacket = await r.result;
-          o.log.append({ tool, args, ok: true, outcome: "result", duration_ms: Date.now() - started, response: state.lastPacket });
+          o.log.append({
+            tool,
+            args,
+            actor: "human",
+            ok: true,
+            outcome: "result",
+            duration_ms: Date.now() - started,
+            response: state.lastPacket,
+          });
         } catch (e) {
           if (!(e instanceof Rejection)) {
             res.writeHead(500, { "content-type": "text/plain; charset=utf-8" });
@@ -130,7 +138,15 @@ export function startMirror(o: MirrorOptions): Server {
             return;
           }
           state.lastPacket = e.toJSON();
-          o.log.append({ tool, args, ok: false, outcome: "rejected", duration_ms: Date.now() - started, response: state.lastPacket });
+          o.log.append({
+            tool,
+            args,
+            actor: "human",
+            ok: false,
+            outcome: "rejected",
+            duration_ms: Date.now() - started,
+            response: state.lastPacket,
+          });
         }
         res.writeHead(303, { location: "/" });
         res.end();
@@ -347,12 +363,28 @@ export function startMirror(o: MirrorOptions): Server {
           const a = apply(body);
           args = a.args;
           const r = await a.run();
-          const rec = o.log.append({ tool, args, ok: true, outcome: "result", duration_ms: Date.now() - started, response: r.log });
+          const rec = o.log.append({
+            tool,
+            args,
+            actor: "human",
+            ok: true,
+            outcome: "result",
+            duration_ms: Date.now() - started,
+            response: r.log,
+          });
           if (onLogged !== undefined) onLogged(rec);
           res.end(JSON.stringify(r.answer));
         } catch (e) {
           const payload = e instanceof Rejection ? e.toJSON() : { error: whyOf(e) };
-          o.log.append({ tool, args, ok: false, outcome: "rejected", duration_ms: Date.now() - started, response: payload });
+          o.log.append({
+            tool,
+            args,
+            actor: "human",
+            ok: false,
+            outcome: "rejected",
+            duration_ms: Date.now() - started,
+            response: payload,
+          });
           res.end(JSON.stringify(onError(e)));
         }
       })();
@@ -829,6 +861,7 @@ export function startMirror(o: MirrorOptions): Server {
       o.log.append({
         tool: "mirror_profile",
         args: { path: url.pathname, widget, phases: profile },
+        actor: "ui",
         ok: true,
         outcome: "result",
         duration_ms: performance.now() - started,
@@ -896,6 +929,7 @@ export function startMirror(o: MirrorOptions): Server {
             o.log.append({
               tool: "mirror_slow",
               args: { path: url.pathname, method: req.method ?? "", ms },
+              actor: "ui",
               ok: true,
               outcome: "result",
               duration_ms: ms,

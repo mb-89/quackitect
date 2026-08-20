@@ -9,11 +9,21 @@ realizes:
   - if-project-producer-to-resolution-seam
   - el-mirror
 files:
+  - project/deliverable/engine/actbound.ts
   - project/deliverable/engine/produce.ts
   - project/deliverable/engine/paths.ts
   - project/deliverable/engine/tools.ts
   - project/deliverable/vscode/src/extension.ts
 ---
+
+## The bound travels with the act
+
+`actbound.ts` holds it, and it was named by no design spec. The rule is
+SE-C-141: every act writes inside one tree and nowhere else, refused at a
+single resolver, with WHICH tree asked rather than assumed.
+
+IT IS ITS OWN MODULE TO KEEP THE IMPORTS ACYCLIC, which is why it is easy to
+miss: nothing above it names it and `paths.ts` asks it a question.
 
 ## Responsibility
 

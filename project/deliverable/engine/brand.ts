@@ -26,8 +26,31 @@ export interface Brand {
 // word, never whichever product this source last belonged to.
 const FALLBACK: Brand = { name: "se", id: "se", abbr: null };
 
+/** THE BRAND FOLDER holds every file a product is configured BY, and ONE
+ *  module knows where it is — see
+ *  dsp-quality-toolchain.md#a-check-asks-the-reader-where-it-looked.
+ *
+ *  IT LIVES HERE RATHER THAN IN THE RENDERER because a boot check has to ask
+ *  the same question, and reaching the renderer to ask it drags the whole
+ *  drawing graph into preflight. */
+const BRAND_DIR = ["project", "deliverable", "brand"] as const;
+
+/** The manifest's path, as segments, for a caller that joins them itself. */
+export const BRAND_PARTS = [...BRAND_DIR, "brand.json"] as const;
+
+/** see dsp-mirror-render.md#the-look-files-are-configuration-not-code */
+export const LOOK_FILES = ["palette.css", "trace.css"] as const;
+
+export function lookPath(root: string, name: string): string {
+  return join(root, ...BRAND_DIR, name);
+}
+
+export function palettePath(root: string): string {
+  return lookPath(root, LOOK_FILES[0]);
+}
+
 export function brandPath(root: string): string {
-  return join(root, "project", "deliverable", "brand", "brand.json");
+  return join(root, ...BRAND_PARTS);
 }
 
 /** Read live (owner ruling 2026-07-29): a running system holding a stale copy

@@ -14,9 +14,9 @@
 // One source, two projections: the packet JSON shown here IS what the
 // agent receives.
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { BASES_SCRIPT, BASES_STYLE, BASES_TABLE_STYLE } from "./basesclient.ts";
 import { basesCard } from "./baseui.ts";
+import { LOOK_FILES, lookPath, palettePath } from "./brand.ts";
 import type { CallLog, CallRecord } from "./calllog.ts";
 import { type CanvasData, type CanvasElement, loadCanvas, subLabel } from "./canvas.ts";
 import { bindings, loadCards } from "./cards.ts";
@@ -136,6 +136,10 @@ export interface StateMeta {
   /** A blessed gate — the thumbs-up rides the green (owner ruling
    *  2026-08-11: green means submitted; green plus thumb means blessed). */
   blessed?: boolean;
+  /** Green because a LAW passed, with no form signed. The third kind, and the
+   *  one that used to look exactly like the first — see
+   *  dsp-mirror-render.md#one-decider-says-which-kind-of-green-it-is. */
+  law_proven?: boolean;
   has_exit: boolean;
   exit_met: boolean;
   has_entry: boolean;
@@ -257,11 +261,29 @@ function svgEdges(canvas: CanvasData, byId: Map<string, CNode>, skip: Set<string
  *  ONE WORD FOR ONE IDEA. The trace graph marks a node standing on moved
  *  ground with the same word and the same style. A reader who learns the mark
  *  once reads it everywhere. */
+/** ONE PLACE DECIDES WHAT A GREEN MEANS. Three rules said it and three test
+ *  files enforced parts of them, so nobody could say which parts were covered.
+ *  see dsp-mirror-render.md#one-decider-says-which-kind-of-green-it-is */
+export function statePaint(
+  sid: string,
+  activeIds: Set<string>,
+  doneIds: Set<string>,
+  meta: Record<string, StateMeta>,
+): { cls: string; marks: string[] } {
+  const m = meta[sid];
+  // SUSPECT BEATS EVERY GREEN. A colour standing on moved ground is no longer
+  // earned, and the drawing says so before anybody trusts it.
+  if (activeIds.has(sid)) return { cls: "state active", marks: [] };
+  if (m?.suspect === true) return { cls: "state suspect", marks: [] };
+  if (!doneIds.has(sid)) return { cls: "state", marks: [] };
+  // A LAW-PROVEN GREEN SIGNED NOTHING. It rides the same green — a pass is a
+  // pass — and carries its own word, so the two are told apart at a glance.
+  const cls = m?.law_proven === true ? "state done proven" : "state done";
+  return { cls, marks: m?.blessed === true ? ["bless"] : [] };
+}
+
 function stateClass(sid: string, activeIds: Set<string>, doneIds: Set<string>, meta: Record<string, StateMeta>): string {
-  if (activeIds.has(sid)) return "state active";
-  if (meta[sid]?.suspect === true) return "state suspect";
-  if (doneIds.has(sid)) return "state done";
-  return "state";
+  return statePaint(sid, activeIds, doneIds, meta).cls;
 }
 
 function svgStateNode(
@@ -302,7 +324,7 @@ function svgStateNode(
   const sub = subLabel(meta[sid]?.subtitle);
   parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + (sub !== undefined ? -6 : 6)}" class="label">${esc(sid)}</text>`);
   if (sub !== undefined) parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + 24}" class="sublabel">${esc(sub)}</text>`);
-  if (meta[sid]?.blessed === true) {
+  if (statePaint(sid, activeIds, doneIds, meta).marks.includes("bless")) {
     parts.push(`<text x="${n.x + n.width - 14}" y="${n.y + 26}" class="bless-mark">👍</text>`);
   }
   parts.push("</g>");
@@ -549,7 +571,11 @@ function oneLine(s: string): string {
 /** see dsp-mirror-render.md#the-server-acting-on-its-own-behalf */
 const SELF_SERVED = new Set(["mirror_slow", "mirror_narration_now", "mirror_profile"]);
 
-function srcOf(tool: string): string {
+function srcOf(tool: string, actor?: string): string {
+  // THE RECORD WINS. A stamp is what the handler that served the call KNEW;
+  // the rule below is a guess from a string, kept only for records written
+  // before the stamp existed, because history cannot be restamped.
+  if (actor === "human" || actor === "agent" || actor === "ui") return actor;
   if (SELF_SERVED.has(tool)) return "ui";
   return tool.startsWith("mirror_") ? "human" : "agent";
 }
@@ -568,7 +594,7 @@ export function feedRows(
   const rows = records.slice(-500).map((rec) => ({
     ref: rec.ref,
     ts: rec.ts,
-    src: srcOf(rec.tool),
+    src: srcOf(rec.tool, rec.actor),
     // Updates are NARRATION (bold), whatever their op — only se_note
     // strays are retro notes (italic). Two kinds, never conflated.
     type:
@@ -632,21 +658,18 @@ const PALETTE_FALLBACK = ":root{--se-bg:#14171a;--se-fg:#d8dde2}";
 
 export function palette(root: string): string {
   try {
-    return readFileSync(join(root, "project", "deliverable", "brand", "palette.css"), "utf8");
+    return readFileSync(palettePath(root), "utf8");
   } catch {
     return PALETTE_FALLBACK;
   }
 }
 
-/** see dsp-mirror-render.md#the-look-files-are-configuration-not-code */
-const LOOK_FILES = ["palette.css", "trace.css"];
-
 export function look(root: string): string {
   return LOOK_FILES.map((f) => {
     try {
-      return readFileSync(join(root, "project", "deliverable", "brand", f), "utf8");
+      return readFileSync(lookPath(root, f), "utf8");
     } catch {
-      return f === "palette.css" ? PALETTE_FALLBACK : "";
+      return f === LOOK_FILES[0] ? PALETTE_FALLBACK : "";
     }
   }).join("\n");
 }
@@ -789,6 +812,7 @@ function drawingSets(
   // see dsp-mirror-render.md#only-record-backed-states-paint
   const paint = new Set(m.session.recordPaint(decl));
   const blessed = new Set(m.session.blessedGates(decl, paint));
+  const proven = new Set(m.session.lawProvenStates(decl));
   // see dsp-mirror-render.md#drift-is-computed-on-the-way-to-the-screen
   const suspect = new Set(m.session.suspectStates(decl));
   const subIds = new Set(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id));
@@ -806,6 +830,7 @@ function drawingSets(
     meta[s.id] = {
       suspect: suspect.has(s.id),
       ...(blessed.has(s.id) ? { blessed: true } : {}),
+      ...(proven.has(s.id) ? { law_proven: true } : {}),
       has_exit: s.exit !== undefined,
       exit_met: m.session.conditionMet(decl, s, "leave"),
       has_entry: s.entry !== undefined,

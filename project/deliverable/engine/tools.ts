@@ -641,7 +641,15 @@ export function buildServer(
       // the apply (a closed node). Spreading would drop one silently.
       const notes = [(result as Record<string, unknown>).corrected, corrected].filter((c): c is string => typeof c === "string");
       updateResult = { ...(result as unknown as Record<string, unknown>), ...(notes.length > 0 ? { corrected: notes.join(" · ") } : {}) };
-      log.append({ tool: "se_update", args: { via: tool, visit, ...op }, ok: true, outcome: "result", duration_ms: 0, response: result });
+      log.append({
+        tool: "se_update",
+        args: { via: tool, visit, ...op },
+        actor: "agent",
+        ok: true,
+        outcome: "result",
+        duration_ms: 0,
+        response: result,
+      });
       toll.paid();
     } catch (e) {
       if (!(e instanceof Rejection)) throw e;
@@ -650,6 +658,7 @@ export function buildServer(
       log.append({
         tool: "se_update",
         args: { via: tool, refused: true },
+        actor: "agent",
         ok: false,
         outcome: "rejected",
         duration_ms: 0,
@@ -774,6 +783,7 @@ export function buildServer(
     log.append({
       tool: rec.tool,
       args: rec.args,
+      actor: "agent",
       ok: rec.ok,
       outcome: rec.outcome,
       duration_ms: rec.duration_ms,

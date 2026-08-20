@@ -5,6 +5,8 @@ type: "[[function]]"
 cluster: the-account
 statement: put the whole standing position in front of a person, without them asking anybody
 satisfies:
+  - req-the-panel-s-paint-says-which-kind-of-green-it-is
+  - req-the-actor-is-recorded-where-the-call-is-served
   - req-surface-answers-in-one-second
   - req-survey-counts-only-open-records
   - req-panel-shows-the-machine

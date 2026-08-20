@@ -117,11 +117,19 @@ bug somewhere else.
   - A palette we maintain ourselves drifts, and drifts worst against a theme we do not control.
 - AN OUTSIDE CONVENTION CAN BEAT THE HOST. The route line stays BLUE, because every map application has already taught that meaning and no editor theme outweighs it.
   - Claiming an exception means naming the convention it rests on.
+- ONE MEANING, SEVERAL DEGREES: SEPARATE BY SHAPE, NOT BY SHADE.
+  - Where one meaning says more than one thing, keep the hue and change the STROKE, or add a MARK.
+  - Two shades of one colour ask the reader to compare hues from memory. The eye does not make that comparison reliably.
+  - The walk's own two blues were collapsed for this reason. The trace's proven-green is the same green, drawn dashed.
+- ONE DECIDER PER PAINT.
+  - Every rule deciding how one thing is drawn lives in ONE function, and every surface drawing that thing calls it.
+  - A second caller deciding a mark for itself is how one surface starts disagreeing with the next about what is proven.
 - COLOUR IS CONFIGURATION, NEVER CODE (owner ruling 2026-07-30).
   - One palette file holds every colour the product chooses.
   - A person edits that file. Changing a colour never means changing code.
   - The surfaces read it LIVE. An edit shows without reloading the machinery.
   - A colour written at the place it is used is a defect.
+  - WHERE THAT FILE LIVES IS ALSO NAMED ONCE. The path is code, and a second copy of it is the same defect one level up: two readers would look in different places and only one of them would say so.
 
 ## The reader keeps their place
 

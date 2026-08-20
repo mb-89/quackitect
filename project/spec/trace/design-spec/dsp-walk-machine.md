@@ -9,6 +9,7 @@ realizes:
   - if-record-store-to-walk-engine
 files:
   - project/deliverable/engine/session.ts
+  - project/deliverable/engine/sessionclaims.ts
   - project/deliverable/engine/machine.ts
   - project/deliverable/engine/pull.ts
   - project/deliverable/engine/route.ts
@@ -20,6 +21,15 @@ files:
   - project/deliverable/engine/sessionviews.ts
   - project/deliverable/engine/sessionscript.ts
 ---
+
+## Two files were unclaimed, and one of them is where green is decided
+
+`sessionclaims.ts` holds the claim readers — what stands, what is blessed,
+what a law proved, and what drift painted suspect. It was named by no design
+spec at all, so the sweep counted it as code nobody designed.
+
+IT BELONGS HERE BY ITS OWN IMPORTS AND BY ITS SUBJECT. The session recomputes
+position on every call, and what it recomputes is which claims still stand.
 
 ## Responsibility
 

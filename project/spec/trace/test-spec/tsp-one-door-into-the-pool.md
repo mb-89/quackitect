@@ -7,7 +7,7 @@ method: inspection
 verifies:
   - req-the-crossing-is-the-same-act-for-a-person-and-an-agent
 files:
-  - none — an inspection examines the code rather than running it, so the Checklist below is the whole definition. What it reads is the set of modules that write the pool, and naming a file here would freeze that set as the answer when the point is to re-derive it.
+  - "none — a checklist, read rather than run, because only reading proves a second door does not exist. What it reads is the set of modules that write the pool, and naming a file here would freeze that set as the answer when the point is to re-derive it."
 ---
 
 ## Scope

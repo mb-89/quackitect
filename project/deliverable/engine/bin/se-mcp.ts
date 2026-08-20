@@ -90,6 +90,12 @@ function evictMirrorPort(port: number): number[] {
   return [...new Set(killed)].sort((a, b) => a - b);
 }
 
+// see dsp-lane-door.md#the-entrypoint-answers-what-it-is-before-it-answers-anything-else
+if (argv.some((a) => a === "--version" || a === "-v" || a === "-V")) {
+  process.stdout.write(`${SE_VERSION}\n`);
+  process.exit(0);
+}
+
 if (argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
   process.stdout.write(`se — ONE help for the whole system.
 
@@ -158,6 +164,8 @@ ENGINE — read by the server (this file is where they are defined).
   --child        INTERNAL, never typed by hand. The shim spawns itself with
                  it to run the engine proper. SE_HOT_DISABLE=1 does the same
                  in one process.
+  --version      the version this build is, read from the manifest. One line,
+                 then it exits — no root, no port, no lane (-v, -V).
   --help         this text (-h, -?, -Help)
 
   RELOAD: se_reload (agent or mirror hand, at idle only) restarts the

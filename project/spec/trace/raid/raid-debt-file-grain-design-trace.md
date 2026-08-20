@@ -46,6 +46,10 @@ sweeps is unchanged and unreached.
 
 The trigger stands unchanged.
 
+## Sweep 2026-08-19, at i5's retro
+
+RESCHEDULED, trigger re-affirmed. The coarse sweep has NOT gone quiet: i5's trace-design pass found a live finding at file grain this iteration. i7 remains the seeded iteration that repays it.
+
 ## Swept 2026-08-19, at i9's onboard-retro: RE-ACCEPTED
 
 UNMOVED. The destination recorded at the last two sweeps, i7, still reads

@@ -182,6 +182,18 @@ THE PIN IS IN `package.json` under `engines.node`, and the verify step reads
 it rather than carrying a copy. A syntax error deep in a spawned script almost
 always means the runtime is below the pin.
 
+### You do not know which build you are on
+
+ASK THE ENTRYPOINT AND IT ANSWERS:
+
+    node project/deliverable/engine/bin/se-mcp.ts --version
+
+IT PRINTS THE VERSION AND EXITS 0, and it does that before it resolves a root,
+so it answers on a checkout too broken to start. Pass a root that does not
+exist and it still answers. On an unattended machine this is the first fact
+worth having, because every later report is about SOME build and a report that
+does not say which one is hearsay.
+
 ### Another machine may be walking the same record
 
 NOTHING STOPS IT, AND NOTHING IS MEANT TO. There is no claim, no lock and no
@@ -205,8 +217,38 @@ record and why you think so. Do not try to arbitrate it.
 - DO NOT EDIT `engines.node` TO MAKE VERIFY PASS. That turns a loud failure
   into a silent one.
 - DO NOT WORK AROUND A REFUSAL WITH ANOTHER LANE. Every refusal carries a
-  remedy; follow it.
-- DO NOT PUSH. Pushing is the person's act, here as everywhere.
+  remedy; follow it. The push below is the one exception, and it is an
+  exception the owner made in as many words.
+
+## You must push before you finish (owner ruling 2026-08-19)
+
+THIS CARD USED TO SAY "DO NOT PUSH. Pushing is the person's act, here as
+everywhere." THAT WAS WRONG HERE, and the owner struck it: "A cloud iteration
+needs to push back. This is part of it."
+
+THE REASON IS THE ONE THIS WHOLE CARD IS ABOUT. On a laptop an unpushed commit
+waits on a disk somebody owns, and the person pushes when they are ready.
+
+HERE THERE IS NO SUCH DISK. The box is reclaimed and the clone goes with it, so
+a commit that was never pushed did not happen. Work you do not push, you have
+not delivered — you have thrown away.
+
+SO PUSHING IS PART OF THE RUN, not something that follows it.
+
+- PUSH WHAT YOU COMMITTED, to the branch you were given. If you were given
+  none, push the branch you are on.
+- PUSH BEFORE YOU REPORT, and push again after any later commit. A report
+  describing commits nobody can fetch is worse than no report.
+- THE LANE STILL REFUSES IT. SE-C-003 refuses every push without exception, so
+  the push runs through the host's own git rather than through `se_git`, and
+  it is the one act of the run that is not in the call log. Say so when you
+  report.
+- WHAT DOES NOT CHANGE: no force, no history rewrite, and no push to a branch
+  you were not given. SE-C-002 stands untouched.
+
+THE GUIDANCE AND THE ENGINE NOW DISAGREE, deliberately and temporarily. The
+engine is the half that is wrong, and closing the gap is an iteration's work:
+[[raid-iss-a-cloud-run-must-push-and-the-lane-refuses-it]].
 
 ## What to leave behind
 

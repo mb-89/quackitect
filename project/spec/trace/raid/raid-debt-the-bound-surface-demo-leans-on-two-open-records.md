@@ -86,6 +86,10 @@ req-a-surface-resolves-to-what-it-shows was verified only by the dropped
 demonstration, and nothing verifies it now. That is the next surface-resolution
 work's question, not this row's.
 
+## Sweep 2026-08-19, at i5's retro
+
+RE-ACCEPTED. The build it waits on has not landed and no surface-resolution change happened in i5.
+
 ## Swept 2026-08-19, at i9's onboard-retro: SETTLED, AND ONE THREAD MOVES ON
 
 CONFIRMED SETTLED on the owner's ruling of 2026-08-17. The entry carries

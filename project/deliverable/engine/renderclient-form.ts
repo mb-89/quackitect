@@ -112,6 +112,13 @@ function sfOne(f, fl) {
     s += '<div class="meta">' + wikiText(fl.description || "", f.ref_paths || {}) + "</div>";
     if (hint.description) s += '<div class="meta">' + wikiText(hint.description, f.ref_paths || {}) + "</div>";
   }
+  // AN EMPTY LIVE SOURCE SAYS SO, IN THE FIELD — see
+  // dsp-evidence-forms.md#a-live-source-that-resolves-to-nothing-says-so. A
+  // field whose source resolved to nothing draws exactly like a field nobody
+  // wired up, and the reader has no way to tell the two apart.
+  (args.empty_sources || []).forEach(function (src) {
+    s += '<div class="meta" style="color:var(--se-warn)">no items — the live source ' + escText(src) + " resolves to none</div>";
+  });
   (fl.prefills || []).forEach(function (p, i) {
     s += '<div class="prefill"><div class="comment-text">prefill — unconfirmed:</div><div>' + escText(p) + '</div><button class="primary confirmpre" data-form="' + name + '" data-machine="' + escText(f.machine || "") + '" data-field="' + escText(fl.name) + '" data-index="' + i + '">confirm</button></div>';
   });

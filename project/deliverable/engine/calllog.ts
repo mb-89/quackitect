@@ -18,6 +18,8 @@ export interface CallRecord {
   duration_ms: number;
   /** Capped response summary — or the FULL payload for se_run. */
   response?: unknown;
+  /** see dsp-call-log.md#the-acting-role-is-stamped-where-the-call-is-served */
+  actor?: "human" | "agent" | "ui";
   se_version: string;
 }
 

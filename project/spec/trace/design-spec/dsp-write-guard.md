@@ -15,6 +15,12 @@ files:
   - project/deliverable/engine/tools.ts
 ---
 
+## One realizes edge was removed, and it is worth saying why
+
+`if-satellite-to-walk-engine` was named here and no longer exists. The core-and-satellite subsystem was cut from this branch — its code, its design spec and its elements are all gone — and the interface node was the last file left behind. i5 removed it and recorded the finding as raid-iss-a-cut-subsystem-left-its-interface-node-behind.
+
+WHAT THE GUARD STILL DOES IS UNCHANGED. The crossing this edge named was one caller reaching the guard, and the guard sits where it always did.
+
 ## Responsibility
 
 The check that stands between a write verb being called and anything

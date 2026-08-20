@@ -271,7 +271,10 @@ test("a finished sub-machine does NOT paint its container while the container's 
   const host = renderMirror({ session, root, lastPacket: undefined, mode: "manual" }, "machine", iteration);
   assert.doesNotMatch(
     host,
-    /data-detail="state:enumerate-space"[^>]*>[\s\S]{0,300}?class="state done"/,
+    // THE CLASS CAN CARRY A THIRD WORD. A law-proven green renders
+    // `class="state done proven"`, so matching the closing quote would turn a
+    // second kind of green into a false red here.
+    /data-detail="state:enumerate-space"[^>]*>[\s\S]{0,300}?class="state done/,
     "a container whose feeders are grey stays grey, however finished its interior",
   );
 
@@ -285,7 +288,7 @@ test("a finished sub-machine does NOT paint its container while the container's 
   const sub = renderMirror({ session, root, lastPacket: undefined, mode: "manual" }, "machine", "enumerate-space");
   assert.match(
     sub,
-    /data-detail="state:end"[^>]*>[\s\S]{0,300}?class="state done"/,
+    /data-detail="state:end"[^>]*>[\s\S]{0,300}?class="state done/,
     "its end is green — the machine completed on the record",
   );
 });

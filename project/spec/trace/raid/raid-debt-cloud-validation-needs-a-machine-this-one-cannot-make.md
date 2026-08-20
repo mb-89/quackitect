@@ -116,6 +116,10 @@ green on the machine that wrote it and red on every machine that is not it.
 RESCHEDULED, TRIGGER RE-AFFIRMED. The next cloud run is still the trigger, and
 the bar is unchanged: no step typed by hand.
 
+## Sweep 2026-08-19, at i5's retro
+
+RE-AFFIRMED as accepted, and the trigger has now fired repeatedly. i5 ran wholly on a cloud box. What it measured is worse than the entry assumed: the box loses its whole session record when it is reclaimed ([[raid-iss-an-ephemeral-box-loses-the-whole-record-of-a-session]]), so a cloud run cannot yet even hand its successor the account of what it found.
+
 ## Swept 2026-08-19, at i9's onboard-retro: RE-ACCEPTED
 
 STILL OWED AND KNOWINGLY CARRIED. Nothing in the tree records a cloud run after

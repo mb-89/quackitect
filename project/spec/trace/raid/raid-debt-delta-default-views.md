@@ -63,6 +63,10 @@ neither `answerStructuredQuery` nor `rankCandidateCouplings` has a lane door
 
 The trigger stands unchanged.
 
+## Sweep 2026-08-19, at i5's retro
+
+RE-ACCEPTED, and the trigger fired twice in one record. i5's validation gate served 24 must stories and 9 value props for a delta of five requirements, and observe-red served the whole non-test corpus. Both are this debt's exact cost. i5 minted [[raid-iss-a-gate-form-asks-the-standing-set-where-its-guidance-says-the-delta]] from the gate half before finding this entry; the two describe one repair and it should be built once.
+
 ## Swept 2026-08-19, at i9's onboard-retro: RESCHEDULED
 
 UNMOVED. `engine/stateform.ts` line 928 and line 943 still list the whole

@@ -30,7 +30,7 @@ or better.
 | Grep | `se_file_search` (state your intent — it is logged) |
 | ls | `se_file_list` |
 | Bash | `se_run` (output captured in full under the returned ref) |
-| git (via Bash) | `se_git` (allowlisted; push stays with the user) |
+| git (via Bash) | `se_git` (allowlisted; push stays with the user, EXCEPT on a cloud run — see cloud-runner.md) |
 | WebFetch | `se_web_fetch` |
 | WebSearch | ALLOWED natively — it runs on the provider's backend and cannot be self-hosted keylessly. Every query reaches the feed mechanically, through a hook. |
 | your own history | `se_log_query` |
@@ -39,6 +39,12 @@ PATHS ARE ROOT-RELATIVE TO THE PROJECT ROOT, which is the parent of the folder
 you have open. You open `project/`; a path you pass starts `project/`.
 
 Every call is logged raw to `.se/calls.jsonl`.
+
+THE RECORD CARRIES WHO ACTED. The acting role — a person, an agent, the
+surface itself — is stamped on the record where the call is SERVED, by the
+code that knows. Nothing downstream infers it from the tool name: a reader
+guessing the actor from which verb was called gets it wrong the moment one
+verb serves two callers, and it did.
 
 TWO DOORS LEAD OUTSIDE THE ROOT, and neither is a path. A past version of this
 repo is read at a committed ref — `se_file_read`, `se_file_search` and

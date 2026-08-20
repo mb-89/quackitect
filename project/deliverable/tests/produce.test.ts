@@ -25,7 +25,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { drivenBy, produceProject, produceVehicle } from "../engine/produce.ts";
+import { drivenBy, EXCLUDE_DIRS, produceProject, produceVehicle } from "../engine/produce.ts";
 import { inventory } from "../engine/update.ts";
 
 const REPO = fileURLToPath(new URL("../../../", import.meta.url));
@@ -118,10 +118,25 @@ describe("producing a vehicle", () => {
     // paths the source never had, so they passed against an engine with no
     // exclusion list at all. Fourth wrong-reason pass in this iteration, same
     // shape as the other three.
+    // WHAT TRAVELS IS THE CLAIM, AND IT IS CHECKED TWO WAYS. The exclusion has
+    // to be DECLARED, and nothing may have arrived. Both hold wherever this
+    // runs.
+    for (const generated of ["dist", "scratchpad", ".obsidian", ".vscode"]) {
+      assert.ok(EXCLUDE_DIRS.has(generated), `${generated} is named in the exclusion list`);
+    }
     for (const generated of ["dist", join("project", "scratchpad"), join("project", ".obsidian"), join("project", ".vscode")]) {
-      assert.ok(existsSync(join(REPO, generated)), `${generated} must exist in the source, or this case is checking nothing`);
       assert.ok(!existsSync(join(made.dest, generated)), `${generated} is generated or local, and must not travel`);
     }
+    // AND THE SOURCE-SIDE GUARD HOLDS FOR WHAT THE REPOSITORY ACTUALLY CARRIES.
+    // It used to demand all four, and three of them are generated or local by
+    // definition: `dist` is a release output, `scratchpad` is the workbench,
+    // and `.vscode` is an editor's own folder. None is on a fresh clone, so the
+    // guard failed for the one reason it existed to rule out — a path the
+    // source does not have. `.obsidian` IS tracked, so it still carries it.
+    assert.ok(
+      existsSync(join(REPO, "project", ".obsidian")),
+      "project/.obsidian is tracked, so a vehicle not carrying it is a real exclusion rather than an absent source",
+    );
   });
 
   test("the one file the arrival needs travels, and the generated one beside it does not", () => {

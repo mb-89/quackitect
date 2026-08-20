@@ -10,8 +10,8 @@ status: open
 impact: "Every record citing ref: main or ref: v2 stays unreadable, and the arrival degrades to the state i15 ran in. The arrival is built to carry on rather than stop, so the failure is quiet by design and the account is the only thing that reports it."
 breaks_how_badly: abrasive
 how_likely: conceivable
-probe: "holds here. i35 on 2026-08-17: git fetch --all --prune brought main, v2 and 26 it/* branches. The clone was shallow with one branch, so it had been deliberately narrowed rather than network-limited."
-probed: 2026-08-17
+probe: "holds here. i35 on 2026-08-17: git fetch --all --prune brought main, v2 and 26 it/* branches. The clone was shallow with one branch, so it had been deliberately narrowed rather than network-limited. HOLDS AGAIN on a second box, i5 on 2026-08-19: the arrival's fetch step reported main and v2 resolving locally, and git branch -a listed main, v2, v3 and their remote-tracking pairs. Two boxes, two families of the same result."
+probed: 2026-08-19
 source_refs:
   - uc-arrive-on-an-unattended-machine
   - i35-the-cloud-run-s-findings-land-the-fix-fi

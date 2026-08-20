@@ -62,6 +62,10 @@ question is whether the checklist reuses it, not whether it has to be invented.
 
 The trigger stands unchanged.
 
+## Sweep 2026-08-19, at i5's retro
+
+RE-ACCEPTED. The trigger is the owner's own review of the panel and it has not happened. i5 wrote seven checklist fields through forms and never needed the owed state, which is consistent with the entry's own reading: the mechanism works for an agent and the gap is the panel's render.
+
 ## Swept 2026-08-19, at i9's onboard-retro: RESCHEDULED
 
 TWO OF THE THREE CLAUSES ARE NOW FALSE. `engine/editors/checklist.ts` lines 25
