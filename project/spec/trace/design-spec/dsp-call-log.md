@@ -112,3 +112,47 @@ THE LAST SESSION, READ OFF THE LOG (owner ruling 2026-08-07).
 ONLY THE TAIL IS PARSED. Splitting a few megabytes of text is cheap;
  JSON.parse of every record is not, and this runs during boot. The same
  trade find() already makes one line at a time.
+
+## The walk position is stamped, not inferred
+
+EVERY RECORD SAYS WHERE THE WALK STOOD. `where` is written by the one observer
+in `tools.ts`, from `session.active()`, beside the actor and the host.
+
+IT IS THE SAME RULE AS THE ACTOR, one section up: stamped where the call is
+SERVED, by the code that knows. Nothing downstream infers it.
+
+## Why an inference was tried first, and why it failed
+
+THE FIRST DESIGN RECOVERED THE POSITION FROM EACH PULL'S ANSWER. Every `se_pull`
+response names its `where`, so walking the log in order and carrying that
+forward would partition every call between two pulls.
+
+IT ATTRIBUTED NOTHING. Measured on this project's own log, 2026-08-20:
+
+- 13,619 records, 2,298 of them pulls.
+- **0 records carry a position** — `CallRecord` had no such field.
+- The response does carry one, and the log CAPS every non-`se_run` response at
+  500 characters. **2,233 of 2,298 stored pull responses are not valid JSON.**
+  31 are recoverable.
+
+SO THE DERIVATION RETURNED AN EMPTY OBJECT over a full log, and its unit tests
+passed — because the fixture was written from the design document rather than
+from `CallRecord`, and invented a shape the product never emits.
+
+## What this costs, said plainly
+
+A LOG WRITTEN BEFORE THE STAMP CANNOT BE PARTITIONED AFTERWARDS. Carry-forward
+from the last stamped record is what a mixed log gets, and everything before the
+first stamp is counted under an explicit unattributed bucket rather than
+dropped — a total that silently omits work reads as a cheaper walk than
+happened.
+
+THE HISTORICAL LOG IS THEREFORE NOT A BASELINE. The first benchmark runs measure
+only themselves.
+
+## The general rule this is an instance of
+
+A FACT THE ENGINE HOLDS AT THE MOMENT OF A CALL IS CHEAPER TO STAMP THAN TO
+RECONSTRUCT. The trail is capped on purpose — it is a trail, not an archive —
+so anything a later reader must partition by has to be a FIELD, never something
+parsed back out of a summary.

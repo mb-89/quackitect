@@ -1612,3 +1612,7 @@
 {"ts":"2026-08-20T11:21:28.809Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d849","brief":"running the battery on the fixed tree"}
 {"ts":"2026-08-20T11:21:56.111Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d850","brief":"running the battery on the fixed tree"}
 {"ts":"2026-08-20T11:22:07.160Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d851","brief":"committing the verification fixes"}
+{"ts":"2026-08-20T11:23:17.974Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d852","brief":"the assumption is superseded, and its premise was wrong"}
+{"ts":"2026-08-20T11:23:39.861Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d853","brief":"recording why the position is stamped rather than inferred"}
+{"ts":"2026-08-20T11:23:55.379Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d854","brief":"the cage the parent is in does not reach the child"}
+{"ts":"2026-08-20T11:24:03.432Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d855","brief":"committing the register and design updates"}
