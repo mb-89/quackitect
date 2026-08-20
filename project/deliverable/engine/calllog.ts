@@ -65,8 +65,17 @@ export interface CallRecord {
   named_driver?: string;
   /** WHY A WEAKER HAND WALKED IT — req-a-weaker-driver-than-named-owes-a-recorded-reason. */
   weaker_reason?: string | null;
+  /** THE CALLER'S OWN WORD THAT A WEAKER HAND THAN NAMED WALKED THIS STEP.
+   *  Not computable here: `named_driver` is a rung and `answered_by` is a
+   *  model name, and no mapping between them exists in this tree. */
+  went_weaker?: boolean;
   /** THE MARK THAT A REASON WAS OWED AND NOT GIVEN. Marked rather than
-   *  refused: refusing would be a different requirement. */
+   *  refused: refusing would be a different requirement.
+   *
+   *  IT FIRES ON A WEAKER WALK, NOT ON A NAMED ONE. It used to fire whenever
+   *  a driver was named and no reason came with it, which marked a step walked
+   *  at or above its named strength identically to one that went below — and
+   *  the lane asks for `named_driver` on every call. */
   unreasoned?: boolean;
   se_version: string;
 }
@@ -155,7 +164,7 @@ export class CallLog {
       se_version: SE_VERSION,
       ...entry,
       claimed: [...SELF_REPORTED],
-      ...(entry.named_driver !== undefined && entry.weaker_reason === undefined ? { weaker_reason: null, unreasoned: true } : {}),
+      ...(entry.went_weaker === true && entry.weaker_reason === undefined ? { weaker_reason: null, unreasoned: true } : {}),
     };
     mkdirSync(dirname(this.path), { recursive: true });
     appendFileSync(this.path, `${JSON.stringify(rec)}\n`, "utf8");

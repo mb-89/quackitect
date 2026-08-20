@@ -25,6 +25,8 @@
 // falls back to "(none)" for a key it cannot reach. This iteration once read
 // that as evidence of an absence and it is not.
 import { strict as assert } from "node:assert";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { test } from "node:test";
 import type { CallPart } from "../engine/calllog.ts";
 import { CallLog } from "../engine/calllog.ts";
@@ -120,15 +122,36 @@ test("a step walked below its named strength carries the stated reason", () => {
     answered_by: "weak",
     state: "s",
     part: "walker",
-    named_driver: "C3",
+    named_driver: "author",
+    went_weaker: true,
     weaker_reason: "the strong hand was unreachable",
   });
   assert.equal((rec as unknown as Record<string, unknown>).weaker_reason, "the strong hand was unreachable");
+  assert.equal((rec as unknown as Record<string, unknown>).unreasoned, undefined, "a reason was given, so nothing is owed");
+});
+
+test("a step walked at or above its named strength is not marked", () => {
+  const log = logIn();
+  // FOUND BY A FRESH-EYES TESTER: the mark used to fire on any named driver
+  // with no reason, and the lane asks for `named_driver` on EVERY call while
+  // walking a rated step. So nearly every record was `unreasoned`, and a mark
+  // that fires on nearly everything counts nothing.
+  const rec = log.append({ ...base, actor: "agent", answered_by: "strong", state: "s", part: "walker", named_driver: "author" });
+  assert.equal((rec as unknown as Record<string, unknown>).unreasoned, undefined, "a stronger hand than named needs no argument");
+  assert.equal((rec as unknown as Record<string, unknown>).weaker_reason, undefined, "and owes no sentence");
 });
 
 test("and an absent reason is marked rather than refused", () => {
   const log = logIn();
-  const rec = log.append({ ...base, actor: "agent", answered_by: "weak", state: "s", part: "walker", named_driver: "C3" });
+  const rec = log.append({
+    ...base,
+    actor: "agent",
+    answered_by: "weak",
+    state: "s",
+    part: "walker",
+    named_driver: "author",
+    went_weaker: true,
+  });
   assert.equal((rec as unknown as Record<string, unknown>).weaker_reason, null, "a refusal here would be a different requirement");
   assert.equal((rec as unknown as Record<string, unknown>).unreasoned, true, "the mark says a reason was owed and not given");
 });
@@ -218,7 +241,7 @@ test("a caller can state the named strength and the reason it went weaker", asyn
   }
 });
 
-test("a reason carried without a named strength is dropped, not recorded", () => {
+test("a reason carried without a named strength is kept, and marks nothing", () => {
   const log = logIn();
   const rec = log.append({
     ...base,
@@ -234,4 +257,94 @@ test("a reason carried without a named strength is dropped, not recorded", () =>
     "no driver was ever named",
     "the field is kept as written — what is refused is letting it stand IN PLACE OF a named strength",
   );
+});
+
+// ── the lane, not just the log ────────────────────────────────────────────
+//
+// FOUND BY A FRESH-EYES TESTER, by mutation. `whichHand` in engine/tools.ts is
+// the only place a real call's coordinates are taken from the caller, and
+// replacing its whole return with constants left the entire battery green:
+// every case above tests `CallLog.append` directly or the tool SCHEMA
+// separately, and nothing tested the join between them.
+//
+// A COORDINATE THAT ONLY WORKS AT THE LOG IS A COORDINATE THAT DOES NOT WORK.
+
+async function pullThenLastRecord(root: string, args: Record<string, unknown>): Promise<Record<string, unknown> | undefined> {
+  const { buildServer } = await import("../engine/tools.ts");
+  const server = buildServer(root);
+  await server.handle({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name: "se_pull", arguments: args } });
+  const path = join(seDir(root), "calls.jsonl");
+  if (!existsSync(path)) return undefined;
+  const lines = readFileSync(path, "utf8").trim().split("\n").filter(Boolean);
+  const last = lines.at(-1);
+  return last === undefined ? undefined : (JSON.parse(last) as Record<string, unknown>);
+}
+
+test("a real lane call carries the coordinates its caller declared", async () => {
+  const rec = await pullThenLastRecord(freshRoot(), {
+    as: "guide",
+    relayed_by: "walker",
+    answered_by: "a-strong-model",
+    named_driver: "frame",
+    went_weaker: true,
+    weaker_reason: "the frame hand was busy",
+  });
+  assert.ok(rec !== undefined, "the call must reach the log for anything else to mean anything");
+  assert.equal(rec.part, "guide", "the part comes from the caller, through the dispatcher, onto the record");
+  assert.equal(rec.relayed_by, "walker");
+  assert.equal(rec.answered_by, "a-strong-model");
+  assert.equal(rec.named_driver, "frame");
+  assert.equal(rec.went_weaker, true, "and the caller's own word that it went weaker");
+  assert.equal(rec.weaker_reason, "the frame hand was busy");
+  assert.equal(rec.unreasoned, undefined, "a reason was given");
+  assert.ok(typeof rec.state === "string" && rec.state !== "", "and the state is the server's own observation");
+});
+
+test("a lane call that declares nothing is recorded as the walker's, on an unreported model", async () => {
+  const rec = await pullThenLastRecord(freshRoot(), {});
+  assert.ok(rec !== undefined);
+  assert.equal(rec.part, "walker", "the hand holding the session IS the walker by definition");
+  assert.equal(rec.answered_by, "unreported", "a declared absence, never a missing field");
+});
+
+test("a hand outside the vocabulary refuses the CALL and still logs it", async () => {
+  const { buildServer } = await import("../engine/tools.ts");
+  const root = freshRoot();
+  const server = buildServer(root);
+  const res = await server.handle({
+    jsonrpc: "2.0",
+    id: 1,
+    method: "tools/call",
+    params: { name: "se_pull", arguments: { as: "sorcerer" } },
+  });
+  const r = res?.result as { isError?: boolean; content: { text: string }[] };
+  assert.equal(r.isError, true, "the call is refused, typed, like any other bad argument");
+  assert.ok(r.content[0].text.includes("sorcerer"), "and the refusal names what it got");
+  const lines = readFileSync(join(seDir(root), "calls.jsonl"), "utf8")
+    .trim()
+    .split("\n")
+    .filter(Boolean);
+  assert.equal(lines.length, 1, "a refused call is a record — losing it is what this case exists to stop");
+  assert.equal((JSON.parse(lines[0]) as { ok: boolean }).ok, false);
+});
+
+test("a relayer that names its own part refuses the call", async () => {
+  const { buildServer } = await import("../engine/tools.ts");
+  const server = buildServer(freshRoot());
+  const res = await server.handle({
+    jsonrpc: "2.0",
+    id: 1,
+    method: "tools/call",
+    params: { name: "se_pull", arguments: { as: "guide", relayed_by: "guide" } },
+  });
+  const refused = res?.result as { isError?: boolean } | undefined;
+  assert.equal(refused?.isError, true, "a record where the author and the relayer agree is a contradiction");
+});
+
+test("a weaker walk through the lane with no reason is marked, and one at strength is not", async () => {
+  const marked = await pullThenLastRecord(freshRoot(), { named_driver: "frame", went_weaker: true });
+  assert.equal(marked?.unreasoned, true, "the sentence was owed and not given");
+  assert.equal(marked?.weaker_reason, null);
+  const plain = await pullThenLastRecord(freshRoot(), { named_driver: "frame" });
+  assert.equal(plain?.unreasoned, undefined, "the lane asks for named_driver on every call — that alone owes nothing");
 });

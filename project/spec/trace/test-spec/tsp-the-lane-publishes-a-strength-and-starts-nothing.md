@@ -7,8 +7,18 @@ method: inspection
 verifies:
   - req-the-machine-names-a-driver-and-starts-nothing
 files:
-  - project/spec/trace/element/el-sizing.md
+  - project/deliverable/tests/sizing-on-the-pull.test.ts
 ---
+
+## The claimed file was a trace node, corrected 2026-08-20
+
+THIS SPEC'S `files:` NAMED `el-sizing.md`, WHICH IS AN ELEMENT NODE. `files:`
+names what REALIZES the spec, and a trace node realizes nothing — it is the
+design the spec is about. A fresh-eyes tester also found
+`tests/sizing-on-the-pull.test.ts` named by no spec at all, which is the same
+defect from the other side: an unclaimed file is the dead-code view's business.
+
+BOTH ARE THE SAME PAIRING and it is made here.
 
 ## Scope
 

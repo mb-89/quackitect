@@ -13,9 +13,9 @@ import { strict as assert } from "node:assert";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { demandsFor } from "../engine/iterations.ts";
+import { demandsFor, iterationDrift, itPinRel, itSeed, pinIteration } from "../engine/iterations.ts";
 import { type ChangeColumn, matrixDir, readRigorMatrix } from "../engine/rigor-matrix.ts";
-import { freshRoot } from "./helpers.ts";
+import { freshRoot, gitInit } from "./helpers.ts";
 
 const SIZE: ChangeColumn = "major";
 
@@ -88,4 +88,49 @@ test("a change the ledger IS about still moves the digest", () => {
     before,
     "without this the three cases above pass on a digest that never moves at all",
   );
+});
+
+// ── the payoff, end to end ────────────────────────────────────────────────
+//
+// FOUND MISSING BY A FRESH-EYES TESTER. The spec owes "a standing claim
+// survives a rating edit" and this file held four unit cases, none of which
+// signed a claim or touched a pin. The three guards above are about the
+// digest; this one is about what the digest is FOR.
+
+test("a standing claim survives a rating edit", () => {
+  const root = freshRoot();
+  gitInit(root);
+  const it = itSeed(root, "ledger", "a rating moves and nothing reopens", ["e13"]);
+  pinIteration(root, it, SIZE);
+  assert.deepEqual(iterationDrift(root, it), [], "a fresh pin has drifted from nothing");
+
+  const { file } = anAppliedRow(root);
+  setComplexity(root, file, "C0", "R0");
+  assert.deepEqual(iterationDrift(root, it), [], "declaring a complexity reopens nothing");
+
+  const abs = join(matrixDir(root), "rows", file);
+  writeFileSync(abs, readFileSync(abs, "utf8").replace(`${SIZE}_complexity: C0/R0`, `${SIZE}_complexity: C4/R4`), "utf8");
+  assert.deepEqual(
+    iterationDrift(root, it),
+    [],
+    "and changing it reopens nothing either — three records stand open with pinned demands right now",
+  );
+});
+
+test("the drift check is not simply mute", () => {
+  const root = freshRoot();
+  gitInit(root);
+  const it = itSeed(root, "ledger-control", "the drift check is not simply mute", ["e13"]);
+  pinIteration(root, it, SIZE);
+  // THE PIN IS REWRITTEN AS IF IT HAD BEEN TAKEN WHEN THE STEP ASKED SOMETHING
+  // ELSE, which is how tests/drift.test.ts proves the same thing. Without a
+  // control the case above passes on a check that never reports anything.
+  const pinAbs = join(it.path, itPinRel(it.id));
+  const pin = JSON.parse(readFileSync(pinAbs, "utf8")) as { demands: Record<string, { evidence: string }>; rigor_matrix_hash: string };
+  const victim = Object.keys(pin.demands).sort()[0];
+  assert.ok(victim !== undefined, "the pin must carry demands for this to mean anything");
+  pin.demands[victim].evidence = JSON.stringify([{ name: "what_it_used_to_ask" }]);
+  pin.rigor_matrix_hash = "0000stalehash";
+  writeFileSync(pinAbs, JSON.stringify(pin, null, 2), "utf8");
+  assert.deepEqual(iterationDrift(root, it), [victim], "a demand that really moved is reported");
 });

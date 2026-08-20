@@ -564,12 +564,24 @@ export class Session {
    *  req-an-unmatched-rung-names-itself-and-publishes-no-driver forbids. */
   private strengthNeeded(): Record<string, unknown> {
     try {
-      const m = this.machine;
-      const id = this.active()[0];
-      const step = m?.states.find((s) => s.id === id);
-      if (step === undefined || step.submachine !== undefined) return {};
+      // THE LEAF, NOT THE OUTER MACHINE. `active()` reports a nested id like
+      // `iterations/i1/onboard-retro`, and the compiled iteration's own states
+      // are named bare. Looking the nested id up in the outer machine found
+      // nothing and published nothing — silently, because the catch below
+      // treats an unrated step as the ordinary case.
+      //
+      // FOUND BY A FRESH-EYES TESTER AT i38's verification: deleting this
+      // whole call changed no test, because no test ever stood the walk on a
+      // rated step. The lookup had never worked.
+      const { machine, ids } = this.leaves();
+      const id = ids[0];
+      if (id === undefined) return {};
+      const step = this.state(machine, id);
+      if (process.env.SE_DBG_SIZING === "1") console.error("DBG", machine.id, id, Object.keys(step).join(","));
+      if (step.submachine !== undefined) return {};
       return { needs: publish(difficultyOf(step)) };
-    } catch {
+    } catch (e) {
+      if (process.env.SE_DBG_SIZING === "1") console.error("DBG-THREW", String((e as Error).message).slice(0, 120));
       // AN UNRATED STEP IS THE COMMON CASE TODAY and it is not an error. The
       // block refuses rather than guessing, and the pull publishes nothing.
       return {};
@@ -3692,6 +3704,7 @@ export class Session {
       ...(this._emergency ? { emergency: true } : {}),
       power: this.power,
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
+      ...this.strengthNeeded(),
       // WHERE THIS IS HEADED. Carried on every packet so neither hand has
       // to ask, and so a walk that drifts off the way is visibly off it.
       target: this._target,
@@ -4084,6 +4097,7 @@ export class Session {
       ...(this._emergency ? { emergency: true } : {}),
       power: this.power,
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
+      ...this.strengthNeeded(),
       legal_tools: this._emergency ? "all" : all ? "all" : [...ALWAYS_LEGAL, ...tools],
       history: this.instance.history.slice(-10),
     };

@@ -9,10 +9,11 @@ import { strict as assert } from "node:assert";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
+import { itSeed, itShortId, pinIteration } from "../engine/iterations.ts";
 import { CHANGE_COLUMNS, compileColumn, matrixDir, readRigorMatrix } from "../engine/rigor-matrix.ts";
 import { Session } from "../engine/session.ts";
 import { type Difficulty, difficultyOf, publish, RUNGS } from "../engine/sizing.ts";
-import { freshRoot, laneSources, pullTo } from "./helpers.ts";
+import { checkDocs, freshRoot, gitInit, laneSources, pullTo } from "./helpers.ts";
 
 function rateEverything(root: string): void {
   const matrix = readRigorMatrix(root);
@@ -84,4 +85,42 @@ test("nothing on the sizing path starts a process", () => {
     assert.ok(!src.includes(forbidden), `engine/sizing.ts carries ${forbidden} — the lane does not start processes`);
   }
   assert.ok(laneSources().length > 0, "the lane must have sources for the inspection to mean anything");
+});
+
+// ── the field is on a LIVE pull, not only in an envelope we assembled ─────
+//
+// FOUND BY A FRESH-EYES TESTER, by mutation: deleting `...this.strengthNeeded()`
+// from the pull's head produced ZERO additional failures across the whole
+// battery. The only case touching `body.needs` asserted it ABSENT, and the
+// positive case built the envelope itself with compileColumn and publish — so
+// it could not see the field go away.
+//
+// A CHECK THAT CANNOT SEE ITS MECHANISM REMOVED IS NOT CHECKING IT.
+
+test("a live pull inside a rated, pinned iteration carries the published strength", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  rateEverything(root);
+  // THE COLUMN MUST BE PINNED FIRST, and that is the design rather than
+  // fixture noise. A difficulty is declared per CHANGE-SIZE column, and an
+  // iteration before its kickoff gate has no change size — so its two M0
+  // steps compile through `compileM0`, which has no column to read a cell
+  // from. There is nothing to publish there and nothing is published.
+  const it = itSeed(root, "sizing", "a walk that knows how hard its steps are", ["e13"]);
+  pinIteration(root, it, "major");
+  // THE SHORT ID IS WHAT THE DRAWING OFFERS — `i1`, not `i1-sizing`.
+  const sid = itShortId(it.id);
+  const session = new Session(root);
+  for (let i = 0; i < 2; i++) await session.advance();
+  checkDocs(session);
+  for (let i = 0; i < 3; i++) await session.advance();
+  session.setAutonomy(1);
+  await session.advance("iterations");
+  await session.advance(sid);
+  await pullTo(session, `iterations/${sid}/onboard-retro`);
+  const body = (await session.pull({}, "agent")) as Record<string, unknown>;
+  const needs = body.needs as { rung?: string; pair?: Difficulty } | undefined;
+  assert.ok(needs !== undefined, "the head consults the sizing block — delete that line and this is the case that goes red");
+  assert.deepEqual(needs.pair, { judgement: "C3", reading: "R1" }, "the input goes out beside the decision");
+  assert.ok(RUNGS.includes(needs.rung as (typeof RUNGS)[number]), `${needs.rung} is not in the published vocabulary`);
 });

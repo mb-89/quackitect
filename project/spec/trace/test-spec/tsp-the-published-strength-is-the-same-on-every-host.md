@@ -7,7 +7,8 @@ method: inspection
 verifies:
   - req-one-model-list-is-read-live-from-the-repository
 files:
-  - project/spec/trace/element/el-sizing.md
+  - project/deliverable/engine/sizing.ts
+  - project/deliverable/engine/rigor-matrix.ts
 ---
 
 ## Scope

@@ -616,6 +616,11 @@ export function buildServer(
     description:
       "THE STRENGTH THIS STEP WAS TOLD IT NEEDS, as the machine published it. Send it back on the calls you make while walking that step, so the record can compare what was named against what answered without reconstructing either side.\n\nSENDING IT ARMS THE ASYMMETRY. A record carrying a named driver and no reason takes a mark saying a reason was owed and not given.",
   };
+  const WENT_WEAKER_PROP = {
+    type: "boolean",
+    description:
+      "SAY SO WHEN A WEAKER HAND THAN NAMED WALKED THIS STEP. Nothing here can work it out: `named_driver` is a rung and `answered_by` is a model name, and no mapping between them exists in this tree.\n\nSENDING IT WITHOUT `weaker_reason` MARKS THE RECORD `unreasoned`. A stronger hand than named needs no argument, so leaving this off is the ordinary case and costs nothing.",
+  };
   const WEAKER_REASON_PROP = {
     type: "string",
     description:
@@ -634,6 +639,7 @@ export function buildServer(
     props.answered_by = ANSWERED_BY_PROP;
     props.named_driver = NAMED_DRIVER_PROP;
     props.weaker_reason = WEAKER_REASON_PROP;
+    props.went_weaker = WENT_WEAKER_PROP;
   }
   const server = new McpServer(
     { name: "se-mcp", version: SE_VERSION },
@@ -796,6 +802,47 @@ export function buildServer(
       },
     ]),
   );
+  // THE HAND A CALLER DECLARES IS CHECKED HERE AND NOT AT THE LOG.
+  //
+  // WHY IT MOVED. `CallLog.append` refuses a part outside the closed
+  // vocabulary, which is right — but the dispatch's log hook catches and
+  // discards whatever the append throws, because a log hook must never break
+  // dispatch. So a call carrying `as: "sorcerer"` was ANSWERED NORMALLY and
+  // never reached calls.jsonl. Refusing the CALL is correct; losing the RECORD
+  // is not, and req-every-call-logged is unconditional.
+  //
+  // FOUND BY A FRESH-EYES TESTER AT i38's verification, by probing the lane
+  // rather than by reading the check — the case that was supposed to hold this
+  // asserted on `append` directly, and the property is false one layer up.
+  server.addGuard((tool, args) => {
+    for (const key of ["as", "relayed_by"] as const) {
+      const v = args[key];
+      if (v === undefined) continue;
+      if (typeof v !== "string" || !PART_WORDS.has(v)) {
+        throw new Rejection({
+          clause: CLAUSES.UNKNOWN_ARGS,
+          expected: `${key} is one of: ${[...PART_WORDS].join(", ")}`,
+          got: `${key}: ${JSON.stringify(v)}`,
+          remedy: {
+            tool,
+            args: { [key]: "walker" },
+            note: "omit it and the record says `walker`, which is right for the hand holding the session",
+          },
+          source: "engine/tools.ts which-hand",
+        });
+      }
+    }
+    if (args.relayed_by !== undefined && args.relayed_by === args.as) {
+      throw new Rejection({
+        clause: CLAUSES.UNKNOWN_ARGS,
+        expected: "relayed_by to name a DIFFERENT part from `as` — it says who FILED work somebody else authored",
+        got: `both are ${JSON.stringify(args.as)}`,
+        remedy: { tool, args: {}, note: "a guide filing its own work needs neither key" },
+        source: "engine/tools.ts which-hand",
+      });
+    }
+  });
+
   server.addGuard((tool, args) => {
     const shape = shapes.get(tool);
     if (shape === undefined) return;
@@ -861,24 +908,56 @@ export function buildServer(
    *  RELAYED WORK NAMES ITS AUTHOR AND ITS RELAYER. Where the walker files work
    *  a guide authored, `part` is the guide's and `relayed_by` is the walker's —
    *  raid-risk-a-relayed-judgment-is-filed-under-the-hand-that-relayed-it. */
+  const PART_WORDS: ReadonlySet<string> = new Set<CallPart>(["owner", "walker", "guide", "reviewer", "surface"]);
+
   function whichHand(
     session: Session,
     args: unknown,
-  ): { state: string; part: CallPart; answered_by: string; relayed_by?: CallPart; named_driver?: string; weaker_reason?: string } {
+  ): {
+    state: string;
+    part: CallPart;
+    answered_by: string;
+    relayed_by?: CallPart;
+    named_driver?: string;
+    went_weaker?: boolean;
+    weaker_reason?: string;
+  } {
     const a = (args ?? {}) as Record<string, unknown>;
-    const declared = typeof a.as === "string" ? (a.as as CallPart) : undefined;
-    const relayed = typeof a.relayed_by === "string" ? (a.relayed_by as CallPart) : undefined;
+    // THE LOG NEVER REFUSES A RECORD IT IS ASKED TO WRITE. The guard above has
+    // already refused any call carrying a part outside the vocabulary — and a
+    // REFUSED call is still observed, so this runs for it too. Passing the bad
+    // value through to `append` would throw inside the log hook, the dispatch
+    // would swallow it, and the refusal record would vanish. Losing the record
+    // of a refusal is the same defect as losing the record of a call.
+    //
+    // SO AN UNKNOWN VALUE FALLS BACK, AND THE CLAIM IS STILL VISIBLE: the raw
+    // arguments ride the same record, so a reader sees both what was declared
+    // and what the record settled on.
+    const word = (v: unknown): CallPart | undefined => (typeof v === "string" && PART_WORDS.has(v) ? (v as CallPart) : undefined);
+    const declared = word(a.as);
+    const relayed = word(a.relayed_by) === declared ? undefined : word(a.relayed_by);
     const named = typeof a.named_driver === "string" && a.named_driver !== "" ? a.named_driver : undefined;
     // THE REASON ONLY MEANS ANYTHING BESIDE A NAMED STRENGTH. Carried alone it
     // is a sentence about nothing, and it would suppress the `unreasoned` mark
     // on a record that never named a driver to be weaker than.
     const why = named !== undefined && typeof a.weaker_reason === "string" && a.weaker_reason !== "" ? a.weaker_reason : undefined;
+    // THE MARK IS ABOUT GOING WEAKER, AND ONLY THE CALLER KNOWS. `named_driver`
+    // is a rung and `answered_by` is a model name; nothing in this tree maps
+    // one to the other, so "weaker" is not computable here.
+    //
+    // IT USED TO FIRE ON ANY NAMED DRIVER WITH NO REASON, which marked a step
+    // walked at or above its named strength identically to one that went below
+    // it — and the schema tells callers to send `named_driver` on every call.
+    // A mark that fires on nearly everything counts nothing. Found by a
+    // fresh-eyes tester at i38's verification.
+    const weaker = named !== undefined && a.went_weaker === true;
     return {
       state: session.currentState(),
       part: declared ?? "walker",
       answered_by: typeof a.answered_by === "string" ? a.answered_by : UNREPORTED,
       ...(relayed !== undefined ? { relayed_by: relayed } : {}),
       ...(named !== undefined ? { named_driver: named } : {}),
+      ...(weaker ? { went_weaker: true } : {}),
       ...(why !== undefined ? { weaker_reason: why } : {}),
     };
   }

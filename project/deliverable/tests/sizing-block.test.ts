@@ -195,10 +195,23 @@ test("a unit is no weaker than its hardest step, and the spread rides along", as
   ];
   const out = sizeUnit(steps);
   assert.deepEqual(out.difficulty, { judgement: "C4", reading: "R3" }, "the unit takes the maximum on each figure");
+  // THE NAMES WERE ALL THIS ASSERTED, AND A TESTER PROVED IT EMPTY: rewriting
+  // sizeUnit so every entry carried the unit maximum left this file at 12 pass.
+  // The spread's whole point is HOW FAR each step sits below the answer, and
+  // that is the half a name cannot carry.
   assert.deepEqual(
-    out.spread.map((s) => s.step).sort(),
-    ["easy", "hard", "middling"],
-    "how far each step sits below the unit answer stays readable",
+    [...out.spread].sort((a, b) => a.step.localeCompare(b.step)),
+    [
+      { step: "easy", difficulty: { judgement: "C1", reading: "R0" } },
+      { step: "hard", difficulty: { judgement: "C4", reading: "R1" } },
+      { step: "middling", difficulty: { judgement: "C2", reading: "R3" } },
+    ],
+    "each entry carries its OWN difficulty — a spread of copies of the maximum says nothing",
+  );
+  assert.notDeepEqual(
+    out.spread.map((s) => s.difficulty),
+    out.spread.map(() => out.difficulty),
+    "and at least one of them differs from the unit answer, or the spread is decoration",
   );
 });
 
@@ -210,11 +223,19 @@ test("an unmatched pair returns a value naming itself and no driver", async () =
 });
 
 test("an unmatched pair never falls back", async () => {
-  const { rungFor } = await sizing();
-  const placed = rungFor({ judgement: "C2", reading: "R2" });
+  const { rungFor, RUNGS: ladder } = (await sizing()) as unknown as { rungFor: (d: Difficulty) => { rung?: string }; RUNGS: string[] };
+  // A TESTER FOUND BOTH ASSERTIONS REDUCED TO `rung === undefined`, which the
+  // case above already holds. What "never falls back" actually forbids is
+  // returning ANY rung — the last one answered, the strongest, or the one a
+  // neighbouring pair would get.
+  const answered = rungFor({ judgement: "C2", reading: "R2" }).rung;
+  assert.ok(answered !== undefined, "the ladder must place an ordinary pair for this to mean anything");
   const out = rungFor({ judgement: "C9", reading: "R9" });
-  assert.notEqual(out.rung, placed.rung, "a silent fallback is indistinguishable from a working lookup");
-  assert.equal(out.rung, undefined, "and it is not the strongest entry either");
+  assert.equal(out.rung, undefined, "no driver at all");
+  assert.ok(!ladder.includes(String(out.rung)), "and nothing from the ladder — not the last answer, not the strongest");
+  const again = rungFor({ judgement: "C0", reading: "R0" }).rung;
+  assert.equal(rungFor({ judgement: "C9", reading: "R9" }).rung, undefined, "and the miss does not depend on what was asked before it");
+  assert.notEqual(again, answered, "the two ordinary pairs must differ, or the ladder is a constant");
 });
 
 test("the compile carries the cell's difficulty onto the step", () => {
@@ -236,4 +257,24 @@ test("a step whose cell declared none carries none, rather than a default", () =
   const decl = compileColumn(readRigorMatrix(root), SIZE);
   const withOne = decl.states.filter((s) => s.complexity !== undefined);
   assert.deepEqual(withOne, [], "nothing is rated in this fixture, so nothing may claim a rating");
+});
+
+test("the unmatched branch guards a coupling between three ladders", async () => {
+  // FOUND BY A FRESH-EYES TESTER: the loader refuses any cell value outside
+  // the two figure vocabularies, and the loader is the ONLY source of a step's
+  // complexity — so the unmatched branch cannot be reached from any input the
+  // system can produce. The case that exercises it uses a value the loader
+  // would have rejected.
+  //
+  // THAT DOES NOT MAKE THE BRANCH DEAD. It guards a COUPLING: the rung a pair
+  // maps to is `RUNGS[max(judgementIndex, readingIndex)]`, so the three lists
+  // must stay the same length. Let one figure ladder grow past `RUNGS` and
+  // every pair at the new top becomes unmatched — which is the branch working.
+  //
+  // SO THE HONEST CHECK IS ON THE COUPLING, and the requirement is discharged
+  // at the loader for every input a rating can take.
+  const { RUNGS: ladder } = (await sizing()) as unknown as { RUNGS: string[] };
+  const { JUDGEMENT_RUNGS: j, READING_RUNGS: r } = await import("../engine/rigor-matrix.ts");
+  assert.equal(j.length, ladder.length, "a judgement figure with no rung above it would publish an unmatched value for a legal cell");
+  assert.equal(r.length, ladder.length, "and so would a reading figure");
 });
