@@ -115,3 +115,18 @@ The trigger stands unchanged.
 ## Sweep 2026-08-19, at i5's retro
 
 RE-ACCEPTED. Neither trigger fired: no consolidation pass ran and i5's delta touched none of the four specs. What changed is evidence that the class is not uniformly blocked. i5's own demonstration ran unattended, end to end. The four should be re-read for which steps genuinely need a watcher.
+
+## Swept 2026-08-19, at i9's onboard-retro: RESCHEDULED, TRIGGER HALF-FIRED
+
+THE CARRIER IT WAS WAITING FOR NOW EXISTS. The trigger names a consolidation
+pass collecting everything that needs a person. The work-token pool is built
+and person-facing: `engine/pool.ts` line 255 serves standing tokens, and
+`engine/survey.ts` line 68 reads them into the survey a person sees.
+
+STILL UNOBSERVED, and the owner's re-acceptance of 2026-08-15 still governs.
+
+THE POOL WAS EMPTY UNTIL TODAY. This retro minted its first tokens, so the
+consolidation is now possible rather than merely imagined.
+
+TRIGGER RE-AFFIRMED for its other half: any iteration whose delta touches one
+of the four specs.

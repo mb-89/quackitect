@@ -98,8 +98,11 @@ export interface ParetoView {
 /** One row per candidate per axis, read back out of the stored table.
  *
  *  The columns are candidate, axis, score, anchor, prior_art. Only the first
- *  three are needed to rank; the other two are what makes a 4 or a 5 legal,
- *  and the checker reads them, not this. */
+ *  three are needed to rank. The other two are what makes a 4 or a 5 legal.
+ *
+ *  NOTHING CHECKS THEM. This comment used to claim a checker read them, and no
+ *  such checker exists anywhere in the engine. One scoring run put 22 of 44
+ *  cells at the top two marks with that column blank and nothing objected. */
 export function readScores(content: string): { candidates: Scored[]; axes: string[] } {
   const byId = new Map<string, Scored>();
   const axes: string[] = [];

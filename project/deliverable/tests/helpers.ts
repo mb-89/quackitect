@@ -240,7 +240,35 @@ export type Server = ReturnType<typeof buildServer>;
 export async function call(server: Server, name: string, args: Record<string, unknown> = {}) {
   const res = await server.handle({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name, arguments: args } });
   const r = res?.result as { content: { text: string }[]; isError: boolean };
-  return { isError: r.isError, body: JSON.parse(r.content[0].text) as Record<string, unknown> };
+  let body = JSON.parse(r.content[0].text) as Record<string, unknown>;
+  if (body.bounded === true) body = await readBoundedAnswer(server, body);
+  return { isError: r.isError, body };
+}
+
+async function readBoundedAnswer(server: Server, bounded: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const next = bounded.next as { tool?: string; args?: Record<string, unknown> } | undefined;
+  if (next?.tool !== "se_file_read") throw new Error(`bounded answer has no readable spill: ${JSON.stringify(bounded)}`);
+  const args = next.args ?? {};
+  let offset = Number(args.char_offset ?? 0);
+  const limit = Number(args.char_limit ?? 3_000);
+  let whole = "";
+  for (;;) {
+    const res = await server.handle({
+      jsonrpc: "2.0",
+      id: 1,
+      method: "tools/call",
+      params: { name: "se_file_read", arguments: { path: args.path, char_offset: offset, char_limit: limit } },
+    });
+    const raw = res?.result as { content: { text: string }[]; isError: boolean };
+    if (raw.isError) throw new Error(`spill read failed: ${raw.content[0]?.text ?? "no body"}`);
+    const page = JSON.parse(raw.content[0].text) as {
+      content: string;
+      char_range: { to: number; of: number };
+    };
+    whole += page.content;
+    if (page.char_range.to >= page.char_range.of) return JSON.parse(whole) as Record<string, unknown>;
+    offset = page.char_range.to;
+  }
 }
 
 export async function waitForTestJob(server: Server, job: string): Promise<Record<string, unknown>> {

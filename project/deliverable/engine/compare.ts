@@ -126,8 +126,27 @@ function cyclesOf(reps: string[], gt: Set<string>): string[][] {
  *  Give it every judgment recorded so far. It returns the next pair to ask,
  *  or the finished order. */
 export function walk(items: string[], js: Judgment[], kind: RelationKind = "order", pairs?: [string, string][]): WalkResult {
-  const group = equalityGroups(items, js);
-  // One representative per equality group, keeping the hint order.
+  // THE CLOSURE RUNS OVER EVERY NODE THE JUDGMENTS MENTION, never only the
+  // ones being ordered. A > X and X > B settle A > B whether or not X is
+  // itself in the pool, and closing over the pool alone throws that away.
+  //
+  // IT COST TWO ITERATIONS BEFORE ANYBODY SAW IT. The walk kept asking pairs
+  // its own edges already implied, because the path between them ran through
+  // a requirement that was not a criterion. Both agents read the counter,
+  // concluded the state was a hundred judgments of standing debt, and stopped.
+  const universe: string[] = [...items];
+  const inUniverse = new Set(items);
+  for (const j of js) {
+    for (const n of [j.a, j.b]) {
+      if (inUniverse.has(n)) continue;
+      inUniverse.add(n);
+      universe.push(n);
+    }
+  }
+  const group = equalityGroups(universe, js);
+  // One representative per equality group, keeping the hint order. Only the
+  // items being ORDERED appear here; the rest of the universe exists to carry
+  // inference and is never asked about or reported.
   const reps: string[] = [];
   const seenRep = new Set<string>();
   for (const i of items) {
@@ -136,7 +155,15 @@ export function walk(items: string[], js: Judgment[], kind: RelationKind = "orde
     seenRep.add(g);
     reps.push(g);
   }
-  const gt = closeOrder(reps, js, group);
+  const closureNodes: string[] = [];
+  const seenClosure = new Set<string>();
+  for (const n of universe) {
+    const g = group.get(n) as string;
+    if (seenClosure.has(g)) continue;
+    seenClosure.add(g);
+    closureNodes.push(g);
+  }
+  const gt = closeOrder(closureNodes, js, group);
   const cycles = cyclesOf(reps, gt);
   const answered = js.length;
 

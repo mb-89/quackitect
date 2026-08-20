@@ -34,7 +34,8 @@ const version = String(JSON.parse(readFileSync(join(root, "project", "deliverabl
 const outDir = arg("--out") ?? join(root, "dist");
 
 // THE LIST LIVES IN ONE PLACE NOW, engine/produce.ts, and both the packaging
-// script and the producing act call it.
+// script and the producing act call it. That shared list carries .worktrees,
+// so the exclusion this file used to hold locally is not lost by deleting it.
 //
 // THE COMMENT HERE USED TO SAY "the same list the export excludes" while they
 // were in fact two lists, and the difference was 20.8 MB of release archives

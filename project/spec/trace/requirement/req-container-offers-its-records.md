@@ -13,6 +13,8 @@ source_refs:
   - uc-get-work-routed
   - i12
 priority: should
+weighs_against:
+  - req-survey-counts-only-open-records > — not being offered the records blocks the work; a survey counting closed ones misstates a number the reader can check
 ---
 
 ## Detail

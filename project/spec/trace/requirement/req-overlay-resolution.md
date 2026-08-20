@@ -21,6 +21,8 @@ source_refs:
 priority: should
 weighs_against:
   - req-overlay-survives-update >
+  - req-broken-trace-is-a-defect > — a wrong method layer governs every act that follows it, including the ones that write trace; a broken trace edge is one link a reader can see is missing
+  - req-acts-carry-role-and-channel > — if the wrong method layer is served, every act is governed by the wrong rules including the one that records who authorized what; resolution sits above the record it governs
 ---
 
 ## Detail

@@ -14,6 +14,8 @@ satisfies:
   - req-nothing-a-copy-does-reaches-its-source
   - req-where-each-artifact-lands-when-driving
   - req-the-system-runs-in-a-tree-that-is-not-its-own
+  - req-the-machine-state-sits-in-the-folder-that-is-open
+  - req-only-a-file-with-its-own-door-is-withheld
 inputs:
   - flow-dispatched-call
   - flow-worktree
@@ -99,3 +101,39 @@ Naming the resolved tree is not reporting - it is the part that makes a
 wrong answer findable. A resolution nobody can see is one nobody can
 check, and a read taken in the wrong tree produces a confident conclusion
 with nothing to contradict it.
+
+## And i9 answered a question this function had been asking without a source
+
+`req-the-machine-state-sits-in-the-folder-that-is-open` belongs here for the
+same reason as the three rows before it: it is a question about WHICH TREE.
+
+WHAT IT ADDS IS THE REFERENT. This function's controls already name the path's
+own kind, and two of those kinds - session state and repository root - were
+defined against a root nothing identified. A rule about what lives inside a
+root can be satisfied by any root at all, including one the person never sees.
+
+AND IT ADDS AN INVARIANT THIS FUNCTION HAD NEVER BEEN GIVEN. The answer must
+not change when a branch is checked out. That is testable, it was never tested,
+and it is the one property that makes the resolution trustworthy while a record
+is bound.
+
+THE CONTAINMENT HALF IS NOT THIS ROW'S AND NOT THIS FUNCTION'S NEW WORK.
+`req-product-is-a-folder` has demanded it since i1.
+
+## And the exclusion row, placed here with its limit stated
+
+`req-only-a-file-with-its-own-door-is-withheld` says a direct read is withheld
+only where a structured verb already serves that file, and served otherwise.
+
+IT IS A QUESTION ABOUT WHAT A PATH NAMES, which is this function's subject. A
+withheld file is one whose path names something the lane serves another way,
+and the refusal has to name that way. This function's second half - AND SAY SO
+- is exactly the part that makes such a refusal useful rather than blank.
+
+THE LIMIT IS WORTH STATING RATHER THAN GLOSSING. This function is about which
+TREE, and the row is about which FILE. They meet because both are answered
+before anything is read, and they are not the same granularity.
+
+IF THE DESIGN MILESTONE FINDS A BETTER HOME the move is cheap. What must not
+happen is the row hanging off nothing, because a goal with no requirement and a
+requirement with no function are the same failure at two levels.

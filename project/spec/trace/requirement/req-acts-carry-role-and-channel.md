@@ -24,6 +24,7 @@ source_refs:
 priority: should
 weighs_against:
   - req-repo-search-carries-intent >
+  - req-overlay-survives-update > — both sit above a fresh machine running, and accountability underpins every other guarantee; a lost overlay costs one vehicle owner their customisation and is rebuildable
   - req-nothing-a-copy-does-reaches-its-source >
   - req-fresh-machine-runs > — both crippling, but accountability underpins every other guarantee (who authorized what); a broken install is recoverable, an unrecoverable authorization trail is not
 ---

@@ -6,7 +6,7 @@ statement: A vehicle is gutted, renamed and put through the cleanup command that
 method: demonstration
 demonstrates:
   - sty-nothing-i-do-reaches-what-it-came-from
-verifies: "none — demonstrates: carries the edge; the containment rules are verify_method: test and are carried by tsp-a-produced-tree-is-bounded-and-named"
+verifies: "none — demonstrates carries the edge; the containment rules are verify method test and are carried by tsp-a-produced-tree-is-bounded-and-named"
 files:
   - none — a demonstration is observed rather than instrumented, and the Procedure below is the whole definition
 ---

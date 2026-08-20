@@ -43,7 +43,7 @@ test("POST /pty/end ends the agent: settle, /exit, then the insist kill", async 
     let up = false;
     while (Date.now() < until) {
       try {
-        up = (await fetch(`http://localhost:${port}/pty/alive`)).ok;
+        up = (await fetch(`http://127.0.0.1:${port}/pty/alive`)).ok;
         if (up) break;
       } catch {
         // not listening yet
@@ -51,7 +51,7 @@ test("POST /pty/end ends the agent: settle, /exit, then the insist kill", async 
       await new Promise((r) => setTimeout(r, 100));
     }
     assert.ok(up, "the terminal host came up");
-    const res = await fetch(`http://localhost:${port}/pty/end`, {
+    const res = await fetch(`http://127.0.0.1:${port}/pty/end`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ reason: "test over" }),

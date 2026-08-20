@@ -5,8 +5,8 @@ type: "[[raid]]"
 kind: debt
 statement: The consistency sweep was rewired to run after the demonstrations rather than beside them, because the walker cannot resume a fan leg once the leg it took was a submachine, so the method lost a parallel branch to get past an engine defect.
 owner: the owner
-status: open
 looked: 2026-08-19
+status: open
 breaks_how_badly: corrosive
 how_likely: expected
 impact: "Any drawing that fans into a submachine is unwalkable by one agent. The walk reaches the join with the other leg never taken, and every legal move is closed: the pull refuses SE-C-123, a choice refuses SE-C-110, the router draws a route the whole way round the record and moves zero hops, and se_reopen would take the walked leg down with it. The only ways out are editing the drawing or editing the engine."
@@ -93,3 +93,22 @@ compile, and strand the first agent that walks it.
 ## Sweep 2026-08-19, at i5's retro
 
 RE-ACCEPTED, unchanged. i5 walked a seeded machine with a build-steps submachine and never fanned, so nothing here was exercised. It joins the standing list of walker limits alongside [[raid-iss-a-state-that-signs-no-form-can-never-be-sent-back]], which i5 found the same way — by hitting a move the walker has no way back from.
+
+## Swept 2026-08-19, at i9's onboard-retro: RESCHEDULED
+
+NEITHER CHANGE LANDED. The guard this entry quotes still stands, though it has
+moved house: it is now at `engine/sessionclaims.ts` line 1220, carried out of
+`engine/session.ts` by the i17 overhaul. The walk-back still takes its target
+from the top of the host stack rather than from the machine owning the feeder.
+
+THE CODE MOVED AND THE LOGIC DID NOT.
+
+NO TEST WALKS A NESTED-MACHINE FAN LEG EITHER. The branching fixture rejoins
+plain steps, and `tests/drawnsub.test.ts` says in its own comment at lines 301
+to 304 that standing a fixture walk mid-record is its own piece of work.
+
+THIS ENTRY CARRIES NO `trigger` FIELD, and its prose says it comes due the next
+time anybody draws a fan with a nested leg. Nothing has.
+
+A `looked` FIELD WAS ADDED HERE TODAY. It had none, along with the two other
+entries minted at i16, so no sweep could tell when it was last read.

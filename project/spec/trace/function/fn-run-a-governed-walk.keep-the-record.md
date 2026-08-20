@@ -37,6 +37,7 @@ inputs:
   - flow-findings-report
   - flow-sweep-result
   - flow-divergence-report
+  - flow-failure-disposition
 outputs:
   - flow-call-log
   - flow-trace-graph

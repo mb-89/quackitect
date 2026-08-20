@@ -65,3 +65,23 @@ The trigger stands unchanged.
 ## Sweep 2026-08-19, at i5's retro
 
 RE-ACCEPTED. The trigger is the owner's own review of the panel and it has not happened. i5 wrote seven checklist fields through forms and never needed the owed state, which is consistent with the entry's own reading: the mechanism works for an agent and the gap is the panel's render.
+
+## Swept 2026-08-19, at i9's onboard-retro: RESCHEDULED
+
+TWO OF THE THREE CLAUSES ARE NOW FALSE. `engine/editors/checklist.ts` lines 25
+to 28 and line 34 render an owed line as a disabled box with its ref as muted
+tail text, and it survives a collect. So it no longer reads as an unchecked
+box, and clicking can no longer discard the ref.
+
+WHAT REMAINS is the ref-ENTRY affordance. A person still cannot set an owed
+state from the panel.
+
+THE CHANGE ARRIVED WITH THE i17 MERGE, after the last look. The same file at
+ref 13cb0538 has neither behaviour.
+
+THIS ENTRY'S `statement` NOW MISDESCRIBES THE CODE and wants rewriting rather
+than only a dated look. Recorded here rather than rewritten, because the
+remaining clause is the owner's to scope.
+
+TRIGGER RE-AFFIRMED: the owner reviews the panel's checklist rendering. It has
+not fired.

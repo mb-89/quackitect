@@ -68,3 +68,19 @@ FROM THE POOL, 2026-08-13. Seven more, each already diagnosed.
 - THE WRITE RATCHET STANDS AT 36 direct write sites (note-8ec15d39c18b): 18 in the session module, 4 in iterations, 3 in bases. It may fall and cannot rise. A site whose file the door can never hold may stay direct, with the ceiling lowered around it.
 - THE WALK SIGNS STATES WITHOUT COMMITTING THEM (note-7112f62ea40c). Seven signed states and 36 minted nodes stood disk-only until a manual checkpoint. A signature that lives only on disk is weaker than the word suggests. The engine takes a checkpoint commit on the record's branch at every signing.
 - THE LOG GARBAGE COLLECTOR, last survivor of the 2026-07-27 backlog (note-792c32b5425e).
+
+## Added 2026-08-19, from the owner
+
+CHECK THE REPOSITORY ROOT FOR CLEANLINESS. Their steer, given while ruling on
+i9: i9 moves only `.se` out of the root, and tidying what is left belongs here.
+
+THE LAW TO MEASURE AGAINST is the one i9's own vision already cites: at most
+about five visible files and folders per level, dotfolders exempt.
+
+WHAT STANDS AT THE ROOT TODAY, seven visible entries: `project`, `dist`,
+`README.md`, `RELEASES.md`, `RUNME.ps1`, `.gitattributes`, `.gitignore`. Plus
+`.claude`, `.github`, `.git` and `.se` as dotfolders.
+
+AND ONE STRING TO SWEEP WHILE HERE. The engine serves the word `wedge-guard`
+as a refusal source at `engine/session.ts` line 1281. It is a forbidden word
+under the voice rules and it reaches readers. One line.

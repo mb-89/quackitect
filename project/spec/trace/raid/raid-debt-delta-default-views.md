@@ -97,3 +97,16 @@ STATUS STAYS OPEN. The debt's own closure bar ("every $-item resolver")
 is not fully met — eight of fifteen source names are fixed, covering the
 debt's own worked example (test-specs) exactly. The remaining seven are a
 named, reasoned follow-up, not a silent gap.
+## Swept 2026-08-19, at i9's onboard-retro: RESCHEDULED
+
+UNMOVED. `engine/stateform.ts` line 928 and line 943 still list the whole
+corpus with no delta filter. Only the promotion resolver filters on the bound
+record, at lines 951 to 958. No opt-in exists.
+
+THE DESTINATION IS STILL OPEN. i15 reads `status: open`.
+
+ONE FACT FROM THE LAST LOOK HAS CHANGED. The structured query and the coupling
+ranker are now built, at `engine/query.ts` line 45 and `engine/disposition.ts`
+line 70. Neither is the resolver this debt is about.
+
+TRIGGER RE-AFFIRMED and still fires on any form listing another record's nodes.

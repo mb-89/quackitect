@@ -257,7 +257,9 @@ function startServer(root, runner) {
   const entry = path.join(root, "project", "deliverable", "engine", "bin", "se-mcp.ts");
   child = spawn(runner.cmd, [entry, "--root", root, "--child", "--headless"], {
     cwd: root,
-    env: { ...process.env, ...runner.env, SE_SESSION: sessionToken, SE_PARENT_PID: String(process.pid), SE_PANEL_SUPPRESS: "1" },
+    // The headless lane survives an extension-host restart. Deactivation
+    // still owns deliberate shutdown through the process-tree kill below.
+    env: { ...process.env, ...runner.env, SE_SESSION: sessionToken, SE_PANEL_SUPPRESS: "1" },
     stdio: ["ignore", "pipe", "pipe"],
     shell: runner.shell,
     windowsHide: true
@@ -1272,6 +1274,7 @@ async function showLogRef(ref) {
 function psq(text) {
   return `'${String(text).replace(/'/g, "''")}'`;
 }
+const nativeExceptions = new Set(["web_search", "WebSearch"]);
 function parseExcludedToolsFromCage(cage) {
   const args = Array.isArray(cage?.exclude_args) ? cage.exclude_args : [];
   const i = args.indexOf("--excluded-tools");
@@ -1280,6 +1283,7 @@ function parseExcludedToolsFromCage(cage) {
   for (let n = i + 1; n < args.length; n++) {
     const a = String(args[n] ?? "").trim();
     if (a === "" || a.startsWith("--")) break;
+    if (nativeExceptions.has(a)) continue;
     out.push(a);
   }
   return out;

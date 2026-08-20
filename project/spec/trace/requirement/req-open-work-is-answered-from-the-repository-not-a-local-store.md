@@ -10,7 +10,7 @@ breaks_how_badly: crippling
 refines:
   - uc-see-the-whole-pool-from-any-clone
 source_refs:
-  - vp-what-is-learned-outlives-the-machine
+  - vp-the-ledger
   - sty-see-what-the-other-machine-may-pull-from
 priority: must
 ---

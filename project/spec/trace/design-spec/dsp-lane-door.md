@@ -8,6 +8,8 @@ realizes:
   - "if-walk-engine-to-query-evaluator"
   - "if-walk-engine-to-coupling-disposer"
 files:
+  - "project/deliverable/engine/harness.ts"
+  - "project/deliverable/engine/payload-limit.ts"
   - "project/deliverable/engine/tools.ts"
   - "project/deliverable/engine/tools-file.ts"
   - "project/deliverable/engine/tools-run.ts"

@@ -14,6 +14,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { createInterface } from "node:readline";
 import { boundAnswer } from "./bound.ts";
 import { Rejection } from "./errors.ts";
+import { type Harness, harnessFor } from "./harness.ts";
 import { RepeatWatch } from "./repeat.ts";
 
 export interface ToolDef {
@@ -98,6 +99,13 @@ export class McpServer {
   private observers: CallObserver[] = [];
   private readonly contextFor: RequestContextAdapter;
   readonly serverInfo: { name: string; version: string };
+  /** This server's own `.se`, so its spill cannot land in another root. */
+  private seDir: string | undefined;
+  /** WHAT THE HOST CALLED ITSELF at initialize, and which registry entry that
+   *  is. MCP hands this over on every connect; it used to be thrown away, so
+   *  no refusal rate or slow call in the whole log said which host it came
+   *  from. */
+  private client: { name: string; version?: string } | undefined;
 
   constructor(
     serverInfo: { name: string; version: string },
@@ -107,6 +115,21 @@ export class McpServer {
     this.serverInfo = serverInfo;
     this.contextFor = contextFor;
     for (const t of tools) this.register(t);
+  }
+
+  setAnswerSpillDir(seDir: string): void {
+    this.seDir = seDir;
+  }
+
+  /** The host that connected, as it named itself. Undefined before initialize. */
+  clientInfo(): { name: string; version?: string } | undefined {
+    return this.client;
+  }
+
+  /** The registry entry for the connected host, or undefined when nothing
+   *  matches. Unknown is an answer — see harness.ts. */
+  harness(): Harness | undefined {
+    return harnessFor(this.client?.name);
   }
 
   addGuard(guard: DispatchGuard): void {
@@ -121,10 +144,39 @@ export class McpServer {
     this.observers.push(observer);
   }
 
+  /** A REFUSAL, SERVED AND COUNTED.
+   *
+   *  Rejections are results, not protocol errors: the model must read the
+   *  clause and its executable remedy and recover in one turn.
+   *
+   *  AND WHEN IT DOES NOT, the identical answer comes back and nothing counts
+   *  it. The watch rides ON the refusal, because a refused call cannot be
+   *  refused harder (engine/repeat.ts).
+   *
+   *  THE BOUND HOLDS HERE TOO. An unreadable refusal is worse than an
+   *  unreadable result: the reason a submit was rejected sits inside it, and
+   *  no cheap question answers it. */
+  private refused(id: number | string, name: string, args: Record<string, unknown>, e: Rejection, started: number): JsonRpcResponse {
+    const again = this.repeats.refused(name, String(e.toJSON().clause ?? "(unnamed)"));
+    const body = again === undefined ? e.toJSON() : { ...e.toJSON(), repeated: again };
+    this.observe({ tool: name, args, ok: false, duration_ms: Date.now() - started, outcome: "rejected", response: body });
+    return this.ok(id, {
+      content: [{ type: "text", text: boundAnswer(`${name}-refused`, body, this.seDir).text }],
+      isError: true,
+    });
+  }
+
   private observe(record: Parameters<CallObserver>[0]): void {
+    // EVERY RECORD SAYS WHICH HOST IT CAME FROM. Without it a refusal rate or
+    // a slow call is pooled across harnesses and "it runs worse there" can
+    // never be shown.
+    const stamped =
+      this.client === undefined
+        ? record
+        : { ...record, client: this.client.name, ...(this.harness() === undefined ? {} : { harness: this.harness()?.id }) };
     for (const o of this.observers) {
       try {
-        o(record);
+        o(stamped);
       } catch {
         // The log hook must never break dispatch.
       }
@@ -147,7 +199,16 @@ export class McpServer {
     const id = msg.id;
     try {
       switch (msg.method) {
-        case "initialize":
+        case "initialize": {
+          // THE HOST NAMES ITSELF HERE, once per connection. Keeping it is
+          // what lets every later record say which harness it came from.
+          const named = (msg.params as { clientInfo?: { name?: unknown; version?: unknown } } | undefined)?.clientInfo;
+          if (typeof named?.name === "string" && named.name.trim() !== "") {
+            this.client = {
+              name: named.name,
+              ...(typeof named.version === "string" ? { version: named.version } : {}),
+            };
+          }
           return this.ok(id, {
             protocolVersion: PROTOCOL_VERSION,
             // listChanged is what lets a RELOAD add a tool. Without it a
@@ -157,6 +218,7 @@ export class McpServer {
             capabilities: { tools: { listChanged: true } },
             serverInfo: this.serverInfo,
           });
+        }
         case "ping":
           return this.ok(id, {});
         // see dsp-lane-door.md#the-one-exit-the-bound-cannot-cover
@@ -189,28 +251,11 @@ export class McpServer {
             // answer is serialised. A host that truncates gives back nothing
             // the engine can act on; the bound gives back a remedy.
             return this.ok(id, {
-              content: [{ type: "text", text: boundAnswer(name, payload).text }, ...blocks],
+              content: [{ type: "text", text: boundAnswer(name, payload, this.seDir).text }, ...blocks],
               isError: false,
             });
           } catch (e) {
-            if (e instanceof Rejection) {
-              // Rejections are results, not protocol errors: the model must
-              // read clause + executable remedy and recover in one turn.
-              //
-              // AND WHEN IT DOES NOT, the identical answer comes back and
-              // nothing counts it. The watch rides ON the refusal, because a
-              // refused call cannot be refused harder (engine/repeat.ts).
-              const again = this.repeats.refused(name, String(e.toJSON().clause ?? "(unnamed)"));
-              const body = again === undefined ? e.toJSON() : { ...e.toJSON(), repeated: again };
-              this.observe({ tool: name, args, ok: false, duration_ms: Date.now() - started, outcome: "rejected", response: body });
-              // THE BOUND HOLDS ON REFUSALS TOO. An unreadable refusal is
-              // worse than an unreadable result: the reason a submit was
-              // rejected sits inside it, and no cheap question answers it.
-              return this.ok(id, {
-                content: [{ type: "text", text: boundAnswer(`${name}-refused`, body).text }],
-                isError: true,
-              });
-            }
+            if (e instanceof Rejection) return this.refused(id, name, args, e, started);
             this.observe({
               tool: name,
               args,
@@ -224,7 +269,10 @@ export class McpServer {
             // worst of the three: there is no remedy in it to follow.
             return this.ok(id, {
               content: [
-                { type: "text", text: boundAnswer(`${name}-errored`, { kind: "errored", message: String((e as Error).message) }).text },
+                {
+                  type: "text",
+                  text: boundAnswer(`${name}-errored`, { kind: "errored", message: String((e as Error).message) }, this.seDir).text,
+                },
               ],
               isError: true,
             });

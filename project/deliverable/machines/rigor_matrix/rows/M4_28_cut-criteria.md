@@ -125,6 +125,10 @@ TWO KINDS OF CUT ARRIVE HERE, and they are not equally safe.
   - Checkable from the candidate records, with no score anywhere.
 - BELOW THE LINE — the axis discriminates and sorted outside the vital few. Out by position, not on its merits, and it owes no reason of its own.
 
+A ROW'S FUNCTION PREDICTS WHETHER IT WILL DISCRIMINATE, and it is one frontmatter field away. A criterion whose function is not the one under redesign is a CANDIDATE for the no-differentiation cut, because every option leaves it untouched by construction.
+
+THAT IS A FILTER AND NEVER A VERDICT. It says where to look first, not what to cut. The cut still owes its own check against the candidate records.
+
 WHAT IS NOT A LEGAL REASON TO CUT: it looks like they are all about the same, the axis seems minor, or scoring it would be work. The first is a guess, and the ranking moves when a guess is wrong.
 
 THE LINE IS DRAWN HERE, AND ONLY HERE. One drawing is enough because the ORDER under it is mechanical: the boundary takes a prefix of a computed sort and cannot promote anything past it.

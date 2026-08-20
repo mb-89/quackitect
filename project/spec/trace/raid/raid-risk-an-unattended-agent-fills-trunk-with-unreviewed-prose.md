@@ -9,7 +9,7 @@ trigger: the first cloud run that files an option, or the first retro that finds
 status: open
 impact: The cloud case is why the pool exists - a finding must survive the box being released. The same property means a walk nobody watches writes to the shared store. A pool nobody trusts is read like an inbox, which is what this iteration is trying to stop being.
 breaks_how_badly: corrosive
-how_likely: plausible
+how_likely: expected
 source_refs:
   - i17-the-options-pool-triage-a-raw-note-into-
 weighs_with: none

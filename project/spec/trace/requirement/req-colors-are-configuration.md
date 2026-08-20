@@ -13,6 +13,9 @@ source_refs:
   - the color-is-configuration ruling in guidance/craft/ux.md
   - reverse-engineered from tests/palette.test.ts
 priority: should
+weighs_against:
+  - req-autonomy-is-categorical >
+  - req-nodes-scoped-to-iteration > — the same judgment as the line above it, written directly rather than through the equality, because an equals may not carry order across a chain — palette drift is felt at the next theme change, and a dial read as a continuum is felt the first time somebody expects half a rung; both are small, and the visible one comes first
 ---
 
 ## Detail

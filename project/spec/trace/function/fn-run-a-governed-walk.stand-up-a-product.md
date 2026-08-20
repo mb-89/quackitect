@@ -22,6 +22,7 @@ satisfies:
   - req-one-command-starts-an-unattended-machine
   - req-the-lane-runs-without-a-console
   - req-work-starts-without-a-reachable-remote
+  - req-the-folder-shows-what-to-run
 inputs:
   - flow-bare-computer
   - flow-product-template
@@ -49,3 +50,18 @@ uninstalled one, because it looks finished.
 
 Beginning a second product touches nothing of the first. That is what keeps
 this allocatable without dragging the running system into its blast radius.
+
+## Finding the way in is part of this function, not part of teaching
+
+`req-the-folder-shows-what-to-run` sits here rather than with the newcomer's
+tour, and the tour's own rationale is why. That function explains the system
+FROM THE LIVE SYSTEM. Before the launcher runs there is no live system to
+derive anything from, so the tour cannot reach this moment at all.
+
+SO THE FIRST STEP OF THE PATH IS FINDING THE PATH. This function's statement
+already begins at a computer with nothing on it, and a person who cannot find
+what to run has not left that starting point.
+
+ITS PASS LINE IS READ OFF PEOPLE RATHER THAN OFF THE MACHINE, which this
+function has not had before. That is a real change to what verifying this
+function costs, and it is named here rather than discovered later.

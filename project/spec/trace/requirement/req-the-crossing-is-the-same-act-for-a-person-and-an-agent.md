@@ -12,7 +12,7 @@ refines:
 source_refs:
   - raid-risk-an-unattended-agent-fills-trunk-with-unreviewed-prose
   - project/spec/iterations/i17-the-options-pool-triage-a-raw-note-into-/record.md "the cloud agent can put stuff in work tokens" (owner ruling 2026-08-17)
-  - vp-what-is-learned-outlives-the-machine
+  - vp-the-ledger
 priority: must
 ---
 

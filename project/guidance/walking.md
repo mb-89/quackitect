@@ -107,6 +107,27 @@ names which of four you got.
   verb and none is missing. "You never name a target" means you never invent
   one — it has never meant you cannot move.
 
+  AN ITERATION HAS ONE TARGET AND IT IS ITS SHIP STATE (owner ruling
+  2026-08-19). Never aim at a state in the middle of one.
+
+  THE OWNER'S WORDS: "Obviously, the target of an iteration is always the
+  shipped state. You don't set the target to something in the middle of the
+  iteration. You set it to ship, and then you let the machine pull you there.
+  Everything that you need to do on the way there, you do."
+
+  SO THE DIVISION IS PLAIN. The machine routes. The agent works whatever the
+  route lands on, and pulls again. Aiming one state further on, over and over,
+  is the agent doing the router's job by hand.
+
+  WHAT IT COSTS WHEN IGNORED. Every arrival clears the target, so a
+  mid-iteration aim arrives almost at once and leaves the walk with nothing
+  routed. The agent then re-aims, arrives, re-aims. i36 spent a whole session
+  in that loop on 2026-08-19.
+
+  AN EMPTY TARGET IS EMPTY, and it never means the front desk. A pull with
+  nothing routed reports that there is nothing to do here and shows the
+  options, exactly as this document already says.
+
   A `wait` IS NOT PROOF THERE IS NO DOOR. It reports that the route to the
   STANDING target could not be drawn, which says nothing about the doors from
   here. Ask with a choice; the refusal names what is actually offered.

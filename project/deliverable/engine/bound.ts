@@ -1,16 +1,25 @@
 // see dsp-lane-door.md#the-answers-bound
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { smallestInlineOutputBytes } from "./harness.ts";
 
-/** The size no answer may exceed, in characters of serialised JSON.
+/** The ceiling this project sets for itself, in characters of serialised
+ *  JSON. req-oversized-results-remain-recoverable-through-the-lane names it. */
+const OWN_CEILING = 6_000;
+
+/** The size no answer may exceed.
  *
- *  Chosen well under the smallest host limit observed biting, so the bound
- *  fires before the host's own cut does. A host that truncates gives back
- *  nothing the engine can act on; this gives back content plus a cursor. */
-export const ANSWER_BOUND_BYTES = 60_000;
+ *  IT IS DERIVED, NOT CHOSEN. The bound is our own ceiling or the smallest
+ *  limit measured across supported hosts, whichever is tighter. Measuring a
+ *  host tighter than the ceiling therefore lowers the bound by itself, and a
+ *  number written here by hand could not do that.
+ *
+ *  A host that truncates gives back nothing the engine can act on; this gives
+ *  back content plus a cursor. */
+export const ANSWER_BOUND_BYTES = Math.min(OWN_CEILING, smallestInlineOutputBytes() ?? OWN_CEILING);
 
 /** A first guess at what the envelope costs. The real cost is measured. */
-const ENVELOPE = 4_000;
+const ENVELOPE = 2_500;
 
 /** The smallest page worth sending. Below this the answer is all envelope,
  *  and the caller is better served by the cursor alone. */
@@ -18,7 +27,12 @@ const MIN_PAGE = 500;
 
 /** Where an oversized answer spills. Set by whoever knows the project root;
  *  until it is set, the bound still holds and the cursor names the call log
- *  instead of a file. */
+ *  instead of a file.
+ *
+ *  THIS IS A FALLBACK, NOT THE ADDRESS. Two servers at different roots share
+ *  this module, so the last one to build used to win it and every other
+ *  server wrote its spill where its own reader never looked. Callers that
+ *  know their root pass it to boundAnswer instead. */
 let spillDir: string | undefined;
 
 export function setAnswerSpill(seDir: string): void {
@@ -39,11 +53,11 @@ export interface BoundedAnswer {
  *
  *  THE WHOLE ANSWER IS ALSO LOGGED by the time this runs, so nothing is lost
  *  even when the spill cannot be written. */
-export function boundAnswer(tool: string, payload: unknown): BoundedAnswer {
+export function boundAnswer(tool: string, payload: unknown, seDir?: string): BoundedAnswer {
   const whole = JSON.stringify(payload, null, 1);
   if (whole.length <= ANSWER_BOUND_BYTES) return { text: whole, cut: false, bytes: whole.length };
 
-  const spilled = spill(tool, whole);
+  const spilled = spill(tool, whole, seDir === undefined ? spillDir : join(seDir, "answers"));
   const next =
     spilled === undefined
       ? {
@@ -53,8 +67,8 @@ export function boundAnswer(tool: string, payload: unknown): BoundedAnswer {
         }
       : {
           tool: "se_file_read",
-          args: { path: spilled, offset: 1, limit: 400 },
-          note: "se_file_read pages by line and is bounded by its own limit, so no page can overflow. Walk it with offset.",
+          args: { path: spilled, char_offset: 0, char_limit: 3_000 },
+          note: "Read the exact spill text by character. Continue at char_range.to until it reaches char_range.of.",
         };
 
   // MEASURE THE SERIALISED LENGTH, never assume it. A JSON body is full of
@@ -92,11 +106,11 @@ export function boundAnswer(tool: string, payload: unknown): BoundedAnswer {
  *  ONE FILE PER TOOL, overwritten. The newest is always the one a caller
  *  wants, and disk stays bounded by the number of tools rather than by the
  *  number of calls. */
-function spill(tool: string, whole: string): string | undefined {
-  if (spillDir === undefined) return undefined;
+function spill(tool: string, whole: string, dir: string | undefined): string | undefined {
+  if (dir === undefined) return undefined;
   try {
-    mkdirSync(spillDir, { recursive: true });
-    const abs = join(spillDir, `${tool}.json`);
+    mkdirSync(dir, { recursive: true });
+    const abs = join(dir, `${tool}.json`);
     writeFileSync(abs, whole, "utf8");
     // Root-relative, because that is the only address the lane accepts.
     return `.se/answers/${tool}.json`;

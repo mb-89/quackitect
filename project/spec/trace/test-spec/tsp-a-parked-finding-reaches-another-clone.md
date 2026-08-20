@@ -5,10 +5,9 @@ type: "[[test-spec]]"
 statement: A finding parked on one machine is offered to an engineer on a clone that never held it, verified by demonstration across two clones of one origin.
 method: "demonstration"
 demonstrates:
-  - "sty-a-finding-outlives-the-box-that-found-it"
   - "sty-see-what-the-other-machine-may-pull-from"
 verifies:
-  - none — this spec demonstrates a story end to end; no requirement is verified through it
+  - "none — this spec demonstrates a story end to end, so the demonstrates edge above carries its trace; the one requirement mentioning either story is req-open-work-is-answered-from-the-repository-not-a-local-store and its verify method is test; every requirement was checked for a mention of either story"
 files:
   - "none — the procedure below is the definition; the observed sessions are the evidence"
 ---

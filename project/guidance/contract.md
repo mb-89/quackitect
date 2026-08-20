@@ -218,6 +218,14 @@ and the conflict surfaced only because a walk hit the state.
 THE CONTRACT OVERRIDES DEFAULTS — the first line of this file says so. This
 rule is where that override is written down for subagents and for research.
 
+HOW TO SPAWN ONE WELL is `guidance/method/subagents.md`. It carries three
+things this rule does not: which model each subagent gets, what an interrupt
+does to one running in the background, and what its narration costs you.
+
+PASS THE LANE RULE TO EVERY SUBAGENT YOU SPAWN. One that does not know about
+the cage reaches for its native tools, finds them blocked, and reports that it
+could not read anything.
+
 ## 12. Walk, do not ruminate
 
 No mid-walk philosophy about a step's purpose. No re-deriving settled

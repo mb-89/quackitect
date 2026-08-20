@@ -50,6 +50,18 @@ That is why both run. Each one's blind spot is the other's evidence.
 
 ## Steps
 
+0. READ THE PREDECESSOR FIRST. This project has earlier versions and they are
+   one argument away on every read verb. `se_file_read`, `se_file_search` and
+   `se_file_glob` all take `ref`. `main` reaches v1, `v2` reaches v2.
+
+   IT IS THE ONLY CODEBASE THAT EVER SOLVED THESE PROBLEMS FOR THIS METHOD. A
+   sweep of roughly a hundred external products once missed six working
+   implementations sitting one ref away, one of them a lint this project had
+   written down as impossible to build.
+
+   MINE IT FOR FEATURES, NEVER FOR AUTHORITY. A decision recorded in an earlier
+   version is evidence that version tried it, and nothing more.
+
 1. Name the problem in the field's vocabulary. Finding the right TERM is half
    the search, and `se_web_search` earns its keep here.
 2. Sweep three angles, all of them written: patterns that describe it,
@@ -58,6 +70,35 @@ That is why both run. Each one's blind spot is the other's evidence.
    context breaks.
 4. Cite everything. An idea with a source is checkable; one without is a
    rumour.
+
+## STORING A BIG SWEEP
+
+EXTENSIVE RESEARCH IS NEVER THROWN AWAY (owner instruction 2026-08-18).
+
+- IT IS STORED LOCALLY, under `project/scratchpad/research/`, and never
+  committed. The scratchpad is the workbench.
+- ONE FILE PER SWEEP, named by its date and its question.
+- EVERY FINDING CARRIES ITS PRIMARY SOURCE, as a URL or a git ref.
+- WHAT COULD NOT BE ESTABLISHED IS RECORDED SEPARATELY. Those gaps say where a
+  later search should start, and they are worth as much as the findings.
+
+A LATER PASS MINES IT, and the retro is where that happens today. One sweep of
+roughly a hundred products yielded ten reusable mechanisms on its second
+reading, none of them the question it was commissioned for.
+
+WHAT A MINED FINDING THEN BECOMES IS STILL OPEN. It stands as a work token in
+the pool, because a finding with no reader is landfill.
+
+## THE BACK-CHECK, AND IT IS NOT HERE
+
+This card is the FRONT end: research before invention.
+
+THERE IS A BACK END TOO (owner ruling 2026-08-18). A chosen design that
+re-derives existing prior art owes a study of the original. What does the
+original do better than ours? What cost did it pay that we have not paid yet?
+
+IT RUNS AT record-adrs IN M5, not here. By then a winner exists, so the
+question has something concrete to compare against.
 
 ## Output
 

@@ -5,7 +5,7 @@ type: "[[story]]"
 statement: An engineer sends an agent to a machine nobody is watching, and it is working on the record within the minute rather than on its own setup.
 actor: stk-engineer-driving-agents
 refines:
-  - vp-the-unattended-arrival
+  - vp-autonomy-range
   - vp-autonomy-range
 priority: must
 ---

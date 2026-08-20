@@ -18,7 +18,8 @@ source_refs:
   - stk-newcomer
   - ".se/req-mine-sebots.md: the person's dial and the manual path (the checklist bar)"
 priority: could
-weighs_against: null
+weighs_against:
+  - req-what-the-corpus-is-has-one-answer > — an install path that grows a step is visible the moment it happens; callers disagreeing about the corpus produces confident wrong answers nobody can spot
 ---
 
 ## Scenario

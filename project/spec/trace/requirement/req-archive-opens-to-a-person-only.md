@@ -12,5 +12,6 @@ refines:
 source_refs:
   - uc-browse-the-archive ext 1a
 priority: should
-weighs_against: null
+weighs_against:
+  - req-small-fix-joins-open-record > — an archive an agent can rewrite destroys the one record nobody can reconstruct; a small fix opening its own record only fragments the trail
 ---

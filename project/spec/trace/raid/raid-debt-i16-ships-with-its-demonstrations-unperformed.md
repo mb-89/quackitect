@@ -5,8 +5,8 @@ type: "[[raid]]"
 kind: debt
 statement: The four demonstrations this iteration authored are drawn and none of them has been performed, so the iteration ships with every claim that needs a person watching standing on a drawing rather than on an observation.
 owner: the owner
-status: open
 looked: 2026-08-19
+status: open
 breaks_how_badly: crippling
 how_likely: expected
 impact: "Both headline capabilities are proved only inside this repository. The pass line of the two must requirements is a machine holding nothing of the source, and nothing has ever been run on one. A vehicle that works here and fails there looks identical from here."
@@ -75,3 +75,20 @@ costs nothing and hides everything.
 ## Sweep 2026-08-19, at i5's retro
 
 RE-ACCEPTED, and i5 moved the neighbouring case forward rather than this one. i5 authored a must story and PERFORMED its demonstration on the shipped archive — extracted, asked, installed, booted. That is the pattern this debt owes for four specs, and it is now known to be affordable on a cloud box for at least one of them.
+
+## Swept 2026-08-19, at i9's onboard-retro: RESCHEDULED, AND IT IS WORSE THAN STATED
+
+NOTHING PERFORMED. A glob for report files across the whole repository returns
+ZERO. None of the four named reports exists. The four steps still stand drawn
+in this iteration's own demonstration machine.
+
+IT IS WIDER THAN THIS ENTRY SAYS. Not one of the twenty-one must stories has a
+demonstration report, in the whole history of the product. These four are part
+of a total of zero, so the gap is a convention nobody has ever run rather than
+one iteration's omission.
+
+THAT WIDER FACT IS NOT THIS ENTRY'S TO CARRY. It is recorded here so the next
+sweep meets it rather than rediscovering it.
+
+TRIGGER: this entry carries no field, and its prose says it comes due the first
+time a vehicle is handed to another person. That has not happened.

@@ -14,6 +14,8 @@ source_refs:
   - sty-vendor-it-into-my-product
   - RUNME.ps1 lines 28-33
 priority: should
+weighs_against:
+  - req-query-is-deterministic > — a name scattered across files causes a conflict on every update; a query that answers differently twice is caught the second time somebody runs it
 ---
 
 ## Detail

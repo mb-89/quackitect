@@ -9,7 +9,7 @@ trigger: when the work-token system can carry a task to a person; or at the firs
 status: open
 looked: 2026-08-19
 impact: A check nobody can run is marked owed every iteration and eventually stops being read, which is how four factual errors sat in the README while its own inspection was marked owed.
-breaks_how_badly: corrosive
+breaks_how_badly: abrasive
 how_likely: expected
 source_refs:
   - raid-issue-the-corpus-wide-inspections-have-no-runner
@@ -132,3 +132,18 @@ to put it there. A row with no look date cannot be told from a row nobody read.
 ## Sweep 2026-08-19, at i5's retro
 
 RE-ACCEPTED consciously. Neither trigger has fired: the work-token system still cannot carry a task to a person, and the date is not reached. i5's retro found the pool EMPTY and the door into it shut on a fresh clone. The trigger this debt waits on is further away than it looked ([[raid-iss-the-one-door-into-the-pool-is-shut-on-a-fresh-clone]]).
+
+## Swept 2026-08-19, at i9's onboard-retro: DUE, NOT WAITING
+
+THE FIRST HALF OF THE TRIGGER HAS FIRED. This entry repays when the work is
+ROUTABLE rather than finished, and the work-token pool now carries a task to a
+person — `engine/pool.ts` line 255 into `engine/survey.ts` line 68.
+
+SO IT IS DUE. That is a change of state from the last look, not a re-park.
+
+ONE THING BLOCKS THE ROUTING ANYWAY. The token shape carries an id, a
+statement, a ready-when and a source, and NO assignee. A token cannot say "this
+one needs a person", which is exactly what these ten checks have to say.
+
+AND THE CHEAP CHECK THIS ENTRY ASKS FOR FIRST HAS STILL NOT BEEN RUN: whether
+the cloud runs already satisfy the second-machine group.

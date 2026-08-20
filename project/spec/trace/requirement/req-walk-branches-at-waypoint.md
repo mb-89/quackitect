@@ -14,4 +14,5 @@ source_refs:
 priority: should
 weighs_against:
   - req-pin-writes-seeded-scaffolds >
+  - req-fresh-machine-runs > — a walk that branches where it should not corrupts the record it is writing; a fresh machine failing to run is loud and recoverable
 ---

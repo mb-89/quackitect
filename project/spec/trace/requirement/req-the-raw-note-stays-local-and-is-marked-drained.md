@@ -11,7 +11,7 @@ refines:
   - uc-put-a-finding-where-it-outlives-the-machine
 source_refs:
   - raid-risk-the-option-and-its-note-drift-apart
-  - vp-what-is-learned-outlives-the-machine
+  - vp-the-ledger
 priority: must
 ---
 

@@ -122,3 +122,24 @@ The trigger stands unchanged.
 ## Sweep 2026-08-19, at i5's retro
 
 RE-ACCEPTED. Neither trigger fired — the run mode is unchanged and the code-review iteration has not run. i5's own trace-design sweep touched the same seam from the other side: it found an interface node naming an element of a subsystem that had been cut wholesale ([[raid-iss-a-cut-subsystem-left-its-interface-node-behind]]). A subsystem off the live path leaves debris in the corpus as well as in the code.
+
+## Swept 2026-08-19, at i9's onboard-retro: REPAID BY CUTTING, WITH TWO GAPS
+
+THE SUBJECT IS GONE. At ref 570cdc66 the cluster was eight engine files and
+six test files. At HEAD a glob for any of them returns zero, and one search for
+the cluster's name across every TypeScript file hits only `bin/se-mcp.ts`. They
+were already absent at ref 13cb0538, so the cut predates i16's ship.
+
+SO THE STATE THIS ENTRY FORBIDS CANNOT EXIST ANY MORE. Green tests over
+unreachable code need both, and neither survives.
+
+TWO THINGS IT ASKED FOR DID NOT HAPPEN, and they are recorded rather than
+quietly dropped.
+
+- THE TRACE RECOVERY IT DEMANDED BEFORE EITHER OUTCOME was never done. The two
+  design-spec nodes went with the code.
+- NO EVIDENCE FILE RECORDS THE OWNER'S WORD ON THE CUT. The cut looks right and
+  its authorisation is not written down anywhere this sweep could find.
+
+THAT SECOND GAP IS THE ONE WORTH A DECISION. A cut nobody can point to an
+authorisation for is indistinguishable from a cut nobody authorised.

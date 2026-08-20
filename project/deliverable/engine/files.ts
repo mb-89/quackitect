@@ -68,8 +68,10 @@ export interface ReadResult {
   exists?: boolean;
   /** Text reads only — an image has no lines. */
   total_lines?: number;
-  /** Present on range reads: which slice this is. */
+  /** Present on line-range reads: which slice this is. */
   range?: { offset: number; limit: number };
+  /** Present on exact character reads, used for long generated lines. */
+  char_range?: { offset: number; limit: number; to: number; of: number };
   /** Present when the read came from a committed ref, not the working tree. */
   ref?: string;
   content: string;
@@ -134,10 +136,37 @@ function imageRead(path: string, bytes: Buffer, mimeType: string, ref?: string):
   return res;
 }
 
+function characterRead(
+  path: string,
+  raw: string,
+  hash: string,
+  opts: { charOffset?: number; charLimit?: number; ref?: string },
+): ReadResult {
+  const charOffset = Math.max(0, opts.charOffset ?? 0);
+  const charLimit = Math.max(1, opts.charLimit ?? 3_000);
+  const to = Math.min(raw.length, charOffset + charLimit);
+  return {
+    path,
+    hash,
+    bytes: raw.length,
+    content: raw.slice(charOffset, to),
+    char_range: { offset: charOffset, limit: charLimit, to, of: raw.length },
+    ...(opts.ref !== undefined ? { ref: opts.ref } : {}),
+  };
+}
+
 export function fileRead(
   root: string,
   path: string,
-  opts: { offset?: number; limit?: number; ref?: string; optional?: boolean; maxChars?: number } = {},
+  opts: {
+    offset?: number;
+    limit?: number;
+    charOffset?: number;
+    charLimit?: number;
+    ref?: string;
+    optional?: boolean;
+    maxChars?: number;
+  } = {},
 ): ReadResult {
   // AN OPTIONAL READ FORGIVES ABSENCE AND NOTHING ELSE. Some documents are
   // allowed not to exist — the handover is why this exists, and a boot that
@@ -192,11 +221,22 @@ export function fileRead(
   const raw = bytes.toString("utf8");
   const hash = contentHash(raw);
   const lines = raw.split("\n");
-  const wantsRange = opts.offset !== undefined || opts.limit !== undefined;
+  const wantsLineRange = opts.offset !== undefined || opts.limit !== undefined;
+  const wantsCharRange = opts.charOffset !== undefined || opts.charLimit !== undefined;
+  if (wantsLineRange && wantsCharRange) {
+    throw new Rejection({
+      clause: CLAUSES.UNKNOWN_ARGS,
+      expected: "either offset/limit for lines or char_offset/char_limit for exact text",
+      got: "both range modes",
+      remedy: { tool: "se_file_read", args: { path, char_offset: 0, char_limit: 3_000 } },
+      source: SRC,
+    });
+  }
+  if (wantsCharRange) return characterRead(path, raw, hash, opts);
   // The budget is raisable for a document the ENGINE wrote, because the
   // engine chose what went into it. Nothing the agent asks for moves it.
   const budget = opts.maxChars ?? READ_BUDGET;
-  if (!wantsRange && raw.length > budget) {
+  if (!wantsLineRange && raw.length > budget) {
     throw new Rejection({
       clause: CLAUSES.OVERSIZE_READ,
       expected: `a whole-file read under ${budget} chars — this file is ${raw.length} chars / ${lines.length} lines`,
@@ -210,7 +250,7 @@ export function fileRead(
     });
   }
   const offset = Math.max(1, opts.offset ?? 1);
-  const limit = wantsRange ? Math.max(1, opts.limit ?? RANGE_DEFAULT_LIMIT) : lines.length;
+  const limit = wantsLineRange ? Math.max(1, opts.limit ?? RANGE_DEFAULT_LIMIT) : lines.length;
   const slice = lines.slice(offset - 1, offset - 1 + limit);
   const truncated: number[] = [];
   const numbered = slice.map((l, i) => {
@@ -223,7 +263,7 @@ export function fileRead(
   });
   const res: ReadResult = { path, hash, total_lines: lines.length, content: numbered.join("\n") };
   if (opts.ref !== undefined) res.ref = opts.ref;
-  if (wantsRange) res.range = { offset, limit };
+  if (wantsLineRange) res.range = { offset, limit };
   if (truncated.length > 0) res.truncated_lines = truncated;
   return res;
 }

@@ -77,3 +77,27 @@ Owed: the full both-machines walk needs a real second machine. [[raid-asm-peer-r
 Two iterations ship in the time one used to take. The archive holds both, and the one ledger answers who did what and why — same rigor, twice the hands.
 |||
 Owed with the slide before it: two concurrently shipped iterations are the population claim. What stands demonstrated is the shape — two clones, two engines, two records — not the throughput.
+
+## What i9 adds, 2026-08-19
+
+THE SECOND MACHINE PAYS A ONE-TIME COST at the collapse, and this story is
+where it lands.
+
+THE MACHINE-STATE FOLDER IS IGNORED BY VERSION CONTROL, so no commit can carry
+it. The machine that makes the move relocates it as a file operation. Every
+OTHER clone keeps it where it was, and the engine then looks in the new place
+and finds nothing.
+
+AND FINDING NOTHING IS A LEGAL STATE, because a folder nobody has driven has
+none either. So a long-driven clone reads as a fresh one, with its history
+intact one level up and nothing pointing at it.
+
+THE OWNER RULED IT ACCEPTABLE, 2026-08-19, on the grounds that this concerns
+one project on two machines. No mechanism is built. The migration is one folder
+move by hand, and it is written out on
+[[raid-risk-an-existing-checkout-keeps-its-state-where-the-move-left]] with its
+verification step.
+
+WHY IT BELONGS ON THIS STORY RATHER THAN ONLY IN THE REGISTER. This deck is the
+only place in the corpus where two machines holding two clones is the subject.
+A reader working out what the second machine needs comes here first.

@@ -19,6 +19,7 @@ priority: should
 weighs_against:
   - req-setup-floor-editor-shell >
   - req-newcomer-leaves-able-to-ask > — crippling outranks abrasive on the damage scale
+  - req-desk-offers-a-tour > — both touch a newcomer's first hour, and a machine that will not install has no tour to offer. THIS REPLACES AN UNREASONED EDGE IN THE OPPOSITE DIRECTION, which made the standing judgments cyclic: this row already sat above the whole tour chain, and the tour's own bottom pointed back up at it
 ---
 
 ## Detail

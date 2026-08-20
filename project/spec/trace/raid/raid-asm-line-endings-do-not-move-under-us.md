@@ -6,7 +6,7 @@ kind: assumption
 statement: A document's bytes on disk stay stable while nobody edits its meaning, so a content hash does not change for a reason the reader would call no change.
 owner: the driving agent
 trigger: the reading credit's hash is chosen, or a line-ending complaint appears in the log
-status: open
+status: probed
 impact: A credit dies for a change nobody made. The agent re-reads a document it still holds, which is the exact defect the requirement removes, arriving by a different door.
 breaks_how_badly: abrasive
 how_likely: plausible
@@ -54,3 +54,18 @@ decision rather than a habit.
 
 Bounded. A false miss costs one re-read, never a wrong answer. That is why
 this is abrasive rather than corrosive: it wastes work and never corrupts it.
+
+## Probe result, 2026-08-19 — HOLDS at the filesystem, which is not the whole channel
+
+CARRIAGE-RETURN LINE-FEED WAS WRITTEN AND READ BACK BYTE-IDENTICAL on this
+machine. Nothing between the write and the read rewrote the endings.
+
+WHAT THAT SETTLES is the layer this entry named: the platform does not move
+endings under us.
+
+WHAT IT DOES NOT SETTLE is the tooling above it. Version control, an editor's
+own save behaviour, and the lane's patch verb each touch endings, and the lane
+is documented as CORRECTING a mismatch rather than refusing it. A correction is
+a deliberate move, which is the opposite of the drift this entry worries about,
+but it means a byte comparison across the whole chain is a different experiment
+from this one.

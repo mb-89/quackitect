@@ -4,6 +4,7 @@ id: opt-one-command-install
 type: "[[option]]"
 statement: collapse the whole install to a single command with no interactive wizard, so nothing stands between a bare machine and a running product
 cluster: cluster-the-bootstrap
+question: how the product reaches a machine that has nothing on it
 found_by: prior-art
 source: Getting Started with @microsoft/spfx-cli, https://spknowledge.com/2026/05/12/getting-started-microsoft-spfx-cli-tutorial/
 ---

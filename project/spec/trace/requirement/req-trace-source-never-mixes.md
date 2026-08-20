@@ -14,4 +14,5 @@ source_refs:
 priority: should
 weighs_against:
   - req-broken-trace-is-a-defect >
+  - req-overlay-resolution > — mixing trace sources corrupts the record itself and nothing downstream can detect it; a wrong overlay layer serves the wrong method, which shows up the first time somebody reads the guidance
 ---
