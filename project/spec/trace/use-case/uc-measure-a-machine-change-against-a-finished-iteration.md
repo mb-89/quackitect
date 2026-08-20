@@ -28,6 +28,25 @@ priority: must
 
 1b. The engineer names a size. The system draws an archived iteration pinned at that size, records the seed of the draw, and states both.
 
+5a. The subject is the OLDEST shipped iteration, so no older neighbour exists to prove the tree with. The run proceeds and RECORDS that it had no control — a weaker result, not an equal one.
+
+5b. An older neighbour exists and its files are NOT in the stood tree. The run refuses: an empty fetch and a correct rewind both answer "not there" to everything, so a tree that cannot show what the rewind was never meant to remove has proved nothing.
+
+6a. The model or the reasoning effort is unset. The refusal happens AT BIND and names which, because a run that walks a whole iteration and is only then refused at report time has thrown the work away.
+
+7a. The walk dies part way. The report still exists, and `ended_at` is where it actually stopped — a run that died is the interesting one.
+
+7b. The call log predates the position stamp, so no record says which state it was in. Cost per state REFUSES rather than returning one bucket holding the whole walk under a plausible label.
+
+## What this use case does not promise
+
+IT CANNOT TELL A GOOD DECISION FROM A BAD ONE. A re-walked iteration has no live subject to decide about, so what is measured is process overhead under observation — never production behaviour, and never quality.
+
+A SINGLE RUN IS NOT A RESULT. Agents vary between identical runs by more than the effect being measured, so the unit is a median over at least three with the spread beside it, compared only within one set of conditions.
+
+THE VERB IS `se_benchmark`. `se_benchmark {iteration?, stop_at?}` opens a run and `se_benchmark {stop: true, ended_at}` closes one. It is one verb because a run has one lifetime.
+
+
 1c. The engineer names a stop point. The run walks to that gate instead of to the end, and the report says so, because a run stopped early cannot be compared with one that was not.
 
 2a. No archived iteration matches. The system refuses and names what the archive holds, rather than substituting a near miss.

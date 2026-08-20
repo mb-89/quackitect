@@ -1655,3 +1655,80 @@
 {"ts":"2026-08-20T11:43:24.941Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d892","brief":"the report fixture carries the stamp set the guard now checks"}
 {"ts":"2026-08-20T11:44:18.154Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d893","brief":"bind checks the shape a report will carry"}
 {"ts":"2026-08-20T11:45:20.582Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d894","brief":"committing the second fix pass"}
+{"ts":"2026-08-20T11:45:35.824Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d895","brief":"running the battery from a quiescent tree"}
+{"ts":"2026-08-20T11:45:46.643Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d896","brief":"reading what fix-findings asks"}
+{"ts":"2026-08-20T11:46:19.251Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d897","brief":"two fix rounds against one standing gatekeeper"}
+{"ts":"2026-08-20T11:46:40.159Z","op":"update","visit":"iterations/i37/cut-criteria@4","node":"d898","brief":"re-aiming at the ship state"}
+{"ts":"2026-08-20T11:46:42.483Z","op":"update","visit":"iterations/i37/cut-criteria@4","node":"d899","brief":"walking the chain forward"}
+{"ts":"2026-08-20T11:47:02.952Z","op":"update","visit":"iterations/i37/fold-back@3","node":"d900","brief":"walking the chain forward"}
+{"ts":"2026-08-20T11:49:08.129Z","op":"update","visit":"iterations/i37/verification@1","node":"d901","brief":"walking the chain forward"}
+{"ts":"2026-08-20T11:51:10.792Z","op":"update","visit":"iterations/i37/verification@1","node":"d902","brief":"walking the chain forward"}
+{"ts":"2026-08-20T11:53:16.852Z","op":"update","visit":"iterations/i37/verification@1","node":"d903","brief":"walking the chain forward"}
+{"ts":"2026-08-20T11:55:23.773Z","op":"update","visit":"iterations/i37/verification@1","node":"d904","brief":"walking the chain forward"}
+{"ts":"2026-08-20T11:56:47.960Z","op":"update","visit":"iterations/i37/verification@1","node":"d905","brief":"checking where the walk stands"}
+{"ts":"2026-08-20T11:57:25.045Z","op":"update","visit":"iterations/i37/verification@1","node":"d906","brief":"walking the chain forward"}
+{"ts":"2026-08-20T11:57:34.319Z","op":"update","visit":"iterations/i37/verification@1","node":"d907","brief":"letting the exit script run the battery"}
+{"ts":"2026-08-20T11:59:26.879Z","op":"update","visit":"iterations/i37/verification@1","node":"d908","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:12:44.608Z","op":"update","visit":"iterations/i37/verification@1","node":"d909","brief":"the verb gets a use case saying what somebody does with it"}
+{"ts":"2026-08-20T12:12:55.114Z","op":"update","visit":"iterations/i37/verification@1","node":"d910","brief":"the battery named two, and fixing needs write access"}
+{"ts":"2026-08-20T12:12:55.726Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d911","brief":"moving to fix-findings"}
+{"ts":"2026-08-20T12:13:08.529Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d912","brief":"the verb gets a use case saying what somebody does with it"}
+{"ts":"2026-08-20T12:13:20.521Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d913","brief":"the verb count moves once, with the confirmation written down"}
+{"ts":"2026-08-20T12:14:01.297Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d914","brief":"a use case for this already existed; mine was a duplicate"}
+{"ts":"2026-08-20T12:14:22.000Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d915","brief":"a use case for this already existed; mine was a duplicate"}
+{"ts":"2026-08-20T12:14:36.140Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d916","brief":"back to the state that can write"}
+{"ts":"2026-08-20T12:14:39.625Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d917","brief":"at fix-findings to remove a duplicate"}
+{"ts":"2026-08-20T12:14:41.262Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d918","brief":"removing my duplicate use case"}
+{"ts":"2026-08-20T12:14:51.344Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d919","brief":"reading the stopped step at cut-criteria"}
+{"ts":"2026-08-20T12:15:13.256Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d920","brief":"the chain needs run-candidates re-signed"}
+{"ts":"2026-08-20T12:15:17.796Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d921","brief":"at run-candidates"}
+{"ts":"2026-08-20T12:15:26.602Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d922","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:15:29.642Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d923","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:15:31.246Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d924","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:15:32.814Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d925","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:15:34.436Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d926","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:15:36.060Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d927","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:15:37.620Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d928","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:16:29.150Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d929","brief":"removing the duplicate use case that broke the trace"}
+{"ts":"2026-08-20T12:16:43.422Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d930","brief":"going to the root of the fallen chain"}
+{"ts":"2026-08-20T12:16:48.499Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d931","brief":"at the chain root"}
+{"ts":"2026-08-20T12:17:42.612Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d932","brief":"asking which doors this state offers"}
+{"ts":"2026-08-20T12:18:20.918Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d933","brief":"the extensions M7 measured, and the verb that opens a run"}
+{"ts":"2026-08-20T12:18:36.021Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d934","brief":"the duplicate stops being a node so the walk can reach a delete"}
+{"ts":"2026-08-20T12:18:52.763Z","op":"update","visit":"iterations/i37/cut-criteria@5","node":"d935","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:19:16.564Z","op":"update","visit":"iterations/i37/record-adrs@5","node":"d936","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:19:38.613Z","op":"update","visit":"iterations/i37/author-tests@3","node":"d937","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:21:56.115Z","op":"update","visit":"iterations/i37/verification@2","node":"d938","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:24:09.011Z","op":"update","visit":"iterations/i37/verification@2","node":"d939","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:26:20.313Z","op":"update","visit":"iterations/i37/verification@2","node":"d940","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:28:21.058Z","op":"update","visit":"iterations/i37/verification@2","node":"d941","brief":"checking where the walk stands"}
+{"ts":"2026-08-20T12:28:56.835Z","op":"update","visit":"iterations/i37/verification@2","node":"d942","brief":"the exit script runs the battery"}
+{"ts":"2026-08-20T12:34:22.816Z","op":"update","visit":"iterations/i37/verification@2","node":"d943","brief":"a delete needs a state that grants one"}
+{"ts":"2026-08-20T12:34:23.414Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d944","brief":"moving to fix-findings"}
+{"ts":"2026-08-20T12:34:54.950Z","op":"update","visit":"iterations/i37/cut-criteria@6","node":"d945","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:34:55.628Z","op":"update","visit":"iterations/i37/cut-criteria@6","node":"d946","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:35:04.523Z","op":"update","visit":"iterations/i37/cut-criteria@6","node":"d947","brief":"the iterations one target is its ship state"}
+{"ts":"2026-08-20T12:35:07.119Z","op":"update","visit":"iterations/i37/cut-criteria@6","node":"d948","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:35:28.041Z","op":"update","visit":"iterations/i37/rank-unknowns@6","node":"d949","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:38:06.236Z","op":"update","visit":"iterations/i37/verification@3","node":"d950","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:40:33.869Z","op":"update","visit":"iterations/i37/verification@3","node":"d951","brief":"the battery named a file that must be deleted"}
+{"ts":"2026-08-20T12:40:34.468Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d952","brief":"checking position"}
+{"ts":"2026-08-20T12:40:59.141Z","op":"update","visit":"iterations/i37/cut-criteria@7","node":"d953","brief":"deleting the duplicate use case"}
+{"ts":"2026-08-20T12:41:18.010Z","op":"update","visit":"iterations/i37/cut-criteria@7","node":"d954","brief":"escaping to route into a state that grants a delete"}
+{"ts":"2026-08-20T12:42:02.155Z","op":"update","visit":"iterations/i37/draft-vision@2","node":"d956","brief":"checking position after the desk"}
+{"ts":"2026-08-20T12:42:36.886Z","op":"update","visit":"iterations/i37/gate-requirements@8","node":"d957","brief":"deleting the duplicate use case"}
+{"ts":"2026-08-20T12:42:53.888Z","op":"update","visit":"iterations/i37/gate-requirements@8","node":"d958","brief":"author-tests grants the delete this fix needs"}
+{"ts":"2026-08-20T12:43:16.771Z","op":"update","visit":"iterations/i37/declare-winner@7","node":"d959","brief":"checking position"}
+{"ts":"2026-08-20T12:43:35.446Z","op":"update","visit":"iterations/i37/author-tests@5","node":"d960","brief":"deleting the duplicate use case"}
+{"ts":"2026-08-20T12:43:53.545Z","op":"update","visit":"iterations/i37/author-tests@5","node":"d961","brief":"a refusal that names no reachable remedy"}
+{"ts":"2026-08-20T12:44:07.456Z","op":"update","visit":"iterations/i37/author-tests@5","node":"d962","brief":"committing the use-case merge and the delete"}
+{"ts":"2026-08-20T12:44:17.665Z","op":"update","visit":"iterations/i37/author-tests@5","node":"d963","brief":"committing the use-case work"}
+{"ts":"2026-08-20T12:44:17.820Z","op":"update","visit":"iterations/i37/author-tests@5","node":"d964","brief":"committing the use-case work"}
+{"ts":"2026-08-20T12:44:31.897Z","op":"update","visit":"iterations/i37/author-tests@5","node":"d965","brief":"back to the ship state as the one target"}
+{"ts":"2026-08-20T12:44:33.022Z","op":"update","visit":"iterations/i37/author-tests@5","node":"d966","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:46:55.772Z","op":"update","visit":"iterations/i37/gate-implementation@0","node":"d967","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:46:57.217Z","op":"update","visit":"iterations/i37/gate-implementation@0","node":"d968","brief":"walking the chain forward"}
+{"ts":"2026-08-20T12:47:10.920Z","op":"update","visit":"iterations/i37/gate-implementation@0","node":"d969","brief":"reading the gate-implementation form"}
+{"ts":"2026-08-20T12:47:26.823Z","op":"update","visit":"iterations/i37/gate-implementation@0","node":"d970","brief":"probing the checklists this gate names"}
+{"ts":"2026-08-20T12:47:38.919Z","op":"update","visit":"iterations/i37/gate-implementation@0","node":"d971","brief":"discovering the exact items each checklist names"}
+{"ts":"2026-08-20T12:49:20.180Z","op":"update","visit":"iterations/i37/gate-implementation@0","node":"d972","brief":"gate-implementation: pass with two named overrides"}
