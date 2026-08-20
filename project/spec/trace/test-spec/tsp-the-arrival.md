@@ -37,3 +37,34 @@ So the cases here are weighted toward the quiet direction. Two of the six check
 that something is SAID: the hook announcing a failed arrival, and the opt-out
 announcing a skip. Both would pass trivially if the code simply did nothing, and
 both are written to fail in exactly that case.
+
+## Steps
+
+EVERY CASE IN THE REFERENCED FILE IS ONE STEP. The load-bearing ones, and why
+each earns its place rather than the whole list restated.
+
+- THE ARRIVAL ITSELF runs end to end, which is the control. Without it a suite
+  of failure cases can all pass while nothing works.
+- A RUNTIME BELOW THE FLOOR STOPS THE ARRIVAL, and the declaration is left
+  alone. Two claims in one case on purpose: the stop, and the fact that
+  nothing was edited to make it possible.
+- AN ARRIVAL THAT STOPS PLACES NO CAGE. This is the case that matters most. A
+  half-arrived machine with no cage is an agent that believes it is caged and
+  is not, which is the worst failure this area can produce.
+- THE HOOK SURVIVES A FAILED ARRIVAL AND SAYS SO. The requirement is that the
+  arrival never costs the session, and a hook that dies with the arrival costs
+  exactly that.
+- SKIPPING IS LOUD. The escape hatch says that it skipped, so a session that
+  quietly did nothing cannot look like one that succeeded.
+- EVERY STEP ACCOUNTS FOR ITSELF IN THE SAME SHAPE. This is what makes the
+  other cases readable at a failure, because one sentence names one step.
+- AN UNREACHABLE REMOTE DEGRADES RATHER THAN STOPS. The boundary case on the
+  one input the machine does not control.
+
+THE ORACLE IS THE NAMED STEP, not the exit code. Every failure of the first
+cloud run presented as one symptom that pointed at the wrong step in six of
+seven cases, and that is the defect these steps exist to prevent.
+
+THIS SECTION WAS ADDED 2026-08-19, at i9's author-tests, because the spec
+carried a test method and no Steps. The cases were read before it was written;
+nothing here is copied from the file.

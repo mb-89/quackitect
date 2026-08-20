@@ -1,8 +1,9 @@
 ---
 form: scope-non-goals
+amended: "2026-08-19T12:45:21.205Z by agent — the M2 gate found the owner's no-migration-mechanism ruling missing from the exclusion list"
 by: agent
-signed_off: 2026-08-19T11:44:00.470Z
-reopened: "2026-08-19T11:43:04.409Z — The owner ruled 2026-08-19 that the one-time installer is not a structural change and does not move the size, so it comes into scope rather than staying a non-goal."
+signed_off: 2026-08-19T12:06:16.128Z
+reopened: "2026-08-19T12:05:44.987Z — The blessed goals changed twice above it — the collapse became the first goal and the column went major — so its scope list is for an iteration that no longer exists."
 authors: agent
 files:
 ---
@@ -11,55 +12,58 @@ files:
 
 ## current_situation
 
-Scope is reopened and widened on the owner's ruling of 2026-08-19. The installer ask is not a structural change and does not move the size, so it comes in rather than staying out.
+Scope is re-earned against the blessed goals, which moved twice after this state first signed.
 
-WHAT FELL WITH THE REOPEN: gate-motivation, which is the mechanism working rather than a cost. Six states stayed green. The gate returns as a recheck asking only whether the named change moved its claim.
+WHAT CHANGED ABOVE IT. The column went to major, the wrapper collapse became the FIRST goal rather than a non-goal, and the marker goal dissolved entirely.
 
-WHAT THE ASK IS. Run the installer once. From then on, opening the editor pulls everything the session needs. Where an update cannot apply to a running window, say so in a toast naming the restart.
+SO THIS IS A REWRITE RATHER THAN A RECHECK. The previous scope was correct for a smaller iteration that no longer exists.
 
-WHY IT SITS HERE RATHER THAN ELSEWHERE. It is the same question this iteration already asks in a different place: what does a tool need to find and set up before it can work in a tree. The marker answers it for the engine. This answers it for the person.
+AND THE MAJOR COLUMN SHARPENS THIS STATE'S OWN JOB. Its note says an architectural move without a sharp exclusion list sprawls, which is why the list below is longer than the one it replaces.
 
-THE SPLIT IS ALREADY VISIBLE IN THE LAUNCHER. Some of what it does genuinely cannot move, and the rest can.
+THE BINDING SYSTEM-LEVEL EXCLUSION LIST STILL COMES LATER, at draw-context. This is the vision-level cut.
 
 ## scope
 
-- MOVE THE MACHINE-STATE FOLDER into project/, and re-locate every path that resolves it BEFORE the first edit rather than after.
-- COUNT THE CALLERS FIRST. Every module that builds a path from that folder is enumerable and the list is the move's own starting point.
-- CHOOSE THE MARKER MECHANISM, then build it. Two work and neither is chosen. The vision's third does not.
+- COLLAPSE THE WRAPPER. Everything at the repository root moves into the folder that gets opened, until the root holds the project and git's own plumbing and nothing else.
+- THE MACHINE-STATE FOLDER GOES FIRST, because its home is the one the rule settles first and every other move follows the same rule.
+- COUNT THE CALLERS BEFORE THE FIRST EDIT, over every path that assumes a level above the project. The packager, the continuous-integration configuration, the launcher, the cage placement and the engine's own resolution are all inside that count.
+- RE-READ THE STANDING REQUIREMENTS the move touches, for continued truth. This is the major column's own sweep and the reason the column was raised.
+- MOVE FIRST, CLEAN SECOND, AND STOP IN BETWEEN. Nothing is renamed and nothing is deleted while things are moving.
+- THE CLEANUP IS A STEP THAT WAITS FOR THE OWNER. After everything is in one place they rule what should not have travelled.
 - SPLIT THE LANE'S EXCLUSION BY FILE, keeping the three files that have a structured door and serving the rest.
-- WRITE A REASON FOR EVERY NAME THAT STAYS HIDDEN. Five are hidden today and none records why. A name with no reason does not survive the split.
-- GIVE THE ENGINE ONE CORPUS READER, so what the corpus is has a single answer.
+- WRITE A REASON FOR EVERY NAME THAT STAYS HIDDEN. Five are hidden today and none records why.
+- GIVE THE ENGINE ONE CORPUS READER.
 - PIN BRANCH INDEPENDENCE WITH ONE TEST: the folder resolves to one place while a record is bound.
-- MOVE THE WATCH FILE inside the marker folder.
-- CORRECT THE NEVER-COMMITTED WORDING everywhere it is stated, in the same act that lands the marker.
-- INVENTORY THE LAUNCHER FIRST, step by step, and mark each step as one-time or every-time. Nobody has written that list and the whole installer ask rests on it.
-- THE ONE-TIME HALF STAYS IN THE LAUNCHER: installing the runtime and the tools the package manager fetches. Neither can run from inside a process that needs the runtime to exist.
-- THE EVERY-TIME HALF MOVES INTO THE EDITOR'S ACTIVATION: clearing a stale server, the preflight check, refreshing what a changed tree needs, placing the cage, starting the lane, and re-projecting the prompt layer.
-- DETECT WHAT CANNOT APPLY TO A RUNNING WINDOW, and say so in a toast that names restarting the window. The owner accepted a restart as the answer; what they will not accept is silence.
-- ONE RUN OF THE LAUNCHER, THEN NEVER AGAIN, is the pass line for the whole of it.
+- INVENTORY THE LAUNCHER, step by step, marking each one-time or every-time.
+- MOVE THE EVERY-TIME HALF INTO THE EDITOR'S ACTIVATION, with a message where something cannot apply to a running window.
+- READ EVERY EVERY-TIME STEP AGAINST THE CONSENT LINE: would somebody opening a folder be surprised this happened.
 
 ## non_goals
 
-- THE 121 BROKEN CITATIONS. They point at files that are never committed, so no move repairs them. They must be rewritten, and that is the big sweep's work.
-- THE METHOD FAN-OUT TO OPEN WORKTREES. Obsolete since worktrees were retired, and ruled so by the owner. This iteration is smaller than its vision reads.
-- TIDYING THE REST OF THE REPOSITORY ROOT. Seven visible entries stay after this move. The owner steered that pass to the engine-hygiene record.
-- APPLYING AN ENGINE CHANGE TO A RUNNING WINDOW WITHOUT A RESTART. The owner accepted the toast as the answer, so live reload is deliberately not attempted.
+- THE 121 BROKEN CITATIONS. They point at files that are never committed, so no move repairs them. They belong to the big sweep that follows.
+- THE COMMITTED MARKER, and the whole question of recognising a tree from inside a clone. The folder open in the editor is the project, so nothing needs recognising.
+- SEEDING A PROJECT AUTOMATICALLY when the agent starts somewhere that is not one. Raised and struck the same day.
+- APPLYING AN ENGINE CHANGE TO A RUNNING WINDOW WITHOUT A RESTART. The message is the accepted answer, so live reload is not attempted.
+- RENAMING OR RESHAPING ANYTHING THAT MOVES. The collapse relocates files and changes no file's content beyond the paths pointing at it.
+- DECIDING THE CLEANUP WITHOUT THE OWNER. Their candidates are examples rather than a list. The agent moves; it does not prune.
+- THE METHOD FAN-OUT TO OPEN WORKTREES. Obsolete since worktrees were retired.
 - THE PREDECESSOR'S FOUR-NAMED-MUTATIONS INVARIANT, which would make the tree provably clean after any other command. Worth stealing and wider than this delta.
-- WHETHER THE EXCLUSION LIST SHOULD EXIST AT ALL. This delta splits it by file and assumes the mechanism stands. Arguing it away is a different question.
+- A MECHANISM FOR MIGRATING AN EXISTING CHECKOUT. The owner ruled on 2026-08-19 that none is built. Two machines hold a checkout in the old shape, and moving each is a hand operation done once. The steps stand in sty-work-on-two-machines, and the accepted risk carries the reasoning. Building a migrator would cost more than the migration.
 
 ## follow_up
 
-THE SCOPE GREW ONCE, ON THE OWNER'S RULING, and the growth is recorded rather than absorbed quietly.
+THE EXCLUSION LIST IS SHARPER THAN THE ONE IT REPLACES, and it had to be, because the iteration doubled.
 
-WHAT THEY RULED. The installer ask is not a structural change and does not increase or decrease the size significantly. That is theirs to judge and it is judged.
+TWO NON-GOALS EXIST TO STOP THE WORK EATING ITSELF.
 
-MY RESERVATION, SAID ONCE AND THEN DROPPED. It adds a second subsystem to an iteration whose other half is a folder move, and the previous iteration's most expensive step was this one growing twice in an afternoon. The size stays minor on their ruling, and the escalation clause at the kickoff remains the visible way out if the work outgrows it.
+- NOTHING IS RENAMED OR RESHAPED WHILE MOVING. Without that line a reviewer cannot tell a relocated file from a deleted one, and the cleanup becomes an argument about a diff.
+- THE AGENT DOES NOT PRUNE. The owner's candidates are examples. Acting on them as a list would turn illustrations into a decision nobody made.
 
-WHY THE RESERVATION IS WEAKER THAN IT FIRST LOOKED. The two halves share a question rather than merely a record: what must a tool find and prepare before it can work in a tree. The marker answers it for the engine, the activation answers it for the person, and both are about a fresh clone becoming usable with no hand-work.
+ONE SCOPE ITEM IS A CHECK RATHER THAN A DELIVERABLE. Reading every every-time step against the consent line turns the launcher inventory from a plan into a probe, and it is the silent-bootstrap entry's own stated probe.
 
-THE FIRST ACT OF THE NEXT MILESTONE IS NOW AN INVENTORY. Step through the launcher and mark each step one-time or every-time. Everything else in the installer half is unscopable until that list exists, which is why it is written as a scope item rather than assumed.
+ONE MECHANICAL LESSON FROM RE-EARNING THIS STATE, worth the next session's time. A fan leg the walker will not resume is freed by REOPENING it. An aim lands on it but does not serve its form, and the bare pull needed to get the form sweeps the walk back to the other leg. The reopen breaks that loop, and it cost eight calls to find.
 
-ONE FACT ALREADY ESTABLISHED, so the inventory does not start from nothing. The launcher installs the runtime through the system package manager and pulls the new path into its own window. That cannot move into a process which needs the runtime in order to start.
+WHAT THE NEXT MILESTONE INHERITS. The context boundary, where this vision-level cut becomes the binding system-level exclusion list a check can read.
 
 ## anything_else
 

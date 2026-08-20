@@ -8,7 +8,7 @@ owner: the driving agent
 status: open
 impact: "A builder following the record lands on unrelated code, and the sizing argument rests on a claim about how small the change is that nobody can now check from the citation."
 breaks_how_badly: abrasive
-how_likely: certain
+how_likely: expected
 source_refs:
   - "the record was seeded 2026-08-12; the file it cites was restructured by two iterations that shipped after"
 ---

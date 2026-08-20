@@ -704,8 +704,11 @@ export function refsIn(text: string): string[] {
 /** see dsp-radial-layout.md#the-references-a-table-row-carries */
 export function refsInRows(text: string, columns = 2): string[] {
   const out: string[] = [];
-  for (const line of text.split(/\r?\n/)) {
-    if (!/^\s*\|/.test(line)) continue;
+  const rows = text.split(/\r?\n/).filter((line) => /^\s*\|/.test(line));
+  // A HEADER IS NOT A ROW: its first cell is a column name, and a hyphenated
+  // column name survives the id filter and then resolves to nothing.
+  const sep = rows.findIndex((line) => /^\s*\|[\s:|-]+\|\s*$/.test(line));
+  for (const line of sep === -1 ? rows : rows.slice(sep + 1)) {
     const cells = line.split("|").slice(1, -1);
     for (const cell of cells.slice(0, columns)) {
       const id = refId(cell.trim());

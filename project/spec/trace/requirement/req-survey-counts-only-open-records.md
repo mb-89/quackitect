@@ -12,6 +12,8 @@ refines:
 source_refs:
   - i12
 priority: should
+weighs_against:
+  - req-bm25-below-threshold-returns-empty > — a wrong survey count misroutes planning; a weak match returned instead of nothing costs one disposition
 ---
 
 ## Detail

@@ -6,6 +6,8 @@ statement: There is exactly one path that writes an option, and it applies the s
 method: inspection
 verifies:
   - req-the-crossing-is-the-same-act-for-a-person-and-an-agent
+files:
+  - none — an inspection examines the code rather than running it, so the Checklist below is the whole definition. What it reads is the set of modules that write the pool, and naming a file here would freeze that set as the answer when the point is to re-derive it.
 ---
 
 ## Scope

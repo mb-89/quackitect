@@ -8,7 +8,7 @@ owner: the driving agent
 trigger: the migration of the parked options, where duplicates arrive in bulk
 status: open
 impact: A pool with three statements of one option is worse than a backlog, because each carries its own ready-when and each is separately believable. Linear's triage has a duplicate action that MERGES and moves attachments to the canonical issue; ours has nothing.
-breaks_how_badly: annoying
+breaks_how_badly: abrasive
 how_likely: expected
 source_refs:
   - i17-the-options-pool-triage-a-raw-note-into-

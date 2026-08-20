@@ -374,6 +374,61 @@ function fieldDsm(f: EvidenceField, traceRoot: string, items: string[]): Dsm | n
   }
 }
 
+/** EVERY ANSWER ON EVERY NODE, and no filtering by what is being ordered.
+ *
+ *  THERE IS NO POOL HERE (owner ruling 2026-08-19). Take the notes, take their
+ *  comparisons, sort them. The filtering belongs where SCORING happens, never
+ *  where the order is computed.
+ *
+ *  IT WAS FILTERED TWICE AND BOTH CUTS COST THE SAME THING. First only the
+ *  items being ordered were read at all. Then, one fix later, an edge was kept
+ *  only if ONE end was among them — which still dropped the MIDDLE of any
+ *  chain, where both ends sit outside. A above X above Y above B is exactly
+ *  that shape, and it is common: the newcomer-tour chain runs through two rows
+ *  that are not themselves axes.
+ *
+ *  WHAT IT COST. The walk re-asked pairs the register had already answered,
+ *  and two iterations in a row read the resulting counter, concluded the state
+ *  held a hundred judgments of standing debt, and stopped. */
+function cardJudgments(files: Map<string, string>, writes: string): Judgment[] {
+  const js: Judgment[] = [];
+  for (const [id, file] of files) {
+    for (const raw of nodeList(file, writes)) {
+      const parts = raw.split(/\s+/);
+      const other = parts[0];
+      const verdict = parts[1];
+      if (other === undefined || other.length === 0) continue;
+      if (verdict === ">" || verdict === "<" || verdict === "=") js.push({ a: id, b: other, verdict });
+      // `!` says NOT THE SAME on an equivalence card. It settles the pair
+      // without joining the two, which is exactly what the order relation
+      // does with a strict verdict, so it rides in as one.
+      else if (verdict === "!") js.push({ a: id, b: other, verdict: ">" });
+    }
+  }
+  return js;
+}
+
+/** A MERGE IS AN EQUAL RANK, and the order walk has to be told (owner ruling
+ *  2026-08-19).
+ *
+ *  The merge is recorded under `weighs_with` and the ordering card writes
+ *  `weighs_against`, so without this the order walk cannot see a merge at all
+ *  and treats two rows measuring one thing as unrelated.
+ *
+ *  A `!` MEANS NOT THE SAME and merges nothing, so it is skipped. */
+function mergeEqualities(files: Map<string, string>): Judgment[] {
+  const out: Judgment[] = [];
+  for (const [id, file] of files) {
+    for (const raw of nodeList(file, "weighs_with")) {
+      const parts = raw.split(/\s+/);
+      const other = parts[0];
+      if (other === undefined || other.length === 0 || parts[1] === "!") continue;
+      out.push({ a: id, b: other, verdict: "=" });
+    }
+  }
+  return out;
+}
+
 /** THE ANSWERS ARE ON THE NODES, so a card's next question is derived and
  *  never stored. One frontmatter line per answered pair, shaped `<id>
  *  <verdict>`, with anything after it a reason for a reader.
@@ -391,22 +446,8 @@ function cardWalk(f: EvidenceField, traceRoot: string, items: string[]): WalkRes
     return null;
   }
   const known = new Set(items);
-  const js: Judgment[] = [];
-  for (const id of items) {
-    const file = files.get(id);
-    if (file === undefined) continue;
-    for (const raw of nodeList(file, f.writes)) {
-      const parts = raw.split(/\s+/);
-      const other = parts[0];
-      const verdict = parts[1];
-      if (!known.has(other)) continue;
-      if (verdict === ">" || verdict === "<" || verdict === "=") js.push({ a: id, b: other, verdict });
-      // `!` says NOT THE SAME on an equivalence card. It settles the pair
-      // without joining the two, which is exactly what the order relation
-      // does with a strict verdict, so it rides in as one.
-      else if (verdict === "!") js.push({ a: id, b: other, verdict: ">" });
-    }
-  }
+  const js = cardJudgments(files, f.writes);
+  if (kind === "order") js.push(...mergeEqualities(files));
   const pairs = kind === "equivalence" ? compoundingSuspectPairs(traceRoot).filter(([a, b]) => known.has(a) && known.has(b)) : undefined;
   return walk(items, js, kind, pairs);
 }
@@ -1066,13 +1107,28 @@ export function criterionAxisItems(traceRoot: string): string[] {
   }
   // THE ORDER IS THE HINT'S, NOT THE ALPHABET'S. Sorting here would throw
   // away the very thing that makes the first pass affordable.
+  //
+  // EVERY ROW APPEARS, INCLUDING MERGED ONES (owner ruling 2026-08-19). Two
+  // rows that measure the same thing SHARE A RANK rather than one of them
+  // vanishing into the other. Collapsing hid rows from the list a reader was
+  // looking at, and cut every chain that ran through a hidden member.
+  //
+  // MEMBERS STAY ADJACENT, so a group reads as a group rather than as
+  // duplicates scattered down the list.
+  const byGroup = new Map<string, string[]>();
+  for (const n of pool) {
+    const r = find(n.id);
+    const at = byGroup.get(r);
+    if (at === undefined) byGroup.set(r, [n.id]);
+    else at.push(n.id);
+  }
   const seen = new Set<string>();
   const out: string[] = [];
   for (const n of pool) {
     const r = find(n.id);
     if (seen.has(r)) continue;
     seen.add(r);
-    out.push(r);
+    out.push(...(byGroup.get(r) as string[]));
   }
   return out;
 }

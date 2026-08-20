@@ -2,18 +2,12 @@
 minted_in: i35-the-cloud-run-s-findings-land-the-fix-fi
 id: el-arrival
 type: "[[element]]"
-statement: Takes a clone that has no lane and produces a lane an ALREADY-RUNNING agent can attach to, with the means to call it — or reports which step failed and leaves the session standing.
+statement: "SUPERSEDED at i9, 2026-08-19, and folded into el-entrypoint: takes a clone that has no lane and produces a lane an ALREADY-RUNNING agent can attach to, with the means to call it, or reports which step failed and leaves the session standing."
 kind: new
 realization: make
 group: the-bootstrap
-implements:
-  - fn-arrive-on-a-machine.resolve-the-cited-refs
-  - fn-arrive-on-a-machine.judge-the-runtime
-  - fn-arrive-on-a-machine.supply-the-dependencies
-  - fn-arrive-on-a-machine.place-the-cage
-  - fn-arrive-on-a-machine.raise-the-lane
-  - fn-arrive-on-a-machine.hand-over-the-means-to-call
-  - fn-arrive-on-a-machine.account-for-the-arrival
+superseded_by: el-entrypoint
+implements: []
 source_refs:
   - uc-arrive-on-an-unattended-machine
   - req-one-command-takes-a-fresh-clone-to-a-live-lane

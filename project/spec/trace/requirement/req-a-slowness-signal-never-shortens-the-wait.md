@@ -10,6 +10,8 @@ verify_method: demonstration
 breaks_if_removed: The transparency demand is met to the letter and people leave anyway, and it reads as the demand having been wrong rather than as one reading of honest having been wrong.
 breaks_how_badly: abrasive
 priority: should
+weighs_against:
+  - req-open-notes-stay-visible > — a signal that steals from the wait it is reporting makes the product slower for saying so; notes going out of sight is recoverable by looking
 refines:
   - uc-quality-performance-efficiency
 source_refs:

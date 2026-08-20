@@ -4,6 +4,7 @@ id: opt-the-environment-stands-the-product-up
 type: "[[option]]"
 statement: The product never installs itself. A declared image or devcontainer arrives with the runtime and the product already in it, so the bootstrap cluster has nothing left to do.
 cluster: the-bootstrap
+question: how the product reaches a machine that has nothing on it
 found_by: without
 source: "trimming the-bootstrap: what if standing the product up does not exist, and who does its job"
 ---

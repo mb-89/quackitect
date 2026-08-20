@@ -6,7 +6,7 @@ statement: An engineer meets a real defect that blocks nothing, records it as ow
 method: demonstration
 demonstrates:
   - sty-carry-a-finding-without-stopping
-verifies: []
+verifies: "none — the demonstrates edge above carries this spec's trace; the two requirements stating the mechanics are req-a-harmless-finding-is-carried-not-stopped-on and req-a-harmless-finding-names-an-open-entry; both are verify method test so both belong on a test spec"
 files:
   - none — the procedure below is the definition; the observed session is the evidence
 ---

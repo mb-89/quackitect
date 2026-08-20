@@ -1,7 +1,8 @@
 ---
 form: log-risks
 by: agent
-signed_off: 2026-08-19T11:27:01.129Z
+signed_off: 2026-08-19T12:06:51.002Z
+reopened: "2026-08-19T12:06:32.515Z — Its inputs re-signed beneath it and the register gained an entry the prior-art scan produced, so the list is re-earned rather than assumed."
 authors: agent
 files:
 ---
@@ -10,15 +11,13 @@ files:
 
 ## current_situation
 
-The register opens for this iteration. It was not empty — the kickoff gate already filed two entries before this state was reached, and they are the first two goal conflicts made durable.
+The register is re-earned after its inputs re-signed. SEVEN entries stand now, all nodes rather than table rows.
 
-WHAT THIS STATE ADDED: four more, from the delta rather than from the whole goal system.
+WHAT THE SEVENTH IS. The prior-art scan the major column forced at frame-delta turned up a warning nobody was looking for: the editor's own silent bootstrap is a documented abuse shape, and this iteration's entry-point goal describes the same shape aimed at ourselves.
 
-TWO OF THE SIX ARE THE GOAL CONFLICTS THEMSELVES, ruled at draft-vision and filed so a later iteration can point at them. The other four are what the delta exposes once those rulings are taken as given.
+ONE OF THE SEVEN IS SUPERSEDED rather than open. The broken marker mechanism bears on nothing since the owner ruled no marker is needed. It stays listed, because a finding that stopped mattering is not a finding that was wrong.
 
-ONE IS GRADED CRIPPLING and it is an assumption rather than a risk. Every goal in this iteration rests on one reading of one standing ruling, and nobody has asked the person who made it.
-
-NO ENTRY HERE IS A TABLE ROW. Each is a node in the register folder, addressable and durable past this record's close.
+AND THE GOAL CONFLICTS THAT SEEDED THIS LIST HAVE CHANGED. The marker conflict dissolved. Two took its place, and one of them — convenience against consent — is what the seventh entry is about.
 
 ## raid_opened
 
@@ -28,20 +27,19 @@ NO ENTRY HERE IS A TABLE ROW. Each is a node in the register folder, addressable
 - raid-risk-a-path-that-resolves-the-machine-state-folder-is-missed
 - raid-risk-opening-a-hidden-file-changes-what-a-walk-in-flight-can-see
 - raid-risk-the-never-committed-wording-is-corrected-in-one-place-only
+- raid-risk-the-entry-point-goal-is-a-silent-bootstrap-by-another-name
 
 ## follow_up
 
-ONE ENTRY NEEDS A PERSON AND NOT A TEST, and it is the crippling one.
+SEVEN ENTRIES, AND THREE CARRY A PROBE THAT RUNS INSIDE THIS ITERATION.
 
-THE BRANCH-INDEPENDENCE ASSUMPTION HAS TWO HALVES. The mechanical half is probed by the test this iteration already owes — the folder resolves to one place while a record is bound. The INTENT half cannot be reached by any test: whether the ruling's author also meant the folder's depth.
+THE CRIPPLING ONE IS AN ASSUMPTION AND HALF ITS PROBE IS A QUESTION. Every goal rests on reading one standing ruling as being about which branch owns session state rather than about depth. A test in scope probes the mechanical half. The intent half is one sentence from the owner, and it blocks nothing.
 
-THAT QUESTION IS CHEAP AND IT IS THE OWNER'S. One sentence settles it, and it decides whether this iteration is a tidy-up or a proposal to change a standing guarantee.
+THE SILENT-BOOTSTRAP RISK IS PROBED BY WORK ALREADY IN SCOPE. Splitting the launcher into one-time and every-time produces a list, and every every-time step gets read against one question: would somebody opening a folder be surprised this happened. That turns the inventory from a plan into a check.
 
-IT DOES NOT BLOCK THE WALK. The record's reading is argued rather than asserted, the probe is in scope, and the design milestone can proceed on the reading while the question stands.
+THE MISSED-PATH RISK IS PROBED BY THE CALLER COUNT, the design milestone's first act, which now covers the whole collapse rather than one folder.
 
-THREE ENTRIES CARRY A TRIGGER THAT FIRES INSIDE THIS ITERATION. The missed-path risk fires on the first walk after the move. The raw-read risk fires the first time an agent reads a newly served file. The wording risk fires on the first newcomer after the marker lands.
-
-SO NONE OF THE FOUR IS PARKED FOR A LATER RECORD. They are all live within the work about to be done, which is what a register opened at the right moment looks like.
+TWO OF THE SEVEN WERE FOUND BY A SCAN RATHER THAN A REVIEW, and that is the part worth carrying forward. The prior-art scan the raised column forced turned up a broken mechanism and a security shape. Neither came from anybody reviewing the work, and the minor column would have run no scan at all.
 
 ## anything_else
 

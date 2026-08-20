@@ -5,7 +5,7 @@ statement: "Decompose the structure: the winner becomes elements, allocation, in
 state_kind: work
 filled_by: agent
 depends_on:
-  - declare-winner
+  - graft-onto-the-winner
 legal_tools:
   - se_file_read
   - se_file_write

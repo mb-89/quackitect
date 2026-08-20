@@ -94,10 +94,9 @@ test("compileColumn major: every row seeds; the machine validates", () => {
   const m = readRigorMatrix(ROOT);
   const decl = compileColumn(m, "major");
   validateMachine(decl);
-  // 52 rows + the mechanical start. finalize-docs and ship-review left the
-  // matrix (owner ruling 2026-08-11) until the book and vendoring mechanisms
-  // exist.
-  assert.equal(decl.states.length, 53);
+  // 53 rows + the mechanical start. finalize-docs and ship-review are not in
+  // the matrix until the book and vendoring mechanisms exist.
+  assert.equal(decl.states.length, 54);
   // Only a state that RUNS a machine descends; authoring states do not.
   assert.ok(decl.states.some((s) => s.id === "build-steps" && s.submachine === "build-chunks"));
   assert.ok(decl.states.some((s) => s.id === "run-spikes" && s.submachine === "spikes"));

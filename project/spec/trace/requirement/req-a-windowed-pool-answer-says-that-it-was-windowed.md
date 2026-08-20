@@ -13,6 +13,8 @@ source_refs:
   - vp-what-is-learned-outlives-the-machine
   - project/guidance/refusals.md "SE-C-137 — a truncating shape in the command"
 priority: should
+weighs_against:
+  - req-container-offers-its-records > — a silently truncated answer is read as complete; a container that does not offer its records is a missing affordance somebody notices at once
 ---
 
 ## Scenario

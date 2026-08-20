@@ -6,7 +6,7 @@ statement: An engineer re-runs the agent's own search and gets the same rows bac
 method: demonstration
 demonstrates:
   - sty-trust-a-repeatable-answer
-verifies: []
+verifies: "none — the demonstrates edge above carries this spec's trace; no requirement in the corpus mentions sty-trust-a-repeatable-answer; what this spec observes is whether a person TRUSTS an answer and no row states that as a behaviour"
 files:
   - none — the procedure below is the definition; the observed run is the evidence
 ---

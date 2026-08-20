@@ -6,7 +6,7 @@ statement: The calls a person or an agent makes to drive the machine come back i
 method: demonstration
 demonstrates:
   - sty-the-call-that-comes-back-inside-a-second
-verifies: "none — demonstrates: carries the edge; the one-second demand is verify_method: test and is carried by the bound checks on the modelled interfaces"
+verifies: "none — demonstrates carries the edge; the one-second demand is verify method test and is carried by the bound checks on the modelled interfaces"
 files:
   - none — the clock answers half of this, and the half that needs a person is a judgment about the list rather than a program
 ---

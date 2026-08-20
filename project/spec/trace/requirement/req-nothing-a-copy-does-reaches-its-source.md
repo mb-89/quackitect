@@ -16,6 +16,8 @@ source_refs:
   - sty-nothing-i-do-reaches-what-it-came-from
   - stk-vehicle-owner
 priority: must
+weighs_against:
+  - req-desk-states-the-folder-rule > — a copy reaching back into its source damages a tree nobody was working in; an unstated folder rule costs one person one confusion
 ---
 
 ## Detail

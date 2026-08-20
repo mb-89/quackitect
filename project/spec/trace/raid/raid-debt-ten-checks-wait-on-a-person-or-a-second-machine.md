@@ -9,7 +9,7 @@ trigger: when the work-token system can carry a task to a person; or at the firs
 status: open
 looked: 2026-08-19
 impact: A check nobody can run is marked owed every iteration and eventually stops being read, which is how four factual errors sat in the README while its own inspection was marked owed.
-breaks_how_badly: annoying
+breaks_how_badly: abrasive
 how_likely: expected
 source_refs:
   - raid-issue-the-corpus-wide-inspections-have-no-runner

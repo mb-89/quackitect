@@ -5,7 +5,7 @@ statement: Record the deciding ADRs, each addressing the requirements it shapes.
 state_kind: work
 filled_by: agent
 depends_on:
-  - declare-winner
+  - graft-onto-the-winner
 legal_tools:
   - se_file_read
   - se_file_write
@@ -73,6 +73,16 @@ Each decision carries:
 
 The register view shows the decisions beside the risks ([[meth-raid]]). One
 surface to read, files apart underneath.
+
+## Its near relative runs one state earlier
+
+[[graft-onto-the-winner]] ASKS THE SAME SHAPE OF QUESTION ABOUT THE LOSERS.
+What do they do better, and can the winner take it. The back-check below asks
+it about the winner's published ANCESTOR.
+
+BOTH EXIST because they find different things. The losers know what this
+problem's own alternatives buy under these criteria. The ancestor knows what a
+decade of real use taught it.
 
 ## The prior-art back-check
 

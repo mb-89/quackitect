@@ -7,6 +7,8 @@ statement: "The standing ruling that pins the machine-state folder is read as be
 owner: the driving agent
 trigger: "before the folder is moved, and again if the move produces any behaviour that differs between two checkouts"
 status: open
+probed: 2026-08-19
+probe: "scheduled, and it is owed twice over. Its own probe is one test asserting the folder resolves to one place while a record is bound, and that same test is a blessed goal of this iteration, so M6 carries it rather than this state. THE INTENT HALF NO TEST CAN REACH - whether the ruling that pinned session state to the machine meant depth as well as branch is one sentence from the person who made it, and it has not been asked. That question is cheap and it is still open, which is why this entry stays graded crippling while every goal in the iteration sits on it."
 impact: "The whole iteration rests on this reading. If the ruling meant depth as well as branch, the move breaches a standing guarantee and the iteration is arguing to change a law rather than to tidy a tree."
 breaks_how_badly: crippling
 how_likely: plausible

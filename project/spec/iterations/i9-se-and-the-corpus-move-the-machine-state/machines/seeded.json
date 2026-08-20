@@ -1,6 +1,6 @@
 {
   "change_size": "major",
-  "rigor_matrix_hash": "b614f9a6435d",
+  "rigor_matrix_hash": "a3f838bb05bc",
   "pinned_at": "2026-08-19T11:54:52.044Z",
   "reopened": [
     "decompose-structure",
@@ -154,7 +154,7 @@
     },
     "reverse-sensitivity": {
       "applies": "full",
-      "evidence": "[[\"sensitivity\",true,\"\",[],\"sensitivity\",\"\",[],[],[]]]",
+      "evidence": "[[\"sensitivity\",true,\"\",[],\"sensitivity\",\"\",[],[],[]],[\"reverse_graft\",true,\"\",[],\"findings\",\"\",[],[],[]]]",
       "shape": "[[\"converge-pugh\"],false,\"\",\"\"]"
     },
     "declare-winner": {
@@ -162,15 +162,20 @@
       "evidence": "[[\"winner\",true,\"\",[],\"decision-matrix\",\"\",[],[],[]],[\"comments\",true,\"\",[],\"\",\"\",[],[],[]]]",
       "shape": "[[\"reverse-sensitivity\"],false,\"\",\"\"]"
     },
+    "graft-onto-the-winner": {
+      "applies": "full",
+      "evidence": "[[\"grafts\",true,\"\",[\"strength\",\"from\",\"verdict\",\"why\"],\"table\",\"\",[],[],[]],[\"rescored\",true,\"\",[\"axis\",\"was\",\"now\",\"what_changed\"],\"table\",\"\",[],[],[]]]",
+      "shape": "[[\"declare-winner\"],false,\"\",\"\"]"
+    },
     "record-adrs": {
       "applies": "full",
       "evidence": "[[\"adrs\",true,\"\",[],\"refs\",\"raid\",[],[],[]]]",
-      "shape": "[[\"declare-winner\"],false,\"\",\"\"]"
+      "shape": "[[\"graft-onto-the-winner\"],false,\"\",\"\"]"
     },
     "decompose-structure": {
       "applies": "full",
       "evidence": "[[\"elements\",true,\"\",[],\"list\",\"element\",[],[],[]],[\"allocation\",true,\"\",[],\"element-matrix\",\"element\",[],[],[]]]",
-      "shape": "[[\"declare-winner\"],false,\"\",\"\"]"
+      "shape": "[[\"graft-onto-the-winner\"],false,\"\",\"\"]"
     },
     "evaluate-architecture": {
       "applies": "full",
