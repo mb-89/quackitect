@@ -1743,3 +1743,6 @@
 {"ts":"2026-08-20T12:57:30.874Z","op":"update","visit":"iterations/i37/fill-story-evidence@1","node":"d981","brief":"a read of a concealed path refuses rather than reading empty"}
 {"ts":"2026-08-20T12:58:00.851Z","op":"update","visit":"iterations/i37/fill-story-evidence@1","node":"d982","brief":"the concealment cases land with the chunk, as test-first asks"}
 {"ts":"2026-08-20T12:58:20.165Z","op":"update","visit":"iterations/i37/fill-story-evidence@1","node":"d983","brief":"the search opts carry no intent at this layer"}
+{"ts":"2026-08-20T13:01:40.152Z","op":"update","visit":"iterations/i37/fill-story-evidence@1","node":"d984","brief":"the reading verb asks the concealment now"}
+{"ts":"2026-08-20T13:02:01.480Z","op":"update","visit":"iterations/i37/fill-story-evidence@1","node":"d985","brief":"the reading verb asks the concealment now"}
+{"ts":"2026-08-20T13:02:01.896Z","op":"update","visit":"iterations/i37/fill-story-evidence@1","node":"d986","brief":"the reading verb asks the concealment now"}
