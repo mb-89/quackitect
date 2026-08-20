@@ -9,6 +9,7 @@ carries:
   - flow-dispatched-call
   - flow-stamped-claim
   - flow-findings-report
+  - flow-failure-disposition
 form: file
 source_refs:
   - decompose-structure, the element matrix's owed cell

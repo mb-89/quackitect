@@ -6,7 +6,8 @@ kind: assumption
 statement: One file per option is a workable store at the scale a single product's pool reaches, so nothing more than the corpus is needed.
 owner: the driving agent
 trigger: the migration, or the first time a pool answer has to be windowed
-status: open
+status: deferred
+defer_until: ready when migration probe data is captured and reviewed
 impact: It is the storage half of the minor column. If it fails the pool needs an index or a database, M4 has to open, and the change size this iteration was blessed at was wrong.
 breaks_how_badly: crippling
 how_likely: conceivable

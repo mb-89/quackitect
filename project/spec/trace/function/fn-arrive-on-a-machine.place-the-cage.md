@@ -6,6 +6,7 @@ cluster: the-arrival
 statement: put the deny list and the lane config where the host reads them
 satisfies:
   - req-one-command-takes-a-fresh-clone-to-a-live-lane
+  - req-native-project-tools-stay-outside-the-cage
 inputs:
   - flow-arrival-request
 outputs:

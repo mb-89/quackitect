@@ -570,8 +570,14 @@ function refProblems(name: string, meta: TemplateMeta, args: FieldArgs, content:
   // own frontmatter, written back rather than resolved — so a register whose
   // columns hold ids (a design spec's elements) had them read as references of
   // the wrong type.
+  //
+  // A DECLARED-COLUMN TABLE IS THE SAME CASE, and it is a second way in rather
+  // than the same one. `columns` names frontmatter KEYS, so a row is one node
+  // followed by that node's field values — and a value like an element id is
+  // not this field's artifact. Either tell is enough.
   const nodeTable = meta.editor === "node-table";
-  const refs = answersInRows ? refsInRows(content, nodeTable ? 1 : args.writes === "" ? 2 : 1) : refsIn(content);
+  const valueCells = nodeTable || args.writes !== "" || args.columns.length > 0;
+  const refs = answersInRows ? refsInRows(content, valueCells ? 1 : 2) : refsIn(content);
   if (refs.length === 0) {
     // AN EMPTY REGISTER IS AN ANSWER. The rows come from a live source, so a
     // table with none is the source saying there are none — the field's author
@@ -600,12 +606,19 @@ function refProblems(name: string, meta: TemplateMeta, args: FieldArgs, content:
 /** see dsp-evidence-forms.md#coverage-is-mutual-and-both-sides-are-computed — req-a-coverage-check-computes-both-sides */
 function coverProblems(name: string, covers: string, refs: string[], byId: Map<string, TraceNode>, corpus: TraceNode[]): string[] {
   if (covers === "" || covers === undefined) return [];
+  // A FIELD MAY COVER SEVERAL TYPES. trace-design's own law is "every element
+  // AND INTERFACE is realized", and a single type here made a spec that
+  // realizes only interfaces read as covering nothing.
+  const kinds = covers
+    .split(",")
+    .map((k) => k.trim())
+    .filter((k) => k !== "");
   const out: string[] = [];
   // THE LISTED SIDE IS STILL CHECKED, because a node the author names that
   // serves nothing is a fact about THEIR work rather than about the corpus.
   const orphan = refs.filter((r) => {
     const n = byId.get(r);
-    return n !== undefined && !n.refines.some((p) => byId.get(p)?.type === covers);
+    return n !== undefined && !n.refines.some((p) => kinds.includes(byId.get(p)?.type ?? ""));
   });
   if (orphan.length > 0) out.push(`${name}: each one refines a ${covers} — ${orphan.join(" · ")} refines none`);
   // THE COVERING SIDE IS COMPUTED FROM THE WHOLE CORPUS, not from `refs`.
@@ -613,7 +626,7 @@ function coverProblems(name: string, covers: string, refs: string[], byId: Map<s
   // not anybody listed it.
   const served = new Set<string>();
   for (const n of corpus) for (const p of n.refines) served.add(p);
-  const bare = corpus.filter((n) => n.type === covers && !served.has(n.id)).map((n) => n.id);
+  const bare = corpus.filter((n) => kinds.includes(n.type) && !served.has(n.id)).map((n) => n.id);
   // AND THE HOLE IS STILL REFUSED. Computing both sides must not soften the
   // check into a report: a node of the covered type that NOTHING in the
   // corpus refines is a real gap, and it is still named by id.

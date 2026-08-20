@@ -15,7 +15,7 @@ outputs:
   - flow-recommendation
 source_refs:
   - uc-see-the-whole-pool-from-any-clone
-  - vp-what-is-learned-outlives-the-machine
+  - vp-the-ledger
 ---
 
 ## Rationale

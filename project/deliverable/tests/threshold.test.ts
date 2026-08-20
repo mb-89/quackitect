@@ -185,7 +185,7 @@ test("the mirror over HTTP: slider served, POST /autonomy moves the gate, /api/a
   const server = startMirror({ session, root: r, port: 0, log: new CallLog(seDir(r)), mode: "agent" });
   await new Promise((rs) => server.on("listening", rs));
   const port = (server.address() as { port: number }).port;
-  const base = `http://localhost:${port}`;
+  const base = `http://127.0.0.1:${port}`;
   try {
     const page = await (await fetch(`${base}/`)).text();
     assert.ok(page.includes('id="thr"'), "the slider is served");

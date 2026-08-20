@@ -15,13 +15,13 @@ M1's vision delta is signed and its four goal conflicts are on the register as r
 ONE NEW VALUE PROP, and the argument for it being new rather than inherited is the whole of this state's work. Eight props stand. Two of them come close and neither covers this, which is checked rather than assumed:
 
 - vp-the-ledger is about DECISIONS being recorded, attributed and refusable. The pool holds strays and options — things nobody has decided. Its whole subject is the stage BEFORE a decision.
-- vp-the-unattended-arrival gets a fresh box TO the lane. This proposition gets what that box LEARNED back out again. They are the two ends of the same journey and neither implies the other.
+- vp-qualities gets a fresh box TO the lane. This proposition gets what that box LEARNED back out again. They are the two ends of the same journey and neither implies the other.
 
 THE GAP CLAIM AND THE WHY-NOW ARE NOT ASKED at this size, and the resident frame carries them.
 
 ## value_props
 
-- vp-what-is-learned-outlives-the-machine
+- vp-the-ledger
 
 ## business_case
 
@@ -41,7 +41,7 @@ WHAT WOULD MAKE THIS NOT WORTH DOING: if the owner would rather every unattended
 
 ## follow_up
 
-- gate-motivation reviews vp-what-is-learned-outlives-the-machine as an artifact, and the reference resolves — the node is written, not promised
+- gate-motivation reviews vp-the-ledger as an artifact, and the reference resolves — the node is written, not promised
 - the fourth success criterion, that the desk reads the pool and nothing else for open work, is the one most likely to be quietly dropped; M8 checks it rather than the build claiming it
 - the alternative named in the business case — reports to a person instead of a pool — is the honest counter-proposal and belongs in gate-motivation's red team rather than being settled here
 - nothing else in the resident frame moved: the gap claim and the why-now stand inherited, unedited

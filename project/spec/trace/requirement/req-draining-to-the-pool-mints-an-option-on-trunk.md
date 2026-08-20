@@ -11,7 +11,7 @@ refines:
   - uc-put-a-finding-where-it-outlives-the-machine
   - uc-see-the-whole-pool-from-any-clone
 source_refs:
-  - vp-what-is-learned-outlives-the-machine
+  - vp-the-ledger
   - raid-asm-the-pool-is-a-node-kind-under-project-spec
   - project/spec/iterations/i17-the-options-pool-triage-a-raw-note-into-/record.md "Yes, the work token is i17 options pool" (owner ruling 2026-08-17)
 priority: must

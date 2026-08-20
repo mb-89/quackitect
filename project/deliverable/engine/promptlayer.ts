@@ -23,6 +23,8 @@ export interface Projection {
   hash: string;
 }
 
+export const SKILL_SOURCES = [{ name: "deep-research", path: "project/guidance/skills/deep-research/SKILL.md" }] as const;
+
 /** The authoring notes explain the register to whoever edits the source. They
  *  mean nothing to an agent reading the projection. */
 function stripAuthoring(md: string): string {
@@ -73,6 +75,27 @@ export function textFor(target: { frontmatter?: string }, projection: Projection
   return target.frontmatter === undefined ? projection.body : `${target.frontmatter}\n${projection.body}`;
 }
 
+export function skillTargets(opened: string, name: string): string[] {
+  return [
+    join(opened, ".claude", "skills", name, "SKILL.md"),
+    join(opened, ".github", "skills", name, "SKILL.md"),
+    join(opened, ".agents", "skills", name, "SKILL.md"),
+  ];
+}
+
+export function placeSkills(root: string, opened: string): string[] {
+  const written: string[] = [];
+  for (const skill of SKILL_SOURCES) {
+    const body = readFileSync(join(root, skill.path), "utf8");
+    for (const path of skillTargets(opened, skill.name)) {
+      mkdirSync(dirname(path), { recursive: true });
+      writeFileSync(path, body, "utf8");
+      written.push(path);
+    }
+  }
+  return written;
+}
+
 /** Write every projection. Returns what it wrote, so the caller can say so. */
 export function placeProtocol(root: string, opened: string): string[] {
   const projection = assembleProtocol(root);
@@ -82,5 +105,6 @@ export function placeProtocol(root: string, opened: string): string[] {
     writeFileSync(t.path, textFor(t, projection), "utf8");
     written.push(t.path);
   }
+  written.push(...placeSkills(root, opened));
   return written;
 }

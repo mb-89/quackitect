@@ -19,15 +19,16 @@
     "  openCopilotInChat). Tools are excluded BY NAME, as on the CLI.",
     "",
     "  OPENED BY HAND FROM THE CHAT PANEL - NOT CAGED. Nothing passes",
-    "  toolsExclude, so the native file, search and terminal tools stay",
-    "  visible, and contract rule 1 is ADVISORY for that session.",
+    "  toolsExclude, so native file and terminal tools stay visible. Native",
+    "  web search is allowed in either launch mode; project search is not.",
     "",
     "A reader cannot tell from inside which session they are in, so behave as",
     "if uncaged either way: use the se lane, every time.",
     "",
     "VERIFY BEFORE TRUSTING IT, the same empirical way copilot-cage.json was",
     "verified: open a session EACH WAY and ask it to list the exact names of",
-    "every tool it can see. Anything that is not an se_ tool is a hole."
+    "every tool it can see. Anything except se_ tools and native web search",
+    "is a hole."
   ],
   "servers": {
     "se": {

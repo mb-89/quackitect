@@ -7,13 +7,13 @@ statement: prose-inspect's identity sweep already walks anything under project/s
 owner: the driving agent
 trigger: the first mint, or any change to where the pool is stored
 status: open
-impact: It is free coverage the design is counting on. If the pool lands anywhere the sweep does not walk, the second success criterion of vp-what-is-learned-outlives-the-machine - zero identity needles in minted options - has nothing measuring it, and nobody would notice the gap because the criterion would keep reading as met.
+impact: It is free coverage the design is counting on. If the pool lands anywhere the sweep does not walk, the second success criterion of vp-the-ledger - zero identity needles in minted options - has nothing measuring it, and nobody would notice the gap because the criterion would keep reading as met.
 breaks_how_badly: crippling
 how_likely: conceivable
 probe: "HOLDS. Run 2026-08-18 against a throwaway root carrying one minted option under project/spec/trace/option/, with a git identity and a HOME belonging to nobody real and the option body carrying both. prose-inspect came back RED with two findings, naming the file and the line for the username and for the home directory, exit 1. It does NOT settle the inherited blind spot: a leaked name that is also common project vocabulary is muted here as everywhere."
 probed: 2026-08-18
 source_refs:
-  - vp-what-is-learned-outlives-the-machine
+  - vp-the-ledger
   - raid-asm-the-pool-is-a-node-kind-under-project-spec
   - raid-iss-an-exit-script-may-not-read-unpinned-host-state
 weighs_with: none

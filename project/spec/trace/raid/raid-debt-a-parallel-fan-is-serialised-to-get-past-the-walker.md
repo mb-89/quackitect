@@ -7,7 +7,6 @@ statement: The consistency sweep was rewired to run after the demonstrations rat
 owner: the owner
 looked: 2026-08-19
 status: open
-looked: 2026-08-19
 breaks_how_badly: corrosive
 how_likely: expected
 impact: "Any drawing that fans into a submachine is unwalkable by one agent. The walk reaches the join with the other leg never taken, and every legal move is closed: the pull refuses SE-C-123, a choice refuses SE-C-110, the router draws a route the whole way round the record and moves zero hops, and se_reopen would take the walked leg down with it. The only ways out are editing the drawing or editing the engine."

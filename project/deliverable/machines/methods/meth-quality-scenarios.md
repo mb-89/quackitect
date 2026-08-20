@@ -22,6 +22,11 @@ ISO/IEC 25010:2023 names nine. Each stands as a node in spec/trace/use-case/, ca
 
 WALK ALL NINE, WRITE SCENARIOS FOR FEW. The walk is the elicitation aid and it is now a set question at write-requirements, answered one line per characteristic. A characteristic the change does not touch is answered and left alone.
 
+THE NINE quality-area USE CASES ARE FIXED, never freely authored — see the
+closed-list rule in machines/items/use-case.md. A quality requirement
+`refines` one of the nine; it never gets a new use case or value prop of its
+own.
+
 ## Form
 - source (who/what initiates) | stimulus (the event) | artifact (what is hit) | environment (under which conditions) | response (what the system does) | response measure (the pass line, with tolerance).
 

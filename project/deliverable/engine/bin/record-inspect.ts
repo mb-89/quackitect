@@ -72,11 +72,20 @@ function testRunsCarryTheirQuestion(): void {
     const body = typeof rec.response === "string" ? rec.response : JSON.stringify(rec.response ?? {});
     const q = /"question"\s*:\s*"[^"]+"/.test(body);
     const s = /"scope"\s*:\s*"[^"]+"/.test(body);
-    if (!q || !s) stale += 1;
+    if (!q && !s) {
+      // Neither key at all is the pre-2026-08-17 shape, which cannot carry
+      // them. Judging it would block boot over a record nobody can fix.
+      stale += 1;
+      continue;
+    }
     latest = { q, s };
   }
-  if (seen === 0 || latest === undefined) {
+  if (seen === 0) {
     caveats.push("no test verdicts in the log yet, so item 12 proved nothing");
+    return;
+  }
+  if (latest === undefined) {
+    caveats.push(`item 12 read ${String(seen)} test run(s), all predating the 2026-08-17 fix, so there was nothing it could judge`);
     return;
   }
   if (!latest.q) findings.push("item 12 · the most recent test run carries no question");

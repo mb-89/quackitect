@@ -21,10 +21,10 @@ test("the mirror asks for the component library and serves it", async () => {
   const root = freshRoot();
   const server = startMirror({ session: new Session(root), root, port: PORT, log: new CallLog(root), mode: "manual" });
   try {
-    const page = await (await fetch(`http://localhost:${PORT}/`)).text();
+    const page = await (await fetch(`http://127.0.0.1:${PORT}/`)).text();
     assert.match(page, /<script type="module" src="\/vendor\/vscode-elements\.js">/, "the page must ask for the library");
 
-    const res = await fetch(`http://localhost:${PORT}/vendor/vscode-elements.js`);
+    const res = await fetch(`http://127.0.0.1:${PORT}/vendor/vscode-elements.js`);
     assert.equal(res.status, 200, "the library route must serve");
     const body = await res.text();
     // THE BUNDLE COMES FROM THE ENGINE'S OWN DEPENDENCIES. A test root has no

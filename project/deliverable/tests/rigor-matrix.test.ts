@@ -63,7 +63,9 @@ test("readMatrix: the real matrix is complete", () => {
   // 52 since the M9 cut (owner ruling 2026-08-11): finalize-docs and
   // ship-review wait outside the matrix until the book and vendoring
   // mechanisms exist.
-  assert.equal(m.rows.length, 52);
+  // 53 since 2026-08-19: M5_27 graft-onto-the-winner, added by i9 between
+  // declare-winner and record-adrs.
+  assert.equal(m.rows.length, 53);
   for (const row of m.rows) {
     for (const col of ALL_COLUMNS) {
       const cell = m.cells.get(row.name)?.get(col);

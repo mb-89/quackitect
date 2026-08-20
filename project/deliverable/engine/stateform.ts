@@ -526,7 +526,7 @@ function resolveSource(i: string, root: string, traceRoot: string, instanceRaw?:
   if (typed !== undefined) return typedItems(traceRoot, typed);
   const catalog = CATALOG_SOURCES[i];
   if (catalog !== undefined) return catalogItems(root, catalog);
-  if (i === "$promotions") return promotionItems(traceRoot);
+  if (i === "$promotions") return promotionItems(traceRoot, evidenceDir);
   if (i === "$claim-specs") return claimSpecItems(traceRoot);
   if (i === "$must-stories") return mustStoryItems(traceRoot);
   if (i === "$candidates") return candidateItems(traceRoot);
@@ -998,8 +998,12 @@ function mustStoryItems(traceRoot: string): string[] {
 }
 
 /** see dsp-evidence-forms.md#promotions-resolved-live */
-function promotionItems(traceRoot: string): string[] {
-  const owner = basename(traceRoot);
+function promotionItems(traceRoot: string, evidenceDir?: string): string[] {
+  // THE OWNER IS THE RECORD'S OWN FOLDER, and it has to be told. traceRoot
+  // defaults to the project root, whose basename is the checkout's name — so
+  // deriving the owner from it matched no record ever, and every promotion
+  // resolved to an empty set.
+  const owner = evidenceDir === undefined ? basename(traceRoot) : basename(dirname(evidenceDir));
   return traceFolder(traceRoot, "experiment")
     .filter((n) => {
       const p = String(n.fm.promote ?? "").trim();

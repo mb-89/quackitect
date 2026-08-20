@@ -228,8 +228,12 @@ A NUL makes the whole file unsearchable. In code, write the escape sequence.
 
 ## Running things
 
-### SE-C-106 — the lane is not configured
-The capability exists but wants owner configuration. Ask; never route around.
+### SE-C-106 — no search backend answered
+`se_web_search` already tried its configured and keyless server-side providers.
+
+Use native `WebSearch` when the harness exposes it. Every native query is still logged by the harness hook.
+
+If native search is unavailable, fetch known primary URLs with `se_web_fetch`. State that discovery was incomplete.
 
 ### SE-C-107 — the command timed out
 Scope the command down, or hand it off and poll the job.

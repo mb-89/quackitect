@@ -64,7 +64,7 @@ test("/api/decisions serves the panel's whole contract over HTTP", async () => {
   await new Promise((r) => server.on("listening", r));
   const port = (server.address() as { port: number }).port;
   try {
-    const g = (await (await fetch(`http://localhost:${port}/api/decisions?visit=${encodeURIComponent("idle@0")}`)).json()) as {
+    const g = (await (await fetch(`http://127.0.0.1:${port}/api/decisions?visit=${encodeURIComponent("idle@0")}`)).json()) as {
       visit: string;
       nodes: { brief: string }[];
       visits: string[];
@@ -602,7 +602,7 @@ test("/doc resolves wiki links to doclinks and leaves unresolved ones as text", 
   await new Promise((r) => server.on("listening", r));
   const port = (server.address() as { port: number }).port;
   try {
-    const d = (await (await fetch(`http://localhost:${port}/doc?path=${encodeURIComponent("project/linkdoc.md")}`)).json()) as {
+    const d = (await (await fetch(`http://127.0.0.1:${port}/doc?path=${encodeURIComponent("project/linkdoc.md")}`)).json()) as {
       html: string;
     };
     assert.match(
@@ -628,7 +628,7 @@ test("/target/selected with no selection answers its rejection in place", async 
   await new Promise((r) => server.on("listening", r));
   const port = (server.address() as { port: number }).port;
   try {
-    const r = await fetch(`http://localhost:${port}/target/selected`, {
+    const r = await fetch(`http://127.0.0.1:${port}/target/selected`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: "{}",
@@ -659,7 +659,7 @@ test("a slow mirror request lands in the call log with its path and wait", async
     await new Promise((r) => server.on("listening", r));
     const port = (server.address() as { port: number }).port;
     try {
-      await (await fetch(`http://localhost:${port}/api/packet`)).json();
+      await (await fetch(`http://127.0.0.1:${port}/api/packet`)).json();
     } finally {
       server.close();
     }

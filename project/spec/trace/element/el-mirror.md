@@ -11,6 +11,9 @@ implements:
   - fn-run-a-governed-walk.teach-the-newcomer
   - fn-run-a-governed-walk.work-the-register
 source_refs:
+  - req-oversized-results-remain-recoverable-through-the-lane
+  - req-stop-hook-yields-only-at-a-machine-stop
+  - req-interrupted-call-names-the-stopping-layer
   - cand-thin-worktree
 ---
 

@@ -7,7 +7,6 @@ statement: The four demonstrations this iteration authored are drawn and none of
 owner: the owner
 looked: 2026-08-19
 status: open
-looked: 2026-08-19
 breaks_how_badly: crippling
 how_likely: expected
 impact: "Both headline capabilities are proved only inside this repository. The pass line of the two must requirements is a machine holding nothing of the source, and nothing has ever been run on one. A vehicle that works here and fails there looks identical from here."

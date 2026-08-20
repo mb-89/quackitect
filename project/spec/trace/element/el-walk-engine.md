@@ -12,6 +12,10 @@ implements:
   - fn-run-a-governed-walk.judge-a-claim
   - fn-run-a-governed-walk.guard-a-write
   - fn-run-a-governed-walk.help-find-a-capability
+  - fn-run-a-governed-walk.hold-the-session-through-work
+  - fn-run-a-governed-walk.name-the-stopping-layer
+  - fn-run-a-governed-walk.route-a-failure-shape
+  - fn-run-a-governed-walk.tolerate-old-test-records
 source_refs:
   - cand-thin-worktree
   - raid-dec-two-layer-auth

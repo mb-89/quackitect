@@ -21,7 +21,7 @@ controls:
   - the drain's legal context, unchanged from the disposition it rides on
 source_refs:
   - uc-put-a-finding-where-it-outlives-the-machine
-  - vp-what-is-learned-outlives-the-machine
+  - vp-the-ledger
 ---
 
 ## Rationale

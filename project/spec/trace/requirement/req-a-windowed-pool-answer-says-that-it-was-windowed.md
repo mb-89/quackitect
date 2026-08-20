@@ -10,7 +10,7 @@ breaks_how_badly: corrosive
 refines:
   - uc-see-the-whole-pool-from-any-clone
 source_refs:
-  - vp-what-is-learned-outlives-the-machine
+  - vp-the-ledger
   - project/guidance/refusals.md "SE-C-137 — a truncating shape in the command"
 priority: should
 weighs_against:

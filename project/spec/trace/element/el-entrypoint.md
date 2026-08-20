@@ -21,6 +21,7 @@ implements:
   - fn-arrive-on-a-machine.hand-over-the-means-to-call
   - fn-arrive-on-a-machine.account-for-the-arrival
   - fn-arrive-on-a-machine.state-which-build-this-is
+  - fn-arrive-on-a-machine.identify-the-harness
   - fn-run-a-governed-walk.stand-up-a-product
 source_refs:
   - req-one-command-starts-an-unattended-machine

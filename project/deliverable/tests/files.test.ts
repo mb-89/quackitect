@@ -110,7 +110,14 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   // no door could share a parse with any of them.
   // THE TWO INCREMENTS ARE INDEPENDENT and the merge kept both, 2026-08-18.
   // i17 took 105 to 106 and i16 took 105 to 110, so the merged ceiling is 111.
-  const CEILING = 111;
+  // 112 since 2026-08-19: stopping-layer.ts reads .se/engine.log to say which
+  // layer ended an interrupted call. A plain append-only text file outside the
+  // note system, with no frontmatter to parse, read once to answer one
+  // question. Routing it through a note door would share a parse with nobody,
+  // and the door would have to parse a log as a node to do it.
+  // THAT ONE ARRIVED ON TOP OF 111 AT THE i36 MERGE, 2026-08-20. Its own branch
+  // counted it as 107 because it never saw the five increments above it.
+  const CEILING = 112;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {
@@ -158,7 +165,11 @@ test("no new file write bypasses the door — the count may fall, never rise", (
   // person chose. Session state again — host-local, uncommitted, one small
   // object, and deliberately NOT corpus: what suits one machine's cores is not
   // a fact about the product.
-  const CEILING = 40;
+  // 41 since 2026-08-19: promptlayer.ts gained placeSkills, which writes one
+  // skill file into three host directories from a single loop. It is a
+  // projection of guidance, placed exactly like the protocol files beside it,
+  // and no note door could hold a file whose shape the host owns.
+  const CEILING = 41;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {
@@ -346,6 +357,17 @@ test("oversize whole-file read is REFUSED with offset/limit remedy — never sil
   // and the range read works
   const r = fileRead(root, "big.md", { offset: 1, limit: 1 });
   assert.ok(r.content.includes("[line truncated"));
+});
+
+test("character range reads preserve exact text inside one oversized line", () => {
+  const root = fresh();
+  const raw = JSON.stringify({ body: "x".repeat(READ_BUDGET + 1) });
+  writeFileSync(join(root, "answer.json"), raw);
+  const first = fileRead(root, "answer.json", { charOffset: 0, charLimit: 3_000 });
+  assert.equal(first.content, raw.slice(0, 3_000));
+  assert.deepEqual(first.char_range, { offset: 0, limit: 3_000, to: 3_000, of: raw.length });
+  const second = fileRead(root, "answer.json", { charOffset: first.char_range?.to, charLimit: 3_000 });
+  assert.equal(first.content + second.content, raw.slice(0, 6_000));
 });
 
 test("path escape is refused", () => {

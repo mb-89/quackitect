@@ -6,6 +6,8 @@ statement: the typed tool lane, carried by one registry of verbs with schemas, c
 realizes:
   - "el-walk-engine"
 files:
+  - "project/deliverable/engine/harness.ts"
+  - "project/deliverable/engine/payload-limit.ts"
   - "project/deliverable/engine/tools.ts"
   - "project/deliverable/engine/tools-file.ts"
   - "project/deliverable/engine/tools-run.ts"

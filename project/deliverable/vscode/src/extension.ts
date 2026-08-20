@@ -371,7 +371,9 @@ function startServer(root, runner) {
   const entry = path.join(root, "project", "deliverable", "engine", "bin", "se-mcp.ts");
   child = spawn(runner.cmd, [entry, "--root", root, "--child", "--headless"], {
     cwd: root,
-    env: { ...process.env, ...runner.env, SE_SESSION: sessionToken, SE_PARENT_PID: String(process.pid), SE_PANEL_SUPPRESS: "1" },
+    // The headless lane survives an extension-host restart. Deactivation
+    // still owns deliberate shutdown through the process-tree kill below.
+    env: { ...process.env, ...runner.env, SE_SESSION: sessionToken, SE_PANEL_SUPPRESS: "1" },
     stdio: ["ignore", "pipe", "pipe"],
     shell: runner.shell,
     windowsHide: true,
@@ -1609,6 +1611,10 @@ function psq(text) {
   return `'${String(text).replace(/'/g, "''")}'`;
 }
 
+// The one native tool the cage must never remove. It runs on the provider's
+// backend and cannot be self-hosted keylessly, so research dies without it.
+const nativeExceptions = new Set(["web_search", "WebSearch"]);
+
 function parseExcludedToolsFromCage(cage) {
   const args = Array.isArray(cage?.exclude_args) ? cage.exclude_args : [];
   const i = args.indexOf("--excluded-tools");
@@ -1617,6 +1623,9 @@ function parseExcludedToolsFromCage(cage) {
   for (let n = i + 1; n < args.length; n++) {
     const a = String(args[n] ?? "").trim();
     if (a === "" || a.startsWith("--")) break;
+    // A cage that names an exception is corrected rather than obeyed: the
+    // exception is a standing rule, and a file edit must not overturn it.
+    if (nativeExceptions.has(a)) continue;
     out.push(a);
   }
   return out;
