@@ -1,7 +1,7 @@
 ---
 form: write-requirements
 by: agent
-signed_off: 2026-08-19T17:14:37.371Z
+signed_off: 2026-08-20T07:19:53.491Z
 authors: agent
 files:
 ---
@@ -34,6 +34,7 @@ The register still carries a fatal assumption that is half probed, and probe-ass
 - comprehensible: Each statement names one subject and one demand. The two ceiling requirements were deliberately split rather than joined — one says what resolves, the other says what happens when the check itself cannot answer. Joined, the fail-closed rule reads as a footnote on the happy path, and it is the half that fails silently.
 - no_tbd: No TBD, TBC, TBR or open placeholder in any of the six. Every source_ref points at a use-case step, an extension, a register entry or a measurement dated 2026-08-19.
 - behaviour_modelled: Behaviour is modelled as six scenarios in the source-stimulus-artifact-environment-response-measure shape. Two of the six are constraints on the machine rather than behaviour under load, and both state their environment explicitly so the absence of a stimulus rate is a choice rather than an omission.
+- quality_groups_swept: Swept, and the sweep is recorded rather than asserted. PERFORMANCE: the guard sits under every resolution of a bound run, which is why if-benchmark-binding-to-guard carries a bound at all; the structural ceiling removed the per-call cost entirely. RELIABILITY: the fatal requirement is that a wrong read never resolves, and the run proves its own guard with one forbidden request per run. SECURITY: nothing here crosses a trust boundary — a benchmark run reads its own repository and writes one report. USABILITY: one verb opens and closes a run, and the report names where it stopped. MAINTAINABILITY: the concealment is the one place this iteration adds a rule four verbs must honour, and that is exactly why it is the expensive requirement. PORTABILITY: the conditions a report carries exist because the harness is not constant, which is i36's finding applied here. TWO GROUPS YIELDED NOTHING and say so: there is no scalability question because a run is one walk at a time, and no compatibility question because nothing outside this repository consumes a benchmark report.
 
 ## follow_up
 

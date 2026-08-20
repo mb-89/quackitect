@@ -1,6 +1,6 @@
 {
   "change_size": "major",
-  "rigor_matrix_hash": "45a7d5135bfd",
+  "rigor_matrix_hash": "11b14e245a26",
   "pinned_at": "2026-08-19T16:45:22.245Z",
   "demands": {
     "onboard-retro": {
@@ -75,7 +75,7 @@
     },
     "write-requirements": {
       "applies": "full",
-      "evidence": "[[\"register\",true,\"\",[],\"refs\",\"requirement\",[],[],[]],[\"set_criteria\",true,\"\",[],\"per-item\",\"\",[],[\"complete\",\"consistent\",\"affordable\",\"bounded\",\"comprehensible\",\"no_tbd\",\"behaviour_modelled\"],[]]]",
+      "evidence": "[[\"register\",true,\"\",[],\"refs\",\"requirement\",[],[],[]],[\"set_criteria\",true,\"\",[],\"per-item\",\"\",[],[\"complete\",\"consistent\",\"affordable\",\"bounded\",\"comprehensible\",\"no_tbd\",\"behaviour_modelled\",\"quality_groups_swept\"],[]]]",
       "shape": "[[\"gate-inputs\"],false,\"\",\"\"]"
     },
     "derive-functions": {
@@ -140,7 +140,7 @@
     },
     "reverse-sensitivity": {
       "applies": "full",
-      "evidence": "[[\"sensitivity\",true,\"\",[],\"sensitivity\",\"\",[],[],[]]]",
+      "evidence": "[[\"sensitivity\",true,\"\",[],\"sensitivity\",\"\",[],[],[]],[\"reverse_graft\",true,\"\",[],\"findings\",\"\",[],[],[]]]",
       "shape": "[[\"converge-pugh\"],false,\"\",\"\"]"
     },
     "declare-winner": {
@@ -148,15 +148,20 @@
       "evidence": "[[\"winner\",true,\"\",[],\"decision-matrix\",\"\",[],[],[]],[\"comments\",true,\"\",[],\"\",\"\",[],[],[]]]",
       "shape": "[[\"reverse-sensitivity\"],false,\"\",\"\"]"
     },
+    "graft-onto-the-winner": {
+      "applies": "full",
+      "evidence": "[[\"grafts\",true,\"\",[\"strength\",\"from\",\"verdict\",\"why\"],\"table\",\"\",[],[],[]],[\"rescored\",true,\"\",[\"axis\",\"was\",\"now\",\"what_changed\"],\"table\",\"\",[],[],[]]]",
+      "shape": "[[\"declare-winner\"],false,\"\",\"\"]"
+    },
     "record-adrs": {
       "applies": "full",
       "evidence": "[[\"adrs\",true,\"\",[],\"refs\",\"raid\",[],[],[]]]",
-      "shape": "[[\"declare-winner\"],false,\"\",\"\"]"
+      "shape": "[[\"graft-onto-the-winner\"],false,\"\",\"\"]"
     },
     "decompose-structure": {
       "applies": "full",
       "evidence": "[[\"elements\",true,\"\",[],\"list\",\"element\",[],[],[]],[\"allocation\",true,\"\",[],\"element-matrix\",\"element\",[],[],[]]]",
-      "shape": "[[\"declare-winner\"],false,\"\",\"\"]"
+      "shape": "[[\"graft-onto-the-winner\"],false,\"\",\"\"]"
     },
     "evaluate-architecture": {
       "applies": "full",
