@@ -26,6 +26,35 @@ A SUBAGENT THAT DOES NOT KNOW ABOUT THE CAGE WILL REACH FOR ITS NATIVE TOOLS.
 It will then report that it could not read anything, and you will have paid
 for a turn that found nothing.
 
+## Two hands, and the log has to be able to count them apart
+
+THE OWNER'S NAMING, 2026-08-20. A WALKER does the daily work — pulling, reading,
+filling, submitting. A GUIDE is asked for the occasional step the walker will
+not take alone: a question, a comparison, a decision.
+
+THE STRONG HAND IS NOT THE ONE THAT PULLS. Paying a strong model to call
+`se_pull` two hundred times is the arrangement this is meant to avoid, and an
+arrangement where the strong model walks and the weak one advises is the same
+waste with the labels swapped.
+
+EITHER HAND MAY WORK THE LANE. Nothing bars a guide from pulling or filling.
+Where a step is the guide's, the guide can do it, and the lane sees the guide.
+
+SAY WHICH YOU ARE. Every lane tool takes `as`. Omit it and the record says
+`walker`, which is right for the hand holding the session. A guide says
+`as: "guide"`, because a default of `guide` would let the strong hand's work
+hide in the weak hand's count.
+
+AND WHEN YOU CARRY A GUIDE'S ANSWER BACK, say `as: "guide"` and
+`relayed_by: "walker"`. Filing a delegate's judgment under your own name
+erases exactly what the coordinate is for, and it is the cheaper path — which
+is why `raid-risk-a-relayed-judgment-is-filed-under-the-hand-that-relayed-it`
+stands at expected.
+
+NOTHING CHECKS ANY OF THIS. One dispatcher serves every agent, so the lane
+cannot tell two hands apart on its own, and the record marks both values as
+claims.
+
 ## Which model
 
 JUDGE IT PER SUBAGENT (owner grant 2026-07-11). There is no fixed mapping and

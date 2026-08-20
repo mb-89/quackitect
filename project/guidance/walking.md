@@ -211,6 +211,35 @@ refusing, and the agent's pull is what moves.
 READ SERIALLY FOR NOW. A RETREAT, not a preference: a Copilot harness appears
 to cancel itself on parallel batches. The lane serves parallel reads fine.
 
+## Attribution — who you are rides every call too
+
+THREE ARGUMENTS RIDE EVERY LANE TOOL, the same way `update` does, because the
+answer is about the CALL rather than about any one verb.
+
+- `as` — WHICH HAND YOU ARE, from a closed vocabulary: owner, walker, guide,
+  reviewer, surface. Omit it and the record says `walker`, which is right for
+  the hand holding the session and making the daily calls.
+- `relayed_by` — WHO IS FILING WORK SOMEBODY ELSE DID. Send `as` naming the
+  AUTHOR and this naming yourself.
+- `answered_by` — WHAT ACTUALLY SERVED THE CALL, not what was asked for.
+  Omit it and the record says `unreported`, which is a declared absence rather
+  than a missing field.
+
+SAY `as: "guide"` WHEN YOU ARE THE HAND THAT WAS ASKED. A guide is delegated
+one step — a question, a comparison, a decision the walker will not take alone.
+A default of `guide` would let the strong hand's work hide in the weak hand's
+count, which is the failure this coordinate exists to make visible.
+
+NOTHING CHECKS ANY OF IT. One dispatcher serves every agent, so the record
+marks `as` and `answered_by` as claims. That is honest rather than weak: a
+field that reads like an observation and is a claim is worse than an empty one.
+
+THREE MORE CARRY THE SAFETY RULE. `named_driver` is the strength the step was
+told it needs; `went_weaker` is your own word that a weaker hand took it;
+`weaker_reason` is why. Going weaker with no reason marks the record
+`unreasoned` — marked, never refused, because the party being asked is the
+party being judged.
+
 ## Narration — the update rides every call
 
 `update: {...}` on ANY lane call carries a decision-graph op. Ride one on

@@ -11,7 +11,9 @@ from it.
   stable short title (`draft-vision`), never the numbered prefix.
 - The CELLS ARE FRONTMATTER on the row. `patch`, `minor`, `major`,
   `product` and `specification` carry how the row applies at that change
-  size; `<column>_note` carries the prose. A cell that does not apply is an
+  size; `<column>_note` carries the prose; `<column>_complexity` carries how
+  hard the row is THERE, as `<judgement>/<reading>` — judgement one of
+  C0 C1 C2 C3 C4, reading one of R0 R1 R2 R3 R4. A cell that does not apply is an
   EXPLICIT `none` with its reason — absence means not yet written, and the
   loader refuses it.
 
