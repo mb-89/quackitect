@@ -1,8 +1,8 @@
 ---
 form: author-tests
 by: agent
-signed_off: 2026-08-20T19:44:59.628Z
-reopened: "2026-08-20T19:44:57.891Z — this form says ten requirements land in five specs. It signed with eleven in six: the engine's coverage check named req-a-machine-decision-repeats, which neither of this iteration's passes carries, and a sixth spec was written for it."
+signed_off: 2026-08-20T22:05:46.071Z
+reopened: "2026-08-20T22:05:44.196Z — gate-validation's law wants a demonstration-method spec carrying the must story under demonstrates:, and the two inspection specs do not. A seventh spec is minted, tsp-a-walk-opens-each-step-by-naming-the-hand-it-needs, and this state is where the register lives."
 authors: agent
 files:
 ---
@@ -41,13 +41,41 @@ WHETHER A DECLARED DIFFICULTY IS CORRECT. `exp-two-hands-rating-the-same-six-cel
 
 WHETHER A SELF-REPORTED VALUE IS TRUE. Two of the three call coordinates can only come from the caller. The requirements demand the record MARK them as claimed; the specs assert the mark and nothing more.
 
+### A seventh spec, and the law that asked for it, 2026-08-20
+
+`gate-validation` REFUSED FOR A REASON THIS STATE COULD HAVE SEEN. A must
+story needs a spec whose `method` is `demonstration` and which names it under
+`demonstrates:`. This iteration's only must story had two inspection specs
+near it and no demonstration spec at all.
+
+THE SPLIT IS BETWEEN A LINK AND A CHAIN.
+`tsp-a-step-is-sized-from-its-own-rows`,
+`tsp-a-sizing-decision-repeats-and-shows-its-input` and
+`tsp-the-lane-publishes-a-strength-and-starts-nothing` each hold one link: the
+cell declares, the block answers, the pull publishes and starts nothing. None of
+them walks the whole chain with a real session, and the chain is what the story
+promises.
+
+`tsp-a-walk-opens-each-step-by-naming-the-hand-it-needs` IS THAT CHAIN. Its
+Procedure is six observed steps and it verifies no requirement of its own — the
+demonstrates edge carries it, and the requirements behind the story are held by
+the three specs above.
+
+AND ITS PROCEDURE CARRIES THE TRAP RATHER THAN LEAVING IT TO BE FOUND: run it
+against modules built from the code under test. A long-running lane server
+predating the build does not know the new arguments exist, and a run against it
+shows the feature absent — which is indistinguishable from an unrated matrix,
+so it reads as a pass.
+
 ## checks
 
 | test-spec | method | verifies |
 | --- | --- | --- |
 | [[tsp-a-call-record-carries-who-where-and-which-hand]] | test | req-every-call-records-the-model-that-answered-it · req-every-call-records-the-state-it-was-made-in · req-every-call-records-the-part-its-caller-played · req-a-weaker-driver-than-named-owes-a-recorded-reason |
 | [[tsp-a-complexity-never-enters-a-demand-ledger]] | test | req-the-complexity-value-is-read-live-and-never-pinned |
+| [[tsp-a-sizing-decision-repeats-and-shows-its-input]] | test | req-a-machine-decision-repeats |
 | [[tsp-a-step-is-sized-from-its-own-rows]] | test | req-every-matrix-row-declares-its-complexity · req-a-milestone-takes-the-maximum-complexity-over-its-rows · req-an-unmatched-rung-names-itself-and-publishes-no-driver |
+| [[tsp-a-walk-opens-each-step-by-naming-the-hand-it-needs]] | demonstration | none — demonstrates carries the edge; the requirements behind this story are verify method test and inspection, and are carried by tsp-a-step-is-sized-from-its-own-rows, tsp-a-sizing-decision-repeats-and-shows-its-input and tsp-the-lane-publishes-a-strength-and-starts-nothing |
 | [[tsp-the-lane-publishes-a-strength-and-starts-nothing]] | inspection | req-the-machine-names-a-driver-and-starts-nothing |
 | [[tsp-the-published-strength-is-the-same-on-every-host]] | inspection | req-one-model-list-is-read-live-from-the-repository |
 

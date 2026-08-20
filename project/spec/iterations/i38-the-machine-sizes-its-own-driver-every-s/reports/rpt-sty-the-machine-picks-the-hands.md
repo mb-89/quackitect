@@ -1,7 +1,7 @@
 ---
 kind: report
 story: sty-the-machine-picks-the-hands
-spec: tsp-the-lane-publishes-a-strength-and-starts-nothing
+spec: tsp-a-walk-opens-each-step-by-naming-the-hand-it-needs
 performed: 2026-08-20
 performed_by: agent
 ---
