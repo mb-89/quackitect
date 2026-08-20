@@ -2,7 +2,7 @@
 form: run-spikes
 by: agent
 signed_off: 2026-08-20T08:22:10.626Z
-reopened: "2026-08-20T06:59:28.606Z — rank-unknowns re-signed above it after the M6 spikes overturned the declared winner"
+reopened: "2026-08-20T08:43:45.238Z — stale after rank-unknowns re-signed; the reopen is what puts the claim in a shape the pop can honour"
 authors: agent
 files:
 ---

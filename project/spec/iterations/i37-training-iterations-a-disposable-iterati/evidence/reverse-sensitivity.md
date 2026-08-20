@@ -1,7 +1,8 @@
 ---
 form: reverse-sensitivity
+reopened: "2026-08-20T08:25:59.255Z — a feeder re-signed above it"
 by: agent
-signed_off: 2026-08-20T07:25:13.680Z
+signed_off: 2026-08-20T08:26:02.446Z
 authors: agent
 files:
 ---

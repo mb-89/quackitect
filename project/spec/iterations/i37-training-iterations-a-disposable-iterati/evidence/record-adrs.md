@@ -1,8 +1,8 @@
 ---
 form: record-adrs
 by: agent
-signed_off: 2026-08-20T07:26:44.535Z
-reopened: "2026-08-20T07:26:42.728Z — a feeder re-signed above it after the v3 merge moved the rigor matrix and the M6 spikes moved the winner"
+signed_off: 2026-08-20T08:26:23.771Z
+reopened: "2026-08-20T08:26:21.201Z — a feeder re-signed above it"
 authors: agent
 files:
 ---

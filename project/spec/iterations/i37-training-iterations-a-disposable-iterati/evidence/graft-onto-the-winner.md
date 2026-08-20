@@ -1,7 +1,8 @@
 ---
 form: graft-onto-the-winner
+reopened: "2026-08-20T08:26:12.744Z — a feeder re-signed above it"
 by: agent
-signed_off: 2026-08-20T07:26:22.910Z
+signed_off: 2026-08-20T08:26:17.097Z
 authors: agent
 files:
 ---

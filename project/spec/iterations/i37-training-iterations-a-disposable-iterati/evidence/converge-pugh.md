@@ -1,7 +1,8 @@
 ---
 form: converge-pugh
+reopened: "2026-08-20T08:25:53.221Z — a feeder re-signed above it"
 by: agent
-signed_off: 2026-08-19T18:52:32.447Z
+signed_off: 2026-08-20T08:25:55.840Z
 authors: agent
 files:
 ---

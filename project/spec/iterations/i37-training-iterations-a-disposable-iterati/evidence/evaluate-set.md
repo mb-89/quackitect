@@ -1,7 +1,8 @@
 ---
 form: evaluate-set
+reopened: "2026-08-20T08:24:13.246Z — a feeder re-signed above it"
 by: agent
-signed_off: 2026-08-19T18:48:00.433Z
+signed_off: 2026-08-20T08:25:09.135Z
 authors: agent
 files:
 ---

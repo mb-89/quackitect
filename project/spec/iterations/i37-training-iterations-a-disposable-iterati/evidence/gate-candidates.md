@@ -1,8 +1,9 @@
 ---
 form: gate-candidates
+reopened: "2026-08-20T08:25:45.145Z — a feeder re-signed above it"
 bless: blessed by agent
 by: agent
-signed_off: 2026-08-19T18:50:45.268Z
+signed_off: 2026-08-20T08:25:49.980Z
 authors: agent
 files:
 ---

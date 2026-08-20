@@ -1,8 +1,8 @@
 ---
 form: declare-winner
 by: agent
-signed_off: 2026-08-20T07:25:25.074Z
-reopened: "2026-08-20T07:25:23.225Z — a feeder re-signed above it after the v3 merge moved the rigor matrix and the M6 spikes moved the winner"
+signed_off: 2026-08-20T08:26:09.124Z
+reopened: "2026-08-20T08:26:05.978Z — a feeder re-signed above it"
 authors: agent
 files:
 ---

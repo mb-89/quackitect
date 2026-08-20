@@ -1410,10 +1410,7 @@ export class Session {
         const t = decl.states.find((s) => s.id === e.to);
         return t !== undefined && t.submachine === undefined;
       });
-    // A PLACEHOLDER WHOSE OWN CLAIM IS OWED IS WALKED TO, NOT THROUGH.
-    // Landing on its sub-machine's start is right while the claim stands and
-    // wrong when it is owed: the walk dives, completes the sub-machine, and
-    // is refused at its END where the form can no longer be served.
+    // see dsp-walk-machine.md#a-reopened-placeholder-is-walked-to-not-through
     const land = (pfx: string, t: StateDecl, tick: RouteNode["nexts"][number]["tick"]): void => {
       const at = Session.qual(pfx, t.id);
       if (t.submachine !== undefined && this.placeholderOwesItsOwnClaim(decl, t)) {
@@ -1532,11 +1529,7 @@ export class Session {
     const decl = this.declForPrefix(cut < 0 ? "" : target.slice(0, cut))?.states.find(
       (s) => s.id === (cut < 0 ? target : target.slice(cut + 1)),
     );
-    // A PLACEHOLDER WHOSE CLAIM IS OWED IS THE TARGET ITSELF, not its
-    // sub-machine's start. Naming it is how a walk gets back to a reopened
-    // placeholder to re-sign it; resolving past it aims at a state the
-    // drawing cannot reach and the aim refuses. Same rule as expandNode's
-    // landing, for the same reason.
+    // see dsp-walk-machine.md#a-reopened-placeholder-is-walked-to-not-through
     if (decl?.submachine !== undefined) {
       const owner = this.declForPrefix(cut < 0 ? "" : target.slice(0, cut));
       const it = owner === undefined ? undefined : this.declIteration(owner);
@@ -3467,8 +3460,7 @@ export class Session {
    *  pop out of it is a real hop the route must see — without it the walk
    *  wedges on a shipped state with no drawn way out.
    *
-   *  THE POP LANDS ON THE PARENT ITSELF WHEN ITS OWN CLAIM IS OWED, so its
-   *  form is served instead of the walk being refused at the sub's end. */
+   *  see dsp-walk-machine.md#a-reopened-placeholder-is-walked-to-not-through */
   private popOutNexts(
     q: string,
     prefix: string,
@@ -3500,6 +3492,8 @@ export class Session {
     const it = this.declIteration(m);
     if (it === undefined || !this.owesASignature(s, it)) return false;
     const fm = noteOf(this.claims.evidenceAbs(it, s.id))?.frontmatter;
+    // ONLY THE REOPENED CASE, and the narrowing is deliberate.
+    // see dsp-walk-machine.md#why-only-reopened-and-not-merely-stale
     return fm !== undefined && reopenedAfterSigning(fm);
   }
 
@@ -3519,9 +3513,8 @@ export class Session {
       channel,
       supplied,
     );
-    // POP WITHOUT COMPLETING when the parent's own claim was reopened: the
-    // walk then STANDS on the placeholder, its form is served, and the
-    // re-sign is what lets the next tick complete it.
+    // POP WITHOUT COMPLETING when the parent's own claim was reopened.
+    // see dsp-walk-machine.md#a-reopened-placeholder-is-walked-to-not-through
     if (this.placeholderOwesItsOwnClaim(pm, parent)) {
       this.subs.pop();
       this.notifyChange();
@@ -3804,13 +3797,9 @@ export class Session {
     const { machine, ids } = this.leaves();
     const subState = ids.map((s) => this.state(machine, s)).find((s) => s.submachine !== undefined);
     if (subState === undefined) return;
-    // A REOPENED PLACEHOLDER IS NOT DIVED INTO. Its sub-machine already ran;
-    // what it owes now is its own signature, and diving would put the walk
-    // back at the sub's end where that form cannot be served.
-    if (this.placeholderOwesItsOwnClaim(machine, subState)) return;
-    // The containers are GENERATED from the records — their drawn canvases
-    // are stubs (owner design 2026-07-27). A generated machine's own sub
-    // states (archive decades) come from its parent's subGen.
+    // THE DIVE STILL HAPPENS FOR A PLACEHOLDER THAT OWES ITS OWN CLAIM: the
+    // pop is where the owed claim is honoured, not the entry.
+    // see dsp-walk-machine.md#a-reopened-placeholder-is-walked-to-not-through
     const gen = this.top()?.gen?.subGen?.[subState.id]?.() ?? this.views.genFor(subState.id);
     let decl: MachineDecl;
     if (gen !== undefined) {

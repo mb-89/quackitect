@@ -2,8 +2,8 @@
 form: evaluate-architecture
 amended: "2026-08-20T07:30:44.632Z by agent — the v3 merge brought ten new quality scenarios; each is ruled here"
 by: agent
-signed_off: 2026-08-20T07:31:05.011Z
-reopened: "2026-08-20T07:31:00.533Z — a feeder re-signed above it after the v3 merge moved the rigor matrix and the M6 spikes moved the winner"
+signed_off: 2026-08-20T08:26:47.481Z
+reopened: "2026-08-20T08:26:38.394Z — a feeder re-signed above it"
 authors: agent
 files:
 ---

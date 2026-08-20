@@ -1,7 +1,8 @@
 ---
 form: cut-criteria
+reopened: "2026-08-20T08:23:54.494Z — a feeder re-signed above it after the v3 merge moved the rigor matrix and the M6 spikes moved the winner"
 by: agent
-signed_off: 2026-08-19T18:46:34.324Z
+signed_off: 2026-08-20T08:23:56.583Z
 authors: agent
 files:
 ---

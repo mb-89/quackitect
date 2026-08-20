@@ -2049,3 +2049,49 @@ the machine view, which must draw a route through a sub-machine nobody
 has authored yet. Refusing at ENTRY breaks nothing and closes the hole.
 
 An AUTHORED none is not a scaffold and walks through as it always did.
+
+## A reopened placeholder is walked to, not through
+
+A PLACEHOLDER IS A STATE WHOSE WORK IS A SUB-MACHINE. `run-spikes`,
+`build-steps`, `run-candidates`, `enumerate-space` and `run-demos` are all
+this shape. Its own claim carries no evidence fields, and it stands on the
+signature its evidence file holds.
+
+THREE MECHANISMS USED TO DISAGREE ABOUT WHETHER SUCH A STATE WAS GREEN.
+
+- `recordDone` greens it as soon as its sub-machine's DRAWING is done,
+  whatever its own signature says.
+- The claim guard in `completeGuarded` asks whether its own claim STANDS, and
+  a reopen makes it not stand.
+- The pop out of a sub-machine landed on the parent's SUCCESSORS, so the
+  parent itself had no landing site.
+
+THE THREE MADE A CIRCLE. The parent could only go green once the drawing
+finished, and the drawing could not finish because the parent was not green.
+The walk dived in, completed the sub-machine, and was refused at its end —
+where the placeholder is one frame out and no verb can serve its form.
+
+WHAT IT COST, measured on i37: a full session ended on it, six remedies were
+tried and none applied, and it was written up as a fatal register issue with
+no fix.
+
+### The rule
+
+A placeholder whose own claim was REOPENED is a destination rather than a
+doorway. Three paths now ask one question, `placeholderOwesItsOwnClaim`:
+
+- the router lands ON it instead of on its sub-machine's start;
+- the aim resolves to it instead of resolving past it;
+- the pop out of its sub-machine stands the walk on it, without completing it,
+  so its form is served and the re-sign is what lets the next tick complete.
+
+## Why only reopened, and not merely stale
+
+A STALE PLACEHOLDER — one signed before a feeder re-signed — is held by the
+same guard. Treating it as owed here was tried and made things worse: the walk
+stands on the placeholder, the sub-machine reads unfinished, and there is no
+drawn path back into it.
+
+SO THE STALE CASE KEEPS THE ACT `se_why` ALREADY NAMES. The reopen is what
+puts the claim in a shape the pop can honour, and it is one call the agent is
+already told to make.
