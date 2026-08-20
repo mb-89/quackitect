@@ -452,3 +452,10 @@
 {"ts":"2026-08-20T14:18:07.774Z","op":"update","visit":"iterations/i38/cut-criteria@1","node":"d36","brief":"after re-signing evaluate-set"}
 {"ts":"2026-08-20T14:18:23.186Z","op":"update","visit":"iterations/i38/cut-criteria@1","node":"d37","brief":"routing to the gate now the root stands"}
 {"ts":"2026-08-20T14:18:52.780Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d38","brief":"correcting the never-a-hostile-pass absolute in the reader node"}
+{"ts":"2026-08-20T14:19:55.551Z","op":"update","visit":"iterations/i38/cut-criteria@2","node":"d39","brief":"reopening the gate on the re-scored evidence"}
+{"ts":"2026-08-20T14:20:15.386Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d40","brief":"reading the reopened gate"}
+{"ts":"2026-08-20T14:21:14.343Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d41","brief":"gate recheck: rounds 0 and 1 and the goals against the new evidence"}
+{"ts":"2026-08-20T14:21:57.469Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d42","brief":"gate round 2 rewritten on the returned pass"}
+{"ts":"2026-08-20T14:22:39.258Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d43","brief":"gate verdict and reasons on the re-scored evidence"}
+{"ts":"2026-08-20T14:22:53.831Z","op":"done","visit":"iterations/i38/derive-functions@0","node":"d9","brief":"gate-candidates re-blessed on the re-scored evidence"}
+{"ts":"2026-08-20T14:23:31.071Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d44","brief":"blessing the re-signed gate"}
