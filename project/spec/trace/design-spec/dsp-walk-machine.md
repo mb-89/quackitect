@@ -2049,3 +2049,15 @@ the machine view, which must draw a route through a sub-machine nobody
 has authored yet. Refusing at ENTRY breaks nothing and closes the hole.
 
 An AUTHORED none is not a scaffold and walks through as it always did.
+
+## Only what might need action earns a dot
+
+The exposure chart plots what a reader might still have to do something
+about. Three states are excluded and each for its own reason.
+
+- CLOSED is done.
+- SUPERSEDED is done, by something else.
+- DEFERRED is parked behind its own until, so it is not owed yet.
+
+An entry in any of the three is real and recorded; it just is not a call on
+anybody today, and plotting it buries the ones that are.

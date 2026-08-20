@@ -160,9 +160,7 @@ export function exposureView(
   likelihoodOrder: string[],
 ): ExposureView {
   const problems: string[] = [];
-  // Only what might need action (owner ruling 2026-08-10): closed and
-  // superseded are done, deferred is parked behind its until — none of the
-  // three earns a dot.
+  // see dsp-walk-machine.md#only-what-might-need-action-earns-a-dot
   const items = entries
     .filter((e) => e.status !== "closed" && e.status !== "superseded" && e.status !== "deferred")
     .map((e) => {
