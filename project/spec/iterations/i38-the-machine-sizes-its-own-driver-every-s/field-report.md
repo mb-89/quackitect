@@ -835,6 +835,57 @@ score above par owes a name. Each makes the cheap, unfalsifiable version of an
 act impossible to record. What is missing is the fourth instance F16 asked for:
 a claim about our own work owing the query that produced it.
 
+## F27 — two records read cut-criteria opposite ways and got opposite results
+
+The state's own note is unambiguous about what the first act is:
+
+> ONE. CUT WHAT DOES NOT DIFFERENTIATE. Strike a row by writing its reason in
+> the cut cell. It stays on the page, struck. This act is BLIND TO IMPORTANCE:
+> an axis every candidate meets identically is out whether it is fatal or
+> cosmetic.
+
+The input is the standing pool of should-and-could criteria. The act is
+per-row: does this axis separate the candidates in front of me.
+
+i38 DID THAT. 119 rows enumerated, five kept, five struck with per-row reasons,
+one moved with a rationale, the cutoff at row ten.
+
+i36 DID NOT, AND SAID SO IN ITS OWN WORDS. Its entire `cuts` field reads
+`- none [cutoff]`, and its current_situation gives the reason:
+
+> derive-criteria found all seven i36 requirements at priority must; none
+> entered the should/could pool. The standing product-wide criteria pool (89
+> should, 22 could rows) is unchanged by this iteration.
+
+THOSE ARE DIFFERENT JUSTIFICATIONS AND ONLY ONE IS THE STATE'S. "Unchanged by
+this iteration" is an ownership argument: the pool is not mine, so it is not in
+play. "Does not differentiate" is the argument the state asks for. The first
+never looks at a row.
+
+WHAT IT COST i36. evaluate-set ran with zero axes. Its reading says so plainly
+and argues it well — both candidates sit on the front by construction, because
+neither can be shown worse on an axis that does not exist — and hands the real
+choice to gate-candidates as a pass/fail check. That is an honest recovery from
+an empty table. It is not a comparison.
+
+I CANNOT SAY i36 REACHED THE WRONG ANSWER. Most of those 111 rows probably do
+not separate a harness-identity change either, and the record it produced is
+coherent. What I can say is that the answer was reached without performing the
+act, and that the two readings are not reconcilable: one of them enumerates the
+pool every time and one of them never does.
+
+WHY THIS IS THE SHAPE OF EVERY OTHER FINDING HERE. The machinery around this
+state is strict — a moved row owes a rationale, a score above par owes a named
+comparison, a spawned scorer must be a stranger to the composer. All of that
+guards the scoring. None of it guards the step before, where deciding there is
+nothing to score makes the rest optional. The cheapest way past a rigorous
+mechanism is to arrive at it with an empty input, and nothing checks the input.
+
+THE FIX IS THE SAME ONE-LINE SHAPE AS THE OTHERS: a `cuts` field that strikes
+every row owes a reason per row, and `none` is a reason for exactly zero rows.
+The template already refuses a moved row with no rationale. It accepts a whole
+pool discarded with none.
+
 ## Leads for whoever opens an engine iteration
 
 Collected here because none of them is i38's work and none would survive the
