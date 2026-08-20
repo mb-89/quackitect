@@ -1,6 +1,50 @@
 ---
 id: i37-training-iterations-a-disposable-iterati
-status: open
+status: shipped
+closed: 2026-08-20T13:40:54.360Z
+carried_count: 41
+carried:
+  - tsp-a-slow-signal-keeps-the-wait — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (observe-red.md)
+  - tsp-a-vehicle-is-made-and-then-drives-something-else — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (observe-red.md)
+  - tsp-autonomy-tiers — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (observe-red.md)
+  - tsp-bound-surface — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (observe-red.md)
+  - tsp-coupling-disposition — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (observe-red.md)
+  - tsp-derivation-analysis — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (observe-red.md)
+  - tsp-desk-and-gates — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (observe-red.md)
+  - tsp-first-run — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (observe-red.md)
+  - tsp-one-door-into-the-pool — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (observe-red.md)
+  - tsp-opening-the-folder-is-the-whole-interaction — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (observe-red.md)
+  - tsp-panel-walkthrough — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (observe-red.md)
+  - tsp-prose-inspection — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (observe-red.md)
+  - tsp-read-back-inspection — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (observe-red.md)
+  - tsp-record-inspection — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (observe-red.md)
+  - tsp-the-arrival-in-one-act — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (observe-red.md)
+  - tsp-the-cited-refs-resolve — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (observe-red.md)
+  - tsp-the-engine-keeps-no-record-of-what-it-produced — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (observe-red.md)
+  - tsp-tour-run — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (observe-red.md)
+  - tsp-two-machines — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (observe-red.md)
+  - tsp-unattended-start — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (observe-red.md)
+  - tsp-a-benchmark-run-leaves-the-archive-untouched — raid-asm-the-call-log-attributes-every-call-to-the-state-it-was-made-in (verification.md)
+  - tsp-a-slow-signal-keeps-the-wait — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (verification.md)
+  - tsp-a-vehicle-is-made-and-then-drives-something-else — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (verification.md)
+  - tsp-autonomy-tiers — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (verification.md)
+  - tsp-bound-surface — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (verification.md)
+  - tsp-coupling-disposition — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (verification.md)
+  - tsp-derivation-analysis — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (verification.md)
+  - tsp-desk-and-gates — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (verification.md)
+  - tsp-first-run — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (verification.md)
+  - tsp-one-door-into-the-pool — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (verification.md)
+  - tsp-opening-the-folder-is-the-whole-interaction — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (verification.md)
+  - tsp-panel-walkthrough — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (verification.md)
+  - tsp-prose-inspection — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (verification.md)
+  - tsp-read-back-inspection — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (verification.md)
+  - tsp-record-inspection — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (verification.md)
+  - tsp-the-arrival-in-one-act — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (verification.md)
+  - tsp-the-cited-refs-resolve — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (verification.md)
+  - tsp-the-engine-keeps-no-record-of-what-it-produced — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (verification.md)
+  - tsp-tour-run — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (verification.md)
+  - tsp-two-machines — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (verification.md)
+  - tsp-unattended-start — raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger (verification.md)
 started: 2026-08-19T16:38:23.768Z
 opened: 2026-08-19T15:42:15.402Z
 goal: "Training iterations: a disposable iteration seeded by command, sized by draw or by choice, walked by an agent so the walk itself can be timed, and discarded without ever reaching the archive."
