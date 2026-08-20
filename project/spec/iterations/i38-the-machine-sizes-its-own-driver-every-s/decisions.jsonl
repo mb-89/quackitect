@@ -471,3 +471,10 @@
 {"ts":"2026-08-20T14:32:18.150Z","op":"update","visit":"iterations/i38/reverse-sensitivity@0","node":"d57","brief":"reopening reverse-sensitivity for the new leader"}
 {"ts":"2026-08-20T14:33:40.567Z","op":"update","visit":"iterations/i38/reverse-sensitivity@0","node":"d58","brief":"reverse-sensitivity re-earned: one graft overtakes"}
 {"ts":"2026-08-20T14:34:33.687Z","op":"update","visit":"iterations/i38/reverse-sensitivity@0","node":"d59","brief":"minting the live tripwire against the new leader"}
+{"ts":"2026-08-20T14:39:09.113Z","op":"plan","visit":"iterations/i38/record-adrs@0","parent":null,"nodes":[{"id":"d60","brief":"record the ADRs"},{"id":"d61","brief":"decompose the structure"},{"id":"d62","brief":"evaluate the architecture"},{"id":"d63","brief":"gate the architecture"}]}
+{"ts":"2026-08-20T14:39:44.272Z","op":"update","visit":"iterations/i38/record-adrs@0","node":"d64","brief":"at record-adrs"}
+{"ts":"2026-08-20T14:42:50.538Z","op":"update","visit":"iterations/i38/record-adrs@0","node":"d65","brief":"recording decision the-block-names-a-rung-and-never-a-mo"}
+{"ts":"2026-08-20T14:42:50.708Z","op":"update","visit":"iterations/i38/record-adrs@0","node":"d66","brief":"recording decision the-no-match-is-a-returned-value-not-"}
+{"ts":"2026-08-20T14:42:50.859Z","op":"update","visit":"iterations/i38/record-adrs@0","node":"d67","brief":"recording decision a-record-without-a-driver-or-a-reason"}
+{"ts":"2026-08-20T14:42:51.022Z","op":"update","visit":"iterations/i38/record-adrs@0","node":"d68","brief":"recording decision difficulty-is-two-figures-and-is-name"}
+{"ts":"2026-08-20T14:43:20.883Z","op":"update","visit":"iterations/i38/record-adrs@0","node":"d69","brief":"recording the four deciding ADRs"}
