@@ -326,3 +326,15 @@
 {"ts":"2026-08-20T12:38:16.278Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d210","brief":"redrawing the chart with one cell per contested axis"}
 {"ts":"2026-08-20T12:38:33.607Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d211","brief":"receiver-decides: naming its half-measurement"}
 {"ts":"2026-08-20T12:38:33.770Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d212","brief":"redrawing the chart with one cell per contested axis"}
+{"ts":"2026-08-20T12:43:38.793Z","op":"done","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d199","brief":"authoring the candidate drawing build_chart owed"}
+{"ts":"2026-08-20T12:43:45.244Z","op":"update","visit":"iterations/i38/run-candidates@0","node":"d213","brief":"entering the seeded candidate machine"}
+{"ts":"2026-08-20T12:44:56.538Z","op":"done","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d200","brief":"run-candidates placeholder signed; descending into four compose states"}
+{"ts":"2026-08-20T12:45:18.741Z","op":"update","visit":"iterations/i38/run-candidates/the-seed-made-total@0","node":"d214","brief":"pulling for the descent into the candidate machine"}
+{"ts":"2026-08-20T12:45:19.125Z","op":"update","visit":"iterations/i38/run-candidates/the-seed-made-total@0","node":"d215","brief":"pulling for the descent into the candidate machine"}
+{"ts":"2026-08-20T12:45:46.686Z","op":"update","visit":"iterations/i38/run-candidates/the-seed-made-total@0","node":"d216","brief":"re-submitting run-candidates after the machine recompiled"}
+{"ts":"2026-08-20T12:48:34.283Z","op":"update","visit":"iterations/i38/run-candidates/the-seed-made-total@0","node":"d217","brief":"composing the seed candidate: seams and a feasibility number"}
+{"ts":"2026-08-20T12:49:26.575Z","op":"update","visit":"iterations/i38/run-candidates/the-derived-ladder@0","node":"d218","brief":"moving to the next compose state"}
+{"ts":"2026-08-20T12:50:15.675Z","op":"update","visit":"iterations/i38/run-candidates/the-derived-ladder@0","node":"d219","brief":"composing the remaining three candidates"}
+{"ts":"2026-08-20T12:50:50.441Z","op":"update","visit":"iterations/i38/run-candidates/the-derived-ladder@0","node":"d220","brief":"composing the-derived-ladder"}
+{"ts":"2026-08-20T12:50:52.743Z","op":"update","visit":"iterations/i38/run-candidates/the-reader-beside-the-walk@0","node":"d221","brief":"composing the-reader-beside-the-walk"}
+{"ts":"2026-08-20T12:50:54.912Z","op":"update","visit":"iterations/i38/run-candidates/the-receiver-decides@0","node":"d222","brief":"composing the-receiver-decides"}

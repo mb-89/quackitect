@@ -71,7 +71,45 @@ A RECORD CARRYING NEITHER A NAMED DRIVER NOR A STATED REASON IS NOT A VALID
 RECORD, which closes the silence in the design's only safety rule by making the
 invalid case unrepresentable rather than merely checked.
 
+## The seams, which is what this compose state is for
+
+THE RUNG VOCABULARY IS THE INTERFACE, AND IT IS THE ONLY ONE. Everything this
+candidate publishes crosses a boundary we do not control, so the vocabulary has
+to be stable, documented and versioned in a way none of the other three need. The
+seam is not a function call; it is a published contract, and changing it later
+breaks a receiver we cannot see.
+
+THE TWO-PART DIFFICULTY AND THE RUNG NAME ARE REDUNDANT ON PURPOSE. The pair says
+what the work is like; the rung says what we would pick. A receiver that
+disagrees with our rung can still use the pair, which is what makes the
+publication worth reading to somebody whose fleet is not ours. That redundancy is
+a cost — two things to keep consistent — and it is the price of not asserting a
+roster.
+
+THE NO-MATCH VALUE AND THE RECORD VALIDITY RULE CLOSE THE SAME HOLE FROM TWO
+SIDES. NotApplicable makes the absence legible on the wire; a record carrying
+neither a driver nor a reason being invalid makes it legible in the log. Taking
+one without the other leaves the hole open in whichever place was not covered.
+
+THE MEASUREMENT SEAM IS BROKEN AND THE CANDIDATE ADMITS IT. Naming an acceptable
+over-driving rate needs somebody to report against it, and under this line
+nothing of ours ever learns which model the rung resolved to.
+
 ## What it costs
+
+THE BUILD COST IS THE SMALLEST OF THE THREE THAT TOUCH THE WALK and the adoption
+cost is the largest. Publishing a pair and a rung is less code than resolving a
+roster. What it needs instead is a receiver that reads the rung and acts, and
+nbr-the-driver-that-performs-the-spawn was rewritten in this record because the
+first version claimed one existed: the receiver reads and cannot act.
+
+THE TWO-PART DIFFICULTY DOUBLES THE DECLARATION OR THE DERIVATION. Every one of
+the 154 active cells probe 1 counted now carries two figures rather than one,
+whichever way they are arrived at.
+
+AND THE MAPPING ONTO A ONE-DIMENSIONAL LADDER NEEDS A RULE FOR THE CORNER where
+the two axes disagree. raid-asm-the-model-ladder-is-a-total-order was already
+unproven; this makes the disagreement explicit rather than creating it.
 
 IT DOES NOT ANSWER THE QUESTION THE RECORD WAS OPENED FOR. Somebody still maps a
 rung to a hand, and under this candidate that somebody is outside our tree,

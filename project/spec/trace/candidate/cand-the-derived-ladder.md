@@ -69,7 +69,49 @@ computable and gave the range a repair pass produces — median similarity 0.81
 between a form and its own repair — so an agreement threshold has a measured
 scale to sit against.
 
+## The seams, which is what this compose state is for
+
+THE FORMULA AND THE OMIT LISTS ARE THE SAME MECHANISM SEEN TWICE. A cell's field
+count is what the row asks for at that column after its omit lists are applied,
+and the omit lists are the only per-size information rigor-matrix.ts already
+validates (:200-206). So the formula is not reading a new thing; it is reading the
+thing the loader already checks. That is why this candidate is cheap.
+
+THE PER-STATE NAMING AND THE PUBLISH-ON-CHANGE CELL ARE ONE DESIGN, NOT TWO.
+Naming per state multiplies the raw publication rate by the states in a
+milestone, and almost all of that traffic repeats. Publishing on change is what
+makes per-state naming affordable, and taking the first without the second is the
+only combination on this line that would be worse than the seed.
+
+THE DOUBLE-WALK AND THE DERIVATION ARE IN TENSION AND THE TENSION IS THE POINT.
+The formula asserts which steps are hard; the double-walk is the only mechanism on
+the chart that can return the answer that the formula is wrong. A candidate that
+derives and does not test is asserting a formula nobody checked, which is the
+declaration problem with an extra step.
+
+THE ROSTER SPLIT IS INHERITED FROM THE SEED and carries the same coupling: the
+two-record split needs the totality check, or a rung the mapping names goes
+unfilled. Both cells are on this line for that reason.
+
 ## What it costs
+
+THE HAND-WRITTEN POPULATION IS ZERO CELLS, which is the number this candidate is
+for. The same 154 active cells probe 1 counted are read by a formula instead of
+filled by a person.
+
+THE ENGINE CHANGE IS FOUR EDITS RATHER THAN THREE: cellsOf, compileColumn, the
+formula itself, and the totality check. The formula is the only one that needs
+designing, and it is the risk.
+
+THE DOUBLE-WALK COSTS REAL MONEY ON THE SAMPLE and needs an agreement rule nobody
+has written. Probe 3 established the method and the scale — median similarity
+0.81 between a form and its own repair — but the threshold is a design decision
+still open.
+
+THE FORMULA IS A DESIGN DECISION NOBODY HAS MADE, and a bad formula is worse than
+a bad declaration because it is wrong everywhere at once. Field count is a
+reading measure wearing a judgement label, and it cannot express a state that
+asks one field and needs deep judgement.
 
 THE FORMULA IS A DESIGN DECISION NOBODY HAS MADE, and a bad formula is worse
 than a bad declaration because it is wrong everywhere at once. Field count is a

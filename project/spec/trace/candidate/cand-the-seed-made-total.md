@@ -64,18 +64,52 @@ rung that moves when a vendor ships — with a named pool per rung.
 publish-the-driver-outward emits only when the answer differs from the standing
 one.
 
+## The seams, which is what this compose state is for
+
+THE CELL AND THE COMPILE. The third cell key rides a path that already carries
+the cell's prose, so the seam is a field addition rather than a new call. What is
+NOT free: the compiled machine is pinned, so a difficulty edited mid-record does
+not reach an open walk until the column recompiles.
+raid-iss-the-live-read-rule-forbids-more-than-its-own-reason-needs is exactly
+this seam, and gate-design has to rule on it before this candidate is buildable
+as described.
+
+THE TOTALITY CHECK AND THE TWO-RECORD MAPPING MEET AT THE JOIN. Splitting the
+ladder from the roster creates a way to be incomplete that one file did not have:
+a rung the mapping names and the roster does not fill. The totality check is what
+closes it, and the two options are therefore not independent — taking the split
+without the check is strictly worse than taking neither.
+
+THE PUBLICATION AND THE RECORD ARE TWO WRITES OF ONE FACT. Publishing on change
+means a receiver arriving late has no standing answer, so the block must answer
+the current value on first ask as well as on change. The call record carries both
+drivers on every call regardless. Those are different cadences for the same
+value, and a later reader comparing the stream against the log will find them
+disagreeing at every boundary unless the log is treated as the authority.
+
 WHAT HOLDS IT HONEST. The compile refuses a mapping with a hole. Every call
-record carries the driver named beside the driver that answered, so the gap is
-readable without reconstruction. An acceptable over-driving rate is stated in
-advance, and a sample is audited against it rather than reconciling every call.
+record carries the driver named beside the driver that answered. An acceptable
+over-driving rate is stated in advance, and a sample is audited against it.
 
 ## What it costs
+
+THE HAND-WRITTEN POPULATION IS 154 CELLS, MEASURED. Probe 1 counted the rows
+active per column: 19 at patch, 29 at minor, 53 at major, 53 at product. Every
+one needs a difficulty typed into it, and every one is a thing that can be typed
+wrongly or left to rot. That is the feasibility number this candidate lives or
+dies by, and it is the largest of the four.
+
+THE ENGINE CHANGE IS SMALL AND THE CORPUS CHANGE IS NOT. cellsOf at
+rigor-matrix.ts:417 gains a third key; compileColumn at :609 carries it onto the
+StateDecl; the totality check is one pass over the same rows at pin time. Call it
+three edits. The 154 cells are the work.
 
 THE DECLARED NUMBER CAN DRIFT AND THIS CANDIDATE HAS NO ANSWER TO THAT.
 raid-risk-a-hand-declared-rung-drifts-upward-and-nothing-ever-says-so stands
 against it in full. The audit measures the gap after the fact; nothing stops a
-declaration being raised.
+declaration being raised, and probe 3 measured that exact ratchet running in this
+record's own evidence — seventeen forms repaired, seventeen grew, none shrank.
 
-AND THE MILESTONE MAXIMUM WASTES BY CONSTRUCTION. Probe 1 measured the spread
-it hides: at major, ten rows ask no evidence field at all and one asks six, and
-a maximum puts them on the same hand.
+AND THE MILESTONE MAXIMUM WASTES BY CONSTRUCTION. Probe 1 measured the spread it
+hides: at major, ten rows ask no evidence field at all and one asks six, and a
+maximum puts them on the same hand.

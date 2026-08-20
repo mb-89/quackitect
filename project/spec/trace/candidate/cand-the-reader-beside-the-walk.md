@@ -66,7 +66,44 @@ and writes its finding into the call record — which is also the publication,
 because a log is already append-only and already carries every value with its
 moment. A sample is audited rather than every call reconciled.
 
+## The seams, which is what this compose state is for
+
+THE READER AND THE WALK SHARE ONE ARTIFACT AND NOTHING ELSE. That artifact is the
+call record, and it is also the publication, so there is no second channel and no
+protocol between them. The seam is a file format rather than an interface, which
+is the cheapest seam of the four and also the most brittle: a change to the record
+shape silently changes what the reader computes.
+
+THE HISTORY SIGNAL AND THE TOTALITY CHECK MEET AWKWARDLY. A reader deriving
+difficulty from reopen counts produces a continuous quantity; a mapping checked
+for totality wants a closed domain. Bucketing the rate into rungs is the join, and
+nobody has chosen the bucket boundaries — which is where a recommendation
+quietly becomes an opinion.
+
+AND THERE IS NO SEAM WITH THE SPAWN AT ALL, which is the whole argument. Three of
+the four shipped systems this is modelled on hold no write path into the thing
+they advise. Here the reader is a program run over a finished record; there is
+nothing to wire, nothing to permission, and nothing that can spend money by
+mistake.
+
 ## What it costs
+
+IT COSTS ALMOST NOTHING TO BUILD AND THAT IS MEASURED. Probe 2 is most of this
+candidate: it read all 640 evidence forms, counted reopens per state name and
+produced the ranking, in a script short enough to fit in one call. Nothing in the
+engine changes, nothing is compiled, nothing is pinned.
+
+THE ONGOING COST IS A PROGRAM SOMEBODY RUNS, and the failure mode is that nobody
+runs it. Three of the four shipped systems it is modelled on are dashboards.
+
+IT ANSWERS THE WRONG TENSE, which is the real price. A reader over history says
+what should have happened, so nothing it produces can size a step before that
+step runs.
+
+AND THE HISTORY SIGNAL CAN LIE IN BOTH DIRECTIONS. Probe 2 caught it: all six
+finder states read as easy at zero reopens in six walks, and nothing has ever run
+a hostile pass over a finder. A row never checked is indistinguishable here from
+a row never wrong.
 
 IT ANSWERS THE WRONG TENSE. A reader over history says what should have
 happened, not what should happen, so nothing it produces can size a step before
