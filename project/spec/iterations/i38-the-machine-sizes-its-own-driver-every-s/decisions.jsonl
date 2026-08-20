@@ -182,3 +182,11 @@
 {"ts":"2026-08-20T11:11:00.965Z","op":"update","visit":"iterations/i38/probe-assumptions@0","node":"d71","brief":"two standing assumptions re-probed on this session's evidence"}
 {"ts":"2026-08-20T11:11:25.423Z","op":"update","visit":"iterations/i38/probe-assumptions@0","node":"d72","brief":"probe table accepted as drawn, with three rows re-probed"}
 {"ts":"2026-08-20T11:11:40.019Z","op":"done","visit":"iterations/i38/write-requirements@0","node":"d47","brief":"probe-assumptions signed; one assumption falsified and three artifacts changed"}
+{"ts":"2026-08-20T11:12:56.593Z","op":"update","visit":"iterations/i38/gate-requirements@0","node":"d73","brief":"recount corrects 46 of 52 to 47 of 53"}
+{"ts":"2026-08-20T11:12:56.717Z","op":"update","visit":"iterations/i38/gate-requirements@0","node":"d74","brief":"reopening identify-assumptions on a truncated count"}
+{"ts":"2026-08-20T11:13:14.881Z","op":"update","visit":"iterations/i38/identify-assumptions@2","node":"d75","brief":"identify-assumptions re-signed with the recount"}
+{"ts":"2026-08-20T11:13:32.662Z","op":"update","visit":"iterations/i38/probe-assumptions@1","node":"d76","brief":"re-earning probe-assumptions after the recount"}
+{"ts":"2026-08-20T11:13:33.413Z","op":"update","visit":"iterations/i38/probe-assumptions@1","node":"d77","brief":"probe-assumptions re-earned; the falsification is unaffected"}
+{"ts":"2026-08-20T11:13:46.066Z","op":"update","visit":"iterations/i38/gate-requirements@0","node":"d78","brief":"reading the requirements gate form"}
+{"ts":"2026-08-20T11:14:45.937Z","op":"plan","visit":"iterations/i38/gate-requirements@0","parent":"d48","nodes":[{"id":"d79","brief":"gate acceptance items"},{"id":"d80","brief":"rounds 0 and 1"},{"id":"d81","brief":"goals and bound"}]}
+{"ts":"2026-08-20T11:15:11.665Z","op":"update","visit":"iterations/i38/gate-requirements@0","node":"d82","brief":"field report takes the three-mechanisms finding"}

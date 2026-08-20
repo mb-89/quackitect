@@ -1,8 +1,8 @@
 ---
 form: identify-assumptions
 by: agent
-signed_off: 2026-08-20T11:09:37.296Z
-reopened: "2026-08-20T11:09:36.411Z — its upstream was re-signed and one of the two assumptions it opened has since been falsified and changed kind to issue"
+signed_off: 2026-08-20T11:13:15.232Z
+reopened: "2026-08-20T11:12:56.718Z — its environment sweep says forty-six of fifty-two rows vary by column; it is forty-seven of fifty-three, because the counting script truncated each file at three thousand characters and one long row lost a cell"
 authors: agent
 files:
 ---
@@ -24,7 +24,7 @@ THE SWEEP WAS ACTUALLY PERFORMED THIS TIME, which needs saying: this iteration h
 
 ## sweep
 
-- environment: SWEPT, AND IT TURNED UP THE STRONGEST ASSUMPTION OF THE MILESTONE. The environment this mechanism runs in is the matrix itself, and the matrix already varies a row's work by change size — forty-six of fifty-two rows differ across their four cells, and draft-vision runs `none`, `inherit`, `tailored`, `full` under one row name. The design gives each row ONE complexity value. Minted as raid-asm-a-state-is-equally-hard-at-every-change-size, graded crippling and expected, with the honest counter-case written into it: difficulty and volume are not the same thing, and the KIND of judgment may be stable where the AMOUNT is not. One row rated at two columns settles it and that is one row's work.
+- environment: SWEPT, AND IT TURNED UP THE STRONGEST ASSUMPTION OF THE MILESTONE. The environment this mechanism runs in is the matrix itself, and the matrix already varies a row's work by change size — FORTY-SEVEN OF FIFTY-THREE rows differ across their four cells and six are identical, and draft-vision runs `none`, `inherit`, `tailored`, `full` under one row name. THIS FIGURE WAS FIRST WRITTEN AS FORTY-SIX OF FIFTY-TWO and corrected at the requirements gate: the counting script truncated each file at three thousand characters, so one long row lost its fourth cell and left the population. The design gives each row ONE complexity value. Minted as raid-asm-a-state-is-equally-hard-at-every-change-size, graded crippling and expected, with the honest counter-case written into it: difficulty and volume are not the same thing, and the KIND of judgment may be stable where the AMOUNT is not. One row rated at two columns settles it and that is one row's work.
 - toolchain: SWEPT, NOTHING NEW. The mechanism needs a file read, a comparison and two record fields; nothing about Node, the typechecker, the linter or the test runner is leaned on beyond what every other lane verb already assumes. The one toolchain-adjacent claim — that a test can assert complexity stays out of the demand digest — was verified live rather than assumed: demandOf serialises evidence-field structure and shapeOf reads four named keys today.
 - host: SWEPT, AND IT WAS ALREADY REGISTERED. raid-asm-one-model-list-serves-every-host-the-engine-supports stands at `expected` on the evidence that a model alias already resolves to different models on different providers, against three registered hosts of which two are a different vendor. Nothing new here; re-read rather than re-derived.
 - platform: SWEPT, AND ONE ASSUMPTION HAD NO NODE. The design rules that asking for a STRONGER driver needs no argument, which is only safe if model strength is a single well-ordered dimension. Nothing establishes that, and the lane's own guidance already warns that a capable model re-derives a drawn field or writes an essay where a pick was wanted — which is a stronger model doing a C1 state WORSE. Minted as raid-asm-the-model-ladder-is-a-total-order.
@@ -46,6 +46,12 @@ THE SWEEP WAS ACTUALLY PERFORMED THIS TIME, which needs saying: this iteration h
 - THE ENTRY WAS WORTH MINTING PRECISELY BECAUSE IT DIED. It carried its own probe, the probe was one row's work, and running it changed a requirement, a flow and a function before fifty-three ratings were authored against the wrong schema. An assumption that survives tells you little; one that falsifies inside a milestone has paid for itself.
 
 - THE SECOND ASSUMPTION STANDS UNPROBED AND SAYS SO. raid-asm-the-model-ladder-is-a-total-order cannot be tested until a list exists, and its probe is written and cheap for whoever gets there first.
+
+- RE-SIGNED AT THE REQUIREMENTS GATE ON A WRONG COUNT OF MY OWN, and the mechanism is new even though the class is not. The figure was produced BY A PROGRAM rather than by eye — the correction this iteration had already adopted twice — and the program read only the first three thousand characters of each row file, so one long row silently left the population. A MEASUREMENT WITH A TRUNCATION IN IT IS NOT BETTER THAN A GUESS BECAUSE IT WAS AUTOMATED.
+
+- AND THE CROSS-CHECK WAS ALREADY ON THE RECORD. This iteration established at its kickoff that the matrix has fifty-three rows. Four milestones later it wrote fifty-two and nothing compared the two. The lesson is not "count by program" — it is that a count owes a sanity check against a figure already established.
+
+- THE CONCLUSION IS UNTOUCHED. Forty-seven of fifty-three is the same finding as forty-six of fifty-two, and the assumption it supported was falsified at the next state on different evidence entirely — draft-vision's own column notes, read rather than counted.
 
 ## anything_else
 

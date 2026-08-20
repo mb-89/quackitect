@@ -11,7 +11,7 @@ impact: "A rating judged against the column it was written for is wrong at every
 breaks_how_badly: crippling
 how_likely: expected
 falsified: 2026-08-20
-probe: "COUNTED OVER THE MATRIX AT i38's identify-assumptions, 2026-08-20. Fifty-two rows declare all four change-size cells; FORTY-SIX of them differ across the columns and only six are identical in all four. The spread is not cosmetic: draft-vision is `none` at patch, `inherit` at minor, `tailored` at major and `full` at product — four different amounts of work under one row name. write-requirements is `tailored` at patch and `full` everywhere else. The design's own words are that every STATE says how hard it is, and the hazard it worried about — a key added to all rows moving the matrix hash — is stated per row, so one value per row is what is proposed."
+probe: "COUNTED OVER THE MATRIX AT i38's identify-assumptions, 2026-08-20, AND RECOUNTED AT THE REQUIREMENTS GATE BECAUSE THE FIRST COUNT WAS WRONG. All FIFTY-THREE rows declare all four change-size cells; FORTY-SEVEN differ across the columns and six are identical in all four. The first count said forty-six of fifty-two: the counting script read only the first three thousand characters of each file, so one long row lost its fourth cell and dropped out of the population entirely. The conclusion is untouched and the method was not. The spread is not cosmetic: draft-vision is `none` at patch, `inherit` at minor, `tailored` at major and `full` at product — four different amounts of work under one row name. write-requirements is `tailored` at patch and `full` everywhere else. The design's own words are that every STATE says how hard it is, and the hazard it worried about — a key added to all rows moving the matrix hash — is stated per row, so one value per row is what is proposed."
 probed: 2026-08-20
 source_refs:
   - i38-the-machine-sizes-its-own-driver-every-s
@@ -93,7 +93,18 @@ which is why that requirement was amended the same day.
 ## The original probe, kept
 
 THE CHEAP HALF, run at identify-assumptions: count how many rows already vary by
-column. Forty-six of fifty-two.
+column. FORTY-SEVEN OF FIFTY-THREE, six identical.
+
+IT WAS FIRST REPORTED AS FORTY-SIX OF FIFTY-TWO and the error is worth keeping.
+The count was made by a program rather than by eye — which is the correction
+this iteration had already adopted twice — and the program truncated each file
+at three thousand characters, so one long row lost its fourth cell and left the
+population. A MEASUREMENT WITH A SILENT TRUNCATION IN IT IS NOT BETTER THAN A
+GUESS BECAUSE IT WAS AUTOMATED.
+
+AND THE SANITY CHECK WAS ALREADY IN HAND. This iteration established at its
+kickoff gate that the matrix has fifty-three rows, and then wrote fifty-two four
+milestones later without noticing the two figures disagreed.
 
 THE HALF THAT NEEDS THE RATINGS: take any row whose cells span a wide range —
 `draft-vision` is the clearest, running from `none` to `full` — and rate it

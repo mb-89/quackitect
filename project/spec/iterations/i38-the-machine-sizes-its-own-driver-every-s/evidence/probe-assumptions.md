@@ -1,7 +1,8 @@
 ---
 form: probe-assumptions
 by: agent
-signed_off: 2026-08-20T11:11:40.302Z
+signed_off: 2026-08-20T11:13:33.816Z
+reopened: "2026-08-20T11:13:32.664Z — identify-assumptions was re-signed after it with a corrected row count, and this states own follow-up quotes the old figure"
 authors: agent
 files:
 ---
@@ -107,6 +108,10 @@ TWO STANDING ASSUMPTIONS WERE RE-PROBED ON THIS SESSION'S OWN EVIDENCE.
 - raid-asm-refusals-recover-a-weak-model: a second one-sided data point, still not a weak model. Forty-five refusals in five hundred calls, every typed clause recovered in one turn EXCEPT the narration ones — SE-C-121 sixteen times and SE-C-133 twenty. The 121s were node ids guessed while the open node map rode every result. That is this assumption's own failure mode arriving in a capable model: a remedy present, correct, and unused because the answer looked obvious. The claim to test is narrower than whether the remedy works — it is whether the remedy is placed where a reader who thinks they know will still see it.
 
 ONE STANDING UNPROBED, HONESTLY. raid-asm-the-model-ladder-is-a-total-order cannot be tested until a list exists. Its probe is written and costs one state walked at two rungs.
+
+- RE-EARNED AFTER A RECOUNT UPSTREAM. The matrix figure moved from forty-six of fifty-two to forty-seven of fifty-three; a counting script had truncated each row file at three thousand characters and one long row lost a cell. The falsification this state performed does not rest on that figure at all — it rests on draft-vision's four column notes, read directly — so nothing here moved.
+
+- WORTH SAYING BECAUSE IT IS THE THIRD SHAPE OF THE SAME ERROR IN THREE MILESTONES. M1 recalled a number. M2 read a listing by eye. M3 ran a program that silently dropped a row. Each correction adopted the previous lesson and met a new mechanism. THE PATTERN IS NOT CARELESSNESS ABOUT METHOD — it is that no method carries its own check, and the cross-check for this one was already on the record: this iteration established fifty-three rows at its kickoff and wrote fifty-two four milestones later without either figure noticing the other.
 
 ## anything_else
 

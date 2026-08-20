@@ -352,6 +352,43 @@ ONE THING THE ENGINE COULD DO ABOUT THE FIRST, offered as a lead rather than a
 demand: the open node map rides every refusal already. A `done` naming an
 unknown id could name the closest open id instead of only listing them.
 
+
+## F15 — three milestones, three mechanisms, one error
+
+THE SAME CLASS OF ERROR HAS NOW ARRIVED THREE TIMES BY THREE DIFFERENT ROUTES,
+each correction adopting the previous lesson and meeting a new mechanism.
+
+- M1: a number RECALLED. "Six autonomy rungs" written from memory against a
+  page that says five plus a control position. Lesson adopted: read, do not
+  recall.
+- M2: a listing READ BY EYE. "Forty-five stories stand" counted off a printed
+  glob. Lesson adopted: count by program, not by eye.
+- M3: a program that TRUNCATED. "Forty-six of fifty-two rows" produced by a
+  script reading the first three thousand characters of each file, so one long
+  row lost a cell and left the population. It is forty-seven of fifty-three.
+
+THE LESSON IS NOT "COUNT MORE CAREFULLY". Each method was better than the last
+and each failed differently. What none of them carried was a CHECK — a second
+figure the first could be compared against.
+
+AND THE CHECK WAS ALREADY ON THE RECORD FOR THE THIRD ONE. This iteration
+established at its kickoff gate that the matrix holds fifty-three rows. Four
+milestones later it wrote fifty-two, and nothing compared the two figures
+because nothing was looking.
+
+WHY THIS SHARPENS THE EVIDENCE-BINDING ARGUMENT rather than repeating it. A
+claim bound to a re-executable query would not have caught this one either —
+re-running the truncating script reproduces forty-six of fifty-two exactly.
+WHAT WOULD HAVE CAUGHT IT is the corpus already holding an authoritative row
+count that any new count is compared against. So the design implication is
+narrower and more useful than "bind claims to queries": bind a claim to a query
+AND, where the corpus already knows the answer, compare rather than recompute.
+
+THE COST, MEASURED. Eighteen reopens across this iteration, every one because
+its own evidence needed correcting. Six pulls between 15 and 18 seconds are
+reopen cascades. The fabrications are not only a trust problem; they are the
+single largest wall-clock cost in the walk.
+
 ## Leads for whoever opens an engine iteration
 
 Collected here because none of them is i38's work and none would survive the
