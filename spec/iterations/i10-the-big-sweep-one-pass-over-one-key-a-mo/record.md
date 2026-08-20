@@ -106,3 +106,17 @@ AND SUB-AGENTS BY TIER (note-ac0d51fafb55), the third kind of parallelism, which
 - i9-se-and-the-corpus-move-the-machine-state
 - spec/raid/raid-module-id-collisions.md at ref main
 - project/spec/references/
+
+## Overhaul input (2026-08-20)
+
+The overhaul's requirement sweeps extend this record's citation work. The
+evidence is spec/overhauls/2026-08-20/findings.md, requirement sections.
+
+- 35 files cite .se/req-mine sources that resolve nowhere, plus two more
+  broken refs (a wrong node id, a wrong path).
+- About 11 rows carry path-shaped refs with pre-collapse prefixes
+  (engine/..., tests/...), one naming the deleted worktree.ts.
+- Three rows admit their own id is a misnomer and the rename sweep is owed.
+
+i44 repairs what resolves wrongly today and arms the lints; the migration
+to one citation form and the glossary stay this record's work.

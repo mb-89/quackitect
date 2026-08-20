@@ -113,6 +113,60 @@ Take the Erroneous first. A wrong document is worse than no document.
 
 A candidate that fits no letter is KEPT. Record that it was looked at.
 
+## The pattern checklist
+
+OWNER RULING 2026-08-20. The overhaul asks one more fixed question set,
+about the CODE: would a named design pattern, applied where we do not
+use it, improve us? The list is named so two passes reach the same
+verdict, exactly like SORTED.
+
+HOW TO RUN IT. Run it in step 3, beside the rule sweep. For each
+pattern, try to name ONE place where applying it would delete code or
+a defect class. No place found? Write "none" and move on. A hit is a
+finding like any other: evidence, proposal, a CODE letter.
+
+HOW IT GROWS. Add a pattern when an overhaul finds the same improvable
+shape twice and a named pattern covers it. The list is the rule's
+memory, the same doctrine as the forbidden-words list in voice.md.
+
+- ONE SOURCE, DERIVED VIEWS. Is one fact stored in two places, so the
+  copies can disagree? The owner's words (2026-08-20): copies that
+  diverge are the defect, size is not. The exemplar is se_coverage —
+  the verb and the submit-time law share one function, so they cannot
+  drift.
+- STRATEGY. Is one decision re-made by if/switch on the same kind in
+  several places? The tell: three copies of a kind-test, and a fourth
+  that quietly diverges.
+- REGISTRY. Does a list grow by editing code in N places instead of
+  registering an entry in one? The exemplars are the editors and the
+  condition types: an unknown entry refuses, a new one is one file.
+- TEMPLATE METHOD. Do two procedures share most of their steps and
+  differ in one? The tell: a copied block with a ten-line comment
+  duplicated verbatim.
+- ADAPTER. Are host or environment differences handled inline where
+  they occur, instead of at one seam? The exemplar is the harness
+  registry: measured limits live in one module, callers never ask
+  which host they are on.
+- INVALIDATE ON THE EVENT. Does a write path have to remember to clear
+  a cache by hand? The tell: an invalidation call sprinkled at some
+  call sites and missing at others. Put it in the one write funnel.
+- ONE CACHE, ONE OWNER. Does every cache have exactly one writer and
+  one invalidation point, and a test for its poisoning case?
+- VALUE OBJECT. Is a small domain idea — a qualified id, a reference,
+  a path — hand-parsed wherever it is touched? The tell: the same
+  split or strip spelled out in many files, each slightly different.
+- FACADE ONLY WHERE IT ADDS A CONTRACT. Does a wrapper layer only
+  forward? Forwarding without a contract is ceremony, and it hides
+  the real surface.
+- ONE DOOR PER RESOURCE. Is a file, a folder or a log read through one
+  module, or does everybody open it themselves? The exemplar is the
+  corpus door; the counterexample is a second hand-rolled parser
+  beside the real one.
+- TYPED RESULT. Does a failure carry a type, a reason and a remedy, or
+  only a string? The exemplar is the refusal.
+- LAYERS POINT ONE WAY. Does a lower module import an upper one, or
+  shape answers that belong to the layer above it?
+
 ## The steps
 
 1. Inventory. List what is active, because you cannot weed what you have

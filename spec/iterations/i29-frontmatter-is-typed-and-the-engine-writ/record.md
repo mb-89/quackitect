@@ -102,3 +102,18 @@ FROM THE POOL, 2026-08-13. Three more, and the first two are fields to strike ra
 - STRIKE THE characteristic FIELD from the requirement template (owner agreed, note-69d710297f3c). It holds a second copy of an edge the trace already carries, which this project's own rule refuses, and it is already inconsistent at 8 of 19 qualities. Nothing reads it - the only match outside the template is a comment written the same day. Three steps: remove the field block including its nine-value enumeration, strip the key from the 8 nodes carrying it, and check no form template, lint or view reads it first. WHAT MUST SURVIVE: the nine characteristics themselves, as use cases. A quality is placed by what it refines.
 - DOES current_situation EARN ITS PLACE (owner question, note-1d59851377ac). The check ran: all 30 of 30 evidence files carry it and none is boilerplate, NOTHING MECHANICAL READS IT, and its content is restatement of what upstream states already stamped. THE DECISION IS THE OWNER'S and it is unanswered. The proposed direction is to keep it on GATE forms, where an adjudicator reads cold, and drop it from operational states, whose reader arrives from the trace.
 - CONFORMANCE MOVES TO THE WRITE (owner, note-b93ad16c18a5), which is this iteration's authoring-time half stated as a rule. Two pieces already exist: item templates declare checks and conformance runs them, but at submit and at the gate; and the write path already lints and formats covered files, so the hook point is there. THE SKELETON MINT STAYS LEGAL - the check must distinguish unanswered from wrong, as conformance already does.
+
+## Overhaul input (2026-08-20)
+
+The overhaul found the second frontmatter parser this record exists to
+retire, with a measured divergence. Evidence in
+spec/overhauls/2026-08-20/findings.md, engine-core section.
+
+- stateform's nodeField/nodeList hand-parse frontmatter beside notes.ts's
+  real YAML parse; on a CRLF file the fence detection fails and the
+  FRONTMATTER-ONLY guard silently turns off. The corpus is all-LF today,
+  so the divergence is latent, on a Windows repo.
+- Seven rows write weighs_with as a scalar (including the literal none),
+  which mergeEqualities turns into an equality judgment against a
+  phantom node — i40 guards the crash path; the typed-field refusal that
+  makes the shape unwritable is this record's work.

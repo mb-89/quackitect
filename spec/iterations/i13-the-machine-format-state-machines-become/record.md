@@ -92,3 +92,15 @@ IS THE SPIKE TOO LATE (owner question, note-d59e030d4886). The derisking value o
 - spec/guides/guide-model-syntax.md at ref main
 - spec/decisions/adr-element-major-format.md at ref main
 - project/scratchpad/trace-mindmap.puml
+
+## Overhaul input (2026-08-20)
+
+The overhaul's render sweep was blocked by a host safety classifier and
+never ran, so the presentation half got reference-level coverage only. Two
+items land here, where the drawing is rewritten anyway.
+
+- Verify raid-debt-two-drawing-mechanisms while replacing the renderer:
+  the duplication it records is this record's territory.
+- A render audit is owed: dead template branches, duplicated drawing
+  paths, and drifted comments across render.ts, traceui.ts, tables.ts,
+  trace-layout.ts and iterations-draw.ts.

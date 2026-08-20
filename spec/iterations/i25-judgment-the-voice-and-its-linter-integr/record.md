@@ -86,3 +86,21 @@ SPEC PROSE INVENTS PLAUSIBLE HISTORY, AND ONLY A SOURCE CHECK CATCHES IT (note-f
 - spec/decisions/adr-glossary-discipline.md at ref main
 - product/engine-go/autolink.go at ref main
 - project/guidance/voice.md
+
+## Overhaul input (2026-08-20)
+
+The overhaul researched prose-lint prior art with sources; the analysis is
+in spec/overhauls/2026-08-20/findings.md, prior-art-maintenance section.
+
+- A TENSION TO RESOLVE AT DESIGN, stated plainly: this record's vision
+  rules for Vale and rejects maintaining our own prose linter. The
+  research found Vale's code support lints comments only — it cannot
+  reach served strings in engine TS, and it lints files, so lane-passing
+  form and brief prose is invisible to it. Both halves are evidence; the
+  design step decides how they compose (Vale for the markdown corpus,
+  something else for the served-string surface, or a ruling that one
+  surface goes unlinted).
+- The mechanically-checkable voice rules and their parameter split
+  (rules' logic vs voice-lint.md data) are inventoried there too, with
+  the forbidden-word collision measurement (972 'record' hits including
+  the TypeScript type).
