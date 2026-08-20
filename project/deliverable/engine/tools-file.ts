@@ -40,12 +40,24 @@ function readMany(model: ModelFileSystem, entries: unknown[], ref: string | unde
     });
   }
   const files = entries.map((e) => {
-    const spec = typeof e === "string" ? { path: e } : (e as { path?: unknown; offset?: unknown; limit?: unknown; optional?: unknown });
+    const spec =
+      typeof e === "string"
+        ? { path: e }
+        : (e as {
+            path?: unknown;
+            offset?: unknown;
+            limit?: unknown;
+            char_offset?: unknown;
+            char_limit?: unknown;
+            optional?: unknown;
+          });
     const path = String(spec.path ?? "");
     try {
       return model.read(path, {
         ...(spec.offset !== undefined ? { offset: Number(spec.offset) } : {}),
         ...(spec.limit !== undefined ? { limit: Number(spec.limit) } : {}),
+        ...(spec.char_offset !== undefined ? { charOffset: Number(spec.char_offset) } : {}),
+        ...(spec.char_limit !== undefined ? { charLimit: Number(spec.char_limit) } : {}),
         ...(ref !== undefined ? { ref } : {}),
         ...(spec.optional === true || optional ? { optional: true } : {}),
       }) as unknown as Record<string, unknown>;
@@ -112,7 +124,7 @@ export function fileTools(rootOf: (rel?: string) => string, model: ModelFileSyst
       name: "se_file_read",
       title: "se.file.read",
       description:
-        "Read a project file (root-relative path) — TEXT OR IMAGE. Returns the CAS hash writes will demand. Text comes back as numbered lines; pass offset (1-based line) / limit to read a large file in PARTS — an oversize whole-file read is refused with the remedy, never silently truncated. An IMAGE (png, jpg, gif, webp) comes back as the picture itself, so a sketch can be LOOKED AT rather than described to you. Any other binary is refused. A DECLARED ROOT is reachable as '@name/rest' (the owner declares roots in .se/roots.json; read-only unless the declaration says writable). Pass ref to read AT A COMMITTED REF ('main' reaches v1, 'v2' reaches v2) — pair with se_file_search/se_file_glob at the same ref. Pass optional: true for a file that is ALLOWED to be missing (the handover): absence answers exists: false rather than refusing. THE READING (.se/reading.md) is the one path the ENGINE writes: it holds every document the way ahead still demands, concatenated, and reading it CREDITS them all — one call instead of one per document, and no read_hashes to carry afterwards. The packet names it whenever anything is owed.",
+        "Read a project file (root-relative path) — TEXT OR IMAGE. Returns the CAS hash writes will demand. Text comes back as numbered lines; pass offset/limit for line windows. Pass char_offset/char_limit for exact slices of generated files with one long line. An oversize whole-file read is refused with the remedy, never silently truncated. An IMAGE (png, jpg, gif, webp) comes back as the picture itself, so a sketch can be LOOKED AT rather than described to you. Any other binary is refused. A DECLARED ROOT is reachable as '@name/rest' (the owner declares roots in .se/roots.json; read-only unless the declaration says writable). Pass ref to read AT A COMMITTED REF ('main' reaches v1, 'v2' reaches v2) — pair with se_file_search/se_file_glob at the same ref. Pass optional: true for a file that is ALLOWED to be missing (the handover): absence answers exists: false rather than refusing. THE READING (.se/reading.md) is the one path the ENGINE writes: it holds every document the way ahead still demands, concatenated, and reading it CREDITS them all — one call instead of one per document, and no read_hashes to carry afterwards. The packet names it whenever anything is owed.",
       inputSchema: {
         type: "object",
         properties: {
@@ -120,11 +132,13 @@ export function fileTools(rootOf: (rel?: string) => string, model: ModelFileSyst
           paths: {
             type: "array",
             description:
-              "read MANY in ONE call — a list of paths, or of {path, offset?, limit?} for per-file windows. Read-proof is a SET, so a state's whole reading list comes back in one envelope, each entry with its own hash. An unreadable path returns its refusal in place of its content and the others still arrive.",
+              "read MANY in ONE call — a list of paths, or per-file windows with line or character ranges. Read-proof is a SET, so a state's whole reading list comes back in one envelope, each entry with its own hash. An unreadable path returns its refusal in place of its content and the others still arrive.",
             items: { type: ["string", "object"] },
           },
           offset: { type: "number", description: "1-based first line" },
           limit: { type: "number", description: "how many lines" },
+          char_offset: { type: "number", description: "0-based first character; do not combine with offset/limit" },
+          char_limit: { type: "number", description: "exact character count; continue at char_range.to" },
           ref: { type: "string", description: "read from this committed git ref instead of the working tree" },
           optional: {
             type: "boolean",
@@ -151,6 +165,8 @@ export function fileTools(rootOf: (rel?: string) => string, model: ModelFileSyst
         return model.read(String(args.path), {
           ...(args.offset !== undefined ? { offset: Number(args.offset) } : {}),
           ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
+          ...(args.char_offset !== undefined ? { charOffset: Number(args.char_offset) } : {}),
+          ...(args.char_limit !== undefined ? { charLimit: Number(args.char_limit) } : {}),
           ...(ref !== undefined ? { ref } : {}),
           ...(optional ? { optional: true } : {}),
         });

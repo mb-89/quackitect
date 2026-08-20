@@ -7,7 +7,7 @@ statement: A vehicle's owner reads what an arriving update did before keeping it
 owner: the adjudicator
 trigger: the first update taken by somebody who did not write the program
 status: deferred
-probe: "scheduled — the check is a WATCH rather than a run, and it cannot happen until an update mechanism exists and somebody who did not write the program takes one. Written in full under ## Probe below, with the weaker instrumented proxy named as a fallback rather than as the probe."
+probe: "scheduled — the check is a WATCH rather than a run, and it cannot happen until an update mechanism exists and somebody who did not write the program takes one. Written in full under ## Probe below, with the weaker instrumented proxy named as a fallback rather than as the probe, because nothing inside the product can see whether somebody read what they kept. M6 carries it, and two separate looks on 2026-08-19 confirmed the defer rather than inventing a result."
 probed: "never — the trigger has not fired"
 defer_until: the update mechanism exists and one real update is taken by somebody who did not write the program. The probe on this node is a WATCH rather than a run, and nothing a program can assert stands in for whether a person read what they kept.
 impact: the winning design's entire safety story for a wrong migration is that the result is left unstaged in front of a person, so an owner who keeps without reading has no signal at all

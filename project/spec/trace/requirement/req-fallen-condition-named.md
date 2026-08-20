@@ -15,4 +15,5 @@ source_refs:
 priority: should
 weighs_against:
   - req-first-green-needs-a-red >
+  - req-newcomer-leaves-able-to-ask > — a condition that falls without saying so stops the walk with nothing to read; a newcomer who leaves without the vocabulary is fixed by the next tour
 ---

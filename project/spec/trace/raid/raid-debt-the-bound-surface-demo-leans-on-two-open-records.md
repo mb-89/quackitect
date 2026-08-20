@@ -89,3 +89,16 @@ work's question, not this row's.
 ## Sweep 2026-08-19, at i5's retro
 
 RE-ACCEPTED. The build it waits on has not landed and no surface-resolution change happened in i5.
+
+## Swept 2026-08-19, at i9's onboard-retro: SETTLED, AND ONE THREAD MOVES ON
+
+CONFIRMED SETTLED on the owner's ruling of 2026-08-17. The entry carries
+`status: decided`, and `tsp-bound-surface.md` reads `status: dropped` with the
+ruling quoted in its own body. This entry carries no claim and blocks no close.
+
+ONE THREAD STAYS OPEN AND BELONGS ELSEWHERE.
+`req-a-surface-resolves-to-what-it-shows` was verified only by the
+demonstration that got dropped. Nothing verifies it now.
+
+THAT IS NOT THIS DEBT'S TO CARRY, and it is written here so the next sweep can
+follow it rather than rediscover it.

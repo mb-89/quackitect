@@ -12,7 +12,7 @@ refines:
 source_refs:
   - raid-risk-the-rewrite-carries-the-private-sentence-across
   - project/spec/iterations/i17-the-options-pool-triage-a-raw-note-into-/record.md "RAW NOTES NEVER ENTER VERSION CONTROL... That is a hard line and it does not bend."
-  - vp-what-is-learned-outlives-the-machine
+  - vp-the-ledger
 priority: must
 ---
 

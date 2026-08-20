@@ -1,8 +1,8 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from project/guidance/contract.md b538e8ccc81e
-     from project/guidance/walking.md 8d2cebb9bd5a
-     from project/guidance/method/lane.md b68c5bf364c7
-     from project/guidance/voice.md 0b6faf79ff32
+     from project/guidance/contract.md 7987f2f45156
+     from project/guidance/walking.md 60936239a991
+     from project/guidance/method/lane.md 9090ed0f4b6b
+     from project/guidance/voice.md 5d2f97858f4b
 -->
 
 # contract — the binding rules of the session
@@ -208,6 +208,14 @@ and the conflict surfaced only because a walk hit the state.
 THE CONTRACT OVERRIDES DEFAULTS — the first line of this file says so. This
 rule is where that override is written down for subagents and for research.
 
+HOW TO SPAWN ONE WELL is `guidance/method/subagents.md`. It carries three
+things this rule does not: which model each subagent gets, what an interrupt
+does to one running in the background, and what its narration costs you.
+
+PASS THE LANE RULE TO EVERY SUBAGENT YOU SPAWN. One that does not know about
+the cage reaches for its native tools, finds them blocked, and reports that it
+could not read anything.
+
 ## 12. Walk, do not ruminate
 
 No mid-walk philosophy about a step's purpose. No re-deriving settled
@@ -316,6 +324,27 @@ names which of four you got.
   that is how the agent moves toward anything at all. There is no separate
   verb and none is missing. "You never name a target" means you never invent
   one — it has never meant you cannot move.
+
+  AN ITERATION HAS ONE TARGET AND IT IS ITS SHIP STATE (owner ruling
+  2026-08-19). Never aim at a state in the middle of one.
+
+  THE OWNER'S WORDS: "Obviously, the target of an iteration is always the
+  shipped state. You don't set the target to something in the middle of the
+  iteration. You set it to ship, and then you let the machine pull you there.
+  Everything that you need to do on the way there, you do."
+
+  SO THE DIVISION IS PLAIN. The machine routes. The agent works whatever the
+  route lands on, and pulls again. Aiming one state further on, over and over,
+  is the agent doing the router's job by hand.
+
+  WHAT IT COSTS WHEN IGNORED. Every arrival clears the target, so a
+  mid-iteration aim arrives almost at once and leaves the walk with nothing
+  routed. The agent then re-aims, arrives, re-aims. i36 spent a whole session
+  in that loop on 2026-08-19.
+
+  AN EMPTY TARGET IS EMPTY, and it never means the front desk. A pull with
+  nothing routed reports that there is nothing to do here and shows the
+  options, exactly as this document already says.
 
   A `wait` IS NOT PROOF THERE IS NO DOOR. It reports that the route to the
   STANDING target could not be drawn, which says nothing about the doors from
@@ -564,6 +593,18 @@ host's file. The lane logged the full response; `se_log_query` with the
 call's ref serves it back. Retro finding 2026-08-10: several shell reads of
 host-persisted files stood where one log query belonged.
 
+A RESULT WITH `bounded: true` WAS CUT BY THE LANE BEFORE THE HOST COULD CUT IT.
+The first page and a `next` call ride in the result. Make that exact call.
+For an answer spill, continue `se_file_read` at `char_range.to` until it reaches
+`char_range.of`, then parse the concatenated text as the original JSON result.
+Do not use line paging for an answer spill. Escaped JSON may be one long line.
+
+FOLLOWING THAT CURSOR IS ALWAYS LEGAL. An `se_file_read` under `.se/answers/`
+is exempt from the state gate and from the narration toll, in every state,
+including ones that allow no tools at all. The lane handed you the call, so
+the lane does not then refuse it. Before i36 both guards bit, and a state that
+served a bounded answer could make its own answer unreadable.
+
 WRITE A SCRIPT WHEN THE QUESTION IS ABOUT MANY THINGS. Counting what a rule
 touches, routing four hundred blocks, measuring which methods need what,
 applying one shape across a tree — these are programs, not readings. Reading
@@ -586,6 +627,14 @@ TWO SHAPES, AND BOTH ARE RIGHT.
 DEFAULT TO NODE. The engine runs on it, so it cannot be missing on any host
 the lane runs on. PowerShell is there on Windows and bash on POSIX. Python is
 usually there and is not guaranteed; reach for it when it earns the bet.
+
+WHERE PYTHON EARNS IT, RUN IT THROUGH `uv`. On this machine a bare `python`
+is not the interpreter you want; `uv run python ...` is. That applies to the
+heredoc above as much as to a script file.
+
+THIS IS MACHINE-SPECIFIC AND IT IS WRITTEN DOWN ANYWAY. It lived in an
+assistant memory until 2026-08-19, where the next session could not see it,
+and the repo is the memory.
 
 THE SCRIPT PRINTS WHAT YOU NEED, so nothing has to be piped. A script that
 answers "how many and which" prints the count and the list itself. That is why
@@ -778,6 +827,13 @@ So the list is the rule's memory: the specific words that got through. A rule wi
 - WHERE THE ORIGINAL IS OUT OF REACH, say so in the citation. "Reported by X,
   primary not seen" is honest and useful. A second-hand citation dressed as a
   primary one is not.
+- A PAGE THAT NAMES NO PRIMARY OF ITS OWN IS A LEAD, NEVER EVIDENCE. The chain
+  has to end somewhere a person wrote from knowledge. Where it simply stops, a
+  reader cannot tell an unreached primary from an absent one.
+- PREFER THE PUBLISHER TO THE SUMMARISER. A standards body, a journal, or a
+  vendor's own documentation for its own product. Web research can return prose
+  echoing our own house style, and generated prose is confident and sourceless
+  in exactly the shape a summary takes.
 - AN ASSERTION ABOUT THE SYSTEM IS CHECKABLE, so check it rather than citing
   it. A remedy naming a tool argument, a link to a file, a claim that a state
   exists — the repo answers in milliseconds. Where the check is cheap, run it.
@@ -835,4 +891,5 @@ So the list is the rule's memory: the specific words that got through. A rule wi
   - The README and anything a stranger reads FIRST use plain language only.
   - A method term (suspect, bless, cone, gate) may appear where its definition is one click away, in the book's termrefs. Never bare in the front door.
   - The i17 red-team and the i19 cold-read both caught exactly this.
-  - The terms lint cannot see the README, so the rule holds by authorship.
+  - THE TERMS LINT DOES SEE THE README. `engine/bin/prose-inspect.ts` line 40 sets its entry-document list to README.md, and its first item flags a bare method term on any line carrying no link.
+  - This line said the opposite until 2026-08-19. It was corrected after the predecessor version was found to have had the same check all along, tested and green.

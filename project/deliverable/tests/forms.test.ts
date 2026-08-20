@@ -209,9 +209,12 @@ test("the criterion sources: pool, suspects, and axes collapsed by weighs_with",
 
   assert.deepEqual(criterionPoolItems(root), ["req-a", "req-b", "req-c", "req-d", "req-gate"]);
 
-  // a, b and c are one axis; the group takes its LOWEST id. d stands alone.
-  // The must row is gone, and it is the only pool member that is.
-  assert.deepEqual(criterionAxisItems(root), ["req-a", "req-d"]);
+  // EVERY ROW APPEARS, INCLUDING MERGED ONES (owner ruling 2026-08-19). a, b
+  // and c are one group and all three are listed, adjacent, sharing a rank.
+  // Collapsing them to the lowest id is what this line used to assert, and it
+  // hid rows from the reader and cut every chain running through a hidden
+  // member. The must row is gone, and it is the only pool member that is.
+  assert.deepEqual(criterionAxisItems(root), ["req-a", "req-b", "req-c", "req-d"]);
 
   assert.deepEqual(compoundingSuspectItems(root), ["req-a", "req-b"]);
 

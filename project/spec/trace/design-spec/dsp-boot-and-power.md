@@ -6,13 +6,16 @@ statement: the engine standing up and lying down, carried by the host bridge, th
 realizes:
   - el-bootstrap
 files:
-  - project/deliverable/engine/bin/se-pty.ts
-  - project/deliverable/engine/bin/se-hook-stop.ts
-  - project/deliverable/engine/bin/se-hook-start.ts
-  - project/deliverable/engine/pullnotice.ts
-  - project/deliverable/engine/bin/package.ts
-  - project/deliverable/engine/version.ts
-  - project/deliverable/engine/sessionlive.ts
+  - "project/deliverable/engine/lifecycle.ts"
+  - "project/deliverable/engine/stopping-layer.ts"
+  - "project/deliverable/engine/cage-inventory.ts"
+  - "project/deliverable/engine/bin/se-pty.ts"
+  - "project/deliverable/engine/bin/se-hook-stop.ts"
+  - "project/deliverable/engine/bin/se-hook-start.ts"
+  - "project/deliverable/engine/pullnotice.ts"
+  - "project/deliverable/engine/bin/package.ts"
+  - "project/deliverable/engine/version.ts"
+  - "project/deliverable/engine/sessionlive.ts"
 ---
 
 ## Responsibility

@@ -69,3 +69,16 @@ The trigger stands unchanged.
 ## Sweep 2026-08-19, at i5's retro
 
 RE-ACCEPTED, and the trigger fired again. i5 reached observe-red and answered the same wide checklist for a delta of five requirements. It is the same shape as [[raid-iss-a-gate-form-asks-the-standing-set-where-its-guidance-says-the-delta]], which i5 minted at its validation gate: a live source serving the standing set where the method asks for the delta. If one repair is built, it should close both.
+
+## Swept 2026-08-19, at i9's onboard-retro: RESCHEDULED
+
+NOTHING BUILT. `machines/rigor_matrix/rows/M7_30_observe-red.md` lines 22 to 26
+still declare their items with no owed rule, and the guidance section has none.
+The resolver behind them lists the whole corpus, unfiltered.
+
+THE SIBLING RULE EXISTS ONE MILESTONE LATER, at `M7_50_verification.md` lines
+78 to 92. So the mechanism this repayment calls "already computed" has exactly
+one call site, and it is not this one.
+
+TRIGGER RE-AFFIRMED, and it fires on the next iteration that reaches the step,
+which is every iteration.

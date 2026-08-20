@@ -7,27 +7,32 @@ coupling: shared-failure-mode
 source_refs:
   - the function DSM at M4 partition-functions, 2026-08-09
   - the function DSM at M4 partition-functions, 2026-08-18
+  - the function DSM at M4 partition-functions, 2026-08-19
 ---
 
 ## Rationale
 
-IT WAS A CLUSTER OF ONE, THEN THREE, AND IS NOW FIVE. i16 first added
+IT WAS A CLUSTER OF ONE, THEN THREE, THEN FIVE, AND IS NOW SIX. i16 first added
 `bring-forth-a-vehicle` and `bring-forth-a-project` beside `stand-up-a-product`.
 It then added `take-an-update` and `report-what-the-vehicle-changed` when the
-function set was rebuilt on 2026-08-18.
+function set was rebuilt on 2026-08-18. i9 added `bring-the-product-up` on
+2026-08-19, and that one does not fit the same way the other five do.
 
 THE NAME CHANGED WITH THE LAST TWO. It said "producing a tree that did not
 exist", which two of the five do not do. Taking an update rewrites a tree that
 already exists, and reporting what a vehicle changed writes no tree at all.
 
-WHAT SURVIVED THE WIDENING is the unit and the hazard. Every member acts on a
-WHOLE TREE, from OUTSIDE that tree. Every one fails by leaving something that
+WHAT SURVIVED THE FIRST WIDENING is the unit and the hazard. Five members act on
+a WHOLE TREE, from OUTSIDE that tree. All six fail by leaving something that
 looks finished and is not.
+
+THE SIXTH BROKE THE UNIT AND KEPT THE HAZARD. That seam has its own section
+below, and a finder has already minted an option on it.
 
 ## Why shared-failure-mode
 
-ALL FIVE FAIL THE SAME WAY. A design that solves that once solves it for all
-five, and that is what makes them one cluster.
+ALL SIX FAIL THE SAME WAY. A design that solves that once solves it for all
+six, and that is what makes them one cluster.
 
 - `stand-up-a-product` carries [[req-setup-stops-before-partial]]. Its own
   rationale gives the reason: a half-installed machine is worse than an
@@ -41,10 +46,33 @@ five, and that is what makes them one cluster.
   updated.
 - `report-what-the-vehicle-changed` fails it quietly. A report missing a path
   reads exactly like a report where that path did not change.
+- `bring-the-product-up` fails it in front of a person. A lane that came up
+  half-way looks exactly like one that came up. Its own controls name the
+  shape: what a running window cannot pick up is announced rather than forced,
+  which is refuse-rather-than-half-do wearing different clothes.
 
 SAME-LIFECYCLE NO LONGER EVEN COMPETES. It was the second-best class while the
-cluster held three functions that each ran once at the birth of a tree. Two of
-the five now run over and over, so the class is false rather than weaker.
+cluster held three functions that each ran once at the birth of a tree. Three of
+the six now run over and over, so the class is false rather than weaker.
+
+## The sixth member shares the hazard and not the unit
+
+THE CLUSTER IS NAMED FOR ACTING ON A WHOLE TREE FROM OUTSIDE IT.
+`bring-the-product-up` does not do that. It runs INSIDE the folder somebody has
+open, every time they open it, and it touches no tree but that one.
+
+SO ONE HALF OF THE BINDING HOLDS AND THE OTHER DOES NOT. The hazard is shared,
+and it is the half the coupling class is named after. The unit is not.
+
+THIS IS RECORDED RATHER THAN QUIETLY FIXED because the fix is a partition
+decision, and M4 is where partitions are decided. The heuristics finder held
+"group what changes together, separate what changes apart" against this cluster
+and landed on exactly this seam. Its option is
+[[opt-split-the-bootstrap-by-whether-the-tree-is-the-one-you-stand-in]].
+
+THE COUNT WAS WRONG FOR PART OF 2026-08-19. This node said five and named five
+while the corpus held six, because the member was added at partition-functions
+and the node was not brought with it.
 
 ## One flow runs inside this cluster, and it is the newest thing here
 

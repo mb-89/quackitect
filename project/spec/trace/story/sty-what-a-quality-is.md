@@ -25,7 +25,19 @@ The cross-cutting rule in meth-requirement-authoring: a quality names every use 
 
 I open the qualities section and find nine doors, one per characteristic of ISO/IEC 25010:2023. Each door names its own sub-characteristics in its own words, so I never have to open the standard to use it.
 |||
-The nine stand as nodes: uc-quality-functional-suitability through uc-quality-safety, in spec/trace/use-case/.
+The nine stand as nodes in spec/trace/use-case/. Here they are in full, so nobody has to open the standard to look one up.
+
+- FUNCTIONAL SUITABILITY. Does it provide the functions the need calls for, under the stated conditions.
+- PERFORMANCE EFFICIENCY. What it costs in time and resources to do that.
+- COMPATIBILITY. Does it share its environment, and exchange information with what is already there.
+- INTERACTION CAPABILITY. Can the specified users work it through its interface. This replaced usability in the 2023 revision.
+- RELIABILITY. Does it keep performing over a stated period, and does it survive a fault.
+- SECURITY. Does access match authorisation, and is every act attributable.
+- MAINTAINABILITY. Can it be changed to improve it, correct it, or adapt it.
+- FLEXIBILITY. Can it be adapted to a new requirement, context or environment. This replaced portability in 2023, and it reaches wider than the name it replaced.
+- SAFETY. Does it avoid a state that endangers life, health, property or the environment. New in the 2023 revision.
+
+Each node carries its own sub-characteristics in its own words. The source is ISO/IEC 25010:2023.
 
 ---
 

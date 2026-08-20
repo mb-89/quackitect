@@ -23,9 +23,9 @@ evidence:
     columns:
       - realizes
       - files
-    covers: element
+    covers: element,interface
     page_size: 25
-    description: the spec register against the elements — coverage is checked, never claimed. The laws add file existence and the unclaimed sweep.
+    description: the spec register against the elements and interfaces — coverage is checked, never claimed. The laws add file existence and the unclaimed sweep.
 major: full
 minor: full
 patch: full

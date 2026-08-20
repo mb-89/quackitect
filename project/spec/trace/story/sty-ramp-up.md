@@ -17,15 +17,15 @@ The demonstration is OWED: reports/rpt-ramp-up.md - the fresh-machine run wants 
 
 ---
 
-They clone the repository into a folder and open a terminal there. One script sits in the root, and its name is the loudest thing in the folder.
+They clone the repository into a folder and open a terminal there. One script installs what the machine is missing, and they run it ONCE — never again after that.
 |||
-req-one-script-installs binds it; tsp-first-run's first procedure step walks it.
+req-one-script-installs binds it. REVISED AT i9: the entry document has always said run it once, and until this iteration that was not true. WHERE the script sits is an OPEN ISSUE after the collapse — raid-iss-the-collapse-hides-the-one-thing-a-newcomer-must-run, found by trying to tell this slide against the new shape.
 
 ---
 
-The script installs the editor extension, starts the engine, and opens the workspace. It asks for nothing else. There is no configuration step, no key to paste, no service to sign into.
+The script installs the runtime and the editor extension, then opens the workspace. It asks for nothing else. No configuration step, no key to paste, no service to sign into.
 |||
-req-newcomer-one-command: exactly one command, zero hand-edited files, per the spec's observation line.
+req-newcomer-one-command: exactly one command, zero hand-edited files. REVISED AT i9: the script's job SHRINKS to what only a script can do — installing a runtime that a process needing that runtime could never install for itself. Starting the engine moves to the act of opening the folder.
 
 ---
 
@@ -53,6 +53,6 @@ req-desk-greets-walkable, observed across the live sessions rpt-review-a-gate ci
 
 ---
 
-From an empty machine to a system waiting for one sentence. One script, one folder, no configuration. Every other story in this set begins here.
+From an empty machine to a system waiting for one sentence. One script, ONE TIME, one folder, no configuration. Every other story in this set begins here — and none of them runs the script again.
 |||
-The end-to-end run on a genuinely fresh machine is the owed piece: reports/rpt-ramp-up.md names it plainly.
+The end-to-end run on a genuinely fresh machine is the owed piece: reports/rpt-ramp-up.md names it plainly. REVISED AT i9: the run-it-once claim is now the pass line for the entry-point goal rather than a description, so this slide is what that goal is measured against.

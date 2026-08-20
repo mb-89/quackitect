@@ -18,11 +18,42 @@ Lives in `project/spec/trace/value-prop/`. It is a STANDING ARTIFACT: it
 outlives the iteration that authored it, lands on trunk when that record
 closes, and a later record may change it.
 
+MINT ONE SPARINGLY (owner ruling 2026-08-19). A value proposition is something you would take to a CUSTOMER and market. If you would not put it in front of somebody deciding whether to use the product, it is not one.
+
+THE TEST, and it is deliberately hard to pass. Would this sentence persuade a buyer? Internal machinery, process hygiene and engineering tidiness all fail it, however useful they are. They are requirements, functions or qualities instead, and each of those has its own home lower in the trace.
+
+RECENT ITERATIONS MINTED TOO MANY, which is what the ruling responds to. A proposition per improvement inflates the top of the trace and makes the real promises harder to see.
+
+STRONG FEELING IS STILL A REASON. Where one is genuinely warranted, mint it. The instruction is conservatism, never a ban.
+
 Value props are what v1 called NEEDS. They are the top of the design trace:
 the vision is their parent, and stories, use cases and requirements hang
 below them. `frame-delta` authors them and passes REFERENCES as its
 evidence; `gate-motivation` follows each reference and reviews the artifact
 itself.
+
+## A VALUE PROP IS HIGH-LEVEL, NEVER A MECHANISM
+
+Owner ruling 2026-08-19. A value prop is a product-level promise, in a form
+suitable for marketing to show a customer who has never read the engine.
+
+It is NOT:
+
+- a technical quality
+- a mechanism
+- a runtime behavior
+- a portability fix
+- a recovery loop
+- an implementation capability
+
+THE TEST: could this sentence appear on a product page unchanged, and mean
+something to someone who has never read the engine? A sentence naming a
+hook, a transport, a diagnostic, or any other mechanism fails the test.
+
+THAT DETAIL BELONGS BELOW an existing value prop instead — as a story, a use
+case, a requirement, or a quality row under one of the nine ISO/IEC
+25010:2023 characteristics. It is never a value prop of its own, however
+important the detail is.
 
 ## The template
 

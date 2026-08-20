@@ -54,7 +54,7 @@ WHAT THE SCAN COULD NOT DO, said rather than implied: se_web_search REFUSED for 
 
 ## success_measurable
 
-MEASURABLE, and the four criteria are on vp-what-is-learned-outlives-the-machine rather than restated here. Each names a metric and a target.
+MEASURABLE, and the four criteria are on vp-the-ledger rather than restated here. Each names a metric and a target.
 
 - findings captured on a released box that survive it — target: all of them
 - identity needles found by the corpus sweep in minted options — target: zero

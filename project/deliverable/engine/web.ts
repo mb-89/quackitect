@@ -1,7 +1,7 @@
 // The web lane — WebFetch/WebSearch replacements.
-// Fetch is dependency-free. Search needs a provider key (owner config):
-// set SE_BRAVE_API_KEY to enable; without it the tool exists and refuses
-// with the setup instruction — an honest gap beats a fake result.
+// Fetch is dependency-free. Search prefers Brave when configured, then uses
+// a keyless DuckDuckGo HTML adapter. A native-search handoff is the final
+// honest fallback when neither server-side provider can answer.
 import { CLAUSES, Rejection } from "./errors.ts";
 
 const FETCH_CAP = 40_000;
@@ -145,29 +145,73 @@ export interface SearchHit {
   snippet: string;
 }
 
-export async function webSearch(query: string, count = 8): Promise<{ query: string; hits: SearchHit[] }> {
+export interface SearchResult {
+  query: string;
+  provider: "brave" | "duckduckgo";
+  hits: SearchHit[];
+}
+
+export async function webSearch(query: string, count = 8): Promise<SearchResult> {
   const key = process.env.SE_BRAVE_API_KEY;
-  if (key === undefined || key === "") {
+  if (key !== undefined && key !== "") return braveSearch(query, count, key);
+  try {
+    return await duckDuckGoSearch(query, count);
+  } catch (cause) {
     throw new Rejection({
       clause: CLAUSES.NOT_CONFIGURED,
-      expected: "SE_BRAVE_API_KEY in the server's environment (free tier: https://brave.com/search/api/)",
-      got: "no search provider configured",
+      expected: "a configured Brave provider, a reachable keyless fallback, or a harness-native WebSearch tool",
+      got: `no server-side search provider answered: ${String(cause)}`,
       remedy: {
-        tool: "se_web_fetch",
-        args: { url: "<a specific url>" },
-        note: "fetch works without a key — or ask the owner to configure search",
+        tool: "WebSearch",
+        args: { query },
+        note: "Use native WebSearch when the harness exposes it. Otherwise fetch known primary URLs with se_web_fetch.",
       },
       source: "engine/web.ts",
     });
   }
+}
+
+async function braveSearch(query: string, count: number, key: string): Promise<SearchResult> {
   const res = await fetch(`https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}&count=${count}`, {
     headers: { "x-subscription-token": key, accept: "application/json" },
     signal: AbortSignal.timeout(20_000),
   });
-  if (!res.ok) throw new Error(`search provider: HTTP ${res.status}`);
+  if (!res.ok) throw new Error(`Brave search: HTTP ${res.status}`);
   const data = (await res.json()) as { web?: { results?: { title: string; url: string; description?: string }[] } };
   return {
     query,
+    provider: "brave",
     hits: (data.web?.results ?? []).map((r) => ({ title: r.title, url: r.url, snippet: r.description ?? "" })),
   };
+}
+
+async function duckDuckGoSearch(query: string, count: number): Promise<SearchResult> {
+  const res = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`, {
+    headers: { "user-agent": "se-web-search", accept: "text/html" },
+    signal: AbortSignal.timeout(20_000),
+  });
+  if (!res.ok) throw new Error(`DuckDuckGo search: HTTP ${res.status}`);
+  const html = await readCapped(res);
+  const links = [...html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)]
+    .map((match) => {
+      const attrs = match[1] ?? "";
+      if (!/\bclass="[^"]*\bresult__a\b[^"]*"/i.test(attrs)) return undefined;
+      const href = /\bhref="([^"]+)"/i.exec(attrs)?.[1];
+      if (href === undefined) return undefined;
+      return { index: match.index ?? 0, end: (match.index ?? 0) + match[0].length, href, title: htmlToText(match[2] ?? "") };
+    })
+    .filter((value): value is { index: number; end: number; href: string; title: string } => value !== undefined);
+  const hits = links.slice(0, count).map((link, index) => {
+    const next = links[index + 1]?.index ?? html.length;
+    const tail = html.slice(link.end, next);
+    const snippet = htmlToText(/class="[^"]*\bresult__snippet\b[^"]*"[^>]*>([\s\S]*?)<\//i.exec(tail)?.[1] ?? "");
+    return { title: link.title, url: duckDuckGoTarget(link.href), snippet };
+  });
+  return { query, provider: "duckduckgo", hits };
+}
+
+function duckDuckGoTarget(href: string): string {
+  const decoded = href.replace(/&amp;/g, "&");
+  const url = new URL(decoded, "https://duckduckgo.com");
+  return url.hostname.endsWith("duckduckgo.com") ? (url.searchParams.get("uddg") ?? url.href) : url.href;
 }

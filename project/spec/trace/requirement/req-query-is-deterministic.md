@@ -14,6 +14,8 @@ refines:
 source_refs:
   - uc-get-a-trustworthy-answer step 5
 priority: should
+weighs_against:
+  - req-a-windowed-pool-answer-says-that-it-was-windowed > — an answer that changes under you cannot be trusted at all; a windowed answer that says so is trustworthy and merely partial
 ---
 
 ## Scenario

@@ -80,3 +80,22 @@ in one session: "Again, I want you to push to v three. Why doesn't this work?"
 WHAT THIS ENTRY SHOULD LEAVE BEHIND. The rule is right and the failure mode is
 real: a debt that only a person can clear grows every day nobody is asked. This
 one grew across four records before anybody said the sentence that cleared it.
+
+## Swept 2026-08-19, at i9's onboard-retro: REPAID
+
+THE OWNER PUSHED, and it is corroborated rather than taken on trust. Reading
+this very file at ref `origin/v3` succeeds and returns the same content hash as
+the working tree. The same path at ref 8253bfd9, the merge commit, is refused:
+it did not exist yet.
+
+SO origin/v3 HAS ADVANCED PAST THE MERGE TO THE TIP. A remote-tracking ref
+moves only on a successful push or fetch, and the lane cannot push.
+
+WHAT COULD NOT BE REACHED, said plainly. `git log`, `git rev-parse`, any
+ahead-behind count, and any query against the remote itself. Git is not legal
+in this state, so this is proved from ref reads alone.
+
+THE DECISION THIS ENTRY LEAVES OPEN IS UNTOUCHED. SE-C-003 still reads that the
+agent never pushes, without exception. Repaying one push does not settle
+whether that should stay absolute, and this entry is the only place the
+question is written down.

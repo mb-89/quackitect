@@ -62,3 +62,11 @@ The trigger stands unchanged.
 ## Sweep 2026-08-19, at i5's retro
 
 RE-ACCEPTED. Neither trigger fired. i5 compiled a seeded machine from the rigor matrix and read its steps as frontmatter rows throughout. The split is still doing exactly what this entry says it does.
+
+## Swept 2026-08-19, at i9's onboard-retro: RE-ACCEPTED
+
+UNMOVED. i13 is still the recorded destination and still reads `status:
+seeded`.
+
+TRIGGER RE-AFFIRMED. Neither the design discussion nor a change to the seeded
+compiler has happened.

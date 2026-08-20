@@ -18,7 +18,7 @@ The seed framed the delta as ten fixes that do not travel. That framing is right
 
 ## value_props
 
-- vp-the-unattended-arrival
+- vp-qualities
 - vp-autonomy-range
 
 ## business_case
@@ -35,7 +35,7 @@ THE SECOND HALF IS LARGER AND HARDER TO PRICE. The i15 run rediscovered ten thin
 
 - Close the duplication debt between se-arrive and se-start with one shared module and a cage-comparison test.
 - Owner: set the cloud default for the dial, which is the half of the arrival a script cannot decide.
-- Measure the arrival on the NEXT cloud run and put the number against the first criterion of vp-the-unattended-arrival. This run measured the before; nothing has yet measured the after on a genuinely fresh box.
+- Measure the arrival on the NEXT cloud run and put the number against the first criterion of vp-qualities. This run measured the before; nothing has yet measured the after on a genuinely fresh box.
 
 ## anything_else
 

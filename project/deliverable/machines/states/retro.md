@@ -3,7 +3,7 @@ state: retro
 state_kind: work
 priority: strategic
 statement: Turn what happened into rules.
-legal_tools: se_note_drain, se_survey, se_log_query, se_answer, se_test, se_run, se_file_read, se_file_search, se_file_glob, se_file_patch, se_file_write, se_seed_expedition, se_seed_iteration, se_web_search, se_web_fetch
+legal_tools: se_note_drain, se_survey, se_log_query, se_answer, se_help, se_test, se_run, se_file_read, se_file_search, se_file_glob, se_file_list, se_file_patch, se_file_write, se_prompt_place, se_seed_expedition, se_seed_iteration, se_web_search, se_web_fetch
 entry_read: project/guidance/method/retro.md
 motivation: Lessons expire. A stray nobody judges rots into noise, and a mistake nobody names repeats. The retro turns what happened into rules while it is cheap, and it empties the inbox so the next decision starts clean.
 inputs:
@@ -18,6 +18,9 @@ guidance: |
   - Drain every pending note with se_note_drain, including the needs-retro
     triggers. This state is the ONE place draining is legal.
   - Aim improvements at durable homes.
+  - Re-project the prompt layer with se_prompt_place after editing guidance.
+    Editing project/guidance/ makes AGENTS.md, CLAUDE.md and the Copilot
+    instructions stale, and preflight goes red at the next verdict.
   - Seed iterations from here, with a goal and a vision. Seeding is legal HERE
     and needs no leaving.
 
@@ -60,7 +63,36 @@ THE MECHANICAL HALF IS NOT BUILT. Today this rule holds by authorship: the
 agent surveys, sees zero, and pulls onward. Making the engine skip it needs a
 condition the router can route PAST rather than block on, and onboard-retro
 sits on an iteration's mandatory path where an unmet entry condition would
-wedge the record instead of skipping the state.
+stop the iteration dead instead of skipping the state.
+
+## Three verbs this state was missing, all added 2026-08-19
+
+EACH ONE WAS REFUSED WHILE THE RETRO WAS DOING WHAT THE RETRO IS FOR. That is
+the test a grant has to pass, and these three failed it.
+
+- `se_help` — the method's own step 8 opens with the demand log, and the demand
+  log is read through this verb. So the step asked for something the state
+  forbade, and the retro that hit it had to record the gap instead of the
+  answer.
+- `se_file_list` — refused while surveying what stands at a directory. Third
+  sighting across three retros, and the first two were parked.
+- `se_prompt_place` — see below.
+
+WHY IT KEPT HAPPENING. A grant is written when a state is drawn, and the
+method card is written separately. Nothing compares the two, so a card can ask
+for a verb its own state does not hold and nobody finds out until a walk hits
+it.
+
+## Why this state holds the prompt-layer verb (added 2026-08-19)
+
+THE RETRO IS THE STATE MOST LIKELY TO MAKE THE PROMPT LAYER STALE, because
+editing guidance is what it exists to do. It was the one state granted the
+edit and refused the repair.
+
+MEASURED HERE: six guidance files were edited, preflight went red naming three
+stale projections, and the verb that fixes it refused under SE-C-110. The
+repair went through the shell with its reason logged, which is a refusal doing
+its job and a grant that was wrong.
 
 ## The outward doors are legal here (owner ruling 2026-08-15)
 

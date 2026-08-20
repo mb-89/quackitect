@@ -30,9 +30,19 @@ import { fileURLToPath } from "node:url";
 
 const deliverable = join(fileURLToPath(new URL(".", import.meta.url)), "..");
 
-test("the VS Code shell tells the server which window owns it", () => {
-  const ext = readFileSync(join(deliverable, "vscode", "extension.js"), "utf8");
-  assert.match(ext, /SE_PARENT_PID:\s*String\(process\.pid\)/, "the shell must pass its own pid to the server");
+test("the headless VS Code lane does not inherit a transient extension-host lifetime", () => {
+  const ext = readFileSync(join(deliverable, "vscode", "src", "extension.ts"), "utf8");
+  assert.doesNotMatch(
+    ext,
+    /SE_PARENT_PID:\s*String\(process\.pid\)/,
+    "the shared headless lane must not exit when the extension host restarts",
+  );
+});
+
+test("broken output pipes are recorded instead of killing the engine", () => {
+  const mcp = readFileSync(join(deliverable, "engine", "bin", "se-mcp.ts"), "utf8");
+  assert.match(mcp, /streamError/, "the launcher must handle output-stream errors");
+  assert.match(mcp, /EPIPE/, "the launcher must recognise a disconnected output pipe");
 });
 
 test("deactivate kills the process tree, not just the handle it holds", () => {
@@ -43,10 +53,19 @@ test("deactivate kills the process tree, not just the handle it holds", () => {
   assert.match(ext, /"\/T"/, "the tree flag is what reaches the grandchildren");
 });
 
-test("the server watches the window that owns it", () => {
+test("only non-headless servers watch the window that owns them", () => {
   const mcp = readFileSync(join(deliverable, "engine", "bin", "se-mcp.ts"), "utf8");
-  assert.match(mcp, /SE_PARENT_PID/, "the server must read the pid of the window that owns it");
-  assert.match(mcp, /process\.kill\(parentPid, 0\)/, "liveness is asked with signal 0, which delivers nothing");
+  assert.match(
+    mcp,
+    /const parentPid = Number\(process\.env\.SE_PARENT_PID/,
+    "the server must read a parent identifier for non-headless launches",
+  );
+  assert.match(
+    mcp,
+    /if \(!argv\.includes\("--headless"\) && Number\.isInteger\(parentPid\)/,
+    "a shared headless lane must not inherit a transient parent lifetime",
+  );
+  assert.match(mcp, /process\.kill\(parentPid, 0\)/, "non-headless liveness is asked with signal 0, which delivers nothing");
 });
 
 test("a server with no declared parent keeps running", () => {

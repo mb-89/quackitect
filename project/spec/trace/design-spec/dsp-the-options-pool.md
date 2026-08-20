@@ -7,12 +7,9 @@ realizes:
   - el-holding-pen
   - el-front-desk
 files:
-  - project/deliverable/engine/pool.ts
-  - project/deliverable/engine/inbox.ts
-  - project/deliverable/engine/survey.ts
-  - project/deliverable/engine/tools.ts
-  - project/deliverable/engine/errors.ts
-  - project/guidance/refusals.md
+  - "project/deliverable/engine/pool.ts"
+  - "project/deliverable/engine/inbox.ts"
+  - "project/deliverable/engine/survey.ts"
 ---
 
 ## The shape

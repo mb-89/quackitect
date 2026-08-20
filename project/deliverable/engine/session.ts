@@ -2786,8 +2786,19 @@ export class Session {
   }
 
   /** THE STATE GATE — a dispatch guard, throws the typed refusal. */
-  gate(tool: string): void {
+  gate(tool: string, args: Record<string, unknown> = {}): void {
     if (ALWAYS_LEGAL.has(tool)) return;
+    // FOLLOWING THE LANE'S OWN CURSOR IS ALWAYS LEGAL. A bounded answer hands
+    // back a page and the exact call that fetches the rest. A state that
+    // serves one and then forbids the read makes its own answer unreadable —
+    // and boot/prepare_idle, which allows no tools at all, does exactly that.
+    if (
+      tool === "se_file_read" &&
+      String(args.path ?? "")
+        .replace(/\\/g, "/")
+        .startsWith(".se/answers/")
+    )
+      return;
     // EMERGENCY OPENS EVERY DOOR, including on a closed machine — a machine
     // that will not move is precisely when the repair is needed.
     if (this._emergency) return;

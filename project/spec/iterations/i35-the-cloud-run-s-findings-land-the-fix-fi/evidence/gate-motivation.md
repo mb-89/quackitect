@@ -55,7 +55,7 @@ THE COMPARISON NOT MADE, and it is named rather than left blank: whether any age
 
 ## success_measurable
 
-EVERY NEED CARRIES ITS PASS LINES, in vp-the-unattended-arrival.
+EVERY NEED CARRIES ITS PASS LINES, in vp-qualities.
 
 - Agent-minutes from session start to first pull. Target under one. BEFORE: most of an hour, measured this run. AFTER: not yet measured, and said so.
 - Acts required on a second run. Target none. MET: se-arrive is idempotent and reuses a lane already answering.
@@ -116,7 +116,7 @@ WHAT MAKES IT PASS: every claim carries a number taken on this box, the prior ar
 - Owner: the cloud default for the dial. It is the one thing standing between this and an unattended walk.
 - Owner: rule findings 2 and 3.
 - i10: the short-name rename.
-- Next cloud run: measure the arrival on a fresh box and close vp-the-unattended-arrival's first criterion.
+- Next cloud run: measure the arrival on a fresh box and close vp-qualities's first criterion.
 - A later iteration: the shared arrival module, and the test that both entrypoints place the same cage.
 
 ## anything_else

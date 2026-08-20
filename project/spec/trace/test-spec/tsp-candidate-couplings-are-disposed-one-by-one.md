@@ -6,7 +6,7 @@ statement: An agent about to make a change gets a ranked list of couplings no ed
 method: demonstration
 demonstrates:
   - sty-dispose-a-candidate-coupling
-verifies: "none — demonstrates: carries the edge; the ranker's own mechanics are test-verified over tests/coupling-rank.test.ts"
+verifies: "none — demonstrates carries the edge; the ranker's mechanics are test-verified over the coupling-rank cases"
 files:
   - none — the procedure below is the definition, because the pass is that every candidate was disposed of, which only a reader of the dispositions can say
 ---

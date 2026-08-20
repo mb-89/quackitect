@@ -59,12 +59,23 @@ picks one of three outcomes.
 - `sweep.ts` — the whole-repo runner. `se_lint` takes one file per call
   today while its own description promises a pass over everything.
 
-## The crossing this spec realizes
+## The crossing this spec used to realize, and why there is none now
 
-`if-satellite-to-walk-engine` is the interface minted at
-decompose-structure, and this is the design that serves it. It is
-SYNCHRONOUS where the satellite's other crossings append and do not
-wait, because the answer decides whether the write happens at all.
+IT NAMED `if-satellite-to-walk-engine`, an interface whose source element was
+`el-satellite`. That element has never existed in the committed record, and the
+satellite architecture it came from was never chosen.
+
+SO THE CROSSING IS INTERNAL RATHER THAN OWED. `el-walk-engine` implements
+`guard-a-write` itself, which means the write and the guard that judges it live
+in one element and no interface is demanded between them.
+
+WHAT SURVIVES UNCHANGED is the synchronous property and its reason: the answer
+decides whether the write happens at all, so the caller waits. That is a
+property of this design rather than of a crossing.
+
+THE INTERFACE WAS DELETED AT i9, 2026-08-19, because it blocked the element
+matrix in every iteration and could not be repaired without inventing an element.
+note-723fa9d36107 carries what it was for.
 
 THE SPEC CHECK FOUND THE OMISSION. The first version of this node named
 only the element, and the submit refused with the interface named. An

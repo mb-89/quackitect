@@ -709,6 +709,9 @@ export function refsInRows(text: string, columns = 2): string[] {
   // and a type name carrying a dash is shaped exactly like an id — so a bound
   // table over `test-spec` reported its own header as a reference resolving to
   // nothing. The rule row underneath is what tells a header from a data row.
+  // THIS SKIPS EVERY TABLE'S HEADER, not only the first document's. The version
+  // it replaced cut everything above the first rule row, so a second table in
+  // the same text leaked its header back in.
   const isRule = (l: string | undefined): boolean => l !== undefined && /^\s*\|(?:\s*:?-{3,}:?\s*\|)+\s*$/.test(l);
   for (const [i, line] of lines.entries()) {
     if (!/^\s*\|/.test(line)) continue;

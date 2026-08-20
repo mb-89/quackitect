@@ -7,6 +7,7 @@ coupling: sequence
 source_refs:
   - the function DSM at M4 partition-functions, 2026-08-09
   - the function DSM at M4 partition-functions, 2026-08-18
+  - the function DSM at M4 partition-functions, 2026-08-19
 ---
 
 ## Rationale
@@ -70,3 +71,16 @@ THEY ACT ON DIFFERENT THINGS.
 A CANDIDATE MAY ALLOCATE BOTH TO ONE ELEMENT. Nothing here forbids it, and the
 partition records the adjacency so that the choice is visible rather than
 accidental.
+
+## The eighth function, added at i36
+
+IDENTIFY-THE-HARNESS JOINED AFTER THE SEVEN ABOVE WERE COUNTED. Every count in
+the sections above is a count of the original seven, and it is left standing
+rather than restated, because each of those claims was measured against them.
+
+IT EXTENDS THE SEQUENCE RATHER THAN BRANCHING IT. It consumes the same
+`flow-arrival-request` the rest of the cluster starts from.
+
+ITS OUTPUT LEAVES THE CLUSTER. `flow-harness-profile` crosses into
+[[cluster-the-walk]]'s serve-a-step, so the arrival hands off to the governed
+walk exactly as raising the lane already does through `flow-live-lane`.

@@ -30,6 +30,9 @@ weight: 0.8
   A first step it cannot pass is not a degraded experience, it is a closed
   door, and weaker models already fail the boot reading proof outright
   (added at i28, 2026-08-15).
+- IT CANNOT DIAGNOSE A GENERIC CANCELLATION. The lane must distinguish server
+  loss, transport loss, host cancellation and stop-hook action. Otherwise the
+  next recovery is guesswork (added at i36, 2026-08-19).
 
 ## Notes (not load-bearing)
 

@@ -18,6 +18,7 @@ source_refs:
 priority: should
 weighs_against:
   - req-newcomer-leaves-able-to-ask >
+  - req-repo-search-carries-intent > — entry documents nobody can read cost every arrival; a search without its intent costs one reader of the log later
 ---
 
 ## Scenario

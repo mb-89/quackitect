@@ -22,6 +22,8 @@ import { fileURLToPath } from "node:url";
 
 const REPO_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 const CAGE = join(REPO_ROOT, "project", "deliverable", "cage", "claude-settings.json");
+const COPILOT_CAGE = join(REPO_ROOT, "project", "deliverable", "cage", "copilot-cage.json");
+const VSCODE_EXTENSION = join(REPO_ROOT, "project", "deliverable", "vscode", "extension.js");
 // THE SECOND PLACE A HOOK CAN BE WIRED, and it is not the cage (i35).
 //
 // The cage template is placed BY the arrival, so it cannot carry the hook that
@@ -73,6 +75,14 @@ describe("the shipped cage", { concurrency: true }, () => {
       /cage\\+claude-settings\.json/,
       "RUNME must still place this template — if that line moves, this test is checking a file nobody installs",
     );
+  });
+
+  test("native web search is preserved as the one research exception", () => {
+    const cage = JSON.parse(readFileSync(COPILOT_CAGE, "utf8")) as { exclude_args?: string[] };
+    assert.equal(cage.exclude_args?.includes("web_search"), false);
+    assert.equal(cage.exclude_args?.includes("WebSearch"), false);
+    const extension = readFileSync(VSCODE_EXTENSION, "utf8");
+    assert.match(extension, /nativeExceptions = new Set\(\["web_search", "WebSearch"\]\)/);
   });
 
   test("the Stop hook is wired, by name, because losing it is silent", () => {

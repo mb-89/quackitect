@@ -163,6 +163,19 @@ The trigger is a NOTE carrying "needs retro":
      owner before declaring one; the refusal's own remedy says so.
    - WHAT IS NOT ALLOWED is ticking this step because nothing was surfaced.
      Say what you could reach and what you could not.
+
+   NAME THE FOLDER AND COUNT THE FILES (added 2026-08-19, after this step was
+   ticked against the wrong one). "Nothing to drain" and "I looked in the wrong
+   place" produce the same clean-looking result, and only the count tells them
+   apart.
+
+   WHAT HAPPENED. The i16 retro reported the memory folder empty. It read the
+   slug for the CURRENT project path, which holds nothing. Eight memory files
+   sat under the older slug, and the drain was recorded as satisfied.
+
+   SO GLOB WIDER THAN ONE SLUG. `@sessions/**/memory/*.md` finds every project's
+   memory folder, and a project renamed or moved leaves its memories behind
+   under the old name. Write the paths you found into the evidence.
 7. Hunt wasted effort. Rework, reversals, avoidable refactors,
    reinventing instead of reusing. Each one is a lead.
 8. Mine the record, using the timestamp step 1 stored — never the whole

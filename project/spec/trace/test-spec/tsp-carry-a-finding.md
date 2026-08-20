@@ -7,7 +7,7 @@ method: demonstration
 demonstrates:
   - sty-carry-a-finding-without-stopping
 verifies:
-  - none — this spec demonstrates a story end to end; no requirement is verified through it
+  - "none — this spec demonstrates a story end to end, so the demonstrates edge above carries its trace; the two requirements stating the mechanics are req-a-harmless-finding-is-carried-not-stopped-on and req-a-harmless-finding-names-an-open-entry; both are verify method test so both belong on a test spec"
 files:
   - none — the procedure below is the definition; the observed session is the evidence
 ---

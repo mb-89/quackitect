@@ -10,6 +10,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { ANSWER_BOUND_BYTES, boundAnswer, setAnswerSpill } from "../engine/bound.ts";
+import { smallestInlineOutputBytes } from "../engine/harness.ts";
 
 const SE = mkdtempSync(join(tmpdir(), "se-bound-"));
 
@@ -19,6 +20,7 @@ const oversized = (): unknown => ({ rows: Array.from({ length: 20_000 }, (_, i) 
 test("the engine declares a bound for an answer", () => {
   assert.equal(typeof ANSWER_BOUND_BYTES, "number");
   assert.equal(ANSWER_BOUND_BYTES > 0, true, "a bound of zero would send nothing at all");
+  assert.equal(ANSWER_BOUND_BYTES <= 6_000, true, "the bound must beat the 8 KB host offload observed in i36");
 });
 
 test("an answer within the bound is returned whole", () => {
@@ -53,7 +55,8 @@ test("the cursor names a verb that pages, so following it cannot recurse", () =>
   const answered = boundAnswer("se_pull", oversized());
   const page = JSON.parse(answered.text);
   assert.equal(page.next.tool, "se_file_read", "se_log_query would return the whole answer and be cut again");
-  assert.equal(typeof page.next.args.limit, "number", "a cursor with no limit is the recursion, not the fix");
+  assert.equal(page.next.args.char_offset, 0);
+  assert.equal(page.next.args.char_limit, 3_000, "character paging survives one huge escaped JSON line");
   assert.equal(page.next.args.path, ".se/answers/se_pull.json");
 });
 
@@ -64,6 +67,40 @@ test("the whole answer is on disk where the paged reader can reach it", () => {
   assert.equal(onDisk.length, answered.bytes, "the spill is the whole answer, not the page");
   const page = JSON.parse(answered.text);
   assert.equal(onDisk.startsWith(page.body), true, "the inline page is the head of the file, so a reader can continue");
+});
+
+test("a caller's own spill directory wins over the module's, so two roots cannot collide", () => {
+  // The module global points at SE, as the last server to build would leave it.
+  setAnswerSpill(SE);
+  const mine = mkdtempSync(join(tmpdir(), "se-spill-"));
+  const answered = boundAnswer("se_pull", oversized(), mine);
+  const onDisk = readFileSync(join(mine, "answers", "se_pull.json"), "utf8");
+  assert.equal(onDisk.length, answered.bytes, "the spill landed under the caller's root, not the global one");
+});
+
+test("the bound is derived from the measured hosts, never written by hand", () => {
+  const smallest = smallestInlineOutputBytes();
+  assert.notEqual(smallest, undefined, "at least one host must be measured for the bound to mean anything");
+  assert.ok(ANSWER_BOUND_BYTES <= (smallest ?? 0), "the bound must fire before the tightest host cuts");
+});
+
+test("paging the cursor to exhaustion rebuilds the original answer byte for byte", () => {
+  setAnswerSpill(SE);
+  const payload = oversized();
+  const answered = boundAnswer("se_pull", payload);
+  const page = JSON.parse(answered.text);
+  const whole = readFileSync(join(SE, "answers", "se_pull.json"), "utf8");
+
+  // Walk it exactly as the cursor instructs, a page at a time.
+  let rebuilt = "";
+  let offset = page.next.args.char_offset as number;
+  const limit = page.next.args.char_limit as number;
+  while (offset < whole.length) {
+    rebuilt += whole.slice(offset, offset + limit);
+    offset += limit;
+  }
+  assert.equal(rebuilt.length, answered.bytes, "every byte of the original came back");
+  assert.deepEqual(JSON.parse(rebuilt), payload, "and it parses as the answer that was withheld");
 });
 
 // ------------------------------------- every exit, not just the happy one

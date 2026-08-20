@@ -222,7 +222,7 @@ function it does not sit beneath.
 
 ## The spine divides once, at its end
 
-Every wedge of the drawing runs whole while the spine lasts. At the spine's
+Every part of the drawing runs whole while the spine lasts. At the spine's
 END it divides into slices, and each slice goes its own way outward.
 
 Today there are two.
@@ -288,7 +288,7 @@ THE FILES ARE REALIZATION, NOT TRACE — the same law as test specs. A
 spec's `files:` names the code it lands in. The seam is checked
 MECHANICALLY and outside the graph, at trace-design:
 
-- every design spec names files that exist
+- every design spec names files that exist BY THE END OF THE RECORD THAT AUTHORED IT. A planned name is legal while the spec is being written; it may not survive the record unrealised. Corrected 2026-08-19, where it read "names files that exist" and contradicted both the item card and the engine.
 - every deliverable code file is claimed by at least one spec — the
   unclaimed list is the dead-code view
 

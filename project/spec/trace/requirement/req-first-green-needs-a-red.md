@@ -13,7 +13,8 @@ source_refs:
   - uc-answer-a-question-with-tests step 4
   - ".se/req-mine-v1.md: tests and the battery"
 priority: should
-weighs_against: null
+weighs_against:
+  - req-unshipped-dependency-refused > — a suite that can pass without ever having failed proves nothing, and every later green rests on it; an undeclared dependency is caught the first time somebody tries to ship
 ---
 
 ## Detail

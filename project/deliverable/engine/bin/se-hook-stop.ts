@@ -47,6 +47,7 @@
 import { closeSync, fstatSync, openSync, readSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { recordLifecycle } from "../lifecycle.ts";
 
 // bin -> engine -> deliverable -> product -> the project root. The env
 // override is the test seam — the suite points the hook at a crafted log.
@@ -195,6 +196,9 @@ process.stdin.on("end", () => {
               SANCTIONED),
       }),
     );
+    // The veto is now observable after the fact. Without a line here, a turn
+    // the hook ended looks exactly like one the transport ended.
+    recordLifecycle(root, "stop-block", where === "" ? pull : `${pull} at ${where}`);
   } catch {
     /* a hook must never break the turn */
   }

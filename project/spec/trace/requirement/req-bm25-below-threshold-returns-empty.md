@@ -12,4 +12,6 @@ refines:
 source_refs:
   - uc-dispose-of-a-candidate-coupling extension 3a
 priority: should
+weighs_against:
+  - req-a-slowness-signal-never-shortens-the-wait > — noise in a candidate list is paid by every reader of it; a slowness signal that costs time is paid only while something is already slow
 ---
