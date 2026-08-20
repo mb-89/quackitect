@@ -31,7 +31,7 @@ ONE LIST, EDITED BY HAND, READ LIVE — the same shape both existing dials alrea
 
 Whoever is driving reads the name and starts the next stretch on it.
 |||
-THIS IS THE SLIDE THAT DOES NOT FILL YET, AND IT IS NOT A DETAIL. Measured 2026-08-20: engine/bin/se-start.ts spawns one agent, unrefs the child and returns. On an unattended box nothing is listening. nbr-the-driver-that-performs-the-spawn is drawn EMPTY for exactly this reason.
+THIS IS THE SLIDE THAT DOES NOT FILL YET, AND THE REASON IS NARROWER THAN THIS DECK FIRST CLAIMED. It said nothing is listening on an unattended box. Something is: se-start.ts:141 spawns the lane and :155-170 polls until it answers before any agent launches, and the agent it then launches at :245 is alive and pulling. THE ACTUAL HOLE is that a live agent has no way to become a different model, and nothing beside it can relaunch one mid-walk. The receiver can read and cannot act.
 
 ---
 

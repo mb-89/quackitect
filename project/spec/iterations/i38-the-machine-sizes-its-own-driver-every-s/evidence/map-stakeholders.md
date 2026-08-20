@@ -1,8 +1,8 @@
 ---
 form: map-stakeholders
 by: agent
-signed_off: 2026-08-20T10:43:16.629Z
-reopened: "2026-08-20T10:42:52.946Z — its coverage field swept three value props and wrote it as a sweep; the method asks for every one, and ten stand"
+signed_off: 2026-08-20T10:55:32.672Z
+reopened: "2026-08-20T10:54:04.563Z — it says no standing role node needed changing while stk-engineer-driving-agents carried a value-prop count this iteration had just falsified, and it credits three reviewing agents where two ran"
 authors: agent
 files:
 ---
@@ -13,7 +13,7 @@ files:
 
 The context is drawn. This state asks who the change answers to.
 
-FOUR ROLES STAND FROM i1 and none needed changing. ONE WAS MISSING and is minted here: the reviewing agent, which the roster ruling names and no node carried.
+FOUR ROLES STAND FROM i1. THIS FORM FIRST SAID NONE NEEDED CHANGING AND ONE DID: stk-engineer-driving-agents carried a note reading "four of the five value props serve this role", and this iteration had just minted two more. Nine of ten now serve it. The node is corrected, and the ratio held while the figure did not. ONE WAS MISSING and is minted here: the reviewing agent, which the roster ruling names and no node carried.
 
 The value props are the first source and they resolve cleanly. The always-on classes are walked below and two are struck with reasons.
 
@@ -45,7 +45,7 @@ THE SEVEN ALWAYS-ON CLASSES, kept or struck deliberately.
 - USER → stk-engineer-driving-agents. KEPT. Every value prop lands here.
 - NEWCOMER → stk-newcomer. KEPT, thinly. The change adds one number to a row a newcomer reads, and nothing else reaches them.
 - AGENT → stk-agent. KEPT, and it is the role the change acts upon: its strength stops being an accident of who started the session.
-- ASSESSOR → stk-reviewing-agent. MINTED HERE. The roster ruling names a reviewer at gates and no node carried it. It earned the mint on this iteration: three reviewing agents ran across M0 and M1 and between them found the demand-ledger cascade, the scheduler literature, an unswept register, an invalid measurement and an inflated figure. The walker found none of the five.
+- ASSESSOR → stk-reviewing-agent. MINTED HERE. The roster ruling names a reviewer at gates and no node carried it. It earned the mint on this iteration, and the figure here is the corrected one: TWO reviewing agents ran across M0 and M1, not three, and between them they found the demand-ledger cascade, an unswept register, an invalid measurement and an inflated figure. A THIRD ran at M2 and overturned this milestone's central claim about who is listening. THE SCHEDULER LITERATURE WAS THE RESEARCHER'S, a role the same ruling names separately, and crediting it here counted another role's work toward this one. What the mint actually rests on survives: the walker found none of what the separate readers found. AND THE RULING NAMES A ROLE THIS MILESTONE DID NOT MINT — the researcher, which no node carries and no state struck. Registered rather than invented, because a role minted to tidy a sentence is worse than a gap written down.
 - COMMUNICATOR → STRUCK, with its reason. Nobody explains this product to others today; the emit surfaces that would serve that role are unbuilt and stand as their own open iterations. Nothing in this change reaches it, and minting a role no artifact serves would be filling the register rather than reading it.
 - PROJECT-OWNER → STRUCK HERE AND NOT WAVED AWAY. No node has ever carried it, across thirty-seven records, and minting one for the whole product inside this iteration's M2 would be re-doing the product's stakeholder map under cover of a sizing change. WHAT THIS CHANGE ADDS TO IT IS REAL, THOUGH: the ruling that "the owner maintains the list by hand, one sitting at a time" puts a standing maintenance duty on a role with nowhere to record it. Registered rather than absorbed.
 
@@ -62,6 +62,10 @@ THE HOLE THIS FIELD LEAVES, said plainly: two of seven always-on classes have no
 - RE-SIGNED DURING THE INPUTS GATE'S ROUND 0, which found that the coverage field had swept three value props and written it as a sweep. The conclusion held — nothing resolves to nothing — and the method asks for the standing set, so the check was real and the sample was not.
 
 - THE LESSON IS THE SAME ONE THE MOTIVATION GATE PAID FOR: a subset stated in the voice of a sweep is indistinguishable, in the text, from a sweep. This one was caught before the verdict rather than after it, which is what round 0 is for.
+
+- RE-SIGNED A SECOND TIME AT THE INPUTS GATE, on two false claims an adversarial pass found. One was a standing node this iteration had itself made stale and this form then vouched for. The other counted a researcher's finding toward the assessor role while citing a ruling that separates them in the same sentence.
+
+- THE RESEARCHER ROLE IS NOW AN OPEN GAP rather than an unnoticed one: the roster names four, exactly one had a node before this state, and this state minted one of the remaining three. Guide and researcher stand uncovered, alongside communicator and project-owner. That is four of the register's role-coverage holes, and the entry is widened to say so.
 
 ## anything_else
 

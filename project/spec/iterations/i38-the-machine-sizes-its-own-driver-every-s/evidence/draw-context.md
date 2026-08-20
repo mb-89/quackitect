@@ -1,7 +1,8 @@
 ---
 form: draw-context
 by: agent
-signed_off: 2026-08-20T10:11:42.363Z
+signed_off: 2026-08-20T10:55:08.840Z
+reopened: "2026-08-20T10:54:04.286Z — it says the one place this repository starts an agent is the entrypoint; se-pty.ts:275 starts one inside a pseudo-terminal with a keystroke channel back, and the boundary section rests on a receiver that does not exist when one does"
 authors: agent
 files:
 ---
@@ -26,6 +27,10 @@ OUTSIDE THE BOX, AND THIS IS THE LINE THAT MATTERS: everything that acts on the 
 
 THE BOX SAYS AND DOES NOT DO. That is the same line the lane already holds for pushing, for opening records and for reaching the screen, and this change does not move it.
 
+WHAT SITS JUST OUTSIDE AND IS ALREADY BUILT, which this form first missed entirely. The lane LISTENS: se-start.ts:141 spawns it, :155-170 polls until it answers before any agent launches, and the mirror serves /mcp, /pull and an SSE stream at /events. The agent launched at :245 is alive and pulling. se-pty.ts runs an agent inside a pseudo-terminal with a keystroke channel back over POST.
+
+SO THE OUTSIDE OF THIS BOX IS POPULATED RATHER THAN EMPTY, and the receiver of a published name can read it today. What nothing out there can do is become a different model once a walk is under way.
+
 WHERE THE LINE IS AWKWARD, said rather than smoothed. The value stamped on a call — which model answered — is INSIDE the box as a field and OUTSIDE it as a fact. The engine owns the column; it cannot own the truth in it, because the transport hands it a client name and nothing else. That awkwardness is the whole of raid-asm-the-answering-model-can-be-recorded-when-only-the-agent-knows-it, and drawing the boundary is where it becomes visible rather than arguable.
 
 ## neighbours
@@ -47,7 +52,7 @@ THE HONEST SCOPE OF "INTENDED": this is intended for THIS product driving THIS p
 
 IT DOES NOT PREDICT ANYTHING. No score per request, no classifier, no learning from outcomes. The same milestone names the same driver every time, and if that answer is wrong it stays wrong until a person edits a file.
 
-IT DOES NOT START AN AGENT. Not on any host, not in any mode. The one place this repository starts an agent is the entrypoint, before a walk exists.
+IT DOES NOT START AN AGENT. Not on any host, not in any mode. THIS FIELD FIRST ADDED that the one place this repository starts an agent is the entrypoint, and that was false: se-pty.ts:275 starts one inside a pseudo-terminal, streams its output as server-sent events and takes keystrokes back over POST, and RUNME invokes it. THE EXCLUSION ITSELF IS UNAFFECTED — the sizing mechanism starts nothing — and the false half was a claim about the REPOSITORY smuggled into an exclusion about the BOX.
 
 IT DOES NOT ASK THE HOST WHAT IT CAN RUN. No discovery, no capability probe, no per-host roster.
 
@@ -64,6 +69,10 @@ AND IT DOES NOT OPEN THE DOOR IT DEPENDS ON. A weaker model still cannot produce
 - The boundary's awkward edge — the engine owns the model column and cannot own the truth in it — is where map-stakeholders and the requirements should look first. A field whose correctness lives outside the box needs either a party that can vouch for it or an honest label saying it is a claim.
 
 - Five standing neighbours are referenced and none needed changing. nbr-agent-harness already lists result offload, cancellation and hook delivery as host-controlled; the model actually serving a request belongs on that list and is not on it. That is an edit to a standing node rather than this state's work, and it is named here so it is not lost.
+
+- RE-SIGNED AT THE INPUTS GATE after an adversarial pass falsified what this form rested on. THE NEIGHBOUR IS NOT EMPTY. Something listens, the agent pulls, and se-pty carries keystrokes into a running one. The corrected hole is narrower and more useful: a live receiver can read a published name and has no way to become a different model.
+
+- THE ERROR IS KEPT ON THE RECORD RATHER THAN TIDIED, because of how it happened. The claim that nothing was listening was written THROUGH .se/se-call.mjs, a client for the listener it said did not exist. The measurement under it was sound — launch spawns, unrefs, main() returns — and it was carried to a conclusion it could not support. That is the second time in this iteration that real evidence produced a wrong inference, and both times a negative control or a fresh reader was what caught it, never more care.
 
 ## anything_else
 

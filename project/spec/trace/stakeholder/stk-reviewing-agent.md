@@ -33,18 +33,38 @@ statement: An AI reading a finished artifact with no shared context, to judge wh
 ## Why it is a role and not an implementation detail
 
 THE ROSTER RULING NAMES IT (owner, 2026-08-20): a guide, a walker, a reviewer
-at gates, a researcher where research is asked for. That is a cast, and three
-of the four already have nodes or are covered. This one did not.
+at gates, a researcher where research is asked for.
+
+OF THOSE FOUR, EXACTLY ONE HAD A NODE — `stk-agent`, the walker. This node
+first claimed three of the four were covered, and that was unsupported: the
+guide has no node, and the RESEARCHER has none either and is neither minted
+nor struck anywhere in this milestone.
+
+SO THIS MINT LEAVES A SIBLING GAP AND SAYS SO. The same ruling that justifies
+minting the assessor names a researcher nothing carries. It is registered
+rather than quietly minted, because a role invented to tidy a sentence is worse
+than a gap that is written down.
 
 IT IS NOT `stk-agent`. That role WALKS — it reads guidance, holds a position,
 recovers from refusals, and its concerns are all about surviving the machine.
 This one holds no position, walks nothing, and its whole value is that it
 arrives ignorant.
 
-THE DISTINCTION EARNED ITS KEEP ON THIS ITERATION. Three reviewing agents ran
-across M0 and M1. Between them they found the demand-ledger cascade, the
-scheduler literature that argues against the design, an unswept register, an
-invalid measurement and an inflated figure. The walker found none of the five.
+THE DISTINCTION EARNED ITS KEEP ON THIS ITERATION, and the figure below is the
+corrected one.
+
+TWO REVIEWING AGENTS RAN ACROSS M0 AND M1, not three. Between them they found
+the demand-ledger cascade, an unswept register, an invalid measurement and an
+inflated figure. A THIRD PASS RAN AT M2 and overturned this milestone's central
+claim about who is listening.
+
+THE SCHEDULER LITERATURE WAS NOT THEIRS. It came from a RESEARCHER, which the
+roster ruling names as a separate role, and crediting it here counted another
+role's work toward this one. The iteration's own M1 gate separates them in as
+many words, so the evidence to get it right was already on the record.
+
+WHAT SURVIVES THE CORRECTION: the walker found none of what the separate
+readers found, which is the claim the mint actually rests on.
 
 ## Notes (not load-bearing)
 

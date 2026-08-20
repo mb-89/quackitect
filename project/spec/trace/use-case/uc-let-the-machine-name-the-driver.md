@@ -26,9 +26,10 @@ priority: must
 ## Extensions
 
 - 3a. The milestone's rows span more than one rung. The maximum still governs, and the per-item values ride along so a reader can see what the maximum cost. Registered: `raid-risk-a-submachine-maximum-drags-easy-items-onto-an-expensive-walker`.
+- 5a. `se-pty.ts:275` runs an agent inside a pseudo-terminal, streams its output as server-sent events and takes keystrokes back over POST. That is a live read-write channel into a running agent and it is the nearest standing thing to a receiver that can act. Whether the published name should travel that way is a design question this case does not settle.
 - 4a. The list has no entry for that rung. The milestone names no driver and says which rung was unmatched. It does not fall back to the session's current model silently, because a silent fallback is indistinguishable from a working lookup.
 - 4b. The name resolves to different models on different hosts. Open: `raid-asm-one-model-list-serves-every-host-the-engine-supports`, raised to expected on the evidence that an alias already does exactly this.
-- 6a. NOBODY IS LISTENING, which is the state of the world today. `nbr-the-driver-that-performs-the-spawn` is drawn empty: on an unattended box `se-start.ts` spawns once, unrefs and returns. The name is published into a room with no one in it, and the guarantee above is met while the value is not.
+- 6a. THE RECEIVER READS AND CANNOT ACT, which is the state of the world today and is not the same as nobody listening. `se-start.ts:141` spawns the lane and `:155-170` proves it answers before launching an agent at `:245`; that agent pulls, so a published name reaches a reader. What no path does is start a NEW agent on a DIFFERENT model once the walk is under way — the entrypoint has returned, and the shim in `se-mcp.ts` respawns the engine child rather than the walker. The guarantee above is met while the value is not, and `nbr-the-driver-that-performs-the-spawn` carries the corrected shape.
 - 6b. The receiver wants a STRONGER model than named. It takes it and owes nothing.
 - 6c. The receiver wants a WEAKER one. It owes a recorded reason, and today nothing checks that the reason is there — `raid-risk-the-weaker-model-asymmetry-has-nothing-enforcing-it`.
 

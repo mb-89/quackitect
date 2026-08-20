@@ -3,7 +3,7 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-iss-two-always-on-roles-have-no-node-and-one-now-carries-a-duty
 type: "[[raid]]"
 kind: issue
-statement: "The communicator and project-owner role classes have never been minted across thirty-seven records, and this iteration has just put a standing maintenance duty on the project-owner with nowhere to record it."
+statement: "Four roles the method and the roster ruling name have no node — communicator, project-owner, guide and researcher — and this iteration has put a standing maintenance duty on the project-owner and credited a researcher's work to a role it did mint."
 owner: the owner
 trigger: "the next product-level stakeholder pass, and the first time anybody asks who is answerable for the model list being current"
 status: open
@@ -18,6 +18,21 @@ source_refs:
 weighs_with: raid-asm-one-model-list-serves-every-host-the-engine-supports
 weighs_against: none
 ---
+
+## Widened 2026-08-20, at the inputs gate
+
+TWO MORE CAME OUT OF AN ADVERSARIAL PASS. The roster ruling names four agent
+roles — a guide, a walker, a reviewer, a researcher. Exactly one had a node
+before this iteration (`stk-agent`, the walker) and this iteration minted the
+reviewer as `stk-reviewing-agent`.
+
+THE GUIDE AND THE RESEARCHER HAVE NONE, and neither was struck anywhere. The
+researcher is the sharper gap: this iteration used one, credited its finding to
+the reviewer role, and the mint's central evidence had to be corrected for it.
+
+A ROLE THAT DOES WORK AND HAS NO NODE GETS ITS WORK CREDITED SOMEWHERE ELSE.
+That is not a bookkeeping complaint — it inflated the case for minting a
+different role, and the inflation was only caught by a reader with no context.
 
 ## The two are not the same case
 

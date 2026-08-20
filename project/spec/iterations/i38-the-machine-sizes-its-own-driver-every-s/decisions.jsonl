@@ -133,3 +133,22 @@
 {"ts":"2026-08-20T10:48:41.632Z","op":"done","visit":"iterations/i38/gate-inputs@0","node":"d22","brief":"rounds and verdict written"}
 {"ts":"2026-08-20T10:48:42.162Z","op":"update","visit":"iterations/i38/gate-inputs@0","node":"d26","brief":"holding the submit until the adversarial pass reports"}
 {"ts":"2026-08-20T10:49:11.554Z","op":"update","visit":"iterations/i38/gate-inputs@0","node":"d27","brief":"gate carries the minted inventory, counted not recalled"}
+{"ts":"2026-08-20T10:49:28.639Z","op":"done","visit":"front_desk@0","node":"d4","brief":"branch pushed with M2 evidence and the gate form"}
+{"ts":"2026-08-20T10:53:16.415Z","op":"plan","visit":"iterations/i38/gate-inputs@0","parent":null,"nodes":[{"id":"d28","brief":"the neighbour is occupied"},{"id":"d29","brief":"not empty"},{"id":"d30","brief":"the hole is narrower"}]}
+{"ts":"2026-08-20T10:53:50.564Z","op":"update","visit":"iterations/i38/gate-inputs@0","node":"d31","brief":"correcting five nodes the adversarial pass falsified"}
+{"ts":"2026-08-20T10:54:02.479Z","op":"done","visit":"iterations/i38/gate-inputs@0","node":"d28","brief":"node corrected"}
+{"ts":"2026-08-20T10:54:03.121Z","op":"done","visit":"iterations/i38/gate-inputs@0","node":"d29","brief":"node corrected"}
+{"ts":"2026-08-20T10:54:03.676Z","op":"done","visit":"iterations/i38/gate-inputs@0","node":"d30","brief":"node corrected"}
+{"ts":"2026-08-20T10:54:04.284Z","op":"update","visit":"iterations/i38/gate-inputs@0","node":"d32","brief":"reopening draw-context on the receiver claim"}
+{"ts":"2026-08-20T10:54:04.562Z","op":"update","visit":"iterations/i38/draw-context@0","node":"d33","brief":"reopening map-stakeholders on two false claims"}
+{"ts":"2026-08-20T10:54:04.838Z","op":"update","visit":"iterations/i38/map-stakeholders@0","node":"d34","brief":"reopening write-stories on recalled document content"}
+{"ts":"2026-08-20T10:54:45.586Z","op":"update","visit":"iterations/i38/write-stories@2","node":"d35","brief":"write-stories re-signed; the ancestor deck claim corrected"}
+{"ts":"2026-08-20T10:55:08.544Z","op":"update","visit":"iterations/i38/draw-context@0","node":"d36","brief":"draw-context re-signed: the outside is populated"}
+{"ts":"2026-08-20T10:55:32.348Z","op":"update","visit":"iterations/i38/map-stakeholders@0","node":"d37","brief":"map-stakeholders re-signed on both false claims"}
+{"ts":"2026-08-20T10:55:56.809Z","op":"update","visit":"iterations/i38/generalize-use-cases@2","node":"d38","brief":"role-coverage entry widened to four uncovered roles"}
+{"ts":"2026-08-20T10:56:12.015Z","op":"update","visit":"iterations/i38/generalize-use-cases@2","node":"d39","brief":"aiming back at the gate after the repairs"}
+{"ts":"2026-08-20T10:56:24.855Z","op":"update","visit":"iterations/i38/generalize-use-cases@2","node":"d40","brief":"re-earning use-cases after the receiver correction"}
+{"ts":"2026-08-20T10:56:25.441Z","op":"update","visit":"iterations/i38/generalize-use-cases@2","node":"d41","brief":"use-cases re-earned; the pass is unchanged"}
+{"ts":"2026-08-20T10:56:44.266Z","op":"update","visit":"iterations/i38/gate-inputs@0","node":"d42","brief":"round 0 records the adversarial pass and its nine findings"}
+{"ts":"2026-08-20T10:57:16.478Z","op":"update","visit":"iterations/i38/gate-inputs@0","node":"d43","brief":"red team and verdict rewritten on the corrected ground"}
+{"ts":"2026-08-20T10:57:33.477Z","op":"done","visit":"iterations/i38/write-stories@0","node":"d14","brief":"inputs gate blessed on corrected evidence"}

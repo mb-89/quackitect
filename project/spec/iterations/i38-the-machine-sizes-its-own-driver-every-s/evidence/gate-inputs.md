@@ -1,5 +1,8 @@
 ---
 form: gate-inputs
+bless: blessed by agent
+by: agent
+signed_off: 2026-08-20T10:57:33.950Z
 authors: agent
 files:
 ---
@@ -66,6 +69,7 @@ WHAT WOULD MAKE A SCRIPT LIE, and it is worth naming at M2 rather than at M6: a 
 - types: not run here — this gate's tools carry no se_test and no se_run. M2 wrote no code: every artifact is a corpus node or an evidence form. There is nothing to typecheck that this milestone produced.
 - lint: the corpus half IS checked and it is checked on every write. SE-C-138 refuses a node whose frontmatter the engine's reader cannot load, before anything lands. Seven nodes were written across M2 and none was refused, so seven parse. The prose guard also fired once during M1 and was fixed, so the wall rule is live rather than theoretical.
 - tests: STILL NOT RUN ON THIS BOX, unchanged and still a real gap. No test verdict stands in this session's log. The battery is the engine's own and fires at verification. M2 wrote no code, so nothing it produced could have been tested — but the baseline this iteration will measure against is still the repository's and not one taken here.
+- adversarial pass: COMMISSIONED BEFORE THIS FORM WAS FILLED AND HELD THE SUBMIT UNTIL IT REPORTED, which is the M1 lesson applied. It raised nine claims against M2's evidence. EVERY ONE WAS RE-CHECKED BY HAND against the tree before being accepted and ALL NINE HELD — no false positive this time, unlike the M1 pass where one of nine was wrong. FOUR WERE THE SAME LOAD-BEARING ERROR: that nothing is listening on an unattended box. Verified false by opening the files the claim itself cited — se-start.ts:141 spawns the lane, :155-170 polls until it answers and dies if it never does, :245 then launches an agent whose first instruction is to pull, and se-pty.ts:275 runs an agent in a pseudo-terminal with keystrokes coming back over POST. THE CLAIM WAS WRITTEN THROUGH .se/se-call.mjs, WHICH IS A CLIENT FOR THE LISTENER IT SAID DID NOT EXIST. THE OTHERS: a story count off by one; the ancestor deck's content recalled rather than read; a standing role node this iteration had made stale and this milestone then vouched for; three reviewing agents credited where two ran, with a researcher's finding counted toward the assessor role; and 'three of the four cast roles are covered' where exactly one was. ALL NINE ARE FIXED. Four forms reopened and re-signed, five nodes corrected, one register entry widened.
 
 ## round_1_validate
 
@@ -96,7 +100,11 @@ WHAT WOULD MAKE A SCRIPT LIE, and it is worth naming at M2 rather than at M6: a 
 - YOUR OWN NARRATION IS THE WORST-BEHAVED THING IN THE LOG: over 400 records, 36 failed, and 25 of those are narration clauses — SE-C-121 fourteen times and SE-C-133 eleven => CONFIRMED BY MEASUREMENT AND IT IS THE WALKER'S FAULT, NOT THE ENGINE'S. The 121s are node ids guessed from the order I had planned items in, when every result hands the open node map back. The 133s are a checklist that stopped closing while the reopen cascades ran. Neither cost the work anything and both made the log a worse witness, which on an unattended box is the only witness there is.
 - THE SIX PULLS BETWEEN FIFTEEN AND EIGHTEEN SECONDS ARE A NEW COST NOBODY HAS PRICED => TRUE AND WORTH THE OWNING MILESTONE KNOWING. They are reopen cascades — re-signing recomputes the demand ledger for the whole column and walks the downstream cone. i33's measurement of the standing shape has nothing like them, so a reopen is roughly five times a transition. This iteration made nine of them and would have made none if its evidence had been right the first time.
 - KILL-CRITERION FOR THIS GATE, NAMED AND LOOKED FOR: the inputs are wrong if the journeys describe a system nobody asked for — that is, if the actors would not recognise the passes as things they want to do => NOT MET, WITH ONE QUALIFICATION. stk-engineer-driving-agents wants both passes and nine of ten value props already point at that role, so the forward and backward journeys land where the product already builds. THE QUALIFICATION: the pass that the design most depends on — somebody keeping the list current — belongs to an actor with no node, so its want is asserted by nobody. That is registered rather than resolved, and it is the one place the picture is incomplete rather than wrong.
-- SO WHAT SURVIVES: the journeys are right, one of them terminates in an empty room, and the milestone's own evidence needed correcting twice before this form could be filled => PASS WITH OVERRIDES, and the overrides are the empty receiver, the actorless maintenance pass, and an error rate in the evidence that a mechanical check would remove and discipline has now twice failed to.
+- THE MILESTONE'S CENTRAL FINDING WAS WRONG AND AN OUTSIDER HAD TO SAY SO. M2's sharpest claim was that a milestone naming its driver names it into a room with nobody in it, and the neighbour was drawn empty to make the hole visible => FALSIFIED, AND THE CORRECTED VERSION IS BETTER. Something is always listening: the entrypoint spawns the lane, polls until it answers, dies if it never does, and only then launches an agent that pulls. se-pty even carries keystrokes into a running agent. THE ACTUAL HOLE IS NARROWER AND MORE ACTIONABLE — a live receiver can read a published name and has no way to become a different model, and the entrypoint that could have launched a different one has already returned. The fix is not "build a receiver"; it is a way for the driving side to act.
+- AND THE WAY IT WAS WRONG IS THE FINDING BEHIND THE FINDING => THE CLAIM WAS WRITTEN THROUGH A CLIENT FOR THE LISTENER IT DENIED. Every call of this iteration went over .se/se-call.mjs to the mirror port. The measurement underneath was sound — launch spawns, unrefs, main() returns — and it was carried to a conclusion it could not support. That is the second time in this iteration that real evidence produced a wrong inference, and both times what caught it was a negative control or a fresh reader, never more care.
+- THE ASSESSOR ROLE WAS MINTED ON AN INFLATED CASE => THREE REVIEWING AGENTS BECAME TWO, and one of the findings credited to them belonged to a researcher — a role the same ruling names separately and which no node carries. The mint survives on what is left, because it rests on the readers being SEPARATE rather than on them being many. But the case for it was counted over the wrong population, which is the identical error this iteration made at M1 with the pinned records and corrected there.
+- FOUR OF THE ROSTER'S ROLES HAVE NO NODE, NOT TWO => THE REGISTER ENTRY IS WIDENED. Guide and researcher stand uncovered beside communicator and project-owner. The researcher is the sharp one: this milestone USED one, credited its work elsewhere, and only a reader with no context noticed. A role that does work and has no node gets its work credited to whichever role does.
+- SO WHAT SURVIVES: the journeys are right, one of them ends at a receiver that can read and cannot act, and this milestone's evidence needed correcting in nine places across two passes before this form could be filled => PASS WITH OVERRIDES. The overrides are the receiver that cannot act, the actorless maintenance pass, four uncovered roster roles, and an error rate that discipline has now failed at three times in three milestones with the lesson written down each time.
 
 ## raid_additions
 
@@ -106,7 +114,7 @@ WHAT WOULD MAKE A SCRIPT LIE, and it is worth naming at M2 rather than at M6: a 
 
 ## verdict
 
-pass with overrides — the journeys are the right two and one of them terminates in a room with nobody in it: the receiver is drawn empty, the maintenance pass has no actor to want it, and this milestone's own evidence needed two corrections before the form could be filled.
+pass with overrides — the two journeys are right and everything under them needed correcting: nine findings across two adversarial passes, the central one overturning this milestone's own headline claim, and the receiver turns out to read without being able to act.
 
 ## follow_up
 
@@ -119,6 +127,14 @@ pass with overrides — the journeys are the right two and one of them terminate
 - THE MAINTENANCE PASS WAITS ON A PRODUCT-LEVEL STAKEHOLDER NODE. Until then the honest answer to "who keeps the list current" is nobody, on the record.
 
 - ONE THING FOR A RETRO RATHER THAN FOR THIS ITERATION, and the measurement is above: twice in two milestones a SUBSET was checked and written in the voice of a sweep, and both times the conclusion happened to hold so nothing signalled. Discipline has now failed at it twice with the lesson already written down. That is an argument for a mechanical check — a claim bound to a query the engine re-runs — rather than for trying harder.
+
+WHAT THIS GATE ACTUALLY DEMONSTRATED, recorded because it is the reusable part.
+
+HOLDING THE SUBMIT FOR THE COMMISSIONED PASS WAS THE WHOLE DIFFERENCE. The form was complete and self-consistent before the pass reported, and it was wrong in nine places. At M1 the same form was submitted first and the gate failed; here it was held and the gate passes on corrected evidence. That is one behaviour change and it is cheap.
+
+THE ERROR RATE DID NOT FALL — the errors moved earlier. Three milestones, three rounds of the same two classes: a number recalled rather than counted, and a conclusion drawn past what its evidence supports. Each time the lesson was written down before the next one happened.
+
+THE ONE STRUCTURAL CONCLUSION, and it goes to a retro: care does not fix this. A negative control caught one, a fresh reader caught the rest, and the walker caught none of the load-bearing ones in three attempts. Binding a claim to a query the engine re-runs would have killed the counting errors outright and left the reader free for the inference errors, which are the only ones it cannot kill.
 
 ## anything_else
 
