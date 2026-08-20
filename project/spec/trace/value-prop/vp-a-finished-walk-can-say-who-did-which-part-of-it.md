@@ -26,6 +26,12 @@ and this is the backward one. That one decides before the work; this one reads
 after it. They are separable — a machine could route perfectly and record
 nothing, or record everything and route by accident.
 
+[[vp-a-cheaper-model-does-the-mechanical-work]] is the ancestor both of these
+descend from, and this node is the one that would let anybody check it. That
+proposition asks that a record walk to its gates on a small model with the same
+states signing. Nothing today could tell you whether it did, because nothing
+records which model walked which state.
+
 THE BACKWARD HALF IS WHAT MAKES THE FORWARD HALF CORRECTABLE. A declared rating
 with no record of what it produced can never be shown to have been wrong, which
 is the standing risk this proposition would eventually retire.
