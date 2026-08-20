@@ -20,6 +20,16 @@ export interface CallRecord {
   response?: unknown;
   /** see dsp-call-log.md#the-acting-role-is-stamped-where-the-call-is-served */
   actor?: "human" | "agent" | "ui";
+  /** WHERE THE WALK STOOD when this call was served, stamped by the code that
+   *  knows — the same rule the actor above follows.
+   *
+   *  IT USED TO BE INFERRED AND THE INFERENCE DOES NOT HOLD. Cost per state was
+   *  to be recovered by carrying each pull's `where` forward from its RESPONSE;
+   *  measured on this project's own log, 2,233 of 2,298 pull responses are
+   *  capped to invalid JSON and 31 are recoverable. A trail nobody can partition
+   *  cannot answer which state cost what.
+   *  see dsp-call-log.md#the-walk-position-is-stamped-not-inferred */
+  where?: string[];
   se_version: string;
 }
 

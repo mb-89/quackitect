@@ -12,7 +12,6 @@ realizes:
   - if-state-declaration-to-method-compiler
   - if-walk-engine-to-state-declaration
 files:
-  - project/deliverable/engine/statedecl.ts
   - project/deliverable/engine/paths.ts
   - project/deliverable/engine/produce.ts
   - project/deliverable/engine/search.ts
@@ -86,3 +85,14 @@ this iteration on the owner's ruling. The folder open in the editor is the
 project, so nothing needs recognising.
 
 THE DECISION IS raid-dec-the-machine-state-sits-inside-the-opened-folder-and-one-declaration-names-it.
+
+## Where the declaration actually lives, 2026-08-20
+
+`statedecl.ts` IS GONE AND THE DECLARATION IS NOT. It folded into `paths.ts`,
+which already carried the resolution seam this design is about: `seDir` names
+the machine-state folder and `isExcluded` reads the exclusion set beside it.
+
+FOUND BY trace-design, which is where a named file must exist. The name was
+right when i9 wrote it and the code was carried into `paths.ts` afterwards
+without the spec following. One file dropped from the list; nothing else about
+this design changed.

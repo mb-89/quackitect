@@ -24,6 +24,8 @@ fields:
     hint: where the run was TOLD to stop — the whole walk by default
   - field: ended_at
     hint: where it ACTUALLY ended, recorded even when it equals stop_at
+  - field: stamp_covers
+    hint: every directory the conditions cover, each with its hash — the matrix hash alone is necessary and not sufficient
 ---
 
 # benchmark-run — what survives a thrown-away run
@@ -84,6 +86,7 @@ model: TODO
 effort: TODO
 stop_at: TODO — where the run was told to stop
 ended_at: TODO — where it actually ended
+stamp_covers: TODO — <dir>=<hash> per directory, from conditionsFor()
 ---
 
 ## Per state
@@ -97,10 +100,18 @@ carry-forward rule; nothing here is typed by hand. -->
 <!-- The same iteration's own first walk, state by state. This is the only
 comparison the design makes. -->
 
-## The forbidden request
+## The forbidden request — NOT BUILT YET
 
 <!-- One deliberately forbidden request per run, and its outcome. A run whose
-forbidden request SUCCEEDED is discarded rather than reported. -->
+forbidden request SUCCEEDED is discarded rather than reported.
+
+NOTHING IMPLEMENTS THIS. No code makes the request, no field carries it, and no
+check enforces the discard. It is the design's answer to the one failure mode a
+structural ceiling still has — a fetch that was wrong looks exactly like a fetch
+that was right — and until it is built, a report leaves this section empty and
+says so.
+
+It belongs with the concealment work: both need a lane verb to refuse. -->
 
 ## What this cannot say
 

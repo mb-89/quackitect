@@ -1,7 +1,8 @@
 ---
 form: write-the-benchmark-report
+reopened: "2026-08-20T10:24:14.528Z — bind-a-run-and-write-its-conditions re-signed beneath it"
 by: agent
-signed_off: 2026-08-20T10:02:39.746Z
+signed_off: 2026-08-20T10:24:24.661Z
 authors: agent
 files:
 ---

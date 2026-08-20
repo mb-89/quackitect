@@ -808,6 +808,9 @@ export function buildServer(
       tool: rec.tool,
       args: rec.args,
       actor: "agent",
+      // WHERE, STAMPED RATHER THAN INFERRED. The session knows; the reader of
+      // a capped response does not. see dsp-call-log.md#the-walk-position-is-stamped-not-inferred
+      where: session.active(),
       ok: rec.ok,
       outcome: rec.outcome,
       duration_ms: rec.duration_ms,

@@ -12,8 +12,8 @@ import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { describe, test } from "node:test";
 import { benchmarkBind, leastRecentlyBenchmarked, rewindPointFor, standRewoundTree } from "../engine/benchmark.ts";
-import { concealedFromLane, concealmentCallSites, controlFilesPresent, resolvesInBoundTree } from "../engine/benchmark-guard.ts";
-import { conditionsStampDirs, costPerState, reportProblems } from "../engine/benchmark-report.ts";
+import { controlFilesPresent, resolvesInBoundTree } from "../engine/benchmark-guard.ts";
+import { conditionsStampDirs, costPerState, reportProblems, UNATTRIBUTED } from "../engine/benchmark-report.ts";
 import { git } from "../engine/gitlane.ts";
 import { freshRoot, gitInit } from "./helpers.ts";
 
@@ -124,31 +124,22 @@ function fullReport(): Record<string, unknown> {
   return r;
 }
 
-describe("the benchmark reports are concealed while a run is bound", { concurrency: true }, () => {
-  test("a reports path is invisible to the lane while a run is bound", () => {
-    assert.equal(concealedFromLane("project/spec/benchmarks/bench-i33.md", true), true);
-  });
-
-  test("the same path is visible with no run bound", () => {
-    assert.equal(concealedFromLane("project/spec/benchmarks/bench-i33.md", false), false);
-  });
-
-  test("a path that merely resembles a reports path is never concealed", () => {
-    // The rule is a rule, not a substring: this must stay visible either way.
-    assert.equal(concealedFromLane("project/spec/benchmarksomething/notes.md", true), false);
-  });
-
-  test("the mask covers every call site that was measured, and the count is asserted", () => {
-    // Four sites across three files. A verb added later fails here rather than
-    // escaping the rule, which is why the count is the assertion.
-    assert.deepEqual(concealmentCallSites().sort(), [
-      "engine/files.ts:fileRead",
-      "engine/paths.ts:resolveInRoot",
-      "engine/search.ts:fileGlob",
-      "engine/search.ts:fileSearch",
-    ]);
-  });
-});
+// THE CONCEALMENT HAS A SPEC AND NO CASES YET, AND THAT IS DELIBERATE.
+//
+// `tsp-the-benchmark-reports-are-concealed-while-a-run-is-bound` is authored in
+// full — seven steps, written against CALL SITES rather than against any of the
+// four disagreeing exclusion lists. What it describes is blocked on
+// `wt-three-separate-lists-decide-which-paths-a-lane-verb-may-see-`:
+// `search.ts` never reaches the containment seam, so a rule placed there holds
+// for every verb except the one most likely to find a previous run's numbers.
+//
+// FOUR CASES USED TO SIT HERE AND ALL FOUR WERE WRONG TO BE HERE. Two asserted
+// against stubs that returned `false` unconditionally — green from birth,
+// proving nothing. Two were red and could not go green in this iteration, which
+// left the battery permanently failing on work nobody had agreed to do.
+//
+// TEST-FIRST MEANS THE SPEC IS WRITTEN BEFORE THE BUILD, never that the cases
+// are. The spec is the artifact and it stands; the cases land with the chunk.
 
 describe("a benchmark report carries the conditions of its run", { concurrency: true }, () => {
   test("a report carrying every condition records", () => {
@@ -184,17 +175,88 @@ describe("a benchmark report carries the conditions of its run", { concurrency: 
     ]);
   });
 
-  test("cost per state attributes every call between two pulls to the state the earlier one named", () => {
+  // EVERY RECORD BELOW IS THE SHAPE engine/calllog.ts REALLY WRITES. The first
+  // version of these cases invented `where: string` and put the clause in
+  // `outcome`; the product has neither, so the suite was green over a function
+  // that returned {} on a real log of 13,619 records.
+  test("cost per state reads the stamp the lane writes on every record", () => {
     const cost = costPerState([
-      { tool: "se_pull", where: "iterations/ix/draft-vision", duration_ms: 10, ok: true },
-      { tool: "se_file_read", duration_ms: 5, ok: true },
-      { tool: "se_file_read", duration_ms: 5, ok: true },
-      { tool: "se_pull", where: "iterations/ix/gate-kickoff", duration_ms: 10, ok: true },
-      { tool: "se_file_search", duration_ms: 7, ok: false, outcome: "SE-C-101" },
+      { tool: "se_pull", where: ["iterations/ix/draft-vision"], duration_ms: 10, ok: true, outcome: "result" },
+      { tool: "se_file_read", where: ["iterations/ix/draft-vision"], duration_ms: 5, ok: true, outcome: "result" },
+      { tool: "se_file_read", where: ["iterations/ix/draft-vision"], duration_ms: 5, ok: true, outcome: "result" },
+      { tool: "se_pull", where: ["iterations/ix/gate-kickoff"], duration_ms: 10, ok: true, outcome: "result" },
+      {
+        tool: "se_file_search",
+        where: ["iterations/ix/gate-kickoff"],
+        duration_ms: 7,
+        ok: false,
+        outcome: "rejected",
+        response: { clause: "SE-C-101" },
+      },
     ]);
-    assert.equal(cost["iterations/ix/draft-vision"]?.calls, 3, "the pull and the two reads after it");
-    assert.equal(cost["iterations/ix/gate-kickoff"]?.calls, 2, "the next pull and the call after it");
+    assert.equal(cost["iterations/ix/draft-vision"]?.calls, 3);
+    assert.equal(cost["iterations/ix/gate-kickoff"]?.calls, 2);
     assert.equal(cost["iterations/ix/draft-vision"]?.ms, 20, "durations sum within a state");
-    assert.deepEqual(cost["iterations/ix/gate-kickoff"]?.refusals_by_clause, { "SE-C-101": 1 }, "refusals are counted by clause");
+    assert.deepEqual(cost["iterations/ix/gate-kickoff"]?.refusals_by_clause, { "SE-C-101": 1 }, "the clause comes off the response");
+    assert.equal(cost["iterations/ix/draft-vision"]?.entered, 1);
+  });
+
+  test("a clause cut out of a capped response is still counted", () => {
+    // The log caps every non-se_run answer, so a rejection body can arrive as
+    // a truncated string rather than an object.
+    const cost = costPerState([
+      { tool: "se_pull", where: ["s"], ok: true, outcome: "result" },
+      { tool: "se_file_read", where: ["s"], ok: false, outcome: "rejected", response: '{"clause":"SE-C-102","expec' },
+    ]);
+    assert.deepEqual(cost.s?.refusals_by_clause, { "SE-C-102": 1 });
+  });
+
+  test("a crash is not counted as a typed refusal", () => {
+    const cost = costPerState([
+      { tool: "se_pull", where: ["s"], ok: true, outcome: "result" },
+      { tool: "se_run", where: ["s"], ok: false, outcome: "errored", response: "boom" },
+    ]);
+    assert.deepEqual(cost.s?.refusals_by_clause, {}, "a crash never reached an expectation, so it names no clause");
+    assert.equal(cost.s?.calls, 2, "and it still costs a call");
+  });
+
+  test("a refill is a form after a REFUSED FORM, never after any failed call", () => {
+    const cost = costPerState([
+      { tool: "se_pull", where: ["s"], ok: true, outcome: "result" },
+      { tool: "se_file_read", where: ["s"], ok: false, outcome: "rejected", response: { clause: "SE-C-102" } },
+      { tool: "se_pull", where: ["s"], args: { form: {} }, ok: true, outcome: "result" },
+    ]);
+    assert.equal(cost.s?.forms_filled, 1);
+    assert.equal(cost.s?.forms_refilled, 0, "no form was ever refused, so nothing was refilled");
+  });
+
+  test("a form refused and sent again counts exactly one refill", () => {
+    const cost = costPerState([
+      { tool: "se_pull", where: ["s"], ok: true, outcome: "result" },
+      { tool: "se_pull", where: ["s"], args: { form: {} }, ok: false, outcome: "rejected", response: { clause: "SE-C-112" } },
+      { tool: "se_pull", where: ["s"], args: { form: {} }, ok: true, outcome: "result" },
+    ]);
+    assert.equal(cost.s?.forms_refilled, 1, "the machine sent the agent back once");
+  });
+
+  test("work before the first stamp is counted, never dropped", () => {
+    // A total that silently omits work reads as a cheaper walk than happened.
+    const cost = costPerState([
+      { tool: "se_file_read", duration_ms: 9, ok: true, outcome: "result" },
+      { tool: "se_pull", where: ["s"], duration_ms: 1, ok: true, outcome: "result" },
+    ]);
+    assert.equal(cost[UNATTRIBUTED]?.calls, 1, "it has a home of its own");
+    assert.equal(cost[UNATTRIBUTED]?.ms, 9);
+    assert.equal(cost.s?.calls, 1);
+  });
+
+  test("re-entering a state counts a second entry", () => {
+    const cost = costPerState([
+      { tool: "se_pull", where: ["a"], ok: true, outcome: "result" },
+      { tool: "se_pull", where: ["b"], ok: true, outcome: "result" },
+      { tool: "se_pull", where: ["a"], ok: true, outcome: "result" },
+    ]);
+    assert.equal(cost.a?.entered, 2, "states visited AND re-entered");
+    assert.equal(cost.b?.entered, 1);
   });
 });

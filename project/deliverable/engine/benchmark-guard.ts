@@ -48,15 +48,19 @@ export function controlFilesPresent(tree: string, otherIteration: string): numbe
   return n;
 }
 
-/** THE CONCEALMENT, asked at each of the four measured call sites rather than
- *  attached to one of the four disagreeing exclusion lists.
- *  NOT BUILT: waits on wt-three-separate-lists-decide-which-paths-a-lane-verb-may-see-. */
-export function concealedFromLane(_rel: string, _bound: boolean): boolean {
-  return false;
-}
-
-/** The call sites the mask covers. Asserted, so a verb added later fails
- *  rather than escaping the rule. NOT BUILT — see above. */
-export function concealmentCallSites(): string[] {
-  return [];
-}
+/* THE CONCEALMENT IS NOT BUILT AND CARRIES NO STUB.
+ *
+ * It used to sit here as two functions returning `false` and `[]`. Nothing
+ * called them, so they were dead code that made the design look half-present —
+ * and the two tests that exercised them were green from birth for the same
+ * reason.
+ *
+ * WHAT IT WILL BE is on dsp-benchmark-guard.md: one predicate asked at four
+ * measured call sites, never attached to any of the four disagreeing exclusion
+ * lists. What blocks it is that `search.ts` never reaches the containment seam,
+ * so a rule there holds for every verb except the one most likely to find a
+ * previous run's numbers.
+ *
+ * The obligation lives on the spec and the work token, which is where an
+ * obligation belongs — not in a function that answers nothing.
+ * see wt-three-separate-lists-decide-which-paths-a-lane-verb-may-see- */

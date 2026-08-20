@@ -3,6 +3,7 @@
 import { createHash } from "node:crypto";
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { controlFilesPresent } from "./benchmark-guard.ts";
 import { CONDITIONS, conditionsStampDirs } from "./benchmark-report.ts";
 import { git } from "./gitlane.ts";
 import { noteOf } from "./notes.ts";
@@ -92,6 +93,12 @@ export function standRewoundTree(
   if (!git(into, "init", "-q").ok) return empty;
   if (!git(into, "fetch", "--depth", "1", root, `${ref}:refs/heads/bench`).ok) return empty;
   if (!git(into, "checkout", "-q", "bench").ok) return empty;
+  // COUNT BEFORE THE COPY, OR THE COUNT IS OF THE COPY. This ran after the
+  // loop below and therefore measured the CURRENT directories it had just
+  // written, so `files > 0` was satisfied by the copy and an empty fetch
+  // reported success. Reproduced against an empty root commit: 2 files, no
+  // project/spec, guard passed.
+  const fetched = countFiles(into);
   // THE MACHINE AND THE METHOD COME FORWARD, over whatever the old commit had.
   for (const rel of CURRENT) {
     const src = join(root, rel);
@@ -100,7 +107,7 @@ export function standRewoundTree(
     rmSync(dst, { recursive: true, force: true });
     cpSync(src, dst, { recursive: true });
   }
-  return { files: countFiles(into), rewound: [...REWOUND], current: [...CURRENT] };
+  return { files: fetched, rewound: [...REWOUND], current: [...CURRENT] };
 }
 
 /** THE ITERATION BENCHMARKED LONGEST AGO, read from the reports folder.
@@ -184,10 +191,15 @@ export function conditionsStamp(root: string): Record<string, string> {
 /** THE THREE CONDITIONS NO LOG HOLDS. They are written when a run BINDS,
  *  because nothing recovers them afterwards. */
 function hostConditions(env: NodeJS.ProcessEnv): Record<string, string> {
+  // ABSENCE STAYS ABSENT. These defaulted to "unknown", which is a non-empty
+  // string and therefore passed `reportProblems` — so a report with no harness,
+  // no model and no effort recorded clean, and the requirement's measure
+  // ("reports missing any condition = 0") was met by three fields that were
+  // missing. An empty string is what the guard is for.
   return {
-    harness: env.SE_HARNESS ?? "unknown",
-    model: env.SE_MODEL ?? "unknown",
-    effort: env.SE_EFFORT ?? "unknown",
+    harness: env.SE_HARNESS ?? "",
+    model: env.SE_MODEL ?? "",
+    effort: env.SE_EFFORT ?? "",
   };
 }
 
@@ -207,15 +219,29 @@ export function benchmarkBind(root: string, opts: { iteration?: string; stop_at?
   const tree = join(root, ".se", "bench", iteration);
   const stood = standRewoundTree(root, iteration, rewind, tree);
   if (stood.files === 0) return { refused: `the rewound tree for ${iteration} stood empty — the fetch did not take` };
+  // THE POSITIVE CONTROL RUNS IN THE PRODUCT, not only in a test. An empty
+  // fetch and a correct rewind both answer "not there" to everything, so a run
+  // proves the tree HAS what the rewind was never meant to remove.
+  const neighbour = shippedIterations(root).find((i) => i !== iteration);
+  if (neighbour !== undefined && controlFilesPresent(tree, neighbour) === 0) {
+    return {
+      refused: `the rewound tree for ${iteration} holds no trace of ${neighbour} either — the control failed, so an empty fetch cannot be told from a correct rewind`,
+    };
+  }
   const conditions: Record<string, string> = {
     iteration,
     rewind,
     change_size: changeSizeOf(root, iteration),
+    // "unpinned" and "gone" were sentinels too. An unpinned iteration and an
+    // absent matrix are things a report must not quietly carry.
     se_version: SE_VERSION,
     ...hostConditions(process.env),
     ...conditionsStamp(root),
   };
-  conditions.rigor_matrix_hash = conditions["project/deliverable/machines/rigor_matrix/rows"] ?? "gone";
+  // THE MATRIX HASH IS KEPT AS ONE MEMBER OF THE SET, never as the answer. A
+  // reader who wants the old field still finds it; the five directories beside
+  // it are what stop the report claiming more than it knows.
+  conditions.rigor_matrix_hash = conditions["project/deliverable/machines/rigor_matrix/rows"] ?? "";
   const run: BenchmarkRun = {
     iteration,
     rewind,
@@ -235,11 +261,11 @@ export function benchmarkBind(root: string, opts: { iteration?: string; stop_at?
  *  result's name rather than a property of the run. */
 function changeSizeOf(root: string, iteration: string): string {
   const pin = join(root, "project", "spec", "iterations", iteration, "machines", "seeded.json");
-  if (!existsSync(pin)) return "unpinned";
+  if (!existsSync(pin)) return "";
   try {
-    return String((JSON.parse(readFileSync(pin, "utf8")) as { change_size?: unknown }).change_size ?? "unpinned");
+    return String((JSON.parse(readFileSync(pin, "utf8")) as { change_size?: unknown }).change_size ?? "");
   } catch {
-    return "unpinned";
+    return "";
   }
 }
 
@@ -253,6 +279,12 @@ export function benchmarkStop(root: string, run: BenchmarkRun, endedAt: string):
   const done: BenchmarkRun = { ...run, ended_at: endedAt };
   const bound = join(root, ".se", "benchmark.json");
   if (existsSync(bound)) rmSync(bound, { force: true });
+  // THE REF GOES WITH THE RUN. `refs/bench/<id>` is written into the LIVE repo
+  // to make the rewind commit fetchable, and it used to stay there forever —
+  // invisible to `git status`, so the inspection that exists to catch "a write
+  // somewhere unexpected" passed straight over it.
+  git(root, "update-ref", "-d", `refs/bench/${run.iteration}`);
+  rmSync(run.tree, { recursive: true, force: true });
   return done;
 }
 
@@ -270,5 +302,12 @@ export function isBound(root: string): boolean {
 export function conditionsFor(run: BenchmarkRun): Record<string, string> {
   const out: Record<string, string> = {};
   for (const c of CONDITIONS) out[c] = run.conditions[c] ?? "";
+  // THE STAMP SET TRAVELS WITH THEM. This used to iterate CONDITIONS alone and
+  // drop every per-directory hash the binding had just computed, so a real
+  // report stamped the matrix by itself — the exact claim this design calls a
+  // lie in writing.
+  out.stamp_covers = conditionsStampDirs()
+    .map((rel) => `${rel}=${run.conditions[rel] ?? ""}`)
+    .join(" ");
   return out;
 }

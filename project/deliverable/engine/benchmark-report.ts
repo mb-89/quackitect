@@ -1,5 +1,4 @@
 // see dsp-benchmark-report.md#responsibility
-//
 
 export interface StateCost {
   calls: number;
@@ -10,16 +9,25 @@ export interface StateCost {
   entered: number;
 }
 
+/** The shape `engine/calllog.ts` actually writes. Written against CallRecord
+ *  rather than against the design document, because the first version of this
+ *  file was written the other way round and read two fields the log has never
+ *  carried. */
 export interface CallRecordish {
-  ts?: number;
+  ts?: string;
   tool?: string;
   ok?: boolean;
-  outcome?: string;
+  outcome?: "result" | "rejected" | "errored";
   duration_ms?: number;
-  /** The state a pull ANSWERED with. Only se_pull carries one. */
-  where?: string;
+  /** Stamped by the lane at the moment the call is served. */
+  where?: string[];
   args?: Record<string, unknown>;
+  response?: unknown;
 }
+
+/** Calls the log cannot place. They are COUNTED rather than dropped: a total
+ *  that silently omits work reads as a cheaper walk than happened. */
+export const UNATTRIBUTED = "(before the first pull)";
 
 function empty(): StateCost {
   return { calls: 0, ms: 0, forms_filled: 0, forms_refilled: 0, refusals_by_clause: {}, entered: 0 };
@@ -31,54 +39,67 @@ function bucket(out: Record<string, StateCost>, id: string): StateCost {
   return b;
 }
 
-/** The clause a refusal names, or undefined. A refusal with no clause is a
- *  crash rather than a typed refusal, and the two must not be added together. */
-function clauseOf(outcome: string | undefined): string | undefined {
-  return /SE-C-\d+/.exec(outcome ?? "")?.[0];
+/** THE CLAUSE A TYPED REFUSAL NAMES, or undefined for a crash.
+ *
+ *  IT LIVES ON THE RESPONSE, never on `outcome` — which is the three-value
+ *  enum `result | rejected | errored`. The first version of this function read
+ *  `outcome` and therefore counted nothing. `render.ts` and `failure-shapes.ts`
+ *  both read `response.clause`, and this now agrees with them.
+ *
+ *  THE STRING FALLBACK IS FOR A CAPPED RESPONSE: the log truncates every
+ *  non-se_run answer, so an object may arrive as a cut string. */
+export function clauseOf(rec: CallRecordish): string | undefined {
+  const r = rec.response;
+  if (r !== null && typeof r === "object") {
+    const c = (r as { clause?: unknown }).clause;
+    if (typeof c === "string" && c !== "") return c;
+  }
+  return /SE-C-\d+/.exec(typeof r === "string" ? r : JSON.stringify(r ?? ""))?.[0];
 }
 
-/** THE CARRY-FORWARD RULE. No call record carries a state, so attribution is an
- *  inference: every se_pull answer names its `where`, and every call after it
- *  belongs to that state until the next pull names a different one.
+/** The state a record was served in — the stamp, flattened. */
+function whereOf(rec: CallRecordish): string | undefined {
+  const w = rec.where;
+  if (!Array.isArray(w) || w.length === 0) return undefined;
+  return w.join(" · ");
+}
+
+/** WHAT A WALK COST, PER STATE, from the trail the lane already writes.
  *
- *  THE NAMING PULL BELONGS TO THE STATE IT NAMES, not to the one it left. It is
- *  the call that did the work of arriving, and charging it backwards would bill
- *  every state for its successor's entry.
+ *  ATTRIBUTION IS READ, NOT INFERRED. Every record carries the state it was
+ *  served in. The carry-forward rule this replaced tried to recover boundaries
+ *  from each pull's response; measured on this project's own log, 2,233 of
+ *  2,298 pull responses are capped to invalid JSON.
  *
- *  WHAT THIS CANNOT SEE is on
- *  raid-asm-carry-forward-attribution-covers-every-call-between-two-pulls. A
- *  call made from somewhere else between two pulls lands on the wrong state,
- *  and nothing in the log distinguishes it. */
+ *  A RECORD WITH NO STAMP IS CARRIED FORWARD from the last one that had a
+ *  stamp, so a log written before the stamp existed still partitions. What
+ *  precedes the first stamp is counted under UNATTRIBUTED rather than dropped. */
 export function costPerState(log: CallRecordish[]): Record<string, StateCost> {
   const out: Record<string, StateCost> = {};
   let here: string | undefined;
-  let refusedSinceLastForm = false;
+  let formRefused = false;
   for (const rec of log) {
-    if (rec.tool === "se_pull" && typeof rec.where === "string" && rec.where !== "") {
-      if (rec.where !== here) {
-        here = rec.where;
-        bucket(out, here).entered += 1;
-        refusedSinceLastForm = false;
-      }
+    const stamp = whereOf(rec);
+    if (stamp !== undefined && stamp !== here) {
+      here = stamp;
+      bucket(out, here).entered += 1;
     }
-    // A CALL BEFORE THE FIRST PULL HAS NO HOME, and inventing one for it would
-    // put boot cost on whichever state happened to come first.
-    if (here === undefined) continue;
-    const b = bucket(out, here);
+    const b = bucket(out, here ?? UNATTRIBUTED);
     b.calls += 1;
     b.ms += rec.duration_ms ?? 0;
-    if (rec.ok === false) {
-      const clause = clauseOf(rec.outcome);
+    const refused = rec.ok === false;
+    if (refused) {
+      const clause = clauseOf(rec);
       if (clause !== undefined) b.refusals_by_clause[clause] = (b.refusals_by_clause[clause] ?? 0) + 1;
     }
-    if (rec.tool === "se_pull" && rec.args?.form !== undefined) {
+    const isForm = rec.tool === "se_pull" && rec.args?.form !== undefined;
+    if (isForm) {
       b.forms_filled += 1;
-      // A REFILL IS A FORM SENT AGAIN AFTER ONE WAS REFUSED, which is the
-      // number that says how often the machine sent an agent back.
-      if (refusedSinceLastForm) b.forms_refilled += 1;
-      refusedSinceLastForm = rec.ok === false;
-    } else if (rec.ok === false) {
-      refusedSinceLastForm = true;
+      // A REFILL IS A FORM SENT AGAIN AFTER A FORM WAS REFUSED — never after
+      // any other call failed. The first version armed on every failure, so an
+      // unrelated refusal before the session's first form counted as a refill.
+      if (formRefused) b.forms_refilled += 1;
+      formRefused = refused;
     }
   }
   return out;

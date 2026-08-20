@@ -1,0 +1,79 @@
+---
+form: trace-design
+by: agent
+signed_off: 2026-08-20T10:29:13.477Z
+authors: agent
+files:
+---
+
+# Evidence form / trace-design
+
+## current_situation
+
+trace-design, after the build. The coverage half runs again with existence now real and the unclaimed sweep on top.
+
+THE COVERAGE HALF ALREADY BIT ONCE, at specify-build, and it named fourteen crossings with no design spec. Nine were minted in i9, which shipped before this law existed. All fourteen are covered now and each was checked against the spec that actually details it rather than filed to make a count reach zero.
+
+THE FILES ARE NO LONGER PLANNED. At specify-build the three benchmark specs named files that did not exist, which is what test-first means. Four of five chunks are built, so `benchmark.ts`, `benchmark-guard.ts` and `benchmark-report.ts` are real and the item template beside them is real.
+
+## design_trace
+
+| design-spec | realizes | files |
+| --- | --- | --- |
+| [[dsp-benchmark-binding]] | el-benchmark-binding · if-benchmark-binding-to-guard · if-benchmark-report-to-binding | project/deliverable/engine/benchmark.ts · project/deliverable/engine/tools.ts |
+| [[dsp-benchmark-guard]] | el-benchmark-guard | project/deliverable/engine/benchmark-guard.ts · project/deliverable/engine/paths.ts · project/deliverable/engine/search.ts · project/deliverable/engine/files.ts |
+| [[dsp-benchmark-report]] | el-benchmark-report · if-benchmark-binding-to-report · if-benchmark-guard-to-report | project/deliverable/engine/benchmark-report.ts · project/deliverable/machines/items/benchmark-run.md |
+| [[dsp-boot-and-power]] | el-bootstrap | project/deliverable/engine/lifecycle.ts · project/deliverable/engine/stopping-layer.ts · project/deliverable/engine/cage-inventory.ts · project/deliverable/engine/bin/se-pty.ts · project/deliverable/engine/bin/se-hook-stop.ts · project/deliverable/engine/bin/se-hook-start.ts · project/deliverable/engine/pullnotice.ts · project/deliverable/engine/bin/package.ts · project/deliverable/engine/version.ts · project/deliverable/engine/sessionlive.ts |
+| [[dsp-call-log]] | el-account · if-walk-engine-to-account · if-holding-pen-to-account · if-method-compiler-to-account · if-record-store-to-account | project/deliverable/engine/failure-shapes.ts · project/deliverable/engine/calllog.ts · project/deliverable/engine/version.ts · project/deliverable/engine/survey.ts |
+| [[dsp-coupling-disposer]] | el-coupling-disposer | project/deliverable/engine/disposition.ts |
+| [[dsp-decision-mathematics]] | el-method-compiler | project/deliverable/engine/dsm.ts · project/deliverable/engine/pugh.ts · project/deliverable/engine/pareto.ts · project/deliverable/engine/compare.ts · project/deliverable/engine/elematrix.ts · project/deliverable/engine/morphbox.ts · project/deliverable/engine/bin/flow-closure.ts · project/deliverable/engine/bin/grades-complete.ts |
+| [[dsp-engine-delta]] | el-engine-delta · if-engine-delta-to-account · if-engine-delta-to-mirror · if-engine-delta-to-walk-engine | project/deliverable/engine/paths.ts · project/deliverable/engine/machines/compile.ts |
+| [[dsp-evidence-forms]] | el-walk-engine | project/deliverable/engine/stateform.ts · project/deliverable/engine/forms.ts · project/deliverable/engine/sessionforms.ts · project/deliverable/engine/stateform-problems.ts · project/deliverable/engine/stateform-sheet.ts |
+| [[dsp-file-lane]] | el-walk-engine | project/deliverable/engine/files.ts · project/deliverable/engine/files-patch.ts · project/deliverable/engine/signals.ts · project/deliverable/engine/paths.ts · project/deliverable/engine/resolve.ts · project/deliverable/engine/search.ts · project/deliverable/engine/move.ts · project/deliverable/engine/run.ts · project/deliverable/engine/web.ts · project/deliverable/engine/gitlane.ts · project/deliverable/engine/jsonio.ts · project/deliverable/engine/hash.ts · project/deliverable/engine/model-fs.ts · project/deliverable/engine/bin/outward-search.ts · project/deliverable/engine/bin/se-hook-websearch.ts |
+| [[dsp-form-editors]] | el-mirror | project/deliverable/engine/editors/index.ts · project/deliverable/engine/editors/kinds.ts · project/deliverable/engine/editors/checklist.ts · project/deliverable/engine/editors/choice-rationale.ts · project/deliverable/engine/editors/compare-card.ts · project/deliverable/engine/editors/decision-matrix.ts · project/deliverable/engine/editors/dsm.ts · project/deliverable/engine/editors/element-matrix.ts · project/deliverable/engine/editors/exposure-pick.ts · project/deliverable/engine/editors/findings.ts · project/deliverable/engine/editors/list.ts · project/deliverable/engine/editors/morph-box.ts · project/deliverable/engine/editors/node-table.ts · project/deliverable/engine/editors/pareto-plot.ts · project/deliverable/engine/editors/per-item.ts · project/deliverable/engine/editors/rank-cut.ts · project/deliverable/engine/editors/scenario-deck.ts · project/deliverable/engine/editors/sensitivity.ts · project/deliverable/engine/editors/table.ts |
+| [[dsp-front-desk]] | el-front-desk | project/deliverable/machines/main.canvas |
+| [[dsp-help-search]] | el-walk-engine | project/deliverable/engine/help.ts · project/deliverable/engine/tools.ts |
+| [[dsp-lane-door]] | el-walk-engine · if-walk-engine-to-query-evaluator · if-walk-engine-to-coupling-disposer | project/deliverable/engine/harness.ts · project/deliverable/engine/payload-limit.ts · project/deliverable/engine/tools.ts · project/deliverable/engine/tools-file.ts · project/deliverable/engine/tools-run.ts · project/deliverable/engine/tools-desk.ts · project/deliverable/engine/mcp.ts · project/deliverable/engine/errors.ts · project/deliverable/engine/discipline.ts · project/deliverable/engine/promptlayer.ts · project/deliverable/engine/params.ts · project/deliverable/engine/bound.ts · project/deliverable/engine/bin/se-mcp.ts · project/deliverable/engine/bin/se-manual.ts · project/deliverable/engine/tools-query.ts · project/deliverable/engine/repeat.ts |
+| [[dsp-legible-controls]] | el-mirror | project/deliverable/engine/params.ts · project/deliverable/engine/mirror.ts · project/deliverable/engine/run.ts · project/deliverable/vscode/src/extension.ts |
+| [[dsp-live-register]] | el-mirror | project/deliverable/engine/bases.ts · project/deliverable/engine/basesclient.ts · project/deliverable/engine/baseui.ts · project/deliverable/engine/tables.ts · project/deliverable/engine/vault.ts · project/deliverable/engine/expr.ts · project/deliverable/engine/expr-parse.ts · project/deliverable/engine/expr-value.ts · project/deliverable/engine/bin/format-vault.ts · project/deliverable/engine/signals.ts |
+| [[dsp-method-compilation]] | el-method-compiler | project/deliverable/engine/rigor-matrix.ts · project/deliverable/engine/canvas.ts · project/deliverable/engine/catalogs.ts · project/deliverable/engine/machines/compile.ts · project/deliverable/engine/expmachine.ts · project/deliverable/engine/machines/supply.ts |
+| [[dsp-mirror-render]] | el-mirror · if-account-to-mirror · if-front-desk-to-mirror · if-holding-pen-to-mirror · if-method-compiler-to-mirror · if-record-store-to-mirror · if-walk-engine-to-mirror | project/deliverable/engine/render.ts · project/deliverable/engine/renderclient.ts · project/deliverable/engine/renderclient-detail.ts · project/deliverable/engine/renderclient-walk.ts · project/deliverable/engine/renderclient-form.ts · project/deliverable/engine/renderclient-panel.ts · project/deliverable/engine/renderclient-log.ts · project/deliverable/engine/renderclient-live.ts · project/deliverable/engine/renderstyle.ts · project/deliverable/engine/mirror.ts · project/deliverable/engine/panel.ts · project/deliverable/engine/brand.ts · project/deliverable/engine/card-parts.ts · project/deliverable/engine/cards.ts · project/deliverable/engine/traceui.ts · project/deliverable/engine/gitgraph.ts · project/deliverable/engine/shoot.ts · project/deliverable/engine/bin/brand.ts · project/deliverable/engine/bin/mermaid-check.ts · project/deliverable/engine/bin/place-prompt-layer.ts |
+| [[dsp-narration]] | el-walk-engine | project/deliverable/engine/decisions.ts · project/deliverable/engine/toll.ts · project/deliverable/engine/bin/render-decisions.ts |
+| [[dsp-note-pen]] | el-holding-pen · if-holding-pen-to-front-desk | project/deliverable/engine/notes.ts · project/deliverable/engine/inbox.ts |
+| [[dsp-quality-toolchain]] | el-test-runner · if-record-store-to-test-runner · if-test-runner-to-record-store · if-test-runner-to-walk-engine | project/deliverable/engine/testreporters.ts · project/deliverable/engine/tools.ts · project/deliverable/engine/lint.ts · project/deliverable/engine/bin/grades-complete.ts · project/deliverable/engine/bin/backfill-minted.ts · project/deliverable/engine/lintfix.ts · project/deliverable/engine/bin/selftest.ts · project/deliverable/engine/bin/smoketest.ts · project/deliverable/engine/bin/preflight.ts · project/deliverable/engine/bin/red-observed.ts · project/deliverable/engine/bin/battery.ts · project/deliverable/engine/bin/test-timings.mjs · project/deliverable/engine/bin/prose-inspect.ts · project/deliverable/engine/bin/record-inspect.ts |
+| [[dsp-query-evaluator]] | el-query-evaluator | project/deliverable/engine/query.ts |
+| [[dsp-radial-layout]] | el-mirror | project/deliverable/engine/trace.ts · project/deliverable/engine/trace-layout.ts |
+| [[dsp-record-lifecycle]] | el-record-store · if-front-desk-to-record-store | project/deliverable/engine/iterations.ts · project/deliverable/engine/iterations-draw.ts · project/deliverable/engine/records.ts · project/deliverable/engine/seed.ts |
+| [[dsp-resolution-seam]] | el-resolution-seam · if-walk-engine-to-resolution-seam · if-resolution-seam-to-engine-delta · if-resolution-seam-to-method-compiler · if-record-store-to-resolution-seam · if-resolution-seam-to-account | project/deliverable/engine/paths.ts · project/deliverable/engine/resolve.ts · project/deliverable/engine/tools.ts |
+| [[dsp-the-arrival]] | el-arrival · if-arrival-to-walk-engine | project/deliverable/engine/bin/se-arrive.ts · project/deliverable/engine/bin/se-hook-arrive.ts · .claude/settings.json · project/deliverable/engine/bin/se-hook-start.ts · project/deliverable/engine/pullnotice.ts |
+| [[dsp-the-goal-binds-the-walk]] | el-walk-engine | project/deliverable/engine/machine.ts · project/deliverable/engine/stateform.ts · project/deliverable/engine/rigor-matrix.ts · project/deliverable/engine/machines/compile.ts · project/deliverable/engine/session.ts |
+| [[dsp-the-install-preflight]] | el-preflight | project/deliverable/engine/bin/install-preflight.ts |
+| [[dsp-the-one-corpus-reader]] | el-corpus-reader | project/deliverable/engine/trace.ts · project/deliverable/engine/stateform.ts |
+| [[dsp-the-options-pool]] | el-holding-pen · el-front-desk | project/deliverable/engine/pool.ts · project/deliverable/engine/inbox.ts · project/deliverable/engine/survey.ts |
+| [[dsp-the-outside-boundaries-and-their-bounds]] | el-walk-engine · if-agent-harness-to-entrypoint · if-engineer-to-mirror · if-vscode-to-mirror · if-test-runner-to-toolchain · if-bootstrap-to-toolchain · if-account-to-git · if-record-store-to-git · if-record-store-to-origin-remote · if-account-to-obsidian · if-walk-engine-to-web · if-mirror-to-output-tools | project/deliverable/machines/items/interface.md · project/deliverable/engine/trace.ts · project/deliverable/engine/elematrix.ts |
+| [[dsp-the-producing-acts]] | el-vehicle-producer · el-project-producer · if-project-producer-to-resolution-seam · el-mirror | project/deliverable/engine/actbound.ts · project/deliverable/engine/produce.ts · project/deliverable/engine/paths.ts · project/deliverable/engine/tools.ts · project/deliverable/vscode/src/extension.ts |
+| [[dsp-the-state-declaration]] | el-state-declaration · if-project-producer-to-state-declaration · if-record-store-to-state-declaration · if-state-declaration-to-account · if-state-declaration-to-engine-delta · if-state-declaration-to-method-compiler · if-walk-engine-to-state-declaration | project/deliverable/engine/statedecl.ts · project/deliverable/engine/paths.ts · project/deliverable/engine/produce.ts · project/deliverable/engine/search.ts · project/deliverable/engine/tables.ts · project/deliverable/engine/vault.ts |
+| [[dsp-the-update-channel]] | el-update-runner · el-change-reporter · if-change-reporter-to-update-runner | project/deliverable/engine/update.ts |
+| [[dsp-trace-corpus]] | el-account | project/deliverable/engine/trace.ts · project/deliverable/engine/traceschema.ts · project/deliverable/engine/frontmatter.ts · project/deliverable/engine/bin/backfill-minted.ts |
+| [[dsp-unattended-entrypoint]] | el-entrypoint · if-bootstrap-to-entrypoint · if-preflight-to-entrypoint · if-project-producer-to-entrypoint · if-entrypoint-to-walk-engine | project/deliverable/engine/bin/se-start.ts · project/deliverable/package.json |
+| [[dsp-walk-machine]] | el-walk-engine · if-method-compiler-to-walk-engine · if-record-store-to-walk-engine | project/deliverable/engine/session.ts · project/deliverable/engine/sessionclaims.ts · project/deliverable/engine/machine.ts · project/deliverable/engine/pull.ts · project/deliverable/engine/route.ts · project/deliverable/engine/atamwalk.ts · project/deliverable/engine/conditions.ts · project/deliverable/engine/scale.ts · project/deliverable/engine/readproof.ts · project/deliverable/engine/sessionreads.ts · project/deliverable/engine/sessionviews.ts · project/deliverable/engine/sessionscript.ts |
+| [[dsp-write-guard]] | el-walk-engine | project/deliverable/engine/guard.ts · project/deliverable/engine/rules.ts · project/deliverable/engine/vocabulary.ts · project/deliverable/engine/sweep.ts · project/deliverable/engine/bin/sweep.ts · project/deliverable/engine/files.ts · project/deliverable/engine/tools.ts |
+
+## follow_up
+
+- verification is next, then fix-findings, then gate-implementation.
+- ONE NAMED FILE IS STILL A STUB IN PART. `benchmark-guard.ts` exists and two of its four functions return neutral answers, because conceal-the-reports-while-a-run-is-bound is blocked. The file is claimed by `dsp-benchmark-guard` and the spec says so in its own body.
+- THE COVERAGE LAW NOW HAS A SWEEP. `tests/design-coverage-sweep.test.ts` runs it over the real trace on every battery, so an uncovered crossing fails where it was minted instead of surfacing states later on somebody else's iteration.
+- gate-implementation has to rule on `req-the-benchmark-history-is-unreadable-while-a-run-is-bound`, which cannot ship here.
+
+## anything_else
+
+THIS STATE IS WHERE THE DESIGN-COVERAGE LAW WAS ALWAYS SUPPOSED TO GET ITS TEETH, and the interesting thing is that it had them at specify-build too — for a corpus nobody had ever swept.
+
+THE LAW READS THE WHOLE CORPUS AND FIRED ONLY AT TWO STATES. It landed as an owner ruling on 2026-08-11, nothing swept what came before it, and eleven battery cases exercised it against synthetic fixtures. So the logic was green the entire time the corpus was in breach, and the bill arrived on whichever iteration next stood here.
+
+THE OWNER ASKED HOW THAT COULD HAPPEN and the answer is that pair: corpus-wide in scope, state-local in trigger, and no sweep. It is recorded as `raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger`, which stays OPEN because two of its three known instances are fixed and the SHAPE is not.
+
+THE THIRD INSTANCE TURNED UP IN THIS SAME MILESTONE. `$claim-specs` handed observe-red twenty-one checkboxes, twenty of them other iterations', and the only way to tick those is to assert a red nobody observed. What settles that one as a defect rather than a choice is that the state disagreed with itself: `red-observed.ts` filters test specs by `minted_in` and the form half filtered nothing.
+
+TRUNK HAD ALREADY GENERALISED THE FIX while this walk was making it by hand, and the merge took trunk's version whole.
