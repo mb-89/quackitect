@@ -15,7 +15,7 @@ import { strict as assert } from "node:assert";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { type ChangeColumn, compileColumn, matrixDir, readRigorMatrix } from "../engine/rigor-matrix.ts";
+import { CHANGE_COLUMNS, type ChangeColumn, compileColumn, matrixDir, readRigorMatrix } from "../engine/rigor-matrix.ts";
 import { freshRoot } from "./helpers.ts";
 
 const SIZE: ChangeColumn = "major";
@@ -34,15 +34,19 @@ async function sizing(): Promise<Sizing> {
   return (await import("../engine/sizing.ts")) as unknown as Sizing;
 }
 
-function setComplexity(abs: string, judgement: string, reading: string): void {
+function setComplexity(abs: string, judgement: string, reading: string, col: string = SIZE): void {
   const text = readFileSync(abs, "utf8");
   const end = text.indexOf("\n---", 3);
   assert.ok(end > 0, "the row must have frontmatter to edit");
-  writeFileSync(
-    abs,
-    `${text.slice(0, end)}\ncomplexity:\n  ${SIZE}:\n    judgement: ${judgement}\n    reading: ${reading}${text.slice(end)}`,
-    "utf8",
-  );
+  writeFileSync(abs, `${text.slice(0, end)}\n${col}_complexity: ${judgement}/${reading}${text.slice(end)}`, "utf8");
+}
+
+/** THE LINE THAT TURNS THE LOAD-TIME REFUSAL ON. The engine reads the matrix
+ *  folder's own README for it, so a fixture that wants the refusal has to say
+ *  the thing that makes it binding — which is the point of putting it there. */
+function declareRated(root: string): void {
+  const abs = join(matrixDir(root), "README.md");
+  writeFileSync(abs, `${readFileSync(abs, "utf8")}\n\nEVERY ACTIVE CELL CARRIES A COMPLEXITY.\n`, "utf8");
 }
 
 function appliedRows(root: string): { name: string; file: string; seeds?: string }[] {
@@ -52,10 +56,19 @@ function appliedRows(root: string): { name: string; file: string; seeds?: string
     .map((r) => ({ name: r.name, file: r.file, seeds: r.seeds }));
 }
 
-function rateEverything(root: string, skip?: string): void {
-  for (const r of appliedRows(root)) {
-    if (r.seeds !== undefined || r.name === skip) continue;
-    setComplexity(join(matrixDir(root), "rows", r.file), "C2", "R2");
+/** RATE EVERY CELL THAT OWES ONE, IN EVERY COLUMN. Rating only `major` leaves
+ *  the other three columns unrated, and the load-time refusal then fires on
+ *  whichever row it reaches first — which is a true refusal about the wrong
+ *  cell, and it made this file's own case pass for the wrong reason once. */
+function rateEverything(root: string, skip?: { name: string; column: string }): void {
+  const matrix = readRigorMatrix(root);
+  for (const row of matrix.rows) {
+    if (row.seeds !== undefined) continue;
+    for (const col of CHANGE_COLUMNS) {
+      if (matrix.cells.get(row.name)?.get(col)?.applies === "none") continue;
+      if (skip !== undefined && skip.name === row.name && skip.column === col) continue;
+      setComplexity(join(matrixDir(root), "rows", row.file), "C2", "R2", col);
+    }
   }
 }
 
@@ -72,7 +85,8 @@ test("a row that applies and declares nothing is a loud refusal", () => {
   const root = freshRoot();
   const victim = appliedRows(root).find((r) => r.seeds === undefined);
   assert.ok(victim !== undefined, "the column must apply at least one non-seeding row");
-  rateEverything(root, victim.name);
+  rateEverything(root, { name: victim.name, column: SIZE });
+  declareRated(root);
   assert.throws(
     () => readRigorMatrix(root),
     (e: Error) => e.message.includes(victim.name) && e.message.includes(SIZE),
@@ -83,10 +97,49 @@ test("a row that applies and declares nothing is a loud refusal", () => {
 test("a row that does not apply in a column owes nothing there", () => {
   const root = freshRoot();
   const matrix = readRigorMatrix(root);
-  const absent = matrix.rows.find((r) => matrix.cells.get(r.name)?.get(SIZE)?.applies === "none");
-  assert.ok(absent !== undefined, "the major column must exclude at least one row for this to mean anything");
+  // ANY column that excludes any row. Naming `major` here would have made
+  // this case vacuous, because the live matrix applies every row at `major`.
+  const excluded = matrix.rows.flatMap((r) =>
+    CHANGE_COLUMNS.filter((c) => matrix.cells.get(r.name)?.get(c)?.applies === "none").map((c) => ({ row: r.name, column: c })),
+  );
+  assert.ok(excluded.length > 0, "some row must be excluded somewhere for this to mean anything");
   rateEverything(root);
-  assert.doesNotThrow(() => readRigorMatrix(root), "a row not walked here has no work to size");
+  declareRated(root);
+  assert.doesNotThrow(
+    () => readRigorMatrix(root),
+    `a row not walked in a column has no work to size there — ${excluded.length} such cells stand unrated`,
+  );
+  const after = readRigorMatrix(root);
+  assert.equal(
+    after.cells.get(excluded[0].row)?.get(excluded[0].column)?.difficulty,
+    undefined,
+    "and it carries no difficulty either, rather than a default nobody chose",
+  );
+});
+
+test("an unrated matrix still loads, and refuses at the point of use instead", async () => {
+  const root = freshRoot();
+  const matrix = readRigorMatrix(root);
+  const bare = matrix.rows.find((r) => matrix.cells.get(r.name)?.get(SIZE)?.applies !== "none" && r.seeds === undefined);
+  assert.ok(bare !== undefined, "the column must apply at least one non-seeding row");
+  assert.equal(matrix.cells.get(bare.name)?.get(SIZE)?.difficulty, undefined, "nothing is rated yet, and that is not a load failure");
+  const { difficultyOf } = await sizing();
+  assert.throws(() => difficultyOf({ id: bare.name }), "nothing proceeds without a complexity — the refusal moves, it does not disappear");
+});
+
+test("an unreadable complexity refuses whether the matrix is rated or not", () => {
+  const root = freshRoot();
+  const victim = appliedRows(root).find((r) => r.seeds === undefined);
+  assert.ok(victim !== undefined, "the column must apply at least one non-seeding row");
+  const abs = join(matrixDir(root), "rows", victim.file);
+  const text = readFileSync(abs, "utf8");
+  const end = text.indexOf("\n---", 3);
+  writeFileSync(abs, `${text.slice(0, end)}\n${SIZE}_complexity: sideways${text.slice(end)}`, "utf8");
+  assert.throws(
+    () => readRigorMatrix(root),
+    (e: Error) => e.message.includes("C0") && e.message.includes("R0"),
+    "a wrong value is always wrong, and the refusal names both vocabularies",
+  );
 });
 
 test("a row that seeds a sub-machine may not carry a difficulty", () => {

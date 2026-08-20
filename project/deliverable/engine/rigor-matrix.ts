@@ -70,11 +70,47 @@ export interface RigorMatrixRow {
   follow_up_label?: string;
 }
 
+/** HOW HARD THE JUDGEMENT IS, AND HOW MUCH HAS TO BE READ — two ordinal
+ *  figures, because the corpus holds both extremes. A finder state reads one
+ *  method card and asks for deep original judgement; a partition state reads
+ *  forty-nine function nodes and renders a table. One scalar calls both
+ *  `major` (raid-dec-difficulty-is-two-figures-and-is-named-per-state). */
+export interface CellDifficulty {
+  judgement: string;
+  reading: string;
+}
+
 export interface RigorMatrixCell {
   row: string;
   column: RigorMatrixColumn;
   applies: "full" | "tailored" | "inherit" | "none";
   body: string;
+  /** WHAT THIS ROW COSTS IN THIS COLUMN. Absent where the row does not apply
+   *  here, and absent on a row that SEEDS a sub-machine — a placeholder for
+   *  work that happens elsewhere has no difficulty of its own
+   *  (exp-two-hands-rating-the-same-six-cells). */
+  difficulty?: CellDifficulty;
+}
+
+/** THE FIGURES, ordered. The rung a pair asks for is the HIGHER of the two
+ *  positions: under-driving produces a plausible wrong answer that passes,
+ *  over-driving only costs money. */
+export const JUDGEMENT_RUNGS = ["C0", "C1", "C2", "C3", "C4"] as const;
+export const READING_RUNGS = ["R0", "R1", "R2", "R3", "R4"] as const;
+
+/** A DIFFICULTY IS ONE SCALAR ON THE CELL, `<column>_complexity: C3/R1`.
+ *  It is a scalar for the same reason `applies` and `<column>_note` are: a
+ *  Bases table edits a cell inline and cannot edit a nested map. */
+function parseDifficulty(raw: unknown, row: string, col: string): CellDifficulty {
+  if (typeof raw !== "string") throw new Error(`matrix row ${row} carries a non-text ${col}_complexity`);
+  const [judgement = "", reading = ""] = raw.trim().split("/");
+  if (!(JUDGEMENT_RUNGS as readonly string[]).includes(judgement) || !(READING_RUNGS as readonly string[]).includes(reading)) {
+    throw new Error(
+      `matrix row ${row} carries an unreadable ${col}_complexity "${raw}" — the shape is <judgement>/<reading>, ` +
+        `judgement one of ${JUDGEMENT_RUNGS.join(" ")} and reading one of ${READING_RUNGS.join(" ")}`,
+    );
+  }
+  return { judgement, reading };
 }
 
 export interface RigorMatrix {
@@ -293,6 +329,12 @@ function rowsStamp(dir: string): string {
   const rows = join(dir, "rows");
   const parts: string[] = [];
   try {
+    // THE README IS AN INPUT TO THE LOAD, so it is an input to the stamp. Its
+    // rated line decides whether a missing complexity refuses, and a cache key
+    // that ignores a file the answer depends on serves a stale answer with
+    // nothing to say it did.
+    const readme = statSync(join(dir, "README.md"));
+    parts.push(`README.md:${readme.size}:${readme.mtimeMs}`);
     for (const file of readdirSync(rows)
       .filter((f) => f.endsWith(".md"))
       .sort()) {
@@ -319,6 +361,7 @@ export function rigorMatrixContentHash(root: string): string {
     return hit.hash;
   }
   const h = createHash("sha256");
+  h.update(complexityRequiredIn(dir) ? "rated" : "unrated");
   for (const file of readdirSync(join(dir, "rows"))
     .filter((f) => f.endsWith(".md"))
     .sort()) {
@@ -414,7 +457,93 @@ function mergeSameAs(dir: string, row: RigorMatrixRow, fm: Record<string, unknow
 // The column value is the cell; `<column>_note` is its prose. Both are
 // scalars, because a Bases table edits a cell inline and cannot edit a
 // nested map.
-function cellsOf(rows: RigorMatrixRow[], fmByName: Map<string, Record<string, unknown>>): Map<string, Map<string, RigorMatrixCell>> {
+/** WHAT A CELL OWES AND WHAT IT MAY NOT CARRY —
+ *  req-every-matrix-row-declares-its-complexity.
+ *
+ *  A ROW THAT APPLIES HERE OWES A DIFFICULTY, and a missing one refuses loudly
+ *  naming the row and the column. A default would be a judgement nobody made,
+ *  wearing the clothes of one somebody did.
+ *
+ *  A ROW THAT DOES NOT APPLY OWES NOTHING. `applies: none` means the row is not
+ *  walked in this column, so there is no work to size.
+ *
+ *  A ROW THAT SEEDS A SUB-MACHINE MAY NOT CARRY ONE. It is a placeholder for
+ *  work that happens elsewhere, and the two readers who rated six cells
+ *  disagreed on exactly the one row of that shape, both naming it their
+ *  least-sure for the same reason. The rating belongs on the states the
+ *  sub-machine seeds. */
+function difficultyFor(
+  fm: Record<string, unknown>,
+  row: RigorMatrixRow,
+  col: string,
+  applies: string,
+  root: string,
+): { difficulty?: CellDifficulty } {
+  const raw = fm[`${col}_complexity`];
+  if (row.seeds !== undefined) {
+    if (raw !== undefined) {
+      throw new Error(
+        `matrix row ${row.name} seeds ${row.seeds} and carries a ${col}_complexity — a placeholder for work that happens ` +
+          `elsewhere has no difficulty of its own; rate the states it seeds`,
+      );
+    }
+    return {};
+  }
+  if (applies === "none") return {};
+  // ONLY A CHANGE-SIZE COLUMN OWES A DIFFICULTY, which is what the
+  // requirement says in as many words: "every row in every CHANGE-SIZE column
+  // in which that row applies". `specification` is the fifth column and it is
+  // not one — it says how the row is documented, not how hard it is to walk.
+  if (!(CHANGE_COLUMNS as readonly string[]).includes(col)) {
+    if (raw !== undefined) {
+      throw new Error(`matrix row ${row.name} carries a ${col}_complexity, and ${col} is not a change-size column`);
+    }
+    return {};
+  }
+  if (raw === undefined) {
+    // A MISSING RATING REFUSES AT THE POINT OF USE AND NOT AT LOAD, WHILE THE
+    // MATRIX IS UNRATED. `difficultyOf` throws for a step that has none, so
+    // nothing ever proceeds without one — which is what the requirement is
+    // about. Refusing here instead would make the product unloadable until
+    // all 154 active cells are rated, and rating them is the matrix owner's
+    // judgement rather than this build's.
+    //
+    // THE SEAM CLOSES BY ITSELF. `complexityRequired` reads the folder's
+    // README for the line that says every cell is rated; once it is there, a
+    // missing one refuses at load exactly as the requirement asks. The check
+    // is on the file rather than on a flag in code, so turning it on is the
+    // same act as writing down that it is true.
+    if (!complexityRequired(root)) return {};
+    throw new Error(
+      `matrix row ${row.name} applies at ${col} and declares no ${col}_complexity — how strong a hand a step needs is ` +
+        `an explicit value, never a default`,
+    );
+  }
+  return { difficulty: parseDifficulty(raw, row.name, col) };
+}
+
+/** THE LINE THAT TURNS THE LOAD-TIME REFUSAL ON. It lives in the matrix
+ *  folder's own README because saying "every cell is rated" and MAKING it
+ *  binding should be one act, not two that can disagree. */
+const RATED_MARK = "EVERY ACTIVE CELL CARRIES A COMPLEXITY.";
+
+function complexityRequiredIn(dir: string): boolean {
+  try {
+    return readFileSync(join(dir, "README.md"), "utf8").includes(RATED_MARK);
+  } catch {
+    return false;
+  }
+}
+
+function complexityRequired(root: string): boolean {
+  return complexityRequiredIn(matrixDir(root));
+}
+
+function cellsOf(
+  rows: RigorMatrixRow[],
+  fmByName: Map<string, Record<string, unknown>>,
+  root: string,
+): Map<string, Map<string, RigorMatrixCell>> {
   const cells = new Map<string, Map<string, RigorMatrixCell>>();
   for (const row of rows) {
     const fm = fmByName.get(row.name)!;
@@ -433,6 +562,7 @@ function cellsOf(rows: RigorMatrixRow[], fmByName: Map<string, Record<string, un
         column: col as RigorMatrixColumn,
         applies: applies as RigorMatrixCell["applies"],
         body: typeof note === "string" ? note.trim() : "",
+        ...difficultyFor(fm, row, col, applies, root),
       });
     }
     cells.set(row.name, per);
@@ -458,7 +588,7 @@ function readRigorMatrixFresh(root: string): RigorMatrix {
       if (!byName.has(d)) throw new Error(`matrix row ${row.name} depends on undeclared row ${d}`);
     }
   }
-  return { rows, cells: cellsOf(rows, fmByName), root };
+  return { rows, cells: cellsOf(rows, fmByName, root), root };
 }
 
 /** Priority anchors per state kind (the autonomy scale's bands). */

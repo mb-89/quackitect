@@ -15,10 +15,20 @@ files:
 
 ## Where a difficulty is declared
 
-ON THE CELL, BY HAND, PER CHANGE-SIZE COLUMN. A matrix row already carries one
-key per column holding its `applies` value — `major: full`, `patch: none`.
-The difficulty is a second value on the same cell, so the pair lives where the
-judgement about that row in that column already lives.
+ON THE CELL, BY HAND, PER CHANGE-SIZE COLUMN, AS ONE SCALAR. A matrix row
+already carries one key per column holding its `applies` value — `major: full`,
+`patch: none` — and a `<column>_note` beside it. The difficulty is a third key
+in the same shape: `major_complexity: C3/R1`.
+
+IT IS A SCALAR AND NOT A NESTED MAP, corrected 2026-08-20. This spec first said
+a `complexity:` block keyed by column, each holding two figures. The loader's
+own comment says why that cannot work: "Both are scalars, because a Bases table
+edits a cell inline and cannot edit a nested map." A shape the surface cannot
+edit puts the rating out of reach of the person who does the rating.
+
+THE TWO FIGURES RIDE ONE STRING, `<judgement>/<reading>`, and an unreadable one
+refuses naming both vocabularies. That keeps the pair together where a reader
+looks, at the cost of a parse the nested shape would not have needed.
 
 IT IS PER COLUMN AND NOT PER ROW, and this was measured rather than assumed.
 `draft-vision` spans three rungs across its columns and not monotonically: it
@@ -31,6 +41,19 @@ A COLUMN WHERE THE ROW DOES NOT APPLY OWES NOTHING. `applies: none` means the
 row is not walked there, so there is no work to size. The loader refuses a
 MISSING difficulty only where `applies` is one of `full`, `tailored` or
 `inherit`.
+
+AND THE LOAD-TIME REFUSAL IS OFF UNTIL THE MATRIX SAYS IT IS RATED. Turning it
+on before the 154 active cells carry values would make the product unloadable,
+and rating them is the matrix owner's judgement rather than this build's.
+
+SO A MISSING RATING REFUSES AT THE POINT OF USE INSTEAD, and nothing ever
+proceeds without one — `difficultyOf` throws for a step that has none. The
+requirement's demand is that the engine never proceed without a complexity, and
+that holds either way.
+
+THE SEAM IS ONE LINE IN THE MATRIX FOLDER'S OWN README, and the check reads the
+file rather than a flag in code. Saying "every active cell carries a complexity"
+and MAKING it binding is then one act rather than two that can disagree.
 
 A PLACEHOLDER ROW THAT SEEDS A SUB-MACHINE CARRIES NO DIFFICULTY OF ITS OWN, and
 this is `exp-two-hands-rating-the-same-six-cells`'s promotion. Two independent

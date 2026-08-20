@@ -29,16 +29,16 @@ function anAppliedRow(root: string): { name: string; file: string } {
   return { name: row.name, file: row.file };
 }
 
-/** Write a complexity onto a row's frontmatter, under the change-size column
- *  it applies in. The shape is the one dsp-the-sizing-block declares: a
- *  `complexity:` block keyed by column, each holding two figures. */
+/** Write a complexity onto a row's frontmatter for the change-size column it
+ *  applies in. ONE SCALAR, `<column>_complexity: C3/R1`, for the same reason
+ *  `applies` and `<column>_note` are scalars: a Bases table edits a cell
+ *  inline and cannot edit a nested map. */
 function setComplexity(root: string, file: string, judgement: string, reading: string): void {
   const abs = join(matrixDir(root), "rows", file);
   const text = readFileSync(abs, "utf8");
   const end = text.indexOf("\n---", 3);
   assert.ok(end > 0, "the row must have frontmatter to edit");
-  const block = `\ncomplexity:\n  ${SIZE}:\n    judgement: ${judgement}\n    reading: ${reading}`;
-  writeFileSync(abs, text.slice(0, end) + block + text.slice(end), "utf8");
+  writeFileSync(abs, `${text.slice(0, end)}\n${SIZE}_complexity: ${judgement}/${reading}${text.slice(end)}`, "utf8");
 }
 
 test("a declared complexity is visible on the loaded cell", () => {
@@ -48,7 +48,7 @@ test("a declared complexity is visible on the loaded cell", () => {
   const cell = readRigorMatrix(root).cells.get(name)?.get(SIZE);
   assert.ok(cell !== undefined, "the cell must load");
   assert.deepEqual(
-    (cell as unknown as { complexity?: unknown }).complexity,
+    cell.difficulty,
     { judgement: "C3", reading: "R1" },
     "the loader exposes what the cell declares — without this the guards below measure nothing",
   );
@@ -60,7 +60,7 @@ test("changing a complexity moves no demand digest", () => {
   setComplexity(root, file, "C1", "R1");
   const before = demandsFor(readRigorMatrix(root), SIZE)[name];
   const abs = join(matrixDir(root), "rows", file);
-  writeFileSync(abs, readFileSync(abs, "utf8").replace("judgement: C1", "judgement: C4"), "utf8");
+  writeFileSync(abs, readFileSync(abs, "utf8").replace(`${SIZE}_complexity: C1/R1`, `${SIZE}_complexity: C4/R1`), "utf8");
   const after = demandsFor(readRigorMatrix(root), SIZE)[name];
   assert.deepEqual(after, before, "the demand a step asks for is untouched by how hard the step is");
 });
@@ -71,7 +71,7 @@ test("changing a complexity moves no step shape", () => {
   setComplexity(root, file, "C1", "R1");
   const before = demandsFor(readRigorMatrix(root), SIZE)[name].shape;
   const abs = join(matrixDir(root), "rows", file);
-  writeFileSync(abs, readFileSync(abs, "utf8").replace("reading: R1", "reading: R4"), "utf8");
+  writeFileSync(abs, readFileSync(abs, "utf8").replace(`${SIZE}_complexity: C1/R1`, `${SIZE}_complexity: C1/R4`), "utf8");
   assert.equal(demandsFor(readRigorMatrix(root), SIZE)[name].shape, before, "the shape is the topology, and a difficulty is not topology");
 });
 
