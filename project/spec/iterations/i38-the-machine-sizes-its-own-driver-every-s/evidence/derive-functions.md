@@ -1,8 +1,8 @@
 ---
 form: derive-functions
 by: agent
-signed_off: 2026-08-20T11:28:01.600Z
-reopened: "2026-08-20T11:09:16.268Z — write-requirements was re-signed after it: the complexity value is now per column, and flow-step-difficulty and the obtain function describe a per-row value"
+signed_off: 2026-08-20T11:39:45.220Z
+reopened: "2026-08-20T11:39:18.684Z — its neutrality section admitted one impurity and missed two, and a typing defect stood under it: reduce-a-milestone declared the same flow as input and output"
 authors: agent
 files:
 ---
@@ -48,7 +48,15 @@ flow-step-difficulty's statement says "as the step itself declares it", which en
 
 fn-...stamp-who-answered-and-where names TWO things in one function, and a stricter reading would split it. It stays one because the two coordinates are worthless apart and the requirement says the record grows both or neither — splitting the function would invite building half.
 
-THE TEST I APPLIED: could a completely different implementation satisfy these five? Yes — a derived rating, a capability-word mapping, a published value on any channel, and a call record of any shape carrying two fields. That is the bar, and four of the five clear it cleanly.
+THE TEST I APPLIED: could a completely different implementation satisfy these? THE FIRST ANSWER WAS "four of the five clear it cleanly" AND IT OVERSTATED BY ONE. An adversarial pass found two more impurities this section had missed while it was congratulating itself on admitting one.
+
+SECOND IMPURITY, NOW ADMITTED. `resolve-a-difficulty-to-a-driver` says "from one standing mapping", which commits to the fixed-table decision — a runtime router or a per-host resolver cannot satisfy it. This section listed that phrase among the NEUTRAL ones, and its own test varied only what the mapping HOLDS, never whether there is one standing mapping at all. The commitment stays, because the requirement it serves makes it explicitly and a function neutral about it could be traced to nothing. But it is an impurity and it is named on the node now.
+
+THIRD IMPURITY, AND IT IS THE SUBTLE ONE. This section claimed the pull was kept out — "publish outward" rather than "put a model name on the pull". The STATEMENT does avoid it. The NODE declares `outputs: flow-instruction`, which this form's own follow-up calls the flow a pull hands back. THE PULL IS WIRED IN THROUGH THE OUTPUT TYPE while the prose says it was kept out, and the disclosure sat two sections away in the same form.
+
+SO THE HONEST TALLY IS THREE IMPURITIES IN FIVE FUNCTIONS: one admitted at first writing, two found by somebody else. THE PATTERN IS WORTH MORE THAN THE COUNT — a neutrality check run by the author of the thing being checked found the impurity it had already decided to accept and missed the two it had not thought about.
+
+AND A TYPING DEFECT STOOD UNDER THIS SECTION with no reading catching it. `reduce-a-milestone-to-one-difficulty` declared `flow-step-difficulty` as both its input and its output, so a milestone maximum travelled typed as a step-level value and the reduction was invisible. `flow-milestone-difficulty` now exists and carries the spread with it. A section claiming the layer was checked for exactly this class did not check the types.
 
 ## follow_up
 
@@ -69,6 +77,10 @@ THE TEST I APPLIED: could a completely different implementation satisfy these fi
 - IT BELONGS ON TWO. fn-...resolve-a-difficulty-to-a-driver is where repeatability is true or false: the others read, reduce and publish, and this one turns an input into the decision. fn-...publish-the-driver-outward carries the second half — recording what was read, without which an answer that repeats is reproducible only by luck.
 
 - THIS IS THE MECHANICAL-CHECK ARGUMENT LANDING ON ITS AUTHOR, which is worth more than another example of it landing on somebody else. A coverage rule the engine enforces caught a coverage gap I had just written a paragraph excusing.
+
+- RE-SIGNED AFTER AN ADVERSARIAL PASS. Two missed impurities are now named, a fourth flow is minted, and the reduction emits a different flow from the one it consumes.
+
+- ONE REQUIREMENT ARRIVED FROM UPSTREAM AND NEEDED COVERING: req-a-weaker-driver-than-named-owes-a-recorded-reason, from the extension the completeness criterion had skipped. It hangs on fn-...stamp-who-answered-and-where, which is where the record grows a field the server knows about the call.
 
 ## anything_else
 
