@@ -224,3 +224,13 @@
 {"ts":"2026-08-20T11:36:35.511Z","op":"update","visit":"iterations/i38/probe-assumptions@2","node":"d114","brief":"probe-assumptions re-signed with true figures and withdrawn claims"}
 {"ts":"2026-08-20T11:36:59.962Z","op":"update","visit":"iterations/i38/gate-requirements@1","node":"d115","brief":"minting the missing milestone-difficulty flow"}
 {"ts":"2026-08-20T11:37:00.084Z","op":"update","visit":"iterations/i38/gate-requirements@1","node":"d116","brief":"the reduction now emits a milestone-level flow"}
+{"ts":"2026-08-20T11:41:46.613Z","op":"done","visit":"iterations/i38/derive-criteria@0","node":"d91","brief":"criteria derived; one axis added and the standing set reused"}
+{"ts":"2026-08-20T11:42:27.744Z","op":"update","visit":"iterations/i38/probe-assumptions@3","node":"d117","brief":"aiming at the gate"}
+{"ts":"2026-08-20T11:42:39.856Z","op":"update","visit":"iterations/i38/probe-assumptions@3","node":"d118","brief":"submitting probe-assumptions after the re-earn"}
+{"ts":"2026-08-20T11:42:49.293Z","op":"update","visit":"iterations/i38/probe-assumptions@3","node":"d119","brief":"taking the gate door"}
+{"ts":"2026-08-20T11:43:21.444Z","op":"update","visit":"iterations/i38/probe-assumptions@3","node":"d120","brief":"re-earning probe-assumptions once more, in order"}
+{"ts":"2026-08-20T11:43:22.174Z","op":"update","visit":"iterations/i38/probe-assumptions@3","node":"d121","brief":"probe-assumptions re-signed; content unchanged"}
+{"ts":"2026-08-20T11:44:05.686Z","op":"update","visit":"iterations/i38/gate-requirements@1","node":"d122","brief":"re-ruling the requirements gate on repaired evidence"}
+{"ts":"2026-08-20T11:44:06.208Z","op":"update","visit":"iterations/i38/gate-requirements@1","node":"d123","brief":"gate re-ruled on repaired evidence"}
+{"ts":"2026-08-20T11:44:24.197Z","op":"update","visit":"iterations/i38/gate-requirements@1","node":"d124","brief":"verdict recast as a legal choice"}
+{"ts":"2026-08-20T11:44:24.943Z","op":"update","visit":"iterations/i38/gate-requirements@1","node":"d125","brief":"requirements gate re-blessed on repaired evidence"}

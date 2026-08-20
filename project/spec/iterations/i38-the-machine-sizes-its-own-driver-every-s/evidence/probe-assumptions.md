@@ -1,8 +1,8 @@
 ---
 form: probe-assumptions
 by: agent
-signed_off: 2026-08-20T11:36:36.012Z
-reopened: "2026-08-20T11:36:09.134Z — its refusal figures were taken over a tail window imposed by the query limit, its clause list was recalled rather than read, and its claim that every typed clause recovered in one turn was never measured"
+signed_off: 2026-08-20T11:43:22.505Z
+reopened: "2026-08-20T11:43:21.446Z — identify-assumptions was re-signed after it in the repair pass, so it answers older ground; its own content is unchanged"
 authors: agent
 files:
 ---
@@ -114,6 +114,8 @@ ONE STANDING UNPROBED, HONESTLY. raid-asm-the-model-ladder-is-a-total-order cann
 - WORTH SAYING BECAUSE IT IS THE THIRD SHAPE OF THE SAME ERROR IN THREE MILESTONES. M1 recalled a number. M2 read a listing by eye. M3 ran a program that silently dropped a row. Each correction adopted the previous lesson and met a new mechanism. THE PATTERN IS NOT CARELESSNESS ABOUT METHOD — it is that no method carries its own check, and the cross-check for this one was already on the record: this iteration established fifty-three rows at its kickoff and wrote fifty-two four milestones later without either figure noticing the other.
 
 - RE-SIGNED AFTER AN ADVERSARIAL PASS. Two of this state's three probe results were reported over populations the state chose without saying so, and one was not a measurement at all. The falsification of the per-column assumption — this state's actual result — was itself half wrong and is corrected in the entry: the SPREAD stands, the NON-MONOTONICITY was manufactured by quoting one of a note's two sentences and is withdrawn.
+
+- RE-EARNED after the M3 adversarial repairs re-signed the states above it. Nothing in this form moved; the corrections landed on the requirement set, the function layer and the register entries it references.
 
 ## anything_else
 

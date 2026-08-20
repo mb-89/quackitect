@@ -1,8 +1,8 @@
 ---
 form: identify-assumptions
 by: agent
-signed_off: 2026-08-20T11:13:15.232Z
-reopened: "2026-08-20T11:12:56.718Z — its environment sweep says forty-six of fifty-two rows vary by column; it is forty-seven of fifty-three, because the counting script truncated each file at three thousand characters and one long row lost a cell"
+signed_off: 2026-08-20T11:40:54.607Z
+reopened: "2026-08-20T11:40:50.176Z — the states above it were re-signed during the M3 repairs, so it answers older ground"
 authors: agent
 files:
 ---
@@ -52,6 +52,8 @@ THE SWEEP WAS ACTUALLY PERFORMED THIS TIME, which needs saying: this iteration h
 - AND THE CROSS-CHECK WAS ALREADY ON THE RECORD. This iteration established at its kickoff that the matrix has fifty-three rows. Four milestones later it wrote fifty-two and nothing compared the two. The lesson is not "count by program" — it is that a count owes a sanity check against a figure already established.
 
 - THE CONCLUSION IS UNTOUCHED. Forty-seven of fifty-three is the same finding as forty-six of fifty-two, and the assumption it supported was falsified at the next state on different evidence entirely — draft-vision's own column notes, read rather than counted.
+
+- RE-EARNED after the M3 adversarial repairs re-signed the states above it. Nothing in this form moved; the corrections landed on the requirement set, the function layer and the register entries it references.
 
 ## anything_else
 
