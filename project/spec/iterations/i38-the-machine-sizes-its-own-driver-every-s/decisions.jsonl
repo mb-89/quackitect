@@ -107,3 +107,12 @@
 {"ts":"2026-08-20T10:07:35.553Z","op":"update","visit":"iterations/i38/scope-non-goals@0","node":"d102","brief":"aiming at the gate rather than choosing a door"}
 {"ts":"2026-08-20T10:07:58.059Z","op":"update","visit":"iterations/i38/scope-non-goals@0","node":"d103","brief":"re-earning scope-non-goals after frame-delta moved"}
 {"ts":"2026-08-20T10:07:58.739Z","op":"update","visit":"iterations/i38/scope-non-goals@0","node":"d104","brief":"scope re-earned; nothing in it moved"}
+{"ts":"2026-08-20T10:32:34.504Z","op":"update","visit":"iterations/i38/start@0","node":"d6","brief":"aiming at ship, which is an iterations only target"}
+{"ts":"2026-08-20T10:32:41.233Z","op":"done","visit":"front_desk@0","node":"d1","brief":"i38 re-entered and aimed at ship"}
+{"ts":"2026-08-20T10:33:02.280Z","op":"done","visit":"front_desk@0","node":"d2","brief":"picked up at map-stakeholders"}
+{"ts":"2026-08-20T10:35:00.765Z","op":"update","visit":"iterations/i38/map-stakeholders@0","node":"d7","brief":"recording the owner answer on evidence-binding versus review"}
+{"ts":"2026-08-20T10:35:37.984Z","op":"done","visit":"front_desk@0","node":"d3","brief":"field report takes the evidence-binding answer"}
+{"ts":"2026-08-20T10:36:06.000Z","op":"update","visit":"iterations/i38/map-stakeholders@0","node":"d8","brief":"minting the assessor role the cast names and no node carried"}
+{"ts":"2026-08-20T10:36:34.765Z","op":"update","visit":"iterations/i38/map-stakeholders@0","node":"d9","brief":"map-stakeholders: five roles, and the always-on classes ruled"}
+{"ts":"2026-08-20T10:37:00.044Z","op":"update","visit":"iterations/i38/map-stakeholders@0","node":"d10","brief":"registering the role-coverage hole this state left"}
+{"ts":"2026-08-20T10:37:00.162Z","op":"update","visit":"iterations/i38/map-stakeholders@0","node":"d11","brief":"map-stakeholders signed"}

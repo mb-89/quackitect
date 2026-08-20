@@ -210,6 +210,87 @@ Registered as `raid-iss-a-call-cannot-be-attributed-to-the-state-it-was-made-in`
 i38 has taken the fix into scope because its own fourth goal cannot be
 delivered without it.
 
+
+## F11 — why the fabrications were not caught, and what would catch them
+
+OWNER QUESTION, 2026-08-20, after the motivation gate failed: "the pressure
+test is this idea where we have a PR-FAQ. Not sure that needs to catch
+internals. The question is more: why was the fabrication not caught? Would the
+assertion+evidence system help here?"
+
+### The pressure test was not the state that failed
+
+THE PR-FAQ TESTS THE VISION. Why now, why us, what breaks, what it costs, what
+was given up. Whether `machines/scale.md` declares five rungs or six is not a
+question a press release or a hostile customer would ever ask.
+
+AN EARLIER NOTE IN THIS REPORT CRITICISED THE PRESSURE TEST FOR MISSING THE
+FABRICATIONS. That was wrong and is withdrawn here.
+
+THE STATE THAT FAILED IS THE GATE'S ROUND 0, whose own words are "open what the
+evidence points at; a bless is not proof". On its first ruling it re-checked
+three claims already checked at the kickoff and called that opening the
+evidence. It did not open the register, did not test its own measurement, and
+did not count the population behind its own headline figure.
+
+### The seven, classified by what would have caught them
+
+FIVE DIE TO EVIDENCE-BINDING — a claim that cannot be written without an
+attached query the engine re-runs.
+
+- "six autonomy rungs": recall written as measurement.
+- "three method cards carry the word": the search HAD been run and its counts
+  list came back TRUNCATED; the head was written as the whole.
+- "whatever names a driver has somewhere to hand it to": no measurement existed
+  at all, in the same declarative voice as the measured sentences beside it.
+- "nothing in the standing register was re-derived": true, and not the claim
+  the state asked for, which was that it was RE-READ.
+- "referenced from both new nodes": a statement of intent, not of fact.
+
+TWO SURVIVE IT, and they are the two that matter.
+
+- "thirteen of fourteen pinned records": re-running the count gives exactly
+  that. The arithmetic was right and the POPULATION was wrong — eleven of the
+  fourteen are shipped, so the live exposure is two. Evidence supports the
+  number; the number does not support the conclusion.
+- "the mechanism works and the coordinate is simply absent": the command was
+  real and reproduces. The INFERENCE was invalid. What killed it was a NEGATIVE
+  CONTROL — `group_by: "banana"` returns the same single bucket.
+
+### The finding
+
+THE TWO KINDS ARE DISJOINT AND SO ARE THEIR GUARDS. Evidence-binding kills
+FABRICATION cheaply and mechanically. It cannot touch WRONG INFERENCE from
+sound evidence, which needs a negative control or an adversarial reader.
+
+SO THE ARGUMENT FOR BUILDING IT IS NOT THAT IT REPLACES REVIEW. It is that the
+adversarial pass currently spends most of its budget finding stale numbers.
+Take fabrication off the table mechanically and the same reviewer spends its
+whole budget on inference, which is the only thing it is actually good at.
+
+ONE CAUTION THAT DECIDES THE DESIGN. Evidence that merely RESOLVES is not
+enough. `scale.md:8` attached to "six rungs" resolves fine and is still false.
+The evidence must be RE-EXECUTED and compared, not pointed at — otherwise the
+fabrication moves down one level and hides better.
+
+THE PIECES ALREADY EXIST HERE: `source_refs` on register nodes; the `refs`
+field template that refuses a reference not resolving to a standing node of
+that type; SE-C-138 refusing frontmatter the reader cannot load. What is
+missing is that discipline for PROSE CLAIMS INSIDE EVIDENCE FORMS, which is
+where all seven of these lived.
+
+### And it is i38's own seam
+
+A CLAIM WHOSE EVIDENCE A CHECKER CAN RE-RUN IS C2 — a named method over named
+inputs, procedural failure a checker can see. A claim only a reader can judge
+is C3. An assertion+evidence system is a mechanism for MOVING CLAIMS FROM C3 TO
+C2, which is the same move this iteration argues about for states.
+
+THAT IS A REASON TO TAKE THE SCAN'S FIRST RECOMMENDATION SERIOUSLY at M3 —
+derive a rung from what will judge the output — because the same idea has just
+been demonstrated on this milestone's own evidence, at this milestone's own
+expense.
+
 ## Leads for whoever opens an engine iteration
 
 Collected here because none of them is i38's work and none would survive the
