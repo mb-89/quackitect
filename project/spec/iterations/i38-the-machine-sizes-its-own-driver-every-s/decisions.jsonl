@@ -357,3 +357,9 @@
 {"ts":"2026-08-20T13:01:24.944Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d242","brief":"reading the over-driving-rate option node, last read of the scoring pass"}
 {"ts":"2026-08-20T13:02:10.366Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d243","brief":"carrying probe measurements into three open register entries"}
 {"ts":"2026-08-20T13:06:52.010Z","op":"plan","visit":"iterations/i38/evaluate-set@0","parent":null,"nodes":[{"id":"d244","brief":"land the spawned scorer's table"},{"id":"d245","brief":"compute the front"},{"id":"d246","brief":"write the reading"},{"id":"d247","brief":"sign evaluate-set"}]}
+{"ts":"2026-08-20T13:07:29.452Z","op":"plan","visit":"iterations/i38/gate-candidates@0","parent":null,"nodes":[{"id":"d248","brief":"read the gate form"},{"id":"d249","brief":"commission the hostile pass"},{"id":"d250","brief":"fill round 0"},{"id":"d251","brief":"bless or fail"}]}
+{"ts":"2026-08-20T13:10:55.516Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d252","brief":"gate-candidates rounds 0 and 1, holding the submit for the pass"}
+{"ts":"2026-08-20T13:11:12.220Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d253","brief":"bound_breaches as one line per item"}
+{"ts":"2026-08-20T13:12:34.262Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d254","brief":"gate reasons_hold: the move favoured the baseline and changed nothing"}
+{"ts":"2026-08-20T13:13:17.225Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d255","brief":"correcting six of seven to five of seven in the fan measurement"}
+{"ts":"2026-08-20T13:13:17.379Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d256","brief":"same correction in the gate's fifth goal"}
