@@ -729,3 +729,51 @@ laws, the field checks and the per-editor checks live apart from it.
 THEY RENDER NOTHING AND WRITE NOTHING. A check answers with the sentence a
 person reads and stops there — the caller decides whether that sentence blocks
 a save, greys a claim, or only shows in the panel.
+
+
+## A checklist over the whole corpus asks for a lie
+
+`$claim-specs` RESOLVED EVERY NON-TEST SPEC IN THE PROJECT, with no owner. Two
+states use it — observe-red and verification — and both are per-iteration acts.
+
+WHAT THAT ASKS FOR. observe-red asks whether every new check failed BEFORE the
+build. Handed twenty-one specs, twenty of them other iterations', a walk can
+satisfy it in one way: tick boxes for reds it never observed, on specs it did
+not author, whose reds were observed months ago if at all.
+
+THE SAME SHAPE ALREADY BIT ONCE AND WAS ALREADY FIXED. `$promotions` returned
+every promoted experiment in the project. i2 promoted a batch reader and i3's
+build form still demanded it. The ruling of 2026-08-13 scoped it to the owning
+record and `tests/promotions-stay-home.test.ts` pins it.
+
+`$claim-specs` SITS ONE FUNCTION ABOVE `$promotions` IN THE SAME FILE and was
+left unscoped.
+
+## The state disagreed with itself, which is what settles it
+
+observe-red's ENGINE half is scoped. `engine/bin/red-observed.ts` reads each
+test spec's `minted_in` and skips every one that is not the record standing
+there.
+
+observe-red's FORM half was not. One state, two halves, opposite answers about
+whose specs it is asking about — so this is a defect rather than a design
+choice, and no assumption about verification is needed to see it.
+
+## The fix
+
+`claimSpecItems` takes the evidence directory and filters on `minted_in`,
+exactly as `promotionItems` does six lines below it.
+
+VERIFICATION NARROWS WITH IT, and that is intended rather than collateral.
+`observed green by FRESH EYES` is a per-iteration act too, and the corpus-wide
+reading grows without bound — twenty-one specs today, every iteration, forever.
+A standing corpus-wide obligation is a battery sweep, not a checkbox an agent
+ticks.
+
+## What it belongs to
+
+THE GENERAL SHAPE IS `raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger`.
+This is its third measured instance in one iteration: the design-coverage law,
+the register's grading condition, and this checklist. The first two land as work
+an iteration did not create; this one lands as a request to assert something
+untrue, which is worse.

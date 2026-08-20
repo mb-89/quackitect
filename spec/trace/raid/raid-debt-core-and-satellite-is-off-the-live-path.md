@@ -7,7 +7,7 @@ statement: The core and satellite cluster is built and tested, and nothing the r
 owner: the driving agent
 trigger: when the run mode is first flipped away from inline, or at the code-review iteration
 status: open
-looked: 2026-08-19
+looked: 2026-08-20
 impact: A whole subsystem drifts from the engine it is meant to carry, and its green tests read as proof it works.
 breaks_how_badly: corrosive
 how_likely: expected
@@ -143,3 +143,12 @@ quietly dropped.
 
 THAT SECOND GAP IS THE ONE WORTH A DECISION. A cut nobody can point to an
 authorisation for is indistinguishable from a cut nobody authorised.
+
+## Swept 2026-08-20, at the standalone retro after i37 shipped
+
+RE-AFFIRMED AS STANDING, trigger unchanged. i37 did not touch what this entry
+is about, so nothing here moved.
+
+THE LOOK IS THE POINT. A debt nobody re-reads is a lie in the ledger, and this
+line is the evidence that somebody read it on this date.
+

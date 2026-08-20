@@ -20,6 +20,18 @@ export interface CallRecord {
   response?: unknown;
   /** see dsp-call-log.md#the-acting-role-is-stamped-where-the-call-is-served */
   actor?: "human" | "agent" | "ui";
+  /** WHERE THE CALL LANDED, stamped by the code that knows — the same rule the
+   *  actor above follows. The stamp is taken AFTER the handler runs, so a pull
+   *  that moved the walk carries its DESTINATION, and a refusal carries where
+   *  it stood when it was refused.
+   *
+   *  IT USED TO BE INFERRED AND THE INFERENCE DOES NOT HOLD. Cost per state was
+   *  to be recovered by carrying each pull's `where` forward from its RESPONSE;
+   *  measured on this project's own log, 2,233 of 2,298 pull responses are
+   *  capped to invalid JSON and 31 are recoverable. A trail nobody can partition
+   *  cannot answer which state cost what.
+   *  see dsp-call-log.md#the-walk-position-is-stamped-not-inferred */
+  where?: string[];
   se_version: string;
 }
 
@@ -49,6 +61,10 @@ export function slowMs(): number {
 
 /** see dsp-call-log.md#the-live-files-ceiling */
 const ROTATE_BYTES = 12 * 1024 * 1024;
+
+/** How many archives the retro-boundary scan reads before giving up.
+ *  see dsp-call-log.md#the-boundary-scan-crosses-rotations */
+const ARCHIVE_SCAN = 12;
 
 /** How often the size is checked. A stat is cheap; a stat per append is
  *  still a syscall on the hot path for nothing. */
@@ -85,6 +101,11 @@ export class CallLog {
     } catch {
       // a rotation that cannot happen must never cost a record
     }
+  }
+
+  /** One file's lines, or none where it is absent. */
+  private read(p: string): string[] {
+    return existsSync(p) ? stripBom(readFileSync(p, "utf8")).split("\n") : [];
   }
 
   /** The archives, OLDEST FIRST — the order the live file continues from, so
@@ -162,7 +183,7 @@ export class CallLog {
    *  Without that, the first retro after a rotation would silently mine half
    *  its window and report a clean run that was not clean. */
   private lines(since?: string): string[] {
-    const read = (p: string): string[] => (existsSync(p) ? stripBom(readFileSync(p, "utf8")).split("\n") : []);
+    const read = (p: string): string[] => this.read(p);
     const live = read(this.path);
     if (since === undefined) return live;
     const reaches = (ls: string[]): boolean => {
@@ -201,13 +222,41 @@ export class CallLog {
    *  truncated mining window reports almost nothing and reads as finished,
    *  and retro.md step 1 already promised the behaviour this now has.
    *
-   *  A drain older than the live file is a retro that ended before the
-   *  rotation, and the live file's start is the honest answer rather than a
-   *  scan of every archive. */
+   *  THE SCAN CROSSES ROTATIONS, corrected 2026-08-20. It used to read the
+   *  LIVE FILE ALONE and call the live file's start "the honest answer" for a
+   *  drain older than it. That reasoning assumed a rotation lands between
+   *  retros. It does not: this log rotates every 12 MB, which this project
+   *  fills in under a day, so a rotation lands INSIDE an iteration.
+   *
+   *  MEASURED at the retro that fixed it. The live file held 1,613 records
+   *  back to 10:57 that morning; the archive beside it held 14,460 more,
+   *  reaching to the previous afternoon. The window the retro mined was 10%
+   *  of the period it was mining, and nothing said so — the same silent
+   *  truncation the paragraph above exists to prevent, in a new place.
+   *
+   *  SO ARCHIVES ARE SEARCHED NEWEST FIRST until a judged drain turns up. The
+   *  scan is bounded: past ARCHIVE_SCAN, the previous retro is prehistory and
+   *  the oldest record actually read is as good a floor as any. */
   private lastRetroMark(): string | undefined {
+    const live = this.mark(this.lines());
+    if (live.judged !== undefined) return live.judged;
+    let first = live.first;
+    let scanned = 0;
+    for (const p of this.archives().reverse()) {
+      if (++scanned > ARCHIVE_SCAN) break;
+      const m = this.mark(this.read(p));
+      if (m.judged !== undefined) return m.judged;
+      if (m.first !== undefined) first = m.first;
+    }
+    return first;
+  }
+
+  /** The newest judged drain in one file's lines, and that file's first
+   *  timestamp. Split out so the archive walk above can ask it per file. */
+  private mark(lines: string[]): { judged?: string; first?: string } {
     let judged: string | undefined;
     let first: string | undefined;
-    for (const line of this.lines()) {
+    for (const line of lines) {
       // The first parseable record dates the live file. Only this one line is
       // parsed speculatively — the whole-log parse is what killed the server
       // in 2026-08-09, and the substring guard below still holds for the rest.
@@ -224,7 +273,7 @@ export class CallLog {
         if (d === "carried" || d === "backlog") judged = rec.ts;
       } catch {}
     }
-    return judged ?? first;
+    return { judged, first };
   }
 
   /** see dsp-call-log.md#the-whole-log-parse-was-the-server-killer */

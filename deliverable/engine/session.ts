@@ -46,6 +46,7 @@ import {
   formTemplatePath,
   lintForm,
   parseFormTemplate,
+  reopenedAfterSigning,
   scaffoldInstance,
   withBy,
   withFieldContent,
@@ -65,7 +66,7 @@ import {
   pinIteration,
   readItRecord,
 } from "./iterations.ts";
-import { withPass } from "./notes.ts";
+import { noteOf, withPass } from "./notes.ts";
 import { pathKind, resolveInRoot, seDir } from "./paths.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { probesMissed, readingProbes } from "./readproof.ts";
@@ -1409,8 +1410,13 @@ export class Session {
         const t = decl.states.find((s) => s.id === e.to);
         return t !== undefined && t.submachine === undefined;
       });
+    // see dsp-walk-machine.md#a-reopened-placeholder-is-walked-to-not-through
     const land = (pfx: string, t: StateDecl, tick: RouteNode["nexts"][number]["tick"]): void => {
       const at = Session.qual(pfx, t.id);
+      if (t.submachine !== undefined && this.placeholderOwesItsOwnClaim(decl, t)) {
+        nexts.push({ to: at, tick });
+        return;
+      }
       if (t.submachine !== undefined) {
         // Only a GENERATED sub is a record. An authored sub-machine is part of
         // the method's own drawing and is walked through as it always was.
@@ -1428,21 +1434,7 @@ export class Session {
       if (t === undefined) continue;
       land(prefix, t, { from: q, to: e.to });
     }
-    // A TERMINAL closes the machine exactly as end does (machine.ts), so
-    // the pop out of it is a real hop the route must see — without it the
-    // walk wedges on a shipped state with no drawn way out.
-    if ((st.kind === "end" || st.kind === "terminal") && prefix !== "") {
-      const pcut = prefix.lastIndexOf("/");
-      const pprefix = pcut < 0 ? "" : prefix.slice(0, pcut);
-      const pid = pcut < 0 ? prefix : prefix.slice(pcut + 1);
-      const pdecl = this.declForPrefix(pprefix);
-      const pst = pdecl?.states.find((s) => s.id === pid);
-      for (const e of pst?.edges ?? []) {
-        const t = pdecl?.states.find((s) => s.id === e.to);
-        if (t === undefined) continue;
-        land(pprefix, t, { from: q, advance: true });
-      }
-    }
+    if (st.kind === "end" || st.kind === "terminal") this.popOutNexts(q, prefix, nexts, land);
     return {
       priority: this.entryWeight(prefix, decl, id, st.priority),
       demands: { ...(st.entry ?? {}) },
@@ -1555,6 +1547,14 @@ export class Session {
     const decl = this.declForPrefix(cut < 0 ? "" : target.slice(0, cut))?.states.find(
       (s) => s.id === (cut < 0 ? target : target.slice(cut + 1)),
     );
+    // see dsp-walk-machine.md#a-reopened-placeholder-is-walked-to-not-through
+    if (decl?.submachine !== undefined) {
+      const owner = this.declForPrefix(cut < 0 ? "" : target.slice(0, cut));
+      const it = owner === undefined ? undefined : this.declIteration(owner);
+      const owed =
+        owner !== undefined && it !== undefined && this.owesASignature(decl, it) && !new Set(this.claims.recordDone(owner)).has(decl.id);
+      if (owed) return target;
+    }
     return decl?.submachine !== undefined ? Session.qual(target, this.declForPrefix(target)?.initial ?? "start") : target;
   }
 
@@ -3682,6 +3682,47 @@ export class Session {
   /** Standing on the sub's end: this tick returns to the parent —
    *  whatever the parent's edges enter is what the threshold weighs
    *  and what the read gate demands proven. */
+  /** A TERMINAL closes the machine exactly as end does (machine.ts), so the
+   *  pop out of it is a real hop the route must see — without it the walk
+   *  wedges on a shipped state with no drawn way out.
+   *
+   *  see dsp-walk-machine.md#a-reopened-placeholder-is-walked-to-not-through */
+  private popOutNexts(
+    q: string,
+    prefix: string,
+    nexts: RouteNode["nexts"],
+    land: (pfx: string, t: StateDecl, tick: RouteNode["nexts"][number]["tick"]) => void,
+  ): void {
+    if (prefix === "") return;
+    const pcut = prefix.lastIndexOf("/");
+    const pprefix = pcut < 0 ? "" : prefix.slice(0, pcut);
+    const pid = pcut < 0 ? prefix : prefix.slice(pcut + 1);
+    const pdecl = this.declForPrefix(pprefix);
+    const pst = pdecl?.states.find((s) => s.id === pid);
+    if (pst === undefined || pdecl === undefined) return;
+    if (this.placeholderOwesItsOwnClaim(pdecl, pst)) {
+      nexts.push({ to: Session.qual(pprefix, pst.id), tick: { from: q, advance: true } });
+      return;
+    }
+    for (const e of pst.edges) {
+      const t = pdecl.states.find((s) => s.id === e.to);
+      if (t === undefined) continue;
+      land(pprefix, t, { from: q, advance: true });
+    }
+  }
+
+  /** see dsp-walk-machine.md#a-reopened-claim-is-owed-again — a placeholder
+   *  reopened after signing owes its OWN claim, whatever its sub-machine did. */
+  private placeholderOwesItsOwnClaim(m: MachineDecl, s: StateDecl): boolean {
+    if (s.submachine === undefined) return false;
+    const it = this.declIteration(m);
+    if (it === undefined || !this.owesASignature(s, it)) return false;
+    const fm = noteOf(this.claims.evidenceAbs(it, s.id))?.frontmatter;
+    // ONLY THE REOPENED CASE, and the narrowing is deliberate.
+    // see dsp-walk-machine.md#why-only-reopened-and-not-merely-stale
+    return fm !== undefined && reopenedAfterSigning(fm);
+  }
+
   private advanceOutOfSub(channel: Channel, supplied: Record<string, string>, now: string): Record<string, unknown> {
     const top = this.top()!;
     const { machine: pm, instance: pi } = this.parentOfTop();
@@ -3698,6 +3739,13 @@ export class Session {
       channel,
       supplied,
     );
+    // POP WITHOUT COMPLETING when the parent's own claim was reopened.
+    // see dsp-walk-machine.md#a-reopened-placeholder-is-walked-to-not-through
+    if (this.placeholderOwesItsOwnClaim(pm, parent)) {
+      this.subs.pop();
+      this.notifyChange();
+      return this.landing();
+    }
     this.completeGuarded(pm, pi, top.parentState, "filled", now);
     this.subs.pop();
     if (pi !== this.instance) pi.history.push({ state: top.parentState, outcome: "filled", at: now });
@@ -3975,9 +4023,9 @@ export class Session {
     const { machine, ids } = this.leaves();
     const subState = ids.map((s) => this.state(machine, s)).find((s) => s.submachine !== undefined);
     if (subState === undefined) return;
-    // The containers are GENERATED from the records — their drawn canvases
-    // are stubs (owner design 2026-07-27). A generated machine's own sub
-    // states (archive decades) come from its parent's subGen.
+    // THE DIVE STILL HAPPENS FOR A PLACEHOLDER THAT OWES ITS OWN CLAIM: the
+    // pop is where the owed claim is honoured, not the entry.
+    // see dsp-walk-machine.md#a-reopened-placeholder-is-walked-to-not-through
     const gen = this.top()?.gen?.subGen?.[subState.id]?.() ?? this.views.genFor(subState.id);
     let decl: MachineDecl;
     if (gen !== undefined) {

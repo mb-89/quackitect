@@ -2,6 +2,7 @@
 import { spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { relative, resolve, sep } from "node:path";
+import { concealedFromLane, isBound } from "./benchmark-guard.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { isRootRef, resolveDeclaredRoot, resolveForRead } from "./paths.ts";
 
@@ -105,11 +106,18 @@ export function search(root: string, query: string, opts: SearchOpts = {}): Sear
       matches: [],
       total: counts.reduce((n, c) => n + c.count, 0),
       truncated: counts.length > limit,
-      counts: counts.slice(0, limit),
+      counts: counts.filter((c) => !concealedFromLane(c.path, isBound(root))).slice(0, limit),
     };
   }
   const unreadable: string[] = [];
-  const matches = opts.ref === undefined ? rgSearch(root, query, opts, unreadable) : gitGrepSearch(root, query, opts.ref, opts);
+  // THE CONCEALMENT, at the one point every match arrives before it is
+  // returned. This verb reaches no exclusion list and no containment seam — it
+  // asks ripgrep and filters the answer here — so the rule has to be asked
+  // here or it does not hold for the verb most likely to find what is hidden.
+  const bound = isBound(root);
+  const matches = (opts.ref === undefined ? rgSearch(root, query, opts, unreadable) : gitGrepSearch(root, query, opts.ref, opts)).filter(
+    (m) => !concealedFromLane(m.path, bound),
+  );
   return {
     query,
     engine: opts.ref === undefined ? "ripgrep" : "git-grep",

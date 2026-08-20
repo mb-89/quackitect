@@ -6,8 +6,8 @@ kind: debt
 statement: This iteration ships its bootstrap without validating it on a genuinely fresh machine, because the machine walking it cannot produce one.
 owner: the owner
 trigger: the first cloud run after this iteration ships
-status: accepted
-looked: 2026-08-19
+status: mitigated
+looked: 2026-08-20
 impact: The acceptance criterion is that a fresh machine, a seed id and one command produce a walking agent. Everything else can be verified here; the freshness cannot. So the criterion is proven in parts and not end to end, and a step that only fails on a clean host stays undetected until somebody uses one.
 breaks_how_badly: corrosive
 how_likely: expected
@@ -133,3 +133,33 @@ handled by the arrival script now. What is live is an environment-sensitive
 CHECK rather than a missing step.
 
 TRIGGER RE-AFFIRMED: the next cloud run.
+
+## REPAID 2026-08-20, at the standalone retro after i37 shipped
+
+THE TRIGGER FIRED A FOURTH TIME AND THE REPAYMENT LANDED. i37 was walked and
+shipped end to end on a cloud box, from 2026-08-19 15:28 to 2026-08-20 13:40.
+
+MEASURED AGAINST THIS ROW'S OWN CRITERIA, each with what proves it:
+
+- THE ARRIVAL RAN TO COMPLETION. `.claude/settings.json` carries a modified
+  time of 2026-08-19 15:28, the same minute the lane started. The arrival hook
+  wrote it. Nobody placed the cage by hand.
+- THE AGENT REACHED ITS FIRST PULL WITH NOTHING EDITED. `.se/engine.log` records
+  the lane starting at 15:28:54. The call log's first agent record is a bare
+  `se_pull` at 15:29:04 — ten seconds later. Between those two timestamps there
+  is no write of any kind in the log.
+- NOTHING REQUIRED READING A HANDOVER. Boot derived the previous session from
+  the call log, which is the mechanism that replaced the handover file.
+
+NONE OF THE THREE PREVIOUS FAILURES RECURRED. Not the seven cloud-only
+discoveries of 2026-08-17, not the `NaN` autonomy argument, and not the
+environment-sensitive prose check. The i35 work and the 2026-08-18 fixes hold.
+
+STATUS MOVED FROM accepted TO mitigated RATHER THAN closed. What is proven is
+one arrival shape on one provider. A different host, or an arrival that is
+handed no branch at all, is still unproven, and this row is where that gets
+re-asked.
+
+THE TRIGGER IS NARROWED, not dropped: a cloud run on a host this project has
+not run on before.
+

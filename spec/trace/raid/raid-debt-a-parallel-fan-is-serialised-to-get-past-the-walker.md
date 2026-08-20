@@ -5,7 +5,7 @@ type: "[[raid]]"
 kind: debt
 statement: The consistency sweep was rewired to run after the demonstrations rather than beside them, because the walker cannot resume a fan leg once the leg it took was a submachine, so the method lost a parallel branch to get past an engine defect.
 owner: the owner
-looked: 2026-08-19
+looked: 2026-08-20
 status: open
 breaks_how_badly: corrosive
 how_likely: expected
@@ -112,3 +112,18 @@ time anybody draws a fan with a nested leg. Nothing has.
 
 A `looked` FIELD WAS ADDED HERE TODAY. It had none, along with the two other
 entries minted at i16, so no sweep could tell when it was last read.
+
+## Swept 2026-08-20, at the standalone retro after i37 shipped
+
+THE NEIGHBOURING ENGINE DEFECT IS FIXED AND THIS ONE IS NOT. i37 fixed the
+placeholder that could never be re-signed: `placeholderOwesItsOwnClaim` in
+`deliverable/engine/session.ts` is now asked by all three paths, so a
+state whose work is a sub-machine can be re-signed.
+
+THAT IS THE SAME AREA AND A DIFFERENT DEFECT. This row is about RESUMING a fan
+leg after taking a sub-machine leg, not about re-signing the leg itself. The
+sweep did not confuse the two, and the method still carries the serialised
+shape.
+
+RE-AFFIRMED AS STANDING. Trigger unchanged.
+

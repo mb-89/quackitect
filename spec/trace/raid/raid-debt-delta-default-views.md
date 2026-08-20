@@ -7,7 +7,7 @@ statement: The reference views still list the whole corpus - the minted_in stamp
 owner: the driving agent
 trigger: the next form opened in a record whose table lists another record's nodes, or the owner's next reiteration of the delta demand
 status: open
-looked: 2026-08-19
+looked: 2026-08-20
 breaks_how_badly: abrasive
 how_likely: expected
 impact: Every reference table in a record lists the standing corpus beside the delta - 38 test-specs where 7 are the iteration's own - and the reader wades through history, exactly what the owner has flagged three times.
@@ -110,3 +110,12 @@ ranker are now built, at `engine/query.ts` line 45 and `engine/disposition.ts`
 line 70. Neither is the resolver this debt is about.
 
 TRIGGER RE-AFFIRMED and still fires on any form listing another record's nodes.
+
+## Swept 2026-08-20, at the standalone retro after i37 shipped
+
+RE-AFFIRMED AS STANDING, trigger unchanged. i37 did not touch what this entry
+is about, so nothing here moved.
+
+THE LOOK IS THE POINT. A debt nobody re-reads is a lie in the ledger, and this
+line is the evidence that somebody read it on this date.
+

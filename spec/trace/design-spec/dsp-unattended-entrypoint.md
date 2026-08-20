@@ -5,6 +5,10 @@ type: "[[design-spec]]"
 statement: one command from a repository address and an iteration id to a walking agent, seven steps that each fail by name, with the runtime pinned and the lane released
 realizes:
   - el-entrypoint
+  - if-bootstrap-to-entrypoint
+  - if-preflight-to-entrypoint
+  - if-project-producer-to-entrypoint
+  - if-entrypoint-to-walk-engine
 files:
   - deliverable/engine/bin/se-start.ts
   - deliverable/package.json
@@ -104,3 +108,20 @@ executing on no platform at all.
 HOW THE RUNTIME ARRIVES. A declared image would delete verify and install
 entirely, and [[cand-the-host-is-declared]] was not adopted. The steps are
 written so an image can replace them later without changing the other five.
+
+
+## What the entrypoint hands the walk engine
+
+THE HOST IS MEASURED ONCE, AT BRING-UP, and the profile is handed over with the
+live lane. That crossing is `if-entrypoint-to-walk-engine` and it carries two
+flows: the harness profile and the live lane itself.
+
+WHY IT IS MEASURED HERE AND NOWHERE ELSE. The entrypoint is the only code that
+runs before the engine exists, so it is the only place that can tell the engine
+what it started under. An engine asking mid-walk would be asking about a host it
+is already running on, which cannot fail informatively.
+
+WHAT THE PROFILE IS FOR. The engine serves steps sized for the host it actually
+got. A profile that arrives late, or not at all, is the shape behind two
+measured breaches on `if-agent-harness-to-entrypoint`: a lane restart came back
+without the owner's autonomy grant, twice, and said nothing.

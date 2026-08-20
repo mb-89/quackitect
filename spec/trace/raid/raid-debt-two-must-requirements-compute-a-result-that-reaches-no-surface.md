@@ -8,7 +8,7 @@ owner: the driving agent
 trigger: the next iteration that opens the lane's reporting surfaces
 status: open
 breaks_how_badly: corrosive
-how_likely: certain
+how_likely: expected
 impact: Two must requirements read as met in the corpus and are not met in the running system, so a later reader trusts a diagnosis that is never produced.
 source_refs:
   - spec/trace/requirement/req-interrupted-call-names-the-stopping-layer.md
@@ -67,3 +67,12 @@ decision and it is why the gap was not closed inside i36.
 exist. `verification` checks that the tests are green, and they are. Neither
 check follows a call graph, so a module that only its own test imports looks
 exactly like a wired one. That blind spot is the retro's to consider.
+
+## Swept 2026-08-20, at the standalone retro after i37 shipped
+
+RE-AFFIRMED AS STANDING, trigger unchanged. i37 did not touch what this entry
+is about, so nothing here moved.
+
+THE LOOK IS THE POINT. A debt nobody re-reads is a lie in the ledger, and this
+line is the evidence that somebody read it on this date.
+

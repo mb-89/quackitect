@@ -497,7 +497,6 @@ se_reopen and se_amend join them because A CLAIM IS FIXED FROM OUTSIDE IT
  se_why joins them because A DIAGNOSTIC IS NEEDED EXACTLY WHERE THE WALK IS
  STUCK. A verb that explains why a state is grey, but is only callable from
  states where nothing is grey, is useless at the one moment it exists for.
-
  It was written gated and its own first test caught it: refused at
  boot/read_contract, which is precisely the kind of place somebody asks.
 
@@ -997,8 +996,7 @@ CHOICE POINT: standing on the iterations container with two records
 open, a bare pull left through the container's exit and arrived at the
 desk, because the desk looked like somewhere it had been told to go.
 
-THE REQUIREMENT HAS TWO CONJUNCTS and this is the second: the engine
-"shall enter no iteration AND shall answer with the offer". Leaving
+THE REQUIREMENT HAS TWO CONJUNCTS and this is the second: the engine"shall enter no iteration AND shall answer with the offer". Leaving
 satisfies the first and fails the second, which is exactly the half a
 tester with fresh eyes caught after the builder tested only the first.
 
@@ -1497,7 +1495,6 @@ and at a low dial only a person can. Losing one silently is not the
 same kind of loss, so this one is confirmed rather than assumed.
 
 ## An amend may not break what the signature covers
-
 AN AMEND MAY NOT BREAK WHAT THE SIGNATURE COVERS. Written first and
 judged after, because the check reads the file; a failure puts the
 original back, so a refused amend leaves nothing behind.
@@ -1997,7 +1994,6 @@ EXCEPT ALONG A FALLBACK, AND THAT EXCEPTION IS THE WHOLE REPAIR LOOP
 (owner instruction 2026-08-18: "you do the verification, you fail, you go
 to fix-findings, you go back to verification, you try again... I don't
 know why every agent keeps messing that up").
-
 THEY WERE NOT MESSING IT UP. A fallback edge IS the drawn path for this
 state failing, and this line demanded a GREEN CLAIM before it could be
 walked — which is demanding that the failure not have happened. So a
@@ -2049,6 +2045,52 @@ the machine view, which must draw a route through a sub-machine nobody
 has authored yet. Refusing at ENTRY breaks nothing and closes the hole.
 
 An AUTHORED none is not a scaffold and walks through as it always did.
+
+## A reopened placeholder is walked to, not through
+
+A PLACEHOLDER IS A STATE WHOSE WORK IS A SUB-MACHINE. `run-spikes`,
+`build-steps`, `run-candidates`, `enumerate-space` and `run-demos` are all
+this shape. Its own claim carries no evidence fields, and it stands on the
+signature its evidence file holds.
+
+THREE MECHANISMS USED TO DISAGREE ABOUT WHETHER SUCH A STATE WAS GREEN.
+
+- `recordDone` greens it as soon as its sub-machine's DRAWING is done,
+  whatever its own signature says.
+- The claim guard in `completeGuarded` asks whether its own claim STANDS, and
+  a reopen makes it not stand.
+- The pop out of a sub-machine landed on the parent's SUCCESSORS, so the
+  parent itself had no landing site.
+
+THE THREE MADE A CIRCLE. The parent could only go green once the drawing
+finished, and the drawing could not finish because the parent was not green.
+The walk dived in, completed the sub-machine, and was refused at its end —
+where the placeholder is one frame out and no verb can serve its form.
+
+WHAT IT COST, measured on i37: a full session ended on it, six remedies were
+tried and none applied, and it was written up as a fatal register issue with
+no fix.
+
+### The rule
+
+A placeholder whose own claim was REOPENED is a destination rather than a
+doorway. Three paths now ask one question, `placeholderOwesItsOwnClaim`:
+
+- the router lands ON it instead of on its sub-machine's start;
+- the aim resolves to it instead of resolving past it;
+- the pop out of its sub-machine stands the walk on it, without completing it,
+  so its form is served and the re-sign is what lets the next tick complete.
+
+## Why only reopened, and not merely stale
+
+A STALE PLACEHOLDER — one signed before a feeder re-signed — is held by the
+same guard. Treating it as owed here was tried and made things worse: the walk
+stands on the placeholder, the sub-machine reads unfinished, and there is no
+drawn path back into it.
+
+SO THE STALE CASE KEEPS THE ACT `se_why` ALREADY NAMES. The reopen is what
+puts the claim in a shape the pop can honour, and it is one call the agent is
+already told to make.
 
 ## Only what might need action earns a dot
 

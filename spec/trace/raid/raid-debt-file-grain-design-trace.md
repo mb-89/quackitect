@@ -7,7 +7,7 @@ statement: The design-to-code sweep runs at file grain, so dead code inside a cl
 owner: the driving agent
 trigger: when the file-grain sweep stops finding anything new, or when a region-marker mechanism lands
 status: open
-looked: 2026-08-19
+looked: 2026-08-20
 impact: A dead function inside a live file never surfaces as an unclaimed finding, and only a reachability probe or a reader catches it.
 breaks_how_badly: corrosive
 how_likely: plausible
@@ -59,3 +59,12 @@ WHAT MAKES IT ACCEPTABLE IS UNCHANGED: the coarse sweep is still finding
 things, so this entry's own repayment condition is not met.
 
 TRIGGER RE-AFFIRMED. Neither half has fired.
+
+## Swept 2026-08-20, at the standalone retro after i37 shipped
+
+RE-AFFIRMED AS STANDING, trigger unchanged. i37 did not touch what this entry
+is about, so nothing here moved.
+
+THE LOOK IS THE POINT. A debt nobody re-reads is a lie in the ledger, and this
+line is the evidence that somebody read it on this date.
+

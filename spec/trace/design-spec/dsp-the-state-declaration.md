@@ -5,8 +5,13 @@ type: "[[design-spec]]"
 statement: One declaration says what the machine-state folder is called and which files inside it have a structured door, and every consumer is generated from it rather than written beside it.
 realizes:
   - el-state-declaration
+  - if-project-producer-to-state-declaration
+  - if-record-store-to-state-declaration
+  - if-state-declaration-to-account
+  - if-state-declaration-to-engine-delta
+  - if-state-declaration-to-method-compiler
+  - if-walk-engine-to-state-declaration
 files:
-  - deliverable/engine/statedecl.ts
   - deliverable/engine/paths.ts
   - deliverable/engine/produce.ts
   - deliverable/engine/search.ts
@@ -80,3 +85,14 @@ this iteration on the owner's ruling. The folder open in the editor is the
 project, so nothing needs recognising.
 
 THE DECISION IS raid-dec-the-machine-state-sits-inside-the-opened-folder-and-one-declaration-names-it.
+
+## Where the declaration actually lives, 2026-08-20
+
+`statedecl.ts` IS GONE AND THE DECLARATION IS NOT. It folded into `paths.ts`,
+which already carried the resolution seam this design is about: `seDir` names
+the machine-state folder and `isExcluded` reads the exclusion set beside it.
+
+FOUND BY trace-design, which is where a named file must exist. The name was
+right when i9 wrote it and the code was carried into `paths.ts` afterwards
+without the spec following. One file dropped from the list; nothing else about
+this design changed.

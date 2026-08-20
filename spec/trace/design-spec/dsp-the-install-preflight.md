@@ -6,7 +6,7 @@ statement: One read-only check runs every precondition before the install writes
 realizes:
   - el-preflight
 files:
-  - deliverable/engine/bin/install-preflight.ts
+  - deliverable/engine/bin/preflight.ts
 ---
 
 ## Responsibility
@@ -71,3 +71,18 @@ THE DECISION IS raid-dec-install-is-one-command-behind-a-complete-preflight,
 and it records that the stop-before-partial property becomes a build rather
 than a guarantee. A preflight can be incomplete in a way an image cannot, and
 that is what the graft spent.
+
+## The install preflight is the bring-up preflight, 2026-08-20
+
+`bin/install-preflight.ts` IS GONE AND ITS JOB IS NOT. It is
+`bin/preflight.ts`, which a state declares in its own exit condition:
+
+    exit:
+      script: deliverable/engine/bin/preflight.ts
+
+THE CONCERN DID NOT MOVE, THE WORD DID. i9 wrote this when the path in question
+was an install; it is bring-up now, and `if-preflight-to-entrypoint` already
+says so — the preflight tells the bring-up path whether every precondition
+holds, before the path changes anything.
+
+FOUND BY trace-design, where a named file must exist.

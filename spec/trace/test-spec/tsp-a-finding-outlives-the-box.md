@@ -7,6 +7,8 @@ method: "demonstration"
 demonstrates:
   - "sty-a-finding-outlives-the-box-that-found-it"
 verifies: "none — demonstrates: carries the edge; the pool and mint requirements behind this story are verify_method: test and are carried by tsp-the-mint-crosses-the-boundary and tsp-one-door-into-the-pool"
+files:
+  - "none — a demonstration across two clones; what it observes is what survives outside any one working copy"
 ---
 
 ## Scope
@@ -29,7 +31,7 @@ trunk and the desk's answer, and no component sees more than one of them.
 DEPTH: high. The failure is silent and total — the box is released and the
 finding is simply gone, with nothing left to notice.
 
-## Steps
+## Procedure
 
 - Capture findings on one clone and confirm the raw notes are untracked.
 - Drain each to the pool with an authored statement and a re-entry condition.
