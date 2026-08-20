@@ -479,3 +479,8 @@
 {"ts":"2026-08-20T14:42:51.022Z","op":"update","visit":"iterations/i38/record-adrs@0","node":"d68","brief":"recording decision difficulty-is-two-figures-and-is-name"}
 {"ts":"2026-08-20T14:43:20.883Z","op":"update","visit":"iterations/i38/record-adrs@0","node":"d69","brief":"recording the four deciding ADRs"}
 {"ts":"2026-08-20T14:43:45.465Z","op":"update","visit":"iterations/i38/decompose-structure@0","node":"d70","brief":"on to decompose-structure"}
+{"ts":"2026-08-20T14:48:39.146Z","op":"update","visit":"iterations/i38/decompose-structure@0","node":"d71","brief":"minting el-sizing for the four sizing functions"}
+{"ts":"2026-08-20T14:48:39.299Z","op":"update","visit":"iterations/i38/decompose-structure@0","node":"d72","brief":"allocating the stamp to the account"}
+{"ts":"2026-08-20T14:48:52.892Z","op":"update","visit":"iterations/i38/decompose-structure@0","node":"d73","brief":"re-reading the element matrix after allocation"}
+{"ts":"2026-08-20T14:49:42.841Z","op":"update","visit":"iterations/i38/decompose-structure@0","node":"d74","brief":"decompose-structure: 23 elements, nothing unimplemented"}
+{"ts":"2026-08-20T14:50:15.435Z","op":"update","visit":"iterations/i38/decompose-structure@0","node":"d75","brief":"allocation drawn"}
