@@ -630,3 +630,17 @@
 {"ts":"2026-08-20T08:06:39.757Z","op":"update","visit":"iterations/i37/evaluate-set@0","node":"d11","brief":"walking the re-signed chain forward"}
 {"ts":"2026-08-20T08:06:53.778Z","op":"update","visit":"iterations/i37/run-spikes@0","node":"d12","brief":"walking the re-signed chain forward"}
 {"ts":"2026-08-20T08:06:54.213Z","op":"update","visit":"iterations/i37/run-spikes@0","node":"d13","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:20:50.077Z","op":"update","visit":"iterations/i37/start@0","node":"d8","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:20:51.533Z","op":"update","visit":"iterations/i37/start@0","node":"d9","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:20:53.070Z","op":"update","visit":"iterations/i37/start@0","node":"d10","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:20:53.394Z","op":"update","visit":"iterations/i37/start@0","node":"d11","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:20:53.700Z","op":"update","visit":"iterations/i37/start@0","node":"d12","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:20:54.011Z","op":"update","visit":"iterations/i37/start@0","node":"d13","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:20:55.028Z","op":"update","visit":"iterations/i37/start@0","node":"d14","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:20:57.342Z","op":"update","visit":"iterations/i37/start@0","node":"d15","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:20:59.994Z","op":"update","visit":"iterations/i37/start@0","node":"d16","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:21:23.066Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d17","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:21:43.507Z","op":"update","visit":"iterations/i37/declare-winner@0","node":"d18","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:21:49.860Z","op":"update","visit":"iterations/i37/run-spikes@0","node":"d19","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:21:50.225Z","op":"update","visit":"iterations/i37/run-spikes@0","node":"d20","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:22:10.333Z","op":"update","visit":"iterations/i37/run-spikes@0","node":"d21","brief":"re-signing run-spikes now the walk can reach it"}

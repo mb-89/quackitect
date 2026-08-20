@@ -1,8 +1,8 @@
 ---
 form: run-spikes
-reopened: "2026-08-20T06:59:28.606Z — rank-unknowns re-signed above it after the M6 spikes overturned the declared winner"
 by: agent
-signed_off: 2026-08-19T19:34:22.818Z
+signed_off: 2026-08-20T08:22:10.626Z
+reopened: "2026-08-20T06:59:28.606Z — rank-unknowns re-signed above it after the M6 spikes overturned the declared winner"
 authors: agent
 files:
 ---
@@ -11,24 +11,33 @@ files:
 
 ## current_situation
 
-i37 stands at run-spikes, the placeholder M6 fills with one timeboxed spike per chosen unknown.
+run-spikes, re-signed 2026-08-20 after the walk could reach it again.
 
-Five unknowns were picked at rank-unknowns off the exposure chart. The spikes drawing is authored with one state each, and entering this state runs them.
+IT COULD NOT BE REACHED FOR A WHOLE SESSION. Reopening it — the correct act once rank-unknowns re-signed above it — pinned the walk at its sub-machine's end with no route out and no verb able to serve its form. That was an engine defect and it is fixed on this branch.
 
-The register went green first: twenty entries had to be graded onto the standing scale before this state could be left, and seventeen of them were other iterations' off-scale synonyms.
+All five spikes stand. Three answered, one falls, one holds by a route its question did not name.
 
 ## follow_up
 
-- The five spike states run next, then fold-back and gate-prototype close M6.
-- THE FIRST SPIKE CAN OVERTURN TWO GATES. If the lane can read from a history that ends at the rewind commit, cand-the-guarded-run's structural ceiling becomes available on probed ground, and both gate-candidates and gate-architecture recorded that dissent in advance.
-- THE THIRD IS THE ONE THAT WOULD HURT MOST QUIETLY. If the call log cannot attribute a call to a state, cost per state is not derivable and el-benchmark-report needs a different input — a design change landing after two blessed gates.
+- fold-back is next, then gate-prototype closes M6.
+- THE FOLD-BACK OWES THE REVISIT both blessed gates wrote a trigger for. The truncated history holds, so the structural ceiling is available on probed ground.
+- ONE SPIKE'S VERDICT WAS RE-READ RATHER THAN RE-RUN. The ancestry-bound spike measured 4229 microseconds against a threshold the agent had invented, and the owner caught it. The measurement stands; the judgment does not.
+- THE ENGINE FIX THIS STATE FORCED is on the branch: three paths in session.ts now ask one question about whether a placeholder owes its own claim.
 
 ## anything_else
 
-EVERY SPIKE HERE IS TIMEBOXED IN MINUTES, and that is a claim about this design rather than a preference.
+THIS STATE MADE THE ITERATION'S OWN ARGUMENT BY REFUSING TO BE WALKED.
 
-The winner leans almost entirely on primitives that already exist: git's ancestry answer, git archive, the call log's own records, and the lane's own verbs. Nothing here needs a prototype built to be tested; it needs an existing thing asked a question.
+A prototype milestone overturned a decision. That is what M6 is for, and both gates had written the falsification condition in advance. The correct consequence was to reopen and re-sign the chain beneath it.
 
-THAT IS THE CHEAPEST KIND OF UNKNOWN and it is why five were picked rather than one or two. A spike that costs minutes should not be argued about.
+THE MACHINE COULD NOT EXPRESS THAT CONSEQUENCE. A placeholder — a state whose work is a sub-machine — could not be re-signed once reopened, because three parts of the engine disagreed about whether it was green.
 
-THE ONE UNKNOWN THAT IS NOT HERE is the honesty assumption — whether an agent told its work is discarded walks the same way. It cannot be spiked before the instrument exists, and rank-unknowns says so rather than leaving it looking overlooked.
+- recordDone calls it green as soon as its sub-machine's DRAWING is done, whatever its own signature says.
+- The claim guard asks whether its own claim STANDS, and a reopen makes it not stand.
+- The pop out of a sub-machine lands on the parent's SUCCESSORS, so the parent itself had no landing site.
+
+THE THREE MADE A CIRCLE. The parent could only go green if the drawing finished, and the drawing could not finish because the parent was not green.
+
+WHAT IT COST, MEASURED: one session ended on it, six remedies were tried and none applied, and it was written up as a fatal register issue with no fix.
+
+WHAT A BENCHMARK RUN WOULD HAVE SHOWN: a state visited twice with no transition, and one refusal clause repeating. Both are fields on the report this iteration is designing. The instrument would have named in one line what took a session to find by hand.
